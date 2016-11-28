@@ -52,7 +52,7 @@ namespace Ogre
         /*mWidth( 1 ),
         mHeight( 1 ),
         mNumSlices( 2 ),*/
-        mLightsPerCell( lightsPerCell ),
+        mLightsPerCell( lightsPerCell + 3u ),
         mTableSize( mWidth * mHeight * mLightsPerCell ),
         mMinDistance( minDistance ),
         mMaxDistance( maxDistance ),
@@ -79,7 +79,7 @@ namespace Ogre
         mResolutionAtSlice.back().zEnd = std::numeric_limits<Real>::max();
 
         const size_t p = -((1 - (1 << (mNumSlices << 1))) / 3);
-        mLightCountInCell.resize( p * mWidth * mHeight, 0 );
+        mLightCountInCell.resize( p * mWidth * mHeight, LightCount() );
     }
     //-----------------------------------------------------------------------------------
     Forward3D::~Forward3D()
@@ -183,6 +183,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     inline bool OrderLightByDistanceToCamera( const Light *left, const Light *right )
     {
+        if( left->getType() != right->getType() )
+            return left->getType() < right->getType();
         return left->getCachedDistanceToCameraAsReal() < right->getCachedDistanceToCameraAsReal();
     }
 
@@ -265,7 +267,7 @@ namespace Ogre
         uint16 * RESTRICT_ALIAS gridBuffer = reinterpret_cast<uint16 * RESTRICT_ALIAS>(
                     cachedGrid->gridBuffer->map( 0, cachedGrid->gridBuffer->getNumElements() ) );
 
-        memset( mLightCountInCell.begin(), 0, mLightCountInCell.size() * sizeof(uint32) );
+        memset( mLightCountInCell.begin(), 0, mLightCountInCell.size() * sizeof(LightCount) );
 
         Matrix4 viewMat = camera->getViewMatrix();
         Matrix4 projMatrix = camera->getProjectionMatrix();
@@ -375,6 +377,8 @@ namespace Ogre
             size_t offset           = p * mTableSize;
             size_t offsetLightCount = p * mWidth * mHeight;
 
+            const Light::LightTypes lightType = (*itLight)->getType();
+
             for( uint32 slice=minSlice; slice<=maxSlice; ++slice )
             {
                 //The end of this slice may go past beyond the back face of the AABB.
@@ -401,20 +405,21 @@ namespace Ogre
                 {
                     for( uint32 x=startX; x<=endX; ++x )
                     {
-                        FastArray<uint32>::iterator numLightsInCell = mLightCountInCell.begin() + offsetLightCount +
-                                                                        (y * sliceRes.width) + x;
+                        FastArray<LightCount>::iterator numLightsInCell =
+                                mLightCountInCell.begin() + offsetLightCount + (y * sliceRes.width) + x;
 
                         //assert( numLightsInCell < mLightCountInCell.end() );
 
-                        //mLightsPerCell - 1 because one slot is reserved
-                        //for the number of lights in cell
-                        if( *numLightsInCell < mLightsPerCell - 1 )
+                        //mLightsPerCell - 3 because three slots is reserved
+                        //for the number of lights in cell per type
+                        if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
                         {
-                            uint16 * RESTRICT_ALIAS cellElem = gridBuffer + offset +
-                                                                (y * sliceRes.width + x) * mLightsPerCell +
-                                                                (*numLightsInCell + 1);
-                            ++(*numLightsInCell);
+                            uint16 * RESTRICT_ALIAS cellElem =
+                                    gridBuffer + offset + (y * sliceRes.width + x) * mLightsPerCell +
+                                    (numLightsInCell->lightCount[0] + 3u);
                             *cellElem = i * 6;
+                            ++numLightsInCell->lightCount[0];
+                            ++numLightsInCell->lightCount[lightType];
                         }
                     }
                 }
@@ -431,15 +436,20 @@ namespace Ogre
 
         {
             //Now write all the light counts
-            FastArray<uint32>::const_iterator itor = mLightCountInCell.begin();
-            FastArray<uint32>::const_iterator end  = mLightCountInCell.end();
+            FastArray<LightCount>::const_iterator itor = mLightCountInCell.begin();
+            FastArray<LightCount>::const_iterator end  = mLightCountInCell.end();
 
             const size_t cellSize = mLightsPerCell;
             size_t gridIdx = 0;
 
             while( itor != end )
             {
-                gridBuffer[gridIdx] = static_cast<uint16>( *itor );
+                uint32 accumLight = itor->lightCount[1];
+                gridBuffer[gridIdx+0u] = static_cast<uint16>( accumLight );
+                accumLight += itor->lightCount[2];
+                gridBuffer[gridIdx+1u] = static_cast<uint16>( accumLight );
+                accumLight += itor->lightCount[3];
+                gridBuffer[gridIdx+2u] = static_cast<uint16>( accumLight );
                 gridIdx += cellSize;
                 ++itor;
             }

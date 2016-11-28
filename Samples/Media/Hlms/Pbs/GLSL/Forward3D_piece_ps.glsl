@@ -39,7 +39,7 @@
 	for( uint i=0u; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = texelFetch( f3dGrid, int(sampleOffset + i + 1u) ).x;
+		uint idx = texelFetch( f3dGrid, int(sampleOffset + i + 3u) ).x;
 
 		//Get the light
 		vec4 posAndType = texelFetch( f3dLightList, int(idx) );
@@ -59,46 +59,93 @@
 				atten *= max( (attenuation.x - fDistance) * attenuation.w, 0.0f );
 			@end
 
-			if( posAndType.w == 1.0 )
+			//Point light
+			vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
+			finalColour += tmpColour * atten;
+		}
+	}
+
+	uint prevLightCount = numLightsInGrid;
+	numLightsInGrid		= texelFetch( f3dGrid, int(sampleOffset + 1u) ).x;
+
+	for( uint i=prevLightCount; i<numLightsInGrid; ++i )
+	{
+		//Get the light index
+		uint idx = texelFetch( f3dGrid, int(sampleOffset + i + 3u) ).x;
+
+		//Get the light
+		vec4 posAndType = texelFetch( f3dLightList, int(idx) );
+
+		vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyz;
+		vec3 lightSpecular	= texelFetch( f3dLightList, int(idx + 2u) ).xyz;
+		vec4 attenuation	= texelFetch( f3dLightList, int(idx + 3u) ).xyzw;
+		vec3 spotDirection	= texelFetch( f3dLightList, int(idx + 4u) ).xyz;
+		vec3 spotParams		= texelFetch( f3dLightList, int(idx + 5u) ).xyz;
+
+		vec3 lightDir	= posAndType.xyz - inPs.pos;
+		float fDistance	= length( lightDir );
+
+		if( fDistance <= attenuation.x )
+		{
+			lightDir *= 1.0 / fDistance;
+			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
+			@property( hlms_forward_fade_attenuation_range )
+				atten *= max( (attenuation.x - fDistance) * attenuation.w, 0.0f );
+			@end
+
+			//spotParams.x = 1.0 / cos( InnerAngle ) - cos( OuterAngle )
+			//spotParams.y = cos( OuterAngle / 2 )
+			//spotParams.z = falloff
+
+			//Spot light
+			float spotCosAngle = dot( normalize( inPs.pos - posAndType.xyz ), spotDirection.xyz );
+
+			float spotAtten = clamp( (spotCosAngle - spotParams.y) * spotParams.x, 0.0, 1.0 );
+			spotAtten = pow( spotAtten, spotParams.z );
+			atten *= spotAtten;
+
+			if( spotCosAngle >= spotParams.y )
 			{
-				//Point light
 				vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
 				finalColour += tmpColour * atten;
 			}
-			@property( hlms_instant_radiosity || 1 )
-			else if( posAndType.w == 3.0 )
-			{
-				vec3 lightDir2	= posAndType.xyz - inPs.pos;
-				//lightDir2 *= 1.0 / max( 1, fDistance );
-				//lightDir2 *= 1.0 / fDistance;
-
-				finalColour += BRDF_IR( lightDir2, lightDiffuse ) * atten;
-			}
-			@end
-			else
-			{
-				//spotParams.x = 1.0 / cos( InnerAngle ) - cos( OuterAngle )
-				//spotParams.y = cos( OuterAngle / 2 )
-				//spotParams.z = falloff
-
-				//Spot light
-				vec3 spotDirection	= texelFetch( f3dLightList, int(idx + 4u) ).xyz;
-				vec3 spotParams		= texelFetch( f3dLightList, int(idx + 5u) ).xyz;
-
-				float spotCosAngle = dot( normalize( inPs.pos - posAndType.xyz ), spotDirection.xyz );
-
-				float spotAtten = clamp( (spotCosAngle - spotParams.y) * spotParams.x, 0.0, 1.0 );
-				spotAtten = pow( spotAtten, spotParams.z );
-				atten *= spotAtten;
-
-				if( spotCosAngle >= spotParams.y )
-				{
-					vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
-					finalColour += tmpColour * atten;
-				}
-			}
 		}
 	}
+
+@property( hlms_instant_radiosity || 1 )
+	prevLightCount	= numLightsInGrid;
+	numLightsInGrid	= texelFetch( f3dGrid, int(sampleOffset + 2u) ).x;
+
+	for( uint i=prevLightCount; i<numLightsInGrid; ++i )
+	{
+		//Get the light index
+		uint idx = texelFetch( f3dGrid, int(sampleOffset + i + 3u) ).x;
+
+		//Get the light
+		vec4 posAndType = texelFetch( f3dLightList, int(idx) );
+
+		vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyz;
+		vec4 attenuation	= texelFetch( f3dLightList, int(idx + 3u) ).xyzw;
+
+		vec3 lightDir	= posAndType.xyz - inPs.pos;
+		float fDistance	= length( lightDir );
+
+		if( fDistance <= attenuation.x )
+		{
+			//lightDir *= 1.0 / fDistance;
+			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
+			@property( hlms_forward_fade_attenuation_range )
+				atten *= max( (attenuation.x - fDistance) * attenuation.w, 0.0f );
+			@end
+
+			//vec3 lightDir2	= posAndType.xyz - inPs.pos;
+			//lightDir2 *= 1.0 / max( 1, fDistance );
+			//lightDir2 *= 1.0 / fDistance;
+
+			finalColour += BRDF_IR( lightDir, lightDiffuse ) * atten;
+		}
+	}
+@end
 
 	@property( hlms_forward3d_debug )
 		float occupancy = (numLightsInGrid / pass.f3dGridHWW[0].w);

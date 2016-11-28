@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
+#include "OgreLight.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -72,6 +73,13 @@ namespace Ogre
             TexBufferPacked         *globalLightListBuffer;
         };
 
+        struct LightCount
+        {
+            //We use LT_DIRECTIONAL (index = 0) to contain the total light count.
+            uint32  lightCount[Light::NUM_LIGHT_TYPES];
+            LightCount() { memset( lightCount, 0, sizeof(lightCount) ); }
+        };
+
         typedef vector<CachedGrid>::type CachedGridVec;
         CachedGridVec   mCachedGrid;
         LightArray      mCurrentLightList;
@@ -83,7 +91,7 @@ namespace Ogre
         uint32  mTableSize; /// Automatically calculated, size of the first table, elements.
 
         FastArray<Resolution>   mResolutionAtSlice;
-        FastArray<uint32>       mLightCountInCell;
+        FastArray<LightCount>   mLightCountInCell;
 
         float   mMinDistance;
         float   mMaxDistance;

@@ -33,7 +33,7 @@
 	for( uint i=0u; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = f3dGrid.Load( int(sampleOffset + i + 1u) ).x;
+		uint idx = f3dGrid.Load( int(sampleOffset + i + 3u) ).x;
 
 		//Get the light
 		float4 posAndType = f3dLightList.Load( int(idx) );
@@ -45,7 +45,7 @@
 		float3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
 
-		if( fDistance <= attenuation.x )
+		[branch]if( fDistance <= attenuation.x )
 		{
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
@@ -53,47 +53,94 @@
 				atten *= max( (attenuation.x - fDistance) * attenuation.w, 0.0f );
 			@end
 
-			if( posAndType.w == 1.0 )
+			//Point light
+			float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular, material, nNormal @insertpiece( brdfExtraParams ) );
+			finalColour += tmpColour * atten;
+		}
+	}
+
+	uint prevLightCount = numLightsInGrid;
+	numLightsInGrid		= f3dGrid.Load( int(sampleOffset + 1u) ).x;
+
+	for( uint i=prevLightCount; i<numLightsInGrid; ++i )
+	{
+		//Get the light index
+		uint idx = f3dGrid.Load( int(sampleOffset + i + 3u) ).x;
+
+		//Get the light
+		float4 posAndType = f3dLightList.Load( int(idx) );
+
+		float3 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyz;
+		float3 lightSpecular= f3dLightList.Load( int(idx + 2u) ).xyz;
+		float4 attenuation	= f3dLightList.Load( int(idx + 3u) ).xyzw;
+		float3 spotDirection= f3dLightList.Load( int(idx + 4u) ).xyz;
+		float3 spotParams	= f3dLightList.Load( int(idx + 5u) ).xyz;
+
+		float3 lightDir	= posAndType.xyz - inPs.pos;
+		float fDistance	= length( lightDir );
+
+		[branch]if( fDistance <= attenuation.x )
+		{
+			lightDir *= 1.0 / fDistance;
+			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
+			@property( hlms_forward_fade_attenuation_range )
+				atten *= max( (attenuation.x - fDistance) * attenuation.w, 0.0f );
+			@end
+
+			//spotParams.x = 1.0 / cos( InnerAngle ) - cos( OuterAngle )
+			//spotParams.y = cos( OuterAngle / 2 )
+			//spotParams.z = falloff
+
+			//Spot light
+			float spotCosAngle = dot( normalize( inPs.pos - posAndType.xyz ), spotDirection.xyz );
+
+			float spotAtten = clamp( (spotCosAngle - spotParams.y) * spotParams.x, 0.0, 1.0 );
+			spotAtten = pow( spotAtten, spotParams.z );
+			atten *= spotAtten;
+
+			if( spotCosAngle >= spotParams.y )
 			{
-				//Point light
 				float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular, material, nNormal @insertpiece( brdfExtraParams ) );
 				finalColour += tmpColour * atten;
 			}
-			@property( hlms_instant_radiosity || 1 )
-			else if( posAndType.w == 3.0 )
-			{
-				float3 lightDir2 = posAndType.xyz - inPs.pos;
-				//lightDir2 *= 1.0 / max( 1, fDistance );
-				//lightDir2 *= 1.0 / fDistance;
-
-				finalColour += BRDF_IR( lightDir2, lightDiffuse, material,
-										nNormal @insertpiece( brdfExtraParams ) ) * atten;
-			}
-			@end
-			else
-			{
-				//spotParams.x = 1.0 / cos( InnerAngle ) - cos( OuterAngle )
-				//spotParams.y = cos( OuterAngle / 2 )
-				//spotParams.z = falloff
-
-				//Spot light
-				float3 spotDirection	= f3dLightList.Load( int(idx + 4u) ).xyz;
-				float3 spotParams		= f3dLightList.Load( int(idx + 5u) ).xyz;
-
-				float spotCosAngle = dot( normalize( inPs.pos - posAndType.xyz ), spotDirection.xyz );
-
-				float spotAtten = clamp( (spotCosAngle - spotParams.y) * spotParams.x, 0.0, 1.0 );
-				spotAtten = pow( spotAtten, spotParams.z );
-				atten *= spotAtten;
-
-				if( spotCosAngle >= spotParams.y )
-				{
-					float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular, material, nNormal @insertpiece( brdfExtraParams ) );
-					finalColour += tmpColour * atten;
-				}
-			}
 		}
 	}
+
+@property( hlms_instant_radiosity || 1 )
+	prevLightCount	= numLightsInGrid;
+	numLightsInGrid	= f3dGrid.Load( int(sampleOffset + 2u) ).x;
+
+	for( uint i=prevLightCount; i<numLightsInGrid; ++i )
+	{
+		//Get the light index
+		uint idx = f3dGrid.Load( int(sampleOffset + i + 3u) ).x;
+
+		//Get the light
+		float4 posAndType = f3dLightList.Load( int(idx) );
+
+		float3 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyz;
+		float4 attenuation	= f3dLightList.Load( int(idx + 3u) ).xyzw;
+
+		float3 lightDir	= posAndType.xyz - inPs.pos;
+		float fDistance	= length( lightDir );
+
+		[branch]if( fDistance <= attenuation.x )
+		{
+			//lightDir *= 1.0 / fDistance;
+			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
+			@property( hlms_forward_fade_attenuation_range )
+				atten *= max( (attenuation.x - fDistance) * attenuation.w, 0.0f );
+			@end
+
+			//float3 lightDir2 = posAndType.xyz - inPs.pos;
+			//lightDir2 *= 1.0 / max( 1, fDistance );
+			//lightDir2 *= 1.0 / fDistance;
+
+			finalColour += BRDF_IR( lightDir, lightDiffuse, material,
+									nNormal @insertpiece( brdfExtraParams ) ) * atten;
+		}
+	}
+@end
 
 	@property( hlms_forward3d_debug )
 		float occupancy = (numLightsInGrid / passBuf.f3dGridHWW[0].w);
