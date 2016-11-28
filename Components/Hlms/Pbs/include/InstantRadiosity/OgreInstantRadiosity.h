@@ -152,13 +152,42 @@ namespace Ogre
         uint32          mNumSpreadIterations;
         Real            mSpreadThreshold;
 
+        /// Areas of Interest are defined by both AABB and distance (can be 0). AoIs serve two purposes:
+        ///     1. Define where to shoot the rays (i.e. windows, holes, etc)
+        ///     2. Limit the scope of the rays for performance rasons.
+        ///
+        /// We will shoot rays towards the AABB from the largest distance between the AABB and the sphere
+        /// of radius sphereRadius and center at aabb.mCenter. Only the hits that lay inside
+        /// the AABB or the sphere will be considered.
+        ///
+        /// Example 1:
+        /// Let's suppose for performance reasons you want to restrict AoI to four buildings in a city,
+        /// In this case you set aabb to encompass all 4 buildings, and most likely sphereRadius to 0.
+        ///
+        /// Example 2:
+        /// You have a big building, but only want to shoot rays against the windows to avoid generating
+        /// many unnecesary VPLs that hit the outer walls of the building.
+        /// In this case you generate multiple AABBs each with the shape of each window, and set radius
+        /// to a large value that will create A SPHERE with sphereRadius and center at aabb.mCenter.
+        /// This distance will ensure the rays are hit from a place far enough to hit other walls and
+        /// buidings occluding this object (i.e. the sphere should encompass the entire room or the
+        /// entire house)
+        struct AreaOfInterest
+        {
+            Aabb    aabb;
+            Real    sphereRadius;
+            AreaOfInterest( const Aabb &_aabb, Real _sphereRadius ) :
+                aabb( _aabb ), sphereRadius( _sphereRadius ) {}
+        };
+
         /// Areas of interest. Only used for directional lights. Normally you don't want to
-        /// use this system for empty landscapes because a regular environment map and simple
+        /// use Instant Radiosity for empty landscapes because a regular environment map and simple
         /// math can take care of that. You want to focus on a particular building, or
         /// in different cities; but not everything.
         /// If left unfilled, the system will auto-calculate one (not recommended).
-        typedef vector<Aabb>::type AabbVec;
-        AabbVec         mAoI;
+        /// See AreaOfInterest
+        typedef vector<AreaOfInterest>::type AreaOfInterestVec;
+        AreaOfInterestVec   mAoI;
 
         /// ANY CHANGE TO A mVpl* variable will take effect after calling updateExistingVpls
         /// (or calling build)
@@ -215,7 +244,7 @@ namespace Ogre
         void processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
                            Radian angle, Vector3 lightColour, Real lightRange,
                            Real attenConst, Real attenLinear, Real attenQuad,
-                           const Aabb &areaOfInfluence );
+                           const AreaOfInterest &areaOfInfluence );
 
         /// Generates the ray bounces based on mRayHits[raySrcStart] through
         /// mRayHits[raySrcStart+raySrcCount-1]; generating up to 'raysToGenerate' rays
@@ -231,7 +260,7 @@ namespace Ogre
 
         void testLightVsAllObjects( uint8 lightType, Real lightRange,
                                     ObjectData objData, size_t numNodes,
-                                    const Aabb &areaOfInfluence,
+                                    const AreaOfInterest &areaOfInfluence,
                                     size_t rayStart, size_t numRays );
         void raycastLightRayVsMesh( Real lightRange, const MeshData meshData,
                                     Matrix4 worldMatrix, const MaterialData &material,

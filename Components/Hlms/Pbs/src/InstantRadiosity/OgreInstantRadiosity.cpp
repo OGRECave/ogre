@@ -303,6 +303,13 @@ namespace Ogre
             {
                 const RayHit &alikeHit = *itor;
 
+                if( alikeHit.distance >= std::numeric_limits<Real>::max() )
+                {
+                    itor = efficientVectorRemove( mRayHits, itor );
+                    end  = mRayHits.end();
+                    continue;
+                }
+
                 const Real alikeAccumDistance = alikeHit.accumDistance + alikeHit.distance;
                 Real alikeAtten = Real(1.0f) /
                         (attenConst + (attenLinear +
@@ -570,16 +577,16 @@ namespace Ogre
             }
         }
 
-        mAoI.push_back( Aabb::newFromExtents( areaOfInfluence.getMinimum(),
-                                              areaOfInfluence.getMaximum() ) );
+        Aabb aabb = Aabb::newFromExtents( areaOfInfluence.getMinimum(), areaOfInfluence.getMaximum() );
+        mAoI.push_back( AreaOfInterest( aabb, 0.0f ) );
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
                                          Radian angle, Vector3 lightColour, Real lightRange,
                                          Real attenConst, Real attenLinear, Real attenQuad,
-                                         const Aabb &areaOfInfluence )
+                                         const AreaOfInterest &areaOfInfluence )
     {
-        Aabb rotatedAoI = areaOfInfluence;
+        Aabb rotatedAoI = areaOfInfluence.aabb;
         {
             Matrix4 rotMatrix;
             rotMatrix.makeTransform( Vector3::ZERO, Vector3::UNIT_SCALE, lightRot.Inverse() );
@@ -618,8 +625,8 @@ namespace Ogre
                 Vector3 randomPos;
                 randomPos.x = rng.boxRand() * rotatedAoI.mHalfSize.x;
                 randomPos.y = rng.boxRand() * rotatedAoI.mHalfSize.y;
-                randomPos.z = rotatedAoI.mHalfSize.z + 1.0f;
-                randomPos = lightRot * randomPos + areaOfInfluence.mCenter;
+                randomPos.z = Ogre::max( rotatedAoI.mHalfSize.z, areaOfInfluence.sphereRadius ) + 1.0f;
+                randomPos = lightRot * randomPos + areaOfInfluence.aabb.mCenter;
 
                 mRayHits[i].ray.setOrigin( randomPos );
                 mRayHits[i].ray.setDirection( -lightRot.zAxis() );
@@ -629,6 +636,11 @@ namespace Ogre
             arrayRays->mDirection.setAll( mRayHits[i].ray.getDirection() );
             ++arrayRays;
         }
+
+        //Initialize all other rays (some rays may not be initialized
+        //at all when not all bounced rays end up hitting something)
+        for( size_t i=mNumRays; i<mTotalNumRays; ++i )
+            mRayHits[i].distance = std::numeric_limits<Real>::max();
 
         size_t rayStart = 0;
         size_t numRays = mNumRays;
@@ -701,6 +713,7 @@ namespace Ogre
                 arrayRays[i].mOrigin.setAll( mRayHits[i].ray.getOrigin() );
                 arrayRays[i].mDirection.setAll( mRayHits[i].ray.getDirection() );
 
+                ++rayIdx;
                 --raysRemaining;
             }
         }
@@ -1009,13 +1022,16 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::testLightVsAllObjects( uint8 lightType, Real lightRange,
                                                   ObjectData objData, size_t numNodes,
-                                                  const Aabb &scalarAreaOfInfluence,
+                                                  const AreaOfInterest &scalarAreaOfInfluence,
                                                   size_t rayStart, size_t numRays )
     {
+        Aabb biggestAoI = scalarAreaOfInfluence.aabb;
+        biggestAoI.merge( Aabb( biggestAoI.mCenter, Vector3( scalarAreaOfInfluence.sphereRadius ) ) );
+
         const ArrayInt sceneFlags = Mathlib::SetAll( mVisibilityMask &
                                                      VisibilityFlags::RESERVED_VISIBILITY_FLAGS );
         ArrayAabb areaOfInfluence( ArrayVector3::ZERO, ArrayVector3::ZERO );
-        areaOfInfluence.setAll( scalarAreaOfInfluence );
+        areaOfInfluence.setAll( biggestAoI );
 
         for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
         {
@@ -1063,7 +1079,7 @@ namespace Ogre
 
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
-                //Convert isInAreaOfIterest into something smaller we can work with.
+                //Convert isObjectHitByRays into something smaller we can work with.
                 uint32 scalarIsObjectHitByRays = BooleanMask4::getScalarMask( isObjectHitByRays );
 
                 if( !mTmpRaysThatHitObject[j].empty() &&
@@ -1412,7 +1428,7 @@ namespace Ogre
 
                             for( size_t l=0; l<numAoI; ++l )
                             {
-                                const Aabb &areaOfInfluence = mAoI[l];
+                                const AreaOfInterest &areaOfInfluence = mAoI[l];
                                 processLight( lightNode->_getDerivedPosition(),
                                               lightNode->_getDerivedOrientation(),
                                               light->getType(),

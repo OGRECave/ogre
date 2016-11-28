@@ -66,16 +66,21 @@ namespace Demo
             mLight->setType( Ogre::Light::LT_SPOTLIGHT );
             mLight->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
             mLightNode->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
+            mLight->setAttenuation( 23.0f, 0.5f, 0.0f, 0.5f );
             break;
         case Ogre::Light::LT_POINT:
             mLight->setType( Ogre::Light::LT_POINT );
             mLightNode->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
+            mLight->setAttenuation( 23.0f, 0.5f, 0.0f, 0.5f );
             break;
         case Ogre::Light::LT_DIRECTIONAL:
             mLight->setType( Ogre::Light::LT_DIRECTIONAL );
             mLight->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
+            mLight->setAttenuation( std::numeric_limits<Ogre::Real>::max(), 1.0f, 0, 0 );
             break;
         }
+
+        mInstantRadiosity->build();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::createScene01(void)
@@ -136,6 +141,34 @@ namespace Demo
 
         generateScene( sceneManager );
 
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        mInstantRadiosity = new Ogre::InstantRadiosity( sceneManager, hlmsManager );
+        mInstantRadiosity->mNumSpreadIterations = 0;
+        mInstantRadiosity->setEnableDebugMarkers( !mInstantRadiosity->getEnableDebugMarkers() );
+
+        //Guide where to shoot the rays for directional lights the 3 windows + the
+        //hole in the ceiling). We use a sphere radius of 30 to ensure when the directional
+        //light's dir is towards -X, we actually hit walls (instead of going through these
+        //walls and generating incorrect results).
+        mInstantRadiosity->mAoI.push_back( Ogre::InstantRadiosity::AreaOfInterest(
+                    Ogre::Aabb( Ogre::Vector3( -0.746887f, 7.543859f, 5.499001f ),
+                                Ogre::Vector3( 2.876101f, 2.716137f, 6.059607f ) * 0.5f ), 30.0f ) );
+        mInstantRadiosity->mAoI.push_back( Ogre::InstantRadiosity::AreaOfInterest(
+                    Ogre::Aabb( Ogre::Vector3( -6.26f, 3.969576f, 6.628003f ),
+                                Ogre::Vector3( 1.673888f, 6.04f, 1.3284f ) * 0.5f ), 30.0f ) );
+        mInstantRadiosity->mAoI.push_back( Ogre::InstantRadiosity::AreaOfInterest(
+                    Ogre::Aabb( Ogre::Vector3( -6.26f, 3.969576f, 3.083399f ),
+                                Ogre::Vector3( 1.673888f, 6.04f, 1.3284f ) * 0.5f ), 30.0f ) );
+        mInstantRadiosity->mAoI.push_back( Ogre::InstantRadiosity::AreaOfInterest(
+                    Ogre::Aabb( Ogre::Vector3( -6.26f, 3.969576f, -0.415852f ),
+                                Ogre::Vector3( 1.673888f, 6.04f, 1.3284f ) * 0.5f ), 30.0f ) );
+
+        mInstantRadiosity->mVplPowerBoost = 1.13775f;
+        mInstantRadiosity->mVplMaxRange = 10.97f;
+        mInstantRadiosity->mNumRays = 2048;
+        mInstantRadiosity->mCellSize = 2;
+        mInstantRadiosity->mNumRayBounces = 2;
+
         createLight();
 
         mCameraController = new CameraController( mGraphicsSystem, false );
@@ -146,11 +179,6 @@ namespace Demo
         sceneManager->getForward3D()->setFadeAttenuationRange( true );
 
         TutorialGameState::createScene01();
-
-        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
-        mInstantRadiosity = new Ogre::InstantRadiosity( sceneManager, hlmsManager );
-        mInstantRadiosity->mNumSpreadIterations = 0;
-        mInstantRadiosity->build();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::destroyScene(void)
@@ -180,7 +208,7 @@ namespace Demo
         while( itor != end )
         {
             const SDL_Keysym &keySym = itor->second;
-            const bool reverse = (keySym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
+            const bool reverse = (keySym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) != 0;
             const float modPerFrame = reverse ? -timeSinceLast : timeSinceLast;
             if( keySym.sym == SDLK_h )
             {
@@ -229,6 +257,20 @@ namespace Demo
 
         outText += "\nF2 to toggle debug VPL markers ";
         outText += mInstantRadiosity->getEnableDebugMarkers() ? "[On]" : "[Off]";
+        outText += "\nF3 to change light type ";
+        switch( mCurrentType )
+        {
+        default:
+        case Ogre::Light::LT_SPOTLIGHT:
+            outText += "[Spot]";
+            break;
+        case Ogre::Light::LT_POINT:
+            outText += "[Point]";
+            break;
+        case Ogre::Light::LT_DIRECTIONAL:
+            outText += "[Directional]";
+            break;
+        }
         outText += "\nHold [Shift] to change value in opposite direction";
         outText += "\nVPL Max range [U]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplMaxRange );
@@ -275,9 +317,15 @@ namespace Demo
         {
             mInstantRadiosity->setEnableDebugMarkers( !mInstantRadiosity->getEnableDebugMarkers() );
         }
+        else if( arg.keysym.sym == SDLK_F3 )
+        {
+            mCurrentType = static_cast<Ogre::Light::LightTypes>( (mCurrentType + 1) %
+                                                                 Ogre::Light::LT_VPL );
+            createLight();
+        }
         else if( arg.keysym.sym == SDLK_g )
         {
-            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
+            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) != 0;
             if( reverse )
                 mInstantRadiosity->mNumRays >>= 1u;
             else
@@ -291,7 +339,7 @@ namespace Demo
         }
         else if( arg.keysym.sym == SDLK_k )
         {
-            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
+            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) != 0;
             if( reverse )
             {
                 if( mInstantRadiosity->mNumSpreadIterations )
@@ -307,7 +355,7 @@ namespace Demo
         }
         else if( arg.keysym.sym == SDLK_l )
         {
-            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
+            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) != 0;
             if( reverse )
             {
                 if( mInstantRadiosity->mNumRayBounces )
