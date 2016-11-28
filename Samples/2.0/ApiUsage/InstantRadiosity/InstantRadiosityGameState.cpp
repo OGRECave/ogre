@@ -143,8 +143,7 @@ namespace Demo
 
         Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
         mInstantRadiosity = new Ogre::InstantRadiosity( sceneManager, hlmsManager );
-        mInstantRadiosity->mNumSpreadIterations = 0;
-        mInstantRadiosity->setEnableDebugMarkers( !mInstantRadiosity->getEnableDebugMarkers() );
+        mInstantRadiosity->mVplThreshold = 0.0005f;
 
         //Guide where to shoot the rays for directional lights the 3 windows + the
         //hole in the ceiling). We use a sphere radius of 30 to ensure when the directional
