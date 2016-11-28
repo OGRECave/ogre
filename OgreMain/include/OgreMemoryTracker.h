@@ -42,7 +42,9 @@ THE SOFTWARE.
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
 // We need to define a hash function for void*
 // For gcc 4.3 see http://gcc.gnu.org/gcc-4.3/changes.html
-#   if OGRE_COMP_VER >= 430
+#   if __cplusplus >= 201103L
+#       include <unordered_map>
+#   elif OGRE_COMP_VER >= 430
 #       include <tr1/unordered_map>
 #   else
 #       include <ext/hash_map>

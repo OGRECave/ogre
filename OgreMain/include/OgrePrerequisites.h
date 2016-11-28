@@ -75,7 +75,11 @@ namespace Ogre {
 
     #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
     #   if OGRE_COMP_VER >= 430
-    #       define OGRE_HASH_NAMESPACE ::std::tr1
+    #       if __cplusplus >= 201103L
+    #           define OGRE_HASH_NAMESPACE ::std
+    #       else
+    #           define OGRE_HASH_NAMESPACE ::std::tr1
+    #       endif
     #       define OGRE_HASHMAP_NAME unordered_map
     #       define OGRE_HASHMULTIMAP_NAME unordered_multimap
     #       define OGRE_HASHSET_NAME unordered_set
