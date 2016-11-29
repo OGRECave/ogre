@@ -382,7 +382,9 @@ namespace Ogre {
         size_t getConsecutiveSize() const;
         /** Return a subvolume of this PixelBox.
             @param def  Defines the bounds of the subregion to return
-            @param resetOrigin set origin of the new PixelBox to be (0,0,0)
+            @param resetOrigin Whether to reset left/top/front of returned PixelBox to zero 
+                together with adjusting data pointer to compensate this, or do nothing 
+                so that returned PixelBox will have left/top/front of requested Box
             @return A pixel box describing the region and the data in it
             @remarks    This function does not copy any data, it just returns
                 a PixelBox object with a data pointer pointing somewhere inside 
