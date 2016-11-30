@@ -244,7 +244,7 @@ namespace Ogre {
         {
             // Get Material
             Material* thisMaterial = mati->first;
-
+            thisMaterial->touch();
             // Empty existing cache
             mRenderOp.indexData->indexCount = 0;
             // lock index buffer ready to receive data
@@ -269,11 +269,19 @@ namespace Ogre {
 
             while (pit.hasMoreElements())
             {
-                _setPass(pit.getNext());
+                Pass* pass = pit.getNext();
+                _setPass(pass);
 
+                // Do we need to update GPU program parameters?
+                if (pass->isProgrammable())
+                {
+                    mAutoParamDataSource->setCurrentRenderable(0);
+                    mAutoParamDataSource->setCurrentSceneManager(this);
+                    mAutoParamDataSource->setWorldMatrices(&Matrix4::IDENTITY, 1);
+                    mAutoParamDataSource->setCurrentCamera(mCameraInProgress, false);
+                    updateGpuProgramParameters(pass);
+                }
                 mDestRenderSystem->_render(mRenderOp);
-
-
             } 
 
 
