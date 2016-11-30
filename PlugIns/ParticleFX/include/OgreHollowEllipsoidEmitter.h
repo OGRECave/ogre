@@ -40,13 +40,13 @@ namespace Ogre {
     *  @{
     */
     /** Particle emitter which emits particles randomly from points inside a hollow ellipsoid.
-    @remarks
+
         This particle emitter emits particles from a hollow ellipsoid area.
         The initial direction of these particles can either be a single
         direction (i.e. a line), a random scattering inside a cone, or a random
         scattering in all directions, depending the 'angle' parameter, which
         is the angle across which to scatter the particles either side of the
-        base direction of the emitter. 
+        base direction of the emitter.
     */
     class _OgreParticleFXExport HollowEllipsoidEmitter : public EllipsoidEmitter
     {
@@ -76,32 +76,31 @@ namespace Ogre {
 
         HollowEllipsoidEmitter(ParticleSystem* psys);
 
-        /** See ParticleEmitter. */
         void _initParticle(Particle* pParticle);
 
         /** Sets the size of the clear space inside the area from where NO particles are emitted.
         @param x,y,z
             Parametric values describing the proportion of the shape which is hollow in each direction.
-            E.g. 0 is solid, 0.5 is half-hollow etc
+        @note The values are fractions of the 'outer' dimensions; E.g. 0 is solid, 0.5 is half-hollow etc
         */
         void setInnerSize(Real x, Real y, Real z);
 
         /** Sets the x component of the area inside the ellipsoid which doesn't emit particles. 
         @param x
             Parametric value describing the proportion of the shape which is hollow in this direction.
-            E.g. 0 is solid, 0.5 is half-hollow etc
+        @note The values are fractions of the 'outer' dimensions; E.g. 0 is solid, 0.5 is half-hollow etc
         */
         void setInnerSizeX(Real x);
         /** Sets the y component of the area inside the ellipsoid which doesn't emit particles. 
         @param y
             Parametric value describing the proportion of the shape which is hollow in this direction.
-            E.g. 0 is solid, 0.5 is half-hollow etc
+        @note The values are fractions of the 'outer' dimensions; E.g. 0 is solid, 0.5 is half-hollow etc
         */
         void setInnerSizeY(Real y);
         /** Sets the z component of the area inside the ellipsoid which doesn't emit particles. 
         @param z
             Parametric value describing the proportion of the shape which is hollow in this direction.
-            E.g. 0 is solid, 0.5 is half-hollow etc
+        @note The values are fractions of the 'outer' dimensions; E.g. 0 is solid, 0.5 is half-hollow etc
         */
         void setInnerSizeZ(Real z);
         /** Gets the x component of the area inside the ellipsoid which doesn't emit particles. */
