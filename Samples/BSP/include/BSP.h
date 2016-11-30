@@ -31,18 +31,11 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
                         "so you cannot run this sample. Sorry!", "Sample_BSP::testCapabilities");
         }
-        // else if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
-        else if (mRoot->getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "BspSceneManager does not yet have GL3+ render system support. Sorry!",
-                        "Sample_BSP::testCapabilities");
-        }
     }
 
     StringVector getRequiredPlugins()
     {
         StringVector names;
-        names.push_back("Cg Program Manager");
         names.push_back("BSP Scene Manager");
         return names;
     }
