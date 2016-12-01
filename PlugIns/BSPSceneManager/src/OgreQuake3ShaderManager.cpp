@@ -491,7 +491,7 @@ namespace Ogre {
         {
             return SBF_SOURCE_COLOUR;
         }
-        else if (q3func == "gl_one_minus_dest_color")
+        else if (q3func == "gl_one_minus_dst_color")
         {
             return SBF_ONE_MINUS_DEST_COLOUR;
         }

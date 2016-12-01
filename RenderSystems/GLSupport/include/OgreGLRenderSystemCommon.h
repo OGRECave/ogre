@@ -55,6 +55,39 @@ namespace Ogre {
         */
         virtual void _unregisterContext(GLContext *context) = 0;
 
+        Real getHorizontalTexelOffset(void) { return 0.0; }               // No offset in GL
+        Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
+        Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
+        Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
+
+        VertexElementType getColourVertexElementType(void) const {
+            return VET_COLOUR_ABGR;
+        }
+
+        void reinitialise(void)
+        {
+            this->shutdown();
+            this->_initialise(true);
+        }
+
+        void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool)
+        {
+            // no conversion request for OpenGL
+            dest = matrix;
+        }
+
+        void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane,
+                                   Matrix4& dest, bool forGpuProgram = false);
+
+        void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top,
+                                   Real nearPlane, Real farPlane, Matrix4& dest, bool forGpuProgram = false);
+
+        void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane,
+                              Matrix4& dest, bool forGpuProgram = false);
+
+        void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
+                                          bool forGpuProgram);
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         virtual void resetRenderer(RenderWindow* pRenderWnd) = 0;
         virtual void notifyOnContextLost() = 0;

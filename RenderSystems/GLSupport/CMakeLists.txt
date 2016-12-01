@@ -82,7 +82,7 @@ set(GLSUPPORT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/  ${CMAKE_CURRENT_
 
 include_directories(${NATIVE_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/)
 file(GLOB GLSL_SOURCES src/GLSL/*.cpp)
-ogre_add_library(OgreGLSupport STATIC ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES})
+ogre_add_library(OgreGLSupport STATIC ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES} src/OgreGLRenderSystemCommon.cpp)
 target_link_libraries(OgreGLSupport OgreMain ${PLATFORM_LIBS})
 
 if (APPLE)
