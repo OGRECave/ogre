@@ -946,12 +946,6 @@ namespace Ogre {
         mGLInitialised = true;
     }
 
-    void GLRenderSystem::reinitialise(void)
-    {
-        this->shutdown();
-        this->_initialise(true);
-    }
-
     void GLRenderSystem::shutdown(void)
     {
         RenderSystem::shutdown();
@@ -2226,87 +2220,6 @@ namespace Ogre {
         // XXX Hint here?
     }
 
-    VertexElementType GLRenderSystem::getColourVertexElementType(void) const
-    {
-        return VET_COLOUR_ABGR;
-    }
-
-    void GLRenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
-                                                  Matrix4& dest, bool forGpuProgram)
-    {
-        // no any conversion request for OpenGL
-        dest = matrix;
-    }
-
-    void GLRenderSystem::_makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane,
-                                               Real farPlane, Matrix4& dest, bool forGpuProgram)
-    {
-        Radian thetaY ( fovy / 2.0f );
-        Real tanThetaY = Math::Tan(thetaY);
-        //Real thetaX = thetaY * aspect;
-        //Real tanThetaX = Math::Tan(thetaX);
-
-        // Calc matrix elements
-        Real w = (1.0f / tanThetaY) / aspect;
-        Real h = 1.0f / tanThetaY;
-        Real q, qn;
-        if (farPlane == 0)
-        {
-            // Infinite far plane
-            q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-            qn = nearPlane * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
-        }
-        else
-        {
-            q = -(farPlane + nearPlane) / (farPlane - nearPlane);
-            qn = -2 * (farPlane * nearPlane) / (farPlane - nearPlane);
-        }
-
-        // NB This creates Z in range [-1,1]
-        //
-        // [ w   0   0   0  ]
-        // [ 0   h   0   0  ]
-        // [ 0   0   q   qn ]
-        // [ 0   0   -1  0  ]
-
-        dest = Matrix4::ZERO;
-        dest[0][0] = w;
-        dest[1][1] = h;
-        dest[2][2] = q;
-        dest[2][3] = qn;
-        dest[3][2] = -1;
-
-    }
-
-    void GLRenderSystem::_makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane,
-                                          Real farPlane, Matrix4& dest, bool forGpuProgram)
-    {
-        Radian thetaY (fovy / 2.0f);
-        Real tanThetaY = Math::Tan(thetaY);
-
-        //Real thetaX = thetaY * aspect;
-        Real tanThetaX = tanThetaY * aspect; //Math::Tan(thetaX);
-        Real half_w = tanThetaX * nearPlane;
-        Real half_h = tanThetaY * nearPlane;
-		Real iw = 1.0f / half_w;
-		Real ih = 1.0f / half_h;
-        Real q;
-        if (farPlane == 0)
-        {
-            q = 0;
-        }
-        else
-        {
-			q = 2.0f / (farPlane - nearPlane);
-        }
-        dest = Matrix4::ZERO;
-        dest[0][0] = iw;
-        dest[1][1] = ih;
-        dest[2][2] = -q;
-        dest[2][3] = - (farPlane + nearPlane)/(farPlane - nearPlane);
-        dest[3][3] = 1;
-    }
-
     void GLRenderSystem::_setPolygonMode(PolygonMode level)
     {
         GLenum glmode;
@@ -3376,79 +3289,12 @@ namespace Ogre {
             mStateCacheManager->setStencilMask(mStencilWriteMask);
         }
     }
-    // ------------------------------------------------------------------
-    void GLRenderSystem::_makeProjectionMatrix(Real left, Real right,
-                                               Real bottom, Real top, Real nearPlane, Real farPlane, Matrix4& dest,
-                                               bool forGpuProgram)
-    {
-        Real width = right - left;
-        Real height = top - bottom;
-        Real q, qn;
-        if (farPlane == 0)
-        {
-            // Infinite far plane
-            q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-            qn = nearPlane * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
-        }
-        else
-        {
-            q = -(farPlane + nearPlane) / (farPlane - nearPlane);
-            qn = -2 * (farPlane * nearPlane) / (farPlane - nearPlane);
-        }
-        dest = Matrix4::ZERO;
-        dest[0][0] = 2 * nearPlane / width;
-        dest[0][2] = (right+left) / width;
-        dest[1][1] = 2 * nearPlane / height;
-        dest[1][2] = (top+bottom) / height;
-        dest[2][2] = q;
-        dest[2][3] = qn;
-        dest[3][2] = -1;
-    }
     //---------------------------------------------------------------------
     HardwareOcclusionQuery* GLRenderSystem::createHardwareOcclusionQuery(void)
     {
         GLHardwareOcclusionQuery* ret = new GLHardwareOcclusionQuery();
         mHwOcclusionQueries.push_back(ret);
         return ret;
-    }
-    //---------------------------------------------------------------------
-    Real GLRenderSystem::getHorizontalTexelOffset(void)
-    {
-        // No offset in GL
-        return 0.0f;
-    }
-    //---------------------------------------------------------------------
-    Real GLRenderSystem::getVerticalTexelOffset(void)
-    {
-        // No offset in GL
-        return 0.0f;
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::_applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
-                                                      bool forGpuProgram)
-    {
-        // Thanks to Eric Lenyel for posting this calculation at www.terathon.com
-
-        // Calculate the clip-space corner point opposite the clipping plane
-        // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
-        // transform it into camera space by multiplying it
-        // by the inverse of the projection matrix
-
-        Vector4 q;
-        q.x = (Math::Sign(plane.normal.x) + matrix[0][2]) / matrix[0][0];
-        q.y = (Math::Sign(plane.normal.y) + matrix[1][2]) / matrix[1][1];
-        q.z = -1.0F;
-        q.w = (1.0F + matrix[2][2]) / matrix[2][3];
-
-        // Calculate the scaled plane vector
-        Vector4 clipPlane4d(plane.normal.x, plane.normal.y, plane.normal.z, plane.d);
-        Vector4 c = clipPlane4d * (2.0F / (clipPlane4d.dotProduct(q)));
-
-        // Replace the third row of the projection matrix
-        matrix[2][0] = c.x;
-        matrix[2][1] = c.y;
-        matrix[2][2] = c.z + 1.0F;
-        matrix[2][3] = c.w;
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::_oneTimeContextInitialization()
@@ -3600,18 +3446,6 @@ namespace Ogre {
             }
         }
         mStateCacheManager->unregisterContext((intptr_t)context);
-    }
-    //---------------------------------------------------------------------
-    Real GLRenderSystem::getMinimumDepthInputValue(void)
-    {
-        // Range [-1.0f, 1.0f]
-        return -1.0f;
-    }
-    //---------------------------------------------------------------------
-    Real GLRenderSystem::getMaximumDepthInputValue(void)
-    {
-        // Range [-1.0f, 1.0f]
-        return 1.0f;
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::registerThread()

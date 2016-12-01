@@ -197,10 +197,7 @@ namespace Ogre {
 
         void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
-        void reinitialise(void); // Used if settings changed mid-rendering
-
         void shutdown(void);
-
 
         void setAmbientLight(float r, float g, float b);
 
@@ -230,9 +227,6 @@ namespace Ogre {
         void destroyRenderWindow(const String& name);
 
         String getErrorDescription(long errorNumber) const;
-
-
-        VertexElementType getColourVertexElementType(void) const;
 
         void setNormaliseNormals(bool normalise);
 
@@ -319,23 +313,6 @@ namespace Ogre {
 
         void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end);
 
-        void _convertProjectionMatrix(const Matrix4& matrix,
-            Matrix4& dest, bool forGpuProgram = false);
-
-        void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
-            Matrix4& dest, bool forGpuProgram = false);
-
-        void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top, 
-            Real nearPlane, Real farPlane, Matrix4& dest, bool forGpuProgram = false);
-
-        void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
-            Matrix4& dest, bool forGpuProgram = false);
-        /** See
-        RenderSystem
-        */
-        void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, 
-            bool forGpuProgram);
-
         void setClipPlane (ushort index, Real A, Real B, Real C, Real D);
 
         void enableClipPlane (ushort index, bool enable);
@@ -368,7 +345,6 @@ namespace Ogre {
 
         void _render(const RenderOperation& op);
 
-
         void bindGpuProgram(GpuProgram* prg);
 
         void unbindGpuProgram(GpuProgramType gptype);
@@ -385,10 +361,6 @@ namespace Ogre {
                               const ColourValue& colour = ColourValue::Black, 
                               Real depth = 1.0f, unsigned short stencil = 0);
         HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
-        Real getHorizontalTexelOffset(void);
-        Real getVerticalTexelOffset(void);
-        Real getMinimumDepthInputValue(void);
-        Real getMaximumDepthInputValue(void);
         OGRE_MUTEX(mThreadInitMutex);
         void registerThread();
         void unregisterThread();
