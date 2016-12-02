@@ -570,7 +570,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    bool Root::showConfigDialog(void)
+    bool Root::showConfigDialog( ConfigDialog* aCustomDialog /*= 0*/ )
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "showConfigDialog is not supported on NaCl",
@@ -579,17 +579,18 @@ namespace Ogre {
 
         // Displays the standard config dialog
         // Will use stored defaults if available
-        ConfigDialog* dlg;
+        ConfigDialog* dlg = aCustomDialog;
         bool isOk;
 
         restoreConfig();
 
-        dlg = OGRE_NEW ConfigDialog();
+        if( !dlg )
+            dlg = OGRE_NEW ConfigDialog();
         isOk = dlg->display();
         if (isOk)
             saveConfig();
-
-        OGRE_DELETE dlg;
+        if( !aCustomDialog )
+            OGRE_DELETE dlg;
         return isOk;
     }
 

@@ -83,10 +83,10 @@ namespace Ogre
     {
     public:
         ConfigDialog();
-        ~ConfigDialog();
-    
+        virtual ~ConfigDialog();
+
         void initialise();
-        bool display();
+        virtual bool display();
 
     protected:
 #ifdef __OBJC__

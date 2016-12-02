@@ -38,14 +38,14 @@ namespace Ogre
     {
     public:
         ConfigDialog();
-        ~ConfigDialog();
+        virtual ~ConfigDialog();
     
     public:
         void initialise();
         void run();
         void cancel();
 
-        bool display();
+        virtual bool display();
 
     protected:
         RenderSystem* iSelectedRenderSystem;

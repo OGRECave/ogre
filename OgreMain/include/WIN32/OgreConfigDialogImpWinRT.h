@@ -60,7 +60,7 @@ namespace Ogre
     {
     public:
         ConfigDialog();
-        ~ConfigDialog();
+        virtual ~ConfigDialog();
         
         /** Displays the dialog.
         @remarks
@@ -77,7 +77,7 @@ namespace Ogre
         @see
             RenderSystem
         */
-        bool display();
+        virtual bool display();
 
     protected:
         RenderSystem* mSelectedRenderSystem;

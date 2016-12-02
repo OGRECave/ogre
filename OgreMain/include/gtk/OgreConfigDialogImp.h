@@ -53,6 +53,7 @@ namespace Ogre
     {
     public:
         ConfigDialog();
+        virtual ~ConfigDialog() {};
 
         /**
         Displays the dialog.
@@ -70,7 +71,7 @@ namespace Ogre
         @see
             RenderSystem
         */
-        bool display ();
+        virtual bool display();
 
     protected:
         /// The rendersystem selected by user
@@ -90,8 +91,8 @@ namespace Ogre
         static void rendererChanged (GtkComboBox *widget, gpointer data);
         /// Callback function to change a renderer option
         static void optionChanged (GtkComboBox *widget, gpointer data);
-    /// Idle function to refresh renderer parameters
-    static gboolean refreshParams (gpointer data);
+        /// Idle function to refresh renderer parameters
+        static gboolean refreshParams (gpointer data);
     };
 }
 #endif
