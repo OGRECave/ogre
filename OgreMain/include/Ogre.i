@@ -13,6 +13,7 @@
 #include "OgreParticleAffectorFactory.h"
 #include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreScriptCompiler.h"
+#include "OgreConfigDialog.h"
 %}
 
 %include std_string.i
@@ -277,6 +278,8 @@ ADD_REPR(ColourValue)
 %include "OgreRenderQueueInvocation.h"
 %include "OgreSceneManager.h"
 %include "OgreSceneManagerEnumerator.h"
+%include "OgreConfigDialog.h"
+%ignore Ogre::Root::showConfigDialog(); // deprecated
 %include "OgreRoot.h"
 // dont wrap: platform specific
 // %include "OgreWindowEventUtilities.h"
