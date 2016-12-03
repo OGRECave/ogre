@@ -28,26 +28,76 @@ THE SOFTWARE.
 
 #import "OgreLogManager.h"
 #import "OgreConfigDialog.h"
+#import "OgreRoot.h"
+#import "OgreRenderSystem.h"
+#import "OgreConfigOptionMap.h"
+
+#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 using namespace Ogre;
 
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+@interface OgreConfigWindowDelegate : NSObject <NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource>
+#else
+@interface OgreConfigWindowDelegate : NSObject
+#endif
+{
+    NSWindow *mConfigWindow;
+    NSImageView *mOgreLogo;
+    NSPopUpButton *mRenderSystemsPopUp;
+    NSPopUpButton *mOptionsPopUp;
+    NSTableView *mOptionsTable;
+    NSButton *mOkButton;
+    NSButton *mCancelButton;
+    NSTextField *mOptionLabel;
+
+    NSDictionary *mOptions;
+}
+
+- (void)cancelButtonPressed:(id)sender;
+- (void)okButtonPressed:(id)sender;
+- (void)popUpValueChanged:(id)sender;
+
+// Getters and setters
+- (void)setOptions:(NSDictionary *)dict;
+- (NSDictionary *)getOptions;
+- (void)setRenderSystemsPopUp:(NSPopUpButton *)button;
+- (NSPopUpButton *)getRenderSystemsPopUp;
+- (void)setOgreLogo:(NSImageView *)image;
+- (NSImageView *)getOgreLogo;
+- (void)setConfigWindow:(NSWindow *)window;
+- (NSWindow *)getConfigWindow;
+- (void)setOptionsTable:(NSTableView *)table;
+- (NSTableView *)getOptionsTable;
+- (void)setOptionsPopUp:(NSPopUpButton *)button;
+- (NSPopUpButton *)getOptionsPopUp;
+
+@end
+
 namespace Ogre {
 
-	ConfigDialog* dlg = NULL;
+    struct ConfigDialog::PrivateData {
+        OgreConfigWindowDelegate *mWindowDelegate;
+        RenderSystem *mSelectedRenderSystem;
+    };
 
-	ConfigDialog::ConfigDialog()
+	static ConfigDialog* dlg = NULL;
+
+	ConfigDialog::ConfigDialog() : mImpl(new ConfigDialog::PrivateData())
 	{
 		dlg = this;
 	}
 	
 	ConfigDialog::~ConfigDialog()
 	{
-        [mWindowDelegate release]; mWindowDelegate = nil;
+        [mImpl->mWindowDelegate release]; mImpl->mWindowDelegate = nil;
+        delete mImpl;
 	}
 	
-	void ConfigDialog::initialise()
+	static void initialise(OgreConfigWindowDelegate *mWindowDelegate)
 	{
-        mWindowDelegate = [[OgreConfigWindowDelegate alloc] init];
+	    mWindowDelegate = [[OgreConfigWindowDelegate alloc] init];
 
         if (!mWindowDelegate)
             OGRE_EXCEPT (Exception::ERR_INTERNAL_ERROR, "Could not load config dialog",
@@ -166,13 +216,13 @@ namespace Ogre {
 	bool ConfigDialog::display()
 	{
         // Select previously selected rendersystem
-        mSelectedRenderSystem = Root::getSingleton().getRenderSystem();
+        mImpl->mSelectedRenderSystem = Root::getSingleton().getRenderSystem();
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        initialise();
+        initialise(mImpl->mWindowDelegate);
 
         // Run a modal dialog, Abort means cancel, Stop means Ok
         long retVal = 0;
-        NSModalSession modalSession = [NSApp beginModalSessionForWindow:[mWindowDelegate getConfigWindow]];
+        NSModalSession modalSession = [NSApp beginModalSessionForWindow:[mImpl->mWindowDelegate getConfigWindow]];
         for (;;) {
             retVal = [NSApp runModalSession:modalSession];
 
@@ -183,13 +233,13 @@ namespace Ogre {
         [NSApp endModalSession:modalSession];
 
         // Set the rendersystem
-        String selectedRenderSystemName = String([[[[mWindowDelegate getRenderSystemsPopUp] selectedItem] title] UTF8String]);
+        String selectedRenderSystemName = String([[[[mImpl->mWindowDelegate getRenderSystemsPopUp] selectedItem] title] UTF8String]);
         RenderSystem *rs = Root::getSingleton().getRenderSystemByName(selectedRenderSystemName);
         Root::getSingleton().setRenderSystem(rs);
         
         // Relinquish control of the table
-        [[mWindowDelegate getOptionsTable] setDataSource:nil];
-        [[mWindowDelegate getOptionsTable] setDelegate:nil];
+        [[mImpl->mWindowDelegate getOptionsTable] setDataSource:nil];
+        [[mImpl->mWindowDelegate getOptionsTable] setDelegate:nil];
         
         // Drain the auto release pool
         [pool drain];
