@@ -140,7 +140,10 @@ namespace Ogre
 
         if( mFSAA > 1u )
         {
-            desc.sampleCount = mFSAA;
+            desc.textureType    = MTLTextureType2DMultisample;
+            desc.depth          = 1u;
+            desc.arrayLength    = 1u;
+            desc.sampleCount    = mFSAA;
             mMsaaTexture = [mDevice->mDevice newTextureWithDescriptor:desc];
             mMsaaTexture.label = [NSString stringWithUTF8String:(mName + "_MSAA").c_str()];
         }
