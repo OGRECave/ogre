@@ -34,7 +34,7 @@ def main():
                 rgm.addResourceLocation(loc, kind, sec)
 
     if not root.restoreConfig():
-        root.showConfigDialog()
+        root.showConfigDialog(Ogre.ConfigDialog())
 
     win = root.initialise(True)
 
