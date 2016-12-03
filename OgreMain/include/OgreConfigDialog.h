@@ -36,8 +36,6 @@ THE SOFTWARE.
 # include "WIN32/OgreConfigDialogImp.h"
 #elif defined OGRE_GUI_gtk
 # include "gtk/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreConfigDialogImp.h"
 #else
 namespace Ogre
 {
