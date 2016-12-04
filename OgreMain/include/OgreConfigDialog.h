@@ -31,10 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgrePlatform.h"
 
-// Bring in the specific platform's header file: first allow forced override
-#if defined OGRE_GUI_gtk
-# include "gtk/OgreConfigDialogImp.h"
-#else
 namespace Ogre
 {
     /** \addtogroup Core
@@ -87,6 +83,5 @@ namespace Ogre
     /** @} */
     /** @} */
 }
-#endif
 
 #endif
