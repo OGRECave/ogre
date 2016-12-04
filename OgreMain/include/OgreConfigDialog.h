@@ -32,9 +32,7 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 
 // Bring in the specific platform's header file: first allow forced override
-#if defined(OGRE_GUI_WIN32) || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_gtk
+#if defined OGRE_GUI_gtk
 # include "gtk/OgreConfigDialogImp.h"
 #else
 namespace Ogre
