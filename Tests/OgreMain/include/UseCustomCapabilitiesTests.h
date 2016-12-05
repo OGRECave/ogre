@@ -57,7 +57,7 @@ class UseCustomCapabilitiesTests : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 #ifdef OGRE_STATIC_LIB
-    Ogre::StaticPluginLoader mStaticPluginLoader;
+    OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
 
 public:

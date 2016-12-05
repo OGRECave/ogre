@@ -244,7 +244,7 @@ namespace OgreBites
 
         Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
         Ogre::Root* mRoot;              // OGRE root
-        Ogre::StaticPluginLoader mStaticPluginLoader;
+        StaticPluginLoader mStaticPluginLoader;
         bool mGrabInput;
         bool mFirstRun;
         Ogre::String mNextRenderer;     // name of renderer used for next run

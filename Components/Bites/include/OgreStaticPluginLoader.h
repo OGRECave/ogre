@@ -24,7 +24,7 @@ Description: Utility class to load plugins statically
 #include "OgreBitesPrerequisites.h"
 
 
-namespace Ogre
+namespace OgreBites
 {
     /** Utility class for loading the plugins statically.
 
@@ -33,7 +33,7 @@ namespace Ogre
         plugins based on OgreBuildSettings.h
     */
     class _OgreBitesExport StaticPluginLoader {
-        std::vector<Plugin*> mPlugins;
+        std::vector<Ogre::Plugin*> mPlugins;
 
     public:
         /** Load all the enabled plugins */
