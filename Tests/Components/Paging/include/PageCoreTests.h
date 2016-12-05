@@ -57,7 +57,7 @@ class PageCoreTests : public CppUnit::TestFixture
     FileSystemLayer* mFSLayer;
 
 #ifdef OGRE_STATIC_LIB
-    StaticPluginLoader mStaticPluginLoader;
+    OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
 
 public:
