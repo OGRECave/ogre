@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -25,39 +25,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreErrorDialog.h"
 
-#include <iostream>
-#include <gtk/gtk.h>
+#ifndef COMPONENTS_BITES_INCLUDE_OGREBITESCONFIGDIALOG_H_
+#define COMPONENTS_BITES_INCLUDE_OGREBITESCONFIGDIALOG_H_
 
-namespace Ogre {
+#include "OgreBitesPrerequisites.h"
+#include "OgreConfigDialog.h"
 
-extern bool __gtk_init_once ();
+namespace OgreBites {
 
-//---------------------------------------------------------------------------//
-ErrorDialog::ErrorDialog ()
-{
-}
+    /**
+     * get an platform native  dialog instance.
+     * @return pointer to Ogre::ConfigDialog or NULL if not available on the current platform.
+     */
+    _OgreBitesExport Ogre::ConfigDialog* getNativeConfigDialog();
 
-//---------------------------------------------------------------------------//
-void ErrorDialog::display (const String& errorMessage, String logName)
-{
-    if (!__gtk_init_once ())
-    {
-        std::cerr << "*** ERROR: " << errorMessage << std::endl;
-        return;
-    }
+} /* namespace OgreBites */
 
-    GtkWidget *dialog = gtk_message_dialog_new (
-        NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
-        errorMessage.c_str ());
-
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-
-    // Wait for all gtk events to be consumed ...
-    while (gtk_events_pending ())
-        gtk_main_iteration_do (FALSE);
-}
-
-}
+#endif /* COMPONENTS_BITES_INCLUDE_OGREBITESCONFIGDIALOG_H_ */

@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "CppUnitResultWriter.h"
 #include "OgreConfigFile.h"
 #include "OgrePlatform.h"
+#include "OgreBitesConfigDialog.h"
+
 #include <iostream>
 
 #ifdef WIN32
@@ -493,7 +495,7 @@ bool TestContext::oneTimeConfig()
     // if forced, just do it and return
     if(mForceConfig)
     {
-        bool temp = mRoot->showConfigDialog();
+        bool temp = mRoot->showConfigDialog(OgreBites::getNativeConfigDialog());
         if(!temp)
             mRoot->setRenderSystem(NULL);
         return temp;

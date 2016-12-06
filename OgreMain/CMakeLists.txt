@@ -107,7 +107,6 @@ elseif (WIN32)
   else ()
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
-      include/WIN32/OgreConfigDialogImp.h
       include/WIN32/OgreErrorDialogImp.h
       include/WIN32/OgreTimerImp.h
       include/WIN32/OgreMinGWSupport.h

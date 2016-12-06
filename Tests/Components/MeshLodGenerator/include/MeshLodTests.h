@@ -49,7 +49,7 @@ class MeshLodTests : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 #ifdef OGRE_STATIC_LIB
-    StaticPluginLoader mStaticPluginLoader;
+    OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
     MeshPtr mMesh;
     FileSystemLayer* mFSLayer;

@@ -84,8 +84,9 @@
 #endif
 #endif
 
-void Ogre::StaticPluginLoader::load()
+void OgreBites::StaticPluginLoader::load()
 {
+    using namespace Ogre;
 #ifdef OGRE_STATIC_LIB
     Plugin* plugin = NULL;
 #ifdef OGRE_STATIC_GL
@@ -145,7 +146,7 @@ void Ogre::StaticPluginLoader::load()
     }
 }
 
-void Ogre::StaticPluginLoader::unload()
+void OgreBites::StaticPluginLoader::unload()
 {
     // don't unload plugins, since Root will have done that. Destroy here.
     for (size_t i = 0; i < mPlugins.size(); ++i) {

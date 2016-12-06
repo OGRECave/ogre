@@ -43,8 +43,8 @@ Karmic, the following command will install all of the dependencies:
 
      sudo apt-get install libfreetype6-dev libboost-date-time-dev \
        libboost-thread-dev nvidia-cg-toolkit libfreeimage-dev \
-       zlib1g-dev libzzip-dev libois-dev libcppunit-dev doxygen \
-       libxt-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libglu-dev
+       zlib1g-dev libzzip-dev libsdl2-dev libcppunit-dev doxygen \
+       libxt-dev libxaw7-dev libxxf86vm-dev libxrandr-dev
 
 If you cannot obtain prebuilt binaries of a dependency for your platform,
 please refer to the list below and get a source package from the website,
@@ -57,14 +57,14 @@ Recommended dependencies:
 * Boost: http://www.boost.org (+)
 * Cg: http://developer.nvidia.com/object/cg_toolkit.html
 * DirectX SDK: http://msdn.microsoft.com/en-us/directx/
-* FreeImage: http://freeimage.sourceforge.net
 * zlib: http://www.zlib.net
 * zziplib: http://zziplib.sourceforge.net
 
 Optional dependencies:
+* FreeImage: http://freeimage.sourceforge.net
 * CppUnit: http://cppunit.sourceforge.net
 * Doxygen: http://doxygen.org
-* OIS: http://sourceforge.net/projects/wgois
+* SDL: https://www.libsdl.org/
 * POCO: http://pocoproject.org (+)
 * TBB: http://www.threadingbuildingblocks.org (+)
 
