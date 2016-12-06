@@ -1,9 +1,9 @@
 #version 150
 
-mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[48]);
+mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, mat2x4 dualQuaternions[24]);
 vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ);
 
-uniform vec4 worldDualQuaternion2x4Array[48];
+uniform mat2x4 worldDualQuaternion2x4Array[24];
 uniform mat4x4 viewProjectionMatrix;
 uniform vec4   ambient;
 
@@ -27,4 +27,3 @@ void main()
 	
 	oColour = ambient;
 }
-
