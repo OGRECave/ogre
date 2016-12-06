@@ -14,7 +14,7 @@
 #include "OgreViewport.h"
 #include "OgreOverlaySystem.h"
 #include "OgreDataStream.h"
-#include "OgreConfigDialog.h"
+#include "OgreBitesConfigDialog.h"
 
 #if OGRE_BITES_HAVE_SDL
 #include <SDL_video.h>
@@ -272,8 +272,7 @@ bool ApplicationContext::oneTimeConfig()
     mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
 #else
     if (!mRoot->restoreConfig()) {
-        Ogre::ConfigDialog dlg;
-        return mRoot->showConfigDialog(&dlg);
+        return mRoot->showConfigDialog(OgreBites::getNativeConfigDialog());
     }
 #endif
     return true;
