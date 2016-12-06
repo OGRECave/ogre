@@ -54,6 +54,9 @@ namespace Ogre
     class _OgreExport ConfigDialog : public UtilityAlloc
     {
     public:
+        /**
+         * @deprecated this class will become a pure interface in the future. Use OgreBites::getNativeConfigDialog instead.
+         */
         ConfigDialog();
         virtual ~ConfigDialog();
 
@@ -76,7 +79,6 @@ namespace Ogre
 
     protected:
         // platform specific implementation
-        // TODO: use this on remaining platforms instead of duplicating whole header
         struct PrivateData;
         PrivateData* mImpl;
     };
