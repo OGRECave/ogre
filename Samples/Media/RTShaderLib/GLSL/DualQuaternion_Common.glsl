@@ -30,7 +30,7 @@
 
 */
 
-mat2x4 blendTwoWeights(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[24])
+mat2x4 blendTwoWeights(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[48])
 {
 	mat2x4 blendDQ = blendWgt.x*mat2x4(dualQuaternions[int(blendIdx.x) * 2], dualQuaternions[int(blendIdx.x) * 2 + 1]);
 	blendDQ += blendWgt.y*mat2x4(dualQuaternions[int(blendIdx.y) * 2], dualQuaternions[int(blendIdx.y) * 2 + 1]);
@@ -38,7 +38,7 @@ mat2x4 blendTwoWeights(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[24])
 	return blendDQ;
 }
 
-mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[24])
+mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[48])
 {
 	mat2x4 dq0 = mat2x4(dualQuaternions[int(blendIdx.x) * 2], dualQuaternions[int(blendIdx.x) * 2 + 1]);
 	mat2x4 dq1 = mat2x4(dualQuaternions[int(blendIdx.y) * 2], dualQuaternions[int(blendIdx.y) * 2 + 1]);
@@ -105,5 +105,3 @@ vec3 calculateBlendNormal(vec3 normal, mat2x4 blendDQ)
 {
 	return normal + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, normal) + blendDQ[0].x*normal);
 }
-
-
