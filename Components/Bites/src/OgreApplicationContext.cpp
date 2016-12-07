@@ -654,10 +654,6 @@ void ApplicationContext::locateResources()
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSL", type, sec);
-        if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
-        {
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSL150", type, sec);
-        }
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
     {
