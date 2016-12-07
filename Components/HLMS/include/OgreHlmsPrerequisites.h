@@ -29,6 +29,7 @@ THE SOFTWARE.
 #ifndef __Ogre_Hlms_Prereq_H__
 #define __Ogre_Hlms_Prereq_H__
 
+#include <cstddef>
 #include "OgrePrerequisites.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
