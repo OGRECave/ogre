@@ -150,6 +150,7 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                     versionLine += "#define texture2D texture\n";
                     versionLine += "#define texture3D texture\n";
                     versionLine += "#define textureCube texture\n";
+                    versionLine += "#define texture2DLod textureLod\n";
                 }
 
                 pSubGpuProgram->setSource(versionLine + pSubGpuProgram->getSource());
