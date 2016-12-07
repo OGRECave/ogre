@@ -46,6 +46,7 @@
 * fix flipped Environment Maps using GLSL (GLSES) shaders
 * use same lighting equations as legacy GL resulting in equal light intensity
 * merge duplicated GLSL, GLSLES and GLSL150 shaders. Dropping 4200 loc.
+* The hardware skeletal animation support for GLSL is finished. See the skeletal animation sample for how to enable it in your code.
 
 ## HLMS
 * add GLSLES template making it work on GLES2 (TODO: correct rendering requires GLES3)
