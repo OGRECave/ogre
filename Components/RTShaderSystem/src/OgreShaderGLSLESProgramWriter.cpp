@@ -128,7 +128,7 @@ namespace Ogre {
                     if (gpuType == GCT_UNKNOWN)
                     {
                         OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                            "Can not convert Operand::OpMask to GpuConstantType", 
+                            "Can not convert '"+paramTokens[1]+"' to GpuConstantType",
                             "GLSLESProgramWriter::createInvocationFromString" );    
                     }
 
