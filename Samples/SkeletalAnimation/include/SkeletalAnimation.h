@@ -155,8 +155,9 @@ protected:
     {
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        // RTSS currently generates unusable shader for GLSL. HLSL to be tested.
-        if (mShaderGenerator->getTargetLanguage() == "cg")
+        // RTSS currently unable to generate shader for GLSLES and HLSL
+        if (mShaderGenerator->getTargetLanguage() != "glsles" &&
+                mShaderGenerator->getTargetLanguage() != "hlsl")
         {
             // Make this viewport work with shader generator scheme.
             mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -265,7 +266,8 @@ protected:
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
             //see above
-            if (mShaderGenerator->getTargetLanguage() == "cg")
+            if (mShaderGenerator->getTargetLanguage() != "glsles" &&
+                    mShaderGenerator->getTargetLanguage() != "hlsl")
             {
                 //In case the system uses the RTSS, the following line will ensure
                 //that the entity is using hardware animation in RTSS as well.
@@ -377,7 +379,8 @@ protected:
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         //see above
-        if (mShaderGenerator->getTargetLanguage() == "cg")
+        if (mShaderGenerator->getTargetLanguage() != "glsles" &&
+                mShaderGenerator->getTargetLanguage() != "hlsl")
         {
             Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
             renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
