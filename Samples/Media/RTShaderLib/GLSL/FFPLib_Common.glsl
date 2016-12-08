@@ -251,3 +251,9 @@ void FFP_DotProduct(in vec4 vIn0, in vec4 vIn1, out vec4 vOut)
 {
 	vOut = vec4(dot(vIn0, vIn1), 1.0, 1.0, 1.0);
 }
+
+//-----------------------------------------------------------------------------
+void FFP_Normalize(inout vec3 vIn)
+{
+    vIn = normalize(vIn);
+}
