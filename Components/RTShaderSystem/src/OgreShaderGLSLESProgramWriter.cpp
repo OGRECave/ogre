@@ -128,7 +128,7 @@ namespace Ogre {
                     if (gpuType == GCT_UNKNOWN)
                     {
                         OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                            "Can not convert Operand::OpMask to GpuConstantType", 
+                            "Can not convert '"+paramTokens[1]+"' to GpuConstantType",
                             "GLSLESProgramWriter::createInvocationFromString" );    
                     }
 
@@ -238,6 +238,8 @@ namespace Ogre {
             mContentToPerVertexAttributes[Parameter::SPC_NORMAL_OBJECT_SPACE] = "normal";
             mContentToPerVertexAttributes[Parameter::SPC_TANGENT_OBJECT_SPACE] = "tangent";
             mContentToPerVertexAttributes[Parameter::SPC_BINORMAL_OBJECT_SPACE] = "binormal";
+            mContentToPerVertexAttributes[Parameter::SPC_BLEND_INDICES] = "blendIndices";
+            mContentToPerVertexAttributes[Parameter::SPC_BLEND_WEIGHTS] = "blendWeights";
 
             mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE0] = "uv0";
             mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE1] = "uv1";
@@ -294,6 +296,7 @@ namespace Ogre {
                 os << "#define texture2D texture" << std::endl;
                 os << "#define texture3D texture" << std::endl;
                 os << "#define textureCube texture" << std::endl;
+                os << "#define texture2DLod textureLod" << std::endl;
             }
 
             // Generate source code header.
