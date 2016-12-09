@@ -234,6 +234,48 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::createProxyItems(void)
+    {
+        destroyProxyItems();
+
+        char tmpBuffer[64];
+        LwString materialName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+        materialName = "Cubemap/BlendProjectCubemap";
+        const size_t matNameSize = materialName.size();
+
+        //Create the Items using that geometry
+        for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+        {
+            mProxyItems[i] = mSceneManager->createItem( mProxyMesh, SCENE_DYNAMIC );
+            mProxyNodes[i] = mSceneManager->getRootSceneNode()->createChildSceneNode();
+            mProxyItems[i]->setRenderQueueGroup( mReservedRqId );
+            mProxyItems[i]->setVisibilityFlags( mProxyVisibilityMask );
+            mProxyItems[i]->setCastShadows( false );
+            mProxyNodes[i]->attachObject( mProxyItems[i] );
+
+            materialName.resize( matNameSize );
+            materialName.a( i );
+            mProxyItems[i]->setMaterialName( materialName.c_str() );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::destroyProxyItems(void)
+    {
+        for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+        {
+            if( mProxyNodes[i] )
+            {
+                mProxyNodes[i]->getParentSceneNode()->removeAndDestroyChild( mProxyNodes[i] );
+                mProxyNodes[i] = 0;
+            }
+            if( mProxyItems[i] )
+            {
+                mSceneManager->destroyItem( mProxyItems[i] );
+                mProxyItems[i] = 0;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::setUpdatedTrackedDataFromCamera( Camera *trackedCamera )
     {
         mTrackedPosition = trackedCamera->getDerivedPosition();
@@ -336,42 +378,12 @@ namespace Ogre
         renderQueue->setRenderQueueMode( mReservedRqId, RenderQueue::FAST );
         renderQueue->setSortRenderQueue( mReservedRqId, false );
 
-        char tmpBuffer[64];
-        LwString materialName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
-        materialName = "Cubemap/BlendProjectCubemap";
-        const size_t matNameSize = materialName.size();
-
-        //Create the Items using that geometry
-        for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
-        {
-            mProxyItems[i] = mSceneManager->createItem( mProxyMesh, SCENE_DYNAMIC );
-            mProxyNodes[i] = mSceneManager->getRootSceneNode()->createChildSceneNode();
-            mProxyItems[i]->setRenderQueueGroup( mReservedRqId );
-            mProxyItems[i]->setVisibilityFlags( mProxyVisibilityMask );
-            mProxyItems[i]->setCastShadows( false );
-            mProxyNodes[i]->attachObject( mProxyItems[i] );
-
-            materialName.resize( matNameSize );
-            materialName.a( i );
-            mProxyItems[i]->setMaterialName( materialName.c_str() );
-        }
+        createProxyItems();
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::destroyProxyGeometry(void)
     {
-        for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
-        {
-            if( mProxyNodes[i] )
-            {
-                mProxyNodes[i]->getParentSceneNode()->removeAndDestroyChild( mProxyNodes[i] );
-                mProxyNodes[i] = 0;
-            }
-            if( mProxyItems[i] )
-            {
-                mSceneManager->destroyItem( mProxyItems[i] );
-                mProxyItems[i] = 0;
-            }
-        }
+        destroyProxyItems();
 
         if( !mProxyMesh.isNull() )
         {
