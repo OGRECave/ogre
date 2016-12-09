@@ -161,10 +161,12 @@ namespace Ogre
         mVplLinearAtten( 0.5 ),
         mVplQuadAtten( 0 ),
         mVplThreshold( 0.0005f ),
+        mVplPowerBoost( 1.4f ),
+        mVplUseIntensityForMaxRange( true ),
+        mVplIntensityRangeMultiplier( 100.0 ),
         mBias( 0.982f ),
         mNumSpreadIterations( 1 ),
         mSpreadThreshold( 0.0004 ),
-        mVplPowerBoost( 1.4f ),
         mMipmapBias( 0 ),
         mTotalNumRays( 0 ),
         mEnableDebugMarkers( false ),
@@ -1298,9 +1300,22 @@ namespace Ogre
                 colour.g = diffuseCol.y;
                 colour.b = diffuseCol.z;
                 colour.a = 1.0f;
+
+                Real range = mVplMaxRange;
+                if( mVplUseIntensityForMaxRange )
+                {
+                    double intensity;
+                    intensity = Ogre::max( colour.r, colour.g );
+                    intensity = Ogre::max( intensity, (double)colour.b );
+                    if( mVplQuadAtten != 0 )
+                        intensity *= 1e-6 / mVplQuadAtten;
+                    double rangeInMeters = sqrt( intensity );
+                    range = (float)(rangeInMeters * mVplIntensityRangeMultiplier);
+                }
+
                 vpl.light->setDiffuseColour( colour );
                 vpl.light->setSpecularColour( ColourValue::Black );
-                vpl.light->setAttenuation( mVplMaxRange, mVplConstAtten,
+                vpl.light->setAttenuation( Ogre::min( range, mVplMaxRange ), mVplConstAtten,
                                            mVplLinearAtten, mVplQuadAtten );
             }
             else if( vpl.light )

@@ -152,7 +152,7 @@
 		else
 			occupCol.x = occupancy;
 
-		finalColour.xyz = mix( finalColour.xyz, occupCol.xyz, 0.95f );
+		finalColour.xyz = lerp( finalColour.xyz, occupCol.xyz, 0.95f );
 	@end
 @end
 @end

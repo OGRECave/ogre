@@ -232,6 +232,13 @@ namespace Demo
                 mInstantRadiosity->mVplThreshold += modPerFrame * 0.05f;
                 changedVplSetting = true;
             }
+            if( keySym.sym == SDLK_p )
+            {
+                mInstantRadiosity->mVplIntensityRangeMultiplier += modPerFrame * 10.0;
+                mInstantRadiosity->mVplIntensityRangeMultiplier =
+                        Ogre::max( mInstantRadiosity->mVplIntensityRangeMultiplier, 0.01 );
+                changedVplSetting = true;
+            }
 
             ++itor;
         }
@@ -264,6 +271,9 @@ namespace Demo
             outText += "[Directional]";
             break;
         }
+        outText += "\nF4 to toggle intensity for max range ";
+        outText += mInstantRadiosity->mVplUseIntensityForMaxRange ? "[On]" : "[Off]";
+
         outText += "\nHold [Shift] to change value in opposite direction";
         outText += "\nVPL Max range [U]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplMaxRange );
@@ -271,6 +281,12 @@ namespace Demo
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplPowerBoost );
         outText += "\nVPL Threshold [O]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplThreshold );
+        if( mInstantRadiosity->mVplUseIntensityForMaxRange )
+        {
+            outText += "\nVPL Intensity Range Multiplier [P]: ";
+            outText += Ogre::StringConverter::toString(
+                        mInstantRadiosity->mVplIntensityRangeMultiplier );
+        }
 
         outText += "\nNum Rays [G]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumRays );
@@ -315,6 +331,12 @@ namespace Demo
             mCurrentType = static_cast<Ogre::Light::LightTypes>( (mCurrentType + 1) %
                                                                  Ogre::Light::LT_VPL );
             createLight();
+        }
+        else if( arg.keysym.sym == SDLK_F4 )
+        {
+            mInstantRadiosity->mVplUseIntensityForMaxRange =
+                    !mInstantRadiosity->mVplUseIntensityForMaxRange;
+            mInstantRadiosity->updateExistingVpls();
         }
         else if( arg.keysym.sym == SDLK_g )
         {
