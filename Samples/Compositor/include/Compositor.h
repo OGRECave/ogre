@@ -34,7 +34,6 @@ class _OgreSampleClassExport Sample_Compositor : public SdkSample
 
     void setupContent(void);
     void cleanupContent(void);
-    StringVector getRequiredPlugins();
 
     bool frameRenderingQueued(const FrameEvent& evt);
 
@@ -132,16 +131,6 @@ void Sample_Compositor::setupContent(void)
     setDragLook(true);
 #endif
 }
-
-
-StringVector Sample_Compositor::getRequiredPlugins()
-{
-    StringVector names;
-    if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
-        names.push_back("Cg Program Manager");
-    return names;
-}
-
 
 void Sample_Compositor::registerCompositors(void)
 {
