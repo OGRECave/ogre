@@ -108,8 +108,8 @@ namespace Ogre {
                         "GL3PlusHardwareIndexBuffer::lock");
         }
 
-        // return offsetted
-        retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+        // pBuffer is already offsetted in glMapBufferRange
+        retPtr = pBuffer;
 
         mLockedToScratch = false;
 
