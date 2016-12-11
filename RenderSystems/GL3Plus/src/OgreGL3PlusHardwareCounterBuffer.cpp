@@ -121,8 +121,8 @@ namespace v1 {
                         "GL3PlusHardwareCounterBuffer::lock");
         }
 
-        // return offsetted
-        retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+        // pBuffer is already offsetted in glMapBufferRange
+        retPtr = pBuffer;
 
         mIsLocked = true;
         return retPtr;
