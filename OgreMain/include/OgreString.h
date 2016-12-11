@@ -32,13 +32,8 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 // If we're using the GCC 3.1 C++ Std lib
-#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
-
-// For gcc 4.3 see http://gcc.gnu.org/gcc-4.3/changes.html
-#   if OGRE_COMP_VER >= 430
-#       include <tr1/unordered_map>
-#   else
-#       include <ext/hash_map>
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && OGRE_COMP_VER < 430 && !defined(STLPORT)
+#include <ext/hash_map>
 namespace __gnu_cxx
 {
     template <> struct hash< Ogre::_StringBase >
@@ -59,8 +54,6 @@ namespace __gnu_cxx
         }
     };
 }
-#   endif
-
 #endif
 
 namespace Ogre {
