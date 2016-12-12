@@ -55,12 +55,6 @@ namespace Ogre {
 #define OGRE_ARCHITECTURE_32 1
 #define OGRE_ARCHITECTURE_64 2
 
-#define OGRE_CPP_VER_UNDEFINED 0L
-#define OGRE_CPP_VER_98 199711L
-#define OGRE_CPP_VER_11 201103L
-#define OGRE_CPP_VER_14 201402L
-
-
 /* Finds the compiler type and version.
 */
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && defined(__ANDROID__) // We are using NVTegra
@@ -96,27 +90,6 @@ namespace Ogre {
 #endif
 
 #define OGRE_COMPILER_MIN_VERSION(COMPILER, VERSION) (OGRE_COMPILER == (COMPILER) && OGRE_COMP_VER >= (VERSION))
-
-/* Finds the c++ version.*/
-#ifdef  __cplusplus
-    #if __cplusplus >= OGRE_CPP_VER_14 
-        #define OGRE_CPP_VER OGRE_CPP_VER_14
-    #elif __cplusplus >= OGRE_CPP_VER_11
-        #define OGRE_CPP_VER OGRE_CPP_VER_11
-    #elif __cplusplus >= OGRE_CPP_VER_98
-        #define OGRE_CPP_VER OGRE_CPP_VER_98
-    #else
-        #define OGRE_CPP_VER OGRE_CPP_VER_UNDEFINED
-    #endif
-#endif
-
-
-/* define OGRE_OVERRIDE macro */
-#if OGRE_CPP_VER >= OGRE_CPP_VER_11 || OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1600)
-    #define OGRE_OVERRIDE override
-#else
-    #define OGRE_OVERRIDE 
-#endif
 
 /* See if we can use __forceinline or if we need to use __inline instead */
 #if OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1200)
@@ -205,27 +178,14 @@ namespace Ogre {
 #define OGRE_QUOTE(x) OGRE_QUOTE_INPLACE(x)
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
 
-/* define OGRE_DEPRECATED macro */
-#if OGRE_CPP_VER >= OGRE_CPP_VER_14
-#   define OGRE_DEPRECATED [[deprecated]]
-#elif OGRE_COMPILER == OGRE_COMPILER_MSVC
+// For marking functions as deprecated
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   define OGRE_DEPRECATED __declspec(deprecated)
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
 #   define OGRE_DEPRECATED __attribute__ ((deprecated))
 #else
 #   pragma message("WARNING: You need to implement OGRE_DEPRECATED for this compiler")
 #   define OGRE_DEPRECATED
-#endif
-
-/* define OGRE_DEPRECATED_EX(msg) macro */
-#if OGRE_CPP_VER >= OGRE_CPP_VER_14
-    #define OGRE_DEPRECATED_EX(message) [[deprecated(message)]]
-#elif OGRE_COMPILER == OGRE_COMPILER_MSVC
-    #define OGRE_DEPRECATED_EX(message) __declspec(deprecated(message))
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
-#   define OGRE_DEPRECATED_EX(message) __attribute__ ((deprecated))
-#else
-#   define OGRE_DEPRECATED_EX(message)
 #endif
 
 //----------------------------------------------------------------------------

@@ -203,6 +203,7 @@ namespace Ogre {
         case GL_FLOAT_VEC4:
             defToUpdate.constType = GCT_FLOAT4;
             break;
+        case GL_IMAGE_1D: //TODO should be its own type?
         case GL_SAMPLER_1D:
         case GL_SAMPLER_1D_ARRAY:
         case GL_INT_SAMPLER_1D:
@@ -212,6 +213,8 @@ namespace Ogre {
             // need to record samplers for GLSL
             defToUpdate.constType = GCT_SAMPLER1D;
             break;
+        case GL_IMAGE_2D: //TODO should be its own type?
+        case GL_IMAGE_2D_RECT:
         case GL_SAMPLER_2D:
         case GL_SAMPLER_2D_RECT:    // TODO: Move these to a new type??
         case GL_INT_SAMPLER_2D_RECT:
@@ -223,6 +226,7 @@ namespace Ogre {
         case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
             defToUpdate.constType = GCT_SAMPLER2D;
             break;
+        case GL_IMAGE_3D: //TODO should be its own type?
         case GL_SAMPLER_3D:
         case GL_INT_SAMPLER_3D:
         case GL_UNSIGNED_INT_SAMPLER_3D:
