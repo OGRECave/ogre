@@ -1,5 +1,7 @@
 #include <vrmllib/types_bits.h>
 
+#include <stdexcept>
+
 namespace vrmllib {
 namespace bits {
 

@@ -1,4 +1,12 @@
-#include "stdafx.h"
+#include <vrmllib/nodes.h>
+#include <vrmllib/file.h>
+
+#include <Ogre.h>
+#include <OgreDefaultHardwareBufferManager.h>
+#include <OgreLodStrategyManager.h>
+
+using namespace Ogre;
+using namespace vrmllib;
 
 struct vertex {
     int pos, tc, normal, colour;
@@ -101,10 +109,15 @@ try
 
     Math math;
     ResourceGroupManager resGrpMgr;
+    LodStrategyManager lodMgr;
+    MeshManager meshMgr;
     MaterialManager materialMgr;
+    materialMgr.initialise();
     MeshSerializer meshSer;
+    MaterialSerializer matSer;
+    DefaultHardwareBufferManager hbm;
 
-    Mesh mesh("conversionTarget");
+    MeshPtr mesh = meshMgr.create("conversionTarget", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     try {
         log.logMessage("Reading " + inname);
@@ -122,13 +135,20 @@ try
             gNameMap[i->second] = i->first;
 
         // search from SubMeshes
-        parseFile(&mesh, vfile);
+        parseFile(mesh.get(), vfile);
 
-        if (mesh.getNumSubMeshes() == 0)
+        if (mesh->getNumSubMeshes() == 0)
             throw "No SubMeshes were generated, aborting.";
 
         log.logMessage("Exporting Mesh");
-        meshSer.exportMesh(&mesh, outname, true);
+        meshSer.exportMesh(mesh.get(), outname);
+
+        ResourceManager::ResourceMapIterator it = materialMgr.getResourceIterator();
+        while(it.hasMoreElements()) {
+            matSer.queueForExport(it.getNext().staticCast<Ogre::Material>());
+        }
+
+        matSer.exportQueued(path + gBaseName + ".material");
 
         log.logMessage("Done.");
     }
@@ -136,14 +156,15 @@ try
         log.logMessage(LML_NORMAL, "Error: %s", e);
         return 1;
     }
-    catch (std::exception &e) {
-        log.logMessage(LML_NORMAL, "Exception: %s", e.what());
-        return 1;
-    }
     catch (Exception &e) {
         log.logMessage("Exception: " + e.getFullDescription());
         return 1;
     }
+    catch (std::exception &e) {
+        log.logMessage(LML_NORMAL, e.what());
+        return 1;
+    }
+
 }
 catch (Exception &e) {
     std::cerr << "Exception: " << e.getFullDescription() << std::endl;
@@ -175,7 +196,7 @@ void parseNode(Mesh *mesh, const vrmllib::node *n, Matrix4 m)
         scale[2][2] = tr->scale.z;
 
         Matrix3 rot3;
-        rot3.FromAxisAngle(vec(tr->rotation.vector), tr->rotation.radians);
+        rot3.FromAngleAxis(vec(tr->rotation.vector), Radian(tr->rotation.radians));
         Matrix4 rot = Matrix4::IDENTITY;
         rot = rot3;
 
@@ -248,13 +269,13 @@ try
     static std::map<Appearance *, Ogre::MaterialPtr> matMap;
 
     Ogre::MaterialPtr material = matMap[app];
-    if (!material->isNull() && app) {
+    if (!material.isNull() && app) {
         log.logMessage("Using material " + material->getName());
         sub->setMaterialName(material->getName());
     } else {
         String matName;
         const String *mn;
-        if (mn = findName(app))
+        if ((mn = findName(app)))
             matName = *mn;
         else if (app && (mn = findName(app->material))) {
             static std::map<String, int> postfix;
@@ -282,6 +303,11 @@ try
     VertVec vertices;
     TriVec triangles;
 
+    AxisAlignedBox bbox = mesh->getBounds();
+    for(size_t i = 0; i < coord->point.size(); i++) {
+        bbox.merge(vec(coord->point[i]));
+    }
+    mesh->_setBounds(bbox);
     log.logMessage("Processing geometry...");
     triangulateAndExpand(triangles, vertices, faces, sh);
 
@@ -306,45 +332,68 @@ void copyToSubMesh(SubMesh *sub, const TriVec &triangles, const VertVec &vertice
     int nvertices = vertices.size();
     int nfaces = triangles.size();
 
-    GeometryData &geom = sub->geometry;
+    sub->vertexData = new VertexData();
+    VertexDeclaration* decl = sub->vertexData->vertexDeclaration;
     sub->useSharedVertices = false;
-    sub->numFaces = nfaces;
-    sub->faceVertexIndices = new unsigned short[nfaces*3];
 
-    geom.hasColours = color;
-    geom.hasNormals = norm;
-    geom.numTexCoords = tcs ? 1 : 0;
-    geom.numTexCoordDimensions[0] = 2;
-    geom.numVertices = nvertices;
+    size_t offset = 0;
+    decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
+    offset += VertexElement::getTypeSize(VET_FLOAT3);
+    if(norm) {
+        decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL);
+        offset += VertexElement::getTypeSize(VET_FLOAT3);
+    }
+    if(tcs) {
+        decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES);
+        offset += VertexElement::getTypeSize(VET_FLOAT2);
+    }
 
-    geom.pVertices = new Real[nvertices*3];
-    if (tcs)
-        geom.pTexCoords[0] = new Real[nvertices*2];
-    if (norm)
-        geom.pNormals = new Real[nvertices*3];
-    if (color)
-        geom.pColours = new unsigned long[nvertices];
+    HardwareVertexBufferSharedPtr vbuf =
+            HardwareBufferManager::getSingleton().createVertexBuffer(
+            offset, nvertices, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+    ABGR* colors = NULL;
+    HardwareVertexBufferSharedPtr cbuf;
+    if(color) {
+        cbuf = HardwareBufferManager::getSingleton().createVertexBuffer(VertexElement::getTypeSize(VET_COLOUR),
+                nvertices, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        colors = (ABGR*)cbuf->lock(HardwareBuffer::HBL_DISCARD);
+
+        decl->addElement(1, 0, VET_COLOUR, VES_DIFFUSE);
+    }
+
+    HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
+            createIndexBuffer(
+            HardwareIndexBuffer::IT_16BIT,
+            nfaces*3,
+            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+    uint16* faces = (uint16*)ibuf->lock(HardwareBuffer::HBL_DISCARD);
+    // populate face list
+    for (int i=0; i!=nfaces; ++i) {
+        unsigned short *f = &faces[i*3];
+        f[0] = triangles[i].vertices[0];
+        f[1] = triangles[i].vertices[1];
+        f[2] = triangles[i].vertices[2];
+    }
+    ibuf->unlock();
+
+    sub->indexData->indexBuffer = ibuf;
+    sub->indexData->indexStart = 0;
+    sub->indexData->indexCount = nfaces*3;
 
     Matrix3 normMat;
     mat.extract3x3Matrix(normMat);
     normMat = normMat.Inverse().Transpose();
 
-    // populate face list
-    for (int i=0; i!=nfaces; ++i) {
-        unsigned short *f = sub->faceVertexIndices + i*3;
-        f[0] = triangles[i].vertices[0];
-        f[1] = triangles[i].vertices[1];
-        f[2] = triangles[i].vertices[2];
-    }
-
+    uchar* vattrs = (uchar*)vbuf->lock(HardwareBuffer::HBL_DISCARD);
     // populate vertex arrays
     for (int i=0; i!=nvertices; ++i) {
         const vertex &v = vertices[i];
 
-        Real *pos = geom.pVertices + i*3;
-        Real *tc = geom.pTexCoords[0] + i*2;
-        Real *n = geom.pNormals + i*3;
-        unsigned long *col = geom.pColours + i;
+        Real *pos = (Real*)&vattrs[i*offset];
+        Real *n = pos + 3;
+        Real *tc = n + 3;
 
         copyVec(pos, mat * vec(coord->point[v.pos]));
         if (norm) {
@@ -354,18 +403,23 @@ void copyToSubMesh(SubMesh *sub, const TriVec &triangles, const VertVec &vertice
         }
         if (tcs)
             copyVec(tc, tcs->point[v.tc]);
+
         if (color) {
             col3 c = color->color[v.colour];
             ColourValue cv(c.r, c.g, c.b);
-            *col = cv.getAsLongRGBA();
+            colors[i] = cv.getAsABGR();
         }
     }
+
+    if(color)
+        cbuf->unlock();
+
+    vbuf->unlock();
 }
 
 void triangulateAndExpand(TriVec &triangles, VertVec &vertices, const FaceVec &faces, const Shape *sh)
 {
     IndexedFaceSet *ifs = dynamic_cast<IndexedFaceSet *>(sh->geometry);
-    Coordinate *coord = dynamic_cast<Coordinate *>(ifs->coord);
     TextureCoordinate *tcs = dynamic_cast<TextureCoordinate *>(ifs->texCoord);
     Normal *norm = dynamic_cast<Normal *>(ifs->normal);
     Color *color = dynamic_cast<Color *>(ifs->color);
@@ -375,9 +429,8 @@ void triangulateAndExpand(TriVec &triangles, VertVec &vertices, const FaceVec &f
     // triangulate and expand vertices
     for (FaceVec::const_iterator f=faces.begin(), e=faces.end(); f!=e; ++f) {
         int faceNr = f - faces.begin();
-        int triVertNr = 0;
         int triVerts[2] = { -1, -1 };
-        for (IntVec::const_iterator i = f->indices.begin(), e=f->indices.end(); i!=e; ++i, ++triVertNr) {
+        for (IntVec::const_iterator i = f->indices.begin(), ei=f->indices.end(); i!=ei; ++i) {
             int triVertNr = i - f->indices.begin();
             int index = *i;
 
@@ -393,7 +446,7 @@ void triangulateAndExpand(TriVec &triangles, VertVec &vertices, const FaceVec &f
                 true, faceNr, index) : 0;
 
             // avoid duplication
-            int nvert = vertexMap.size();
+            size_t nvert = vertexMap.size();
             int &vpos = vertexMap[vert];
             if (nvert != vertexMap.size()) {
                 vpos = vertices.size();
@@ -477,7 +530,14 @@ Ogre::MaterialPtr parseMaterial(const Appearance *app, const String &name)
     vrmllib::Material *vm = app ? dynamic_cast<vrmllib::Material *>(app->material) : 0;
     vrmllib::ImageTexture *texture = app ? dynamic_cast<vrmllib::ImageTexture *>(app->texture) : 0;
 
-    Ogre::MaterialPtr m = MaterialManager::getSingleton().create(name, 
+    MaterialPtr m = MaterialManager::getSingleton().getByName(name,
+            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+    if(m.get()) {
+        return m;
+    }
+
+    m = MaterialManager::getSingleton().create(name,
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     ColourValue diffuse = texture ? ColourValue::White : col(vm->diffuseColor);
@@ -488,25 +548,28 @@ Ogre::MaterialPtr parseMaterial(const Appearance *app, const String &name)
     a.r *= vm->ambientIntensity;
     a.g *= vm->ambientIntensity;
     a.b *= vm->ambientIntensity;
-    m->setAmbient(a);
-    m->setDiffuse(diffuse);
-    m->setSelfIllumination(col(vm->emissiveColor));
-    m->setShininess(vm->shininess);
-    m->setSpecular(col(vm->specularColor));
 
-    m->setLightingEnabled(app);
+    Pass* p = m->createTechnique()->createPass();
+
+    p->setAmbient(a);
+    p->setDiffuse(diffuse);
+    p->setSelfIllumination(col(vm->emissiveColor));
+    p->setShininess(vm->shininess);
+    p->setSpecular(col(vm->specularColor));
+
+    p->setLightingEnabled(app);
 
     if (texture && !texture->url.empty()) {
         String texName = texture->url.front();
-        size_t p = texName.find_last_of("/\\");
-        if (p != texName.npos) {
+        size_t pos = texName.find_last_of("/\\");
+        if (pos != texName.npos) {
             LogManager::getSingleton().logMessage("Stripping path from texture " + texName);
-            texName.erase(0, p+1);
+            texName.erase(0, pos+1);
         }
 
         LogManager::getSingleton().logMessage("Adding texture layer for " + texName);
 
-        Ogre::TextureUnitState *l = m->addTextureLayer(texName);
+        Ogre::TextureUnitState *l = p->createTextureUnitState(texName);
         l->setTextureAddressingMode(texture->repeatS ?
             Ogre::TextureUnitState::TAM_WRAP : Ogre::TextureUnitState::TAM_CLAMP);
     }
@@ -533,7 +596,7 @@ Matrix4 scaleMat(vrmllib::vec3 v, bool inverse)
 Matrix4 rotMat(vrmllib::rot r, bool inverse)
 {
     Matrix3 rot3;
-    rot3.FromAxisAngle(vec(r.vector), inverse ? -r.radians : r.radians);
+    rot3.FromAngleAxis(vec(r.vector), Radian(inverse ? -r.radians : r.radians));
     Matrix4 rot = Matrix4::IDENTITY;
     rot = rot3;
     return rot;

@@ -1,4 +1,5 @@
 #include "commentstream.h"
+#include <cstdio>
 
 namespace utillib {
 
@@ -43,7 +44,7 @@ int commentstreambuf::underflow()
 }
 
 commentstream::commentstream(std::istream &s, char start, char end)
-    :   std::basic_istream(new commentstreambuf(s.rdbuf(), start, end))
+    :   std::istream(new commentstreambuf(s.rdbuf(), start, end))
 {
 }
 
