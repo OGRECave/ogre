@@ -2676,7 +2676,7 @@ namespace Ogre
                     break;
                 case ACT_LIGHT_DIRECTION_OBJECT_SPACE:
                     // We need the inverse of the inverse transpose
-                    source->getInverseTransposeWorldMatrix().inverse().extract3x3Matrix(m3);
+                    source->getTransposeWorldMatrix().extract3x3Matrix(m3);
                     vec3 = m3 * source->getLightDirection(i->data);
                     vec3.normalise();
                     // Set as 4D vector for compatibility
@@ -2696,7 +2696,7 @@ namespace Ogre
 
                 case ACT_LIGHT_DIRECTION_OBJECT_SPACE_ARRAY:
                     // We need the inverse of the inverse transpose
-                    source->getInverseTransposeWorldMatrix().inverse().extract3x3Matrix(m3);
+                    source->getTransposeWorldMatrix().extract3x3Matrix(m3);
                     for (size_t l = 0; l < i->data; ++l)
                     {
                         vec3 = m3 * source->getLightDirection(l);
