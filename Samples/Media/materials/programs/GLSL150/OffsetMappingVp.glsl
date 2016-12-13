@@ -35,7 +35,10 @@ void main()
     vec3 localbinormal = cross(tangent, normal);
 
     // Form a rotation matrix out of the vectors, column major for glsl es
-    mat3 TBN = mat3(tangent, localbinormal, normal);
+	mat3 TBN = mat3(vec3(tangent[0], localbinormal[0], normal[0]),
+						vec3(tangent[1], localbinormal[1], normal[1]),
+						vec3(tangent[2], localbinormal[2], normal[2]));
+    
 
     // Transform the light vector according to this matrix
     oLightDir = normalize(TBN * lightDir);

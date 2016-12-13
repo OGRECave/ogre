@@ -2058,8 +2058,6 @@ namespace Ogre {
                         "Cannot begin frame - no viewport selected.",
                         "GLRenderSystem::_beginFrame");
 
-        mCurrentContext->setCurrent();
-
         // Activate the viewport clipping
         mScissorsEnabled = true;
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
