@@ -128,6 +128,8 @@ namespace Ogre {
                 access = GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT;
 
             OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(GL_ARRAY_BUFFER, offset, length, access));
+            // pBuffer is already offsetted in glMapBufferRange
+            offset = 0;
         }
 #if OGRE_NO_GLES3_SUPPORT == 1
         else if(support->checkExtension("GL_OES_mapbuffer"))
@@ -153,8 +155,7 @@ namespace Ogre {
         }
 
         // return offsetted
-        void* retPtr = static_cast<void*>(
-                                    static_cast<unsigned char*>(pBuffer) + offset);
+        void* retPtr = static_cast<uint8*>(pBuffer) + offset;
 
         mIsLocked = true;
         return retPtr;
