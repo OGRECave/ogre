@@ -31,6 +31,9 @@ get_filename_component(OGRE_LIBRARY_DIRS "${OGRE_PREFIX_DIR}/lib" ABSOLUTE)
 get_filename_component(OGRE_INCLUDE_DIRS "${OGRE_PREFIX_DIR}/include/OGRE" ABSOLUTE)
 set(OGRE_LIBRARIES "OgreMain@OGRE_LIB_SUFFIX@")
 
+cmake_policy(PUSH)
+cmake_policy(SET CMP0012 NEW)
+
 if(@OGRE_USE_BOOST@)
     list(APPEND OGRE_INCLUDE_DIRS @Boost_INCLUDE_DIRS@)
     list(APPEND OGRE_LIBRARIES @Boost_LIBRARIES@)
@@ -130,6 +133,7 @@ endif()
 if(@OGRE_BUILD_RENDERSYSTEM_D3D11@)
     ogre_declare_plugin(RenderSystem Direct3D11)
 endif()
+cmake_policy(POP)
 
 message(STATUS "Found OGRE")
 message(STATUS "  static     : ${OGRE_STATIC}")
