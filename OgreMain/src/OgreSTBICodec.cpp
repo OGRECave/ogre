@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "stbi/stb_image.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#define STBI_WRITE_NO_STDIO
 #include "stbi/stb_image_write.h"
 
 namespace Ogre {
@@ -90,35 +91,42 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     DataStreamPtr STBIImageCodec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
-    {        
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "STBI encoding not supported",
-                    "STBIImageCodec::encode" ) ;
+    {
+        if(mType != "png") {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                        "currently only encoding to PNG supported",
+                        "STBIImageCodec::encode" ) ;
+        }
 
-        return DataStreamPtr();
+        ImageData* pImgData = static_cast<ImageData*>(pData.getPointer());
+        int channels = PixelUtil::getComponentCount(pImgData->format);
+
+        int len;
+        uchar *data = stbi_write_png_to_mem(input->getPtr(), pImgData->width*channels,
+                pImgData->width, pImgData->height, channels, &len);
+
+        if (!data) {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Error encoding image: " + String(stbi_failure_reason()),
+                "STBIImageCodec::encode");
+        }
+
+        return DataStreamPtr(new MemoryDataStream(data, len, true));
     }
     //---------------------------------------------------------------------
     void STBIImageCodec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
-        if(!StringUtil::endsWith(outFileName, "png")) {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                        "currently only encoding to PNG supported",
+        MemoryDataStreamPtr data = encode(input, pData).staticCast<MemoryDataStream>();
+        std::ofstream f(outFileName.c_str(), std::ios::out | std::ios::binary);
+
+        if(!f.is_open()) {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "could not open file",
                         "STBIImageCodec::encodeToFile" ) ;
         }
 
-        ImageData* pImgData = static_cast<ImageData*>(pData.getPointer());
-
-        int channels = PixelUtil::getComponentCount(pImgData->format);
-
-        int ret = stbi_write_png(outFileName.c_str(), pImgData->width, pImgData->height, channels,
-                           input->getPtr(), pImgData->width*channels);
-
-        if (!ret) {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Error encoding image: " + String(stbi_failure_reason()),
-                "STBIImageCodec::encodeToFile");
-        }
+        f.write((char*)data->getPtr(), data->size());
     }
     //---------------------------------------------------------------------
     Codec::DecodeResult STBIImageCodec::decode(DataStreamPtr& input) const
@@ -127,9 +135,9 @@ namespace Ogre {
         MemoryDataStream memStream(input, true);
 
         int width, height, components;
-        stbi_uc* pixelData = stbi_load_from_memory(memStream.getPtr(), static_cast<int>(memStream.size()), &width, &height, &components, 0);
-        
-        
+        stbi_uc* pixelData = stbi_load_from_memory(memStream.getPtr(),
+                static_cast<int>(memStream.size()), &width, &height, &components, 0);
+
         if (!pixelData)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
@@ -137,7 +145,7 @@ namespace Ogre {
                 "STBIImageCodec::decode");
         }
 
-        ImageData* imgData = OGRE_NEW ImageData();
+        SharedPtr<ImageData> imgData(OGRE_NEW ImageData());
         MemoryDataStreamPtr output;
 
         imgData->depth = 1; // only 2D formats handled by this codec
@@ -170,16 +178,11 @@ namespace Ogre {
         
         size_t dstPitch = imgData->width * PixelUtil::getNumElemBytes(imgData->format);
         imgData->size = dstPitch * imgData->height;
-        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        output.bind(OGRE_NEW MemoryDataStream(pixelData, imgData->size, true));
         
-        uchar* pDst = output->getPtr();
-        memcpy(pDst, pixelData, imgData->size);
-        
-        stbi_image_free(pixelData);
-
         DecodeResult ret;
         ret.first = output;
-        ret.second = CodecDataPtr(imgData);
+        ret.second = imgData;
         return ret;
     }
     //---------------------------------------------------------------------    
