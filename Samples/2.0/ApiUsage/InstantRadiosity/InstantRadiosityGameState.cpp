@@ -169,7 +169,7 @@ namespace Demo
         mCameraController->mCameraSpeedBoost = 10.0f;
 
         sceneManager->setForward3D( true, 4, 4, 4, 96, 0.5, 20 );
-        sceneManager->getForward3D()->setFadeAttenuationRange( true );
+        sceneManager->getForwardPlus()->setFadeAttenuationRange( true );
 
         TutorialGameState::createScene01();
     }

@@ -429,7 +429,7 @@ namespace Ogre
                         passScene->mCameraCubemapReorient = true;
                         passScene->mFirstRQ = mReservedRqId;
                         passScene->mLastRQ  = mReservedRqId + 1u;
-                        passScene->mEnableForward3D = false;
+                        passScene->mEnableForwardPlus = false;
                         passScene->mIncludeOverlays = false;
                         passScene->mVisibilityMask  = mProxyVisibilityMask;
                     }

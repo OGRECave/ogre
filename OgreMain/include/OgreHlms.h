@@ -646,10 +646,17 @@ namespace Ogre
         static const IdString ShadowCaster;
         static const IdString ShadowUsesDepthTexture;
         static const IdString RenderDepthOnly;
+        static const IdString ForwardPlus;
+        static const IdString ForwardPlusFlipY;
+        static const IdString ForwardPlusDebug;
+        static const IdString ForwardPlusFadeAttenRange;
+        static const IdString Forward3DNumSlices;
+        static const IdString FwdClusteredWidthxHeight;
+        static const IdString FwdClusteredWidth;
+        static const IdString FwdClusteredLightsPerCell;
+
         static const IdString Forward3D;
-        static const IdString Forward3DFlipY;
-        static const IdString Forward3DDebug;
-        static const IdString Forward3DFadeAttenRange;
+        static const IdString ForwardClustered;
         static const IdString VPos;
 
         //Change per material (hash can be cached on the renderable)

@@ -295,6 +295,12 @@ namespace Ogre
             return _mm_set1_epi32( val );
         }
 
+        static inline void Set( ArrayReal &_dst, Real val, size_t index )
+        {
+            float *dst = reinterpret_cast<float*>( &_dst );
+            dst[index] = val;
+        }
+
         /** Returns the result of "a == std::numeric_limits<float>::infinity()"
         @return
             r[i] = a[i] == Inf ? 0xffffffff : 0;

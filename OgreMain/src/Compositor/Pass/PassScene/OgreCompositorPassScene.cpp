@@ -155,7 +155,7 @@ namespace Ogre
             //We need to restore the previous RT's update
             mTarget->_beginUpdate();
         }
-        sceneManager->_setForward3DEnabledInPass( mDefinition->mEnableForward3D );
+        sceneManager->_setForwardPlusEnabledInPass( mDefinition->mEnableForwardPlus );
 
         mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
                                              mDefinition->mFirstRQ, mDefinition->mLastRQ );

@@ -180,6 +180,8 @@ namespace Ogre {
     class ExternalTextureSourceManager;
     class Factory;
     class Forward3D;
+    class ForwardClustered;
+    class ForwardPlusBase;
     struct FrameEvent;
     class FrameListener;
     class Frustum;

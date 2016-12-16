@@ -8414,7 +8414,7 @@ namespace Ogre{
                         }
                     }
                     break;
-                case ID_ENABLE_FORWARD3D:
+                case ID_ENABLE_FORWARDPLUS:
                     {
                         if(prop->values.empty())
                         {
@@ -8423,7 +8423,7 @@ namespace Ogre{
                         }
 
                         AbstractNodeList::const_iterator it0 = prop->values.begin();
-                        if( !getBoolean( *it0, &passScene->mEnableForward3D ) )
+                        if( !getBoolean( *it0, &passScene->mEnableForwardPlus ) )
                         {
                              compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
                         }

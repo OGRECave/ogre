@@ -524,12 +524,12 @@ namespace Ogre
         mGridBuffer             = 0;
         mGlobalLightListBuffer  = 0;
 
-        Forward3D *forward3D = sceneManager->_getActivePassForward3D();
-        if( forward3D )
+        ForwardPlusBase *forwardPlus = sceneManager->_getActivePassForwardPlus();
+        if( forwardPlus )
         {
-            mapSize += forward3D->getConstBufferSize();
-            mGridBuffer             = forward3D->getGridBuffer( camera );
-            mGlobalLightListBuffer  = forward3D->getGlobalLightListBuffer( camera );
+            mapSize += forwardPlus->getConstBufferSize();
+            mGridBuffer             = forwardPlus->getGridBuffer( camera );
+            mGlobalLightListBuffer  = forwardPlus->getGlobalLightListBuffer( camera );
         }
 
         //mat4 shadowRcv[numShadowMaps].texViewProj +
@@ -811,10 +811,10 @@ namespace Ogre
             }
         }
 
-        if( forward3D )
+        if( forwardPlus )
         {
-            forward3D->fillConstBufferData( renderTarget, passBufferPtr );
-            passBufferPtr += forward3D->getConstBufferSize() >> 2;
+            forwardPlus->fillConstBufferData( renderTarget, passBufferPtr );
+            passBufferPtr += forwardPlus->getConstBufferSize() >> 2;
         }
 
         passBufferPtr = mListener->preparePassBuffer( shadowNode, casterPass, dualParaboloid,

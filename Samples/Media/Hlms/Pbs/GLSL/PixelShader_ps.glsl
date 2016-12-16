@@ -19,9 +19,9 @@ in vec4 gl_FragCoord;
 @end
 
 @property( two_sided_lighting )
-	@property( hlms_forward3d_flipY )
+	@property( hlms_forwardplus_flipY )
 		@piece( two_sided_flip_normal )* (gl_FrontFacing ? -1.0 : 1.0)@end
-	@end @property( !hlms_forward3d_flipY )
+	@end @property( !hlms_forwardplus_flipY )
 		@piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
 	@end
 @end
@@ -44,7 +44,7 @@ in block
 
 @property( !hlms_shadowcaster )
 
-@property( hlms_forward3d )
+@property( hlms_forwardplus )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
 /*layout(binding = 2) */uniform samplerBuffer f3dLightList;@end
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
@@ -355,7 +355,7 @@ void main()
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forwardplus )
 	vec3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 

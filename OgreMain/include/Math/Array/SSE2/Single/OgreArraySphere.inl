@@ -38,6 +38,17 @@ namespace Ogre
         return _mm_cmple_ps( sqDist, sqRadius ); // sqDist <= sqRadius
     }
     //-----------------------------------------------------------------------------------
+    inline ArrayMaskR ArraySphere::intersects( const ArrayAabb &aabb ) const
+    {
+        //Get closest point from the AABB to the sphere's center by clamping
+        ArrayVector3 closestPoint = mCenter;
+        closestPoint.makeFloor( aabb.getMaximum() );
+        closestPoint.makeCeil( aabb.getMinimum() );
+
+        //Test the closets point vs sphere
+        return intersects( closestPoint );
+    }
+    //-----------------------------------------------------------------------------------
     inline ArrayReal ArraySphere::intersects( const ArrayVector3 &v ) const
     {
         ArrayReal sqRadius  = _mm_mul_ps( mRadius, mRadius );
