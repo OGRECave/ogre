@@ -289,14 +289,14 @@ namespace Demo
         if( mDisplayHelpMode == 2 )
         {
             Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-            Ogre::Forward3D *forward3D = sceneManager->getForward3D();
+            Ogre::ForwardPlusBase *forwardPlus = sceneManager->getForwardPlus();
 
             outText += "\nF2 to toggle animation. ";
             outText += mAnimateObjects ? "[On]" : "[Off]";
             outText += "\nF3 to use a low/high threshold for radius. ";
             outText += mLowThreshold ? "[Low]" : "[High]";
             outText += "\nF4 to use atten. range approximation. ";
-            outText += forward3D->getFadeAttenuationRange() ? "[On]" : "[Off]";
+            outText += forwardPlus->getFadeAttenuationRange() ? "[On]" : "[Off]";
             outText += "\nF5/F6 to increase/reduce number of lights. ";
             outText += "[" + Ogre::StringConverter::toString( mNumLights ) + "]";
             outText += "\nF7/F8 to increase/reduce light's radius. ";
@@ -338,8 +338,8 @@ namespace Demo
         else if( arg.keysym.sym == SDLK_F4 )
         {
             Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-            Ogre::Forward3D *forward3D = sceneManager->getForward3D();
-            forward3D->setFadeAttenuationRange( !forward3D->getFadeAttenuationRange() );
+            Ogre::ForwardPlusBase *forwardPlus = sceneManager->getForwardPlus();
+            forwardPlus->setFadeAttenuationRange( !forwardPlus->getFadeAttenuationRange() );
         }
         else if( arg.keysym.sym == SDLK_F5 || arg.keysym.sym == SDLK_F6 )
         {
