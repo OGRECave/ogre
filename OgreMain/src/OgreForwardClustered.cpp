@@ -40,7 +40,10 @@ THE SOFTWARE.
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreTexBufferPacked.h"
 
+#include "Math/Array/OgreObjectMemoryManager.h"
+
 #include "OgreHlms.h"
+#include "OgreWireAabb.h"
 
 namespace Ogre
 {
@@ -62,10 +65,11 @@ namespace Ogre
         mGridBuffer( 0 ),
         mCurrentCamera( 0 ),
         mMinDistance( minDistance ),
-        mMaxDistance( maxDistance )
+        mMaxDistance( maxDistance ),
+        mObjectMemoryManager( 0 ),
+        mNodeMemoryManager( 0 ),
+        mDebugWireAabbFrozen( false )
     {
-        assert( numSlices > 1 && "Must use at least 2 slices for ForwardClustered!" );
-
         //SIMD optimization restriction.
         assert( (width % ARRAY_PACKED_REALS) == 0 && "Width must be multiple of ARRAY_PACKED_REALS!" );
 
@@ -76,10 +80,38 @@ namespace Ogre
         mInvExponentK = 1.0f / mExponentK;
 
         mFrustumRegions.resize( (mWidth / ARRAY_PACKED_REALS) * mHeight * mNumSlices );
+
+        mObjectMemoryManager = new ObjectMemoryManager();
+        mNodeMemoryManager = new NodeMemoryManager();
+
+        mThreadCameras.reserve( mSceneManager->getNumWorkerThreads() );
+        for( size_t i=0; i<mSceneManager->getNumWorkerThreads(); ++i )
+        {
+            SceneNode *sceneNode = OGRE_NEW SceneNode( i, 0, mNodeMemoryManager, 0 );
+            Camera *newCamera = OGRE_NEW Camera( i, mObjectMemoryManager, 0 );
+            sceneNode->attachObject( newCamera );
+            mThreadCameras.push_back( newCamera );
+        }
     }
     //-----------------------------------------------------------------------------------
     ForwardClustered::~ForwardClustered()
     {
+        setDebugFrustum( false );
+
+        for( size_t i=mThreadCameras.size(); i--; )
+        {
+            SceneNode *sceneNode = mThreadCameras[i]->getParentSceneNode();
+            sceneNode->detachAllObjects();
+            OGRE_DELETE sceneNode;
+            OGRE_DELETE mThreadCameras[i];
+        }
+        mThreadCameras.clear();
+
+        delete mObjectMemoryManager;
+        delete mNodeMemoryManager;
+
+        mObjectMemoryManager = 0;
+        mNodeMemoryManager = 0;
     }
     //-----------------------------------------------------------------------------------
     inline float ForwardClustered::getDepthAtSlice( uint32 uSlice ) const
@@ -98,19 +130,19 @@ namespace Ogre
         const size_t slicesPerThread = mNumSlices / numThreads;
 
         for( size_t i=0; i<slicesPerThread; ++i )
-            collectLightForSlice( i + threadId * slicesPerThread );
+            collectLightForSlice( i + threadId * slicesPerThread, threadId );
 
         const size_t slicesRemainder = mNumSlices % numThreads;
         if( slicesRemainder > threadId )
-            collectLightForSlice( threadId + numThreads * slicesPerThread );
+            collectLightForSlice( threadId + numThreads * slicesPerThread, threadId );
     }
     //-----------------------------------------------------------------------------------
-    void ForwardClustered::collectLightForSlice( size_t slice )
+    void ForwardClustered::collectLightForSlice( size_t slice, size_t threadId )
     {
         const size_t frustumStartIdx = slice * (mWidth / ARRAY_PACKED_REALS) * mHeight;
 
-        Real nearDepthAtSlice = getDepthAtSlice( slice );
-        Real farDepthAtSlice  = getDepthAtSlice( slice + 1 );
+        Real nearDepthAtSlice = -getDepthAtSlice( slice );
+        Real farDepthAtSlice  = -getDepthAtSlice( slice + 1 );
 
         if( slice == 0 )
             nearDepthAtSlice = mCurrentCamera->getNearClipDistance();
@@ -118,87 +150,65 @@ namespace Ogre
         if( slice == mNumSlices - 1u )
             farDepthAtSlice = Ogre::max( mCurrentCamera->getFarClipDistance(), farDepthAtSlice );
 
-        const Vector3 *wsCorners = mCurrentCamera->_getCachedWorldSpaceCorners();
-        const Vector3 cameraPos = mCurrentCamera->_getCachedDerivedPosition();
-        const Vector3 cameraDir = mCurrentCamera->_getCachedDerivedDirection();
+        Camera *camera = mThreadCameras[threadId];
+
+        camera->resetFrustumExtents();
+        camera->setPosition( mCurrentCamera->_getCachedDerivedPosition() );
+        camera->setOrientation( mCurrentCamera->_getCachedDerivedOrientation() );
+
+        camera->setProjectionType( mCurrentCamera->getProjectionType() );
+        camera->setAspectRatio( mCurrentCamera->getAspectRatio() );
+        camera->setFOVy( mCurrentCamera->getFOVy() );
+        camera->setFocalLength( mCurrentCamera->getFocalLength() );
+        camera->setOrthoWindowHeight( mCurrentCamera->getOrthoWindowHeight() );
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+        camera->setOrientationMode( mCurrentCamera->getOrientationMode() );
+#endif
+
+        camera->setNearClipDistance( nearDepthAtSlice );
+        camera->setFarClipDistance( farDepthAtSlice );
+
+        Real origFrustumLeft, origFrustumRight, origFrustumTop, origFrustumBottom;
+        camera->getFrustumExtents( origFrustumLeft, origFrustumRight,
+                                   origFrustumTop, origFrustumBottom );
+
+        const Real frustumHorizLength = (origFrustumRight - origFrustumLeft) / (Real)mWidth;
+        const Real frustumVertLength = (origFrustumTop - origFrustumBottom) / (Real)mHeight;
 
         for( size_t y=0; y<mHeight; ++y )
         {
-            const Real fWyBottom    = y / (Real)mHeight;
-            const Real fWyTop       = (y + 1u) / (Real)mHeight;
-
-            const Vector3 leftMostBottom    = Math::lerp( wsCorners[6], wsCorners[5], fWyBottom );
-            const Vector3 leftMostTop       = Math::lerp( wsCorners[6], wsCorners[5], fWyTop );
-            const Vector3 rightMostBottom   = Math::lerp( wsCorners[7], wsCorners[4], fWyBottom );
-            const Vector3 rightMostTop      = Math::lerp( wsCorners[7], wsCorners[4], fWyTop );
+            const Real yStep = y;
 
             for( size_t x=0; x<mWidth / ARRAY_PACKED_REALS; ++x )
             {
-                FrustumRegion &frustumRegion = mFrustumRegions[frustumStartIdx + y *
-                        (mWidth / ARRAY_PACKED_REALS) + x];
-
                 for( size_t i=0; i<ARRAY_PACKED_REALS; ++i )
                 {
-                    const Real fWxLeft  = (x * ARRAY_PACKED_REALS + i) / (Real)mWidth;
-                    const Real fWxRight = (x * ARRAY_PACKED_REALS + i + 1u) / (Real)mWidth;
+                    const Real xStep = x * ARRAY_PACKED_REALS + i;
 
-                    Vector3 leftTop     = Math::lerp( leftMostTop,    rightMostTop,    fWxLeft );
-                    Vector3 leftBottom  = Math::lerp( leftMostBottom, rightMostBottom, fWxLeft );
-                    Vector3 rightTop    = Math::lerp( leftMostTop,    rightMostTop,    fWxRight );
-                    Vector3 rightBottom = Math::lerp( leftMostBottom, rightMostBottom, fWxRight );
+                    const Real newLeft   = origFrustumLeft + xStep * frustumHorizLength;
+                    const Real newRight  = newLeft + frustumHorizLength;
+                    const Real newBottom = origFrustumBottom + yStep * frustumVertLength;
+                    const Real newTop    = newBottom + frustumVertLength;
 
-                    Vector3 vDir;
+                    camera->setFrustumExtents( newLeft, newRight, newTop, newBottom, false );
 
-                    vDir = (leftTop - cameraPos).normalisedCopy();
-                    vDir /= vDir.dotProduct( cameraDir );
-                    const Vector3 leftTopNear( vDir * nearDepthAtSlice + cameraPos );
-                    vDir = (leftBottom - cameraPos).normalisedCopy();
-                    vDir /= vDir.dotProduct( cameraDir );
-                    const Vector3 leftBottomNear( vDir * nearDepthAtSlice + cameraPos );
-                    vDir = (rightTop - cameraPos).normalisedCopy();
-                    vDir /= vDir.dotProduct( cameraDir );
-                    const Vector3 rightTopNear( vDir * nearDepthAtSlice + cameraPos );
-                    vDir = (rightBottom - cameraPos).normalisedCopy();
-                    vDir /= vDir.dotProduct( cameraDir );
-                    const Vector3 rightBottomNear( vDir * nearDepthAtSlice + cameraPos );
+                    const Vector3 *wsCorners = camera->getWorldSpaceCorners();
 
-                    vDir = (leftTop - cameraPos).normalisedCopy();
-                    vDir /= vDir.dotProduct( cameraDir );
-                    const Vector3 leftTopFar( vDir * farDepthAtSlice + cameraPos );
-                    vDir = (leftBottom - cameraPos).normalisedCopy();
-                    vDir /= vDir.dotProduct( cameraDir );
-                    const Vector3 leftBottomFar( vDir * farDepthAtSlice + cameraPos );
-                    vDir = (rightTop - cameraPos).normalisedCopy();
-                    vDir /= vDir.dotProduct( cameraDir );
-                    const Vector3 rightTopFar( vDir * farDepthAtSlice + cameraPos );
-                    vDir = (rightBottom - cameraPos).normalisedCopy();
-                    vDir /= vDir.dotProduct( cameraDir );
-                    const Vector3 rightBottomFar( vDir * farDepthAtSlice + cameraPos );
-
-                    Plane plane[6];
-                    plane[FRUSTUM_PLANE_LEFT]   = Plane( leftTopFar, leftTopNear, leftBottomFar );
-                    plane[FRUSTUM_PLANE_RIGHT]  = Plane( rightTopFar, rightBottomFar, rightTopNear );
-                    plane[FRUSTUM_PLANE_TOP]    = Plane( leftTopFar, rightTopFar, leftTopNear );
-                    plane[FRUSTUM_PLANE_BOTTOM] = Plane( leftBottomFar, leftBottomNear, rightBottomFar );
-                    plane[FRUSTUM_PLANE_NEAR]   = Plane( rightBottomNear, rightTopNear, leftBottomNear );
-                    plane[FRUSTUM_PLANE_FAR]    = Plane( leftBottomFar, rightBottomFar, rightTopFar );
-
-                    Aabb planeAabb( leftTopNear, Vector3::ZERO );
-                    planeAabb.merge( leftBottomNear );
-                    planeAabb.merge( rightTopNear );
-                    planeAabb.merge( rightBottomNear );
-                    planeAabb.merge( leftTopFar );
-                    planeAabb.merge( leftBottomFar );
-                    planeAabb.merge( rightTopFar );
-                    planeAabb.merge( rightBottomFar );
-
-                    for( int i=0; i<6; ++i )
+                    FrustumRegion &frustumRegion = mFrustumRegions[frustumStartIdx + y *
+                            (mWidth / ARRAY_PACKED_REALS) + x];
                     {
-                        frustumRegion.plane[i].normal.setFromVector3( plane[i].normal, i );
-                        Mathlib::Set( frustumRegion.plane[i].negD, plane[i].d, i );
+                        Aabb planeAabb( wsCorners[0], Vector3::ZERO );
+                        for( int j=1; j<8; ++j )
+                            planeAabb.merge( wsCorners[j] );
+                        frustumRegion.aabb.setFromAabb( planeAabb, i );
                     }
 
-                    frustumRegion.aabb.setFromAabb( planeAabb, i );
+                    const Plane *planes = camera->getFrustumPlanes();
+                    for( int j=0; j<6; ++j )
+                    {
+                        frustumRegion.plane[j].normal.setFromVector3( planes[j].normal, i );
+                        Mathlib::Set( frustumRegion.plane[j].negD, -planes[j].d, i );
+                    }
                 }
             }
         }
@@ -297,6 +307,8 @@ namespace Ogre
                     }
                 }
             }
+
+            ++itLight;
         }
 
         {
@@ -418,6 +430,23 @@ namespace Ogre
 
         mSceneManager->executeUserScalableTask( this, true );
 
+        if( !mDebugWireAabb.empty() && !mDebugWireAabbFrozen )
+        {
+            //std::cout << "Start" << std::endl;
+            const size_t numFrustumRegions = mFrustumRegions.size();
+            for( size_t i=0; i<numFrustumRegions; ++i )
+            {
+                for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+                {
+                    Aabb aabb = mFrustumRegions[i].aabb.getAsAabb( j );
+                    mDebugWireAabb[i*ARRAY_PACKED_REALS+j]->setToAabb( aabb );
+                    mDebugWireAabb[i*ARRAY_PACKED_REALS+j]->getParentNode()->_getFullTransformUpdated();
+
+                    //std::cout << aabb.mCenter << aabb.mHalfSize << std::endl;
+                }
+            }
+        }
+
         cachedGrid->gridBuffer->unmap( UO_KEEP_PERSISTENT );
         mGridBuffer = 0;
 
@@ -493,5 +522,54 @@ namespace Ogre
         hlms->_setProperty( HlmsBaseProp::FwdClusteredWidthxHeight, mWidth * mHeight );
         hlms->_setProperty( HlmsBaseProp::FwdClusteredWidth,        mWidth );
         hlms->_setProperty( HlmsBaseProp::FwdClusteredLightsPerCell,mLightsPerCell );
+    }
+    //-----------------------------------------------------------------------------------
+    void ForwardClustered::setDebugFrustum( bool bEnableDebugFrustumWireAabb )
+    {
+        if( bEnableDebugFrustumWireAabb )
+        {
+            if( getDebugFrustum() )
+                setDebugFrustum( false );
+
+            const size_t numDebugWires = mWidth * mHeight * mNumSlices;
+            mDebugWireAabb.reserve( numDebugWires );
+            SceneNode *rootNode = mSceneManager->getRootSceneNode();
+            for( size_t i=0; i<numDebugWires; ++i )
+            {
+                mDebugWireAabb.push_back( mSceneManager->createWireAabb() );
+                rootNode->createChildSceneNode()->attachObject( mDebugWireAabb.back() );
+            }
+        }
+        else
+        {
+            //LIFO order for optimum cleanup perfomance
+            vector<WireAabb*>::type::const_reverse_iterator ritor = mDebugWireAabb.rbegin();
+            vector<WireAabb*>::type::const_reverse_iterator rend  = mDebugWireAabb.rend();
+
+            while( ritor != rend )
+            {
+                SceneNode *sceneNode = (*ritor)->getParentSceneNode();
+                sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
+                mSceneManager->destroyWireAabb( *ritor );
+                ++ritor;
+            }
+
+            mDebugWireAabb.clear();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    bool ForwardClustered::getDebugFrustum(void) const
+    {
+        return !mDebugWireAabb.empty();
+    }
+    //-----------------------------------------------------------------------------------
+    void ForwardClustered::setFreezeDebugFrustum( bool freezeDebugFrustum )
+    {
+        mDebugWireAabbFrozen = freezeDebugFrustum;
+    }
+    //-----------------------------------------------------------------------------------
+    bool ForwardClustered::getFreezeDebugFrustum(void) const
+    {
+        return mDebugWireAabbFrozen;
     }
 }

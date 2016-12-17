@@ -47,6 +47,14 @@ namespace Ogre
     /** ForwardPlusBase */
     class _OgreExport ForwardPlusBase : public HlmsAlloc
     {
+    public:
+        enum ForwardPlusMethods
+        {
+            MethodForward3D,
+            MethodForwardClustered,
+            NumForwardPlusMethods
+        };
+
     protected:
         static const size_t NumBytesPerLight;
 
@@ -106,6 +114,8 @@ namespace Ogre
     public:
         ForwardPlusBase( SceneManager *sceneManager );
         virtual ~ForwardPlusBase();
+
+        virtual ForwardPlusMethods getForwardPlusMethod(void) const = 0;
 
         void _changeRenderSystem( RenderSystem *newRs );
 

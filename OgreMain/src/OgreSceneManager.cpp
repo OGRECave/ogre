@@ -230,6 +230,10 @@ mGpuParamsDirty((uint16)GPV_ALL)
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
 {
+    OGRE_DELETE mForwardPlusSystem;
+    mForwardPlusSystem  = 0;
+    mForwardPlusImpl    = 0;
+
     fireSceneManagerDestroyed();
     clearScene();
     destroyAllCameras();
@@ -253,13 +257,10 @@ SceneManager::~SceneManager()
         mSceneRoot[i] = 0;
     }
     OGRE_DELETE mFullScreenQuad;
-    OGRE_DELETE mForwardPlusSystem;
     OGRE_DELETE mRenderQueue;
     OGRE_DELETE mAutoParamDataSource;
 
     mFullScreenQuad         = 0;
-    mForwardPlusSystem      = 0;
-    mForwardPlusImpl        = 0;
     mRenderQueue            = 0;
     mAutoParamDataSource    = 0;
 

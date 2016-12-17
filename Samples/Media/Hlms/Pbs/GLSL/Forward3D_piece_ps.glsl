@@ -42,23 +42,25 @@
 		// See C++'s ForwardClustered::getSliceAtDepth
 		float fSlice = log2( max( -inPs.pos.z - f3dMinDistance, 1 ) ) * f3dInvExponentK;
 		fSlice = floor( min( fSlice, f3dNumSlicesSub1 ) );
-		uint slice = uint( fSlice );
+		uint sliceSkip = uint( fSlice * @value( fwd_clustered_width_x_height ) );
 
-		uint sampleOffset = slice * @value( fwd_clustered_grid_width_x_height )u +
+		uint sampleOffset = sliceSkip +
 							uint(floor( gl_FragCoord.x * pass.fwdScreenToGrid.x ));
 		@property( hlms_forwardplus_flipY )
 			float windowHeight = pass.f3dData.w; //renderTarget->height
 			sampleOffset += uint(floor( (windowHeight - gl_FragCoord.y) * pass.fwdScreenToGrid.y ) *
-								 @value( fwd_clustered_grid_width ));
+								 @value( fwd_clustered_width ));
 		@end @property( !hlms_forwardplus_flipY )
 			sampleOffset += uint(floor( gl_FragCoord.y * pass.fwdScreenToGrid.y ) *
-								 @value( fwd_clustered_grid_width ));
+								 @value( fwd_clustered_width ));
 		@end
 
 		sampleOffset *= @value( fwd_clustered_lights_per_cell )u;
 	@end
 
 	uint numLightsInGrid = texelFetch( f3dGrid, int(sampleOffset) ).x;
+
+	@property( hlms_forwardplus_debug )uint totalNumLightsInGrid = numLightsInGrid;@end
 
 	for( uint i=0u; i<numLightsInGrid; ++i )
 	{
@@ -91,6 +93,8 @@
 
 	uint prevLightCount = numLightsInGrid;
 	numLightsInGrid		= texelFetch( f3dGrid, int(sampleOffset + 1u) ).x;
+
+	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
 
 	for( uint i=prevLightCount; i<numLightsInGrid; ++i )
 	{
@@ -140,6 +144,8 @@
 	prevLightCount	= numLightsInGrid;
 	numLightsInGrid	= texelFetch( f3dGrid, int(sampleOffset + 2u) ).x;
 
+	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
+
 	for( uint i=prevLightCount; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
@@ -172,7 +178,11 @@
 @end
 
 	@property( hlms_forwardplus_debug )
-		float occupancy = (numLightsInGrid / pass.f3dGridHWW[0].w);
+		@property( hlms_forwardplus == forward3d )
+			float occupancy = (totalNumLightsInGrid / pass.f3dGridHWW[0].w);
+		@end @property( hlms_forwardplus != forward3d )
+			float occupancy = (totalNumLightsInGrid / float( @value( fwd_clustered_lights_per_cell ) ));
+		@end
 		vec3 occupCol = vec3( 0.0, 0.0, 0.0 );
 		if( occupancy < 1.0 / 3.0 )
 			occupCol.z = occupancy;

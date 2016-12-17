@@ -97,6 +97,8 @@ namespace Ogre
                    float minDistance, float maxDistance, SceneManager *sceneManager );
         virtual ~Forward3D();
 
+        virtual ForwardPlusMethods getForwardPlusMethod(void) const     { return MethodForward3D; }
+
         virtual void collectLights( Camera *camera );
 
         uint32 getNumSlices(void) const                                 { return mNumSlices; }

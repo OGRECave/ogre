@@ -398,8 +398,8 @@ namespace Ogre {
         Vector3 getDerivedRight(void) const;
 
         /// Same as getDerivedPosition, but doesn't check if dirty.
-        const Vector3& _getCachedDerivedPosition(void) const    { return mDerivedPosition; }
-        Vector3 _getCachedDerivedDirection(void) const          { return -mDerivedOrientation.zAxis(); }
+        const Vector3& _getCachedDerivedPosition(void) const            { return mDerivedPosition; }
+        const Quaternion& _getCachedDerivedOrientation(void) const      { return mDerivedOrientation; }
 
         /** Gets the real world orientation of the camera, including any
             rotation inherited from a node attachment */

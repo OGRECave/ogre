@@ -71,6 +71,13 @@ namespace Ogre
         float   mExponentK;
         float   mInvExponentK;
 
+        ObjectMemoryManager     *mObjectMemoryManager;
+        NodeMemoryManager       *mNodeMemoryManager;
+        vector<Camera*>::type   mThreadCameras;
+
+        bool                    mDebugWireAabbFrozen;
+        vector<WireAabb*>::type mDebugWireAabb;
+
         /// Performs the reverse of getSliceAtDepth. @see getSliceAtDepth.
         inline float getDepthAtSlice( uint32 slice ) const;
 
@@ -82,12 +89,20 @@ namespace Ogre
         */
         inline uint32 getSliceAtDepth( Real depth ) const;
 
-        void collectLightForSlice( size_t slice );
+        void collectLightForSlice( size_t slice, size_t threadId );
 
     public:
         ForwardClustered( uint32 width, uint32 height, uint32 numSlices, uint32 lightsPerCell,
                    float minDistance, float maxDistance, SceneManager *sceneManager );
         virtual ~ForwardClustered();
+
+        virtual ForwardPlusMethods getForwardPlusMethod(void) const { return MethodForwardClustered; }
+
+        void setDebugFrustum( bool bEnableDebugFrustumWireAabb );
+        bool getDebugFrustum(void) const;
+
+        void setFreezeDebugFrustum( bool freezeDebugFrustum );
+        bool getFreezeDebugFrustum(void) const;
 
         virtual void execute( size_t threadId, size_t numThreads );
 

@@ -120,7 +120,7 @@ namespace Ogre
         outY = static_cast<uint32>( Ogre::min( floorf( fy ), res.height - 1 ) );
     }
     //-----------------------------------------------------------------------------------
-    inline bool OrderLightByDistanceToCamera( const Light *left, const Light *right )
+    inline bool OrderLightByDistanceToCamera3D( const Light *left, const Light *right )
     {
         if( left->getType() != right->getType() )
             return left->getType() < right->getType();
@@ -171,7 +171,7 @@ namespace Ogre
         const size_t numLights = mCurrentLightList.size();
 
         //Sort by distance to camera
-        std::sort( mCurrentLightList.begin(), mCurrentLightList.end(), OrderLightByDistanceToCamera );
+        std::sort( mCurrentLightList.begin(), mCurrentLightList.end(), OrderLightByDistanceToCamera3D );
 
         //Allocate the buffers if not already.
         if( !cachedGrid->gridBuffer )
