@@ -183,7 +183,7 @@
 		else
 			occupCol.x = occupancy;
 
-		finalColour.xyz = mix( finalColour.xyz, occupCol.xyz, 0.95f );
+		finalColour.xyz = mix( finalColour.xyz, occupCol.xyz, 0.55f ) * 2;
 	@end
 @end
 @end

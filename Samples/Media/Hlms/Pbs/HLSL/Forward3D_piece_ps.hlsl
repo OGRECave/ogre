@@ -181,7 +181,7 @@
 		else
 			occupCol.x = occupancy;
 
-		finalColour.xyz = lerp( finalColour.xyz, occupCol.xyz, 0.95f );
+		finalColour.xyz = lerp( finalColour.xyz, occupCol.xyz, 0.55f ) * 2;
 	@end
 @end
 @end

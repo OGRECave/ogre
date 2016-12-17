@@ -296,6 +296,8 @@ namespace Ogre {
         */
         const Radian& getSpotlightOuterAngle(void) const            { return mSpotOuter; }
 
+        Real getSpotlightTanHalfAngle(void) const                   { return mTanHalfAngle; }
+
         /** Returns the falloff between the inner and outer cones of the spotlight.
         */
         Real getSpotlightFalloff(void) const                        { return mSpotFalloff; }
@@ -518,6 +520,7 @@ namespace Ogre {
 
         Radian mSpotOuter;
         Radian mSpotInner;
+        Real mTanHalfAngle; // = tan( mSpotOuter * 0.5f );
         Real mSpotFalloff;
         Real mSpotNearClip;
         Real mRange;

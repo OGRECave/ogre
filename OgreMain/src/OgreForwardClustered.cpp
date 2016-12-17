@@ -198,8 +198,12 @@ namespace Ogre
                             (mWidth / ARRAY_PACKED_REALS) + x];
                     {
                         Aabb planeAabb( wsCorners[0], Vector3::ZERO );
+                        frustumRegion.corners[0].setAll( wsCorners[0] );
                         for( int j=1; j<8; ++j )
+                        {
                             planeAabb.merge( wsCorners[j] );
+                            frustumRegion.corners[j].setAll( wsCorners[j] );
+                        }
                         frustumRegion.aabb.setFromAabb( planeAabb, i );
                     }
 
@@ -238,7 +242,7 @@ namespace Ogre
                 ArrayVector3 lightPos;
                 ArrayReal lightRadius;
                 lightPos.setAll( scalarLightPos );
-                lightRadius = Mathlib::SetAll( (*itLight)->getWorldRadius() );
+                lightRadius = Mathlib::SetAll( (*itLight)->getAttenuationRange() );
 
                 ArraySphere sphere( lightRadius, lightPos );
 
@@ -280,6 +284,144 @@ namespace Ogre
                     ArrayMaskR aabbVsSphere = sphere.intersects( frustumRegion.aabb );
 
                     mask = Mathlib::And( mask, aabbVsSphere );
+
+                    const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
+
+                    for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+                    {
+                        if( IS_BIT_SET( k, scalarMask ) )
+                        {
+                            const size_t idx = (frustumStartIdx + j) * ARRAY_PACKED_REALS + k;
+                            FastArray<LightCount>::iterator numLightsInCell =
+                                    mLightCountInCell.begin() + idx;
+
+                            //assert( numLightsInCell < mLightCountInCell.end() );
+
+                            //mLightsPerCell - 3 because three slots is reserved
+                            //for the number of lights in cell per type
+                            if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
+                            {
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mLightsPerCell +
+                                        (numLightsInCell->lightCount[0] + 3u);
+                                *cellElem = i * 6;
+                                ++numLightsInCell->lightCount[0];
+                                ++numLightsInCell->lightCount[lightType];
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                //Spotlight. Do pyramid vs frustum intersection. This pyramid
+                //has 5 sides and encloses the spotlight's cone.
+
+                Node *lightNode = (*itLight)->getParentNode();
+
+                //Generate the 5 pyramid vertices
+                const Real lightRange = (*itLight)->getAttenuationRange();
+                const Real lenOpposite = (*itLight)->getSpotlightTanHalfAngle() * lightRange;
+
+                Vector3 leftCorner = lightNode->_getDerivedOrientation() *
+                        Vector3( -lenOpposite, lenOpposite, 0 );
+                Vector3 rightCorner = lightNode->_getDerivedOrientation() *
+                        Vector3( lenOpposite, lenOpposite, 0 );
+
+                Vector3 scalarLightPos = (*itLight)->getParentNode()->_getDerivedPosition();
+                Vector3 scalarLightDir = (*itLight)->getDirection() * lightRange;
+
+                Plane scalarPlane[6];
+
+                scalarPlane[FRUSTUM_PLANE_FAR] = Plane( scalarLightPos + scalarLightDir + leftCorner,
+                                                        scalarLightPos + scalarLightDir,
+                                                        scalarLightPos + scalarLightDir + rightCorner );
+                scalarPlane[FRUSTUM_PLANE_NEAR] = Plane( -scalarPlane[FRUSTUM_PLANE_FAR].normal,
+                                                         scalarLightPos );
+
+                scalarPlane[FRUSTUM_PLANE_LEFT] = Plane( scalarLightPos + scalarLightDir - rightCorner,
+                                                         scalarLightPos + scalarLightDir + leftCorner,
+                                                         scalarLightPos );
+                scalarPlane[FRUSTUM_PLANE_RIGHT]= Plane( scalarLightPos + scalarLightDir + rightCorner,
+                                                         scalarLightPos + scalarLightDir - leftCorner,
+                                                         scalarLightPos );
+
+                scalarPlane[FRUSTUM_PLANE_TOP]  = Plane( scalarLightPos + scalarLightDir + leftCorner,
+                                                         scalarLightPos + scalarLightDir + rightCorner,
+                                                         scalarLightPos );
+                scalarPlane[FRUSTUM_PLANE_BOTTOM]= Plane( scalarLightPos + scalarLightDir - leftCorner,
+                                                          scalarLightPos + scalarLightDir - rightCorner,
+                                                          scalarLightPos );
+
+                ArrayPlane pyramidPlane[6];
+                pyramidPlane[0].normal.setAll( scalarPlane[0].normal );
+                pyramidPlane[0].negD = Mathlib::SetAll( -scalarPlane[0].d );
+                pyramidPlane[1].normal.setAll( scalarPlane[1].normal );
+                pyramidPlane[1].negD = Mathlib::SetAll( -scalarPlane[1].d );
+                pyramidPlane[2].normal.setAll( scalarPlane[2].normal );
+                pyramidPlane[2].negD = Mathlib::SetAll( -scalarPlane[2].d );
+                pyramidPlane[3].normal.setAll( scalarPlane[3].normal );
+                pyramidPlane[3].negD = Mathlib::SetAll( -scalarPlane[3].d );
+                pyramidPlane[4].normal.setAll( scalarPlane[4].normal );
+                pyramidPlane[4].negD = Mathlib::SetAll( -scalarPlane[4].d );
+                pyramidPlane[5].normal.setAll( scalarPlane[5].normal );
+                pyramidPlane[5].negD = Mathlib::SetAll( -scalarPlane[5].d );
+
+                ArrayVector3 pyramidVertex[5];
+
+                pyramidVertex[0].setAll( scalarLightPos );
+                pyramidVertex[1].setAll( scalarLightPos + scalarLightDir + leftCorner );
+                pyramidVertex[2].setAll( scalarLightPos + scalarLightDir + rightCorner );
+                pyramidVertex[3].setAll( scalarLightPos + scalarLightDir - leftCorner );
+                pyramidVertex[4].setAll( scalarLightPos + scalarLightDir - rightCorner );
+
+                for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
+                {
+                    const FrustumRegion frustumRegion = mFrustumRegions[frustumStartIdx + j];
+
+                    ArrayReal dotResult;
+                    ArrayMaskR mask;
+
+                    mask = BooleanMask4::getAllSetMask();
+
+                    //There is no intersection if for at least one of the 12 planes
+                    //(6+6) all the vertices (5+8 verts.) are on the negative side.
+
+                    //Test all 5 pyramid vertices against each of the 6 frustum planes.
+                    for( int k=0; k<6; ++k )
+                    {
+                        ArrayMaskR vertexMask = ARRAY_REAL_ZERO;
+
+                        for( int l=0; l<5; ++l )
+                        {
+                            dotResult = frustumRegion.plane[k].normal.dotProduct( pyramidVertex[l] ) -
+                                        frustumRegion.plane[k].negD;
+                            vertexMask = Mathlib::Or( vertexMask,
+                                                      Mathlib::CompareGreater( dotResult,
+                                                                               ARRAY_REAL_ZERO ) );
+                        }
+
+                        mask = Mathlib::And( mask, vertexMask );
+                    }
+
+                    if( BooleanMask4::getScalarMask( mask ) != 0 )
+                    {
+                        //Test all 8 frustum corners against each of the 6 pyramid planes.
+                        for( int k=0; k<6; ++k )
+                        {
+                            ArrayMaskR vertexMask = ARRAY_REAL_ZERO;
+
+                            for( int l=0; l<8; ++l )
+                            {
+                                dotResult = pyramidPlane[k].normal.dotProduct( frustumRegion.corners[l] ) -
+                                            pyramidPlane[k].negD;
+                                vertexMask = Mathlib::Or( vertexMask,
+                                                          Mathlib::CompareGreater( dotResult,
+                                                                                   ARRAY_REAL_ZERO ) );
+                            }
+
+                            mask = Mathlib::And( mask, vertexMask );
+                        }
+                    }
 
                     const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
 

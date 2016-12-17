@@ -41,6 +41,7 @@ namespace Ogre {
           mSpecular(ColourValue::White),
           mSpotOuter(Degree(40.0f)),
           mSpotInner(Degree(30.0f)),
+          mTanHalfAngle( Math::Tan( mSpotOuter * 0.5f ) ),
           mSpotFalloff(1.0f),
           mSpotNearClip(0.0f),
           mRange(23.0f),
@@ -129,6 +130,8 @@ namespace Ogre {
         mSpotOuter = outerAngle;
         mSpotFalloff = falloff;
 
+        mTanHalfAngle = Math::Tan( mSpotOuter * 0.5f );
+
         if( boundsChanged && mLightType == LT_SPOTLIGHT )
             updateLightBounds();
     }
@@ -142,6 +145,7 @@ namespace Ogre {
     {
         bool boundsChanged = mSpotOuter != val;
         mSpotOuter = val;
+        mTanHalfAngle = Math::Tan( mSpotOuter * 0.5f );
         if( boundsChanged && mLightType == LT_SPOTLIGHT )
             updateLightBounds();
     }
@@ -220,7 +224,7 @@ namespace Ogre {
             {
                 //In local space, lights are centered at origin, facing towards +Z
                 Aabb aabb;
-                Real lenOpposite = Math::Tan( mSpotOuter * 0.5f ) * mRange;
+                Real lenOpposite = mTanHalfAngle * mRange;
                 aabb.mCenter    = Vector3( 0, 0, -mRange * 0.5f );
                 aabb.mHalfSize  = Vector3( lenOpposite, lenOpposite, mRange * 0.5f );
                 mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
@@ -228,8 +232,8 @@ namespace Ogre {
             }
             else
             {
-                Real tanHalfAngle = Math::Tan( mSpotOuter * 0.5f ) * mRange;
-                mParentNode->setScale( tanHalfAngle, tanHalfAngle, mRange );
+                Real tanHalfAngleRange = mTanHalfAngle * mRange;
+                mParentNode->setScale( tanHalfAngleRange, tanHalfAngleRange, mRange );
             }
         }
     }

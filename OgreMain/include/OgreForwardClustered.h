@@ -54,6 +54,7 @@ namespace Ogre
         {
             ArrayPlane      plane[6];
             ArrayAabb       aabb;
+            ArrayVector3    corners[8];
         };
 
         uint32  mWidth;
