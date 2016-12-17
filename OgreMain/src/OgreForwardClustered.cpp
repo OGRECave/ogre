@@ -202,7 +202,7 @@ namespace Ogre
                         for( int j=1; j<8; ++j )
                         {
                             planeAabb.merge( wsCorners[j] );
-                            frustumRegion.corners[j].setAll( wsCorners[j] );
+                            frustumRegion.corners[j].setFromVector3( wsCorners[j], i );
                         }
                         frustumRegion.aabb.setFromAabb( planeAabb, i );
                     }
