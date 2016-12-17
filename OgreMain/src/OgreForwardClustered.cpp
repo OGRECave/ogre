@@ -79,7 +79,8 @@ namespace Ogre
         mExponentK = Math::Log2( mMaxDistance - mMinDistance ) / (Real)mNumSlices;
         mInvExponentK = 1.0f / mExponentK;
 
-        mFrustumRegions.resize( (mWidth / ARRAY_PACKED_REALS) * mHeight * mNumSlices );
+        mFrustumRegions = RawSimdUniquePtr<FrustumRegion, MEMCATEGORY_SCENE_CONTROL>(
+                    (mWidth / ARRAY_PACKED_REALS) * mHeight * mNumSlices );
 
         mObjectMemoryManager = new ObjectMemoryManager();
         mNodeMemoryManager = new NodeMemoryManager();
@@ -194,7 +195,7 @@ namespace Ogre
 
                     const Vector3 *wsCorners = camera->getWorldSpaceCorners();
 
-                    FrustumRegion &frustumRegion = mFrustumRegions[frustumStartIdx + y *
+                    FrustumRegion &frustumRegion = mFrustumRegions.get()[frustumStartIdx + y *
                             (mWidth / ARRAY_PACKED_REALS) + x];
                     {
                         Aabb planeAabb( wsCorners[0], Vector3::ZERO );
@@ -248,7 +249,8 @@ namespace Ogre
 
                 for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
                 {
-                    const FrustumRegion frustumRegion = mFrustumRegions[frustumStartIdx + j];
+                    const FrustumRegion * RESTRICT_ALIAS frustumRegion =
+                            mFrustumRegions.get() + frustumStartIdx + j;
 
                     //Test all 6 planes and AND the dot product. If one is false, then we're not visible
                     //We perform (both lines are equivalent):
@@ -257,31 +259,31 @@ namespace Ogre
                     ArrayReal dotResult;
                     ArrayMaskR mask;
 
-                    dotResult = frustumRegion.plane[0].normal.dotProduct( lightPos ) + lightRadius;
-                    mask = Mathlib::CompareGreater( dotResult, frustumRegion.plane[0].negD );
+                    dotResult = frustumRegion->plane[0].normal.dotProduct( lightPos ) + lightRadius;
+                    mask = Mathlib::CompareGreater( dotResult, frustumRegion->plane[0].negD );
 
-                    dotResult = frustumRegion.plane[1].normal.dotProduct( lightPos ) + lightRadius;
+                    dotResult = frustumRegion->plane[1].normal.dotProduct( lightPos ) + lightRadius;
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion.plane[1].negD ) );
+                                                                        frustumRegion->plane[1].negD ) );
 
-                    dotResult = frustumRegion.plane[2].normal.dotProduct( lightPos ) + lightRadius;
+                    dotResult = frustumRegion->plane[2].normal.dotProduct( lightPos ) + lightRadius;
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion.plane[2].negD ) );
+                                                                        frustumRegion->plane[2].negD ) );
 
-                    dotResult = frustumRegion.plane[3].normal.dotProduct( lightPos ) + lightRadius;
+                    dotResult = frustumRegion->plane[3].normal.dotProduct( lightPos ) + lightRadius;
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion.plane[3].negD ) );
+                                                                        frustumRegion->plane[3].negD ) );
 
-                    dotResult = frustumRegion.plane[4].normal.dotProduct( lightPos ) + lightRadius;
+                    dotResult = frustumRegion->plane[4].normal.dotProduct( lightPos ) + lightRadius;
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion.plane[4].negD ) );
+                                                                        frustumRegion->plane[4].negD ) );
 
-                    dotResult = frustumRegion.plane[5].normal.dotProduct( lightPos ) + lightRadius;
+                    dotResult = frustumRegion->plane[5].normal.dotProduct( lightPos ) + lightRadius;
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion.plane[5].negD ) );
+                                                                        frustumRegion->plane[5].negD ) );
 
                     //Test the frustum's AABB vs sphere. If they don't intersect, we're not visible.
-                    ArrayMaskR aabbVsSphere = sphere.intersects( frustumRegion.aabb );
+                    ArrayMaskR aabbVsSphere = sphere.intersects( frustumRegion->aabb );
 
                     mask = Mathlib::And( mask, aabbVsSphere );
 
@@ -376,7 +378,8 @@ namespace Ogre
 
                 for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
                 {
-                    const FrustumRegion frustumRegion = mFrustumRegions[frustumStartIdx + j];
+                    const FrustumRegion * RESTRICT_ALIAS frustumRegion =
+                            mFrustumRegions.get() + frustumStartIdx + j;
 
                     ArrayReal dotResult;
                     ArrayMaskR mask;
@@ -393,8 +396,8 @@ namespace Ogre
 
                         for( int l=0; l<5; ++l )
                         {
-                            dotResult = frustumRegion.plane[k].normal.dotProduct( pyramidVertex[l] ) -
-                                        frustumRegion.plane[k].negD;
+                            dotResult = frustumRegion->plane[k].normal.dotProduct( pyramidVertex[l] ) -
+                                        frustumRegion->plane[k].negD;
                             vertexMask = Mathlib::Or( vertexMask,
                                                       Mathlib::CompareGreater( dotResult,
                                                                                ARRAY_REAL_ZERO ) );
@@ -412,8 +415,8 @@ namespace Ogre
 
                             for( int l=0; l<8; ++l )
                             {
-                                dotResult = pyramidPlane[k].normal.dotProduct( frustumRegion.corners[l] ) -
-                                            pyramidPlane[k].negD;
+                                dotResult = pyramidPlane[k].normal.dotProduct(
+                                            frustumRegion->corners[l] ) - pyramidPlane[k].negD;
                                 vertexMask = Mathlib::Or( vertexMask,
                                                           Mathlib::CompareGreater( dotResult,
                                                                                    ARRAY_REAL_ZERO ) );
@@ -580,7 +583,7 @@ namespace Ogre
             {
                 for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
                 {
-                    Aabb aabb = mFrustumRegions[i].aabb.getAsAabb( j );
+                    Aabb aabb = mFrustumRegions.get()[i].aabb.getAsAabb( j );
                     mDebugWireAabb[i*ARRAY_PACKED_REALS+j]->setToAabb( aabb );
                     mDebugWireAabb[i*ARRAY_PACKED_REALS+j]->getParentNode()->_getFullTransformUpdated();
 

@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreForwardPlusBase.h"
+#include "OgreRawPtr.h"
 #include "Threading/OgreUniformScalableTask.h"
 #include "OgreHeaderPrefix.h"
 
@@ -62,7 +63,7 @@ namespace Ogre
         uint32  mNumSlices;
         uint32  mLightsPerCell;
 
-        FastArray<FrustumRegion>    mFrustumRegions;
+        RawSimdUniquePtr<FrustumRegion, MEMCATEGORY_SCENE_CONTROL> mFrustumRegions;
 
         uint16 * RESTRICT_ALIAS mGridBuffer;
         Camera                  *mCurrentCamera;
