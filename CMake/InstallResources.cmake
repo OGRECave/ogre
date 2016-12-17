@@ -266,14 +266,21 @@ endif ()
 
 
 # Create the CMake package files
+include(CMakePackageConfigHelpers)
+
 if (WIN32)
    set(OGRE_CMAKE_DIR CMake)
 elseif (UNIX)
    set(OGRE_CMAKE_DIR lib/OGRE/cmake)
 elseif (APPLE)
 endif ()
-configure_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake @ONLY)
-configure_file(${OGRE_TEMPLATES_DIR}/OGREConfigVersion.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake @ONLY)
+configure_package_config_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
+    INSTALL_DESTINATION ${OGRE_CMAKE_DIR}
+    PATH_VARS CMAKE_INSTALL_PREFIX)
+write_basic_package_version_file(
+    ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake 
+    VERSION ${OGRE_VERSION} 
+    COMPATIBILITY SameMajorVersion)
 install(FILES
    ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
    ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake
