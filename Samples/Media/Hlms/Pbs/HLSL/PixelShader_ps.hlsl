@@ -21,7 +21,7 @@ struct PS_INPUT
 @piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
 @end
 
-@property( hlms_forward3d )
+@property( hlms_forwardplus )
 Buffer<uint> f3dGrid : register(t1);
 Buffer<float4> f3dLightList : register(t2);@end
 
@@ -298,7 +298,7 @@ float4 diffuseCol;
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forwardplus )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 

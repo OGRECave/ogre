@@ -142,7 +142,7 @@ fragment @insertpiece( output_type ) main_metal
 	@end
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
-	@property( hlms_forward3d )
+	@property( hlms_forwardplus )
 		, device const ushort *f3dGrid [[buffer(TEX_SLOT_START+1)]]
 		, device const float4 *f3dLightList [[buffer(TEX_SLOT_START+2)]]
 	@end
@@ -311,7 +311,7 @@ float4 diffuseCol;
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forwardplus )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 

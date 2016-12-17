@@ -55,13 +55,25 @@ cbuffer PassBuffer : register(b0)
 	float2 depthRange;
 @end
 
-@property( hlms_forward3d )
+@property( hlms_forwardplus )
+	//Forward3D
 	//f3dData.x = minDistance;
 	//f3dData.y = invMaxDistance;
 	//f3dData.z = f3dNumSlicesSub1;
 	//f3dData.w = uint cellsPerTableOnGrid0 (floatBitsToUint);
+
+	//Clustered Forward:
+	//f3dData.x = minDistance;
+	//f3dData.y = invExponentK;
+	//f3dData.z = f3dNumSlicesSub1;
+	//f3dData.w = renderWindow->getHeight();
 	float4 f3dData;
-	float4 f3dGridHWW[@value( hlms_forward3d )];
+	@property( hlms_forwardplus == forward3d )
+		float4 f3dGridHWW[@value( forward3d_num_slices )];
+	@end
+	@property( hlms_forwardplus != forward3d )
+		float4 fwdScreenToGrid;
+	@end
 @end
 
 @property( parallax_correct_cubemaps )
