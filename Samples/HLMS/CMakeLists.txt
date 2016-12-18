@@ -3,7 +3,7 @@
 set(HEADER_FILES include/HLMS.h)
 set(SOURCE_FILES src/HLMS.cpp)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR})
 
 ogre_add_library_to_folder(Samples Sample_HLMS ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
