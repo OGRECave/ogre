@@ -68,6 +68,8 @@ namespace Ogre
         GLuint getDepthBuffer() const  { return mDepthBufferName; }
         GLuint getStencilBuffer() const { return mStencilBufferName; }
 
+        bool hasSeparateStencilBuffer() const;
+
     protected:
         uint32                  mMultiSampleQuality;
         GL3PlusContext              *mCreatorContext;
