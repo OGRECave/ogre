@@ -90,6 +90,13 @@ namespace Ogre
         OT_PATCH_32_CONTROL_POINT   = 38
     };
 
+    /** IT'S MEMBERS MUST BE KEPT POD (Otherwise HlmsPso needs to be modified).
+    @par
+        Padding must be explicit! This way, copy/assignment operators will also copy the padded
+        values which is needed for properly testing via memcmp.
+        Use these Clang params to help you find alignment issues:
+            -Xclang -fdump-record-layouts -Wpadded > dmp.txt 2>err.txt
+    */
     struct HlmsPassPso
     {
         /// Stencil support
@@ -110,9 +117,16 @@ namespace Ogre
 
         bool operator == ( const HlmsPassPso &_r ) const
         {
-            //Warning! For this to work correctly, the struct must have been previously
-            //memset to zero (padded bytes would affect the results otherwise)
+            //This will work correctly, because padded bytes are explicit.
             return !memcmp( this, &_r, sizeof(HlmsPassPso) );
+        }
+        bool operator != ( const HlmsPassPso &_r ) const
+        {
+            return !(*this == _r);
+        }
+        bool operator < ( const HlmsPassPso &_r ) const
+        {
+            return memcmp( this, &_r, sizeof(HlmsPassPso) ) < 0;
         }
     };
 
@@ -124,6 +138,11 @@ namespace Ogre
 
             In the other APIs, vertex-input data is use, and VertexArrayObject pointers
             only control which vertex and index buffers are bound to the device.
+    @par
+        Padding must be explicit! This way, copy/assignment operators will also copy the padded
+        values which is needed for properly testing via memcmp.
+        Use these Clang params to help you find alignment issues:
+            -Xclang -fdump-record-layouts -Wpadded > dmp.txt 2>err.txt
     */
     struct HlmsPso
     {
@@ -133,20 +152,27 @@ namespace Ogre
         GpuProgramPtr   tesselationDomainShader;
         GpuProgramPtr   pixelShader;
 
+        //Computed from the VertexArrayObject (or v1 equivalent)
+        VertexElement2VecVec    vertexElements;
+        OperationType           operationType;
+        bool                    enablePrimitiveRestart;
+        uint8                   padding[3];
+
         HlmsMacroblock const    *macroblock;
         HlmsBlendblock const    *blendblock;
         //No independent blenblocks for now
 //      HlmsBlendblock const    *blendblock[8];
 //      bool                    independentBlend;
-        uint32                  sampleMask; /// Fixed to 0xffffffff for now
 
-        //Computed from the VertexArrayObject (or v1 equivalent)
-        VertexElement2VecVec    vertexElements;
-        OperationType           operationType;
-        bool                    enablePrimitiveRestart;
         //TODO: Stream Out.
+        //-dark_sylinc update: Stream Out seems to be dying.
+        //It was hard to setup, applications are limited,
+        //UAVs are easier and more flexible/powerful.
 
+        // --- Begin Pass data ---
+        uint32          sampleMask; /// Fixed to 0xffffffff for now
         HlmsPassPso     pass;
+        // --- End Pass data ---
 
         void        *rsData;        /// Render-System specific data
 
@@ -162,9 +188,95 @@ namespace Ogre
             sampleMask = 0;
             operationType = OT_POINT_LIST;
             enablePrimitiveRestart = false;
+            memset( padding, 0, sizeof(padding) );
             memset( &pass, 0, sizeof(HlmsPassPso) );
             rsData = 0;
         }
+
+        bool equalNonPod( const HlmsPso &_r ) const
+        {
+            return this->vertexShader == _r.vertexShader &&
+                   this->geometryShader == _r.geometryShader &&
+                   this->tesselationHullShader == _r.tesselationHullShader &&
+                   this->tesselationDomainShader == _r.tesselationDomainShader &&
+                   this->pixelShader == _r.pixelShader &&
+                   this->vertexElements == _r.vertexElements;
+        }
+        int lessNonPod( const HlmsPso &_r ) const
+        {
+            if( this->vertexShader < _r.vertexShader ) return -1;
+            if( this->vertexShader != _r.vertexShader ) return 1;
+            if( this->geometryShader < _r.geometryShader ) return -1;
+            if( this->geometryShader != _r.geometryShader ) return 1;
+            if( this->tesselationHullShader < _r.tesselationHullShader ) return -1;
+            if( this->tesselationHullShader != _r.tesselationHullShader ) return 1;
+            if( this->tesselationDomainShader < _r.tesselationDomainShader ) return -1;
+            if( this->tesselationDomainShader != _r.tesselationDomainShader ) return 1;
+            if( this->pixelShader < _r.pixelShader ) return -1;
+            if( this->pixelShader != _r.pixelShader ) return 1;
+            if( this->vertexElements < _r.vertexElements ) return -1;
+            if( this->vertexElements != _r.vertexElements ) return 1;
+
+            return 0;
+        }
+
+        /// Compares if this == _r but only accounting data that is independent of a pass
+        /// (and is typically part of a renderable with a material already assigned).
+        bool equalExcludePassData( const HlmsPso &_r ) const
+        {
+            //Non-POD datatypes.
+            return
+            equalNonPod( _r ) &&
+            //POD datatypes
+            memcmp( &this->operationType, &_r.operationType,
+                    (uint8*)&this->operationType -
+                    (uint8*)&this->sampleMask ) == 0;
+        }
+        /// Compares if this <= _r. See equalExcludePassData
+        int lessThanExcludePassData( const HlmsPso &_r ) const
+        {
+            //Non-POD datatypes.
+            int nonPodResult = lessNonPod( _r );
+            if( nonPodResult != 0 )
+                return nonPodResult < 0;
+
+            //POD datatypes
+            return memcmp( &this->operationType, &_r.operationType,
+                           (uint8*)&this->operationType -
+                           (uint8*)&this->sampleMask ) < 0;
+        }
+
+        /* Disabled because it's not used.
+        /// IMPORTANT: rsData is not considered.
+        bool operator < ( const HlmsPso &_r ) const
+        {
+            //Non-POD datatypes.
+            int nonPodResult = lessNonPod( _r );
+            if( nonPodResult != 0 )
+                return nonPodResult < 0;
+
+            //POD datatypes
+            return memcmp( &this->operationType, &_r.operationType,
+                           (uint8*)&this->operationType -
+                           (uint8*)&this->rsData ) < 0;
+        }
+        /// IMPORTANT: rsData is not considered.
+        bool operator == ( const HlmsPso &_r ) const
+        {
+            //Non-POD datatypes.
+            return
+            equalNonPod( _r ) &&
+            //POD datatypes
+            memcmp( &this->operationType, &_r.operationType,
+                    (uint8*)&this->operationType -
+                    (uint8*)&this->rsData ) == 0;
+        }
+        /// IMPORTANT: rsData is not considered.
+        bool operator != ( const HlmsPso &_r ) const
+        {
+            //Non-POD datatypes.
+            return  !(*this == _r);
+        }*/
     };
 
     struct HlmsComputePso

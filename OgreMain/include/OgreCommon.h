@@ -150,16 +150,19 @@ namespace Ogre {
         }
     };
 
+    ///@see HlmsPso regarding padding.
     struct StencilParams
     {
         bool            enabled;
         uint8           readMask;
         uint8           writeMask;
+        uint8           padding;
         StencilStateOp  stencilFront;
         StencilStateOp  stencilBack;
 
         StencilParams() :
             enabled( false ),
+            padding( 0 ),
             readMask( 0xFF ),
             writeMask( 0xFF ) {}
 

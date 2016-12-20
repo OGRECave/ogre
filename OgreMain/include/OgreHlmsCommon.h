@@ -182,8 +182,8 @@ namespace Ogre
     struct HlmsCache
     {
         uint32          hash;
-        HlmsPropertyVec setProperties;
         HlmsTypes       type;
+        HlmsPropertyVec setProperties;
 
         HlmsPso         pso;
 
