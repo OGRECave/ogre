@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2017 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreForward3D_H_
-#define _OgreForward3D_H_
+#ifndef _OgreForwardClustered_H_
+#define _OgreForwardClustered_H_
 
 #include "OgrePrerequisites.h"
 #include "OgreForwardPlusBase.h"
+#include "OgreRawPtr.h"
+#include "Threading/OgreUniformScalableTask.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -41,33 +43,45 @@ namespace Ogre
     *  @{
     */
 
-    /** Forward3D */
-    class _OgreExport Forward3D : public ForwardPlusBase
+    /** Implementation of Clustered Forward Shading */
+    class _OgreExport ForwardClustered : public ForwardPlusBase, public UniformScalableTask
     {
-        struct Resolution
+        struct ArrayPlane
         {
-            uint32 width;
-            uint32 height;
-            Real   zEnd; /// Depth at which this slice ends, in view space.
-            Resolution() : width( 0 ), height( 0 ), zEnd( 0 ) {}
-            Resolution( uint32 w, uint32 h, Real _zEnd ) :
-                width( w ), height( h ), zEnd( _zEnd ) {}
+            ArrayVector3    normal;
+            ArrayReal       negD;
+        };
+        struct FrustumRegion
+        {
+            ArrayPlane      plane[6];
+            ArrayAabb       aabb;
+            ArrayVector3    corners[8];
         };
 
         uint32  mWidth;
         uint32  mHeight;
         uint32  mNumSlices;
         uint32  mLightsPerCell;
-        uint32  mTableSize; /// Automatically calculated, size of the first table, elements.
 
-        FastArray<Resolution>   mResolutionAtSlice;
+        RawSimdUniquePtr<FrustumRegion, MEMCATEGORY_SCENE_CONTROL> mFrustumRegions;
+
+        uint16 * RESTRICT_ALIAS mGridBuffer;
+        Camera                  *mCurrentCamera;
 
         float   mMinDistance;
         float   mMaxDistance;
-        float   mInvMaxDistance;
+        float   mExponentK;
+        float   mInvExponentK;
+
+        ObjectMemoryManager     *mObjectMemoryManager;
+        NodeMemoryManager       *mNodeMemoryManager;
+        vector<Camera*>::type   mThreadCameras;
+
+        bool                    mDebugWireAabbFrozen;
+        vector<WireAabb*>::type mDebugWireAabb;
 
         /// Performs the reverse of getSliceAtDepth. @see getSliceAtDepth.
-        inline Real getDepthAtSlice( uint32 slice ) const;
+        inline float getDepthAtSlice( uint32 slice ) const;
 
         /** Returns the slice index at the given depth
         @param depth
@@ -77,27 +91,22 @@ namespace Ogre
         */
         inline uint32 getSliceAtDepth( Real depth ) const;
 
-        /** Converts a vector in projection space to grid space from the specified slice index.
-        @param projSpace
-            projSpace.x & projSpace.y should be in range [0; 1]
-        @param slice
-            Slice index.
-        @param outX [out]
-            The column of table in the given slice.
-            Will be in range [0; mResolutionAtSlice[slice].width)
-        @param outY [out]
-            The row of the table in the given slice.
-            Will be in range [0; mResolutionAtSlice[slice].height)
-        */
-        inline void projectionSpaceToGridSpace( const Vector2 &projSpace, uint32 slice,
-                                                uint32 &outX, uint32 &outY ) const;
+        void collectLightForSlice( size_t slice, size_t threadId );
 
     public:
-        Forward3D( uint32 width, uint32 height, uint32 numSlices, uint32 lightsPerCell,
+        ForwardClustered( uint32 width, uint32 height, uint32 numSlices, uint32 lightsPerCell,
                    float minDistance, float maxDistance, SceneManager *sceneManager );
-        virtual ~Forward3D();
+        virtual ~ForwardClustered();
 
-        virtual ForwardPlusMethods getForwardPlusMethod(void) const     { return MethodForward3D; }
+        virtual ForwardPlusMethods getForwardPlusMethod(void) const { return MethodForwardClustered; }
+
+        void setDebugFrustum( bool bEnableDebugFrustumWireAabb );
+        bool getDebugFrustum(void) const;
+
+        void setFreezeDebugFrustum( bool freezeDebugFrustum );
+        bool getFreezeDebugFrustum(void) const;
+
+        virtual void execute( size_t threadId, size_t numThreads );
 
         virtual void collectLights( Camera *camera );
 
@@ -106,7 +115,7 @@ namespace Ogre
         /// Returns the amount of bytes that fillConstBufferData is going to fill.
         virtual size_t getConstBufferSize(void) const;
 
-        /** Fills 'passBufferPtr' with the necessary data for Forward3D rendering.
+        /** Fills 'passBufferPtr' with the necessary data for ForwardClustered rendering.
             @see getConstBufferSize
         @remarks
             Assumes 'passBufferPtr' is aligned to a vec4/float4 boundary.

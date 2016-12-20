@@ -275,6 +275,11 @@ namespace Ogre
             return val;
         }
 
+        static inline void Set( ArrayReal &dst, Real val, size_t index )
+        {
+            dst = val;
+        }
+
         /** Returns the result of "a == std::numeric_limits<float>::infinity()"
         @return
             r[i] = a[i] == Inf ? 0xffffffff : 0;

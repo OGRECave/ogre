@@ -114,6 +114,7 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 
 @property( hlms_normal || hlms_qtangent )
 @insertpiece( DeclareBRDF )
+@insertpiece( DeclareBRDF_InstantRadiosity )
 @end
 
 @property( use_parallax_correct_cubemaps )
@@ -141,7 +142,7 @@ fragment @insertpiece( output_type ) main_metal
 	@end
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
-	@property( hlms_forward3d )
+	@property( hlms_forwardplus )
 		, device const ushort *f3dGrid [[buffer(TEX_SLOT_START+1)]]
 		, device const float4 *f3dLightList [[buffer(TEX_SLOT_START+2)]]
 	@end
@@ -310,7 +311,7 @@ float4 diffuseCol;
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forwardplus )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 
@@ -345,7 +346,7 @@ float4 diffuseCol;
 	{
 		lightDir *= 1.0 / fDistance;
 		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
+		float atten = 1.0 / (0.5 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
@@ -370,7 +371,7 @@ float4 diffuseCol;
 		spotAtten = pow( spotAtten, pass.lights[@n].spotParams.z );
 	@end
 		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
+		float atten = 1.0 / (0.5 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
 

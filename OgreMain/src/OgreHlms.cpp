@@ -112,11 +112,17 @@ namespace Ogre
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
-    const IdString HlmsBaseProp::Forward3D          = IdString( "hlms_forward3d" );
-    const IdString HlmsBaseProp::Forward3DFlipY     = IdString( "hlms_forward3d_flipY" );
-    const IdString HlmsBaseProp::Forward3DDebug     = IdString( "hlms_forward3d_debug" );
-    const IdString HlmsBaseProp::Forward3DFadeAttenRange
+    const IdString HlmsBaseProp::ForwardPlus        = IdString( "hlms_forwardplus" );
+    const IdString HlmsBaseProp::ForwardPlusFlipY   = IdString( "hlms_forwardplus_flipY" );
+    const IdString HlmsBaseProp::ForwardPlusDebug   = IdString( "hlms_forwardplus_debug" );
+    const IdString HlmsBaseProp::ForwardPlusFadeAttenRange
                                                     = IdString( "hlms_forward_fade_attenuation_range" );
+    const IdString HlmsBaseProp::Forward3DNumSlices = IdString( "forward3d_num_slices" );
+    const IdString HlmsBaseProp::FwdClusteredWidthxHeight  = IdString( "fwd_clustered_width_x_height" );
+    const IdString HlmsBaseProp::FwdClusteredWidth         = IdString( "fwd_clustered_width" );
+    const IdString HlmsBaseProp::FwdClusteredLightsPerCell = IdString( "fwd_clustered_lights_per_cell" );
+    const IdString HlmsBaseProp::Forward3D          = IdString( "forward3d" );
+    const IdString HlmsBaseProp::ForwardClustered   = IdString( "forward_clustered" );
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
 
     //Change per material (hash can be cached on the renderable)
@@ -2093,15 +2099,9 @@ namespace Ogre
                 setProperty( HlmsBaseProp::ShadowUsesDepthTexture, usesDepthTextures );
             }
 
-            Forward3D *forward3D = sceneManager->_getActivePassForward3D();
-            if( forward3D )
-            {
-                setProperty( HlmsBaseProp::Forward3D,       forward3D->getNumSlices() );
-                setProperty( HlmsBaseProp::Forward3DDebug,  forward3D->getDebugMode() );
-                setProperty( HlmsBaseProp::Forward3DFadeAttenRange,
-                             forward3D->getFadeAttenuationRange() );
-                setProperty( HlmsBaseProp::VPos, 1 );
-            }
+            ForwardPlusBase *forwardPlus = sceneManager->_getActivePassForwardPlus();
+            if( forwardPlus )
+                forwardPlus->setHlmsPassProperties( this );
 
             if( mShaderFileExt == ".glsl" )
             {
@@ -2110,7 +2110,7 @@ namespace Ogre
                 //between texture and render window. In GL, RenderWindows don't need
                 //to flip, but textures do.
                 RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
-                setProperty( HlmsBaseProp::Forward3DFlipY, renderTarget->requiresTextureFlipping() );
+                setProperty( HlmsBaseProp::ForwardPlusFlipY, renderTarget->requiresTextureFlipping() );
             }
 
             uint numLightsPerType[Light::NUM_LIGHT_TYPES];

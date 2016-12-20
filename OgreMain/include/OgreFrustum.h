@@ -432,6 +432,7 @@ namespace Ogre
 
         /// Returns the frustum planes, doesn't check if dirty.
         const Plane* _getCachedFrustumPlanes(void) const                { return mFrustumPlanes; }
+        const Vector3* _getCachedWorldSpaceCorners(void) const          { return mWorldSpaceCorners; }
 
         /** Retrieves a specified plane of the frustum (world space).
         @remarks

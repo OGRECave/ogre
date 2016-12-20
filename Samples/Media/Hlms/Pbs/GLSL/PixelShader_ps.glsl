@@ -19,9 +19,9 @@ in vec4 gl_FragCoord;
 @end
 
 @property( two_sided_lighting )
-	@property( hlms_forward3d_flipY )
+	@property( hlms_forwardplus_flipY )
 		@piece( two_sided_flip_normal )* (gl_FrontFacing ? -1.0 : 1.0)@end
-	@end @property( !hlms_forward3d_flipY )
+	@end @property( !hlms_forwardplus_flipY )
 		@piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
 	@end
 @end
@@ -44,7 +44,7 @@ in block
 
 @property( !hlms_shadowcaster )
 
-@property( hlms_forward3d )
+@property( hlms_forwardplus )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
 /*layout(binding = 2) */uniform samplerBuffer f3dLightList;@end
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
@@ -218,6 +218,7 @@ vec3 qmul( vec4 q, vec3 v )
 
 @property( hlms_normal || hlms_qtangent )
 @insertpiece( DeclareBRDF )
+@insertpiece( DeclareBRDF_InstantRadiosity )
 @end
 
 @property( use_parallax_correct_cubemaps )
@@ -354,7 +355,7 @@ void main()
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forwardplus )
 	vec3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 
@@ -389,7 +390,7 @@ void main()
 	{
 		lightDir *= 1.0 / fDistance;
 		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
+		float atten = 1.0 / (0.5 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
@@ -414,7 +415,7 @@ void main()
 		spotAtten = pow( spotAtten, pass.lights[@n].spotParams.z );
 	@end
 		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
+		float atten = 1.0 / (0.5 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
 

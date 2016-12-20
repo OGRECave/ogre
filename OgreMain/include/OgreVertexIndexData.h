@@ -235,6 +235,52 @@ namespace v1 {
         */
         ushort allocateHardwareAnimationElements(ushort count, bool animateNormals);
 
+        struct ReadRequests
+        {
+            VertexElementSemantic semantic;
+            VertexElementType type;
+            /// Data is already offseted. To get the vertex location, perform (data - offset);
+            char *data;
+            size_t offset;
+            HardwareVertexBuffer *vertexBuffer;
+
+            ReadRequests( VertexElementSemantic _semantic ) :
+                semantic( _semantic ), type(VET_FLOAT1), data( 0 ), offset( 0 ), vertexBuffer( 0 ) {}
+        };
+
+        typedef FastArray<ReadRequests> ReadRequestsArray;
+        /** Utility to get multiple pointers & read specific elements of the vertex,
+            even if they're in separate buffers.
+            When two elements share the same buffer, the buffer is locked once.
+
+            Example usage:
+                VertexData::ReadRequestsArray requests;
+                requests.push_back( VertexData::ReadRequests( VES_POSITION ) );
+                requests.push_back( VertexData::ReadRequests( VES_NORMALS ) );
+                vao->lockMultipleElements( requests );
+
+                for( size_t i=0; i<numVertices; ++i )
+                {
+                    float const *position = reinterpret_cast<const float*>( requests[0].data );
+                    float const *normals  = reinterpret_cast<const float*>( requests[1].data );
+
+                    requests[0].data += requests[0].vertexBuffer->getVertexSize();
+                    requests[1].data += requests[1].vertexBuffer->getVertexSize();
+                }
+
+                vao->unlockMultipleElements( requests );
+        @remarks
+            Throws if an element couldn't be found.
+            See VertexArrayObject::readRequests
+        @param requests [in/out]
+            Array filled with the semantic.
+        */
+        void lockMultipleElements( ReadRequestsArray &requests,
+                                   HardwareBuffer::LockOptions lockOptions,
+                                   HardwareBuffer::UploadOptions uploadOptions =
+                                                        HardwareBuffer::HBU_DEFAULT );
+        void unlockMultipleElements( ReadRequestsArray &requests );
+
 
         HardwareBufferManagerBase* _getHardwareBufferManager(void) const    { return mMgr; }
 
@@ -276,7 +322,6 @@ namespace v1 {
             in any case.
         */
         void optimiseVertexCacheTriList(void);
-    
     };
 
     /** Vertex cache profiler.

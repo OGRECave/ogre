@@ -2,7 +2,7 @@
 //Set the sampler starts. Note that 'padd' get calculated before _any_ 'add'
 @set( texUnit, 1 )
 
-@property( hlms_forward3d )
+@property( hlms_forwardplus )
 	@add( texUnit, 2 )
 @end
 

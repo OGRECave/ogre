@@ -808,12 +808,12 @@ namespace Ogre
 
         if( !casterPass )
         {
-            Forward3D *forward3D = sceneManager->_getActivePassForward3D();
-            if( forward3D )
+            ForwardPlusBase *forwardPlus = sceneManager->_getActivePassForwardPlus();
+            if( forwardPlus )
             {
-                mapSize += forward3D->getConstBufferSize();
-                mGridBuffer             = forward3D->getGridBuffer( camera );
-                mGlobalLightListBuffer  = forward3D->getGlobalLightListBuffer( camera );
+                mapSize += forwardPlus->getConstBufferSize();
+                mGridBuffer             = forwardPlus->getGridBuffer( camera );
+                mGlobalLightListBuffer  = forwardPlus->getGlobalLightListBuffer( camera );
             }
 
             if( mParallaxCorrectedCubemap )
@@ -1113,11 +1113,11 @@ namespace Ogre
                 }
             }
 
-            Forward3D *forward3D = sceneManager->_getActivePassForward3D();
-            if( forward3D )
+            ForwardPlusBase *forwardPlus = sceneManager->_getActivePassForwardPlus();
+            if( forwardPlus )
             {
-                forward3D->fillConstBufferData( renderTarget, passBufferPtr );
-                passBufferPtr += forward3D->getConstBufferSize() >> 2u;
+                forwardPlus->fillConstBufferData( renderTarget, passBufferPtr );
+                passBufferPtr += forwardPlus->getConstBufferSize() >> 2u;
             }
 
             if( mParallaxCorrectedCubemap )

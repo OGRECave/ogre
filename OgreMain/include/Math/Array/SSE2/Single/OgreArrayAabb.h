@@ -72,6 +72,8 @@ namespace Ogre
         ArrayVector3    mCenter;
         ArrayVector3    mHalfSize;
 
+        ArrayAabb() {}
+
         ArrayAabb( const ArrayVector3 &center, const ArrayVector3 &halfSize ) :
                 mCenter( center ), mHalfSize( halfSize )
         {

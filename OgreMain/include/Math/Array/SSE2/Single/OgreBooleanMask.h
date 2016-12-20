@@ -68,6 +68,8 @@ namespace Ogre
         inline static ArrayMaskR getMask( bool x, bool y, bool z, bool w );
         inline static ArrayMaskR getMask( bool booleans[ARRAY_PACKED_REALS] );
 
+        inline static ArrayMaskR getAllSetMask(void);
+
         /// Returns true if alls bit in mask0[i] and mask1[i] are set.
         inline static bool allBitsSet( bool mask0[4], bool mask1[4] );
 

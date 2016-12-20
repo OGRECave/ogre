@@ -300,7 +300,9 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void VertexArrayObject::readRequests( ReadRequestsArray &requests )
+    void VertexArrayObject::readRequests( ReadRequestsArray &requests,
+                                          size_t elementStart, size_t elementCount,
+                                          bool skipRequestIfBufferHasShadowCopy )
     {
         set<VertexBufferPacked*>::type seenBuffers;
 
@@ -324,13 +326,24 @@ namespace Ogre
 
             VertexBufferPacked *vertexBuffer = mVertexBuffers[bufferIdx];
 
+            assert( elementStart < vertexBuffer->getNumElements() );
+            assert( elementStart + elementCount <= vertexBuffer->getNumElements() );
+
             itor->type = vElement->mType;
             itor->offset = offset;
             itor->vertexBuffer = vertexBuffer;
 
-            if( seenBuffers.find( vertexBuffer ) == seenBuffers.end() )
+            if( skipRequestIfBufferHasShadowCopy && vertexBuffer->getShadowCopy() )
             {
-                itor->asyncTicket = vertexBuffer->readRequest( 0, vertexBuffer->getNumElements() );
+                itor->data = reinterpret_cast<const char*>( vertexBuffer->getShadowCopy() );
+                itor->data += offset + elementStart * vertexBuffer->getBytesPerElement();
+            }
+            else if( seenBuffers.find( vertexBuffer ) == seenBuffers.end() )
+            {
+                if( elementCount == 0 )
+                    elementCount = vertexBuffer->getNumElements() - elementStart;
+
+                itor->asyncTicket = vertexBuffer->readRequest( elementStart, elementCount );
                 seenBuffers.insert( vertexBuffer );
             }
 
@@ -347,13 +360,20 @@ namespace Ogre
 
         while( itor != end )
         {
+            assert( ( !itor->asyncTicket.isNull() ||
+                      seenBuffers.find( itor->vertexBuffer ) != seenBuffers.end() ||
+                      (itor->data &&
+                       itor->vertexBuffer->getShadowCopy() &&
+                       itor->asyncTicket.isNull()) )
+                    && "These tickets are invalid or already been unmapped, or you're mapping twice" );
+
             if( !itor->asyncTicket.isNull() )
             {
                 itor->data = reinterpret_cast<const char*>( itor->asyncTicket->map() );
                 itor->data += itor->offset;
                 seenBuffers[itor->vertexBuffer] = itor - tickets.begin();
             }
-            else
+            else if( !itor->data )
             {
                 map<VertexBufferPacked const *, size_t>::type::const_iterator it = seenBuffers.find(
                                                                                 itor->vertexBuffer );

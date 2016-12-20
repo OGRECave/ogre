@@ -475,8 +475,8 @@ namespace Ogre {
         /// Queue of objects for rendering
         RenderQueue* mRenderQueue;
 
-        Forward3D   *mForward3DSystem;
-        Forward3D   *mForward3DImpl;
+        ForwardPlusBase *mForwardPlusSystem;
+        ForwardPlusBase *mForwardPlusImpl;
 
         /// Updated every frame, has enough memory to hold all lights.
         /// The order is not deterministic, it depends on the number
@@ -1307,12 +1307,15 @@ namespace Ogre {
         void setForward3D( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
                            uint32 lightsPerCell, float minDistance, float maxDistance );
 
-        Forward3D* getForward3D(void)                       { return mForward3DSystem; }
-        Forward3D* _getActivePassForward3D(void)            { return mForward3DImpl; }
+        void setForwardClustered( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
+                                  uint32 lightsPerCell, float minDistance, float maxDistance );
+
+        ForwardPlusBase* getForwardPlus(void)                       { return mForwardPlusSystem; }
+        ForwardPlusBase* _getActivePassForwardPlus(void)            { return mForwardPlusImpl; }
 
         /// For internal use.
-        /// @see CompositorPassSceneDef::mEnableForward3D
-        void _setForward3DEnabledInPass( bool bEnable );
+        /// @see CompositorPassSceneDef::mEnableForwardPlus
+        void _setForwardPlusEnabledInPass( bool bEnable );
 
         NodeMemoryManager& _getNodeMemoryManager(SceneMemoryMgrTypes sceneType)
                                                                 { return mNodeMemoryManager[sceneType]; }
@@ -1326,6 +1329,8 @@ namespace Ogre {
         */
         ObjectMemoryManager& _getEntityMemoryManager(SceneMemoryMgrTypes sceneType)
                                                             { return mEntityMemoryManager[sceneType]; }
+        ObjectMemoryManager& _getLightMemoryManager(void)
+                                                            { return mLightMemoryManager; }
 
         /** Create an Item (instance of a discrete mesh).
             @param

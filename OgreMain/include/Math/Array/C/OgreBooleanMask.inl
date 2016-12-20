@@ -38,6 +38,11 @@ namespace Ogre
         return b[0];
     }
     //--------------------------------------------------------------------------------------
+    inline ArrayMaskR BooleanMask4::getAllSetMask(void)
+    {
+        return true;
+    }
+    //--------------------------------------------------------------------------------------
     inline bool BooleanMask4::allBitsSet( bool mask0[1], bool mask1[1] )
     {
         return ( *mask0 & *mask1 ) == true;

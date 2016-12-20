@@ -44,7 +44,7 @@ namespace Demo
                                          LogicSystem **outLogicSystem )
     {
         Forward3DGameState *gfxGameState = new Forward3DGameState(
-        "Forward3D is a technique capable of rendering many lights. It is required in order\n"
+        "Forward3D & Clustered are techniques capable of rendering many lights. It is required in order\n"
         "to render non-shadow casting non-directional lights with the PBS implementation.\n"
         "Deferred shading has a lot of problems (transparency, antialiasing, multiple BDRF). Besides,\n"
         "it uses a lot of bandwidth. Forward+/Forward2.5 is great, but requires DX11 HW (needs UAV) and\n"
@@ -57,8 +57,8 @@ namespace Demo
         "\n\n"
         "Like its alternatives Defered & Forward+, it works best with many small lights, or few big\n"
         "lights.\n"
-        "Forward3D has many parameters, and this demo shows different presets that often trade\n"
-        "quality for speed; but sometimes some presets work better on some scenarios than others.\n"
+        "Forward3D & Clustered have many parameters, and this demo shows different presets that often\n"
+        "trade quality for speed; but sometimes some presets work better on some scenarios than others.\n"
         "This demo stresses the implementation, showing you both its strengths and limitations\n"
         "   1. Increase the number of lights to show the artifacts.\n"
         "   2. Decrease the lights' radius to alleviate the artifacts.\n"
@@ -98,6 +98,6 @@ namespace Demo
 
     const char* MainEntryPoints::getWindowTitle(void)
     {
-        return "Forward3D Lights";
+        return "Forward+ Lights";
     }
 }
