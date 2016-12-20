@@ -116,7 +116,9 @@ namespace Ogre
 
             typedef vector<VertexBinding>::type VertexBindingVec;
 
-            v1::RenderOperation::OperationType operationType;
+            /// Not used anymore, however it's useful for sorting
+            /// purposes in the RenderQueue (using the Vao's ID).
+            OperationType operationType;
             VertexBindingVec    vertexBuffers;
             ID3D11Buffer        *indexBufferVbo;
             IndexBufferPacked::IndexType indexType;
@@ -229,6 +231,11 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
+        virtual UavBufferPacked* createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                      uint32 bindFlags,
+                                                      void *initialData, bool keepAsShadow );
+        virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer );
+
         virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes, BufferType bufferType,
                                                                 void *initialData, bool keepAsShadow );
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
@@ -237,7 +244,7 @@ namespace Ogre
         /// Increases refCount before returning the iterator.
         VaoVec::iterator findVao( const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer,
-                                  v1::RenderOperation::OperationType opType );
+                                  OperationType opType );
         uint32 createVao( const Vao &vaoRef );
         void releaseVao( VertexArrayObject *vao );
 
@@ -247,14 +254,15 @@ namespace Ogre
         virtual VertexArrayObject* createVertexArrayObjectImpl(
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
-                                                        v1::RenderOperation::OperationType opType );
+                                                        OperationType opType );
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 
-        D3D11CompatBufferInterface* createShaderBufferInterface( bool constantBuffer,
+        D3D11CompatBufferInterface* createShaderBufferInterface( uint32 bindFlags,
                                                                  size_t sizeBytes,
                                                                  BufferType bufferType,
-                                                                 void *initialData );
+                                                                 void *initialData,
+                                                                 uint32 structureByteStride = 0 );
 
     public:
         D3D11VaoManager( bool supportsIndirectBuffers, D3D11Device &device,
@@ -264,7 +272,7 @@ namespace Ogre
         D3D11RenderSystem* getD3D11RenderSystem(void) const              { return mD3D11RenderSystem; }
 
         /// Binds the Draw ID to the currently bound vertex array object.
-        void bindDrawId(void);
+        void bindDrawId( uint32 bindSlotId );
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks

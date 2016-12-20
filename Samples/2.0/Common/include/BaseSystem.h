@@ -17,13 +17,13 @@ namespace Demo
         BaseSystem( GameState *gameState );
         virtual ~BaseSystem();
 
-        void initialize(void);
-        void deinitialize(void);
+        virtual void initialize(void);
+        virtual void deinitialize(void);
 
-        void createScene01(void);
-        void createScene02(void);
+        virtual void createScene01(void);
+        virtual void createScene02(void);
 
-        void destroyScene(void);
+        virtual void destroyScene(void);
 
         void beginFrameParallel(void);
         void update( float timeSinceLast );

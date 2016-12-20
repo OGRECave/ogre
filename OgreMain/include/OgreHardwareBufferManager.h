@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreHlmsManager.h" //For OGRE_HLMS_NUM_INPUT_LAYOUTS
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
@@ -130,11 +131,26 @@ namespace v1 {
         UniformBufferList mUniformBuffers;
         CounterBufferList mCounterBuffers;
 
-
         typedef set<VertexDeclaration*>::type VertexDeclarationList;
         typedef set<VertexBufferBinding*>::type VertexBufferBindingList;
         VertexDeclarationList mVertexDeclarations;
         VertexBufferBindingList mVertexBufferBindings;
+
+        struct ReferencedInputLayouts
+        {
+            VertexDeclaration::VertexElementList elementList;
+            uint32 refCount;
+        };
+
+        typedef vector<VertexDeclaration*>::type VertexDeclarationVec;
+        typedef vector<uint8>::type InputLayoutsIdVec;
+
+        /// @see HlmsBits::InputLayoutBits
+        ReferencedInputLayouts  mReferencedInputLayouts[OGRE_HLMS_NUM_INPUT_LAYOUTS];
+        InputLayoutsIdVec       mActiveInputLayouts;
+        InputLayoutsIdVec       mFreeInputLayouts;
+
+        VertexDeclarationVec    mDirtyInputLayouts;
 
         // Mutexes
         OGRE_MUTEX(mVertexBuffersMutex);
@@ -372,6 +388,20 @@ namespace v1 {
         */
         virtual void touchVertexBufferCopy(const HardwareVertexBufferSharedPtr& bufferCopy);
 
+        /** Adds a vertex declaration tagged as dirty for us to process later and assign to
+            it an ID shared by other VertexDeclarations with the same vertex formats.
+            For internal use.
+        @param vertexDecl
+            VertexDeclaration that is dirty. Don't call this twice (i.e. check the value of
+            VertexDeclaration::mInputLayoutDirty before calling).
+        */
+        void _addDirtyInputLayout( VertexDeclaration *vertexDecl );
+        /// Gets called when the VertexDeclaration no longer matches the assigned shared layout.
+        void _removeInputLayoutReference( uint8 layoutId );
+
+        /// Updates all dirty layouts gathered via _addDirtyInputLayout
+        virtual void _updateDirtyInputLayouts(void );
+
         /** Free all unused vertex buffer copies.
         @remarks
             This method free all temporary vertex buffers that not in used.
@@ -433,6 +463,7 @@ namespace v1 {
         friend class HardwareIndexBufferSharedPtr;
     protected:
         HardwareBufferManagerBase* mImpl;
+
     public:
         HardwareBufferManager(HardwareBufferManagerBase* imp);
         ~HardwareBufferManager();
@@ -563,6 +594,12 @@ namespace v1 {
         void _notifyConterBufferDestroyed(HardwareCounterBuffer* buf)
         {
             mImpl->_notifyCounterBufferDestroyed(buf);
+        }
+
+        /** @copydoc HardwareBufferManagerInterface::_updateDirtyInputLayouts */
+        virtual void _updateDirtyInputLayouts(void )
+        {
+            mImpl->_updateDirtyInputLayouts();
         }
 
         /** Override standard Singleton retrieval.

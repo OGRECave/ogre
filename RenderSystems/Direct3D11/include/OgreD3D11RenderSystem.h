@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Mappings.h"
+#include "OgreD3D11PixelFormatToShaderType.h"
 
 namespace Ogre 
 {
@@ -105,19 +106,21 @@ namespace Ogre
         bool checkVertexTextureFormats(void);
         void detachRenderTargetImpl(const String& name);
         
+        //TODO: Looks like dead code or useless now
         bool mReadBackAsTexture;
 
-        bool                        mUseAdjacency;
         ID3D11Buffer    *mBoundIndirectBuffer;
         unsigned char   *mSwIndirectBufferPtr;
-        D3D11HLSLProgram* mBoundVertexProgram;
-        D3D11HLSLProgram* mBoundFragmentProgram;
-        D3D11HLSLProgram* mBoundGeometryProgram;
-        D3D11HLSLProgram* mBoundTessellationHullProgram;
-        D3D11HLSLProgram* mBoundTessellationDomainProgram;
+        D3D11HlmsPso    *mPso;
         D3D11HLSLProgram* mBoundComputeProgram;
+        uint32          mMaxBoundUavCS;
+
+        uint            mNumberOfViews;
+        ID3D11RenderTargetView *mRenderTargetViews[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        ID3D11DepthStencilView *mDepthStencilView;
 
         TexturePtr                  mUavTexPtr[64];
+        UavBufferPacked             *mUavBuffers[64];
         ID3D11UnorderedAccessView   *mUavs[64];
 
         /// In range [0; 64]; note that a user may use
@@ -135,8 +138,6 @@ namespace Ogre
         ID3D11ShaderResourceView* mDSTResView;
 
         UINT                        mStencilRef;
-        D3D11_DEPTH_STENCIL_DESC    mDepthStencilDesc;
-        ID3D11DepthStencilState     *mBoundDepthStencilState;
 
         ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mBoundTexturesCount;
@@ -180,14 +181,14 @@ namespace Ogre
         bool mRenderSystemWasInited;
 
         IDXGIFactoryN*  mpDXGIFactory;
+
+        D3D11PixelFormatToShaderType mD3D11PixelFormatToShaderType;
 		
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		D3D11StereoDriverBridge* mStereoDriver;
 #endif
 
     protected:
-
-        void setDepthStencilDefaults(void);
 
         void setClipPlanesImpl(const PlaneList& clipPlanes);
 
@@ -196,8 +197,6 @@ namespace Ogre
          * from us each Present(), and we need the way to reestablish connection.
          */
         void _setRenderTargetViews( bool colourWrite );
-
-        void updateDepthStencilView(void);
 
     public:
         // constructor
@@ -253,24 +252,12 @@ namespace Ogre
         void setLightingEnabled( bool enabled );
         void destroyRenderTarget(const String& name);
         VertexElementType getColourVertexElementType(void) const;
-        void setStencilCheckEnabled(bool enabled);
-        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-            uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
-            StencilOperation stencilFailOp = SOP_KEEP, 
-            StencilOperation depthFailOp = SOP_KEEP,
-            StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false,
-            bool readBackAsTexture = false);
+        virtual void setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams );
         void setNormaliseNormals(bool normalise);
 
         virtual String getErrorDescription(long errorNumber) const;
 
         // Low-level overridden members, mainly for internal use
-        D3D11HLSLProgram* _getBoundVertexProgram() const;
-        D3D11HLSLProgram* _getBoundFragmentProgram() const;
-        D3D11HLSLProgram* _getBoundGeometryProgram() const;
-        D3D11HLSLProgram* _getBoundTessellationHullProgram() const;
-        D3D11HLSLProgram* _getBoundTessellationDomainProgram() const;
         D3D11HLSLProgram* _getBoundComputeProgram() const;
         void _useLights(const LightList& lights, unsigned short limit);
         void _setWorldMatrix( const Matrix4 &m );
@@ -298,23 +285,39 @@ namespace Ogre
                                    ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN );
+        virtual void queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
+                                   size_t offset = 0, size_t sizeBytes = 0 );
 
         virtual void clearUAVs(void);
 
         virtual void flushUAVs(void);
 
+        virtual void _bindTextureUavCS( uint32 slot, Texture *texture,
+                                        ResourceAccess::ResourceAccess access,
+                                        int32 mipmapLevel, int32 textureArrayIndex,
+                                        PixelFormat pixelFormat );
+        virtual void _setTextureCS( uint32 slot, bool enabled, Texture *texPtr );
+        virtual void _setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock );
+
+        virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso );
+        virtual void _hlmsPipelineStateObjectDestroyed( HlmsPso *pso );
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock );
         virtual void _hlmsBlendblockDestroyed( HlmsBlendblock *block );
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
-        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
-        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
+        void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
+        void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
-        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
+        virtual void _setPipelineStateObject( const HlmsPso *pso );
 
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
+
+        virtual void _hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso );
+        virtual void _hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *newPso );
+        virtual void _setComputePso( const HlmsComputePso *pso );
 
         void _beginFrame(void);
         void _endFrame(void);
@@ -327,11 +330,10 @@ namespace Ogre
         void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
             Matrix4& dest, bool forGpuProgram = false);
         void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, bool forGpuProgram);
-        void setVertexDeclaration(v1::VertexDeclaration* decl);
-        void setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding);
-        void setVertexBufferBinding(v1::VertexBufferBinding* binding);
         void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName,unsigned int StartSlot);
         void _render(const v1::RenderOperation& op);
+
+        virtual void _dispatch( const HlmsComputePso &pso );
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd );
@@ -342,14 +344,6 @@ namespace Ogre
         virtual void _setRenderOperation( const v1::CbRenderOp *cmd );
         virtual void _render( const v1::CbDrawCallIndexed *cmd );
         virtual void _render( const v1::CbDrawCallStrip *cmd );
-        /** See
-          RenderSystem
-         */
-        void bindGpuProgram(GpuProgram* prg);
-        /** See
-          RenderSystem
-         */
-        void unbindGpuProgram(GpuProgramType gptype);
         /** See
           RenderSystem
          */
@@ -415,6 +409,9 @@ namespace Ogre
 		
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+
+        /// @copydoc RenderSystem::getPixelFormatToShaderType
+        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const;
 
         void _clearStateAndFlushCommandBuffer(void);
     };

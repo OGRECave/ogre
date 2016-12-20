@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/OgreCompositorPassDef.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
+#include "Compositor/Pass/PassCompute/OgreCompositorPassComputeDef.h"
 #include "Compositor/Pass/PassDepthCopy/OgreCompositorPassDepthCopyDef.h"
 #include "Compositor/Pass/PassMipmap/OgreCompositorPassMipmapDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
@@ -82,6 +83,9 @@ namespace Ogre
             break;
         case PASS_MIPMAP:
             retVal = OGRE_NEW CompositorPassMipmapDef();
+            break;
+        case PASS_COMPUTE:
+            retVal = OGRE_NEW CompositorPassComputeDef( mParentNodeDef, mRtIndex );
             break;
         case PASS_CUSTOM:
             {

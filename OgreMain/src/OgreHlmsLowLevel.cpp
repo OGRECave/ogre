@@ -41,8 +41,15 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
+#include "Animation/OgreSkeletonInstance.h"
+
+#include "CommandBuffer/OgreCommandBuffer.h"
+#include "CommandBuffer/OgreCbLowLevelMaterial.h"
+
 namespace Ogre
 {
+    const IdString LowLevelProp::PassId                     = IdString( "pass_id" );
+
     HlmsLowLevel::HlmsLowLevel() :
         Hlms( HLMS_LOW_LEVEL, "", 0, 0 ),
         mAutoParamDataSource( 0 ),
@@ -58,9 +65,9 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* HlmsLowLevel::createShaderCacheEntry( uint32 renderableHash,
-                                                              const HlmsCache &passCache,
-                                                              uint32 finalHash,
-                                                              const QueuedRenderable &queuedRenderable )
+                                                           const HlmsCache &passCache,
+                                                           uint32 finalHash,
+                                                           const QueuedRenderable &queuedRenderable )
     {
         Renderable *renderable = queuedRenderable.renderable;
         const MaterialPtr &mat = renderable->getMaterial();
@@ -75,30 +82,59 @@ namespace Ogre
                          "HlmsLowLevel::createShaderCacheEntry" );
         }
 
-        //We push into mShaderCache then clear each pass so that we can return unique references.
-        //This forces a new hash per renderable, and therefore forces HLMS to update the shaders & tex units for each renderable
-        //This will cause a performance hit if a pass has many objects with the same low level material, as it will
-        //cause a state change for each object. However currently there has not been devised a way of supporting low
-        //level materials without impacting the peformance of normal HLMS materials.
-        //Basically avoid low level materials as much as possible
-        HlmsCache *cache = new HlmsCache( mShaderCache.size() + 1, HLMS_LOW_LEVEL );
+        HlmsPso pso;
+        pso.initialize();
         if( pass->hasVertexProgram() )
-            cache->vertexShader             = pass->getVertexProgram();
+            pso.vertexShader            = pass->getVertexProgram();
         if( pass->hasGeometryProgram() )
-            cache->geometryShader           = pass->getGeometryProgram();
+            pso.geometryShader          = pass->getGeometryProgram();
         if( pass->hasTessellationHullProgram() )
-            cache->tesselationHullShader    = pass->getTessellationHullProgram();
+            pso.tesselationHullShader   = pass->getTessellationHullProgram();
         if( pass->hasTessellationDomainProgram() )
-            cache->tesselationDomainShader  = pass->getTessellationDomainProgram();
+            pso.tesselationDomainShader = pass->getTessellationDomainProgram();
         if( pass->hasFragmentProgram() )
-            cache->pixelShader              = pass->getFragmentProgram();
-        mShaderCache.push_back( cache );
+            pso.pixelShader             = pass->getFragmentProgram();
 
-        return cache;
+        bool casterPass = getProperty( HlmsBaseProp::ShadowCaster ) != 0;
+
+        const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
+        pso.macroblock = datablock->getMacroblock( casterPass );
+        pso.blendblock = datablock->getBlendblock( casterPass );
+        pso.pass = passCache.pso.pass;
+
+        if( queuedRenderable.renderable )
+        {
+            const VertexArrayObjectArray &vaos =
+                    queuedRenderable.renderable->getVaos( static_cast<VertexPass>(casterPass) );
+            if( !vaos.empty() )
+            {
+                //v2 object. TODO: LOD? Should we allow Vaos with different vertex formats on LODs?
+                //(also the datablock hash in the renderable would have to account for that)
+                pso.operationType = vaos.front()->getOperationType();
+                pso.vertexElements = vaos.front()->getVertexDeclaration();
+            }
+            else
+            {
+                //v1 object.
+                v1::RenderOperation renderOp;
+                queuedRenderable.renderable->getRenderOperation( renderOp, casterPass );
+                pso.operationType = renderOp.operationType;
+                pso.vertexElements = renderOp.vertexData->vertexDeclaration->convertToV2();
+            }
+
+            pso.enablePrimitiveRestart = true;
+        }
+
+        mRenderSystem->_hlmsPipelineStateObjectCreated( &pso );
+
+        const HlmsCache* retVal = addShaderCache( finalHash, pso );
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void HlmsLowLevel::calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash )
     {
+        mSetProperties.clear();
+
         const MaterialPtr &mat = renderable->getMaterial();
 
         Material::TechniqueIterator techniqueIt = mat->getTechniqueIterator();
@@ -121,22 +157,32 @@ namespace Ogre
             }
         }
 
-        //Each Renderable should use a different hash so that Hlms::getMaterial forces
-        //shaders to change. HlmsLowLevel::createShaderCacheEntry takes care of this, so 
-        //here we just set the hashes to the max value possible so no asserts are thrown in Hlms::getMaterial
-        //This will causes more state changes than is needed so avoid low level materials as much as possible!
-        outHash = 0x1FFFF;
-        outCasterHash = 0x1FFFF;
+        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(false)->mId );
+        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(false)->mId );
+
+        Technique *technique = mat->getBestTechnique( renderable->getCurrentMaterialLod(), renderable );
+        Pass *pass = technique->getPass( 0 );
+
+        setProperty( LowLevelProp::PassId, static_cast<Ogre::int32>( pass->getId() ) );
+
+        outHash = this->addRenderableCache( mSetProperties, (const PiecesMap*)0 );
+
+        setProperty( HlmsBaseProp::ShadowCaster, true );
+        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(true)->mId );
+        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(true)->mId );
+
+        outCasterHash = this->addRenderableCache( mSetProperties, (const PiecesMap*)0 );
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsLowLevel::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                              bool dualParaboloid, SceneManager *sceneManager )
     {
-        clearShaderCache();
-
         mCurrentSceneManager = sceneManager;
 
         HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
+
+        //Never produce a HlmsCache.hash of 0. Only affects LowLevel because HLMS_LOW_LEVEL = 0
+        retVal.hash += 1;
 
         //TODO: Update auto params here
         Camera *camera = sceneManager->getCameraInProgress();
@@ -153,9 +199,76 @@ namespace Ogre
                                          bool casterPass, uint32 lastCacheHash,
                                          uint32 lastTextureHash )
     {
-        Renderable *renderable = queuedRenderable.renderable;
-        unsigned short numMatrices = renderable->getNumWorldTransforms();
-        renderable->getWorldTransforms( mTempXform );
+        executeCommand( queuedRenderable.movableObject, queuedRenderable.renderable, casterPass );
+        return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsLowLevel::fillBuffersForV1( const HlmsCache *cache,
+                                           const QueuedRenderable &queuedRenderable,
+                                           bool casterPass, uint32 lastCacheHash,
+                                           CommandBuffer *commandBuffer )
+    {
+        *commandBuffer->addCommand<CbLowLevelMaterial>() =
+                CbLowLevelMaterial( casterPass, this, queuedRenderable.movableObject,
+                                    queuedRenderable.renderable );
+        return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsLowLevel::fillBuffersForV2( const HlmsCache *cache,
+                                           const QueuedRenderable &queuedRenderable,
+                                           bool casterPass, uint32 lastCacheHash,
+                                           CommandBuffer *commandBuffer )
+    {
+        *commandBuffer->addCommand<CbLowLevelMaterial>() =
+                CbLowLevelMaterial( casterPass, this, queuedRenderable.movableObject,
+                                    queuedRenderable.renderable );
+
+        return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsLowLevel::executeCommand( const MovableObject *movableObject, Renderable *renderable,
+                                       bool casterPass )
+    {
+        unsigned short numMatrices = 1;
+        if( renderable->getVaos( static_cast<VertexPass>(casterPass) ).empty() )
+        {
+            numMatrices = renderable->getNumWorldTransforms();
+            renderable->getWorldTransforms( mTempXform );
+        }
+        else
+        {
+            if( !renderable->hasSkeletonAnimation() )
+            {
+                mTempXform[0] = movableObject->_getParentNodeFullTransform();
+            }
+            else
+            {
+                SkeletonInstance *skeleton = movableObject->getSkeletonInstance();
+#if OGRE_DEBUG_MODE
+                assert( dynamic_cast<const RenderableAnimated*>( renderable ) );
+#endif
+
+                const RenderableAnimated *renderableAnimated = static_cast<const RenderableAnimated*>(
+                                                                                            renderable );
+
+                const RenderableAnimated::IndexMap *indexMap = renderableAnimated->getBlendIndexToBoneIndexMap();
+
+                assert( indexMap->size() < 256 &&
+                        "Up to 256 bones per submesh are supported for low level materials!" );
+
+                RenderableAnimated::IndexMap::const_iterator itBone = indexMap->begin();
+                RenderableAnimated::IndexMap::const_iterator enBone = indexMap->end();
+
+                size_t matIdx = 0;
+                while( itBone != enBone )
+                {
+                    const SimpleMatrixAf4x3 &mat4x3 = skeleton->_getBoneFullTransform( *itBone );
+                    mat4x3.store( &mTempXform[matIdx++] );
+
+                    ++itBone;
+                }
+            }
+        }
 
         const MaterialPtr &mat = renderable->getMaterial();
         Technique *technique = mat->getBestTechnique( renderable->getCurrentMaterialLod(), renderable );
@@ -251,32 +364,6 @@ namespace Ogre
             mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM,
                                                      pass->getFragmentProgramParameters(), GPV_ALL );
         }
-
-        return 0;
-    }
-    //-----------------------------------------------------------------------------------
-    uint32 HlmsLowLevel::fillBuffersForV1( const HlmsCache *cache,
-                                           const QueuedRenderable &queuedRenderable,
-                                           bool casterPass, uint32 lastCacheHash,
-                                           CommandBuffer *commandBuffer )
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-                     "Low Level materials can only be used in RenderQueue mode V1_LEGACY. "
-                     "Change the mode with RenderQueue::setRenderQueueMode, or place the "
-                     "object in a different RenderQueue",
-                     "HlmsLowLevel::fillBuffersFor" );
-    }
-    //-----------------------------------------------------------------------------------
-    uint32 HlmsLowLevel::fillBuffersForV2( const HlmsCache *cache,
-                                           const QueuedRenderable &queuedRenderable,
-                                           bool casterPass, uint32 lastCacheHash,
-                                           CommandBuffer *commandBuffer )
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-                     "Low Level materials can only be used in RenderQueue mode V1_LEGACY. "
-                     "Change the mode with RenderQueue::setRenderQueueMode, or place the "
-                     "object in a different RenderQueue",
-                     "HlmsLowLevel::fillBuffersFor" );
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsLowLevel::createDatablockImpl( IdString datablockName,

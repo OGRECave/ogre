@@ -33,10 +33,10 @@ namespace Ogre
 {
     NULLConstBufferPacked::NULLConstBufferPacked(
                 size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                BufferType bufferType, void *initialData, bool keepAsShadow,
+                uint32 numElementsPadding, BufferType bufferType, void *initialData, bool keepAsShadow,
                 VaoManager *vaoManager, BufferInterface *bufferInterface , size_t bindableSize ) :
-        ConstBufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
-                           initialData, keepAsShadow, vaoManager, bufferInterface, bindableSize )
+        ConstBufferPacked( internalBufferStartBytes, numElements, bytesPerElement, numElementsPadding,
+                           bufferType, initialData, keepAsShadow, vaoManager, bufferInterface )
     {
     }
     //-----------------------------------------------------------------------------------

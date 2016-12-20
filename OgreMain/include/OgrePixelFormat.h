@@ -638,6 +638,23 @@ namespace Ogre {
          */
         static void bulkPixelVerticalFlip(const PixelBox &box);
     };
+
+    class _OgreExport PixelFormatToShaderType
+    {
+    public:
+        /** Converts a PixelFormat into its equivalent layout for image variables (GLSL)
+            or its equivalent for D3D11/12 variables (HLSL). Used mostly with UAVs.
+        @param pixelFormat
+            Pixel format to convert.
+        @return
+            String for the shader to use "as is". If the Pixel Format doesn't have
+            a shader equivalent (i.e. depth formats), a null pointer is returned.
+            The validity of the pointer lasts as long as the RenderSystem remains
+            loaded.
+        */
+        virtual const char* getPixelFormatType( PixelFormat pixelFormat ) const = 0;
+    };
+
     /** @} */
     /** @} */
 

@@ -86,6 +86,8 @@ namespace Ogre {
             LT_POINT = 1,
             /// Spotlights simulate a cone of light from a source so require position and direction, plus extra values for falloff
             LT_SPOTLIGHT = 2,
+            /// Virtual point lights, used for Instant Radiosity (Global Illumination fake / approximation)
+            LT_VPL = 3,
 
             NUM_LIGHT_TYPES
         };
@@ -293,6 +295,8 @@ namespace Ogre {
         /** Returns the angle covered by the spotlights outer cone.
         */
         const Radian& getSpotlightOuterAngle(void) const            { return mSpotOuter; }
+
+        Real getSpotlightTanHalfAngle(void) const                   { return mTanHalfAngle; }
 
         /** Returns the falloff between the inner and outer cones of the spotlight.
         */
@@ -516,6 +520,7 @@ namespace Ogre {
 
         Radian mSpotOuter;
         Radian mSpotInner;
+        Real mTanHalfAngle; // = tan( mSpotOuter * 0.5f );
         Real mSpotFalloff;
         Real mSpotNearClip;
         Real mRange;

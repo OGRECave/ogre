@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareBufferManager.h"
 #include "OgreD3D11HardwareVertexBuffer.h"
 #include "OgreD3D11HardwareIndexBuffer.h"
-#include "OgreD3D11VertexDeclaration.h"
 #include "OgreD3D11RenderToVertexBuffer.h"
 #include "OgreD3D11HardwareUniformBuffer.h"
 #include "OgreLogManager.h"
@@ -145,16 +144,6 @@ namespace v1 {
 		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 			"*** not implemented ***",
 			"D3D11HardwareBufferManagerBase::createCounterBuffer");
-	}
-	//-----------------------------------------------------------------------
-	VertexDeclaration* D3D11HardwareBufferManagerBase::createVertexDeclarationImpl(void)
-	{
-		return new D3D11VertexDeclaration(mlpD3DDevice);
-	}
-	//-----------------------------------------------------------------------
-	void D3D11HardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)
-	{
-		delete decl;
-	}
+    }
 }
 }

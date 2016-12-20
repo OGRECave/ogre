@@ -246,22 +246,22 @@ namespace v1 {
         // Operation type
         switch(s->operationType)
         {
-        case RenderOperation::OT_LINE_LIST:
+        case OT_LINE_LIST:
             subMeshNode->SetAttribute("operationtype", "line_list");
             break;
-        case RenderOperation::OT_LINE_STRIP:
+        case OT_LINE_STRIP:
             subMeshNode->SetAttribute("operationtype", "line_strip");
             break;
-        case RenderOperation::OT_POINT_LIST:
+        case OT_POINT_LIST:
             subMeshNode->SetAttribute("operationtype", "point_list");
             break;
-        case RenderOperation::OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_FAN:
             subMeshNode->SetAttribute("operationtype", "triangle_fan");
             break;
-        case RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             subMeshNode->SetAttribute("operationtype", "triangle_list");
             break;
-        case RenderOperation::OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_STRIP:
             subMeshNode->SetAttribute("operationtype", "triangle_strip");
             break;
         }
@@ -273,17 +273,17 @@ namespace v1 {
                 subMeshNode->InsertEndChild(TiXmlElement("faces"))->ToElement();
             switch(s->operationType)
             {
-            case RenderOperation::OT_TRIANGLE_LIST:
+            case OT_TRIANGLE_LIST:
                 // tri list
                 numFaces = s->indexData[VpNormal]->indexCount / 3;
 
                 break;
-            case RenderOperation::OT_LINE_LIST:
+            case OT_LINE_LIST:
                 numFaces = s->indexData[VpNormal]->indexCount / 2;
 
                 break;
-            case RenderOperation::OT_TRIANGLE_FAN:
-            case RenderOperation::OT_TRIANGLE_STRIP:
+            case OT_TRIANGLE_FAN:
+            case OT_TRIANGLE_STRIP:
                 // triangle fan or triangle strip
                 numFaces = s->indexData[VpNormal]->indexCount - 2;
 
@@ -317,12 +317,12 @@ namespace v1 {
                 if (use32BitIndexes)
                 {
                     faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
-                    if(s->operationType == RenderOperation::OT_LINE_LIST)
+                    if(s->operationType == OT_LINE_LIST)
                     {
                         faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
                     }
                     /// Only need all 3 vertex indices if trilist or first face
-                    else if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
+                    else if (s->operationType == OT_TRIANGLE_LIST || i == 0)
                     {
                         faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
                         faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
@@ -331,12 +331,12 @@ namespace v1 {
                 else
                 {
                     faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
-                    if(s->operationType == RenderOperation::OT_LINE_LIST)
+                    if(s->operationType == OT_LINE_LIST)
                     {
                         faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
                     }
                     /// Only need all 3 vertex indices if trilist or first face
-                    else if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
+                    else if (s->operationType == OT_TRIANGLE_LIST || i == 0)
                     {
                         faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
                         faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
@@ -703,29 +703,29 @@ namespace v1 {
             {
                 if (!strcmp(optype, "triangle_list"))
                 {
-                    sm->operationType = RenderOperation::OT_TRIANGLE_LIST;
+                    sm->operationType = OT_TRIANGLE_LIST;
                 }
                 else if (!strcmp(optype, "triangle_fan"))
                 {
-                    sm->operationType = RenderOperation::OT_TRIANGLE_FAN;
+                    sm->operationType = OT_TRIANGLE_FAN;
                 }
                 else if (!strcmp(optype, "triangle_strip"))
                 {
-                    sm->operationType = RenderOperation::OT_TRIANGLE_STRIP;
+                    sm->operationType = OT_TRIANGLE_STRIP;
                 }
                 else if (!strcmp(optype, "line_strip"))
                 {
-                    sm->operationType = RenderOperation::OT_LINE_STRIP;
+                    sm->operationType = OT_LINE_STRIP;
                     readFaces = false;
                 }
                 else if (!strcmp(optype, "line_list"))
                 {
-                    sm->operationType = RenderOperation::OT_LINE_LIST;
+                    sm->operationType = OT_LINE_LIST;
                     readFaces = false;
                 }
                 else if (!strcmp(optype, "point_list"))
                 {
-                    sm->operationType = RenderOperation::OT_POINT_LIST;
+                    sm->operationType = OT_POINT_LIST;
                     readFaces = false;
                 }
 
@@ -762,17 +762,17 @@ namespace v1 {
                     // Faces
                     switch(sm->operationType)
                     {
-                    case RenderOperation::OT_TRIANGLE_LIST:
+                    case OT_TRIANGLE_LIST:
                         // tri list
                         sm->indexData[VpNormal]->indexCount = actualCount * 3;
 
                         break;
-                    case RenderOperation::OT_LINE_LIST:
+                    case OT_LINE_LIST:
                         sm->indexData[VpNormal]->indexCount = actualCount * 2;
 
                         break;
-                    case RenderOperation::OT_TRIANGLE_FAN:
-                    case RenderOperation::OT_TRIANGLE_STRIP:
+                    case OT_TRIANGLE_FAN:
+                    case OT_TRIANGLE_STRIP:
                         // triangle fan or triangle strip
                         sm->indexData[VpNormal]->indexCount = actualCount + 2;
 
@@ -810,12 +810,12 @@ namespace v1 {
                         if (use32BitIndexes)
                         {
                             *pInt++ = StringConverter::parseInt(faceElem->Attribute("v1"));
-                            if(sm->operationType == RenderOperation::OT_LINE_LIST)
+                            if(sm->operationType == OT_LINE_LIST)
                             {
                                 *pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
                             }
                             // only need all 3 vertices if it's a trilist or first tri
-                            else if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
+                            else if (sm->operationType == OT_TRIANGLE_LIST || firstTri)
                             {
                                 *pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
                                 *pInt++ = StringConverter::parseInt(faceElem->Attribute("v3"));
@@ -824,12 +824,12 @@ namespace v1 {
                         else
                         {
                             *pShort++ = StringConverter::parseInt(faceElem->Attribute("v1"));
-                            if(sm->operationType == RenderOperation::OT_LINE_LIST)
+                            if(sm->operationType == OT_LINE_LIST)
                             {
                                 *pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
                             }
                             // only need all 3 vertices if it's a trilist or first tri
-                            else if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
+                            else if (sm->operationType == OT_TRIANGLE_LIST || firstTri)
                             {
                                 *pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
                                 *pShort++ = StringConverter::parseInt(faceElem->Attribute("v3"));

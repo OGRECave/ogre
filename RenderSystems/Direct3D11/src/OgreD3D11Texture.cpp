@@ -50,15 +50,21 @@ namespace Ogre
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, D3D11Device & device)
         :Texture(creator, name, handle, group, isManual, loader),
-        mDevice(device), 
-        mpTex(NULL),
-        mpShaderResourceView(NULL),
+        mDevice(device),
         mp1DTex(NULL),
         mp2DTex(NULL),
         mp3DTex(NULL),
+        mpTex(NULL),
+        mpResolveTexture( 0 ),
+        mpShaderResourceView(NULL),
+        mpShaderResourceViewMsaa(NULL),
         mDynamicTextures(false),
-        mAutoMipMapGeneration(false)
+        mCurrentCacheCursor( 0 ),
+        mAutoMipMapGeneration(false),
+        mD3dFormat( DXGI_FORMAT_UNKNOWN ),
+        mD3dViewDimension( D3D11_SRV_DIMENSION_UNKNOWN )
     {
+        memset( mCachedUavViews, 0, sizeof( mCachedUavViews ) );
     }
     //---------------------------------------------------------------------
     D3D11Texture::~D3D11Texture()
@@ -92,7 +98,10 @@ namespace Ogre
         // get the target
         other = static_cast< D3D11Texture * >( target.get() );
 
-        mDevice.GetImmediateContext()->CopyResource(other->getTextureResource(), mpTex);
+        if( mpResolveTexture && !other->mpResolveTexture )
+            mDevice.GetImmediateContext()->CopyResource( other->getTextureResource(), mpResolveTexture );
+        else
+            mDevice.GetImmediateContext()->CopyResource( other->getTextureResource(), mpTex );
         if (mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription();
@@ -100,7 +109,6 @@ namespace Ogre
                 "D3D11 device cannot copy resource\nError Description:" + errorDescription,
                 "D3D11Texture::copyToTexture");
         }
-
     }
     //---------------------------------------------------------------------
     void D3D11Texture::loadImage( const Image &img )
@@ -115,6 +123,28 @@ namespace Ogre
     {
         assert(mpShaderResourceView);
 
+        ID3D11ShaderResourceView *retVal = mpShaderResourceView;
+
+        if( mpResolveTexture )
+        {
+            //Has MSAA
+            RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+            if( !mFsaaExplicitResolve )
+            {
+                for( size_t face=0; face<getNumFaces(); ++face )
+                {
+                    renderTarget = mSurfaceList[face * (mNumMipmaps+1)]->getRenderTarget();
+                    if( renderTarget->isFsaaResolveDirty() )
+                        renderTarget->swapBuffers();
+                }
+            }
+            else if( renderTarget->isFsaaResolveDirty() )
+            {
+                //Explicit resolves. Only use the Fsaa texture before it has been resolved
+                retVal = mpShaderResourceViewMsaa;
+            }
+        }
+
         if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET|TU_AUTOMIPMAP_AUTO)) ==
                 (TU_AUTOMIPMAP|TU_RENDERTARGET|TU_AUTOMIPMAP_AUTO) )
         {
@@ -124,6 +154,90 @@ namespace Ogre
         }
 
         return mpShaderResourceView;
+    }
+    //-----------------------------------------------------------------------------------
+    ID3D11UnorderedAccessView* D3D11Texture::createUavView( int cacheIdx, int32 mipmapLevel,
+                                                            int32 textureArrayIndex,
+                                                            PixelFormat pixelFormat )
+    {
+        assert( cacheIdx < 16 );
+
+        if( mCachedUavViews[cacheIdx].uavView )
+            mCachedUavViews[cacheIdx].uavView->Release();
+
+        mCachedUavViews[cacheIdx].mipmapLevel       = mipmapLevel;
+        mCachedUavViews[cacheIdx].textureArrayIndex = textureArrayIndex;
+        mCachedUavViews[cacheIdx].pixelFormat       = pixelFormat;
+
+        D3D11_UNORDERED_ACCESS_VIEW_DESC descUAV;
+
+        descUAV.Format = D3D11Mappings::_getPF( pixelFormat );
+
+        switch( this->getTextureType() )
+        {
+        case TEX_TYPE_1D:
+            descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE1D;
+            descUAV.Texture1D.MipSlice = static_cast<UINT>( mipmapLevel );
+            break;
+        case TEX_TYPE_2D:
+            descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+            descUAV.Texture2D.MipSlice = static_cast<UINT>( mipmapLevel );
+            break;
+        case TEX_TYPE_2D_ARRAY:
+            descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+            descUAV.Texture2DArray.MipSlice         = static_cast<UINT>( mipmapLevel );
+            descUAV.Texture2DArray.FirstArraySlice  = textureArrayIndex;
+            descUAV.Texture2DArray.ArraySize        = static_cast<UINT>( this->getDepth() -
+                                                                         textureArrayIndex );
+            break;
+        case TEX_TYPE_3D:
+            descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
+            descUAV.Texture3D.MipSlice      = static_cast<UINT>( mipmapLevel );
+            descUAV.Texture3D.FirstWSlice   = 0;
+            descUAV.Texture3D.WSize         = static_cast<UINT>( this->getDepth() );
+            break;
+        default:
+            break;
+        }
+
+        mDevice.get()->CreateUnorderedAccessView( mpTex, &descUAV, &mCachedUavViews[cacheIdx].uavView );
+
+        mCurrentCacheCursor = (cacheIdx + 1) % 4;
+
+        return mCachedUavViews[cacheIdx].uavView;
+    }
+    //---------------------------------------------------------------------
+    ID3D11UnorderedAccessView* D3D11Texture::getUavView( int32 mipmapLevel,
+                                                         int32 textureArrayIndex,
+                                                         PixelFormat pixelFormat )
+    {
+        ID3D11UnorderedAccessView *uavView = 0;
+
+        for( int i=0; i<4; ++i )
+        {
+            //Reuse resource views. Reuse res. views that are bigger than what's requested too.
+            if( mipmapLevel == mCachedUavViews[i].mipmapLevel &&
+                textureArrayIndex == mCachedUavViews[i].textureArrayIndex &&
+                pixelFormat == mCachedUavViews[i].pixelFormat )
+            {
+                uavView = mCachedUavViews[i].uavView;
+                break;
+            }
+            else if( !mCachedUavViews[i].uavView )
+            {
+                //We create in-order. If we hit here, the next ones are also null pointers.
+                uavView = createUavView( i, mipmapLevel, textureArrayIndex, pixelFormat );
+                break;
+            }
+        }
+
+        if( !uavView )
+        {
+            //If we hit here, the cache is full and couldn't find a match.
+            uavView = createUavView( mCurrentCacheCursor, mipmapLevel, textureArrayIndex, pixelFormat );
+        }
+
+        return uavView;
     }
     //---------------------------------------------------------------------
     void D3D11Texture::loadImpl()
@@ -164,10 +278,21 @@ namespace Ogre
     {
         mSurfaceList.clear();        
         SAFE_RELEASE(mpTex);
+        SAFE_RELEASE(mpResolveTexture);
         SAFE_RELEASE(mpShaderResourceView);
+        SAFE_RELEASE(mpShaderResourceViewMsaa);
         SAFE_RELEASE(mp1DTex);
         SAFE_RELEASE(mp2DTex);
         SAFE_RELEASE(mp3DTex);
+
+        for( int i=0; i<4; ++i )
+        {
+            if( mCachedUavViews[i].uavView )
+            {
+                mCachedUavViews[i].uavView->Release();
+                mCachedUavViews[i].uavView = 0;
+            }
+        }
     }
     //---------------------------------------------------------------------
     void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)
@@ -447,14 +572,18 @@ namespace Ogre
         mp1DTex->GetDesc(&desc);
         mNumMipmaps = desc.MipLevels - 1;
 
-        ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        ZeroMemory( &srvDesc, sizeof(srvDesc) );
 
         if( !(mUsage & TU_NOT_TEXTURE) )
         {
-            mSRVDesc.Format = desc.Format;
-            mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
-            mSRVDesc.Texture1D.MipLevels = desc.MipLevels;
-            hr = mDevice->CreateShaderResourceView( mp1DTex, &mSRVDesc, &mpShaderResourceView );
+            srvDesc.Format = desc.Format;
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+            srvDesc.Texture1D.MipLevels = desc.MipLevels;
+            mD3dFormat = srvDesc.Format,
+            mD3dViewDimension = srvDesc.ViewDimension;
+
+            hr = mDevice->CreateShaderResourceView( mp1DTex, &srvDesc, &mpShaderResourceView );
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
@@ -568,6 +697,29 @@ namespace Ogre
                 "D3D11Texture::_create2DTex" );
         }
 
+        if( desc.SampleDesc.Count > 1 )
+        {
+            ID3D11Texture2D *resolveTexture = 0;
+
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            hr = mDevice->CreateTexture2D(
+                &desc,
+                NULL,// data pointer
+                &resolveTexture);
+            // check result and except if failed
+            if (FAILED(hr) || mDevice.isError())
+            {
+                this->freeInternalResources();
+                String errorDescription = mDevice.getErrorDescription(hr);
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Error creating resolve texture for MSAA\nError Description:" + errorDescription,
+                    "D3D11Texture::_create2DTex" );
+            }
+
+            mpResolveTexture = resolveTexture;
+        }
+
         //set the base texture we'll use in the render system
         _queryInterface<ID3D11Texture2D, ID3D11Resource>(mp2DTex, &mpTex);
 
@@ -583,34 +735,35 @@ namespace Ogre
         mp2DTex->GetDesc(&desc);
         mNumMipmaps = desc.MipLevels - 1;
         
-        ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        ZeroMemory( &srvDesc, sizeof(srvDesc) );
 
         if( !(mUsage & TU_NOT_TEXTURE) )
         {
-            mSRVDesc.Format = desc.Format;
+            srvDesc.Format = desc.Format;
 
             switch(this->getTextureType())
             {
             case TEX_TYPE_CUBE_MAP:
-                mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-                mSRVDesc.TextureCube.MipLevels = desc.MipLevels;
-                mSRVDesc.TextureCube.MostDetailedMip = 0;
+                srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+                srvDesc.TextureCube.MipLevels = desc.MipLevels;
+                srvDesc.TextureCube.MostDetailedMip = 0;
                 break;
 
             case TEX_TYPE_2D_ARRAY:
                 if (mUsage & TU_RENDERTARGET && (mFSAA > 1 || atoi(mFSAAHint.c_str()) > 0))
                 {
-                    mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
-                    mSRVDesc.Texture2DMSArray.FirstArraySlice = 0;
-                    mSRVDesc.Texture2DMSArray.ArraySize = desc.ArraySize;
+                    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
+                    srvDesc.Texture2DMSArray.FirstArraySlice = 0;
+                    srvDesc.Texture2DMSArray.ArraySize = desc.ArraySize;
                 }
                 else
                 {
-                    mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-                    mSRVDesc.Texture2DArray.MostDetailedMip = 0;
-                    mSRVDesc.Texture2DArray.MipLevels = desc.MipLevels;
-                    mSRVDesc.Texture2DArray.FirstArraySlice = 0;
-                    mSRVDesc.Texture2DArray.ArraySize = desc.ArraySize;
+                    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+                    srvDesc.Texture2DArray.MostDetailedMip = 0;
+                    srvDesc.Texture2DArray.MipLevels = desc.MipLevels;
+                    srvDesc.Texture2DArray.FirstArraySlice = 0;
+                    srvDesc.Texture2DArray.ArraySize = desc.ArraySize;
                 }
                 break;
 
@@ -619,25 +772,73 @@ namespace Ogre
                                 // revert to creating a 2D texture.
                 if (mUsage & TU_RENDERTARGET && (mFSAA > 1 || atoi(mFSAAHint.c_str()) > 0))
                 {
-                    mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+                    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
                 }
                 else
                 {
-                    mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-                    mSRVDesc.Texture2D.MostDetailedMip = 0;
-                    mSRVDesc.Texture2D.MipLevels = desc.MipLevels;
+                    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+                    srvDesc.Texture2D.MostDetailedMip = 0;
+                    srvDesc.Texture2D.MipLevels = desc.MipLevels;
                 }
                 break;
             }
 
-            hr = mDevice->CreateShaderResourceView( mp2DTex, &mSRVDesc, &mpShaderResourceView );
-            if (FAILED(hr) || mDevice.isError())
+            mD3dFormat = srvDesc.Format,
+            mD3dViewDimension = srvDesc.ViewDimension;
+
+            if( mFSAA > 1 || atoi(mFSAAHint.c_str()) > 0 )
             {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                               "D3D11 device can't create shader resource view.\nError Description:" +
-                               errorDescription,
-                               "D3D11Texture::_create2DTex");
+                hr = mDevice->CreateShaderResourceView( mp2DTex, &srvDesc, &mpShaderResourceViewMsaa );
+                if (FAILED(hr) || mDevice.isError())
+                {
+                    String errorDescription = mDevice.getErrorDescription(hr);
+                    OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                                   "D3D11 device can't create MSAA shader resource view."
+                                   "\nError Description:" + errorDescription,
+                                   "D3D11Texture::_create2DTex");
+                }
+
+                switch(this->getTextureType())
+                {
+                case TEX_TYPE_2D_ARRAY:
+                    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+                    srvDesc.Texture2DArray.MostDetailedMip = 0;
+                    srvDesc.Texture2DArray.MipLevels = desc.MipLevels;
+                    srvDesc.Texture2DArray.FirstArraySlice = 0;
+                    srvDesc.Texture2DArray.ArraySize = desc.ArraySize;
+                    break;
+                case TEX_TYPE_2D:
+                case TEX_TYPE_1D:   // For Feature levels that do not support 1D textures,
+                                    // revert to creating a 2D texture.
+                    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+                    srvDesc.Texture2D.MostDetailedMip = 0;
+                    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+                    break;
+                }
+
+                ID3D11Texture2D *resolveTexture = static_cast<ID3D11Texture2D*>( mpResolveTexture );
+                hr = mDevice->CreateShaderResourceView( resolveTexture, &srvDesc, &mpShaderResourceView );
+
+                if (FAILED(hr) || mDevice.isError())
+                {
+                    String errorDescription = mDevice.getErrorDescription(hr);
+                    OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                                   "D3D11 device can't create shader resource view for resolved texture."
+                                   "\nError Description:" + errorDescription,
+                                   "D3D11Texture::_create2DTex");
+                }
+            }
+            else
+            {
+                hr = mDevice->CreateShaderResourceView( mp2DTex, &srvDesc, &mpShaderResourceView );
+                if (FAILED(hr) || mDevice.isError())
+                {
+                    String errorDescription = mDevice.getErrorDescription(hr);
+                    OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                                   "D3D11 device can't create shader resource view.\nError Description:" +
+                                   errorDescription,
+                                   "D3D11Texture::_create2DTex");
+                }
             }
         }
 
@@ -707,15 +908,18 @@ namespace Ogre
         mp3DTex->GetDesc(&desc);
         mNumMipmaps = desc.MipLevels - 1;
 
-        ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        ZeroMemory( &srvDesc, sizeof(srvDesc) );
 
         if( !(mUsage & TU_NOT_TEXTURE) )
         {
-            mSRVDesc.Format = desc.Format;
-            mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
-            mSRVDesc.Texture3D.MostDetailedMip = 0;
-            mSRVDesc.Texture3D.MipLevels = desc.MipLevels;
-            hr = mDevice->CreateShaderResourceView( mp3DTex, &mSRVDesc, &mpShaderResourceView );
+            srvDesc.Format = desc.Format;
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+            srvDesc.Texture3D.MostDetailedMip = 0;
+            srvDesc.Texture3D.MipLevels = desc.MipLevels;
+            mD3dFormat = srvDesc.Format,
+            mD3dViewDimension = srvDesc.ViewDimension;
+            hr = mDevice->CreateShaderResourceView( mp3DTex, &srvDesc, &mpShaderResourceView );
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
@@ -808,7 +1012,7 @@ namespace Ogre
     {
         // Choose frame buffer pixel format in case PF_UNKNOWN was requested
         if(mFormat == PF_UNKNOWN)
-            return mBBPixelFormat;
+            return DXGI_FORMAT_UNKNOWN;
 
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         if (rsys->_getFeatureLevel() < D3D_FEATURE_LEVEL_10_0 && mFormat == PF_L8)
@@ -893,6 +1097,8 @@ namespace Ogre
                         depth,
                         face,
                         format,
+                        mFSAA,
+                        mFSAAHint,
                         (v1::HardwareBuffer::Usage)bufusage // usage
                         ); 
 
@@ -1051,15 +1257,15 @@ namespace Ogre
         mBuffer = buffer;
         mWidth = (unsigned int) mBuffer->getWidth();
         mHeight = (unsigned int) mBuffer->getHeight();
-        mColourDepth = (unsigned int) PixelUtil::getNumElemBits(mBuffer->getFormat());
+        mFormat = mBuffer->getFormat();
         
         ID3D11Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
 
         D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
         ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
 
-        RTVDesc.Format = buffer->getParentTexture()->getShaderResourceViewDesc().Format;
-        switch(buffer->getParentTexture()->getShaderResourceViewDesc().ViewDimension)
+        RTVDesc.Format = buffer->getParentTexture()->getD3dFormat();
+        switch(buffer->getParentTexture()->getD3dViewDimension())
         {
         case D3D11_SRV_DIMENSION_BUFFER:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_BUFFER;
@@ -1155,21 +1361,42 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11RenderTexture::D3D11RenderTexture( const String &name, v1::D3D11HardwarePixelBuffer *buffer,
                                             bool writeGamma,
+                                            uint fsaa,
+                                            const String &fsaaHint,
                                             D3D11Device & device ) :
         mDevice(device),
         RenderTexture(buffer, 0),
-        mRenderTargetView(NULL)
+        mRenderTargetView(NULL),
+        mHasFsaaResource( false )
     {
         mName = name;
         mHwGamma = writeGamma;
+        mFSAA = fsaa;
+        mFSAAHint = fsaaHint;
+        mHasFsaaResource = mFSAA > 1 || (atoi(mFSAAHint.c_str()) > 0);
 
         rebind(buffer);
     }
-
     //---------------------------------------------------------------------
-
     D3D11RenderTexture::~D3D11RenderTexture()
     {
         SAFE_RELEASE(mRenderTargetView);
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderTexture::swapBuffers(void)
+    {
+        if( isFsaaResolveDirty() && mHasFsaaResource )
+        {
+            assert( dynamic_cast<v1::D3D11HardwarePixelBuffer*>( mBuffer ) );
+            v1::D3D11HardwarePixelBuffer *buffer = static_cast<v1::D3D11HardwarePixelBuffer*>( mBuffer );
+
+            D3D11Texture *texture = buffer->getParentTexture();
+            mDevice.GetImmediateContext()->ResolveSubresource( texture->getResolveTextureResource(),
+                                                               buffer->getSubresourceIndex(),
+                                                               texture->getTextureResource(),
+                                                               buffer->getSubresourceIndex(),
+                                                               texture->getD3dFormat() );
+        }
+        RenderTexture::swapBuffers();
     }
 }

@@ -435,12 +435,18 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void Texture::convertToImage(Image& destImage, bool includeMipMaps)
+    void Texture::convertToImage( Image &destImage, bool includeMipMaps, uint32 mipmapBias )
     {
+        mipmapBias = std::min<uint32>( mipmapBias, getNumMipmaps() );
 
-        size_t numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
-        size_t dataSize = Image::calculateSize(numMips,
-            getNumFaces(), getWidth(), getHeight(), getDepth(), getFormat());
+        const uint32 startingWidth  = std::max( getWidth() >> mipmapBias, 1u );
+        const uint32 startingHeight = std::max( getHeight() >> mipmapBias, 1u );
+        const uint32 startingDepth  = std::max( getDepth() >> mipmapBias, 1u );
+
+        const size_t numMips = includeMipMaps ? (getNumMipmaps() - mipmapBias + 1) : 1;
+        const size_t dataSize = Image::calculateSize( numMips, getNumFaces(),
+                                                      startingWidth, startingHeight,
+                                                      startingDepth, getFormat() );
 
         void* pixData = OGRE_MALLOC(dataSize, Ogre::MEMCATEGORY_GENERAL);
         // if there are multiple faces and mipmaps we must pack them into the data
@@ -448,9 +454,9 @@ namespace Ogre {
         void* currentPixData = pixData;
         for (size_t face = 0; face < getNumFaces(); ++face)
         {
-            uint32 width = getWidth();
-            uint32 height = getHeight();
-            uint32 depth = getDepth();
+            uint32 width  = startingWidth;
+            uint32 height = startingHeight;
+            uint32 depth  = startingDepth;
             for (size_t mip = 0; mip < numMips; ++mip)
             {
                 size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
@@ -460,18 +466,19 @@ namespace Ogre {
 
                 currentPixData = (void*)((char*)currentPixData + mipDataSize);
 
-                if(width != 1)
-                    width /= 2;
-                if(height != 1)
-                    height /= 2;
-                if(depth != 1)
-                    depth /= 2;
+                if( width != 1 )
+                    width >>= 1u;
+                if( height != 1 )
+                    height >>= 1u;
+                if( depth != 1 )
+                    depth >>= 1u;
             }
         }
 
         // load, and tell Image to delete the memory when it's done.
-        destImage.loadDynamicImage((Ogre::uchar*)pixData, getWidth(), getHeight(), getDepth(), getFormat(), true, 
-            getNumFaces(), numMips - 1);
+        destImage.loadDynamicImage( (Ogre::uchar*)pixData, startingWidth, startingHeight,
+                                    startingDepth, getFormat(), true,
+                                    getNumFaces(), numMips - 1 );
     }
     //--------------------------------------------------------------------------
     void Texture::getCustomAttribute(const String&, void*)

@@ -1,0 +1,64 @@
+compositor_node TutorialComputeTest02_UavBufferRenderingNode
+{
+	in 0 rt_renderwindow
+	//in_buffer 0 inputBuffer
+
+	texture nullDummy target_width target_height PF_NULL
+	texture testTexture target_width target_height PF_R8G8B8A8 depth_pool 0 no_gamma uav
+
+	//buffer name size bytesPerElement [target_width] [target_height] bind_flags
+	buffer testBuffer 1 4 target_width target_height
+	
+	target nullDummy
+	{
+		pass compute
+		{
+			job	TestJob
+			
+			uav 0 testTexture	read write
+			//input 0 mrtTexture 1
+			//uav_buffer # bufferName offset_start size read write allow_write_after_write
+			uav_buffer 0 testBuffer write
+		}
+	}
+
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		//The bindings made by pass bind_uav PERSIST even after we're out of rt_renderwindow.
+		pass bind_uav
+		{
+			starting_slot 1
+
+			// When true, we only affect the UAVs we're changing.
+			// When false, we clear all UAVs settings from all slots.
+			keep_previous_uavs	false
+
+			uav_buffer 0 testBuffer			read
+		}
+
+		//Compositor will issue the appropiate barriers because
+		//it knows testTexture will be used as a texture.
+		pass render_quad
+		{
+			material DrawFromUavBuffer
+			uses_uav 0 read
+		}
+
+		pass render_scene
+		{
+			overlays	on
+		}
+	}
+	
+	//out_buffer 0 outputBuffer
+}
+
+workspace TutorialComputeTest02_UavBufferWorkspace
+{
+	connect_output TutorialComputeTest02_UavBufferRenderingNode 0
+}

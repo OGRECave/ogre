@@ -120,6 +120,7 @@ namespace Ogre {
         const Viewport* mCurrentViewport;
         const SceneManager* mCurrentSceneManager;
         const Pass* mCurrentPass;
+        const HlmsComputeJob *mCurrentJob;
         const CompositorShadowNode *mCurrentShadowNode;
         vector<Real>::type          mNullPssmSplitPoint;
 
@@ -148,6 +149,7 @@ namespace Ogre {
          void setCurrentSceneManager(const SceneManager* sm);
         /** Sets the current pass */
          void setCurrentPass(const Pass* pass);
+         void setCurrentJob(const HlmsComputeJob* job);
          void setCurrentShadowNode(const CompositorShadowNode *sn);
 
          const Camera* getCurrentCamera() const;
@@ -206,6 +208,7 @@ namespace Ogre {
          const RenderTarget* getCurrentRenderTarget(void) const;
          const Renderable* getCurrentRenderable(void) const;
          const Pass* getCurrentPass(void) const;
+         const HlmsComputeJob* getCurrentJob(void) const;
          Vector4 getTextureSize(size_t index) const;
          Vector4 getInverseTextureSize(size_t index) const;
          Vector4 getPackedTextureSize(size_t index) const;

@@ -1,0 +1,69 @@
+{
+    "Terra" :
+    {
+        "TerraExampleMaterial" :
+        {
+            "diffuse" :
+            {
+                "value" : [1, 1, 1],
+                "texture" : "DiffuseTerrain.png"
+            },
+			
+			"detail_weight" :
+            {
+                "texture" : "DetailMap.png",
+                "sampler" : "unique_name",
+                "normalize" : true,
+				"autogenerate" :
+				[
+					{
+						"slope_min" : 0,
+						"slope_max" : 0,
+						"elevation_min" : 0,
+						"elevation_max" : 0
+					},
+					{
+						"slope_min" : 0,
+						"slope_max" : 0,
+						"elevation_min" : 0,
+						"elevation_max" : 0
+					},
+					{
+						"slope_min" : 0,
+						"slope_max" : 0,
+						"elevation_min" : 0,
+						"elevation_max" : 0
+					},
+					{
+						"slope_min" : 0,
+						"slope_max" : 0,
+						"elevation_min" : 0,
+						"elevation_max" : 0
+					}
+				]
+            },
+			
+			"detail0" :
+            {
+                "offset" : [0, 0],
+                "scale" : [256, 256],
+				"roughness" : 1,
+				"metalness" : 1,
+                "diffuse_map" : "BeachStones.jpg",
+				"roughness_map" : "BeachStones.jpg",
+				"metalness_map" : "BeachStones.jpg"
+            },
+
+			"detail1" :
+            {
+                "offset" : [0, 0],
+                "scale" : [128, 128],
+				"roughness" : 1,
+				"metalness" : 1,
+                "diffuse_map" : "Water02.jpg",
+				"roughness_map" : "Water02.jpg",
+				"metalness_map" : "Water02.jpg"
+            }
+        }
+    }
+}

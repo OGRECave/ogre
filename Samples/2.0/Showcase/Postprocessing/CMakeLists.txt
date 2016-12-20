@@ -18,7 +18,18 @@ ogre_add_component_include_dir(Hlms/Pbs)
 
 add_recursive( ./ SOURCE_FILES )
 
-ogre_add_executable(Sample_Postprocessing WIN32 ${SOURCE_FILES})
+set( POSTPROCESSING_RESOURCES ${SAMPLE_COMMON_RESOURCES} )
+if( APPLE )
+	set( POSTPROCESSING_RESOURCES ${POSTPROCESSING_RESOURCES}
+		 ${CMAKE_SOURCE_DIR}/Samples/Media/packs/cubemapsJS.zip )
+endif()
+
+ogre_add_executable(Sample_Postprocessing WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${POSTPROCESSING_RESOURCES})
 
 target_link_libraries(Sample_Postprocessing ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_Postprocessing)
+
+if( APPLE )
+	set_target_properties( Sample_Postprocessing PROPERTIES RESOURCE "${POSTPROCESSING_RESOURCES}" )
+	set_target_properties( Sample_Postprocessing PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SAMPLES_PLIST} )
+endif()

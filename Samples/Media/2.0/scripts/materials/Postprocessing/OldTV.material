@@ -16,17 +16,23 @@ fragment_program OldTV_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program OldTV_ps_Metal metal
+{
+	source OldTV_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program OldTV_ps unified
 {
 	delegate OldTV_ps_GLSL
 	delegate OldTV_ps_HLSL
+	delegate OldTV_ps_Metal
 }
 
 material Postprocess/OldTV
 {
 	technique
 	{
-
 		pass
 		{
 			depth_check off

@@ -59,15 +59,14 @@ namespace Ogre
         &CommandBuffer::execute_setTextureBufferDS,
         &CommandBuffer::execute_setTextureBufferCS,
         &CommandBuffer::execute_setTextureBufferInvalid,
-        &CommandBuffer::execute_setMacroblock,
-        &CommandBuffer::execute_setBlendblock,
-        &CommandBuffer::execute_setHlmsCache,
+        &CommandBuffer::execute_setPso,
         &CommandBuffer::execute_setTexture,
         &CommandBuffer::execute_disableTextureUnitsFrom,
         &CommandBuffer::execute_startV1LegacyRendering,
         &CommandBuffer::execute_setV1RenderOp,
         &CommandBuffer::execute_drawV1Indexed,
         &CommandBuffer::execute_drawV1Strip,
+        &CommandBuffer::execute_lowLevelMaterial,
         &CommandBuffer::execute_invalidCommand
     };
     //-----------------------------------------------------------------------------------

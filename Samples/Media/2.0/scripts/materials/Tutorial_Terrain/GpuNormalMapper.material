@@ -1,0 +1,58 @@
+fragment_program Terra/GpuNormalMapper_ps_GLSL glsl
+{
+	source GpuNormalMapper_ps.glsl
+
+	default_params
+	{
+		param_named heightMap int 0
+	}
+}
+
+fragment_program Terra/GpuNormalMapper_ps_HLSL hlsl
+{
+	source GpuNormalMapper_ps.hlsl
+	target ps_5_0 ps_4_0
+	entry_point main
+}
+
+fragment_program Terra/GpuNormalMapper_ps unified
+{
+	delegate Terra/GpuNormalMapper_ps_GLSL
+	delegate Terra/GpuNormalMapper_ps_HLSL
+
+	default_params
+	{
+		param_named heightMapResolution float2 128 128
+		param_named vScale float3 1.0 1.0 1.0
+	}
+}
+
+material Terra/GpuNormalMapper
+{
+    technique
+    {
+
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Terra/GpuNormalMapper_ps
+			{
+			}
+
+			texture_unit heightMap
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+

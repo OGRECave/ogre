@@ -119,7 +119,7 @@ namespace v1
     //-----------------------------------------------------------------------
     bool InstanceBatch::checkSubMeshCompatibility( const SubMesh* baseSubMesh )
     {
-        if( baseSubMesh->operationType != RenderOperation::OT_TRIANGLE_LIST )
+        if( baseSubMesh->operationType != OT_TRIANGLE_LIST )
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Only meshes with OT_TRIANGLE_LIST are supported",
                         "InstanceBatch::checkSubMeshCompatibility");
@@ -295,7 +295,7 @@ namespace v1
         if( checkSubMeshCompatibility( baseSubMesh ) )
         {
             //Only triangle list at the moment
-            mRenderOperation.operationType  = RenderOperation::OT_TRIANGLE_LIST;
+            mRenderOperation.operationType  = OT_TRIANGLE_LIST;
 #if OGRE_DEBUG_MODE
             mRenderOperation.srcRenderable  = this;
 #endif

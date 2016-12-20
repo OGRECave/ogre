@@ -9,7 +9,7 @@ namespace Demo
     class GameState : public MouseListener, public KeyboardListener, public JoystickListener
     {
     public:
-        ~GameState() {}
+        virtual ~GameState() {}
 
         virtual void initialize(void) {}
         virtual void deinitialize(void) {}

@@ -104,11 +104,15 @@ namespace Ogre
         HlmsSamplerblock const  *mShadowmapSamplerblock;    /// GL3+ only when not using depth textures
         HlmsSamplerblock const  *mShadowmapCmpSamplerblock; /// For depth textures & D3D11
         HlmsSamplerblock const  *mCurrentShadowmapSamplerblock;
+        TexturePtr              mTargetEnvMap;
+        ParallaxCorrectedCubemap    *mParallaxCorrectedCubemap;
 
         uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
 
         TexBufferPacked         *mGridBuffer;
         TexBufferPacked         *mGlobalLightListBuffer;
+
+        uint32                  mTexUnitSlotStart;
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
@@ -175,6 +179,9 @@ namespace Ogre
 
         void setAmbientLightMode( AmbientLightMode mode );
         AmbientLightMode getAmbientLightMode(void) const    { return mAmbientLightMode; }
+
+        void setParallaxCorrectedCubemap( ParallaxCorrectedCubemap *pcc )
+                                                            { mParallaxCorrectedCubemap = pcc; }
 
 #if !OGRE_NO_JSON
         /// @copydoc Hlms::_loadJson
@@ -267,9 +274,12 @@ namespace Ogre
         static const IdString Pcf4x4;
         static const IdString PcfIterations;
 
+        static const IdString AmbientHemisphere;
         static const IdString EnvMapScale;
         static const IdString AmbientFixed;
-        static const IdString AmbientHemisphere;
+        static const IdString TargetEnvprobeMap;
+        static const IdString ParallaxCorrectCubemaps;
+        static const IdString UseParallaxCorrectCubemaps;
 
         static const IdString BrdfDefault;
         static const IdString BrdfCookTorrance;

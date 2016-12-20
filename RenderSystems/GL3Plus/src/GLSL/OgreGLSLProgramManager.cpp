@@ -775,7 +775,6 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(glUniformBlockBinding(programObject, index, bufferBinding));
         }
-#endif
 
         // Now deal with shader storage blocks
 
@@ -850,6 +849,7 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, bufferBinding));
             }
         }
+#endif
         // if (mGLSupport.checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
         if (mGLSupport.hasMinGLVersion(4, 2))
         {

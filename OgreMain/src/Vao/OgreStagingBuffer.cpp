@@ -84,7 +84,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    StagingStallType StagingBuffer::uploadWillStall( size_t sizeBytes ) const
+    StagingStallType StagingBuffer::uploadWillStall( size_t sizeBytes )
     {
         assert( mUploadOnly );
         return STALL_PARTIAL;

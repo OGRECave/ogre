@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
 
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
@@ -336,33 +337,51 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorWorkspaceDef* CompositorManager2::getWorkspaceDefinition( IdString name ) const
     {
-        CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
-        if( itor == mWorkspaceDefs.end() )
+        CompositorWorkspaceDef *retVal = getWorkspaceDefinitionNoThrow( name );
+        if( !retVal )
         {
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace definition with name '" +
                             name.getFriendlyText() + "' not found",
                             "CompositorManager2::getWorkspaceDefinition" );
         }
 
-        return itor->second;
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorWorkspaceDef* CompositorManager2::getWorkspaceDefinitionNoThrow( IdString name ) const
+    {
+        CompositorWorkspaceDef *retVal = 0;
+        CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
+        if( itor != mWorkspaceDefs.end() )
+            retVal = itor->second;
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
                                              RenderTarget *finalRenderTarget, Camera *defaultCam,
                                              IdString definitionName, bool bEnabled, int position,
+                                             const UavBufferPackedVec *uavBuffers,
+                                             const ResourceLayoutMap* initialLayouts,
+                                             const ResourceAccessMap* initialUavAccess,
                                              const Vector4 &vpOffsetScale,
                                              uint8 vpModifierMask, uint8 executionMask )
     {
-        CompositorChannel channel;
-        channel.target = finalRenderTarget;
-        return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled, position,
+        CompositorChannelVec channels;
+        channels.push_back( CompositorChannel() );
+        channels.back().target = finalRenderTarget;
+        return addWorkspace( sceneManager, channels, defaultCam, definitionName, bEnabled, position,
+                             uavBuffers, initialLayouts, initialUavAccess,
                              vpOffsetScale, vpModifierMask, executionMask );
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
-                                             const CompositorChannel &finalRenderTarget,
+                                             const CompositorChannelVec &externalRenderTargets,
                                              Camera *defaultCam, IdString definitionName,
                                              bool bEnabled, int position,
+                                             const UavBufferPackedVec *uavBuffers,
+                                             const ResourceLayoutMap* initialLayouts,
+                                             const ResourceAccessMap* initialUavAccess,
                                              const Vector4 &vpOffsetScale,
                                              uint8 vpModifierMask, uint8 executionMask )
     {
@@ -381,8 +400,9 @@ namespace Ogre
         {
             workspace = OGRE_NEW CompositorWorkspace(
                                 Id::generateNewId<CompositorWorkspace>(), itor->second,
-                                finalRenderTarget, sceneManager, defaultCam, mRenderSystem,
-                                bEnabled, executionMask, vpModifierMask, vpOffsetScale );
+                                externalRenderTargets, sceneManager, defaultCam, mRenderSystem,
+                                bEnabled, executionMask, vpModifierMask, vpOffsetScale,
+                                uavBuffers, initialLayouts, initialUavAccess );
 
             mQueuedWorkspaces.push_back( QueuedWorkspace( workspace, position ) );
         }
@@ -527,6 +547,17 @@ namespace Ogre
             ++itor;
         }
 
+        {
+            //Notify the listeners
+            CompositorWorkspaceListenerVec::const_iterator itor = mListeners.begin();
+            CompositorWorkspaceListenerVec::const_iterator end  = mListeners.end();
+            while( itor != end )
+            {
+                (*itor)->allWorkspacesBeforeBeginUpdate();
+                ++itor;
+            }
+        }
+
         mRenderSystem->_beginFrameOnce();
 
         itor = mWorkspaces.begin();
@@ -549,6 +580,17 @@ namespace Ogre
                 }
             }
             ++itor;
+        }
+
+        {
+            //Notify the listeners
+            CompositorWorkspaceListenerVec::const_iterator itor = mListeners.begin();
+            CompositorWorkspaceListenerVec::const_iterator end  = mListeners.end();
+            while( itor != end )
+            {
+                (*itor)->allWorkspacesBeginUpdate();
+                ++itor;
+            }
         }
 
         //The actual update
@@ -599,24 +641,18 @@ namespace Ogre
         WorkspaceVec::const_iterator end  = mWorkspaces.end();
 
         vector<RenderTarget*>::type swappedTargets;
-        swappedTargets.reserve( mWorkspaces.size() );
+        swappedTargets.reserve( mWorkspaces.size() * 2u );
 
         while( itor != end )
         {
             CompositorWorkspace *workspace = (*itor);
-
-            RenderTarget *finalTarget = workspace->getFinalTarget();
-            bool alreadySwapped = std::find( swappedTargets.begin(),
-                                             swappedTargets.end(), finalTarget ) != swappedTargets.end();
-
-            if( workspace->getEnabled() && workspace->isValid() && !alreadySwapped )
-            {
-                workspace->_swapFinalTarget();
-                swappedTargets.push_back( finalTarget );
-            }
+            if( workspace->getEnabled() && workspace->isValid() )
+                workspace->_swapFinalTarget( swappedTargets );
 
             ++itor;
         }
+
+        mRenderSystem->_endFrameOnce();
     }
     //-----------------------------------------------------------------------------------
     void CompositorManager2::createBasicWorkspaceDef( const IdString &workspaceDefName,
@@ -648,7 +684,7 @@ namespace Ogre
         }
 
         CompositorWorkspaceDef *workDef = this->addWorkspaceDefinition( workspaceDefName );
-        workDef->connectOutput( nodeDef->getName(), 0 );
+        workDef->connectExternal( 0, nodeDef->getName(), 0 );
     }
     //-----------------------------------------------------------------------------------
     void CompositorManager2::setCompositorPassProvider( CompositorPassProvider *passProvider )
@@ -659,5 +695,21 @@ namespace Ogre
     CompositorPassProvider* CompositorManager2::getCompositorPassProvider(void) const
     {
         return mCompositorPassProvider;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::addListener( CompositorWorkspaceListener *listener )
+    {
+        mListeners.push_back( listener );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::removeListener( CompositorWorkspaceListener *listener )
+    {
+        CompositorWorkspaceListenerVec::iterator itor = std::find( mListeners.begin(),
+                                                                   mListeners.end(),
+                                                                   listener );
+
+        //Preserve order.
+        if( itor != mListeners.end() )
+            mListeners.erase( itor );
     }
 }

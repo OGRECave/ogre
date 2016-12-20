@@ -1,0 +1,159 @@
+This file does not contain valid JSON. It's only used as an example to show all possible options for each setting,
+including invalid combinations (i.e. having a Metallic texture and a Specular texture is not valid)
+
+{
+    "samplers" :
+   {
+        "unique_name" :
+        {
+            "min" : "point" "linear" "anisotropic",
+            "mag" : "point" "linear" "anisotropic",
+            "mip" : "none" "point" "linear" "anisotropic",
+            "u" : "wrap" "mirror" "clamp" "border",
+            "v" : "wrap" "mirror" "clamp" "border",
+            "w" : "wrap" "mirror" "clamp" "border",
+            "miplodbias" : 0,
+            "max_anisotropic" : 1,
+            "compare_function" : "less" "less_equal" "equal" "not_equal" "greater_equal" "greater" "never" "always" "disabled",
+            "border" : [1, 1, 1, 1],
+            "min_lod" : -3.40282347E+38,
+            "max_lod" : 3.40282347E+38
+        }
+    },
+
+    "macroblocks" :
+    {
+        "unique_name" :
+        {
+            "scissor_test" : false,
+            "depth_check" : true,
+            "depth_write" : true,
+            "depth_function" : "less" "less_equal" "equal" "not_equal" "greater_equal" "greater" "never" "always",
+            "depth_bias_constant" : 0,
+            "depth_bias_slope_scale" : 0,
+            "cull_mode" : "none" "clockwise" "anticlockwise",
+            "polygon_mode" : "points" "wireframe" "solid"
+        }
+    },
+
+    "blendblocks" :
+    {
+        "unique_name" :
+        {
+            "alpha_to_coverage" : false,
+            "blendmask" : "rgba",
+            "separate_blend" : true,
+            "src_blend_factor" : "one" "zero" "dst_colour" "src_colour" "one_minus_dst_colour" "one_minus_src_colour" "dst_alpha" "src_alpha" "one_minus_dst_alpha" "one_minus_src_alpha",
+            "dst_blend_factor" : "one" "zero" "dst_colour" "src_colour" "one_minus_dst_colour" "one_minus_src_colour" "dst_alpha" "src_alpha" "one_minus_dst_alpha" "one_minus_src_alpha",
+            "src_alpha_blend_factor" : "one" "zero" "dst_colour" "src_colour" "one_minus_dst_colour" "one_minus_src_colour" "dst_alpha" "src_alpha" "one_minus_dst_alpha" "one_minus_src_alpha",
+            "dst_alpha_blend_factor" : "one" "zero" "dst_colour" "src_colour" "one_minus_dst_colour" "one_minus_src_colour" "dst_alpha" "src_alpha" "one_minus_dst_alpha" "one_minus_src_alpha",
+            "blend_operation" : "add" "subtract" "reverse_subtract" "min" "max",
+            "blend_operation_alpha" : "add" "subtract" "reverse_subtract" "min" "max"
+        }
+    },
+
+    "pbs" :
+    {
+        "material_name" :
+        {
+            "macroblock" : "unique_name" ["unique_name", "unique_name_for_shadows"],
+            "blendblock" : "unique_name" ["unique_name", "unique_name_for_shadows"],
+            "alpha_test" : ["less" "less_equal" "equal" "not_equal" "greater_equal" "greater" "never" "always" "disabled", 0.5],
+            "shadow_const_bias" : 0.01,
+            "two_sided"  :  false,
+
+            "workflow" : "specular_ogre" "specular_fresnel" "metallic",
+
+            "transparency" :
+            {
+                "value" : 1.0,
+                "mode" : "None" "Transparent" "Fade",
+                "use_alpha_from_textures" : true
+            },
+
+            "diffuse" :
+            {
+                "value" : [1, 1, 1],
+                "background" : [1, 1, 1, 1],
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "specular" :
+            {
+                "value" : [1, 1, 1],
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "roughness" :
+            {
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "fresnel" :
+            {
+                "mode" : "coeff" "ior" "coloured" "coloured_ior",
+                "value" : [1, 1, 1],
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "metallness" :
+            {
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "normal" :
+            {
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "detail_weight" :
+            {
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "detail_diffuse0" :
+            {
+                "mode" : "NormalNonPremul" "NormalPremul" "Add" "Subtract" "Multiply" "Multiply2x" "Screen" "Overlay" "Lighten" "Darken" "GrainExtract" "GrainMerge" "Difference",
+                "offset" : [0, 0],
+                "scale" : [1, 1],
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "detail_normal0" :
+            {
+                "offset" : [0, 0],
+                "scale" : [1, 1],
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "reflection" :
+            {
+                "texture" : "cubemap.png",
+                "sampler" : "unique_name"
+            }
+        }
+    }
+}

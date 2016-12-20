@@ -254,6 +254,8 @@ namespace Ogre{
     protected:
         void translateTextureProperty( TextureDefinitionBase *defBase, PropertyAbstractNode *prop,
                                         ScriptCompiler *compiler ) const;
+        void translateBufferProperty( TextureDefinitionBase *defBase, PropertyAbstractNode *prop,
+                                      ScriptCompiler *compiler ) const;
     };
     class _OgreExport CompositorWorkspaceTranslator : public CompositorTextureBaseTranslator
     {
@@ -311,9 +313,13 @@ namespace Ogre{
         void translateScene( ScriptCompiler *compiler, const AbstractNodePtr &node,
                              CompositorTargetDef *targetDef );
         void translateStencil( ScriptCompiler *compiler, const AbstractNodePtr &node,
-                                CompositorTargetDef *targetDef );
+                               CompositorTargetDef *targetDef );
+        void translateStencilFace( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                                   StencilStateOp *stencilStateOp );
         void translateUav( ScriptCompiler *compiler, const AbstractNodePtr &node,
                            CompositorTargetDef *targetDef );
+        void translateCompute( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                               CompositorTargetDef *targetDef );
 
     public:
         CompositorPassTranslator();

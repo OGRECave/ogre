@@ -40,6 +40,12 @@ namespace Ogre
         class HardwareBufferManager;
     }
 
+    class _OgreNULLExport NULLPixelFormatToShaderType : public PixelFormatToShaderType
+    {
+    public:
+        virtual const char* getPixelFormatType( PixelFormat pixelFormat ) const { return 0; }
+    };
+
     /**
        Implementation of NULL as a rendering system.
     */
@@ -51,6 +57,8 @@ namespace Ogre
         ConfigOptionMap mOptions;
 
         vector<RenderTarget*>::type mRenderTargets;
+
+        NULLPixelFormatToShaderType mPixelFormatToShaderType;
 
     public:
         NULLRenderSystem();
@@ -98,8 +106,18 @@ namespace Ogre
                                            ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
                                            int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                            PixelFormat pixelFormat = PF_UNKNOWN );
+        virtual void queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
+                                   size_t offset = 0, size_t sizeBytes = 0 );
         virtual void clearUAVs(void);
         virtual void flushUAVs(void);
+
+        virtual void _bindTextureUavCS( uint32 slot, Texture *texture,
+                                        ResourceAccess::ResourceAccess access,
+                                        int32 mipmapLevel, int32 textureArrayIndex,
+                                        PixelFormat pixelFormat );
+        virtual void _setTextureCS( uint32 slot, bool enabled, Texture *texPtr );
+        virtual void _setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock );
 
         virtual void _setTexture(size_t unit, bool enabled,  Texture *texPtr);
 
@@ -118,10 +136,9 @@ namespace Ogre
         virtual void _endFrame(void);
         virtual void _setViewport(Viewport *vp);
 
-        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
-        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock );
-        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
+        virtual void _setPipelineStateObject( const HlmsPso *pso );
+        virtual void _setComputePso( const HlmsComputePso *pso );
 
         virtual VertexElementType getColourVertexElementType(void) const;
         virtual void _convertProjectionMatrix(const Matrix4& matrix,
@@ -135,10 +152,9 @@ namespace Ogre
             Matrix4& dest, bool forGpuProgram = false) {}
         virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
             bool forGpuProgram) {}
-        virtual void setStencilCheckEnabled(bool enabled) {}
 
-        virtual void setVertexDeclaration(v1::VertexDeclaration* decl);
-        virtual void setVertexBufferBinding(v1::VertexBufferBinding* binding);
+        virtual void _dispatch( const HlmsComputePso &pso );
+
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
 
         virtual void _render( const CbDrawCallIndexed *cmd );
@@ -170,6 +186,8 @@ namespace Ogre
         virtual void registerThread();
         virtual void unregisterThread();
         virtual unsigned int getDisplayMonitorCount() const     { return 1; }
+
+        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const;
 
         virtual void beginProfileEvent( const String &eventName );
         virtual void endProfileEvent( void );

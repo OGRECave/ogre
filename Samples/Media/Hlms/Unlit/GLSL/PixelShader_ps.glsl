@@ -72,7 +72,7 @@ void main()
 }
 
 @end @property( hlms_shadowcaster )
-	@property( hlms_shadow_uses_depth_texture )
+	@property( hlms_render_depth_only )
 		@set( hlms_disable_stage, 1 )
 	@end
 void main()

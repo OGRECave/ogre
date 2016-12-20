@@ -114,6 +114,7 @@ namespace Ogre
     class D3D11VideoModeList;
     class D3D11GpuProgram;
     class D3D11GpuProgramManager;
+    struct D3D11HlmsPso;
     class D3D11HLSLProgramFactory;
     class D3D11HLSLProgram;
     class D3D11Device;
@@ -126,7 +127,6 @@ namespace Ogre
         class D3D11HardwareBufferManager;
         class D3D11HardwareIndexBuffer;
         class D3D11HardwarePixelBuffer;
-        class D3D11VertexDeclaration;
     }
 
     typedef SharedPtr<D3D11GpuProgram>  D3D11GpuProgramPtr;

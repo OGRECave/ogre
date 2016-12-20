@@ -18,6 +18,8 @@ struct Light
 @end
 };
 
+@insertpiece( DeclCubemapProbeStruct )
+
 //Uniforms that change per pass
 layout(binding = 0) uniform PassBuffer
 {
@@ -50,14 +52,31 @@ layout(binding = 0) uniform PassBuffer
 	vec2 depthRange;
 @end
 
-@property( hlms_forward3d )
+@property( hlms_forwardplus )
+	//Forward3D
 	//f3dData.x = minDistance;
 	//f3dData.y = invMaxDistance;
 	//f3dData.z = f3dNumSlicesSub1;
 	//f3dData.w = uint cellsPerTableOnGrid0 (floatBitsToUint);
+
+	//Clustered Forward:
+	//f3dData.x = minDistance;
+	//f3dData.y = invExponentK;
+	//f3dData.z = f3dNumSlicesSub1;
+	//f3dData.w = renderWindow->getHeight();
 	vec4 f3dData;
-	vec4 f3dGridHWW[@value( hlms_forward3d )];
+	@property( hlms_forwardplus == forward3d )
+		vec4 f3dGridHWW[@value( forward3d_num_slices )];
+	@end
+	@property( hlms_forwardplus != forward3d )
+		vec4 fwdScreenToGrid;
+	@end
 @end
+
+@property( parallax_correct_cubemaps )
+	CubemapProbe autoProbe;
+@end
+
 	@insertpiece( custom_passBuffer )
 } pass;
 @end
@@ -94,7 +113,6 @@ layout(binding = 1) uniform MaterialBuf
 } materialArray;
 @end
 
-
 @piece( InstanceDecl )
 //Uniforms that change per Item/Entity
 layout(binding = 2) uniform InstanceBuffer
@@ -109,6 +127,15 @@ layout(binding = 2) uniform InstanceBuffer
     //Must be loaded with uintBitsToFloat
     uvec4 worldMaterialIdx[4096];
 } instance;
+@end
+
+@property( envprobe_map && envprobe_map != target_envprobe_map && use_parallax_correct_cubemaps )
+@piece( PccManualProbeDecl )
+layout(binding = 3) uniform ManualProbe
+{
+	CubemapProbe probe;
+} manualProbe;
+@end
 @end
 
 @piece( VStoPS_block )

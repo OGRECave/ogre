@@ -175,7 +175,7 @@ namespace Ogre {
         mEstimatedIndices = icount;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::begin(const String & datablockName, v1::RenderOperation::OperationType opType)
+    void ManualObject::begin(const String & datablockName, OperationType opType)
     {
         if (mCurrentSection)
         {
@@ -551,7 +551,7 @@ namespace Ogre {
                 "ManualObject::line");
         }
 
-        if (mCurrentSection->mOperationType != v1::RenderOperation::OT_LINE_LIST)
+        if (mCurrentSection->mOperationType != OT_LINE_LIST)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "This method is only valid on line lists",
@@ -571,7 +571,7 @@ namespace Ogre {
                 "ManualObject::triangle");
         }
 
-        if (mCurrentSection->mOperationType != v1::RenderOperation::OT_TRIANGLE_LIST)
+        if (mCurrentSection->mOperationType != OT_TRIANGLE_LIST)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "This method is only valid on triangle lists",
@@ -870,7 +870,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------------
     ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
-        const String& datablockName, v1::RenderOperation::OperationType opType)
+        const String& datablockName, OperationType opType)
         : mParent(parent), mVao(0), mOperationType(opType), m32BitIndices(false)
     {
 

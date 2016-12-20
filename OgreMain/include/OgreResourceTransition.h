@@ -130,8 +130,12 @@ namespace Ogre
         void    *mRsData;       /// Render-System specific data
     };
 
-    typedef map<RenderTarget*, ResourceLayout::Layout>::type ResourceLayoutMap;
-    typedef map<RenderTarget*, ResourceAccess::ResourceAccess>::type ResourceAccessMap;
+    struct GpuResource
+    {
+    };
+
+    typedef map<GpuResource*, ResourceLayout::Layout>::type ResourceLayoutMap;
+    typedef map<GpuResource*, ResourceAccess::ResourceAccess>::type ResourceAccessMap;
 
     /** @} */
     /** @} */

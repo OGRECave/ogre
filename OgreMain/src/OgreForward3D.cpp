@@ -37,31 +37,29 @@ THE SOFTWARE.
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreTexBufferPacked.h"
 
+#include "OgreHlms.h"
+
 namespace Ogre
 {
-    //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
-    const size_t c_numBytesPerLight = 6 * 4 * 4;
-
     Forward3D::Forward3D( uint32 width, uint32 height,
                           uint32 numSlices, uint32 lightsPerCell,
                           float minDistance, float maxDistance,
                           SceneManager *sceneManager ) :
+        ForwardPlusBase( sceneManager ),
         mWidth( width ),
         mHeight( height ),
         mNumSlices( numSlices ),
         /*mWidth( 1 ),
         mHeight( 1 ),
         mNumSlices( 2 ),*/
-        mLightsPerCell( lightsPerCell ),
+        mLightsPerCell( lightsPerCell + 3u ),
         mTableSize( mWidth * mHeight * mLightsPerCell ),
         mMinDistance( minDistance ),
         mMaxDistance( maxDistance ),
-        mInvMaxDistance( 1.0f / mMaxDistance ),
-        mVaoManager( 0 ),
-        mSceneManager( sceneManager ),
-        mDebugMode( false ),
-        mFadeAttenuationRange( true )
+        mInvMaxDistance( 1.0f / mMaxDistance )
     {
+        assert( numSlices > 1 && "Must use at least 2 slices for Forward3D!" );
+
         uint32 sliceWidth   = mWidth;
         uint32 sliceHeight  = mHeight;
         mResolutionAtSlice.reserve( mNumSlices );
@@ -77,68 +75,11 @@ namespace Ogre
         mResolutionAtSlice.back().zEnd = std::numeric_limits<Real>::max();
 
         const size_t p = -((1 - (1 << (mNumSlices << 1))) / 3);
-        mLightCountInCell.resize( p * mWidth * mHeight, 0 );
+        mLightCountInCell.resize( p * mWidth * mHeight, LightCount() );
     }
     //-----------------------------------------------------------------------------------
     Forward3D::~Forward3D()
     {
-        CachedGridVec::iterator itor = mCachedGrid.begin();
-        CachedGridVec::iterator end  = mCachedGrid.end();
-
-        while( itor != end )
-        {
-            if( itor->gridBuffer )
-            {
-                if( itor->gridBuffer->getMappingState() != MS_UNMAPPED )
-                    itor->gridBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( itor->gridBuffer );
-                itor->gridBuffer = 0;
-            }
-
-            if( itor->globalLightListBuffer )
-            {
-                if( itor->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
-                    itor->globalLightListBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( itor->globalLightListBuffer );
-                itor->globalLightListBuffer = 0;
-            }
-
-            ++itor;
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void Forward3D::_changeRenderSystem( RenderSystem *newRs )
-    {
-        CachedGridVec::iterator itor = mCachedGrid.begin();
-        CachedGridVec::iterator end  = mCachedGrid.end();
-
-        while( itor != end )
-        {
-            if( itor->gridBuffer )
-            {
-                if( itor->gridBuffer->getMappingState() != MS_UNMAPPED )
-                    itor->gridBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( itor->gridBuffer );
-                itor->gridBuffer = 0;
-            }
-
-            if( itor->globalLightListBuffer )
-            {
-                if( itor->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
-                    itor->globalLightListBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( itor->globalLightListBuffer );
-                itor->globalLightListBuffer = 0;
-            }
-
-            ++itor;
-        }
-
-        mVaoManager = 0;
-
-        if( newRs )
-        {
-            mVaoManager = newRs->getVaoManager();
-        }
     }
     //-----------------------------------------------------------------------------------
     inline Real Forward3D::getDepthAtSlice( uint32 uSlice ) const
@@ -179,8 +120,10 @@ namespace Ogre
         outY = static_cast<uint32>( Ogre::min( floorf( fy ), res.height - 1 ) );
     }
     //-----------------------------------------------------------------------------------
-    inline bool OrderLightByDistanceToCamera( const Light *left, const Light *right )
+    inline bool OrderLightByDistanceToCamera3D( const Light *left, const Light *right )
     {
+        if( left->getType() != right->getType() )
+            return left->getType() < right->getType();
         return left->getCachedDistanceToCameraAsReal() < right->getCachedDistanceToCameraAsReal();
     }
 
@@ -228,7 +171,7 @@ namespace Ogre
         const size_t numLights = mCurrentLightList.size();
 
         //Sort by distance to camera
-        std::sort( mCurrentLightList.begin(), mCurrentLightList.end(), OrderLightByDistanceToCamera );
+        std::sort( mCurrentLightList.begin(), mCurrentLightList.end(), OrderLightByDistanceToCamera3D );
 
         //Allocate the buffers if not already.
         if( !cachedGrid->gridBuffer )
@@ -240,7 +183,7 @@ namespace Ogre
         }
 
         if( !cachedGrid->globalLightListBuffer ||
-            cachedGrid->globalLightListBuffer->getNumElements() < c_numBytesPerLight * numLights )
+            cachedGrid->globalLightListBuffer->getNumElements() < NumBytesPerLight * numLights )
         {
             if( cachedGrid->globalLightListBuffer )
             {
@@ -251,7 +194,7 @@ namespace Ogre
 
             cachedGrid->globalLightListBuffer = mVaoManager->createTexBuffer(
                                                                     PF_FLOAT32_RGBA,
-                                                                    c_numBytesPerLight *
+                                                                    NumBytesPerLight *
                                                                     std::max<size_t>( numLights, 96 ),
                                                                     BT_DYNAMIC_PERSISTENT, 0, false );
         }
@@ -263,13 +206,16 @@ namespace Ogre
         uint16 * RESTRICT_ALIAS gridBuffer = reinterpret_cast<uint16 * RESTRICT_ALIAS>(
                     cachedGrid->gridBuffer->map( 0, cachedGrid->gridBuffer->getNumElements() ) );
 
-        memset( mLightCountInCell.begin(), 0, mLightCountInCell.size() * sizeof(uint32) );
+        memset( mLightCountInCell.begin(), 0, mLightCountInCell.size() * sizeof(LightCount) );
 
         Matrix4 viewMat = camera->getViewMatrix();
         Matrix4 projMatrix = camera->getProjectionMatrix();
 
         Real nearPlane  = camera->getNearClipDistance();
         Real farPlane   = camera->getFarClipDistance();
+
+        if( farPlane == 0 )
+            farPlane = std::numeric_limits<Real>::max();
 
         assert( mNumSlices < 256 );
 
@@ -370,6 +316,8 @@ namespace Ogre
             size_t offset           = p * mTableSize;
             size_t offsetLightCount = p * mWidth * mHeight;
 
+            const Light::LightTypes lightType = (*itLight)->getType();
+
             for( uint32 slice=minSlice; slice<=maxSlice; ++slice )
             {
                 //The end of this slice may go past beyond the back face of the AABB.
@@ -396,20 +344,21 @@ namespace Ogre
                 {
                     for( uint32 x=startX; x<=endX; ++x )
                     {
-                        FastArray<uint32>::iterator numLightsInCell = mLightCountInCell.begin() + offsetLightCount +
-                                                                        (y * sliceRes.width) + x;
+                        FastArray<LightCount>::iterator numLightsInCell =
+                                mLightCountInCell.begin() + offsetLightCount + (y * sliceRes.width) + x;
 
                         //assert( numLightsInCell < mLightCountInCell.end() );
 
-                        //mLightsPerCell - 1 because one slot is reserved
-                        //for the number of lights in cell
-                        if( *numLightsInCell < mLightsPerCell - 1 )
+                        //mLightsPerCell - 3 because three slots is reserved
+                        //for the number of lights in cell per type
+                        if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
                         {
-                            uint16 * RESTRICT_ALIAS cellElem = gridBuffer + offset +
-                                                                (y * sliceRes.width + x) * mLightsPerCell +
-                                                                (*numLightsInCell + 1);
-                            ++(*numLightsInCell);
+                            uint16 * RESTRICT_ALIAS cellElem =
+                                    gridBuffer + offset + (y * sliceRes.width + x) * mLightsPerCell +
+                                    (numLightsInCell->lightCount[0] + 3u);
                             *cellElem = i * 6;
+                            ++numLightsInCell->lightCount[0];
+                            ++numLightsInCell->lightCount[lightType];
                         }
                     }
                 }
@@ -426,15 +375,20 @@ namespace Ogre
 
         {
             //Now write all the light counts
-            FastArray<uint32>::const_iterator itor = mLightCountInCell.begin();
-            FastArray<uint32>::const_iterator end  = mLightCountInCell.end();
+            FastArray<LightCount>::const_iterator itor = mLightCountInCell.begin();
+            FastArray<LightCount>::const_iterator end  = mLightCountInCell.end();
 
             const size_t cellSize = mLightsPerCell;
             size_t gridIdx = 0;
 
             while( itor != end )
             {
-                gridBuffer[gridIdx] = static_cast<uint16>( *itor );
+                uint32 accumLight = itor->lightCount[1];
+                gridBuffer[gridIdx+0u] = static_cast<uint16>( accumLight );
+                accumLight += itor->lightCount[2];
+                gridBuffer[gridIdx+1u] = static_cast<uint16>( accumLight );
+                accumLight += itor->lightCount[3];
+                gridBuffer[gridIdx+2u] = static_cast<uint16>( accumLight );
                 gridIdx += cellSize;
                 ++itor;
             }
@@ -480,181 +434,6 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void Forward3D::fillGlobalLightListBuffer( Camera *camera, TexBufferPacked *globalLightListBuffer )
-    {
-        //const LightListInfo &globalLightList = mSceneManager->getGlobalLightList();
-        const size_t numLights = mCurrentLightList.size();
-
-        if( !numLights )
-            return;
-
-        Matrix4 viewMatrix = camera->getViewMatrix();
-        Matrix3 viewMatrix3;
-        viewMatrix.extract3x3Matrix( viewMatrix3 );
-
-        float * RESTRICT_ALIAS lightData = reinterpret_cast<float * RESTRICT_ALIAS>(
-                    globalLightListBuffer->map( 0, c_numBytesPerLight * numLights ) );
-        LightArray::const_iterator itLights = mCurrentLightList.begin();
-        LightArray::const_iterator enLights = mCurrentLightList.end();
-
-        while( itLights != enLights )
-        {
-            const Light *light = *itLights;
-
-            Vector3 lightPos = light->getParentNode()->_getDerivedPosition();
-            lightPos = viewMatrix * lightPos;
-
-            //vec3 lights[numLights].position
-            *lightData++ = lightPos.x;
-            *lightData++ = lightPos.y;
-            *lightData++ = lightPos.z;
-            *lightData++ = static_cast<float>( light->getType() );
-
-            //vec3 lights[numLights].diffuse
-            ColourValue colour = light->getDiffuseColour() *
-                                 light->getPowerScale();
-            *lightData++ = colour.r;
-            *lightData++ = colour.g;
-            *lightData++ = colour.b;
-            ++lightData;
-
-            //vec3 lights[numLights].specular
-            colour = light->getSpecularColour() * light->getPowerScale();
-            *lightData++ = colour.r;
-            *lightData++ = colour.g;
-            *lightData++ = colour.b;
-            ++lightData;
-
-            //vec3 lights[numLights].attenuation;
-            Real attenRange     = light->getAttenuationRange();
-            Real attenLinear    = light->getAttenuationLinear();
-            Real attenQuadratic = light->getAttenuationQuadric();
-            *lightData++ = attenRange;
-            *lightData++ = attenLinear;
-            *lightData++ = attenQuadratic;
-            *lightData++ = 1.0f / attenRange;
-
-            //vec3 lights[numLights].spotDirection;
-            Vector3 spotDir = viewMatrix3 * light->getDerivedDirection();
-            *lightData++ = spotDir.x;
-            *lightData++ = spotDir.y;
-            *lightData++ = spotDir.z;
-            ++lightData;
-
-            //vec3 lights[numLights].spotParams;
-            Radian innerAngle = light->getSpotlightInnerAngle();
-            Radian outerAngle = light->getSpotlightOuterAngle();
-            *lightData++ = 1.0f / ( cosf( innerAngle.valueRadians() * 0.5f ) -
-                                     cosf( outerAngle.valueRadians() * 0.5f ) );
-            *lightData++ = cosf( outerAngle.valueRadians() * 0.5f );
-            *lightData++ = light->getSpotlightFalloff();
-            ++lightData;
-
-            ++itLights;
-        }
-
-        globalLightListBuffer->unmap( UO_KEEP_PERSISTENT );
-    }
-    //-----------------------------------------------------------------------------------
-    bool Forward3D::getCachedGridFor( Camera *camera, CachedGrid **outCachedGrid )
-    {
-        const CompositorShadowNode *shadowNode = mSceneManager->getCurrentShadowNode();
-
-        CachedGridVec::iterator itor = mCachedGrid.begin();
-        CachedGridVec::iterator end  = mCachedGrid.end();
-
-        while( itor != end )
-        {
-            if( itor->camera == camera &&
-                itor->reflection == camera->isReflected() &&
-                (itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
-                itor->shadowNode == shadowNode )
-            {
-                bool upToDate = itor->lastFrame == mVaoManager->getFrameCount();
-                itor->lastFrame = mVaoManager->getFrameCount();
-                *outCachedGrid = &(*itor);
-
-                //Not only this causes bugs see http://www.ogre3d.org/forums/viewtopic.php?f=25&t=88776
-                //as far as I can't tell this is not needed anymore.
-                //if( mSceneManager->isCurrentShadowNodeReused() )
-                //    upToDate = false; //We can't really be sure the cache is up to date
-
-                return upToDate;
-            }
-
-            ++itor;
-        }
-
-        //If we end up here, the entry doesn't exist. Create a new one.
-        CachedGrid cachedGrid;
-        cachedGrid.camera      = camera;
-        cachedGrid.reflection  = camera->isReflected();
-        cachedGrid.aspectRatio = camera->getAspectRatio();
-        cachedGrid.shadowNode  = mSceneManager->getCurrentShadowNode();
-        cachedGrid.lastFrame   = mVaoManager->getFrameCount();
-
-        cachedGrid.gridBuffer               = 0;
-        cachedGrid.globalLightListBuffer    = 0;
-
-        mCachedGrid.push_back( cachedGrid );
-
-        *outCachedGrid = &mCachedGrid.back();
-
-        return false;
-    }
-    //-----------------------------------------------------------------------------------
-    bool Forward3D::getCachedGridFor( Camera *camera, const CachedGrid **outCachedGrid ) const
-    {
-        CachedGridVec::const_iterator itor = mCachedGrid.begin();
-        CachedGridVec::const_iterator end  = mCachedGrid.end();
-
-        while( itor != end )
-        {
-            if( itor->camera == camera &&
-                itor->reflection == camera->isReflected() &&
-                (itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
-                itor->shadowNode == mSceneManager->getCurrentShadowNode() )
-            {
-                bool upToDate = itor->lastFrame == mVaoManager->getFrameCount();
-                *outCachedGrid = &(*itor);
-
-                return upToDate;
-            }
-
-            ++itor;
-        }
-
-        return false;
-    }
-    //-----------------------------------------------------------------------------------
-    TexBufferPacked* Forward3D::getGridBuffer( Camera *camera ) const
-    {
-        CachedGrid const *cachedGrid = 0;
-
-#ifdef NDEBUG
-        getCachedGridFor( camera, &cachedGrid );
-#else
-        bool upToDate = getCachedGridFor( camera, &cachedGrid );
-        assert( upToDate && "You must call Forward3D::collectLights first!" );
-#endif
-
-        return cachedGrid->gridBuffer;
-    }
-    //-----------------------------------------------------------------------------------
-    TexBufferPacked* Forward3D::getGlobalLightListBuffer( Camera *camera ) const
-    {
-        CachedGrid const *cachedGrid = 0;
-
-#ifdef NDEBUG
-        getCachedGridFor( camera, &cachedGrid );
-#else
-        bool upToDate = getCachedGridFor( camera, &cachedGrid );
-        assert( upToDate && "You must call Forward3D::collectLights first!" );
-#endif
-
-        return cachedGrid->globalLightListBuffer;
-    }
-    //-----------------------------------------------------------------------------------
     size_t Forward3D::getConstBufferSize(void) const
     {
         // (1 + mNumSlices) vars * 4 (vec4) * 4 bytes = 12
@@ -684,5 +463,13 @@ namespace Ogre
             *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].width * mLightsPerCell );
             *passBufferPtr++ = i < 1u ? fLightsPerCell : renderTargetHeight;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void Forward3D::setHlmsPassProperties( Hlms *hlms )
+    {
+        ForwardPlusBase::setHlmsPassProperties( hlms );
+
+        hlms->_setProperty( HlmsBaseProp::ForwardPlus, HlmsBaseProp::Forward3D.mHash );
+        hlms->_setProperty( HlmsBaseProp::Forward3DNumSlices, mNumSlices );
     }
 }

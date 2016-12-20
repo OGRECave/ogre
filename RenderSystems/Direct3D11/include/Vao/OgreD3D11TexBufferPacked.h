@@ -56,10 +56,11 @@ namespace Ogre
 
     public:
         D3D11TexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                              BufferType bufferType, void *initialData, bool keepAsShadow,
+                              uint32 numElementsPadding, BufferType bufferType,
+                              void *initialData, bool keepAsShadow,
                               VaoManager *vaoManager, BufferInterface *bufferInterface,
                               Ogre::PixelFormat pf, D3D11Device &device );
-        ~D3D11TexBufferPacked();
+        virtual ~D3D11TexBufferPacked();
 
         virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
         virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );

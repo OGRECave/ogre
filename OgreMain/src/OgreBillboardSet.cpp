@@ -607,7 +607,7 @@ namespace v1 {
 
         if (mPointRendering)
         {
-            op.operationType = RenderOperation::OT_POINT_LIST;
+            op.operationType = OT_POINT_LIST;
             op.useIndexes = false;
             op.useGlobalInstancingVertexBufferIsAvailable = false;
             op.indexData = 0;
@@ -615,7 +615,7 @@ namespace v1 {
         }
         else
         {
-            op.operationType = RenderOperation::OT_TRIANGLE_LIST;
+            op.operationType = OT_TRIANGLE_LIST;
             op.useIndexes = true;
 
             op.vertexData->vertexCount = mNumVisibleBillboards * 4;

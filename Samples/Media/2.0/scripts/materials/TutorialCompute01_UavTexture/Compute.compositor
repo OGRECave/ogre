@@ -1,0 +1,45 @@
+compositor_node TutorialComputeTest01_UavTextureRenderingNode
+{
+	in 0 rt_renderwindow
+
+	texture nullDummy target_width target_height PF_NULL
+	texture testTexture target_width target_height PF_R8G8B8A8 depth_pool 0 no_gamma uav
+	
+	target nullDummy
+	{
+		pass compute
+		{
+			job	TestJob
+			
+			//uav # textureName read write allow_write_after_write
+			uav 0 testTexture	write
+			//input 0 mrtTexture 1
+		}
+	}
+
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		//Compositor will issue the appropiate barriers because
+		//it knows testTexture will be used as a texture.
+		pass render_quad
+		{
+			material Ogre/Copy/4xFP32
+			input 0 testTexture
+		}
+
+		pass render_scene
+		{
+			overlays	on
+		}
+	}
+}
+
+workspace TutorialComputeTest01_UavTextureWorkspace
+{
+	connect_output TutorialComputeTest01_UavTextureRenderingNode 0
+}

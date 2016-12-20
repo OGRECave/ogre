@@ -64,15 +64,15 @@ namespace v1 {
     }
 
 
-    static GLint getR2VBPrimitiveType(RenderOperation::OperationType operationType)
+    static GLint getR2VBPrimitiveType(OperationType operationType)
     {
         switch (operationType)
         {
-        case RenderOperation::OT_POINT_LIST:
+        case OT_POINT_LIST:
             return GL_POINTS;
-        case RenderOperation::OT_LINE_LIST:
+        case OT_LINE_LIST:
             return GL_LINES;
-        case RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             return GL_TRIANGLES;
             //TODO Add other RenderOperation allowed when no GS present.
         default:
@@ -83,18 +83,18 @@ namespace v1 {
     }
 
 
-    static GLint getVertexCountPerPrimitive(RenderOperation::OperationType operationType)
+    static GLint getVertexCountPerPrimitive(OperationType operationType)
     {
         // We can only get points, lines or triangles since they are the only
         // legal R2VB output primitive types.
         switch (operationType)
         {
-        case RenderOperation::OT_POINT_LIST:
+        case OT_POINT_LIST:
             return 1;
-        case RenderOperation::OT_LINE_LIST:
+        case OT_LINE_LIST:
             return 2;
         default:
-        case RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             return 3;
         }
     }
@@ -244,7 +244,7 @@ namespace v1 {
         Ogre::Pass* r2vbPass = mMaterial->getBestTechnique()->getPass(0);
 
         // Set pass before binding buffers to activate the GPU programs.
-        sceneMgr->_setPass(r2vbPass);
+        //sceneMgr->_setPass(r2vbPass); TODO
         if (mFirstUpdate)
         {
             bindVerticesOutput(r2vbPass);

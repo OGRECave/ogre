@@ -138,6 +138,34 @@ namespace Ogre
         TextureDefinitionBase::removeTexture( name );
     }
     //-----------------------------------------------------------------------------------
+    void CompositorNodeDef::mapOutputBufferChannel( size_t outChannel, IdString bufferName )
+    {
+        IdStringVec::const_iterator inputIt = std::find( mInputBuffers.begin(),
+                                                         mInputBuffers.end(), bufferName );
+
+        if( inputIt == mInputBuffers.end() )
+        {
+            BufferDefinitionVec::const_iterator itor = mLocalBufferDefs.begin();
+            BufferDefinitionVec::const_iterator end  = mLocalBufferDefs.end();
+
+            while( itor != end && itor->getName() != bufferName )
+                ++itor;
+
+            if( itor == mLocalBufferDefs.end() )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Trying to map buffer '" +
+                             bufferName.getFriendlyText() + "' to input channel #" +
+                             StringConverter::toString( outChannel ) +
+                             " but no buffer with such name exists.",
+                             "CompositorNodeDef::mapOutputBufferChannel" );
+            }
+        }
+
+        mOutBufferChannelMapping.resize( outChannel+1u );
+
+        mOutBufferChannelMapping[outChannel] = bufferName;
+    }
+    //-----------------------------------------------------------------------------------
     size_t CompositorNodeDef::getPassNumber( const CompositorPassDef *passDef ) const
     {
         size_t passCount = 0;

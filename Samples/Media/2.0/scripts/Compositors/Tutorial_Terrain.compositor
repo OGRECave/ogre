@@ -1,0 +1,54 @@
+compositor_node Tutorial_TerrainRenderingNode
+{
+	in 0 rt_renderwindow
+	in 1 TerraShadowTexture
+
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		pass render_scene
+		{
+			expose TerraShadowTexture
+
+			overlays	on
+			shadows		Tutorial_TerrainShadowNode
+		}
+	}
+}
+
+compositor_node_shadow Tutorial_TerrainShadowNode
+{
+	technique pssm
+
+	num_splits		3
+	pssm_lambda		0.95
+	shadow_map 0 2048 2048 PF_D32_FLOAT light 0 split 0
+	shadow_map 1 1024 1024 PF_D32_FLOAT light 0 split 1
+	shadow_map 2 1024 1024 PF_D32_FLOAT light 0 split 2
+
+	technique focused
+	//shadow_map 4 2048 2048 PF_D32_FLOAT light 1
+	//shadow_map 5 2048 2048 PF_D32_FLOAT light 2
+
+	//shadow_map 0 1 2 4 5
+	shadow_map 0 1 2
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+		pass render_scene
+		{
+		}
+	}
+}
+
+workspace Tutorial_TerrainWorkspace
+{
+	connect_external 0 Tutorial_TerrainRenderingNode 0
+	connect_external 1 Tutorial_TerrainRenderingNode 1
+}

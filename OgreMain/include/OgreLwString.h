@@ -30,7 +30,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#ifndef _OgreLwString_H_
+#define _OgreLwString_H_
 
 #include "OgreLwConstString.h"
 
@@ -417,3 +418,5 @@ namespace Ogre
 #endif
 
 #pragma warning( pop )
+
+#endif

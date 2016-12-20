@@ -1,0 +1,57 @@
+
+// GLSL shaders
+fragment_program DrawFromUavBuffer_ps_GLSL glsl
+{
+	source DrawFromUavBuffer_ps.glsl
+}
+
+// HLSL shaders
+fragment_program DrawFromUavBuffer_ps_HLSL hlsl
+{
+	source DrawFromUavBuffer_ps.hlsl
+	entry_point main
+	target ps_5_0
+}
+
+// Metal shaders
+fragment_program DrawFromUavBuffer_ps_Metal metal
+{
+	source DrawFromUavBuffer_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
+// Unified definitions
+fragment_program DrawFromUavBuffer_ps unified
+{
+	delegate DrawFromUavBuffer_ps_HLSL
+	delegate DrawFromUavBuffer_ps_GLSL
+	delegate DrawFromUavBuffer_ps_Metal
+	
+	default_params
+	{
+		param_named		texResolution	uint2	128 128
+	}
+}
+
+// Material definition
+material DrawFromUavBuffer
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref DrawFromUavBuffer_ps
+			{
+			}
+		}
+	}
+}

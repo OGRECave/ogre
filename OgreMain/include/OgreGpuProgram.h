@@ -80,6 +80,12 @@ namespace Ogre {
         String doGet(const void* target) const;
         void doSet(void* target, const String& val);
     };
+    class _OgreExport CmdBuildParamsFromRefl : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
     class _OgreExport CmdSkeletal : public ParamCommand
     {
     public:
@@ -125,6 +131,7 @@ namespace Ogre {
     // Command object for setting / getting parameters
     static CmdType msTypeCmd;
     static CmdSyntax msSyntaxCmd;
+    static CmdBuildParamsFromRefl msBuildParamsFromReflCmd;
     static CmdSkeletal msSkeletalCmd;
     static CmdMorph msMorphCmd;
     static CmdPose msPoseCmd;
@@ -142,6 +149,9 @@ namespace Ogre {
     bool mLoadFromFile;
     /// Syntax code e.g. arbvp1, vs_2_0 etc
     String mSyntaxCode;
+    /// Hlms shaders rarely need reflection. Because it's expensive in Metal,
+    /// it's turned off by default, and enabled for low level materials.
+    bool mBuildParametersFromReflection;
     /// Does this (vertex) program include skeletal animation?
     bool mSkeletalAnimation;
     /// Does this (vertex) program include morph animation?
@@ -278,6 +288,11 @@ namespace Ogre {
         they are appropriate.
     */
     virtual GpuProgramParametersSharedPtr createParameters(void);
+
+    void setBuildParametersFromReflection( bool buildParams )
+    { mBuildParametersFromReflection = buildParams; }
+
+    bool getBuildParametersFromReflection(void) const { return mBuildParametersFromReflection; }
 
     /** Sets whether a vertex program includes the required instructions
         to perform skeletal animation.

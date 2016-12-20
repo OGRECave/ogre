@@ -16,7 +16,10 @@ namespace Demo
         bool                mSlideUpDown[2];
         float               mCameraYaw;
         float               mCameraPitch;
+        public: float       mCameraBaseSpeed;
+        public: float       mCameraSpeedBoost;
 
+    private:
         GraphicsSystem      *mGraphicsSystem;
 
     public:

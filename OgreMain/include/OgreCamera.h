@@ -332,6 +332,22 @@ namespace Ogre {
         */
         void setOrientation(const Quaternion& q);
 
+        /** When a camera is created via SceneManager::createCamera, there are two
+            additional parameters.
+        @param collectLights
+            Tell Ogre to cull lights against this camera. This requires additional
+            CPU power. If a camera is not going to be used for a long time (or it
+            doesn't need lights, which is what happens with shadow mapping cameras)
+            you want this set to false. Otherwise if you need to render and need
+            lights, enable this setting.
+        @param isCubemap
+            Use an alternative algorithm to collect lights in 360° around the camera.
+            This is required if the camera is going to be used in passes where
+            CompositorPassSceneDef::mCameraCubemapReorient = true;
+            Does nothing if collectLights = false
+        */
+        void setLightCullingVisibility( bool collectLights, bool isCubemap );
+
         /** Tells the Camera to contact the SceneManager to render from it's viewpoint.
         @param vp The viewport to render to
         @param includeOverlays Whether or not any overlay objects should be included
@@ -382,7 +398,8 @@ namespace Ogre {
         Vector3 getDerivedRight(void) const;
 
         /// Same as getDerivedPosition, but doesn't check if dirty.
-        const Vector3& _getCachedDerivedPosition(void) const                { return mDerivedPosition; }
+        const Vector3& _getCachedDerivedPosition(void) const            { return mDerivedPosition; }
+        const Quaternion& _getCachedDerivedOrientation(void) const      { return mDerivedOrientation; }
 
         /** Gets the real world orientation of the camera, including any
             rotation inherited from a node attachment */

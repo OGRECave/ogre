@@ -36,17 +36,18 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    VertexBufferPacked VertexArrayObject::msDummyVertexBuffer( 0, 0, 1, BT_DEFAULT, 0, false, 0,
+    VertexBufferPacked VertexArrayObject::msDummyVertexBuffer( 0, 0, 1, 0, BT_DEFAULT, 0, false, 0,
                                                                0, VertexElement2Vec(), 0, 0, 0 );
 
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
 
-    VertexArrayObject::VertexArrayObject( uint32 vaoName, uint32 renderQueueId,
+    VertexArrayObject::VertexArrayObject( uint32 vaoName, uint32 renderQueueId, uint8 inputLayoutId,
                                           const VertexBufferPackedVec &vertexBuffers,
                                           IndexBufferPacked *indexBuffer,
-                                          v1::RenderOperation::OperationType operationType ) :
+                                          OperationType operationType ) :
             mVaoName( vaoName ),
             mRenderQueueId( renderQueueId ),
+            mInputLayoutId( inputLayoutId ),
             mPrimStart( 0 ),
             mPrimCount( 0 ),
             mVertexBuffers( vertexBuffers ),
@@ -66,11 +67,11 @@ namespace Ogre
 
         /*switch( mOperationType )
         {
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             mFaceCount = (val / 3);
             break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_FAN:
             mFaceCount = (val - 2);
             break;
         default:
@@ -160,6 +161,22 @@ namespace Ogre
         retVal.reserve( mVertexBuffers.size() );
         VertexBufferPackedVec::const_iterator itBuffers = mVertexBuffers.begin();
         VertexBufferPackedVec::const_iterator enBuffers = mVertexBuffers.end();
+
+        while( itBuffers != enBuffers )
+        {
+            retVal.push_back( (*itBuffers)->getVertexElements() );
+            ++itBuffers;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    VertexElement2VecVec VertexArrayObject::getVertexDeclaration( const VertexBufferPackedVec &vertexBuffers )
+    {
+        VertexElement2VecVec retVal;
+        retVal.reserve( vertexBuffers.size() );
+        VertexBufferPackedVec::const_iterator itBuffers = vertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator enBuffers = vertexBuffers.end();
 
         while( itBuffers != enBuffers )
         {
@@ -283,7 +300,9 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void VertexArrayObject::readRequests( ReadRequestsArray &requests )
+    void VertexArrayObject::readRequests( ReadRequestsArray &requests,
+                                          size_t elementStart, size_t elementCount,
+                                          bool skipRequestIfBufferHasShadowCopy )
     {
         set<VertexBufferPacked*>::type seenBuffers;
 
@@ -307,13 +326,24 @@ namespace Ogre
 
             VertexBufferPacked *vertexBuffer = mVertexBuffers[bufferIdx];
 
+            assert( elementStart < vertexBuffer->getNumElements() );
+            assert( elementStart + elementCount <= vertexBuffer->getNumElements() );
+
             itor->type = vElement->mType;
             itor->offset = offset;
             itor->vertexBuffer = vertexBuffer;
 
-            if( seenBuffers.find( vertexBuffer ) == seenBuffers.end() )
+            if( skipRequestIfBufferHasShadowCopy && vertexBuffer->getShadowCopy() )
             {
-                itor->asyncTicket = vertexBuffer->readRequest( 0, vertexBuffer->getNumElements() );
+                itor->data = reinterpret_cast<const char*>( vertexBuffer->getShadowCopy() );
+                itor->data += offset + elementStart * vertexBuffer->getBytesPerElement();
+            }
+            else if( seenBuffers.find( vertexBuffer ) == seenBuffers.end() )
+            {
+                if( elementCount == 0 )
+                    elementCount = vertexBuffer->getNumElements() - elementStart;
+
+                itor->asyncTicket = vertexBuffer->readRequest( elementStart, elementCount );
                 seenBuffers.insert( vertexBuffer );
             }
 
@@ -330,13 +360,20 @@ namespace Ogre
 
         while( itor != end )
         {
+            assert( ( !itor->asyncTicket.isNull() ||
+                      seenBuffers.find( itor->vertexBuffer ) != seenBuffers.end() ||
+                      (itor->data &&
+                       itor->vertexBuffer->getShadowCopy() &&
+                       itor->asyncTicket.isNull()) )
+                    && "These tickets are invalid or already been unmapped, or you're mapping twice" );
+
             if( !itor->asyncTicket.isNull() )
             {
                 itor->data = reinterpret_cast<const char*>( itor->asyncTicket->map() );
                 itor->data += itor->offset;
                 seenBuffers[itor->vertexBuffer] = itor - tickets.begin();
             }
-            else
+            else if( !itor->data )
             {
                 map<VertexBufferPacked const *, size_t>::type::const_iterator it = seenBuffers.find(
                                                                                 itor->vertexBuffer );

@@ -34,7 +34,7 @@ namespace Ogre {
 namespace v1 {
     //-----------------------------------------------------------------------
     RenderToVertexBuffer::RenderToVertexBuffer() :
-        mOperationType(RenderOperation::OT_TRIANGLE_LIST),
+        mOperationType(OT_TRIANGLE_LIST),
         mResetsEveryUpdate(false),
         mResetRequested(true),
         mSourceRenderable(0),

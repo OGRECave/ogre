@@ -173,7 +173,7 @@ namespace Ogre
         VertexBufferPackedVec vertexBuffers;
         vertexBuffers.push_back( vertexBuffer );
         Ogre::VertexArrayObject *vao = vaoManager->createVertexArrayObject(
-                    vertexBuffers, indexBuffer, v1::RenderOperation::OT_TRIANGLE_LIST );
+                    vertexBuffers, indexBuffer, OT_TRIANGLE_LIST );
 
         mVaoPerLod[0].push_back( vao );
         //Use the same geometry for shadow casting. You can optimize performance by creating

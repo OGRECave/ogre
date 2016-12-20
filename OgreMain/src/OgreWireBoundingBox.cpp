@@ -50,7 +50,7 @@ namespace v1 {
         mRenderOp.indexData = 0;
         mRenderOp.vertexData->vertexCount = 24; 
         mRenderOp.vertexData->vertexStart = 0; 
-        mRenderOp.operationType = RenderOperation::OT_LINE_LIST; 
+        mRenderOp.operationType = OT_LINE_LIST;
         mRenderOp.useIndexes = false; 
         mRenderOp.useGlobalInstancingVertexBufferIsAvailable = false;
 

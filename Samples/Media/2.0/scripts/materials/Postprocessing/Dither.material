@@ -15,17 +15,23 @@ fragment_program Postprocess/Dither_ps_GLSL glsl
    	}
 }
 
+fragment_program Postprocess/Dither_ps_Metal metal
+{
+	source Dither_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program Postprocess/Dither_ps unified
 {
 	delegate Postprocess/Dither_ps_GLSL
 	delegate Postprocess/Dither_ps_HLSL
+	delegate Postprocess/Dither_ps_Metal
 }
 
 material Postprocess/Dither
 {
     technique
     {
-
 		pass
 		{
 			depth_check off

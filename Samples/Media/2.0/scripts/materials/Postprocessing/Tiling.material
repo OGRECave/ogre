@@ -10,10 +10,17 @@ fragment_program Postprocess/Tiling_ps_GLSL glsl
 	source Tiling_ps.glsl
 }
 
+fragment_program Postprocess/Tiling_ps_Metal metal
+{
+	source Tiling_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program Postprocess/Tiling_ps unified
 {
 	delegate Postprocess/Tiling_ps_GLSL
 	delegate Postprocess/Tiling_ps_HLSL
+	delegate Postprocess/Tiling_ps_Metal
 }
 
 material Postprocess/Tiling

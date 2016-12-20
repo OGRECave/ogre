@@ -250,7 +250,7 @@ namespace Ogre
         convexBody.clip( p );
         p.redefine( Vector3::UNIT_Y, vMaxCamFrustumLS );
         convexBody.clip( p );
-        p.redefine( Vector3::UNIT_Z, vMaxCamFrustumLS );
+        p.redefine( Vector3::NEGATIVE_UNIT_Z, vMinCamFrustumLS );
         convexBody.clip( p );
 
         Vector3 vMin( std::numeric_limits<Real>::max(), std::numeric_limits<Real>::max(),
@@ -285,7 +285,7 @@ namespace Ogre
 
         texCam->setProjectionType( PT_ORTHOGRAPHIC );
         Vector3 shadowCameraPos = (vMin + vMax) * 0.5f;
-        shadowCameraPos.z       = vMin.z - 2.0f;
+        shadowCameraPos.z       = vMax.z + 2.0f; // Backwards is towards +Z!
         //Go back from light space to world space
         shadowCameraPos = scalarLightSpaceToWorld * shadowCameraPos;
         texCam->setPosition( shadowCameraPos );

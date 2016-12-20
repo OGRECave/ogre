@@ -11,17 +11,23 @@ fragment_program Embossed_ps_GLSL glsl
 	source Embossed_ps.glsl
 }
 
+fragment_program Embossed_ps_Metal metal
+{
+	source Embossed_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program Embossed_ps unified
 {
-	delegate Embossed_ps_HLSL
 	delegate Embossed_ps_GLSL
+	delegate Embossed_ps_HLSL
+	delegate Embossed_ps_Metal
 }
 
 material Postprocess/Embossed
 {
 	technique
 	{
-
 		pass
 		{
 			depth_check off

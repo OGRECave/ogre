@@ -10,10 +10,17 @@ fragment_program Postprocess/SharpenEdges_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program Postprocess/SharpenEdges_ps_Metal metal
+{
+	source SharpenEdges_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program Postprocess/SharpenEdges_ps unified
 {
 	delegate Postprocess/SharpenEdges_ps_GLSL
 	delegate Postprocess/SharpenEdges_ps_HLSL
+	delegate Postprocess/SharpenEdges_ps_Metal
 
 	default_params
 	{
@@ -25,7 +32,6 @@ material Postprocess/SharpenEdges
 {
     technique
     {
-
 		pass
 		{
 			depth_check off

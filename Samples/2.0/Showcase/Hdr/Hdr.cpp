@@ -1,9 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "HdrGameState.h"
-#include "SdlInputHandler.h"
 
-#include "OgreTimer.h"
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreRoot.h"
@@ -14,7 +12,16 @@
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
 
-using namespace Demo;
+#include "System/MainEntryPoints.h"
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
+}
 
 namespace Demo
 {
@@ -41,18 +48,20 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[7] =
+            const char *c_locations[9] =
             {
                 "2.0/scripts/materials/Common",
                 "2.0/scripts/materials/Common/GLSL",
                 "2.0/scripts/materials/Common/HLSL",
+                "2.0/scripts/materials/Common/Metal",
                 "2.0/scripts/materials/HDR",
                 "2.0/scripts/materials/HDR/GLSL",
                 "2.0/scripts/materials/HDR/HLSL",
+                "2.0/scripts/materials/HDR/Metal",
                 "2.0/scripts/materials/PbsMaterials"
             };
 
-            for( size_t i=0; i<7; ++i )
+            for( size_t i=0; i<9; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );
@@ -65,15 +74,13 @@ namespace Demo
         {
         }
     };
-}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    HdrGameState hdrGameState(
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        HdrGameState *gfxGameState = new HdrGameState(
         "This samples shows the HDR (High Dynamic Range) pipeline in action\n"
         "HDR combined with PBR let us use real world values as input for our lighting and\n"
         "a real world scale such as lumen, lux and EV Stops (photography, in log2 space)\n"
@@ -94,54 +101,26 @@ int mainApp()
         "\n"
         "LEGAL: Uses Saint Peter's Basilica (C) by Emil Persson under CC Attrib 3.0 Unported\n"
         "See Samples/Media/materials/textures/Cubemaps/License.txt for more information.");
-    HdrGraphicsSystem graphicsSystem( &hdrGameState );
 
-    hdrGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new HdrGraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "High Dynamic Range (HDR) Sample" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "High Dynamic Range (HDR) Sample";
+    }
 }

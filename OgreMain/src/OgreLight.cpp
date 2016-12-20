@@ -41,6 +41,7 @@ namespace Ogre {
           mSpecular(ColourValue::White),
           mSpotOuter(Degree(40.0f)),
           mSpotInner(Degree(30.0f)),
+          mTanHalfAngle( Math::Tan( mSpotOuter * 0.5f ) ),
           mSpotFalloff(1.0f),
           mSpotNearClip(0.0f),
           mRange(23.0f),
@@ -82,6 +83,7 @@ namespace Ogre {
             break;
         case LT_POINT:
         case LT_SPOTLIGHT:
+        case LT_VPL:
             resetAabb();
             updateLightBounds();
             break;
@@ -103,12 +105,13 @@ namespace Ogre {
         assert( dynamic_cast<SceneNode*>( mParentNode ) );
         assert( !static_cast<SceneNode*>( mParentNode )->isYawFixed() && "Attach Lights to a "
                 "SceneNode without a fixed yaw! (SceneNode::setFixedYawAxis(false))" );
-        static_cast<SceneNode*>( mParentNode )->setDirection( vec, Node::TS_PARENT, Vector3::UNIT_Z );
+        static_cast<SceneNode*>( mParentNode )->setDirection( vec, Node::TS_PARENT,
+                                                              Vector3::NEGATIVE_UNIT_Z );
     }
     //-----------------------------------------------------------------------
     Vector3 Light::getDirection(void) const
     {
-        return mParentNode->getOrientation().zAxis();
+        return -mParentNode->getOrientation().zAxis();
     }
     //-----------------------------------------------------------------------
     void Light::setAffectParentNode( bool bAffect )
@@ -127,6 +130,8 @@ namespace Ogre {
         mSpotOuter = outerAngle;
         mSpotFalloff = falloff;
 
+        mTanHalfAngle = Math::Tan( mSpotOuter * 0.5f );
+
         if( boundsChanged && mLightType == LT_SPOTLIGHT )
             updateLightBounds();
     }
@@ -140,6 +145,7 @@ namespace Ogre {
     {
         bool boundsChanged = mSpotOuter != val;
         mSpotOuter = val;
+        mTanHalfAngle = Math::Tan( mSpotOuter * 0.5f );
         if( boundsChanged && mLightType == LT_SPOTLIGHT )
             updateLightBounds();
     }
@@ -184,7 +190,7 @@ namespace Ogre {
     void Light::resetAabb()
     {
         mObjectData.mLocalRadius[mObjectData.mIndex] = 1.0f;
-        if( mLightType == LT_POINT )
+        if( mLightType == LT_POINT || mLightType == LT_VPL )
         {
             mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
                                                  mObjectData.mIndex );
@@ -199,7 +205,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Light::updateLightBounds(void)
     {
-        if( mLightType == LT_POINT )
+        if( mLightType == LT_POINT || mLightType == LT_VPL )
         {
             if( !mAffectParentNode )
             {
@@ -218,16 +224,16 @@ namespace Ogre {
             {
                 //In local space, lights are centered at origin, facing towards +Z
                 Aabb aabb;
-                Real lenOpposite = Math::Tan( mSpotOuter * 0.5f ) * mRange;
-                aabb.mCenter    = Vector3( 0, 0, mRange * 0.5f );
+                Real lenOpposite = mTanHalfAngle * mRange;
+                aabb.mCenter    = Vector3( 0, 0, -mRange * 0.5f );
                 aabb.mHalfSize  = Vector3( lenOpposite, lenOpposite, mRange * 0.5f );
                 mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
                 mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
             }
             else
             {
-                Real tanHalfAngle = Math::Tan( mSpotOuter * 0.5f ) * mRange;
-                mParentNode->setScale( tanHalfAngle, tanHalfAngle, mRange );
+                Real tanHalfAngleRange = mTanHalfAngle * mRange;
+                mParentNode->setScale( tanHalfAngleRange, tanHalfAngleRange, mRange );
             }
         }
     }
@@ -244,12 +250,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Vector3 Light::getDerivedDirection(void) const
     {
-        return mParentNode->_getDerivedOrientation().zAxis();
+        return -mParentNode->_getDerivedOrientation().zAxis();
     }
     //-----------------------------------------------------------------------
     Vector3 Light::getDerivedDirectionUpdated(void) const
     {
-        return mParentNode->_getDerivedOrientationUpdated().zAxis();
+        return -mParentNode->_getDerivedOrientationUpdated().zAxis();
     }
     //-----------------------------------------------------------------------
     Vector4 Light::getAs4DVector(void) const

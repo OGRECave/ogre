@@ -766,6 +766,16 @@ namespace Ogre
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN ) = 0;
 
+        /** See other overload. The slots are shared with the textures'
+        @param offset
+            Offset to bind, in bytes
+        @param sizeBytes
+            Size to bind, in bytes. Use 0 to bind until the end of the buffer.
+        */
+        virtual void queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
+                                   size_t offset = 0, size_t sizeBytes = 0 ) = 0;
+
         /// By default queueBindUAV will keep all other slots intact. Calling this function
         /// will unset all bound UAVs. Will take effect after flushUAVs or setting a new RT.
         virtual void clearUAVs(void) = 0;
@@ -773,6 +783,26 @@ namespace Ogre
         /// Forces to take effect all the queued UAV binding requests. @see _queueBindUAV.
         /// You don't need to call this if you're going to set the render target next.
         virtual void flushUAVs(void) = 0;
+
+        /** Binds an UAV texture to a Compute Shader.
+        @remarks
+            @see queueBindUAV param description.
+        @par
+            Internal Developer Notes:
+            D3D11 keeps UAVs that affect rendering separate from UAVs that affect Compute Shaders.
+            Hence queueBindUAV & _bindTextureUavCS are independent.
+
+            OpenGL however, does not make this distinction. Hence once we switch back to
+            3D rendering, we need to restore UAVs set via queueBindUAV.
+        */
+        virtual void _bindTextureUavCS( uint32 slot, Texture *texture,
+                                        ResourceAccess::ResourceAccess access,
+                                        int32 mipmapLevel, int32 textureArrayIndex,
+                                        PixelFormat pixelFormat ) = 0;
+
+        /// Binds a regular texture to a Compute Shader.
+        virtual void _setTextureCS( uint32 slot, bool enabled, Texture *texPtr ) = 0;
+        virtual void _setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *Samplerblock ) = 0;
 
         /**
         Sets the texture to bind to a given texture unit.
@@ -793,6 +823,8 @@ namespace Ogre
         virtual void _resourceTransitionDestroyed( ResourceTransition *resTransition )  {}
         virtual void _executeResourceTransition( ResourceTransition *resTransition )    {}
 
+        virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso ) {}
+        virtual void _hlmsPipelineStateObjectDestroyed( HlmsPso *pso ) {}
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock ) {}
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block ) {}
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock ) {}
@@ -801,6 +833,9 @@ namespace Ogre
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block ) {}
 
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer ) = 0;
+
+        virtual void _hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso ) {}
+        virtual void _hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *newPso ) {}
 
         /** Binds a texture to a vertex, geometry, compute, tessellation hull
         or tessellation domain sampler.
@@ -880,6 +915,9 @@ namespace Ogre
         /// Signifies the beginning of the main frame. i.e. will only be called once per frame,
         /// not per viewport
         virtual void _beginFrameOnce(void);
+        /// Called once per frame, regardless of how many active workspaces there are.
+        /// Gets called AFTER all RenderWindows have been swapped.
+        virtual void _endFrameOnce(void) {}
 
         /**
         * Signifies the beginning of a frame, i.e. the start of rendering on a single viewport. Will occur
@@ -923,44 +961,17 @@ namespace Ogre
         /** Get the current active viewport for rendering. */
         virtual Viewport* _getViewport(void);
 
-        /// @See HlmsMacroblock
-        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock ) = 0;
-
-        /// @See HlmsBlendblock
-        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock ) = 0;
-
         /// @See HlmsSamplerblock. This function MUST be called after _setTexture, not before.
         /// Otherwise not all APIs may see the change.
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock ) = 0;
 
-        /// @See HlmsCache
-        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache ) = 0;
+        /// @See HlmsPso
+        virtual void _setPipelineStateObject( const HlmsPso *pso );
 
-        /** Sets the depth bias, NB you should use the Material version of this. 
-        @remarks
-        When polygons are coplanar, you can get problems with 'depth fighting' where
-        the pixels from the two polys compete for the same screen pixel. This is particularly
-        a problem for decals (polys attached to another surface to represent details such as
-        bulletholes etc.).
-        @par
-        A way to combat this problem is to use a depth bias to adjust the depth buffer value
-        used for the decal such that it is slightly higher than the true value, ensuring that
-        the decal appears on top.
-        @note
-        The final bias value is a combination of a constant bias and a bias proportional
-        to the maximum depth slope of the polygon being rendered. The final bias
-        is constantBias + slopeScaleBias * maxslope. Slope scale biasing is
-        generally preferable but is not available on older hardware.
-        @param constantBias The constant bias value, expressed as a value in 
-        homogeneous depth coordinates.
-        @param slopeScaleBias The bias value which is factored by the maximum slope
-        of the polygon, see the description above. This is not supported by all
-        cards.
-
-        Documentation TODO: This feature was moved to HlmsMacroblock
-
-        */
-        //virtual void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) = 0;
+        /// Unlike _setPipelineStateObject, the RenderSystem will check if the PSO
+        /// has changed to avoid redundant state changes (since it's hard to do it
+        /// at Hlms level)
+        virtual void _setComputePso( const HlmsComputePso *pso ) = 0;
 
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
         virtual void _beginGeometryCount(void);
@@ -1039,43 +1050,6 @@ namespace Ogre
         virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, 
             bool forGpuProgram) = 0;
 
-        /** Turns depth-stencil buffer checking on or off. 
-        @remarks
-        An inactive depth-stencil buffer can be read by a shader as a texture. An 
-        application that reads a depth-stencil buffer as a texture renders in two
-        passes, the first pass writes to the depth-stencil buffer and the second
-        pass reads from the buffer. This allows a shader to compare depth or
-        stencil values previously written to the buffer against the value for
-        the pixel currrently being rendered. The result of the comparison can
-        be used to create effects such as shadow mapping or soft particles
-        in a particle system.
-        */
-        // virtual void setDepthCheckEnabled(bool enabled) = 0;
-
-        /** Turns stencil buffer checking on or off. 
-        @remarks
-        Stencilling (masking off areas of the rendering target based on the stencil 
-        buffer) can be turned on or off using this method. By default, stencilling is
-        disabled.
-        */
-        virtual void setStencilCheckEnabled(bool enabled) = 0;
-        /** Determines if this system supports hardware accelerated stencil buffer. 
-        @remarks
-        Note that the lack of this function doesn't mean you can't do stencilling, but
-        the stencilling operations will be provided in software, which will NOT be
-        fast.
-        @par
-        Generally hardware stencils are only supported in 32-bit colour modes, because
-        the stencil buffer shares the memory of the z-buffer, and in most cards the 
-        z-buffer has to be the same depth as the colour buffer. This means that in 32-bit
-        mode, 24 bits of the z-buffer are depth and 8 bits are stencil. In 16-bit mode there
-        is no room for a stencil (although some cards support a 15:1 depth:stencil option,
-        this isn't useful for very much) so 8 bits of stencil are provided in software.
-        This can mean that if you use stencilling, your applications may be faster in 
-        32-but colour than in 16-bit, which may seem odd to some people.
-        */
-        /*virtual bool hasHardwareStencil(void) = 0;*/
-
         /** This method allows you to set all the stencil buffer parameters in one call.
         @remarks
         The stencil buffer is used to mask out pixels in the render target, allowing
@@ -1094,40 +1068,15 @@ namespace Ogre
         In order to batch things this way, you'll want to use OGRE's separate render queue
         groups (see RenderQueue) and register a RenderQueueListener to get notifications
         between batches.
-        @par
-        There are individual state change methods for each of the parameters set using 
-        this method. 
-        Note that the default values in this method represent the defaults at system 
-        start up too.
-        @param func The comparison function applied.
-        @param refValue The reference value used in the comparison
-        @param compareMask The bitmask applied to both the stencil value and the reference value 
-        before comparison
-        @param writeMask The bitmask the controls which bits from refValue will be written to 
-        stencil buffer (valid for operations such as SOP_REPLACE).
-        the stencil
-        @param stencilFailOp The action to perform when the stencil check fails
-        @param depthFailOp The action to perform when the stencil check passes, but the
-        depth buffer check still fails
-        @param passOp The action to take when both the stencil and depth check pass.
-        @param twoSidedOperation If set to true, then if you render both back and front faces 
-        (you'll have to turn off culling) then these parameters will apply for front faces, 
-        and the inverse of them will happen for back faces (keep remains the same).
+        @param refValue
+            The reference value used in the comparison (dynamic)
+        @param stencilParams
+            The static parameters that involve more expensive state changes.
+            Ogre dev implementors note: Should check if the stencilParams are different from before
         */
-        virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-            uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
-            StencilOperation stencilFailOp = SOP_KEEP, 
-            StencilOperation depthFailOp = SOP_KEEP,
-            StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false,
-            bool readBackAsTexture = false) {};
+        virtual void setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams );
 
-
-
-        /** Sets the current vertex declaration, ie the source of vertex data. */
-        virtual void setVertexDeclaration(v1::VertexDeclaration* decl) = 0;
-        /** Sets the current vertex buffer binding state. */
-        virtual void setVertexBufferBinding(v1::VertexBufferBinding* binding) = 0;
+        const StencilParams& getStencilBufferParams(void) const         { return mStencilParams; }
 
         /**
         Render something to the active viewport.
@@ -1143,11 +1092,13 @@ namespace Ogre
         */
         virtual void _render(const v1::RenderOperation& op);
 
+        virtual void _dispatch( const HlmsComputePso &pso ) = 0;
+
         /** Part of the low level rendering interface. Tells the RS which VAO will be bound now.
             (i.e. Vertex Formats, buffers being bound, etc.)
             You don't need to rebind if the VAO's mRenderQueueId is the same as previous call.
         @remarks
-            Assumes _setProgramsFromHlms has already been called.
+            Assumes _setPipelineStateObject has already been called.
         */
         virtual void _setVertexArrayObject( const VertexArrayObject *vao ) = 0;
 
@@ -1185,12 +1136,6 @@ namespace Ogre
         */
         virtual const String& _getDefaultViewportMaterialScheme(void) const;
 
-        /** Binds a given GpuProgram (but not the parameters). 
-        @remarks Only one GpuProgram of each type can be bound at once, binding another
-        one will simply replace the existing one.
-        */
-        virtual void bindGpuProgram(GpuProgram* prg);
-
         /** Bind Gpu program parameters.
         @param gptype The type of program to bind the parameters to
         @param params The parameters to bind
@@ -1202,11 +1147,6 @@ namespace Ogre
         /** Only binds Gpu program parameters used for passes that have more than one iteration rendering
         */
         virtual void bindGpuProgramPassIterationParameters(GpuProgramType gptype) = 0;
-        /** Unbinds GpuPrograms of a given GpuProgramType.
-        @remarks
-        This returns the pipeline to fixed-function processing for this type.
-        */
-        virtual void unbindGpuProgram(GpuProgramType gptype);
 
         /** Returns whether or not a Gpu program of the given type is currently bound. */
         virtual bool isGpuProgramBound(GpuProgramType gptype);
@@ -1330,6 +1270,45 @@ namespace Ogre
             The RenderTarget is needed to know the depth/stencil information.
          */
         virtual void _setRenderTarget(RenderTarget *target, bool colourWrite) = 0;
+
+        /** This function was created because of Metal. The Metal API doesn't have a
+            'device->clear( texture )' function. Instead we must specify we want to
+            start rendering to a cleared surface. This allows mobile TBDR GPUs to begin
+            rendering without having to load any data from memory (saves a lot of bandwidth
+            and battery).
+        @par
+            But it also means Ogre must do an effort to delay the clear operation as much as
+            possible (until actual rendering to it, or until the texture is used for
+            reading/sampling).
+        @par
+            Normally, we'd want to stop deferring a clear and immediately issue it when
+            _setRenderTarget gets called with a different pointer. However, the following
+            scenario is too common:
+            target rtt
+            {
+                pass clear {}
+                pass render_scene
+                {
+                    shadows myShadowNode
+                }
+            }
+
+            Ogre will first issue a clear, then begin executing the shadow node (which switches
+            to the shadow map) then switch back to the original rtt to resume regular rendinering.
+            In this common case we want to delay the clear, but _setRenderTarget is clearly
+            not an trusted indication (we would get many false positives).
+        @par
+            Therefore the compositor has much better knowledge, and it informs of this fact
+            via this call.
+        @remarks
+            TODO: This function will eventually be removed. The Compositor should be creating
+            a resource transition. We only need to force clear when we're going to be using
+            the target as a texture for reading/sampling. That's exactly what
+            ResourceTransitions are for.
+        @param previousRenderTarget
+            RenderTarget that was being used (and we should clear if we have to).
+        */
+        virtual void _notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget ) {}
 
         /** Defines a listener on the custom events that this render system 
         can raise.
@@ -1462,6 +1441,8 @@ namespace Ogre
         /// Checks for the presense of an API-specific extension (eg. Vulkan, GL)
         virtual bool checkExtension( const String &ext ) const      { return false; }
 
+        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const = 0;
+
     protected:
 
         void cleanReleasedDepthBuffers(void);
@@ -1474,6 +1455,8 @@ namespace Ogre
         RenderTargetMap mRenderTargets;
         /** The Active render target. */
         RenderTarget * mActiveRenderTarget;
+
+        StencilParams   mStencilParams;
 
         /** The Active GPU programs and gpu program parameters*/
         GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;

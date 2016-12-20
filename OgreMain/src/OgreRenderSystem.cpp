@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
+#include "OgreHlmsPso.h"
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreVertexArrayObject.h"
 
@@ -89,7 +90,6 @@ namespace Ogre {
     {
         mEventNames.push_back("RenderSystemCapabilitiesCreated");
     }
-
     //-----------------------------------------------------------------------
     RenderSystem::~RenderSystem()
     {
@@ -270,6 +270,33 @@ namespace Ogre {
     Viewport* RenderSystem::_getViewport(void)
     {
         return mActiveViewport;
+    }
+    //-----------------------------------------------------------------------
+    void RenderSystem::_setPipelineStateObject( const HlmsPso *pso )
+    {
+        assert( (!pso || pso->rsData) &&
+                "The PipelineStateObject must have been created via "
+                "RenderSystem::_hlmsPipelineStateObjectCreated!" );
+
+        //Disable previous state
+        mActiveVertexGpuProgramParameters.setNull();
+        mActiveGeometryGpuProgramParameters.setNull();
+        mActiveTessellationHullGpuProgramParameters.setNull();
+        mActiveTessellationDomainGpuProgramParameters.setNull();
+        mActiveFragmentGpuProgramParameters.setNull();
+        mActiveComputeGpuProgramParameters.setNull();
+
+        if( mVertexProgramBound && !mClipPlanes.empty() )
+            mClipPlanesDirty = true;
+
+        mVertexProgramBound             = false;
+        mGeometryProgramBound           = false;
+        mFragmentProgramBound           = false;
+        mTessellationHullProgramBound   = false;
+        mTessellationDomainProgramBound = false;
+        mComputeProgramBound            = false;
+
+        //Derived class must set new state
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_setTextureUnitSettings(size_t texUnit, TextureUnitState& tl)
@@ -756,6 +783,22 @@ namespace Ogre {
         _setWorldMatrix(Matrix4::IDENTITY);
     }
     //-----------------------------------------------------------------------
+    void RenderSystem::setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams )
+    {
+        mStencilParams = stencilParams;
+
+        // NB: We should always treat CCW as front face for consistent with default
+        // culling mode.
+        const bool mustFlip = ((mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
+                               (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping()));
+
+        if( mustFlip )
+        {
+            mStencilParams.stencilBack = stencilParams.stencilFront;
+            mStencilParams.stencilFront = stencilParams.stencilBack;
+        }
+    }
+    //-----------------------------------------------------------------------
     void RenderSystem::_render(const v1::RenderOperation& op)
     {
         // Update stats
@@ -776,48 +819,48 @@ namespace Ogre {
 
         switch(op.operationType)
         {
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             mFaceCount += (val / 3);
             break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_FAN:
             mFaceCount += (val - 2);
             break;
-        case v1::RenderOperation::OT_POINT_LIST:
-        case v1::RenderOperation::OT_LINE_LIST:
-        case v1::RenderOperation::OT_LINE_STRIP:
-        case v1::RenderOperation::OT_PATCH_1_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_2_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_3_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_4_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_5_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_6_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_7_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_8_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_9_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_10_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_11_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_12_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_13_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_14_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_15_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_16_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_17_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_18_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_19_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_20_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_21_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_22_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_23_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_24_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_25_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_26_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_27_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_28_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_29_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_30_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_31_CONTROL_POINT:
-        case v1::RenderOperation::OT_PATCH_32_CONTROL_POINT:
+        case OT_POINT_LIST:
+        case OT_LINE_LIST:
+        case OT_LINE_STRIP:
+        case OT_PATCH_1_CONTROL_POINT:
+        case OT_PATCH_2_CONTROL_POINT:
+        case OT_PATCH_3_CONTROL_POINT:
+        case OT_PATCH_4_CONTROL_POINT:
+        case OT_PATCH_5_CONTROL_POINT:
+        case OT_PATCH_6_CONTROL_POINT:
+        case OT_PATCH_7_CONTROL_POINT:
+        case OT_PATCH_8_CONTROL_POINT:
+        case OT_PATCH_9_CONTROL_POINT:
+        case OT_PATCH_10_CONTROL_POINT:
+        case OT_PATCH_11_CONTROL_POINT:
+        case OT_PATCH_12_CONTROL_POINT:
+        case OT_PATCH_13_CONTROL_POINT:
+        case OT_PATCH_14_CONTROL_POINT:
+        case OT_PATCH_15_CONTROL_POINT:
+        case OT_PATCH_16_CONTROL_POINT:
+        case OT_PATCH_17_CONTROL_POINT:
+        case OT_PATCH_18_CONTROL_POINT:
+        case OT_PATCH_19_CONTROL_POINT:
+        case OT_PATCH_20_CONTROL_POINT:
+        case OT_PATCH_21_CONTROL_POINT:
+        case OT_PATCH_22_CONTROL_POINT:
+        case OT_PATCH_23_CONTROL_POINT:
+        case OT_PATCH_24_CONTROL_POINT:
+        case OT_PATCH_25_CONTROL_POINT:
+        case OT_PATCH_26_CONTROL_POINT:
+        case OT_PATCH_27_CONTROL_POINT:
+        case OT_PATCH_28_CONTROL_POINT:
+        case OT_PATCH_29_CONTROL_POINT:
+        case OT_PATCH_30_CONTROL_POINT:
+        case OT_PATCH_31_CONTROL_POINT:
+        case OT_PATCH_32_CONTROL_POINT:
             break;
         }
 
@@ -956,63 +999,6 @@ namespace Ogre {
         {
             mHwOcclusionQueries.erase(i);
             OGRE_DELETE hq;
-        }
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::bindGpuProgram(GpuProgram* prg)
-    {
-        switch(prg->getType())
-        {
-        case GPT_VERTEX_PROGRAM:
-            // mark clip planes dirty if changed (programmable can change space)
-            if (!mVertexProgramBound && !mClipPlanes.empty())
-                mClipPlanesDirty = true;
-
-            mVertexProgramBound = true;
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mGeometryProgramBound = true;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mFragmentProgramBound = true;
-            break;
-        case GPT_HULL_PROGRAM:
-            mTessellationHullProgramBound = true;
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mTessellationDomainProgramBound = true;
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mComputeProgramBound = true;
-            break;
-        }
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::unbindGpuProgram(GpuProgramType gptype)
-    {
-        switch(gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            // mark clip planes dirty if changed (programmable can change space)
-            if (mVertexProgramBound && !mClipPlanes.empty())
-                mClipPlanesDirty = true;
-            mVertexProgramBound = false;
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mGeometryProgramBound = false;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mFragmentProgramBound = false;
-            break;
-        case GPT_HULL_PROGRAM:
-            mTessellationHullProgramBound = false;
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mTessellationDomainProgramBound = false;
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mComputeProgramBound = false;
-            break;
         }
     }
     //-----------------------------------------------------------------------

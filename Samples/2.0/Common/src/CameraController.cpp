@@ -15,6 +15,8 @@ namespace Demo
         mSpeedMofifier( false ),
         mCameraYaw( 0 ),
         mCameraPitch( 0 ),
+        mCameraBaseSpeed( 10 ),
+        mCameraSpeedBoost( 5 ),
         mGraphicsSystem( graphicsSystem )
     {
         memset( mWASD, 0, sizeof(mWASD) );
@@ -54,7 +56,7 @@ namespace Demo
         {
             Ogre::Vector3 camMovementDir( camMovementX, slideUpDown, camMovementZ );
             camMovementDir.normalise();
-            camMovementDir *= timeSinceLast * 10.0f * (1 + mSpeedMofifier * 5);
+            camMovementDir *= timeSinceLast * mCameraBaseSpeed * (1 + mSpeedMofifier * mCameraSpeedBoost);
 
             if( mUseSceneNode )
             {

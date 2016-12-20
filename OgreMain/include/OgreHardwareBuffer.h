@@ -365,10 +365,8 @@ namespace v1 {
                     _updateFromShadow();
             }
 
-
-
-
-            
+            /// An internal function that should be used only by a render system for internal use
+            virtual void* getRenderSystemData(void)     { return 0; }
     };
     /** @} */
     /** @} */

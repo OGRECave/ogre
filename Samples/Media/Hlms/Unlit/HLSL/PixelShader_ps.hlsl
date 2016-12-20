@@ -27,8 +27,8 @@ SamplerState samplerState@n : register(s@counter(samplerStateBind));@end
 
 @property( diffuse )@piece( MultiplyDiffuseConst )* material.diffuse@end @end
 
-float4 main( PS_INPUT inPs
-@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) : SV_Target0
+@insertpiece( output_type ) main( PS_INPUT inPs
+@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) @insertpiece( output_type_sv )
 {
 	@insertpiece( custom_ps_preExecution )
 
@@ -70,10 +70,12 @@ float4 main( PS_INPUT inPs
 
 	@insertpiece( custom_ps_posExecution )
 
+@property( !hlms_render_depth_only )
 	return outColour;
+@end
 }
 @end @property( hlms_shadowcaster )
-	@property( hlms_shadow_uses_depth_texture )
+	@property( hlms_render_depth_only )
 		@set( hlms_disable_stage, 1 )
 	@end
 float main( PS_INPUT inPs

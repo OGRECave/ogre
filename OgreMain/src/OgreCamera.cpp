@@ -366,6 +366,11 @@ namespace Ogre {
         Frustum::invalidateFrustum();
     }
     //-----------------------------------------------------------------------
+    void Camera::setLightCullingVisibility( bool collectLights, bool isCubemap )
+    {
+        mSceneMgr->_setLightCullingVisibility( this, collectLights, isCubemap );
+    }
+    //-----------------------------------------------------------------------
     void Camera::_cullScenePhase01( const Camera *lodCamera, Viewport *vp, uint8 firstRq, uint8 lastRq )
     {
         OgreProfileBeginGPUEvent("Camera: " + getName());
@@ -475,7 +480,6 @@ namespace Ogre {
     {
         return mOrientation;
     }
-
     //-----------------------------------------------------------------------
     void Camera::setOrientation(const Quaternion& q)
     {

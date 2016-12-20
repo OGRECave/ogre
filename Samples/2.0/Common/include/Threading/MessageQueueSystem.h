@@ -68,7 +68,7 @@ namespace Mq
             storeMessageToQueue( mPendingOutgoingMessages[dstSystem], messageId, msg );
         }
 
-        /// Sends all the messages queue via @see queueSendMessage();
+        /// Sends all the messages queued via see queueSendMessage();
         /// Must be called from the thread that owns 'this'
         void flushQueuedMessages(void)
         {
@@ -99,7 +99,7 @@ namespace Mq
         /// time critical messages or if the sender thread doesn't own its own
         /// MessageQueueSystem class.
         /// Abusing this function can degrade performance as it would perform
-        /// frequent locking. @see queueSendMessage
+        /// frequent locking. See queueSendMessage
         template <typename T>
         void receiveMessageImmediately( Mq::MessageId messageId, const T &msg )
         {
@@ -109,7 +109,7 @@ namespace Mq
         }
 
     protected:
-        /// Processes all incoming messages sent from other threads.
+        /// Processes all incoming messages received from other threads.
         /// Should be called from the thread that owns 'this'
         void processIncomingMessages(void)
         {

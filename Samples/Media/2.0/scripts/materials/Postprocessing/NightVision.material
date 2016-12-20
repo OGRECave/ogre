@@ -16,10 +16,17 @@ fragment_program Postprocess/NightVision_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program Postprocess/NightVision_ps_Metal metal
+{
+	source NightVision_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program Postprocess/NightVision_ps unified
 {
 	delegate Postprocess/NightVision_ps_GLSL
 	delegate Postprocess/NightVision_ps_HLSL
+	delegate Postprocess/NightVision_ps_Metal
 
 	default_params
 	{

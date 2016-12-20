@@ -50,6 +50,8 @@ namespace Ogre {
         , mScissorRelTop(top)
         , mScissorRelWidth(width)
         , mScissorRelHeight(height)
+        , mCoversEntireTarget(true)
+        , mScissorsMatchViewport(true)
         , mColourWrite( true )
         // Actual dimensions will update later
         , mUpdated(false)
@@ -110,6 +112,14 @@ namespace Ogre {
         mScissorActWidth    = (int)( mScissorRelWidth * width );
         mScissorActHeight   = (int)( mScissorRelHeight * height );
 
+        mScissorsMatchViewport =
+                mActLeft == mScissorActLeft && mActTop == mScissorActTop &&
+                mActWidth == mScissorActWidth && mActHeight == mScissorActHeight;
+        mCoversEntireTarget =
+                mActLeft == 0 && mActTop == 0 &&
+                mActWidth == width && mActHeight == height &&
+                mScissorsMatchViewport;
+
         mUpdated = true;
     }
     //---------------------------------------------------------------------
@@ -156,6 +166,16 @@ namespace Ogre {
     int Viewport::getActualHeight(void) const
     {
         return mActHeight;
+    }
+    //---------------------------------------------------------------------
+    bool Viewport::coversEntireTarget(void) const
+    {
+        return mCoversEntireTarget;
+    }
+    //---------------------------------------------------------------------
+    bool Viewport::scissorsMatchViewport(void) const
+    {
+        return mScissorsMatchViewport;
     }
     //---------------------------------------------------------------------
     void Viewport::setDimensions(Real left, Real top, Real width, Real height, bool overrideScissors)

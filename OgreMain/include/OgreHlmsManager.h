@@ -48,6 +48,7 @@ namespace Ogre
 #define OGRE_HLMS_NUM_MACROBLOCKS 32
 #define OGRE_HLMS_NUM_BLENDBLOCKS 32
 #define OGRE_HLMS_NUM_SAMPLERBLOCKS 64
+#define OGRE_HLMS_NUM_INPUT_LAYOUTS 128
 
 //Biggest value between all three
 #define OGRE_HLMS_MAX_BASIC_BLOCKS OGRE_HLMS_NUM_SAMPLERBLOCKS
@@ -64,6 +65,7 @@ namespace Ogre
     protected:
         Hlms    *mRegisteredHlms[HLMS_MAX];
         bool    mDeleteRegisteredOnExit[HLMS_MAX];
+        HlmsCompute *mComputeHlms;
 
         HlmsMacroblock      mMacroblocks[OGRE_HLMS_NUM_MACROBLOCKS];
         HlmsBlendblock      mBlendblocks[OGRE_HLMS_NUM_BLENDBLOCKS];
@@ -71,6 +73,19 @@ namespace Ogre
         BlockIdxVec         mActiveBlocks[NUM_BASIC_BLOCKS];
         BlockIdxVec         mFreeBlockIds[NUM_BASIC_BLOCKS];
         BasicBlock          *mBlocks[NUM_BASIC_BLOCKS][OGRE_HLMS_MAX_BASIC_BLOCKS];
+
+        struct InputLayouts
+        {
+            OperationType           opType;
+            VertexElement2VecVec    vertexElements;
+            uint32                  refCount;
+        };
+
+        typedef vector<uint8>::type InputLayoutsIdVec;
+        InputLayoutsIdVec   mActiveInputLayouts;
+        InputLayoutsIdVec   mFreeInputLayouts;
+        /// @see HlmsBits::InputLayoutBits
+        InputLayouts        mInputLayouts[OGRE_HLMS_NUM_INPUT_LAYOUTS];
 
         RenderSystem        *mRenderSystem;
         bool                mShadowMappingUseBackFaces;
@@ -99,6 +114,8 @@ namespace Ogre
 
         /// Returns a registered HLMS based on type. May be null.
         Hlms* getHlms( HlmsTypes type )                 { return mRegisteredHlms[type]; }
+
+        HlmsCompute* getComputeHlms(void)               { return mComputeHlms; }
 
         /** Creates a macroblock that matches the same parameter as the input. If it already exists,
             returns the existing one.
@@ -149,6 +166,11 @@ namespace Ogre
 
         /// @See destroyMacroblock
         void destroySamplerblock( const HlmsSamplerblock *Samplerblock );
+
+        uint8 _addInputLayoutId( VertexElement2VecVec vertexElements, OperationType opType );
+        void _removeInputLayoutIdReference( uint8 layoutId );
+
+        void _notifyV1InputLayoutDestroyed( uint8 v1LayoutId );
 
         /** Internal function used by Hlms types to tell us a datablock has been created
             so that we can return it when the user calls @getDatablock.
@@ -214,6 +236,9 @@ namespace Ogre
         /// Unregisters an HLMS provider of the given type. Does nothing if no provider was registered.
         /// @See registerHlms for details.
         void unregisterHlms( HlmsTypes type );
+
+        void registerComputeHlms( HlmsCompute *provider );
+        void unregisterComputeHlms(void);
 
         /** Sets whether or not shadow casters should be rendered into shadow
             textures using their back faces rather than their front faces.

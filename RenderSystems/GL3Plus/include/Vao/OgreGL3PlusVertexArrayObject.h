@@ -42,33 +42,33 @@ namespace Ogre
         GL3PlusVertexArrayObject( GLuint vaoName, uint32 renderQueueId,
                                   const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer,
-                                  v1::RenderOperation::OperationType opType ) :
-            VertexArrayObject( vaoName, renderQueueId, vertexBuffers, indexBuffer, opType )
+                                  OperationType opType ) :
+            VertexArrayObject( vaoName, renderQueueId, 0, vertexBuffers, indexBuffer, opType )
         {
             switch( opType )
             {
-            case v1::RenderOperation::OT_POINT_LIST:
+            case OT_POINT_LIST:
                 mPrimType[0] = GL_POINTS;
                 mPrimType[1] = GL_POINTS;
                 break;
-            case v1::RenderOperation::OT_LINE_LIST:
+            case OT_LINE_LIST:
                 mPrimType[0] = GL_LINES;
                 mPrimType[1] = GL_LINES_ADJACENCY;
                 break;
-            case v1::RenderOperation::OT_LINE_STRIP:
+            case OT_LINE_STRIP:
                 mPrimType[0] = GL_LINE_STRIP;
                 mPrimType[1] = GL_LINE_STRIP_ADJACENCY;
                 break;
             default:
-            case v1::RenderOperation::OT_TRIANGLE_LIST:
+            case OT_TRIANGLE_LIST:
                 mPrimType[0] = GL_TRIANGLES;
                 mPrimType[1] = GL_TRIANGLES_ADJACENCY;
                 break;
-            case v1::RenderOperation::OT_TRIANGLE_STRIP:
+            case OT_TRIANGLE_STRIP:
                 mPrimType[0] = GL_TRIANGLE_STRIP;
                 mPrimType[1] = GL_TRIANGLE_STRIP_ADJACENCY;
                 break;
-            case v1::RenderOperation::OT_TRIANGLE_FAN:
+            case OT_TRIANGLE_FAN:
                 mPrimType[0] = GL_TRIANGLE_FAN;
                 mPrimType[1] = GL_TRIANGLE_FAN;
                 break;

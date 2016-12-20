@@ -62,8 +62,7 @@ namespace v1
         mRenderOp.vertexData->vertexStart   = 0;
         //Strip or list is fine for triangle, but using lists avoids tiny unnecessary state
         //switches (assuming most of normal render is indexed list).
-        mRenderOp.operationType             = mQuad ? RenderOperation::OT_TRIANGLE_STRIP :
-                                                        RenderOperation::OT_TRIANGLE_LIST;
+        mRenderOp.operationType             = mQuad ? OT_TRIANGLE_STRIP : OT_TRIANGLE_LIST;
         mRenderOp.useIndexes                                    = false; 
         mRenderOp.useGlobalInstancingVertexBufferIsAvailable    = false;
 

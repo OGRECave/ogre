@@ -140,17 +140,23 @@ namespace Ogre
             //We need to prepare for rendering another RT (we broke the contiguous chain)
             mTarget->_endUpdate();
 
+            //Save the value in case the listener changed it
+            const uint32 oldVisibilityMask = mViewport->getVisibilityMask();
+
             shadowNode->_update( mCamera, usedLodCamera, sceneManager );
 
             //ShadowNode passes may've overriden these settings.
             sceneManager->_setCurrentShadowNode( shadowNode, mDefinition->mShadowNodeRecalculation ==
                                                                                     SHADOW_NODE_REUSE );
+            sceneManager->_setCompositorTarget( mTargetTexture );
+            mViewport->_setVisibilityMask( oldVisibilityMask );
             mCamera->_notifyViewport( mViewport );
 
             //We need to restore the previous RT's update
             mTarget->_beginUpdate();
         }
-        
+        sceneManager->_setForwardPlusEnabledInPass( mDefinition->mEnableForwardPlus );
+
         mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
                                              mDefinition->mFirstRQ, mDefinition->mLastRQ );
 

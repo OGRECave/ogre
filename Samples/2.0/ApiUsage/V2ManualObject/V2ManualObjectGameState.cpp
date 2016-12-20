@@ -35,7 +35,7 @@ namespace Demo
         //---------------------------------------------------------------------------------------
         Ogre::ManualObject * manualObject = sceneManager->createManualObject();
 
-        manualObject->begin("BaseWhite", Ogre::v1::RenderOperation::OT_LINE_LIST);
+        manualObject->begin("BaseWhite", Ogre::OT_LINE_LIST);
 
         // Back
         manualObject->position(0.0f, 0.0f, 0.0f);
@@ -111,7 +111,7 @@ namespace Demo
 
         mManualObject = sceneManager->createManualObject();
 
-        mManualObject->begin("Rocks", Ogre::v1::RenderOperation::OT_TRIANGLE_LIST);
+        mManualObject->begin("Rocks", Ogre::OT_TRIANGLE_LIST);
 
         fillBuffer(0.0f);
 

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Vao/OgreNULLBufferInterface.h"
 #include "Vao/OgreNULLConstBufferPacked.h"
 #include "Vao/OgreNULLTexBufferPacked.h"
+#include "Vao/OgreNULLUavBufferPacked.h"
 #include "Vao/OgreNULLMultiSourceVertexBufferPool.h"
 #include "Vao/OgreNULLAsyncTicket.h"
 
@@ -81,7 +82,7 @@ namespace Ogre
     {
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
-                                                        0, numElements, bytesPerElement,
+                                                        0, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, vElements, 0, 0, 0 );
 
@@ -112,7 +113,7 @@ namespace Ogre
     {
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
-                                                        0, numElements, bytesPerElement,
+                                                        0, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -144,7 +145,7 @@ namespace Ogre
 
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         ConstBufferPacked *retVal = OGRE_NEW NULLConstBufferPacked(
-                                                        0, sizeBytes, 1,
+                                                        0, sizeBytes, 1, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, bindableSize );
 
@@ -177,7 +178,7 @@ namespace Ogre
 
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         TexBufferPacked *retVal = OGRE_NEW NULLTexBufferPacked(
-                                                        0, sizeBytes, 1,
+                                                        0, sizeBytes, 1, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, pixelFormat );
 
@@ -188,6 +189,26 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void NULLVaoManager::destroyTexBufferImpl( TexBufferPacked *texBuffer )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    UavBufferPacked* NULLVaoManager::createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                          uint32 bindFlags,
+                                                          void *initialData, bool keepAsShadow )
+    {
+        NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
+        UavBufferPacked *retVal = OGRE_NEW NULLUavBufferPacked(
+                                                        0, numElements, bytesPerElement,
+                                                        bindFlags, initialData, keepAsShadow,
+                                                        this, bufferInterface );
+
+        if( initialData )
+            bufferInterface->_firstUpload( initialData, 0, numElements );
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void NULLVaoManager::destroyUavBufferImpl( UavBufferPacked *uavBuffer )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -215,7 +236,7 @@ namespace Ogre
         }
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
-                                                        0, sizeBytes, 1,
+                                                        0, sizeBytes, 1, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -244,7 +265,7 @@ namespace Ogre
     VertexArrayObject* NULLVaoManager::createVertexArrayObjectImpl(
                                                             const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
-                                                            v1::RenderOperation::OperationType opType )
+                                                            OperationType opType )
     {
         size_t idx = mVertexArrayObjects.size();
 

@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreIdString.h"
 #include "OgreBlendMode.h"
 #include "OgreVector3.h"
+#include "OgreHlmsPso.h"
+#include <stddef.h>
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -142,6 +144,7 @@ namespace Ogre
     };
 
     typedef vector<HlmsProperty>::type HlmsPropertyVec;
+    typedef map<IdString, String>::type PiecesMap;
 
     inline bool OrderPropertyByIdString( const HlmsProperty &_left, const HlmsProperty &_right )
     {
@@ -171,23 +174,22 @@ namespace Ogre
         HLMS_USER2,
         HLMS_USER3,
 
-        HLMS_MAX = 8
+        HLMS_MAX = 8,
+
+        HLMS_COMPUTE,
     };
 
     struct HlmsCache
     {
         uint32          hash;
-        HlmsPropertyVec setProperties;
         HlmsTypes       type;
+        HlmsPropertyVec setProperties;
 
-        GpuProgramPtr   vertexShader;
-        GpuProgramPtr   geometryShader;
-        GpuProgramPtr   tesselationHullShader;
-        GpuProgramPtr   tesselationDomainShader;
-        GpuProgramPtr   pixelShader;
+        HlmsPso         pso;
 
         HlmsCache() : hash( 0 ), type( HLMS_MAX ) {}
-        HlmsCache( uint32 _hash, HlmsTypes _type ) : hash( _hash ), type( _type ) {}
+        HlmsCache( uint32 _hash, HlmsTypes _type, const HlmsPso &_pso ) :
+            hash( _hash ), type( _type ), pso( _pso ) {}
     };
 
     #define OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( x ) (x >> 29)

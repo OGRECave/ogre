@@ -128,7 +128,7 @@ namespace v1 {
             // bind texcoord
             binding->setBinding(TEXCOORD_BINDING, vbuf);
 
-            mRenderOp2.operationType = RenderOperation::OT_TRIANGLE_LIST;
+            mRenderOp2.operationType = OT_TRIANGLE_LIST;
             mRenderOp2.useIndexes = true;
             // Index data
             mRenderOp2.indexData = OGRE_NEW IndexData();

@@ -1202,6 +1202,17 @@ namespace Ogre {
             hlmsManager->destroySamplerblock( oldSamplerblock );
     }
     //-----------------------------------------------------------------------
+    void TextureUnitState::_setSamplerblock( const HlmsSamplerblock *samplerblock )
+    {
+        HlmsManager *hlmsManager = mParent->_getDatablock()->getCreator()->getHlmsManager();
+        const HlmsSamplerblock *oldSamplerblock = mSamplerblock;
+        hlmsManager->addReference( samplerblock );
+        mSamplerblock = samplerblock;
+
+        if( oldSamplerblock )
+            hlmsManager->destroySamplerblock( oldSamplerblock );
+    }
+    //-----------------------------------------------------------------------
     const HlmsSamplerblock* TextureUnitState::getSamplerblock(void) const
     {
         return mSamplerblock;

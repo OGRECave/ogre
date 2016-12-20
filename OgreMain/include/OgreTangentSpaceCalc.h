@@ -96,7 +96,7 @@ namespace v1
         /** Add a set of index data that references the vertex data.
             This might be modified if there are vertex splits.
         */
-        void addIndexData(IndexData* i_in, RenderOperation::OperationType opType = RenderOperation::OT_TRIANGLE_LIST);
+        void addIndexData(IndexData* i_in, OperationType opType = OT_TRIANGLE_LIST);
 
         /** Sets whether to store tangent space parity in the W of a 4-component tangent or not.
         @remarks
@@ -186,7 +186,7 @@ namespace v1
 
         VertexData* mVData;
         typedef vector<IndexData*>::type IndexDataList;
-        typedef vector<RenderOperation::OperationType>::type OpTypeList;
+        typedef vector<OperationType>::type OpTypeList;
         IndexDataList mIDataList;
         OpTypeList mOpTypes;
         bool mSplitMirrored;

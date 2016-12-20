@@ -83,7 +83,7 @@ namespace Ogre
         @param opType The type of operation to use to render. 
         */
         virtual_l1 void begin(const String& datablockName,
-                           v1::RenderOperation::OperationType opType = v1::RenderOperation::OT_TRIANGLE_LIST);
+                           OperationType opType = OT_TRIANGLE_LIST);
 
         /** Start the definition of an update to a part of the object.
         @remarks
@@ -171,7 +171,7 @@ namespace Ogre
         @remarks
             You will have to call this 3 times for each face for a triangle list, 
             or use the alternative 3-parameter version. Other operation types
-            require different numbers of indexes, @see RenderOperation::OperationType.
+            require different numbers of indexes, @see OperationType.
         @note
             32-bit indexes are not supported on all cards and will only be used
             when required, if an index is > 65535.
@@ -275,7 +275,7 @@ namespace Ogre
             Aabb mAabb;
             VertexArrayObject * mVao;
             VaoManager * mVaoManager;
-            v1::RenderOperation::OperationType mOperationType;
+            OperationType mOperationType;
             VertexElement2Vec mVertexElements;
             bool m32BitIndices;
             Ogre::String mName;
@@ -285,7 +285,7 @@ namespace Ogre
         public:
             friend class ManualObject;
 
-            ManualObjectSection(ManualObject* parent, const String& datablockName, v1::RenderOperation::OperationType opType);
+            ManualObjectSection(ManualObject* parent, const String& datablockName, OperationType opType);
             virtual ~ManualObjectSection();
             
             // Renderable overrides

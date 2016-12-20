@@ -160,6 +160,11 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
+        virtual UavBufferPacked* createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                      uint32 bindFlags,
+                                                      void *initialData, bool keepAsShadow );
+        virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer );
+
         virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes, BufferType bufferType,
                                                                 void *initialData, bool keepAsShadow );
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
@@ -167,7 +172,7 @@ namespace Ogre
         virtual VertexArrayObject* createVertexArrayObjectImpl(
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
-                                                        v1::RenderOperation::OperationType opType );
+                                                        OperationType opType );
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 

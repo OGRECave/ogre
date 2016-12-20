@@ -110,6 +110,9 @@ namespace Ogre
         virtual void setFsaaResolveDirty(void);
         virtual void swapBuffers(void);
 
+        virtual void getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],
+                                       bool outHwGamma[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const;
+
         /// Irrelevant implementation since cannot copy
         PixelFormat suggestPixelFormat() const { return PF_UNKNOWN; }
 

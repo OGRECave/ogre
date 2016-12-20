@@ -365,7 +365,7 @@ namespace Demo
         }
 
         workspaceDef->connect( "PostprocessingSampleStdRenderer", 0, "FinalComposition", 1 );
-        workspaceDef->connectOutput( "FinalComposition", 0 );
+        workspaceDef->connectExternal( 0, "FinalComposition", 0 );
 
         SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
         RenderWindow *renderWindow = mGraphicsSystem->getRenderWindow();

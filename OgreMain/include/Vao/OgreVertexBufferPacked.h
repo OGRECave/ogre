@@ -41,17 +41,41 @@ namespace Ogre
         /// The meaning of the element
         VertexElementSemantic mSemantic;
 
+        /// The number of instances to draw using the same per-instance data before
+        /// advancing in the buffer by one element. This value must be 0 for an
+        /// element that contains per-vertex data
+        uint32 mInstancingStepRate;
+
         VertexElement2( VertexElementType type, VertexElementSemantic semantic ) :
-            mType( type ), mSemantic( semantic ) {}
+            mType( type ), mSemantic( semantic ), mInstancingStepRate( 0 ) {}
 
         bool operator == ( const VertexElement2 _r ) const
         {
-            return mType == _r.mType && mSemantic == _r.mSemantic;
+            return mType == _r.mType && mSemantic == _r.mSemantic &&
+                    mInstancingStepRate == _r.mInstancingStepRate;
         }
 
         bool operator == ( VertexElementSemantic semantic ) const
         {
             return mSemantic == semantic;
+        }
+
+        /// Warning: Beware a VertexElement2Vec shouldn't be sorted.
+        /// The order in which they're pushed into the vector defines the offsets
+        /// in the vertex buffer. Altering the order would cause the GPU to
+        /// to read garbage when trying to interpret the vertex buffer
+        /// This operator exists because it's useful when implementing
+        /// a '<' operator in other structs that contain VertexElement2Vecs
+        /// (see HlmsPso)
+        bool operator < ( const VertexElement2 &_r ) const
+        {
+            if( this->mType < _r.mType ) return true;
+            if( this->mType > _r.mType ) return false;
+
+            if( this->mSemantic < _r.mSemantic ) return true;
+            if( this->mSemantic > _r.mSemantic ) return false;
+
+            return this->mInstancingStepRate < _r.mInstancingStepRate;
         }
     };
 
@@ -81,7 +105,8 @@ namespace Ogre
 
     public:
         VertexBufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                            BufferType bufferType, void *initialData, bool keepAsShadow,
+                            uint32 numElementsPadding, BufferType bufferType,
+                            void *initialData, bool keepAsShadow,
                             VaoManager *vaoManager, BufferInterface *bufferInterface,
                             const VertexElement2Vec &vertexElements, size_t multiSourceId,
                             MultiSourceVertexBufferPool *multiSourcePool, uint8 sourceIdx );

@@ -39,11 +39,11 @@ namespace Ogre
         D3D11Device &mDevice;
 
     public:
-        D3D11ConstBufferPacked( size_t numElements, uint32 bytesPerElement,
+        D3D11ConstBufferPacked( size_t numElements, uint32 bytesPerElement, uint32 numElementsPadding,
                                 BufferType bufferType, void *initialData, bool keepAsShadow,
                                 VaoManager *vaoManager, BufferInterface *bufferInterface,
                                 D3D11Device &device );
-        ~D3D11ConstBufferPacked();
+        virtual ~D3D11ConstBufferPacked();
 
         virtual void bindBufferVS( uint16 slot );
         virtual void bindBufferPS( uint16 slot );

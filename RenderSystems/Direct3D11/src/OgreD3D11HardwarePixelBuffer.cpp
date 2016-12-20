@@ -46,9 +46,15 @@ namespace v1 {
 
     //-----------------------------------------------------------------------------  
 
-    D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,
-        size_t width, size_t height, size_t depth, size_t face, PixelFormat format, HardwareBuffer::Usage usage):
-    HardwarePixelBuffer(width, height, depth, format, parentTexture->isHardwareGammaEnabled(), usage, false, false),
+    D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer( D3D11Texture *parentTexture,
+                                                        D3D11Device &device,
+                                                        size_t subresourceIndex,
+                                                        size_t width, size_t height, size_t depth,
+                                                        size_t face, PixelFormat format,
+                                                        uint fsaa, const String &fsaaHint,
+                                                        HardwareBuffer::Usage usage ) :
+        HardwarePixelBuffer( width, height, depth, format,
+                             parentTexture->isHardwareGammaEnabled(), usage, false, false ),
         mParentTexture(parentTexture),
         mDevice(device),
         mSubresourceIndex(subresourceIndex),
@@ -63,9 +69,10 @@ namespace v1 {
             for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
             {
                 String name;
-                name = "rtt/"+StringConverter::toString((size_t)mParentTexture) + "/" + StringConverter::toString(mSubresourceIndex) + "/" + parentTexture->getName();
+                name = "rtt/"+StringConverter::toString((size_t)mParentTexture) + "/" +
+                        StringConverter::toString(mSubresourceIndex) + "/" + parentTexture->getName();
 
-                RenderTexture *trt = new D3D11RenderTexture(name, this, mHwGamma, mDevice);
+                RenderTexture *trt = new D3D11RenderTexture(name, this, mHwGamma, fsaa, fsaaHint, mDevice);
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
             }
@@ -784,6 +791,25 @@ namespace v1 {
         //Only implemented for 2D at the moment...
         ID3D11Texture2D *textureResource = mParentTexture->GetTex2D();
 
+        if( mParentTexture->getResolveTextureResource() )
+        {
+            textureResource = static_cast<ID3D11Texture2D*>(
+                        mParentTexture->getResolveTextureResource() );
+        }
+        else if( mParentTexture->getFSAA() > 1 || atoi(mParentTexture->getFSAAHint().c_str()) > 0 )
+        {
+            //Backbuffer? Create a temporary texture where to resolve to.
+            D3D11_TEXTURE2D_DESC desc = {0};
+            mParentTexture->GetTex2D()->GetDesc( &desc );
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            mDevice->CreateTexture2D( &desc, NULL, &textureResource );
+
+            mDevice.GetImmediateContext()->ResolveSubresource( textureResource, 0,
+                                                               mParentTexture->GetTex2D(), 0,
+                                                               mParentTexture->getD3dFormat() );
+        }
+
         // get the description of the texture
         D3D11_TEXTURE2D_DESC desc = {0};
         textureResource->GetDesc( &desc );
@@ -811,8 +837,13 @@ namespace v1 {
         //Release the staging texture
         mDevice.GetImmediateContext()->Unmap( pStagingTexture, 0 );
         pStagingTexture->Release();
-    }
 
+        if( !mParentTexture->getResolveTextureResource() &&
+            (mParentTexture->getFSAA() > 1 || atoi(mParentTexture->getFSAAHint().c_str()) > 0) )
+        {
+            textureResource->Release();
+        }
+    }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_genMipmaps()
     {

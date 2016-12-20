@@ -204,11 +204,32 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    void NULLRenderSystem::queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                         ResourceAccess::ResourceAccess access,
+                                         size_t offset, size_t sizeBytes )
+    {
+    }
+    //-------------------------------------------------------------------------
     void NULLRenderSystem::clearUAVs(void)
     {
     }
     //-------------------------------------------------------------------------
     void NULLRenderSystem::flushUAVs(void)
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::_bindTextureUavCS( uint32 slot, Texture *texture,
+                                              ResourceAccess::ResourceAccess access,
+                                              int32 mipmapLevel, int32 textureArrayIndex,
+                                              PixelFormat pixelFormat )
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::_setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
     }
     //-------------------------------------------------------------------------
@@ -255,19 +276,15 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
-    void NULLRenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
-    {
-    }
-    //-------------------------------------------------------------------------
-    void NULLRenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
-    {
-    }
-    //-------------------------------------------------------------------------
     void NULLRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock )
     {
     }
     //-------------------------------------------------------------------------
-    void NULLRenderSystem::_setProgramsFromHlms( const HlmsCache *hlmsCache )
+    void NULLRenderSystem::_setPipelineStateObject( const HlmsPso *pso )
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::_setComputePso( const HlmsComputePso *pso )
     {
     }
     //-------------------------------------------------------------------------
@@ -276,11 +293,7 @@ namespace Ogre
         return VET_COLOUR_ARGB;
     }
     //-------------------------------------------------------------------------
-    void NULLRenderSystem::setVertexDeclaration(v1::VertexDeclaration* decl)
-    {
-    }
-    //-------------------------------------------------------------------------
-    void NULLRenderSystem::setVertexBufferBinding(v1::VertexBufferBinding* binding)
+    void NULLRenderSystem::_dispatch( const HlmsComputePso &pso )
     {
     }
     //-------------------------------------------------------------------------
@@ -372,6 +385,11 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void NULLRenderSystem::unregisterThread()
     {
+    }
+    //-------------------------------------------------------------------------
+    const PixelFormatToShaderType* NULLRenderSystem::getPixelFormatToShaderType(void) const
+    {
+        return &mPixelFormatToShaderType;
     }
     //-------------------------------------------------------------------------
     void NULLRenderSystem::beginProfileEvent( const String &eventName )

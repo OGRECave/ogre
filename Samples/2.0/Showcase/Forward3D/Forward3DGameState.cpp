@@ -57,10 +57,10 @@ namespace Demo
     Forward3DGameState::Forward3DGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mAnimateObjects( true ),
-        mCurrentForward3DPreset( -1 ),
+        mCurrentForward3DPreset( 0 ),
         mNumLights( 128 ),
         mLightRadius( 10.0f ),
-        mLowThreshold( true )
+        mLowThreshold( false )
     {
         mDisplayHelpMode        = 2;
         mNumDisplayHelpModes    = 3;
@@ -73,7 +73,7 @@ namespace Demo
 
         mGraphicsSystem->getCamera()->setPosition( Ogre::Vector3( 0, 30, 100 ) );
 
-        changeForward3DPreset( true );
+        sceneManager->setForwardClustered( true, 16, 8, 24, 96, 5, 500 );
 
         Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
                                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -211,10 +211,16 @@ namespace Demo
 
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
+        Ogre::ForwardPlusBase *forwardPlus = sceneManager->getForwardPlus();
+        const bool wasInDebugMode = forwardPlus->getDebugMode();
+
         const Presets &preset = c_presets[mCurrentForward3DPreset];
         sceneManager->setForward3D( true, preset.width, preset.height,
                                     preset.numSlices, preset.lightsPerCell,
                                     preset.minDistance, preset.maxDistance );
+
+        forwardPlus = sceneManager->getForwardPlus();
+        forwardPlus->setDebugMode( wasInDebugMode );
     }
     //-----------------------------------------------------------------------------------
     void Forward3DGameState::generateLights(void)
@@ -289,34 +295,48 @@ namespace Demo
         if( mDisplayHelpMode == 2 )
         {
             Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-            Ogre::Forward3D *forward3D = sceneManager->getForward3D();
+            Ogre::ForwardPlusBase *forwardPlus = sceneManager->getForwardPlus();
 
             outText += "\nF2 to toggle animation. ";
             outText += mAnimateObjects ? "[On]" : "[Off]";
             outText += "\nF3 to use a low/high threshold for radius. ";
             outText += mLowThreshold ? "[Low]" : "[High]";
             outText += "\nF4 to use atten. range approximation. ";
-            outText += forward3D->getFadeAttenuationRange() ? "[On]" : "[Off]";
+            outText += forwardPlus->getFadeAttenuationRange() ? "[On]" : "[Off]";
             outText += "\nF5/F6 to increase/reduce number of lights. ";
             outText += "[" + Ogre::StringConverter::toString( mNumLights ) + "]";
             outText += "\nF7/F8 to increase/reduce light's radius. ";
             outText += "[" + Ogre::StringConverter::toString( mLightRadius ) + "]";
-            outText += "\n[Shift+] SPACE to switch Forward3D settings back and forth. ";
-            outText += "Preset: [" + Ogre::StringConverter::toString( mCurrentForward3DPreset ) + "]";
+            outText += "\nF9 Debug Mode. ";
+            outText += forwardPlus->getDebugMode() ? "[On]" : "[Off]";
+            outText += "\nF10 Switch between Forward3D and Clustered Forward. ";
+            outText += forwardPlus->getForwardPlusMethod() == Ogre::ForwardPlusBase::MethodForward3D ?
+                        "[F3D]" : "[Clustered]";
 
-            const Presets &preset = c_presets[mCurrentForward3DPreset];
-            outText += "\n\nWidth  " + Ogre::StringConverter::toString( preset.width );
-            outText += "\nHeight " + Ogre::StringConverter::toString( preset.height );
-            outText += "\nSlices " + Ogre::StringConverter::toString( preset.numSlices );
-            outText += "\nLights p/ Cell " + Ogre::StringConverter::toString( preset.lightsPerCell );
-            outText += "\nMin Distance   " + Ogre::StringConverter::toString( preset.minDistance );
-            outText += "\nMax Distance  "  + Ogre::StringConverter::toString( preset.maxDistance );
+            if( forwardPlus->getForwardPlusMethod() == Ogre::ForwardPlusBase::MethodForward3D )
+            {
+                outText += "\n[Shift+] SPACE to switch Forward3D settings back and forth. ";
+                outText += "Preset: [";
+                outText += Ogre::StringConverter::toString( mCurrentForward3DPreset ) + "]";
+
+                const Presets &preset = c_presets[mCurrentForward3DPreset];
+                outText += "\n\nWidth  " + Ogre::StringConverter::toString( preset.width );
+                outText += "\nHeight " + Ogre::StringConverter::toString( preset.height );
+                outText += "\nSlices " + Ogre::StringConverter::toString( preset.numSlices );
+                outText += "\nLights p/ Cell " + Ogre::StringConverter::toString( preset.lightsPerCell );
+                outText += "\nMin Distance   " + Ogre::StringConverter::toString( preset.minDistance );
+                outText += "\nMax Distance  "  + Ogre::StringConverter::toString( preset.maxDistance );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
     void Forward3DGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
-        if( arg.keysym.sym == SDLK_SPACE )
+        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+        Ogre::ForwardPlusBase *forwardPlus = sceneManager->getForwardPlus();
+
+        if( arg.keysym.sym == SDLK_SPACE &&
+            forwardPlus->getForwardPlusMethod() == Ogre::ForwardPlusBase::MethodForward3D )
         {
             changeForward3DPreset( !(arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) );
         }
@@ -337,9 +357,7 @@ namespace Demo
         }
         else if( arg.keysym.sym == SDLK_F4 )
         {
-            Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-            Ogre::Forward3D *forward3D = sceneManager->getForward3D();
-            forward3D->setFadeAttenuationRange( !forward3D->getFadeAttenuationRange() );
+            forwardPlus->setFadeAttenuationRange( !forwardPlus->getFadeAttenuationRange() );
         }
         else if( arg.keysym.sym == SDLK_F5 || arg.keysym.sym == SDLK_F6 )
         {
@@ -360,6 +378,29 @@ namespace Demo
 
             mLightRadius = Ogre::Math::Clamp( mLightRadius, 0.5f, 100.0f );
             generateLights();
+        }
+        else if( arg.keysym.sym == SDLK_F9 )
+        {
+            forwardPlus->setDebugMode( !forwardPlus->getDebugMode() );
+        }
+        else if( arg.keysym.sym == SDLK_F10 )
+        {
+            const bool wasInDebugMode = forwardPlus->getDebugMode();
+
+            if( forwardPlus->getForwardPlusMethod() == Ogre::ForwardPlusBase::MethodForwardClustered )
+            {
+                const Presets &preset = c_presets[mCurrentForward3DPreset];
+                sceneManager->setForward3D( true, preset.width, preset.height,
+                                            preset.numSlices, preset.lightsPerCell,
+                                            preset.minDistance, preset.maxDistance );
+            }
+            else
+            {
+                sceneManager->setForwardClustered( true, 16, 8, 24, 96, 5, 500 );
+            }
+
+            forwardPlus = sceneManager->getForwardPlus();
+            forwardPlus->setDebugMode( wasInDebugMode );
         }
         else
         {

@@ -154,7 +154,7 @@ namespace v1
         @param opType The type of operation to use to render. 
         */
         virtual void begin(const String& materialName,
-            RenderOperation::OperationType opType = RenderOperation::OT_TRIANGLE_LIST, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            OperationType opType = OT_TRIANGLE_LIST, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         /** Use before defining geometry to indicate that you intend to update the
             geometry regularly and want the internal structure to reflect that.
@@ -241,7 +241,7 @@ namespace v1
         @remarks
             You will have to call this 3 times for each face for a triangle list, 
             or use the alternative 3-parameter version. Other operation types
-            require different numbers of indexes, @see RenderOperation::OperationType.
+            require different numbers of indexes, @see OperationType.
         @note
             32-bit indexes are not supported on all cards and will only be used
             when required, if an index is > 65535.
@@ -400,7 +400,7 @@ namespace v1
             
         public:
             ManualObjectSection(ManualObject* parent, const String& materialName,
-                RenderOperation::OperationType opType, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                OperationType opType, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             virtual ~ManualObjectSection();
             
             /// Retrieve render operation for manipulation

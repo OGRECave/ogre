@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorCommon.h"
 #include "Compositor/OgreCompositorChannel.h"
+#include "Compositor/OgreCompositorNamedBuffer.h"
 #include "OgreIdString.h"
 #include "OgreId.h"
 
@@ -125,6 +126,42 @@ namespace Ogre
         };
         typedef vector<TextureDefinition>::type     TextureDefinitionVec;
 
+        struct _OgreExport BufferDefinition : public CompositorInstAlloc
+        {
+            IdString name;
+        public:
+            size_t numElements;
+            uint32 bytesPerElement;
+            uint32 bindFlags;
+
+            /// Sometimes buffers can be used as a plain-array contiguous image (instead of
+            /// the swizzled pattern from textures). The formula to calculate final
+            /// num elements is :
+            ///     finalNumElements = numElements;
+            ///     if( widthFactor > 0 )
+            ///         finalNumElements *= (widthFactor * width);
+            ///     if( heightFactor > 0 )
+            ///         finalNumElements *= (heightFactor * height);
+            /// For example  if you want to do 512 x height; just set numElements to 512
+            /// and heightFactor to 1.
+            /// Since there are no pixel formats, the bytesPerElement controls such
+            /// such thing (eg. 4 bytes for RGBA8888)
+            float widthFactor;  // multiple of target width to use (activates if > 0)
+            float heightFactor; // multiple of target height to use (activates if > 0)
+
+            /// Do not call directly. @see TextureDefinition::renameBuffer instead.
+            void _setName( IdString newName )   { name = newName; }
+            IdString getName(void) const        { return name; }
+
+            BufferDefinition( IdString _name, size_t _numElements,
+                              uint32 _bytesPerElement, uint32 _bindFlags,
+                              float _widthFactor, float _heightFactor ) :
+                    name(_name), numElements( _numElements ),
+                    bytesPerElement( _bytesPerElement ), bindFlags( _bindFlags ),
+                    widthFactor( _widthFactor ), heightFactor( _heightFactor ) {}
+        };
+        typedef vector<BufferDefinition>::type     BufferDefinitionVec;
+
     protected:
         friend class CompositorNode;
         friend class CompositorWorkspace;
@@ -135,6 +172,8 @@ namespace Ogre
         */
         TextureSource           mDefaultLocalTextureSource;
         TextureDefinitionVec    mLocalTextureDefs;
+        BufferDefinitionVec     mLocalBufferDefs;
+        IdStringVec             mInputBuffers;
 
         /** Similar to @see CompositorNodeDef::mOutChannelMapping,
             associates a given name with the input, local or global textures.
@@ -154,6 +193,7 @@ namespace Ogre
 
         /// This has O(N) complexity! (not cached, we look in mNameToChannelMap)
         size_t getNumInputChannels(void) const;
+        size_t getNumInputBufferChannels(void) const;
 
         /** Adds a texture name, whether a real one or an alias, and where to grab it from.
         @remarks
@@ -318,6 +358,116 @@ namespace Ogre
                                                 RenderSystem *renderSys,
                                                 const CompositorNodeVec &connectedNodes,
                                                 const CompositorPassVec *passes );
+
+
+        /////////////////////////////////////////////////////////////////////////////////
+        /// Buffers
+        /////////////////////////////////////////////////////////////////////////////////
+
+        /** Specifies that buffer incoming from channel 'inputChannel'
+            will be referenced by the name 'name'
+        @remarks
+            Don't leave gaps. (i.e. set channel 0 & 2, without setting channel 1)
+            It's ok to map them out of order (i.e. set channel 2, then 0, then 1)
+        @param inputChannel
+            Input channel # the buffer comes from.
+        @param name
+            Name to give to this buffer for referencing it locally from this scope.
+            Duplicate names (including names from addBufferDefinition) will raise an
+            exception when trying to instantiate the workspace.
+        */
+        virtual void addBufferInput( size_t inputChannel, IdString name );
+
+        /** Creates an UAV buffer.
+        @param name
+            Name to give to this buffer for referencing it locally from this scope.
+            Duplicate names (including names from addBufferInput) will raise an
+            exception when trying to instantiate the workspace.
+        @param bindFlags
+            Bitmask. @see BufferBindFlags
+        @param widthFactor
+            @see BufferDefinition::widthFactor
+        @param heightFactor
+            @see BufferDefinition::widthFactor
+        */
+        void addBufferDefinition( IdString name, size_t numElements,
+                                  uint32 bytesPerElement, uint32 bindFlags,
+                                  float widthFactor, float heightFactor );
+
+        /// Remove a buffer. Buffer can come from an input channel, or a locally defined one.
+        virtual void removeBuffer( IdString name );
+
+        /** Changes the name of a buffer. Buffer can come from
+            an input channel, or a locally defined one.
+        */
+        void renameBuffer( IdString oldName, const String &newName );
+
+        /** Reserves enough memory for all texture definitions
+        @remarks
+            Calling this function is not obligatory, but recommended
+        @param numPasses
+            The number of texture definitions expected to contain.
+        */
+        void setNumLocalBufferDefinitions( size_t numTDs )      { mLocalBufferDefs.reserve( numTDs ); }
+
+        const BufferDefinitionVec& getLocalBufferDefinitions(void) const    { return mLocalBufferDefs; }
+
+        /** Returns the local buffer definitions.
+        @remarks
+            WARNING: Use with care. You should not add/remove elements or change the name
+            @see addBufferDefinition, @see removeBuffer and @see renameBuffer to perform these actions
+        */
+        BufferDefinitionVec& getLocalBufferDefinitionsNonConst(void)        { return mLocalBufferDefs; }
+
+        /** Utility function to create the buffers based on a given set of
+            buffer definitions and put them in a container.
+        @remarks
+            Useful because both Workspace & CompositorNode share the same functionality
+            (create global/local buffers respectively) without having to create a whole
+            base class just for one function. It's confusing that Nodes & Workspace would
+            share the same base class, as if they were the same base object or share
+            similar functionality (when in fact, workspace manages nodes)
+        */
+        static void createBuffers( const BufferDefinitionVec &bufferDefs,
+                                   CompositorNamedBufferVec &inOutBufContainer,
+                                   const RenderTarget *finalTarget, RenderSystem *renderSys );
+
+        static UavBufferPacked* createBuffer( const BufferDefinition &bufferDef,
+                                              const RenderTarget *finalTarget, VaoManager *vaoManager );
+
+        /// @see createBuffers
+        /// We need the definition because, unlike textures, the container passed in may
+        /// contain textures that were not created by us (i.e. global & input textures)
+        /// that we shouldn't delete.
+        /// It is illegal for two buffers to have the same name, so it's invalid that a
+        /// e.g. an input and a local texture would share the same name.
+        static void destroyBuffers( const BufferDefinitionVec &bufferDefs,
+                                    CompositorNamedBufferVec &inOutBufContainer,
+                                    RenderSystem *renderSys );
+
+        /** Destroys & recreates only the buffers that depend on the main RT
+            (i.e. the RenderWindow) resolution
+        @param textureDefs
+            Array of texture definitions, so we know which ones depend on main RT's resolution
+        @param inOutTexContainer
+            Where we'll replace the RTs & textures
+        @param finalTarget
+            The final render target (usually the render window) we have to clone parameters from
+            (eg. when using auto width & height, or fsaa settings)
+        @param renderSys
+            The RenderSystem to use
+        @param connectedNodes
+            Array of connected nodes that may be using our buffers and need to be notified.
+        @param passes
+            Array of Compositor Passes which may contain the texture being recreated
+            When the pointer is null, we don't iterate through it.
+        */
+        static void recreateResizableBuffers( const BufferDefinitionVec &bufferDefs,
+                                              CompositorNamedBufferVec &inOutBufContainer,
+                                              const RenderTarget *finalTarget,
+                                              RenderSystem *renderSys,
+                                              const CompositorNodeVec &connectedNodes,
+                                              const CompositorPassVec *passes );
     };
 
     /** @} */

@@ -140,16 +140,20 @@ namespace Ogre
         {
             if( depthFormat != GL_NONE )
                 mDepthBufferName = createRenderBuffer( depthFormat );
+
             if( stencilFormat != GL_NONE )
                 mStencilBufferName = createRenderBuffer( stencilFormat );
         }
+
+        if( depthFormat == GL_DEPTH24_STENCIL8 || depthFormat == GL_DEPTH32F_STENCIL8 )
+            mStencilBufferName = mDepthBufferName;
     }
 
     GL3PlusDepthBuffer::~GL3PlusDepthBuffer()
     {
         if( mDepthTexture )
         {
-            assert( mStencilBufferName == 0 && "OpenGL specs don't allow depth textures "
+            assert( !hasSeparateStencilBuffer() && "OpenGL specs don't allow depth textures "
                     "with separate stencil format. We should have never hit this path." );
 
             if( mDepthBufferName )
@@ -159,7 +163,7 @@ namespace Ogre
         {
             if( mDepthBufferName )
                 glDeleteFramebuffers( 1, &mDepthBufferName );
-            if( mStencilBufferName )
+            if( hasSeparateStencilBuffer() )
                 glDeleteFramebuffers( 1, &mStencilBufferName );
         }
     }
@@ -234,10 +238,13 @@ namespace Ogre
     {
         if( mDepthTexture )
         {
-            assert( mStencilBufferName == 0 && "OpenGL specs don't allow depth textures "
+            assert( !hasSeparateStencilBuffer() && "OpenGL specs don't allow depth textures "
                     "with separate stencil format. We should have never hit this path." );
 
             OCGE( glFramebufferTexture( target, GL_DEPTH_ATTACHMENT, mDepthBufferName, 0 ) );
+
+            if( mStencilBufferName )
+                OCGE( glFramebufferTexture( target, GL_STENCIL_ATTACHMENT, mStencilBufferName, 0 ) );
         }
         else
         {
@@ -249,9 +256,14 @@ namespace Ogre
             if( mStencilBufferName )
             {
                 OCGE( glFramebufferRenderbuffer( target, GL_STENCIL_ATTACHMENT,
-                                                 GL_RENDERBUFFER, mDepthBufferName ) );
+                                                 GL_RENDERBUFFER, mStencilBufferName ) );
             }
         }
+    }
+    //---------------------------------------------------------------------
+    bool GL3PlusDepthBuffer::hasSeparateStencilBuffer() const
+    {
+        return mStencilBufferName && mDepthBufferName != mStencilBufferName;
     }
     //---------------------------------------------------------------------
     bool GL3PlusDepthBuffer::copyToImpl( DepthBuffer *_destination )

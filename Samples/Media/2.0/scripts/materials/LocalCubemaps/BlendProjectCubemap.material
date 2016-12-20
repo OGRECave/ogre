@@ -1,0 +1,99 @@
+//------------------------
+//OpenGL GLSL Definitions
+//------------------------
+vertex_program Cubemap/BlendProjectCubemap_vs_GLSL glsl
+{
+	source BlendProjectCubemap_vs.glsl
+}
+fragment_program Cubemap/BlendProjectCubemap_ps_GLSL glsl
+{
+	source BlendProjectCubemap_ps.glsl
+	default_params
+	{
+		param_named cubeTexture	int 0
+	}
+}
+
+//------------------------
+//DirectX 11 HLSL Definitions
+//------------------------
+vertex_program Cubemap/BlendProjectCubemap_vs_HLSL hlsl
+{
+	source BlendProjectCubemap_vs.hlsl
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	entry_point main
+}
+fragment_program Cubemap/BlendProjectCubemap_ps_HLSL hlsl
+{
+	source BlendProjectCubemap_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+//------------------------
+//Metal Definitions
+//------------------------
+vertex_program Cubemap/BlendProjectCubemap_vs_Metal metal
+{
+	source BlendProjectCubemap_vs.metal
+}
+fragment_program Cubemap/BlendProjectCubemap_ps_Metal metal
+{
+	source BlendProjectCubemap_ps.metal
+	shader_reflection_pair_hint Cubemap/BlendProjectCubemap_vs_Metal
+}
+
+vertex_program Cubemap/BlendProjectCubemap_vs unified
+{
+	delegate Cubemap/BlendProjectCubemap_vs_GLSL
+	delegate Cubemap/BlendProjectCubemap_vs_HLSL
+	delegate Cubemap/BlendProjectCubemap_vs_Metal
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+fragment_program Cubemap/BlendProjectCubemap_ps unified
+{
+	delegate Cubemap/BlendProjectCubemap_ps_GLSL
+	delegate Cubemap/BlendProjectCubemap_ps_HLSL
+	delegate Cubemap/BlendProjectCubemap_ps_Metal
+}
+
+material Cubemap/BlendProjectCubemap0
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			scene_blend add
+
+			vertex_program_ref Cubemap/BlendProjectCubemap_vs
+			{
+			}
+
+			fragment_program_ref Cubemap/BlendProjectCubemap_ps
+			{
+			}
+
+			texture_unit cubemap0
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+		}
+	}
+}
+material Cubemap/BlendProjectCubemap1 : Cubemap/BlendProjectCubemap0
+{
+}
+material Cubemap/BlendProjectCubemap2 : Cubemap/BlendProjectCubemap0
+{
+}
+material Cubemap/BlendProjectCubemap3 : Cubemap/BlendProjectCubemap0
+{
+}

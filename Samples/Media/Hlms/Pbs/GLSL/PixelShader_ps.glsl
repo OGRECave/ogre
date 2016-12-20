@@ -6,10 +6,12 @@
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
-@property( !hlms_shadowcaster )
-layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
-@end @property( hlms_shadowcaster && !hlms_shadow_uses_depth_texture )
-layout(location = FRAG_COLOR, index = 0) out float outColour;
+@property( !hlms_render_depth_only )
+	@property( !hlms_shadowcaster )
+	layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
+	@end @property( hlms_shadowcaster )
+	layout(location = FRAG_COLOR, index = 0) out float outColour;
+	@end
 @end
 
 @property( hlms_vpos )
@@ -17,9 +19,9 @@ in vec4 gl_FragCoord;
 @end
 
 @property( two_sided_lighting )
-	@property( hlms_forward3d_flipY )
+	@property( hlms_forwardplus_flipY )
 		@piece( two_sided_flip_normal )* (gl_FrontFacing ? -1.0 : 1.0)@end
-	@end @property( !hlms_forward3d_flipY )
+	@end @property( !hlms_forwardplus_flipY )
 		@piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
 	@end
 @end
@@ -31,6 +33,7 @@ in vec4 gl_FragCoord;
 	@end
 	@insertpiece( MaterialDecl )
 	@insertpiece( InstanceDecl )
+	@insertpiece( PccManualProbeDecl )
 @end
 @insertpiece( custom_ps_uniformDeclaration )
 // END UNIFORM DECLARATION
@@ -41,12 +44,12 @@ in block
 
 @property( !hlms_shadowcaster )
 
-@property( hlms_forward3d )
+@property( hlms_forwardplus )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
 /*layout(binding = 2) */uniform samplerBuffer f3dLightList;@end
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
-@property( envprobe_map )uniform samplerCube	texEnvProbeMap;@end
+@property( use_envprobe_map )uniform samplerCube	texEnvProbeMap;@end
 
 @property( diffuse_map )	uint diffuseIdx;@end
 @property( normal_map_tex )	uint normalIdx;@end
@@ -57,7 +60,7 @@ in block
 	@property( detail_map@n )uint detailMapIdx@n;@end @end
 @foreach( 4, n )
 	@property( detail_map_nm@n )uint detailNormMapIdx@n;@end @end
-@property( envprobe_map )	uint envMapIdx;@end
+@property( use_envprobe_map )	uint envMapIdx;@end
 
 vec4 diffuseCol;
 @property( specular_map && !metallic_workflow && !fresnel_workflow )vec3 specularCol;@end
@@ -215,6 +218,11 @@ vec3 qmul( vec4 q, vec3 v )
 
 @property( hlms_normal || hlms_qtangent )
 @insertpiece( DeclareBRDF )
+@insertpiece( DeclareBRDF_InstantRadiosity )
+@end
+
+@property( use_parallax_correct_cubemaps )
+@insertpiece( DeclParallaxLocalCorrect )
 @end
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
@@ -243,7 +251,7 @@ void main()
 @property( detail_map_nm1 )	detailNormMapIdx1	= material.indices4_7.y & 0x0000FFFFu;@end
 @property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16u;@end
 @property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFFu;@end
-@property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
+@property( use_envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
 
 	@insertpiece( custom_ps_posMaterialLoad )
 
@@ -347,7 +355,7 @@ void main()
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forwardplus )
 	vec3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 
@@ -382,7 +390,7 @@ void main()
 	{
 		lightDir *= 1.0 / fDistance;
 		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
+		float atten = 1.0 / (0.5 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
@@ -407,18 +415,43 @@ void main()
 		spotAtten = pow( spotAtten, pass.lights[@n].spotParams.z );
 	@end
 		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
+		float atten = 1.0 / (0.5 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
 
 @insertpiece( forward3dLighting )
 
-@property( envprobe_map || ambient_hemisphere )
+@property( use_envprobe_map || ambient_hemisphere )
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 
-	@property( envprobe_map )
-		vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
-		vec3 envColourD = textureLod( texEnvProbeMap, nNormal * pass.invViewMatCubemap, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+	@property( use_envprobe_map )
+		@property( use_parallax_correct_cubemaps )
+			vec3 envColourS;
+			vec3 envColourD;
+			vec3 posInProbSpace = toProbeLocalSpace( inPs.pos, @insertpiece( pccProbeSource ) );
+			float probeFade = getProbeFade( posInProbSpace, @insertpiece( pccProbeSource ) );
+			if( probeFade > 0 )
+			{
+				vec3 reflDirLS = localCorrect( reflDir, posInProbSpace, @insertpiece( pccProbeSource ) );
+				vec3 nNormalLS = localCorrect( nNormal, posInProbSpace, @insertpiece( pccProbeSource ) );
+				envColourS = textureLod( texEnvProbeMap,
+										 reflDirLS, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+				envColourD = textureLod( texEnvProbeMap,
+										 nNormalLS, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+
+				envColourS = envColourS * clamp( probeFade * 200.0, 0.0, 1.0 );
+				envColourD = envColourD * clamp( probeFade * 200.0, 0.0, 1.0 );
+			}
+			else
+			{
+				//TODO: Fallback to a global cubemap.
+				envColourS = vec3( 0, 0, 0 );
+				envColourD = vec3( 0, 0, 0 );
+			}
+		@end @property( !use_parallax_correct_cubemaps )
+			vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+			vec3 envColourD = textureLod( texEnvProbeMap, nNormal * pass.invViewMatCubemap, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+		@end
 		@property( !hw_gamma_read )	//Gamma to linear space
 			envColourS = envColourS * envColourS;
 			envColourD = envColourD * envColourD;
@@ -428,10 +461,10 @@ void main()
 		float ambientWD = dot( pass.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( pass.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
-		@property( envprobe_map )
+		@property( use_envprobe_map )
 			envColourS	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			envColourD	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
-		@end @property( !envprobe_map )
+		@end @property( !use_envprobe_map )
 			vec3 envColourS = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			vec3 envColourD = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
 		@end
@@ -439,33 +472,33 @@ void main()
 
 	@insertpiece( BRDF_EnvMap )
 @end
-@property( !hw_gamma_write )
-	//Linear to Gamma space
-	outColour.xyz	= sqrt( finalColour );
-@end @property( hw_gamma_write )
-	outColour.xyz	= finalColour;
-@end
 
-@property( hlms_alphablend )
-	@property( use_texture_alpha )
-		outColour.w		= material.F0.w * diffuseCol.w;
-	@end @property( !use_texture_alpha )
-		outColour.w		= material.F0.w;
+@property( !hlms_render_depth_only )
+	@property( !hw_gamma_write )
+		//Linear to Gamma space
+		outColour.xyz	= sqrt( finalColour );
+	@end @property( hw_gamma_write )
+		outColour.xyz	= finalColour;
 	@end
-@end @property( !hlms_alphablend )
-	outColour.w		= 1.0;@end
 
-@end @property( !hlms_normal && !hlms_qtangent )
-	outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
+	@property( hlms_alphablend )
+		@property( use_texture_alpha )
+			outColour.w		= material.F0.w * diffuseCol.w;
+		@end @property( !use_texture_alpha )
+			outColour.w		= material.F0.w;
+		@end
+	@end @property( !hlms_alphablend )
+		outColour.w		= 1.0;@end
+
+	@end @property( !hlms_normal && !hlms_qtangent )
+		outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
+	@end
 @end
 
 	@insertpiece( custom_ps_posExecution )
 }
 @end
 @property( hlms_shadowcaster )
-	@property( hlms_shadow_uses_depth_texture && !alpha_test )
-		@set( hlms_disable_stage, 1 )
-	@end
 
 @property( alpha_test )
 	Material material;
@@ -530,7 +563,7 @@ void main()
 		discard;
 @end /// !alpha_test
 
-@property( !hlms_shadow_uses_depth_texture )
+@property( !hlms_render_depth_only )
 	@property( GL3+ )outColour = inPs.depth;@end
 	@property( !GL3+ )gl_FragColor.x = inPs.depth;@end
 @end

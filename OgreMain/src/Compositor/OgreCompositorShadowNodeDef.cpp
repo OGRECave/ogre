@@ -42,12 +42,19 @@ namespace Ogre
         if( textureSource == TEXTURE_INPUT )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Shadow Nodes don't support input channels!"
-                            " Shadow Node: '" + mName.getFriendlyText() + "'",
+                            " Shadow Node: '" + mNameStr + "'",
                             "OgreCompositorShadowNodeDef::addTextureSourceName" );
         }
 
         return CompositorNodeDef::addTextureSourceName( name, mShadowMapTexDefinitions.size() + index,
                                                         textureSource );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNodeDef::addBufferInput( size_t inputChannel, IdString name )
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Shadow Nodes don't support input channels!"
+                        " Shadow Node: '" + mNameStr + "'",
+                        "OgreCompositorShadowNodeDef::addBufferInput" );
     }
     //-----------------------------------------------------------------------------------
     IdString CompositorShadowNodeDef::addShadowTextureSourceName( const String &name, size_t index,
@@ -56,7 +63,7 @@ namespace Ogre
         if( textureSource == TEXTURE_INPUT )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Shadow Nodes don't support input channels!"
-                            " Shadow Node: '" + mName.getFriendlyText() + "'",
+                            " Shadow Node: '" + mNameStr + "'",
                             "OgreCompositorShadowNodeDef::addTextureSourceName" );
         }
 

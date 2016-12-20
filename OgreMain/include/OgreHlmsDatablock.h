@@ -271,6 +271,7 @@ namespace Ogre
         /** Sets a new macroblock that matches the same parameter as the input.
             Decreases the reference count of the previously set one.
             Runs an O(N) search to get the right block.
+            Calling this function triggers a HlmsDatablock::flushRenderables
         @param macroblock
             @See HlmsManager::getMacroblock
         @param casterBlock
@@ -283,6 +284,7 @@ namespace Ogre
         /** Sets the macroblock from the given pointer that was already
             retrieved from the HlmsManager. Unlike the other overload,
             this operation is O(1).
+            Calling this function triggers a HlmsDatablock::flushRenderables
         @param macroblock
             A valid block. The reference count is increased inside this function.
         @param casterBlock
@@ -295,6 +297,7 @@ namespace Ogre
         /** Sets a new blendblock that matches the same parameter as the input.
             Decreases the reference count of the previous mBlendblock.
             Runs an O(N) search to get the right block.
+            Calling this function triggers a HlmsDatablock::flushRenderables
         @param blendblock
             @See HlmsManager::getBlendblock
         @param casterBlock
@@ -306,6 +309,7 @@ namespace Ogre
         /** Sets the blendblock from the given pointer that was already
             retrieved from the HlmsManager. Unlike the other overload,
             this operation is O(1).
+            Calling this function triggers a HlmsDatablock::flushRenderables
         @param blendblock
             A valid block. The reference count is increased inside this function.
         @param casterBlock

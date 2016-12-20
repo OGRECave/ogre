@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Vao/OgreD3D11CompatBufferInterface.h"
 #include "Vao/OgreD3D11ConstBufferPacked.h"
 #include "Vao/OgreD3D11TexBufferPacked.h"
+#include "Vao/OgreD3D11UavBufferPacked.h"
 //#include "Vao/OgreD3D11MultiSourceVertexBufferPool.h"
 #include "Vao/OgreD3D11DynamicBuffer.h"
 #include "Vao/OgreD3D11AsyncTicket.h"
@@ -469,7 +470,7 @@ namespace Ogre
         D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vboName,
                                                                           dynamicBuffer );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
-                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bufferOffset, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, vElements, 0, 0, 0 );
 
@@ -496,7 +497,7 @@ namespace Ogre
         {
             deallocateVbo( bufferInterface->getVboPoolIndex(),
                            vertexBuffer->_getInternalBufferStart() * vertexBuffer->getBytesPerElement(),
-                           vertexBuffer->getNumElements() * vertexBuffer->getBytesPerElement(),
+                           vertexBuffer->_getInternalTotalSizeBytes(),
                            vertexBuffer->getBufferType(), VERTEX_BUFFER );
         }
     }
@@ -753,7 +754,7 @@ namespace Ogre
         D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vboName,
                                                                           dynamicBuffer );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
-                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bufferOffset, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -780,21 +781,29 @@ namespace Ogre
         {
             deallocateVbo( bufferInterface->getVboPoolIndex(),
                            indexBuffer->_getInternalBufferStart() * indexBuffer->getBytesPerElement(),
-                           indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
+                           indexBuffer->_getInternalTotalSizeBytes(),
                            indexBuffer->getBufferType(), INDEX_BUFFER );
         }
     }
     //-----------------------------------------------------------------------------------
-    D3D11CompatBufferInterface* D3D11VaoManager::createShaderBufferInterface( bool constantBuffer,
-                                                                              size_t sizeBytes,
-                                                                              BufferType bufferType,
-                                                                              void *initialData )
+    D3D11CompatBufferInterface* D3D11VaoManager::createShaderBufferInterface(
+            uint32 bindFlags, size_t sizeBytes, BufferType bufferType,
+            void *initialData, uint32 structureByteStride )
     {
         ID3D11DeviceN *d3dDevice = mDevice.get();
 
         D3D11_BUFFER_DESC desc;
         ZeroMemory( &desc, sizeof(D3D11_BUFFER_DESC) );
-        desc.BindFlags      = constantBuffer ? D3D11_BIND_CONSTANT_BUFFER : D3D11_BIND_SHADER_RESOURCE;
+        if( bindFlags & BB_FLAG_CONST )
+            desc.BindFlags |= D3D11_BIND_CONSTANT_BUFFER;
+        if( bindFlags & BB_FLAG_TEX )
+            desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+        if( bindFlags & BB_FLAG_UAV )
+        {
+            desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+            desc.MiscFlags |= D3D11_RESOURCE_MISC_BUFFER_STRUCTURED /*|
+                    D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS*/;
+        }
         desc.ByteWidth      = sizeBytes;
         desc.CPUAccessFlags = 0;
         if( bufferType == BT_IMMUTABLE )
@@ -806,6 +815,7 @@ namespace Ogre
             desc.Usage = D3D11_USAGE_DYNAMIC;
             desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         }
+        desc.StructureByteStride = structureByteStride;
 
         D3D11_SUBRESOURCE_DATA subResData;
         ZeroMemory( &subResData, sizeof(D3D11_SUBRESOURCE_DATA) );
@@ -833,12 +843,12 @@ namespace Ogre
     {
         //Const buffers don't get batched together since D3D11 doesn't allow binding just a
         //region and has a 64kb limit. Only D3D11.1 on Windows 8.1 supports this feature.
-        D3D11CompatBufferInterface *bufferInterface = createShaderBufferInterface( true,
+        D3D11CompatBufferInterface *bufferInterface = createShaderBufferInterface( BB_FLAG_CONST,
                                                                                    sizeBytes,
                                                                                    bufferType,
                                                                                    initialData );
         ConstBufferPacked *retVal = OGRE_NEW D3D11ConstBufferPacked(
-                                                        sizeBytes, 1,
+                                                        sizeBytes, 1, 0,
                                                         bufferType,
                                                         initialData, keepAsShadow,
                                                         this, bufferInterface,
@@ -863,6 +873,9 @@ namespace Ogre
         size_t bufferOffset = 0;
 
         uint32 alignment = mTexBufferAlignment;
+        size_t requestedSize = sizeBytes;
+
+        const size_t bytesPerElement = 1;
 
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
@@ -870,7 +883,7 @@ namespace Ogre
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, Math::lcm( alignment, bytesPerElement ) );
         }
 
         if( mD3D11RenderSystem->_getFeatureLevel() > D3D_FEATURE_LEVEL_11_0 )
@@ -890,14 +903,14 @@ namespace Ogre
         else
         {
             //D3D11.0 and below doesn't support NO_OVERWRITE on shader buffers. Use the basic interface.
-            bufferInterface = createShaderBufferInterface( false, sizeBytes, bufferType, initialData );
+            bufferInterface = createShaderBufferInterface( BB_FLAG_TEX, sizeBytes, bufferType, initialData );
         }
 
-        const size_t numElements        = sizeBytes;
-        const size_t bytesPerElement    = 1;
+        const size_t numElements = requestedSize;
 
         D3D11TexBufferPacked *retVal = OGRE_NEW D3D11TexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
+                                                        (sizeBytes - requestedSize) / bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, pixelFormat, mDevice );
 
@@ -929,7 +942,7 @@ namespace Ogre
             {
                 deallocateVbo( bufferInterface->getVboPoolIndex(),
                                texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
-                               texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
+                               texBuffer->_getInternalTotalSizeBytes(),
                                texBuffer->getBufferType(), SHADER_BUFFER );
             }
         }
@@ -942,6 +955,35 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    UavBufferPacked* D3D11VaoManager::createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                           uint32 bindFlags, void *initialData,
+                                                           bool keepAsShadow )
+    {
+        size_t bufferOffset = 0;
+
+        const BufferType bufferType = BT_DEFAULT;
+
+        BufferInterface *bufferInterface = createShaderBufferInterface( bindFlags|BB_FLAG_UAV,
+                                                                        numElements * bytesPerElement,
+                                                                        bufferType, initialData,
+                                                                        bytesPerElement );
+
+        D3D11UavBufferPacked *retVal = OGRE_NEW D3D11UavBufferPacked(
+                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bindFlags, initialData, keepAsShadow,
+                                                        this, bufferInterface, mDevice );
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::destroyUavBufferImpl( UavBufferPacked *uavBuffer )
+    {
+        D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
+                                                                uavBuffer->getBufferInterface() );
+
+        bufferInterface->getVboName()->Release();
+    }
+    //-----------------------------------------------------------------------------------
     IndirectBufferPacked* D3D11VaoManager::createIndirectBufferImpl( size_t sizeBytes,
                                                                        BufferType bufferType,
                                                                        void *initialData,
@@ -949,6 +991,7 @@ namespace Ogre
     {
         const size_t alignment = 4;
         size_t bufferOffset = 0;
+        size_t requestedSize = sizeBytes;
 
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
@@ -956,7 +999,7 @@ namespace Ogre
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
         }
 
         D3D11BufferInterface *bufferInterface = 0;
@@ -976,7 +1019,8 @@ namespace Ogre
         }
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, requestedSize, 1,
+                                                        (sizeBytes - requestedSize) / 1,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -988,7 +1032,7 @@ namespace Ogre
             }
             else
             {
-                memcpy( retVal->getSwBufferPtr(), initialData, sizeBytes );
+                memcpy( retVal->getSwBufferPtr(), initialData, requestedSize );
             }
         }
 
@@ -1012,7 +1056,7 @@ namespace Ogre
                 deallocateVbo( bufferInterface->getVboPoolIndex(),
                                indirectBuffer->_getInternalBufferStart() *
                                     indirectBuffer->getBytesPerElement(),
-                               indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
+                               indirectBuffer->_getInternalTotalSizeBytes(),
                                indirectBuffer->getBufferType(), SHADER_BUFFER );
             }
         }
@@ -1021,7 +1065,7 @@ namespace Ogre
     D3D11VaoManager::VaoVec::iterator D3D11VaoManager::findVao(
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
-                                                        v1::RenderOperation::OperationType opType )
+                                                        OperationType opType )
     {
         Vao vao;
 
@@ -1135,7 +1179,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void D3D11VaoManager::bindDrawId()
+    void D3D11VaoManager::bindDrawId( uint32 bindSlotId )
     {
         D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
                                                     mDrawId->getBufferInterface() );
@@ -1145,7 +1189,7 @@ namespace Ogre
         UINT offset = 0;
 
         mDevice.GetImmediateContext()->IASetVertexBuffers(
-                    15,
+                    bindSlotId,
                     1,
                     &vertexBuffer,
                     &stride,
@@ -1194,8 +1238,12 @@ namespace Ogre
     VertexArrayObject* D3D11VaoManager::createVertexArrayObjectImpl(
                                                             const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
-                                                            v1::RenderOperation::OperationType opType )
+                                                            OperationType opType )
     {
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        VertexElement2VecVec vertexElements = VertexArrayObject::getVertexDeclaration( vertexBuffers );
+        uint8 inputLayout = hlmsManager->_addInputLayoutId( vertexElements, opType );
+
         {
             bool hasImmutableDelayedBuffer = false;
             VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
@@ -1230,6 +1278,7 @@ namespace Ogre
                 //create the actual Vao yet. We'll modify the pointer later.
                 D3D11VertexArrayObject *retVal = OGRE_NEW D3D11VertexArrayObject( 0,
                                                                                   renderQueueId,
+                                                                                  inputLayout,
                                                                                   vertexBuffers,
                                                                                   indexBuffer,
                                                                                   opType,
@@ -1244,6 +1293,7 @@ namespace Ogre
 
         D3D11VertexArrayObject *retVal = OGRE_NEW D3D11VertexArrayObject( itor->vaoName,
                                                                           renderQueueId,
+                                                                          inputLayout,
                                                                           vertexBuffers,
                                                                           indexBuffer,
                                                                           opType,

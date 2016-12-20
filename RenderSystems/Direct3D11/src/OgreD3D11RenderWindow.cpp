@@ -82,8 +82,7 @@ namespace Ogre
         mFSAAHint = "";
         mFSAAType.Count = 1;
         mFSAAType.Quality = 0;
-        
-        unsigned int colourDepth = 32;
+
         bool depthBuffer = true;
         
         if(miscParams)
@@ -94,10 +93,6 @@ namespace Ogre
             opt = miscParams->find("hidden");
             if(opt != miscParams->end())
                 mHidden = StringConverter::parseBool(opt->second);
-            // colourDepth
-            opt = miscParams->find("colourDepth");
-            if(opt != miscParams->end())
-                colourDepth = StringConverter::parseUnsignedInt(opt->second);
             // depthBuffer [parseBool]
             opt = miscParams->find("depthBuffer");
             if(opt != miscParams->end())
@@ -124,9 +119,7 @@ namespace Ogre
 		{
 			D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 			rsys->addToSwitchingFullscreenCounter();
-		}
-
-        mColourDepth = colourDepth;
+        }
 
         mWidth = mHeight = mLeft = mTop = 0;
 
@@ -180,6 +173,8 @@ namespace Ogre
                 "Unable to create rendertagert view\nError Description:" + errorDescription,
                 "D3D11RenderWindow::_createSizeDependedD3DResources");
         }
+
+        mFormat = D3D11Mappings::_getPF( BBDesc.Format );
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::_destroySizeDependedD3DResources()
@@ -656,7 +651,6 @@ namespace Ogre
         HWND externalHandle = 0;
         String title = name;
 
-		unsigned int colourDepth = 32;
 		int left = INT_MAX; // Defaults to screen center
 		int top = INT_MAX;  // Defaults to screen center
 		bool depthBuffer = true;
@@ -874,15 +868,15 @@ namespace Ogre
         mWidth = rc.right;
         mHeight = rc.bottom;
 
-        LogManager::getSingleton().stream()
-            << "D3D11 : Created D3D11 Rendering Window '"
-            << mName << "' : " << mWidth << "x" << mHeight 
-            << ", " << mColourDepth << "bpp";
-
         _createSwapChain();
         _createSizeDependedD3DResources();
         mpDXGIFactory->MakeWindowAssociation(mHWnd, mAlwaysWindowedMode == true ? DXGI_MWA_NO_ALT_ENTER : static_cast<UINT>(0));
         setHidden(mHidden);
+
+        LogManager::getSingleton().stream()
+            << "D3D11 : Created D3D11 Rendering Window '"
+            << mName << "' : " << mWidth << "x" << mHeight
+            << ", " << PixelUtil::getNumElemBits( mFormat ) << "bpp";
 
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         rsys->fireDeviceEvent(&mDevice,"RenderWindowCreated",this);
@@ -1308,13 +1302,13 @@ namespace Ogre
         mWidth = (int)(rc.Width * scale + 0.5f);
         mHeight = (int)(rc.Height * scale + 0.5f);
 
-        LogManager::getSingleton().stream() << std::fixed << std::setprecision(1) 
-            << "D3D11 : Created D3D11 Rendering Window \"" << mName << "\", " << rc.Width << " x " << rc.Height
-            << ", with backing store " << mWidth << "x" << mHeight << ", " << mColourDepth << "bpp, "
-            << "using content scaling factor " << scale;
-
         _createSwapChain();
         _createSizeDependedD3DResources();
+
+        LogManager::getSingleton().stream() << std::fixed << std::setprecision(1)
+            << "D3D11 : Created D3D11 Rendering Window \"" << mName << "\", " << rc.Width << " x " << rc.Height
+            << ", with backing store " << mWidth << "x" << mHeight << ", " << PixelUtil::getNumElemBits( mFormat ) << "bpp, "
+            << "using content scaling factor " << scale;
     }
 
     //---------------------------------------------------------------------

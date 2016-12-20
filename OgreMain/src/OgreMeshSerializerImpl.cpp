@@ -1150,7 +1150,7 @@ namespace v1 {
         // unsigned short operationType
         unsigned short opType;
         readShorts(stream, &opType, 1);
-        sm->operationType = static_cast<RenderOperation::OperationType>(opType);
+        sm->operationType = static_cast<OperationType>(opType);
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readSubMeshTextureAlias(DataStreamPtr& stream, Mesh* pMesh, SubMesh* sub)

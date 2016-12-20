@@ -104,7 +104,7 @@ namespace v1 {
         }
 
         //Set pass before binding buffers to activate the GPU programs
-        sceneMgr->_setPass(r2vbPass);
+        //sceneMgr->_setPass(r2vbPass); TODO
 
         RenderOperation renderOp;
         size_t targetBufferIndex;

@@ -40,9 +40,10 @@ namespace Ogre
     {
     public:
         NULLTexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                                BufferType bufferType, void *initialData, bool keepAsShadow,
-                                VaoManager *vaoManager, NULLBufferInterface *bufferInterface,
-                                Ogre::PixelFormat pf );
+                             uint32 numElementsPadding, BufferType bufferType,
+                             void *initialData, bool keepAsShadow,
+                             VaoManager *vaoManager, NULLBufferInterface *bufferInterface,
+                             Ogre::PixelFormat pf );
         ~NULLTexBufferPacked();
 
         virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}

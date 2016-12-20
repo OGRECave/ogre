@@ -1,5 +1,5 @@
 @insertpiece( Common_Matrix_DeclUnpackMatrix4x4 )
-@insertpiece( Common_Matrix_DeclUnpackMatrix3x4 )
+@insertpiece( Common_Matrix_DeclUnpackMatrix4x3 )
 
 struct VS_INPUT
 {
@@ -108,15 +108,15 @@ Buffer<float4> worldMatBuf : register(t0);
     @piece( worldViewMat )worldView@end
 @end
 
-@piece( CalculatePsPos )mul( @insertpiece( worldViewMat ), @insertpiece(local_vertex) ).xyz@end
+@piece( CalculatePsPos )mul( @insertpiece(local_vertex), @insertpiece( worldViewMat ) ).xyz@end
 
 @piece( VertexTransform )
 	//Lighting is in view space
 	@property( hlms_normal || hlms_qtangent )outVs.pos		= @insertpiece( CalculatePsPos );@end
-	@property( hlms_normal || hlms_qtangent )outVs.normal	= mul( (float3x3)@insertpiece( worldViewMat ), @insertpiece(local_normal) );@end
-	@property( normal_map )outVs.tangent	= mul( (float3x3)@insertpiece( worldViewMat ), @insertpiece(local_tangent) );@end
+	@property( hlms_normal || hlms_qtangent )outVs.normal	= mul( @insertpiece(local_normal), (float3x3)@insertpiece( worldViewMat ) );@end
+	@property( normal_map )outVs.tangent	= mul( @insertpiece(local_tangent), (float3x3)@insertpiece( worldViewMat ) );@end
 @property( !hlms_dual_paraboloid_mapping )
-	outVs.gl_Position = mul( passBuf.viewProj, worldPos );@end
+	outVs.gl_Position = mul( worldPos, passBuf.viewProj );@end
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	outVs.gl_Position.w	= 1.0f;
@@ -129,7 +129,7 @@ Buffer<float4> worldMatBuf : register(t0);
 @end
 @piece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-	outVs.posL@n = mul( passBuf.shadowRcv[@n].texViewProj, float4(worldPos.xyz, 1.0f) );@end
+	outVs.posL@n = mul( float4(worldPos.xyz, 1.0f), passBuf.shadowRcv[@n].texViewProj );@end
 @end
 
 PS_INPUT main( VS_INPUT input )
@@ -137,12 +137,12 @@ PS_INPUT main( VS_INPUT input )
 	PS_INPUT outVs;
 	@insertpiece( custom_vs_preExecution )
 @property( !hlms_skeleton )
-	float3x4 worldMat = UNPACK_MAT3x4( worldMatBuf, input.drawId @property( !hlms_shadowcaster )<< 1u@end );
+	float4x3 worldMat = UNPACK_MAT4x3( worldMatBuf, input.drawId @property( !hlms_shadowcaster )<< 1u@end );
 	@property( hlms_normal || hlms_qtangent )
     float4x4 worldView = UNPACK_MAT4( worldMatBuf, (input.drawId << 1u) + 1u );
 	@end
 
-	float4 worldPos = float4( mul( worldMat, input.vertex ).xyz, 1.0f );
+	float4 worldPos = float4( mul( input.vertex, worldMat ).xyz, 1.0f );
 @end
 
 @property( hlms_qtangent )
