@@ -233,7 +233,7 @@ namespace Ogre
                     (uint8*)&this->sampleMask ) == 0;
         }
         /// Compares if this <= _r. See equalExcludePassData
-        int lessThanExcludePassData( const HlmsPso &_r ) const
+        bool lessThanExcludePassData( const HlmsPso &_r ) const
         {
             //Non-POD datatypes.
             int nonPodResult = lessNonPod( _r );

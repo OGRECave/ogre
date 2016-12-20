@@ -139,6 +139,10 @@ namespace Ogre
             {
                 return _l.hash < _r;
             }
+            bool operator ()( const PsoCacheEntry &_l, const PsoCacheEntry &_r ) const
+            {
+                return _l.hash < _r.hash;
+            }
         };
         struct PassCacheEntry
         {
