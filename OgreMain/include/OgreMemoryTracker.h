@@ -109,7 +109,7 @@ namespace Ogre
 
         std::string mLeakFileName;
         bool mDumpToStdOut;
-        typedef OGRE_HashMap<void*, Alloc> AllocationMap;
+        typedef unordered_map<void*, Alloc>::type AllocationMap;
         AllocationMap mAllocations;
 
         size_t mTotalAllocations;
