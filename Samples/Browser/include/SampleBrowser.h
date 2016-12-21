@@ -938,11 +938,7 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void setup()
         {
-            if(mWindow == NULL)
-                mWindow = createWindow();
-
-            setupInput(mGrabInput);
-            locateResources();
+            ApplicationContext::setup();
 
 #ifdef OGRE_STATIC_LIB
             // Check if the render system supports any shader profiles.
@@ -1020,26 +1016,7 @@ namespace OgreBites
 #endif
 #endif
 
-            Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
-            mTrayMgr = new TrayManager("BrowserControls", mWindow, this);
-            mTrayMgr->showBackdrop("SdkTrays/Bands");
-            mTrayMgr->getTrayContainer(TL_NONE)->hide();
-
-#if ENABLE_SHADERS_CACHE == 1
-            enableShaderCache();
-#endif
-
-            createDummyScene();
-            loadResources();
-
-
             Sample* startupSample = loadSamples();
-
-            // Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
-
-            // adds context as listener to process context-level (above the sample level) events
-            mRoot->addFrameListener(this);
-            Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 
             // create template material for sample thumbnails
             Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SdkTrays/SampleThumbnail", "Essential");
@@ -1096,6 +1073,17 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void loadResources()
         {
+            Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
+            mTrayMgr = new TrayManager("BrowserControls", mWindow, this);
+            mTrayMgr->showBackdrop("SdkTrays/Bands");
+            mTrayMgr->getTrayContainer(TL_NONE)->hide();
+
+#if ENABLE_SHADERS_CACHE == 1
+            enableShaderCache();
+#endif
+            // Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
+
+            createDummyScene();
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mTrayMgr->showLoadingBar(1, 0);
 #endif
