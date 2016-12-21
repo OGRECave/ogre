@@ -88,10 +88,11 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     {
         Vector3 tsPos;
         terrain->getTerrainPosition(centrepos, &tsPos);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_BITES_HAVE_SDL
         const uint8* state = SDL_GetKeyboardState(NULL);
-        if (state[uint('=')] || state[SDLK_KP_PLUS] ||
-            state[SDLK_KP_MINUS] || state[uint('-')])
+
+        if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS] ||
+            state[SDL_SCANCODE_KP_MINUS] || state[SDL_SCANCODE_MINUS])
         {
             switch(mMode)
             {
@@ -120,7 +121,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
                             float addedHeight = weight * 250.0 * timeElapsed;
                             float newheight;
-                            if (state[uint('=')] || state[SDLK_KP_PLUS])
+                            if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS])
                                 newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
                             else
                                 newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
@@ -159,7 +160,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                             float paint = weight * timeElapsed;
                             size_t imgY = imgSize - y;
                             float val;
-                            if (state[uint('=')] || state[SDLK_KP_PLUS])
+                            if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS])
                                 val = layer->getBlendValue(x, imgY) + paint;
                             else
                                 val = layer->getBlendValue(x, imgY) - paint;
