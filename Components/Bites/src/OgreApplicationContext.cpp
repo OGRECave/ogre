@@ -111,8 +111,6 @@ void ApplicationContext::closeApp()
         mRoot = NULL;
     }
 
-    mWindow = NULL;
-
 #ifdef OGRE_STATIC_LIB
     mStaticPluginLoader.unload();
 #endif
@@ -120,11 +118,6 @@ void ApplicationContext::closeApp()
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
     if (mTaskScheduler.is_active())
         mTaskScheduler.terminate();
-#endif
-
-#if OGRE_BITES_HAVE_SDL
-    SDL_DestroyWindow(mSDLWindow);
-    mSDLWindow = NULL;
 #endif
 }
 
@@ -223,11 +216,6 @@ void ApplicationContext::destroyRTShaderSystem()
 
 void ApplicationContext::setup()
 {
-#if OGRE_BITES_HAVE_SDL
-    SDL_Init(0);
-    SDL_InitSubSystem(SDL_INIT_VIDEO);
-#endif
-
     mWindow = createWindow();
     setupInput(mGrabInput);
     locateResources();
@@ -378,6 +366,10 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     miscParams["vsync"] = ropts["VSync"].currentValue;
 
 #if OGRE_BITES_HAVE_SDL
+    if(!SDL_WasInit(SDL_INIT_VIDEO)) {
+        SDL_InitSubSystem(SDL_INIT_VIDEO);
+    }
+
     mSDLWindow = SDL_CreateWindow(mAppName.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
@@ -521,11 +513,10 @@ void ApplicationContext::_fireInputEvent(const Event& event) {
 void ApplicationContext::setupInput(bool _grab)
 {
 #if OGRE_BITES_HAVE_SDL
-    if (SDL_InitSubSystem(SDL_INIT_EVENTS) != 0)
+    if (!mSDLWindow)
     {
         OGRE_EXCEPT(Ogre::Exception::ERR_INVALID_STATE,
-                    Ogre::String("Could not initialize SDL2 input: ")
-                    + SDL_GetError(),
+                    "you must create a SDL window first",
                     "SampleContext::setupInput");
     }
 
@@ -727,8 +718,12 @@ void ApplicationContext::shutdown()
     destroyRTShaderSystem();
 #endif
 
-    // remove window event listener before shutting down SDL
-    Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
+    // remove window event listener before destroying it
+    if(mWindow) {
+        Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
+        mRoot->destroyRenderTarget(mWindow);
+        mWindow = NULL;
+    }
 
     if (mOverlaySystem)
     {
@@ -736,14 +731,23 @@ void ApplicationContext::shutdown()
     }
 
 #if OGRE_BITES_HAVE_SDL
-    SDL_QuitSubSystem(SDL_INIT_EVENTS);
-    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+    if(mSDLWindow) {
+        SDL_DestroyWindow(mSDLWindow);
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        mSDLWindow = NULL;
+    }
 #endif
 }
 
 void ApplicationContext::pollEvents()
 {
 #if OGRE_BITES_HAVE_SDL
+    if(!mSDLWindow)
+    {
+        // SDL events not initialized
+        return;
+    }
+
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {

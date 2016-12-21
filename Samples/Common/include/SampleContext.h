@@ -424,17 +424,6 @@ namespace OgreBites
         bool isLastRun() { return mLastRun; }
         void setLastRun(bool flag) { mLastRun = flag; }
     protected:
-
-        /*-----------------------------------------------------------------------------
-         | Sets up the context after configuration.
-         -----------------------------------------------------------------------------*/
-        virtual void setup()
-        {
-            ApplicationContext::setup();
-            
-            Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
-        }
-
         /*-----------------------------------------------------------------------------
         | Reconfigures the context. Attempts to preserve the current sample state.
         -----------------------------------------------------------------------------*/

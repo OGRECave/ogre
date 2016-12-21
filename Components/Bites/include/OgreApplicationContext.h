@@ -113,7 +113,7 @@ namespace OgreBites
         This function closes down the application - saves the configuration then
         shutdowns.
         */
-        virtual void closeApp();
+        void closeApp();
 
         // callback interface copied from various listeners to be used by ApplicationContext
         virtual bool frameStarted(const Ogre::FrameEvent& evt) {
