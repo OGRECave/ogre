@@ -88,7 +88,7 @@ namespace Ogre
         // Ignore fatal XErrorEvents from stale handles.
         oldXErrorHandler = XSetErrorHandler(safeXErrorHandler);
 
-        if (mWindow)
+        if (mWindow && mIsTopLevel)
         {
             XDestroyWindow(xDisplay, mWindow);
         }
