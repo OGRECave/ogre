@@ -330,7 +330,7 @@ namespace Ogre
                         Vector3( lenOpposite, lenOpposite, 0 );
 
                 Vector3 scalarLightPos = (*itLight)->getParentNode()->_getDerivedPosition();
-                Vector3 scalarLightDir = (*itLight)->getDirection() * lightRange;
+                Vector3 scalarLightDir = (*itLight)->getDerivedDirection() * lightRange;
 
                 Plane scalarPlane[6];
 
