@@ -138,7 +138,8 @@ namespace Ogre {
         */
         const VertexBoneAssignmentVec& getBoneAssignments() { return mBoneAssignments; }
 
-        /// Must be called once to compile bone assignments into geometry buffer.
+        /// Call this function if you've manually called addBoneAssignment to setup
+        /// bones for vertices.
         /// WARNING: Will destroy LODs.
         void _compileBoneAssignments(void);
 
