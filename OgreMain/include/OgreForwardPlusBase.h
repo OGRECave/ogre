@@ -92,6 +92,8 @@ namespace Ogre
 
         bool    mDebugMode;
         bool    mFadeAttenuationRange;
+        /// VPLs = Virtual Point Lights. Used by InstantRadiosity.
+        bool    mEnableVpls;
 
         void fillGlobalLightListBuffer( Camera *camera, TexBufferPacked *globalLightListBuffer );
 
@@ -159,6 +161,9 @@ namespace Ogre
         ///     atten *= max( (attenRange - fDistance) / attenRange, 0.0f );
         void setFadeAttenuationRange( bool fade )                       { mFadeAttenuationRange = fade; }
         bool getFadeAttenuationRange(void) const                        { return mFadeAttenuationRange; }
+
+        void setEnableVpls( bool enable )                               { mEnableVpls = enable; }
+        bool getEnableVpls(void) const                                  { return mEnableVpls; }
     };
 
     /** @} */

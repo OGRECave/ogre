@@ -646,6 +646,7 @@ namespace Ogre
         static const IdString ShadowCaster;
         static const IdString ShadowUsesDepthTexture;
         static const IdString RenderDepthOnly;
+        static const IdString EnableVpls;
         static const IdString ForwardPlus;
         static const IdString ForwardPlusFlipY;
         static const IdString ForwardPlusDebug;

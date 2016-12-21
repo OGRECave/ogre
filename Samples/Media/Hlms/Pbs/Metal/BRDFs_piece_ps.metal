@@ -141,7 +141,7 @@ inline float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDi
 @end
 @end
 
-@property( hlms_instant_radiosity || 1 )
+@property( hlms_enable_vpls )
 @piece( DeclareBRDF_InstantRadiosity )
 //Simplified cheap BRDF for Instant Radiosity.
 float3 BRDF_IR( float3 lightDir, float3 lightDiffuse,

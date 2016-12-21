@@ -143,7 +143,7 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 @end
 @end
 
-@property( hlms_instant_radiosity || 1 )
+@property( hlms_enable_vpls )
 @piece( DeclareBRDF_InstantRadiosity )
 //Simplified cheap BRDF for Instant Radiosity.
 vec3 BRDF_IR( vec3 lightDir, vec3 lightDiffuse )

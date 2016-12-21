@@ -140,7 +140,7 @@
 		}
 	}
 
-@property( hlms_instant_radiosity || 1 )
+@property( hlms_enable_vpls )
 	prevLightCount	= numLightsInGrid;
 	numLightsInGrid	= texelFetch( f3dGrid, int(sampleOffset + 2u) ).x;
 

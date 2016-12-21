@@ -45,7 +45,8 @@ namespace Ogre
         mVaoManager( 0 ),
         mSceneManager( sceneManager ),
         mDebugMode( false ),
-        mFadeAttenuationRange( true )
+        mFadeAttenuationRange( true ),
+        mEnableVpls( false )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -296,5 +297,8 @@ namespace Ogre
 
         hlms->_setProperty( HlmsBaseProp::Forward3D,        HlmsBaseProp::Forward3D.mHash );
         hlms->_setProperty( HlmsBaseProp::ForwardClustered, HlmsBaseProp::ForwardClustered.mHash );
+
+        if( mEnableVpls )
+            hlms->_setProperty( HlmsBaseProp::EnableVpls, 1 );
     }
 }

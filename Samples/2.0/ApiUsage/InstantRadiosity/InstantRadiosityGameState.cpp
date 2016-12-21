@@ -169,7 +169,8 @@ namespace Demo
         mCameraController->mCameraSpeedBoost = 10.0f;
 
         sceneManager->setForwardClustered( true, 16, 8, 24, 96, 2, 50 );
-        sceneManager->getForwardPlus()->setFadeAttenuationRange( true );
+        //Required by InstantRadiosity
+        sceneManager->getForwardPlus()->setEnableVpls( true );
 
         TutorialGameState::createScene01();
     }
