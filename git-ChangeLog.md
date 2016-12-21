@@ -3,6 +3,7 @@
 ## Batteries Included
 * by default Ogre will now automatically fetch and build its core dependencies
 * [Unified documentation](https://ogrecave.github.io/ogre/api/1.10/index.html): merged API reference, manual and some of the wiki tutorials using Doxygen
+* CMake Config-File support for an easy integration in third-party projects.
 
 ## Python Bindings (new component)
 * cover OgreMain, RTShaderSystem, Overlay and OgreBites
