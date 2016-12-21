@@ -21,7 +21,7 @@
 %include std_map.i
 %include std_multimap.i
 %include std_vector.i
-%include exception.i 
+%include exception.i
  
 /* Parse the header file to generate wrappers */
 #define _OgreExport
@@ -42,11 +42,21 @@
 %ignore *::getSingletonPtr; // only expose the non ptr variant
 %rename(OgreException) Ogre::Exception; // confilcts with Python Exception
 
+%feature("director:except") {
+    if ($error != NULL) {
+        throw Swig::DirectorMethodException();
+    }
+}
+
 // convert c++ exceptions to language native exceptions
 %exception {
     try {
         $action
-    } catch (const std::exception& e) {
+    }  
+    catch (Swig::DirectorException &e) { 
+        SWIG_fail;
+    }
+    catch (const std::exception& e) {
         SWIG_exception(SWIG_RuntimeError, e.what());
     }
 }
