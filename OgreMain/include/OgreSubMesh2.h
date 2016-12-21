@@ -139,7 +139,8 @@ namespace Ogre {
         const VertexBoneAssignmentVec& getBoneAssignments() { return mBoneAssignments; }
 
         /// Must be called once to compile bone assignments into geometry buffer.
-        //void _compileBoneAssignments(void);
+        /// WARNING: Will destroy LODs.
+        void _compileBoneAssignments(void);
 
         /// Builds mBlendIndexToBoneIndexMap based on mBoneAssignments.
         /// mBlendIndexToBoneIndexMap is necessary for enabling skeletal animation.
