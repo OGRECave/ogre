@@ -87,7 +87,10 @@ namespace Ogre {
             VertexBoneAssignmentVec::iterator itor = first;
 
             while( itor != end && itor->vertexIndex == i )
+            {
                 ++bonesPerVertex;
+                ++itor;
+            }
 
             maxBonesPerVertex = std::max( maxBonesPerVertex, bonesPerVertex );
 
