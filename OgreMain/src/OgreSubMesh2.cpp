@@ -182,8 +182,9 @@ namespace Ogre {
                             readRequests.push_back( VertexArrayObject::ReadRequests(
                                                         itElement->mSemantic ) );
                             newVertexDeclaration.push_back( *itElement );
-                            ++itElement;
                         }
+
+                        ++itElement;
                     }
 
                     ++itor;
