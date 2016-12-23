@@ -9,6 +9,7 @@
 #define SAMPLES_COMMON_INCLUDE_INPUT_H_
 
 #include <OgreBuildSettings.h>
+#include <OgreBitesPrerequisites.h>
 
 #if OGRE_BITES_HAVE_SDL
 #include <SDL.h>
@@ -139,5 +140,29 @@ inline SDL_Keymod SDL_GetModState() {
     return SDL_Keymod();
 }
 #endif
+
+namespace Ogre {
+    struct FrameEvent;
+}
+
+namespace OgreBites {
+/**
+the return values of the callbacks are ignored by ApplicationContext
+however they can be used to control event propagation in a hierarchy
+*/
+struct _OgreBitesExport InputListener {
+    virtual ~InputListener() {}
+    virtual void frameRendered(const Ogre::FrameEvent& evt) { }
+    virtual bool keyPressed(const KeyboardEvent& evt) { return true;}
+    virtual bool keyReleased(const KeyboardEvent& evt) { return true; }
+    virtual bool touchMoved(const TouchFingerEvent& evt) { return true; }
+    virtual bool touchPressed(const TouchFingerEvent& evt) { return true; }
+    virtual bool touchReleased(const TouchFingerEvent& evt) { return true; }
+    virtual bool mouseMoved(const MouseMotionEvent& evt) { return true; }
+    virtual bool mouseWheelRolled(const MouseWheelEvent& evt) { return true; }
+    virtual bool mousePressed(const MouseButtonEvent& evt) { return true; }
+    virtual bool mouseReleased(const MouseButtonEvent& evt) { return true; }
+};
+}
 
 #endif /* SAMPLES_COMMON_INCLUDE_INPUT_H_ */

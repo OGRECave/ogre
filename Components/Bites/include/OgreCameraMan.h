@@ -53,19 +53,17 @@ namespace OgreBites
     /**
     Utility class for controlling the camera in samples.
     */
-    class _OgreBitesExport CameraMan
+    class _OgreBitesExport CameraMan : public InputListener
     {
     public:
         CameraMan(Ogre::Camera* cam);
 
-        virtual ~CameraMan() {}
-
         /**
         Swaps the camera on our camera man for another camera.
         */
-        virtual void setCamera(Ogre::Camera* cam);
+        void setCamera(Ogre::Camera* cam);
 
-        virtual Ogre::Camera* getCamera()
+        Ogre::Camera* getCamera()
         {
             return mCamera;
         }
@@ -75,7 +73,7 @@ namespace OgreBites
         */
         virtual void setTarget(Ogre::SceneNode* target);
 
-        virtual Ogre::SceneNode* getTarget()
+        Ogre::SceneNode* getTarget()
         {
             return mTarget;
         }
@@ -83,17 +81,17 @@ namespace OgreBites
         /**
         Sets the spatial offset from the target. Only applies for orbit style.
         */
-        virtual void setYawPitchDist(Ogre::Radian yaw, Ogre::Radian pitch, Ogre::Real dist);
+        void setYawPitchDist(Ogre::Radian yaw, Ogre::Radian pitch, Ogre::Real dist);
 
         /**
         Sets the camera's top speed. Only applies for free-look style.
         */
-        virtual void setTopSpeed(Ogre::Real topSpeed)
+        void setTopSpeed(Ogre::Real topSpeed)
         {
             mTopSpeed = topSpeed;
         }
 
-        virtual Ogre::Real getTopSpeed()
+        Ogre::Real getTopSpeed()
         {
             return mTopSpeed;
         }
@@ -103,7 +101,7 @@ namespace OgreBites
         */
         virtual void setStyle(CameraStyle style);
 
-        virtual CameraStyle getStyle()
+        CameraStyle getStyle()
         {
             return mStyle;
         }
@@ -111,38 +109,38 @@ namespace OgreBites
         /**
         Manually stops the camera when in free-look mode.
         */
-        virtual void manualStop();
+        void manualStop();
 
-        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+        void frameRendered(const Ogre::FrameEvent& evt);
 
         /**
         Processes key presses for free-look style movement.
         */
-        virtual void injectKeyDown(const KeyboardEvent& evt);
+        bool keyPressed(const KeyboardEvent& evt);
 
         /**
         Processes key releases for free-look style movement.
         */
-        virtual void injectKeyUp(const KeyboardEvent& evt);
+        bool keyReleased(const KeyboardEvent& evt);
 
         /**
         Processes mouse movement differently for each style.
         */
-        virtual void injectMouseMove(const MouseMotionEvent& evt);
+        bool mouseMoved(const MouseMotionEvent& evt);
 
-        virtual void injectMouseWheel(const MouseWheelEvent& evt);
+        bool mouseWheelRolled(const MouseWheelEvent& evt);
 
         /**
         Processes mouse presses. Only applies for orbit style.
         Left button is for orbiting, and right button is for zooming.
         */
-        virtual void injectMouseDown(const MouseButtonEvent& evt);
+        bool mousePressed(const MouseButtonEvent& evt);
 
         /**
         Processes mouse releases. Only applies for orbit style.
         Left button is for orbiting, and right button is for zooming.
         */
-        virtual void injectMouseUp(const MouseButtonEvent& evt);
+        bool mouseReleased(const MouseButtonEvent& evt);
 
     protected:
 

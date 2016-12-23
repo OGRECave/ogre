@@ -3,9 +3,11 @@ import OgreRTShader
 import OgreOverlay
 import OgreBites
 
-class SampleApp(OgreBites.ApplicationContext):
+class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
     def __init__(self):
         OgreBites.ApplicationContext.__init__(self, "PySample", False)
+        OgreBites.InputListener.__init__(self)
+        self.addInputListener(self)
 
     def keyPressed(self, evt):
         if evt.keysym.sym == OgreBites.SDLK_ESCAPE:
@@ -20,6 +22,7 @@ class SampleApp(OgreBites.ApplicationContext):
         Ogre.ResourceGroupManager.getSingleton().initialiseResourceGroup("Essential")
         self.createDummyScene()
         self.trays = OgreBites.TrayManager("Interface", self.getRenderWindow())
+        self.addInputListener(self.trays)
 
         # show loading progress
         self.trays.showLoadingBar(1, 0)
@@ -60,6 +63,7 @@ class SampleApp(OgreBites.ApplicationContext):
         self.camman = OgreBites.CameraMan(cam)
         self.camman.setStyle(OgreBites.CS_ORBIT)
         self.camman.setYawPitchDist(Ogre.Radian(0), Ogre.Radian(0.3), 15)
+        self.addInputListener(self.camman)
 
         vp = self.getRenderWindow().addViewport(cam)
         vp.setBackgroundColour(Ogre.ColourValue(.3, .3, .3))
@@ -67,28 +71,6 @@ class SampleApp(OgreBites.ApplicationContext):
         ent = scn_mgr.createEntity("Sinbad.mesh")
         node = scn_mgr.getRootSceneNode().createChildSceneNode()
         node.attachObject(ent)
-
-    # forward input events to camera manager
-    def mouseMoved(self, evt):
-        self.camman.injectMouseMove(evt)
-        self.trays.injectMouseMove(evt)
-        return True
-
-    def mouseWheelRolled(self, evt):
-        self.camman.injectMouseWheel(evt)
-        return True
-
-    def mousePressed(self, evt):
-        self.camman.injectMouseDown(evt)
-        return True
-
-    def mouseReleased(self, evt):
-        self.camman.injectMouseUp(evt)
-        return True
-
-    def frameRenderingQueued(self, evt):
-        self.trays.frameRenderingQueued(evt)
-        return True
 
 if __name__ == "__main__":
     app = SampleApp()

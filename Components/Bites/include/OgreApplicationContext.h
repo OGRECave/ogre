@@ -120,7 +120,7 @@ namespace OgreBites
             pollEvents();
             return true;
         }
-        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt) { return true; }
+        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
         virtual bool frameEnded(const Ogre::FrameEvent& evt) { return true; }
         virtual void windowMoved(Ogre::RenderWindow* rw) {}
         virtual void windowResized(Ogre::RenderWindow* rw) {}
@@ -129,20 +129,10 @@ namespace OgreBites
         virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
 
         /**
-         * inspect the event and call one of the corresponding functions defined below
+         * inspect the event and call one of the corresponding functions on the registered InputListener
          * @param event Input Event
          */
         void _fireInputEvent(const Event& event);
-
-        virtual bool keyPressed(const KeyboardEvent& evt) { return true; }
-        virtual bool keyReleased(const KeyboardEvent& evt) { return true; }
-        virtual bool touchMoved(const TouchFingerEvent& evt) { return true; }
-        virtual bool touchPressed(const TouchFingerEvent& evt) { return true; }
-        virtual bool touchReleased(const TouchFingerEvent& evt) { return true; }
-        virtual bool mouseMoved(const MouseMotionEvent& evt) { return true; }
-        virtual bool mouseWheelRolled(const MouseWheelEvent& evt) { return true; }
-        virtual bool mousePressed(const MouseButtonEvent& evt) { return true; }
-        virtual bool mouseReleased(const MouseButtonEvent& evt) { return true; }
 
         /**
           Initialize the RT Shader system.
@@ -221,6 +211,16 @@ namespace OgreBites
          * also loads any existing cache
          */
         void enableShaderCache();
+
+        /// attach input listener
+        void addInputListener(InputListener* lis) {
+            mInputListeners.insert(lis);
+        }
+
+        /// detach input listener
+        void removeInputListener(InputListener* lis) {
+            mInputListeners.erase(lis);
+        }
     protected:
 
         /**
@@ -252,6 +252,8 @@ namespace OgreBites
         Ogre::NameValuePairList mLastSampleState;     // state of last sample
         Ogre::RenderWindow* mWindow;    // render window
         SDL_Window* mSDLWindow;
+
+        std::set<InputListener*> mInputListeners;
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*       mShaderGenerator;                       // The Shader generator instance.

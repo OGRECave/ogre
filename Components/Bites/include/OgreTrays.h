@@ -750,7 +750,7 @@ namespace OgreBites
     /**
     Main class to manage a cursor, backdrop, trays and widgets.
     */
-    class _OgreBitesExport TrayManager : public TrayListener, public Ogre::ResourceGroupListener
+    class _OgreBitesExport TrayManager : public TrayListener, public Ogre::ResourceGroupListener, public InputListener
     {
     public:
 
@@ -1093,7 +1093,7 @@ namespace OgreBites
         Process frame events. Updates frame statistics widget set and deletes
         all widgets queued for destruction.
         */
-        bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+        void frameRendered(const Ogre::FrameEvent& evt);
 
         void windowUpdate();
 
@@ -1165,24 +1165,20 @@ namespace OgreBites
         Processes mouse button down events. Returns true if the event was
         consumed and should not be passed on to other handlers.
         */
-        bool injectMouseDown(const MouseButtonEvent& evt);
+        bool mousePressed(const MouseButtonEvent& evt);
 
         /**
         Processes mouse button up events. Returns true if the event was
         consumed and should not be passed on to other handlers.
         */
-        bool injectMouseUp(const MouseButtonEvent& evt);
+        bool mouseReleased(const MouseButtonEvent& evt);
 
         /**
         Updates cursor position. Returns true if the event was
         consumed and should not be passed on to other handlers.
         */
-        bool injectMouseMove(const MouseMotionEvent& evt);
+        bool mouseMoved(const MouseMotionEvent& evt);
 
-        bool injectMouseWheel(const MouseWheelEvent& evt) {
-            // TODO: float wheelDelta = 0;
-            return false;
-        }
     protected:
 
         /**
