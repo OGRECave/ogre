@@ -134,11 +134,6 @@ namespace Ogre {
         }
 
     }
-    //-----------------------------------------------------------------------
-    Node* Node::getParent(void) const
-    {
-        return mParent;
-    }
 
     //-----------------------------------------------------------------------
     void Node::setParent(Node* parent)
@@ -350,11 +345,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    unsigned short Node::numChildren(void) const
-    {
-        return static_cast< unsigned short >( mChildren.size() );
-    }
-    //-----------------------------------------------------------------------
     Node* Node::getChild(unsigned short index) const
     {
         if( index < mChildren.size() )
@@ -408,16 +398,11 @@ namespace Ogre {
         }
         return child;
     }
-    //-----------------------------------------------------------------------
-    const Quaternion& Node::getOrientation() const
-    {
-        return mOrientation;
-    }
 
     //-----------------------------------------------------------------------
     void Node::setOrientation( const Quaternion & q )
     {
-        assert(!q.isNaN() && "Invalid orientation supplied as parameter");
+        OgreAssert(!q.isNaN(), "Invalid orientation supplied as parameter");
         mOrientation = q;
         mOrientation.normalise();
         needUpdate();
@@ -450,11 +435,6 @@ namespace Ogre {
         setPosition(v);
     }
 
-    //-----------------------------------------------------------------------
-    const Vector3 & Node::getPosition(void) const
-    {
-        return mPosition;
-    }
     //-----------------------------------------------------------------------
     Matrix3 Node::getLocalAxes(void) const
     {
@@ -702,11 +682,7 @@ namespace Ogre {
     {
         setScale(Vector3(x, y, z));
     }
-    //-----------------------------------------------------------------------
-    const Vector3 & Node::getScale(void) const
-    {
-        return mScale;
-    }
+
     //-----------------------------------------------------------------------
     void Node::setInheritOrientation(bool inherit)
     {
@@ -714,20 +690,10 @@ namespace Ogre {
         needUpdate();
     }
     //-----------------------------------------------------------------------
-    bool Node::getInheritOrientation(void) const
-    {
-        return mInheritOrientation;
-    }
-    //-----------------------------------------------------------------------
     void Node::setInheritScale(bool inherit)
     {
         mInheritScale = inherit;
         needUpdate();
-    }
-    //-----------------------------------------------------------------------
-    bool Node::getInheritScale(void) const
-    {
-        return mInheritScale;
     }
     //-----------------------------------------------------------------------
     void Node::scale(const Vector3& inScale)
@@ -746,11 +712,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    const String& Node::getName(void) const
-    {
-        return mName;
-    }
-    //-----------------------------------------------------------------------
     void Node::setInitialState(void)
     {
         mInitialPosition = mPosition;
@@ -765,22 +726,6 @@ namespace Ogre {
         mScale = mInitialScale;
 
         needUpdate();
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& Node::getInitialPosition(void) const
-    {
-        return mInitialPosition;
-    }
-    //-----------------------------------------------------------------------
-    const Quaternion& Node::getInitialOrientation(void) const
-    {
-        return mInitialOrientation;
-
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& Node::getInitialScale(void) const
-    {
-        return mInitialScale;
     }
     //-----------------------------------------------------------------------
     Node* Node::getChild(const String& name) const
