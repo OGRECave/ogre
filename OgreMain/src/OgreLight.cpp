@@ -344,11 +344,6 @@ namespace Ogre {
         return mDerivedDirection;
     }
     //-----------------------------------------------------------------------
-    void Light::setVisible(bool visible)
-    {
-        MovableObject::setVisible(visible);
-    }
-    //-----------------------------------------------------------------------
     Vector4 Light::getAs4DVector(bool cameraRelativeIfSet) const
     {
         Vector4 ret;

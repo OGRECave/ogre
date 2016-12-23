@@ -178,11 +178,11 @@ namespace Ogre {
         /** Notify the object of it's creator (internal use only) */
         virtual void _notifyCreator(MovableObjectFactory* fact) { mCreator = fact; }
         /** Get the creator of this object, if any (internal use only) */
-        virtual MovableObjectFactory*  _getCreator(void) const { return mCreator; }
+        MovableObjectFactory*  _getCreator(void) const { return mCreator; }
         /** Notify the object of it's manager (internal use only) */
         virtual void _notifyManager(SceneManager* man) { mManager = man; }
         /** Get the manager of this object, if any (internal use only) */
-        virtual SceneManager* _getManager(void) const { return mManager; }
+        SceneManager* _getManager(void) const { return mManager; }
 
         /** Notifies the movable object that hardware resources were lost
             @remarks
@@ -201,7 +201,7 @@ namespace Ogre {
         virtual void _restoreManualHardwareResources() {}
 
         /** Returns the name of this object. */
-        virtual const String& getName(void) const { return mName; }
+        const String& getName(void) const { return mName; }
 
         /** Returns the type name of this object. */
         virtual const String& getMovableType(void) const = 0;
@@ -212,7 +212,7 @@ namespace Ogre {
             the latter case if it's attached to a bone on an animated entity. 
             Both are Node subclasses so this method will return either.
         */
-        virtual Node* getParentNode(void) const;
+        Node* getParentNode(void) const { return mParentNode; }
 
         /** Returns the scene node to which this object is attached.
         @remarks
@@ -221,20 +221,20 @@ namespace Ogre {
             This method will return the scene node of the parent entity 
             if the latter is true.
         */
-        virtual SceneNode* getParentSceneNode(void) const;
+        SceneNode* getParentSceneNode(void) const;
 
         /// Gets whether the parent node is a TagPoint (or a SceneNode)
-        virtual bool isParentTagPoint() const { return mParentIsTagPoint; }
+        bool isParentTagPoint() const { return mParentIsTagPoint; }
 
         /** Internal method called to notify the object that it has been attached to a node.
         */
         virtual void _notifyAttached(Node* parent, bool isTagPoint = false);
 
         /** Returns true if this object is attached to a SceneNode or TagPoint. */
-        virtual bool isAttached(void) const;
+        bool isAttached(void) const { return (mParentNode != NULL); }
 
         /** Detaches an object from a parent SceneNode or TagPoint, if attached. */
-        virtual void detachFromParent(void);
+        void detachFromParent(void);
 
         /** Returns true if this object is attached to a SceneNode or TagPoint, 
             and this SceneNode / TagPoint is currently in an active part of the
@@ -288,13 +288,13 @@ namespace Ogre {
             changes are best done using this method; large or more longer term
             changes are best done by detaching.
         */
-        virtual void setVisible(bool visible);
+        void setVisible(bool visible) { mVisible = visible; }
 
         /** Gets this object whether to be visible or not, if it has a renderable component. 
         @remarks
             Returns the value set by MovableObject::setVisible only.
         */
-        virtual bool getVisible(void) const;
+        bool getVisible(void) const { return mVisible; }
 
         /** Returns whether or not this object is supposed to be visible or not. 
         @remarks
@@ -307,26 +307,26 @@ namespace Ogre {
         @param dist Distance beyond which the object will not be rendered 
             (the default is 0, which means objects are always rendered).
         */
-        virtual void setRenderingDistance(Real dist) { 
+        void setRenderingDistance(Real dist) {
             mUpperDistance = dist; 
             mSquaredUpperDistance = mUpperDistance * mUpperDistance;
         }
 
         /** Gets the distance at which batches are no longer rendered. */
-        virtual Real getRenderingDistance(void) const { return mUpperDistance; }        
+        Real getRenderingDistance(void) const { return mUpperDistance; }
 
         /** Sets the minimum pixel size an object needs to be in both screen axes in order to be rendered
         @note Camera::setUseMinPixelSize() needs to be called for this parameter to be used.
         @param pixelSize Number of minimum pixels
             (the default is 0, which means objects are always rendered).
         */
-        virtual void setRenderingMinPixelSize(Real pixelSize) { 
+        void setRenderingMinPixelSize(Real pixelSize) {
             mMinPixelSize = pixelSize; 
         }
 
         /** Returns the minimum pixel size an object needs to be in both screen axes in order to be rendered
         */
-        virtual Real getRenderingMinPixelSize() const { 
+        Real getRenderingMinPixelSize() const {
             return mMinPixelSize; 
         }
 
@@ -337,12 +337,12 @@ namespace Ogre {
             this MovableObject. This can be a pointer back to one of your own
             classes for instance.       
         */
-        OGRE_DEPRECATED virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
+        OGRE_DEPRECATED void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
         /** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
             Retrieves the custom user value associated with this object.
         */
-        OGRE_DEPRECATED virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
+        OGRE_DEPRECATED const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
 
         /** Return an instance of user objects binding associated with this class.
         You can use it to associate one or more custom objects with this class instance.
@@ -387,8 +387,10 @@ namespace Ogre {
         */
         virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
-        /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual uint8 getRenderQueueGroup(void) const;
+        /** Gets the queue group for this entity
+        @see setRenderQueueGroup
+        */
+        uint8 getRenderQueueGroup(void) const { return mRenderQueueID; }
 
         /// Return the full transformation of the parent sceneNode or the attachingPoint node
         virtual const Matrix4& _getParentNodeFullTransform(void) const;
@@ -400,18 +402,18 @@ namespace Ogre {
             a bit on these flags is set, will it be included in a query asking for that flag. The
             meaning of the bits is application-specific.
         */
-        virtual void setQueryFlags(uint32 flags) { mQueryFlags = flags; }
+        void setQueryFlags(uint32 flags) { mQueryFlags = flags; }
 
         /** As setQueryFlags, except the flags passed as parameters are appended to the
         existing flags on this object. */
-        virtual void addQueryFlags(uint32 flags) { mQueryFlags |= flags; }
+        void addQueryFlags(uint32 flags) { mQueryFlags |= flags; }
             
         /** As setQueryFlags, except the flags passed as parameters are removed from the
         existing flags on this object. */
-        virtual void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
+        void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
         
         /// Returns the query flags relevant for this object
-        virtual uint32 getQueryFlags(void) const { return mQueryFlags; }
+        uint32 getQueryFlags(void) const { return mQueryFlags; }
 
         /** Set the default query flags for all future MovableObject instances.
         */
@@ -428,18 +430,18 @@ namespace Ogre {
             you can also set visibility flags which when 'and'ed with the SceneManager's
             visibility mask can also make an object invisible.
         */
-        virtual void setVisibilityFlags(uint32 flags) { mVisibilityFlags = flags; }
+        void setVisibilityFlags(uint32 flags) { mVisibilityFlags = flags; }
 
         /** As setVisibilityFlags, except the flags passed as parameters are appended to the
         existing flags on this object. */
-        virtual void addVisibilityFlags(uint32 flags) { mVisibilityFlags |= flags; }
+        void addVisibilityFlags(uint32 flags) { mVisibilityFlags |= flags; }
             
         /** As setVisibilityFlags, except the flags passed as parameters are removed from the
         existing flags on this object. */
-        virtual void removeVisibilityFlags(uint32 flags) { mVisibilityFlags &= ~flags; }
+        void removeVisibilityFlags(uint32 flags) { mVisibilityFlags &= ~flags; }
         
         /// Returns the visibility flags relevant for this object
-        virtual uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
+        uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
 
         /** Set the default visibility flags for all future MovableObject instances.
         */
@@ -454,11 +456,11 @@ namespace Ogre {
             Note for size and performance reasons only one listener per object
             is allowed.
         */
-        virtual void setListener(Listener* listener) { mListener = listener; }
+        void setListener(Listener* listener) { mListener = listener; }
 
         /** Gets the current listener for this object.
         */
-        virtual Listener* getListener(void) const { return mListener; }
+        Listener* getListener(void) const { return mListener; }
 
         /** Gets a list of lights, ordered relative to how close they are to this movable object.
         @remarks
@@ -478,20 +480,20 @@ namespace Ogre {
             the renderable is a part of the movable.
         @return The list of lights use to lighting this object.
         */
-        virtual const LightList& queryLights(void) const;
+        const LightList& queryLights(void) const;
 
         /** Get a bitwise mask which will filter the lights affecting this object
         @remarks
         By default, this mask is fully set meaning all lights will affect this object
         */
-        virtual uint32 getLightMask()const { return mLightMask; }
+        uint32 getLightMask()const { return mLightMask; }
         /** Set a bitwise mask which will filter the lights affecting this object
         @remarks
         This mask will be compared against the mask held against Light to determine
         if a light should affect a given object. 
         By default, this mask is fully set meaning all lights will affect this object
         */
-        virtual void setLightMask(uint32 lightMask);
+        void setLightMask(uint32 lightMask);
 
         /** Returns a pointer to the current list of lights for this object.
         @remarks
@@ -499,7 +501,7 @@ namespace Ogre {
             (say if you want to use it to implement this method, and use the pointer
             as a return value) and for reading it's only accurate as at the last frame.
         */
-        virtual LightList* _getLightList() { return &mLightList; }
+        LightList* _getLightList() { return &mLightList; }
 
         /// Returns details of the edges which might be used to determine a silhouette
         EdgeData* getEdgeList(void) { return NULL; }
@@ -571,9 +573,9 @@ namespace Ogre {
             disables that debug display. Objects that are not visible never display
             debug geometry regardless of this setting.
         */
-        virtual void setDebugDisplayEnabled(bool enabled) { mDebugDisplay = enabled; }
+        void setDebugDisplayEnabled(bool enabled) { mDebugDisplay = enabled; }
         /// Gets whether debug display of this object is enabled. 
-        virtual bool isDebugDisplayEnabled(void) const { return mDebugDisplay; }
+        bool isDebugDisplayEnabled(void) const { return mDebugDisplay; }
 
 
 
@@ -608,7 +610,7 @@ namespace Ogre {
         @param params Name/value pair list of additional parameters required to 
             construct the object (defined per subtype). Optional.
         */
-        virtual MovableObject* createInstance(
+        MovableObject* createInstance(
             const String& name, SceneManager* manager, 
             const NameValuePairList* params = 0);
         /** Destroy an instance of the object */
