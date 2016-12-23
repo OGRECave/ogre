@@ -26,18 +26,20 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreEXRCodec.h"
+#include "OgreEXRCodecExports.h"
+
 
 namespace Ogre {
 #ifndef OGRE_STATIC_LIB
     Codec *mEXRCodec;
     
     //-----------------------------------------------------------------------
-    extern "C" void dllStartPlugin(void)
+    extern "C" _OgreEXRPluginExport void dllStartPlugin(void)
     {
         mEXRCodec = new EXRCodec;
         Codec::registerCodec( mEXRCodec );
     }
-    extern "C" void dllStopPlugin(void)
+    extern "C" _OgreEXRPluginExport void dllStopPlugin(void)
     {
         Codec::unregisterCodec( mEXRCodec );
         delete mEXRCodec;
