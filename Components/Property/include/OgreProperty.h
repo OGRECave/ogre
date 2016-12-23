@@ -140,6 +140,8 @@ namespace Ogre
         PROP_UNKNOWN = 999
     };
 
+    typedef GeneralAllocatedObject PropertyAlloc;
+
     /** Definition of a property of an object.
     @remarks
     This definition is shared between all instances of an object and therefore

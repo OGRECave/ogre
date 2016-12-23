@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    class GLPBuffer;
+
     /** \addtogroup RenderSystems RenderSystems
     *  @{
     */

@@ -415,6 +415,8 @@ namespace Ogre
         */
         void loadResource(Resource* resource);
     };
+
+    typedef SharedPtr<Font> FontPtr;
     /** @} */
     /** @} */
 }

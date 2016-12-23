@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreRenderWindow.h"
 
 namespace Ogre {
+    class GLContext;
 
     class _OgreGLExport GLRenderSystemCommon : public RenderSystem
     {

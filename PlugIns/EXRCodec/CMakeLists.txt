@@ -7,14 +7,17 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" ${CMAKE_BINARY_DIR}/include/OgreEXRCodecExports.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(SYSTEM ${OPENEXR_INCLUDE_DIR}/OpenEXR)
 
 ogre_add_library_to_folder(Plugins Plugin_EXRCodec ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(Plugin_EXRCodec OgreMain ${Cg_LIBRARIES})
+target_link_libraries(Plugin_EXRCodec OgreMain ${OPENEXR_LIBRARIES})
 ogre_config_framework(Plugin_EXRCodec)
 ogre_config_plugin(Plugin_EXRCodec)
+generate_export_header(Plugin_EXRCodec 
+    EXPORT_MACRO_NAME _OgreEXRPluginExport
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreEXRCodecExports.h)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/EXRCodec)

@@ -35,7 +35,8 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 
 namespace Ogre {
-
+    class OverlayContainer;
+    class OverlayElement;
 
     /** \addtogroup Optional
     *  @{

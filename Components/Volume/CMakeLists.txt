@@ -14,11 +14,8 @@
 PROJECT(OgreVolume)
 
 # define header and source files for the library
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" ${CMAKE_BINARY_DIR}/include/OgreVolumePrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-
-# Add needed definitions 
-add_definitions(-DOGRE_VOLUME_EXPORTS)
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -32,6 +29,9 @@ if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreVolume ${OGRE_THREAD_LIBRARIES})
 endif ()
 
+generate_export_header(OgreVolume 
+    EXPORT_MACRO_NAME _OgreVolumeExport
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreVolumePrerequisites.h)
 
 # install 
 ogre_config_framework(OgreVolume)
@@ -40,4 +40,3 @@ ogre_config_component(OgreVolume)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Volume
 )
-

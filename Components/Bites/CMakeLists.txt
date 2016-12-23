@@ -61,7 +61,7 @@ if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
 endif ()
 
 # define header and source files for the library
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" ${CMAKE_BINARY_DIR}/include/OgreBitesPrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 # include headers
@@ -73,6 +73,10 @@ ogre_add_component_include_dir(Overlay)
 ogre_add_library_to_folder(Components OgreBites ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreBites PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreBites OgreMain OgreOverlay ${DEPENDENCIES})
+
+generate_export_header(OgreBites 
+    EXPORT_MACRO_NAME _OgreBitesExport
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreBitesPrerequisites.h)
 
 # install 
 ogre_config_framework(OgreBites)

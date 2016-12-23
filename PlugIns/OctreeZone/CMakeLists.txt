@@ -9,19 +9,18 @@
 
 # Configure OctreeZone SceneManager build
 
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" ${CMAKE_BINARY_DIR}/include/OgreOctreeZonePrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../PCZSceneManager/include)
-add_definitions(-D_USRDLL)
 
 ogre_add_library_to_folder(Plugins Plugin_OctreeZone ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(Plugin_OctreeZone OgreMain Plugin_PCZSceneManager)
-if (NOT OGRE_STATIC)
-  set_property(TARGET Plugin_OctreeZone PROPERTY
-    COMPILE_DEFINITIONS OGRE_OCTREEZONEPLUGIN_EXPORTS)
-endif ()
+
+generate_export_header(Plugin_OctreeZone 
+    EXPORT_MACRO_NAME _OgreOctreeZonePluginExport
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreOctreeZonePrerequisites.h)
 
 # need to include the plugins directory in the RPATH for OctreeZone to be able
 # to find the PCZSceneManager library
