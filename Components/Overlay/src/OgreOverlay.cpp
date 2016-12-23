@@ -70,12 +70,12 @@ namespace v1 {
     //---------------------------------------------------------------------
     void Overlay::setZOrder( uint16 zorder )
     {
-        mObjectData.mDistanceToCamera[mObjectData.mIndex] = zorder;
+        mObjectData.mDistanceToCamera[mObjectData.mIndex] = zorder << (32u - RqBits::DepthBits);
     }
     //---------------------------------------------------------------------
     uint16 Overlay::getZOrder(void) const
     {
-        return (uint16)mObjectData.mDistanceToCamera[mObjectData.mIndex];
+        return (uint16)(mObjectData.mDistanceToCamera[mObjectData.mIndex] >> (32u - RqBits::DepthBits));
     }
     //---------------------------------------------------------------------
     void Overlay::show(void)
