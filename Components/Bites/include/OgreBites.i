@@ -44,10 +44,11 @@
 %include "SDL_events.h"
 #endif
 
-%include "OgreInput.h"
 %include "OgreSGTechniqueResolverListener.h"
+%feature("director") OgreBites::ApplicationContext;
+%feature("director") OgreBites::InputListener;
+%include "OgreInput.h"
+%include "OgreApplicationContext.h"
 %include "OgreCameraMan.h"
 %include "OgreWindowEventUtilities.h"
-%feature("director") OgreBites::ApplicationContext;
-%include "OgreApplicationContext.h"
 %include "OgreTrays.h"

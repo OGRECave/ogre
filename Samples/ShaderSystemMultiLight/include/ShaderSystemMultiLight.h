@@ -326,7 +326,7 @@ protected:
 
     bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectMouseDown(evt)) 
+        if (mTrayMgr->mousePressed(evt)) 
             return true;
         if (evt.button == BUTTON_LEFT)
             // Hide the cursor if user left-clicks in the scene            .
@@ -338,7 +338,7 @@ protected:
 
     bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectMouseUp(evt)) 
+        if (mTrayMgr->mouseReleased(evt)) 
             return true;
         if (evt.button == BUTTON_LEFT)
             // Unhide the cursor if user lets go of LMB.
@@ -352,9 +352,9 @@ protected:
     {
         // only rotate the camera if cursor is hidden
         if (mTrayMgr->isCursorVisible()) 
-            mTrayMgr->injectMouseMove(evt);
+            mTrayMgr->mouseMoved(evt);
         else 
-            mCameraMan->injectMouseMove(evt);
+            mCameraMan->mouseMoved(evt);
 
         return true;
     }

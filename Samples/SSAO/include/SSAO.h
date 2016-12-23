@@ -746,7 +746,7 @@ protected:
     /** @see Sample::pointerPressed. */
     bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectMouseDown(evt)) 
+        if (mTrayMgr->mousePressed(evt)) 
             return true;
         if (evt.button == BUTTON_LEFT)     
             mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
@@ -757,7 +757,7 @@ protected:
     /** @see Sample::mouseReleased. */
     bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectMouseUp(evt)) 
+        if (mTrayMgr->mouseReleased(evt)) 
             return true;
         if (evt.button == BUTTON_LEFT) 
             mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
@@ -770,10 +770,10 @@ protected:
     {
         // only rotate the camera if cursor is hidden
         if (mTrayMgr->isCursorVisible())
-            mTrayMgr->injectMouseMove(evt);
+            mTrayMgr->mouseMoved(evt);
         else 
         {
-            mCameraMan->injectMouseMove(evt);
+            mCameraMan->mouseMoved(evt);
             static_cast<SelectMenu*>(mTrayMgr->getWidget(SSAO_CAMERA_MENU_NAME))->selectItem(SSAO_USER_CAMERA_ITEM);
         }
         

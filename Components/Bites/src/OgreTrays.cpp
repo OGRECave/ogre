@@ -1943,7 +1943,7 @@ void TrayManager::clearAllTrays()
     }
 }
 
-bool TrayManager::frameRenderingQueued(const Ogre::FrameEvent &evt)
+void TrayManager::frameRendered(const Ogre::FrameEvent &evt)
 {
     for (unsigned int i = 0; i < mWidgetDeathRow.size(); i++)
     {
@@ -1993,8 +1993,6 @@ bool TrayManager::frameRenderingQueued(const Ogre::FrameEvent &evt)
             mStatsPanel->setAllParamValues(values);
         }
     }
-
-    return true;
 }
 
 void TrayManager::windowUpdate()
@@ -2030,7 +2028,7 @@ void TrayManager::buttonHit(Button *button)
     closeDialog();
 }
 
-bool TrayManager::injectMouseDown(const MouseButtonEvent &evt)
+bool TrayManager::mousePressed(const MouseButtonEvent &evt)
 {
     // Only process mouse buttons when stuff is visible.
     if (!mCursorLayer->isVisible() || evt.button != BUTTON_LEFT) return false;
@@ -2104,7 +2102,7 @@ bool TrayManager::injectMouseDown(const MouseButtonEvent &evt)
     return true;   // a tray click is not to be handled by another party
 }
 
-bool TrayManager::injectMouseUp(const MouseButtonEvent &evt)
+bool TrayManager::mouseReleased(const MouseButtonEvent &evt)
 {
     // Only process mouse buttons when stuff is visible.
     if (!mCursorLayer->isVisible() || evt.button != BUTTON_LEFT) return false;
@@ -2150,7 +2148,7 @@ bool TrayManager::injectMouseUp(const MouseButtonEvent &evt)
     return true;         // this click did originate in this tray, so don't pass it on
 }
 
-bool TrayManager::injectMouseMove(const MouseMotionEvent &evt)
+bool TrayManager::mouseMoved(const MouseMotionEvent &evt)
 {
     if (!mCursorLayer->isVisible()) return false;   // don't process if cursor layer is invisible
 

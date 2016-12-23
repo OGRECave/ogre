@@ -101,11 +101,11 @@ namespace OgreBites
 
         virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt)
         {
-            mTrayMgr->frameRenderingQueued(evt);
+            mTrayMgr->frameRendered(evt);
 
             if (!mTrayMgr->isDialogVisible())
             {
-                mCameraMan->frameRenderingQueued(evt);   // if dialog isn't up, then update the camera
+                mCameraMan->frameRendered(evt);   // if dialog isn't up, then update the camera
 
                 if (mDetailsPanel->isVisible())   // if details panel is visible, then update its contents
                 {
@@ -333,13 +333,13 @@ namespace OgreBites
             }
 #endif // OGRE_PROFILING
 
-            mCameraMan->injectKeyDown(evt);
+            mCameraMan->keyPressed(evt);
             return true;
         }
 
         virtual bool keyReleased(const KeyboardEvent& evt)
         {
-            mCameraMan->injectKeyUp(evt);
+            mCameraMan->keyReleased(evt);
 
             return true;
         }
@@ -349,9 +349,9 @@ namespace OgreBites
         If the tray manager handler returns true, the event was meant for the trays, not you. */
         virtual bool mouseMoved(const MouseMotionEvent& evt)
         {
-            if (mTrayMgr->injectMouseMove(evt)) return true;
+            if (mTrayMgr->mouseMoved(evt)) return true;
 
-            mCameraMan->injectMouseMove(evt);
+            mCameraMan->mouseMoved(evt);
             return true;
         }
 
@@ -365,7 +365,7 @@ namespace OgreBites
 
         virtual bool mousePressed(const MouseButtonEvent& evt)
         {
-            if (mTrayMgr->injectMouseDown(evt)) return true;
+            if (mTrayMgr->mousePressed(evt)) return true;
 
             if (mDragLook && evt.button == BUTTON_LEFT)
             {
@@ -373,7 +373,7 @@ namespace OgreBites
                 mTrayMgr->hideCursor();
             }
 
-            mCameraMan->injectMouseDown(evt);
+            mCameraMan->mousePressed(evt);
             return true;
         }
 
@@ -386,7 +386,7 @@ namespace OgreBites
 
         virtual bool mouseReleased(const MouseButtonEvent& evt)
         {
-            if (mTrayMgr->injectMouseUp(evt)) return true;
+            if (mTrayMgr->mouseReleased(evt)) return true;
 
             if (mDragLook && evt.button == BUTTON_LEFT)
             {
@@ -394,7 +394,7 @@ namespace OgreBites
                 mTrayMgr->showCursor();
             }
 
-            mCameraMan->injectMouseUp(evt);
+            mCameraMan->mouseReleased(evt);
             return true;
         }
 
@@ -406,9 +406,7 @@ namespace OgreBites
         }
 
         virtual bool mouseWheelRolled(const MouseWheelEvent& evt) {
-            if (mTrayMgr->injectMouseWheel(evt)) return true;
-
-            mCameraMan->injectMouseWheel(evt);
+            mCameraMan->mouseWheelRolled(evt);
             return true;
         }
 
