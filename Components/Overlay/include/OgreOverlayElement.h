@@ -37,6 +37,9 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 
 namespace Ogre {
+    class Overlay;
+    class OverlayContainer;
+
     /** \addtogroup Optional
     *  @{
     */

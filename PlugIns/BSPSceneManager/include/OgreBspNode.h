@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreSceneQuery.h"
 
 namespace Ogre {
+    class BspLevel;
+
     /** \addtogroup Plugins
     *  @{
     */
