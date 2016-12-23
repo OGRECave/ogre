@@ -112,6 +112,8 @@ namespace Ogre
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
+    const IdString HlmsBaseProp::PrePass            = IdString( "hlms_prepass" );
+    const IdString HlmsBaseProp::UsePrePass         = IdString( "hlms_use_prepass" );
     const IdString HlmsBaseProp::EnableVpls         = IdString( "hlms_enable_vpls" );
     const IdString HlmsBaseProp::ForwardPlus        = IdString( "hlms_forwardplus" );
     const IdString HlmsBaseProp::ForwardPlusFlipY   = IdString( "hlms_forwardplus_flipY" );
@@ -2221,6 +2223,14 @@ namespace Ogre
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         setProperty( HlmsBaseProp::RenderDepthOnly,
                      renderTarget->getForceDisableColourWrites() ? 1 : 0 );
+
+        if( sceneManager->getCurrentPrePassMode() == PrePassCreate )
+            setProperty( HlmsBaseProp::PrePass, 1 );
+        else if( sceneManager->getCurrentPrePassMode() == PrePassUse )
+        {
+            setProperty( HlmsBaseProp::UsePrePass, 1 );
+            setProperty( HlmsBaseProp::VPos, 1 );
+        }
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 

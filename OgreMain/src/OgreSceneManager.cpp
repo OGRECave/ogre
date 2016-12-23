@@ -95,6 +95,8 @@ SceneManager::SceneManager(const String& name, size_t numWorkerThreads,
                            InstancingThreadedCullingMethod threadedCullingMethod) :
 mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
+mPrePassMode( PrePassNone ),
+mPrePassTextures( 0 ),
 mName(name),
 mRenderQueue( 0 ),
 mForwardPlusSystem( 0 ),
@@ -888,6 +890,12 @@ void SceneManager::_setForwardPlusEnabledInPass( bool bEnable )
         mForwardPlusImpl = mForwardPlusSystem;
     else
         mForwardPlusImpl = 0;
+}
+//-----------------------------------------------------------------------
+void SceneManager::_setPrePassMode( PrePassMode mode, const TextureVec *prepassTextures )
+{
+    mPrePassMode = mode;
+    mPrePassTextures = prepassTextures;
 }
 //-----------------------------------------------------------------------
 void SceneManager::prepareRenderQueue(void)

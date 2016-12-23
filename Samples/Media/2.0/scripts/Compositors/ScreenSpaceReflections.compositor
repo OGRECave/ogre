@@ -1,0 +1,66 @@
+compositor_node ScreenSpaceReflectionsRenderingNode
+{
+	in 0 rt_renderwindow
+
+	texture myMrt target_width target_height PF_A2R10G10B10 PF_SHORT_GR
+
+	target myMrt
+	{
+		pass clear
+		{
+			colour_value 0 0 1 1
+		}
+
+		pass render_scene
+		{
+			overlays	off
+			shadows		ScreenSpaceReflectionsShadowNode
+
+			is_prepass	on
+		}
+	}
+
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		pass render_scene
+		{
+			overlays	on
+			shadows		ScreenSpaceReflectionsShadowNode
+
+			//use_prepass		myMrt
+			lod_update_list		false
+		}
+	}
+}
+
+compositor_node_shadow ScreenSpaceReflectionsShadowNode
+{
+	technique pssm
+
+	num_splits		3
+	pssm_lambda		0.95
+	shadow_map 0 2048 2048 PF_D32_FLOAT light 0 split 0
+	shadow_map 1 1024 1024 PF_D32_FLOAT light 0 split 1
+	shadow_map 2 1024 1024 PF_D32_FLOAT light 0 split 2
+
+	shadow_map 0 1 2
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+		pass render_scene
+		{
+		}
+	}
+}
+
+workspace ScreenSpaceReflectionsWorkspace
+{
+	connect_output ScreenSpaceReflectionsRenderingNode 0
+}

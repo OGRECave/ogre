@@ -6399,7 +6399,8 @@ namespace Ogre{
                     PixelFormat format = PixelUtil::getFormatFromName(atom->value, false);
                     if (format == PF_UNKNOWN)
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                           "Unrecognized PixelFormat");
                         return;
                     }
                     formats.push_back(format);
@@ -8426,6 +8427,50 @@ namespace Ogre{
                         if( !getBoolean( *it0, &passScene->mEnableForwardPlus ) )
                         {
                              compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_IS_PREPASS:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        bool createPrePass = false;
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getBoolean( *it0, &createPrePass ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        }
+                        else if( createPrePass )
+                        {
+                            passScene->mPrePassMode = PrePassCreate;
+                        }
+                    }
+                    break;
+                case ID_USE_PREPASS:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "use_prepass only supports 1 argument: the texture's name");
+                    }
+                    else
+                    {
+                        IdString val;
+                        if( !getIdString(prop->values.front(), &val) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "use_prepass must be the name of a texture available in the local or global scope");
+                        }
+                        else
+                        {
+                            passScene->setUseDepthPrePass( val );
                         }
                     }
                     break;
