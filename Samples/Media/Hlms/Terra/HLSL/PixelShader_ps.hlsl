@@ -33,7 +33,7 @@ SamplerState terrainShadowsSamplerState : register(s2);
 
 @property( !hlms_shadowcaster )
 
-@property( hlms_forward3d )
+@property( hlms_forwardplus )
 Buffer<uint> f3dGrid : register(t3);
 Buffer<float4> f3dLightList : register(t4);@end
 
@@ -268,7 +268,7 @@ float3 qmul( float4 q, float3 v )
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forwardplus )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 
