@@ -34,14 +34,14 @@
 		float f3dNumSlicesSub1	= pass.f3dData.z;
 
 		// See C++'s ForwardClustered::getSliceAtDepth
-		float fSlice = log2( max( -inPs.pos.z - f3dMinDistance, 1 ) ) * f3dInvExponentK;
+		float fSlice = log2( max( -inPs.pos.z - f3dMinDistance, 1.0 ) ) * f3dInvExponentK;
 		fSlice = floor( min( fSlice, f3dNumSlicesSub1 ) );
 		uint sliceSkip = uint( fSlice * @value( fwd_clustered_width_x_height ) );
 
 		uint sampleOffset = sliceSkip +
-							uint(floor( gl_FragCoord.x * pass.fwdScreenToGrid.x ));
+							uint(floor( inPs.gl_FragCoord.x * pass.fwdScreenToGrid.x ));
 		float windowHeight = pass.f3dData.w; //renderTarget->height
-		sampleOffset += uint(floor( (windowHeight - gl_FragCoord.y) * pass.fwdScreenToGrid.y ) *
+		sampleOffset += uint(floor( (windowHeight - inPs.gl_FragCoord.y) * pass.fwdScreenToGrid.y ) *
 							 @value( fwd_clustered_width ));
 
 		sampleOffset *= @value( fwd_clustered_lights_per_cell )u;
