@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreGLSupportPrerequisites.h"
 
 namespace Ogre {
+    class GLContext;
+
     /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
         convience, but the component format is configurable.
     */

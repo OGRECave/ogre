@@ -76,7 +76,7 @@ elseif (UNIX)
   endif()
 endif ()
 
-file(GLOB GLSUPPORT_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB GLSUPPORT_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" ${CMAKE_BINARY_DIR}/include/OgreGLSupportPrerequisites.h)
 set(GLSUPPORT_HEADERS ${GLSUPPORT_HEADERS} PARENT_SCOPE)
 set(GLSUPPORT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/  ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/ PARENT_SCOPE)
 
@@ -84,6 +84,9 @@ include_directories(${NATIVE_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${CM
 file(GLOB GLSL_SOURCES src/GLSL/*.cpp)
 ogre_add_library(OgreGLSupport STATIC ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES} src/OgreGLRenderSystemCommon.cpp)
 target_link_libraries(OgreGLSupport OgreMain ${PLATFORM_LIBS})
+generate_export_header(OgreGLSupport 
+    EXPORT_MACRO_NAME _OgreGLExport
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreGLSupportPrerequisites.h)
 
 if (APPLE)
     set_target_properties(OgreGLSupport PROPERTIES LINK_FLAGS "-framework Cocoa -framework OpenGL")

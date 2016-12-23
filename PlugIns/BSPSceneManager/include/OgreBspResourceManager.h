@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 
 namespace Ogre {
+    class Quake3ShaderManager;
+
     /** \addtogroup Plugins
     *  @{
     */

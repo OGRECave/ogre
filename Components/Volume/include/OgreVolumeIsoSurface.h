@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __Ogre_Volume_IsoSurface_H__
 
 #include "OgreVolumePrerequisites.h"
+#include "OgrePrerequisites.h"
 
 namespace Ogre {
 namespace Volume {

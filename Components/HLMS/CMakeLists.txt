@@ -14,7 +14,7 @@
 PROJECT(OgreHLMS)
 
 # define header and source files for the library
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" ${CMAKE_BINARY_DIR}/include/OgreHlmsPrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 # Add needed definitions 
@@ -31,6 +31,10 @@ target_link_libraries(OgreHLMS OgreMain)
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreHLMS ${OGRE_THREAD_LIBRARIES})
 endif ()
+
+generate_export_header(OgreHLMS 
+    EXPORT_MACRO_NAME _OgreHlmsExport
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreHlmsPrerequisites.h)
 
 # install 
 ogre_config_framework(OgreHLMS)

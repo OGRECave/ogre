@@ -38,6 +38,8 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
+    class OverlayManager;
+    class FontManager;
 
     /** \addtogroup Optional
     *  @{

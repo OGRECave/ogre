@@ -33,6 +33,9 @@ THE SOFTWARE.
 #include "OgreProfiler.h"
 
 namespace Ogre  {
+    class Overlay;
+    class OverlayContainer;
+    class OverlayElement;
 
     /** \addtogroup Optional
     *  @{

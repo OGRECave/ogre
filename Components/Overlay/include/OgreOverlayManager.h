@@ -35,6 +35,10 @@ THE SOFTWARE.
 #include "OgreFrustum.h"
 
 namespace Ogre {
+    class Overlay;
+    class OverlayContainer;
+    class OverlayElement;
+    class OverlayElementFactory;
 
     /** \addtogroup Optional
     *  @{

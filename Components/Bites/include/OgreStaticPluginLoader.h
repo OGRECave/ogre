@@ -22,7 +22,7 @@ Description: Utility class to load plugins statically
 #define __StaticPluginLoader_H__
 
 #include "OgreBitesPrerequisites.h"
-
+#include "OgrePrerequisites.h"
 
 namespace OgreBites
 {

@@ -16,15 +16,12 @@ PROJECT(OgreProperty)
 # define header and source files for the library
 set (HEADER_FILES
 	include/OgreProperty.h
-	include/OgrePropertyPrerequisites.h
+	${CMAKE_BINARY_DIR}/include/OgrePropertyPrerequisites.h
 )
 
 set (SOURCE_FILES
 	src/OgreProperty.cpp
 )
-
-# Add needed definitions 
-add_definitions(-DOGRE_PROPERTY_EXPORTS)
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -39,6 +36,10 @@ ogre_add_library_to_folder(Components OgreProperty ${OGRE_COMP_LIB_TYPE} ${HEADE
 set_target_properties(OgreProperty PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreProperty OgreMain)
 
+generate_export_header(OgreProperty 
+    EXPORT_MACRO_NAME _OgrePropertyExport
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgrePropertyPrerequisites.h)
+
 # install 
 ogre_config_framework(OgreProperty)
 ogre_config_component(OgreProperty)
@@ -46,4 +47,3 @@ ogre_config_component(OgreProperty)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Property
 )
-
