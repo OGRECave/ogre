@@ -48,7 +48,7 @@ namespace Ogre
                 mCamera( 0 ),
                 mLodCamera( 0 ),
                 mUpdateShadowNode( false ),
-                mPrePassTexture( 0 )
+                mPrePassTextures( 0 )
     {
         CompositorWorkspace *workspace = parentNode->getWorkspace();
 
@@ -73,8 +73,12 @@ namespace Ogre
         else
             mLodCamera = mCamera;
 
-        if( mDefinition->mPrePassTexture != IdString() )
-            mPrePassTexture = parentNode->_getDefinedTexture( mDefinition->mPrePassTexture );
+        if( mDefinition->mPrePassMode == PrePassUse && mDefinition->mPrePassTexture != IdString() )
+        {
+            const CompositorChannel *channel = parentNode->_getDefinedTexture(
+                        mDefinition->mPrePassTexture );
+            mPrePassTextures = &channel->textures;
+        }
     }
     //-----------------------------------------------------------------------------------
     CompositorPassScene::~CompositorPassScene()
@@ -160,7 +164,7 @@ namespace Ogre
             mTarget->_beginUpdate();
         }
         sceneManager->_setForwardPlusEnabledInPass( mDefinition->mEnableForwardPlus );
-        sceneManager->_setPrePassMode( mDefinition->mPrePassMode, &mPrePassTexture->textures );
+        sceneManager->_setPrePassMode( mDefinition->mPrePassMode, mPrePassTextures );
 
         mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
                                              mDefinition->mFirstRQ, mDefinition->mLastRQ );

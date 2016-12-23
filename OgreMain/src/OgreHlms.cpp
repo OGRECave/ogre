@@ -449,8 +449,15 @@ namespace Ogre
         else
         {
             syntaxError = true;
+
+            char tmpData[64];
+            memset( tmpData, 0, sizeof(tmpData) );
+            strncpy( tmpData, &(*outSubString.begin()),
+                     std::min<size_t>( 63u, outSubString.getSize() ) );
+
             printf( "Syntax Error at line %lu: start block (e.g. @foreach; @property) "
-                    "without matching @end\n", calculateLineCount( outSubString ) );
+                    "without matching @end\nNear: '%s'\n", calculateLineCount( outSubString ),
+                    tmpData );
         }
     }
     //-----------------------------------------------------------------------------------

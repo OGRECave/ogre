@@ -66,7 +66,7 @@ namespace Ogre
         Camera                  *mLodCamera;
         bool                    mUpdateShadowNode;
 
-        CompositorChannel const *mPrePassTexture;
+        TextureVec const        *mPrePassTextures;
 
     public:
         /** Constructor

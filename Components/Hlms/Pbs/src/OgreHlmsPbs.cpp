@@ -208,6 +208,7 @@ namespace Ogre
         mGridBuffer( 0 ),
         mGlobalLightListBuffer( 0 ),
         mTexUnitSlotStart( 0 ),
+        mPrePassTextures( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
         mShadowFilter( PCF_3x3 ),
@@ -298,6 +299,12 @@ namespace Ogre
                 psParams->setNamedConstant( "f3dGrid",      1 );
                 psParams->setNamedConstant( "f3dLightList", 2 );
                 texUnit += 2;
+            }
+
+            if( mPrePassTextures )
+            {
+                psParams->setNamedConstant( "gBuf_normals",         texUnit++ );
+                psParams->setNamedConstant( "gBuf_shadowRoughness", texUnit++ );
             }
 
             if( !mPreparedPass.shadowMaps.empty() )
@@ -715,6 +722,9 @@ namespace Ogre
         }
 
         mTargetEnvMap.setNull();
+
+        mPrePassTextures = sceneManager->getCurrentPrePassTextures();
+        assert( !mPrePassTextures || mPrePassTextures->size() == 2u );
 
         AmbientLightMode ambientMode = mAmbientLightMode;
         ColourValue upperHemisphere = sceneManager->getAmbientLightUpperHemisphere();
@@ -1168,6 +1178,8 @@ namespace Ogre
             mTexUnitSlotStart += 2;
         if( mParallaxCorrectedCubemap )
             mTexUnitSlotStart += 1;
+        if( mPrePassTextures )
+            mTexUnitSlotStart += 2;
 
         uploadDirtyDatablocks();
 
@@ -1234,6 +1246,14 @@ namespace Ogre
                             CbShaderBuffer( PixelShader, 1, mGridBuffer, 0, 0 );
                     *commandBuffer->addCommand<CbShaderBuffer>() =
                             CbShaderBuffer( PixelShader, 2, mGlobalLightListBuffer, 0, 0 );
+                }
+
+                if( mPrePassTextures )
+                {
+                    *commandBuffer->addCommand<CbTexture>() =
+                            CbTexture( texUnit++, true, (*mPrePassTextures)[0].get(), 0 );
+                    *commandBuffer->addCommand<CbTexture>() =
+                            CbTexture( texUnit++, true, (*mPrePassTextures)[1].get(), 0 );
                 }
 
                 //We changed HlmsType, rebind the shared textures.

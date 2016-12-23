@@ -23,7 +23,7 @@ layout(std140) uniform;
 	@property( !hlms_use_prepass_msaa )
 		uniform sampler2D gBuf_normals;
 		uniform sampler2D gBuf_shadowRoughness;
-	@property( hlms_use_prepass_msaa )
+	@end @property( hlms_use_prepass_msaa )
 		uniform sampler2DMS gBuf_normals;
 		uniform sampler2DMS gBuf_shadowRoughness;
 	@end
@@ -358,7 +358,7 @@ void main()
 	float fShadow = shadowRoughness.x;
 
 	@property( roughness_map )
-		ROUGHNESS = shadowRoughness.y; //ROUGHNESS is a constant otherwise
+		ROUGHNESS = shadowRoughness.y; /// ROUGHNESS is a constant otherwise
 	@end
 @end
 
