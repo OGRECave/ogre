@@ -148,11 +148,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Node* MovableObject::getParentNode(void) const
-    {
-        return mParentNode;
-    }
-    //-----------------------------------------------------------------------
     SceneNode* MovableObject::getParentSceneNode(void) const
     {
         if (mParentIsTagPoint)
@@ -164,12 +159,6 @@ namespace Ogre {
         {
             return static_cast<SceneNode*>(mParentNode);
         }
-    }
-    //-----------------------------------------------------------------------
-    bool MovableObject::isAttached(void) const
-    {
-        return (mParentNode != 0);
-
     }
     //---------------------------------------------------------------------
     void MovableObject::detachFromParent(void)
@@ -221,16 +210,6 @@ namespace Ogre {
         {
             mListener->objectMoved(this);
         }
-    }
-    //-----------------------------------------------------------------------
-    void MovableObject::setVisible(bool visible)
-    {
-        mVisible = visible;
-    }
-    //-----------------------------------------------------------------------
-    bool MovableObject::getVisible(void) const
-    {
-        return mVisible;
     }
     //-----------------------------------------------------------------------
     bool MovableObject::isVisible(void) const
@@ -332,11 +311,6 @@ namespace Ogre {
 
     }
 
-    //-----------------------------------------------------------------------
-    uint8 MovableObject::getRenderQueueGroup(void) const
-    {
-        return mRenderQueueID;
-    }
     //-----------------------------------------------------------------------
     const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
     {
