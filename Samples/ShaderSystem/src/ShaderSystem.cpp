@@ -436,10 +436,6 @@ void Sample_ShaderSystem::setupContent()
 
     // Make this viewport work with shader generator scheme.
     mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-    // Mark system as on.
-    mDetailsPanel->setParamValue(11, "On");
-
     
     // a friendly reminder
     StringVector names;
