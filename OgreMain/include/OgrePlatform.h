@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __Platform_H_
 
 #include "OgreConfig.h"
+#include "OgreExports.h"
 
 namespace Ogre {
 /* Initial platform/compiler-related stuff to set.
@@ -178,38 +179,10 @@ namespace Ogre {
 #define OGRE_QUOTE(x) OGRE_QUOTE_INPLACE(x)
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
 
-// For marking functions as deprecated
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#   define OGRE_DEPRECATED __declspec(deprecated)
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
-#   define OGRE_DEPRECATED __attribute__ ((deprecated))
-#else
-#   pragma message("WARNING: You need to implement OGRE_DEPRECATED for this compiler")
-#   define OGRE_DEPRECATED
-#endif
-
 //----------------------------------------------------------------------------
 // Windows Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
-// If we're not including this from a client build, specify that the stuff
-// should get exported. Otherwise, import it.
-#   if defined( OGRE_STATIC_LIB )
-        // Linux compilers don't have symbol import/export directives.
-#       define _OgreExport
-#       define _OgrePrivate
-#   else
-#       if defined( OGRE_NONCLIENT_BUILD )
-#           define _OgreExport __declspec( dllexport )
-#       else
-#           if defined( __MINGW32__ )
-#               define _OgreExport
-#           else
-#               define _OgreExport __declspec( dllimport )
-#           endif
-#       endif
-#       define _OgrePrivate
-#   endif
 // Win32 compilers use _DEBUG for specifying debug builds.
 // for MinGW, we set DEBUG
 #   if defined(_DEBUG) || defined(DEBUG)
@@ -247,15 +220,6 @@ namespace Ogre {
 // Linux/Apple/iOS/Android/NaCl/Emscripten Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
     OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-
-// Enable GCC symbol visibility
-#   if defined( OGRE_GCC_VISIBILITY )
-#       define _OgreExport  __attribute__ ((visibility("default")))
-#       define _OgrePrivate __attribute__ ((visibility("hidden")))
-#   else
-#       define _OgreExport
-#       define _OgrePrivate
-#   endif
 
 // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
