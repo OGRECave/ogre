@@ -17,7 +17,9 @@ include(PrecompiledHeader)
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h")
-list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
+list(APPEND HEADER_FILES
+    ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
+    ${CMAKE_BINARY_DIR}/include/OgreExports.h
     src/OgreImageResampler.h
     src/OgrePixelConversions.h
     src/OgreSIMDHelper.h)
@@ -262,8 +264,6 @@ endif ()
 list(APPEND HEADER_FILES ${THREAD_HEADER_FILES})
 
 # Add needed definitions and nedmalloc include dir
-add_definitions(-DOGRE_NONCLIENT_BUILD)
-
 if(NOT OGRE_CONFIG_ALLOCATOR EQUAL 1)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
 endif()
@@ -341,6 +341,13 @@ else ()
 	# exclude OgreAlignedAllocator.cpp from unity builds; causes problems on Linux
 	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")
 endif ()
+
+generate_export_header(OgreMain 
+    EXPORT_MACRO_NAME _OgreExport
+    NO_EXPORT_MACRO_NAME _OgrePrivate
+    DEPRECATED_MACRO_NAME OGRE_DEPRECATED
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreExports.h)
+
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
 if(WIN32 AND MSVC10 AND CMAKE_CL_64)
   set_target_properties(OgreMain PROPERTIES 
