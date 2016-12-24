@@ -11,13 +11,13 @@ classes.
 
 ### Attention: this is a Fork
 
-This is not a pure mirror of the [OGRE Project at Bitbucket](https://bitbucket.org/sinbad/ogre/) but a fork with a diverged codebase. If you wonder what is different, see [git-ChangeLog](git-ChangeLog.md).
+This is not a mirror of the [OGRE Project at Bitbucket](https://bitbucket.org/sinbad/ogre/) but a fork with a diverged codebase. If you wonder what is different, see [git-ChangeLog](git-ChangeLog.md).
 
 The current CI status is: Ubuntu/ OSX/ Android/ iOS [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre)
 MSVC [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
 
 ## Index Of Contents
-* <a href="Docs/ChangeLog.md">What's New?</a>
+* <a href="Docs/1.10-Notes.md">What's New?</a>
 <p>A summary of the new and altered features in this release.</p>
 * <a href="http://www.ogre3d.org/about/features">Features</a>
 <p class="maincontent">A summary of OGRE's main features.</p>
@@ -28,24 +28,12 @@ MSVC [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrgg
 <p>A high-level guide to the major parts of the engine and script reference.</p>
 * <a href="https://ogrecave.github.io/ogre/api/1.10/">API Reference</a>
 <p class="maincontent">The full OGRE API documentation, as generated from the (heavily!) commented source.</p>
-* <a href="http://www.ogre3d.org/wiki">The OGRE Wiki</a>
-<p>A gold mine of tutorials, tips and code snippets which will help you get up to speed with the engine.</p>
 
 ## Contributing
 We welcome all contributions to OGRE, be that new
 plugins, bugfixes, extensions, tutorials, documentation, example
 applications, artwork or pretty much anything else! If you would like
 to contribute to the development of OGRE, please create a [pull request](https://github.com/OGRECave/ogre/pulls).
-
-## Keeping Up To Date
-The best place to keep up to date with developments on
-OGRE is the <a href="http://www.ogre3d.org/">Official Web Site</a>.
-From there you can download the latest source code and documentation.
-You can choose between keeping bang up to date with Git
-or by just getting the regularly released snapshots.
-
-The changes included in this current version can be
-viewed on the <a href="Docs/ChangeLog.md">ChangeLog</a>.
 
 ## Licensing
 Please see the <a href="Docs/License.md">full license documentation</a> for details.
