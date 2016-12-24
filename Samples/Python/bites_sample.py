@@ -65,6 +65,10 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
         self.camman.setYawPitchDist(Ogre.Radian(0), Ogre.Radian(0.3), 15)
         self.addInputListener(self.camman)
 
+        # must keep a reference to ctrls so it does not get deleted
+        self.ctrls = OgreBites.AdvancedRenderControls(self.trays, cam)
+        self.addInputListener(self.ctrls)
+
         vp = self.getRenderWindow().addViewport(cam)
         vp.setBackgroundColour(Ogre.ColourValue(.3, .3, .3))
 

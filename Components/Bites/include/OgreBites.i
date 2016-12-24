@@ -7,6 +7,7 @@
 #include "OgreSGTechniqueResolverListener.h"
 #include "OgreCameraMan.h"
 #include "OgreTrays.h"
+#include "OgreAdvancedRenderControls.h"
 
 #if OGRE_BITES_HAVE_SDL
 #include "SDL_stdinc.h"
@@ -52,3 +53,4 @@
 %include "OgreCameraMan.h"
 %include "OgreWindowEventUtilities.h"
 %include "OgreTrays.h"
+%include "OgreAdvancedRenderControls.h"
