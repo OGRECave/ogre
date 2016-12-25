@@ -26,6 +26,7 @@
 /* Parse the header file to generate wrappers */
 #define _OgreExport
 #define _OgrePrivate
+#define OGRE_DEPRECATED
 #define OGRE_NORETURN
 #define OGRE_STATIC_MUTEX(arg)
 #define OGRE_MUTEX(arg)

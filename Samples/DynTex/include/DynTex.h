@@ -65,14 +65,14 @@ public:
 
     bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectMouseDown(evt)) return true;
+        if (mTrayMgr->mousePressed(evt)) return true;
         mWiping = true;  // wipe frost if user left clicks in the scene
         return true;
     }
     
     bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectMouseUp(evt)) return true;
+        if (mTrayMgr->mouseReleased(evt)) return true;
         mWiping = false;  // stop wiping frost if user releases LMB
         return true;
     }

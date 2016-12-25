@@ -174,7 +174,7 @@ protected:
 
     bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectMouseDown(evt))
+        if (mTrayMgr->mousePressed(evt))
             return true;
         
         if (evt.button == BUTTON_LEFT)
@@ -187,7 +187,7 @@ protected:
     
     bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectMouseUp(evt))
+        if (mTrayMgr->mouseReleased(evt))
             return true;
         
         if (evt.button == BUTTON_LEFT)
@@ -202,9 +202,9 @@ protected:
     {
         // Only rotate the camera if cursor is hidden.
         if (mTrayMgr->isCursorVisible()) 
-            mTrayMgr->injectMouseMove(evt);
+            mTrayMgr->mouseMoved(evt);
         else 
-            mCameraMan->injectMouseMove(evt);
+            mCameraMan->mouseMoved(evt);
 
         return true;
     }

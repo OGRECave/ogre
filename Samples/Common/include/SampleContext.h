@@ -39,7 +39,7 @@ namespace OgreBites
     | May be subclassed for specific sample types (not specific samples).
     | Allows one sample to run at a time, while maintaining a sample queue.
     =============================================================================*/
-    class SampleContext : public ApplicationContext
+    class SampleContext : public ApplicationContext, InputListener
     {
     public:
 
@@ -50,6 +50,8 @@ namespace OgreBites
             mSamplePaused = false;
             mLastRun = false;
             mLastSample = 0;
+
+            addInputListener(this);
         }
 
         virtual Sample* getCurrentSample()

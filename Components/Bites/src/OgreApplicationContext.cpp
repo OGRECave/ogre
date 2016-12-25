@@ -315,6 +315,15 @@ void ApplicationContext::enableShaderCache() {
     }
 }
 
+bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt) {
+    for(std::set<InputListener*>::iterator it = mInputListeners.begin();
+            it != mInputListeners.end(); ++it) {
+        (*it)->frameRendered(evt);
+    }
+
+    return true;
+}
+
 Ogre::RenderWindow *ApplicationContext::createWindow()
 {
     mRoot->initialise(false, mAppName);
@@ -474,39 +483,44 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
 #endif
 
 void ApplicationContext::_fireInputEvent(const Event& event) {
-    switch (event.type)
-    {
-    case SDL_KEYDOWN:
-        // Ignore repeated signals from key being held down.
-        if (event.key.repeat) break;
-        keyPressed(event.key);
-        break;
-    case SDL_KEYUP:
-        keyReleased(event.key);
-        break;
-    case SDL_MOUSEBUTTONDOWN:
-        mousePressed(event.button);
-        break;
-    case SDL_MOUSEBUTTONUP:
-        mouseReleased(event.button);
-        break;
-    case SDL_MOUSEWHEEL:
-        mouseWheelRolled(event.wheel);
-        break;
-    case SDL_MOUSEMOTION:
-        mouseMoved(event.motion);
-        break;
-    case SDL_FINGERDOWN:
-        // for finger down we have to move the pointer first
-        touchMoved(event.tfinger);
-        touchPressed(event.tfinger);
-        break;
-    case SDL_FINGERUP:
-        touchReleased(event.tfinger);
-        break;
-    case SDL_FINGERMOTION:
-        touchMoved(event.tfinger);
-        break;
+    for(std::set<InputListener*>::iterator it = mInputListeners.begin();
+            it != mInputListeners.end(); ++it) {
+        InputListener& l = **it;
+
+        switch (event.type)
+        {
+        case SDL_KEYDOWN:
+            // Ignore repeated signals from key being held down.
+            if (event.key.repeat) break;
+            l.keyPressed(event.key);
+            break;
+        case SDL_KEYUP:
+            l.keyReleased(event.key);
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            l.mousePressed(event.button);
+            break;
+        case SDL_MOUSEBUTTONUP:
+            l.mouseReleased(event.button);
+            break;
+        case SDL_MOUSEWHEEL:
+            l.mouseWheelRolled(event.wheel);
+            break;
+        case SDL_MOUSEMOTION:
+            l.mouseMoved(event.motion);
+            break;
+        case SDL_FINGERDOWN:
+            // for finger down we have to move the pointer first
+            l.touchMoved(event.tfinger);
+            l.touchPressed(event.tfinger);
+            break;
+        case SDL_FINGERUP:
+            l.touchReleased(event.tfinger);
+            break;
+        case SDL_FINGERMOTION:
+            l.touchMoved(event.tfinger);
+            break;
+        }
     }
 }
 

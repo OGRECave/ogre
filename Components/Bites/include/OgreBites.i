@@ -7,6 +7,7 @@
 #include "OgreSGTechniqueResolverListener.h"
 #include "OgreCameraMan.h"
 #include "OgreTrays.h"
+#include "OgreAdvancedRenderControls.h"
 
 #if OGRE_BITES_HAVE_SDL
 #include "SDL_stdinc.h"
@@ -44,10 +45,12 @@
 %include "SDL_events.h"
 #endif
 
-%include "OgreInput.h"
 %include "OgreSGTechniqueResolverListener.h"
+%feature("director") OgreBites::ApplicationContext;
+%feature("director") OgreBites::InputListener;
+%include "OgreInput.h"
+%include "OgreApplicationContext.h"
 %include "OgreCameraMan.h"
 %include "OgreWindowEventUtilities.h"
-%feature("director") OgreBites::ApplicationContext;
-%include "OgreApplicationContext.h"
 %include "OgreTrays.h"
+%include "OgreAdvancedRenderControls.h"

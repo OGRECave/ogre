@@ -94,7 +94,7 @@ void CameraMan::manualStop()
     }
 }
 
-bool CameraMan::frameRenderingQueued(const Ogre::FrameEvent &evt)
+void CameraMan::frameRendered(const Ogre::FrameEvent &evt)
 {
     if (mStyle == CS_FREELOOK)
     {
@@ -130,11 +130,9 @@ bool CameraMan::frameRenderingQueued(const Ogre::FrameEvent &evt)
 
         if (mVelocity != Ogre::Vector3::ZERO) mCamera->move(mVelocity * evt.timeSinceLastFrame);
     }
-
-    return true;
 }
 
-void CameraMan::injectKeyDown(const KeyboardEvent &evt)
+bool CameraMan::keyPressed(const KeyboardEvent &evt)
 {
     if (mStyle == CS_FREELOOK)
     {
@@ -147,9 +145,11 @@ void CameraMan::injectKeyDown(const KeyboardEvent &evt)
         else if (key == SDLK_PAGEDOWN) mGoingDown = true;
         else if (key == SDLK_LSHIFT) mFastMove = true;
     }
+
+    return InputListener::keyPressed(evt);
 }
 
-void CameraMan::injectKeyUp(const KeyboardEvent &evt)
+bool CameraMan::keyReleased(const KeyboardEvent &evt)
 {
     if (mStyle == CS_FREELOOK)
     {
@@ -162,9 +162,11 @@ void CameraMan::injectKeyUp(const KeyboardEvent &evt)
         else if (key == SDLK_PAGEDOWN) mGoingDown = false;
         else if (key == SDLK_LSHIFT) mFastMove = false;
     }
+
+    return InputListener::keyReleased(evt);
 }
 
-void CameraMan::injectMouseMove(const MouseMotionEvent &evt)
+bool CameraMan::mouseMoved(const MouseMotionEvent &evt)
 {
     if (mStyle == CS_ORBIT)
     {
@@ -192,32 +194,40 @@ void CameraMan::injectMouseMove(const MouseMotionEvent &evt)
         mCamera->yaw(Ogre::Degree(-evt.xrel * 0.15f));
         mCamera->pitch(Ogre::Degree(-evt.yrel * 0.15f));
     }
+
+    return InputListener::mouseMoved(evt);
 }
 
-void CameraMan::injectMouseWheel(const MouseWheelEvent &evt) {
+bool CameraMan::mouseWheelRolled(const MouseWheelEvent &evt) {
     if (mStyle == CS_ORBIT && evt.y != 0)
     {
         Ogre::Real dist = (mCamera->getPosition() - mTarget->_getDerivedPosition()).length();
         mCamera->moveRelative(Ogre::Vector3(0, 0, -evt.y * 0.08f * dist));
     }
+
+    return InputListener::mouseWheelRolled(evt);
 }
 
-void CameraMan::injectMouseDown(const MouseButtonEvent &evt)
+bool CameraMan::mousePressed(const MouseButtonEvent &evt)
 {
     if (mStyle == CS_ORBIT)
     {
         if (evt.button == BUTTON_LEFT) mOrbiting = true;
         else if (evt.button == BUTTON_RIGHT) mZooming = true;
     }
+
+    return InputListener::mousePressed(evt);
 }
 
-void CameraMan::injectMouseUp(const MouseButtonEvent &evt)
+bool CameraMan::mouseReleased(const MouseButtonEvent &evt)
 {
     if (mStyle == CS_ORBIT)
     {
         if (evt.button == BUTTON_LEFT) mOrbiting = false;
         else if (evt.button == BUTTON_RIGHT) mZooming = false;
     }
+
+    return InputListener::mouseReleased(evt);
 }
 
 }

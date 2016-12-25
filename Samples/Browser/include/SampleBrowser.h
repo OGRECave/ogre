@@ -318,7 +318,7 @@ namespace OgreBites
                 }
             }
 
-            mTrayMgr->frameRenderingQueued(evt);
+            mTrayMgr->frameRendered(evt);
 
             try
             {
@@ -789,7 +789,7 @@ namespace OgreBites
                 }
             }
 
-            if (mTrayMgr->injectMouseDown(evt)) return true;
+            if (mTrayMgr->mousePressed(evt)) return true;
 
             try
             {
@@ -821,7 +821,7 @@ namespace OgreBites
             //transformInputState(state);
             //OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-            if (mTrayMgr->injectMouseUp(evt)) return true;
+            if (mTrayMgr->mouseReleased(evt)) return true;
 
             try
             {
@@ -853,7 +853,7 @@ namespace OgreBites
             //transformInputState(state);
             //OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-            if (mTrayMgr->injectMouseMove(evt)) return true;
+            if (mTrayMgr->mouseMoved(evt)) return true;
 
             try
             {
