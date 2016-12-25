@@ -228,13 +228,6 @@ namespace Ogre {
 #       endif
 #       define _OgrePrivate
 #   endif
-// Win32 compilers use _DEBUG for specifying debug builds.
-// for MinGW, we set DEBUG
-#   if defined(_DEBUG) || defined(DEBUG)
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
 
 // Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
 // STLPORT fixes this though so allow if found
@@ -278,12 +271,6 @@ namespace Ogre {
 // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
 
-#   ifdef DEBUG
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     #define OGRE_PLATFORM_LIB "OgrePlatform.bundle"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -301,17 +288,6 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Android Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#   ifdef OGRE_UNICODE_SUPPORT
-#       undef OGRE_UNICODE_SUPPORT
-#   endif
-#   define OGRE_UNICODE_SUPPORT 1
-    // A quick define to overcome different names for the same function
-#   define stricmp strcasecmp
-#   ifdef DEBUG
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
 #   ifndef CLOCKS_PER_SEC
 #       define CLOCKS_PER_SEC  1000
 #   endif

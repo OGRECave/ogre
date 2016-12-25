@@ -13,8 +13,12 @@
 # also prepare package files for pkg-config and CMake.
 #######################################################################
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+string(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_LOWER)
+if(${BUILD_TYPE_LOWER} STREQUAL "debug")
+  set(OGRE_DEBUG_MODE 1)
+else()
+  set(OGRE_DEBUG_MODE 0)
+endif()
 
 if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_SET_BUILD_PLATFORM_APPLE_IOS 1)
