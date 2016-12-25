@@ -92,6 +92,7 @@ namespace Ogre
             Vector3 diffuse;
             Vector3 position;
             Vector3 normal;
+            Vector3 dirDiffuse[6]; /// Directional diffuse
             Real    numMergedVpls;
         };
 
@@ -100,10 +101,12 @@ namespace Ogre
             int32   blockHash[3];
             Vector3 diffuse;
             Vector3 direction;
+            Vector3 dirDiffuse[6];
 
             SparseCluster();
             SparseCluster( int32 blockX, int32 blockY, int32 blockZ,
-                           const Vector3 _diffuse, const Vector3 dir );
+                           const Vector3 &_diffuse, const Vector3 &dir,
+                           const Vector3 _dirDiffuse[6] );
             SparseCluster( int32 _blockHash[3] );
 
             bool operator () ( const SparseCluster &_l, int32 _r[3] ) const;
@@ -234,6 +237,8 @@ namespace Ogre
 
         bool                mUseTextures;
 
+        TexturePtr      mIrradianceVolume;
+
         /**
         @param lightPos
         @param lightRot
@@ -284,6 +289,10 @@ namespace Ogre
         void clusterAllVpls(void);
         void autogenerateAreaOfInterest(void);
 
+        /// lightDir is normalized
+        static void mergeDirectionalDiffuse( const Vector3 &diffuse, const Vector3 &lightDir,
+                                             Vector3 *inOutDirDiffuse );
+
         void createDebugMarkers(void);
         void destroyDebugMarkers(void);
 
@@ -321,6 +330,43 @@ namespace Ogre
         */
         void setUseTextures( bool bUseTextures );
         bool getUseTextures(void) const             { return mUseTextures; }
+
+        /** Outputs suggested parameters for a volumetric texture that will encompass all
+            VPLs. They are suggestions, you don't have to follow them.
+        @param outVolumeOrigin
+            Where the volume should start. This value will be in the same unit of measure
+            you are working with (your Items/Entities, mCellSize).
+            If your Items and mCellSize are in centimeters, this value will be in cm.
+            If you've been working in meters, it will be in meters.
+            This value will be quantized to increments of mCellSize, and that's the only
+            requirement (we'll quantize it for you if you change it later).
+        @param outLightMinPower
+            The minimum light power of the dimmest VPL. Useful to maximize the quality
+            of the 10-bits we use for the 3D texture.
+        @param outLightMaxPower
+            The maximum light power of the brightest VPL. Useful to maximize the quality
+            of the 10-bits we use for the 3D texture.
+        @param outTexWidth
+            The suggested with for the volume texture. Volume's width in units will be:
+                outVolumeOrigin.x + mCellSize * outTexWidth;
+        @param outTexHeight
+            The suggested with for the volume texture times 6. Volume's height in units will be:
+                outVolumeOrigin.y + mCellSize * outTexHeight / 6.0f;
+        @param outTexDepth
+            The suggested depth for the volume texture times. Volume's depth in units will be:
+                outVolumeOrigin.z + mCellSize * outTexDepth;
+        */
+        void suggestIrradianceVolumeParameters( Vector3 &outVolumeOrigin,
+                                                Real &outLightMinPower,
+                                                Real &outLightMaxPower,
+                                                uint32 &outTexWidth,
+                                                uint32 &outTexHeight,
+                                                uint32 &outTexDepth );
+
+        void createIrradianceVolumeTexture( uint32 width, uint32 height, uint32 depth );
+        void destroyIrradianceVolumeTexture(void);
+
+        void fillIrradianceVolume( Vector3 volumeOrigin, Real lightMinPower, Real lightMaxPower );
     };
 
     /** @} */
