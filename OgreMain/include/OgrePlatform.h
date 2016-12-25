@@ -182,15 +182,6 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Windows Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-
-// Win32 compilers use _DEBUG for specifying debug builds.
-// for MinGW, we set DEBUG
-#   if defined(_DEBUG) || defined(DEBUG)
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
-
 // Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
 // STLPORT fixes this though so allow if found
 // MinGW C++ Toolkit supports unicode and sets the define __MINGW32_TOOLBOX_UNICODE__ in _mingw.h
@@ -224,12 +215,6 @@ namespace Ogre {
 // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
 
-#   ifdef DEBUG
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
-
 // Always enable unicode support for the moment
 // Perhaps disable in old versions of gcc if necessary
 #define OGRE_UNICODE_SUPPORT 1
@@ -239,17 +224,6 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Android Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#   ifdef OGRE_UNICODE_SUPPORT
-#       undef OGRE_UNICODE_SUPPORT
-#   endif
-#   define OGRE_UNICODE_SUPPORT 1
-    // A quick define to overcome different names for the same function
-#   define stricmp strcasecmp
-#   ifdef DEBUG
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
 #   ifndef CLOCKS_PER_SEC
 #       define CLOCKS_PER_SEC  1000
 #   endif
