@@ -45,12 +45,8 @@ layout(binding = 0) uniform PassBuffer
 @end
 
 @property( irradiance_volumes )
-	vec4 irradianceOrigin; //.w contains the inverse of cell size.
-	//.x = minPower() / irradiancePowerRange
-	//.y = irradiancePowerRange
-	//.z = irradianceTexture->getHeight() / 6
-	//.w = 1.0f / irradianceTexture->getHeight()
-	vec4 irradiancePower;
+	vec4 irradianceOrigin;	//.w = maxPower
+	vec4 irradianceSize;	//.w = 1.0f / irradianceTexture->getHeight()
 @end
 
 @property( hlms_pssm_splits )@foreach( hlms_pssm_splits, n )

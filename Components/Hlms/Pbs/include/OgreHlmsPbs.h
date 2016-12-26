@@ -185,6 +185,9 @@ namespace Ogre
         void setParallaxCorrectedCubemap( ParallaxCorrectedCubemap *pcc )
                                                             { mParallaxCorrectedCubemap = pcc; }
 
+        void setIrrandianceVolume( InstantRadiosity *irrandianceVolume )
+                                                    { mIrrandianceVolume = irrandianceVolume; }
+
 #if !OGRE_NO_JSON
         /// @copydoc Hlms::_loadJson
         virtual void _loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,

@@ -303,6 +303,9 @@ namespace Ogre
                 texUnit += 2;
             }
 
+            if( mIrrandianceVolume && getProperty( HlmsBaseProp::ShadowCaster ) == 0 )
+                psParams->setNamedConstant( "irradianceVolume", texUnit++ );
+
             if( !mPreparedPass.shadowMaps.empty() )
             {
                 vector<int>::type shadowMaps;
@@ -843,7 +846,7 @@ namespace Ogre
             if( ambientMode == AmbientHemisphere )
                 mapSize += 8 * 4;
 
-            //vec3 irradianceOrigin + float cellSize + vec2 irradiancePower + padding;
+            //vec3 irradianceOrigin + float maxPower + vec3 irradianceSize + float invHeight;
             if( mIrrandianceVolume )
                 mapSize += (4 + 4) * 4;
 
@@ -993,21 +996,24 @@ namespace Ogre
 
             if( mIrrandianceVolume )
             {
-                const Vector3 irradianceVolumeOrigin = mIrrandianceVolume->getIrradianceOrigin();
-                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.x );
-                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.y );
-                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.z );
-                *passBufferPtr++ = 1.0f / mIrrandianceVolume->mCellSize;
+                const Vector3 irradianceVolumeOrigin = mIrrandianceVolume->getIrradianceOrigin() /
+                                                       mIrrandianceVolume->mCellSize;
+                const float fTexWidth = static_cast<float>(
+                            mIrrandianceVolume->getIrradianceVolumeTexture()->getWidth() );
+                const float fTexDepth = static_cast<float>(
+                            mIrrandianceVolume->getIrradianceVolumeTexture()->getDepth() );
 
-                float fTexHeight = static_cast<float>(
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.x ) / fTexWidth;
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.y );
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.z ) / fTexDepth;
+                *passBufferPtr++ = mIrrandianceVolume->getIrradianceMaxPower();
+
+                const float fTexHeight = static_cast<float>(
                             mIrrandianceVolume->getIrradianceVolumeTexture()->getHeight() );
 
-                const Real irradiancePowerRange =
-                        mIrrandianceVolume->getIrradianceMaxPower() -
-                        mIrrandianceVolume->getIrradianceMinPower();
-                *passBufferPtr++ = mIrrandianceVolume->getIrradianceMinPower() / irradiancePowerRange;
-                *passBufferPtr++ = irradiancePowerRange;
-                *passBufferPtr++ = fTexHeight / 6.0f;
+                *passBufferPtr++ = 1.0f / (fTexWidth * mIrrandianceVolume->mCellSize);
+                *passBufferPtr++ = 1.0f / mIrrandianceVolume->mCellSize;
+                *passBufferPtr++ = 1.0f / (fTexDepth * mIrrandianceVolume->mCellSize);
                 *passBufferPtr++ = 1.0f / fTexHeight;
             }
 
@@ -1264,6 +1270,17 @@ namespace Ogre
                             CbShaderBuffer( PixelShader, 1, mGridBuffer, 0, 0 );
                     *commandBuffer->addCommand<CbShaderBuffer>() =
                             CbShaderBuffer( PixelShader, 2, mGlobalLightListBuffer, 0, 0 );
+                }
+
+                if( mIrrandianceVolume )
+                {
+                    const TexturePtr &irradianceTex = mIrrandianceVolume->getIrradianceVolumeTexture();
+                    const HlmsSamplerblock *samplerblock = mIrrandianceVolume->getIrradSamplerblock();
+
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
+                                                                         irradianceTex.get(),
+                                                                         samplerblock );
+                    ++texUnit;
                 }
 
                 //We changed HlmsType, rebind the shared textures.

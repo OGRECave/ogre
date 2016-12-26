@@ -237,10 +237,10 @@ namespace Ogre
 
         bool                mUseTextures;
 
-        float           mIrradianceMinPower;
-        float           mIrradianceMaxPower;
-        Vector3         mIrradianceOrigin;
-        TexturePtr      mIrradianceVolume;
+        float                   mIrradianceMaxPower;
+        Vector3                 mIrradianceOrigin;
+        TexturePtr              mIrradianceVolume;
+        HlmsSamplerblock const  *mIrradianceSamplerblock;
 
         /**
         @param lightPos
@@ -343,9 +343,6 @@ namespace Ogre
             If you've been working in meters, it will be in meters.
             This value will be quantized to increments of mCellSize, and that's the only
             requirement (we'll quantize it for you if you change it later).
-        @param outLightMinPower
-            The minimum light power of the dimmest VPL. Useful to maximize the quality
-            of the 10-bits we use for the 3D texture.
         @param outLightMaxPower
             The maximum light power of the brightest VPL. Useful to maximize the quality
             of the 10-bits we use for the 3D texture.
@@ -360,7 +357,6 @@ namespace Ogre
                 outVolumeOrigin.z + mCellSize * outTexDepth;
         */
         void suggestIrradianceVolumeParameters( Vector3 &outVolumeOrigin,
-                                                Real &outLightMinPower,
                                                 Real &outLightMaxPower,
                                                 uint32 &outTexWidth,
                                                 uint32 &outTexHeight,
@@ -369,13 +365,13 @@ namespace Ogre
         void createIrradianceVolumeTexture( uint32 width, uint32 height, uint32 depth );
         void destroyIrradianceVolumeTexture(void);
 
-        void fillIrradianceVolume( Vector3 volumeOrigin, Real lightMinPower, Real lightMaxPower );
+        void fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower );
 
-        float getIrradianceMinPower(void) const             { return mIrradianceMinPower; }
         float getIrradianceMaxPower(void) const             { return mIrradianceMaxPower; }
         const Vector3& getIrradianceOrigin(void) const      { return mIrradianceOrigin; }
 
         const TexturePtr& getIrradianceVolumeTexture(void) const    { return mIrradianceVolume; }
+        const HlmsSamplerblock* getIrradSamplerblock(void) const    { return mIrradianceSamplerblock; }
     };
 
     /** @} */
