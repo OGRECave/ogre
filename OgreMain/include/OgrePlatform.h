@@ -182,6 +182,21 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Windows Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+
+// on windows we override OgreBuildSettings.h for convenience
+// see https://bitbucket.org/sinbad/ogre/pull-requests/728
+#ifdef OGRE_DEBUG_MODE
+#undef OGRE_DEBUG_MODE
+#endif
+
+// Win32 compilers use _DEBUG for specifying debug builds.
+// for MinGW, we set DEBUG
+#   if defined(_DEBUG) || defined(DEBUG)
+#       define OGRE_DEBUG_MODE 1
+#   else
+#       define OGRE_DEBUG_MODE 0
+#   endif
+
 // Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
 // STLPORT fixes this though so allow if found
 // MinGW C++ Toolkit supports unicode and sets the define __MINGW32_TOOLBOX_UNICODE__ in _mingw.h
