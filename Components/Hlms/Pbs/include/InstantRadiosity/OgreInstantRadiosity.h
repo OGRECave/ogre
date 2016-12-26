@@ -363,7 +363,7 @@ namespace Ogre
                                                 uint32 &outTexDepth );
 
         void createIrradianceVolumeTexture( uint32 width, uint32 height, uint32 depth );
-        void destroyIrradianceVolumeTexture(void);
+        void destroyIrradianceVolumeTexture( bool restoreVpls=true );
 
         void fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower );
 

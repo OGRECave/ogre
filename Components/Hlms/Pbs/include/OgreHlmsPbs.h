@@ -187,6 +187,7 @@ namespace Ogre
 
         void setIrrandianceVolume( InstantRadiosity *irrandianceVolume )
                                                     { mIrrandianceVolume = irrandianceVolume; }
+        InstantRadiosity* getIrrandianceVolume(void) const  { return mIrrandianceVolume; }
 
 #if !OGRE_NO_JSON
         /// @copydoc Hlms::_loadJson

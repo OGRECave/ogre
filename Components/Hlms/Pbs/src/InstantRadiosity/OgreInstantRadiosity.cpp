@@ -182,7 +182,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     InstantRadiosity::~InstantRadiosity()
     {
-        destroyIrradianceVolumeTexture();
+        destroyIrradianceVolumeTexture( false );
         freeMemory();
         clear();
     }
@@ -1305,9 +1305,10 @@ namespace Ogre
         {
             Vpl &vpl = *itor;
             Vector3 diffuseCol = vpl.diffuse * mVplPowerBoost;
-            if( diffuseCol.x > mVplThreshold ||
-                diffuseCol.y > mVplThreshold ||
-                diffuseCol.z > mVplThreshold )
+            if( (diffuseCol.x > mVplThreshold ||
+                 diffuseCol.y > mVplThreshold ||
+                 diffuseCol.z > mVplThreshold) &&
+                mIrradianceVolume.isNull() )
             {
                 if( !vpl.light )
                 {
@@ -1713,7 +1714,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::createIrradianceVolumeTexture( uint32 width, uint32 height, uint32 depth )
     {
-        destroyIrradianceVolumeTexture();
+        destroyIrradianceVolumeTexture( false );
 
         //const uint32 maxMipCount = PixelUtil::getMaxMipmapCount( width, height, depth );
         const uint32 maxMipCount = 0; //TODO?
@@ -1728,9 +1729,11 @@ namespace Ogre
         samplerblock.mMagFilter = FO_LINEAR;
         samplerblock.mMipFilter = FO_LINEAR;
         mIrradianceSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+
+        updateExistingVpls();
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::destroyIrradianceVolumeTexture(void)
+    void InstantRadiosity::destroyIrradianceVolumeTexture( bool restoreVpls )
     {
         if( !mIrradianceVolume.isNull() )
         {
@@ -1743,6 +1746,9 @@ namespace Ogre
             mHlmsManager->destroySamplerblock( mIrradianceSamplerblock );
             mIrradianceSamplerblock = 0;
         }
+
+        if( restoreVpls )
+            updateExistingVpls();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower )

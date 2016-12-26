@@ -33,6 +33,7 @@ namespace Demo
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
         void createLight(void);
+        void updateIrradianceVolume(void);
 
     public:
         InstantRadiosityGameState( const Ogre::String &helpDescription );
