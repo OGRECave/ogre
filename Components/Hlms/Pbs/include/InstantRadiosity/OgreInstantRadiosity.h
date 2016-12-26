@@ -237,6 +237,9 @@ namespace Ogre
 
         bool                mUseTextures;
 
+        float           mIrradianceMinPower;
+        float           mIrradianceMaxPower;
+        Vector3         mIrradianceOrigin;
         TexturePtr      mIrradianceVolume;
 
         /**
@@ -367,6 +370,12 @@ namespace Ogre
         void destroyIrradianceVolumeTexture(void);
 
         void fillIrradianceVolume( Vector3 volumeOrigin, Real lightMinPower, Real lightMaxPower );
+
+        float getIrradianceMinPower(void) const             { return mIrradianceMinPower; }
+        float getIrradianceMaxPower(void) const             { return mIrradianceMaxPower; }
+        const Vector3& getIrradianceOrigin(void) const      { return mIrradianceOrigin; }
+
+        const TexturePtr& getIrradianceVolumeTexture(void) const    { return mIrradianceVolume; }
     };
 
     /** @} */

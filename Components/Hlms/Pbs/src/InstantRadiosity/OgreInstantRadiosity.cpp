@@ -173,7 +173,10 @@ namespace Ogre
         mMipmapBias( 0 ),
         mTotalNumRays( 0 ),
         mEnableDebugMarkers( false ),
-        mUseTextures( true )
+        mUseTextures( true ),
+        mIrradianceMinPower( 0 ),
+        mIrradianceMaxPower( 1 ),
+        mIrradianceOrigin( Vector3::ZERO )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -1546,12 +1549,12 @@ namespace Ogre
     {
         const Vector3 directions[6] =
         {
-            Vector3(  1,  0,  0 ),
             Vector3( -1,  0,  0 ),
-            Vector3(  0,  1,  0 ),
+            Vector3(  1,  0,  0 ),
             Vector3(  0, -1,  0 ),
-            Vector3(  0,  0,  1 ),
+            Vector3(  0,  1,  0 ),
             Vector3(  0,  0, -1 ),
+            Vector3(  0,  0,  1 ),
         };
 
         for( int i=0; i<6; ++i )
@@ -1717,7 +1720,8 @@ namespace Ogre
     {
         destroyIrradianceVolumeTexture();
 
-        uint32 maxMipCount = PixelUtil::getMaxMipmapCount( width, height, depth );
+        //const uint32 maxMipCount = PixelUtil::getMaxMipmapCount( width, height, depth );
+        const uint32 maxMipCount = 0; //TODO?
 
         mIrradianceVolume = TextureManager::getSingleton().createManual(
                     "InstantRadiosity_IrradianceVolume",
@@ -1748,7 +1752,7 @@ namespace Ogre
         const int32 volumeOriginY = static_cast<int32>( volumeOrigin.y * 6.0f );
         const int32 volumeOriginZ = static_cast<int32>( volumeOrigin.z );
 
-        //= (x * power - minPower) / lightPowerRange
+        //= (x * power - minPower) / (maxPower - minPower)
         //= (x * power) / lightPowerRange - lightMinPower / lightPowerRange
         const Real lightPowerRange = lightMaxPower - lightMinPower;
         const Real powerDivPowerRange = mVplPowerBoost / lightPowerRange;

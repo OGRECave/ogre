@@ -114,6 +114,8 @@ namespace Ogre
 
         uint32                  mTexUnitSlotStart;
 
+        InstantRadiosity       *mIrrandianceVolume;
+
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
         uint32 mLastTextureHash;
@@ -280,6 +282,7 @@ namespace Ogre
         static const IdString TargetEnvprobeMap;
         static const IdString ParallaxCorrectCubemaps;
         static const IdString UseParallaxCorrectCubemaps;
+        static const IdString IrradianceVolumes;
 
         static const IdString BrdfDefault;
         static const IdString BrdfCookTorrance;

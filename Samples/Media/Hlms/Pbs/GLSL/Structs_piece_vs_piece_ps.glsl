@@ -44,6 +44,15 @@ layout(binding = 0) uniform PassBuffer
 	vec4 ambientHemisphereDir;
 @end
 
+@property( irradiance_volumes )
+	vec4 irradianceOrigin; //.w contains the inverse of cell size.
+	//.x = minPower() / irradiancePowerRange
+	//.y = irradiancePowerRange
+	//.z = irradianceTexture->getHeight() / 6
+	//.w = 1.0f / irradianceTexture->getHeight()
+	vec4 irradiancePower;
+@end
+
 @property( hlms_pssm_splits )@foreach( hlms_pssm_splits, n )
 	float pssmSplitPoints@n;@end @end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end

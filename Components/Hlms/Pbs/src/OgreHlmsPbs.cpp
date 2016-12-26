@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreForward3D.h"
 #include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+#include "InstantRadiosity/OgreInstantRadiosity.h"
 
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -139,6 +140,7 @@ namespace Ogre
     const IdString PbsProperty::TargetEnvprobeMap = IdString( "target_envprobe_map" );
     const IdString PbsProperty::ParallaxCorrectCubemaps = IdString( "parallax_correct_cubemaps" );
     const IdString PbsProperty::UseParallaxCorrectCubemaps= IdString( "use_parallax_correct_cubemaps" );
+    const IdString PbsProperty::IrradianceVolumes = IdString( "irradiance_volumes" );
 
     const IdString PbsProperty::BrdfDefault       = IdString( "BRDF_Default" );
     const IdString PbsProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
@@ -208,6 +210,7 @@ namespace Ogre
         mGridBuffer( 0 ),
         mGlobalLightListBuffer( 0 ),
         mTexUnitSlotStart( 0 ),
+        mIrrandianceVolume( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
         mShadowFilter( PCF_3x3 ),
@@ -764,6 +767,9 @@ namespace Ogre
 
             if( mParallaxCorrectedCubemap )
                 setProperty( PbsProperty::ParallaxCorrectCubemaps, 1 );
+
+            if( mIrrandianceVolume )
+                setProperty( PbsProperty::IrradianceVolumes, 1 );
         }
 
         if( mOptimizationStrategy == LowerGpuOverhead )
@@ -836,6 +842,10 @@ namespace Ogre
             //vec3 ambientLowerHemi + padding + vec3 ambientHemisphereDir + padding
             if( ambientMode == AmbientHemisphere )
                 mapSize += 8 * 4;
+
+            //vec3 irradianceOrigin + float cellSize + vec2 irradiancePower + padding;
+            if( mIrrandianceVolume )
+                mapSize += (4 + 4) * 4;
 
             //float pssmSplitPoints N times.
             mapSize += numPssmSplits * 4;
@@ -979,6 +989,26 @@ namespace Ogre
                 *passBufferPtr++ = static_cast<float>( hemisphereDir.y );
                 *passBufferPtr++ = static_cast<float>( hemisphereDir.z );
                 *passBufferPtr++ = 1.0f;
+            }
+
+            if( mIrrandianceVolume )
+            {
+                const Vector3 irradianceVolumeOrigin = mIrrandianceVolume->getIrradianceOrigin();
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.x );
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.y );
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.z );
+                *passBufferPtr++ = 1.0f / mIrrandianceVolume->mCellSize;
+
+                float fTexHeight = static_cast<float>(
+                            mIrrandianceVolume->getIrradianceVolumeTexture()->getHeight() );
+
+                const Real irradiancePowerRange =
+                        mIrrandianceVolume->getIrradianceMaxPower() -
+                        mIrrandianceVolume->getIrradianceMinPower();
+                *passBufferPtr++ = mIrrandianceVolume->getIrradianceMinPower() / irradiancePowerRange;
+                *passBufferPtr++ = irradiancePowerRange;
+                *passBufferPtr++ = fTexHeight / 6.0f;
+                *passBufferPtr++ = 1.0f / fTexHeight;
             }
 
             //float pssmSplitPoints
