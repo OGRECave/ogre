@@ -50,7 +50,7 @@ namespace Ogre {
     // Define ogre version
     #define OGRE_VERSION_MAJOR 1
     #define OGRE_VERSION_MINOR 10
-    #define OGRE_VERSION_PATCH 0
+    #define OGRE_VERSION_PATCH 1
     #define OGRE_VERSION_SUFFIX "unstable"
     #define OGRE_VERSION_NAME "Xalafu"
 
