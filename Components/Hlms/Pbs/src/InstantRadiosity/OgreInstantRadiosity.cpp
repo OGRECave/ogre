@@ -1678,17 +1678,33 @@ namespace Ogre
         {
             const Vpl &vpl = *itor;
 
+            Real range = mVplMaxRange;
+            const Vector3 diffuseColForRange = vpl.diffuse;
+            if( mVplUseIntensityForMaxRange )
+            {
+                double intensity;
+                intensity = Ogre::max( diffuseColForRange.x, diffuseColForRange.y );
+                intensity = Ogre::max( intensity, (double)diffuseColForRange.z );
+                /*if( mVplQuadAtten != 0 )
+                    intensity *= 1e-6 / mVplQuadAtten;*/
+                double rangeInMeters = sqrt( intensity );
+                range = (float)(rangeInMeters * mVplIntensityRangeMultiplier);
+            }
+
+            range = Ogre::min( range, mVplMaxRange );
+            const int32 xyzRange = static_cast<int32>( Math::Floor( range * invCellSize ) );
+
             int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize ) );
             int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize ) );
             int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * invCellSize ) );
 
-            minBlockX = std::min( minBlockX, blockX );
-            minBlockY = std::min( minBlockY, blockY );
-            minBlockZ = std::min( minBlockZ, blockZ );
+            minBlockX = std::min( minBlockX, blockX - xyzRange );
+            minBlockY = std::min( minBlockY, blockY - xyzRange );
+            minBlockZ = std::min( minBlockZ, blockZ - xyzRange );
 
-            maxBlockX = std::max( maxBlockX, blockX );
-            maxBlockY = std::max( maxBlockY, blockY );
-            maxBlockZ = std::max( maxBlockZ, blockZ );
+            maxBlockX = std::max( maxBlockX, blockX + xyzRange );
+            maxBlockY = std::max( maxBlockY, blockY + xyzRange );
+            maxBlockZ = std::max( maxBlockZ, blockZ + xyzRange );
 
             for( int i=0; i<6; ++i )
             {
@@ -1708,7 +1724,6 @@ namespace Ogre
         outVolumeOrigin.y = static_cast<Real>( minBlockY ) * mCellSize;
         outVolumeOrigin.z = static_cast<Real>( minBlockZ ) * mCellSize;
 
-        lightMaxPower *= mVplPowerBoost;
         outLightMaxPower = lightMaxPower;
     }
     //-----------------------------------------------------------------------------------
@@ -1753,7 +1768,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower )
     {
-        const Real invCellSize = Real(1.0) / mCellSize;
+        const Real cellSize     = mCellSize;
+        const Real invCellSize  = Real(1.0) / mCellSize;
 
         //Quantize volumeCenter.
         volumeOrigin.x = static_cast<int32>( Math::Floor( volumeOrigin.x * invCellSize ) );
@@ -1767,14 +1783,14 @@ namespace Ogre
         const int32 volumeOriginY = static_cast<int32>( volumeOrigin.y * 6.0f );
         const int32 volumeOriginZ = static_cast<int32>( volumeOrigin.z );
 
-        const Real powerRatio = mVplPowerBoost / lightMaxPower;
+        const Real invMaxPower = 1.0f / lightMaxPower;
 
         const int32 texWidth  = static_cast<int32>( mIrradianceVolume->getWidth() );
         const int32 texHeight = static_cast<int32>( mIrradianceVolume->getHeight() );
         const int32 texDepth  = static_cast<int32>( mIrradianceVolume->getDepth() );
 
         const PixelBox &lockBox = mIrradianceVolume->getBuffer()->lock(
-                    Box( 0, 0, 0, texWidth, texHeight, texDepth ), v1::HardwareBuffer::HBL_WRITE_ONLY );
+                    Box( 0, 0, 0, texWidth, texHeight, texDepth ), v1::HardwareBuffer::HBL_NORMAL );
 
         const size_t bytesPerPixel = PixelUtil::getNumElemBytes( mIrradianceVolume->getFormat() );
         const size_t texRowPitch = lockBox.rowPitchAlwaysBytes();
@@ -1785,11 +1801,39 @@ namespace Ogre
 
         memset( lockBox.data, 0, texSlicePitch * lockBox.getDepth() );
 
+        const Vector3 c_directions[6] =
+        {
+            Vector3(  1,  0,  0 ),
+            Vector3( -1,  0,  0 ),
+            Vector3(  0,  1,  0 ),
+            Vector3(  0, -1,  0 ),
+            Vector3(  0,  0,  1 ),
+            Vector3(  0,  0, -1 )
+        };
+
         uint8 * RESTRICT_ALIAS dstData = reinterpret_cast<uint8 * RESTRICT_ALIAS>( lockBox.data );
 
         while( itor != end )
         {
             const Vpl &vpl = *itor;
+
+            Real range = mVplMaxRange;
+            const Vector3 diffuseColForRange = vpl.diffuse * mVplPowerBoost;
+            if( mVplUseIntensityForMaxRange )
+            {
+                double intensity;
+                intensity = Ogre::max( diffuseColForRange.x, diffuseColForRange.y );
+                intensity = Ogre::max( intensity, (double)diffuseColForRange.z );
+                /*if( mVplQuadAtten != 0 )
+                    intensity *= 1e-6 / mVplQuadAtten;*/
+                double rangeInMeters = sqrt( intensity );
+                range = (float)(rangeInMeters * mVplIntensityRangeMultiplier);
+            }
+
+            range = Ogre::min( range, mVplMaxRange );
+
+            const int32 xzRange = static_cast<int32>( Math::Floor( range * invCellSize ) );
+            const int32 yRange  = xzRange * 6;
 
             int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize ) );
             int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize ) * 6.0f );
@@ -1799,18 +1843,62 @@ namespace Ogre
             blockY -= volumeOriginY;
             blockZ -= volumeOriginZ;
 
-            if( blockX >= 0 && blockX < texWidth &&
-                blockY >= 0 && blockY < texHeight &&
-                blockZ >= 0 && blockZ < texDepth )
-            {
-                for( int i=0; i<6; ++i )
-                {
-                    const Vector3 diffuseCol = vpl.dirDiffuse[i] * powerRatio;
-                    const size_t idx = blockZ * texSlicePitch + (blockY + i) * texRowPitch +
-                                       blockX * bytesPerPixel;
+            const int32 minBlockX = std::max( 0, blockX - xzRange );
+            const int32 minBlockY = std::max( 0, blockY -  yRange );
+            const int32 minBlockZ = std::max( 0, blockZ - xzRange );
 
-                    PixelUtil::packColour( diffuseCol.x, diffuseCol.y, diffuseCol.z, 1.0f,
-                                           PF_A2R10G10B10, &dstData[idx] );
+            const int32 maxBlockX = std::min( texWidth  - 1, blockX + xzRange );
+            const int32 maxBlockY = std::min( texHeight - 6, blockY +  yRange );
+            const int32 maxBlockZ = std::min( texDepth  - 1, blockZ + xzRange );
+
+            if( maxBlockX >= 0 && minBlockX < texWidth &&
+                maxBlockY >= 0 && minBlockY < texHeight &&
+                maxBlockZ >= 0 && minBlockZ < texDepth )
+            {
+                for( int32 z=minBlockZ; z<=maxBlockZ; ++z )
+                {
+                    for( int32 y=minBlockY; y<=maxBlockY; y += 6 )
+                    {
+                        for( int32 x=minBlockX; x<=maxBlockX; ++x )
+                        {
+                            Vector3 vplToCell = Vector3( x - blockX, (y - blockY) / 6, z - blockZ );
+                            Real distance = vplToCell.normalise();
+                            distance *= cellSize;
+                            if( vplToCell.dotProduct( vpl.normal ) < 0 )
+                                continue;
+
+                            Real atten = Real(1.0f) /
+                                    (mVplConstAtten + (mVplLinearAtten +
+                                                       mVplQuadAtten * distance) * distance);
+                            atten = Ogre::min( Real(1.0f), atten );
+                            atten *= Ogre::max( (range - distance) / range, 0.0f );
+
+                            const Vector3 diffuseCol = vpl.diffuse * invMaxPower * atten;
+                            for( int i=0; i<6; ++i )
+                            {
+                                const size_t idx = z * texSlicePitch + (y + i) * texRowPitch +
+                                                   x * bytesPerPixel;
+
+                                Vector3 prevCol;
+                                Real prevAlpha;
+                                PixelUtil::unpackColour( &prevCol.x, &prevCol.y, &prevCol.z, &prevAlpha,
+                                                         PF_A2R10G10B10, &dstData[idx] );
+
+                                if( x != blockX || y != blockY || z != blockZ )
+                                {
+                                    prevCol += Ogre::max( -vplToCell.dotProduct( c_directions[i] ),
+                                                          0 ) * diffuseCol;
+                                }
+                                else
+                                {
+                                    prevCol += vpl.dirDiffuse[i] * invMaxPower;
+                                }
+
+                                PixelUtil::packColour( prevCol.x, prevCol.y, prevCol.z, 1.0f,
+                                                       PF_A2R10G10B10, &dstData[idx] );
+                            }
+                        }
+                    }
                 }
             }
 

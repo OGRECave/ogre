@@ -1006,7 +1006,8 @@ namespace Ogre
                 *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.x ) / fTexWidth;
                 *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.y );
                 *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.z ) / fTexDepth;
-                *passBufferPtr++ = mIrrandianceVolume->getIrradianceMaxPower();
+                *passBufferPtr++ = mIrrandianceVolume->getIrradianceMaxPower() *
+                                   mIrrandianceVolume->mVplPowerBoost;
 
                 const float fTexHeight = static_cast<float>(
                             mIrrandianceVolume->getIrradianceVolumeTexture()->getHeight() );

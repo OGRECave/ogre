@@ -215,7 +215,7 @@ namespace Demo
         std::map<SDL_Keycode, SDL_Keysym>::const_iterator itor = mKeysHold.begin();
         std::map<SDL_Keycode, SDL_Keysym>::const_iterator end  = mKeysHold.end();
 
-        bool changedPowerBoost = false;
+        bool needsIrradianceVolumeRebuild = false;
         bool changedVplSetting = false;
         bool needsRebuild = false;
         while( itor != end )
@@ -241,12 +241,13 @@ namespace Demo
             {
                 mInstantRadiosity->mVplMaxRange += modPerFrame * 4.0f;
                 changedVplSetting = true;
+                needsIrradianceVolumeRebuild = true;
             }
             if( keySym.sym == SDLK_i )
             {
                 mInstantRadiosity->mVplPowerBoost += modPerFrame * 2.0f;
                 changedVplSetting = true;
-                changedPowerBoost = true;
+                needsIrradianceVolumeRebuild = true;
             }
             if( keySym.sym == SDLK_o )
             {
@@ -259,6 +260,7 @@ namespace Demo
                 mInstantRadiosity->mVplIntensityRangeMultiplier =
                         Ogre::max( mInstantRadiosity->mVplIntensityRangeMultiplier, 0.01 );
                 changedVplSetting = true;
+                needsIrradianceVolumeRebuild = true;
             }
 
             ++itor;
@@ -267,7 +269,7 @@ namespace Demo
         if( changedVplSetting && !needsRebuild )
         {
             mInstantRadiosity->updateExistingVpls();
-            if( changedPowerBoost )
+            if( needsIrradianceVolumeRebuild )
                 updateIrradianceVolume();
         }
         if( needsRebuild )
@@ -375,6 +377,7 @@ namespace Demo
             mInstantRadiosity->mVplUseIntensityForMaxRange =
                     !mInstantRadiosity->mVplUseIntensityForMaxRange;
             mInstantRadiosity->updateExistingVpls();
+            updateIrradianceVolume();
         }
         else if( arg.keysym.sym == SDLK_F5 )
         {
