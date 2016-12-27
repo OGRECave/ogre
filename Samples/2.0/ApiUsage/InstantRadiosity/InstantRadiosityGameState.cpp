@@ -98,7 +98,7 @@ namespace Demo
         mInstantRadiosity->suggestIrradianceVolumeParameters( volumeOrigin, lightMaxPower,
                                                               texWidth, texHeight, texDepth );
         mInstantRadiosity->createIrradianceVolumeTexture( texWidth, texHeight, texDepth );
-        mInstantRadiosity->fillIrradianceVolume( volumeOrigin, lightMaxPower );
+        mInstantRadiosity->fillIrradianceVolume( volumeOrigin, lightMaxPower, true );
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::createScene01(void)

@@ -365,7 +365,15 @@ namespace Ogre
         void createIrradianceVolumeTexture( uint32 width, uint32 height, uint32 depth );
         void destroyIrradianceVolumeTexture( bool restoreVpls=true );
 
-        void fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower );
+        /**
+        @param volumeOrigin
+        @param lightMaxPower
+        @param fadeAttenuationOverDistance
+            Whether to fade the attenuation with distance (not physically based).
+            See ForwardPlusBase::setFadeAttenuationRange
+        */
+        void fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower,
+                                   bool fadeAttenuationOverDistance );
 
         float getIrradianceMaxPower(void) const             { return mIrradianceMaxPower; }
         const Vector3& getIrradianceOrigin(void) const      { return mIrradianceOrigin; }

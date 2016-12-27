@@ -1766,7 +1766,8 @@ namespace Ogre
             updateExistingVpls();
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower )
+    void InstantRadiosity::fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower,
+                                                 bool fadeAttenuationOverDistance )
     {
         const Real cellSize     = mCellSize;
         const Real invCellSize  = Real(1.0) / mCellSize;
@@ -1871,7 +1872,8 @@ namespace Ogre
                                     (mVplConstAtten + (mVplLinearAtten +
                                                        mVplQuadAtten * distance) * distance);
                             atten = Ogre::min( Real(1.0f), atten );
-                            atten *= Ogre::max( (range - distance) / range, 0.0f );
+                            if( fadeAttenuationOverDistance )
+                                atten *= Ogre::max( (range - distance) / range, 0.0f );
 
                             const Vector3 diffuseCol = vpl.diffuse * invMaxPower * atten;
                             for( int i=0; i<6; ++i )
