@@ -996,8 +996,9 @@ namespace Ogre
 
             if( mIrrandianceVolume )
             {
+                const Vector3 irradianceCellSize = mIrrandianceVolume->getIrradianceCellSize();
                 const Vector3 irradianceVolumeOrigin = mIrrandianceVolume->getIrradianceOrigin() /
-                                                       mIrrandianceVolume->mCellSize;
+                                                       irradianceCellSize;
                 const float fTexWidth = static_cast<float>(
                             mIrrandianceVolume->getIrradianceVolumeTexture()->getWidth() );
                 const float fTexDepth = static_cast<float>(
@@ -1012,9 +1013,9 @@ namespace Ogre
                 const float fTexHeight = static_cast<float>(
                             mIrrandianceVolume->getIrradianceVolumeTexture()->getHeight() );
 
-                *passBufferPtr++ = 1.0f / (fTexWidth * mIrrandianceVolume->mCellSize);
-                *passBufferPtr++ = 1.0f / mIrrandianceVolume->mCellSize;
-                *passBufferPtr++ = 1.0f / (fTexDepth * mIrrandianceVolume->mCellSize);
+                *passBufferPtr++ = 1.0f / (fTexWidth * irradianceCellSize.x);
+                *passBufferPtr++ = 1.0f / irradianceCellSize.y;
+                *passBufferPtr++ = 1.0f / (fTexDepth * irradianceCellSize.z);
                 *passBufferPtr++ = 1.0f / fTexHeight;
             }
 

@@ -35,6 +35,7 @@ namespace Demo
         mLightNode( 0 ),
         mLight( 0 ),
         mInstantRadiosity( 0 ),
+        mIrradianceCellSize( 5.0f ),
         mCurrentType( Ogre::Light::LT_SPOTLIGHT )
     {
         mDisplayHelpMode        = 2;
@@ -95,10 +96,12 @@ namespace Demo
         Ogre::Vector3 volumeOrigin;
         Ogre::Real lightMaxPower;
         Ogre::uint32 texWidth, texHeight, texDepth;
-        mInstantRadiosity->suggestIrradianceVolumeParameters( volumeOrigin, lightMaxPower,
+        mInstantRadiosity->suggestIrradianceVolumeParameters( Ogre::Vector3( mIrradianceCellSize ),
+                                                              volumeOrigin, lightMaxPower,
                                                               texWidth, texHeight, texDepth );
         mInstantRadiosity->createIrradianceVolumeTexture( texWidth, texHeight, texDepth );
-        mInstantRadiosity->fillIrradianceVolume( volumeOrigin, lightMaxPower, true );
+        mInstantRadiosity->fillIrradianceVolume( Ogre::Vector3( mIrradianceCellSize ),
+                                                 volumeOrigin, lightMaxPower, true );
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::createScene01(void)
@@ -262,21 +265,23 @@ namespace Demo
                 changedVplSetting = true;
                 needsIrradianceVolumeRebuild = true;
             }
+            if( keySym.sym == SDLK_m )
+            {
+                mIrradianceCellSize += modPerFrame * 10.0;
+                mIrradianceCellSize = std::max( mIrradianceCellSize, 0.1f );
+                needsIrradianceVolumeRebuild = true;
+            }
 
             ++itor;
         }
 
         if( changedVplSetting && !needsRebuild )
-        {
             mInstantRadiosity->updateExistingVpls();
-            if( needsIrradianceVolumeRebuild )
-                updateIrradianceVolume();
-        }
         if( needsRebuild )
-        {
             mInstantRadiosity->build();
+
+        if( needsIrradianceVolumeRebuild || needsRebuild )
             updateIrradianceVolume();
-        }
 
         TutorialGameState::update( timeSinceLast );
     }
@@ -337,6 +342,12 @@ namespace Demo
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumSpreadIterations );
         outText += "\nNum bounces [L]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumRayBounces );
+
+        if( hlmsPbs->getIrrandianceVolume() )
+        {
+            outText += "\nIrradiance Cell Size [M]: ";
+            outText += Ogre::StringConverter::toString( mIrradianceCellSize );
+        }
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         outText += "\nCamera: ";

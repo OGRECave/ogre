@@ -176,6 +176,7 @@ namespace Ogre
         mUseTextures( true ),
         mIrradianceMaxPower( 1 ),
         mIrradianceOrigin( Vector3::ZERO ),
+        mIrradianceCellSize( Vector3::UNIT_SCALE ),
         mIrradianceSamplerblock( 0 )
     {
     }
@@ -1653,13 +1654,14 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::suggestIrradianceVolumeParameters( Vector3 &outVolumeOrigin,
+    void InstantRadiosity::suggestIrradianceVolumeParameters( const Vector3 &cellSize,
+                                                              Vector3 &outVolumeOrigin,
                                                               Real &outLightMaxPower,
                                                               uint32 &outTexWidth,
                                                               uint32 &outTexHeight,
                                                               uint32 &outTexDepth )
     {
-        const Real invCellSize = Real(1.0) / mCellSize;
+        const Vector3 invCellSize = Real(1.0) / cellSize;
 
         int32 minBlockX = std::numeric_limits<int32>::max();
         int32 minBlockY = std::numeric_limits<int32>::max();
@@ -1692,19 +1694,21 @@ namespace Ogre
             }
 
             range = Ogre::min( range, mVplMaxRange );
-            const int32 xyzRange = static_cast<int32>( Math::Floor( range * invCellSize ) );
+            const int32 xRange = static_cast<int32>( Math::Floor( range * invCellSize.x ) );
+            const int32 yRange = static_cast<int32>( Math::Floor( range * invCellSize.y ) );
+            const int32 zRange = static_cast<int32>( Math::Floor( range * invCellSize.z ) );
 
-            int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize ) );
-            int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize ) );
-            int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * invCellSize ) );
+            int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize.x ) );
+            int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize.y ) );
+            int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * invCellSize.z ) );
 
-            minBlockX = std::min( minBlockX, blockX - xyzRange );
-            minBlockY = std::min( minBlockY, blockY - xyzRange );
-            minBlockZ = std::min( minBlockZ, blockZ - xyzRange );
+            minBlockX = std::min( minBlockX, blockX - xRange );
+            minBlockY = std::min( minBlockY, blockY - yRange );
+            minBlockZ = std::min( minBlockZ, blockZ - zRange );
 
-            maxBlockX = std::max( maxBlockX, blockX + xyzRange );
-            maxBlockY = std::max( maxBlockY, blockY + xyzRange );
-            maxBlockZ = std::max( maxBlockZ, blockZ + xyzRange );
+            maxBlockX = std::max( maxBlockX, blockX + xRange );
+            maxBlockY = std::max( maxBlockY, blockY + yRange );
+            maxBlockZ = std::max( maxBlockZ, blockZ + zRange );
 
             for( int i=0; i<6; ++i )
             {
@@ -1720,9 +1724,9 @@ namespace Ogre
         outTexHeight    = (maxBlockY - minBlockY + 1) * 6u;
         outTexDepth     = maxBlockZ - minBlockZ + 1;
 
-        outVolumeOrigin.x = static_cast<Real>( minBlockX ) * mCellSize;
-        outVolumeOrigin.y = static_cast<Real>( minBlockY ) * mCellSize;
-        outVolumeOrigin.z = static_cast<Real>( minBlockZ ) * mCellSize;
+        outVolumeOrigin.x = static_cast<Real>( minBlockX ) * cellSize.x;
+        outVolumeOrigin.y = static_cast<Real>( minBlockY ) * cellSize.x;
+        outVolumeOrigin.z = static_cast<Real>( minBlockZ ) * cellSize.x;
 
         outLightMaxPower = lightMaxPower;
     }
@@ -1766,18 +1770,18 @@ namespace Ogre
             updateExistingVpls();
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower,
-                                                 bool fadeAttenuationOverDistance )
+    void InstantRadiosity::fillIrradianceVolume( Vector3 cellSize, Vector3 volumeOrigin,
+                                                 Real lightMaxPower, bool fadeAttenuationOverDistance )
     {
-        const Real cellSize     = mCellSize;
-        const Real invCellSize  = Real(1.0) / mCellSize;
+        const Vector3 invCellSize  = Real(1.0) / cellSize;
 
         //Quantize volumeCenter.
-        volumeOrigin.x = static_cast<int32>( Math::Floor( volumeOrigin.x * invCellSize ) );
-        volumeOrigin.y = static_cast<int32>( Math::Floor( volumeOrigin.y * invCellSize ) );
-        volumeOrigin.z = static_cast<int32>( Math::Floor( volumeOrigin.z * invCellSize ) );
+        volumeOrigin.x = static_cast<int32>( Math::Floor( volumeOrigin.x * invCellSize.x ) );
+        volumeOrigin.y = static_cast<int32>( Math::Floor( volumeOrigin.y * invCellSize.y ) );
+        volumeOrigin.z = static_cast<int32>( Math::Floor( volumeOrigin.z * invCellSize.z ) );
 
-        mIrradianceOrigin = volumeOrigin * mCellSize;
+        mIrradianceOrigin = volumeOrigin * cellSize;
+        mIrradianceCellSize = cellSize;
         mIrradianceMaxPower = lightMaxPower;
 
         const int32 volumeOriginX = static_cast<int32>( volumeOrigin.x );
@@ -1833,24 +1837,25 @@ namespace Ogre
 
             range = Ogre::min( range, mVplMaxRange );
 
-            const int32 xzRange = static_cast<int32>( Math::Floor( range * invCellSize ) );
-            const int32 yRange  = xzRange * 6;
+            const int32 xRange = static_cast<int32>( Math::Floor( range * invCellSize.x ) );
+            const int32 yRange = static_cast<int32>( Math::Floor( range * invCellSize.y ) * 6.0f );
+            const int32 zRange = static_cast<int32>( Math::Floor( range * invCellSize.z ) );
 
-            int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize ) );
-            int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize ) * 6.0f );
-            int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * invCellSize ) );
+            int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize.x ) );
+            int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize.y ) * 6.0f );
+            int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * invCellSize.z ) );
 
             blockX -= volumeOriginX;
             blockY -= volumeOriginY;
             blockZ -= volumeOriginZ;
 
-            const int32 minBlockX = std::max( 0, blockX - xzRange );
-            const int32 minBlockY = std::max( 0, blockY -  yRange );
-            const int32 minBlockZ = std::max( 0, blockZ - xzRange );
+            const int32 minBlockX = std::max( 0, blockX - xRange );
+            const int32 minBlockY = std::max( 0, blockY - yRange );
+            const int32 minBlockZ = std::max( 0, blockZ - zRange );
 
-            const int32 maxBlockX = std::min( texWidth  - 1, blockX + xzRange );
-            const int32 maxBlockY = std::min( texHeight - 6, blockY +  yRange );
-            const int32 maxBlockZ = std::min( texDepth  - 1, blockZ + xzRange );
+            const int32 maxBlockX = std::min( texWidth  - 1, blockX + xRange );
+            const int32 maxBlockY = std::min( texHeight - 6, blockY + yRange );
+            const int32 maxBlockZ = std::min( texDepth  - 1, blockZ + zRange );
 
             if( maxBlockX >= 0 && minBlockX < texWidth &&
                 maxBlockY >= 0 && minBlockY < texHeight &&
@@ -1863,8 +1868,8 @@ namespace Ogre
                         for( int32 x=minBlockX; x<=maxBlockX; ++x )
                         {
                             Vector3 vplToCell = Vector3( x - blockX, (y - blockY) / 6, z - blockZ );
+                            vplToCell *= cellSize;
                             Real distance = vplToCell.normalise();
-                            distance *= cellSize;
                             if( vplToCell.dotProduct( vpl.normal ) < 0 )
                                 continue;
 

@@ -27,6 +27,7 @@ namespace Demo
         Ogre::Light::LightTypes  mCurrentType;
 
         Ogre::InstantRadiosity          *mInstantRadiosity;
+        Ogre::Real                      mIrradianceCellSize;
 
         std::map<SDL_Keycode, SDL_Keysym> mKeysHold;
 

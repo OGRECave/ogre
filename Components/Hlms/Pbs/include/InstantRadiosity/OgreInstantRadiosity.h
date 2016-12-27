@@ -239,6 +239,7 @@ namespace Ogre
 
         float                   mIrradianceMaxPower;
         Vector3                 mIrradianceOrigin;
+        Vector3                 mIrradianceCellSize;
         TexturePtr              mIrradianceVolume;
         HlmsSamplerblock const  *mIrradianceSamplerblock;
 
@@ -336,6 +337,9 @@ namespace Ogre
 
         /** Outputs suggested parameters for a volumetric texture that will encompass all
             VPLs. They are suggestions, you don't have to follow them.
+        @param inCellSize
+            The size of the voxel size. Doesn't have to match mCellSize. The suggested
+            output parameters will be based on this input parameter.
         @param outVolumeOrigin
             Where the volume should start. This value will be in the same unit of measure
             you are working with (your Items/Entities, mCellSize).
@@ -356,7 +360,8 @@ namespace Ogre
             The suggested depth for the volume texture times. Volume's depth in units will be:
                 outVolumeOrigin.z + mCellSize * outTexDepth;
         */
-        void suggestIrradianceVolumeParameters( Vector3 &outVolumeOrigin,
+        void suggestIrradianceVolumeParameters( const Vector3 &inCellSize,
+                                                Vector3 &outVolumeOrigin,
                                                 Real &outLightMaxPower,
                                                 uint32 &outTexWidth,
                                                 uint32 &outTexHeight,
@@ -372,11 +377,12 @@ namespace Ogre
             Whether to fade the attenuation with distance (not physically based).
             See ForwardPlusBase::setFadeAttenuationRange
         */
-        void fillIrradianceVolume( Vector3 volumeOrigin, Real lightMaxPower,
+        void fillIrradianceVolume( Vector3 cellSize, Vector3 volumeOrigin, Real lightMaxPower,
                                    bool fadeAttenuationOverDistance );
 
         float getIrradianceMaxPower(void) const             { return mIrradianceMaxPower; }
         const Vector3& getIrradianceOrigin(void) const      { return mIrradianceOrigin; }
+        const Vector3& getIrradianceCellSize(void) const    { return mIrradianceCellSize; }
 
         const TexturePtr& getIrradianceVolumeTexture(void) const    { return mIrradianceVolume; }
         const HlmsSamplerblock* getIrradSamplerblock(void) const    { return mIrradianceSamplerblock; }
