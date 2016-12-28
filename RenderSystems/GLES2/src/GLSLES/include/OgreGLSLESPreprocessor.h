@@ -291,6 +291,18 @@ class CPreprocessor
     bool HandleIf (Token &iBody, int iLine);
 
     /**
+     * Handle an #elif directive.
+     * @param iBody
+     *     The body of the directive (everything after the directive
+     *     until end of line).
+     * @param iLine
+     *     The line where the directive begins (for error reports)
+     * @return
+     *     true if everything went ok, false if not
+     */
+    bool HandleElif (Token &iBody, int iLine);
+
+    /**
      * Handle an #else directive.
      * @param iBody
      *     The body of the directive (everything after the directive
