@@ -114,6 +114,8 @@ namespace Ogre
 
         uint32                  mTexUnitSlotStart;
 
+        InstantRadiosity       *mIrrandianceVolume;
+
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
         uint32 mLastTextureHash;
@@ -182,6 +184,10 @@ namespace Ogre
 
         void setParallaxCorrectedCubemap( ParallaxCorrectedCubemap *pcc )
                                                             { mParallaxCorrectedCubemap = pcc; }
+
+        void setIrrandianceVolume( InstantRadiosity *irrandianceVolume )
+                                                    { mIrrandianceVolume = irrandianceVolume; }
+        InstantRadiosity* getIrrandianceVolume(void) const  { return mIrrandianceVolume; }
 
 #if !OGRE_NO_JSON
         /// @copydoc Hlms::_loadJson
@@ -280,6 +286,7 @@ namespace Ogre
         static const IdString TargetEnvprobeMap;
         static const IdString ParallaxCorrectCubemaps;
         static const IdString UseParallaxCorrectCubemaps;
+        static const IdString IrradianceVolumes;
 
         static const IdString BrdfDefault;
         static const IdString BrdfCookTorrance;

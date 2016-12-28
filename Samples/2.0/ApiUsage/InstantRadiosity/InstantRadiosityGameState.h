@@ -27,12 +27,14 @@ namespace Demo
         Ogre::Light::LightTypes  mCurrentType;
 
         Ogre::InstantRadiosity          *mInstantRadiosity;
+        Ogre::Real                      mIrradianceCellSize;
 
         std::map<SDL_Keycode, SDL_Keysym> mKeysHold;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
         void createLight(void);
+        void updateIrradianceVolume(void);
 
     public:
         InstantRadiosityGameState( const Ogre::String &helpDescription );

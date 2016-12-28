@@ -25,6 +25,11 @@ struct PS_INPUT
 Buffer<uint> f3dGrid : register(t1);
 Buffer<float4> f3dLightList : register(t2);@end
 
+@property( irradiance_volumes )
+	Texture3D<float4>	irradianceVolume		: register(t@value(irradianceVolumeTexUnit));
+	SamplerState		irradianceVolumeSampler	: register(s@value(irradianceVolumeTexUnit));
+@end
+
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( use_envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));
@@ -363,6 +368,7 @@ float4 diffuseCol;
 	}@end
 
 @insertpiece( forward3dLighting )
+@insertpiece( applyIrradianceVolumes )
 
 @property( use_envprobe_map || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;

@@ -44,6 +44,11 @@ struct PassData
 	float4 ambientLowerHemi;
 	float4 ambientHemisphereDir;
 @end
+@property( irradiance_volumes )
+	float4 irradianceOrigin;	//.w = maxPower
+	float4 irradianceSize;		//.w = 1.0f / irradianceTexture->getHeight()
+	float4x4 invView;
+@end
 @property( hlms_pssm_splits )@foreach( hlms_pssm_splits, n )
 	float pssmSplitPoints@n;@end @end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end

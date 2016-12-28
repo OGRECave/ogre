@@ -20,6 +20,10 @@ struct PS_INPUT
 
 @property( !hlms_shadowcaster )
 
+@property( irradiance_volumes )
+	@insertpiece( Common_Matrix_Conversions )
+@end
+
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 
 @property( normal_map )
@@ -145,6 +149,11 @@ fragment @insertpiece( output_type ) main_metal
 	@property( hlms_forwardplus )
 		, device const ushort *f3dGrid [[buffer(TEX_SLOT_START+1)]]
 		, device const float4 *f3dLightList [[buffer(TEX_SLOT_START+2)]]
+	@end
+
+	@property( irradiance_volumes )
+		, texture3d<float>	irradianceVolume		[[texture(t@value(irradianceVolumeTexUnit))]];
+		, sampler			irradianceVolumeSampler	[[sampler(t@value(irradianceVolumeTexUnit))]];
 	@end
 
 	@property( two_sided_lighting )
@@ -376,6 +385,7 @@ float4 diffuseCol;
 	}@end
 
 @insertpiece( forward3dLighting )
+@insertpiece( applyIrradianceVolumes )
 
 @property( use_envprobe_map || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
