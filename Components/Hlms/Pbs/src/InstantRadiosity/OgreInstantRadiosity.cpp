@@ -1563,6 +1563,192 @@ namespace Ogre
             inOutDirDiffuse[i] += Ogre::max( lightDir.dotProduct( directions[i] ), 0 ) * diffuse;
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosity::gaussFilter( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
+                                        size_t texWidth, size_t texHeight, size_t texDepth )
+    {
+        /*const float c_kernel[17] =
+        {
+            0.000078f, 0.000489f, 0.002403f, 0.009245f, 0.027835f, 0.065592f, 0.12098f, 0.17467f,
+            0.197417f,
+            0.17467f, 0.12098f, 0.065592f, 0.027835f, 0.009245f, 0.002403f, 0.000489f, 0.000078f
+        };
+
+        const int kernelStart = -8;
+        const int kernelEnd   =  8;*/
+        const float c_kernel[9] =
+        {
+            0.028532f, 0.067234f, 0.124009f, 0.179044f,
+            0.20236f,
+            0.179044f, 0.124009f, 0.067234f, 0.028532f
+        };
+
+        const int kernelStart = -4;
+        const int kernelEnd   =  4;
+
+        gaussFilterX( dstData, srcData, texWidth, texHeight, texDepth,
+                      c_kernel, kernelStart, kernelEnd );
+        gaussFilterY( srcData, dstData, texWidth, texHeight, texDepth,
+                      c_kernel, kernelStart, kernelEnd );
+        gaussFilterZ( dstData, srcData, texWidth, texHeight, texDepth,
+                      c_kernel, kernelStart, kernelEnd );
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::gaussFilterX( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
+                                         size_t texWidth, size_t texHeight, size_t texDepth,
+                                         const float * RESTRICT_ALIAS kernel,
+                                         int kernelStart, int kernelEnd )
+    {
+        const size_t rowPitch = texWidth * 3u;
+        const size_t slicePitch = rowPitch * texHeight;
+
+        //X filter
+        for( size_t z=0; z<texDepth; ++z )
+        {
+            for( size_t y=0; y<texHeight; y += 6u )
+            {
+                for( size_t x=0; x<texWidth; ++x )
+                {
+                    const int kStart    = std::max<int>( -x, kernelStart );
+                    const int kEnd      = std::min<int>( texWidth - 1 - x, kernelEnd );
+
+                    for( int i=0; i<6; ++i )
+                    {
+                        float accumR = 0;
+                        float accumG = 0;
+                        float accumB = 0;
+
+                        float divisor = 0;
+
+                        size_t srcIdx = z * slicePitch + (y + i) * rowPitch + (x + kStart) * 3u;
+
+                        for( int k=kStart; k<=kEnd; ++k )
+                        {
+                            const float kernelVal = kernel[k+kernelEnd];
+
+                            accumR += srcData[srcIdx+0] * kernelVal;
+                            accumG += srcData[srcIdx+1] * kernelVal;
+                            accumB += srcData[srcIdx+2] * kernelVal;
+
+                            divisor += kernelVal;
+                            srcIdx += 3;
+                        }
+
+                        float invDivisor = 1.0f / divisor;
+                        const size_t dstIdx = z * slicePitch + (y + i) * rowPitch + x * 3u;
+
+                        dstData[dstIdx+0] = accumR * invDivisor;
+                        dstData[dstIdx+1] = accumG * invDivisor;
+                        dstData[dstIdx+2] = accumB * invDivisor;
+                    }
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::gaussFilterY( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
+                                         size_t texWidth, size_t texHeight, size_t texDepth,
+                                         const float * RESTRICT_ALIAS kernel,
+                                         int kernelStart, int kernelEnd )
+    {
+        const size_t rowPitch = texWidth * 3u;
+        const size_t slicePitch = rowPitch * texHeight;
+
+        //Y filter
+        for( size_t z=0; z<texDepth; ++z )
+        {
+            for( size_t y=0; y<texHeight; y += 6u )
+            {
+                const int kStart    = std::max<int>( -(y / 6u), kernelStart );
+                const int kEnd      = std::min<int>( (texHeight - 6u - y) / 6u, kernelEnd );
+
+                for( size_t x=0; x<texWidth; ++x )
+                {
+                    for( int i=0; i<6; ++i )
+                    {
+                        float accumR = 0;
+                        float accumG = 0;
+                        float accumB = 0;
+
+                        float divisor = 0;
+
+                        size_t srcIdx = z * slicePitch + (y + i + kStart * 6) * rowPitch + x * 3u;
+
+                        for( int k=kStart; k<=kEnd; ++k )
+                        {
+                            const float kernelVal = kernel[k+kernelEnd];
+
+                            accumR += srcData[srcIdx+0] * kernelVal;
+                            accumG += srcData[srcIdx+1] * kernelVal;
+                            accumB += srcData[srcIdx+2] * kernelVal;
+
+                            divisor += kernelVal;
+                            srcIdx += rowPitch * 6u;
+                        }
+
+                        float invDivisor = 1.0f / divisor;
+                        const size_t dstIdx = z * slicePitch + (y + i) * rowPitch + x * 3u;
+
+                        dstData[dstIdx+0] = accumR * invDivisor;
+                        dstData[dstIdx+1] = accumG * invDivisor;
+                        dstData[dstIdx+2] = accumB * invDivisor;
+                    }
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::gaussFilterZ( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
+                                         size_t texWidth, size_t texHeight, size_t texDepth,
+                                         const float * RESTRICT_ALIAS kernel,
+                                         int kernelStart, int kernelEnd )
+    {
+        const size_t rowPitch = texWidth * 3u;
+        const size_t slicePitch = rowPitch * texHeight;
+
+        //Z filter
+        for( size_t z=0; z<texDepth; ++z )
+        {
+            const int kStart    = std::max<int>( -z, kernelStart );
+            const int kEnd      = std::min<int>( texDepth - 1u - z, kernelEnd );
+
+            for( size_t y=0; y<texHeight; y += 6u )
+            {
+                for( size_t x=0; x<texWidth; ++x )
+                {
+                    for( int i=0; i<6; ++i )
+                    {
+                        float accumR = 0;
+                        float accumG = 0;
+                        float accumB = 0;
+
+                        float divisor = 0;
+
+                        size_t srcIdx = (z + kStart) * slicePitch + (y + i) * rowPitch + x * 3u;
+
+                        for( int k=kStart; k<=kEnd; ++k )
+                        {
+                            const float kernelVal = kernel[k+kernelEnd];
+
+                            accumR += srcData[srcIdx+0] * kernelVal;
+                            accumG += srcData[srcIdx+1] * kernelVal;
+                            accumB += srcData[srcIdx+2] * kernelVal;
+
+                            divisor += kernelVal;
+                            srcIdx += slicePitch;
+                        }
+
+                        float invDivisor = 1.0f / divisor;
+                        const size_t dstIdx = z * slicePitch + (y + i) * rowPitch + x * 3u;
+
+                        dstData[dstIdx+0] = accumR * invDivisor;
+                        dstData[dstIdx+1] = accumG * invDivisor;
+                        dstData[dstIdx+2] = accumB * invDivisor;
+                    }
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void InstantRadiosity::createDebugMarkers(void)
     {
         destroyDebugMarkers();
@@ -1794,17 +1980,16 @@ namespace Ogre
         const int32 texHeight = static_cast<int32>( mIrradianceVolume->getHeight() );
         const int32 texDepth  = static_cast<int32>( mIrradianceVolume->getDepth() );
 
-        const PixelBox &lockBox = mIrradianceVolume->getBuffer()->lock(
-                    Box( 0, 0, 0, texWidth, texHeight, texDepth ), v1::HardwareBuffer::HBL_NORMAL );
-
-        const size_t bytesPerPixel = PixelUtil::getNumElemBytes( mIrradianceVolume->getFormat() );
-        const size_t texRowPitch = lockBox.rowPitchAlwaysBytes();
-        const size_t texSlicePitch = lockBox.slicePitchAlwaysBytes();
+        float *floatVolume = reinterpret_cast<float*>( OGRE_MALLOC( texWidth * texHeight *
+                                                                    texDepth * 3u * sizeof(float),
+                                                                    MEMCATEGORY_GENERAL ) );
+        const size_t rowPitch = texWidth * 3u;
+        const size_t slicePitch = rowPitch * texHeight;
 
         VplVec::const_iterator itor = mVpls.begin();
         VplVec::const_iterator end  = mVpls.end();
 
-        memset( lockBox.data, 0, texSlicePitch * lockBox.getDepth() );
+        memset( floatVolume, 0, texWidth * texHeight * texDepth * 3u * sizeof(float) );
 
         const Vector3 c_directions[6] =
         {
@@ -1815,8 +2000,6 @@ namespace Ogre
             Vector3(  0,  0,  1 ),
             Vector3(  0,  0, -1 )
         };
-
-        uint8 * RESTRICT_ALIAS dstData = reinterpret_cast<uint8 * RESTRICT_ALIAS>( lockBox.data );
 
         while( itor != end )
         {
@@ -1883,26 +2066,23 @@ namespace Ogre
                             const Vector3 diffuseCol = vpl.diffuse * invMaxPower * atten;
                             for( int i=0; i<6; ++i )
                             {
-                                const size_t idx = z * texSlicePitch + (y + i) * texRowPitch +
-                                                   x * bytesPerPixel;
-
-                                Vector3 prevCol;
-                                Real prevAlpha;
-                                PixelUtil::unpackColour( &prevCol.x, &prevCol.y, &prevCol.z, &prevAlpha,
-                                                         PF_A2R10G10B10, &dstData[idx] );
+                                const size_t idx = z * slicePitch + (y + i) * rowPitch + x * 3u;
 
                                 if( x != blockX || y != blockY || z != blockZ )
                                 {
-                                    prevCol += Ogre::max( -vplToCell.dotProduct( c_directions[i] ),
-                                                          0 ) * diffuseCol;
+                                    Vector3 finalCol = Ogre::max(
+                                                -vplToCell.dotProduct( c_directions[i] ),
+                                                0 ) * diffuseCol;
+                                    floatVolume[idx+0] += finalCol.x;
+                                    floatVolume[idx+1] += finalCol.y;
+                                    floatVolume[idx+2] += finalCol.z;
                                 }
                                 else
                                 {
-                                    prevCol += vpl.dirDiffuse[i] * invMaxPower;
+                                    floatVolume[idx+0] += vpl.dirDiffuse[i].x * invMaxPower;
+                                    floatVolume[idx+1] += vpl.dirDiffuse[i].y * invMaxPower;
+                                    floatVolume[idx+2] += vpl.dirDiffuse[i].z * invMaxPower;
                                 }
-
-                                PixelUtil::packColour( prevCol.x, prevCol.y, prevCol.z, 1.0f,
-                                                       PF_A2R10G10B10, &dstData[idx] );
                             }
                         }
                     }
@@ -1912,7 +2092,45 @@ namespace Ogre
             ++itor;
         }
 
+        {
+            float *floatVolume02 = reinterpret_cast<float*>( OGRE_MALLOC( texWidth * texHeight *
+                                                                          texDepth * 3u * sizeof(float),
+                                                                          MEMCATEGORY_GENERAL ) );
+            gaussFilter( floatVolume02, floatVolume, texWidth, texHeight, texDepth );
+
+            OGRE_FREE( floatVolume, MEMCATEGORY_GENERAL );
+            floatVolume = 0;
+
+            floatVolume = floatVolume02;
+        }
+
+        const PixelBox &lockBox = mIrradianceVolume->getBuffer()->lock(
+                            Box( 0, 0, 0, texWidth, texHeight, texDepth ), v1::HardwareBuffer::HBL_NORMAL );
+
+        const size_t bytesPerPixel = PixelUtil::getNumElemBytes( mIrradianceVolume->getFormat() );
+        const size_t texRowPitch = lockBox.rowPitchAlwaysBytes();
+        const size_t texSlicePitch = lockBox.slicePitchAlwaysBytes();
+
+        uint8 * RESTRICT_ALIAS dstData = reinterpret_cast<uint8 * RESTRICT_ALIAS>( lockBox.data );
+
+        for( size_t z=0; z<texDepth; ++z )
+        {
+            for( size_t y=0; y<texHeight; ++y )
+            {
+                for( size_t x=0; x<texWidth; ++x )
+                {
+                    const size_t srcIdx = z * slicePitch + y * rowPitch + x * 3u;
+                    const size_t dstIdx = z * texSlicePitch + y * texRowPitch + x * bytesPerPixel;
+                    PixelUtil::packColour( floatVolume[srcIdx+0], floatVolume[srcIdx+1],
+                                           floatVolume[srcIdx+2], 1.0f,
+                                           PF_A2R10G10B10, &dstData[dstIdx] );
+                }
+            }
+        }
+
         mIrradianceVolume->getBuffer()->unlock();
+        OGRE_FREE( floatVolume, MEMCATEGORY_GENERAL );
+        floatVolume = 0;
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------

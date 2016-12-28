@@ -35,7 +35,7 @@ namespace Demo
         mLightNode( 0 ),
         mLight( 0 ),
         mInstantRadiosity( 0 ),
-        mIrradianceCellSize( 5.0f ),
+        mIrradianceCellSize( 1.5f ),
         mCurrentType( Ogre::Light::LT_SPOTLIGHT )
     {
         mDisplayHelpMode        = 2;
@@ -101,7 +101,7 @@ namespace Demo
                                                               texWidth, texHeight, texDepth );
         mInstantRadiosity->createIrradianceVolumeTexture( texWidth, texHeight, texDepth );
         mInstantRadiosity->fillIrradianceVolume( Ogre::Vector3( mIrradianceCellSize ),
-                                                 volumeOrigin, lightMaxPower, true );
+                                                 volumeOrigin, lightMaxPower, false );
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::createScene01(void)

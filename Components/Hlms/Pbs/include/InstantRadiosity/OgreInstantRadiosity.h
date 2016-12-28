@@ -296,6 +296,17 @@ namespace Ogre
         /// lightDir is normalized
         static void mergeDirectionalDiffuse( const Vector3 &diffuse, const Vector3 &lightDir,
                                              Vector3 *inOutDirDiffuse );
+        static void gaussFilter( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
+                                 size_t texWidth, size_t texHeight, size_t texDepth );
+        static void gaussFilterX( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
+                                  size_t texWidth, size_t texHeight, size_t texDepth,
+                                  const float * RESTRICT_ALIAS kernel, int kernelStart, int kernelEnd );
+        static void gaussFilterY( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
+                                  size_t texWidth, size_t texHeight, size_t texDepth,
+                                  const float * RESTRICT_ALIAS kernel, int kernelStart, int kernelEnd );
+        static void gaussFilterZ( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
+                                  size_t texWidth, size_t texHeight, size_t texDepth,
+                                  const float * RESTRICT_ALIAS kernel, int kernelStart, int kernelEnd );
 
         void createDebugMarkers(void);
         void destroyDebugMarkers(void);
