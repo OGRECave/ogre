@@ -149,10 +149,9 @@ namespace Ogre {
         mGLSupport.getStateCacheManager()->bindGLTexture(texTarget, mTextureID);
         
         // If we can do automip generation and the user desires this, do so
-        mMipmapsHardwareGenerated =
-            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
+        mMipmapsHardwareGenerated = !PixelUtil::isCompressed(mFormat);
 
-        if(!Bitwise::isPO2(mWidth) || !Bitwise::isPO2(mHeight))
+        if(!nonPowerOfTwoSupported && (!Bitwise::isPO2(mWidth) || !Bitwise::isPO2(mHeight)))
             mMipmapsHardwareGenerated = false;
 
         // glGenerateMipmap require all mip levels to be prepared. So override how many this texture has.
