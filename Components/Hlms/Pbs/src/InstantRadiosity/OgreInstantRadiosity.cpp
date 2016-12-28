@@ -1933,6 +1933,8 @@ namespace Ogre
         samplerblock.mMinFilter = FO_LINEAR;
         samplerblock.mMagFilter = FO_LINEAR;
         samplerblock.mMipFilter = FO_LINEAR;
+        samplerblock.setAddressingMode( TAM_BORDER );
+        samplerblock.mBorderColour = ColourValue::ZERO;
         mIrradianceSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
 
         updateExistingVpls();
