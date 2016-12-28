@@ -1,9 +1,9 @@
 @property( irradiance_volumes )
 @piece( applyIrradianceVolumes )
-	vec3 worldNormal = nNormal.xyz * mat3(pass.invView);
-	vec3 worldPos = (vec4( inPs.pos.xyz, 1.0 ) * pass.invView).xyz;
+	float3 worldNormal = mul( nNormal.xyz, (float3x3)passBuf.invView );
+	float3 worldPos = mul( float4( inPs.pos.xyz, 1.0 ), passBuf.invView ).xyz;
 
-	vec3 irradiancePos = worldPos.xyz * pass.irradianceSize.xyz - pass.irradianceOrigin.xyz;
+	float3 irradiancePos = worldPos.xyz * passBuf.irradianceSize.xyz - passBuf.irradianceOrigin.xyz;
 	//Floor irradiancePos.y and put the fractional part so we can lerp.
 	irradiancePos.y -= 0.5f;	//Texel centers are at center. Move it to origin.
 	float origYPos;
@@ -12,13 +12,13 @@
 	origYPos += 0.5f;	//Make sure we sample at center (so HW doesn't do linear
 						//filtering on the Y axis. We'll do that manually)
 
-	vec3 isNegative = vec3( lessThan( worldNormal.xyz, vec3( 0, 0, 0 ) ) );
+	float3 isNegative = float3( worldNormal.xyz < float3( 0, 0, 0 ) );
 
-	vec3 tmpAmbientSample;
+	float3 tmpAmbientSample;
 
 	//We need to make 3 samples (actually 6), one for each axis.
 	/* The code is basically doing:
-	vec3 cAmbientCube[6];
+	float3 cAmbientCube[6];
 	int3 isNegative = ( worldNormal < 0.0 );
 	float3 linearColor;
 	linearColor =	worldNormalSq.x * cAmbientCube[isNegative.x] +
@@ -32,35 +32,35 @@
 	filtering around the Y axis)
 	**/
 
-	float irradianceTexInvHeight = pass.irradianceSize.w;
+	float irradianceTexInvHeight = passBuf.irradianceSize.w;
 
 	irradiancePos.y		= (origYPos + isNegative.x) * irradianceTexInvHeight;
-	vec3 xAmbientSample	= texture( irradianceVolume, irradiancePos ).xyz;
+	float3 xAmbientSample	= irradianceVolume.Sample( irradianceVolumeSampler, irradiancePos ).xyz;
 	irradiancePos.y		+= 6.0f * irradianceTexInvHeight;
-	tmpAmbientSample	= texture( irradianceVolume, irradiancePos ).xyz;
+	tmpAmbientSample	= irradianceVolume.Sample( irradianceVolumeSampler, irradiancePos ).xyz;
 
-	xAmbientSample = mix( xAmbientSample, tmpAmbientSample, fIrradianceYWeight );
+	xAmbientSample = lerp( xAmbientSample, tmpAmbientSample, fIrradianceYWeight );
 
 	irradiancePos.y		= (origYPos + (2.0f + isNegative.y)) * irradianceTexInvHeight;
-	vec3 yAmbientSample	= texture( irradianceVolume, irradiancePos ).xyz;
+	float3 yAmbientSample	= irradianceVolume.Sample( irradianceVolumeSampler, irradiancePos ).xyz;
 	irradiancePos.y		+= 6.0f * irradianceTexInvHeight;
-	tmpAmbientSample	= texture( irradianceVolume, irradiancePos ).xyz;
+	tmpAmbientSample	= irradianceVolume.Sample( irradianceVolumeSampler, irradiancePos ).xyz;
 
-	yAmbientSample = mix( yAmbientSample, tmpAmbientSample, fIrradianceYWeight );
+	yAmbientSample = lerp( yAmbientSample, tmpAmbientSample, fIrradianceYWeight );
 
 	irradiancePos.y		= (origYPos + (4.0f + isNegative.z)) * irradianceTexInvHeight;
-	vec3 zAmbientSample = texture( irradianceVolume, irradiancePos ).xyz;
+	float3 zAmbientSample = irradianceVolume.Sample( irradianceVolumeSampler, irradiancePos ).xyz;
 	irradiancePos.y		+= 6.0f * irradianceTexInvHeight;
-	tmpAmbientSample	= texture( irradianceVolume, irradiancePos ).xyz;
+	tmpAmbientSample	= irradianceVolume.Sample( irradianceVolumeSampler, irradiancePos ).xyz;
 
-	zAmbientSample = mix( zAmbientSample, tmpAmbientSample, fIrradianceYWeight );
+	zAmbientSample = lerp( zAmbientSample, tmpAmbientSample, fIrradianceYWeight );
 
 
-	vec3 worldNormalSq = worldNormal.xyz * worldNormal.xyz;
-	vec3 ambientTerm =	worldNormalSq.x * xAmbientSample.xyz +
-						worldNormalSq.y * yAmbientSample.xyz +
-						worldNormalSq.z * zAmbientSample.xyz;
-	ambientTerm *= pass.irradianceOrigin.w; //irradianceOrigin.w = irradianceMaxPower
+	float3 worldNormalSq = worldNormal.xyz * worldNormal.xyz;
+	float3 ambientTerm =	worldNormalSq.x * xAmbientSample.xyz +
+							worldNormalSq.y * yAmbientSample.xyz +
+							worldNormalSq.z * zAmbientSample.xyz;
+	ambientTerm *= passBuf.irradianceOrigin.w; //irradianceOrigin.w = irradianceMaxPower
 
 	finalColour.xyz += ambientTerm.xyz * @insertpiece( kD ).xyz;
 @end

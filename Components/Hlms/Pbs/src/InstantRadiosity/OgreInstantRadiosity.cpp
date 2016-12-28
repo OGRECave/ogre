@@ -1608,7 +1608,7 @@ namespace Ogre
             {
                 for( size_t x=0; x<texWidth; ++x )
                 {
-                    const int kStart    = std::max<int>( -x, kernelStart );
+                    const int kStart    = std::max<int>( -(int)x, kernelStart );
                     const int kEnd      = std::min<int>( texWidth - 1 - x, kernelEnd );
 
                     for( int i=0; i<6; ++i )
@@ -1658,7 +1658,7 @@ namespace Ogre
         {
             for( size_t y=0; y<texHeight; y += 6u )
             {
-                const int kStart    = std::max<int>( -(y / 6u), kernelStart );
+                const int kStart    = std::max<int>( -(int)(y / 6u), kernelStart );
                 const int kEnd      = std::min<int>( (texHeight - 6u - y) / 6u, kernelEnd );
 
                 for( size_t x=0; x<texWidth; ++x )
@@ -1708,7 +1708,7 @@ namespace Ogre
         //Z filter
         for( size_t z=0; z<texDepth; ++z )
         {
-            const int kStart    = std::max<int>( -z, kernelStart );
+            const int kStart    = std::max<int>( -(int)z, kernelStart );
             const int kEnd      = std::min<int>( texDepth - 1u - z, kernelEnd );
 
             for( size_t y=0; y<texHeight; y += 6u )
@@ -2113,11 +2113,11 @@ namespace Ogre
 
         uint8 * RESTRICT_ALIAS dstData = reinterpret_cast<uint8 * RESTRICT_ALIAS>( lockBox.data );
 
-        for( size_t z=0; z<texDepth; ++z )
+        for( size_t z=0; z<(size_t)texDepth; ++z )
         {
-            for( size_t y=0; y<texHeight; ++y )
+            for( size_t y=0; y<(size_t)texHeight; ++y )
             {
-                for( size_t x=0; x<texWidth; ++x )
+                for( size_t x=0; x<(size_t)texWidth; ++x )
                 {
                     const size_t srcIdx = z * slicePitch + y * rowPitch + x * 3u;
                     const size_t dstIdx = z * texSlicePitch + y * texRowPitch + x * bytesPerPixel;

@@ -47,6 +47,7 @@ layout(binding = 0) uniform PassBuffer
 @property( irradiance_volumes )
 	vec4 irradianceOrigin;	//.w = maxPower
 	vec4 irradianceSize;	//.w = 1.0f / irradianceTexture->getHeight()
+	mat4 invView;
 @end
 
 @property( hlms_pssm_splits )@foreach( hlms_pssm_splits, n )

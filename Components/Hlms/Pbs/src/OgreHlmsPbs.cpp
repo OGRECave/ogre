@@ -846,9 +846,10 @@ namespace Ogre
             if( ambientMode == AmbientHemisphere )
                 mapSize += 8 * 4;
 
-            //vec3 irradianceOrigin + float maxPower + vec3 irradianceSize + float invHeight;
+            //vec3 irradianceOrigin + float maxPower +
+            //vec3 irradianceSize + float invHeight + mat4 invView
             if( mIrrandianceVolume )
-                mapSize += (4 + 4) * 4;
+                mapSize += (4 + 4 + 4*4) * 4;
 
             //float pssmSplitPoints N times.
             mapSize += numPssmSplits * 4;
@@ -1017,6 +1018,11 @@ namespace Ogre
                 *passBufferPtr++ = 1.0f / irradianceCellSize.y;
                 *passBufferPtr++ = 1.0f / (fTexDepth * irradianceCellSize.z);
                 *passBufferPtr++ = 1.0f / fTexHeight;
+
+                //mat4 invView;
+                Matrix4 invViewMatrix = viewMatrix.inverse();
+                for( size_t i=0; i<16; ++i )
+                    *passBufferPtr++ = (float)invViewMatrix[0][i];
             }
 
             //float pssmSplitPoints
