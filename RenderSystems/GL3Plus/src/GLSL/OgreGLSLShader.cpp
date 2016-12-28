@@ -178,7 +178,12 @@ namespace Ogre {
                     }
                 }
                 else
+                {
+                    if(pos < mPreprocessorDefines.size())
+                         cpp.Define (mPreprocessorDefines.c_str () + pos, mPreprocessorDefines.size() - pos, 1);
+ 
                     pos = endPos;
+                }
             }
         }
 
