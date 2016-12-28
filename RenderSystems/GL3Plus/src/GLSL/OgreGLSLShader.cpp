@@ -40,28 +40,15 @@
 #include "OgreGLUtil.h"
 
 namespace Ogre {
-
-    String operationTypeToString(RenderOperation::OperationType val);
-    RenderOperation::OperationType parseOperationType(const String& val);
-
-    GLSLShader::CmdPreprocessorDefines GLSLShader::msCmdPreprocessorDefines;
-    GLSLShader::CmdAttach GLSLShader::msCmdAttach;
-    GLSLShader::CmdColumnMajorMatrices GLSLShader::msCmdColumnMajorMatrices;
-    GLSLShader::CmdInputOperationType GLSLShader::msInputOperationTypeCmd;
-    GLSLShader::CmdOutputOperationType GLSLShader::msOutputOperationTypeCmd;
-    GLSLShader::CmdMaxOutputVertices GLSLShader::msMaxOutputVerticesCmd;
-    
     GLuint GLSLShader::mShaderCount = 0;
 
     GLSLShader::GLSLShader(
         ResourceManager* creator,
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
+        : GLSLProgramCommon(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
-        , mCompiled(0)
-        , mColumnMajorMatrices(true)
     {
         if (createParamDictionary("GLSLShader"))
         {
@@ -112,7 +99,6 @@ namespace Ogre {
         mLoadFromFile = false;
     }
 
-
     GLSLShader::~GLSLShader()
     {
         // Have to call this here rather than in Resource destructor
@@ -127,79 +113,7 @@ namespace Ogre {
         }
     }
 
-
-    void GLSLShader::loadFromSource(void)
-    {
-        // Preprocess the GLSL shader in order to get a clean source
-        CPreprocessor cpp;
-
-        // Pass all user-defined macros to preprocessor
-        if (!mPreprocessorDefines.empty ())
-        {
-            String::size_type pos = 0;
-            while (pos != String::npos)
-            {
-                // Find delims
-                String::size_type endPos = mPreprocessorDefines.find_first_of(";,=", pos);
-                if (endPos != String::npos)
-                {
-                    String::size_type macro_name_start = pos;
-                    size_t macro_name_len = endPos - pos;
-                    pos = endPos;
-
-                    // Check definition part
-                    if (mPreprocessorDefines[pos] == '=')
-                    {
-                        // Set up a definition, skip delim
-                        ++pos;
-                        String::size_type macro_val_start = pos;
-                        size_t macro_val_len;
-
-                        endPos = mPreprocessorDefines.find_first_of(";,", pos);
-                        if (endPos == String::npos)
-                        {
-                            macro_val_len = mPreprocessorDefines.size () - pos;
-                            pos = endPos;
-                        }
-                        else
-                        {
-                            macro_val_len = endPos - pos;
-                            pos = endPos+1;
-                        }
-                        cpp.Define (
-                            mPreprocessorDefines.c_str () + macro_name_start, macro_name_len,
-                            mPreprocessorDefines.c_str () + macro_val_start, macro_val_len);
-                    }
-                    else
-                    {
-                        // No definition part, define as "1"
-                        ++pos;
-                        cpp.Define (
-                            mPreprocessorDefines.c_str () + macro_name_start, macro_name_len, 1);
-                    }
-                }
-                else
-                    pos = endPos;
-            }
-        }
-
-        size_t out_size = 0;
-        const char *src = mSource.c_str ();
-        size_t src_len = mSource.size ();
-        char *out = cpp.Parse (src, src_len, out_size);
-        if (!out || !out_size)
-            // Failed to preprocess, break out
-            OGRE_EXCEPT (Exception::ERR_RENDERINGAPI_ERROR,
-                         "Failed to preprocess shader " + mName,
-                         __FUNCTION__);
-
-        mSource = String (out, out_size);
-        if (out < src || out > src + src_len)
-            free (out);
-    }
-
-
-    bool GLSLShader::compile(const bool checkErrors)
+    bool GLSLShader::compile(bool checkErrors)
     {
         if (mCompiled == 1)
         {
@@ -310,18 +224,6 @@ namespace Ogre {
         // mAssemblerProgram->setComputeGroupDimensions(getComputeGroupDimensions());
     }
 
-
-    void GLSLShader::unloadImpl()
-    {
-        // We didn't create mAssemblerProgram through a manager, so override this
-        // implementation so that we don't try to remove it from one. Since getCreator()
-        // is used, it might target a different matching handle!
-        // mAssemblerProgram.setNull();
-
-        unloadHighLevel();
-    }
-
-
     void GLSLShader::unloadHighLevelImpl(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
@@ -335,15 +237,6 @@ namespace Ogre {
         mGLProgramHandle = 0;
         mCompiled = 0;
     }
-
-
-    void GLSLShader::populateParameterNames(GpuProgramParametersSharedPtr params)
-    {
-        getConstantDefinitions();
-        params->_setNamedConstants(mConstantDefs);
-        // Don't set logical / physical maps here, as we can't access parameters by logical index in GLSL.
-    }
-
 
     void GLSLShader::buildConstantDefinitions() const
     {
@@ -362,10 +255,10 @@ namespace Ogre {
         }
 
         // Also parse any attached sources.
-        for (GLSLShaderContainer::const_iterator i = mAttachedGLSLShaders.begin();
-             i != mAttachedGLSLShaders.end(); ++i)
+        for (GLSLProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
+             i != mAttachedGLSLPrograms.end(); ++i)
         {
-            GLSLShader* childShader = *i;
+            GLSLProgramCommon* childShader = *i;
 
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
@@ -380,132 +273,15 @@ namespace Ogre {
         }
     }
 
-
-    inline bool GLSLShader::getPassSurfaceAndLightStates(void) const
-    {
-        // Scenemanager should pass on light & material state to the rendersystem.
-        return true;
-    }
-
-    inline bool GLSLShader::getPassTransformStates(void) const
-    {
-        // Scenemanager should pass on transform state to the rendersystem.
-        return true;
-    }
-
-    inline bool GLSLShader::getPassFogStates(void) const
-    {
-        // Scenemanager should pass on fog state to the rendersystem.
-        return true;
-    }
-
-
-    String GLSLShader::CmdAttach::doGet(const void *target) const
-    {
-        return (static_cast<const GLSLShader*>(target))->getAttachedShaderNames();
-    }
-    void GLSLShader::CmdAttach::doSet(void *target, const String& shaderNames)
-    {
-        // Get all the shader program names: there could be more than one.
-        StringVector vecShaderNames = StringUtil::split(shaderNames, " \t", 0);
-
-        size_t programNameCount = vecShaderNames.size();
-        for ( size_t i = 0; i < programNameCount; ++i)
-        {
-            static_cast<GLSLShader*>(target)->attachChildShader(vecShaderNames[i]);
-        }
-    }
-
-
-    String GLSLShader::CmdColumnMajorMatrices::doGet(const void *target) const
-    {
-        return StringConverter::toString(static_cast<const GLSLShader*>(target)->getColumnMajorMatrices());
-    }
-    void GLSLShader::CmdColumnMajorMatrices::doSet(void *target, const String& val)
-    {
-        static_cast<GLSLShader*>(target)->setColumnMajorMatrices(StringConverter::parseBool(val));
-    }
-
-
-    String GLSLShader::CmdPreprocessorDefines::doGet(const void *target) const
-    {
-        return static_cast<const GLSLShader*>(target)->getPreprocessorDefines();
-    }
-    void GLSLShader::CmdPreprocessorDefines::doSet(void *target, const String& val)
-    {
-        static_cast<GLSLShader*>(target)->setPreprocessorDefines(val);
-    }
-
-
-    String GLSLShader::CmdInputOperationType::doGet(const void* target) const
-    {
-        const GLSLShader* t = static_cast<const GLSLShader*>(target);
-        return operationTypeToString(t->getInputOperationType());
-    }
-    void GLSLShader::CmdInputOperationType::doSet(void* target, const String& val)
-    {
-        GLSLShader* t = static_cast<GLSLShader*>(target);
-        t->setInputOperationType(parseOperationType(val));
-    }
-
-
-    String GLSLShader::CmdOutputOperationType::doGet(const void* target) const
-    {
-        const GLSLShader* t = static_cast<const GLSLShader*>(target);
-        return operationTypeToString(t->getOutputOperationType());
-    }
-    void GLSLShader::CmdOutputOperationType::doSet(void* target, const String& val)
-    {
-        GLSLShader* t = static_cast<GLSLShader*>(target);
-        t->setOutputOperationType(parseOperationType(val));
-    }
-
-
-    String GLSLShader::CmdMaxOutputVertices::doGet(const void* target) const
-    {
-        const GLSLShader* t = static_cast<const GLSLShader*>(target);
-        return StringConverter::toString(t->getMaxOutputVertices());
-    }
-    void GLSLShader::CmdMaxOutputVertices::doSet(void* target, const String& val)
-    {
-        GLSLShader* t = static_cast<GLSLShader*>(target);
-        t->setMaxOutputVertices(StringConverter::parseInt(val));
-    }
-
-
-    void GLSLShader::attachChildShader(const String& name)
-    {
-        // Is the name valid and already loaded?
-        // Check with the high level program manager to see if it was loaded.
-        HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name);
-        if (!hlProgram.isNull())
-        {
-            if (hlProgram->getSyntaxCode() == "glsl")
-            {
-                // Make sure attached program source gets loaded and compiled
-                // don't need a low level implementation for attached shader objects
-                // loadHighLevelImpl will only load the source and compile once
-                // so don't worry about calling it several times.
-                GLSLShader* childShader = static_cast<GLSLShader*>(hlProgram.getPointer());
-                // Load the source and attach the child shader.
-                childShader->loadHighLevelImpl();
-                // Add to the container.
-                mAttachedGLSLShaders.push_back(childShader);
-                mAttachedShaderNames += name + " ";
-            }
-        }
-    }
-
-
     void GLSLShader::attachToProgramObject(const GLuint programObject)
     {
         // attach child objects
-        GLSLShaderContainerIterator childProgramCurrent = mAttachedGLSLShaders.begin();
-        GLSLShaderContainerIterator childProgramEnd = mAttachedGLSLShaders.end();
+        GLSLProgramContainerIterator childProgramCurrent = mAttachedGLSLPrograms.begin();
+        GLSLProgramContainerIterator childProgramEnd = mAttachedGLSLPrograms.end();
 
         for (; childProgramCurrent != childProgramEnd; ++childProgramCurrent)
         {
-            GLSLShader* childShader = *childProgramCurrent;
+            GLSLProgramCommon* childShader = *childProgramCurrent;
             childShader->compile(true);
             childShader->attachToProgramObject(programObject);
         }
@@ -518,12 +294,12 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glDetachShader(programObject, mGLShaderHandle));
         logObjectInfo( "Error detaching " + mName + " shader object from GLSL Program Object", programObject);
         // attach child objects
-        GLSLShaderContainerIterator childprogramcurrent = mAttachedGLSLShaders.begin();
-        GLSLShaderContainerIterator childprogramend = mAttachedGLSLShaders.end();
+        GLSLProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
+        GLSLProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
 
         while (childprogramcurrent != childprogramend)
         {
-            GLSLShader* childShader = *childprogramcurrent;
+            GLSLProgramCommon* childShader = *childprogramcurrent;
             childShader->detachFromProgramObject(programObject);
             ++childprogramcurrent;
         }
@@ -627,34 +403,6 @@ namespace Ogre {
             return RenderOperation::OT_TRIANGLE_LIST;
         }
     }
-
-
-    String operationTypeToString(RenderOperation::OperationType val)
-    {
-        switch (val)
-        {
-        case RenderOperation::OT_POINT_LIST:
-            return "point_list";
-            break;
-        case RenderOperation::OT_LINE_LIST:
-            return "line_list";
-            break;
-        case RenderOperation::OT_LINE_STRIP:
-            return "line_strip";
-            break;
-        case RenderOperation::OT_TRIANGLE_STRIP:
-            return "triangle_strip";
-            break;
-        case RenderOperation::OT_TRIANGLE_FAN:
-            return "triangle_fan";
-            break;
-        case RenderOperation::OT_TRIANGLE_LIST:
-        default:
-            return "triangle_list";
-            break;
-        }
-    }
-
 
     GLenum GLSLShader::getGLShaderType(GpuProgramType programType)
     {

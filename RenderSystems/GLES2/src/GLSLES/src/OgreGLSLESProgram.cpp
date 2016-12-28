@@ -44,7 +44,6 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    GLSLESProgram::CmdPreprocessorDefines GLSLESProgram::msCmdPreprocessorDefines;
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
     GLSLESProgram::CmdOptimisation GLSLESProgram::msCmdOptimisation;
 #endif
@@ -53,10 +52,9 @@ namespace Ogre {
     GLSLESProgram::GLSLESProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        : HighLevelGpuProgram(creator, name, handle, group, isManual, loader) 
+        : GLSLProgramCommon(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
-        , mCompiled(0)
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         , mIsOptimised(false)
         , mOptimiserEnabled(false)
@@ -100,77 +98,6 @@ namespace Ogre {
         unloadHighLevelImpl();
     }
 #endif
-    //-----------------------------------------------------------------------
-    void GLSLESProgram::loadFromSource(void)
-    {
-        // Preprocess the GLSL ES shader in order to get a clean source
-        CPreprocessor cpp;
-
-        // Pass all user-defined macros to preprocessor
-        if (!mPreprocessorDefines.empty ())
-        {
-            String::size_type pos = 0;
-            while (pos != String::npos)
-            {
-                // Find delims
-                String::size_type endPos = mPreprocessorDefines.find_first_of(";,=", pos);
-                if (endPos != String::npos)
-                {
-                    String::size_type macro_name_start = pos;
-                    size_t macro_name_len = endPos - pos;
-                    pos = endPos;
-
-                    // Check definition part
-                    if (mPreprocessorDefines[pos] == '=')
-                    {
-                        // Set up a definition, skip delim
-                        ++pos;
-                        String::size_type macro_val_start = pos;
-                        size_t macro_val_len;
-
-                        endPos = mPreprocessorDefines.find_first_of(";,", pos);
-                        if (endPos == String::npos)
-                        {
-                            macro_val_len = mPreprocessorDefines.size () - pos;
-                            pos = endPos;
-                        }
-                        else
-                        {
-                            macro_val_len = endPos - pos;
-                            pos = endPos+1;
-                        }
-                        cpp.Define (
-                            mPreprocessorDefines.c_str () + macro_name_start, macro_name_len,
-                            mPreprocessorDefines.c_str () + macro_val_start, macro_val_len);
-                    }
-                    else
-                    {
-                        // No definition part, define as "1"
-                        ++pos;
-                        cpp.Define (
-                            mPreprocessorDefines.c_str () + macro_name_start, macro_name_len, 1);
-                    }
-                }
-                else
-                    pos = endPos;
-            }
-        }
-
-        size_t out_size = 0;
-        const char *src = mSource.c_str ();
-        size_t src_len = mSource.size ();
-        char *out = cpp.Parse (src, src_len, out_size);
-        if (!out || !out_size)
-            // Failed to preprocess, break out
-            OGRE_EXCEPT (Exception::ERR_RENDERINGAPI_ERROR,
-                         "Failed to preprocess shader " + mName,
-                         __FUNCTION__);
-
-        mSource = String (out, out_size);
-        if (out < src || out > src + src_len)
-            free (out);
-    }
-
     GLuint GLSLESProgram::createGLProgramHandle() {
         if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             return 0;
@@ -310,16 +237,6 @@ namespace Ogre {
     {
         mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLESGpuProgram( this ));
     }
-    //---------------------------------------------------------------------------
-    void GLSLESProgram::unloadImpl()
-    {   
-        // We didn't create mAssemblerProgram through a manager, so override this
-        // implementation so that we don't try to remove it from one. Since getCreator()
-        // is used, it might target a different matching handle!
-        mAssemblerProgram.setNull();
-
-        unloadHighLevel();
-    }
     //-----------------------------------------------------------------------
     void GLSLESProgram::unloadHighLevelImpl(void)
     {
@@ -339,14 +256,6 @@ namespace Ogre {
             mCompiled = 0;
         }
     }
-
-    //-----------------------------------------------------------------------
-    void GLSLESProgram::populateParameterNames(GpuProgramParametersSharedPtr params)
-    {
-        getConstantDefinitions();
-        params->_setNamedConstants(mConstantDefs);
-        // Don't set logical / physical maps here, as we can't access parameters by logical index in GLHL.
-    }
     //-----------------------------------------------------------------------
     void GLSLESProgram::buildConstantDefinitions() const
     {
@@ -365,24 +274,6 @@ namespace Ogre {
         }
     }
 
-    //---------------------------------------------------------------------
-    inline bool GLSLESProgram::getPassSurfaceAndLightStates(void) const
-    {
-        // Scenemanager should pass on light & material state to the rendersystem
-        return true;
-    }
-    //---------------------------------------------------------------------
-    inline bool GLSLESProgram::getPassTransformStates(void) const
-    {
-        // Scenemanager should pass on transform state to the rendersystem
-        return true;
-    }
-    //---------------------------------------------------------------------
-    inline bool GLSLESProgram::getPassFogStates(void) const
-    {
-        // Scenemanager should pass on fog state to the rendersystem
-        return true;
-    }
     //-----------------------------------------------------------------------
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
     String GLSLESProgram::CmdOptimisation::doGet(const void *target) const
@@ -394,16 +285,6 @@ namespace Ogre {
         static_cast<GLSLESProgram*>(target)->setOptimiserEnabled(StringConverter::parseBool(val));
     }
 #endif
-    //-----------------------------------------------------------------------
-    String GLSLESProgram::CmdPreprocessorDefines::doGet(const void *target) const
-    {
-        return static_cast<const GLSLESProgram*>(target)->getPreprocessorDefines();
-    }
-    void GLSLESProgram::CmdPreprocessorDefines::doSet(void *target, const String& val)
-    {
-        static_cast<GLSLESProgram*>(target)->setPreprocessorDefines(val);
-    }
-
     //-----------------------------------------------------------------------
     void GLSLESProgram::attachToProgramObject( const GLuint programObject )
     {
