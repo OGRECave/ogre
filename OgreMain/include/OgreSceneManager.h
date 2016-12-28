@@ -3052,17 +3052,6 @@ namespace Ogre {
         /// Returns the current relative origin. (Only when non-permanent)
         Vector3 getRelativeOrigin(void) const;
 
-        //Derived from ArrayMemoryManager::RebaseListener
-        /*virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                    const MemoryPoolVec &basePtrs,
-                                    ArrayMemoryManager::PtrdiffVec &outDiffsList );
-        virtual void applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                    const MemoryPoolVec &newBasePtrs,
-                                    const ArrayMemoryManager::PtrdiffVec &diffsList );
-        virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                     const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
-                                     size_t startInstance, size_t diffInstances );*/
-
         /** Add a level of detail listener. */
         void addLodListener(LodListener *listener);
 
