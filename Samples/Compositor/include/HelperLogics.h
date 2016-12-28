@@ -45,6 +45,7 @@ class ListenerFactoryLogic : public Ogre::CompositorLogic
     /** @copydoc CompositorLogic::compositorInstanceDestroyed */
     virtual void compositorInstanceDestroyed(Ogre::CompositorInstance* destroyedInstance)
     {
+        destroyedInstance->removeListener(mListeners[destroyedInstance]);
         delete mListeners[destroyedInstance];
         mListeners.erase(destroyedInstance);
     }
