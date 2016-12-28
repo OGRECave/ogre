@@ -180,9 +180,8 @@ namespace Ogre
         return mMemoryManagers[depth].getFirstNode( outTransform );
     }
     //-----------------------------------------------------------------------------------
-    void BoneMemoryManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                            const MemoryPoolVec &basePtrs,
-                                            ArrayMemoryManager::PtrdiffVec &outDiffsList )
+    void BoneMemoryManager::buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
+                                           ArrayMemoryManager::PtrdiffVec &outDiffsList )
     {
         //We don't need to build the diff list as we've access to the Node through mOwner
         //and access to the actual Node with the right pointers.
@@ -203,9 +202,8 @@ namespace Ogre
         }*/
     }
     //---------------------------------------------------------------------
-    void BoneMemoryManager::applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                            const MemoryPoolVec &newBasePtrs,
-                                            const ArrayMemoryManager::PtrdiffVec &diffsList )
+    void BoneMemoryManager::applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
+                                         const ArrayMemoryManager::PtrdiffVec &diffsList )
     {
         BoneTransform transform;
         const size_t numNodes = this->getFirstNode( transform, level );
@@ -229,9 +227,9 @@ namespace Ogre
             mBoneRebaseListener->_updateBoneStartTransforms();
     }
     //---------------------------------------------------------------------
-    void BoneMemoryManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                        const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
-                                        size_t startInstance, size_t diffInstances )
+    void BoneMemoryManager::performCleanup( uint16 level, const MemoryPoolVec &basePtrs,
+                                            size_t const *elementsMemSizes,
+                                            size_t startInstance, size_t diffInstances )
     {
         BoneTransform transform;
         const size_t numNodes = this->getFirstNode( transform, level );

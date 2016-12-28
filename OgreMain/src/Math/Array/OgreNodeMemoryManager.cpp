@@ -236,9 +236,8 @@ namespace Ogre
         return mMemoryManagers[depth].getFirstNode( outTransform );
     }
     //-----------------------------------------------------------------------------------
-    void NodeMemoryManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                            const MemoryPoolVec &basePtrs,
-                                            ArrayMemoryManager::PtrdiffVec &outDiffsList )
+    void NodeMemoryManager::buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
+                                           ArrayMemoryManager::PtrdiffVec &outDiffsList )
     {
         //We don't need to build the diff list as we've access to the Node through mOwner
         //and access to the actual Node with the right pointers.
@@ -259,9 +258,8 @@ namespace Ogre
         }*/
     }
     //---------------------------------------------------------------------
-    void NodeMemoryManager::applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                            const MemoryPoolVec &newBasePtrs,
-                                            const ArrayMemoryManager::PtrdiffVec &diffsList )
+    void NodeMemoryManager::applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
+                                         const ArrayMemoryManager::PtrdiffVec &diffsList )
     {
         Transform transform;
         const size_t numNodes = this->getFirstNode( transform, level );
@@ -281,9 +279,9 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void NodeMemoryManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                        const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
-                                        size_t startInstance, size_t diffInstances )
+    void NodeMemoryManager::performCleanup( uint16 level, const MemoryPoolVec &basePtrs,
+                                            size_t const *elementsMemSizes,
+                                            size_t startInstance, size_t diffInstances )
     {
         Transform transform;
         const size_t numNodes = this->getFirstNode( transform, level );
