@@ -45,7 +45,7 @@ namespace Ogre
     const size_t ArrayMemoryManager::MAX_MEMORY_SLOTS = (size_t)(-ARRAY_PACKED_REALS) - 1
                                                             - OGRE_PREFETCH_SLOT_DISTANCE;
 
-    ArrayMemoryManager::ArrayMemoryManager( ManagerType managerType, size_t const *elementsMemSize,
+    ArrayMemoryManager::ArrayMemoryManager( size_t const *elementsMemSize,
                                             CleanupRoutines const *cleanupRoutines,
                                             size_t numElementsSize, uint16 depthLevel,
                                             size_t hintMaxNodes, size_t cleanupThreshold,
@@ -58,8 +58,7 @@ namespace Ogre
                             mMaxHardLimit( maxHardLimit ),
                             mCleanupThreshold( cleanupThreshold ),
                             mRebaseListener( rebaseListener ),
-                            mLevel( depthLevel ),
-                            mManagerType( managerType )
+                            mLevel( depthLevel )
     {
         //If the assert triggers, their values will overflow to 0 when
         //trying to round to nearest multiple of ARRAY_PACKED_REALS
@@ -170,7 +169,7 @@ namespace Ogre
             //Build the diff list for rebase later.
             PtrdiffVec diffsList;
             diffsList.reserve( mUsedMemory );
-            mRebaseListener->buildDiffList( mManagerType, mLevel, mMemoryPools, diffsList );
+            mRebaseListener->buildDiffList( mLevel, mMemoryPools, diffsList );
 
             //Reallocate, grow by 50% increments, rounding up to next multiple of ARRAY_PACKED_REALS
             size_t newMemory = std::min( mMaxMemory + (mMaxMemory >> 1), mMaxHardLimit );
@@ -199,7 +198,7 @@ namespace Ogre
             mMaxMemory = newMemory;
 
             //Rebase all ptrs
-            mRebaseListener->applyRebase( mManagerType, mLevel, mMemoryPools, diffsList );
+            mRebaseListener->applyRebase( mLevel, mMemoryPools, diffsList );
 
             slotsRecreated( prevNumSlots );
         }
@@ -269,9 +268,9 @@ namespace Ogre
                     mUsedMemory -= lastRange;
                     slotsRecreated( mUsedMemory );
 
-                    mRebaseListener->performCleanup( mManagerType, mLevel, mMemoryPools,
-                                                        mElementsMemSizes, (newEnd - lastRange),
-                                                        lastRange );
+                    mRebaseListener->performCleanup( mLevel, mMemoryPools,
+                                                     mElementsMemSizes, (newEnd - lastRange),
+                                                     lastRange );
                     
                     itor += lastRange;
                 }

@@ -64,25 +64,6 @@ namespace Ogre
     class _OgreExport ArrayMemoryManager
     {
     public:
-        enum ManagerType
-        {
-            NodeType,
-            ObjectDataType,
-            BoneType,
-
-            // User defined types in case you may want to have more than
-            // one NodeArrayMemoryManager, or your own custom ones
-            UserDefinedType0,
-            UserDefinedType1,
-            UserDefinedType2,
-            UserDefinedType3,
-            UserDefinedType4,
-            UserDefinedType5,
-            UserDefinedType6,
-
-            NumStructTypes
-        };
-
         //typedef vector<ptrdiff_t>::type PtrdiffVec; //TODO: Modify for Ogre
         typedef std::vector<ptrdiff_t> PtrdiffVec;
 
@@ -108,9 +89,6 @@ namespace Ogre
                     ArrayVector3/ArrayMatrix4/etc and the base pointers _in_the_order_ in which the
                     derived class holds those pointers (i.e. in the order the SceneNodes are arranged
                     in memory)
-                @param managerType
-                    The derived type of this manager, so listener knows whether this is an Node or
-                    ObjectData manager
                 @param level
                     The hierarchy depth level
                 @param basePtrs
@@ -118,16 +96,13 @@ namespace Ogre
                 @param utDiffsList
                     The list we'll generate. "outDiffsList" already has enough reserved space
             */
-            virtual void buildDiffList( ManagerType managerType, uint16 level,
-                                        const MemoryPoolVec &basePtrs, PtrdiffVec &outDiffsList ) = 0;
+            virtual void buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
+                                        PtrdiffVec &outDiffsList ) = 0;
 
             /** Called when the manager already grew it's memory pool to honour more node requests.
                 @remarks
                     Will use the new base ptr and the list we built in @see buildDiffList() to know
                     what mChunkPtr & mIndex needs to be set for each ArrayVector3/etc we have.
-                @param managerType
-                    The derived type of this manager, so listener knows whether this is an Node or
-                    ObjectData manager
                 @param level
                     The hierarchy depth level
                 @param newBasePtrs
@@ -135,9 +110,8 @@ namespace Ogre
                 @param diffsList
                     The list built in buildDiffList
             */
-            virtual void applyRebase( ManagerType managerType, uint16 level,
-                                        const MemoryPoolVec &newBasePtrs,
-                                        const PtrdiffVec &diffsList ) = 0;
+            virtual void applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
+                                      const PtrdiffVec &diffsList ) = 0;
 
             /** Called when too many nodes were destroyed in a non-LIFO fashion. Without cleaning up,
                 the scene manager will waste CPU & bandwidth on processing vectors & matrices that
@@ -149,9 +123,6 @@ namespace Ogre
 
                     In a way, it's very similar to vector::remove(), as removing an element from
                     the middle means we need to shift everything past that point one place (or more).
-                @param managerType
-                    The derived type of this manager, so listener knows whether this is an Node or
-                    ObjectData manager
                 @param level
                     The hierarchy depth level
                 @param basePtrs
@@ -161,8 +132,7 @@ namespace Ogre
                 @param diffInstances
                     How many places we need to shift backwards.
             */
-            virtual void performCleanup( ManagerType managerType, uint16 level,
-                                         const MemoryPoolVec &basePtrs,
+            virtual void performCleanup( uint16 level, const MemoryPoolVec &basePtrs,
                                          size_t const *elementsMemSizes, size_t startInstance,
                                          size_t diffInstances ) = 0;
         };
@@ -187,8 +157,6 @@ namespace Ogre
         /// just passed to the listeners so they can know to which level it
         /// belongs
         uint16              mLevel;
-
-        ManagerType         mManagerType;
 
     public:
         static const size_t MAX_MEMORY_SLOTS;
@@ -223,9 +191,8 @@ namespace Ogre
                 The listener to be called when cleaning up or growing the memory pool. If null,
                 cleanupThreshold is set to -1 & maxHardLimit will be set to hintMaxNodes
         */
-        ArrayMemoryManager( ManagerType managerType, size_t const *elementsMemSize,
-                            CleanupRoutines const *cleanupRoutines, size_t numElementsSize,
-                            uint16 depthLevel, size_t hintMaxNodes,
+        ArrayMemoryManager( size_t const *elementsMemSize, CleanupRoutines const *cleanupRoutines,
+                            size_t numElementsSize, uint16 depthLevel, size_t hintMaxNodes,
                             size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
                             RebaseListener *rebaseListener=0 );
 
