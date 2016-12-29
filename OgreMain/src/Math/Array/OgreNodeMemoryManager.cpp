@@ -98,8 +98,8 @@ namespace Ogre
         OGRE_FREE_SIMD( mDummyTransformPtrs.mDerivedOrientation, MEMCATEGORY_SCENE_OBJECTS );
         OGRE_FREE_SIMD( mDummyTransformPtrs.mDerivedScale, MEMCATEGORY_SCENE_OBJECTS );
 
-        /*OGRE_FREE_SIMD( mDummyTransformPtrs.mDerivedTransform, MEMCATEGORY_SCENE_OBJECTS );
-        OGRE_FREE_SIMD( mDummyTransformPtrs.mInheritOrientation, MEMCATEGORY_SCENE_OBJECTS );
+        OGRE_FREE_SIMD( mDummyTransformPtrs.mDerivedTransform, MEMCATEGORY_SCENE_OBJECTS );
+        /*OGRE_FREE_SIMD( mDummyTransformPtrs.mInheritOrientation, MEMCATEGORY_SCENE_OBJECTS );
         OGRE_FREE_SIMD( mDummyTransformPtrs.mInheritScale, MEMCATEGORY_SCENE_OBJECTS );*/
         mDummyTransformPtrs = Transform();
     }
