@@ -1210,6 +1210,8 @@ namespace Ogre
         mTexUnitSlotStart = mPreparedPass.shadowMaps.size() + 1;
         if( mGridBuffer )
             mTexUnitSlotStart += 2;
+        if( mIrrandianceVolume )
+            mTexUnitSlotStart += 1;
         if( mParallaxCorrectedCubemap )
             mTexUnitSlotStart += 1;
 

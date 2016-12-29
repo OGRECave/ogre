@@ -1,6 +1,6 @@
 @property( irradiance_volumes )
 @piece( applyIrradianceVolumes )
-	float3 worldNormal = nNormal.xyz * toMat3x3( pass.invView ) );
+	float3 worldNormal = nNormal.xyz * toMat3x3( pass.invView );
 	float3 worldPos = ( float4( inPs.pos.xyz, 1.0 ) * pass.invView ).xyz;
 
 	float3 irradiancePos = worldPos.xyz * pass.irradianceSize.xyz - pass.irradianceOrigin.xyz;

@@ -152,8 +152,8 @@ fragment @insertpiece( output_type ) main_metal
 	@end
 
 	@property( irradiance_volumes )
-		, texture3d<float>	irradianceVolume		[[texture(t@value(irradianceVolumeTexUnit))]];
-		, sampler			irradianceVolumeSampler	[[sampler(t@value(irradianceVolumeTexUnit))]];
+		, texture3d<float>	irradianceVolume		[[texture(@value(irradianceVolumeTexUnit))]]
+		, sampler			irradianceVolumeSampler	[[sampler(@value(irradianceVolumeTexUnit))]]
 	@end
 
 	@property( two_sided_lighting )
