@@ -206,7 +206,7 @@ namespace Ogre {
         template<class Y>
 #endif
         SharedPtr(const SharedPtr<Y>& r)
-            : pRep(r.getPointer())
+            : pRep(r.pRep)
             , pInfo(r.pInfo)
         {
             if (pRep) 
@@ -240,9 +240,9 @@ namespace Ogre {
             release();
         }
 
-
+        /// @deprecated use Ogre::static_pointer_cast instead
         template<typename Y>
-        inline SharedPtr<Y> staticCast() const
+        SharedPtr<Y> staticCast() const
         {
             if(pRep) {
                 ++pInfo->useCount;
@@ -250,8 +250,9 @@ namespace Ogre {
             } else return SharedPtr<Y>();
         }
 
+        /// @deprecated use Ogre::dynamic_pointer_cast instead
         template<typename Y>
-        inline SharedPtr<Y> dynamicCast() const
+        SharedPtr<Y> dynamicCast() const
         {
             Y* rep = dynamic_cast<Y*>(pRep);
             if(rep) {
@@ -270,6 +271,8 @@ namespace Ogre {
 
             @warning
                 The object must not be bound into a SharedPtr elsewhere
+
+            @deprecated this api will be dropped. use reset(T*) instead
         */
         void bind(T* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) {
             assert(!pRep && !pInfo);
@@ -278,18 +281,41 @@ namespace Ogre {
         }
 
         inline bool unique() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get() == 1; }
-        inline unsigned int useCount() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get(); }
-        inline void setUseCount(unsigned value) { assert(pInfo); pInfo->useCount = value; }
 
-        inline T* getPointer() const { return pRep; }
+        /// @deprecated use use_count() instead
+        unsigned int useCount() const { return use_count(); }
 
-        inline bool isNull(void) const { return pRep == 0; }
+        unsigned int use_count() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get(); }
 
-        inline void setNull(void) { 
-            if (pRep)
-            {
-                release();
-            }
+        /// @deprecated this API will be dropped
+        void setUseCount(unsigned value) { assert(pInfo); pInfo->useCount = value; }
+
+        /// @deprecated use get() instead
+        T* getPointer() const { return pRep; }
+
+        static void unspecified_bool( SharedPtr*** )
+        {
+        }
+
+        typedef void (*unspecified_bool_type)( SharedPtr*** );
+
+        operator unspecified_bool_type() const
+        {
+            return pRep == 0 ? 0 : unspecified_bool;
+        }
+
+        /// @deprecated use SharedPtr::operator unspecified_bool_type() instead
+        bool isNull(void) const { return pRep == 0; }
+
+        /// @deprecated use reset() instead
+        void setNull() { reset(); }
+
+        void reset(void) {
+            release();
+        }
+
+        void reset(T* rep) {
+            SharedPtr(rep).swap(*this);
         }
 
     protected:
@@ -309,7 +335,7 @@ namespace Ogre {
 
         /** IF YOU GET A CRASH HERE, YOU FORGOT TO FREE UP POINTERS
          BEFORE SHUTTING OGRE DOWN
-         Use setNull() before shutdown or make sure your pointer goes
+         Use reset() before shutdown or make sure your pointer goes
          out of scope before OGRE shuts down to avoid this. */
         inline void destroy(void)
         {
@@ -337,6 +363,18 @@ namespace Ogre {
     template<class T, class U> inline bool operator<(SharedPtr<T> const& a, SharedPtr<U> const& b)
     {
         return std::less<const void*>()(a.get(), b.get());
+    }
+
+    template<class T, class U>
+    inline SharedPtr<T> static_pointer_cast( SharedPtr<U> const & r )
+    {
+        return r.template staticCast<T>();
+    }
+
+    template<class T, class U>
+    inline SharedPtr<T> dynamic_pointer_cast( SharedPtr<U> const & r )
+    {
+        return r.template dynamicCast<T>();
     }
     /** @} */
     /** @} */
