@@ -129,7 +129,7 @@ namespace OgreBites
             }
 #if OGRE_PROFILING
             // Toggle visibility of profiler window
-            else if (key == SDLK_P)
+            else if (key == 'p')
             {
                 Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
                 if (prof)

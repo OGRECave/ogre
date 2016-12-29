@@ -29,38 +29,93 @@
 #cmakedefine OGRE_CONFIG_LITTLE_ENDIAN
 #cmakedefine OGRE_CONFIG_BIG_ENDIAN
 
+/** If set to 1, Real is typedef'ed to double. Otherwise, Real is typedef'ed
+    to float. Setting this allows you to perform mathematical operations in the
+    CPU (Quaternion, Vector3 etc) with more precision, but bear in mind that the
+    GPU still operates in single-precision mode.
+*/
 #cmakedefine01 OGRE_DOUBLE_PRECISION
 
 #cmakedefine01 OGRE_NODE_INHERIT_TRANSFORM
 
 #define OGRE_MEMORY_ALLOCATOR @OGRE_SET_ALLOCATOR@
 
+// Whether to use the custom memory allocator in STL containers
 #cmakedefine01 OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
 
+// if you want to make Ogre::String use the custom memory allocator
+// Doing this will mean Ogre's strings will not be compatible with std::string however
 #cmakedefine01 OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
 
+// enable or disable the memory tracker, recording the memory allocations & tracking leaks
+// default is to disable since it's expensive, but you can enable if needed per build target
 #cmakedefine01 OGRE_MEMORY_TRACKER_DEBUG_MODE
 
 #cmakedefine01 OGRE_MEMORY_TRACKER_RELEASE_MODE
 
+/** There are three modes for handling asserts in OGRE:
+0 - STANDARD - Standard asserts in debug builds, nothing in release builds
+1 - RELEASE_EXCEPTIONS - Standard asserts in debug builds, exceptions in release builds
+2 - EXCEPTIONS - Exceptions in debug builds, exceptions in release builds
+*/
 #define OGRE_ASSERT_MODE @OGRE_SET_ASSERT_MODE@
 
+/** Support for multithreading, there are 3 options
+
+OGRE_THREAD_SUPPORT = 0
+    No support for threading.       
+OGRE_THREAD_SUPPORT = 1
+    Thread support for background loading, by both loading and constructing resources
+    in a background thread. Resource management and SharedPtr handling becomes
+    thread-safe, and resources may be completely loaded in the background. 
+    The places where threading is available are clearly
+    marked, you should assume state is NOT thread safe unless otherwise
+    stated in relation to this flag.
+OGRE_THREAD_SUPPORT = 2
+    Thread support for background resource preparation. This means that resource
+    data can streamed into memory in the background, but the final resource
+    construction (including RenderSystem dependencies) is still done in the primary
+    thread. Has a lower synchronisation primitive overhead than full threading
+    while still allowing the major blocking aspects of resource management (I/O)
+    to be done in the background.
+*/
 #define OGRE_THREAD_SUPPORT @OGRE_SET_THREADS@
 
+/** Provider for threading functionality, there are 4 options.
+
+OGRE_THREAD_PROVIDER = 0
+    No support for threading.
+OGRE_THREAD_PROVIDER = 1
+    Boost libraries provide threading functionality.
+OGRE_THREAD_PROVIDER = 2
+    Poco libraries provide threading functionality.
+OGRE_THREAD_PROVIDER = 3
+    TBB library provides threading functionality.
+OGRE_THREAD_PROVIDER = 4
+    Standard library provides threading functionality. (requires compiler support)
+*/
 #define OGRE_THREAD_PROVIDER @OGRE_SET_THREAD_PROVIDER@
 
 #cmakedefine01 OGRE_NO_MESHLOD
 
+/** Disables use of the FreeImage image library for loading images. */
 #cmakedefine01 OGRE_NO_FREEIMAGE
 
+/** Disables use of the internal image codec for loading DDS files. */
 #cmakedefine01 OGRE_NO_DDS_CODEC
 
+/** Disables use of the internal image codec for loading PVRTC files. */
 #cmakedefine01 OGRE_NO_PVRTC_CODEC
 
+/** Disables use of the internal image codec for loading ETC files. */
 #cmakedefine01 OGRE_NO_ETC_CODEC
 
+/** Disables use of the internal image codec for loading image files. */
 #cmakedefine01 OGRE_NO_STBI_CODEC
 
+/** Disables use of the ZIP archive support.
+WARNING: Disabling this will make the samples unusable.
+*/
 #cmakedefine01 OGRE_NO_ZIP_ARCHIVE
 
 #cmakedefine01 OGRE_NO_VIEWPORT_ORIENTATIONMODE
@@ -77,6 +132,8 @@
 
 #cmakedefine01 OGRE_USE_BOOST
 
+/** If set to 1, profiling code will be included in the application. When you
+    are deploying your application you will probably want to set this to 0 */
 #cmakedefine01 OGRE_PROFILING
 
 #cmakedefine01 OGRE_NO_QUAD_BUFFER_STEREO
