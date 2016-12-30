@@ -182,7 +182,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void ResourceManager::removeImpl( ResourcePtr& res )
+    void ResourceManager::removeImpl(const ResourcePtr& res )
     {
             OGRE_LOCK_AUTO_MUTEX;
 
@@ -305,7 +305,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void ResourceManager::remove(ResourcePtr& res)
+    void ResourceManager::remove(const ResourcePtr& res)
     {
         removeImpl(res);
     }
