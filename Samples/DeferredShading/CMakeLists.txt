@@ -19,7 +19,6 @@ set(HEADER_FILES
   include/GBufferSchemeHandler.h
   include/GeomUtils.h
   include/LightMaterialGenerator.h
-  include/ListenerFactoryLogic.h
   include/MaterialGenerator.h
   include/NullSchemeHandler.h
   include/SharedData.h
@@ -53,4 +52,3 @@ if (APPLE AND NOT APPLE_IOS)
        INSTALL_NAME_DIR "@executable_path/../Plugins"
     )
 endif()
-
