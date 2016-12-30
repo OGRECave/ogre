@@ -22,6 +22,7 @@ same license as the rest of the engine.
 
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
+#include "OgreMaterialManager.h"
 
 #include <iostream>
 
@@ -33,6 +34,15 @@ MaterialGenerator::MaterialGenerator():
 }
 MaterialGenerator::~MaterialGenerator()
 {
+    // we have generated fragment shaders and materials
+    // so delete them
+    for(ProgramMap::iterator it = mFs.begin(); it != mFs.end(); ++it) {
+        HighLevelGpuProgramManager::getSingleton().remove(it->second);
+    }
+    for(MaterialMap::iterator it = mMaterials.begin(); it != mMaterials.end(); ++it) {
+        MaterialManager::getSingleton().remove(it->second);
+    }
+
     delete mImpl;
 }
 
