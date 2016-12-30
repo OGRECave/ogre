@@ -41,14 +41,20 @@ class TrayManager;
 class ParamsPanel;
 
 /**
-     F:        Toggle frame rate stats on/off
-     G:        Toggle advanced frame stats on/off
-     R:        Render mode
-     T:        Cycle texture filtering
-               Bilinear, Trilinear, Anisotropic(8)
-     F2:       Set the main viewport material scheme to default material manager scheme.
-     F3:       Toggle default shader generator lighting model from per vertex to per pixel.
-     F4:       Switch vertex shader outputs compaction policy.
+   - F:        Toggle frame rate stats on/off
+   - G:        Toggle advanced frame stats on/off
+   - R:        Render mode
+               - Wireframe
+               - Points
+               - Solid
+   - T:        Cycle texture filtering
+               - Bilinear
+               - Trilinear
+               - Anisotropic(8)
+               - None
+   - F2:       Set the main viewport material scheme to default material manager scheme.
+   - F3:       Toggle default shader generator lighting model from per vertex to per pixel.
+   - F4:       Switch vertex shader outputs compaction policy.
  */
 class _OgreBitesExport AdvancedRenderControls : public InputListener {
 public:
