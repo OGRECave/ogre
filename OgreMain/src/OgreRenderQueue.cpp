@@ -777,6 +777,8 @@ namespace Ogre
     void RenderQueue::renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                           RenderSystem *rs, bool casterPass, bool dualParaboloid )
     {
+        v1::HardwareBufferManager::getSingleton()._updateDirtyInputLayouts();
+
         if( mLastVaoName )
         {
             rs->_startLegacyV1Rendering();
