@@ -1148,7 +1148,7 @@ namespace Ogre {
         fireResourceCreated(res);
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::_notifyResourceRemoved(ResourcePtr& res)
+    void ResourceGroupManager::_notifyResourceRemoved(const ResourcePtr& res)
     {
         fireResourceRemove(res);
 

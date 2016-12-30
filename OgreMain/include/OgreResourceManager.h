@@ -273,7 +273,7 @@ namespace Ogre {
             destruction of resources, try making sure you release all your
             shared pointers before you shutdown OGRE.
         */
-        virtual void remove(ResourcePtr& r);
+        virtual void remove(const ResourcePtr& r);
 
         /** Remove a single resource by name.
         @remarks
@@ -529,7 +529,7 @@ namespace Ogre {
         /** Add a newly created resource to the manager (note weak reference) */
         virtual void addImpl( ResourcePtr& res );
         /** Remove a resource from this manager; remove it from the lists. */
-        virtual void removeImpl( ResourcePtr& res );
+        virtual void removeImpl(const ResourcePtr& res );
         /** Checks memory usage and pages out if required. This is automatically done after a new resource is loaded.
         */
         virtual void checkUsage(void);
