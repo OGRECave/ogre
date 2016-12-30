@@ -266,7 +266,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	// Resolve input vertex shader normal.
 	// first look in local variables so other SRS can override
 	mVSInNormal = vsMain->getParameterByContent(vsMain->getLocalParameters(), Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-	if(mVSInNormal.isNull()) {
+	if(!mVSInNormal) {
 	    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 	}
 	

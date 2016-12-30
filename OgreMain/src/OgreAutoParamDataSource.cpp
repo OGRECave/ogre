@@ -558,7 +558,7 @@ namespace Ogre {
         {
             const TexturePtr& tex = mCurrentPass->getTextureUnitState(
                 static_cast<unsigned short>(index))->_getTexturePtr();
-            if (!tex.isNull())
+            if (tex)
             {
                 size.x = static_cast<Real>(tex->getWidth());
                 size.y = static_cast<Real>(tex->getHeight());

@@ -113,7 +113,7 @@ namespace Ogre
                 "Source and destination buffer may not be locked!",
                 "HardwarePixelBuffer::blit");
         }
-        if(src.getPointer() == this)
+        if(src.get() == this)
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                 "Source must not be the same object",

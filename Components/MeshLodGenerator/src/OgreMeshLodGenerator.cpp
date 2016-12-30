@@ -115,7 +115,7 @@ void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
             usage.userValue = lodConfig.levels[i].distance;
             usage.value = lodConfig.mesh->getLodStrategy()->transformUserValue(usage.userValue);
             usage.edgeData = NULL;
-            usage.manualMesh.setNull();
+            usage.manualMesh.reset();
             usage.manualName = lodConfig.levels[i].manualMeshName;
             lodConfig.mesh->_setLodUsage(++n, usage);
         }
@@ -145,7 +145,7 @@ void MeshLodGenerator::_resolveComponents(LodConfig& lodConfig,
                                           LodOutputProviderPtr& output,
                                           LodCollapserPtr& collapser)
 {
-    if(cost.isNull()) {
+    if(!cost) {
         cost = LodCollapseCostPtr(new LodCollapseCostCurvature);
         if(lodConfig.advanced.outsideWeight != 0) {
             cost =
@@ -157,17 +157,17 @@ void MeshLodGenerator::_resolveComponents(LodConfig& lodConfig,
         }
 
     }
-    if(data.isNull()) {
+    if(!data) {
         data = LodDataPtr(new LodData());
     }
-    if(collapser.isNull()) {
+    if(!collapser) {
         collapser = LodCollapserPtr(new LodCollapser());
     }
     if(lodConfig.advanced.useBackgroundQueue) {
-        if(input.isNull()) {
+        if(!input) {
             input = LodInputProviderPtr(new LodInputProviderBuffer(lodConfig.mesh));
         }
-        if(output.isNull()) {
+        if(!output) {
             if(lodConfig.advanced.useCompression) {
                 output = LodOutputProviderPtr(new LodOutputProviderCompressedBuffer(lodConfig.mesh));
             } else {
@@ -175,10 +175,10 @@ void MeshLodGenerator::_resolveComponents(LodConfig& lodConfig,
             }
         }
     } else {
-        if(input.isNull()) {
+        if(!input) {
             input = LodInputProviderPtr(new LodInputProviderMesh(lodConfig.mesh));
         }
-        if(output.isNull()) {
+        if(!output) {
             if(lodConfig.advanced.useCompression) {
                 output = LodOutputProviderPtr(new LodOutputProviderCompressedMesh(lodConfig.mesh));
             } else {

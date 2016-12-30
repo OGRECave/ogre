@@ -145,17 +145,17 @@ void MeshSerializerTests::TearDown()
     if (!mSkeletonFullPath.empty()) {
         copyFile(mSkeletonFullPath + ".bak", mSkeletonFullPath);
     }
-    if (!mMesh.isNull()) {
+    if (mMesh) {
         mMesh->unload();
-        mMesh.setNull();
+        mMesh.reset();
     }
-    if (!mOrigMesh.isNull()) {
+    if (mOrigMesh) {
         mOrigMesh->unload();
-        mOrigMesh.setNull();
+        mOrigMesh.reset();
     }
-    if (!mSkeleton.isNull()) {
+    if (mSkeleton) {
         mSkeleton->unload();
-        mSkeleton.setNull();
+        mSkeleton.reset();
     }    
     
     OGRE_DELETE MeshManager::getSingletonPtr();
@@ -184,7 +184,7 @@ void MeshSerializerTests::testMesh(MeshVersion version)
 //--------------------------------------------------------------------------
 TEST_F(MeshSerializerTests,Skeleton_Version_1_8)
 {
-    if (!mSkeleton.isNull()) {
+    if (mSkeleton) {
         SkeletonSerializer skeletonSerializer;
         skeletonSerializer.exportSkeleton(mSkeleton.get(), mSkeletonFullPath, SKELETON_VERSION_1_8);
         mSkeleton->reload();
@@ -193,7 +193,7 @@ TEST_F(MeshSerializerTests,Skeleton_Version_1_8)
 //--------------------------------------------------------------------------
 TEST_F(MeshSerializerTests,Skeleton_Version_1_0)
 {
-    if (!mSkeleton.isNull()) {
+    if (mSkeleton) {
         SkeletonSerializer skeletonSerializer;
         skeletonSerializer.exportSkeleton(mSkeleton.get(), mSkeletonFullPath, SKELETON_VERSION_1_0);
         mSkeleton->reload();
@@ -526,7 +526,7 @@ void MeshSerializerTests::assertIndexDataClone(IndexData* a, IndexData* b, MeshV
         EXPECT_TRUE(a->indexCount == b->indexCount);
         // EXPECT_TRUE(a->indexStart == b->indexStart);
         EXPECT_TRUE((a->indexBuffer.get() == NULL) == (b->indexBuffer.get() == NULL));
-        if (!a->indexBuffer.isNull()) {
+        if (a->indexBuffer) {
             EXPECT_TRUE(a->indexBuffer->getManager() == b->indexBuffer->getManager());
             // EXPECT_TRUE(a->indexBuffer->getNumIndexes() == b->indexBuffer->getNumIndexes());
             EXPECT_TRUE(a->indexBuffer->getIndexSize() == b->indexBuffer->getIndexSize());

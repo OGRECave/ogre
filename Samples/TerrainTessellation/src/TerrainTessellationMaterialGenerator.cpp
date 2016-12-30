@@ -57,7 +57,7 @@ MaterialPtr TerrainTessellationMaterialGenerator::Profile::generate(const Terrai
     const Ogre::String& matName = terrain->getMaterialName();        
     MaterialPtr mat = MaterialManager::getSingleton().getByName( matName ).staticCast<Material>();
 
-    if (!mat.isNull()) 
+    if (mat) 
         MaterialManager::getSingleton().remove(matName);
 
     TerrainTessellationMaterialGenerator* parent = (TerrainTessellationMaterialGenerator*)getParent();

@@ -305,7 +305,7 @@ protected:
 
         // change the value if hardware skinning is enabled
         MaterialPtr entityMaterial = ent->getSubEntity(0)->getMaterial();
-        if(!entityMaterial.isNull())
+        if(entityMaterial)
         {
             Technique* bestTechnique = entityMaterial->getBestTechnique();
             if(bestTechnique)

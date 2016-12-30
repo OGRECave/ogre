@@ -57,7 +57,7 @@ namespace Ogre {
     {
         mMaterial = MaterialManager::getSingleton().getByName(materialName);
 
-        if (mMaterial.isNull())
+        if (!mMaterial)
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + materialName,
                          "RenderToVertexBuffer::setRenderToBufferMaterialName" );
 

@@ -76,7 +76,7 @@ namespace Ogre {
         lod.userValue = 0; // User value not used for base LOD level
         lod.value = getLodStrategy()->getBaseValue();
         lod.edgeData = NULL;
-        lod.manualMesh.setNull();
+        lod.manualMesh.reset();
         mMeshLodUsageList.push_back(lod);
     }
     //-----------------------------------------------------------------------
@@ -217,7 +217,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Mesh::unprepareImpl()
     {
-        mFreshFromDisk.setNull();
+        mFreshFromDisk.reset();
     }
     void Mesh::loadImpl()
     {
@@ -227,9 +227,9 @@ namespace Ogre {
         // If the only copy is local on the stack, it will be cleaned
         // up reliably in case of exceptions, etc
         DataStreamPtr data(mFreshFromDisk);
-        mFreshFromDisk.setNull();
+        mFreshFromDisk.reset();
 
-        if (data.isNull()) {
+        if (!data) {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                         "Data doesn't appear to have been prepared in " + mName,
                         "Mesh::loadImpl()");
@@ -505,7 +505,7 @@ namespace Ogre {
             if (skelName.empty())
             {
                 // No skeleton
-                mSkeleton.setNull();
+                mSkeleton.reset();
             }
             else
             {
@@ -515,7 +515,7 @@ namespace Ogre {
                 }
                 catch (...)
                 {
-                    mSkeleton.setNull();
+                    mSkeleton.reset();
                     // Log this error
                     String msg = "Unable to load skeleton ";
                     msg += skelName + " for Mesh " + mName
@@ -558,7 +558,7 @@ namespace Ogre {
     void Mesh::_initAnimationState(AnimationStateSet* animSet)
     {
         // Animation states for skeletal animation
-        if (!mSkeleton.isNull())
+        if (mSkeleton)
         {
             // Delegate to Skeleton
             mSkeleton->_initAnimationState(animSet);
@@ -588,7 +588,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::_refreshAnimationState(AnimationStateSet* animSet)
     {
-        if (!mSkeleton.isNull())
+        if (mSkeleton)
         {
             mSkeleton->_refreshAnimationState(animSet);
         }
@@ -972,7 +972,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::_computeBoneBoundingRadius()
     {
-        if (mBoneBoundingRadius == Real(0) && ! mSkeleton.isNull())
+        if (mBoneBoundingRadius == Real(0) && mSkeleton)
         {
             Real radius = Real(0);
             vector<Vector3>::type bonePositions;
@@ -1055,7 +1055,7 @@ namespace Ogre {
     {
 #if !OGRE_NO_MESHLOD
         index = std::min(index, (ushort)(mMeshLodUsageList.size() - 1));
-        if (this->_isManualLodLevel(index) && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
+        if (this->_isManualLodLevel(index) && index > 0 && !mMeshLodUsageList[index].manualMesh)
         {
             // Load the mesh now
             try {
@@ -1107,7 +1107,7 @@ namespace Ogre {
         MeshLodUsage* lod = &(mMeshLodUsageList[index]);
 
         lod->manualName = meshName;
-        lod->manualMesh.setNull();
+        lod->manualMesh.reset();
         OGRE_DELETE lod->edgeData;
         lod->edgeData = 0;
     }
@@ -1617,7 +1617,7 @@ namespace Ogre {
             {
                 // Delegate edge building to manual mesh
                 // It should have already built it's own edge list while loading
-                if (!usage.manualMesh.isNull())
+                if (usage.manualMesh)
                 {
                     usage.edgeData = usage.manualMesh->getEdgeList(0);
                 }
@@ -2133,7 +2133,7 @@ namespace Ogre {
                         ->getBuffer(i)->getSizeInBytes();
                 }
             }
-            if (!(*si)->indexData->indexBuffer.isNull())
+            if ((*si)->indexData->indexBuffer)
             {
                 // Index data
                 ret += (*si)->indexData->indexBuffer->getSizeInBytes();

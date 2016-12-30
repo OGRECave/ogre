@@ -983,7 +983,7 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
             mCurTexMipCount = 0;
 #endif
-            if (!tex.isNull())
+            if (tex)
             {
                 // Note used
                 tex->touch();

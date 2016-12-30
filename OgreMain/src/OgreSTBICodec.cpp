@@ -98,7 +98,7 @@ namespace Ogre {
                         "STBIImageCodec::encode" ) ;
         }
 
-        ImageData* pImgData = static_cast<ImageData*>(pData.getPointer());
+        ImageData* pImgData = static_cast<ImageData*>(pData.get());
         int channels = PixelUtil::getComponentCount(pImgData->format);
 
         int len;
@@ -146,7 +146,6 @@ namespace Ogre {
         }
 
         SharedPtr<ImageData> imgData(OGRE_NEW ImageData());
-        MemoryDataStreamPtr output;
 
         imgData->depth = 1; // only 2D formats handled by this codec
         imgData->width = width;
@@ -178,7 +177,7 @@ namespace Ogre {
         
         size_t dstPitch = imgData->width * PixelUtil::getNumElemBytes(imgData->format);
         imgData->size = dstPitch * imgData->height;
-        output.bind(OGRE_NEW MemoryDataStream(pixelData, imgData->size, true));
+        MemoryDataStreamPtr output(OGRE_NEW MemoryDataStream(pixelData, imgData->size, true));
         
         DecodeResult ret;
         ret.first = output;

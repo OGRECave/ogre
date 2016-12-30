@@ -48,8 +48,8 @@ namespace Ogre {
         , mBufManager(bufManager)
         , mpGeometryShader(0)
     {
-        mVertexBuffers[0].setNull();
-        mVertexBuffers[1].setNull();
+        mVertexBuffers[0].reset();
+        mVertexBuffers[1].reset();
     }
 
     D3D11RenderToVertexBuffer::~D3D11RenderToVertexBuffer(void)
@@ -81,7 +81,7 @@ namespace Ogre {
         }
         else
         {
-            dx11Program = static_cast<D3D11HLSLProgram*>(program.getPointer());
+            dx11Program = static_cast<D3D11HLSLProgram*>(program.get());
         }
         dx11Program->reinterpretGSForStreamOut();
 
@@ -96,7 +96,7 @@ namespace Ogre {
         setupGeometryShaderLinkageToStreamOut(r2vbPass);
 
         size_t bufSize = mVertexData->vertexDeclaration->getVertexSize(0) * mMaxVertexCount;
-        if (mVertexBuffers[0].isNull() || mVertexBuffers[0]->getSizeInBytes() != bufSize)
+        if (!mVertexBuffers[0] || mVertexBuffers[0]->getSizeInBytes() != bufSize)
         {
             //Buffers don't match. Need to reallocate.
             mResetRequested = true;
@@ -122,7 +122,7 @@ namespace Ogre {
             targetBufferIndex = 1 - mFrontBufferIndex;
         }
 
-        if (mVertexBuffers[targetBufferIndex].isNull() || 
+        if (!mVertexBuffers[targetBufferIndex] || 
             mVertexBuffers[targetBufferIndex]->getSizeInBytes() != bufSize)
         {
             reallocateBuffer(targetBufferIndex);
@@ -135,7 +135,7 @@ namespace Ogre {
         targetRenderSystem->_setViewMatrix(Matrix4::IDENTITY);
         targetRenderSystem->_setProjectionMatrix(Matrix4::IDENTITY);
 
-        D3D11HardwareVertexBuffer* vertexBuffer = static_cast<D3D11HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].getPointer());
+        D3D11HardwareVertexBuffer* vertexBuffer = static_cast<D3D11HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
     
         UINT offset[1] = { 0 };
         ID3D11Buffer* iBuffer[1];
@@ -179,9 +179,9 @@ namespace Ogre {
     void D3D11RenderToVertexBuffer::reallocateBuffer(size_t index)
     {
         assert(index == 0 || index == 1);
-        if (!mVertexBuffers[index].isNull())
+        if (mVertexBuffers[index])
         {
-            mVertexBuffers[index].setNull();
+            mVertexBuffers[index].reset();
         }
 
         mVertexBuffers[index] = mBufManager->createStreamOutputVertexBuffer(

@@ -202,8 +202,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
             const char* addressVFuncName = getAdressingFunctionName(mTextureAddressings[j].v);
             
             //Create a function which will replace the texel with the texture texel
-            if ((texcoord.isNull() == false) && (texel.isNull() == false) && 
-                (sampler.isNull() == false) && (addressUFuncName != NULL) && (addressVFuncName != NULL))
+            if (texcoord && texel && sampler && addressUFuncName && addressVFuncName)
             {
                 //calculate the U value due to addressing mode
                 curFuncInvocation = OGRE_NEW FunctionInvocation(addressUFuncName, groupOrder, internalCounter++);
@@ -321,7 +320,7 @@ bool TextureAtlasSampler::preAddToRenderState(const RenderState* renderState, Pa
         TextureUnitState* pState = srcPass->getTextureUnitState(i);
         
         const TextureAtlasTablePtr& table = factory.getTextureAtlasTable(pState->getTextureName()); 
-        if (table.isNull() == false)
+        if (table)
         {
             if (table->size() > TAS_MAX_SAFE_ATLASED_TEXTURES)
             {
@@ -457,7 +456,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
                         );
 
                     it->second->push_back(newRecord);
-                    if (!textureAtlasTable.isNull())
+                    if (textureAtlasTable)
                     {
                         textureAtlasTable->push_back(newRecord);
                     }
@@ -490,7 +489,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
 //-----------------------------------------------------------------------
 void TextureAtlasSamplerFactory::setTextureAtlasTable(const String& textureName, const TextureAtlasTablePtr& atlasData, bool autoBorderAdjust)
 {
-    if ((atlasData.isNull() == true) || (atlasData->empty()))
+    if (!atlasData || atlasData->empty())
         removeTextureAtlasTable(textureName);
     else mAtlases.insert(TextureAtlasMap::value_type(textureName, atlasData));
 }

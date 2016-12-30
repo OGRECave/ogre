@@ -655,11 +655,11 @@ namespace Ogre
 
         // unlock buffers
         uvBuf->unlock();
-        if (!posBuf.isNull())
+        if (posBuf)
         {
             posBuf->unlock();
         }
-        if (!normBuf.isNull())
+        if (normBuf)
         {
             normBuf->unlock();
         }

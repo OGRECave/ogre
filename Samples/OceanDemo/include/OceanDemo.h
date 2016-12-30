@@ -144,11 +144,11 @@ void Sample_Ocean::cleanupContent()
     MeshManager::getSingleton().remove("OceanSurface", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     // get rid of the shared pointers before shutting down ogre or exceptions occur
-    mActiveFragmentProgram.setNull();
-    mActiveFragmentParameters.setNull();
-    mActiveVertexProgram.setNull();
-    mActiveVertexParameters.setNull();
-    mActiveMaterial.setNull();
+    mActiveFragmentProgram.reset();
+    mActiveFragmentParameters.reset();
+    mActiveVertexProgram.reset();
+    mActiveVertexParameters.reset();
+    mActiveMaterial.reset();
 }
 
 //--------------------------------------------------------------------------
@@ -275,7 +275,7 @@ void Sample_Ocean::sliderMoved(Slider* slider)
                         (ActiveShaderDef.ValType == GPU_VERTEX) ?
                             mActiveVertexParameters : mActiveFragmentParameters;
 
-                    if(!activeParameters.isNull())
+                    if(activeParameters)
                     {
                         activeParameters->_writeRawConstant(
                             ActiveShaderDef.PhysicalIndex + ActiveShaderDef.ElementIndex, val);
@@ -332,7 +332,7 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
     sprintf(pageText, "Parameters %zu / %zu", mCurrentPage+1, mNumPages);
     static_cast<OgreBites::Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
 
-    if(!mActiveMaterial.isNull() && !mActiveMaterial->getSupportedTechniques().empty())
+    if(mActiveMaterial && !mActiveMaterial->getSupportedTechniques().empty())
     {
         Ogre::Technique* currentTechnique = mActiveMaterial->getSupportedTechniques().front();
         if(currentTechnique)
@@ -382,7 +382,7 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
                                     Ogre::GpuProgramParametersSharedPtr activeParameters =
                                         (ActiveShaderDef.ValType == GPU_VERTEX) ?
                                             mActiveVertexParameters : mActiveFragmentParameters;
-                                    if(!activeParameters.isNull())
+                                    if(activeParameters)
                                     {
                                         // use param name to get index : use appropriate parameters ptr
                                         const Ogre::GpuConstantDefinition& def = 

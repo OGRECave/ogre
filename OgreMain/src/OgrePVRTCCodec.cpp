@@ -191,7 +191,6 @@ namespace Ogre {
         size_t numFaces = 1; // Assume one face until we know otherwise
 
         ImageData *imgData = OGRE_NEW ImageData();
-        MemoryDataStreamPtr output;
 
         // Read the PVRTC header
         stream->read(&header, sizeof(PVRTCTexHeaderV2));
@@ -229,7 +228,7 @@ namespace Ogre {
                                              imgData->width, imgData->height, imgData->depth, imgData->format);
 
         // Bind output buffer
-        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        MemoryDataStreamPtr output(OGRE_NEW MemoryDataStream(imgData->size));
 
         // Now deal with the data
         void *destPtr = output->getPtr();
@@ -251,7 +250,6 @@ namespace Ogre {
         size_t numFaces = 1; // Assume one face until we know otherwise
 
         ImageData *imgData = OGRE_NEW ImageData();
-        MemoryDataStreamPtr output;
 
         // Read the PVRTC header
         stream->read(&header, sizeof(PVRTCTexHeaderV3));
@@ -308,7 +306,7 @@ namespace Ogre {
                                              imgData->width, imgData->height, imgData->depth, imgData->format);
 
         // Bind output buffer
-        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        MemoryDataStreamPtr output(OGRE_NEW MemoryDataStream(imgData->size));
 
         // Now deal with the data
         void *destPtr = output->getPtr();

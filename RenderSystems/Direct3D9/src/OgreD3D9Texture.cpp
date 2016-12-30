@@ -226,7 +226,7 @@ namespace Ogre
         }
 
         // Make sure streams prepared.
-        if (mLoadedStreams.isNull())
+        if (!mLoadedStreams)
         {
             prepareImpl();
         }
@@ -375,7 +375,7 @@ namespace Ogre
     void D3D9Texture::postLoadImpl(void)
     {
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
-        mLoadedStreams.setNull();
+        mLoadedStreams.reset();
     }   
 
     /****************************************************************************************/

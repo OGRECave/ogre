@@ -77,9 +77,9 @@ void Exporter::exportMesh(std::string fileName, std::string skelName)
     pMesh->setSkeletonName(skelName);
 
     // We'll assume we want to export the entire scene
-    exportCSLModel(pMesh.getPointer(), SceneRoot);
+    exportCSLModel(pMesh.get(), SceneRoot);
     MeshSerializer serializer;
-    serializer.exportMesh(pMesh.getPointer(), fileName);
+    serializer.exportMesh(pMesh.get(), fileName);
 }
 
 //--------------------------------------------------------------------------
@@ -413,14 +413,14 @@ void Exporter::exportBones(std::string fileName)
         
     // Recursively traverse the bone tree   
     root = false;
-    recurseBones(pSkel.getPointer(), SceneRoot);
+    recurseBones(pSkel.get(), SceneRoot);
     
     // Export animations
-    exportAnim(pSkel.getPointer(), SceneRoot);
+    exportAnim(pSkel.get(), SceneRoot);
 
     // Call serializer to write .skeleton file
     SkeletonSerializer serializer;
-    serializer.exportSkeleton(pSkel.getPointer(), fileName);
+    serializer.exportSkeleton(pSkel.get(), fileName);
 }
 
 //-----------------------------------------------------------------

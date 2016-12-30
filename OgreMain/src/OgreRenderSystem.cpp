@@ -892,32 +892,32 @@ namespace Ogre {
 
         --mCurrentPassIterationCount;
         ++mCurrentPassIterationNum;
-        if (!mActiveVertexGpuProgramParameters.isNull())
+        if (mActiveVertexGpuProgramParameters)
         {
             mActiveVertexGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_VERTEX_PROGRAM);
         }
-        if (!mActiveGeometryGpuProgramParameters.isNull())
+        if (mActiveGeometryGpuProgramParameters)
         {
             mActiveGeometryGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_GEOMETRY_PROGRAM);
         }
-        if (!mActiveFragmentGpuProgramParameters.isNull())
+        if (mActiveFragmentGpuProgramParameters)
         {
             mActiveFragmentGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_FRAGMENT_PROGRAM);
         }
-        if (!mActiveTessellationHullGpuProgramParameters.isNull())
+        if (mActiveTessellationHullGpuProgramParameters)
         {
             mActiveTessellationHullGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_HULL_PROGRAM);
         }
-        if (!mActiveTessellationDomainGpuProgramParameters.isNull())
+        if (mActiveTessellationDomainGpuProgramParameters)
         {
             mActiveTessellationDomainGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_DOMAIN_PROGRAM);
         }
-        if (!mActiveComputeGpuProgramParameters.isNull())
+        if (mActiveComputeGpuProgramParameters)
         {
             mActiveComputeGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_COMPUTE_PROGRAM);
@@ -1090,7 +1090,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr &val )
     {
-        if ( !val.isNull() && !val->getIsInstanceData() )
+        if ( val && !val->getIsInstanceData() )
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
                         "A none instance data vertex buffer was set to be the global instance vertex buffer.",

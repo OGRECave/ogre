@@ -662,7 +662,7 @@ void Sample_Compositor::createTextures(void)
         TU_DYNAMIC_WRITE_ONLY
     );
 
-    if(!tex.isNull())
+    if(tex)
     {
         HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
         ptr->lock(HardwareBuffer::HBL_DISCARD);

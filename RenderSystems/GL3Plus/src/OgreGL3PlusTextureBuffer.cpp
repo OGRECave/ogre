@@ -459,7 +459,7 @@ namespace Ogre {
 
     void GL3PlusTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
-        GL3PlusTextureBuffer *srct = static_cast<GL3PlusTextureBuffer *>(src.getPointer());
+        GL3PlusTextureBuffer *srct = static_cast<GL3PlusTextureBuffer *>(src.get());
         // Check for FBO support first
         // Destination texture must be 1D, 2D, 3D, or Cube
         // Source texture must be 1D, 2D or 3D
@@ -678,7 +678,7 @@ namespace Ogre {
         if (GL3PlusPixelUtil::getGLOriginFormat(src_orig.format) == 0)
         {
             // Convert to buffer internal format
-            buf.bind(new MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(),
+            buf.reset(new MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(),
                                                                    src_orig.getDepth(), mFormat)));
             src = PixelBox(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(), mFormat, buf->getPtr());
             PixelUtil::bulkPixelConversion(src_orig, src);

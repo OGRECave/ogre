@@ -550,7 +550,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         // Create material
         String matName = "Ogre/DebugTexture" + StringConverter::toString(i);
         MaterialPtr debugMat = MaterialManager::getSingleton().getByName(matName);
-        if (debugMat.isNull())
+        if (!debugMat)
         {
             debugMat = MaterialManager::getSingleton().create(matName,
                                                               ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -594,7 +594,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         String matName = "DepthShadows/" + textureName;
 
         MaterialPtr ret = MaterialManager::getSingleton().getByName(matName);
-        if (ret.isNull())
+        if (!ret)
         {
             MaterialPtr baseMat = MaterialManager::getSingleton().getByName("Ogre/shadow/depth/integrated/pssm");
             ret = baseMat->clone(matName);
@@ -645,7 +645,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             // 3 textures per directional light (PSSM)
             mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
 
-            if (mPSSMSetup.isNull())
+            if (!mPSSMSetup)
             {
                 // shadow camera setup
                 PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
@@ -655,7 +655,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 pssmSetup->setOptimalAdjustFactor(1, 1);
                 pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
-                mPSSMSetup.bind(pssmSetup);
+                mPSSMSetup.reset(pssmSetup);
             }
             mSceneMgr->setShadowCameraSetup(mPSSMSetup);
 

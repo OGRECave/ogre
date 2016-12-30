@@ -441,10 +441,10 @@ namespace Ogre
 		if (s.status == SS_ACTIVE && tex == s.tex && s.blendFunc == blendFunc && s.blendFactor1 == blendFactor1 && s.blendFactor2 == blendFactor2 &&
 			s.intensity == intensityFactor && s.textureAddressing == textureAddr)
 			return;
-		if (s.status == SS_NOT_ACTIVE && tex.isNull())
+		if (s.status == SS_NOT_ACTIVE && !tex)
 			return;
 
-		if (!tex.isNull())
+		if (tex)
 		{
 			// Ensure that the texture in the shader is in linear space
 			tex->setHardwareGammaEnabled(mCanHardwareGamma && s.needsGammaCorrection);
@@ -472,7 +472,7 @@ namespace Ogre
 		s.blendFactor2 = blendFactor2;
 
 		s.intensity = intensityFactor;
-		s.mipmapCount = tex.isNull() ? 0.0f : tex->getNumMipmaps();
+		s.mipmapCount = !tex ? 0.0f : tex->getNumMipmaps();
 
 		_hasSamplerChanged = true;
 		_hasSamplerListChanged = s.status == SS_ADDED || s.status == SS_REMOVED;

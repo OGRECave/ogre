@@ -80,7 +80,7 @@ Ogre::Vector2 Widget::cursorOffset(Ogre::OverlayElement *element, const Ogre::Ve
 
 Ogre::Real Widget::getCaptionWidth(const Ogre::DisplayString &caption, Ogre::TextAreaOverlayElement *area)
 {
-    Ogre::Font* font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(area->getFontName()).getPointer();
+    Ogre::FontPtr font = Ogre::FontManager::getSingleton().getByName(area->getFontName());
     Ogre::String current = DISPLAY_STRING_TO_STRING(caption);
     Ogre::Real lineWidth = 0;
 
@@ -102,7 +102,7 @@ Ogre::Real Widget::getCaptionWidth(const Ogre::DisplayString &caption, Ogre::Tex
 
 void Widget::fitCaptionToArea(const Ogre::DisplayString &caption, Ogre::TextAreaOverlayElement *area, Ogre::Real maxWidth)
 {
-    Ogre::Font* f = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(area->getFontName()).getPointer();
+    Ogre::FontPtr f = Ogre::FontManager::getSingleton().getByName(area->getFontName());
     Ogre::String s = DISPLAY_STRING_TO_STRING(caption);
 
     size_t nl = s.find('\n');
@@ -240,7 +240,7 @@ void TextBox::setText(const Ogre::DisplayString &text)
     mText = text;
     mLines.clear();
 
-    Ogre::Font* font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(mTextArea->getFontName()).getPointer();
+    Ogre::FontPtr font = Ogre::FontManager::getSingleton().getByName(mTextArea->getFontName());
 
     Ogre::String current = DISPLAY_STRING_TO_STRING(text);
     bool firstWord = true;

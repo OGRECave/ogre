@@ -82,7 +82,7 @@ void Context::_mainLoop(void* target)
 void Context::unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName)
 {
     Ogre::ResourcePtr rPtr = resMgr->getResourceByName(resourceName);
-    if (rPtr.isNull())
+    if (!rPtr)
         return;
     
     rPtr->unload();
@@ -108,7 +108,7 @@ void Context::destroyMaterials( Ogre::String resourceGroupID )
             {
                 mShaderGenerator->removeAllShaderBasedTechniques( matName );
                 material->unload();
-                material.setNull();
+                material.reset();
                 materialNamesToRemove.push_back( matName );
             }
         }
@@ -142,7 +142,7 @@ void Context::destroyTextures( Ogre::String resourceGroupID )
             if( resourceGroupID == texture->getGroup())
             {
                 texture->unload();
-                texture.setNull();
+                texture.reset();
                 textureNamesToRemove.push_back( resourceName );
             }
         }

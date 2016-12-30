@@ -421,7 +421,7 @@ namespace Ogre {
             {
                 // A use count of 3 means that only RGM and RM have references
                 // RGM has one (this one) and RM has 2 (by name and by handle)
-                if (l->useCount() == RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+                if (l->use_count() == RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
                 {
                     Resource* resource = l->get();
                     if (!reloadableOnly || resource->isReloadable())
@@ -676,7 +676,7 @@ namespace Ogre {
         if(mLoadingListener)
         {
             DataStreamPtr stream = mLoadingListener->resourceLoading(resourceName, groupName, resourceBeingLoaded);
-            if(!stream.isNull())
+            if(stream)
                 return stream;
         }
 
@@ -751,7 +751,7 @@ namespace Ogre {
             for (StringVector::iterator ni = names->begin(); ni != names->end(); ++ni)
             {
                 DataStreamPtr ptr = arch->open(*ni);
-                if (!ptr.isNull())
+                if (ptr)
                 {
                     ret->push_back(ptr);
                 }
@@ -1034,15 +1034,14 @@ namespace Ogre {
                         LogManager::getSingleton().logMessage(
                             "Parsing script " + fii->filename);
                         DataStreamPtr stream = fii->archive->open(fii->filename);
-                        if (!stream.isNull())
+                        if (stream)
                         {
                             if (mLoadingListener)
                                 mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
 
                             if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
                             {
-                                DataStreamPtr cachedCopy;
-                                cachedCopy.bind(OGRE_NEW MemoryDataStream(stream->getName(), stream));
+                                DataStreamPtr cachedCopy(OGRE_NEW MemoryDataStream(stream->getName(), stream));
                                 su->parseScript(cachedCopy, grp->name);
                             }
                             else
@@ -1128,7 +1127,7 @@ namespace Ogre {
                     for (LoadUnloadResourceList::iterator l = resList.begin();
                         l != resList.end(); ++ l)
                     {
-                        if ((*l).getPointer() == res.getPointer())
+                        if ((*l).get() == res.get())
                         {
                             // this is the one
                             resList.erase(l);
@@ -1160,7 +1159,7 @@ namespace Ogre {
             for (LoadUnloadResourceList::iterator l = loadList.begin();
                 l != loadList.end(); ++l)
             {
-                if ((*l).getPointer() == res)
+                if ((*l).get() == res)
                 {
                     resPtr = *l;
                     loadList.erase(l);
@@ -1169,7 +1168,7 @@ namespace Ogre {
             }
         }
 
-        if (!resPtr.isNull())
+        if (resPtr)
         {
             // New group
             ResourceGroup* newGrp = getResourceGroup(res->getGroup());

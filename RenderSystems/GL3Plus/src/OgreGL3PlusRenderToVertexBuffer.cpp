@@ -47,8 +47,8 @@ namespace Ogre {
         : mTargetBufferIndex(0)
         , mFirstUpdate(true)
     {
-        mVertexBuffers[0].setNull();
-        mVertexBuffers[1].setNull();
+        mVertexBuffers[0].reset();
+        mVertexBuffers[1].reset();
 
         // Create query objects.
         OGRE_CHECK_GL_ERROR(glGenQueries(1, &mPrimitivesDrawnQuery));
@@ -147,8 +147,8 @@ namespace Ogre {
         // Bind and fill vertex arrays + buffers.
         reallocateBuffer(sourceBufferIndex);
         reallocateBuffer(mTargetBufferIndex);
-        // GL3PlusHardwareVertexBuffer* sourceVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mSourceBufferIndex].getPointer());
-        // GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].getPointer());
+        // GL3PlusHardwareVertexBuffer* sourceVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mSourceBufferIndex].get());
+        // GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].get());
 
         //TODO GL4+ glBindTransformFeedback
 
@@ -215,7 +215,7 @@ namespace Ogre {
     void GL3PlusRenderToVertexBuffer::update(SceneManager* sceneMgr)
     {
         //     size_t bufSize = mVertexData->vertexDeclaration->getVertexSize(0) * mMaxVertexCount;
-        //     if (mVertexBuffers[0].isNull() || mVertexBuffers[0]->getSizeInBytes() != bufSize)
+        //     if (!mVertexBuffers[0] || mVertexBuffers[0]->getSizeInBytes() != bufSize)
         //     {
         //         // Buffers don't match. Need to reallocate.
         //         mResetRequested = true;
@@ -234,7 +234,7 @@ namespace Ogre {
         //         targetBufferIndex = 1 - mSourceBufferIndex;
         //     }
 
-        //     if (mVertexBuffers[targetBufferIndex].isNull() ||
+        //     if (!mVertexBuffers[targetBufferIndex] ||
         //         mVertexBuffers[targetBufferIndex]->getSizeInBytes() != bufSize)
         //     {
         //         reallocateBuffer(targetBufferIndex);
@@ -279,7 +279,7 @@ namespace Ogre {
         //TODO add tessellation stages
 
         // Bind source vertex array + target tranform feedback buffer.
-        GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].getPointer());
+        GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].get());
         // OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VertexBuffer[mTargetBufferIndex]));
         OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, targetVertexBuffer->getGLBufferId()));
         // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[mSourceBufferIndex]));
@@ -343,9 +343,9 @@ namespace Ogre {
     void GL3PlusRenderToVertexBuffer::reallocateBuffer(size_t index)
     {
         assert(index == 0 || index == 1);
-        if (!mVertexBuffers[index].isNull())
+        if (mVertexBuffers[index])
         {
-            mVertexBuffers[index].setNull();
+            mVertexBuffers[index].reset();
         }
 
         // Transform feedback buffer must be at least as large as the

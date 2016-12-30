@@ -650,7 +650,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     EXPECT_EQ(caps.getDriverVersion().release, caps2.getDriverVersion().release);
     EXPECT_EQ(0, caps2.getDriverVersion().build);
 
-    dataStreamPtr.setNull();
+    dataStreamPtr.reset();
 }
 //--------------------------------------------------------------------------
 

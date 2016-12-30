@@ -998,15 +998,15 @@ namespace Ogre
             memSize += sizeof((*i));
         }
 
-        if(!mFloatLogicalToPhysical.isNull())
+        if(mFloatLogicalToPhysical)
             memSize += mFloatLogicalToPhysical->bufferSize;
-        if(!mDoubleLogicalToPhysical.isNull())
+        if(mDoubleLogicalToPhysical)
             memSize += mDoubleLogicalToPhysical->bufferSize;
-        if(!mIntLogicalToPhysical.isNull())
+        if(mIntLogicalToPhysical)
             memSize += mIntLogicalToPhysical->bufferSize;
-        if(!mUnsignedIntLogicalToPhysical.isNull())
+        if(mUnsignedIntLogicalToPhysical)
             memSize += mUnsignedIntLogicalToPhysical->bufferSize;
-        if(!mBoolLogicalToPhysical.isNull())
+        if(mBoolLogicalToPhysical)
             memSize += mBoolLogicalToPhysical->bufferSize;
 
         return memSize;
@@ -1066,27 +1066,27 @@ namespace Ogre
         // set has set some parameters
 
         // Size and reset buffer (fill with zero to make comparison later ok)
-        if (!floatIndexMap.isNull() && floatIndexMap->bufferSize > mFloatConstants.size())
+        if (floatIndexMap && floatIndexMap->bufferSize > mFloatConstants.size())
         {
             mFloatConstants.insert(mFloatConstants.end(),
                                    floatIndexMap->bufferSize - mFloatConstants.size(), 0.0f);
         }
-        if (!doubleIndexMap.isNull() && doubleIndexMap->bufferSize > mDoubleConstants.size())
+        if (doubleIndexMap && doubleIndexMap->bufferSize > mDoubleConstants.size())
         {
             mDoubleConstants.insert(mDoubleConstants.end(),
                                     doubleIndexMap->bufferSize - mDoubleConstants.size(), 0.0f);
         }
-        if (!intIndexMap.isNull() &&  intIndexMap->bufferSize > mIntConstants.size())
+        if (intIndexMap &&  intIndexMap->bufferSize > mIntConstants.size())
         {
             mIntConstants.insert(mIntConstants.end(),
                                  intIndexMap->bufferSize - mIntConstants.size(), 0);
         }
-        if (!uintIndexMap.isNull() &&  uintIndexMap->bufferSize > mUnsignedIntConstants.size())
+        if (uintIndexMap &&  uintIndexMap->bufferSize > mUnsignedIntConstants.size())
         {
             mUnsignedIntConstants.insert(mUnsignedIntConstants.end(),
                                  uintIndexMap->bufferSize - mUnsignedIntConstants.size(), 0);
         }
-        // if (!boolIndexMap.isNull() &&  boolIndexMap->bufferSize > mBoolConstants.size())
+        // if (boolIndexMap &&  boolIndexMap->bufferSize > mBoolConstants.size())
         // {
         //     mBoolConstants.insert(mBoolConstants.end(),
         //                          boolIndexMap->bufferSize - mBoolConstants.size(), 0);
@@ -1158,7 +1158,7 @@ namespace Ogre
         // Raw buffer size is 4x count
         size_t rawCount = count * 4;
         // get physical index
-        assert(!mFloatLogicalToPhysical.isNull() && "GpuProgram hasn't set up the logical -> physical map!");
+        assert(mFloatLogicalToPhysical && "GpuProgram hasn't set up the logical -> physical map!");
 
         size_t physicalIndex = _getFloatConstantPhysicalIndex(index, rawCount, GPV_GLOBAL);
 
@@ -1172,7 +1172,7 @@ namespace Ogre
         // Raw buffer size is 4x count
         size_t rawCount = count * 4;
         // get physical index
-        assert(!mFloatLogicalToPhysical.isNull() && "GpuProgram hasn't set up the logical -> physical map!");
+        assert(mFloatLogicalToPhysical && "GpuProgram hasn't set up the logical -> physical map!");
 
         size_t physicalIndex = _getFloatConstantPhysicalIndex(index, rawCount, GPV_GLOBAL);
         assert(physicalIndex + rawCount <= mFloatConstants.size());
@@ -1190,7 +1190,7 @@ namespace Ogre
         // Raw buffer size is 4x count
         size_t rawCount = count * 4;
         // get physical index
-        assert(!mIntLogicalToPhysical.isNull() && "GpuProgram hasn't set up the logical -> physical map!");
+        assert(mIntLogicalToPhysical && "GpuProgram hasn't set up the logical -> physical map!");
 
         size_t physicalIndex = _getIntConstantPhysicalIndex(index, rawCount, GPV_GLOBAL);
         // Copy
@@ -1202,7 +1202,7 @@ namespace Ogre
         // Raw buffer size is 4x count
         size_t rawCount = count * 4;
         // get physical index
-        assert(!mUnsignedIntLogicalToPhysical.isNull() && "GpuProgram hasn't set up the logical -> physical map!");
+        assert(mUnsignedIntLogicalToPhysical && "GpuProgram hasn't set up the logical -> physical map!");
 
         size_t physicalIndex = _getUnsignedIntConstantPhysicalIndex(index, rawCount, GPV_GLOBAL);
         // Copy
@@ -1214,7 +1214,7 @@ namespace Ogre
     //     // Raw buffer size is 4x count
     //     size_t rawCount = count * 4;
     //     // get physical index
-    //     assert(!mBoolLogicalToPhysical.isNull() && "GpuProgram hasn't set up the logical -> physical map!");
+    //     assert(mBoolLogicalToPhysical && "GpuProgram hasn't set up the logical -> physical map!");
 
     //     size_t physicalIndex = _getBoolConstantPhysicalIndex(index, rawCount, GPV_GLOBAL);
     //     // Copy
@@ -1517,7 +1517,7 @@ namespace Ogre
     GpuLogicalIndexUse* GpuProgramParameters::_getFloatConstantLogicalIndexUse(
         size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
-        if (mFloatLogicalToPhysical.isNull())
+        if (!mFloatLogicalToPhysical)
             return 0;
 
         GpuLogicalIndexUse* indexUse = 0;
@@ -1599,7 +1599,7 @@ namespace Ogre
                         i->physicalIndex += insertCount;
                     }
                 }
-                if (!mNamedConstants.isNull())
+                if (mNamedConstants)
                 {
                     for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
                          i != mNamedConstants->map.end(); ++i)
@@ -1624,7 +1624,7 @@ namespace Ogre
     GpuLogicalIndexUse* GpuProgramParameters::_getDoubleConstantLogicalIndexUse(
         size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
-        if (mDoubleLogicalToPhysical.isNull())
+        if (!mDoubleLogicalToPhysical)
             return 0;
 
         GpuLogicalIndexUse* indexUse = 0;
@@ -1706,7 +1706,7 @@ namespace Ogre
                         i->physicalIndex += insertCount;
                     }
                 }
-                if (!mNamedConstants.isNull())
+                if (mNamedConstants)
                 {
                     for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
                          i != mNamedConstants->map.end(); ++i)
@@ -1730,7 +1730,7 @@ namespace Ogre
     //---------------------------------------------------------------------()
     GpuLogicalIndexUse* GpuProgramParameters::_getIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
-        if (mIntLogicalToPhysical.isNull())
+        if (!mIntLogicalToPhysical)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::_getIntConstantPhysicalIndex");
@@ -1813,7 +1813,7 @@ namespace Ogre
                         i->physicalIndex += insertCount;
                     }
                 }
-                if (!mNamedConstants.isNull())
+                if (mNamedConstants)
                 {
                     for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
                          i != mNamedConstants->map.end(); ++i)
@@ -1838,7 +1838,7 @@ namespace Ogre
     //TODO double check that this is implemented correctly
     GpuLogicalIndexUse* GpuProgramParameters::_getUnsignedIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
-        if (mUnsignedIntLogicalToPhysical.isNull())
+        if (!mUnsignedIntLogicalToPhysical)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::_getUnsignedIntConstantPhysicalIndex");
@@ -1921,7 +1921,7 @@ namespace Ogre
                 //         i->physicalIndex += insertCount;
                 //     }
                 // }
-                if (!mNamedConstants.isNull())
+                if (mNamedConstants)
                 {
                     for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
                          i != mNamedConstants->map.end(); ++i)
@@ -1946,7 +1946,7 @@ namespace Ogre
     // //TODO double check that this is implemented correctly
     // GpuLogicalIndexUse* GpuProgramParameters::_getBoolConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability)
     // {
-    //     if (mBoolLogicalToPhysical.isNull())
+    //     if (!mBoolLogicalToPhysical)
     //         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
     //                     "This is not a low-level parameter parameter object",
     //                     "GpuProgramParameters::_getBoolConstantPhysicalIndex");
@@ -2029,7 +2029,7 @@ namespace Ogre
     //             //         i->physicalIndex += insertCount;
     //             //     }
     //             // }
-    //             if (!mNamedConstants.isNull())
+    //             if (mNamedConstants)
     //             {
     //                 for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
     //                      i != mNamedConstants->map.end(); ++i)
@@ -2152,7 +2152,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     GpuConstantDefinitionIterator GpuProgramParameters::getConstantDefinitionIterator(void) const
     {
-        if (mNamedConstants.isNull())
+        if (!mNamedConstants)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This params object is not based on a program with named parameters.",
                         "GpuProgramParameters::getConstantDefinitionIterator");
@@ -2164,7 +2164,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     const GpuNamedConstants& GpuProgramParameters::getConstantDefinitions() const
     {
-        if (mNamedConstants.isNull())
+        if (!mNamedConstants)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This params object is not based on a program with named parameters.",
                         "GpuProgramParameters::getConstantDefinitionIterator");
@@ -2174,7 +2174,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     const GpuConstantDefinition& GpuProgramParameters::getConstantDefinition(const String& name) const
     {
-        if (mNamedConstants.isNull())
+        if (!mNamedConstants)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This params object is not based on a program with named parameters.",
                         "GpuProgramParameters::getConstantDefinitionIterator");
@@ -2191,7 +2191,7 @@ namespace Ogre
     GpuProgramParameters::_findNamedConstantDefinition(const String& name,
                                                        bool throwExceptionIfNotFound) const
     {
-        if (mNamedConstants.isNull())
+        if (!mNamedConstants)
         {
             if (throwExceptionIfNotFound)
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -3292,7 +3292,7 @@ namespace Ogre
     const GpuProgramParameters::AutoConstantEntry*
     GpuProgramParameters::findFloatAutoConstantEntry(size_t logicalIndex)
     {
-        if (mFloatLogicalToPhysical.isNull())
+        if (!mFloatLogicalToPhysical)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::findFloatAutoConstantEntry");
@@ -3305,7 +3305,7 @@ namespace Ogre
     const GpuProgramParameters::AutoConstantEntry*
     GpuProgramParameters::findDoubleAutoConstantEntry(size_t logicalIndex)
     {
-        if (mDoubleLogicalToPhysical.isNull())
+        if (!mDoubleLogicalToPhysical)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::findDoubleAutoConstantEntry");
@@ -3317,7 +3317,7 @@ namespace Ogre
     const GpuProgramParameters::AutoConstantEntry*
     GpuProgramParameters::findIntAutoConstantEntry(size_t logicalIndex)
     {
-        if (mIntLogicalToPhysical.isNull())
+        if (!mIntLogicalToPhysical)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::findIntAutoConstantEntry");
@@ -3329,7 +3329,7 @@ namespace Ogre
     const GpuProgramParameters::AutoConstantEntry*
     GpuProgramParameters::findUnsignedIntAutoConstantEntry(size_t logicalIndex)
     {
-        if (mUnsignedIntLogicalToPhysical.isNull())
+        if (!mUnsignedIntLogicalToPhysical)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::findUnsignedIntAutoConstantEntry");
@@ -3341,7 +3341,7 @@ namespace Ogre
     // const GpuProgramParameters::AutoConstantEntry*
     // GpuProgramParameters::findBoolAutoConstantEntry(size_t logicalIndex)
     // {
-    //     if (mBoolLogicalToPhysical.isNull())
+    //     if (!mBoolLogicalToPhysical)
     //         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
     //                     "This is not a low-level parameter parameter object",
     //                     "GpuProgramParameters::findBoolAutoConstantEntry");
@@ -3353,7 +3353,7 @@ namespace Ogre
     const GpuProgramParameters::AutoConstantEntry*
     GpuProgramParameters::findAutoConstantEntry(const String& paramName) const
     {
-        if (mNamedConstants.isNull())
+        if (!mNamedConstants)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This params object is not based on a program with named parameters.",
                         "GpuProgramParameters::findAutoConstantEntry");
@@ -3441,7 +3441,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuProgramParameters::copyMatchingNamedConstantsFrom(const GpuProgramParameters& source)
     {
-        if (!mNamedConstants.isNull() && !source.mNamedConstants.isNull())
+        if (mNamedConstants && source.mNamedConstants)
         {
             std::map<size_t, String> srcToDestNamedMap;
             for (GpuConstantDefinitionMap::const_iterator i = source.mNamedConstants->map.begin();

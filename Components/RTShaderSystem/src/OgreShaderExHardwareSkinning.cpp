@@ -86,18 +86,18 @@ void HardwareSkinning::setHardwareSkinningParam(ushort boneCount, ushort weightC
     
     if(skinningType == ST_DUAL_QUATERNION)
     {
-        if(mDualQuat.isNull())
+        if(!mDualQuat)
         {
-            mDualQuat.bind(OGRE_NEW DualQuaternionSkinning);
+            mDualQuat.reset(OGRE_NEW DualQuaternionSkinning);
         }
 
         mActiveTechnique = mDualQuat;
     }
     else //if(skinningType == ST_LINEAR)
     {
-        if(mLinear.isNull())
+        if(!mLinear)
         {
-            mLinear.bind(OGRE_NEW LinearSkinning);
+            mLinear.reset(OGRE_NEW LinearSkinning);
         }
 
         mActiveTechnique = mLinear;
@@ -109,35 +109,35 @@ void HardwareSkinning::setHardwareSkinningParam(ushort boneCount, ushort weightC
 //-----------------------------------------------------------------------
 ushort HardwareSkinning::getBoneCount()
 {
-    assert(!mActiveTechnique.isNull());
+    assert(mActiveTechnique);
     return mActiveTechnique->getBoneCount();
 }
 
 //-----------------------------------------------------------------------
 ushort HardwareSkinning::getWeightCount()
 {
-    assert(!mActiveTechnique.isNull());
+    assert(mActiveTechnique);
     return mActiveTechnique->getWeightCount();
 }
 
 //-----------------------------------------------------------------------
 SkinningType HardwareSkinning::getSkinningType()
 {
-    assert(!mActiveTechnique.isNull());
+    assert(mActiveTechnique);
     return mSkinningType;
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinning::hasCorrectAntipodalityHandling()
 {
-    assert(!mActiveTechnique.isNull());
+    assert(mActiveTechnique);
     return mActiveTechnique->hasCorrectAntipodalityHandling();
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinning::hasScalingShearingSupport()
 {
-    assert(!mActiveTechnique.isNull());
+    assert(mActiveTechnique);
     return mActiveTechnique->hasScalingShearingSupport();
 }
 
@@ -185,7 +185,7 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
     }
 
     //If there is no associated technique, default to linear skinning as a pass-through
-    if(mActiveTechnique.isNull())
+    if(!mActiveTechnique)
     {
         setHardwareSkinningParam(0, 0, ST_LINEAR, false, false);
     }
@@ -203,13 +203,13 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
     if ((doBoneCalculations) && (mCreator))
     {
         //update the receiver and caster materials
-        if (dstPass->getParent()->getShadowCasterMaterial().isNull())
+        if (!dstPass->getParent()->getShadowCasterMaterial())
         {
             dstPass->getParent()->setShadowCasterMaterial(
                 mCreator->getCustomShadowCasterMaterial(mSkinningType, weightCount - 1));
         }
 
-        if (dstPass->getParent()->getShadowReceiverMaterial().isNull())
+        if (!dstPass->getParent()->getShadowReceiverMaterial())
         {
             dstPass->getParent()->setShadowReceiverMaterial(
                 mCreator->getCustomShadowReceiverMaterial(mSkinningType, weightCount - 1));
@@ -222,21 +222,21 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
 //-----------------------------------------------------------------------
 bool HardwareSkinning::resolveParameters(ProgramSet* programSet)
 {
-    assert(!mActiveTechnique.isNull());
+    assert(mActiveTechnique);
     return mActiveTechnique->resolveParameters(programSet);
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinning::resolveDependencies(ProgramSet* programSet)
 {
-    assert(!mActiveTechnique.isNull());
+    assert(mActiveTechnique);
     return mActiveTechnique->resolveDependencies(programSet);
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinning::addFunctionInvocations(ProgramSet* programSet)
 {
-    assert(!mActiveTechnique.isNull());
+    assert(mActiveTechnique);
     return mActiveTechnique->addFunctionInvocations(programSet);
 }
 

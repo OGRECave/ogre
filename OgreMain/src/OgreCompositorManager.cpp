@@ -169,7 +169,7 @@ Renderable *CompositorManager::_getTexturedRectangle2D()
 CompositorInstance *CompositorManager::addCompositor(Viewport *vp, const String &compositor, int addPosition)
 {
     CompositorPtr comp = getByName(compositor);
-    if(comp.isNull())
+    if(!comp)
         return 0;
     CompositorChain *chain = getCompositorChain(vp);
     return chain->addCompositor(comp, addPosition==-1 ? CompositorChain::LAST : (size_t)addPosition);
@@ -319,7 +319,7 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
         }
     }
 
-    if (ret.isNull())
+    if (!ret)
     {
         // ok, we need to create a new one
         ret = TextureManager::getSingleton().createManual(
@@ -367,7 +367,7 @@ bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, TextureP
         {
             // Don't have to worry about an MRT, because no MRT can be input previous
             TexturePtr t = inst->getTextureInstance(tp->getOutputName(), 0);
-            if (!t.isNull() && t.get() == tex.get())
+            if (t && t.get() == tex.get())
                 return true;
         }
 
@@ -407,7 +407,7 @@ bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, TextureP
         for (size_t i = 0; i < p->getNumInputs(); ++i)
         {
             TexturePtr t = inst->getTextureInstance(p->getInput(i).name, 0);
-            if (!t.isNull() && t.get() == tex.get())
+            if (t && t.get() == tex.get())
                 return true;
         }
     }
@@ -428,7 +428,7 @@ void CompositorManager::freePooledTextures(bool onlyIfUnreferenced)
                 // if the resource system, plus this class, are the only ones to have a reference..
                 // NOTE: any material references will stop this texture getting freed (e.g. compositor demo)
                 // until this routine is called again after the material no longer references the texture
-                if (j->useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+                if (j->use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
                 {
                     TextureManager::getSingleton().remove((*j)->getHandle());
                     j = texList->erase(j);
@@ -443,7 +443,7 @@ void CompositorManager::freePooledTextures(bool onlyIfUnreferenced)
             for (TextureDefMap::iterator j = texMap.begin(); j != texMap.end();) 
             {
                 const TexturePtr& tex = j->second;
-                if (tex.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+                if (tex.use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
                 {
                     TextureManager::getSingleton().remove(tex->getHandle());
                     texMap.erase(j++);

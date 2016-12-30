@@ -402,11 +402,11 @@ namespace Ogre
         // Convert our nodes to an AST
         AbstractNodeListPtr ast = convertToAST(cst);
 
-        if(!ast.isNull() && doImports)
+        if(ast && doImports)
             processImports(ast);
-        if(!ast.isNull() && doObjects)
+        if(ast && doObjects)
             processObjects(ast.get(), ast);
-        if(!ast.isNull() && doVariables)
+        if(ast && doVariables)
             processVariables(ast.get());
 
         return ast;
@@ -520,12 +520,12 @@ namespace Ogre
                 {
                     // Load the script
                     AbstractNodeListPtr importedNodes = loadImportPath(import->source);
-                    if(!importedNodes.isNull() && !importedNodes->empty())
+                    if(importedNodes && !importedNodes->empty())
                     {
                         processImports(importedNodes);
                         processObjects(importedNodes.get(), importedNodes);
                     }
-                    if(!importedNodes.isNull() && !importedNodes->empty())
+                    if(importedNodes && !importedNodes->empty())
                         mImports.insert(std::make_pair(import->source, importedNodes));
                 }
 
@@ -573,7 +573,7 @@ namespace Ogre
                     {
                         // Locate this target and insert it into the import table
                         AbstractNodeListPtr newNodes = locateTarget(it->second.get(), j->second);
-                        if(!newNodes.isNull() && !newNodes->empty())
+                        if(newNodes && !newNodes->empty())
                             mImportTable.insert(mImportTable.begin(), newNodes->begin(), newNodes->end());
                     }
                 }
@@ -589,10 +589,10 @@ namespace Ogre
         if(mListener)
             nodes = mListener->importFile(this, name);
 
-        if(nodes.isNull() && ResourceGroupManager::getSingletonPtr())
+        if(!nodes && ResourceGroupManager::getSingletonPtr())
         {
             DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(name, mGroup);
-            if(!stream.isNull())
+            if(stream)
             {
                 ScriptLexer lexer;
                 ScriptTokenListPtr tokens = lexer.tokenize(stream->getAsString(), name);
@@ -601,7 +601,7 @@ namespace Ogre
             }
         }
 
-        if(!nodes.isNull())
+        if(nodes)
             retval = convertToAST(nodes);
 
         return retval;
@@ -1409,7 +1409,7 @@ namespace Ogre
                 temp2 = *riter;
 
             // object = last 2 children == { and }
-            if(!temp1.isNull() && !temp2.isNull() &&
+            if(temp1 && temp2 &&
                 temp1->type == CNT_RBRACE && temp2->type == CNT_LBRACE)
             {
                 if(node->children.size() < 2)
@@ -1543,7 +1543,7 @@ namespace Ogre
         }
 
         // Here, we must insert the node into the tree
-        if(!asn.isNull())
+        if(asn)
         {
             if(mCurrent)
             {

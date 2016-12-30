@@ -753,7 +753,7 @@ namespace Ogre {
         {
             mCurTexMipCount = 0;
             GLuint texID =  0;
-            if (!tex.isNull())
+            if (tex)
             {
                 // Note used
                 tex->touch();
@@ -1412,7 +1412,7 @@ namespace Ogre {
             globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
             hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
-                                !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
+                                globalInstanceVertexBuffer && (globalVertexDeclaration != NULL))
                                 || op.vertexData->vertexBufferBinding->getHasInstanceData();
 
             numberOfInstances = op.numberOfInstances;
@@ -1454,7 +1454,7 @@ namespace Ogre {
 
         if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
         {
-            if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
+            if( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
             {
                 elemEnd = globalVertexDeclaration->getElements().end();
                 for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
@@ -1960,13 +1960,13 @@ namespace Ogre {
     {
         if (gptype == GPT_VERTEX_PROGRAM && mCurrentVertexProgram)
         {
-            mActiveVertexGpuProgramParameters.setNull();
+            mActiveVertexGpuProgramParameters.reset();
             mCurrentVertexProgram->unbindProgram();
             mCurrentVertexProgram = 0;
         }
         else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentFragmentProgram)
         {
-            mActiveFragmentGpuProgramParameters.setNull();
+            mActiveFragmentGpuProgramParameters.reset();
             mCurrentFragmentProgram->unbindProgram();
             mCurrentFragmentProgram = 0;
         }

@@ -182,7 +182,7 @@ namespace Ogre {
         // Check that a valid material was provided
         MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, groupName);
 
-        if( material.isNull() )
+        if( !material )
         {
             LogManager::getSingleton().logMessage("Can't assign material " + materialName +
                                                   " to the ManualObject " + mName + " because this "
@@ -1083,7 +1083,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     const MaterialPtr& ManualObject::ManualObjectSection::getMaterial(void) const
     {
-        if (mMaterial.isNull())
+        if (!mMaterial)
         {
             // Load from default group. If user wants to use alternate groups,
             // they can define it and preload
@@ -1098,7 +1098,7 @@ namespace Ogre {
         {
             mMaterialName = name;
             mGroupName = groupName;
-            mMaterial.setNull();
+            mMaterial.reset();
         }
     }
     //-----------------------------------------------------------------------------
@@ -1147,7 +1147,7 @@ namespace Ogre {
         mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(origPosBind);
         mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
         // Map in w-coord buffer (if present)
-        if(!vertexData->hardwareShadowVolWBuffer.isNull())
+        if(vertexData->hardwareShadowVolWBuffer)
         {
             mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
             mWBuffer = vertexData->hardwareShadowVolWBuffer;

@@ -31,9 +31,9 @@ void MeshLodTests::SetUp()
 //--------------------------------------------------------------------------
 void MeshLodTests::TearDown()
 {
-    if (!mMesh.isNull()) {
+    if (mMesh) {
         mMesh->unload();
-        mMesh.setNull();
+        mMesh.reset();
     }
     OGRE_DELETE MeshLodGenerator::getSingletonPtr();
     RootWithoutRenderSystemFixture::TearDown();

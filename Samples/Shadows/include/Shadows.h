@@ -627,7 +627,7 @@ protected:
             mSceneMgr->setShadowCameraSetup(mCurrentShadowCameraSetup);
 
             //updateTipForCombo(cbo);
-            if (!mCustomRockwallVparams.isNull() && !mCustomRockwallFparams.isNull())
+            if (mCustomRockwallVparams && mCustomRockwallFparams)
             {
                 // set
                 setDefaultDepthShadowParams();
@@ -675,7 +675,7 @@ protected:
 
     void sliderMoved(Slider* slider)
     {
-        if (!mCustomRockwallVparams.isNull() && !mCustomRockwallFparams.isNull())
+        if (mCustomRockwallVparams && mCustomRockwallFparams)
         {
             updateDepthShadowParams();
         }
@@ -705,10 +705,10 @@ protected:
             (*i)->setMaterialName(BASIC_ROCKWALL_MATERIAL);
         }
 
-        mCustomRockwallVparams.setNull();
-        mCustomRockwallFparams.setNull();
-        mCustomAtheneVparams.setNull();
-        mCustomAtheneFparams.setNull();
+        mCustomRockwallVparams.reset();
+        mCustomRockwallFparams.reset();
+        mCustomAtheneVparams.reset();
+        mCustomAtheneFparams.reset();
 
     }
     

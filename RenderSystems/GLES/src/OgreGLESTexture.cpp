@@ -376,7 +376,7 @@ namespace Ogre {
 
     void GLESTexture::unprepareImpl()
     {
-        mLoadedImages.setNull();
+        mLoadedImages.reset();
     }
 
     void GLESTexture::loadImpl()
@@ -390,7 +390,7 @@ namespace Ogre {
         // Now the only copy is on the stack and will be cleaned in case of
         // exceptions being thrown from _loadImages
         LoadedImages loadedImages = mLoadedImages;
-        mLoadedImages.setNull();
+        mLoadedImages.reset();
 
         // Call internal _loadImages, not loadImage since that's external and 
         // will determine load status etc again
@@ -440,7 +440,7 @@ namespace Ogre {
             
             for(size_t i = 0; i < mSurfaceList.size(); i++)
             {
-                static_cast<GLESTextureBuffer*>(mSurfaceList[i].getPointer())->updateTextureId(mTextureID);
+                static_cast<GLESTextureBuffer*>(mSurfaceList[i].get())->updateTextureId(mTextureID);
             }
             
             if (mLoader)

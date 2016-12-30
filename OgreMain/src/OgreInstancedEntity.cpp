@@ -87,7 +87,7 @@ namespace Ogre
     bool InstancedEntity::shareTransformWith( InstancedEntity *slave )
     {
         if( !this->mBatchOwner->_getMeshRef()->hasSkeleton() ||
-            this->mBatchOwner->_getMeshRef()->getSkeleton().isNull() ||
+            !this->mBatchOwner->_getMeshRef()->getSkeleton() ||
             !this->mBatchOwner->_supportsSkeletalAnimation() )
         {
             return false;
@@ -267,7 +267,7 @@ namespace Ogre
     {
         //Is mesh skeletally animated?
         if( mBatchOwner->_getMeshRef()->hasSkeleton() &&
-            !mBatchOwner->_getMeshRef()->getSkeleton().isNull() &&
+            mBatchOwner->_getMeshRef()->getSkeleton() &&
             mBatchOwner->_supportsSkeletalAnimation() )
         {
             mSkeletonInstance = OGRE_NEW SkeletonInstance( mBatchOwner->_getMeshRef()->getSkeleton() );

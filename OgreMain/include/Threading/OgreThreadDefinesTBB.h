@@ -52,8 +52,8 @@ THE SOFTWARE
 #define OGRE_THREAD_POINTER_INIT(var) var()
 #define OGRE_THREAD_POINTER_VAR(T, var) tbb::enumerable_thread_specific<SharedPtr<T> > var
 #define OGRE_THREAD_POINTER_GET(var) var.local().get()
-#define OGRE_THREAD_POINTER_SET(var, expr) do { var.local().setNull(); var.local().bind(expr); } while (0)
-#define OGRE_THREAD_POINTER_DELETE(var) var.local().setNull()
+#define OGRE_THREAD_POINTER_SET(var, expr) do { var.local().reset(); var.local().bind(expr); } while (0)
+#define OGRE_THREAD_POINTER_DELETE(var) var.local().reset()
 // Utility
 #define OGRE_THREAD_HARDWARE_CONCURRENCY tbb::task_scheduler_init::default_num_threads()
 #define OGRE_THREAD_CURRENT_ID tbb::this_tbb_thread::get_id() 

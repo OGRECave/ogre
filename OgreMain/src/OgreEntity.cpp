@@ -166,7 +166,7 @@ namespace Ogre {
             return;
 
         // Is mesh skeletally animated?
-        if (mMesh->hasSkeleton() && !mMesh->getSkeleton().isNull())
+        if (mMesh->hasSkeleton() && mMesh->getSkeleton())
         {
             mSkeletonInstance = OGRE_NEW SkeletonInstance(mMesh->getSkeleton());
             mSkeletonInstance->load();
@@ -2257,7 +2257,7 @@ namespace Ogre {
         mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(mOriginalPosBufferBinding);
         mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
         // Map in w-coord buffer (if present)
-        if(!vertexData->hardwareShadowVolWBuffer.isNull())
+        if(vertexData->hardwareShadowVolWBuffer)
         {
             mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
             mWBuffer = vertexData->hardwareShadowVolWBuffer;
@@ -2590,7 +2590,7 @@ namespace Ogre {
             }
 
         }
-        if (pMesh.isNull())
+        if (!pMesh)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "'mesh' parameter required when constructing an Entity.",

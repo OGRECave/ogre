@@ -97,15 +97,15 @@ namespace Ogre
         memSize += sizeof(ushort);
 
         size_t paramsSize = 0;
-        if(!mDefaultParams.isNull())
-            paramsSize += mDefaultParams.getPointer()->calculateSize();
-        if(!mFloatLogicalToPhysical.isNull())
-            paramsSize += mFloatLogicalToPhysical.getPointer()->bufferSize;
-        if(!mDoubleLogicalToPhysical.isNull())
-            paramsSize += mDoubleLogicalToPhysical.getPointer()->bufferSize;
-        if(!mIntLogicalToPhysical.isNull())
-            paramsSize += mIntLogicalToPhysical.getPointer()->bufferSize;
-        if(!mConstantDefs.isNull())
+        if(mDefaultParams)
+            paramsSize += mDefaultParams->calculateSize();
+        if(mFloatLogicalToPhysical)
+            paramsSize += mFloatLogicalToPhysical->bufferSize;
+        if(mDoubleLogicalToPhysical)
+            paramsSize += mDoubleLogicalToPhysical->bufferSize;
+        if(mIntLogicalToPhysical)
+            paramsSize += mIntLogicalToPhysical->bufferSize;
+        if(mConstantDefs)
             paramsSize += mConstantDefs->calculateSize();
 
         return memSize + paramsSize;
@@ -127,12 +127,12 @@ namespace Ogre
         {
             loadFromSource();
 
-            if (!mDefaultParams.isNull())
+            if (mDefaultParams)
             {
                 // Keep a reference to old ones to copy
                 GpuProgramParametersSharedPtr savedParams = mDefaultParams;
                 // reset params to stop them being referenced in the next create
-                mDefaultParams.setNull();
+                mDefaultParams.reset();
 
                 // Create new params
                 mDefaultParams = createParameters();
@@ -204,15 +204,15 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuProgram::createLogicalParameterMappingStructures(bool recreateIfExists) const
     {
-        if (recreateIfExists || mFloatLogicalToPhysical.isNull())
+        if (recreateIfExists || !mFloatLogicalToPhysical)
             mFloatLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
-        if (recreateIfExists || mIntLogicalToPhysical.isNull())
+        if (recreateIfExists || !mIntLogicalToPhysical)
             mIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
     }
     //---------------------------------------------------------------------
     void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists) const
     {
-        if (recreateIfExists || mConstantDefs.isNull())
+        if (recreateIfExists || !mConstantDefs)
             mConstantDefs = GpuNamedConstantsPtr(OGRE_NEW GpuNamedConstants());
     }
     //---------------------------------------------------------------------
@@ -286,7 +286,7 @@ namespace Ogre
         
         
         // set up named parameters, if any
-        if (!mConstantDefs.isNull() && !mConstantDefs->map.empty())
+        if (mConstantDefs && !mConstantDefs->map.empty())
         {
             ret->_setNamedConstants(mConstantDefs);
         }
@@ -296,7 +296,7 @@ namespace Ogre
                                         mBoolLogicalToPhysical);
 
         // Copy in default parameters if present
-        if (!mDefaultParams.isNull())
+        if (mDefaultParams)
             ret->copyConstantsFrom(*(mDefaultParams.get()));
         
         return ret;
@@ -304,7 +304,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     GpuProgramParametersSharedPtr GpuProgram::getDefaultParameters(void)
     {
-        if (mDefaultParams.isNull())
+        if (!mDefaultParams)
         {
             mDefaultParams = createParameters();
         }

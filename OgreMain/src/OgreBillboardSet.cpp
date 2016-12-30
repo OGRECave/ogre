@@ -306,7 +306,7 @@ namespace Ogre {
     {
         mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
 
-        if (mMaterial.isNull())
+        if (!mMaterial)
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
                 "BillboardSet::setMaterialName" );
 
@@ -647,7 +647,7 @@ namespace Ogre {
     {
         mMaterial = material;
         
-        if (mMaterial.isNull())
+        if (!mMaterial)
         {
             LogManager::getSingleton().logMessage("Can't assign material " + material->getName()+
                                                   " to BillboardSet of " + getName() + " because this "
@@ -872,7 +872,7 @@ namespace Ogre {
             mIndexData = 0;
         }
 
-        mMainBuf.setNull();
+        mMainBuf.reset();
 
         mBuffersCreated = false;
 

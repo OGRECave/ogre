@@ -179,7 +179,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 
         // Change the value if hardware skinning is enabled.
         MaterialPtr dqMat = ent->getSubEntity(0)->getMaterial();
-        if(!dqMat.isNull())
+        if(dqMat)
         {
             Technique* bestTechnique = dqMat->getBestTechnique();
             if(bestTechnique)

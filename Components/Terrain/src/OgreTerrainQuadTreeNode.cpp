@@ -694,7 +694,7 @@ namespace Ogre
         unsigned char* pRowPosBuf = 0;
         unsigned char* pRowDeltaBuf = 0;
 
-        if (!posbuf.isNull())
+        if (posbuf)
         {
             destPosRowSkip = mVertexDataRecord->size * uint16(posbuf->getVertexSize());
             pRootPosBuf = static_cast<unsigned char*>(posbuf->lock(lockMode));
@@ -702,7 +702,7 @@ namespace Ogre
             // skip dest buffer in by left/top
             pRowPosBuf += destOffsetY * destPosRowSkip + destOffsetX * posbuf->getVertexSize();
         }
-        if (!deltabuf.isNull())
+        if (deltabuf)
         {
             destDeltaRowSkip = mVertexDataRecord->size * uint16(deltabuf->getVertexSize());
             pRootDeltaBuf = static_cast<unsigned char*>(deltabuf->lock(lockMode));
@@ -778,7 +778,7 @@ namespace Ogre
             skirtStartX += inc - (skirtStartX % inc);
         skirtStartY = std::max(skirtStartY, (long)mOffsetY);
         pBaseHeight = mTerrain->getHeightData(skirtStartX, skirtStartY);
-        if (!posbuf.isNull())
+        if (posbuf)
         {
             // position dest buffer just after the main vertex data
             pRowPosBuf = pRootPosBuf + posbuf->getVertexSize() 
@@ -787,7 +787,7 @@ namespace Ogre
             pRowPosBuf += destPosRowSkip * ((skirtStartY - mOffsetY) / skirtSpacing);
             pRowPosBuf += posbuf->getVertexSize() * (skirtStartX - mOffsetX) / inc;
         }
-        if (!deltabuf.isNull())
+        if (deltabuf)
         {
             // position dest buffer just after the main vertex data
             pRowDeltaBuf = pRootDeltaBuf + deltabuf->getVertexSize() 
@@ -840,7 +840,7 @@ namespace Ogre
         if (skirtStartY % inc)
             skirtStartY += inc - (skirtStartY % inc);
         skirtStartX = std::max(skirtStartX, (long)mOffsetX);
-        if (!posbuf.isNull())
+        if (posbuf)
         {
             // position dest buffer just after the main vertex data and skirt rows
             pRowPosBuf = pRootPosBuf + posbuf->getVertexSize() 
@@ -851,7 +851,7 @@ namespace Ogre
             pRowPosBuf += destPosRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
             pRowPosBuf += posbuf->getVertexSize() * (skirtStartY - mOffsetY) / inc;
         }
-        if (!deltabuf.isNull())
+        if (deltabuf)
         {
             // Delta dest buffer just after the main vertex data and skirt rows
             pRowDeltaBuf = pRootDeltaBuf + deltabuf->getVertexSize() 
@@ -893,9 +893,9 @@ namespace Ogre
                 pRowDeltaBuf += destDeltaRowSkip;
         }
 
-        if (!posbuf.isNull())
+        if (posbuf)
             posbuf->unlock();
-        if (!deltabuf.isNull())
+        if (deltabuf)
             deltabuf->unlock();
         
     }

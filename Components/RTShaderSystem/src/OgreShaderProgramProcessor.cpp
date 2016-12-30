@@ -1004,7 +1004,7 @@ void ProgramProcessor::MergeParameter::createDestinationParameter(int usage, int
 //-----------------------------------------------------------------------------
 Ogre::RTShader::ParameterPtr ProgramProcessor::MergeParameter::getDestinationParameter(int usage, int index)
 {
-    if (mDstParameter.isNull())
+    if (!mDstParameter)
         createDestinationParameter(usage, index);
 
     return mDstParameter;
@@ -1013,10 +1013,10 @@ Ogre::RTShader::ParameterPtr ProgramProcessor::MergeParameter::getDestinationPar
 //-----------------------------------------------------------------------------
 void ProgramProcessor::MergeParameter::clear()
 {
-    mDstParameter.setNull();
+    mDstParameter.reset();
     for (unsigned int i=0; i < 4; ++i)
     {
-        mSrcParameter[i].setNull();
+        mSrcParameter[i].reset();
         mSrcParameterMask[i] = 0;
         mDstParameterMask[i] = 0;
     }   

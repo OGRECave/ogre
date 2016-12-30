@@ -44,7 +44,7 @@ protected:
 		mMaterialList.clear();
 		mFloor->unload();
 		MeshManager::getSingleton().remove(mFloor);
-		mFloor.setNull();
+		mFloor.reset();
 
 		mHlmsManager->unbindAll("pbs");
 		delete mHlmsManager;

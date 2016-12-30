@@ -125,10 +125,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     TerrainMaterialGeneratorPtr TerrainGlobalOptions::getDefaultMaterialGenerator()
     {
-        if (mDefaultMaterialGenerator.isNull())
+        if (!mDefaultMaterialGenerator)
         {
             // default
-            mDefaultMaterialGenerator.bind(OGRE_NEW TerrainMaterialGeneratorA());
+            mDefaultMaterialGenerator.reset(OGRE_NEW TerrainMaterialGeneratorA());
         }
 
         return mDefaultMaterialGenerator;
@@ -2039,40 +2039,40 @@ namespace Ogre
             }
             mBlendTextureList.clear();
 
-            if (!mTerrainNormalMap.isNull())
+            if (mTerrainNormalMap)
             {
                 tmgr->remove(mTerrainNormalMap->getHandle());
-                mTerrainNormalMap.setNull();
+                mTerrainNormalMap.reset();
             }
 
-            if (!mColourMap.isNull())
+            if (mColourMap)
             {
                 tmgr->remove(mColourMap->getHandle());
-                mColourMap.setNull();
+                mColourMap.reset();
             }
 
-            if (!mLightmap.isNull())
+            if (mLightmap)
             {
                 tmgr->remove(mLightmap->getHandle());
-                mLightmap.setNull();
+                mLightmap.reset();
             }
 
-            if (!mCompositeMap.isNull())
+            if (mCompositeMap)
             {
                 tmgr->remove(mCompositeMap->getHandle());
-                mCompositeMap.setNull();
+                mCompositeMap.reset();
             }
         }
 
-        if (!mMaterial.isNull())
+        if (mMaterial)
         {
             MaterialManager::getSingleton().remove(mMaterial->getHandle());
-            mMaterial.setNull();
+            mMaterial.reset();
         }
-        if (!mCompositeMapMaterial.isNull())
+        if (mCompositeMapMaterial)
         {
             MaterialManager::getSingleton().remove(mCompositeMapMaterial->getHandle());
-            mCompositeMapMaterial.setNull();
+            mCompositeMapMaterial.reset();
         }
 
 
@@ -2539,7 +2539,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     const MaterialPtr& Terrain::getMaterial() const
     {
-        if (mMaterial.isNull() || 
+        if (!mMaterial || 
             mMaterialGenerator->getChangeCount() != mMaterialGenerationCount ||
             mMaterialDirty)
         {
@@ -2600,7 +2600,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::checkDeclaration()
     {
-        if (mMaterialGenerator.isNull())
+        if (!mMaterialGenerator)
         {
             mMaterialGenerator = TerrainGlobalOptions::getSingleton().getDefaultMaterialGenerator();
         }
@@ -2762,7 +2762,7 @@ namespace Ogre
                 checkLayers(true);
 
             const TexturePtr& tex = mBlendTextureList[idx / 4];
-            mLayerBlendMapList[idx] = OGRE_NEW TerrainLayerBlendMap(this, layerIndex, tex->getBuffer().getPointer());
+            mLayerBlendMapList[idx] = OGRE_NEW TerrainLayerBlendMap(this, layerIndex, tex->getBuffer().get());
         }
 
         return mLayerBlendMapList[idx];
@@ -2980,7 +2980,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::createOrDestroyGPUNormalMap()
     {
-        if (mNormalMapRequired && mTerrainNormalMap.isNull())
+        if (mNormalMapRequired && !mTerrainNormalMap)
         {
             // create
             mTerrainNormalMap = TextureManager::getSingleton().createManual(
@@ -2997,11 +2997,11 @@ namespace Ogre
             }
 
         }
-        else if (!mNormalMapRequired && !mTerrainNormalMap.isNull())
+        else if (!mNormalMapRequired && mTerrainNormalMap)
         {
             // destroy
             TextureManager::getSingleton().remove(mTerrainNormalMap->getHandle());
-            mTerrainNormalMap.setNull();
+            mTerrainNormalMap.reset();
         }
 
     }
@@ -3407,7 +3407,7 @@ namespace Ogre
     {
         createOrDestroyGPUNormalMap();
         // deal with race condition where nm has been disabled while we were working!
-        if (!mTerrainNormalMap.isNull())
+        if (mTerrainNormalMap)
         {
             // blit the normals into the texture
             if (rect.left == 0 && rect.top == 0 && rect.bottom == mSize && rect.right == mSize)
@@ -3579,7 +3579,7 @@ namespace Ogre
     {
         createOrDestroyGPULightmap();
         // deal with race condition where lm has been disabled while we were working!
-        if (!mLightmap.isNull())
+        if (mLightmap)
         {
             // blit the normals into the texture
             if (rect.left == 0 && rect.top == 0 && rect.bottom == mLightmapSizeActual && rect.right == mLightmapSizeActual)
@@ -3682,7 +3682,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::createOrDestroyGPUColourMap()
     {
-        if (mGlobalColourMapEnabled && mColourMap.isNull())
+        if (mGlobalColourMapEnabled && !mColourMap)
         {
             // create
             mColourMap = TextureManager::getSingleton().createManual(
@@ -3701,18 +3701,18 @@ namespace Ogre
 
             }
         }
-        else if (!mGlobalColourMapEnabled && !mColourMap.isNull())
+        else if (!mGlobalColourMapEnabled && mColourMap)
         {
             // destroy
             TextureManager::getSingleton().remove(mColourMap->getHandle());
-            mColourMap.setNull();
+            mColourMap.reset();
         }
 
     }
     //---------------------------------------------------------------------
     void Terrain::createOrDestroyGPULightmap()
     {
-        if (mLightMapRequired && mLightmap.isNull())
+        if (mLightMapRequired && !mLightmap)
         {
             // create
             mLightmap = TextureManager::getSingleton().createManual(
@@ -3742,18 +3742,18 @@ namespace Ogre
 
             }
         }
-        else if (!mLightMapRequired && !mLightmap.isNull())
+        else if (!mLightMapRequired && mLightmap)
         {
             // destroy
             TextureManager::getSingleton().remove(mLightmap->getHandle());
-            mLightmap.setNull();
+            mLightmap.reset();
         }
 
     }
     //---------------------------------------------------------------------
     void Terrain::createOrDestroyGPUCompositeMap()
     {
-        if (mCompositeMapRequired && mCompositeMap.isNull())
+        if (mCompositeMapRequired && !mCompositeMap)
         {
             // create
             mCompositeMap = TextureManager::getSingleton().createManual(
@@ -3783,11 +3783,11 @@ namespace Ogre
 
             }
         }
-        else if (!mCompositeMapRequired && !mCompositeMap.isNull())
+        else if (!mCompositeMapRequired && mCompositeMap)
         {
             // destroy
             TextureManager::getSingleton().remove(mCompositeMap->getHandle());
-            mCompositeMap.setNull();
+            mCompositeMap.reset();
         }
 
     }
@@ -4283,28 +4283,28 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::_dumpTextures(const String& prefix, const String& suffix)
     {
-        if (!mTerrainNormalMap.isNull())
+        if (mTerrainNormalMap)
         {
             Image img;
             mTerrainNormalMap->convertToImage(img);
             img.save(prefix + "_normalmap" + suffix);
         }
 
-        if (!mColourMap.isNull())
+        if (mColourMap)
         {
             Image img;
             mColourMap->convertToImage(img);
             img.save(prefix + "_colourmap" + suffix);
         }
 
-        if (!mLightmap.isNull())
+        if (mLightmap)
         {
             Image img;
             mLightmap->convertToImage(img);
             img.save(prefix + "_lightmap" + suffix);
         }
 
-        if (!mCompositeMap.isNull())
+        if (mCompositeMap)
         {
             Image img;
             mCompositeMap->convertToImage(img);
@@ -4314,7 +4314,7 @@ namespace Ogre
         int blendTexture = 0;
         for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i, ++blendTexture)
         {
-            if (!i->isNull())
+            if (*i)
             {
                 Image img;
                 (*i)->convertToImage(img);
@@ -4570,10 +4570,10 @@ namespace Ogre
 
             Image::scale(src, dst, Image::FILTER_BILINEAR);
 
-            if (!mTerrainNormalMap.isNull())
+            if (mTerrainNormalMap)
             {
                 TextureManager::getSingletonPtr()->remove(mTerrainNormalMap->getHandle());
-                mTerrainNormalMap.setNull();
+                mTerrainNormalMap.reset();
             }
 
             freeLodData();

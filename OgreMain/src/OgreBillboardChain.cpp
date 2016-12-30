@@ -728,7 +728,7 @@ namespace Ogre {
     {
         mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
 
-        if (mMaterial.isNull())
+        if (!mMaterial)
         {
             LogManager::getSingleton().logMessage("Can't assign material " + name +
                 " to BillboardChain " + mName + " because this "

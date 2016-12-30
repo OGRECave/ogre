@@ -269,7 +269,7 @@ try
     static std::map<Appearance *, Ogre::MaterialPtr> matMap;
 
     Ogre::MaterialPtr material = matMap[app];
-    if (!material.isNull() && app) {
+    if (material && app) {
         log.logMessage("Using material " + material->getName());
         sub->setMaterialName(material->getName());
     } else {

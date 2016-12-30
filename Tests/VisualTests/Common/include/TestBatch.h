@@ -129,7 +129,7 @@ public:
         ComparisonResultVectorPtr out(OGRE_NEW_T(ComparisonResultVector, Ogre::MEMCATEGORY_GENERAL)(), Ogre::SPFM_DELETE_T);
         if (!canCompareWith(other))
         {
-            out.setNull();
+            out.reset();
         }
         else
         {

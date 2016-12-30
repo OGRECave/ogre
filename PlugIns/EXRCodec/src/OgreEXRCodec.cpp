@@ -138,7 +138,7 @@ Codec::DecodeResult EXRCodec::decode(DataStreamPtr& input) const
             components = 4;
         
         // Allocate memory
-        output.bind(new MemoryDataStream(width*height*components*4));
+        output.reset(new MemoryDataStream(width*height*components*4));
     
         // Construct frame buffer
         uchar *pixels = output->getPtr();

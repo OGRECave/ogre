@@ -78,8 +78,8 @@ namespace Ogre {
 //-----------------------------------------------------------------------------
     GLES2RenderToVertexBuffer::GLES2RenderToVertexBuffer() : mFrontBufferIndex(-1)
     {
-        mVertexBuffers[0].setNull();
-        mVertexBuffers[1].setNull();
+        mVertexBuffers[0].reset();
+        mVertexBuffers[1].reset();
 
         // Create query objects
         OGRE_CHECK_GL_ERROR(glGenQueries(1, &mPrimitivesDrawnQuery));
@@ -100,7 +100,7 @@ namespace Ogre {
     void GLES2RenderToVertexBuffer::update(SceneManager* sceneMgr)
     {
         size_t bufSize = mVertexData->vertexDeclaration->getVertexSize(0) * mMaxVertexCount;
-        if (mVertexBuffers[0].isNull() || mVertexBuffers[0]->getSizeInBytes() != bufSize)
+        if (!mVertexBuffers[0] || mVertexBuffers[0]->getSizeInBytes() != bufSize)
         {
             // Buffers don't match. Need to reallocate.
             mResetRequested = true;
@@ -128,13 +128,13 @@ namespace Ogre {
             targetBufferIndex = 1 - mFrontBufferIndex;
         }
 
-        if (mVertexBuffers[targetBufferIndex].isNull() || 
+        if (!mVertexBuffers[targetBufferIndex] || 
             mVertexBuffers[targetBufferIndex]->getSizeInBytes() != bufSize)
         {
             reallocateBuffer(targetBufferIndex);
         }
 
-        GLES2HardwareVertexBuffer* vertexBuffer = static_cast<GLES2HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].getPointer());
+        GLES2HardwareVertexBuffer* vertexBuffer = static_cast<GLES2HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
 /*        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLESProgramPipeline* programPipeline =
@@ -209,9 +209,9 @@ namespace Ogre {
     void GLES2RenderToVertexBuffer::reallocateBuffer(size_t index)
     {
         assert(index == 0 || index == 1);
-        if (!mVertexBuffers[index].isNull())
+        if (mVertexBuffers[index])
         {
-            mVertexBuffers[index].setNull();
+            mVertexBuffers[index].reset();
         }
         
         mVertexBuffers[index] = HardwareBufferManager::getSingleton().createVertexBuffer(

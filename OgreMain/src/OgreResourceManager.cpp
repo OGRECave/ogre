@@ -74,7 +74,7 @@ namespace Ogre {
 
         ResourcePtr res = getResourceByName(name, group);
         bool created = false;
-        if (res.isNull())
+        if (!res)
         {
             created = true;
             res = createResource(name, group, isManual, loader, params);
@@ -223,7 +223,7 @@ namespace Ogre {
         OgreAssert(res, "attempting to unload unknown resource: "+name+" in group "+group);
 #endif
 
-        if (!res.isNull())
+        if (res)
         {
             res->unload();
         }
@@ -237,7 +237,7 @@ namespace Ogre {
         OgreAssert(res, "attempting to unload unknown resource");
 #endif
 
-        if (!res.isNull())
+        if (res)
         {
             res->unload();
         }
@@ -256,7 +256,7 @@ namespace Ogre {
         {
             // A use count of 3 means that only RGM and RM have references
             // RGM has one (this one) and RM has 2 (by name and by handle)
-            if (!unreferencedOnly || i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+            if (!unreferencedOnly || i->second.use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
             {
                 Resource* res = i->second.get();
                 if (!reloadableOnly || res->isReloadable())
@@ -280,7 +280,7 @@ namespace Ogre {
         {
             // A use count of 3 means that only RGM and RM have references
             // RGM has one (this one) and RM has 2 (by name and by handle)
-            if (!unreferencedOnly || i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+            if (!unreferencedOnly || i->second.use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
             {
                 Resource* res = i->second.get();
                 if (!reloadableOnly || res->isReloadable())
@@ -304,7 +304,7 @@ namespace Ogre {
         OgreAssert(res, "attempting to remove unknown resource: "+name+" in group "+group);
 #endif
 
-        if (!res.isNull())
+        if (res)
         {
             removeImpl(res);
         }
@@ -318,7 +318,7 @@ namespace Ogre {
         OgreAssert(res, "attempting to remove unknown resource");
 #endif
 
-        if (!res.isNull())
+        if (res)
         {
             removeImpl(res);
         }
@@ -345,7 +345,7 @@ namespace Ogre {
         {
             // A use count of 3 means that only RGM and RM have references
             // RGM has one (this one) and RM has 2 (by name and by handle)
-            if (i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+            if (i->second.use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
             {
                 Resource* res = (i++)->second.get();
                 if (!reloadableOnly || res->isReloadable())
@@ -443,7 +443,7 @@ namespace Ogre {
             {
                 // A use count of 3 means that only RGM and RM have references
                 // RGM has one (this one) and RM has 2 (by name and by handle)
-                if (i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+                if (i->second.use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
                 {
                     Resource* res = i->second.get();
                     if (res->isReloadable())

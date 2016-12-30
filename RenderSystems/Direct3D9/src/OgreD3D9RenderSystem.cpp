@@ -2027,7 +2027,7 @@ namespace Ogre
     {
         HRESULT hr;
         D3D9TexturePtr dt = tex.staticCast<D3D9Texture>();
-        if (enabled && !dt.isNull())
+        if (enabled && dt)
         {
             // note used
             dt->touch();
@@ -2086,7 +2086,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
     {
-        if (tex.isNull())
+        if (!tex)
         {
 
             if (mTexStageDesc[stage].pVertexTex != 0)
@@ -3424,7 +3424,7 @@ namespace Ogre
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = useGlobalInstancingVertexBufferIsAvailable &&
-                    !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
+                    globalInstanceVertexBuffer && globalVertexDeclaration != NULL 
                 || binding->getHasInstanceData();
 
 
@@ -3499,7 +3499,7 @@ namespace Ogre
         if (useGlobalInstancingVertexBufferIsAvailable)
         {
         // bind global instance buffer if exist
-        if( !globalInstanceVertexBuffer.isNull() )
+        if( globalInstanceVertexBuffer )
         {
             if ( !indexesUsed )
             {
@@ -3748,7 +3748,7 @@ namespace Ogre
         switch(gptype)
         {
         case GPT_VERTEX_PROGRAM:
-            mActiveVertexGpuProgramParameters.setNull();
+            mActiveVertexGpuProgramParameters.reset();
             hr = getActiveD3D9Device()->SetVertexShader(NULL);
             if (FAILED(hr))
             {
@@ -3757,7 +3757,7 @@ namespace Ogre
             }
             break;
         case GPT_FRAGMENT_PROGRAM:
-            mActiveFragmentGpuProgramParameters.setNull();
+            mActiveFragmentGpuProgramParameters.reset();
             hr = getActiveD3D9Device()->SetPixelShader(NULL);
             if (FAILED(hr))
             {
