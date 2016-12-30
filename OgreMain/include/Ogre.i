@@ -91,6 +91,13 @@
 // Basic Data Types
 %include "OgreException.h"
 %include "OgreAtomicScalar.h"
+// deprecated
+%ignore Ogre::SharedPtr::useCount;
+%ignore Ogre::SharedPtr::bind;
+%ignore Ogre::SharedPtr::getPointer;
+%ignore Ogre::SharedPtr::setNull;
+%ignore Ogre::SharedPtr::isNull;
+%ignore Ogre::SharedPtr::setUseCount;
 %include "OgreSharedPtr.h"
 %include "OgreAny.h"
 %include "OgreIteratorWrapper.h"
