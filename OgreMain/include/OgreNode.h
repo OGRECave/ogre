@@ -124,15 +124,15 @@ namespace Ogre {
 
         typedef set<Node*>::type ChildUpdateSet;
         /// List of children which need updating, used if self is not out of date but children are
-        mutable ChildUpdateSet mChildrenToUpdate;
+        ChildUpdateSet mChildrenToUpdate;
         /// Flag to indicate own transform from parent is out of date
         mutable bool mNeedParentUpdate;
         /// Flag indicating that all children need to be updated
-        mutable bool mNeedChildUpdate;
+        bool mNeedChildUpdate;
         /// Flag indicating that parent has been notified about update request
-        mutable bool mParentNotified ;
+        bool mParentNotified ;
         /// Flag indicating that the node has been queued for update
-        mutable bool mQueuedForUpdate;
+        bool mQueuedForUpdate;
 
         /// Friendly name of this node, can be automatically generated if you don't care
         String mName;
