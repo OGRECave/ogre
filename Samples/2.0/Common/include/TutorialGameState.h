@@ -39,6 +39,7 @@ namespace Demo
 
     public:
         TutorialGameState( const Ogre::String &helpDescription );
+        virtual ~TutorialGameState();
 
         void _notifyGraphicsSystem( GraphicsSystem *graphicsSystem );
 
