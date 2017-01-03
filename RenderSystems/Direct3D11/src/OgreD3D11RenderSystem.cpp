@@ -790,7 +790,7 @@ namespace Ogre
             miscParams["FSAAHint"] = fsaaHint;
             miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
             miscParams["gamma"] = StringConverter::toString(hwGamma);
-            //miscParams["useFlipMode"] = StringConverter::toString(true);
+            //miscParams["useFlipSequentialMode"] = StringConverter::toString(true);
 
             opt = mOptions.find("VSync");
             if (opt == mOptions.end())
