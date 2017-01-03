@@ -216,8 +216,8 @@ You can use https://bitbucket.org/eugene_gff/ogre-dependencies-winrt -
 has VS2012 and VS2013 projects for Win32, WinRT (can be reused for WinPhone)
 Compile dependencies for all configurations that you plan to use before
 running CMake. Dependencies for Win32 and for WinRT must be located in
-separate folders, Win32 version can be built from OgreDependencies.VS201x.sln,
- WinRT from OgreDependencies.VS201x.WinRT.sln
+separate folders, Win32 version can be built from OgreDependencies.VS201x.sln, 
+WinRT from OgreDependencies.VS201x.WinRT.sln
 
 Run CMake, specify source and binaries folders, than "Configure", select
 "Visual Studio 14 2015" generator and "Specify options for cross-compiling"
@@ -228,7 +228,7 @@ for OGRE_DEPENDENCIES_DIR, "Configure", should be no more errors, then press
 
 Select SampleBrowser as the start up project and run.
 
-Note 1: The code and generated cmake solution should be on local NTFS drive,
+Note 1: The code and generated CMake solution should be on local NTFS drive,
 and can't be on a network drive, including VMWare shared folders - or
 you will get a errors when you will try to compile/link/run resulting exe.
 
