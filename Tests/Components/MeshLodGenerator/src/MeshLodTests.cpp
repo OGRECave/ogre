@@ -42,7 +42,7 @@ void MeshLodTests::setUp()
 #endif
 
     CPPUNIT_ASSERT(!root->getAvailableRenderers().empty());
-    root->setRenderSystem(root->getAvailableRenderers().back());
+    root->setRenderSystem(root->getAvailableRenderers().front()); // front prefers GL for GL3+
     root->initialise(false); // Needed for setting up HardwareBufferManager
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
