@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,13 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
+    /** \addtogroup RenderSystems RenderSystems
+    *  @{
+    */
+    /** \defgroup Direct3D9 Direct3D9
+    * Implementation of DirectX9 as a rendering system.
+    *  @{
+    */
 #define MAX_LIGHTS 8
 
     class D3D9DriverList;
@@ -247,8 +254,6 @@ namespace Ogre
         String getErrorDescription( long errorNumber ) const;
         const String& getName() const;
 
-		const String& getFriendlyName() const;
-
         // Low-level overridden members
         void setConfigOption( const String &name, const String &value );
         void reinitialise();
@@ -324,17 +329,11 @@ namespace Ogre
         void setVertexBufferBinding(VertexBufferBinding* binding);
         void setVertexBufferBinding(VertexBufferBinding* binding, size_t numberOfInstances, bool useGlobalInstancingVertexBufferIsAvailable, bool indexesUsed);
         void _render(const RenderOperation& op);
-        /** See
-          RenderSystem
-         */
+
         void bindGpuProgram(GpuProgram* prg);
-        /** See
-          RenderSystem
-         */
+
         void unbindGpuProgram(GpuProgramType gptype);
-        /** See
-          RenderSystem
-         */
+
         void bindGpuProgramParameters(GpuProgramType gptype, 
             GpuProgramParametersSharedPtr params, uint16 variabilityMask);
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
@@ -430,5 +429,7 @@ namespace Ogre
         friend class D3D9Device;
         friend class D3D9DeviceManager;     
     };
+    /** @} */
+    /** @} */
 }
 #endif

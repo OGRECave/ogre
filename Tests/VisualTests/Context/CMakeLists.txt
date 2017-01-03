@@ -52,7 +52,7 @@ ogre_add_component_include_dir(Overlay)
 ogre_add_component_include_dir(Volume)
 
 ogre_add_executable(TestContext ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES} OgreOverlay OgreRTShaderSystem)
+target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_LIBRARIES} OgreOverlay OgreRTShaderSystem OgreBites)
 ogre_config_common(TestContext)
 
 # Make sure all plugins are built
@@ -96,7 +96,7 @@ endif ()
 add_dependencies(TestContext VTests PlayPenTests)
 
 if (APPLE)
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (APPLE_IOS)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE TRUE)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")
@@ -207,6 +207,11 @@ if (APPLE)
 	endif()
 	
 	# Components
+    add_custom_command(TARGET TestContext POST_BUILD
+        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreBites.framework 
+        ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
+        )
+    
 	if (OGRE_BUILD_COMPONENT_PAGING OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
 			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgrePaging.framework 

@@ -4,7 +4,7 @@
  * (Object-oriented Graphics Rendering Engine)
  * For the latest info, see http://www.ogre3d.org/
  *
- * Copyright (c) 2000-2016 Torus Knot Software Ltd
+ * Copyright (c) 2000-2014 Torus Knot Software Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -122,9 +122,9 @@ namespace Ogre
         meshName = mesh->getName();
         boundingSphereRadius = mesh->getBoundingSphereRadius();
         bool sharedVerticesAdded = false;
-        unsigned short submeshCount = mesh->getNumSubMeshes();
+        size_t submeshCount = mesh->getNumSubMeshes();
         submesh.resize(submeshCount);
-        for (unsigned short i = 0; i < submeshCount; i++) {
+        for (size_t i = 0; i < submeshCount; i++) {
             const SubMesh* ogresubmesh = mesh->getSubMesh(i);
             LodInputBuffer::Submesh& outsubmesh = submesh[i];
             outsubmesh.indexBuffer.fillBuffer(ogresubmesh->indexData);

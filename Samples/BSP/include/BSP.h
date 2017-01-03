@@ -31,18 +31,11 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
                         "so you cannot run this sample. Sorry!", "Sample_BSP::testCapabilities");
         }
-        // else if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
-        else if (mRoot->getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "BspSceneManager does not yet have GL3+ render system support. Sorry!",
-                        "Sample_BSP::testCapabilities");
-        }
     }
 
     StringVector getRequiredPlugins()
     {
         StringVector names;
-        names.push_back("Cg Program Manager");
         names.push_back("BSP Scene Manager");
         return names;
     }
@@ -58,11 +51,22 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         mMap = cf.getSetting("Map");
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    Ogre::String bundle = Ogre::macBundlePath();
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+    char* env_SNAP = getenv("SNAP");
+    Ogre::String bundle(env_SNAP ? env_SNAP : "");
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // OS X does not set the working directory relative to the app,
         // In order to make things portable on OS X we need to provide
         // the loading with it's own bundle path location
         if (!Ogre::StringUtil::startsWith(mArchive, "/", false)) // only adjust relative dirs
-            mArchive = Ogre::String(Ogre::macBundlePath() + "/" + mArchive);
+            mArchive = bundle + "/" + mArchive;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+            // With Ubuntu Snappy changes absolute paths are relative to the snap package.
+            if (Ogre::StringUtil::startsWith(mArchive, "/", false)) // only adjust absolute dirs
+                mArchive = bundle + mArchive;
 #endif
 
         // add the Quake archive to the world resource group

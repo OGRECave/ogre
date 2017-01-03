@@ -39,6 +39,7 @@ class VectorTests : public CppUnit::TestFixture
     CPPUNIT_TEST(testVector2Scaler);
     CPPUNIT_TEST(testVector3Scaler);
     CPPUNIT_TEST(testVector4Scaler);
+    CPPUNIT_TEST(testPerpendicularVector);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -48,6 +49,7 @@ public:
     void testVector2Scaler();
     void testVector3Scaler();
     void testVector4Scaler();
+    void testPerpendicularVector();
 };
 
 #endif

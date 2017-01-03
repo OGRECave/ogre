@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
+// Original author: Tels <http://bloodgate.com>, released as public domain
 #ifndef __EllipsoidEmitter_H__
 #define __EllipsoidEmitter_H__
 
@@ -33,7 +33,12 @@ THE SOFTWARE.
 #include "OgreAreaEmitter.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
     /** Particle emitter which emits particles randomly from points inside an ellipsoid.
     @remarks
         This basic particle emitter emits particles from a ellipsoid area.
@@ -52,7 +57,8 @@ namespace Ogre {
         /** See ParticleEmitter. */
         void _initParticle(Particle* pParticle);
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

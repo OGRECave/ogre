@@ -35,10 +35,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Component
+	/** \addtogroup Optional
 	*  @{
 	*/
-	/** \addtogroup Hlms
+	/** \defgroup Hlms HLMS
+	* High-level Material-System
 	*  @{
 	*/
 	class _OgreHlmsExport HlmsDatablock : public PassAlloc

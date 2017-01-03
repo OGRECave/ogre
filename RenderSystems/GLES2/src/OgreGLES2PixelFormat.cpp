@@ -51,22 +51,16 @@ namespace Ogre {
                 return GL_RGBA;
 #endif
 
-#if (OGRE_NO_GLES3_SUPPORT == 0)
-            case PF_FLOAT16_R:
-            case PF_FLOAT32_R:
-            case PF_R8:
-                return GL_RED_EXT;
-            case PF_FLOAT16_GR:
-            case PF_FLOAT32_GR:
-            case PF_RG8:
-                return GL_RG_EXT;
-#else
+#if OGRE_NO_GLES3_SUPPORT
             case PF_BYTE_LA:
             case PF_SHORT_GR:
                 return GL_LUMINANCE_ALPHA;
+            case PF_L8:
+            case PF_L16:
+                return GL_LUMINANCE;
 #endif
 
-#if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL)
+#if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL) || !OGRE_NO_GLES3_SUPPORT
             case PF_FLOAT16_R:
             case PF_FLOAT32_R:
             case PF_R8:
@@ -103,11 +97,11 @@ namespace Ogre {
 #   endif
 #   ifdef GL_AMD_compressed_ATC_texture
             case PF_ATC_RGB:
-                return ATC_RGB_AMD;
+                return GL_ATC_RGB_AMD;
             case PF_ATC_RGBA_EXPLICIT_ALPHA:
-                return ATC_RGBA_EXPLICIT_ALPHA_AMD;
+                return GL_ATC_RGBA_EXPLICIT_ALPHA_AMD;
             case PF_ATC_RGBA_INTERPOLATED_ALPHA:
-                return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+                return GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD;
 #   endif
 #endif
 
@@ -149,17 +143,14 @@ namespace Ogre {
 #else
                 return GL_RGBA;
 #endif
-
+#ifdef GL_EXT_texture_compression_dxt1
             case PF_DXT1:
-#if GL_EXT_texture_compression_dxt1
                 return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 #endif
+#ifdef GL_EXT_texture_compression_s3tc
             case PF_DXT3:
-#if GL_EXT_texture_compression_s3tc
                 return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-#endif
             case PF_DXT5:
-#if GL_EXT_texture_compression_s3tc
                 return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 #endif
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -204,10 +195,6 @@ namespace Ogre {
                 return GL_RGB8_SNORM;
             case PF_R8G8B8A8_SNORM:
                 return GL_RGBA8_SNORM;
-#else
-            case PF_L8:
-            case PF_L16:
-                return GL_LUMINANCE;
 #endif
             default:
                 return 0;
@@ -242,7 +229,6 @@ namespace Ogre {
             case PF_X8R8G8B8:
             case PF_A8B8G8R8:
             case PF_A8R8G8B8:
-                return GL_UNSIGNED_INT_8_8_8_8_REV;
             case PF_B8G8R8A8:
             case PF_R8G8B8A8:
                 return GL_UNSIGNED_BYTE;
@@ -337,7 +323,7 @@ namespace Ogre {
         switch (fmt)
         {
             case PF_DEPTH:
-                return GL_DEPTH_COMPONENT;
+                return GL_DEPTH_COMPONENT16;
 #if GL_IMG_texture_compression_pvrtc && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_PVRTC_RGB2:
                 return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
@@ -362,11 +348,11 @@ namespace Ogre {
 #   endif
 #   ifdef GL_AMD_compressed_ATC_texture
             case PF_ATC_RGB:
-                return ATC_RGB_AMD;
+                return GL_ATC_RGB_AMD;
             case PF_ATC_RGBA_EXPLICIT_ALPHA:
-                return ATC_RGBA_EXPLICIT_ALPHA_AMD;
+                return GL_ATC_RGBA_EXPLICIT_ALPHA_AMD;
             case PF_ATC_RGBA_INTERPOLATED_ALPHA:
-                return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+                return GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD;
 #   endif
 #endif
 
@@ -530,7 +516,7 @@ namespace Ogre {
             case PF_DXT5:
 #if GL_EXT_texture_compression_s3tc
                 if (!hwGamma)
-                    return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+                    return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 #endif
                 
 #if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL) || (OGRE_NO_GLES3_SUPPORT == 0)
@@ -620,11 +606,11 @@ namespace Ogre {
                 return PF_ETC1_RGB8;
 #   endif
 #   ifdef GL_AMD_compressed_ATC_texture
-            case ATC_RGB_AMD:
+            case GL_ATC_RGB_AMD:
                 return PF_ATC_RGB;
-            case ATC_RGBA_EXPLICIT_ALPHA_AMD:
+            case GL_ATC_RGBA_EXPLICIT_ALPHA_AMD:
                 return PF_ATC_RGBA_EXPLICIT_ALPHA;
-            case ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+            case GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
                 return PF_ATC_RGBA_INTERPOLATED_ALPHA;
 #   endif
 #endif
@@ -790,7 +776,7 @@ namespace Ogre {
 #endif
 
             default:
-                LogManager::getSingleton().logMessage("Unhandled Pixel format: " + StringConverter::toString(fmt));
+                LogManager::getSingleton().stream() << "Unhandled Pixel format: 0x" << std::hex << fmt;
                 return PF_A8B8G8R8;
         };
     }
@@ -820,21 +806,5 @@ namespace Ogre {
             } while(!(width == 1 && height == 1 && depth == 1));
         }       
         return count;
-    }
-    //-----------------------------------------------------------------------------
-    // TODO: Remove
-    uint32 GLES2PixelUtil::optionalPO2(uint32 value)
-    {
-        const RenderSystemCapabilities *caps =
-            Root::getSingleton().getRenderSystem()->getCapabilities();
-
-        if (caps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES))
-        {
-            return value;
-        }
-        else
-        {
-            return Bitwise::firstPO2From(value);
-        }
     }
 }

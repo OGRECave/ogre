@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -328,7 +328,7 @@ namespace Ogre {
         /** Retrieves the direction of the light including any transform from nodes it is attached to. */
         const Vector3& getDerivedDirection(void) const;
 
-        /** @copydoc MovableObject::setVisible.
+        /** @copydoc MovableObject::setVisible
         @remarks
             Although lights themselves are not 'visible', setting a light to invisible
             means it no longer affects the scene.

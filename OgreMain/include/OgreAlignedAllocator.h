@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ namespace Ogre {
             @par
                 On failure, exception will be throw.
         */
-        static void* allocate(size_t size, size_t alignment);
+        static DECL_MALLOC void* allocate(size_t size, size_t alignment);
 
         /** Allocate memory with default platform dependent alignment.
             @remarks
@@ -84,7 +84,7 @@ namespace Ogre {
             @par
                 On failure, exception will be throw.
         */
-        static void* allocate(size_t size);
+        static DECL_MALLOC void* allocate(size_t size);
 
         /** Deallocate memory that allocated by this class.
             @param

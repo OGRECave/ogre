@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,19 +101,23 @@ public:
     
     /** Overridden from SdkSample.
     */
-    virtual bool keyPressed(const OIS::KeyEvent& evt);
-    
-    /** Overridden from SdkSample.
-    */
-    virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id);
+    virtual bool keyPressed(const KeyboardEvent& evt);
 
     /** Overridden from SdkSample.
     */
-    virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id);
+    virtual bool touchPressed(const TouchFingerEvent& evt);
 
     /** Overridden from SdkSample.
     */
-    virtual bool pointerMoved(const OIS::PointerEvent& evt);
+    virtual bool mousePressed(const MouseButtonEvent& evt);
+
+    /** Overridden from SdkSample.
+    */
+    virtual bool mouseReleased(const MouseButtonEvent& evt);
+
+    /** Overridden from SdkSample.
+    */
+    virtual bool mouseMoved(const MouseMotionEvent& evt);
     
     /** Overridden from SdkSample.
      */

@@ -39,7 +39,13 @@
 
 #define USE_DISPLAYLINK 0
 
+#include <AppKit/NSWindow.h>
+
+#if USE_DISPLAYLINK
+// FIXME file located at GLSupport/include/OSX
 #import "OgreOSXCocoaWindow.h"
+#endif
+
 #import <QuartzCore/CVDisplayLink.h>
 #include <iostream>
 

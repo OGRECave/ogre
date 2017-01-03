@@ -38,22 +38,14 @@ THE SOFTWARE.
 //
 namespace Ogre
 {
-
-    // forward declarations
-    class GLSLESProgram;
-    class GLSLESGpuProgram;
-    class GLSLESLinkProgram;
-    class GLSLESLinkProgramManager;
-    class GLSLESProgramPipelineManager;
-    class GLSLESProgramFactory;
-
+namespace GLSLES {
     /** If there is a message in GL info log then post it in the Ogre Log
     @param msg The info log message string is appended to this string
     @param obj The GL object that is used to retrieve the info log
     */
     String logObjectInfo(const String& msg, const GLuint obj);
 
-
+}
 } // namespace Ogre
 
 #endif // __GLSLESExtSupport_H__

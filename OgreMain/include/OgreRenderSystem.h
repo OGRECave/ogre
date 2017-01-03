@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -129,11 +129,7 @@ namespace Ogre
         /** Returns the name of the rendering system.
         */
         virtual const String& getName(void) const = 0;
-		
-		/** Returns the friendly name of the render system
-		*/
-		virtual const String& getFriendlyName(void) const = 0;
-		
+
         /** Returns the details of this API's configuration options
         @remarks
         Each render system must be able to inform the world
@@ -365,10 +361,10 @@ namespace Ogre
             <td>OpenGL specific</td>
         </tr>
         <tr>
-            <td>externalGLContext</td>
-            <td>Context as Unsigned Long</td>
-            <td>0 (create own context)</td>
-            <td>Use an externally created GL context</td>
+            <td>currentGLContext</td>
+            <td>true, false</td>
+            <td>false</td>
+            <td>Use an externally created GL context. (Must be current)</td>
             <td>OpenGL Specific</td>
         </tr>
         <tr>
@@ -390,13 +386,13 @@ namespace Ogre
          <tr>
             <td>macAPICocoaUseNSView</td>
             <td>bool "true" or "false"</td>
-            <td>"false"</td>
+            <td>"true"</td>
             <td>On the Mac platform the most diffused method to embed OGRE in a custom application is to use Interface Builder
                 and add to the interface an instance of OgreView.
                 The pointer to this instance is then used as "externalWindowHandle".
-                However, there are cases where you are NOT using Interface Builder and you get the Cocoa NSView* of an existing interface.
+                However, there are cases where you are NOT using Interface Builder and you get the Cocoa NSWindow* of an existing interface.
                 For example, this is happens when you want to render into a Java/AWT interface.
-                In short, by setting this flag to "true" the Ogre::Root::createRenderWindow interprets the "externalWindowHandle" as a NSView*
+                In short, by setting this flag to "true" the Ogre::Root::createRenderWindow interprets the "externalWindowHandle" as a NSWindow*
                 instead of an OgreView*. See OgreOSXCocoaView.h/mm.
             </td>
             <td>Mac OS X Specific</td>

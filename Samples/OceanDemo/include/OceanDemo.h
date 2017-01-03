@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -329,7 +329,7 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
     mCurrentPage = (pageNum == -1) ? (mCurrentPage+1) % mNumPages : pageNum;
 
     static char pageText[64];
-    sprintf(pageText, "Parameters %lu / %d", mCurrentPage+1, (int)mNumPages);
+    sprintf(pageText, "Parameters %zu / %zu", mCurrentPage+1, mNumPages);
     static_cast<OgreBites::Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
 
     if(!mActiveMaterial.isNull() && mActiveMaterial->getNumSupportedTechniques())

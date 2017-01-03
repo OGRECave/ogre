@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgrePanelOverlayElement.h"
 
 namespace Ogre {
-    /** \addtogroup Core
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Overlays
@@ -64,9 +64,9 @@ namespace Ogre {
 
         virtual void initialise(void);
 
-        /** @copydoc OverlayElement::_releaseManualHardwareResources. */
+        /** @copydoc OverlayElement::_releaseManualHardwareResources */
         virtual void _releaseManualHardwareResources();
-        /** @copydoc OverlayElement::_restoreManualHardwareResources. */
+        /** @copydoc OverlayElement::_restoreManualHardwareResources */
         virtual void _restoreManualHardwareResources();
 
         const String& getTypeName(void) const;

@@ -21,10 +21,10 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 ogre_add_library_to_folder(Samples Sample_Isosurf ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_Isosurf ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_Isosurf ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_Isosurf)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND NOT APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(Sample_Isosurf
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1

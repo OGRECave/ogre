@@ -4,7 +4,7 @@
  * (Object-oriented Graphics Rendering Engine)
  * For the latest info, see http://www.ogre3d.org/
  *
- * Copyright (c) 2000-2016 Torus Knot Software Ltd
+ * Copyright (c) 2000-2014 Torus Knot Software Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,12 @@
 
 namespace Ogre
 {
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup MeshLodGenerator
+*  @{
+*/
 /// Thread-safe buffer for storing Hardware index buffer
 struct _OgreLodExport LodIndexBuffer {
     size_t indexSize; /// Index size: 2 or 4 byte/index is supported only.
@@ -73,5 +79,7 @@ struct _OgreLodExport LodOutputBuffer {
     /// Contains every generated indexBuffer from every submesh. submeshCount*lodLevelCount buffers.
     vector<Submesh>::type submesh;
 };
+/** @} */
+/** @} */
 }
 #endif

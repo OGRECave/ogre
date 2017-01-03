@@ -113,7 +113,7 @@ namespace Ogre {
             @param fragmentConstantDefs Definition of the uniforms extracted from the
             fragment program, used to match up physical buffer indexes with program
             uniforms. May be null if there is no fragment program.
-            @param list The list to populate (will not be cleared before adding, clear
+            @param uniformList The list to populate (will not be cleared before adding, clear
             it yourself before calling this if that's what you want).
         */
         void extractUniformsFromProgram(

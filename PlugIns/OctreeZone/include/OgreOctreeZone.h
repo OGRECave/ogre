@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,13 @@ Code Style Update    :
 
 namespace Ogre
 {
+    /** \addtogroup Plugins Plugins
+    *  @{
+    */
+    /** \defgroup OctreeZone OctreeZone
+    * Octree version of PCZone
+    *  @{
+    */
     /** Octree version of PCZone 
     */
     class Octree;
@@ -251,7 +258,8 @@ namespace Ogre
         bool supportsPCZoneType(const String& zoneType);
         PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName);
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

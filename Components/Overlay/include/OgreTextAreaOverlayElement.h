@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -29,10 +29,11 @@ THE SOFTWARE
 
 #include "OgreOverlayElement.h"
 #include "OgreRenderOperation.h"
+#include "OgreFont.h"
 
 namespace Ogre
 {
-    /** \addtogroup Core
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Overlays
@@ -57,9 +58,9 @@ namespace Ogre
 
         virtual void initialise(void);
 
-        /** @copydoc OverlayElement::_releaseManualHardwareResources. */
+        /** @copydoc OverlayElement::_releaseManualHardwareResources */
         virtual void _releaseManualHardwareResources();
-        /** @copydoc OverlayElement::_restoreManualHardwareResources. */
+        /** @copydoc OverlayElement::_restoreManualHardwareResources */
         virtual void _restoreManualHardwareResources();
 
         virtual void setCaption(const DisplayString& text);

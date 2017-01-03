@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,11 +56,15 @@ THE SOFTWARE.
 #include "OgreConfig.h"
 #include "OgreViewport.h"
 
+#include "OgreGLPixelFormat.h"
+
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 #if OGRE_THREAD_SUPPORT != 1
-GLenum GLEWAPIENTRY glewContextInit (Ogre::GLSupport *glSupport);
+extern "C" {
+GLenum GLEWAPIENTRY glewContextInit (void*);
+}
 #endif
 
 namespace Ogre {
@@ -127,7 +131,7 @@ namespace Ogre {
         mStateCacheManager = OGRE_NEW GLStateCacheManager();
 
         // Get our GLSupport
-        mGLSupport = getGLSupport();
+        mGLSupport = new GLSupport(getGLSupport(GLNativeSupport::CONTEXT_COMPATIBILITY));
         mGLSupport->setStateCacheManager(mStateCacheManager);
 
         for( i=0; i<MAX_LIGHTS; i++ )
@@ -182,13 +186,6 @@ namespace Ogre {
         static String strName("OpenGL Rendering Subsystem");
         return strName;
     }
-
-
-	const String& GLRenderSystem::getFriendlyName(void) const
-	{
-		static String strName("OpenGL");
-		return strName;
-	}
 
     void GLRenderSystem::initConfigOptions(void)
     {
@@ -270,24 +267,7 @@ namespace Ogre {
         // Check for hardware mipmapping support.
         if(GLEW_VERSION_1_4 || GLEW_SGIS_generate_mipmap)
         {
-            bool disableAutoMip = false;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-            // Apple & Linux ATI drivers have faults in hardware mipmap generation
-            if (rsc->getVendor() == GPU_AMD)
-                disableAutoMip = true;
-#endif
-            // The Intel 915G frequently corrupts textures when using hardware mip generation
-            // I'm not currently sure how many generations of hardware this affects,
-            // so for now, be safe.
-            if (rsc->getVendor() == GPU_INTEL)
-                disableAutoMip = true;
-
-            // SiS chipsets also seem to have problems with this
-            if (rsc->getVendor() == GPU_SIS)
-                disableAutoMip = true;
-
-            if (!disableAutoMip)
-                rsc->setCapability(RSC_AUTOMIPMAP);
+            rsc->setCapability(RSC_AUTOMIPMAP);
         }
 
         // Check for blending support
@@ -374,6 +354,7 @@ namespace Ogre {
             rsc->setStencilBufferBitDepth(stencil);
         }
 
+        rsc->setCapability(RSC_HW_GAMMA);
 
         if(GLEW_VERSION_1_5 || GLEW_ARB_vertex_buffer_object)
         {
@@ -965,12 +946,6 @@ namespace Ogre {
         mGLInitialised = true;
     }
 
-    void GLRenderSystem::reinitialise(void)
-    {
-        this->shutdown();
-        this->_initialise(true);
-    }
-
     void GLRenderSystem::shutdown(void)
     {
         RenderSystem::shutdown();
@@ -1241,58 +1216,51 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLRenderSystem::destroyRenderWindow(RenderWindow* pWin)
+    void GLRenderSystem::destroyRenderWindow(const String& name)
     {
-        // Find it to remove from list
-        RenderTargetMap::iterator i = mRenderTargets.begin();
+        // Find it to remove from list.
+        RenderTarget* pWin = detachRenderTarget(name);
+        OgreAssert(pWin, "unknown RenderWindow name");
 
-        while (i != mRenderTargets.end())
+        GLContext *windowContext = 0;
+        pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
+
+        //1 Window <-> 1 Context, should be always true
+        assert( windowContext );
+
+        bool bFound = false;
+        //Find the depth buffer from this window and remove it.
+        DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+        DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+
+        while( itMap != enMap && !bFound )
         {
-            if (i->second == pWin)
+            DepthBufferVec::iterator itor = itMap->second.begin();
+            DepthBufferVec::iterator end  = itMap->second.end();
+
+            while( itor != end )
             {
-                GLContext *windowContext = 0;
-                pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
+                //A DepthBuffer with no depth & stencil pointers is a dummy one,
+                //look for the one that matches the same GL context
+                GLDepthBuffer *depthBuffer = static_cast<GLDepthBuffer*>(*itor);
+                GLContext *glContext = depthBuffer->getGLContext();
 
-                //1 Window <-> 1 Context, should be always true
-                assert( windowContext );
-
-                bool bFound = false;
-                //Find the depth buffer from this window and remove it.
-                DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
-                DepthBufferMap::iterator enMap = mDepthBufferPool.end();
-
-                while( itMap != enMap && !bFound )
+                if( glContext == windowContext &&
+                    (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
                 {
-                    DepthBufferVec::iterator itor = itMap->second.begin();
-                    DepthBufferVec::iterator end  = itMap->second.end();
+                    bFound = true;
 
-                    while( itor != end )
-                    {
-                        //A DepthBuffer with no depth & stencil pointers is a dummy one,
-                        //look for the one that matches the same GL context
-                        GLDepthBuffer *depthBuffer = static_cast<GLDepthBuffer*>(*itor);
-                        GLContext *glContext = depthBuffer->getGLContext();
-
-                        if( glContext == windowContext &&
-                            (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
-                        {
-                            bFound = true;
-
-                            delete *itor;
-                            itMap->second.erase( itor );
-                            break;
-                        }
-                        ++itor;
-                    }
-
-                    ++itMap;
+                    delete *itor;
+                    itMap->second.erase( itor );
+                    break;
                 }
-
-                mRenderTargets.erase(i);
-                delete pWin;
-                break;
+                ++itor;
             }
+
+            ++itMap;
         }
+
+        delete pWin;
     }
 
     //---------------------------------------------------------------------
@@ -2090,8 +2058,6 @@ namespace Ogre {
                         "Cannot begin frame - no viewport selected.",
                         "GLRenderSystem::_beginFrame");
 
-        mCurrentContext->setCurrent();
-
         // Activate the viewport clipping
         mScissorsEnabled = true;
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
@@ -2250,87 +2216,6 @@ namespace Ogre {
         glFogf(GL_FOG_START, start);
         glFogf(GL_FOG_END, end);
         // XXX Hint here?
-    }
-
-    VertexElementType GLRenderSystem::getColourVertexElementType(void) const
-    {
-        return VET_COLOUR_ABGR;
-    }
-
-    void GLRenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
-                                                  Matrix4& dest, bool forGpuProgram)
-    {
-        // no any conversion request for OpenGL
-        dest = matrix;
-    }
-
-    void GLRenderSystem::_makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane,
-                                               Real farPlane, Matrix4& dest, bool forGpuProgram)
-    {
-        Radian thetaY ( fovy / 2.0f );
-        Real tanThetaY = Math::Tan(thetaY);
-        //Real thetaX = thetaY * aspect;
-        //Real tanThetaX = Math::Tan(thetaX);
-
-        // Calc matrix elements
-        Real w = (1.0f / tanThetaY) / aspect;
-        Real h = 1.0f / tanThetaY;
-        Real q, qn;
-        if (farPlane == 0)
-        {
-            // Infinite far plane
-            q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-            qn = nearPlane * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
-        }
-        else
-        {
-            q = -(farPlane + nearPlane) / (farPlane - nearPlane);
-            qn = -2 * (farPlane * nearPlane) / (farPlane - nearPlane);
-        }
-
-        // NB This creates Z in range [-1,1]
-        //
-        // [ w   0   0   0  ]
-        // [ 0   h   0   0  ]
-        // [ 0   0   q   qn ]
-        // [ 0   0   -1  0  ]
-
-        dest = Matrix4::ZERO;
-        dest[0][0] = w;
-        dest[1][1] = h;
-        dest[2][2] = q;
-        dest[2][3] = qn;
-        dest[3][2] = -1;
-
-    }
-
-    void GLRenderSystem::_makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane,
-                                          Real farPlane, Matrix4& dest, bool forGpuProgram)
-    {
-        Radian thetaY (fovy / 2.0f);
-        Real tanThetaY = Math::Tan(thetaY);
-
-        //Real thetaX = thetaY * aspect;
-        Real tanThetaX = tanThetaY * aspect; //Math::Tan(thetaX);
-        Real half_w = tanThetaX * nearPlane;
-        Real half_h = tanThetaY * nearPlane;
-		Real iw = 1.0f / half_w;
-		Real ih = 1.0f / half_h;
-        Real q;
-        if (farPlane == 0)
-        {
-            q = 0;
-        }
-        else
-        {
-			q = 2.0f / (farPlane - nearPlane);
-        }
-        dest = Matrix4::ZERO;
-        dest[0][0] = iw;
-        dest[1][1] = ih;
-        dest[2][2] = -q;
-        dest[2][3] = - (farPlane + nearPlane)/(farPlane - nearPlane);
-        dest[3][3] = 1;
     }
 
     void GLRenderSystem::_setPolygonMode(PolygonMode level)
@@ -3402,79 +3287,12 @@ namespace Ogre {
             mStateCacheManager->setStencilMask(mStencilWriteMask);
         }
     }
-    // ------------------------------------------------------------------
-    void GLRenderSystem::_makeProjectionMatrix(Real left, Real right,
-                                               Real bottom, Real top, Real nearPlane, Real farPlane, Matrix4& dest,
-                                               bool forGpuProgram)
-    {
-        Real width = right - left;
-        Real height = top - bottom;
-        Real q, qn;
-        if (farPlane == 0)
-        {
-            // Infinite far plane
-            q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-            qn = nearPlane * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
-        }
-        else
-        {
-            q = -(farPlane + nearPlane) / (farPlane - nearPlane);
-            qn = -2 * (farPlane * nearPlane) / (farPlane - nearPlane);
-        }
-        dest = Matrix4::ZERO;
-        dest[0][0] = 2 * nearPlane / width;
-        dest[0][2] = (right+left) / width;
-        dest[1][1] = 2 * nearPlane / height;
-        dest[1][2] = (top+bottom) / height;
-        dest[2][2] = q;
-        dest[2][3] = qn;
-        dest[3][2] = -1;
-    }
     //---------------------------------------------------------------------
     HardwareOcclusionQuery* GLRenderSystem::createHardwareOcclusionQuery(void)
     {
         GLHardwareOcclusionQuery* ret = new GLHardwareOcclusionQuery();
         mHwOcclusionQueries.push_back(ret);
         return ret;
-    }
-    //---------------------------------------------------------------------
-    Real GLRenderSystem::getHorizontalTexelOffset(void)
-    {
-        // No offset in GL
-        return 0.0f;
-    }
-    //---------------------------------------------------------------------
-    Real GLRenderSystem::getVerticalTexelOffset(void)
-    {
-        // No offset in GL
-        return 0.0f;
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::_applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
-                                                      bool forGpuProgram)
-    {
-        // Thanks to Eric Lenyel for posting this calculation at www.terathon.com
-
-        // Calculate the clip-space corner point opposite the clipping plane
-        // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
-        // transform it into camera space by multiplying it
-        // by the inverse of the projection matrix
-
-        Vector4 q;
-        q.x = (Math::Sign(plane.normal.x) + matrix[0][2]) / matrix[0][0];
-        q.y = (Math::Sign(plane.normal.y) + matrix[1][2]) / matrix[1][1];
-        q.z = -1.0F;
-        q.w = (1.0F + matrix[2][2]) / matrix[2][3];
-
-        // Calculate the scaled plane vector
-        Vector4 clipPlane4d(plane.normal.x, plane.normal.y, plane.normal.z, plane.d);
-        Vector4 c = clipPlane4d * (2.0F / (clipPlane4d.dotProduct(q)));
-
-        // Replace the third row of the projection matrix
-        matrix[2][0] = c.x;
-        matrix[2][1] = c.y;
-        matrix[2][2] = c.z + 1.0F;
-        matrix[2][3] = c.w;
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::_oneTimeContextInitialization()
@@ -3506,12 +3324,8 @@ namespace Ogre {
 
 		if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map"))
 		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-			// Some Apple NVIDIA hardware can't handle seamless cubemaps
-			if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
-#endif
-				// Enable seamless cube maps
-				glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+            // Enable seamless cube maps
+            glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		}
 
         static_cast<GLTextureManager*>(mTextureManager)->createWarningTexture();
@@ -3630,18 +3444,6 @@ namespace Ogre {
             }
         }
         mStateCacheManager->unregisterContext((intptr_t)context);
-    }
-    //---------------------------------------------------------------------
-    Real GLRenderSystem::getMinimumDepthInputValue(void)
-    {
-        // Range [-1.0f, 1.0f]
-        return -1.0f;
-    }
-    //---------------------------------------------------------------------
-    Real GLRenderSystem::getMaximumDepthInputValue(void)
-    {
-        // Range [-1.0f, 1.0f]
-        return 1.0f;
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::registerThread()
@@ -3914,5 +3716,38 @@ namespace Ogre {
 		return result;
 	}
 #endif
+
+    void GLRenderSystem::_copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox &dst, RenderWindow::FrameBuffer buffer)
+    {
+        GLenum format = GLPixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = GLPixelUtil::getGLOriginDataType(dst.format);
+
+        if ((format == GL_NONE) || (type == 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format.", "GLRenderSystem::copyContentsToMemory" );
+        }
+
+        // Switch context if different from current one
+        _setViewport(vp);
+
+        if(dst.getWidth() != dst.rowPitch)
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+        // Must change the packing to ensure no overruns!
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+        glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
+
+        uint32_t height = vp->getTarget()->getHeight();
+
+        glReadPixels((GLint)src.left, (GLint)(height - src.bottom),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
+
+        // restore default alignment
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+
+        PixelUtil::bulkPixelVerticalFlip(dst);
+    }
 	//---------------------------------------------------------------------
 }

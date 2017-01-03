@@ -60,7 +60,7 @@ VTestPlugin::~VTestPlugin()
 
 #ifndef OGRE_STATIC_LIB
 
-VTestPlugin* testPlugin = 0;
+static VTestPlugin* testPlugin = 0;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {

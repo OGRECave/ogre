@@ -33,10 +33,11 @@ THE SOFTWARE.
 #include "OgreHlmsPrerequisites.h"
 #include "OgreIdString.h"
 #include "Hash/MurmurHash3.h"
+#include <cstddef>
 
 namespace Ogre
 {
-	/** \addtogroup Component
+	/** \addtogroup Optional
 	*  @{
 	*/
 	/** \addtogroup Hlms

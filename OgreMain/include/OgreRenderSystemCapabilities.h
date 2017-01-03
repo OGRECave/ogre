@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -74,17 +74,21 @@ namespace Ogre
     enum Capabilities
     {
         /// Supports generating mipmaps in hardware
+        /// @deprecated All targetted APIs by Ogre support this feature
         RSC_AUTOMIPMAP              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 0),
+        /// @deprecated All targetted APIs by Ogre support this feature
         RSC_BLENDING                = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 1),
         /// Supports anisotropic texture filtering
         RSC_ANISOTROPY              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 2),
         /// Supports fixed-function DOT3 texture blend
+        /// @deprecated All targetted APIs by Ogre support this feature
         RSC_DOT3                    = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 3),
         /// Supports cube mapping
         RSC_CUBEMAPPING             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 4),
         /// Supports hardware stencil buffer
         RSC_HWSTENCIL               = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 5),
         /// Supports hardware vertex and index buffers
+        /// @deprecated All targetted APIs by Ogre support this feature
         RSC_VBO                     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 7),
         /// Supports 32bit hardware index buffers
         RSC_32BIT_INDEX             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 8),
@@ -93,6 +97,7 @@ namespace Ogre
         /// Supports fragment programs (pixel shaders)
         RSC_FRAGMENT_PROGRAM        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
         /// Supports performing a scissor test to exclude areas of the screen
+		/// @deprecated All targetted APIs by Ogre support this feature
         RSC_SCISSOR_TEST            = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 11),
         /// Supports separate stencil updates for both front and back faces
         RSC_TWO_SIDED_STENCIL       = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 12),
@@ -154,6 +159,7 @@ namespace Ogre
         /// Supports Alpha to Coverage (A2C)
         RSC_ALPHA_TO_COVERAGE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 11),
         /// Supports Blending operations other than +
+		/// @deprecated All targetted APIs by Ogre support this feature.
         RSC_ADVANCED_BLEND_OPERATIONS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
         /// Supports a separate depth buffer for RTTs. D3D 9 & 10, OGL w/FBO (RSC_FBO implies this flag)
         RSC_RTT_SEPARATE_DEPTHBUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 13),
@@ -185,26 +191,35 @@ namespace Ogre
         RSC_ATOMIC_COUNTERS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 25),
         /// Supports reading back the inactive depth-stencil buffer as texture
         RSC_READ_BACK_AS_TEXTURE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
+        /// Supports HW gamma, both in the framebuffer and as texture.
+        RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 27),
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
         RSC_PERSTAGECONSTANT = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 0),
 
         // ***** GL Specific Caps *****
         /// Supports OpenGL version 1.5
+		/// @deprecated All targetted APIs by Ogre support this feature.
         RSC_GL1_5_NOVBO    = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 1),
         /// Support for Frame Buffer Objects (FBOs)
+        /// @deprecated All targetted APIs by Ogre support this feature.
         RSC_FBO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 2),
         /// Support for Frame Buffer Objects ARB implementation (regular FBO is higher precedence)
+        /// @deprecated obsolete
         RSC_FBO_ARB          = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 3),
         /// Support for Frame Buffer Objects ATI implementation (ARB FBO is higher precedence)
+        /// @deprecated obsolete
         RSC_FBO_ATI          = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 4),
         /// Support for PBuffer
         RSC_PBUFFER          = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 5),
         /// Support for GL 1.5 but without HW occlusion workaround
+		/// @deprecated obsolete
         RSC_GL1_5_NOHWOCCLUSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 6),
         /// Support for point parameters ARB implementation
+        /// @deprecated obsolete
         RSC_POINT_EXTENDED_PARAMETERS_ARB = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 7),
         /// Support for point parameters EXT implementation
+        /// @deprecated obsolete
         RSC_POINT_EXTENDED_PARAMETERS_EXT = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 8),
         /// Support for Separate Shader Objects
         RSC_SEPARATE_SHADER_OBJECTS = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 9),

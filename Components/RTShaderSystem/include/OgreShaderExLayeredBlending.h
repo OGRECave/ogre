@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -130,6 +130,7 @@ public:
 
     /** 
     Set the source modifier parameters for a given texture unit
+    @param index Texture blend index
     @param modType The source modification type to use
     @param customNum The custom parameter number used to control the modification
     */
@@ -198,7 +199,7 @@ protected:
 A factory that enables creation of LayeredBlending instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class LayeredBlendingFactory : public SubRenderStateFactory
+class _OgreRTSSExport LayeredBlendingFactory : public SubRenderStateFactory
 {
 public:
 

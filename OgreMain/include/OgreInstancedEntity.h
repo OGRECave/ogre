@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -266,7 +266,7 @@ namespace Ogre
                 mParentNode ? mParentNode->_getDerivedPosition() : Vector3::ZERO;
         }
 
-        /** @copydoc MovableObject::isInScene. */
+        /** @copydoc MovableObject::isInScene */
         virtual bool isInScene(void) const
         {
             //We assume that the instanced entity is in the scene if it is in use

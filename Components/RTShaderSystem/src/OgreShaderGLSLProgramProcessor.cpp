@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -136,12 +136,23 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TargetLanguage, program->getType());
 
                 // Set the source name
-                String sourceName = program->getDependency(i) + "." + TargetLanguage;
+                String sourceName = program->getDependency(i) + ".glsl";
                 pSubGpuProgram->setSourceFile(sourceName);
                 pSubGpuProgram->load();
 
                 // Prepend the current GLSL version
-                String versionLine = "#version " + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion()) + "\n";
+                int GLSLVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+                String versionLine = "#version " + StringConverter::toString(GLSLVersion) + "\n";
+
+                if(GLSLVersion > 130) {
+                    // Redefine texture functions to maintain reusability
+                    versionLine += "#define texture1D texture\n";
+                    versionLine += "#define texture2D texture\n";
+                    versionLine += "#define texture3D texture\n";
+                    versionLine += "#define textureCube texture\n";
+                    versionLine += "#define texture2DLod textureLod\n";
+                }
+
                 pSubGpuProgram->setSource(versionLine + pSubGpuProgram->getSource());
 
                 // If we have compile errors than stop processing

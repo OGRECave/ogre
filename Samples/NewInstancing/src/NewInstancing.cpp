@@ -6,8 +6,8 @@ using namespace OgreBites;
 
 #ifndef OGRE_STATIC_LIB
 
-SamplePlugin* sp;
-Sample* s;
+static SamplePlugin* sp;
+static Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
@@ -102,10 +102,11 @@ bool Sample_NewInstancing::frameRenderingQueued(const FrameEvent& evt)
 }
 
 //------------------------------------------------------------------------------
-bool Sample_NewInstancing::keyPressed(const OIS::KeyEvent& evt)
+bool Sample_NewInstancing::keyPressed(const KeyboardEvent& evt)
 {
+    Keycode key = evt.keysym.sym;
     //Toggle bounding boxes with B key unless the help dialog is visible
-    if (evt.key == OIS::KC_B && !mTrayMgr->isDialogVisible() && mCurrentManager)
+    if (key == 'b' && !mTrayMgr->isDialogVisible() && mCurrentManager)
     {
         bool oldShow = mCurrentManager->getSetting( InstanceManager::SHOW_BOUNDINGBOX,
             mCurrentMaterialSet[mInstancingTechnique] );
@@ -113,7 +114,7 @@ bool Sample_NewInstancing::keyPressed(const OIS::KeyEvent& evt)
     }
 
     //Switch to next instancing technique with space bar
-    if (evt.key == OIS::KC_SPACE && !mTrayMgr->isDialogVisible())
+    if (key == SDLK_SPACE && !mTrayMgr->isDialogVisible())
         mTechniqueMenu->selectItem( (mTechniqueMenu->getSelectionIndex() + 1) % (NUM_TECHNIQUES+1) );
 
     return SdkSample::keyPressed(evt);

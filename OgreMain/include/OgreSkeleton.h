@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -160,7 +160,8 @@ namespace Ogre {
         /** Returns the number of bones in this skeleton. */
         virtual unsigned short getNumBones(void) const;
 
-        /** Gets the root bone of the skeleton: deprecated in favour of getRootBoneIterator. 
+        /** Gets the root bone of the skeleton
+        @deprecated use Skeleton::getRootBoneIterator.
         @remarks
             The system derives the root bone the first time you ask for it. The root bone is the
             only bone in the skeleton which has no parent. The system locates it by taking the

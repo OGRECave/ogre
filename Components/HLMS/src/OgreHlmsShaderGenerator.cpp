@@ -82,7 +82,7 @@ namespace Ogre
 		else
 		{
 			syntaxError = false;
-			printf("Syntax Error at line %lu: start block (e.g. @foreach; @property) "
+			printf("Syntax Error at line %zu: start block (e.g. @foreach; @property) "
 				"without matching @end\n", calculateLineCount(outSubString));
 		}
 	}
@@ -191,7 +191,7 @@ namespace Ogre
 			retVal = evaluateExpressionRecursive(outExpressions, syntaxError, properties);
 
 		if (syntaxError)
-			printf("Syntax Error at line %lu\n", calculateLineCount(subString));
+			printf("Syntax Error at line %zu\n", calculateLineCount(subString));
 
 		outSyntaxError = syntaxError;
 
@@ -304,7 +304,7 @@ namespace Ogre
 		}
 		else
 		{
-			printf("Syntax Error at line %lu: opening parenthesis without matching closure\n",
+			printf("Syntax Error at line %zu: opening parenthesis without matching closure\n",
 				calculateLineCount(outSubString));
 		}
 
@@ -359,7 +359,7 @@ namespace Ogre
 			{
 				if (expressionState == 2)
 				{
-					printf("Syntax Error at line %lu: ',' or ')' expected\n",
+					printf("Syntax Error at line %zu: ',' or ')' expected\n",
 						calculateLineCount(subString));
 					syntaxError = true;
 				}
@@ -374,7 +374,7 @@ namespace Ogre
 		}
 
 		if (syntaxError)
-			printf("Syntax Error at line %lu\n", calculateLineCount(subString));
+			printf("Syntax Error at line %zu\n", calculateLineCount(subString));
 
 		outSyntaxError = syntaxError;
 	}
@@ -402,7 +402,7 @@ namespace Ogre
 				if (subString.find(counterVar) == 0)
 				{
 					char tmp[16];
-					sprintf(tmp, "%lu", passNum);
+					sprintf(tmp, "%zu", passNum);
 					outBuffer += tmp;
 					itor += counterVar.size() + 1;
 				}
@@ -515,12 +515,12 @@ namespace Ogre
 				size_t lineCount = calculateLineCount(subString);
 				if (keyword <= 1)
 				{
-					printf("Syntax Error at line %lu: @%s expects one parameter",
+					printf("Syntax Error at line %zu: @%s expects one parameter",
 						lineCount, c_operations[keyword].opName);
 				}
 				else
 				{
-					printf("Syntax Error at line %lu: @%s expects two or three parameters",
+					printf("Syntax Error at line %zu: @%s expects two or three parameters",
 						lineCount, c_operations[keyword].opName);
 				}
 			}
@@ -678,7 +678,7 @@ namespace Ogre
 				if (it != pieces.end())
 				{
 					syntaxError = true;
-					printf("Error at line %lu: @piece '%s' already defined",
+					printf("Error at line %zu: @piece '%s' already defined",
 						calculateLineCount(subString), argValues[0].c_str());
 				}
 				else
@@ -695,7 +695,7 @@ namespace Ogre
 			}
 			else
 			{
-				printf("Syntax Error at line %lu: @piece expects one parameter",
+				printf("Syntax Error at line %zu: @piece expects one parameter",
 					calculateLineCount(subString));
 			}
 
@@ -737,7 +737,7 @@ namespace Ogre
 			}
 			else
 			{
-				printf("Syntax Error at line %lu: @insertpiece expects one parameter",
+				printf("Syntax Error at line %zu: @insertpiece expects one parameter",
 					calculateLineCount(subString));
 			}
 
@@ -861,12 +861,12 @@ namespace Ogre
 				size_t lineCount = calculateLineCount(subString);
 				if (keyword <= 1)
 				{
-					printf("Syntax Error at line %lu: @%s expects one parameter",
+					printf("Syntax Error at line %zu: @%s expects one parameter",
 						lineCount, c_counterOperations[keyword].opName);
 				}
 				else
 				{
-					printf("Syntax Error at line %lu: @%s expects two or three parameters",
+					printf("Syntax Error at line %zu: @%s expects two or three parameters",
 						lineCount, c_counterOperations[keyword].opName);
 				}
 			}

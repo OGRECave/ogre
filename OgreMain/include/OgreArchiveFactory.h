@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,7 @@ namespace Ogre {
         virtual ~ArchiveFactory() {}
         /** Creates a new object.
         @param name Name of the object to create
+        @param readOnly whether the Archive is read only
         @return
             An object created by the factory. The type of the object depends on
             the factory.

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __OgreGLES2FBORTT_H__
 
 #include "OgreGLES2RenderTexture.h"
-#include "OgreGLES2Context.h"
+#include "OgreGLContext.h"
 #include "OgreGLES2FrameBufferObject.h"
 #include "OgreGLES2ManagedResource.h"
 
@@ -84,7 +84,7 @@ namespace Ogre {
         
         /** Get best depth and stencil supported for given internalFormat
         */
-        void getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat);
+        void getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat);
         
         /** Create a texture rendertarget object
         */

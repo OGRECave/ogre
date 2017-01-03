@@ -37,7 +37,7 @@ namespace Ogre
 
 #	define PBS_MAX_LIGHT_COUNT 10
 
-	/** \addtogroup Component
+	/** \addtogroup Optional
 	*  @{
 	*/
 	/** \addtogroup Hlms
@@ -195,6 +195,7 @@ namespace Ogre
 	protected:
 
 		bool mCanHardwareGamma;
+		bool mIsGLES;
 
 		ColourValue mAlbedo;
 		ColourValue mF0;

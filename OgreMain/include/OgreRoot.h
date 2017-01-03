@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -251,13 +251,22 @@ namespace Ogre
                 RenderSystem::setConfigOption and Root::saveConfig with the
                 user's choices. This is the easiest way to get the system
                 configured.
+            @param dialog ConfigDialog implementation to use.
+                If NULL, the first available render system with the default options
+                will be selected.
             @return
                 If the user clicked 'Ok', <b>true</b> is returned.
             @par
                 If they clicked 'Cancel' (in which case the app should
                 strongly consider terminating), <b>false</b> is returned.
          */
-        bool showConfigDialog(void);
+        bool showConfigDialog(ConfigDialog* dialog);
+
+        /** @overload
+
+            @deprecated use showConfigDialog(ConfigDialog* dialog);
+         */
+        OGRE_DEPRECATED bool showConfigDialog(void);
 
         /** Adds a new rendering subsystem to the list of available renderers.
             @remarks

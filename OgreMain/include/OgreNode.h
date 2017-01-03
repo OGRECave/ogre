@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -124,15 +124,15 @@ namespace Ogre {
 
         typedef set<Node*>::type ChildUpdateSet;
         /// List of children which need updating, used if self is not out of date but children are
-        mutable ChildUpdateSet mChildrenToUpdate;
+        ChildUpdateSet mChildrenToUpdate;
         /// Flag to indicate own transform from parent is out of date
         mutable bool mNeedParentUpdate;
         /// Flag indicating that all children need to be updated
-        mutable bool mNeedChildUpdate;
+        bool mNeedChildUpdate;
         /// Flag indicating that parent has been notified about update request
-        mutable bool mParentNotified ;
+        bool mParentNotified ;
         /// Flag indicating that the node has been queued for update
-        mutable bool mQueuedForUpdate;
+        bool mQueuedForUpdate;
 
         /// Friendly name of this node, can be automatically generated if you don't care
         String mName;
@@ -515,7 +515,7 @@ namespace Ogre {
         @param rotate
             Initial rotation relative to parent
         */
-        virtual Node* createChild(
+        Node* createChild(
             const Vector3& translate = Vector3::ZERO, 
             const Quaternion& rotate = Quaternion::IDENTITY );
 
@@ -528,7 +528,7 @@ namespace Ogre {
         @param rotate
             Initial rotation relative to parent
         */
-        virtual Node* createChild(const String& name, const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
+        Node* createChild(const String& name, const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
 
         /** Adds a (precreated) child scene node to this node. If it is attached to another node,
             it must be detached first.

@@ -4,7 +4,7 @@
  * (Object-oriented Graphics Rendering Engine)
  * For the latest info, see http://www.ogre3d.org/
  *
- * Copyright (c) 2000-2016 Torus Knot Software Ltd
+ * Copyright (c) 2000-2014 Torus Knot Software Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,12 @@
 
 namespace Ogre
 {
-
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup MeshLodGenerator
+*  @{
+*/
 struct _OgreLodExport LodData {
 
     static const Real NEVER_COLLAPSE_COST /*= std::numeric_limits<Real>::max()*/;
@@ -63,7 +68,7 @@ struct _OgreLodExport LodData {
     typedef VectorSet<Edge, 8> VEdges;
     typedef VectorSet<Triangle*, 7> VTriangles;
 
-    // Hash function for UniqueVertexSet.
+    /// Hash function for UniqueVertexSet.
     struct VertexHash {
         LodData* mGen;
 
@@ -72,7 +77,7 @@ struct _OgreLodExport LodData {
         size_t operator() (const Vertex* v) const;
     };
 
-    // Equality function for UniqueVertexSet.
+    /// Equality function for UniqueVertexSet.
     struct VertexEqual {
         bool operator() (const Vertex* lhs, const Vertex* rhs) const;
     };
@@ -108,7 +113,7 @@ struct _OgreLodExport LodData {
         Vertex* vertex[3];
         Vector3 normal;
         bool isRemoved;
-        unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
+        size_t submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
         unsigned int vertexID[3]; /// Vertex ID in the buffer associated with the submeshID.
 
         void computeNormal();
@@ -125,9 +130,9 @@ struct _OgreLodExport LodData {
     struct IndexBufferInfo {
         size_t indexSize;
         size_t indexCount;
-        IndexBufferPointer buf; // Used by output providers only!
-        size_t prevOnlyIndexCount; // Used by output providers only!
-        size_t prevIndexCount; // Used by output providers only!
+        IndexBufferPointer buf; /// Used by output providers only!
+        size_t prevOnlyIndexCount; /// Used by output providers only!
+        size_t prevIndexCount; /// Used by output providers only!
     };
 
     typedef vector<IndexBufferInfo>::type IndexBufferInfoList;
@@ -166,6 +171,7 @@ struct _OgreLodExport LodData {
         mUseVertexNormals(true)
     {}
 };
-
+/** @} */
+/** @} */
 }
 #endif

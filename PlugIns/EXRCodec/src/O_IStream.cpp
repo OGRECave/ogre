@@ -34,7 +34,7 @@ namespace Ogre {
 
 bool O_IStream::read(char c[], int n) {
     size_t s = _stream.read(c, n);
-    if(s != n)
+    if(s != size_t(n))
         throw Iex::InputExc ("Unexpected end of file.");
     return _stream.eof();
 }

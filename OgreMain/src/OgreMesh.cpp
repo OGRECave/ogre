@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -155,9 +155,9 @@ namespace Ogre {
         destroySubMesh(index);
     }
     //-----------------------------------------------------------------------
-    unsigned short Mesh::getNumSubMeshes() const
+    size_t Mesh::getNumSubMeshes() const
     {
-        return static_cast< unsigned short >( mSubMeshList.size() );
+        return mSubMeshList.size();
     }
 
     //---------------------------------------------------------------------
@@ -180,7 +180,7 @@ namespace Ogre {
         return getSubMesh(index);
     }
     //-----------------------------------------------------------------------
-    SubMesh* Mesh::getSubMesh(unsigned short index) const
+    SubMesh* Mesh::getSubMesh(size_t index) const
     {
         if (index >= mSubMeshList.size())
         {

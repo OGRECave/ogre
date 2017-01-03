@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,8 @@ namespace Ogre {
                 The filename that will be opened
             @param archiveType
                 The type of archive that this is. For example: "Zip".
+            @param readOnly
+                Whether the Archive is read only
             @return
                 If the function succeeds, a valid pointer to an Archive
                 object is returned.

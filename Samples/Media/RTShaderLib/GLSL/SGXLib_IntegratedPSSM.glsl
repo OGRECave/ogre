@@ -55,7 +55,7 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 }
 	
 //-----------------------------------------------------------------------------
-float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
+float _SGX_ShadowPCF4(in sampler2D shadowMap, in vec4 shadowMapPos, in vec2 offset)
 {
 	shadowMapPos = shadowMapPos / shadowMapPos.w;
 	vec2 uv = shadowMapPos.xy;

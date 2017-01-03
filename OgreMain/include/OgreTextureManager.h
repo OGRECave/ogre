@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -74,8 +74,10 @@ namespace Ogre {
         /// @see ResourceManager::getResourceByName
         TexturePtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-        /** Create a new texture, or retrieve an existing one with the same
-            name if it already exists.
+        using ResourceManager::createOrRetrieve;
+
+        /** @overload ResourceManager::createOrRetrieve
+
             @param
                 texType The type of texture to load/create, defaults to normal 2D textures
             @param
@@ -97,11 +99,10 @@ namespace Ogre {
                 to linear space when reading from this texture. Only applicable for 
                 8-bits per channel textures, will be ignored for other types. Has the advantage
                 over pre-applied gamma that the texture precision is maintained.
-            @see ResourceManager::createOrRetrieve
         */
-        virtual ResourceCreateOrRetrieveResult createOrRetrieve(
-            const String &name, const String& group, bool isManual = false,
-            ManualResourceLoader* loader = 0, const NameValuePairList* createParams = 0,
+        ResourceCreateOrRetrieveResult createOrRetrieve(
+            const String &name, const String& group, bool isManual,
+            ManualResourceLoader* loader, const NameValuePairList* createParams,
             TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
             Real gamma = 1.0f, bool isAlpha = false,
             PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
@@ -133,7 +134,7 @@ namespace Ogre {
                 8-bits per channel textures, will be ignored for other types. Has the advantage
                 over pre-applied gamma that the texture precision is maintained.
         */
-        virtual TexturePtr prepare( 
+        TexturePtr prepare(
             const String& name, const String& group, 
             TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
             Real gamma = 1.0f, bool isAlpha = false,
@@ -168,7 +169,7 @@ namespace Ogre {
                 8-bits per channel textures, will be ignored for other types. Has the advantage
                 over pre-applied gamma that the texture precision is maintained.
         */
-        virtual TexturePtr load( 
+        TexturePtr load(
             const String& name, const String& group, 
             TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
             Real gamma = 1.0f, bool isAlpha = false,

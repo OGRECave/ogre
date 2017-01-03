@@ -80,8 +80,8 @@ namespace Ogre {
 
     EAGLES2Context::~EAGLES2Context()
     {
-        GLES2RenderSystem *rs =
-            static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
+        GLRenderSystemCommon *rs =
+            static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
 
         rs->_unregisterContext(this);
 

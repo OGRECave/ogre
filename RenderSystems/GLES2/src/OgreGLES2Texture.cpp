@@ -62,8 +62,8 @@ namespace Ogre {
             size_t w = 0, h = 0;
             
             // Scale to nearest power of 2
-            w = GLES2PixelUtil::optionalPO2(images[imgIdx].getWidth());
-            h = GLES2PixelUtil::optionalPO2(images[imgIdx].getHeight());
+            w = Bitwise::firstPO2From(images[imgIdx].getWidth());
+            h = Bitwise::firstPO2From(images[imgIdx].getHeight());
             if((images[imgIdx].getWidth() != w) || (images[imgIdx].getHeight() != h))
                 images[imgIdx].resize(w, h);
         }
@@ -100,9 +100,9 @@ namespace Ogre {
                 return GL_TEXTURE_2D;
             case TEX_TYPE_CUBE_MAP:
                 return GL_TEXTURE_CUBE_MAP;
-#if OGRE_NO_GLES3_SUPPORT == 0
             case TEX_TYPE_3D:
-                return GL_TEXTURE_3D;
+                return GL_TEXTURE_3D_OES;
+#if OGRE_NO_GLES3_SUPPORT == 0
             case TEX_TYPE_2D_ARRAY:
                 return GL_TEXTURE_2D_ARRAY;
 #endif
@@ -123,9 +123,9 @@ namespace Ogre {
         if( !nonPowerOfTwoSupported )
         {
             // Convert to nearest power-of-two size if required
-            mWidth = GLES2PixelUtil::optionalPO2(mWidth);
-            mHeight = GLES2PixelUtil::optionalPO2(mHeight);
-            mDepth = GLES2PixelUtil::optionalPO2(mDepth);
+            mWidth = Bitwise::firstPO2From(mWidth);
+            mHeight = Bitwise::firstPO2From(mHeight);
+            mDepth = Bitwise::firstPO2From(mDepth);
         }
 
         // Adjust format if required
@@ -149,17 +149,18 @@ namespace Ogre {
         mGLSupport.getStateCacheManager()->bindGLTexture(texTarget, mTextureID);
         
         // If we can do automip generation and the user desires this, do so
-        mMipmapsHardwareGenerated =
-            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
+        mMipmapsHardwareGenerated = !PixelUtil::isCompressed(mFormat);
 
-        if(!Bitwise::isPO2(mWidth) || !Bitwise::isPO2(mHeight))
+        if(!nonPowerOfTwoSupported && (!Bitwise::isPO2(mWidth) || !Bitwise::isPO2(mHeight)))
             mMipmapsHardwareGenerated = false;
 
         // glGenerateMipmap require all mip levels to be prepared. So override how many this texture has.
         if((mUsage & TU_AUTOMIPMAP) && mMipmapsHardwareGenerated && mNumRequestedMipmaps)
             mNumMipmaps = maxMips;
 
-        if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+        GLES2Support* glSupport = getGLES2SupportRef();
+
+        if(glSupport->checkExtension("GL_APPLE_texture_max_level") || glSupport->hasMinGLVersion(3, 0))
             mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
 
         // Set some misc default parameters, these can of course be changed later
@@ -174,20 +175,12 @@ namespace Ogre {
 
         // Set up texture swizzling
 #if OGRE_NO_GLES3_SUPPORT == 0
-        if(gleswIsSupported(3, 0))
+        if(mFormat == PF_L8 || mFormat == PF_L16)
         {
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
-            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN));
-            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE));
-            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA));
-
-            if(mFormat == PF_L8 || mFormat == PF_L16)
-            {
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_RED));
-            }
+            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_RED));
         }
 #endif
 
@@ -210,7 +203,7 @@ namespace Ogre {
             
             uint8* tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
-            for (GLint mip = 0; mip <= mNumMipmaps; mip++)
+            for (uint32 mip = 0; mip <= mNumMipmaps; mip++)
             {
 #if OGRE_DEBUG_MODE
                 LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
@@ -243,12 +236,12 @@ namespace Ogre {
                         break;
 #if OGRE_NO_GLES3_SUPPORT == 0
                     case TEX_TYPE_2D_ARRAY:
+#endif
                     case TEX_TYPE_3D:
-                        glCompressedTexImage3D(getGLES2TextureTarget(), mip, format,
+                        glCompressedTexImage3DOES(getGLES2TextureTarget(), mip, format,
                             width, height, depth, 0, 
                             size, tmpdata);
                         break;
-#endif
                     default:
                         break;
                 };
@@ -299,7 +292,7 @@ namespace Ogre {
             GLenum datatype = GLES2PixelUtil::getGLOriginDataType(mFormat);
 
             // Run through this process to pregenerate mipmap pyramid
-            for(GLint mip = 0; mip <= mNumMipmaps; mip++)
+            for(uint32 mip = 0; mip <= mNumMipmaps; mip++)
             {
 #if OGRE_DEBUG_MODE
                 LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
@@ -329,6 +322,15 @@ namespace Ogre {
                                      mip,
                                      internalformat,
                                      width, height,
+                                     0,
+                                     format,
+                                     datatype, 0));
+                        break;
+                    case TEX_TYPE_3D:
+                        OGRE_CHECK_GL_ERROR(glTexImage3DOES(GL_TEXTURE_3D_OES,
+                                     mip,
+                                     internalformat,
+                                     width, height, depth,
                                      0,
                                      format,
                                      datatype, 0));
@@ -554,7 +556,7 @@ namespace Ogre {
             uint32 height = mHeight;
             uint32 depth = mDepth;
 
-            for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
+            for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GLES2HardwarePixelBuffer *buf = OGRE_NEW GLES2TextureBuffer(mName,
                                                                             getGLES2TextureTarget(),

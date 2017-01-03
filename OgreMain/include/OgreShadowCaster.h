@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -73,7 +73,7 @@ namespace Ogre {
         void getWorldTransforms(Matrix4* xform) const = 0;
         /// @copydoc Renderable::getSquaredViewDepth
         Real getSquaredViewDepth(const Camera*) const{ return 0; /* not used */}
-        /// @copydoc Renderable::getLights.
+        /// @copydoc Renderable::getLights
         const LightList& getLights(void) const;
         /** Does this renderable require a separate light cap?
         @remarks

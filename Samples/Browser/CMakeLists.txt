@@ -14,10 +14,7 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkCameraMan.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
 )
 
 if (WINDOWS_STORE OR WINDOWS_PHONE)
@@ -29,7 +26,7 @@ endif()
 # Get the list of configured samples
 get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
 
-if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE_IOS)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 
   if(OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
@@ -48,7 +45,7 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   endif()
 endif ()
 
-if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND APPLE_IOS)
   set(HEADER_FILES ${HEADER_FILES}
     include/SampleBrowser_iOS.h
   )
@@ -69,7 +66,7 @@ elseif (APPLE)
 elseif (ANDROID)
   set(HEADER_FILES ${HEADER_FILES}
     include/SampleBrowser_Android.h)
-endif (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+endif (APPLE AND APPLE_IOS)
 
 
 if (OGRE_STATIC)
@@ -197,15 +194,10 @@ if(ANDROID)
     SET(HEADERS "")
     SET(SAMPLE_LDLIBS "")
     
-    add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_Water" "Sample_Ocean" "Sample_NewInstancing" "Sample_ShaderSystem" "Sample_DeferredShading" "Sample_EndlessWorld" "Sample_VolumeCSG" "Sample_VolumeTerrain" "Sample_Terrain")
-    if(NOT ANDROID_GLES_ONLY)
-		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Fresnel" "Sample_Grass" "Sample_ParticleFX" "Sample_MeshLod" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
-		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_CameraTrack" "Sample_CelShading" "Sample_Character" "Sample_Compositor" "Sample_Lighting" "Sample_BezierPatch" "Sample_CubeMapping" "Sample_DynTex")
-		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_TerrainTessellation")
-    else()
-		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Grass" "Sample_ParticleFX" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
-		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_CameraTrack"  "Sample_Character" "Sample_Compositor" "Sample_Lighting" "Sample_BezierPatch" "Sample_DynTex")
-    endif()
+    add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_Water" "Sample_Ocean" "Sample_NewInstancing" "Sample_ShaderSystem" "Sample_DeferredShading" "Sample_EndlessWorld" "Sample_VolumeCSG" "Sample_VolumeTerrain" "Sample_Terrain" "Sample_ShaderSystemMultiLight" "Sample_ShaderSystemTexturedFog")
+	add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Fresnel" "Sample_Grass" "Sample_ParticleFX" "Sample_MeshLod" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
+	add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_CameraTrack" "Sample_CelShading" "Sample_Character" "Sample_Compositor" "Sample_Lighting" "Sample_BezierPatch" "Sample_CubeMapping" "Sample_DynTex")
+	add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_HLMS" "Sample_VolumeTex")
 
     if(OGRE_BUILD_TESTS)
         set(OGRE_ANDROID_CFLAGS -DSAMPLES_INCLUDE_PLAYPEN)
@@ -222,6 +214,7 @@ if(ANDROID)
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/thumbnails" DESTINATION "${NDKOUT}/assets")
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/assets")
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/assets")
+	file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/HLMS" DESTINATION "${NDKOUT}/assets")
     
 	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-hdpi" DESTINATION "${NDKOUT}/res")
 	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-ldpi" DESTINATION "${NDKOUT}/res")
@@ -255,7 +248,7 @@ if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
    target_link_libraries(SampleBrowser ${DirectX9_LIBRARIES})
 endif()
 
-target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
+target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_LIBRARIES} OgreBites)
 
 # Add samples as dependencies
 add_dependencies(SampleBrowser ${OGRE_SAMPLES_LIST})
@@ -300,7 +293,7 @@ if (APPLE)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")
     set_target_properties(SampleBrowser PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
 
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (APPLE_IOS)
     set_target_properties(SampleBrowser PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
     set(OGRE_SAMPLE_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app)
     add_custom_command(TARGET SampleBrowser POST_BUILD
@@ -379,6 +372,7 @@ if (APPLE)
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
 
     set(FRAMEWORKS OgreOverlay
+		OgreBites
         OgrePaging
         OgreProperty
         OgreRTShaderSystem
@@ -431,4 +425,3 @@ if (OGRE_INSTALL_SAMPLES)
 	endif ()
 endif ()
 endif(ANDROID)
-

@@ -29,11 +29,12 @@ THE SOFTWARE.
 #include "OgreGLSLESExtSupport.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 #include "OgreGLES2RenderSystem.h"
 
 namespace Ogre
 {
+    namespace GLSLES {
     //-----------------------------------------------------------------------------
     String logObjectInfo(const String& msg, const GLuint obj)
     {
@@ -110,5 +111,5 @@ namespace Ogre
         return logMessage;
     }
 
-
+    }
 } // namespace Ogre

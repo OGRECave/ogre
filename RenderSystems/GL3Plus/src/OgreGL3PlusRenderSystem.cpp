@@ -27,6 +27,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusRenderSystem.h"
+
+#include "OgreGLUtil.h"
 #include "OgreRenderSystem.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -39,7 +41,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreGL3PlusHardwareIndexBuffer.h"
 #include "OgreGL3PlusDefaultHardwareBufferManager.h"
-#include "OgreGL3PlusUtil.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLShaderManager.h"
 #include "OgreException.h"
@@ -47,7 +48,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareOcclusionQuery.h"
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
-#include "OgreGL3PlusContext.h"
+#include "OgreGLContext.h"
 #include "OgreGLSLShaderFactory.h"
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
@@ -58,8 +59,14 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
+#include "OgreGL3PlusPixelFormat.h"
 
-#if OGRE_DEBUG_MODE
+#ifndef GL_EXT_texture_filter_anisotropic
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT     0x84FE
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+#endif
+
+#if OGRE_DEBUG_MODE && ENABLE_GL_DEBUG_OUTPUT
 static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum type,
                                      GLuint id,
@@ -68,7 +75,7 @@ static void APIENTRY GLDebugCallback(GLenum source,
                                      const GLchar* message,
                                      GLvoid* userParam)
 {
-    char debSource[32], debType[32], debSev[32];
+    char debSource[32] = {0}, debType[32] = {0}, debSev[32] = {0};
 
     if (source == GL_DEBUG_SOURCE_API)
         strcpy(debSource, "OpenGL");
@@ -111,6 +118,11 @@ static void APIENTRY GLDebugCallback(GLenum source,
 
 namespace Ogre {
 
+    static GL3PlusSupport* glsupport;
+    static void* get_proc(const char* proc) {
+        return glsupport->getProcAddress(proc);
+    }
+
     GL3PlusRenderSystem::GL3PlusRenderSystem()
         : mDepthWrite(true),
           mScissorsEnabled(false),
@@ -129,7 +141,8 @@ namespace Ogre {
         mRenderInstanceAttribsBound.reserve(100);
 
         // Get our GLSupport
-        mGLSupport = getGLSupport();
+        mGLSupport = new GL3PlusSupport(getGLSupport());
+        glsupport = mGLSupport;
 
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
@@ -181,13 +194,7 @@ namespace Ogre {
 
     const String& GL3PlusRenderSystem::getName(void) const
     {
-        static String strName("OpenGL 3+ Rendering Subsystem (ALPHA)");
-        return strName;
-    }
-
-    const String& GL3PlusRenderSystem::getFriendlyName(void) const
-    {
-        static String strName("OpenGL 3+");
+        static String strName("OpenGL 3+ Rendering Subsystem");
         return strName;
     }
 
@@ -246,21 +253,7 @@ namespace Ogre {
         bool hasGL42 = mGLSupport->hasMinGLVersion(4, 2);
 
         // Check for hardware mipmapping support.
-        bool disableAutoMip = false;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-        // Apple & Linux ATI drivers have faults in hardware mipmap generation
-        // TODO: Test this with GL3+
-        if (rsc->getVendor() == GPU_AMD)
-            disableAutoMip = true;
-#endif
-        // The Intel 915G frequently corrupts textures when using hardware mip generation
-        // I'm not currently sure how many generations of hardware this affects,
-        // so for now, be safe.
-        if (rsc->getVendor() == GPU_INTEL)
-            disableAutoMip = true;
-
-        if (!disableAutoMip)
-            rsc->setCapability(RSC_AUTOMIPMAP);
+        rsc->setCapability(RSC_AUTOMIPMAP);
 
         // Check for blending support
         rsc->setCapability(RSC_BLENDING);
@@ -288,6 +281,8 @@ namespace Ogre {
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);
         rsc->setStencilBufferBitDepth(8);
+
+        rsc->setCapability(RSC_HW_GAMMA);
 
         // Vertex Buffer Objects are always supported
         rsc->setCapability(RSC_VBO);
@@ -410,34 +405,35 @@ namespace Ogre {
         rsc->setCapability(RSC_VERTEX_PROGRAM);
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
-        GLfloat floatConstantCount = 0;
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &floatConstantCount));
-        rsc->setVertexProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
-        rsc->setVertexProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
-        rsc->setVertexProgramConstantIntCount((Ogre::ushort)floatConstantCount);
+        GLint constantCount = 0;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &constantCount));
+        rsc->setVertexProgramConstantFloatCount((Ogre::ushort)constantCount);
+        rsc->setVertexProgramConstantBoolCount((Ogre::ushort)constantCount);
+        rsc->setVertexProgramConstantIntCount((Ogre::ushort)constantCount);
 
         // Fragment Program Properties
-        floatConstantCount = 0;
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &floatConstantCount));
-        rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
-        rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
-        rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
+        constantCount = 0;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &constantCount));
+        rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)constantCount);
+        rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)constantCount);
+        rsc->setFragmentProgramConstantIntCount((Ogre::ushort)constantCount);
 
         // Geometry Program Properties
-        rsc->setCapability(RSC_GEOMETRY_PROGRAM);
+        if(mHasGL32 || mGLSupport->checkExtension("ARB_geometry_shader4")) {
+            rsc->setCapability(RSC_GEOMETRY_PROGRAM);
 
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
-        rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
+            rsc->setGeometryProgramConstantFloatCount(constantCount);
 
-        GLint maxOutputVertices;
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices));
-        rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &constantCount));
+            rsc->setGeometryProgramNumOutputVertices(constantCount);
 
-        //FIXME Is this correct?
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
-        rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
-        rsc->setGeometryProgramConstantBoolCount(floatConstantCount);
-        rsc->setGeometryProgramConstantIntCount(floatConstantCount);
+            //FIXME Is this correct?
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
+            rsc->setGeometryProgramConstantFloatCount(constantCount);
+            rsc->setGeometryProgramConstantBoolCount(constantCount);
+            rsc->setGeometryProgramConstantIntCount(constantCount);
+        }
 
         // Tessellation Program Properties
         if (mGLSupport->checkExtension("GL_ARB_tessellation_shader") || hasGL40)
@@ -445,21 +441,21 @@ namespace Ogre {
             rsc->setCapability(RSC_TESSELLATION_HULL_PROGRAM);
             rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
 
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &floatConstantCount));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &constantCount));
             // 16 boolean params allowed
-            rsc->setTessellationHullProgramConstantBoolCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantBoolCount(constantCount);
             // 16 integer params allowed, 4D
-            rsc->setTessellationHullProgramConstantIntCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantIntCount(constantCount);
             // float params, always 4D
-            rsc->setTessellationHullProgramConstantFloatCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantFloatCount(constantCount);
 
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS, &floatConstantCount));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS, &constantCount));
             // 16 boolean params allowed
-            rsc->setTessellationDomainProgramConstantBoolCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantBoolCount(constantCount);
             // 16 integer params allowed, 4D
-            rsc->setTessellationDomainProgramConstantIntCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantIntCount(constantCount);
             // float params, always 4D
-            rsc->setTessellationDomainProgramConstantFloatCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantFloatCount(constantCount);
         }
 
         // Compute Program Properties
@@ -468,19 +464,19 @@ namespace Ogre {
             rsc->setCapability(RSC_COMPUTE_PROGRAM);
 
             //FIXME Is this correct?
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &floatConstantCount));
-            rsc->setComputeProgramConstantFloatCount(floatConstantCount);
-            rsc->setComputeProgramConstantBoolCount(floatConstantCount);
-            rsc->setComputeProgramConstantIntCount(floatConstantCount);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &constantCount));
+            rsc->setComputeProgramConstantFloatCount(constantCount);
+            rsc->setComputeProgramConstantBoolCount(constantCount);
+            rsc->setComputeProgramConstantIntCount(constantCount);
 
             //TODO we should also check max workgroup count & size
-            // OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_WORK_GROUP_SIZE, &workgroupCount));
-            // OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &workgroupInvocations));
+            // OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_SIZE, &workgroupCount));
+            // OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &workgroupInvocations));
         }
 
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || hasGL41)
         {
-            GLint formats;
+            GLint formats = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
 
             if (formats > 0)
@@ -499,10 +495,7 @@ namespace Ogre {
         units = std::max<GLint>(16, units);
 
         rsc->setNumVertexTextureUnits(static_cast<ushort>(units));
-        if (units > 0)
-        {
-            rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
-        }
+        rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
 
         // Mipmap LOD biasing?
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
@@ -560,12 +553,6 @@ namespace Ogre {
         }
 
         mGLInitialised = true;
-    }
-
-    void GL3PlusRenderSystem::reinitialise(void)
-    {
-        this->shutdown();
-        this->_initialise(true);
     }
 
     void GL3PlusRenderSystem::shutdown(void)
@@ -779,68 +766,56 @@ namespace Ogre {
         return retval;
     }
 
-    void GL3PlusRenderSystem::destroyRenderWindow(RenderWindow* pWin)
+    void GL3PlusRenderSystem::destroyRenderWindow(const String& name)
     {
         // Find it to remove from list.
-        RenderTargetMap::iterator i = mRenderTargets.begin();
+        RenderTarget* pWin = detachRenderTarget(name);
+        OgreAssert(pWin, "unknown RenderWindow name");
 
-        while (i != mRenderTargets.end())
+        GL3PlusContext *windowContext = 0;
+        pWin->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
+
+        // 1 Window <-> 1 Context, should be always true.
+        assert( windowContext );
+
+        bool bFound = false;
+        // Find the depth buffer from this window and remove it.
+        DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+        DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+
+        while( itMap != enMap && !bFound )
         {
-            if (i->second == pWin)
+            DepthBufferVec::iterator itor = itMap->second.begin();
+            DepthBufferVec::iterator end  = itMap->second.end();
+
+            while( itor != end )
             {
-                GL3PlusContext *windowContext = 0;
-                pWin->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
+                // A DepthBuffer with no depth & stencil pointers is a dummy one,
+                // look for the one that matches the same GL context.
+                GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(*itor);
+                GL3PlusContext *glContext = depthBuffer->getGLContext();
 
-                // 1 Window <-> 1 Context, should be always true.
-                assert( windowContext );
-
-                bool bFound = false;
-                // Find the depth buffer from this window and remove it.
-                DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
-                DepthBufferMap::iterator enMap = mDepthBufferPool.end();
-
-                while( itMap != enMap && !bFound )
+                if ( glContext == windowContext &&
+                     (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
                 {
-                    DepthBufferVec::iterator itor = itMap->second.begin();
-                    DepthBufferVec::iterator end  = itMap->second.end();
+                    bFound = true;
 
-                    while( itor != end )
-                    {
-                        // A DepthBuffer with no depth & stencil pointers is a dummy one,
-                        // look for the one that matches the same GL context.
-                        GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(*itor);
-                        GL3PlusContext *glContext = depthBuffer->getGLContext();
-
-                        if ( glContext == windowContext &&
-                             (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
-                        {
-                            bFound = true;
-
-                            delete *itor;
-                            itMap->second.erase( itor );
-                            break;
-                        }
-                        ++itor;
-                    }
-
-                    ++itMap;
+                    delete *itor;
+                    itMap->second.erase( itor );
+                    break;
                 }
-
-                mRenderTargets.erase(i);
-                delete pWin;
-                break;
+                ++itor;
             }
+
+            ++itMap;
         }
+
+        delete pWin;
     }
 
     String GL3PlusRenderSystem::getErrorDescription(long errorNumber) const
     {
         return BLANKSTRING;
-    }
-
-    VertexElementType GL3PlusRenderSystem::getColourVertexElementType(void) const
-    {
-        return VET_COLOUR_ABGR;
     }
 
     void GL3PlusRenderSystem::_setWorldMatrix(const Matrix4 &m)
@@ -1363,140 +1338,6 @@ namespace Ogre {
         mColourWrite[3] = alpha;
     }
 
-    void GL3PlusRenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
-                                                       Matrix4& dest,
-                                                       bool forGpuProgram)
-    {
-        // no any conversion request for OpenGL
-        dest = matrix;
-    }
-
-    void GL3PlusRenderSystem::_makeProjectionMatrix(const Radian& fovy, Real aspect,
-                                                    Real nearPlane, Real farPlane,
-                                                    Matrix4& dest, bool forGpuProgram)
-    {
-        Radian thetaY(fovy / 2.0f);
-        Real tanThetaY = Math::Tan(thetaY);
-
-        // Calc matrix elements
-        Real w = (1.0f / tanThetaY) / aspect;
-        Real h = 1.0f / tanThetaY;
-        Real q, qn;
-        if (farPlane == 0)
-        {
-            // Infinite far plane
-            q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-            qn = nearPlane * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
-        }
-        else
-        {
-            q = -(farPlane + nearPlane) / (farPlane - nearPlane);
-            qn = -2 * (farPlane * nearPlane) / (farPlane - nearPlane);
-        }
-
-        // NB This creates Z in range [-1,1]
-        //
-        // [ w   0   0   0  ]
-        // [ 0   h   0   0  ]
-        // [ 0   0   q   qn ]
-        // [ 0   0   -1  0  ]
-
-        dest = Matrix4::ZERO;
-        dest[0][0] = w;
-        dest[1][1] = h;
-        dest[2][2] = q;
-        dest[2][3] = qn;
-        dest[3][2] = -1;
-    }
-
-    void GL3PlusRenderSystem::_makeProjectionMatrix(Real left, Real right,
-                                                    Real bottom, Real top,
-                                                    Real nearPlane, Real farPlane,
-                                                    Matrix4& dest, bool forGpuProgram)
-    {
-        Real width = right - left;
-        Real height = top - bottom;
-        Real q, qn;
-        if (farPlane == 0)
-        {
-            // Infinite far plane
-            q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-            qn = nearPlane * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
-        }
-        else
-        {
-            q = -(farPlane + nearPlane) / (farPlane - nearPlane);
-            qn = -2 * (farPlane * nearPlane) / (farPlane - nearPlane);
-        }
-
-        dest = Matrix4::ZERO;
-        dest[0][0] = 2 * nearPlane / width;
-        dest[0][2] = (right+left) / width;
-        dest[1][1] = 2 * nearPlane / height;
-        dest[1][2] = (top+bottom) / height;
-        dest[2][2] = q;
-        dest[2][3] = qn;
-        dest[3][2] = -1;
-    }
-
-    void GL3PlusRenderSystem::_makeOrthoMatrix(const Radian& fovy, Real aspect,
-                                               Real nearPlane, Real farPlane,
-                                               Matrix4& dest, bool forGpuProgram)
-    {
-        Radian thetaY(fovy / 2.0f);
-        Real tanThetaY = Math::Tan(thetaY);
-
-        // Real thetaX = thetaY * aspect;
-        Real tanThetaX = tanThetaY * aspect; // Math::Tan(thetaX);
-        Real half_w = tanThetaX * nearPlane;
-        Real half_h = tanThetaY * nearPlane;
-        Real iw = 1.0 / half_w;
-        Real ih = 1.0 / half_h;
-        Real q;
-        if (farPlane == 0)
-        {
-            q = 0;
-        }
-        else
-        {
-            q = 2.0 / (farPlane - nearPlane);
-        }
-        dest = Matrix4::ZERO;
-        dest[0][0] = iw;
-        dest[1][1] = ih;
-        dest[2][2] = -q;
-        dest[2][3] = -(farPlane + nearPlane) / (farPlane - nearPlane);
-        dest[3][3] = 1;
-    }
-
-    void GL3PlusRenderSystem::_applyObliqueDepthProjection(Matrix4& matrix,
-                                                           const Plane& plane,
-                                                           bool forGpuProgram)
-    {
-        // Thanks to Eric Lenyel for posting this calculation at www.terathon.com
-
-        // Calculate the clip-space corner point opposite the clipping plane
-        // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
-        // transform it into camera space by multiplying it
-        // by the inverse of the projection matrix
-
-        Vector4 q;
-        q.x = (Math::Sign(plane.normal.x) + matrix[0][2]) / matrix[0][0];
-        q.y = (Math::Sign(plane.normal.y) + matrix[1][2]) / matrix[1][1];
-        q.z = -1.0F;
-        q.w = (1.0F + matrix[2][2]) / matrix[2][3];
-
-        // Calculate the scaled plane vector
-        Vector4 clipPlane4d(plane.normal.x, plane.normal.y, plane.normal.z, plane.d);
-        Vector4 c = clipPlane4d * (2.0F / (clipPlane4d.dotProduct(q)));
-
-        // Replace the third row of the projection matrix
-        matrix[2][0] = c.x;
-        matrix[2][1] = c.y;
-        matrix[2][2] = c.z + 1.0F;
-        matrix[2][3] = c.w;
-    }
-
     HardwareOcclusionQuery* GL3PlusRenderSystem::createHardwareOcclusionQuery(void)
     {
         GL3PlusHardwareOcclusionQuery* ret = new GL3PlusHardwareOcclusionQuery();
@@ -1705,7 +1546,7 @@ namespace Ogre {
 
         maxAnisotropy = std::min<uint>(mLargestSupportedAnisotropy, maxAnisotropy);
         if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-            OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
 
         activateGLTextureUnit(0);
     }
@@ -1810,9 +1651,9 @@ namespace Ogre {
             // if (mPreComputeMemoryBarrier)
             OGRE_CHECK_GL_ERROR(glMemoryBarrier(GL_ALL_BARRIER_BITS));
             Vector3 workgroupDim = mCurrentComputeShader->getComputeGroupDimensions();
-            OGRE_CHECK_GL_ERROR(glDispatchCompute(workgroupDim[0],
-                                                  workgroupDim[1],
-                                                  workgroupDim[2]));
+            OGRE_CHECK_GL_ERROR(glDispatchCompute(int(workgroupDim[0]),
+                                                  int(workgroupDim[1]),
+                                                  int(workgroupDim[2])));
             // if (mPostComputeMemoryBarrier)
             //     OGRE_CHECK_GL_ERROR(glMemoryBarrier(toGL(MB_TEXTURE)));
             // if (compute_execution_cap > 0)
@@ -2245,17 +2086,13 @@ namespace Ogre {
 
      	if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
         {
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
         }
 
         if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map") || mHasGL32)
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-            // Some Apple NVIDIA hardware can't handle seamless cubemaps
-            if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
-#endif
-                // Enable seamless cube maps
-                OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+            // Enable seamless cube maps
+            OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
         }
 
         if (mGLSupport->checkExtension("GL_ARB_provoking_vertex") || mHasGL32)
@@ -2286,11 +2123,11 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-		// Initialise GL3W
-		if (gl3wInit()) { // gl3wInit() fails if GL3.0 is not supported
+        // Initialise GL3W
+        if (gl3wInitWithGetProc(get_proc)) { // gl3wInit() fails if GL3.0 is not supported
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-				"OpenGL 3.0 is not supported",
-				"GL3PlusRenderSystem::initialiseContext");
+                        "OpenGL 3.0 is not supported",
+                        "GL3PlusRenderSystem::initialiseContext");
         }
 
         // Setup GL3PlusSupport
@@ -2886,4 +2723,36 @@ namespace Ogre {
 		return result;
 	}
 #endif
+
+    void GL3PlusRenderSystem::_copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox &dst, RenderWindow::FrameBuffer buffer)
+    {
+        GLenum format = GL3PlusPixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = GL3PlusPixelUtil::getGLOriginDataType(dst.format);
+
+        if ((format == GL_NONE) || (type == 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format", "GL3PlusRenderSystem::_copyContentsToMemory");
+        }
+
+        // Switch context if different from current one
+        _setViewport(vp);
+
+        if(dst.getWidth() != dst.rowPitch)
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+        // Must change the packing to ensure no overruns!
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+        uint32_t height = vp->getTarget()->getHeight();
+
+        glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
+        glReadPixels((GLint)src.left, (GLint)(height - src.bottom),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
+
+        // restore default alignment
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+
+        PixelUtil::bulkPixelVerticalFlip(dst);
+    }
 }

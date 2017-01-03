@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -162,12 +162,12 @@ public:
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
     }
 
-	bool keyPressed (const OIS::KeyEvent &e)
+	bool keyPressed (const KeyboardEvent &e)
 	{
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-		switch (e.key)
+		switch (e.keysym.sym)
 		{
-		case OIS::KC_PGUP:
+		case SDLK_PAGEUP:
 			{
 				mAutoBox->setChecked(false);
 				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
@@ -179,7 +179,7 @@ public:
 				}
 			}
 			break;
-		case OIS::KC_PGDOWN:
+		case SDLK_PAGEDOWN:
 			{
 				mAutoBox->setChecked(false);
 				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
@@ -192,7 +192,7 @@ public:
 			}
 			break;
 		// generate new random offset, to make terrains different
-		case OIS::KC_C:
+		case 'c':
 			if(mPerlinNoiseTerrainGenerator)
 			{
 				// random a new origin point

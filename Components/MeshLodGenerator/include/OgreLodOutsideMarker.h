@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup MeshLodGenerator
+*  @{
+*/
 /// This class will mark vertices of a mesh, which are visible from far away (from outside).
 /// Triangle is visible if each vertex of it is visible.
 class _OgreLodExport LodOutsideMarker
@@ -118,6 +124,8 @@ private:
     bool isInsideLine(const Vector3& ptarget, const Vector3& p0, const Vector3& p1); /// Whether ptarget is between p0 and p1. Assuming they are on the same line.
     bool isSamePosition(const Vector3& p0, const Vector3& p1); /// Whether p0 = p1 with mEpsilon allowed float error.
 };
+/** @} */
+/** @} */
 }
 
 #endif /* ifndef __OutsideMarker_H__ */

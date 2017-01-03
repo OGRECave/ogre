@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,13 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+    /** \addtogroup Plugins Plugins
+    *  @{
+    */
+    /** \defgroup BSPSceneManager BSPSceneManager
+    * Binary Space Parition (BSP) based indoor level scene manager
+    *  @{
+    */
 
     /** Holds all the data associated with a Binary Space Parition
         (BSP) based indoor level.
@@ -56,6 +63,8 @@ namespace Ogre {
     class BspLevel : public Resource
     {
         friend class BspSceneManager;
+
+        using Resource::load;
     public:
         /** Default constructor - used by BspResourceManager (do not call directly) */
         BspLevel(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -219,6 +228,8 @@ namespace Ogre {
 
     };
     typedef SharedPtr<BspLevel> BspLevelPtr;
+    /** @} */
+    /** @} */
 }
 
 #endif

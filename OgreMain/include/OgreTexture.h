@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -127,13 +127,13 @@ namespace Ogre {
 
         /** Gets the number of mipmaps to be used for this texture.
         */
-        virtual uint8 getNumMipmaps(void) const {return mNumMipmaps;}
+        virtual uint32 getNumMipmaps(void) const {return mNumMipmaps;}
 
         /** Sets the number of mipmaps to be used for this texture.
             @note
                 Must be set before calling any 'load' method.
         */
-        virtual void setNumMipmaps(uint8 num) {mNumRequestedMipmaps = mNumMipmaps = num;}
+        virtual void setNumMipmaps(uint32 num) {mNumRequestedMipmaps = mNumMipmaps = num;}
 
         /** Are mipmaps hardware generated?
         @remarks
@@ -411,8 +411,8 @@ namespace Ogre {
         uint32 mWidth;
         uint32 mDepth;
 
-        uint8 mNumRequestedMipmaps;
-        uint8 mNumMipmaps;
+        uint32 mNumRequestedMipmaps;
+        uint32 mNumMipmaps;
         bool mMipmapsHardwareGenerated;
         float mGamma;
         bool mHwGamma;

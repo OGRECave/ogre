@@ -31,32 +31,38 @@ public:
         return SdkSample::frameRenderingQueued(evt);
     }
     
-    bool keyPressed(const OIS::KeyEvent& evt)
+    bool keyPressed(const KeyboardEvent& evt)
     {
         // relay input events to character controller
         if (!mTrayMgr->isDialogVisible()) mChara->injectKeyDown(evt);
         return SdkSample::keyPressed(evt);
     }
     
-    bool keyReleased(const OIS::KeyEvent& evt)
+    bool keyReleased(const KeyboardEvent& evt)
     {
         // relay input events to character controller
         if (!mTrayMgr->isDialogVisible()) mChara->injectKeyUp(evt);
         return SdkSample::keyReleased(evt);
     }
 
-    bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+    bool mouseMoved(const MouseMotionEvent& evt)
     {
-        // relay input events to character controller
-        if (!mTrayMgr->isDialogVisible()) mChara->injectPointerDown(evt, id);
-        return SdkSample::pointerPressed(evt, id);
+        // Relay input events to character controller.
+        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseMove(evt);
+        return SdkSample::mouseMoved(evt);
     }
 
-    bool pointerMoved(const OIS::PointerEvent& evt)
+    virtual bool mouseWheelRolled(const MouseWheelEvent& evt) {
+        // Relay input events to character controller.
+        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseWheel(evt);
+        return SdkSample::mouseWheelRolled(evt);
+    }
+
+    bool mousePressed(const MouseButtonEvent& evt)
     {
-        // relay input events to character controller
-        if (!mTrayMgr->isDialogVisible()) mChara->injectPointerMove(evt);
-        return SdkSample::pointerMoved(evt);
+        // Relay input events to character controller.
+        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseDown(evt);
+        return SdkSample::mousePressed(evt);
     }
 
 protected:

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,11 +41,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
-    /** \addtogroup Terrain
-    *  Some details on the terrain component
+    /** \defgroup Terrain Terrain
+    *
     *  @{
     */
 
@@ -624,7 +624,7 @@ namespace Ogre
 
         */
         static void _populateIndexBuffer(uint16* pIndexes, uint16 batchSize, 
-            uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+            uint16 vdatasize, uint16 vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols,
             uint16 skirtRowColSkip);
 
         /** Utility method to calculate the skirt index for a given original vertex index. */

@@ -60,16 +60,6 @@ namespace Ogre {
         GL3PlusScratchBufferAlloc* ptrAlloc = (GL3PlusScratchBufferAlloc*)mScratchBufferPool;
         ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GL3PlusScratchBufferAlloc);
         ptrAlloc->free = 1;
-
-        // Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
-        // disable for now until we figure out where the problem lies
-#       if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_AMD)
-        {
-            mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
-        }
-#       endif
-
     }
 
     GL3PlusHardwareBufferManagerBase::~GL3PlusHardwareBufferManagerBase()
@@ -151,22 +141,28 @@ namespace Ogre {
 
     GLenum GL3PlusHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
-        switch(usage)
+        // this is also used with Textures, so unset non HBU related flags
+        usage = usage & ~(TU_AUTOMIPMAP | TU_RENDERTARGET);
+
+        switch(HardwareBuffer::Usage(usage))
         {
         case HardwareBuffer::HBU_STATIC:
+        case HardwareBuffer::HBU_WRITE_ONLY:
         case HardwareBuffer::HBU_STATIC_WRITE_ONLY:
             return GL_STATIC_DRAW;
         case HardwareBuffer::HBU_DYNAMIC:
         case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
             return GL_DYNAMIC_DRAW;
+        case HardwareBuffer::HBU_DISCARDABLE:
         case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
             return GL_STREAM_DRAW;
-        default:
-            return GL_DYNAMIC_DRAW;
         };
+
+        OgreAssert(false, "unknown usage flags");
+        return GL_DYNAMIC_DRAW;
     }
 
-    GLenum GL3PlusHardwareBufferManagerBase::getGLType(unsigned int type)
+    GLenum GL3PlusHardwareBufferManagerBase::getGLType(VertexElementType type)
     {
         switch(type)
         {
@@ -205,9 +201,10 @@ namespace Ogre {
         case VET_COLOUR_ARGB:
         case VET_UBYTE4:
             return GL_UNSIGNED_BYTE;
-        default:
-            return 0;
         };
+
+        OgreAssert(false, "unknown Vertex Element Type");
+        return 0;
     }
 
     void* GL3PlusHardwareBufferManagerBase::allocateScratch(uint32 size)

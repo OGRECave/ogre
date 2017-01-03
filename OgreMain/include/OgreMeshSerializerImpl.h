@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -237,6 +237,7 @@ namespace Ogre {
         size_t calcMorphKeyframeSize(const VertexMorphKeyFrame* kf, size_t vertexCount);
         size_t calcPoseSize(const Pose* pose);
         size_t calcPoseVertexSize(void);
+        using MeshSerializerImpl::calcPoseVertexSize;
     };
 
     /** Class for providing backwards-compatibility for loading version 1.4 of the .mesh format. 

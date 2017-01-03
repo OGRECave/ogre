@@ -32,7 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusTextureBuffer.h"
-#include "OgreGL3PlusUtil.h"
+#include "OgreGLUtil.h"
 #include "OgreRoot.h"
 #include "OgreBitwise.h"
 #include "OgreTextureManager.h"
@@ -147,21 +147,16 @@ namespace Ogre {
         bool hasGL42 = mGLSupport.hasMinGLVersion(4, 2);
 
         // Set up texture swizzling.
-        if (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || hasGL33)
+        if (PixelUtil::isLuminance(mFormat) && (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || hasGL33))
         {
-            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
-            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN));
-            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE));
-            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA));
-
-            if (mFormat == PF_BYTE_LA)
+            if (PixelUtil::getComponentCount(mFormat) == 2)
             {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED));
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_GREEN));
             }
-            else if (mFormat == PF_L8 || mFormat == PF_L16)
+            else
             {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
@@ -183,7 +178,7 @@ namespace Ogre {
             // Compressed formats
             GLsizei size;
 
-            for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
+            for (uint32 mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
                 // std::stringstream str;
@@ -281,7 +276,7 @@ namespace Ogre {
             else
             {
                 // Run through this process to pregenerate mipmap pyramid
-                for(uint8 mip = 0; mip <= mNumMipmaps; mip++)
+                for(uint32 mip = 0; mip <= mNumMipmaps; mip++)
                 {
                     //                    std::stringstream str;
                     //                    str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
@@ -490,7 +485,7 @@ namespace Ogre {
 
         for (uint8 face = 0; face < getNumFaces(); face++)
         {
-            for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
+            for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GL3PlusHardwarePixelBuffer *buf = new GL3PlusTextureBuffer(mName,
                                                                            getGL3PlusTextureTarget(),

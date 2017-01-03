@@ -37,17 +37,16 @@ the more innovative ideas I've seen of late.
 using namespace Ogre;
 using namespace OgreBites;
 
-const uint8 cPriorityMain = 50;
-const uint8 cPriorityQuery = 51;
-const uint8 cPriorityLights = 55;
-const unsigned int cInitialLightCount = 3;
-const String DEBUG_MODE_CHECKBOX = "DebugMode";
-const String NUM_OF_LIGHTS_SLIDER = "NumOfLights";
-const String TWIRL_LIGHTS_CHECKBOX = "TwirlLights";
-
-
 class _OgreSampleClassExport Sample_ShaderSystemMultiLight : public SdkSample
 {
+    static const uint8 cPriorityMain = 50;
+    static const uint8 cPriorityQuery = 51;
+    static const uint8 cPriorityLights = 55;
+    static const uint32 cInitialLightCount = 3;
+
+    static const String DEBUG_MODE_CHECKBOX;
+    static const String NUM_OF_LIGHTS_SLIDER;
+    static const String TWIRL_LIGHTS_CHECKBOX;
 public:
 
     Sample_ShaderSystemMultiLight() :
@@ -116,19 +115,6 @@ public:
 
 protected:
 
-    void testCapabilities( const RenderSystemCapabilities* caps )
-    {
-        if (!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_3_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_1") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_5_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("glsl"))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample uses dynamic loops in Cg or GLSL type shader language, your graphic card must support Shader Profile 3 or above."
-                " You cannot run this sample. Sorry!", "Sample_ShaderSystemMultiLight::testCapabilities");
-        }
-    }
-
     void setupContent()
     {
         mTrayMgr->createThickSlider(TL_BOTTOM, NUM_OF_LIGHTS_SLIDER, "Num of lights", 240, 80, 0, 64, 65)->setValue(cInitialLightCount, false);
@@ -159,6 +145,11 @@ protected:
         setupLights();
     }
         
+    void cleanupContent()
+    {
+        MeshManager::getSingleton().remove("floor");
+    }
+
     void setupShaderGenerator()
     {
         new SegmentedDynamicLightManager;
@@ -333,42 +324,40 @@ protected:
         }
     }
 
-    //-----------------------------------------------------------------------
-    bool pointerPressed( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+    bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerDown(evt, id)) 
+        if (mTrayMgr->mousePressed(evt)) 
             return true;
-        if (id == OIS::MB_Left)     
-            mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
+        if (evt.button == BUTTON_LEFT)
+            // Hide the cursor if user left-clicks in the scene            .
+            mTrayMgr->hideCursor();  
     
         return true;
     }
 
-    //-----------------------------------------------------------------------
-    bool pointerReleased( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+
+    bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerUp(evt, id)) 
+        if (mTrayMgr->mouseReleased(evt)) 
             return true;
-        if (id == OIS::MB_Left) 
-            mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+        if (evt.button == BUTTON_LEFT)
+            // Unhide the cursor if user lets go of LMB.
+            mTrayMgr->showCursor();  
 
         return true;
     }
 
-    //-----------------------------------------------------------------------
-    bool pointerMoved( const OIS::PointerEvent& evt )
+
+    bool mouseMoved(const MouseMotionEvent& evt)
     {
         // only rotate the camera if cursor is hidden
         if (mTrayMgr->isCursorVisible()) 
-            mTrayMgr->injectPointerMove(evt);
+            mTrayMgr->mouseMoved(evt);
         else 
-            mCameraMan->injectPointerMove(evt);
-
+            mCameraMan->mouseMoved(evt);
 
         return true;
     }
-
-    
 
 private:
 

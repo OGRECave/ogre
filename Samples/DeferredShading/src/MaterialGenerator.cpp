@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -22,6 +22,7 @@ same license as the rest of the engine.
 
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
+#include "OgreMaterialManager.h"
 
 #include <iostream>
 
@@ -33,6 +34,15 @@ MaterialGenerator::MaterialGenerator():
 }
 MaterialGenerator::~MaterialGenerator()
 {
+    // we have generated fragment shaders and materials
+    // so delete them
+    for(ProgramMap::iterator it = mFs.begin(); it != mFs.end(); ++it) {
+        HighLevelGpuProgramManager::getSingleton().remove(it->second);
+    }
+    for(MaterialMap::iterator it = mMaterials.begin(); it != mMaterials.end(); ++it) {
+        MaterialManager::getSingleton().remove(it->second);
+    }
+
     delete mImpl;
 }
 

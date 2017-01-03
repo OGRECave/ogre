@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -143,7 +143,7 @@ namespace Ogre {
         @param createParams If any parameters are required to create an instance,
             they should be supplied here as name / value pairs
         */
-        virtual ResourcePtr createResource(const String& name, const String& group,
+        ResourcePtr createResource(const String& name, const String& group,
             bool isManual = false, ManualResourceLoader* loader = 0, 
             const NameValuePairList* createParams = 0);
 
@@ -161,7 +161,7 @@ namespace Ogre {
         @return A pair, the first element being the pointer, and the second being 
             an indicator specifying whether the resource was newly created.
         */
-        virtual ResourceCreateOrRetrieveResult createOrRetrieve(const String& name, 
+        ResourceCreateOrRetrieveResult createOrRetrieve(const String& name,
             const String& group, bool isManual = false, 
             ManualResourceLoader* loader = 0, 
             const NameValuePairList* createParams = 0);
@@ -299,7 +299,7 @@ namespace Ogre {
             destruction of resources, try making sure you release all your
             shared pointers before you shutdown OGRE.
         */
-        virtual void remove(ResourcePtr& r);
+        virtual void remove(const ResourcePtr& r);
 
         /** Remove a single resource by name.
         @remarks
@@ -418,7 +418,7 @@ namespace Ogre {
         @param backgroundThread Optional boolean which lets the load routine know if it
             is being run on the background resource loading thread
         */
-        virtual ResourcePtr prepare(const String& name, 
+        ResourcePtr prepare(const String& name,
             const String& group, bool isManual = false, 
             ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0,
             bool backgroundThread = false);
@@ -438,7 +438,7 @@ namespace Ogre {
         @param backgroundThread Optional boolean which lets the load routine know if it
             is being run on the background resource loading thread
         */
-        virtual ResourcePtr load(const String& name, 
+        ResourcePtr load(const String& name,
             const String& group, bool isManual = false, 
             ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0,
             bool backgroundThread = false);
@@ -555,7 +555,7 @@ namespace Ogre {
         /** Add a newly created resource to the manager (note weak reference) */
         virtual void addImpl( ResourcePtr& res );
         /** Remove a resource from this manager; remove it from the lists. */
-        virtual void removeImpl( ResourcePtr& res );
+        virtual void removeImpl(const ResourcePtr& res );
         /** Checks memory usage and pages out if required. This is automatically done after a new resource is loaded.
         */
         virtual void checkUsage(void);

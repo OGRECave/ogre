@@ -35,10 +35,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include <iostream> // for Apple
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
-#include "ShaderGeneratorTechniqueResolverListener.h"
-#endif
-
 // These need to be included prior to everything else to prevent name clashes.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
 
@@ -99,11 +95,6 @@ class TestContext : public OgreBites::SampleContext
     /** Called after tests successfully complete, generates output */
     virtual void finishedTests();
 
-    void createDummyScene();
-    void destroyDummyScene();
-    bool initialiseRTShaderSystem(SceneManager* sceneMgr);
-    void finaliseRTShaderSystem();
-
     /** Sets the timstep value
      *        @param timestep The time to simulate elapsed between each frame
      *        @remarks Use with care! Screenshots produced at different timesteps
@@ -115,26 +106,13 @@ class TestContext : public OgreBites::SampleContext
 
     VisualTest* getCurrentTest() { return mCurrentTest; }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    virtual bool touchCancelled(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
+    /// Returns whether the entire test was successful or not.
+    bool wasSuccessful() const {
+        return mSuccess;
     }
-    virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-    virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-    virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-#endif
 
  protected:
+    bool mSuccess;
 
     /// The timestep
     Real mTimestep;
@@ -156,10 +134,6 @@ class TestContext : public OgreBites::SampleContext
 
     /// The active test (0 if none is active)
     VisualTest* mCurrentTest;
-#ifdef INCLUDE_RTSHADER_SYSTEM
-    RTShader::ShaderGenerator* mShaderGenerator; // The Shader generator instance.
-    OgreBites::ShaderGeneratorTechniqueResolverListener* mMaterialMgrListener; // Shader generator material manager listener.
-#endif // INCLUDE_RTSHADER_SYSTEM
 
     /// The current frame of a running test
     unsigned int mCurrentFrame;

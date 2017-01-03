@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2016 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,9 @@
  THE SOFTWARE.
  -----------------------------------------------------------------------------
  */
+#include <time.h>
 #include "OgrePlatform.h"
+#include <iostream>
 
 // Sadly we needed to add this #if to solve a NACL compiler bug...
 #if (OGRE_PLATFORM == OGRE_PLATFORM_NACL) 
@@ -45,22 +47,12 @@
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "SampleBrowser_Android.h"
 
-SampleBrowser* OgreAndroidBridge::mBrowser = NULL;
-AndroidInputInjector* OgreAndroidBridge::mInputInjector = NULL;
-AndroidMultiTouch* OgreAndroidBridge::mTouch = NULL;
-AndroidKeyboard* OgreAndroidBridge::mKeyboard = NULL;
-Ogre::RenderWindow* OgreAndroidBridge::mRenderWnd = NULL;
-Ogre::Root* OgreAndroidBridge::mRoot = NULL;
-bool OgreAndroidBridge::mInit = false;
-
-#   ifdef OGRE_STATIC_LIB
-StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
-#   endif
+SampleBrowser OgreAndroidBridge::mBrowser;
+ndk_helper::PinchDetector OgreAndroidBridge::mPinchGesture;
 
 #endif
 
 #include "SampleBrowser.h"
-#include <iostream>
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 

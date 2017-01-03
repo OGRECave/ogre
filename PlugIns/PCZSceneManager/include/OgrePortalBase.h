@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -188,18 +188,18 @@ namespace Ogre
         /** Check if portal touches another portal */
         bool closeTo(const PortalBase* otherPortal);
 
-        /** @copydoc MovableObject::getBoundingBox. */
+        /** @copydoc MovableObject::getBoundingBox */
         const AxisAlignedBox& getBoundingBox() const;
 
-        /** @copydoc MovableObject::getBoundingRadius. */
+        /** @copydoc MovableObject::getBoundingRadius */
         Real getBoundingRadius() const
         { return getRadius(); }
 
-        /** @copydoc MovableObject::_updateRenderQueue. */
+        /** @copydoc MovableObject::_updateRenderQueue */
         void _updateRenderQueue(RenderQueue* queue)
         { /* Draw debug info if needed? */ }
 
-        /** @copydoc MovableObject::visitRenderables. */
+        /** @copydoc MovableObject::visitRenderables */
         void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false)
         { }
 

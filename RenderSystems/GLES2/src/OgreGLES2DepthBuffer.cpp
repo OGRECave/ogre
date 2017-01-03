@@ -112,7 +112,7 @@ namespace Ogre
             //If you don't want depth buffer, use a Null Depth Buffer, not a dummy one.
             if( mDepthBuffer || mStencilBuffer )
             {
-                GLenum internalFormat = fbo->getFormat();
+                PixelFormat internalFormat = fbo->getFormat();
                 GLenum depthFormat, stencilFormat;
                 mRenderSystem->_getDepthStencilFormatFor( internalFormat, &depthFormat, &stencilFormat );
 

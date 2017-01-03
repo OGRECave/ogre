@@ -62,12 +62,12 @@ protected:
         css->appendAttribute("rel","stylesheet");
 
         // Hosted as an attachment on the wiki
-        css->appendAttribute("href","http://www.ogre3d.org/tikiwiki/tiki-download_wiki_attachment.php?attId=142");
+        css->appendAttribute("href","https://ogrecave.github.io/ogre/vtests/vtests.css");
         css->appendAttribute("type","text/css");
         
         // link a little javascript
         HtmlElement* js = head->appendElement("script");
-        js->appendAttribute("src","http://www.ogre3d.org/tikiwiki/tiki-download_wiki_attachment.php?attId=143");
+        js->appendAttribute("src","https://ogrecave.github.io/ogre/vtests/vtests.js");
         js->appendText("");// so it doesn't self close
         
         // </head>

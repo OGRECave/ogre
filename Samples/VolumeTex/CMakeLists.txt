@@ -9,13 +9,14 @@
 
 # Configure VolumeTex demo build
 
-set(HEADER_FILES 
+set(HEADER_FILES
   include/VolumeRenderable.h
   include/Julia.h
   include/ThingRenderable.h
+  include/VolumeTex.h
 )
 
-set(SOURCE_FILES 
+set(SOURCE_FILES
   src/VolumeTex.cpp
   src/ThingRenderable.cpp
   src/VolumeRenderable.cpp
@@ -24,10 +25,10 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 ogre_add_library_to_folder(Samples Sample_VolumeTex ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_VolumeTex ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_VolumeTex ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_VolumeTex)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND NOT APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(Sample_VolumeTex
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -428,6 +428,9 @@ namespace Ogre
             Gets a reference to one of the planes which make up the frustum frustum, e.g. for clipping purposes.
         */
         virtual const Plane& getFrustumPlane( unsigned short plane ) const;
+
+        /// @copydoc MovableObject::isVisible
+        using Ogre::MovableObject::isVisible;
 
         /** Tests whether the given container is visible in the Frustum.
         @param bound

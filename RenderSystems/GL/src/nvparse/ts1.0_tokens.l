@@ -13,7 +13,7 @@ alphanum [0-9a-zA-Z_]
 #endif
 #include "nvparse_errors.h"
 #include "nvparse_externs.h"
-
+#define YY_NO_UNPUT
 
 #define YY_INPUT(buf,result,max_size) \
 { \

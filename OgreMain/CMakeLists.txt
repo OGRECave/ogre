@@ -17,12 +17,19 @@ include(PrecompiledHeader)
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h")
-list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
+list(APPEND HEADER_FILES
+    ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
+    ${CMAKE_BINARY_DIR}/include/OgreExports.h
     src/OgreImageResampler.h
     src/OgrePixelConversions.h
     src/OgreSIMDHelper.h)
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/Hash/*.cpp")
+
+# silence deprecation warning for internal call
+if(UNIX)
+  set_source_files_properties(src/OgreResource.cpp PROPERTIES COMPILE_FLAGS "-Wno-deprecated-declarations")
+endif()
 
 # Remove optional header files
 list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
@@ -36,6 +43,7 @@ list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImage
 # Remove optional source files
 list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreDDSCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePVRTCCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreETCCodec.cpp"
@@ -66,6 +74,7 @@ if (OGRE_BUILD_PLATFORM_NACL)
   file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/NaCl/*.h")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/NaCl/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
 
   set(PLATFORM_LIBS nosys)
@@ -77,6 +86,7 @@ elseif (EMSCRIPTEN)
 
   file(GLOB PLATFORM_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten/*.h)
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Emscripten/*.cpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
 
   set(PLATFORM_HEADER_INSTALL "Emscripten")
@@ -99,7 +109,6 @@ elseif (WIN32)
   else ()
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
-      include/WIN32/OgreConfigDialogImp.h
       include/WIN32/OgreErrorDialogImp.h
       include/WIN32/OgreTimerImp.h
       include/WIN32/OgreMinGWSupport.h
@@ -141,7 +150,7 @@ elseif (WIN32)
   endif ()
 
 elseif (APPLE)
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (APPLE_IOS)
     include_directories("include/iOS")
     file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS/*.h")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.cpp"
@@ -255,8 +264,6 @@ endif ()
 list(APPEND HEADER_FILES ${THREAD_HEADER_FILES})
 
 # Add needed definitions and nedmalloc include dir
-add_definitions(-DOGRE_NONCLIENT_BUILD)
-
 if(NOT OGRE_CONFIG_ALLOCATOR EQUAL 1)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
 endif()
@@ -277,6 +284,15 @@ endif()
 if (OGRE_CONFIG_ENABLE_STBI)
   list(APPEND HEADER_FILES include/OgreSTBICodec.h)
   list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
+  
+  if(UNIX)
+    set_source_files_properties(src/OgreSTBICodec.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function")
+  endif()
+  
+  if(CMAKE_COMPILER_IS_GNUCXX)
+      # workaround gcc5 bug on Ubuntu 16.04 regarding __builtin_cpu_supports
+      list(APPEND LIBRARIES gcc)
+  endif()
 endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
@@ -325,6 +341,13 @@ else ()
 	# exclude OgreAlignedAllocator.cpp from unity builds; causes problems on Linux
 	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")
 endif ()
+
+generate_export_header(OgreMain 
+    EXPORT_MACRO_NAME _OgreExport
+    NO_EXPORT_MACRO_NAME _OgrePrivate
+    DEPRECATED_MACRO_NAME OGRE_DEPRECATED
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreExports.h)
+
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
 if(WIN32 AND MSVC10 AND CMAKE_CL_64)
   set_target_properties(OgreMain PROPERTIES 
@@ -344,7 +367,7 @@ if(OGRE_GCC_VERSION VERSION_EQUAL 4.8 OR OGRE_GCC_VERSION VERSION_GREATER 4.8)
 endif()
 
 if (APPLE)
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (APPLE_IOS)
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
   else ()
     set_target_properties(OgreMain PROPERTIES

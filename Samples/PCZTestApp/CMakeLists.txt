@@ -12,7 +12,7 @@
 set(HEADER_FILES include/PCZTestApp.h include/RoomObject.h)
 set(SOURCE_FILES src/PCZTestApp.cpp src/RoomObject.cpp)
 
-if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE_IOS)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/PCZTestApp.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
@@ -23,7 +23,7 @@ include_directories(
 )
 add_executable(Demo_PCZTestApp WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
-target_link_libraries(Demo_PCZTestApp ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_PCZSceneManager_LIBRARIES} ${OGRE_Plugin_OctreeZone_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Demo_PCZTestApp ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_PCZSceneManager_LIBRARIES} ${OGRE_Plugin_OctreeZone_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_exe(Demo_PCZTestApp)
 # need to include plugins directory in RPATH for the demo to be able to find the PCZ libs
 set_property(TARGET Demo_PCZTestApp APPEND PROPERTY

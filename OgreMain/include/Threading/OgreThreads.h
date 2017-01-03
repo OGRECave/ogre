@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ THE SOFTWARE.
         return retVal;\
     }
 #else
-    /// @See Threads::CreateThread for an example on how to use
+    /// @see Threads::CreateThread for an example on how to use
     #define THREAD_DECLARE( threadFunction ) \
     void* OGRE_THREAD_CALL_CONVENTION threadFunction##_internal( void *argName )\
     {\
@@ -168,7 +168,7 @@ namespace Ogre
                                              size_t threadIdx, void *param );
 
         /** Waits until all threads are finished
-        @param numThreadInfos
+        @param numThreadHandles
             Number of ThreadHandle passed in the array as 'threadHandles'
         @param threadHandles
             Array of numThreadHandles or more ThreadHandle

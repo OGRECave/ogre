@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __Platform_H_
 
 #include "OgreConfig.h"
+#include "OgreExports.h"
 
 namespace Ogre {
 /* Initial platform/compiler-related stuff to set.
@@ -54,12 +55,6 @@ namespace Ogre {
 
 #define OGRE_ARCHITECTURE_32 1
 #define OGRE_ARCHITECTURE_64 2
-
-#define OGRE_CPP_VER_UNDEFINED 0L
-#define OGRE_CPP_VER_98 199711L
-#define OGRE_CPP_VER_11 201103L
-#define OGRE_CPP_VER_14 201402L
-
 
 /* Finds the compiler type and version.
 */
@@ -96,27 +91,6 @@ namespace Ogre {
 #endif
 
 #define OGRE_COMPILER_MIN_VERSION(COMPILER, VERSION) (OGRE_COMPILER == (COMPILER) && OGRE_COMP_VER >= (VERSION))
-
-/* Finds the c++ version.*/
-#ifdef  __cplusplus
-    #if __cplusplus >= OGRE_CPP_VER_14 
-        #define OGRE_CPP_VER OGRE_CPP_VER_14
-    #elif __cplusplus >= OGRE_CPP_VER_11
-        #define OGRE_CPP_VER OGRE_CPP_VER_11
-    #elif __cplusplus >= OGRE_CPP_VER_98
-        #define OGRE_CPP_VER OGRE_CPP_VER_98
-    #else
-        #define OGRE_CPP_VER OGRE_CPP_VER_UNDEFINED
-    #endif
-#endif
-
-
-/* define OGRE_OVERRIDE macro */
-#if OGRE_CPP_VER >= OGRE_CPP_VER_11 || OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1600)
-    #define OGRE_OVERRIDE override
-#else
-    #define OGRE_OVERRIDE 
-#endif
 
 /* See if we can use __forceinline or if we need to use __inline instead */
 #if OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1200)
@@ -205,51 +179,16 @@ namespace Ogre {
 #define OGRE_QUOTE(x) OGRE_QUOTE_INPLACE(x)
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
 
-/* define OGRE_DEPRECATED macro */
-#if OGRE_CPP_VER >= OGRE_CPP_VER_14
-#   define OGRE_DEPRECATED [[deprecated]]
-#elif OGRE_COMPILER == OGRE_COMPILER_MSVC
-#   define OGRE_DEPRECATED __declspec(deprecated)
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
-#   define OGRE_DEPRECATED __attribute__ ((deprecated))
-#else
-#   pragma message("WARNING: You need to implement OGRE_DEPRECATED for this compiler")
-#   define OGRE_DEPRECATED
-#endif
-
-/* define OGRE_DEPRECATED_EX(msg) macro */
-#if OGRE_CPP_VER >= OGRE_CPP_VER_14
-    #define OGRE_DEPRECATED_EX(message) [[deprecated(message)]]
-#elif OGRE_COMPILER == OGRE_COMPILER_MSVC
-    #define OGRE_DEPRECATED_EX(message) __declspec(deprecated(message))
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
-#   define OGRE_DEPRECATED_EX(message) __attribute__ ((deprecated))
-#else
-#   define OGRE_DEPRECATED_EX(message)
-#endif
-
 //----------------------------------------------------------------------------
 // Windows Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
-// If we're not including this from a client build, specify that the stuff
-// should get exported. Otherwise, import it.
-#   if defined( OGRE_STATIC_LIB )
-        // Linux compilers don't have symbol import/export directives.
-#       define _OgreExport
-#       define _OgrePrivate
-#   else
-#       if defined( OGRE_NONCLIENT_BUILD )
-#           define _OgreExport __declspec( dllexport )
-#       else
-#           if defined( __MINGW32__ )
-#               define _OgreExport
-#           else
-#               define _OgreExport __declspec( dllimport )
-#           endif
-#       endif
-#       define _OgrePrivate
-#   endif
+// on windows we override OgreBuildSettings.h for convenience
+// see https://bitbucket.org/sinbad/ogre/pull-requests/728
+#ifdef OGRE_DEBUG_MODE
+#undef OGRE_DEBUG_MODE
+#endif
+
 // Win32 compilers use _DEBUG for specifying debug builds.
 // for MinGW, we set DEBUG
 #   if defined(_DEBUG) || defined(DEBUG)
@@ -288,23 +227,8 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
     OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 
-// Enable GCC symbol visibility
-#   if defined( OGRE_GCC_VISIBILITY )
-#       define _OgreExport  __attribute__ ((visibility("default")))
-#       define _OgrePrivate __attribute__ ((visibility("hidden")))
-#   else
-#       define _OgreExport
-#       define _OgrePrivate
-#   endif
-
 // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
-
-#   ifdef DEBUG
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
 
 // Always enable unicode support for the moment
 // Perhaps disable in old versions of gcc if necessary
@@ -315,17 +239,6 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Android Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#   ifdef OGRE_UNICODE_SUPPORT
-#       undef OGRE_UNICODE_SUPPORT
-#   endif
-#   define OGRE_UNICODE_SUPPORT 1
-    // A quick define to overcome different names for the same function
-#   define stricmp strcasecmp
-#   ifdef DEBUG
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
 #   ifndef CLOCKS_PER_SEC
 #       define CLOCKS_PER_SEC  1000
 #   endif

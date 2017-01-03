@@ -14,10 +14,12 @@
 # OGRE_DEPENDENCIES_DIR can be used to specify a single base
 # folder where the required dependencies may be found.
 set(OGRE_DEPENDENCIES_DIR "" CACHE PATH "Path to prebuilt OGRE dependencies")
+option(OGRE_BUILD_DEPENDENCIES "automaitcally build Ogre Dependencies (freetype, zzip)" TRUE)
+
 include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
 if(OGRE_BUILD_PLATFORM_EMSCRIPTEN)
-  set(OGRE_DEP_SEARCH_PATH 
+  set(OGRE_DEP_SEARCH_PATH
     ${OGRE_DEPENDENCIES_DIR}
     ${EMSCRIPTEN_ROOT_PATH}/system
     ${ENV_OGRE_DEPENDENCIES_DIR}
@@ -27,7 +29,7 @@ if(OGRE_BUILD_PLATFORM_EMSCRIPTEN)
     "${OGRE_SOURCE_DIR}/../EmscriptenDependencies"
   )
   set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${OGRE_DEP_SEARCH_PATH})
-elseif(OGRE_BUILD_PLATFORM_APPLE_IOS)
+elseif(APPLE_IOS)
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}
     ${ENV_OGRE_DEPENDENCIES_DIR}
@@ -57,6 +59,23 @@ else()
 endif()
 
 message(STATUS "Search path: ${OGRE_DEP_SEARCH_PATH}")
+list(GET OGRE_DEP_SEARCH_PATH 0 OGREDEPS_PATH)
+
+if(CMAKE_CROSSCOMPILING)
+    set(CROSS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+    
+    if(ANDROID)
+        set(CROSS ${CROSS}
+            -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL}
+            -DANDROID_ABI=${ANDROID_ABI}
+            -DANDROID_NDK=${ANDROID_NDK})
+    endif()
+    
+    if(APPLE_IOS)
+        set(CROSS ${CROSS}
+            -DIOS_PLATFORM=${IOS_PLATFORM})
+    endif()
+endif()
 
 # Set hardcoded path guesses for various platforms
 if (UNIX AND NOT EMSCRIPTEN)
@@ -68,6 +87,69 @@ endif ()
 # give guesses as hints to the find_package calls
 set(CMAKE_PREFIX_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
 set(CMAKE_FRAMEWORK_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_FRAMEWORK_PATH})
+
+if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
+    set(OGREDEPS_SHARED TRUE)
+    if(OGRE_STATIC OR MSVC)
+        # freetype does not like shared build on MSVC and it generally eases distribution there
+        set(OGREDEPS_SHARED FALSE)
+    endif()
+
+    if(MSVC OR EMSCRIPTEN) # other platforms ship zlib
+        message(STATUS "Building zlib")
+        file(DOWNLOAD
+            http://zlib.net/zlib-1.2.8.tar.gz
+            ./zlib-1.2.8.tar.gz)
+        execute_process(COMMAND cmake -E tar xf zlib-1.2.8.tar.gz)
+        execute_process(COMMAND cmake
+            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+            -G ${CMAKE_GENERATOR}
+            ${CROSS}
+            .
+            WORKING_DIRECTORY zlib-1.2.8)
+        execute_process(COMMAND cmake --build zlib-1.2.8 --target install)
+    endif()
+
+    message(STATUS "Building ZZIPlib")
+    file(DOWNLOAD
+        https://github.com/paroj/ZZIPlib/archive/master.tar.gz
+        ./ZZIPlib-master.tar.gz)
+    execute_process(COMMAND cmake -E tar xf ZZIPlib-master.tar.gz)
+    execute_process(COMMAND cmake
+        -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DZLIB_ROOT=${OGREDEPS_PATH}
+        -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+        -G ${CMAKE_GENERATOR}
+        ${CROSS}
+        .
+        WORKING_DIRECTORY ZZIPlib-master)
+    execute_process(COMMAND cmake --build ZZIPlib-master --target install)
+    
+    message(STATUS "Building freetype")
+    file(DOWNLOAD
+        http://download.savannah.gnu.org/releases/freetype/freetype-2.6.5.tar.gz
+        ./freetype-2.6.5.tar.gz)
+    execute_process(COMMAND cmake -E tar xf freetype-2.6.5.tar.gz)
+    # patch toolchain for iOS
+    execute_process(COMMAND cmake -E copy
+        ${CMAKE_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
+        freetype-2.6.5/builds/cmake/iOS.cmake)
+    execute_process(COMMAND cmake
+        -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+        -DWITH_BZip2=OFF # tries to use it on iOS otherwise
+        # workaround for broken iOS toolchain in freetype
+        -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.6.5
+        ${CROSS}
+        -G ${CMAKE_GENERATOR}
+        ..
+        WORKING_DIRECTORY freetype-2.6.5/objs)
+    execute_process(COMMAND cmake --build freetype-2.6.5/objs --target install)
+endif()
 
 #######################################################################
 # Core dependencies
@@ -95,7 +177,6 @@ macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.f
 if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
   find_package(X11)
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org" TRUE "" "")
-  macro_log_feature(X11_Xt_FOUND "Xt" "X Toolkit" "http://www.x.org" TRUE "" "")
   find_library(XAW_LIBRARY NAMES Xaw Xaw7 PATHS ${OGRE_DEP_SEARCH_PATH} ${DEP_LIB_SEARCH_DIR} ${X11_LIB_SEARCH_PATH})
   macro_log_feature(XAW_LIBRARY "Xaw" "X11 Athena widget set" "http://www.x.org" TRUE "" "")
   mark_as_advanced(XAW_LIBRARY)
@@ -151,7 +232,7 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
+if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
 endif ()
@@ -164,7 +245,7 @@ else ()
 	# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
 	set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
 endif ()
-if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND APPLE_IOS)
     set(Boost_USE_MULTITHREADED OFF)
 endif()
 
@@ -198,26 +279,22 @@ if(Boost_FOUND AND Boost_VERSION GREATER 104900)
     find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 endif()
 
-if(Boost_VERSION GREATER 105200)
-	# Use boost threading version 4 for boost 1.53 and above
-	add_definitions( -DBOOST_THREAD_VERSION=4 )
-endif()
-
 if(Boost_FOUND AND NOT WIN32)
   list(REMOVE_DUPLICATES Boost_LIBRARIES)
 endif()
 
 # Optional Boost libs (Boost_${COMPONENT}_FOUND
 macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" FALSE "" "")
-macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
-macro_log_feature(Boost_DATE_TIME_FOUND "boost-date_time" "Used for threading support" "http://boost.org" FALSE "" "")
-if(Boost_VERSION GREATER 104900)
-    macro_log_feature(Boost_SYSTEM_FOUND "boost-system" "Used for threading support" "http://boost.org" FALSE "" "")
-    macro_log_feature(Boost_CHRONO_FOUND "boost-chrono" "Used for threading support" "http://boost.org" FALSE "" "")
-	if(Boost_VERSION GREATER 105300)
-		macro_log_feature(Boost_ATOMIC_FOUND "boost-atomic" "Used for threading support" "http://boost.org" FALSE "" "")
-	endif()
+if(NOT Boost_DATE_TIME_FOUND)
+    set(Boost_THREAD_FOUND FALSE)
 endif()
+if(Boost_VERSION GREATER 104900 AND (NOT Boost_SYSTEM_FOUND OR NOT Boost_CHRONO_FOUND))
+    set(Boost_THREAD_FOUND FALSE)
+endif()
+if(Boost_VERSION GREATER 105300 AND NOT Boost_ATOMIC_FOUND)
+    set(Boost_THREAD_FOUND FALSE)
+endif()
+macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
 
 # POCO
 find_package(POCO)
@@ -235,27 +312,25 @@ macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http:/
 find_package(HLSL2GLSL)
 macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/" FALSE "" "")
 
+# OpenEXR
+find_package(OpenEXR)
+macro_log_feature(OPENEXR_FOUND "OpenEXR" "Load High dynamic range images" "http://www.openexr.com/" FALSE "" "")
+
 # Python
-if (EMSCRIPTEN)
-  find_package(PythonInterp)
-  macro_log_feature(PYTHONINTERP_FOUND "Python" "Used to generate indices for dynamic file loading" "http://www.python.org/" FALSE "" "")
-endif()
+find_package(PythonLibs)
+find_package(PythonInterp)
+macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from Python" "http://www.python.org/" FALSE "" "")
 
 #######################################################################
 # Samples dependencies
 #######################################################################
 
-# Find OIS
-if (WINDOWS_STORE OR WINDOWS_PHONE)
-	# for WinRT we need only includes
-	set(OIS_FIND_QUIETLY TRUE)
-        find_package(OIS)
-	set(OIS_INCLUDE_DIRS ${OIS_INCLUDE_DIR})
-	macro_log_feature(OIS_INCLUDE_DIRS "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
-else ()
-	find_package(OIS)
-	macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
-endif ()
+# Find sdl2
+if(NOT ANDROID)
+# find script does not work in cross compilation environment
+find_package(SDL2)
+macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for input handling in samples" "https://www.libsdl.org/" FALSE "" "")
+endif()
 
 #######################################################################
 # Tools
@@ -267,9 +342,6 @@ macro_log_feature(DOXYGEN_FOUND "Doxygen" "Tool for building API documentation" 
 # Find Softimage SDK
 find_package(Softimage)
 macro_log_feature(Softimage_FOUND "Softimage" "Softimage SDK needed for building XSIExporter" FALSE "6.0" "")
-
-find_package(TinyXML)
-macro_log_feature(TINYXML_FOUND "TinyXML" "TinyXML needed for building OgreXMLConverter" FALSE "" "")
 
 #######################################################################
 # Tests
@@ -303,7 +375,6 @@ include_directories(
   ${OPENGLES_INCLUDE_DIRS}
   ${OPENGLES2_INCLUDE_DIRS}
   ${OPENGLES3_INCLUDE_DIRS}
-  ${OIS_INCLUDE_DIRS}
   ${Cg_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
   ${DirectX_INCLUDE_DIRS}

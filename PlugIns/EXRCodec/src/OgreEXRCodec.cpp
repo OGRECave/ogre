@@ -52,8 +52,7 @@ namespace Ogre {
 void writeEXRHalf(OStream *ost, const float *pixels,
           int width, int height, int components) 
 {
-    //assert(components==3 || components==4);
-    // TODO: throw std::exception if invalid number of components
+    OgreAssert(components==3 || components==4, "invalid number of components");
 
     Header header (width, height);
     header.channels().insert ("R", Channel (HALF));
@@ -96,7 +95,7 @@ void writeEXRHalf(OStream *ost, const float *pixels,
 
     file.setFrameBuffer(frameBuffer);
     file.writePixels(height);
-    delete data;
+    delete[] data;
 }
 
 
@@ -109,9 +108,10 @@ EXRCodec::~EXRCodec()
     LogManager::getSingleton().logMessage("EXRCodec deinitialised");
 }
 
-DataStreamPtr EXRCodec::code(MemoryDataStreamPtr& input, CodecDataPtr& pData) const
+DataStreamPtr EXRCodec::encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const
 {
-
+    OgreAssert(false, "not implemented");
+    return DataStreamPtr();
 }
 
 Codec::DecodeResult EXRCodec::decode(DataStreamPtr& input) const
@@ -189,9 +189,9 @@ Codec::DecodeResult EXRCodec::decode(DataStreamPtr& input) const
     return ret;
 }
 
-void EXRCodec::codeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const
+void EXRCodec::encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const
 {
-
+    OgreAssert(false, "not implemented");
 }
 
 

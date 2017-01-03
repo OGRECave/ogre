@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -360,7 +360,7 @@ namespace Ogre {
                     }
 
 
-                    const int maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
+                    const uint maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
                     if (maxExtensionFunctionSupport >= CPUID_FUNC_ADVANCED_POWER_MANAGEMENT)
                     {
                         _performCpuid(CPUID_FUNC_ADVANCED_POWER_MANAGEMENT, result);
@@ -393,7 +393,7 @@ namespace Ogre {
                         features |= PlatformInformation::CPU_FEATURE_SSE3;
 
                     // Has extended feature ?
-                    const int maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
+                    const uint maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
                     if (maxExtensionFunctionSupport >= CPUID_FUNC_EXTENDED_FEATURES)
                     {
                         // Check extended feature
@@ -537,6 +537,9 @@ namespace Ogre {
         AndroidCpuFamily cpuInfo = android_getCpuFamily();
         
         switch (cpuInfo) {
+            case ANDROID_CPU_FAMILY_ARM64:
+                cpuID = "ARM64";
+                break;
             case ANDROID_CPU_FAMILY_ARM:
             {
                 if (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_ARMv7) 

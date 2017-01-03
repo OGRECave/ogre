@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -95,7 +95,7 @@ namespace Ogre {
 
         // Check material & technique supplied (the former since the default implementation
         // of getTechnique is based on it for backwards compatibility
-        if(pRend->getMaterial().isNull() || !(pTech = pRend->getTechnique()))
+        if(pRend->getMaterial().isNull() || !pRend->getTechnique())
         {
             // Use default base white, with lighting only if vertices has normals
             RenderOperation op;
@@ -105,6 +105,8 @@ namespace Ogre {
             baseWhite->load();
             pTech = baseWhite->getBestTechnique();
         }
+        else
+            pTech = pRend->getTechnique();
 
         if (mRenderableListener)
         {

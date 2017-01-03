@@ -1,14 +1,13 @@
 # Configure Samples build
 
-if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT ((WINDOWS_STORE OR WINDOWS_PHONE) AND OIS_INCLUDE_DIRS))
-  message(STATUS "Could not find dependency: OIS")
-  message(STATUS "Skipping samples build")
-  set(OGRE_BUILD_SAMPLES 0)
+if(SDL2_FOUND)
+  include_directories(${SDL2_INCLUDE_DIR})
 endif()
 
 if (OGRE_BUILD_SAMPLES)
-  include_directories(${OIS_INCLUDE_DIRS})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
+
+  ogre_add_component_include_dir(Bites)
 
   # Make sure all plugins are built
   if (OGRE_BUILD_PLUGIN_OCTREE)
@@ -76,7 +75,7 @@ if (OGRE_BUILD_SAMPLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES2)
   endif ()
   if (APPLE)
-    if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+    if (APPLE_IOS)
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES})
     endif ()
   endif ()
@@ -93,19 +92,12 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
+  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
     if (OGRE_BUILD_RENDERSYSTEM_GL)
-      	include_directories(
-	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/include
-		    ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
-    		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
-	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
-		    )
+      	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL/include)
 	endif()
     if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-      	include_directories(
-	    	${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
-	        ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include/GLSL
-    		)
+      	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include)
     endif()
 
 	# Link to all enabled plugins
@@ -124,12 +116,16 @@ if (OGRE_BUILD_SAMPLES)
 	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)	
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreRTShaderSystem)
 	endif () 
-	if (OGRE_BUILD_COMPONENT_OVERLAY)	
-  		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
-	endif () 
+    
+	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay OgreBites)
   endif ()
   
-  add_subdirectory(AtomicCounters)
+  if(EMSCRIPTEN)
+    add_subdirectory(Emscripten)
+    return()
+  endif()
+  
+  #add_subdirectory(AtomicCounters)
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)
   add_subdirectory(Character)
@@ -166,9 +162,9 @@ if (OGRE_BUILD_COMPONENT_TERRAIN)
   add_subdirectory(EndlessWorld)
 endif ()
   add_subdirectory(Tessellation)
-  add_subdirectory(Hair)
-  add_subdirectory(Island)
-  add_subdirectory(TerrainTessellation)
+  #add_subdirectory(Hair)
+  #add_subdirectory(Island)
+  #add_subdirectory(TerrainTessellation)
   add_subdirectory(TextureFX)
   add_subdirectory(TextureArray)
   add_subdirectory(Transparency)

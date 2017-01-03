@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ namespace Ogre
         3 additional TEXCOORDS (12 bytes) repeated as much as the instance count.
         That will be used for each instance data.
         @par
-        The main advantage of this technique is that it's <u>VERY</u> fast; but it doesn't support
+        The main advantage of this technique is that it's <em>VERY</em> fast; but it doesn't support
         skeletal animation at all. Very reduced memory consumption and bandwidth. Great for particles,
         debris, bricks, trees, sprites.
         This batch is one of the few (if not the only) techniques that allows culling on an individual

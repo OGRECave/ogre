@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -196,6 +196,7 @@ namespace Ogre {
             @param offset The byte offset from the start of the buffer to lock
             @param length The size of the area to lock, in bytes
             @param options Locking options
+            @param uploadOpt
             @return Pointer to the locked memory
             */
             virtual void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT)

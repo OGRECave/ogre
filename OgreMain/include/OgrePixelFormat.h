@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -449,7 +449,7 @@ namespace Ogre {
                 The size in bytes
             @remarks
                 In case that the format is non-compressed, this simply returns
-                width*height*depth*PixelUtil::getNumElemBytes(format). In the compressed
+                width * height * depth * PixelUtil::getNumElemBytes(format). In the compressed
                 case, this does serious magic.
         */
         static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format);

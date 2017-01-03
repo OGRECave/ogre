@@ -5,7 +5,7 @@
  * (Object-oriented Graphics Rendering Engine)
  * For the latest info, see http://www.ogre3d.org/
  *
- * Copyright (c) 2000-2016 Torus Knot Software Ltd
+ * Copyright (c) 2000-2014 Torus Knot Software Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -57,16 +57,16 @@ protected:
 
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
-    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID, RenderOperation::OperationType renderOp);
+    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, size_t submeshID, RenderOperation::OperationType renderOp);
     void addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup);
     template<typename IndexType>
     void addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd,
-                          VertexLookupList& lookup, unsigned short submeshID, RenderOperation::OperationType renderOp)
+                          VertexLookupList& lookup, size_t submeshID, RenderOperation::OperationType renderOp)
     {
         if(iEnd - iPos < 3 
-        || renderOp != RenderOperation::OT_TRIANGLE_LIST
+        || (renderOp != RenderOperation::OT_TRIANGLE_LIST
         && renderOp != RenderOperation::OT_TRIANGLE_STRIP
-        && renderOp != RenderOperation::OT_TRIANGLE_FAN)
+        && renderOp != RenderOperation::OT_TRIANGLE_FAN))
             return;
 
         IndexType i0 = iPos[0], i1 = iPos[1], i2 = iPos[2];
@@ -101,6 +101,9 @@ protected:
                 case RenderOperation::OT_TRIANGLE_FAN:
                     i1 = i2;
                     i2 = iPos[0];
+                    break;
+                default:
+                    OgreAssert(false, "Invalid RenderOperation");
                     break;
                 }
             }

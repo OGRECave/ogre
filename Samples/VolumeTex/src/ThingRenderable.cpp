@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -53,10 +53,10 @@ void ThingRenderable::initialise()
 {
     // Fill array with randomly oriented quads
     Vector3 ax, ay, az;
-    size_t x;
+
     Quaternion q;
     things.clear(); orbits.clear();
-    for(x=0; x<mCount; x++)
+    for(size_t x=0; x<mCount; x++)
     {
         ax = Vector3(randFloat(), randFloat(), randFloat());
         ay = Vector3(randFloat(), randFloat(), randFloat());
@@ -86,7 +86,7 @@ void ThingRenderable::initialise()
 
     // Quads
     unsigned short *faces = new unsigned short[mCount*6];
-    for(x=0; x<mCount; x++) 
+    for(uint16 x=0; x<uint16(mCount); x++)
     {
         faces[x*6+0] = x*4+0;
         faces[x*6+1] = x*4+1;
