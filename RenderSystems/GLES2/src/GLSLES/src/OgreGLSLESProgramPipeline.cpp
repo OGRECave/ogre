@@ -36,8 +36,9 @@
 #include "OgreGLES2UniformCache.h"
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 #include "OgreRoot.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre
 {
@@ -67,6 +68,14 @@ namespace Ogre
             {
                 mLinked |= VERTEX_PROGRAM_LINKED;
             }
+            else if(getMicrocodeFromCache(
+                    mVertexProgram->getName(),
+                    mVertexProgram->getGLSLProgram()->createGLProgramHandle()))
+            {
+                mVertexProgram->setLinked(true);
+                mLinked |= VERTEX_PROGRAM_LINKED;
+                mTriedToLinkAndFailed = false;
+            }
             else
             {
                 try
@@ -93,7 +102,7 @@ namespace Ogre
                 
                 mTriedToLinkAndFailed = !linkStatus;
                 
-                logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
+                GLSLES::logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
 
                 setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
             }
@@ -105,6 +114,14 @@ namespace Ogre
             if(mFragmentProgram->isLinked())
             {
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
+            }
+            else if(getMicrocodeFromCache(
+                    mFragmentProgram->getName(),
+                    mFragmentProgram->getGLSLProgram()->createGLProgramHandle()))
+            {
+                mFragmentProgram->setLinked(true);
+                mLinked |= FRAGMENT_PROGRAM_LINKED;
+                mTriedToLinkAndFailed = false;
             }
             else
             {
@@ -124,16 +141,16 @@ namespace Ogre
                 mFragmentProgram->getGLSLProgram()->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-                
+
                 if(linkStatus)
                 {
                     mFragmentProgram->setLinked(linkStatus);
                     mLinked |= FRAGMENT_PROGRAM_LINKED;
                 }
-                
+
                 mTriedToLinkAndFailed = !linkStatus;
-                
-                logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
+
+                GLSLES::logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
             }
         }
         
@@ -142,22 +159,22 @@ namespace Ogre
             if(mVertexProgram && mVertexProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT_EXT, mVertexProgram->getGLSLProgram()->getGLProgramHandle()));
+                _writeToCache(mVertexProgram->getName(), mVertexProgram->getGLSLProgram()->getGLProgramHandle());
             }
             if(mFragmentProgram && mFragmentProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_FRAGMENT_SHADER_BIT_EXT, mFragmentProgram->getGLSLProgram()->getGLProgramHandle()));
+                _writeToCache(mFragmentProgram->getName(), mFragmentProgram->getGLSLProgram()->getGLProgramHandle());
             }
 
             // Validate pipeline
-            logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+            GLSLES::logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
             if(mVertexProgram && mFragmentProgram && getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
             {
                 OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
                     glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
                                  (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
             }
-#endif
         }
 #endif
     }

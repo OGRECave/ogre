@@ -103,14 +103,14 @@ namespace Ogre
         /** Sets a float parameter value per texture target.
          @param target The texture target.
          @param pname The parameter name.
-         @param params The parameter value.
+         @param param The parameter value.
          */
         void setTexParameterf(GLenum target, GLenum pname, GLfloat param);
 
         /** Sets a float parameter value per texture target.
          @param target The texture target.
          @param pname The parameter name.
-         @param params The parameter value.
+         @param param The parameter value.
          */
         void getTexParameterfv(GLenum target, GLenum pname, GLfloat *param);
 

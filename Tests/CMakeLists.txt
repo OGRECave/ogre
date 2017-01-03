@@ -12,6 +12,13 @@ if (OGRE_BUILD_TESTS)
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
+  ogre_add_component_include_dir(Bites)
+  set(TEST_DEPENDENCIES OgreBites)
+
+  if(SDL2_FOUND)
+    include_directories(${SDL2_INCLUDE_DIR})
+  endif()
+
   # Make sure all plugins are built
   if (OGRE_BUILD_PLUGIN_OCTREE)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_OctreeSceneManager)
@@ -40,7 +47,7 @@ if (OGRE_BUILD_TESTS)
   if (OGRE_BUILD_RENDERSYSTEM_GL)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GL)
   endif ()
-  if (OGRE_BUILD_RENDERSYSTEM_GLPLUS)
+  if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GL3Plus)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GLES)
@@ -61,16 +68,10 @@ if (OGRE_BUILD_TESTS)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
-    include_directories(
-      ${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include
-      ${OGRE_SOURCE_DIR}/RenderSystems/GLES2/src/GLSLES/include
-      )
-    include_directories(
-      ${OGRE_SOURCE_DIR}/RenderSystems/GL/include
-      ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
-      ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
-      ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
-      )
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include)
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL/include)
     # Link to all enabled plugins
     set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${TEST_DEPENDENCIES})
 
@@ -139,10 +140,10 @@ if (OGRE_BUILD_TESTS)
     endif ()
 
     add_executable(Test_Ogre WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
-    ogre_config_sample_exe(Test_Ogre)
+    ogre_install_target(Test_Ogre "" FALSE)
     target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} ${CppUnit_LIBRARIES})
 
-    if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+    if(APPLE AND NOT APPLE_IOS)
       set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
       set(OGRE_TEST_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
       set_target_properties(Test_Ogre PROPERTIES
@@ -275,13 +276,11 @@ if (OGRE_BUILD_TESTS)
 	  
 	else() # not APPLE
 		# Copy necessary unit test data
-				
 		if (OGRE_CONFIG_ENABLE_ZIP)
 			file(COPY ${OGRE_SOURCE_DIR}/Tests/OgreMain/misc DESTINATION ${OGRE_BINARY_DIR}/Tests/OgreMain/)
 		endif ()
 		
 		file(COPY ${OGRE_SOURCE_DIR}/Tests/Media/CustomCapabilities DESTINATION ${OGRE_BINARY_DIR}/Tests/Media)
-	  
     endif()
   else (CppUnit_FOUND)
     # Necessary for tests to link when CppUnit is unavailable.
@@ -295,12 +294,5 @@ if (OGRE_BUILD_TESTS)
     endif ()
   endif (CppUnit_FOUND)
 
-  # Configure interactive test build
-  if (OIS_FOUND)
-
-    # add VisualTests directory
-    add_subdirectory(VisualTests)
-
-  endif (OIS_FOUND)
-
+  add_subdirectory(VisualTests)
 endif (OGRE_BUILD_TESTS)

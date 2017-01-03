@@ -138,7 +138,6 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
  	matViewT[1][2] = -matViewT[1][2];
   	matViewT[2][2] = -matViewT[2][2];
  	vReflect = (mat3(matViewT) * vReflect);
-	vReflect.z = -vReflect.z; // Hack for gl 
 
 	vOut = vReflect;
 }
@@ -172,7 +171,6 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
  	vReflect = (mat3(matViewT) * vReflect);
 
  	vReflect = (mTexture * vec4(vReflect, 1.0)).xyz;
-	vReflect.z = -vReflect.z; // Hack for gl 
 
 	vOut = vReflect;
 }
@@ -332,4 +330,3 @@ void FFP_AddSmooth(in vec4 vIn0, in vec4 vIn1, out vec4 vOut)
 {
 	vOut = vIn0 + vIn1 - (vIn0 * vIn1);
 }
-

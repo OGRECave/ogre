@@ -4,7 +4,7 @@
  * (Object-oriented Graphics Rendering Engine)
  * For the latest info, see http://www.ogre3d.org/
  *
- * Copyright (c) 2000-2016 Torus Knot Software Ltd
+ * Copyright (c) 2000-2014 Torus Knot Software Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -104,8 +104,8 @@ void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
     lodConfig.mesh->freeEdgeList();
     lodConfig.mesh->setLodStrategy(lodConfig.strategy);
     MeshLodUsage usage;
-    size_t n = 0;
-    lodConfig.mesh->_setLodInfo(lodConfig.levels.size() + 1); // add Lod levels
+    ushort n = 0;
+    lodConfig.mesh->_setLodInfo(ushort(lodConfig.levels.size()) + 1); // add Lod levels
     for(size_t i = 0; i < lodConfig.levels.size(); i++) {
         // Record usages. First Lod usage is the mesh itself.
 

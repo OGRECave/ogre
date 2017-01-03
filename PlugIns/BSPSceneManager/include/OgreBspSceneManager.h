@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,12 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup BSPSceneManager
+    *  @{
+    */
 
     /** Specialisation of the SceneManager class to deal with indoor scenes
         based on a BSP tree.
@@ -275,6 +280,8 @@ namespace Ogre {
         SceneManager* createInstance(const String& instanceName);
         void destroyInstance(SceneManager* instance);
     };
+    /** @} */
+    /** @} */
 }
 
 #endif

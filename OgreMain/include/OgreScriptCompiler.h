@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -249,9 +249,9 @@ namespace Ogre
          * names. This means that excluded types will always have empty names.
          * All values in the object header are stored as object values.
          */
-        void addNameExclusion(const String &type);
+        //void addNameExclusion(const String &type);
         /// Removes a name exclusion
-        void removeNameExclusion(const String &type);
+        //void removeNameExclusion(const String &type);
         /// Internal method for firing the handleEvent method
         bool _fireEvent(ScriptCompilerEvent *evt, void *retval);
 

@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 
-#include "OgreGLES2RenderSystem.h"
+#include "OgreRenderSystem.h"
 #include "OgreEAGLES2Context.h"
 
 #include "OgreEAGL2Support.h"
@@ -39,10 +39,16 @@ THE SOFTWARE.
 #import <UIKit/UIScreen.h>
 
 namespace Ogre {
-
-    EAGL2Support::EAGL2Support()
+    float EAGLCurrentOSVersion;
+    
+    GLNativeSupport* getGLSupport(int = 0)
     {
-        mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
+        return new EAGL2Support();
+    }
+
+    EAGL2Support::EAGL2Support() : GLNativeSupport(CONTEXT_ES)
+    {
+        EAGLCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
     }
 
     EAGL2Support::~EAGL2Support()
@@ -121,14 +127,15 @@ namespace Ogre {
         mOptions[optOrientation.name] = optOrientation;
 #endif
         
+        // FIXME: these are probably unused
         // Set the shader cache path
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *cachesDirectory = [paths objectAtIndex:0];
+        //NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        //NSString *cachesDirectory = [paths objectAtIndex:0];
 
-        setShaderCachePath([[cachesDirectory stringByAppendingString:@"/"] cStringUsingEncoding:NSASCIIStringEncoding]);
+        //setShaderCachePath([[cachesDirectory stringByAppendingString:@"/"] cStringUsingEncoding:NSASCIIStringEncoding]);
         
         // Set the shader library path
-        setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Media/RTShaderLib");
+        //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Media/RTShaderLib");
     }
 
     String EAGL2Support::validateConfig(void)
@@ -226,7 +233,7 @@ namespace Ogre {
     }
     
     RenderWindow * EAGL2Support::createWindow(bool autoCreateWindow,
-                                           GLES2RenderSystem* renderSystem,
+                                           RenderSystem* renderSystem,
                                            const String& windowTitle)
     {
         RenderWindow *window = 0;
@@ -308,9 +315,9 @@ namespace Ogre {
         return context;
     }
 
-    void * EAGL2Support::getProcAddress(const Ogre::String& name)
+    void * EAGL2Support::getProcAddress(const char* name)
     {
-        return NULL;
+        return gleswGetProcAddress(name);
     }
     
     void EAGL2Support::start()

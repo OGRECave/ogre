@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,14 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 
 namespace Ogre {
+    class Quake3ShaderManager;
 
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup BSPSceneManager
+    *  @{
+    */
     /** Manages the locating and loading of BSP-based indoor levels.
     Like other ResourceManager specialisations it manages the location and loading
     of a specific type of resource, in this case files containing Binary
@@ -105,7 +112,8 @@ namespace Ogre {
         Quake3ShaderManager *mShaderMgr;
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

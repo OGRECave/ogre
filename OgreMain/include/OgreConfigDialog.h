@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,14 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgrePlatform.h"
 
-// Bring in the specific platform's header file: first allow forced override
-#if defined(OGRE_GUI_WIN32) || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_gtk
-# include "gtk/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreConfigDialogImp.h"
-#else
 namespace Ogre
 {
     /** \addtogroup Core
@@ -62,7 +54,11 @@ namespace Ogre
     class _OgreExport ConfigDialog : public UtilityAlloc
     {
     public:
+        /**
+         * @deprecated this class will become a pure interface in the future. Use OgreBites::getNativeConfigDialog instead.
+         */
         ConfigDialog();
+        virtual ~ConfigDialog();
 
         /** Displays the dialog.
         @remarks
@@ -79,17 +75,15 @@ namespace Ogre
         @see
             RenderSystem
         */
-        bool display();
+        virtual bool display();
 
     protected:
         // platform specific implementation
-        // TODO: use this on remaining platforms instead of duplicating whole header
         struct PrivateData;
         PrivateData* mImpl;
     };
     /** @} */
     /** @} */
 }
-#endif
 
 #endif

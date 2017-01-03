@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __GLSLProgram_H__
 
 #include "OgreGLPrerequisites.h"
-#include "OgreHighLevelGpuProgram.h"
+#include "OgreGLSLProgramCommon.h"
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
@@ -55,24 +55,9 @@ namespace Ogre {
         separated by white space.
         
     */
-    class _OgreGLExport GLSLProgram : public HighLevelGpuProgram
+    class _OgreGLExport GLSLProgram : public GLSLProgramCommon
     {
     public:
-        /// Command object for attaching another GLSL Program 
-        class CmdAttach : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& shaderNames);
-        };
-        /// Command object for setting matrix packing in column-major order
-        class CmdColumnMajorMatrices : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
         GLSLProgram(ResourceManager* creator, 
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
@@ -81,98 +66,13 @@ namespace Ogre {
         GLhandleARB getGLHandle() const { return mGLHandle; }
         void attachToProgramObject( const GLhandleARB programObject );
         void detachFromProgramObject( const GLhandleARB programObject );
-        String getAttachedShaderNames() const { return mAttachedShaderNames; }
-
-        /// Overridden
-        bool getPassTransformStates(void) const;
-        bool getPassSurfaceAndLightStates(void) const;
-
-        /** Attach another GLSL Shader to this one. */
-        void attachChildShader(const String& name);
-
-        /** Sets the preprocessor defines use to compile the program. */
-        void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
-        /** Sets the preprocessor defines use to compile the program. */
-        const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
 
-        /** Sets whether matrix packing in column-major order. */ 
-        void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }
-        /** Gets whether matrix packed in column-major order. */
-        bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
-
-        /** Returns the operation type that this geometry program expects to
-            receive as input
-        */
-        virtual RenderOperation::OperationType getInputOperationType(void) const 
-        { return mInputOperationType; }
-        /** Returns the operation type that this geometry program will emit
-        */
-        virtual RenderOperation::OperationType getOutputOperationType(void) const 
-        { return mOutputOperationType; }
-        /** Returns the maximum number of vertices that this geometry program can
-            output in a single run
-        */
-        virtual int getMaxOutputVertices(void) const { return mMaxOutputVertices; }
-
-        /** Sets the operation type that this geometry program expects to receive
-        */
-        virtual void setInputOperationType(RenderOperation::OperationType operationType) 
-        { mInputOperationType = operationType; }
-        /** Set the operation type that this geometry program will emit
-        */
-        virtual void setOutputOperationType(RenderOperation::OperationType operationType) 
-        { mOutputOperationType = operationType; }
-        /** Set the maximum number of vertices that a single run of this geometry program
-            can emit.
-        */
-        virtual void setMaxOutputVertices(int maxOutputVertices) 
-        { mMaxOutputVertices = maxOutputVertices; }
-
         /// compile source into shader object
-        bool compile( const bool checkErrors = true);
-
-        /// Command object for setting macro defines
-        class CmdPreprocessorDefines : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting the input operation type (geometry shader only)
-        class _OgreGLExport CmdInputOperationType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting the output operation type (geometry shader only)
-        class _OgreGLExport CmdOutputOperationType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting the maximum output vertices (geometry shader only)
-        class _OgreGLExport CmdMaxOutputVertices : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
+        bool compile( bool checkErrors = true);
     protected:
-        static CmdPreprocessorDefines msCmdPreprocessorDefines;
-        static CmdAttach msCmdAttach;
-        static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
-        static CmdInputOperationType msInputOperationTypeCmd;
-        static CmdOutputOperationType msOutputOperationTypeCmd;
-        static CmdMaxOutputVertices msMaxOutputVerticesCmd;
-
-        /** Internal load implementation, must be implemented by subclasses.
-        */
-        void loadFromSource(void);
         /** Internal method for creating a dummy low-level program for this
         high-level program. GLSL does not give access to the low level implementation of the
         shader so this method creates an object sub-classed from GLGpuProgram just to be
@@ -181,8 +81,6 @@ namespace Ogre {
         void createLowLevelImpl(void);
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
-        /// Overridden from HighLevelGpuProgram
-        void unloadImpl(void);
 
         /// Populate the passed parameters with name->index map
         void populateParameterNames(GpuProgramParametersSharedPtr params);
@@ -192,25 +90,6 @@ namespace Ogre {
     private:
         /// GL handle for shader object
         GLhandleARB mGLHandle;
-        /// Flag indicating if shader object successfully compiled
-        GLint mCompiled;
-        /// The input operation type for this (geometry) program
-        RenderOperation::OperationType mInputOperationType;
-        /// The output operation type for this (geometry) program
-        RenderOperation::OperationType mOutputOperationType;
-        /// The maximum amount of vertices that this (geometry) program can output
-        int mMaxOutputVertices;
-        /// Attached Shader names
-        String mAttachedShaderNames;
-        /// Preprocessor options
-        String mPreprocessorDefines;
-        /// Container of attached programs
-        typedef vector< GLSLProgram* >::type GLSLProgramContainer;
-        typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
-        GLSLProgramContainer mAttachedGLSLPrograms;
-        /// Matrix in column major pack format?
-        bool mColumnMajorMatrices;
-
     };
     }
 }

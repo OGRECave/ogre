@@ -37,6 +37,14 @@ THE SOFTWARE.
 
 
 //-----------------------------------------------------------------------------
+void FFP_Transform(in mat3 m, 
+             in vec3 v, 
+             out vec3 vOut)
+{
+    vOut = m * v;
+}
+
+//-----------------------------------------------------------------------------
 void FFP_Transform(in mat4 m, 
 			 in vec4 v, 
 			 out vec4 vOut)
@@ -59,7 +67,6 @@ void FFP_Transform(in mat3x4 m,
 {
 	vOut = mat3(m) * v;
 }
-
 
 //-----------------------------------------------------------------------------
 void FFP_Transform(in mat4 m, 

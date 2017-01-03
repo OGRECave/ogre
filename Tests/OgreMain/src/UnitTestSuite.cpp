@@ -36,7 +36,9 @@ THE SOFTWARE.
 
 #include "UnitTestSuite.h"
 
-template<> UnitTestSuite* Ogre::Singleton<UnitTestSuite>::msSingleton = 0;
+namespace Ogre {
+template<> UnitTestSuite* Singleton<UnitTestSuite>::msSingleton = NULL;
+}
 
 //--------------------------------------------------------------------------
 void UnitTestSuite::setUpSuite()

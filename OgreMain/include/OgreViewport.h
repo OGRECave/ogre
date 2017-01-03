@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -393,7 +393,7 @@ namespace Ogre {
 			the render target does not support stereo (ie. left
 			and right), then only back and front will be used.
 		@param
-			buffer Specifies the particular buffer that will be
+			colourBuffer Specifies the particular buffer that will be
 			targeted by the render target.
 		*/
 		void setDrawBuffer(ColourBufferType colourBuffer);

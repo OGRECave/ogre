@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2016 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -32,22 +32,18 @@
 #include "OgreOverlaySystem.h"
 #include "OgreResourceManager.h"
 
-#include "InputContext.h"
 #include "OgreFileSystemLayer.h"
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
 #   include "OgreRTShaderSystem.h"
 #endif //INCLUDE_RTSHADER_SYSTEM
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   include "macUtils.h"
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL && !defined(INCLUDE_RTSHADER_SYSTEM)
 #   define INCLUDE_RTSHADER_SYSTEM
 #include "OgreShaderGenerator.h"
 #endif
 
+#include "OgreInput.h"
 
 namespace OgreBites
 {
@@ -138,13 +134,13 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Sets up a sample. Used by the SampleContext class. Do not call directly.
         -----------------------------------------------------------------------------*/
-        virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
+        virtual void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
         {
             // assign mRoot here in case Root was initialised after the Sample's constructor ran.
             mRoot = Ogre::Root::getSingletonPtr();
             mOverlaySystem = overlaySys;
             mWindow = window;
-            mInputContext = inputContext;
+
             mFSLayer = fsLayer;
 
             locateResources();
@@ -219,12 +215,15 @@ namespace OgreBites
         virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }
         virtual void windowClosed(Ogre::RenderWindow* rw) {}
         virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
-        virtual bool keyPressed(const OIS::KeyEvent& evt) { return true; }
-        virtual bool keyReleased(const OIS::KeyEvent& evt) { return true; }
-        virtual bool pointerMoved(const OIS::PointerEvent& evt) { return true; }
-        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id) { return true; }
-        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id) { return true; }
-
+        virtual bool keyPressed(const KeyboardEvent& evt) { return true; }
+        virtual bool keyReleased(const KeyboardEvent& evt) { return true; }
+        virtual bool touchMoved(const TouchFingerEvent& evt) { return true; }
+        virtual bool touchPressed(const TouchFingerEvent& evt) { return true; }
+        virtual bool touchReleased(const TouchFingerEvent& evt) { return true; }
+        virtual bool mouseMoved(const MouseMotionEvent& evt) { return true; }
+        virtual bool mouseWheelRolled(const MouseWheelEvent& evt) { return true; }
+        virtual bool mousePressed(const MouseButtonEvent& evt) { return true; }
+        virtual bool mouseReleased(const MouseButtonEvent& evt) { return true; }
     protected:
 
         /*-----------------------------------------------------------------------------
@@ -286,7 +285,6 @@ namespace OgreBites
         Ogre::Root* mRoot;                // OGRE root object
         Ogre::OverlaySystem* mOverlaySystem; // OverlaySystem
         Ogre::RenderWindow* mWindow;      // context render window
-        InputContext mInputContext;
         Ogre::FileSystemLayer* mFSLayer;          // file system abstraction layer
         Ogre::SceneManager* mSceneMgr;    // scene manager for this sample
         Ogre::NameValuePairList mInfo;    // custom sample info

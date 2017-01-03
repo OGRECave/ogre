@@ -20,7 +20,6 @@ else()
 endif()
 
 set(INST_FILES
-  Packages/FindOIS.cmake
   Packages/FindOGRE.cmake
   Utils/FindPkgMacros.cmake
   Utils/MacroLogFeature.cmake
@@ -48,7 +47,6 @@ set(STATIC_INST_FILES
   Packages/FindFreetype.cmake
   Packages/FindOpenGLES.cmake
   Packages/FindOpenGLES2.cmake
-  Packages/FindZLIB.cmake
   Packages/FindZZip.cmake
   Packages/FindSoftimage.cmake
   Packages/FindGLSLOptimizer.cmake

@@ -34,39 +34,56 @@ THE SOFTWARE.
 #include "OgreConfigOptionMap.h"
 #include "OgreRenderSystemCapabilities.h"
 
+#include "OgreGLNativeSupport.h"
+
 namespace Ogre
 {
-    class GL3PlusRenderSystem;
-
     class _OgreGL3PlusExport GL3PlusSupport
     {
         public:
-            GL3PlusSupport() { }
-            virtual ~GL3PlusSupport() { }
+            GL3PlusSupport(GLNativeSupport* native) : mNative(native) { }
+            virtual ~GL3PlusSupport() {
+                delete mNative;
+            }
 
             /**
             * Add any special config values to the system.
             * Must have a "Full Screen" value that is a bool and a "Video Mode" value
             * that is a string in the form of wxh
             */
-            virtual void addConfig() = 0;
-            virtual void setConfigOption(const String &name, const String &value);
+            void addConfig() {
+                mNative->addConfig();
+            }
+
+            void setConfigOption(const String &name, const String &value) {
+                mNative->setConfigOption(name, value);
+            }
 
            /**
             * Make sure all the extra options are valid
             * @return string with error message
             */
-            virtual String validateConfig() = 0;
-            virtual ConfigOptionMap& getConfigOptions(void);
-            virtual RenderWindow* createWindow(bool autoCreateWindow,
-                                               GL3PlusRenderSystem *renderSystem,
-                                               const String& windowTitle) = 0;
+            String validateConfig() {
+                return mNative->validateConfig();
+            }
+
+            ConfigOptionMap& getConfigOptions(void) {
+                return mNative->getConfigOptions();
+            }
+
+            RenderWindow* createWindow(bool autoCreateWindow,
+                                               RenderSystem *renderSystem,
+                                               const String& windowTitle) {
+                return mNative->createWindow(autoCreateWindow, renderSystem, windowTitle);
+            }
 
             /// @copydoc RenderSystem::_createRenderWindow
-            virtual RenderWindow* newWindow(const String &name,
+            RenderWindow* newWindow(const String &name,
                                             unsigned int width, unsigned int height,
                                             bool fullScreen,
-                                            const NameValuePairList *miscParams = 0) = 0;
+                                            const NameValuePairList *miscParams = 0) {
+                return mNative->newWindow(name, width, height, fullScreen, miscParams);
+            }
 
             /**
             * Get vendor information
@@ -124,32 +141,38 @@ namespace Ogre
             /**
             * Get the address of a function
             */
-            virtual void *getProcAddress(const String& procname) = 0;
+            void *getProcAddress(const char* procname) {
+                return mNative->getProcAddress(procname);
+            }
 
             /** Initialises GL extensions, must be done AFTER the GL context has been
                established.
             */
-            virtual void initialiseExtensions();
+            void initialiseExtensions();
 
             /**
             * Check if an extension is available
             */
-            virtual bool checkExtension(const String& ext) const;
+            bool checkExtension(const String& ext) const;
 
             /// @copydoc RenderSystem::getDisplayMonitorCount
             virtual unsigned int getDisplayMonitorCount() const
             {
-                return 1;
+                return mNative->getDisplayMonitorCount();
             }
 
             /**
             * Start anything special
             */
-            virtual void start() = 0;
+            virtual void start() {
+                mNative->start();
+            }
             /**
             * Stop anything special
             */
-            virtual void stop() = 0;
+            virtual void stop() {
+                mNative->stop();
+            }
 
         private:
             DriverVersion mVersion;
@@ -158,9 +181,7 @@ namespace Ogre
             String mShaderCachePath;
             String mShaderLibraryPath;
 
-        protected:
-            // Stored options
-            ConfigOptionMap mOptions;
+            GLNativeSupport* mNative;
 
             // This contains the complete list of supported extensions
             set<String>::type extensionList;

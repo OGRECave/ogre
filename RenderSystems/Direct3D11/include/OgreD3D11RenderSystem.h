@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,8 +37,15 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	// Enable recognizing SM2.0 HLSL shaders.
-	// (the same shader code could be used by many RenderSystems, directly or via Cg)
+    /** \addtogroup RenderSystems RenderSystems
+    *  @{
+    */
+    /** \defgroup Direct3D11 Direct3D11
+    * Implementation of DirectX11 as a rendering system.
+    *  @{
+    */
+	/// Enable recognizing SM2.0 HLSL shaders.
+	/// (the same shader code could be used by many RenderSystems, directly or via Cg)
 	#define SUPPORT_SM2_0_HLSL_SHADERS  0
 
     class D3D11DriverList;
@@ -234,10 +241,8 @@ namespace Ogre
         /// @copydoc RenderSystem::_swapAllRenderTargetBuffers
         virtual void _swapAllRenderTargetBuffers();
 
-        /// @copydoc RenderSystem::fireDeviceEvent
         void fireDeviceEvent( D3D11Device* device, const String & name, D3D11RenderWindowBase* sendingWindow = NULL);
 
-        /// @copydoc RenderSystem::createRenderTexture
         RenderTexture * createRenderTexture( const String & name, unsigned int width, unsigned int height,
             TextureType texType = TEX_TYPE_2D, PixelFormat internalFormat = PF_X8R8G8B8, 
             const NameValuePairList *miscParams = 0 ); 
@@ -261,9 +266,7 @@ namespace Ogre
         virtual RenderTarget * detachRenderTarget(const String &name);
 
         const String& getName(void) const;
-		
-		const String& getFriendlyName(void) const;
-		
+
         void getCustomAttribute(const String& name, void* pData);
         // Low-level overridden members
         void setConfigOption( const String &name, const String &value );
@@ -352,21 +355,13 @@ namespace Ogre
         void setVertexBufferBinding(VertexBufferBinding* binding);
         void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName,unsigned int StartSlot);
         void _render(const RenderOperation& op);
-        /** See
-          RenderSystem
-         */
+
         void bindGpuProgram(GpuProgram* prg);
-        /** See
-          RenderSystem
-         */
+
         void unbindGpuProgram(GpuProgramType gptype);
-        /** See
-          RenderSystem
-         */
+
         void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
-        /** See
-          RenderSystem
-         */
+
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
         void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
@@ -408,10 +403,8 @@ namespace Ogre
         
         D3D_FEATURE_LEVEL _getFeatureLevel() const { return mFeatureLevel; }
 
-        /// @copydoc RenderSystem::setSubroutine
         void setSubroutine(GpuProgramType gptype, unsigned int slotIndex, const String& subroutineName);
         
-        /// @copydoc RenderSystem::setSubroutineName
         void setSubroutine(GpuProgramType gptype, const String& slotName, const String& subroutineName);
 
         /// @copydoc RenderSystem::beginProfileEvent
@@ -426,5 +419,7 @@ namespace Ogre
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
     };
+    /** @} */
+    /** @} */
 }
 #endif

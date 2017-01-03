@@ -25,27 +25,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreGLES2Prerequisites.h"
 #include "OgreGpuProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 #include "OgreStringConverter.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Support.h"
 
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESProgramPipelineManager.h"
-#include "OgreGLSLESPreprocessor.h"
+#include "OgreGLSLPreprocessor.h"
 
 namespace Ogre {
 
-    String operationTypeToString(RenderOperation::OperationType val);
-    RenderOperation::OperationType parseOperationType(const String& val);
-
     //-----------------------------------------------------------------------
-    GLSLESProgram::CmdPreprocessorDefines GLSLESProgram::msCmdPreprocessorDefines;
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
     GLSLESProgram::CmdOptimisation GLSLESProgram::msCmdOptimisation;
 #endif
@@ -54,10 +52,9 @@ namespace Ogre {
     GLSLESProgram::GLSLESProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        : HighLevelGpuProgram(creator, name, handle, group, isManual, loader) 
+        : GLSLProgramCommon(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
-        , mCompiled(0)
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         , mIsOptimised(false)
         , mOptimiserEnabled(false)
@@ -101,80 +98,23 @@ namespace Ogre {
         unloadHighLevelImpl();
     }
 #endif
-    //-----------------------------------------------------------------------
-    void GLSLESProgram::loadFromSource(void)
-    {
-        // Preprocess the GLSL ES shader in order to get a clean source
-        CPreprocessor cpp;
+    GLuint GLSLESProgram::createGLProgramHandle() {
+        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            return 0;
 
-        // Pass all user-defined macros to preprocessor
-        if (!mPreprocessorDefines.empty ())
+        if (mGLProgramHandle)
+            return mGLProgramHandle;
+
+        OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
         {
-            String::size_type pos = 0;
-            while (pos != String::npos)
-            {
-                // Find delims
-                String::size_type endPos = mPreprocessorDefines.find_first_of(";,=", pos);
-                if (endPos != String::npos)
-                {
-                    String::size_type macro_name_start = pos;
-                    size_t macro_name_len = endPos - pos;
-                    pos = endPos;
-
-                    // Check definition part
-                    if (mPreprocessorDefines[pos] == '=')
-                    {
-                        // Set up a definition, skip delim
-                        ++pos;
-                        String::size_type macro_val_start = pos;
-                        size_t macro_val_len;
-
-                        endPos = mPreprocessorDefines.find_first_of(";,", pos);
-                        if (endPos == String::npos)
-                        {
-                            macro_val_len = mPreprocessorDefines.size () - pos;
-                            pos = endPos;
-                        }
-                        else
-                        {
-                            macro_val_len = endPos - pos;
-                            pos = endPos+1;
-                        }
-                        cpp.Define (
-                            mPreprocessorDefines.c_str () + macro_name_start, macro_name_len,
-                            mPreprocessorDefines.c_str () + macro_val_start, macro_val_len);
-                    }
-                    else
-                    {
-                        // No definition part, define as "1"
-                        ++pos;
-                        cpp.Define (
-                            mPreprocessorDefines.c_str () + macro_name_start, macro_name_len, 1);
-                    }
-                }
-                else
-                {
-                    if(pos < mPreprocessorDefines.size())
-                         cpp.Define (mPreprocessorDefines.c_str () + pos, mPreprocessorDefines.size() - pos, 1);
- 
-                    pos = endPos;
-                }
-            }
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+                glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
         }
+#endif
 
-        size_t out_size = 0;
-        const char *src = mSource.c_str ();
-        size_t src_len = mSource.size ();
-        char *out = cpp.Parse (src, src_len, out_size);
-        if (!out || !out_size)
-            // Failed to preprocess, break out
-            OGRE_EXCEPT (Exception::ERR_RENDERINGAPI_ERROR,
-                         "Failed to preprocess shader " + mName,
-                         __FUNCTION__);
-
-        mSource = String (out, out_size);
-        if (out < src || out > src + src_len)
-            free (out);
+        return mGLProgramHandle;
     }
 
     bool GLSLESProgram::compile(const bool checkErrors)
@@ -205,40 +145,33 @@ namespace Ogre {
                     glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
             }
 #endif
-
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
-                {
-                    OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-                        glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
-                }
-#endif
-            }
+            createGLProgramHandle();
         }
 
         // Add preprocessor extras and main source
         if (!mSource.empty())
         {
+            const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
             // Fix up the source in case someone forgot to redeclare gl_Position
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
-                mType == GPT_VERTEX_PROGRAM)
+            if(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS)
+                    && mType == GPT_VERTEX_PROGRAM
+                    // Mesa 11.2 does not behave according to spec and throws a "gl_Position redefined"
+                    && caps->getDeviceName().find("Mesa") == String::npos)
             {
                 size_t versionPos = mSource.find("#version");
                 int shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
+                size_t belowVersionPos = mSource.find("\n", versionPos) + 1;
 
-                // Check that it's missing and that this shader has a main function, ie. not a child shader.
-                if(mSource.find("out highp vec4 gl_Position") == String::npos)
-                {
-                    if(shaderVersion >= 300)
-                        mSource.insert(versionPos+16, "out highp vec4 gl_Position;\nout highp float gl_PointSize;\n");
-                }
-                if(mSource.find("#extension GL_EXT_separate_shader_objects : require") == String::npos)
-                {
-                    if(shaderVersion >= 300)
-                        mSource.insert(versionPos+16, "#extension GL_EXT_separate_shader_objects : require\n");
+                if(shaderVersion >= 300) {
+                    // Check that it's missing and that this shader has a main function, ie. not a child shader.
+                    if(mSource.find("out highp vec4 gl_Position") == String::npos)
+                    {
+                        mSource.insert(belowVersionPos, "out highp vec4 gl_Position;\nout highp float gl_PointSize;\n");
+                    }
+                    if(mSource.find("#extension GL_EXT_separate_shader_objects : require") == String::npos)
+                    {
+                        mSource.insert(belowVersionPos, "#extension GL_EXT_separate_shader_objects : require\n");
+                    }
                 }
             }
     
@@ -252,7 +185,7 @@ namespace Ogre {
         }
 
         if (checkErrors)
-            logObjectInfo("GLSL ES compiling: " + mName, mGLShaderHandle);
+            GLSLES::logObjectInfo("GLSL ES compiling: " + mName, mGLShaderHandle);
 
         OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
@@ -260,13 +193,13 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled));
         if(!mCompiled && checkErrors)
         {
-            String message = logObjectInfo("GLSL ES compile log: " + mName, mGLShaderHandle);
+            String message = GLSLES::logObjectInfo("GLSL ES compile log: " + mName, mGLShaderHandle);
             checkAndFixInvalidDefaultPrecisionError(message);
         }
 
         // Log a message that the shader compiled successfully.
         if (mCompiled && checkErrors)
-            logObjectInfo("GLSL ES compiled: " + mName, mGLShaderHandle);
+            GLSLES::logObjectInfo("GLSL ES compiled: " + mName, mGLShaderHandle);
 
         if(!mCompiled)
         {
@@ -304,16 +237,6 @@ namespace Ogre {
     {
         mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLESGpuProgram( this ));
     }
-    //---------------------------------------------------------------------------
-    void GLSLESProgram::unloadImpl()
-    {   
-        // We didn't create mAssemblerProgram through a manager, so override this
-        // implementation so that we don't try to remove it from one. Since getCreator()
-        // is used, it might target a different matching handle!
-        mAssemblerProgram.setNull();
-
-        unloadHighLevel();
-    }
     //-----------------------------------------------------------------------
     void GLSLESProgram::unloadHighLevelImpl(void)
     {
@@ -333,14 +256,6 @@ namespace Ogre {
             mCompiled = 0;
         }
     }
-
-    //-----------------------------------------------------------------------
-    void GLSLESProgram::populateParameterNames(GpuProgramParametersSharedPtr params)
-    {
-        getConstantDefinitions();
-        params->_setNamedConstants(mConstantDefs);
-        // Don't set logical / physical maps here, as we can't access parameters by logical index in GLHL.
-    }
     //-----------------------------------------------------------------------
     void GLSLESProgram::buildConstantDefinitions() const
     {
@@ -359,24 +274,6 @@ namespace Ogre {
         }
     }
 
-    //---------------------------------------------------------------------
-    inline bool GLSLESProgram::getPassSurfaceAndLightStates(void) const
-    {
-        // Scenemanager should pass on light & material state to the rendersystem
-        return true;
-    }
-    //---------------------------------------------------------------------
-    inline bool GLSLESProgram::getPassTransformStates(void) const
-    {
-        // Scenemanager should pass on transform state to the rendersystem
-        return true;
-    }
-    //---------------------------------------------------------------------
-    inline bool GLSLESProgram::getPassFogStates(void) const
-    {
-        // Scenemanager should pass on fog state to the rendersystem
-        return true;
-    }
     //-----------------------------------------------------------------------
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
     String GLSLESProgram::CmdOptimisation::doGet(const void *target) const
@@ -388,16 +285,6 @@ namespace Ogre {
         static_cast<GLSLESProgram*>(target)->setOptimiserEnabled(StringConverter::parseBool(val));
     }
 #endif
-    //-----------------------------------------------------------------------
-    String GLSLESProgram::CmdPreprocessorDefines::doGet(const void *target) const
-    {
-        return static_cast<const GLSLESProgram*>(target)->getPreprocessorDefines();
-    }
-    void GLSLESProgram::CmdPreprocessorDefines::doSet(void *target, const String& val)
-    {
-        static_cast<GLSLESProgram*>(target)->setPreprocessorDefines(val);
-    }
-
     //-----------------------------------------------------------------------
     void GLSLESProgram::attachToProgramObject( const GLuint programObject )
     {
@@ -478,61 +365,6 @@ namespace Ogre {
             {
                 LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
             }
-        }
-    }
-    //-----------------------------------------------------------------------
-    RenderOperation::OperationType parseOperationType(const String& val)
-    {
-        if (val == "point_list")
-        {
-            return RenderOperation::OT_POINT_LIST;
-        }
-        else if (val == "line_list")
-        {
-            return RenderOperation::OT_LINE_LIST;
-        }
-        else if (val == "line_strip")
-        {
-            return RenderOperation::OT_LINE_STRIP;
-        }
-        else if (val == "triangle_strip")
-        {
-            return RenderOperation::OT_TRIANGLE_STRIP;
-        }
-        else if (val == "triangle_fan")
-        {
-            return RenderOperation::OT_TRIANGLE_FAN;
-        }
-        else 
-        {
-            //Triangle list is the default fallback. Keep it this way?
-            return RenderOperation::OT_TRIANGLE_LIST;
-        }
-    }
-    //-----------------------------------------------------------------------
-    String operationTypeToString(RenderOperation::OperationType val)
-    {
-        switch (val)
-        {
-        case RenderOperation::OT_POINT_LIST:
-            return "point_list";
-            break;
-        case RenderOperation::OT_LINE_LIST:
-            return "line_list";
-            break;
-        case RenderOperation::OT_LINE_STRIP:
-            return "line_strip";
-            break;
-        case RenderOperation::OT_TRIANGLE_STRIP:
-            return "triangle_strip";
-            break;
-        case RenderOperation::OT_TRIANGLE_FAN:
-            return "triangle_fan";
-            break;
-        case RenderOperation::OT_TRIANGLE_LIST:
-        default:
-            return "triangle_list";
-            break;
         }
     }
 }

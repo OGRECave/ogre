@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -159,12 +159,12 @@ namespace Ogre {
                  The memory associated with this buffer is NOT destroyed with the
                  Image object, unless autoDelete is set to true.
             @remarks 
-                The size of the buffer must be numFaces*PixelUtil::getMemorySize(width, height, depth, format)
+                The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
          */
         Image& loadDynamicImage( uchar* data, uint32 width, uint32 height,
                             uint32 depth,
                              PixelFormat format, bool autoDelete = false, 
-                             size_t numFaces = 1, uint8 numMipMaps = 0);
+                             size_t numFaces = 1, uint32 numMipMaps = 0);
         
         /** Stores a pointer to raw data in memory. The pixel format has to be specified.
             @remarks
@@ -197,11 +197,11 @@ namespace Ogre {
             @note
                  The memory associated with this buffer is NOT destroyed with the
                  Image object.
-            @remarks This function is deprecated; one should really use the
+            @deprecated use the
                 Image::loadDynamicImage(data, width, height, depth, format, ...) to be compatible
                 with future Ogre versions.
          */
-        Image& loadDynamicImage( uchar* data, uint32 width,
+        OGRE_DEPRECATED Image& loadDynamicImage( uchar* data, uint32 width,
                                  uint32 height, PixelFormat format)
         {
             return loadDynamicImage(data, width, height, 1, format);
@@ -209,7 +209,7 @@ namespace Ogre {
         /** Loads raw data from a stream. See the function
             loadDynamicImage for a description of the parameters.
             @remarks 
-                The size of the buffer must be numFaces*PixelUtil::getMemorySize(width, height, depth, format)
+                The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
             @note
                 Whilst typically your image is likely to be a simple 2D image,
                 you can define complex images including cube maps
@@ -229,9 +229,9 @@ namespace Ogre {
             DataStreamPtr& stream, 
             uint32 width, uint32 height, uint32 depth,
             PixelFormat format,
-            size_t numFaces = 1, uint8 numMipMaps = 0);
+            size_t numFaces = 1, uint32 numMipMaps = 0);
         /** Loads raw data from a stream. The pixel format has to be specified. 
-            @remarks This function is deprecated; one should really use the
+            @deprecated use the
                 Image::loadRawData(stream, width, height, depth, format, ...) to be compatible
                 with future Ogre versions.
             @note
@@ -249,7 +249,7 @@ namespace Ogre {
                 Of course, you will never have multiple faces (cube map) and
                 depth too.
         */
-        Image & loadRawData( 
+        OGRE_DEPRECATED Image & loadRawData(
             DataStreamPtr& stream, 
             uint32 width, uint32 height,
             PixelFormat format )
@@ -378,7 +378,7 @@ namespace Ogre {
 
         /** Returns the number of mipmaps contained in the image.
         */
-        uint8 getNumMipmaps() const;
+        uint32 getNumMipmaps() const;
 
         /** Returns true if the image has the appropriate flag set.
         */
@@ -483,7 +483,7 @@ namespace Ogre {
         /// The size of the image buffer
         size_t mBufSize;
         /// The number of mipmaps the image contains
-        uint8 mNumMipmaps;
+        uint32 mNumMipmaps;
         /// Image specific flags.
         int mFlags;
 

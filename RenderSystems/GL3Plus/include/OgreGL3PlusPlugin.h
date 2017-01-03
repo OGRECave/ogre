@@ -29,10 +29,10 @@ THE SOFTWARE.
 #define __GL3PlusPlugin_H__
 
 #include "OgrePlugin.h"
-#include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre
 {
+    class GL3PlusRenderSystem;
 
     /** Plugin instance for GL3Plus Manager */
     class GL3PlusPlugin : public Plugin

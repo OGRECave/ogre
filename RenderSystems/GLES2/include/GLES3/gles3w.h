@@ -11,7 +11,7 @@
 
 #include <KHR/khrplatform.h>
 #include <GLES3/gl3platform.h>
-#include <GLES3/gl3ext.h>
+#include <GLES2/gl2ext.h>
 
 #ifndef __gl3_h_
 #define __gl3_h_
@@ -23,6 +23,7 @@ extern "C" {
 
 /* glesw api */
 int gleswInit(void);
+int gleswInitWithGetProc(void* (*getproc)(const char*));
 int gleswIsSupported(int major, int minor);
 void *gleswGetProcAddress(const char *proc);
 

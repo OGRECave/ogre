@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -86,13 +86,13 @@ namespace Ogre {
 
             /** Callback to indicate that background loading has completed.
             @deprecated
-                Use loadingComplete instead.
+                Use Listener::loadingComplete instead.
             */
             OGRE_DEPRECATED virtual void backgroundLoadingComplete(Resource*) {}
 
             /** Callback to indicate that background preparing has completed.
             @deprecated
-                Use preparingComplete instead.
+                Use Listener::preparingComplete instead.
             */
             OGRE_DEPRECATED virtual void backgroundPreparingComplete(Resource*) {}
 

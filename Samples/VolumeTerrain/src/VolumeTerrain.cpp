@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -41,7 +41,7 @@ const Real Sample_VolumeTerrain::MOUSE_MODIFIER_TIME_LIMIT = (Real)0.033333;
 void Sample_VolumeTerrain::setupContent(void)
 {
     setupControls();
-        
+
     // Skydome
     mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
@@ -51,6 +51,8 @@ void Sample_VolumeTerrain::setupContent(void)
     directionalLight0->setDirection(Vector3((Real)1, (Real)-1, (Real)1));
     directionalLight0->setDiffuseColour((Real)1, (Real)0.98, (Real)0.73);
     directionalLight0->setSpecularColour((Real)0.1, (Real)0.1, (Real)0.1);
+
+    mSceneMgr->setAmbientLight(Ogre::ColourValue::White);
    
     // Volume
     mVolumeRoot = OGRE_NEW Chunk();
@@ -58,6 +60,12 @@ void Sample_VolumeTerrain::setupContent(void)
     Timer t;
     mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", true);
     LogManager::getSingleton().stream() << "Loaded volume terrain in " << t.getMillisecondsCPU() << " ms";
+
+#if defined(INCLUDE_RTSHADER_SYSTEM)
+    // Make this viewport work with shader generator scheme.
+    mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+#endif
 
     // Camera
     mCamera->setPosition((Real)3264, (Real)2700, (Real)3264);
@@ -83,7 +91,7 @@ void Sample_VolumeTerrain::setupControls(void)
 
     mTrayMgr->createTextBox(TL_TOPLEFT, "VolumeTerrainHelp", "Usage:\n\nHold the left mouse button, press\nwasd for movement and move the\nmouse for the direction.\nYou can add spheres with the\nmiddle mouse button and remove\nspheres with the right one.", 310, 150);
 }
-    
+
 //-----------------------------------------------------------------------
 
 void Sample_VolumeTerrain::cleanupContent(void)
@@ -105,22 +113,20 @@ Sample_VolumeTerrain::Sample_VolumeTerrain(void) : mVolumeRoot(0), mHideAll(fals
     
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::keyPressed(const OIS::KeyEvent& evt)
+bool Sample_VolumeTerrain::keyPressed(const KeyboardEvent& evt)
 {
-    if (evt.key == OIS::KC_F10)
+    switch(evt.keysym.sym)
     {
+    case SDLK_F10:
         mVolumeRoot->setVolumeVisible(!mVolumeRoot->getVolumeVisible());
-    }
-    if (evt.key == OIS::KC_F11)
-    {
+        break;
+    case SDLK_F11:
         mVolumeRoot->setOctreeVisible(!mVolumeRoot->getOctreeVisible());
-    }
-    if (evt.key == OIS::KC_F12)
-    {
+        break;
+    case SDLK_F12:
         mVolumeRoot->setDualGridVisible(!mVolumeRoot->getDualGridVisible());
-    }
-    if (evt.key == OIS::KC_H)
-    {
+        break;
+    case 'h':
         if (mHideAll)
         {
             mTrayMgr->showAll();
@@ -130,6 +136,9 @@ bool Sample_VolumeTerrain::keyPressed(const OIS::KeyEvent& evt)
             mTrayMgr->hideAll();
         }
         mHideAll = !mHideAll;
+        break;
+    default:
+        break;
     }
     return SdkSample::keyPressed(evt);
 }
@@ -157,63 +166,57 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
 
 //-----------------------------------------------------------------------
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-bool Sample_VolumeTerrain::pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+bool Sample_VolumeTerrain::touchPressed(const TouchFingerEvent& evt)
 {
-    Real x = (Real)evt.state.X.abs / (Real)evt.state.width;
-    Real y = (Real)evt.state.Y.abs / (Real)evt.state.height;
-    Ray ray = mCamera->getCameraToViewportRay(x, y);
+    Ray ray = mCamera->getCameraToViewportRay(evt.x, evt.y);
     shootRay(ray, true);
 
-    return SdkSample::pointerPressed(evt, id);
+    return SdkSample::touchPressed(evt);
 }
-
-#else
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+bool Sample_VolumeTerrain::mousePressed(const MouseButtonEvent& evt)
 {
     if (mMouseState == 0)
     {
-        if (id == OIS::MB_Middle)
+        if (evt.button == BUTTON_MIDDLE)
         {
             mMouseState = 1;
             mMouseCountdown = MOUSE_MODIFIER_TIME_LIMIT;
         }
-        if (id == OIS::MB_Right)
+        if (evt.button == BUTTON_RIGHT)
         {
             mMouseState = 2;
             mMouseCountdown = MOUSE_MODIFIER_TIME_LIMIT;
         }
     }
 
-    return SdkSample::pointerPressed(evt, id);
+    return SdkSample::mousePressed(evt);
 }
-#endif
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+bool Sample_VolumeTerrain::mouseReleased(const MouseButtonEvent& evt)
 {
-    
-    if (id == OIS::MB_Middle || id == OIS::MB_Right)
+    if (evt.button == BUTTON_MIDDLE || evt.button == BUTTON_RIGHT)
     {
         mMouseState = 0;
     }
 
-    return SdkSample::pointerReleased(evt, id);
+    return SdkSample::mouseReleased(evt);
 }
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::pointerMoved(const OIS::PointerEvent& evt)
+bool Sample_VolumeTerrain::mouseMoved(const MouseMotionEvent& evt)
 {
-    mMouseX = (Real)evt.state.X.abs / (Real)evt.state.width;
-    mMouseY = (Real)evt.state.Y.abs / (Real)evt.state.height;
-    return SdkSample::pointerMoved(evt);
+    int width = mWindow->getWidth(), height = mWindow->getHeight();
+    
+    mMouseX = (Real)evt.x / (Real)width;
+    mMouseY = (Real)evt.y / (Real)height;
+    return SdkSample::mouseMoved(evt);
 }
-
 
 //-----------------------------------------------------------------------
 
@@ -236,8 +239,8 @@ bool Sample_VolumeTerrain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 #ifndef OGRE_STATIC_LIB
 
-SamplePlugin* sp;
-Sample* s;
+static SamplePlugin* sp;
+static Sample* s;
     
 //-----------------------------------------------------------------------
 

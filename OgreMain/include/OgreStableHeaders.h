@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,8 @@ THE SOFTWARE.
 
 #ifndef __OgreStableHeaders__
 #define __OgreStableHeaders__
+
+#ifdef __cplusplus // xcode tries to create a PCH for C code using this
 
 #include "OgrePlatform.h"
 
@@ -74,6 +76,8 @@ THE SOFTWARE.
 #include "OgreWireBoundingBox.h"
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #   include "OgreZip.h"
+#endif
+
 #endif
 
 #endif 

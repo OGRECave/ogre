@@ -4,7 +4,7 @@
  * (Object-oriented Graphics Rendering Engine)
  * For the latest info, see http://www.ogre3d.org/
  *
- * Copyright (c) 2000-2016 Torus Knot Software Ltd
+ * Copyright (c) 2000-2014 Torus Knot Software Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ namespace Ogre
 
 	inline void Lod0Stripifier::generateRemapInfo(const MeshPtr& mesh, bool stableVertexOrder)
 	{
-		ushort submeshCount = mesh->getNumSubMeshes();
+		size_t submeshCount = mesh->getNumSubMeshes();
 		remapInfos.resize(1 + submeshCount);
 		remapInfos[0].prepare(mesh->sharedVertexData ? mesh->sharedVertexData->vertexCount : 0);
 		for(ushort i = 0; i < submeshCount; i++)
@@ -165,7 +165,7 @@ namespace Ogre
 		{
 			uint16 *pSrc16 = (uint16*)pSrc, *pDst16 = (uint16*)pDst;
 			for(size_t i = 0; i < indexCount; ++i)
-				pDst16[i] = remapInfo.indexMap[pSrc16[i]];
+				pDst16[i] = uint16(remapInfo.indexMap[pSrc16[i]]);
 		}
 
 		indexData->indexBuffer->unlock();
@@ -255,7 +255,7 @@ namespace Ogre
 
 	inline void Lod0Stripifier::performPoseRemap(Pose* pose, const RemapInfo& remapInfo)
 	{
-		if(remapInfo.nothingToStrip() || pose->getVertexOffsets().empty() && pose->getNormals().empty())
+		if(remapInfo.nothingToStrip() || (pose->getVertexOffsets().empty() && pose->getNormals().empty()))
 			return;
 
 		Pose::VertexOffsetMap vv = pose->getVertexOffsets();
@@ -306,8 +306,8 @@ namespace Ogre
 			performVertexDataRemap(mesh->sharedVertexData, remapInfos[0]);
 		performBoneAssignmentRemap(mesh.get(), remapInfos[0]);
 
-		ushort submeshCount = mesh->getNumSubMeshes();
-		for(ushort i = 0; i < submeshCount; i++)
+		size_t submeshCount = mesh->getNumSubMeshes();
+		for(size_t i = 0; i < submeshCount; i++)
 		{
 			SubMesh* submesh = mesh->getSubMesh(i);
 			const RemapInfo& remapInfo = remapInfos[submesh->useSharedVertices ? 0 : 1 + i];

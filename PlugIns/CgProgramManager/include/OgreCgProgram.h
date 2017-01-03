@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,12 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 
 namespace Ogre {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup CgProgramManager
+    *  @{
+    */
     /** Specialisation of HighLevelGpuProgram to provide support for nVidia's CG language.
     @remarks
         Cg can be used to compile common, high-level, C-like code down to assembler
@@ -167,9 +173,11 @@ namespace Ogre {
         size_t getSize(void) const;
         void touch(void);
 
-        /// Scan the file for #include and replace with source from the OGRE resources
+        /// Scan the file for \#include and replace with source from the OGRE resources
         static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
     };
+    /** @} */
+    /** @} */
 }
 
 #endif

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,21 +41,12 @@ THE SOFTWARE.
 #   if OGRE_DEBUG_MODE
 #       define OgreAssert( a, b ) assert( (a) && (b) )
 #   else
-#       if OGRE_COMP != OGRE_COMPILER_BORL
-#           define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), "no function info")
-#       else
-#           define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNC__ )
-#       endif
+#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNCTION__ )
 #   endif
 
 // EXCEPTIONS mode
 #elif OGRE_ASSERT_MODE == 2
-#   if OGRE_COMP != OGRE_COMPILER_BORL
-#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), "no function info")
-#   else
-#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNC__ )
-#   endif
-
+#   define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNCTION__ )
 // STANDARD mode
 #else
 #   define OgreAssert( a, b ) assert( (a) && (b) )

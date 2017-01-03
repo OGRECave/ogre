@@ -1,0 +1,14 @@
+platform: x64
+configuration: Release
+os: Visual Studio 2015
+
+build:
+
+build_script:
+ - cmake -P ci-build.cmake
+ - cmake --build .
+cache:
+- ogredeps -> CMake/Dependencies.cmake
+branches:
+  only:
+    - master

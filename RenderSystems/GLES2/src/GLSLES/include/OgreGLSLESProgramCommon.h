@@ -83,8 +83,6 @@ namespace Ogre {
         /// Flag indicating skeletal animation is being performed
         bool mSkeletalAnimation;
 
-        /// Build uniform references from active named uniforms
-        void buildGLUniformReferences(void);
         typedef set<GLuint>::type AttributeSet;
 
         /// An array to hold the attributes indexes
@@ -96,11 +94,13 @@ namespace Ogre {
 
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
-        void getMicrocodeFromCache(void);
+        static bool getMicrocodeFromCache(const String& name, GLuint programHandle);
         /// Compiles and links the vertex and fragment programs
         virtual void compileAndLink(void) = 0;
         /// Put a program in use
         virtual void _useProgram(void) = 0;
+
+        static void _writeToCache(const String& name, GLuint programHandle);
 
         typedef map<String, VertexElementSemantic>::type SemanticToStringMap;
         SemanticToStringMap mSemanticTypeMap;

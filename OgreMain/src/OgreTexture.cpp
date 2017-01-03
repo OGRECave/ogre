@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,7 @@ namespace Ogre {
         ushort uWidth, ushort uHeight, PixelFormat eFormat)
     {
         Image img;
-        img.loadRawData(stream, uWidth, uHeight, eFormat);
+        img.loadRawData(stream, uWidth, uHeight, 1, eFormat);
         loadImage(img);
     }
     //--------------------------------------------------------------------------    
@@ -213,7 +213,7 @@ namespace Ogre {
         }
 
         // The custom mipmaps in the image have priority over everything
-        uint8 imageMips = images[0]->getNumMipmaps();
+        uint32 imageMips = images[0]->getNumMipmaps();
 
         if(imageMips > 0)
         {

@@ -81,16 +81,15 @@ public:
             mStatusPanel->setParamValue(mBoneBoundingBoxesItemName, mBoneBoundingBoxes ? "On" : "Off");
         }
     }
-    bool keyPressed(const OIS::KeyEvent& evt)
-    {
-        // unless the help dialog is visible,
+    bool keyPressed(const KeyboardEvent& evt)
+    {   
         if ( !mTrayMgr->isDialogVisible() )
         {
-            // handle keypresses
-            switch (evt.key)
+            // Handle keypresses.
+            switch (evt.keysym.sym)
             {
-            case OIS::KC_V:
-                // toggle visualise bounding boxes
+            case 'v':
+                // Toggle visualise bounding boxes.
                 switch (mVisualiseBoundingBoxMode)
                 {
                 case kVisualiseNone:
@@ -106,9 +105,9 @@ public:
                 return true;
                 break;
 
-            case OIS::KC_B:
+            case 'b':
                 {
-                    // toggle bone based bounding boxes for all models
+                    // Toggle bone based bounding boxes for all models.
                     enableBoneBoundingBoxMode( ! mBoneBoundingBoxes );
                     return true;
                 }
@@ -155,11 +154,15 @@ protected:
     void setupContent()
     {
 
-/*#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        //To make glsles work the program will need to be provided with proper
-        //shadow caster materials
-        if (mShaderGenerator->getTargetLanguage() != "glsles" && mShaderGenerator->getTargetLanguage() != "glsl")
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+        // RTSS currently unable to generate shader for GLSLES and HLSL
+        if (mShaderGenerator->getTargetLanguage() != "glsles" &&
+                mShaderGenerator->getTargetLanguage() != "hlsl")
         {
+            // Make this viewport work with shader generator scheme.
+            mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+            mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
             //Add the hardware skinning to the shader generator default render state
             mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
             Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -173,7 +176,7 @@ protected:
             Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
                 Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
         }
-#endif*/
+#endif
         // set shadow properties
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
         mSceneMgr->setShadowTextureSize(512);
@@ -261,10 +264,10 @@ protected:
             ent->setMaterialName("jaiqua"); //"jaiquaDualQuatTest"
             sn->attachObject(ent);
 
-/*#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-            //To make glsles work the program will need to be provided with proper
-            //shadow caster materials
-            if (mShaderGenerator->getTargetLanguage() != "glsles")
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+            //see above
+            if (mShaderGenerator->getTargetLanguage() != "glsles" &&
+                    mShaderGenerator->getTargetLanguage() != "hlsl")
             {
                 //In case the system uses the RTSS, the following line will ensure
                 //that the entity is using hardware animation in RTSS as well.
@@ -278,7 +281,7 @@ protected:
                     Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
                     true);
             }
-#endif*/
+#endif
         
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
@@ -374,15 +377,15 @@ protected:
         MeshManager::getSingleton().remove("floor");
         mSceneMgr->destroyEntity("Jaiqua");
 
-/*#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        //To make glsles work the program will need to be provided with proper
-        //shadow caster materials
-        if (mShaderGenerator->getTargetLanguage() != "glsles")
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+        //see above
+        if (mShaderGenerator->getTargetLanguage() != "glsles" &&
+                mShaderGenerator->getTargetLanguage() != "hlsl")
         {
             Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
             renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
         }
-#endif*/
+#endif
     }
 
     const int NUM_MODELS;

@@ -34,7 +34,9 @@ THE SOFTWARE.
 namespace Ogre
 {
     ConfigDialog::ConfigDialog() : mImpl(NULL) {
+    }
 
+    ConfigDialog::~ConfigDialog() {
     }
 
     bool ConfigDialog::display()

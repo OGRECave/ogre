@@ -31,7 +31,7 @@ if (WIN32)
   set(OGRE_CFG_INSTALL_PATH "bin")
 elseif (APPLE)
   set(OGRE_MEDIA_PATH "Media")
-  if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if(APPLE_IOS)
     set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
     set(OGRE_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
     set(OGRE_TEST_MEDIA_DIR_REL "../../Tests/${OGRE_MEDIA_PATH}")
@@ -102,6 +102,9 @@ endif ()
 if (NOT OGRE_BUILD_PLUGIN_CG)
   set(OGRE_COMMENT_PLUGIN_CG "#")
 endif ()
+if (NOT OGRE_BUILD_PLUGIN_EXRCODEC)
+  set(OGRE_COMMENT_PLUGIN_EXRCODEC "#")
+endif ()
 if (NOT OGRE_BUILD_COMPONENT_TERRAIN)
   set(OGRE_COMMENT_COMPONENT_TERRAIN "#")
 endif ()
@@ -114,6 +117,9 @@ endif ()
 if (NOT OGRE_BUILD_COMPONENT_TERRAIN OR NOT OGRE_BUILD_COMPONENT_PAGING)
   set(OGRE_COMMENT_SAMPLE_ENDLESSWORLD "#")
 endif ()
+if(NOT OGRE_BUILD_TESTS)
+  set(OGRE_COMMENT_PLAYPENTESTS "#")
+endif()
 
 
 # CREATE CONFIG FILES - INSTALL VERSIONS
@@ -169,7 +175,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
   )
 
   # Need a special case here for the iOS SDK, configuration is not being matched, could be a CMake bug.
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (APPLE_IOS)
     install(FILES 
       ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
       ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
@@ -184,7 +190,7 @@ endif (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
-if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE))
+if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE))
   set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/Media")
   set(OGRE_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Samples/Media")
   set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Tests/Media")
@@ -215,7 +221,7 @@ elseif (UNIX)
   set(OGRE_SAMPLES_DIR_DBG "${OGRE_BINARY_DIR}/lib")
 endif ()
 
-if (WINDOWS_STORE OR WINDOWS_PHONE)
+if (WINDOWS_STORE OR WINDOWS_PHONE OR EMSCRIPTEN)
   # These platfroms requires all resources to be packaged inside the application bundle,
   # therefore install versions of configs would be copied and added as content file to each project.
 elseif (MSVC AND NOT NMAKE)
@@ -261,3 +267,25 @@ else() # other OS only need one cfg file
   configure_file(${OGRE_TEMPLATES_DIR}/tests${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/tests${OGRE_CFG_SUFFIX}.cfg)
 endif ()
 
+
+# Create the CMake package files
+include(CMakePackageConfigHelpers)
+
+if (WIN32)
+   set(OGRE_CMAKE_DIR CMake)
+elseif (UNIX)
+   set(OGRE_CMAKE_DIR lib/OGRE/cmake)
+elseif (APPLE)
+endif ()
+configure_package_config_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
+    INSTALL_DESTINATION ${OGRE_CMAKE_DIR}
+    PATH_VARS CMAKE_INSTALL_PREFIX)
+write_basic_package_version_file(
+    ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake 
+    VERSION ${OGRE_VERSION} 
+    COMPATIBILITY SameMajorVersion)
+install(FILES
+   ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
+   ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake
+   DESTINATION ${OGRE_CMAKE_DIR}
+)

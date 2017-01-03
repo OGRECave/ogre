@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
   You may use this sample code for anything you like, it is not covered by the
@@ -28,10 +28,6 @@ Also see acknowledgements in Readme.html
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrainPaging.h"
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "macUtils.h"
-#endif
 
 #define TERRAIN_FILE_PREFIX String("testTerrain")
 #define TERRAIN_FILE_SUFFIX String("dat")
@@ -92,9 +88,11 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     {
         Vector3 tsPos;
         terrain->getTerrainPosition(centrepos, &tsPos);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        if (mInputContext.isKeyDown(OIS::KC_EQUALS) || mInputContext.isKeyDown(OIS::KC_ADD) ||
-            mInputContext.isKeyDown(OIS::KC_MINUS) || mInputContext.isKeyDown(OIS::KC_SUBTRACT))
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_BITES_HAVE_SDL
+        const uint8* state = SDL_GetKeyboardState(NULL);
+
+        if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS] ||
+            state[SDL_SCANCODE_KP_MINUS] || state[SDL_SCANCODE_MINUS])
         {
             switch(mMode)
             {
@@ -123,7 +121,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
                             float addedHeight = weight * 250.0 * timeElapsed;
                             float newheight;
-                            if (mInputContext.isKeyDown(OIS::KC_EQUALS) || mInputContext.isKeyDown(OIS::KC_ADD))
+                            if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS])
                                 newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
                             else
                                 newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
@@ -162,7 +160,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                             float paint = weight * timeElapsed;
                             size_t imgY = imgSize - y;
                             float val;
-                            if (mInputContext.isKeyDown(OIS::KC_EQUALS) || mInputContext.isKeyDown(OIS::KC_ADD))
+                            if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS])
                                 val = layer->getBlendValue(x, imgY) + paint;
                             else
                                 val = layer->getBlendValue(x, imgY) - paint;
@@ -285,21 +283,22 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTerrainGroup->saveAllTerrains(onlyIfModified);
     }
 
-    bool keyPressed (const OIS::KeyEvent &e)
+    bool keyPressed (const KeyboardEvent &e)
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        switch (e.key)
+        SDL_Keymod mod = SDL_GetModState();
+        switch (e.keysym.sym)
         {
-        case OIS::KC_S:
+        case 's':
             // CTRL-S to save
-            if (mInputContext.isKeyDown(OIS::KC_LCONTROL) || mInputContext.isKeyDown(OIS::KC_RCONTROL))
+            if (mod & KMOD_CTRL)
             {
                 saveTerrains(true);
             }
             else
                 return SdkSample::keyPressed(e);
             break;
-        case OIS::KC_F10:
+        case SDLK_F10:
             // dump
             {
                 TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
@@ -315,14 +314,14 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             }
             break;
             /*
-              case OIS::KC_F7:
+              case SDLK_F7:
               // change terrain size
               if (mTerrainGroup->getTerrainSize() == 513)
               mTerrainGroup->setTerrainSize(1025);
               else
               mTerrainGroup->setTerrainSize(513);
               break;
-              case OIS::KC_F8:
+              case SDLK_F8:
               // change terrain world size
               if (mTerrainGroup->getTerrainWorldSize() == TERRAIN_WORLD_SIZE)
               mTerrainGroup->setTerrainWorldSize(TERRAIN_WORLD_SIZE * 2);

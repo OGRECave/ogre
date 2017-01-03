@@ -32,7 +32,8 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
     GLES2HardwareUniformBuffer::GLES2HardwareUniformBuffer(HardwareBufferManagerBase* mgr, 
@@ -120,8 +121,8 @@ namespace Ogre {
                         "GLES2HardwareUniformBuffer::lock");
         }
         
-        // return offsetted
-        retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+        // pBuffer is already offsetted in glMapBufferRange
+        retPtr = pBuffer;
 
         mIsLocked = true;
         return retPtr;

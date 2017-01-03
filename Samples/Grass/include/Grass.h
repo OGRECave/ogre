@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2016 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
   Also see acknowledgements in Readme.html
 
   You may use this sample code for anything you like, it is not covered by the
@@ -42,10 +42,11 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
         return SdkSample::frameRenderingQueued(evt);        // don't forget the parent class updates!
     }
 
-    bool keyPressed(const OIS::KeyEvent& evt)
+    bool keyPressed(const KeyboardEvent& evt)
     {
+        Keycode key = evt.keysym.sym;
         // toggle bounding boxes with B key unless the help dialog is visible
-        if (evt.key == OIS::KC_B && !mTrayMgr->isDialogVisible())
+        if (key == 'b' && !mTrayMgr->isDialogVisible())
             mSceneMgr->showBoundingBoxes(!mSceneMgr->getShowBoundingBoxes());
         return SdkSample::keyPressed(evt);
     }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -552,6 +552,17 @@ protected:
     
 public:
     
+    bool keyPressed(const KeyboardEvent& evt)
+    {
+        static bool rain = false;
+
+        if(evt.keysym.sym == SDLK_SPACE) {
+            rain = !rain;
+            particleEmitter->setEmissionRate(rain ? 20.0f : 0.0f);
+        }
+
+        return SdkSample::keyPressed(evt);
+    }
     
     bool frameRenderingQueued(const FrameEvent& evt)
     {
@@ -562,12 +573,7 @@ public:
         
         // rain
         processCircles(evt.timeSinceLastFrame);
-        if(mInputContext.mKeyboard)
-        {
-            particleEmitter->setEmissionRate(mInputContext.mKeyboard->isKeyDown(OIS::KC_SPACE) ? 20.0f : 0.0f);
-        }
         processParticles();
-        
         
         timeoutDelay-=evt.timeSinceLastFrame ;
         if (timeoutDelay<=0)

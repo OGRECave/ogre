@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -206,12 +206,7 @@ namespace Ogre
         static String strName( "Direct3D11 Rendering Subsystem");
         return strName;
     }
-    //---------------------------------------------------------------------
-	const String& D3D11RenderSystem::getFriendlyName(void) const
-	{
-		static String strName("Direct3D 11");
-		return strName;
-	}
+
 	//---------------------------------------------------------------------
     D3D11DriverList* D3D11RenderSystem::getDirect3DDrivers(bool refreshList /* = false*/)
     {

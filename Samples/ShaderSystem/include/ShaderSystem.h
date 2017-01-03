@@ -83,14 +83,14 @@ public:
 
     void updateTargetObjInfo();
 
-    /** @see Sample::pointerPressed. */
-    bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id);
+    /** @see Sample::mousePressed. */
+    bool mousePressed(const MouseButtonEvent& evt);
 
-    /** @see Sample::pointerReleased. */
-    bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id);
+    /** @see Sample::mouseReleased. */
+    bool mouseReleased(const MouseButtonEvent& evt);
 
-    /** @see Sample::pointerMoved. */
-    bool pointerMoved(const OIS::PointerEvent& evt);
+    /** @see Sample::mouseMoved. */
+    bool mouseMoved(const MouseMotionEvent& evt);
 
 protected:
 
@@ -178,7 +178,7 @@ protected:
     void destroyPrivateResourceGroup();
 
     /** Pick the target object. */
-    void pickTargetObject( const OIS::PointerEvent &evt );
+    void pickTargetObject( const MouseButtonEvent &evt );
 
     /** Apply shadow type from the given shadow menu selected index. */
     void applyShadowType(int menuIndex);

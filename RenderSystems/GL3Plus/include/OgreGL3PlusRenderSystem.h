@@ -32,11 +32,18 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusPrerequisites.h"
 
 #include "OgreMaterialManager.h"
-#include "OgreRenderSystem.h"
 #include "OgreGLSLShader.h"
+#include "OgreRenderWindow.h"
+#include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
-    class GL3PlusContext;
+    /** \addtogroup RenderSystems RenderSystems
+    *  @{
+    */
+    /** \defgroup GL3Plus GL3Plus
+    * Implementation of GL 3 as a rendering system.
+    *  @{
+    */
     class GL3PlusSupport;
     class GL3PlusRTTManager;
     class GLSLShaderManager;
@@ -46,7 +53,7 @@ namespace Ogre {
     /**
        Implementation of GL 3 as a rendering system.
     */
-    class _OgreGL3PlusExport GL3PlusRenderSystem : public RenderSystem
+    class _OgreGL3PlusExport GL3PlusRenderSystem : public GLRenderSystemCommon
     {
     private:
         /// Rendering loop control
@@ -76,7 +83,7 @@ namespace Ogre {
         /// Holds texture type settings for every stage
         GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
 
-        GLfloat mLargestSupportedAnisotropy;
+        GLint mLargestSupportedAnisotropy;
 
         /// Number of fixed-function texture units
         unsigned short mFixedFunctionTextureUnits;
@@ -183,57 +190,27 @@ namespace Ogre {
         // ----------------------------------
         // Overridden RenderSystem functions
         // ----------------------------------
-        /** See
-            RenderSystem
-        */
+
         const String& getName(void) const;
-        /** See
-            RenderSystem
-        */
-            const String& getFriendlyName(void) const;
-        /** See
-            RenderSystem
-        */
+
         ConfigOptionMap& getConfigOptions(void);
-        /** See
-            RenderSystem
-        */
+
         void setConfigOption(const String &name, const String &value);
-        /** See
-            RenderSystem
-        */
+
         String validateConfigOptions(void);
-        /** See
-            RenderSystem
-        */
+
         RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
-        /** See
-            RenderSystem
-        */
+
         virtual RenderSystemCapabilities* createRenderSystemCapabilities() const;
-        /** See
-            RenderSystem
-        */
+
         void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
-        /** See
-            RenderSystem
-        */
-        void reinitialise(void); // Used if settings changed mid-rendering
-        /** See
-            RenderSystem
-        */
+
         void shutdown(void);
-        /** See
-            RenderSystem
-        */
+
         void setAmbientLight(float r, float g, float b) { };   // Not supported
-        /** See
-            RenderSystem
-        */
+
         void setShadingType(ShadeOptions so) { };   // Not supported
-        /** See
-            RenderSystem
-        */
+
         void setLightingEnabled(bool enabled) { };   // Not supported
 
         /// @copydoc RenderSystem::_createRenderWindow
@@ -254,61 +231,35 @@ namespace Ogre {
         /// @copydoc RenderSystem::createMultiRenderTarget
         virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
 
-        /** See
-            RenderSystem
-        */
-        void destroyRenderWindow(RenderWindow* pWin);
-        /** See
-            RenderSystem
-        */
+
+        void destroyRenderWindow(const String& name);
+
         String getErrorDescription(long errorNumber) const;
-        /** See
-            RenderSystem
-        */
-        VertexElementType getColourVertexElementType(void) const;
-        /** See
-            RenderSystem
-        */
+
         void setNormaliseNormals(bool normalise) { };   // Not supported
 
         // -----------------------------
         // Low-level overridden members
         // -----------------------------
-        /** See
-            RenderSystem
-        */
+
         void _useLights(const LightList& lights, unsigned short limit) { };   // Not supported
-        /** See
-            RenderSystem
-        */
+
         bool areFixedFunctionLightsInViewSpace() const { return true; }
-        /** See
-            RenderSystem
-        */
+
         void _setWorldMatrix(const Matrix4 &m);
-        /** See
-            RenderSystem
-        */
+
         void _setViewMatrix(const Matrix4 &m);
-        /** See
-            RenderSystem
-        */
+
         void _setProjectionMatrix(const Matrix4 &m);
-        /** See
-            RenderSystem
-        */
+
         void _setSurfaceParams(const ColourValue &ambient,
                                const ColourValue &diffuse, const ColourValue &specular,
                                const ColourValue &emissive, Real shininess,
                                TrackVertexColourType tracking) {}
-        /** See
-            RenderSystem
-        */
+
         void _setPointParameters(Real size, bool attenuationEnabled,
                                  Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
-        /** See
-            RenderSystem
-        */
+
         void _setPointSpritesEnabled(bool enabled);
         /** See
          RenderSystem
@@ -330,123 +281,52 @@ namespace Ogre {
          RenderSystem
          */
         void _setTesselationDomainTexture(size_t unit, const TexturePtr &tex);
-        /** See
-            RenderSystem
-        */
+
         void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureCoordSet(size_t stage, size_t index);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureCoordCalculation(size_t stage, TexCoordCalcMethod m,
                                          const Frustum* frustum = 0) { };   // Not supported
-        /** See
-            RenderSystem
-        */
+
         void _setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm) { };   // Not supported
-        /** See
-            RenderSystem
-        */
+
         void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureBorderColour(size_t stage, const ColourValue& colour);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureMipmapBias(size_t unit, float bias);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureMatrix(size_t stage, const Matrix4& xform) { };   // Not supported
-        /** See
-            RenderSystem
-        */
+
         void _setViewport(Viewport *vp);
-        /** See
-            RenderSystem
-        */
+
         void _beginFrame(void);
-        /** See
-            RenderSystem
-        */
+
         void _endFrame(void);
-        /** See
-            RenderSystem
-        */
+
         void _setCullingMode(CullingMode mode);
-        /** See
-            RenderSystem
-        */
+
         void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
-        /** See
-            RenderSystem
-        */
+
         void _setDepthBufferCheckEnabled(bool enabled = true);
-        /** See
-            RenderSystem
-        */
+
         void _setDepthBufferWriteEnabled(bool enabled = true);
-        /** See
-            RenderSystem
-        */
+
         void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL);
-        /** See
-            RenderSystem
-        */
+
         void _setDepthBias(float constantBias, float slopeScaleBias);
-        /** See
-            RenderSystem
-        */
+
         void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
-        /** See
-            RenderSystem
-        */
+
         void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end) {}
-        /** See
-            RenderSystem
-        */
-        void _convertProjectionMatrix(const Matrix4& matrix,
-                                      Matrix4& dest, bool forGpuProgram = false);
-        /** See
-            RenderSystem
-        */
-        void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane,
-                                   Matrix4& dest, bool forGpuProgram = false);
-        /** See
-            RenderSystem
-        */
-        void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top,
-                                   Real nearPlane, Real farPlane, Matrix4& dest, bool forGpuProgram = false);
-        /** See
-            RenderSystem
-        */
-        void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane,
-                              Matrix4& dest, bool forGpuProgram = false);
-        /** See
-            RenderSystem
-        */
-        void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
-                                          bool forGpuProgram);
-        /** See
-            RenderSystem
-        */
+
         void setClipPlane (ushort index, Real A, Real B, Real C, Real D);
-        /** See
-            RenderSystem
-        */
+
         void enableClipPlane (ushort index, bool enable);
-        /** See
-            RenderSystem
-        */
+
         void _setPolygonMode(PolygonMode level);
-        /** See
-            RenderSystem
-        */
+
         void setStencilCheckEnabled(bool enabled);
         /** See
             RenderSystem.
@@ -458,51 +338,31 @@ namespace Ogre {
                                     StencilOperation passOp = SOP_KEEP,
                     bool twoSidedOperation = false,
                     bool readBackAsTexture = false);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureUnitCompareEnabled(size_t unit, bool compare);
-        /** See
-            RenderSystem
-        */
+
         void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
-        /** See
-            RenderSystem
-        */
+
         void setVertexDeclaration(VertexDeclaration* decl) {}
-        /** See
-            RenderSystem
-        */
+
         void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding) {}
         /** See
             RenderSystem.
         */
         void setVertexBufferBinding(VertexBufferBinding* binding) {}
-        /** See
-            RenderSystem
-        */
+
         void _render(const RenderOperation& op);
-        /** See
-            RenderSystem
-        */
+
         void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
 
         void clearFrameBuffer(unsigned int buffers,
                               const ColourValue& colour = ColourValue::Black,
                               Real depth = 1.0f, unsigned short stencil = 0);
         HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
-        Real getHorizontalTexelOffset(void) { return 0.0; }               // No offset in GL
-        Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
-        Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
-        Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
         OGRE_MUTEX(mThreadInitMutex);
         void registerThread();
         void unregisterThread();
@@ -571,7 +431,12 @@ namespace Ogre {
 
         /// @copydoc RenderSystem::markProfileEvent
         virtual void markProfileEvent( const String &eventName );
+
+        /** @copydoc RenderTarget::copyContentsToMemory */
+        void _copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox &dst, RenderWindow::FrameBuffer buffer);
     };
+    /** @} */
+    /** @} */
 }
 
 #endif

@@ -1,0 +1,11 @@
+prefix=@OGRE_PREFIX_PATH@
+exec_prefix=${prefix}
+libdir=${prefix}/@OGRE_LIB_DIRECTORY@
+includedir=${prefix}/include
+
+Name: OGRE-Bites
+Description: Bites component for OGRE
+Version: @OGRE_VERSION@
+Requires: OGRE = @OGRE_VERSION@ @OGRE_BITES_ADDITIONAL_PACKAGES@
+Libs: -L${libdir} -lOgreBites@OGRE_LIB_SUFFIX@
+Cflags: -I${includedir}/OGRE/Bites @OGRE_CFLAGS@

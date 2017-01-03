@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,17 +34,6 @@ THE SOFTWARE.
 #include "OgreGLHardwarePixelBuffer.h"
 
 namespace Ogre {
-//-----------------------------------------------------------------------------  
-    GLPBuffer::GLPBuffer(PixelComponentType format, uint32 width, uint32 height):
-        mFormat(format),
-        mWidth(width),
-        mHeight(height)
-    {
-    }
-    GLPBuffer::~GLPBuffer()
-    {
-    }
-
 //-----------------------------------------------------------------------------  
     GLPBRenderTexture::GLPBRenderTexture(GLPBRTTManager *manager, const String &name, 
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa):

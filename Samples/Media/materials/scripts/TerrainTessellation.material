@@ -120,7 +120,7 @@ vertex_program Ogre/TerrainTessellation/VTFDisplacementVS hlsl
 	}
 }
 
-tesselation_hull_program Ogre/TerrainTessellation/TerrainScreenspaceLODHS hlsl
+tessellation_hull_program Ogre/TerrainTessellation/TerrainScreenspaceLODHS hlsl
 {
 	source TerrainTessellation.hlsl
 	entry_point TerrainScreenspaceLODHS
@@ -137,7 +137,7 @@ tesselation_hull_program Ogre/TerrainTessellation/TerrainScreenspaceLODHS hlsl
 	}
 }
 
-tesselation_domain_program Ogre/TerrainTessellation/TerrainDisplaceDS hlsl
+tessellation_domain_program Ogre/TerrainTessellation/TerrainDisplaceDS hlsl
 {
 	source TerrainTessellation.hlsl
 	entry_point TerrainDisplaceDS
@@ -174,12 +174,12 @@ material Ogre/TerrainTessellation/Terrain
 			
 			}
 			
-			tesselation_hull_program_ref Ogre/TerrainTessellation/TerrainScreenspaceLODHS
+			tessellation_hull_program_ref Ogre/TerrainTessellation/TerrainScreenspaceLODHS
 			{
 			
 			}
 			
-			tesselation_domain_program_ref Ogre/TerrainTessellation/TerrainDisplaceDS
+			tessellation_domain_program_ref Ogre/TerrainTessellation/TerrainDisplaceDS
 			{
 			
 			}

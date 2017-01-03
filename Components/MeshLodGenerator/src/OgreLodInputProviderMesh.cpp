@@ -4,7 +4,7 @@
  * (Object-oriented Graphics Rendering Engine)
  * For the latest info, see http://www.ogre3d.org/
  *
- * Copyright (c) 2000-2016 Torus Knot Software Ltd
+ * Copyright (c) 2000-2014 Torus Knot Software Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -60,13 +60,13 @@ namespace Ogre
         size_t vertexCount = 0;
         size_t vertexLookupSize = 0;
         size_t sharedVertexLookupSize = 0;
-        unsigned short submeshCount = mMesh->getNumSubMeshes();
-        for (unsigned short i = 0; i < submeshCount; i++) {
+        size_t submeshCount = mMesh->getNumSubMeshes();
+        for (size_t i = 0; i < submeshCount; i++) {
             const SubMesh* submesh = mMesh->getSubMesh(i);
             trianglesCount += getTriangleCount(submesh->operationType , submesh->indexData->indexCount);
             if (!submesh->useSharedVertices) {
                 size_t count = submesh->vertexData->vertexCount;
-                vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
+                vertexLookupSize = std::max(vertexLookupSize, count);
                 vertexCount += count;
             } else if (!sharedVerticesAdded) {
                 sharedVerticesAdded = true;
@@ -92,8 +92,8 @@ namespace Ogre
         data->mMeshName = mMesh->getName();
 #endif
         data->mMeshBoundingSphereRadius = mMesh->getBoundingSphereRadius();
-        unsigned short submeshCount = mMesh->getNumSubMeshes();
-        for (unsigned short i = 0; i < submeshCount; ++i) {
+        size_t submeshCount = mMesh->getNumSubMeshes();
+        for (size_t i = 0; i < submeshCount; ++i) {
             const SubMesh* submesh = mMesh->getSubMesh(i);
             VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData : submesh->vertexData);
             addVertexData(data, vertexData, submesh->useSharedVertices);
@@ -131,7 +131,6 @@ namespace Ogre
 
         HardwareVertexBufferSharedPtr vNormalBuf;
         unsigned char* vNormal = NULL;
-        size_t vNormSize;
         const VertexElement* elemNormal = vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
 
         data->mUseVertexNormals &= (elemNormal != NULL);
@@ -144,7 +143,6 @@ namespace Ogre
                 vNormalBuf = vertexData->vertexBufferBinding->getBuffer(elemNormal->getSource());
                 vNormal = static_cast<unsigned char*>(vNormalBuf->lock(HardwareBuffer::HBL_READ_ONLY));
             }
-            vNormSize = vNormalBuf->getVertexSize();
         }
 
 
@@ -191,7 +189,7 @@ namespace Ogre
                     v->normal.z = pFloat[2];
                     v->normal.normalise();
                 }
-                vNormal += vNormSize;
+                vNormal += vNormalBuf->getVertexSize();;
             }
         }
         vbuf->unlock();
@@ -199,7 +197,7 @@ namespace Ogre
             vNormalBuf->unlock();
         }
     }
-    void LodInputProviderMesh::addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID, RenderOperation::OperationType renderOp)
+    void LodInputProviderMesh::addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, size_t submeshID, RenderOperation::OperationType renderOp)
     {
         const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
         size_t isize = ibuf->getIndexSize();

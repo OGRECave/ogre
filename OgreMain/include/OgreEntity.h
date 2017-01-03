@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -411,29 +411,29 @@ namespace Ogre {
         */
         void setMaterial(const MaterialPtr& material);
 
-        /** @copydoc MovableObject::_releaseManualHardwareResources. */
+        /** @copydoc MovableObject::_releaseManualHardwareResources */
         void _releaseManualHardwareResources();
-        /** @copydoc MovableObject::_restoreManualHardwareResources. */
+        /** @copydoc MovableObject::_restoreManualHardwareResources */
         void _restoreManualHardwareResources();
 
-        /** @copydoc MovableObject::_notifyCurrentCamera.
+        /** @copydoc MovableObject::_notifyCurrentCamera
         */
         void _notifyCurrentCamera(Camera* cam);
 
-        /// @copydoc MovableObject::setRenderQueueGroup.
+        /// @copydoc MovableObject::setRenderQueueGroup
         void setRenderQueueGroup(uint8 queueID);
 
-        /// @copydoc MovableObject::setRenderQueueGroupAndPriority.
+        /// @copydoc MovableObject::setRenderQueueGroupAndPriority
         void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
-        /** @copydoc MovableObject::getBoundingBox.
+        /** @copydoc MovableObject::getBoundingBox
         */
         const AxisAlignedBox& getBoundingBox(void) const;
 
         /// Merge all the child object Bounds a return it.
         AxisAlignedBox getChildObjectsBoundingBox(void) const;
 
-        /** @copydoc MovableObject::_updateRenderQueue.
+        /** @copydoc MovableObject::_updateRenderQueue
         */
         void _updateRenderQueue(RenderQueue* queue);
 
@@ -606,11 +606,11 @@ namespace Ogre {
         /** @copydoc MovableObject::getWorldBoundingSphere */
         const Sphere& getWorldBoundingSphere(bool derive = false) const;
 
-        /** @copydoc ShadowCaster::getEdgeList. */
+        /** @copydoc ShadowCaster::getEdgeList */
         EdgeData* getEdgeList(void);
-        /** @copydoc ShadowCaster::hasEdgeList. */
+        /** @copydoc ShadowCaster::hasEdgeList */
         bool hasEdgeList(void);
-        /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator. */
+        /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator */
         ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light,
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,

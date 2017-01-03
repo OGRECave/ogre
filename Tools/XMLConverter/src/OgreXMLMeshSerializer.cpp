@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -170,7 +170,7 @@ namespace Ogre {
         // Write Submeshes
         TiXmlElement* subMeshesNode = 
             rootNode->InsertEndChild(TiXmlElement("submeshes"))->ToElement();
-        for (int i = 0; i < pMesh->getNumSubMeshes(); ++i)
+        for (size_t i = 0; i < pMesh->getNumSubMeshes(); ++i)
         {
             LogManager::getSingleton().logMessage("Writing submesh...");
             writeSubMesh(subMeshesNode, pMesh->getSubMesh(i));
@@ -256,6 +256,9 @@ namespace Ogre {
             break;
         case RenderOperation::OT_TRIANGLE_STRIP:
             subMeshNode->SetAttribute("operationtype", "triangle_strip");
+            break;
+        default:
+            OgreAssert(false, "Patch control point operations not supported");
             break;
         }
 
@@ -469,6 +472,9 @@ namespace Ogre {
                         case VET_UBYTE4: 
                             type = "ubyte4"; 
                             break;
+                        default:
+                            OgreAssert(false, "Unsupported VET");
+                            break;
                         }
                         vbNode->SetAttribute(
                             "texture_coord_dimensions_" + StringConverter::toString(numTextureCoords), type);
@@ -629,6 +635,9 @@ namespace Ogre {
                             dataNode->SetAttribute("v", StringConverter::toString(*pChar++ / 255.0f));
                             dataNode->SetAttribute("w", StringConverter::toString(*pChar++ / 255.0f));
                             dataNode->SetAttribute("x", StringConverter::toString(*pChar++ / 255.0f));
+                            break;
+                        default:
+                            OgreAssert(false, "Unsupported VET");
                             break;
                         }
                         break;
@@ -1315,6 +1324,9 @@ namespace Ogre {
                                 *pCol++ = VertexElement::convertColourValue(cv, elem.getType());
                             }
                             break;
+                        default:
+                            OgreAssert(false, "Unsupported VET");
+                            break;
                         }
 
                         break;
@@ -1506,9 +1518,9 @@ namespace Ogre {
             StringConverter::toString(usage.userValue));
 
         // Iterate over submeshes at this level
-        unsigned short numsubs = pMesh->getNumSubMeshes();
+        size_t numsubs = pMesh->getNumSubMeshes();
 
-        for (unsigned short subi = 0; subi < numsubs; ++subi)
+        for (size_t subi = 0; subi < numsubs; ++subi)
         {
             TiXmlElement* subNode = 
                 generatedNode->InsertEndChild(TiXmlElement("lodfacelist"))->ToElement();
@@ -1569,8 +1581,8 @@ namespace Ogre {
     void XMLMeshSerializer::writeExtremes(TiXmlElement* mMeshNode, const Mesh* m)
     {
         TiXmlElement* extremesNode = NULL;
-        ushort submeshCount = m->getNumSubMeshes();
-        for (int idx = 0; idx < submeshCount; ++idx)
+        size_t submeshCount = m->getNumSubMeshes();
+        for (size_t idx = 0; idx < submeshCount; ++idx)
         {
             SubMesh *sm = m->getSubMesh(idx);
             if (sm->extremityPoints.empty())
@@ -1664,7 +1676,7 @@ namespace Ogre {
         usage.edgeData = NULL;
 
         // Generate for mixed
-        ushort numSubs, i;
+        size_t numSubs, i;
         numSubs = mMesh->getNumSubMeshes();
         for (i = 0; i < numSubs; ++i)
         {

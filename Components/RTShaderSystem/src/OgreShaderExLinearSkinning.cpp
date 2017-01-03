@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -77,6 +77,7 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
     //local param
     mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT4);
     mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);
+    mParamLocalNormal = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
     //mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);
     //mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);
 
@@ -109,8 +110,8 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
         mParamInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
         //mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);
         //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
-        mParamInIndices = vsMain->resolveInputParameter(Parameter::SPS_BLEND_INDICES, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-        mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+        mParamInIndices = vsMain->resolveInputParameter(Parameter::SPS_BLEND_INDICES, 0, Parameter::SPC_BLEND_INDICES, GCT_FLOAT4);
+        mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_BLEND_WEIGHTS, GCT_FLOAT4);
         mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, 0, mBoneCount);
         mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
         mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
@@ -163,7 +164,7 @@ bool LinearSkinning::addFunctionInvocations(ProgramSet* programSet)
     addPositionCalculations(vsMain, internalCounter);
 
     //add functions to calculate normal and normal related data in world and object space
-    addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld, internalCounter);
+    addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormal, mParamLocalNormalWorld, internalCounter);
     //addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
     //addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
     return true;
@@ -216,11 +217,18 @@ void LinearSkinning::addPositionCalculations(Function* vsMain, int& funcCounter)
 
 //-----------------------------------------------------------------------
 void LinearSkinning::addNormalRelatedCalculations(Function* vsMain,
+                                ParameterPtr& pNormalIn,
                                 ParameterPtr& pNormalRelatedParam,
                                 ParameterPtr& pNormalWorldRelatedParam,
                                 int& funcCounter)
 {
     FunctionInvocation* curFuncInvocation;
+
+    // allow writing to normal parameter
+    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+    curFuncInvocation->pushOperand(pNormalIn, Operand::OPS_IN);
+    curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
+    vsMain->addAtomInstance(curFuncInvocation);
 
     if (mDoBoneCalculations == true)
     {

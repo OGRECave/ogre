@@ -43,12 +43,12 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     ##################################################################    
     	
 	if(OGRE_BUILD_RENDERSYSTEM_GLES2)
-	    SET(DEPENDENCIES OgreMain RenderSystem_GLES2)
+	    SET(DEPENDENCIES OgreMain OgreGLSupport RenderSystem_GLES2)
 	else()
 	    SET(DEPENDENCIES OgreMain RenderSystem_GLES)		
 	endif()
 	
-	SET(DEPENDENCIES ${DEPENDENCIES} OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)
+	SET(DEPENDENCIES ${DEPENDENCIES} OgreHLMS OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager OgreBites)
 	add_dependencies(${ANDROID_PROJECT_TARGET} ${DEPENDENCIES})
 	set(DEPEND_STATIC_LIBS "")	
 	foreach(DEPENDENCY ${DEPENDENCIES})
@@ -68,7 +68,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	   add_static_libs_from_paths(${Boost_LIBRARIES})
     endif()
 
-    add_static_libs_from_paths(${OIS_LIBRARIES} ${FREETYPE_LIBRARIES} ${ZZip_LIBRARIES})
+    add_static_libs_from_paths(${FREETYPE_LIBRARIES} ${ZZip_LIBRARIES})
 
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
@@ -95,6 +95,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 		SET(SCREEN_SIZE "|screenSize")
 	endif()
 	
+    set(OGRE_ANDROID_CFLAGS "${CMAKE_CXX_FLAGS} ${OGRE_ANDROID_CFLAGS}")
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
 
     file(MAKE_DIRECTORY "${NDKOUT}")
@@ -142,4 +143,3 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         message(WARNING "Android executable not found. Not building ${ANDROID_PROJECT_TARGET} APK. Do you have the Android SDK installed?")
     endif()
 endmacro(create_android_proj)
-

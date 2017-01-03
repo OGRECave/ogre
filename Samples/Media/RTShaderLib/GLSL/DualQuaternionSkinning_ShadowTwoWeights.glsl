@@ -1,15 +1,17 @@
 #version 120
 
-mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[24]);
+mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[48]);
 vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ);
 
-uniform vec4 worldDualQuaternion2x4Array[24];
+uniform vec4 worldDualQuaternion2x4Array[48];
 uniform mat4 viewProjectionMatrix;
 uniform vec4   ambient;
 
 attribute vec4 vertex;
 attribute vec4 blendIndices;
 attribute vec4 blendWeights;
+
+varying vec4 colour;
 
 //Shadow caster pass
 void main()
@@ -24,6 +26,5 @@ void main()
 	// view / projection
 	gl_Position = viewProjectionMatrix * vec4(blendPosition, 1.0);
 	
-	gl_FrontColor = ambient;
+	colour = ambient;
 }
-

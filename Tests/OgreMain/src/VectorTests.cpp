@@ -112,4 +112,20 @@ void VectorTests::testVector4Scaler()
     v1 -= 4;
     CPPUNIT_ASSERT_EQUAL(v1, Vector4(-6,-6,-6,-6));
 }
+
+void VectorTests::testPerpendicularVector()
+{
+    Vector3 v1(1, 0, 0);
+    Vector3 v2(0, 1, 0);
+    Vector3 v3(0, 0, 1);
+
+    CPPUNIT_ASSERT_EQUAL(v1.dotProduct(v1.perpendicular()), (Real)0);
+    CPPUNIT_ASSERT_EQUAL(v2.dotProduct(v2.perpendicular()), (Real)0);
+    CPPUNIT_ASSERT_EQUAL(v3.dotProduct(v3.perpendicular()), (Real)0);
+
+    CPPUNIT_ASSERT_EQUAL((v1 + v2).dotProduct((v1 + v2).perpendicular()), (Real)0);
+    CPPUNIT_ASSERT_EQUAL((v2 + v3).dotProduct((v2 + v3).perpendicular()), (Real)0);
+    CPPUNIT_ASSERT_EQUAL((v3 + v1).dotProduct((v3 + v1).perpendicular()), (Real)0);
+}
+
 //--------------------------------------------------------------------------

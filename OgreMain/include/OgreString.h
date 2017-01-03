@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,13 +32,8 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 // If we're using the GCC 3.1 C++ Std lib
-#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
-
-// For gcc 4.3 see http://gcc.gnu.org/gcc-4.3/changes.html
-#   if OGRE_COMP_VER >= 430
-#       include <tr1/unordered_map>
-#   else
-#       include <ext/hash_map>
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && OGRE_COMP_VER < 430 && !defined(STLPORT)
+#include <ext/hash_map>
 namespace __gnu_cxx
 {
     template <> struct hash< Ogre::_StringBase >
@@ -59,8 +54,6 @@ namespace __gnu_cxx
         }
     };
 }
-#   endif
-
 #endif
 
 namespace Ogre {
@@ -75,6 +68,8 @@ namespace Ogre {
     class _OgreExport StringUtil
     {
     public:
+        OGRE_DEPRECATED static const String& BLANK; /// @deprecated use Ogre::BLANKSTRING instead
+        OGRE_DEPRECATED typedef StringStream StrStreamType; /// @deprecated use Ogre::StringStream instead
 
         /** Removes any whitespace characters, be it standard space or
             TABs and so on.
@@ -87,6 +82,7 @@ namespace Ogre {
 
         /** Returns a StringVector that contains all the substrings delimited
             by the characters in the passed <code>delims</code> argument.
+            @param str
             @param
             delims A list of delimiter characters to split by
             @param
@@ -101,6 +97,7 @@ namespace Ogre {
             by the characters in the passed <code>delims</code> argument,
             or in the <code>doubleDelims</code> argument, which is used to include (normal)
             delimeters in the tokenised string. For example, "strings like this".
+            @param str
             @param
             delims A list of delimiter characters to split by
             @param
@@ -125,6 +122,7 @@ namespace Ogre {
 
 
         /** Returns whether the string begins with the pattern passed in.
+            @param str
             @param pattern The pattern to compare with.
             @param lowerCase If true, the start of the string will be lower cased before
             comparison, pattern should also be in lower case.
@@ -132,6 +130,7 @@ namespace Ogre {
         static bool startsWith(const String& str, const String& pattern, bool lowerCase = true);
 
         /** Returns whether the string ends with the pattern passed in.
+            @param str
             @param pattern The pattern to compare with.
             @param lowerCase If true, the end of the string will be lower cased before
             comparison, pattern should also be in lower case.

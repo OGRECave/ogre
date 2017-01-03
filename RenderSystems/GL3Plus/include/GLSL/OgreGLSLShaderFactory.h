@@ -34,6 +34,9 @@
 
 namespace Ogre
 {
+    class GLSLMonolithicProgramManager;
+    class GLSLSeparableProgramManager;
+
     /** Factory class for GLSL shaders.
      */
     class _OgreGL3PlusExport GLSLShaderFactory : public HighLevelGpuProgramFactory

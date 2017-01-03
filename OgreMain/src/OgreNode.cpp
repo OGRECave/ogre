@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -318,8 +318,8 @@ namespace Ogre {
     Node* Node::createChild(const Vector3& inTranslate, const Quaternion& inRotate)
     {
         Node* newNode = createChildImpl();
-        newNode->translate(inTranslate);
-        newNode->rotate(inRotate);
+        newNode->setPosition(inTranslate);
+        newNode->setOrientation(inRotate);
         this->addChild(newNode);
 
         return newNode;
@@ -328,8 +328,8 @@ namespace Ogre {
     Node* Node::createChild(const String& name, const Vector3& inTranslate, const Quaternion& inRotate)
     {
         Node* newNode = createChildImpl(name);
-        newNode->translate(inTranslate);
-        newNode->rotate(inRotate);
+        newNode->setPosition(inTranslate);
+        newNode->setOrientation(inRotate);
         this->addChild(newNode);
 
         return newNode;

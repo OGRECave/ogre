@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -159,9 +159,10 @@ Sample_VolumeCSG::Sample_VolumeCSG(void) : mVolumeRoot(0), mHideAll(false)
     
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeCSG::keyPressed(const OIS::KeyEvent& evt)
+bool Sample_VolumeCSG::keyPressed(const KeyboardEvent& evt)
 {
-    if (evt.key == OIS::KC_H)
+	Keycode key = evt.keysym.sym;
+    if (key == 'h')
     {
         if (mHideAll)
         {
@@ -205,8 +206,8 @@ void Sample_VolumeCSG::_shutdown()
 
 #ifndef OGRE_STATIC_LIB
 
-SamplePlugin* sp;
-Sample* s;
+static SamplePlugin* sp;
+static Sample* s;
     
 //-----------------------------------------------------------------------
 

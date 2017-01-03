@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreBuildSettings.h"
 #include "OgreFileSystemLayer.h"
 #ifdef OGRE_STATIC_LIB
-#include "../../../../Samples/Common/include/OgreStaticPluginLoader.h"
+#include "OgreStaticPluginLoader.h"
 #endif
 
 #include "OgreMesh.h"
@@ -49,7 +49,7 @@ class MeshLodTests : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 #ifdef OGRE_STATIC_LIB
-    StaticPluginLoader mStaticPluginLoader;
+    OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
     MeshPtr mMesh;
     FileSystemLayer* mFSLayer;

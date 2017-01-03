@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -471,7 +471,6 @@ namespace Ogre {
             return mImpl->createCounterBuffer(sizeBytes, usage, useShadowBuffer, name);
         }
 
-        /** @copydoc HardwareBufferManagerInterface::createVertexDeclaration */
         virtual VertexDeclaration* createVertexDeclaration(void)
         {
             return mImpl->createVertexDeclaration();
@@ -553,12 +552,12 @@ namespace Ogre {
         {
             mImpl->_notifyIndexBufferDestroyed(buf);
         }
-        /** @copydoc HardwareBufferManagerInterface::_notifyUniformBufferDestroyed */
+        /** @copydoc HardwareBufferManagerBase::_notifyUniformBufferDestroyed */
         void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
         {
             mImpl->_notifyUniformBufferDestroyed(buf);
         }
-        /** @copydoc HardwareBufferManagerInterface::_notifyCounterBufferDestroyed */
+        /** @copydoc HardwareBufferManagerBase::_notifyCounterBufferDestroyed */
         void _notifyConterBufferDestroyed(HardwareCounterBuffer* buf)
         {
             mImpl->_notifyCounterBufferDestroyed(buf);

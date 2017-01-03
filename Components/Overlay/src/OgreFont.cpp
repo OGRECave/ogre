@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -422,7 +422,7 @@ namespace Ogre
             OGRE_NEW MemoryDataStream(imageData, data_size, true));
 
         Image img;
-        img.loadRawData( memStream, finalWidth, finalHeight, PF_BYTE_LA );
+        img.loadRawData( memStream, finalWidth, finalHeight, 1, PF_BYTE_LA );
 
         Texture* tex = static_cast<Texture*>(res);
         // Call internal _loadImages, not loadImage since that's external and 

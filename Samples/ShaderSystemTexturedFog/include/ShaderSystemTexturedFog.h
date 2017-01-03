@@ -8,15 +8,13 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-const uint8 cPriorityMain = 50;
-const String FOG_DISTANCE_SLIDER = "FogDistance";
-const String ACTIVATE_FOG_BUTTON = "ActivateFog";
-const String FOG_BACKGROUND_SLIDER = "FogBackground";
-const String ACTIVATE_SKY_BUTTON = "ActivateSkyBox";
-
-
 class _OgreSampleClassExport Sample_ShaderSystemTexturedFog : public SdkSample
 {
+    static const uint8 cPriorityMain = 50;
+    static const String FOG_DISTANCE_SLIDER;
+    static const String ACTIVATE_FOG_BUTTON;
+    static const String FOG_BACKGROUND_SLIDER;
+    static const String ACTIVATE_SKY_BUTTON;
 public:
 
     Sample_ShaderSystemTexturedFog() :
@@ -174,39 +172,46 @@ protected:
         }
     }
 
-    //-----------------------------------------------------------------------
-    bool pointerPressed( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+    bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerDown(evt, id)) 
+        if (mTrayMgr->mousePressed(evt))
             return true;
-        if (id == OIS::MB_Left)     
-            mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
+        
+        if (evt.button == BUTTON_LEFT)
+            // Hide the cursor if user left-clicks in the scene.
+            mTrayMgr->hideCursor();
+
+        return true;
+    }
+
     
-        return true;
-    }
-
-    //-----------------------------------------------------------------------
-    bool pointerReleased( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+    bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerUp(evt, id)) 
+        if (mTrayMgr->mouseReleased(evt))
             return true;
-        if (id == OIS::MB_Left) 
-            mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+        
+        if (evt.button == BUTTON_LEFT)
+            // Unhide the cursor if user lets go of LMB.
+            mTrayMgr->showCursor();
 
         return true;
     }
 
-    //-----------------------------------------------------------------------
-    bool pointerMoved( const OIS::PointerEvent& evt )
-    {
-        // only rotate the camera if cursor is hidden
-        if (mTrayMgr->isCursorVisible()) 
-            mTrayMgr->injectPointerMove(evt);
-        else 
-            mCameraMan->injectPointerMove(evt);
 
+    bool mouseMoved(const MouseMotionEvent& evt)
+    {
+        // Only rotate the camera if cursor is hidden.
+        if (mTrayMgr->isCursorVisible()) 
+            mTrayMgr->mouseMoved(evt);
+        else 
+            mCameraMan->mouseMoved(evt);
 
         return true;
+    }
+
+    void cleanupContent()
+    {
+        MeshManager::getSingleton().remove("floor");
     }
 
 private:

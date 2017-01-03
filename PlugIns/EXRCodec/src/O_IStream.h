@@ -42,8 +42,8 @@ class O_IStream: public Imf::IStream
 {
 public:
 
-    O_IStream(MemoryDataStream& stream, const char fileName[]):
-        IStream (fileName), _stream(stream) {}
+    O_IStream(MemoryDataStream& stream, const char file_name[]):
+        IStream (file_name), _stream(stream) {}
 
     virtual bool    read (char c[], int n);
     virtual Imf::Int64   tellg ();

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -244,7 +244,7 @@ namespace Ogre {
         {
             // Get Material
             Material* thisMaterial = mati->first;
-
+            thisMaterial->touch();
             // Empty existing cache
             mRenderOp.indexData->indexCount = 0;
             // lock index buffer ready to receive data
@@ -269,11 +269,19 @@ namespace Ogre {
 
             while (pit.hasMoreElements())
             {
-                _setPass(pit.getNext());
+                Pass* pass = pit.getNext();
+                _setPass(pass);
 
+                // Do we need to update GPU program parameters?
+                if (pass->isProgrammable())
+                {
+                    mAutoParamDataSource->setCurrentRenderable(0);
+                    mAutoParamDataSource->setCurrentSceneManager(this);
+                    mAutoParamDataSource->setWorldMatrices(&Matrix4::IDENTITY, 1);
+                    mAutoParamDataSource->setCurrentCamera(mCameraInProgress, false);
+                    updateGpuProgramParameters(pass);
+                }
                 mDestRenderSystem->_render(mRenderOp);
-
-
             } 
 
 

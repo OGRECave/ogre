@@ -492,7 +492,10 @@ void GLXConfigurator::SetConfigOption(const String &optionName, const String &va
 ConfigDialog::ConfigDialog() : mImpl(NULL)
 {
 }
-
+//------------------------------------------------------------------------------------//
+ConfigDialog::~ConfigDialog()
+{
+}
 //------------------------------------------------------------------------------------//
 bool ConfigDialog::display()
 {

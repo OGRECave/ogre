@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -49,6 +49,11 @@ The wiki article explaining this demo can be found here :
 
 using namespace Ogre;
 using namespace OgreBites;
+
+const ColourValue SAMPLE_COLORS[] =
+{   ColourValue::Red, ColourValue::Green, ColourValue::Blue,
+    ColourValue::White, ColourValue(1,1,0,1), ColourValue(1,0,1,1)
+};
 
 class _OgreSampleClassExport Sample_DeferredShading : public SdkSample, public RenderTargetListener
 {

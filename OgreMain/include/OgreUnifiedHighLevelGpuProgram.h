@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,13 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
-        static void setPrioriry(String shaderLanguage,int priority);
+
+        /// @deprecated use UnifiedHighLevelGpuProgram::setPriority
+        OGRE_DEPRECATED static void setPrioriry(String shaderLanguage,int priority) {
+            setPriority(shaderLanguage,priority);
+        }
+
+        static void setPriority(String shaderLanguage,int priority);
         static int  getPriority(String shaderLanguage);
 
     protected:
@@ -164,7 +170,7 @@ namespace Ogre {
     };
 
     /** Factory class for Unified programs. */
-    class UnifiedHighLevelGpuProgramFactory : public HighLevelGpuProgramFactory
+    class _OgreExport UnifiedHighLevelGpuProgramFactory : public HighLevelGpuProgramFactory
     {
     public:
         UnifiedHighLevelGpuProgramFactory();

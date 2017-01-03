@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,13 @@ email                : janders@users.sf.net
 
 namespace Ogre
 {
-
+/** \addtogroup Plugins Plugins
+*  @{
+*/
+/** \addtogroup Octree OctreeSceneManager
+* Octree datastructure for managing scene nodes.
+*  @{
+*/
 /** Specialized viewpoint from which an Octree can be rendered.
 @remarks
 This class contains several specializations of the Ogre::Camera class. It
@@ -77,7 +83,8 @@ public:
     OctreeCamera::Visibility getVisibility( const AxisAlignedBox &bound );
 
 };
-
+/** @} */
+/** @} */
 }
 
 #endif

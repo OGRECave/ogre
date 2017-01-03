@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -160,10 +160,13 @@ namespace Ogre {
         
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
-        GLenum format = GLPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
+        GLenum internalformat = GLPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
         uint32 width = mWidth;
         uint32 height = mHeight;
         uint32 depth = mDepth;
+
+        GLenum format = GLPixelUtil::getGLOriginFormat(mFormat);
+        GLenum datatype = GLPixelUtil::getGLOriginDataType(mFormat);
 
         if(PixelUtil::isCompressed(mFormat))
         {
@@ -175,30 +178,30 @@ namespace Ogre {
             uint8 *tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
             
-            for(uint8 mip=0; mip<=mNumMipmaps; mip++)
+            for(uint32 mip=0; mip<=mNumMipmaps; mip++)
             {
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
                 switch(mTextureType)
                 {
                     case TEX_TYPE_1D:
-                        glCompressedTexImage1DARB(GL_TEXTURE_1D, mip, format, 
+                        glCompressedTexImage1DARB(GL_TEXTURE_1D, mip, internalformat, 
                             width, 0, 
                             size, tmpdata);
                         break;
                     case TEX_TYPE_2D:
-                        glCompressedTexImage2DARB(GL_TEXTURE_2D, mip, format,
+                        glCompressedTexImage2DARB(GL_TEXTURE_2D, mip, internalformat,
                             width, height, 0, 
                             size, tmpdata);
                         break;
                     case TEX_TYPE_2D_ARRAY:
                     case TEX_TYPE_3D:
-                        glCompressedTexImage3DARB(getGLTextureTarget(), mip, format,
+                        glCompressedTexImage3DARB(getGLTextureTarget(), mip, internalformat,
                             width, height, depth, 0, 
                             size, tmpdata);
                         break;
                     case TEX_TYPE_CUBE_MAP:
                         for(int face=0; face<6; face++) {
-                            glCompressedTexImage2DARB(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+                            glCompressedTexImage2DARB(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
                                 width, height, 0, 
                                 size, tmpdata);
                         }
@@ -218,33 +221,33 @@ namespace Ogre {
         else
         {
             // Run through this process to pregenerate mipmap pyramid
-            for(uint8 mip=0; mip<=mNumMipmaps; mip++)
+            for(uint32 mip=0; mip<=mNumMipmaps; mip++)
             {
                 // Normal formats
                 switch(mTextureType)
                 {
                     case TEX_TYPE_1D:
-                        glTexImage1D(GL_TEXTURE_1D, mip, format,
+                        glTexImage1D(GL_TEXTURE_1D, mip, internalformat,
                             width, 0, 
-                            GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                            format, datatype, 0);
     
                         break;
                     case TEX_TYPE_2D:
-                        glTexImage2D(GL_TEXTURE_2D, mip, format,
+                        glTexImage2D(GL_TEXTURE_2D, mip, internalformat,
                             width, height, 0, 
-                            GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                            format, datatype, 0);
                         break;
                     case TEX_TYPE_2D_ARRAY:
                     case TEX_TYPE_3D:
-                        glTexImage3D(getGLTextureTarget(), mip, format,
+                        glTexImage3D(getGLTextureTarget(), mip, internalformat,
                             width, height, depth, 0, 
-                            GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                            format, datatype, 0);
                         break;
                     case TEX_TYPE_CUBE_MAP:
                         for(int face=0; face<6; face++) {
-                            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+                            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
                                 width, height, 0, 
-                                GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                                format, datatype, 0);
                         }
                         break;
                     case TEX_TYPE_2D_RECT:
@@ -403,7 +406,7 @@ namespace Ogre {
         
         for(GLint face=0; face<static_cast<GLint>(getNumFaces()); face++)
         {
-            for(uint8 mip=0; mip<=getNumMipmaps(); mip++)
+            for(uint32 mip=0; mip<=getNumMipmaps(); mip++)
             {
                 GLHardwarePixelBuffer *buf = new GLTextureBuffer(mGLSupport, mName, getGLTextureTarget(), mTextureID, face, mip,
                         static_cast<HardwareBuffer::Usage>(mUsage), doSoftware && mip==0, mHwGamma, mFSAA);

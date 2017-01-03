@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,12 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "resource.h"
 
+#define WIN32_LEAN_AND_MEAN
+#if !defined(NOMINMAX) && defined(_MSC_VER)
+#   define NOMINMAX // required to stop windows.h messing up std::min
+#endif
+#include <windows.h>
+
 namespace
 {
     Ogre::ConfigDialog* dlg;  // This is a pointer to instance, since this is a static member
@@ -40,34 +46,47 @@ namespace
 
 namespace Ogre
 {
-    ConfigDialog::ConfigDialog()
+    struct ConfigDialog::PrivateData {
+        RenderSystem* mSelectedRenderSystem;
+        HINSTANCE mHInstance; // HInstance of application, for dialog
+
+        /** Callback to process window events */
+#if OGRE_ARCHITECTURE_64 == OGRE_ARCH_TYPE
+        static INT_PTR CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+#else
+        static BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+#endif
+    };
+
+    ConfigDialog::ConfigDialog() : mImpl(new ConfigDialog::PrivateData())
     {
 		#ifdef __MINGW32__
 			#ifdef OGRE_STATIC_LIB
-        		mHInstance = GetModuleHandle( NULL );
+                mImpl->mHInstance = GetModuleHandle( NULL );
 			#else
 				#if OGRE_DEBUG_MODE == 1
-					mHInstance = GetModuleHandle("OgreMain_d.dll");
+        		    mImpl->mHInstance = GetModuleHandle("OgreMain_d.dll");
 				#else
-					mHInstance = GetModuleHandle("OgreMain.dll");
+					mImpl->mHInstance = GetModuleHandle("OgreMain.dll");
 				#endif
 			#endif
 		#else
 			static const TCHAR staticVar;
-			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &mHInstance);
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &mImpl->mHInstance);
 		#endif
 
-        mSelectedRenderSystem = 0;
+        mImpl->mSelectedRenderSystem = 0;
     }
 
     ConfigDialog::~ConfigDialog()
     {
+        delete mImpl;
     }
 
 #if OGRE_ARCHITECTURE_64 == OGRE_ARCH_TYPE
-    INT_PTR ConfigDialog::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+    INT_PTR ConfigDialog::PrivateData::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 #else
-    BOOL ConfigDialog::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+    BOOL ConfigDialog::PrivateData::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 #endif
     {
         HWND hwndDlgItem;
@@ -83,7 +102,7 @@ namespace Ogre
 
         case WM_INITDIALOG:
             // Load saved settings
-            dlg->mSelectedRenderSystem = Root::getSingleton().getRenderSystem();
+            dlg->mImpl->mSelectedRenderSystem = Root::getSingleton().getRenderSystem();
             // Get all render systems
             lstRend = &Root::getSingleton().getAvailableRenderers();
             pRend = lstRend->begin();            
@@ -95,7 +114,7 @@ namespace Ogre
                 SendMessage(hwndDlgItem, CB_ADDSTRING, 0,
                     (LPARAM)(char*)(*pRend)->getName().c_str());
 
-                if (*pRend == dlg->mSelectedRenderSystem)
+                if (*pRend == dlg->mImpl->mSelectedRenderSystem)
                 {
                     // Select
                     SendMessage(hwndDlgItem, CB_SETCURSEL, (WPARAM)i, 0);
@@ -152,7 +171,7 @@ namespace Ogre
                     {
                         // Get RenderSystem selected
                         pRend = lstRend->begin();
-                        dlg->mSelectedRenderSystem = pRend[sel];
+                        dlg->mImpl->mSelectedRenderSystem = pRend[sel];
                         // refresh options
                         // Get options from render system
                         opts = pRend[sel]->getConfigOptions();
@@ -229,10 +248,10 @@ namespace Ogre
                         StringVector::iterator pPoss = pOpt->second.possibleValues.begin();
 
                         // Set option
-                        dlg->mSelectedRenderSystem->setConfigOption(
+                        dlg->mImpl->mSelectedRenderSystem->setConfigOption(
                             pOpt->second.name, pPoss[sel]);
                         // Re-retrieve options
-                        opts = dlg->mSelectedRenderSystem->getConfigOptions();
+                        opts = dlg->mImpl->mSelectedRenderSystem->getConfigOptions();
 
                         // Reset options list box
                         hwndDlgItem = GetDlgItem(hDlg, IDC_LST_OPTIONS);
@@ -255,17 +274,17 @@ namespace Ogre
 
             case IDOK:
                 // Set render system
-                if (!dlg->mSelectedRenderSystem)
+                if (!dlg->mImpl->mSelectedRenderSystem)
                 {
                     MessageBox(NULL, "Please choose a rendering system.", "OGRE", MB_OK | MB_ICONEXCLAMATION);
                     return TRUE;
                 }
-                err = dlg->mSelectedRenderSystem->validateConfigOptions();
+                err = dlg->mImpl->mSelectedRenderSystem->validateConfigOptions();
                 if (err.length() > 0)
                 {
                     // refresh options incase updated by validation
                     // Get options from render system
-                    opts = dlg->mSelectedRenderSystem->getConfigOptions();
+                    opts = dlg->mImpl->mSelectedRenderSystem->getConfigOptions();
                     // Reset list box
                     hwndDlgItem = GetDlgItem(hDlg, IDC_LST_OPTIONS);
                     SendMessage(hwndDlgItem, LB_RESETCONTENT, 0, 0);
@@ -282,7 +301,7 @@ namespace Ogre
                     return TRUE;
                 }
 
-                Root::getSingleton().setRenderSystem(dlg->mSelectedRenderSystem);
+                Root::getSingleton().setRenderSystem(dlg->mImpl->mSelectedRenderSystem);
 
                 EndDialog(hDlg, TRUE);
                 return TRUE;
@@ -304,7 +323,7 @@ namespace Ogre
         int i;
         dlg = this;
         
-        i = DialogBox(mHInstance, MAKEINTRESOURCE(IDD_DLG_CONFIG), NULL, DlgProc);
+        i = DialogBox(mImpl->mHInstance, MAKEINTRESOURCE(IDD_DLG_CONFIG), NULL, ConfigDialog::PrivateData::DlgProc);
 
         if (i == -1)
         {

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -235,7 +235,7 @@ namespace Ogre {
     Image& Image::loadDynamicImage( uchar* pData, uint32 uWidth, uint32 uHeight,
         uint32 depth,
         PixelFormat eFormat, bool autoDelete, 
-        size_t numFaces, uint8 numMipMaps)
+        size_t numFaces, uint32 numMipMaps)
     {
 
         freeMemory();
@@ -272,7 +272,7 @@ namespace Ogre {
         DataStreamPtr& stream, 
         uint32 uWidth, uint32 uHeight, uint32 uDepth,
         PixelFormat eFormat,
-        size_t numFaces, uint8 numMipMaps)
+        size_t numFaces, uint32 numMipMaps)
     {
 
         size_t size = calculateSize(numMipMaps, numFaces, uWidth, uHeight, uDepth, eFormat);
@@ -467,7 +467,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    uint8 Image::getNumMipmaps() const
+    uint32 Image::getNumMipmaps() const
     {
         return mNumMipmaps;
     }

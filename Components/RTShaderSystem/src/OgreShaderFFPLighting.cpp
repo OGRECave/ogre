@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -264,7 +264,11 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	mSurfaceShininess = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_SHININESS, 0);
 	
 	// Resolve input vertex shader normal.
-	mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+	// first look in local variables so other SRS can override
+	mVSInNormal = vsMain->getParameterByContent(vsMain->getLocalParameters(), Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+	if(mVSInNormal.isNull()) {
+	    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+	}
 	
 	if (mTrackVertexColourType != 0)
 	{

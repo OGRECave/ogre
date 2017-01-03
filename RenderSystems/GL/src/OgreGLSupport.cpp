@@ -5,7 +5,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,25 +34,10 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    void GLSupport::setConfigOption(const String &name, const String &value)
-    {
-        ConfigOptionMap::iterator it = mOptions.find(name);
-
-        if (it != mOptions.end())
-            it->second.currentValue = value;
-    }
-
-    ConfigOptionMap& GLSupport::getConfigOptions(void)
-    {
-        return mOptions;
-    }
-
     void GLSupport::initialiseExtensions(void)
     {
         // Set version string
         const GLubyte* pcVer = glGetString(GL_VERSION);
-
-
         assert(pcVer && "Problems getting GL version string using glGetString");
        
         String tmpStr = (const char*)pcVer;
@@ -75,9 +60,8 @@ namespace Ogre {
         String str;
 
         const GLubyte* pcExt = glGetString(GL_EXTENSIONS);
-        LogManager::getSingleton().logMessage("GL_EXTENSIONS = " + String((const char*)pcExt));
-
         assert(pcExt && "Problems getting GL extension string using glGetString");
+        LogManager::getSingleton().logMessage("GL_EXTENSIONS = " + String((const char*)pcExt));
 
         ext << pcExt;
 
@@ -128,20 +112,12 @@ namespace Ogre {
     {
         assert(!extensionList.empty() && "ExtensionList is empty!" );
 
-        if(extensionList.find(ext) == extensionList.end())
-            return false; 
-        
-        return true;
+        return extensionList.find(ext) != extensionList.end() || mNative->checkExtension(ext);
     }
     
     bool GLSupport::supportsPBuffers()
     {
         return (GLEW_ARB_pixel_buffer_object || GLEW_EXT_pixel_buffer_object) != GL_FALSE;
-    }
-
-    GLPBuffer* GLSupport::createPBuffer(PixelComponentType format, size_t width, size_t height)
-    {
-        return 0;
     }
 
 }

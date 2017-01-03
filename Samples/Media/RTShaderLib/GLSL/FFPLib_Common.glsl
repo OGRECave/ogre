@@ -193,33 +193,39 @@ void FFP_Subtract(in vec4 vIn0, in vec4 vIn1, out vec4 vOut)
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Lerp(in float vIn0, in float vIn1, float T, out float vOut)
+void FFP_Lerp(in float vIn0, in float vIn1, in float T, out float vOut)
 {
 	vOut = mix(vIn0, vIn1, T);
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Lerp(in vec2 vIn0, in vec2 vIn1, float T, out vec2 vOut)
+void FFP_Lerp(in vec2 vIn0, in vec2 vIn1, in float T, out vec2 vOut)
 {
 	vOut = mix(vIn0, vIn1, T);
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Lerp(in vec3 vIn0, in vec3 vIn1, float T, out vec3 vOut)
+void FFP_Lerp(in vec3 vIn0, in vec3 vIn1, in float T, out vec3 vOut)
 {
 	vOut = mix(vIn0, vIn1, T);
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Lerp(in vec4 vIn0, in vec4 vIn1, float T, out vec4 vOut)
+void FFP_Lerp(in vec4 vIn0, in vec4 vIn1, in float T, out vec4 vOut)
 {
 	vOut = mix(vIn0, vIn1, T);
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Lerp(in vec4 vIn0, in vec4 vIn1, vec4 T, out vec4 vOut)
+void FFP_Lerp(in vec4 vIn0, in vec4 vIn1, in vec4 T, out vec4 vOut)
 {
 	vOut = mix(vIn0, vIn1, T);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Lerp(in vec3 vIn0, in vec3 vIn1, in vec4 T, out vec3 vOut)
+{
+	vOut = mix(vIn0, vIn1, T.xyz);
 }
 
 //-----------------------------------------------------------------------------
@@ -244,4 +250,10 @@ void FFP_DotProduct(in vec3 vIn0, in vec3 vIn1, out vec3 vOut)
 void FFP_DotProduct(in vec4 vIn0, in vec4 vIn1, out vec4 vOut)
 {
 	vOut = vec4(dot(vIn0, vIn1), 1.0, 1.0, 1.0);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Normalize(inout vec3 vIn)
+{
+    vIn = normalize(vIn);
 }

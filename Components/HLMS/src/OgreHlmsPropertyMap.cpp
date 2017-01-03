@@ -114,15 +114,15 @@ namespace Ogre
 		{
 			if (mHash == 0)
 			{
-				float* buffer = new float[mProperties.size() * 2];
+				std::vector<int32> buffer(mProperties.size() * 2);
 				int j = 0;
-				for (unsigned int i = 0; i < mProperties.size(); i++)
+				for (size_t i = 0; i < mProperties.size(); i++)
 				{
-					buffer[j++] = mProperties[i].keyName.mHash;
+					buffer[j++] = int32(mProperties[i].keyName.mHash);
 					buffer[j++] = mProperties[i].value;
 				}
 
-				mHash = calcHash((void*)buffer, mProperties.size() * 2 * sizeof(float));
+				mHash = calcHash(&buffer[0], mProperties.size() * 2 * sizeof(int32));
 			}
 		}
 

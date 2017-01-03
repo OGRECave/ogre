@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -128,7 +128,7 @@ namespace Ogre {
                     if (gpuType == GCT_UNKNOWN)
                     {
                         OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                            "Can not convert Operand::OpMask to GpuConstantType", 
+                            "Can not convert '"+paramTokens[1]+"' to GpuConstantType",
                             "GLSLESProgramWriter::createInvocationFromString" );    
                     }
 
@@ -151,7 +151,7 @@ namespace Ogre {
         {
             // Uses recursion to find any functions that the supplied function invocation depends on
             FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
-            String body = BLANKSTRING;
+            String body;
 
             // Find the function in the cache and retrieve the body
             for (; itCache != mFunctionCacheMap.end(); ++itCache)
@@ -163,7 +163,7 @@ namespace Ogre {
                 break;
             }
 
-            if(body != BLANKSTRING)
+            if(!body.empty())
             {
                 // Trim whitespace
                 StringUtil::trim(body);
@@ -171,7 +171,7 @@ namespace Ogre {
 
                 for (StringVector::const_iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
-                    StringVector moreTokens = StringUtil::split(*it, " ");
+                    StringVector moreTokens = StringUtil::split(*it, " \n");
 
                     if (!moreTokens.empty())
                     {
@@ -225,19 +225,21 @@ namespace Ogre {
             mGpuConstTypeMap[GCT_MATRIX_4X3] = "mat4x3";
             mGpuConstTypeMap[GCT_MATRIX_4X4] = "mat4";
             mGpuConstTypeMap[GCT_INT1] = "int";
-            mGpuConstTypeMap[GCT_INT2] = "int2";
-            mGpuConstTypeMap[GCT_INT3] = "int3";
-            mGpuConstTypeMap[GCT_INT4] = "int4";
+            mGpuConstTypeMap[GCT_INT2] = "ivec2";
+            mGpuConstTypeMap[GCT_INT3] = "ivec3";
+            mGpuConstTypeMap[GCT_INT4] = "ivec4";
             mGpuConstTypeMap[GCT_UINT1] = "uint";
-            mGpuConstTypeMap[GCT_UINT2] = "uint2";
-            mGpuConstTypeMap[GCT_UINT3] = "uint3";
-            mGpuConstTypeMap[GCT_UINT4] = "uint4";
+            mGpuConstTypeMap[GCT_UINT2] = "uvec2";
+            mGpuConstTypeMap[GCT_UINT3] = "uvec3";
+            mGpuConstTypeMap[GCT_UINT4] = "uvec4";
 
             // Custom vertex attributes defined http://www.ogre3d.org/docs/manual/manual_21.html
             mContentToPerVertexAttributes[Parameter::SPC_POSITION_OBJECT_SPACE] = "vertex";
             mContentToPerVertexAttributes[Parameter::SPC_NORMAL_OBJECT_SPACE] = "normal";
             mContentToPerVertexAttributes[Parameter::SPC_TANGENT_OBJECT_SPACE] = "tangent";
             mContentToPerVertexAttributes[Parameter::SPC_BINORMAL_OBJECT_SPACE] = "binormal";
+            mContentToPerVertexAttributes[Parameter::SPC_BLEND_INDICES] = "blendIndices";
+            mContentToPerVertexAttributes[Parameter::SPC_BLEND_WEIGHTS] = "blendWeights";
 
             mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE0] = "uv0";
             mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE1] = "uv1";
@@ -286,12 +288,15 @@ namespace Ogre {
             os << "precision highp float;" << std::endl;
             os << "precision highp int;" << std::endl;
 
-            // Redefine texture functions to maintain reusability
             if(mGLSLVersion > 100)
             {
+                // sampler3D has no default precision
+                os << "precision highp sampler3D;" << std::endl;
+                // Redefine texture functions to maintain reusability
                 os << "#define texture2D texture" << std::endl;
                 os << "#define texture3D texture" << std::endl;
                 os << "#define textureCube texture" << std::endl;
+                os << "#define texture2DLod textureLod" << std::endl;
             }
 
             // Generate source code header.
@@ -908,7 +913,7 @@ namespace Ogre {
 
             mCachedFunctionLibraries[libName] = "";
 
-            String libFileName =  libName + ".glsles";
+            String libFileName =  libName + ".glsl";
 
             DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(libFileName);
 
@@ -993,7 +998,9 @@ namespace Ogre {
                                 if(lparen_pos != String::npos)
                                 {
                                     StringVector lineTokens = StringUtil::split(line, "(");
-                                    paramTokens = StringUtil::split(lineTokens[1], ",");
+                                    if(lineTokens.size() == 2) {
+                                        paramTokens = StringUtil::split(lineTokens[1], ",");
+                                    }
                                 }
                                 else
                                 {

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -425,7 +425,7 @@ namespace Ogre {
     bool Root::restoreConfig(void)
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "restoreConfig is not supported on NaCl",
+        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "restoreConfig is not supported",
             "Root::restoreConfig");
 #endif
 
@@ -539,6 +539,31 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
+    bool Root::showConfigDialog(ConfigDialog* dialog) {
+        if(dialog) {
+            restoreConfig();
+
+            if (dialog->display()) {
+                saveConfig();
+                return true;
+            }
+
+            return false;
+        }
+
+        const RenderSystemList& lstRend = Root::getSingleton().getAvailableRenderers();
+
+        // just select the first available render system
+        if (!lstRend.empty())
+        {
+            Root::getSingleton().setRenderSystem(lstRend.front());
+            return true;
+        }
+
+        return false;
+    }
+
+    //-----------------------------------------------------------------------
     bool Root::showConfigDialog(void)
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
@@ -548,15 +573,8 @@ namespace Ogre {
 
         // Displays the standard config dialog
         // Will use stored defaults if available
-        ConfigDialog* dlg;
-        bool isOk;
-
-        restoreConfig();
-
-        dlg = OGRE_NEW ConfigDialog();
-        isOk = dlg->display();
-        if (isOk)
-            saveConfig();
+        ConfigDialog* dlg = OGRE_NEW ConfigDialog();
+        bool isOk = showConfigDialog(dlg);
 
         OGRE_DELETE dlg;
         return isOk;

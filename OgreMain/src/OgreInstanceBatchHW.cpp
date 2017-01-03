@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -183,7 +183,7 @@ namespace Ogre
         size_t retVal = 0;
 
         //Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
-        const size_t bufferIdx = mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1;
+        const ushort bufferIdx = ushort(mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1);
         float *pDest = static_cast<float*>(mRenderOperation.vertexData->vertexBufferBinding->
                                             getBuffer(bufferIdx)->lock( HardwareBuffer::HBL_DISCARD ));
 

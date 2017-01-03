@@ -19,7 +19,7 @@ using namespace ps10;
 
 #include "nvparse_errors.h"
 #include "nvparse_externs.h"
-
+#define YY_NO_UNPUT
 
 #define YY_INPUT(buf,result,max_size)                            \
 {                                                                \

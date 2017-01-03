@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -17,8 +17,8 @@ same license as the rest of the engine.
 using namespace Ogre;
 using namespace OgreBites;
 
-SamplePlugin* sp;
-Sample* s;
+static SamplePlugin* sp;
+static Sample* s;
 
 class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
 {

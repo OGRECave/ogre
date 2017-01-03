@@ -1,7 +1,14 @@
+@property( !is_gles )
 #version 120
+@end @property( is_gles )
+#version 300 es
+
+#define varying out
+#define attribute in
 
 precision highp int;
 precision highp float;
+@end
 
 uniform mat4 mvpMat;
 uniform mat4 mvMat;

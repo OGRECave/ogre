@@ -29,7 +29,8 @@ THE SOFTWARE.
 #include "OgreGLES2DefaultHardwareBufferManager.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
     GLES2DefaultHardwareVertexBuffer::GLES2DefaultHardwareVertexBuffer(size_t vertexSize,
@@ -102,7 +103,6 @@ namespace Ogre {
         : HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false)
           // always software, never shadowed
     {
-#if OGRE_NO_GLES3_SUPPORT == 1
         if (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_32BIT_INDEX) &&
             idxType == HardwareIndexBuffer::IT_32BIT)
         {
@@ -110,7 +110,7 @@ namespace Ogre {
                 "32 bit hardware buffers are not allowed in OpenGL ES.",
                 "GLES2DefaultHardwareIndexBuffer");
         }
-#endif
+
         mData = new unsigned char[mSizeInBytes];
     }
 
@@ -250,7 +250,7 @@ namespace Ogre {
     GLES2DefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                                  bool useShadowBuffer, const String& name)
     {
-        if(!gleswIsSupported(3, 0))
+        if(!getGLES2SupportRef()->hasMinGLVersion(3, 0))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "GLES2 does not support uniform buffer objects",

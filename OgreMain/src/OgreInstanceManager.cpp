@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -574,7 +574,7 @@ namespace Ogre
             newVertexData->vertexCount = indicesMap.size();
             newVertexData->vertexDeclaration = sharedVertexData->vertexDeclaration->clone();
 
-            for (size_t bufIdx = 0; bufIdx < sharedVertexData->vertexBufferBinding->getBufferCount(); bufIdx++) 
+            for (uint16 bufIdx = 0; bufIdx < uint16(sharedVertexData->vertexBufferBinding->getBufferCount()); bufIdx++)
             {
                 HardwareVertexBufferSharedPtr sharedVertexBuffer = sharedVertexData->vertexBufferBinding->getBuffer(bufIdx);
                 size_t vertexSize = sharedVertexBuffer->getVertexSize();                

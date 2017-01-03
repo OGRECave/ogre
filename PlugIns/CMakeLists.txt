@@ -27,6 +27,10 @@ if (OGRE_BUILD_PLUGIN_CG)
   endif (NOT Cg_FOUND)
 endif (OGRE_BUILD_PLUGIN_CG)
 
+if (OGRE_BUILD_PLUGIN_EXRCODEC)
+  add_subdirectory(EXRCodec)
+endif (OGRE_BUILD_PLUGIN_EXRCODEC)
+
 if (OGRE_BUILD_PLUGIN_PFX)
   add_subdirectory(ParticleFX)
 endif (OGRE_BUILD_PLUGIN_PFX)
@@ -35,4 +39,3 @@ if (OGRE_BUILD_PLUGIN_PCZ)
   add_subdirectory(PCZSceneManager)
   add_subdirectory(OctreeZone)
 endif (OGRE_BUILD_PLUGIN_PCZ)
-

@@ -31,14 +31,32 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
 
-#define GL_R8_SNORM                       0x8F94
-#define GL_RG8_SNORM                      0x8F95
-#define GL_RGB8_SNORM                     0x8F96
-#define GL_RGBA8_SNORM                    0x8F97
-#define GL_R16_SNORM                      0x8F98
-#define GL_RG16_SNORM                     0x8F99
-#define GL_RGB16_SNORM                    0x8F9A
-#define GL_RGBA16_SNORM                   0x8F9B
+#ifndef GL_EXT_texture_compression_s3tc
+#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT   0x83F0
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT  0x83F1
+#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT  0x83F2
+#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  0x83F3
+#endif
+
+#ifndef GL_EXT_texture_sRGB
+#define GL_SRGB_EXT                       0x8C40
+#define GL_SRGB8_EXT                      0x8C41
+#define GL_SRGB_ALPHA_EXT                 0x8C42
+#define GL_SRGB8_ALPHA8_EXT               0x8C43
+#define GL_SLUMINANCE_ALPHA_EXT           0x8C44
+#define GL_SLUMINANCE8_ALPHA8_EXT         0x8C45
+#define GL_SLUMINANCE_EXT                 0x8C46
+#define GL_SLUMINANCE8_EXT                0x8C47
+#define GL_COMPRESSED_SRGB_EXT            0x8C48
+#define GL_COMPRESSED_SRGB_ALPHA_EXT      0x8C49
+#define GL_COMPRESSED_SLUMINANCE_EXT      0x8C4A
+#define GL_COMPRESSED_SLUMINANCE_ALPHA_EXT 0x8C4B
+#define GL_COMPRESSED_SRGB_S3TC_DXT1_EXT  0x8C4C
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT 0x8C4D
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT 0x8C4E
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT 0x8C4F
+#endif
+
 
 namespace Ogre  {
 
@@ -118,30 +136,33 @@ namespace Ogre  {
         case PF_DXT5:
             return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
         case PF_R8_UINT:
-        case PF_R8G8_UINT:
-        case PF_R8G8B8_UINT:
-        case PF_R8G8B8A8_UINT:
-        case PF_R16_UINT:
-        case PF_R16G16_UINT:
-        case PF_R16G16B16_UINT:
-        case PF_R16G16B16A16_UINT:
-        case PF_R32_UINT:
-        case PF_R32G32_UINT:
-        case PF_R32G32B32_UINT:
-        case PF_R32G32B32A32_UINT:
         case PF_R8_SINT:
-        case PF_R8G8_SINT:
-        case PF_R8G8B8_SINT:
-        case PF_R8G8B8A8_SINT:
+        case PF_R16_UINT:
         case PF_R16_SINT:
-        case PF_R16G16_SINT:
-        case PF_R16G16B16_SINT:
-        case PF_R16G16B16A16_SINT:
+        case PF_R32_UINT:
         case PF_R32_SINT:
+            return GL_RED_INTEGER;
+        case PF_R8G8_UINT:
+        case PF_R8G8_SINT:
+        case PF_R16G16_UINT:
+        case PF_R16G16_SINT:
+        case PF_R32G32_UINT:
         case PF_R32G32_SINT:
-        case PF_R32G32B32_SINT:
-        case PF_R32G32B32A32_SINT:
             return GL_RG_INTEGER;
+        case PF_R8G8B8_UINT:
+        case PF_R8G8B8_SINT:
+        case PF_R16G16B16_UINT:
+        case PF_R16G16B16_SINT:
+        case PF_R32G32B32_UINT:
+        case PF_R32G32B32_SINT:
+            return GL_RGB_INTEGER;
+        case PF_R8G8B8A8_UINT:
+        case PF_R8G8B8A8_SINT:
+        case PF_R16G16B16A16_UINT:
+        case PF_R16G16B16A16_SINT:
+        case PF_R32G32B32A32_UINT:
+        case PF_R32G32B32A32_SINT:
+            return GL_RGBA_INTEGER;
         case PF_R11G11B10_FLOAT:
             return GL_RGB;
         case PF_R9G9B9E5_SHAREDEXP:
@@ -195,21 +216,23 @@ namespace Ogre  {
         switch(format)
         {
         case PF_DEPTH:
-            return GL_UNSIGNED_INT;
+            return GL_UNSIGNED_SHORT;
         case PF_BYTE_LA:
         case PF_A8:
         case PF_L8:
         case PF_R8G8B8:
         case PF_B8G8R8:
+            return GL_UNSIGNED_BYTE;
         case PF_R8_SNORM:
         case PF_R8G8_SNORM:
         case PF_R8G8B8_SNORM:
         case PF_R8G8B8A8_SNORM:
+            return GL_BYTE;
         case PF_R16_SNORM:
         case PF_R16G16_SNORM:
         case PF_R16G16B16_SNORM:
         case PF_R16G16B16A16_SNORM:
-            return GL_UNSIGNED_BYTE;
+            return GL_SHORT;
         case PF_R3G3B2:
             return GL_UNSIGNED_BYTE_3_3_2;
         case PF_A1R5G5B5:
@@ -267,30 +290,33 @@ namespace Ogre  {
         case PF_R11G11B10_FLOAT:
             return GL_UNSIGNED_INT_10F_11F_11F_REV;
         case PF_R8_UINT:
-        case PF_R16_UINT:
-        case PF_R32_UINT:
         case PF_R8G8_UINT:
-        case PF_R16G16_UINT:
-        case PF_R32G32_UINT:
         case PF_R8G8B8_UINT:
-        case PF_R16G16B16_UINT:
-        case PF_R32G32B32_UINT:
         case PF_R8G8B8A8_UINT:
+            return GL_UNSIGNED_BYTE;
+        case PF_R16_UINT:
+        case PF_R16G16_UINT:
+        case PF_R16G16B16_UINT:
         case PF_R16G16B16A16_UINT:
+            return GL_UNSIGNED_SHORT;
+        case PF_R32_UINT:
+        case PF_R32G32_UINT:
+        case PF_R32G32B32_UINT:
         case PF_R32G32B32A32_UINT:
             return GL_UNSIGNED_INT;
-
-        case PF_R8G8_SINT:
-        case PF_R16G16_SINT:
-        case PF_R32G32_SINT:
         case PF_R8_SINT:
-        case PF_R16_SINT:
-        case PF_R32_SINT:
+        case PF_R8G8_SINT:
         case PF_R8G8B8_SINT:
-        case PF_R16G16B16_SINT:
-        case PF_R32G32B32_SINT:
         case PF_R8G8B8A8_SINT:
+            return GL_BYTE;
+        case PF_R16_SINT:
+        case PF_R16G16_SINT:
+        case PF_R16G16B16_SINT:
         case PF_R16G16B16A16_SINT:
+            return GL_SHORT;
+        case PF_R32_SINT:
+        case PF_R32G32_SINT:
+        case PF_R32G32B32_SINT:
         case PF_R32G32B32A32_SINT:
             return GL_INT;
 

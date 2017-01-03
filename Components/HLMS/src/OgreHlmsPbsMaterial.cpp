@@ -59,16 +59,16 @@ namespace Ogre
 		_samplers[ST_D2_F0].init("d2_f0", true, true);
 
 
-		RenderSystem* rs = Root::getSingleton().getRenderSystem();
+		const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
 
 		String language = "";
-		if (rs->getCapabilities()->isShaderProfileSupported("hlsl"))
+		if (caps->isShaderProfileSupported("hlsl"))
 		{
 			language = "hlsl";
 			mVertexDatablock.addProfile("vs_3_0");
 			mFragmentDatablock.addProfile("ps_3_0");
 		}
-		else if (rs->getCapabilities()->isShaderProfileSupported("glsl"))
+		else if (caps->isShaderProfileSupported("glsl"))
 		{
 			language = "glsl";
 		}
@@ -77,14 +77,15 @@ namespace Ogre
 			language = "glsles";
 		}
 
+        mIsGLES = language == "glsles";
+
 		mVertexDatablock.setLanguage(language);
 		mFragmentDatablock.setLanguage(language);
 
 		mVertexDatablock.setTemplateName("PBS");
 		mFragmentDatablock.setTemplateName("PBS");
 
-		// TODO check if the hardware supports gamma correction "Root::getSingleton().getRenderSystem()->getCapabilities()" doesen't support this check
-		mCanHardwareGamma = false;
+		mCanHardwareGamma = caps->hasCapability(RSC_HW_GAMMA);
 	}
 	//-----------------------------------------------------------------------------------
 	PbsMaterial::PbsMaterial(const PbsMaterial &obj)
@@ -195,6 +196,9 @@ namespace Ogre
 		mPropertyMap.setProperty("lights_spot_count", mSpotLightCount);
 
 		mPropertyMap.setProperty("lights_count", mDirectionalLightCount + mPointLightCount + mSpotLightCount);
+
+		// tell the shader some details about the render system
+		mPropertyMap.setProperty("is_gles", mIsGLES);
 
 		// tell the shader if the hardware supports hardware gamma correction or not 
 		mPropertyMap.setProperty("hw_gamma_read", mCanHardwareGamma);
