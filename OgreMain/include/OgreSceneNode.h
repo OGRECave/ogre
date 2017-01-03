@@ -127,18 +127,18 @@ namespace Ogre {
 
         /** Reports the number of objects attached to this node.
         */
-        virtual unsigned short numAttachedObjects(void) const;
+        unsigned short numAttachedObjects(void) const;
 
         /** Retrieves a pointer to an attached object.
         @remarks Retrieves by index, see alternate version to retrieve by name. The index
         of an object may change as other objects are added / removed.
         */
-        virtual MovableObject* getAttachedObject(unsigned short index);
+        MovableObject* getAttachedObject(unsigned short index);
 
         /** Retrieves a pointer to an attached object.
         @remarks Retrieves by object name, see alternate version to retrieve by index.
         */
-        virtual MovableObject* getAttachedObject(const String& name);
+        MovableObject* getAttachedObject(const String& name);
 
         /** Detaches the indexed object from this scene node.
         @remarks
@@ -159,13 +159,13 @@ namespace Ogre {
         /** Determines whether this node is in the scene graph, i.e.
             whether it's ultimate ancestor is the root scene node.
         */
-        virtual bool isInSceneGraph(void) const { return mIsInSceneGraph; }
+        bool isInSceneGraph(void) const { return mIsInSceneGraph; }
 
         /** Notifies this SceneNode that it is the root scene node. 
         @remarks
             Only SceneManager should call this!
         */
-        virtual void _notifyRootNode(void) { mIsInSceneGraph = true; }
+        void _notifyRootNode(void) { mIsInSceneGraph = true; }
             
 
         /** Internal method to update the Node.
@@ -180,7 +180,7 @@ namespace Ogre {
                     so the child should retrieve the parent's transform and combine it with its own
                     even if it hasn't changed itself.
         */
-        virtual void _update(bool updateChildren, bool parentHasChanged);
+        void _update(bool updateChildren, bool parentHasChanged);
 
         /** Tells the SceneNode to update the world bound info it stores.
         */
@@ -204,7 +204,7 @@ namespace Ogre {
                 displayNodes If true, the nodes themselves are rendered as a set of 3 axes as well
                     as the objects being rendered. For debugging purposes.
         */
-        virtual void _findVisibleObjects(Camera* cam, RenderQueue* queue, 
+        void _findVisibleObjects(Camera* cam, RenderQueue* queue,
             VisibleObjectsBoundsInfo* visibleBounds, 
             bool includeChildren = true, bool displayNodes = false, bool onlyShadowCasters = false);
 
@@ -213,7 +213,7 @@ namespace Ogre {
             Recommended only if you are extending a SceneManager, because the bounding box returned
             from this method is only up to date after the SceneManager has called _update.
         */
-        virtual const AxisAlignedBox& _getWorldAABB(void) const;
+        const AxisAlignedBox& _getWorldAABB(void) const { return mWorldAABB; }
 
         /** Retrieves an iterator which can be used to efficiently step through the objects 
             attached to this node.
@@ -225,7 +225,9 @@ namespace Ogre {
             until the end, or retrieve a new iterator after making the change. Making changes to
             the object returned through the iterator is OK though.
         */
-        virtual ObjectIterator getAttachedObjectIterator(void);
+        ObjectIterator getAttachedObjectIterator(void) {
+            return ObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
+        }
         /** Retrieves an iterator which can be used to efficiently step through the objects 
             attached to this node.
         @remarks
@@ -236,7 +238,9 @@ namespace Ogre {
             until the end, or retrieve a new iterator after making the change. Making changes to
             the object returned through the iterator is OK though.
         */
-        virtual ConstObjectIterator getAttachedObjectIterator(void) const;
+        ConstObjectIterator getAttachedObjectIterator(void) const {
+            return ConstObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
+        }
 
         /** Gets the creator of this scene node. 
         @remarks
@@ -255,7 +259,7 @@ namespace Ogre {
             detaching it from it's parent. Note that any objects attached to
             the nodes will be detached but will not themselves be destroyed.
         */
-        virtual void removeAndDestroyChild(const String& name);
+        void removeAndDestroyChild(const String& name);
 
         /** This method removes and destroys the child and all of its children.
         @remarks
@@ -267,7 +271,7 @@ namespace Ogre {
             detaching it from it's parent. Note that any objects attached to
             the nodes will be detached but will not themselves be destroyed.
         */
-        virtual void removeAndDestroyChild(unsigned short index);
+        void removeAndDestroyChild(unsigned short index);
 
         /** Removes and destroys all children of this node.
         @remarks
@@ -275,24 +279,24 @@ namespace Ogre {
             them from the scene graph. Note that all objects attached to this
             node will be detached but will not be destroyed.
         */
-        virtual void removeAndDestroyAllChildren(void);
+        void removeAndDestroyAllChildren(void);
 
         /** Allows the showing of the node's bounding box.
         @remarks
             Use this to show or hide the bounding box of the node.
         */
-        virtual void showBoundingBox(bool bShow);
+        void showBoundingBox(bool bShow) { mShowBoundingBox = bShow; }
 
         /** Allows the overriding of the node's bounding box
             over the SceneManager's bounding box setting.
         @remarks
             Use this to override the bounding box setting of the node.
         */
-        virtual void hideBoundingBox(bool bHide);
+        void hideBoundingBox(bool bHide) { mHideBoundingBox = bHide; }
 
         /** Add the bounding box to the rendering queue.
         */
-        virtual void _addBoundingBoxToQueue(RenderQueue* queue);
+        void _addBoundingBoxToQueue(RenderQueue* queue);
 
         /** This allows scene managers to determine if the node's bounding box
             should be added to the rendering queue.
@@ -301,7 +305,7 @@ namespace Ogre {
             check this flag and then use _addBoundingBoxToQueue to add the bounding box
             wireframe.
         */
-        virtual bool getShowBoundingBox() const;
+        bool getShowBoundingBox() const { return mShowBoundingBox; }
 
         /** Creates an unnamed new SceneNode as a child of this node.
         @param
@@ -340,7 +344,7 @@ namespace Ogre {
             this SceneNode's centre.
         @param lightMask The mask with which to include / exclude lights
         */
-        virtual void findLights(LightList& destList, Real radius, uint32 lightMask = 0xFFFFFFFF) const;
+        void findLights(LightList& destList, Real radius, uint32 lightMask = 0xFFFFFFFF) const;
 
         /** Tells the node whether to yaw around it's own local Y axis or a fixed axis of choice.
         @remarks
@@ -356,11 +360,11 @@ namespace Ogre {
         @param
         fixedAxis The axis to use if the first parameter is true.
         */
-        virtual void setFixedYawAxis( bool useFixed, const Vector3& fixedAxis = Vector3::UNIT_Y );
+        void setFixedYawAxis( bool useFixed, const Vector3& fixedAxis = Vector3::UNIT_Y );
 
         /** Rotate the node around the Y-axis.
         */
-        virtual void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
+        void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
         /** Sets the node's direction vector ie it's local -z.
         @remarks
         Note that the 'up' vector for the orientation will automatically be 
@@ -371,7 +375,7 @@ namespace Ogre {
         @param localDirectionVector The vector which normally describes the natural
         direction of the node, usually -Z
         */
-        virtual void setDirection(Real x, Real y, Real z, 
+        void setDirection(Real x, Real y, Real z,
             TransformSpace relativeTo = TS_LOCAL, 
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z);
 
@@ -385,7 +389,7 @@ namespace Ogre {
         @param localDirectionVector The vector which normally describes the natural
         direction of the node, usually -Z
         */
-        virtual void setDirection(const Vector3& vec, TransformSpace relativeTo = TS_LOCAL, 
+        void setDirection(const Vector3& vec, TransformSpace relativeTo = TS_LOCAL,
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z);
         /** Points the local -Z direction of this node at a point in space.
         @param targetPoint A vector specifying the look at point.
@@ -393,7 +397,7 @@ namespace Ogre {
         @param localDirectionVector The vector which normally describes the natural
         direction of the node, usually -Z
         */
-        virtual void lookAt( const Vector3& targetPoint, TransformSpace relativeTo,
+        void lookAt( const Vector3& targetPoint, TransformSpace relativeTo,
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z);
         /** Enables / disables automatic tracking of another SceneNode.
         @remarks
@@ -413,15 +417,15 @@ namespace Ogre {
         @param offset If supplied, this is the target point in local space of the target node
         instead of the origin of the target node. Good for fine tuning the look at point.
         */
-        virtual void setAutoTracking(bool enabled, SceneNode* const target = 0, 
+        void setAutoTracking(bool enabled, SceneNode* const target = 0,
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z,
             const Vector3& offset = Vector3::ZERO);
         /** Get the auto tracking target for this node, if any. */
-        virtual SceneNode* getAutoTrackTarget(void) { return mAutoTrackTarget; }
+        SceneNode* getAutoTrackTarget(void) { return mAutoTrackTarget; }
         /** Get the auto tracking offset for this node, if the node is auto tracking. */
-        virtual const Vector3& getAutoTrackOffset(void) { return mAutoTrackOffset; }
+        const Vector3& getAutoTrackOffset(void) { return mAutoTrackOffset; }
         /** Get the auto tracking local direction for this node, if it is auto tracking. */
-        virtual const Vector3& getAutoTrackLocalDirection(void) { return mAutoTrackLocalDirection; }
+        const Vector3& getAutoTrackLocalDirection(void) { return mAutoTrackLocalDirection; }
         /** Internal method used by OGRE to update auto-tracking cameras. */
         void _autoTrack(void);
         /** Gets the parent of this SceneNode. */
@@ -434,7 +438,7 @@ namespace Ogre {
         @param visible Whether the objects are to be made visible or invisible
         @param cascade If true, this setting cascades into child nodes too.
         */
-        virtual void setVisible(bool visible, bool cascade = true);
+        void setVisible(bool visible, bool cascade = true);
         /** Inverts the visibility of all objects attached to this node.
         @remarks    
         This is a shortcut to calling setVisible(!isVisible()) on the objects attached
@@ -442,7 +446,7 @@ namespace Ogre {
         nodes. 
         @param cascade If true, this setting cascades into child nodes too.
         */
-        virtual void flipVisibility(bool cascade = true);
+        void flipVisibility(bool cascade = true);
 
         /** Tells all objects attached to this node whether to display their
             debug information or not.
@@ -453,10 +457,10 @@ namespace Ogre {
         @param enabled Whether the objects are to display debug info or not
         @param cascade If true, this setting cascades into child nodes too.
         */
-        virtual void setDebugDisplayEnabled(bool enabled, bool cascade = true);
+        void setDebugDisplayEnabled(bool enabled, bool cascade = true);
 
         /// As Node::getDebugRenderable, except scaling is automatically determined
-        virtual DebugRenderable* getDebugRenderable();
+        DebugRenderable* getDebugRenderable();
 
         /// @copydoc Node::getDebugRenderable
         using Node::getDebugRenderable;
