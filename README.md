@@ -1,7 +1,7 @@
-<p class="header" align="center">![](Docs/ogre-logo-wetfloor.gif)</p>
+![](Docs/ogre-logo-wetfloor.gif)
 
 ## Summary
-**OGRE** (<b>O</b>bject-Oriented <b>G</b>raphics <b>R</b>endering <b>E</b>ngine) is a
+**OGRE** (Object-Oriented Graphics Rendering Engine) is a
 scene-oriented, flexible 3D engine written in C++ designed to make it
 easier and more intuitive for developers to produce games and demos
 utilising 3D hardware. The class library abstracts all the details of
@@ -10,11 +10,11 @@ provides an interface based on world objects and other intuitive
 classes.
 
 ## Index Of Contents
-* [What's New?](Docs/ChangeLog.md)  
+* [What's New?](Docs/1.10-Notes.md)  
 A summary of the new and altered features in this release.
 * [Features](http://www.ogre3d.org/about/features)  
 A summary of OGRE's main features.
-* <a href="BuildingOgre.md">Building the core OGRE libraries</a>  
+* [Building the core OGRE libraries](BuildingOgre.md)  
 If you're using the full source release, this will help you build it. If you're using a precompiled SDK then most of the work has already been done for you, and you should use the sample projects to see how to compile your own code against OGRE.
 * [The OGRE Manual](https://ogrecave.github.io/ogre/api/1.10/manual.html)  
 A high-level guide to the major parts of the engine and script reference.
@@ -27,17 +27,7 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 We welcome all contributions to OGRE, be that new
 plugins, bugfixes, extensions, tutorials, documentation, example
 applications, artwork or pretty much anything else! If you would like
-to contribute to the development of OGRE, please create a [pull request](https://github.com/OGRECave/ogre/pulls).
-
-## Keeping Up To Date
-The best place to keep up to date with developments on
-OGRE is the [Official Web Site](http://www.ogre3d.org/).
-From there you can download the latest source code and documentation.
-You can choose between keeping bang up to date with Git
-or by just getting the regularly released snapshots.
-
-The changes included in this current version can be
-viewed on the [ChangeLog](Docs/ChangeLog.md).
+to contribute to the development of OGRE, please create a [pull request](https://bitbucket.org/sinbad/ogre/pull-requests/).
 
 ## Getting Support
 Please use our [community support forums](http://www.ogre3d.org/forums) if you need help or
