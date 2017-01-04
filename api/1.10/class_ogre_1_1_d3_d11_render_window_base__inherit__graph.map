@@ -1,0 +1,7 @@
+<map id="Ogre::D3D11RenderWindowBase" name="Ogre::D3D11RenderWindowBase">
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d11_render_window_swap_chain_based.html" title="Ogre::D3D11RenderWindowSwap\lChainBased" alt="" coords="65,304,287,345"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_render_window.html" title="Manages the target rendering window. " alt="" coords="5,155,152,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation. " alt="" coords="10,80,147,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="21,5,137,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d11_device_resource.html" title="Represents a Direct3D rendering resource. " alt="" coords="177,155,373,181"/>
+</map>
