@@ -1,4 +1,4 @@
-![](Docs/ogre-logo-wetfloor.gif)
+<p class="header" align="center"><img alt="" src="Docs/ogre-logo-wetfloor.gif"></p>
 
 ## Summary
 **OGRE** (Object-Oriented Graphics Rendering Engine) is a
@@ -8,6 +8,9 @@ utilising 3D hardware. The class library abstracts all the details of
 using the underlying system libraries like Direct3D and OpenGL and
 provides an interface based on world objects and other intuitive
 classes.
+
+The current CI status is: Ubuntu/ OSX/ Android/ iOS [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre)
+MSVC [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
 
 ## Index Of Contents
 * [What's New?](Docs/1.10-Notes.md)  
@@ -27,7 +30,7 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 We welcome all contributions to OGRE, be that new
 plugins, bugfixes, extensions, tutorials, documentation, example
 applications, artwork or pretty much anything else! If you would like
-to contribute to the development of OGRE, please create a [pull request](https://bitbucket.org/sinbad/ogre/pull-requests/).
+to contribute to the development of OGRE, please create a [pull request](https://github.com/OGRECave/ogre/pulls).
 
 ## Getting Support
 Please use our [community support forums](http://www.ogre3d.org/forums) if you need help or
