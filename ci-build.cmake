@@ -54,7 +54,7 @@ endif()
 if(DEFINED ENV{ANDROID})
     set(CROSS
         -DANDROID_NATIVE_API_LEVEL=21
-        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r13
+        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r13b
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/CMake/toolchain/android.toolchain.cmake
         "-DANDROID_ABI=armeabi-v7a with NEON")
 
@@ -71,10 +71,10 @@ if(DEFINED ENV{ANDROID})
     
     message(STATUS "Downloading Android NDK")
     file(DOWNLOAD
-        http://dl.google.com/android/repository/android-ndk-r13-linux-x86_64.zip
-        ./android-ndk-r13-linux-x86_64.zip)
+        http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
+        ./android-ndk-r13b-linux-x86_64.zip)
     message(STATUS "Extracting Android NDK")
-    execute_process(COMMAND unzip android-ndk-r13-linux-x86_64.zip OUTPUT_QUIET)
+    execute_process(COMMAND unzip android-ndk-r13b-linux-x86_64.zip OUTPUT_QUIET)
 endif()
 
 execute_process(COMMAND cmake
