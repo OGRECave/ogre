@@ -917,6 +917,13 @@ namespace v1 {
             Renderable::setDatablock( datablock );
     }
     //-----------------------------------------------------------------------
+    void BillboardSet::_setNullDatablock(void)
+    {
+        mMaterialName.clear();
+        mMaterialGroup.clear();
+        Renderable::_setNullDatablock();
+    }
+    //-----------------------------------------------------------------------
     unsigned int BillboardSet::getPoolSize(void) const
     {
         return static_cast< unsigned int >( mBillboardPool.size() );

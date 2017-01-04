@@ -389,6 +389,18 @@ namespace Ogre {
         /// Assigns a datablock (i.e. HLMS Material) to this renderable
         virtual void setDatablock( HlmsDatablock *datablock );
 
+        /** Sets the datablock to a null pointer. Use case: If you will be destroying an
+            HlmsDatablock and all Renderables associated by it; it makes no sense to
+            change the Renderable's datablock to a default one, only to be destroyed
+            immediately after (you pay an unnecessary performance price).
+        @remarks
+            Do not attempt to render a Renderable whose datablock has been set to null.
+            It will crash. You can call setDatablock afterwards though.
+            Use at your own risk, hence the _underscore.
+            See http://ogre3d.org/forums/viewtopic.php?f=25&t=91791&p=534476#p534476
+        */
+        virtual void _setNullDatablock(void);
+
         /// Manually sets the hlms hashes. Don't call this directly
         virtual void _setHlmsHashes( uint32 hash, uint32 casterHash );
 

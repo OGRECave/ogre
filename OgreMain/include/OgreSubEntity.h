@@ -125,6 +125,7 @@ namespace v1 {
         using Renderable::setDatablock;
 
         virtual void setDatablock( HlmsDatablock *datablock );
+        virtual void _setNullDatablock(void);
 
         /** Accessor method to read mesh data.
         */

@@ -826,6 +826,7 @@ namespace v1 {
 
         virtual void setMaterial( const MaterialPtr& material );
         virtual void setDatablock( HlmsDatablock *datablock );
+        virtual void _setNullDatablock(void);
 
     };
 
