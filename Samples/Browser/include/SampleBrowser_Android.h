@@ -31,11 +31,10 @@
 
 #include <android_native_app_glue.h>
 #include <android/log.h>
-#include <EGL/egl.h>
 #include "OgrePlatform.h"
 #include "SampleBrowser.h"
 #include "OgreInput.h"
-#include "Android/OgreAndroidEGLWindow.h"
+#include "OgreGLRenderSystemCommon.h"
 
 #include <gestureDetector.h>
 
@@ -124,7 +123,7 @@ namespace OgreBites
                         }
                         else
                         {
-                            static_cast<AndroidEGLWindow*>(mBrowser.getRenderWindow())->_createInternalResources(app->window, config);
+                            GLRenderSystemCommon::_createInternalResources(mBrowser.getRenderWindow(), app->window, config);
                         }
                         
                         AConfiguration_delete(config);
@@ -132,7 +131,7 @@ namespace OgreBites
                     break;
                 case APP_CMD_TERM_WINDOW:
                     if(mBrowser.getRenderWindow())
-                        static_cast<AndroidEGLWindow*>(mBrowser.getRenderWindow())->_destroyInternalResources();
+                        GLRenderSystemCommon::_destroyInternalResources(mBrowser.getRenderWindow());
                     break;
                 case APP_CMD_GAINED_FOCUS:
                     break;

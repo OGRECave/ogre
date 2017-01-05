@@ -254,7 +254,7 @@ namespace Ogre {
         mClosed = true;
     }
     
-    void AndroidEGLWindow::_createInternalResources(NativeWindowType window, AConfiguration* config)
+    void AndroidEGLWindow::_createInternalResources(NativeWindowType window, void* config)
     {
         mWindow = window;
         
@@ -352,7 +352,7 @@ namespace Ogre {
 
             if (config)
             {
-                bool isLandscape = (int)AConfiguration_getOrientation(config) == 2;
+                bool isLandscape = (int)AConfiguration_getOrientation((AConfiguration*)config) == 2;
                 mGLSupport->setConfigOption("Orientation", isLandscape ? "Landscape" : "Portrait");
             }
         }
