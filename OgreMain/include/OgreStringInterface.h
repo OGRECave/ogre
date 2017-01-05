@@ -33,8 +33,44 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre {
+    namespace detail {
+        // this namespace providestype traits for emulating std::decay
+        // without depending on C++11
+        // TODO remove when using C++11 is accepted
+        template <typename T>
+        struct remove_reference {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct remove_reference<T&> {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct remove_const {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct remove_const<T const> {
+            typedef T type;
+        };
+
+        /**
+         * decay that only removes const and reference without caring about arrays
+         */
+        template <typename T>
+        struct simple_decay {
+        private:
+            typedef typename detail::remove_reference<T>::type _remove_type;
+        public:
+            typedef typename detail::remove_const<_remove_type>::type type;
+        };
+    }
 
     /** \addtogroup Core
     *  @{
@@ -62,6 +98,54 @@ namespace Ogre {
         PT_COLOURVALUE
     };
 
+    /** conversion from C++ type to ParameterType enum
+     for template metaprogramming*/
+    template<typename T> struct ParameterTypeFrom {
+        // empty implementation to trigger compile time error for unknown types
+    };
+    template<> struct ParameterTypeFrom<bool> {
+        static const ParameterType pt = PT_BOOL;
+    };
+    template<> struct ParameterTypeFrom<Real> {
+        static const ParameterType pt = PT_REAL;
+    };
+    template<> struct ParameterTypeFrom<int> {
+        static const ParameterType pt = PT_INT;
+    };
+    template<> struct ParameterTypeFrom<unsigned int> {
+        static const ParameterType pt = PT_UNSIGNED_INT;
+    };
+    template<> struct ParameterTypeFrom<short> {
+        static const ParameterType pt = PT_SHORT;
+    };
+    template<> struct ParameterTypeFrom<unsigned short> {
+        static const ParameterType pt = PT_UNSIGNED_SHORT;
+    };
+    template<> struct ParameterTypeFrom<long> {
+        static const ParameterType pt = PT_LONG;
+    };
+    template<> struct ParameterTypeFrom<unsigned long> {
+        static const ParameterType pt = PT_UNSIGNED_LONG;
+    };
+    template<> struct ParameterTypeFrom<String> {
+        static const ParameterType pt = PT_STRING;
+    };
+    template<> struct ParameterTypeFrom<Vector3> {
+        static const ParameterType pt = PT_VECTOR3;
+    };
+    template<> struct ParameterTypeFrom<Matrix3> {
+        static const ParameterType pt = PT_MATRIX3;
+    };
+    template<> struct ParameterTypeFrom<Matrix4> {
+        static const ParameterType pt = PT_MATRIX4;
+    };
+    template<> struct ParameterTypeFrom<Quaternion> {
+        static const ParameterType pt = PT_QUATERNION;
+    };
+    template<> struct ParameterTypeFrom<ColourValue> {
+        static const ParameterType pt = PT_COLOURVALUE;
+    };
+
     /// Definition of a parameter supported by a StringInterface class, for introspection
     class _OgreExport ParameterDef
     {
@@ -85,6 +169,23 @@ namespace Ogre {
     };
     typedef map<String, ParamCommand* >::type ParamCommandMap;
 
+    /** Generic ParamCommand implementation
+     stores pointers to the class getter and setter functions */
+    template <typename _Class, typename Param, Param (_Class::*getter)() const, void (_Class::*setter)(Param)>
+    class AutoParamCommand : public ParamCommand {
+    public:
+        String doGet(const void* target) const {
+            return StringConverter::toString((static_cast<const _Class*>(target)->*getter)());
+        }
+
+        void doSet(void* target, const String& val) {
+            // TODO: better use std::decay here if C++11 is available
+            typename detail::simple_decay<Param>::type tmp;
+            StringConverter::parse(val, tmp);
+            (static_cast<_Class*>(target)->*setter)(tmp);
+        }
+    };
+
     /** Class to hold a dictionary of parameters for a single class. */
     class _OgreExport ParamDictionary
     {
@@ -95,7 +196,7 @@ namespace Ogre {
 
         /// Command objects to get/set
         ParamCommandMap mParamCommands;
-
+    public:
         /** Retrieves the parameter command object for a named parameter. */
         ParamCommand* getParamCommand(const String& name)
         {
@@ -122,7 +223,7 @@ namespace Ogre {
                 return 0;
             }
         }
-    public:
+
         ParamDictionary()  {}
         /** Method for adding a parameter definition for this class. 
         @param paramDef A ParameterDef object defining the parameter
@@ -135,6 +236,7 @@ namespace Ogre {
             mParamDefs.push_back(paramDef);
             mParamCommands[paramDef.name] = paramCmd;
         }
+
         /** Retrieves a list of parameters valid for this object. 
         @return
             A reference to a static list of ParameterDef objects.
@@ -145,11 +247,46 @@ namespace Ogre {
             return mParamDefs;
         }
 
-
-
     };
     typedef map<String, ParamDictionary>::type ParamDictionaryMap;
     
+    /** Class to hold a dictionary of parameters for a single class.
+    Templated Version for automatically genarating the reflection code*/
+    template <typename _Class>
+    class AutoParamDictionary : public ParamDictionary {
+    public:
+        /** Convenience Method for adding a parameter definition for this class.
+        @param name name of the ParameterDefinition
+        @param getter Pointer to a member function to handle the getting of this parameter.
+        @param setter Pointer to a member function to handle the setting of this parameter.
+            NB this class will not destroy AutoParamCommand on shutdown, please ensure you do
+        */
+        template<typename Param, Param (_Class::*getter)() const, void (_Class::*setter)(Param)>
+        AutoParamDictionary& addParameter(const String& name, const String& descr = "") {
+            // we never free this memory as the Dictionary exists for the whole application lifetime anyway
+            ParamDictionary::addParameter(
+                    ParameterDef(name, descr, ParameterTypeFrom<Param>::pt),
+                    new AutoParamCommand<_Class, Param, getter, setter>);
+            return *this;
+        }
+
+        /** Convenience Method for adding a parameter definition for this class.
+        this is a teplate overload so you do not have to care whether the parameter is const ref or not
+        @param name name of the ParameterDefinition
+        @param getter Pointer to a member function to handle the getting of this parameter.
+        @param setter Pointer to a member function to handle the setting of this parameter.
+            NB this class will not destroy AutoParamCommand on shutdown, please ensure you do
+        */
+        template<typename Param, const Param& (_Class::*getter)() const, void (_Class::*setter)(const Param&)>
+        AutoParamDictionary& addParameter(const String& name, const String& descr = "") {
+            // we never free this memory as the Dictionary exists for the whole application lifetime anyway
+            ParamDictionary::addParameter(
+                    ParameterDef(name, descr, ParameterTypeFrom<typename detail::simple_decay<Param>::type>::pt),
+                    new AutoParamCommand<_Class, const Param&, getter, setter>);
+            return *this;
+        }
+    };
+
     /** Class defining the common interface which classes can use to 
         present a reflection-style, self-defining parameter set to callers.
     @remarks
