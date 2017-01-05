@@ -254,7 +254,7 @@ namespace Ogre {
         mClosed = true;
     }
     
-    void EmscriptenEGLWindow::_createInternalResources(NativeWindowType window)
+    void EmscriptenEGLWindow::_createInternalResources(NativeWindowType window, void*)
     {
         mWindow = window;
         

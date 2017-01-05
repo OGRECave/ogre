@@ -76,7 +76,7 @@ namespace Ogre {
                     bool fullScreen, const NameValuePairList *miscParams);
 
         void _destroyInternalResources();
-        void _createInternalResources(NativeWindowType window);
+        void _createInternalResources(NativeWindowType window, void* config = NULL);
         virtual void swapBuffers();
     };
 }
