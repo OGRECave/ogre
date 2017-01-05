@@ -127,6 +127,8 @@ namespace Ogre
         /// False if a technique doesn't support skeletal animation
         bool                mTechnSupportsSkeletal;
 
+        /// Last update camera distance frame number
+        mutable unsigned long mCameraDistLastUpdateFrameNumber;
         /// Cached distance to last camera for getSquaredViewDepth
         mutable Real mCachedCameraDist;
         /// The camera for which the cached distance is valid
