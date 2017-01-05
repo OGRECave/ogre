@@ -34,6 +34,9 @@ THE SOFTWARE.
 #include "OgreCamera.h"
 #include "OgreException.h"
 #include "OgreRenderQueue.h"
+#include "OgreLodListener.h"
+#include "OgreSceneManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -158,7 +161,7 @@ namespace Ogre
         mFullBoundingBox.setMinimum(mFullBoundingBox.getMinimum() - addToBound);
 
 
-        mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
+        mBoundingRadius = Math::boundingRadiusFromAABBCentered( mFullBoundingBox );
         mBoundsDirty    = false;
     }
 
@@ -487,9 +490,9 @@ namespace Ogre
         //We use our own because our SceneNode is just filled with zeroes, and updating it
         //with real values is expensive, plus we would need to make sure it doesn't get to
         //the shader
-        Real depth = Math::Sqrt( getSquaredViewDepth(cam) ) -
-                     mMeshReference->getBoundingSphereRadius();
+		Real depth = Math::Sqrt(getSquaredViewDepth(cam)) - getBoundingRadius();          
         depth = std::max( depth, Real(0) );
+
         Real lodValue = depth * cam->_getLodBiasInverse();
 
         //Now calculate Material LOD
@@ -513,10 +516,52 @@ namespace Ogre
         //Notify LOD event listeners
         cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);*/
 
-        //Change LOD index
+        // Change LOD index
         mMaterialLodIndex = idx;
 
-        MovableObject::_notifyCurrentCamera( cam );
+        mBeyondFarDistance = false;
+
+        if (cam->getUseRenderingDistance() && mUpperDistance > 0)
+        {
+            if (depth > mUpperDistance)
+                mBeyondFarDistance = true;
+        }
+
+        if (!mBeyondFarDistance && cam->getUseMinPixelSize() && mMinPixelSize > 0)
+        {
+            Real pixelRatio = cam->getPixelDisplayRatio();
+
+            Ogre::Vector3 objBound =
+                getBoundingBox().getSize() * getParentNode()->_getDerivedScale();
+            objBound.x = Math::Sqr(objBound.x);
+            objBound.y = Math::Sqr(objBound.y);
+            objBound.z = Math::Sqr(objBound.z);
+            float sqrObjMedianSize = std::max(
+                std::max(std::min(objBound.x, objBound.y), std::min(objBound.x, objBound.z)),
+                std::min(objBound.y, objBound.z));
+
+            // If we have a perspective camera calculations are done relative to distance
+            Real sqrDistance = 1;
+
+            if (cam->getProjectionType() == PT_PERSPECTIVE)
+                sqrDistance = getSquaredViewDepth(cam->getLodCamera()); // it's ok
+
+            mBeyondFarDistance =
+                sqrObjMedianSize < sqrDistance * Math::Sqr(pixelRatio * mMinPixelSize);
+        }
+
+        if (mParentNode)
+        {
+            MovableObjectLodChangedEvent evt;
+            evt.movableObject = this;
+            evt.camera = cam;
+
+            cam->getSceneManager()->_notifyMovableObjectLodChanged(evt);
+        }
+
+        mRenderingDisabled = mListener && !mListener->objectRendering(this, cam);
+
+        // MovableObject::_notifyCurrentCamera( cam ); // it does not suit
     }
     //-----------------------------------------------------------------------
     const AxisAlignedBox& InstanceBatch::getBoundingBox(void) const
@@ -531,21 +576,15 @@ namespace Ogre
     //-----------------------------------------------------------------------
     Real InstanceBatch::getSquaredViewDepth( const Camera* cam ) const
     {
-        if( mCachedCamera != cam )
+        unsigned long currentFrameNumber = Root::getSingleton().getNextFrameNumber();
+
+        if (mCameraDistLastUpdateFrameNumber != currentFrameNumber || mCachedCamera != cam)
         {
-            mCachedCameraDist = std::numeric_limits<Real>::infinity();
-
-            InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-            InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
-            while( itor != end )
-            {
-                if( (*itor)->isVisible() )
-                    mCachedCameraDist = std::min( mCachedCameraDist, (*itor)->getSquaredViewDepth( cam ) );
-                ++itor;
-            }
+            mCachedCameraDist =
+                getBoundingBox().getCenter().squaredDistance(cam->getDerivedPosition());
 
             mCachedCamera = cam;
+            mCameraDistLastUpdateFrameNumber = currentFrameNumber;
         }
 
         return mCachedCameraDist;
