@@ -973,8 +973,8 @@ namespace Ogre
     //---------------------------------------------------------------------
     Real Math::boundingRadiusFromAABB(const AxisAlignedBox& aabb)
     {
-        Vector3 max = aabb.getMaximum();
-        Vector3 min = aabb.getMinimum();
+        const Vector3& max = aabb.getMaximum();
+        const Vector3& min = aabb.getMinimum();
 
         Vector3 magnitude = max;
         magnitude.makeCeil(-max);
@@ -984,4 +984,11 @@ namespace Ogre
         return magnitude.length();
     }
 
+    Real Math::boundingRadiusFromAABBCentered(const AxisAlignedBox& aabb)
+    {
+        const Vector3& max = aabb.getMaximum();
+        const Vector3& min = aabb.getMinimum();
+
+        return ((min - max) * 0.5f).length();
+    }
 }

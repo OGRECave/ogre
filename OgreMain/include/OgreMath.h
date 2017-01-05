@@ -361,15 +361,20 @@ namespace Ogre
             return Degree(Sign(dValue.valueDegrees()));
         }
 
-        //Simulate the shader function saturate that clamps a parameter value between 0 and 1
+        /// Simulate the shader function saturate that clamps a parameter value between 0 and 1
         static inline float saturate(float t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
         static inline double saturate(double t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
-        
-        //Simulate the shader function lerp which performers linear interpolation
-        //given 3 parameters v0, v1 and t the function returns the value of (1 – t)* v0 + t * v1. 
-        //where v0 and v1 are matching vector or scalar types and t can be either a scalar or a vector of the same type as a and b.
-        template<typename V, typename T> static V lerp(const V& v0, const V& v1, const T& t) { 
-            return v0 * (1 - t) + v1 * t; }
+
+        /** Simulate the shader function lerp which performers linear interpolation
+
+           given 3 parameters v0, v1 and t the function returns the value of (1 - t)* v0 + t * v1.
+           where v0 and v1 are matching vector or scalar types and t can be either a scalar or a
+           vector of the same type as a and b.
+        */
+        template <typename V, typename T> static V lerp(const V& v0, const V& v1, const T& t)
+        {
+            return v0 * (1 - t) + v1 * t;
+        }
 
         /** Sine function.
             @param fValue
@@ -696,9 +701,11 @@ namespace Ogre
         static Matrix4 makeViewMatrix(const Vector3& position, const Quaternion& orientation, 
             const Matrix4* reflectMatrix = 0);
 
-        /** Get a bounding radius value from a bounding box. */
+        /** Get the radius of the origin-centered bounding sphere from the bounding box. */
         static Real boundingRadiusFromAABB(const AxisAlignedBox& aabb);
 
+        /** Get the radius of the bbox-centered bounding sphere from the bounding box. */
+        static Real boundingRadiusFromAABBCentered(const AxisAlignedBox &aabb);
 
 
         static const Real POS_INFINITY;
