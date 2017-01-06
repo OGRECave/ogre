@@ -28,6 +28,10 @@ THE SOFTWARE.
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreFrustum.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#include <OgreEGLWindow.h>
+#endif
+
 namespace Ogre {
     void GLRenderSystemCommon::_makeProjectionMatrix(const Radian& fovy, Real aspect,
                                                     Real nearPlane, Real farPlane,
@@ -154,4 +158,18 @@ namespace Ogre {
         matrix[2][2] = c.z + 1.0F;
         matrix[2][3] = c.w;
     }
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    void GLRenderSystemCommon::_destroyInternalResources(RenderWindow* pRenderWnd)
+    {
+        static_cast<EGLWindow*>(pRenderWnd)->_destroyInternalResources();
+    }
+
+    void GLRenderSystemCommon::_createInternalResources(RenderWindow* pRenderWnd, void* window,
+                                                        void* config)
+    {
+        static_cast<EGLWindow*>(pRenderWnd)
+            ->_createInternalResources(reinterpret_cast<EGLNativeWindowType>(window), config);
+    }
+#endif
 }

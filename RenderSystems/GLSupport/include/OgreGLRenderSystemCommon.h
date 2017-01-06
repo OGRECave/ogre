@@ -90,6 +90,9 @@ namespace Ogre {
                                           bool forGpuProgram);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        static void _destroyInternalResources(RenderWindow* pRenderWnd);
+        static void _createInternalResources(RenderWindow* pRenderWnd, void* nativeWindow, void* config = NULL);
+
         virtual void resetRenderer(RenderWindow* pRenderWnd) = 0;
         virtual void notifyOnContextLost() = 0;
 #endif
