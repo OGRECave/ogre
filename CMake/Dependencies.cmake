@@ -98,9 +98,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     if(MSVC OR EMSCRIPTEN) # other platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD
-            http://zlib.net/zlib-1.2.8.tar.gz
-            ./zlib-1.2.8.tar.gz)
-        execute_process(COMMAND cmake -E tar xf zlib-1.2.8.tar.gz)
+            http://zlib.net/zlib-1.2.10.tar.gz
+        ./zlib-1.2.10.tar.gz)
+        execute_process(COMMAND cmake -E tar xf zlib-1.2.10.tar.gz)
         execute_process(COMMAND cmake
             -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -108,8 +108,8 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             -G ${CMAKE_GENERATOR}
             ${CROSS}
             .
-            WORKING_DIRECTORY zlib-1.2.8)
-        execute_process(COMMAND cmake --build zlib-1.2.8 --target install)
+            WORKING_DIRECTORY zlib-1.2.10)
+        execute_process(COMMAND cmake --build zlib-1.2.10 --target install)
     endif()
 
     message(STATUS "Building ZZIPlib")
