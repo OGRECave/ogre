@@ -56,7 +56,7 @@ if (OGRE_BUILD_TESTS)
   if (OGRE_BUILD_RENDERSYSTEM_GLES2)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GLES2)
   endif ()
-
+ 
   if (OGRE_STATIC)
     # Static linking means we need to directly use plugins
     include_directories(${OGRE_SOURCE_DIR}/PlugIns/BSPSceneManager/include)
@@ -84,12 +84,28 @@ if (OGRE_BUILD_TESTS)
       source_group(Resources FILES ${RESOURCE_FILES})
     endif ()
   endif (OGRE_STATIC)
+    
+    set(GTEST_SHARED TRUE)
+    if(APPLE AND NOT APPLE_IOS)
+        set(GTEST_SHARED FALSE)
+        set(CROSS ${CROSS} -DCMAKE_CXX_FLAGS=-stdlib=libc++)
+    endif()
+    
+    set(GTEST_INSTALL_DIR ${CMAKE_BINARY_DIR}/gtest)
+    include(ExternalProject)
+    ExternalProject_Add(googletest
+        URL https://github.com/google/googletest/archive/release-1.8.0.tar.gz
+        SOURCE_DIR ${GTEST_INSTALL_DIR}
+        CMAKE_ARGS
+            -DCMAKE_INSTALL_PREFIX=${GTEST_INSTALL_DIR}
+            -DBUILD_SHARED_LIBS=${GTEST_SHARED}
+            -G ${CMAKE_GENERATOR}
+            ${CROSS})
 
-
-  if (CppUnit_FOUND)
     # unit tests are go!
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include)
-
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include ${GTEST_INSTALL_DIR}/include)
+    link_directories(${GTEST_INSTALL_DIR}/lib)
+    
     file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include/*.h")
     file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/src/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
@@ -125,11 +141,8 @@ if (OGRE_BUILD_TESTS)
       list(APPEND SOURCE_FILES Components/Terrain/src/TerrainTests.cpp)
     endif ()
     if (OGRE_BUILD_COMPONENT_PROPERTY)
-      include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Property/include
-        ${OGRE_SOURCE_DIR}/Components/Property/include)
-
+      include_directories(${OGRE_SOURCE_DIR}/Components/Property/include)
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreProperty)
-      list(APPEND HEADER_FILES Components/Property/include/PropertyTests.h)
       list(APPEND SOURCE_FILES Components/Property/src/PropertyTests.cpp)
     endif ()
     if (OGRE_BUILD_COMPONENT_OVERLAY)
@@ -139,9 +152,12 @@ if (OGRE_BUILD_TESTS)
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
     endif ()
 
-    add_executable(Test_Ogre WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
-    ogre_install_target(Test_Ogre "" FALSE)
-    target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} ${CppUnit_LIBRARIES})
+    if(NOT ANDROID)
+        add_executable(Test_Ogre ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
+        add_dependencies(Test_Ogre googletest)
+        ogre_install_target(Test_Ogre "" FALSE)
+        target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} gtest)
+    endif()
 
     if(APPLE AND NOT APPLE_IOS)
       set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
@@ -282,17 +298,6 @@ if (OGRE_BUILD_TESTS)
 		
 		file(COPY ${OGRE_SOURCE_DIR}/Tests/Media/CustomCapabilities DESTINATION ${OGRE_BINARY_DIR}/Tests/Media)
     endif()
-  else (CppUnit_FOUND)
-    # Necessary for tests to link when CppUnit is unavailable.
-    if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
-      include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/MeshLodGenerator/include)
-      ogre_add_component_include_dir(MeshLodGenerator)
-
-      set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreMeshLodGenerator)
-      list(APPEND HEADER_FILES Components/MeshLodGenerator/include/MeshLodTests.h)
-      list(APPEND SOURCE_FILES Components/MeshLodGenerator/src/MeshLodTests.cpp)
-    endif ()
-  endif (CppUnit_FOUND)
-
-  add_subdirectory(VisualTests)
+    
+    add_subdirectory(VisualTests)
 endif (OGRE_BUILD_TESTS)

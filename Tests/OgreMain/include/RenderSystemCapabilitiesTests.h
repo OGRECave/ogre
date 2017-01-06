@@ -29,8 +29,7 @@ THE SOFTWARE.
 #ifndef __RenderSystemCapabilitiesTests_H__
 #define __RenderSystemCapabilitiesTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 #include "OgrePrerequisites.h"
 #include "OgreArchiveManager.h"
@@ -39,48 +38,12 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-class RenderSystemCapabilitiesTests : public CppUnit::TestFixture
+class RenderSystemCapabilitiesTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(RenderSystemCapabilitiesTests);
-    CPPUNIT_TEST(testIsShaderProfileSupported);
-    CPPUNIT_TEST(testHasCapability);
-    CPPUNIT_TEST(testSerializeBlank);
-    CPPUNIT_TEST(testSerializeEnumCapability);
-    CPPUNIT_TEST(testSerializeStringCapability);
-    CPPUNIT_TEST(testSerializeBoolCapability);
-    CPPUNIT_TEST(testSerializeIntCapability);
-    CPPUNIT_TEST(testSerializeRealCapability);
-    CPPUNIT_TEST(testSerializeShaderCapability);
-    CPPUNIT_TEST(testWriteSimpleCapabilities);
-    CPPUNIT_TEST(testWriteAllFalseCapabilities);
-    CPPUNIT_TEST(testWriteAllTrueCapabilities);
-    CPPUNIT_TEST(testWriteAndReadComplexCapabilities);
-    CPPUNIT_TEST_SUITE_END();
 
 public:
-    void setUp();
-    void tearDown();
-
-    void testIsShaderProfileSupported();
-    void testHasCapability();
-
-    // Tests for basic functionality in RenderSystemCapabilitiesSerializer
-    void testSerializeBlank();
-    void testSerializeEnumCapability();
-    void testSerializeStringCapability();
-    void testSerializeBoolCapability();
-    void testSerializeIntCapability();
-    void testSerializeRealCapability();
-    void testSerializeShaderCapability();
-
-    // Test for serializing capabilities to file
-    void testWriteSimpleCapabilities();
-    void testWriteAllFalseCapabilities();
-    void testWriteAllTrueCapabilities();
-
-    // Test serializing to and from the file
-    void testWriteAndReadComplexCapabilities();
+    void SetUp();
+    void TearDown();
 
     // For serializing .rendercaps we need RSCManager
     RenderSystemCapabilitiesManager* mRenderSystemCapabilitiesManager;

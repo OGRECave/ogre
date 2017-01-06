@@ -25,8 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 #include "OgreBuildSettings.h"
 #include "OgreFileSystemLayer.h"
@@ -39,30 +38,19 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-class MeshLodTests : public CppUnit::TestFixture
+class MeshLodTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(MeshLodTests);
-    CPPUNIT_TEST(testLodConfigSerializer);
-    CPPUNIT_TEST(testMeshLodGenerator);
-    CPPUNIT_TEST(testManualLodLevels);
-    CPPUNIT_TEST_SUITE_END();
-
+public:
 #ifdef OGRE_STATIC_LIB
     OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
     MeshPtr mMesh;
     FileSystemLayer* mFSLayer;
-public:
-    void setUp();
-    void tearDown();
-    void testLodConfigSerializer();
-    void testMeshLodGenerator();
-    void testManualLodLevels();
-    void testQuadricError();
+
+    void SetUp();
+    void TearDown();
     void runMeshLodConfigTests(LodConfig::Advanced& advanced);
     void blockedWaitForLodGeneration(const MeshPtr& mesh);
     void addProfile(LodConfig& config);
     void setTestLodConfig(LodConfig& config);
-    bool isEqual(Real a, Real b);
 };

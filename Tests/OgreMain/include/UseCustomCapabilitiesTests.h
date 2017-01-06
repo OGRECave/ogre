@@ -29,8 +29,7 @@ THE SOFTWARE.
 #ifndef __UseCustomCapabilitiesTests_H__
 #define __UseCustomCapabilitiesTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 #include "OgrePrerequisites.h"
 #include "OgreRoot.h"
@@ -48,25 +47,14 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-class UseCustomCapabilitiesTests : public CppUnit::TestFixture
+class UseCustomCapabilitiesTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(UseCustomCapabilitiesTests);
-    CPPUNIT_TEST(testCustomCapabilitiesGL);
-    CPPUNIT_TEST(testCustomCapabilitiesD3D9);
-    CPPUNIT_TEST_SUITE_END();
-
+public:
 #ifdef OGRE_STATIC_LIB
     OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
-
-public:
-    void setUp();
-    void tearDown();
-
-    // Test the full stack of custom capabilities use (including config file and initialization)
-    void testCustomCapabilitiesGL();
-    void testCustomCapabilitiesD3D9();
+    void SetUp();
+    void TearDown();
 };
 
 #endif

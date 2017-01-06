@@ -29,8 +29,7 @@ THE SOFTWARE.
 #ifndef __PageCoreTests_H__
 #define __PageCoreTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 #include "OgreRoot.h"
 #include "OgrePageManager.h"
@@ -44,13 +43,9 @@ THE SOFTWARE.
 
 using namespace Ogre; 
 
-class PageCoreTests : public CppUnit::TestFixture
+class PageCoreTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(PageCoreTests);
-    CPPUNIT_TEST(testSimpleCreateSaveLoadWorld);
-    CPPUNIT_TEST_SUITE_END();
-
+public:
     Root* mRoot;
     PageManager* mPageManager;
     SceneManager* mSceneMgr;
@@ -60,12 +55,8 @@ class PageCoreTests : public CppUnit::TestFixture
     OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
 
-public:
-    void setUp();
-    void tearDown();
-
-    void testSimpleCreateSaveLoadWorld();
-    void testLoadWorld();
+    void SetUp();
+    void TearDown();
 };
 
 #endif

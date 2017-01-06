@@ -29,16 +29,12 @@ THE SOFTWARE.
 #include "OgrePaging.h"
 #include "OgreLogManager.h"
 
-#include "UnitTestSuite.h"
 
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(PageCoreTests);
 
 //--------------------------------------------------------------------------
-void PageCoreTests::setUp()
-{
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-    
+void PageCoreTests::SetUp()
+{    
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #ifdef OGRE_STATIC_LIB
@@ -58,17 +54,15 @@ void PageCoreTests::setUp()
     mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
 }
 //--------------------------------------------------------------------------
-void PageCoreTests::tearDown()
+void PageCoreTests::TearDown()
 {
     OGRE_DELETE mPageManager;
     OGRE_DELETE mRoot;
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
 //--------------------------------------------------------------------------
-void PageCoreTests::testSimpleCreateSaveLoadWorld()
+TEST_F(PageCoreTests,SimpleCreateSaveLoadWorld)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String worldName = "MyWorld";
     String filename = "myworld.world";
     String sectionName1 = "Section1";
@@ -88,13 +82,13 @@ void PageCoreTests::testSimpleCreateSaveLoadWorld()
     world = 0;
     world = mPageManager->loadWorld(filename);
 
-    CPPUNIT_ASSERT_EQUAL(worldName, world->getName());
-    CPPUNIT_ASSERT_EQUAL((size_t)2, world->getSectionCount());
+    EXPECT_EQ(worldName, world->getName());
+    EXPECT_EQ((size_t)2, world->getSectionCount());
 
     section = world->getSection(sectionName1);
-    CPPUNIT_ASSERT(section != 0);
+    EXPECT_TRUE(section != 0);
     section = world->getSection(sectionName2);
-    CPPUNIT_ASSERT(section != 0);
+    EXPECT_TRUE(section != 0);
 }
 //--------------------------------------------------------------------------
 

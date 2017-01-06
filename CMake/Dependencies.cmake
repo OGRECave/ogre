@@ -347,9 +347,6 @@ macro_log_feature(Softimage_FOUND "Softimage" "Softimage SDK needed for building
 # Tests
 #######################################################################
 
-find_package(CppUnit)
-macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "http://cppunit.sourceforge.net" FALSE "" "")
-
 # now see if we have a buildable Dependencies package in
 # the source tree. If so, include that, and it will take care of
 # setting everything up, including overriding any of the above
@@ -378,7 +375,6 @@ include_directories(
   ${Cg_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
   ${DirectX_INCLUDE_DIRS}
-  ${CppUnit_INCLUDE_DIRS}
   ${GLSL_Optimizer_INCLUDE_DIRS}
   ${HLSL2GLSL_INCLUDE_DIRS}
 )
@@ -391,7 +387,6 @@ link_directories(
   ${Cg_LIBRARY_DIRS}
   ${X11_LIBRARY_DIRS}
   ${DirectX_LIBRARY_DIRS}
-  ${CppUnit_LIBRARY_DIRS}
 )
 
 if (Boost_FOUND)

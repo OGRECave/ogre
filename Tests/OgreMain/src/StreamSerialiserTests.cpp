@@ -25,33 +25,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "StreamSerialiserTests.h"
+#include <gtest/gtest.h>
 #include "OgreStreamSerialiser.h"
 #include "OgreFileSystem.h"
 #include "OgreException.h"
 #include "OgreVector3.h"
 
-#include "UnitTestSuite.h"
 
 using namespace Ogre;
 
-// Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(StreamSerialiserTests);
-
 //--------------------------------------------------------------------------
-void StreamSerialiserTests::setUp()
+TEST(StreamSerialiserTests,WriteBasic)
 {
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-}
-//--------------------------------------------------------------------------
-void StreamSerialiserTests::tearDown()
-{
-}
-//--------------------------------------------------------------------------
-void StreamSerialiserTests::testWriteBasic()
-{
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     FileSystemArchive arch("./", "FileSystem", false);
     arch.load();
 
@@ -83,8 +68,8 @@ void StreamSerialiserTests::testWriteBasic()
 
         const StreamSerialiser::Chunk* c = serialiser.readChunkBegin();
 
-        CPPUNIT_ASSERT_EQUAL(chunkID, c->id);
-        CPPUNIT_ASSERT_EQUAL(sizeof(Vector3) + sizeof(int) + aTestString.size() + 4, (size_t)c->length);
+        EXPECT_EQ(chunkID, c->id);
+        EXPECT_EQ(sizeof(Vector3) + sizeof(int) + aTestString.size() + 4, (size_t)c->length);
 
         Vector3 inVector;
         String inString;
@@ -95,13 +80,13 @@ void StreamSerialiserTests::testWriteBasic()
         serialiser.read(&inValue);
         serialiser.readChunkEnd(chunkID);
 
-        CPPUNIT_ASSERT_EQUAL(aTestVector, inVector);
-        CPPUNIT_ASSERT_EQUAL(aTestString, inString);
-        CPPUNIT_ASSERT_EQUAL(aTestValue, inValue);
+        EXPECT_EQ(aTestVector, inVector);
+        EXPECT_EQ(aTestString, inString);
+        EXPECT_EQ(aTestValue, inValue);
     }
 
     arch.remove(fileName);
 
-    CPPUNIT_ASSERT(!arch.exists(fileName));
+    EXPECT_TRUE(!arch.exists(fileName));
 }
 //--------------------------------------------------------------------------

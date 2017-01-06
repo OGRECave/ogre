@@ -29,27 +29,12 @@ THE SOFTWARE.
 #ifndef __MeshWithoutIndexDataTests_H__
 #define __MeshWithoutIndexDataTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 using namespace Ogre;
 
-class MeshWithoutIndexDataTests : public CppUnit::TestFixture
+class MeshWithoutIndexDataTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(MeshWithoutIndexDataTests);
-    CPPUNIT_TEST(testCreateSimpleLine);
-    CPPUNIT_TEST(testCreateLineList);
-    CPPUNIT_TEST(testCreateLineStrip);
-    CPPUNIT_TEST(testCreatePointList);
-    CPPUNIT_TEST(testCreateLineWithMaterial);
-    CPPUNIT_TEST(testCreateMesh);
-    CPPUNIT_TEST(testCloneMesh);
-    CPPUNIT_TEST(testEdgeList);
-    CPPUNIT_TEST(testGenerateExtremes);
-    CPPUNIT_TEST(testBuildTangentVectors);
-    CPPUNIT_TEST(testGenerateLodLevels);
-    CPPUNIT_TEST_SUITE_END();
 
 protected:
     HardwareBufferManager* mBufMgr;
@@ -57,19 +42,7 @@ protected:
     ArchiveManager* mArchiveMgr;
 
 public:
-    void setUp();
-    void tearDown();
-
-    void testCreateSimpleLine();
-    void testCreateLineList();
-    void testCreateLineStrip();
-    void testCreatePointList();
-    void testCreateLineWithMaterial();
-    void testCreateMesh();
-    void testCloneMesh();
-    void testEdgeList();
-    void testGenerateExtremes();
-    void testBuildTangentVectors();
-    void testGenerateLodLevels();
+    void SetUp();
+    void TearDown();
 };
 #endif

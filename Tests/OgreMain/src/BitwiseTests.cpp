@@ -25,102 +25,83 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "BitwiseTests.h"
-#include "UnitTestSuite.h"
+#include <gtest/gtest.h>
 
 #include "OgreBitwise.h"
 #include "OgreStringConverter.h"
 
 using namespace Ogre;
 
-// Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(BitwiseTests);
-
 //--------------------------------------------------------------------------
-void BitwiseTests::setUp()
-{    
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-}
-//--------------------------------------------------------------------------
-void BitwiseTests::tearDown()
+TEST(BitwiseTests,FixedPointConversion)
 {
-}
-//--------------------------------------------------------------------------
-void BitwiseTests::testFixedPointConversion()
-{  
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+    EXPECT_EQ(Bitwise::fixedToFixed(0x0,  1,8), (unsigned int)0x00);
+    EXPECT_EQ(Bitwise::fixedToFixed(0x1,  1,8), (unsigned int)0xFF);
+    EXPECT_EQ(Bitwise::fixedToFixed(0x2,  2,8), (unsigned int)0xAA);     // 10101010
+    EXPECT_EQ(Bitwise::fixedToFixed(0x1,  2,8), (unsigned int)0x55);     // 01010101
+    EXPECT_EQ(Bitwise::fixedToFixed(0x2,  2,9), (unsigned int)0x155);    // 1 01010101
+    EXPECT_EQ(Bitwise::fixedToFixed(0x1,  2,9), (unsigned int)0x0AA);    // 0 10101010
+    EXPECT_EQ(Bitwise::fixedToFixed(0xFE, 8,3), (unsigned int)0x7);      // 111
+    EXPECT_EQ(Bitwise::fixedToFixed(0xFE, 8,9), (unsigned int)0x1FD);    // 111111101
 
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFixed(0x0,  1,8), (unsigned int)0x00);
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFixed(0x1,  1,8), (unsigned int)0xFF);
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFixed(0x2,  2,8), (unsigned int)0xAA);     // 10101010
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFixed(0x1,  2,8), (unsigned int)0x55);     // 01010101
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFixed(0x2,  2,9), (unsigned int)0x155);    // 1 01010101
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFixed(0x1,  2,9), (unsigned int)0x0AA);    // 0 10101010
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFixed(0xFE, 8,3), (unsigned int)0x7);      // 111
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFixed(0xFE, 8,9), (unsigned int)0x1FD);    // 111111101
+    EXPECT_EQ(Bitwise::fixedToFloat(0xFF, 8), 1.0f);
+    EXPECT_EQ(Bitwise::fixedToFloat(0x00, 8), 0.0f);
 
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFloat(0xFF, 8), 1.0f);
-    CPPUNIT_ASSERT_EQUAL(Bitwise::fixedToFloat(0x00, 8), 0.0f);
-
-    CPPUNIT_ASSERT_EQUAL(Bitwise::floatToFixed(1.0f, 8), (unsigned int)0xFF);
-    CPPUNIT_ASSERT_EQUAL(Bitwise::floatToFixed(0.0f, 8), (unsigned int)0x00);
+    EXPECT_EQ(Bitwise::floatToFixed(1.0f, 8), (unsigned int)0xFF);
+    EXPECT_EQ(Bitwise::floatToFixed(0.0f, 8), (unsigned int)0x00);
 
     // Test clamping
-    CPPUNIT_ASSERT_EQUAL(Bitwise::floatToFixed(-1.0f,8), (unsigned int)0x00);
-    CPPUNIT_ASSERT_EQUAL(Bitwise::floatToFixed(2.0f, 8), (unsigned int)0xFF);
+    EXPECT_EQ(Bitwise::floatToFixed(-1.0f,8), (unsigned int)0x00);
+    EXPECT_EQ(Bitwise::floatToFixed(2.0f, 8), (unsigned int)0xFF);
 
     // Test circular conversion
     bool failed = false;
     for(unsigned int x = 0; x < 0x0010; x++)
         if(Bitwise::floatToFixed(Bitwise::fixedToFloat(x, 4), 4) != x)
             failed = true;
-    CPPUNIT_ASSERT_MESSAGE("circular floatToFixed/fixedToFloat for 4 bit failed", !failed);
+    EXPECT_TRUE(!failed) << "circular floatToFixed/fixedToFloat for 4 bit failed";
 
     failed = false;
     for(unsigned int x = 0; x < 0x0100; x++)
         if(Bitwise::floatToFixed(Bitwise::fixedToFloat(x, 8), 8) != x)
             failed = true;
-    CPPUNIT_ASSERT_MESSAGE("circular floatToFixed/fixedToFloat for 8 bit failed", !failed); 
+    EXPECT_TRUE(!failed) << "circular floatToFixed/fixedToFloat for 8 bit failed";
 
     failed = false;
     for(unsigned int x = 0; x < 0xFFE; x++) // originally loop ran till 0x1000, but precision issues sometimes prevent that
         if(Bitwise::floatToFixed(Bitwise::fixedToFloat(x, 12), 12) != x)
             failed = true;
-    CPPUNIT_ASSERT_MESSAGE("circular floatToFixed/fixedToFloat for 12 bit failed", !failed);    
+    EXPECT_TRUE(!failed) << "circular floatToFixed/fixedToFloat for 12 bit failed";
 }
 //--------------------------------------------------------------------------
-void BitwiseTests::testIntReadWrite()
-{
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-    
+TEST(BitwiseTests,IntReadWrite)
+{    
     // Test reading and writing integers
     uint32 testje = 0x12345678;
-    CPPUNIT_ASSERT(Bitwise::intRead(&testje, 4) == 0x12345678);
+    EXPECT_TRUE(Bitwise::intRead(&testje, 4) == 0x12345678);
     uint16 testje2 = 0x1234;
-    CPPUNIT_ASSERT(Bitwise::intRead(&testje2, 2) == 0x1234);
+    EXPECT_TRUE(Bitwise::intRead(&testje2, 2) == 0x1234);
     uint8 testje3 = 0xD3;
-    CPPUNIT_ASSERT(Bitwise::intRead(&testje3, 1) == 0xD3);
+    EXPECT_TRUE(Bitwise::intRead(&testje3, 1) == 0xD3);
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
     uint8 testje4[] = {0x12, 0x34, 0x56};
 #else
     uint8 testje4[] = {0x56, 0x34, 0x12};
 #endif
-    CPPUNIT_ASSERT(Bitwise::intRead(&testje4, 3) == 0x123456);
+    EXPECT_TRUE(Bitwise::intRead(&testje4, 3) == 0x123456);
 
     Bitwise::intWrite(&testje, 4, 0x87654321);
-    CPPUNIT_ASSERT(testje == 0x87654321);
+    EXPECT_TRUE(testje == 0x87654321);
 
     Bitwise::intWrite(&testje2, 2, 0x4321);
-    CPPUNIT_ASSERT(testje2 == 0x4321);
+    EXPECT_TRUE(testje2 == 0x4321);
 
     Bitwise::intWrite(&testje3, 1, 0x12);
-    CPPUNIT_ASSERT(testje3 == 0x12);
+    EXPECT_TRUE(testje3 == 0x12);
 }
 //--------------------------------------------------------------------------
-void BitwiseTests::testHalf()
-{
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-    
+TEST(BitwiseTests,Half)
+{    
     /*
     for(int x=0; x<0x100; x++)
     {

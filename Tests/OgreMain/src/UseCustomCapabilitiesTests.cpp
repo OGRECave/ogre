@@ -33,20 +33,16 @@ THE SOFTWARE.
 #include "OgreRenderSystemCapabilitiesManager.h"
 #include "OgreStringConverter.h"
 
-#include "UnitTestSuite.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
 #endif
 
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(UseCustomCapabilitiesTests);
 
 //--------------------------------------------------------------------------
-void UseCustomCapabilitiesTests::setUp()
-{
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-    
+void UseCustomCapabilitiesTests::SetUp()
+{    
     using namespace Ogre;
 
     if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
@@ -61,7 +57,7 @@ void UseCustomCapabilitiesTests::setUp()
         OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
 }
 //--------------------------------------------------------------------------
-void UseCustomCapabilitiesTests::tearDown()
+void UseCustomCapabilitiesTests::TearDown()
 {
 }
 //--------------------------------------------------------------------------
@@ -69,77 +65,77 @@ void checkCaps(const Ogre::RenderSystemCapabilities* caps)
 {
     using namespace Ogre;
 
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_AUTOMIPMAP), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_BLENDING), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_ANISOTROPY), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_DOT3), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_CUBEMAPPING), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_HWSTENCIL), true);
+    EXPECT_EQ(caps->hasCapability(RSC_AUTOMIPMAP), true);
+    EXPECT_EQ(caps->hasCapability(RSC_BLENDING), true);
+    EXPECT_EQ(caps->hasCapability(RSC_ANISOTROPY), true);
+    EXPECT_EQ(caps->hasCapability(RSC_DOT3), true);
+    EXPECT_EQ(caps->hasCapability(RSC_CUBEMAPPING), true);
+    EXPECT_EQ(caps->hasCapability(RSC_HWSTENCIL), true);
 
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_VBO), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_VERTEX_PROGRAM), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FRAGMENT_PROGRAM), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_SCISSOR_TEST), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TWO_SIDED_STENCIL), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_STENCIL_WRAP), true);
+    EXPECT_EQ(caps->hasCapability(RSC_VBO), true);
+    EXPECT_EQ(caps->hasCapability(RSC_VERTEX_PROGRAM), true);
+    EXPECT_EQ(caps->hasCapability(RSC_FRAGMENT_PROGRAM), true);
+    EXPECT_EQ(caps->hasCapability(RSC_SCISSOR_TEST), true);
+    EXPECT_EQ(caps->hasCapability(RSC_TWO_SIDED_STENCIL), true);
+    EXPECT_EQ(caps->hasCapability(RSC_STENCIL_WRAP), true);
 
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_HWOCCLUSION), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_USER_CLIP_PLANES), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_VERTEX_FORMAT_UBYTE4), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_INFINITE_FAR_PLANE), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_FLOAT), true);
+    EXPECT_EQ(caps->hasCapability(RSC_HWOCCLUSION), true);
+    EXPECT_EQ(caps->hasCapability(RSC_USER_CLIP_PLANES), true);
+    EXPECT_EQ(caps->hasCapability(RSC_VERTEX_FORMAT_UBYTE4), true);
+    EXPECT_EQ(caps->hasCapability(RSC_INFINITE_FAR_PLANE), true);
+    EXPECT_EQ(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE), true);
+    EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_FLOAT), true);
 
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_3D), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_POINT_SPRITES), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_VERTEX_TEXTURE_FETCH), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_MIPMAP_LOD_BIAS), true);
+    EXPECT_EQ(caps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES), false);
+    EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_3D), true);
+    EXPECT_EQ(caps->hasCapability(RSC_POINT_SPRITES), true);
+    EXPECT_EQ(caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS), true);
+    EXPECT_EQ(caps->hasCapability(RSC_VERTEX_TEXTURE_FETCH), false);
+    EXPECT_EQ(caps->hasCapability(RSC_MIPMAP_LOD_BIAS), true);
 
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_VTC), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO), true);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO_ARB), false);
+    EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION), true);
+    EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT), true);
+    EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION_VTC), false);
+    EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), false);
+    EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5), false);
+    EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), false);
+    EXPECT_EQ(caps->hasCapability(RSC_FBO), true);
+    EXPECT_EQ(caps->hasCapability(RSC_FBO_ARB), false);
 
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO_ATI), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_PBUFFER), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_PERSTAGECONSTANT), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_VAO), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS), false);
+    EXPECT_EQ(caps->hasCapability(RSC_FBO_ATI), false);
+    EXPECT_EQ(caps->hasCapability(RSC_PBUFFER), false);
+    EXPECT_EQ(caps->hasCapability(RSC_PERSTAGECONSTANT), false);
+    EXPECT_EQ(caps->hasCapability(RSC_VAO), false);
+    EXPECT_EQ(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS), false);
 
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbfp1"));
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbvp1"));
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("glsl"));
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("ps_1_1"));
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("ps_1_2"));
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("ps_1_3"));
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("ps_1_4"));
+    EXPECT_TRUE(caps->isShaderProfileSupported("arbfp1"));
+    EXPECT_TRUE(caps->isShaderProfileSupported("arbvp1"));
+    EXPECT_TRUE(caps->isShaderProfileSupported("glsl"));
+    EXPECT_TRUE(caps->isShaderProfileSupported("ps_1_1"));
+    EXPECT_TRUE(caps->isShaderProfileSupported("ps_1_2"));
+    EXPECT_TRUE(caps->isShaderProfileSupported("ps_1_3"));
+    EXPECT_TRUE(caps->isShaderProfileSupported("ps_1_4"));
 
-    CPPUNIT_ASSERT_EQUAL(caps->getMaxPointSize(), (Real)1024);
-    CPPUNIT_ASSERT_EQUAL(caps->getNonPOW2TexturesLimited(), false);
-    CPPUNIT_ASSERT_EQUAL(caps->getVertexTextureUnitsShared(), true);
-    CPPUNIT_ASSERT_EQUAL(caps->getNumWorldMatrices(), (Ogre::ushort)0);
-    CPPUNIT_ASSERT_EQUAL(caps->getNumTextureUnits(), (Ogre::ushort)16);
-    CPPUNIT_ASSERT_EQUAL(caps->getStencilBufferBitDepth(), (Ogre::ushort)8);
-    CPPUNIT_ASSERT_EQUAL(caps->getNumVertexBlendMatrices(), (Ogre::ushort)0);
-    CPPUNIT_ASSERT_EQUAL(caps->getNumMultiRenderTargets(), (Ogre::ushort)4);
+    EXPECT_EQ(caps->getMaxPointSize(), (Real)1024);
+    EXPECT_EQ(caps->getNonPOW2TexturesLimited(), false);
+    EXPECT_EQ(caps->getVertexTextureUnitsShared(), true);
+    EXPECT_EQ(caps->getNumWorldMatrices(), (Ogre::ushort)0);
+    EXPECT_EQ(caps->getNumTextureUnits(), (Ogre::ushort)16);
+    EXPECT_EQ(caps->getStencilBufferBitDepth(), (Ogre::ushort)8);
+    EXPECT_EQ(caps->getNumVertexBlendMatrices(), (Ogre::ushort)0);
+    EXPECT_EQ(caps->getNumMultiRenderTargets(), (Ogre::ushort)4);
 
-    CPPUNIT_ASSERT_EQUAL(caps->getVertexProgramConstantFloatCount(), (Ogre::ushort)256);
-    CPPUNIT_ASSERT_EQUAL(caps->getVertexProgramConstantIntCount(), (Ogre::ushort)0);
-    CPPUNIT_ASSERT_EQUAL(caps->getVertexProgramConstantBoolCount(), (Ogre::ushort)0);
+    EXPECT_EQ(caps->getVertexProgramConstantFloatCount(), (Ogre::ushort)256);
+    EXPECT_EQ(caps->getVertexProgramConstantIntCount(), (Ogre::ushort)0);
+    EXPECT_EQ(caps->getVertexProgramConstantBoolCount(), (Ogre::ushort)0);
 
-    CPPUNIT_ASSERT_EQUAL(caps->getFragmentProgramConstantFloatCount(), (Ogre::ushort)64);
-    CPPUNIT_ASSERT_EQUAL(caps->getFragmentProgramConstantIntCount(), (Ogre::ushort)0);
-    CPPUNIT_ASSERT_EQUAL(caps->getFragmentProgramConstantBoolCount(), (Ogre::ushort)0);
+    EXPECT_EQ(caps->getFragmentProgramConstantFloatCount(), (Ogre::ushort)64);
+    EXPECT_EQ(caps->getFragmentProgramConstantIntCount(), (Ogre::ushort)0);
+    EXPECT_EQ(caps->getFragmentProgramConstantBoolCount(), (Ogre::ushort)0);
 
-    CPPUNIT_ASSERT_EQUAL(caps->getNumVertexTextureUnits(), (Ogre::ushort)0);
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbvp1"));
-    CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbfp1"));
+    EXPECT_EQ(caps->getNumVertexTextureUnits(), (Ogre::ushort)0);
+    EXPECT_TRUE(caps->isShaderProfileSupported("arbvp1"));
+    EXPECT_TRUE(caps->isShaderProfileSupported("arbfp1"));
 }
 //--------------------------------------------------------------------------
 void setUpGLRenderSystemOptions(Ogre::RenderSystem* rs)
@@ -169,10 +165,8 @@ void setUpGLRenderSystemOptions(Ogre::RenderSystem* rs)
         rs->setConfigOption(String("RTT Preferred Mode"), String("Copy"));
 }
 //--------------------------------------------------------------------------
-void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
+TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesGL)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     using namespace Ogre;
 
 #ifdef OGRE_STATIC_LIB
@@ -236,10 +230,8 @@ void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
     rs->setConfigOption(optionDevice.name, optionDevice.currentValue);
 }
 //--------------------------------------------------------------------------
-void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
+TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesD3D9)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
 #ifdef OGRE_STATIC_LIB
     Root* root = OGRE_NEW Root(BLANKSTRING);        
     mStaticPluginLoader.load();
