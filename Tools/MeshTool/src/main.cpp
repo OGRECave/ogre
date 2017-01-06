@@ -1238,7 +1238,15 @@ int main(int numargs, char** args)
         if( opts.unoptimizeBuffer )
         {
             if( !v1Mesh.isNull() )
+            {
+                if( v1Mesh->sharedVertexData[VpNormal] )
+                {
+                    cout << "v1 Mesh has shared geometry. 'Unsharing' them..." << endl;
+                    v1::MeshManager::unshareVertices( v1Mesh.get() );
+                    cout << "Unshare operation successful" << endl;
+                }
                 v1Mesh->dearrangeToInefficient();
+            }
 
             if( !v2Mesh.isNull() )
                 v2Mesh->dearrangeToInefficient();
