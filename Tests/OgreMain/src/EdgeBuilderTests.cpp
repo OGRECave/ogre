@@ -30,28 +30,22 @@ THE SOFTWARE.
 #include "OgreVertexIndexData.h"
 #include "OgreEdgeListBuilder.h"
 
-#include "UnitTestSuite.h"
 
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(EdgeBuilderTests);
 
 //--------------------------------------------------------------------------
-void EdgeBuilderTests::setUp()
-{
-   UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-   
+void EdgeBuilderTests::SetUp()
+{   
    mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
 }
 //--------------------------------------------------------------------------
-void EdgeBuilderTests::tearDown()
+void EdgeBuilderTests::TearDown()
 {
     OGRE_DELETE mBufMgr;
 }
 //--------------------------------------------------------------------------
-void EdgeBuilderTests::testSingleIndexBufSingleVertexBuf()
+TEST_F(EdgeBuilderTests,SingleIndexBufSingleVertexBuf)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     /* This tests the edge builders ability to find shared edges in the simple case
     of a single index buffer referencing a single vertex buffer
     */
@@ -89,20 +83,18 @@ void EdgeBuilderTests::testSingleIndexBufSingleVertexBuf()
     EdgeData* edgeData = edgeBuilder.build();
 
     // Should be only one group, since only one vertex buffer
-    CPPUNIT_ASSERT(edgeData->edgeGroups.size() == 1);
+    EXPECT_TRUE(edgeData->edgeGroups.size() == 1);
     // 4 triangles
-    CPPUNIT_ASSERT(edgeData->triangles.size() == 4);
+    EXPECT_TRUE(edgeData->triangles.size() == 4);
     EdgeData::EdgeGroup& eg = edgeData->edgeGroups[0];
     // 6 edges
-    CPPUNIT_ASSERT(eg.edges.size() == 6);
+    EXPECT_TRUE(eg.edges.size() == 6);
 
     delete edgeData;
 }
 //--------------------------------------------------------------------------
-void EdgeBuilderTests::testMultiIndexBufSingleVertexBuf()
+TEST_F(EdgeBuilderTests,MultiIndexBufSingleVertexBuf)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     /* This tests the edge builders ability to find shared edges when there are
     multiple index sets (submeshes) using a single vertex buffer.
     */
@@ -164,20 +156,18 @@ void EdgeBuilderTests::testMultiIndexBufSingleVertexBuf()
     EdgeData* edgeData = edgeBuilder.build();
 
     // Should be only one group, since only one vertex buffer
-    CPPUNIT_ASSERT(edgeData->edgeGroups.size() == 1);
+    EXPECT_TRUE(edgeData->edgeGroups.size() == 1);
     // 4 triangles
-    CPPUNIT_ASSERT(edgeData->triangles.size() == 4);
+    EXPECT_TRUE(edgeData->triangles.size() == 4);
     EdgeData::EdgeGroup& eg = edgeData->edgeGroups[0];
     // 6 edges
-    CPPUNIT_ASSERT(eg.edges.size() == 6);
+    EXPECT_TRUE(eg.edges.size() == 6);
 
     delete edgeData;
 }
 //--------------------------------------------------------------------------
-void EdgeBuilderTests::testMultiIndexBufMultiVertexBuf()
+TEST_F(EdgeBuilderTests,MultiIndexBufMultiVertexBuf)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     /* This tests the edge builders ability to find shared edges when there are
     both multiple index sets (submeshes) each using a different vertex buffer
     (not using shared geometry).
@@ -279,11 +269,11 @@ void EdgeBuilderTests::testMultiIndexBufMultiVertexBuf()
     EdgeData* edgeData = edgeBuilder.build();
 
     // Should be 4 groups
-    CPPUNIT_ASSERT(edgeData->edgeGroups.size() == 4);
+    EXPECT_TRUE(edgeData->edgeGroups.size() == 4);
     // 4 triangles
-    CPPUNIT_ASSERT(edgeData->triangles.size() == 4);
+    EXPECT_TRUE(edgeData->triangles.size() == 4);
     // 6 edges in total
-    CPPUNIT_ASSERT(
+    EXPECT_TRUE(
         (edgeData->edgeGroups[0].edges.size() +
         edgeData->edgeGroups[1].edges.size() +
         edgeData->edgeGroups[2].edges.size() +

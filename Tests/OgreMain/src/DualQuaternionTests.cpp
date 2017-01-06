@@ -25,32 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "DualQuaternionTests.h"
+#include <gtest/gtest.h>
 #include "OgreDualQuaternion.h"
 #include "OgreVector3.h"
 #include "OgreMatrix4.h"
 
-#include "UnitTestSuite.h"
 
 using namespace Ogre;
 
-// Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(DualQuaternionTests);
-
 //--------------------------------------------------------------------------
-void DualQuaternionTests::setUp()
+TEST(DualQuaternionTests,Conversion)
 {
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-}
-//--------------------------------------------------------------------------
-void DualQuaternionTests::tearDown()
-{
-}
-//--------------------------------------------------------------------------
-void DualQuaternionTests::testConversion()
-{
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     DualQuaternion dQuat;
     Quaternion quat(Radian(Degree(60)), Vector3::UNIT_Y);
     Vector3 translation(0, 0, 10);
@@ -60,14 +45,12 @@ void DualQuaternionTests::testConversion()
     Vector3 resTrans;
     dQuat.toRotationTranslation(result, resTrans);
 
-    CPPUNIT_ASSERT_EQUAL(result, quat);
-    CPPUNIT_ASSERT(resTrans.positionEquals(translation));
+    EXPECT_EQ(result, quat);
+    EXPECT_TRUE(resTrans.positionEquals(translation));
 }
 //--------------------------------------------------------------------------
-void DualQuaternionTests::testDefaultValue()
+TEST(DualQuaternionTests,DefaultValue)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     DualQuaternion dQuatDefault;
     
     Quaternion quatDefault;
@@ -75,14 +58,12 @@ void DualQuaternionTests::testDefaultValue()
     
     dQuatDefault.toRotationTranslation(quatDefault, transDefault);
 
-    CPPUNIT_ASSERT_EQUAL(quatDefault, Quaternion::IDENTITY); 
-    CPPUNIT_ASSERT(transDefault.positionEquals(Vector3::ZERO));
+    EXPECT_EQ(quatDefault, Quaternion::IDENTITY); 
+    EXPECT_TRUE(transDefault.positionEquals(Vector3::ZERO));
 }
 //--------------------------------------------------------------------------
-void DualQuaternionTests::testMatrix()
+TEST(DualQuaternionTests,Matrix)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     Matrix4 transform;
     Vector3 translation(10, 4, 0);
     Vector3 scale = Vector3::UNIT_SCALE;
@@ -100,8 +81,8 @@ void DualQuaternionTests::testMatrix()
     Quaternion rotationResult;
     transformResult.decomposition(translationResult, scaleResult, rotationResult);
 
-    CPPUNIT_ASSERT(translationResult.positionEquals(translation));
-    CPPUNIT_ASSERT(scaleResult.positionEquals(scale));
-    CPPUNIT_ASSERT(rotationResult.equals(rotation, Radian(0.001)));
+    EXPECT_TRUE(translationResult.positionEquals(translation));
+    EXPECT_TRUE(scaleResult.positionEquals(scale));
+    EXPECT_TRUE(rotationResult.equals(rotation, Radian(0.001)));
 }
 //--------------------------------------------------------------------------

@@ -29,16 +29,12 @@ THE SOFTWARE.
 #include <cstdlib>
 #include <iomanip>
 
-#include "UnitTestSuite.h"
 
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(PixelFormatTests);
 
 //--------------------------------------------------------------------------
-void PixelFormatTests::setUp()
-{
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-    
+void PixelFormatTests::SetUp()
+{    
     mSize = 4096;
     mRandomData = new uint8[mSize];
     mTemp = new uint8[mSize];
@@ -50,30 +46,26 @@ void PixelFormatTests::setUp()
         mRandomData[x] = (uint8)rand();
 }
 //--------------------------------------------------------------------------
-void PixelFormatTests::tearDown()
+void PixelFormatTests::TearDown()
 {
     delete [] mRandomData;
     delete [] mTemp;
     delete [] mTemp2;
 }
 //--------------------------------------------------------------------------
-void PixelFormatTests::testIntegerPackUnpack()
-{
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-}
+TEST_F(PixelFormatTests,IntegerPackUnpack)
+{}
 //--------------------------------------------------------------------------
-void PixelFormatTests::testFloatPackUnpack()
+TEST_F(PixelFormatTests,FloatPackUnpack)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     // Float32
     float data[4] = {1.0f, 2.0f, 3.0f, 4.0f};
     float r,g,b,a;
     PixelUtil::unpackColour(&r, &g, &b, &a, PF_FLOAT32_RGBA, data);
-    CPPUNIT_ASSERT_EQUAL(r, 1.0f);
-    CPPUNIT_ASSERT_EQUAL(g, 2.0f);
-    CPPUNIT_ASSERT_EQUAL(b, 3.0f);
-    CPPUNIT_ASSERT_EQUAL(a, 4.0f);
+    EXPECT_EQ(r, 1.0f);
+    EXPECT_EQ(g, 2.0f);
+    EXPECT_EQ(b, 3.0f);
+    EXPECT_EQ(a, 4.0f);
 
     // Float16
     setupBoxes(PF_A8B8G8R8, PF_FLOAT16_RGBA);
@@ -93,8 +85,7 @@ void PixelFormatTests::testFloatPackUnpack()
     }
 
     // src and dst2 should match
-    CPPUNIT_ASSERT_MESSAGE("PF_FLOAT16_RGBA<->PF_A8B8G8R8 conversion was not lossless "+s.str(),
-        memcmp(mSrc.data, mDst2.data, eob) == 0);
+    EXPECT_TRUE(memcmp(mSrc.data, mDst2.data, eob) == 0) << "PF_FLOAT16_RGBA<->PF_A8B8G8R8 conversion was not lossless "+s.str();
 }
 //--------------------------------------------------------------------------
 // Pure 32 bit float precision brute force pixel conversion; for comparison
@@ -159,8 +150,8 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
     PixelUtil::bulkPixelConversion(mSrc, mDst1);
     naiveBulkPixelConversion(mSrc, mDst2);
 
-    CPPUNIT_ASSERT_EQUAL(mTemp[eob], (unsigned char)0x56);
-    CPPUNIT_ASSERT_EQUAL(mTemp[eob+1], (unsigned char)0x23);
+    EXPECT_EQ(mTemp[eob], (unsigned char)0x56);
+    EXPECT_EQ(mTemp[eob+1], (unsigned char)0x23);
 
     std::stringstream s;
     int x;
@@ -179,14 +170,11 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
     StringStream msg;
     msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
         "->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
-    CPPUNIT_ASSERT_MESSAGE(msg.str().c_str(),
-        memcmp(mDst1.data, mDst2.data, eob) == 0);
+    EXPECT_TRUE(memcmp(mDst1.data, mDst2.data, eob) == 0) << msg.str().c_str();
 }
 //--------------------------------------------------------------------------
-void PixelFormatTests::testBulkConversion()
+TEST_F(PixelFormatTests,BulkConversion)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     // Self match
     testCase(PF_A8R8G8B8, PF_A8R8G8B8);
 

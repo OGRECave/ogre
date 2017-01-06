@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreArchiveManager.h"
 #include "OgreLogManager.h"
 
-#include "UnitTestSuite.h"
 
 #include <fstream>
 #include <algorithm>
@@ -44,13 +43,10 @@ THE SOFTWARE.
 #endif
 
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(RenderSystemCapabilitiesTests);
 
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::setUp()
-{
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-    
+void RenderSystemCapabilitiesTests::SetUp()
+{    
     using namespace Ogre;
 
     // We need to be able to create FileSystem archives to load .rendercaps
@@ -71,57 +67,53 @@ void RenderSystemCapabilitiesTests::setUp()
 #endif
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::tearDown()
+void RenderSystemCapabilitiesTests::TearDown()
 {
     OGRE_DELETE mRenderSystemCapabilitiesManager;
     OGRE_DELETE mArchiveManager;
     OGRE_DELETE mFileSystemArchiveFactory;
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testIsShaderProfileSupported(void)
+TEST_F(RenderSystemCapabilitiesTests,IsShaderProfileSupported)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     // create a new RSC
     Ogre::RenderSystemCapabilities rsc;
 
     // check that no shader profile is supported
-    CPPUNIT_ASSERT(!rsc.isShaderProfileSupported("vs_1"));
-    CPPUNIT_ASSERT(!rsc.isShaderProfileSupported("ps_1_1"));
-    CPPUNIT_ASSERT(!rsc.isShaderProfileSupported("fp1"));
+    EXPECT_TRUE(!rsc.isShaderProfileSupported("vs_1"));
+    EXPECT_TRUE(!rsc.isShaderProfileSupported("ps_1_1"));
+    EXPECT_TRUE(!rsc.isShaderProfileSupported("fp1"));
 
     rsc.addShaderProfile("vs_1");
     rsc.addShaderProfile("fp1");
 
     // check that the added shader profiles are supported
-    CPPUNIT_ASSERT(rsc.isShaderProfileSupported("vs_1"));
-    CPPUNIT_ASSERT(rsc.isShaderProfileSupported("fp1"));
+    EXPECT_TRUE(rsc.isShaderProfileSupported("vs_1"));
+    EXPECT_TRUE(rsc.isShaderProfileSupported("fp1"));
 
 
     // check that non added profile is not supported
-    CPPUNIT_ASSERT(!rsc.isShaderProfileSupported("ps_1_1"));
+    EXPECT_TRUE(!rsc.isShaderProfileSupported("ps_1_1"));
 
 
     // check that empty string is not supported
-    CPPUNIT_ASSERT(!rsc.isShaderProfileSupported(""));
+    EXPECT_TRUE(!rsc.isShaderProfileSupported(""));
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testHasCapability()
+TEST_F(RenderSystemCapabilitiesTests,HasCapability)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     RenderSystemCapabilities rsc;
 
     // check that no caps (from 2 categories) are supported
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_AUTOMIPMAP));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_BLENDING));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_FBO_ATI));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_PBUFFER));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_AUTOMIPMAP));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_BLENDING));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_FBO_ATI));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_PBUFFER));
 
     // add support for few caps from each category
     rsc.setCapability(RSC_AUTOMIPMAP);
@@ -130,130 +122,113 @@ void RenderSystemCapabilitiesTests::testHasCapability()
     rsc.setCapability(RSC_FBO_ATI);
 
     // check that the newly set caps are supported
-    CPPUNIT_ASSERT(rsc.hasCapability(RSC_AUTOMIPMAP));
-    CPPUNIT_ASSERT(rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
-    CPPUNIT_ASSERT(rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
-    CPPUNIT_ASSERT(rsc.hasCapability(RSC_FBO_ATI));
+    EXPECT_TRUE(rsc.hasCapability(RSC_AUTOMIPMAP));
+    EXPECT_TRUE(rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
+    EXPECT_TRUE(rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
+    EXPECT_TRUE(rsc.hasCapability(RSC_FBO_ATI));
 
     // check that the non-set caps are NOT supported
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_BLENDING));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_PBUFFER));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_BLENDING));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
+    EXPECT_TRUE(!rsc.hasCapability(RSC_PBUFFER));
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testSerializeBlank()
+TEST_F(RenderSystemCapabilitiesTests,SerializeBlank)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps Blank");
 
     // if we have a non-NULL it's good enough
-    CPPUNIT_ASSERT(rsc != 0);
+    EXPECT_TRUE(rsc != 0);
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testSerializeEnumCapability()
+TEST_F(RenderSystemCapabilitiesTests,SerializeEnumCapability)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps enum Capabilities");
 
     // confirm that RSC was loaded
-    CPPUNIT_ASSERT(rsc != 0);
+    EXPECT_TRUE(rsc != 0);
 
     // confirm that the contents are the same as in .rendercaps file
-    CPPUNIT_ASSERT(rsc->hasCapability(RSC_AUTOMIPMAP));
-    CPPUNIT_ASSERT(rsc->hasCapability(RSC_FBO_ARB));
+    EXPECT_TRUE(rsc->hasCapability(RSC_AUTOMIPMAP));
+    EXPECT_TRUE(rsc->hasCapability(RSC_FBO_ARB));
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testSerializeStringCapability()
+TEST_F(RenderSystemCapabilitiesTests,SerializeStringCapability)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps set String");
 
     // confirm that RSC was loaded
-    CPPUNIT_ASSERT(rsc != 0);
+    EXPECT_TRUE(rsc != 0);
 
-    CPPUNIT_ASSERT(rsc->isShaderProfileSupported("vs99"));
+    EXPECT_TRUE(rsc->isShaderProfileSupported("vs99"));
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testSerializeBoolCapability()
+TEST_F(RenderSystemCapabilitiesTests,SerializeBoolCapability)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rscTrue = rscManager->loadParsedCapabilities("TestCaps set bool (true)");
     RenderSystemCapabilities* rscFalse = rscManager->loadParsedCapabilities("TestCaps set bool (false)");
 
     // confirm that RSC was loaded
-    CPPUNIT_ASSERT(rscTrue != 0);
-    CPPUNIT_ASSERT(rscFalse != 0);
+    EXPECT_TRUE(rscTrue != 0);
+    EXPECT_TRUE(rscFalse != 0);
 
-    CPPUNIT_ASSERT(rscTrue->getVertexTextureUnitsShared() == true);
-    CPPUNIT_ASSERT(rscFalse->getVertexTextureUnitsShared() == false);
+    EXPECT_TRUE(rscTrue->getVertexTextureUnitsShared() == true);
+    EXPECT_TRUE(rscFalse->getVertexTextureUnitsShared() == false);
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testSerializeIntCapability()
+TEST_F(RenderSystemCapabilitiesTests,SerializeIntCapability)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps set int");
 
     // confirm that RSC was loaded
-    CPPUNIT_ASSERT(rsc != 0);
+    EXPECT_TRUE(rsc != 0);
 
     // TODO: why no get?
-    CPPUNIT_ASSERT(rsc->getNumMultiRenderTargets() == 99);
+    EXPECT_TRUE(rsc->getNumMultiRenderTargets() == 99);
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testSerializeRealCapability()
+TEST_F(RenderSystemCapabilitiesTests,SerializeRealCapability)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps set Real");
 
     // confirm that RSC was loaded
-    CPPUNIT_ASSERT(rsc != 0);
+    EXPECT_TRUE(rsc != 0);
 
-    CPPUNIT_ASSERT(rsc->getMaxPointSize() == 99.5);
+    EXPECT_TRUE(rsc->getMaxPointSize() == 99.5);
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testSerializeShaderCapability()
+TEST_F(RenderSystemCapabilitiesTests,SerializeShaderCapability)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps addShaderProfile");
 
     // confirm that RSC was loaded
-    CPPUNIT_ASSERT(rsc != 0);
+    EXPECT_TRUE(rsc != 0);
 
-    CPPUNIT_ASSERT(rsc->isShaderProfileSupported("vp1"));
-    CPPUNIT_ASSERT(rsc->isShaderProfileSupported("vs_1_1"));
-    CPPUNIT_ASSERT(rsc->isShaderProfileSupported("ps_99"));
+    EXPECT_TRUE(rsc->isShaderProfileSupported("vp1"));
+    EXPECT_TRUE(rsc->isShaderProfileSupported("vs_1_1"));
+    EXPECT_TRUE(rsc->isShaderProfileSupported("ps_99"));
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
+TEST_F(RenderSystemCapabilitiesTests,WriteSimpleCapabilities)
 {
     using namespace Ogre;
     using namespace std;
-
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String name = "simple caps";
     String filename = "simpleCapsTest.rendercaps";
 
@@ -275,10 +250,10 @@ void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
     char buff[255];
 
     capsfile.getline(buff, 255);
-    CPPUNIT_ASSERT_EQUAL(String("render_system_capabilities \"") + name + "\"", String(buff));
+    EXPECT_EQ(String("render_system_capabilities \"") + name + "\"", String(buff));
 
     capsfile.getline(buff, 255);
-    CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
+    EXPECT_EQ(String("{"), String(buff));
 
     // scan every line and find the set capabilities it them
     std::vector <String> lines;
@@ -290,24 +265,21 @@ void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
 
     // check that the file is closed nicely
     String closeBracket = *(lines.end() - 2);
-    CPPUNIT_ASSERT_EQUAL(String("}"), closeBracket);
-    CPPUNIT_ASSERT_EQUAL(String(""), lines.back());
+    EXPECT_EQ(String("}"), closeBracket);
+    EXPECT_EQ(String(""), lines.back());
 
     // check that all the set caps are there
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tautomipmap true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tmax_point_size 10.5") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tshader_profile sp999") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tnum_world_matrices 777") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tmax_point_size 10.5") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tshader_profile sp999") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tnum_world_matrices 777") != lines.end());
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
+TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
 {
     using namespace Ogre;
     using namespace std;
-
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String name = "all false caps";
     String filename = "allFalseCapsTest.rendercaps";
 
@@ -326,10 +298,10 @@ void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
     char buff[255];
 
     capsfile.getline(buff, 255);
-    CPPUNIT_ASSERT_EQUAL(String("render_system_capabilities \"") + name + "\"", String(buff));
+    EXPECT_EQ(String("render_system_capabilities \"") + name + "\"", String(buff));
 
     capsfile.getline(buff, 255);
-    CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
+    EXPECT_EQ(String("{"), String(buff));
 
     // scan every line and find the set capabilities it them
     std::vector <String> lines;
@@ -341,64 +313,61 @@ void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
 
       // check that the file is closed nicely
     String closeBracket = *(lines.end() - 2);
-    CPPUNIT_ASSERT_EQUAL(String("}"), closeBracket);
-    CPPUNIT_ASSERT_EQUAL(String(""), lines.back());
+    EXPECT_EQ(String("}"), closeBracket);
+    EXPECT_EQ(String(""), lines.back());
 
     // confirm every caps
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tautomipmap false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tblending false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tanisotropy false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tdot3 false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tcubemapping false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\thwstencil false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tblending false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tcubemapping false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil false") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvbo false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_program false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tfragment_program false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tscissor_test false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttwo_sided_stencil false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tstencil_wrap false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvbo false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfragment_program false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tscissor_test false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttwo_sided_stencil false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tstencil_wrap false") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\thwocclusion false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tuser_clip_planes false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_format_ubyte4 false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tinfinite_far_plane false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\thwrender_to_texture false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_float false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwocclusion false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tuser_clip_planes false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_format_ubyte4 false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tinfinite_far_plane false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwrender_to_texture false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_float false") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tnon_power_of_2_textures false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_3d false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tpoint_sprites false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tpoint_extended_parameters false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_texture_fetch false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tmipmap_lod_bias false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tnon_power_of_2_textures false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_3d false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpoint_sprites false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpoint_extended_parameters false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_fetch false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tmipmap_lod_bias false") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_dxt false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_vtc false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_pvrtc false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_bc4_bc5 false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_bc6h_bc7 false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tfbo false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tfbo_arb false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_dxt false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_vtc false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_pvrtc false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_bc4_bc5 false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_bc6h_bc7 false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo_arb false") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tfbo_ati false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tpbuffer false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tperstageconstant false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tseparate_shader_objects false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvao false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo_ati false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpbuffer false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tperstageconstant false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tseparate_shader_objects false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvao false") != lines.end());
 
     // bool caps
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared false") != lines.end());
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
+TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
 {
     using namespace Ogre;
     using namespace std;
-
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String name = "all false caps";
     String filename = "allFalseCapsTest.rendercaps";
 
@@ -460,10 +429,10 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
     char buff[255];
 
     capsfile.getline(buff, 255);
-    CPPUNIT_ASSERT_EQUAL(String("render_system_capabilities \"") + name + "\"", String(buff));
+    EXPECT_EQ(String("render_system_capabilities \"") + name + "\"", String(buff));
 
     capsfile.getline(buff, 255);
-    CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
+    EXPECT_EQ(String("{"), String(buff));
 
     // scan every line and find the set capabilities it them
     std::vector <String> lines;
@@ -475,64 +444,61 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
 
     // check that the file is closed nicely
     String closeBracket = *(lines.end() - 2);
-    CPPUNIT_ASSERT_EQUAL(String("}"), closeBracket);
-    CPPUNIT_ASSERT_EQUAL(String(""), lines.back());
+    EXPECT_EQ(String("}"), closeBracket);
+    EXPECT_EQ(String(""), lines.back());
 
     // confirm all caps
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tautomipmap true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tblending true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tanisotropy true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tdot3 true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tcubemapping true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\thwstencil true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tblending true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tcubemapping true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil true") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvbo true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_program true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tfragment_program true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tscissor_test true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttwo_sided_stencil true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tstencil_wrap true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvbo true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfragment_program true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tscissor_test true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttwo_sided_stencil true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tstencil_wrap true") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\thwocclusion true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tuser_clip_planes true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_format_ubyte4 true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tinfinite_far_plane true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\thwrender_to_texture true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_float true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwocclusion true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tuser_clip_planes true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_format_ubyte4 true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tinfinite_far_plane true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwrender_to_texture true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_float true") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tnon_power_of_2_textures true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_3d true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tpoint_sprites true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tpoint_extended_parameters true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_texture_fetch true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tmipmap_lod_bias true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tnon_power_of_2_textures true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_3d true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpoint_sprites true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpoint_extended_parameters true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_fetch true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tmipmap_lod_bias true") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_dxt true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_vtc true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_pvrtc true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_bc4_bc5 true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\ttexture_compression_bc6h_bc7 true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tfbo true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tfbo_arb true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_dxt true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_vtc true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_pvrtc true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_bc4_bc5 true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_bc6h_bc7 true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo_arb true") != lines.end());
 
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tfbo_ati true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tpbuffer true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tperstageconstant true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tseparate_shader_objects true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvao true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo_ati true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpbuffer true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tperstageconstant true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tseparate_shader_objects true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvao true") != lines.end());
 
     // bool caps
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared true") != lines.end());
 }
 //--------------------------------------------------------------------------
-void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
+TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
 {
     using namespace Ogre;
     using namespace std;
-
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String name = "complex caps";
     String filename = "complexCapsTest.rendercaps";
 
@@ -617,77 +583,77 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities(name);
     // confirm that RSC was loaded
-    CPPUNIT_ASSERT(rsc != 0);
+    EXPECT_TRUE(rsc != 0);
 
     // create a reference, so that were are working with two refs
     RenderSystemCapabilities& caps2 = *rsc;
 
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_AUTOMIPMAP), caps2.hasCapability(RSC_AUTOMIPMAP));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_BLENDING), caps2.hasCapability(RSC_BLENDING));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_ANISOTROPY), caps2.hasCapability(RSC_ANISOTROPY));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_DOT3), caps2.hasCapability(RSC_DOT3));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_CUBEMAPPING), caps2.hasCapability(RSC_CUBEMAPPING));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_HWSTENCIL), caps2.hasCapability(RSC_HWSTENCIL));
+    EXPECT_EQ(caps.hasCapability(RSC_AUTOMIPMAP), caps2.hasCapability(RSC_AUTOMIPMAP));
+    EXPECT_EQ(caps.hasCapability(RSC_BLENDING), caps2.hasCapability(RSC_BLENDING));
+    EXPECT_EQ(caps.hasCapability(RSC_ANISOTROPY), caps2.hasCapability(RSC_ANISOTROPY));
+    EXPECT_EQ(caps.hasCapability(RSC_DOT3), caps2.hasCapability(RSC_DOT3));
+    EXPECT_EQ(caps.hasCapability(RSC_CUBEMAPPING), caps2.hasCapability(RSC_CUBEMAPPING));
+    EXPECT_EQ(caps.hasCapability(RSC_HWSTENCIL), caps2.hasCapability(RSC_HWSTENCIL));
 
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_VBO), caps2.hasCapability(RSC_VBO));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_VERTEX_PROGRAM), caps2.hasCapability(RSC_VERTEX_PROGRAM));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_FRAGMENT_PROGRAM), caps2.hasCapability(RSC_FRAGMENT_PROGRAM));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_SCISSOR_TEST), caps2.hasCapability(RSC_SCISSOR_TEST));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TWO_SIDED_STENCIL), caps2.hasCapability(RSC_TWO_SIDED_STENCIL));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_STENCIL_WRAP), caps2.hasCapability(RSC_STENCIL_WRAP));
+    EXPECT_EQ(caps.hasCapability(RSC_VBO), caps2.hasCapability(RSC_VBO));
+    EXPECT_EQ(caps.hasCapability(RSC_VERTEX_PROGRAM), caps2.hasCapability(RSC_VERTEX_PROGRAM));
+    EXPECT_EQ(caps.hasCapability(RSC_FRAGMENT_PROGRAM), caps2.hasCapability(RSC_FRAGMENT_PROGRAM));
+    EXPECT_EQ(caps.hasCapability(RSC_SCISSOR_TEST), caps2.hasCapability(RSC_SCISSOR_TEST));
+    EXPECT_EQ(caps.hasCapability(RSC_TWO_SIDED_STENCIL), caps2.hasCapability(RSC_TWO_SIDED_STENCIL));
+    EXPECT_EQ(caps.hasCapability(RSC_STENCIL_WRAP), caps2.hasCapability(RSC_STENCIL_WRAP));
 
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_HWOCCLUSION), caps2.hasCapability(RSC_HWOCCLUSION));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_USER_CLIP_PLANES), caps2.hasCapability(RSC_USER_CLIP_PLANES));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_VERTEX_FORMAT_UBYTE4), caps2.hasCapability(RSC_VERTEX_FORMAT_UBYTE4));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_INFINITE_FAR_PLANE), caps2.hasCapability(RSC_INFINITE_FAR_PLANE));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_HWRENDER_TO_TEXTURE), caps2.hasCapability(RSC_HWRENDER_TO_TEXTURE));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_FLOAT), caps2.hasCapability(RSC_TEXTURE_FLOAT));
+    EXPECT_EQ(caps.hasCapability(RSC_HWOCCLUSION), caps2.hasCapability(RSC_HWOCCLUSION));
+    EXPECT_EQ(caps.hasCapability(RSC_USER_CLIP_PLANES), caps2.hasCapability(RSC_USER_CLIP_PLANES));
+    EXPECT_EQ(caps.hasCapability(RSC_VERTEX_FORMAT_UBYTE4), caps2.hasCapability(RSC_VERTEX_FORMAT_UBYTE4));
+    EXPECT_EQ(caps.hasCapability(RSC_INFINITE_FAR_PLANE), caps2.hasCapability(RSC_INFINITE_FAR_PLANE));
+    EXPECT_EQ(caps.hasCapability(RSC_HWRENDER_TO_TEXTURE), caps2.hasCapability(RSC_HWRENDER_TO_TEXTURE));
+    EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_FLOAT), caps2.hasCapability(RSC_TEXTURE_FLOAT));
 
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_NON_POWER_OF_2_TEXTURES), caps2.hasCapability(RSC_NON_POWER_OF_2_TEXTURES));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_3D), caps2.hasCapability(RSC_TEXTURE_3D));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_POINT_SPRITES), caps2.hasCapability(RSC_POINT_SPRITES));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_POINT_EXTENDED_PARAMETERS), caps2.hasCapability(RSC_POINT_EXTENDED_PARAMETERS));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_VERTEX_TEXTURE_FETCH), caps2.hasCapability(RSC_VERTEX_TEXTURE_FETCH));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_MIPMAP_LOD_BIAS), caps2.hasCapability(RSC_MIPMAP_LOD_BIAS));
+    EXPECT_EQ(caps.hasCapability(RSC_NON_POWER_OF_2_TEXTURES), caps2.hasCapability(RSC_NON_POWER_OF_2_TEXTURES));
+    EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_3D), caps2.hasCapability(RSC_TEXTURE_3D));
+    EXPECT_EQ(caps.hasCapability(RSC_POINT_SPRITES), caps2.hasCapability(RSC_POINT_SPRITES));
+    EXPECT_EQ(caps.hasCapability(RSC_POINT_EXTENDED_PARAMETERS), caps2.hasCapability(RSC_POINT_EXTENDED_PARAMETERS));
+    EXPECT_EQ(caps.hasCapability(RSC_VERTEX_TEXTURE_FETCH), caps2.hasCapability(RSC_VERTEX_TEXTURE_FETCH));
+    EXPECT_EQ(caps.hasCapability(RSC_MIPMAP_LOD_BIAS), caps2.hasCapability(RSC_MIPMAP_LOD_BIAS));
 
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION), caps2.hasCapability(RSC_TEXTURE_COMPRESSION));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION_DXT), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_DXT));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION_VTC), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_FBO), caps2.hasCapability(RSC_FBO));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_FBO_ARB), caps2.hasCapability(RSC_FBO_ARB));
+    EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION), caps2.hasCapability(RSC_TEXTURE_COMPRESSION));
+    EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION_DXT), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_DXT));
+    EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION_VTC), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
+    EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC));
+    EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5));
+    EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7));
+    EXPECT_EQ(caps.hasCapability(RSC_FBO), caps2.hasCapability(RSC_FBO));
+    EXPECT_EQ(caps.hasCapability(RSC_FBO_ARB), caps2.hasCapability(RSC_FBO_ARB));
 
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_FBO_ATI), caps2.hasCapability(RSC_FBO_ATI));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_PBUFFER), caps2.hasCapability(RSC_PBUFFER));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_PERSTAGECONSTANT), caps2.hasCapability(RSC_PERSTAGECONSTANT));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_SEPARATE_SHADER_OBJECTS), caps2.hasCapability(RSC_SEPARATE_SHADER_OBJECTS));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_VAO), caps2.hasCapability(RSC_VAO));
+    EXPECT_EQ(caps.hasCapability(RSC_FBO_ATI), caps2.hasCapability(RSC_FBO_ATI));
+    EXPECT_EQ(caps.hasCapability(RSC_PBUFFER), caps2.hasCapability(RSC_PBUFFER));
+    EXPECT_EQ(caps.hasCapability(RSC_PERSTAGECONSTANT), caps2.hasCapability(RSC_PERSTAGECONSTANT));
+    EXPECT_EQ(caps.hasCapability(RSC_SEPARATE_SHADER_OBJECTS), caps2.hasCapability(RSC_SEPARATE_SHADER_OBJECTS));
+    EXPECT_EQ(caps.hasCapability(RSC_VAO), caps2.hasCapability(RSC_VAO));
 
-    CPPUNIT_ASSERT_EQUAL(caps.getNumWorldMatrices(), caps2.getNumWorldMatrices());
-    CPPUNIT_ASSERT_EQUAL(caps.getNumTextureUnits(), caps2.getNumTextureUnits());
-    CPPUNIT_ASSERT_EQUAL(caps.getStencilBufferBitDepth(), caps2.getStencilBufferBitDepth());
-    CPPUNIT_ASSERT_EQUAL(caps.getNumVertexBlendMatrices(), caps2.getNumVertexBlendMatrices());
-    CPPUNIT_ASSERT_EQUAL(caps.getNumMultiRenderTargets(), caps2.getNumMultiRenderTargets());
+    EXPECT_EQ(caps.getNumWorldMatrices(), caps2.getNumWorldMatrices());
+    EXPECT_EQ(caps.getNumTextureUnits(), caps2.getNumTextureUnits());
+    EXPECT_EQ(caps.getStencilBufferBitDepth(), caps2.getStencilBufferBitDepth());
+    EXPECT_EQ(caps.getNumVertexBlendMatrices(), caps2.getNumVertexBlendMatrices());
+    EXPECT_EQ(caps.getNumMultiRenderTargets(), caps2.getNumMultiRenderTargets());
 
-    CPPUNIT_ASSERT_EQUAL(caps.getVertexProgramConstantFloatCount(), caps2.getVertexProgramConstantFloatCount());
-    CPPUNIT_ASSERT_EQUAL(caps.getVertexProgramConstantIntCount(), caps2.getVertexProgramConstantIntCount());
-    CPPUNIT_ASSERT_EQUAL(caps.getVertexProgramConstantBoolCount(), caps2.getVertexProgramConstantBoolCount());
+    EXPECT_EQ(caps.getVertexProgramConstantFloatCount(), caps2.getVertexProgramConstantFloatCount());
+    EXPECT_EQ(caps.getVertexProgramConstantIntCount(), caps2.getVertexProgramConstantIntCount());
+    EXPECT_EQ(caps.getVertexProgramConstantBoolCount(), caps2.getVertexProgramConstantBoolCount());
 
-    CPPUNIT_ASSERT_EQUAL(caps.getFragmentProgramConstantFloatCount(), caps2.getFragmentProgramConstantFloatCount());
-    CPPUNIT_ASSERT_EQUAL(caps.getFragmentProgramConstantIntCount(), caps2.getFragmentProgramConstantIntCount());
-    CPPUNIT_ASSERT_EQUAL(caps.getFragmentProgramConstantBoolCount(), caps2.getFragmentProgramConstantBoolCount());
+    EXPECT_EQ(caps.getFragmentProgramConstantFloatCount(), caps2.getFragmentProgramConstantFloatCount());
+    EXPECT_EQ(caps.getFragmentProgramConstantIntCount(), caps2.getFragmentProgramConstantIntCount());
+    EXPECT_EQ(caps.getFragmentProgramConstantBoolCount(), caps2.getFragmentProgramConstantBoolCount());
 
-    CPPUNIT_ASSERT_EQUAL(caps.getMaxPointSize(), caps2.getMaxPointSize());
-    CPPUNIT_ASSERT_EQUAL(caps.getNonPOW2TexturesLimited(), caps2.getNonPOW2TexturesLimited());
-    CPPUNIT_ASSERT_EQUAL(caps.getVertexTextureUnitsShared(), caps2.getVertexTextureUnitsShared());
+    EXPECT_EQ(caps.getMaxPointSize(), caps2.getMaxPointSize());
+    EXPECT_EQ(caps.getNonPOW2TexturesLimited(), caps2.getNonPOW2TexturesLimited());
+    EXPECT_EQ(caps.getVertexTextureUnitsShared(), caps2.getVertexTextureUnitsShared());
     
     // test versions
-    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().major, caps2.getDriverVersion().major);
-    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().minor, caps2.getDriverVersion().minor);
-    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().release, caps2.getDriverVersion().release);
-    CPPUNIT_ASSERT_EQUAL(0, caps2.getDriverVersion().build);
+    EXPECT_EQ(caps.getDriverVersion().major, caps2.getDriverVersion().major);
+    EXPECT_EQ(caps.getDriverVersion().minor, caps2.getDriverVersion().minor);
+    EXPECT_EQ(caps.getDriverVersion().release, caps2.getDriverVersion().release);
+    EXPECT_EQ(0, caps2.getDriverVersion().build);
 
     dataStreamPtr.setNull();
 }
