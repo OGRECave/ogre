@@ -26,21 +26,35 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include <Ogre.h>
+#include <OgreInstancedEntity.h>
+#include <OgreInstanceBatchShader.h>
 #include "RootWithoutRenderSystemFixture.h"
-#include "OgreMesh.h"
-#include "OgreLodConfig.h"
 
 using namespace Ogre;
 
-class MeshLodTests : public RootWithoutRenderSystemFixture
-{
-public:
-    MeshPtr mMesh;
+typedef RootWithoutRenderSystemFixture Instancing;
 
-    void SetUp();
-    void TearDown();
-    void runMeshLodConfigTests(LodConfig::Advanced& advanced);
-    void blockedWaitForLodGeneration(const MeshPtr& mesh);
-    void addProfile(LodConfig& config);
-    void setTestLodConfig(LodConfig& config);
-};
+TEST_F(Instancing, Bounds) {
+    SceneManager* sceneMgr = SceneManagerEnumerator::getSingleton().createSceneManager(ST_GENERIC);
+    Entity* entity = sceneMgr->createEntity("robot.mesh");
+
+    MeshPtr mesh = entity->getMesh();
+    InstanceBatchShader batch(NULL, mesh, entity->getSubEntity(0)->getMaterial(), 1, NULL, "");
+    InstancedEntity instanced_entity(&batch, 0);
+
+    SceneNode* node = sceneMgr->createSceneNode();
+    node->attachObject(&instanced_entity);
+    node->attachObject(entity);
+    node->translate(Vector3::UNIT_X);
+    node->setScale(Vector3(2, 2, 2));
+
+    EXPECT_EQ(instanced_entity.getBoundingBox(), entity->getBoundingBox());
+    EXPECT_EQ(instanced_entity.getBoundingRadius(), entity->getBoundingRadius());
+
+    sceneMgr->destroyEntity(entity);
+    MeshManager::getSingleton().remove(mesh->getHandle());
+}
+
+
+
