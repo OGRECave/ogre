@@ -85,7 +85,7 @@ namespace v1
         CbStartV1LegacyRendering();
     };
 
-    struct CbRenderOp : public CbBase
+    struct _OgreExport CbRenderOp : public CbBase
     {
         v1::VertexData  *vertexData;
         v1::IndexData   *indexData;
