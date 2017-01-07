@@ -19,17 +19,13 @@
 #include "OgreLodConfigSerializer.h"
 #include "OgreWorkQueue.h"
 
-#include "UnitTestSuite.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
 #endif
 
-// Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(MeshLodTests);
-
 //--------------------------------------------------------------------------
-void MeshLodTests::setUp()
+void MeshLodTests::SetUp()
 {
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
@@ -41,7 +37,7 @@ void MeshLodTests::setUp()
     Root* root = OGRE_NEW Root(pluginsPath);
 #endif
 
-    CPPUNIT_ASSERT(!root->getAvailableRenderers().empty());
+    EXPECT_TRUE(!root->getAvailableRenderers().empty());
     root->setRenderSystem(root->getAvailableRenderers().back());
     root->initialise(false); // Needed for setting up HardwareBufferManager
 
@@ -87,7 +83,7 @@ void MeshLodTests::setUp()
     mMesh = MeshManager::getSingleton().load("Sinbad.mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 }
 //--------------------------------------------------------------------------
-void MeshLodTests::tearDown()
+void MeshLodTests::TearDown()
 {
     if (!mMesh.isNull()) {
         mMesh->unload();
@@ -124,10 +120,8 @@ void MeshLodTests::addProfile(LodConfig& config)
     vbuf->unlock();
 }
 //--------------------------------------------------------------------------
-void MeshLodTests::testMeshLodGenerator()
+TEST_F(MeshLodTests,MeshLodGenerator)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     LodConfig config;
     setTestLodConfig(config);
 
@@ -144,11 +138,11 @@ void MeshLodTests::testMeshLodGenerator()
     config2.mesh->removeLodLevels();
     gen.generateLodLevels(config);
     blockedWaitForLodGeneration(config.mesh);
-    CPPUNIT_ASSERT(config.levels.size() == config2.levels.size());
+    EXPECT_TRUE(config.levels.size() == config2.levels.size());
     for (size_t i = 0; i < config.levels.size(); i++) 
     {
-        CPPUNIT_ASSERT(config.levels[i].outSkipped == config2.levels[i].outSkipped);
-        CPPUNIT_ASSERT(config.levels[i].outUniqueVertexCount == config2.levels[i].outUniqueVertexCount);
+        EXPECT_TRUE(config.levels[i].outSkipped == config2.levels[i].outSkipped);
+        EXPECT_TRUE(config.levels[i].outUniqueVertexCount == config2.levels[i].outUniqueVertexCount);
     }
 }
 //--------------------------------------------------------------------------
@@ -167,40 +161,38 @@ void MeshLodTests::blockedWaitForLodGeneration(const MeshPtr& mesh)
         }
     }
     // timeout
-    CPPUNIT_ASSERT(success);
+    EXPECT_TRUE(success);
 }
 //--------------------------------------------------------------------------
-void MeshLodTests::testLodConfigSerializer()
+TEST_F(MeshLodTests,LodConfigSerializer)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     LodConfig config, config2;
     setTestLodConfig(config);
     addProfile(config);
     LodConfigSerializer serializer;
     serializer.exportLodConfig(config, "testLodConfigSerializer.lodconfig");
     serializer.importLodConfig(&config2, "testLodConfigSerializer.lodconfig");
-    CPPUNIT_ASSERT(config.mesh->getHandle() == config2.mesh->getHandle());
-    CPPUNIT_ASSERT(config.strategy == config2.strategy);
-    CPPUNIT_ASSERT(config.advanced.outsideWalkAngle == config.advanced.outsideWalkAngle);
-    CPPUNIT_ASSERT(config.advanced.outsideWeight == config.advanced.outsideWeight);
-    CPPUNIT_ASSERT(config.advanced.useBackgroundQueue == config.advanced.useBackgroundQueue);
-    CPPUNIT_ASSERT(config.advanced.useCompression == config.advanced.useCompression);
-    CPPUNIT_ASSERT(config.advanced.useVertexNormals == config.advanced.useVertexNormals);
+    EXPECT_TRUE(config.mesh->getHandle() == config2.mesh->getHandle());
+    EXPECT_TRUE(config.strategy == config2.strategy);
+    EXPECT_TRUE(config.advanced.outsideWalkAngle == config.advanced.outsideWalkAngle);
+    EXPECT_TRUE(config.advanced.outsideWeight == config.advanced.outsideWeight);
+    EXPECT_TRUE(config.advanced.useBackgroundQueue == config.advanced.useBackgroundQueue);
+    EXPECT_TRUE(config.advanced.useCompression == config.advanced.useCompression);
+    EXPECT_TRUE(config.advanced.useVertexNormals == config.advanced.useVertexNormals);
 
     {
         // Compare profiles
         LodProfile& p1 = config.advanced.profile;
         LodProfile& p2 = config2.advanced.profile;
         bool isProfileSameSize = (p1.size() == p2.size());
-        CPPUNIT_ASSERT(isProfileSameSize);
+        EXPECT_TRUE(isProfileSameSize);
         if (isProfileSameSize) 
         {
             for (size_t i = 0; i < p1.size(); i++) 
             {
-                CPPUNIT_ASSERT(p1[i].src == p2[i].src);
-                CPPUNIT_ASSERT(p1[i].dst == p2[i].dst);
-                CPPUNIT_ASSERT(isEqual(p1[i].cost, p2[i].cost));
+                EXPECT_TRUE(p1[i].src == p2[i].src);
+                EXPECT_TRUE(p1[i].dst == p2[i].dst);
+                EXPECT_FLOAT_EQ(p1[i].cost, p2[i].cost);
             }
         }
     }
@@ -210,34 +202,30 @@ void MeshLodTests::testLodConfigSerializer()
         LodConfig::LodLevelList& l1 = config.levels;
         LodConfig::LodLevelList& l2 = config2.levels;
         bool isLevelsSameSize = (l1.size() == l2.size());
-        CPPUNIT_ASSERT(isLevelsSameSize);
+        EXPECT_TRUE(isLevelsSameSize);
         if (isLevelsSameSize) 
         {
             for (size_t i = 0; i < l1.size(); i++) 
             {
-                CPPUNIT_ASSERT(l1[i].distance == l2[i].distance);
-                CPPUNIT_ASSERT(l1[i].manualMeshName == l2[i].manualMeshName);
-                CPPUNIT_ASSERT(l1[i].reductionMethod == l2[i].reductionMethod);
-                CPPUNIT_ASSERT(isEqual(l1[i].reductionValue, l2[i].reductionValue));
+                EXPECT_TRUE(l1[i].distance == l2[i].distance);
+                EXPECT_TRUE(l1[i].manualMeshName == l2[i].manualMeshName);
+                EXPECT_TRUE(l1[i].reductionMethod == l2[i].reductionMethod);
+                EXPECT_FLOAT_EQ(l1[i].reductionValue, l2[i].reductionValue);
             }
         }
     }
 }
 //--------------------------------------------------------------------------
-void MeshLodTests::testManualLodLevels()
+TEST_F(MeshLodTests,ManualLodLevels)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     LodConfig config;
     setTestLodConfig(config);
     gen.generateLodLevels(config, LodCollapseCostPtr(new LodCollapseCostQuadric()));
 }
 //--------------------------------------------------------------------------
-void MeshLodTests::testQuadricError()
+TEST_F(MeshLodTests,QuadricError)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     LodConfig config;
     setTestLodConfig(config);
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
@@ -256,11 +244,5 @@ void MeshLodTests::setTestLodConfig(LodConfig& config)
     config.advanced.useCompression = true;
     config.advanced.useVertexNormals = true;
     config.advanced.useBackgroundQueue = false;
-}
-//--------------------------------------------------------------------------
-bool MeshLodTests::isEqual(Real a, Real b)
-{
-    Real absoluteError = static_cast<Real>(std::abs(a * 0.05));
-    return ((a - absoluteError) <= b) && ((a + absoluteError) >= b);
 }
 //--------------------------------------------------------------------------

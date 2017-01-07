@@ -25,24 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "QuaternionTests.h"
+#include <gtest/gtest.h>
 #include "OgreQuaternion.h"
 #include "OgreVector3.h"
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( QuaternionTests );
-
 using namespace Ogre;
 
-void QuaternionTests::setUp()
-{
-}
-
-void QuaternionTests::tearDown()
-{
-}
-
-void QuaternionTests::testFromVectors()
+TEST(QuaternionTests,FromVectors)
 {
     Vector3 list[][2] =
     {
@@ -67,42 +56,42 @@ void QuaternionTests::testFromVectors()
 
     from = list[0][0];
     to = list[0][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[1][0];
     to = list[1][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[2][0];
     to = list[2][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[3][0];
     to = list[3][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[4][0];
     to = list[4][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[5][0];
     to = list[5][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[6][0];
     to = list[6][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[7][0];
     to = list[7][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[8][0];
     to = list[8][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 
     from = list[9][0];
     to = list[9][1];
-    CPPUNIT_ASSERT(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
 }
 

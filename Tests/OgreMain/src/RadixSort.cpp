@@ -29,22 +29,18 @@ THE SOFTWARE.
 #include "OgreRadixSort.h"
 #include "OgreMath.h"
 
-#include "UnitTestSuite.h"
 
 using namespace Ogre;
 
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(RadixSortTests);
 
 //--------------------------------------------------------------------------
-void RadixSortTests::setUp()
-{
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-    srand(0);
+void RadixSortTests::SetUp()
+{    srand(0);
     
 }
 //--------------------------------------------------------------------------
-void RadixSortTests::tearDown()
+void RadixSortTests::TearDown()
 {
 }
 //--------------------------------------------------------------------------
@@ -75,10 +71,8 @@ public:
     }
 };
 //--------------------------------------------------------------------------
-void RadixSortTests::testFloatVector()
+TEST_F(RadixSortTests,FloatVector)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     std::vector<float> container;
     FloatSortFunctor func;
     RadixSort<std::vector<float>, float, float> sorter;
@@ -94,15 +88,13 @@ void RadixSortTests::testFloatVector()
     float lastValue = *v++;
     for (;v != container.end(); ++v)
     {
-        CPPUNIT_ASSERT(*v >= lastValue);
+        EXPECT_TRUE(*v >= lastValue);
         lastValue = *v;
     }
 }
 //--------------------------------------------------------------------------
-void RadixSortTests::testFloatList()
+TEST_F(RadixSortTests,FloatList)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     std::list<float> container;
     FloatSortFunctor func;
     RadixSort<std::list<float>, float, float> sorter;
@@ -118,15 +110,13 @@ void RadixSortTests::testFloatList()
     float lastValue = *v++;
     for (;v != container.end(); ++v)
     {
-        CPPUNIT_ASSERT(*v >= lastValue);
+        EXPECT_TRUE(*v >= lastValue);
         lastValue = *v;
     }
 }
 //--------------------------------------------------------------------------
-void RadixSortTests::testUnsignedIntList()
+TEST_F(RadixSortTests,UnsignedIntList)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     std::list<unsigned int> container;
     UnsignedIntSortFunctor func;
     RadixSort<std::list<unsigned int>, unsigned int, unsigned int> sorter;
@@ -142,15 +132,13 @@ void RadixSortTests::testUnsignedIntList()
     unsigned int lastValue = *v++;
     for (;v != container.end(); ++v)
     {
-        CPPUNIT_ASSERT(*v >= lastValue);
+        EXPECT_TRUE(*v >= lastValue);
         lastValue = *v;
     }
 }
 //--------------------------------------------------------------------------
-void RadixSortTests::testIntList()
+TEST_F(RadixSortTests,IntList)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     std::list<int> container;
     IntSortFunctor func;
     RadixSort<std::list<int>, int, int> sorter;
@@ -166,15 +154,13 @@ void RadixSortTests::testIntList()
     int lastValue = *v++;
     for (;v != container.end(); ++v)
     {
-        CPPUNIT_ASSERT(*v >= lastValue);
+        EXPECT_TRUE(*v >= lastValue);
         lastValue = *v;
     }
 }
 //--------------------------------------------------------------------------
-void RadixSortTests::testUnsignedIntVector()
+TEST_F(RadixSortTests,UnsignedIntVector)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     std::vector<unsigned int> container;
     UnsignedIntSortFunctor func;
     RadixSort<std::vector<unsigned int>, unsigned int, unsigned int> sorter;
@@ -190,15 +176,13 @@ void RadixSortTests::testUnsignedIntVector()
     unsigned int lastValue = *v++;
     for (;v != container.end(); ++v)
     {
-        CPPUNIT_ASSERT(*v >= lastValue);
+        EXPECT_TRUE(*v >= lastValue);
         lastValue = *v;
     }
 }
 //--------------------------------------------------------------------------
-void RadixSortTests::testIntVector()
+TEST_F(RadixSortTests,IntVector)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     std::vector<int> container;
     IntSortFunctor func;
     RadixSort<std::vector<int>, int, int> sorter;
@@ -214,7 +198,7 @@ void RadixSortTests::testIntVector()
     int lastValue = *v++;
     for (;v != container.end(); ++v)
     {
-        CPPUNIT_ASSERT(*v >= lastValue);
+        EXPECT_TRUE(*v >= lastValue);
         lastValue = *v;
     }
 }

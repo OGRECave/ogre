@@ -29,8 +29,7 @@ THE SOFTWARE.
 #ifndef __TerrainTests_H__
 #define __TerrainTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 #include "OgreRoot.h"
 #include "OgreTerrain.h"
@@ -42,15 +41,11 @@ THE SOFTWARE.
 #include "OgreStaticPluginLoader.h"
 #endif
 
-using namespace Ogre; 
+using namespace Ogre;
 
-class TerrainTests : public CppUnit::TestFixture
+class TerrainTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(TerrainTests);
-    CPPUNIT_TEST(testCreate);
-    CPPUNIT_TEST_SUITE_END();
-
+public:
 #ifdef OGRE_STATIC_LIB
     OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
@@ -60,11 +55,8 @@ class TerrainTests : public CppUnit::TestFixture
     TerrainGlobalOptions* mTerrainOpts;
     FileSystemLayer* mFSLayer;
 
-public:
-    void setUp();
-    void tearDown();
-
-    void testCreate();
+    void SetUp();
+    void TearDown();
 };
 
 #endif

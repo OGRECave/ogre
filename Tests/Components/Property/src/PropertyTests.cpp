@@ -25,9 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "PropertyTests.h"
+#include "OgreRoot.h"
+#include "OgreProperty.h"
 
-#include "UnitTestSuite.h"
+#include <gtest/gtest.h>
 
 // use std::bind regardless of whether we are using boost or not
 #if __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
@@ -36,18 +37,7 @@ THE SOFTWARE.
 #include <tr1/functional>
 #endif
 
-// Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(PropertyTests);
-
-//--------------------------------------------------------------------------
-void PropertyTests::setUp()
-{
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-}
-//--------------------------------------------------------------------------
-void PropertyTests::tearDown()
-{
-}
+using namespace Ogre;
 //--------------------------------------------------------------------------
 class Foo
 {
@@ -58,15 +48,13 @@ public:
     const String& getName() const { return mName; }
 };
 //--------------------------------------------------------------------------
-void PropertyTests::testStringProp()
-{
+
+TEST(Property, StringProp) {
 #if __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
     using namespace std;
 #else
     using namespace std::tr1;
 #endif
-
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     PropertyDefMap propertyDefs;
     Foo foo;
@@ -86,6 +74,6 @@ void PropertyTests::testStringProp()
     props.setValue("name", strTest);
     props.getValue("name", strName);
 
-    CPPUNIT_ASSERT_EQUAL(strTest, strName);
+    ASSERT_EQ(strTest, strName);
 }
 //--------------------------------------------------------------------------

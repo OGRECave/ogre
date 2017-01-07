@@ -29,29 +29,15 @@ THE SOFTWARE.
 #ifndef __MeshSerializerTests_H__
 #define __MeshSerializerTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include "OgreMesh.h"
 #include "OgreMeshSerializer.h"
 #include "OgreFileSystemLayer.h"
 
 using namespace Ogre;
 
-class MeshSerializerTests : public CppUnit::TestFixture
+class MeshSerializerTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(MeshSerializerTests);
-    CPPUNIT_TEST(testMesh_XML);
-    CPPUNIT_TEST(testSkeleton_Version_1_8);
-    CPPUNIT_TEST(testSkeleton_Version_1_0);
-    CPPUNIT_TEST(testMesh_clone);
-    CPPUNIT_TEST(testMesh_Version_1_10);
-    CPPUNIT_TEST(testMesh_Version_1_8);
-    CPPUNIT_TEST(testMesh_Version_1_41);
-    CPPUNIT_TEST(testMesh_Version_1_4);
-    CPPUNIT_TEST(testMesh_Version_1_3);
-    CPPUNIT_TEST(testMesh_Version_1_2);
-    CPPUNIT_TEST_SUITE_END();
 
 protected:
     MeshPtr mMesh;
@@ -63,18 +49,8 @@ protected:
     FileSystemLayer* mFSLayer;
 
 public:
-    void setUp();
-    void tearDown();
-    void testSkeleton_Version_1_8();
-    void testSkeleton_Version_1_0();
-    void testMesh_clone();
-    void testMesh_Version_1_10();
-    void testMesh_Version_1_8();
-    void testMesh_Version_1_41();
-    void testMesh_Version_1_4();
-    void testMesh_Version_1_3();
-    void testMesh_Version_1_2();
-    void testMesh_XML();
+    void SetUp();
+    void TearDown();
     void testMesh(MeshVersion version);
     void assertMeshClone(Mesh* a, Mesh* b, MeshVersion version = MESH_VERSION_LATEST);
     void assertVertexDataClone(VertexData* a, VertexData* b, MeshVersion version = MESH_VERSION_LATEST);

@@ -29,43 +29,18 @@ THE SOFTWARE.
 #ifndef __ZipArchiveTests_H__
 #define __ZipArchiveTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include "OgreString.h"
 
-class ZipArchiveTests : public CppUnit::TestFixture
+class ZipArchiveTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(ZipArchiveTests);
-    CPPUNIT_TEST(testListNonRecursive);
-    CPPUNIT_TEST(testListRecursive);
-    CPPUNIT_TEST(testListFileInfoNonRecursive);
-    CPPUNIT_TEST(testListFileInfoRecursive);
-    CPPUNIT_TEST(testFindNonRecursive);
-    CPPUNIT_TEST(testFindRecursive);
-    CPPUNIT_TEST(testFindFileInfoNonRecursive);
-    CPPUNIT_TEST(testFindFileInfoRecursive);
-    CPPUNIT_TEST(testFileRead);
-    CPPUNIT_TEST(testReadInterleave);
-    CPPUNIT_TEST_SUITE_END();
 
 protected:
     Ogre::String mTestPath;
 
 public:
-    void setUp();
-    void tearDown();
-
-    void testListNonRecursive();
-    void testListRecursive();
-    void testListFileInfoNonRecursive();
-    void testListFileInfoRecursive();
-    void testFindNonRecursive();
-    void testFindRecursive();
-    void testFindFileInfoNonRecursive();
-    void testFindFileInfoRecursive();
-    void testFileRead();
-    void testReadInterleave();
+    void SetUp();
+    void TearDown();
 };
 
 #endif

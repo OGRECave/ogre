@@ -29,35 +29,11 @@ THE SOFTWARE.
 #ifndef __StringTests_H__
 #define __StringTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include "OgreString.h"
 
-class StringTests : public CppUnit::TestFixture
+class StringTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(StringTests);
-    CPPUNIT_TEST(testSplitFileNameNoPath);
-    CPPUNIT_TEST(testSplitFileNameRelativePath);
-    CPPUNIT_TEST(testSplitFileNameAbsolutePath);
-    CPPUNIT_TEST(testMatchCaseSensitive);
-    CPPUNIT_TEST(testMatchCaseInSensitive);
-    CPPUNIT_TEST(testMatchGlobAll);
-    CPPUNIT_TEST(testMatchGlobStart);
-    CPPUNIT_TEST(testMatchGlobEnd);
-    CPPUNIT_TEST(testMatchGlobStartAndEnd);
-    CPPUNIT_TEST(testMatchGlobMiddle);
-    CPPUNIT_TEST(testMatchSuperGlobtastic);
-    CPPUNIT_TEST(testParseReal);
-    CPPUNIT_TEST(testParseInt);
-    CPPUNIT_TEST(testParseLong);
-    CPPUNIT_TEST(testParseUnsignedLong);
-    CPPUNIT_TEST(testParseVector3);
-    CPPUNIT_TEST(testParseMatrix4);
-    CPPUNIT_TEST(testParseQuaternion);
-    CPPUNIT_TEST(testParseBool);
-    CPPUNIT_TEST(testParseColourValue);
-    CPPUNIT_TEST_SUITE_END();
 
 protected:
     Ogre::String testFileNoPath;
@@ -67,34 +43,8 @@ protected:
     Ogre::String testFileAbsolutePathUnix;
 
 public:
-    void setUp();
-    void tearDown();
-
-    // StringUtil::splitFileName tests
-    void testSplitFileNameNoPath();
-    void testSplitFileNameRelativePath();
-    void testSplitFileNameAbsolutePath();
-
-    // StringUtil::match tests
-    void testMatchCaseSensitive();
-    void testMatchCaseInSensitive();
-    void testMatchGlobAll();
-    void testMatchGlobStart();
-    void testMatchGlobEnd();
-    void testMatchGlobStartAndEnd();
-    void testMatchGlobMiddle();
-    void testMatchSuperGlobtastic();
-
-    // StringConverter tests
-    void testParseReal();
-    void testParseInt();
-    void testParseLong();
-    void testParseUnsignedLong();
-    void testParseVector3();
-    void testParseMatrix4();
-    void testParseQuaternion();
-    void testParseBool();
-    void testParseColourValue();
+    void SetUp();
+    void TearDown();
 };
 
 #endif

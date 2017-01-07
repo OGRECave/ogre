@@ -35,20 +35,16 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreLodConfig.h"
 
-#include "UnitTestSuite.h"
 
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 #include "OgreMeshLodGenerator.h"
 #endif
 
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(MeshWithoutIndexDataTests);
 
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::setUp()
-{
-    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
-    
+void MeshWithoutIndexDataTests::SetUp()
+{    
     OGRE_NEW ResourceGroupManager();
     OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
@@ -60,7 +56,7 @@ void MeshWithoutIndexDataTests::setUp()
     matMgr->initialise();
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::tearDown()
+void MeshWithoutIndexDataTests::TearDown()
 {
     OGRE_DELETE MaterialManager::getSingletonPtr();
     OGRE_DELETE mArchiveMgr;
@@ -70,10 +66,8 @@ void MeshWithoutIndexDataTests::tearDown()
     OGRE_DELETE ResourceGroupManager::getSingletonPtr();
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testCreateSimpleLine()
+TEST_F(MeshWithoutIndexDataTests,CreateSimpleLine)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     ManualObject* line = OGRE_NEW ManualObject("line");
     line->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
     line->position(0, 50, 0);
@@ -83,12 +77,12 @@ void MeshWithoutIndexDataTests::testCreateSimpleLine()
     MeshPtr lineMesh = line->convertToMesh(fileName);
     OGRE_DELETE line;
 
-    CPPUNIT_ASSERT(lineMesh->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(lineMesh->getNumSubMeshes() == 1);
+    EXPECT_TRUE(lineMesh->getSubMesh(0)->indexData->indexCount == 0);
     RenderOperation rop;
     lineMesh->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
 
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineMesh.get(), fileName);
@@ -100,19 +94,17 @@ void MeshWithoutIndexDataTests::testCreateSimpleLine()
 
     remove(fileName.c_str());
 
-    CPPUNIT_ASSERT(loadedLine->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(loadedLine->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(loadedLine->getNumSubMeshes() == 1);
+    EXPECT_TRUE(loadedLine->getSubMesh(0)->indexData->indexCount == 0);
     loadedLine->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
 
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testCreateLineList()
+TEST_F(MeshWithoutIndexDataTests,CreateLineList)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     ManualObject* lineList = OGRE_NEW ManualObject("line");
     lineList->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
     lineList->position(0, 50, 0);
@@ -126,12 +118,12 @@ void MeshWithoutIndexDataTests::testCreateLineList()
     MeshPtr lineListMesh = lineList->convertToMesh(fileName);
     OGRE_DELETE lineList;
 
-    CPPUNIT_ASSERT(lineListMesh->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(lineListMesh->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(lineListMesh->getNumSubMeshes() == 1);
+    EXPECT_TRUE(lineListMesh->getSubMesh(0)->indexData->indexCount == 0);
     RenderOperation rop;
     lineListMesh->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(lineListMesh->getSubMesh(0)->vertexData->vertexCount == 6);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(lineListMesh->getSubMesh(0)->vertexData->vertexCount == 6);
 
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineListMesh.get(), fileName);
@@ -143,19 +135,17 @@ void MeshWithoutIndexDataTests::testCreateLineList()
 
     remove(fileName.c_str());
 
-    CPPUNIT_ASSERT(loadedLineList->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(loadedLineList->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(loadedLineList->getNumSubMeshes() == 1);
+    EXPECT_TRUE(loadedLineList->getSubMesh(0)->indexData->indexCount == 0);
     loadedLineList->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(loadedLineList->getSubMesh(0)->vertexData->vertexCount == 6);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(loadedLineList->getSubMesh(0)->vertexData->vertexCount == 6);
 
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testCreateLineStrip()
+TEST_F(MeshWithoutIndexDataTests,CreateLineStrip)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     ManualObject* lineStrip = OGRE_NEW ManualObject("line");
     lineStrip->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_STRIP);
     lineStrip->position(50, 100, 0);
@@ -167,12 +157,12 @@ void MeshWithoutIndexDataTests::testCreateLineStrip()
     MeshPtr lineStripMesh = lineStrip->convertToMesh(fileName);
     OGRE_DELETE lineStrip;
 
-    CPPUNIT_ASSERT(lineStripMesh->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(lineStripMesh->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(lineStripMesh->getNumSubMeshes() == 1);
+    EXPECT_TRUE(lineStripMesh->getSubMesh(0)->indexData->indexCount == 0);
     RenderOperation rop;
     lineStripMesh->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(lineStripMesh->getSubMesh(0)->vertexData->vertexCount == 4);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(lineStripMesh->getSubMesh(0)->vertexData->vertexCount == 4);
 
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineStripMesh.get(), fileName);
@@ -184,19 +174,17 @@ void MeshWithoutIndexDataTests::testCreateLineStrip()
 
     remove(fileName.c_str());
 
-    CPPUNIT_ASSERT(loadedLineStrip->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(loadedLineStrip->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(loadedLineStrip->getNumSubMeshes() == 1);
+    EXPECT_TRUE(loadedLineStrip->getSubMesh(0)->indexData->indexCount == 0);
     loadedLineStrip->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(loadedLineStrip->getSubMesh(0)->vertexData->vertexCount == 4);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(loadedLineStrip->getSubMesh(0)->vertexData->vertexCount == 4);
 
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testCreatePointList()
+TEST_F(MeshWithoutIndexDataTests,CreatePointList)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     ManualObject* pointList = OGRE_NEW ManualObject("line");
     pointList->begin("BaseWhiteNoLighting", RenderOperation::OT_POINT_LIST);
     pointList->position(50, 100, 0);
@@ -208,12 +196,12 @@ void MeshWithoutIndexDataTests::testCreatePointList()
     MeshPtr pointListMesh = pointList->convertToMesh(fileName);
     OGRE_DELETE pointList;
 
-    CPPUNIT_ASSERT(pointListMesh->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(pointListMesh->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(pointListMesh->getNumSubMeshes() == 1);
+    EXPECT_TRUE(pointListMesh->getSubMesh(0)->indexData->indexCount == 0);
     RenderOperation rop;
     pointListMesh->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(pointListMesh->getSubMesh(0)->vertexData->vertexCount == 4);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(pointListMesh->getSubMesh(0)->vertexData->vertexCount == 4);
 
     MeshSerializer meshWriter;
     meshWriter.exportMesh(pointListMesh.get(), fileName);
@@ -225,19 +213,17 @@ void MeshWithoutIndexDataTests::testCreatePointList()
 
     remove(fileName.c_str());
 
-    CPPUNIT_ASSERT(loadedPointList->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(loadedPointList->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(loadedPointList->getNumSubMeshes() == 1);
+    EXPECT_TRUE(loadedPointList->getSubMesh(0)->indexData->indexCount == 0);
     loadedPointList->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(loadedPointList->getSubMesh(0)->vertexData->vertexCount == 4);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(loadedPointList->getSubMesh(0)->vertexData->vertexCount == 4);
 
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
+TEST_F(MeshWithoutIndexDataTests,CreateLineWithMaterial)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String matName = "lineMat";
     MaterialPtr matPtr = MaterialManager::getSingleton().create(matName, "General").staticCast<Material>();
     Pass* pass = matPtr->getTechnique(0)->getPass(0);
@@ -252,12 +238,12 @@ void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
     MeshPtr lineMesh = line->convertToMesh(fileName);
     OGRE_DELETE line;
 
-    CPPUNIT_ASSERT(lineMesh->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(lineMesh->getNumSubMeshes() == 1);
+    EXPECT_TRUE(lineMesh->getSubMesh(0)->indexData->indexCount == 0);
     RenderOperation rop;
     lineMesh->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
 
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineMesh.get(), fileName);
@@ -274,11 +260,11 @@ void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
     remove(fileName.c_str());
     remove((matName + ".material").c_str());
 
-    CPPUNIT_ASSERT(loadedLine->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(loadedLine->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(loadedLine->getNumSubMeshes() == 1);
+    EXPECT_TRUE(loadedLine->getSubMesh(0)->indexData->indexCount == 0);
     loadedLine->getSubMesh(0)->_getRenderOperation(rop);
-    CPPUNIT_ASSERT(rop.useIndexes == false);
-    CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
+    EXPECT_TRUE(rop.useIndexes == false);
+    EXPECT_TRUE(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
 
     mMeshMgr->remove(fileName);
 }
@@ -343,21 +329,19 @@ void createMeshWithMaterial(String fileName)
     OGRE_DELETE manObj;
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testCreateMesh()
+TEST_F(MeshWithoutIndexDataTests,CreateMesh)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String fileName = "indexMix.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
-    CPPUNIT_ASSERT(mesh->getNumSubMeshes() == 4);
+    EXPECT_TRUE(mesh->getNumSubMeshes() == 4);
     RenderOperation rop;
     for (int i=0; i<4; ++i)
     {
         mesh->getSubMesh(i)->_getRenderOperation(rop);
         // First submesh has indexes, the others does not.
-        CPPUNIT_ASSERT( rop.useIndexes == (i == 0) );
+        EXPECT_TRUE( rop.useIndexes == (i == 0) );
     }
 
     MeshSerializer meshWriter;
@@ -370,22 +354,20 @@ void MeshWithoutIndexDataTests::testCreateMesh()
 
     remove(fileName.c_str());
 
-    CPPUNIT_ASSERT(loadedMesh->getNumSubMeshes() == 4);
+    EXPECT_TRUE(loadedMesh->getNumSubMeshes() == 4);
 
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testCloneMesh()
+TEST_F(MeshWithoutIndexDataTests,CloneMesh)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String originalName = "toClone.mesh";
     createMeshWithMaterial(originalName);
     MeshPtr mesh = mMeshMgr->getByName(originalName).staticCast<Mesh>();
 
     String fileName = "clone.mesh";
     MeshPtr clone = mesh->clone(fileName);
-    CPPUNIT_ASSERT(mesh->getNumSubMeshes() == 4);
+    EXPECT_TRUE(mesh->getNumSubMeshes() == 4);
 
     MeshSerializer meshWriter;
     meshWriter.exportMesh(mesh.get(), fileName);
@@ -397,15 +379,13 @@ void MeshWithoutIndexDataTests::testCloneMesh()
 
     remove(fileName.c_str());
 
-    CPPUNIT_ASSERT(loadedMesh->getNumSubMeshes() == 4);
+    EXPECT_TRUE(loadedMesh->getNumSubMeshes() == 4);
 
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testEdgeList()
+TEST_F(MeshWithoutIndexDataTests,EdgeList)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String fileName = "testEdgeList.mesh";
     ManualObject* line = OGRE_NEW ManualObject("line");
     line->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
@@ -416,8 +396,8 @@ void MeshWithoutIndexDataTests::testEdgeList()
     OGRE_DELETE line;
 
     // whole mesh must not contain index data, for this test
-    CPPUNIT_ASSERT(mesh->getNumSubMeshes() == 1);
-    CPPUNIT_ASSERT(mesh->getSubMesh(0)->indexData->indexCount == 0);
+    EXPECT_TRUE(mesh->getNumSubMeshes() == 1);
+    EXPECT_TRUE(mesh->getSubMesh(0)->indexData->indexCount == 0);
 
     mesh->buildEdgeList();
     MeshSerializer meshWriter;
@@ -429,10 +409,8 @@ void MeshWithoutIndexDataTests::testEdgeList()
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testGenerateExtremes()
+TEST_F(MeshWithoutIndexDataTests,GenerateExtremes)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String fileName = "testGenerateExtremes.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
@@ -450,40 +428,27 @@ void MeshWithoutIndexDataTests::testGenerateExtremes()
         // So...there should always be some extremity points. The number of which may vary.
         if (subMesh->indexData->indexCount > 0)
         {
-            CPPUNIT_ASSERT(subMesh->extremityPoints.size() == NUM_EXTREMES);
+            EXPECT_TRUE(subMesh->extremityPoints.size() == NUM_EXTREMES);
         }
     }
 
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testBuildTangentVectors()
+TEST_F(MeshWithoutIndexDataTests,BuildTangentVectors)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String fileName = "testBuildTangentVectors.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
-    try
-    {
-        // Make sure correct exception is thrown
-        mesh->buildTangentVectors();
-        CPPUNIT_FAIL("Expected InvalidParametersException!");
-    }
-    catch (const InvalidParametersException&)
-    {
-        // Ok
-    }
+    EXPECT_THROW(mesh->buildTangentVectors(), InvalidParametersException);
     
     mMeshMgr->remove(fileName);
 }
 //--------------------------------------------------------------------------
-void MeshWithoutIndexDataTests::testGenerateLodLevels()
+TEST_F(MeshWithoutIndexDataTests,GenerateLodLevels)
 {
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     String fileName = "testGenerateLodLevels.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
@@ -492,7 +457,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     lodConfig.createGeneratedLodLevel(600, 2, LodLevel::VRM_CONSTANT);
     MeshLodGenerator().generateLodLevels(lodConfig);
     // It may be less then 2, when two levels have the same vertex count it will be optimized out and lodLevel.outSkipped=true
-    CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
+    EXPECT_TRUE(mesh->getNumLodLevels() == 2);
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
     {
         SubMesh* subMesh = mesh->getSubMesh(i);
@@ -501,12 +466,12 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
             if (subMesh->indexData->indexCount > 0)
             {
                 // This may not be true for all meshes, but in this test we don't have reduced to 0.
-                CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount > 0);
+                EXPECT_TRUE(subMesh->mLodFaceList[j]->indexCount > 0);
             }
             else
             {
                 // Should be 3 because of the dummy triangle being generated
-                CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount == 3);
+                EXPECT_TRUE(subMesh->mLodFaceList[j]->indexCount == 3);
             }
         }
     }

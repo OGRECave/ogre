@@ -29,32 +29,21 @@ THE SOFTWARE.
 #ifndef __EdgeBuilderTests_H__
 #define __EdgeBuilderTests_H__
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include "OgreLogManager.h"
 #include "OgreHardwareBufferManager.h"
 
 using namespace Ogre;
 
-class EdgeBuilderTests : public CppUnit::TestFixture
+class EdgeBuilderTests : public ::testing::Test
 {
-    // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(EdgeBuilderTests);
-    CPPUNIT_TEST(testSingleIndexBufSingleVertexBuf);
-    CPPUNIT_TEST(testMultiIndexBufSingleVertexBuf);
-    CPPUNIT_TEST(testMultiIndexBufMultiVertexBuf);
-    CPPUNIT_TEST_SUITE_END();
 
 protected:
     HardwareBufferManager* mBufMgr;
 
 public:
-    void setUp();
-    void tearDown();
-
-    void testSingleIndexBufSingleVertexBuf();
-    void testMultiIndexBufSingleVertexBuf();
-    void testMultiIndexBufMultiVertexBuf();
+    void SetUp();
+    void TearDown();
 };
 
 #endif
