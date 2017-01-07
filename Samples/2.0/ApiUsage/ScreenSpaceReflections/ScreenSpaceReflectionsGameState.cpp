@@ -31,7 +31,8 @@ namespace Demo
 {
     ScreenSpaceReflectionsGameState::ScreenSpaceReflectionsGameState(
             const Ogre::String &helpDescription ) :
-        TutorialGameState( helpDescription )
+        TutorialGameState( helpDescription ),
+        mScreenSpaceReflections( 0 )
     {
         mDisplayHelpMode        = 2;
         mNumDisplayHelpModes    = 3;
@@ -39,6 +40,8 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflectionsGameState::createScene01(void)
     {
+        mScreenSpaceReflections = new ScreenSpaceReflections();
+
         //Setup a scene similar to that of PBS sample, except
         //we apply the cubemap to everything via C++ code
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
@@ -100,10 +103,13 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflectionsGameState::destroyScene(void)
     {
+        delete mScreenSpaceReflections;
+        mScreenSpaceReflections = 0;
     }
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflectionsGameState::update( float timeSinceLast )
     {
+        mScreenSpaceReflections->update( mGraphicsSystem->getCamera() );
         TutorialGameState::update( timeSinceLast );
     }
     //-----------------------------------------------------------------------------------

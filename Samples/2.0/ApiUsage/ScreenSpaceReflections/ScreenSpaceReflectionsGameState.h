@@ -5,7 +5,7 @@
 #include "OgrePrerequisites.h"
 #include "TutorialGameState.h"
 
-#include "OgreLight.h"
+#include "Utils/ScreenSpaceReflections.h"
 
 #include "SdlEmulationLayer.h"
 #if OGRE_USE_SDL2
@@ -21,6 +21,8 @@ namespace Demo
 {
     class ScreenSpaceReflectionsGameState : public TutorialGameState
     {
+        ScreenSpaceReflections  *mScreenSpaceReflections;
+
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
     public:

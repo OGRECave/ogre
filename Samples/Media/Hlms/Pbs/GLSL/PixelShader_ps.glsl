@@ -350,10 +350,17 @@ void main()
 @end @property( hlms_use_prepass )
 	@property( hlms_use_prepass_msaa )
 		int gBufSubsample = findLSB( gl_SampleMaskIn[0] );
-		@piece( gbuf_subsample ), gBufSubsample@end
+	@end @property( !hlms_use_prepass_msaa )
+		//On non-msaa RTTs gBufSubsample is the LOD level.
+		int gBufSubsample = 0;
 	@end
-	nNormal = texelFetch( gBuf_normals, gl_FragCoord.xy @insertpiece( gbuf_subsample ) ).xyz;
-	vec2 shadowRoughness = texelFetch( gBuf_shadowRoughness, gl_FragCoord.xy @insertpiece( gbuf_subsample ) ).xy;
+
+	ivec2 iFragCoord = ivec2( gl_FragCoord.x,
+							  @property( !hlms_forwardplus_flipY )pass.windowHeight.x - @end
+							  gl_FragCoord.y );
+
+	nNormal = texelFetch( gBuf_normals, iFragCoord, gBufSubsample ).xyz;
+	vec2 shadowRoughness = texelFetch( gBuf_shadowRoughness, iFragCoord, gBufSubsample ).xy;
 
 	float fShadow = shadowRoughness.x;
 

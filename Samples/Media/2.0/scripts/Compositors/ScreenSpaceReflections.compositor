@@ -2,9 +2,17 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 {
 	in 0 rt_renderwindow
 
-	texture myMrt target_width target_height PF_A2R10G10B10 PF_SHORT_GR
+	texture mrtGBuffer target_width target_height PF_A2R10G10B10 PF_SHORT_GR depth_format PF_D32_FLOAT depth_texture depth_pool 1
+	texture mrtDepthBuffer target_width target_height PF_D32_FLOAT depth_pool 1
+	
+	texture prevFrame target_width target_height PF_R8G8B8A8 depth_pool 0
+	//Needed to calculate the difference in depths (if it's too high, then we can't use this result)
+	texture prevFrameDepthBuffer target_width target_height PF_D32_FLOAT
+	texture rtt target_width target_height PF_R8G8B8A8
 
-	target myMrt
+	texture rayTracingResults target_width target_height PF_FLOAT32_RGBA depth_pool 0
+
+	target mrtGBuffer
 	{
 		pass clear
 		{
@@ -20,7 +28,20 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 		}
 	}
 
-	target rt_renderwindow
+	target rayTracingResults
+	{
+		pass clear {}
+		pass render_quad
+		{
+			quad_normals	camera_far_corners_view_space
+
+			material SSR/ScreenSpaceReflectionsVectors
+			input 0 mrtDepthBuffer
+			input 1 mrtGBuffer 1
+		}
+	}
+
+	target rtt
 	{
 		pass clear
 		{
@@ -32,8 +53,38 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 			overlays	on
 			shadows		ScreenSpaceReflectionsShadowNode
 
-			//use_prepass		myMrt
+			use_prepass			mrtGBuffer
 			lod_update_list		false
+		}
+	}
+	
+	target prevFrame
+	{
+		pass clear
+		{
+			colour_value 0 0 0 0
+			discard_only true
+		}
+
+		pass render_quad
+		{
+			material Ogre/Copy/4xFP32
+			input 0 rtt
+		}
+	}
+	
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0 0 0 0
+			discard_only true
+		}
+
+		pass render_quad
+		{
+			material Ogre/Copy/4xFP32
+			input 0 rtt
 		}
 	}
 }

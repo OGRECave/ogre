@@ -1,0 +1,82 @@
+fragment_program SSR/ScreenSpaceReflectionsVectors_ps_GLSL glsl
+{
+	source ScreenSpaceReflectionsVectors_ps.glsl
+	default_params
+	{
+		param_named depthTexture	int 0
+		param_named gBuf_normals	int 1
+	}
+}
+
+fragment_program SSR/ScreenSpaceReflectionsVectors_ps_HLSL hlsl
+{
+	source ScreenSpaceReflectionsVectors_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SSR/ScreenSpaceReflectionsVectors_ps_Metal metal
+{
+	source ScreenSpaceReflectionsVectors_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/QuadCameraDir_vs
+}
+
+fragment_program SSR/ScreenSpaceReflectionsVectors_ps unified
+{
+	delegate SSR/ScreenSpaceReflectionsVectors_ps_GLSL
+	delegate SSR/ScreenSpaceReflectionsVectors_ps_HLSL
+	delegate SSR/ScreenSpaceReflectionsVectors_ps_Metal
+}
+
+material SSR/ScreenSpaceReflectionsVectors
+{
+    technique
+    {
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/QuadCameraDir_vs
+			{
+			}
+
+			fragment_program_ref SSR/ScreenSpaceReflectionsVectors_ps
+			{
+				param_named_auto	p_depthBufferRes	texture_size 0
+				param_named			p_zThickness		float	0.25
+				param_named_auto	p_nearPlaneZ		near_clip_distance
+
+				param_named			p_stride			float	2
+				param_named			p_maxSteps			float	100
+				param_named			p_maxDistance		float	1000
+				param_named			p_strideZCutoff		float	0.01
+
+				//param_named			p_numMips
+				param_named			p_fadeStart			float	0.95
+				param_named			p_fadeEnd			float	1.00
+
+				//p_projectionParams will be set from C++
+				param_named			p_projectionParams	float2	0 1
+				param_named_auto	p_invDepthBufferRes	inverse_texture_size 0;
+
+				//p_viewToTextureSpaceMatrix will be set from C++
+				//param_named		p_viewToTextureSpaceMatrix	float4x4
+			}
+
+			texture_unit depthTexture
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit gBufferNormals
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}

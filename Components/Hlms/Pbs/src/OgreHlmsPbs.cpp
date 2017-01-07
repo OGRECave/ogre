@@ -839,6 +839,10 @@ namespace Ogre
             //mat3 invViewMatCubemap (upgraded to three vec4)
             mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMaps + 4 * 3 ) * 4;
 
+            //float windowHeight + padding
+            if( mPrePassTextures )
+                mapSize += 4 * 4;
+
             //vec3 ambientUpperHemi + float envMapScale
             if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere || envMapScale != 1.0f )
                 mapSize += 4 * 4;
@@ -964,6 +968,16 @@ namespace Ogre
                 //Alignment: each row/column is one vec4, despite being 3x3
                 if( !( (i+1) % 3 ) )
                     ++passBufferPtr;
+            }
+
+            if( mPrePassTextures )
+            {
+                //vec4 windowHeight
+                const float windowHeight = renderTarget->getHeight();
+                *passBufferPtr++ = windowHeight;
+                *passBufferPtr++ = windowHeight;
+                *passBufferPtr++ = windowHeight;
+                *passBufferPtr++ = windowHeight;
             }
 
             //vec3 ambientUpperHemi + padding
