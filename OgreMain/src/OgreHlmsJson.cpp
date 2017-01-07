@@ -465,7 +465,8 @@ namespace Ogre
             datablock->mShadowConstantBias = static_cast<float>( itor->value.GetDouble() );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJson::loadDatablocks( const rapidjson::Value &json, const NamedBlocks &blocks, Hlms *hlms )
+    void HlmsJson::loadDatablocks( const rapidjson::Value &json, const NamedBlocks &blocks, Hlms *hlms,
+                                   const String &filename, const String &resourceGroup )
     {
         rapidjson::Value::ConstMemberIterator itor = json.MemberBegin();
         rapidjson::Value::ConstMemberIterator end  = json.MemberEnd();
@@ -475,19 +476,32 @@ namespace Ogre
             if( itor->value.IsObject() )
             {
                 const char *datablockName = itor->name.GetString();
-                HlmsDatablock *datablock = hlms->createDatablock( datablockName, datablockName,
-                                                                  HlmsMacroblock(), HlmsBlendblock(),
-                                                                  HlmsParamVec() );
-                loadDatablockCommon( itor->value, blocks, datablock );
+                try
+                {
+                    HlmsDatablock *datablock = hlms->createDatablock( datablockName, datablockName,
+                                                                      HlmsMacroblock(), HlmsBlendblock(),
+                                                                      HlmsParamVec(), true,
+                                                                      filename, resourceGroup );
+                    loadDatablockCommon( itor->value, blocks, datablock );
 
-                hlms->_loadJson( itor->value, blocks, datablock );
+                    hlms->_loadJson( itor->value, blocks, datablock );
+                }
+                catch( Exception &e )
+                {
+                    //Ignore datablocks that already exist (useful for reloading materials)
+                    if( e.getNumber() != Exception::ERR_DUPLICATE_ITEM )
+                        throw e;
+                    else
+                        LogManager::getSingleton().logMessage( e.getFullDescription() );
+                }
             }
 
             ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJson::loadMaterials( const String &filename, const char *jsonString )
+    void HlmsJson::loadMaterials( const String &filename, const String &resourceGroup,
+                                  const char *jsonString )
     {
         rapidjson::Document d;
         d.Parse( jsonString );
@@ -583,7 +597,7 @@ namespace Ogre
 
                 if( hlms && typeName == hlms->getTypeName() )
                 {
-                    loadDatablocks( itDatablock->value, blocks, hlms );
+                    loadDatablocks( itDatablock->value, blocks, hlms, filename, resourceGroup );
                 }
             }
 

@@ -316,6 +316,12 @@ namespace Ogre
         return mCreator->getFullNameString( mName );
     }
     //-----------------------------------------------------------------------------------
+    void HlmsDatablock::getFilenameAndResourceGroup( String const * *outFilename,
+                                                     String const * *outResourceGroup ) const
+    {
+        return mCreator->getFilenameAndResourceGroup( mName, outFilename, outResourceGroup );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsDatablock::_linkRenderable( Renderable *renderable )
     {
         assert( renderable->mHlmsGlobalIndex == (uint32)~0 &&

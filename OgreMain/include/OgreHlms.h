@@ -66,9 +66,13 @@ namespace Ogre
             HlmsDatablock   *datablock;
             bool            visibleToManager;
             String          name;
+            String          srcFile;            ///Filename in which it was defined, if any
+            String          srcResourceGroup;   ///ResourceGroup in which it was defined, if any
             DatablockEntry() : datablock( 0 ), visibleToManager( false ) {}
-            DatablockEntry( HlmsDatablock *_datablock, bool _visibleToManager, const String &_name ) :
-                datablock( _datablock ), visibleToManager( _visibleToManager ), name( _name ) {}
+            DatablockEntry( HlmsDatablock *_datablock, bool _visibleToManager, const String &_name,
+                            const String &_srcFile, const String &_srcGroup ) :
+                datablock( _datablock ), visibleToManager( _visibleToManager ), name( _name ),
+                srcFile( _srcFile ), srcResourceGroup( _srcGroup  ) {}
         };
 
         typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
@@ -406,6 +410,11 @@ namespace Ogre
             Key - String Value list of paramters. MUST BE SORTED.
         @param visibleToManager
             When false, HlmsManager::getDatablock won't find this datablock. True by default
+        @param filename
+            Filename in which it was defined, so that this information can be retrieved
+            later by the user if needed. This is only for informational purposes.
+        @param resourceGroup
+            ResourceGroup. See filename param.
         @return
             Pointer to created Datablock
         */
@@ -413,7 +422,9 @@ namespace Ogre
                                         const HlmsMacroblock &macroblockRef,
                                         const HlmsBlendblock &blendblockRef,
                                         const HlmsParamVec &paramVec,
-                                        bool visibleToManager=true );
+                                        bool visibleToManager=true,
+                                        const String &filename=BLANKSTRING,
+                                        const String &resourceGroup=BLANKSTRING );
 
         /** Finds an existing datablock based on its name (@see createDatablock)
         @return
@@ -428,6 +439,24 @@ namespace Ogre
         /// cache trashing (datablocks are hot iterated every frame, and the
         /// full name is rarely ever used)
         const String* getFullNameString( IdString name ) const;
+
+        /// Returns the filaname & resource group a datablock was created from, and
+        /// is associated with its hashed name (this was passed as in @createDatablock).
+        /// Returns null ptr if not found. Note that it may also be a valid pointer but
+        /// contain an empty string.
+        /// The reason this String doesn't live in HlmsDatablock is to prevent
+        /// cache trashing (datablocks are hot iterated every frame, and the
+        /// filename & resource groups are rarely ever used)
+        /// Usage:
+        ///     String const *filename;
+        ///     String const *resourceGroup;
+        ///     datablock->getFilenameAndResourceGroup( &filename, &resourceGroup );
+        ///     if( filename && resourceGroup && !filename->empty() && !resourceGroup->empty() )
+        ///     {
+        ///         //Valid filename & resource group.
+        ///     }
+        void getFilenameAndResourceGroup(IdString name, String const * *outFilename,
+                                          String const * *outResourceGroup ) const;
 
         /** Destroys a datablocks given its name. Caller is responsible for ensuring
             those pointers aren't still in use (i.e. dangling pointers)

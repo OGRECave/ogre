@@ -1502,7 +1502,8 @@ namespace Ogre
     HlmsDatablock* Hlms::createDatablock( IdString name, const String &refName,
                                           const HlmsMacroblock &macroblockRef,
                                           const HlmsBlendblock &blendblockRef,
-                                          const HlmsParamVec &paramVec, bool visibleToManager )
+                                          const HlmsParamVec &paramVec, bool visibleToManager,
+                                          const String &filename, const String &resourceGroup )
     {
         if( mDatablocks.find( name ) != mDatablocks.end() )
         {
@@ -1515,7 +1516,7 @@ namespace Ogre
 
         HlmsDatablock *retVal = createDatablockImpl( name, macroblock, blendblock, paramVec );
 
-        mDatablocks[name] = DatablockEntry( retVal, visibleToManager, refName );
+        mDatablocks[name] = DatablockEntry( retVal, visibleToManager, refName, filename, resourceGroup );
 
         retVal->calculateHash();
 
@@ -1543,6 +1544,22 @@ namespace Ogre
             retVal = &itor->second.name;
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::getFilenameAndResourceGroup( IdString name, String const * *outFilename,
+                                            String const * *outResourceGroup ) const
+    {
+        HlmsDatablockMap::const_iterator itor = mDatablocks.find( name );
+        if( itor != mDatablocks.end() )
+        {
+            *outFilename        = &itor->second.srcFile;
+            *outResourceGroup   = &itor->second.srcResourceGroup;
+        }
+        else
+        {
+            *outFilename        = 0;
+            *outResourceGroup   = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     void Hlms::destroyDatablock( IdString name )

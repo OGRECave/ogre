@@ -347,6 +347,19 @@ namespace Ogre
         /// (if the datablock was removed from the Hlms but somehow is still alive)
         const String* getFullName(void) const;
 
+        /// @see Hlms::getFilenameAndResourceGroup. This operations is NOT fast. Might return
+        /// null (if the datablock was removed from the Hlms but somehow is still alive)
+        /// Usage:
+        ///     String const *filename;
+        ///     String const *resourceGroup;
+        ///     datablock->getFilenameAndResourceGroup( &filename, &resourceGroup );
+        ///     if( filename && resourceGroup && !filename->empty() && !resourceGroup->empty() )
+        ///     {
+        ///         //Valid filename & resource group.
+        ///     }
+        void getFilenameAndResourceGroup( String const * *outFilename,
+                                          String const * *outResourceGroup ) const;
+
         void _linkRenderable( Renderable *renderable );
         void _unlinkRenderable( Renderable *renderable );
 
