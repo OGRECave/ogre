@@ -19,66 +19,12 @@
 #include "OgreLodConfigSerializer.h"
 #include "OgreWorkQueue.h"
 
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "macUtils.h"
-#endif
-
 //--------------------------------------------------------------------------
 void MeshLodTests::SetUp()
 {
-    mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
-
-#ifdef OGRE_STATIC_LIB
-    Root* root = OGRE_NEW Root(BLANKSTRING);        
-    mStaticPluginLoader.load();
-#else
-    String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
-    Root* root = OGRE_NEW Root(pluginsPath);
-#endif
-
-    EXPECT_TRUE(!root->getAvailableRenderers().empty());
-    root->setRenderSystem(root->getAvailableRenderers().back());
-    root->initialise(false); // Needed for setting up HardwareBufferManager
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    Ogre::NameValuePairList misc;
-    // Tell OGRE that we're using cocoa, so it doesn't need to make a window for us
-    misc["macAPI"] = "cocoa";
-    root->createRenderWindow("", 320, 240, false, &misc)->setHidden(true);
-#else
-    root->createRenderWindow("", 320, 240, false, NULL)->setHidden(true);
-#endif
+    RootWithoutRenderSystemFixture::SetUp();
 
     new MeshLodGenerator;
-
-    // Load resource paths from config file
-    ConfigFile cf;
-    String resourcesPath;
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
-#else
-    resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
-#endif
-
-    cf.load(resourcesPath);
-    // Go through all sections & settings in the file
-    ConfigFile::SectionIterator seci = cf.getSectionIterator();
-
-    String secName, typeName, archName;
-    while (seci.hasMoreElements()) {
-        secName = seci.peekNextKey();
-        ConfigFile::SettingsMultiMap* settings = seci.getNext();
-        ConfigFile::SettingsMultiMap::iterator i;
-        for (i = settings->begin(); i != settings->end(); ++i) {
-            typeName = i->first;
-            archName = i->second;
-            ResourceGroupManager::getSingleton().addResourceLocation(
-                archName, typeName, secName);
-        }
-    }
-
     // Create the mesh for testing
     mMesh = MeshManager::getSingleton().load("Sinbad.mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 }
@@ -90,8 +36,7 @@ void MeshLodTests::TearDown()
         mMesh.setNull();
     }
     OGRE_DELETE MeshLodGenerator::getSingletonPtr();
-    OGRE_DELETE Root::getSingletonPtr();
-    OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
+    RootWithoutRenderSystemFixture::TearDown();
 }
 //--------------------------------------------------------------------------
 void MeshLodTests::addProfile(LodConfig& config)

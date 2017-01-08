@@ -26,21 +26,21 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "RootWithoutRenderSystemFixture.h"
-#include "OgreMesh.h"
-#include "OgreLodConfig.h"
+#ifndef TESTS_OGREMAIN_INCLUDE_ROOTWITHOUTRENDERSYSTEMFIXTURE_H_
+#define TESTS_OGREMAIN_INCLUDE_ROOTWITHOUTRENDERSYSTEMFIXTURE_H_
 
-using namespace Ogre;
+#include <gtest/gtest.h>
+#include <OgreRoot.h>
+#include <OgreFileSystemLayer.h>
+#include <OgreHardwareBufferManager.h>
 
-class MeshLodTests : public RootWithoutRenderSystemFixture
-{
+class RootWithoutRenderSystemFixture : public ::testing::Test {
 public:
-    MeshPtr mMesh;
-
+    Ogre::Root* mRoot;
+    Ogre::HardwareBufferManager* mHBM;
+    Ogre::FileSystemLayer* mFSLayer;
     void SetUp();
     void TearDown();
-    void runMeshLodConfigTests(LodConfig::Advanced& advanced);
-    void blockedWaitForLodGeneration(const MeshPtr& mesh);
-    void addProfile(LodConfig& config);
-    void setTestLodConfig(LodConfig& config);
 };
+
+#endif /* TESTS_OGREMAIN_INCLUDE_ROOTWITHOUTRENDERSYSTEMFIXTURE_H_ */

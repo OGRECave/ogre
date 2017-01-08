@@ -79,7 +79,11 @@ namespace Ogre {
     {
         StringStream errors;
 
-        mIsSupported = checkGPURules(errors) && checkHardwareSupport(autoManageTextureUnits, errors);
+        if(!Root::getSingleton().getRenderSystem()) {
+            errors << "NULL RenderSystem";
+        } else {
+            mIsSupported = checkGPURules(errors) && checkHardwareSupport(autoManageTextureUnits, errors);
+        }
 
         // Compile for categorised illumination on demand
         clearIlluminationPasses();

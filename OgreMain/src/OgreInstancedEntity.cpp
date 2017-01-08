@@ -362,7 +362,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     Real InstancedEntity::getBoundingRadius(void) const
     {
-        return mBatchOwner->_getMeshReference()->getBoundingSphereRadius() * getMaxScaleCoef();
+        return mBatchOwner->_getMeshReference()->getBoundingSphereRadius();
     }
     //-----------------------------------------------------------------------
     Real InstancedEntity::getSquaredViewDepth( const Camera* cam ) const
