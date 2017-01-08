@@ -36,7 +36,7 @@
 
 namespace Ogre
 {
-#if _DEBUG || DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
     const char *LwConstString::WarningHeaderConst = "!!! ERROR BAD PRINTF !!!";
 #endif
 }
