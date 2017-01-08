@@ -37,7 +37,7 @@ THE SOFTWARE.
 #define OGRE_HASH_FUNC MurmurHash3_x86_32
 #define OGRE_HASH_BITS 32
 
-#ifdef NDEBUG
+#if OGRE_DEBUG_MODE == 0
     #define OGRE_COPY_DEBUG_STRING( _Expression ) ((void)0)
     #define OGRE_APPEND_DEBUG_STRING( _Expression ) ((void)0)
 #else
@@ -61,7 +61,7 @@ namespace Ogre
         This means that you may no longer recover the real string it was constructed from.
         When the original data is not available getFriendlyText returns [Hash 0x0a0100ef]
         (in the example that mHash = 0x0a0100ef)*
-        In non-release modes (NDEBUG is not defined), IdStrings try to maintain a copy of
+        In debug mode (OGRE_DEBUG_MODE is defined), IdStrings try to maintain a copy of
         the original string for two purposes:
             1. Easy debugging: Reading "Texture/diffuse.png" is much nicer than "0x0a0100ef"
             2. Hash collision: If Ogre finds two IdStrings are identical but their original
@@ -96,14 +96,14 @@ namespace Ogre
         static const uint32_t Seed = 0x3A8EFA67; //It's a prime number :)
 
         uint32      mHash;
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         #define OGRE_DEBUG_STR_SIZE 32
         char        mDebugString[OGRE_DEBUG_STR_SIZE];
 #endif
 
         IdString() : mHash( 0 )
         {
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             mDebugString[0] = '\0';
 #endif
         }
@@ -126,7 +126,7 @@ namespace Ogre
             OGRE_COPY_DEBUG_STRING( value );
         }
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         #if OGRE_COMPILER == OGRE_COMPILER_MSVC
             #pragma warning( push )
             #pragma warning( disable: 4996 ) //Unsecure CRT deprecation warning
@@ -234,7 +234,7 @@ namespace Ogre
 
         bool operator == ( IdString idString ) const
         {
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             assert( !(mHash == idString.mHash &&
                     strcmp( mDebugString, idString.mDebugString ) != 0) &&
                     "Collision detected!" );
@@ -244,7 +244,7 @@ namespace Ogre
 
         bool operator != ( IdString idString ) const
         {
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             assert( !(mHash == idString.mHash &&
                     strcmp( mDebugString, idString.mDebugString ) != 0) &&
                     "Collision detected!" );
@@ -255,22 +255,10 @@ namespace Ogre
         /// Returns "[Hash 0x0a0100ef]" strings in Release mode, readable string in debug
         std::string getFriendlyText() const
         {
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             return std::string( mDebugString );
 #else
-        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-            #pragma warning( push )
-            #pragma warning( disable: 4996 ) //Unsecure CRT deprecation warning
-        #endif
-
-            char tmp[(OGRE_HASH_BITS >> 2)+10];
-            sprintf( tmp, "[Hash 0x%.8x]", mHash );
-            tmp[(OGRE_HASH_BITS >> 2)+10-1] = '\0';
-            return std::string( tmp );
-
-        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-            #pragma warning( pop )
-        #endif
+            return getReleaseText();
 #endif
         }
 
@@ -297,3 +285,4 @@ namespace Ogre
 }
 
 #endif
+

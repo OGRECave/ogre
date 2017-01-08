@@ -4,6 +4,7 @@
 // CMake auto-generated configuration options
 
 #cmakedefine OGRE_STATIC_LIB
+#define OGRE_DEBUG_MODE @OGRE_DEBUG_MODE@
 
 #cmakedefine OGRE_BUILD_RENDERSYSTEM_D3D11
 #cmakedefine OGRE_BUILD_RENDERSYSTEM_GL3PLUS
