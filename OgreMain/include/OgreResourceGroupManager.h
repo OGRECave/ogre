@@ -341,7 +341,7 @@ namespace Ogre {
             /// Created resources which are ready to be loaded / unloaded
             // Group by loading order of the type (defined by ResourceManager)
             // (e.g. skeletons and materials before meshes)
-            typedef map<Real, LoadUnloadResourceList*>::type LoadResourceOrderMap;
+            typedef map<Real, LoadUnloadResourceList>::type LoadResourceOrderMap;
             LoadResourceOrderMap loadResourceOrderMap;
             /// Linked world geometry, as passed to setWorldGeometry
             String worldGeometry;
