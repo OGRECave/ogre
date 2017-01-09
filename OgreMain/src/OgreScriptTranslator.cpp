@@ -8070,6 +8070,10 @@ namespace Ogre{
                             AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(prop->values.front().get());
                             if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE)
                                 passQuad->mFrustumCorners = CompositorPassQuadDef::VIEW_SPACE_CORNERS;
+                            else if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE_NORMALIZED)
+                                passQuad->mFrustumCorners = CompositorPassQuadDef::VIEW_SPACE_CORNERS_NORMALIZED;
+                            else if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE_NORMALIZED_LH)
+                                passQuad->mFrustumCorners = CompositorPassQuadDef::VIEW_SPACE_CORNERS_NORMALIZED_LH;
                             else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)
                                 passQuad->mFrustumCorners = CompositorPassQuadDef::WORLD_SPACE_CORNERS;
                             else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE_CENTERED)

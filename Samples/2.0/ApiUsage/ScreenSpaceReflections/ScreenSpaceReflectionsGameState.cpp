@@ -23,6 +23,10 @@
 
 #include "../LocalCubemaps/LocalCubemapScene.h"
 
+#include "OgreMaterialManager.h"
+#include "OgreMaterial.h"
+#include "OgreTechnique.h"
+
 #include "OgreForward3D.h"
 
 using namespace Demo;
@@ -94,6 +98,10 @@ namespace Demo
         light->setType( Ogre::Light::LT_DIRECTIONAL );
         light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
 
+        sceneManager->setAmbientLight( Ogre::ColourValue( 0.2, 0.4, 0.8 ) * 0.2,
+                                       Ogre::ColourValue( 0.6, 0.5, 0.4 ) * 0.2,
+                                       Ogre::Vector3::UNIT_Y );
+
         mCameraController = new CameraController( mGraphicsSystem, false );
         mCameraController->mCameraBaseSpeed = 1.0f;
         mCameraController->mCameraSpeedBoost = 10.0f;
@@ -130,6 +138,29 @@ namespace Demo
         {
             TutorialGameState::keyReleased( arg );
             return;
+        }
+
+        static float tmpValue = 1;
+
+        if( arg.keysym.sym == SDLK_SPACE )
+        {
+            Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().load(
+                        "SSR/ScreenSpaceReflectionsVectors",
+                        Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+                    staticCast<Ogre::Material>();
+
+            Ogre::Pass *pass = material->getTechnique(0)->getPass(0);
+
+            Ogre::GpuProgramParametersSharedPtr psParams = pass->getFragmentProgramParameters();
+
+            if( arg.keysym.mod & KMOD_LSHIFT )
+            {
+                tmpValue -= 20;
+                tmpValue = Ogre::max( tmpValue, 0 );
+            }
+            else
+                tmpValue += 20;
+            psParams->setNamedConstant( "p_maxSteps", tmpValue );
         }
 
         TutorialGameState::keyReleased( arg );

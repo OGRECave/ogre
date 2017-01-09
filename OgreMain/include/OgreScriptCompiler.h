@@ -878,6 +878,8 @@ namespace Ogre
                     ID_USE_QUAD,
                     ID_QUAD_NORMALS,
                         ID_CAMERA_FAR_CORNERS_VIEW_SPACE,
+                        ID_CAMERA_FAR_CORNERS_VIEW_SPACE_NORMALIZED,
+                        ID_CAMERA_FAR_CORNERS_VIEW_SPACE_NORMALIZED_LH,
                         ID_CAMERA_FAR_CORNERS_WORLD_SPACE,
                         ID_CAMERA_FAR_CORNERS_WORLD_SPACE_CENTERED,
                         ID_CAMERA_DIRECTION,

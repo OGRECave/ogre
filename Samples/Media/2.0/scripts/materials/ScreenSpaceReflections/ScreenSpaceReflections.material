@@ -5,6 +5,7 @@ fragment_program SSR/ScreenSpaceReflectionsVectors_ps_GLSL glsl
 	{
 		param_named depthTexture	int 0
 		param_named gBuf_normals	int 1
+		param_named prevFrame		int 2
 	}
 }
 
@@ -73,6 +74,12 @@ material SSR/ScreenSpaceReflectionsVectors
 			}
 
 			texture_unit gBufferNormals
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit prevFrame
 			{
 				tex_address_mode clamp
 				filtering none

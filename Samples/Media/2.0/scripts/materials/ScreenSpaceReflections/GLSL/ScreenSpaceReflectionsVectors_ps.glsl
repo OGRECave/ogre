@@ -43,6 +43,7 @@
 
 uniform sampler2D depthTexture;
 uniform sampler2D gBuf_normals;
+uniform sampler2D prevFrame;
 
 #define float2 vec2
 #define float3 vec3
@@ -152,10 +153,10 @@ INLINE bool traceScreenSpaceRay
 
 	// Project into homogeneous clip space
 	//float4 H0 = mul( float4( csOrig, 1.0f ), p_viewToTextureSpaceMatrix );
-	float4 H0 = float4( csOrig, 1.0f ) * p_viewToTextureSpaceMatrix;
+	float4 H0 = p_viewToTextureSpaceMatrix * float4( csOrig, 1.0f );
 	H0.xy *= p_depthBufferRes;
 	//float4 H1 = mul( float4( csEndPoint, 1.0f ), p_viewToTextureSpaceMatrix );
-	float4 H1 = float4( csEndPoint, 1.0f ) * p_viewToTextureSpaceMatrix;
+	float4 H1 = p_viewToTextureSpaceMatrix * float4( csEndPoint, 1.0f );
 	H1.xy *= p_depthBufferRes;
 	float k0 = 1.0f / H0.w;
 	float k1 = 1.0f / H1.w;
@@ -249,6 +250,7 @@ in float4 gl_FragCoord;
 void main()
 {
 	float3 normalVS = texelFetch( gBuf_normals, int2( gl_FragCoord.xy ), 0 ).xyz;
+	normalVS.z = -normalVS.z; //Normal should be left handed.
 	//if( !any(normalVS) )
 	if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
 	{
@@ -257,7 +259,7 @@ void main()
 	}
 
 	float depth = texelFetch( depthTexture, int2( gl_FragCoord.xy ), 0 ).x;
-	float3 rayOriginVS = inPs.cameraDir * linearizeDepth( depth );
+	float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
 	/*
 	* Since position is reconstructed in view space, just normalize it to get the
@@ -286,5 +288,12 @@ void main()
 	if( hitPixel.x > 1.0f || hitPixel.x < 0.0f || hitPixel.y > 1.0f || hitPixel.y < 0.0f )
 		intersection = false;
 
-	fragColour = float4( hitPixel.xy, depth, rDotV ) * (intersection ? 1.0f : 0.0f);
+	//fragColour = float4( hitPixel.xy, depth, rDotV ) * (intersection ? 1.0f : 0.0f);
+	if( !intersection )
+		fragColour = float4( 0, 0, 0, 0 );
+		//fragColour = float4( hitPixel.xy, depth, intersection ? 1 : 0 );
+	else
+		fragColour = textureLod( prevFrame, hitPixel.xy, 0 ).xyzw;
+//	float4 hitResult = float4( hitPixel.xy, depth, rDotV ) * (intersection ? 1.0f : 0.0f);
+	//fragColour = textureLod( prevFrame, hitPixel.xy, 0 ).xyzw;
 }
