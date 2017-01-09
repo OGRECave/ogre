@@ -636,8 +636,9 @@ namespace Ogre
             only locations which match that pattern (as determined by StringUtil::match)
             will be considered candidates for creation.
         */
-        DataStreamPtr createFileStream(const String& filename, const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-            bool overwrite = false, const String& locationPattern = BLANKSTRING);
+        static DataStreamPtr createFileStream(const String& filename,
+                const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                bool overwrite = false, const String& locationPattern = BLANKSTRING);
 
         /** Helper method to assist you in accessing readable file streams.
         @remarks
@@ -653,8 +654,9 @@ namespace Ogre
             only locations which match that pattern (as determined by StringUtil::match)
             will be considered candidates for creation.
         */      
-        DataStreamPtr openFileStream(const String& filename, const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-            const String& locationPattern = BLANKSTRING);
+        static DataStreamPtr openFileStream(const String& filename,
+                const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                const String& locationPattern = BLANKSTRING);
 
         /** Generates a packed data version of the passed in ColourValue suitable for
             use with the current RenderSystem.
