@@ -28,9 +28,8 @@ THE SOFTWARE.
 #include "OgreEXRCodec.h"
 #include "OgreEXRCodecExports.h"
 
-
-namespace Ogre {
 #ifndef OGRE_STATIC_LIB
+namespace Ogre {
     Codec *mEXRCodec;
     
     //-----------------------------------------------------------------------
