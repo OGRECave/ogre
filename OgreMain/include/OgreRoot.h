@@ -599,8 +599,9 @@ namespace Ogre
                 with the same name are still unique.
             @see
                 Archive
+            @deprecated use ResourceGroupManager::addResourceLocation
         */
-        void addResourceLocation(const String& name, const String& locType, 
+        OGRE_DEPRECATED void addResourceLocation(const String& name, const String& locType,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
             bool recursive = false);
 
@@ -609,8 +610,9 @@ namespace Ogre
         @param name The name of the resource location as specified in addResourceLocation
         @param groupName The name of the resource group to which this location 
             was assigned.
+        @deprecated use ResourceGroupManager::removeResourceLocation
         */
-        void removeResourceLocation(const String& name, 
+        OGRE_DEPRECATED void removeResourceLocation(const String& name,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         /** Helper method to assist you in creating writeable file streams.
