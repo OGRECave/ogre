@@ -61,7 +61,7 @@ namespace Ogre
     {
         friend class LwString;
     protected:
-#if defined(_DEBUG) || defined(DEBUG)
+#if OGRE_DEBUG_MODE
         char const *WarningHeader;
         static const char *WarningHeaderConst;
 #endif
@@ -81,7 +81,7 @@ namespace Ogre
             //mSize < mCapacity and not mSize <= mCapacity
             //because we need to account the null terminator
             assert( mSize < mCapacity );
-#if defined(_DEBUG) || defined(DEBUG)
+#if OGRE_DEBUG_MODE
             WarningHeader = WarningHeaderConst;
 #endif
         }
