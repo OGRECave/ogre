@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreMath.h"
-#include "asm_math.h"
 #include "OgreVector2.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"
@@ -166,14 +165,14 @@ namespace Ogre
     //-----------------------------------------------------------------------
     Real Math::InvSqrt(Real fValue)
     {
-        return Real(asm_rsq(fValue));
+        return Real(1.) / std::sqrt(fValue);
     }
     //-----------------------------------------------------------------------
     Real Math::UnitRandom ()
     {
         if (mRandProvider)
             return mRandProvider->getRandomUnit();
-        else return asm_rand() / asm_rand_max();
+        else return Real(rand()) / RAND_MAX;
     }
     
     //-----------------------------------------------------------------------
