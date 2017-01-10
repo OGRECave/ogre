@@ -40,7 +40,7 @@ THE SOFTWARE.
 #import "OgreViewport.h"
 #import <iomanip>
 
-@implementation OgreGL3PlusWindow
+@implementation OgreGLWindow
 
 - (BOOL)canBecomeKeyWindow
 {
@@ -76,7 +76,7 @@ namespace Ogre {
 
         if(mView && !mUseNSView)
         {
-            [(OgreGL3PlusView*)mView setOgreWindow:NULL];
+            [(OgreGLView*)mView setOgreWindow:NULL];
         }
         
         if(mWindow && !mIsExternal)
@@ -303,8 +303,8 @@ namespace Ogre {
                 NSView *nsview = [nswindow contentView];
                 mView = nsview;
             } else {
-                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGL3PlusView*");
-                OgreGL3PlusView *view = (OgreGL3PlusView*)StringConverter::parseUnsignedLong(opt->second);
+                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGLView*");
+                OgreGLView *view = (OgreGLView*)StringConverter::parseUnsignedLong(opt->second);
                 [view setOgreWindow:this];
                 mView = view;
             }
@@ -381,7 +381,7 @@ namespace Ogre {
     {
         if(!mIsFullScreen)
         {
-            // Unregister and destroy OGRE GL3PlusContext
+            // Unregister and destroy OGRE GLContext
             OGRE_DELETE mContext;
             
             if(!mIsExternal)
@@ -627,14 +627,14 @@ namespace Ogre {
         else
             windowRect = NSMakeRect(0.0, 0.0, widthPt, heightPt);
 
-        mWindow = [[OgreGL3PlusWindow alloc] initWithContentRect:windowRect
+        mWindow = [[OgreGLWindow alloc] initWithContentRect:windowRect
                                               styleMask:mIsFullScreen ? NSBorderlessWindowMask : NSResizableWindowMask|NSTitledWindowMask
                                                 backing:NSBackingStoreBuffered
                                                   defer:YES];
         [mWindow setTitle:[NSString stringWithCString:title.c_str() encoding:NSUTF8StringEncoding]];
         mWindowTitle = title;
 
-        mView = [[OgreGL3PlusView alloc] initWithGLOSXWindow:this];
+        mView = [[OgreGLView alloc] initWithGLOSXWindow:this];
 
         _setWindowParameters(widthPt, heightPt);
 

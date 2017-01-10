@@ -40,11 +40,11 @@ namespace Ogre {
                      HGLRC   Glrc);
         virtual ~Win32Context();
 
-        /** See GL3PlusContext */
+        /** See GLContext */
         virtual void setCurrent();
-        /** See GL3PlusContext */
+        /** See GLContext */
         virtual void endCurrent();
-        /// @copydoc GL3PlusContext::clone
+        /// @copydoc GLContext::clone
         GLContext* clone() const;
 
         virtual void releaseContext();

@@ -42,7 +42,7 @@ namespace Ogre {
 
         virtual ~CocoaContext();
 
-        /** See GL3PlusContext */
+        /** See GLContext */
         virtual void setCurrent();
         /**
          * This is called before another context is made current. By default,

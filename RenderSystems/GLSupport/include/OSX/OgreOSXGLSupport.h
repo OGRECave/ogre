@@ -34,11 +34,11 @@ THE SOFTWARE.
 namespace Ogre
 {
     
-class OSXGL3PlusSupport : public GLNativeSupport
+class OSXGLSupport : public GLNativeSupport
 {
 public:
-    OSXGL3PlusSupport(int profile) : GLNativeSupport(profile) {}
-    ~OSXGL3PlusSupport() {}
+    OSXGLSupport(int profile) : GLNativeSupport(profile) {}
+    ~OSXGLSupport() {}
 
     /**
     * Add any special config values to the system.

@@ -46,10 +46,10 @@ namespace Ogre {
 
 GLNativeSupport* getGLSupport(int profile)
 {
-    return new OSXGL3PlusSupport(profile);
+    return new OSXGLSupport(profile);
 }
 
-void OSXGL3PlusSupport::addConfig( void )
+void OSXGLSupport::addConfig( void )
 {
 	ConfigOption optFullScreen;
 	ConfigOption optVideoMode;
@@ -238,26 +238,26 @@ void OSXGL3PlusSupport::addConfig( void )
     //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Resources/RTShaderLib/GLSL150");
 }
 
-String OSXGL3PlusSupport::validateConfig( void )
+String OSXGLSupport::validateConfig( void )
 {
 	return String( "" );
 }
 
-RenderWindow* OSXGL3PlusSupport::createWindow( bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle ) 
+RenderWindow* OSXGLSupport::createWindow( bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle ) 
 {
 	if( autoCreateWindow )
 	{
 		ConfigOptionMap::iterator opt = mOptions.find( "Full Screen" );
 		if( opt == mOptions.end() )
-			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find full screen options!", "OSXGL3PlusSupport::createWindow" );
+			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find full screen options!", "OSXGLSupport::createWindow" );
 		bool fullscreen = ( opt->second.currentValue == "Yes" );
 		opt = mOptions.find( "Video Mode" );
 		if( opt == mOptions.end() )
-			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find video mode options!", "OSXGL3PlusSupport::createWindow" );
+			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find video mode options!", "OSXGLSupport::createWindow" );
 		String val = opt->second.currentValue;
 		String::size_type pos = val.find( 'x' );
 		if( pos == String::npos )
-			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Invalid Video Mode provided", "OSXGL3PlusSupport::createWindow" );
+			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Invalid Video Mode provided", "OSXGLSupport::createWindow" );
 
 		unsigned int w = StringConverter::parseUnsignedInt( val.substr( 0, pos ) );
 		unsigned int h = StringConverter::parseUnsignedInt( val.substr( pos + 1 ) );
@@ -317,7 +317,7 @@ RenderWindow* OSXGL3PlusSupport::createWindow( bool autoCreateWindow, RenderSyst
 	}
 }
 
-RenderWindow* OSXGL3PlusSupport::newWindow( const String &name, unsigned int width, unsigned int height, 
+RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, 
 	bool fullScreen, const NameValuePairList *miscParams )
 {
 	// Create the window, if Cocoa return a Cocoa window
@@ -328,7 +328,7 @@ RenderWindow* OSXGL3PlusSupport::newWindow( const String &name, unsigned int wid
     return window;
 }
 
-void OSXGL3PlusSupport::start()
+void OSXGLSupport::start()
 {
 	LogManager::getSingleton().logMessage(
 			"********************************************\n"
@@ -336,7 +336,7 @@ void OSXGL3PlusSupport::start()
 			"********************************************");
 }
 
-void OSXGL3PlusSupport::stop()
+void OSXGLSupport::stop()
 {
 	LogManager::getSingleton().logMessage(
 			"********************************************\n"
@@ -344,12 +344,12 @@ void OSXGL3PlusSupport::stop()
 			"********************************************");
 }
 
-void* OSXGL3PlusSupport::getProcAddress( const char* name )
+void* OSXGLSupport::getProcAddress( const char* name )
 {
     return dlsym (RTLD_DEFAULT, name);
 }
 
-CFComparisonResult OSXGL3PlusSupport::_compareModes (const void *val1, const void *val2, void *context)
+CFComparisonResult OSXGLSupport::_compareModes (const void *val1, const void *val2, void *context)
 {
 	// These are the values we will be interested in...
 	/*
@@ -398,7 +398,7 @@ CFComparisonResult OSXGL3PlusSupport::_compareModes (const void *val1, const voi
 	return kCFCompareEqualTo;
 }
 
-Boolean OSXGL3PlusSupport::_getDictionaryBoolean(CFDictionaryRef dict, const void* key)
+Boolean OSXGLSupport::_getDictionaryBoolean(CFDictionaryRef dict, const void* key)
 {
 	Boolean value = false;
 	CFBooleanRef boolRef;
@@ -410,7 +410,7 @@ Boolean OSXGL3PlusSupport::_getDictionaryBoolean(CFDictionaryRef dict, const voi
 	return value;
 }
 
-long OSXGL3PlusSupport::_getDictionaryLong(CFDictionaryRef dict, const void* key)
+long OSXGLSupport::_getDictionaryLong(CFDictionaryRef dict, const void* key)
 {
 	long value = 0;
 	CFNumberRef numRef;

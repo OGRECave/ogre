@@ -40,13 +40,13 @@ namespace Ogre {
         
         virtual ~GLXContext();
         
-        /// @copydoc GL3PlusContext::setCurrent
+        /// @copydoc GLContext::setCurrent
         virtual void setCurrent();
         
-        /// @copydoc GL3PlusContext::endCurrent
+        /// @copydoc GLContext::endCurrent
         virtual void endCurrent();
         
-        /// @copydoc GL3PlusContext::clone
+        /// @copydoc GLContext::clone
         GLContext* clone() const;
         
         ::GLXDrawable  mDrawable;

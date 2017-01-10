@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 @class CocoaWindowDelegate;
 
-@interface OgreGL3PlusWindow : NSWindow
+@interface OgreGLWindow : NSWindow
 
 @end
 
@@ -75,7 +75,7 @@ namespace Ogre {
         NSView* ogreView() const { return mView; };
         NSWindow* ogreWindow() const { return mWindow; };
         NSOpenGLContext* nsopenGLContext() const { return mGLContext; };
-        void createWithView(OgreGL3PlusView *view);
+        void createWithView(OgreGLView *view);
 
         /** @copydoc see RenderWindow::getViewPointToPixelScale */
         float getViewPointToPixelScale();

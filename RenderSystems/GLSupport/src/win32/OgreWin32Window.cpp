@@ -664,7 +664,7 @@ namespace Ogre {
         if (!mHWnd)
             return;
 
-        // Unregister and destroy OGRE GL3PlusContext
+        // Unregister and destroy OGRE GLContext
         delete mContext;
         mContext = 0;
 

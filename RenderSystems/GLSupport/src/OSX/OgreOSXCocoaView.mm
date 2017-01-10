@@ -29,7 +29,7 @@ THE SOFTWARE.
 #import "OgreOSXCocoaView.h"
 #import <AppKit/AppKit.h>
 
-@implementation OgreGL3PlusView
+@implementation OgreGLView
 
 - (id)initWithFrame:(NSRect)f
 {

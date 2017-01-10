@@ -99,7 +99,7 @@ namespace Ogre
            @remarks
            * Get custom attribute; the following attributes are valid:
            * WINDOW      The X Window target for rendering.
-           * GLCONTEXT    The Ogre GL3PlusContext used for rendering.
+           * GLCONTEXT    The Ogre GLContext used for rendering.
            * DISPLAY        The X Display connection behind that context.
            * DISPLAYNAME    The X Server name for the connected display.
            * ATOM          The X Atom used in client delete events.

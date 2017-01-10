@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreRenderWindow.h"
 #include <AppKit/NSView.h>
 
-@interface OgreGL3PlusView : NSView
+@interface OgreGLView : NSView
 {
     Ogre::RenderWindow *window;
 }
