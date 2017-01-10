@@ -50,9 +50,23 @@ namespace Ogre
         : mTerrain(t), mStreamOffset(0)
     {
         init();
+        open(filename);
+    }
 
+    void TerrainLodManager::open(const String& filename)
+    {
         if(!filename.empty() && filename.length() > 0)
             mDataStream = Root::getSingleton().openFileStream(filename, mTerrain->_getDerivedResourceGroup());
+    }
+
+    void TerrainLodManager::close()
+    {
+        mDataStream.setNull();
+    }
+
+    bool TerrainLodManager::isOpen() const
+    {
+        return !mDataStream.isNull();
     }
 
     void TerrainLodManager::init()

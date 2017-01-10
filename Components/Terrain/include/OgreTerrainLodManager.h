@@ -87,6 +87,10 @@ namespace Ogre
         TerrainLodManager(Terrain* t, const String& filename = "");
         virtual ~TerrainLodManager();
 
+        void open(const String& filename);
+        void close();
+        bool isOpen() const;
+
         static const uint16 WORKQUEUE_LOAD_LOD_DATA_REQUEST;
         virtual bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
         virtual bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
