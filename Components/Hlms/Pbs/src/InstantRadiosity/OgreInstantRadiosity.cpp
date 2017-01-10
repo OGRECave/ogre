@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "InstantRadiosity/OgreInstantRadiosity.h"
+#include "OgreIrradianceVolume.h"
 #include "OgreHlmsPbsDatablock.h"
 #include "OgreHlmsPbs.h"
 #include "OgreHlmsManager.h"
@@ -174,16 +175,12 @@ namespace Ogre
         mTotalNumRays( 0 ),
         mEnableDebugMarkers( false ),
         mUseTextures( true ),
-        mIrradianceMaxPower( 1 ),
-        mIrradianceOrigin( Vector3::ZERO ),
-        mIrradianceCellSize( Vector3::UNIT_SCALE ),
-        mIrradianceSamplerblock( 0 )
+        mUseIrradianceVolume( false )
     {
     }
     //-----------------------------------------------------------------------------------
     InstantRadiosity::~InstantRadiosity()
     {
-        destroyIrradianceVolumeTexture( false );
         freeMemory();
         clear();
     }
@@ -1309,7 +1306,7 @@ namespace Ogre
             if( (diffuseCol.x > mVplThreshold ||
                  diffuseCol.y > mVplThreshold ||
                  diffuseCol.z > mVplThreshold) &&
-                mIrradianceVolume.isNull() )
+                 !mUseIrradianceVolume)
             {
                 if( !vpl.light )
                 {
@@ -1563,192 +1560,6 @@ namespace Ogre
             inOutDirDiffuse[i] += Ogre::max( lightDir.dotProduct( directions[i] ), 0 ) * diffuse;
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::gaussFilter( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
-                                        size_t texWidth, size_t texHeight, size_t texDepth )
-    {
-        /*const float c_kernel[17] =
-        {
-            0.000078f, 0.000489f, 0.002403f, 0.009245f, 0.027835f, 0.065592f, 0.12098f, 0.17467f,
-            0.197417f,
-            0.17467f, 0.12098f, 0.065592f, 0.027835f, 0.009245f, 0.002403f, 0.000489f, 0.000078f
-        };
-
-        const int kernelStart = -8;
-        const int kernelEnd   =  8;*/
-        const float c_kernel[9] =
-        {
-            0.028532f, 0.067234f, 0.124009f, 0.179044f,
-            0.20236f,
-            0.179044f, 0.124009f, 0.067234f, 0.028532f
-        };
-
-        const int kernelStart = -4;
-        const int kernelEnd   =  4;
-
-        gaussFilterX( dstData, srcData, texWidth, texHeight, texDepth,
-                      c_kernel, kernelStart, kernelEnd );
-        gaussFilterY( srcData, dstData, texWidth, texHeight, texDepth,
-                      c_kernel, kernelStart, kernelEnd );
-        gaussFilterZ( dstData, srcData, texWidth, texHeight, texDepth,
-                      c_kernel, kernelStart, kernelEnd );
-    }
-    //-----------------------------------------------------------------------------------
-    void InstantRadiosity::gaussFilterX( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
-                                         size_t texWidth, size_t texHeight, size_t texDepth,
-                                         const float * RESTRICT_ALIAS kernel,
-                                         int kernelStart, int kernelEnd )
-    {
-        const size_t rowPitch = texWidth * 3u;
-        const size_t slicePitch = rowPitch * texHeight;
-
-        //X filter
-        for( size_t z=0; z<texDepth; ++z )
-        {
-            for( size_t y=0; y<texHeight; y += 6u )
-            {
-                for( size_t x=0; x<texWidth; ++x )
-                {
-                    const int kStart    = std::max<int>( -(int)x, kernelStart );
-                    const int kEnd      = std::min<int>( texWidth - 1 - x, kernelEnd );
-
-                    for( int i=0; i<6; ++i )
-                    {
-                        float accumR = 0;
-                        float accumG = 0;
-                        float accumB = 0;
-
-                        float divisor = 0;
-
-                        size_t srcIdx = z * slicePitch + (y + i) * rowPitch + (x + kStart) * 3u;
-
-                        for( int k=kStart; k<=kEnd; ++k )
-                        {
-                            const float kernelVal = kernel[k+kernelEnd];
-
-                            accumR += srcData[srcIdx+0] * kernelVal;
-                            accumG += srcData[srcIdx+1] * kernelVal;
-                            accumB += srcData[srcIdx+2] * kernelVal;
-
-                            divisor += kernelVal;
-                            srcIdx += 3;
-                        }
-
-                        float invDivisor = 1.0f / divisor;
-                        const size_t dstIdx = z * slicePitch + (y + i) * rowPitch + x * 3u;
-
-                        dstData[dstIdx+0] = accumR * invDivisor;
-                        dstData[dstIdx+1] = accumG * invDivisor;
-                        dstData[dstIdx+2] = accumB * invDivisor;
-                    }
-                }
-            }
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void InstantRadiosity::gaussFilterY( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
-                                         size_t texWidth, size_t texHeight, size_t texDepth,
-                                         const float * RESTRICT_ALIAS kernel,
-                                         int kernelStart, int kernelEnd )
-    {
-        const size_t rowPitch = texWidth * 3u;
-        const size_t slicePitch = rowPitch * texHeight;
-
-        //Y filter
-        for( size_t z=0; z<texDepth; ++z )
-        {
-            for( size_t y=0; y<texHeight; y += 6u )
-            {
-                const int kStart    = std::max<int>( -(int)(y / 6u), kernelStart );
-                const int kEnd      = std::min<int>( (texHeight - 6u - y) / 6u, kernelEnd );
-
-                for( size_t x=0; x<texWidth; ++x )
-                {
-                    for( int i=0; i<6; ++i )
-                    {
-                        float accumR = 0;
-                        float accumG = 0;
-                        float accumB = 0;
-
-                        float divisor = 0;
-
-                        size_t srcIdx = z * slicePitch + (y + i + kStart * 6) * rowPitch + x * 3u;
-
-                        for( int k=kStart; k<=kEnd; ++k )
-                        {
-                            const float kernelVal = kernel[k+kernelEnd];
-
-                            accumR += srcData[srcIdx+0] * kernelVal;
-                            accumG += srcData[srcIdx+1] * kernelVal;
-                            accumB += srcData[srcIdx+2] * kernelVal;
-
-                            divisor += kernelVal;
-                            srcIdx += rowPitch * 6u;
-                        }
-
-                        float invDivisor = 1.0f / divisor;
-                        const size_t dstIdx = z * slicePitch + (y + i) * rowPitch + x * 3u;
-
-                        dstData[dstIdx+0] = accumR * invDivisor;
-                        dstData[dstIdx+1] = accumG * invDivisor;
-                        dstData[dstIdx+2] = accumB * invDivisor;
-                    }
-                }
-            }
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void InstantRadiosity::gaussFilterZ( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
-                                         size_t texWidth, size_t texHeight, size_t texDepth,
-                                         const float * RESTRICT_ALIAS kernel,
-                                         int kernelStart, int kernelEnd )
-    {
-        const size_t rowPitch = texWidth * 3u;
-        const size_t slicePitch = rowPitch * texHeight;
-
-        //Z filter
-        for( size_t z=0; z<texDepth; ++z )
-        {
-            const int kStart    = std::max<int>( -(int)z, kernelStart );
-            const int kEnd      = std::min<int>( texDepth - 1u - z, kernelEnd );
-
-            for( size_t y=0; y<texHeight; y += 6u )
-            {
-                for( size_t x=0; x<texWidth; ++x )
-                {
-                    for( int i=0; i<6; ++i )
-                    {
-                        float accumR = 0;
-                        float accumG = 0;
-                        float accumB = 0;
-
-                        float divisor = 0;
-
-                        size_t srcIdx = (z + kStart) * slicePitch + (y + i) * rowPitch + x * 3u;
-
-                        for( int k=kStart; k<=kEnd; ++k )
-                        {
-                            const float kernelVal = kernel[k+kernelEnd];
-
-                            accumR += srcData[srcIdx+0] * kernelVal;
-                            accumG += srcData[srcIdx+1] * kernelVal;
-                            accumB += srcData[srcIdx+2] * kernelVal;
-
-                            divisor += kernelVal;
-                            srcIdx += slicePitch;
-                        }
-
-                        float invDivisor = 1.0f / divisor;
-                        const size_t dstIdx = z * slicePitch + (y + i) * rowPitch + x * 3u;
-
-                        dstData[dstIdx+0] = accumR * invDivisor;
-                        dstData[dstIdx+1] = accumG * invDivisor;
-                        dstData[dstIdx+2] = accumB * invDivisor;
-                    }
-                }
-            }
-        }
-    }
-    //-----------------------------------------------------------------------------------
     void InstantRadiosity::createDebugMarkers(void)
     {
         destroyDebugMarkers();
@@ -1840,12 +1651,21 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosity::setUseIrradianceVolume(bool bUseIrradianceVolume)
+    {
+        if (bUseIrradianceVolume != mUseIrradianceVolume)
+        {
+            mUseIrradianceVolume = bUseIrradianceVolume;
+            updateExistingVpls();
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void InstantRadiosity::suggestIrradianceVolumeParameters( const Vector3 &cellSize,
                                                               Vector3 &outVolumeOrigin,
                                                               Real &outLightMaxPower,
-                                                              uint32 &outTexWidth,
-                                                              uint32 &outTexHeight,
-                                                              uint32 &outTexDepth )
+                                                              uint32 &outNumBlocksX,
+                                                              uint32 &outNumBlocksY,
+                                                              uint32 &outNumBlocksZ)
     {
         const Vector3 invCellSize = Real(1.0) / cellSize;
 
@@ -1906,61 +1726,23 @@ namespace Ogre
             ++itor;
         }
 
-        outTexWidth     = maxBlockX - minBlockX + 1;
-        outTexHeight    = (maxBlockY - minBlockY + 1) * 6u;
-        outTexDepth     = maxBlockZ - minBlockZ + 1;
+        outNumBlocksX = maxBlockX - minBlockX + 1;
+        outNumBlocksY = maxBlockY - minBlockY + 1;
+        outNumBlocksZ = maxBlockZ - minBlockZ + 1;
 
         outVolumeOrigin.x = static_cast<Real>( minBlockX ) * cellSize.x;
-        outVolumeOrigin.y = static_cast<Real>( minBlockY ) * cellSize.x;
-        outVolumeOrigin.z = static_cast<Real>( minBlockZ ) * cellSize.x;
+        outVolumeOrigin.y = static_cast<Real>( minBlockY ) * cellSize.y;
+        outVolumeOrigin.z = static_cast<Real>( minBlockZ ) * cellSize.z;
 
         outLightMaxPower = lightMaxPower;
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::createIrradianceVolumeTexture( uint32 width, uint32 height, uint32 depth )
-    {
-        destroyIrradianceVolumeTexture( false );
-
-        //const uint32 maxMipCount = PixelUtil::getMaxMipmapCount( width, height, depth );
-        const uint32 maxMipCount = 0; //TODO?
-
-        mIrradianceVolume = TextureManager::getSingleton().createManual(
-                    "InstantRadiosity_IrradianceVolume",
-                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                    TEX_TYPE_3D, width, height, depth, maxMipCount, PF_A2R10G10B10, TU_DEFAULT );
-
-        HlmsSamplerblock samplerblock;
-        samplerblock.mMinFilter = FO_LINEAR;
-        samplerblock.mMagFilter = FO_LINEAR;
-        samplerblock.mMipFilter = FO_LINEAR;
-        samplerblock.setAddressingMode( TAM_BORDER );
-        samplerblock.mBorderColour = ColourValue::ZERO;
-        mIrradianceSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
-
-        updateExistingVpls();
-    }
-    //-----------------------------------------------------------------------------------
-    void InstantRadiosity::destroyIrradianceVolumeTexture( bool restoreVpls )
-    {
-        if( !mIrradianceVolume.isNull() )
-        {
-            TextureManager::getSingleton().remove( mIrradianceVolume->getHandle() );
-            mIrradianceVolume.setNull();
-        }
-
-        if( mIrradianceSamplerblock )
-        {
-            mHlmsManager->destroySamplerblock( mIrradianceSamplerblock );
-            mIrradianceSamplerblock = 0;
-        }
-
-        if( restoreVpls )
-            updateExistingVpls();
-    }
-    //-----------------------------------------------------------------------------------
-    void InstantRadiosity::fillIrradianceVolume( Vector3 cellSize, Vector3 volumeOrigin,
+    void InstantRadiosity::fillIrradianceVolume( IrradianceVolume *volume,
+                                                 Vector3 cellSize, Vector3 volumeOrigin,
                                                  Real lightMaxPower, bool fadeAttenuationOverDistance )
     {
+        if (!volume) return;
+
         const Vector3 invCellSize  = Real(1.0) / cellSize;
 
         //Quantize volumeCenter.
@@ -1968,30 +1750,25 @@ namespace Ogre
         volumeOrigin.y = static_cast<int32>( Math::Floor( volumeOrigin.y * invCellSize.y ) );
         volumeOrigin.z = static_cast<int32>( Math::Floor( volumeOrigin.z * invCellSize.z ) );
 
-        mIrradianceOrigin = volumeOrigin * cellSize;
-        mIrradianceCellSize = cellSize;
-        mIrradianceMaxPower = lightMaxPower;
+        volume->setIrradianceOrigin( volumeOrigin * cellSize );
+        volume->setIrradianceCellSize( cellSize );
+        volume->setIrradianceMaxPower( lightMaxPower );
+        volume->setPowerScale( mVplPowerBoost );
 
         const int32 volumeOriginX = static_cast<int32>( volumeOrigin.x );
-        const int32 volumeOriginY = static_cast<int32>( volumeOrigin.y * 6.0f );
+        const int32 volumeOriginY = static_cast<int32>( volumeOrigin.y );
         const int32 volumeOriginZ = static_cast<int32>( volumeOrigin.z );
 
         const Real invMaxPower = 1.0f / lightMaxPower;
 
-        const int32 texWidth  = static_cast<int32>( mIrradianceVolume->getWidth() );
-        const int32 texHeight = static_cast<int32>( mIrradianceVolume->getHeight() );
-        const int32 texDepth  = static_cast<int32>( mIrradianceVolume->getDepth() );
-
-        float *floatVolume = reinterpret_cast<float*>( OGRE_MALLOC( texWidth * texHeight *
-                                                                    texDepth * 3u * sizeof(float),
-                                                                    MEMCATEGORY_GENERAL ) );
-        const size_t rowPitch = texWidth * 3u;
-        const size_t slicePitch = rowPitch * texHeight;
+        const int32 numBlocksX = volume->getNumBlocksX();
+        const int32 numBlocksY = volume->getNumBlocksY();
+        const int32 numBlocksZ = volume->getNumBlocksZ();
 
         VplVec::const_iterator itor = mVpls.begin();
         VplVec::const_iterator end  = mVpls.end();
 
-        memset( floatVolume, 0, texWidth * texHeight * texDepth * 3u * sizeof(float) );
+        volume->clearVolumeData();
 
         const Vector3 c_directions[6] =
         {
@@ -2023,11 +1800,11 @@ namespace Ogre
             range = Ogre::min( range, mVplMaxRange );
 
             const int32 xRange = static_cast<int32>( Math::Floor( range * invCellSize.x ) );
-            const int32 yRange = static_cast<int32>( Math::Floor( range * invCellSize.y ) * 6.0f );
+            const int32 yRange = static_cast<int32>( Math::Floor( range * invCellSize.y ) );
             const int32 zRange = static_cast<int32>( Math::Floor( range * invCellSize.z ) );
 
             int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize.x ) );
-            int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize.y ) * 6.0f );
+            int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize.y ) );
             int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * invCellSize.z ) );
 
             blockX -= volumeOriginX;
@@ -2038,21 +1815,21 @@ namespace Ogre
             const int32 minBlockY = std::max( 0, blockY - yRange );
             const int32 minBlockZ = std::max( 0, blockZ - zRange );
 
-            const int32 maxBlockX = std::min( texWidth  - 1, blockX + xRange );
-            const int32 maxBlockY = std::min( texHeight - 6, blockY + yRange );
-            const int32 maxBlockZ = std::min( texDepth  - 1, blockZ + zRange );
+            const int32 maxBlockX = std::min( numBlocksX - 1, blockX + xRange );
+            const int32 maxBlockY = std::min( numBlocksY - 1, blockY + yRange);
+            const int32 maxBlockZ = std::min( numBlocksZ - 1, blockZ + zRange);
 
-            if( maxBlockX >= 0 && minBlockX < texWidth &&
-                maxBlockY >= 0 && minBlockY < texHeight &&
-                maxBlockZ >= 0 && minBlockZ < texDepth )
+            if (maxBlockX >= 0 && minBlockX < numBlocksX &&
+                maxBlockY >= 0 && minBlockY < numBlocksY &&
+                maxBlockZ >= 0 && minBlockZ < numBlocksZ)
             {
                 for( int32 z=minBlockZ; z<=maxBlockZ; ++z )
                 {
-                    for( int32 y=minBlockY; y<=maxBlockY; y += 6 )
+                    for( int32 y=minBlockY; y<=maxBlockY; ++y )
                     {
                         for( int32 x=minBlockX; x<=maxBlockX; ++x )
                         {
-                            Vector3 vplToCell = Vector3( x - blockX, (y - blockY) / 6, z - blockZ );
+                            Vector3 vplToCell = Vector3( x - blockX, y - blockY, z - blockZ );
                             vplToCell *= cellSize;
                             Real distance = vplToCell.normalise();
                             if( vplToCell.dotProduct( vpl.normal ) < 0 )
@@ -2068,22 +1845,16 @@ namespace Ogre
                             const Vector3 diffuseCol = vpl.diffuse * invMaxPower * atten;
                             for( int i=0; i<6; ++i )
                             {
-                                const size_t idx = z * slicePitch + (y + i) * rowPitch + x * 3u;
-
                                 if( x != blockX || y != blockY || z != blockZ )
                                 {
                                     Vector3 finalCol = Ogre::max(
                                                 -vplToCell.dotProduct( c_directions[i] ),
                                                 0 ) * diffuseCol;
-                                    floatVolume[idx+0] += finalCol.x;
-                                    floatVolume[idx+1] += finalCol.y;
-                                    floatVolume[idx+2] += finalCol.z;
+                                    volume->changeVolumeData( x, y, z, i, finalCol );
                                 }
                                 else
                                 {
-                                    floatVolume[idx+0] += vpl.dirDiffuse[i].x * invMaxPower;
-                                    floatVolume[idx+1] += vpl.dirDiffuse[i].y * invMaxPower;
-                                    floatVolume[idx+2] += vpl.dirDiffuse[i].z * invMaxPower;
+                                    volume->changeVolumeData( x, y, z, i, vpl.dirDiffuse[i] * invMaxPower );
                                 }
                             }
                         }
@@ -2094,45 +1865,7 @@ namespace Ogre
             ++itor;
         }
 
-        {
-            float *floatVolume02 = reinterpret_cast<float*>( OGRE_MALLOC( texWidth * texHeight *
-                                                                          texDepth * 3u * sizeof(float),
-                                                                          MEMCATEGORY_GENERAL ) );
-            gaussFilter( floatVolume02, floatVolume, texWidth, texHeight, texDepth );
-
-            OGRE_FREE( floatVolume, MEMCATEGORY_GENERAL );
-            floatVolume = 0;
-
-            floatVolume = floatVolume02;
-        }
-
-        const PixelBox &lockBox = mIrradianceVolume->getBuffer()->lock(
-                            Box( 0, 0, 0, texWidth, texHeight, texDepth ), v1::HardwareBuffer::HBL_NORMAL );
-
-        const size_t bytesPerPixel = PixelUtil::getNumElemBytes( mIrradianceVolume->getFormat() );
-        const size_t texRowPitch = lockBox.rowPitchAlwaysBytes();
-        const size_t texSlicePitch = lockBox.slicePitchAlwaysBytes();
-
-        uint8 * RESTRICT_ALIAS dstData = reinterpret_cast<uint8 * RESTRICT_ALIAS>( lockBox.data );
-
-        for( size_t z=0; z<(size_t)texDepth; ++z )
-        {
-            for( size_t y=0; y<(size_t)texHeight; ++y )
-            {
-                for( size_t x=0; x<(size_t)texWidth; ++x )
-                {
-                    const size_t srcIdx = z * slicePitch + y * rowPitch + x * 3u;
-                    const size_t dstIdx = z * texSlicePitch + y * texRowPitch + x * bytesPerPixel;
-                    PixelUtil::packColour( floatVolume[srcIdx+0], floatVolume[srcIdx+1],
-                                           floatVolume[srcIdx+2], 1.0f,
-                                           PF_A2R10G10B10, &dstData[dstIdx] );
-                }
-            }
-        }
-
-        mIrradianceVolume->getBuffer()->unlock();
-        OGRE_FREE( floatVolume, MEMCATEGORY_GENERAL );
-        floatVolume = 0;
+        volume->updateIrradianceVolumeTexture();
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
