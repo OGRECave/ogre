@@ -57,6 +57,11 @@ namespace Ogre
         Bone(const String& name, unsigned short handle, Skeleton* creator);
         ~Bone();
 
+    private:
+        // Intentionally hide base implementations of createChild methods. This will also suppress
+        // warnings like 'Ogre::Bone::createChild' hides overloaded virtual functions
+        using Node::createChild;
+    public:
         /** Creates a new Bone as a child of this bone.
         @remarks
             This method creates a new bone which will inherit the transforms of this
@@ -70,7 +75,6 @@ namespace Ogre
         */
         Bone* createChild(unsigned short handle, 
             const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
-
 
         /** Gets the numeric handle for this bone (unique within the skeleton). */
         unsigned short getHandle(void) const;
