@@ -9,6 +9,9 @@ using the underlying system libraries like Direct3D and OpenGL and
 provides an interface based on world objects and other intuitive
 classes.
 
+The current CI status on *github* is Ubuntu/ OSX/ Android/ iOS [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre) MSVC [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
+
+
 ## Index Of Contents
 * [What's New?](Docs/1.10-Notes.md)  
 A summary of the new and altered features in this release.
@@ -27,7 +30,7 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 We welcome all contributions to OGRE, be that new
 plugins, bugfixes, extensions, tutorials, documentation, example
 applications, artwork or pretty much anything else! If you would like
-to contribute to the development of OGRE, please create a [pull request](https://bitbucket.org/sinbad/ogre/pull-requests/).
+to contribute to the development of OGRE, please create a pull request on [bitbucket](https://bitbucket.org/sinbad/ogre/pull-requests/) or [github](https://github.com/OGRECave/ogre/pulls).
 
 ## Getting Support
 Please use our [community support forums](http://www.ogre3d.org/forums) if you need help or
