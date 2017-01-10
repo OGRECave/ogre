@@ -93,7 +93,7 @@ namespace Ogre
 
     class CubemapProbe;
     class HlmsPbs;
-    class InstantRadiosity;
+    class IrradianceVolume;
     class ParallaxCorrectedCubemap;
 }
 

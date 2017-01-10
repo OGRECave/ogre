@@ -46,6 +46,7 @@ namespace Ogre
     */
 
     class RandomNumberGenerator;
+    class IrradianceVolume;
 
     class _OgreHlmsPbsExport InstantRadiosity
     {
@@ -237,11 +238,7 @@ namespace Ogre
 
         bool                mUseTextures;
 
-        float                   mIrradianceMaxPower;
-        Vector3                 mIrradianceOrigin;
-        Vector3                 mIrradianceCellSize;
-        TexturePtr              mIrradianceVolume;
-        HlmsSamplerblock const  *mIrradianceSamplerblock;
+        bool                mUseIrradianceVolume;
 
         /**
         @param lightPos
@@ -296,17 +293,6 @@ namespace Ogre
         /// lightDir is normalized
         static void mergeDirectionalDiffuse( const Vector3 &diffuse, const Vector3 &lightDir,
                                              Vector3 *inOutDirDiffuse );
-        static void gaussFilter( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
-                                 size_t texWidth, size_t texHeight, size_t texDepth );
-        static void gaussFilterX( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
-                                  size_t texWidth, size_t texHeight, size_t texDepth,
-                                  const float * RESTRICT_ALIAS kernel, int kernelStart, int kernelEnd );
-        static void gaussFilterY( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
-                                  size_t texWidth, size_t texHeight, size_t texDepth,
-                                  const float * RESTRICT_ALIAS kernel, int kernelStart, int kernelEnd );
-        static void gaussFilterZ( float * RESTRICT_ALIAS dstData, float * RESTRICT_ALIAS srcData,
-                                  size_t texWidth, size_t texHeight, size_t texDepth,
-                                  const float * RESTRICT_ALIAS kernel, int kernelStart, int kernelEnd );
 
         void createDebugMarkers(void);
         void destroyDebugMarkers(void);
@@ -346,6 +332,13 @@ namespace Ogre
         void setUseTextures( bool bUseTextures );
         bool getUseTextures(void) const             { return mUseTextures; }
 
+        /** Whether to use Irradiance Volume instead of VPLs.
+        @param bUseIrradianceVolume
+            Whether to use Irradiance Volume.
+        */
+        void setUseIrradianceVolume(bool bUseIrradianceVolume);
+        bool getUseIrradianceVolume(void) const             { return mUseIrradianceVolume; }
+
         /** Outputs suggested parameters for a volumetric texture that will encompass all
             VPLs. They are suggestions, you don't have to follow them.
         @param inCellSize
@@ -361,42 +354,35 @@ namespace Ogre
         @param outLightMaxPower
             The maximum light power of the brightest VPL. Useful to maximize the quality
             of the 10-bits we use for the 3D texture.
-        @param outTexWidth
+        @param outNumBlocksX
             The suggested with for the volume texture. Volume's width in units will be:
-                outVolumeOrigin.x + mCellSize * outTexWidth;
-        @param outTexHeight
+                outVolumeOrigin.x + mCellSize * outNumBlocksX;
+        @param outNumBlocksY
             The suggested with for the volume texture times 6. Volume's height in units will be:
-                outVolumeOrigin.y + mCellSize * outTexHeight / 6.0f;
-        @param outTexDepth
+                outVolumeOrigin.y + mCellSize * outNumBlocksY;
+        @param outNumBlocksZ
             The suggested depth for the volume texture times. Volume's depth in units will be:
-                outVolumeOrigin.z + mCellSize * outTexDepth;
+                outVolumeOrigin.z + mCellSize * outNumBlocksZ;
         */
         void suggestIrradianceVolumeParameters( const Vector3 &inCellSize,
                                                 Vector3 &outVolumeOrigin,
                                                 Real &outLightMaxPower,
-                                                uint32 &outTexWidth,
-                                                uint32 &outTexHeight,
-                                                uint32 &outTexDepth );
-
-        void createIrradianceVolumeTexture( uint32 width, uint32 height, uint32 depth );
-        void destroyIrradianceVolumeTexture( bool restoreVpls=true );
+                                                uint32 &outNumBlocksX,
+                                                uint32 &outNumBlocksY,
+                                                uint32 &outNumBlocksZ );
 
         /**
+        @param volume
+        @param cellSize
         @param volumeOrigin
         @param lightMaxPower
         @param fadeAttenuationOverDistance
             Whether to fade the attenuation with distance (not physically based).
             See ForwardPlusBase::setFadeAttenuationRange
         */
-        void fillIrradianceVolume( Vector3 cellSize, Vector3 volumeOrigin, Real lightMaxPower,
+        void fillIrradianceVolume( IrradianceVolume *volume,
+                                   Vector3 cellSize, Vector3 volumeOrigin, Real lightMaxPower,
                                    bool fadeAttenuationOverDistance );
-
-        float getIrradianceMaxPower(void) const             { return mIrradianceMaxPower; }
-        const Vector3& getIrradianceOrigin(void) const      { return mIrradianceOrigin; }
-        const Vector3& getIrradianceCellSize(void) const    { return mIrradianceCellSize; }
-
-        const TexturePtr& getIrradianceVolumeTexture(void) const    { return mIrradianceVolume; }
-        const HlmsSamplerblock* getIrradSamplerblock(void) const    { return mIrradianceSamplerblock; }
     };
 
     /** @} */

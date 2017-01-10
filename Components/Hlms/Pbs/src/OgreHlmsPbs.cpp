@@ -44,7 +44,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreForward3D.h"
 #include "Cubemaps/OgreParallaxCorrectedCubemap.h"
-#include "InstantRadiosity/OgreInstantRadiosity.h"
+#include "OgreIrradianceVolume.h"
 
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -210,7 +210,7 @@ namespace Ogre
         mGridBuffer( 0 ),
         mGlobalLightListBuffer( 0 ),
         mTexUnitSlotStart( 0 ),
-        mIrrandianceVolume( 0 ),
+        mIrradianceVolume( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
         mShadowFilter( PCF_3x3 ),
@@ -303,7 +303,7 @@ namespace Ogre
                 texUnit += 2;
             }
 
-            if( mIrrandianceVolume && getProperty( HlmsBaseProp::ShadowCaster ) == 0 )
+            if( mIrradianceVolume && getProperty( HlmsBaseProp::ShadowCaster ) == 0 )
                 psParams->setNamedConstant( "irradianceVolume", texUnit++ );
 
             if( !mPreparedPass.shadowMaps.empty() )
@@ -771,7 +771,7 @@ namespace Ogre
             if( mParallaxCorrectedCubemap )
                 setProperty( PbsProperty::ParallaxCorrectCubemaps, 1 );
 
-            if( mIrrandianceVolume )
+            if( mIrradianceVolume )
                 setProperty( PbsProperty::IrradianceVolumes, 1 );
         }
 
@@ -848,7 +848,7 @@ namespace Ogre
 
             //vec3 irradianceOrigin + float maxPower +
             //vec3 irradianceSize + float invHeight + mat4 invView
-            if( mIrrandianceVolume )
+            if( mIrradianceVolume )
                 mapSize += (4 + 4 + 4*4) * 4;
 
             //float pssmSplitPoints N times.
@@ -995,24 +995,24 @@ namespace Ogre
                 *passBufferPtr++ = 1.0f;
             }
 
-            if( mIrrandianceVolume )
+            if( mIrradianceVolume )
             {
-                const Vector3 irradianceCellSize = mIrrandianceVolume->getIrradianceCellSize();
-                const Vector3 irradianceVolumeOrigin = mIrrandianceVolume->getIrradianceOrigin() /
+                const Vector3 irradianceCellSize = mIrradianceVolume->getIrradianceCellSize();
+                const Vector3 irradianceVolumeOrigin = mIrradianceVolume->getIrradianceOrigin() /
                                                        irradianceCellSize;
                 const float fTexWidth = static_cast<float>(
-                            mIrrandianceVolume->getIrradianceVolumeTexture()->getWidth() );
+                            mIrradianceVolume->getIrradianceVolumeTexture()->getWidth() );
                 const float fTexDepth = static_cast<float>(
-                            mIrrandianceVolume->getIrradianceVolumeTexture()->getDepth() );
+                            mIrradianceVolume->getIrradianceVolumeTexture()->getDepth() );
 
                 *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.x ) / fTexWidth;
                 *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.y );
                 *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.z ) / fTexDepth;
-                *passBufferPtr++ = mIrrandianceVolume->getIrradianceMaxPower() *
-                                   mIrrandianceVolume->mVplPowerBoost;
+                *passBufferPtr++ = mIrradianceVolume->getIrradianceMaxPower() *
+                                   mIrradianceVolume->getPowerScale();
 
                 const float fTexHeight = static_cast<float>(
-                            mIrrandianceVolume->getIrradianceVolumeTexture()->getHeight() );
+                            mIrradianceVolume->getIrradianceVolumeTexture()->getHeight() );
 
                 *passBufferPtr++ = 1.0f / (fTexWidth * irradianceCellSize.x);
                 *passBufferPtr++ = 1.0f / irradianceCellSize.y;
@@ -1210,7 +1210,7 @@ namespace Ogre
         mTexUnitSlotStart = mPreparedPass.shadowMaps.size() + 1;
         if( mGridBuffer )
             mTexUnitSlotStart += 2;
-        if( mIrrandianceVolume )
+        if( mIrradianceVolume )
             mTexUnitSlotStart += 1;
         if( mParallaxCorrectedCubemap )
             mTexUnitSlotStart += 1;
@@ -1282,10 +1282,10 @@ namespace Ogre
                             CbShaderBuffer( PixelShader, 2, mGlobalLightListBuffer, 0, 0 );
                 }
 
-                if( mIrrandianceVolume )
+                if( mIrradianceVolume )
                 {
-                    const TexturePtr &irradianceTex = mIrrandianceVolume->getIrradianceVolumeTexture();
-                    const HlmsSamplerblock *samplerblock = mIrrandianceVolume->getIrradSamplerblock();
+                    const TexturePtr &irradianceTex = mIrradianceVolume->getIrradianceVolumeTexture();
+                    const HlmsSamplerblock *samplerblock = mIrradianceVolume->getIrradSamplerblock();
 
                     *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
                                                                          irradianceTex.get(),

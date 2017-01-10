@@ -114,7 +114,7 @@ namespace Ogre
 
         uint32                  mTexUnitSlotStart;
 
-        InstantRadiosity       *mIrrandianceVolume;
+        IrradianceVolume       *mIrradianceVolume;
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
@@ -185,9 +185,9 @@ namespace Ogre
         void setParallaxCorrectedCubemap( ParallaxCorrectedCubemap *pcc )
                                                             { mParallaxCorrectedCubemap = pcc; }
 
-        void setIrrandianceVolume( InstantRadiosity *irrandianceVolume )
-                                                    { mIrrandianceVolume = irrandianceVolume; }
-        InstantRadiosity* getIrrandianceVolume(void) const  { return mIrrandianceVolume; }
+        void setIrradianceVolume( IrradianceVolume *irradianceVolume )
+                                                    { mIrradianceVolume = irradianceVolume; }
+        IrradianceVolume* getIrradianceVolume(void) const  { return mIrradianceVolume; }
 
 #if !OGRE_NO_JSON
         /// @copydoc Hlms::_loadJson
