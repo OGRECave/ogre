@@ -117,17 +117,12 @@ namespace Ogre
         return mTanTable[idx];
     }
     //-----------------------------------------------------------------------
-    int Math::ISign (int iValue)
-    {
-        return ( iValue > 0 ? +1 : ( iValue < 0 ? -1 : 0 ) );
-    }
-    //-----------------------------------------------------------------------
     Radian Math::ACos (Real fValue)
     {
         if ( -1.0 < fValue )
         {
             if ( fValue < 1.0 )
-                return Radian(acos(fValue));
+                return Radian(std::acos(fValue));
             else
                 return Radian(0.0);
         }
@@ -142,7 +137,7 @@ namespace Ogre
         if ( -1.0 < fValue )
         {
             if ( fValue < 1.0 )
-                return Radian(asin(fValue));
+                return Radian(std::asin(fValue));
             else
                 return Radian(HALF_PI);
         }
@@ -162,11 +157,7 @@ namespace Ogre
 
         return 0.0;
     }
-    //-----------------------------------------------------------------------
-    Real Math::InvSqrt(Real fValue)
-    {
-        return Real(1.) / std::sqrt(fValue);
-    }
+
     //-----------------------------------------------------------------------
     Real Math::UnitRandom ()
     {
@@ -176,23 +167,10 @@ namespace Ogre
     }
     
     //-----------------------------------------------------------------------
-    Real Math::RangeRandom (Real fLow, Real fHigh)
-    {
-        return (fHigh-fLow)*UnitRandom() + fLow;
-    }
-
-    //-----------------------------------------------------------------------
-    Real Math::SymmetricRandom ()
-    {
-        return 2.0f * UnitRandom() - 1.0f;
-    }
-
-    //-----------------------------------------------------------------------
     void Math::SetRandomValueProvider(RandomValueProvider* provider)
     {
         mRandProvider = provider;
     }
-
 
    //-----------------------------------------------------------------------
     void Math::setAngleUnit(Math::AngleUnit unit)
@@ -336,15 +314,6 @@ namespace Ogre
 
         return true;
     }
-    //-----------------------------------------------------------------------
-    bool Math::RealEqual( Real a, Real b, Real tolerance )
-    {
-        if (fabs(b-a) <= tolerance)
-            return true;
-        else
-            return false;
-    }
-
     //-----------------------------------------------------------------------
     std::pair<bool, Real> Math::intersects(const Ray& ray, const Plane& plane)
     {

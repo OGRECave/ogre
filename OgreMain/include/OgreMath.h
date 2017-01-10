@@ -249,7 +249,9 @@ namespace Ogre
         static inline int IAbs (int iValue) { return ( iValue >= 0 ? iValue : -iValue ); }
         static inline int ICeil (float fValue) { return int(ceil(fValue)); }
         static inline int IFloor (float fValue) { return int(floor(fValue)); }
-        static int ISign (int iValue);
+        static int ISign (int iValue) {
+            return ( iValue > 0 ? +1 : ( iValue < 0 ? -1 : 0 ) );
+        }
 
         /** Absolute value function
             @param
@@ -430,7 +432,9 @@ namespace Ogre
             @param fValue
                 The value whose inverse square root will be calculated.
         */
-        static Real InvSqrt (Real fValue);
+        static Real InvSqrt (Real fValue) {
+            return Real(1.) / std::sqrt(fValue);
+        }
 
         /** Generate a random number of unit length.
             @return
@@ -446,13 +450,17 @@ namespace Ogre
             @return
                 A random number in the range from [fLow,fHigh].
          */
-        static Real RangeRandom (Real fLow, Real fHigh);
+        static Real RangeRandom (Real fLow, Real fHigh) {
+            return (fHigh-fLow)*UnitRandom() + fLow;
+        }
 
         /** Generate a random number in the range [-1,1].
             @return
                 A random number in the range from [-1,1].
          */
-        static Real SymmetricRandom ();
+        static Real SymmetricRandom () {
+            return 2.0f * UnitRandom() - 1.0f;
+        }
 
         static void SetRandomValueProvider(RandomValueProvider* provider);
        
@@ -667,7 +675,9 @@ namespace Ogre
         /** Compare 2 reals, using tolerance for inaccuracies.
         */
         static bool RealEqual(Real a, Real b,
-            Real tolerance = std::numeric_limits<Real>::epsilon());
+            Real tolerance = std::numeric_limits<Real>::epsilon()) {
+            return std::abs(b-a) <= tolerance;
+        }
 
         /** Calculates the tangent space vector for a given set of positions / texture coords. */
         static Vector3 calculateTangentSpaceVector(
