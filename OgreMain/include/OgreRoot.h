@@ -599,8 +599,9 @@ namespace Ogre
                 with the same name are still unique.
             @see
                 Archive
+            @deprecated use ResourceGroupManager::addResourceLocation
         */
-        void addResourceLocation(const String& name, const String& locType, 
+        OGRE_DEPRECATED void addResourceLocation(const String& name, const String& locType,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
             bool recursive = false);
 
@@ -609,8 +610,9 @@ namespace Ogre
         @param name The name of the resource location as specified in addResourceLocation
         @param groupName The name of the resource group to which this location 
             was assigned.
+        @deprecated use ResourceGroupManager::removeResourceLocation
         */
-        void removeResourceLocation(const String& name, 
+        OGRE_DEPRECATED void removeResourceLocation(const String& name,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         /** Helper method to assist you in creating writeable file streams.
@@ -634,8 +636,9 @@ namespace Ogre
             only locations which match that pattern (as determined by StringUtil::match)
             will be considered candidates for creation.
         */
-        DataStreamPtr createFileStream(const String& filename, const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-            bool overwrite = false, const String& locationPattern = BLANKSTRING);
+        static DataStreamPtr createFileStream(const String& filename,
+                const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                bool overwrite = false, const String& locationPattern = BLANKSTRING);
 
         /** Helper method to assist you in accessing readable file streams.
         @remarks
@@ -651,8 +654,9 @@ namespace Ogre
             only locations which match that pattern (as determined by StringUtil::match)
             will be considered candidates for creation.
         */      
-        DataStreamPtr openFileStream(const String& filename, const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-            const String& locationPattern = BLANKSTRING);
+        static DataStreamPtr openFileStream(const String& filename,
+                const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                const String& locationPattern = BLANKSTRING);
 
         /** Generates a packed data version of the passed in ColourValue suitable for
             use with the current RenderSystem.

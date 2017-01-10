@@ -551,12 +551,10 @@ namespace Ogre {
             return false;
         }
 
-        const RenderSystemList& lstRend = Root::getSingleton().getAvailableRenderers();
-
         // just select the first available render system
-        if (!lstRend.empty())
+        if (!mRenderers.empty())
         {
-            Root::getSingleton().setRenderSystem(lstRend.front());
+            setRenderSystem(mRenderers.front());
             return true;
         }
 

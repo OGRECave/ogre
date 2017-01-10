@@ -286,15 +286,29 @@ namespace Ogre
         // force to load highest lod, or quadTree may contain hole
         load(0,true);
 
+        bool wasOpen = false;
+
+        if (mLodManager)
+        {
+            wasOpen = mLodManager->isOpen();
+            mLodManager->close();
+        }
+
+        {
+            DataStreamPtr stream = Root::createFileStream(
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        DataStreamPtr stream = Root::getSingleton().createFileStream(iOSDocumentsDirectory() + "/" + filename,
-                                                                   _getDerivedResourceGroup(), true);
-#else
-        DataStreamPtr stream = Root::getSingleton().createFileStream(filename,
-                                                                   _getDerivedResourceGroup(), true);
+                iOSDocumentsDirectory() + "/" +
 #endif
-        StreamSerialiser ser(stream);
-        save(ser);
+                filename,
+                _getDerivedResourceGroup(),
+                true);
+
+            StreamSerialiser ser(stream);
+            save(ser);
+        }
+
+        if (mLodManager && wasOpen)
+            mLodManager->open(filename);
     }
     //---------------------------------------------------------------------
     void Terrain::save(StreamSerialiser& stream)
