@@ -99,6 +99,7 @@
 %ignore Ogre::SharedPtr::isNull;
 %ignore Ogre::SharedPtr::setUseCount;
 %include "OgreSharedPtr.h"
+%ignore Ogre::Any::getType; // deprecated
 %include "OgreAny.h"
 %include "OgreIteratorWrapper.h"
 %include "OgreMath.h"
