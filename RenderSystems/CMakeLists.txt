@@ -29,8 +29,9 @@ if (OGRE_BUILD_RENDERSYSTEM_D3D11)
   endif ()
 endif ()
 
-# always add as it does not build anything
-add_subdirectory(GLSupport)
+if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_BUILD_RENDERSYSTEM_GL3PLUS OR OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
+  add_subdirectory(GLSupport)
+endif()
 
 if (OGRE_BUILD_RENDERSYSTEM_GL)
   if (NOT OPENGL_FOUND)
