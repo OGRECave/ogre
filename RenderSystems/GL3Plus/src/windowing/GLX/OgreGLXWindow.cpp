@@ -154,7 +154,7 @@ namespace Ogre
             if((opt = miscParams->find("FSAA")) != end)
                 samples = StringConverter::parseUnsignedInt(opt->second);
 
-            if((opt = miscParams->find("displayFrequency")) != end)
+            if( (opt = miscParams->find("displayFrequency")) != end && opt->second != "N/A" )
                 frequency = (short)StringConverter::parseInt(opt->second);
 
             if((opt = miscParams->find("vsync")) != end)
