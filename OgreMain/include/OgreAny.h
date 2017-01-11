@@ -118,7 +118,7 @@ namespace Ogre
         }
 
         /// @deprecated use type() instead
-        const std::type_info& getType() const { return type(); }
+        OGRE_DEPRECATED const std::type_info& getType() const { return type(); }
 
         inline friend std::ostream& operator <<
             ( std::ostream& o, const Any& v )
@@ -203,14 +203,14 @@ namespace Ogre
     public: 
         /// @deprecated use Ogre::any_cast instead
         template<typename ValueType>
-        ValueType operator()() const
+        OGRE_DEPRECATED ValueType operator()() const
         {
             return any_cast<ValueType>(*this);
         }
 
         /// @deprecated use Ogre::any_cast instead
         template <typename ValueType>
-        ValueType get(void) const
+        OGRE_DEPRECATED ValueType get(void) const
         {
             return any_cast<ValueType>(*this);
         }

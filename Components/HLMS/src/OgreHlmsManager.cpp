@@ -66,7 +66,7 @@ namespace Ogre
 			if (hlmsMatBindingAny.isEmpty())
 				continue;
 
-			HlmsMatBindingMap* hlmsMatBindingMap = hlmsMatBindingAny.get<HlmsMatBindingMap*>();
+			HlmsMatBindingMap* hlmsMatBindingMap = any_cast<HlmsMatBindingMap*>(hlmsMatBindingAny);
 
 			HlmsMatBindingMap::iterator bindingIt = hlmsMatBindingMap->begin();
 			HlmsMatBindingMap::iterator bindingItEnd = hlmsMatBindingMap->end();
@@ -89,7 +89,7 @@ namespace Ogre
 			if (hlmsMatBindingAny.isEmpty())
 				continue;
 
-			HlmsMatBindingMap* hlmsMatBindingMap = hlmsMatBindingAny.get<HlmsMatBindingMap*>();
+			HlmsMatBindingMap* hlmsMatBindingMap = any_cast<HlmsMatBindingMap*>(hlmsMatBindingAny);
 
 			HlmsMatBindingMap::iterator bindingIt = hlmsMatBindingMap->begin();
 			HlmsMatBindingMap::iterator bindingItEnd = hlmsMatBindingMap->end();
@@ -176,7 +176,7 @@ namespace Ogre
 			return;
 
 		// get the bounded material for the current pass
-		HlmsMatBindingMap* hlmsMatBindingMap = hlmsMatBindingAny.get<HlmsMatBindingMap*>();
+		HlmsMatBindingMap* hlmsMatBindingMap = any_cast<HlmsMatBindingMap*>(hlmsMatBindingAny);
 		HlmsMatBindingMap::iterator bindingIt = hlmsMatBindingMap->find(pass->getName());
 		if (bindingIt != hlmsMatBindingMap->end())
 		{
@@ -202,7 +202,7 @@ namespace Ogre
 		}
 		else
 		{
-			hlmsMatMap = rend->getUserObjectBindings().getUserAny(HLMS_KEY).get<HlmsMatBindingMap*>();
+			hlmsMatMap = any_cast<HlmsMatBindingMap*>(rend->getUserObjectBindings().getUserAny(HLMS_KEY));
 		}
 
 		(*hlmsMatMap)[passName] = material;
@@ -212,7 +212,7 @@ namespace Ogre
 	{
 		if (!rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
 		{
-			HlmsMatBindingMap* hlmsMatMap = rend->getUserObjectBindings().getUserAny(HLMS_KEY).get<HlmsMatBindingMap*>();
+			HlmsMatBindingMap* hlmsMatMap = any_cast<HlmsMatBindingMap*>(rend->getUserObjectBindings().getUserAny(HLMS_KEY));
 			hlmsMatMap->erase(passName);
 
 			// if the hasmap is empty delete it
@@ -236,7 +236,7 @@ namespace Ogre
 		for (; bindingIt != bindingItEnd; bindingIt++)
 		{
 			Renderable* rend = *bindingIt;
-			HlmsMatBindingMap* hlmsMatMap = rend->getUserObjectBindings().getUserAny(HLMS_KEY).get<HlmsMatBindingMap*>();
+			HlmsMatBindingMap* hlmsMatMap = any_cast<HlmsMatBindingMap*>(rend->getUserObjectBindings().getUserAny(HLMS_KEY));
 			hlmsMatMap->erase(passName);
 
 			// if the hasmap is empty delete it
@@ -253,7 +253,7 @@ namespace Ogre
 	{
 		if (!rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
 		{
-		    HlmsMatBindingMap* hlmsMatMap = rend->getUserObjectBindings().getUserAny(HLMS_KEY).get<HlmsMatBindingMap*>();
+		    HlmsMatBindingMap* hlmsMatMap = any_cast<HlmsMatBindingMap*>(rend->getUserObjectBindings().getUserAny(HLMS_KEY));
 			return hlmsMatMap->find(passName) != hlmsMatMap->end();
 		}
 
