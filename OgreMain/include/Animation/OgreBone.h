@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreId.h"
 #include "Math/Array/OgreBoneTransform.h"
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     #include "OgreNode.h"
 #endif
 
@@ -68,7 +68,7 @@ namespace Ogre {
         ArrayMatrixAf4x3 const * RESTRICT_ALIAS mReverseBind;
         BoneTransform                           mTransform;
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mutable bool mCachedTransformOutOfDate;
         Node        *mDebugParentNode;
         bool        mInitialized;
@@ -305,7 +305,7 @@ namespace Ogre {
                                          ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind,
                                          size_t numBinds );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         virtual void _setCachedTransformOutOfDate(void);
         bool isCachedTransformOutOfDate(void) const             { return mCachedTransformOutOfDate; }
 #endif

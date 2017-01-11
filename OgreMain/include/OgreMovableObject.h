@@ -116,7 +116,7 @@ namespace Ogre {
         /// The memory manager used to allocate the ObjectData.
         ObjectMemoryManager *mObjectMemoryManager;
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mutable bool mCachedAabbOutOfDate;
 #endif
 
@@ -549,7 +549,7 @@ namespace Ogre {
 
         SkeletonInstance* getSkeletonInstance(void) const   { return mSkeletonInstance; }
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         void _setCachedAabbOutOfDate(void)                  { mCachedAabbOutOfDate = true; }
         bool isCachedAabbOutOfDate() const                  { return mCachedAabbOutOfDate; }
 #endif

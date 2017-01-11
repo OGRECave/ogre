@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreBooleanMask.h"
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     #define CACHED_TRANSFORM_OUT_OF_DATE() this->_setCachedTransformOutOfDate()
 #else
     #define CACHED_TRANSFORM_OUT_OF_DATE() ((void)0)
@@ -47,7 +47,7 @@ namespace Ogre {
         mDepthLevel( 0 ),
         mParent( parent ),
 		mName( "" ),
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mCachedTransformOutOfDate( true ),
 #endif
         mListener( 0 ),
@@ -70,7 +70,7 @@ namespace Ogre {
         mDepthLevel( 0 ),
         mParent( 0 ),
 		mName( "Dummy Node" ),
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mCachedTransformOutOfDate( true ),
 #endif
         mListener( 0 ),
@@ -341,7 +341,7 @@ namespace Ogre {
                                          *mTransform.mDerivedScale,
                                          *mTransform.mDerivedOrientation );
         derivedTransform.storeToAoS( mTransform.mDerivedTransform );
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
         {
             if( mTransform.mOwner[j] )
@@ -393,7 +393,7 @@ namespace Ogre {
                                             *t.mDerivedScale,
                                             *t.mDerivedOrientation );
             derivedTransform.storeToAoS( t.mDerivedTransform );
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( t.mOwner[j] )
@@ -816,7 +816,7 @@ namespace Ogre {
         return diff.squaredLength();
     }
     //---------------------------------------------------------------------
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     void Node::_setCachedTransformOutOfDate(void)
     {
         mCachedTransformOutOfDate = true;

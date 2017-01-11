@@ -317,7 +317,7 @@ namespace Ogre {
 
         virtual NodeMemoryManager* getDefaultNodeMemoryManager( SceneMemoryMgrTypes sceneType );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         virtual void _setCachedTransformOutOfDate(void);
 #endif
     };

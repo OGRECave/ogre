@@ -161,7 +161,7 @@ namespace Ogre {
                                          *t.mDerivedScale,
                                          *t.mDerivedOrientation );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( t.mOwner[j] )
@@ -210,7 +210,7 @@ namespace Ogre {
                                          *t.mDerivedScale,
                                          *t.mDerivedOrientation );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( t.mOwner[j] )

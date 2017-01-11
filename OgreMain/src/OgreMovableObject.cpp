@@ -330,7 +330,7 @@ namespace Ogre {
 
         mObjectData.mWorldAabb->setFromAabb( retVal, mObjectData.mIndex );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mCachedAabbOutOfDate = false;
 #endif
 
@@ -402,7 +402,7 @@ namespace Ogre {
             objData.mWorldAabb->transformAffine( parentMat );
             *worldRadius = (*localRadius) * parentScale.getMaxComponent();
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( objData.mOwner[j] )
