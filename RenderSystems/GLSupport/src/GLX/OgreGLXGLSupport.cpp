@@ -276,23 +276,33 @@ namespace Ogre
     {
         ConfigOptionMap::iterator optVideoMode = mOptions.find("Video Mode");
         ConfigOptionMap::iterator optDisplayFrequency = mOptions.find("Display Frequency");
+        ConfigOptionMap::iterator optFullScreen = mOptions.find("Full Screen");
+
+        bool isFullscreen = false;
+        if( optFullScreen != mOptions.end() && optFullScreen->second.currentValue == "Yes" )
+            isFullscreen = true;
 
         if (optVideoMode != mOptions.end() && optDisplayFrequency != mOptions.end())
         {
             optDisplayFrequency->second.possibleValues.clear();
-
-            VideoModes::const_iterator value = mVideoModes.begin();
-            VideoModes::const_iterator end = mVideoModes.end();
-
-            for (; value != end; value++)
+            if( !isFullscreen )
+                optDisplayFrequency->second.possibleValues.push_back( "N/A" );
+            else
             {
-                String mode = StringConverter::toString(value->first.first,4) + " x " + StringConverter::toString(value->first.second,4);
+                VideoModes::const_iterator value = mVideoModes.begin();
+                VideoModes::const_iterator end = mVideoModes.end();
 
-                if (mode == optVideoMode->second.currentValue)
+                for (; value != end; value++)
                 {
-                    String frequency = StringConverter::toString(value->second) + " Hz";
+                    String mode = StringConverter::toString(value->first.first,4) + " x " +
+                                  StringConverter::toString(value->first.second,4);
 
-                    optDisplayFrequency->second.possibleValues.push_back(frequency);
+                    if (mode == optVideoMode->second.currentValue)
+                    {
+                        String frequency = StringConverter::toString(value->second) + " Hz";
+
+                        optDisplayFrequency->second.possibleValues.push_back(frequency);
+                    }
                 }
             }
 
@@ -313,16 +323,11 @@ namespace Ogre
     {
         GLNativeSupport::setConfigOption(name, value);
 
-        if (name == "Video Mode")
+        if( name == "Video Mode" || name == "Full Screen" )
         {
-            ConfigOptionMap::iterator opt = mOptions.find("Full Screen");
-            if(opt != mOptions.end() && opt->second.currentValue == "Yes")
-            {
-                refreshConfig();
-            }
+            refreshConfig();
         }
     }
-
     //-------------------------------------------------------------------------------------------------//
     String GLXGLSupport::validateConfig(void)
     {
