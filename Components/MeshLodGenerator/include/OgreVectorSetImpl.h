@@ -39,7 +39,7 @@ namespace Ogre
     template<typename T, unsigned S>
     void VectorSet<T, S>::addNotExists(const T& item)
     {
-        OgreAssert(find(item) == this->end(), "");
+        OgreAssertDbg(find(item) == this->end(), "");
         this->push_back(item);
     }
 
@@ -68,7 +68,7 @@ namespace Ogre
     void VectorSet<T, S>::removeExists(const T& item)
     {
         iterator it = find(item);
-        OgreAssert(it != this->end(), "");
+        OgreAssertDbg(it != this->end(), "");
         remove(it);
     }
 
@@ -88,7 +88,7 @@ namespace Ogre
     void VectorSet<T, S>::replaceExists(const T& oldItem, const T& newItem)
     {
         iterator it = find(oldItem);
-        OgreAssert(it != this->end(), "");
+        OgreAssertDbg(it != this->end(), "");
         *it = newItem;
     }
 
@@ -109,7 +109,7 @@ namespace Ogre
         const T& item)
     {
         iterator it = find(item);
-        OgreAssert(it != this->end(), "");
+        OgreAssertDbg(it != this->end(), "");
         return it;
     }
 

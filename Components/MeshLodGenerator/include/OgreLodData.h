@@ -160,7 +160,7 @@ struct _OgreLodExport LodData {
     template<typename T, typename A>
     static size_t getVectorIDFromPointer(const std::vector<T, A>& vec, const T* pointer) {
         size_t id = pointer - &vec.at(0);
-        OgreAssert(id < vec.size() && (&vec[id] == pointer), "Invalid pointer");
+        OgreAssertDbg(id < vec.size() && (&vec[id] == pointer), "Invalid pointer");
         return id;
     }
 

@@ -74,7 +74,7 @@ protected:
             tri->submeshID = submeshID;
             for (int i = 0; i < 3; i++) {
                 // Invalid index: Index is bigger then vertex buffer size.
-                OgreAssert(iPos[i] < lookup.size(), "");
+                OgreAssertDbg(iPos[i] < lookup.size(), "");
                 tri->vertexID[i] = iPos[i];
                 tri->vertex[i] = lookup[iPos[i]];
             }
