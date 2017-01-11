@@ -17,11 +17,7 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 )
 
-if (WINDOWS_STORE OR WINDOWS_PHONE)
-	set(SOURCE_FILES src/SampleBrowser_WinRT.cpp)
-else()
-	set(SOURCE_FILES src/SampleBrowser.cpp)
-endif()
+set(SOURCE_FILES src/SampleBrowser.cpp)
 
 # Get the list of configured samples
 get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
@@ -52,11 +48,6 @@ if (APPLE AND APPLE_IOS)
 elseif (OGRE_BUILD_PLATFORM_NACL)
   set(HEADER_FILES ${HEADER_FILES}
     include/SampleBrowser_NaCl.h
-  )
-elseif (WINDOWS_STORE OR WINDOWS_PHONE)
-  set(HEADER_FILES ${HEADER_FILES}
-    include/SampleBrowser_WinRT.h
-    include/InputManagerWinRT.h
   )
 elseif (APPLE)
   set(HEADER_FILES ${HEADER_FILES}
@@ -123,6 +114,8 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 
     # Copy other resources
     file(COPY
+	${SDL2_BINARY}
+
         ${OGRE_BINARY_DIR}/inst/bin/debug/resources_d.cfg
         ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg
         ${OGRE_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg
@@ -146,6 +139,7 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
     # Mark resources as deployment content, so that it would be packaged
     set(CONTENT_FILES ${CONTENT_FILES}
         ${CMAKE_CURRENT_BINARY_DIR}/${APP_MANIFEST_NAME}
+	${CMAKE_CURRENT_BINARY_DIR}/SDL2.dll
         ${CMAKE_CURRENT_BINARY_DIR}/Media
         ${CMAKE_CURRENT_BINARY_DIR}/Logo.png
         ${CMAKE_CURRENT_BINARY_DIR}/SmallLogo.png

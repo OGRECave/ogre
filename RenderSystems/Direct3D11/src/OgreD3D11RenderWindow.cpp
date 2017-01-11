@@ -1314,6 +1314,8 @@ namespace Ogre
             opt = miscParams->find("externalWindowHandle");
             if(opt != miscParams->end())
                 externalHandle = reinterpret_cast<Windows::UI::Core::CoreWindow^>((void*)StringConverter::parseSizeT(opt->second));
+            else
+                externalHandle = Windows::UI::Core::CoreWindow::GetForCurrentThread();
         }
 
         // Reset current window if any

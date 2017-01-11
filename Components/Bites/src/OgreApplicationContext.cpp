@@ -334,26 +334,6 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     // create 1x1 window - we will resize later
     return mRoot->createRenderWindow(mAppName, mInitWidth, mInitHeight, false, &miscParams);
 
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-    Ogre::RenderWindow* res;
-    if(mNativeWindow.Get())
-    {
-        miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)reinterpret_cast<void*>(mNativeWindow.Get()));
-        res = mRoot->createRenderWindow(mAppName, mNativeWindow->Bounds.Width, mNativeWindow->Bounds.Height, false, &miscParams);
-    }
-#       if !__OGRE_WINRT_PHONE_80
-    else if(mNativeControl)
-    {
-        miscParams["windowType"] = "SurfaceImageSource";
-        res = mRoot->createRenderWindow(mAppName, mNativeControl->ActualWidth, mNativeControl->ActualHeight, false, &miscParams);
-        void* pUnk = NULL;
-        res->getCustomAttribute("ImageBrush", &pUnk);
-        mNativeControl->Fill = reinterpret_cast<Windows::UI::Xaml::Media::ImageBrush^>(pUnk);
-    }
-#       endif // !__OGRE_WINRT_PHONE_80
-
-    return res;
-
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAndroidApp->window));
     miscParams["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAConfig));

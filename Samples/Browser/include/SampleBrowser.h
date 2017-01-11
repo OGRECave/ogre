@@ -179,21 +179,6 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-          | init data members needed only by WinRT
-          -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-        void initAppForWinRT( Windows::UI::Core::CoreWindow^ nativeWindow, InputContext inputContext)
-        {
-            mNativeWindow = nativeWindow;
-        }
-#       if !__OGRE_WINRT_PHONE_80
-        void initAppForWinRT( Windows::UI::Xaml::Shapes::Rectangle ^ nativeControl, InputContext inputContext)
-        {
-            mNativeControl = nativeControl;
-        }
-#       endif
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-        /*-----------------------------------------------------------------------------
           | init data members needed only by NaCl
           -----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
@@ -1036,14 +1021,6 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void windowMovedOrResized()
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && !__OGRE_WINRT_PHONE_80
-            if(mNativeControl)
-            {
-                // in WinRT.Xaml case Ogre::RenderWindow is actually brush
-                // applied to native control and we need resize this brush manually
-                mWindow->resize(mNativeControl->ActualWidth, mNativeControl->ActualHeight);
-            }
-#endif // !__OGRE_WINRT_PHONE_80
             mWindow->windowMovedOrResized();    // notify window
             windowResized(mWindow);                             // notify window event listeners
         }
@@ -1538,12 +1515,6 @@ namespace OgreBites
         int mLastViewCategory;                         // last sample category viewed
         int mLastSampleIndex;                          // index of last sample running
         int mStartSampleIndex;                         // directly starts the sample with the given index
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-        Platform::Agile<Windows::UI::Core::CoreWindow> mNativeWindow;
-#       if !__OGRE_WINRT_PHONE_80
-        Windows::UI::Xaml::Shapes::Rectangle^ mNativeControl;
-#       endif // !__OGRE_WINRT_PHONE_80
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;
         pp::CompletionCallback* mNaClSwapCallback;

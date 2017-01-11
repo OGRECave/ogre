@@ -101,6 +101,15 @@ if (OGRE_INSTALL_DEPENDENCIES)
 endif () # OGRE_INSTALL_DEPENDENCIES
     
   if(WIN32)
+    if(OGRE_BUILD_SAMPLES OR OGRE_BUILD_TESTS)
+      if(EXISTS "${SDL2_BINARY}")
+	  file(COPY ${SDL2_BINARY} DESTINATION ${OGRE_BINARY_DIR}/bin/debug)
+	  file(COPY ${SDL2_BINARY} DESTINATION ${OGRE_BINARY_DIR}/bin/release)
+	  file(COPY ${SDL2_BINARY} DESTINATION ${OGRE_BINARY_DIR}/bin/relwithdebinfo)
+	  file(COPY ${SDL2_BINARY} DESTINATION ${OGRE_BINARY_DIR}/bin/minsizerel)
+      endif()
+    endif()
+
     if (OGRE_BUILD_PLUGIN_CG)
       # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
       if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
