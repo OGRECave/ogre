@@ -267,7 +267,9 @@ namespace Ogre {
         */
         FORCEINLINE const SimpleMatrixAf4x3& _getLocalSpaceTransform(void) const
         {
-            assert( !mCachedTransformOutOfDate );
+#if OGRE_DEBUG_MODE
+          assert( !mCachedTransformOutOfDate );
+#endif
             return mTransform.mDerivedTransform[mTransform.mIndex];
         }
 
@@ -285,8 +287,10 @@ namespace Ogre {
         */
         FORCEINLINE const SimpleMatrixAf4x3& _getFullTransform(void) const
         {
+#if OGRE_DEBUG_MODE
             assert( !mCachedTransformOutOfDate &&
                     (!mDebugParentNode || !mDebugParentNode->isCachedTransformOutOfDate()) );
+#endif
             return mTransform.mFinalTransform[mTransform.mIndex];
         }
 
