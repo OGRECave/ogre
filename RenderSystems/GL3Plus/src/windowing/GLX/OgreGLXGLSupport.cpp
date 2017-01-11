@@ -279,20 +279,25 @@ namespace Ogre
         {
             optDisplayFrequency->second.possibleValues.clear();
             if( !isFullscreen )
-                optDisplayFrequency->second.possibleValues.push_back( "N/A" );
-
-            VideoModes::const_iterator value = mVideoModes.begin();
-            VideoModes::const_iterator end = mVideoModes.end();
-
-            for (; value != end; value++)
             {
-                String mode = StringConverter::toString(value->first.first,4) + " x " + StringConverter::toString(value->first.second,4);
+                optDisplayFrequency->second.possibleValues.push_back( "N/A" );
+            }
+            else
+            {
+                VideoModes::const_iterator value = mVideoModes.begin();
+                VideoModes::const_iterator end = mVideoModes.end();
 
-                if (mode == optVideoMode->second.currentValue && isFullscreen)
+                for (; value != end; value++)
                 {
-                    String frequency = StringConverter::toString(value->second) + " Hz";
+                    String mode = StringConverter::toString(value->first.first,4) + " x " +
+                                  StringConverter::toString(value->first.second,4);
 
-                    optDisplayFrequency->second.possibleValues.push_back(frequency);
+                    if (mode == optVideoMode->second.currentValue && isFullscreen)
+                    {
+                        String frequency = StringConverter::toString(value->second) + " Hz";
+
+                        optDisplayFrequency->second.possibleValues.push_back(frequency);
+                    }
                 }
             }
 
@@ -302,7 +307,8 @@ namespace Ogre
             }
             else
             {
-                optVideoMode->second.currentValue = StringConverter::toString(mVideoModes[0].first.first,4) + " x " + StringConverter::toString(mVideoModes[0].first.second,4);
+                optVideoMode->second.currentValue = StringConverter::toString(mVideoModes[0].first.first,4) + " x " +
+                                                    StringConverter::toString(mVideoModes[0].first.second,4);
                 optDisplayFrequency->second.currentValue = StringConverter::toString(mVideoModes[0].second) + " Hz";
             }
         }
