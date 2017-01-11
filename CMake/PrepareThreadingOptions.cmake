@@ -48,6 +48,7 @@ set(OGRE_CONFIG_THREADS ${OGRE_THREAD_TYPE} CACHE STRING
 	1 - Full background loading.
 	2 - Background resource preparation."
 )
+set_property(CACHE OGRE_CONFIG_THREADS PROPERTY STRINGS 0 1 2)
 set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER} CACHE STRING
 	"Select the library to use for thread support. Possible values:
 	boost - Boost thread library.
@@ -55,6 +56,7 @@ set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER} CACHE STRING
 	tbb   - ThreadingBuildingBlocks library.
 	std   - STL thread library (requires compiler support)."
 )
+set_property(CACHE OGRE_CONFIG_THREAD_PROVIDER PROPERTY STRINGS boost poco tbb std)
 
 # sanitise threading choices
 if (NOT OGRE_CONFIG_THREADS)

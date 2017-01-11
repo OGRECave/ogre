@@ -81,6 +81,7 @@ set(OGRE_ASSERT_MODE 0 CACHE STRING
 	1 - Standard asserts in debug builds, exceptions in release builds.
 	2 - Exceptions in debug builds, exceptions in release builds."
 )
+set_property(CACHE OGRE_ASSERT_MODE PROPERTY STRINGS 0 1 2)
 
 # determine config values depending on build options
 set(OGRE_STATIC_LIB ${OGRE_STATIC})
