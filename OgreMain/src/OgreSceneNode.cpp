@@ -128,7 +128,7 @@ namespace Ogre {
         // Also add to name index
         std::pair<ObjectMap::iterator, bool> insresult = 
             mObjectsByName.insert(ObjectMap::value_type(obj->getName(), obj));
-        assert(insresult.second && "Object was not attached because an object of the "
+        OgreAssert(insresult.second, "Object was not attached because an object of the "
             "same name was already attached to this node.");
         (void)insresult;
         

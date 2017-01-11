@@ -975,7 +975,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::startRendering(void)
     {
-        assert(mActiveRenderer != 0);
+        OgreAssert(mActiveRenderer != 0, "no RenderSystem");
 
         mActiveRenderer->_initRenderTargets();
 

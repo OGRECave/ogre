@@ -90,7 +90,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	PbsMaterial::PbsMaterial(const PbsMaterial &obj)
 	{
-		assert(true); // this should not be copied
+		OgreAssert(false, "this should not be copied");
 	}
 	//-----------------------------------------------------------------------------------
 	PbsMaterial::~PbsMaterial()
