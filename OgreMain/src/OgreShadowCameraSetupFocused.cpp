@@ -658,7 +658,7 @@ namespace Ogre
     //-----------------------------------------------------------------------   
     const Vector3& FocusedShadowCameraSetup::PointListBody::getPoint(size_t cnt) const
     {
-        OgreAssert(cnt < getPointCount(), "Search position out of range");
+        OgreAssertDbg(cnt < getPointCount(), "Search position out of range");
 
         return mBodyPoints[ cnt ];
     }

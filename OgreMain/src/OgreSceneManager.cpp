@@ -4688,7 +4688,7 @@ void SceneManager::initShadowVolumeMaterials(void)
        created the SceneManager BEFORE the Root object, you will need to call
        SceneManager::_setDestinationRenderSystem manually.
      */
-    assert( mDestRenderSystem );
+    OgreAssert( mDestRenderSystem, "no RenderSystem");
 
     if (mShadowMaterialInitDone)
         return;

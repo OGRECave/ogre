@@ -402,7 +402,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::setOrientation( const Quaternion & q )
     {
-        OgreAssert(!q.isNaN(), "Invalid orientation supplied as parameter");
+        OgreAssertDbg(!q.isNaN(), "Invalid orientation supplied as parameter");
         mOrientation = q;
         mOrientation.normalise();
         needUpdate();

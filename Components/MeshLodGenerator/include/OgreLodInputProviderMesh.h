@@ -76,7 +76,7 @@ protected:
         // Loop through all triangles and connect them to the vertices.
         for (iPos += (3 - inc); iPos < iEnd; iPos += inc, ++triangleIdx) {
             // It should never reallocate or every pointer will be invalid.
-            OgreAssert(data->mTriangleList.capacity() > data->mTriangleList.size(), "");
+            OgreAssertDbg(data->mTriangleList.capacity() > data->mTriangleList.size(), "");
             data->mTriangleList.push_back(LodData::Triangle());
             LodData::Triangle* tri = &data->mTriangleList.back();
             tri->isRemoved = false;
@@ -109,7 +109,7 @@ protected:
             }
             
             // Invalid index: Index is bigger then vertex buffer size.
-            OgreAssert(i0 < lookup.size() && i1 < lookup.size() && i2 < lookup.size(), "");
+            OgreAssertDbg(i0 < lookup.size() && i1 < lookup.size() && i2 < lookup.size(), "");
             tri->vertexID[0] = i0;
             tri->vertexID[1] = i1;
             tri->vertexID[2] = i2;

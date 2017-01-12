@@ -231,9 +231,9 @@ TEST_F(MeshSerializerTests,Mesh_Version_1_3)
     testMesh(MESH_VERSION_1_0);
 }
 //--------------------------------------------------------------------------
+#ifdef I_HAVE_LOT_OF_FREE_TIME
 TEST_F(MeshSerializerTests,Mesh_Version_1_2)
 {
-#ifdef I_HAVE_LOT_OF_FREE_TIME
     // My sandboxing test. Takes a long time to complete!
     // Runs on all meshes and exports all to every LoD version.
     char* groups [] = { "Popular", "General", "Tests" };
@@ -280,8 +280,8 @@ TEST_F(MeshSerializerTests,Mesh_Version_1_2)
             mSkeleton->reload();
         }
     }
-#endif /* ifdef I_HAVE_LOT_OF_FREE_TIME */
 }
+#endif /* ifdef I_HAVE_LOT_OF_FREE_TIME */
 //--------------------------------------------------------------------------
 TEST_F(MeshSerializerTests,Mesh_XML)
 {
@@ -600,7 +600,7 @@ void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, Strin
     }
     outPath += info->filename;
 
-    assert(info->archive->getType() == "FileSystem");
+    OgreAssert(info->archive->getType() == "FileSystem", "");
 }
 //--------------------------------------------------------------------------
 bool MeshSerializerTests::copyFile(const String& srcPath, const String& dstPath)
