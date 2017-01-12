@@ -61,11 +61,9 @@ THE SOFTWARE.
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-#if OGRE_THREAD_SUPPORT != 1
 extern "C" {
 GLenum GLEWAPIENTRY glewContextInit (void*);
 }
-#endif
 
 namespace Ogre {
 
@@ -1198,9 +1196,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("***************************");
 
         // Get extension function pointers
-#if OGRE_THREAD_SUPPORT != 1
         glewContextInit(mGLSupport);
-#endif
 
         mStateCacheManager->switchContext((intptr_t)mCurrentContext);
     }
