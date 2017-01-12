@@ -376,7 +376,7 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     assert(wmInfo.subsystem == SDL_SYSWM_COCOA);
-    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t([wmInfo.info.cocoa.window contentView]));
+    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.cocoa.window));
 #endif
 #endif
     return mRoot->createRenderWindow(mAppName, w, h, false, &miscParams);
