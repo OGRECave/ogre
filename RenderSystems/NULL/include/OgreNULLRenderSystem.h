@@ -26,8 +26,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   -----------------------------------------------------------------------------
 */
 
-#ifndef __GL3PlusRenderSystem_H__
-#define __GL3PlusRenderSystem_H__
+#ifndef __NULLRenderSystem_H__
+#define __NULLRenderSystem_H__
 
 #include "OgreNULLPrerequisites.h"
 

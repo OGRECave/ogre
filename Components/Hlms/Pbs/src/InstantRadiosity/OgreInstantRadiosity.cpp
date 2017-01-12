@@ -1840,7 +1840,7 @@ namespace Ogre
                                                        mVplQuadAtten * distance) * distance);
                             atten = Ogre::min( Real(1.0f), atten );
                             if( fadeAttenuationOverDistance )
-                                atten *= Ogre::max( (range - distance) / range, 0.0f );
+                                atten *= Ogre::max( (range - distance) / range, Ogre::Real( 0.0f ) );
 
                             const Vector3 diffuseCol = vpl.diffuse * invMaxPower * atten;
                             for( int i=0; i<6; ++i )
