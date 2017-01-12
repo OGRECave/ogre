@@ -59,7 +59,6 @@ if(CMAKE_CROSSCOMPILING)
 endif()
 
 include(CMakeDependentOption)
-include(CheckCXXCompilerFlag)
 include(MacroLogFeature)
 include(OgreAddTargets)
 include(OgreConfigTargets)
@@ -100,11 +99,15 @@ if (NOT APPLE AND NOT ANDROID)
 endif ()
 
 # Set compiler specific build flags
-if (UNIX)
+if (UNIX OR MINGW)
+  include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
   if (OGRE_GCC_HAS_SSE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
   endif ()
+endif()
+
+if(UNIX)
   # This is a set of sensible warnings that provide meaningful output
   set(OGRE_WARNING_FLAGS "-Wall -Winit-self -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -Wshadow -Wno-missing-field-initializers -Wno-long-long")
   if (EMSCRIPTEN)
