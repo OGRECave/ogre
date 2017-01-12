@@ -295,7 +295,7 @@ namespace Ogre {
                 mUseNSView = StringConverter::parseBool(param_useNSView_pair->second, true);
 
             // If the macAPICocoaUseNSView parameter was set, use the winhandler as pointer to an NSView
-            // Otherwise we assume the user created the interface with Interface Builder and instantiated an OgreView.
+            // Otherwise we assume the user created the interface with Interface Builder and instantiated an OgreGLView.
             
             if(mUseNSView) {
                 LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external plain NSView*");

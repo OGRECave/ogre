@@ -5,7 +5,7 @@
 
 @interface OgreController : NSObject
 {
-    IBOutlet OgreView *ogreView;
+    IBOutlet OgreGLView *ogreView;
     NSColor *diffuseLight;
     NSColor *specularLight;
 }

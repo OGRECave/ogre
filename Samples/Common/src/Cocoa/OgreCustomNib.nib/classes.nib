@@ -7,7 +7,7 @@
             OUTLETS = {ogreView = id; }; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = OgreView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = OgreGLView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {CLASS = OgreWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }
     ); 
     IBVersion = 1; 
