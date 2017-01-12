@@ -63,7 +63,7 @@ namespace Ogre {
 
     CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
         mWindowDelegate(NULL), mActive(false), mClosed(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
-        mUseNSView(true), mContentScalingFactor(1.0)
+        mUseNSView(false), mContentScalingFactor(1.0)
     {
         // Set vsync by default to save battery and reduce tearing
     }
@@ -299,8 +299,7 @@ namespace Ogre {
             
             if(mUseNSView) {
                 LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external plain NSView*");
-                NSWindow *nswindow = (NSWindow*)StringConverter::parseUnsignedLong(opt->second);
-                NSView *nsview = [nswindow contentView];
+                NSView *nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
                 mView = nsview;
             } else {
                 LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGLView*");
