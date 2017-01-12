@@ -63,7 +63,7 @@ namespace Ogre {
 
     CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
         mWindowDelegate(NULL), mActive(false), mClosed(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
-        mUseNSView(false), mContentScalingFactor(1.0)
+        mUseOgreGLView(true), mContentScalingFactor(1.0)
     {
         // Set vsync by default to save battery and reduce tearing
     }
@@ -74,7 +74,7 @@ namespace Ogre {
 
         destroy();
 
-        if(mView && !mUseNSView)
+        if(mView && mUseOgreGLView)
         {
             [(OgreGLView*)mView setOgreWindow:NULL];
         }
@@ -288,26 +288,30 @@ namespace Ogre {
         }
         else
         {
-            NameValuePairList::const_iterator param_useNSView_pair;
-            param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
-            
-            if(param_useNSView_pair != miscParams->end())
-                mUseNSView = StringConverter::parseBool(param_useNSView_pair->second, true);
-
-            // If the macAPICocoaUseNSView parameter was set, use the winhandler as pointer to an NSView
-            // Otherwise we assume the user created the interface with Interface Builder and instantiated an OgreGLView.
-            
-            if(mUseNSView) {
-                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external plain NSView*");
-                NSView *nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
-                mView = nsview;
-            } else {
-                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGLView*");
-                OgreGLView *view = (OgreGLView*)StringConverter::parseUnsignedLong(opt->second);
-                [view setOgreWindow:this];
-                mView = view;
+            NSObject* externalHandle = (NSObject*)StringConverter::parseUnsignedLong(opt->second);
+            if([externalHandle isKindOfClass:[NSWindow class]])
+            {
+                mView = [(NSWindow*)externalHandle contentView];
+                mUseOgreGLView = [mView isKindOfClass:[OgreGLView class]];
+                LogManager::getSingleton().logMessage(mUseOgreGLView ?
+                    "Mac Cocoa Window: Rendering on an external NSWindow with nested OgreGLView" :
+                    "Mac Cocoa Window: Rendering on an external NSWindow with nested NSView");
+            }
+            else
+            {
+                assert([externalHandle isKindOfClass:[NSView class]]);
+                mView = (NSView*)externalHandle;
+                mUseOgreGLView = [mView isKindOfClass:[OgreGLView class]];
+                LogManager::getSingleton().logMessage(mUseOgreGLView ?
+                    "Mac Cocoa Window: Rendering on an external OgreGLView" :
+                    "Mac Cocoa Window: Rendering on an external NSView");
             }
             
+            if(mUseOgreGLView)
+            {
+                [(OgreGLView*)mView setOgreWindow:this];
+            }
+
             NSRect b = [mView bounds];
             mWidth = _getPixelFromPoint((int)b.size.width);
             mHeight = _getPixelFromPoint((int)b.size.height);

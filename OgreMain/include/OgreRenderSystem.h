@@ -341,7 +341,8 @@ namespace Ogre
             <td>externalWindowHandle</td>
             <td>Win32: HWND as integer<br/>
                 GLX: poslong:posint:poslong (display*:screen:windowHandle) or poslong:posint:poslong:poslong (display*:screen:windowHandle:XVisualInfo*)<br/>
-                OS X: WindowRef for Carbon or OgreGLView (or NSView) for Cocoa address as an integer
+                OS X Cocoa: OgreGLView address as an integer. You can pass NSView or NSWindow too, but should perform OgreGLView callbacks into the Ogre manually.
+                OS X Carbon: WindowRef as an integer
                 iOS: UIWindow address as an integer
             </td>
             <td>0 (none)</td>
@@ -380,21 +381,6 @@ namespace Ogre
             <td>String: "cocoa" or "carbon"</td>
             <td>"carbon"</td>
             <td>Specifies the type of rendering window on the Mac Platform.</td>
-            <td>Mac OS X Specific</td>
-            <td>&nbsp;</td>
-         </tr>
-         <tr>
-            <td>macAPICocoaUseNSView</td>
-            <td>bool "true" or "false"</td>
-            <td>"true"</td>
-            <td>On the Mac platform the most diffused method to embed OGRE in a custom application is to use Interface Builder
-                and add to the interface an instance of OgreGLView.
-                The pointer to this instance is then used as "externalWindowHandle".
-                However, there are cases where you are NOT using Interface Builder and you get the Cocoa NSView* of an existing interface.
-                For example, this is happens when you want to render into a Java/AWT interface.
-                In short, by setting this flag to "true" the Ogre::Root::createRenderWindow interprets the "externalWindowHandle" as a NSView*
-                instead of an OgreGLView*. See OgreOSXCocoaView.h/mm.
-            </td>
             <td>Mac OS X Specific</td>
             <td>&nbsp;</td>
          </tr>

@@ -62,7 +62,7 @@ namespace Ogre {
         bool mHasResized;
         bool mIsExternal;
         String mWindowTitle;
-        bool mUseNSView;
+        bool mUseOgreGLView;
         float mContentScalingFactor;
         
         int _getPixelFromPoint(int viewPt) const;
