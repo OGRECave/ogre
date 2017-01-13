@@ -655,7 +655,8 @@ namespace Ogre
 
         for (; currentPair != endPair; ++currentPair)
         {
-            GpuSharedParametersPtr paramsPtr = currentPair->first;
+            // force const call to get*Pointer
+            const GpuSharedParameters* paramsPtr = currentPair->first.get();
 
             //FIXME Possible buffer does not exist if no associated uniform block.
             HardwareUniformBuffer* hwGlBuffer = currentPair->second.get();
@@ -676,7 +677,7 @@ namespace Ogre
 
                 BaseConstantType baseType = GpuConstantDefinition::getBaseType(param->constType);
 
-                void* dataPtr;
+                const void* dataPtr;
 
                 // NOTE: the naming is backward. this is the logical index
                 size_t index =  param->physicalIndex;
@@ -712,8 +713,6 @@ namespace Ogre
                 size_t offset = param->logicalIndex;
                 hwGlBuffer->writeData(offset, length, dataPtr);
             }
-
-            paramsPtr->_markClean();
         }
     }
 

@@ -743,13 +743,16 @@ namespace Ogre
         if (mCopyDataVersion != mSharedParams->getVersion())
             initCopyData();
 
+        // force const call to get*Pointer
+        const GpuSharedParameters* sharedParams = mSharedParams.get();
+
         for (CopyDataList::iterator i = mCopyDataList.begin(); i != mCopyDataList.end(); ++i)
         {
             CopyDataEntry& e = *i;
 
             if (e.dstDefinition->isFloat())
             {
-                const float* pSrc = mSharedParams->getFloatPointer(e.srcDefinition->physicalIndex);
+                const float* pSrc = sharedParams->getFloatPointer(e.srcDefinition->physicalIndex);
                 float* pDst = mParams->getFloatPointer(e.dstDefinition->physicalIndex);
 
                 // Deal with matrix transposition here!!!
@@ -792,7 +795,7 @@ namespace Ogre
             }
             else if (e.dstDefinition->isDouble())
             {
-                const double* pSrc = mSharedParams->getDoublePointer(e.srcDefinition->physicalIndex);
+                const double* pSrc = sharedParams->getDoublePointer(e.srcDefinition->physicalIndex);
                 double* pDst = mParams->getDoublePointer(e.dstDefinition->physicalIndex);
 
                 // Deal with matrix transposition here!!!
@@ -837,7 +840,7 @@ namespace Ogre
                      e.dstDefinition->isSampler() ||
                      e.dstDefinition->isSubroutine())
             {
-                const int* pSrc = mSharedParams->getIntPointer(e.srcDefinition->physicalIndex);
+                const int* pSrc = sharedParams->getIntPointer(e.srcDefinition->physicalIndex);
                 int* pDst = mParams->getIntPointer(e.dstDefinition->physicalIndex);
 
                 if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
@@ -863,7 +866,7 @@ namespace Ogre
             }
             else if (e.dstDefinition->isUnsignedInt() || e.dstDefinition->isBool()) 
             {
-                const uint* pSrc = mSharedParams->getUnsignedIntPointer(e.srcDefinition->physicalIndex);
+                const uint* pSrc = sharedParams->getUnsignedIntPointer(e.srcDefinition->physicalIndex);
                 uint* pDst = mParams->getUnsignedIntPointer(e.dstDefinition->physicalIndex);
 
                 if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
