@@ -41,6 +41,10 @@ elseif (WIN32)
 
     set(NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/win32)
+        
+    if(MINGW)
+        set(PLATFORM_LIBS opengl32)
+    endif()
   endif()
 elseif(APPLE_IOS)
   # only works with GLES2 - no shared components here.
