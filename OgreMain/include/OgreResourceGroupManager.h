@@ -382,7 +382,8 @@ namespace Ogre {
         /** Delete a group for shutdown - don't notify ResourceManagers. */
         void deleteGroup(ResourceGroup* grp);
         /// Internal find method for auto groups
-        ResourceGroup* findGroupContainingResourceImpl(const String& filename) const;
+        std::pair<Archive*, ResourceGroup*>
+        resourceExistsInAnyGroupImpl(const String& filename) const;
         /// Internal event firing method
         void fireResourceGroupScriptingStarted(const String& groupName, size_t scriptCount) const;
         /// Internal event firing method
@@ -418,7 +419,7 @@ namespace Ogre {
          @param group Pointer to the resource group
          @param filename Fully qualified name of the file to test for
          */
-        bool resourceExists(ResourceGroup* group, const String& filename) const;
+        Archive* resourceExists(ResourceGroup* group, const String& filename) const;
 
         /// Stored current group - optimisation for when bulk loading a group
         ResourceGroup* mCurrentGroup;

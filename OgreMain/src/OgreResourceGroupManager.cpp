@@ -689,74 +689,28 @@ namespace Ogre {
                 "ResourceGroupManager::openResource");
         }
 
-        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        Archive* pArch = NULL;
 
-        Archive* pArch = 0;
-        ResourceLocationIndex::iterator rit = grp->resourceIndexCaseSensitive.find(resourceName);
-        if (rit != grp->resourceIndexCaseSensitive.end())
+        if(searchGroupsIfNotFound) {
+            std::pair<Archive*, ResourceGroup*> ret = resourceExistsInAnyGroupImpl(resourceName);
+
+            if(ret.second && resourceBeingLoaded) {
+                resourceBeingLoaded->changeGroupOwnership(ret.second->name);
+            }
+
+            pArch = ret.first;
+        } else {
+            pArch = resourceExists(grp, resourceName);
+        }
+
+        if (pArch)
         {
-            // Found in the index
-            pArch = rit->second;
             DataStreamPtr stream = pArch->open(resourceName);
             if (mLoadingListener)
                 mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, stream);
             return stream;
         }
-        else 
-        {
-            // try case insensitive
-            String lcResourceName = resourceName;
-            StringUtil::toLowerCase(lcResourceName);
-            rit = grp->resourceIndexCaseInsensitive.find(lcResourceName);
-            if (rit != grp->resourceIndexCaseInsensitive.end())
-            {
-                // Found in the index
-                pArch = rit->second;
-                DataStreamPtr stream = pArch->open(resourceName);
-                if (mLoadingListener)
-                    mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, stream);
-                return stream;
-            }
-            else
-            {
-                // Search the hard way
-                LocationList::iterator li, liend;
-                liend = grp->locationList.end();
-                for (li = grp->locationList.begin(); li != liend; ++li)
-                {
-                    Archive* arch = (*li)->archive;
-                    if (arch->exists(resourceName))
-                    {
-                        DataStreamPtr ptr = arch->open(resourceName);
-                        if (mLoadingListener)
-                            mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, ptr);
-                        return ptr;
-                    }
-                }
-            }
-        }
 
-        
-        // Not found
-        if (searchGroupsIfNotFound)
-        {
-            ResourceGroup* foundGrp = findGroupContainingResourceImpl(resourceName); 
-            if (foundGrp)
-            {
-                if (resourceBeingLoaded)
-                {
-                    resourceBeingLoaded->changeGroupOwnership(foundGrp->name);
-                }
-                return openResource(resourceName, foundGrp->name, false);
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, 
-                    "Cannot locate resource " + resourceName + 
-                    " in resource group " + groupName + " or any other group.", 
-                    "ResourceGroupManager::openResource");
-            }
-        }
         OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "Cannot locate resource " + 
             resourceName + " in resource group " + groupName + ".", 
             "ResourceGroupManager::openResource");
@@ -1650,7 +1604,7 @@ namespace Ogre {
         return resourceExists(grp, resourceName);
     }
     //-----------------------------------------------------------------------
-    bool ResourceGroupManager::resourceExists(ResourceGroup* grp, const String& resourceName) const
+    Archive* ResourceGroupManager::resourceExists(ResourceGroup* grp, const String& resourceName) const
     {
 
             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
@@ -1660,36 +1614,32 @@ namespace Ogre {
         if (rit != grp->resourceIndexCaseSensitive.end())
         {
             // Found in the index
-            return true;
+            return rit->second;
         }
-        else 
+
+        // try case insensitive
+        String lcResourceName = resourceName;
+        StringUtil::toLowerCase(lcResourceName);
+        rit = grp->resourceIndexCaseInsensitive.find(lcResourceName);
+        if (rit != grp->resourceIndexCaseInsensitive.end())
         {
-            // try case insensitive
-            String lcResourceName = resourceName;
-            StringUtil::toLowerCase(lcResourceName);
-            rit = grp->resourceIndexCaseInsensitive.find(lcResourceName);
-            if (rit != grp->resourceIndexCaseInsensitive.end())
+            // Found in the index
+            return rit->second;
+        }
+
+        // Search the hard way
+        LocationList::iterator li, liend;
+        liend = grp->locationList.end();
+        for (li = grp->locationList.begin(); li != liend; ++li)
+        {
+            Archive* arch = (*li)->archive;
+            if (arch->exists(resourceName))
             {
-                // Found in the index
-                return true;
-            }
-            else
-            {
-                // Search the hard way
-                LocationList::iterator li, liend;
-                liend = grp->locationList.end();
-                for (li = grp->locationList.begin(); li != liend; ++li)
-                {
-                    Archive* arch = (*li)->archive;
-                    if (arch->exists(resourceName))
-                    {
-                        return true;
-                    }
-                }
+                return arch;
             }
         }
 
-        return false;
+        return NULL;
 
     }
     //-----------------------------------------------------------------------
@@ -1712,47 +1662,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     time_t ResourceGroupManager::resourceModifiedTime(ResourceGroup* grp, const String& resourceName) const
     {
-            OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-
-        // Try indexes first
-        ResourceLocationIndex::iterator rit = grp->resourceIndexCaseSensitive.find(resourceName);
-        if (rit != grp->resourceIndexCaseSensitive.end())
+        Archive* arch = resourceExists(grp, resourceName);
+        if (arch)
         {
-            return rit->second->getModifiedTime(resourceName);
-        }
-        else 
-        {
-            // try case insensitive
-            String lcResourceName = resourceName;
-            StringUtil::toLowerCase(lcResourceName);
-            rit = grp->resourceIndexCaseInsensitive.find(lcResourceName);
-            if (rit != grp->resourceIndexCaseInsensitive.end())
-            {
-                return rit->second->getModifiedTime(resourceName);
-            }
-            else
-            {
-                // Search the hard way
-                LocationList::iterator li, liend;
-                liend = grp->locationList.end();
-                for (li = grp->locationList.begin(); li != liend; ++li)
-                {
-                    Archive* arch = (*li)->archive;
-                    time_t testTime = arch->getModifiedTime(resourceName);
-
-                    if (testTime > 0)
-                    {
-                        return testTime;
-                    }
-                }
-            }
+            return arch->getModifiedTime(resourceName);
         }
 
         return 0;
     }
     //-----------------------------------------------------------------------
-    ResourceGroupManager::ResourceGroup* 
-    ResourceGroupManager::findGroupContainingResourceImpl(const String& filename) const
+    std::pair<Archive*, ResourceGroupManager::ResourceGroup*>
+    ResourceGroupManager::resourceExistsInAnyGroupImpl(const String& filename) const
     {
             OGRE_LOCK_AUTO_MUTEX;
 
@@ -1760,37 +1680,31 @@ namespace Ogre {
         for (ResourceGroupMap::const_iterator i = mResourceGroupMap.begin();
             i != mResourceGroupMap.end(); ++i)
         {
-            ResourceGroup* grp = i->second;
-
-                OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-                
-            if (resourceExists(grp, filename))
-                return grp;
+            Archive* arch = resourceExists(i->second, filename);
+            if (arch)
+                return std::make_pair(arch, i->second);
         }
         // Not found
-        return 0;
+        return std::pair<Archive*, ResourceGroup*>();
     }
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::resourceExistsInAnyGroup(const String& filename) const
     {
-        ResourceGroup* grp = findGroupContainingResourceImpl(filename);
-        if (!grp)
-            return false;
-        return true;
+        return resourceExistsInAnyGroupImpl(filename).first;
     }
     //-----------------------------------------------------------------------
     const String& ResourceGroupManager::findGroupContainingResource(const String& filename) const
     {
-        ResourceGroup* grp = findGroupContainingResourceImpl(filename);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "Unable to derive resource group for " + 
-                filename + " automatically since the resource was not "
-                "found.", 
-                "ResourceGroupManager::findGroupContainingResource");
-        }
-        return grp->name;
+        ResourceGroup* grp = resourceExistsInAnyGroupImpl(filename).second;
+
+        if(grp)
+            return grp->name;
+
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+            "Unable to derive resource group for " +
+            filename + " automatically since the resource was not "
+            "found.",
+            "ResourceGroupManager::findGroupContainingResource");
     }
     //-----------------------------------------------------------------------
     StringVectorPtr ResourceGroupManager::listResourceLocations(const String& groupName) const
