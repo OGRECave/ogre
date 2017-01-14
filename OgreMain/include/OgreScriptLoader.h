@@ -59,7 +59,7 @@ namespace Ogre {
     class _OgreExport ScriptLoader
     {
     public:
-        virtual ~ScriptLoader();
+        virtual ~ScriptLoader() {}
         /** Gets the file patterns which should be used to find scripts for this
             class.
         @remarks
