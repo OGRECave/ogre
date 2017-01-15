@@ -32,23 +32,10 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGLUniformCache.h"
+#include "OgreGLSLProgramCommon.h"
 
 namespace Ogre {
     namespace GLSL {
-
-    /// Structure used to keep track of named uniforms in the linked program object
-    struct GLUniformReference
-    {
-        /// GL location handle
-        GLint  mLocation;
-        /// Which type of program params will this value come from?
-        GpuProgramType mSourceProgType;
-        /// The constant definition it relates to
-        const GpuConstantDefinition* mConstantDef;
-    };
-
-    typedef vector<GLUniformReference>::type GLUniformReferenceList;
-    typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 
     /** C++ encapsulation of GLSL Program Object
 

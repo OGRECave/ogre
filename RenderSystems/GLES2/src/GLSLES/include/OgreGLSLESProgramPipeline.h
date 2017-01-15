@@ -96,8 +96,6 @@ namespace Ogre
         virtual void compileAndLink(void);
         /// Put a program pipeline in use
         virtual void _useProgram(void);
-        /// Finds layout qualifiers in the shader source and sets attribute indices appropriately
-        virtual void extractLayoutQualifiers(void);
         /// Build uniform references from active named uniforms
         virtual void buildGLUniformReferences(void);
     };

@@ -62,17 +62,17 @@ namespace Ogre
         OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramPipelineHandle));
 
         // Compile and attach Vertex Program
-        if(mVertexProgram)
+        if(getVertexProgram())
         {
-            if(mVertexProgram->isLinked())
+            if(getVertexProgram()->isLinked())
             {
                 mLinked |= VERTEX_PROGRAM_LINKED;
             }
             else if(getMicrocodeFromCache(
-                    mVertexProgram->getName(),
-                    mVertexProgram->getGLSLProgram()->createGLProgramHandle()))
+                    getVertexProgram()->getName(),
+                    getVertexProgram()->getGLSLProgram()->createGLProgramHandle()))
             {
-                mVertexProgram->setLinked(true);
+                getVertexProgram()->setLinked(true);
                 mLinked |= VERTEX_PROGRAM_LINKED;
                 mTriedToLinkAndFailed = false;
             }
@@ -80,7 +80,7 @@ namespace Ogre
             {
                 try
                 {
-                    mVertexProgram->getGLSLProgram()->compile(true);
+                    getVertexProgram()->getGLSLProgram()->compile(true);
                 }
                 catch (Exception& e)
                 {
@@ -88,15 +88,15 @@ namespace Ogre
                     mTriedToLinkAndFailed = true;
                     return;
                 }
-                GLuint programHandle = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
+                GLuint programHandle = getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
                 OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-                mVertexProgram->getGLSLProgram()->attachToProgramObject(programHandle);
+                getVertexProgram()->getGLSLProgram()->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
                 
                 if(linkStatus)
                 {
-                    mVertexProgram->setLinked(linkStatus);
+                    getVertexProgram()->setLinked(linkStatus);
                     mLinked |= VERTEX_PROGRAM_LINKED;
                 }
                 
@@ -104,7 +104,7 @@ namespace Ogre
                 
                 GLSLES::logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
 
-                setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
+                setSkeletalAnimationIncluded(getVertexProgram()->isSkeletalAnimationIncluded());
             }
         }
         
@@ -156,10 +156,10 @@ namespace Ogre
         
         if(mLinked)
         {
-            if(mVertexProgram && mVertexProgram->isLinked())
+            if(getVertexProgram() && getVertexProgram()->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT_EXT, mVertexProgram->getGLSLProgram()->getGLProgramHandle()));
-                _writeToCache(mVertexProgram->getName(), mVertexProgram->getGLSLProgram()->getGLProgramHandle());
+                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT_EXT, getVertexProgram()->getGLSLProgram()->getGLProgramHandle()));
+                _writeToCache(getVertexProgram()->getName(), getVertexProgram()->getGLSLProgram()->getGLProgramHandle());
             }
             if(mFragmentProgram && mFragmentProgram->isLinked())
             {
@@ -169,11 +169,11 @@ namespace Ogre
 
             // Validate pipeline
             GLSLES::logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
-            if(mVertexProgram && mFragmentProgram && getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+            if(getVertexProgram() && mFragmentProgram && getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
             {
                 OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
                     glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
-                                 (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
+                                 (getVertexProgram()->getName() + "/" + mFragmentProgram->getName()).c_str());
             }
         }
 #endif
@@ -195,7 +195,7 @@ namespace Ogre
         GLint res = mCustomAttributesIndexes[semantic-1][index];
         if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
         {
-            GLuint handle = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
+            GLuint handle = getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
             const char * attString = getAttributeSemanticString(semantic);
             GLint attrib;
             OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attString));
@@ -265,10 +265,10 @@ namespace Ogre
         {
             const GpuConstantDefinitionMap* vertParams = 0;
             const GpuConstantDefinitionMap* fragParams = 0;
-            if (mVertexProgram)
+            if (getVertexProgram())
             {
-                vertParams = &(mVertexProgram->getGLSLProgram()->getConstantDefinitions().map);
-                GLSLESProgramPipelineManager::getSingleton().extractUniforms(mVertexProgram->getGLSLProgram()->getGLProgramHandle(),
+                vertParams = &(getVertexProgram()->getGLSLProgram()->getConstantDefinitions().map);
+                GLSLESProgramPipelineManager::getSingleton().extractUniforms(getVertexProgram()->getGLSLProgram()->getGLProgramHandle(),
                     vertParams, NULL, mGLUniformReferences, mGLUniformBufferReferences);
             }
             if (mFragmentProgram)
@@ -293,7 +293,7 @@ namespace Ogre
         GLuint progID = 0;
         if(fromProgType == GPT_VERTEX_PROGRAM)
         {
-            progID = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
+            progID = getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
         }
         else if(fromProgType == GPT_FRAGMENT_PROGRAM)
         {
@@ -509,7 +509,7 @@ namespace Ogre
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 
                     GLuint progID = 0;
-                    if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
+                    if (getVertexProgram() && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
                         if(!mUniformCache->updateUniform(currentUniform->mLocation,
                                                                              params->getFloatPointer(index),
@@ -518,7 +518,7 @@ namespace Ogre
                                                                              sizeof(float))))
                             return;
                         
-                        progID = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
+                        progID = getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     }
                     
@@ -537,77 +537,6 @@ namespace Ogre
                     // There will only be one multipass entry
                     return;
                 }
-            }
-        }
-    }
-    //-----------------------------------------------------------------------
-    void GLSLESProgramPipeline::extractLayoutQualifiers(void)
-    {
-        // Format is:
-        //      layout(location = 0) attribute vec4 vertex;
-
-        if(mVertexProgram)
-        {
-            String shaderSource = mVertexProgram->getGLSLProgram()->getSource();
-            String::size_type currPos = shaderSource.find("layout");
-            while (currPos != String::npos)
-            {
-                VertexElementSemantic semantic;
-                GLint index = 0;
-                
-                String::size_type endPos = shaderSource.find(";", currPos);
-                if (endPos == String::npos)
-                {
-                    // Problem, missing semicolon, abort
-                    break;
-                }
-                
-                String line = shaderSource.substr(currPos, endPos - currPos);
-                
-                // Skip over 'layout'
-                currPos += 6;
-                
-                // Skip until '='
-                String::size_type eqPos = line.find("=");
-                String::size_type parenPos = line.find(")");
-                
-                // Skip past '=' up to a ')' which contains an integer(the position).  This could be a definition, does the preprocessor do replacement?
-                String attrLocation = line.substr(eqPos + 1, parenPos - eqPos - 1);
-                StringUtil::trim(attrLocation);
-                GLint attrib = StringConverter::parseInt(attrLocation);
-                
-                // The rest of the line is a standard attribute definition.
-                // Erase up to it then split the remainder by spaces.
-                line.erase (0, parenPos + 1);
-                StringUtil::trim(line);
-                StringVector parts = StringUtil::split(line, " ");
-                
-                if(parts.size() < 3)
-                {
-                    // This is a malformed attribute
-                    // It should contain 3 parts, i.e. "attribute vec4 vertex"
-                    break;
-                }
-                
-                String attrName = parts[2];
-                
-                // Special case for attribute named position
-                if(attrName == "position")
-                    semantic = getAttributeSemanticEnum("vertex");
-                else
-                    semantic = getAttributeSemanticEnum(attrName);
-                
-                // Find the texture unit index
-                String::size_type uvPos = attrName.find("uv");
-                if(uvPos != String::npos)
-                {
-                    String uvIndex = attrName.substr(uvPos + 2, attrName.length() - 2);
-                    index = StringConverter::parseInt(uvIndex);
-                }
-                
-                mCustomAttributesIndexes[semantic-1][index] = attrib;
-                
-                currPos = shaderSource.find("layout", currPos);
             }
         }
     }

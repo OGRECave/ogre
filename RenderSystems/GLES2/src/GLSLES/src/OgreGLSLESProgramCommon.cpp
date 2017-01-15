@@ -38,39 +38,9 @@ namespace Ogre {
     
     //-----------------------------------------------------------------------
     GLSLESProgramCommon::GLSLESProgramCommon(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
-    : mVertexProgram(vertexProgram)
+    : GLSLProgramCommon(vertexProgram)
     , mFragmentProgram(fragmentProgram)
-    , mUniformRefsBuilt(false)
-    , mGLProgramHandle(0)
-    , mLinked(false)
-    , mTriedToLinkAndFailed(false)
     {
-        // init mCustomAttributesIndexes
-        for(size_t i = 0 ; i < VES_COUNT; i++)
-            for(size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
-            {
-                mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
-            }
-
-        // Initialize the attribute to semantic map
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("vertex", VES_POSITION));
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("blendWeights", VES_BLEND_WEIGHTS));
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("normal", VES_NORMAL));
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("colour", VES_DIFFUSE));
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("secondary_colour", VES_SPECULAR));
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("blendIndices", VES_BLEND_INDICES));
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("tangent", VES_TANGENT));
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("binormal", VES_BINORMAL));
-        mSemanticTypeMap.insert(SemanticToStringMap::value_type("uv", VES_TEXTURE_COORDINATES));
-
-        if ((!mVertexProgram || !mFragmentProgram) && 
-            !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Attempted to create a shader program without both a vertex and fragment program.",
-                        "GLSLESProgramCommon::GLSLESProgramCommon");
-        }
-
         // Initialise uniform cache
         mUniformCache = new GLES2UniformCache();
     }
@@ -88,10 +58,10 @@ namespace Ogre {
     Ogre::String GLSLESProgramCommon::getCombinedName()
     {
         String name;
-        if (mVertexProgram)
+        if (getVertexProgram())
         {
             name += "Vertex Program:" ;
-            name += mVertexProgram->getName();
+            name += getVertexProgram()->getName();
         }
         if (mFragmentProgram)
         {
@@ -101,34 +71,6 @@ namespace Ogre {
         name += "\n";
 
         return name;
-    }
-
-    //-----------------------------------------------------------------------
-    VertexElementSemantic GLSLESProgramCommon::getAttributeSemanticEnum(String type)
-    {
-        VertexElementSemantic semantic = mSemanticTypeMap[type];
-        if(semantic > 0)
-        {
-            return semantic;
-        }
-        else
-        {
-            assert(false && "Missing attribute!");
-            return (VertexElementSemantic)0;
-        }
-    }
-    
-    //-----------------------------------------------------------------------
-    const char * GLSLESProgramCommon::getAttributeSemanticString(VertexElementSemantic semantic)
-    {
-        for (SemanticToStringMap::iterator i = mSemanticTypeMap.begin(); i != mSemanticTypeMap.end(); ++i)
-        {
-            if((*i).second == semantic)
-                return (*i).first.c_str();
-        }
-
-        assert(false && "Missing attribute!");
-        return 0;
     }
     
     //-----------------------------------------------------------------------
@@ -159,11 +101,6 @@ namespace Ogre {
             res = attrib;
         }
         return res;
-    }
-    //-----------------------------------------------------------------------
-    bool GLSLESProgramCommon::isAttributeValid(VertexElementSemantic semantic, uint index)
-    {
-        return getAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
     }
     //-----------------------------------------------------------------------
     bool GLSLESProgramCommon::getMicrocodeFromCache(const String& name, GLuint programHandle)

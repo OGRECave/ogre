@@ -45,7 +45,7 @@ namespace Ogre {
     GLSLESLinkProgram::GLSLESLinkProgram(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
     : GLSLESProgramCommon(vertexProgram, fragmentProgram)
     {
-        if ((!mVertexProgram || !mFragmentProgram))
+        if ((!getVertexProgram() || !mFragmentProgram))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Attempted to create a shader program without both a vertex and fragment program.",
@@ -143,7 +143,7 @@ namespace Ogre {
         // Compile and attach Vertex Program
         try
         {
-            mVertexProgram->getGLSLProgram()->compile(true);
+            getVertexProgram()->getGLSLProgram()->compile(true);
         }
         catch (Exception& e)
         {
@@ -152,8 +152,8 @@ namespace Ogre {
             return;
         }
 
-        mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
-        setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
+        getVertexProgram()->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+        setSkeletalAnimationIncluded(getVertexProgram()->isSkeletalAnimationIncluded());
         
         // Compile and attach Fragment Program
         try
@@ -209,9 +209,9 @@ namespace Ogre {
         {
             const GpuConstantDefinitionMap* vertParams = 0;
             const GpuConstantDefinitionMap* fragParams = 0;
-            if (mVertexProgram)
+            if (getVertexProgram())
             {
-                vertParams = &(mVertexProgram->getGLSLProgram()->getConstantDefinitions().map);
+                vertParams = &(getVertexProgram()->getGLSLProgram()->getConstantDefinitions().map);
             }
             if (mFragmentProgram)
             {
