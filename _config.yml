@@ -3,6 +3,7 @@ description: official github mirror
 google_analytics: 
 show_downloads: true
 theme: jekyll-theme-dinky
+include: ["_ogre_*"]
 
 gems:
   - jekyll-mentions
