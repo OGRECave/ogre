@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __GLSLESProgram_H__
 
 #include "OgreGLES2Prerequisites.h"
-#include "OgreGLSLProgramCommon.h"
+#include "OgreGLSLShaderCommon.h"
 #include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
@@ -47,7 +47,7 @@ namespace Ogre {
         not create a program object.  It's up to GLES2GpuProgram class to request a program object
         to link the shader object to.
     */
-    class _OgreGLES2Export GLSLESProgram : public GLSLProgramCommon MANAGED_RESOURCE
+    class _OgreGLES2Export GLSLESProgram : public GLSLShaderCommon MANAGED_RESOURCE
     {
     public:
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER

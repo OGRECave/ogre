@@ -112,15 +112,15 @@ namespace Ogre {
 
         if (mActiveVertexGpuProgram)
         {
-            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getProgramID()) << 32;
+            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getShaderID()) << 32;
         }
         if (mActiveGeometryGpuProgram)
         {
-            activeKey += static_cast<uint64>(mActiveGeometryGpuProgram->getProgramID()) << 16;
+            activeKey += static_cast<uint64>(mActiveGeometryGpuProgram->getShaderID()) << 16;
         }
         if (mActiveFragmentGpuProgram)
         {
-            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getProgramID());
+            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getShaderID());
         }
 
         // only return a link program object if a vertex, geometry or fragment program exist
@@ -149,7 +149,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLLinkProgramManager::setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram)
+    void GLSLLinkProgramManager::setActiveFragmentShader(GLSLProgram* fragmentGpuProgram)
     {
         if (fragmentGpuProgram != mActiveFragmentGpuProgram)
         {
@@ -162,7 +162,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLLinkProgramManager::setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram)
+    void GLSLLinkProgramManager::setActiveVertexShader(GLSLProgram* vertexGpuProgram)
     {
         if (vertexGpuProgram != mActiveVertexGpuProgram)
         {
@@ -174,7 +174,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLLinkProgramManager::setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram)
+    void GLSLLinkProgramManager::setActiveGeometryShader(GLSLProgram* geometryGpuProgram)
     {
         if (geometryGpuProgram != mActiveGeometryGpuProgram)
         {

@@ -57,13 +57,13 @@
 #  endif /* _WIN32 */
 #  define GLEW_CONTEXT_ARG_DEF_LIST GLEWContext* ctx
 #else /* GLEW_MX */
-#  define GLEW_CONTEXT_ARG_DEF_INIT void* ctx
-#  define GLEW_CONTEXT_ARG_VAR_INIT NULL
-#  define GLEW_CONTEXT_ARG_DEF_LIST void* ctx
-#  define WGLEW_CONTEXT_ARG_DEF_INIT void* ctx
-#  define WGLEW_CONTEXT_ARG_DEF_LIST void* ctx
-#  define GLXEW_CONTEXT_ARG_DEF_INIT void* ctx
-#  define GLXEW_CONTEXT_ARG_DEF_LIST void* ctx
+#  define GLEW_CONTEXT_ARG_DEF_INIT void
+#  define GLEW_CONTEXT_ARG_VAR_INIT
+#  define GLEW_CONTEXT_ARG_DEF_LIST void
+#  define WGLEW_CONTEXT_ARG_DEF_INIT void
+#  define WGLEW_CONTEXT_ARG_DEF_LIST void
+#  define GLXEW_CONTEXT_ARG_DEF_INIT void
+#  define GLXEW_CONTEXT_ARG_DEF_LIST void
 #endif /* GLEW_MX */
 
 #if defined(__sgi) || defined (__sun) || defined(GLEW_APPLE_GLX)
@@ -142,7 +142,7 @@ void* NSGLGetProcAddress (const GLubyte *name)
   symbolName[0] = '_';
   symbol = NULL;
   /* if (NSIsSymbolNameDefined(symbolName))
-     symbol = NSLookupAndBindSymbol(symbolName); */
+	 symbol = NSLookupAndBindSymbol(symbolName); */
   symbol = image ? NSLookupSymbolInImage(image, symbolName, NSLOOKUPSYMBOLINIMAGE_OPTION_BIND | NSLOOKUPSYMBOLINIMAGE_OPTION_RETURN_ON_ERROR) : NULL;
   free(symbolName);
   if( symbol ) return NSAddressOfSymbol(symbol);
@@ -8463,11 +8463,9 @@ GLboolean GLEWAPIENTRY glewGetExtension (const char* name)
 
 /* ------------------------------------------------------------------------- */
 
-// SJS
-//#ifndef GLEW_MX
-//static
-//#endif
-// SJS
+#ifndef GLEW_MX
+static
+#endif
 GLenum GLEWAPIENTRY glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
 {
   const GLubyte* s;
@@ -11225,14 +11223,7 @@ static GLboolean _glewInit_GLX_VERSION_1_2 (GLXEW_CONTEXT_ARG_DEF_INIT)
 {
   GLboolean r = GL_FALSE;
 
-    // SJS
-    // FB: Patched to allow Ogre to overload glXGetCurrentDisplay
-    if (glXGetCurrentDisplay == NULL)
-    {
-        r = ((glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)glewGetProcAddress((const GLubyte*)"glXGetCurrentDisplay")) == NULL) || r;
-    }
-    //r = ((glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)glewGetProcAddress((const GLubyte*)"glXGetCurrentDisplay")) == NULL) || r;
-    // SJS
+  r = ((glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)glewGetProcAddress((const GLubyte*)"glXGetCurrentDisplay")) == NULL) || r;
 
   return r;
 }
@@ -12113,21 +12104,25 @@ GLboolean glewExperimental = GL_FALSE;
 
 #if !defined(GLEW_MX)
 
-// SJS
-//GLenum GLEWAPIENTRY glewInit (void)
-//{
-//  GLenum r;
-//  r = glewContextInit();
-//  if ( r != 0 ) return r;
-//#if defined(_WIN32)
-//  return wglewContextInit();
-//#elif !defined(__ANDROID__) && (!defined(__APPLE__) || defined(GLEW_APPLE_GLX)) /* _UNIX */
-//  return glxewContextInit();
-//#else
-//  return r;
-//#endif /* _WIN32 */
-//}
-// End SJS
+#if defined(_WIN32)
+extern GLenum GLEWAPIENTRY wglewContextInit (void);
+#elif !defined(__ANDROID__) && (!defined(__APPLE__) || defined(GLEW_APPLE_GLX))
+extern GLenum GLEWAPIENTRY glxewContextInit (void);
+#endif /* _WIN32 */
+
+GLenum GLEWAPIENTRY glewInit (void)
+{
+  GLenum r;
+  r = glewContextInit();
+  if ( r != 0 ) return r;
+#if defined(_WIN32)
+  return wglewContextInit();
+#elif !defined(__ANDROID__) && (!defined(__APPLE__) || defined(GLEW_APPLE_GLX)) /* _UNIX */
+  return glxewContextInit();
+#else
+  return r;
+#endif /* _WIN32 */
+}
 
 #endif /* !GLEW_MX */
 #ifdef GLEW_MX

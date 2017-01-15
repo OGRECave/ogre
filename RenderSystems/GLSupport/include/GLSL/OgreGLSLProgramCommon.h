@@ -25,181 +25,124 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __GLSLProgramCommon_H__
-#define __GLSLProgramCommon_H__
+
+#ifndef RENDERSYSTEMS_GLSUPPORT_INCLUDE_GLSL_OGREGLSLPROGRAMCOMMON_H_
+#define RENDERSYSTEMS_GLSUPPORT_INCLUDE_GLSL_OGREGLSLPROGRAMCOMMON_H_
 
 #include "OgreGLSupportPrerequisites.h"
-#include "OgreHighLevelGpuProgram.h"
-#include "OgreRenderOperation.h"
+#include "OgreConfig.h"
+#include "OgreHardwareVertexBuffer.h"
+#include "OgreGLSLShaderCommon.h"
+#include "OgreHardwareUniformBuffer.h"
 
-namespace Ogre {
-    /** Specialisation of HighLevelGpuProgram to provide support for OpenGL
-        Shader Language (GLSL).
-    @remarks
-        GLSL has no target assembler or entry point specification like DirectX 9 HLSL.
-        Vertex and Fragment shaders only have one entry point called "main".  
-        When a shader is compiled, microcode is generated but can not be accessed by
-        the application.
-        GLSL also does not provide assembler low level output after compiling.  The GL Render
-        system assumes that the Gpu program is a GL Gpu program so GLSLProgram will create a 
-        GLSLGpuProgram that is subclassed from GLGpuProgram for the low level implementation.
-        The GLSLProgram class will create a shader object and compile the source but will
-        not create a program object.  It's up to GLSLGpuProgram class to request a program object
-        to link the shader object to.
+namespace Ogre
+{
+/// Structure used to keep track of named uniforms in the linked program object
+struct GLUniformReference
+{
+    /// GL location handle
+    int mLocation;
+    /// Which type of program params will this value come from?
+    GpuProgramType mSourceProgType;
+    /// The constant definition it relates to
+    const GpuConstantDefinition* mConstantDef;
+};
+typedef vector<GLUniformReference>::type GLUniformReferenceList;
+typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 
-    @note
-        GLSL supports multiple modular shader objects that can be attached to one program
-        object to form a single shader.  This is supported through the "attach" material script
-        command.  All the modules to be attached are listed on the same line as the attach command
-        separated by white space.
-        
+typedef vector<HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
+typedef GLUniformBufferList::iterator GLUniformBufferIterator;
+
+class GLSLProgramCommon
+{
+public:
+    GLSLProgramCommon(GLSLShaderCommon* vertexShader);
+    virtual ~GLSLProgramCommon() {}
+
+    void extractLayoutQualifiers(void);
+
+    /** Sets whether the linked program includes the required instructions
+        to perform skeletal animation.
+        @remarks
+        If this is set to true, OGRE will not blend the geometry according to
+        skeletal animation, it will expect the vertex program to do it.
     */
-    class GLSLProgramCommon : public HighLevelGpuProgram
-    {
-    public:
-        /// Command object for attaching another GLSL Program 
-        class CmdAttach : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& shaderNames);
-        };
-        /// Command object for setting matrix packing in column-major order
-        class CmdColumnMajorMatrices : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
+    void setSkeletalAnimationIncluded(bool included) { mSkeletalAnimation = included; }
 
-        GLSLProgramCommon(ResourceManager* creator,
-            const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader);
+    /** Returns whether the linked program includes the required instructions
+        to perform skeletal animation.
+        @remarks
+         If this returns true, OGRE will not blend the geometry according to
+         skeletal animation, it will expect the vertex program to do it.
+                                                                         */
+    bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
-        virtual bool compile( bool checkErrors = false) = 0;
-        virtual void attachToProgramObject(const uint programObject) = 0;
-        virtual void detachFromProgramObject(const uint programObject) = 0;
+    /// Is a non-standard attribute bound in the linked code?
+    bool isAttributeValid(VertexElementSemantic semantic, uint index) {
+        return getAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
+    }
 
-        String getAttachedShaderNames() const { return mAttachedShaderNames; }
+    /// Get the GL Handle for the program object
+    uint getGLProgramHandle(void) const { return mGLProgramHandle; }
 
-        /// Overridden
-        bool getPassTransformStates(void) const {
-            return true;
-        }
-        bool getPassSurfaceAndLightStates(void) const {
-            return true;
-        }
-        bool getPassFogStates(void) const {
-            return true;
-        }
+    /// Get the index of a non-standard attribute bound in the linked code
+    virtual int getAttributeIndex(VertexElementSemantic semantic, uint index) = 0;
 
-        /** Attach another GLSL Shader to this one. */
-        void attachChildShader(const String& name);
+    /** Makes a program object active by making sure it is linked and then putting it in use.
+     */
+    virtual void activate(void) = 0;
 
-        /** Sets the preprocessor defines use to compile the program. */
-        void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
-        /** Sets the preprocessor defines use to compile the program. */
-        const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
+    /** Updates program object uniforms using data from GpuProgramParameters.
+        Normally called by GLSLShader::bindParameters() just before rendering occurs.
+    */
+    virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
 
-        /** Sets whether matrix packing in column-major order. */ 
-        void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }
-        /** Gets whether matrix packed in column-major order. */
-        bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
+    /** Updates program object uniform blocks using data from GpuProgramParameters.
+        Normally called by GLSLShader::bindParameters() just before rendering occurs.
+    */
+    virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
 
-        /** Returns the operation type that this geometry program expects to
-            receive as input
-        */
-        RenderOperation::OperationType getInputOperationType(void) const
-        { return mInputOperationType; }
-        /** Returns the operation type that this geometry program will emit
-        */
-        RenderOperation::OperationType getOutputOperationType(void) const
-        { return mOutputOperationType; }
-        /** Returns the maximum number of vertices that this geometry program can
-            output in a single run
-        */
-        int getMaxOutputVertices(void) const { return mMaxOutputVertices; }
+    /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
+        Normally called by GLSLShader::bindMultiPassParameters() just before multi pass rendering occurs.
+    */
+    virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
+protected:
+    /// Container of uniform references that are active in the program object
+    GLUniformReferenceList mGLUniformReferences;
+    /// Container of uniform buffer references that are active in the program object
+    GLUniformBufferList mGLUniformBufferReferences;
 
-        /** Sets the operation type that this geometry program expects to receive
-        */
-        void setInputOperationType(RenderOperation::OperationType operationType)
-        { mInputOperationType = operationType; }
-        /** Set the operation type that this geometry program will emit
-        */
-        void setOutputOperationType(RenderOperation::OperationType operationType)
-        { mOutputOperationType = operationType; }
-        /** Set the maximum number of vertices that a single run of this geometry program
-            can emit.
-        */
-        void setMaxOutputVertices(int maxOutputVertices)
-        { mMaxOutputVertices = maxOutputVertices; }
+    /// Linked vertex shader.
+    GLSLShaderCommon* mVertexShader;
 
-        /// Command object for setting macro defines
-        class CmdPreprocessorDefines : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting the input operation type (geometry shader only)
-        class CmdInputOperationType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting the output operation type (geometry shader only)
-        class CmdOutputOperationType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting the maximum output vertices (geometry shader only)
-        class CmdMaxOutputVertices : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-    protected:
-        static CmdPreprocessorDefines msCmdPreprocessorDefines;
-        static CmdAttach msCmdAttach;
-        static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
-        static CmdInputOperationType msInputOperationTypeCmd;
-        static CmdOutputOperationType msOutputOperationTypeCmd;
-        static CmdMaxOutputVertices msMaxOutputVerticesCmd;
+    /// Flag to indicate that uniform references have already been built
+    bool mUniformRefsBuilt;
+    /// GL handle for the program object
+    uint mGLProgramHandle;
+    /// Flag indicating that the program or pipeline object has been successfully linked
+    int mLinked;
+    /// Flag indicating that the program or pipeline object has tried to link and failed
+    bool mTriedToLinkAndFailed;
+    /// Flag indicating skeletal animation is being performed
+    bool mSkeletalAnimation;
+    /// A value to define the case we didn't look for the attributes since the contractor
+    static const int NULL_CUSTOM_ATTRIBUTES_INDEX = -2;
+    /// A value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)
+    static const int NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX = -1;
 
-        /** Internal load implementation, must be implemented by subclasses.
-        */
-        void loadFromSource(void);
+    /// An array to hold the attributes indexes
+    int mCustomAttributesIndexes[VES_COUNT][OGRE_MAX_TEXTURE_COORD_SETS];
 
-        /// Overridden from HighLevelGpuProgram
-        void unloadImpl(void);
+    /// Compiles and links the vertex and fragment programs
+    virtual void compileAndLink(void) = 0;
 
-        /// Populate the passed parameters with name->index map
-        void populateParameterNames(GpuProgramParametersSharedPtr params);
+    typedef map<String, VertexElementSemantic>::type SemanticToStringMap;
+    SemanticToStringMap mSemanticTypeMap;
 
-        /// Flag indicating if shader object successfully compiled
-        int mCompiled;
-        /// The input operation type for this (geometry) program
-        RenderOperation::OperationType mInputOperationType;
-        /// The output operation type for this (geometry) program
-        RenderOperation::OperationType mOutputOperationType;
-        /// The maximum amount of vertices that this (geometry) program can output
-        int mMaxOutputVertices;
-        /// Attached Shader names
-        String mAttachedShaderNames;
-        /// Preprocessor options
-        String mPreprocessorDefines;
-        /// Container of attached programs
-        typedef vector< GLSLProgramCommon* >::type GLSLProgramContainer;
-        typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
-        GLSLProgramContainer mAttachedGLSLPrograms;
-        /// Matrix in column major pack format?
-        bool mColumnMajorMatrices;
+    VertexElementSemantic getAttributeSemanticEnum(String type);
+    const char * getAttributeSemanticString(VertexElementSemantic semantic);
+};
 
-    };
-}
+} /* namespace Ogre */
 
-#endif // __GLSLProgramCommon_H__
+#endif /* RENDERSYSTEMS_GLSUPPORT_INCLUDE_GLSL_OGREGLSLPROGRAMCOMMON_H_ */

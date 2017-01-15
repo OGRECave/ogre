@@ -42,7 +42,6 @@ THE SOFTWARE.
 #include "OgreGLSLPreprocessor.h"
 
 namespace Ogre {
-
     //-----------------------------------------------------------------------
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
     GLSLESProgram::CmdOptimisation GLSLESProgram::msCmdOptimisation;
@@ -52,7 +51,7 @@ namespace Ogre {
     GLSLESProgram::GLSLESProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        : GLSLProgramCommon(creator, name, handle, group, isManual, loader)
+        : GLSLShaderCommon(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER

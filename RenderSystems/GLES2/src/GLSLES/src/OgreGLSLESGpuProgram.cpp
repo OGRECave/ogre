@@ -33,9 +33,6 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 
 namespace Ogre {
-
-    GLuint GLSLESGpuProgram::mVertexShaderCount = 0;
-    GLuint GLSLESGpuProgram::mFragmentShaderCount = 0;
     //-----------------------------------------------------------------------------
     GLSLESGpuProgram::GLSLESGpuProgram(GLSLESProgram* parent) : 
         GLES2GpuProgram(parent->getCreator(), parent->getName(), parent->getHandle(), 
@@ -43,17 +40,6 @@ namespace Ogre {
     {
         mType = parent->getType();
         mSyntaxCode = "glsles";
-
-        mLinked = 0;
-
-        if (parent->getType() == GPT_VERTEX_PROGRAM)
-        {
-            mProgramID = ++mVertexShaderCount;
-        }
-        else if (parent->getType() == GPT_FRAGMENT_PROGRAM)
-        {
-            mProgramID = ++mFragmentShaderCount;
-        }
 
         // Transfer skeletal animation status from parent
         mSkeletalAnimation = mGLSLProgram->isSkeletalAnimationIncluded();
@@ -64,7 +50,7 @@ namespace Ogre {
     GLSLESGpuProgram::~GLSLESGpuProgram()
     {
 		// This workaround is needed otherwise we carry on some dangling pointers
-		GLSLESLinkProgramManager::getSingletonPtr()->destroyAllByProgram(this);
+		GLSLESLinkProgramManager::getSingletonPtr()->destroyAllByProgram(mGLSLProgram);
 
         // Have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
@@ -97,10 +83,10 @@ namespace Ogre {
             switch (mType)
             {
                 case GPT_VERTEX_PROGRAM:
-                    GLSLESProgramPipelineManager::getSingleton().setActiveVertexLinkProgram( this );
+                    GLSLESProgramPipelineManager::getSingleton().setActiveVertexLinkProgram( mGLSLProgram );
                     break;
                 case GPT_FRAGMENT_PROGRAM:
-                    GLSLESProgramPipelineManager::getSingleton().setActiveFragmentLinkProgram( this );
+                    GLSLESProgramPipelineManager::getSingleton().setActiveFragmentLinkProgram( mGLSLProgram );
                     break;
                 case GPT_GEOMETRY_PROGRAM:
                 default:
@@ -113,10 +99,10 @@ namespace Ogre {
             switch (mType)
             {
                 case GPT_VERTEX_PROGRAM:
-                    GLSLESLinkProgramManager::getSingleton().setActiveVertexShader( this );
+                    GLSLESLinkProgramManager::getSingleton().setActiveVertexShader( mGLSLProgram );
                     break;
                 case GPT_FRAGMENT_PROGRAM:
-                    GLSLESLinkProgramManager::getSingleton().setActiveFragmentShader( this );
+                    GLSLESLinkProgramManager::getSingleton().setActiveFragmentShader( mGLSLProgram );
                     break;
                 case GPT_GEOMETRY_PROGRAM:
                 default:

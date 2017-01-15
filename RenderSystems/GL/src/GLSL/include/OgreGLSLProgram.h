@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __GLSLProgram_H__
 
 #include "OgreGLPrerequisites.h"
-#include "OgreGLSLProgramCommon.h"
+#include "OgreGLSLShaderCommon.h"
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
@@ -55,7 +55,7 @@ namespace Ogre {
         separated by white space.
         
     */
-    class _OgreGLExport GLSLProgram : public GLSLProgramCommon
+    class _OgreGLExport GLSLProgram : public GLSLShaderCommon
     {
     public:
         GLSLProgram(ResourceManager* creator, 

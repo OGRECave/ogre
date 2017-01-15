@@ -101,11 +101,6 @@
 #define __GLEXT_H_
 #define __gl_ATI_h_
 
-// SJS
-// Build statically
-#define GLEW_STATIC
-// SJS
-
 #if defined(_WIN32)
 
 /*

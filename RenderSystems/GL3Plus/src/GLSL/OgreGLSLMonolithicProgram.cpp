@@ -142,12 +142,12 @@ namespace Ogre {
         // Compile and attach Vertex Program
         if (mVertexShader)
         {
-            if (!mVertexShader->compile(true))
+            if (!getVertexShader()->compile(true))
             {
                 mTriedToLinkAndFailed = true;
                 return;
             }
-            mVertexShader->attachToProgramObject(mGLProgramHandle);
+            getVertexShader()->attachToProgramObject(mGLProgramHandle);
             setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
         }
 
@@ -300,7 +300,7 @@ namespace Ogre {
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getColumnMajorMatrices())) ||
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!getVertexShader()->getColumnMajorMatrices())) ||
             (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getColumnMajorMatrices())) ||
             (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getColumnMajorMatrices())) ||
             (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getColumnMajorMatrices())) ||

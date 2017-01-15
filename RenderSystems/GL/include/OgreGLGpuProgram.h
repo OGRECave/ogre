@@ -56,10 +56,6 @@ namespace Ogre {
         /// @copydoc Resource::calculateSize
         virtual size_t calculateSize(void) const;
 
-        /// Get the assigned GL program id
-        GLuint getProgramID(void) const
-        { return mProgramID; }
-
         /** Get the attribute index for a given semantic. 
         @remarks
             This can be used to identify the attribute index to bind non-builtin

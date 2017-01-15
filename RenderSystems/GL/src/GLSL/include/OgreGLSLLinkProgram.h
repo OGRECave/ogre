@@ -32,23 +32,10 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGLUniformCache.h"
+#include "OgreGLSLProgramCommon.h"
 
 namespace Ogre {
     namespace GLSL {
-
-    /// Structure used to keep track of named uniforms in the linked program object
-    struct GLUniformReference
-    {
-        /// GL location handle
-        GLint  mLocation;
-        /// Which type of program params will this value come from?
-        GpuProgramType mSourceProgType;
-        /// The constant definition it relates to
-        const GpuConstantDefinition* mConstantDef;
-    };
-
-    typedef vector<GLUniformReference>::type GLUniformReferenceList;
-    typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 
     /** C++ encapsulation of GLSL Program Object
 
@@ -61,11 +48,11 @@ namespace Ogre {
         GLUniformReferenceList mGLUniformReferences;
 
         /// Linked vertex program
-        GLSLGpuProgram* mVertexProgram;
+        GLSLProgram* mVertexProgram;
         /// Linked geometry program
-        GLSLGpuProgram* mGeometryProgram;
+        GLSLProgram* mGeometryProgram;
         /// Linked fragment program
-        GLSLGpuProgram* mFragmentProgram;
+        GLSLProgram* mFragmentProgram;
         GLUniformCache *mUniformCache;
 
         /// Flag to indicate that uniform references have already been built
@@ -106,7 +93,7 @@ namespace Ogre {
         void getMicrocodeFromCache();
     public:
         /// Constructor should only be used by GLSLLinkProgramManager
-        GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
+        GLSLLinkProgram(GLSLProgram* vertexProgram, GLSLProgram* geometryProgram, GLSLProgram* fragmentProgram);
         ~GLSLLinkProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.

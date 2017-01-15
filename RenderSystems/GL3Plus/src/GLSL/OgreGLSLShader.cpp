@@ -40,13 +40,11 @@
 #include "OgreGLUtil.h"
 
 namespace Ogre {
-    GLuint GLSLShader::mShaderCount = 0;
-
     GLSLShader::GLSLShader(
         ResourceManager* creator,
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        : GLSLProgramCommon(creator, name, handle, group, isManual, loader)
+        : GLSLShaderCommon(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
     {
@@ -88,13 +86,7 @@ namespace Ogre {
 
         mType = GPT_VERTEX_PROGRAM; // default value, to be corrected after the constructor with GpuProgram::setType()
         mSyntaxCode = "glsl" + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion());
-
-        mLinked = 0;
-        // Increase shader counter and use as ID
-        mShaderID = ++mShaderCount;        
         
-        // Transfer skeletal animation status from parent
-        mSkeletalAnimation = isSkeletalAnimationIncluded();
         // There is nothing to load
         mLoadFromFile = false;
     }
@@ -258,7 +250,7 @@ namespace Ogre {
         for (GLSLProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
              i != mAttachedGLSLPrograms.end(); ++i)
         {
-            GLSLProgramCommon* childShader = *i;
+            GLSLShaderCommon* childShader = *i;
 
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
@@ -281,7 +273,7 @@ namespace Ogre {
 
         for (; childProgramCurrent != childProgramEnd; ++childProgramCurrent)
         {
-            GLSLProgramCommon* childShader = *childProgramCurrent;
+            GLSLShaderCommon* childShader = *childProgramCurrent;
             childShader->compile(true);
             childShader->attachToProgramObject(programObject);
         }
@@ -299,7 +291,7 @@ namespace Ogre {
 
         while (childprogramcurrent != childprogramend)
         {
-            GLSLProgramCommon* childShader = *childprogramcurrent;
+            GLSLShaderCommon* childShader = *childprogramcurrent;
             childShader->detachFromProgramObject(programObject);
             ++childprogramcurrent;
         }

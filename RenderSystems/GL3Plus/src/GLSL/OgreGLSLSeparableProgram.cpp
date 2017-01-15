@@ -67,7 +67,7 @@ namespace Ogre
 
         mVertexArrayObject->bind();
 
-        loadIndividualProgram(mVertexShader);
+        loadIndividualProgram(getVertexShader());
         loadIndividualProgram(mDomainShader);
         loadIndividualProgram(mHullShader);
         loadIndividualProgram(mGeometryShader);
@@ -99,9 +99,9 @@ namespace Ogre
             //     // Add to the microcode to the cache
             //     GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
             // }
-            if (mVertexShader && mVertexShader->isLinked())
+            if (mVertexShader && getVertexShader()->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT, mVertexShader->getGLProgramHandle()));
+                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT, getVertexShader()->getGLProgramHandle()));
             }
             if (mDomainShader && mDomainShader->isLinked())
             {
@@ -257,7 +257,7 @@ namespace Ogre
         GLint res = mCustomAttributesIndexes[semantic-1][index];
         if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
         {
-            GLuint handle = mVertexShader->getGLProgramHandle();
+            GLuint handle = getVertexShader()->getGLProgramHandle();
             const char * attString = getAttributeSemanticString(semantic);
             GLint attrib;
             OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attString));
@@ -318,7 +318,7 @@ namespace Ogre
             if (mVertexShader)
             {
                 vertParams = &(mVertexShader->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mVertexShader->getGLProgramHandle(),
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(getVertexShader()->getGLProgramHandle(),
                                                                                        vertParams, NULL, NULL, NULL, NULL, NULL,
                                                                                        mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
@@ -372,7 +372,7 @@ namespace Ogre
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getColumnMajorMatrices())) ||
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!getVertexShader()->getColumnMajorMatrices())) ||
             (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getColumnMajorMatrices())) ||
             (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getColumnMajorMatrices())) ||
             (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getColumnMajorMatrices())) ||
@@ -385,7 +385,7 @@ namespace Ogre
         GLuint progID = 0;
         if (fromProgType == GPT_VERTEX_PROGRAM)
         {
-            progID = mVertexShader->getGLProgramHandle();
+            progID = getVertexShader()->getGLProgramHandle();
         }
         else if (fromProgType == GPT_FRAGMENT_PROGRAM)
         {
@@ -735,7 +735,7 @@ namespace Ogre
                     GLuint progID = 0;
                     if (mVertexShader && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
-                        progID = mVertexShader->getGLProgramHandle();
+                        progID = getVertexShader()->getGLProgramHandle();
                     }
 
                     if (mFragmentShader && currentUniform->mSourceProgType == GPT_FRAGMENT_PROGRAM)

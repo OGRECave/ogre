@@ -73,8 +73,8 @@ namespace Ogre
          The active program pipeline object will be cleared.
          Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
          */
-        void setActiveVertexLinkProgram(GLSLESGpuProgram* vertexGpuProgram);
-        void setActiveFragmentLinkProgram(GLSLESGpuProgram* fragmentGpuProgram);
+        void setActiveVertexLinkProgram(GLSLESProgram* vertexGpuProgram);
+        void setActiveFragmentLinkProgram(GLSLESProgram* fragmentGpuProgram);
 
         static GLSLESProgramPipelineManager& getSingleton(void);
         static GLSLESProgramPipelineManager* getSingletonPtr(void);

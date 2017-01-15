@@ -58,17 +58,12 @@ namespace Ogre {
         /// @copydoc Resource::calculateSize
         virtual size_t calculateSize(void) const;
 
-        /// Get the assigned GL program id
-        GLuint getProgramID(void) const
-        { return mProgramID; }
-
     protected:
         /** Overridden from GpuProgram, do nothing */
         void loadFromSource(void) {}
         /// @copydoc Resource::unloadImpl
         void unloadImpl(void) {}
 
-        GLuint mProgramID;
         GLenum mProgramType;
     };
 
