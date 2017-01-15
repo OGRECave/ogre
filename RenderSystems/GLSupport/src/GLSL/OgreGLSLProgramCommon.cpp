@@ -124,16 +124,18 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
         }
 
         String attrName = parts[2];
+        String::size_type uvPos = attrName.find("uv");
 
         // Special case for attribute named position.
         if (attrName == "position")
             semantic = getAttributeSemanticEnum("vertex");
+        else if(uvPos == 0)
+            semantic = getAttributeSemanticEnum("uv"); // treat "uvXY" as "uv"
         else
             semantic = getAttributeSemanticEnum(attrName);
 
         // Find the texture unit index.
-        String::size_type uvPos = attrName.find("uv");
-        if (uvPos != String::npos)
+        if (uvPos == 0)
         {
             String uvIndex = attrName.substr(uvPos + 2, attrName.length() - 2);
             index = StringConverter::parseInt(uvIndex);
