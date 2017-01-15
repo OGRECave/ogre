@@ -61,10 +61,6 @@ THE SOFTWARE.
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-extern "C" {
-GLenum GLEWAPIENTRY glewContextInit (void*);
-}
-
 namespace Ogre {
 
     // Callback function used when registering GLGpuPrograms
@@ -1196,7 +1192,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("***************************");
 
         // Get extension function pointers
-        glewContextInit(mGLSupport);
+        glewInit();
 
         mStateCacheManager->switchContext((intptr_t)mCurrentContext);
     }
