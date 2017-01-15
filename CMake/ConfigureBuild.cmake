@@ -75,7 +75,7 @@ if (OGRE_CONFIG_THREADS)
 
 endif()
 
-set(OGRE_ASSERT_MODE 0 CACHE STRING 
+set(OGRE_ASSERT_MODE 1 CACHE STRING 
 	"Enable Ogre asserts and exceptions. Possible values:
 	0 - Standard asserts in debug builds, nothing in release builds.
 	1 - Standard asserts in debug builds, exceptions in release builds.
