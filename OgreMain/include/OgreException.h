@@ -49,13 +49,25 @@ THE SOFTWARE.
 #   define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNCTION__ )
 // STANDARD mode
 #else
-#   define OgreAssert( a, b ) assert( (a) && (b) )
+/** Checks a condition at runtime and throws exception/ aborts if it fails.
+ *
+ * The macros OgreAssert (and OgreAssertDbg) evaluate the specified expression.
+ * If it is 0, OgreAssert raises an error (see Ogre::RuntimeAssertionException) in Release configuration
+ * and aborts in Debug configuration.
+ * The macro OgreAssert checks the condition in both Debug and Release configurations
+ * while OgreAssertDbg is only retained in the Debug configuration.
+ *
+ * To always abort instead of throwing an exception or disabling OgreAssert in Release configuration altogether,
+ * set OGRE_ASSERT_MODE in CMake accordingly.
+ */
+#   define OgreAssert( expr, mesg ) assert( (expr) && (mesg) )
 #endif
 
 #if OGRE_DEBUG_MODE
 #   define OgreAssertDbg( a, b ) OgreAssert( a, b )
 #else
-#   define OgreAssertDbg( a, b )
+/// replaced with OgreAssert(expr, mesg) in Debug configuration
+#   define OgreAssertDbg( expr, mesg )
 #endif
 
 namespace Ogre {
