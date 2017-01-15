@@ -37,7 +37,7 @@
 namespace Ogre {
     
     //-----------------------------------------------------------------------
-    GLSLESProgramCommon::GLSLESProgramCommon(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
+    GLSLESProgramCommon::GLSLESProgramCommon(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram)
     : GLSLProgramCommon(vertexProgram)
     , mFragmentProgram(fragmentProgram)
     {

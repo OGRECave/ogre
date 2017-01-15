@@ -81,7 +81,7 @@ namespace Ogre {
 		/**
 			Get the linker program by a gpu program
 		*/
-		GLSLESLinkProgram* getByProgram(GLSLESGpuProgram* gpuProgram);
+		GLSLESLinkProgram* getByProgram(GLSLESProgram* gpuProgram);
 
 		/**
 			Destroy and remove the linker program from the local cache
@@ -91,18 +91,18 @@ namespace Ogre {
 		/**
 			Destroy all linker programs which referencing this gpu program
 		*/
-		void destroyAllByProgram(GLSLESGpuProgram* gpuProgram);
+		void destroyAllByProgram(GLSLESProgram* gpuProgram);
 
         /** Set the active fragment shader for the next rendering state.
             The active program object will be cleared.
             Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
         */
-        void setActiveFragmentShader(GLSLESGpuProgram* fragmentGpuProgram);
+        void setActiveFragmentShader(GLSLESProgram* fragmentGpuProgram);
         /** Set the active vertex shader for the next rendering state.
             The active program object will be cleared.
             Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
         */
-        void setActiveVertexShader(GLSLESGpuProgram* vertexGpuProgram);
+        void setActiveVertexShader(GLSLESProgram* vertexGpuProgram);
 
         static GLSLESLinkProgramManager& getSingleton(void);
         static GLSLESLinkProgramManager* getSingletonPtr(void);

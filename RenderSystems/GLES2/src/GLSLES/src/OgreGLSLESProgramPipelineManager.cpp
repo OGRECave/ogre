@@ -61,7 +61,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    void GLSLESProgramPipelineManager::setActiveFragmentLinkProgram(GLSLESGpuProgram* fragmentGpuProgram)
+    void GLSLESProgramPipelineManager::setActiveFragmentLinkProgram(GLSLESProgram* fragmentGpuProgram)
     {
         if (fragmentGpuProgram != mActiveFragmentGpuProgram)
         {
@@ -72,7 +72,7 @@ namespace Ogre
     }
     
     //-----------------------------------------------------------------------
-    void GLSLESProgramPipelineManager::setActiveVertexLinkProgram(GLSLESGpuProgram* vertexGpuProgram)
+    void GLSLESProgramPipelineManager::setActiveVertexLinkProgram(GLSLESProgram* vertexGpuProgram)
     {
         if (vertexGpuProgram != mActiveVertexGpuProgram)
         {
@@ -95,11 +95,11 @@ namespace Ogre
 
         if (mActiveVertexGpuProgram)
         {
-            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getProgramID()) << 32;
+            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getShaderID()) << 32;
         }
         if (mActiveFragmentGpuProgram)
         {
-            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getProgramID());
+            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getShaderID());
         }
 
         // Only return a program pipeline object if a vertex or fragment stage exist

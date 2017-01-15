@@ -57,7 +57,7 @@ namespace Ogre
     {
     public:
         /// Constructor should only be used by GLSLESProgramPipelineManager
-        GLSLESProgramPipeline(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram);
+        GLSLESProgramPipeline(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram);
         virtual ~GLSLESProgramPipeline();
 
         /// GL Program Pipeline Handle

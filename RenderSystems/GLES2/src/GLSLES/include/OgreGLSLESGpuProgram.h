@@ -51,16 +51,6 @@ namespace Ogre {
         /// GL Handle for the shader object
         GLSLESProgram* mGLSLProgram;
 
-        /// Keep track of the number of vertex shaders created
-        static GLuint mVertexShaderCount;
-        /// Keep track of the number of fragment shaders created
-        static GLuint mFragmentShaderCount;
-
-        /** Flag indicating that the program object has been successfully linked.
-            Only used when programs are linked separately with GL_EXT_separate_shader_objects.
-         */
-        GLint mLinked;
-
     public:
         GLSLESGpuProgram(GLSLESProgram* parent);
         ~GLSLESGpuProgram();
@@ -75,19 +65,6 @@ namespace Ogre {
         void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
         /// Execute the pass iteration param binding functions for this program
         void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
-
-        /// Get the GLSLESProgram for the shader object
-        GLSLESProgram* getGLSLProgram(void) const { return mGLSLProgram; }      
-
-        /** Return the programs link status
-            Only used when programs are linked separately with GL_EXT_separate_shader_objects.
-         */
-        GLint isLinked(void) { return mLinked; }
-
-        /** Set the programs link status
-            Only used when programs are linked separately with GL_EXT_separate_shader_objects.
-         */
-        void setLinked(GLint flag) { mLinked = flag; }
 
     protected:
         /// Overridden from GpuProgram

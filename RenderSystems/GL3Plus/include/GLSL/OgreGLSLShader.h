@@ -97,22 +97,8 @@ namespace Ogre {
         /// Execute the shared param binding functions for this shader.
         void bindSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
-
-        /** Return the shader link status.
-            Only used for separable programs.
-        */
-        GLint isLinked(void) { return mLinked; }
-
-        /** Set the shader link status.
-            Only used for separable programs.
-        */
-        void setLinked(GLint flag) { mLinked = flag; }
-
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
-
-        /// Get the OGRE assigned shader ID.
-        GLuint getShaderID(void) const { return mShaderID; }
 
         /// Since GLSL has no assembly, use this shader for binding.
         GpuProgram* _getBindingDelegate(void) { return this; }
@@ -142,22 +128,11 @@ namespace Ogre {
         // /// @copydoc Resource::loadImpl
         // void loadImpl(void) {}
 
-        /// OGRE assigned shader ID.
-        GLuint mShaderID;
-
     private:
         /// GL handle for shader object.
         GLuint mGLShaderHandle;
         /// GL handle for program object the shader is bound to.
         GLuint mGLProgramHandle;
-
-        /// Keep track of the number of shaders created.
-        static GLuint mShaderCount;
-
-        /** Flag indicating that the shader has been successfully
-            linked.
-            Only used for separable programs. */
-        GLint mLinked;
     };
 }
 

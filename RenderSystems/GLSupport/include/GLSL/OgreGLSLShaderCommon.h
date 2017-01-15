@@ -134,6 +134,19 @@ namespace Ogre {
         void setMaxOutputVertices(int maxOutputVertices)
         { mMaxOutputVertices = maxOutputVertices; }
 
+        /** Return the shader link status.
+            Only used for separable programs.
+        */
+        int isLinked(void) { return mLinked; }
+
+        /** Set the shader link status.
+            Only used for separable programs.
+        */
+        void setLinked(int flag) { mLinked = flag; }
+
+        /// Get the OGRE assigned shader ID.
+        uint getShaderID(void) const { return mShaderID; }
+
         /// Command object for setting macro defines
         class CmdPreprocessorDefines : public ParamCommand
         {
@@ -199,6 +212,16 @@ namespace Ogre {
         /// Matrix in column major pack format?
         bool mColumnMajorMatrices;
 
+        /** Flag indicating that the shader has been successfully
+            linked.
+            Only used for separable programs. */
+        int mLinked;
+
+        /// OGRE assigned shader ID.
+        uint mShaderID;
+
+        /// Keep track of the number of shaders created.
+        static uint mShaderCount;
     };
 }
 

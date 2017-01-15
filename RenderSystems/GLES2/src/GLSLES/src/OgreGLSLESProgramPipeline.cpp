@@ -42,7 +42,7 @@
 
 namespace Ogre
 {
-    GLSLESProgramPipeline::GLSLESProgramPipeline(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram) : 
+    GLSLESProgramPipeline::GLSLESProgramPipeline(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram) :
     GLSLESProgramCommon(vertexProgram, fragmentProgram) { }
 
     GLSLESProgramPipeline::~GLSLESProgramPipeline()
@@ -70,7 +70,7 @@ namespace Ogre
             }
             else if(getMicrocodeFromCache(
                     getVertexProgram()->getName(),
-                    getVertexProgram()->getGLSLProgram()->createGLProgramHandle()))
+                    getVertexProgram()->createGLProgramHandle()))
             {
                 getVertexProgram()->setLinked(true);
                 mLinked |= VERTEX_PROGRAM_LINKED;
@@ -80,7 +80,7 @@ namespace Ogre
             {
                 try
                 {
-                    getVertexProgram()->getGLSLProgram()->compile(true);
+                    getVertexProgram()->compile(true);
                 }
                 catch (Exception& e)
                 {
@@ -88,9 +88,9 @@ namespace Ogre
                     mTriedToLinkAndFailed = true;
                     return;
                 }
-                GLuint programHandle = getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
+                GLuint programHandle = getVertexProgram()->getGLProgramHandle();
                 OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-                getVertexProgram()->getGLSLProgram()->attachToProgramObject(programHandle);
+                getVertexProgram()->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
                 
@@ -117,7 +117,7 @@ namespace Ogre
             }
             else if(getMicrocodeFromCache(
                     mFragmentProgram->getName(),
-                    mFragmentProgram->getGLSLProgram()->createGLProgramHandle()))
+                    mFragmentProgram->createGLProgramHandle()))
             {
                 mFragmentProgram->setLinked(true);
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
@@ -127,7 +127,7 @@ namespace Ogre
             {
                 try
                 {
-                    mFragmentProgram->getGLSLProgram()->compile(true);
+                    mFragmentProgram->compile(true);
                 }
                 catch (Exception& e)
                 {
@@ -136,9 +136,9 @@ namespace Ogre
                     return;
                 }
 
-                GLuint programHandle = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
+                GLuint programHandle = mFragmentProgram->getGLProgramHandle();
                 OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-                mFragmentProgram->getGLSLProgram()->attachToProgramObject(programHandle);
+                mFragmentProgram->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
 
@@ -158,13 +158,13 @@ namespace Ogre
         {
             if(getVertexProgram() && getVertexProgram()->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT_EXT, getVertexProgram()->getGLSLProgram()->getGLProgramHandle()));
-                _writeToCache(getVertexProgram()->getName(), getVertexProgram()->getGLSLProgram()->getGLProgramHandle());
+                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT_EXT, getVertexProgram()->getGLProgramHandle()));
+                _writeToCache(getVertexProgram()->getName(), getVertexProgram()->getGLProgramHandle());
             }
             if(mFragmentProgram && mFragmentProgram->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_FRAGMENT_SHADER_BIT_EXT, mFragmentProgram->getGLSLProgram()->getGLProgramHandle()));
-                _writeToCache(mFragmentProgram->getName(), mFragmentProgram->getGLSLProgram()->getGLProgramHandle());
+                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_FRAGMENT_SHADER_BIT_EXT, mFragmentProgram->getGLProgramHandle()));
+                _writeToCache(mFragmentProgram->getName(), mFragmentProgram->getGLProgramHandle());
             }
 
             // Validate pipeline
@@ -195,7 +195,7 @@ namespace Ogre
         GLint res = mCustomAttributesIndexes[semantic-1][index];
         if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
         {
-            GLuint handle = getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
+            GLuint handle = getVertexProgram()->getGLProgramHandle();
             const char * attString = getAttributeSemanticString(semantic);
             GLint attrib;
             OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attString));
@@ -267,14 +267,14 @@ namespace Ogre
             const GpuConstantDefinitionMap* fragParams = 0;
             if (getVertexProgram())
             {
-                vertParams = &(getVertexProgram()->getGLSLProgram()->getConstantDefinitions().map);
-                GLSLESProgramPipelineManager::getSingleton().extractUniforms(getVertexProgram()->getGLSLProgram()->getGLProgramHandle(),
+                vertParams = &(getVertexProgram()->getConstantDefinitions().map);
+                GLSLESProgramPipelineManager::getSingleton().extractUniforms(getVertexProgram()->getGLProgramHandle(),
                     vertParams, NULL, mGLUniformReferences, mGLUniformBufferReferences);
             }
             if (mFragmentProgram)
             {
-                fragParams = &(mFragmentProgram->getGLSLProgram()->getConstantDefinitions().map);
-                GLSLESProgramPipelineManager::getSingleton().extractUniforms(mFragmentProgram->getGLSLProgram()->getGLProgramHandle(),
+                fragParams = &(mFragmentProgram->getConstantDefinitions().map);
+                GLSLESProgramPipelineManager::getSingleton().extractUniforms(mFragmentProgram->getGLProgramHandle(),
                                                                          NULL, fragParams, mGLUniformReferences, mGLUniformBufferReferences);
             }
 
@@ -293,11 +293,11 @@ namespace Ogre
         GLuint progID = 0;
         if(fromProgType == GPT_VERTEX_PROGRAM)
         {
-            progID = getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
+            progID = getVertexProgram()->getGLProgramHandle();
         }
         else if(fromProgType == GPT_FRAGMENT_PROGRAM)
         {
-            progID = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
+            progID = mFragmentProgram->getGLProgramHandle();
         }
 
         for (;currentUniform != endUniform; ++currentUniform)
@@ -518,7 +518,7 @@ namespace Ogre
                                                                              sizeof(float))))
                             return;
                         
-                        progID = getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
+                        progID = getVertexProgram()->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     }
                     
@@ -530,7 +530,7 @@ namespace Ogre
                                                                                currentUniform->mConstantDef->arraySize *
                                                                                sizeof(float))))
                             return;
-                        progID = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
+                        progID = mFragmentProgram->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     }
 #endif

@@ -42,7 +42,6 @@ THE SOFTWARE.
 #include "OgreGLSLPreprocessor.h"
 
 namespace Ogre {
-
     //-----------------------------------------------------------------------
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
     GLSLESProgram::CmdOptimisation GLSLESProgram::msCmdOptimisation;

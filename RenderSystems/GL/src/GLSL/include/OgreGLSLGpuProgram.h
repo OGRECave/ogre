@@ -50,13 +50,6 @@ namespace Ogre {
         /// GL Handle for the shader object
         GLSLProgram* mGLSLProgram;
 
-        /// Keep track of the number of vertex shaders created
-        static GLuint mVertexShaderCount;
-        /// Keep track of the number of fragment shaders created
-        static GLuint mFragmentShaderCount;
-        /// keep track of the number of geometry shaders created
-        static GLuint mGeometryShaderCount;
-
     public:
         GLSLGpuProgram(GLSLProgram* parent);
         ~GLSLGpuProgram();
@@ -70,13 +63,6 @@ namespace Ogre {
         void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
         /// Execute the pass iteration param binding functions for this program
         void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
-
-        /// Get the assigned GL program id
-        GLuint getProgramID(void) const
-        { return mProgramID; }
-
-        /// Get the GLSLProgram for the shader object
-        GLSLProgram* getGLSLProgram(void) const { return mGLSLProgram; }
 
         /// @copydoc GLGpuProgram::getAttributeIndex
         GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);

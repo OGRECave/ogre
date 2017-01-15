@@ -48,11 +48,11 @@ namespace Ogre {
         GLUniformReferenceList mGLUniformReferences;
 
         /// Linked vertex program
-        GLSLGpuProgram* mVertexProgram;
+        GLSLProgram* mVertexProgram;
         /// Linked geometry program
-        GLSLGpuProgram* mGeometryProgram;
+        GLSLProgram* mGeometryProgram;
         /// Linked fragment program
-        GLSLGpuProgram* mFragmentProgram;
+        GLSLProgram* mFragmentProgram;
         GLUniformCache *mUniformCache;
 
         /// Flag to indicate that uniform references have already been built
@@ -93,7 +93,7 @@ namespace Ogre {
         void getMicrocodeFromCache();
     public:
         /// Constructor should only be used by GLSLLinkProgramManager
-        GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
+        GLSLLinkProgram(GLSLProgram* vertexProgram, GLSLProgram* geometryProgram, GLSLProgram* fragmentProgram);
         ~GLSLLinkProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.

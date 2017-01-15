@@ -201,7 +201,6 @@ namespace Ogre {
         }
         // Manually assign language now since we use it immediately
         mSyntaxCode = "glsl";
-        
     }
 
     //-----------------------------------------------------------------------

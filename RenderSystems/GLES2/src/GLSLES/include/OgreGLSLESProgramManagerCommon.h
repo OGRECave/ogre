@@ -55,8 +55,8 @@ namespace Ogre {
     {
     protected:
         /// Active objects defining the active rendering gpu state
-        GLSLESGpuProgram* mActiveVertexGpuProgram;
-        GLSLESGpuProgram* mActiveFragmentGpuProgram;
+        GLSLESProgram* mActiveVertexGpuProgram;
+        GLSLESProgram* mActiveFragmentGpuProgram;
 
         typedef map<String, GLenum>::type StringToEnumMap;
         StringToEnumMap mTypeEnumMap;

@@ -76,11 +76,11 @@ namespace Ogre {
 
         if (mActiveVertexGpuProgram)
         {
-            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getProgramID()) << 32;
+            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getShaderID()) << 32;
         }
         if (mActiveFragmentGpuProgram)
         {
-            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getProgramID());
+            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getShaderID());
         }
 
         // Only return a link program object if a vertex or fragment program exist
@@ -108,7 +108,7 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------
-	GLSLESLinkProgram* GLSLESLinkProgramManager::getByProgram(GLSLESGpuProgram* gpuProgram)
+	GLSLESLinkProgram* GLSLESLinkProgramManager::getByProgram(GLSLESProgram* gpuProgram)
 	{
 		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
 			currentProgram != mLinkPrograms.end(); ++currentProgram)
@@ -142,7 +142,7 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------
-	void GLSLESLinkProgramManager::destroyAllByProgram(GLSLESGpuProgram* gpuProgram)
+	void GLSLESLinkProgramManager::destroyAllByProgram(GLSLESProgram* gpuProgram)
 	{
 		std::vector<uint64> keysToErase;
 		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
@@ -163,7 +163,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLESLinkProgramManager::setActiveFragmentShader(GLSLESGpuProgram* fragmentGpuProgram)
+    void GLSLESLinkProgramManager::setActiveFragmentShader(GLSLESProgram* fragmentGpuProgram)
     {
         if (fragmentGpuProgram != mActiveFragmentGpuProgram)
         {
@@ -174,7 +174,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLESLinkProgramManager::setActiveVertexShader(GLSLESGpuProgram* vertexGpuProgram)
+    void GLSLESLinkProgramManager::setActiveVertexShader(GLSLESProgram* vertexGpuProgram)
     {
         if (vertexGpuProgram != mActiveVertexGpuProgram)
         {

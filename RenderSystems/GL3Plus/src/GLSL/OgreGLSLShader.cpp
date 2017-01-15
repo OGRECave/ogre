@@ -40,8 +40,6 @@
 #include "OgreGLUtil.h"
 
 namespace Ogre {
-    GLuint GLSLShader::mShaderCount = 0;
-
     GLSLShader::GLSLShader(
         ResourceManager* creator,
         const String& name, ResourceHandle handle,
@@ -88,13 +86,7 @@ namespace Ogre {
 
         mType = GPT_VERTEX_PROGRAM; // default value, to be corrected after the constructor with GpuProgram::setType()
         mSyntaxCode = "glsl" + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion());
-
-        mLinked = 0;
-        // Increase shader counter and use as ID
-        mShaderID = ++mShaderCount;        
         
-        // Transfer skeletal animation status from parent
-        mSkeletalAnimation = isSkeletalAnimationIncluded();
         // There is nothing to load
         mLoadFromFile = false;
     }

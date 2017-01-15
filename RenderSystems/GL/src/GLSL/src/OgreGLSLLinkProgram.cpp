@@ -110,7 +110,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgram::GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram)
+    GLSLLinkProgram::GLSLLinkProgram(GLSLProgram* vertexProgram, GLSLProgram* geometryProgram, GLSLProgram* fragmentProgram)
         : mVertexProgram(vertexProgram)
         , mGeometryProgram(geometryProgram)
         , mFragmentProgram(fragmentProgram)
@@ -241,15 +241,15 @@ namespace Ogre {
             const GpuConstantDefinitionMap* geomParams = 0;
             if (mVertexProgram)
             {
-                vertParams = &(mVertexProgram->getGLSLProgram()->getConstantDefinitions().map);
+                vertParams = &(mVertexProgram->getConstantDefinitions().map);
             }
             if (mGeometryProgram)
             {
-                geomParams = &(mGeometryProgram->getGLSLProgram()->getConstantDefinitions().map);
+                geomParams = &(mGeometryProgram->getConstantDefinitions().map);
             }
             if (mFragmentProgram)
             {
-                fragParams = &(mFragmentProgram->getGLSLProgram()->getConstantDefinitions().map);
+                fragParams = &(mFragmentProgram->getConstantDefinitions().map);
             }
 
             GLSLLinkProgramManager::getSingleton().extractUniforms(
@@ -269,9 +269,9 @@ namespace Ogre {
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getGLSLProgram()->getColumnMajorMatrices())))
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getColumnMajorMatrices())))
         {
             transpose = GL_FALSE;
         }
@@ -490,12 +490,12 @@ namespace Ogre {
         if (mVertexProgram)
         {
             // compile and attach Vertex Program
-            if (!mVertexProgram->getGLSLProgram()->compile(true))
+            if (!mVertexProgram->compile(true))
             {
                 // todo error
                 return;
             }
-            mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+            mVertexProgram->attachToProgramObject(mGLHandle);
             setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
 
             // Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
@@ -508,7 +508,7 @@ namespace Ogre {
             // until it is linked (chicken and egg!) we have to parse the source
 
             size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
-            const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
+            const String& vpSource = mVertexProgram->getSource();
             for (size_t i = 0; i < numAttribs; ++i)
             {
                 const CustomAttribute& a = msCustomAttributes[i];
@@ -545,38 +545,38 @@ namespace Ogre {
         if (mGeometryProgram)
         {
             // compile and attach Geometry Program
-            if (!mGeometryProgram->getGLSLProgram()->compile(true))
+            if (!mGeometryProgram->compile(true))
             {
                 // todo error
                 return;
             }
 
-            mGeometryProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+            mGeometryProgram->attachToProgramObject(mGLHandle);
 
             //Don't set adjacency flag. We handle it internally and expose "false"
 
-            RenderOperation::OperationType inputOperationType = mGeometryProgram->getGLSLProgram()->getInputOperationType();
+            RenderOperation::OperationType inputOperationType = mGeometryProgram->getInputOperationType();
             glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
                 getGLGeometryInputPrimitiveType(inputOperationType, mGeometryProgram->isAdjacencyInfoRequired()));
 
-            RenderOperation::OperationType outputOperationType = mGeometryProgram->getGLSLProgram()->getOutputOperationType();
+            RenderOperation::OperationType outputOperationType = mGeometryProgram->getOutputOperationType();
 
             glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT,
                 getGLGeometryOutputPrimitiveType(outputOperationType));
 
             glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_VERTICES_OUT_EXT,
-                mGeometryProgram->getGLSLProgram()->getMaxOutputVertices());
+                mGeometryProgram->getMaxOutputVertices());
         }
 
         if (mFragmentProgram)
         {
             // compile and attach Fragment Program
-            if (!mFragmentProgram->getGLSLProgram()->compile(true))
+            if (!mFragmentProgram->compile(true))
             {
                 // todo error
                 return;
             }       
-            mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+            mFragmentProgram->attachToProgramObject(mGLHandle);
         }
 
         

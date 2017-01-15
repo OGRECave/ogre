@@ -39,6 +39,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
+    uint GLSLShaderCommon::mShaderCount = 0;
     GLSLShaderCommon::CmdPreprocessorDefines GLSLShaderCommon::msCmdPreprocessorDefines;
     GLSLShaderCommon::CmdAttach GLSLShaderCommon::msCmdAttach;
     GLSLShaderCommon::CmdColumnMajorMatrices GLSLShaderCommon::msCmdColumnMajorMatrices;
@@ -149,6 +150,8 @@ namespace Ogre {
         , mOutputOperationType(RenderOperation::OT_TRIANGLE_LIST)
         , mMaxOutputVertices(3)
         , mColumnMajorMatrices(true)
+        , mLinked(0)
+        , mShaderID(++mShaderCount) // Increase shader counter and use as ID
     {
     }
     //-----------------------------------------------------------------------

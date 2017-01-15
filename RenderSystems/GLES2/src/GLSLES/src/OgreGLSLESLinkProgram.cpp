@@ -42,7 +42,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    GLSLESLinkProgram::GLSLESLinkProgram(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
+    GLSLESLinkProgram::GLSLESLinkProgram(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram)
     : GLSLESProgramCommon(vertexProgram, fragmentProgram)
     {
         if ((!getVertexProgram() || !mFragmentProgram))
@@ -143,7 +143,7 @@ namespace Ogre {
         // Compile and attach Vertex Program
         try
         {
-            getVertexProgram()->getGLSLProgram()->compile(true);
+            getVertexProgram()->compile(true);
         }
         catch (Exception& e)
         {
@@ -152,13 +152,13 @@ namespace Ogre {
             return;
         }
 
-        getVertexProgram()->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+        getVertexProgram()->attachToProgramObject(mGLProgramHandle);
         setSkeletalAnimationIncluded(getVertexProgram()->isSkeletalAnimationIncluded());
         
         // Compile and attach Fragment Program
         try
         {
-            mFragmentProgram->getGLSLProgram()->compile(true);
+            mFragmentProgram->compile(true);
         }
         catch (Exception& e)
         {
@@ -166,7 +166,7 @@ namespace Ogre {
             mTriedToLinkAndFailed = true;
             return;
         }
-        mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+        mFragmentProgram->attachToProgramObject(mGLProgramHandle);
         
         // The link
         OGRE_CHECK_GL_ERROR(glLinkProgram( mGLProgramHandle ));
@@ -211,11 +211,11 @@ namespace Ogre {
             const GpuConstantDefinitionMap* fragParams = 0;
             if (getVertexProgram())
             {
-                vertParams = &(getVertexProgram()->getGLSLProgram()->getConstantDefinitions().map);
+                vertParams = &(getVertexProgram()->getConstantDefinitions().map);
             }
             if (mFragmentProgram)
             {
-                fragParams = &(mFragmentProgram->getGLSLProgram()->getConstantDefinitions().map);
+                fragParams = &(mFragmentProgram->getConstantDefinitions().map);
             }
 
             GLSLESLinkProgramManager::getSingleton().extractUniforms(

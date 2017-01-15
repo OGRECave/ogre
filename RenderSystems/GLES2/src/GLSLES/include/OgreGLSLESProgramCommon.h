@@ -34,7 +34,7 @@
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreGLES2UniformCache.h"
 #include "OgreGLSLProgramCommon.h"
-#include "OgreGLSLESGpuProgram.h"
+#include "OgreGLSLESProgram.h"
 
 namespace Ogre {
     /** C++ encapsulation of GLSL ES Program Object
@@ -45,7 +45,7 @@ namespace Ogre {
     {
     protected:
         /// Linked fragment program
-        GLSLESGpuProgram* mFragmentProgram;
+        GLSLESProgram* mFragmentProgram;
         GLES2UniformCache *mUniformCache;
 
         Ogre::String getCombinedName(void);
@@ -57,14 +57,14 @@ namespace Ogre {
         static void _writeToCache(const String& name, GLuint programHandle);
     public:
         /// Constructor should only be used by GLSLESLinkProgramManager and GLSLESProgramPipelineManager
-        GLSLESProgramCommon(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram);
+        GLSLESProgramCommon(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram);
         virtual ~GLSLESProgramCommon(void);
 
         /// Get the index of a non-standard attribute bound in the linked code
         virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
 
-        GLSLESGpuProgram* getVertexProgram(void) const { return static_cast<GLSLESGpuProgram*>(mVertexShader); }
-        GLSLESGpuProgram* getFragmentProgram(void) const { return mFragmentProgram; }
+        GLSLESProgram* getVertexProgram(void) const { return static_cast<GLSLESProgram*>(mVertexShader); }
+        GLSLESProgram* getFragmentProgram(void) const { return mFragmentProgram; }
         GLES2UniformCache * getUniformCache(void) { return mUniformCache; }
     };
 }

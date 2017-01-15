@@ -24,7 +24,7 @@ VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(String type)
     }
 }
 
-GLSLProgramCommon::GLSLProgramCommon(GpuProgram* vertexShader)
+GLSLProgramCommon::GLSLProgramCommon(GLSLShaderCommon* vertexShader)
     : mVertexShader(vertexShader),
       mUniformRefsBuilt(false),
       mGLProgramHandle(0),

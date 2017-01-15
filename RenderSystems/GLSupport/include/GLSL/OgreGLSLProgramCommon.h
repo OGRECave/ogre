@@ -56,7 +56,7 @@ typedef GLUniformBufferList::iterator GLUniformBufferIterator;
 class GLSLProgramCommon
 {
 public:
-    GLSLProgramCommon(GpuProgram* vertexShader);
+    GLSLProgramCommon(GLSLShaderCommon* vertexShader);
     virtual ~GLSLProgramCommon() {}
 
     void extractLayoutQualifiers(void);
@@ -113,7 +113,7 @@ protected:
     GLUniformBufferList mGLUniformBufferReferences;
 
     /// Linked vertex shader.
-    GpuProgram* mVertexShader;
+    GLSLShaderCommon* mVertexShader;
 
     /// Flag to indicate that uniform references have already been built
     bool mUniformRefsBuilt;
