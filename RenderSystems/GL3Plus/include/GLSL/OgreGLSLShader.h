@@ -29,7 +29,7 @@
 #define __GLSLShader_H__
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "OgreGLSLProgramCommon.h"
+#include "OgreGLSLShaderCommon.h"
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
@@ -58,7 +58,7 @@ namespace Ogre {
         command.  All the modules to be attached are listed on the
         same line as the attach command separated by white space.
     */
-    class _OgreGL3PlusExport GLSLShader : public GLSLProgramCommon
+    class _OgreGL3PlusExport GLSLShader : public GLSLShaderCommon
     {
     public:
         GLSLShader(ResourceManager* creator,

@@ -152,7 +152,7 @@ namespace Ogre {
         for (GLSLProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
             i != mAttachedGLSLPrograms.end(); ++i)
         {
-            GLSLProgramCommon* childShader = *i;
+            GLSLShaderCommon* childShader = *i;
 
             GLSLLinkProgramManager::getSingleton().extractConstantDefs(
                 childShader->getSource(), *mConstantDefs.get(), childShader->getName());
@@ -164,7 +164,7 @@ namespace Ogre {
     GLSLProgram::GLSLProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        : GLSLProgramCommon(creator, name, handle, group, isManual, loader)
+        : GLSLShaderCommon(creator, name, handle, group, isManual, loader)
         , mGLHandle(0)
     {
         // add parameter command "attach" to the material serializer dictionary
@@ -214,7 +214,7 @@ namespace Ogre {
         while (childprogramcurrent != childprogramend)
         {
 
-            GLSLProgramCommon* childShader = *childprogramcurrent;
+            GLSLShaderCommon* childShader = *childprogramcurrent;
             // bug in ATI GLSL linker : modules without main function must be recompiled each time 
             // they are linked to a different program object
             // don't check for compile errors since there won't be any
@@ -251,7 +251,7 @@ namespace Ogre {
 
         while (childprogramcurrent != childprogramend)
         {
-            GLSLProgramCommon* childShader = *childprogramcurrent;
+            GLSLShaderCommon* childShader = *childprogramcurrent;
             childShader->detachFromProgramObject( programObject );
             ++childprogramcurrent;
         }

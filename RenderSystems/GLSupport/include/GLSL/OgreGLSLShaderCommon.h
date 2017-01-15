@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __GLSLProgramCommon_H__
-#define __GLSLProgramCommon_H__
+#ifndef __GLSLShaderCommon_H__
+#define __GLSLShaderCommon_H__
 
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
@@ -54,7 +54,7 @@ namespace Ogre {
         separated by white space.
         
     */
-    class GLSLProgramCommon : public HighLevelGpuProgram
+    class GLSLShaderCommon : public HighLevelGpuProgram
     {
     public:
         /// Command object for attaching another GLSL Program 
@@ -72,7 +72,7 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
-        GLSLProgramCommon(ResourceManager* creator,
+        GLSLShaderCommon(ResourceManager* creator,
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
 
@@ -193,7 +193,7 @@ namespace Ogre {
         /// Preprocessor options
         String mPreprocessorDefines;
         /// Container of attached programs
-        typedef vector< GLSLProgramCommon* >::type GLSLProgramContainer;
+        typedef vector< GLSLShaderCommon* >::type GLSLProgramContainer;
         typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
         GLSLProgramContainer mAttachedGLSLPrograms;
         /// Matrix in column major pack format?
