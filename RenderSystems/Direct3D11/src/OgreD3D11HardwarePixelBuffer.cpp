@@ -791,8 +791,9 @@ namespace v1 {
         //Only implemented for 2D at the moment...
         ID3D11Texture2D *textureResource = mParentTexture->GetTex2D();
 
-        if( mParentTexture->getResolveTextureResource() )
+        if( mParentTexture->hasResolveTextureResource() )
         {
+            mParentTexture->getTexture(); //Trigger a resolve in case it's needed.
             textureResource = static_cast<ID3D11Texture2D*>(
                         mParentTexture->getResolveTextureResource() );
         }
@@ -838,7 +839,7 @@ namespace v1 {
         mDevice.GetImmediateContext()->Unmap( pStagingTexture, 0 );
         pStagingTexture->Release();
 
-        if( !mParentTexture->getResolveTextureResource() &&
+        if( !mParentTexture->hasResolveTextureResource() &&
             (mParentTexture->getFSAA() > 1 || atoi(mParentTexture->getFSAAHint().c_str()) > 0) )
         {
             textureResource->Release();

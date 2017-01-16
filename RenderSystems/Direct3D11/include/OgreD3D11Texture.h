@@ -70,6 +70,7 @@ namespace Ogre {
 		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
         ID3D11Resource *getResolveTextureResource()
                                             { assert(mpResolveTexture); return mpResolveTexture; }
+        bool hasResolveTextureResource() const  { return mpResolveTexture != 0; }
 		/// retrieves a pointer to the actual texture
         ID3D11ShaderResourceView *getTexture();
 
