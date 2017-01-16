@@ -286,20 +286,13 @@ namespace Ogre
             }
         }
 
-        ShaderParams *shaderParams = job->_getShaderParams( "default" );
-        if( shaderParams )
-            shaderParams->updateParameters( shader->getDefaultParameters() );
-
-        shaderParams = job->_getShaderParams( mShaderProfile );
-        if( shaderParams )
-            shaderParams->updateParameters( shader->getDefaultParameters() );
-
         //Reset the disable flag.
         setProperty( HlmsBaseProp::DisableStage, 0 );
 
         HlmsComputePso pso;
         pso.initialize();
         pso.computeShader = shader;
+        pso.computeParams = shader->createParameters();
         pso.mThreadsPerGroup[0] = getProperty( ComputeProperty::ThreadsPerGroupX );
         pso.mThreadsPerGroup[1] = getProperty( ComputeProperty::ThreadsPerGroupY );
         pso.mThreadsPerGroup[2] = getProperty( ComputeProperty::ThreadsPerGroupZ );
@@ -317,6 +310,14 @@ namespace Ogre
                          " or read the value using @value( threads_per_group_x ) if you've already"
                          " set it from C++ or the JSON material", "HlmsCompute::compileShader" );
         }
+
+        ShaderParams *shaderParams = job->_getShaderParams( "default" );
+        if( shaderParams )
+            shaderParams->updateParameters( pso.computeParams );
+
+        shaderParams = job->_getShaderParams( mShaderProfile );
+        if( shaderParams )
+            shaderParams->updateParameters( pso.computeParams );
 
         mRenderSystem->_hlmsComputePipelineStateObjectCreated( &pso );
 
@@ -413,14 +414,14 @@ namespace Ogre
             ShaderParams *shaderParams = job->_getShaderParams( "default" );
             if( shaderParams && psoCache.paramsUpdateCounter != shaderParams->getUpdateCounter() )
             {
-                shaderParams->updateParameters( psoCache.pso.computeShader->getDefaultParameters() );
+                shaderParams->updateParameters( psoCache.pso.computeParams );
                 psoCache.paramsUpdateCounter = shaderParams->getUpdateCounter();
             }
 
             shaderParams = job->_getShaderParams( mShaderProfile );
             if( shaderParams && psoCache.paramsProfileUpdateCounter != shaderParams->getUpdateCounter() )
             {
-                shaderParams->updateParameters( psoCache.pso.computeShader->getDefaultParameters() );
+                shaderParams->updateParameters( psoCache.pso.computeParams );
                 psoCache.paramsProfileUpdateCounter = shaderParams->getUpdateCounter();
             }
         }
@@ -488,7 +489,7 @@ namespace Ogre
         //mAutoParamDataSource->setCurrentShadowNode( shadowNode );
         //mAutoParamDataSource->setCurrentViewport( sceneManager->getCurrentViewport() );
 
-        GpuProgramParametersSharedPtr csParams = psoCache.pso.computeShader->getDefaultParameters();
+        GpuProgramParametersSharedPtr csParams = psoCache.pso.computeParams;
         csParams->_updateAutoParams( mAutoParamDataSource, GPV_ALL );
         mRenderSystem->bindGpuProgramParameters( GPT_COMPUTE_PROGRAM, csParams, GPV_ALL );
 

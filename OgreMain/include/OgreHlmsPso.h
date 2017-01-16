@@ -282,6 +282,7 @@ namespace Ogre
     struct HlmsComputePso
     {
         GpuProgramPtr   computeShader;
+        GpuProgramParametersSharedPtr computeParams;
 
         /// XYZ. Metal needs the threads per group on C++ side. HLSL & GLSL want
         /// the thread count on shader side, thus we allow users to tell us
