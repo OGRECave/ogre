@@ -130,36 +130,15 @@ namespace Ogre{
         return true;
     }
     //-------------------------------------------------------------------------
-    bool ScriptTranslator::getReal(const Ogre::AbstractNodePtr &node, Ogre::Real *result)
-    {
-        if (node->type != ANT_ATOM)
-            return false;
-
-        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-
-#if OGRE_DOUBLE_PRECISION == 0
-        int n = sscanf(atom->value.c_str(), "%f", result);
-#else
-        int n = sscanf(atom->value.c_str(), "%lf", result);
-#endif
-
-        if (n == 0 || n == EOF)
-            return false; // Conversion failed
-
-        return true;
-    }
-    //-------------------------------------------------------------------------
     bool ScriptTranslator::getFloat(const Ogre::AbstractNodePtr &node, float *result)
     {
         if(node->type != ANT_ATOM)
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        int n = sscanf(atom->value.c_str(), "%f", result);
-        if (n == 0 || n == EOF)
-            return false; // Conversion failed
-
-        return true;
+        char* end;
+        *result = strtof(atom->value.c_str(), &end);
+        return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getDouble(const Ogre::AbstractNodePtr &node, double *result)
@@ -168,11 +147,9 @@ namespace Ogre{
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        int n = sscanf(atom->value.c_str(), "%lf", result);
-        if (n == 0 || n == EOF)
-            return false; // Conversion failed
-
-        return true;
+        char* end;
+        *result = strtod(atom->value.c_str(), &end);
+        return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getInt(const Ogre::AbstractNodePtr &node, int *result)
@@ -181,11 +158,9 @@ namespace Ogre{
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        int n = sscanf(atom->value.c_str(), "%d", result);
-        if (n == 0 || n == EOF)
-            return false; // Conversion failed
-
-        return true;
+        char* end;
+        *result = (int)strtol(atom->value.c_str(), &end, 0);
+        return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getUInt(const Ogre::AbstractNodePtr &node, uint *result)
@@ -194,11 +169,9 @@ namespace Ogre{
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        int n = sscanf(atom->value.c_str(), "%u", result);
-        if (n == 0 || n == EOF)
-            return false; // Conversion failed
-
-        return true;
+        char* end;
+        *result = (uint)strtoul(atom->value.c_str(), &end, 0);
+        return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result, int maxEntries)
