@@ -3127,7 +3127,7 @@ bail:
         mBoundComputeProgram = newComputeShader;
 
         deviceContext->CSSetShader( mBoundComputeProgram->getComputeShader(), 0, 0 );
-        mActiveComputeGpuProgramParameters = mBoundComputeProgram->getDefaultParameters();
+        mActiveComputeGpuProgramParameters = pso->computeParams;
         mComputeProgramBound = true;
 
         if (mDevice.isError())

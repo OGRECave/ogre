@@ -2089,7 +2089,7 @@ namespace Ogre {
 
         mCurrentComputeShader = newComputeShader;
         mCurrentComputeShader->bind();
-        mActiveComputeGpuProgramParameters = mCurrentComputeShader->getDefaultParameters();
+        mActiveComputeGpuProgramParameters = pso->computeParams;
         mComputeProgramBound = true;
 
         GLSLSeparableProgramManager* separableProgramMgr =
