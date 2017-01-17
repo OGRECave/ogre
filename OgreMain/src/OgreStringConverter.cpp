@@ -31,17 +31,10 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 
 namespace Ogre {
-
-    String StringConverter::msDefaultStringLocale = OGRE_DEFAULT_LOCALE;
-    std::locale StringConverter::msLocale = std::locale(msDefaultStringLocale.c_str());
-    bool StringConverter::msUseLocale = false;
-
     template<typename T>
     String StringConverter::_toString(T val, uint16 width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags & std::ios::basefield) {
@@ -61,8 +54,6 @@ namespace Ogre {
                                      unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -77,8 +68,6 @@ namespace Ogre {
                                      unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -133,8 +122,6 @@ namespace Ogre {
     String StringConverter::toString(const Vector2& val)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         stream << val.x << " " << val.y;
         return stream.str();
     }
@@ -142,8 +129,6 @@ namespace Ogre {
     String StringConverter::toString(const Vector3& val)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         stream << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
@@ -151,8 +136,6 @@ namespace Ogre {
     String StringConverter::toString(const Vector4& val)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         stream << val.x << " " << val.y << " " << val.z << " " << val.w;
         return stream.str();
     }
@@ -160,7 +143,6 @@ namespace Ogre {
     String StringConverter::toString(const Matrix3& val)
     {
         StringStream stream;
-        stream.imbue(msLocale);
         stream << val[0][0] << " "
             << val[0][1] << " "             
             << val[0][2] << " "             
@@ -200,7 +182,6 @@ namespace Ogre {
     String StringConverter::toString(const Matrix4& val)
     {
         StringStream stream;
-        stream.imbue(msLocale);
         stream << val[0][0] << " "
             << val[0][1] << " "             
             << val[0][2] << " "             
@@ -223,8 +204,6 @@ namespace Ogre {
     String StringConverter::toString(const Quaternion& val)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         stream  << val.w << " " << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
@@ -232,8 +211,6 @@ namespace Ogre {
     String StringConverter::toString(const ColourValue& val)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         stream << val.r << " " << val.g << " " << val.b << " " << val.a;
         return stream.str();
     }
@@ -241,8 +218,6 @@ namespace Ogre {
     String StringConverter::toString(const StringVector& val)
     {
         StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
         StringVector::const_iterator i, iend, ibegin;
         ibegin = val.begin();
         iend = val.end();
@@ -258,80 +233,43 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real StringConverter::parseReal(const String& val, Real defaultValue)
     {
-        // Use iStringStream for direct correspondence with toString
-        StringStream str(val);
-        if (msUseLocale)
-            str.imbue(msLocale);
-        Real ret = defaultValue;
-        if( !(str >> ret) )
-            return defaultValue;
-
-        return ret;
+        char* end;
+        Real ret = (Real)strtod(val.c_str(), &end);
+        return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     int StringConverter::parseInt(const String& val, int defaultValue)
     {
-        // Use iStringStream for direct correspondence with toString
-        StringStream str(val);
-        if (msUseLocale)
-            str.imbue(msLocale);
-        int ret = defaultValue;
-        if( !(str >> ret) )
-            return defaultValue;
-
-        return ret;
+        char* end;
+        int ret = (int)strtoul(val.c_str(), &end, 0);
+        return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     unsigned int StringConverter::parseUnsignedInt(const String& val, unsigned int defaultValue)
     {
-        // Use iStringStream for direct correspondence with toString
-        StringStream str(val);
-        if (msUseLocale)
-            str.imbue(msLocale);
-        unsigned int ret = defaultValue;
-        if( !(str >> ret) )
-            return defaultValue;
-
-        return ret;
+        char* end;
+        unsigned int ret = (unsigned int)strtoul(val.c_str(), &end, 0);
+        return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     long StringConverter::parseLong(const String& val, long defaultValue)
     {
-        // Use iStringStream for direct correspondence with toString
-        StringStream str(val);
-        if (msUseLocale)
-            str.imbue(msLocale);
-        long ret = defaultValue;
-        if( !(str >> ret) )
-            return defaultValue;
-
-        return ret;
+        char* end;
+        long ret = strtol(val.c_str(), &end, 0);
+        return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     unsigned long StringConverter::parseUnsignedLong(const String& val, unsigned long defaultValue)
     {
-        // Use iStringStream for direct correspondence with toString
-        StringStream str(val);
-        if (msUseLocale)
-            str.imbue(msLocale);
-        unsigned long ret = defaultValue;
-        if( !(str >> ret) )
-            return defaultValue;
-
-        return ret;
+        char* end;
+        unsigned long ret = strtoul(val.c_str(), &end, 0);
+        return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     size_t StringConverter::parseSizeT(const String& val, size_t defaultValue)
     {
-        // Use iStringStream for direct correspondence with toString
-        StringStream str(val);
-        if (msUseLocale)
-            str.imbue(msLocale);
-        size_t ret = defaultValue;
-        if( !(str >> ret) )
-            return defaultValue;
-
-        return ret;
+        size_t ret;
+        return sscanf(val.c_str(), "%zu", &ret) == 1 ? ret : defaultValue;
     }
     //-----------------------------------------------------------------------
     bool StringConverter::parseBool(const String& val, bool defaultValue)
@@ -504,15 +442,13 @@ namespace Ogre {
     {
         return StringUtil::split(val);
     }
+
     //-----------------------------------------------------------------------
     bool StringConverter::isNumber(const String& val)
     {
-        StringStream str(val);
-        if (msUseLocale)
-            str.imbue(msLocale);
-        float tst;
-        str >> tst;
-        return !str.fail() && str.eof();
+        char* end;
+        strtof(val.c_str(), &end);
+        return end == (val.c_str() + val.size());
     }
 	//-----------------------------------------------------------------------
     String StringConverter::toString(ColourBufferType val)

@@ -291,28 +291,9 @@ namespace Ogre {
 			String input format should be "None", "Frame Sequential", etc.
 		*/
 		static StereoModeType parseStereoMode(const String& val, StereoModeType defaultValue = SMT_NONE);
-		
-        //-----------------------------------------------------------------------
-        static void setDefaultStringLocale(const String &loc)
-        {
-            msDefaultStringLocale = loc;
-            msLocale = std::locale(msDefaultStringLocale.c_str());
-        }
-        //-----------------------------------------------------------------------
-        static String getDefaultStringLocale(void) { return msDefaultStringLocale; }
-        //-----------------------------------------------------------------------
-        static void setUseLocale(bool useLocale) { msUseLocale = useLocale; }
-        //-----------------------------------------------------------------------
-        static bool isUseLocale() { return msUseLocale; }
-        //-----------------------------------------------------------------------
-
     protected:
         template<typename T>
         static String _toString(T val, uint16 width, char fill, std::ios::fmtflags flags);
-
-        static String msDefaultStringLocale;
-        static std::locale msLocale;
-        static bool msUseLocale;		
     };
 
     template<> inline void StringConverter::parse(const String& str, ColourValue& v) {
