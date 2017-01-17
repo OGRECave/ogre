@@ -42,6 +42,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsCompute.h"
 #include "OgreHlmsComputeJob.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
@@ -61,148 +62,10 @@ namespace Ogre
                          "CompositorPassMipmap::CompositorPassMipmap" );
         }
 
-        RenderSystem *renderSystem = mParentNode->getRenderSystem();
-        const RenderSystemCapabilities *caps = renderSystem->getCapabilities();
-
-        if( (mDefinition->mMipmapGenerationMethod == CompositorPassMipmapDef::Compute ||
-            mDefinition->mMipmapGenerationMethod == CompositorPassMipmapDef::ComputeHQ) &&
-            caps->hasCapability( RSC_COMPUTE_PROGRAM ) )
+        if( mDefinition->mMipmapGenerationMethod == CompositorPassMipmapDef::Compute ||
+            mDefinition->mMipmapGenerationMethod == CompositorPassMipmapDef::ComputeHQ )
         {
-            HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-            HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
-
-            HlmsComputeJob *blurH = hlmsCompute->findComputeJobNoThrow( "Mipmap/GaussianBlurH" );
-            HlmsComputeJob *blurV = hlmsCompute->findComputeJobNoThrow( "Mipmap/GaussianBlurV" );
-
-        #if OGRE_NO_JSON
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "To use PASS_MIPMAP with compute shaders, Ogre must be build with JSON support "
-                         "and you must include the resource bundled at "
-                         "Samples/Media/2.0/scripts/materials/Common",
-                         "CompositorPassMipmap::CompositorPassMipmap" );
-        #endif
-
-            if( !blurH || !blurV )
-            {
-                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             "To use PASS_MIPMAP with compute shaders, you must include the resources "
-                             "bundled at Samples/Media/2.0/scripts/materials/Common\n"
-                             "Could not find Mipmap/GaussianBlurH and Mipmap/GaussianBlurV",
-                             "CompositorPassMipmap::CompositorPassMipmap" );
-            }
-
-            setGaussianFilterParams( blurH, mDefinition->mKernelRadius,
-                                     mDefinition->mGaussianDeviationFactor );
-            setGaussianFilterParams( blurV, mDefinition->mKernelRadius,
-                                     mDefinition->mGaussianDeviationFactor );
-
-            //TextureVec::iterator tmpItor = mTmpTextures.begin();
-            TextureVec::iterator itor = mTextures.begin();
-            TextureVec::iterator end  = mTextures.end();
-
-            while( itor != end )
-            {
-                TexturePtr &texture = *itor;
-
-                if( texture->getNumMipmaps() > 0 )
-                {
-                    if( !(texture->getUsage() & TU_UAV) || (texture->getUsage() & TU_NOT_TEXTURE) )
-                    {
-                        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture '" + texture->getName() +
-                                     "' must be flagged as UAV texture in order to be able to generate "
-                                     "mipmaps using Compute Shaders",
-                                     "CompositorPassMipmap::CompositorPassMipmap" );
-                    }
-
-                    const String newId = StringConverter::toString(
-                                Id::generateNewId<CompositorPassMipmap>() );
-
-                    TexturePtr tmpTex = TextureManager::getSingleton().
-                            createManual( "MipmapTmpTexture " + newId,
-                                          ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                          texture->getTextureType(),
-                                          texture->getWidth() >> 1u, texture->getHeight(),
-                                          texture->getNumMipmaps(), texture->getFormat(),
-                                          TU_RENDERTARGET|TU_UAV, 0, texture->isHardwareGammaEnabled() );
-
-                    mTmpTextures.push_back( tmpTex );
-
-                    const uint8 numMips = texture->getNumMipmaps() + 1u;
-                    const PixelFormat pf = texture->getFormat();
-
-                    uint32 currWidth  = texture->getWidth();
-                    uint32 currHeight = texture->getHeight();
-
-                    for( size_t mip=0; mip<numMips - 1u; ++mip )
-                    {
-                        const String mipString = StringConverter::toString( mip );
-                        HlmsComputeJob *blurH2  = blurH->clone( "Mipmap_BlurH" + newId +
-                                                                " mip " + mipString );
-                        HlmsComputeJob *blurV2  = blurV->clone( "Mipmap_BlurV" + newId +
-                                                                " mip " + mipString );
-
-                        ShaderParams::Param paramLodIdx;
-                        paramLodIdx.name = "srcLodIdx";
-                        ShaderParams::Param paramOutputSize;
-                        paramOutputSize.name = "g_f4OutputSize";
-
-                        ShaderParams *shaderParams = 0;
-
-                        paramLodIdx.setManualValue( (float)mip );
-                        paramOutputSize.setManualValue( Vector4( (float)currWidth, (float)currHeight,
-                                                                 1.0f / currWidth, 1.0f / currHeight ) );
-
-                        shaderParams = &blurH2->getShaderParams( "default" );
-                        shaderParams->mParams.push_back( paramLodIdx );
-                        shaderParams->mParams.push_back( paramOutputSize );
-                        shaderParams->setDirty();
-
-                        blurH2->setProperty( "width_with_lod", currWidth );
-                        blurH2->setProperty( "height_with_lod", currHeight );
-
-                        currWidth = std::max( currWidth >> 1u, 1u );
-                        paramOutputSize.setManualValue( Vector4( (float)currWidth, (float)currHeight,
-                                                                 1.0f / currWidth, 1.0f / currHeight ) );
-
-                        shaderParams = &blurV2->getShaderParams( "default" );
-                        shaderParams->mParams.push_back( paramLodIdx );
-                        shaderParams->mParams.push_back( paramOutputSize );
-                        shaderParams->setDirty();
-
-                        blurH2->setTexture( 0, texture );
-                        blurH2->_setUavTexture( 0, tmpTex, 0, ResourceAccess::Write, mip, pf );
-                        blurV2->setTexture( 0, tmpTex );
-                        blurV2->_setUavTexture( 0, texture, 0, ResourceAccess::Write, mip + 1u, pf );
-
-                        blurV2->setProperty( "width_with_lod", currWidth );
-                        blurV2->setProperty( "height_with_lod", currHeight );
-
-                        JobWithBarrier jobWithBarrier;
-
-                        //TODO: The system does not support bits like Vulkan & D3D12 do.
-                        //We need generic read layouts.
-                        //jobWithBarrier.resourceTransition.oldLayout = ResourceLayout::Texture;
-                        //jobWithBarrier.resourceTransition.newLayout = ResourceLayout::Uav;
-                        jobWithBarrier.resourceTransition.oldLayout = ResourceLayout::Undefined;
-                        jobWithBarrier.resourceTransition.newLayout = ResourceLayout::Undefined;
-
-                        jobWithBarrier.resourceTransition.writeBarrierBits = 0;
-                        jobWithBarrier.resourceTransition.readBarrierBits = ReadBarrier::Texture;
-
-                        jobWithBarrier.job = blurH2;
-                        renderSystem->_resourceTransitionCreated( &jobWithBarrier.resourceTransition );
-                        mJobs.push_back( jobWithBarrier );
-
-                        jobWithBarrier.job = blurV2;
-                        renderSystem->_resourceTransitionCreated( &jobWithBarrier.resourceTransition );
-                        mJobs.push_back( jobWithBarrier );
-
-                        currHeight = std::max( currHeight >> 1u, 1u );
-                    }
-                }
-
-                ++itor;
-            }
+            setupComputeShaders();
         }
     }
     //-----------------------------------------------------------------------------------
@@ -233,6 +96,154 @@ namespace Ogre
         }
 
         mTmpTextures.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassMipmap::setupComputeShaders(void)
+    {
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
+
+        HlmsComputeJob *blurH = hlmsCompute->findComputeJobNoThrow( "Mipmap/GaussianBlurH" );
+        HlmsComputeJob *blurV = hlmsCompute->findComputeJobNoThrow( "Mipmap/GaussianBlurV" );
+
+    #if OGRE_NO_JSON
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                     "To use PASS_MIPMAP with compute shaders, Ogre must be build with JSON support "
+                     "and you must include the resource bundled at "
+                     "Samples/Media/2.0/scripts/materials/Common",
+                     "CompositorPassMipmap::CompositorPassMipmap" );
+    #endif
+
+        if( !blurH || !blurV )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "To use PASS_MIPMAP with compute shaders, you must include the resources "
+                         "bundled at Samples/Media/2.0/scripts/materials/Common\n"
+                         "Could not find Mipmap/GaussianBlurH and Mipmap/GaussianBlurV",
+                         "CompositorPassMipmap::CompositorPassMipmap" );
+        }
+
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+        const RenderSystemCapabilities *caps = renderSystem->getCapabilities();
+
+        if( !caps->hasCapability( RSC_COMPUTE_PROGRAM ) )
+        {
+            LogManager::getSingleton().logMessage(
+                        "[INFO] Compute Shaders not supported. Using fallback mipmap generation." );
+            return;
+        }
+
+        setGaussianFilterParams( blurH, mDefinition->mKernelRadius,
+                                 mDefinition->mGaussianDeviationFactor );
+        setGaussianFilterParams( blurV, mDefinition->mKernelRadius,
+                                 mDefinition->mGaussianDeviationFactor );
+
+        TextureVec::iterator itor = mTextures.begin();
+        TextureVec::iterator end  = mTextures.end();
+
+        while( itor != end )
+        {
+            TexturePtr &texture = *itor;
+
+            if( texture->getNumMipmaps() > 0 )
+            {
+                if( !(texture->getUsage() & TU_UAV) || (texture->getUsage() & TU_NOT_TEXTURE) )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture '" + texture->getName() +
+                                 "' must be flagged as UAV texture in order to be able to generate "
+                                 "mipmaps using Compute Shaders",
+                                 "CompositorPassMipmap::CompositorPassMipmap" );
+                }
+
+                const String newId = StringConverter::toString(
+                            Id::generateNewId<CompositorPassMipmap>() );
+
+                TexturePtr tmpTex = TextureManager::getSingleton().
+                        createManual( "MipmapTmpTexture " + newId,
+                                      ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                      texture->getTextureType(),
+                                      texture->getWidth() >> 1u, texture->getHeight(),
+                                      texture->getNumMipmaps(), texture->getFormat(),
+                                      TU_RENDERTARGET|TU_UAV, 0, texture->isHardwareGammaEnabled() );
+
+                mTmpTextures.push_back( tmpTex );
+
+                const uint8 numMips = texture->getNumMipmaps() + 1u;
+                const PixelFormat pf = texture->getFormat();
+
+                uint32 currWidth  = texture->getWidth();
+                uint32 currHeight = texture->getHeight();
+
+                for( size_t mip=0; mip<numMips - 1u; ++mip )
+                {
+                    const String mipString = StringConverter::toString( mip );
+                    HlmsComputeJob *blurH2  = blurH->clone( "Mipmap_BlurH" + newId +
+                                                            " mip " + mipString );
+                    HlmsComputeJob *blurV2  = blurV->clone( "Mipmap_BlurV" + newId +
+                                                            " mip " + mipString );
+
+                    ShaderParams::Param paramLodIdx;
+                    paramLodIdx.name = "srcLodIdx";
+                    ShaderParams::Param paramOutputSize;
+                    paramOutputSize.name = "g_f4OutputSize";
+
+                    ShaderParams *shaderParams = 0;
+
+                    paramLodIdx.setManualValue( (float)mip );
+                    paramOutputSize.setManualValue( Vector4( (float)currWidth, (float)currHeight,
+                                                             1.0f / currWidth, 1.0f / currHeight ) );
+
+                    shaderParams = &blurH2->getShaderParams( "default" );
+                    shaderParams->mParams.push_back( paramLodIdx );
+                    shaderParams->mParams.push_back( paramOutputSize );
+                    shaderParams->setDirty();
+
+                    blurH2->setProperty( "width_with_lod", currWidth );
+                    blurH2->setProperty( "height_with_lod", currHeight );
+
+                    currWidth = std::max( currWidth >> 1u, 1u );
+                    paramOutputSize.setManualValue( Vector4( (float)currWidth, (float)currHeight,
+                                                             1.0f / currWidth, 1.0f / currHeight ) );
+
+                    shaderParams = &blurV2->getShaderParams( "default" );
+                    shaderParams->mParams.push_back( paramLodIdx );
+                    shaderParams->mParams.push_back( paramOutputSize );
+                    shaderParams->setDirty();
+
+                    blurH2->setTexture( 0, texture );
+                    blurH2->_setUavTexture( 0, tmpTex, 0, ResourceAccess::Write, mip, pf );
+                    blurV2->setTexture( 0, tmpTex );
+                    blurV2->_setUavTexture( 0, texture, 0, ResourceAccess::Write, mip + 1u, pf );
+
+                    blurV2->setProperty( "width_with_lod", currWidth );
+                    blurV2->setProperty( "height_with_lod", currHeight );
+
+                    JobWithBarrier jobWithBarrier;
+
+                    //TODO: The system does not support bits like Vulkan & D3D12 do.
+                    //We need generic read layouts.
+                    //jobWithBarrier.resourceTransition.oldLayout = ResourceLayout::Texture;
+                    //jobWithBarrier.resourceTransition.newLayout = ResourceLayout::Uav;
+                    jobWithBarrier.resourceTransition.oldLayout = ResourceLayout::Undefined;
+                    jobWithBarrier.resourceTransition.newLayout = ResourceLayout::Undefined;
+
+                    jobWithBarrier.resourceTransition.writeBarrierBits = 0;
+                    jobWithBarrier.resourceTransition.readBarrierBits = ReadBarrier::Texture;
+
+                    jobWithBarrier.job = blurH2;
+                    renderSystem->_resourceTransitionCreated( &jobWithBarrier.resourceTransition );
+                    mJobs.push_back( jobWithBarrier );
+
+                    jobWithBarrier.job = blurV2;
+                    renderSystem->_resourceTransitionCreated( &jobWithBarrier.resourceTransition );
+                    mJobs.push_back( jobWithBarrier );
+
+                    currHeight = std::max( currHeight >> 1u, 1u );
+                }
+            }
+
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     void CompositorPassMipmap::setGaussianFilterParams( HlmsComputeJob *job, uint8 kernelRadius,
