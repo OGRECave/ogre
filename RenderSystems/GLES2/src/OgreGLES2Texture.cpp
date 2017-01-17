@@ -128,6 +128,10 @@ namespace Ogre {
             mDepth = Bitwise::firstPO2From(mDepth);
         }
 
+        // set HardwareBuffer::Usage for TU_RENDERTARGET if nothing else specified
+        if((mUsage & TU_RENDERTARGET) && (mUsage & ~TU_RENDERTARGET) == 0)
+            mUsage |= HardwareBuffer::HBU_DYNAMIC;
+
         // Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
         GLenum texTarget = getGLES2TextureTarget();

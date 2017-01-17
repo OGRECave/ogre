@@ -101,6 +101,10 @@ namespace Ogre {
     // Creation / loading methods
     void GL3PlusTexture::createInternalResourcesImpl(void)
     {
+        // set HardwareBuffer::Usage for TU_RENDERTARGET if nothing else specified
+        if((mUsage & TU_RENDERTARGET) && (mUsage & ~TU_RENDERTARGET) == 0)
+            mUsage |= HardwareBuffer::HBU_DYNAMIC;
+
         // Adjust format if required.
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
 
