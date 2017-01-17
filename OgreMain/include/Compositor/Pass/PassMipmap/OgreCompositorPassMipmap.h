@@ -65,6 +65,7 @@ namespace Ogre
         TextureVec                      mTmpTextures;
         vector<JobWithBarrier>::type    mJobs;
 
+        void setupComputeShaders(void);
         void setGaussianFilterParams( HlmsComputeJob *job, uint8 kernelRadius,
                                       float gaussianDeviationFactor );
 
