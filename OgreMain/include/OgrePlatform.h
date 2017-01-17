@@ -229,6 +229,7 @@ namespace Ogre {
 
 // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
+#   define strnicmp strncasecmp
 
 // Always enable unicode support for the moment
 // Perhaps disable in old versions of gcc if necessary

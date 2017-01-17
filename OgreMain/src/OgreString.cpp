@@ -227,40 +227,30 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool StringUtil::startsWith(const String& str, const String& pattern, bool lowerCase)
     {
-        size_t thisLen = str.length();
-        size_t patternLen = pattern.length();
-        if (thisLen < patternLen || patternLen == 0)
+        if (pattern.empty())
             return false;
 
-        String startOfThis = str.substr(0, patternLen);
         if (lowerCase)
         {
-            String lowerCasePattern = pattern;
-            StringUtil::toLowerCase(lowerCasePattern);
-            StringUtil::toLowerCase(startOfThis);
-            return (startOfThis == lowerCasePattern);
+            return strnicmp(str.c_str(), pattern.c_str(), pattern.size()) == 0;
         }
 
-        return (startOfThis == pattern);
+        return strncmp(str.c_str(), pattern.c_str(), pattern.size()) == 0;
     }
     //-----------------------------------------------------------------------
     bool StringUtil::endsWith(const String& str, const String& pattern, bool lowerCase)
     {
-        size_t thisLen = str.length();
-        size_t patternLen = pattern.length();
-        if (thisLen < patternLen || patternLen == 0)
+        if (pattern.empty())
             return false;
 
-        String endOfThis = str.substr(thisLen - patternLen, patternLen);
+        size_t offset = str.size() - pattern.size();
+
         if (lowerCase)
         {
-            String lowerCasePattern = pattern;
-            StringUtil::toLowerCase(lowerCasePattern);
-            StringUtil::toLowerCase(endOfThis);
-            return (endOfThis == lowerCasePattern);
+            return strnicmp(str.c_str() + offset, pattern.c_str(), pattern.size()) == 0;
         }
 
-        return (endOfThis == pattern);
+        return strncmp(str.c_str() + offset, pattern.c_str(), pattern.size()) == 0;
     }
     //-----------------------------------------------------------------------
     String StringUtil::standardisePath(const String& init)
