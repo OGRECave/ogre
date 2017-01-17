@@ -977,8 +977,7 @@ namespace Ogre {
     const LightList& Frustum::getLights(void) const 
     {
         // N/A
-        OGRE_DEFINE_STATIC_LOCAL(LightList, ll, ());
-//        static LightList ll;
+        static LightList ll;
         return ll;
     }
     //-----------------------------------------------------------------------
