@@ -396,7 +396,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     
     // Generate program name.
-    programName = generateGUID(source);
+    programName = generateHash(source);
 
 #else // Disable caching on android devices 
 
@@ -517,7 +517,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 
 
 //-----------------------------------------------------------------------------
-String ProgramManager::generateGUID(const String& programString)
+String ProgramManager::generateHash(const String& programString)
 {
     //To generate a unique value this component used to use _StringHash class.
     //However when this generates a hash value it selects a maximum of 10 places within the string
@@ -560,12 +560,8 @@ String ProgramManager::generateGUID(const String& programString)
     stream.fill('0');
     stream.setf(std::ios::fixed);
     stream.setf(std::ios::hex, std::ios::basefield);
-    stream.width(8); stream << val1 << "-";
-    stream.width(4); stream << (uint16)(val2 >> 16) << "-";
-    stream.width(4); stream << (uint16)(val2) << "-";
-    stream.width(4); stream << (uint16)(val3 >> 16) << "-";
-    stream.width(4); stream << (uint16)(val3);
-    stream.width(8); stream << val4;
+    stream.width(8);
+    stream << val1 << val2 << val3 << val4;
     return stream.str();
 }
 
