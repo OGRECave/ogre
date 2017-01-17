@@ -439,6 +439,9 @@ namespace Ogre
         void _setUavTexture( uint8 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
                              ResourceAccess::ResourceAccess access, int32 mipmapLevel,
                              PixelFormat pixelFormat );
+
+        HlmsComputeJob *clone( const String &cloneName );
+        void cloneTo( HlmsComputeJob *dstJob );
     };
 
     /** @} */

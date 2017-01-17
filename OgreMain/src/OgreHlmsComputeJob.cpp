@@ -91,11 +91,12 @@ namespace Ogre
         char tmpData[64];
         LwString propName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
 
-        propName = propTexture; //ComputeProperty::Texture or ComputeProperty::Uav
+        propName = propTexture; //It's either ComputeProperty::Texture or ComputeProperty::Uav
         const size_t texturePropSize = propName.size() + 1u;
 
         uint8 maxTexUnitReached = outMaxTexUnitReached;
 
+        //Remove everything from any previous run.
         for( uint8 i=0; i<maxTexUnitReached; ++i )
         {
             propName.resize( texturePropSize - 1u );
@@ -235,6 +236,19 @@ namespace Ogre
                         const char *typeName = toShaderType->getPixelFormatType( texture->getFormat() );
                         if( typeName )
                             setPiece( propName.c_str(), typeName );
+                        propName.resize( texturePropSize );
+
+                        uint32 mipLevel = std::min<uint32>( itor->mipmapLevel,
+                                                            texture->getNumMipmaps() );
+
+                        propName.a( "_width_with_lod" );    //uav0_width_with_lod
+                        setProperty( propName.c_str(), std::max( texture->getWidth() >>
+                                                                 (uint32)mipLevel, 1u ) );
+                        propName.resize( texturePropSize );
+
+                        propName.a( "_height_with_lod" );   //uav0_height_with_lod
+                        setProperty( propName.c_str(), std::max( texture->getHeight() >>
+                                                                 (uint32)mipLevel, 1u ) );
                         propName.resize( texturePropSize );
                     }
                 }
@@ -654,5 +668,24 @@ namespace Ogre
         texSlot.access              = access;
         texSlot.mipmapLevel         = mipmapLevel;
         texSlot.pixelFormat         = pixelFormat;
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsComputeJob* HlmsComputeJob::clone( const String &cloneName )
+    {
+        HlmsCompute *compute = static_cast<HlmsCompute*>( mCreator );
+        HlmsComputeJob *newJob = compute->createComputeJob( cloneName, cloneName,
+                                                            this->mSourceFilename,
+                                                            this->mIncludedPieceFiles );
+
+        this->cloneTo( newJob );
+
+        return newJob;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::cloneTo( HlmsComputeJob *dstJob )
+    {
+        IdString originalName = dstJob->mName;
+        *dstJob = *this;
+        dstJob->mName = originalName;
     }
 }

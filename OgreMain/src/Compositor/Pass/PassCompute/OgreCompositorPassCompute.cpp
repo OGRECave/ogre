@@ -120,7 +120,7 @@ namespace Ogre
             while( it != en && it->name != itor->textureName )
                 ++it;
 
-            if( it != en )
+            if( it == en )
             {
                 mTextureDependencies.push_back( CompositorTexture( itor->textureName,
                                                                    &channel->textures ) );

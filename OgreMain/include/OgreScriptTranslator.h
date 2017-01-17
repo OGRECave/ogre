@@ -320,6 +320,8 @@ namespace Ogre{
                            CompositorTargetDef *targetDef );
         void translateCompute( ScriptCompiler *compiler, const AbstractNodePtr &node,
                                CompositorTargetDef *targetDef );
+        void translateMipmap( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                              CompositorTargetDef *targetDef );
 
     public:
         CompositorPassTranslator();
