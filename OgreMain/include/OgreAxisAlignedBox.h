@@ -350,7 +350,7 @@ namespace Ogre {
             }
         }
 
-        _OgreExport friend std::ostream& operator<<( std::ostream& o, const AxisAlignedBox &aab )
+        friend std::ostream& operator<<( std::ostream& o, const AxisAlignedBox &aab )
         {
             switch (aab.mExtent)
             {

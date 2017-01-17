@@ -260,7 +260,7 @@ namespace Ogre
             PortalSortDistance(const Vector3& inCameraPosition) : cameraPosition(inCameraPosition)
             { }
 
-            bool _OgrePCZPluginExport operator()(const PortalBase* p1, const PortalBase* p2) const
+            bool operator()(const PortalBase* p1, const PortalBase* p2) const
             {
                 Real depth1 = p1->getDerivedCP().squaredDistance(cameraPosition);
                 Real depth2 = p2->getDerivedCP().squaredDistance(cameraPosition);
