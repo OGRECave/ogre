@@ -238,3 +238,22 @@ TEST_F(StringTests,ParseColourValue)
     EXPECT_EQ(r, t);
 }
 //--------------------------------------------------------------------------
+TEST_F(StringTests,EndsWith)
+{
+    String s = "Hello World!";
+
+    EXPECT_TRUE(StringUtil::endsWith(s, "world!"));
+    EXPECT_FALSE(StringUtil::endsWith(s, "hello"));
+    EXPECT_FALSE(StringUtil::endsWith(s, "world!", false));
+    EXPECT_FALSE(StringUtil::endsWith(s, "", false));
+}
+
+TEST_F(StringTests,StartsWith)
+{
+    String s = "Hello World!";
+
+    EXPECT_TRUE(StringUtil::startsWith(s, "hello"));
+    EXPECT_FALSE(StringUtil::startsWith(s, "world"));
+    EXPECT_FALSE(StringUtil::startsWith(s, "hello", false));
+    EXPECT_FALSE(StringUtil::startsWith(s, "", false));
+}
