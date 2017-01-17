@@ -1315,6 +1315,13 @@ namespace Ogre
 
         mIds["job"]             = ID_JOB;
 
+        mIds["mipmap_method"]   = ID_MIPMAP_METHOD;
+        mIds["api_default"]     = ID_API_DEFAULT;
+        //mIds["compute"]       = ID_COMPUTE;
+        mIds["compute_hq"]      = ID_COMPUTE_HQ;
+        mIds["kernel_radius"]   = ID_KERNEL_RADIUS;
+        mIds["gauss_deviation"] = ID_GAUSS_DEVIATION;
+
         mIds["compositor_node_shadow"]  = ID_SHADOW_NODE;
         mIds["num_splits"]              = ID_NUM_SPLITS;
         mIds["pssm_split_padding"]      = ID_PSSM_SPLIT_PADDING;

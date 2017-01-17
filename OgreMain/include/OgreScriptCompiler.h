@@ -926,6 +926,14 @@ namespace Ogre
                     //Used by PASS_COMPUTE
                     ID_JOB,
 
+                    //Used by PASS_MIPMAP
+                    ID_MIPMAP_METHOD,
+                        ID_API_DEFAULT,
+                        //ID_COMPUTE,
+                        ID_COMPUTE_HQ,
+                    ID_KERNEL_RADIUS,
+                    ID_GAUSS_DEVIATION,
+
             ID_READ_BACK_AS_TEXTURE,
 
         ID_SHADOW_NODE,

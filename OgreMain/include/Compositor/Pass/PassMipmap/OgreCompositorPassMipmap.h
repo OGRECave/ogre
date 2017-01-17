@@ -53,11 +53,25 @@ namespace Ogre
     class _OgreExport CompositorPassMipmap : public CompositorPass
     {
     protected:
+        struct JobWithBarrier
+        {
+            HlmsComputeJob      *job;
+            ResourceTransition  resourceTransition;
+        };
+
         TextureVec      mTextures;
+
+        /// Compute
+        TextureVec                      mTmpTextures;
+        vector<JobWithBarrier>::type    mJobs;
+
+        void setGaussianFilterParams( HlmsComputeJob *job, uint8 kernelRadius,
+                                      float gaussianDeviationFactor );
 
     public:
         CompositorPassMipmap( const CompositorPassMipmapDef *definition,
                               const CompositorChannel &target, CompositorNode *parentNode );
+        virtual ~CompositorPassMipmap();
 
         virtual void execute( const Camera *lodCamera );
 

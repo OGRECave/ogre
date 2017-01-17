@@ -383,6 +383,8 @@ namespace Ogre
 			weights[i] = fWeight;
         }
 
+        fWeightSum = fWeightSum * 2.0f - weights[kernelRadius];
+
         //Normalize the weights
         for( uint32 i=0; i<kernelRadius + 1u; ++i )
             weights[i] /= fWeightSum;

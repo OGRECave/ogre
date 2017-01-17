@@ -17,6 +17,8 @@
 //	image_store
 //	image_sample
 //	decode_lds (optional, i.e. when lds_data_type != data_type)
+//	Define the property "downscale" if you're doing a downsample.
+//	Define "downscale_lq" (must also define downscale) for SLIGHTLY lower quality downscale
 // The script uses the template syntax to automatically set the num. of threadgroups
 // based on the bound input texture.
 
@@ -34,26 +36,34 @@ layout( local_size_x = 32,
 @pmul( pixelsPerRow, threads_per_group_x, 4 )
 @pset( rowsPerThreadGroup, threads_per_group_y )
 @pset( num_thread_groups_z, 1 )
+
+@set( input_width, uav0_width_with_lod )
+@set( input_height, uav0_height_with_lod )
+
 @property( horizontal_pass )
+	@property( downscale ) @mul( input_width, 2 ) @end
+
 	/// Calculate num_thread_groups_
 	/// num_thread_groups_x = (texture0_width + pixelsPerRow - 1) / pixelsPerRow
 	/// num_thread_groups_y = (texture0_height + rowsPerThreadGroup - 1) / rowsPerThreadGroup
-	@add( num_thread_groups_x, texture0_width, pixelsPerRow )
+	@add( num_thread_groups_x, input_width, pixelsPerRow )
 	@sub( num_thread_groups_x, 1 )
 	@div( num_thread_groups_x, pixelsPerRow )
 
-	@add( num_thread_groups_y, texture0_height, rowsPerThreadGroup )
+	@add( num_thread_groups_y, input_height, rowsPerThreadGroup )
 	@sub( num_thread_groups_y, 1 )
 	@div( num_thread_groups_y, rowsPerThreadGroup )
 @end @property( !horizontal_pass )
+	@property( downscale ) @mul( input_height, 2 ) @end
+
 	/// Calculate num_thread_groups_
 	/// num_thread_groups_x = (texture0_width + rowsPerThreadGroup - 1) / rowsPerThreadGroup
 	/// num_thread_groups_y = (texture0_height + pixelsPerRow - 1) / pixelsPerRow
-	@add( num_thread_groups_x, texture0_width, rowsPerThreadGroup )
+	@add( num_thread_groups_x, input_width, rowsPerThreadGroup )
 	@sub( num_thread_groups_x, 1 )
 	@div( num_thread_groups_x, rowsPerThreadGroup )
 
-	@add( num_thread_groups_y, texture0_height, pixelsPerRow )
+	@add( num_thread_groups_y, input_height, pixelsPerRow )
 	@sub( num_thread_groups_y, 1 )
 	@div( num_thread_groups_y, pixelsPerRow )
 @end
@@ -76,24 +86,39 @@ uniform float c_weights[@value( kernel_radius_plus1 )];
 
 void ComputeFilterKernel( int iPixelOffset, int iLineOffset, ivec2 i2Center, ivec2 i2Inc )
 {
-	@insertpiece( data_type ) outColour[ 4 ];
+	@property( !downscale_lq )
+		@insertpiece( data_type ) outColour[ 4 ];
+	@end @property( downscale_lq )
+		@insertpiece( data_type ) outColour[ 2 ];
+	@end
 	@insertpiece( data_type ) RDI[ 4 ] ;
 
 	@foreach( 4, iPixel )
 		RDI[ @iPixel ] = @insertpiece( decode_lds )( g_f3LDS[ iLineOffset ][ iPixelOffset + @value( kernel_radius ) + @iPixel ] );@end
 
-	@foreach( 4, iPixel )
-		outColour[ @iPixel ].xyz = RDI[ @iPixel ] * c_weights[ @value( kernel_radius ) ];@end
+	@property( !downscale_lq )
+		@foreach( 4, iPixel )
+			outColour[ @iPixel ].xyz = RDI[ @iPixel ] * c_weights[ @value( kernel_radius ) ];@end
+	@end @property( downscale_lq )
+		@foreach( 2, iPixel )
+			outColour[ @iPixel ].xyz = RDI[ @iPixel * 2 ] * c_weights[ @value( kernel_radius ) ];@end
+	@end
 
 	@foreach( 4, iPixel )
 		RDI[ @iPixel ] = @insertpiece( decode_lds )( g_f3LDS[ iLineOffset ][ iPixelOffset + @iPixel ] );@end
 
 	iPixelOffset += 4;
 
+	/// Deal with taps to our left.
 	/// for ( iIteration = 0; iIteration < radius; iIteration += 1 )
 	@foreach( kernel_radius, iIteration )
-		@foreach( 4, iPixel )
-			outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @iIteration ];@end
+		@property( !downscale_lq )
+			@foreach( 4, iPixel )
+				outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @iIteration ];@end
+		@end @property( downscale_lq )
+			@foreach( 2, iPixel )
+				outColour[ @iPixel ].xyz += RDI[ @iPixel * 2 ] * c_weights[ @iIteration ];@end
+		@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
 		@foreach( 1, iPixel )
@@ -109,10 +134,16 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, ivec2 i2Center, ive
 
 	@pmul( kernel_radius2x, kernel_radius, 2 )
 
+	/// Deal with taps to our right.
 	/// for ( iIteration = radius + 1; iIteration < ( radius * 2 + 1 ); iIteration += 1 )
 	@foreach( kernel_radius2x_plus1, iIteration, kernel_radius_plus1 )
-		@foreach( 4, iPixel )
-			outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
+		@property( !downscale_lq )
+			@foreach( 4, iPixel )
+				outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
+		@end @property( downscale_lq )
+			@foreach( 2, iPixel )
+				outColour[ @iPixel ].xyz += RDI[ @iPixel * 2 ] * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
+		@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
 		@foreach( 1, iPixel )
@@ -163,6 +194,10 @@ void main()
 		ivec2 i2Center	= i2Coord + ivec2( 0, gl_LocalInvocationID.y );
 		ivec2 i2Inc		= ivec2 ( 1, 0 );
 
+		@property( downscale )
+			i2Center.x = int( uint( i2Center.x ) >> 1u );
+		@end
+
 		ComputeFilterKernel( iPixelOffset, iLineOffset, i2Center, i2Inc );
 	}
 @end @property( !horizontal_pass )
@@ -194,6 +229,10 @@ void main()
 	{
 		ivec2 i2Center	= i2Coord + ivec2( gl_LocalInvocationID.y, 0 );
 		ivec2 i2Inc		= ivec2 ( 0, 1 );
+
+		@property( downscale )
+			i2Center.y = int( uint( i2Center.y ) >> 1u );
+		@end
 
 		ComputeFilterKernel( iPixelOffset, iLineOffset, i2Center, i2Inc );
 	}

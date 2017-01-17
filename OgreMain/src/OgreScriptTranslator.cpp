@@ -56,6 +56,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassCompute/OgreCompositorPassComputeDef.h"
 #include "Compositor/Pass/PassDepthCopy/OgreCompositorPassDepthCopyDef.h"
+#include "Compositor/Pass/PassMipmap/OgreCompositorPassMipmapDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
@@ -9159,6 +9160,124 @@ namespace Ogre{
         }
     }
 
+    void CompositorPassTranslator::translateMipmap( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                                                    CompositorTargetDef *targetDef )
+    {
+        mPassDef = targetDef->addPass( PASS_MIPMAP );
+        CompositorPassMipmapDef *passMipmap = static_cast<CompositorPassMipmapDef*>( mPassDef );
+
+        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        obj->context = Any(mPassDef);
+
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_OBJECT)
+            {
+                processNode(compiler, *i);
+            }
+            else if((*i)->type == ANT_PROPERTY)
+            {
+                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                switch(prop->id)
+                {
+                case ID_MIPMAP_METHOD:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "mipmap_method must have at most 1 argument");
+                    }
+                    else
+                    {
+                        if(prop->values.front()->type == ANT_ATOM)
+                        {
+                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
+                            switch(atom->id)
+                            {
+                            case ID_API_DEFAULT:
+                                passMipmap->mMipmapGenerationMethod = CompositorPassMipmapDef::ApiDefault;
+                                break;
+                            case ID_COMPUTE:
+                                passMipmap->mMipmapGenerationMethod = CompositorPassMipmapDef::Compute;
+                                break;
+                            case ID_COMPUTE_HQ:
+                                passMipmap->mMipmapGenerationMethod = CompositorPassMipmapDef::ComputeHQ;
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   prop->values.front()->getValue() +
+                                                   " is not a valid miprmap_method (api_default, compute, or compute_hq)");
+                            }
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() +
+                                               " is not a valid miprmap_method (api_default, compute, or compute_hq)");
+                        }
+                    }
+                break;
+                case ID_KERNEL_RADIUS:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "kernel_radius must have at most 1 argument");
+                    }
+                    else
+                    {
+                        int value = 8;
+                        if( !getInt( prop->values.front(), &value ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() + " is not a valid integer argument");
+                        }
+                        else
+                        {
+                            passMipmap->mKernelRadius = (uint8)Math::Clamp( value, 0, 255 );
+                        }
+                    }
+                break;
+                case ID_GAUSS_DEVIATION:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "gauss_deviation must have at most 1 argument");
+                    }
+                    else
+                    {
+                        if( !getFloat( prop->values.front(), &passMipmap->mGaussianDeviationFactor ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() + " is not a valid integer argument");
+                        }
+                    }
+                break;
+
+                //case ID_VIEWPORT:
+                case ID_IDENTIFIER:
+                case ID_NUM_INITIAL:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
+                    break;
+                default:
+                    compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
+                        "token \"" + prop->name + "\" is not recognized");
+                }
+            }
+        }
+    }
+
     void CompositorPassTranslator::translateStencilFace( ScriptCompiler *compiler, const AbstractNodePtr &node,
                                                          StencilStateOp *stencilStateOp )
     {
@@ -9247,9 +9366,7 @@ namespace Ogre{
         else if(obj->name == "compute")
             translateCompute( compiler, node, target );
         else if(obj->name == "generate_mipmaps")
-        {
-            mPassDef = target->addPass( PASS_MIPMAP );
-        }
+            translateMipmap( compiler, node, target );
         else if(obj->name == "custom")
         {
             IdString customId;

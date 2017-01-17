@@ -47,8 +47,38 @@ namespace Ogre
     class _OgreExport CompositorPassMipmapDef : public CompositorPassDef
     {
     public:
+        enum MipmapGenerationMethods
+        {
+            /// Use the default based on the API selected. On DX12 that means using Compute.
+            ApiDefault,
+            /// Tell the API's to use high quality. Not recommended
+            /// ("quality" varies a lot across vendors).
+            //ApiDefaultHQ,
+            /** Use a compute shader. Ogre must be compiled with JSON and the
+                Compute shaders bundled at Samples/Media/2.0/scripts/materials/Common
+                must be in the resource path.
+            @remarks
+                Will use ApiDefault if Compute Shaders are not supported.
+                At the time of writing (2017/01/16) Compute uses ComputeHQ
+            */
+            Compute,
+            /// See Compute, but use a high quality gaussian filter.
+            ComputeHQ
+        };
+
+        MipmapGenerationMethods mMipmapGenerationMethod;
+
+        /// Used when mMipmapGenerationMethod == ComputeHQ
+        float mGaussianDeviationFactor;
+        /// Used when mMipmapGenerationMethod == ComputeHQ
+        uint8 mKernelRadius;
+
+    public:
         CompositorPassMipmapDef() :
-            CompositorPassDef( PASS_MIPMAP, 0 )
+            CompositorPassDef( PASS_MIPMAP, 0 ),
+            mMipmapGenerationMethod( ApiDefault ),
+            mGaussianDeviationFactor( 0.5f ),
+            mKernelRadius( 8 )
         {
         }
     };
