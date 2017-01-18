@@ -46,14 +46,14 @@ namespace Ogre {
     class _OgrePrivate EmscriptenEGLWindow : public EGLWindow
     {
     private:
-        uint mMaxBufferSize;
-        uint mMinBufferSize;
-        uint mMaxDepthSize;
-        uint mMaxStencilSize;
-        uint mMSAA;
-        uint mCSAA;
-        uint mOldWidth;
-        uint mOldHeight;
+        int mMaxBufferSize;
+        int mMinBufferSize;
+        int mMaxDepthSize;
+        int mMaxStencilSize;
+        int mMSAA;
+        int mCSAA;
+        int mOldWidth;
+        int mOldHeight;
         
     protected:
         virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
