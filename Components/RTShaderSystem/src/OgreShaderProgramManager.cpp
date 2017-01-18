@@ -519,50 +519,14 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 //-----------------------------------------------------------------------------
 String ProgramManager::generateHash(const String& programString)
 {
-    //To generate a unique value this component used to use _StringHash class.
-    //However when this generates a hash value it selects a maximum of 10 places within the string
-    //and bases the hash value on those position. This is not good enough for this situation.
-    //
-    //Different programs must have unique hash values. Some programs only differ in the size of array parameters.
-    //This means that only 1 or 2 letters will be changed. Using the _StringHash class in these case will, in all 
-    //likelihood, produce the same values.
+    //Different programs must have unique hash values.
+    uint32_t hash[4];
+    MurmurHash3_128(programString.c_str(), programString.size(), 0, hash);
 
-    unsigned int val1 = 0x9e3779b9;
-    unsigned int val2 = 0x61C88646;
-    unsigned int val3 = 0x9e3779b9;
-    unsigned int val4 = 0x61C88646;
-
-    //instead of generating the hash from the individual characters we will treat this string as a long 
-    //integer value for faster processing. We dismiss the last non-full int.
-    size_t sizeInInts = (programString.size() - 3) / 4;
-    const uint32* intBuffer = (const uint32*)programString.c_str();
-
-    size_t i = 0;
-    for( ; i < sizeInInts - 2 ; i += 3) 
-    {
-        uint32 bufVal0 = *(intBuffer + i);
-        uint32 bufVal1 = *(intBuffer + i + 1);
-        uint32 bufVal2 = *(intBuffer + i + 2);
-        val1 ^= (val1<<6) + (val1>>2) + bufVal0;
-        val2 ^= (val2<<6) + (val2>>2) + bufVal1;
-        val3 ^= (val3<<6) + (val3>>2) + bufVal2;
-        //ensure greater uniqueness by having the forth int value dependent on the entire string
-        val4 ^= (val4<<6) + (val4>>2) + bufVal0 + bufVal1 + bufVal2;
-    }
-    //read the end of the string we missed
-    if (i < sizeInInts - 1)
-        val1 ^= (val1<<6) + (val1>>2) + *(intBuffer + i - 1);
-    if (i < sizeInInts)
-        val2 ^= (val2<<6) + (val2>>2) + *(intBuffer + i);
-
-    //Generate the guid string
-    stringstream stream;
-    stream.fill('0');
-    stream.setf(std::ios::fixed);
-    stream.setf(std::ios::hex, std::ios::basefield);
-    stream.width(8);
-    stream << val1 << val2 << val3 << val4;
-    return stream.str();
+    //Generate the string
+    char str[33];
+    sprintf(str, "%08x%08x%08x%08x", hash[0], hash[1], hash[2], hash[3]);
+    return String(str);
 }
 
 
