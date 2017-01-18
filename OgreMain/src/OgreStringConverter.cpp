@@ -30,7 +30,18 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgrePlatform.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   define LC_NUMERIC_MASK LC_NUMERIC
+#   define newlocale(cat, loc, base) _create_locale(cat, loc)
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#   define newlocale(cat, loc, base) 0
+#endif
+
 namespace Ogre {
+    locale_t StringConverter::_numLocale = newlocale(LC_NUMERIC_MASK, OGRE_DEFAULT_LOCALE, NULL);
+
     template<typename T>
     String StringConverter::_toString(T val, uint16 width, char fill, std::ios::fmtflags flags)
     {
@@ -230,39 +241,40 @@ namespace Ogre {
         }
         return stream.str();
     }
+
     //-----------------------------------------------------------------------
     Real StringConverter::parseReal(const String& val, Real defaultValue)
     {
         char* end;
-        Real ret = (Real)strtod(val.c_str(), &end);
+        Real ret = (Real)strtod_l(val.c_str(), &end, _numLocale);
         return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     int StringConverter::parseInt(const String& val, int defaultValue)
     {
         char* end;
-        int ret = (int)strtoul(val.c_str(), &end, 0);
+        int ret = (int)strtoul_l(val.c_str(), &end, 0, _numLocale);
         return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     unsigned int StringConverter::parseUnsignedInt(const String& val, unsigned int defaultValue)
     {
         char* end;
-        unsigned int ret = (unsigned int)strtoul(val.c_str(), &end, 0);
+        unsigned int ret = (unsigned int)strtoul_l(val.c_str(), &end, 0, _numLocale);
         return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     long StringConverter::parseLong(const String& val, long defaultValue)
     {
         char* end;
-        long ret = strtol(val.c_str(), &end, 0);
+        long ret = strtol_l(val.c_str(), &end, 0, _numLocale);
         return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------
     unsigned long StringConverter::parseUnsignedLong(const String& val, unsigned long defaultValue)
     {
         char* end;
-        unsigned long ret = strtoul(val.c_str(), &end, 0);
+        unsigned long ret = strtoul_l(val.c_str(), &end, 0, _numLocale);
         return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------

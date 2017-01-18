@@ -56,6 +56,24 @@ namespace __gnu_cxx
 }
 #endif
 
+// A quick define to overcome different names for the same function
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   define locale_t _locale_t
+#   define strtod_l _strtod_l
+#   define strtoul_l _strtoul_l
+#   define strtol_l _strtol_l
+#else
+#   define stricmp strcasecmp
+#   define strnicmp strncasecmp
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#   define locale_t int
+#   define strtod_l(ptr, end, l) strtod(ptr, end)
+#   define strtoul_l(ptr, end, base, l) strtoul(ptr, end, base)
+#   define strtol_l(ptr, end, base, l) strtol(ptr, end, base)
+#endif
+
 namespace Ogre {
     /** \addtogroup Core
      *  @{
