@@ -447,7 +447,7 @@ namespace Ogre {
     bool StringConverter::isNumber(const String& val)
     {
         char* end;
-        strtof(val.c_str(), &end);
+        strtod(val.c_str(), &end);
         return end == (val.c_str() + val.size());
     }
 	//-----------------------------------------------------------------------

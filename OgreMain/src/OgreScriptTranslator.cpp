@@ -137,7 +137,7 @@ namespace Ogre{
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
         char* end;
-        *result = strtof(atom->value.c_str(), &end);
+        *result = strtod(atom->value.c_str(), &end);
         return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
