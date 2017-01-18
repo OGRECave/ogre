@@ -387,25 +387,14 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
                                                const String& cachePath)
 {
     stringstream sourceCodeStringStream;
-    String programName;
 
     // Generate source code.
     programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
     String source = sourceCodeStringStream.str();
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    
     // Generate program name.
-    programName = generateHash(source);
+    String programName = generateHash(source);
 
-#else // Disable caching on android devices 
-
-    // Generate program name.
-    static int gpuProgramID = 0;
-    programName = "RTSS_"  + StringConverter::toString(++gpuProgramID);
-   
-#endif
-    
     if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
     {
         programName += "_VS";
@@ -418,101 +407,101 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     // Try to get program by name.
     HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
 
+    if(pGpuProgram) {
+        return static_pointer_cast<GpuProgram>(pGpuProgram);
+    }
+
     // Case the program doesn't exist yet.
-    if (pGpuProgram.isNull())
+    // Create new GPU program.
+    pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
+
+    // Case cache directory specified -> create program from file.
+    if (cachePath.empty() == false)
     {
-        // Create new GPU program.
-        pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
+        const String  programFullName = programName + "." + language;
+        const String  programFileName = cachePath + programFullName;
+        std::ifstream programFile;
+        bool          writeFile = true;
 
-        // Case cache directory specified -> create program from file.
-        if (cachePath.empty() == false)
+
+        // Check if program file already exist.
+        programFile.open(programFileName.c_str());
+
+        // Case no matching file found -> we have to write it.
+        if (!programFile)
         {
-            const String  programFullName = programName + "." + language;
-            const String  programFileName = cachePath + programFullName;    
-            std::ifstream programFile;
-            bool          writeFile = true;
-
-
-            // Check if program file already exist.
-            programFile.open(programFileName.c_str());
-
-            // Case no matching file found -> we have to write it.
-            if (!programFile)
-            {           
-                writeFile = true;
-            }
-            else
-            {
-                writeFile = false;
-                programFile.close();
-            }
-
-            // Case we have to write the program to a file.
-            if (writeFile)
-            {
-                std::ofstream outFile(programFileName.c_str());
-
-                if (!outFile)
-                    return GpuProgramPtr();
-
-                outFile << source;
-                outFile.close();
-            }
-
-            pGpuProgram->setSourceFile(programFullName);
+            writeFile = true;
         }
-
-        // No cache directory specified -> create program from system memory.
         else
         {
-            pGpuProgram->setSource(source);
+            writeFile = false;
+            programFile.close();
         }
-        
-        
-        pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
 
-        if (language == "hlsl")
+        // Case we have to write the program to a file.
+        if (writeFile)
         {
-            // HLSL program requires specific target profile settings - we have to split the profile string.
-            StringVector::const_iterator it = profilesList.begin();
-            StringVector::const_iterator itEnd = profilesList.end();
-            
-            for (; it != itEnd; ++it)
+            std::ofstream outFile(programFileName.c_str());
+
+            if (!outFile)
+                return GpuProgramPtr();
+
+            outFile << source;
+            outFile.close();
+        }
+
+        pGpuProgram->setSourceFile(programFullName);
+    }
+
+    // No cache directory specified -> create program from system memory.
+    else
+    {
+        pGpuProgram->setSource(source);
+    }
+
+    pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
+
+    if (language == "hlsl")
+    {
+        // HLSL program requires specific target profile settings - we have to split the profile string.
+        StringVector::const_iterator it = profilesList.begin();
+        StringVector::const_iterator itEnd = profilesList.end();
+        
+        for (; it != itEnd; ++it)
+        {
+            if (GpuProgramManager::getSingleton().isSyntaxSupported(*it))
             {
-                if (GpuProgramManager::getSingleton().isSyntaxSupported(*it))
-                {
-                    pGpuProgram->setParameter("target", *it);
-                    break;
-                }
+                pGpuProgram->setParameter("target", *it);
+                break;
             }
-
-            pGpuProgram->setParameter("enable_backwards_compatibility", "false");
-            pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
-        }
-        
-        pGpuProgram->setParameter("profiles", profiles);
-        pGpuProgram->load();
-    
-        // Case an error occurred.
-        if (pGpuProgram->hasCompileError())
-        {
-            pGpuProgram.setNull();
-            return GpuProgramPtr(pGpuProgram);
         }
 
-        // Add the created GPU program to local cache.
-        if (pGpuProgram->getType() == GPT_VERTEX_PROGRAM)
-        {
-            mVertexShaderMap[programName] = pGpuProgram;            
-        }
-        else if (pGpuProgram->getType() == GPT_FRAGMENT_PROGRAM)
-        {
-            mFragmentShaderMap[programName] = pGpuProgram;  
-        }               
+        pGpuProgram->setParameter("enable_backwards_compatibility", "false");
+        pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
     }
     
-    return GpuProgramPtr(pGpuProgram);
+    pGpuProgram->setParameter("profiles", profiles);
+    pGpuProgram->load();
+
+    // Case an error occurred.
+    if (pGpuProgram->hasCompileError())
+    {
+        pGpuProgram.setNull();
+        return GpuProgramPtr(pGpuProgram);
+    }
+
+    // Add the created GPU program to local cache.
+    if (pGpuProgram->getType() == GPT_VERTEX_PROGRAM)
+    {
+        mVertexShaderMap[programName] = pGpuProgram;
+    }
+    else if (pGpuProgram->getType() == GPT_FRAGMENT_PROGRAM)
+    {
+        mFragmentShaderMap[programName] = pGpuProgram;
+    }
+    
+    return static_pointer_cast<GpuProgram>(pGpuProgram);
 }
 
 
