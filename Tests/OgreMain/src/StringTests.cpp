@@ -45,6 +45,7 @@ void StringTests::SetUp()
     testFileRelativePathWindows = "this\\is\\relative\\testfile.txt";
     testFileAbsolutePathUnix = "/this/is/absolute/testfile.txt";
     testFileAbsolutePathWindows = "c:\\this\\is\\absolute\\testfile.txt";
+    setlocale(LC_NUMERIC, "");
 }
 //--------------------------------------------------------------------------
 void StringTests::TearDown()
@@ -151,9 +152,10 @@ TEST_F(StringTests,ParseReal)
     Real r = 23.454;
 
     String s = StringConverter::toString(r);
-    Real t = StringConverter::parseReal(s);
 
-    EXPECT_EQ(r, t);
+    EXPECT_EQ(r, StringConverter::parseReal(s));
+    EXPECT_EQ(r, StringConverter::parseReal("23.454"));
+    EXPECT_NE(r, StringConverter::parseReal("23,454"));
 }
 //--------------------------------------------------------------------------
 TEST_F(StringTests,ParseInt)
