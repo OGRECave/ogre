@@ -171,6 +171,7 @@ if (OGRE_BUILD_TESTS)
     endif()
     
     if(APPLE AND NOT APPLE_IOS)
+      set_property(TARGET Test_Ogre PROPERTY MACOSX_BUNDLE TRUE)
       set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
       set(OGRE_TEST_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
       set_target_properties(Test_Ogre PROPERTIES
