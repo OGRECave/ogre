@@ -40,6 +40,9 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreLwString.h"
 
+#include "OgreRoot.h"
+#include "OgreHlmsManager.h"
+
 #include "OgreHlmsCompute.h"
 #include "OgreHlmsComputeJob.h"
 #include "OgreLogManager.h"
