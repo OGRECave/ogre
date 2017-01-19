@@ -162,11 +162,11 @@ protected:
     bool createGpuPrograms(ProgramSet* programSet);
         
     /** 
-    Generates a unique guid value from a string
+    Generates a unique hash from a string
     @param programString string to generate a hash value for
     @return A string representing a 128 bit hash value of the original string
     */
-    String generateGUID(const String& programString);
+    static String generateHash(const String& programString);
 
     /** Create GPU program based on the give CPU program.
     @param shaderProgram The CPU program instance.

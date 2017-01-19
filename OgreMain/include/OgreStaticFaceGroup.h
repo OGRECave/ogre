@@ -110,7 +110,7 @@ namespace Ogre {
         PatchSurface* patchSurf;
 
 
-        _OgreExport friend std::ostream& operator<<(std::ostream& o, const StaticFaceGroup& s)
+        friend std::ostream& operator<<(std::ostream& o, const StaticFaceGroup& s)
         {
             o << "StaticFaceGroup(";
             if (s.fType == FGT_FACE_LIST)

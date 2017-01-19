@@ -134,7 +134,7 @@ namespace Ogre {
         /// Comparator to order pass groups
         struct PassGroupLess
         {
-            bool _OgreExport operator()(const Pass* a, const Pass* b) const
+            bool operator()(const Pass* a, const Pass* b) const
             {
                 // Sort by passHash, which is pass, then texture unit changes
                 uint32 hasha = a->getHash();
@@ -160,7 +160,7 @@ namespace Ogre {
             {
             }
 
-            bool _OgreExport operator()(const RenderablePass& a, const RenderablePass& b) const
+            bool operator()(const RenderablePass& a, const RenderablePass& b) const
             {
                 if (a.renderable == b.renderable)
                 {

@@ -75,13 +75,6 @@ typedef SharedPtr<Parameter>        ParameterPtr;
 typedef SharedPtr<UniformParameter> UniformParameterPtr;
 typedef vector<ParameterPtr>::type  ShaderParameterList;
 
-/// Utility function with same style as boost::hash_combine
-template <class T>
-inline void sh_hash_combine(uint32& seed, T const& v)
-{
-    seed ^= FastHash((const char*)&v, sizeof(T)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-}
-
 // Vertex shader output parameters compact policy.
 enum VSOutputCompactPolicy
 {   
