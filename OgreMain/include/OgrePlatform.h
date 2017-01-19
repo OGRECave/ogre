@@ -227,10 +227,6 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
     OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 
-// A quick define to overcome different names for the same function
-#   define stricmp strcasecmp
-#   define strnicmp strncasecmp
-
 // Always enable unicode support for the moment
 // Perhaps disable in old versions of gcc if necessary
 #define OGRE_UNICODE_SUPPORT 1

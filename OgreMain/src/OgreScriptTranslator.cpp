@@ -137,7 +137,7 @@ namespace Ogre{
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
         char* end;
-        *result = strtod(atom->value.c_str(), &end);
+        *result = (float)strtod_l(atom->value.c_str(), &end, StringConverter::_numLocale);
         return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
@@ -148,7 +148,7 @@ namespace Ogre{
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
         char* end;
-        *result = strtod(atom->value.c_str(), &end);
+        *result = strtod_l(atom->value.c_str(), &end, StringConverter::_numLocale);
         return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
@@ -159,7 +159,7 @@ namespace Ogre{
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
         char* end;
-        *result = (int)strtol(atom->value.c_str(), &end, 0);
+        *result = (int)strtol_l(atom->value.c_str(), &end, 0, StringConverter::_numLocale);
         return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
@@ -170,7 +170,7 @@ namespace Ogre{
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
         char* end;
-        *result = (uint)strtoul(atom->value.c_str(), &end, 0);
+        *result = (uint)strtoul_l(atom->value.c_str(), &end, 0, StringConverter::_numLocale);
         return atom->value.c_str() != end;
     }
     //-------------------------------------------------------------------------
