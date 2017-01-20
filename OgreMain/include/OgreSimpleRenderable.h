@@ -55,7 +55,6 @@ namespace Ogre {
         Matrix4 mTransform;
         AxisAlignedBox mBox;
 
-        String mMatName;
         MaterialPtr mMaterial;
 
         /// The scene manager for the current frame.

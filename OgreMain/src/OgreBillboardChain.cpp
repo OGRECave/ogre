@@ -92,8 +92,8 @@ namespace Ogre {
         mVertexData->vertexStart = 0;
         // index data set up later
         // set basic white material
-        this->setMaterialName("BaseWhiteNoLighting");
-
+        mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
+        mMaterial->load();
     }
     //-----------------------------------------------------------------------
     BillboardChain::~BillboardChain()
@@ -726,8 +726,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardChain::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
-        mMaterialName = name;
-        mMaterial = MaterialManager::getSingleton().getByName(mMaterialName, groupName);
+        mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
 
         if (mMaterial.isNull())
         {
@@ -735,14 +734,7 @@ namespace Ogre {
                 " to BillboardChain " + mName + " because this "
                 "Material does not exist. Have you forgotten to define it in a "
                 ".material script?", LML_CRITICAL);
-            mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting");
-            if (mMaterial.isNull())
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
-                    "to BillboardChain of " + mName + ". Did "
-                    "you forget to call MaterialManager::initialise()?",
-                    "BillboardChain.setMaterialName");
-            }
+            mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
         }
         // Ensure new material loaded (will not load again if already loaded)
         mMaterial->load();

@@ -367,9 +367,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getResourceByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
-    {       
-        ResourcePtr res;
-
+    {
         // if not in the global pool - get it from the grouped pool 
         if(!ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(groupName))
         {
@@ -382,59 +380,45 @@ namespace Ogre {
 
                 if( it != itGroup->second.end())
                 {
-                    res = it->second;
+                    return it->second;
                 }
             }
         }
 
         // if didn't find it the grouped pool - get it from the global pool 
-        if (res.isNull())
+        OGRE_LOCK_AUTO_MUTEX;
+
+        ResourceMap::iterator it = mResources.find(name);
+
+        if( it != mResources.end())
         {
-                    OGRE_LOCK_AUTO_MUTEX;
+            return it->second;
+        }
 
-            ResourceMap::iterator it = mResources.find(name);
+        // this is the case when we need to search also in the grouped hash
+        if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+        {
+            ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
+            ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
+            for ( ; iter != iterE ; ++iter )
+            {
+                ResourceMap::iterator resMapIt = iter->second.find(name);
 
-            if( it != mResources.end())
-            {
-                res = it->second;
-            }
-            else
-            {
-                // this is the case when we need to search also in the grouped hash
-                if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+                if( resMapIt != iter->second.end())
                 {
-                    ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
-                    ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
-                    for ( ; iter != iterE ; ++iter )
-                    {
-                        ResourceMap::iterator resMapIt = iter->second.find(name);
-
-                        if( resMapIt != iter->second.end())
-                        {
-                            res = resMapIt->second;
-                            break;
-                        }
-                    }
+                    return resMapIt->second;
                 }
             }
         }
     
-        return res;
+        return ResourcePtr();
     }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getByHandle(ResourceHandle handle)
     {
         OGRE_LOCK_AUTO_MUTEX;
-
         ResourceHandleMap::iterator it = mResourcesByHandle.find(handle);
-        if (it == mResourcesByHandle.end())
-        {
-            return ResourcePtr();
-        }
-        else
-        {
-            return it->second;
-        }
+        return it == mResourcesByHandle.end() ? ResourcePtr() : it->second;
     }
     //-----------------------------------------------------------------------
     ResourceHandle ResourceManager::getNextHandle(void)

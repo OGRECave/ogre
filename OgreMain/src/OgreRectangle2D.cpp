@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreRectangle2D.h"
 
 #include "OgreHardwareBufferManager.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre {
 #define POSITION_BINDING 0
@@ -125,7 +126,8 @@ namespace Ogre {
         }
 
         // set basic white material
-        this->setMaterial("BaseWhiteNoLighting");
+        mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
+        mMaterial->load();
     }
 
     Rectangle2D::~Rectangle2D() 

@@ -110,6 +110,21 @@ namespace Ogre {
     {
         return getResourceByName(name, groupName).staticCast<Material>();
     }
+
+    MaterialPtr MaterialManager::getDefaultMaterial(bool useLighting) {
+        MaterialPtr ret = getByName(useLighting ? "BaseWhite" : "BaseWhiteNoLighting",
+                                    ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+
+        if (!ret)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't find default material "
+                " Did you forget to call MaterialManager::initialise()?",
+                "MaterialManager::getDefaultMaterial");
+        }
+
+        return ret;
+    }
+
     //-----------------------------------------------------------------------
     void MaterialManager::initialise(void)
     {

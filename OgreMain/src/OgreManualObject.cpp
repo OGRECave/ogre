@@ -189,15 +189,7 @@ namespace Ogre {
                                                   "Material does not exist. Have you forgotten to define it in a "
                                                   ".material script?", LML_CRITICAL);
 
-            material = MaterialManager::getSingleton().getByName("BaseWhite");
-
-            if (material.isNull())
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
-                            "to the ManualObject " + mName + ". Did "
-                            "you forget to call MaterialManager::initialise()?",
-                            "ManualObject::begin");
-            }
+            material = MaterialManager::getSingleton().getDefaultMaterial();
         }
 
         mCurrentSection = OGRE_NEW ManualObjectSection(this, materialName, opType, groupName);

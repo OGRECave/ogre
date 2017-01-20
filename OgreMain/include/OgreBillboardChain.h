@@ -254,7 +254,7 @@ namespace Ogre {
         void setFaceCamera( bool faceCamera, const Vector3 &normalVector=Vector3::UNIT_X );
 
         /// Get the material name in use
-        virtual const String& getMaterialName(void) const { return mMaterialName; }
+        virtual const String& getMaterialName(void) const { return mMaterial->getName(); }
         /// Set the material name to use for rendering
         virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
@@ -307,7 +307,6 @@ namespace Ogre {
         /// Bounding radius
         mutable Real mRadius;
         /// Material 
-        String mMaterialName;
         MaterialPtr mMaterial;
         /// Texture coord direction
         TexCoordDirection mTexCoordDir;

@@ -71,7 +71,7 @@ namespace Ogre {
         mLinkedObliqueProjPlane(0)
     {
         // Initialise material
-        mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting");
+        mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
         
         // Alter superclass members
         mVisible = false;
