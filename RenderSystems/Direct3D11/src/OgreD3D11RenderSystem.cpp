@@ -908,6 +908,8 @@ namespace Ogre
 #if !__OGRE_WINRT_PHONE_80
 		if(win == NULL && windowType == "SurfaceImageSource")
 			win = new D3D11RenderWindowImageSource(mDevice);
+		if(win == NULL && windowType == "SwapChainPanel")
+			win = new D3D11RenderWindowSwapChainPanel(mDevice);
 #endif // !__OGRE_WINRT_PHONE_80
 		if(win == NULL)
 			win = new D3D11RenderWindowCoreWindow(mDevice);

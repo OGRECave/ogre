@@ -237,6 +237,36 @@ namespace Ogre
         Platform::Agile<Windows::UI::Core::CoreWindow> mCoreWindow;
     };
 
+#if defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+    class _OgreD3D11Export D3D11RenderWindowSwapChainPanel
+        : public D3D11RenderWindowSwapChainBased
+    {
+    public:
+        D3D11RenderWindowSwapChainPanel(D3D11Device& device);
+        ~D3D11RenderWindowSwapChainPanel()                      { destroy(); }
+
+        virtual float getViewPointToPixelScale();
+        virtual void create(const String& name, unsigned widthPt, unsigned heightPt, bool fullScreen, const NameValuePairList *miscParams);
+        virtual void destroy(void);
+
+        Windows::UI::Xaml::Controls::SwapChainPanel^ getSwapChainPanel() const    { return mSwapChainPanel; }
+
+        bool isVisible() const;
+
+        // Method for dealing with resize / move & 3d library
+        void windowMovedOrResized();
+
+    protected:
+        virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice);
+        HRESULT _compensateSwapChainCompositionScale();
+
+    protected:
+        Windows::UI::Xaml::Controls::SwapChainPanel^ mSwapChainPanel;
+        Windows::Foundation::Size mCompositionScale;
+        Windows::Foundation::EventRegistrationToken sizeChangedToken, compositionScaleChangedToken;
+    };
+#endif
+
 #if !__OGRE_WINRT_PHONE_80
 
     class _OgreD3D11Export D3D11RenderWindowImageSource

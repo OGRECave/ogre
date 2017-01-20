@@ -40,6 +40,9 @@ THE SOFTWARE.
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
 #include <iomanip>
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+#include <dxgi1_3.h> // for IDXGISwapChain2::SetMatrixTransform used in D3D11RenderWindowSwapChainPanel
+#endif
 
 #define OGRE_D3D11_WIN_CLASS_NAME "OgreD3D11Wnd"
 
@@ -1422,6 +1425,185 @@ namespace Ogre
 #pragma endregion
 
     //---------------------------------------------------------------------
+    // class D3D11RenderWindowSwapChainPanel
+    //---------------------------------------------------------------------
+#pragma region D3D11RenderWindowSwapChainPanel
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+	D3D11RenderWindowSwapChainPanel::D3D11RenderWindowSwapChainPanel(D3D11Device& device)
+        : D3D11RenderWindowSwapChainBased(device)
+        , mCompositionScale(1.0f, 1.0f)
+    {
+        mUseFlipSequentialMode = true;
+    }
+
+    float D3D11RenderWindowSwapChainPanel::getViewPointToPixelScale()
+    {
+        return std::max(mCompositionScale.Width, mCompositionScale.Height);
+    }
+
+    void D3D11RenderWindowSwapChainPanel::create(const String& name, unsigned int widthPt, unsigned int heightPt,
+        bool fullScreen, const NameValuePairList *miscParams)
+    {
+        D3D11RenderWindowSwapChainBased::create(name, widthPt, heightPt, fullScreen, miscParams);
+
+        Windows::UI::Xaml::Controls::SwapChainPanel^ externalHandle = nullptr;
+
+        if(miscParams)
+        {
+            // Get variable-length params
+            NameValuePairList::const_iterator opt;
+            // externalWindowHandle     -> externalHandle
+            opt = miscParams->find("externalWindowHandle");
+            if(opt != miscParams->end())
+                externalHandle = reinterpret_cast<Windows::UI::Xaml::Controls::SwapChainPanel^>((void*)StringConverter::parseSizeT(opt->second));
+        }
+
+        // Reset current control if any
+        mSwapChainPanel = nullptr;
+
+        if (!externalHandle)
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "External window handle is not specified.", "D3D11RenderWindow::create" );
+        }
+        else
+        {
+            mSwapChainPanel = externalHandle;
+            mIsExternal = true;
+
+            // subscribe to important notifications
+            compositionScaleChangedToken = (mSwapChainPanel->CompositionScaleChanged +=
+                ref new Windows::Foundation::TypedEventHandler<Windows::UI::Xaml::Controls::SwapChainPanel^, Platform::Object^>([this](Windows::UI::Xaml::Controls::SwapChainPanel^ sender, Platform::Object^ e)
+            {
+                windowMovedOrResized();
+            }));
+            sizeChangedToken = (mSwapChainPanel->SizeChanged +=
+                ref new Windows::UI::Xaml::SizeChangedEventHandler([this](Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e)
+            {
+                windowMovedOrResized();
+            }));
+        }
+
+        Windows::Foundation::Size sz = Windows::Foundation::Size(static_cast<float>(mSwapChainPanel->ActualWidth), static_cast<float>(mSwapChainPanel->ActualHeight));
+        mCompositionScale = Windows::Foundation::Size(mSwapChainPanel->CompositionScaleX, mSwapChainPanel->CompositionScaleY);
+        mLeft = 0;
+        mTop = 0;
+        mWidth = (int)(sz.Width * mCompositionScale.Width + 0.5f);
+        mHeight = (int)(sz.Height * mCompositionScale.Height + 0.5f);
+
+        LogManager::getSingleton().stream() << std::fixed << std::setprecision(1) 
+            << "D3D11: Created D3D11 SwapChainPanel Rendering Window \"" << mName << "\", " << sz.Width << " x " << sz.Height
+            << ", with backing store " << mWidth << "x" << mHeight << ", " << mColourDepth << "bpp, "
+            << "using content scaling factor { " << mCompositionScale.Width << ", " << mCompositionScale.Height << " }";
+
+        _createSwapChain();
+        _createSizeDependedD3DResources();
+    }
+
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainPanel::destroy()
+    {
+        D3D11RenderWindowSwapChainBased::destroy();
+
+        if (mSwapChainPanel && !mIsExternal)
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Only external window handles are supported."
+                , "D3D11RenderWindow::destroy" );
+        }
+        mSwapChainPanel->CompositionScaleChanged -= compositionScaleChangedToken; compositionScaleChangedToken.Value = 0;
+        mSwapChainPanel->SizeChanged -= sizeChangedToken; sizeChangedToken.Value = 0;
+        mSwapChainPanel = nullptr;
+    }
+    //---------------------------------------------------------------------
+    HRESULT D3D11RenderWindowSwapChainPanel::_createSwapChainImpl(IDXGIDeviceN* pDXGIDevice)
+    {
+#if !__OGRE_WINRT_PHONE
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->determineFSAASettings(mFSAA, mFSAAHint, _getRenderFormat(), &mFSAAType);
+#endif
+
+        mSwapChainDesc.Width                = mWidth;                                    // Use automatic sizing.
+        mSwapChainDesc.Height               = mHeight;
+        mSwapChainDesc.Format               = _getSwapChainFormat();
+        mSwapChainDesc.Stereo               = false;
+
+        assert(mUseFlipSequentialMode);                                             // i.e. no FSAA for swapchain, but can be enabled in separate backbuffer
+        mSwapChainDesc.SampleDesc.Count     = 1;
+        mSwapChainDesc.SampleDesc.Quality   = 0;
+
+        mSwapChainDesc.BufferUsage          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        mSwapChainDesc.BufferCount          = 2;                                    // Use two buffers to enable flip effect.
+        mSwapChainDesc.Scaling              = DXGI_SCALING_STRETCH;                 // Required for CreateSwapChainForComposition.
+        mSwapChainDesc.SwapEffect           = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;     // MS recommends using this swap effect for all applications.
+        mSwapChainDesc.AlphaMode            = DXGI_ALPHA_MODE_UNSPECIFIED;
+
+        // Create swap chain
+        HRESULT hr = mDevice.GetDXGIFactory()->CreateSwapChainForComposition(pDXGIDevice, &mSwapChainDesc, NULL, mpSwapChain.ReleaseAndGetAddressOf());
+        if (FAILED(hr))
+            return hr;
+
+        // Associate swap chain with SwapChainPanel
+        // Get backing native interface for SwapChainPanel
+        ComPtr<ISwapChainPanelNative> panelNative;
+        hr = reinterpret_cast<IUnknown*>(mSwapChainPanel)->QueryInterface(IID_PPV_ARGS(panelNative.ReleaseAndGetAddressOf()));
+        if(FAILED(hr))
+            return hr;
+        hr = panelNative->SetSwapChain(mpSwapChain.Get());
+        if(FAILED(hr))
+            return hr;
+
+        // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
+        // latency and ensures that the application will only render after each VSync, minimizing 
+        // power consumption.
+        hr = pDXGIDevice->SetMaximumFrameLatency(1);
+        if(FAILED(hr))
+            return hr;
+
+        hr = _compensateSwapChainCompositionScale();
+        return hr;
+    }
+    //---------------------------------------------------------------------
+    bool D3D11RenderWindowSwapChainPanel::isVisible() const
+    {
+        return (mSwapChainPanel && mSwapChainPanel->Visibility == Windows::UI::Xaml::Visibility::Visible);
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainPanel::windowMovedOrResized()
+    {
+        Windows::Foundation::Size sz = Windows::Foundation::Size(static_cast<float>(mSwapChainPanel->ActualWidth), static_cast<float>(mSwapChainPanel->ActualHeight));
+        mCompositionScale = Windows::Foundation::Size(mSwapChainPanel->CompositionScaleX, mSwapChainPanel->CompositionScaleY);
+        mLeft = 0;
+        mTop = 0;
+        mWidth = (int)(sz.Width * mCompositionScale.Width + 0.5f);
+        mHeight = (int)(sz.Height * mCompositionScale.Height + 0.5f);
+
+        // Prevent zero size DirectX content from being created.
+        mWidth = std::max(mWidth, 1U);
+        mHeight = std::max(mHeight, 1U);
+
+        _resizeSwapChainBuffers(mWidth, mHeight);
+
+        _compensateSwapChainCompositionScale();
+    }
+
+    HRESULT D3D11RenderWindowSwapChainPanel::_compensateSwapChainCompositionScale()
+    {
+        // Setup inverse scale on the swap chain
+        DXGI_MATRIX_3X2_F inverseScale = { 0 };
+        inverseScale._11 = 1.0f / mCompositionScale.Width;
+        inverseScale._22 = 1.0f / mCompositionScale.Height;
+        ComPtr<IDXGISwapChain2> spSwapChain2;
+        HRESULT hr = mpSwapChain.As<IDXGISwapChain2>(&spSwapChain2);
+        if(FAILED(hr))
+            return hr;
+
+        hr = spSwapChain2->SetMatrixTransform(&inverseScale);
+        return hr;
+    }
+
+#endif
+#pragma endregion
+
+    //---------------------------------------------------------------------
     // class D3D11RenderWindowImageSource
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowImageSource
@@ -1564,7 +1746,7 @@ namespace Ogre
             return;
 
         ComPtr<IDXGISurface> dxgiSurface;
-        RECT updateRect = { 0, 0, mWidth, mHeight };
+        RECT updateRect = { 0, 0, (LONG)mWidth, (LONG)mHeight };
         POINT offset = { 0, 0 };
 
         HRESULT hr = mImageSourceNative->BeginDraw(updateRect, dxgiSurface.ReleaseAndGetAddressOf(), &offset);
