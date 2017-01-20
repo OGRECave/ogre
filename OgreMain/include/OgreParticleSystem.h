@@ -671,8 +671,6 @@ namespace Ogre {
 
         /// Name of the resource group to use to load materials
         String mResourceGroupName;
-        /// Name of the material to use
-        String mMaterialName;
         /// Have we set the material etc on the renderer?
         bool mIsRendererConfigured;
         /// Pointer to the material to use

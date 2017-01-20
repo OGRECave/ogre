@@ -38,7 +38,6 @@ namespace Ogre {
     SimpleRenderable::SimpleRenderable()
     : MovableObject()
     , mTransform(Matrix4::IDENTITY)
-    , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
     , mParentSceneManager(NULL)
     , mCamera(NULL)
@@ -53,7 +52,6 @@ namespace Ogre {
     SimpleRenderable::SimpleRenderable(const String& name)
     : MovableObject(name)
     , mTransform(Matrix4::IDENTITY)
-    , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
     , mParentSceneManager(NULL)
     , mCamera(NULL)
@@ -62,10 +60,9 @@ namespace Ogre {
 
     void SimpleRenderable::setMaterial( const String& matName )
     {
-        mMatName = matName;
-        mMaterial = MaterialManager::getSingleton().getByName(mMatName);
+        mMaterial = MaterialManager::getSingleton().getByName(matName);
         if (mMaterial.isNull())
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + mMatName,
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + matName,
                 "SimpleRenderable::setMaterial" );
     
         // Won't load twice anyway

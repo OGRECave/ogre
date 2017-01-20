@@ -302,8 +302,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::setMaterialName( const String& name , const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */ )
     {
-        mMaterialName = name;
-
         mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
 
         if (mMaterial.isNull())
@@ -319,7 +317,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& BillboardSet::getMaterialName(void) const
     {
-        return mMaterialName;
+        return mMaterial->getName();
     }
 
     //-----------------------------------------------------------------------
@@ -664,9 +662,7 @@ namespace Ogre {
                             "BillboardSet::setMaterial");
             }
         }
-        
-        mMaterialName = mMaterial->getName();
-        
+
         // Ensure new material loaded (will not load again if already loaded)
         mMaterial->load();
     }
