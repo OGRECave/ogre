@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __Common_H__
 // Common stuff
 
-#include "OgreHeaderPrefix.h"
 #include "Hash/MurmurHash3.h"
 
 namespace Ogre {
@@ -782,6 +781,5 @@ namespace Ogre {
     /** @} */
 }
 
-#include "OgreHeaderSuffix.h"
 
 #endif

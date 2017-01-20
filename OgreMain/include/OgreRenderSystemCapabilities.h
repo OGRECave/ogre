@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreStringVector.h"
 #include "OgreStringConverter.h"
-#include "OgreHeaderPrefix.h"
 
 // Because there are more than 32 possible Capabilities, more than 1 int is needed to store them all.
 // In fact, an array of integers is used to store capabilities. However all the capabilities are defined in the single
@@ -901,7 +900,6 @@ namespace Ogre
 } // namespace
 
 
-#include "OgreHeaderSuffix.h"
 
 #endif // __RenderSystemCapabilities__
 

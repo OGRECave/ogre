@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreShadowCameraSetup.h"
 #include "OgrePolygon.h"
 #include "OgreConvexBody.h"
-#include "OgreHeaderPrefix.h"
 #include "OgreAxisAlignedBox.h"
 
 namespace Ogre {
@@ -309,6 +308,5 @@ namespace Ogre {
 
 } // namespace Ogre
 
-#include "OgreHeaderSuffix.h"
 
 #endif // __ShadowCameraSetupFocused_H__

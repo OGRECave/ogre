@@ -39,7 +39,6 @@ email                : pjcast@yahoo.com
 #include "OgreSingleton.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreExternalTextureSource.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -122,6 +121,5 @@ namespace Ogre
     /** @} */
 } 
 
-#include "OgreHeaderSuffix.h"
 
 #endif

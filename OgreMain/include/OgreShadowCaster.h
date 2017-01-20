@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreRenderable.h"
 #include "OgreRenderOperation.h"
-#include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
@@ -249,6 +248,5 @@ namespace Ogre {
     /** @} */
     /** @} */
 } // namespace Ogre
-#include "OgreHeaderSuffix.h"
 
 #endif // __ShadowCaster_H__

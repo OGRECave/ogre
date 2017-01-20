@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include "OgreRadixSort.h"
 #include "OgreCommon.h"
 #include "OgreResourceGroupManager.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -882,6 +881,5 @@ namespace Ogre {
 
 } // namespace Ogre
 
-#include "OgreHeaderSuffix.h"
 
 #endif // __BillboardSet_H__

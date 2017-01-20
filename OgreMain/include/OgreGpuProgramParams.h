@@ -35,7 +35,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreSerializer.h"
 #include "OgreAny.h"
 #include "Threading/OgreThreadHeaders.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -2455,6 +2454,5 @@ namespace Ogre {
     /** @} */
 }
 
-#include "OgreHeaderSuffix.h"
 
 #endif

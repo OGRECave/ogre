@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     class HardwareBufferManagerBase;
@@ -72,6 +71,5 @@ namespace Ogre {
 
 }
 
-#include "OgreHeaderSuffix.h"
 
 #endif
