@@ -135,7 +135,7 @@ namespace Ogre {
         mEmittedEmitterPoolSize(0)
     {
         setDefaultDimensions( 100, 100 );
-        setMaterialName( "BaseWhite" );
+        mMaterial = MaterialManager::getSingleton().getDefaultMaterial();
         // Default to 10 particles, expect app to specify (will only be increased, not decreased)
         setParticleQuota( 10 );
         setEmittedEmitterQuota( 3 );

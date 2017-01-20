@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreSimpleRenderable.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreCamera.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre {
     #define POSITION_BINDING 0
@@ -74,10 +75,8 @@ namespace Ogre {
         bind->setBinding(POSITION_BINDING, vbuf);
 
         // set basic white material
-        this->setMaterial("BaseWhiteNoLighting");
-
-
-        
+        mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
+        mMaterial->load();
     }
     
     WireBoundingBox::~WireBoundingBox() 

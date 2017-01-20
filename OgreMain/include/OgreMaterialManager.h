@@ -171,6 +171,10 @@ namespace Ogre {
         /// @see ResourceManager::getResourceByName
         MaterialPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
+        /// Get a default material that is always available even when no resources were loaded
+        /// @param useLighting whether the material should be lit
+        MaterialPtr getDefaultMaterial(bool useLighting = true);
+
         /** Default constructor.
         */
         MaterialManager();
