@@ -117,6 +117,8 @@ if(UNIX)
 endif ()
 if (MSVC)
   add_definitions(-D_MT -D_USRDLL)
+  # MSVC does not like Ogre::Singleton (header pragma is enough for MSVC2015+ though)
+  add_definitions(/wd4661)
   if (CMAKE_BUILD_TOOL STREQUAL "nmake")
     # set variable to state that we are using nmake makefiles
 	set(NMAKE TRUE)
