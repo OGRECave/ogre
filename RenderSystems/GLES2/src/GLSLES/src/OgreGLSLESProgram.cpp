@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreGLES2Support.h"
 
 #include "OgreGLSLESProgram.h"
-#include "OgreGLSLESGpuProgram.h"
+#include "OgreGLSLESProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLPreprocessor.h"
@@ -75,6 +75,9 @@ namespace Ogre {
         }
         // Manually assign language now since we use it immediately
         mSyntaxCode = "glsles";
+
+        // There is nothing to load
+        mLoadFromFile = false;
     }
     //---------------------------------------------------------------------------
     GLSLESProgram::~GLSLESProgram()
@@ -234,7 +237,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLESProgram::createLowLevelImpl(void)
     {
-        mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLESGpuProgram( this ));
     }
     //-----------------------------------------------------------------------
     void GLSLESProgram::unloadHighLevelImpl(void)
@@ -365,5 +367,151 @@ namespace Ogre {
                 LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
             }
         }
+    }
+
+    //-----------------------------------------------------------------------------
+    void GLSLESProgram::bindProgram(void)
+    {
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            // Tell the Program Pipeline Manager what pipeline is to become active
+            switch (mType)
+            {
+                case GPT_VERTEX_PROGRAM:
+                    GLSLESProgramPipelineManager::getSingleton().setActiveVertexLinkProgram( this );
+                    break;
+                case GPT_FRAGMENT_PROGRAM:
+                    GLSLESProgramPipelineManager::getSingleton().setActiveFragmentLinkProgram( this );
+                    break;
+                case GPT_GEOMETRY_PROGRAM:
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            // Tell the Link Program Manager what shader is to become active
+            switch (mType)
+            {
+                case GPT_VERTEX_PROGRAM:
+                    GLSLESLinkProgramManager::getSingleton().setActiveVertexShader( this );
+                    break;
+                case GPT_FRAGMENT_PROGRAM:
+                    GLSLESLinkProgramManager::getSingleton().setActiveFragmentShader( this );
+                    break;
+                case GPT_GEOMETRY_PROGRAM:
+                default:
+                    break;
+            }
+        }
+    }
+
+    //-----------------------------------------------------------------------------
+    void GLSLESProgram::unbindProgram(void)
+    {
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            // Tell the Program Pipeline Manager what pipeline is to become inactive
+            if (mType == GPT_VERTEX_PROGRAM)
+            {
+                GLSLESProgramPipelineManager::getSingleton().setActiveVertexLinkProgram(NULL);
+            }
+            else if (mType == GPT_FRAGMENT_PROGRAM)
+            {
+                GLSLESProgramPipelineManager::getSingleton().setActiveFragmentLinkProgram(NULL);
+            }
+        }
+        else
+        {
+            // Tell the Link Program Manager what shader is to become inactive
+            if (mType == GPT_VERTEX_PROGRAM)
+            {
+                GLSLESLinkProgramManager::getSingleton().setActiveVertexShader( NULL );
+            }
+            else if (mType == GPT_FRAGMENT_PROGRAM)
+            {
+                GLSLESLinkProgramManager::getSingleton().setActiveFragmentShader( NULL );
+            }
+        }
+    }
+
+    //-----------------------------------------------------------------------------
+    void GLSLESProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    {
+        // Link can throw exceptions, ignore them at this point
+        try
+        {
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                // Activate the program pipeline object
+                GLSLESProgramPipeline* programPipeline = GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+                // Pass on parameters from params to program object uniforms
+                programPipeline->updateUniforms(params, mask, mType);
+            }
+            else
+            {
+                // Activate the link program object
+                GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+                // Pass on parameters from params to program object uniforms
+                linkProgram->updateUniforms(params, mask, mType);
+            }
+        }
+        catch (Exception& e) {}
+    }
+
+    //-----------------------------------------------------------------------------
+    void GLSLESProgram::bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    {
+        // Link can throw exceptions, ignore them at this point
+        try
+        {
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                // Activate the program pipeline object
+                GLSLESProgramPipeline* programPipeline = GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+                // Pass on parameters from params to program object uniforms
+                programPipeline->updateUniformBlocks(params, mask, mType);
+            }
+            else
+            {
+                // Activate the link program object
+                GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+                // Pass on parameters from params to program object uniforms
+                linkProgram->updateUniformBlocks(params, mask, mType);
+            }
+        }
+        catch (Exception& e) {}
+    }
+
+    //-----------------------------------------------------------------------------
+    void GLSLESProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
+    {
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            // Activate the program pipeline object
+            GLSLESProgramPipeline* programPipeline = GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+            // Pass on parameters from params to program object uniforms
+            programPipeline->updatePassIterationUniforms( params );
+        }
+        else
+        {
+            // Activate the link program object
+            GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+            // Pass on parameters from params to program object uniforms
+            linkProgram->updatePassIterationUniforms( params );
+        }
+    }
+
+    //-----------------------------------------------------------------------------
+    size_t GLSLESProgram::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        // Delegate Names
+        memSize += sizeof(GLuint);
+        memSize += sizeof(GLenum);
+        memSize += GpuProgram::calculateSize();
+
+        return memSize;
     }
 }

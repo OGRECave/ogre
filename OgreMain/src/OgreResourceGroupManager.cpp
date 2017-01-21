@@ -670,6 +670,7 @@ namespace Ogre {
         const String& resourceName, const String& groupName, 
         bool searchGroupsIfNotFound, Resource* resourceBeingLoaded) const
     {
+        OgreAssert(!resourceName.empty(), "resourceName is empty string");
         OGRE_LOCK_AUTO_MUTEX;
 
         if(mLoadingListener)

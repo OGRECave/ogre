@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLSLESLinkProgram.h"
-#include "OgreGLSLESGpuProgram.h"
+#include "OgreGLSLESProgram.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLES2HardwareUniformBuffer.h"

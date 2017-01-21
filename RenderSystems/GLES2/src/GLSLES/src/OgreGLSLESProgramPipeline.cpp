@@ -28,7 +28,7 @@
 
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreStringConverter.h"
-#include "OgreGLSLESGpuProgram.h"
+#include "OgreGLSLESProgram.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGpuProgramManager.h"
