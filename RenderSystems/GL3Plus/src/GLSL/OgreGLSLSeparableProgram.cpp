@@ -177,13 +177,11 @@ namespace Ogre
                 // unavailable or failed to link.
                 if (!linkStatus)
                 {
-                    try
-                    {
-                        program->compile(true);
-                    }
-                    catch (Exception& e)
-                    {
-                        LogManager::getSingleton().stream() << e.getDescription();
+                    if(!program->compile(true)) {
+                        LogManager::getSingleton().stream(LML_CRITICAL)
+                                << program->getShaderTypeLabel(program->getType()) << " Shader "
+                                << program->getName()
+                                << " failed to compile. See compile log above for details.";
                         mTriedToLinkAndFailed = true;
                         return;
                     }

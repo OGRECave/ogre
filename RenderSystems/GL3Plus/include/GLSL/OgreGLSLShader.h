@@ -71,10 +71,10 @@ namespace Ogre {
         void attachToProgramObject(const GLuint programObject);
         void detachFromProgramObject(const GLuint programObject);
         /// Get OpenGL GLSL shader type from OGRE GPU program type.
-        GLenum getGLShaderType(GpuProgramType programType);
+        static GLenum getGLShaderType(GpuProgramType programType);
         /// Get a string containing the name of the GLSL shader type
         /// correspondening to the OGRE GPU program type.
-        String getShaderTypeLabel(GpuProgramType programType);
+        static String getShaderTypeLabel(GpuProgramType programType);
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;

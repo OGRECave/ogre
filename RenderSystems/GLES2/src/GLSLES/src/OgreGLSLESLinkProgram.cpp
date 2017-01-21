@@ -141,13 +141,10 @@ namespace Ogre {
     void GLSLESLinkProgram::compileAndLink()
     {
         // Compile and attach Vertex Program
-        try
-        {
-            getVertexProgram()->compile(true);
-        }
-        catch (Exception& e)
-        {
-            LogManager::getSingleton().stream() << e.getDescription();
+        if(!getVertexProgram()->compile(true)) {
+            LogManager::getSingleton().stream(LML_CRITICAL)
+                    << "Vertex Program " << getVertexProgram()->getName()
+                    << " failed to compile. See compile log above for details.";
             mTriedToLinkAndFailed = true;
             return;
         }
@@ -156,16 +153,14 @@ namespace Ogre {
         setSkeletalAnimationIncluded(getVertexProgram()->isSkeletalAnimationIncluded());
         
         // Compile and attach Fragment Program
-        try
-        {
-            mFragmentProgram->compile(true);
-        }
-        catch (Exception& e)
-        {
-            LogManager::getSingleton().stream() << e.getDescription();
+        if(!mFragmentProgram->compile(true)) {
+            LogManager::getSingleton().stream(LML_CRITICAL)
+                    << "Vertex Program " << mFragmentProgram->getName()
+                    << " failed to compile. See compile log above for details.";
             mTriedToLinkAndFailed = true;
             return;
         }
+
         mFragmentProgram->attachToProgramObject(mGLProgramHandle);
         
         // The link
