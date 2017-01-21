@@ -69,12 +69,14 @@ if(DEFINED ENV{ANDROID})
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
     set(BUILD_DEPS TRUE)
     
-    message(STATUS "Downloading Android NDK")
-    file(DOWNLOAD
-        http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
-        ./android-ndk-r13b-linux-x86_64.zip)
-    message(STATUS "Extracting Android NDK")
-    execute_process(COMMAND unzip android-ndk-r13b-linux-x86_64.zip OUTPUT_QUIET)
+    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r13b)
+        message(STATUS "Downloading Android NDK")
+        file(DOWNLOAD
+            http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
+            ./android-ndk-r13b-linux-x86_64.zip)
+        message(STATUS "Extracting Android NDK")
+        execute_process(COMMAND unzip android-ndk-r13b-linux-x86_64.zip OUTPUT_QUIET)
+    endif()
 endif()
 
 execute_process(COMMAND cmake
