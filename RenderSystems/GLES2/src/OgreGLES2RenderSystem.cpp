@@ -1936,7 +1936,7 @@ namespace Ogre {
                         "GLES2RenderSystem::bindGpuProgram");
         }
         
-        GLES2GpuProgram* glprg = static_cast<GLES2GpuProgram*>(prg);
+        GLSLESProgram* glprg = static_cast<GLSLESProgram*>(prg);
         
         // Unbind previous gpu program first.
         //

@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
-#include "OgreGLES2GpuProgram.h"
+#include "OgreGLSLESProgram.h"
 #include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
@@ -52,7 +52,6 @@ namespace Ogre {
 #if !OGRE_NO_GLES2_CG_SUPPORT
     class GLSLESCgProgramFactory;
 #endif
-    class GLSLESGpuProgram;
     class HardwareBufferManager;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     class GLES2ManagedResourceManager;
@@ -129,8 +128,8 @@ namespace Ogre {
 
             GLint getCombinedMinMipFilter(void) const;
 
-            GLES2GpuProgram* mCurrentVertexProgram;
-            GLES2GpuProgram* mCurrentFragmentProgram;
+            GLSLESProgram* mCurrentVertexProgram;
+            GLSLESProgram* mCurrentFragmentProgram;
 
             GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;

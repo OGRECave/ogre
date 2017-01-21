@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLES2GpuProgramManager.h"
-#include "OgreGLES2GpuProgram.h"
+#include "OgreGLSLESProgram.h"
 #include "OgreLogManager.h"
 
 namespace Ogre {
@@ -77,7 +77,7 @@ namespace Ogre {
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new GLES2GpuProgram(this, name, handle, group, isManual, loader);
+            return new GLSLESProgram(this, name, handle, group, isManual, loader);
         }
 
         GpuProgramType gpt;
@@ -106,7 +106,7 @@ namespace Ogre {
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new GLES2GpuProgram(this, name, handle, group, isManual, loader);
+            return new GLSLESProgram(this, name, handle, group, isManual, loader);
         }
         
         return (iter->second)(this, name, handle, group, isManual, loader, gptype, syntaxCode);

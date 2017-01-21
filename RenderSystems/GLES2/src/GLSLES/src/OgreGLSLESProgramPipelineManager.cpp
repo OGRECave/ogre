@@ -27,7 +27,7 @@
  */
 
 #include "OgreGLSLESProgramPipelineManager.h"
-#include "OgreGLSLESGpuProgram.h"
+#include "OgreGLSLESProgram.h"
 #include "OgreGLSLESProgram.h"
 
 namespace Ogre
