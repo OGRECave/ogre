@@ -53,7 +53,7 @@ void Sample_MeshLod::setupContent()
     setupControls();
 
     // load mesh
-    changeSelectedMesh("sinbad.mesh");
+    changeSelectedMesh("Sinbad.mesh");
 }
 
 void Sample_MeshLod::cleanupContent()
@@ -72,7 +72,7 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
     cleanupControls();
 
     SelectMenu* models = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "cmbModels", "Model:", 150, 8);
-    models->addItem("sinbad.mesh");
+    models->addItem("Sinbad.mesh");
     models->addItem("ogrehead.mesh");
     models->addItem("knot.mesh");
     models->addItem("fish.mesh");

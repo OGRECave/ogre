@@ -710,7 +710,7 @@ material "Material #8"
 
 			texture_unit
 			{
-				texture BODY.jpg
+				texture body.jpg
 			}
 		}
 	}
@@ -724,7 +724,7 @@ material "Material #3"
 
 			texture_unit
 			{
-				texture HEAD4.jpg
+				texture head4.jpg
 			}
 		}
 	}
@@ -738,7 +738,7 @@ material "Material #9"
 
 			texture_unit
 			{
-				texture LEGS.jpg
+				texture legs.jpg
 			}
 		}
 	}
