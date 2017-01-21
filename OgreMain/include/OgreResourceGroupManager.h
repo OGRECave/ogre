@@ -333,8 +333,10 @@ namespace Ogre {
             LocationList locationList;
             /// Index of resource names to locations, built for speedy access (case sensitive archives)
             ResourceLocationIndex resourceIndexCaseSensitive;
+#if !OGRE_RESOURCEMANAGER_STRICT
             /// Index of resource names to locations, built for speedy access (case insensitive archives)
             ResourceLocationIndex resourceIndexCaseInsensitive;
+#endif
             /// Pre-declared resources, ready to be created
             ResourceDeclarationList resourceDeclarations;
             /// Created resources which are ready to be loaded / unloaded
@@ -463,7 +465,7 @@ namespace Ogre {
         @param inGlobalPool if true the resource will be loaded even a different
             group was requested in the load method as a parameter.
         */
-        void createResourceGroup(const String& name, const bool inGlobalPool = true);
+        void createResourceGroup(const String& name, bool inGlobalPool = !OGRE_RESOURCEMANAGER_STRICT);
 
 
         /** Initialises a resource group.
@@ -766,7 +768,7 @@ namespace Ogre {
         */
         DataStreamPtr openResource(const String& resourceName, 
             const String& groupName = DEFAULT_RESOURCE_GROUP_NAME,
-            bool searchGroupsIfNotFound = true, Resource* resourceBeingLoaded = 0) const;
+            bool searchGroupsIfNotFound = !OGRE_RESOURCEMANAGER_STRICT, Resource* resourceBeingLoaded = 0) const;
 
         /** Open all resources matching a given pattern (which can contain
             the character '*' as a wildcard), and return a collection of 

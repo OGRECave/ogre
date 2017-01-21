@@ -59,11 +59,11 @@ namespace Ogre {
         : mLoadingListener(0), mCurrentGroup(0)
     {
         // Create the 'General' group
-        createResourceGroup(DEFAULT_RESOURCE_GROUP_NAME);
+        createResourceGroup(DEFAULT_RESOURCE_GROUP_NAME, true); // the "General" group is synonymous to global pool
         // Create the 'Internal' group
-        createResourceGroup(INTERNAL_RESOURCE_GROUP_NAME);
+        createResourceGroup(INTERNAL_RESOURCE_GROUP_NAME, true);
         // Create the 'Autodetect' group (only used for temp storage)
-        createResourceGroup(AUTODETECT_RESOURCE_GROUP_NAME);
+        createResourceGroup(AUTODETECT_RESOURCE_GROUP_NAME, true); // autpdetect includes the global pool
         // default world group to the default group
         mWorldGroupName = DEFAULT_RESOURCE_GROUP_NAME;
     }
@@ -80,7 +80,7 @@ namespace Ogre {
         mResourceGroupMap.clear();
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::createResourceGroup(const String& name, const bool inGlobalPool /* = true */)
+    void ResourceGroupManager::createResourceGroup(const String& name, bool inGlobalPool)
     {
         OGRE_LOCK_AUTO_MUTEX;
 
@@ -688,6 +688,10 @@ namespace Ogre {
                 "Cannot locate a resource group called '" + groupName + 
                 "' for resource '" + resourceName + "'" , 
                 "ResourceGroupManager::openResource");
+        }
+
+        if(groupName == AUTODETECT_RESOURCE_GROUP_NAME) {
+            searchGroupsIfNotFound = true;
         }
 
         Archive* pArch = NULL;
@@ -1618,6 +1622,7 @@ namespace Ogre {
             return rit->second;
         }
 
+#if !OGRE_RESOURCEMANAGER_STRICT
         // try case insensitive
         String lcResourceName = resourceName;
         StringUtil::toLowerCase(lcResourceName);
@@ -1639,6 +1644,7 @@ namespace Ogre {
                 return arch;
             }
         }
+#endif
 
         return NULL;
 
@@ -1876,12 +1882,14 @@ namespace Ogre {
         // internal, assumes mutex lock has already been obtained
         this->resourceIndexCaseSensitive[filename] = arch;
 
+#if !OGRE_RESOURCEMANAGER_STRICT
         if (!arch->isCaseSensitive())
         {
             String lcase = filename;
             StringUtil::toLowerCase(lcase);
             this->resourceIndexCaseInsensitive[lcase] = arch;
         }
+#endif
     }
     //---------------------------------------------------------------------
     void ResourceGroupManager::ResourceGroup::removeFromIndex(const String& filename, Archive* arch)
@@ -1891,6 +1899,7 @@ namespace Ogre {
         if (i != this->resourceIndexCaseSensitive.end() && i->second == arch)
             this->resourceIndexCaseSensitive.erase(i);
 
+#if !OGRE_RESOURCEMANAGER_STRICT
         if (!arch->isCaseSensitive())
         {
             String lcase = filename;
@@ -1899,12 +1908,14 @@ namespace Ogre {
             if (i != this->resourceIndexCaseInsensitive.end() && i->second == arch)
                 this->resourceIndexCaseInsensitive.erase(i);
         }
+#endif
     }
     //---------------------------------------------------------------------
     void ResourceGroupManager::ResourceGroup::removeFromIndex(Archive* arch)
     {
         // Delete indexes
         ResourceLocationIndex::iterator rit, ritend;
+#if !OGRE_RESOURCEMANAGER_STRICT
         ritend = this->resourceIndexCaseInsensitive.end();
         for (rit = this->resourceIndexCaseInsensitive.begin(); rit != ritend;)
         {
@@ -1918,6 +1929,7 @@ namespace Ogre {
                 ++rit;
             }
         }
+#endif
         ritend = this->resourceIndexCaseSensitive.end();
         for (rit = this->resourceIndexCaseSensitive.begin(); rit != ritend;)
         {

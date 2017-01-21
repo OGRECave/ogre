@@ -70,7 +70,7 @@ namespace Ogre {
         ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo = NULL);
         ~ZipArchive();
         /// @copydoc Archive::isCaseSensitive
-        bool isCaseSensitive(void) const { return false; }
+        bool isCaseSensitive(void) const { return OGRE_RESOURCEMANAGER_STRICT; }
 
         /// @copydoc Archive::load
         void load();

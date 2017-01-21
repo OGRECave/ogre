@@ -148,7 +148,13 @@ namespace Ogre {
 
         // Format not used here (always binary)
         ZZIP_FILE* zzipFile = 
-            zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS);
+            zzip_file_open(mZzipDir, lookUpFileName.c_str(),
+#if OGRE_RESOURCEMANAGER_STRICT
+                    ZZIP_ONLYZIP
+#else
+                    ZZIP_ONLYZIP | ZZIP_CASELESS
+#endif
+                    );
         if (!zzipFile) // Try if we find the file
         {
             const Ogre::FileInfoListPtr fileNfo = findFileInfo(lookUpFileName, true);
