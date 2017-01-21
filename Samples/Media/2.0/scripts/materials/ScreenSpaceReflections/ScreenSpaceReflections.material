@@ -3,9 +3,9 @@ fragment_program SSR/ScreenSpaceReflectionsVectors_ps_GLSL glsl
 	source ScreenSpaceReflectionsVectors_ps.glsl
 	default_params
 	{
-		param_named depthTexture	int 0
-		param_named gBuf_normals	int 1
-		param_named prevFrame		int 2
+		param_named depthTexture			int 0
+		param_named gBuf_normals			int 1
+		param_named prevFrame				int 2
 	}
 }
 
@@ -55,10 +55,6 @@ material SSR/ScreenSpaceReflectionsVectors
 				param_named			p_maxDistance		float	1000
 				param_named			p_strideZCutoff		float	0.01
 
-				//param_named			p_numMips
-				param_named			p_fadeStart			float	0.95
-				param_named			p_fadeEnd			float	1.00
-
 				//p_projectionParams will be set from C++
 				param_named			p_projectionParams	float2	0 1
 				param_named_auto	p_invDepthBufferRes	inverse_texture_size 0;
@@ -80,6 +76,107 @@ material SSR/ScreenSpaceReflectionsVectors
 			}
 
 			texture_unit prevFrame
+			{
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}
+
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_GLSL glsl
+{
+	source ScreenSpaceReflectionsCombine_ps.glsl
+	default_params
+	{
+		param_named depthTexture			int 0
+		param_named gBuf_normals			int 1
+		param_named gBuf_shadowRoughness	int 2
+		param_named prevFrame				int 3
+		param_named rayTraceBuffer			int 4
+	}
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_HLSL hlsl
+{
+	source ScreenSpaceReflectionsCombine_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_Metal metal
+{
+	source ScreenSpaceReflectionsCombine_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/QuadCameraDir_vs
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps unified
+{
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_GLSL
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_HLSL
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_Metal
+}
+
+
+material SSR/ScreenSpaceReflectionsCombine
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/QuadCameraDir_vs
+			{
+			}
+
+			fragment_program_ref SSR/ScreenSpaceReflectionsCombine_ps
+			{
+				param_named_auto	p_depthBufferRes	texture_size 0
+
+				//param_named			p_maxDistance		float	1000
+
+				param_named			p_fadeStart			float	0.95
+				//param_named		p_fadeEnd			float	1.00
+				// 1 / (p_fadeEnd - p_fadeStart)
+				param_named			p_invFadeRange		float	20
+
+				//p_projectionParams will be set from C++
+				param_named			p_projectionParams	float2	0 1
+
+				//p_textureSpaceToViewSpace will be set from C++
+				//param_named		p_textureSpaceToViewSpace	float4x4
+			}
+
+			texture_unit depthTexture
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit gBufferNormals
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit gBufferShadowRoughness
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit prevFrame
+			{
+				tex_address_mode clamp
+				filtering trilinear
+			}
+
+			texture_unit rayTraceBuffer
 			{
 				tex_address_mode clamp
 				filtering none

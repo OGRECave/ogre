@@ -24,7 +24,14 @@ namespace Demo
 
         Ogre::Pass *pass = material->getTechnique(0)->getPass(0);
 
-        mPsParams = pass->getFragmentProgramParameters();
+        mPsParams[0] = pass->getFragmentProgramParameters();
+
+        material = Ogre::MaterialManager::getSingleton().load(
+                            "SSR/ScreenSpaceReflectionsCombine",
+                            Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+                        staticCast<Ogre::Material>();
+        pass = material->getTechnique(0)->getPass(0);
+        mPsParams[1] = pass->getFragmentProgramParameters();
     }
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflections::update( Ogre::Camera *camera )
@@ -33,10 +40,13 @@ namespace Demo
                                     (camera->getFarClipDistance() - camera->getNearClipDistance());
         Ogre::Real projectionB = (-camera->getFarClipDistance() * camera->getNearClipDistance()) /
                                     (camera->getFarClipDistance() - camera->getNearClipDistance());
-        //The division will keep "linearDepth" in the shader in the [0; 1] range.
-        //projectionB /= camera->getFarClipDistance();
-        mPsParams->setNamedConstant( "p_projectionParams",
-                                     Ogre::Vector4( projectionA, projectionB, 0, 0 ) );
+        for( int i=0; i<2; ++i )
+        {
+            //The division will keep "linearDepth" in the shader in the [0; 1] range.
+            //projectionB /= camera->getFarClipDistance();
+            mPsParams[0]->setNamedConstant( "p_projectionParams",
+                                            Ogre::Vector4( projectionA, projectionB, 0, 0 ) );
+        }
 
         Ogre::Matrix4 viewToTextureSpaceMatrix = camera->getProjectionMatrix();
         // Convert depth range from [-1,+1] to [0,1]
@@ -53,6 +63,7 @@ namespace Demo
 
         viewToTextureSpaceMatrix = PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * viewToTextureSpaceMatrix;
 
-        mPsParams->setNamedConstant( "p_viewToTextureSpaceMatrix", viewToTextureSpaceMatrix );
+        mPsParams[0]->setNamedConstant( "p_viewToTextureSpaceMatrix", viewToTextureSpaceMatrix );
+        mPsParams[1]->setNamedConstant( "p_textureSpaceToViewSpace", viewToTextureSpaceMatrix.inverse() );
     }
 }

@@ -7,7 +7,7 @@ namespace Demo
 {
     class ScreenSpaceReflections
     {
-        Ogre::GpuProgramParametersSharedPtr mPsParams;
+        Ogre::GpuProgramParametersSharedPtr mPsParams[2];
 
     public:
         ScreenSpaceReflections();
