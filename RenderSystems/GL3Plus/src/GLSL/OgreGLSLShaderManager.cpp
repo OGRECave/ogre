@@ -83,7 +83,10 @@ namespace Ogre {
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new GLSLShader(this, name, handle, group, isManual, loader);
+            // we have to forward the syntax code though
+            GpuProgram* ret =  new GLSLShader(this, name, handle, group, isManual, loader);
+            ret->setSyntaxCode(paramSyntax->second);
+            return  ret;
         }
 
         GpuProgramType gpt;
@@ -135,7 +138,10 @@ namespace Ogre {
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new GLSLShader(this, name, handle, group, isManual, loader);
+            // we have to forward the syntax code though
+            GpuProgram* ret =  new GLSLShader(this, name, handle, group, isManual, loader);
+            ret->setSyntaxCode(syntaxCode);
+            return  ret;
         }
 
         return (iter->second)(this, name, handle, group, isManual, loader, gptype, syntaxCode);
