@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreMovableObject.h"
 #include "OgreMesh.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -361,6 +360,5 @@ namespace Ogre
     };
 } // namespace Ogre
 
-#include "OgreHeaderSuffix.h"
 
 #endif // __InstanceBatch_H__

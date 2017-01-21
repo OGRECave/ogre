@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 #include "OgreAlignedAllocator.h"
 #include "OgreMemoryTracker.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -154,6 +153,5 @@ namespace Ogre
 }// namespace Ogre
 
 
-#include "OgreHeaderSuffix.h"
 
 #endif // __MemoryStdAlloc_H__

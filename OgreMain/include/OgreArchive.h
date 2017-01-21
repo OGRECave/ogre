@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreException.h"
 #include <ctime>
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -224,6 +223,5 @@ namespace Ogre {
 
 }
 
-#include "OgreHeaderSuffix.h"
 
 #endif

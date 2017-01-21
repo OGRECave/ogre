@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 #include "OgreMovableObject.h"
 #include "OgrePlaneBoundedVolume.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -618,7 +617,6 @@ namespace Ogre {
     /** @} */
     /** @} */
 
-#include "OgreHeaderPrefix.h"
 
 } // namespace Ogre
 #endif // _LIGHT_H__

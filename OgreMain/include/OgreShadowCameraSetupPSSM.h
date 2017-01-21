@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreShadowCameraSetupLiSPSM.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -126,6 +125,5 @@ namespace Ogre
     /** @} */
 }
 
-#include "OgreHeaderSuffix.h"
 
 #endif

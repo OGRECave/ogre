@@ -34,7 +34,6 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgrePixelFormat.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -149,7 +148,6 @@ namespace Ogre
     /** @} */
 }
 
-#include "OgreHeaderSuffix.h"
 
 #endif
 

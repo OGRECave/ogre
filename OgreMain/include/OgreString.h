@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define _String_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreHeaderPrefix.h"
 
 // If we're using the GCC 3.1 C++ Std lib
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && OGRE_COMP_VER < 430 && !defined(STLPORT)
@@ -238,6 +237,5 @@ namespace Ogre {
 
 } // namespace Ogre
 
-#include "OgreHeaderSuffix.h"
 
 #endif // _String_H__
