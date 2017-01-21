@@ -66,6 +66,7 @@ namespace Ogre
         vector<JobWithBarrier>::type    mJobs;
 
         void setupComputeShaders(void);
+        void destroyComputeShaders(void);
         void setGaussianFilterParams( HlmsComputeJob *job, uint8 kernelRadius,
                                       float gaussianDeviationFactor );
 
@@ -79,6 +80,9 @@ namespace Ogre
         virtual void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
                                                            ResourceAccessMap &uavsAccess,
                                                            ResourceLayoutMap &resourcesLayout );
+
+        virtual void notifyRecreated( const CompositorChannel &oldChannel,
+                                      const CompositorChannel &newChannel );
 
     private:
         CompositorPassMipmapDef const *mDefinition;

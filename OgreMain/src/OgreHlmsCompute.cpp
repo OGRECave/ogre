@@ -324,6 +324,14 @@ namespace Ogre
         return pso;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsCompute::destroyComputeJob( IdString name )
+    {
+        HlmsComputeJobMap::iterator itor = mComputeJobs.find( name );
+
+        if( itor != mComputeJobs.end() )
+            mComputeJobs.erase( itor );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsCompute::destroyAllComputeJobs()
     {
         HlmsComputeJobMap::const_iterator itor = mComputeJobs.begin();

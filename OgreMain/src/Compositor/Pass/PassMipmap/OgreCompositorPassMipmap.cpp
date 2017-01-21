@@ -74,8 +74,17 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorPassMipmap::~CompositorPassMipmap()
     {
+        destroyComputeShaders();
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassMipmap::destroyComputeShaders(void)
+    {
+        if( !mJobs.empty() )
         {
             RenderSystem *renderSystem = mParentNode->getRenderSystem();
+
+            assert( dynamic_cast<HlmsCompute*>( mJobs[0].job->getCreator() ) );
+            HlmsCompute *hlmsCompute = static_cast<HlmsCompute*>( mJobs[0].job->getCreator() );
 
             vector<JobWithBarrier>::type::iterator itor = mJobs.begin();
             vector<JobWithBarrier>::type::iterator end  = mJobs.end();
@@ -83,6 +92,7 @@ namespace Ogre
             while( itor != end )
             {
                 renderSystem->_resourceTransitionDestroyed( &itor->resourceTransition );
+                hlmsCompute->destroyComputeJob( itor->job->getName() );
                 ++itor;
             }
 
@@ -103,6 +113,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorPassMipmap::setupComputeShaders(void)
     {
+        destroyComputeShaders();
+
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
 
@@ -440,5 +452,17 @@ namespace Ogre
 
         //Do not use base class functionality at all.
         //CompositorPass::_placeBarriersAndEmulateUavExecution();
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassMipmap::notifyRecreated( const CompositorChannel &oldChannel,
+                                                const CompositorChannel &newChannel )
+    {
+        CompositorPass::notifyRecreated( oldChannel, newChannel );
+
+        if( mTextures == oldChannel.textures )
+        {
+            mTextures = newChannel.textures;
+            setupComputeShaders();
+        }
     }
 }

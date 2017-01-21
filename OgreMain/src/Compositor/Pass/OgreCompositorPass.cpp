@@ -427,7 +427,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void CompositorPass::notifyRecreated( const CompositorChannel &oldChannel,
-                                            const CompositorChannel &newChannel )
+                                          const CompositorChannel &newChannel )
     {
         const Real EPSILON = 1e-6f;
 

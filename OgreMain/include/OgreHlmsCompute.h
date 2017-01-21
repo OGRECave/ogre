@@ -158,6 +158,10 @@ namespace Ogre
         /// full name is rarely ever used)
         const String* getJobNameStr( IdString name ) const;
 
+        /// Destroys a specific Compute Job. You are responsible for ensuring
+        /// is not in use anywhere (otherwise a dangling pointer will ensue)
+        void destroyComputeJob( IdString name );
+
         /// Destroys all jobs created via @see createComputeJob
         void destroyAllComputeJobs(void);
 
