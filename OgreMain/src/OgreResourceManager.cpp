@@ -368,34 +368,21 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getResourceByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
-        // if not in the global pool - get it from the grouped pool 
-        if(!ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(groupName))
+        OGRE_LOCK_AUTO_MUTEX;
+
+        // resource should be in global pool
+        bool isGlobal = ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(groupName);
+
+        if(isGlobal)
         {
-                    OGRE_LOCK_AUTO_MUTEX;
-            ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
-
-            if( itGroup != mResourcesWithGroup.end())
+            ResourceMap::iterator it = mResources.find(name);
+            if( it != mResources.end())
             {
-                ResourceMap::iterator it = itGroup->second.find(name);
-
-                if( it != itGroup->second.end())
-                {
-                    return it->second;
-                }
+                return it->second;
             }
         }
 
-        // if didn't find it the grouped pool - get it from the global pool 
-        OGRE_LOCK_AUTO_MUTEX;
-
-        ResourceMap::iterator it = mResources.find(name);
-
-        if( it != mResources.end())
-        {
-            return it->second;
-        }
-
-        // this is the case when we need to search also in the grouped hash
+        // look in all grouped pools
         if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
         {
             ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
@@ -409,6 +396,29 @@ namespace Ogre {
                     return resMapIt->second;
                 }
             }
+        }
+        else if (!isGlobal)
+        {
+            // look in the grouped pool
+            ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
+            if( itGroup != mResourcesWithGroup.end())
+            {
+                ResourceMap::iterator it = itGroup->second.find(name);
+
+                if( it != itGroup->second.end())
+                {
+                    return it->second;
+                }
+            }
+
+#if !OGRE_RESOURCEMANAGER_STRICT
+            // fall back to global
+            ResourceMap::iterator it = mResources.find(name);
+            if( it != mResources.end())
+            {
+                return it->second;
+            }
+#endif
         }
     
         return ResourcePtr();
