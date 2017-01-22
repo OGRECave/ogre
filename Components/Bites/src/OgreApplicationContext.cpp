@@ -124,7 +124,7 @@ bool ApplicationContext::initialiseRTShaderSystem()
     {
         mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
         // Core shader libs not found -> shader generating will fail.
         if (mRTShaderLibPath.empty())
             return false;
@@ -553,22 +553,22 @@ void ApplicationContext::locateResources()
     sec = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
     const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(sec);
     arch = genLocs.front()->archive->getName();
-#   if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#       if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     arch = Ogre::macBundlePath() + "/Contents/Resources/Media";
-#       elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     arch = Ogre::macBundlePath() + "/Media";
-#       else
+#else
     arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
     arch = Ogre::StringUtil::replaceAll(arch, "media/../../Tests/Media", "");
-#       endif
-    type = "FileSystem";
+# endif
+    type = genLocs.front()->archive->getType();
 
-#		ifdef OGRE_BUILD_PLUGIN_CG
+#ifdef OGRE_BUILD_PLUGIN_CG
     bool use_HLSL_Cg_shared = true;
-#		else
+#else
     bool use_HLSL_Cg_shared = Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl");
-#		endif
+#endif
 
     // Add locations for supported shader languages
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
@@ -595,16 +595,18 @@ void ApplicationContext::locateResources()
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL", type, sec);
     }
-#       ifdef OGRE_BUILD_PLUGIN_CG
+#ifdef OGRE_BUILD_PLUGIN_CG
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/Cg", type, sec);
-#       endif
+#endif
     if (use_HLSL_Cg_shared)
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL_Cg", type, sec);
     }
 
-#       ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     mRTShaderLibPath = arch + "/RTShaderLib";
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/materials", type, sec);
+
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/GLSL", type, sec);
@@ -618,15 +620,14 @@ void ApplicationContext::locateResources()
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/HLSL", type, sec);
     }
-#           ifdef OGRE_BUILD_PLUGIN_CG
+#   ifdef OGRE_BUILD_PLUGIN_CG
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/Cg", type, sec);
-#           endif
+#   endif
     if (use_HLSL_Cg_shared)
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/HLSL_Cg", type, sec);
     }
-#       endif /* OGRE_BUILD_COMPONENT_RTSHADERSYSTEM */
-#   endif /* OGRE_PLATFORM != OGRE_PLATFORM_ANDROID */
+#endif /* OGRE_BUILD_COMPONENT_RTSHADERSYSTEM */
 #endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
 }
 
