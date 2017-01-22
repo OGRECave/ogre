@@ -31,12 +31,6 @@ THE SOFTWARE.
 
 #include "OgreBuildSettings.h"
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
-// Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
-// If cache path is not set - all shaders are generated to system memory.
-//#define _RTSS_WRITE_SHADERS_TO_DISK
-#endif // INCLUDE_RTSHADER_SYSTEM   
-
 #include "SdkSample.h"
 
 // resource group that will be automatically unloaded after the close of the sample
