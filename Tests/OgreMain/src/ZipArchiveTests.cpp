@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "ZipArchiveTests.h"
 #include "Threading/OgreThreadHeaders.h"
-#include "OgreZip.h"
 #include "OgreCommon.h"
 
 
@@ -37,11 +36,21 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-// Register the test suite ZipArchiveTests );
+
+static String fileId(const String& path) {
+#if !OGRE_RESOURCEMANAGER_STRICT
+    String file;
+    String base;
+    StringUtil::splitFilename(path, file, base);
+    return file;
+#endif
+    return path;
+}
 
 //--------------------------------------------------------------------------
 void ZipArchiveTests::SetUp()
 {
+    Ogre::String
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     mTestPath = macBundlePath() + "/Contents/Resources/Media/misc/ArchiveTest.zip";
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -49,67 +58,42 @@ void ZipArchiveTests::SetUp()
 #else
     mTestPath = "./Tests/OgreMain/misc/ArchiveTest.zip";
 #endif
+
+    arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
+    arch->load();
 }
 //--------------------------------------------------------------------------
 void ZipArchiveTests::TearDown()
 {
+    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,ListNonRecursive)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
     StringVectorPtr vec = arch->list(false);
 
     EXPECT_EQ((size_t)2, vec->size());
     EXPECT_EQ(String("rootfile.txt"), vec->at(0));
     EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
 
-    OGRE_DELETE arch;
+
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,ListRecursive)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
     StringVectorPtr vec = arch->list(true);
 
     EXPECT_EQ((size_t)6, vec->size());
-    EXPECT_EQ(String("file.material"), vec->at(0));
-    EXPECT_EQ(String("file2.material"), vec->at(1));
-    EXPECT_EQ(String("file3.material"), vec->at(2));
-    EXPECT_EQ(String("file4.material"), vec->at(3));
+    EXPECT_EQ(fileId("level1/materials/scripts/file.material"), vec->at(0));
+    EXPECT_EQ(fileId("level1/materials/scripts/file2.material"), vec->at(1));
+    EXPECT_EQ(fileId("level2/materials/scripts/file3.material"), vec->at(2));
+    EXPECT_EQ(fileId("level2/materials/scripts/file4.material"), vec->at(3));
     EXPECT_EQ(String("rootfile.txt"), vec->at(4));
     EXPECT_EQ(String("rootfile2.txt"), vec->at(5));
-
-    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,ListFileInfoNonRecursive)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
     FileInfoListPtr vec = arch->listFileInfo(false);
 
     EXPECT_EQ((size_t)2, vec->size());
@@ -124,44 +108,33 @@ TEST_F(ZipArchiveTests,ListFileInfoNonRecursive)
     EXPECT_EQ(BLANKSTRING, fi2.path);
     EXPECT_EQ((size_t)45, fi2.compressedSize);
     EXPECT_EQ((size_t)156, fi2.uncompressedSize);
-
-    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,ListFileInfoRecursive)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
     FileInfoListPtr vec = arch->listFileInfo(true);
 
     EXPECT_EQ((size_t)6, vec->size());
     FileInfo& fi3 = vec->at(0);
-    EXPECT_EQ(String("file.material"), fi3.filename);
+    EXPECT_EQ(fileId("level1/materials/scripts/file.material"), fi3.filename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi3.path);
     EXPECT_EQ((size_t)0, fi3.compressedSize);
     EXPECT_EQ((size_t)0, fi3.uncompressedSize);
 
     FileInfo& fi4 = vec->at(1);
-    EXPECT_EQ(String("file2.material"), fi4.filename);
+    EXPECT_EQ(fileId("level1/materials/scripts/file2.material"), fi4.filename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi4.path);
     EXPECT_EQ((size_t)0, fi4.compressedSize);
     EXPECT_EQ((size_t)0, fi4.uncompressedSize);
 
     FileInfo& fi5 = vec->at(2);
-    EXPECT_EQ(String("file3.material"), fi5.filename);
+    EXPECT_EQ(fileId("level2/materials/scripts/file3.material"), fi5.filename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi5.path);
     EXPECT_EQ((size_t)0, fi5.compressedSize);
     EXPECT_EQ((size_t)0, fi5.uncompressedSize);
 
     FileInfo& fi6 = vec->at(3);
-    EXPECT_EQ(String("file4.material"), fi6.filename);
+    EXPECT_EQ(fileId("level2/materials/scripts/file4.material"), fi6.filename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi6.path);
     EXPECT_EQ((size_t)0, fi6.compressedSize);
     EXPECT_EQ((size_t)0, fi6.uncompressedSize);
@@ -177,65 +150,30 @@ TEST_F(ZipArchiveTests,ListFileInfoRecursive)
     EXPECT_EQ(BLANKSTRING, fi2.path);
     EXPECT_EQ((size_t)45, fi2.compressedSize);
     EXPECT_EQ((size_t)156, fi2.uncompressedSize);
-
-    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,FindNonRecursive)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
-
     StringVectorPtr vec = arch->find("*.txt", false);
 
     EXPECT_EQ((size_t)2, vec->size());
     EXPECT_EQ(String("rootfile.txt"), vec->at(0));
     EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
-
-    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,FindRecursive)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
-
     StringVectorPtr vec = arch->find("*.material", true);
 
     EXPECT_EQ((size_t)4, vec->size());
-    EXPECT_EQ(String("file.material"), vec->at(0));
-    EXPECT_EQ(String("file2.material"), vec->at(1));
-    EXPECT_EQ(String("file3.material"), vec->at(2));
-    EXPECT_EQ(String("file4.material"), vec->at(3));
-
-    OGRE_DELETE arch;
+    EXPECT_EQ(fileId("level1/materials/scripts/file.material"), vec->at(0));
+    EXPECT_EQ(fileId("level1/materials/scripts/file2.material"), vec->at(1));
+    EXPECT_EQ(fileId("level2/materials/scripts/file3.material"), vec->at(2));
+    EXPECT_EQ(fileId("level2/materials/scripts/file4.material"), vec->at(3));
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,FindFileInfoNonRecursive)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
     FileInfoListPtr vec = arch->findFileInfo("*.txt", false);
 
     EXPECT_EQ((size_t)2, vec->size());
@@ -250,64 +188,41 @@ TEST_F(ZipArchiveTests,FindFileInfoNonRecursive)
     EXPECT_EQ(BLANKSTRING, fi2.path);
     EXPECT_EQ((size_t)45, fi2.compressedSize);
     EXPECT_EQ((size_t)156, fi2.uncompressedSize);
-
-    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,FindFileInfoRecursive)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
     FileInfoListPtr vec = arch->findFileInfo("*.material", true);
 
     EXPECT_EQ((size_t)4, vec->size());
 
     FileInfo& fi3 = vec->at(0);
-    EXPECT_EQ(String("file.material"), fi3.filename);
+    EXPECT_EQ(fileId("level1/materials/scripts/file.material"), fi3.filename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi3.path);
     EXPECT_EQ((size_t)0, fi3.compressedSize);
     EXPECT_EQ((size_t)0, fi3.uncompressedSize);
 
     FileInfo& fi4 = vec->at(1);
-    EXPECT_EQ(String("file2.material"), fi4.filename);
+    EXPECT_EQ(fileId("level1/materials/scripts/file2.material"), fi4.filename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi4.path);
     EXPECT_EQ((size_t)0, fi4.compressedSize);
     EXPECT_EQ((size_t)0, fi4.uncompressedSize);
 
     FileInfo& fi5 = vec->at(2);
-    EXPECT_EQ(String("file3.material"), fi5.filename);
+    EXPECT_EQ(fileId("level2/materials/scripts/file3.material"), fi5.filename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi5.path);
     EXPECT_EQ((size_t)0, fi5.compressedSize);
     EXPECT_EQ((size_t)0, fi5.uncompressedSize);
 
     FileInfo& fi6 = vec->at(3);
-    EXPECT_EQ(String("file4.material"), fi6.filename);
+    EXPECT_EQ(fileId("level2/materials/scripts/file4.material"), fi6.filename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi6.path);
     EXPECT_EQ((size_t)0, fi6.compressedSize);
     EXPECT_EQ((size_t)0, fi6.uncompressedSize);
-
-    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,FileRead)
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
-
     DataStreamPtr stream = arch->open("rootfile.txt");
     EXPECT_EQ(String("this is line 1 in file 1"), stream->getLine());
     EXPECT_EQ(String("this is line 2 in file 1"), stream->getLine());
@@ -315,23 +230,11 @@ TEST_F(ZipArchiveTests,FileRead)
     EXPECT_EQ(String("this is line 4 in file 1"), stream->getLine());
     EXPECT_EQ(String("this is line 5 in file 1"), stream->getLine());
     EXPECT_TRUE(stream->eof());
-
-    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,ReadInterleave)
 {
     // Test overlapping reads from same archive
-    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
-    try {
-        arch->load();
-    } catch (Ogre::Exception e) {
-        // If it starts in build/bin/debug
-        OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
-        arch->load();
-    }
-
     // File 1
     DataStreamPtr stream1 = arch->open("rootfile.txt");
     EXPECT_EQ(String("this is line 1 in file 1"), stream1->getLine());
@@ -354,7 +257,5 @@ TEST_F(ZipArchiveTests,ReadInterleave)
     EXPECT_EQ(String("this is line 5 in file 2"), stream2->getLine());
     EXPECT_EQ(String("this is line 6 in file 2"), stream2->getLine());
     EXPECT_TRUE(stream2->eof());
-
-    OGRE_DELETE arch;
 }
 //--------------------------------------------------------------------------

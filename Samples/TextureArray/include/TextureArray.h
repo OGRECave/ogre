@@ -81,7 +81,7 @@ protected:
         texNames.push_back("wall3.jpg");
         texNames.push_back("sinbad_body.tga");
         texNames.push_back("sinbad_clothes.tga");
-        texNames.push_back("stevecube_BK.jpg");
+        texNames.push_back("stevecube_bk.jpg");
 
         // create the 2d texture array (the depth is the size of the array - number of textures)
         TexturePtr tex = TextureManager::getSingleton().createManual("TextureArrayTex", 

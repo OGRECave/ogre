@@ -649,11 +649,11 @@ namespace Ogre {
         
         if (mMaterial.isNull())
         {
-            LogManager::getSingleton().logMessage("Can't assign material "  
+            LogManager::getSingleton().logMessage("Can't assign material " + material->getName()+
                                                   " to BillboardSet of " + getName() + " because this "
-                                                  "Material does not exist. Have you forgotten to define it in a "
+                                                  "Material does not exist in group "+material->getGroup()+". Have you forgotten to define it in a "
                                                   ".material script?", LML_CRITICAL);
-            
+
             mMaterial = MaterialManager::getSingleton().getDefaultMaterial();
         }
 

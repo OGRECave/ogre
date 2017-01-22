@@ -174,7 +174,7 @@ protected:
 
         pb->setComment("Columns");
         windowUpdate();
-        ent = mSceneMgr->createEntity("Columns", "columns.mesh");
+        ent = mSceneMgr->createEntity("Columns", "Columns.mesh");
         mSceneMgr->getRootSceneNode()->attachObject(ent);        
         mSurfaceEnts.push_back(ent);
         pb->setProgress(0.5);

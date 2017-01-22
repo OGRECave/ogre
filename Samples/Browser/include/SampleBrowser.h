@@ -1064,7 +1064,7 @@ namespace OgreBites
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mTrayMgr->showLoadingBar(1, 0);
 #endif
-            Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Popular");
+            Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("General");
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mTrayMgr->hideLoadingBar();
 #endif

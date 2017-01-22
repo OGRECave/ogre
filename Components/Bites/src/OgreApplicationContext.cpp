@@ -527,7 +527,7 @@ void ApplicationContext::locateResources()
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Essential.zip", "EmbeddedZip", "Essential");
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Popular.zip", "EmbeddedZip", "Popular");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Popular.zip", "EmbeddedZip", "General");
 #else
     // load resource paths from config file
     Ogre::ConfigFile cf;
@@ -576,8 +576,8 @@ void ApplicationContext::locateResources()
         }
     }
 
-
-    const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList("General");
+    sec = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+    const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(sec);
     arch = genLocs.front()->archive->getName();
 #   if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #       if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
@@ -589,7 +589,6 @@ void ApplicationContext::locateResources()
     arch = Ogre::StringUtil::replaceAll(arch, "media/../../Tests/Media", "");
 #       endif
     type = "FileSystem";
-    sec = "Popular";
 
 #		ifdef OGRE_BUILD_PLUGIN_CG
     bool use_HLSL_Cg_shared = true;

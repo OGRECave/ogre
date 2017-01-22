@@ -41,6 +41,7 @@ THE SOFTWARE.
 
 // resource group that will be automatically unloaded after the close of the sample
 #define TRANSIENT_RESOURCE_GROUP "VisualTestTransient"
+#define ASSETS_RESOURCE_GROUP "General"
 
 /** The base class for a visual test scene */
 class VisualTest : public OgreBites::Sample
@@ -56,7 +57,7 @@ class VisualTest : public OgreBites::Sample
         mInfo["Help"] = "";
         Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
         if (!rgm.resourceGroupExists(TRANSIENT_RESOURCE_GROUP))
-            rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
+            rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP, true);
     }
 
     /** Adds a screenshot frame to the list - this should

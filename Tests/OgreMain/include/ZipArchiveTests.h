@@ -30,14 +30,13 @@ THE SOFTWARE.
 #define __ZipArchiveTests_H__
 
 #include <gtest/gtest.h>
-#include "OgreString.h"
+#include "OgreZip.h"
 
 class ZipArchiveTests : public ::testing::Test
 {
 
 protected:
-    Ogre::String mTestPath;
-
+    Ogre::ZipArchive* arch;
 public:
     void SetUp();
     void TearDown();
