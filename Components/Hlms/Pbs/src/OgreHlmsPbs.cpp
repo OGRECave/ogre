@@ -209,6 +209,7 @@ namespace Ogre
         mGlobalLightListBuffer( 0 ),
         mTexUnitSlotStart( 0 ),
         mPrePassTextures( 0 ),
+        mSsrTexture( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
         mShadowFilter( PCF_3x3 ),
@@ -305,6 +306,9 @@ namespace Ogre
             {
                 psParams->setNamedConstant( "gBuf_normals",         texUnit++ );
                 psParams->setNamedConstant( "gBuf_shadowRoughness", texUnit++ );
+
+                if( mSsrTexture )
+                    psParams->setNamedConstant( "ssrTexture", texUnit++ );
             }
 
             if( !mPreparedPass.shadowMaps.empty() )
@@ -725,6 +729,10 @@ namespace Ogre
 
         mPrePassTextures = sceneManager->getCurrentPrePassTextures();
         assert( !mPrePassTextures || mPrePassTextures->size() == 2u );
+
+        mSsrTexture = sceneManager->getCurrentSsrTexture();
+        assert( !(!mPrePassTextures && mSsrTexture) && "Using SSR *requires* to be in prepass mode" );
+        assert( !mSsrTexture || mSsrTexture->size() == 1u );
 
         AmbientLightMode ambientMode = mAmbientLightMode;
         ColourValue upperHemisphere = sceneManager->getAmbientLightUpperHemisphere();
@@ -1194,6 +1202,8 @@ namespace Ogre
             mTexUnitSlotStart += 1;
         if( mPrePassTextures )
             mTexUnitSlotStart += 2;
+        if( mSsrTexture )
+            mTexUnitSlotStart += 1;
 
         uploadDirtyDatablocks();
 
@@ -1268,6 +1278,12 @@ namespace Ogre
                             CbTexture( texUnit++, true, (*mPrePassTextures)[0].get(), 0 );
                     *commandBuffer->addCommand<CbTexture>() =
                             CbTexture( texUnit++, true, (*mPrePassTextures)[1].get(), 0 );
+                }
+
+                if( mSsrTexture )
+                {
+                    *commandBuffer->addCommand<CbTexture>() =
+                            CbTexture( texUnit++, true, (*mSsrTexture)[0].get(), 0 );
                 }
 
                 //We changed HlmsType, rebind the shared textures.

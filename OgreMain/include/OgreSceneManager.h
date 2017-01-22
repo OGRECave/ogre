@@ -471,6 +471,7 @@ namespace Ogre {
 
         PrePassMode             mPrePassMode;
         TextureVec const        *mPrePassTextures;
+        TextureVec const        *mSsrTexture;
 
         /// Instance name
         String mName;
@@ -1322,9 +1323,11 @@ namespace Ogre {
 
         /// For internal use.
         /// @see CompositorPassSceneDef::mPrePassMode
-        void _setPrePassMode( PrePassMode mode, const TextureVec *prepassTextures );
+        void _setPrePassMode( PrePassMode mode, const TextureVec *prepassTextures,
+                              const TextureVec *ssrTexture );
         PrePassMode getCurrentPrePassMode(void) const               { return mPrePassMode; }
         const TextureVec* getCurrentPrePassTextures(void) const     { return mPrePassTextures; }
+        const TextureVec* getCurrentSsrTexture(void) const          { return mSsrTexture; }
 
         NodeMemoryManager& _getNodeMemoryManager(SceneMemoryMgrTypes sceneType)
                                                                 { return mNodeMemoryManager[sceneType]; }

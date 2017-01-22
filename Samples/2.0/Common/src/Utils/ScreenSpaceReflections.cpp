@@ -15,7 +15,7 @@ namespace Demo
         0,      0,    1,    0,
         0,      0,    0,    1);
 
-    ScreenSpaceReflections::ScreenSpaceReflections()
+    ScreenSpaceReflections::ScreenSpaceReflections( const Ogre::TexturePtr &globalCubemap )
     {
         Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().load(
                     "SSR/ScreenSpaceReflectionsVectors",
@@ -32,6 +32,8 @@ namespace Demo
                         staticCast<Ogre::Material>();
         pass = material->getTechnique(0)->getPass(0);
         mPsParams[1] = pass->getFragmentProgramParameters();
+
+        //pass->getTextureUnitState( "globalCubemap" )->setTexture( globalCubemap );
     }
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflections::update( Ogre::Camera *camera )
@@ -65,5 +67,17 @@ namespace Demo
 
         mPsParams[0]->setNamedConstant( "p_viewToTextureSpaceMatrix", viewToTextureSpaceMatrix );
         mPsParams[1]->setNamedConstant( "p_textureSpaceToViewSpace", viewToTextureSpaceMatrix.inverse() );
+
+        Ogre::Matrix4 viewMatrix = camera->getViewMatrix(true);
+        Ogre::Matrix3 viewMatrix3, invViewMatrixCubemap;
+        viewMatrix.extract3x3Matrix( viewMatrix3 );
+        //Cubemaps are left-handed.
+        invViewMatrixCubemap = viewMatrix3;
+        invViewMatrixCubemap[0][2] = -invViewMatrixCubemap[0][2];
+        invViewMatrixCubemap[1][2] = -invViewMatrixCubemap[1][2];
+        invViewMatrixCubemap[2][2] = -invViewMatrixCubemap[2][2];
+        invViewMatrixCubemap = invViewMatrixCubemap.Inverse();
+
+        mPsParams[1]->setNamedConstant( "p_invViewMatCubemap", &invViewMatrixCubemap[0][0], 3*3, 1 );
     }
 }

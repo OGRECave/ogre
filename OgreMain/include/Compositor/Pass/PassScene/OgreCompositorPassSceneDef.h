@@ -84,6 +84,7 @@ namespace Ogre
 
         /// Only used if mPrePassMode == PrePassUse
         IdString        mPrePassTexture;
+        IdString        mPrePassSsrTexture;
 
         /// This is a depth pre-pass. Note: Implementations may write
         /// to colour too for hybrid deferred & forward rendering.
@@ -146,10 +147,11 @@ namespace Ogre
             mVisibilityMask = visibilityMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
         }
 
-        void setUseDepthPrePass( IdString textureName )
+        void setUseDepthPrePass( IdString textureName, IdString ssrTexture )
         {
             mPrePassMode = PrePassUse;
             mPrePassTexture = textureName;
+            mPrePassSsrTexture = ssrTexture;
             mExposedTextures.push_back( textureName );
         }
     };

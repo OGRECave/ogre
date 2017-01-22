@@ -10,7 +10,7 @@ namespace Demo
         Ogre::GpuProgramParametersSharedPtr mPsParams[2];
 
     public:
-        ScreenSpaceReflections();
+        ScreenSpaceReflections( const Ogre::TexturePtr &globalCubemap );
 
         void update( Ogre::Camera *camera );
     };

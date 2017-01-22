@@ -117,6 +117,7 @@ namespace Ogre
         uint32                  mTexUnitSlotStart;
 
         TextureVec const        *mPrePassTextures;
+        TextureVec const        *mSsrTexture;
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 

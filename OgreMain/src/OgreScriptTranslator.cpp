@@ -8460,22 +8460,28 @@ namespace Ogre{
                     {
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                     }
-                    else if(prop->values.size() > 1)
+                    else if(prop->values.size() > 2)
                     {
                         compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                            "use_prepass only supports 1 argument: the texture's name");
+                                           "use_prepass only supports 2 argument: the GBuffer's' "
+                                           "texture name & the SSR texture name");
                     }
                     else
                     {
-                        IdString val;
-                        if( !getIdString(prop->values.front(), &val) )
+                        IdString gbuffer, ssr;
+
+                        AbstractNodeList::const_iterator it1 = prop->values.begin();
+                        AbstractNodeList::const_iterator it0 = it1++;
+
+                        if( !getIdString( *it0, &gbuffer ) ||
+                            (it1 != prop->values.end() && !getIdString( *it1, &ssr )) )
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                 "use_prepass must be the name of a texture available in the local or global scope");
                         }
                         else
                         {
-                            passScene->setUseDepthPrePass( val );
+                            passScene->setUseDepthPrePass( gbuffer, ssr );
                         }
                     }
                     break;

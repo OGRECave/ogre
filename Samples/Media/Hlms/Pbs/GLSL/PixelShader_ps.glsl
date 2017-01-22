@@ -27,6 +27,10 @@ layout(std140) uniform;
 		uniform sampler2DMS gBuf_normals;
 		uniform sampler2DMS gBuf_shadowRoughness;
 	@end
+
+	@property( hlms_use_ssr )
+		uniform sampler2D ssrTexture;
+	@end
 @end
 
 @property( hlms_vpos )
@@ -511,6 +515,12 @@ void main()
 			vec3 envColourS = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			vec3 envColourD = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
 		@end
+	@end
+
+	@property( hlms_use_ssr )
+		//TODO: SSR pass should be able to combine global & local cubemap.
+		vec4 ssrReflection = texelFetch( ssrTexture, iFragCoord, 0 ).xyzw;
+		envColourS = mix( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
 	@end
 
 	@insertpiece( BRDF_EnvMap )

@@ -27,6 +27,8 @@
 #include "OgreMaterial.h"
 #include "OgreTechnique.h"
 
+#include "OgreTextureManager.h"
+
 #include "OgreForward3D.h"
 
 using namespace Demo;
@@ -44,7 +46,11 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflectionsGameState::createScene01(void)
     {
-        mScreenSpaceReflections = new ScreenSpaceReflections();
+//        Ogre::TexturePtr globalCubemap = Ogre::TextureManager::getSingleton().load(
+//                    "SaintPetersBasilica.dds", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+//                    Ogre::TEX_TYPE_CUBE_MAP );
+        //mScreenSpaceReflections = new ScreenSpaceReflections( globalCubemap );
+        mScreenSpaceReflections = new ScreenSpaceReflections( Ogre::TexturePtr() );
 
         //Setup a scene similar to that of PBS sample, except
         //we apply the cubemap to everything via C++ code

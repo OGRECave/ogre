@@ -48,7 +48,8 @@ namespace Ogre
                 mCamera( 0 ),
                 mLodCamera( 0 ),
                 mUpdateShadowNode( false ),
-                mPrePassTextures( 0 )
+                mPrePassTextures( 0 ),
+                mSsrTexture( 0 )
     {
         CompositorWorkspace *workspace = parentNode->getWorkspace();
 
@@ -78,6 +79,10 @@ namespace Ogre
             const CompositorChannel *channel = parentNode->_getDefinedTexture(
                         mDefinition->mPrePassTexture );
             mPrePassTextures = &channel->textures;
+
+            const CompositorChannel *ssrChannel = parentNode->_getDefinedTexture(
+                        mDefinition->mPrePassSsrTexture );
+            mSsrTexture = &ssrChannel->textures;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -164,7 +169,7 @@ namespace Ogre
             mTarget->_beginUpdate();
         }
         sceneManager->_setForwardPlusEnabledInPass( mDefinition->mEnableForwardPlus );
-        sceneManager->_setPrePassMode( mDefinition->mPrePassMode, mPrePassTextures );
+        sceneManager->_setPrePassMode( mDefinition->mPrePassMode, mPrePassTextures, mSsrTexture );
 
         mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
                                              mDefinition->mFirstRQ, mDefinition->mLastRQ );
@@ -184,7 +189,7 @@ namespace Ogre
         //restore viewport material scheme
         mViewport->setMaterialScheme(oldViewportMatScheme);
 
-        sceneManager->_setPrePassMode( PrePassNone, 0 );
+        sceneManager->_setPrePassMode( PrePassNone, 0, 0 );
 
         if( listener )
             listener->passPosExecute( this );
@@ -202,6 +207,60 @@ namespace Ogre
         {
             mShadowNode->_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess,
                                                                resourcesLayout );
+        }
+
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+        const RenderSystemCapabilities *caps = renderSystem->getCapabilities();
+        const bool explicitApi = caps->hasCapability( RSC_EXPLICIT_API );
+
+        //Check <anything> -> Texture (GBuffers)
+        if( mPrePassTextures )
+        {
+            TextureVec::const_iterator itor = mPrePassTextures->begin();
+            TextureVec::const_iterator end  = mPrePassTextures->end();
+
+            while( itor != end )
+            {
+                const TexturePtr &texture = *itor;
+                RenderTarget *renderTarget = texture->getBuffer()->getRenderTarget();
+
+                ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( renderTarget );
+
+                if( (currentLayout->second != ResourceLayout::Texture && explicitApi) ||
+                        currentLayout->second == ResourceLayout::Uav )
+                {
+                    addResourceTransition( currentLayout,
+                                           ResourceLayout::Texture,
+                                           ReadBarrier::Texture );
+                }
+
+                ++itor;
+            }
+        }
+
+        //Check <anything> -> Texture (SSR Texture)
+        if( mSsrTexture )
+        {
+            TextureVec::const_iterator itor = mSsrTexture->begin();
+            TextureVec::const_iterator end  = mSsrTexture->end();
+
+            while( itor != end )
+            {
+                const TexturePtr &texture = *itor;
+                RenderTarget *renderTarget = texture->getBuffer()->getRenderTarget();
+
+                ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( renderTarget );
+
+                if( (currentLayout->second != ResourceLayout::Texture && explicitApi) ||
+                        currentLayout->second == ResourceLayout::Uav )
+                {
+                    addResourceTransition( currentLayout,
+                                           ResourceLayout::Texture,
+                                           ReadBarrier::Texture );
+                }
+
+                ++itor;
+            }
         }
 
         CompositorPass::_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );

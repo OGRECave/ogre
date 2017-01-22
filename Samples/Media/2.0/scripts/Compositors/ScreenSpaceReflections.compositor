@@ -18,7 +18,7 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 	{
 		pass clear
 		{
-			colour_value 0 0 1 1
+			colour_value 1 1 1 1
 		}
 
 		pass render_scene
@@ -72,7 +72,7 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 			overlays	off
 			shadows		ScreenSpaceReflectionsShadowNode
 
-			use_prepass			mrtGBuffer
+			use_prepass			mrtGBuffer reflectionBuffer
 			lod_update_list		false
 		}
 	}
@@ -108,8 +108,8 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 		pass render_quad
 		{
 			material Ogre/Copy/4xFP32
-			//input 0 rtt
-			input 0 reflectionBuffer
+			input 0 rtt
+			//input 0 reflectionBuffer
 		}
 
 		pass render_scene

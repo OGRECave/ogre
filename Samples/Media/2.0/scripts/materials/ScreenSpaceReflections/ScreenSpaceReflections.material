@@ -1,3 +1,7 @@
+//---------------------------------------------------------------------------------------
+// SSR/ScreenSpaceReflectionsVectors
+//---------------------------------------------------------------------------------------
+
 fragment_program SSR/ScreenSpaceReflectionsVectors_ps_GLSL glsl
 {
 	source ScreenSpaceReflectionsVectors_ps.glsl
@@ -27,6 +31,44 @@ fragment_program SSR/ScreenSpaceReflectionsVectors_ps unified
 	delegate SSR/ScreenSpaceReflectionsVectors_ps_GLSL
 	delegate SSR/ScreenSpaceReflectionsVectors_ps_HLSL
 	delegate SSR/ScreenSpaceReflectionsVectors_ps_Metal
+}
+
+//---------------------------------------------------------------------------------------
+// SSR/ScreenSpaceReflectionsCombine
+//---------------------------------------------------------------------------------------
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_GLSL glsl
+{
+	source ScreenSpaceReflectionsCombine_ps.glsl
+	default_params
+	{
+		param_named depthTexture			int 0
+		param_named gBuf_normals			int 1
+		param_named gBuf_shadowRoughness	int 2
+		param_named prevFrame				int 3
+		param_named rayTraceBuffer			int 4
+		//param_named globalCubemap			int 5
+	}
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_HLSL hlsl
+{
+	source ScreenSpaceReflectionsCombine_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_Metal metal
+{
+	source ScreenSpaceReflectionsCombine_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/QuadCameraDir_vs
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps unified
+{
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_GLSL
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_HLSL
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_Metal
 }
 
 material SSR/ScreenSpaceReflectionsVectors
@@ -84,41 +126,6 @@ material SSR/ScreenSpaceReflectionsVectors
 	}
 }
 
-
-fragment_program SSR/ScreenSpaceReflectionsCombine_ps_GLSL glsl
-{
-	source ScreenSpaceReflectionsCombine_ps.glsl
-	default_params
-	{
-		param_named depthTexture			int 0
-		param_named gBuf_normals			int 1
-		param_named gBuf_shadowRoughness	int 2
-		param_named prevFrame				int 3
-		param_named rayTraceBuffer			int 4
-	}
-}
-
-fragment_program SSR/ScreenSpaceReflectionsCombine_ps_HLSL hlsl
-{
-	source ScreenSpaceReflectionsCombine_ps.hlsl
-	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-	entry_point main
-}
-
-fragment_program SSR/ScreenSpaceReflectionsCombine_ps_Metal metal
-{
-	source ScreenSpaceReflectionsCombine_ps.metal
-	shader_reflection_pair_hint Ogre/Compositor/QuadCameraDir_vs
-}
-
-fragment_program SSR/ScreenSpaceReflectionsCombine_ps unified
-{
-	delegate SSR/ScreenSpaceReflectionsCombine_ps_GLSL
-	delegate SSR/ScreenSpaceReflectionsCombine_ps_HLSL
-	delegate SSR/ScreenSpaceReflectionsCombine_ps_Metal
-}
-
-
 material SSR/ScreenSpaceReflectionsCombine
 {
 	technique
@@ -150,6 +157,7 @@ material SSR/ScreenSpaceReflectionsCombine
 
 				//p_textureSpaceToViewSpace will be set from C++
 				//param_named		p_textureSpaceToViewSpace	float4x4
+				//param_named		p_invViewMatCubemap			float4x4
 			}
 
 			texture_unit depthTexture
@@ -181,6 +189,12 @@ material SSR/ScreenSpaceReflectionsCombine
 				tex_address_mode clamp
 				filtering none
 			}
+
+			/*texture_unit globalCubemap
+			{
+				tex_address_mode clamp
+				filtering trilinear
+			}*/
 		}
 	}
 }

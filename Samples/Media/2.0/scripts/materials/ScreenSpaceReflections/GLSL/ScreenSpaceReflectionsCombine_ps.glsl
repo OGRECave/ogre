@@ -7,6 +7,7 @@ uniform sampler2D gBuf_normals;
 uniform sampler2D gBuf_shadowRoughness;
 uniform sampler2D prevFrame;
 uniform sampler2D rayTraceBuffer;
+//uniform samplerCube globalCubemap;
 
 #define float2 vec2
 #define float3 vec3
@@ -15,6 +16,7 @@ uniform sampler2D rayTraceBuffer;
 #define int2 ivec2
 #define int3 ivec3
 
+#define float3x3 mat3
 #define float4x4 mat4
 
 #define lerp mix
@@ -44,6 +46,7 @@ uniform	float p_invFadeRange;	//1.0 / (p_fadeEnd - p_fadeStart)
 uniform	float2 p_projectionParams;
 
 uniform	float4x4 p_textureSpaceToViewSpace;
+uniform	float3x3 p_invViewMatCubemap;
 //};
 
 //uniform Params p;
@@ -107,7 +110,7 @@ in float4 gl_FragCoord;
 void main()
 {
 	float depth = texelFetch( depthTexture, int2( gl_FragCoord.xy ), 0 ).x;
-	float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
+	//float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
 	float4 raySS = texelFetch( rayTraceBuffer, int2( gl_FragCoord.xy ), 0 ).xyzw;
 
@@ -182,9 +185,19 @@ void main()
 	float totalFade =	fadeOnBorder * fadeOnDistance * fadeOnPerpendicular *
 						fadeOnRoughness * ( 1.0f - saturate(remainingAlpha) );
 
-	float3 fallbackColor = float3( 0, 0, 0 );
+	/*float3 nNormal = texelFetch( gBuf_normals, int2( gl_FragCoord.xy ), 0 ).xyz;
+	float3 viewDir = normalize( float3( inPs.cameraDir.xy, -inPs.cameraDir.z ) );
+	float3 reflDir = viewDir - 2.0 * dot( viewDir, nNormal ) * nNormal;
+	float3 globalCubemapColour = textureLod( globalCubemap, p_invViewMatCubemap * reflDir,
+											 roughness * 12.0 ).xyz;
 
-	fragColour = float4( lerp( fallbackColor, totalColor.rgb, totalFade ), 1.0f );
+	float3 fallbackColor = globalCubemapColour;
+
+	fragColour = float4( lerp( fallbackColor, totalColor.rgb, totalFade ), 1.0f );*/
+
+	//TODO: Perform the fallback blending SSR -> Local Cubemap -> Global Cubemap here.
+	fragColour = float4( totalColor.rgb, totalFade );
+
 	//fragColour = float4( fadeOnDistance, fadeOnDistance, fadeOnDistance, 1 );
 	//fragColour = float4( totalColor.xyz, 1 );
 }
