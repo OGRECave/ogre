@@ -194,16 +194,6 @@ namespace Ogre {
         if (mCompiled && checkErrors)
             logObjectInfo("GLSL compiled: " + mName, mGLShaderHandle);
 
-        if (!mCompiled)
-        {
-            String shaderType = getShaderTypeLabel(mType);
-            StringUtil::toTitleCase(shaderType);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        shaderType + " Program " + mName +
-                        " failed to compile. See compile log above for details.",
-                        "GLSLShader::compile");
-        }
-
         return (mCompiled == 1);
     }
 

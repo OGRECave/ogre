@@ -78,16 +78,14 @@ namespace Ogre
             }
             else
             {
-                try
-                {
-                    getVertexProgram()->compile(true);
-                }
-                catch (Exception& e)
-                {
-                    LogManager::getSingleton().stream() << e.getDescription();
+                if(!getVertexProgram()->compile(true)) {
+                    LogManager::getSingleton().stream(LML_CRITICAL)
+                            << "Vertex Program " << getVertexProgram()->getName()
+                            << " failed to compile. See compile log above for details.";
                     mTriedToLinkAndFailed = true;
                     return;
                 }
+
                 GLuint programHandle = getVertexProgram()->getGLProgramHandle();
                 OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
                 getVertexProgram()->attachToProgramObject(programHandle);
@@ -125,13 +123,10 @@ namespace Ogre
             }
             else
             {
-                try
-                {
-                    mFragmentProgram->compile(true);
-                }
-                catch (Exception& e)
-                {
-                    LogManager::getSingleton().stream() << e.getDescription();
+                if(!mFragmentProgram->compile(true)) {
+                    LogManager::getSingleton().stream(LML_CRITICAL)
+                            << "Fragment Program " << mFragmentProgram->getName()
+                            << " failed to compile. See compile log above for details.";
                     mTriedToLinkAndFailed = true;
                     return;
                 }
