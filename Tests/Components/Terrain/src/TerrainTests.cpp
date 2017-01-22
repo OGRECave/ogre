@@ -53,13 +53,7 @@ void TerrainTests::SetUp()
 
     // Load resource paths from config file
     ConfigFile cf;
-    String resourcesPath;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
-#else
-    resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
-#endif
-
+    String resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
     cf.load(resourcesPath);
 
     // Go through all sections & settings in the file

@@ -33,14 +33,11 @@ THE SOFTWARE.
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreArchiveManager.h"
 #include "OgreLogManager.h"
-
+#include "OgreConfigFile.h"
+#include "OgreFileSystemLayer.h"
 
 #include <fstream>
 #include <algorithm>
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "macUtils.h"
-#endif
 
 // Register the test suite
 
@@ -57,14 +54,12 @@ void RenderSystemCapabilitiesTests::SetUp()
 
     mRenderSystemCapabilitiesManager = OGRE_NEW RenderSystemCapabilitiesManager();
 
+    Ogre::ConfigFile cf;
+    cf.load(Ogre::FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    Ogre::String testPath = cf.getSettingsIterator("Tests").getNext()+"/CustomCapabilities";
+
     // Actual parsing happens here. The following test methods confirm parse results only.
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive(macBundlePath() + "/Contents/Resources/Media/CustomCapabilities", "FileSystem", true);
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("./Tests/Media/CustomCapabilities", "FileSystem", true);
-#else
-    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("../../Tests/Media/CustomCapabilities", "FileSystem", true);
-#endif
+    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive(testPath, "FileSystem", true);
 }
 //--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::TearDown()

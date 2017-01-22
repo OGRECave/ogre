@@ -116,7 +116,6 @@ if (OGRE_BUILD_TESTS)
     if (OGRE_CONFIG_ENABLE_ZIP)
       list(APPEND HEADER_FILES OgreMain/include/ZipArchiveTests.h)
       list(APPEND SOURCE_FILES OgreMain/src/ZipArchiveTests.cpp)
-	  file(COPY OgreMain/misc DESTINATION OgreMain/)
     endif ()
 
     if (OGRE_BUILD_COMPONENT_PAGING)
@@ -195,7 +194,7 @@ if (OGRE_BUILD_TESTS)
         COMMAND ditto
         ${OGRE_SOURCE_DIR}/Samples/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
         COMMAND ditto
-        ${OGRE_SOURCE_DIR}/Tests/OgreMain/misc/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/misc/
+        ${OGRE_SOURCE_DIR}/Tests/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
         COMMAND ditto
         ${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TEST_CONTENTS_PATH}/Resources
         )
@@ -301,14 +300,6 @@ if (OGRE_BUILD_TESTS)
           ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
           )
       endif()
-	  
-	else() # not APPLE
-		# Copy necessary unit test data
-		if (OGRE_CONFIG_ENABLE_ZIP)
-			file(COPY ${OGRE_SOURCE_DIR}/Tests/OgreMain/misc DESTINATION ${OGRE_BINARY_DIR}/Tests/OgreMain/)
-		endif ()
-		
-		file(COPY ${OGRE_SOURCE_DIR}/Tests/Media/CustomCapabilities DESTINATION ${OGRE_BINARY_DIR}/Tests/Media)
     endif()
     
     add_subdirectory(VisualTests)
