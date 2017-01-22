@@ -57,7 +57,7 @@ class VisualTest : public OgreBites::Sample
         mInfo["Help"] = "";
         Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
         if (!rgm.resourceGroupExists(TRANSIENT_RESOURCE_GROUP))
-            rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
+            rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP, true);
     }
 
     /** Adds a screenshot frame to the list - this should
