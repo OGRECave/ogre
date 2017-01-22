@@ -36,7 +36,16 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-// Register the test suite ZipArchiveTests );
+
+static String fileId(const String& path) {
+#if !OGRE_RESOURCEMANAGER_STRICT
+    String file;
+    String base;
+    StringUtil::splitFilename(path, file, base);
+    return file;
+#endif
+    return path;
+}
 
 //--------------------------------------------------------------------------
 void ZipArchiveTests::SetUp()
@@ -75,10 +84,10 @@ TEST_F(ZipArchiveTests,ListRecursive)
     StringVectorPtr vec = arch->list(true);
 
     EXPECT_EQ((size_t)6, vec->size());
-    EXPECT_EQ(String("file.material"), vec->at(0));
-    EXPECT_EQ(String("file2.material"), vec->at(1));
-    EXPECT_EQ(String("file3.material"), vec->at(2));
-    EXPECT_EQ(String("file4.material"), vec->at(3));
+    EXPECT_EQ(fileId("level1/materials/scripts/file.material"), vec->at(0));
+    EXPECT_EQ(fileId("level1/materials/scripts/file2.material"), vec->at(1));
+    EXPECT_EQ(fileId("level2/materials/scripts/file3.material"), vec->at(2));
+    EXPECT_EQ(fileId("level2/materials/scripts/file4.material"), vec->at(3));
     EXPECT_EQ(String("rootfile.txt"), vec->at(4));
     EXPECT_EQ(String("rootfile2.txt"), vec->at(5));
 }
@@ -107,25 +116,25 @@ TEST_F(ZipArchiveTests,ListFileInfoRecursive)
 
     EXPECT_EQ((size_t)6, vec->size());
     FileInfo& fi3 = vec->at(0);
-    EXPECT_EQ(String("file.material"), fi3.filename);
+    EXPECT_EQ(fileId("level1/materials/scripts/file.material"), fi3.filename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi3.path);
     EXPECT_EQ((size_t)0, fi3.compressedSize);
     EXPECT_EQ((size_t)0, fi3.uncompressedSize);
 
     FileInfo& fi4 = vec->at(1);
-    EXPECT_EQ(String("file2.material"), fi4.filename);
+    EXPECT_EQ(fileId("level1/materials/scripts/file2.material"), fi4.filename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi4.path);
     EXPECT_EQ((size_t)0, fi4.compressedSize);
     EXPECT_EQ((size_t)0, fi4.uncompressedSize);
 
     FileInfo& fi5 = vec->at(2);
-    EXPECT_EQ(String("file3.material"), fi5.filename);
+    EXPECT_EQ(fileId("level2/materials/scripts/file3.material"), fi5.filename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi5.path);
     EXPECT_EQ((size_t)0, fi5.compressedSize);
     EXPECT_EQ((size_t)0, fi5.uncompressedSize);
 
     FileInfo& fi6 = vec->at(3);
-    EXPECT_EQ(String("file4.material"), fi6.filename);
+    EXPECT_EQ(fileId("level2/materials/scripts/file4.material"), fi6.filename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi6.path);
     EXPECT_EQ((size_t)0, fi6.compressedSize);
     EXPECT_EQ((size_t)0, fi6.uncompressedSize);
@@ -157,10 +166,10 @@ TEST_F(ZipArchiveTests,FindRecursive)
     StringVectorPtr vec = arch->find("*.material", true);
 
     EXPECT_EQ((size_t)4, vec->size());
-    EXPECT_EQ(String("file.material"), vec->at(0));
-    EXPECT_EQ(String("file2.material"), vec->at(1));
-    EXPECT_EQ(String("file3.material"), vec->at(2));
-    EXPECT_EQ(String("file4.material"), vec->at(3));
+    EXPECT_EQ(fileId("level1/materials/scripts/file.material"), vec->at(0));
+    EXPECT_EQ(fileId("level1/materials/scripts/file2.material"), vec->at(1));
+    EXPECT_EQ(fileId("level2/materials/scripts/file3.material"), vec->at(2));
+    EXPECT_EQ(fileId("level2/materials/scripts/file4.material"), vec->at(3));
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,FindFileInfoNonRecursive)
@@ -188,25 +197,25 @@ TEST_F(ZipArchiveTests,FindFileInfoRecursive)
     EXPECT_EQ((size_t)4, vec->size());
 
     FileInfo& fi3 = vec->at(0);
-    EXPECT_EQ(String("file.material"), fi3.filename);
+    EXPECT_EQ(fileId("level1/materials/scripts/file.material"), fi3.filename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi3.path);
     EXPECT_EQ((size_t)0, fi3.compressedSize);
     EXPECT_EQ((size_t)0, fi3.uncompressedSize);
 
     FileInfo& fi4 = vec->at(1);
-    EXPECT_EQ(String("file2.material"), fi4.filename);
+    EXPECT_EQ(fileId("level1/materials/scripts/file2.material"), fi4.filename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi4.path);
     EXPECT_EQ((size_t)0, fi4.compressedSize);
     EXPECT_EQ((size_t)0, fi4.uncompressedSize);
 
     FileInfo& fi5 = vec->at(2);
-    EXPECT_EQ(String("file3.material"), fi5.filename);
+    EXPECT_EQ(fileId("level2/materials/scripts/file3.material"), fi5.filename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi5.path);
     EXPECT_EQ((size_t)0, fi5.compressedSize);
     EXPECT_EQ((size_t)0, fi5.uncompressedSize);
 
     FileInfo& fi6 = vec->at(3);
-    EXPECT_EQ(String("file4.material"), fi6.filename);
+    EXPECT_EQ(fileId("level2/materials/scripts/file4.material"), fi6.filename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi6.path);
     EXPECT_EQ((size_t)0, fi6.compressedSize);
     EXPECT_EQ((size_t)0, fi6.uncompressedSize);
