@@ -116,7 +116,7 @@ void MeshSerializerTests::SetUp()
         }
     }
 
-    mMesh = MeshManager::getSingleton().load("knot.mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+    mMesh = MeshManager::getSingleton().load("knot.mesh", "General");
 
     getResourceFullPath(mMesh, mMeshFullPath);
     if (!copyFile(mMeshFullPath + ".bak", mMeshFullPath)) {
@@ -124,7 +124,7 @@ void MeshSerializerTests::SetUp()
         copyFile(mMeshFullPath, mMeshFullPath + ".bak");
     }
     mSkeletonFullPath = "";
-    mSkeleton = SkeletonManager::getSingleton().load("jaiqua.skeleton", "Popular").staticCast<Skeleton>();
+    mSkeleton = SkeletonManager::getSingleton().load("jaiqua.skeleton", "General").staticCast<Skeleton>();
     getResourceFullPath(mSkeleton, mSkeletonFullPath);
     if (!copyFile(mSkeletonFullPath + ".bak", mSkeletonFullPath)) {
         // If there is no backup, create one.

@@ -83,7 +83,7 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
     models->addItem("sibenik.mesh");
 
     // Add all meshes from popular:
-    StringVectorPtr meshes = ResourceGroupManager::getSingleton().findResourceNames("Popular", "*.mesh");
+    StringVectorPtr meshes = ResourceGroupManager::getSingleton().findResourceNames("General", "*.mesh");
     StringVector::iterator it, itEnd;
     it = meshes->begin();
     itEnd = meshes->end();

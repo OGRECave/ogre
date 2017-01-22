@@ -7,7 +7,9 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/thumbnails
 # Common sample resources needed by many of the samples.
 # Rarely used resources should be separately loaded by the
 # samples which require them.
-[Popular]
+[General]
+# Bites uses this entry to generate paths for RTSS
+FileSystem=@OGRE_MEDIA_DIR_REL@
 FileSystem=@OGRE_MEDIA_DIR_REL@/fonts
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts
@@ -33,8 +35,6 @@ Zip=@OGRE_MEDIA_DIR_REL@/packs/Sinbad.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/skybox.zip
 Zip=@OGRE_MEDIA_DIR_REL@/volumeTerrain/volumeTerrainBig.zip
 
-[General]
-FileSystem=@OGRE_MEDIA_DIR_REL@
 FileSystem=@OGRE_MEDIA_DIR_REL@/HLMS
 
 # Materials for visual tests

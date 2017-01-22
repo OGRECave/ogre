@@ -6,7 +6,9 @@ APKFileSystem=/thumbnails
 # Common sample resources needed by many of the samples.
 # Rarely used resources should be separately loaded by the
 # samples which require them.
-[Popular]
+[General]
+# Bites uses this entry to generate paths for RTSS
+APKFileSystem=/
 APKFileSystem=/fonts
 APKFileSystem=/materials/programs
 APKFileSystem=/materials/programs/GLSLES
@@ -29,6 +31,5 @@ APKZip=/packs/ogredance.zip
 APKZip=/packs/Sinbad.zip
 APKZip=/packs/skybox.zip
 
-[General]
-APKFileSystem=/
+
 APKFileSystem=/HLMS
