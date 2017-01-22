@@ -1947,7 +1947,7 @@ namespace Ogre {
             const Plane& plane, const String& materialName, Real scale = 1000,
             Real tiling = 10, bool drawFirst = true, Real bow = 0, 
             int xsegments = 1, int ysegments = 1, 
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         /** Enables / disables a 'sky plane' i.e. a plane at constant
             distance from the camera representing the sky.
             @remarks
@@ -1996,7 +1996,7 @@ namespace Ogre {
             const Plane& plane, const String& materialName, Real scale = 1000,
             Real tiling = 10, uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, Real bow = 0, 
             int xsegments = 1, int ysegments = 1, 
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky plane' */
         virtual void setSkyPlaneEnabled(bool enable) { mSkyPlaneEnabled = enable; }
@@ -2054,7 +2054,7 @@ namespace Ogre {
         virtual void setSkyBox(
             bool enable, const String& materialName, Real distance = 5000,
             bool drawFirst = true, const Quaternion& orientation = Quaternion::IDENTITY,
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky box' i.e. a 6-sided box at constant
             distance from the camera representing the sky.
@@ -2091,7 +2091,7 @@ namespace Ogre {
         virtual void _setSkyBox(
             bool enable, const String& materialName, Real distance = 5000,
             uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, const Quaternion& orientation = Quaternion::IDENTITY,
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky box' */
         virtual void setSkyBoxEnabled(bool enable) { mSkyBoxEnabled = enable; }
@@ -2165,7 +2165,7 @@ namespace Ogre {
             Real tiling = 8, Real distance = 4000, bool drawFirst = true,
             const Quaternion& orientation = Quaternion::IDENTITY,
             int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky dome' i.e. an illusion of a curved sky.
             @remarks
@@ -2218,7 +2218,7 @@ namespace Ogre {
             Real tiling = 8, Real distance = 4000, uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY,
             const Quaternion& orientation = Quaternion::IDENTITY,
             int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky dome' */
         virtual void setSkyDomeEnabled(bool enable) { mSkyDomeEnabled = enable; }
