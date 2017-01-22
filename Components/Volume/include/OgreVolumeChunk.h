@@ -363,7 +363,7 @@ namespace Volume {
         @param resourceGroup
             The resource group where to search for the configuration file.
         */
-        virtual void load(SceneNode *parent, SceneManager *sceneManager, const String& filename, bool validSourceResult = false, MeshBuilderCallback *lodCallback = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        virtual void load(SceneNode *parent, SceneManager *sceneManager, const String& filename, bool validSourceResult = false, MeshBuilderCallback *lodCallback = 0, const String& resourceGroup = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         
         /** Shows the debug visualization entity of the dualgrid.
         @param visible
