@@ -56,9 +56,13 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 
 void Sample_VolumeTex::setupContent()
 {
+    if (!ResourceGroupManager::getSingleton().resourceGroupExists("VolumeRenderable"))
+    {
+        ResourceGroupManager::getSingleton().createResourceGroup("VolumeRenderable");
+    }
     // Create dynamic texture
     ptex = TextureManager::getSingleton().createManual(
-                "DynaTex","General", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);
+                "DynaTex","VolumeRenderable", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);
 
     // Set ambient light
     mSceneMgr->setAmbientLight(ColourValue(0.6, 0.6, 0.6));
