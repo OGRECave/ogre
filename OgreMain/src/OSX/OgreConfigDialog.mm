@@ -103,25 +103,8 @@ namespace Ogre {
             OGRE_EXCEPT (Exception::ERR_INTERNAL_ERROR, "Could not load config dialog",
                          "ConfigDialog::initialise");
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-        NSArray *keys = [[NSArray alloc] initWithObjects:@"Stereo Mode", @"Full Screen", @"FSAA", @"Colour Depth", @"RTT Preferred Mode", @"Video Mode", @"sRGB Gamma Conversion", @"macAPI", @"Content Scaling Factor", nil];
-        NSArray *stereoModeOptions = [[NSArray alloc] initWithObjects:@"None", @"Frame Sequential", nil];
-#else
-        NSArray *keys = [[NSArray alloc] initWithObjects:@"Full Screen", @"FSAA", @"Colour Depth", @"RTT Preferred Mode", @"Video Mode", @"sRGB Gamma Conversion", @"macAPI", @"Content Scaling Factor", nil];
-#endif
-        
-        NSArray *fullScreenOptions = [[NSArray alloc] initWithObjects:@"Yes", @"No", nil];
-        NSArray *colourDepthOptions = [[NSArray alloc] initWithObjects:@"32", @"16", nil];
-        NSArray *rttOptions = [[NSArray alloc] initWithObjects:@"FBO", @"PBuffer", @"Copy", nil];
-        NSMutableArray *videoModeOptions = [[NSMutableArray alloc] initWithCapacity:1];
-        NSMutableArray *fsaaOptions = [[NSMutableArray alloc] initWithCapacity:1];
-        NSArray *sRGBOptions = [[NSArray alloc] initWithObjects:@"Yes", @"No", nil];
-        NSArray *contentScaleOptions = [[NSArray alloc] initWithObjects:@"2.0", @"1.5", @"1.33", @"1.0", nil];
-#ifdef __LP64__
-        NSArray *macAPIOptions = [[NSArray alloc] initWithObjects:@"cocoa", nil];
-#else
-        NSArray *macAPIOptions = [[NSArray alloc] initWithObjects:@"cocoa", @"carbon", nil];
-#endif
+        NSMutableArray *videoModeOptions = [NSMutableArray arrayWithCapacity:1];
+        NSMutableArray *fsaaOptions = [NSMutableArray arrayWithCapacity:1];
 		const RenderSystemList& renderers = Root::getSingleton().getAvailableRenderers();
 
         // Add renderers and options that are detected per RenderSystem
@@ -160,54 +143,45 @@ namespace Ogre {
                 {
                     for(uint i = 0; i < pOpt->second.possibleValues.size(); i++)
                     {
-                        NSString *optionString = [[NSString alloc] initWithCString:pOpt->second.possibleValues[i].c_str()
+                        NSString *optionString = [NSString stringWithCString:pOpt->second.possibleValues[i].c_str()
                                                                     encoding:NSASCIIStringEncoding];
 
                         if(![fsaaOptions containsObject:optionString])
                              [fsaaOptions addObject:optionString];
-
-                        [optionString release];
                     }
                 }
                 else if(pOpt->first == "Video Mode")
                 {
                     for(uint i = 0; i < pOpt->second.possibleValues.size(); i++)
                     {
-                        NSString *optionString = [[NSString alloc] initWithCString:pOpt->second.possibleValues[i].c_str()
+                        NSString *optionString = [NSString stringWithCString:pOpt->second.possibleValues[i].c_str()
                                                                     encoding:NSASCIIStringEncoding];
                         
                         if(![videoModeOptions containsObject:optionString])
                             [videoModeOptions addObject:optionString];
-                        
-                        [optionString release];
                     }
                 }
             }
         }
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		NSArray *objects = [[NSArray alloc] initWithObjects:stereoModeOptions, fullScreenOptions, fsaaOptions,
-			 colourDepthOptions, rttOptions, videoModeOptions, sRGBOptions, macAPIOptions, contentScaleOptions, nil];
+        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 videoModeOptions, @"Video Mode",
+                                 fsaaOptions, @"FSAA",
+                                 [NSArray arrayWithObjects:@"Yes", @"No", nil], @"Full Screen",
+                                 [NSArray arrayWithObjects:@"32", @"16", nil], @"Colour Depth",
+                                 [NSArray arrayWithObjects:@"FBO", @"PBuffer", @"Copy", nil], @"RTT Preferred Mode",
+                                 [NSArray arrayWithObjects:@"Yes", @"No", nil], @"sRGB Gamma Conversion",
+                                 [NSArray arrayWithObjects:@"2.0", @"1.5", @"1.33", @"1.0", nil], @"Content Scaling Factor",
+#ifdef __LP64__
+                                 //[NSArray arrayWithObjects:@"cocoa", nil], @"macAPI", // single choice means no choice
 #else
-        NSArray *objects = [[NSArray alloc] initWithObjects:fullScreenOptions, fsaaOptions,
-                            colourDepthOptions, rttOptions, videoModeOptions, sRGBOptions, macAPIOptions, contentScaleOptions, nil];
+                                 [NSArray arrayWithObjects:@"cocoa", @"carbon", nil], @"macAPI",
 #endif
-		[mWindowDelegate setOptions:[NSDictionary dictionaryWithObjects:objects forKeys:keys]];
-
-        // Clean up all those arrays
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		[stereoModeOptions release];
+                                 [NSArray arrayWithObjects:@"None", @"Frame Sequential", nil], @"Stereo Mode",
 #endif
-        [fullScreenOptions release];
-        [fsaaOptions release];
-        [colourDepthOptions release];
-        [rttOptions release];
-        [videoModeOptions release];
-        [sRGBOptions release];
-        [macAPIOptions release];
-        [contentScaleOptions release];
-        [keys release];
-        [objects release];
+                                 nil];
+		[mWindowDelegate setOptions:options];
 
         // Reload table data
         [[mWindowDelegate getOptionsTable] reloadData];
