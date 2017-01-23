@@ -7,19 +7,15 @@ APKFileSystem=/thumbnails
 # Rarely used resources should be separately loaded by the
 # samples which require them.
 [General]
-# Bites uses this entry to generate paths for RTSS
+# Bites uses the next entry to discover the platform shaders
 APKFileSystem=/
 APKFileSystem=/fonts
 APKFileSystem=/materials/programs
-APKFileSystem=/materials/programs/GLSLES
 APKFileSystem=/materials/scripts
 APKFileSystem=/materials/textures
 APKFileSystem=/materials/textures/nvidia
 APKFileSystem=/models
 APKFileSystem=/particle
-APKFileSystem=/RTShaderLib/GLSL
-APKFileSystem=/RTShaderLib/GLSLES
-APKFileSystem=/RTShaderLib/materials
 APKFileSystem=/materials/scripts/SSAO
 APKFileSystem=/materials/textures/SSAO
 APKZip=/packs/cubemap.zip

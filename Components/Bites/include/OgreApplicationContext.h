@@ -140,6 +140,15 @@ namespace OgreBites
         bool initialiseRTShaderSystem();
 
         /**
+         * make the RTSS write out the generated shaders for caching and debugging
+         *
+         * by default all shaders are generated to system memory.
+         * Must be called before loadResources
+         * @param write
+         */
+        void setRTSSWriteShadersToDisk(bool write);
+
+        /**
         Destroy the RT Shader system.
           */
         void destroyRTShaderSystem();
@@ -256,8 +265,9 @@ namespace OgreBites
         std::set<InputListener*> mInputListeners;
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        Ogre::RTShader::ShaderGenerator*       mShaderGenerator;                       // The Shader generator instance.
-        SGTechniqueResolverListener*       mMaterialMgrListener;           // Shader generator material manager listener.
+        Ogre::RTShader::ShaderGenerator*       mShaderGenerator; // The Shader generator instance.
+        SGTechniqueResolverListener*       mMaterialMgrListener; // Shader generator material manager listener.
+        Ogre::String                           mRTShaderLibPath;
 #endif // INCLUDE_RTSHADER_SYSTEM
     };
 }
