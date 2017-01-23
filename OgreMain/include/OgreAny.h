@@ -43,6 +43,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	// resolve circular dependancy
+    class Any;
+    template<typename ValueType> ValueType
+    any_cast(const Any & operand);
+
     /** \addtogroup Core
     *  @{
     */
@@ -73,7 +78,7 @@ namespace Ogre
 
         virtual ~Any()
         {
-            destroy();
+            reset();
         }
 
     public: // modifiers
@@ -99,15 +104,21 @@ namespace Ogre
 
     public: // queries
 
-        bool isEmpty() const
+        bool has_value() const
         {
-            return !mContent;
+            return mContent != NULL;
         }
 
-        const std::type_info& getType() const
+        /// @deprecated use has_value() instead
+        bool isEmpty() const { return !has_value(); }
+
+        const std::type_info& type() const
         {
             return mContent ? mContent->getType() : typeid(void);
         }
+
+        /// @deprecated use type() instead
+        const std::type_info& getType() const { return type(); }
 
         inline friend std::ostream& operator <<
             ( std::ostream& o, const Any& v )
@@ -117,11 +128,14 @@ namespace Ogre
             return o;
         }
 
-        void destroy()
+        void reset()
         {
             OGRE_DELETE_T(mContent, placeholder, MEMCATEGORY_GENERAL);
             mContent = NULL;
         }
+
+        /// @deprecated use reset() instead
+        void destroy() { reset(); }
 
     protected: // types
 
@@ -187,53 +201,18 @@ namespace Ogre
 
 
     public: 
-
+        /// @deprecated use Ogre::any_cast instead
         template<typename ValueType>
         ValueType operator()() const
         {
-            if (!mContent) 
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                    "Bad cast from uninitialised Any", 
-                    "Any::operator()");
-            }
-            else if(getType() == typeid(ValueType))
-            {
-                return static_cast<Any::holder<ValueType> *>(mContent)->held;
-            }
-            else
-            {
-                StringStream str;
-                str << "Bad cast from type '" << getType().name() << "' "
-                    << "to '" << typeid(ValueType).name() << "'";
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                     str.str(), 
-                    "Any::operator()");
-            }
+            return any_cast<ValueType>(*this);
         }
 
+        /// @deprecated use Ogre::any_cast instead
         template <typename ValueType>
         ValueType get(void) const
         {
-            if (!mContent) 
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                    "Bad cast from uninitialised Any", 
-                    "Any::operator()");
-            }
-            else if(getType() == typeid(ValueType))
-            {
-                return static_cast<Any::holder<ValueType> *>(mContent)->held;
-            }
-            else
-            {
-                StringStream str;
-                str << "Bad cast from type '" << getType().name() << "' "
-                    << "to '" << typeid(ValueType).name() << "'";
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                     str.str(), 
-                    "Any::operator()");
-            }
+            return any_cast<ValueType>(*this);
         }
 
     };
@@ -402,7 +381,12 @@ namespace Ogre
     template<typename ValueType>
     ValueType * any_cast(Any * operand)
     {
-        return operand && (std::strcmp(operand->getType().name(), typeid(ValueType).name()) == 0)
+        return operand &&
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER < 450
+                (std::strcmp(operand->type().name(), typeid(ValueType).name()) == 0)
+#else
+                (operand->type() == typeid(ValueType))
+#endif
                     ? &static_cast<Any::holder<ValueType> *>(operand->mContent)->held
                     : 0;
     }
@@ -420,7 +404,7 @@ namespace Ogre
         if(!result)
         {
             StringStream str;
-            str << "Bad cast from type '" << operand.getType().name() << "' "
+            str << "Bad cast from type '" << operand.type().name() << "' "
                 << "to '" << typeid(ValueType).name() << "'";
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 str.str(), 

@@ -1009,7 +1009,7 @@ namespace Ogre {
         /** Internal method called by ResourceManager when a resource is removed.
         @param res Weak reference to resource
         */
-        void _notifyResourceRemoved(ResourcePtr& res);
+        void _notifyResourceRemoved(const ResourcePtr& res);
 
         /** Internal method to notify the group manager that a resource has
             changed group (only applicable for autodetect group) */
