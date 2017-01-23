@@ -45,18 +45,21 @@ if (OGRE_BUILD_TESTS)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_Direct3D11)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GL)
+    set(TEST_GLSUPPORT TRUE)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GL)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
+    set(TEST_GLSUPPORT TRUE)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GL3Plus)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GLES)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GLES)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GLES2)
+    set(TEST_GLSUPPORT TRUE)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GLES2)
   endif ()
- 
+  
   if (OGRE_STATIC)
     # Static linking means we need to directly use plugins
     include_directories(${OGRE_SOURCE_DIR}/PlugIns/BSPSceneManager/include)
@@ -153,7 +156,13 @@ if (OGRE_BUILD_TESTS)
 
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
     endif ()
-
+    
+    if(TEST_GLSUPPORT)
+      include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
+      set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreGLSupport)
+      list(APPEND SOURCE_FILES RenderSystems/GLSupport/src/GLSLTests.cpp)
+    endif()
+    
     if(ANDROID)
         list(APPEND SOURCE_FILES ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
         list(APPEND OGRE_LIBRARIES EGL log android)
