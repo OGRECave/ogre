@@ -28,14 +28,10 @@ THE SOFTWARE.
 #include "ZipArchiveTests.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreCommon.h"
-
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "macUtils.h"
-#endif
+#include "OgreConfigFile.h"
+#include "OgreFileSystemLayer.h"
 
 using namespace Ogre;
-
 
 static String fileId(const String& path) {
 #if !OGRE_RESOURCEMANAGER_STRICT
@@ -50,16 +46,11 @@ static String fileId(const String& path) {
 //--------------------------------------------------------------------------
 void ZipArchiveTests::SetUp()
 {
-    Ogre::String
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    mTestPath = macBundlePath() + "/Contents/Resources/Media/misc/ArchiveTest.zip";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    mTestPath = "../../Tests/OgreMain/misc/ArchiveTest.zip";
-#else
-    mTestPath = "./Tests/OgreMain/misc/ArchiveTest.zip";
-#endif
+    Ogre::ConfigFile cf;
+    cf.load(Ogre::FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    Ogre::String testPath = cf.getSettingsIterator("Tests").getNext()+"/misc/ArchiveTest.zip";
 
-    arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
+    arch = OGRE_NEW ZipArchive(testPath, "Zip");
     arch->load();
 }
 //--------------------------------------------------------------------------

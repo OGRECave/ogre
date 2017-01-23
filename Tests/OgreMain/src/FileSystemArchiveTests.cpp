@@ -29,10 +29,8 @@ THE SOFTWARE.
 #include "OgreFileSystem.h"
 #include "OgreException.h"
 #include "OgreCommon.h"
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "macUtils.h"
-#endif
+#include "OgreConfigFile.h"
+#include "OgreFileSystemLayer.h"
 
 
 namespace Ogre {
@@ -48,13 +46,9 @@ void FileSystemArchiveTests::SetUp()
     mFileSizeRoot1 = 125;
     mFileSizeRoot2 = 150;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    mTestPath = macBundlePath() + "/Contents/Resources/Media/misc/ArchiveTest";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mTestPath = "./Tests/OgreMain/misc/ArchiveTest";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    mTestPath = "../../Tests/OgreMain/misc/ArchiveTest";
-#endif
+    Ogre::ConfigFile cf;
+    cf.load(Ogre::FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    mTestPath = cf.getSettingsIterator("Tests").getNext()+"/misc/ArchiveTest";
 }
 //--------------------------------------------------------------------------
 void FileSystemArchiveTests::TearDown()
