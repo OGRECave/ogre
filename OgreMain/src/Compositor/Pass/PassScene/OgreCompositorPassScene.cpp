@@ -37,6 +37,9 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 #include "OgreSceneManager.h"
 
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderTexture.h"
+
 namespace Ogre
 {
     CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
