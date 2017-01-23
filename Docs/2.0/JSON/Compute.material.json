@@ -25,7 +25,9 @@
 			"threads_per_group" : [16, 16, 1],
 			"thread_groups" : [16, 16, 1],
 			"thread_groups_based_on_texture" : 0,
+			"thread_groups_based_on_texture" : { "slot" : 0, "divisor" : [1, 1, 1] },
 			"thread_groups_based_on_uav" : 0,
+			"thread_groups_based_on_uav" : { "slot" : 0, "divisor" : [1, 1, 1] },
 			"inform_shader_of_texture_data_change" : true,
 
 			"source" : "MyComputeShader",

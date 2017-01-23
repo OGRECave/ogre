@@ -44,6 +44,7 @@
 uniform sampler2D depthTexture;
 uniform sampler2D gBuf_normals;
 uniform sampler2D prevFrame;
+uniform sampler2D prevFrameDepthTexture;
 
 #define float2 vec2
 #define float3 vec3
@@ -82,16 +83,12 @@ uniform	float p_strideZCutoff;	// More distant pixels are smaller in screen spac
 								// start relaxing the stride to give higher quality reflections for objects far from
 								// the camera.
 
-#if 0
-	uniform	float p_fadeStart;		// determines where to start screen edge fading of effect
-	//uniform	float p_fadeEnd;		// determines where to end screen edge fading of effect
-	uniform	float p_invFadeRange;	//1.0 / (p_fadeEnd - p_fadeStart)
-#endif
-
 uniform	float2 p_projectionParams;
 uniform	float2 p_invDepthBufferRes;
 
 uniform	float4x4 p_viewToTextureSpaceMatrix;
+uniform	float4x4 p_reprojectionMatrix;
+uniform float p_reprojectionMaxDistanceError;
 //};
 
 //uniform Params p;
@@ -248,49 +245,11 @@ INLINE bool traceScreenSpaceRay
 	return intersectsDepthBuffer( sceneZMax, rayZMin, rayZMax );
 }
 
-#if 0
-INLINE float specularPowerToConeAngle( float specularPower )
-{
-	// based on phong distribution model
-	if( specularPower >= exp2(11) )
-		return 0.0f;
-
-	const float xi = 0.244f;
-	float exponent = 1.0f / (specularPower + 1.0f);
-	return acos( pow( xi, exponent ) );
-}
-
-INLINE float isoscelesTriangleOpposite( float adjacentLength, float coneTheta )
-{
-	// simple trig and algebra - soh, cah, toa - tan(theta) = opp/adj, opp = tan(theta) * adj,
-	// then multiply * 2.0f for isosceles triangle base
-	return 2.0f * tan(coneTheta) * adjacentLength;
-}
-
-INLINE float isoscelesTriangleInRadius( float a, float h )
-{
-	float a2 = a * a;
-	float fh2 = 4.0f * h * h;
-	return (a * (sqrt(a2 + fh2) - a)) / (4.0f * h);
-}
-
-INLINE float4 coneSampleWeightedColor( float2 samplePos, float mipChannel, float gloss )
-{
-	float3 sampleColor = textureLod( prevFrame, samplePos, mipChannel ).xyz;
-	return float4( sampleColor * gloss, gloss );
-}
-
-INLINE float glossToSpecularPower( float gloss )
-{
-	return exp2(10.0 * gloss + 1.0);
-}
-#endif
-
 in float4 gl_FragCoord;
 
 void main()
 {
-	float3 normalVS = texelFetch( gBuf_normals, int2( gl_FragCoord.xy ), 0 ).xyz;
+	float3 normalVS = texelFetch( gBuf_normals, int2( gl_FragCoord.xy * 2.0 ), 0 ).xyz;
 	normalVS.z = -normalVS.z; //Normal should be left handed.
 	//if( !any(normalVS) )
 	if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
@@ -299,7 +258,7 @@ void main()
 		return;
 	}
 
-	float depth = texelFetch( depthTexture, int2( gl_FragCoord.xy ), 0 ).x;
+	float depth = texelFetch( depthTexture, int2( gl_FragCoord.xy * 2.0 ), 0 ).x;
 	float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
 	/** Since position is reconstructed in view space, just normalize it to get the
@@ -321,103 +280,29 @@ void main()
 	// perform ray tracing - true if hit found, false otherwise
 	bool intersection = traceScreenSpaceRay( rayOriginVS, rayDirectionVS, jitter, hitPixel, hitPoint );
 
-	// move hit pixel from pixel position to UVs
-	hitPixel *= p_invDepthBufferRes.xy;
-	if( hitPixel.x > 1.0f || hitPixel.x < 0.0f || hitPixel.y > 1.0f || hitPixel.y < 0.0f )
-		intersection = false;
+	//Reflections lag one frame behind, so we need to reproject based on previous camera position
+	//to know where to sample the colour. If the depth differences are too big then we don't use
+	//that reflection.
+	float currDepth = texelFetch( depthTexture, int2(hitPixel.xy), 0 ).x;
+	hitPixel *= p_invDepthBufferRes.xy; //Transform hit pixel from pixel position to UVs
+	float4 reprojectedPos = p_reprojectionMatrix * float4( hitPixel.xy, currDepth, 1.0 );
+	reprojectedPos.xyz /= reprojectedPos.w;
+	float prevDepth = texelFetch( prevFrameDepthTexture,
+								  int2(reprojectedPos.xy * p_depthBufferRes.xy), 0 ).x;
+	hitPixel.xy = reprojectedPos.xy;
+	bool reprojFailed = (linearizeDepth( reprojectedPos.z ) -
+						 linearizeDepth( prevDepth )) > p_reprojectionMaxDistanceError;
+
+	intersection = intersection
+					&& hitPixel.x <= 1.0f
+					&& hitPixel.x >= 0.0f
+					&& hitPixel.y <= 1.0f
+					&& hitPixel.y >= 0.0f
+					&& !reprojFailed;
 
 	float fadeOnDistance = distance( hitPoint, rayOriginVS ) / p_maxDistance;
 	//fadeOnDistance = 1.0f - saturate( fadeOnDistance );
 	fadeOnDistance = 1.0f - fadeOnDistance;
 
-	//depth = texelFetch( depthTexture, int2( hitPixel ), 0 ).x;
-
-	fragColour = intersection ? float4( hitPixel.xy, /*depth*/fadeOnDistance, rDotV ) : float4( 0, 0, 0, 0 );
-
-#if 0
-	//-----------------------------------
-	//CONE TRACE SECTION (single pass)
-	//-----------------------------------
-
-	if( !intersection )
-	{
-		hitPixel.xy = float2( 0.0, 0.0 );
-		rDotV = 0;
-	}
-
-	float roughness = texelFetch( gBuf_shadowRoughness, int2( gl_FragCoord.xy ), 0 ).y;
-	//float roughness = 0.5;
-	float gloss = 1.0f - roughness;
-	float specularPower = glossToSpecularPower( gloss );
-
-	// convert to cone angle (maximum extent of the specular lobe aperture)
-	// only want half the full cone angle since we're slicing the isosceles triangle in half to get a right triangle
-	float coneTheta = specularPowerToConeAngle( specularPower ) * 0.5f;
-
-	// P1 = positionSS, P2 = hitPixel, adjacent length = ||P2 - P1||
-	float2 positionSS = inPs.uv0.xy;
-	float2 deltaP = hitPixel.xy - positionSS.xy;
-	float adjacentLength = length( deltaP );
-	float2 adjacentUnit = normalize( deltaP );
-
-	float4 totalColor = float4( 0.0f, 0.0f, 0.0f, 0.0f );
-	float remainingAlpha = 1.0f;
-	float glossMult = gloss;
-	// cone-tracing using an isosceles triangle to approximate a cone in screen space
-	for( int i = 0; i < 14; ++i )
-	{
-		// intersection length is the adjacent side, get the opposite side using trig
-		float oppositeLength = isoscelesTriangleOpposite( adjacentLength, coneTheta );
-
-		// calculate in-radius of the isosceles triangle
-		float incircleSize = isoscelesTriangleInRadius( oppositeLength, adjacentLength );
-
-		// get the sample position in screen space
-		float2 samplePos = positionSS.xy + adjacentUnit * (adjacentLength - incircleSize);
-
-		//convert the in-radius into screen size then check what power N to
-		//raise 2 to reach it - that power N becomes mip level to sample from
-		float mipChannel = log2( incircleSize * p_depthBufferRes.w );
-
-		/**	Read color and accumulate it using trilinear filtering and weight it.
-			Uses pre-convolved image (color buffer) and glossiness to weigh color contributions.
-			Visibility is accumulated in the alpha channel.
-			Break if visibility is 100% or greater (>= 1.0f).
-		*/
-		float4 newColor = coneSampleWeightedColor( samplePos, mipChannel, glossMult );
-
-		remainingAlpha -= newColor.a;
-		if( remainingAlpha < 0.0f )
-			newColor.xyz *= ( 1.0f - abs(remainingAlpha) );
-		totalColor += newColor;
-
-		if( totalColor.a >= 1.0f )
-			break;
-
-		// subtract the diameter of the incircle to get the adjacent side of the next level on the cone
-		// (isoscelesTriangleNextAdjacent( adjacentLength, incircleRadius ))
-		adjacentLength = adjacentLength - (incircleSize * 2.0f);
-		glossMult *= gloss;
-	}
-
-	// fade rays close to screen edge
-	float2 boundary = abs( hitPixel.xy - float2(0.5f, 0.5f) ) * 2.0f;
-	float fadeOnBorder = 1.0f - saturate( (boundary.x - p_fadeStart) * p_invFadeRange );
-	fadeOnBorder *= 1.0f - saturate( (boundary.y - p_fadeStart) * p_invFadeRange );
-	fadeOnBorder = smoothstep( 0.0f, 1.0f, fadeOnBorder );
-	//float3 rayHitPositionVS = viewSpacePositionFromDepth( hitPixel.xy, raySS.z );
-	float fadeOnDistance = distance( hitPoint /*rayHitPositionVS*/, rayOriginVS ) / p_maxDistance;
-	fadeOnDistance = 1.0f - saturate( fadeOnDistance );
-	// ray tracing steps stores rdotv in w component - always > 0 due to check at start of this method
-	float fadeOnPerpendicular = saturate( rDotV * 4.0f );
-	float fadeOnRoughness = saturate( gloss * 4.0f );
-	float totalFade =	fadeOnBorder * fadeOnDistance * fadeOnPerpendicular *
-						fadeOnRoughness * ( 1.0f - saturate(remainingAlpha) );
-
-	float3 fallbackColor = float3( 0, 0, 0 );
-
-	fragColour = float4( lerp( fallbackColor, totalColor.rgb, totalFade ), 1.0f );
-	//fragColour = float4( fadeOnDistance, fadeOnDistance, fadeOnDistance, 1 );
-	//fragColour = float4( totalColor.xyz, 1 );
-#endif
+	fragColour = intersection ? float4( hitPixel.xy, fadeOnDistance, rDotV ) : float4( 0, 0, 0, 0 );
 }

@@ -109,13 +109,15 @@ in float4 gl_FragCoord;
 
 void main()
 {
-	float depth = texelFetch( depthTexture, int2( gl_FragCoord.xy ), 0 ).x;
+	//float depth = texelFetch( depthTexture, int2( gl_FragCoord.xy ), 0 ).x;
 	//float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
-	float4 raySS = texelFetch( rayTraceBuffer, int2( gl_FragCoord.xy ), 0 ).xyzw;
+	float4 raySS = texelFetch( rayTraceBuffer, int2( gl_FragCoord.xy * 0.5f ), 0 ).xyzw;
 
+	//Do not decode roughness, keep it in [0; 1] range.
 	float roughness = texelFetch( gBuf_shadowRoughness, int2( gl_FragCoord.xy ), 0 ).y;
-	//float roughness = 0.5;
+	//roughness = roughness * 0.98 + 0.02
+	//float roughness = 0.0;
 	float gloss = 1.0f - roughness;
 	float specularPower = glossToSpecularPower( gloss );
 

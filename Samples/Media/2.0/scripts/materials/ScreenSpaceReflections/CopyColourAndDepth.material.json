@@ -1,0 +1,26 @@
+{
+    "compute" :
+    {
+        "SSR/CopyColourAndDepth" :
+        {
+            "threads_per_group" : [8, 8, 1],
+            "thread_groups" : [1, 1, 1],
+
+            "source" : "CopyColourAndDepth_cs",
+            "inform_shader_of_texture_data_change" : true,
+			"thread_groups_based_on_texture" : { "slot" : 0, "divisor" : [2, 2, 1] },
+
+            "uav_units" : 2,
+
+			"textures" :  [ {}, {} ],
+
+            "params_glsl" :
+            [
+                ["srcRtt",			[0], "int"],
+				["srcDepth",		[1], "int"],
+                ["dstRtt",			[0], "int"],
+				["dstDepth",		[1], "int"]
+            ]
+        }
+    }
+}

@@ -115,6 +115,7 @@ namespace Ogre
 
         ThreadGroupsBasedOn mThreadGroupsBasedOnTexture;
         uint8               mThreadGroupsBasedOnTexSlot;
+        uint8               mThreadGroupsBasedDivisor[3];
 
         ConstBufferSlotVec  mConstBuffers;
         TextureSlotVec      mTextureSlots;
@@ -210,7 +211,8 @@ namespace Ogre
         /** Instead of calling setNumThreadGroups, Ogre can automatically deduce
             them based on the Texture resolution and the threads per group.
             It is calculated as follows:
-                numThreadGroupsX = (textureWidth + threadsPerGroupX - 1u) / threadsPerGroupX;
+                scaledWidth = (textureWidth + divisorX - 1u) / divisorX;
+                numThreadGroupsX = (scaledWidth + threadsPerGroupX - 1u) / threadsPerGroupX;
         @remarks
             Unless disabled, this will overwrite your setNumThreadGroups based on the
             texture bound at the time the job is dispatched.
@@ -221,8 +223,13 @@ namespace Ogre
             What to use as source for the calculations. @see ThreadGroupsBasedOn
         @param texSlot
             Index of the texture/uav unit.
+        @param divisorX divisorY divisorZ
+            Often compute shaders operate on multiple pixels, thus you need less
+            thread groups. For example if you operate on blocks of 2x2, then you
+            want divisorX = 2 and divisorY = 2.
         */
-        void setNumThreadGroupsBasedOn( ThreadGroupsBasedOn source, uint8 texSlot );
+        void setNumThreadGroupsBasedOn( ThreadGroupsBasedOn source, uint8 texSlot,
+                                        uint8 divisorX, uint8 divisorY, uint8 divisorZ );
 
         /// INTERNAL USE. Calculates the number of thread groups as specified
         /// in @see setNumThreadGroupsBasedOn, overriding setNumThreadGroups.

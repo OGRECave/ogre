@@ -10,6 +10,7 @@ fragment_program SSR/ScreenSpaceReflectionsVectors_ps_GLSL glsl
 		param_named depthTexture			int 0
 		param_named gBuf_normals			int 1
 		param_named prevFrame				int 2
+		param_named prevFrameDepthTexture	int 3
 	}
 }
 
@@ -92,17 +93,20 @@ material SSR/ScreenSpaceReflectionsVectors
 				param_named			p_zThickness		float	0.25
 				param_named_auto	p_nearPlaneZ		near_clip_distance
 
-				param_named			p_stride			float	2
-				param_named			p_maxSteps			float	100
+				param_named			p_stride			float	4
+				param_named			p_maxSteps			float	200
 				param_named			p_maxDistance		float	1000
 				param_named			p_strideZCutoff		float	0.01
+
+				param_named			p_reprojectionMaxDistanceError	float	2
 
 				//p_projectionParams will be set from C++
 				param_named			p_projectionParams	float2	0 1
 				param_named_auto	p_invDepthBufferRes	inverse_texture_size 0;
 
-				//p_viewToTextureSpaceMatrix will be set from C++
+				//Set from C++
 				//param_named		p_viewToTextureSpaceMatrix	float4x4
+				//param_named		p_reprojectionMatrix		float4x4
 			}
 
 			texture_unit depthTexture
@@ -121,6 +125,12 @@ material SSR/ScreenSpaceReflectionsVectors
 			{
 				tex_address_mode clamp
 				filtering trilinear
+			}
+
+			texture_unit prevFrameDepthTexture
+			{
+				tex_address_mode clamp
+				filtering none
 			}
 		}
 	}
@@ -152,10 +162,8 @@ material SSR/ScreenSpaceReflectionsCombine
 				// 1 / (p_fadeEnd - p_fadeStart)
 				param_named			p_invFadeRange		float	20
 
-				//p_projectionParams will be set from C++
+				//Set from C++
 				param_named			p_projectionParams	float2	0 1
-
-				//p_textureSpaceToViewSpace will be set from C++
 				//param_named		p_textureSpaceToViewSpace	float4x4
 				//param_named		p_invViewMatCubemap			float4x4
 			}

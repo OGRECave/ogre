@@ -369,7 +369,7 @@ void main()
 	float fShadow = shadowRoughness.x;
 
 	@property( roughness_map )
-		ROUGHNESS = shadowRoughness.y; /// ROUGHNESS is a constant otherwise
+		ROUGHNESS = shadowRoughness.y * 0.98 + 0.02; /// ROUGHNESS is a constant otherwise
 	@end
 @end
 
@@ -520,7 +520,12 @@ void main()
 	@property( hlms_use_ssr )
 		//TODO: SSR pass should be able to combine global & local cubemap.
 		vec4 ssrReflection = texelFetch( ssrTexture, iFragCoord, 0 ).xyzw;
-		envColourS = mix( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
+		@property( use_envprobe_map || ambient_hemisphere )
+			envColourS = mix( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
+		@end @property( !use_envprobe_map && !ambient_hemisphere )
+			vec3 envColourS = ssrReflection.xyz * ssrReflection.w;
+			vec3 envColourD = vec3( 0, 0, 0 );
+		@end
 	@end
 
 	@insertpiece( BRDF_EnvMap )
@@ -551,9 +556,9 @@ void main()
 	@end @property( hlms_prepass )
 		outNormals			= vec4( nNormal, 1.0 );
 		@property( hlms_pssm_splits )
-			outShadowRoughness	= vec2( fShadow, ROUGHNESS );
+			outShadowRoughness	= vec2( fShadow, (ROUGHNESS - 0.02) * 1.02040816 );
 		@end @property( !hlms_pssm_splits )
-			outShadowRoughness	= vec2( 1.0, ROUGHNESS );
+			outShadowRoughness	= vec2( 1.0, (ROUGHNESS - 0.02) * 1.02040816 );
 		@end
 	@end
 @end

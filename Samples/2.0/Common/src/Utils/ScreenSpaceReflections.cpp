@@ -15,7 +15,8 @@ namespace Demo
         0,      0,    1,    0,
         0,      0,    0,    1);
 
-    ScreenSpaceReflections::ScreenSpaceReflections( const Ogre::TexturePtr &globalCubemap )
+    ScreenSpaceReflections::ScreenSpaceReflections( const Ogre::TexturePtr &globalCubemap ) :
+        mLastUvSpaceViewProjMatrix( PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE )
     {
         Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().load(
                     "SSR/ScreenSpaceReflectionsVectors",
@@ -79,5 +80,14 @@ namespace Demo
         invViewMatrixCubemap = invViewMatrixCubemap.Inverse();
 
         mPsParams[1]->setNamedConstant( "p_invViewMatCubemap", &invViewMatrixCubemap[0][0], 3*3, 1 );
+
+        Ogre::Matrix4 projMatrix = camera->getProjectionMatrixWithRSDepth();
+        Ogre::Matrix4 uvSpaceViewProjMatrix =
+                (PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * projMatrix) * viewMatrix;
+
+        Ogre::Matrix4 reprojectionMatrix = mLastUvSpaceViewProjMatrix * uvSpaceViewProjMatrix.inverse();
+        mPsParams[0]->setNamedConstant( "p_reprojectionMatrix", reprojectionMatrix );
+
+        mLastUvSpaceViewProjMatrix = uvSpaceViewProjMatrix;
     }
 }

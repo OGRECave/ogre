@@ -61,6 +61,10 @@ namespace Ogre
     {
         memset( mThreadsPerGroup, 0, sizeof( mThreadsPerGroup ) );
         memset( mNumThreadGroups, 0, sizeof( mNumThreadGroups ) );
+
+        mThreadGroupsBasedDivisor[0] = 1;
+        mThreadGroupsBasedDivisor[1] = 1;
+        mThreadGroupsBasedDivisor[2] = 1;
     }
     //-----------------------------------------------------------------------------------
     HlmsComputeJob::~HlmsComputeJob()
@@ -326,10 +330,15 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsComputeJob::setNumThreadGroupsBasedOn( ThreadGroupsBasedOn source, uint8 texSlot )
+    void HlmsComputeJob::setNumThreadGroupsBasedOn( ThreadGroupsBasedOn source, uint8 texSlot,
+                                                    uint8 divisorX, uint8 divisorY, uint8 divisorZ )
     {
         mThreadGroupsBasedOnTexture = source;
         mThreadGroupsBasedOnTexSlot = texSlot;
+
+        mThreadGroupsBasedDivisor[0] = divisorX;
+        mThreadGroupsBasedDivisor[1] = divisorY;
+        mThreadGroupsBasedDivisor[2] = divisorZ;
     }
     //-----------------------------------------------------------------------------------
     void HlmsComputeJob::_calculateNumThreadGroupsBasedOnSetting()
@@ -354,10 +363,13 @@ namespace Ogre
                 if( tex->getTextureType() == TEX_TYPE_CUBE_MAP )
                     resolution[2] = tex->getNumFaces();
 
-                for( uint32 i=0; i<3u; ++i )
+                for( int i=0; i<3; ++i )
                 {
+                    resolution[i] = (resolution[i] + mThreadGroupsBasedDivisor[i] - 1u) /
+                                    mThreadGroupsBasedDivisor[i];
+
                     uint32 numThreadGroups = (resolution[i] + mThreadsPerGroup[i] - 1u) /
-                            mThreadsPerGroup[i];
+                                             mThreadsPerGroup[i];
                     if( mNumThreadGroups[i] != numThreadGroups )
                     {
                         mNumThreadGroups[i] = numThreadGroups;
