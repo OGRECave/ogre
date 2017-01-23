@@ -95,7 +95,7 @@ namespace Ogre {
         delete mImpl;
 	}
 	
-	static void initialise(OgreConfigWindowDelegate *mWindowDelegate)
+	static void initialise(OgreConfigWindowDelegate*& mWindowDelegate)
 	{
 	    mWindowDelegate = [[OgreConfigWindowDelegate alloc] init];
 
@@ -367,6 +367,7 @@ namespace Ogre {
 
 - (void)dealloc
 {
+    [mOptions release]; mOptions = nil;
     [mConfigWindow release]; mConfigWindow = nil;
     [mOptionsPopUp release]; mOptionsPopUp = nil;
     [mOptionLabel release]; mOptionLabel = nil;
@@ -507,6 +508,8 @@ namespace Ogre {
 
 - (void)setOptions:(NSDictionary *)dict
 {
+    [dict retain];
+    [mOptions release];
     mOptions = dict;
 }
 
