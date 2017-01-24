@@ -1490,6 +1490,10 @@ namespace Ogre
         mWidth = (int)(sz.Width * mCompositionScale.Width + 0.5f);
         mHeight = (int)(sz.Height * mCompositionScale.Height + 0.5f);
 
+        // Prevent zero size DirectX content from being created.
+        mWidth = std::max(mWidth, 1U);
+        mHeight = std::max(mHeight, 1U);
+
         LogManager::getSingleton().stream() << std::fixed << std::setprecision(1) 
             << "D3D11: Created D3D11 SwapChainPanel Rendering Window \"" << mName << "\", " << sz.Width << " x " << sz.Height
             << ", with backing store " << mWidth << "x" << mHeight << ", " << mColourDepth << "bpp, "
