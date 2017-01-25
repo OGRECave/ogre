@@ -508,7 +508,7 @@ namespace Ogre {
 
         /** Gets the name of an image format
         */
-        static String getFormatName(PixelFormat srcformat);
+        static const String& getFormatName(PixelFormat srcformat);
 
         /** Returns whether the format can be packed or unpacked with the packColour()
         and unpackColour() functions. This is generally not true for compressed and

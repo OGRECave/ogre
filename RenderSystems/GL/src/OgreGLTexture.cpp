@@ -61,8 +61,8 @@ namespace Ogre {
     GLTexture::GLTexture(ResourceManager* creator, const String& name, 
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, GLSupport& support) 
-        : Texture(creator, name, handle, group, isManual, loader),
-          mTextureID(0), mGLSupport(support)
+        : GLTextureCommon(creator, name, handle, group, isManual, loader),
+          mGLSupport(support)
     {
     }
 
@@ -266,90 +266,6 @@ namespace Ogre {
         mFormat = getBuffer(0,0)->getFormat();
     }
     
-    void GLTexture::createRenderTexture(void)
-    {
-        // Create the GL texture
-        // This already does everything necessary
-        createInternalResources();
-    }
-
-    static inline void do_image_io(const String &name, const String &group,
-                                   const String &ext,
-                                   vector<Image>::type &images,
-                                   Resource *r)
-    {
-        size_t imgIdx = images.size();
-        images.push_back(Image());
-
-        DataStreamPtr dstream = 
-            ResourceGroupManager::getSingleton().openResource(
-                name, group, true, r);
-
-        images[imgIdx].load(dstream, ext);
-    }
-
-    
-    void GLTexture::prepareImpl()
-    {
-        if( mUsage & TU_RENDERTARGET ) return;
-
-        String baseName, ext;
-        size_t pos = mName.find_last_of(".");
-        baseName = mName.substr(0, pos);
-        if( pos != String::npos )
-            ext = mName.substr(pos+1);
-
-        LoadedImages loadedImages = LoadedImages(new vector<Image>::type());
-
-        if(mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D || 
-             mTextureType == TEX_TYPE_2D_ARRAY || mTextureType == TEX_TYPE_3D)
-        {
-
-            do_image_io(mName, mGroup, ext, *loadedImages, this);
-
-            // If this is a cube map, set the texture type flag accordingly.
-            if ((*loadedImages)[0].hasFlag(IF_CUBEMAP))
-                mTextureType = TEX_TYPE_CUBE_MAP;
-            // If this is a volumetric texture set the texture type flag accordingly.
-            if((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                mTextureType = TEX_TYPE_3D;
-        }
-        else if (mTextureType == TEX_TYPE_CUBE_MAP)
-        {
-            if(getSourceFileType() == "dds")
-            {
-                // XX HACK there should be a better way to specify whether 
-                // all faces are in the same file or not
-                do_image_io(mName, mGroup, ext, *loadedImages, this);
-            }
-            else
-            {
-                vector<Image>::type images(6);
-                ConstImagePtrList imagePtrs;
-                static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
-
-                for(size_t i = 0; i < 6; i++)
-                {
-                    String fullName = baseName + suffixes[i];
-                    if (!ext.empty())
-                        fullName = fullName + "." + ext;
-                    // find & load resource data intro stream to allow resource
-                    // group changes if required
-                    do_image_io(fullName,mGroup,ext,*loadedImages,this);
-                }
-            }
-        }
-        else
-            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "**** Unknown texture type ****", "GLTexture::prepare" );
-
-        mLoadedImages = loadedImages;
-    }
-    
-    void GLTexture::unprepareImpl()
-    {
-        mLoadedImages.setNull();
-    }
-
     void GLTexture::loadImpl()
     {
         if( mUsage & TU_RENDERTARGET )
@@ -358,16 +274,16 @@ namespace Ogre {
             return;
         }
 
+        LoadedImages loadedImages;
         // Now the only copy is on the stack and will be cleaned in case of
         // exceptions being thrown from _loadImages
-        LoadedImages loadedImages = mLoadedImages;
-        mLoadedImages.setNull();
+        std::swap(loadedImages, mLoadedImages);
 
         // Call internal _loadImages, not loadImage since that's external and 
         // will determine load status etc again
         ConstImagePtrList imagePtrs;
-        for (size_t i=0 ; i<loadedImages->size() ; ++i) {
-            imagePtrs.push_back(&(*loadedImages)[i]);
+        for (size_t i=0 ; i<loadedImages.size() ; ++i) {
+            imagePtrs.push_back(&loadedImages[i]);
         }
 
         _loadImages(imagePtrs);
@@ -426,26 +342,5 @@ namespace Ogre {
             }
         }
     }
-    
-    //---------------------------------------------------------------------------------------------
-    HardwarePixelBufferSharedPtr GLTexture::getBuffer(size_t face, size_t mipmap)
-    {
-        if(face >= getNumFaces())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Face index out of range",
-                    "GLTexture::getBuffer");
-        if(mipmap > mNumMipmaps)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmap index out of range",
-                    "GLTexture::getBuffer");
-        unsigned long idx = face*(mNumMipmaps+1) + mipmap;
-        assert(idx < mSurfaceList.size());
-        return mSurfaceList[idx];
-    }
-    //---------------------------------------------------------------------------------------------
-    void GLTexture::getCustomAttribute(const String& name, void* pData)
-    {
-        if (name == "GLID")
-            *static_cast<GLuint*>(pData) = mTextureID;
-    }
-    
 }
 

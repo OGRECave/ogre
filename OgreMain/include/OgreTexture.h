@@ -452,6 +452,7 @@ namespace Ogre {
         */
         String getSourceFileType() const;
 
+        static const char* CUBEMAP_SUFFIXES[6];
     };
     /** @} */
     /** @} */

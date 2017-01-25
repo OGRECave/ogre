@@ -33,12 +33,12 @@ THE SOFTWARE.
 #include "OgreGLES2Support.h"
 #include "OgrePlatform.h"
 #include "OgreRenderTexture.h"
-#include "OgreTexture.h"
+#include "OgreGLTextureCommon.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
-    class _OgreGLES2Export GLES2Texture : public Texture MANAGED_RESOURCE
+    class _OgreGLES2Export GLES2Texture : public GLTextureCommon MANAGED_RESOURCE
     {
         public:
             // Constructor
@@ -48,27 +48,12 @@ namespace Ogre {
 
             virtual ~GLES2Texture();
 
-            void createRenderTexture();
-            /// @copydoc Texture::getBuffer
-            HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
-
             // Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
             GLenum getGLES2TextureTarget(void) const;
-
-            GLuint getGLID() const
-            {
-                return mTextureID;
-            }
             
-            void getCustomAttribute(const String& name, void* pData);
-
         protected:
             /// @copydoc Texture::createInternalResourcesImpl
             void createInternalResourcesImpl(void);
-            /// @copydoc Resource::prepareImpl
-            void prepareImpl(void);
-            /// @copydoc Resource::unprepareImpl
-            void unprepareImpl(void);
             /// @copydoc Resource::loadImpl
             void loadImpl(void);
             /// @copydoc Texture::freeInternalResourcesImpl
@@ -80,15 +65,6 @@ namespace Ogre {
              actually allocate the buffer
              */
             void _createSurfaceList();
-
-            /// Used to hold images between calls to prepare and load.
-            typedef SharedPtr<vector<Image>::type > LoadedImages;
-
-            /** Vector of images that were pulled from disk by
-             prepareLoad but have yet to be pushed into texture memory
-             by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
-             */
-            LoadedImages mLoadedImages;
 
             /// Create gl texture
             void _createGLTexResource();
@@ -102,13 +78,7 @@ namespace Ogre {
 #endif
 
         private:
-            GLuint mTextureID;
             GLES2Support& mGLSupport;
-            
-            /// Vector of pointers to subsurfaces
-            typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
-            SurfaceList mSurfaceList;
-
     };
 }
 

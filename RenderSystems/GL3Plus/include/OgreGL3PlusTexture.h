@@ -33,11 +33,11 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusSupport.h"
 #include "OgrePlatform.h"
 #include "OgreRenderTexture.h"
-#include "OgreTexture.h"
+#include "OgreGLTextureCommon.h"
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
-    class _OgreGL3PlusExport GL3PlusTexture : public Texture
+    class _OgreGL3PlusExport GL3PlusTexture : public GLTextureCommon
     {
     public:
         // Constructor
@@ -47,31 +47,15 @@ namespace Ogre {
 
         virtual ~GL3PlusTexture();
 
-        void createRenderTexture();
-        /// @copydoc Texture::getBuffer
-        HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
-
         // Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
         GLenum getGL3PlusTextureTarget(void) const;
-
-        GLuint getGLID() const
-        {
-            return mTextureID;
-        }
-
-        void getCustomAttribute(const String& name, void* pData);
 
         void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
                                      int mipmapLevel = 0, int textureArrayIndex = 0,
                                      PixelFormat* format = NULL);
-
     protected:
         /// @copydoc Texture::createInternalResourcesImpl
         void createInternalResourcesImpl(void);
-        /// @copydoc Resource::prepareImpl
-        void prepareImpl(void);
-        /// @copydoc Resource::unprepareImpl
-        void unprepareImpl(void);
         /// @copydoc Resource::loadImpl
         void loadImpl(void);
         /// @copydoc Resource::freeInternalResourcesImpl
@@ -84,23 +68,8 @@ namespace Ogre {
         */
         void _createSurfaceList();
 
-        /// Used to hold images between calls to prepare and load.
-        typedef SharedPtr<vector<Image>::type > LoadedImages;
-
-        /** Vector of images that were pulled from disk by
-            prepareLoad but have yet to be pushed into texture memory
-            by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
-        */
-        LoadedImages mLoadedImages;
-
-
     private:
-        GLuint mTextureID;
         GL3PlusSupport& mGLSupport;
-
-        /// Vector of pointers to subsurfaces
-        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
-        SurfaceList mSurfaceList;
     };
 }
 
