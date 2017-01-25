@@ -262,6 +262,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 //-----------------------------------------------------------------------
 bool FFPTexturing::resolveDependencies(ProgramSet* programSet)
 {
+    //! [deps_resolve]
     Program* vsProgram = programSet->getCpuVertexProgram();
     Program* psProgram = programSet->getCpuFragmentProgram();
 
@@ -269,7 +270,7 @@ bool FFPTexturing::resolveDependencies(ProgramSet* programSet)
     vsProgram->addDependency(FFP_LIB_TEXTURING);    
     psProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(FFP_LIB_TEXTURING);
-
+    //! [deps_resolve]
     return true;
 }
 

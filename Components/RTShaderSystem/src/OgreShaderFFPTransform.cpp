@@ -56,6 +56,7 @@ int FFPTransform::getExecutionOrder() const
 //-----------------------------------------------------------------------
 bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 {
+    //! [param_resolve]
     Program* vsProgram = programSet->getCpuVertexProgram();
     Function* vsEntry = vsProgram->getEntryPointFunction();
     
@@ -67,14 +68,14 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     
     // Resolve output position parameter.
     ParameterPtr positionOut = vsEntry->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
-    
-    if (!(wvpMatrix.get()) || !(positionIn.get()) || !(positionOut.get()))
+
+    if (!wvpMatrix || !positionIn || !positionOut)
     {
         OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                 "Not all parameters could be constructed for the sub-render state.",
                 "FFPTransform::createCpuSubPrograms" );
     }
-    
+    //! [param_resolve]
     // Add dependency.
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
 

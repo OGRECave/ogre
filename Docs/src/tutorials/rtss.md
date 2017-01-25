@@ -141,51 +141,18 @@ Implementing the SubRenderState requires overriding the pure methods of the base
 The SubRenderState supply default implementation for this method which break down this method into three stages:
 * Resolving parameters: this stage should grab all the needed parameters for this SubRrenderState. In case of the FFPTransform it should resolve the world view projection matrix and vertex shader input and output position parameters.
 
-```cpp
-Program* vsProgram = programSet->getCpuVertexProgram();
-	
-// Resolve World View Projection Matrix.
-ParameterPtr wvpMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
-if (wvpMatrix.get() == NULL)
-	return false;
-		
-Function* vsEntry = vsProgram->getEntryPointFunction();
-assert(vsEntry != NULL);
+@snippet Components/RTShaderSystem/src/OgreShaderFFPTransform.cpp param_resolve
 
-// Resolve input position parameter.
-ParameterPtr positionIn = vsEntry->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);	
-if (positionIn.get() == NULL)
-	return false;
-	
-
-// Resolve output position parameter.
-ParameterPtr positionOut = vsEntry->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
-if (positionOut.get() == NULL)
-   return false;
-```
 * Resolving dependencies: this stage should provide the name of the external shader library files that contains the actual shader code needed by this SubRenderState.
 In case of the FFPTexturing  it will add the common and texturing library for both vertex and pixel shader program.
 
-```cpp
-Program* vsProgram = programSet->getCpuVertexProgram();
-Program* psProgram = programSet->getCpuFragmentProgram();
+@snippet Components/RTShaderSystem/src/OgreShaderFFPTexturing.cpp deps_resolve
 
-vsProgram->addDependency(FFP_LIB_COMMON);
-vsProgram->addDependency(FFP_LIB_TEXTURING);	
-psProgram->addDependency(FFP_LIB_COMMON);
-psProgram->addDependency(FFP_LIB_TEXTURING);
-```
 * Adding function invocations: this stage creates the function calls within this SubRenderState requires. Each function call has two keys that are used by the system to sort it before generating the actual shader code as well as set of in/out parameters.
 A function invocation is added to either vertex shader program or fragment shader program.
 In case of the FFPFog it will add vertex depth calculation to the vertex shader program.
 
-```cpp
-curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_DEPTH, FFP_VS_FOG, internalCounter++);
-curFuncInvocation->pushOperand(mWorldViewProjMatrix, Operand::OPS_IN);
-curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);	
-curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);	
-vsMain->addAtomInstace(curFuncInvocation);
-```		
+@snippet Components/RTShaderSystem/src/OgreShaderFFPFog.cpp func_invoc
 
 Note: 
 * Each Ogre::RTShader::SubRenderState can add as many function invocations as it needs.
@@ -195,24 +162,21 @@ Note:
 * Ogre::RTShader::SubRenderState::updateGpuProgramsParams - As the name suggest this method should be overridden only in case your SubRenderState should update some parameter it created before.
 * Ogre::RTShader::SubRenderState::preAddToRenderState(): this method called before adding this SubRenderState to a parent RenderState instances. It allows this SubRenderState to exclude itself from the list in case the source pass is not matching. I.E in case of SubRenderState that perform lighting calculations it can return false when the given source pass specifies that lighting calculations disabled for it.
 
-```cpp
-if (srcPass->getLightingEnabled() == false)
-	return false;
-```
+@snippet Components/RTShaderSystem/src/OgreShaderFFPLighting.cpp disable
 
 This method also let the SubRenderState to opportunity to modify the destination pass. I.E the NormalMapLighting instance adds the normal map texture unit in this context.
 
-Implementing the SunRenderStateFactory is much simpler and involves implementing the following methods
+Implementing the Ogre::RTShader::SubRenderStateFactory is much simpler and involves implementing the following methods
 * Ogre::RTShader::SubRenderStateFactory::createInstanceImpl(): This method should return instance for the SubRenderState sub class.
 * Ogre::RTShader::SubRenderStateFactory::createInstance(): This method should return instasnce for the SubRenderState sub class using the given script compiler parameters. Implemet this method if you want to be able to creat your custom shader extension from material script.
 * Ogre::RTShader::SubRenderStateFactory::writeInstance(): This method should write down the parameters of a given SubRenderState instance to material script file. Implement this method if you want to be able to export a material that contains your custom shader extension.
 
 # Tips for debugging shaders {#debugging}
 A couple of notes on debugging shaders coming from the RTSS:
-* Go to OgreApplicationContext.cpp and define the preprocessor command `_RTSS_WRITE_SHADERS_TO_DISK`. This will cache the generated shaders onto the disk under the directory `{Ogre directory}\Samples\Media\RTShaderLib\cache`. This is important for 2 reasons:
+* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory `{Ogre directory}\Samples\Media\RTShaderLib\cache`. This is important for 2 reasons:
   * It will make compilation problems easier to detect.
   * Once a shader is written to the disk, as long as you don't change the code behind it, the same shader will be picked up in the next application run even if its content has changed. If you have compilation or visual problems with the shader you can try to manually tinker with it without compiling the code again and again.
-* Find the file OgreShaderProgramManager.h and add a breakpoint at `pGpuProgram.setNull();` (in createGpuProgram). If a shader will fail to compile it will usually fail there. Once that happens you can find the shader name under the `programName` parameter, then look for it in the cache directory you created.
+* Find the file OgreShaderProgramManager.cpp and add a breakpoint at `pGpuProgram.setNull();` (in createGpuProgram). If a shader will fail to compile it will usually fail there. Once that happens you can find the shader name under the `programName` parameter, then look for it in the cache directory you created.
 * Other common problems with creating shaders in RTSS usually occur from defining vertex shader parameters and using them in the pixel shader and vice versa. so watch out for those.
 
 # Historical background {#history}

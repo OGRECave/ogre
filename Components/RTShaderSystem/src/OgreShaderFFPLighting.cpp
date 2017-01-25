@@ -620,8 +620,10 @@ void FFPLighting::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-	if (srcPass->getLightingEnabled() == false)
+    //! [disable]
+	if (!srcPass->getLightingEnabled())
 		return false;
+	//! [disable]
 
 	int lightCount[3];
 

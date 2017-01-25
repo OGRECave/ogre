@@ -41,6 +41,7 @@ particle_system Examples/GreenyNimbus
     }
 }
 
+//! [manual_sample]
 // A sparkly purple fountain.
 particle_system Examples/PurpleFountain
 {
@@ -79,7 +80,7 @@ particle_system Examples/PurpleFountain
         blue -0.25
     }
 }
-
+//! [manual_sample]
 
 // A downpour.
 particle_system Examples/Rain
