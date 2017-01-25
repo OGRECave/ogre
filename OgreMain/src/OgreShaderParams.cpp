@@ -44,14 +44,14 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void ShaderParams::updateParameters( GpuProgramParametersSharedPtr params )
+    void ShaderParams::updateParameters( GpuProgramParametersSharedPtr params, bool bForce )
     {
         ParamVec::iterator itor = mParams.begin();
         ParamVec::iterator end  = mParams.end();
 
         while( itor != end )
         {
-            if( itor->isDirty )
+            if( itor->isDirty || bForce )
             {
                 itor->isDirty = false;
                 try

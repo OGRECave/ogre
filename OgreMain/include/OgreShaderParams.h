@@ -146,7 +146,7 @@ namespace Ogre
 
         ShaderParams();
 
-        void updateParameters( GpuProgramParametersSharedPtr params );
+        void updateParameters( GpuProgramParametersSharedPtr params, bool bForce );
 
         /// Call this whenever you've updated a parameter in mParams
         void setDirty(void)                         { ++mUpdateCounter; }
