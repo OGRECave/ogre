@@ -343,37 +343,7 @@ Compositor scripts are loaded when resource groups are initialised: OGRE looks i
 
 Several compositors may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces (’{’, ’}’), and comments indicated by starting a line with ’//’ (note, no nested form comments allowed). The general format is shown below in the example below:
 
-```cpp
-// This is a comment
-// Black and white effect
-compositor B&W
-{
-    technique
-    {
-        // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8
-
-        target rt0
-        {
-            // Render output from previous compositor (or original scene)
-            input previous
-        }
-
-        target_output
-        {
-            // Start with clear output
-            input none
-            // Draw a fullscreen quad with the black and white image
-            pass render_quad
-            {
-                // Renders a fullscreen quad with a material
-                material Ogre/Compositor/BlackAndWhite
-                input 0 rt0
-            }
-        }
-    }
-}
-```
+@snippet Samples/Media/materials/scripts/Examples.compositor manual_sample
 
 Every compositor in the script must be given a name, which is the line ’compositor &lt;name&gt;’ before the first opening ’{’. This name must be globally unique. It can include path characters (as in the example) to logically divide up your compositors, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string. Names can include spaces but must be surrounded by double quotes i.e. compositor "My Name".
 

@@ -487,7 +487,9 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     // Case an error occurred.
     if (pGpuProgram->hasCompileError())
     {
+        //! [debug_break]
         pGpuProgram.setNull();
+        //! [debug_break]
         return GpuProgramPtr(pGpuProgram);
     }
 

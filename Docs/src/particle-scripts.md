@@ -14,48 +14,7 @@ Once scripts have been parsed, your code is free to instantiate systems based on
 
 Several particle systems may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ({}), and comments indicated by starting a line with ’//’ (note, no nested form comments allowed). The general format is shown below in a typical example:
 
-```cpp
-// A sparkly purple fountain
-particle_system Examples/PurpleFountain
-{
-    material Examples/Flare2
-    particle_width 20
-    particle_height 20
-    cull_each false
-    quota 10000
-    billboard_type oriented_self
-
-    // Area emitter
-    emitter Point
-    {
-        angle 15
-        emission_rate 75
-        time_to_live 3
-        direction 0 1 0
-        velocity_min 250
-        velocity_max 300
-        colour_range_start 1 0 0
-        colour_range_end 0 0 1
-    }
-
-    // Gravity
-    affector LinearForce
-    {
-        force_vector 0 -100 0
-        force_application add
-    }
-
-    // Fader
-    affector ColourFader
-    {
-        red -0.25
-        green -0.25
-        blue -0.25
-    }
-}
-```
-
-
+@snippet Samples/Media/particle/Examples.particle manual_sample
 
 Every particle system in the script must be given a name, which is the line before the first opening ’{’, in the example this is ’Examples/PurpleFountain’. This name must be globally unique. It can include path characters (as in the example) to logically divide up your particle systems, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.
 

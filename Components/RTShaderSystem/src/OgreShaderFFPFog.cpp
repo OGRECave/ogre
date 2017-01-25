@@ -211,11 +211,13 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
     if (mCalcMode == CM_PER_PIXEL)
     {
         internalCounter = 0;
+        //! [func_invoc]
         curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_DEPTH, FFP_VS_FOG, internalCounter++);
         curFuncInvocation->pushOperand(mWorldViewProjMatrix, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);  
         curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);  
         vsMain->addAtomInstance(curFuncInvocation);     
+        //! [func_invoc]
 
         internalCounter = 0;
         switch (mFogMode)

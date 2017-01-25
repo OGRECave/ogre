@@ -116,7 +116,7 @@ compositor "Old TV"
     }
 }
 
-
+//! [manual_sample]
 // Black and white effect
 compositor B&W
 {
@@ -145,6 +145,7 @@ compositor B&W
         }
     }
 }
+//! [manual_sample]
 
 //compositor DOF // based on Blur but final pass does depth of field
 //{
