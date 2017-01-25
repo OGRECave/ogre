@@ -38,22 +38,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreTextureManager.h"
 
 namespace Ogre {
-
-    static inline void doImageIO(const String &name, const String &group,
-                                 const String &ext,
-                                 vector<Image>::type &images,
-                                 Resource *r)
-    {
-        size_t imgIdx = images.size();
-        images.push_back(Image());
-
-        DataStreamPtr dstream =
-            ResourceGroupManager::getSingleton().openResource(
-                name, group, true, r);
-
-        images[imgIdx].load(dstream, ext);
-    }
-
     GL3PlusTexture::GL3PlusTexture(ResourceManager* creator, const String& name,
                                    ResourceHandle handle, const String& group, bool isManual,
                                    ManualResourceLoader* loader, GL3PlusSupport& support)
