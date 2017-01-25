@@ -315,11 +315,10 @@ namespace Ogre
             baseName = mName.substr(0, pos);
             if ( pos != String::npos )
                 ext = mName.substr(pos+1);
-            static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
 
             for(size_t i = 0; i < 6; i++)
             {
-                String fullName = baseName + suffixes[i];
+                String fullName = baseName + CUBEMAP_SUFFIXES[i];
                 if (!ext.empty())
                     fullName = fullName + "." + ext;
 

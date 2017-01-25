@@ -105,11 +105,9 @@ void GLTextureCommon::prepareImpl(void)
         }
         else
         {
-            static const char* suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
-
             for (size_t i = 0; i < 6; i++)
             {
-                String fullName = baseName + suffixes[i];
+                String fullName = baseName + CUBEMAP_SUFFIXES[i];
                 if (!ext.empty())
                     fullName = fullName + "." + ext;
                 // find & load resource data intro stream to allow resource

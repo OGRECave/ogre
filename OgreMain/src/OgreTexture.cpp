@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 
 namespace Ogre {
+    const char* Texture::CUBEMAP_SUFFIXES[] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
     //--------------------------------------------------------------------------
     Texture::Texture(ResourceManager* creator, const String& name, 
         ResourceHandle handle, const String& group, bool isManual, 
