@@ -1,5 +1,6 @@
 # Tutorials {#tutorials}
 
+- @subpage setup
 - @subpage rtss
 - @subpage hlms
 - @subpage trays
