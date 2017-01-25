@@ -680,6 +680,9 @@ namespace Ogre
         texSlot.access              = access;
         texSlot.mipmapLevel         = mipmapLevel;
         texSlot.pixelFormat         = pixelFormat;
+
+        if( pixelFormat == PF_UNKNOWN && !texture.isNull() )
+            texSlot.pixelFormat = texture->getFormat();
     }
     //-----------------------------------------------------------------------------------
     HlmsComputeJob* HlmsComputeJob::clone( const String &cloneName )
