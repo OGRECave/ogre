@@ -31,6 +31,7 @@ elseif("$ENV{TRAVIS_OS_NAME}" STREQUAL "osx")
         -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS=TRUE)
 
     set(OTHER
+        ${OTHER}
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
         ${CROSS})
 endif()
