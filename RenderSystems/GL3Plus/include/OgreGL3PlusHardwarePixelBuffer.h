@@ -30,53 +30,22 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #define __GL3PlusHardwarePixelBuffer_H__
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "OgreHardwarePixelBuffer.h"
+#include "OgreGLHardwarePixelBufferCommon.h"
 
 namespace Ogre {
-    class _OgreGL3PlusExport GL3PlusHardwarePixelBuffer: public HardwarePixelBuffer
+    class _OgreGL3PlusExport GL3PlusHardwarePixelBuffer: public GLHardwarePixelBufferCommon
     {
-    protected:
-        /// Lock a box
-        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
-
-        /// Unlock a box
-        void unlockImpl(void);
-
-        // Internal buffer; either on-card or in system memory, freed/allocated on demand
-        // depending on buffer usage
-        PixelBox mBuffer;
-        GLenum mGLInternalFormat; // GL internal format
-        LockOptions mCurrentLockOptions;
-
-        // Buffer allocation/freeage
-        void allocateBuffer();
-
-        void freeBuffer();
-
-        /// Upload a box of pixels to this buffer on the card
-        virtual void upload(const PixelBox &data, const Image::Box &dest);
-
-        /// Download a box of pixels from the card
-        virtual void download(const PixelBox &data);
-
     public:
         /// Should be called by HardwareBufferManager
-            GL3PlusHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
-                                   PixelFormat mFormat,
-                                   HardwareBuffer::Usage usage);
+        GL3PlusHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
+                               PixelFormat mFormat,
+                               HardwareBuffer::Usage usage);
 
         /// @copydoc HardwarePixelBuffer::blitFromMemory
         void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
 
         /// @copydoc HardwarePixelBuffer::blitToMemory
         void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
-
-        ~GL3PlusHardwarePixelBuffer();
-
-        /** Bind surface to frame buffer. Needs FBO extension.
-         */
-            virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
-        GLenum getGLFormat() { return mGLInternalFormat; }
     };
 
     /** Renderbuffer surface.  Needs FBO extension.
@@ -88,7 +57,7 @@ namespace Ogre {
         ~GL3PlusRenderBuffer();
 
         /// @copydoc GL3PlusHardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
+            virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
 
     protected:
         // In case this is a render buffer

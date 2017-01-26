@@ -86,7 +86,12 @@ set(GLSUPPORT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/  ${CMAKE_CURRENT_
 
 include_directories(${NATIVE_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/)
 file(GLOB GLSL_SOURCES src/GLSL/*.cpp)
-ogre_add_library_to_folder(RenderSystems OgreGLSupport STATIC ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES} src/OgreGLRenderSystemCommon.cpp src/OgreGLTextureCommon.cpp)
+ogre_add_library_to_folder(RenderSystems OgreGLSupport STATIC 
+    ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES} 
+    src/OgreGLRenderSystemCommon.cpp 
+    src/OgreGLTextureCommon.cpp
+    src/OgreGLHardwarePixelBufferCommon.cpp
+)
 target_link_libraries(OgreGLSupport OgreMain ${PLATFORM_LIBS})
 generate_export_header(OgreGLSupport 
     EXPORT_MACRO_NAME _OgreGLExport

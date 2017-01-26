@@ -29,31 +29,11 @@ THE SOFTWARE.
 #define __GLPIXELBUFFER_H__
 
 #include "OgreGLPrerequisites.h"
-#include "OgreHardwarePixelBuffer.h"
+#include "OgreGLHardwarePixelBufferCommon.h"
 
 namespace Ogre {
-    class _OgreGLExport GLHardwarePixelBuffer: public HardwarePixelBuffer
+    class _OgreGLExport GLHardwarePixelBuffer: public GLHardwarePixelBufferCommon
     {
-    protected:  
-        /// Lock a box
-        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
-
-        /// Unlock a box
-        void unlockImpl(void);
-        
-        /** Internal buffer; either on-card or in system memory, freed/allocated on demand
-         depending on buffer usage */
-        PixelBox mBuffer;
-        GLenum mGLInternalFormat; /// GL internal format
-        LockOptions mCurrentLockOptions;
-        
-        /// Buffer allocation/freeage
-        void allocateBuffer();
-        void freeBuffer();
-        /// Upload a box of pixels to this buffer on the card
-        virtual void upload(const PixelBox &data, const Image::Box &dest);
-        /// Download a box of pixels from the card
-        virtual void download(const PixelBox &data);
     public:
         /// Should be called by HardwareBufferManager
         GLHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
@@ -65,13 +45,6 @@ namespace Ogre {
         
         /// @copydoc HardwarePixelBuffer::blitToMemory
         void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
-        
-        ~GLHardwarePixelBuffer();
-        
-        /** Bind surface to frame buffer. Needs FBO extension.
-        */
-        virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
-        GLenum getGLFormat() { return mGLInternalFormat; }
     };
 
     /** Texture surface.
@@ -85,7 +58,7 @@ namespace Ogre {
         ~GLTextureBuffer();
         
         /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
-        virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
+        virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
         /// @copydoc HardwarePixelBuffer::getRenderTarget
         RenderTexture* getRenderTarget(size_t slice);
         /// Upload a box of pixels to this buffer on the card
@@ -131,7 +104,7 @@ namespace Ogre {
         ~GLRenderBuffer();
         
         /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
-        virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
+        virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
     protected:
         /// In case this is a render buffer
         GLuint mRenderbufferID;
