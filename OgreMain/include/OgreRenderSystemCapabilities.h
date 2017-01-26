@@ -223,7 +223,10 @@ namespace Ogre
         /// Support for Separate Shader Objects
         RSC_SEPARATE_SHADER_OBJECTS = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 9),
         /// Support for Vertex Array Objects (VAOs)
-        RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10)
+        RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10),
+        /// with Separate Shader Objects the gl_PerVertex interface block must be redeclared
+        /// but some drivers misbehave and do not compile if we do so
+        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11)
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9

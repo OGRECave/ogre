@@ -298,6 +298,9 @@ namespace Ogre {
             pLog->logMessage(
                 " * Separate shader objects: "
                 + StringConverter::toString(hasCapability(RSC_SEPARATE_SHADER_OBJECTS), true));
+            pLog->logMessage(
+                " * GLSL SSO redeclare interface block: "
+                + StringConverter::toString(hasCapability(RSC_GLSL_SSO_REDECLARE), true));
         }
 
         if (mCategoryRelevant[CAPS_CATEGORY_D3D9])

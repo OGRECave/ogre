@@ -359,8 +359,15 @@ namespace Ogre {
 
         // Separate shader objects
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects"))
+        if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects")) {
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
+            rsc->setCapability(RSC_GLSL_SSO_REDECLARE);
+        }
+
+        // Mesa 11.2 does not behave according to spec and throws a "gl_Position redefined"
+        if(rsc->getDeviceName().find("Mesa") != String::npos) {
+            rsc->unsetCapability(RSC_GLSL_SSO_REDECLARE);
+        }
 #endif
 
         GLfloat floatConstantCount = 0;

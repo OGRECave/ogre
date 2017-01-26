@@ -133,7 +133,7 @@ namespace Ogre {
         if (!mSource.empty())
         {
             // Add standard shader input and output blocks, if missing.
-            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_GLSL_SSO_REDECLARE))
             {
                 // Assume blocks are missing if gl_Position is missing.
                 if (mSource.find("vec4 gl_Position") == String::npos)
