@@ -363,7 +363,7 @@ void main()
 							  @property( !hlms_forwardplus_flipY )pass.windowHeight.x - @end
 							  gl_FragCoord.y );
 
-	nNormal = texelFetch( gBuf_normals, iFragCoord, gBufSubsample ).xyz;
+	nNormal = texelFetch( gBuf_normals, iFragCoord, gBufSubsample ).xyz * 2.0 - 1.0;
 	vec2 shadowRoughness = texelFetch( gBuf_shadowRoughness, iFragCoord, gBufSubsample ).xy;
 
 	float fShadow = shadowRoughness.x;
@@ -554,7 +554,7 @@ void main()
 			outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
 		@end
 	@end @property( hlms_prepass )
-		outNormals			= vec4( nNormal, 1.0 );
+		outNormals			= vec4( nNormal * 0.5 + 0.5, 1.0 );
 		@property( hlms_pssm_splits )
 			outShadowRoughness	= vec2( fShadow, (ROUGHNESS - 0.02) * 1.02040816 );
 		@end @property( !hlms_pssm_splits )

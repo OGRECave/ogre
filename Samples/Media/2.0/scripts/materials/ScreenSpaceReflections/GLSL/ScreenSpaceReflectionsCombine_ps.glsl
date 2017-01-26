@@ -187,7 +187,7 @@ void main()
 	float totalFade =	fadeOnBorder * fadeOnDistance * fadeOnPerpendicular *
 						fadeOnRoughness * ( 1.0f - saturate(remainingAlpha) );
 
-	/*float3 nNormal = texelFetch( gBuf_normals, int2( gl_FragCoord.xy ), 0 ).xyz;
+	/*float3 nNormal = texelFetch( gBuf_normals, int2( gl_FragCoord.xy ), 0 ).xyz * 2.0 - 1.0;
 	float3 viewDir = normalize( float3( inPs.cameraDir.xy, -inPs.cameraDir.z ) );
 	float3 reflDir = viewDir - 2.0 * dot( viewDir, nNormal ) * nNormal;
 	float3 globalCubemapColour = textureLod( globalCubemap, p_invViewMatCubemap * reflDir,
