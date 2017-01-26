@@ -548,7 +548,7 @@ namespace Ogre {
 
         while( itor != end )
         {
-            (*itor)->setVisible( (*itor)->getVisible() );
+            (*itor)->setVisible( !(*itor)->getVisible() );
             ++itor;
         }
 
