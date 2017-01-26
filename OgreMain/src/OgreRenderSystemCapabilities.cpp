@@ -308,7 +308,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    StringVector RenderSystemCapabilities::msGPUVendorStrings;
+    String RenderSystemCapabilities::msGPUVendorStrings[GPU_VENDOR_COUNT];
     //---------------------------------------------------------------------
     GPUVendor RenderSystemCapabilities::vendorFromString(const String& vendorString)
     {
@@ -330,7 +330,7 @@ namespace Ogre {
         
     }
     //---------------------------------------------------------------------
-    String RenderSystemCapabilities::vendorToString(GPUVendor v)
+    const String& RenderSystemCapabilities::vendorToString(GPUVendor v)
     {
         initVendorStrings();
         return msGPUVendorStrings[v];
@@ -338,10 +338,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void RenderSystemCapabilities::initVendorStrings()
     {
-        if (msGPUVendorStrings.empty())
+        if (msGPUVendorStrings[0].empty())
         {
             // Always lower case!
-            msGPUVendorStrings.resize(GPU_VENDOR_COUNT);
             msGPUVendorStrings[GPU_UNKNOWN] = "unknown";
             msGPUVendorStrings[GPU_NVIDIA] = "nvidia";
             msGPUVendorStrings[GPU_AMD] = "amd";

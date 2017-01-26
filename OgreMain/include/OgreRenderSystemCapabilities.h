@@ -307,7 +307,7 @@ namespace Ogre
         /// GPU Vendor
         GPUVendor mVendor;
 
-        static StringVector msGPUVendorStrings;
+        static String msGPUVendorStrings[GPU_VENDOR_COUNT];
         static void initVendorStrings();
 
         /// The number of world matrices available
@@ -430,7 +430,7 @@ namespace Ogre
         /// Convert a vendor string to an enum
         static GPUVendor vendorFromString(const String& vendorString);
         /// Convert a vendor enum to a string
-        static String vendorToString(GPUVendor v);
+        static const String& vendorToString(GPUVendor v);
 
         bool isDriverOlderThanVersion(const DriverVersion &v) const
         {
