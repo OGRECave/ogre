@@ -357,8 +357,8 @@ namespace Ogre
         @param metalness
             Value in range [0; 1]
         */
-        void setMetallness( float metalness );
-        float getMetallness(void) const;
+        void setMetalness( float metalness );
+        float getMetalness(void) const;
 
         /** Calculates fresnel (F0 in most books) based on the IOR.
             The formula used is ( (1 - idx) / 1 + idx )²

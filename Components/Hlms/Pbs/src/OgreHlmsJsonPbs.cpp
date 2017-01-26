@@ -374,7 +374,11 @@ namespace Ogre
             }
         }
 
-        itor = json.FindMember("metallness");
+        //There used to be a typo, so allow the wrong spelling.
+        itor = json.FindMember("metalness");
+        if( itor == json.MemberEnd() )
+            itor = json.FindMember("metallness");
+
         if( itor != json.MemberEnd() && itor->value.IsObject() )
         {
             const rapidjson::Value &subobj = itor->value;
@@ -382,7 +386,7 @@ namespace Ogre
 
             itor = subobj.FindMember( "value" );
             if( itor != subobj.MemberEnd() && itor->value.IsNumber() )
-                pbsDatablock->setMetallness( static_cast<float>( itor->value.GetDouble() ) );
+                pbsDatablock->setMetalness( static_cast<float>( itor->value.GetDouble() ) );
         }
 
         itor = json.FindMember("normal");
@@ -708,7 +712,7 @@ namespace Ogre
         }
         else
         {
-            saveTexture( pbsDatablock->getMetallness(), "metallness", PBSM_METALLIC,
+            saveTexture( pbsDatablock->getMetalness(), "metalness", PBSM_METALLIC,
                          pbsDatablock, outString );
         }
 

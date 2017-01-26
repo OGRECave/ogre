@@ -564,14 +564,14 @@ namespace Ogre
         return static_cast<Workflows>( mWorkflow );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::setMetallness( float metalness )
+    void HlmsPbsDatablock::setMetalness( float metalness )
     {
         assert( mWorkflow == MetallicWorkflow );
         mFresnelR = metalness;
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
-    float HlmsPbsDatablock::getMetallness(void) const
+    float HlmsPbsDatablock::getMetalness(void) const
     {
         return mFresnelR;
     }
@@ -1055,7 +1055,7 @@ namespace Ogre
 
         setSpecular( Vector3::UNIT_SCALE );
         setFresnel( Vector3::UNIT_SCALE, false );
-        setMetallness( metallic );
+        setMetalness( metallic );
         setRoughness( roughness );
     }
     //-----------------------------------------------------------------------------------

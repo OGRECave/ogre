@@ -263,7 +263,7 @@ namespace Ogre
 
                 itor = subobj.FindMember( "metalness" );
                 if( itor != subobj.MemberEnd() && itor->value.IsNumber() )
-                    terraDatablock->setMetallness( i, static_cast<float>( itor->value.GetDouble() ) );
+                    terraDatablock->setMetalness( i, static_cast<float>( itor->value.GetDouble() ) );
 
                 Vector4 offsetScale( 0, 0, 1, 1 );
 
