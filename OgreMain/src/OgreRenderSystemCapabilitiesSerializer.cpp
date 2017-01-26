@@ -42,13 +42,11 @@ namespace Ogre
     RenderSystemCapabilitiesSerializer::RenderSystemCapabilitiesSerializer() : mCurrentLineNumber(0), mCurrentLine(0),
         mCurrentCapabilities(0)
     {
-        mCurrentStream.setNull();
-
         initialiaseDispatchTables();
     }
     
     //-----------------------------------------------------------------------
-    static void write(const RenderSystemCapabilities* caps, const String &name, std::ostream &file)
+    void RenderSystemCapabilitiesSerializer::write(const RenderSystemCapabilities* caps, const String &name, std::ostream &file)
     {
         using namespace std;
 
@@ -67,56 +65,11 @@ namespace Ogre
         file << endl;
 
         file << endl;
-        file << "\t" << "fixed_function " << StringConverter::toString(caps->hasCapability(RSC_FIXED_FUNCTION)) << endl;
-        file << "\t" << "automipmap " << StringConverter::toString(caps->hasCapability(RSC_AUTOMIPMAP)) << endl;
-        file << "\t" << "blending " << StringConverter::toString(caps->hasCapability(RSC_BLENDING)) << endl;
-        file << "\t" << "anisotropy " << StringConverter::toString(caps->hasCapability(RSC_ANISOTROPY)) << endl;
-        file << "\t" << "dot3 " << StringConverter::toString(caps->hasCapability(RSC_DOT3)) << endl;
-        file << "\t" << "cubemapping " << StringConverter::toString(caps->hasCapability(RSC_CUBEMAPPING)) << endl;
-        file << "\t" << "hwstencil " << StringConverter::toString(caps->hasCapability(RSC_HWSTENCIL)) << endl;
-        file << "\t" << "vbo " << StringConverter::toString(caps->hasCapability(RSC_VBO)) << endl;
-        file << "\t" << "32bit_index " << StringConverter::toString(caps->hasCapability(RSC_32BIT_INDEX)) << endl;
-        file << "\t" << "vertex_program " << StringConverter::toString(caps->hasCapability(RSC_VERTEX_PROGRAM)) << endl;
-        file << "\t" << "fragment_program " << StringConverter::toString(caps->hasCapability(RSC_FRAGMENT_PROGRAM)) << endl;
-        file << "\t" << "geometry_program " << StringConverter::toString(caps->hasCapability(RSC_GEOMETRY_PROGRAM)) << endl;
-        file << "\t" << "tessellation_hull_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM)) << endl;
-        file << "\t" << "tessellation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM)) << endl;
-        file << "\t" << "compute_program " << StringConverter::toString(caps->hasCapability(RSC_COMPUTE_PROGRAM)) << endl;
-        file << "\t" << "scissor_test " << StringConverter::toString(caps->hasCapability(RSC_SCISSOR_TEST)) << endl;
-        file << "\t" << "two_sided_stencil " << StringConverter::toString(caps->hasCapability(RSC_TWO_SIDED_STENCIL)) << endl;
-        file << "\t" << "stencil_wrap " << StringConverter::toString(caps->hasCapability(RSC_STENCIL_WRAP)) << endl;
-        file << "\t" << "hwocclusion " << StringConverter::toString(caps->hasCapability(RSC_HWOCCLUSION)) << endl;
-        file << "\t" << "user_clip_planes " << StringConverter::toString(caps->hasCapability(RSC_USER_CLIP_PLANES)) << endl;
-        file << "\t" << "vertex_format_ubyte4 " << StringConverter::toString(caps->hasCapability(RSC_VERTEX_FORMAT_UBYTE4)) << endl;
-        file << "\t" << "infinite_far_plane " << StringConverter::toString(caps->hasCapability(RSC_INFINITE_FAR_PLANE)) << endl;
-        file << "\t" << "hwrender_to_texture " << StringConverter::toString(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE)) << endl;
-        file << "\t" << "texture_float " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_FLOAT)) << endl;
-        file << "\t" << "non_power_of_2_textures " << StringConverter::toString(caps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES)) << endl;
-        file << "\t" << "texture_3d " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_3D)) << endl;
-        file << "\t" << "texture_1d " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_1D)) << endl;
-        file << "\t" << "point_sprites " << StringConverter::toString(caps->hasCapability(RSC_POINT_SPRITES)) << endl;
-        file << "\t" << "point_extended_parameters " << StringConverter::toString(caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS)) << endl;
-        file << "\t" << "vertex_texture_fetch " << StringConverter::toString(caps->hasCapability(RSC_VERTEX_TEXTURE_FETCH)) << endl;
-        file << "\t" << "mipmap_lod_bias " << StringConverter::toString(caps->hasCapability(RSC_MIPMAP_LOD_BIAS)) << endl;
-        file << "\t" << "atomic_counters " << StringConverter::toString(caps->hasCapability(RSC_ATOMIC_COUNTERS)) << endl;
-        file << "\t" << "texture_compression " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION)) << endl;
-        file << "\t" << "texture_compression_dxt " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT)) << endl;
-        file << "\t" << "texture_compression_vtc " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_VTC)) << endl;
-        file << "\t" << "texture_compression_pvrtc " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC)) << endl;
-        file << "\t" << "texture_compression_atc " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_ATC)) << endl;
-        file << "\t" << "texture_compression_etc1 " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_ETC1)) << endl;
-        file << "\t" << "texture_compression_etc2 " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_ETC2)) << endl;
-        file << "\t" << "texture_compression_bc4_bc5 " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5)) << endl;
-        file << "\t" << "texture_compression_bc6h_bc7 " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7)) << endl;
-        file << "\t" << "gl1_5_novbo " << StringConverter::toString(caps->hasCapability(RSC_GL1_5_NOVBO)) << endl;
-        file << "\t" << "fbo " << StringConverter::toString(caps->hasCapability(RSC_FBO)) << endl;
-        file << "\t" << "fbo_arb " << StringConverter::toString(caps->hasCapability(RSC_FBO_ARB)) << endl;
-        file << "\t" << "fbo_ati " << StringConverter::toString(caps->hasCapability(RSC_FBO_ATI)) << endl;
-        file << "\t" << "pbuffer " << StringConverter::toString(caps->hasCapability(RSC_PBUFFER)) << endl;
-        file << "\t" << "gl1_5_nohwocclusion " << StringConverter::toString(caps->hasCapability(RSC_GL1_5_NOHWOCCLUSION)) << endl;
-        file << "\t" << "perstageconstant " << StringConverter::toString(caps->hasCapability(RSC_PERSTAGECONSTANT)) << endl;
-        file << "\t" << "vao " << StringConverter::toString(caps->hasCapability(RSC_VAO)) << endl;
-        file << "\t" << "separate_shader_objects " << StringConverter::toString(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS)) << endl;
+
+        for(CapabilitiesMap::iterator it = mCapabilitiesMap.begin(); it != mCapabilitiesMap.end(); ++it) {
+            file << "\t" << it->first << " " << StringConverter::toString(caps->hasCapability(it->second)) << endl;
+        }
+
         file << endl;
 
         RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
@@ -418,57 +371,6 @@ namespace Ogre
         // there is no dispatch table for shader profiles, just the type
         addKeywordType("shader_profile", ADD_SHADER_PROFILE_STRING);
 
-        // set up RSC_XXX style capabilities
-        addKeywordType("fixed_function", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("automipmap", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("blending", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("anisotropy", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("dot3", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("cubemapping", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("hwstencil", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("vbo", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("vertex_program", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("geometry_program", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("fragment_program", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("tessellation_hull_program", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("tessellation_domain_program", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("compute_program", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("scissor_test", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("two_sided_stencil", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("stencil_wrap", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("hwocclusion", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("user_clip_planes", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("vertex_format_ubyte4", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("infinite_far_plane", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("hwrender_to_texture", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_float", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("non_power_of_2_textures", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_1d", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_3d", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("point_sprites", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("point_extended_parameters", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("vertex_texture_fetch", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("mipmap_lod_bias", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("atomic_counters", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression_dxt", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression_vtc", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression_pvrtc", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression_atc", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression_etc1", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression_etc2", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression_bc4_bc5", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("texture_compression_bc6h_bc7", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("gl1_5_novbo", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("fbo", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("fbo_arb", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("fbo_ati", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("pbuffer", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("gl1_5_nohwocclusion", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("perstageconstant", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("vao", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("separate_shader_objects", SET_CAPABILITY_ENUM_BOOL);
-
         addCapabilitiesMapping("fixed_function", RSC_FIXED_FUNCTION);
         addCapabilitiesMapping("automipmap", RSC_AUTOMIPMAP);
         addCapabilitiesMapping("blending", RSC_BLENDING);
@@ -520,7 +422,7 @@ namespace Ogre
         addCapabilitiesMapping("perstageconstant", RSC_PERSTAGECONSTANT);
         addCapabilitiesMapping("vao", RSC_VAO);
         addCapabilitiesMapping("separate_shader_objects", RSC_SEPARATE_SHADER_OBJECTS);
-
+        addCapabilitiesMapping("glsl_sso_redeclare", RSC_GLSL_SSO_REDECLARE);
     }
 
     void RenderSystemCapabilitiesSerializer::parseCapabilitiesLines(CapabilitiesLinesList& lines)
