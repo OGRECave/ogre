@@ -291,10 +291,9 @@ namespace Ogre
         GPU_VENDOR_COUNT = 17
     };
 
-    /** singleton class for storing the capabilities of the graphics card. 
+    /** This class stores the capabilities of the graphics card.
     @remarks
-    This class stores the capabilities of the graphics card.  This
-    information is set by the individual render systems.
+    This information is set by the individual render systems.
     */
     class _OgreExport RenderSystemCapabilities : public RenderSysAlloc
     {
@@ -391,9 +390,10 @@ namespace Ogre
 
     public: 
         RenderSystemCapabilities ();
-        virtual ~RenderSystemCapabilities ();
+        virtual ~RenderSystemCapabilities () {}
 
-        virtual size_t calculateSize() const {return 0;}
+        /// @deprecated
+        OGRE_DEPRECATED virtual size_t calculateSize() const {return 0;}
 
         /** Set the driver version. */
         void setDriverVersion(const DriverVersion& version)
@@ -775,7 +775,7 @@ namespace Ogre
         }
 
         /// Get the identifier of the rendersystem from which these capabilities were generated
-        String getRenderSystemName(void) const
+        const String& getRenderSystemName(void) const
         {
             return mRenderSystemName;
         }

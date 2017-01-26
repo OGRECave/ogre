@@ -54,10 +54,7 @@ namespace Ogre {
         mCategoryRelevant[CAPS_CATEGORY_D3D9] = false;
         mCategoryRelevant[CAPS_CATEGORY_GL] = false;
     }
-    //-----------------------------------------------------------------------
-    RenderSystemCapabilities::~RenderSystemCapabilities()
-    {
-    }
+
     //-----------------------------------------------------------------------
     void RenderSystemCapabilities::log(Log* pLog)
     {
