@@ -283,12 +283,15 @@ namespace Ogre {
         */
         virtual PixelFormat suggestPixelFormat() const { return PF_BYTE_RGBA; }
         
-        /** Writes the current contents of the render target to the named file. */
-        void writeContentsToFile(const String& filename);
+        /** Writes the current contents of the render target to the named file.
+            If format is unspecified (PF_UNKNOWN), the most suitable one is automatically chosen.
+        */
+        void writeContentsToFile( const String& filename, PixelFormat format = PF_UNKNOWN );
 
         /** Writes the current contents of the render target to the (PREFIX)(time-stamp)(SUFFIX) file.
             @return the name of the file used.*/
-        virtual String writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix);
+        virtual String writeContentsToTimestampedFile( const String& filenamePrefix, const String& filenameSuffix,
+                                                       PixelFormat format = PF_UNKNOWN );
 
         virtual bool requiresTextureFlipping() const = 0;
 
