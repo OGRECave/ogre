@@ -285,10 +285,10 @@ namespace Ogre
         /// Returns the precreated blank texture
         TextureLocation getBlankTexture(void) const;
 
-        /// Dumps to the Ogre log in csv format (separator is '|') the usage statistics
-        /// of all textures currently loaded by the texture manager. Useful for profiling
-        /// or determining sources of waste GPU RAM.
-        void dumpMemoryUsage(void) const;
+        /// Dumps to the Ogre log passed as parameter (if NULL, uses the default one)
+        /// in csv format (separator is '|') the usage statistics of all textures currently loaded by the texture manager.
+        /// Useful for profiling or determining sources of waste GPU RAM.
+        void dumpMemoryUsage( Log* log = NULL ) const;
 
         DefaultTextureParameters* getDefaultTextureParameters(void) { return mDefaultTextureParameters; }
     };
