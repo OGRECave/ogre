@@ -48,8 +48,6 @@ namespace Ogre {
     public:
         /** default constructor*/
         RenderSystemCapabilitiesSerializer();
-        /** default destructor*/
-        virtual ~RenderSystemCapabilitiesSerializer() {}
 
         /** Writes a RenderSystemCapabilities object to a data stream */
         void writeScript(const RenderSystemCapabilities* caps, const String &name, String filename);
@@ -63,7 +61,7 @@ namespace Ogre {
         void parseScript(DataStreamPtr& stream);
 
     protected:
-
+        void write(const RenderSystemCapabilities* caps, const String &name, std::ostream &file);
 
         enum CapabilityKeywordType {UNDEFINED_CAPABILITY_TYPE = 0, SET_STRING_METHOD, SET_INT_METHOD, SET_BOOL_METHOD, SET_REAL_METHOD,
                                 SET_CAPABILITY_ENUM_BOOL, ADD_SHADER_PROFILE_STRING};
@@ -119,16 +117,14 @@ namespace Ogre {
             mKeywordTypeMap.insert(KeywordTypeMap::value_type(keyword, type));
         }
 
-        inline CapabilityKeywordType getKeywordType(const String& keyword) const
+        CapabilityKeywordType getKeywordType(const String& keyword) const
         {
-                        KeywordTypeMap::const_iterator it = mKeywordTypeMap.find(keyword);
-            if(it != mKeywordTypeMap.end())
-                             return (*it).second;
-                        else
-                        {
-                             logParseError("Can't find the type for keyword: " + keyword);
-                             return UNDEFINED_CAPABILITY_TYPE;
-                        }
+            KeywordTypeMap::const_iterator it = mKeywordTypeMap.find(keyword);
+            if (it != mKeywordTypeMap.end())
+                return (*it).second;
+
+            // default
+            return SET_CAPABILITY_ENUM_BOOL;
         }
 
         inline void addSetStringMethod(String keyword, SetStringMethod method)

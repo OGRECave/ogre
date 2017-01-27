@@ -169,6 +169,7 @@ ADD_REPR(ColourValue)
 %include "OgreSceneQuery.h"
 %include "OgreNameGenerator.h"
 %include "OgreController.h"
+%ignore Ogre::RenderSystemCapabilities::calculateSize; // deprecated
 %include "OgreRenderSystemCapabilities.h"
 %include "OgreGpuProgramParams.h"
 %ignore Ogre::Image::loadDynamicImage(uchar*, uint32, uint32, PixelFormat); // deprecated

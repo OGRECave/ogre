@@ -155,10 +155,7 @@ namespace Ogre {
         {
             const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
             // Fix up the source in case someone forgot to redeclare gl_Position
-            if(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS)
-                    && mType == GPT_VERTEX_PROGRAM
-                    // Mesa 11.2 does not behave according to spec and throws a "gl_Position redefined"
-                    && caps->getDeviceName().find("Mesa") == String::npos)
+            if (caps->hasCapability(RSC_GLSL_SSO_REDECLARE) && mType == GPT_VERTEX_PROGRAM)
             {
                 size_t versionPos = mSource.find("#version");
                 int shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));

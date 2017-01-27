@@ -223,7 +223,10 @@ namespace Ogre
         /// Support for Separate Shader Objects
         RSC_SEPARATE_SHADER_OBJECTS = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 9),
         /// Support for Vertex Array Objects (VAOs)
-        RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10)
+        RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10),
+        /// with Separate Shader Objects the gl_PerVertex interface block must be redeclared
+        /// but some drivers misbehave and do not compile if we do so
+        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11)
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9
@@ -288,10 +291,9 @@ namespace Ogre
         GPU_VENDOR_COUNT = 17
     };
 
-    /** singleton class for storing the capabilities of the graphics card. 
+    /** This class stores the capabilities of the graphics card.
     @remarks
-    This class stores the capabilities of the graphics card.  This
-    information is set by the individual render systems.
+    This information is set by the individual render systems.
     */
     class _OgreExport RenderSystemCapabilities : public RenderSysAlloc
     {
@@ -307,7 +309,7 @@ namespace Ogre
         /// GPU Vendor
         GPUVendor mVendor;
 
-        static StringVector msGPUVendorStrings;
+        static String msGPUVendorStrings[GPU_VENDOR_COUNT];
         static void initVendorStrings();
 
         /// The number of world matrices available
@@ -388,9 +390,10 @@ namespace Ogre
 
     public: 
         RenderSystemCapabilities ();
-        virtual ~RenderSystemCapabilities ();
+        virtual ~RenderSystemCapabilities () {}
 
-        virtual size_t calculateSize() const {return 0;}
+        /// @deprecated
+        OGRE_DEPRECATED virtual size_t calculateSize() const {return 0;}
 
         /** Set the driver version. */
         void setDriverVersion(const DriverVersion& version)
@@ -430,7 +433,7 @@ namespace Ogre
         /// Convert a vendor string to an enum
         static GPUVendor vendorFromString(const String& vendorString);
         /// Convert a vendor enum to a string
-        static String vendorToString(GPUVendor v);
+        static const String& vendorToString(GPUVendor v);
 
         bool isDriverOlderThanVersion(const DriverVersion &v) const
         {
@@ -772,7 +775,7 @@ namespace Ogre
         }
 
         /// Get the identifier of the rendersystem from which these capabilities were generated
-        String getRenderSystemName(void) const
+        const String& getRenderSystemName(void) const
         {
             return mRenderSystemName;
         }

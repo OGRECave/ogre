@@ -54,10 +54,7 @@ namespace Ogre {
         mCategoryRelevant[CAPS_CATEGORY_D3D9] = false;
         mCategoryRelevant[CAPS_CATEGORY_GL] = false;
     }
-    //-----------------------------------------------------------------------
-    RenderSystemCapabilities::~RenderSystemCapabilities()
-    {
-    }
+
     //-----------------------------------------------------------------------
     void RenderSystemCapabilities::log(Log* pLog)
     {
@@ -298,6 +295,9 @@ namespace Ogre {
             pLog->logMessage(
                 " * Separate shader objects: "
                 + StringConverter::toString(hasCapability(RSC_SEPARATE_SHADER_OBJECTS), true));
+            pLog->logMessage(
+                " * GLSL SSO redeclare interface block: "
+                + StringConverter::toString(hasCapability(RSC_GLSL_SSO_REDECLARE), true));
         }
 
         if (mCategoryRelevant[CAPS_CATEGORY_D3D9])
@@ -308,7 +308,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    StringVector RenderSystemCapabilities::msGPUVendorStrings;
+    String RenderSystemCapabilities::msGPUVendorStrings[GPU_VENDOR_COUNT];
     //---------------------------------------------------------------------
     GPUVendor RenderSystemCapabilities::vendorFromString(const String& vendorString)
     {
@@ -330,7 +330,7 @@ namespace Ogre {
         
     }
     //---------------------------------------------------------------------
-    String RenderSystemCapabilities::vendorToString(GPUVendor v)
+    const String& RenderSystemCapabilities::vendorToString(GPUVendor v)
     {
         initVendorStrings();
         return msGPUVendorStrings[v];
@@ -338,10 +338,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void RenderSystemCapabilities::initVendorStrings()
     {
-        if (msGPUVendorStrings.empty())
+        if (msGPUVendorStrings[0].empty())
         {
             // Always lower case!
-            msGPUVendorStrings.resize(GPU_VENDOR_COUNT);
             msGPUVendorStrings[GPU_UNKNOWN] = "unknown";
             msGPUVendorStrings[GPU_NVIDIA] = "nvidia";
             msGPUVendorStrings[GPU_AMD] = "amd";
