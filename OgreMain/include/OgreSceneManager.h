@@ -325,6 +325,7 @@ namespace Ogre {
             Real skyBoxDistance;
         };
 
+        typedef vector<SceneNode*>::type SceneNodeList;
         typedef vector<MovableObject*>::type MovableObjectVec;
 
         /** Class that allows listening in on the various stages of SceneManager
@@ -514,8 +515,6 @@ namespace Ogre {
 
         typedef vector<v1::InstanceManager*>::type  InstanceManagerVec;
         InstanceManagerVec  mInstanceManagers;
-
-        typedef vector<SceneNode*>::type SceneNodeList;
 
         /** Central list of SceneNodes - for easy memory management.
             @note
@@ -1269,6 +1268,9 @@ namespace Ogre {
         */
         virtual_l1 SceneNode* getSceneNode( IdType id );
         virtual_l1 const SceneNode* getSceneNode( IdType id ) const;
+
+        /// Finds all the scene nodes with the name passed as parameter.
+        virtual_l1 SceneNodeList findSceneNodes( const String& name ) const;
 
         /** Node listeners need to be registered with us so that they can be successfully called
             when calling updateAllTransforms. @See updateAllTransforms

@@ -848,6 +848,19 @@ const SceneNode* SceneManager::getSceneNode( IdType id ) const
     return retVal;
 }
 //-----------------------------------------------------------------------
+SceneManager::SceneNodeList SceneManager::findSceneNodes( const String& name ) const
+{
+    SceneNodeList nodes;
+    for( SceneNodeList::const_iterator itor = mSceneNodes.begin(); itor != mSceneNodes.end(); ++itor )
+    {
+        SceneNode* node = *itor;
+        if( node->getName() == name )
+            nodes.push_back( node );
+    }
+
+    return nodes;
+}
+//-----------------------------------------------------------------------
 void SceneManager::registerSceneNodeListener( SceneNode *sceneNode )
 {
     SceneNodeList::iterator itor = std::lower_bound( mSceneNodesWithListeners.begin(),
