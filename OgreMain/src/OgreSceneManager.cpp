@@ -267,6 +267,22 @@ SceneManager::~SceneManager()
     stopWorkerThreads();
 }
 //-----------------------------------------------------------------------
+SceneManager::MovableObjectVec SceneManager::findMovableObjects( const String& type, const String& name )
+{
+    MovableObjectVec objects;
+    MovableObjectIterator itor = getMovableObjectIterator( type );
+    while( itor.hasMoreElements() )
+    {
+        MovableObject* object = itor.peekNext();
+        if( object->getName() == name )
+            objects.push_back( object );
+
+        itor.moveNext();
+    }
+
+    return objects;
+}
+//-----------------------------------------------------------------------
 Camera* SceneManager::createCamera( const String &name, bool isVisible, bool forCubemapping )
 {
     if( mCamerasByName.find( name ) != mCamerasByName.end() )
@@ -830,6 +846,19 @@ const SceneNode* SceneManager::getSceneNode( IdType id ) const
         retVal = *ritor;
 
     return retVal;
+}
+//-----------------------------------------------------------------------
+SceneManager::SceneNodeList SceneManager::findSceneNodes( const String& name ) const
+{
+    SceneNodeList nodes;
+    for( SceneNodeList::const_iterator itor = mSceneNodes.begin(); itor != mSceneNodes.end(); ++itor )
+    {
+        SceneNode* node = *itor;
+        if( node->getName() == name )
+            nodes.push_back( node );
+    }
+
+    return nodes;
 }
 //-----------------------------------------------------------------------
 void SceneManager::registerSceneNodeListener( SceneNode *sceneNode )
