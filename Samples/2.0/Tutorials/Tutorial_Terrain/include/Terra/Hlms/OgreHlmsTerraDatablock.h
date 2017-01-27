@@ -189,8 +189,8 @@ namespace Ogre
         @param metalness
             Value in range [0; 1]
         */
-        void setMetallness( uint8 detailMapIdx, float metalness );
-        float getMetallness( uint8 detailMapIdx ) const;
+        void setMetalness( uint8 detailMapIdx, float metalness );
+        float getMetalness( uint8 detailMapIdx ) const;
 
         /** Advanced function for setting all textures at once,
             instead of one by one, for performance reasons.
