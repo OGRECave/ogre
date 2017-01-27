@@ -453,7 +453,8 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    String RenderTarget::writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix)
+    String RenderTarget::writeContentsToTimestampedFile( const String& filenamePrefix, const String& filenameSuffix,
+                                                         PixelFormat format )
     {
         struct tm *pTime;
         time_t ctTime; time(&ctTime);
@@ -468,14 +469,14 @@ namespace Ogre {
             << std::setw(3) << std::setfill('0') <<
                         (Root::getSingleton().getTimer()->getMilliseconds() % 1000);
         String filename = filenamePrefix + oss.str() + filenameSuffix;
-        writeContentsToFile(filename);
+        writeContentsToFile( filename, format );
         return filename;
 
     }
     //-----------------------------------------------------------------------
-    void RenderTarget::writeContentsToFile(const String& filename)
+    void RenderTarget::writeContentsToFile( const String& filename, PixelFormat format )
     {
-        PixelFormat pf = suggestPixelFormat();
+        PixelFormat pf = format == PF_UNKNOWN ? suggestPixelFormat() : format;
 
         uchar *data = OGRE_ALLOC_T(uchar, mWidth * mHeight * PixelUtil::getNumElemBytes(pf), MEMCATEGORY_RENDERSYS);
         PixelBox pb(mWidth, mHeight, 1, pf, data);
