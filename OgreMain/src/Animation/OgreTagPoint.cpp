@@ -95,7 +95,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Matrix3 TagPoint::_getDerivedOrientationMatrix(void) const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
+#endif
         Matrix3 retVal;
         mTransform.mDerivedTransform[mTransform.mIndex].extract3x3Matrix( retVal );
         return retVal;

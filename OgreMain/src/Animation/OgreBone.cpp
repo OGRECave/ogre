@@ -63,15 +63,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Bone::~Bone()
     {
+#if OGRE_DEBUG_MODE
         assert( !mInitialized && "Must call _deinitialize() before destructor!" );
+#endif
     }
     //-----------------------------------------------------------------------
     void Bone::_initialize( IdType id, BoneMemoryManager *boneMemoryManager,
                             Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind )
     {
-        assert( !mInitialized );
-
 #if OGRE_DEBUG_MODE
+        assert( !mInitialized );
         mInitialized = true;
 #endif
 
@@ -250,8 +251,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Matrix4 Bone::_getDerivedTransform(void) const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
-
+#endif
         OGRE_ALIGNED_DECL( Matrix4, localSpaceBone, OGRE_SIMD_ALIGNMENT );
         OGRE_ALIGNED_DECL( Matrix4, parentNodeTransform, OGRE_SIMD_ALIGNMENT );
 
