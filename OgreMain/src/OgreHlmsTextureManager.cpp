@@ -903,7 +903,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsTextureManager::dumpMemoryUsage(void) const
+    void HlmsTextureManager::dumpMemoryUsage( Log* log ) const
     {
         const char *typeNames[NUM_TEXTURE_TYPES] =
         {
@@ -919,15 +919,15 @@ namespace Ogre
         size_t bytesPerCategory[NUM_TEXTURE_TYPES];
         memset( bytesPerCategory, 0, sizeof( bytesPerCategory ) );
 
-        LogManager &logManager = LogManager::getSingleton();
+        Log* logActual = log == NULL ? LogManager::getSingleton().getDefaultLog() : log;
 
-        logManager.logMessage(
+        logActual->logMessage(
                     "================================"
                     "Start dump of HlmsTextureManager"
                     "================================",
                     LML_CRITICAL );
 
-        logManager.logMessage(
+        logActual->logMessage(
                     "|#|Type|Width|Height|Depth|Format|HW Gamma|Mipmaps|Size in bytes|"
                     "Num. active textures|Total texture capacity|Texture Names",
                     LML_CRITICAL );
@@ -978,7 +978,7 @@ namespace Ogre
                 while( itEntry != enEntry )
                     row += "|" + *itEntry++;
 
-                logManager.logMessage( row, LML_CRITICAL );
+                logActual->logMessage( row, LML_CRITICAL );
                 row.clear();
 
                 bytesPerCategory[i] += textureSize;
@@ -987,12 +987,12 @@ namespace Ogre
             }
         }
 
-        logManager.logMessage( "|Size in MBs per category:", LML_CRITICAL );
+        logActual->logMessage( "|Size in MBs per category:", LML_CRITICAL );
 
         size_t totalBytes = 0;
         for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
         {
-            logManager.logMessage( "|" + String( typeNames[i] ) + "|" +
+            logActual->logMessage( "|" + String( typeNames[i] ) + "|" +
                                    StringConverter::toString( bytesPerCategory[i] /
                                                               (1024.0f * 1024.0f) ),
                                    LML_CRITICAL );
@@ -1000,10 +1000,10 @@ namespace Ogre
             totalBytes += bytesPerCategory[i];
         }
 
-        logManager.logMessage( "|Total MBs used:|" + StringConverter::toString( totalBytes /
+        logActual->logMessage( "|Total MBs used:|" + StringConverter::toString( totalBytes /
                                                                                 (1024.0f * 1024.0f) ),
                                LML_CRITICAL );
-        logManager.logMessage(
+        logActual->logMessage(
                     "================================"
                     "End dump of HlmsTextureManager"
                     "================================",
