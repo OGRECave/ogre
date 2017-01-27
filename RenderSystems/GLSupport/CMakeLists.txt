@@ -90,6 +90,7 @@ ogre_add_library_to_folder(RenderSystems OgreGLSupport STATIC
     ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES} 
     src/OgreGLRenderSystemCommon.cpp 
     src/OgreGLTextureCommon.cpp
+    src/OgreGLRenderTexture.cpp
     src/OgreGLHardwarePixelBufferCommon.cpp
 )
 target_link_libraries(OgreGLSupport OgreMain ${PLATFORM_LIBS})

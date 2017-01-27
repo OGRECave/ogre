@@ -45,7 +45,6 @@ namespace Ogre {
     *  @{
     */
     class GL3PlusSupport;
-    class GL3PlusRTTManager;
     class GLSLShaderManager;
     class GLSLShaderFactory;
     class HardwareBufferManager;

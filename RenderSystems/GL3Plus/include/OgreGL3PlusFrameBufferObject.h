@@ -34,7 +34,6 @@ THE SOFTWARE.
 namespace Ogre {
     
     class GL3PlusFBOManager;
-    struct GL3PlusSurfaceDesc;
 
     /** Frame Buffer Object abstraction.
     */

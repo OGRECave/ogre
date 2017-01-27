@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreBitwise.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,

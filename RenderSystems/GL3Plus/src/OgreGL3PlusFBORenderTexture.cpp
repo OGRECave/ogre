@@ -32,6 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreLogManager.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusFBOMultiRenderTarget.h"
+#include "OgreGL3PlusSupport.h"
 
 namespace Ogre {
     static const size_t TEMP_FBOS = 2;

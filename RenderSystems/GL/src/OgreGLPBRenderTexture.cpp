@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 #include "OgreGLHardwarePixelBuffer.h"
+#include "OgreGLSupport.h"
 
 namespace Ogre {
 //-----------------------------------------------------------------------------  

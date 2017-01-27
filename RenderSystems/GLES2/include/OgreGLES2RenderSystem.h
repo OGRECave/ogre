@@ -45,7 +45,8 @@ namespace Ogre {
     *  @{
     */
     class GLES2Support;
-    class GLES2RTTManager;
+    class GLRTTManager;
+    typedef GLRTTManager GLES2RTTManager;
     class GLES2GpuProgramManager;
     class GLSLESProgramFactory;
     class GLES2StateCacheManager;
