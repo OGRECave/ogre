@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __GLPBRENDERTEXTURE_H__
 #define __GLPBRENDERTEXTURE_H__
 
-#include "OgreGLRenderTexture.h"
+#include "OgreGLCopyingRenderTexture.h"
 #include "OgreGLPBuffer.h"
 namespace Ogre {
     

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreGLTextureManager.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreGLRenderTexture.h"
+#include "OgreGLCopyingRenderTexture.h"
 #include "OgreGLTexture.h"
 
 namespace Ogre {

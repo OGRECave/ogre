@@ -30,35 +30,11 @@ THE SOFTWARE.
 #define __GLES2HardwarePixelBuffer_H__
 
 #include "OgreGLES2Prerequisites.h"
-#include "OgreHardwarePixelBuffer.h"
+#include "OgreGLHardwarePixelBufferCommon.h"
 
 namespace Ogre {
-    class _OgreGLES2Export GLES2HardwarePixelBuffer: public HardwarePixelBuffer
+    class _OgreGLES2Export GLES2HardwarePixelBuffer: public GLHardwarePixelBufferCommon
     {
-        protected:
-            /// Lock a box
-            PixelBox lockImpl(const Image::Box &lockBox,  LockOptions options);
-
-            /// Unlock a box
-            void unlockImpl(void);
-
-            // Internal buffer; either on-card or in system memory, freed/allocated on demand
-            // depending on buffer usage
-            PixelBox mBuffer;
-            GLenum mGLInternalFormat; // GL internal format
-            LockOptions mCurrentLockOptions;
-
-            // Buffer allocation/freeage
-            void allocateBuffer();
-
-            void freeBuffer();
-
-            // Upload a box of pixels to this buffer on the card
-            virtual void upload(const PixelBox &data, const Image::Box &dest);
-
-            // Download a box of pixels from the card
-            virtual void download(const PixelBox &data);
-        
         public:
             /// Should be called by HardwareBufferManager
             GLES2HardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
@@ -70,13 +46,6 @@ namespace Ogre {
 
             /// @copydoc HardwarePixelBuffer::blitToMemory
             void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
-
-            virtual ~GLES2HardwarePixelBuffer();
-
-            /** Bind surface to frame buffer. Needs FBO extension.
-            */
-            virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
-            GLenum getGLFormat() { return mGLInternalFormat; }
     };
 
     /** Texture surface.
@@ -90,7 +59,7 @@ namespace Ogre {
             virtual ~GLES2TextureBuffer();
 
             /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
+            virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
 
             /// @copydoc HardwarePixelBuffer::getRenderTarget
             RenderTexture* getRenderTarget(size_t slice);
@@ -151,7 +120,7 @@ namespace Ogre {
             virtual ~GLES2RenderBuffer();
 
             /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
+            virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
 
         protected:
             // In case this is a render buffer

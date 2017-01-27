@@ -42,61 +42,8 @@ namespace Ogre {
 GLHardwarePixelBuffer::GLHardwarePixelBuffer(uint32 inWidth, uint32 inHeight, uint32 inDepth,
                 PixelFormat inFormat,
                 HardwareBuffer::Usage usage):
-      HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false, false),
-      mBuffer(inWidth, inHeight, inDepth, inFormat),
-      mGLInternalFormat(GL_NONE)
+        GLHardwarePixelBufferCommon(inWidth, inHeight, inDepth, inFormat, usage)
 {
-    mCurrentLockOptions = (LockOptions)0;
-}
-
-//-----------------------------------------------------------------------------  
-GLHardwarePixelBuffer::~GLHardwarePixelBuffer()
-{
-    // Force free buffer
-    delete [] (uint8*)mBuffer.data;
-}
-//-----------------------------------------------------------------------------  
-void GLHardwarePixelBuffer::allocateBuffer()
-{
-    if(mBuffer.data)
-        // Already allocated
-        return;
-    mBuffer.data = new uint8[mSizeInBytes];
-    // TODO: use PBO if we're HBU_DYNAMIC
-}
-//-----------------------------------------------------------------------------  
-void GLHardwarePixelBuffer::freeBuffer()
-{
-    // Free buffer if we're STATIC to save memory
-    if(mUsage & HBU_STATIC)
-    {
-        delete [] (uint8*)mBuffer.data;
-        mBuffer.data = 0;
-    }
-}
-//-----------------------------------------------------------------------------  
-PixelBox GLHardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
-{
-    allocateBuffer();
-    if(options != HardwareBuffer::HBL_DISCARD) 
-    {
-        // Download the old contents of the texture
-        download(mBuffer);
-    }
-    mCurrentLockOptions = options;
-    mLockedBox = lockBox;
-    return mBuffer.getSubVolume(lockBox);
-}
-//-----------------------------------------------------------------------------  
-void GLHardwarePixelBuffer::unlockImpl(void)
-{
-    if (mCurrentLockOptions != HardwareBuffer::HBL_READ_ONLY)
-    {
-        // From buffer to card, only upload if was locked for writing
-        upload(mCurrentLock, mLockedBox);
-    }
-    
-    freeBuffer();
 }
 
 //-----------------------------------------------------------------------------  
@@ -173,25 +120,6 @@ void GLHardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBo
         }
         freeBuffer();
     }
-}
-//-----------------------------------------------------------------------------
-void GLHardwarePixelBuffer::upload(const PixelBox &data, const Image::Box &dest)
-{
-    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-        "Upload not possible for this pixelbuffer type",
-        "GLHardwarePixelBuffer::upload");
-}
-//-----------------------------------------------------------------------------  
-void GLHardwarePixelBuffer::download(const PixelBox &data)
-{
-    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Download not possible for this pixelbuffer type",
-        "GLHardwarePixelBuffer::download");
-}
-//-----------------------------------------------------------------------------  
-void GLHardwarePixelBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
-{
-    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Framebuffer bind not possible for this pixelbuffer type",
-        "GLHardwarePixelBuffer::bindToFramebuffer");
 }
 //********* GLTextureBuffer
 GLTextureBuffer::GLTextureBuffer(GLSupport& support, const String &baseName, GLenum target, GLuint id,
@@ -509,7 +437,7 @@ void GLTextureBuffer::download(const PixelBox &data)
     }
 }
 //-----------------------------------------------------------------------------  
-void GLTextureBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
+void GLTextureBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)
 {
     assert(zoffset < mDepth);
     switch(mTarget)
@@ -901,7 +829,7 @@ GLRenderBuffer::~GLRenderBuffer()
     glDeleteRenderbuffersEXT(1, &mRenderbufferID);
 }
 //-----------------------------------------------------------------------------  
-void GLRenderBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
+void GLRenderBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)
 {
     assert(zoffset < mDepth);
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, attachment,

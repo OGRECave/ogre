@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
@@ -26,37 +26,45 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLES2RenderTexture.h"
-#include "OgreGLES2HardwarePixelBuffer.h"
+#ifndef __GLCOPYINGRENDERTEXTURE_H__
+#define __GLCOPYINGRENDERTEXTURE_H__
+
+#include "OgreGLPrerequisites.h"
+#include "OgreGLRenderTexture.h"
 
 namespace Ogre {
-    GLES2CopyingRenderTexture::GLES2CopyingRenderTexture(GLES2CopyingRTTManager *manager,
-                                                       const String &name,
-                                                       const GLES2SurfaceDesc &target,
-                                                       bool writeGamma, uint fsaa)
-        : GLES2RenderTexture(name, target, writeGamma, fsaa)
+    /** RenderTexture for simple copying from frame buffer
+    */
+    class GLCopyingRTTManager;
+    class _OgreGLExport GLCopyingRenderTexture: public GLRenderTexture
     {
-    }
-
-    void GLES2CopyingRenderTexture::getCustomAttribute(const String& name, void* pData)
+    public:
+        GLCopyingRenderTexture(GLCopyingRTTManager *manager, const String &name, const GLSurfaceDesc &target, 
+            bool writeGamma, uint fsaa);
+        
+        virtual void getCustomAttribute(const String& name, void* pData);
+    };
+    
+    /** Simple, copying manager/factory for RenderTextures. This is only used as the last fallback if
+        both PBuffers and FBOs aren't supported.
+    */
+    class _OgreGLExport GLCopyingRTTManager: public GLRTTManager
     {
-        if (name==GLRenderTexture::CustomAttributeString_TARGET)
-        {
-            GLES2SurfaceDesc &target = *static_cast<GLES2SurfaceDesc*>(pData);
-            target.buffer = static_cast<GLES2HardwarePixelBuffer*>(mBuffer);
-            target.zoffset = mZOffset;
+    public:
+        RenderTexture *createRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa) {
+            return new GLCopyingRenderTexture(this, name, target, writeGamma, fsaa);
         }
-    }
 
-    void GLES2CopyingRTTManager::unbind(RenderTarget *target)
-    {
-        // Copy on unbind
-        GLES2SurfaceDesc surface;
-        surface.buffer = 0;
-        target->getCustomAttribute(GLRenderTexture::CustomAttributeString_TARGET, &surface);
-        if (surface.buffer)
-        {
-            static_cast<GLES2TextureBuffer*>(surface.buffer)->copyFromFramebuffer(surface.zoffset);
+        bool checkFormat(PixelFormat format) {
+            return true;
         }
-    }
+        
+        void bind(RenderTarget *target) {
+            // Nothing to do here
+        }
+
+        void unbind(RenderTarget *target);
+    };
 }
+
+#endif // __GLTEXTURE_H__

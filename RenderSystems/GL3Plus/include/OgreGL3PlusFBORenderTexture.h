@@ -38,7 +38,7 @@ namespace Ogre {
 
     /** RenderTexture for GL FBO
      */
-    class _OgreGL3PlusExport GL3PlusFBORenderTexture: public GL3PlusRenderTexture
+    class _OgreGL3PlusExport GL3PlusFBORenderTexture: public GLRenderTexture
     {
     public:
         GL3PlusFBORenderTexture(GL3PlusFBOManager *manager, const String &name, const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa);

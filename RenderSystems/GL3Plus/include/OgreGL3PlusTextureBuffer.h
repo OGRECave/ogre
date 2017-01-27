@@ -44,7 +44,7 @@ namespace Ogre {
                              bool writeGamma, uint fsaa);
         ~GL3PlusTextureBuffer();
 
-        virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
+        virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
 
         RenderTexture* getRenderTarget(size_t);
 

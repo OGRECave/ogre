@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __OgreGLFBO_H__
 #define __OgreGLFBO_H__
 
-#include "OgreGLRenderTexture.h"
+#include "OgreGLCopyingRenderTexture.h"
 #include "OgreGLContext.h"
 
 namespace Ogre {

@@ -35,7 +35,6 @@ THE SOFTWARE.
 namespace Ogre {
     
     class GLES2FBOManager;
-    struct GLES2SurfaceDesc;
 
     /** Frame Buffer Object abstraction.
     */

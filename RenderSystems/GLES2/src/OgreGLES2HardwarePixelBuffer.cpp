@@ -39,64 +39,14 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreBitwise.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
                                                      uint32 depth, PixelFormat format,
                                                      HardwareBuffer::Usage usage)
-        : HardwarePixelBuffer(width, height, depth, format, usage, false, false),
-          mBuffer(width, height, depth, format),
-          mGLInternalFormat(GL_NONE)
+        : GLHardwarePixelBufferCommon(width, height, depth, format, usage)
     {
-    }
-
-    GLES2HardwarePixelBuffer::~GLES2HardwarePixelBuffer()
-    {
-        // Force free buffer
-        delete [] (uint8*)mBuffer.data;
-    }
-
-    void GLES2HardwarePixelBuffer::allocateBuffer()
-    {
-        if (mBuffer.data)
-            // Already allocated
-            return;
-
-        mBuffer.data = new uint8[mSizeInBytes];
-        // TODO use PBO if we're HBU_DYNAMIC
-    }
-
-    void GLES2HardwarePixelBuffer::freeBuffer()
-    {
-        // Free buffer if we're STATIC to save memory
-        if (mUsage & HBU_STATIC)
-        {
-            delete [] (uint8*)mBuffer.data;
-            mBuffer.data = 0;
-        }
-    }
-
-    PixelBox GLES2HardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
-    {
-        allocateBuffer();
-        if (options != HardwareBuffer::HBL_DISCARD)
-        {
-            // Download the old contents of the texture
-            download(mBuffer);
-        }
-        mCurrentLockOptions = options;
-        mLockedBox = lockBox;
-        return mBuffer.getSubVolume(lockBox);
-    }
-
-    void GLES2HardwarePixelBuffer::unlockImpl(void)
-    {
-        if (mCurrentLockOptions != HardwareBuffer::HBL_READ_ONLY)
-        {
-            // From buffer to card, only upload if was locked for writing
-            upload(mCurrentLock, mLockedBox);
-        }
-        freeBuffer();
     }
 
     void GLES2HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
@@ -204,27 +154,6 @@ namespace Ogre {
             }
             freeBuffer();
         }
-    }
-
-    void GLES2HardwarePixelBuffer::upload(const PixelBox &data, const Image::Box &dest)
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Upload not possible for this pixelbuffer type",
-                    "GLES2HardwarePixelBuffer::upload");
-    }
-
-    void GLES2HardwarePixelBuffer::download(const PixelBox &data)
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Download not possible for this pixelbuffer type",
-                    "GLES2HardwarePixelBuffer::download");
-    }
-
-    void GLES2HardwarePixelBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Framebuffer bind not possible for this pixelbuffer type",
-                    "GLES2HardwarePixelBuffer::bindToFramebuffer");
     }
     
     // TextureBuffer
@@ -741,7 +670,7 @@ namespace Ogre {
     }
 #endif
     //-----------------------------------------------------------------------------  
-    void GLES2TextureBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
+    void GLES2TextureBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)
     {
         assert(zoffset < mDepth);
         OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment,
@@ -1281,7 +1210,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &mRenderbufferID));
     }
     //-----------------------------------------------------------------------------  
-    void GLES2RenderBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
+    void GLES2RenderBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)
     {
         assert(zoffset < mDepth);
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment,

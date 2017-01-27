@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __OgreGLFBORTT_H__
 #define __OgreGLFBORTT_H__
 
-#include "OgreGLRenderTexture.h"
+#include "OgreGLCopyingRenderTexture.h"
 #include "OgreGLContext.h"
 #include "OgreGLFrameBufferObject.h"
 

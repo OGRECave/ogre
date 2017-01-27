@@ -26,30 +26,26 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   -----------------------------------------------------------------------------
 */
 
-#include "OgreGL3PlusRenderTexture.h"
-#include "OgreGL3PlusHardwarePixelBuffer.h"
+#include "OgreGLRenderTexture.h"
+#include "OgreGLHardwarePixelBufferCommon.h"
 
 namespace Ogre {
 
-    const String GL3PlusRenderTexture::CustomAttributeString_FBO = "FBO";
-    const String GL3PlusRenderTexture::CustomAttributeString_TARGET = "TARGET";
-    const String GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT = "GLCONTEXT";
+    const String GLRenderTexture::CustomAttributeString_FBO = "FBO";
+    const String GLRenderTexture::CustomAttributeString_TARGET = "TARGET";
+    const String GLRenderTexture::CustomAttributeString_GLCONTEXT = "GLCONTEXT";
 
-    template<> GL3PlusRTTManager* Singleton<GL3PlusRTTManager>::msSingleton = 0;
+    template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = NULL;
 
-    GL3PlusRTTManager::~GL3PlusRTTManager()
-    {
-    }
-
-    MultiRenderTarget* GL3PlusRTTManager::createMultiRenderTarget(const String & name)
+    MultiRenderTarget* GLRTTManager::createMultiRenderTarget(const String & name)
     {
         // TODO: Check rendersystem capabilities before throwing the exception
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "MultiRenderTarget is not supported",
-                    "GL3PlusRTTManager::createMultiRenderTarget");
+                    "GLRTTManager::createMultiRenderTarget");
     }
 
-    PixelFormat GL3PlusRTTManager::getSupportedAlternative(PixelFormat format)
+    PixelFormat GLRTTManager::getSupportedAlternative(PixelFormat format)
     {
         if (checkFormat(format))
         {
@@ -85,8 +81,8 @@ namespace Ogre {
         return PF_A8R8G8B8;
     }
 
-    GL3PlusRenderTexture::GL3PlusRenderTexture(const String &name,
-                                               const GL3PlusSurfaceDesc &target,
+    GLRenderTexture::GLRenderTexture(const String &name,
+                                               const GLSurfaceDesc &target,
                                                bool writeGamma,
                                                uint fsaa)
         : RenderTexture(target.buffer, target.zoffset)
@@ -95,10 +91,4 @@ namespace Ogre {
         mHwGamma = writeGamma;
         mFSAA = fsaa;
     }
-
-    GL3PlusRenderTexture::~GL3PlusRenderTexture()
-    {
-    }
-
-
 }

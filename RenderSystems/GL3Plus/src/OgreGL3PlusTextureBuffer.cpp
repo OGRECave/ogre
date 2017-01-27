@@ -428,7 +428,7 @@ namespace Ogre {
     }
 
 
-    void GL3PlusTextureBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
+    void GL3PlusTextureBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)
     {
         // Delegate the framebuffer binding to a more specific function
         // This call retains the original implementation using GL_FRAMEBUFFER (aka GL_DRAW_FRAMEBUFFER)
