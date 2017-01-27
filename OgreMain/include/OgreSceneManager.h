@@ -325,6 +325,8 @@ namespace Ogre {
             Real skyBoxDistance;
         };
 
+        typedef vector<MovableObject*>::type MovableObjectVec;
+
         /** Class that allows listening in on the various stages of SceneManager
             processing, so that custom behaviour can be implemented from outside.
         */
@@ -621,7 +623,6 @@ namespace Ogre {
 
         typedef vector<LightInfo>::type LightInfoList;
 
-        typedef vector<MovableObject*>::type MovableObjectVec;
         /// Simple structure to hold MovableObject map and a mutex to go with it.
         struct MovableObjectCollection
         {
@@ -1107,6 +1108,9 @@ namespace Ogre {
         virtual const String& getTypeName(void) const = 0;
 
         size_t getNumWorkerThreads() const                          { return mNumWorkerThreads; }
+
+        /// Finds all the movable objects with the type and name passed as parameters.
+        virtual MovableObjectVec findMovableObjects( const String& type, const String& name );
 
         /** Creates a camera to be managed by this scene manager.
             @remarks

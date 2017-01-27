@@ -267,6 +267,22 @@ SceneManager::~SceneManager()
     stopWorkerThreads();
 }
 //-----------------------------------------------------------------------
+SceneManager::MovableObjectVec SceneManager::findMovableObjects( const String& type, const String& name )
+{
+    MovableObjectVec objects;
+    MovableObjectIterator itor = getMovableObjectIterator( type );
+    while( itor.hasMoreElements() )
+    {
+        MovableObject* object = itor.peekNext();
+        if( object->getName() == name )
+            objects.push_back( object );
+
+        itor.moveNext();
+    }
+
+    return objects;
+}
+//-----------------------------------------------------------------------
 Camera* SceneManager::createCamera( const String &name, bool isVisible, bool forCubemapping )
 {
     if( mCamerasByName.find( name ) != mCamerasByName.end() )
