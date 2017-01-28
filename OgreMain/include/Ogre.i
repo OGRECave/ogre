@@ -278,6 +278,11 @@ ADD_REPR(ColourValue)
 %include "OgreParticleSystemManager.h"
 %include "OgreInstanceManager.h" 
 %include "OgreVertexBoneAssignment.h"
+// deprecated
+%ignore Ogre::Mesh::getSubMeshIterator;
+%ignore Ogre::Mesh::getPoseCount;
+%ignore Ogre::Mesh::getPose;
+%ignore Ogre::Mesh::getPoseIterator;
 %include "OgreMesh.h"
 %include "OgreSubMesh.h"
 %include "OgreStaticGeometry.h"

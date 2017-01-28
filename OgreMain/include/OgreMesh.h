@@ -252,12 +252,18 @@ namespace Ogre {
         ushort _getSubMeshIndex(const String& name) const;
 
         /** Gets the number of sub meshes which comprise this mesh.
+        *  @deprecated use getSubMeshes() instead
         */
-        size_t getNumSubMeshes(void) const;
+        size_t getNumSubMeshes(void) const {
+            return mSubMeshList.size();
+        }
 
         /** Gets a pointer to the submesh indicated by the index.
+        *  @deprecated use getSubMeshes() instead
         */
-        SubMesh* getSubMesh(size_t index) const;
+        SubMesh* getSubMesh(size_t index) const {
+            return mSubMeshList[index];
+        }
 
         /** Gets a SubMesh by name
         */
@@ -281,9 +287,15 @@ namespace Ogre {
         
         typedef VectorIterator<SubMeshList> SubMeshIterator;
         /// Gets an iterator over the available submeshes
-        SubMeshIterator getSubMeshIterator(void)
+        /// @deprecated use getSubMeshes() instead
+        OGRE_DEPRECATED SubMeshIterator getSubMeshIterator(void)
         { return SubMeshIterator(mSubMeshList.begin(), mSubMeshList.end()); }
       
+        /// Gets the available submeshes
+        const SubMeshList& getSubMeshes() const {
+            return mSubMeshList;
+        }
+
         /** Shared vertex data.
         @remarks
             This vertex data can be shared among multiple submeshes. SubMeshes may not have
@@ -927,10 +939,12 @@ namespace Ogre {
             A new Pose ready for population.
         */
         Pose* createPose(ushort target, const String& name = BLANKSTRING);
-        /** Get the number of poses.*/
-        size_t getPoseCount(void) const { return mPoseList.size(); }
-        /** Retrieve an existing Pose by index.*/
-        Pose* getPose(ushort index);
+        /** Get the number of poses.
+         * @deprecated use getPoseList() */
+        OGRE_DEPRECATED size_t getPoseCount(void) const { return mPoseList.size(); }
+        /** Retrieve an existing Pose by index.
+         * @deprecated use getPoseList() */
+        OGRE_DEPRECATED Pose* getPose(ushort index);
         /** Retrieve an existing Pose by name.*/
         Pose* getPose(const String& name);
         /** Destroy a pose by index.
@@ -949,10 +963,12 @@ namespace Ogre {
         typedef VectorIterator<PoseList> PoseIterator;
         typedef ConstVectorIterator<PoseList> ConstPoseIterator;
 
-        /** Get an iterator over all the poses defined. */
-        PoseIterator getPoseIterator(void);
-        /** Get an iterator over all the poses defined. */
-        ConstPoseIterator getPoseIterator(void) const;
+        /** Get an iterator over all the poses defined.
+         * @deprecated use getPoseList() */
+        OGRE_DEPRECATED PoseIterator getPoseIterator(void);
+        /** Get an iterator over all the poses defined.
+         * @deprecated use getPoseList()  */
+        OGRE_DEPRECATED ConstPoseIterator getPoseIterator(void) const;
         /** Get pose list. */
         const PoseList& getPoseList(void) const;
 

@@ -429,10 +429,9 @@ void XMLToBinary(XmlOptions opts)
                 }
             }
             // Dedicated geometry
-            Mesh::SubMeshIterator smIt = newMesh->getSubMeshIterator();
-            while (smIt.hasMoreElements())
+            for (size_t i = 0; i < newMesh->getNumSubMeshes(); i++)
             {
-                SubMesh* sm = smIt.getNext();
+                SubMesh* sm = newMesh->getSubMesh(i);
                 if (!sm->useSharedVertices)
                 {
                     const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
@@ -461,10 +460,9 @@ void XMLToBinary(XmlOptions opts)
 
         if (opts.nuextremityPoints)
         {
-            Mesh::SubMeshIterator smIt = newMesh->getSubMeshIterator();
-            while (smIt.hasMoreElements())
+            for (size_t i = 0; i < newMesh->getNumSubMeshes(); i++)
             {
-                SubMesh* sm = smIt.getNext();
+                SubMesh* sm = newMesh->getSubMesh(i);
                 sm->generateExtremes (opts.nuextremityPoints);
             }
         }

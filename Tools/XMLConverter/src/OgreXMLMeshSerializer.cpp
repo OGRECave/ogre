@@ -2124,16 +2124,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void XMLMeshSerializer::writePoses(TiXmlElement* meshNode, const Mesh* m)
     {
-        if (m->getPoseCount() == 0)
+        if (m->getPoseList().empty())
             return;
 
         TiXmlElement* posesNode = 
             meshNode->InsertEndChild(TiXmlElement("poses"))->ToElement();
 
-        Mesh::ConstPoseIterator poseIt = m->getPoseIterator();
-        while (poseIt.hasMoreElements())
+        PoseList::const_iterator it;
+        for( it = m->getPoseList().begin(); it != m->getPoseList().end(); ++it)
         {
-            const Pose* pose = poseIt.getNext();
+            const Pose* pose = *it;
             TiXmlElement* poseNode = 
                 posesNode->InsertEndChild(TiXmlElement("pose"))->ToElement();
             unsigned short target = pose->getTarget();

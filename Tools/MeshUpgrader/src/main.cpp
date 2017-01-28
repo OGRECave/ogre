@@ -495,14 +495,13 @@ void reorganiseVertexBuffers(Mesh& mesh)
         }
     }
 
-    Mesh::SubMeshIterator smIt = mesh.getSubMeshIterator();
-    unsigned short idx = 0;
-    while (smIt.hasMoreElements()) {
-        SubMesh* sm = smIt.getNext();
+    for (size_t i = 0; i < mesh.getNumSubMeshes(); i++)
+    {
+        SubMesh* sm = mesh.getSubMesh(i);
         if (!sm->useSharedVertices) {
             if (opts.interactive) {
                 StringStream str;
-                str << "SubMesh " << idx++; 
+                str << "SubMesh " << i;
                 reorganiseVertexBuffers(str.str(), mesh, sm, sm->vertexData);
             } else {
                 const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;

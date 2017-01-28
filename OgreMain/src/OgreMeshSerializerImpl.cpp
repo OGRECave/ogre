@@ -2195,13 +2195,14 @@ namespace Ogre {
     size_t MeshSerializerImpl::calcPosesSize(const Mesh* pMesh)
     {
         size_t size = 0;
-        Mesh::ConstPoseIterator poseIterator = pMesh->getPoseIterator();
-        if (poseIterator.hasMoreElements())
+
+        if (!pMesh->getPoseList().empty())
         {
             size += MSTREAM_OVERHEAD_SIZE;
-            while (poseIterator.hasMoreElements())
+            PoseList::const_iterator it;
+            for( it = pMesh->getPoseList().begin(); it != pMesh->getPoseList().end(); ++it)
             {
-                size += calcPoseSize(poseIterator.getNext());
+                size += calcPoseSize(*it);
             }
         }
         return size;
@@ -2241,14 +2242,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writePoses(const Mesh* pMesh)
     {
-        Mesh::ConstPoseIterator poseIterator = pMesh->getPoseIterator();
-        if (poseIterator.hasMoreElements())
+        if (!pMesh->getPoseList().empty())
         {
             writeChunkHeader(M_POSES, calcPosesSize(pMesh));
             pushInnerChunk(mStream);
-            while (poseIterator.hasMoreElements())
+            PoseList::const_iterator it;
+            for(it = pMesh->getPoseList().begin(); it != pMesh->getPoseList().end(); ++it)
             {
-                writePose(poseIterator.getNext());
+                writePose(*it);
             }
             popInnerChunk(mStream);
         }
