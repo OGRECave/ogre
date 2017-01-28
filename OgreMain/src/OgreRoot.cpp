@@ -500,11 +500,10 @@ namespace Ogre {
             }
         }
 
-        ConfigFile::SectionIterator iSection = cfg.getSectionIterator();
-        while (iSection.hasMoreElements())
-        {
-            const String& renderSystem = iSection.peekNextKey();
-            const ConfigFile::SettingsMultiMap& settings = *iSection.getNext();
+        ConfigFile::SettingsBySection_::const_iterator seci;
+        for(seci = cfg.getSettingsBySection().begin(); seci != cfg.getSettingsBySection().end(); ++seci) {
+            const ConfigFile::SettingsMultiMap& settings = seci->second;
+            const String& renderSystem = seci->first;
 
             RenderSystem* rs = getRenderSystemByName(renderSystem);
             if (!rs)
@@ -683,12 +682,12 @@ namespace Ogre {
 
             // Capabilities Database setting must be in the same format as
             // resources.cfg in Ogre examples.
-            ConfigFile::SettingsIterator iter = cfg.getSettingsIterator("Capabilities Database");
-            while(iter.hasMoreElements())
+            const ConfigFile::SettingsMultiMap& dbs = cfg.getSettings("Capabilities Database");
+            for(ConfigFile::SettingsMultiMap::const_iterator it = dbs.begin(); it != dbs.end(); ++it)
             {
-                String archType = iter.peekNextKey();
+                const String& archType = it->first;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                String filename = iter.getNext();
+                String filename = it->second;
 
                 // Only adjust relative directories
                 if (!StringUtil::startsWith(filename, "/", false))
@@ -697,7 +696,7 @@ namespace Ogre {
                     filename = String(macBundlePath() + "/Contents/Resources/" + filename);
                 }
 #else
-                String filename = iter.getNext();
+                String filename = it->second;
 #endif
 
                 rscManager.parseCapabilitiesFromArchive(filename, archType, true);

@@ -75,15 +75,13 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
         cf.loadFromResourceSystem(filename, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "\t;=", true);
 
         // Go through all sections & controls in the file
-        Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
-
         Ogre::String secName, typeName, materialName, dataString;
 
-        while (seci.hasMoreElements())
-        {
-            secName = seci.peekNextKey();
-            Ogre::ConfigFile::SettingsMultiMap* settings = seci.getNext();
-            if (!secName.empty() && settings)
+        Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
+        for(seci = cf.getSettingsBySection().begin(); seci != cf.getSettingsBySection().end(); ++seci) {
+            secName = seci->first;
+            const Ogre::ConfigFile::SettingsMultiMap& settings = seci->second;
+            if (!secName.empty())
             {
                 materialName = cf.getSetting("material", secName);
                 
@@ -100,9 +98,9 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
 
                 size_t idx = controlsContainer.size() - 1;
 
-                Ogre::ConfigFile::SettingsMultiMap::iterator i;
+                Ogre::ConfigFile::SettingsMultiMap::const_iterator i;
 
-                for (i = settings->begin(); i != settings->end(); ++i)
+                for (i = settings.begin(); i != settings.end(); ++i)
                 {
                     typeName = i->first;
                     dataString = i->second;

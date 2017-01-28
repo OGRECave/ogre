@@ -512,8 +512,6 @@ void ApplicationContext::locateResources()
 #   else
     cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
 #   endif
-    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
-    Ogre::String sec, type, arch;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     Ogre::String bundle = Ogre::macBundlePath();
@@ -522,15 +520,16 @@ void ApplicationContext::locateResources()
     Ogre::String bundle(env_SNAP ? env_SNAP : "");
 #endif
 
+    Ogre::String sec, type, arch;
     // go through all specified resource groups
-    while (seci.hasMoreElements())
-    {
-        sec = seci.peekNextKey();
-        Ogre::ConfigFile::SettingsMultiMap* settings = seci.getNext();
-        Ogre::ConfigFile::SettingsMultiMap::iterator i;
+    Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
+    for(seci = cf.getSettingsBySection().begin(); seci != cf.getSettingsBySection().end(); ++seci) {
+        sec = seci->first;
+        const Ogre::ConfigFile::SettingsMultiMap& settings = seci->second;
+        Ogre::ConfigFile::SettingsMultiMap::const_iterator i;
 
         // go through all resource paths
-        for (i = settings->begin(); i != settings->end(); i++)
+        for (i = settings.begin(); i != settings.end(); i++)
         {
             type = i->first;
             arch = i->second;

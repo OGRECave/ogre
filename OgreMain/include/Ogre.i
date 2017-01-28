@@ -109,14 +109,10 @@
 %include "OgreMath.h"
 ADD_REPR(Degree)
 ADD_REPR(Radian)
-//%include "OgreStringVector.h"
-// the original definitions confuses SWIG by typedeffing to std inside a struct
-namespace Ogre {
-typedef std::vector<std::string> StringVector;
-typedef Ogre::SharedPtr<StringVector> StringVectorPtr;
-}
+%include "OgreStringVector.h"
+%template(_StringVector) Ogre::vector<Ogre::String>;
 %template(StringVector) std::vector<Ogre::String>;
-%template(StringVectorPtr) Ogre::SharedPtr<std::vector<std::string> >;
+%template(StringVectorPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
 // Linear Algebra
 %include "OgreVector2.h"
 ADD_REPR(Vector2)
@@ -142,6 +138,12 @@ ADD_REPR(Plane)
 // I/O
 %include "OgreConfigOptionMap.h"
 %ignore Ogre::ConfigFile::load; // conflicting overloads
+%ignore Ogre::ConfigFile::getSettingsIterator; // deprecated
+%ignore Ogre::ConfigFile::getSectionIterator;
+%template(_SettingsBySection) Ogre::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
+%template(SettingsBySection) std::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
+%template(_SettingsMultiMap) Ogre::multimap<Ogre::String, Ogre::String>;
+%template(SettingsMultiMap) std::multimap<Ogre::String, Ogre::String>;
 %include "OgreConfigFile.h"
 %feature("valuewrapper") Ogre::Log::Stream;
 %include "OgreLog.h"

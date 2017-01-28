@@ -40,24 +40,10 @@ namespace Ogre {
     {
     }
     //-----------------------------------------------------------------------
-    ConfigFile::~ConfigFile()
-    {
-        SettingsBySection::iterator seci, secend;
-        secend = mSettings.end();
-        for (seci = mSettings.begin(); seci != secend; ++seci)
-        {
-            OGRE_DELETE_T(seci->second, SettingsMultiMap, MEMCATEGORY_GENERAL);
-        }
-    }
-    //-----------------------------------------------------------------------
     void ConfigFile::clear(void)
     {
-        for (SettingsBySection::iterator seci = mSettings.begin(); 
-            seci != mSettings.end(); ++seci)
-        {
-             OGRE_DELETE_T(seci->second, SettingsMultiMap, MEMCATEGORY_GENERAL);
-        }
         mSettings.clear();
+        mSettingsPtr.clear();
     }
     //-----------------------------------------------------------------------
     void ConfigFile::load(const String& filename, const String& separators, bool trimWhitespace)
@@ -109,8 +95,8 @@ namespace Ogre {
         clear();
 
         String currentSection = BLANKSTRING;
-        SettingsMultiMap* currentSettings = OGRE_NEW_T(SettingsMultiMap, MEMCATEGORY_GENERAL)();
-        mSettings[currentSection] = currentSettings;
+        SettingsMultiMap* currentSettings = &mSettings[currentSection];
+        mSettingsPtr[currentSection] = currentSettings;
 
 
         /* Process the file line for line */
@@ -125,16 +111,8 @@ namespace Ogre {
                 {
                     // Section
                     currentSection = line.substr(1, line.length() - 2);
-                    SettingsBySection::const_iterator seci = mSettings.find(currentSection);
-                    if (seci == mSettings.end())
-                    {
-                        currentSettings = OGRE_NEW_T(SettingsMultiMap, MEMCATEGORY_GENERAL)();
-                        mSettings[currentSection] = currentSettings;
-                    }
-                    else
-                    {
-                        currentSettings = seci->second;
-                    } 
+                    currentSettings = &mSettings[currentSection];
+                    mSettingsPtr[currentSection] = currentSettings;
                 }
                 else
                 {
@@ -163,15 +141,15 @@ namespace Ogre {
     String ConfigFile::getSetting(const String& key, const String& section, const String& defaultValue) const
     {
         
-        SettingsBySection::const_iterator seci = mSettings.find(section);
+        SettingsBySection_::const_iterator seci = mSettings.find(section);
         if (seci == mSettings.end())
         {
             return defaultValue;
         }
         else
         {
-            SettingsMultiMap::const_iterator i = seci->second->find(key);
-            if (i == seci->second->end())
+            SettingsMultiMap::const_iterator i = seci->second.find(key);
+            if (i == seci->second.end())
             {
                 return defaultValue;
             }
@@ -181,20 +159,20 @@ namespace Ogre {
             }
         }
     }
+
     //-----------------------------------------------------------------------
     StringVector ConfigFile::getMultiSetting(const String& key, const String& section) const
     {
         StringVector ret;
 
-
-        SettingsBySection::const_iterator seci = mSettings.find(section);
+        SettingsBySection_::const_iterator seci = mSettings.find(section);
         if (seci != mSettings.end())
         {
             SettingsMultiMap::const_iterator i;
 
-            i = seci->second->find(key);
+            i = seci->second.find(key);
             // Iterate over matches
-            while (i != seci->second->end() && i->first == key)
+            while (i != seci->second.end() && i->first == key)
             {
                 ret.push_back(i->second);
                 ++i;
@@ -207,22 +185,33 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ConfigFile::SettingsIterator ConfigFile::getSettingsIterator(const String& section)
     {
-        SettingsBySection::const_iterator seci = mSettings.find(section);
+        SettingsBySection_::iterator seci = mSettings.find(section);
         if (seci == mSettings.end())
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
                 "Cannot find section " + section, 
                 "ConfigFile::getSettingsIterator");
         }
-        else
+
+        return SettingsIterator(seci->second.begin(), seci->second.end());
+    }
+    //-----------------------------------------------------------------------
+    const ConfigFile::SettingsMultiMap& ConfigFile::getSettings(const String& section) const
+    {
+        SettingsBySection_::const_iterator seci = mSettings.find(section);
+        if (seci == mSettings.end())
         {
-            return SettingsIterator(seci->second->begin(), seci->second->end());
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find section " + section, 
+                "ConfigFile::getSettings");
         }
+
+        return seci->second;
     }
     //-----------------------------------------------------------------------
     ConfigFile::SectionIterator ConfigFile::getSectionIterator(void)
     {
-        return SectionIterator(mSettings.begin(), mSettings.end());
+        return SectionIterator(mSettingsPtr.begin(), mSettingsPtr.end());
     }
 
 }

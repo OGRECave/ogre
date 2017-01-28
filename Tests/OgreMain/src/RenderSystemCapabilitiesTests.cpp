@@ -56,7 +56,7 @@ void RenderSystemCapabilitiesTests::SetUp()
 
     Ogre::ConfigFile cf;
     cf.load(Ogre::FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
-    Ogre::String testPath = cf.getSettingsIterator("Tests").getNext()+"/CustomCapabilities";
+    Ogre::String testPath = cf.getSettings("Tests").begin()->second+"/CustomCapabilities";
 
     // Actual parsing happens here. The following test methods confirm parse results only.
     mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive(testPath, "FileSystem", true);
