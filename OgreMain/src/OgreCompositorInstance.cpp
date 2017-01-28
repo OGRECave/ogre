@@ -378,7 +378,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
                 break;
             }
             srcmat->load();
-            if(srcmat->getNumSupportedTechniques()==0)  
+            if(srcmat->getSupportedTechniques().empty())
             {
                 /// No supported techniques -- warn user
                 LogManager::getSingleton().logMessage("Warning in compilation of Compositor "

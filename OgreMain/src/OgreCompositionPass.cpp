@@ -340,7 +340,7 @@ bool CompositionPass::_isSupported(void)
         }
 
         mMaterial->compile();
-        if (mMaterial->getNumSupportedTechniques() == 0)
+        if (mMaterial->getSupportedTechniques().empty())
         {
             return false;
         }

@@ -1973,10 +1973,10 @@ void SceneManager::_setSkyBox(
                 // Make sure the material doesn't update the depth buffer
                 boxMat->setDepthWriteEnabled(false);
                 // Set active frame
-                Material::TechniqueIterator ti = boxMat->getSupportedTechniqueIterator();
-                while (ti.hasMoreElements())
+                Material::Techniques::const_iterator it;
+                for(it = boxMat->getSupportedTechniques().begin(); it != boxMat->getSupportedTechniques().end(); ++it)
                 {
-                    Technique* tech = ti.getNext();
+                    Technique* tech = *it;
                     if (tech->getPass(0)->getNumTextureUnitStates() > 0)
                     {
                         TextureUnitState* t = tech->getPass(0)->getTextureUnitState(0);

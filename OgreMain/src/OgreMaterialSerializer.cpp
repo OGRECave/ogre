@@ -2484,12 +2484,11 @@ namespace Ogre
                 // figure out technique index by iterating through technique container
                 // would be nice if each technique remembered its index
                 int count = 0;
-                Material::TechniqueIterator i = context.material->getTechniqueIterator();
-                while(i.hasMoreElements())
+                Material::Techniques::const_iterator it;
+                for(it = context.material->getTechniques().begin(); it != context.material->getTechniques().end(); ++it)
                 {
-                    if (foundTechnique == i.peekNext())
+                    if (foundTechnique == *it)
                         break;
-                    i.moveNext();
                     ++count;
                 }
 
@@ -3803,15 +3802,15 @@ namespace Ogre
             fireMaterialEvent(MSE_WRITE_BEGIN, skipWriting, pMat.get());
 
             // Write LOD information
-            Material::LodValueIterator valueIt = pMat->getUserLodValueIterator();
+            Material::LodValueList::const_iterator valueIt = pMat->getUserLodValues().begin();
             // Skip zero value
-            if (valueIt.hasMoreElements())
-                valueIt.getNext();
+            if (!pMat->getUserLodValues().empty())
+                valueIt++;
             String attributeVal;
-            while (valueIt.hasMoreElements())
+            while (valueIt != pMat->getUserLodValues().end())
             {
-                attributeVal.append(StringConverter::toString(valueIt.getNext()));
-                if (valueIt.hasMoreElements())
+                attributeVal.append(StringConverter::toString(*valueIt++));
+                if (valueIt != pMat->getUserLodValues().end())
                     attributeVal.append(" ");
             }
             if (!attributeVal.empty())
@@ -3838,10 +3837,10 @@ namespace Ogre
             }
 
             // Iterate over techniques
-            Material::TechniqueIterator it = pMat->getTechniqueIterator();
-            while (it.hasMoreElements())
+            Material::Techniques::const_iterator it;
+            for(it = pMat->getTechniques().begin(); it != pMat->getTechniques().end(); ++it)
             {
-                writeTechnique(it.getNext());
+                writeTechnique(*it);
                 mBuffer += "\n";
             }
 

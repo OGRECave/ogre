@@ -242,6 +242,12 @@ ADD_REPR(ColourValue)
 %include "OgreSkeletonManager.h"
 %include "OgreRenderQueue.h"
 %include "OgreRenderOperation.h"
+%ignore Ogre::Material::getLodValueIterator;
+%ignore Ogre::Material::getUserLodValueIterator;
+%ignore Ogre::Material::getSupportedTechniqueIterator;
+%ignore Ogre::Material::getTechniqueIterator;
+%ignore Ogre::Material::getSupportedTechnique;
+%ignore Ogre::Material::getNumSupportedTechniques;
 %include "OgreMaterial.h"
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"

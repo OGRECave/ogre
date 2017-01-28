@@ -1031,13 +1031,12 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
                 const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable)
  {
      MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
-     Material::TechniqueIterator itMatTechniques = mat->getTechniqueIterator();
-     
 
      // Find the source technique and make sure it is not programmable.
-     while (itMatTechniques.hasMoreElements())
+     Material::Techniques::const_iterator it;
+     for(it = mat->getTechniques().begin(); it != mat->getTechniques().end(); ++it)
      {
-         Technique* curTechnique = itMatTechniques.getNext();
+         Technique *curTechnique = *it;
 
          if (curTechnique->getSchemeName() == srcTechniqueSchemeName && (allowProgrammable || !isProgrammable(curTechnique)))
          {

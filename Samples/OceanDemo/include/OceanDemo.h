@@ -332,9 +332,9 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
     sprintf(pageText, "Parameters %zu / %zu", mCurrentPage+1, mNumPages);
     static_cast<OgreBites::Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
 
-    if(!mActiveMaterial.isNull() && mActiveMaterial->getNumSupportedTechniques())
+    if(!mActiveMaterial.isNull() && !mActiveMaterial->getSupportedTechniques().empty())
     {
-        Ogre::Technique* currentTechnique = mActiveMaterial->getSupportedTechnique(0);
+        Ogre::Technique* currentTechnique = mActiveMaterial->getSupportedTechniques().front();
         if(currentTechnique)
         {
             mActivePass = currentTechnique->getPass(0);
