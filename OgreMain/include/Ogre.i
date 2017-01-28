@@ -80,6 +80,10 @@
 %rename(__getitem__) *::operator[];
 %ignore Ogre::Matrix3::operator[];
 %ignore Ogre::Matrix4::operator[];
+%ignore Ogre::ColourValue::operator[];
+
+// stringinterface internal
+%rename("$ignore", regextarget=1) "^Cmd+";
 
 /* these are ordered by dependancy */
 %include "OgreBuildSettings.h"
