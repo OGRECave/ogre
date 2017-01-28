@@ -1155,8 +1155,6 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
 
         // Texture unit settings
-
-        Pass::ConstTextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
         size_t unit = 0;
         // Reset the shadow texture index for each pass
         size_t startLightIndex = pass->getStartLight();
@@ -1164,9 +1162,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         size_t shadowTexIndex = mShadowTextures.size();
         if (mShadowTextureIndexLightList.size() > startLightIndex)
             shadowTexIndex = mShadowTextureIndexLightList[startLightIndex];
-        while(texIter.hasMoreElements())
+        Pass::TextureUnitStates::const_iterator it;
+        for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
         {
-            TextureUnitState* pTex = texIter.getNext();
+            TextureUnitState* pTex = *it;
             if (!pass->getIteratePerLight() && 
                 isShadowTechniqueTextureBased() && 
                 pTex->getContentType() == TextureUnitState::CONTENT_SHADOW)
@@ -3243,11 +3242,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         }
 
         // Reissue any texture gen settings which are dependent on view matrix
-        Pass::ConstTextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
         size_t unit = 0;
-        while(texIter.hasMoreElements())
+        Pass::TextureUnitStates::const_iterator it;
+        for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
         {
-            TextureUnitState* pTex = texIter.getNext();
+            TextureUnitState* pTex = *it;
             if (pTex->hasViewRelativeTextureCoordinateGeneration())
             {
                 mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);

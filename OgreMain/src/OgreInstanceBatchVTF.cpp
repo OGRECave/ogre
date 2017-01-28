@@ -215,14 +215,11 @@ namespace Ogre
 
             while( passItor.hasMoreElements() )
             {
-                bool bTexUnitFound = false;
-
                 Pass *pass = passItor.getNext();
-                Pass::TextureUnitStateIterator texUnitItor = pass->getTextureUnitStateIterator();
-
-                while( texUnitItor.hasMoreElements() && !bTexUnitFound )
+                Pass::TextureUnitStates::const_iterator it;
+                for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
                 {
-                    TextureUnitState *texUnit = texUnitItor.getNext();
+                    TextureUnitState *texUnit = *it;
 
                     if( texUnit->getName() == "InstancingVTF" )
                     {

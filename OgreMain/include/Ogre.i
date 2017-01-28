@@ -289,6 +289,7 @@ ADD_REPR(ColourValue)
 %include "OgrePatchSurface.h"
     %include "OgrePatchMesh.h"
 %include "OgreMeshManager.h"
+%ignore Ogre::Pass::getTextureUnitStateIterator;
 %include "OgrePass.h"
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);

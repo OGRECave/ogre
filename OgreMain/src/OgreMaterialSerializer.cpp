@@ -4455,10 +4455,10 @@ namespace Ogre
             }
 
             // Nested texture layers
-            Pass::TextureUnitStateIterator it = const_cast<Pass*>(pPass)->getTextureUnitStateIterator();
-            while(it.hasMoreElements())
+            Pass::TextureUnitStates::const_iterator it;
+            for(it = pPass->getTextureUnitStates().begin(); it != pPass->getTextureUnitStates().end(); ++it)
             {
-                writeTextureUnit(it.getNext());
+                writeTextureUnit(*it);
             }
 
             // Fire write end event.
