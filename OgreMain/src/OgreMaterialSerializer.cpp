@@ -3904,10 +3904,10 @@ namespace Ogre
                 writeValue(quoteWord(pTech->getShadowReceiverMaterial()->getName()));
             }
             // GPU vendor rules
-            Technique::GPUVendorRuleIterator vrit = pTech->getGPUVendorRuleIterator();
-            while (vrit.hasMoreElements())
+            Technique::GPUVendorRuleList::const_iterator vrit;
+            for (vrit = pTech->getGPUVendorRules().begin(); vrit != pTech->getGPUVendorRules().end(); ++vrit)
             {
-                const Technique::GPUVendorRule& rule = vrit.getNext();
+                const Technique::GPUVendorRule& rule = *vrit;
                 writeAttribute(2, "gpu_vendor_rule");
                 if (rule.includeOrExclude == Technique::INCLUDE)
                     writeValue("include");
@@ -3916,10 +3916,10 @@ namespace Ogre
                 writeValue(quoteWord(RenderSystemCapabilities::vendorToString(rule.vendor)));
             }
             // GPU device rules
-            Technique::GPUDeviceNameRuleIterator dnit = pTech->getGPUDeviceNameRuleIterator();
-            while (dnit.hasMoreElements())
+            Technique::GPUDeviceNameRuleList::const_iterator dnit;
+            for (dnit = pTech->getGPUDeviceNameRules().begin(); dnit != pTech->getGPUDeviceNameRules().end(); ++dnit)
             {
-                const Technique::GPUDeviceNameRule& rule = dnit.getNext();
+                const Technique::GPUDeviceNameRule& rule = *dnit;
                 writeAttribute(2, "gpu_device_rule");
                 if (rule.includeOrExclude == Technique::INCLUDE)
                     writeValue("include");
@@ -3929,10 +3929,10 @@ namespace Ogre
                 writeValue(StringConverter::toString(rule.caseSensitive));
             }
             // Iterate over passes
-            Technique::PassIterator it = const_cast<Technique*>(pTech)->getPassIterator();
-            while (it.hasMoreElements())
+            Technique::Passes::const_iterator i;
+            for(i = pTech->getPasses().begin(); i != pTech->getPasses().end(); ++i)
             {
-                writePass(it.getNext());
+                writePass(*i);
                 mBuffer += "\n";
             }
 

@@ -245,11 +245,11 @@ public:
         }
 
         // Queue passes from mat
-        Technique::PassIterator i = technique->getPassIterator();
-        while(i.hasMoreElements())
+        Technique::Passes::const_iterator i;
+        for(i = technique->getPasses().begin(); i != technique->getPasses().end(); ++i)
         {
             sm->_injectRenderWithPass(
-                i.getNext(), 
+                *i,
                 rect,
                 false // don't allow replacement of shadow passes
                 );
@@ -389,10 +389,10 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
             /// Create local material
             MaterialPtr localMat = createLocalMaterial(srcmat->getName());
             /// Copy and adapt passes from source material
-            Technique::PassIterator i = srctech->getPassIterator();
-            while(i.hasMoreElements())
+            Technique::Passes::const_iterator i;
+            for(i = srctech->getPasses().begin(); i != srctech->getPasses().end(); ++i)
             {
-                Pass *srcpass = i.getNext();
+                Pass *srcpass = *i;
                 /// Create new target pass
                 targetpass = localMat->getTechnique(0)->createPass();
                 (*targetpass) = (*srcpass);

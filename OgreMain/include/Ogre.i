@@ -291,6 +291,10 @@ ADD_REPR(ColourValue)
 %include "OgreMeshManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator;
 %include "OgrePass.h"
+    %ignore Ogre::Technique::getGPUVendorRuleIterator;
+    %ignore Ogre::Technique::getGPUDeviceNameRuleIterator;
+    %ignore Ogre::Technique::getIlluminationPassIterator;
+    %ignore Ogre::Technique::getPassIterator();
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&, FrameBuffer); // deprecated

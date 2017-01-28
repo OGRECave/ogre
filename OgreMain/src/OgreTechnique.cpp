@@ -1179,8 +1179,8 @@ namespace Ogre {
         mIlluminationPasses.clear();
     }
     //-----------------------------------------------------------------------
-    const Technique::IlluminationPassIterator
-    Technique::getIlluminationPassIterator(void)
+    const IlluminationPassList&
+    Technique::getIlluminationPasses(void)
     {
         IlluminationPassesState targetState = IPS_COMPILED;
         if(mIlluminationPassesCompilationPhase != targetState
@@ -1197,8 +1197,7 @@ namespace Ogre {
             mIlluminationPassesCompilationPhase = targetState;
         }
 
-        return IlluminationPassIterator(mIlluminationPasses.begin(),
-            mIlluminationPasses.end());
+        return mIlluminationPasses;
     }
     //-----------------------------------------------------------------------
     const String& Technique::getResourceGroup(void) const

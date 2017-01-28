@@ -211,11 +211,10 @@ namespace Ogre
         while( techItor.hasMoreElements() )
         {
             Technique *technique = techItor.getNext();
-            Technique::PassIterator passItor = technique->getPassIterator();
-
-            while( passItor.hasMoreElements() )
+            Technique::Passes::const_iterator i;
+            for(i = technique->getPasses().begin(); i != technique->getPasses().end(); ++i)
             {
-                Pass *pass = passItor.getNext();
+                Pass *pass = *i;
                 Pass::TextureUnitStates::const_iterator it;
                 for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
                 {
