@@ -85,7 +85,7 @@ namespace Ogre {
         
         typedef set<Entity*>::type EntitySet;
         typedef map<unsigned short, bool>::type SchemeHardwareAnimMap;
-
+        typedef vector<SubEntity*>::type SubEntityList;
     protected:
 
         /** Private constructor (instances cannot be created directly).
@@ -101,7 +101,6 @@ namespace Ogre {
 
         /** List of SubEntities (point to SubMeshes).
         */
-        typedef vector<SubEntity*>::type SubEntityList;
         SubEntityList mSubEntityList;
 
 
@@ -365,6 +364,7 @@ namespace Ogre {
         const MeshPtr& getMesh(void) const;
 
         /** Gets a pointer to a SubEntity, ie a part of an Entity.
+         @deprecated use getSubEntities()
         */
         SubEntity* getSubEntity(unsigned int index) const;
 
@@ -375,8 +375,15 @@ namespace Ogre {
         SubEntity* getSubEntity( const String& name ) const;
 
         /** Retrieves the number of SubEntity objects making up this entity.
+        * @deprecated use getSubEntities()
         */
         unsigned int getNumSubEntities(void) const;
+
+        /** Retrieves SubEntity objects making up this entity.
+        */
+        const SubEntityList& getSubEntities() const {
+            return mSubEntityList;
+        }
 
         /** Clones this entity and returns a pointer to the clone.
         @remarks
