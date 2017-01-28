@@ -254,12 +254,16 @@ namespace Ogre {
         /** This returns a OverlayElement at position x,y. */
         virtual OverlayElement* findElementAt(Real x, Real y);
 
-        /** Returns an iterator over all 2D elements in this manager.
-        @remarks
-            VectorIterator is actually a too generic name, since it also works for lists.
+        /** Returns all 2D elements in this manager.
         */
+        const OverlayContainerList& get2DElements() const {
+            return m2DElements;
+        }
+
         typedef VectorIterator<OverlayContainerList> Overlay2DElementsIterator ;
-        Overlay2DElementsIterator get2DElementsIterator ()
+
+        /// @deprecated use get2DElements()
+        OGRE_DEPRECATED Overlay2DElementsIterator get2DElementsIterator ()
         {
             return Overlay2DElementsIterator (m2DElements.begin(), m2DElements.end());
         }

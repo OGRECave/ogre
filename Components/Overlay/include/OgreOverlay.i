@@ -26,6 +26,7 @@
 %include "OgreOverlayPrerequisites.h"
 %include "OgreFont.h"
 %include "OgreFontManager.h"
+%ignore Ogre::Overlay::get2DElementsIterator;
 %include "OgreOverlay.h"
 %include "OgreOverlayElement.h"
 %include "OgreOverlayElementFactory.h"
