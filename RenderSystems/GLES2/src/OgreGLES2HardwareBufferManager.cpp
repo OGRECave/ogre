@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreGLES2VertexDeclaration.h"
 #include "OgreGLES2RenderToVertexBuffer.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLES2Support.h"
 #include "OgreGLUtil.h"
 #include "OgreRoot.h"
 
@@ -42,7 +41,6 @@ namespace Ogre {
     GLES2HardwareBufferManagerBase::GLES2HardwareBufferManagerBase()
     {
         mGLSupport = getGLES2SupportRef();
-        mStateCacheManager = mGLSupport->getStateCacheManager();
     }
 
     GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()

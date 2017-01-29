@@ -35,8 +35,6 @@ typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
 
 namespace Ogre
 {
-    class GLES2StateCacheManagerImp;
-
     /** An in memory cache of the OpenGL ES state.
      @remarks
      State changes can be particularly expensive time wise. This is because
@@ -53,8 +51,65 @@ namespace Ogre
     class _OgreGLES2Export GLES2StateCacheManager : public StateCacheAlloc
     {
     private:
-        GLES2StateCacheManagerImp* mImp;
+        typedef OGRE_HashMap<GLenum, GLuint> BindBufferMap;
+        typedef OGRE_HashMap<GLenum, GLint> TexParameteriMap;
+        typedef OGRE_HashMap<GLenum, GLfloat> TexParameterfMap;
 
+        struct TextureUnitParams
+        {
+            ~TextureUnitParams()
+            {
+                mTexParameteriMap.clear();
+                mTexParameterfMap.clear();
+            }
+
+            TexParameteriMap mTexParameteriMap;
+            TexParameterfMap mTexParameterfMap;
+        };
+
+        typedef OGRE_HashMap<GLuint, TextureUnitParams> TexUnitsMap;
+
+        /* These variables are used for caching OpenGL state.
+         They are cached because state changes can be quite expensive,
+         which is especially important on mobile or embedded systems.
+         */
+
+        /// A map of different buffer types and the currently bound buffer for each type
+        BindBufferMap mActiveBufferMap;
+        /// A map of texture parameters for each texture unit
+        TexUnitsMap mTexUnitsMap;
+        /// Array of each OpenGL feature that is enabled i.e. blending, depth test, etc.
+        vector<GLenum>::type mEnableVector;
+        /// Stores the current clear colour
+        vector<GLclampf>::type mClearColour;
+        /// Stores the current colour write mask
+        vector<GLboolean>::type mColourMask;
+        /// Stores the currently enabled vertex attributes
+        vector<GLuint>::type mEnabledVertexAttribs;
+        /// Stores the current depth write mask
+        GLboolean mDepthMask;
+        /// Stores the current polygon rendering mode
+        GLenum mPolygonMode;
+        /// Stores the current blend equation
+        GLenum mBlendEquation;
+        /// Stores the current blend source function
+        GLenum mBlendFuncSource;
+        /// Stores the current blend destination function
+        GLenum mBlendFuncDest;
+        /// Stores the current face culling setting
+        GLenum mCullFace;
+        /// Stores the current depth test function
+        GLenum mDepthFunc;
+        /// Stores the current stencil mask
+        GLuint mStencilMask;
+        /// Stores the last bound texture id
+        GLuint mLastBoundTexID;
+        /// Stores the currently active texture unit
+        GLenum mActiveTextureUnit;
+        /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
+        unsigned int mDiscardBuffers;
+        /// Stores the current depth clearing colour
+        GLclampf mClearDepth;
     public:
         GLES2StateCacheManager(void);
         ~GLES2StateCacheManager(void);
@@ -123,7 +178,7 @@ namespace Ogre
         /** Gets the current blend equation setting.
          @return The blend equation.
          */
-        GLenum getBlendEquation(void) const;
+        GLenum getBlendEquation(void) const { return mBlendEquation; }
 
         /** Sets the current blend equation setting.
          @param eq The blend equation to use.
@@ -139,7 +194,7 @@ namespace Ogre
         /** Gets the current depth mask setting.
          @return The current depth mask.
          */
-        GLboolean getDepthMask(void) const;
+        GLboolean getDepthMask(void) const { return mDepthMask; }
 
         /** Sets the current depth mask setting.
          @param mask The depth mask to use.
@@ -149,7 +204,7 @@ namespace Ogre
         /** Gets the current depth test function.
          @return The current depth test function.
          */
-        GLenum getDepthFunc(void) const;
+        GLenum getDepthFunc(void) const { return mDepthFunc; }
 
         /** Sets the current depth test function.
          @param func The depth test function to use.
@@ -159,7 +214,7 @@ namespace Ogre
         /** Gets the clear depth in the range from [0..1].
          @return The current clearing depth.
          */
-        GLclampf getClearDepth(void) const;
+        GLclampf getClearDepth(void) const { return mDepthFunc; }
 
         /** Sets the clear depth in the range from [0..1].
          @param depth The clear depth to use.
@@ -177,7 +232,7 @@ namespace Ogre
         /** Gets the current colour mask setting.
          @return An array containing the mask in RGBA order.
          */
-        vector<GLboolean>::type & getColourMask(void) const;
+        vector<GLboolean>::type & getColourMask(void) { return mColourMask; }
 
         /** Sets the current colour mask.
          @param red The red component.
@@ -190,7 +245,7 @@ namespace Ogre
         /** Gets the current stencil mask.
          @return The stencil mask.
          */
-        GLuint getStencilMask(void) const;
+        GLuint getStencilMask(void) const { return mStencilMask; }
 
         /** Sets the stencil mask.
          @param mask The stencil mask to use
@@ -220,27 +275,27 @@ namespace Ogre
         /** Gets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
          @return The buffer mask.
          */
-        unsigned int getDiscardBuffers(void) const;
+        unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }
 
         /** Sets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
          @param flags The bit mask of buffers to be discarded. Stored as Ogre::FrameBufferType.
          */
-        void setDiscardBuffers(unsigned int flags);
+        void setDiscardBuffers(unsigned int flags) { mDiscardBuffers = flags; }
 
         /** Gets the current polygon rendering mode, fill, wireframe, points, etc.
          @return The current polygon rendering mode.
          */
-        GLenum getPolygonMode(void) const;
+        GLenum getPolygonMode(void) const { return mPolygonMode; }
 
         /** Sets the current polygon rendering mode.
          @param mode The polygon mode to use.
          */
-        void setPolygonMode(GLenum mode);
+        void setPolygonMode(GLenum mode) { mPolygonMode = mode; }
 
         /** Sets the face culling mode.
          @return The current face culling mode
          */
-        GLenum getCullFace(void) const;
+        GLenum getCullFace(void) const { return mCullFace; }
 
         /** Sets the face culling setting.
          @param face The face culling mode to use.

@@ -27,23 +27,23 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLES2NullUniformCacheImp.h"
+#include "OgreGLES2UniformCache.h"
 
 namespace Ogre {
     
-    GLES2UniformCacheImp::GLES2UniformCacheImp(void)
+    GLES2UniformCache::GLES2UniformCache(void)
     {
     }
 
-    void GLES2UniformCacheImp::clearCache()
+    void GLES2UniformCache::clearCache()
     {
     }
 
-    GLES2UniformCacheImp::~GLES2UniformCacheImp(void)
+    GLES2UniformCache::~GLES2UniformCache(void)
     {
     }
 
-    bool GLES2UniformCacheImp::updateUniform(GLint location, const void *value, GLsizei length)
+    bool GLES2UniformCache::updateUniform(GLint location, const void *value, GLsizei length)
     {
         return true;
     }

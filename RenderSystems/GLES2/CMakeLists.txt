@@ -37,19 +37,11 @@ file(GLOB KHR_HEADERS "include/KHR/*.h")
 
 include_directories(src/StateCacheManager)
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
-  list(APPEND STATECACHE_HEADERS
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2UniformCacheImp.h
-  )
   list(APPEND SOURCE_FILES
       ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2UniformCacheImp.cpp
   )
 else()
-  list(APPEND STATECACHE_HEADERS
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullUniformCacheImp.h
-  )
   list(APPEND SOURCE_FILES
       ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullUniformCacheImp.cpp
@@ -91,7 +83,7 @@ include_directories(
   ${OPENGLES3_INCLUDE_DIR} ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
 )
 
-ogre_add_library_to_folder(RenderSystems RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${STATECACHE_HEADERS} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} SEPARATE ${GLSLES_FILES})
+ogre_add_library_to_folder(RenderSystems RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} SEPARATE ${GLSLES_FILES})
 target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES3_LIBRARIES} ${OPENGLES2_LIBRARIES} ${GLSUPPORT_LIBS})
 
 if (NOT OGRE_STATIC)
@@ -109,5 +101,4 @@ ogre_config_plugin(RenderSystem_GLES2)
 install(FILES ${HEADER_FILES} ${GLSUPPORT_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2)
 install(FILES ${GLESW_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/${GLESW_HEADER_INSTALL})
 install(FILES ${KHR_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/KHR)
-install(FILES ${STATECACHE_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/StateCacheManager)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include/ DESTINATION include/OGRE/RenderSystems/GLES2/GLSLES)

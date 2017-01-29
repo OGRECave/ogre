@@ -28,26 +28,26 @@
 
 #include "OgreStableHeaders.h"
 #include "OgreCommon.h"
-#include "OgreGLES2UniformCacheImp.h"
+#include "OgreGLES2UniformCache.h"
 
 namespace Ogre {
     
-    GLES2UniformCacheImp::GLES2UniformCacheImp(void)
+    GLES2UniformCache::GLES2UniformCache(void)
     {
         clearCache();
     }
     
-    void GLES2UniformCacheImp::clearCache()
+    void GLES2UniformCache::clearCache()
     {
         mUniformValueMap.clear();
     }
     
-    GLES2UniformCacheImp::~GLES2UniformCacheImp(void)
+    GLES2UniformCache::~GLES2UniformCache(void)
     {
         mUniformValueMap.clear();
     }
     
-    bool GLES2UniformCacheImp::updateUniform(GLint location, const void *value, GLsizei length)
+    bool GLES2UniformCache::updateUniform(GLint location, const void *value, GLsizei length)
     {
         uint32 current = mUniformValueMap[location];
         uint32 hash = Ogre::FastHash(static_cast<const char*>(value), length);
