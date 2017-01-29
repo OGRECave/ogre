@@ -94,6 +94,7 @@ namespace Ogre {
         /// distance list used to specify LOD
         typedef vector<Real>::type LodValueList;
         typedef ConstVectorIterator<LodValueList> LodValueIterator;
+        typedef vector<Technique*>::type Techniques;
     protected:
 
 
@@ -101,7 +102,6 @@ namespace Ogre {
         */
         void applyDefaults(void);
 
-        typedef vector<Technique*>::type Techniques;
         /// All techniques, supported and unsupported
         Techniques mTechniques;
         /// Supported techniques of any sort
@@ -211,33 +211,49 @@ namespace Ogre {
             return the first one in the technique list which is supported by the hardware.
         */
         Technique* createTechnique(void);
-        /** Gets the indexed technique. */
+        /** Gets the indexed technique.
+         * @deprecated use getTechniques()  */
         Technique* getTechnique(unsigned short index);
         /** searches for the named technique.
             Return 0 if technique with name is not found
         */
         Technique* getTechnique(const String& name);
-        /** Retrieves the number of techniques. */
+        /** Retrieves the number of techniques.
+         * @deprecated use getTechniques()  */
         unsigned short getNumTechniques(void) const;
         /** Removes the technique at the given index. */        
         void removeTechnique(unsigned short index);     
         /** Removes all the techniques in this Material. */
         void removeAllTechniques(void);
         typedef VectorIterator<Techniques> TechniqueIterator;
-        /** Get an iterator over the Techniques in this Material. */
-        TechniqueIterator getTechniqueIterator(void);
-        /** Gets an iterator over all the Techniques which are supported by the current card. 
+        /** Get an iterator over the Techniques in this Material.
+         * @deprecated use getTechniques() */
+        OGRE_DEPRECATED TechniqueIterator getTechniqueIterator(void);
+
+        /** Get the Techniques in this Material. */
+        const Techniques& getTechniques(void) const {
+            return mTechniques;
+        }
+
+        /** Gets all the Techniques which are supported by the current card.
         @remarks
             The supported technique list is only available after this material has been compiled,
             which typically happens on loading the material. Therefore, if this method returns
             an empty list, try calling Material::load.
         */
-        TechniqueIterator getSupportedTechniqueIterator(void);
+        const Techniques& getSupportedTechniques(void) const {
+            return mSupportedTechniques;
+        }
+
+        /// @deprecated use getSupportedTechniques()
+        OGRE_DEPRECATED TechniqueIterator getSupportedTechniqueIterator(void);
         
-        /** Gets the indexed supported technique. */
-        Technique* getSupportedTechnique(unsigned short index);
-        /** Retrieves the number of supported techniques. */
-        unsigned short getNumSupportedTechniques(void) const;
+        /** Gets the indexed supported technique.
+         * @deprecated use getSupportedTechniques() */
+        OGRE_DEPRECATED Technique* getSupportedTechnique(unsigned short index);
+        /** Retrieves the number of supported techniques.
+         * @deprecated use getSupportedTechniques() */
+        OGRE_DEPRECATED unsigned short getNumSupportedTechniques(void) const;
         /** Gets a string explaining why any techniques are not supported. */
         const String& getUnsupportedTechniquesExplanation() const { return mUnsupportedReasons; }
 
@@ -614,23 +630,33 @@ namespace Ogre {
         */
         void setLodLevels(const LodValueList& lodValues);
 
-        /** Gets an iterator over the list of values transformed by the LodStrategy at which each LOD comes into effect. 
+        /** Gets the list of values transformed by the LodStrategy at which each LOD comes into effect.
         @remarks
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero
             entry at the start (since the highest LOD starts at value 0). Also, the
             values returned are after being transformed by LodStrategy::transformUserValue.
         */
-        LodValueIterator getLodValueIterator(void) const;
+        const LodValueList& getLodValues(void) const {
+            return mLodValues;
+        }
 
-        /** Gets an iterator over the user-defined list of values which are internally transfomed by the LodStrategy. 
+        /// @deprecated use getLodValues()
+        OGRE_DEPRECATED LodValueIterator getLodValueIterator(void) const;
+
+        /** Gets the user-defined list of values which are internally transfomed by the LodStrategy.
         @remarks
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero
             entry at the start (since the highest LOD starts at value 0). Also, the
             values returned are after being transformed by LodStrategy::transformUserValue.
         */
-        LodValueIterator getUserLodValueIterator(void) const;
+        const LodValueList& getUserLodValues(void) const {
+            return mUserLodValues;
+        }
+
+        /// @deprecated use getUserLodValues()
+        OGRE_DEPRECATED LodValueIterator getUserLodValueIterator(void) const;
 
         /** Gets the LOD index to use at the given value. 
         @note The value passed in is the 'transformed' value. If you are dealing with

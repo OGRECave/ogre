@@ -28,11 +28,12 @@ def main():
 
     rgm = Ogre.ResourceGroupManager.getSingleton()
 
-    for sec in ("Essential", "Popular"):
-        for kind in ("Zip", "FileSystem"):
-            for loc in cfg.getMultiSetting(kind, sec):
-                rgm.addResourceLocation(loc, kind, sec)
+    for sec, settings in cfg.getSettingsBySection().items():
+        for kind, loc in settings.items():
+            rgm.addResourceLocation(loc, kind, sec)
 
+    arch = cfg.getSettings("General").values()[0]
+    rgm.addResourceLocation(arch + "/materials/programs/GLSL", "FileSystem", "General");
     if not root.restoreConfig():
         root.showConfigDialog(Ogre.ConfigDialog())
 

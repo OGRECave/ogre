@@ -272,15 +272,11 @@ protected:
         {
             instancedMaterial = originalMaterial->clone(instancedMaterialName);
             instancedMaterial->load();
-            Technique::PassIterator pIt = instancedMaterial->getBestTechnique ()->getPassIterator();
-            while (pIt.hasMoreElements())
+            const Technique::Passes& passes = instancedMaterial->getBestTechnique ()->getPasses();
+            for (size_t p = 0; p < passes.size(); p++)
             {
-
-                Pass * const p = pIt.getNext();
-                p->setVertexProgram("Instancing", false);
-                p->setShadowCasterVertexProgram("InstancingShadowCaster");
-
-
+                passes[p]->setVertexProgram("Instancing", false);
+                passes[p]->setShadowCasterVertexProgram("InstancingShadowCaster");
             }
         }
         instancedMaterial->load();

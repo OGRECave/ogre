@@ -965,8 +965,9 @@ namespace OgreBites
 
         /**
         Gets a widget from a tray by place.
+        @deprecated use getWidgets() instead
         */
-        Widget* getWidget(TrayLocation trayLoc, unsigned int place);
+        OGRE_DEPRECATED Widget* getWidget(TrayLocation trayLoc, unsigned int place);
 
         /**
         Gets a widget from a tray by name.
@@ -985,13 +986,22 @@ namespace OgreBites
 
         /**
         Gets the number of widgets in a tray.
+        @deprecated use getWidgets() instead
         */
-        size_t getNumWidgets(TrayLocation trayLoc);
+        OGRE_DEPRECATED size_t getNumWidgets(TrayLocation trayLoc);
+
+        /**
+        Gets all the widgets of a specific tray.
+        @deprecated use getWidgets() instead
+        */
+        OGRE_DEPRECATED WidgetIterator getWidgetIterator(TrayLocation trayLoc);
 
         /**
         Gets all the widgets of a specific tray.
         */
-        WidgetIterator getWidgetIterator(TrayLocation trayLoc);
+        const WidgetList& getWidgets(TrayLocation trayLoc) const {
+            return mWidgets[trayLoc];
+        }
 
         /**
         Gets a widget's position in its tray.
@@ -1005,7 +1015,7 @@ namespace OgreBites
 
         void destroyWidget(TrayLocation trayLoc, unsigned int place)
         {
-            destroyWidget(getWidget(trayLoc, place));
+            destroyWidget(mWidgets[trayLoc][place]);
         }
 
         void destroyWidget(TrayLocation trayLoc, const Ogre::String& name)
@@ -1047,7 +1057,7 @@ namespace OgreBites
         void moveWidgetToTray(TrayLocation currentTrayLoc, unsigned int currentPlace, TrayLocation targetTrayLoc,
             int targetPlace = -1)
         {
-            moveWidgetToTray(getWidget(currentTrayLoc, currentPlace), targetTrayLoc, targetPlace);
+            moveWidgetToTray(mWidgets[currentTrayLoc][currentPlace], targetTrayLoc, targetPlace);
         }
 
         /**
@@ -1070,7 +1080,7 @@ namespace OgreBites
 
         void removeWidgetFromTray(TrayLocation trayLoc, int place)
         {
-            removeWidgetFromTray(getWidget(trayLoc, place));
+            removeWidgetFromTray(mWidgets[trayLoc][place]);
         }
 
         /**

@@ -48,7 +48,7 @@ void FileSystemArchiveTests::SetUp()
 
     Ogre::ConfigFile cf;
     cf.load(Ogre::FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
-    mTestPath = cf.getSettingsIterator("Tests").getNext()+"/misc/ArchiveTest";
+    mTestPath = cf.getSettings("Tests").begin()->second+"/misc/ArchiveTest";
 }
 //--------------------------------------------------------------------------
 void FileSystemArchiveTests::TearDown()

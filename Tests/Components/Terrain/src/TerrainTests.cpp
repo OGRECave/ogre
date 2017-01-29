@@ -57,15 +57,13 @@ void TerrainTests::SetUp()
     cf.load(resourcesPath);
 
     // Go through all sections & settings in the file
-    ConfigFile::SectionIterator seci = cf.getSectionIterator();
-
     String secName, typeName, archName;
-    while (seci.hasMoreElements())
-    {
-        secName = seci.peekNextKey();
-        ConfigFile::SettingsMultiMap *settings = seci.getNext();
-        ConfigFile::SettingsMultiMap::iterator i;
-        for (i = settings->begin(); i != settings->end(); ++i)
+    ConfigFile::SettingsBySection_::const_iterator seci;
+    for(seci = cf.getSettingsBySection().begin(); seci != cf.getSettingsBySection().end(); ++seci) {
+        secName = seci->first;
+        const ConfigFile::SettingsMultiMap& settings = seci->second;
+        ConfigFile::SettingsMultiMap::const_iterator i;
+        for (i = settings.begin(); i != settings.end(); ++i)
         {
             typeName = i->first;
             archName = i->second;

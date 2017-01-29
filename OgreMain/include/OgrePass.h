@@ -94,6 +94,8 @@ namespace Ogre {
             /// Need virtual destructor in case subclasses use it
             virtual ~HashFunc() {}
         };
+
+        typedef vector<TextureUnitState*>::type TextureUnitStates;
     protected:
         Technique* mParent;
         unsigned short mIndex; /// Pass index
@@ -193,7 +195,6 @@ namespace Ogre {
         //-------------------------------------------------------------------------
 
         /// Storage of texture unit states
-        typedef vector<TextureUnitState*>::type TextureUnitStates;
         TextureUnitStates mTextureUnitStates;
 
         /// Vertex program details
@@ -576,6 +577,7 @@ namespace Ogre {
         */
         TextureUnitState* getTextureUnitState(const String& name);
         /** Retrieves a const pointer to a texture unit state.
+         * @deprecated use getTextureUnitStates()
          */
         const TextureUnitState* getTextureUnitState(unsigned short index) const;
         /** Retrieves the Texture Unit State matching name.
@@ -588,16 +590,22 @@ namespace Ogre {
              state The Texture Unit State this is attached to this pass.
              @note
              Throws an exception if the state is not attached to the pass.
+             @deprecated use getTextureUnitStates()
         */
         unsigned short getTextureUnitStateIndex(const TextureUnitState* state) const;
 
         typedef VectorIterator<TextureUnitStates> TextureUnitStateIterator;
-        /** Get an iterator over the TextureUnitStates contained in this Pass. */
-        TextureUnitStateIterator getTextureUnitStateIterator(void);
+        /** Get an iterator over the TextureUnitStates contained in this Pass.
+         * @deprecated use getTextureUnitStates() */
+        OGRE_DEPRECATED TextureUnitStateIterator getTextureUnitStateIterator(void);
 
         typedef ConstVectorIterator<TextureUnitStates> ConstTextureUnitStateIterator;
-        /** Get an iterator over the TextureUnitStates contained in this Pass. */
-        ConstTextureUnitStateIterator getTextureUnitStateIterator(void) const;
+        /** Get an iterator over the TextureUnitStates contained in this Pass.
+         * @deprecated use getTextureUnitStates() */
+        OGRE_DEPRECATED ConstTextureUnitStateIterator getTextureUnitStateIterator(void) const;
+
+        /** Get the TextureUnitStates contained in this Pass. */
+        const TextureUnitStates& getTextureUnitStates() const { return mTextureUnitStates; }
 
         /** Removes the indexed texture unit state from this pass.
             @remarks
@@ -610,6 +618,7 @@ namespace Ogre {
         void removeAllTextureUnitStates(void);
 
         /** Returns the number of texture unit settings.
+         * @deprecated use getTextureUnitStates()
          */
         unsigned short getNumTextureUnitStates(void) const
         {

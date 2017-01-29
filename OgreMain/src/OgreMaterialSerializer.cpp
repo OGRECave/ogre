@@ -2484,12 +2484,11 @@ namespace Ogre
                 // figure out technique index by iterating through technique container
                 // would be nice if each technique remembered its index
                 int count = 0;
-                Material::TechniqueIterator i = context.material->getTechniqueIterator();
-                while(i.hasMoreElements())
+                Material::Techniques::const_iterator it;
+                for(it = context.material->getTechniques().begin(); it != context.material->getTechniques().end(); ++it)
                 {
-                    if (foundTechnique == i.peekNext())
+                    if (foundTechnique == *it)
                         break;
-                    i.moveNext();
                     ++count;
                 }
 
@@ -3803,15 +3802,15 @@ namespace Ogre
             fireMaterialEvent(MSE_WRITE_BEGIN, skipWriting, pMat.get());
 
             // Write LOD information
-            Material::LodValueIterator valueIt = pMat->getUserLodValueIterator();
+            Material::LodValueList::const_iterator valueIt = pMat->getUserLodValues().begin();
             // Skip zero value
-            if (valueIt.hasMoreElements())
-                valueIt.getNext();
+            if (!pMat->getUserLodValues().empty())
+                valueIt++;
             String attributeVal;
-            while (valueIt.hasMoreElements())
+            while (valueIt != pMat->getUserLodValues().end())
             {
-                attributeVal.append(StringConverter::toString(valueIt.getNext()));
-                if (valueIt.hasMoreElements())
+                attributeVal.append(StringConverter::toString(*valueIt++));
+                if (valueIt != pMat->getUserLodValues().end())
                     attributeVal.append(" ");
             }
             if (!attributeVal.empty())
@@ -3838,10 +3837,10 @@ namespace Ogre
             }
 
             // Iterate over techniques
-            Material::TechniqueIterator it = pMat->getTechniqueIterator();
-            while (it.hasMoreElements())
+            Material::Techniques::const_iterator it;
+            for(it = pMat->getTechniques().begin(); it != pMat->getTechniques().end(); ++it)
             {
-                writeTechnique(it.getNext());
+                writeTechnique(*it);
                 mBuffer += "\n";
             }
 
@@ -3904,10 +3903,10 @@ namespace Ogre
                 writeValue(quoteWord(pTech->getShadowReceiverMaterial()->getName()));
             }
             // GPU vendor rules
-            Technique::GPUVendorRuleIterator vrit = pTech->getGPUVendorRuleIterator();
-            while (vrit.hasMoreElements())
+            Technique::GPUVendorRuleList::const_iterator vrit;
+            for (vrit = pTech->getGPUVendorRules().begin(); vrit != pTech->getGPUVendorRules().end(); ++vrit)
             {
-                const Technique::GPUVendorRule& rule = vrit.getNext();
+                const Technique::GPUVendorRule& rule = *vrit;
                 writeAttribute(2, "gpu_vendor_rule");
                 if (rule.includeOrExclude == Technique::INCLUDE)
                     writeValue("include");
@@ -3916,10 +3915,10 @@ namespace Ogre
                 writeValue(quoteWord(RenderSystemCapabilities::vendorToString(rule.vendor)));
             }
             // GPU device rules
-            Technique::GPUDeviceNameRuleIterator dnit = pTech->getGPUDeviceNameRuleIterator();
-            while (dnit.hasMoreElements())
+            Technique::GPUDeviceNameRuleList::const_iterator dnit;
+            for (dnit = pTech->getGPUDeviceNameRules().begin(); dnit != pTech->getGPUDeviceNameRules().end(); ++dnit)
             {
-                const Technique::GPUDeviceNameRule& rule = dnit.getNext();
+                const Technique::GPUDeviceNameRule& rule = *dnit;
                 writeAttribute(2, "gpu_device_rule");
                 if (rule.includeOrExclude == Technique::INCLUDE)
                     writeValue("include");
@@ -3929,10 +3928,10 @@ namespace Ogre
                 writeValue(StringConverter::toString(rule.caseSensitive));
             }
             // Iterate over passes
-            Technique::PassIterator it = const_cast<Technique*>(pTech)->getPassIterator();
-            while (it.hasMoreElements())
+            Technique::Passes::const_iterator i;
+            for(i = pTech->getPasses().begin(); i != pTech->getPasses().end(); ++i)
             {
-                writePass(it.getNext());
+                writePass(*i);
                 mBuffer += "\n";
             }
 
@@ -4455,10 +4454,10 @@ namespace Ogre
             }
 
             // Nested texture layers
-            Pass::TextureUnitStateIterator it = const_cast<Pass*>(pPass)->getTextureUnitStateIterator();
-            while(it.hasMoreElements())
+            Pass::TextureUnitStates::const_iterator it;
+            for(it = pPass->getTextureUnitStates().begin(); it != pPass->getTextureUnitStates().end(); ++it)
             {
-                writeTextureUnit(it.getNext());
+                writeTextureUnit(*it);
             }
 
             // Fire write end event.

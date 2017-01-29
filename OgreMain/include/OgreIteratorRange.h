@@ -63,6 +63,7 @@ namespace Ogre {
  *\n Also it prepairs for direct usage of boost::iterator_range by providing the real used type via iterator_range::type
  *   so that client code does not have to change when boost::iterator_range will be implemented some day.
  *\n see VectorRange MapRange or corresponding Const variants for a sample of concrete usage of the iterator_range::type
+ * @deprecated do not use
 */
 template <typename T>
 class iterator_range{
@@ -136,6 +137,7 @@ class iterator_range{
  * @tparam T iterator type
  *
  * compatility class for VectorIterator
+ * @deprecated do not use
 */
 template<typename T>
 struct VectorRange : public iterator_range<typename T::iterator>::type
@@ -145,7 +147,7 @@ struct VectorRange : public iterator_range<typename T::iterator>::type
     @remarks
         Provide a container to initialise.
     */
-    VectorRange( T& c )
+    OGRE_DEPRECATED VectorRange( T& c )
     : iterator_range<typename T::iterator>::type( c.begin(), c.end() )
     {}
 
@@ -153,7 +155,7 @@ struct VectorRange : public iterator_range<typename T::iterator>::type
     @remarks
     Provide a start and end iterator to initialise.
     */
-    VectorRange( typename T::iterator b, typename T::iterator e )
+    OGRE_DEPRECATED VectorRange( typename T::iterator b, typename T::iterator e )
     : iterator_range<typename T::iterator>::type( b, e )
     {}
 
@@ -179,6 +181,7 @@ struct VectorRange : public iterator_range<typename T::iterator>::type
  * @tparam T iterator type
  *
  * compatility class for ConstVectorIterator
+ * @deprecated do not use
 */
 template<typename T>
 struct ConstVectorRange : public iterator_range<typename T::const_iterator>::type
@@ -188,7 +191,7 @@ struct ConstVectorRange : public iterator_range<typename T::const_iterator>::typ
     @remarks
         Provide a container to initialise.
     */
-    ConstVectorRange( const T& c )
+    OGRE_DEPRECATED ConstVectorRange( const T& c )
     : iterator_range<typename T::const_iterator>::type( c.begin(), c.end() )
     {}
 
@@ -196,7 +199,7 @@ struct ConstVectorRange : public iterator_range<typename T::const_iterator>::typ
     @remarks
     Provide a start and end iterator to initialise.
     */
-    ConstVectorRange( typename T::iterator b, typename T::iterator e )
+    OGRE_DEPRECATED ConstVectorRange( typename T::iterator b, typename T::iterator e )
     : iterator_range<typename T::const_iterator>::type( b, e )
     {}
 
@@ -204,7 +207,7 @@ struct ConstVectorRange : public iterator_range<typename T::const_iterator>::typ
     @remarks
     Provide a start and end const_iterator to initialise.
     */
-    ConstVectorRange( typename T::const_iterator b, typename T::const_iterator e )
+    OGRE_DEPRECATED ConstVectorRange( typename T::const_iterator b, typename T::const_iterator e )
     : iterator_range<typename T::const_iterator>::type( b, e )
     {}
 
@@ -212,7 +215,7 @@ struct ConstVectorRange : public iterator_range<typename T::const_iterator>::typ
     @remarks
     Provide a VectorRange to initialise.
     */
-    ConstVectorRange( const VectorRange<T>& rhs  )
+    OGRE_DEPRECATED ConstVectorRange( const VectorRange<T>& rhs  )
     : iterator_range<typename T::const_iterator>::type( rhs.begin(), rhs.end() )
     {}
 
@@ -240,6 +243,7 @@ struct ConstVectorRange : public iterator_range<typename T::const_iterator>::typ
  * @tparam T iterator type
  *
  * compatility class for MapIterator
+ * @deprecated do not use
 */
 template<typename T>
 struct MapRange : public iterator_range<typename T::iterator>::type
@@ -248,7 +252,7 @@ struct MapRange : public iterator_range<typename T::iterator>::type
     @remarks
         Provide a container to initialise.
     */
-    MapRange( T& c )
+    OGRE_DEPRECATED MapRange( T& c )
     : iterator_range<typename T::iterator>::type( c.begin(), c.end() )
     {}
 
@@ -256,7 +260,7 @@ struct MapRange : public iterator_range<typename T::iterator>::type
     @remarks
     Provide a start and end iterator to initialise.
     */
-    MapRange( typename T::iterator b, typename T::iterator e )
+    OGRE_DEPRECATED MapRange( typename T::iterator b, typename T::iterator e )
     : iterator_range<typename T::iterator>::type( b, e )
     {}
 
@@ -282,6 +286,7 @@ struct MapRange : public iterator_range<typename T::iterator>::type
  * @tparam T iterator type   
  *
  * compatility class for ConstMapIterator
+ * @deprecated do not use
 */
 template<typename T>
 struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
@@ -291,7 +296,7 @@ struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
     @remarks
         Provide a container to initialise.
     */
-    ConstMapRange( const T& c )
+    OGRE_DEPRECATED ConstMapRange( const T& c )
     : iterator_range<typename T::const_iterator>::type( c.begin(), c.end() )
     {}
 
@@ -299,7 +304,7 @@ struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
     @remarks
     Provide a start and end iterator to initialise.
     */
-    ConstMapRange( typename T::iterator b, typename T::iterator e )
+    OGRE_DEPRECATED ConstMapRange( typename T::iterator b, typename T::iterator e )
     : iterator_range<typename T::const_iterator>::type( b, e )
     {}
     
@@ -307,7 +312,7 @@ struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
     @remarks
     Provide a start and end const_iterator to initialise.
     */
-    ConstMapRange( typename T::const_iterator b, typename T::const_iterator e )
+    OGRE_DEPRECATED ConstMapRange( typename T::const_iterator b, typename T::const_iterator e )
     : iterator_range<typename T::const_iterator>::type( b, e )
     {}
 
@@ -315,7 +320,7 @@ struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
     @remarks
     Provide a MapRange to initialise.
     */
-    ConstMapRange( const MapRange<T>& rhs  )
+    OGRE_DEPRECATED ConstMapRange( const MapRange<T>& rhs  )
     : iterator_range<typename T::const_iterator>::type( rhs.begin(), rhs.end() )
     {}
     

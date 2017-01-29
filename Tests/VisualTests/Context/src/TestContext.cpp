@@ -168,17 +168,16 @@ void TestContext::setup()
 #endif
     }
 
-    Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
-
     // Parse for the test sets and plugins that they're made up of.
-    for (; sections.hasMoreElements(); sections.moveNext())
-    {
-        Ogre::String setName = sections.peekNextKey();
+    ConfigFile::SettingsBySection_::const_iterator seci;
+    for(seci = testConfig.getSettingsBySection().begin(); seci != testConfig.getSettingsBySection().end(); ++seci) {
+        const ConfigFile::SettingsMultiMap& settings = seci->second;
+        Ogre::String setName = seci->first;
         if (setName != "")
         {
             mTestSets[setName] = Ogre::StringVector();
-            Ogre::ConfigFile::SettingsMultiMap::iterator it = sections.peekNextValue()->begin();
-            for (; it != sections.peekNextValue()->end(); ++it)
+            Ogre::ConfigFile::SettingsMultiMap::const_iterator it = settings.begin();
+            for (; it != settings.end(); ++it)
                 mTestSets[setName].push_back(it->second);
         }
     }

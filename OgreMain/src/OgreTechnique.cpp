@@ -143,11 +143,11 @@ namespace Ogre {
                 }
 
                 // Check a few fixed-function options in texture layers
-                Pass::TextureUnitStateIterator texi = currPass->getTextureUnitStateIterator();
                 size_t texUnit = 0;
-                while (texi.hasMoreElements())
+                Pass::TextureUnitStates::const_iterator it;
+                for(it = currPass->getTextureUnitStates().begin(); it != currPass->getTextureUnitStates().end(); ++it)
                 {
-                    TextureUnitState* tex = texi.getNext();
+                    TextureUnitState* tex = *it;
                     // Any Cube textures? NB we make the assumption that any
                     // card capable of running fragment programs can support
                     // cubic textures, which has to be true, surely?
@@ -980,10 +980,10 @@ namespace Ogre {
                             {
                                 // Alpha rejection passes must retain their transparency, so
                                 // we allow the texture units, but override the colour functions
-                                Pass::TextureUnitStateIterator tusi = newPass->getTextureUnitStateIterator();
-                                while (tusi.hasMoreElements())
+                                Pass::TextureUnitStates::const_iterator it;
+                                for(it = newPass->getTextureUnitStates().begin(); it != newPass->getTextureUnitStates().end(); ++it)
                                 {
-                                    TextureUnitState* tus = tusi.getNext();
+                                    TextureUnitState* tus = *it;
                                     tus->setColourOperationEx(LBX_SOURCE1, LBS_CURRENT);
                                 }
                             }
@@ -1066,10 +1066,10 @@ namespace Ogre {
                             {
                                 // Alpha rejection passes must retain their transparency, so
                                 // we allow the texture units, but override the colour functions
-                                Pass::TextureUnitStateIterator tusi = newPass->getTextureUnitStateIterator();
-                                while (tusi.hasMoreElements())
+                                Pass::TextureUnitStates::const_iterator it;
+                                for(it = newPass->getTextureUnitStates().begin(); it != newPass->getTextureUnitStates().end(); ++it)
                                 {
-                                    TextureUnitState* tus = tusi.getNext();
+                                    TextureUnitState* tus = *it;
                                     tus->setColourOperationEx(LBX_SOURCE1, LBS_CURRENT);
                                 }
                             }
@@ -1179,8 +1179,8 @@ namespace Ogre {
         mIlluminationPasses.clear();
     }
     //-----------------------------------------------------------------------
-    const Technique::IlluminationPassIterator
-    Technique::getIlluminationPassIterator(void)
+    const IlluminationPassList&
+    Technique::getIlluminationPasses(void)
     {
         IlluminationPassesState targetState = IPS_COMPILED;
         if(mIlluminationPassesCompilationPhase != targetState
@@ -1197,8 +1197,7 @@ namespace Ogre {
             mIlluminationPassesCompilationPhase = targetState;
         }
 
-        return IlluminationPassIterator(mIlluminationPasses.begin(),
-            mIlluminationPasses.end());
+        return mIlluminationPasses;
     }
     //-----------------------------------------------------------------------
     const String& Technique::getResourceGroup(void) const

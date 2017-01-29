@@ -154,12 +154,6 @@ namespace Ogre {
         unsigned short index = _getSubMeshIndex(name);
         destroySubMesh(index);
     }
-    //-----------------------------------------------------------------------
-    size_t Mesh::getNumSubMeshes() const
-    {
-        return mSubMeshList.size();
-    }
-
     //---------------------------------------------------------------------
     void Mesh::nameSubMesh(const String& name, ushort index)
     {
@@ -178,18 +172,6 @@ namespace Ogre {
     {
         ushort index = _getSubMeshIndex(name);
         return getSubMesh(index);
-    }
-    //-----------------------------------------------------------------------
-    SubMesh* Mesh::getSubMesh(size_t index) const
-    {
-        if (index >= mSubMeshList.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Index out of bounds.",
-                "Mesh::getSubMesh");
-        }
-
-        return mSubMeshList[index];
     }
     //-----------------------------------------------------------------------
     void Mesh::postLoadImpl(void)
@@ -1441,11 +1423,10 @@ namespace Ogre {
                 // Update poses (some vertices might have been duplicated)
                 // we will just check which vertices have been split and copy
                 // the offset for the original vertex to the corresponding new vertex
-                PoseIterator pose_it = getPoseIterator();
-
-                while( pose_it.hasMoreElements() )
+                PoseList::iterator pose_it;
+                for( pose_it = mPoseList.begin(); pose_it != mPoseList.end(); ++pose_it)
                 {
-                    Pose* current_pose = pose_it.getNext();
+                    Pose* current_pose = *pose_it;
                     const Pose::VertexOffsetMap& offset_map = current_pose->getVertexOffsets();
 
                     for( TangentSpaceCalc::VertexSplits::iterator it = res.vertexSplits.begin();
@@ -2384,7 +2365,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Pose* Mesh::getPose(ushort index)
     {
-        if (index >= getPoseCount())
+        if (index >= mPoseList.size())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Index out of bounds",
@@ -2412,7 +2393,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::removePose(ushort index)
     {
-        if (index >= getPoseCount())
+        if (index >= mPoseList.size())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Index out of bounds",

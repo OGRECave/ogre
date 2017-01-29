@@ -32,11 +32,10 @@ Ogre::Technique *SGTechniqueResolverListener::handleSchemeNotFound(unsigned shor
     mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
 
     // Grab the generated technique.
-    Ogre::Material::TechniqueIterator itTech = originalMaterial->getTechniqueIterator();
-
-    while (itTech.hasMoreElements())
+    Ogre::Material::Techniques::const_iterator it;
+    for(it = originalMaterial->getTechniques().begin(); it != originalMaterial->getTechniques().end(); ++it)
     {
-        Ogre::Technique* curTech = itTech.getNext();
+        Ogre::Technique* curTech = *it;
 
         if (curTech->getSchemeName() == schemeName)
         {

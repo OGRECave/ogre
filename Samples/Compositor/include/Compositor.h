@@ -365,7 +365,7 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
     }
 
     mTrayMgr->getWidget("DebugRTTPanel")->show();
-    mTrayMgr->moveWidgetToTray("DebugRTTPanel", TL_TOPRIGHT, static_cast<unsigned int>(mTrayMgr->getNumWidgets(TL_TOPRIGHT) - 1));
+    mTrayMgr->moveWidgetToTray("DebugRTTPanel", TL_TOPRIGHT, mTrayMgr->getWidgets(TL_TOPRIGHT).size() - 1);
     StringVector parts = StringUtil::split(menu->getSelectedItem(), ";");
     mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
 

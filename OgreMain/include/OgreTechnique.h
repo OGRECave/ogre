@@ -49,6 +49,9 @@ namespace Ogre {
     */
     class _OgreExport Technique : public TechniqueAlloc
     {
+    public:
+        typedef vector<Pass*>::type Passes;
+
     protected:
         /// Illumination pass state type
         enum IlluminationPassesState
@@ -58,7 +61,6 @@ namespace Ogre {
             IPS_COMPILED = 1
         };
 
-        typedef vector<Pass*>::type Passes;
         /// List of primary passes
         Passes mPasses;
         /// List of derived passes, categorised into IlluminationStage (ordered)
@@ -178,13 +180,15 @@ namespace Ogre {
             enough facilities for what you're asking for.
         */
         Pass* createPass(void);
-        /** Retrieves the Pass with the given index. */
+        /** Retrieves the Pass with the given index.
+         * @deprecated use getPasses() */
         Pass* getPass(unsigned short index);
         /** Retrieves the Pass matching name.
             Returns 0 if name match is not found.
         */
         Pass* getPass(const String& name);
-        /** Retrieves the number of passes. */
+        /** Retrieves the number of passes.
+         * @deprecated use getPasses() */
         unsigned short getNumPasses(void) const;
         /** Removes the Pass with the given index. */
         void removePass(unsigned short index);
@@ -195,11 +199,28 @@ namespace Ogre {
         */
         bool movePass(const unsigned short sourceIndex, const unsigned short destinationIndex);
         typedef VectorIterator<Passes> PassIterator;
-        /** Gets an iterator over the passes in this Technique. */
-        const PassIterator getPassIterator(void);
+        /** Gets an iterator over the passes in this Technique.
+         * @deprecated use getPasses() */
+        OGRE_DEPRECATED const PassIterator getPassIterator(void);
+
+        /** Gets the passes in this Technique. */
+        const Passes& getPasses(void) const {
+            return mPasses;
+        }
+
         typedef VectorIterator<IlluminationPassList> IlluminationPassIterator;
-        /** Gets an iterator over the illumination-stage categorised passes. */
-        const IlluminationPassIterator getIlluminationPassIterator(void);
+        /** Gets an iterator over the illumination-stage categorised passes.
+         * @deprecated use getIlluminationPasses() */
+        OGRE_DEPRECATED const IlluminationPassIterator getIlluminationPassIterator(void) {
+            getIlluminationPasses(); // refresh as needed
+            return IlluminationPassIterator(mIlluminationPasses.begin(),
+                mIlluminationPasses.end());
+        }
+
+        /** Gets the illumination-stage categorised passes
+         * @note triggers compilation if needed */
+        const IlluminationPassList& getIlluminationPasses();
+
         /// Gets the parent Material
         Material* getParent(void) const { return mParent; }
 
@@ -649,7 +670,13 @@ namespace Ogre {
         void removeGPUVendorRule(GPUVendor vendor);
         typedef ConstVectorIterator<GPUVendorRuleList> GPUVendorRuleIterator;
         /// Get an iterator over the currently registered vendor rules.
-        GPUVendorRuleIterator getGPUVendorRuleIterator() const;
+        /// @deprecated use getGPUVendorRules()
+        OGRE_DEPRECATED GPUVendorRuleIterator getGPUVendorRuleIterator() const;
+
+        /// Get the currently registered vendor rules.
+        const GPUVendorRuleList& getGPUVendorRules() const {
+            return mGPUVendorRules;
+        }
 
         /** Add a rule which manually influences the support for this technique based
             on a pattern that matches a GPU device name (e.g. '*8800*').
@@ -690,7 +717,13 @@ namespace Ogre {
         void removeGPUDeviceNameRule(const String& devicePattern);
         typedef ConstVectorIterator<GPUDeviceNameRuleList> GPUDeviceNameRuleIterator;
         /// Get an iterator over the currently registered device name rules.
-        GPUDeviceNameRuleIterator getGPUDeviceNameRuleIterator() const;
+        /// @deprecated use getGPUDeviceNameRules()
+        OGRE_DEPRECATED GPUDeviceNameRuleIterator getGPUDeviceNameRuleIterator() const;
+
+        /// Get the currently registered device name rules.
+        GPUDeviceNameRuleList getGPUDeviceNameRules() const {
+            return mGPUDeviceNameRules;
+        }
 
         /** Return an instance of user objects binding associated with this class.
         You can use it to associate one or more custom objects with this class instance.

@@ -67,10 +67,10 @@ namespace Ogre
     BaseInstanceBatchVTF::~BaseInstanceBatchVTF()
     {
         //Remove cloned caster materials (if any)
-        Material::TechniqueIterator techItor = mMaterial->getTechniqueIterator();
-        while( techItor.hasMoreElements() )
+        Material::Techniques::const_iterator it;
+        for(it = mMaterial->getTechniques().begin(); it != mMaterial->getTechniques().end(); ++it)
         {
-            Technique *technique = techItor.getNext();
+            Technique *technique = *it;
 
             if( !technique->getShadowCasterMaterial().isNull() )
                 MaterialManager::getSingleton().remove( technique->getShadowCasterMaterial()->getName() );
@@ -115,10 +115,10 @@ namespace Ogre
         mMaterial = material->clone( mName + "/VTFMaterial" );
 
         //Now do the same with the techniques which have a material shadow caster
-        Material::TechniqueIterator techItor = material->getTechniqueIterator();
-        while( techItor.hasMoreElements() )
+        Material::Techniques::const_iterator it;
+        for(it = mMaterial->getTechniques().begin(); it != mMaterial->getTechniques().end(); ++it)
         {
-            Technique *technique = techItor.getNext();
+            Technique *technique = *it;
 
             if( !technique->getShadowCasterMaterial().isNull() )
             {
@@ -207,22 +207,18 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void BaseInstanceBatchVTF::setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material )
     {
-        Material::TechniqueIterator techItor = material->getTechniqueIterator();
-        while( techItor.hasMoreElements() )
+        Material::Techniques::const_iterator t;
+        for(t = mMaterial->getTechniques().begin(); t != mMaterial->getTechniques().end(); ++t)
         {
-            Technique *technique = techItor.getNext();
-            Technique::PassIterator passItor = technique->getPassIterator();
-
-            while( passItor.hasMoreElements() )
+            Technique *technique = *t;
+            Technique::Passes::const_iterator i;
+            for(i = technique->getPasses().begin(); i != technique->getPasses().end(); ++i)
             {
-                bool bTexUnitFound = false;
-
-                Pass *pass = passItor.getNext();
-                Pass::TextureUnitStateIterator texUnitItor = pass->getTextureUnitStateIterator();
-
-                while( texUnitItor.hasMoreElements() && !bTexUnitFound )
+                Pass *pass = *i;
+                Pass::TextureUnitStates::const_iterator it;
+                for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
                 {
-                    TextureUnitState *texUnit = texUnitItor.getNext();
+                    TextureUnitState *texUnit = *it;
 
                     if( texUnit->getName() == "InstancingVTF" )
                     {

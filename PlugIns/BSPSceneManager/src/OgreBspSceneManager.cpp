@@ -265,11 +265,10 @@ namespace Ogre {
             if (mRenderOp.indexData->indexCount == 0)
                 continue;
 
-            Technique::PassIterator pit = thisMaterial->getBestTechnique()->getPassIterator();
-
-            while (pit.hasMoreElements())
+            const Technique::Passes& passes = thisMaterial->getBestTechnique ()->getPasses();
+            for (size_t p = 0; p < passes.size(); p++)
             {
-                Pass* pass = pit.getNext();
+                Pass* pass = passes[p];
                 _setPass(pass);
 
                 // Do we need to update GPU program parameters?

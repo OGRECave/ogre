@@ -332,10 +332,10 @@ namespace Ogre
 		mesh->_setLodInfo(numLods - 1);
 
 
-		Mesh::PoseIterator poseIterator = mesh->getPoseIterator();
-		while(poseIterator.hasMoreElements())
-		{
-			Pose* pose = poseIterator.getNext();
+		PoseList::const_iterator it;
+        for( it = mesh->getPoseList().begin(); it != mesh->getPoseList().end(); ++it)
+        {
+			Pose* pose = *it;
 			performPoseRemap(pose, remapInfos[pose->getTarget()]);
 		}
 

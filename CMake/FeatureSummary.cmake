@@ -221,9 +221,9 @@ else ()
 endif ()
 
 if (OGRE_RESOURCEMANAGER_STRICT)
-	set(_resmgr "strict [BETA]")
+	set(_resmgr "strict")
 else ()
-	set(_resmgr "compatible")
+	set(_resmgr "legacy [DEPRECATED]")
 endif ()
 
 set(_features "${_features}Build type:                      ${_buildtype}\n")

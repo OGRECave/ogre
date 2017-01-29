@@ -407,12 +407,12 @@ namespace OgreBites
             }
             else if (b->getName() == "Back")   // leave configuration screen
             {
-                while (mTrayMgr->getNumWidgets(mRendererMenu->getTrayLocation()) > 3)
+                while (mTrayMgr->getWidgets(mRendererMenu->getTrayLocation()).size() > 3)
                 {
                     mTrayMgr->destroyWidget(mRendererMenu->getTrayLocation(), 3);
                 }
 
-                while (mTrayMgr->getNumWidgets(TL_NONE) != 0)
+                while (!mTrayMgr->getWidgets(TL_NONE).empty())
                 {
                     mTrayMgr->moveWidgetToTray(TL_NONE, 0, TL_LEFT);
                 }
@@ -445,9 +445,9 @@ namespace OgreBites
                     reset = true;
                 }
 
-                for (unsigned int i = 3; i < mTrayMgr->getNumWidgets(mRendererMenu->getTrayLocation()); i++)
+                for (unsigned int i = 3; i < mTrayMgr->getWidgets(mRendererMenu->getTrayLocation()).size(); i++)
                 {
-                    SelectMenu* menu = (SelectMenu*)mTrayMgr->getWidget(mRendererMenu->getTrayLocation(), i);
+                    SelectMenu* menu = (SelectMenu*)mTrayMgr->getWidgets(mRendererMenu->getTrayLocation())[i];
                     if (menu->getSelectedItem() != options[menu->getCaption()].currentValue) reset = true;
                     newOptions[menu->getCaption()] = menu->getSelectedItem();
                 }
@@ -563,7 +563,7 @@ namespace OgreBites
             }
             else if (menu == mRendererMenu)    // renderer selected, so update all settings
             {
-                while (mTrayMgr->getNumWidgets(mRendererMenu->getTrayLocation()) > 3)
+                while (mTrayMgr->getWidgets(mRendererMenu->getTrayLocation()).size() > 3)
                 {
                     mTrayMgr->destroyWidget(mRendererMenu->getTrayLocation(), 3);
                 }
@@ -898,14 +898,14 @@ namespace OgreBites
             {
                 while (center->isVisible())
                 {
-                    mTrayMgr->moveWidgetToTray(mTrayMgr->getWidget(TL_CENTER, 0), TL_LEFT);
+                    mTrayMgr->moveWidgetToTray(mTrayMgr->getWidgets(TL_CENTER)[0], TL_LEFT);
                 }
             }
             else if (left->isVisible() && rw->getWidth() >= 1280 - left->getWidth())
             {
                 while (left->isVisible())
                 {
-                    mTrayMgr->moveWidgetToTray(mTrayMgr->getWidget(TL_LEFT, 0), TL_CENTER);
+                    mTrayMgr->moveWidgetToTray(mTrayMgr->getWidgets(TL_LEFT)[0], TL_CENTER);
                 }
             }
 

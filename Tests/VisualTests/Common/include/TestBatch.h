@@ -72,9 +72,9 @@ public:
         comment = info.getSetting("Comment","Info");
         name = info.getSetting("Name","Info");
         // grab image names
-        Ogre::ConfigFile::SettingsIterator it = info.getSettingsIterator("Tests");
-        while(it.hasMoreElements())
-            images.push_back(it.getNext());
+        const Ogre::ConfigFile::SettingsMultiMap& tests = info.getSettings("Tests");
+        for(Ogre::ConfigFile::SettingsMultiMap::const_iterator i = tests.begin(); i != tests.end(); ++i)
+            images.push_back(i->second);
     }
 
     /** Manually initialize a batch object
