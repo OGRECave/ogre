@@ -39,19 +39,11 @@ source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
 
 include_directories(src/StateCacheManager)
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
-  list(APPEND HEADER_FILES
-      src/StateCacheManager/OgreGLStateCacheManagerImp.h
-      src/StateCacheManager/OgreGLUniformCacheImp.h
-  )
   list(APPEND SOURCE_FILES
       src/StateCacheManager/OgreGLStateCacheManagerImp.cpp
       src/StateCacheManager/OgreGLUniformCacheImp.cpp
   )
 else()
-  list(APPEND HEADER_FILES
-      src/StateCacheManager/OgreGLNullStateCacheManagerImp.h
-      src/StateCacheManager/OgreGLNullUniformCacheImp.h
-  )
   list(APPEND SOURCE_FILES
       src/StateCacheManager/OgreGLNullStateCacheManagerImp.cpp
       src/StateCacheManager/OgreGLNullUniformCacheImp.cpp

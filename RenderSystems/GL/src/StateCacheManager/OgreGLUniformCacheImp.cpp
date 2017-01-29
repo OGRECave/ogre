@@ -27,27 +27,27 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLUniformCacheImp.h"
+#include "OgreGLUniformCache.h"
 #include "OgreCommon.h"
 
 namespace Ogre {
     
-    GLUniformCacheImp::GLUniformCacheImp(void)
+    GLUniformCache::GLUniformCache(void)
     {
         clearCache();
     }
     
-    void GLUniformCacheImp::clearCache()
+    void GLUniformCache::clearCache()
     {
         mUniformValueMap.clear();
     }
     
-    GLUniformCacheImp::~GLUniformCacheImp(void)
+    GLUniformCache::~GLUniformCache(void)
     {
         mUniformValueMap.clear();
     }
     
-    bool GLUniformCacheImp::updateUniform(GLint location, const void *value, GLsizei length)
+    bool GLUniformCache::updateUniform(GLint location, const void *value, GLsizei length)
     {
         uint32 current = mUniformValueMap[location];
         uint32 hash = Ogre::FastHash((const char *)value, length);

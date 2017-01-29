@@ -29,8 +29,6 @@ THE SOFTWARE.
 #define OGRE_GLSUPPORT_H
 
 #include "OgreGLPrerequisites.h"
-#include "OgreGLRenderSystem.h"
-
 #include "OgreRenderWindow.h"
 #include "OgreConfigOptionMap.h"
 #include "OgreGLPBuffer.h"
@@ -75,7 +73,7 @@ public:
         return mNative->getConfigOptions();
     }
 
-    RenderWindow* createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle) {
+    RenderWindow* createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle) {
         return mNative->createWindow(autoCreateWindow, renderSystem, windowTitle);
     }
 

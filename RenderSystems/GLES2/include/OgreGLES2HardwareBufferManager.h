@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
     class GLES2StateCacheManager;
@@ -39,7 +40,6 @@ namespace Ogre {
     class _OgreGLES2Export GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         protected:
-            GLES2StateCacheManager* mStateCacheManager;
             GLES2Support* mGLSupport;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
             VertexDeclaration* createVertexDeclarationImpl(void);
@@ -73,7 +73,7 @@ namespace Ogre {
             /// Utility function to get the correct GL type based on VET's
             static GLenum getGLType(VertexElementType type);
 
-            GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
+            GLES2StateCacheManager * getStateCacheManager() { return mGLSupport->getStateCacheManager(); }
     };
 
     /// GLES2HardwareBufferManagerBase as a Singleton

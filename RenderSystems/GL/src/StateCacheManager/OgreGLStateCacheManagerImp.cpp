@@ -27,19 +27,19 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLStateCacheManagerImp.h"
+#include "OgreGLStateCacheManager.h"
 #include "OgreGLRenderSystem.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
     
-    GLStateCacheManagerImp::GLStateCacheManagerImp(void)
+    GLStateCacheManager::GLStateCacheManager(void)
     {
         clearCache();
     }
     
-    void GLStateCacheManagerImp::initializeCache()
+    void GLStateCacheManager::initializeCache()
     {
         glBlendEquation(GL_FUNC_ADD);
 
@@ -83,7 +83,7 @@ namespace Ogre {
         glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode);
     }
 
-    void GLStateCacheManagerImp::clearCache()
+    void GLStateCacheManager::clearCache()
     {
         mDepthMask = GL_TRUE;
         mBlendEquation = GL_FUNC_ADD;
@@ -154,7 +154,7 @@ namespace Ogre {
         mPointAttenuation[2] = 0.0f;
     }
     
-    GLStateCacheManagerImp::~GLStateCacheManagerImp(void)
+    GLStateCacheManager::~GLStateCacheManager(void)
     {
         mColourMask.clear();
         mClearColour.clear();
@@ -164,7 +164,7 @@ namespace Ogre {
         mTextureCoordGen.clear();
     }
     
-    void GLStateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
+    void GLStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         bool update = false;
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
@@ -199,7 +199,7 @@ namespace Ogre {
 
     }
 
-    void GLStateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
+    void GLStateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
@@ -229,13 +229,13 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::invalidateStateForTexture(GLuint texture)
+    void GLStateCacheManager::invalidateStateForTexture(GLuint texture)
     {
         mTexUnitsMap.erase(texture);
     }
 
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
-    void GLStateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
+    void GLStateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
@@ -273,7 +273,7 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
+    void GLStateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
         mLastBoundTexID = texture;
         
@@ -281,7 +281,7 @@ namespace Ogre {
         glBindTexture(target, texture);
     }
     
-    bool GLStateCacheManagerImp::activateGLTextureUnit(size_t unit)
+    bool GLStateCacheManager::activateGLTextureUnit(size_t unit)
     {
         if (mActiveTextureUnit != unit)
         {
@@ -308,7 +308,7 @@ namespace Ogre {
     }
     
     // TODO: Store as high/low bits of a GLuint
-    void GLStateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
+    void GLStateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {
         if(mBlendFuncSource != source || mBlendFuncDest != dest)
         {
@@ -319,7 +319,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setDepthMask(GLboolean mask)
+    void GLStateCacheManager::setDepthMask(GLboolean mask)
     {
         if(mDepthMask != mask)
         {
@@ -329,7 +329,7 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setDepthFunc(GLenum func)
+    void GLStateCacheManager::setDepthFunc(GLenum func)
     {
         if(mDepthFunc != func)
         {
@@ -339,7 +339,7 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setClearDepth(GLclampf depth)
+    void GLStateCacheManager::setClearDepth(GLclampf depth)
     {
         if(mClearDepth != depth)
         {
@@ -349,7 +349,7 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+    void GLStateCacheManager::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     {
         if((mClearColour[0] != red) ||
            (mClearColour[1] != green) ||
@@ -365,7 +365,7 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+    void GLStateCacheManager::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
         if((mColourMask[0] != red) ||
            (mColourMask[1] != green) ||
@@ -381,7 +381,7 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setStencilMask(GLuint mask)
+    void GLStateCacheManager::setStencilMask(GLuint mask)
     {
         if(mStencilMask != mask)
         {
@@ -391,7 +391,7 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setEnabled(GLenum flag, bool enabled)
+    void GLStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
         if (mBoolStateMap[flag] == enabled)
         {
@@ -403,7 +403,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
+    void GLStateCacheManager::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
         if((mViewport[0] != x) ||
            (mViewport[1] != y) ||
@@ -418,13 +418,13 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::getViewport(int *array)
+    void GLStateCacheManager::getViewport(int *array)
     {
         for (int i = 0; i < 4; ++i)
             array[i] = mViewport[i];
     }
 
-    void GLStateCacheManagerImp::setCullFace(GLenum face)
+    void GLStateCacheManager::setCullFace(GLenum face)
     {
         if(mCullFace != face)
         {
@@ -434,7 +434,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setBlendEquation(GLenum eq)
+    void GLStateCacheManager::setBlendEquation(GLenum eq)
     {
         if(mBlendEquationRGB != eq || mBlendEquationAlpha != eq)
         {
@@ -452,7 +452,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setBlendEquation(GLenum eqRGB, GLenum eqAlpha)
+    void GLStateCacheManager::setBlendEquation(GLenum eqRGB, GLenum eqAlpha)
     {
         if(mBlendEquationRGB != eqRGB || mBlendEquationAlpha != eqAlpha)
         {
@@ -470,7 +470,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setMaterialDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+    void GLStateCacheManager::setMaterialDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     {
         if((mDiffuse[0] != r) ||
            (mDiffuse[1] != g) ||
@@ -486,7 +486,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setMaterialAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+    void GLStateCacheManager::setMaterialAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     {
         if((mAmbient[0] != r) ||
            (mAmbient[1] != g) ||
@@ -502,7 +502,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setMaterialEmissive(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+    void GLStateCacheManager::setMaterialEmissive(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     {
         if((mEmissive[0] != r) ||
            (mEmissive[1] != g) ||
@@ -518,7 +518,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setMaterialSpecular(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+    void GLStateCacheManager::setMaterialSpecular(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     {
         if((mSpecular[0] != r) ||
            (mSpecular[1] != g) ||
@@ -534,7 +534,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setMaterialShininess(GLfloat shininess)
+    void GLStateCacheManager::setMaterialShininess(GLfloat shininess)
     {
         if (mShininess != shininess)
         {
@@ -543,7 +543,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setPolygonMode(GLenum mode)
+    void GLStateCacheManager::setPolygonMode(GLenum mode)
     {
         if (mPolygonMode != mode)
         {
@@ -552,7 +552,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setShadeModel(GLenum model)
+    void GLStateCacheManager::setShadeModel(GLenum model)
     {
         if (mShadeModel != model)
         {
@@ -561,7 +561,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setLightAmbient(GLfloat r, GLfloat g, GLfloat b)
+    void GLStateCacheManager::setLightAmbient(GLfloat r, GLfloat g, GLfloat b)
     {
         if((mLightAmbient[0] != r) ||
            (mLightAmbient[1] != g) ||
@@ -575,7 +575,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setPointSize(GLfloat size)
+    void GLStateCacheManager::setPointSize(GLfloat size)
     {
         if (mPointSize != size)
         {
@@ -584,7 +584,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::setPointParameters(GLfloat *attenuation, float minSize, float maxSize)
+    void GLStateCacheManager::setPointParameters(GLfloat *attenuation, float minSize, float maxSize)
     {
         if (minSize != mPointSizeMin)
         {
@@ -623,7 +623,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::enableTextureCoordGen(GLenum type)
+    void GLStateCacheManager::enableTextureCoordGen(GLenum type)
     {
         OGRE_HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
         if (it == mTextureCoordGen.end())
@@ -641,7 +641,7 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManagerImp::disableTextureCoordGen(GLenum type)
+    void GLStateCacheManager::disableTextureCoordGen(GLenum type)
     {
         OGRE_HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
         if (it != mTextureCoordGen.end())

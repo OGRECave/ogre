@@ -27,19 +27,19 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLES2StateCacheManagerImp.h"
+#include "OgreGLES2StateCacheManager.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
     
-    GLES2StateCacheManagerImp::GLES2StateCacheManagerImp(void)
+    GLES2StateCacheManager::GLES2StateCacheManager(void)
     {
         clearCache();
     }
     
-    void GLES2StateCacheManagerImp::initializeCache()
+    void GLES2StateCacheManager::initializeCache()
     {
         OGRE_CHECK_GL_ERROR(glBlendEquation(GL_FUNC_ADD));
         
@@ -72,7 +72,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glColorMask(mColourMask[0], mColourMask[1], mColourMask[2], mColourMask[3]));
     }
     
-    void GLES2StateCacheManagerImp::clearCache()
+    void GLES2StateCacheManager::clearCache()
     {
         mDepthMask = GL_TRUE;
         mPolygonMode = GL_FILL;
@@ -105,7 +105,7 @@ namespace Ogre {
         mEnabledVertexAttribs.clear();
     }
     
-    GLES2StateCacheManagerImp::~GLES2StateCacheManagerImp(void)
+    GLES2StateCacheManager::~GLES2StateCacheManager(void)
     {
         mColourMask.clear();
         mClearColour.clear();
@@ -114,7 +114,7 @@ namespace Ogre {
         mTexUnitsMap.clear();
     }
     
-    void GLES2StateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
+    void GLES2StateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         bool update = false;
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
@@ -148,7 +148,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
+    void GLES2StateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
@@ -178,13 +178,13 @@ namespace Ogre {
         }
     }
 
-    void GLES2StateCacheManagerImp::invalidateStateForTexture(GLuint texture)
+    void GLES2StateCacheManager::invalidateStateForTexture(GLuint texture)
     {
         mTexUnitsMap.erase(texture);
     }
 
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
-    void GLES2StateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
+    void GLES2StateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
@@ -222,7 +222,7 @@ namespace Ogre {
         }
     }
 
-    void GLES2StateCacheManagerImp::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
+    void GLES2StateCacheManager::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
     {
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
@@ -260,7 +260,7 @@ namespace Ogre {
         }
     }
 
-    void GLES2StateCacheManagerImp::getTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
+    void GLES2StateCacheManager::getTexParameterfv(GLenum target, GLenum pname, GLfloat* params)
     {
         // Check if we have a map entry for this texture id.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
@@ -268,10 +268,10 @@ namespace Ogre {
         // Get a local copy of the parameter map and search for this parameter
         TexParameterfMap::iterator i = (*it).second.mTexParameterfMap.find(pname);
 
-        params = &(*i).second;
+        *params = i->second;
     }
 
-    void GLES2StateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
+    void GLES2StateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
         mLastBoundTexID = texture;
         
@@ -279,7 +279,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindTexture(target, texture));
     }
     
-    bool GLES2StateCacheManagerImp::activateGLTextureUnit(size_t unit)
+    bool GLES2StateCacheManager::activateGLTextureUnit(uchar unit)
     {
         if (mActiveTextureUnit != unit)
         {
@@ -306,7 +306,7 @@ namespace Ogre {
     }
     
     // TODO: Store as high/low bits of a GLuint
-    void GLES2StateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
+    void GLES2StateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {
         if(mBlendFuncSource != source || mBlendFuncDest != dest)
         {
@@ -317,7 +317,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setBlendEquation(GLenum eq)
+    void GLES2StateCacheManager::setBlendEquation(GLenum eq)
     {
         if(mBlendEquation != eq)
         {
@@ -327,7 +327,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setDepthMask(GLboolean mask)
+    void GLES2StateCacheManager::setDepthMask(GLboolean mask)
     {
         if(mDepthMask != mask)
         {
@@ -337,7 +337,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setDepthFunc(GLenum func)
+    void GLES2StateCacheManager::setDepthFunc(GLenum func)
     {
         if(mDepthFunc != func)
         {
@@ -347,7 +347,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setClearDepth(GLclampf depth)
+    void GLES2StateCacheManager::setClearDepth(GLclampf depth)
     {
         if(mClearDepth != depth)
         {
@@ -357,7 +357,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+    void GLES2StateCacheManager::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     {
         if((mClearColour[0] != red) ||
            (mClearColour[1] != green) ||
@@ -373,7 +373,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+    void GLES2StateCacheManager::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
         if((mColourMask[0] != red) ||
            (mColourMask[1] != green) ||
@@ -389,7 +389,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setStencilMask(GLuint mask)
+    void GLES2StateCacheManager::setStencilMask(GLuint mask)
     {
         if(mStencilMask != mask)
         {
@@ -399,7 +399,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setEnabled(GLenum flag)
+    void GLES2StateCacheManager::setEnabled(GLenum flag)
     {
         bool found = std::find(mEnableVector.begin(), mEnableVector.end(), flag) != mEnableVector.end();
         if(!found)
@@ -410,7 +410,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setDisabled(GLenum flag)
+    void GLES2StateCacheManager::setDisabled(GLenum flag)
     {
         vector<GLenum>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
         if(iter != mEnableVector.end())
@@ -421,7 +421,7 @@ namespace Ogre {
         }
     }
 
-    void GLES2StateCacheManagerImp::setVertexAttribEnabled(GLuint attrib)
+    void GLES2StateCacheManager::setVertexAttribEnabled(GLuint attrib)
     {
         bool found = std::find(mEnabledVertexAttribs.begin(), mEnabledVertexAttribs.end(), attrib) != mEnabledVertexAttribs.end();
         if(!found)
@@ -432,7 +432,7 @@ namespace Ogre {
         }
     }
 
-    void GLES2StateCacheManagerImp::setVertexAttribDisabled(GLuint attrib)
+    void GLES2StateCacheManager::setVertexAttribDisabled(GLuint attrib)
     {
         vector<GLuint>::iterator iter = std::find(mEnabledVertexAttribs.begin(), mEnabledVertexAttribs.end(), attrib);
         if(iter != mEnabledVertexAttribs.end())
@@ -443,7 +443,7 @@ namespace Ogre {
         }
     }
 
-    void GLES2StateCacheManagerImp::setCullFace(GLenum face)
+    void GLES2StateCacheManager::setCullFace(GLenum face)
     {
         if(mCullFace != face)
         {

@@ -146,6 +146,9 @@ namespace Ogre {
         /// List of background thread contexts
         GLContextList mBackgroundContextList;
 
+        // statecaches are per context
+        typedef map<GLContext*, GLStateCacheManager>::type CachesMap;
+        CachesMap mCaches;
         GLStateCacheManager* mStateCacheManager;
 
         /** Manager object for creating render textures.
@@ -173,6 +176,17 @@ namespace Ogre {
         void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
                 const size_t vertexStart, 
                 vector<GLuint>::type &attribsBound, vector<GLuint>::type &instanceAttribsBound );
+
+        /**
+         * GL state is tracked per context, so call this function to drop all
+         * recorded state for a given context before you destroy it.
+         */
+        void unregisterContextCache (GLContext* id);
+
+        /**
+         * @param id new context to switch to for state tracking
+         */
+        void switchContextCache (GLContext* id);
     public:
         // Default constructor / destructor
         GLRenderSystem();

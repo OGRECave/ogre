@@ -27,23 +27,23 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLES2NullStateCacheManagerImp.h"
+#include "OgreGLES2StateCacheManager.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
     
-    GLES2StateCacheManagerImp::GLES2StateCacheManagerImp(void) 
+    GLES2StateCacheManager::GLES2StateCacheManager(void)
     {
         clearCache();
     }
     
-    GLES2StateCacheManagerImp::~GLES2StateCacheManagerImp(void)
+    GLES2StateCacheManager::~GLES2StateCacheManager(void)
     {
     }
     
-    void GLES2StateCacheManagerImp::initializeCache()
+    void GLES2StateCacheManager::initializeCache()
     {
         OGRE_CHECK_GL_ERROR(glBlendEquation(GL_FUNC_ADD));
 
@@ -76,7 +76,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glColorMask(mColourMask[0], mColourMask[1], mColourMask[2], mColourMask[3]));
     }
     
-    void GLES2StateCacheManagerImp::clearCache()
+    void GLES2StateCacheManager::clearCache()
     {
         mDepthMask = GL_TRUE;
         mPolygonMode = GL_FILL;
@@ -95,7 +95,7 @@ namespace Ogre {
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
     }
     
-    void GLES2StateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, bool force)
+    void GLES2StateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         // Update GL
         if(target == GL_FRAMEBUFFER)
@@ -112,7 +112,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
+    void GLES2StateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
@@ -132,31 +132,31 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
+    void GLES2StateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         // Update GL
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
     }
 
-    void GLES2StateCacheManagerImp::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
+    void GLES2StateCacheManager::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
     {
         OGRE_CHECK_GL_ERROR(glTexParameterf(target, pname, param));
     }
 
-    void GLES2StateCacheManagerImp::getTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
+    void GLES2StateCacheManager::getTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
     {
         OGRE_CHECK_GL_ERROR(glGetTexParameterfv(target, pname, params));
     }
 
-    void GLES2StateCacheManagerImp::invalidateStateForTexture(GLuint texture) { }
+    void GLES2StateCacheManager::invalidateStateForTexture(GLuint texture) { }
 
-    void GLES2StateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
+    void GLES2StateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
         // Update GL
         OGRE_CHECK_GL_ERROR(glBindTexture(target, texture));
     }
     
-    bool GLES2StateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
+    bool GLES2StateCacheManager::activateGLTextureUnit(unsigned char unit)
     {
         // Always return true for the currently bound texture unit
         if (mActiveTextureUnit == unit)
@@ -176,18 +176,18 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
+    void GLES2StateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {
         OGRE_CHECK_GL_ERROR(glBlendFunc(source, dest));
     }
     
-    void GLES2StateCacheManagerImp::setBlendEquation(GLenum eq)
+    void GLES2StateCacheManager::setBlendEquation(GLenum eq)
     {
         mBlendEquation = eq;
         OGRE_CHECK_GL_ERROR(glBlendEquation(eq));
     }
     
-    void GLES2StateCacheManagerImp::setDepthMask(GLboolean mask)
+    void GLES2StateCacheManager::setDepthMask(GLboolean mask)
     {
         if(mDepthMask != mask)
         {
@@ -197,7 +197,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setDepthFunc(GLenum func)
+    void GLES2StateCacheManager::setDepthFunc(GLenum func)
     {
         if(mDepthFunc != func)
         {
@@ -207,7 +207,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setClearDepth(GLclampf depth)
+    void GLES2StateCacheManager::setClearDepth(GLclampf depth)
     {
         if(mClearDepth != depth)
         {
@@ -217,7 +217,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+    void GLES2StateCacheManager::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     {
         if((mClearColour[0] != red) ||
            (mClearColour[1] != green) ||
@@ -233,7 +233,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+    void GLES2StateCacheManager::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
         if((mColourMask[0] != red) ||
            (mColourMask[1] != green) ||
@@ -249,7 +249,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setStencilMask(GLuint mask)
+    void GLES2StateCacheManager::setStencilMask(GLuint mask)
     {
         if(mStencilMask != mask)
         {
@@ -259,27 +259,27 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManagerImp::setEnabled(GLenum flag)
+    void GLES2StateCacheManager::setEnabled(GLenum flag)
     {
         OGRE_CHECK_GL_ERROR(glEnable(flag));
     }
     
-    void GLES2StateCacheManagerImp::setDisabled(GLenum flag)
+    void GLES2StateCacheManager::setDisabled(GLenum flag)
     {
         OGRE_CHECK_GL_ERROR(glDisable(flag));
     }
 
-    void GLES2StateCacheManagerImp::setVertexAttribEnabled(GLuint attrib)
+    void GLES2StateCacheManager::setVertexAttribEnabled(GLuint attrib)
     {
         OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
     }
 
-    void GLES2StateCacheManagerImp::setVertexAttribDisabled(GLuint attrib)
+    void GLES2StateCacheManager::setVertexAttribDisabled(GLuint attrib)
     {
         OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(attrib));
     }
 
-    void GLES2StateCacheManagerImp::setCullFace(GLenum face)
+    void GLES2StateCacheManager::setCullFace(GLenum face)
     {
         if(mCullFace != face)
         {
