@@ -81,6 +81,10 @@ namespace Demo
 
         mPsParams[1]->setNamedConstant( "p_invViewMatCubemap", &invViewMatrixCubemap[0][0], 3*3, 1 );
 
+        //Why do we need to 2x the camera position (so that difference is 2x)? I have no clue.
+        viewMatrix[0][3] *= 2.0;
+        viewMatrix[1][3] *= 2.0;
+        viewMatrix[2][3] *= 2.0;
         Ogre::Matrix4 projMatrix = camera->getProjectionMatrixWithRSDepth();
         Ogre::Matrix4 uvSpaceViewProjMatrix =
                 (PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * projMatrix) * viewMatrix;

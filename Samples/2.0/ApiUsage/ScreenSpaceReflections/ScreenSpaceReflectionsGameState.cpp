@@ -123,8 +123,12 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflectionsGameState::update( float timeSinceLast )
     {
-        mScreenSpaceReflections->update( mGraphicsSystem->getCamera() );
         TutorialGameState::update( timeSinceLast );
+
+        //Must be called *AFTER* TutorialGameState::update because ScreenSpaceReflections::update
+        //must be called once the camera has stopped from being manipulated (otherwise reprojection
+        //errors could be huge).
+        mScreenSpaceReflections->update( mGraphicsSystem->getCamera() );
     }
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflectionsGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
