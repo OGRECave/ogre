@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __Common_H__
 // Common stuff
 
-#include "Hash/MurmurHash3.h"
+#include "OgreMurmurHash3.h"
 
 namespace Ogre {
 

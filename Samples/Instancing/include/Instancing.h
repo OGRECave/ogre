@@ -50,7 +50,7 @@ public:
     //-----------------------------------------------------------------------
     Sample_Instancing()  
     { 
-        mInfo["Title"] = "Instancing";
+        mInfo["Title"] = "Instancing [DEPRECATED]";
         mInfo["Description"] = "A demo of different methods to handle a large number of objects.";
         mInfo["Thumbnail"] = "thumb_instancing.png";
         mInfo["Category"] = "Geometry";

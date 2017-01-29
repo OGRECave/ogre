@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __OgreIdString__
 #define __OgreIdString__
 
-#include "Hash/MurmurHash3.h"
+#include "OgreMurmurHash3.h"
 #include <stdio.h>  // sprintf
 #include <string.h> // strlen
 #include <string>

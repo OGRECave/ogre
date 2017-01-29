@@ -3164,6 +3164,7 @@ namespace Ogre {
             read the InstancedGeometry class documentation for full information.
         @param name The name to give the new object
         @return The new InstancedGeometry instance
+        @deprecated createInstanceManager() with InstanceManager::ShaderBased instead
         */
         virtual InstancedGeometry* createInstancedGeometry(const String& name);
         /** Retrieve a previously created InstancedGeometry instance. */

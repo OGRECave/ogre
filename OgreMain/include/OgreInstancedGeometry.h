@@ -97,6 +97,7 @@ namespace Ogre {
         classes.
     @note
         Warning: this class only works with indexed triangle lists at the moment,       do not pass it triangle strips, fans or lines / points, or unindexed geometry.
+    @deprecated use InstanceManager::ShaderBased instead of this
     */
     class _OgreExport  InstancedGeometry : public BatchedGeometryAlloc
     {
