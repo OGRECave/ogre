@@ -38,7 +38,7 @@ namespace Ogre
     /** An in memory cache of the OpenGL ES 2 uniforms. */
     class _OgreGLES2Export GLES2UniformCache : public UniformCacheAlloc
     {
-    private:
+    protected:
         typedef OGRE_HashMap<GLint, uint32> UniformMap;
 
         /// A map of uniform names and a hash of their values

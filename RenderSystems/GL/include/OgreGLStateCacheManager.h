@@ -54,7 +54,7 @@ namespace Ogre
      */
     class _OgreGLExport GLStateCacheManager : public StateCacheAlloc
     {
-    private:
+    protected:
         typedef OGRE_HashMap<GLenum, GLuint> BindBufferMap;
         typedef OGRE_HashMap<GLenum, GLint> TexParameteriMap;
         typedef OGRE_HashMap<GLenum, bool> GLbooleanStateMap;

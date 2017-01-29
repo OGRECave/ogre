@@ -50,7 +50,7 @@ namespace Ogre
      */
     class _OgreGLES2Export GLES2StateCacheManager : public StateCacheAlloc
     {
-    private:
+    protected:
         typedef OGRE_HashMap<GLenum, GLuint> BindBufferMap;
         typedef OGRE_HashMap<GLenum, GLint> TexParameteriMap;
         typedef OGRE_HashMap<GLenum, GLfloat> TexParameterfMap;
