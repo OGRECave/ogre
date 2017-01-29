@@ -35,13 +35,14 @@ typedef Ogre::GeneralAllocatedObject UniformCacheAlloc;
 
 namespace Ogre
 {
-    class GLUniformCacheImp;
-
     /** An in memory cache of the OpenGL uniforms. */
     class _OgreGLExport GLUniformCache : public UniformCacheAlloc
     {
     private:
-        GLUniformCacheImp* mImp;
+        typedef OGRE_HashMap<GLint, uint32> UniformMap;
+
+        /// A map of uniform names and a hash of their values
+        UniformMap mUniformValueMap;
 
     public:
         GLUniformCache(void);
