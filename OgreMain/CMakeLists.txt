@@ -16,7 +16,7 @@ PROJECT(OgreMain)
 include(PrecompiledHeader)
 
 # define header and source files for the library
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES
     ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
     ${CMAKE_BINARY_DIR}/include/OgreExports.h
@@ -24,7 +24,7 @@ list(APPEND HEADER_FILES
     src/OgrePixelConversions.h
     src/OgreSIMDHelper.h)
 
-file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/Hash/*.cpp")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 # silence deprecation warning for internal call
 if(UNIX)

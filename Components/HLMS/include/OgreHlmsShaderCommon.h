@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "Ogre.h"			
 #include "OgreHlmsPrerequisites.h"
 #include "OgreIdString.h"
-#include "Hash/MurmurHash3.h"
+#include "OgreMurmurHash3.h"
 #include <cstddef>
 
 namespace Ogre
