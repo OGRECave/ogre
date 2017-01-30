@@ -39,6 +39,10 @@ cbuffer PassBuffer : register(b0)
 	//Pixel shader
 	float3x3 invViewMatCubemap;
 	float padding; //Compatibility with GLSL.
+
+@property( hlms_use_prepass )
+	float4 windowHeight;
+@end
 	
 @property( ambient_hemisphere || ambient_fixed || envmap_scale )
 	float4 ambientUpperHemi;

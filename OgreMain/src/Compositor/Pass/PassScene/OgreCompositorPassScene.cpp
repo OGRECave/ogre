@@ -83,9 +83,12 @@ namespace Ogre
                         mDefinition->mPrePassTexture );
             mPrePassTextures = &channel->textures;
 
-            const CompositorChannel *ssrChannel = parentNode->_getDefinedTexture(
-                        mDefinition->mPrePassSsrTexture );
-            mSsrTexture = &ssrChannel->textures;
+            if( mDefinition->mPrePassSsrTexture != IdString() )
+            {
+                const CompositorChannel *ssrChannel = parentNode->_getDefinedTexture(
+                            mDefinition->mPrePassSsrTexture );
+                mSsrTexture = &ssrChannel->textures;
+            }
         }
     }
     //-----------------------------------------------------------------------------------

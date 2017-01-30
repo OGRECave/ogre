@@ -39,34 +39,17 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-#version 330
-
-uniform sampler2D depthTexture;
-uniform sampler2D gBuf_normals;
-uniform sampler2D prevFrameDepthTexture;
-
-#define float2 vec2
-#define float3 vec3
-#define float4 vec4
-
-#define int2 ivec2
-#define int3 ivec3
-
-#define float4x4 mat4
-
-#define lerp mix
-
-#define saturate(x) clamp( (x), 0.0, 1.0 )
+Texture2D<float> depthTexture			: register(t0);
+Texture2D<unorm float4> gBuf_normals	: register(t1);
+Texture2D<float> prevFrameDepthTexture	: register(t2);
 
 #define INLINE
 
-out vec4 fragColour;
-
-in block
+struct PS_INPUT
 {
-	vec2 uv0;
-	vec3 cameraDir;
-} inPs;
+	float2 uv0			: TEXCOORD0;
+	float3 cameraDir	: TEXCOORD1;
+};
 
 #define p_depthBufferRes				depthBufferRes
 #define p_zThickness					zThickness
@@ -140,10 +123,10 @@ INLINE float linearizeDepth( float fDepth )
 	return p_projectionParams.y / (fDepth - p_projectionParams.x);
 }
 
-INLINE float linearDepthTexelFetch( sampler2D depthTex, int2 hitPixel )
+INLINE float linearDepthTexelFetch( Texture2D<float> depthTex, int2 hitPixel )
 {
 	// Load returns 0 for any value accessed out of bounds
-	return linearizeDepth( texelFetch( depthTex, int2( hitPixel ), 0 ).x );
+	return linearizeDepth( depthTex.Load( int3( hitPixel , 0 ) ).x );
 }
 
 // Returns true if the ray hit something
@@ -169,10 +152,10 @@ INLINE bool traceScreenSpaceRay
 
 	// Project into homogeneous clip space
 	//float4 H0 = mul( float4( csOrig, 1.0f ), p_viewToTextureSpaceMatrix );
-	float4 H0 = p_viewToTextureSpaceMatrix * float4( csOrig, 1.0f );
+	float4 H0 = mul( p_viewToTextureSpaceMatrix, float4( csOrig, 1.0f ) );
 	H0.xy *= p_depthBufferRes.xy;
 	//float4 H1 = mul( float4( csEndPoint, 1.0f ), p_viewToTextureSpaceMatrix );
-	float4 H1 = p_viewToTextureSpaceMatrix * float4( csEndPoint, 1.0f );
+	float4 H1 = mul( p_viewToTextureSpaceMatrix, float4( csEndPoint, 1.0f ) );
 	H1.xy *= p_depthBufferRes.xy;
 	float k0 = 1.0f / H0.w;
 	float k1 = 1.0f / H1.w;
@@ -261,20 +244,24 @@ INLINE bool traceScreenSpaceRay
 	return intersectsDepthBuffer( sceneZMax, rayZMin, rayZMax );
 }
 
-in float4 gl_FragCoord;
-
-void main()
+float4 main
+(
+	PS_INPUT inPs,
+	float4 gl_FragCoord : SV_Position
+) : SV_Target0
 {
-	float3 normalVS = texelFetch( gBuf_normals, int2( gl_FragCoord.xy * 2.0 ), 0 ).xyz * 2.0 - 1.0;
+	float4 fragColour;
+
+	float3 normalVS = gBuf_normals.Load( int3( gl_FragCoord.xy * 2.0, 0 ) ).xyz * 2.0 - 1.0;
 	normalVS.z = -normalVS.z; //Normal should be left handed.
-	//if( !any(normalVS) )
-	if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
+	if( !any(normalVS) )
+	//if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
 	{
-		fragColour = vec4( 0.0f, 0.0f, 0.0f, 0.0f );
-		return;
+		fragColour = float4( 0.0f, 0.0f, 0.0f, 0.0f );
+		return fragColour;
 	}
 
-	float depth = texelFetch( depthTexture, int2( gl_FragCoord.xy * 2.0 ), 0 ).x;
+	float depth = depthTexture.Load( int3( gl_FragCoord.xy * 2.0, 0 ) ).x;
 	float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
 	/** Since position is reconstructed in view space, just normalize it to get the
@@ -299,12 +286,11 @@ void main()
 	//Reflections lag one frame behind, so we need to reproject based on previous camera position
 	//to know where to sample the colour. If the depth differences are too big then we don't use
 	//that reflection.
-	float currDepth = texelFetch( depthTexture, int2(hitPixel.xy), 0 ).x;
+	float currDepth = depthTexture.Load( int3(hitPixel.xy, 0 ) ).x;
 	hitPixel *= p_invDepthBufferRes.xy; //Transform hit pixel from pixel position to UVs
-	float4 reprojectedPos = p_reprojectionMatrix * float4( hitPixel.xy, currDepth, 1.0 );
+	float4 reprojectedPos = mul( p_reprojectionMatrix, float4( hitPixel.xy, currDepth, 1.0 ) );
 	reprojectedPos.xyz /= reprojectedPos.w;
-	float prevDepth = texelFetch( prevFrameDepthTexture,
-								  int2(reprojectedPos.xy * p_depthBufferRes.xy), 0 ).x;
+	float prevDepth = prevFrameDepthTexture.Load( int3(reprojectedPos.xy * p_depthBufferRes.xy, 0 ) ).x;
 	hitPixel.xy = reprojectedPos.xy;
 	bool reprojFailed = (linearizeDepth( reprojectedPos.z ) -
 						 linearizeDepth( prevDepth )) > p_reprojectionMaxDistanceError;
@@ -321,4 +307,5 @@ void main()
 	fadeOnDistance = 1.0f - fadeOnDistance;
 
 	fragColour = intersection ? float4( hitPixel.xy, fadeOnDistance, rDotV ) : float4( 0, 0, 0, 0 );
+	return fragColour;
 }

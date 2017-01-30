@@ -17,6 +17,20 @@ struct PS_INPUT
 
 @property( !hlms_shadowcaster )
 
+@property( hlms_use_prepass )
+	@property( !hlms_use_prepass_msaa )
+		Texture2D<unorm float4> gBuf_normals			: register(t@value(gBuf_normals));
+		Texture2D<unorm float2> gBuf_shadowRoughness	: register(t@value(gBuf_shadowRoughness));
+	@end @property( hlms_use_prepass_msaa )
+		Texture2DMS<unorm float4> gBuf_normals			: register(t@value(gBuf_normals));
+		Texture2DMS<unorm float2> gBuf_shadowRoughness	: register(t@value(gBuf_shadowRoughness));
+	@end
+
+	@property( hlms_use_ssr )
+		Texture2D<unorm float4> ssrTexture : register(t@value(ssrTexture));
+	@end
+@end
+
 @property( two_sided_lighting )
 @piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
 @end
@@ -136,7 +150,7 @@ float3 qmul( float4 q, float3 v )
 	@end
 @end
 
-@property( hlms_normal || hlms_qtangent )
+@property( (hlms_normal || hlms_qtangent) && !hlms_prepass )
 @insertpiece( DeclareBRDF )
 @insertpiece( DeclareBRDF_InstantRadiosity )
 @end
@@ -152,7 +166,8 @@ float3 qmul( float4 q, float3 v )
 
 @insertpiece( output_type ) main( PS_INPUT inPs
 @property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end
-@property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end )
+@property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end
+@property( hlms_use_prepass_msaa && hlms_use_prepass ), uint gl_SampleMask : SV_Coverage@end )
 {
 	PS_OUTPUT psOut;
 	@insertpiece( custom_ps_preExecution )
@@ -221,59 +236,82 @@ float4 diffuseCol;
 	detailCol@n.w = detailWeights.@insertpiece(detail_swizzle@n);@end
 @end
 
-@insertpiece( SampleDiffuseMap )
+@property( !hlms_prepass || alpha_test )
+	@insertpiece( SampleDiffuseMap )
 
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value.
 	@property( !diffuse_map )diffuseCol = material.bgDiffuse;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
-@foreach( detail_maps_diffuse, n )
-	@insertpiece( blend_mode_idx@n ) @add( t, 1 ) @end
+	@foreach( detail_maps_diffuse, n )
+		@insertpiece( blend_mode_idx@n ) @add( t, 1 ) @end
 
-	/// Apply the material's diffuse over the textures
-	@property( !transparent_mode )
-		diffuseCol.xyz *= material.kD.xyz;
-	@end @property( transparent_mode )
-		diffuseCol.xyz *= material.kD.xyz * diffuseCol.w * diffuseCol.w;
-	@end
+		/// Apply the material's diffuse over the textures
+		@property( !transparent_mode )
+			diffuseCol.xyz *= material.kD.xyz;
+		@end @property( transparent_mode )
+			diffuseCol.xyz *= material.kD.xyz * diffuseCol.w * diffuseCol.w;
+		@end
 
-@property( alpha_test )
-	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
-		discard;
-@end
-
-@property( !normal_map )
-	// Geometric normal
-	nNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
-@end @property( normal_map )
-	//Normal mapping.
-	float3 geomNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
-	float3 vTangent = normalize( inPs.tangent );
-
-	//Get the TBN matrix
-	float3 vBinormal	= normalize( cross( geomNormal, vTangent )@insertpiece( tbnApplyReflection ) );
-	float3x3 TBN		= float3x3( vTangent, vBinormal, geomNormal );
-
-	@property( normal_map_tex )nNormal = getTSNormal( float3( inPs.uv@value(uv_normal).xy, normalIdx ) );@end
-	@property( normal_weight_tex )
-		// Apply the weight to the main normal map
-		nNormal = lerp( float3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );
+	@property( alpha_test )
+		if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
+			discard;
 	@end
 @end
 
-@property( hlms_pssm_splits )
-    float fShadow = 1.0;
-    if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
-        fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-@foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
-        fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
-    float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+@property( !hlms_use_prepass )
+	@property( !normal_map )
+		// Geometric normal
+		nNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
+	@end @property( normal_map )
+		//Normal mapping.
+		float3 geomNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
+		float3 vTangent = normalize( inPs.tangent );
+
+		//Get the TBN matrix
+		float3 vBinormal	= normalize( cross( geomNormal, vTangent )@insertpiece( tbnApplyReflection ) );
+		float3x3 TBN		= float3x3( vTangent, vBinormal, geomNormal );
+
+		@property( normal_map_tex )nNormal = getTSNormal( float3( inPs.uv@value(uv_normal).xy, normalIdx ) );@end
+		@property( normal_weight_tex )
+			// Apply the weight to the main normal map
+			nNormal = lerp( float3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );
+		@end
+	@end
+
+	@property( hlms_pssm_splits )
+		float fShadow = 1.0;
+		if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
+			fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+	@foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
+			fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+	@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
+		float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+	@end
+	@insertpiece( SampleRoughnessMap )
+
+@end @property( hlms_use_prepass )
+	int2 iFragCoord = int2( gl_FragCoord.xy );
+
+	@property( hlms_use_prepass_msaa )
+		int gBufSubsample = firstbit_lo( gl_SampleMask[0] );
+
+		nNormal = gBuf_normals.Load( iFragCoord, 0 ).xyz * 2.0 - 1.0;
+		float2 shadowRoughness = gBuf_shadowRoughness.Load( iFragCoord, 0 ).xy;
+	@end @property( !hlms_use_prepass_msaa )
+		nNormal = gBuf_normals.Load( int3( iFragCoord, 0 ) ).xyz * 2.0 - 1.0;
+		float2 shadowRoughness = gBuf_shadowRoughness.Load( int3( iFragCoord, 0 ) ).xy;
+	@end
+
+	float fShadow = shadowRoughness.x;
+
+	@property( roughness_map )
+		ROUGHNESS = shadowRoughness.y * 0.98 + 0.02; /// ROUGHNESS is a constant otherwise
+	@end
 @end
 
-@insertpiece( SampleSpecularMap )
-@insertpiece( SampleRoughnessMap )
+	@insertpiece( SampleSpecularMap )
 
 	/// If there is no normal map, the first iteration must
 	/// initialize nNormal instead of try to merge with it.
@@ -299,10 +337,12 @@ float4 diffuseCol;
 	nNormal = normalize( mul( nNormal, TBN ) );
 @end
 
+@property( !hlms_prepass )
 	//Everything's in Camera space
 @property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forwardplus )
 	float3 viewDir	= normalize( -inPs.pos );
-	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
+	float NdotV		= saturate( dot( nNormal, viewDir ) );
+@end
 
 @property( !ambient_fixed )
 	float3 finalColour = float3(0, 0, 0);
@@ -415,27 +455,48 @@ float4 diffuseCol;
 		@end
 	@end
 
+	@property( hlms_use_ssr )
+		//TODO: SSR pass should be able to combine global & local cubemap.
+		float4 ssrReflection = ssrTexture.Load( int3( iFragCoord, 0 ) ).xyzw;
+		@property( use_envprobe_map || ambient_hemisphere )
+			envColourS = lerp( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
+		@end @property( !use_envprobe_map && !ambient_hemisphere )
+			float3 envColourS = ssrReflection.xyz * ssrReflection.w;
+			float3 envColourD = float3( 0, 0, 0 );
+		@end
+	@end
+
 	@insertpiece( BRDF_EnvMap )
 @end
+@end ///!hlms_prepass
 
-@property( !hw_gamma_write )
-	//Linear to Gamma space
-	psOut.colour0.xyz	= sqrt( finalColour );
-@end @property( hw_gamma_write )
-	psOut.colour0.xyz	= finalColour;
-@end
-
-@property( hlms_alphablend )
-	@property( use_texture_alpha )
-		psOut.colour0.w		= material.F0.w * diffuseCol.w;
-	@end @property( !use_texture_alpha )
-		psOut.colour0.w		= material.F0.w;
+@property( !hlms_prepass )
+	@property( !hw_gamma_write )
+		//Linear to Gamma space
+		psOut.colour0.xyz	= sqrt( finalColour );
+	@end @property( hw_gamma_write )
+		psOut.colour0.xyz	= finalColour;
 	@end
-@end @property( !hlms_alphablend )
-	psOut.colour0.w		= 1.0;@end
-	
-@end @property( !hlms_normal && !hlms_qtangent )
-	psOut.colour0 = float4( 1.0, 1.0, 1.0, 1.0 );
+
+	@property( hlms_alphablend )
+		@property( use_texture_alpha )
+			psOut.colour0.w		= material.F0.w * diffuseCol.w;
+		@end @property( !use_texture_alpha )
+			psOut.colour0.w		= material.F0.w;
+		@end
+	@end @property( !hlms_alphablend )
+		psOut.colour0.w		= 1.0;@end
+
+	@end @property( !hlms_normal && !hlms_qtangent )
+		psOut.colour0 = float4( 1.0, 1.0, 1.0, 1.0 );
+	@end
+@end @property( hlms_prepass )
+	psOut.normals			= float4( nNormal * 0.5 + 0.5, 1.0 );
+	@property( hlms_pssm_splits )
+		psOut.shadowRoughness	= float2( fShadow, (ROUGHNESS - 0.02) * 1.02040816 );
+	@end @property( !hlms_pssm_splits )
+		psOut.sShadowRoughness	= float2( 1.0, (ROUGHNESS - 0.02) * 1.02040816 );
+	@end
 @end
 
 	@insertpiece( custom_ps_posExecution )
@@ -450,7 +511,7 @@ float4 diffuseCol;
 @property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
 @insertpiece( DeclOutputType )
-	
+
 @insertpiece( output_type ) main( PS_INPUT inPs )
 {
 	PS_OUTPUT psOut;

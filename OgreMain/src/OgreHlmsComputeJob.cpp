@@ -233,15 +233,15 @@ namespace Ogre
                     setProperty( propName.c_str(), texture->getTextureType() == TEX_TYPE_2D_ARRAY );
                     propName.resize( texturePropSize );
 
+                    propName.a( "_pf_type" );           //uav0_pf_type
+                    const char *typeName = toShaderType->getPixelFormatType( texture->getFormat() );
+                    if( typeName )
+                        setPiece( propName.c_str(), typeName );
+                    propName.resize( texturePropSize );
+
                     //Note we're comparing pointers, not string comparison!
                     if( propTexture == ComputeProperty::Uav )
                     {
-                        propName.a( "_pf_type" );           //uav0_pf_type
-                        const char *typeName = toShaderType->getPixelFormatType( texture->getFormat() );
-                        if( typeName )
-                            setPiece( propName.c_str(), typeName );
-                        propName.resize( texturePropSize );
-
                         uint32 mipLevel = std::min<uint32>( itor->mipmapLevel,
                                                             texture->getNumMipmaps() );
 

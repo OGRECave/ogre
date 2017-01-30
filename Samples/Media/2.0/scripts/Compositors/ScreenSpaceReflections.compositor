@@ -7,11 +7,20 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 	
 	texture prevFrame target_width target_height PF_R8G8B8A8 mipmap -1 no_gamma uav depth_pool 0
 	//Needed to calculate the difference in depths (if it's too high, then we can't use this result)
-	texture prevFrameDepthBuffer target_width target_height PF_FLOAT32_R
+	texture prevFrameDepthBuffer target_width target_height PF_FLOAT32_R uav
 	texture rtt target_width target_height PF_R8G8B8A8
 
 	texture rayTracingBuffer target_width_scaled 0.5 target_height_scaled 0.5 PF_SHORT_RGBA depth_pool 0
 	texture reflectionBuffer target_width target_height PF_R8G8B8A8 depth_pool 0
+
+	target prevFrame
+	{
+		pass clear
+		{
+			colour_value 0 0 0 1
+			num_initial 1
+		}
+	}
 
 	target mrtGBuffer
 	{
@@ -39,8 +48,7 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 			material SSR/ScreenSpaceReflectionsVectors
 			input 0 mrtDepthBuffer
 			input 1 mrtGBuffer 0
-			input 2 prevFrame
-			input 3 prevFrameDepthBuffer
+			input 2 prevFrameDepthBuffer
 		}
 	}
 
