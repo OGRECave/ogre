@@ -148,14 +148,16 @@ float3 qmul( float4 q, float3 v )
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
+@insertpiece( DeclOutputType )
+
 @insertpiece( output_type ) main( PS_INPUT inPs
 @property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end
-@property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end ) @insertpiece( output_type_sv )
+@property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end )
 {
+	PS_OUTPUT psOut;
 	@insertpiece( custom_ps_preExecution )
 
 	Material material;
-	float4 outColour;
 	
 @property( diffuse_map )	uint diffuseIdx;@end
 @property( normal_map_tex )	uint normalIdx;@end
@@ -418,38 +420,42 @@ float4 diffuseCol;
 
 @property( !hw_gamma_write )
 	//Linear to Gamma space
-	outColour.xyz	= sqrt( finalColour );
+	psOut.colour0.xyz	= sqrt( finalColour );
 @end @property( hw_gamma_write )
-	outColour.xyz	= finalColour;
+	psOut.colour0.xyz	= finalColour;
 @end
 
 @property( hlms_alphablend )
 	@property( use_texture_alpha )
-		outColour.w		= material.F0.w * diffuseCol.w;
+		psOut.colour0.w		= material.F0.w * diffuseCol.w;
 	@end @property( !use_texture_alpha )
-		outColour.w		= material.F0.w;
+		psOut.colour0.w		= material.F0.w;
 	@end
 @end @property( !hlms_alphablend )
-	outColour.w		= 1.0;@end
+	psOut.colour0.w		= 1.0;@end
 	
 @end @property( !hlms_normal && !hlms_qtangent )
-	outColour = float4( 1.0, 1.0, 1.0, 1.0 );
+	psOut.colour0 = float4( 1.0, 1.0, 1.0, 1.0 );
 @end
 
 	@insertpiece( custom_ps_posExecution )
 
 @property( !hlms_render_depth_only )
-	return outColour;
+	return psOut;
 @end
 }
 @end
 @property( hlms_shadowcaster )
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+
+@insertpiece( DeclOutputType )
 	
-@insertpiece( output_type ) main( PS_INPUT inPs ) @insertpiece( output_type_sv )
+@insertpiece( output_type ) main( PS_INPUT inPs )
 {
+	PS_OUTPUT psOut;
 	@insertpiece( custom_ps_preExecution )
+
 	
 @property( alpha_test )
 	Material material;
@@ -509,7 +515,8 @@ float4 diffuseCol;
 	@insertpiece( custom_ps_posExecution )
 
 @property( !hlms_render_depth_only )
-	return inPs.depth;
+	psOut.colour0 = inPs.depth;
+	return psOut;
 @end
 }
 @end
