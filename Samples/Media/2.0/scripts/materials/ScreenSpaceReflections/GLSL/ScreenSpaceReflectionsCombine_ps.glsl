@@ -62,7 +62,7 @@ INLINE float linearDepthTexelFetch( sampler2D depthTex, int2 hitPixel )
 	return linearizeDepth( texelFetch( depthTex, int2( hitPixel ), 0 ).x );
 }
 
-INLINE float specularPowerToConeAngle( float specularPower )
+/*INLINE float specularPowerToConeAngle( float specularPower )
 {
 	// based on phong distribution model
 	if( specularPower >= exp2(11) )
@@ -71,13 +71,21 @@ INLINE float specularPowerToConeAngle( float specularPower )
 	const float xi = 0.244f;
 	float exponent = 1.0f / (specularPower + 1.0f);
 	return acos( pow( xi, exponent ) );
+}*/
+
+INLINE float roughnessToConeAngle( float roughness )
+{
+	//This formula was eye-balled. Not done scientifically at all. It's good and fast. Deal with it.
+	//(at least for for roughness < 0.6 which is the range we really care)
+	return smoothstep( 0.0, 1.0, 1 - 1 / (1 + roughness * roughness) );
 }
 
-INLINE float isoscelesTriangleOpposite( float adjacentLength, float coneTheta )
+INLINE float isoscelesTriangleOpposite( float adjacentLength, float tanConeTheta )
 {
 	// simple trig and algebra - soh, cah, toa - tan(theta) = opp/adj, opp = tan(theta) * adj,
 	// then multiply * 2.0f for isosceles triangle base
-	return 2.0f * tan(coneTheta) * adjacentLength;
+	//return 2.0f * tan(coneTheta) * adjacentLength;
+	return 2.0f * tanConeTheta * adjacentLength;
 }
 
 INLINE float isoscelesTriangleInRadius( float a, float h )
@@ -93,10 +101,10 @@ INLINE float4 coneSampleWeightedColor( float2 samplePos, float mipChannel, float
 	return float4( sampleColor * gloss, gloss );
 }
 
-INLINE float glossToSpecularPower( float gloss )
+/*INLINE float glossToSpecularPower( float gloss )
 {
 	return exp2(10.0 * gloss + 1.0);
-}
+}*/
 
 INLINE float3 viewSpacePositionFromDepth( float2 ssPosXY, float zDepth )
 {
@@ -116,14 +124,15 @@ void main()
 
 	//Do not decode roughness, keep it in [0; 1] range.
 	float roughness = texelFetch( gBuf_shadowRoughness, int2( gl_FragCoord.xy ), 0 ).y;
-	//roughness = roughness * 0.98 + 0.02
-	//float roughness = 0.0;
 	float gloss = 1.0f - roughness;
-	float specularPower = glossToSpecularPower( gloss );
+	/*float specularPower = glossToSpecularPower( gloss );
 
-	// convert to cone angle (maximum extent of the specular lobe aperture)
-	// only want half the full cone angle since we're slicing the isosceles triangle in half to get a right triangle
 	float coneTheta = specularPowerToConeAngle( specularPower ) * 0.5f;
+	//float tanConeTheta = tan( roughnessToConeAngle( roughness ) * 0.5f );*/
+	// convert to cone angle (maximum extent of the specular lobe aperture)
+	// only want half the full cone angle since we're slicing the isosceles
+	// triangle in half to get a right triangle
+	float tanConeTheta = roughnessToConeAngle( roughness );
 
 	// P1 = positionSS, P2 = hitPixel, adjacent length = ||P2 - P1||
 	float2 positionSS = inPs.uv0.xy;
@@ -138,7 +147,7 @@ void main()
 	for( int i = 0; i < 14; ++i )
 	{
 		// intersection length is the adjacent side, get the opposite side using trig
-		float oppositeLength = isoscelesTriangleOpposite( adjacentLength, coneTheta );
+		float oppositeLength = isoscelesTriangleOpposite( adjacentLength, tanConeTheta );
 
 		// calculate in-radius of the isosceles triangle
 		float incircleSize = isoscelesTriangleInRadius( oppositeLength, adjacentLength );

@@ -22,6 +22,7 @@ namespace Demo
     class ScreenSpaceReflectionsGameState : public TutorialGameState
     {
         ScreenSpaceReflections  *mScreenSpaceReflections;
+        Ogre::HlmsPbsDatablock  *mMaterials[4];
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 

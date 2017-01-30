@@ -42,6 +42,8 @@ namespace Demo
     {
         mDisplayHelpMode        = 2;
         mNumDisplayHelpModes    = 3;
+
+        memset( mMaterials, 0, sizeof(mMaterials) );
     }
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflectionsGameState::createScene01(void)
@@ -90,6 +92,7 @@ namespace Demo
                 datablock->setBackgroundDiffuse( materials[i].colour );
                 datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
                 datablock->setRoughness( 0.02 );
+                mMaterials[i] = datablock;
             }
         }
 
@@ -133,7 +136,14 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflectionsGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
     {
+        char tmpBuffer[64];
+        Ogre::LwString roughnessStr( Ogre::LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+        roughnessStr.a( Ogre::LwString::Float( mMaterials[0]->getRoughness(), 2 ) );
+
         TutorialGameState::generateDebugText( timeSinceLast, outText );
+
+        outText += "\nPress F2/F3 to adjust material roughness: ";
+        outText += roughnessStr.c_str();
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         outText += "\nCamera: ";
@@ -148,6 +158,19 @@ namespace Demo
         {
             TutorialGameState::keyReleased( arg );
             return;
+        }
+
+        if( arg.keysym.sym == SDLK_F2 )
+        {
+            float roughness = mMaterials[0]->getRoughness();
+            for( int i=0; i<4; ++i )
+                mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness - 0.10f, 0.02f, 1.0f ) );
+        }
+        else if( arg.keysym.sym == SDLK_F3 )
+        {
+            float roughness = mMaterials[0]->getRoughness();
+            for( int i=0; i<4; ++i )
+                mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness + 0.10f, 0.02f, 1.0f ) );
         }
 
         static float tmpValue = 1;
