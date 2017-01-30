@@ -89,24 +89,24 @@ material SSR/ScreenSpaceReflectionsVectors
 
 			fragment_program_ref SSR/ScreenSpaceReflectionsVectors_ps
 			{
-				param_named_auto	p_depthBufferRes	texture_size 0
-				param_named			p_zThickness		float	0.25
-				param_named_auto	p_nearPlaneZ		near_clip_distance
+				param_named_auto	depthBufferRes		texture_size 0
+				param_named			zThickness			float	0.25
+				param_named_auto	nearPlaneZ			near_clip_distance
 
-				param_named			p_stride			float	4
-				param_named			p_maxSteps			float	200
-				param_named			p_maxDistance		float	1000
-				param_named			p_strideZCutoff		float	0.01
+				param_named			stride				float	4
+				param_named			maxSteps			float	200
+				param_named			maxDistance			float	1000
+				param_named			strideZCutoff		float	0.01
 
-				param_named			p_reprojectionMaxDistanceError	float	2
+				param_named			reprojectionMaxDistanceError	float	2
 
-				//p_projectionParams will be set from C++
-				param_named			p_projectionParams	float2	0 1
-				param_named_auto	p_invDepthBufferRes	inverse_texture_size 0;
+				//projectionParams will be set from C++
+				param_named			projectionParams	float2	0 1
+				param_named_auto	invDepthBufferRes	inverse_texture_size 0;
 
 				//Set from C++
-				//param_named		p_viewToTextureSpaceMatrix	float4x4
-				//param_named		p_reprojectionMatrix		float4x4
+				//param_named		viewToTextureSpaceMatrix	float4x4
+				//param_named		reprojectionMatrix			float4x4
 			}
 
 			texture_unit depthTexture
@@ -153,19 +153,19 @@ material SSR/ScreenSpaceReflectionsCombine
 
 			fragment_program_ref SSR/ScreenSpaceReflectionsCombine_ps
 			{
-				param_named_auto	p_depthBufferRes	texture_size 0
+				param_named_auto	depthBufferRes		texture_size 0
 
-				//param_named			p_maxDistance		float	1000
+				//param_named			maxDistance		float	1000
 
-				param_named			p_fadeStart			float	0.95
-				//param_named		p_fadeEnd			float	1.00
-				// 1 / (p_fadeEnd - p_fadeStart)
-				param_named			p_invFadeRange		float	20
+				param_named			fadeStart			float	0.95
+				//param_named		fadeEnd				float	1.00
+				// 1 / (fadeEnd - fadeStart)
+				param_named			invFadeRange		float	20
 
 				//Set from C++
-				param_named			p_projectionParams	float2	0 1
-				//param_named		p_textureSpaceToViewSpace	float4x4
-				//param_named		p_invViewMatCubemap			float4x4
+				param_named			projectionParams		float2	0 1
+				//param_named		textureSpaceToViewSpace	float4x4
+				//param_named		invViewMatCubemap		float4x4
 			}
 
 			texture_unit depthTexture

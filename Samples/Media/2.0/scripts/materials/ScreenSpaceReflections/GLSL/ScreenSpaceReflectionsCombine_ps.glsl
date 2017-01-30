@@ -33,6 +33,14 @@ in block
 	vec3 cameraDir;
 } inPs;
 
+#define p_depthBufferRes			depthBufferRes
+#define p_fadeStart					fadeStart
+#define p_invFadeRange				invFadeRange
+#define p_projectionParams			projectionParams
+#define p_textureSpaceToViewSpace	textureSpaceToViewSpace
+#define p_invViewMatCubemap			invViewMatCubemap
+
+
 //struct Params
 //{
 uniform	float4 p_depthBufferRes;// dimensions of the z-buffer. .w = max( .x, .y )

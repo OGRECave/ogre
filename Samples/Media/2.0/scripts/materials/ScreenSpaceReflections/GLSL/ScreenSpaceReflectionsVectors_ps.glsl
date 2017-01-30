@@ -69,6 +69,23 @@ in block
 	vec3 cameraDir;
 } inPs;
 
+#define p_depthBufferRes				depthBufferRes
+#define p_zThickness					zThickness
+#define p_nearPlaneZ					nearPlaneZ
+
+#define p_stride						stride
+
+#define p_maxSteps						maxSteps
+#define p_maxDistance					maxDistance
+#define p_strideZCutoff					strideZCutoff
+
+#define p_projectionParams				projectionParams
+#define p_invDepthBufferRes				invDepthBufferRes
+
+#define p_viewToTextureSpaceMatrix		viewToTextureSpaceMatrix
+#define p_reprojectionMatrix			reprojectionMatrix
+#define p_reprojectionMaxDistanceError	reprojectionMaxDistanceError
+
 //struct Params
 //{
 uniform	float4 p_depthBufferRes;// dimensions of the z-buffer. .w = max( .x, .y )

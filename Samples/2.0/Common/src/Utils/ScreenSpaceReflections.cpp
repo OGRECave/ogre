@@ -47,7 +47,7 @@ namespace Demo
         {
             //The division will keep "linearDepth" in the shader in the [0; 1] range.
             //projectionB /= camera->getFarClipDistance();
-            mPsParams[0]->setNamedConstant( "p_projectionParams",
+            mPsParams[0]->setNamedConstant( "projectionParams",
                                             Ogre::Vector4( projectionA, projectionB, 0, 0 ) );
         }
 
@@ -66,8 +66,8 @@ namespace Demo
 
         viewToTextureSpaceMatrix = PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * viewToTextureSpaceMatrix;
 
-        mPsParams[0]->setNamedConstant( "p_viewToTextureSpaceMatrix", viewToTextureSpaceMatrix );
-        mPsParams[1]->setNamedConstant( "p_textureSpaceToViewSpace", viewToTextureSpaceMatrix.inverse() );
+        mPsParams[0]->setNamedConstant( "viewToTextureSpaceMatrix", viewToTextureSpaceMatrix );
+        mPsParams[1]->setNamedConstant( "textureSpaceToViewSpace", viewToTextureSpaceMatrix.inverse() );
 
         Ogre::Matrix4 viewMatrix = camera->getViewMatrix(true);
         Ogre::Matrix3 viewMatrix3, invViewMatrixCubemap;
@@ -79,7 +79,7 @@ namespace Demo
         invViewMatrixCubemap[2][2] = -invViewMatrixCubemap[2][2];
         invViewMatrixCubemap = invViewMatrixCubemap.Inverse();
 
-        mPsParams[1]->setNamedConstant( "p_invViewMatCubemap", &invViewMatrixCubemap[0][0], 3*3, 1 );
+        mPsParams[1]->setNamedConstant( "invViewMatCubemap", &invViewMatrixCubemap[0][0], 3*3, 1 );
 
         //Why do we need to 2x the camera position (so that difference is 2x)? I have no clue.
         viewMatrix[0][3] *= 2.0;
@@ -90,7 +90,7 @@ namespace Demo
                 (PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * projMatrix) * viewMatrix;
 
         Ogre::Matrix4 reprojectionMatrix = mLastUvSpaceViewProjMatrix * uvSpaceViewProjMatrix.inverse();
-        mPsParams[0]->setNamedConstant( "p_reprojectionMatrix", reprojectionMatrix );
+        mPsParams[0]->setNamedConstant( "reprojectionMatrix", reprojectionMatrix );
 
         mLastUvSpaceViewProjMatrix = uvSpaceViewProjMatrix;
     }
