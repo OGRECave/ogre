@@ -72,6 +72,7 @@ namespace Ogre
     protected:
 
         IdString            mName;
+        String              mNameStr;
         NodeAliasMap        mAliasedNodes;
         ChannelRouteList    mChannelRoutes;
         ChannelRouteList    mBufferChannelRoutes;
@@ -122,10 +123,11 @@ namespace Ogre
                                              uint32 outChannel ) const;
 
     public:
-        CompositorWorkspaceDef( IdString name, CompositorManager2 *compositorManager );
+        CompositorWorkspaceDef( const String& name, CompositorManager2 *compositorManager );
         virtual ~CompositorWorkspaceDef() {}
 
         IdString getName(void) const                                { return mName; }
+        String getNameStr(void) const                               { return mNameStr; }
 
         /** Connects outNode's output channel to inNode's input channel.
         @remarks

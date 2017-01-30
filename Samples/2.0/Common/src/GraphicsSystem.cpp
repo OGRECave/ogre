@@ -542,7 +542,7 @@ namespace Demo
     {
         Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
-        const Ogre::IdString workspaceName( "Demo Workspace" );
+        const Ogre::String workspaceName( "Demo Workspace" );
         if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
         {
             compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColour,

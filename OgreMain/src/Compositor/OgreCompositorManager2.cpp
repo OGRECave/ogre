@@ -311,7 +311,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    CompositorWorkspaceDef* CompositorManager2::addWorkspaceDefinition( IdString name )
+    CompositorWorkspaceDef* CompositorManager2::addWorkspaceDefinition( const String& name )
     {
         CompositorWorkspaceDef *retVal = 0;
 
@@ -323,7 +323,7 @@ namespace Ogre
         else
         {
             OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "A workspace with name '" +
-                            name.getFriendlyText() + "' already exists",
+                            name + "' already exists",
                             "CompositorManager2::addWorkspaceDefinition" );
         }
 
@@ -655,12 +655,12 @@ namespace Ogre
         mRenderSystem->_endFrameOnce();
     }
     //-----------------------------------------------------------------------------------
-    void CompositorManager2::createBasicWorkspaceDef( const IdString &workspaceDefName,
+    void CompositorManager2::createBasicWorkspaceDef( const String &workspaceDefName,
                                                         const ColourValue &backgroundColour,
                                                         IdString shadowNodeName )
     {
-        CompositorNodeDef *nodeDef = this->addNodeDefinition( "AutoGen " + (workspaceDefName +
-                                                                IdString("/Node")).getReleaseText() );
+        CompositorNodeDef *nodeDef = this->addNodeDefinition( "AutoGen " + IdString(workspaceDefName +
+                                                                "/Node").getReleaseText() );
 
         //Input texture
         nodeDef->addTextureSourceName( "WindowRT", 0, TextureDefinitionBase::TEXTURE_INPUT );

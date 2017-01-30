@@ -194,7 +194,7 @@ namespace Ogre
             Setting workspace def's connections must be done *after* all node
             definitions have been created
         */
-        CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
+        CompositorWorkspaceDef* addWorkspaceDefinition( const String& name );
 
         /// Returns how many times _update has been called.
         size_t getFrameCount(void) const                    { return mFrameCount; }
@@ -371,7 +371,7 @@ namespace Ogre
             Name of the shadow node. Leave blank if no shadows.
             Caller is supposed to have set the shadow node correctly
         */
-        void createBasicWorkspaceDef( const IdString &workspaceDefName,
+        void createBasicWorkspaceDef( const String &workspaceDefName,
                                         const ColourValue &backgroundColour,
                                         IdString shadowNodeName=IdString() );
 
