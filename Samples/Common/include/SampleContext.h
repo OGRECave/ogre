@@ -77,6 +77,7 @@ namespace OgreBites
             }
 
             mWindow->removeAllViewports();                  // wipe viewports
+            mWindow->resetStatistics();
 
             if (s)
             {
