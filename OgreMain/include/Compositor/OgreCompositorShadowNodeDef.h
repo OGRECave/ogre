@@ -84,10 +84,11 @@ namespace Ogre
 
     protected:
         IdString    name;
+        String      nameStr;
         size_t      sharesSetupWith;
 
     public:
-        ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
+        ShadowTextureDefinition( ShadowMapTechniques t, const String& _name,
                                 size_t _light, size_t _split ) :
                 textureType( TEX_TYPE_2D ),
                 width(1024), height(1024), depth(1), widthFactor(1.0f), heightFactor(1.0f),
@@ -95,9 +96,10 @@ namespace Ogre
                 depthBufferId(2), depthBufferFormat( PF_UNKNOWN ),
                 light(_light), split(_split), shadowMapTechnique(t),
                 pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),
-                name( _name ), sharesSetupWith( -1 ) {}
+                name( _name ), nameStr( _name ), sharesSetupWith( -1 ) {}
 
         IdString getName() const            { return name; }
+        String getNameStr() const           { return nameStr; }
 
         void _setSharesSetupWithIdx( size_t idx )   { sharesSetupWith = idx; }
         size_t getSharesSetupWith() const           { return sharesSetupWith; }
@@ -175,6 +177,13 @@ namespace Ogre
         */
         ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx, size_t split,
                                                              const String &name, bool isAtlas );
+
+        /// Gets the number of shadow texture definitions in this node.
+        size_t getNumShadowTextureDefinitions() const   { return mShadowMapTexDefinitions.size(); }
+
+        /// Retrieves a shadow texture definition by its index.
+        ShadowTextureDefinition* getShadowTextureDefinition( size_t texIndex )
+                                                        { return &mShadowMapTexDefinitions[texIndex]; }
 
         /** Checks that paremeters are correctly set, and finalizes whatever needs to be
             done, probably because not enough data was available at the time of creation.

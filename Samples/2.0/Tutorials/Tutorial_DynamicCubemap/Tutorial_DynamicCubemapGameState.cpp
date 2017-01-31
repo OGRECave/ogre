@@ -83,7 +83,7 @@ namespace Demo
         cubemapExternalChannels[0].target = mDynamicCubemap->getBuffer(0)->getRenderTarget();
         cubemapExternalChannels[0].textures.push_back( mDynamicCubemap );
 
-        const Ogre::IdString workspaceName( "Tutorial_DynamicCubemap_cubemap" );
+        const Ogre::String workspaceName( "Tutorial_DynamicCubemap_cubemap" );
         if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
         {
             CompositorWorkspaceDef *workspaceDef = compositorManager->addWorkspaceDefinition(

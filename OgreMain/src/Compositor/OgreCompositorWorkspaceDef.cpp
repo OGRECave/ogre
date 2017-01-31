@@ -36,10 +36,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    CompositorWorkspaceDef::CompositorWorkspaceDef( IdString name,
+    CompositorWorkspaceDef::CompositorWorkspaceDef( const String& name,
                                                     CompositorManager2 *compositorManager ) :
             TextureDefinitionBase( TEXTURE_GLOBAL ),
             mName( name ),
+            mNameStr( name ),
             mCompositorManager( compositorManager )
     {
     }

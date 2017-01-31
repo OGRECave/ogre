@@ -7446,7 +7446,7 @@ namespace Ogre{
         mShadowNodeDef->setNumTargetPass( numTargetPasses );
         mShadowNodeDef->setNumOutputChannels( numOutputChannels );
 
-        ShadowTextureDefinition defaultParams( SHADOWMAP_UNIFORM, IdString(), 0, 0 );
+        ShadowTextureDefinition defaultParams( SHADOWMAP_UNIFORM, "", 0, 0 );
 
         AbstractNodeList::iterator i = obj->children.begin();
         try
