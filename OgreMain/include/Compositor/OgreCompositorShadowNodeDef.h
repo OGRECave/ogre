@@ -178,6 +178,13 @@ namespace Ogre
         ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx, size_t split,
                                                              const String &name, bool isAtlas );
 
+        /// Gets the number of shadow texture definitions in this node.
+        size_t getNumShadowTextureDefinitions() const   { return mShadowMapTexDefinitions.size(); }
+
+        /// Retrieves a shadow texture definition by its index.
+        ShadowTextureDefinition* getShadowTextureDefinition( size_t texIndex )
+                                                        { return &mShadowMapTexDefinitions[texIndex]; }
+
         /** Checks that paremeters are correctly set, and finalizes whatever needs to be
             done, probably because not enough data was available at the time of creation.
         @remarks

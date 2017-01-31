@@ -190,6 +190,7 @@ namespace Ogre
         ~CompositorTargetDef();
 
         IdString getRenderTargetName() const            { return mRenderTargetName; }
+        uint32 getRtIndex(void) const                   { return mRtIndex; }
 
         /** Reserves enough memory for all passes (efficient allocation)
         @remarks
