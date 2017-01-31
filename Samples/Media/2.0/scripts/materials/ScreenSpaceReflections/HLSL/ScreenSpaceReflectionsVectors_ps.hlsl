@@ -283,6 +283,17 @@ float4 main
 	// perform ray tracing - true if hit found, false otherwise
 	bool intersection = traceScreenSpaceRay( rayOriginVS, rayDirectionVS, jitter, hitPixel, hitPoint );
 
+	// Got this from Killing Floor 2
+	// https://sakibsaikia.github.io/2016/12/26/Screen-Space-Reflection-in-Killing-Floor-2.html
+	// This will check the direction of the normal of the reflection sample with the
+	// direction of the reflection vector, and if they are pointing in the same direction,
+	// it will drown out those reflections since backward facing pixels are not available
+	// for screen space reflection. Attenuate reflections for angles between 90 degrees
+	// and 100 degrees, and drop all contribution beyond the (-100,100)  degree range
+	float3 normalsAtRefl = gBuf_normals.Load( int3(hitPixel.xy, 0 ) ).xyz * 2.0 - 1.0;
+	normalsAtRefl.z = -normalsAtRefl.z;
+	rDotV *= smoothstep(-0.17, 0.0, dot( normalVS, -normalsAtRefl ) );
+
 	//Reflections lag one frame behind, so we need to reproject based on previous camera position
 	//to know where to sample the colour. If the depth differences are too big then we don't use
 	//that reflection.
