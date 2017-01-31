@@ -292,6 +292,34 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    CompositorShadowNodeDef* CompositorManager2::getShadowNodeDefinitionNonConst(
+                                                                    IdString nodeDefName ) const
+    {
+        CompositorShadowNodeDef *retVal = 0;
+        
+        CompositorShadowNodeDefMap::const_iterator itor = mShadowNodeDefs.find( nodeDefName );
+        if( itor == mShadowNodeDefs.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "ShadowNode definition with name '" +
+                         nodeDefName.getFriendlyText() + "' not found",
+                         "CompositorManager2::getShadowNodeDefinition" );
+        }
+        else
+        {
+            retVal = itor->second;
+
+            if( !retVal )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "ShadowNode definition with name '" +
+                            nodeDefName.getFriendlyText() + "' was found but not validated.\n"
+                            "Did you call validateAllObjects?",
+                            "CompositorManager2::getShadowNodeDefinition" );
+            }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     CompositorShadowNodeDef* CompositorManager2::addShadowNodeDefinition( const String &name )
     {
         CompositorShadowNodeDef *retVal = 0;
