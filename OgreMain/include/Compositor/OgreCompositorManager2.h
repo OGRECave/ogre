@@ -202,6 +202,9 @@ namespace Ogre
         */
         CompositorWorkspaceDef* addWorkspaceDefinition( const String& name );
 
+        /// Removes the workspace definition with the given name. Throws if not found
+        void removeWorkspaceDefinition( IdString name );
+
         /// Returns how many times _update has been called.
         size_t getFrameCount(void) const                    { return mFrameCount; }
 

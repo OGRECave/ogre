@@ -358,6 +358,22 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    void CompositorManager2::removeWorkspaceDefinition( IdString name )
+    {
+        CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
+        if( itor != mWorkspaceDefs.end() )
+        {
+            OGRE_DELETE itor->second;
+            mWorkspaceDefs.erase( itor );
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace definition with name '" +
+                            name.getFriendlyText() + "' not found",
+                            "CompositorManager2::removeWorkspaceDefinition" );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     bool CompositorManager2::hasWorkspaceDefinition( IdString name ) const
     {
         return mWorkspaceDefs.find( name ) != mWorkspaceDefs.end();
