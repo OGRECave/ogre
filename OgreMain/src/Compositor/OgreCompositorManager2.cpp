@@ -264,6 +264,22 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    void CompositorManager2::removeNodeDefinition( IdString nodeDefName )
+    {
+        CompositorNodeDefMap::const_iterator itor = mNodeDefinitions.find( nodeDefName );
+        if( itor != mNodeDefinitions.end() )
+        {
+            OGRE_DELETE itor->second;
+            mNodeDefinitions.erase( itor );
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Node definition with name '" +
+                            nodeDefName.getFriendlyText() + "' not found",
+                            "CompositorManager2::removeNodeDefinition" );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     const CompositorShadowNodeDef* CompositorManager2::getShadowNodeDefinition(
                                                                     IdString nodeDefName ) const
     {
