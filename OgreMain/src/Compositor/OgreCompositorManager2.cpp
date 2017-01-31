@@ -266,7 +266,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorManager2::removeNodeDefinition( IdString nodeDefName )
     {
-        CompositorNodeDefMap::const_iterator itor = mNodeDefinitions.find( nodeDefName );
+        CompositorNodeDefMap::iterator itor = mNodeDefinitions.find( nodeDefName );
         if( itor != mNodeDefinitions.end() )
         {
             OGRE_DELETE itor->second;
@@ -357,23 +357,27 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorManager2::removeShadowNodeDefinition( IdString nodeDefName )
     {
-        CompositorShadowNodeDefMap::const_iterator itor = mShadowNodeDefs.find( nodeDefName );
+        CompositorShadowNodeDefMap::iterator itor = mShadowNodeDefs.find( nodeDefName );
         if( itor != mShadowNodeDefs.end() )
         {
             if( itor->second != NULL )
+            {
                 OGRE_DELETE itor->second;
+            }
             else
             {
-                for( CompositorShadowNodeDefVec::const_iterator itorUnf = mUnfinishedShadowNodes.begin();
-                        itorUnf != mUnfinishedShadowNodes.end(); ++itorUnf )
+                CompositorShadowNodeDefVec::iterator itUnf = mUnfinishedShadowNodes.begin();
+                CompositorShadowNodeDefVec::iterator enUnf = mUnfinishedShadowNodes.end();
+                while( itUnf != enUnf )
                 {
-                    if( (*itorUnf)->getName() == nodeDefName )
+                    if( (*itUnf)->getName() == nodeDefName )
                     {
-                        OGRE_DELETE *itorUnf;
-                        mUnfinishedShadowNodes.erase( itorUnf );
-
+                        OGRE_DELETE *itUnf;
+                        mUnfinishedShadowNodes.erase( itUnf );
                         break;
                     }
+
+                    ++itUnf;
                 }
             }
 
@@ -408,7 +412,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorManager2::removeWorkspaceDefinition( IdString name )
     {
-        CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
+        CompositorWorkspaceDefMap::iterator itor = mWorkspaceDefs.find( name );
         if( itor != mWorkspaceDefs.end() )
         {
             OGRE_DELETE itor->second;
