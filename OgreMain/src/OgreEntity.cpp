@@ -1167,10 +1167,10 @@ namespace Ogre {
         // Note - you should only apply one morph animation to each set of vertex data
         // at once; if you do more, only the last one will actually apply
         markBuffersUnusedForAnimation();
-        ConstEnabledAnimationStateIterator animIt = mAnimationState->getEnabledAnimationStateIterator();
-        while(animIt.hasMoreElements())
+        EnabledAnimationStateList::const_iterator animIt;
+        for(animIt = mAnimationState->getEnabledAnimationStates().begin(); animIt != mAnimationState->getEnabledAnimationStates().end(); ++animIt)
         {
-            const AnimationState* state = animIt.getNext();
+            const AnimationState* state = *animIt;
             Animation* anim = msh->_getAnimationImpl(state->getAnimationName());
             if (anim)
             {

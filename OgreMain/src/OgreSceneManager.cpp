@@ -3823,11 +3823,10 @@ void SceneManager::_applySceneAnimations(void)
     OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME);
 
     // Iterate twice, once to reset, once to apply, to allow blending
-    ConstEnabledAnimationStateIterator stateIt = mAnimationStates.getEnabledAnimationStateIterator();
-
-    while (stateIt.hasMoreElements())
+    EnabledAnimationStateList::const_iterator animIt;
+    for(animIt = mAnimationStates.getEnabledAnimationStates().begin(); animIt != mAnimationStates.getEnabledAnimationStates().end(); ++animIt)
     {
-        const AnimationState* state = stateIt.getNext();
+        const AnimationState* state = *animIt;
         Animation* anim = getAnimation(state->getAnimationName());
 
         // Reset any nodes involved
@@ -3849,10 +3848,9 @@ void SceneManager::_applySceneAnimations(void)
     }
 
     // this should allow blended animations
-    stateIt = mAnimationStates.getEnabledAnimationStateIterator();
-    while (stateIt.hasMoreElements())
+    for(animIt = mAnimationStates.getEnabledAnimationStates().begin(); animIt != mAnimationStates.getEnabledAnimationStates().end(); ++animIt)
     {
-        const AnimationState* state = stateIt.getNext();
+        const AnimationState* state = *animIt;
         Animation* anim = getAnimation(state->getAnimationName());
         // Apply the animation
         anim->apply(state->getTimePosition(), state->getWeight());

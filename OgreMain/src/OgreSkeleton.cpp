@@ -215,11 +215,10 @@ namespace Ogre {
         {
             // Derive total weights so we can rebalance if > 1.0f
             Real totalWeights = 0.0f;
-            ConstEnabledAnimationStateIterator stateIt = 
-                animSet.getEnabledAnimationStateIterator();
-            while (stateIt.hasMoreElements())
+            EnabledAnimationStateList::const_iterator animIt;
+            for(animIt = animSet.getEnabledAnimationStates().begin(); animIt != animSet.getEnabledAnimationStates().end(); ++animIt)
             {
-                const AnimationState* animState = stateIt.getNext();
+                const AnimationState* animState = *animIt;
                 // Make sure we have an anim to match implementation
                 const LinkedSkeletonAnimationSource* linked = 0;
                 if (_getAnimationImpl(animState->getAnimationName(), &linked))
@@ -236,11 +235,10 @@ namespace Ogre {
         }
 
         // Per enabled animation state
-        ConstEnabledAnimationStateIterator stateIt = 
-            animSet.getEnabledAnimationStateIterator();
-        while (stateIt.hasMoreElements())
+        EnabledAnimationStateList::const_iterator animIt;
+        for(animIt = animSet.getEnabledAnimationStates().begin(); animIt != animSet.getEnabledAnimationStates().end(); ++animIt)
         {
-            const AnimationState* animState = stateIt.getNext();
+            const AnimationState* animState = *animIt;
             const LinkedSkeletonAnimationSource* linked = 0;
             Animation* anim = _getAnimationImpl(animState->getAnimationName(), &linked);
             // tolerate state entries for animations we're not aware of
