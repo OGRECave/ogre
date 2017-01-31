@@ -191,6 +191,9 @@ namespace Ogre
         /// Returns a new node definition. The name must be unique, throws otherwise.
         CompositorShadowNodeDef* addShadowNodeDefinition( const String &name );
 
+        /// Removes the node definition with the given name. Throws if not found
+        void removeShadowNodeDefinition( IdString nodeDefName );
+
         /// Returns true if a workspace definition with the given name exists
         bool hasWorkspaceDefinition( IdString name ) const;
 

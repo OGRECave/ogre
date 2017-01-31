@@ -355,6 +355,38 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    void CompositorManager2::removeShadowNodeDefinition( IdString nodeDefName )
+    {
+        CompositorShadowNodeDefMap::const_iterator itor = mShadowNodeDefs.find( nodeDefName );
+        if( itor != mShadowNodeDefs.end() )
+        {
+            if( itor->second != NULL )
+                OGRE_DELETE itor->second;
+            else
+            {
+                for( CompositorShadowNodeDefVec::const_iterator itorUnf = mUnfinishedShadowNodes.begin();
+                        itorUnf != mUnfinishedShadowNodes.end(); ++itorUnf )
+                {
+                    if( (*itorUnf)->getName() == nodeDefName )
+                    {
+                        OGRE_DELETE *itorUnf;
+                        mUnfinishedShadowNodes.erase( itorUnf );
+
+                        break;
+                    }
+                }
+            }
+
+            mShadowNodeDefs.erase( itor );
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "ShadowNode definition with name '" +
+                         nodeDefName.getFriendlyText() + "' not found",
+                         "CompositorManager2::removeShadowNodeDefinition" );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     CompositorWorkspaceDef* CompositorManager2::addWorkspaceDefinition( const String& name )
     {
         CompositorWorkspaceDef *retVal = 0;
