@@ -245,6 +245,10 @@ ADD_REPR(ColourValue)
 %include "OgreAnimationState.h"
 %include "OgreAnimation.h"
 %template(SkeletonPtr) Ogre::SharedPtr<Ogre::Skeleton>;
+// deprecated
+%ignore Ogre::Skeleton::getRootBone;
+%ignore Ogre::Skeleton::getRootBoneIterator;
+%ignore Ogre::Skeleton::getBoneIterator;
 %include "OgreSkeleton.h"
     %include "OgreSkeletonInstance.h"
 %include "OgreSkeletonManager.h"

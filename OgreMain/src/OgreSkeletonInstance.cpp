@@ -146,10 +146,10 @@ namespace Ogre {
         // construct self from master
         mBlendState = mSkeleton->mBlendState;
         // Copy bones
-        BoneIterator i = mSkeleton->getRootBoneIterator();
-        while (i.hasMoreElements())
+        BoneList::const_iterator i;
+        for (i = mSkeleton->getRootBones().begin(); i != mSkeleton->getRootBones().end(); ++i)
         {
-            Bone* b = i.getNext();
+            Bone* b = *i;
             cloneBoneAndChildren(b, 0);
             b->_update(true, false);
         }

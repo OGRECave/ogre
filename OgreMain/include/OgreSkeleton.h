@@ -160,25 +160,38 @@ namespace Ogre {
         virtual unsigned short getNumBones(void) const;
 
         /** Gets the root bone of the skeleton
-        @deprecated use Skeleton::getRootBoneIterator.
-        @remarks
-            The system derives the root bone the first time you ask for it. The root bone is the
-            only bone in the skeleton which has no parent. The system locates it by taking the
-            first bone in the list and going up the bone tree until there are no more parents,
-            and saves this top bone as the root. If you are building the skeleton manually using
-            createBone then you must ensure there is only one bone which is not a child of 
-            another bone, otherwise your skeleton will not work properly. If you use createBone
-            only once, and then use Bone::createChild from then on, then inherently the first
-            bone you create will by default be the root.
+        @deprecated use Skeleton::getRootBones
         */
-        virtual Bone* getRootBone(void) const;
+        OGRE_DEPRECATED virtual Bone* getRootBone(void) const {
+            return getRootBones()[0];
+        }
 
         typedef vector<Bone*>::type BoneList;
         typedef VectorIterator<BoneList> BoneIterator;
         /// Get an iterator over the root bones in the skeleton, ie those with no parents
-        virtual BoneIterator getRootBoneIterator(void);
+        /// @deprecated use Skeleton::getRootBones
+        OGRE_DEPRECATED virtual BoneIterator getRootBoneIterator(void);
+
+        /** Get the root bones in the skeleton, ie those with no parents
+
+            The system derives the root bone the first time you ask for it. The root bone is the
+            only bone in the skeleton which has no parent. The system locates it by taking the
+            first bone in the list and going up the bone tree until there are no more parents,
+            and saves this top bone as the root. If you are building the skeleton manually using
+            createBone then you must ensure there is only one bone which is not a child of
+            another bone, otherwise your skeleton will not work properly. If you use createBone
+            only once, and then use Bone::createChild from then on, then inherently the first
+            bone you create will by default be the root.
+        */
+        const BoneList& getRootBones() const;
+
         /// Get an iterator over all the bones in the skeleton
-        virtual BoneIterator getBoneIterator(void);
+        /// @deprecated use getBones()
+        OGRE_DEPRECATED virtual BoneIterator getBoneIterator(void);
+        /// Get all the bones in the skeleton
+        const BoneList& getBones() const {
+            return mBoneList;
+        }
 
         /** Gets a bone by it's handle. */
         virtual Bone* getBone(unsigned short handle) const;

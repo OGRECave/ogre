@@ -189,18 +189,15 @@ namespace Ogre {
         return ret;
     }
 
-
-
-    //---------------------------------------------------------------------
-    Bone* Skeleton::getRootBone(void) const
-    {
+    const Skeleton::BoneList& Skeleton::getRootBones() const {
         if (mRootBones.empty())
         {
             deriveRootBone();
         }
 
-        return mRootBones[0];
+        return mRootBones;
     }
+
     //---------------------------------------------------------------------
     void Skeleton::setAnimationState(const AnimationStateSet& animSet)
     {
@@ -1038,4 +1035,3 @@ namespace Ogre {
         return memSize;
     }
 }
-
