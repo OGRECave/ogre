@@ -1161,7 +1161,7 @@ namespace Ogre {
         return retVal;
     }
     //---------------------------------------------------------------------
-    void GLRenderSystem::_getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
+    void GLRenderSystem::_getDepthStencilFormatFor( PixelFormat internalColourFormat, GLenum *depthFormat,
                                                     GLenum *stencilFormat )
     {
         mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );

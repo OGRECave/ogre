@@ -422,7 +422,7 @@ static const size_t depthBits[] =
         }
         LogManager::getSingleton().logMessage("[GL] : Valid FBO targets " + fmtstring);
     }
-    void GLFBOManager::getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
+    void GLFBOManager::getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
     {
         const FormatProperties &props = mProps[internalFormat];
         /// Decide what stencil and depth formats to use

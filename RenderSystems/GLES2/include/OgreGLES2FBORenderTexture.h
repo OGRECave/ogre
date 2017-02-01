@@ -84,7 +84,7 @@ namespace Ogre {
         
         /** Get best depth and stencil supported for given internalFormat
         */
-        void getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat);
+        void getBestDepthStencil(PixelFormat internalFormat, uint32 *depthFormat, uint32 *stencilFormat);
         
         /** Create a texture rendertarget object
         */
