@@ -293,11 +293,6 @@ namespace Ogre {
 
     }
 
-    const RenderTarget::FrameStats& RenderTarget::getStatistics(void) const
-    {
-        return mStats;
-    }
-
     float RenderTarget::getLastFPS() const
     {
         return mStats.lastFPS;
