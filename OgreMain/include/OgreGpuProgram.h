@@ -162,25 +162,13 @@ namespace Ogre {
         This is a shared pointer because if the program is recompiled and the parameters
         change, this definition will alter, but previous params may reference the old def. */
     mutable GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
-    /** Record of logical to physical buffer maps. Mandatory for low-level
-        programs or high-level programs which set their params the same way.
-        This is a shared pointer because if the program is recompiled and the parameters
-        change, this definition will alter, but previous params may reference the old def. */
+    /// @copydoc mFloatLogicalToPhysical
     mutable GpuLogicalBufferStructPtr mDoubleLogicalToPhysical;
-    /** Record of logical to physical buffer maps. Mandatory for low-level
-        programs or high-level programs which set their params the same way.
-        This is a shared pointer because if the program is recompiled and the parameters
-        change, this definition will alter, but previous params may reference the old def.*/
+    /// @copydoc mFloatLogicalToPhysical
     mutable GpuLogicalBufferStructPtr mIntLogicalToPhysical;
-    /** Record of logical to physical buffer maps. Mandatory for low-level
-        programs or high-level programs which set their params the same way.
-        This is a shared pointer because if the program is recompiled and the parameters
-        change, this definition will alter, but previous params may reference the old def.*/
+    /// @copydoc mFloatLogicalToPhysical
     mutable GpuLogicalBufferStructPtr mUIntLogicalToPhysical;
-    /** Record of logical to physical buffer maps. Mandatory for low-level
-        programs or high-level programs which set their params the same way.
-        This is a shared pointer because if the program is recompiled and the parameters
-        change, this definition will alter, but previous params may reference the old def.*/
+    /// @copydoc mFloatLogicalToPhysical
     mutable GpuLogicalBufferStructPtr mBoolLogicalToPhysical;
     /** Parameter name -> ConstantDefinition map, shared instance used by all parameter objects.
         This is a shared pointer because if the program is recompiled and the parameters

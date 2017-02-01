@@ -346,15 +346,7 @@ namespace Ogre {
         */
         void setAmbient(Real red, Real green, Real blue);
 
-        /** Sets the ambient colour reflectance properties for every Pass in every Technique.
-        @note
-            This property has been moved to the Pass class, which is accessible via the 
-            Technique. For simplicity, this method allows you to set these properties for 
-            every current Technique, and for every current Pass within those Techniques. If 
-            you need more precision, retrieve the Technique and Pass instances and set the
-            property there.
-        @see Pass::setAmbient
-        */
+        /// @overload
         void setAmbient(const ColourValue& ambient);
 
         /** Sets the diffuse colour reflectance properties of every Pass in every Technique.
@@ -368,15 +360,7 @@ namespace Ogre {
         */
         void setDiffuse(Real red, Real green, Real blue, Real alpha);
 
-        /** Sets the diffuse colour reflectance properties of every Pass in every Technique.
-        @note
-            This property has been moved to the Pass class, which is accessible via the 
-            Technique. For simplicity, this method allows you to set these properties for 
-            every current Technique, and for every current Pass within those Techniques. If 
-            you need more precision, retrieve the Technique and Pass instances and set the
-            property there.
-        @see Pass::setDiffuse
-        */
+        /// @overload
         void setDiffuse(const ColourValue& diffuse);
 
         /** Sets the specular colour reflectance properties of every Pass in every Technique.
@@ -390,15 +374,7 @@ namespace Ogre {
         */
         void setSpecular(Real red, Real green, Real blue, Real alpha);
 
-        /** Sets the specular colour reflectance properties of every Pass in every Technique.
-        @note
-            This property has been moved to the Pass class, which is accessible via the 
-            Technique. For simplicity, this method allows you to set these properties for 
-            every current Technique, and for every current Pass within those Techniques. If 
-            you need more precision, retrieve the Technique and Pass instances and set the
-            property there.
-        @see Pass::setSpecular
-        */
+        /// @overload
         void setSpecular(const ColourValue& specular);
 
         /** Sets the shininess properties of every Pass in every Technique.
@@ -423,15 +399,7 @@ namespace Ogre {
         */
         void setSelfIllumination(Real red, Real green, Real blue);
 
-        /** Sets the amount of self-illumination of every Pass in every Technique.
-        @note
-            This property has been moved to the Pass class, which is accessible via the 
-            Technique. For simplicity, this method allows you to set these properties for 
-            every current Technique, and for every current Pass within those Techniques. If 
-            you need more precision, retrieve the Technique and Pass instances and set the
-            property there.
-        @see Pass::setSelfIllumination
-        */
+        /// @overload
         void setSelfIllumination(const ColourValue& selfIllum);
 
         /** Sets whether or not each Pass renders with depth-buffer checking on or not.

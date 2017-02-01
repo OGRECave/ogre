@@ -321,89 +321,37 @@ namespace Ogre
             return *this;
         }
 
-        /** Returns the length (magnitude) of the vector.
-            @warning
-                This operation requires a square root and is expensive in
-                terms of CPU operations. If you don't need to know the exact
-                length (e.g. for just comparing lengths) use squaredLength()
-                instead.
-        */
+        /// @copydoc Vector3::length
         inline Real length () const
         {
             return Math::Sqrt( x * x + y * y );
         }
 
-        /** Returns the square of the length(magnitude) of the vector.
-            @remarks
-                This  method is for efficiency - calculating the actual
-                length of a vector requires a square root, which is expensive
-                in terms of the operations required. This method returns the
-                square of the length of the vector, i.e. the same as the
-                length but before the square root is taken. Use this if you
-                want to find the longest / shortest vector without incurring
-                the square root.
-        */
+        /// @copydoc Vector3::squaredLength
         inline Real squaredLength () const
         {
             return x * x + y * y;
         }
 
-        /** Returns the distance to another vector.
-            @warning
-                This operation requires a square root and is expensive in
-                terms of CPU operations. If you don't need to know the exact
-                distance (e.g. for just comparing distances) use squaredDistance()
-                instead.
-        */
+        /// @copydoc Vector3::distance
         inline Real distance(const Vector2& rhs) const
         {
             return (*this - rhs).length();
         }
 
-        /** Returns the square of the distance to another vector.
-            @remarks
-                This method is for efficiency - calculating the actual
-                distance to another vector requires a square root, which is
-                expensive in terms of the operations required. This method
-                returns the square of the distance to another vector, i.e.
-                the same as the distance but before the square root is taken.
-                Use this if you want to find the longest / shortest distance
-                without incurring the square root.
-        */
+        /// @copydoc Vector3::squaredDistance
         inline Real squaredDistance(const Vector2& rhs) const
         {
             return (*this - rhs).squaredLength();
         }
 
-        /** Calculates the dot (scalar) product of this vector with another.
-            @remarks
-                The dot product can be used to calculate the angle between 2
-                vectors. If both are unit vectors, the dot product is the
-                cosine of the angle; otherwise the dot product must be
-                divided by the product of the lengths of both vectors to get
-                the cosine of the angle. This result can further be used to
-                calculate the distance of a point from a plane.
-            @param
-                vec Vector with which to calculate the dot product (together
-                with this one).
-            @return
-                A float representing the dot product value.
-        */
+        /// @copydoc Vector3::dotProduct
         inline Real dotProduct(const Vector2& vec) const
         {
             return x * vec.x + y * vec.y;
         }
 
-        /** Normalises the vector.
-            @remarks
-                This method normalises the vector such that it's
-                length / magnitude is 1. The result is called a unit vector.
-            @note
-                This function will not crash for zero-sized vectors, but there
-                will be no changes made to their components.
-            @return The previous length of the vector.
-        */
-
+        /// @copydoc Vector3::normalise
         inline Real normalise()
         {
             Real fLength = Math::Sqrt( x * x + y * y);

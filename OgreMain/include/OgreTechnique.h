@@ -313,14 +313,7 @@ namespace Ogre {
         */
         void setAmbient(Real red, Real green, Real blue);
 
-        /** Sets the ambient colour reflectance properties for every Pass in every Technique.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setAmbient
-        */
+        /// @overload
         void setAmbient(const ColourValue& ambient);
 
         /** Sets the diffuse colour reflectance properties of every Pass in every Technique.
@@ -333,14 +326,7 @@ namespace Ogre {
         */
         void setDiffuse(Real red, Real green, Real blue, Real alpha);
 
-        /** Sets the diffuse colour reflectance properties of every Pass in every Technique.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setDiffuse
-        */
+        /// @overload
         void setDiffuse(const ColourValue& diffuse);
 
         /** Sets the specular colour reflectance properties of every Pass in every Technique.
@@ -353,14 +339,7 @@ namespace Ogre {
         */
         void setSpecular(Real red, Real green, Real blue, Real alpha);
 
-        /** Sets the specular colour reflectance properties of every Pass in every Technique.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setSpecular
-        */
+        /// @overload
         void setSpecular(const ColourValue& specular);
 
         /** Sets the shininess properties of every Pass in every Technique.
@@ -383,14 +362,7 @@ namespace Ogre {
         */
         void setSelfIllumination(Real red, Real green, Real blue);
 
-        /** Sets the amount of self-illumination of every Pass in every Technique.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setSelfIllumination
-        */
+        /// @overload
         void setSelfIllumination(const ColourValue& selfIllum);
 
         /** Sets whether or not each Pass renders with depth-buffer checking on or not.
@@ -696,20 +668,7 @@ namespace Ogre {
         @param caseSensitive Whether the match is case sensitive or not
         */
         void addGPUDeviceNameRule(const String& devicePattern, IncludeOrExclude includeOrExclude, bool caseSensitive = false);
-        /** Add a rule which manually influences the support for this technique based
-            on a pattern that matches a GPU device name (e.g. '*8800*').
-        @remarks
-            You can use this facility to manually control whether a technique is
-            considered supported, based on a GPU device name pattern. You can add inclusive
-            or exclusive rules, and you can add as many of each as you like. If
-            at least one inclusive rule is added, a technique is considered 
-            unsupported if it does not match any of those inclusive rules. If exclusive rules are
-            added, the technique is considered unsupported if it matches any of
-            those inclusive rules. The pattern you supply can include wildcard
-            characters ('*') if you only want to match part of the device name.
-        @note
-            Any rule for the same device pattern will be removed before adding this one.
-        */
+        /// @overload
         void addGPUDeviceNameRule(const GPUDeviceNameRule& rule);
         /** Removes a matching device name rule.
         @see addGPUDeviceNameRule

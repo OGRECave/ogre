@@ -269,19 +269,7 @@ namespace Ogre {
         */
         void setOrientation( const Quaternion& q );
 
-        /** Sets the orientation of this node via quaternion parameters.
-        @remarks
-            Orientations, unlike other transforms, are not always inherited by child nodes.
-            Whether or not orientations affect the orientation of the child nodes depends on
-            the setInheritOrientation option of the child. In some cases you want a orientating
-            of a parent node to apply to a child node (e.g. where the child node is a part of
-            the same object, so you want it to be the same relative orientation based on the
-            parent's orientation), but not in other cases (e.g. where the child node is just
-            for positioning another object, you want it to maintain it's own orientation).
-            The default is to inherit as with other transforms.
-        @par
-            Note that rotations are oriented around the node's origin.
-        */
+        /// @overload
         void setOrientation( Real w, Real x, Real y, Real z);
 
         /** Resets the nodes orientation (local axes as world axes, no rotation).
@@ -303,8 +291,7 @@ namespace Ogre {
         */
         void setPosition(const Vector3& pos);
 
-        /** Sets the position of the node relative to it's parent.
-        */
+        /// @overload
         void setPosition(Real x, Real y, Real z);
 
         /** Gets the position of the node relative to it's parent.
@@ -325,18 +312,7 @@ namespace Ogre {
         */
         void setScale(const Vector3& scale);
 
-        /** Sets the scaling factor applied to this node.
-        @remarks
-            Scaling factors, unlike other transforms, are not always inherited by child nodes.
-            Whether or not scalings affect the size of the child nodes depends on the setInheritScale
-            option of the child. In some cases you want a scaling factor of a parent node to apply to
-            a child node (e.g. where the child node is a part of the same object, so you want it to be
-            the same relative size based on the parent's size), but not in other cases (e.g. where the
-            child node is just for positioning another object, you want it to maintain it's own size).
-            The default is to inherit as with other transforms.
-        @par
-            Note that like rotations, scalings are oriented around the node's origin.
-        */
+        /// @overload
         void setScale(Real x, Real y, Real z);
 
         /** Gets the scaling factor of this node.
@@ -404,15 +380,7 @@ namespace Ogre {
         */
         void scale(const Vector3& scale);
 
-        /** Scales the node, combining it's current scale with the passed in scaling factor. 
-        @remarks
-            This method applies an extra scaling factor to the node's existing scale, (unlike setScale
-            which overwrites it) combining it's current scale with the new one. E.g. calling this 
-            method twice with Vector3(2,2,2) would have the same effect as setScale(Vector3(4,4,4)) if
-            the existing scale was 1.
-        @par
-            Note that like rotations, scalings are oriented around the node's origin.
-        */
+        /// @overload
         void scale(Real x, Real y, Real z);
 
         /** Moves the node along the Cartesian axes.
@@ -425,19 +393,7 @@ namespace Ogre {
             The space which this transform is relative to.
         */
         void translate(const Vector3& d, TransformSpace relativeTo = TS_PARENT);
-        /** Moves the node along the Cartesian axes.
-        @par
-            This method moves the node by the supplied vector along the
-            world Cartesian axes, i.e. along world x,y,z
-        @param x
-            Real @c x value representing the translation.
-        @param y
-            Real @c y value representing the translation.
-        @param z
-            Real @c z value representing the translation.
-        @param relativeTo
-            The space which this transform is relative to.
-        */
+        /// @overload
         void translate(Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT);
         /** Moves the node along arbitrary axes.
         @remarks
@@ -459,29 +415,7 @@ namespace Ogre {
             The space which this transform is relative to.
         */
         void translate(const Matrix3& axes, const Vector3& move, TransformSpace relativeTo = TS_PARENT);
-        /** Moves the node along arbitrary axes.
-        @remarks
-            This method translates the node by a vector which is relative to
-            a custom set of axes.
-        @param axes
-            A 3x3 Matrix containing 3 column vectors each representing the
-            axes X, Y and Z respectively. In this format the standard cartesian
-            axes would be expressed as
-            <pre>
-            1 0 0
-            0 1 0
-            0 0 1
-            </pre>
-            i.e. the identity matrix.
-        @param x
-            The @c x translation component relative to the axes above.
-        @param y
-            The @c y translation component relative to the axes above.
-        @param z
-            The @c z translation component relative to the axes above.
-        @param relativeTo
-            The space which this transform is relative to.
-        */
+        /// @overload
         void translate(const Matrix3& axes, Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT);
 
         /** Rotate the node around the Z-axis.
@@ -561,16 +495,7 @@ namespace Ogre {
         */
         ChildNodeIterator getChildIterator(void);
 
-        /** Retrieves an iterator for efficiently looping through all children of this node.
-        @remarks
-            Using this is faster than repeatedly calling getChild if you want to go through
-            all (or most of) the children of this node.
-            Note that the returned iterator is only valid whilst no children are added or
-            removed from this node. Thus you should not store this returned iterator for
-            later use, nor should you add / remove children whilst iterating through it;
-            store up changes for later. Note that calling methods on returned items in 
-            the iterator IS allowed and does not invalidate the iterator.
-        */
+        /// @overload
         ConstChildNodeIterator getChildIterator(void) const;
 
         /** Drops the specified child from this node. 
@@ -581,13 +506,7 @@ namespace Ogre {
             child from this node.
         */
         virtual Node* removeChild(unsigned short index);
-        /** Drops the specified child from this node. 
-        @remarks
-            Does not delete the node, just detaches it from
-            this parent, potentially to be reattached elsewhere. 
-            There is also an alternate version which drops a named
-            child from this node.
-        */
+        /// @overload
         virtual Node* removeChild(Node* child);
 
         /** Drops the named child from this node. 

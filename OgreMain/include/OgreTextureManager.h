@@ -288,7 +288,7 @@ namespace Ogre {
                 and pass a pointer to it in this parameter; this means that if the
                 manual texture ever needs to be reloaded, the ManualResourceLoader
                 will be called to do it.
-            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+            @param hwGammaCorrection pass 'true' to enable hardware gamma correction
                 (sRGB) on this texture. The hardware will convert from gamma space
                 to linear space when reading from this texture. Only applicable for 
                 8-bits per channel textures, will be ignored for other types. Has the advantage
@@ -302,49 +302,7 @@ namespace Ogre {
             int numMipmaps, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
             bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = BLANKSTRING);
             
-        /** Create a manual texture with a depth of 1 (not loaded from a file).
-            @param
-                name The name to give the resulting texture
-            @param
-                group The name of the resource group to assign the texture to
-            @param
-                texType The type of texture to load/create, defaults to normal 2D textures
-            @param width
-                The width of the texture
-            @param height
-                The height of the texture
-            @param
-                numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
-                the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps()).
-                If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-                level, 1x1x1.
-            @param
-                format The internal format you wish to request; the manager reserves
-                the right to create a different format if the one you select is
-                not available in this context.
-            @param 
-                usage The kind of usage this texture is intended for. It 
-                is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY, 
-                TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
-                strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
-                update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
-            @param
-                loader If you intend the contents of the manual texture to be 
-                regularly updated, to the extent that you don't need to recover 
-                the contents if the texture content is lost somehow, you can leave
-                this parameter as 0. However, if you intend to populate the
-                texture only once, then you should implement ManualResourceLoader
-                and pass a pointer to it in this parameter; this means that if the
-                manual texture ever needs to be reloaded, the ManualResourceLoader
-                will be called to do it.
-             @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-                 (sRGB) on this texture. The hardware will convert from gamma space
-                 to linear space when reading from this texture. Only applicable for 
-                 8-bits per channel textures, will be ignored for other types. Has the advantage
-                 over pre-applied gamma that the texture precision is maintained.
-            @param fsaa The level of multisampling to use if this is a render target. Ignored
-                if usage does not include TU_RENDERTARGET or if the device does
-                not support it.
+        /** @overload
         */
         TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, int numMipmaps,
@@ -480,37 +438,9 @@ namespace Ogre {
             return mDefaultNumMipmaps;
         }
 
-        /** Override standard Singleton retrieval.
-        @remarks
-        Why do we do this? Well, it's because the Singleton
-        implementation is in a .h file, which means it gets compiled
-        into anybody who includes it. This is needed for the
-        Singleton template to work, but we actually only want it
-        compiled into the implementation of the class based on the
-        Singleton, not all of them. If we don't change this, we get
-        link errors when trying to use the Singleton-based class from
-        an outside dll.
-        @par
-        This method just delegates to the template version anyway,
-        but the implementation stays in this single compilation unit,
-        preventing link errors.
-        */
+        /// @copydoc Singleton::getSingleton()
         static TextureManager& getSingleton(void);
-        /** Override standard Singleton retrieval.
-        @remarks
-        Why do we do this? Well, it's because the Singleton
-        implementation is in a .h file, which means it gets compiled
-        into anybody who includes it. This is needed for the
-        Singleton template to work, but we actually only want it
-        compiled into the implementation of the class based on the
-        Singleton, not all of them. If we don't change this, we get
-        link errors when trying to use the Singleton-based class from
-        an outside dll.
-        @par
-        This method just delegates to the template version anyway,
-        but the implementation stays in this single compilation unit,
-        preventing link errors.
-        */
+        /// @copydoc Singleton::getSingleton()
         static TextureManager* getSingletonPtr(void);
 
     protected:
