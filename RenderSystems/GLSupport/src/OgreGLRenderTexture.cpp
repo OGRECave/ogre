@@ -81,6 +81,42 @@ namespace Ogre {
         return PF_A8R8G8B8;
     }
 
+    void GLRTTManager::requestRenderBuffer(const GLSurfaceDesc &surface)
+    {
+        if(surface.buffer == 0)
+            return;
+        RBFormat key(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
+        RenderBufferMap::iterator it = mRenderBufferMap.find(key);
+        assert(it != mRenderBufferMap.end());
+        if (it != mRenderBufferMap.end())   // Just in case
+        {
+            assert(it->second.buffer == surface.buffer);
+            // Increase refcount
+            ++it->second.refcount;
+        }
+    }
+
+    void GLRTTManager::releaseRenderBuffer(const GLSurfaceDesc &surface)
+    {
+        if(surface.buffer == 0)
+            return;
+        RBFormat key(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
+        RenderBufferMap::iterator it = mRenderBufferMap.find(key);
+        if(it != mRenderBufferMap.end())
+        {
+            // Decrease refcount
+            --it->second.refcount;
+            if(it->second.refcount==0)
+            {
+                // If refcount reaches zero, delete buffer and remove from map
+                delete it->second.buffer;
+                mRenderBufferMap.erase(it);
+                //                              std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
+                //                                      << " of " << key.width << "x" << key.height << std::endl;
+            }
+        }
+    }
+
     GLRenderTexture::GLRenderTexture(const String &name,
                                                const GLSurfaceDesc &target,
                                                bool writeGamma,
