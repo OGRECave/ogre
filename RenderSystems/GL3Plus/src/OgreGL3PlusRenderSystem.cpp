@@ -144,9 +144,6 @@ namespace Ogre {
         mGLSupport = new GL3PlusSupport(getGLSupport());
         glsupport = mGLSupport;
 
-        mWorldMatrix = Matrix4::IDENTITY;
-        mViewMatrix = Matrix4::IDENTITY;
-
         initConfigOptions();
 
         mColourWrite[0] = mColourWrite[1] = mColourWrite[2] = mColourWrite[3] = true;
@@ -154,7 +151,6 @@ namespace Ogre {
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
             // Dummy value
-            mTextureCoordIndex[i] = 99;
             mTextureTypes[i] = 0;
         }
 
@@ -162,7 +158,6 @@ namespace Ogre {
         mCurrentContext = 0;
         mMainContext = 0;
         mGLInitialised = false;
-        mTextureMipmapCount = 0;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
         mCurrentVertexShader = 0;
@@ -528,9 +523,6 @@ namespace Ogre {
         mGLSLShaderFactory = new GLSLShaderFactory(*mGLSupport);
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLShaderFactory);
 
-        // Set texture the number of texture units
-        mFixedFunctionTextureUnits = caps->getNumTextureUnits();
-
         // Use VBO's by default
         mHardwareBufferManager = new GL3PlusHardwareBufferManager();
 
@@ -821,29 +813,6 @@ namespace Ogre {
         return BLANKSTRING;
     }
 
-    void GL3PlusRenderSystem::_setWorldMatrix(const Matrix4 &m)
-    {
-        mWorldMatrix = m;
-    }
-
-    void GL3PlusRenderSystem::_setViewMatrix(const Matrix4 &m)
-    {
-        mViewMatrix = m;
-
-        // Also mark clip planes dirty.
-        if (!mClipPlanes.empty())
-        {
-            mClipPlanesDirty = true;
-        }
-    }
-
-    void GL3PlusRenderSystem::_setProjectionMatrix(const Matrix4 &m)
-    {
-        // Nothing to do but mark clip planes dirty.
-        if (!mClipPlanes.empty())
-            mClipPlanesDirty = true;
-    }
-
     void GL3PlusRenderSystem::_setPointParameters(Real size,
                                                   bool attenuationEnabled, Real constant, Real linear, Real quadratic,
                                                   Real minSize, Real maxSize)
@@ -897,9 +866,6 @@ namespace Ogre {
                 // Note used
                 tex->touch();
                 mTextureTypes[stage] = tex->getGL3PlusTextureTarget();
-
-                // Store the number of mipmaps.
-                mTextureMipmapCount = tex->getNumMipmaps();
             }
             else
                 // Assume 2D.
@@ -950,7 +916,6 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTextureCoordSet(size_t stage, size_t index)
     {
-        mTextureCoordIndex[stage] = index;
     }
 
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
@@ -1536,7 +1501,6 @@ namespace Ogre {
     void GL3PlusRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
         // TODO: GL 3.3 or later or GL_ARB_sampler_objects
-        mTextureCompareEnabled = compare;
     }
 
     void GL3PlusRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)

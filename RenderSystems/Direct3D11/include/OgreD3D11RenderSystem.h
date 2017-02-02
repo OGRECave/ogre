@@ -274,9 +274,6 @@ namespace Ogre
         void shutdown();
         void validateDevice(bool forceDeviceElection = false);
         void handleDeviceLost();
-        void setAmbientLight( float r, float g, float b );
-        void setShadingType( ShadeOptions so );
-        void setLightingEnabled( bool enabled );
         void destroyRenderTarget(const String& name);
         VertexElementType getColourVertexElementType(void) const;
         void setStencilCheckEnabled(bool enabled);
@@ -287,7 +284,6 @@ namespace Ogre
             StencilOperation passOp = SOP_KEEP, 
             bool twoSidedOperation = false,
             bool readBackAsTexture = false);
-        void setNormaliseNormals(bool normalise);
 
         virtual String getErrorDescription(long errorNumber) const;
 
@@ -298,11 +294,6 @@ namespace Ogre
         D3D11HLSLProgram* _getBoundTessellationHullProgram() const;
         D3D11HLSLProgram* _getBoundTessellationDomainProgram() const;
         D3D11HLSLProgram* _getBoundComputeProgram() const;
-        void _useLights(const LightList& lights, unsigned short limit);
-        void _setWorldMatrix( const Matrix4 &m );
-        void _setViewMatrix( const Matrix4 &m );
-        void _setProjectionMatrix( const Matrix4 &m );
-        void _setSurfaceParams( const ColourValue &ambient, const ColourValue &diffuse, const ColourValue &specular, const ColourValue &emissive, Real shininess, TrackVertexColourType tracking );
         void _setPointSpritesEnabled(bool enabled);
         void _setPointParameters(Real size, bool attenuationEnabled, 
             Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
@@ -315,12 +306,9 @@ namespace Ogre
         void _setTesselationDomainTexture(size_t unit, const TexturePtr& tex);
         void _disableTextureUnit(size_t texUnit);
         void _setTextureCoordSet( size_t unit, size_t index );
-        void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m, const Frustum* frustum = 0);
-        void _setTextureBlendMode( size_t unit, const LayerBlendModeEx& bm );
         void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
         void _setTextureBorderColour(size_t stage, const ColourValue& colour);
         void _setTextureMipmapBias(size_t unit, float bias);
-        void _setTextureMatrix( size_t unit, const Matrix4 &xform );
         void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD);
         void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
             SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD);
@@ -336,7 +324,6 @@ namespace Ogre
         void _setDepthBufferWriteEnabled(bool enabled = true);
         void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
         void _setDepthBias(float constantBias, float slopeScaleBias);
-        void _setFog( FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0 );
 		void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool forGpuProgram = false);
         void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
             Matrix4& dest, bool forGpuProgram = false);
@@ -368,8 +355,6 @@ namespace Ogre
         void clearFrameBuffer(unsigned int buffers, 
             const ColourValue& colour = ColourValue::Black, 
             Real depth = 1.0f, unsigned short stencil = 0);
-        void setClipPlane (ushort index, Real A, Real B, Real C, Real D);
-        void enableClipPlane (ushort index, bool enable);
         HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
         Real getHorizontalTexelOffset(void);
         Real getVerticalTexelOffset(void);
