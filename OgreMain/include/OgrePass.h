@@ -297,7 +297,7 @@ namespace Ogre {
 
         /// Gets the index of this Pass in the parent Technique
         unsigned short getIndex(void) const { return mIndex; }
-        /* Set the name of the pass
+        /** Set the name of the pass
            @remarks
            The name of the pass is optional.  Its useful in material scripts where a material could inherit
            from another material and only want to modify a particular pass.
@@ -319,18 +319,7 @@ namespace Ogre {
         */
         void setAmbient(Real red, Real green, Real blue);
 
-        /** Sets the ambient colour reflectance properties of this pass.
-            @remarks
-            The base colour of a pass is determined by how much red, green and blue light is reflects
-            (provided texture layer #0 has a blend mode other than LBO_REPLACE). This property determines how
-            much ambient light (directionless global light) is reflected. The default is full white, meaning
-            objects are completely globally illuminated. Reduce this if you want to see diffuse or specular light
-            effects, or change the blend of colours to make the object have a base colour other than white.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
-        */
-
+        /// @overload
         void setAmbient(const ColourValue& ambient);
 
         /** Sets the diffuse colour reflectance properties of this pass.
@@ -345,16 +334,7 @@ namespace Ogre {
         */
         void setDiffuse(Real red, Real green, Real blue, Real alpha);
 
-        /** Sets the diffuse colour reflectance properties of this pass.
-            @remarks
-            The base colour of a pass is determined by how much red, green and blue light is reflects
-            (provided texture layer #0 has a blend mode other than LBO_REPLACE). This property determines how
-            much diffuse light (light from instances of the Light class in the scene) is reflected. The default
-            is full white, meaning objects reflect the maximum white light they can from Light objects.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
-        */
+        /// @overload
         void setDiffuse(const ColourValue& diffuse);
 
         /** Sets the specular colour reflectance properties of this pass.
@@ -371,18 +351,7 @@ namespace Ogre {
         */
         void setSpecular(Real red, Real green, Real blue, Real alpha);
 
-        /** Sets the specular colour reflectance properties of this pass.
-            @remarks
-            The base colour of a pass is determined by how much red, green and blue light is reflects
-            (provided texture layer #0 has a blend mode other than LBO_REPLACE). This property determines how
-            much specular light (highlights from instances of the Light class in the scene) is reflected.
-            The default is to reflect no specular light.
-            @note
-            The size of the specular highlights is determined by the separate 'shininess' property.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
-        */
+        /// @overload
         void setSpecular(const ColourValue& specular);
 
         /** Sets the shininess of the pass, affecting the size of specular highlights.
@@ -412,21 +381,10 @@ namespace Ogre {
             setSelfIllumination(red, green, blue);
         }
 
-        /** Sets the amount of self-illumination an object has.
-            @remarks
-            If an object is self-illuminating, it does not need external sources to light it, ambient or
-            otherwise. It's like the object has it's own personal ambient light. This property is rarely useful since
-            you can already specify per-pass ambient light, but is here for completeness.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
-        */
+        /// @overload
         void setSelfIllumination(const ColourValue& selfIllum);
 
-        /** Sets the amount of self-illumination an object has.
-            @see
-            setSelfIllumination
-        */
+        /// @overload
         void setEmissive(const ColourValue& emissive)
         {
             setSelfIllumination(emissive);
@@ -550,11 +508,6 @@ namespace Ogre {
         /** Inserts a new TextureUnitState object into the Pass.
             @remarks
             This unit is is added on top of all previous units.
-        */
-        TextureUnitState* createTextureUnitState(void);
-        /** Inserts a new TextureUnitState object into the Pass.
-            @remarks
-            This unit is is added on top of all previous units.
             @param textureName
             The basic name of the texture e.g. brickwall.jpg, stonefloor.png
             @param texCoordSet
@@ -563,6 +516,9 @@ namespace Ogre {
             Applies to both fixed-function and programmable passes.
         */
         TextureUnitState* createTextureUnitState( const String& textureName, unsigned short texCoordSet = 0);
+        /// @overload
+        TextureUnitState* createTextureUnitState(void);
+
         /** Adds the passed in TextureUnitState, to the existing Pass.
             @param
             state The Texture Unit State to be attached to this pass.  It must not be attached to another pass.
@@ -1075,19 +1031,19 @@ namespace Ogre {
         */
         void setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverageEnabled = false);
 
-        /** Sets the alpha reject function. See setAlphaRejectSettings for more information.
+        /** Sets the alpha reject function. @see setAlphaRejectSettings for more information.
          */
         void setAlphaRejectFunction(CompareFunction func);
 
-        /** Gets the alpha reject value. See setAlphaRejectSettings for more information.
+        /** Gets the alpha reject value. @see setAlphaRejectSettings for more information.
          */
         void setAlphaRejectValue(unsigned char val);
 
-        /** Gets the alpha reject function. See setAlphaRejectSettings for more information.
+        /** Gets the alpha reject function. @see setAlphaRejectSettings for more information.
          */
         CompareFunction getAlphaRejectFunction(void) const { return mAlphaRejectFunc; }
 
-        /** Gets the alpha reject value. See setAlphaRejectSettings for more information.
+        /** Gets the alpha reject value. @see setAlphaRejectSettings for more information.
          */
         unsigned char getAlphaRejectValue(void) const { return mAlphaRejectVal; }
 

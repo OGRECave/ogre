@@ -86,7 +86,7 @@ namespace Ogre {
         */
         virtual void unbind(RenderTarget *target) = 0;
 
-        virtual void getBestDepthStencil(uint32 internalFormat, uint32 *depthFormat, uint32 *stencilFormat)
+        virtual void getBestDepthStencil(PixelFormat internalFormat, uint32 *depthFormat, uint32 *stencilFormat)
         {
             *depthFormat = 0;
             *stencilFormat = 0;

@@ -231,7 +231,7 @@ namespace Ogre {
         DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
 
         /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
-        void _getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
+        void _getDepthStencilFormatFor( PixelFormat internalColourFormat, GLenum *depthFormat,
                                         GLenum *stencilFormat );
         
         /// @copydoc RenderSystem::createMultiRenderTarget

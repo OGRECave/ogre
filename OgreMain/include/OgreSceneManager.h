@@ -1273,29 +1273,8 @@ namespace Ogre {
         */
         virtual SceneNode* createSceneNode(void);
 
-        /** Creates an instance of a SceneNode with a given name.
-            @remarks
-                Note that this does not add the SceneNode to the scene hierarchy.
-                This method is for convenience, since it allows an instance to
-                be created for which the SceneManager is responsible for
-                allocating and releasing memory, which is convenient in complex
-                scenes.
-            @par
-                To include the returned SceneNode in the scene, use the addChild
-                method of the SceneNode which is to be it's parent.
-            @par
-                Note that this method takes a name parameter, which makes the node easier to
-                retrieve directly again later.
-        */
+        /// @overload
         virtual SceneNode* createSceneNode(const String& name);
-
-        /** Destroys a SceneNode with a given name.
-        @remarks
-            This allows you to physically delete an individual SceneNode if you want to.
-            Note that this is not normally recommended, it's better to allow SceneManager
-            to delete the nodes when the scene is cleared.
-        */
-        virtual void destroySceneNode(const String& name);
 
         /** Destroys a SceneNode.
         @remarks
@@ -1304,6 +1283,10 @@ namespace Ogre {
             to delete the nodes when the scene is cleared.
         */
         virtual void destroySceneNode(SceneNode* sn);
+
+        /// @overload
+        virtual void destroySceneNode(const String& name);
+
         /** Gets the SceneNode at the root of the scene hierarchy.
             @remarks
                 The entire scene is held as a hierarchy of nodes, which
@@ -1407,14 +1390,7 @@ namespace Ogre {
         */
         virtual void destroyEntity(Entity* ent);
 
-        /** Removes & destroys an Entity from the SceneManager by name.
-            @warning
-                Must only be done if the Entity is not attached
-                to a SceneNode. It may be safer to wait to clear the whole
-                scene if you are unsure use clearScene.
-            @see
-                SceneManager::clearScene
-        */
+        /// @overload
         virtual void destroyEntity(const String& name);
 
         /** Removes & destroys all Entities.
@@ -1449,8 +1425,7 @@ namespace Ogre {
         /** Removes & destroys a ManualObject from the SceneManager.
         */
         virtual void destroyManualObject(ManualObject* obj);
-        /** Removes & destroys a ManualObject from the SceneManager.
-        */
+        /// @overload
         virtual void destroyManualObject(const String& name);
         /** Removes & destroys all ManualObjects from the SceneManager.
         */
@@ -1476,8 +1451,7 @@ namespace Ogre {
         /** Removes & destroys a BillboardChain from the SceneManager.
         */
         virtual void destroyBillboardChain(BillboardChain* obj);
-        /** Removes & destroys a BillboardChain from the SceneManager.
-        */
+        /// @overload
         virtual void destroyBillboardChain(const String& name);
         /** Removes & destroys all BillboardChains from the SceneManager.
         */
@@ -1503,8 +1477,7 @@ namespace Ogre {
         /** Removes & destroys a RibbonTrail from the SceneManager.
         */
         virtual void destroyRibbonTrail(RibbonTrail* obj);
-        /** Removes & destroys a RibbonTrail from the SceneManager.
-        */
+        /// @overload
         virtual void destroyRibbonTrail(const String& name);
         /** Removes & destroys all RibbonTrails from the SceneManager.
         */
@@ -1634,18 +1607,7 @@ namespace Ogre {
         */
         virtual void prepareWorldGeometry(const String& filename);
 
-        /** Sets the source of the 'world' geometry, i.e. the large, mainly 
-            static geometry making up the world e.g. rooms, landscape etc.
-            This function can be called before setWorldGeometry in a background thread, do to
-            some slow tasks (e.g. IO) that do not involve the backend render system.
-            @remarks
-                Depending on the type of SceneManager (subclasses will be 
-                specialised for particular world geometry types) you have 
-                requested via the Root or SceneManagerEnumerator classes, you 
-                can pass a stream to this method and it will attempt to load 
-                the world-level geometry for use. If the manager can only 
-                handle one input format the typeName parameter is not required.
-                The stream passed will be read (and it's state updated). 
+        /** @overload
             @param stream Data stream containing data to load
             @param typeName String identifying the type of world geometry
                 contained in the stream - not required if this manager only 
@@ -1668,17 +1630,7 @@ namespace Ogre {
         */
         virtual void setWorldGeometry(const String& filename);
 
-        /** Sets the source of the 'world' geometry, i.e. the large, mainly 
-            static geometry making up the world e.g. rooms, landscape etc.
-            @remarks
-                Depending on the type of SceneManager (subclasses will be 
-                specialised for particular world geometry types) you have 
-                requested via the Root or SceneManagerEnumerator classes, you 
-                can pass a stream to this method and it will attempt to load 
-                the world-level geometry for use. If the manager can only 
-                handle one input format the typeName parameter is not required.
-                The stream passed will be read (and it's state updated). 
-            @param stream Data stream containing data to load
+        /** @overload
             @param typeName String identifying the type of world geometry
                 contained in the stream - not required if this manager only 
                 supports one type of world geometry.
@@ -1701,13 +1653,7 @@ namespace Ogre {
         virtual size_t estimateWorldGeometry(const String& filename)
         { (void)filename; return 0; }
 
-        /** Estimate the number of loading stages required to load the named
-            world geometry. 
-        @remarks
-            Operates just like the version of this method which takes a
-            filename, but operates on a stream instead. Note that since the
-            stream is updated, you'll need to reset the stream or reopen it
-            when it comes to loading it for real.
+        /** @overload
         @param stream Data stream containing data to load
         @param typeName String identifying the type of world geometry
             contained in the stream - not required if this manager only 
@@ -1948,48 +1894,9 @@ namespace Ogre {
             Real tiling = 10, bool drawFirst = true, Real bow = 0, 
             int xsegments = 1, int ysegments = 1, 
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-        /** Enables / disables a 'sky plane' i.e. a plane at constant
-            distance from the camera representing the sky.
-            @remarks
-                You can create sky planes yourself using the standard mesh and
-                entity methods, but this creates a plane which the camera can
-                never get closer or further away from - it moves with the camera.
-                (NB you could create this effect by creating a world plane which
-                was attached to the same SceneNode as the Camera too, but this
-                would only apply to a single camera whereas this plane applies to
-                any camera using this scene manager).
-            @note
-                To apply scaling, scrolls etc to the sky texture(s) you
-                should use the TextureUnitState class methods.
-            @param
-                enable True to enable the plane, false to disable it
-            @param
-                plane Details of the plane, i.e. it's normal and it's
-                distance from the camera.
-            @param
-                materialName The name of the material the plane will use
-            @param
-                scale The scaling applied to the sky plane - higher values
-                mean a bigger sky plane - you may want to tweak this
-                depending on the size of plane.d and the other
-                characteristics of your scene
-            @param
-                tiling How many times to tile the texture across the sky.
-                Applies to all texture layers. If you need finer control use
-                the TextureUnitState texture coordinate transformation methods.
+        /** @overload
             @param
                 renderQueue The render queue to use when rendering this object
-            @param
-                bow If zero, the plane will be completely flat (like previous
-                versions.  If above zero, the plane will be curved, allowing
-                the sky to appear below camera level.  Curved sky planes are 
-                simular to skydomes, but are more compatible with fog.
-            @param xsegments, ysegments
-                Determines the number of segments the plane will have to it. This
-                is most important when you are bowing the plane, but may also be useful
-                if you need tessellation on the plane to perform per-vertex effects.
-            @param groupName
-                The name of the resource group to which to assign the plane mesh.
         */        
         virtual void _setSkyPlane(
             bool enable,
@@ -2056,37 +1963,9 @@ namespace Ogre {
             bool drawFirst = true, const Quaternion& orientation = Quaternion::IDENTITY,
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-        /** Enables / disables a 'sky box' i.e. a 6-sided box at constant
-            distance from the camera representing the sky.
-            @remarks
-                You could create a sky box yourself using the standard mesh and
-                entity methods, but this creates a plane which the camera can
-                never get closer or further away from - it moves with the camera.
-                (NB you could create this effect by creating a world box which
-                was attached to the same SceneNode as the Camera too, but this
-                would only apply to a single camera whereas this skybox applies
-                to any camera using this scene manager).
-            @par
-                The material you use for the skybox can either contain layers
-                which are single textures, or they can be cubic textures, i.e.
-                made up of 6 images, one for each plane of the cube. See the
-                TextureUnitState class for more information.
-            @param
-                enable True to enable the skybox, false to disable it
-            @param
-                materialName The name of the material the box will use
-            @param
-                distance Distance in world coorinates from the camera to
-                each plane of the box. The default is normally OK.
+        /** @overload
             @param
                 renderQueue The render queue to use when rendering this object
-            @param
-                orientation Optional parameter to specify the orientation
-                of the box. By default the 'top' of the box is deemed to be
-                in the +y direction, and the 'front' at the -z direction.
-                You can use this parameter to rotate the sky if you want.
-            @param groupName
-                The name of the resource group to which to assign the plane mesh.
         */
         virtual void _setSkyBox(
             bool enable, const String& materialName, Real distance = 5000,
@@ -2167,51 +2046,9 @@ namespace Ogre {
             int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-        /** Enables / disables a 'sky dome' i.e. an illusion of a curved sky.
-            @remarks
-                A sky dome is actually formed by 5 sides of a cube, but with
-                texture coordinates generated such that the surface appears
-                curved like a dome. Sky domes are appropriate where you need a
-                realistic looking sky where the scene is not going to be
-                'fogged', and there is always a 'floor' of some sort to prevent
-                the viewer looking below the horizon (the distortion effect below
-                the horizon can be pretty horrible, and there is never anyhting
-                directly below the viewer). If you need a complete wrap-around
-                background, use the setSkyBox method instead. You can actually
-                combine a sky box and a sky dome if you want, to give a positional
-                backdrop with an overlayed curved cloud layer.
-            @par
-                Sky domes work well with 2D repeating textures like clouds. You
-                can change the apparent 'curvature' of the sky depending on how
-                your scene is viewed - lower curvatures are better for 'open'
-                scenes like landscapes, whilst higher curvatures are better for
-                say FPS levels where you don't see a lot of the sky at once and
-                the exaggerated curve looks good.
-            @param
-                enable True to enable the skydome, false to disable it
-            @param
-                materialName The name of the material the dome will use
-            @param
-                curvature The curvature of the dome. Good values are
-                between 2 and 65. Higher values are more curved leading to
-                a smoother effect, lower values are less curved meaning
-                more distortion at the horizons but a better distance effect.
-            @param
-                tiling How many times to tile the texture(s) across the
-                dome.
-            @param
-                distance Distance in world coorinates from the camera to
-                each plane of the box the dome is rendered on. The default
-                is normally OK.
+        /** @overload
             @param
                 renderQueue The render queue to use when rendering this object
-            @param
-                orientation Optional parameter to specify the orientation
-                of the dome. By default the 'top' of the dome is deemed to
-                be in the +y direction, and the 'front' at the -z direction.
-                You can use this parameter to rotate the sky if you want.
-            @param groupName
-                The name of the resource group to which to assign the plane mesh.
                 */        
         virtual void _setSkyDome(
             bool enable, const String& materialName, Real curvature = 10,
@@ -2292,21 +2129,18 @@ namespace Ogre {
                 See the BillboardSet documentations for full details of the
                 returned class.
             @param
-                name The name to give to this billboard set. Must be unique.
-            @param
-                poolSize The initial size of the pool of billboards (see BillboardSet for more information)
-            @see
-                BillboardSet
-        */
-        virtual BillboardSet* createBillboardSet(const String& name, unsigned int poolSize = 20);
-
-        /** Creates a new BillboardSet for use with this scene manager, with a generated name.
-            @param
                 poolSize The initial size of the pool of billboards (see BillboardSet for more information)
             @see
                 BillboardSet
         */
         virtual BillboardSet* createBillboardSet(unsigned int poolSize = 20);
+
+        /** @overload
+            @param
+                name The name to give to this billboard set. Must be unique.
+        */
+        virtual BillboardSet* createBillboardSet(const String& name, unsigned int poolSize = 20);
+
         /** Retrieves a pointer to the named BillboardSet.
         @note Throws an exception if the named instance does not exist
         */
@@ -2323,12 +2157,7 @@ namespace Ogre {
         */
         virtual void destroyBillboardSet(BillboardSet* set);
 
-        /** Removes & destroys an BillboardSet from the SceneManager by name.
-            @warning
-                Must only be done if the BillboardSet is not attached
-                to a SceneNode. It may be safer to wait to clear the whole
-                scene. If you are unsure, use clearScene.
-        */
+        /// @overload
         virtual void destroyBillboardSet(const String& name);
 
         /** Removes & destroys all BillboardSets.
@@ -3275,15 +3104,7 @@ namespace Ogre {
         */
         virtual MovableObject* createMovableObject(const String& name, 
             const String& typeName, const NameValuePairList* params = 0);
-        /** Create a movable object of the type specified without a name.
-        @remarks
-        This is the generalised form of MovableObject creation where you can
-        create a MovableObject of any specialised type generically, including
-        any new types registered using plugins. The name is generated automatically.
-        @param typeName The type of object to create
-        @param params Optional name/value pair list to give extra parameters to
-        the created object.
-        */
+        /// @overload
         virtual MovableObject* createMovableObject(const String& typeName, const NameValuePairList* params = 0);
         /** Destroys a MovableObject with the name specified, of the type specified.
         @remarks
@@ -3333,12 +3154,7 @@ namespace Ogre {
             to destroy it.
         */
         virtual void extractMovableObject(const String& name, const String& typeName);
-        /** Extract a previously injected MovableObject.
-        @remarks
-            Essentially this does the same as destroyMovableObject, but only
-            removes the instance from the internal lists, it does not attempt
-            to destroy it.
-        */
+        /// @overload
         virtual void extractMovableObject(MovableObject* m);
         /** Extract all injected MovableObjects of a given type.
         @remarks

@@ -333,6 +333,15 @@ ADD_REPR(ColourValue)
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&, FrameBuffer); // deprecated
+%ignore Ogre::RenderTarget::getStatistics(float&, float&, float&, float&);
+%ignore Ogre::RenderTarget::getLastFPS;
+%ignore Ogre::RenderTarget::getAverageFPS;
+%ignore Ogre::RenderTarget::getBestFPS;
+%ignore Ogre::RenderTarget::getWorstFPS;
+%ignore Ogre::RenderTarget::getBestFrameTime;
+%ignore Ogre::RenderTarget::getWorstFrameTime;
+%ignore Ogre::RenderTarget::getTriangleCount;
+%ignore Ogre::RenderTarget::getBatchCount;
 %include "OgreRenderTarget.h"
     %include "OgreRenderWindow.h"
     %include "OgreRenderTexture.h"

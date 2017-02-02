@@ -263,95 +263,19 @@ namespace Ogre {
         */
         void setCubicTextureName( const String& name, bool forUVW = false );
 
-        /** Sets this texture layer to use a combination of 6 texture maps, each one relating to a face of a cube.
-        @remarks
-            Cubic textures are made up of 6 separate texture images. Each one of these is an orthogonal view of the
-            world with a FOV of 90 degrees and an aspect ratio of 1:1. You can generate these from 3D Studio by
-            rendering a scene to a reflection map of a transparent cube and saving the output files.
-        @par
-            Cubic maps can be used either for skyboxes (complete wrap-around skies, like space) or as environment
-            maps to simulate reflections. The system deals with these 2 scenarios in different ways:
-            <ol>
-            <li>
-            <p>
-            For cubic environment maps, the 6 textures are combined into a single 'cubic' texture map which
-            is then addressed using 3D texture coordinates. This is required because you don't know what
-            face of the box you're going to need to address when you render an object, and typically you
-            need to reflect more than one face on the one object, so all 6 textures are needed to be
-            'active' at once. Cubic environment maps are enabled by calling this method with the forUVW
-            parameter set to @c true, and then calling setEnvironmentMap(true).
-            </p>
-            <p>
-            Note that not all cards support cubic environment mapping.
-            </p>
-            </li>
-            <li>
-            <p>
-            For skyboxes, the 6 textures are kept separate and used independently for each face of the skybox.
-            This is done because not all cards support 3D cubic maps and skyboxes do not need to use 3D
-            texture coordinates so it is simpler to render each face of the box with 2D coordinates, changing
-            texture between faces.
-            </p>
-            <p>
-            Skyboxes are created by calling SceneManager::setSkyBox.
-            </p>
-            </li>
-            </ol>
-        @note
-            Applies to both fixed-function and programmable pipeline.
-        @param names
-            The 6 names of the textures which make up the 6 sides of the box. The textures must all 
+        /** @overload
+            @param names
+            The 6 names of the textures which make up the 6 sides of the box. The textures must all
             be the same size and be powers of 2 in width & height.
             Must be an Ogre::String array with a length of 6 unless forUVW is set to @c true.
-        @param forUVW
-            Set to @c true if you want a single 3D texture addressable with 3D texture coordinates rather than
-            6 separate textures. Useful for cubic environment mapping.
-        */
+         */
         void setCubicTextureName( const String* const names, bool forUVW = false );
 
-        /** Sets this texture layer to use a combination of 6 texture maps, each one relating to a face of a cube.
-        @remarks
-            Cubic textures are made up of 6 separate texture images. Each one of these is an orthogonal view of the
-            world with a FOV of 90 degrees and an aspect ratio of 1:1. You can generate these from 3D Studio by
-            rendering a scene to a reflection map of a transparent cube and saving the output files.
-        @par
-            Cubic maps can be used either for skyboxes (complete wrap-around skies, like space) or as environment
-            maps to simulate reflections. The system deals with these 2 scenarios in different ways:
-            <ol>
-            <li>
-            <p>
-            for cubic environment maps, the 6 textures are combined into a single 'cubic' texture map which
-            is then addressed using 3D texture coordinates. This is required because you don't know what
-            face of the box you're going to need to address when you render an object, and typically you
-            need to reflect more than one face on the one object, so all 6 textures are needed to be
-            'active' at once. Cubic environment maps are enabled by calling this method with the forUVW
-            parameter set to true, and then calling setEnvironmentMap(true).
-            </p>
-            <p>
-            Note that not all cards support cubic environment mapping.
-            </p>
-            </li>
-            <li>
-            <p>
-            for skyboxes, the 6 textures are kept separate and used independently for each face of the skybox.
-            This is done because not all cards support 3D cubic maps and skyboxes do not need to use 3D
-            texture coordinates so it is simpler to render each face of the box with 2D coordinates, changing
-            texture between faces.
-            </p>
-            <p>
-            Skyboxes are created by calling SceneManager::setSkyBox.
-            </p>
-            </li>
-            </ol>
-        @note
-            Applies to both fixed-function and programmable pipeline.
+        /** @copydoc setCubicTextureName
         @param texPtrs
             The 6 pointers to the textures which make up the 6 sides of the box. The textures must all 
             be the same size and be powers of 2 in width & height.
             Must be an Ogre::TexturePtr array with a length of 6 unless forUVW is set to @c true.
-        @param forUVW
-            Set to @c true if you want a single 3D texture addressable with 3D texture coordinates rather than
-            6 separate textures. Useful for cubic environment mapping.
         */
         void setCubicTexture( const TexturePtr* const texPtrs, bool forUVW = false );
 
@@ -378,27 +302,8 @@ namespace Ogre {
         */
         void setAnimatedTextureName( const String& name, unsigned int numFrames, Real duration = 0 );
 
-        /** Sets the names of the texture images for an animated texture.
-        @remarks
-            This an alternative method to the one where you specify a single name and let the system derive
-            the names of each frame, incase your images can't conform to this naming standard.
-        @par
-            Animated textures are just a series of images making up the frames of the animation. All the images
-            must be the same size, and you must provide their names as an array in the first parameter.
-            You can change the active frame on a texture layer by calling the setCurrentFrame method.
-        @note
-            If you can make your texture images conform to a naming standard of basicName_frame.ext, you
-            can call the alternative setAnimatedTextureName method which just takes a base name instead.
-        @note
-            Applies to both fixed-function and programmable pipeline.
-        @param names
-            Pointer to array of names of the textures to use, in frame order.
-        @param numFrames
-            The number of frames in the sequence.
-        @param duration
-            The length of time it takes to display the whole animation sequence, in seconds.
-            If 0, no automatic transition occurs.
-        */
+        /// @overload
+        /// @param names Pointer to array of names of the textures to use, in frame order.
         void setAnimatedTextureName( const String* const names, unsigned int numFrames, Real duration = 0 );
 
         /** Returns the width and height of the texture in the given frame.

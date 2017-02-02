@@ -429,7 +429,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("[GL] : Valid FBO targets " + fmtstring);
     }
 
-    void GL3PlusFBOManager::getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
+    void GL3PlusFBOManager::getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
     {
         const FormatProperties &props = mProps[internalFormat];
         // Decide what stencil and depth formats to use

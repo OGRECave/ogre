@@ -85,6 +85,7 @@ namespace Ogre {
         }
         ~Singleton( void )
             {  assert( msSingleton );  msSingleton = 0;  }
+        /// @copydoc Singleton::getSingleton()
         static T& getSingleton( void )
         {   assert( msSingleton );  return ( *msSingleton ); }
         static T* getSingletonPtr( void )

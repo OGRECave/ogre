@@ -378,16 +378,7 @@ namespace Ogre {
             TransformSpace relativeTo = TS_LOCAL, 
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z);
 
-        /** Sets the node's direction vector ie it's local -z.
-        @remarks
-        Note that the 'up' vector for the orientation will automatically be 
-        recalculated based on the current 'up' vector (i.e. the roll will 
-        remain the same). If you need more control, use setOrientation.
-        @param vec The direction vector
-        @param relativeTo The space in which this direction vector is expressed
-        @param localDirectionVector The vector which normally describes the natural
-        direction of the node, usually -Z
-        */
+        /// @overload
         void setDirection(const Vector3& vec, TransformSpace relativeTo = TS_LOCAL,
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z);
         /** Points the local -Z direction of this node at a point in space.

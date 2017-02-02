@@ -182,7 +182,7 @@ namespace Ogre
             texture coordinates) to the last vertex started with position().
         */
         virtual void position(const Vector3& pos);
-        /// @copydoc ManualObject::position(const Vector3&)
+        /// @overload
         virtual void position(Real x, Real y, Real z);
 
         /** Add a vertex normal to the current vertex.
@@ -191,7 +191,7 @@ namespace Ogre
             their components should be normalised.
         */
         virtual void normal(const Vector3& norm);
-        /// @copydoc ManualObject::normal(const Vector3&)
+        /// @overload
         virtual void normal(Real x, Real y, Real z);
 
         /** Add a vertex tangent to the current vertex.
@@ -202,7 +202,7 @@ namespace Ogre
             supported on old non-SM2 cards.
         */
         virtual void tangent(const Vector3& tan);
-        /// @copydoc ManualObject::tangent(const Vector3&)
+        /// @overload
         virtual void tangent(Real x, Real y, Real z);
 
         /** Add a texture coordinate to the current vertex.
@@ -214,25 +214,23 @@ namespace Ogre
             variations in number of dimensions.
         */
         virtual void textureCoord(Real u);
-        /// @copydoc ManualObject::textureCoord(Real)
+        /// @overload
         virtual void textureCoord(Real u, Real v);
-        /// @copydoc ManualObject::textureCoord(Real)
+        /// @overload
         virtual void textureCoord(Real u, Real v, Real w);
-        /// @copydoc ManualObject::textureCoord(Real)
+        /// @overload
         virtual void textureCoord(Real x, Real y, Real z, Real w);
-        /// @copydoc ManualObject::textureCoord(Real)
+        /// @overload
         virtual void textureCoord(const Vector2& uv);
-        /// @copydoc ManualObject::textureCoord(Real)
+        /// @overload
         virtual void textureCoord(const Vector3& uvw);
-        /// @copydoc ManualObject::textureCoord(Real)
+        /// @@overload
         virtual void textureCoord(const Vector4& xyzw);
 
         /** Add a vertex colour to a vertex.
         */
         virtual void colour(const ColourValue& col);
-        /** Add a vertex colour to a vertex.
-        @param r,g,b,a Colour components expressed as floating point numbers from 0-1
-        */
+        /// @overload
         virtual void colour(Real r, Real g, Real b, Real a = 1.0f);
 
         /** Add a vertex index to construct faces / lines / points via indexing

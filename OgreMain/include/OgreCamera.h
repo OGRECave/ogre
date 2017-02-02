@@ -231,8 +231,7 @@ namespace Ogre {
         */
         void setPosition(Real x, Real y, Real z);
 
-        /** Sets the camera's position.
-        */
+        /// @overload
         void setPosition(const Vector3& vec);
 
         /** Retrieves the camera's position.
@@ -254,8 +253,7 @@ namespace Ogre {
         */
         void setDirection(Real x, Real y, Real z);
 
-        /** Sets the camera's direction vector.
-        */
+        /// @overload
         void setDirection(const Vector3& vec);
 
         /** Gets the camera's direction.
@@ -279,18 +277,7 @@ namespace Ogre {
             targetPoint A vector specifying the look at point.
         */
         void lookAt( const Vector3& targetPoint );
-        /** Points the camera at a location in worldspace.
-        @remarks
-            This is a helper method to automatically generate the
-            direction vector for the camera, based on it's current position
-            and the supplied look-at point.
-        @param x
-            The @c x co-ordinates of the point to look at.
-        @param y
-            The @c y co-ordinates of the point to look at.
-        @param z
-            The @c z co-ordinates of the point to look at.
-        */
+        /// @overload
         void lookAt(Real x, Real y, Real z);
 
         /** Rolls the camera anticlockwise, around its local z axis.
@@ -309,8 +296,7 @@ namespace Ogre {
         */
         void rotate(const Vector3& axis, const Radian& angle);
 
-        /** Rotate the camera around an arbitrary axis using a Quaternion.
-        */
+        /// @overload
         void rotate(const Quaternion& q);
 
         /** Tells the camera whether to yaw around it's own local Y axis or a 
@@ -501,17 +487,7 @@ namespace Ogre {
         PlaneBoundedVolume getCameraToViewportBoxVolume(Real screenLeft, 
             Real screenTop, Real screenRight, Real screenBottom, bool includeFarPlane = false);
 
-        /** Gets a world-space list of planes enclosing a volume based on a viewport
-            rectangle. 
-        @remarks
-            Can be useful for populating a PlaneBoundedVolumeListSceneQuery, e.g. 
-            for a rubber-band selection. 
-        @param screenLeft, screenTop, screenRight, screenBottom The bounds of the
-            on-screen rectangle, expressed in normalised screen coordinates [0,1]
-        @param outVolume The plane list to populate with the result
-        @param includeFarPlane If true, the volume is truncated by the camera far plane, 
-            by default it is left open-ended
-        */
+        /// @overload
         void getCameraToViewportBoxVolume(Real screenLeft, 
             Real screenTop, Real screenRight, Real screenBottom, 
             PlaneBoundedVolume* outVolume, bool includeFarPlane = false);

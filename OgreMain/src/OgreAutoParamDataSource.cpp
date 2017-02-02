@@ -996,7 +996,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getFPS() const
     {
-        return mCurrentRenderTarget->getLastFPS();
+        return mCurrentRenderTarget->getStatistics().lastFPS;
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getViewportWidth() const

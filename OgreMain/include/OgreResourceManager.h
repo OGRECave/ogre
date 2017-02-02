@@ -300,42 +300,10 @@ namespace Ogre {
         */
         virtual void remove(const ResourcePtr& r);
 
-        /** Remove a single resource by name.
-        @remarks
-            Removes a single resource, meaning it will be removed from the list
-            of valid resources in this manager, also causing it to be unloaded. 
-        @note
-            The word 'Destroy' is not used here, since
-            if any other pointers are referring to this resource, it will persist
-            until they have finished with it; however to all intents and purposes
-            it no longer exists and will likely get destroyed imminently.
-        @note
-            If you do have shared pointers to resources hanging around after the 
-            ResourceManager is destroyed, you may get problems on destruction of
-            these resources if they were relying on the manager (especially if
-            it is a plugin). If you find you get problems on shutdown in the
-            destruction of resources, try making sure you release all your
-            shared pointers before you shutdown OGRE.
-        */
+        /// @overload
         virtual void remove(const String& name);
         
-        /** Remove a single resource by handle.
-        @remarks
-            Removes a single resource, meaning it will be removed from the list
-            of valid resources in this manager, also causing it to be unloaded. 
-        @note
-            The word 'Destroy' is not used here, since
-            if any other pointers are referring to this resource, it will persist
-            until they have finished with it; however to all intents and purposes
-            it no longer exists and will likely get destroyed imminently.
-        @note
-            If you do have shared pointers to resources hanging around after the 
-            ResourceManager is destroyed, you may get problems on destruction of
-            these resources if they were relying on the manager (especially if
-            it is a plugin). If you find you get problems on shutdown in the
-            destruction of resources, try making sure you release all your
-            shared pointers before you shutdown OGRE.
-        */
+        /// @overload
         virtual void remove(ResourceHandle handle);
         /** Removes all resources.
         @note

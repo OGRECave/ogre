@@ -74,13 +74,19 @@ namespace Ogre {
 
         struct FrameStats
         {
+            /// frames per second (FPS) based on the frames rendered in the last second
             float lastFPS;
+            /// average frames per second (FPS) since call to Root::startRendering
             float avgFPS;
+            /// best frames per second (FPS) since call to Root::startRendering
             float bestFPS;
+            /// worst frames per second (FPS) since call to Root::startRendering
             float worstFPS;
             unsigned long bestFrameTime;
             unsigned long worstFrameTime;
+            /// number of triangles rendered in the last update() call.
             size_t triangleCount;
+            /// number of batches rendered in the last update() call.
             size_t batchCount;
             int vBlankMissCount; // -1 means that the value is not applicable
         };
@@ -228,39 +234,37 @@ namespace Ogre {
                     since rendering began.
                 @param
                     worstFPS Pointer to a float to receive the worst FPS rating seen so far.
+                @deprecated use getStatistics()
         */
-        virtual void getStatistics(float& lastFPS, float& avgFPS,
+        OGRE_DEPRECATED virtual void getStatistics(float& lastFPS, float& avgFPS,
             float& bestFPS, float& worstFPS) const;  // Access to stats
 
-        virtual const FrameStats& getStatistics(void) const;
+        /** Retieves details of current rendering performance. */
+        const FrameStats& getStatistics(void) const {
+            return mStats;
+        }
 
-        /** Individual stats access - gets the number of frames per second (FPS) based on the last frame rendered.
-        */
-        virtual float getLastFPS() const;
+        /// @deprecated use getStatistics()
+        OGRE_DEPRECATED virtual float getLastFPS() const;
 
-        /** Individual stats access - gets the average frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getAverageFPS() const;
+        /// @deprecated use getStatistics()
+        OGRE_DEPRECATED virtual float getAverageFPS() const;
 
-        /** Individual stats access - gets the best frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getBestFPS() const;
+        /// @deprecated use getStatistics()
+        OGRE_DEPRECATED virtual float getBestFPS() const;
 
-        /** Individual stats access - gets the worst frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getWorstFPS() const;
+        /// @deprecated use getStatistics()
+        OGRE_DEPRECATED virtual float getWorstFPS() const;
 
-        /** Individual stats access - gets the best frame time
-        */
-        virtual float getBestFrameTime() const;
+        /// @deprecated use getStatistics()
+        OGRE_DEPRECATED virtual float getBestFrameTime() const;
 
-        /** Individual stats access - gets the worst frame time
-        */
-        virtual float getWorstFrameTime() const;
+        /// @deprecated use getStatistics()
+        OGRE_DEPRECATED virtual float getWorstFrameTime() const;
 
         /** Resets saved frame-rate statistices.
         */
-        virtual void resetStatistics(void);
+        void resetStatistics(void);
 
         /** Gets a custom (maybe platform-specific) attribute.
             @remarks
@@ -332,7 +336,7 @@ namespace Ogre {
         */
         virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer = FB_AUTO) = 0;
 
-        /** Copies the current contents of the render target to a pixelbox. 
+        /** @overload
         @deprecated This function is deprecated as behavior for dst.size < RenderTarget.size
             was inconsistent in previous versions of Ogre. Sometimes the whole rect was used as a source,
             sometimes the rect with the size equal to the size of destination rect but located
@@ -355,10 +359,10 @@ namespace Ogre {
 
         virtual bool requiresTextureFlipping() const = 0;
 
-        /** Gets the number of triangles rendered in the last update() call. */
-        virtual size_t getTriangleCount(void) const;
-        /** Gets the number of batches rendered in the last update() call. */
-        virtual size_t getBatchCount(void) const;
+        /// @deprecated use getStatistics()
+        OGRE_DEPRECATED virtual size_t getTriangleCount(void) const;
+        /// @deprecated use getStatistics()
+        OGRE_DEPRECATED virtual size_t getBatchCount(void) const;
         /** Utility method to notify a render target that a camera has been removed,
         incase it was referring to it as a viewer.
         */

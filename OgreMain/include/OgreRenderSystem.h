@@ -746,16 +746,7 @@ namespace Ogre
         */
         virtual void _setTexture(size_t unit, bool enabled, 
             const TexturePtr &texPtr) = 0;
-        /**
-        Sets the texture to bind to a given texture unit.
-
-        User processes would not normally call this direct unless rendering
-        primitives themselves.
-
-        @param unit The index of the texture unit to modify. Multitexturing 
-        hardware can support multiple units (see 
-        RenderSystemCapabilites::getNumTextureUnits)
-        @param enabled Boolean to turn the unit on/off
+        /** @overload
         @param texname The name of the texture to use - this should have
         already been loaded with TextureManager::load.
         */
@@ -806,21 +797,20 @@ namespace Ogre
         */
         virtual void _setTextureBlendMode(size_t unit, const LayerBlendModeEx& bm) = 0;
 
-        /** Sets the filtering options for a given texture unit.
-        @param unit The texture unit to set the filtering options for
-        @param minFilter The filter used when a texture is reduced in size
-        @param magFilter The filter used when a texture is magnified
-        @param mipFilter The filter used between mipmap levels, FO_NONE disables mipmapping
-        */
-        virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-            FilterOptions magFilter, FilterOptions mipFilter);
-
         /** Sets a single filter for a given texture unit.
         @param unit The texture unit to set the filtering options for
         @param ftype The filter type
         @param filter The filter to be used
         */
         virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
+
+        /** @overload
+        @param minFilter The filter used when a texture is reduced in size
+        @param magFilter The filter used when a texture is magnified
+        @param mipFilter The filter used between mipmap levels, FO_NONE disables mipmapping
+        */
+        virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
+            FilterOptions magFilter, FilterOptions mipFilter);
 
         /** Sets whether the compare func is enabled or not for this texture unit 
         @param unit The texture unit to set the filtering options for
