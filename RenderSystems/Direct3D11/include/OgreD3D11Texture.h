@@ -121,10 +121,6 @@ namespace Ogre {
         // is dynamic
         bool mIsDynamic; 
 
-        /// cube texture individual face names
-        String                          mCubeFaceNames[6];
-        // Dynamic textures?
-        bool                            mDynamicTextures;
         /// Vector of pointers to subsurfaces
         typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
         SurfaceList                     mSurfaceList;
@@ -155,9 +151,6 @@ namespace Ogre {
         void _setSrcAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
         /// internal method, set Texture class final texture protected attributes
         void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format, UINT miscflags);
-
-        /// internal method, the cube map face name for the spec. face index
-		String _getCubeFaceName(unsigned char face) const { assert(face < 6); return mCubeFaceNames[face]; }
 
         /// internal method, create D3D11HardwarePixelBuffers for every face and
         /// mipmap level. This method must be called after the D3D texture object was created

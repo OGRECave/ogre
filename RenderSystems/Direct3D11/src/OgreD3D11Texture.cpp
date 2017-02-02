@@ -51,7 +51,6 @@ namespace Ogre
         ManualResourceLoader* loader, D3D11Device & device)
         :Texture(creator, name, handle, group, isManual, loader),
         mDevice(device), 
-        mDynamicTextures(false),
         mAutoMipMapGeneration(false)
     {
     }
