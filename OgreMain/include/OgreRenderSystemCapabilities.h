@@ -226,7 +226,9 @@ namespace Ogre
         RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10),
         /// with Separate Shader Objects the gl_PerVertex interface block must be redeclared
         /// but some drivers misbehave and do not compile if we do so
-        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11)
+        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11),
+        /// GL ES2/ES3 does not support generating mipmaps for compressed formats
+        RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 12),
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9

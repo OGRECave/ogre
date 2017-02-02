@@ -254,6 +254,7 @@ namespace Ogre {
 
         // Check for hardware mipmapping support.
         rsc->setCapability(RSC_AUTOMIPMAP);
+        rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
 
         // Check for blending support
         rsc->setCapability(RSC_BLENDING);

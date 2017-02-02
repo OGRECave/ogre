@@ -259,6 +259,7 @@ namespace Ogre {
         if(GLEW_VERSION_1_4 || GLEW_SGIS_generate_mipmap)
         {
             rsc->setCapability(RSC_AUTOMIPMAP);
+            rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
         }
 
         // Check for blending support

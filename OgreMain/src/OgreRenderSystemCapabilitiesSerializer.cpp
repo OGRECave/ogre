@@ -423,6 +423,7 @@ namespace Ogre
         addCapabilitiesMapping("vao", RSC_VAO);
         addCapabilitiesMapping("separate_shader_objects", RSC_SEPARATE_SHADER_OBJECTS);
         addCapabilitiesMapping("glsl_sso_redeclare", RSC_GLSL_SSO_REDECLARE);
+        addCapabilitiesMapping("automipmap_compressed", RSC_AUTOMIPMAP_COMPRESSED);
     }
 
     void RenderSystemCapabilitiesSerializer::parseCapabilitiesLines(CapabilitiesLinesList& lines)
