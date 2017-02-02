@@ -123,8 +123,6 @@ namespace Ogre {
 
         /// cube texture individual face names
         String                          mCubeFaceNames[6];
-        /// back buffer pixel format
-        DXGI_FORMAT                     mBBPixelFormat;
         // Dynamic textures?
         bool                            mDynamicTextures;
         /// Vector of pointers to subsurfaces

@@ -789,10 +789,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     DXGI_FORMAT D3D11Texture::_chooseD3DFormat()
     {
-        // Choose frame buffer pixel format in case PF_UNKNOWN was requested
-        if(mFormat == PF_UNKNOWN)
-            return mBBPixelFormat;
-
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         if (rsys->_getFeatureLevel() < D3D_FEATURE_LEVEL_10_0 && mFormat == PF_L8)
         {
