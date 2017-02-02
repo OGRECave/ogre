@@ -68,6 +68,12 @@ namespace Ogre
         //Normal textures must be defined last but were already created.
         const size_t numNormalTextures = mLocalTextures.size();
 
+        SceneManager *sceneManager = workspace->getSceneManager();
+        SceneNode *pseudoRootNode = 0;
+
+        if( !definition->mShadowMapTexDefinitions.empty() )
+            pseudoRootNode = sceneManager->createSceneNode( SCENE_DYNAMIC );
+
         //Create the local textures
         CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
                                                             definition->mShadowMapTexDefinitions.begin();
@@ -82,7 +88,6 @@ namespace Ogre
 
             // One map, one camera
             const size_t shadowMapIdx = itor - definition->mShadowMapTexDefinitions.begin();
-            SceneManager *sceneManager = workspace->getSceneManager();
             ShadowMapCamera shadowMapCamera;
             shadowMapCamera.camera = sceneManager->createCamera( "ShadowNode Camera ID " +
                                                 StringConverter::toString( id ) + " Map " +
@@ -90,6 +95,14 @@ namespace Ogre
             shadowMapCamera.camera->setFixedYawAxis( false );
             shadowMapCamera.minDistance = 0.0f;
             shadowMapCamera.maxDistance = 100000.0f;
+
+            {
+                //Attach the camera to a node that exists outside the scene, so that it
+                //doesn't get affected by relative origins (otherwise we'll be setting
+                //the relative origin *twice*)
+                shadowMapCamera.camera->detachFromParent();
+                pseudoRootNode->attachObject( shadowMapCamera.camera );
+            }
 
 
             const size_t sharingSetupIdx = itor->getSharesSetupWith();
@@ -150,6 +163,21 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorShadowNode::~CompositorShadowNode()
     {
+        SceneNode *pseudoRootNode = 0;
+        SceneManager *sceneManager = mWorkspace->getSceneManager();
+
+        ShadowMapCameraVec::const_iterator itor = mShadowMapCameras.begin();
+        ShadowMapCameraVec::const_iterator end  = mShadowMapCameras.end();
+
+        while( itor != end )
+        {
+            pseudoRootNode = itor->camera->getParentSceneNode();
+            sceneManager->destroyCamera( itor->camera );
+            ++itor;
+        }
+
+        if( pseudoRootNode )
+            sceneManager->destroySceneNode( pseudoRootNode );
     }
     //-----------------------------------------------------------------------------------
     CompositorChannel CompositorShadowNode::createShadowTexture(
