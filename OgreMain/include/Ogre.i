@@ -41,6 +41,8 @@
 %ignore *::setUserAny; // deprecated
 %ignore *::getUserAny; // deprecated
 %ignore *::getSingletonPtr; // only expose the non ptr variant
+%ignore Ogre::Exception::getNumber; // deprecated
+%ignore Ogre::ExceptionFactory::throwExceptionEx; // deprecated
 %rename(OgreException) Ogre::Exception; // confilcts with Python Exception
 
 %feature("director:except") {

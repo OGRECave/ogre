@@ -152,8 +152,9 @@ namespace Ogre {
         virtual const String& getFullDescription(void) const;
 
         /** Gets the error code.
+        @deprecated catch by exception type instead
         */
-        virtual int getNumber(void) const throw();
+        OGRE_DEPRECATED virtual int getNumber(void) const throw();
 
         /** Gets the source function.
         */
@@ -264,8 +265,7 @@ namespace Ogre {
     private:
         /// Private constructor, no construction
         ExceptionFactory() {}
-    public:
-        static OGRE_NORETURN void throwException(
+        static OGRE_NORETURN void _throwException(
             Exception::ExceptionCodes code, int number,
             const String& desc, 
             const String& src, const char* file, long line)
@@ -286,14 +286,30 @@ namespace Ogre {
             default:                                    throw Exception(number, desc, src, "Exception", file, line);
             }
         }
+    public:
+        static OGRE_NORETURN void throwException(
+            Exception::ExceptionCodes code,
+            const String& desc,
+            const String& src, const char* file, long line)
+        {
+            _throwException(code, code, desc, src, file, line);
+        }
 
+        OGRE_DEPRECATED static OGRE_NORETURN void throwExceptionEx(
+            Exception::ExceptionCodes code, int number,
+            const String& desc,
+            const String& src, const char* file, long line)
+        {
+            _throwException(code, number, desc, src, file, line);
+        }
     };
     
 
     
 #ifndef OGRE_EXCEPT
-#define OGRE_EXCEPT(code, desc, src)         Ogre::ExceptionFactory::throwException(code, code, desc, src, __FILE__, __LINE__)
-#define OGRE_EXCEPT_EX(code, num, desc, src) Ogre::ExceptionFactory::throwException(code, num, desc, src, __FILE__, __LINE__)
+#define OGRE_EXCEPT(code, desc, src)         Ogre::ExceptionFactory::throwException(code, desc, src, __FILE__, __LINE__)
+/// @deprecated do not use
+#define OGRE_EXCEPT_EX(code, num, desc, src) Ogre::ExceptionFactory::throwExceptionEx(code, num, desc, src, __FILE__, __LINE__)
 #else
 #define OGRE_EXCEPT_EX(code, num, desc, src) OGRE_EXCEPT(code, desc, src)
 #endif
