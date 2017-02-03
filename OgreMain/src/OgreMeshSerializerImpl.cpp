@@ -928,20 +928,13 @@ namespace Ogre {
                     try {
                         readGeometry(stream, pMesh, pMesh->sharedVertexData);
                     }
-                    catch (Exception& e)
+                    catch (ItemIdentityException& e)
                     {
-                        if (e.getNumber() == Exception::ERR_ITEM_NOT_FOUND)
-                        {
-                            // duff geometry data entry with 0 vertices
-                            OGRE_DELETE pMesh->sharedVertexData;
-                            pMesh->sharedVertexData = 0;
-                            // Skip this stream (pointer will have been returned to just after header)
-                            stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        // duff geometry data entry with 0 vertices
+                        OGRE_DELETE pMesh->sharedVertexData;
+                        pMesh->sharedVertexData = 0;
+                        // Skip this stream (pointer will have been returned to just after header)
+                        stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
                     }
                     break;
                 case M_SUBMESH:
