@@ -1967,8 +1967,15 @@ namespace Ogre {
         /** Clears all the existing automatic constants. */
         void clearAutoConstants(void);
         typedef ConstVectorIterator<AutoConstantList> AutoConstantIterator;
-        /** Gets an iterator over the automatic constant bindings currently in place. */
-        AutoConstantIterator getAutoConstantIterator(void) const;
+        /** Gets an iterator over the automatic constant bindings currently in place.
+         * @deprecated use getAutoConstants() */
+        OGRE_DEPRECATED AutoConstantIterator getAutoConstantIterator(void) const;
+
+        /** Gets the automatic constant bindings currently in place. */
+        const AutoConstantList& getAutoConstants() const {
+            return mAutoConstants;
+        }
+
         /// Gets the number of int constants that have been set
         size_t getAutoConstantCount(void) const { return mAutoConstants.size(); }
         /** Gets a specific Auto Constant entry if index is in valid range

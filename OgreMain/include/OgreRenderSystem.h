@@ -203,7 +203,7 @@ namespace Ogre
         */
         virtual RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
 
-        /*
+        /**
         Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
         @remarks
         Needed in the implementation of DirectX9 with DirectX9Ex driver
@@ -228,7 +228,7 @@ namespace Ogre
         *        capabilities has to be a subset of the real capabilities and the caller is 
         *        responsible for deallocating capabilities.
         */
-        virtual void useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities);
+        void useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities);
 
         /** Restart the renderer (normally following a change in settings).
         */
@@ -240,19 +240,22 @@ namespace Ogre
 
 
         /** Sets the colour & strength of the ambient (global directionless) light in the world.
+        @deprecated only needed for fixed function APIs
         */
-        virtual void setAmbientLight(float r, float g, float b) = 0;
+        virtual void setAmbientLight(float r, float g, float b) {}
 
         /** Sets the type of light shading required (default = Gouraud).
+        @deprecated only needed for fixed function APIs
         */
-        virtual void setShadingType(ShadeOptions so) = 0;
+        virtual void setShadingType(ShadeOptions so) {}
 
         /** Sets whether or not dynamic lighting is enabled.
         @param
         enabled If true, dynamic lighting is performed on geometry with normals supplied, geometry without
         normals will not be displayed. If false, no lighting is applied and all geometry will be full brightness.
+        @deprecated only needed for fixed function APIs
         */
-        virtual void setLightingEnabled(bool enabled) = 0;
+        virtual void setLightingEnabled(bool enabled) {}
 
         /** Sets whether or not W-buffers are enabled if they are available for this renderer.
         @param
@@ -582,11 +585,11 @@ namespace Ogre
 
         /** Attaches the passed render target to the render system.
         */
-        virtual void attachRenderTarget( RenderTarget &target );
+        void attachRenderTarget( RenderTarget &target );
         /** Returns a pointer to the render target with the passed name, or NULL if that
         render target cannot be found.
         */
-        virtual RenderTarget * getRenderTarget( const String &name );
+        RenderTarget * getRenderTarget( const String &name );
         /** Detaches the render target with the passed name from the render system and
         returns a pointer to it.
         @note
@@ -598,7 +601,7 @@ namespace Ogre
         typedef MapIterator<Ogre::RenderTargetMap> RenderTargetIterator;
 
         /** Returns a specialised MapIterator over all render targets attached to the RenderSystem. */
-        virtual RenderTargetIterator getRenderTargetIterator(void) {
+        RenderTargetIterator getRenderTargetIterator(void) {
             return RenderTargetIterator( mRenderTargets.begin(), mRenderTargets.end() );
         }
         /** Returns a description of an error code.
@@ -637,7 +640,7 @@ namespace Ogre
             @remarks
                 RenderTarget's pool ID is respected. @see RenderTarget::setDepthBufferPool()
         */
-        virtual void setDepthBufferFor( RenderTarget *renderTarget );
+        void setDepthBufferFor( RenderTarget *renderTarget );
 
         // ------------------------------------------------------------------------
         //                     Internal Rendering Access
@@ -648,19 +651,24 @@ namespace Ogre
 
         /** Tells the rendersystem to use the attached set of lights (and no others) 
         up to the number specified (this allows the same list to be used with different
-        count limits) */
-        virtual void _useLights(const LightList& lights, unsigned short limit) = 0;
+        count limits)
+        @deprecated only needed for fixed function APIs
+        */
+        virtual void _useLights(const LightList& lights, unsigned short limit) {}
         /** Are fixed-function lights provided in view space? Affects optimisation. 
         */
         virtual bool areFixedFunctionLightsInViewSpace() const { return false; }
-        /** Sets the world transform matrix. */
-        virtual void _setWorldMatrix(const Matrix4 &m) = 0;
+        /** Sets the world transform matrix.
+         * @deprecated only needed for fixed function APIs */
+        virtual void _setWorldMatrix(const Matrix4 &m) {}
         /** Sets multiple world matrices (vertex blending). */
         virtual void _setWorldMatrices(const Matrix4* m, unsigned short count);
-        /** Sets the view transform matrix */
-        virtual void _setViewMatrix(const Matrix4 &m) = 0;
-        /** Sets the projection transform matrix */
-        virtual void _setProjectionMatrix(const Matrix4 &m) = 0;
+        /** Sets the view transform matrix
+         * @deprecated only needed for fixed function APIs */
+        virtual void _setViewMatrix(const Matrix4 &m) {}
+        /** Sets the projection transform matrix
+         * @deprecated only needed for fixed function APIs*/
+        virtual void _setProjectionMatrix(const Matrix4 &m) {}
         /** Utility function for setting all the properties of a texture unit at once.
         This method is also worth using over the individual texture unit settings because it
         only sets those settings which are different from the current settings for this
@@ -705,11 +713,12 @@ namespace Ogre
         its ColourValue is ignored. This is a combination of TVC_AMBIENT, TVC_DIFFUSE, TVC_SPECULAR(note that the shininess value is still
         taken from shininess) and TVC_EMISSIVE. TVC_NONE means that there will be no material property
         tracking the vertex colours.
+        @deprecated only needed for fixed function APIs
         */
         virtual void _setSurfaceParams(const ColourValue &ambient,
             const ColourValue &diffuse, const ColourValue &specular,
             const ColourValue &emissive, Real shininess,
-            TrackVertexColourType tracking = TVC_NONE) = 0;
+            TrackVertexColourType tracking = TVC_NONE) {}
 
         /** Sets whether or not rendering points using OT_POINT_LIST will 
         render point sprites (textured quads) or plain points.
@@ -785,17 +794,19 @@ namespace Ogre
         @param unit Texture unit as above
         @param m Calculation method to use
         @param frustum Optional Frustum param, only used for projective effects
+        @deprecated only needed for fixed function APIs
         */
         virtual void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m, 
-            const Frustum* frustum = 0) = 0;
+            const Frustum* frustum = 0) {}
 
         /** Sets the texture blend modes from a TextureUnitState record.
         Meant for use internally only - apps should use the Material
         and TextureUnitState classes.
         @param unit Texture unit as above
         @param bm Details of the blending mode
+        @deprecated only needed for fixed function APIs
         */
-        virtual void _setTextureBlendMode(size_t unit, const LayerBlendModeEx& bm) = 0;
+        virtual void _setTextureBlendMode(size_t unit, const LayerBlendModeEx& bm) {}
 
         /** Sets a single filter for a given texture unit.
         @param unit The texture unit to set the filtering options for
@@ -848,8 +859,9 @@ namespace Ogre
         /** Sets the texture coordinate transformation matrix for a texture unit.
         @param unit Texture unit to affect
         @param xform The 4x4 matrix
+        @deprecated only needed for fixed function APIs
         */
-        virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) = 0;
+        virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) {}
 
         /** Sets the global blending factors for combining subsequent renders with the existing frame contents.
         The result of the blending operation is:
@@ -1036,8 +1048,9 @@ namespace Ogre
         as a parametric value between 0 and 1, with 0 being the near clipping plane, and 1 being the far clipping plane. Only applicable if mode is FOG_LINEAR.
         @param linearEnd Distance at which linear fog becomes completely opaque.The distance must be passed
         as a parametric value between 0 and 1, with 0 being the near clipping plane, and 1 being the far clipping plane. Only applicable if mode is FOG_LINEAR.
+        @deprecated only needed for fixed function APIs
         */
-        virtual void _setFog(FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0) = 0;
+        virtual void _setFog(FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0) {}
 
 
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
@@ -1057,7 +1070,7 @@ namespace Ogre
         @param colour The colour to convert
         @param pDest Pointer to location to put the result.
         */
-        virtual void convertColourValue(const ColourValue& colour, uint32* pDest);
+        void convertColourValue(const ColourValue& colour, uint32* pDest);
         /** Get the native VertexElementType for a compact 32-bit colour value
         for this rendersystem.
         */
@@ -1218,9 +1231,10 @@ namespace Ogre
         @par
         You should not normally call this direct unless you are rendering
         world geometry; set it on the Renderable because otherwise it will be
-        overridden by material settings. 
+        overridden by material settings.
+        @deprecated only needed for fixed function APIs
         */
-        virtual void setNormaliseNormals(bool normalise) = 0;
+        virtual void setNormaliseNormals(bool normalise) {}
 
         /**
         Render something to the active viewport.
@@ -1244,18 +1258,18 @@ namespace Ogre
 
         /** Returns the driver version.
         */
-        virtual const DriverVersion& getDriverVersion(void) const { return mDriverVersion; }
+        const DriverVersion& getDriverVersion(void) const { return mDriverVersion; }
 
         /** Returns the default material scheme used by the render system.
             Systems that use the RTSS to emulate a fixed function pipeline 
-            (e.g. OpenGL ES 2, GL3+, DX11) need to override this function to return
+            (e.g. OpenGL ES 2, GL3+, DX11) need to return
             the default material scheme of the RTSS ShaderGenerator.
          
             This is currently only used to set the default material scheme for
             viewports.  It is a necessary step on these render systems for
             render textures to be rendered into properly.
         */
-        virtual const String& _getDefaultViewportMaterialScheme(void) const;
+        const String& _getDefaultViewportMaterialScheme(void) const;
 
         /** Binds a given GpuProgram (but not the parameters). 
         @remarks Only one GpuProgram of each type can be bound at once, binding another
@@ -1281,7 +1295,7 @@ namespace Ogre
         virtual void unbindGpuProgram(GpuProgramType gptype);
 
         /** Returns whether or not a Gpu program of the given type is currently bound. */
-        virtual bool isGpuProgramBound(GpuProgramType gptype);
+        bool isGpuProgramBound(GpuProgramType gptype);
 
         /**
          * Gets the native shading language version for this render system.
@@ -1295,21 +1309,22 @@ namespace Ogre
         virtual void setClipPlanes(const PlaneList& clipPlanes);
 
         /** Add a user clipping plane. */
-        virtual void addClipPlane (const Plane &p);
-        /** Add a user clipping plane. */
-        virtual void addClipPlane (Real A, Real B, Real C, Real D);
+        void addClipPlane (const Plane &p);
+        /** Add a user clipping plane.
+         @deprecated use addClipPlane(const Plane &p) */
+        OGRE_DEPRECATED void addClipPlane (Real A, Real B, Real C, Real D);
 
         /** Clears the user clipping region.
         */
-        virtual void resetClipPlanes();
+        void resetClipPlanes();
 
         /** Utility method for initialising all render targets attached to this rendering system. */
-        virtual void _initRenderTargets(void);
+        void _initRenderTargets(void);
 
         /** Utility method to notify all render targets that a camera has been removed, 
         in case they were referring to it as their viewer. 
         */
-        virtual void _notifyCameraRemoved(const Camera* cam);
+        void _notifyCameraRemoved(const Camera* cam);
 
         /** Internal method for updating all render targets attached to this rendering system. */
         virtual void _updateAllRenderTargets(bool swapBuffers = true);
@@ -1319,12 +1334,12 @@ namespace Ogre
 
         /** Sets whether or not vertex windings set should be inverted; this can be important
         for rendering reflections. */
-        virtual void setInvertVertexWinding(bool invert);
+        void setInvertVertexWinding(bool invert);
 
         /** Indicates whether or not the vertex windings set will be inverted for the current render (e.g. reflections)
         @see RenderSystem::setInvertVertexWinding
         */
-        virtual bool getInvertVertexWinding(void) const;
+        bool getInvertVertexWinding(void) const;
 
         /** Sets the 'scissor region' i.e. the region of the target in which rendering can take place.
         @remarks
@@ -1405,7 +1420,7 @@ namespace Ogre
         @param multiplier The amount of depth bias to apply per iteration
         @param slopeScale The constant slope scale bias for completeness
         */
-        virtual void setDeriveDepthBias(bool derive, float baseValue = 0.0f,
+        void setDeriveDepthBias(bool derive, float baseValue = 0.0f,
             float multiplier = 0.0f, float slopeScale = 0.0f)
         {
             mDerivedDepthBias = derive;
@@ -1460,16 +1475,16 @@ namespace Ogre
         may wish to know when it happens. 
         @see RenderSystem::getRenderSystemEvents
         */
-        virtual void addListener(Listener* l);
+        void addListener(Listener* l);
         /** Remove a listener to the custom events that this render system can raise.
         */
-        virtual void removeListener(Listener* l);
+        void removeListener(Listener* l);
 
         /** Gets a list of the rendersystem specific events that this rendersystem
         can raise.
         @see RenderSystem::addListener
         */
-        virtual const StringVector& getRenderSystemEvents(void) const { return mEventNames; }
+        const StringVector& getRenderSystemEvents(void) const { return mEventNames; }
 
         /** Tell the rendersystem to perform any prep tasks it needs to directly
         before other threads which might access the rendering API are registered.
@@ -1631,7 +1646,7 @@ namespace Ogre
         StringVector mEventNames;
 
         /// Internal method for firing a rendersystem event
-        virtual void fireEvent(const String& name, const NameValuePairList* params = 0);
+        void fireEvent(const String& name, const NameValuePairList* params = 0);
 
         typedef list<Listener*>::type ListenerList;
         ListenerList mEventListeners;

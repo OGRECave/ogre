@@ -1777,40 +1777,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setAmbientLight( float r, float g, float b )
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_useLights(const LightList& lights, unsigned short limit)
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setShadingType( ShadeOptions so )
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setLightingEnabled( bool enabled )
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setViewMatrix( const Matrix4 &m )
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setProjectionMatrix( const Matrix4 &m )
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setWorldMatrix( const Matrix4 &m )
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setSurfaceParams( const ColourValue &ambient, const ColourValue &diffuse,
-        const ColourValue &specular, const ColourValue &emissive, Real shininess,
-        TrackVertexColourType tracking )
-    {
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setPointParameters(Real size, 
         bool attenuationEnabled, Real constant, Real linear, Real quadratic,
         Real minSize, Real maxSize)
@@ -1903,19 +1869,10 @@ namespace Ogre
         mTexStageDesc[stage].coordIndex = index;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTextureCoordCalculation( size_t stage, TexCoordCalcMethod m,
-        const Frustum* frustum)
-    {
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
     {
         mTexStageDesc[unit].samplerDesc.MipLODBias = bias;
         mSamplerStatesChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTextureMatrix( size_t stage, const Matrix4& xForm )
-    {
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureAddressingMode( size_t stage, 
@@ -1933,10 +1890,6 @@ namespace Ogre
     {
         D3D11Mappings::get(colour, mTexStageDesc[stage].samplerDesc.BorderColor);
         mSamplerStatesChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTextureBlendMode( size_t stage, const LayerBlendModeEx& bm )
-    {
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op /*= SBO_ADD*/ )
@@ -2062,10 +2015,6 @@ namespace Ogre
 
         mBlendDesc.RenderTarget[0].RenderTargetWriteMask = val; 
         mBlendDescChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setFog( FogMode mode, const ColourValue& colour, Real densitiy, Real start, Real end )
-    {
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setPolygonMode(PolygonMode level)
@@ -3119,10 +3068,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setNormaliseNormals(bool normalise)
-    {
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::bindGpuProgram(GpuProgram* prg)
     {
         if (!prg)
@@ -3669,15 +3614,6 @@ namespace Ogre
         dest[2][3] = qn;
     }
 
-    // ------------------------------------------------------------------
-    void D3D11RenderSystem::setClipPlane (ushort index, Real A, Real B, Real C, Real D)
-    {
-    }
-
-    // ------------------------------------------------------------------
-    void D3D11RenderSystem::enableClipPlane (ushort index, bool enable)
-    {
-    }
     //---------------------------------------------------------------------
     HardwareOcclusionQuery* D3D11RenderSystem::createHardwareOcclusionQuery(void)
     {

@@ -64,27 +64,12 @@ namespace Ogre {
     class _OgreGLES2Export GLES2RenderSystem : public GLRenderSystemCommon
     {
         private:
-            /// View matrix to set world against
-            Matrix4 mViewMatrix;
-            Matrix4 mWorldMatrix;
-            Matrix4 mTextureMatrix;
-
             /// Last min & mip filtering options, so we can combine them
             FilterOptions mMinFilter;
             FilterOptions mMipFilter;
 
-            /// What texture coord set each texture unit is using
-            size_t mTextureCoordIndex[OGRE_MAX_TEXTURE_LAYERS];
-
             /// Holds texture type settings for every stage
             GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
-
-            /// Number of fixed-function texture units
-            unsigned short mFixedFunctionTextureUnits;
-
-            GLfloat mAutoTextureMatrix[16];
-
-            bool mUseAutoTextureMatrix;
 
             /// GL support class, used for creating windows etc.
             GLES2Support *mGLSupport;
@@ -172,12 +157,6 @@ namespace Ogre {
 
             void shutdown(void);
 
-            void setAmbientLight(float r, float g, float b) { };   // Not supported
-
-            void setShadingType(ShadeOptions so) { };   // Not supported
-
-            void setLightingEnabled(bool enabled) { };   // Not supported
-
             /// @copydoc RenderSystem::_createRenderWindow
             RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
                 bool fullScreen, const NameValuePairList *miscParams = 0);
@@ -197,26 +176,11 @@ namespace Ogre {
 
             String getErrorDescription(long errorNumber) const;
 
-            void setNormaliseNormals(bool normalise) { };   // Not supported
-
             // -----------------------------
             // Low-level overridden members
             // -----------------------------
 
-            void _useLights(const LightList& lights, unsigned short limit) { };   // Not supported
-
             bool areFixedFunctionLightsInViewSpace() const { return true; }
-
-            void _setWorldMatrix(const Matrix4 &m);
-
-            void _setViewMatrix(const Matrix4 &m);
-
-            void _setProjectionMatrix(const Matrix4 &m);
-
-            void _setSurfaceParams(const ColourValue &ambient,
-                                   const ColourValue &diffuse, const ColourValue &specular,
-                                   const ColourValue &emissive, Real shininess,
-                                   TrackVertexColourType tracking) {}
 
             void _setPointParameters(Real size, bool attenuationEnabled,
                                      Real constant, Real linear, Real quadratic, Real minSize, Real maxSize) {}
@@ -227,18 +191,11 @@ namespace Ogre {
 
             void _setTextureCoordSet(size_t stage, size_t index);
 
-            void _setTextureCoordCalculation(size_t stage, TexCoordCalcMethod m,
-                    const Frustum* frustum = 0) { };   // Not supported
-
-            void _setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm) { };   // Not supported
-
             void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
 
             void _setTextureBorderColour(size_t stage, const ColourValue& colour) { };   // Not supported
 
             void _setTextureMipmapBias(size_t unit, float bias) { };   // Not supported
-
-            void _setTextureMatrix(size_t stage, const Matrix4& xform) { };   // Not supported
 
             void _setViewport(Viewport *vp);
 
@@ -259,12 +216,6 @@ namespace Ogre {
             void _setDepthBias(float constantBias, float slopeScaleBias);
 
             void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
-
-            void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end);
-
-            void setClipPlane (ushort index, Real A, Real B, Real C, Real D);
-
-            void enableClipPlane (ushort index, bool enable);
 
             void _setPolygonMode(PolygonMode level);
 

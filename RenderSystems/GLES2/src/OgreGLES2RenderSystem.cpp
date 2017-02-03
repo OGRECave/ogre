@@ -110,15 +110,11 @@ namespace Ogre {
         glsupport = mGLSupport;
 #endif
 
-        mWorldMatrix = Matrix4::IDENTITY;
-        mViewMatrix = Matrix4::IDENTITY;
-
         mGLSupport->addConfig();
 
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
             // Dummy value
-            mTextureCoordIndex[i] = 99;
             mTextureTypes[i] = 0;
         }
 
@@ -462,9 +458,6 @@ namespace Ogre {
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLESCgProgramFactory);
 #endif
 
-        // Set texture the number of texture units
-        mFixedFunctionTextureUnits = caps->getNumTextureUnits();
-
         // Use VBO's by default
         mHardwareBufferManager = OGRE_NEW GLES2HardwareBufferManager();
 
@@ -749,29 +742,6 @@ namespace Ogre {
         return BLANKSTRING;
     }
 
-    void GLES2RenderSystem::_setWorldMatrix(const Matrix4 &m)
-    {
-        mWorldMatrix = m;
-    }
-
-    void GLES2RenderSystem::_setViewMatrix(const Matrix4 &m)
-    {
-        mViewMatrix = m;
-
-        // Also mark clip planes dirty
-        if (!mClipPlanes.empty())
-        {
-            mClipPlanesDirty = true;
-        }
-    }
-
-    void GLES2RenderSystem::_setProjectionMatrix(const Matrix4 &m)
-    {
-        // Nothing to do but mark clip planes dirty
-        if (!mClipPlanes.empty())
-            mClipPlanesDirty = true;
-    }
-
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
         GLES2TexturePtr tex = texPtr.staticCast<GLES2Texture>();
@@ -811,7 +781,6 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureCoordSet(size_t stage, size_t index)
     {
-        mTextureCoordIndex[stage] = index;
     }
 
     GLint GLES2RenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
@@ -1205,10 +1174,6 @@ namespace Ogre {
     void GLES2RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
     {
         mStateCacheManager->setColourMask(red, green, blue, alpha);
-    }
-
-    void GLES2RenderSystem::_setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end)
-    {
     }
 
     //---------------------------------------------------------------------

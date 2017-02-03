@@ -2502,23 +2502,32 @@ namespace Ogre {
         typedef MapIterator<AnimationList> AnimationIterator;
 
         /** Returns a specialised MapIterator over all cameras in the scene. 
+        @deprecated use getCameras()
         */
-        CameraIterator getCameraIterator(void) {
+        OGRE_DEPRECATED CameraIterator getCameraIterator(void) {
             return CameraIterator(mCameras.begin(), mCameras.end());
         }
         /** Returns a const version of the camera list. 
         */
         const CameraList& getCameras() const { return mCameras; }
-        /** Returns a specialised MapIterator over all animations in the scene. */
-        AnimationIterator getAnimationIterator(void) {
+        /** Returns a specialised MapIterator over all animations in the scene.
+         * @deprecated use getAnimations() */
+        OGRE_DEPRECATED AnimationIterator getAnimationIterator(void) {
             return AnimationIterator(mAnimationsList.begin(), mAnimationsList.end());
         }
         /** Returns a const version of the animation list. 
         */
         const AnimationList& getAnimations() const { return mAnimationsList; }
-        /** Returns a specialised MapIterator over all animation states in the scene. */
-        AnimationStateIterator getAnimationStateIterator(void) {
+        /** Returns a specialised MapIterator over all animation states in the scene.
+         * @deprecated use getAnimationStates() */
+        OGRE_DEPRECATED AnimationStateIterator getAnimationStateIterator(void)
+        {
             return mAnimationStates.getAnimationStateIterator();
+        }
+
+        /** Returns a specialised Map over all animation states in the scene. */
+        const AnimationStateMap& getAnimationStates() {
+            return mAnimationStates.getAnimationStates();
         }
 
         /** Sets the general shadow technique to be used in this scene.

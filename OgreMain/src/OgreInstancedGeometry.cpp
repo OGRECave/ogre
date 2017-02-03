@@ -924,10 +924,10 @@ namespace Ogre {
             mAnimationState = OGRE_NEW AnimationStateSet();
             mNumBoneMatrices = mSkeletonInstance->getNumBones();
             mBoneMatrices = OGRE_ALLOC_T(Matrix4, mNumBoneMatrices, MEMCATEGORY_ANIMATION);
-            AnimationStateIterator it=animations->getAnimationStateIterator();
-            while (it.hasMoreElements())
+            AnimationStateMap::const_iterator it;
+            for (it=animations->getAnimationStates().begin(); it != animations->getAnimationStates().end(); ++it)
             {
-                AnimationState*anim= it.getNext();
+                AnimationState*anim=it->second;
                 mAnimationState->createAnimationState(anim->getAnimationName(),anim->getTimePosition(),anim->getLength(),
                 anim->getWeight());
 

@@ -52,19 +52,16 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
         }
 
-        mNumSamples = 0;
-        mMultisampleFB = 0;
-
         // Check multisampling if supported
+        GLint maxSamples = 0;
         if(glSupport->hasMinGLVersion(3, 0))
         {
             // Check samples supported
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
-            GLint maxSamples;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamples));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-            mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
         }
+        mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
 
         // Will we need a second FBO to do multisampling?
         if (mNumSamples)

@@ -42,22 +42,16 @@ fragment_program Compute/PS_GLSL glsl
 compute_program Compute/CS unified
 {
         delegate Compute/CS_GLSL
-        // delegate Compute/CS_HLSL
-        // delegate Compute/CS_CG
 }
 
 vertex_program Compute/VS unified
 {
         delegate Compute/VS_GLSL
-        // delegate Compute/VS_HLSL
-        // delegate Compute/VS_CG
 }
 
 fragment_program Compute/PS unified
 {
         delegate Compute/PS_GLSL
-        // delegate Compute/PS_HLSL
-        // delegate Compute/PS_CG
 }
 
 material Compute

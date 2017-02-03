@@ -106,10 +106,12 @@ void GLTextureCommon::prepareImpl(void)
         if (loadedImages[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
             mTextureType = TEX_TYPE_3D;
 
-        // If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap
-        // creation
-        if (loadedImages[0].getNumMipmaps() == 0 &&
-            PixelUtil::getFormatName(loadedImages[0].getFormat()).find("PVRTC") != String::npos)
+        // If compressed and 0 custom mipmap, disable auto mip generation and
+        // disable software mipmap creation.
+        // Not supported by GLES.
+        if (PixelUtil::isCompressed(loadedImages[0].getFormat()) &&
+            !renderCaps->hasCapability(RSC_AUTOMIPMAP_COMPRESSED) &&
+            loadedImages[0].getNumMipmaps() == 0)
         {
             mNumMipmaps = mNumRequestedMipmaps = 0;
             // Disable flag for auto mip generation

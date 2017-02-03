@@ -177,6 +177,7 @@ ADD_REPR(ColourValue)
 %include "OgreController.h"
 %ignore Ogre::RenderSystemCapabilities::calculateSize; // deprecated
 %include "OgreRenderSystemCapabilities.h"
+%ignore Ogre::GpuProgramParameters::getAutoConstantIterator; // deprecated
 %include "OgreGpuProgramParams.h"
 %ignore Ogre::Image::loadDynamicImage(uchar*, uint32, uint32, PixelFormat); // deprecated
 %ignore Ogre::Image::loadRawData(DataStreamPtr&, uint32, uint32, PixelFormat); // deprecated
@@ -242,9 +243,15 @@ ADD_REPR(ColourValue)
 %include "OgreKeyFrame.h"
 %include "OgrePose.h"
 %include "OgreAnimationTrack.h"
+%ignore Ogre::AnimationStateSet::getAnimationStateIterator;
+%ignore Ogre::AnimationStateSet::getEnabledAnimationStateIterator;
 %include "OgreAnimationState.h"
 %include "OgreAnimation.h"
 %template(SkeletonPtr) Ogre::SharedPtr<Ogre::Skeleton>;
+// deprecated
+%ignore Ogre::Skeleton::getRootBone;
+%ignore Ogre::Skeleton::getRootBoneIterator;
+%ignore Ogre::Skeleton::getBoneIterator;
 %include "OgreSkeleton.h"
     %include "OgreSkeletonInstance.h"
 %include "OgreSkeletonManager.h"
@@ -350,6 +357,9 @@ ADD_REPR(ColourValue)
 %include "OgreShadowTextureManager.h"
 %include "OgreRenderQueueSortingGrouping.h"
 %include "OgreRenderQueueInvocation.h"
+%ignore Ogre::SceneManager::getCameraIterator; // deprecated
+%ignore Ogre::SceneManager::getAnimationIterator;
+%ignore Ogre::SceneManager::getAnimationStateIterator;
 %include "OgreSceneManager.h"
 %include "OgreSceneManagerEnumerator.h"
 %include "OgreConfigDialog.h"
