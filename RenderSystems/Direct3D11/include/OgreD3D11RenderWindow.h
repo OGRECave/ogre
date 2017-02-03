@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreD3D11Prerequisites.h"
 #include "OgreD3D11DeviceResource.h"
+#include "OgreD3D11Mappings.h"
 #include "OgreRenderWindow.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT 
@@ -79,7 +80,7 @@ namespace Ogre
         virtual void updateImpl();
 
         virtual DXGI_FORMAT _getBasicFormat()                   { return DXGI_FORMAT_B8G8R8A8_UNORM; } // preferred since Win8
-        DXGI_FORMAT _getRenderFormat()                          { return _getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled()); }
+        DXGI_FORMAT _getRenderFormat()                          { return D3D11Mappings::_getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled()); }
         void _createSizeDependedD3DResources();                 // assumes mpBackBuffer is already initialized
         void _destroySizeDependedD3DResources();
 
@@ -87,8 +88,6 @@ namespace Ogre
         void _queryDxgiDeviceImpl(IDXGIDeviceN** dxgiDevice);   // release after use
 
         void _updateViewportsDimensions();
-
-        static DXGI_FORMAT _getGammaFormat(DXGI_FORMAT format, bool appendSRGB);
 
     protected:
         D3D11Device & mDevice;          // D3D11 driver
@@ -135,7 +134,7 @@ namespace Ogre
         void notifyDeviceLost(D3D11Device* device);
         void notifyDeviceRestored(D3D11Device* device);
 
-        DXGI_FORMAT _getSwapChainFormat()                       { return _getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled() && !mUseFlipSequentialMode); }
+        DXGI_FORMAT _getSwapChainFormat()                       { return D3D11Mappings::_getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled() && !mUseFlipSequentialMode); }
         void _createSwapChain();
         virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice) = 0;
         void _destroySwapChain();

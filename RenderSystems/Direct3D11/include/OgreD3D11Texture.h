@@ -81,22 +81,6 @@ namespace Ogre {
         // needed to store data between prepareImpl and loadImpl
         typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
 
-        /// D3DDevice pointer
-		D3D11Device	&	mDevice;
-
-        // 1D texture pointer
-        ComPtr<ID3D11Texture1D> mp1DTex;
-        // 2D texture pointer
-        ComPtr<ID3D11Texture2D> mp2DTex;
-        /// cubic texture pointer
-        ComPtr<ID3D11Texture3D> mp3DTex;
-        /// actual texture pointer
-        ComPtr<ID3D11Resource> mpTex;
-
-        ComPtr<ID3D11ShaderResourceView> mpShaderResourceView;
-
-        bool mAutoMipMapGeneration;
-
         template<typename fromtype, typename totype>
         void _queryInterface(const ComPtr<fromtype>& from, ComPtr<totype> *to)
         {
@@ -110,7 +94,6 @@ namespace Ogre {
                     "D3D11Texture::_queryInterface" );
             }
         }
-        unsigned int mEffectIndex;
 #ifdef USE_D3DX11_LIBRARY       
         void _loadDDS(DataStreamPtr &dstream);
 #endif
@@ -118,14 +101,6 @@ namespace Ogre {
         void _create2DResourceView();
         void _create3DResourceView();
 
-        // is dynamic
-        bool mIsDynamic; 
-
-        /// Vector of pointers to subsurfaces
-        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
-        SurfaceList                     mSurfaceList;
-
-        D3D11_SHADER_RESOURCE_VIEW_DESC mSRVDesc;
         /// internal method, load a normal texture
         void _loadTex(LoadedStreams & loadedStreams);
 
@@ -135,9 +110,6 @@ namespace Ogre {
         void _create2DTex();
         /// internal method, create a blank cube texture
         void _create3DTex();
-
-        /// internal method, return a D3D pixel format for texture creation
-        DXGI_FORMAT _chooseD3DFormat();
 
         /// @copydoc Texture::createInternalResources
         void createInternalResources(void);
@@ -176,6 +148,26 @@ namespace Ogre {
         LoadedStreams _prepareNormTex();
         LoadedStreams _prepareVolumeTex();
         LoadedStreams _prepareCubeTex();
+
+    protected:
+        D3D11Device&	mDevice;
+
+        DXGI_FORMAT mD3DFormat;         // Effective pixel format, already gamma corrected if requested
+        DXGI_SAMPLE_DESC mFSAAType;     // Effective FSAA mode, limited by hardware capabilities
+
+        // device depended resources
+        ComPtr<ID3D11Resource> mpTex;   // actual texture
+        ComPtr<ID3D11ShaderResourceView> mpShaderResourceView;
+        ComPtr<ID3D11Texture1D> mp1DTex;
+        ComPtr<ID3D11Texture2D> mp2DTex;
+        ComPtr<ID3D11Texture3D> mp3DTex;
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC mSRVDesc;
+        bool mAutoMipMapGeneration;
+
+        /// Vector of pointers to subsurfaces
+        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
+        SurfaceList                     mSurfaceList;
     };
 
     /// RenderTexture implementation for D3D11

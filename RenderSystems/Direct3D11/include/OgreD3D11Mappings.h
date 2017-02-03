@@ -31,8 +31,7 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreTextureUnitState.h"
 #include "OgreRenderSystem.h"
-#include "OgreRoot.h"
-#include "OgreD3D11RenderSystem.h"
+#include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre 
 {
@@ -76,6 +75,9 @@ namespace Ogre
 		static PixelFormat _getPF(DXGI_FORMAT d3dPF);
 		/// utility method, convert Ogre pixel format to D3D11 pixel format
 		static DXGI_FORMAT _getPF(PixelFormat ogrePF);
+		/// utility method, optionally maps plain format to _SRGB counterparts
+		static DXGI_FORMAT _getGammaFormat(DXGI_FORMAT format, bool appendSRGB);
+		static bool _isBinaryCompressedFormat(DXGI_FORMAT d3dPF);
 
 		static D3D11_USAGE _getUsage(HardwareBuffer::Usage usage);
 		static D3D11_USAGE _getUsage(TextureUsage usage) { return _getUsage(static_cast<HardwareBuffer::Usage>(usage)); }
@@ -90,7 +92,7 @@ namespace Ogre
 		static TextureType _getTexType(D3D11_SRV_DIMENSION type);
 
 		static UINT _getTextureBindFlags(DXGI_FORMAT format, TextureUsage usage);
-		static UINT _getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic);
+		static UINT _getTextureMiscFlags(UINT bindflags, TextureType textype, TextureUsage usage);
 	};
 }
 #endif

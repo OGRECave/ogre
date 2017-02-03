@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include "OgreMeshManager.h"
+#include "OgreSceneManagerEnumerator.h"
 #include "OgreD3D11HardwareBufferManager.h"
 #include "OgreD3D11HardwareIndexBuffer.h"
 #include "OgreD3D11HardwareVertexBuffer.h"
@@ -1411,7 +1412,7 @@ namespace Ogre
         {
             D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
             viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
+            viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
             viewDesc.Texture2D.MostDetailedMip = 0;
             viewDesc.Texture2D.MipLevels = 1;
             HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil.Get(), &viewDesc, mDSTResView.ReleaseAndGetAddressOf());
