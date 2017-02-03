@@ -121,6 +121,11 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
       set(OGRE_WARNING_FLAGS "${OGRE_WARNING_FLAGS} -Wno-unused-but-set-parameter")
   endif ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OGRE_WARNING_FLAGS}")
+
+  if( CMAKE_COMPILER_IS_CLANGXX )
+    # Without this, builds made with Clang won't print std::string
+    set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-limit-debug-info" )
+  endif()
 endif ()
 if (MSVC)
   if (CMAKE_BUILD_TOOL STREQUAL "nmake")
