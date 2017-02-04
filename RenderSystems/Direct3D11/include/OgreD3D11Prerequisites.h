@@ -34,6 +34,13 @@ THE SOFTWARE.
 #include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
 #include "WIN32/OgreComPtr.h"       // too much resource leaks were caused without it by throwing constructors
 
+#include "OgreException.h"
+
+#ifdef OGRE_EXCEPT_EX
+#undef OGRE_EXCEPT_EX
+#endif
+
+#define OGRE_EXCEPT_EX(code, num, desc, src) throw Ogre::D3D11RenderingAPIException(num, desc, src, __FILE__, __LINE__)
 
 // some D3D commonly used macros
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
@@ -122,5 +129,23 @@ namespace Ogre
 #else
 #   define _OgreD3D11Export
 #endif  // OGRE_WIN32
+
+    class _OgreD3D11Export D3D11RenderingAPIException : public RenderingAPIException
+    {
+    public:
+        D3D11RenderingAPIException(int hr, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : RenderingAPIException(hr, inDescription, inSource, inFile, inLine) {}
+
+        int getNumber(void) const throw() {
+            return number;
+        }
+
+        const String& getFullDescription(void) const {
+            StringStream ss(RenderingAPIException::getFullDescription());
+            ss << " HRESULT=" << number;
+            fullDesc = ss.str();
+            return fullDesc;
+        }
+    };
 }
 #endif

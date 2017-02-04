@@ -1656,7 +1656,7 @@ namespace Ogre
         {
             RenderSystem::_updateAllRenderTargets(swapBuffers);
         }
-        catch(const RenderingAPIException& e)
+        catch(const D3D11RenderingAPIException& e)
         {
             if(e.getNumber() == DXGI_ERROR_DEVICE_REMOVED || e.getNumber() == DXGI_ERROR_DEVICE_RESET)
                 LogManager::getSingleton().logMessage("D3D11: Device was lost while rendering.");
@@ -1671,7 +1671,7 @@ namespace Ogre
         {
             RenderSystem::_swapAllRenderTargetBuffers();
         }
-        catch(const RenderingAPIException& e)
+        catch(const D3D11RenderingAPIException& e)
         {
             if(e.getNumber() == DXGI_ERROR_DEVICE_REMOVED || e.getNumber() == DXGI_ERROR_DEVICE_RESET)
                 LogManager::getSingleton().logMessage("D3D11: Device was lost while rendering.");

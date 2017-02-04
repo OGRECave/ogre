@@ -93,7 +93,7 @@ namespace Ogre {
 
             StringStream desc;
 
-            desc <<  "OGRE EXCEPTION(" << number << ":" << typeName << "): "
+            desc << typeName << ": "
                 << description 
                 << " in " << source;
 
