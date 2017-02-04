@@ -295,10 +295,10 @@ float4 diffuseCol;
 	int2 iFragCoord = int2( gl_FragCoord.xy );
 
 	@property( hlms_use_prepass_msaa )
-		int gBufSubsample = firstbit_lo( gl_SampleMask[0] );
+		int gBufSubsample = firstbitlow( gl_SampleMask );
 
-		nNormal = gBuf_normals.Load( iFragCoord, 0 ).xyz * 2.0 - 1.0;
-		float2 shadowRoughness = gBuf_shadowRoughness.Load( iFragCoord, 0 ).xy;
+		nNormal = gBuf_normals.Load( iFragCoord, gBufSubsample ).xyz * 2.0 - 1.0;
+		float2 shadowRoughness = gBuf_shadowRoughness.Load( iFragCoord, gBufSubsample ).xy;
 	@end @property( !hlms_use_prepass_msaa )
 		nNormal = gBuf_normals.Load( int3( iFragCoord, 0 ) ).xyz * 2.0 - 1.0;
 		float2 shadowRoughness = gBuf_shadowRoughness.Load( int3( iFragCoord, 0 ) ).xy;
