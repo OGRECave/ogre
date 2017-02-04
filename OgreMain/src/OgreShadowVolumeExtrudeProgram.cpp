@@ -90,30 +90,12 @@ namespace Ogre {
         "    return output;\n"
         "}\n";
 
-    String ShadowVolumeExtrudeProgram::mPointVs_glsl = 
-        "#version 150\n"
-        "// Point light shadow volume extrude\n"
-        "in vec4 uv0;\n"
-        "in vec4 vertex;\n\n"
-        "uniform mat4 worldviewproj_matrix;\n"
-        "uniform vec4 light_position_object_space; // homogenous, object space\n\n"
-        "void main()\n"
-        "{\n"
-        "    // Extrusion in object space\n"
-        "    // Vertex unmodified if w==1, extruded if w==0\n"
-        "    vec4 newpos = \n"
-        "        (uv0.xxxx * light_position_object_space) + \n"
-        "        vec4(vertex.xyz - light_position_object_space.xyz, 0.0);\n"
-        "\n"
-        "    gl_Position = worldviewproj_matrix * newpos;\n"
-        "}\n";
-
-    String ShadowVolumeExtrudeProgram::mPointVs_glsles = 
+    static const String glsles_prefix =
         "#version 100\n"
         "precision highp float;\n"
-        "precision highp int;\n"
-        "precision lowp sampler2D;\n"
-        "precision lowp samplerCube;\n\n"
+        "precision highp int;\n";
+
+    String ShadowVolumeExtrudeProgram::mPointVs_glsl =
         "// Point light shadow volume extrude\n"
         "attribute vec4 uv0;\n"
         "attribute vec4 position;\n\n"
@@ -129,6 +111,7 @@ namespace Ogre {
         "\n"
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "}\n";
+    String ShadowVolumeExtrudeProgram::mPointVs_glsles = glsles_prefix + mPointVs_glsl;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1 = 
         "!!ARBvp1.0\n"
@@ -180,29 +163,7 @@ namespace Ogre {
         "    return output;\n"
         "}\n";
 
-    String ShadowVolumeExtrudeProgram::mDirVs_glsl = 
-        "#version 150\n"
-        "// Directional light extrude\n"
-        "in vec4 uv0;\n"
-        "in vec4 vertex;\n\n"
-        "uniform mat4 worldviewproj_matrix;\n"
-        "uniform vec4 light_position_object_space; // homogenous, object space\n\n"
-        "void main()\n"
-        "{\n"
-        "    // Extrusion in object space\n"
-        "    // Vertex unmodified if w==1, extruded if w==0\n"
-        "    vec4 newpos = \n"
-        "        (uv0.xxxx * (vertex + light_position_object_space)) - light_position_object_space;\n"
-        "\n"
-        "    gl_Position = worldviewproj_matrix * newpos;\n"
-        "}\n";
-
-    String ShadowVolumeExtrudeProgram::mDirVs_glsles = 
-        "#version 100\n"
-        "precision highp float;\n"
-        "precision highp int;\n"
-        "precision lowp sampler2D;\n"
-        "precision lowp samplerCube;\n\n"
+    String ShadowVolumeExtrudeProgram::mDirVs_glsl =
         "// Directional light extrude\n"
         "attribute vec4 uv0;\n"
         "attribute vec4 position;\n\n"
@@ -217,6 +178,8 @@ namespace Ogre {
         "\n"
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "}\n";
+
+    String ShadowVolumeExtrudeProgram::mDirVs_glsles = glsles_prefix + mDirVs_glsl;
 
 
     String ShadowVolumeExtrudeProgram::mPointArbvp1Debug = 
@@ -364,32 +327,6 @@ namespace Ogre {
         "}\n";
 
     String ShadowVolumeExtrudeProgram::mPointVs_glslFinite = 
-        "#version 150\n"
-        "// Point light shadow volume extrude - FINITE\n"
-        "in vec4 uv0;\n"
-        "in vec4 vertex;\n\n"
-        "uniform mat4 worldviewproj_matrix;\n"
-        "uniform vec4 light_position_object_space; // homogenous, object space\n"
-        "uniform float shadow_extrusion_distance; // how far to extrude\n\n"
-        "void main()\n"
-        "{\n"
-        "    // Extrusion in object space\n"
-        "    // Vertex unmodified if w==1, extruded if w==0\n"
-        "   vec3 extrusionDir = vertex.xyz - light_position_object_space.xyz;\n"
-        "   extrusionDir = normalize(extrusionDir);\n"
-        "   \n"
-        "    vec4 newpos = vec4(vertex.xyz +  \n"
-        "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
-        "\n"
-        "    gl_Position = worldviewproj_matrix * newpos;\n"
-        "}\n";
-
-    String ShadowVolumeExtrudeProgram::mPointVs_glslesFinite = 
-        "#version 100\n"
-        "precision highp float;\n"
-        "precision highp int;\n"
-        "precision lowp sampler2D;\n"
-        "precision lowp samplerCube;\n\n"
         "// Point light shadow volume extrude - FINITE\n"
         "attribute vec4 uv0;\n"
         "attribute vec4 position;\n\n"
@@ -408,6 +345,8 @@ namespace Ogre {
         "\n"
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "}\n";
+
+    String ShadowVolumeExtrudeProgram::mPointVs_glslesFinite = glsles_prefix + mPointVs_glslFinite;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1Finite = 
         "!!ARBvp1.0\n"
@@ -477,33 +416,6 @@ namespace Ogre {
         "}\n";
 
     String ShadowVolumeExtrudeProgram::mDirVs_glslFinite = 
-        "#version 150\n"
-        "// Directional light extrude - FINITE\n"
-        "in vec4 uv0;\n"
-        "in vec4 vertex;\n\n"
-        "uniform mat4 worldviewproj_matrix;\n"
-        "uniform vec4 light_position_object_space; // homogenous, object space\n"
-        "uniform float shadow_extrusion_distance;  // how far to extrude\n\n"
-        "void main()\n"
-        "{\n"
-        "    // Extrusion in object space\n"
-        "    // Vertex unmodified if w==1, extruded if w==0\n"
-        "	vec3 extrusionDir = - light_position_object_space.xyz;\n"
-        "	extrusionDir = normalize(extrusionDir);\n"
-        "	\n"
-        "    vec4 newpos = vec4(vertex.xyz +  \n"
-        "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
-        "\n"
-        "    gl_Position = worldviewproj_matrix * newpos;\n"
-        "\n"
-        "}\n";
-
-    String ShadowVolumeExtrudeProgram::mDirVs_glslesFinite = 
-        "#version 100\n"
-        "precision highp float;\n"
-        "precision highp int;\n"
-        "precision lowp sampler2D;\n"
-        "precision lowp samplerCube;\n\n"
         "// Directional light extrude - FINITE\n"
         "attribute vec4 uv0;\n"
         "attribute vec4 position;\n\n"
@@ -514,15 +426,17 @@ namespace Ogre {
         "{\n"
         "    // Extrusion in object space\n"
         "    // Vertex unmodified if w==1, extruded if w==0\n"
-		"	vec3 extrusionDir = - light_position_object_space.xyz;\n"
-		"	extrusionDir = normalize(extrusionDir);\n"
-		"	\n"
-		"    vec4 newpos = vec4(position.xyz +  \n"
-		"        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
+        "   vec3 extrusionDir = - light_position_object_space.xyz;\n"
+        "   extrusionDir = normalize(extrusionDir);\n"
+        "   \n"
+        "    vec4 newpos = vec4(position.xyz +  \n"
+        "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
         "\n"
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "\n"
         "}\n";
+
+    String ShadowVolumeExtrudeProgram::mDirVs_glslesFinite = glsles_prefix + mDirVs_glslFinite;
 
     String ShadowVolumeExtrudeProgram::mPointArbvp1FiniteDebug = 
         "!!ARBvp1.0\n"
@@ -628,25 +542,12 @@ namespace Ogre {
         "}\n";
 
     String ShadowVolumeExtrudeProgram::mGeneralFs_glsl = 
-        "#version 150\n"
-        "out vec4 fragColour;\n"
-        "void main()\n"
-        "{\n"
-        "    fragColour = vec4(1.0);\n"
-        "}\n";
-
-    String ShadowVolumeExtrudeProgram::mGeneralFs_glsles = 
-        "#version 100\n"
-        "precision highp float;\n"
-        "precision highp int;\n"
-        "precision lowp sampler2D;\n"
-        "precision lowp samplerCube;\n\n"
         "void main()\n"
         "{\n"
         "    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
         "}\n";
 
-
+    String ShadowVolumeExtrudeProgram::mGeneralFs_glsles = glsles_prefix + mGeneralFs_glsl;
 
 	 String ShadowVolumeExtrudeProgram::mModulate_Fs_hlsl_4_0 = 
         "uniform float4 shadowColor;\n"
@@ -685,13 +586,6 @@ namespace Ogre {
             "   pos = mul(worldViewProj, inPos);\n"
             "}";
 
-
-
-static const String glsles_prefix = "precision highp float;\n"
-                                    "precision highp int;\n"
-                                    "precision lowp sampler2D;\n"
-                                    "precision lowp samplerCube;\n";
-
     String ShadowVolumeExtrudeProgram::mModulate_Fs_glsl =
         "uniform vec4 shadowColor;\n"
         "\n"
@@ -701,10 +595,10 @@ static const String glsles_prefix = "precision highp float;\n"
 
     String ShadowVolumeExtrudeProgram::mModulate_Vs_glsl =
         "uniform mat4 worldViewProj; \n"
-        "attribute vec4 inPos; \n"
+        "attribute vec4 vertex; \n"
         "\n"
         "void main() {\n"
-        "    gl_Position = worldViewProj*inPos; \n"
+        "    gl_Position = worldViewProj*vertex; \n"
         "}";
 
 

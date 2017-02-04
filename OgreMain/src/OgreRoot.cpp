@@ -488,16 +488,9 @@ namespace Ogre {
             // Don't trim whitespace
             cfg.load(mConfigFileName, "\t:=", false);
         }
-        catch (Exception& e)
+        catch (FileNotFoundException& e)
         {
-            if (e.getNumber() == Exception::ERR_FILE_NOT_FOUND)
-            {
-                return false;
-            }
-            else
-            {
-                throw;
-            }
+            return false;
         }
 
         ConfigFile::SettingsBySection_::const_iterator seci;

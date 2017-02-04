@@ -69,6 +69,9 @@ namespace Ogre {
         case ZZIP_DIR_EDH_MISSING:
             errorMsg = "Zip-file's central directory record missing. Is this a 7z file?";
             break;
+        case ZZIP_ENOENT:
+            errorMsg = "File not in archive.";
+            break;
         default:
             errorMsg = "Unknown error.";
             break;            
@@ -172,11 +175,10 @@ namespace Ogre {
         {
             int zerr = zzip_error(mZzipDir);
             String zzDesc = getZzipErrorDescription((zzip_error_t)zerr);
-            LogManager::getSingleton().logMessage(
-                mName + " - Unable to open file " + lookUpFileName + ", error was '" + zzDesc + "'", LML_CRITICAL);
-                
-            // return null pointer
-            return DataStreamPtr();
+
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+                    mName+ " Cannot open file: " + filename + " - "+zzDesc,
+                "FileSystemArchive::open");
         }
 
         // Get uncompressed size too

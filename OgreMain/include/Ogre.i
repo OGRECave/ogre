@@ -267,6 +267,7 @@ ADD_REPR(ColourValue)
 %template(_Techniques) Ogre::vector<Ogre::Technique*>;
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
+%ignore Ogre::RenderSystem::addClipPlane(Real, Real, Real, Real);
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 %include "OgreCompositorInstance.h"
@@ -340,7 +341,7 @@ ADD_REPR(ColourValue)
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&, FrameBuffer); // deprecated
-%ignore Ogre::RenderTarget::getStatistics(float&, float&, float&, float&);
+%ignore Ogre::RenderTarget::getStatistics(float&, float&, float&, float&) const;
 %ignore Ogre::RenderTarget::getLastFPS;
 %ignore Ogre::RenderTarget::getAverageFPS;
 %ignore Ogre::RenderTarget::getBestFPS;

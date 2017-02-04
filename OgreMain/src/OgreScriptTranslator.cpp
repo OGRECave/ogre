@@ -4817,10 +4817,10 @@ namespace Ogre{
                                         else
                                             params->setConstant(index, m);
                                     }
-                                    catch(...)
+                                    catch (Exception& e)
                                     {
                                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "setting matrix4x4 parameter failed");
+                                                           e.getDescription());
                                     }
                                 }
                                 else
@@ -4841,10 +4841,10 @@ namespace Ogre{
                                         else
                                             params->setSubroutine(index, s);
                                     }
-                                    catch(...)
+                                    catch (Exception& e)
                                     {
                                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "setting subroutine parameter failed");
+                                                           e.getDescription());
                                     }
                                 }
                                 else
@@ -4932,10 +4932,10 @@ namespace Ogre{
                                             else
                                                 params->setConstant(index, vals, roundedCount/4);
                                         }
-                                        catch (...)
+                                        catch (Exception& e)
                                         {
                                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "setting of constant failed");
+                                                               e.getDescription());
                                         }
                                     }
                                     else
@@ -4969,10 +4969,10 @@ namespace Ogre{
                                             else
                                                 params->setConstant(index, vals, roundedCount/4);
                                         }
-                                        catch (...)
+                                        catch (Exception& e)
                                         {
                                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "setting of constant failed");
+                                                               e.getDescription());
                                         }
                                     }
                                     else
@@ -5006,10 +5006,10 @@ namespace Ogre{
                                             else
                                                 params->setConstant(index, vals, roundedCount/4);
                                         }
-                                        catch (...)
+                                        catch (Exception& e)
                                         {
                                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "setting of constant failed");
+                                                               e.getDescription());
                                         }
                                     }
                                     else
@@ -5043,10 +5043,10 @@ namespace Ogre{
                                             else
                                                 params->setConstant(index, vals, roundedCount/4);
                                         }
-                                        catch (...)
+                                        catch (Exception& e)
                                         {
                                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "setting of constant failed");
+                                                               e.getDescription());
                                         }
                                     }
                                     else
@@ -5080,10 +5080,10 @@ namespace Ogre{
                                             else
                                                 params->setConstant(index, vals, roundedCount/4);
                                         }
-                                        catch (...)
+                                        catch (Exception& e)
                                         {
                                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "setting of constant failed");
+                                                               e.getDescription());
                                         }
                                     }
                                     else
@@ -5333,10 +5333,10 @@ namespace Ogre{
                                                     else
                                                         params->setAutoConstant(index, def->acType, 0);
                                                 }
-                                                catch(...)
+                                                catch (Exception& e)
                                                 {
                                                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                       "setting of constant failed");
+                                                                       e.getDescription());
                                                 }
                                             }
                                             else
@@ -5375,10 +5375,10 @@ namespace Ogre{
                                                     else
                                                         params->setAutoConstant(index, def->acType, extraInfo);
                                                 }
-                                                catch(...)
+                                                catch (Exception& e)
                                                 {
                                                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                       "setting of constant failed");
+                                                                       e.getDescription());
                                                 }
                                             }
                                             else
@@ -5404,10 +5404,10 @@ namespace Ogre{
                                             else
                                                 params->setAutoConstantReal(index, def->acType, f);
                                         }
-                                        catch(...)
+                                        catch (Exception& e)
                                         {
                                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "setting of constant failed");
+                                                               e.getDescription());
                                         }
                                     }
                                     else
@@ -5424,10 +5424,10 @@ namespace Ogre{
                                                     else
                                                         params->setAutoConstantReal(index, def->acType, extraInfo);
                                                 }
-                                                catch(...)
+                                                catch(Exception& e)
                                                 {
                                                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                       "setting of constant failed");
+                                                                       e.getDescription());
                                                 }
                                             }
                                             else
