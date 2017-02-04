@@ -1,7 +1,11 @@
 #version 430
 
 uniform sampler2D srcRtt;
-uniform sampler2D srcDepth;
+@property( !texture1_msaa )
+	uniform sampler2D srcDepth;
+@end @property( texture1_msaa )
+	uniform sampler2DMS srcDepth;
+@end
 
 layout (@insertpiece(uav0_pf_type)) uniform restrict writeonly image2D dstRtt;
 layout (@insertpiece(uav1_pf_type)) uniform restrict writeonly image2D dstDepth;

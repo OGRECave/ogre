@@ -1,5 +1,9 @@
 Texture2D<@insertpiece(texture0_pf_type)> srcRtt	: register(t0);
-Texture2D<@insertpiece(texture1_pf_type)> srcDepth	: register(t1);
+@property( !texture1_msaa )
+	Texture2D<@insertpiece(texture1_pf_type)> srcDepth	: register(t1);
+@end @property( texture1_msaa )
+	Texture2DMS<@insertpiece(texture1_pf_type)> srcDepth: register(t1);
+@end
 
 RWTexture2D<@insertpiece(uav0_pf_type)> dstRtt		: register(u0);
 RWTexture2D<@insertpiece(uav1_pf_type)> dstDepth	: register(u1);
@@ -27,10 +31,17 @@ void main
 	float4 srcRttValue2 = srcRtt.Load( int3( xyPos2.xy, 0 ) );
 	float4 srcRttValue3 = srcRtt.Load( int3( xyPos3.xy, 0 ) );
 
-	float srcDepthValue0 = srcDepth.Load( int3( xyPos0.xy, 0 ) ).x;
-	float srcDepthValue1 = srcDepth.Load( int3( xyPos1.xy, 0 ) ).x;
-	float srcDepthValue2 = srcDepth.Load( int3( xyPos2.xy, 0 ) ).x;
-	float srcDepthValue3 = srcDepth.Load( int3( xyPos3.xy, 0 ) ).x;
+	@property( !texture1_msaa )
+		float srcDepthValue0 = srcDepth.Load( int3( xyPos0.xy, 0 ) ).x;
+		float srcDepthValue1 = srcDepth.Load( int3( xyPos1.xy, 0 ) ).x;
+		float srcDepthValue2 = srcDepth.Load( int3( xyPos2.xy, 0 ) ).x;
+		float srcDepthValue3 = srcDepth.Load( int3( xyPos3.xy, 0 ) ).x;
+	@end @property( texture1_msaa )
+		float srcDepthValue0 = srcDepth.Load( xyPos0.xy, 0 ).x;
+		float srcDepthValue1 = srcDepth.Load( xyPos1.xy, 0 ).x;
+		float srcDepthValue2 = srcDepth.Load( xyPos2.xy, 0 ).x;
+		float srcDepthValue3 = srcDepth.Load( xyPos3.xy, 0 ).x;
+	@end
 
 	dstRtt[ int2( xyPos0.xy ) ] = srcRttValue0;
 	dstRtt[ int2( xyPos1.xy ) ] = srcRttValue1;
