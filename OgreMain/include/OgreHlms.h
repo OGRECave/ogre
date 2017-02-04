@@ -648,6 +648,7 @@ namespace Ogre
         static const IdString RenderDepthOnly;
         static const IdString PrePass;
         static const IdString UsePrePass;
+        static const IdString UsePrePassMsaa;
         static const IdString UseSsr;
         static const IdString EnableVpls;
         static const IdString ForwardPlus;

@@ -114,6 +114,7 @@ namespace Ogre
     const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
     const IdString HlmsBaseProp::PrePass            = IdString( "hlms_prepass" );
     const IdString HlmsBaseProp::UsePrePass         = IdString( "hlms_use_prepass" );
+    const IdString HlmsBaseProp::UsePrePassMsaa     = IdString( "hlms_use_prepass_msaa" );
     const IdString HlmsBaseProp::UseSsr             = IdString( "hlms_use_ssr" );
     const IdString HlmsBaseProp::EnableVpls         = IdString( "hlms_enable_vpls" );
     const IdString HlmsBaseProp::ForwardPlus        = IdString( "hlms_forwardplus" );
@@ -2238,6 +2239,13 @@ namespace Ogre
         {
             setProperty( HlmsBaseProp::UsePrePass, 1 );
             setProperty( HlmsBaseProp::VPos, 1 );
+
+            {
+                const TextureVec *prePassTextures = sceneManager->getCurrentPrePassTextures();
+                assert( prePassTextures && !prePassTextures->empty() );
+                if( (*prePassTextures)[0]->getFSAA() > 1 )
+                    setProperty( HlmsBaseProp::UsePrePassMsaa, 1 );
+            }
 
             if( sceneManager->getCurrentSsrTexture() != 0 )
                 setProperty( HlmsBaseProp::UseSsr, 1 );

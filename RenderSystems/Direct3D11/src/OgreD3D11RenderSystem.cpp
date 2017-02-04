@@ -1180,6 +1180,8 @@ bail:
             rsc->setCapability(RSC_READ_BACK_AS_TEXTURE);
         }
 
+        rsc->setCapability(RSC_EXPLICIT_FSAA_RESOLVE);
+
         // We always support compression, D3DX will decompress if device does not support
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);

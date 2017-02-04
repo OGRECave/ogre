@@ -2,7 +2,7 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 {
 	in 0 rt_renderwindow
 
-	texture mrtGBuffer target_width target_height PF_A2R10G10B10 PF_SHORT_GR depth_format PF_D32_FLOAT depth_texture depth_pool 1
+	texture mrtGBuffer target_width target_height PF_A2R10G10B10 PF_SHORT_GR depth_format PF_D32_FLOAT depth_texture depth_pool 1 explicit_resolve
 	texture mrtDepthBuffer target_width target_height PF_D32_FLOAT depth_pool 1
 	
 	texture prevFrame target_width target_height PF_R8G8B8A8 mipmap -1 no_gamma uav depth_pool 0
