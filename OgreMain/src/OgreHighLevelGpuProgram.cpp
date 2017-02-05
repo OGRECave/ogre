@@ -138,6 +138,10 @@ namespace Ogre
                 }
 
             }
+            catch (const RuntimeAssertionException&)
+            {
+                throw;
+            }
             catch (const Exception& e)
             {
                 // will already have been logged

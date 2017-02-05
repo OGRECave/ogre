@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreBooleanMask.h"
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     #define CACHED_TRANSFORM_OUT_OF_DATE() this->_setCachedTransformOutOfDate()
 #else
     #define CACHED_TRANSFORM_OUT_OF_DATE() ((void)0)
@@ -47,7 +47,7 @@ namespace Ogre {
         mDepthLevel( 0 ),
         mParent( parent ),
 		mName( "" ),
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mCachedTransformOutOfDate( true ),
 #endif
         mListener( 0 ),
@@ -70,7 +70,7 @@ namespace Ogre {
         mDepthLevel( 0 ),
         mParent( 0 ),
 		mName( "Dummy Node" ),
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mCachedTransformOutOfDate( true ),
 #endif
         mListener( 0 ),
@@ -341,7 +341,7 @@ namespace Ogre {
                                          *mTransform.mDerivedScale,
                                          *mTransform.mDerivedOrientation );
         derivedTransform.storeToAoS( mTransform.mDerivedTransform );
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
         {
             if( mTransform.mOwner[j] )
@@ -393,7 +393,7 @@ namespace Ogre {
                                             *t.mDerivedScale,
                                             *t.mDerivedOrientation );
             derivedTransform.storeToAoS( t.mDerivedTransform );
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( t.mOwner[j] )
@@ -658,7 +658,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Quaternion Node::_getDerivedOrientation(void) const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
+#endif
         return mTransform.mDerivedOrientation->getAsQuaternion( mTransform.mIndex );
     }
     //-----------------------------------------------------------------------
@@ -670,7 +672,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Vector3 Node::_getDerivedPosition(void) const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
+#endif
         return mTransform.mDerivedPosition->getAsVector3( mTransform.mIndex );
     }
     //-----------------------------------------------------------------------
@@ -682,7 +686,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Vector3 Node::_getDerivedScale(void) const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
+#endif
         return mTransform.mDerivedScale->getAsVector3( mTransform.mIndex );
     }
     //-----------------------------------------------------------------------
@@ -694,8 +700,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Vector3 Node::convertWorldToLocalPosition( const Vector3 &worldPos )
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
-
+#endif
         ArrayVector3 arrayWorldPos;
         arrayWorldPos.setAll( worldPos );
         arrayWorldPos = mTransform.mDerivedOrientation->Inverse() *
@@ -709,7 +716,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Vector3 Node::convertLocalToWorldPosition( const Vector3 &localPos )
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
+#endif
         ArrayVector3 arrayLocalPos;
         arrayLocalPos.setAll( localPos );
         arrayLocalPos = ( (*mTransform.mDerivedOrientation) *
@@ -723,14 +732,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Quaternion Node::convertWorldToLocalOrientation( const Quaternion &worldOrientation )
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
+#endif
         return mTransform.mDerivedOrientation->getAsQuaternion( mTransform.mIndex ).Inverse() *
                 worldOrientation;
     }
     //-----------------------------------------------------------------------
     Quaternion Node::convertLocalToWorldOrientation( const Quaternion &localOrientation )
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
+#endif
         return mTransform.mDerivedOrientation->getAsQuaternion( mTransform.mIndex ) * localOrientation;
     }
     //-----------------------------------------------------------------------
@@ -816,7 +829,7 @@ namespace Ogre {
         return diff.squaredLength();
     }
     //---------------------------------------------------------------------
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     void Node::_setCachedTransformOutOfDate(void)
     {
         mCachedTransformOutOfDate = true;

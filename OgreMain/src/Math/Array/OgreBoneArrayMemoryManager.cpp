@@ -64,7 +64,7 @@ namespace Ogre
     BoneArrayMemoryManager::BoneArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
                                                     size_t cleanupThreshold, size_t maxHardLimit,
                                                     RebaseListener *rebaseListener ) :
-            ArrayMemoryManager( ArrayMemoryManager::BoneType, ElementsMemSize, BoneCleanupRoutines,
+            ArrayMemoryManager( ElementsMemSize, BoneCleanupRoutines,
                                 sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
                                 hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener )
     {

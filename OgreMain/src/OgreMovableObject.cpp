@@ -300,7 +300,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Aabb MovableObject::getWorldAabb() const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedAabbOutOfDate );
+#endif
         return mObjectData.mWorldAabb->getAsAabb( mObjectData.mIndex );
     }
     //-----------------------------------------------------------------------
@@ -311,7 +313,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     float MovableObject::getWorldRadius() const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedAabbOutOfDate );
+#endif
         return mObjectData.mWorldRadius[mObjectData.mIndex];
     }
     //-----------------------------------------------------------------------
@@ -330,7 +334,7 @@ namespace Ogre {
 
         mObjectData.mWorldAabb->setFromAabb( retVal, mObjectData.mIndex );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mCachedAabbOutOfDate = false;
 #endif
 
@@ -402,7 +406,7 @@ namespace Ogre {
             objData.mWorldAabb->transformAffine( parentMat );
             *worldRadius = (*localRadius) * parentScale.getMaxComponent();
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( objData.mOwner[j] )

@@ -106,7 +106,7 @@ namespace v1
         const IdString          mName;                  //Not the name of the mesh
         MeshPtr                 mMeshReference;
         InstanceBatchMap        mInstanceBatches;
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         size_t                  mIdCount;
 #endif
         InstanceBatchVec        mDynamicBatches;

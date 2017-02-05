@@ -110,6 +110,7 @@ namespace Ogre
         rsc->setCapability(RSC_TEXTURE_FLOAT);
         rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
         rsc->setMaxPointSize(256);
 
         rsc->setMaximumResolutions( 16384, 4096, 16384 );

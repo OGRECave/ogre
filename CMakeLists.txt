@@ -14,7 +14,7 @@
 # and provide build configuration options.
 ######################################################################
 
-cmake_minimum_required(VERSION 2.6.2)
+cmake_minimum_required(VERSION 2.8.0)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
@@ -76,7 +76,7 @@ set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 # Set up the basic build environment
 #####################################################################
 
-if (CMAKE_BUILD_TYPE STREQUAL "")
+if (NOT CMAKE_BUILD_TYPE)
   # CMake defaults to leaving CMAKE_BUILD_TYPE empty. This screws up
   # differentiation between debug and release builds.
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
@@ -121,6 +121,11 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
       set(OGRE_WARNING_FLAGS "${OGRE_WARNING_FLAGS} -Wno-unused-but-set-parameter")
   endif ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OGRE_WARNING_FLAGS}")
+
+  if( CMAKE_COMPILER_IS_CLANGXX )
+    # Without this, builds made with Clang won't print std::string
+    set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-limit-debug-info" )
+  endif()
 endif ()
 if (MSVC)
   if (CMAKE_BUILD_TOOL STREQUAL "nmake")
@@ -432,12 +437,12 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 # WinRT can only use the standard allocator
 set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING "Forcing Standard Allocator for WinRT" FORCE)
 else ()
-set(OGRE_CONFIG_ALLOCATOR 4 CACHE STRING
+set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING
 "Specify the memory allocator to use. Possible values:
   1 - Standard allocator
-  2 - nedmalloc
+  2 - nedmalloc - NOT RECOMMENDED - Only useful in WinXP & for debugging mem. corruption - Has known issues see https://github.com/ned14/nedmalloc/issues/15
   3 - User-provided allocator
-  4 - nedmalloc with pooling
+  4 - nedmalloc with pooling - NOT RECOMMENDED - See nedmalloc issues.
   5 - Debug allocator that will assert on most forms of memory corruption and provides deterministic memory addressing (for easier debugging w/ data breakpoints). Not indended for release or deployment."
 )
 endif ()

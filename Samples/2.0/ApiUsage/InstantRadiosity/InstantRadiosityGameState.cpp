@@ -24,6 +24,7 @@
 #include "../LocalCubemaps/LocalCubemapScene.h"
 
 #include "InstantRadiosity/OgreInstantRadiosity.h"
+#include "OgreIrradianceVolume.h"
 #include "OgreForward3D.h"
 
 using namespace Demo;
@@ -35,6 +36,8 @@ namespace Demo
         mLightNode( 0 ),
         mLight( 0 ),
         mInstantRadiosity( 0 ),
+        mIrradianceVolume( 0 ),
+        mIrradianceCellSize(1.5f),
         mCurrentType( Ogre::Light::LT_SPOTLIGHT )
     {
         mDisplayHelpMode        = 2;
@@ -81,6 +84,27 @@ namespace Demo
         }
 
         mInstantRadiosity->build();
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosityGameState::updateIrradianceVolume(void)
+    {
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+
+        if( !hlmsPbs->getIrradianceVolume() )
+            return;
+
+        Ogre::Vector3 volumeOrigin;
+        Ogre::Real lightMaxPower;
+        Ogre::uint32 numBlocksX, numBlocksY, numBlocksZ;
+        mInstantRadiosity->suggestIrradianceVolumeParameters( Ogre::Vector3( mIrradianceCellSize ),
+                                                              volumeOrigin, lightMaxPower,
+                                                              numBlocksX, numBlocksY, numBlocksZ);
+        mIrradianceVolume->createIrradianceVolumeTexture(numBlocksX, numBlocksY, numBlocksZ);
+        mInstantRadiosity->fillIrradianceVolume( mIrradianceVolume,
+                                                 Ogre::Vector3(mIrradianceCellSize),
+                                                 volumeOrigin, lightMaxPower, false );
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::createScene01(void)
@@ -172,6 +196,8 @@ namespace Demo
         //Required by InstantRadiosity
         sceneManager->getForwardPlus()->setEnableVpls( true );
 
+        mIrradianceVolume = new Ogre::IrradianceVolume(hlmsManager);
+
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
@@ -197,6 +223,7 @@ namespace Demo
         std::map<SDL_Keycode, SDL_Keysym>::const_iterator itor = mKeysHold.begin();
         std::map<SDL_Keycode, SDL_Keysym>::const_iterator end  = mKeysHold.end();
 
+        bool needsIrradianceVolumeRebuild = false;
         bool changedVplSetting = false;
         bool needsRebuild = false;
         while( itor != end )
@@ -222,11 +249,13 @@ namespace Demo
             {
                 mInstantRadiosity->mVplMaxRange += modPerFrame * 4.0f;
                 changedVplSetting = true;
+                needsIrradianceVolumeRebuild = true;
             }
             if( keySym.sym == SDLK_i )
             {
                 mInstantRadiosity->mVplPowerBoost += modPerFrame * 2.0f;
                 changedVplSetting = true;
+                needsIrradianceVolumeRebuild = true;
             }
             if( keySym.sym == SDLK_o )
             {
@@ -239,6 +268,13 @@ namespace Demo
                 mInstantRadiosity->mVplIntensityRangeMultiplier =
                         Ogre::max( mInstantRadiosity->mVplIntensityRangeMultiplier, 0.01 );
                 changedVplSetting = true;
+                needsIrradianceVolumeRebuild = true;
+            }
+            if( keySym.sym == SDLK_m )
+            {
+                mIrradianceCellSize += modPerFrame * 10.0;
+                mIrradianceCellSize = std::max( mIrradianceCellSize, 0.1f );
+                needsIrradianceVolumeRebuild = true;
             }
 
             ++itor;
@@ -249,12 +285,22 @@ namespace Demo
         if( needsRebuild )
             mInstantRadiosity->build();
 
+        if( needsIrradianceVolumeRebuild || needsRebuild )
+            updateIrradianceVolume();
+
         TutorialGameState::update( timeSinceLast );
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
     {
         TutorialGameState::generateDebugText( timeSinceLast, outText );
+
+        if( mDisplayHelpMode != 2 )
+            return;
+
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
 
         outText += "\nF2 to toggle debug VPL markers ";
         outText += mInstantRadiosity->getEnableDebugMarkers() ? "[On]" : "[Off]";
@@ -274,6 +320,8 @@ namespace Demo
         }
         outText += "\nF4 to toggle intensity for max range ";
         outText += mInstantRadiosity->mVplUseIntensityForMaxRange ? "[On]" : "[Off]";
+        outText += "\nF5 to use Irradiance Volumes instead of VPLs ";
+        outText += hlmsPbs->getIrradianceVolume() ? "[Irradiance]" : "[VPL]";
 
         outText += "\nHold [Shift] to change value in opposite direction";
         outText += "\nVPL Max range [U]: ";
@@ -299,6 +347,12 @@ namespace Demo
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumSpreadIterations );
         outText += "\nNum bounces [L]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumRayBounces );
+
+        if( hlmsPbs->getIrradianceVolume() )
+        {
+            outText += "\nIrradiance Cell Size [M]: ";
+            outText += Ogre::StringConverter::toString( mIrradianceCellSize );
+        }
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         outText += "\nCamera: ";
@@ -332,12 +386,32 @@ namespace Demo
             mCurrentType = static_cast<Ogre::Light::LightTypes>( (mCurrentType + 1) %
                                                                  Ogre::Light::LT_VPL );
             createLight();
+            updateIrradianceVolume();
         }
         else if( arg.keysym.sym == SDLK_F4 )
         {
             mInstantRadiosity->mVplUseIntensityForMaxRange =
                     !mInstantRadiosity->mVplUseIntensityForMaxRange;
             mInstantRadiosity->updateExistingVpls();
+            updateIrradianceVolume();
+        }
+        else if( arg.keysym.sym == SDLK_F5 )
+        {
+            Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+            assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+            Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+
+            if( !hlmsPbs->getIrradianceVolume() )
+            {
+                hlmsPbs->setIrradianceVolume( mIrradianceVolume );
+                updateIrradianceVolume();
+                mInstantRadiosity->setUseIrradianceVolume(true);
+            }
+            else
+            {
+                hlmsPbs->setIrradianceVolume( 0 );
+                mInstantRadiosity->setUseIrradianceVolume(false);
+            }
         }
         else if( arg.keysym.sym == SDLK_g )
         {
@@ -352,6 +426,7 @@ namespace Demo
             mInstantRadiosity->mNumRays = std::min<size_t>( mInstantRadiosity->mNumRays, 32768u );
 
             mInstantRadiosity->build();
+            updateIrradianceVolume();
         }
         else if( arg.keysym.sym == SDLK_k )
         {
@@ -368,6 +443,7 @@ namespace Demo
             }
 
             mInstantRadiosity->build();
+            updateIrradianceVolume();
         }
         else if( arg.keysym.sym == SDLK_l )
         {
@@ -384,6 +460,7 @@ namespace Demo
             }
 
             mInstantRadiosity->build();
+            updateIrradianceVolume();
         }
         else
         {

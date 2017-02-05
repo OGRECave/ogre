@@ -83,6 +83,12 @@ namespace v1 {
         Renderable::setDatablock( datablock );
     }
     //-----------------------------------------------------------------------
+    void SubEntity::_setNullDatablock(void)
+    {
+        mParentEntity->reevaluateVertexProcessing();
+        Renderable::_setNullDatablock();
+    }
+    //-----------------------------------------------------------------------
     void SubEntity::getRenderOperation(RenderOperation& op, bool casterPass)
     {
         // Use LOD

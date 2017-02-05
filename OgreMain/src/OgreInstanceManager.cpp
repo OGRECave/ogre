@@ -50,7 +50,7 @@ namespace v1
                                         size_t instancesPerBatch, unsigned short subMeshIdx,
                                         bool useBoneMatrixLookup ) :
                 mName( customName ),
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
                 mIdCount( 0 ),
 #endif
                 mInstancesPerBatch( instancesPerBatch ),
@@ -267,7 +267,7 @@ namespace v1
                     "InstanceBatch::buildNewBatch()");
         }
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         batch->setName( mName.getFriendlyText() + "/InstanceBatch_" +
                             StringConverter::toString(mIdCount++) );
 #endif

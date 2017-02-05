@@ -61,6 +61,12 @@ THE SOFTWARE.
 #   define OgreAssert( a, b ) assert( (a) && (b) )
 #endif
 
+#if OGRE_DEBUG_MODE
+#   define OgreAssertDbg( a, b ) OgreAssert( a, b )
+#else
+#   define OgreAssertDbg( a, b )
+#endif
+
 namespace Ogre {
 
     /** \addtogroup Core

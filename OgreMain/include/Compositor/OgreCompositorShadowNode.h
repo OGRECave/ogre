@@ -137,7 +137,7 @@ namespace Ogre
         CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
                               CompositorWorkspace *workspace, RenderSystem *renderSys,
                               const RenderTarget *finalTarget );
-        ~CompositorShadowNode();
+        virtual ~CompositorShadowNode();
 
         /** Renders into the shadow map, executes passes
         @param camera

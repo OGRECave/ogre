@@ -264,10 +264,54 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    void CompositorManager2::removeNodeDefinition( IdString nodeDefName )
+    {
+        CompositorNodeDefMap::iterator itor = mNodeDefinitions.find( nodeDefName );
+        if( itor != mNodeDefinitions.end() )
+        {
+            OGRE_DELETE itor->second;
+            mNodeDefinitions.erase( itor );
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Node definition with name '" +
+                            nodeDefName.getFriendlyText() + "' not found",
+                            "CompositorManager2::removeNodeDefinition" );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     const CompositorShadowNodeDef* CompositorManager2::getShadowNodeDefinition(
                                                                     IdString nodeDefName ) const
     {
         CompositorShadowNodeDef const *retVal = 0;
+        
+        CompositorShadowNodeDefMap::const_iterator itor = mShadowNodeDefs.find( nodeDefName );
+        if( itor == mShadowNodeDefs.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "ShadowNode definition with name '" +
+                         nodeDefName.getFriendlyText() + "' not found",
+                         "CompositorManager2::getShadowNodeDefinition" );
+        }
+        else
+        {
+            retVal = itor->second;
+
+            if( !retVal )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "ShadowNode definition with name '" +
+                            nodeDefName.getFriendlyText() + "' was found but not validated.\n"
+                            "Did you call validateAllObjects?",
+                            "CompositorManager2::getShadowNodeDefinition" );
+            }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorShadowNodeDef* CompositorManager2::getShadowNodeDefinitionNonConst(
+                                                                    IdString nodeDefName ) const
+    {
+        CompositorShadowNodeDef *retVal = 0;
         
         CompositorShadowNodeDefMap::const_iterator itor = mShadowNodeDefs.find( nodeDefName );
         if( itor == mShadowNodeDefs.end() )
@@ -311,7 +355,43 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    CompositorWorkspaceDef* CompositorManager2::addWorkspaceDefinition( IdString name )
+    void CompositorManager2::removeShadowNodeDefinition( IdString nodeDefName )
+    {
+        CompositorShadowNodeDefMap::iterator itor = mShadowNodeDefs.find( nodeDefName );
+        if( itor != mShadowNodeDefs.end() )
+        {
+            if( itor->second != NULL )
+            {
+                OGRE_DELETE itor->second;
+            }
+            else
+            {
+                CompositorShadowNodeDefVec::iterator itUnf = mUnfinishedShadowNodes.begin();
+                CompositorShadowNodeDefVec::iterator enUnf = mUnfinishedShadowNodes.end();
+                while( itUnf != enUnf )
+                {
+                    if( (*itUnf)->getName() == nodeDefName )
+                    {
+                        OGRE_DELETE *itUnf;
+                        mUnfinishedShadowNodes.erase( itUnf );
+                        break;
+                    }
+
+                    ++itUnf;
+                }
+            }
+
+            mShadowNodeDefs.erase( itor );
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "ShadowNode definition with name '" +
+                         nodeDefName.getFriendlyText() + "' not found",
+                         "CompositorManager2::removeShadowNodeDefinition" );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorWorkspaceDef* CompositorManager2::addWorkspaceDefinition( const String& name )
     {
         CompositorWorkspaceDef *retVal = 0;
 
@@ -323,11 +403,27 @@ namespace Ogre
         else
         {
             OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "A workspace with name '" +
-                            name.getFriendlyText() + "' already exists",
+                            name + "' already exists",
                             "CompositorManager2::addWorkspaceDefinition" );
         }
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::removeWorkspaceDefinition( IdString name )
+    {
+        CompositorWorkspaceDefMap::iterator itor = mWorkspaceDefs.find( name );
+        if( itor != mWorkspaceDefs.end() )
+        {
+            OGRE_DELETE itor->second;
+            mWorkspaceDefs.erase( itor );
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace definition with name '" +
+                            name.getFriendlyText() + "' not found",
+                            "CompositorManager2::removeWorkspaceDefinition" );
+        }
     }
     //-----------------------------------------------------------------------------------
     bool CompositorManager2::hasWorkspaceDefinition( IdString name ) const
@@ -655,12 +751,12 @@ namespace Ogre
         mRenderSystem->_endFrameOnce();
     }
     //-----------------------------------------------------------------------------------
-    void CompositorManager2::createBasicWorkspaceDef( const IdString &workspaceDefName,
+    void CompositorManager2::createBasicWorkspaceDef( const String &workspaceDefName,
                                                         const ColourValue &backgroundColour,
                                                         IdString shadowNodeName )
     {
-        CompositorNodeDef *nodeDef = this->addNodeDefinition( "AutoGen " + (workspaceDefName +
-                                                                IdString("/Node")).getReleaseText() );
+        CompositorNodeDef *nodeDef = this->addNodeDefinition( "AutoGen " + IdString(workspaceDefName +
+                                                                "/Node").getReleaseText() );
 
         //Input texture
         nodeDef->addTextureSourceName( "WindowRT", 0, TextureDefinitionBase::TEXTURE_INPUT );

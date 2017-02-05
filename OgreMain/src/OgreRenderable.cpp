@@ -129,6 +129,18 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void Renderable::_setNullDatablock(void)
+    {
+        if( mHlmsDatablock )
+            mHlmsDatablock->_unlinkRenderable( this );
+
+        mMaterial.setNull();
+
+        mHlmsDatablock  = 0;
+        mHlmsHash       = 0;
+        mHlmsCasterHash = 0;
+    }
+    //-----------------------------------------------------------------------------------
     void Renderable::_setHlmsHashes( uint32 hash, uint32 casterHash )
     {
         mHlmsHash       = hash;

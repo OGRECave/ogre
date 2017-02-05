@@ -69,7 +69,7 @@ namespace Ogre
                                                     Node *dummyNode, size_t cleanupThreshold,
                                                     size_t maxHardLimit,
                                                     RebaseListener *rebaseListener ) :
-            ArrayMemoryManager( ArrayMemoryManager::NodeType, ElementsMemSize, NodeCleanupRoutines,
+            ArrayMemoryManager( ElementsMemSize, NodeCleanupRoutines,
                                 sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
                                 hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
             mDummyNode( dummyNode )

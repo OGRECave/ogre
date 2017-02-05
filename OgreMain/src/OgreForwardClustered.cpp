@@ -392,7 +392,7 @@ namespace Ogre
                     //Test all 5 pyramid vertices against each of the 6 frustum planes.
                     for( int k=0; k<6; ++k )
                     {
-                        ArrayMaskR vertexMask = ARRAY_REAL_ZERO;
+                        ArrayMaskR vertexMask = ARRAY_MASK_ZERO;
 
                         for( int l=0; l<5; ++l )
                         {
@@ -411,7 +411,7 @@ namespace Ogre
                         //Test all 8 frustum corners against each of the 6 pyramid planes.
                         for( int k=0; k<6; ++k )
                         {
-                            ArrayMaskR vertexMask = ARRAY_REAL_ZERO;
+                            ArrayMaskR vertexMask = ARRAY_MASK_ZERO;
 
                             for( int l=0; l<8; ++l )
                             {

@@ -95,7 +95,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Matrix3 TagPoint::_getDerivedOrientationMatrix(void) const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
+#endif
         Matrix3 retVal;
         mTransform.mDerivedTransform[mTransform.mIndex].extract3x3Matrix( retVal );
         return retVal;
@@ -161,7 +163,7 @@ namespace Ogre {
                                          *t.mDerivedScale,
                                          *t.mDerivedOrientation );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( t.mOwner[j] )
@@ -210,7 +212,7 @@ namespace Ogre {
                                          *t.mDerivedScale,
                                          *t.mDerivedOrientation );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( t.mOwner[j] )

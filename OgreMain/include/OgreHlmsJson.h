@@ -90,7 +90,8 @@ namespace Ogre
         static void loadDatablockCommon( const rapidjson::Value &json, const NamedBlocks &blocks,
                                          HlmsDatablock *datablock );
 
-        void loadDatablocks( const rapidjson::Value &json, const NamedBlocks &blocks, Hlms *hlms );
+        void loadDatablocks( const rapidjson::Value &json, const NamedBlocks &blocks, Hlms *hlms,
+                             const String &filename, const String &resourceGroup );
 
     public:
         static void toQuotedStr( FilterOptions value, String &outString );
@@ -125,11 +126,14 @@ namespace Ogre
         @param filename
             Name of the file. It's only used for providing additional
             info on the log about where it is failing.
+        @param resourceGroup
+            See filename argument.
         @param jsonString
             Null-terminated C string (UTF8) containing
             valid JSON with the Hlms definitions.
         */
-        void loadMaterials( const String &filename, const char *jsonString );
+        void loadMaterials( const String &filename, const String &resourceGroup,
+                            const char *jsonString );
 
         /** Saves all the Datablocks defined in the given
             Hlms into a JSON formatted string.

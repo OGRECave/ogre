@@ -118,6 +118,7 @@ namespace Ogre
 
         TextureVec const        *mPrePassTextures;
         TextureVec const        *mSsrTexture;
+        IrradianceVolume       *mIrradianceVolume;
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
@@ -187,6 +188,10 @@ namespace Ogre
 
         void setParallaxCorrectedCubemap( ParallaxCorrectedCubemap *pcc )
                                                             { mParallaxCorrectedCubemap = pcc; }
+
+        void setIrradianceVolume( IrradianceVolume *irradianceVolume )
+                                                    { mIrradianceVolume = irradianceVolume; }
+        IrradianceVolume* getIrradianceVolume(void) const  { return mIrradianceVolume; }
 
 #if !OGRE_NO_JSON
         /// @copydoc Hlms::_loadJson
@@ -285,6 +290,7 @@ namespace Ogre
         static const IdString TargetEnvprobeMap;
         static const IdString ParallaxCorrectCubemaps;
         static const IdString UseParallaxCorrectCubemaps;
+        static const IdString IrradianceVolumes;
 
         static const IdString BrdfDefault;
         static const IdString BrdfCookTorrance;

@@ -193,9 +193,8 @@ namespace Ogre
         return mMemoryManagers[renderQueue].getFirstNode( outObjectData );
     }
     //-----------------------------------------------------------------------------------
-    void ObjectMemoryManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                                const MemoryPoolVec &basePtrs,
-                                                ArrayMemoryManager::PtrdiffVec &outDiffsList )
+    void ObjectMemoryManager::buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
+                                             ArrayMemoryManager::PtrdiffVec &outDiffsList )
     {
         //We don't need to build the diff list as we've access to the MovableObject through mOwner
         //and access to the actual ObjectData with the right pointers.
@@ -216,9 +215,8 @@ namespace Ogre
         }*/
     }
     //---------------------------------------------------------------------
-    void ObjectMemoryManager::applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                            const MemoryPoolVec &newBasePtrs,
-                                            const ArrayMemoryManager::PtrdiffVec &diffsList )
+    void ObjectMemoryManager::applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
+                                           const ArrayMemoryManager::PtrdiffVec &diffsList )
     {
         ObjectData objectData;
         const size_t numObjs = this->getFirstObjectData( objectData, level );
@@ -238,9 +236,9 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void ObjectMemoryManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                        const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
-                                        size_t startInstance, size_t diffInstances )
+    void ObjectMemoryManager::performCleanup( uint16 level, const MemoryPoolVec &basePtrs,
+                                              size_t const *elementsMemSizes,
+                                              size_t startInstance, size_t diffInstances )
     {
         ObjectData objectData;
         const size_t numObjs = this->getFirstObjectData( objectData, level );

@@ -1203,7 +1203,8 @@ namespace Ogre{
         }
 
         std::sort( paramVec.begin(), paramVec.end(), OrderParamVecByKey );
-        hlms->createDatablock( obj->name, obj->name, macroblock, blendblock, paramVec );
+        hlms->createDatablock( obj->name, obj->name, macroblock, blendblock, paramVec, true,
+                               obj->file, compiler->getResourceGroup() );
 
         }
         catch( Exception & )
@@ -7446,7 +7447,7 @@ namespace Ogre{
         mShadowNodeDef->setNumTargetPass( numTargetPasses );
         mShadowNodeDef->setNumOutputChannels( numOutputChannels );
 
-        ShadowTextureDefinition defaultParams( SHADOWMAP_UNIFORM, IdString(), 0, 0 );
+        ShadowTextureDefinition defaultParams( SHADOWMAP_UNIFORM, "", 0, 0 );
 
         AbstractNodeList::iterator i = obj->children.begin();
         try

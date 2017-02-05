@@ -648,7 +648,7 @@ namespace Ogre
             //Add null terminator just in case (to prevent bad input)
             fileData.back() = '\0';
             HlmsJson hlmsJson( this );
-            hlmsJson.loadMaterials( stream->getName(), &fileData[0] );
+            hlmsJson.loadMaterials( stream->getName(), groupName, &fileData[0] );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -690,7 +690,7 @@ namespace Ogre
             //Add null terminator just in case (to prevent bad input)
             fileData.back() = '\0';
             HlmsJson hlmsJson( this );
-            hlmsJson.loadMaterials( stream->getName(), &fileData[0] );
+            hlmsJson.loadMaterials( stream->getName(), groupName, &fileData[0] );
         }
     }
     //-----------------------------------------------------------------------------------

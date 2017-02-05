@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "InstantRadiosity/OgreInstantRadiosity.h"
+#include "OgreIrradianceVolume.h"
 #include "OgreHlmsPbsDatablock.h"
 #include "OgreHlmsPbs.h"
 #include "OgreHlmsManager.h"
@@ -42,6 +43,9 @@ THE SOFTWARE.
 
 #include "OgreItem.h"
 #include "OgreLwString.h"
+
+#include "OgreTextureManager.h"
+#include "OgreHardwarePixelBuffer.h"
 
 #if (OGRE_COMPILER == OGRE_COMPILER_MSVC ||\
     OGRE_PLATFORM == OGRE_PLATFORM_APPLE ||\
@@ -170,7 +174,8 @@ namespace Ogre
         mMipmapBias( 0 ),
         mTotalNumRays( 0 ),
         mEnableDebugMarkers( false ),
-        mUseTextures( true )
+        mUseTextures( true ),
+        mUseIrradianceVolume( false )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -254,6 +259,9 @@ namespace Ogre
         vpl.position = pointOnTri;
         vpl.numMergedVpls = 1.0f;
 
+        memset( vpl.dirDiffuse, 0, sizeof(vpl.dirDiffuse) );
+        mergeDirectionalDiffuse( diffuseTerm, hit.triNormal, vpl.dirDiffuse );
+
         return vpl;
     }
     //-----------------------------------------------------------------------------------
@@ -294,6 +302,8 @@ namespace Ogre
 
             Vpl vpl = convertToVpl( lightColour, pointOnTri, hit );
             vpl.diffuse *= atten;
+            for( int i=0; i<6; ++i )
+                vpl.dirDiffuse[i] *= atten;
 
             Real numCollectedVpls = 1.0f;
 
@@ -331,6 +341,9 @@ namespace Ogre
                     vpl.normal  += alikeVpl.normal;
                     vpl.position+= alikeVpl.position;
 
+                    for( int i=0; i<6; ++i )
+                        vpl.dirDiffuse[i] += alikeVpl.dirDiffuse[i] * alikeAtten;
+
                     ++numCollectedVpls;
 
                     itor = efficientVectorRemove( mRayHits, itor );
@@ -348,10 +361,13 @@ namespace Ogre
             vpl.normal.normalise();
             vpl.numMergedVpls = numCollectedVpls;
 
+            for( int i=0; i<6; ++i )
+                vpl.dirDiffuse[i] /= mTotalNumRays;
+
             mVpls.push_back( vpl );
 
             mTmpSparseClusters[0].insert( SparseCluster( blockX, blockY, blockZ,
-                                                         vpl.diffuse, vpl.normal ) );
+                                                         vpl.diffuse, vpl.normal, vpl.dirDiffuse ) );
 
             RayHitVec::iterator itRay = mRayHits.begin();
             efficientVectorRemove( mRayHits, itRay );
@@ -479,6 +495,8 @@ namespace Ogre
             vpl.position = vClusterCenter;
             vpl.numMergedVpls = 1.0f;
 
+            memcpy( vpl.dirDiffuse, itor->dirDiffuse, sizeof(vpl.dirDiffuse) );
+
             mVpls.push_back( vpl );
 
             ++itor;
@@ -527,6 +545,9 @@ namespace Ogre
                     vpl.diffuse += alikeVpl.diffuse;
                     vpl.normal  += alikeVpl.normal * alikeVpl.numMergedVpls;
                     vpl.position+= alikeVpl.position * alikeVpl.numMergedVpls;
+
+                    for( int i=0; i<6; ++i )
+                        vpl.dirDiffuse[i] += alikeVpl.dirDiffuse[i];
 
                     numCollectedVpls += alikeVpl.numMergedVpls;
 
@@ -1282,9 +1303,10 @@ namespace Ogre
         {
             Vpl &vpl = *itor;
             Vector3 diffuseCol = vpl.diffuse * mVplPowerBoost;
-            if( diffuseCol.x > mVplThreshold ||
-                diffuseCol.y > mVplThreshold ||
-                diffuseCol.z > mVplThreshold )
+            if( (diffuseCol.x > mVplThreshold ||
+                 diffuseCol.y > mVplThreshold ||
+                 diffuseCol.z > mVplThreshold) &&
+                 !mUseIrradianceVolume)
             {
                 if( !vpl.light )
                 {
@@ -1521,6 +1543,23 @@ namespace Ogre
         mImageMap.clear();
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosity::mergeDirectionalDiffuse( const Vector3 &diffuse, const Vector3 &lightDir,
+                                                    Vector3 *inOutDirDiffuse )
+    {
+        const Vector3 directions[6] =
+        {
+            Vector3(  1,  0,  0 ),
+            Vector3( -1,  0,  0 ),
+            Vector3(  0,  1,  0 ),
+            Vector3(  0, -1,  0 ),
+            Vector3(  0,  0,  1 ),
+            Vector3(  0,  0, -1 )
+        };
+
+        for( int i=0; i<6; ++i )
+            inOutDirDiffuse[i] += Ogre::max( lightDir.dotProduct( directions[i] ), 0 ) * diffuse;
+    }
+    //-----------------------------------------------------------------------------------
     void InstantRadiosity::createDebugMarkers(void)
     {
         destroyDebugMarkers();
@@ -1562,6 +1601,7 @@ namespace Ogre
                                                         Ogre::ResourceGroupManager::
                                                         AUTODETECT_RESOURCE_GROUP_NAME,
                                                         Ogre::SCENE_STATIC );
+                item->setCastShadows( false );
                 sceneNode->attachObject( item );
                 item->setDatablock( datablock );
                 mDebugMarkers.push_back( item );
@@ -1611,17 +1651,237 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosity::setUseIrradianceVolume(bool bUseIrradianceVolume)
+    {
+        if (bUseIrradianceVolume != mUseIrradianceVolume)
+        {
+            mUseIrradianceVolume = bUseIrradianceVolume;
+            updateExistingVpls();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::suggestIrradianceVolumeParameters( const Vector3 &cellSize,
+                                                              Vector3 &outVolumeOrigin,
+                                                              Real &outLightMaxPower,
+                                                              uint32 &outNumBlocksX,
+                                                              uint32 &outNumBlocksY,
+                                                              uint32 &outNumBlocksZ)
+    {
+        const Vector3 invCellSize = Real(1.0) / cellSize;
+
+        int32 minBlockX = std::numeric_limits<int32>::max();
+        int32 minBlockY = std::numeric_limits<int32>::max();
+        int32 minBlockZ = std::numeric_limits<int32>::max();
+
+        int32 maxBlockX = std::numeric_limits<int32>::min();
+        int32 maxBlockY = std::numeric_limits<int32>::min();
+        int32 maxBlockZ = std::numeric_limits<int32>::min();
+
+        Real lightMaxPower = 0.0f;
+
+        VplVec::const_iterator itor = mVpls.begin();
+        VplVec::const_iterator end  = mVpls.end();
+
+        while( itor != end )
+        {
+            const Vpl &vpl = *itor;
+
+            Real range = mVplMaxRange;
+            const Vector3 diffuseColForRange = vpl.diffuse;
+            if( mVplUseIntensityForMaxRange )
+            {
+                double intensity;
+                intensity = Ogre::max( diffuseColForRange.x, diffuseColForRange.y );
+                intensity = Ogre::max( intensity, (double)diffuseColForRange.z );
+                /*if( mVplQuadAtten != 0 )
+                    intensity *= 1e-6 / mVplQuadAtten;*/
+                double rangeInMeters = sqrt( intensity );
+                range = (float)(rangeInMeters * mVplIntensityRangeMultiplier);
+            }
+
+            range = Ogre::min( range, mVplMaxRange );
+            const int32 xRange = static_cast<int32>( Math::Floor( range * invCellSize.x ) );
+            const int32 yRange = static_cast<int32>( Math::Floor( range * invCellSize.y ) );
+            const int32 zRange = static_cast<int32>( Math::Floor( range * invCellSize.z ) );
+
+            int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize.x ) );
+            int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize.y ) );
+            int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * invCellSize.z ) );
+
+            minBlockX = std::min( minBlockX, blockX - xRange );
+            minBlockY = std::min( minBlockY, blockY - yRange );
+            minBlockZ = std::min( minBlockZ, blockZ - zRange );
+
+            maxBlockX = std::max( maxBlockX, blockX + xRange );
+            maxBlockY = std::max( maxBlockY, blockY + yRange );
+            maxBlockZ = std::max( maxBlockZ, blockZ + zRange );
+
+            for( int i=0; i<6; ++i )
+            {
+                lightMaxPower = Ogre::max( lightMaxPower, vpl.dirDiffuse[i].x );
+                lightMaxPower = Ogre::max( lightMaxPower, vpl.dirDiffuse[i].y );
+                lightMaxPower = Ogre::max( lightMaxPower, vpl.dirDiffuse[i].z );
+            }
+
+            ++itor;
+        }
+
+        outNumBlocksX = maxBlockX - minBlockX + 1;
+        outNumBlocksY = maxBlockY - minBlockY + 1;
+        outNumBlocksZ = maxBlockZ - minBlockZ + 1;
+
+        outVolumeOrigin.x = static_cast<Real>( minBlockX ) * cellSize.x;
+        outVolumeOrigin.y = static_cast<Real>( minBlockY ) * cellSize.y;
+        outVolumeOrigin.z = static_cast<Real>( minBlockZ ) * cellSize.z;
+
+        outLightMaxPower = lightMaxPower;
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::fillIrradianceVolume( IrradianceVolume *volume,
+                                                 Vector3 cellSize, Vector3 volumeOrigin,
+                                                 Real lightMaxPower, bool fadeAttenuationOverDistance )
+    {
+        if (!volume) return;
+
+        const Vector3 invCellSize  = Real(1.0) / cellSize;
+
+        //Quantize volumeCenter.
+        volumeOrigin.x = static_cast<int32>( Math::Floor( volumeOrigin.x * invCellSize.x ) );
+        volumeOrigin.y = static_cast<int32>( Math::Floor( volumeOrigin.y * invCellSize.y ) );
+        volumeOrigin.z = static_cast<int32>( Math::Floor( volumeOrigin.z * invCellSize.z ) );
+
+        volume->setIrradianceOrigin( volumeOrigin * cellSize );
+        volume->setIrradianceCellSize( cellSize );
+        volume->setIrradianceMaxPower( lightMaxPower );
+        volume->setPowerScale( mVplPowerBoost );
+
+        const int32 volumeOriginX = static_cast<int32>( volumeOrigin.x );
+        const int32 volumeOriginY = static_cast<int32>( volumeOrigin.y );
+        const int32 volumeOriginZ = static_cast<int32>( volumeOrigin.z );
+
+        const Real invMaxPower = 1.0f / lightMaxPower;
+
+        const int32 numBlocksX = volume->getNumBlocksX();
+        const int32 numBlocksY = volume->getNumBlocksY();
+        const int32 numBlocksZ = volume->getNumBlocksZ();
+
+        VplVec::const_iterator itor = mVpls.begin();
+        VplVec::const_iterator end  = mVpls.end();
+
+        volume->clearVolumeData();
+
+        const Vector3 c_directions[6] =
+        {
+            Vector3(  1,  0,  0 ),
+            Vector3( -1,  0,  0 ),
+            Vector3(  0,  1,  0 ),
+            Vector3(  0, -1,  0 ),
+            Vector3(  0,  0,  1 ),
+            Vector3(  0,  0, -1 )
+        };
+
+        while( itor != end )
+        {
+            const Vpl &vpl = *itor;
+
+            Real range = mVplMaxRange;
+            const Vector3 diffuseColForRange = vpl.diffuse * mVplPowerBoost;
+            if( mVplUseIntensityForMaxRange )
+            {
+                double intensity;
+                intensity = Ogre::max( diffuseColForRange.x, diffuseColForRange.y );
+                intensity = Ogre::max( intensity, (double)diffuseColForRange.z );
+                /*if( mVplQuadAtten != 0 )
+                    intensity *= 1e-6 / mVplQuadAtten;*/
+                double rangeInMeters = sqrt( intensity );
+                range = (float)(rangeInMeters * mVplIntensityRangeMultiplier);
+            }
+
+            range = Ogre::min( range, mVplMaxRange );
+
+            const int32 xRange = static_cast<int32>( Math::Floor( range * invCellSize.x ) );
+            const int32 yRange = static_cast<int32>( Math::Floor( range * invCellSize.y ) );
+            const int32 zRange = static_cast<int32>( Math::Floor( range * invCellSize.z ) );
+
+            int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * invCellSize.x ) );
+            int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * invCellSize.y ) );
+            int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * invCellSize.z ) );
+
+            blockX -= volumeOriginX;
+            blockY -= volumeOriginY;
+            blockZ -= volumeOriginZ;
+
+            const int32 minBlockX = std::max( 0, blockX - xRange );
+            const int32 minBlockY = std::max( 0, blockY - yRange );
+            const int32 minBlockZ = std::max( 0, blockZ - zRange );
+
+            const int32 maxBlockX = std::min( numBlocksX - 1, blockX + xRange );
+            const int32 maxBlockY = std::min( numBlocksY - 1, blockY + yRange);
+            const int32 maxBlockZ = std::min( numBlocksZ - 1, blockZ + zRange);
+
+            if (maxBlockX >= 0 && minBlockX < numBlocksX &&
+                maxBlockY >= 0 && minBlockY < numBlocksY &&
+                maxBlockZ >= 0 && minBlockZ < numBlocksZ)
+            {
+                for( int32 z=minBlockZ; z<=maxBlockZ; ++z )
+                {
+                    for( int32 y=minBlockY; y<=maxBlockY; ++y )
+                    {
+                        for( int32 x=minBlockX; x<=maxBlockX; ++x )
+                        {
+                            Vector3 vplToCell = Vector3( x - blockX, y - blockY, z - blockZ );
+                            vplToCell *= cellSize;
+                            Real distance = vplToCell.normalise();
+                            if( vplToCell.dotProduct( vpl.normal ) < 0 )
+                                continue;
+
+                            Real atten = Real(1.0f) /
+                                    (mVplConstAtten + (mVplLinearAtten +
+                                                       mVplQuadAtten * distance) * distance);
+                            atten = Ogre::min( Real(1.0f), atten );
+                            if( fadeAttenuationOverDistance )
+                                atten *= Ogre::max( (range - distance) / range, Ogre::Real( 0.0f ) );
+
+                            const Vector3 diffuseCol = vpl.diffuse * invMaxPower * atten;
+                            for( int i=0; i<6; ++i )
+                            {
+                                if( x != blockX || y != blockY || z != blockZ )
+                                {
+                                    Vector3 finalCol = Ogre::max(
+                                                -vplToCell.dotProduct( c_directions[i] ),
+                                                0 ) * diffuseCol;
+                                    volume->changeVolumeData( x, y, z, i, finalCol );
+                                }
+                                else
+                                {
+                                    volume->changeVolumeData( x, y, z, i, vpl.dirDiffuse[i] * invMaxPower );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ++itor;
+        }
+
+        volume->updateIrradianceVolumeTexture();
+    }
+    //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     InstantRadiosity::SparseCluster::SparseCluster() {}
     //-----------------------------------------------------------------------------------
     InstantRadiosity::SparseCluster::SparseCluster( int32 blockX, int32 blockY, int32 blockZ,
-                                                    const Vector3 _diffuse, const Vector3 dir ) :
+                                                    const Vector3 &_diffuse, const Vector3 &dir,
+                                                    const Vector3 _dirDiffuse[6] ) :
         diffuse( _diffuse ), direction( dir )
     {
         blockHash[0] = blockX;
         blockHash[1] = blockY;
         blockHash[2] = blockZ;
+
+        memcpy( dirDiffuse, _dirDiffuse, sizeof(dirDiffuse) );
     }
     //-----------------------------------------------------------------------------------
     InstantRadiosity::SparseCluster::SparseCluster( int32 _blockHash[3] ) :
@@ -1630,6 +1890,8 @@ namespace Ogre
         blockHash[0] = _blockHash[0];
         blockHash[1] = _blockHash[1];
         blockHash[2] = _blockHash[2];
+
+        memset( dirDiffuse, 0, sizeof(dirDiffuse) );
     }
     //-----------------------------------------------------------------------------------
     bool InstantRadiosity::SparseCluster::operator () ( const SparseCluster &_l, int32 _r[3] ) const

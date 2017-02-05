@@ -209,7 +209,7 @@ namespace Ogre {
                                        uint8 firstRq, uint8 lastRq )
     {
         // Automatic AR cameras are useful for cameras that draw into multiple viewports
-        const Real aspectRatio = (Real) mActWidth / (Real) mActHeight;
+        const Real aspectRatio = (Real) mActWidth / (Real) std::max( 1, mActHeight );
         if( camera->getAutoAspectRatio() && camera->getAspectRatio() != aspectRatio )
         {
             camera->setAspectRatio( aspectRatio );

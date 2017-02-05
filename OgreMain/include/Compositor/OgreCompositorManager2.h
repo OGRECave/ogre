@@ -176,11 +176,23 @@ namespace Ogre
         /// Returns a new node definition. The name must be unique, throws otherwise.
         CompositorNodeDef* addNodeDefinition( const String &name );
 
+        /// Removes the node definition with the given name. Throws if not found
+        void removeNodeDefinition( IdString nodeDefName );
+
         /// Returns the node definition with the given name. Throws if not found
         const CompositorShadowNodeDef* getShadowNodeDefinition( IdString nodeDefName ) const;
 
+        /// @See getShadowNodeDefinition. Returns a non-const pointer. Use this only if you
+        /// know what you're doing. Modifying a ShadowNodeDef while it's being used by
+        /// CompositorShadowNode instances is undefined. It's safe if you're sure it's not
+        /// being used.
+        CompositorShadowNodeDef* getShadowNodeDefinitionNonConst( IdString nodeDefName ) const;
+
         /// Returns a new node definition. The name must be unique, throws otherwise.
         CompositorShadowNodeDef* addShadowNodeDefinition( const String &name );
+
+        /// Removes the node definition with the given name. Throws if not found
+        void removeShadowNodeDefinition( IdString nodeDefName );
 
         /// Returns true if a workspace definition with the given name exists
         bool hasWorkspaceDefinition( IdString name ) const;
@@ -194,7 +206,10 @@ namespace Ogre
             Setting workspace def's connections must be done *after* all node
             definitions have been created
         */
-        CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
+        CompositorWorkspaceDef* addWorkspaceDefinition( const String& name );
+
+        /// Removes the workspace definition with the given name. Throws if not found
+        void removeWorkspaceDefinition( IdString name );
 
         /// Returns how many times _update has been called.
         size_t getFrameCount(void) const                    { return mFrameCount; }
@@ -371,7 +386,7 @@ namespace Ogre
             Name of the shadow node. Leave blank if no shadows.
             Caller is supposed to have set the shadow node correctly
         */
-        void createBasicWorkspaceDef( const IdString &workspaceDefName,
+        void createBasicWorkspaceDef( const String &workspaceDefName,
                                         const ColourValue &backgroundColour,
                                         IdString shadowNodeName=IdString() );
 

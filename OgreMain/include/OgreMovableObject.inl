@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     //Needed by the dynamic_cast assert
     #include "OgreSceneNode.h"
 #endif

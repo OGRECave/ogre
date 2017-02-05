@@ -156,7 +156,7 @@ namespace Ogre {
         /** Internal method for creating a new child node - must be overridden per subclass. */
         virtual Node* createChildImpl( SceneMemoryMgrTypes sceneType ) = 0;
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mutable bool mCachedTransformOutOfDate;
 #endif
 
@@ -656,7 +656,9 @@ namespace Ogre {
         */
         virtual_l2 FORCEINLINE const Matrix4& _getFullTransform(void) const
         {
+#if OGRE_DEBUG_MODE
             assert( !mCachedTransformOutOfDate );
+#endif
             return mTransform.mDerivedTransform[mTransform.mIndex];
         }
 
@@ -737,7 +739,7 @@ namespace Ogre {
 
         virtual NodeMemoryManager* getDefaultNodeMemoryManager( SceneMemoryMgrTypes sceneType ) = 0;
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         virtual void _setCachedTransformOutOfDate(void);
         bool isCachedTransformOutOfDate(void) const             { return mCachedTransformOutOfDate; }
 #endif

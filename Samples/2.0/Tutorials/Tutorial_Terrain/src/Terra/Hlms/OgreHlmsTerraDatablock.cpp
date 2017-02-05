@@ -252,13 +252,13 @@ namespace Ogre
         return mRoughness[detailMapIdx];
     }
     //-----------------------------------------------------------------------------------
-    void HlmsTerraDatablock::setMetallness( uint8 detailMapIdx, float metalness )
+    void HlmsTerraDatablock::setMetalness( uint8 detailMapIdx, float metalness )
     {
         mMetalness[detailMapIdx] = metalness;
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
-    float HlmsTerraDatablock::getMetallness( uint8 detailMapIdx ) const
+    float HlmsTerraDatablock::getMetalness( uint8 detailMapIdx ) const
     {
         return mMetalness[detailMapIdx];
     }

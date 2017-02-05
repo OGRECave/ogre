@@ -548,7 +548,7 @@ namespace Ogre {
 
         while( itor != end )
         {
-            (*itor)->setVisible( (*itor)->getVisible() );
+            (*itor)->setVisible( !(*itor)->getVisible() );
             ++itor;
         }
 
@@ -569,7 +569,7 @@ namespace Ogre {
         return &mCreator->_getNodeMemoryManager( sceneType );
     }
     //-----------------------------------------------------------------------
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     void SceneNode::_setCachedTransformOutOfDate(void)
     {
         Node::_setCachedTransformOutOfDate();

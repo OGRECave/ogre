@@ -6,6 +6,11 @@
 	@add( texUnit, 2 )
 @end
 
+@property( irradiance_volumes )
+	@set( irradianceVolumeTexUnit, texUnit )
+	@add( texUnit, 1 )
+@end
+
 @set( textureRegShadowMapStart, texUnit )
 @add( texUnit, hlms_num_shadow_maps )
 

@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreId.h"
 #include "Math/Array/OgreBoneTransform.h"
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     #include "OgreNode.h"
 #endif
 
@@ -68,7 +68,7 @@ namespace Ogre {
         ArrayMatrixAf4x3 const * RESTRICT_ALIAS mReverseBind;
         BoneTransform                           mTransform;
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mutable bool mCachedTransformOutOfDate;
         Node        *mDebugParentNode;
         bool        mInitialized;
@@ -267,7 +267,9 @@ namespace Ogre {
         */
         FORCEINLINE const SimpleMatrixAf4x3& _getLocalSpaceTransform(void) const
         {
-            assert( !mCachedTransformOutOfDate );
+#if OGRE_DEBUG_MODE
+          assert( !mCachedTransformOutOfDate );
+#endif
             return mTransform.mDerivedTransform[mTransform.mIndex];
         }
 
@@ -285,8 +287,10 @@ namespace Ogre {
         */
         FORCEINLINE const SimpleMatrixAf4x3& _getFullTransform(void) const
         {
+#if OGRE_DEBUG_MODE
             assert( !mCachedTransformOutOfDate &&
                     (!mDebugParentNode || !mDebugParentNode->isCachedTransformOutOfDate()) );
+#endif
             return mTransform.mFinalTransform[mTransform.mIndex];
         }
 
@@ -305,7 +309,7 @@ namespace Ogre {
                                          ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind,
                                          size_t numBinds );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         virtual void _setCachedTransformOutOfDate(void);
         bool isCachedTransformOutOfDate(void) const             { return mCachedTransformOutOfDate; }
 #endif

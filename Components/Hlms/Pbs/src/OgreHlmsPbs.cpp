@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreForward3D.h"
 #include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+#include "OgreIrradianceVolume.h"
 
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -139,6 +140,7 @@ namespace Ogre
     const IdString PbsProperty::TargetEnvprobeMap = IdString( "target_envprobe_map" );
     const IdString PbsProperty::ParallaxCorrectCubemaps = IdString( "parallax_correct_cubemaps" );
     const IdString PbsProperty::UseParallaxCorrectCubemaps= IdString( "use_parallax_correct_cubemaps" );
+    const IdString PbsProperty::IrradianceVolumes = IdString( "irradiance_volumes" );
 
     const IdString PbsProperty::BrdfDefault       = IdString( "BRDF_Default" );
     const IdString PbsProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
@@ -210,6 +212,7 @@ namespace Ogre
         mTexUnitSlotStart( 0 ),
         mPrePassTextures( 0 ),
         mSsrTexture( 0 ),
+        mIrradianceVolume( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
         mShadowFilter( PCF_3x3 ),
@@ -310,6 +313,9 @@ namespace Ogre
                 if( mSsrTexture )
                     psParams->setNamedConstant( "ssrTexture", texUnit++ );
             }
+
+            if( mIrradianceVolume && getProperty( HlmsBaseProp::ShadowCaster ) == 0 )
+                psParams->setNamedConstant( "irradianceVolume", texUnit++ );
 
             if( !mPreparedPass.shadowMaps.empty() )
             {
@@ -782,6 +788,9 @@ namespace Ogre
 
             if( mParallaxCorrectedCubemap )
                 setProperty( PbsProperty::ParallaxCorrectCubemaps, 1 );
+
+            if( mIrradianceVolume )
+                setProperty( PbsProperty::IrradianceVolumes, 1 );
         }
 
         if( mOptimizationStrategy == LowerGpuOverhead )
@@ -858,6 +867,11 @@ namespace Ogre
             //vec3 ambientLowerHemi + padding + vec3 ambientHemisphereDir + padding
             if( ambientMode == AmbientHemisphere )
                 mapSize += 8 * 4;
+
+            //vec3 irradianceOrigin + float maxPower +
+            //vec3 irradianceSize + float invHeight + mat4 invView
+            if( mIrradianceVolume )
+                mapSize += (4 + 4 + 4*4) * 4;
 
             //float pssmSplitPoints N times.
             mapSize += numPssmSplits * 4;
@@ -1011,6 +1025,36 @@ namespace Ogre
                 *passBufferPtr++ = static_cast<float>( hemisphereDir.y );
                 *passBufferPtr++ = static_cast<float>( hemisphereDir.z );
                 *passBufferPtr++ = 1.0f;
+            }
+
+            if( mIrradianceVolume )
+            {
+                const Vector3 irradianceCellSize = mIrradianceVolume->getIrradianceCellSize();
+                const Vector3 irradianceVolumeOrigin = mIrradianceVolume->getIrradianceOrigin() /
+                                                       irradianceCellSize;
+                const float fTexWidth = static_cast<float>(
+                            mIrradianceVolume->getIrradianceVolumeTexture()->getWidth() );
+                const float fTexDepth = static_cast<float>(
+                            mIrradianceVolume->getIrradianceVolumeTexture()->getDepth() );
+
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.x ) / fTexWidth;
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.y );
+                *passBufferPtr++ = static_cast<float>( irradianceVolumeOrigin.z ) / fTexDepth;
+                *passBufferPtr++ = mIrradianceVolume->getIrradianceMaxPower() *
+                                   mIrradianceVolume->getPowerScale();
+
+                const float fTexHeight = static_cast<float>(
+                            mIrradianceVolume->getIrradianceVolumeTexture()->getHeight() );
+
+                *passBufferPtr++ = 1.0f / (fTexWidth * irradianceCellSize.x);
+                *passBufferPtr++ = 1.0f / irradianceCellSize.y;
+                *passBufferPtr++ = 1.0f / (fTexDepth * irradianceCellSize.z);
+                *passBufferPtr++ = 1.0f / fTexHeight;
+
+                //mat4 invView;
+                Matrix4 invViewMatrix = viewMatrix.inverse();
+                for( size_t i=0; i<16; ++i )
+                    *passBufferPtr++ = (float)invViewMatrix[0][i];
             }
 
             //float pssmSplitPoints
@@ -1198,6 +1242,8 @@ namespace Ogre
         mTexUnitSlotStart = mPreparedPass.shadowMaps.size() + 1;
         if( mGridBuffer )
             mTexUnitSlotStart += 2;
+        if( mIrradianceVolume )
+            mTexUnitSlotStart += 1;
         if( mParallaxCorrectedCubemap )
             mTexUnitSlotStart += 1;
         if( mPrePassTextures )
@@ -1284,6 +1330,17 @@ namespace Ogre
                 {
                     *commandBuffer->addCommand<CbTexture>() =
                             CbTexture( texUnit++, true, (*mSsrTexture)[0].get(), 0 );
+                }
+
+                if( mIrradianceVolume )
+                {
+                    const TexturePtr &irradianceTex = mIrradianceVolume->getIrradianceVolumeTexture();
+                    const HlmsSamplerblock *samplerblock = mIrradianceVolume->getIrradSamplerblock();
+
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
+                                                                         irradianceTex.get(),
+                                                                         samplerblock );
+                    ++texUnit;
                 }
 
                 //We changed HlmsType, rebind the shared textures.

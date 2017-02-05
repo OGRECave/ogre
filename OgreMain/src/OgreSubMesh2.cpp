@@ -154,8 +154,21 @@ namespace Ogre {
     {
         const uint8 maxBones = rationaliseBoneAssignments();
 
+        mBoneAssignmentsOutOfDate = false;
+
         if( maxBones )
         {
+            _buildBoneIndexMap();
+            size_t highestBoneNum = 0;
+            for( size_t i=0; i<mBlendIndexToBoneIndexMap.size(); ++i )
+                highestBoneNum = std::max<size_t>( highestBoneNum, mBlendIndexToBoneIndexMap[i] );
+
+            vector<uint16>::type boneToBlend( highestBoneNum + 1u );
+            for( size_t i=0; i<highestBoneNum; ++i )
+                boneToBlend[i] = 0;
+            for( size_t i=0; i<mBlendIndexToBoneIndexMap.size(); ++i )
+                boneToBlend[mBlendIndexToBoneIndexMap[i]] = static_cast<uint16>( i );
+
             const bool hadIndependentVaos = mVao[VpNormal][0] != mVao[VpShadow][0];
             destroyShadowMappingVaos();
 
@@ -231,8 +244,8 @@ namespace Ogre {
                 while( itBoneAssignments != enBoneAssignments &&
                        itBoneAssignments->vertexIndex == i )
                 {
-                    lastUsedBoneIdx     = itBoneAssignments->boneIndex;
-                    *dstBlendIndex++    = itBoneAssignments->boneIndex;
+                    lastUsedBoneIdx     = (uint8)boneToBlend[itBoneAssignments->boneIndex];
+                    *dstBlendIndex++    = (uint8)boneToBlend[itBoneAssignments->boneIndex];
                     *dstBlendWeight++   = itBoneAssignments->weight;
                     ++itBoneAssignments;
                 }
@@ -272,8 +285,6 @@ namespace Ogre {
             _prepareForShadowMapping( false );
             Mesh::msOptimizeForShadowMapping = oldValue;
         }
-
-        mBoneAssignmentsOutOfDate = false;
     }
     //---------------------------------------------------------------------
     void SubMesh::_buildBoneIndexMap(void)

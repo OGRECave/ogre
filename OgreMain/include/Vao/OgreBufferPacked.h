@@ -156,7 +156,7 @@ namespace Ogre
 
         void *mShadowCopy;
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         /// Used by Dynamic buffers only
         uint32 mLastFrameMapped;
         uint32 mLastFrameMappedAndAdvanced;

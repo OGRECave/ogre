@@ -325,6 +325,9 @@ namespace Ogre {
             Real skyBoxDistance;
         };
 
+        typedef vector<SceneNode*>::type SceneNodeList;
+        typedef vector<MovableObject*>::type MovableObjectVec;
+
         /** Class that allows listening in on the various stages of SceneManager
             processing, so that custom behaviour can be implemented from outside.
         */
@@ -517,8 +520,6 @@ namespace Ogre {
         typedef vector<v1::InstanceManager*>::type  InstanceManagerVec;
         InstanceManagerVec  mInstanceManagers;
 
-        typedef vector<SceneNode*>::type SceneNodeList;
-
         /** Central list of SceneNodes - for easy memory management.
             @note
                 Note that this list is used only for memory management; the structure of the scene
@@ -625,7 +626,6 @@ namespace Ogre {
 
         typedef vector<LightInfo>::type LightInfoList;
 
-        typedef vector<MovableObject*>::type MovableObjectVec;
         /// Simple structure to hold MovableObject map and a mutex to go with it.
         struct MovableObjectCollection
         {
@@ -1112,6 +1112,9 @@ namespace Ogre {
 
         size_t getNumWorkerThreads() const                          { return mNumWorkerThreads; }
 
+        /// Finds all the movable objects with the type and name passed as parameters.
+        virtual MovableObjectVec findMovableObjects( const String& type, const String& name );
+
         /** Creates a camera to be managed by this scene manager.
             @remarks
                 This camera is automatically added to the scene by being attached to the Root
@@ -1269,6 +1272,9 @@ namespace Ogre {
         */
         virtual_l1 SceneNode* getSceneNode( IdType id );
         virtual_l1 const SceneNode* getSceneNode( IdType id ) const;
+
+        /// Finds all the scene nodes with the name passed as parameter.
+        virtual_l1 SceneNodeList findSceneNodes( const String& name ) const;
 
         /** Node listeners need to be registered with us so that they can be successfully called
             when calling updateAllTransforms. @See updateAllTransforms
@@ -3063,17 +3069,6 @@ namespace Ogre {
 
         /// Returns the current relative origin. (Only when non-permanent)
         Vector3 getRelativeOrigin(void) const;
-
-        //Derived from ArrayMemoryManager::RebaseListener
-        /*virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                    const MemoryPoolVec &basePtrs,
-                                    ArrayMemoryManager::PtrdiffVec &outDiffsList );
-        virtual void applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                    const MemoryPoolVec &newBasePtrs,
-                                    const ArrayMemoryManager::PtrdiffVec &diffsList );
-        virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                     const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
-                                     size_t startInstance, size_t diffInstances );*/
 
         /** Add a level of detail listener. */
         void addLodListener(LodListener *listener);

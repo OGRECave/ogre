@@ -66,6 +66,11 @@ in block
 @property( hlms_forwardplus )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
 /*layout(binding = 2) */uniform samplerBuffer f3dLightList;@end
+
+@property( irradiance_volumes )
+	uniform sampler3D irradianceVolume;
+@end
+
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 @property( use_envprobe_map )uniform samplerCube	texEnvProbeMap;@end
@@ -467,6 +472,7 @@ void main()
 	}@end
 
 @insertpiece( forward3dLighting )
+@insertpiece( applyIrradianceVolumes )
 
 @property( use_envprobe_map || ambient_hemisphere )
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;

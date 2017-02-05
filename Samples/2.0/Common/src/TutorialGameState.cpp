@@ -32,6 +32,12 @@ namespace Demo
     {
     }
     //-----------------------------------------------------------------------------------
+    TutorialGameState::~TutorialGameState()
+    {
+        delete mCameraController;
+        mCameraController = 0;
+    }
+    //-----------------------------------------------------------------------------------
     void TutorialGameState::_notifyGraphicsSystem( GraphicsSystem *graphicsSystem )
     {
         mGraphicsSystem = graphicsSystem;

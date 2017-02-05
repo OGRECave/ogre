@@ -270,6 +270,22 @@ SceneManager::~SceneManager()
     stopWorkerThreads();
 }
 //-----------------------------------------------------------------------
+SceneManager::MovableObjectVec SceneManager::findMovableObjects( const String& type, const String& name )
+{
+    MovableObjectVec objects;
+    MovableObjectIterator itor = getMovableObjectIterator( type );
+    while( itor.hasMoreElements() )
+    {
+        MovableObject* object = itor.peekNext();
+        if( object->getName() == name )
+            objects.push_back( object );
+
+        itor.moveNext();
+    }
+
+    return objects;
+}
+//-----------------------------------------------------------------------
 Camera* SceneManager::createCamera( const String &name, bool isVisible, bool forCubemapping )
 {
     if( mCamerasByName.find( name ) != mCamerasByName.end() )
@@ -833,6 +849,19 @@ const SceneNode* SceneManager::getSceneNode( IdType id ) const
         retVal = *ritor;
 
     return retVal;
+}
+//-----------------------------------------------------------------------
+SceneManager::SceneNodeList SceneManager::findSceneNodes( const String& name ) const
+{
+    SceneNodeList nodes;
+    for( SceneNodeList::const_iterator itor = mSceneNodes.begin(); itor != mSceneNodes.end(); ++itor )
+    {
+        SceneNode* node = *itor;
+        if( node->getName() == name )
+            nodes.push_back( node );
+    }
+
+    return nodes;
 }
 //-----------------------------------------------------------------------
 void SceneManager::registerSceneNodeListener( SceneNode *sceneNode )
@@ -4863,70 +4892,6 @@ uint32 SceneManager::_getCombinedVisibilityMask(void) const
                 mVisibilityMask;
 
 }
-//-----------------------------------------------------------------------------------
-/*void SceneManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                    const MemoryPoolVec &basePtrs,
-                                    ArrayMemoryManager::PtrdiffVec &outDiffsList )
-{
-    SceneNodeList::const_iterator itor = mSceneNodes.begin();
-    SceneNodeList::const_iterator end  = mSceneNodes.end();
-
-    while( itor != end )
-    {
-        if( (*itor)->getDepthLevel() == level )
-        {
-            Transform &transform = (*itor)->_getTransform();
-            outDiffsList.push_back( (transform.mParents + transform.mIndex) -
-                                    (Ogre::Node**)basePtrs[NodeArrayMemoryManager::Parent] );
-        }
-        ++itor;
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                const MemoryPoolVec &newBasePtrs,
-                                const ArrayMemoryManager::PtrdiffVec &diffsList )
-{
-    ArrayMemoryManager::PtrdiffVec::const_iterator it = diffsList.begin();
-    SceneNodeList::const_iterator itor = mSceneNodes.begin();
-    SceneNodeList::const_iterator end  = mSceneNodes.end();
-
-    while( itor != end )
-    {
-        if( (*itor)->getDepthLevel() == level )
-        {
-            Transform &transform = (*itor)->_getTransform();
-            transform.rebasePtrs( newBasePtrs, *it++ );
-        }
-
-        ++itor;
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
-                                    const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
-                                    size_t startInstance, size_t diffInstances )
-{
-    //If mSceneNodes were ordered by mChunkBase & mIndex, there would be a huge optimization to be made
-    SceneNodeList::const_iterator itor = mSceneNodes.begin();
-    SceneNodeList::const_iterator end  = mSceneNodes.end();
-
-    const Ogre::Node **minBasePtr = (const Ogre::Node**)( basePtrs[NodeArrayMemoryManager::Parent] +
-                                    startInstance * elementsMemSizes[NodeArrayMemoryManager::Parent] );
-
-    while( itor != end )
-    {
-        if( (*itor)->getDepthLevel() == level )
-        {
-            Transform &transform = (*itor)->_getTransform();
-            if( transform.mParents + transform.mIndex > minBasePtr )
-            {
-                transform.rebasePtrs( diffInstances );
-                ++itor;
-            }
-        }
-    }
-}*/
 //---------------------------------------------------------------------
 void SceneManager::addLodListener(LodListener *listener)
 {

@@ -52,7 +52,7 @@ namespace Ogre
         mLastMappingStart( 0 ),
         mLastMappingCount( 0 ),
         mShadowCopy( 0 )
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     ,   mLastFrameMapped( ~0 ),
         mLastFrameMappedAndAdvanced( ~0 )
 #endif
@@ -169,7 +169,7 @@ namespace Ogre
                          "BufferPacked::map" );
         }
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         {
             uint32 currentFrame = mVaoManager->getFrameCount();
             if( mLastFrameMappedAndAdvanced == currentFrame )
@@ -225,7 +225,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void BufferPacked::advanceFrame(void)
     {
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         if( mLastFrameMappedAndAdvanced == mVaoManager->getFrameCount() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
@@ -249,7 +249,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void BufferPacked::regressFrame(void)
     {
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         if( mLastFrameMappedAndAdvanced != mVaoManager->getFrameCount() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,

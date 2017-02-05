@@ -254,6 +254,19 @@ namespace Ogre
                         setProperty( propName.c_str(), std::max( texture->getHeight() >>
                                                                  (uint32)mipLevel, 1u ) );
                         propName.resize( texturePropSize );
+
+                        uint32 mipLevel = std::min<uint32>( itor->mipmapLevel,
+                                                            texture->getNumMipmaps() );
+
+                        propName.a( "_width_with_lod" );    //uav0_width_with_lod
+                        setProperty( propName.c_str(), std::max( texture->getWidth() >>
+                                                                 (uint32)mipLevel, 1u ) );
+                        propName.resize( texturePropSize );
+
+                        propName.a( "_height_with_lod" );   //uav0_height_with_lod
+                        setProperty( propName.c_str(), std::max( texture->getHeight() >>
+                                                                 (uint32)mipLevel, 1u ) );
+                        propName.resize( texturePropSize );
                     }
                 }
                 else if( itor->buffer )
@@ -683,6 +696,25 @@ namespace Ogre
 
         if( pixelFormat == PF_UNKNOWN && !texture.isNull() )
             texSlot.pixelFormat = texture->getFormat();
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsComputeJob* HlmsComputeJob::clone( const String &cloneName )
+    {
+        HlmsCompute *compute = static_cast<HlmsCompute*>( mCreator );
+        HlmsComputeJob *newJob = compute->createComputeJob( cloneName, cloneName,
+                                                            this->mSourceFilename,
+                                                            this->mIncludedPieceFiles );
+
+        this->cloneTo( newJob );
+
+        return newJob;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::cloneTo( HlmsComputeJob *dstJob )
+    {
+        IdString originalName = dstJob->mName;
+        *dstJob = *this;
+        dstJob->mName = originalName;
     }
     //-----------------------------------------------------------------------------------
     HlmsComputeJob* HlmsComputeJob::clone( const String &cloneName )

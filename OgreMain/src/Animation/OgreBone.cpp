@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "Math/Array/OgreKfTransform.h"
 #include "Math/Array/OgreBooleanMask.h"
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     #define CACHED_TRANSFORM_OUT_OF_DATE() this->setCachedTransformOutOfDate()
 #else
     #define CACHED_TRANSFORM_OUT_OF_DATE() ((void)0)
@@ -47,7 +47,7 @@ namespace Ogre {
         IdObject( 0 ),
         mReverseBind( 0 ),
         mTransform( BoneTransform() ),
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mCachedTransformOutOfDate( true ),
         mDebugParentNode( 0 ),
         mInitialized( false ),
@@ -63,15 +63,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Bone::~Bone()
     {
+#if OGRE_DEBUG_MODE
         assert( !mInitialized && "Must call _deinitialize() before destructor!" );
+#endif
     }
     //-----------------------------------------------------------------------
     void Bone::_initialize( IdType id, BoneMemoryManager *boneMemoryManager,
                             Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind )
     {
+#if OGRE_DEBUG_MODE
         assert( !mInitialized );
-
-#ifndef NDEBUG
         mInitialized = true;
 #endif
 
@@ -111,7 +112,7 @@ namespace Ogre {
 
         mTagPointChildren.clear();
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         //Calling mParent->removeChild() is not necessary during Release mode at all,
         //However we need to call this->_deinitialize in LIFO order (children first,
         //then parents). We check that here via this assert.
@@ -127,14 +128,14 @@ namespace Ogre {
         mReverseBind        = 0;
         mBoneMemoryManager  = 0;
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mInitialized = false;
 #endif
     }
     //-----------------------------------------------------------------------
     void Bone::setCachedTransformOutOfDate(void) const
     {
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mCachedTransformOutOfDate = true;
 
         BoneVec::const_iterator itor = mChildren.begin();
@@ -209,7 +210,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Bone::_setNodeParent( Node *nodeParent )
     {
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         mDebugParentNode = nodeParent;
 #endif
         if( nodeParent )
@@ -250,8 +251,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Matrix4 Bone::_getDerivedTransform(void) const
     {
+#if OGRE_DEBUG_MODE
         assert( !mCachedTransformOutOfDate );
-
+#endif
         OGRE_ALIGNED_DECL( Matrix4, localSpaceBone, OGRE_SIMD_ALIGNMENT );
         OGRE_ALIGNED_DECL( Matrix4, parentNodeTransform, OGRE_SIMD_ALIGNMENT );
 
@@ -310,7 +312,7 @@ namespace Ogre {
         /*
         mat.storeToAoS( mTransform.mDerivedTransform );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
         for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
         {
             if( mTransform.mOwner[j] )
@@ -365,7 +367,7 @@ namespace Ogre {
             derivedTransform = nodeMat * derivedTransform;
             derivedTransform.streamToAoS( t.mFinalTransform );
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 if( t.mOwner[j] )
@@ -401,7 +403,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     void Bone::_setCachedTransformOutOfDate(void)
     {
         mCachedTransformOutOfDate = true;

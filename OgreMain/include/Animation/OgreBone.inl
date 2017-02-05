@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
     #define CACHED_TRANSFORM_OUT_OF_DATE() this->setCachedTransformOutOfDate()
 #else
     #define CACHED_TRANSFORM_OUT_OF_DATE() ((void)0)

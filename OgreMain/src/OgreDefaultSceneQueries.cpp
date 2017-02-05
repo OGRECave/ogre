@@ -200,7 +200,7 @@ namespace Ogre {
                         return false;
                 }
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
                 //Queries must be performed after all bounds have been updated
                 //(i.e. SceneManager::updateSceneGraph does this for you), and don't
                 //move the objects between that call and this query.
@@ -343,7 +343,7 @@ namespace Ogre {
                         return false;
                 }
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
                 //Queries must be performed after all bounds have been updated
                 //(i.e. SceneManager::updateSceneGraph does this for you), and don't
                 //move the objects between that call and this query.
@@ -436,7 +436,7 @@ namespace Ogre {
                         return false;
                 }
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
                 //Queries must be performed after all bounds have been updated
                 //(i.e. SceneManager::updateSceneGraph does this for you), and don't
                 //move the objects between that call and this query.
@@ -584,7 +584,7 @@ namespace Ogre {
                         return false;
                 }
 
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
                 //Queries must be performed after all bounds have been updated
                 //(i.e. SceneManager::updateSceneGraph does this for you), and don't
                 //move the objects between that call and this query.

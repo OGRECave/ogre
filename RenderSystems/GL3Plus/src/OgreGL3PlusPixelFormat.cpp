@@ -128,7 +128,7 @@ namespace Ogre  {
         case PF_B8G8R8A8:
             return GL_BGRA;
         case PF_R8G8B8A8:
-        case PF_A2B10G10R10:
+        case PF_A2R10G10B10:
         case PF_FLOAT16_RGBA:
         case PF_FLOAT32_RGBA:
         case PF_SHORT_RGBA:
@@ -141,7 +141,7 @@ namespace Ogre  {
         case PF_R16G16B16A16_UINT:
         case PF_R32G32B32A32_UINT:
             return GL_RGBA;
-        case PF_A2R10G10B10:
+        case PF_A2B10G10R10:
             return GL_BGRA;
         case PF_FLOAT16_R:
         case PF_FLOAT32_R:
