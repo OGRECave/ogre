@@ -3,8 +3,13 @@
 #version 330
 
 uniform sampler2D depthTexture;
-uniform sampler2D gBuf_normals;
-uniform sampler2D gBuf_shadowRoughness;
+#if !USE_MSAA
+	uniform sampler2D gBuf_normals;
+	uniform sampler2D gBuf_shadowRoughness;
+#else
+	uniform sampler2DMS gBuf_normals;
+	uniform sampler2DMS gBuf_shadowRoughness;
+#endif
 uniform sampler2D prevFrame;
 uniform sampler2D rayTraceBuffer;
 //uniform samplerCube globalCubemap;

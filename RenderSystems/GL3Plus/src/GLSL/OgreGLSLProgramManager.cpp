@@ -235,6 +235,12 @@ namespace Ogre {
         case GL_INT_SAMPLER_2D_ARRAY:
         case GL_UNSIGNED_INT_SAMPLER_2D:
         case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
+        case GL_SAMPLER_2D_MULTISAMPLE:
+        case GL_INT_SAMPLER_2D_MULTISAMPLE:
+        case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:
+        case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:
+        case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
+        case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
             defToUpdate.constType = GCT_SAMPLER2D;
             break;
         case GL_SAMPLER_3D:

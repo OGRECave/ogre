@@ -42,7 +42,11 @@
 #version 330
 
 uniform sampler2D depthTexture;
-uniform sampler2D gBuf_normals;
+#if !USE_MSAA
+	uniform sampler2D gBuf_normals;
+#else
+	uniform sampler2DMS gBuf_normals;
+#endif
 uniform sampler2D prevFrameDepthTexture;
 
 #define float2 vec2

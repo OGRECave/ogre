@@ -1739,7 +1739,10 @@ namespace Ogre
             if( mDataFolder->exists( filename ) )
             {
                 if( mShaderProfile == "glsl" ) //TODO: String comparision
-                    setProperty( HlmsBaseProp::GL3Plus, 330 );
+                {
+                    setProperty( HlmsBaseProp::GL3Plus,
+                                 mRenderSystem->getNativeShadingLanguageVersion() );
+                }
 
                 setProperty( HlmsBaseProp::Syntax,  mShaderSyntax.mHash );
                 setProperty( HlmsBaseProp::Hlsl,    HlmsBaseProp::Hlsl.mHash );

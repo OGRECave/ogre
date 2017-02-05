@@ -675,6 +675,7 @@ namespace Ogre
         static const IdString Metal;
         static const IdString GL3Plus;
         static const IdString iOS;
+        static const IdString GLVersion;
         static const IdString HighQuality;
         static const IdString TexGather;
         static const IdString DisableStage;
