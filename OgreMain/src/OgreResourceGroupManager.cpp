@@ -692,12 +692,12 @@ namespace Ogre {
 
         Archive* pArch = NULL;
 
-        if (groupName == AUTODETECT_RESOURCE_GROUP_NAME ||
+        if (groupName == AUTODETECT_RESOURCE_GROUP_NAME || grp->inGlobalPool ||
             (!OGRE_RESOURCEMANAGER_STRICT && (groupName == DEFAULT_RESOURCE_GROUP_NAME)))
         {
             std::pair<Archive*, ResourceGroup*> ret = resourceExistsInAnyGroupImpl(resourceName);
 
-            if(ret.second && resourceBeingLoaded) {
+            if(ret.second && resourceBeingLoaded && !grp->inGlobalPool) {
                 resourceBeingLoaded->changeGroupOwnership(ret.second->name);
             }
 
