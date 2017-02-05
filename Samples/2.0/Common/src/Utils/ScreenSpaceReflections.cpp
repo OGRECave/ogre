@@ -4,6 +4,7 @@
 #include "OgreMaterialManager.h"
 #include "OgreMaterial.h"
 #include "OgreTechnique.h"
+#include "OgreRenderSystem.h"
 
 #include "OgreCamera.h"
 
@@ -15,26 +16,47 @@ namespace Demo
         0,      0,    1,    0,
         0,      0,    0,    1);
 
-    ScreenSpaceReflections::ScreenSpaceReflections( const Ogre::TexturePtr &globalCubemap ) :
-        mLastUvSpaceViewProjMatrix( PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE )
+    ScreenSpaceReflections::ScreenSpaceReflections( const Ogre::TexturePtr &globalCubemap,
+                                                    Ogre::RenderSystem *renderSystem,
+                                                    bool useMsaa ) :
+        mLastUvSpaceViewProjMatrix( PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE ),
+        mRsDepthRange( 1.0f )
     {
         Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().load(
                     "SSR/ScreenSpaceReflectionsVectors",
                     Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
                 staticCast<Ogre::Material>();
 
+        Ogre::GpuProgram *psShader;
+        Ogre::GpuProgramParametersSharedPtr oldParams;
         Ogre::Pass *pass = material->getTechnique(0)->getPass(0);
-
+        //Save old manual & auto params
+        oldParams = pass->getFragmentProgramParameters();
+        //Retrieve the HLSL/GLSL/Metal shader and rebuild it with/without MSAA
+        psShader = pass->getFragmentProgram()->_getBindingDelegate();
+        psShader->setParameter( "preprocessor_defines", useMsaa ? "USE_MSAA=1" : "" );
+        pass->getFragmentProgram()->reload();
         mPsParams[0] = pass->getFragmentProgramParameters();
+        //Restore manual & auto params to the newly compiled shader
+        mPsParams[0]->copyConstantsFrom( *oldParams );
 
         material = Ogre::MaterialManager::getSingleton().load(
                             "SSR/ScreenSpaceReflectionsCombine",
                             Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
                         staticCast<Ogre::Material>();
         pass = material->getTechnique(0)->getPass(0);
+        //Save old manual & auto params
+        oldParams = pass->getFragmentProgramParameters();
+        //Retrieve the HLSL/GLSL/Metal shader and rebuild it with/without MSAA
+        psShader = pass->getFragmentProgram()->_getBindingDelegate();
+        psShader->setParameter( "preprocessor_defines", useMsaa ? "USE_MSAA=1" : "" );
+        pass->getFragmentProgram()->reload();
         mPsParams[1] = pass->getFragmentProgramParameters();
+        //Restore manual & auto params to the newly compiled shader
+        mPsParams[1]->copyConstantsFrom( *oldParams );
 
         //pass->getTextureUnitState( "globalCubemap" )->setTexture( globalCubemap );
+        mRsDepthRange = renderSystem->getRSDepthRange();
     }
     //-----------------------------------------------------------------------------------
     void ScreenSpaceReflections::update( Ogre::Camera *camera )
@@ -81,10 +103,11 @@ namespace Demo
 
         mPsParams[1]->setNamedConstant( "invViewMatCubemap", &invViewMatrixCubemap[0][0], 3*3, 1 );
 
-        //Why do we need to 2x the camera position (so that difference is 2x)? I have no clue.
-        viewMatrix[0][3] *= 2.0;
-        viewMatrix[1][3] *= 2.0;
-        viewMatrix[2][3] *= 2.0;
+        //Why do we need to 2x the camera position in GL (so that difference is 2x)? I have no clue,
+        //but could be realted with OpenGL's depth range being in range [-1;1] and projection magic.
+        viewMatrix[0][3] *= mRsDepthRange;
+        viewMatrix[1][3] *= mRsDepthRange;
+        viewMatrix[2][3] *= mRsDepthRange;
         Ogre::Matrix4 projMatrix = camera->getProjectionMatrixWithRSDepth();
         Ogre::Matrix4 uvSpaceViewProjMatrix =
                 (PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * projMatrix) * viewMatrix;

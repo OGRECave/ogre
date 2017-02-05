@@ -1005,6 +1005,10 @@ namespace Ogre
         virtual void _convertProjectionMatrix(const Matrix4& matrix,
             Matrix4& dest, bool forGpuProgram = false) = 0;
 
+        /// OpenGL depth is in range [-1;1] so it returns 2.0f;
+        /// D3D11 & Metal are in range [0;1] so it returns 1.0f;
+        virtual Real getRSDepthRange(void) const { return 2.0f; }
+
         /** Builds a perspective projection matrix suitable for this render system.
         @remarks
         Because different APIs have different requirements (some incompatible) for the

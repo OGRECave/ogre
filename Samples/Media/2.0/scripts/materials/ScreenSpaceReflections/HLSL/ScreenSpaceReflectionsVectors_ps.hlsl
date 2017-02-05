@@ -40,7 +40,11 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 
 Texture2D<float> depthTexture			: register(t0);
-Texture2D<unorm float4> gBuf_normals	: register(t1);
+#if !USE_MSAA
+	Texture2D<unorm float4> gBuf_normals	: register(t1);
+#else
+	Texture2DMS<unorm float4> gBuf_normals	: register(t1);
+#endif
 Texture2D<float> prevFrameDepthTexture	: register(t2);
 
 #define INLINE
@@ -123,10 +127,22 @@ INLINE float linearizeDepth( float fDepth )
 	return p_projectionParams.y / (fDepth - p_projectionParams.x);
 }
 
+#if !USE_MSAA
+	INLINE float3 loadSubsample0( Texture2D<unorm float4> tex, int2 iCoords )
+	{
+		return tex.Load( int3( iCoords, 0 ) ).xyz;
+	}
+#else
+	INLINE float3 loadSubsample0( Texture2DMS<unorm float4> tex, int2 iCoords )
+	{
+		return tex.Load( iCoords, 0 ).xyz;
+	}
+#endif
+
 INLINE float linearDepthTexelFetch( Texture2D<float> depthTex, int2 hitPixel )
 {
 	// Load returns 0 for any value accessed out of bounds
-	return linearizeDepth( depthTex.Load( int3( hitPixel , 0 ) ).x );
+	return linearizeDepth( depthTex.Load( int3( hitPixel, 0 ) ).x );
 }
 
 // Returns true if the ray hit something
@@ -252,7 +268,7 @@ float4 main
 {
 	float4 fragColour;
 
-	float3 normalVS = gBuf_normals.Load( int3( gl_FragCoord.xy * 2.0, 0 ) ).xyz * 2.0 - 1.0;
+	float3 normalVS = loadSubsample0( gBuf_normals, gl_FragCoord.xy * 2.0 ).xyz * 2.0 - 1.0;
 	normalVS.z = -normalVS.z; //Normal should be left handed.
 	if( !any(normalVS) )
 	//if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
@@ -290,14 +306,14 @@ float4 main
 	// it will drown out those reflections since backward facing pixels are not available
 	// for screen space reflection. Attenuate reflections for angles between 90 degrees
 	// and 100 degrees, and drop all contribution beyond the (-100,100)  degree range
-	float3 normalsAtRefl = gBuf_normals.Load( int3(hitPixel.xy, 0 ) ).xyz * 2.0 - 1.0;
+	float3 normalsAtRefl = loadSubsample0( gBuf_normals, hitPixel.xy ).xyz * 2.0 - 1.0;
 	normalsAtRefl.z = -normalsAtRefl.z;
 	rDotV *= smoothstep(-0.17, 0.0, dot( normalVS, -normalsAtRefl ) );
 
 	//Reflections lag one frame behind, so we need to reproject based on previous camera position
 	//to know where to sample the colour. If the depth differences are too big then we don't use
 	//that reflection.
-	float currDepth = depthTexture.Load( int3(hitPixel.xy, 0 ) ).x;
+	float currDepth = depthTexture.Load( int3( hitPixel.xy, 0 ) ).x;
 	hitPixel *= p_invDepthBufferRes.xy; //Transform hit pixel from pixel position to UVs
 	float4 reprojectedPos = mul( p_reprojectionMatrix, float4( hitPixel.xy, currDepth, 1.0 ) );
 	reprojectedPos.xyz /= reprojectedPos.w;

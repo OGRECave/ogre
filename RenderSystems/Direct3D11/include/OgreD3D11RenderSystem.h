@@ -323,6 +323,7 @@ namespace Ogre
         void _endFrame(void);
         void _setFog( FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0 );
 		void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool forGpuProgram = false);
+        virtual Real getRSDepthRange(void) const;
         void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
             Matrix4& dest, bool forGpuProgram = false);
         void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top, Real nearPlane, 

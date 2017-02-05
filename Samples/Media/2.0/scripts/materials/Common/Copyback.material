@@ -129,3 +129,57 @@ material Ogre/Copy/1xFP32 : Ogre/Copy/4xFP32
 		}
 	}
 }
+
+fragment_program Ogre/Resolve/1xFP32_Subsample0_ps_GLSL glsl
+{
+	source Resolve_1xFP32_Subsample0_ps.glsl
+	default_params { param_named tex int 0 }
+}
+
+fragment_program Ogre/Resolve/1xFP32_Subsample0_ps_HLSL hlsl
+{
+	source Resolve_1xFP32_Subsample0_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+fragment_program Ogre/Resolve/1xFP32_Subsample0_ps_Metal metal
+{
+	source Resolve_1xFP32_Subsample0_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
+fragment_program Ogre/Resolve/1xFP32_Subsample0_ps unified
+{
+	delegate Ogre/Resolve/1xFP32_Subsample0_ps_GLSL
+	delegate Ogre/Resolve/1xFP32_Subsample0_ps_HLSL
+	delegate Ogre/Resolve/1xFP32_Subsample0_ps_Metal
+}
+
+material Ogre/Resolve/1xFP32_Subsample0
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+			
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Ogre/Resolve/1xFP32_Subsample0_ps
+			{
+			}
+
+			texture_unit
+			{
+				filtering none
+				tex_address_mode clamp
+			}
+		}
+	}
+}

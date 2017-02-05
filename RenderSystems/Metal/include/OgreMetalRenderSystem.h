@@ -248,6 +248,7 @@ namespace Ogre
         virtual VertexElementType getColourVertexElementType(void) const;
         virtual void _convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
                                                bool forGpuProgram = false);
+        virtual Real getRSDepthRange(void) const;
         virtual void _makeProjectionMatrix( Real left, Real right, Real bottom, Real top,
                                             Real nearPlane, Real farPlane, Matrix4& dest,
                                             bool forGpuProgram = false );

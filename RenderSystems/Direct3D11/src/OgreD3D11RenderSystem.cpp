@@ -1931,6 +1931,11 @@ bail:
             dest[3][2] = -dest[3][2];
         }
     }
+    //-------------------------------------------------------------------------
+    Real D3D11RenderSystem::getRSDepthRange(void) const
+    {
+        return 1.0f;
+    }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, 
         Real farPlane, Matrix4& dest, bool forGpuProgram)

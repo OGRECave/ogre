@@ -1,13 +1,18 @@
 // Based on http://roar11.com/2015/07/screen-space-glossy-reflections/
 
-Texture2D<float> depthTexture					: register(t0);
-Texture2D<unorm float4> gBuf_normals			: register(t1);
-Texture2D<unorm float2> gBuf_shadowRoughness	: register(t2);
-Texture2D<unorm float4> prevFrame				: register(t3);
-Texture2D<unorm float4> rayTraceBuffer			: register(t4);
-//uniform samplerCube globalCubemap				: register(t5);
+Texture2D<float> depthTexture						: register(t0);
+#if !USE_MSAA
+	Texture2D<unorm float4> gBuf_normals			: register(t1);
+	Texture2D<unorm float2> gBuf_shadowRoughness	: register(t2);
+#else
+	Texture2DMS<unorm float4> gBuf_normals			: register(t1);
+	Texture2DMS<unorm float2> gBuf_shadowRoughness	: register(t2);
+#endif
+Texture2D<unorm float4> prevFrame					: register(t3);
+Texture2D<unorm float4> rayTraceBuffer				: register(t4);
+//uniform samplerCube globalCubemap					: register(t5);
 
-SamplerState trilinearSampler					: register(s3);
+SamplerState trilinearSampler						: register(s3);
 
 #define INLINE
 
@@ -119,7 +124,11 @@ float4 main
 	float4 raySS = rayTraceBuffer.Load( int3( gl_FragCoord.xy * 0.5f, 0 ) ).xyzw;
 
 	//Do not decode roughness, keep it in [0; 1] range.
+#if !USE_MSAA
 	float roughness = gBuf_shadowRoughness.Load( int3( gl_FragCoord.xy, 0 ) ).y;
+#else
+	float roughness = gBuf_shadowRoughness.Load( gl_FragCoord.xy, 0 ).y;
+#endif
 	float gloss = 1.0f - roughness;
 	/*float specularPower = glossToSpecularPower( gloss );
 

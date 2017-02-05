@@ -1295,6 +1295,11 @@ namespace Ogre
         dest[2][3] = (dest[2][3] + dest[3][3]) / 2;
     }
     //-------------------------------------------------------------------------
+    Real MetalRenderSystem::getRSDepthRange(void) const
+    {
+         return 1.0f;
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::_makeProjectionMatrix( Real left, Real right, Real bottom, Real top,
                                                    Real nearPlane, Real farPlane, Matrix4 &dest,
                                                    bool forGpuProgram )
