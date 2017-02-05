@@ -269,7 +269,7 @@ in float4 gl_FragCoord;
 
 void main()
 {
-	float3 normalVS = texelFetch( gBuf_normals, int2( gl_FragCoord.xy * 2.0 ), 0 ).xyz * 2.0 - 1.0;
+	float3 normalVS = normalize( texelFetch( gBuf_normals, int2( gl_FragCoord.xy * 2.0 ), 0 ).xyz * 2.0 - 1.0 );
 	normalVS.z = -normalVS.z; //Normal should be left handed.
 	//if( !any(normalVS) )
 	if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
@@ -307,7 +307,7 @@ void main()
 	// it will drown out those reflections since backward facing pixels are not available
 	// for screen space reflection. Attenuate reflections for angles between 90 degrees
 	// and 100 degrees, and drop all contribution beyond the (-100,100)  degree range
-	float3 normalsAtRefl = texelFetch( gBuf_normals, int2(hitPixel.xy), 0 ).xyz * 2.0 - 1.0;
+	float3 normalsAtRefl = normalize( texelFetch( gBuf_normals, int2(hitPixel.xy), 0 ).xyz * 2.0 - 1.0 );
 	normalsAtRefl.z = -normalsAtRefl.z;
 	rDotV *= smoothstep(-0.17, 0.0, dot( normalVS, -normalsAtRefl ) );
 
