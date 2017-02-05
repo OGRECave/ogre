@@ -177,8 +177,7 @@ namespace Ogre {
             String zzDesc = getZzipErrorDescription((zzip_error_t)zerr);
 
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                    mName+ " Cannot open file: " + filename + " - "+zzDesc,
-                "FileSystemArchive::open");
+                    mName+ " Cannot open file: " + filename + " - "+zzDesc, "ZipArchive::open");
         }
 
         // Get uncompressed size too

@@ -1156,9 +1156,8 @@ namespace Ogre {
                 }
                 catch (Exception &e) {
                     String msg;
-                    msg = msg + "Error loading texture " + mFrames[frame]  + 
-                        ". Texture layer will be blank. Loading the texture "
-                        "failed with the following exception: " 
+                    msg = msg + "Error preparing texture " + mFrames[frame]  +
+                        ". Texture layer will be blank: "
                         + e.getFullDescription();
                     LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
                     mTextureLoadFailed = true;
@@ -1189,8 +1188,7 @@ namespace Ogre {
                 catch (Exception &e) {
                     String msg;
                     msg = msg + "Error loading texture " + mFrames[frame]  + 
-                        ". Texture layer will be blank. Loading the texture "
-                        "failed with the following exception: " 
+                        ". Texture layer will be blank: "
                         + e.getFullDescription();
                     LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
                     mTextureLoadFailed = true;
