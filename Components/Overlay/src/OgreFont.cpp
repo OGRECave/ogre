@@ -257,7 +257,7 @@ namespace Ogre
         // original DataStream in a MemoryDataStream
         DataStreamPtr dataStreamPtr =
             ResourceGroupManager::getSingleton().openResource(
-                mSource, mGroup, true, this);
+                mSource, mGroup, this);
         MemoryDataStream ttfchunk(dataStreamPtr);
 
         // Load font

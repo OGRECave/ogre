@@ -38,7 +38,7 @@ void GLTextureCommon::readImage(LoadedImages& imgs, const String& name, const St
     imgs.push_back(Image());
     Image& img = imgs.back();
 
-    DataStreamPtr dstream = ResourceGroupManager::getSingleton().openResource(name, mGroup, true, this);
+    DataStreamPtr dstream = ResourceGroupManager::getSingleton().openResource(name, mGroup, this);
     img.load(dstream, ext);
 
     if( haveNPOT )

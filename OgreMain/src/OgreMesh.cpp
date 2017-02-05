@@ -209,7 +209,7 @@ namespace Ogre {
 
         mFreshFromDisk =
             ResourceGroupManager::getSingleton().openResource(
-                mName, mGroup, true, this);
+                mName, mGroup, this);
  
         // fully prebuffer into host RAM
         mFreshFromDisk = DataStreamPtr(OGRE_NEW MemoryDataStream(mName,mFreshFromDisk));

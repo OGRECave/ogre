@@ -1343,7 +1343,7 @@ namespace Ogre {
 
 			// open included file
 			DataStreamPtr resource = ResourceGroupManager::getSingleton().
-				openResource(filename, resourceBeingLoaded->getGroup(), true, resourceBeingLoaded);
+				openResource(filename, resourceBeingLoaded->getGroup(), resourceBeingLoaded);
 
 			// replace entire include directive line
 			// copy up to just before include
