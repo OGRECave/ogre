@@ -174,7 +174,7 @@ float3 qmul( float4 q, float3 v )
 @property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end
 @property( hlms_use_prepass_msaa && hlms_use_prepass ), uint gl_SampleMask : SV_Coverage@end )
 {
-	PS_OUTPUT psOut;
+	PS_OUTPUT outPs;
 	@insertpiece( custom_ps_preExecution )
 
 	Material material;
@@ -479,36 +479,36 @@ float4 diffuseCol;
 @property( !hlms_prepass )
 	@property( !hw_gamma_write )
 		//Linear to Gamma space
-		psOut.colour0.xyz	= sqrt( finalColour );
+		outPs.colour0.xyz	= sqrt( finalColour );
 	@end @property( hw_gamma_write )
-		psOut.colour0.xyz	= finalColour;
+		outPs.colour0.xyz	= finalColour;
 	@end
 
 	@property( hlms_alphablend )
 		@property( use_texture_alpha )
-			psOut.colour0.w		= material.F0.w * diffuseCol.w;
+			outPs.colour0.w		= material.F0.w * diffuseCol.w;
 		@end @property( !use_texture_alpha )
-			psOut.colour0.w		= material.F0.w;
+			outPs.colour0.w		= material.F0.w;
 		@end
 	@end @property( !hlms_alphablend )
-		psOut.colour0.w		= 1.0;@end
+		outPs.colour0.w		= 1.0;@end
 
 	@end @property( !hlms_normal && !hlms_qtangent )
-		psOut.colour0 = float4( 1.0, 1.0, 1.0, 1.0 );
+		outPs.colour0 = float4( 1.0, 1.0, 1.0, 1.0 );
 	@end
 @end @property( hlms_prepass )
-	psOut.normals			= float4( nNormal * 0.5 + 0.5, 1.0 );
+	outPs.normals			= float4( nNormal * 0.5 + 0.5, 1.0 );
 	@property( hlms_pssm_splits )
-		psOut.shadowRoughness	= float2( fShadow, (ROUGHNESS - 0.02) * 1.02040816 );
+		outPs.shadowRoughness	= float2( fShadow, (ROUGHNESS - 0.02) * 1.02040816 );
 	@end @property( !hlms_pssm_splits )
-		psOut.sShadowRoughness	= float2( 1.0, (ROUGHNESS - 0.02) * 1.02040816 );
+		outPs.sShadowRoughness	= float2( 1.0, (ROUGHNESS - 0.02) * 1.02040816 );
 	@end
 @end
 
 	@insertpiece( custom_ps_posExecution )
 
 @property( !hlms_render_depth_only )
-	return psOut;
+	return outPs;
 @end
 }
 @end
@@ -520,7 +520,7 @@ float4 diffuseCol;
 
 @insertpiece( output_type ) main( PS_INPUT inPs )
 {
-	PS_OUTPUT psOut;
+	PS_OUTPUT outPs;
 	@insertpiece( custom_ps_preExecution )
 
 	
@@ -582,8 +582,8 @@ float4 diffuseCol;
 	@insertpiece( custom_ps_posExecution )
 
 @property( !hlms_render_depth_only )
-	psOut.colour0 = inPs.depth;
-	return psOut;
+	outPs.colour0 = inPs.depth;
+	return outPs;
 @end
 }
 @end

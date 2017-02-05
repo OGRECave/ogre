@@ -11,14 +11,14 @@ struct PS_INPUT
 @insertpiece( VStoPS_block )
 };
 
-@insertpiece( PsOutputDecl )
-
 @property( !hlms_shadowcaster )
 
 @padd( numSamplerStates, num_array_textures, num_textures )
 @pset( samplerStateBind, 2 )
 
 @property( diffuse )@piece( MultiplyDiffuseConst )* material.diffuse@end @end
+
+@insertpiece( DeclOutputType )
 
 fragment @insertpiece( output_type ) main_metal
 (

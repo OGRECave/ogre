@@ -3,91 +3,91 @@
 
 @piece( NormalNonPremul )
 	//Normal Non Premultiplied @counter(t)
-	outColour.xyz = lerp( outColour.xyz, topImage@value(t).xyz, topImage@value(t).a );
-	outColour.w = lerp( outColour.w, 1.0, topImage@value(t).w );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz, topImage@value(t).xyz, topImage@value(t).a );
+	outPs.colour0.w = lerp( outPs.colour0.w, 1.0, topImage@value(t).w );
 @end
 
 @piece( NormalPremul )
 	//Normal Premultiplied @counter(t)
-	outColour.xyz = (1.0 - topImage@value(t).a) * outColour.xyz + topImage@value(t).xyz;
-	outColour.w = lerp( outColour.w, 1.0, topImage@value(t).w );
+	outPs.colour0.xyz = (1.0 - topImage@value(t).a) * outPs.colour0.xyz + topImage@value(t).xyz;
+	outPs.colour0.w = lerp( outPs.colour0.w, 1.0, topImage@value(t).w );
 @end
 
 @piece( Add )
 	//Add @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  min( outColour.xyz + topImage@value(t).xyz, float3(1.0) ),
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  min( outPs.colour0.xyz + topImage@value(t).xyz, float3(1.0) ),
+							  topImage@value(t).a );
 @end
 
 @piece( Subtract )
 	//Subtract @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  max( outColour.xyz - topImage@value(t).xyz, float3(0.0) ),
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  max( outPs.colour0.xyz - topImage@value(t).xyz, float3(0.0) ),
+							  topImage@value(t).a );
 @end
 
 @piece( Multiply )
 	//Multiply @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  outColour.xyz * topImage@value(t).xyz,
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  outPs.colour0.xyz * topImage@value(t).xyz,
+							  topImage@value(t).a );
 @end
 
 @piece( Multiply2x )
 	//Multiply2x @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  min( outColour.xyz * topImage@value(t).xyz * 2.0, float3(1.0) ),
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  min( outPs.colour0.xyz * topImage@value(t).xyz * 2.0, float3(1.0) ),
+							  topImage@value(t).a );
 @end
 
 @piece( Screen )
 	//Screen @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  1.0 - (1.0 - outColour.xyz) * (1.0 - topImage@value(t).xyz),
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  1.0 - (1.0 - outPs.colour0.xyz) * (1.0 - topImage@value(t).xyz),
+							  topImage@value(t).a );
 @end
 
 @piece( Overlay )
 	//Overlay @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  outColour.xyz * ( outColour.xyz + 2.0 * topImage@value(t).xyz * (1.0 - outColour.xyz) ),
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  outPs.colour0.xyz * ( outPs.colour0.xyz + 2.0 * topImage@value(t).xyz * (1.0 - outPs.colour0.xyz) ),
+							  topImage@value(t).a );
 @end
 
 @piece( Lighten )
 	//Lighten @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  max( outColour.xyz, topImage@value(t).xyz ),
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  max( outPs.colour0.xyz, topImage@value(t).xyz ),
+							  topImage@value(t).a );
 @end
 
 @piece( Darken )
 	//Darken @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  min( outColour.xyz, topImage@value(t).xyz ),
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  min( outPs.colour0.xyz, topImage@value(t).xyz ),
+							  topImage@value(t).a );
 @end
 
 @piece( GrainExtract )
 	//GrainExtract @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  (outColour.xyz - topImage@value(t).xyz) + 0.5f,
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  (outPs.colour0.xyz - topImage@value(t).xyz) + 0.5f,
+							  topImage@value(t).a );
 @end
 
 @piece( GrainMerge )
 	//GrainMerge @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  (outColour.xyz + topImage@value(t).xyz) - 0.5f,
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  (outPs.colour0.xyz + topImage@value(t).xyz) - 0.5f,
+							  topImage@value(t).a );
 @end
 
 @piece( Difference )
 	//Difference @counter(t)
-	outColour.xyz = lerp( outColour.xyz,
-						  abs(outColour.xyz - topImage@value(t).xyz),
-						  topImage@value(t).a );
+	outPs.colour0.xyz = lerp( outPs.colour0.xyz,
+							  abs(outPs.colour0.xyz - topImage@value(t).xyz),
+							  topImage@value(t).a );
 @end
 
 @foreach( 16, n )
