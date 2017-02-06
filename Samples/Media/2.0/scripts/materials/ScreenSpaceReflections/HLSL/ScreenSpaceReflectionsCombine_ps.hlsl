@@ -8,7 +8,7 @@ Texture2D<float> depthTexture						: register(t0);
 	Texture2DMS<unorm float4> gBuf_normals			: register(t1);
 	Texture2DMS<unorm float2> gBuf_shadowRoughness	: register(t2);
 #endif
-Texture2D<unorm float4> prevFrame					: register(t3);
+Texture2D<float4> prevFrame							: register(t3);
 Texture2D<unorm float4> rayTraceBuffer				: register(t4);
 //uniform samplerCube globalCubemap					: register(t5);
 
