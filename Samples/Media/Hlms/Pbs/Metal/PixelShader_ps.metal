@@ -16,8 +16,6 @@ struct PS_INPUT
 @property( hlms_vpos )	float4 gl_FragCoord [[position]];@end
 };
 
-@insertpiece( PsOutputDecl )
-
 @property( !hlms_shadowcaster )
 
 @property( irradiance_volumes )
