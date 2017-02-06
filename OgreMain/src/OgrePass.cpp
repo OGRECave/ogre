@@ -2162,16 +2162,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Pass::setShadowCasterFragmentProgramParameters(GpuProgramParametersSharedPtr params)
     {
-        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+        if (!mShadowCasterFragmentProgramUsage &&
+            !Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->hasCapability(
+                RSC_FIXED_FUNCTION))
         {
-            if (!mShadowCasterFragmentProgramUsage)
-            {
-                OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
-                    "This pass does not have a shadow caster fragment program assigned!",
-                    "Pass::setShadowCasterFragmentProgramParameters");
-            }
-            mShadowCasterFragmentProgramUsage->setParameters(params);
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "This pass does not have a shadow caster fragment program assigned!",
+                        "Pass::setShadowCasterFragmentProgramParameters");
         }
+        mShadowCasterFragmentProgramUsage->setParameters(params);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getShadowCasterFragmentProgramName(void) const
@@ -2184,15 +2183,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getShadowCasterFragmentProgramParameters(void) const
     {
-        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+
+        if (!mShadowCasterFragmentProgramUsage &&
+            !Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->hasCapability(
+                RSC_FIXED_FUNCTION))
         {
-            if (!mShadowCasterFragmentProgramUsage)
-            {
-                OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
-                    "This pass does not have a shadow caster fragment program assigned!",
-                    "Pass::getShadowCasterFragmentProgramParameters");
-            }
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "This pass does not have a shadow caster fragment program assigned!",
+                        "Pass::getShadowCasterFragmentProgramParameters");
         }
+
         return mShadowCasterFragmentProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------

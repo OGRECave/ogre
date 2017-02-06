@@ -174,7 +174,7 @@ namespace Ogre
             // find & load source code
             DataStreamPtr stream = 
                 ResourceGroupManager::getSingleton().openResource(
-                    mFilename, mGroup, true, this);
+                    mFilename, mGroup, this);
 
             mSource = stream->getAsString();
         }

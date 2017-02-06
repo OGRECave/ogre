@@ -118,7 +118,7 @@ namespace Ogre
             // find & load source code
             DataStreamPtr stream = 
                 ResourceGroupManager::getSingleton().openResource(
-                    mFilename, mGroup, true, this);
+                    mFilename, mGroup, this);
             mSource = stream->getAsString();
         }
 
@@ -271,7 +271,7 @@ namespace Ogre
                 GpuNamedConstants namedConstants;
                 DataStreamPtr stream = 
                     ResourceGroupManager::getSingleton().openResource(
-                    mManualNamedConstantsFile, mGroup, true, this);
+                    mManualNamedConstantsFile, mGroup, this);
                 namedConstants.load(stream);
                 setManualNamedConstants(namedConstants);
             }

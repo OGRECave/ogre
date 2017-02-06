@@ -734,9 +734,20 @@ namespace Ogre {
         @return Shared pointer to data stream containing the data, will be
             destroyed automatically when no longer referenced
         */
-        DataStreamPtr openResource(const String& resourceName, 
-            const String& groupName = DEFAULT_RESOURCE_GROUP_NAME,
-            bool searchGroupsIfNotFound = !OGRE_RESOURCEMANAGER_STRICT, Resource* resourceBeingLoaded = 0) const;
+        DataStreamPtr openResource(const String& resourceName,
+                                   const String& groupName = DEFAULT_RESOURCE_GROUP_NAME,
+                                   Resource* resourceBeingLoaded = NULL) const;
+
+        /// @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
+        OGRE_DEPRECATED DataStreamPtr openResource(const String& resourceName,
+                                                   const String& groupName,
+                                                   bool searchGroupsIfNotFound,
+                                                   Resource* resourceBeingLoaded = 0) const
+        {
+            return openResource(resourceName,
+                                searchGroupsIfNotFound ? AUTODETECT_RESOURCE_GROUP_NAME : groupName,
+                                resourceBeingLoaded);
+        }
 
         /** Open all resources matching a given pattern (which can contain
             the character '*' as a wildcard), and return a collection of 

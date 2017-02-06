@@ -850,7 +850,7 @@ namespace Ogre
             // find & load resource data
             DataStreamPtr dstream = 
                 ResourceGroupManager::getSingleton().openResource(
-                    mName, mGroup, true, this);
+                    mName, mGroup, this);
             loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
         }
         else
@@ -873,7 +873,7 @@ namespace Ogre
                 // group changes if required
                 DataStreamPtr dstream = 
                     ResourceGroupManager::getSingleton().openResource(
-                        fullName, mGroup, true, this);
+                        fullName, mGroup, this);
 
                 loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
             }
@@ -889,7 +889,7 @@ namespace Ogre
         // find & load resource data
         DataStreamPtr dstream = 
             ResourceGroupManager::getSingleton().openResource(
-                mName, mGroup, true, this);
+                mName, mGroup, this);
 
         LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
         loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
@@ -903,7 +903,7 @@ namespace Ogre
         // find & load resource data
         DataStreamPtr dstream = 
             ResourceGroupManager::getSingleton().openResource(
-                mName, mGroup, true, this);
+                mName, mGroup, this);
 
         LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
         loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));

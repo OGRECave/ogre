@@ -76,7 +76,7 @@ namespace Ogre {
 
         DataStreamPtr stream = 
             ResourceGroupManager::getSingleton().openResource(
-                mName, mGroup, true, this);
+                mName, mGroup, this);
 
         serializer.importSkeleton(stream, this);
 

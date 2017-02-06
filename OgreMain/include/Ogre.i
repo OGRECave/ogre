@@ -229,6 +229,7 @@ ADD_REPR(ColourValue)
 %include "OgreHardwareBufferManager.h"
 %include "OgreVertexIndexData.h"
 // managers
+%ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool, Resource*);
 %include "OgreResourceGroupManager.h"
 // overloaded by specfic managers (GpuProgram, Texture)
 %ignore Ogre::ResourceManager::getResourceByName;

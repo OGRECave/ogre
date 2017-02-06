@@ -114,7 +114,7 @@ namespace Ogre
 
 				for (; it != end; it++)
 				{
-					pieces->push_back(rgm.openResource(*it, mResorceGroup, false)->getAsString());
+					pieces->push_back(rgm.openResource(*it, mResorceGroup)->getAsString());
 				}
 
 				loadedPieces[languageTemplateExtension] = pieces;

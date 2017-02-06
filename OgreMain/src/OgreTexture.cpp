@@ -398,7 +398,7 @@ namespace Ogre {
             try
             {
                 dstream = ResourceGroupManager::getSingleton().openResource(
-                        mName, mGroup, true, 0);
+                        mName, mGroup);
             }
             catch (Exception&)
             {
@@ -409,7 +409,7 @@ namespace Ogre {
                 try
                 {
                     dstream = ResourceGroupManager::getSingleton().openResource(
-                        mName + "_rt", mGroup, true, 0);
+                        mName + "_rt", mGroup);
                 }
                 catch (Exception&)
                 {
