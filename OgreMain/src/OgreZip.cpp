@@ -151,25 +151,30 @@ namespace Ogre {
         OGRE_LOCK_AUTO_MUTEX;
         String lookUpFileName = filename;
 
-        // Format not used here (always binary)
-        ZZIP_FILE* zzipFile = 
-            zzip_file_open(mZzipDir, lookUpFileName.c_str(),
 #if OGRE_RESOURCEMANAGER_STRICT
-                    ZZIP_ONLYZIP
+        const int flags = 0;
 #else
-                    ZZIP_ONLYZIP | ZZIP_CASELESS
+        const int flags = ZZIP_CASELESS;
 #endif
-                    );
+
+        // Format not used here (always binary)
+        ZZIP_FILE* zzipFile =
+            zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | flags);
+
+#if !OGRE_RESOURCEMANAGER_STRICT
         if (!zzipFile) // Try if we find the file
         {
-            const Ogre::FileInfoListPtr fileNfo = findFileInfo(lookUpFileName, true);
+            String basename, path;
+            StringUtil::splitFilename(lookUpFileName, basename, path);
+            const FileInfoListPtr fileNfo = findFileInfo(basename, true);
             if (fileNfo->size() == 1) // If there are more files with the same do not open anyone
             {
                 Ogre::FileInfo info = fileNfo->at(0);
                 lookUpFileName = info.path + info.basename;
-                zzipFile = zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS); // When an error happens here we will catch it below
+                zzipFile = zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | flags); // When an error happens here we will catch it below
             }
         }
+#endif
 
         if (!zzipFile)
         {
@@ -177,12 +182,12 @@ namespace Ogre {
             String zzDesc = getZzipErrorDescription((zzip_error_t)zerr);
 
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                    mName+ " Cannot open file: " + filename + " - "+zzDesc, "ZipArchive::open");
+                    mName+ " Cannot open file: " + lookUpFileName + " - "+zzDesc, "ZipArchive::open");
         }
 
         // Get uncompressed size too
         ZZIP_STAT zstat;
-        zzip_dir_stat(mZzipDir, lookUpFileName.c_str(), &zstat, ZZIP_CASEINSENSITIVE);
+        zzip_dir_stat(mZzipDir, lookUpFileName.c_str(), &zstat, flags);
 
         // Construct & return stream
         return DataStreamPtr(OGRE_NEW ZipDataStream(lookUpFileName, zzipFile, static_cast<size_t>(zstat.st_size)));
@@ -288,11 +293,13 @@ namespace Ogre {
     {       
         OGRE_LOCK_AUTO_MUTEX;
         String cleanName = filename;
+#if !OGRE_RESOURCEMANAGER_STRICT
         if(filename.rfind("/") != String::npos)
         {
             StringVector tokens = StringUtil::split(filename, "/");
             cleanName = tokens[tokens.size() - 1];
         }
+#endif
 
         return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), cleanName)) != mFileList.end();
     }
