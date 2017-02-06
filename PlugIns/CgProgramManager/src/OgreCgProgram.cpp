@@ -483,13 +483,7 @@ namespace Ogre {
 			}
 			else
 			{
-				if (mType == GPT_FRAGMENT_PROGRAM) {
-					//HACK : http://developer.nvidia.com/forums/index.php?showtopic=1063&pid=2378&mode=threaded&start=#entry2378
-					//Still happens in CG 2.2. Remove hack when fixed.
-					mProgramString = StringUtil::replaceAll(mProgramString, "oDepth.z", "oDepth");
-				}
 				// Create a low-level program, give it the same name as us
-                GpuProgramManager::getSingleton().remove(mName);
                 mAssemblerProgram = 
 					GpuProgramManager::getSingleton().createProgramFromString(
 					mName, 
