@@ -168,7 +168,7 @@ namespace Ogre {
             if (!ret.isNull())
                 return ret;
         }
-        return ResourceManager::getResourceByName(name);
+        return ResourceManager::getResourceByName(name, group);
     }
     //-----------------------------------------------------------------------------
     GpuProgramParametersSharedPtr GpuProgramManager::createParameters(void)
