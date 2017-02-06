@@ -184,7 +184,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ResourceManager::removeImpl(const ResourcePtr& res )
     {
-            OGRE_LOCK_AUTO_MUTEX;
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to remove unknown resource");
+#endif
+        OGRE_LOCK_AUTO_MUTEX;
 
         if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
         {
@@ -233,15 +236,17 @@ namespace Ogre {
         return mMemoryBudget;
     }
     //-----------------------------------------------------------------------
-    void ResourceManager::unload(const String& name)
+    void ResourceManager::unload(const String& name, const String& group)
     {
-        ResourcePtr res = getResourceByName(name);
+        ResourcePtr res = getResourceByName(name, group);
+
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to unload unknown resource: "+name+" in group "+group);
+#endif
 
         if (!res.isNull())
         {
-            // Unload resource
             res->unload();
-
         }
     }
     //-----------------------------------------------------------------------
@@ -249,11 +254,13 @@ namespace Ogre {
     {
         ResourcePtr res = getByHandle(handle);
 
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to unload unknown resource");
+#endif
+
         if (!res.isNull())
         {
-            // Unload resource
             res->unload();
-
         }
     }
     //-----------------------------------------------------------------------
@@ -310,9 +317,13 @@ namespace Ogre {
         removeImpl(res);
     }
     //-----------------------------------------------------------------------
-    void ResourceManager::remove(const String& name)
+    void ResourceManager::remove(const String& name, const String& group)
     {
-        ResourcePtr res = getResourceByName(name);
+        ResourcePtr res = getResourceByName(name, group);
+
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to remove unknown resource: "+name+" in group "+group);
+#endif
 
         if (!res.isNull())
         {
@@ -323,6 +334,11 @@ namespace Ogre {
     void ResourceManager::remove(ResourceHandle handle)
     {
         ResourcePtr res = getByHandle(handle);
+
+#if OGRE_RESOURCEMANAGER_STRICT
+        // FIXME: wrong shutdown sequence in Root triggers this
+        // OgreAssert(res, "attempting to remove unknown resource");
+#endif
 
         if (!res.isNull())
         {
