@@ -48,8 +48,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-const String cBlankString;
-
 //-----------------------------------------------------------------------
 template<> 
 RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::msSingleton = 0;
@@ -57,7 +55,6 @@ RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::msSingleton = 0
 namespace RTShader {
 
 String ShaderGenerator::DEFAULT_SCHEME_NAME     = "ShaderGeneratorDefaultScheme";
-String GENERATED_SHADERS_GROUP_NAME             = "ShaderGeneratorResourceGroup";
 String ShaderGenerator::SGPass::UserKey         = "SGPass";
 String ShaderGenerator::SGTechnique::UserKey    = "SGTechnique";
 
@@ -1400,12 +1397,6 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
 
     if (mShaderCachePath != stdCachePath)
     {
-        // Remove previous cache path. 
-        if (mShaderCachePath.empty() == false)
-        {
-            ResourceGroupManager::getSingleton().removeResourceLocation(mShaderCachePath, GENERATED_SHADERS_GROUP_NAME);
-        }
-
         mShaderCachePath = stdCachePath;
 
         // Case this is a valid file path -> add as resource location in order to make sure that
@@ -1419,15 +1410,13 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
             if (!outFile)
             {
                 OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
-                    "Could create output files in the given shader cache path '" + mShaderCachePath,
+                    "Could not create output files in the given shader cache path '" + mShaderCachePath,
                     "ShaderGenerator::setShaderCachePath"); 
             }
 
             // Close and remove the test file.
             outFile.close();
             remove(outTestFileName.c_str());
-
-            ResourceGroupManager::getSingleton().addResourceLocation(mShaderCachePath, "FileSystem", GENERATED_SHADERS_GROUP_NAME);                 
         }
     }
 }
@@ -1500,7 +1489,7 @@ const String& ShaderGenerator::getRTShaderScheme(size_t index) const
     assert((it != mSchemeEntriesMap.end()) && "Index out of bounds");
     if (it != mSchemeEntriesMap.end())
         return it->first;
-    else return cBlankString;
+    else return BLANKSTRING;
 }
 
 //-----------------------------------------------------------------------------
