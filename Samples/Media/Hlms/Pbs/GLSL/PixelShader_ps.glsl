@@ -510,6 +510,18 @@ void main()
 			envColourD = envColourD * envColourD;
 		@end
 	@end
+
+	@property( hlms_use_ssr )
+		//TODO: SSR pass should be able to combine global & local cubemap.
+		vec4 ssrReflection = texelFetch( ssrTexture, iFragCoord, 0 ).xyzw;
+		@property( use_envprobe_map || ambient_hemisphere )
+			envColourS = mix( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
+		@end @property( !use_envprobe_map && !ambient_hemisphere )
+			vec3 envColourS = ssrReflection.xyz * ssrReflection.w;
+			vec3 envColourD = vec3( 0, 0, 0 );
+		@end
+	@end
+
 	@property( ambient_hemisphere )
 		float ambientWD = dot( pass.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( pass.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
@@ -520,17 +532,6 @@ void main()
 		@end @property( !use_envprobe_map )
 			vec3 envColourS = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			vec3 envColourD = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
-		@end
-	@end
-
-	@property( hlms_use_ssr )
-		//TODO: SSR pass should be able to combine global & local cubemap.
-		vec4 ssrReflection = texelFetch( ssrTexture, iFragCoord, 0 ).xyzw;
-		@property( use_envprobe_map || ambient_hemisphere )
-			envColourS = mix( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
-		@end @property( !use_envprobe_map && !ambient_hemisphere )
-			vec3 envColourS = ssrReflection.xyz * ssrReflection.w;
-			vec3 envColourD = vec3( 0, 0, 0 );
 		@end
 	@end
 

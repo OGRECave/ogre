@@ -448,6 +448,18 @@ float4 diffuseCol;
 			envColourD = envColourD * envColourD;
 		@end
 	@end
+
+	@property( hlms_use_ssr )
+		//TODO: SSR pass should be able to combine global & local cubemap.
+		float4 ssrReflection = ssrTexture.Load( int3( iFragCoord, 0 ) ).xyzw;
+		@property( use_envprobe_map || ambient_hemisphere )
+			envColourS = lerp( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
+		@end @property( !use_envprobe_map && !ambient_hemisphere )
+			float3 envColourS = ssrReflection.xyz * ssrReflection.w;
+			float3 envColourD = float3( 0, 0, 0 );
+		@end
+	@end
+
 	@property( ambient_hemisphere )
 		float ambientWD = dot( passBuf.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( passBuf.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
@@ -458,17 +470,6 @@ float4 diffuseCol;
 		@end @property( !use_envprobe_map )
 			float3 envColourS = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			float3 envColourD = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
-		@end
-	@end
-
-	@property( hlms_use_ssr )
-		//TODO: SSR pass should be able to combine global & local cubemap.
-		float4 ssrReflection = ssrTexture.Load( int3( iFragCoord, 0 ) ).xyzw;
-		@property( use_envprobe_map || ambient_hemisphere )
-			envColourS = lerp( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
-		@end @property( !use_envprobe_map && !ambient_hemisphere )
-			float3 envColourS = ssrReflection.xyz * ssrReflection.w;
-			float3 envColourD = float3( 0, 0, 0 );
 		@end
 	@end
 
