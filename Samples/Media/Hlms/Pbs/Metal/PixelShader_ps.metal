@@ -302,6 +302,30 @@ float4 diffuseCol;
 		@end
 	@end
 
+	/// If there is no normal map, the first iteration must
+	/// initialize nNormal instead of try to merge with it.
+	@property( normal_map_tex )
+		@piece( detail_nm_op_sum )+=@end
+		@piece( detail_nm_op_mul )*=@end
+	@end @property( !normal_map_tex )
+		@piece( detail_nm_op_sum )=@end
+		@piece( detail_nm_op_mul )=@end
+	@end
+
+	/// Blend the detail normal maps with the main normal.
+	@foreach( second_valid_detail_map_nm, n, first_valid_detail_map_nm )
+		float3 vDetail = @insertpiece( SampleDetailMapNm@n );
+		nNormal.xy	@insertpiece( detail_nm_op_sum ) vDetail.xy;
+		nNormal.z	@insertpiece( detail_nm_op_mul ) vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end
+	@foreach( detail_maps_normal, n, second_valid_detail_map_nm )@property( detail_map_nm@n )
+		vDetail = @insertpiece( SampleDetailMapNm@n );
+		nNormal.xy	+= vDetail.xy;
+		nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
+
+	@property( normal_map )
+		nNormal = normalize( TBN * nNormal );
+	@end
+
 	@property( hlms_pssm_splits )
 		float fShadow = 1.0;
 		if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
@@ -311,7 +335,9 @@ float4 diffuseCol;
 	@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
 		float fShadow = getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 	@end
+
 	@insertpiece( SampleRoughnessMap )
+
 @end @property( hlms_use_prepass )
 	int2 iFragCoord = int2( inPs.gl_FragCoord.xy );
 
@@ -333,30 +359,6 @@ float4 diffuseCol;
 @end
 
 	@insertpiece( SampleSpecularMap )
-
-	/// If there is no normal map, the first iteration must
-	/// initialize nNormal instead of try to merge with it.
-@property( normal_map_tex )
-	@piece( detail_nm_op_sum )+=@end
-	@piece( detail_nm_op_mul )*=@end
-@end @property( !normal_map_tex )
-	@piece( detail_nm_op_sum )=@end
-	@piece( detail_nm_op_mul )=@end
-@end
-
-	/// Blend the detail normal maps with the main normal.
-@foreach( second_valid_detail_map_nm, n, first_valid_detail_map_nm )
-	float3 vDetail = @insertpiece( SampleDetailMapNm@n );
-	nNormal.xy	@insertpiece( detail_nm_op_sum ) vDetail.xy;
-	nNormal.z	@insertpiece( detail_nm_op_mul ) vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end
-@foreach( detail_maps_normal, n, second_valid_detail_map_nm )@property( detail_map_nm@n )
-	vDetail = @insertpiece( SampleDetailMapNm@n );
-	nNormal.xy	+= vDetail.xy;
-	nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
-
-@property( normal_map )
-	nNormal = normalize( TBN * nNormal );
-@end
 
 @property( !hlms_prepass )
 	//Everything's in Camera space
@@ -468,9 +470,9 @@ float4 diffuseCol;
 	@property( hlms_use_ssr )
 		//TODO: SSR pass should be able to combine global & local cubemap.
 		float4 ssrReflection = ssrTexture.read( iFragCoord, 0 ).xyzw;
-		@property( use_envprobe_map || ambient_hemisphere )
+		@property( use_envprobe_map )
 			envColourS = mix( envColourS.xyz, ssrReflection.xyz, ssrReflection.w );
-		@end @property( !use_envprobe_map && !ambient_hemisphere )
+		@end @property( !use_envprobe_map )
 			float3 envColourS = ssrReflection.xyz * ssrReflection.w;
 			float3 envColourD = float3( 0, 0, 0 );
 		@end
@@ -480,10 +482,10 @@ float4 diffuseCol;
 		float ambientWD = dot( pass.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( pass.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
-		@property( use_envprobe_map )
+		@property( use_envprobe_map || hlms_use_ssr )
 			envColourS	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			envColourD	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
-		@end @property( !use_envprobe_map )
+		@end @property( !use_envprobe_map && !hlms_use_ssr )
 			float3 envColourS = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			float3 envColourD = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
 		@end
@@ -518,7 +520,7 @@ float4 diffuseCol;
 	@property( hlms_pssm_splits )
 		outPs.shadowRoughness	= float2( fShadow, (ROUGHNESS - 0.02) * 1.02040816 );
 	@end @property( !hlms_pssm_splits )
-		outPs.sShadowRoughness	= float2( 1.0, (ROUGHNESS - 0.02) * 1.02040816 );
+		outPs.shadowRoughness	= float2( 1.0, (ROUGHNESS - 0.02) * 1.02040816 );
 	@end
 @end
 
