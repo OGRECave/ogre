@@ -126,7 +126,7 @@ namespace Ogre
             size_t          offset;
             //size_t          sizeBytes;
 
-            Uav() : textureName( 0 ), buffer( 0 ) {}
+            Uav() : textureName( 0 ), buffer( 0 ), offset( 0 ) {}
         };
 
         Uav             mUavs[64];
