@@ -184,7 +184,11 @@ namespace Ogre {
             GLintptr    offset;
             GLsizeiptr  sizeBytes;
 
-            Uav() : dirty( false ) {}
+            Uav() :
+                dirty( false ), textureName( 0 ), mipmap( 0 ),
+                isArrayTexture( GL_FALSE ), arrayIndex( 0 ),
+                access( GL_READ_ONLY ), format( GL_RGBA8 ), buffer( 0 ),
+                offset( 0 ), sizeBytes( 0 ) {}
         };
 
         GLuint  mNullColourFramebuffer;
