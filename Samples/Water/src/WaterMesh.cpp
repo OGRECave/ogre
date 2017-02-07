@@ -163,7 +163,7 @@ WaterMesh::~WaterMesh ()
 
     delete[] vNormals;
 
-    MeshManager::getSingleton().remove(meshName);
+    MeshManager::getSingleton().remove(meshName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 /* ========================================================================= */
 void WaterMesh::push(Real x, Real y, Real depth, bool absolute)

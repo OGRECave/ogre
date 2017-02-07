@@ -144,7 +144,7 @@ protected:
     
     void cleanupContent()
     {
-        TextureManager::getSingleton().remove("TextureArrayTex");
+        TextureManager::getSingleton().remove("TextureArrayTex", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 };
 

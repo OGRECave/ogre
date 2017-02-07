@@ -489,7 +489,7 @@ namespace OgreBites
             {
                 for (unsigned int i = 0; i < mThumbs.size(); i++)    // destroy all thumbnails in carousel
                 {
-                    Ogre::MaterialManager::getSingleton().remove(mThumbs[i]->getName());
+                    Ogre::MaterialManager::getSingleton().remove(mThumbs[i]->getName(), "Essential");
                     Widget::nukeOverlayElement(mThumbs[i]);
                 }
                 mThumbs.clear();

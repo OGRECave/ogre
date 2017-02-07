@@ -72,16 +72,16 @@ namespace Ogre
         {
             Technique *technique = *it;
 
-            if( !technique->getShadowCasterMaterial().isNull() )
-                MaterialManager::getSingleton().remove( technique->getShadowCasterMaterial()->getName() );
+            if (!technique->getShadowCasterMaterial().isNull())
+                MaterialManager::getSingleton().remove( technique->getShadowCasterMaterial() );
         }
 
         //Remove cloned material
-        MaterialManager::getSingleton().remove( mMaterial->getName() );
+        MaterialManager::getSingleton().remove( mMaterial );
 
         //Remove the VTF texture
         if( !mMatrixTexture.isNull() )
-            TextureManager::getSingleton().remove( mMatrixTexture->getName() );
+            TextureManager::getSingleton().remove( mMatrixTexture );
 
         OGRE_FREE(mTempTransformsArray3x4, MEMCATEGORY_GENERAL);
     }

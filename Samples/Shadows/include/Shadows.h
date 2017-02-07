@@ -395,7 +395,7 @@ protected:
     {
         ControllerManager::getSingleton().destroyController(mController);
 
-        MeshManager::getSingleton().remove("Myplane");
+        MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         pColumns.clear();
     }

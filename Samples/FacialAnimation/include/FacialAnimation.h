@@ -112,7 +112,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
         mManualAnimState = 0;
         mManualKeyFrame = 0;
         mPlayAnimation = false;
-        MeshManager::getSingleton().unload(mHeadMesh->getHandle());
+        mHeadMesh->unload();
     }
 
     void checkBoxToggled(OgreBites::CheckBox * box)

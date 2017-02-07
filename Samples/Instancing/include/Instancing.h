@@ -444,7 +444,7 @@ protected:
     {
         mSceneMgr->destroyAllInstancedGeometry();
         mSceneMgr->destroyAllStaticGeometry();
-        MeshManager::getSingleton().remove("Myplane");
+        MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         destroyCurrentGeomOpt();
         delete mTimer;
     }

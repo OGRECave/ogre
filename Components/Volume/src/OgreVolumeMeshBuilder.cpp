@@ -186,7 +186,7 @@ namespace Volume {
             manual->end();
             StringStream meshName;
             meshName << name << "ManualObject";
-            MeshManager::getSingleton().remove(meshName.str());
+            MeshManager::getSingleton().remove(meshName.str(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             manual->convertToMesh(meshName.str());
             return sceneManager->createEntity(name, meshName.str());
     }

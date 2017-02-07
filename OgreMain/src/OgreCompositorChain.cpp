@@ -72,7 +72,7 @@ void CompositorChain::destroyResources(void)
         destroyOriginalScene();
 
         // destory base "original scene" compositor
-        CompositorManager::getSingleton().remove(getCompositorName());
+        CompositorManager::getSingleton().remove(getCompositorName(), ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 
         mViewport = 0;
     }

@@ -544,8 +544,9 @@ void ProgramManager::destroyGpuProgram(GpuProgramPtr& gpuProgram)
     ResourcePtr res           = HighLevelGpuProgramManager::getSingleton().getByName(programName);  
 
     if (res.isNull() == false)
-    {       
-        HighLevelGpuProgramManager::getSingleton().remove(programName);
+    {
+        HighLevelGpuProgramManager::getSingleton().remove(
+            programName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
     }
 }
 

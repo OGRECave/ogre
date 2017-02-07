@@ -450,7 +450,7 @@ void Sample_NewInstancing::destroyManagers()
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::cleanupContent()
 {
-    MeshManager::getSingleton().remove("ground");
+    MeshManager::getSingleton().remove("ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     clearScene();
     destroyManagers();
 }

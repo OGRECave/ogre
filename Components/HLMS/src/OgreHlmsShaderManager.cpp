@@ -51,8 +51,8 @@ namespace Ogre
 		for (; it != endIt; ++it)
 		{
 			GpuProgramPtr gpuPrg = it->second;
-			HighLevelGpuProgramManager::getSingleton().unload(gpuPrg->getName());
-			HighLevelGpuProgramManager::getSingleton().remove(gpuPrg->getName());
+			gpuPrg->unload();
+			HighLevelGpuProgramManager::getSingleton().remove(gpuPrg);
 			gpuPrg.setNull();
 		}
 		mShaderCache.clear();

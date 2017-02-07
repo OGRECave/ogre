@@ -469,7 +469,7 @@ namespace Ogre {
 				 )
 			{
 				// Create a high-level program, give it the same name as us
-                HighLevelGpuProgramManager::getSingleton().remove(mName);
+                HighLevelGpuProgramManager::getSingleton().remove(mName, mGroup);
 				HighLevelGpuProgramPtr vp = 
 					HighLevelGpuProgramManager::getSingleton().createProgram(
 					mName, mGroup, "hlsl", mType);

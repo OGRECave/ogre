@@ -84,7 +84,7 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
 
     void cleanupContent()
     {
-        MeshManager::getSingleton().remove(mTetrahedraMesh->getName());
+        MeshManager::getSingleton().remove(mTetrahedraMesh->getName(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     bool frameRenderingQueued(const FrameEvent& evt)

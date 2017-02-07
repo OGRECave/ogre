@@ -155,7 +155,9 @@ namespace Ogre {
         bool newMaterialCreated = false;
         // if submesh has texture aliases
         // ask the material manager if the current summesh material exists
-        if (hasTextureAliases() && MaterialManager::getSingleton().resourceExists(mMaterialName))
+        if (hasTextureAliases() &&
+            MaterialManager::getSingleton().resourceExists(
+                mMaterialName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
         {
             // get the current submesh material
             MaterialPtr material = MaterialManager::getSingleton().getByName( mMaterialName );
@@ -189,7 +191,7 @@ namespace Ogre {
                     
                 // Reuse the material if it's already been created. This decreases batch
                 // count and keeps material explosion under control.
-                if(!MaterialManager::getSingleton().resourceExists(newMaterialName))
+                if(!MaterialManager::getSingleton().resourceExists(newMaterialName, material->getGroup()))
                 {
                     Ogre::MaterialPtr newMaterial = Ogre::MaterialManager::getSingleton().create(
                         newMaterialName, material->getGroup());

@@ -668,7 +668,7 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
     OGRE_LOCK_AUTO_MUTEX;
 
     // Make sure material exists;
-    if (false == MaterialManager::getSingleton().resourceExists(materialName))
+    if (false == MaterialManager::getSingleton().resourceExists(materialName, groupName))
         return false;
 
     
@@ -1705,7 +1705,7 @@ ShaderGenerator::SGTechnique::~SGTechnique()
     const String& materialName = mParent->getMaterialName();
     const String& groupName = mParent->getGroupName();
 
-    if (MaterialManager::getSingleton().resourceExists(materialName))
+    if (MaterialManager::getSingleton().resourceExists(materialName, groupName))
     {
         MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
     

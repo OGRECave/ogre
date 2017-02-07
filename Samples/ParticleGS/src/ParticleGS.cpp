@@ -175,7 +175,7 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         OGRE_DELETE mProceduralManualObjectFactory;
         mProceduralManualObjectFactory = 0;
 
-        MeshManager::getSingleton().remove("Myplane");
+        MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     bool frameStarted(const FrameEvent& evt)

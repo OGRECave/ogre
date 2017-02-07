@@ -187,7 +187,12 @@ namespace Ogre {
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
         */
-        virtual void unload(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        virtual void
+#if OGRE_RESOURCEMANAGER_STRICT
+        unload(const String& name, const String& group);
+#else
+        unload(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
         
         /** Unloads a single resource by handle.
         @remarks
@@ -301,7 +306,13 @@ namespace Ogre {
         void remove(const ResourcePtr& r);
 
         /// @overload
-        void remove(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        void
+#if OGRE_RESOURCEMANAGER_STRICT
+        remove(const String& name, const String& group);
+
+#else
+        remove(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
         
         /// @overload
         void remove(ResourceHandle handle);
@@ -339,13 +350,23 @@ namespace Ogre {
 
         /** Retrieves a pointer to a resource by name, or null if the resource does not exist.
         */
-        virtual ResourcePtr getResourceByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        virtual ResourcePtr
+#if OGRE_RESOURCEMANAGER_STRICT
+        getResourceByName(const String& name, const String& groupName);
+#else
+        getResourceByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
         /** Retrieves a pointer to a resource by handle, or null if the resource does not exist.
         */
         virtual ResourcePtr getByHandle(ResourceHandle handle);
         
         /// Returns whether the named resource exists in this manager
-        bool resourceExists(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+        bool
+#if OGRE_RESOURCEMANAGER_STRICT
+        resourceExists(const String& name, const String& group)
+#else
+        resourceExists(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+#endif
         {
             return getResourceByName(name, group);
         }
