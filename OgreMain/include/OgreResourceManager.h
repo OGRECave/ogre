@@ -187,7 +187,7 @@ namespace Ogre {
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
         */
-        virtual void
+        void
 #if OGRE_RESOURCEMANAGER_STRICT
         unload(const String& name, const String& group);
 #else
@@ -200,7 +200,7 @@ namespace Ogre {
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
         */
-        virtual void unload(ResourceHandle handle);
+        void unload(ResourceHandle handle);
 
         /** Unloads all resources.
         @remarks
