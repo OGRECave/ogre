@@ -376,7 +376,7 @@ namespace Ogre
     void Terra::update( const Vector3 &lightDir, float lightEpsilon )
     {
         const float lightCosAngleChange = Math::Clamp(
-                    m_prevLightDir.dotProduct( lightDir.normalisedCopy() ), -1.0f, 1.0f );
+                    (float)m_prevLightDir.dotProduct( lightDir.normalisedCopy() ), -1.0f, 1.0f );
         if( lightCosAngleChange <= (1.0f - lightEpsilon) )
         {
             m_shadowMapper->updateShadowMap( lightDir, m_xzDimensions, m_height );
