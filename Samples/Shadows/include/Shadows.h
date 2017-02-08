@@ -215,8 +215,8 @@ protected:
         // do this first so we generate edge lists
         if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_HWSTENCIL))
         {
-            mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
-            mCurrentShadowTechnique = SHADOWTYPE_STENCIL_ADDITIVE;
+            mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
+            mCurrentShadowTechnique = SHADOWTYPE_STENCIL_MODULATIVE;
         }
         else
         {
@@ -497,7 +497,7 @@ protected:
             TL_TOPLEFT, "LightingSelectMenu", "Lighting", 300, 200, 5);
         mLightingMenu->addItem("Additive");
         mLightingMenu->addItem("Modulative");
-        if(mCurrentShadowTechnique & SHADOWTYPE_STENCIL_ADDITIVE)
+        if(mCurrentShadowTechnique == SHADOWTYPE_STENCIL_ADDITIVE)
             mLightingMenu->selectItem("Additive", false);
         else
             mLightingMenu->selectItem("Modulative", false);
