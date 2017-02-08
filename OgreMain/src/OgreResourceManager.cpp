@@ -336,8 +336,7 @@ namespace Ogre {
         ResourcePtr res = getByHandle(handle);
 
 #if OGRE_RESOURCEMANAGER_STRICT
-        // FIXME: wrong shutdown sequence in Root triggers this
-        // OgreAssert(res, "attempting to remove unknown resource");
+        OgreAssert(res, "attempting to remove unknown resource");
 #endif
 
         if (!res.isNull())

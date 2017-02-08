@@ -292,8 +292,6 @@ namespace Ogre {
     Root::~Root()
     {
         shutdown();
-        OGRE_DELETE mSceneManagerEnum;
-        OGRE_DELETE mShadowTextureManager;
         OGRE_DELETE mRenderSystemCapabilitiesManager;
 
         destroyAllRenderQueueInvocationSequences();
@@ -1031,7 +1029,9 @@ namespace Ogre {
 
         SceneManagerEnumerator::getSingleton().shutdownAll();
         shutdownPlugins();
+        OGRE_DELETE mSceneManagerEnum;
 
+        OGRE_DELETE mShadowTextureManager;
         ShadowVolumeExtrudeProgram::shutdown();
         ResourceGroupManager::getSingleton().shutdownAll();
 
