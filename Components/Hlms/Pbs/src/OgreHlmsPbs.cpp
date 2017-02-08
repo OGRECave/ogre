@@ -388,10 +388,10 @@ namespace Ogre
                 hasNormalMaps = true;
             }
 
-            if( datablock->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
+            if( datablock->getDetailMapOffsetScale( i ) != Vector4( 0, 0, 1, 1 ) )
                 setProperty( *PbsProperty::DetailOffsetsDPtrs[i], 1 );
 
-            if( datablock->mDetailsOffsetScale[i+4] != Vector4( 0, 0, 1, 1 ) )
+            if( datablock->getDetailMapOffsetScale( i+4 ) != Vector4( 0, 0, 1, 1 ) )
                 setProperty( *PbsProperty::DetailOffsetsNPtrs[i], 1 );
 
             if( datablock->mDetailWeight[i] != 1.0f &&

@@ -82,7 +82,12 @@ namespace Ogre
         mDetailNormalWeight[2] = mDetailNormalWeight[3] = 1.0f;
         mDetailWeight[0] = mDetailWeight[1] = mDetailWeight[2] = mDetailWeight[3] = 1.0f;
         for( size_t i=0; i<8; ++i )
-            mDetailsOffsetScale[i] = Vector4( 0, 0, 1, 1 );
+        {
+            mDetailsOffsetScale[i][0] = 0;
+            mDetailsOffsetScale[i][1] = 0;
+            mDetailsOffsetScale[i][2] = 1;
+            mDetailsOffsetScale[i][3] = 1;
+        }
 
         memset( mTexIndices, 0, sizeof( mTexIndices ) );
         memset( mSamplerblocks, 0, sizeof( mSamplerblocks ) );
@@ -252,15 +257,23 @@ namespace Ogre
             key = "detail_offset_scale" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
-                mDetailsOffsetScale[i] = StringConverter::parseVector4( paramVal,
-                                                                        mDetailsOffsetScale[i] );
+                Vector4 offsetScale = StringConverter::parseVector4( paramVal,
+                                                                     getDetailMapOffsetScale( i ) );
+                mDetailsOffsetScale[i][0] = static_cast<float>( offsetScale[0] );
+                mDetailsOffsetScale[i][1] = static_cast<float>( offsetScale[1] );
+                mDetailsOffsetScale[i][2] = static_cast<float>( offsetScale[2] );
+                mDetailsOffsetScale[i][3] = static_cast<float>( offsetScale[3] );
             }
 
             key = "detail_normal_offset_scale" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
-                mDetailsOffsetScale[i+4] = StringConverter::parseVector4( paramVal,
-                                                                          mDetailsOffsetScale[i+4] );
+                Vector4 offsetScale = StringConverter::parseVector4( paramVal,
+                                                                     getDetailMapOffsetScale( i+4 ) );
+                mDetailsOffsetScale[i+4][0] = static_cast<float>( offsetScale[0] );
+                mDetailsOffsetScale[i+4][1] = static_cast<float>( offsetScale[1] );
+                mDetailsOffsetScale[i+4][2] = static_cast<float>( offsetScale[2] );
+                mDetailsOffsetScale[i+4][3] = static_cast<float>( offsetScale[3] );
             }
 
             key = "uv_detail_map" + StringConverter::toString( i );
@@ -844,11 +857,14 @@ namespace Ogre
     void HlmsPbsDatablock::setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale )
     {
         assert( detailMap < 8 );
-        bool wasDisabled = mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 );
+        bool wasDisabled = getDetailMapOffsetScale( detailMap ) == Vector4( 0, 0, 1, 1 );
 
-        mDetailsOffsetScale[detailMap] = offsetScale;
+        mDetailsOffsetScale[detailMap][0] = static_cast<float>( offsetScale[0] );
+        mDetailsOffsetScale[detailMap][1] = static_cast<float>( offsetScale[1] );
+        mDetailsOffsetScale[detailMap][2] = static_cast<float>( offsetScale[2] );
+        mDetailsOffsetScale[detailMap][3] = static_cast<float>( offsetScale[3] );
 
-        if( wasDisabled != (mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 )) )
+        if( wasDisabled != (getDetailMapOffsetScale( detailMap ) == Vector4( 0, 0, 1, 1 )) )
         {
             flushRenderables();
         }
@@ -859,7 +875,8 @@ namespace Ogre
     const Vector4& HlmsPbsDatablock::getDetailMapOffsetScale( uint8 detailMap ) const
     {
         assert( detailMap < 8 );
-        return mDetailsOffsetScale[detailMap];
+        return Vector4( mDetailsOffsetScale[detailMap][0], mDetailsOffsetScale[detailMap][1],
+                        mDetailsOffsetScale[detailMap][2], mDetailsOffsetScale[detailMap][3] );
     }
     //-----------------------------------------------------------------------------------
     uint8 HlmsPbsDatablock::getBakedTextureIdx( PbsTextureTypes texType ) const
