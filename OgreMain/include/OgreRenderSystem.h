@@ -760,8 +760,9 @@ namespace Ogre
         /** @overload
         @param texname The name of the texture to use - this should have
         already been loaded with TextureManager::load.
+        @deprecated do not use
         */
-        virtual void _setTexture(size_t unit, bool enabled, const String &texname);
+        OGRE_DEPRECATED virtual void _setTexture(size_t unit, bool enabled, const String &texname);
 
         /** Binds a texture to a vertex, geometry, compute, tesselation hull
         or tessellation domain sampler.
