@@ -72,7 +72,12 @@ namespace Ogre
         Real getSpaceWidth() const;
 
         void setFontName( const String& font );
-        const String& getFontName() const;
+        /// @deprecated use getFont()
+        OGRE_DEPRECATED const String& getFontName() const;
+
+        const FontPtr& getFont() const {
+            return mFont;
+        }
 
         /** See OverlayElement. */
         virtual const String& getTypeName(void) const;

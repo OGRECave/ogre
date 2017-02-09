@@ -315,15 +315,15 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const String& OverlayElement::getMaterialName(void) const
     {
-        return mMaterialName;
+        return mMaterial ? mMaterial->getName() : BLANKSTRING;
     }
     //---------------------------------------------------------------------
     void OverlayElement::setMaterialName(const String& matName)
     {
-        mMaterialName = matName;
         if (matName != BLANKSTRING)
         {
-            mMaterial = MaterialManager::getSingleton().getByName(matName);
+            mMaterial = MaterialManager::getSingleton().getByName(
+                matName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
             if (!mMaterial)
                 OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + matName,
                     "OverlayElement::setMaterialName" );

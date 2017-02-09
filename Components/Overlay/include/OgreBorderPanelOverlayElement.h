@@ -275,7 +275,6 @@ namespace Ogre {
         ushort mPixelTopBorderSize;
         ushort mPixelBottomBorderSize;
 
-        String mBorderMaterialName;
         MaterialPtr mBorderMaterial;
 
         /// Render operation for the border area

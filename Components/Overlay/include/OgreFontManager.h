@@ -56,8 +56,12 @@ namespace Ogre
 
         /// Get a resource by name
         /// @see ResourceManager::getResourceByName
-        FontPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-
+        FontPtr
+#if OGRE_RESOURCEMANAGER_STRICT
+        getByName(const String& name, const String& groupName);
+#else
+        getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
 
         /** @copydoc ScriptLoader::parseScript */
         void parseScript(DataStreamPtr& stream, const String& groupName);
