@@ -540,13 +540,11 @@ void ProgramManager::removeProgramProcessor(ProgramProcessor* processor)
 //-----------------------------------------------------------------------------
 void ProgramManager::destroyGpuProgram(GpuProgramPtr& gpuProgram)
 {       
-    const String& programName = gpuProgram->getName();
-    ResourcePtr res           = HighLevelGpuProgramManager::getSingleton().getByName(programName);  
+    HighLevelGpuProgramPtr res           = dynamic_pointer_cast<HighLevelGpuProgram>(gpuProgram);
 
     if (res)
     {
-        HighLevelGpuProgramManager::getSingleton().remove(
-            programName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+        HighLevelGpuProgramManager::getSingleton().remove(res);
     }
 }
 

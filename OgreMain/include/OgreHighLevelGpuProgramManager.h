@@ -101,7 +101,12 @@ namespace Ogre {
 
         /// Get a resource by name
         /// @see ResourceManager::getResourceByName
-        HighLevelGpuProgramPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        HighLevelGpuProgramPtr
+#if OGRE_RESOURCEMANAGER_STRICT
+        getByName(const String& name, const String& groupName);
+#else
+        getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
 
         /** Create a new, unloaded HighLevelGpuProgram. 
         @par
