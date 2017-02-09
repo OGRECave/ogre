@@ -128,7 +128,7 @@ namespace Ogre {
     {
         if (mVertexData)
             OGRE_DELETE mVertexData;
-        mIndexes.setNull();
+        mIndexes.reset();
         if (mFaceGroups)
             OGRE_DELETE_ARRAY_T(mFaceGroups, StaticFaceGroup, (size_t)mNumFaceGroups, MEMCATEGORY_GEOMETRY);
         if (mLeafFaceGroups)
@@ -281,7 +281,7 @@ namespace Ogre {
         // Copy the indexes into a software area for staging
         mNumIndexes = q3lvl.mNumElements + mPatchIndexCount;
         // Create an index buffer manually in system memory, allow space for patches
-        mIndexes.bind(OGRE_NEW DefaultHardwareIndexBuffer(
+        mIndexes.reset(OGRE_NEW DefaultHardwareIndexBuffer(
             HardwareIndexBuffer::IT_32BIT, 
             mNumIndexes, 
             HardwareBuffer::HBU_DYNAMIC));
@@ -346,7 +346,7 @@ namespace Ogre {
             shaderName = tmp.str();
 
             MaterialPtr shadMat = MaterialManager::getSingleton().getByName(shaderName);
-            if (shadMat.isNull())
+            if (!shadMat)
             {
                 // Build new material
 

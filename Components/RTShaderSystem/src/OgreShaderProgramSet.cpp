@@ -51,8 +51,8 @@ ProgramSet::~ProgramSet()
         mPSCpuProgram = NULL;
     }
                 
-    mVSGpuProgram.setNull();                    
-    mPSGpuProgram.setNull();    
+    mVSGpuProgram.reset();                    
+    mPSGpuProgram.reset();    
 }
 
 //-----------------------------------------------------------------------------

@@ -353,7 +353,7 @@ namespace Ogre {
 
     /** Returns true if default parameters have been set up.
      */
-    virtual bool hasDefaultParameters(void) const { return !mDefaultParams.isNull(); }
+    virtual bool hasDefaultParameters(void) const { return mDefaultParams; }
 
     /** Returns whether a vertex program wants light and material states to be passed
         through fixed pipeline low level API rendering calls (default false, subclasses can override)

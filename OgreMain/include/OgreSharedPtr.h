@@ -274,7 +274,7 @@ namespace Ogre {
 
             @deprecated this api will be dropped. use reset(T*) instead
         */
-        void bind(T* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) {
+        OGRE_DEPRECATED void bind(T* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) {
             assert(!pRep && !pInfo);
             pInfo = createInfoForMethod(rep, inFreeMethod);
             pRep = rep;
@@ -283,15 +283,15 @@ namespace Ogre {
         inline bool unique() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get() == 1; }
 
         /// @deprecated use use_count() instead
-        unsigned int useCount() const { return use_count(); }
+        OGRE_DEPRECATED unsigned int useCount() const { return use_count(); }
 
         unsigned int use_count() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get(); }
 
         /// @deprecated this API will be dropped
-        void setUseCount(unsigned value) { assert(pInfo); pInfo->useCount = value; }
+        OGRE_DEPRECATED void setUseCount(unsigned value) { assert(pInfo); pInfo->useCount = value; }
 
         /// @deprecated use get() instead
-        T* getPointer() const { return pRep; }
+        OGRE_DEPRECATED T* getPointer() const { return pRep; }
 
         static void unspecified_bool( SharedPtr*** )
         {
@@ -305,10 +305,10 @@ namespace Ogre {
         }
 
         /// @deprecated use SharedPtr::operator unspecified_bool_type() instead
-        bool isNull(void) const { return pRep == 0; }
+        OGRE_DEPRECATED bool isNull(void) const { return pRep == 0; }
 
         /// @deprecated use reset() instead
-        void setNull() { reset(); }
+        OGRE_DEPRECATED void setNull() { reset(); }
 
         void reset(void) {
             release();

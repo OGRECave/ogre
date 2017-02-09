@@ -61,7 +61,7 @@ namespace Ogre
         if(mMeshReference->sharedVertexData)
             unshareVertices(mMeshReference);
 
-        if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+        if( mMeshReference->hasSkeleton() && mMeshReference->getSkeleton() )
             mMeshReference->getSubMesh(mSubMeshIdx)->_compileBoneAssignments();
     }
                 
@@ -127,7 +127,7 @@ namespace Ogre
         InstanceBatch *batch = 0;
 
         //Base material couldn't be found
-        if( mat.isNull() )
+        if( !mat )
             return 0;
 
         switch( mInstancingTechnique )

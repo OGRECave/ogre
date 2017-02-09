@@ -89,7 +89,7 @@ namespace Ogre
             {
                 const TexturePtr& tex = *t;
                 // Skip if already used this one
-                if (usedTextures.find(tex.getPointer()) != usedTextures.end())
+                if (usedTextures.find(tex.get()) != usedTextures.end())
                     continue;
 
                 if (config.width == tex->getWidth() && config.height == tex->getHeight()
@@ -97,7 +97,7 @@ namespace Ogre
                 {
                     // Ok, a match
                     listToPopulate.push_back(tex);
-                    usedTextures.insert(tex.getPointer());
+                    usedTextures.insert(tex.get());
                     found = true;
                     break;
                 }
@@ -115,7 +115,7 @@ namespace Ogre
                 // Ensure texture loaded
                 shadowTex->load();
                 listToPopulate.push_back(shadowTex);
-                usedTextures.insert(shadowTex.getPointer());
+                usedTextures.insert(shadowTex.get());
                 mTextureList.push_back(shadowTex);
             }
         }
@@ -165,7 +165,7 @@ namespace Ogre
             // Unreferenced if only this reference and the resource system
             // Any cached shadow textures should be re-bound each frame dropping
             // any old references
-            if ((*i).useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+            if ((*i).use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
             {
                 TextureManager::getSingleton().remove((*i)->getHandle());
                 i = mTextureList.erase(i);
@@ -180,7 +180,7 @@ namespace Ogre
             // Unreferenced if only this reference and the resource system
             // Any cached shadow textures should be re-bound each frame dropping
             // any old references
-            if ((*i).useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+            if ((*i).use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
             {
                 TextureManager::getSingleton().remove((*i)->getHandle());
                 i = mNullTextureList.erase(i);

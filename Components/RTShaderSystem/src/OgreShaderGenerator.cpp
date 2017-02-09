@@ -712,7 +712,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
     // Make sure material exists.
     MaterialPtr srcMat = MaterialManager::getSingleton().getByName(materialName, groupName);
-    if (srcMat.isNull() == true)
+    if (!srcMat)
         return false;
 
     // Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
@@ -907,7 +907,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
     // Make sure material exists.
     MaterialPtr srcMat = MaterialManager::getSingleton().getByName(srcMaterialName, srcGroupName);
     MaterialPtr dstMat = MaterialManager::getSingleton().getByName(dstMaterialName, dstGroupName);
-    if ((srcMat.isNull() == true) || (dstMat.isNull() == true) || (srcMat == dstMat))
+    if (!srcMat || !dstMat || (srcMat == dstMat))
         return false;
 
     // Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME

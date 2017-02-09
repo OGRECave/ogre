@@ -46,15 +46,15 @@ Function::~Function()
     mAtomInstances.clear();
 
     for (ShaderParameterIterator it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
-        (*it).setNull();
+        (*it).reset();
     mInputParameters.clear();
 
     for (ShaderParameterIterator it = mOutputParameters.begin(); it != mOutputParameters.end(); ++it)
-        (*it).setNull();
+        (*it).reset();
     mOutputParameters.clear();
 
     for (ShaderParameterIterator it = mLocalParameters.begin(); it != mLocalParameters.end(); ++it)
-        (*it).setNull();
+        (*it).reset();
     mLocalParameters.clear();
 
 }
@@ -390,7 +390,7 @@ void Function::deleteParameter(ShaderParameterList& parameterList, ParameterPtr 
     {
         if (*it == parameter)
         {
-            (*it).setNull();
+            (*it).reset();
             parameterList.erase(it);
             break;
         }

@@ -81,7 +81,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MaterialManager::~MaterialManager()
     {
-        mDefaultSettings.setNull();
+        mDefaultSettings.reset();
         // Resources cleared by superclass
         // Unregister with resource group manager
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);

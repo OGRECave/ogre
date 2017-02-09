@@ -903,7 +903,7 @@ namespace Ogre
 
 		PiecesMap pieces;
 
-		if (!pieceFiles.isNull())
+		if (pieceFiles)
 		{
 			//Collect pieces
 			StringVector::iterator itor = pieceFiles->begin();

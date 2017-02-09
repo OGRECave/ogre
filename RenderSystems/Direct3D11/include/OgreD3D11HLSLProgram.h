@@ -171,11 +171,11 @@ namespace Ogre {
             mutable ShaderVars mShaderVars;
                 
             // Default constructor
-            BufferInfo() : mIdx(0), mName("") { mUniformBuffer.setNull(); }
+            BufferInfo() : mIdx(0), mName("") { mUniformBuffer.reset(); }
             BufferInfo(unsigned int index, const String& name)
                 : mIdx(index), mName(name)
             {
-                mUniformBuffer.setNull();
+                mUniformBuffer.reset();
             }
             
             // Copy constructor

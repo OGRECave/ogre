@@ -74,7 +74,7 @@ namespace Ogre {
         {
             OGRE_LOCK_AUTO_MUTEX;
             prg = getByName(name, groupName);
-            if (prg.isNull())
+            if (!prg)
             {
                 prg = createProgram(name, groupName, filename, gptype, syntaxCode);
             }
@@ -92,7 +92,7 @@ namespace Ogre {
         {
                     OGRE_LOCK_AUTO_MUTEX;
             prg = getByName(name, groupName);
-            if (prg.isNull())
+            if (!prg)
             {
                 prg = createProgramFromString(name, groupName, code, gptype, syntaxCode);
             }
@@ -165,7 +165,7 @@ namespace Ogre {
         if (preferHighLevelPrograms)
         {
             ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name, group);
-            if (!ret.isNull())
+            if (ret)
                 return ret;
         }
         return ResourceManager::getResourceByName(name, group);

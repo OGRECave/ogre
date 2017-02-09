@@ -409,7 +409,7 @@ namespace Ogre {
             
             for(size_t i = 0; i < mSurfaceList.size(); i++)
             {
-                static_cast<GLES2TextureBuffer*>(mSurfaceList[i].getPointer())->updateTextureId(mTextureID);
+                static_cast<GLES2TextureBuffer*>(mSurfaceList[i].get())->updateTextureId(mTextureID);
             }
             
             if (mLoader)

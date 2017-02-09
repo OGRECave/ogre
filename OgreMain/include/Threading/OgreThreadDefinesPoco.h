@@ -56,8 +56,8 @@ THE SOFTWARE
 #define OGRE_THREAD_POINTER_INIT(var) var()
 #define OGRE_THREAD_POINTER_VAR(T, var) Poco::ThreadLocal<SharedPtr<T> > var
 #define OGRE_THREAD_POINTER_GET(var) var.get().get()
-#define OGRE_THREAD_POINTER_SET(var, expr) do { var.get().setNull(); var.get().bind(expr); } while (0)
-#define OGRE_THREAD_POINTER_DELETE(var) var.get().setNull()
+#define OGRE_THREAD_POINTER_SET(var, expr) do { var.get().reset(); var.get().bind(expr); } while (0)
+#define OGRE_THREAD_POINTER_DELETE(var) var.get().reset()
 // Thread objects and related functions
 #define OGRE_THREAD_TYPE Poco::Thread
 #define OGRE_THREAD_CREATE(name, worker) Poco::Thread* name = OGRE_NEW_T(Poco::Thread, MEMCATEGORY_GENERAL)(); name->start(worker)

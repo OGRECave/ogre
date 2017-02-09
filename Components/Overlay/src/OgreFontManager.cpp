@@ -105,7 +105,7 @@ namespace Ogre
             }
             else
             {
-                if (pFont.isNull())
+                if (!pFont)
                 {
                     // No current font
                     // So first valid data should be font name
@@ -125,7 +125,7 @@ namespace Ogre
                     if (line == "}")
                     {
                         // Finished 
-                        pFont.setNull();
+                        pFont.reset();
                         // NB font isn't loaded until required
                     }
                     else

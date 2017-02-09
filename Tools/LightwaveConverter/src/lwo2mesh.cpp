@@ -139,7 +139,7 @@ void Lwo2MeshWriter::doExportMaterials()
         // Create deferred material so no load
         MaterialPtr ogreMat = MaterialManager::getSingleton().getByName(surface->name);
         
-        if (ogreMat.isNull())
+        if (!ogreMat)
         {
             ogreMat = MaterialManager::getSingleton().create(surface->name, 
                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -306,7 +306,7 @@ Skeleton *Lwo2MeshWriter::doExportSkeleton(const String &skelName, int l)
 
     return ogreskel;
 */
-    if (!ogreskel.isNull())
+    if (ogreskel)
         Ogre::SkeletonManager::getSingleton().remove(ogreskel->getHandle());
 
     return NULL;
@@ -745,7 +745,7 @@ bool Lwo2MeshWriter::writeLwo2Mesh(lwObject *nobject, char *ndest)
         
         try
         {
-            meshserializer.exportMesh(ogreMesh.getPointer(), fname);
+            meshserializer.exportMesh(ogreMesh.get(), fname);
         }
         catch (...)
         {

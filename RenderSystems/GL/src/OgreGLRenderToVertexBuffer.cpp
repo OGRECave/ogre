@@ -109,8 +109,8 @@ namespace Ogre {
 //-----------------------------------------------------------------------------
     GLRenderToVertexBuffer::GLRenderToVertexBuffer() : mFrontBufferIndex(-1)
     {
-        mVertexBuffers[0].setNull();
-        mVertexBuffers[1].setNull();
+        mVertexBuffers[0].reset();
+        mVertexBuffers[1].reset();
 
          // create query objects
         glGenQueries(1, &mPrimitivesDrawnQuery);
@@ -134,7 +134,7 @@ namespace Ogre {
         checkGLError(true, false, "start of GLRenderToVertexBuffer::update");
 
         size_t bufSize = mVertexData->vertexDeclaration->getVertexSize(0) * mMaxVertexCount;
-        if (mVertexBuffers[0].isNull() || mVertexBuffers[0]->getSizeInBytes() != bufSize)
+        if (!mVertexBuffers[0] || mVertexBuffers[0]->getSizeInBytes() != bufSize)
         {
             //Buffers don't match. Need to reallocate.
             mResetRequested = true;
@@ -164,13 +164,13 @@ namespace Ogre {
             targetBufferIndex = 1 - mFrontBufferIndex;
         }
 
-        if (mVertexBuffers[targetBufferIndex].isNull() || 
+        if (!mVertexBuffers[targetBufferIndex] || 
             mVertexBuffers[targetBufferIndex]->getSizeInBytes() != bufSize)
         {
             reallocateBuffer(targetBufferIndex);
         }
 
-        GLHardwareVertexBuffer* vertexBuffer = static_cast<GLHardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].getPointer());
+        GLHardwareVertexBuffer* vertexBuffer = static_cast<GLHardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
         GLuint bufferId = vertexBuffer->getGLBufferId();
 
         //Bind the target buffer
@@ -228,9 +228,9 @@ namespace Ogre {
     void GLRenderToVertexBuffer::reallocateBuffer(size_t index)
     {
         assert(index == 0 || index == 1);
-        if (!mVertexBuffers[index].isNull())
+        if (mVertexBuffers[index])
         {
-            mVertexBuffers[index].setNull();
+            mVertexBuffers[index].reset();
         }
         
         mVertexBuffers[index] = HardwareBufferManager::getSingleton().createVertexBuffer(
@@ -295,11 +295,11 @@ namespace Ogre {
         GpuProgram* sampleProgram = 0;
         if (pass->hasVertexProgram())
         {
-            sampleProgram = pass->getVertexProgram().getPointer();
+            sampleProgram = pass->getVertexProgram().get();
         }
         else if (pass->hasGeometryProgram())
         {
-            sampleProgram = pass->getGeometryProgram().getPointer();
+            sampleProgram = pass->getGeometryProgram().get();
         }
         if ((sampleProgram != 0) && (sampleProgram->getLanguage() == "glsl"))
         {

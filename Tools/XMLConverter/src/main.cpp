@@ -372,9 +372,9 @@ void meshToXML(XmlOptions opts)
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     
 
-    meshSerializer->importMesh(stream, mesh.getPointer());
+    meshSerializer->importMesh(stream, mesh.get());
    
-    xmlMeshSerializer->exportMesh(mesh.getPointer(), opts.dest);
+    xmlMeshSerializer->exportMesh(mesh.get(), opts.dest);
 
     // Clean up the conversion mesh
     MeshManager::getSingleton().remove("conversion",
@@ -405,7 +405,7 @@ void XMLToBinary(XmlOptions opts)
         else
             colourElementType = VET_COLOUR_ABGR;
 
-        xmlMeshSerializer->importMesh(opts.source, colourElementType, newMesh.getPointer());
+        xmlMeshSerializer->importMesh(opts.source, colourElementType, newMesh.get());
 
         // Re-jig the buffers?
         // Make sure animation types are up to date first
@@ -468,7 +468,7 @@ void XMLToBinary(XmlOptions opts)
             }
         }
 
-        meshSerializer->exportMesh(newMesh.getPointer(), opts.dest, opts.endian);
+        meshSerializer->exportMesh(newMesh.get(), opts.dest, opts.endian);
 
         // Clean up the conversion mesh
         MeshManager::getSingleton().remove("conversion",
@@ -479,12 +479,12 @@ void XMLToBinary(XmlOptions opts)
         delete doc;
         SkeletonPtr newSkel = SkeletonManager::getSingleton().create("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.getPointer());
+        xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.get());
         if (opts.optimiseAnimations)
         {
             newSkel->optimiseAllAnimations();
         }
-        skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
+        skeletonSerializer->exportSkeleton(newSkel.get(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
 
         // Clean up the conversion skeleton
         SkeletonManager::getSingleton().remove("conversion",
@@ -513,9 +513,9 @@ void skeletonToXML(XmlOptions opts)
 
     // pass false for freeOnClose to FileStreamDataStream since ifs is created locally on stack
     DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));
-    skeletonSerializer->importSkeleton(stream, skel.getPointer());
+    skeletonSerializer->importSkeleton(stream, skel.get());
    
-    xmlSkeletonSerializer->exportSkeleton(skel.getPointer(), opts.dest);
+    xmlSkeletonSerializer->exportSkeleton(skel.get(), opts.dest);
 
     // Clean up the conversion skeleton
     SkeletonManager::getSingleton().remove("conversion",

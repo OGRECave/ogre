@@ -43,7 +43,7 @@ namespace Ogre
         String progName = getVertexProgramName(prof, terrain, tt);
 
         HighLevelGpuProgramPtr ret = mgr.getByName(progName);
-        if (ret.isNull())
+        if (!ret)
         {
             ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
                 "hlsl", GPT_VERTEX_PROGRAM);
@@ -73,7 +73,7 @@ namespace Ogre
         String progName = getFragmentProgramName(prof, terrain, tt);
 
         HighLevelGpuProgramPtr ret = mgr.getByName(progName);
-        if (ret.isNull())
+        if (!ret)
         {
             ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
                 "hlsl", GPT_FRAGMENT_PROGRAM);

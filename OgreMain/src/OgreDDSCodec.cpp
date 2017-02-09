@@ -210,7 +210,7 @@ namespace Ogre {
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
         // Unwrap codecDataPtr - data is cleaned by calling function
-        ImageData* imgData = static_cast<ImageData* >(pData.getPointer());  
+        ImageData* imgData = static_cast<ImageData* >(pData.get());  
 
 
         // Check size for cube map faces
@@ -810,7 +810,7 @@ namespace Ogre {
             imgData->width, imgData->height, imgData->depth, imgData->format);
 
         // Bind output buffer
-        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        output.reset(OGRE_NEW MemoryDataStream(imgData->size));
 
 
         // Now deal with the data

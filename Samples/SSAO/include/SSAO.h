@@ -69,7 +69,7 @@ public:
 
     virtual ~SSAOGBufferSchemeHandler()
     {
-        mGBufRefMat.setNull();
+        mGBufRefMat.reset();
     }
 
     /** @copydoc MaterialManager::Listener::handleSchemeNotFound */

@@ -544,7 +544,7 @@ namespace Ogre {
                 }
 
                 // Special handling for shared parameters
-                if(sharedParams.isNull())
+                if(!sharedParams)
                 {
                     // Complete def and add
                     // increment physical buffer location

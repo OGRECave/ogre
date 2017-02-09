@@ -72,7 +72,7 @@ namespace Ogre
         {
             Technique *technique = *it;
 
-            if (!technique->getShadowCasterMaterial().isNull())
+            if (technique->getShadowCasterMaterial())
                 MaterialManager::getSingleton().remove( technique->getShadowCasterMaterial() );
         }
 
@@ -80,7 +80,7 @@ namespace Ogre
         MaterialManager::getSingleton().remove( mMaterial );
 
         //Remove the VTF texture
-        if( !mMatrixTexture.isNull() )
+        if( mMatrixTexture )
             TextureManager::getSingleton().remove( mMatrixTexture );
 
         OGRE_FREE(mTempTransformsArray3x4, MEMCATEGORY_GENERAL);
@@ -120,7 +120,7 @@ namespace Ogre
         {
             Technique *technique = *it;
 
-            if( !technique->getShadowCasterMaterial().isNull() )
+            if( technique->getShadowCasterMaterial() )
             {
                 const MaterialPtr &casterMat    = technique->getShadowCasterMaterial();
                 const String &casterName        = casterMat->getName();
@@ -229,7 +229,7 @@ namespace Ogre
                 }
             }
 
-            if( !technique->getShadowCasterMaterial().isNull() )
+            if( technique->getShadowCasterMaterial() )
             {
                 MaterialPtr matCaster = technique->getShadowCasterMaterial();
                 setupMaterialToUseVTF( textureType, matCaster );
@@ -515,7 +515,7 @@ namespace Ogre
 
         hwBoneIdx.resize( baseVertexData->vertexCount * mWeightCount, 0 );
 
-        if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+        if( mMeshReference->hasSkeleton() && mMeshReference->getSkeleton() )
         {
             if(mWeightCount > 1)
             {

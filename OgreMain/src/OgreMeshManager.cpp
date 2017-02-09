@@ -167,7 +167,7 @@ namespace Ogre
         params.indexBufferUsage = indexBufferUsage;
         params.vertexShadowBuffer = vertexShadowBuffer;
         params.indexShadowBuffer = indexShadowBuffer;
-        mMeshBuildParams[pMesh.getPointer()] = params;
+        mMeshBuildParams[pMesh.get()] = params;
 
         // to preserve previous behaviour, load immediately
         pMesh->load();
@@ -204,7 +204,7 @@ namespace Ogre
         params.indexBufferUsage = indexBufferUsage;
         params.vertexShadowBuffer = vertexShadowBuffer;
         params.indexShadowBuffer = indexShadowBuffer;
-        mMeshBuildParams[pMesh.getPointer()] = params;
+        mMeshBuildParams[pMesh.get()] = params;
 
         // to preserve previous behaviour, load immediately
         pMesh->load();
@@ -249,7 +249,7 @@ namespace Ogre
         params.vertexShadowBuffer = vertexShadowBuffer;
         params.indexShadowBuffer = indexShadowBuffer;
         params.ySegmentsToKeep = ySegmentsToKeep;
-        mMeshBuildParams[pMesh.getPointer()] = params;
+        mMeshBuildParams[pMesh.get()] = params;
 
         // to preserve previous behaviour, load immediately
         pMesh->load();
@@ -939,7 +939,7 @@ namespace Ogre
         }
 
         MeshPtr pMesh = getByName(name);
-        if (!pMesh.isNull())
+        if (pMesh)
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "A mesh called " + name + 
                 " already exists!", "MeshManager::createBezierPatch");

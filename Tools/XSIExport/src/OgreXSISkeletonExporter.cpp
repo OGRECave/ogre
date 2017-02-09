@@ -98,7 +98,7 @@ namespace Ogre
         establishInitialTransforms(deformers);
 
         // create animations 
-        mAABB.setNull();
+        mAABB.reset();
         createAnimations(skeleton.get(), deformers, framesPerSecond, animList, mAABB);
         // progress report
         ProgressManager::getSingleton().progress();

@@ -62,7 +62,7 @@ namespace Ogre {
         mSkyBoxEnabled = false;
         mSkyDomeEnabled = false;
 
-        mLevel.setNull();
+        mLevel.reset();
 
     }
     //-----------------------------------------------------------------------
@@ -74,7 +74,7 @@ namespace Ogre {
     BspSceneManager::~BspSceneManager()
     {
         freeMemory();
-        mLevel.setNull();
+        mLevel.reset();
     }
     //-----------------------------------------------------------------------
     size_t BspSceneManager::estimateWorldGeometry(const String& filename)
@@ -92,7 +92,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BspSceneManager::setWorldGeometry(const String& filename)
     {
-        mLevel.setNull();
+        mLevel.reset();
         // Check extension is .bsp
         char extension[6];
         size_t pos = filename.find_last_of(".");
@@ -154,7 +154,7 @@ namespace Ogre {
     void BspSceneManager::setWorldGeometry(DataStreamPtr& stream, 
         const String& typeName)
     {
-        mLevel.setNull();
+        mLevel.reset();
 
         // Load using resource manager
         mLevel = BspResourceManager::getSingleton().load(stream, 
@@ -305,7 +305,7 @@ namespace Ogre {
     BspNode* BspSceneManager::walkTree(Camera* camera, 
         VisibleObjectsBoundsInfo *visibleBounds, bool onlyShadowCasters)
     {
-        if (mLevel.isNull()) return 0;
+        if (!mLevel) return 0;
 
         // Locate the leaf node where the camera is located
         BspNode* cameraNode = mLevel->findLeaf(camera->getDerivedPosition());
@@ -395,7 +395,7 @@ namespace Ogre {
                 StaticFaceGroup* faceGroup = mLevel->mFaceGroups + realIndex;
                 // Get Material pointer by handle
                 pMat = MaterialManager::getSingleton().getByHandle(faceGroup->materialHandle).staticCast<Material>();
-                assert (!pMat.isNull());
+                assert (pMat);
                 // Check normal (manual culling)
                 ManualCullingMode cullMode = pMat->getTechnique(0)->getPass(0)->getManualCullingMode();
                 if (cullMode != MANUAL_CULL_NONE)
@@ -409,7 +409,7 @@ namespace Ogre {
                 // Try to insert, will find existing if already there
                 std::pair<MaterialFaceGroupMap::iterator, bool> matgrpi;
                 matgrpi = mMatFaceGroupMap.insert(
-                    MaterialFaceGroupMap::value_type(pMat.getPointer(), vector<StaticFaceGroup*>::type())
+                    MaterialFaceGroupMap::value_type(pMat.get(), vector<StaticFaceGroup*>::type())
                     );
                 // Whatever happened, matgrpi.first is map iterator
                 // Need to get second part of that to get vector
@@ -578,7 +578,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ViewPoint BspSceneManager::getSuggestedViewpoint(bool random)
     {
-        if (mLevel.isNull() || mLevel->mPlayerStarts.empty())
+        if (!mLevel || mLevel->mPlayerStarts.empty())
         {
             // No level, use default
             return SceneManager::getSuggestedViewpoint(random);
@@ -613,7 +613,7 @@ namespace Ogre {
     void BspSceneManager::_notifyObjectMoved(const MovableObject* mov, 
         const Vector3& pos)
     {
-        if (!mLevel.isNull())
+        if (mLevel)
         {
             mLevel->_notifyObjectMoved(mov, pos);
         }
@@ -621,7 +621,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BspSceneManager::_notifyObjectDetached(const MovableObject* mov)
     {
-        if (!mLevel.isNull())
+        if (mLevel)
         {
             mLevel->_notifyObjectDetached(mov);
         }
@@ -632,7 +632,7 @@ namespace Ogre {
         SceneManager::clearScene();
         freeMemory();
         // Clear level
-        mLevel.setNull();
+        mLevel.reset();
     }
     //-----------------------------------------------------------------------
     /*
@@ -684,7 +684,7 @@ namespace Ogre {
         overlap 2 leaves?
         */
         const BspLevelPtr& lvl = ((BspSceneManager*)mParentSceneMgr)->getLevel();
-        if (lvl.isNull()) return;
+        if (!lvl) return;
 
         BspNode* leaf = lvl->getLeafStart();
         int numLeaves = lvl->getNumLeaves();
@@ -790,7 +790,7 @@ namespace Ogre {
     {
         clearTemporaries();
         BspLevelPtr lvl = static_cast<BspSceneManager*>(mParentSceneMgr)->getLevel();
-        if (!lvl.isNull())
+        if (lvl)
         {
             processNode(
                 lvl->getRootNode(), 

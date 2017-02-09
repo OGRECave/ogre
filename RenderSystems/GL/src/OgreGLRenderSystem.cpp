@@ -1524,7 +1524,7 @@ namespace Ogre {
 
         if (enabled)
         {
-            if (!tex.isNull())
+            if (tex)
             {
                 // note used
                 tex->touch();
@@ -1549,7 +1549,7 @@ namespace Ogre {
                     glEnable( mTextureTypes[stage] );
             }
 
-            if(!tex.isNull())
+            if(tex)
                 mStateCacheManager->bindGLTexture( mTextureTypes[stage], tex->getGLID() );
             else
                 mStateCacheManager->bindGLTexture( mTextureTypes[stage], static_cast<GLTextureManager*>(mTextureManager)->getWarningTextureID() );
@@ -2758,7 +2758,7 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
-                                !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL) ||
+                                globalInstanceVertexBuffer && globalVertexDeclaration != NULL) ||
                                 op.vertexData->vertexBufferBinding->getHasInstanceData();
 
         size_t numberOfInstances = op.numberOfInstances;
@@ -2793,7 +2793,7 @@ namespace Ogre {
                                    mRenderAttribsBound, mRenderInstanceAttribsBound);
         }
 
-        if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
+        if( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
         {
             elemEnd = globalVertexDeclaration->getElements().end();
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
@@ -3018,19 +3018,19 @@ namespace Ogre {
 
         if (gptype == GPT_VERTEX_PROGRAM && mCurrentVertexProgram)
         {
-            mActiveVertexGpuProgramParameters.setNull();
+            mActiveVertexGpuProgramParameters.reset();
             mCurrentVertexProgram->unbindProgram();
             mCurrentVertexProgram = 0;
         }
         else if (gptype == GPT_GEOMETRY_PROGRAM && mCurrentGeometryProgram)
         {
-            mActiveGeometryGpuProgramParameters.setNull();
+            mActiveGeometryGpuProgramParameters.reset();
             mCurrentGeometryProgram->unbindProgram();
             mCurrentGeometryProgram = 0;
         }
         else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentFragmentProgram)
         {
-            mActiveFragmentGpuProgramParameters.setNull();
+            mActiveFragmentGpuProgramParameters.reset();
             mCurrentFragmentProgram->unbindProgram();
             mCurrentFragmentProgram = 0;
         }

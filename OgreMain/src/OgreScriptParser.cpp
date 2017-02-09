@@ -486,7 +486,7 @@ namespace Ogre
                     "ScriptParser::parseChunk");
             }
 
-            if(!node.isNull())
+            if(node)
                 nodes->push_back(node);
         }
 

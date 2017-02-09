@@ -51,13 +51,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     GpuProgramUsage::~GpuProgramUsage()
     {
-        if (!mProgram.isNull())
+        if (mProgram)
             mProgram->removeListener(this);
     }
     //-----------------------------------------------------------------------------
     void GpuProgramUsage::setProgramName(const String& name, bool resetParams)
     {
-        if (!mProgram.isNull())
+        if (mProgram)
         {
             mProgram->removeListener(this);
             mRecreateParams = true;
@@ -66,10 +66,10 @@ namespace Ogre
         mProgram = GpuProgramManager::getSingleton().getByName(name, mParent->getResourceGroup());
         
         //Look again without the group if not found
-        if (mProgram.isNull())
+        if (!mProgram)
             mProgram = GpuProgramManager::getSingleton().getByName(name);
         
-        if (mProgram.isNull())
+        if (!mProgram)
         {
             String progType = "fragment";
             if (mType == GPT_VERTEX_PROGRAM)
@@ -99,7 +99,7 @@ namespace Ogre
         }
 
         // Reset parameters 
-        if (resetParams || mParameters.isNull() || mRecreateParams)
+        if (resetParams || !mParameters || mRecreateParams)
         {
             recreateParameters();
         }
@@ -116,7 +116,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     GpuProgramParametersSharedPtr GpuProgramUsage::getParameters(void)
     {
-        if (mParameters.isNull())
+        if (!mParameters)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "You must specify a program before "
                 "you can retrieve parameters.", "GpuProgramUsage::getParameters");
@@ -140,9 +140,9 @@ namespace Ogre
         memSize += sizeof(bool);
 
         // Tally up passes
-        if(!mProgram.isNull())
+        if(mProgram)
             memSize += mProgram->calculateSize();
-        if(!mParameters.isNull())
+        if(mParameters)
             memSize += mParameters->calculateSize();
 
         return memSize;
@@ -237,7 +237,7 @@ namespace Ogre
 
         // Copy old (matching) values across
         // Don't use copyConstantsFrom since program may be different
-        if (!savedParams.isNull())
+        if (savedParams)
             mParameters->copyMatchingNamedConstantsFrom(*savedParams.get());
 
         mRecreateParams = false;

@@ -86,7 +86,7 @@ namespace Ogre {
 					"Unable to find CG profile enum for program " + mName + ": ", mCgContext);
 				
 				// do we need a delegate?
-				if (useDelegate && mDelegate.isNull())
+				if (useDelegate && mDelegate)
 				{
 					mDelegate =
 						HighLevelGpuProgramManager::getSingleton().createProgram(
@@ -98,11 +98,11 @@ namespace Ogre {
 					// HLSL output requires backwards compatibility to be enabled
 					mDelegate->setParameter("backwards_compatibility", "true");
 				}
-				else if (!useDelegate && !mDelegate.isNull())
+				else if (!useDelegate && mDelegate)
 				{
 					ResourcePtr rs (mDelegate);
 					HighLevelGpuProgramManager::getSingleton().remove(rs);
-					mDelegate.setNull();
+					mDelegate.reset();
 				}
 				
 				foundProfile = true;
@@ -187,7 +187,7 @@ namespace Ogre {
 			compileMicrocode();
 		}
 
-		if (!mDelegate.isNull())
+		if (mDelegate)
 		{
 			mDelegate->setSource(mProgramString);
 			mDelegate->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
@@ -276,7 +276,7 @@ namespace Ogre {
 			mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
 		}
 
-		if (!mDelegate.isNull())
+		if (mDelegate)
 		{
 			// get sampler register mapping
 			size_t samplerMapSize = 0;
@@ -343,7 +343,7 @@ namespace Ogre {
 			recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
 			recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
 
-			if (!mDelegate.isNull())
+			if (mDelegate)
 			{
 				// Delegating to HLSL or GLSL, need to clean up Cg's output
 				fixHighLevelOutput(mProgramString);
@@ -416,7 +416,7 @@ namespace Ogre {
 			newMicrocode->write(&def, sizeof(GpuConstantDefinition));
 		}
 
-		if (!mDelegate.isNull())
+		if (mDelegate)
 		{
 			// save additional info required for delegating
 			size_t samplerMapSize = mSamplerRegisterMap.size();
@@ -447,7 +447,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::createLowLevelImpl(void)
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return;
 
 		// ignore any previous error
@@ -754,7 +754,7 @@ namespace Ogre {
 	GpuProgramParametersSharedPtr CgProgram::createParameters()
 	{
 		loadHighLevelSafe();
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->createParameters();
 		else
 			return HighLevelGpuProgram::createParameters();
@@ -762,7 +762,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GpuProgram* CgProgram::_getBindingDelegate()
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->_getBindingDelegate();
 		else
 			return HighLevelGpuProgram::_getBindingDelegate();
@@ -770,7 +770,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::isSkeletalAnimationIncluded(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->isSkeletalAnimationIncluded();
 		else
 			return HighLevelGpuProgram::isSkeletalAnimationIncluded();
@@ -778,7 +778,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::isMorphAnimationIncluded(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->isMorphAnimationIncluded();
 		else
 			return HighLevelGpuProgram::isMorphAnimationIncluded();
@@ -786,7 +786,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::isPoseAnimationIncluded(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->isPoseAnimationIncluded();
 		else
 			return HighLevelGpuProgram::isPoseAnimationIncluded();
@@ -794,7 +794,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::isVertexTextureFetchRequired(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->isVertexTextureFetchRequired();
 		else
 			return HighLevelGpuProgram::isVertexTextureFetchRequired();
@@ -803,7 +803,7 @@ namespace Ogre {
 	GpuProgramParametersSharedPtr CgProgram::getDefaultParameters(void)
 	{
 		loadHighLevelSafe();
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->getDefaultParameters();
 		else
 			return HighLevelGpuProgram::getDefaultParameters();
@@ -811,7 +811,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::hasDefaultParameters(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->hasDefaultParameters();
 		else
 			return HighLevelGpuProgram::hasDefaultParameters();
@@ -819,7 +819,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::getPassSurfaceAndLightStates(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->getPassSurfaceAndLightStates();
 		else
 			return HighLevelGpuProgram::getPassSurfaceAndLightStates();
@@ -827,7 +827,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::getPassFogStates(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->getPassFogStates();
 		else
 			return HighLevelGpuProgram::getPassFogStates();
@@ -835,7 +835,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::getPassTransformStates(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->getPassTransformStates();
 		else
 		{
@@ -845,7 +845,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::hasCompileError(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->hasCompileError();
 		else
 			return HighLevelGpuProgram::hasCompileError();
@@ -853,7 +853,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::resetCompileError(void)
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			mDelegate->resetCompileError();
 		else
 			HighLevelGpuProgram::resetCompileError();
@@ -861,7 +861,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	size_t CgProgram::getSize() const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->getSize();
 		else
 			return HighLevelGpuProgram::getSize();
@@ -869,7 +869,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::touch()
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			mDelegate->touch();
 		else
 			HighLevelGpuProgram::touch();
@@ -1052,7 +1052,7 @@ namespace Ogre {
 
 			// now handle uniform samplers. This is needed to fix their register positions
 			// if delegating to a GLSL shader.
-			if (!mDelegate.isNull() && cgGetParameterVariability(parameter) == CG_UNIFORM && (
+			if (mDelegate && cgGetParameterVariability(parameter) == CG_UNIFORM && (
 				paramType == CG_SAMPLER1D ||
 				paramType == CG_SAMPLER2D ||
 				paramType == CG_SAMPLER3D ||
@@ -1248,7 +1248,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool CgProgram::isSupported(void) const
 	{
-		if (!mDelegate.isNull())
+		if (mDelegate)
 			return mDelegate->isSupported();
 
 		if (mCompileError || !isRequiredCapabilitiesSupported())

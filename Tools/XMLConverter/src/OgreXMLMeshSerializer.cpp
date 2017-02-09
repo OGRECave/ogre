@@ -231,7 +231,7 @@ namespace Ogre {
         subMeshNode->SetAttribute("usesharedvertices", 
             StringConverter::toString(s->useSharedVertices) );
         // bool use32BitIndexes
-        bool use32BitIndexes = (!s->indexData->indexBuffer.isNull() && 
+        bool use32BitIndexes = (s->indexData->indexBuffer && 
             s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
         subMeshNode->SetAttribute("use32bitindexes", 
             StringConverter::toString( use32BitIndexes ));
@@ -1705,7 +1705,7 @@ namespace Ogre {
             usage.userValue = StringConverter::parseReal(val);
         }
         usage.value = mMesh->getLodStrategy()->transformUserValue(usage.userValue);
-        usage.manualMesh.setNull();
+        usage.manualMesh.reset();
         usage.manualName = "";
         usage.edgeData = NULL;
 

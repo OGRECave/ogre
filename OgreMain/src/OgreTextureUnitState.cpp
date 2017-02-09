@@ -215,7 +215,7 @@ namespace Ogre {
             mFrames.resize(1);
             mFramePtrs.resize(1);
             mFrames[0] = name;
-            mFramePtrs[0].setNull();
+            mFramePtrs[0].reset();
             // defer load until used, so don't grab pointer yet
             mCurrentFrame = 0;
             mCubic = false;
@@ -242,7 +242,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setTexture( const TexturePtr& texPtr)
     {
-        if (texPtr.isNull())
+        if (!texPtr)
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                 "Texture Pointer is empty.",
@@ -301,7 +301,7 @@ namespace Ogre {
             mFrames.clear();
             // One reference space, set manually through _setTexturePtr
             mFramePtrs.resize(1);
-            mFramePtrs[0].setNull();
+            mFramePtrs[0].reset();
         }
     }
     //-----------------------------------------------------------------------
@@ -351,7 +351,7 @@ namespace Ogre {
         for (unsigned int i = 0; i < mFrames.size(); ++i)
         {
             mFrames[i] = names[i];
-            mFramePtrs[i].setNull();
+            mFramePtrs[i].reset();
         }
         // Tell parent we need recompiling, will cause reload too
         mParent->_notifyNeedsRecompile();
@@ -402,7 +402,7 @@ namespace Ogre {
         {
             mFrames[frameNumber] = name;
             // reset pointer (don't populate until requested)
-            mFramePtrs[frameNumber].setNull();  
+            mFramePtrs[frameNumber].reset();  
 
             if (isLoaded())
             {
@@ -494,7 +494,7 @@ namespace Ogre {
             StringStream str;
             str << baseName << "_" << i << ext;
             mFrames[i] = str.str();
-            mFramePtrs[i].setNull();
+            mFramePtrs[i].reset();
         }
 
         // Load immediately if Material loaded
@@ -525,7 +525,7 @@ namespace Ogre {
         for (unsigned int i = 0; i < mFrames.size(); ++i)
         {
             mFrames[i] = names[i];
-            mFramePtrs[i].setNull();
+            mFramePtrs[i].reset();
         }
 
         // Load immediately if Material loaded
@@ -544,7 +544,7 @@ namespace Ogre {
     {
         
         TexturePtr tex = _getTexturePtr(frame);
-        if (tex.isNull())
+        if (!tex)
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find texture " + mFrames[ frame ],
             "TextureUnitState::getTextureDimensions" );
 
@@ -1146,7 +1146,7 @@ namespace Ogre {
         {
             // Ensure texture is loaded, specified number of mipmaps and
             // priority
-            if (mFramePtrs[frame].isNull())
+            if (!mFramePtrs[frame])
             {
                 try {
                     mFramePtrs[frame] = 
@@ -1177,7 +1177,7 @@ namespace Ogre {
         {
             // Ensure texture is loaded, specified number of mipmaps and
             // priority
-            if (mFramePtrs[frame].isNull())
+            if (!mFramePtrs[frame])
             {
                 try {
                     mFramePtrs[frame] = 
@@ -1392,7 +1392,7 @@ namespace Ogre {
         tiend = mFramePtrs.end();
         for (ti = mFramePtrs.begin(); ti != tiend; ++ti)
         {
-            ti->setNull();
+            ti->reset();
         }
     }
     //-----------------------------------------------------------------------
@@ -1420,7 +1420,7 @@ namespace Ogre {
         tiend = mFramePtrs.end();
         for (ti = mFramePtrs.begin(); ti != tiend; ++ti)
         {
-            ti->setNull();
+            ti->reset();
         }
     }
     //-----------------------------------------------------------------------------

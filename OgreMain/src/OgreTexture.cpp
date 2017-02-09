@@ -308,7 +308,7 @@ namespace Ogre {
                     // Apply gamma correction
                     // Do not overwrite original image but do gamma correction in temporary buffer
                     MemoryDataStreamPtr buf; // for scoped deletion of conversion buffer
-                    buf.bind(OGRE_NEW MemoryDataStream(
+                    buf.reset(OGRE_NEW MemoryDataStream(
                         PixelUtil::getMemorySize(
                             src.getWidth(), src.getHeight(), src.getDepth(), src.format)));
                     
@@ -403,7 +403,7 @@ namespace Ogre {
             catch (Exception&)
             {
             }
-            if (dstream.isNull() && getTextureType() == TEX_TYPE_CUBE_MAP)
+            if (!dstream && getTextureType() == TEX_TYPE_CUBE_MAP)
             {
                 // try again with one of the faces (non-dds)
                 try
@@ -416,7 +416,7 @@ namespace Ogre {
                 }
             }
 
-            if (!dstream.isNull())
+            if (dstream)
             {
                 return Image::getFileExtFromMagic(dstream);
             }

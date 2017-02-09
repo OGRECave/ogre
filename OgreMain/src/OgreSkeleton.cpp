@@ -339,7 +339,7 @@ namespace Ogre {
             for (it = mLinkedSkeletonAnimSourceList.begin(); 
                 it != mLinkedSkeletonAnimSourceList.end() && !ret; ++it)
             {
-                if (!it->pSkeleton.isNull())
+                if (it->pSkeleton)
                 {
                     ret = it->pSkeleton->_getAnimationImpl(name);
                     if (ret && linker)
@@ -396,7 +396,7 @@ namespace Ogre {
         for (li = mLinkedSkeletonAnimSourceList.begin(); 
             li != mLinkedSkeletonAnimSourceList.end(); ++li)
         {
-            if (!li->pSkeleton.isNull())
+            if (li->pSkeleton)
             {
                 li->pSkeleton->_refreshAnimationState(animSet);
             }
@@ -430,7 +430,7 @@ namespace Ogre {
         for (li = mLinkedSkeletonAnimSourceList.begin(); 
             li != mLinkedSkeletonAnimSourceList.end(); ++li)
         {
-            if (!li->pSkeleton.isNull())
+            if (li->pSkeleton)
             {
                 li->pSkeleton->_refreshAnimationState(animSet);
             }

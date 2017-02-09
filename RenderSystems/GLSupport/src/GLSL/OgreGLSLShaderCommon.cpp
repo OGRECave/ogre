@@ -128,7 +128,7 @@ namespace Ogre {
         // We didn't create mAssemblerProgram through a manager, so override this
         // implementation so that we don't try to remove it from one. Since getCreator()
         // is used, it might target a different matching handle!
-        mAssemblerProgram.setNull();
+        mAssemblerProgram.reset();
 
         unloadHighLevel();
     }
@@ -187,23 +187,20 @@ namespace Ogre {
         // is the name valid and already loaded?
         // check with the high level program manager to see if it was loaded
         HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name);
-        if (!hlProgram.isNull())
+        if (hlProgram && hlProgram->getSyntaxCode() == "glsl")
         {
-            if (hlProgram->getSyntaxCode() == "glsl")
+            // make sure attached program source gets loaded and compiled
+            // don't need a low level implementation for attached shader objects
+            // loadHighLevelImpl will only load the source and compile once
+            // so don't worry about calling it several times
+            GLSLShaderCommon* childShader = static_cast<GLSLShaderCommon*>(hlProgram.get());
+            // load the source and attach the child shader only if supported
+            if (isSupported())
             {
-                // make sure attached program source gets loaded and compiled
-                // don't need a low level implementation for attached shader objects
-                // loadHighLevelImpl will only load the source and compile once
-                // so don't worry about calling it several times
-                GLSLShaderCommon* childShader = static_cast<GLSLShaderCommon*>(hlProgram.getPointer());
-                // load the source and attach the child shader only if supported
-                if (isSupported())
-                {
-                    childShader->loadHighLevelImpl();
-                    // add to the container
-                    mAttachedGLSLPrograms.push_back( childShader );
-                    mAttachedShaderNames += name + " ";
-                }
+                childShader->loadHighLevelImpl();
+                // add to the container
+                mAttachedGLSLPrograms.push_back( childShader );
+                mAttachedShaderNames += name + " ";
             }
         }
     }

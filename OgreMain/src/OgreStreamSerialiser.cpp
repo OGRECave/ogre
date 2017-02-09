@@ -286,7 +286,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void StreamSerialiser::checkStream(bool failOnEof, bool validateReadable, bool validateWriteable) const
     {
-        if (mStream.isNull())
+        if (!mStream)
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
             "Invalid operation, stream is null", "StreamSerialiser::checkStream");
 
@@ -824,9 +824,9 @@ namespace Ogre
     void StreamSerialiser::stopDeflate()
     {
 #if OGRE_NO_ZIP_ARCHIVE == 0
-        assert( !mOriginalStream.isNull() && "Must start (un)compressing first!" );
+        assert( mOriginalStream && "Must start (un)compressing first!" );
         mStream = mOriginalStream;
-        mOriginalStream.setNull();
+        mOriginalStream.reset();
 #else
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "Ogre was not built with Zip file support!", "StreamSerialiser::stopDeflate");

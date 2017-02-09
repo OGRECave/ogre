@@ -409,7 +409,7 @@ namespace Ogre {
         Codec::DecodeResult res = pCodec->decode(stream);
 
         ImageCodec::ImageData* pData = 
-            static_cast<ImageCodec::ImageData*>(res.second.getPointer());
+            static_cast<ImageCodec::ImageData*>(res.second.get());
 
         mWidth = pData->width;
         mHeight = pData->height;
@@ -597,7 +597,7 @@ namespace Ogre {
             {
                 // Allocate temporary buffer of destination size in source format 
                 temp = PixelBox(scaled.getWidth(), scaled.getHeight(), scaled.getDepth(), src.format);
-                buf.bind(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
+                buf.reset(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
                 temp.data = buf->getPtr();
             }
             // super-optimized: no conversion
@@ -640,7 +640,7 @@ namespace Ogre {
                 {
                     // Allocate temp buffer of destination size in source format 
                     temp = PixelBox(scaled.getWidth(), scaled.getHeight(), scaled.getDepth(), src.format);
-                    buf.bind(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
+                    buf.reset(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
                     temp.data = buf->getPtr();
                 }
                 // super-optimized: byte-oriented math, no conversion

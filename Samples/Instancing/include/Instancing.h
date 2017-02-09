@@ -126,7 +126,7 @@ protected:
 
         assert (mSelectedMesh < numTypeMeshes);
         MeshPtr m = MeshManager::getSingleton ().getByName (meshes[mSelectedMesh] + ".mesh");
-        if (m.isNull ())
+        if (!m)
         {
             m = MeshManager::getSingleton ().load (meshes[mSelectedMesh] + ".mesh", 
                 ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
@@ -264,11 +264,11 @@ protected:
 #endif
 
         // if originalMat doesn't exists use "Instancing" material name
-        const String instancedMaterialName (originalMaterial.isNull() ? "Instancing" : originalMaterialName + "/Instanced");
+        const String instancedMaterialName (!originalMaterial ? "Instancing" : originalMaterialName + "/Instanced");
         MaterialPtr  instancedMaterial = MaterialManager::getSingleton ().getByName (instancedMaterialName);
 
         // already exists ?
-        if (instancedMaterial.isNull())
+        if (!instancedMaterial)
         {
             instancedMaterial = originalMaterial->clone(instancedMaterialName);
             instancedMaterial->load();

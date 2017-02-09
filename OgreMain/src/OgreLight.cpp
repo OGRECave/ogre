@@ -752,7 +752,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Light::resetCustomShadowCameraSetup()
     {
-        mCustomShadowCameraSetup.setNull();
+        mCustomShadowCameraSetup.reset();
     }
     //-----------------------------------------------------------------------
     const ShadowCameraSetupPtr& Light::getCustomShadowCameraSetup() const

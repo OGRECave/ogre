@@ -43,7 +43,7 @@ namespace Ogre
     {
         init();
         mDataStream = stream;
-        mStreamOffset = mDataStream.isNull() ? 0 : mDataStream->tell();
+        mStreamOffset = !mDataStream ? 0 : mDataStream->tell();
     }
 
     TerrainLodManager::TerrainLodManager(Terrain* t, const String& filename)
@@ -61,12 +61,12 @@ namespace Ogre
 
     void TerrainLodManager::close()
     {
-        mDataStream.setNull();
+        mDataStream.reset();
     }
 
     bool TerrainLodManager::isOpen() const
     {
-        return !mDataStream.isNull();
+        return mDataStream;
     }
 
     void TerrainLodManager::init()
@@ -324,7 +324,7 @@ namespace Ogre
 
     void TerrainLodManager::readLodData(uint16 lowerLodBound, uint16 higherLodBound)
     {
-        if(mDataStream.isNull()) // No file to read from
+        if(!mDataStream) // No file to read from
             return;
 
         uint16 numLodLevels = mTerrain->getNumLodLevels();

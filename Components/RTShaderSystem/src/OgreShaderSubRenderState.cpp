@@ -42,7 +42,7 @@ SubRenderState::SubRenderState()
 //-----------------------------------------------------------------------
 SubRenderState::~SubRenderState()
 {
-    if (mOtherAccessor.isNull() == false)
+    if (mOtherAccessor)
     {
         mOtherAccessor->removeSubRenderStateInstance(this);
     }
@@ -167,11 +167,9 @@ bool SubRenderState::addFunctionInvocations( ProgramSet* programSet )
 //-----------------------------------------------------------------------
 SubRenderStateAccessorPtr SubRenderState::getAccessor()
 {
-    if (mThisAccessor.isNull())
+    if (!mThisAccessor)
     {
-        SubRenderStateAccessor* accessor = OGRE_NEW_T(SubRenderStateAccessor, MEMCATEGORY_GENERAL)(this);
-        
-        mThisAccessor.bind(accessor, SPFM_DELETE_T);
+        mThisAccessor.reset(OGRE_NEW SubRenderStateAccessor(this));
     }
 
     return mThisAccessor;
@@ -180,11 +178,9 @@ SubRenderStateAccessorPtr SubRenderState::getAccessor()
 //-----------------------------------------------------------------------
 SubRenderStateAccessorPtr SubRenderState::getAccessor() const
 {
-    if (mThisAccessor.isNull())
+    if (!mThisAccessor)
     {
-        SubRenderStateAccessor* accessor = OGRE_NEW_T(SubRenderStateAccessor, MEMCATEGORY_GENERAL)(this);
-
-        mThisAccessor.bind(accessor, SPFM_DELETE_T);
+        mThisAccessor.reset(OGRE_NEW SubRenderStateAccessor(this));
     }
 
     return mThisAccessor;

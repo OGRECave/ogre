@@ -96,7 +96,7 @@ namespace Ogre
 
         hwBoneIdx.resize( baseVertexData->vertexCount * mWeightCount, 0 );
 
-        if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+        if( mMeshReference->hasSkeleton() && mMeshReference->getSkeleton() )
         {
             if(mWeightCount > 1)
             {

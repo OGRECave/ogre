@@ -869,7 +869,7 @@ namespace Ogre {
     {
         String matName = "Ogre/Debug/AxesMat";
         mMat = MaterialManager::getSingleton().getByName(matName);
-        if (mMat.isNull())
+        if (!mMat)
         {
             mMat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
             Pass* p = mMat->getTechnique(0)->getPass(0);
@@ -883,7 +883,7 @@ namespace Ogre {
 
         String meshName = "Ogre/Debug/AxesMesh";
         mMeshPtr = MeshManager::getSingleton().getByName(meshName);
-        if (mMeshPtr.isNull())
+        if (!mMeshPtr)
         {
             ManualObject mo("tmp");
             mo.begin(mMat->getName());

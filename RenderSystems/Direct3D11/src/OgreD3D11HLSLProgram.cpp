@@ -1129,7 +1129,7 @@ namespace Ogre {
                     BufferInfoIterator it = mBufferInfoMap.insert(BufferInfo(0, mD3d11ShaderBufferDescs[b].Name)).first;
 
                     // Guard to create uniform buffer only once
-                    if (it->mUniformBuffer.isNull())
+                    if (!it->mUniformBuffer)
                     {
                         HardwareUniformBufferSharedPtr uBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
                         it->mUniformBuffer = HardwareUniformBufferSharedPtr(uBuffer);
@@ -1945,7 +1945,7 @@ namespace Ogre {
         {
 			BufferInfoIterator it = mBufferInfoMap.begin();
             
-            if (!it->mUniformBuffer.isNull())
+            if (it->mUniformBuffer)
             {
                 void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);
 
@@ -2004,7 +2004,7 @@ namespace Ogre {
         BufferInfoIterator end = mBufferInfoMap.end();
         while (it != end)
         {
-            if (!it->mUniformBuffer.isNull())
+            if (it->mUniformBuffer)
             {
                 void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);
 

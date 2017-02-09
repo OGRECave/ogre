@@ -53,7 +53,7 @@ namespace Ogre
 			GpuProgramPtr gpuPrg = it->second;
 			gpuPrg->unload();
 			HighLevelGpuProgramManager::getSingleton().remove(gpuPrg);
-			gpuPrg.setNull();
+			gpuPrg.reset();
 		}
 		mShaderCache.clear();
 	}
@@ -118,7 +118,7 @@ namespace Ogre
 		// Case an error occurred.
 		if (gpuProgram->hasCompileError())
 		{
-			gpuProgram.setNull();
+			gpuProgram.reset();
 			return GpuProgramPtr(gpuProgram);
 		}
 

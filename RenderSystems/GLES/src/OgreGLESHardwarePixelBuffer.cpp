@@ -446,7 +446,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void GLESTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
-        GLESTextureBuffer *srct = static_cast<GLESTextureBuffer *>(src.getPointer());
+        GLESTextureBuffer *srct = static_cast<GLESTextureBuffer *>(src.get());
         // TODO: Check for FBO support first
         // Destination texture must be 2D
         // Source texture must be 2D

@@ -491,7 +491,7 @@ void D3D9HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &rsrc,
 {
     D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
-    D3D9HardwarePixelBuffer *src = static_cast<D3D9HardwarePixelBuffer*>(rsrc.getPointer());
+    D3D9HardwarePixelBuffer *src = static_cast<D3D9HardwarePixelBuffer*>(rsrc.get());
     DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
 
     // Update all the buffer copies.

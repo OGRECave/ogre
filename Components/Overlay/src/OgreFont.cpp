@@ -165,7 +165,7 @@ namespace Ogre
         mMaterial =  MaterialManager::getSingleton().create(
             "Fonts/" + mName,  mGroup);
 
-        if (mMaterial.isNull())
+        if (!mMaterial)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                 "Error creating new material!", "Font::load" );
@@ -210,16 +210,16 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Font::unloadImpl()
     {
-        if (!mMaterial.isNull())
+        if (mMaterial)
         {
             MaterialManager::getSingleton().remove(mMaterial->getHandle());
-            mMaterial.setNull();
+            mMaterial.reset();
         }
 
-        if (!mTexture.isNull())
+        if (mTexture)
         {
             mTexture->unload();
-            mTexture.setNull();
+            mTexture.reset();
         }
     }
     //---------------------------------------------------------------------

@@ -121,13 +121,10 @@ namespace Ogre {
 
         if (speed != 0)
         {
-            SharedPtr< ControllerValue<Real> > val;
-            SharedPtr< ControllerFunction<Real> > func;
-
             // We do both scrolls with a single controller
-            val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, true, true));
+            SharedPtr< ControllerValue<Real> > val(OGRE_NEW TexCoordModifierControllerValue(layer, true, true));
             // Create function: use -speed since we're altering texture coords so they have reverse effect
-            func.bind(OGRE_NEW ScaleControllerFunction(-speed, true));
+            SharedPtr< ControllerFunction<Real> > func(OGRE_NEW ScaleControllerFunction(-speed, true));
             ret = createController(mFrameTimeController, val, func);
         }
 
@@ -140,12 +137,9 @@ namespace Ogre {
 
         if (uSpeed != 0)
         {
-            SharedPtr< ControllerValue<Real> > uVal;
-            SharedPtr< ControllerFunction<Real> > uFunc;
-
-                uVal.bind(OGRE_NEW TexCoordModifierControllerValue(layer, true));
+            SharedPtr< ControllerValue<Real> > uVal(OGRE_NEW TexCoordModifierControllerValue(layer, true));
             // Create function: use -speed since we're altering texture coords so they have reverse effect
-            uFunc.bind(OGRE_NEW ScaleControllerFunction(-uSpeed, true));
+            SharedPtr< ControllerFunction<Real> > uFunc(OGRE_NEW ScaleControllerFunction(-uSpeed, true));
             ret = createController(mFrameTimeController, uVal, uFunc);
         }
 
@@ -158,13 +152,10 @@ namespace Ogre {
 
         if (vSpeed != 0)
         {
-            SharedPtr< ControllerValue<Real> > vVal;
-            SharedPtr< ControllerFunction<Real> > vFunc;
-
             // Set up a second controller for v scroll
-            vVal.bind(OGRE_NEW TexCoordModifierControllerValue(layer, false, true));
+            SharedPtr< ControllerValue<Real> > vVal(OGRE_NEW TexCoordModifierControllerValue(layer, false, true));
             // Create function: use -speed since we're altering texture coords so they have reverse effect
-            vFunc.bind(OGRE_NEW ScaleControllerFunction(-vSpeed, true));
+            SharedPtr< ControllerFunction<Real> > vFunc(OGRE_NEW ScaleControllerFunction(-vSpeed, true));
             ret = createController(mFrameTimeController, vVal, vFunc);
         }
 
@@ -173,15 +164,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Controller<Real>* ControllerManager::createTextureRotater(TextureUnitState* layer, Real speed)
     {
-        SharedPtr< ControllerValue<Real> > val;
-        SharedPtr< ControllerFunction<Real> > func;
-
         // Target value is texture coord rotation
-        val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, false, false, false, false, true));
+        SharedPtr< ControllerValue<Real> > val(OGRE_NEW TexCoordModifierControllerValue(layer, false, false, false, false, true));
         // Function is simple scale (seconds * speed)
         // Use -speed since altering texture coords has the reverse visible effect
-        func.bind(OGRE_NEW ScaleControllerFunction(-speed, true));
-
+        SharedPtr< ControllerFunction<Real> > func(OGRE_NEW ScaleControllerFunction(-speed, true));
         return createController(mFrameTimeController, val, func);
 
     }
@@ -190,33 +177,32 @@ namespace Ogre {
         TextureUnitState::TextureTransformType ttype, WaveformType waveType, Real base, Real frequency, Real phase, Real amplitude)
     {
         SharedPtr< ControllerValue<Real> > val;
-        SharedPtr< ControllerFunction<Real> > func;
 
         switch (ttype)
         {
         case TextureUnitState::TT_TRANSLATE_U:
             // Target value is a u scroll
-            val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, true));
+            val.reset(OGRE_NEW TexCoordModifierControllerValue(layer, true));
             break;
         case TextureUnitState::TT_TRANSLATE_V:
             // Target value is a v scroll
-            val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, false, true));
+            val.reset(OGRE_NEW TexCoordModifierControllerValue(layer, false, true));
             break;
         case TextureUnitState::TT_SCALE_U:
             // Target value is a u scale
-            val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, false, false, true));
+            val.reset(OGRE_NEW TexCoordModifierControllerValue(layer, false, false, true));
             break;
         case TextureUnitState::TT_SCALE_V:
             // Target value is a v scale
-            val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, false, false, false, true));
+            val.reset(OGRE_NEW TexCoordModifierControllerValue(layer, false, false, false, true));
             break;
         case TextureUnitState::TT_ROTATE:
             // Target value is texture coord rotation
-            val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, false, false, false, false, true));
+            val.reset(OGRE_NEW TexCoordModifierControllerValue(layer, false, false, false, false, true));
             break;
         }
         // Create new wave function for alterations
-        func.bind(OGRE_NEW WaveformControllerFunction(waveType, base, frequency, phase, amplitude, true));
+        SharedPtr< ControllerFunction<Real> > func(OGRE_NEW WaveformControllerFunction(waveType, base, frequency, phase, amplitude, true));
 
         return createController(mFrameTimeController, val, func);
     }
@@ -224,11 +210,8 @@ namespace Ogre {
     Controller<Real>* ControllerManager::createGpuProgramTimerParam(
         GpuProgramParametersSharedPtr params, size_t paramIndex, Real timeFactor)
     {
-        SharedPtr< ControllerValue<Real> > val;
-        SharedPtr< ControllerFunction<Real> > func;
-
-        val.bind(OGRE_NEW FloatGpuParameterControllerValue(params, paramIndex));
-        func.bind(OGRE_NEW ScaleControllerFunction(timeFactor, true));
+        SharedPtr< ControllerValue<Real> > val(OGRE_NEW FloatGpuParameterControllerValue(params, paramIndex));
+        SharedPtr< ControllerFunction<Real> > func(OGRE_NEW ScaleControllerFunction(timeFactor, true));
 
         return createController(mFrameTimeController, val, func);
 
@@ -249,7 +232,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void ControllerManager::setTimeFactor(Real tf) {
-        static_cast<FrameTimeControllerValue*>(mFrameTimeController.getPointer())->setTimeFactor(tf);
+        static_cast<FrameTimeControllerValue*>(mFrameTimeController.get())->setTimeFactor(tf);
     }
     //-----------------------------------------------------------------------
     Real ControllerManager::getFrameDelay(void) const {
@@ -257,7 +240,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void ControllerManager::setFrameDelay(Real fd) {
-        static_cast<FrameTimeControllerValue*>(mFrameTimeController.getPointer())->setFrameDelay(fd);
+        static_cast<FrameTimeControllerValue*>(mFrameTimeController.get())->setFrameDelay(fd);
     }
     //-----------------------------------------------------------------------
     Real ControllerManager::getElapsedTime(void) const

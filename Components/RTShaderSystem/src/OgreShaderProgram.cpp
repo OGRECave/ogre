@@ -93,7 +93,7 @@ void Program::removeParameter(UniformParameterPtr parameter)
     {
         if ((*it) == parameter)
         {
-            (*it).setNull();
+            (*it).reset();
             mParameters.erase(it);
             break;
         }

@@ -259,7 +259,7 @@ namespace Ogre
     {
         // re-use old material if exists
         MaterialPtr mat = terrain->_getMaterial();
-        if (mat.isNull())
+        if (!mat)
         {
             MaterialManager& matMgr = MaterialManager::getSingleton();
 
@@ -267,7 +267,7 @@ namespace Ogre
             // use the terrain pointer as an ID
             const String& matName = terrain->getMaterialName();
             mat = matMgr.getByName(matName);
-            if (mat.isNull())
+            if (!mat)
             {
                 mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             }
@@ -309,7 +309,7 @@ namespace Ogre
     {
         // re-use old material if exists
         MaterialPtr mat = terrain->_getCompositeMapMaterial();
-        if (mat.isNull())
+        if (!mat)
         {
             MaterialManager& matMgr = MaterialManager::getSingleton();
 
@@ -317,7 +317,7 @@ namespace Ogre
             // use the terrain pointer as an ID
             const String& matName = terrain->getMaterialName() + "/comp";
             mat = matMgr.getByName(matName);
-            if (mat.isNull())
+            if (!mat)
             {
                 mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             }

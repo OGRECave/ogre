@@ -264,8 +264,7 @@ namespace Ogre {
         imgData->size = (paddedWidth * paddedHeight) >> 1;
 
         // Bind output buffer
-        MemoryDataStreamPtr output;
-        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        MemoryDataStreamPtr output(OGRE_NEW MemoryDataStream(imgData->size));
 
         // Now deal with the data
         void *destPtr = output->getPtr();
@@ -344,8 +343,7 @@ namespace Ogre {
         stream->skip(header.bytesOfKeyValueData);
 
         // Bind output buffer
-        MemoryDataStreamPtr output;
-        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        MemoryDataStreamPtr output(OGRE_NEW MemoryDataStream(imgData->size));
 
         // Now deal with the data
         uchar* destPtr = output->getPtr();

@@ -516,7 +516,7 @@ protected:
         //Only one menu in this demo
         const String& materialName = menu->getSelectedItem();
         MaterialPtr material = MaterialManager::getSingleton().getByName(materialName);
-        if (material.isNull())
+        if (!material)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Material "+materialName+"doesn't exist!",

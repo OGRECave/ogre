@@ -90,12 +90,12 @@ namespace Ogre {
         Technique* pTech;
 
         // tell material it's been used
-        if (!pRend->getMaterial().isNull())
+        if (pRend->getMaterial())
             pRend->getMaterial()->touch();
 
         // Check material & technique supplied (the former since the default implementation
         // of getTechnique is based on it for backwards compatibility
-        if(pRend->getMaterial().isNull() || !pRend->getTechnique())
+        if(!pRend->getMaterial() || !pRend->getTechnique())
         {
             // Use default base white, with lighting only if vertices has normals
             RenderOperation op;

@@ -431,7 +431,7 @@ namespace Ogre {
             mOutstandingRequestSet.erase(res->getRequest()->getID());
 
             // Call resource listener
-            if (!resresp.resource.isNull()) 
+            if (resresp.resource) 
             {
 
                 if (req.type == RT_LOAD_RESOURCE) 

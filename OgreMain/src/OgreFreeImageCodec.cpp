@@ -156,7 +156,7 @@ namespace Ogre {
     {
         FIBITMAP* ret = 0;
 
-        ImageData* pImgData = static_cast< ImageData * >( pData.getPointer() );
+        ImageData* pImgData = static_cast< ImageData * >( pData.get() );
         PixelBox src(pImgData->width, pImgData->height, pImgData->depth, pImgData->format, input->getPtr());
 
         // The required format, which will adjust to the format
