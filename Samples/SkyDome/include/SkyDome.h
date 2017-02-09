@@ -62,7 +62,7 @@ protected:
 
     void cleanupContent()
     {
-        MeshManager::getSingleton().remove("floor");
+        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     Slider* mCurvatureSlider;

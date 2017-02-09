@@ -343,8 +343,8 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
  void cleanupContent()
  {
      ControllerManager::getSingleton().destroyController(mLightController);
-     MeshManager::getSingleton().remove("ground");
-     MeshManager::getSingleton().remove("grass");
+     MeshManager::getSingleton().remove("ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+     MeshManager::getSingleton().remove("grass", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
  }
 
  const Real GRASS_WIDTH;

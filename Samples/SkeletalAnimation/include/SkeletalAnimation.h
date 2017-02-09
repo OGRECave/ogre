@@ -374,7 +374,7 @@ protected:
         mModelNodes.clear();
         mAnimStates.clear();
         mAnimSpeeds.clear();
-        MeshManager::getSingleton().remove("floor");
+        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         mSceneMgr->destroyEntity("Jaiqua");
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)

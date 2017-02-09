@@ -72,16 +72,16 @@ namespace Ogre
         {
             Technique *technique = *it;
 
-            if( !technique->getShadowCasterMaterial().isNull() )
-                MaterialManager::getSingleton().remove( technique->getShadowCasterMaterial()->getName() );
+            if (!technique->getShadowCasterMaterial().isNull())
+                MaterialManager::getSingleton().remove( technique->getShadowCasterMaterial() );
         }
 
         //Remove cloned material
-        MaterialManager::getSingleton().remove( mMaterial->getName() );
+        MaterialManager::getSingleton().remove( mMaterial );
 
         //Remove the VTF texture
         if( !mMatrixTexture.isNull() )
-            TextureManager::getSingleton().remove( mMatrixTexture->getName() );
+            TextureManager::getSingleton().remove( mMatrixTexture );
 
         OGRE_FREE(mTempTransformsArray3x4, MEMCATEGORY_GENERAL);
     }
@@ -116,7 +116,7 @@ namespace Ogre
 
         //Now do the same with the techniques which have a material shadow caster
         Material::Techniques::const_iterator it;
-        for(it = mMaterial->getTechniques().begin(); it != mMaterial->getTechniques().end(); ++it)
+        for(it = material->getTechniques().begin(); it != material->getTechniques().end(); ++it)
         {
             Technique *technique = *it;
 
@@ -205,10 +205,10 @@ namespace Ogre
     }
     
     //-----------------------------------------------------------------------
-    void BaseInstanceBatchVTF::setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material )
+    void BaseInstanceBatchVTF::setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material ) const
     {
         Material::Techniques::const_iterator t;
-        for(t = mMaterial->getTechniques().begin(); t != mMaterial->getTechniques().end(); ++t)
+        for(t = material->getTechniques().begin(); t != material->getTechniques().end(); ++t)
         {
             Technique *technique = *t;
             Technique::Passes::const_iterator i;

@@ -128,63 +128,45 @@ namespace Ogre {
 
         }
 
-        if (!result.second)
+        // Attempt to resolve the collision
+        ResourceLoadingListener* listener = ResourceGroupManager::getSingleton().getLoadingListener();
+        if (!result.second && listener && listener->resourceCollision(res.get(), this))
         {
-            // Attempt to resolve the collision
-            if(ResourceGroupManager::getSingleton().getLoadingListener())
+            // Try to do the addition again, no seconds attempts to resolve collisions are allowed
+            if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
             {
-                if(ResourceGroupManager::getSingleton().getLoadingListener()->resourceCollision(res.get(), this))
-                {
-                    // Try to do the addition again, no seconds attempts to resolve collisions are allowed
-                    std::pair<ResourceMap::iterator, bool> insertResult;
-                    if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
-                    {
-                        insertResult = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
-                    }
-                    else
-                    {
-                        ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
-                        insertResult = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
-                    }
-                    if (!insertResult.second)
-                    {
-                        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() + 
-                            " already exists.", "ResourceManager::add");
-                    }
-
-                    std::pair<ResourceHandleMap::iterator, bool> resultHandle = 
-                        mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
-                    if (!resultHandle.second)
-                    {
-                        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " + 
-                            StringConverter::toString((long) (res->getHandle())) + 
-                            " already exists.", "ResourceManager::add");
-                    }
-                }
+                result = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
             }
             else
             {
-                OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() +
-                    " already exists.", "ResourceManager::add");
+                ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
+                result = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
             }
         }
-        else
+
+        if (!result.second)
         {
-            // Insert the handle
-            std::pair<ResourceHandleMap::iterator, bool> resultHandle = 
-                mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
-            if (!resultHandle.second)
-            {
-                OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " + 
-                    StringConverter::toString((long) (res->getHandle())) + 
-                    " already exists.", "ResourceManager::add");
-            }
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() +
+                " already exists.", "ResourceManager::add");
+        }
+
+        // Insert the handle
+        std::pair<ResourceHandleMap::iterator, bool> resultHandle =
+            mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
+        if (!resultHandle.second)
+        {
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " +
+                StringConverter::toString((long) (res->getHandle())) +
+                " already exists.", "ResourceManager::add");
         }
     }
     //-----------------------------------------------------------------------
     void ResourceManager::removeImpl(const ResourcePtr& res )
     {
-            OGRE_LOCK_AUTO_MUTEX;
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to remove unknown resource");
+#endif
+        OGRE_LOCK_AUTO_MUTEX;
 
         if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
         {
@@ -233,15 +215,17 @@ namespace Ogre {
         return mMemoryBudget;
     }
     //-----------------------------------------------------------------------
-    void ResourceManager::unload(const String& name)
+    void ResourceManager::unload(const String& name, const String& group)
     {
-        ResourcePtr res = getResourceByName(name);
+        ResourcePtr res = getResourceByName(name, group);
+
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to unload unknown resource: "+name+" in group "+group);
+#endif
 
         if (!res.isNull())
         {
-            // Unload resource
             res->unload();
-
         }
     }
     //-----------------------------------------------------------------------
@@ -249,11 +233,13 @@ namespace Ogre {
     {
         ResourcePtr res = getByHandle(handle);
 
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to unload unknown resource");
+#endif
+
         if (!res.isNull())
         {
-            // Unload resource
             res->unload();
-
         }
     }
     //-----------------------------------------------------------------------
@@ -310,9 +296,13 @@ namespace Ogre {
         removeImpl(res);
     }
     //-----------------------------------------------------------------------
-    void ResourceManager::remove(const String& name)
+    void ResourceManager::remove(const String& name, const String& group)
     {
-        ResourcePtr res = getResourceByName(name);
+        ResourcePtr res = getResourceByName(name, group);
+
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to remove unknown resource: "+name+" in group "+group);
+#endif
 
         if (!res.isNull())
         {
@@ -323,6 +313,10 @@ namespace Ogre {
     void ResourceManager::remove(ResourceHandle handle)
     {
         ResourcePtr res = getByHandle(handle);
+
+#if OGRE_RESOURCEMANAGER_STRICT
+        OgreAssert(res, "attempting to remove unknown resource");
+#endif
 
         if (!res.isNull())
         {

@@ -38,12 +38,12 @@ protected:
 
 		for (size_t i = 0; i < mMaterialList.size(); ++i)
 		{
-			MaterialManager::getSingleton().unload(mMaterialList[i]);
-			MaterialManager::getSingleton().remove(mMaterialList[i]);
+			MaterialManager::getSingleton().unload(mMaterialList[i], ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+			MaterialManager::getSingleton().remove(mMaterialList[i], ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 		}
-
-		MeshManager::getSingleton().unload(mFloor->getName());
-		MeshManager::getSingleton().remove(mFloor->getName());
+		mMaterialList.clear();
+		mFloor->unload();
+		MeshManager::getSingleton().remove(mFloor);
 		mFloor.setNull();
 
 		mHlmsManager->unbindAll("pbs");

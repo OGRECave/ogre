@@ -350,7 +350,7 @@ void Compositor::freeGlobalTextures()
     GlobalTextureMap::iterator i = mGlobalTextures.begin();
     while (i != mGlobalTextures.end())
     {
-        TextureManager::getSingleton().remove(i->second->getName());
+        TextureManager::getSingleton().remove(i->second);
         ++i;
     }
     mGlobalTextures.clear();

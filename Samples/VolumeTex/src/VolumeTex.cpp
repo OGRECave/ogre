@@ -139,7 +139,7 @@ bool Sample_VolumeTex::frameRenderingQueued(const FrameEvent &evt)
 
 void Sample_VolumeTex::cleanupContent()
 {
-    TextureManager::getSingleton().remove("DynaTex");
+    TextureManager::getSingleton().remove("DynaTex", "VolumeRenderable");
     delete vrend;
     delete trend;
 }

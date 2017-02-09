@@ -119,7 +119,7 @@ namespace Ogre
         void retrieveBoneIdxWithWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt);
 
         /** Setups the material to use a vertex texture */
-        void setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material );
+        void setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material ) const;
 
         /** Creates the vertex texture */
         void createVertexTexture( const SubMesh* baseSubMesh );

@@ -214,7 +214,7 @@ namespace Ogre {
         // synchronous
         ResourceManager* rm = 
             ResourceGroupManager::getSingleton()._getResourceManager(resType);
-        rm->unload(name);
+        rm->unload(name, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         return 0; 
 #endif
 
@@ -363,7 +363,7 @@ namespace Ogre {
                 if (resreq.resourceName.empty())
                     rm->unload(resreq.resourceHandle);
                 else
-                    rm->unload(resreq.resourceName);
+                    rm->unload(resreq.resourceName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
                 break;
             };
         }

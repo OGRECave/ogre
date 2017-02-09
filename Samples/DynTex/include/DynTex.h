@@ -174,7 +174,7 @@ protected:
     void cleanupContent()
     {
         delete [] mConstantTexBuf;
-        TextureManager::getSingleton().remove("thaw");
+        TextureManager::getSingleton().remove("thaw", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         mSceneMgr->destroyQuery(mCursorQuery);
     }
 

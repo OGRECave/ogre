@@ -257,9 +257,9 @@ protected:
         mFishAnimStates.clear();
         mFishSplines.clear();
 
-        MeshManager::getSingleton().remove("water");
-        TextureManager::getSingleton().remove("refraction");
-        TextureManager::getSingleton().remove("reflection");
+        MeshManager::getSingleton().remove("water", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        TextureManager::getSingleton().remove("refraction", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        TextureManager::getSingleton().remove("reflection", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     const unsigned int NUM_FISH;

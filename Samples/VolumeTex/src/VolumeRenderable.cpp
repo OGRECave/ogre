@@ -41,7 +41,7 @@ VolumeRenderable::VolumeRenderable(size_t nSlices, float size, const String &tex
 VolumeRenderable::~VolumeRenderable()
 {
     // Remove private material
-    MaterialManager::getSingleton().remove(mTexture);
+    MaterialManager::getSingleton().remove(mTexture, "VolumeRenderable");
     // need to release IndexData and vertexData created for renderable
     delete mRenderOp.indexData;
     delete mRenderOp.vertexData;

@@ -861,7 +861,9 @@ namespace Ogre {
             for (unsigned short v = 0; v < OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS; ++v)
             {
                 // Destroy debug extruders
-                GpuProgramManager::getSingleton().remove(programNames[v]);
+                GpuProgramPtr prog = GpuProgramManager::getSingleton().getByName(
+                    programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+                prog->getCreator()->remove(prog); // handle high level and low level programs
             }
             mInitialised = false;
 			frgProgramName = "";

@@ -296,7 +296,7 @@ protected:
     {
         // clean up properly to avoid interfering with subsequent samples
         for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
-            MeshManager::getSingleton().unload(it->first);
+            MeshManager::getSingleton().unload(it->first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         mPossibilities.clear();
     }
 

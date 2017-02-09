@@ -569,13 +569,13 @@ void Sample_ShaderSystem::cleanupContent()
     for (int i=0; i < MESH_ARRAY_SIZE; ++i)
     {
         const String& curMeshName = MESH_ARRAY[i];
-        MeshManager::getSingleton().unload(curMeshName); 
+        MeshManager::getSingleton().unload(curMeshName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
     
-    MeshManager::getSingleton().remove(MAIN_ENTITY_MESH);
+    MeshManager::getSingleton().remove(MAIN_ENTITY_MESH, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     mTargetEntities.clear();
 
-    MeshManager::getSingleton().remove("Myplane");
+    MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     mSceneMgr->destroyQuery(mRayQuery);
 }
@@ -1675,7 +1675,7 @@ void Sample_ShaderSystem::createInstancedViewports()
 void Sample_ShaderSystem::createMaterialForTexture( const String & texName, bool isTextureAtlasTexture )
 {
     MaterialManager * matMgr = MaterialManager::getSingletonPtr();
-    if ( matMgr->resourceExists(texName) == false )
+    if ( !matMgr->resourceExists(texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME) )
     {
         MaterialPtr newMat = matMgr->create(texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         newMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);

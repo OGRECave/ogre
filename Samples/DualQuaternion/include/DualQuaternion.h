@@ -198,7 +198,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 
     void cleanupContent()
     {
-        MeshManager::getSingleton().remove("floor");
+        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);

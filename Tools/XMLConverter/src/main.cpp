@@ -377,7 +377,8 @@ void meshToXML(XmlOptions opts)
     xmlMeshSerializer->exportMesh(mesh.getPointer(), opts.dest);
 
     // Clean up the conversion mesh
-    MeshManager::getSingleton().remove("conversion");
+    MeshManager::getSingleton().remove("conversion",
+                                       ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
 void XMLToBinary(XmlOptions opts)
@@ -470,7 +471,8 @@ void XMLToBinary(XmlOptions opts)
         meshSerializer->exportMesh(newMesh.getPointer(), opts.dest, opts.endian);
 
         // Clean up the conversion mesh
-        MeshManager::getSingleton().remove("conversion");
+        MeshManager::getSingleton().remove("conversion",
+                                           ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
     else if (!stricmp(root->Value(), "skeleton"))
     {
@@ -485,7 +487,8 @@ void XMLToBinary(XmlOptions opts)
         skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
 
         // Clean up the conversion skeleton
-        SkeletonManager::getSingleton().remove("conversion");
+        SkeletonManager::getSingleton().remove("conversion",
+                                               ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
     else
     {
@@ -515,7 +518,8 @@ void skeletonToXML(XmlOptions opts)
     xmlSkeletonSerializer->exportSkeleton(skel.getPointer(), opts.dest);
 
     // Clean up the conversion skeleton
-    SkeletonManager::getSingleton().remove("conversion");
+    SkeletonManager::getSingleton().remove("conversion",
+                                           ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
 int main(int numargs, char** args)

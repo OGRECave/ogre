@@ -87,7 +87,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateSimpleLine)
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineMesh.get(), fileName);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedLine = mMeshMgr->load(fileName, "General");
@@ -100,7 +100,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateSimpleLine)
     EXPECT_TRUE(rop.useIndexes == false);
     EXPECT_TRUE(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,CreateLineList)
@@ -128,7 +128,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateLineList)
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineListMesh.get(), fileName);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedLineList = mMeshMgr->load(fileName, "General");
@@ -141,7 +141,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateLineList)
     EXPECT_TRUE(rop.useIndexes == false);
     EXPECT_TRUE(loadedLineList->getSubMesh(0)->vertexData->vertexCount == 6);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,CreateLineStrip)
@@ -167,7 +167,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateLineStrip)
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineStripMesh.get(), fileName);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedLineStrip = mMeshMgr->load(fileName, "General");
@@ -180,7 +180,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateLineStrip)
     EXPECT_TRUE(rop.useIndexes == false);
     EXPECT_TRUE(loadedLineStrip->getSubMesh(0)->vertexData->vertexCount == 4);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,CreatePointList)
@@ -206,7 +206,7 @@ TEST_F(MeshWithoutIndexDataTests,CreatePointList)
     MeshSerializer meshWriter;
     meshWriter.exportMesh(pointListMesh.get(), fileName);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedPointList = mMeshMgr->load(fileName, "General");
@@ -219,7 +219,7 @@ TEST_F(MeshWithoutIndexDataTests,CreatePointList)
     EXPECT_TRUE(rop.useIndexes == false);
     EXPECT_TRUE(loadedPointList->getSubMesh(0)->vertexData->vertexCount == 4);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,CreateLineWithMaterial)
@@ -252,7 +252,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateLineWithMaterial)
         MaterialManager::getSingleton().getByName(matName).staticCast<Material>(),
         matName + ".material");
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedLine = mMeshMgr->load(fileName, "General");
@@ -266,7 +266,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateLineWithMaterial)
     EXPECT_TRUE(rop.useIndexes == false);
     EXPECT_TRUE(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 void createMeshWithMaterial(String fileName)
@@ -347,7 +347,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateMesh)
     MeshSerializer meshWriter;
     meshWriter.exportMesh(mesh.get(), fileName);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedMesh = mMeshMgr->load(fileName, "General");
@@ -356,7 +356,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateMesh)
 
     EXPECT_TRUE(loadedMesh->getNumSubMeshes() == 4);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,CloneMesh)
@@ -372,7 +372,7 @@ TEST_F(MeshWithoutIndexDataTests,CloneMesh)
     MeshSerializer meshWriter;
     meshWriter.exportMesh(mesh.get(), fileName);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedMesh = mMeshMgr->load(fileName, "General");
@@ -381,7 +381,7 @@ TEST_F(MeshWithoutIndexDataTests,CloneMesh)
 
     EXPECT_TRUE(loadedMesh->getNumSubMeshes() == 4);
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,EdgeList)
@@ -406,7 +406,7 @@ TEST_F(MeshWithoutIndexDataTests,EdgeList)
 
     remove(fileName.c_str());
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,GenerateExtremes)
@@ -432,7 +432,7 @@ TEST_F(MeshWithoutIndexDataTests,GenerateExtremes)
         }
     }
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,BuildTangentVectors)
@@ -443,7 +443,7 @@ TEST_F(MeshWithoutIndexDataTests,BuildTangentVectors)
 
     EXPECT_THROW(mesh->buildTangentVectors(), InvalidParametersException);
     
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshWithoutIndexDataTests,GenerateLodLevels)
@@ -481,7 +481,7 @@ TEST_F(MeshWithoutIndexDataTests,GenerateLodLevels)
 
     remove(fileName.c_str());
 
-    mMeshMgr->remove(fileName);
+    mMeshMgr->remove(fileName, "General");
 #endif
 }
 //--------------------------------------------------------------------------//--------------------------------------------------------------------------

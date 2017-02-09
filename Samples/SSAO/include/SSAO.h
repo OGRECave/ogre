@@ -161,9 +161,6 @@ public:
             CompositorManager::getSingleton().removeCompositor(mViewport, mPostNames[i]);
         }
         
-        MeshManager::getSingleton().remove("sibenik");
-        MeshManager::getSingleton().remove("cornell");
-        
         mMeshes.clear();
     }
     

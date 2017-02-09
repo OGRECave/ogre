@@ -229,8 +229,8 @@ void Sample_Compositor::cleanupContent(void)
     CompositorManager::getSingleton().removeCompositorChain(mViewport);
     mCompositorNames.clear();
 
-    TextureManager::getSingleton().remove("DitherTex");
-    TextureManager::getSingleton().remove("HalftoneVolume");
+    TextureManager::getSingleton().remove("DitherTex", "General");
+    TextureManager::getSingleton().remove("HalftoneVolume", "General");
 
     Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
     CompositorLogicMap::const_iterator itor = mCompositorLogics.begin();
@@ -242,7 +242,7 @@ void Sample_Compositor::cleanupContent(void)
         ++itor;
     }
     mCompositorLogics.clear();
-    MeshManager::getSingleton().remove("Myplane");
+    MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
 

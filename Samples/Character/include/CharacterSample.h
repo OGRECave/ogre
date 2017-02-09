@@ -125,7 +125,7 @@ protected:
             delete mChara;
             mChara = 0;
         }
-        MeshManager::getSingleton().remove("floor");
+        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     SinbadCharacterController* mChara;

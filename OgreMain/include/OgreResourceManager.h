@@ -172,14 +172,14 @@ namespace Ogre {
                 is not permanent and the Resource is not destroyed; it simply needs to be reloaded when
                 next used.
         */
-        virtual void setMemoryBudget(size_t bytes);
+        void setMemoryBudget(size_t bytes);
 
         /** Get the limit on the amount of memory this resource handler may use.
         */
-        virtual size_t getMemoryBudget(void) const;
+        size_t getMemoryBudget(void) const;
 
         /** Gets the current memory usage, in bytes. */
-        virtual size_t getMemoryUsage(void) const { return mMemoryUsage.get(); }
+        size_t getMemoryUsage(void) const { return mMemoryUsage.get(); }
 
         /** Unloads a single resource by name.
         @remarks
@@ -187,7 +187,12 @@ namespace Ogre {
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
         */
-        virtual void unload(const String& name);
+        void
+#if OGRE_RESOURCEMANAGER_STRICT
+        unload(const String& name, const String& group);
+#else
+        unload(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
         
         /** Unloads a single resource by handle.
         @remarks
@@ -195,7 +200,7 @@ namespace Ogre {
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
         */
-        virtual void unload(ResourceHandle handle);
+        void unload(ResourceHandle handle);
 
         /** Unloads all resources.
         @remarks
@@ -298,13 +303,19 @@ namespace Ogre {
             destruction of resources, try making sure you release all your
             shared pointers before you shutdown OGRE.
         */
-        virtual void remove(const ResourcePtr& r);
+        void remove(const ResourcePtr& r);
 
         /// @overload
-        virtual void remove(const String& name);
+        void
+#if OGRE_RESOURCEMANAGER_STRICT
+        remove(const String& name, const String& group);
+
+#else
+        remove(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
         
         /// @overload
-        virtual void remove(ResourceHandle handle);
+        void remove(ResourceHandle handle);
         /** Removes all resources.
         @note
             The word 'Destroy' is not used here, since
@@ -339,20 +350,30 @@ namespace Ogre {
 
         /** Retrieves a pointer to a resource by name, or null if the resource does not exist.
         */
-        virtual ResourcePtr getResourceByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        virtual ResourcePtr
+#if OGRE_RESOURCEMANAGER_STRICT
+        getResourceByName(const String& name, const String& groupName);
+#else
+        getResourceByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
         /** Retrieves a pointer to a resource by handle, or null if the resource does not exist.
         */
         virtual ResourcePtr getByHandle(ResourceHandle handle);
         
         /// Returns whether the named resource exists in this manager
-        virtual bool resourceExists(const String& name)
+        bool
+#if OGRE_RESOURCEMANAGER_STRICT
+        resourceExists(const String& name, const String& group)
+#else
+        resourceExists(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+#endif
         {
-            return !getResourceByName(name).isNull();
+            return getResourceByName(name, group);
         }
         /// Returns whether a resource with the given handle exists in this manager
-        virtual bool resourceExists(ResourceHandle handle)
+        bool resourceExists(ResourceHandle handle)
         {
-            return !getByHandle(handle).isNull();
+            return getByHandle(handle);
         }
 
         /** Notify this manager that a resource which it manages has been 
@@ -425,7 +446,7 @@ namespace Ogre {
             A list of file patterns, in the order they should be searched in.
         @see isScriptingSupported, parseScript
         */
-        virtual const StringVector& getScriptPatterns(void) const { return mScriptPatterns; }
+        const StringVector& getScriptPatterns(void) const { return mScriptPatterns; }
 
         /** Parse the definition of a set of resources from a script file.
         @remarks
@@ -440,7 +461,7 @@ namespace Ogre {
             then the resources discovered in this script will be loaded / unloaded
             with it.
         */
-        virtual void parseScript(DataStreamPtr& stream, const String& groupName)
+        void parseScript(DataStreamPtr& stream, const String& groupName)
                 { (void)stream; (void)groupName; }
 
         /** Gets the relative loading order of resources of this type.
@@ -449,16 +470,16 @@ namespace Ogre {
             order, and this value enumerates that. Higher values load later during
             bulk loading tasks.
         */
-        virtual Real getLoadingOrder(void) const { return mLoadOrder; }
+        Real getLoadingOrder(void) const { return mLoadOrder; }
 
         /** Gets a string identifying the type of resource this manager handles. */
         const String& getResourceType(void) const { return mResourceType; }
 
         /** Sets whether this manager and its resources habitually produce log output */
-        virtual void setVerbose(bool v) { mVerbose = v; }
+        void setVerbose(bool v) { mVerbose = v; }
 
         /** Gets whether this manager and its resources habitually produce log output */
-        virtual bool getVerbose(void) { return mVerbose; }
+        bool getVerbose(void) { return mVerbose; }
 
         /** Definition of a pool of resources, which users can use to reuse similar
             resources many times without destroying and recreating them.
@@ -525,7 +546,7 @@ namespace Ogre {
         virtual void removeImpl(const ResourcePtr& res );
         /** Checks memory usage and pages out if required. This is automatically done after a new resource is loaded.
         */
-        virtual void checkUsage(void);
+        void checkUsage(void);
 
 
     public:

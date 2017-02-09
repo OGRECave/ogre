@@ -595,7 +595,7 @@ static size_t dummyCounter = 0;
     /// This is safe, as we hold a private reference
     /// XXX does not compile due to ResourcePtr conversion :
     ///     MaterialManager::getSingleton().remove(mat);
-    MaterialManager::getSingleton().remove(mat->getName());
+    MaterialManager::getSingleton().remove(mat);
     /// Remove all passes from first technique
     mat->getTechnique(0)->removeAllPasses();
     return mat;
@@ -916,7 +916,7 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
                     if (!def->pooled && def->scope != CompositionTechnique::TS_GLOBAL)
                     {
                         // remove myself from central only if not pooled and not global
-                        TextureManager::getSingleton().remove(i->second->getName());
+                        TextureManager::getSingleton().remove(i->second);
                     }
 
                     // remove from local

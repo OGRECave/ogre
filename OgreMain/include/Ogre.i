@@ -271,6 +271,8 @@ ADD_REPR(ColourValue)
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
 %ignore Ogre::RenderSystem::addClipPlane(Real, Real, Real, Real);
+%ignore Ogre::RenderSystem::getFixedPipelineEnabled;
+%ignore Ogre::RenderSystem::setFixedPipelineEnabled;
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 %include "OgreCompositorInstance.h"

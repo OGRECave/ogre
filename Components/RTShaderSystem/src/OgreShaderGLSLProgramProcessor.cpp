@@ -52,7 +52,8 @@ GLSLProgramProcessor::~GLSLProgramProcessor()
     
     for (; it != itEnd; ++it)
     {
-        HighLevelGpuProgramManager::getSingleton().remove(*it);
+        HighLevelGpuProgramManager::getSingleton().remove(
+            *it, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
     mLibraryPrograms.clear();
 }
@@ -129,7 +130,8 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
             }                   
 
             // Check if the library shader already compiled
-            if(!HighLevelGpuProgramManager::getSingleton().resourceExists(subShaderName))
+            if (!HighLevelGpuProgramManager::getSingleton().resourceExists(
+                    subShaderName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME))
             {
                 // Create the library shader
                 HighLevelGpuProgramPtr pSubGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(subShaderName,

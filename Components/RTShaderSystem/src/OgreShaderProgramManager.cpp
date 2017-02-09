@@ -405,7 +405,9 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     }
 
     // Try to get program by name.
-    HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+    HighLevelGpuProgramPtr pGpuProgram =
+        HighLevelGpuProgramManager::getSingleton().getByName(
+            programName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 
     if(pGpuProgram) {
         return static_pointer_cast<GpuProgram>(pGpuProgram);
@@ -414,33 +416,20 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     // Case the program doesn't exist yet.
     // Create new GPU program.
     pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
+        ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
 
     // Case cache directory specified -> create program from file.
-    if (cachePath.empty() == false)
+    if (!cachePath.empty())
     {
         const String  programFullName = programName + "." + language;
         const String  programFileName = cachePath + programFullName;
         std::ifstream programFile;
-        bool          writeFile = true;
-
 
         // Check if program file already exist.
         programFile.open(programFileName.c_str());
 
-        // Case no matching file found -> we have to write it.
-        if (!programFile)
-        {
-            writeFile = true;
-        }
-        else
-        {
-            writeFile = false;
-            programFile.close();
-        }
-
         // Case we have to write the program to a file.
-        if (writeFile)
+        if (!programFile)
         {
             std::ofstream outFile(programFileName.c_str());
 
@@ -450,15 +439,16 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
             outFile << source;
             outFile.close();
         }
-
-        pGpuProgram->setSourceFile(programFullName);
+        else
+        {
+            // use program file version
+            StringStream buffer;
+            programFile >> buffer.rdbuf();
+            source = buffer.str();
+        }
     }
 
-    // No cache directory specified -> create program from system memory.
-    else
-    {
-        pGpuProgram->setSource(source);
-    }
+    pGpuProgram->setSource(source);
 
     pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
 
@@ -554,8 +544,9 @@ void ProgramManager::destroyGpuProgram(GpuProgramPtr& gpuProgram)
     ResourcePtr res           = HighLevelGpuProgramManager::getSingleton().getByName(programName);  
 
     if (res.isNull() == false)
-    {       
-        HighLevelGpuProgramManager::getSingleton().remove(programName);
+    {
+        HighLevelGpuProgramManager::getSingleton().remove(
+            programName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
     }
 }
 

@@ -127,8 +127,8 @@ protected:
 		}
 			
 		mSceneMgr->destroyCamera(mCubeCamera);
-        MeshManager::getSingleton().remove("floor");
-        TextureManager::getSingleton().remove("dyncubemap");
+        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        TextureManager::getSingleton().remove("dyncubemap", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     Entity* mHead;

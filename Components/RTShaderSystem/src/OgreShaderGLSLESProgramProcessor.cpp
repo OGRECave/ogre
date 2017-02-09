@@ -49,7 +49,8 @@ GLSLESProgramProcessor::~GLSLESProgramProcessor()
     
     for (; it != itEnd; ++it)
     {
-        HighLevelGpuProgramManager::getSingleton().remove(*it);
+        HighLevelGpuProgramManager::getSingleton().remove(
+            *it, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
     mLibraryPrograms.clear();
 }
