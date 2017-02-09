@@ -64,7 +64,7 @@ namespace Ogre
     {   
         if (mAssemblerProgram && mAssemblerProgram.get() != this)
         {
-            mAssemblerProgram->getCreator()->remove(mAssemblerProgram->getHandle());
+            mAssemblerProgram->getCreator()->remove(mAssemblerProgram);
             mAssemblerProgram.reset();
         }
 

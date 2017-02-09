@@ -163,9 +163,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ResourceManager::removeImpl(const ResourcePtr& res )
     {
-#if OGRE_RESOURCEMANAGER_STRICT
-        OgreAssert(res, "attempting to remove unknown resource");
-#endif
+        OgreAssert(res, "attempting to remove nullptr");
+
         OGRE_LOCK_AUTO_MUTEX;
 
         if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
