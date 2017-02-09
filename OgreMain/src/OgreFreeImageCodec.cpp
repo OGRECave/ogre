@@ -549,7 +549,7 @@ namespace Ogre {
         size_t dstPitch = imgData->width * PixelUtil::getNumElemBytes(imgData->format);
         imgData->size = dstPitch * imgData->height;
         // Bind output buffer
-        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        output.reset(OGRE_NEW MemoryDataStream(imgData->size));
 
         uchar* pDst = output->getPtr();
         for (size_t y = 0; y < imgData->height; ++y)
