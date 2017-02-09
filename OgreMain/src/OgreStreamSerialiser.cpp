@@ -812,7 +812,7 @@ namespace Ogre
     void StreamSerialiser::startDeflate(size_t avail_in)
     {
 #if OGRE_NO_ZIP_ARCHIVE == 0
-        assert( mOriginalStream.isNull() && "Don't start (un)compressing twice!" );
+        OgreAssert( !mOriginalStream , "Don't start (un)compressing twice!" );
         DataStreamPtr deflateStream(OGRE_NEW DeflateStream(mStream,"",avail_in));
         mOriginalStream = mStream;
         mStream = deflateStream;
@@ -824,7 +824,7 @@ namespace Ogre
     void StreamSerialiser::stopDeflate()
     {
 #if OGRE_NO_ZIP_ARCHIVE == 0
-        assert( mOriginalStream && "Must start (un)compressing first!" );
+        OgreAssert( mOriginalStream , "Must start (un)compressing first!" );
         mStream = mOriginalStream;
         mOriginalStream.reset();
 #else

@@ -40,7 +40,7 @@ AmbientLight::AmbientLight()
     mRadius = 15000;
 
     mMatPtr = MaterialManager::getSingleton().getByName("DeferredShading/AmbientLight");
-    assert(mMatPtr.isNull()==false);
+    assert(mMatPtr);
     mMatPtr->load();
 
     // Explicitly bind samplers for OpenGL

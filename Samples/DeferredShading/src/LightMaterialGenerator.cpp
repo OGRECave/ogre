@@ -77,7 +77,7 @@ public:
             DataStreamPtr ptrMasterSource = ResourceGroupManager::getSingleton().openResource(
                  "LightMaterial_ps.cg"
                 , ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-            assert(ptrMasterSource.isNull()==false);
+            assert(ptrMasterSource);
             mMasterSource = ptrMasterSource->getAsString();
         }
 
@@ -168,7 +168,7 @@ public:
 
         void setUpBaseParameters(const GpuProgramParametersSharedPtr& params)
         {
-            assert(params.isNull()==false);
+            assert(params);
 
             struct AutoParamPair { String name; GpuProgramParameters::AutoConstantType type; }; 
 
@@ -355,7 +355,7 @@ protected:
 
     void setUpBaseParameters(const GpuProgramParametersSharedPtr& params)
     {
-        assert(params.isNull()==false);
+        assert(params);
 
         struct AutoParamPair { String name; GpuProgramParameters::AutoConstantType type; };
 
