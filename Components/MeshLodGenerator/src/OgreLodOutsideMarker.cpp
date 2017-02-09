@@ -440,9 +440,7 @@ void LodOutsideMarker::cleanHull()
 Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, const String& resourceGroupName)
 {
     // Based on the wiki sample: http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Generating+A+Mesh
-
-    // Resource with given name should not exist!
-    assert(!MeshManager::getSingleton().getByName(meshName));
+    OgreAssert(!MeshManager::getSingleton().getByName(meshName, resourceGroupName), "Resource with given name should not exist");
 
     generateHull(); // calculate mHull triangles.
 

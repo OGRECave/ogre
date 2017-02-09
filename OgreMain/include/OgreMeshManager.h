@@ -65,8 +65,12 @@ namespace Ogre {
 
         /// Get a resource by name
         /// @see ResourceManager::getResourceByName
-        MeshPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-
+        MeshPtr
+#if OGRE_RESOURCEMANAGER_STRICT
+        getByName(const String& name, const String& groupName);
+#else
+        getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
 
         /// Create a new mesh
         /// @see ResourceManager::createResource

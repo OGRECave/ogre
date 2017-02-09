@@ -1729,11 +1729,11 @@ void SceneManager::_setSkyPlane(
         mSkyPlaneRenderQueue = renderQueue;
 
         // Set up the plane
-        MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName);
+        MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName, groupName);
         if (planeMesh)
         {
             // Destroy the old one
-            MeshManager::getSingleton().remove(planeMesh->getHandle());
+            MeshManager::getSingleton().remove(planeMesh);
         }
 
         // Create up vector
