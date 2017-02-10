@@ -219,7 +219,7 @@ namespace Ogre {
         ResourcePtr res = getResourceByName(name, group);
 
 #if OGRE_RESOURCEMANAGER_STRICT
-        OgreAssert(res, "attempting to unload unknown resource: "+name+" in group "+group);
+        OgreAssert(res, ("attempting to unload unknown resource: "+name+" in group "+group).c_str());
 #endif
 
         if (res)
@@ -300,7 +300,7 @@ namespace Ogre {
         ResourcePtr res = getResourceByName(name, group);
 
 #if OGRE_RESOURCEMANAGER_STRICT
-        OgreAssert(res, "attempting to remove unknown resource: "+name+" in group "+group);
+        OgreAssert(res, ("attempting to remove unknown resource: "+name+" in group "+group).c_str());
 #endif
 
         if (res)
