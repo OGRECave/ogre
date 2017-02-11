@@ -73,7 +73,9 @@ namespace Ogre {
         else
         {
             pArch = i->second;
+            OgreAssert(pArch->isReadOnly() == readOnly, "existing archive location has different readOnly status");
         }
+
         return pArch;
     }
     //-----------------------------------------------------------------------
