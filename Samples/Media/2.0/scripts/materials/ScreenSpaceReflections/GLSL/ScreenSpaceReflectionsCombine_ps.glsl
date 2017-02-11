@@ -133,7 +133,11 @@ void main()
 	//float depth = texelFetch( depthTexture, int2( gl_FragCoord.xy ), 0 ).x;
 	//float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
-	float4 raySS = texelFetch( rayTraceBuffer, int2( gl_FragCoord.xy * 0.5f ), 0 ).xyzw;
+#if HQ
+	float4 raySS = texelFetch( rayTraceBuffer, int2( gl_FragCoord.xy ), 0 ).xyzw;
+#else
+	float4 raySS = texture( rayTraceBuffer, inPs.uv0.xy ).xyzw;
+#endif
 
 	//Do not decode roughness, keep it in [0; 1] range.
 	float roughness = texelFetch( gBuf_shadowRoughness, int2( gl_FragCoord.xy ), 0 ).y;

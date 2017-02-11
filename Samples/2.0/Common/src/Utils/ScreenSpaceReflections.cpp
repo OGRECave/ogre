@@ -6,6 +6,9 @@
 #include "OgreTechnique.h"
 #include "OgreRenderSystem.h"
 
+#include "Compositor/OgreCompositorManager2.h"
+#include "Compositor/OgreCompositorNodeDef.h"
+
 #include "OgreCamera.h"
 
 namespace Demo
@@ -17,8 +20,7 @@ namespace Demo
         0,      0,    0,    1);
 
     ScreenSpaceReflections::ScreenSpaceReflections( const Ogre::TexturePtr &globalCubemap,
-                                                    Ogre::RenderSystem *renderSystem,
-                                                    bool useMsaa ) :
+                                                    Ogre::RenderSystem *renderSystem ) :
         mLastUvSpaceViewProjMatrix( PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE ),
         mRsDepthRange( 1.0f )
     {
@@ -27,33 +29,15 @@ namespace Demo
                     Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
                 staticCast<Ogre::Material>();
 
-        Ogre::GpuProgram *psShader;
-        Ogre::GpuProgramParametersSharedPtr oldParams;
         Ogre::Pass *pass = material->getTechnique(0)->getPass(0);
-        //Save old manual & auto params
-        oldParams = pass->getFragmentProgramParameters();
-        //Retrieve the HLSL/GLSL/Metal shader and rebuild it with/without MSAA
-        psShader = pass->getFragmentProgram()->_getBindingDelegate();
-        psShader->setParameter( "preprocessor_defines", useMsaa ? "USE_MSAA=1" : "" );
-        pass->getFragmentProgram()->reload();
         mPsParams[0] = pass->getFragmentProgramParameters();
-        //Restore manual & auto params to the newly compiled shader
-        mPsParams[0]->copyConstantsFrom( *oldParams );
 
         material = Ogre::MaterialManager::getSingleton().load(
                             "SSR/ScreenSpaceReflectionsCombine",
                             Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
                         staticCast<Ogre::Material>();
         pass = material->getTechnique(0)->getPass(0);
-        //Save old manual & auto params
-        oldParams = pass->getFragmentProgramParameters();
-        //Retrieve the HLSL/GLSL/Metal shader and rebuild it with/without MSAA
-        psShader = pass->getFragmentProgram()->_getBindingDelegate();
-        psShader->setParameter( "preprocessor_defines", useMsaa ? "USE_MSAA=1" : "" );
-        pass->getFragmentProgram()->reload();
         mPsParams[1] = pass->getFragmentProgramParameters();
-        //Restore manual & auto params to the newly compiled shader
-        mPsParams[1]->copyConstantsFrom( *oldParams );
 
         //pass->getTextureUnitState( "globalCubemap" )->setTexture( globalCubemap );
         mRsDepthRange = renderSystem->getRSDepthRange();
@@ -116,5 +100,84 @@ namespace Demo
         mPsParams[0]->setNamedConstant( "reprojectionMatrix", reprojectionMatrix );
 
         mLastUvSpaceViewProjMatrix = uvSpaceViewProjMatrix;
+    }
+    //-----------------------------------------------------------------------------------
+    void ScreenSpaceReflections::setupSSR( bool useMsaa, bool useHq,
+                                           Ogre::CompositorManager2 *compositorManager )
+    {
+        Ogre::String preprocessDefines;
+
+        if( useMsaa )
+            preprocessDefines += "USE_MSAA=1;";
+        if( useHq )
+            preprocessDefines += "HQ=1;";
+
+        Ogre::MaterialPtr material;
+        Ogre::GpuProgram *psShader = 0;
+        Ogre::GpuProgramParametersSharedPtr oldParams;
+        Ogre::Pass *pass = 0;
+
+        material = Ogre::MaterialManager::getSingleton().load(
+                    "SSR/ScreenSpaceReflectionsVectors",
+                    Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+                staticCast<Ogre::Material>();
+
+        pass = material->getTechnique(0)->getPass(0);
+        //Save old manual & auto params
+        oldParams = pass->getFragmentProgramParameters();
+        //Retrieve the HLSL/GLSL/Metal shader and rebuild it with/without MSAA & HQ
+        psShader = pass->getFragmentProgram()->_getBindingDelegate();
+        psShader->setParameter( "preprocessor_defines", preprocessDefines );
+        pass->getFragmentProgram()->reload();
+        //Restore manual & auto params to the newly compiled shader
+        pass->getFragmentProgramParameters()->copyConstantsFrom( *oldParams );
+
+        material = Ogre::MaterialManager::getSingleton().load(
+                    "SSR/ScreenSpaceReflectionsCombine",
+                    Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+                staticCast<Ogre::Material>();
+        pass = material->getTechnique(0)->getPass(0);
+        //Save old manual & auto params
+        oldParams = pass->getFragmentProgramParameters();
+        //Retrieve the HLSL/GLSL/Metal shader and rebuild it with/without MSAA & HQ
+        psShader = pass->getFragmentProgram()->_getBindingDelegate();
+        psShader->setParameter( "preprocessor_defines", preprocessDefines );
+        pass->getFragmentProgram()->reload();
+        //Restore manual & auto params to the newly compiled shader
+        pass->getFragmentProgramParameters()->copyConstantsFrom( *oldParams );
+
+        Ogre::CompositorNodeDef *nodeDef = 0;
+
+        Ogre::IdString nodeNames[2] = { "ScreenSpaceReflectionsRenderingNode",
+                                        "ScreenSpaceReflectionsRenderingNodeMSAA" };
+
+        for( int i=0; i<2; ++i )
+        {
+            nodeDef = compositorManager->getNodeDefinitionNonConst( nodeNames[i] );
+            Ogre::TextureDefinitionBase::TextureDefinitionVec &textureDefs =
+                    nodeDef->getLocalTextureDefinitionsNonConst();
+
+            Ogre::TextureDefinitionBase::TextureDefinitionVec::iterator itor = textureDefs.begin();
+            Ogre::TextureDefinitionBase::TextureDefinitionVec::iterator end  = textureDefs.end();
+
+            while( itor != end )
+            {
+                if( itor->getName() == "rayTracingBuffer" )
+                {
+                    if( useHq )
+                    {
+                        itor->widthFactor   = 1.0f;
+                        itor->heightFactor  = 1.0f;
+                    }
+                    else
+                    {
+                        itor->widthFactor   = 0.5f;
+                        itor->heightFactor  = 0.5f;
+                    }
+                    break;
+                }
+                ++itor;
+            }
+        }
     }
 }

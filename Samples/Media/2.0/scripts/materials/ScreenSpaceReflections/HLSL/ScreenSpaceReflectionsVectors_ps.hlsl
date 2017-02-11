@@ -260,6 +260,12 @@ INLINE bool traceScreenSpaceRay
 	return intersectsDepthBuffer( sceneZMax, rayZMin, rayZMax );
 }
 
+#if HQ
+	#define HQ_MULT
+#else
+	#define HQ_MULT * 2.0
+#endif
+
 float4 main
 (
 	PS_INPUT inPs,
@@ -268,7 +274,7 @@ float4 main
 {
 	float4 fragColour;
 
-	float3 normalVS = normalize( loadSubsample0( gBuf_normals, gl_FragCoord.xy * 2.0 ).xyz * 2.0 - 1.0 );
+	float3 normalVS = normalize( loadSubsample0( gBuf_normals, gl_FragCoord.xy HQ_MULT ).xyz * 2.0 - 1.0 );
 	normalVS.z = -normalVS.z; //Normal should be left handed.
 	if( !any(normalVS) )
 	//if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
@@ -277,7 +283,7 @@ float4 main
 		return fragColour;
 	}
 
-	float depth = depthTexture.Load( int3( gl_FragCoord.xy * 2.0, 0 ) ).x;
+	float depth = depthTexture.Load( int3( gl_FragCoord.xy HQ_MULT, 0 ) ).x;
 	float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
 	/** Since position is reconstructed in view space, just normalize it to get the

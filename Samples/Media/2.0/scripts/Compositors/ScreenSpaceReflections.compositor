@@ -4,7 +4,7 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 
 	texture mrtGBuffer target_width target_height PF_A2R10G10B10 PF_SHORT_GR depth_format PF_D32_FLOAT depth_texture depth_pool 1 explicit_resolve
 	texture mrtDepthBuffer target_width target_height PF_D32_FLOAT depth_pool 1
-	
+
 	texture prevFrame target_width target_height PF_R8G8B8A8 mipmap -1 no_fsaa no_gamma uav depth_pool 0
 	//Needed to calculate the difference in depths (if it's too high, then we can't use this result)
 	texture prevFrameDepthBuffer target_width target_height PF_FLOAT32_R no_fsaa uav
@@ -65,6 +65,44 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 			input 2 mrtGBuffer 1
 			input 3 prevFrame
 			input 4 rayTracingBuffer
+		}
+	}
+
+	//Use prevFrame as a temporary for ping pong (since we can discard prevFrame's contents now)
+	target prevFrame
+	{
+		pass clear { discard_only true }
+		pass render_quad
+		{
+			material SSR/Quincunx
+			input 0 reflectionBuffer
+		}
+	}
+	target reflectionBuffer
+	{
+		pass clear { discard_only true }
+		pass render_quad
+		{
+			material SSR/Quincunx
+			input 0 prevFrame
+		}
+	}
+	target prevFrame
+	{
+		pass clear { discard_only true }
+		pass render_quad
+		{
+			material SSR/Quincunx
+			input 0 reflectionBuffer
+		}
+	}
+	target reflectionBuffer
+	{
+		pass clear { discard_only true }
+		pass render_quad
+		{
+			material SSR/Quincunx
+			input 0 prevFrame
 		}
 	}
 
@@ -228,6 +266,44 @@ compositor_node ScreenSpaceReflectionsRenderingNodeMSAA
 			input 2 mrtGBuffer 1
 			input 3 prevFrame
 			input 4 rayTracingBuffer
+		}
+	}
+
+	//Use prevFrame as a temporary for ping pong (since we can discard prevFrame's contents now)
+	target prevFrame
+	{
+		pass clear { discard_only true }
+		pass render_quad
+		{
+			material SSR/Quincunx
+			input 0 reflectionBuffer
+		}
+	}
+	target reflectionBuffer
+	{
+		pass clear { discard_only true }
+		pass render_quad
+		{
+			material SSR/Quincunx
+			input 0 prevFrame
+		}
+	}
+	target prevFrame
+	{
+		pass clear { discard_only true }
+		pass render_quad
+		{
+			material SSR/Quincunx
+			input 0 reflectionBuffer
+		}
+	}
+	target reflectionBuffer
+	{
+		pass clear { discard_only true }
+		pass render_quad
+		{
+			material SSR/Quincunx
+			input 0 prevFrame
 		}
 	}
 

@@ -40,6 +40,8 @@ namespace Demo
                              "ScreenSpaceReflectionsGraphicsSystem" );
             }
 
+            ScreenSpaceReflections::setupSSR( useMsaa, true, compositorManager );
+
             if( useMsaa )
             {
                 return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,

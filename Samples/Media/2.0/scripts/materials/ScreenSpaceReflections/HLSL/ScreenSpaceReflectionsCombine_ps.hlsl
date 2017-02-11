@@ -121,7 +121,11 @@ float4 main
 	//float depth = depthTexture.Load( int3( gl_FragCoord.xy , 0 ) ).x;
 	//float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
-	float4 raySS = rayTraceBuffer.Load( int3( gl_FragCoord.xy * 0.5f, 0 ) ).xyzw;
+#if HQ
+	float4 raySS = rayTraceBuffer.Load( int3( gl_FragCoord.xy, 0 ) ).xyzw;
+#else
+	float4 raySS = rayTraceBuffer.Sample( trilinearSampler, inPs.uv0.xy ).xyzw;
+#endif
 
 	//Do not decode roughness, keep it in [0; 1] range.
 #if !USE_MSAA

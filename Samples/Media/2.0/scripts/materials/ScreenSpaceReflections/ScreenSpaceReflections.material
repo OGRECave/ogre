@@ -188,7 +188,7 @@ material SSR/ScreenSpaceReflectionsCombine
 			texture_unit rayTraceBuffer
 			{
 				tex_address_mode clamp
-				filtering none
+				filtering bilinear
 			}
 
 			/*texture_unit globalCubemap
@@ -196,6 +196,68 @@ material SSR/ScreenSpaceReflectionsCombine
 				tex_address_mode clamp
 				filtering trilinear
 			}*/
+		}
+	}
+}
+
+
+//---------------------------------------------------------------------------------------
+// SSR/Quincunx
+//---------------------------------------------------------------------------------------
+
+fragment_program SSR/Quincunx_ps_GLSL glsl
+{
+	source Quincunx_ps.glsl
+	default_params
+	{
+		param_named tex			int 0
+	}
+}
+
+fragment_program SSR/Quincunx_ps_HLSL hlsl
+{
+	source Quincunx_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SSR/Quincunx_ps_Metal metal
+{
+	source Quincunx_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
+fragment_program SSR/Quincunx_ps unified
+{
+	delegate SSR/Quincunx_ps_GLSL
+	delegate SSR/Quincunx_ps_HLSL
+	delegate SSR/Quincunx_ps_Metal
+}
+
+material SSR/Quincunx
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref SSR/Quincunx_ps
+			{
+			}
+
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
 		}
 	}
 }
