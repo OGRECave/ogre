@@ -39,46 +39,6 @@
 
 namespace Ogre {
 
-    GLint getGLGeometryInputPrimitiveType(RenderOperation::OperationType operationType, bool requiresAdjacency)
-    {
-        switch (operationType)
-        {
-        case RenderOperation::OT_POINT_LIST:
-            return GL_POINTS;
-        case RenderOperation::OT_LINE_LIST:
-            return requiresAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
-        case RenderOperation::OT_LINE_STRIP:
-            return requiresAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINES;
-        default:
-        case RenderOperation::OT_TRIANGLE_LIST:
-            return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
-        case RenderOperation::OT_TRIANGLE_STRIP:
-            return requiresAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLES;
-        case RenderOperation::OT_TRIANGLE_FAN:
-            return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
-        }
-    }
-
-
-    GLint getGLGeometryOutputPrimitiveType(RenderOperation::OperationType operationType)
-    {
-        switch (operationType)
-        {
-        case RenderOperation::OT_POINT_LIST:
-            return GL_POINTS;
-        case RenderOperation::OT_LINE_STRIP:
-            return GL_LINE_STRIP;
-        case RenderOperation::OT_TRIANGLE_STRIP:
-            return GL_TRIANGLE_STRIP;
-        default:
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Geometry shader output operation type can only be point list,"
-                        "line strip or triangle strip",
-                        "GLSLMonolithicProgram::getGLGeometryOutputPrimitiveType");
-        }
-    }
-
-
     GLSLMonolithicProgram::GLSLMonolithicProgram(GLSLShader* vertexProgram,
                                                  GLSLShader* hullProgram,
                                                  GLSLShader* domainProgram,

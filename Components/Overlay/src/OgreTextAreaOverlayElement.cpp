@@ -375,7 +375,8 @@ namespace Ogre {
 
     void TextAreaOverlayElement::setFontName( const String& font )
     {
-        mFont = FontManager::getSingleton().getByName( font );
+        mFont = FontManager::getSingleton().getByName(
+            font, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         if (!mFont)
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find font " + font,
                 "TextAreaOverlayElement::setFontName" );
@@ -682,7 +683,7 @@ namespace Ogre {
     //
     String TextAreaOverlayElement::CmdFontName::doGet( const void* target ) const
     {
-        return static_cast< const TextAreaOverlayElement* >( target )->getFontName();
+        return static_cast< const TextAreaOverlayElement* >( target )->getFont()->getName();
     }
     void TextAreaOverlayElement::CmdFontName::doSet( void* target, const String& val )
     {

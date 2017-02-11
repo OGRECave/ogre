@@ -64,7 +64,8 @@ public:
             programName += "LightMaterial_vs";
         }
 
-        GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+        GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(
+            programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         OgreAssert(ptr, "vertex shader is NULL");
         return ptr;
     }
@@ -229,7 +230,8 @@ public:
             programName += "LightMaterial_vs";
         }
 
-        GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+        GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(
+            programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         OgreAssert(ptr, "vertex shader is NULL");
         return ptr;
     }

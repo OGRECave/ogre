@@ -47,12 +47,17 @@ namespace Ogre {
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
-    String ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME = "General";
-    String ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME = "Internal";
-    String ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME = "Autodetect";
+    const String ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME = "General";
+#if OGRE_RESOURCEMANAGER_STRICT
+    const String ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME = "OgreInternal";
+    const String ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME = "OgreAutodetect";
+#else
+    const String ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME = "Internal";
+    const String ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME = "Autodetect";
+#endif
     // A reference count of 3 means that only RGM and RM have references
     // RGM has one (this one) and RM has 2 (by name and by handle)
-    size_t ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS = 3;
+    const size_t ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS = 3;
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     ResourceGroupManager::ResourceGroupManager()
@@ -63,7 +68,7 @@ namespace Ogre {
         // Create the 'Internal' group
         createResourceGroup(INTERNAL_RESOURCE_GROUP_NAME, true);
         // Create the 'Autodetect' group (only used for temp storage)
-        createResourceGroup(AUTODETECT_RESOURCE_GROUP_NAME, true); // autpdetect includes the global pool
+        createResourceGroup(AUTODETECT_RESOURCE_GROUP_NAME, true); // autodetect includes the global pool
         // default world group to the default group
         mWorldGroupName = DEFAULT_RESOURCE_GROUP_NAME;
     }

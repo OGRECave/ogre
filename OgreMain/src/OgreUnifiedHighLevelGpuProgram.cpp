@@ -91,7 +91,8 @@ namespace Ogre
 
             //recheck with auto resource group
             if (!deleg)
-              deleg = HighLevelGpuProgramManager::getSingleton().getByName(*i);
+                deleg = HighLevelGpuProgramManager::getSingleton().getByName(
+                    *i, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
             // Silently ignore missing links
             if(deleg && deleg->isSupported())

@@ -80,7 +80,7 @@ Ogre::Vector2 Widget::cursorOffset(Ogre::OverlayElement *element, const Ogre::Ve
 
 Ogre::Real Widget::getCaptionWidth(const Ogre::DisplayString &caption, Ogre::TextAreaOverlayElement *area)
 {
-    Ogre::FontPtr font = Ogre::FontManager::getSingleton().getByName(area->getFontName());
+    Ogre::FontPtr font = area->getFont();
     Ogre::String current = DISPLAY_STRING_TO_STRING(caption);
     Ogre::Real lineWidth = 0;
 
@@ -102,7 +102,7 @@ Ogre::Real Widget::getCaptionWidth(const Ogre::DisplayString &caption, Ogre::Tex
 
 void Widget::fitCaptionToArea(const Ogre::DisplayString &caption, Ogre::TextAreaOverlayElement *area, Ogre::Real maxWidth)
 {
-    Ogre::FontPtr f = Ogre::FontManager::getSingleton().getByName(area->getFontName());
+    Ogre::FontPtr f = area->getFont();
     Ogre::String s = DISPLAY_STRING_TO_STRING(caption);
 
     size_t nl = s.find('\n');
@@ -240,7 +240,7 @@ void TextBox::setText(const Ogre::DisplayString &text)
     mText = text;
     mLines.clear();
 
-    Ogre::FontPtr font = Ogre::FontManager::getSingleton().getByName(mTextArea->getFontName());
+    Ogre::FontPtr font = mTextArea->getFont();
 
     Ogre::String current = DISPLAY_STRING_TO_STRING(text);
     bool firstWord = true;

@@ -125,7 +125,8 @@ protected:
         }
 
         assert (mSelectedMesh < numTypeMeshes);
-        MeshPtr m = MeshManager::getSingleton ().getByName (meshes[mSelectedMesh] + ".mesh");
+        MeshPtr m = MeshManager::getSingleton().getByName(
+            meshes[mSelectedMesh] + ".mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         if (!m)
         {
             m = MeshManager::getSingleton ().load (meshes[mSelectedMesh] + ".mesh", 

@@ -333,7 +333,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateMesh)
 {
     String fileName = "indexMix.mesh";
     createMeshWithMaterial(fileName);
-    MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
+    MeshPtr mesh = mMeshMgr->getByName(fileName, "General");
 
     EXPECT_TRUE(mesh->getNumSubMeshes() == 4);
     RenderOperation rop;
@@ -363,7 +363,7 @@ TEST_F(MeshWithoutIndexDataTests,CloneMesh)
 {
     String originalName = "toClone.mesh";
     createMeshWithMaterial(originalName);
-    MeshPtr mesh = mMeshMgr->getByName(originalName).staticCast<Mesh>();
+    MeshPtr mesh = mMeshMgr->getByName(originalName, "General");
 
     String fileName = "clone.mesh";
     MeshPtr clone = mesh->clone(fileName);
@@ -413,7 +413,7 @@ TEST_F(MeshWithoutIndexDataTests,GenerateExtremes)
 {
     String fileName = "testGenerateExtremes.mesh";
     createMeshWithMaterial(fileName);
-    MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
+    MeshPtr mesh = mMeshMgr->getByName(fileName, "General");
 
     const size_t NUM_EXTREMES = 4;
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
@@ -439,7 +439,7 @@ TEST_F(MeshWithoutIndexDataTests,BuildTangentVectors)
 {
     String fileName = "testBuildTangentVectors.mesh";
     createMeshWithMaterial(fileName);
-    MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
+    MeshPtr mesh = mMeshMgr->getByName(fileName, "General");
 
     EXPECT_THROW(mesh->buildTangentVectors(), InvalidParametersException);
     
@@ -451,7 +451,7 @@ TEST_F(MeshWithoutIndexDataTests,GenerateLodLevels)
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
     String fileName = "testGenerateLodLevels.mesh";
     createMeshWithMaterial(fileName);
-    MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
+    MeshPtr mesh = mMeshMgr->getByName(fileName, "General");
 
     LodConfig lodConfig(mesh);
     lodConfig.createGeneratedLodLevel(600, 2, LodLevel::VRM_CONSTANT);

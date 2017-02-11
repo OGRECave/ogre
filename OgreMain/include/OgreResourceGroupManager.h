@@ -262,13 +262,13 @@ namespace Ogre {
     public:
         OGRE_AUTO_MUTEX; // public to allow external locking
         /// Default resource group name
-        static String DEFAULT_RESOURCE_GROUP_NAME;
+        static const String DEFAULT_RESOURCE_GROUP_NAME;
         /// Internal resource group name (should be used by OGRE internal only)
-        static String INTERNAL_RESOURCE_GROUP_NAME;
+        static const String INTERNAL_RESOURCE_GROUP_NAME;
         /// Special resource group name which causes resource group to be automatically determined based on searching for the resource in all groups.
-        static String AUTODETECT_RESOURCE_GROUP_NAME;
+        static const String AUTODETECT_RESOURCE_GROUP_NAME;
         /// The number of reference counts held per resource by the resource system
-        static size_t RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS;
+        static const size_t RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS;
         /// Nested struct defining a resource declaration
         struct ResourceDeclaration
         {

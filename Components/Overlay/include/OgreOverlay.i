@@ -34,4 +34,5 @@
 %include "OgreOverlayManager.h"
 %include "OgreOverlaySystem.h"
 %include "OgrePanelOverlayElement.h"
+%ignore Ogre::TextAreaOverlayElement::getFontName;
 %include "OgreTextAreaOverlayElement.h"

@@ -1729,11 +1729,11 @@ void SceneManager::_setSkyPlane(
         mSkyPlaneRenderQueue = renderQueue;
 
         // Set up the plane
-        MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName);
+        MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName, groupName);
         if (planeMesh)
         {
             // Destroy the old one
-            MeshManager::getSingleton().remove(planeMesh->getHandle());
+            MeshManager::getSingleton().remove(planeMesh);
         }
 
         // Create up vector
@@ -4906,8 +4906,8 @@ void SceneManager::initShadowVolumeMaterials(void)
     }
 
     // Set up spot shadow fade texture (loaded from code data block)
-    TexturePtr spotShadowFadeTex = 
-        TextureManager::getSingleton().getByName("spot_shadow_fade.png");
+    TexturePtr spotShadowFadeTex = TextureManager::getSingleton().getByName(
+        "spot_shadow_fade.png", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
     if (!spotShadowFadeTex)
     {
         // Load the manual buffer into an image (don't destroy memory!

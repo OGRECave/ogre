@@ -938,7 +938,7 @@ namespace Ogre
                 "MeshManager::createBezierPatch");
         }
 
-        MeshPtr pMesh = getByName(name);
+        MeshPtr pMesh = getByName(name, groupName);
         if (pMesh)
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "A mesh called " + name + 

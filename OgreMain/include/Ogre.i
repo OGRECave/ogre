@@ -229,7 +229,8 @@ ADD_REPR(ColourValue)
 %include "OgreHardwareBufferManager.h"
 %include "OgreVertexIndexData.h"
 // managers
-%ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool, Resource*);
+%ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool, Resource*) const;
+%ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool) const;
 %include "OgreResourceGroupManager.h"
 // overloaded by specfic managers (GpuProgram, Texture)
 %ignore Ogre::ResourceManager::getResourceByName;
@@ -273,6 +274,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::RenderSystem::addClipPlane(Real, Real, Real, Real);
 %ignore Ogre::RenderSystem::getFixedPipelineEnabled;
 %ignore Ogre::RenderSystem::setFixedPipelineEnabled;
+%ignore Ogre::RenderSystem::_setTexture(size_t, bool, const String&);
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 %include "OgreCompositorInstance.h"

@@ -868,7 +868,7 @@ namespace Ogre {
         : mParent(parent)
     {
         String matName = "Ogre/Debug/AxesMat";
-        mMat = MaterialManager::getSingleton().getByName(matName);
+        mMat = MaterialManager::getSingleton().getByName(matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         if (!mMat)
         {
             mMat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
@@ -882,7 +882,7 @@ namespace Ogre {
         }
 
         String meshName = "Ogre/Debug/AxesMesh";
-        mMeshPtr = MeshManager::getSingleton().getByName(meshName);
+        mMeshPtr = MeshManager::getSingleton().getByName(meshName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         if (!mMeshPtr)
         {
             ManualObject mo("tmp");
