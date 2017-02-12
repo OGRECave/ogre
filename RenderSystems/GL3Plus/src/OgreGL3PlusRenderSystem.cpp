@@ -1772,8 +1772,10 @@ namespace Ogre {
         OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_WRAP_R,
                                    getTextureAddressingMode( newBlock->mW ) ) );
 
+        float borderColour[4] = { (float)newBlock->mBorderColour.r, (float)newBlock->mBorderColour.g,
+                                  (float)newBlock->mBorderColour.b, (float)newBlock->mBorderColour.a };
         OCGE( glSamplerParameterfv( samplerName, GL_TEXTURE_BORDER_COLOR,
-                                    newBlock->mBorderColour.ptr() ) );
+                                    borderColour ) );
         OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_LOD_BIAS, newBlock->mMipLodBias ) );
         OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MIN_LOD, newBlock->mMinLod ) );
         OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MAX_LOD, newBlock->mMaxLod ) );
