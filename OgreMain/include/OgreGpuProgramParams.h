@@ -655,7 +655,6 @@ namespace Ogre {
 
     public:
         GpuSharedParameters(const String& name);
-        virtual ~GpuSharedParameters();
 
         /// Get the name of this shared parameter set.
         const String& getName() { return mName; }

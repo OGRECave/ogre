@@ -268,7 +268,6 @@ namespace Ogre {
                 }
                 return false;
             }
-            virtual ~TextureDefLess() {}
         };
         typedef map<TextureDef, TextureList*, TextureDefLess>::type TexturesByDef;
         TexturesByDef mTexturesByDef;

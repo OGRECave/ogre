@@ -45,10 +45,6 @@ namespace Ogre
     {
     }
 
-    InstanceBatchShader::~InstanceBatchShader()
-    {
-    }
-
     //-----------------------------------------------------------------------
     size_t InstanceBatchShader::calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const
     {

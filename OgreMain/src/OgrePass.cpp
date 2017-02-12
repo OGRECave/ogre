@@ -45,25 +45,16 @@ namespace Ogre {
     {
         uint32 operator()(const Pass* p) const
         {
-                    OGRE_LOCK_MUTEX(p->mTexUnitChangeMutex);
-
-            _StringHash H;
-            uint32 hash = p->getIndex() << 28;
+            OGRE_LOCK_MUTEX(p->mTexUnitChangeMutex);
+            uint32 hash = 0;
             size_t c = p->getNumTextureUnitStates();
 
-            const TextureUnitState* t0 = 0;
-            const TextureUnitState* t1 = 0;
-            if (c)
-                t0 = p->getTextureUnitState(0);
-            if (c > 1)
-                t1 = p->getTextureUnitState(1);
-
-            if (t0 && !t0->getTextureName().empty())
-                hash += (static_cast<uint32>(H(t0->getTextureName())) 
-                    % (1 << 14)) << 14;
-            if (t1 && !t1->getTextureName().empty())
-                hash += (static_cast<uint32>(H(t1->getTextureName()))
-                    % (1 << 14));
+            for (size_t i = 0; i < c; ++i)
+            {
+                const TextureUnitState* tus = 0;
+                tus = p->getTextureUnitState(i);
+                hash = FastHash(tus->getTextureName().c_str(), tus->getTextureName().size(), hash);
+            }
 
             return hash;
         }
@@ -78,27 +69,26 @@ namespace Ogre {
         uint32 operator()(const Pass* p) const
         {
             OGRE_LOCK_MUTEX(p->mGpuProgramChangeMutex);
+            uint32 hash = 0;
 
-            _StringHash H;
-            uint32 hash = p->getIndex() << 28;
             if (p->hasVertexProgram())
-                hash += (static_cast<uint32>(H(p->getVertexProgramName()))
-                    % (1 << 14)) << 14;
+                hash = FastHash(p->getVertexProgramName().c_str(),
+                                p->getVertexProgramName().size(), hash);
             if (p->hasFragmentProgram())
-                hash += (static_cast<uint32>(H(p->getFragmentProgramName()))
-                    % (1 << 14));
+                hash = FastHash(p->getFragmentProgramName().c_str(),
+                                p->getFragmentProgramName().size(), hash);
             if (p->hasGeometryProgram())
-                hash += (static_cast<uint32>(H(p->getGeometryProgramName()))
-                         % (1 << 14));
+                hash = FastHash(p->getGeometryProgramName().c_str(),
+                                p->getGeometryProgramName().size(), hash);
             if (p->hasTessellationDomainProgram())
-                hash += (static_cast<uint32>(H(p->getTessellationDomainProgramName()))
-                         % (1 << 14));
+                hash = FastHash(p->getTessellationDomainProgramName().c_str(),
+                                p->getTessellationDomainProgramName().size(), hash);
             if (p->hasTessellationHullProgram())
-                hash += (static_cast<uint32>(H(p->getTessellationHullProgramName()))
-                         % (1 << 14));
+                hash = FastHash(p->getTessellationHullProgramName().c_str(),
+                                p->getTessellationHullProgramName().size(), hash);
             if (p->hasComputeProgram())
-                hash += (static_cast<uint32>(H(p->getComputeProgramName()))
-                         % (1 << 14));
+                hash = FastHash(p->getComputeProgramName().c_str(),
+                                p->getComputeProgramName().size(), hash);
 
             return hash;
         }
@@ -110,7 +100,7 @@ namespace Ogre {
     OGRE_STATIC_MUTEX_INSTANCE(Pass::msDirtyHashListMutex);
     OGRE_STATIC_MUTEX_INSTANCE(Pass::msPassGraveyardMutex);
 
-    Pass::HashFunc* Pass::msHashFunc = &sMinTextureStateChangeHashFunc;
+    Pass::HashFunc* Pass::msHashFunc = &sMinGpuProgramChangeHashFunc;
     //-----------------------------------------------------------------------------
     Pass::HashFunc* Pass::getBuiltinHashFunction(BuiltinHashFunction builtin)
     {
@@ -1879,14 +1869,12 @@ namespace Ogre {
         /* Hash format is 32-bit, divided as follows (high to low bits)
            bits   purpose
             4     Pass index (i.e. max 16 passes!)
-           14     Hashed texture name from unit 0
-           14     Hashed texture name from unit 1
-
-           Note that at the moment we don't sort on the 3rd texture unit plus
-           on the assumption that these are less frequently used; sorting on
-           the first 2 gives us the most benefit for now.
+           28     Pass contents
        */
         mHash = (*msHashFunc)(this);
+
+        // overwrite the 4 upper bits with pass index
+        mHash = (uint32(mIndex) << 28) | (mHash >> 4);
     }
     //-----------------------------------------------------------------------
     void Pass::_dirtyHash(void)

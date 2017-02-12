@@ -36,10 +36,6 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    Pose::~Pose()
-    {
-    }
-    //---------------------------------------------------------------------
     void Pose::addVertex(size_t index, const Vector3& offset)
     {
         if (!mNormalsMap.empty())

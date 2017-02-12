@@ -72,7 +72,7 @@ namespace Ogre {
 
         /** Standard destructor.
         */
-        virtual ~Image();
+        ~Image();
 
         /** Assignment operator - copies all the data from the target image.
         */

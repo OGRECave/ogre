@@ -74,15 +74,12 @@ namespace Ogre {
     class _OgreExport ScriptLexer : public ScriptCompilerAlloc
     {
     public:
-        ScriptLexer();
-        virtual ~ScriptLexer() {}
-
         /** Tokenizes the given input and returns the list of tokens found */
-        ScriptTokenListPtr tokenize(const String &str, const String &source);
+        static ScriptTokenListPtr tokenize(const String &str, const String &source);
     private: // Private utility operations
-        void setToken(const String &lexeme, uint32 line, const String &source, ScriptTokenList *tokens);
-        bool isWhitespace(Ogre::String::value_type c) const;
-        bool isNewline(Ogre::String::value_type c) const;
+        static void setToken(const String &lexeme, uint32 line, const String &source, ScriptTokenList *tokens);
+        static bool isWhitespace(Ogre::String::value_type c);
+        static bool isNewline(Ogre::String::value_type c);
     };
 
     /** @} */

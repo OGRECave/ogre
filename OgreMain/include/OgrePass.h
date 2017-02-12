@@ -86,6 +86,14 @@ namespace Ogre {
             be minimised between passes. An implementation of this functor should
             order passes so that the elements that you want to keep constant are
             sorted next to each other.
+
+            Hash format is 32-bit, divided as follows (high to low bits)
+            bits   purpose
+             4     Pass index (i.e. max 16 passes!).
+            28     Pass contents
+
+            @note the high bits returned by this function will get overwritten
+
             @see Pass::setHashFunc
         */
         struct HashFunc
@@ -266,7 +274,7 @@ namespace Ogre {
         Pass(Technique* parent, unsigned short index, const Pass& oth );
         /// Operator = overload
         Pass& operator=(const Pass& oth);
-        virtual ~Pass();
+        ~Pass();
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
         bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage ||
@@ -904,7 +912,7 @@ namespace Ogre {
             @param override true means that a lower camera detail will override this
             pass's detail level, false means it won't (default true).
         */
-        virtual void setPolygonModeOverrideable(bool override)
+        void setPolygonModeOverrideable(bool override)
         {
             mPolygonModeOverrideable = override;
         }
@@ -912,7 +920,7 @@ namespace Ogre {
         /** Gets whether this renderable's chosen detail level can be
             overridden (downgraded) by the camera setting.
         */
-        virtual bool getPolygonModeOverrideable(void) const
+        bool getPolygonModeOverrideable(void) const
         {
             return mPolygonModeOverrideable;
         }
@@ -1684,7 +1692,7 @@ namespace Ogre {
             exist in the render queue. The only time you can do this is either
             before you render anything, or directly after you manuall call
             RenderQueue::clear(true) to completely destroy the queue structures.
-            The default is MIN_TEXTURE_CHANGE.
+            The default is MIN_GPU_PROGRAM_CHANGE.
             @note
             You can also implement your own hash function, see the alternate version
             of this method.
@@ -1700,7 +1708,7 @@ namespace Ogre {
             RenderQueue::clear(true) to completely destroy the queue structures.
             @note
             You can also use one of the built-in hash functions, see the alternate version
-            of this method. The default is MIN_TEXTURE_CHANGE.
+            of this method. The default is MIN_GPU_PROGRAM_CHANGE.
             @see HashFunc
         */
         static void setHashFunction(HashFunc* hashFunc) { msHashFunc = hashFunc; }

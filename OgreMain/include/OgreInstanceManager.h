@@ -156,7 +156,7 @@ namespace Ogre
                          const String &meshName, const String &groupName,
                          InstancingTechnique instancingTechnique, uint16 instancingFlags,
                          size_t instancesPerBatch, unsigned short subMeshIdx, bool useBoneMatrixLookup = false);
-        virtual ~InstanceManager();
+        ~InstanceManager();
 
         const String& getName() const { return mName; }
 

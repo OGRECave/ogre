@@ -41,11 +41,7 @@ namespace Ogre
         , mStoreParityInW(false)
     {
     }
-    //---------------------------------------------------------------------
-    TangentSpaceCalc::~TangentSpaceCalc()
-    {
 
-    }
     //---------------------------------------------------------------------
     void TangentSpaceCalc::clear()
     {

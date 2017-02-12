@@ -47,10 +47,6 @@ namespace Ogre {
         // NB changed to include bone names in 1.1
         mVersion = "[Unknown]";
     }
-    //---------------------------------------------------------------------
-    SkeletonSerializer::~SkeletonSerializer()
-    {
-    }
 
     //---------------------------------------------------------------------
     void SkeletonSerializer::exportSkeleton(const Skeleton* pSkeleton, 

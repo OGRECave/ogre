@@ -58,7 +58,7 @@ namespace Ogre{
         // needs virtual destructor
         virtual ~ScriptTranslator() {}
         /// Retrieves a new translator from the factories and uses it to process the give node
-        void processNode(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        static void processNode(ScriptCompiler *compiler, const AbstractNodePtr &node);
 
         /// Retrieves the node iterator at the given index
         static AbstractNodeList::const_iterator getNodeAt(const AbstractNodeList &nodes, int index);

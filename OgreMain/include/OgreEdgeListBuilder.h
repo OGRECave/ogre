@@ -172,7 +172,6 @@ namespace Ogre {
     public:
 
         EdgeListBuilder();
-        virtual ~EdgeListBuilder();
         /** Add a set of vertex geometry data to the edge builder. 
         @remarks
             You must add at least one set of vertex data to the builder before invoking the

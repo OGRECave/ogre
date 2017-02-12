@@ -71,8 +71,6 @@ namespace Ogre {
         
     public:
         SkeletonSerializer();
-        virtual ~SkeletonSerializer();
-
 
         /** Exports a skeleton to the file specified. 
         @remarks

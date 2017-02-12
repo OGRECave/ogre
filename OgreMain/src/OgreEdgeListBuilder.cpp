@@ -80,10 +80,6 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    EdgeListBuilder::~EdgeListBuilder()
-    {
-    }
-    //---------------------------------------------------------------------
     void EdgeListBuilder::addVertexData(const VertexData* vertexData)
     {
         if (vertexData->vertexStart != 0)

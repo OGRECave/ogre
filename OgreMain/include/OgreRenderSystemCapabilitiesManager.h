@@ -56,7 +56,7 @@ namespace Ogre {
 
         /** Default destructor.
         */
-        virtual ~RenderSystemCapabilitiesManager();
+        ~RenderSystemCapabilitiesManager();
 
 
         /** @see ScriptLoader::parseScript
