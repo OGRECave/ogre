@@ -47,10 +47,6 @@ namespace Ogre
         mParent->_notifyDirty();
     }
     //---------------------------------------------------------------------
-    AnimationState::~AnimationState()
-    {
-    }
-    //---------------------------------------------------------------------
     AnimationState::AnimationState(const String& animName, 
         AnimationStateSet *parent, Real timePos, Real length, Real weight, 
         bool enabled)

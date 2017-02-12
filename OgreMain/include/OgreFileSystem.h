@@ -126,7 +126,6 @@ namespace Ogre {
     class _OgreExport FileSystemArchiveFactory : public ArchiveFactory
     {
     public:
-        virtual ~FileSystemArchiveFactory() {}
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
         /// @copydoc FactoryObj::createInstance

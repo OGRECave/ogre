@@ -266,7 +266,7 @@ namespace Ogre {
         Pass(Technique* parent, unsigned short index, const Pass& oth );
         /// Operator = overload
         Pass& operator=(const Pass& oth);
-        virtual ~Pass();
+        ~Pass();
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
         bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage ||
@@ -904,7 +904,7 @@ namespace Ogre {
             @param override true means that a lower camera detail will override this
             pass's detail level, false means it won't (default true).
         */
-        virtual void setPolygonModeOverrideable(bool override)
+        void setPolygonModeOverrideable(bool override)
         {
             mPolygonModeOverrideable = override;
         }
@@ -912,7 +912,7 @@ namespace Ogre {
         /** Gets whether this renderable's chosen detail level can be
             overridden (downgraded) by the camera setting.
         */
-        virtual bool getPolygonModeOverrideable(void) const
+        bool getPolygonModeOverrideable(void) const
         {
             return mPolygonModeOverrideable;
         }

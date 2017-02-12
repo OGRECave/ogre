@@ -75,7 +75,6 @@ namespace Ogre {
             Real timePos, Real length, Real weight = 1.0, bool enabled = false);
         /// Constructor to copy from an existing state with new parent
         AnimationState(AnimationStateSet* parent, const AnimationState &rhs);
-        virtual ~AnimationState();
         
         /// Gets the name of the animation to which this state applies
         const String& getAnimationName() const;

@@ -63,7 +63,7 @@ namespace Ogre {
         @see
             Root::~Root
         */
-        virtual ~DynLibManager();
+        ~DynLibManager();
 
         /** Loads the passed library.
         @param filename

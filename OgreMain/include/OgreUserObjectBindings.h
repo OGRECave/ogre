@@ -52,7 +52,7 @@ namespace Ogre {
         UserObjectBindings();
 
         /** Class destructor. */
-        virtual ~UserObjectBindings();
+        ~UserObjectBindings();
 
         /** Sets any kind of user object on this class instance.
         @remarks

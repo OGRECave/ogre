@@ -44,10 +44,6 @@ namespace Ogre {
     {
     }
     //-----------------------------------------------------------------------------
-    TagPoint::~TagPoint()
-    {
-    }
-    //-----------------------------------------------------------------------------
     Entity *TagPoint::getParentEntity(void) const
     {
         return mParentEntity;

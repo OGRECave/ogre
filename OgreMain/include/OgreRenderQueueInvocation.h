@@ -176,7 +176,7 @@ namespace Ogre {
         RenderQueueInvocationList mInvocations;
     public:
         RenderQueueInvocationSequence(const String& name);
-        virtual ~RenderQueueInvocationSequence();
+        ~RenderQueueInvocationSequence();
 
         /** Get the name of this sequence. */
         const String& getName(void) const { return mName; }

@@ -374,11 +374,6 @@ namespace Ogre
     {
 
     }
-    //---------------------------------------------------------------------
-    GpuSharedParameters::~GpuSharedParameters()
-    {
-
-    }
     //-----------------------------------------------------------------------------
     size_t GpuSharedParameters::calculateSize(void) const
     {
