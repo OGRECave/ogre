@@ -92,9 +92,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage(getName() + " created.");
 
         mRenderAttribsBound.reserve(100);
-#if OGRE_NO_GLES3_SUPPORT == 0
         mRenderInstanceAttribsBound.reserve(100);
-#endif
 
         mEnableFixedPipeline = false;
 
@@ -1407,7 +1405,7 @@ namespace Ogre {
         VertexDeclaration* globalVertexDeclaration = 0;
         bool hasInstanceData = false;
         size_t numberOfInstances = 0;
-        if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
+        if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
         {
             globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
@@ -1452,7 +1450,7 @@ namespace Ogre {
                                    mRenderAttribsBound, mRenderInstanceAttribsBound, true);
         }
 
-        if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
+        if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
         {
             if( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
             {
@@ -1515,7 +1513,7 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 
-                if(hasInstanceData && (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30))
+                if(hasInstanceData && getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
                 }
@@ -1543,7 +1541,7 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 
-                if((mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30) && hasInstanceData)
+                if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA) && hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
                 }
@@ -2198,7 +2196,7 @@ namespace Ogre {
                 attrib = (GLuint)linkProgram->getAttributeIndex(sem, elemIndex);
             }
 
-            if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
+            if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
             {
                 if (mCurrentVertexProgram)
                 {
