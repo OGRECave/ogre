@@ -119,8 +119,8 @@ static void APIENTRY GLDebugCallback(GLenum source,
 namespace Ogre {
 
     static GL3PlusSupport* glsupport;
-    static void* get_proc(const char* proc) {
-        return glsupport->getProcAddress(proc);
+    static GL3WglProc get_proc(const char* proc) {
+        return (GL3WglProc)glsupport->getProcAddress(proc);
     }
 
     GL3PlusRenderSystem::GL3PlusRenderSystem()
@@ -2091,7 +2091,7 @@ namespace Ogre {
             mCurrentContext->setCurrent();
 
         // Initialise GL3W
-        if (gl3wInitWithGetProc(get_proc)) { // gl3wInit() fails if GL3.0 is not supported
+        if (gl3wInit2(get_proc)) { // gl3wInit() fails if GL3.0 is not supported
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 3.0 is not supported",
                         "GL3PlusRenderSystem::initialiseContext");
