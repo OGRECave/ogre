@@ -1034,12 +1034,17 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
             fireCullFrustumThreads( cullRequest );
         }
     } // end lock on scene graph mutex
+
+    Root::getSingleton()._popCurrentSceneManager(this);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewport* vp,
                                   uint8 firstRq, uint8 lastRq, bool includeOverlays)
 {
     OgreProfileGroup("_renderPhase02", OGREPROF_GENERAL);
+
+    Root::getSingleton()._pushCurrentSceneManager(this);
+    mAutoParamDataSource->setCurrentSceneManager(this);
 
     // reset light hash so even if light list is the same, we refresh the content every frame
     LightList emptyLightList;

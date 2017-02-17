@@ -863,6 +863,7 @@ namespace Ogre
                     ID_LOD_BIAS,
                     ID_LOD_UPDATE_LIST,
                     ID_LOD_CAMERA,
+                    ID_CULL_REUSE_DATA,
                     ID_MATERIAL_SCHEME,
                     ID_VISIBILITY_MASK,
                     ID_SHADOWS_ENABLED,

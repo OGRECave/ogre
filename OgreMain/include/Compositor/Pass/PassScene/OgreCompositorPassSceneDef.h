@@ -112,6 +112,11 @@ namespace Ogre
         */
         Real            mLodBias;
 
+        /** When true, the frustum culling is skipped in this pass. To cull objects, data from
+            the most recent frustum culling execution are used.
+        */
+        bool            mReuseCullData;
+
         /** The material scheme used for this pass. If no material scheme is set then
             it will use the default scheme
         */
@@ -127,6 +132,7 @@ namespace Ogre
             mCameraCubemapReorient( false ),
             mUpdateLodLists( true ),
             mLodBias( 1.0f ),
+            mReuseCullData( false ),
             mMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME)
         {
             //Change base defaults

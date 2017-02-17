@@ -157,8 +157,11 @@ namespace Ogre
         }
         sceneManager->_setForwardPlusEnabledInPass( mDefinition->mEnableForwardPlus );
 
-        mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
-                                             mDefinition->mFirstRQ, mDefinition->mLastRQ );
+        if( !mDefinition->mReuseCullData )
+        {
+            mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
+                                                 mDefinition->mFirstRQ, mDefinition->mLastRQ );
+        }
 
         executeResourceTransitions();
 
