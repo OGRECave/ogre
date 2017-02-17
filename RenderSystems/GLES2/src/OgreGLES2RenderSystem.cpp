@@ -75,8 +75,8 @@ namespace Ogre {
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
     static GLES2Support* glsupport;
-    static void* get_proc(const char* proc) {
-        return glsupport->getProcAddress(proc);
+    static GLESWglProc get_proc(const char* proc) {
+        return (GLESWglProc)glsupport->getProcAddress(proc);
     }
 #endif
 
@@ -1795,7 +1795,7 @@ namespace Ogre {
         // EAGL2Support redirects to glesw for get_proc. Overwriting it there would create an infinite loop.
         if (gleswInit())
 #else
-        if (gleswInitWithGetProc(get_proc))
+        if (gleswInit2(get_proc))
 #endif
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

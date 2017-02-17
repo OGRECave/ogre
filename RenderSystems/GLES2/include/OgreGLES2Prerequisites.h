@@ -38,22 +38,11 @@ namespace Ogre {
     typedef GLContext GLES2Context;
 }
 
-#if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
-#   include <GLES3/gles3w.h>
-#else
-#   include <GLES2/gles2w.h>
-#endif
+#include <GLES3/glesw.h>
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
-#       if OGRE_NO_GLES3_SUPPORT == 0
-#           define __gl_es20_h_
-#           define __gl_es20ext_h_
-#           ifndef GL_GLEXT_PROTOTYPES
-#               define GL_GLEXT_PROTOTYPES
-#           endif
-#       endif
 #   endif
 #elif (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #       include "ppapi/cpp/completion_callback.h"
@@ -175,6 +164,30 @@ namespace Ogre {
 #undef GL_WAIT_FAILED_APPLE
 
 #undef GL_PROGRAM_BINARY_LENGTH_OES
+
+#undef glUnmapBufferOES
+#undef glRenderbufferStorageMultisampleAPPLE
+#undef glGenQueriesEXT
+#undef glDeleteQueriesEXT
+#undef glBeginQueryEXT
+#undef glEndQueryEXT
+#undef glGetQueryObjectuivEXT
+#undef glMapBufferRangeEXT
+#undef glFlushMappedBufferRangeEXT
+#undef glTexImage3DOES
+#undef glCompressedTexImage3DOES
+#undef glTexSubImage3DOES
+#undef glFenceSyncAPPLE
+#undef glClientWaitSyncAPPLE
+#undef glDeleteSyncAPPLE
+#undef glProgramBinaryOES
+#undef glGetProgramBinaryOES
+#undef glDrawElementsInstancedEXT
+#undef glDrawArraysInstancedEXT
+#undef glVertexAttribDivisorEXT
+#undef glBindVertexArrayOES
+#undef glGenVertexArraysOES
+#undef glDeleteVertexArraysOES
 
 // redefine the extensions by their core name
 #define GL_WRITE_ONLY_OES GL_MAP_WRITE_BIT
