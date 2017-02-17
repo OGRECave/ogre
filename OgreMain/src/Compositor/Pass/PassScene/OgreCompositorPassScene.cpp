@@ -69,7 +69,7 @@ namespace Ogre
             mCamera = defaultCamera;
 
         if( mDefinition->mLodCameraName != IdString() )
-            mLodCamera = workspace->findCamera( mDefinition->mCameraName );
+            mLodCamera = workspace->findCamera( mDefinition->mLodCameraName );
         else
             mLodCamera = mCamera;
 
