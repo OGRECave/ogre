@@ -81,6 +81,8 @@ namespace Ogre
             For shadow nodes, when empty, it will use the receiver's lod camera.
         */
         IdString                mLodCameraName;
+        /// When empty, it implies mCameraName == mCullCameraName.
+        IdString                mCullCameraName;
 
         /// First Render Queue ID to render. Inclusive
         uint8           mFirstRQ;

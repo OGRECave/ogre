@@ -8370,6 +8370,21 @@ namespace Ogre{
                         }
                     }
                     break;
+                case ID_CULL_CAMERA:
+                    {
+                        if( prop->values.empty() )
+                        {
+                            compiler->addError( ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line );
+                            return;
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getIdString( *it0, &passScene->mCullCameraName ) )
+                        {
+                             compiler->addError( ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line );
+                        }
+                    }
+                    break;
                 case ID_FIRST_RENDER_QUEUE:
                     {
                         if(prop->values.empty())

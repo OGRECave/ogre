@@ -47,6 +47,7 @@ namespace Ogre
                 mShadowNode( 0 ),
                 mCamera( 0 ),
                 mLodCamera( 0 ),
+                mCullCamera( 0 ),
                 mUpdateShadowNode( false )
     {
         CompositorWorkspace *workspace = parentNode->getWorkspace();
@@ -71,6 +72,11 @@ namespace Ogre
             mLodCamera = workspace->findCamera( mDefinition->mCameraName );
         else
             mLodCamera = mCamera;
+
+        if( mDefinition->mCullCameraName != IdString() )
+            mCullCamera = workspace->findCamera( mDefinition->mCullCameraName );
+        else
+            mCullCamera = mCamera;
     }
     //-----------------------------------------------------------------------------------
     CompositorPassScene::~CompositorPassScene()
@@ -159,7 +165,7 @@ namespace Ogre
 
         if( !mDefinition->mReuseCullData )
         {
-            mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
+            mTarget->_updateViewportCullPhase01( mViewport, mCullCamera, usedLodCamera,
                                                  mDefinition->mFirstRQ, mDefinition->mLastRQ );
         }
 

@@ -864,6 +864,7 @@ namespace Ogre
                     ID_LOD_UPDATE_LIST,
                     ID_LOD_CAMERA,
                     ID_CULL_REUSE_DATA,
+                    ID_CULL_CAMERA,
                     ID_MATERIAL_SCHEME,
                     ID_VISIBILITY_MASK,
                     ID_SHADOWS_ENABLED,
