@@ -71,6 +71,38 @@ Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = N
 
 using namespace std;
 
+static void gl2ext_to_gl3core() {
+    glUnmapBufferOES = glUnmapBuffer;
+    glRenderbufferStorageMultisampleAPPLE = glRenderbufferStorageMultisample;
+
+    glGenQueriesEXT = glGenQueries;
+    glDeleteQueriesEXT = glDeleteQueries;
+    glBeginQueryEXT = glBeginQuery;
+    glEndQueryEXT = glEndQuery;
+    glGetQueryObjectuivEXT = glGetQueryObjectuiv;
+
+    glMapBufferRangeEXT = glMapBufferRange;
+    glFlushMappedBufferRangeEXT = glFlushMappedBufferRange;
+
+    glTexImage3DOES = (PFNGLTEXIMAGE3DOESPROC)glTexImage3D;
+    glCompressedTexImage3DOES = glCompressedTexImage3D;
+    glTexSubImage3DOES = glTexSubImage3D;
+
+    glFenceSyncAPPLE = glFenceSync;
+    glClientWaitSyncAPPLE = glClientWaitSync;
+    glDeleteSyncAPPLE = glDeleteSync;
+
+    glProgramBinaryOES = glProgramBinary;
+    glGetProgramBinaryOES = glGetProgramBinary;
+
+    glDrawElementsInstancedEXT = glDrawElementsInstanced;
+    glDrawArraysInstancedEXT = glDrawArraysInstanced;
+    glVertexAttribDivisorEXT = glVertexAttribDivisor;
+    glBindVertexArrayOES = glBindVertexArray;
+    glGenVertexArraysOES = glGenVertexArrays;
+    glDeleteVertexArraysOES = glDeleteVertexArrays;
+}
+
 namespace Ogre {
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
@@ -391,7 +423,7 @@ namespace Ogre {
 
         rsc->setCapability(RSC_TEXTURE_1D);
 
-        if(!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_texture_3D"))
+        if(mHasGLES30 || mGLSupport->checkExtension("GL_OES_texture_3D"))
             rsc->setCapability(RSC_TEXTURE_3D);
 
         // ES 3 always supports NPOT textures
@@ -412,10 +444,10 @@ namespace Ogre {
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
         
-        if(!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_vertex_array_object"))
+        if(mHasGLES30 || mGLSupport->checkExtension("GL_OES_vertex_array_object"))
             rsc->setCapability(RSC_VAO);
 
-        if (!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_get_program_binary"))
+        if (mHasGLES30 || mGLSupport->checkExtension("GL_OES_get_program_binary"))
         {
             // http://www.khronos.org/registry/gles/extensions/OES/OES_get_program_binary.txt
             GLint formats;
@@ -1808,6 +1840,10 @@ namespace Ogre {
 
         mHasGLES30 = mGLSupport->hasMinGLVersion(3, 0);
 
+        if(mHasGLES30) {
+            gl2ext_to_gl3core();
+        }
+
         LogManager::getSingleton().logMessage("**************************************");
         LogManager::getSingleton().logMessage("*** OpenGL ES 2.x Renderer Started ***");
         LogManager::getSingleton().logMessage("**************************************");
@@ -2262,9 +2298,10 @@ namespace Ogre {
         // Must change the packing to ensure no overruns!
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
-#endif
+        if(mHasGLES30) {
+            glReadBuffer((buffer == RenderWindow::FB_FRONT) ? GL_FRONT : GL_BACK);
+        }
+
         uint32_t height = vp->getTarget()->getHeight();
 
         glReadPixels((GLint)src.left, (GLint)(height - src.bottom),
