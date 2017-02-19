@@ -123,9 +123,6 @@ namespace Ogre {
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated = !PixelUtil::isCompressed(mFormat);
 
-        if(!nonPowerOfTwoSupported && (!Bitwise::isPO2(mWidth) || !Bitwise::isPO2(mHeight)))
-            mMipmapsHardwareGenerated = false;
-
         // glGenerateMipmap require all mip levels to be prepared. So override how many this texture has.
         if((mUsage & TU_AUTOMIPMAP) && mMipmapsHardwareGenerated && mNumRequestedMipmaps)
             mNumMipmaps = maxMips;
@@ -365,12 +362,6 @@ namespace Ogre {
         }
 
         _loadImages(imagePtrs);
-
-        if((mUsage & TU_AUTOMIPMAP) &&
-           mNumRequestedMipmaps && mMipmapsHardwareGenerated)
-        {
-            OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGLES2TextureTarget()));
-        }
     }
 
     void GLES2Texture::freeInternalResourcesImpl()
@@ -427,12 +418,6 @@ namespace Ogre {
         mSurfaceList.clear();
 
         // For all faces and mipmaps, store surfaces as HardwarePixelBufferSharedPtr
-        bool wantGeneratedMips = (mUsage & TU_AUTOMIPMAP)!=0;
-
-        // Do mipmapping in software? (uses GLU) For some cards, this is still needed. Of course,
-        // only when mipmap generation is desired.
-        bool doSoftware = wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps();
-
         for (size_t face = 0; face < getNumFaces(); face++)
         {
             uint32 width = mWidth;
@@ -450,7 +435,7 @@ namespace Ogre {
                                                                             static_cast<GLint>(face),
                                                                             mip,
                                                                             static_cast<HardwareBuffer::Usage>(mUsage),
-                                                                            doSoftware && mip == 0, mHwGamma, mFSAA);
+                                                                            mHwGamma, mFSAA);
 
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 

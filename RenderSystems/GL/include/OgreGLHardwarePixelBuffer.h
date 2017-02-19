@@ -54,7 +54,7 @@ namespace Ogre {
     public:
         /** Texture constructor */
         GLTextureBuffer(GLSupport& support, const String &baseName, GLenum target, GLuint id, GLint face,
-            GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
+            GLint level, Usage usage, bool writeGamma, uint fsaa);
         ~GLTextureBuffer();
         
         /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
@@ -87,7 +87,6 @@ namespace Ogre {
         GLuint mTextureID;
         GLint mFace;
         GLint mLevel;
-        bool mSoftwareMipmap;       // Use GLU for mip mapping
         bool mHwGamma;
 
         typedef vector<RenderTexture*>::type SliceTRT;

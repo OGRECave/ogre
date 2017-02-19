@@ -304,10 +304,13 @@ namespace Ogre {
                     NULL));
                 break;
             }
-            if (mUsage & TU_AUTOMIPMAP && (mTarget == GL_TEXTURE_2D_ARRAY || mTarget == GL_TEXTURE_3D))
-            {
-                OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
-            }
+        }
+
+        // TU_AUTOMIPMAP is only enabled when there are no custom mips
+        // so we do not have to care about overwriting
+        if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0))
+        {
+            OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
         }
 
         // Delete PBO.

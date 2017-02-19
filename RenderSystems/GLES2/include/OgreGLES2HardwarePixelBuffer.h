@@ -55,7 +55,7 @@ namespace Ogre {
         public:
             /** Texture constructor */
             GLES2TextureBuffer(const String &baseName, GLenum target, GLuint id, GLint width, GLint height, GLint depth, GLint internalFormat,
-                               GLint format, GLint face, GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
+                               GLint format, GLint face, GLint level, Usage usage, bool writeGamma, uint fsaa);
             virtual ~GLES2TextureBuffer();
 
             /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer
@@ -103,7 +103,6 @@ namespace Ogre {
             GLuint mBufferId;
             GLint mFace;
             GLint mLevel;
-            bool mSoftwareMipmap;
                 
             typedef vector<RenderTexture*>::type SliceTRT;
             SliceTRT mSliceTRT;
