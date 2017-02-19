@@ -350,25 +350,6 @@ namespace Ogre {
             }
         }
 
-        if (mCurrentCapabilities->hasCapability(RSC_COMPUTE_PROGRAM))
-        {
-            isValidBinding = true;
-            if (tl.getBindingType() == TextureUnitState::BT_COMPUTE)
-            {
-                // Bind vertex texture
-                _setComputeTexture(texUnit, tex);
-                // bind nothing to fragment unit (hardware isn't shared but fragment
-                // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr.get());
-            }
-            else
-            {
-                // vice versa
-                _setComputeTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex.get());
-            }
-        }
-
         if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
             isValidBinding = true;
@@ -509,15 +490,6 @@ namespace Ogre {
             "you should use the regular texture samplers which are shared between "
             "the vertex and fragment units.", 
             "RenderSystem::_setGeometryTexture");
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::_setComputeTexture(size_t unit, const TexturePtr& tex)
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-            "This rendersystem does not support separate compute texture samplers, "
-            "you should use the regular texture samplers which are shared between "
-            "the vertex and fragment units.", 
-            "RenderSystem::_setComputeTexture");
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_setTessellationHullTexture(size_t unit, const TexturePtr& tex)

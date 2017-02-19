@@ -271,7 +271,6 @@ namespace Ogre
         void _setBindingType(TextureUnitState::BindingType bindingType);
         void _setVertexTexture(size_t unit, const TexturePtr& tex);
         void _setGeometryTexture(size_t unit, const TexturePtr& tex);
-        void _setComputeTexture(size_t unit, const TexturePtr& tex);
         void _setTessellationHullTexture(size_t unit, const TexturePtr& tex);
         void _setTessellationDomainTexture(size_t unit, const TexturePtr& tex);
         void _disableTextureUnit(size_t texUnit);

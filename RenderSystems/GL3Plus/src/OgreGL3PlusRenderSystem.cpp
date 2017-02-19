@@ -1075,11 +1075,6 @@ namespace Ogre {
         _setTexture(unit, true, tex.get());
     }
 
-    void GL3PlusRenderSystem::_setComputeTexture( size_t unit, const TexturePtr &tex )
-    {
-        _setTexture(unit, true, tex.get());
-    }
-
     void GL3PlusRenderSystem::_setTessellationHullTexture( size_t unit, const TexturePtr &tex )
     {
         _setTexture(unit, true, tex.get());

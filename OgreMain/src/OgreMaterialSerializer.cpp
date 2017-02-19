@@ -1082,9 +1082,6 @@ namespace Ogre
                 case TextureUnitState::BT_TESSELLATION_HULL:
                     writeValue("tessellation_hull");
                     break;
-                case TextureUnitState::BT_COMPUTE:
-                    writeValue("compute");
-                    break;
                 };
         
             }

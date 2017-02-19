@@ -4416,9 +4416,6 @@ namespace Ogre{
                             case ID_TESSELLATION_DOMAIN:
                                 mUnit->setBindingType(TextureUnitState::BT_TESSELLATION_DOMAIN);
                                 break;
-                            case ID_COMPUTE:
-                                mUnit->setBindingType(TextureUnitState::BT_COMPUTE);
-                                break;
                             default:
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                     atom->value + " is not a valid binding type (must be \"vertex\" or \"fragment\")");

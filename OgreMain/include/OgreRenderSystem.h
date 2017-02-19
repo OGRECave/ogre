@@ -849,7 +849,6 @@ namespace Ogre
         */
         virtual void _setVertexTexture(size_t unit, const TexturePtr& tex);
         virtual void _setGeometryTexture(size_t unit, const TexturePtr& tex);
-        virtual void _setComputeTexture(size_t unit, const TexturePtr& tex);
         virtual void _setTessellationHullTexture(size_t unit, const TexturePtr& tex);
         virtual void _setTessellationDomainTexture(size_t unit, const TexturePtr& tex);
 

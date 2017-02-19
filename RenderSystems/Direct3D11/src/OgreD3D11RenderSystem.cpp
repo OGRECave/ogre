@@ -2096,14 +2096,6 @@ bail:
             _setTexture(stage, true, tex.get());
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setComputeTexture(size_t stage, const TexturePtr& tex)
-    {
-        if (tex.isNull())
-            _setTexture(stage, false, tex.get());
-        else
-            _setTexture(stage, true, tex.get());
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTessellationHullTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())

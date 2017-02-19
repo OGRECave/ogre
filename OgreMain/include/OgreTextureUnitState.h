@@ -452,9 +452,7 @@ namespace Ogre {
             /// Tessellation control processing unit
             BT_TESSELLATION_HULL = 3,
             /// Tessellation evaluation processing unit
-            BT_TESSELLATION_DOMAIN = 4,
-            /// Compute processing unit
-            BT_COMPUTE = 5
+            BT_TESSELLATION_DOMAIN = 4
         };
         /** Enum identifying the type of content this texture unit contains.
         */

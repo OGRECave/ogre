@@ -347,10 +347,6 @@ namespace Ogre {
         /** See
          RenderSystem
          */
-        void _setComputeTexture(size_t unit, const TexturePtr &tex);
-        /** See
-         RenderSystem
-         */
         void _setTessellationHullTexture(size_t unit, const TexturePtr &tex);
         /** See
          RenderSystem
