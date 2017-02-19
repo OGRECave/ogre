@@ -180,4 +180,50 @@ namespace Demo
             }
         }
     }
+    //-----------------------------------------------------------------------------------
+    void ScreenSpaceReflections::setupSSRValues( double equivalentMetersInCurrentUnit,
+                                                 double zThickness,
+                                                 double zThicknessBiasAmount,
+                                                 double zThicknessBiasStart,
+                                                 double zThicknessBiasEnd,
+                                                 float maxDistance,
+                                                 float reprojectionMaxDistanceError,
+                                                 Ogre::uint16 pixelStride,
+                                                 Ogre::uint16 maxSteps )
+    {
+        assert( zThicknessBiasStart < zThicknessBiasEnd );
+        assert( maxDistance > 0 );
+        assert( reprojectionMaxDistanceError >= 0 );
+        assert( pixelStride > 0 );
+        assert( maxSteps > 0 );
+
+        zThickness                  *= equivalentMetersInCurrentUnit;
+        zThicknessBiasStart         *= equivalentMetersInCurrentUnit;
+        zThicknessBiasEnd           *= equivalentMetersInCurrentUnit;
+        zThicknessBiasAmount        *= equivalentMetersInCurrentUnit;
+        maxDistance                 *= equivalentMetersInCurrentUnit;
+        reprojectionMaxDistanceError*= equivalentMetersInCurrentUnit;
+
+        Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().load(
+                    "SSR/ScreenSpaceReflectionsVectors",
+                    Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+                staticCast<Ogre::Material>();
+
+        Ogre::Pass *pass = material->getTechnique(0)->getPass(0);
+        Ogre::GpuProgramParametersSharedPtr psParams = pass->getFragmentProgramParameters();
+
+        const double biasRangeTimesAmount = zThicknessBiasAmount /
+                                            (zThicknessBiasEnd - zThicknessBiasStart);
+        const double biasStartTimesRangeTimesAmount = zThicknessBiasStart * biasRangeTimesAmount;
+
+        psParams->setNamedConstant( "zThickness",
+                                    Ogre::Vector4( Ogre::Real( zThickness ),
+                                                   Ogre::Real( biasRangeTimesAmount ),
+                                                   Ogre::Real( -biasStartTimesRangeTimesAmount ),
+                                                   Ogre::Real( zThicknessBiasAmount ) ) );
+        psParams->setNamedConstant( "maxDistance", maxDistance );
+        psParams->setNamedConstant( "reprojectionMaxDistanceError", reprojectionMaxDistanceError );
+        psParams->setNamedConstant( "stride", (float)pixelStride );
+        psParams->setNamedConstant( "maxSteps", (float)maxSteps );
+    }
 }

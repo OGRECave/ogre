@@ -89,13 +89,13 @@ material SSR/ScreenSpaceReflectionsVectors
 			fragment_program_ref SSR/ScreenSpaceReflectionsVectors_ps
 			{
 				param_named_auto	depthBufferRes		texture_size 0
-				param_named			zThickness			float	0.25
+				//See ScreenSpaceReflections::setupSSRValues
+				param_named			zThickness			float3	0.25 1 1
 				param_named_auto	nearPlaneZ			near_clip_distance
 
 				param_named			stride				float	4
 				param_named			maxSteps			float	200
 				param_named			maxDistance			float	1000
-				param_named			strideZCutoff		float	0.01
 
 				param_named			reprojectionMaxDistanceError	float	2
 

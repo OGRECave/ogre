@@ -53,6 +53,7 @@ namespace Demo
 //                    "SaintPetersBasilica.dds", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 //                    Ogre::TEX_TYPE_CUBE_MAP );
         //mScreenSpaceReflections = new ScreenSpaceReflections( globalCubemap );
+        ScreenSpaceReflections::setupSSRValues( 1.0 );
         mScreenSpaceReflections = new ScreenSpaceReflections( Ogre::TexturePtr(),
                                                               mGraphicsSystem->getRoot()->
                                                               getRenderSystem() );

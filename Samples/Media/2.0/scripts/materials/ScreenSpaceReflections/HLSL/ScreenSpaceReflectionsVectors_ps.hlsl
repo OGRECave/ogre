@@ -63,7 +63,6 @@ struct PS_INPUT
 
 #define p_maxSteps						maxSteps
 #define p_maxDistance					maxDistance
-#define p_strideZCutoff					strideZCutoff
 
 #define p_projectionParams				projectionParams
 #define p_invDepthBufferRes				invDepthBufferRes
@@ -75,16 +74,16 @@ struct PS_INPUT
 //struct Params
 //{
 uniform	float4 p_depthBufferRes;// dimensions of the z-buffer. .w = max( .x, .y )
-uniform	float p_zThickness;		// thickness to ascribe to each pixel in the depth buffer
+// .x = thickness to ascribe to each pixel in the depth buffer.
+// .yzw = Bias to increase the thickness as Z becomes larger to perform high quality reflections for
+//		  distant objects. See intersectsDepthBuffer and ScreenSpaceReflections::setupSSRValues
+uniform	float4 p_zThickness;
 uniform	float p_nearPlaneZ;		// the camera's near z plane
 
 uniform	float p_stride;		// Step in horizontal or vertical pixels between samples. This is a float
 							// because integer math is slow on GPUs, but should be set to an integer >= 1.
 uniform	float p_maxSteps;		// Maximum number of iterations. Higher gives better images but may be slow.
 uniform	float p_maxDistance;	// Maximum camera-space distance to trace before returning a miss.
-uniform	float p_strideZCutoff;	// More distant pixels are smaller in screen space. This value tells at what point to
-								// start relaxing the stride to give higher quality reflections for objects far from
-								// the camera.
 
 uniform	float2 p_projectionParams;
 uniform	float2 p_invDepthBufferRes;
@@ -110,9 +109,17 @@ INLINE bool intersectsDepthBuffer( float z, float minZ, float maxZ )
 		artifacts. Driving this value up too high can cause
 		artifacts of its own.
 	*/
-	float depthScale = min( 1.0f, z * p_strideZCutoff );
-	z += p_zThickness + lerp( 0.0f, 2.0f, depthScale );
-	return (maxZ >= z) && (minZ - p_zThickness <= z);
+	//Originally:
+	//	depthThicknessDynamicBias = clamp( (z + biasStart) * biasRange, 0, 1 ) * biasAmount;
+	//	= clamp( (z - biasStart) * biasRange * biasAmount, 0, biasAmount );
+	//	= clamp( (z - biasStart) * biasRangeTimesAmount, 0, biasAmount );
+	//	= clamp( (z * biasRangeTimesAmount + -biasStartTimesRangeTimesAmount), 0, biasAmount );
+	//The goal is to preserver precision as biasRange may be too small,
+	//and to allow fmad optimization.
+	float depthThicknessDynamicBias = clamp( (z * p_zThickness.y + p_zThickness.z),
+											 0.0, p_zThickness.w );
+	z += p_zThickness.x + depthThicknessDynamicBias;
+	return (maxZ >= z) && (minZ - p_zThickness.x - depthThicknessDynamicBias <= z);
 }
 
 INLINE void swap( inout float a, inout float b )
@@ -211,11 +218,9 @@ INLINE bool traceScreenSpaceRay
 
 	// Scale derivatives by the desired pixel stride and then
 	// offset the starting values by the jitter fraction
-	float strideScale	= 1.0f - min( 1.0f, csOrig.z * p_strideZCutoff );
-	float fStride		= 1.0f + strideScale * p_stride;
-	dP *= fStride;
-	dQ *= fStride;
-	dk *= fStride;
+	dP *= p_stride;
+	dQ *= p_stride;
+	dk *= p_stride;
 
 	P0 += dP * jitter;
 	Q0 += dQ * jitter;

@@ -87,24 +87,6 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 			input 0 prevFrame
 		}
 	}
-	target prevFrame
-	{
-		pass clear { discard_only true }
-		pass render_quad
-		{
-			material SSR/Quincunx
-			input 0 reflectionBuffer
-		}
-	}
-	target reflectionBuffer
-	{
-		pass clear { discard_only true }
-		pass render_quad
-		{
-			material SSR/Quincunx
-			input 0 prevFrame
-		}
-	}
 
 	target rtt
 	{
