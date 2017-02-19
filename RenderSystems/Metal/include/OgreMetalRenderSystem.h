@@ -30,6 +30,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #define _OgreMetalRenderSystem_H_
 
 #include "OgreMetalPrerequisites.h"
+#include "OgreMetalPixelFormatToShaderType.h"
 
 #include "OgreRenderSystem.h"
 #include "OgreMetalDevice.h"
@@ -43,12 +44,6 @@ namespace Ogre
     {
         class HardwareBufferManager;
     }
-
-    class _OgreMetalExport MetalPixelFormatToShaderType : public PixelFormatToShaderType
-    {
-    public:
-        virtual const char* getPixelFormatType( PixelFormat pixelFormat ) const { return 0; }
-    };
 
     /**
        Implementation of Metal as a rendering system.

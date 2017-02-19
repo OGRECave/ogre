@@ -339,7 +339,7 @@ float4 diffuseCol;
 	@insertpiece( SampleRoughnessMap )
 
 @end @property( hlms_use_prepass )
-	int2 iFragCoord = int2( inPs.gl_FragCoord.xy );
+	ushort2 iFragCoord = ushort2( inPs.gl_FragCoord.xy );
 
 	@property( hlms_use_prepass_msaa )
 		int gBufSubsample = ctz( gl_SampleMask );

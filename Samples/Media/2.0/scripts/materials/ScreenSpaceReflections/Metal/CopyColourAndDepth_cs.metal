@@ -2,7 +2,7 @@
 
 using namespace metal;
 
-kernel void main
+kernel void main_metal
 (
 	texture2d<@insertpiece(texture0_pf_type), access::read> srcRtt			[[texture(0)]],
 	@property( !texture1_msaa )
@@ -12,7 +12,7 @@ kernel void main
 	@end
 
 	texture2d<@insertpiece(uav0_pf_type), access::write> dstRtt		[[texture(UAV_SLOT_START+0)]],
-	texture2d<@insertpiece(uav1_pf_type), access::write> dstDepth	[[texture(UAV_SLOT_START+1)]]
+	texture2d<@insertpiece(uav1_pf_type), access::write> dstDepth	[[texture(UAV_SLOT_START+1)]],
 
 	ushort3 gl_GlobalInvocationID	[[thread_position_in_grid]]
 )
