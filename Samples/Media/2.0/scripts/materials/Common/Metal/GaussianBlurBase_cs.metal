@@ -21,6 +21,9 @@
 // The script uses the template syntax to automatically set the num. of threadgroups
 // based on the bound input texture.
 
+#include <metal_stdlib>
+using namespace metal;
+
 // 32 = 128 / 4
 @pset( threads_per_group_x, 32 )
 @pset( threads_per_group_y, 2 )
@@ -75,9 +78,9 @@ struct Params
 	@insertpiece( extra_params )
 };
 
-@insertpiece( lds_data_type ) sampleTex( int2 i2Position , float2 f2Offset, constant Params &p,
-										 sampler inputSampler,
-										 texture2d<@insertpiece(texture0_pf_type)> inputImage )
+inline @insertpiece( lds_data_type ) sampleTex( int2 i2Position, float2 f2Offset, constant Params &p,
+												sampler inputSampler,
+												texture2d<@insertpiece(texture0_pf_type)> inputImage )
 {
 	float2 f2SamplePosition = float2( i2Position ) + float2( 0.5f, 0.5f );
 
@@ -86,9 +89,10 @@ struct Params
 	@insertpiece( image_sample )
 }
 
-void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2 i2Inc,
-						  @insertpiece( lds_definition ),
-						  texture2D<@insertpiece(uav0_pf_type), access::write> outputImage )
+inline void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2 i2Inc,
+								 constant Params &p,
+								 @insertpiece( lds_definition ),
+								 texture2d<@insertpiece(uav0_pf_type), access::write> outputImage )
 {
 	@property( !downscale_lq )
 		@insertpiece( data_type ) outColour[ 4 ];
@@ -102,10 +106,10 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 
 	@property( !downscale_lq )
 		@foreach( 4, iPixel )
-			outColour[ @iPixel ].xyz = RDI[ @iPixel ] * c_weights[ @value( kernel_radius ) ];@end
+			outColour[ @iPixel ].xyz = RDI[ @iPixel ] * p.c_weights[ @value( kernel_radius ) ];@end
 	@end @property( downscale_lq )
 		@foreach( 2, iPixel )
-			outColour[ @iPixel ].xyz = RDI[ @iPixel * 2 ] * c_weights[ @value( kernel_radius ) ];@end
+			outColour[ @iPixel ].xyz = RDI[ @iPixel * 2 ] * p.c_weights[ @value( kernel_radius ) ];@end
 	@end
 
 	@foreach( 4, iPixel )
@@ -118,10 +122,10 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 	@foreach( kernel_radius, iIteration )
 		@property( !downscale_lq )
 			@foreach( 4, iPixel )
-				outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @iIteration ];@end
+				outColour[ @iPixel ].xyz += RDI[ @iPixel ] * p.c_weights[ @iIteration ];@end
 		@end @property( downscale_lq )
 			@foreach( 2, iPixel )
-				outColour[ @iPixel ].xyz += RDI[ @iPixel * 2 ] * c_weights[ @iIteration ];@end
+				outColour[ @iPixel ].xyz += RDI[ @iPixel * 2 ] * p.c_weights[ @iIteration ];@end
 		@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
@@ -143,10 +147,10 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 	@foreach( kernel_radius2x_plus1, iIteration, kernel_radius_plus1 )
 		@property( !downscale_lq )
 			@foreach( 4, iPixel )
-				outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
+				outColour[ @iPixel ].xyz += RDI[ @iPixel ] * p.c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
 		@end @property( downscale_lq )
 			@foreach( 2, iPixel )
-				outColour[ @iPixel ].xyz += RDI[ @iPixel * 2 ] * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
+				outColour[ @iPixel ].xyz += RDI[ @iPixel * 2 ] * p.c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
 		@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
@@ -161,11 +165,11 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 	@insertpiece( image_store )
 }
 
-kernel void main
+kernel void main_metal
 (
 	  sampler inputSampler												[[sampler(0)]]
 	, texture2d<@insertpiece(texture0_pf_type)> inputImage				[[texture(0)]]
-	, texture2D<@insertpiece(uav0_pf_type), access::write> outputImage	[[texture(UAV_SLOT_START+0)]]
+	, texture2d<@insertpiece(uav0_pf_type), access::write> outputImage	[[texture(UAV_SLOT_START+0)]]
 
 	, constant Params &p [[buffer(PARAMETER_SLOT)]]
 
@@ -199,7 +203,7 @@ kernel void main
 						   p, inputSampler, inputImage );
 	}
 
-	threadgroup_barrier( mem_threadgroup );
+	threadgroup_barrier( mem_flags::mem_threadgroup );
 
 	int iPixelOffset = int( gl_LocalInvocationID.x << 2u ); //gl_LocalInvocationID.x * 4u
 	i2Coord = int2( i2GroupCoord.x + iPixelOffset, i2GroupCoord.y );
@@ -214,7 +218,7 @@ kernel void main
 			i2Center.x = int( uint( i2Center.x ) >> 1u );
 		@end
 
-		ComputeFilterKernel( iPixelOffset, iLineOffset, i2Center, i2Inc, g_f3LDS, outputImage );
+		ComputeFilterKernel( iPixelOffset, iLineOffset, i2Center, i2Inc, p, g_f3LDS, outputImage );
 	}
 @end @property( !horizontal_pass )
 	int iSampleOffset	= int( gl_LocalInvocationID.x * @value( samples_per_thread ) );
@@ -234,7 +238,7 @@ kernel void main
 						   p, inputSampler, inputImage );
 	}
 
-	threadgroup_barrier( mem_threadgroup );
+	threadgroup_barrier( mem_flags::mem_threadgroup );
 
 	int iPixelOffset = int( gl_LocalInvocationID.x << 2u ); //gl_LocalInvocationID.x * 4u
 	i2Coord = int2( i2GroupCoord.x, i2GroupCoord.y + iPixelOffset );
@@ -249,7 +253,7 @@ kernel void main
 			i2Center.y = int( uint( i2Center.y ) >> 1u );
 		@end
 
-		ComputeFilterKernel( iPixelOffset, iLineOffset, i2Center, i2Inc, g_f3LDS, outputImage );
+		ComputeFilterKernel( iPixelOffset, iLineOffset, i2Center, i2Inc, p, g_f3LDS, outputImage );
 	}
 @end
 }

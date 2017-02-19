@@ -31,12 +31,12 @@
 @piece( image_store )
 	@property( downscale_lq )
 		@foreach( 2, iPixel )
-			outputImage.write( uint2( i2Center +  @iPixel * i2Inc ), float4( outColour[ @iPixel ], 1.0 ),
-								0, p.dstLodIdx );@end
+			outputImage.write( float4( outColour[ @iPixel ], 1.0 ), uint2( i2Center +  @iPixel * i2Inc ),
+							   p.dstLodIdx );@end
 	@end @property( !downscale_lq )
 		@foreach( 2, iPixel )
-			outputImage.write( uint2( i2Center +  @iPixel * i2Inc ),
-							   float4( (outColour[ @iPixel * 2 ] + outColour[ @iPixel * 2 + 1 ]) * 0.5, 1.0 ),
-								0, p.dstLodIdx );@end
+			outputImage.write( float4( (outColour[ @iPixel * 2 ] + outColour[ @iPixel * 2 + 1 ]) * 0.5, 1.0 ),
+							   uint2( i2Center +  @iPixel * i2Inc ),
+							   p.dstLodIdx );@end
 	@end
 @end

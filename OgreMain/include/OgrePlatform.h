@@ -300,6 +300,24 @@ namespace Ogre {
 #endif
 
 //----------------------------------------------------------------------------
+// Apple Settings
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+// on Apple & Windows we override OgreBuildSettings.h for convenience
+// see https://bitbucket.org/sinbad/ogre/pull-requests/728
+#   ifdef OGRE_DEBUG_MODE
+#   undef OGRE_DEBUG_MODE
+#   endif
+
+// Win32 compilers use _DEBUG for specifying debug builds.
+// for MinGW, we set DEBUG
+#   if defined(_DEBUG) || defined(DEBUG)
+#       define OGRE_DEBUG_MODE 1
+#   else
+#       define OGRE_DEBUG_MODE 0
+#   endif
+#endif
+
+//----------------------------------------------------------------------------
 // Android Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #   ifndef CLOCKS_PER_SEC

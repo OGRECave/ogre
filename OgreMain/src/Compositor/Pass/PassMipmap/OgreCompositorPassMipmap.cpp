@@ -231,7 +231,7 @@ namespace Ogre
                     shaderParams->mParams.push_back( paramLodIdx );
                     shaderParams->mParams.push_back( paramOutputSize );
                     shaderParams->setDirty();
-                    shaderParams = &blurH2->getShaderParams( "metal" );
+                    shaderParams = &blurV2->getShaderParams( "metal" );
                     shaderParams->mParams.push_back( paramDstLodIdx );
                     shaderParams->setDirty();
 
