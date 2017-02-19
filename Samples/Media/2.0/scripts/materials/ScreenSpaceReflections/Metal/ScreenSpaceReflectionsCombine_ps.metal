@@ -77,7 +77,7 @@ INLINE float3 viewSpacePositionFromDepth( float2 ssPosXY, float zDepth )
 	return result.xyz;
 }
 
-float4 main
+float4 main_metal
 (
 	PS_INPUT inPs,
 	float4 gl_FragCoord [[position]],
@@ -91,7 +91,11 @@ float4 main
 		texture2d_ms<float, access::read> gBuf_shadowRoughness	[[texture(2)]],
 	#endif
 	texture2d<float> prevFrame									[[texture(3)]],
-	texture2d<float, access::read> rayTraceBuffer				[[texture(4)]],
+	#if HQ
+		texture2d<float, access::read> rayTraceBuffer				[[texture(4)]],
+	#else
+		texture2d<float, access::sample> rayTraceBuffer				[[texture(4)]],
+	#endif
 	//uniform samplerCube globalCubemap							[[texture(5)]],
 
 	sampler trilinearSampler									[[sampler(3)]],
@@ -104,7 +108,12 @@ float4 main
 	//float depth = depthTexture.read( uint2( gl_FragCoord.xy ), 0 ).x;
 	//float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth );
 
-	float4 raySS = rayTraceBuffer.read( uint2( gl_FragCoord.xy * 0.5f ), 0 ).xyzw;
+
+#if HQ
+	float4 raySS = rayTraceBuffer.read( uint2( gl_FragCoord.xy ), 0 ).xyzw;
+#else
+	float4 raySS = rayTraceBuffer.sample( trilinearSampler, inPs.uv0.xy ).xyzw;
+#endif
 
 	//Do not decode roughness, keep it in [0; 1] range.
 	float roughness = gBuf_shadowRoughness.read( int2( gl_FragCoord.xy ), 0 ).y;

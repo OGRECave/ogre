@@ -55,16 +55,16 @@ struct PS_INPUT
 struct Params
 {
 	float4 depthBufferRes;// dimensions of the z-buffer. .w = max( .x, .y )
-	float zThickness;		// thickness to ascribe to each pixel in the depth buffer
+	// .x = thickness to ascribe to each pixel in the depth buffer.
+	// .yzw = Bias to increase the thickness as Z becomes larger to perform high quality reflections for
+	//		  distant objects. See intersectsDepthBuffer and ScreenSpaceReflections::setupSSRValues
+	float4 zThickness;
 	float nearPlaneZ;		// the camera's near z plane
 
 	float stride;		// Step in horizontal or vertical pixels between samples. This is a float
 								// because integer math is slow on GPUs, but should be set to an integer >= 1.
 	float maxSteps;		// Maximum number of iterations. Higher gives better images but may be slow.
 	float maxDistance;	// Maximum camera-space distance to trace before returning a miss.
-	float strideZCutoff;	// More distant pixels are smaller in screen space. This value tells at what point to
-									// start relaxing the stride to give higher quality reflections for objects far from
-									// the camera.
 
 	float2 projectionParams;
 	float2 invDepthBufferRes;
@@ -88,9 +88,17 @@ INLINE bool intersectsDepthBuffer( float z, float minZ, float maxZ PARAMS_ARG_DE
 		artifacts. Driving this value up too high can cause
 		artifacts of its own.
 	*/
-	float depthScale = min( 1.0f, z * p.strideZCutoff );
-	z += p.zThickness + lerp( 0.0f, 2.0f, depthScale );
-	return (maxZ >= z) && (minZ - p.zThickness <= z);
+	//Originally:
+	//	depthThicknessDynamicBias = clamp( (z + biasStart) * biasRange, 0, 1 ) * biasAmount;
+	//	= clamp( (z - biasStart) * biasRange * biasAmount, 0, biasAmount );
+	//	= clamp( (z - biasStart) * biasRangeTimesAmount, 0, biasAmount );
+	//	= clamp( (z * biasRangeTimesAmount + -biasStartTimesRangeTimesAmount), 0, biasAmount );
+	//The goal is to preserver precision as biasRange may be too small,
+	//and to allow fmad optimization.
+	float depthThicknessDynamicBias = clamp( (z * p.zThickness.y + p.zThickness.z),
+											 0.0, p.zThickness.w );
+	z += p.zThickness.x + depthThicknessDynamicBias;
+	return (maxZ >= z) && (minZ - p.zThickness.x - depthThicknessDynamicBias <= z);
 }
 
 INLINE void swap( inout float a, inout float b )
@@ -190,11 +198,9 @@ INLINE bool traceScreenSpaceRay
 
 	// Scale derivatives by the desired pixel stride and then
 	// offset the starting values by the jitter fraction
-	float strideScale	= 1.0f - min( 1.0f, csOrig.z * p.strideZCutoff );
-	float fStride		= 1.0f + strideScale * p.stride;
-	dP *= fStride;
-	dQ *= fStride;
-	dk *= fStride;
+	dP *= p.stride;
+	dQ *= p.stride;
+	dk *= p.stride;
 
 	P0 += dP * jitter;
 	Q0 += dQ * jitter;
@@ -239,6 +245,12 @@ INLINE bool traceScreenSpaceRay
 	return intersectsDepthBuffer( sceneZMax, rayZMin, rayZMax PARAMS_ARG );
 }
 
+#if HQ
+	#define HQ_MULT
+#else
+	#define HQ_MULT * 2.0
+#endif
+
 fragment float4 main_metal
 (
 	PS_INPUT inPs,
@@ -257,7 +269,7 @@ fragment float4 main_metal
 {
 	float4 fragColour;
 
-	float3 normalVS = normalize( loadSubsample0( gBuf_normals, gl_FragCoord.xy * 2.0 ).xyz * 2.0 - 1.0 );
+	float3 normalVS = normalize( loadSubsample0( gBuf_normals, gl_FragCoord.xy HQ_MULT ).xyz * 2.0 - 1.0 );
 	normalVS.z = -normalVS.z; //Normal should be left handed.
 	if( !any(normalVS) )
 	//if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
@@ -266,7 +278,7 @@ fragment float4 main_metal
 		return fragColour;
 	}
 
-	float depth = depthTexture.read( uint2( gl_FragCoord.xy * 2.0 ), 0 ).x;
+	float depth = depthTexture.read( uint2( gl_FragCoord.xy HQ_MULT ), 0 ).x;
 	float3 rayOriginVS = inPs.cameraDir.xyz * linearizeDepth( depth PARAMS_ARG );
 
 	/** Since position is reconstructed in view space, just normalize it to get the
