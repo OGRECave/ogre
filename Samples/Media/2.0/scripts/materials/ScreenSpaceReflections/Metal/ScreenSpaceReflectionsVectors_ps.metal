@@ -42,9 +42,13 @@
 #include <metal_stdlib>
 using namespace metal;
 
+#define inout thread
+#define out thread
 #define INLINE inline
 #define PARAMS_ARG_DECL , constant Params &p
 #define PARAMS_ARG , p
+#define TEXTURES_ARG_DECL , texture2d<float, access::read> depthTexture
+#define TEXTURES_ARG , depthTexture
 
 struct PS_INPUT
 {
@@ -101,7 +105,7 @@ INLINE bool intersectsDepthBuffer( float z, float minZ, float maxZ PARAMS_ARG_DE
 	return (maxZ >= z) && (minZ - p.zThickness.x - depthThicknessDynamicBias <= z);
 }
 
-INLINE void swap( inout float a, inout float b )
+INLINE void swap( inout float &a, inout float &b )
 {
 	float t = a;
 	a = b;
@@ -114,21 +118,21 @@ INLINE float linearizeDepth( float fDepth PARAMS_ARG_DECL )
 }
 
 #if !USE_MSAA
-	INLINE float3 loadSubsample0( texture2d<float> tex, uint2 iCoords )
+	INLINE float3 loadSubsample0( texture2d<float, access::read> tex, float2 iCoords )
 	{
-		return tex.read( iCoords, 0 ).xyz;
+		return tex.read( uint2( iCoords ), 0 ).xyz;
 	}
 #else
-	INLINE float3 loadSubsample0( texture2d_ms<float> tex, uint2 iCoords )
+	INLINE float3 loadSubsample0( texture2d_ms<float, access::read> tex, float2 iCoords )
 	{
-		return tex.read( iCoords, 0 ).xyz;
+		return tex.read( uint2( iCoords ), 0 ).xyz;
 	}
 #endif
 
-INLINE float linearDepthTexelFetch( texture2d<float> depthTex, int2 hitPixel PARAMS_ARG_DECL )
+INLINE float linearDepthTexelFetch( texture2d<float, access::read> depthTex, uint2 hitPixel PARAMS_ARG_DECL )
 {
 	// Load returns 0 for any value accessed out of bounds
-	return linearizeDepth( depthTex.read( uint2( hitPixel ), 0 ).x PARAMS_ARG );
+	return linearizeDepth( depthTex.read( hitPixel, 0 ).x PARAMS_ARG );
 }
 
 // Returns true if the ray hit something
@@ -142,10 +146,11 @@ INLINE bool traceScreenSpaceRay
 	// to conceal banding artifacts. Not needed if stride == 1.
 	float jitter,
 	// Pixel coordinates of the first intersection with the scene
-	out float2 hitPixel,
+	out float2 &hitPixel,
 	// Camera space location of the ray hit
-	out float3 hitPoint
+	out float3 &hitPoint
 	PARAMS_ARG_DECL
+	TEXTURES_ARG_DECL
 )
 {
 	// Clip to the near plane
@@ -234,7 +239,7 @@ INLINE bool traceScreenSpaceRay
 		hitPixel = permute ? PQk.yx : PQk.xy;
 		// You may need hitPixel.y = depthBufferSize.y - hitPixel.y; here if your vertical axis
 		// is different than ours in screen space
-		sceneZMax = linearDepthTexelFetch( depthTexture, int2( hitPixel ) PARAMS_ARG );
+		sceneZMax = linearDepthTexelFetch( depthTexture, uint2( hitPixel ) PARAMS_ARG );
 
 		PQk += dPQk;
 	}
@@ -253,7 +258,7 @@ INLINE bool traceScreenSpaceRay
 
 fragment float4 main_metal
 (
-	PS_INPUT inPs,
+	PS_INPUT inPs		[[stage_in]],
 	float4 gl_FragCoord [[position]],
 
 	texture2d<float, access::read> depthTexture				[[texture(0)]],
@@ -271,8 +276,8 @@ fragment float4 main_metal
 
 	float3 normalVS = normalize( loadSubsample0( gBuf_normals, gl_FragCoord.xy HQ_MULT ).xyz * 2.0 - 1.0 );
 	normalVS.z = -normalVS.z; //Normal should be left handed.
-	if( !any(normalVS) )
-	//if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
+	//if( !any(normalVS) )
+	if( normalVS.x == 0 && normalVS.y == 0 && normalVS.z == 0 )
 	{
 		fragColour = float4( 0.0f, 0.0f, 0.0f, 0.0f );
 		return fragColour;
@@ -299,7 +304,7 @@ fragment float4 main_metal
 
 	// perform ray tracing - true if hit found, false otherwise
 	bool intersection = traceScreenSpaceRay( rayOriginVS, rayDirectionVS, jitter,
-											 hitPixel, hitPoint PARAMS_ARG );
+											 hitPixel, hitPoint PARAMS_ARG TEXTURES_ARG );
 
 	// Got this from Killing Floor 2
 	// https://sakibsaikia.github.io/2016/12/26/Screen-Space-Reflection-in-Killing-Floor-2.html
@@ -315,7 +320,7 @@ fragment float4 main_metal
 	//Reflections lag one frame behind, so we need to reproject based on previous camera position
 	//to know where to sample the colour. If the depth differences are too big then we don't use
 	//that reflection.
-	float currDepth = depthTexture.Load( int3( hitPixel.xy, 0 ) ).x;
+	float currDepth = depthTexture.read( uint2( hitPixel.xy ), 0 ).x;
 	hitPixel *= p.invDepthBufferRes.xy; //Transform hit pixel from pixel position to UVs
 	float4 reprojectedPos = p.reprojectionMatrix * float4( hitPixel.xy, currDepth, 1.0 );
 	reprojectedPos.xyz /= reprojectedPos.w;

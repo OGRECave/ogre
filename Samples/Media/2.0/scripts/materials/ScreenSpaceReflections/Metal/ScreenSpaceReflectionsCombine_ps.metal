@@ -1,13 +1,18 @@
 // Based on http://roar11.com/2015/07/screen-space-glossy-reflections/
+#include <metal_stdlib>
+using namespace metal;
 
 #define INLINE inline
 #define PARAMS_ARG_DECL , constant Params &p
 #define PARAMS_ARG , p
 
+#define TEXTURES_ARG_DECL , texture2d<float> prevFrame, sampler trilinearSampler
+#define TEXTURES_ARG , prevFrame, trilinearSampler
+
 struct PS_INPUT
 {
-	float2 uv0			: TEXCOORD0;
-	float3 cameraDir	: TEXCOORD1;
+	float2 uv0;
+	float3 cameraDir;
 };
 
 struct Params
@@ -59,7 +64,7 @@ INLINE float isoscelesTriangleInRadius( float a, float h )
 	return (a * (sqrt(a2 + fh2) - a)) / (4.0f * h);
 }
 
-INLINE float4 coneSampleWeightedColor( float2 samplePos, float mipChannel, float gloss )
+INLINE float4 coneSampleWeightedColor( float2 samplePos, float mipChannel, float gloss TEXTURES_ARG_DECL )
 {
 	float3 sampleColor = prevFrame.sample( trilinearSampler, samplePos, level(mipChannel) ).xyz;
 	return float4( sampleColor * gloss, gloss );
@@ -70,17 +75,17 @@ INLINE float4 coneSampleWeightedColor( float2 samplePos, float mipChannel, float
 	return exp2(10.0 * gloss + 1.0);
 }*/
 
-INLINE float3 viewSpacePositionFromDepth( float2 ssPosXY, float zDepth )
+/*INLINE float3 viewSpacePositionFromDepth( float2 ssPosXY, float zDepth PARAMS_ARG_DECL )
 {
 	float4 result = p.textureSpaceToViewSpace * float4( ssPosXY, zDepth, 1.0 );
 	result.xyz /= result.w;
 	return result.xyz;
-}
+}*/
 
-float4 main_metal
+fragment float4 main_metal
 (
-	PS_INPUT inPs,
-	float4 gl_FragCoord [[position]],
+	PS_INPUT inPs		[[stage_in]],
+	float4 gl_FragCoord	[[position]],
 
 	texture2d<float, access::read> depthTexture					[[texture(0)]],
 	#if !USE_MSAA
@@ -116,7 +121,7 @@ float4 main_metal
 #endif
 
 	//Do not decode roughness, keep it in [0; 1] range.
-	float roughness = gBuf_shadowRoughness.read( int2( gl_FragCoord.xy ), 0 ).y;
+	float roughness = gBuf_shadowRoughness.read( uint2( gl_FragCoord.xy ), 0 ).y;
 	float gloss = 1.0f - roughness;
 	/*float specularPower = glossToSpecularPower( gloss );
 
@@ -157,7 +162,7 @@ float4 main_metal
 			Visibility is accumulated in the alpha channel.
 			Break if visibility is 100% or greater (>= 1.0f).
 		*/
-		float4 newColor = coneSampleWeightedColor( samplePos, mipChannel, glossMult );
+		float4 newColor = coneSampleWeightedColor( samplePos, mipChannel, glossMult TEXTURES_ARG );
 
 		remainingAlpha -= newColor.a;
 		if( remainingAlpha < 0.0f )
@@ -179,7 +184,7 @@ float4 main_metal
 	fadeOnBorder *= 1.0f - saturate( (boundary.y - p.fadeStart) * p.invFadeRange );
 	fadeOnBorder = smoothstep( 0.0f, 1.0f, fadeOnBorder );
 	float fadeOnDistance = raySS.z;
-	//float3 hitPointVS = viewSpacePositionFromDepth( raySS.xy, raySS.z );
+	//float3 hitPointVS = viewSpacePositionFromDepth( raySS.xy, raySS.z PARAMS_ARG );
 	//float fadeOnDistance = distance( hitPointVS, rayOriginVS ) / p.maxDistance;
 	//fadeOnDistance = 1.0f - saturate( fadeOnDistance );
 

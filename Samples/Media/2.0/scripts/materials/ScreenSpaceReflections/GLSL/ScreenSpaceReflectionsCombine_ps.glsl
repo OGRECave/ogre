@@ -119,12 +119,12 @@ INLINE float4 coneSampleWeightedColor( float2 samplePos, float mipChannel, float
 	return exp2(10.0 * gloss + 1.0);
 }*/
 
-INLINE float3 viewSpacePositionFromDepth( float2 ssPosXY, float zDepth )
+/*INLINE float3 viewSpacePositionFromDepth( float2 ssPosXY, float zDepth )
 {
 	float4 result = p_textureSpaceToViewSpace * float4( ssPosXY, zDepth, 1.0 );
 	result.xyz /= result.w;
 	return result.xyz;
-}
+}*/
 
 in float4 gl_FragCoord;
 
