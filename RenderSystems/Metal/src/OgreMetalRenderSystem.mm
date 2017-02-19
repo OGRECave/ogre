@@ -487,7 +487,7 @@ namespace Ogre
             metalTexture = metalTex->getTextureForSampling( this );
         }
 
-        [computeEncoder setTexture:metalTexture atIndex:slot];
+        [computeEncoder setTexture:metalTexture atIndex:slot + OGRE_METAL_CS_UAV_SLOT_START];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )

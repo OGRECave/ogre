@@ -6,9 +6,9 @@ kernel void main_metal
 (
 	texture2d<@insertpiece(texture0_pf_type), access::read> srcRtt			[[texture(0)]],
 	@property( !texture1_msaa )
-		texture2d<@insertpiece(texture1_pf_type), access::read> srcDepth	[[texture(1)]],
+		depth2d<@insertpiece(texture1_pf_type), access::read> srcDepth		[[texture(1)]],
 	@end @property( texture1_msaa )
-		texture2d_ms<@insertpiece(texture1_pf_type), access::read> srcDepth	[[texture(1)]],
+		depth2d_ms<@insertpiece(texture1_pf_type), access::read> srcDepth	[[texture(1)]],
 	@end
 
 	texture2d<@insertpiece(uav0_pf_type), access::write> dstRtt		[[texture(UAV_SLOT_START+0)]],
@@ -27,10 +27,10 @@ kernel void main_metal
 	float4 srcRttValue2 = srcRtt.read( xyPos2.xy, 0 );
 	float4 srcRttValue3 = srcRtt.read( xyPos3.xy, 0 );
 
-	float srcDepthValue0 = srcDepth.read( xyPos0.xy, 0 ).x;
-	float srcDepthValue1 = srcDepth.read( xyPos1.xy, 0 ).x;
-	float srcDepthValue2 = srcDepth.read( xyPos2.xy, 0 ).x;
-	float srcDepthValue3 = srcDepth.read( xyPos3.xy, 0 ).x;
+	float srcDepthValue0 = srcDepth.read( xyPos0.xy, 0 );
+	float srcDepthValue1 = srcDepth.read( xyPos1.xy, 0 );
+	float srcDepthValue2 = srcDepth.read( xyPos2.xy, 0 );
+	float srcDepthValue3 = srcDepth.read( xyPos3.xy, 0 );
 
 	dstRtt.write( srcRttValue0, xyPos0.xy );
 	dstRtt.write( srcRttValue1, xyPos1.xy );
