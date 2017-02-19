@@ -213,6 +213,10 @@ namespace v1
         {
             *static_cast<MetalRenderTargetCommon**>(pData) = 0;
         }
+        else if( name == "mNumMRTs" )
+        {
+            *static_cast<uint8*>(pData) = 0;
+        }
         else if( name == "MetalDevice" )
         {
             *static_cast<MetalDevice**>(pData) = mUltimateTextureOwner->getOwnerDevice();

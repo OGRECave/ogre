@@ -296,7 +296,7 @@ namespace Ogre
             /** @copydoc Renderable::getLights. */
             virtual const LightList &getLights(void) const OGRE_OVERRIDE;
             /** @copydoc Renderable::getCastsShadows. */
-            virtual bool getCastsShadows(void) const;
+            virtual bool getCastsShadows(void) const OGRE_OVERRIDE;
 
             /** Sets an user defined name that can serve to identify this section.
              */
