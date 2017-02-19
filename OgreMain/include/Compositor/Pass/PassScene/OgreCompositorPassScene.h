@@ -64,6 +64,7 @@ namespace Ogre
         CompositorShadowNode    *mShadowNode;
         Camera                  *mCamera;
         Camera                  *mLodCamera;
+        Camera                  *mCullCamera;
         bool                    mUpdateShadowNode;
 
         TextureVec const        *mPrePassTextures;
@@ -92,6 +93,8 @@ namespace Ogre
         CompositorShadowNode* getShadowNode() const             { return mShadowNode; }
         Camera* getCamera() const                               { return mCamera; }
         void _setCustomCamera( Camera *camera )                 { mCamera = camera; }
+        Camera* getCullCamera() const                           { return mCullCamera; }
+        void _setCustomCullCamera( Camera *camera )             { mCullCamera = camera; }
         void _setUpdateShadowNode( bool update )                { mUpdateShadowNode = update; }
 
         bool getUpdateShadowNode(void) const                    { return mUpdateShadowNode; }

@@ -523,6 +523,7 @@ namespace Ogre
         {
             assert( dynamic_cast<CompositorPassScene*>(pass) );
             static_cast<CompositorPassScene*>(pass)->_setCustomCamera( smCamera.camera );
+            static_cast<CompositorPassScene*>(pass)->_setCustomCullCamera( smCamera.camera );
         }
     }
     //-----------------------------------------------------------------------------------

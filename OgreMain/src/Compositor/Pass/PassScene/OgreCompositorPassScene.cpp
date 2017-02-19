@@ -50,6 +50,7 @@ namespace Ogre
                 mShadowNode( 0 ),
                 mCamera( 0 ),
                 mLodCamera( 0 ),
+                mCullCamera( 0 ),
                 mUpdateShadowNode( false ),
                 mPrePassTextures( 0 ),
                 mSsrTexture( 0 )
@@ -73,9 +74,14 @@ namespace Ogre
             mCamera = defaultCamera;
 
         if( mDefinition->mLodCameraName != IdString() )
-            mLodCamera = workspace->findCamera( mDefinition->mCameraName );
+            mLodCamera = workspace->findCamera( mDefinition->mLodCameraName );
         else
             mLodCamera = mCamera;
+
+        if( mDefinition->mCullCameraName != IdString() )
+            mCullCamera = workspace->findCamera( mDefinition->mCullCameraName );
+        else
+            mCullCamera = mCamera;
 
         if( mDefinition->mPrePassMode == PrePassUse && mDefinition->mPrePassTexture != IdString() )
         {
@@ -177,8 +183,11 @@ namespace Ogre
         sceneManager->_setForwardPlusEnabledInPass( mDefinition->mEnableForwardPlus );
         sceneManager->_setPrePassMode( mDefinition->mPrePassMode, mPrePassTextures, mSsrTexture );
 
-        mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
-                                             mDefinition->mFirstRQ, mDefinition->mLastRQ );
+        if( !mDefinition->mReuseCullData )
+        {
+            mTarget->_updateViewportCullPhase01( mViewport, mCullCamera, usedLodCamera,
+                                                 mDefinition->mFirstRQ, mDefinition->mLastRQ );
+        }
 
         executeResourceTransitions();
 

@@ -273,7 +273,7 @@ namespace Demo
             if( keySym.sym == SDLK_m )
             {
                 mIrradianceCellSize += modPerFrame * 10.0;
-                mIrradianceCellSize = std::max( mIrradianceCellSize, 0.1f );
+                mIrradianceCellSize = std::max( mIrradianceCellSize, Ogre::Real(0.1f) );
                 needsIrradianceVolumeRebuild = true;
             }
 

@@ -190,7 +190,7 @@ namespace Ogre
         float   mTransparencyValue;
         float   mDetailNormalWeight[4];
         float   mDetailWeight[4];
-        Vector4 mDetailsOffsetScale[8];
+        float   mDetailsOffsetScale[8][4];
         uint16  mTexIndices[NUM_PBSM_TEXTURE_TYPES];
         float   mNormalMapWeight;
 
