@@ -80,13 +80,6 @@ namespace Demo
                 "2.0/scripts/materials/ScreenSpaceReflections/Metal",
             };
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-            Ogre::String dataFolder = originalDataFolder + "packs/cubemapsJS.zip";
-#else
-            Ogre::String dataFolder = originalDataFolder + "cubemapsJS.zip";
-#endif
-            addResourceLocation( dataFolder, "Zip", "General" );
-
             for( size_t i=0; i<8; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
