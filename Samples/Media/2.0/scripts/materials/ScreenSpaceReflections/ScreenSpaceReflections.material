@@ -90,7 +90,7 @@ material SSR/ScreenSpaceReflectionsVectors
 			{
 				param_named_auto	depthBufferRes		texture_size 0
 				//See ScreenSpaceReflections::setupSSRValues
-				param_named			zThickness			float3	0.25 1 1
+				param_named			zThickness			float4	0.25 1 1 1
 				param_named_auto	nearPlaneZ			near_clip_distance
 
 				param_named			stride				float	4
