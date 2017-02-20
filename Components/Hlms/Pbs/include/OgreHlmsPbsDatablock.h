@@ -527,7 +527,7 @@ namespace Ogre
             Default value is Vector4( 0, 0, 1, 1 )
         */
         void setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale );
-        const Vector4& getDetailMapOffsetScale( uint8 detailMap ) const;
+        Vector4 getDetailMapOffsetScale( uint8 detailMap ) const;
 
         /// Returns the index to mBakedTextures. Returns NUM_PBSM_TEXTURE_TYPES if
         /// there is no texture assigned to texType
