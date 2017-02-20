@@ -57,20 +57,28 @@ namespace Ogre
 
         while( itor != end )
         {
-            if( itor->gridBuffer )
-            {
-                if( itor->gridBuffer->getMappingState() != MS_UNMAPPED )
-                    itor->gridBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( itor->gridBuffer );
-                itor->gridBuffer = 0;
-            }
+            CachedGridBufferVec::iterator itBuf = itor->gridBuffers.begin();
+            CachedGridBufferVec::iterator enBuf = itor->gridBuffers.end();
 
-            if( itor->globalLightListBuffer )
+            while( itBuf != enBuf )
             {
-                if( itor->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
-                    itor->globalLightListBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( itor->globalLightListBuffer );
-                itor->globalLightListBuffer = 0;
+                if( itBuf->gridBuffer )
+                {
+                    if( itBuf->gridBuffer->getMappingState() != MS_UNMAPPED )
+                        itBuf->gridBuffer->unmap( UO_UNMAP_ALL );
+                    mVaoManager->destroyTexBuffer( itBuf->gridBuffer );
+                    itBuf->gridBuffer = 0;
+                }
+
+                if( itBuf->globalLightListBuffer )
+                {
+                    if( itBuf->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
+                        itBuf->globalLightListBuffer->unmap( UO_UNMAP_ALL );
+                    mVaoManager->destroyTexBuffer( itBuf->globalLightListBuffer );
+                    itBuf->globalLightListBuffer = 0;
+                }
+
+                ++itBuf;
             }
 
             ++itor;
@@ -84,20 +92,28 @@ namespace Ogre
 
         while( itor != end )
         {
-            if( itor->gridBuffer )
-            {
-                if( itor->gridBuffer->getMappingState() != MS_UNMAPPED )
-                    itor->gridBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( itor->gridBuffer );
-                itor->gridBuffer = 0;
-            }
+            CachedGridBufferVec::iterator itBuf = itor->gridBuffers.begin();
+            CachedGridBufferVec::iterator enBuf = itor->gridBuffers.end();
 
-            if( itor->globalLightListBuffer )
+            while( itBuf != enBuf )
             {
-                if( itor->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
-                    itor->globalLightListBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( itor->globalLightListBuffer );
-                itor->globalLightListBuffer = 0;
+                if( itBuf->gridBuffer )
+                {
+                    if( itBuf->gridBuffer->getMappingState() != MS_UNMAPPED )
+                        itBuf->gridBuffer->unmap( UO_UNMAP_ALL );
+                    mVaoManager->destroyTexBuffer( itBuf->gridBuffer );
+                    itBuf->gridBuffer = 0;
+                }
+
+                if( itBuf->globalLightListBuffer )
+                {
+                    if( itBuf->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
+                        itBuf->globalLightListBuffer->unmap( UO_UNMAP_ALL );
+                    mVaoManager->destroyTexBuffer( itBuf->globalLightListBuffer );
+                    itBuf->globalLightListBuffer = 0;
+                }
+
+                ++itBuf;
             }
 
             ++itor;
@@ -204,6 +220,28 @@ namespace Ogre
             {
                 bool upToDate = itor->lastFrame == mVaoManager->getFrameCount();
                 itor->lastFrame = mVaoManager->getFrameCount();
+                itor->lastPos   = camera->getDerivedPosition();
+                itor->lastRot   = camera->getDerivedOrientation();
+
+                if( upToDate )
+                {
+                    if( itor->lastPos != camera->getDerivedPosition() ||
+                        itor->lastRot != camera->getDerivedOrientation() )
+                    {
+                        //The Grid Buffers are "up to date" but the camera was moved
+                        //(e.g. through a listener, or while rendering cubemaps)
+                        //So we need to generate a new buffer for them (we can't map
+                        //the same buffer twice in the same frame)
+                        ++itor->currentBufIdx;
+                        if( itor->currentBufIdx > itor->gridBuffers.size() )
+                            itor->gridBuffers.push_back( CachedGridBuffer() );
+                    }
+                }
+                else
+                {
+                    itor->currentBufIdx = 0;
+                }
+
                 *outCachedGrid = &(*itor);
 
                 //Not only this causes bugs see http://www.ogre3d.org/forums/viewtopic.php?f=25&t=88776
@@ -220,13 +258,14 @@ namespace Ogre
         //If we end up here, the entry doesn't exist. Create a new one.
         CachedGrid cachedGrid;
         cachedGrid.camera      = camera;
+        cachedGrid.lastPos     = camera->getDerivedPosition();
+        cachedGrid.lastRot     = camera->getDerivedOrientation();
         cachedGrid.reflection  = camera->isReflected();
         cachedGrid.aspectRatio = camera->getAspectRatio();
         cachedGrid.shadowNode  = mSceneManager->getCurrentShadowNode();
         cachedGrid.lastFrame   = mVaoManager->getFrameCount();
-
-        cachedGrid.gridBuffer               = 0;
-        cachedGrid.globalLightListBuffer    = 0;
+        cachedGrid.currentBufIdx = 0;
+        cachedGrid.gridBuffers.resize( 1 );
 
         mCachedGrid.push_back( cachedGrid );
 
@@ -247,7 +286,10 @@ namespace Ogre
                 (itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
                 itor->shadowNode == mSceneManager->getCurrentShadowNode() )
             {
-                bool upToDate = itor->lastFrame == mVaoManager->getFrameCount();
+                bool upToDate = itor->lastFrame == mVaoManager->getFrameCount() &&
+                                itor->lastPos == camera->getDerivedPosition() &&
+                                itor->lastRot == camera->getDerivedOrientation();
+
                 *outCachedGrid = &(*itor);
 
                 return upToDate;
@@ -257,6 +299,52 @@ namespace Ogre
         }
 
         return false;
+    }
+    //-----------------------------------------------------------------------------------
+    void ForwardPlusBase::deleteOldGridBuffers(void)
+    {
+        //Check if some of the caches are really old and delete them
+        CachedGridVec::iterator itor = mCachedGrid.begin();
+        CachedGridVec::iterator end  = mCachedGrid.end();
+
+        const uint32 currentFrame = mVaoManager->getFrameCount();
+
+        while( itor != end )
+        {
+            if( itor->lastFrame + 3 < currentFrame )
+            {
+                CachedGridBufferVec::iterator itBuf = itor->gridBuffers.begin();
+                CachedGridBufferVec::iterator enBuf = itor->gridBuffers.end();
+
+                while( itBuf != enBuf )
+                {
+                    if( itBuf->gridBuffer )
+                    {
+                        if( itBuf->gridBuffer->getMappingState() != MS_UNMAPPED )
+                            itBuf->gridBuffer->unmap( UO_UNMAP_ALL );
+                        mVaoManager->destroyTexBuffer( itBuf->gridBuffer );
+                        itBuf->gridBuffer = 0;
+                    }
+
+                    if( itBuf->globalLightListBuffer )
+                    {
+                        if( itBuf->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
+                            itBuf->globalLightListBuffer->unmap( UO_UNMAP_ALL );
+                        mVaoManager->destroyTexBuffer( itBuf->globalLightListBuffer );
+                        itBuf->globalLightListBuffer = 0;
+                    }
+
+                    ++itBuf;
+                }
+
+                itor = efficientVectorRemove( mCachedGrid, itor );
+                end  = mCachedGrid.end();
+            }
+            else
+            {
+                ++itor;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     TexBufferPacked* ForwardPlusBase::getGridBuffer( Camera *camera ) const
@@ -270,7 +358,7 @@ namespace Ogre
         assert( upToDate && "You must call ForwardPlusBase::collectLights first!" );
 #endif
 
-        return cachedGrid->gridBuffer;
+        return cachedGrid->gridBuffers[cachedGrid->currentBufIdx].gridBuffer;
     }
     //-----------------------------------------------------------------------------------
     TexBufferPacked* ForwardPlusBase::getGlobalLightListBuffer( Camera *camera ) const
@@ -284,7 +372,7 @@ namespace Ogre
         assert( upToDate && "You must call ForwardPlusBase::collectLights first!" );
 #endif
 
-        return cachedGrid->globalLightListBuffer;
+        return cachedGrid->gridBuffers[cachedGrid->currentBufIdx].globalLightListBuffer;
     }
     //-----------------------------------------------------------------------------------
     void ForwardPlusBase::setHlmsPassProperties( Hlms *hlms )

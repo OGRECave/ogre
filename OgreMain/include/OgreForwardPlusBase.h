@@ -55,12 +55,23 @@ namespace Ogre
             NumForwardPlusMethods
         };
 
+        struct CachedGridBuffer
+        {
+            TexBufferPacked *gridBuffer;
+            TexBufferPacked *globalLightListBuffer;
+            CachedGridBuffer() : gridBuffer( 0 ), globalLightListBuffer( 0 ) {}
+        };
+
+        typedef vector<CachedGridBuffer>::type CachedGridBufferVec;
+
     protected:
         static const size_t NumBytesPerLight;
 
         struct CachedGrid
         {
             Camera                  *camera;
+            Vector3                 lastPos;
+            Quaternion              lastRot;
             /// Cameras used for reflection have a different view proj matrix
             bool                    reflection;
             /// Cameras can change their AR depending on the RTT they're rendering to.
@@ -70,8 +81,8 @@ namespace Ogre
             /// Last frame this cache was updated.
             uint32                  lastFrame;
 
-            TexBufferPacked         *gridBuffer;
-            TexBufferPacked         *globalLightListBuffer;
+            uint32                  currentBufIdx;
+            CachedGridBufferVec     gridBuffers;
         };
 
         struct LightCount
@@ -112,6 +123,9 @@ namespace Ogre
         /// The const version will not create a new cache if not found, and
         /// output a null pointer instead (also returns false in that case).
         bool getCachedGridFor( Camera *camera, const CachedGrid **outCachedGrid ) const;
+
+        /// Check if some of the caches are really old and delete them
+        void deleteOldGridBuffers(void);
 
     public:
         ForwardPlusBase( SceneManager *sceneManager );

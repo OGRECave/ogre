@@ -174,25 +174,26 @@ namespace Ogre
         std::sort( mCurrentLightList.begin(), mCurrentLightList.end(), OrderLightByDistanceToCamera3D );
 
         //Allocate the buffers if not already.
-        if( !cachedGrid->gridBuffer )
+        CachedGridBuffer &gridBuffers = cachedGrid->gridBuffers[cachedGrid->currentBufIdx];
+        if( !gridBuffers.gridBuffer )
         {
             const size_t p = -((1 - (1 << (mNumSlices << 1))) / 3);
-            cachedGrid->gridBuffer = mVaoManager->createTexBuffer( PF_R16_UINT,
+            gridBuffers.gridBuffer = mVaoManager->createTexBuffer( PF_R16_UINT,
                                                                    p * mTableSize * sizeof(uint16),
                                                                    BT_DYNAMIC_PERSISTENT, 0, false );
         }
 
-        if( !cachedGrid->globalLightListBuffer ||
-            cachedGrid->globalLightListBuffer->getNumElements() < NumBytesPerLight * numLights )
+        if( !gridBuffers.globalLightListBuffer ||
+            gridBuffers.globalLightListBuffer->getNumElements() < NumBytesPerLight * numLights )
         {
-            if( cachedGrid->globalLightListBuffer )
+            if( gridBuffers.globalLightListBuffer )
             {
-                if( cachedGrid->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
-                    cachedGrid->globalLightListBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( cachedGrid->globalLightListBuffer );
+                if( gridBuffers.globalLightListBuffer->getMappingState() != MS_UNMAPPED )
+                    gridBuffers.globalLightListBuffer->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyTexBuffer( gridBuffers.globalLightListBuffer );
             }
 
-            cachedGrid->globalLightListBuffer = mVaoManager->createTexBuffer(
+            gridBuffers.globalLightListBuffer = mVaoManager->createTexBuffer(
                                                                     PF_FLOAT32_RGBA,
                                                                     NumBytesPerLight *
                                                                     std::max<size_t>( numLights, 96 ),
@@ -200,11 +201,11 @@ namespace Ogre
         }
 
         //Fill the first buffer with the light. The other buffer contains indexes into this list.
-        fillGlobalLightListBuffer( camera, cachedGrid->globalLightListBuffer );
+        fillGlobalLightListBuffer( camera, gridBuffers.globalLightListBuffer );
 
         //Fill the indexes buffer
         uint16 * RESTRICT_ALIAS gridBuffer = reinterpret_cast<uint16 * RESTRICT_ALIAS>(
-                    cachedGrid->gridBuffer->map( 0, cachedGrid->gridBuffer->getNumElements() ) );
+                    gridBuffers.gridBuffer->map( 0, gridBuffers.gridBuffer->getNumElements() ) );
 
         memset( mLightCountInCell.begin(), 0, mLightCountInCell.size() * sizeof(LightCount) );
 
@@ -394,44 +395,9 @@ namespace Ogre
             }
         }
 
-        cachedGrid->gridBuffer->unmap( UO_KEEP_PERSISTENT );
+        gridBuffers.gridBuffer->unmap( UO_KEEP_PERSISTENT );
 
-        {
-            //Check if some of the caches are really old and delete them
-            CachedGridVec::iterator itor = mCachedGrid.begin();
-            CachedGridVec::iterator end  = mCachedGrid.end();
-
-            const uint32 currentFrame = mVaoManager->getFrameCount();
-
-            while( itor != end )
-            {
-                if( itor->lastFrame + 3 < currentFrame )
-                {
-                    if( itor->gridBuffer )
-                    {
-                        if( itor->gridBuffer->getMappingState() != MS_UNMAPPED )
-                            itor->gridBuffer->unmap( UO_UNMAP_ALL );
-                        mVaoManager->destroyTexBuffer( itor->gridBuffer );
-                        itor->gridBuffer = 0;
-                    }
-
-                    if( itor->globalLightListBuffer )
-                    {
-                        if( itor->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
-                            itor->globalLightListBuffer->unmap( UO_UNMAP_ALL );
-                        mVaoManager->destroyTexBuffer( itor->globalLightListBuffer );
-                        itor->globalLightListBuffer = 0;
-                    }
-
-                    itor = efficientVectorRemove( mCachedGrid, itor );
-                    end  = mCachedGrid.end();
-                }
-                else
-                {
-                    ++itor;
-                }
-            }
-        }
+        deleteOldGridBuffers();
     }
     //-----------------------------------------------------------------------------------
     size_t Forward3D::getConstBufferSize(void) const
