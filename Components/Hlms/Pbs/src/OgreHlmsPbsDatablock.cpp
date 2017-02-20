@@ -872,7 +872,7 @@ namespace Ogre
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
-    const Vector4& HlmsPbsDatablock::getDetailMapOffsetScale( uint8 detailMap ) const
+    Vector4 HlmsPbsDatablock::getDetailMapOffsetScale( uint8 detailMap ) const
     {
         assert( detailMap < 8 );
         return Vector4( mDetailsOffsetScale[detailMap][0], mDetailsOffsetScale[detailMap][1],
