@@ -366,7 +366,12 @@ namespace Ogre {
         
         // GLSL ES is always supported in GL ES 2
         rsc->addShaderProfile("glsles");
-        LogManager::getSingleton().logMessage("GLSL ES support detected");
+        if (getNativeShadingLanguageVersion() >= 320)
+            rsc->addShaderProfile("glsl320es");
+        if (getNativeShadingLanguageVersion() >= 310)
+            rsc->addShaderProfile("glsl310es");
+        if (getNativeShadingLanguageVersion() >= 300)
+            rsc->addShaderProfile("glsl300es");
 
 #if !OGRE_NO_GLES2_CG_SUPPORT
         rsc->addShaderProfile("cg");
