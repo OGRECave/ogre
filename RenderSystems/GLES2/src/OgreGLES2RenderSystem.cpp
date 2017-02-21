@@ -461,6 +461,13 @@ namespace Ogre {
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
+        else if(mGLSupport->checkExtension("GL_ANGLE_instanced_arrays"))
+        {
+            rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+            glDrawElementsInstancedEXT = glDrawElementsInstancedANGLE;
+            glDrawArraysInstancedEXT = glDrawArraysInstancedANGLE;
+            glVertexAttribDivisorEXT = glVertexAttribDivisorANGLE;
+        }
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         // Check if render to vertex buffer (transform feedback in OpenGL)
