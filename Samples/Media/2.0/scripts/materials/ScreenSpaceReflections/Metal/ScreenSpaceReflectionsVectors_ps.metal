@@ -315,7 +315,8 @@ fragment float4 main_metal
 	// and 100 degrees, and drop all contribution beyond the (-100,100)  degree range
 	float3 normalsAtRefl = normalize( loadSubsample0( gBuf_normals, hitPixel.xy ).xyz * 2.0 - 1.0 );
 	normalsAtRefl.z = -normalsAtRefl.z;
-	rDotV *= smoothstep(-0.17, 0.0, dot( normalVS, -normalsAtRefl ) );
+	//* 0.25 because later we'll multiply by 4
+	rDotV *= smoothstep(-0.17, 0.0, dot( normalVS, -normalsAtRefl ) ) * 0.25;
 
 	//Reflections lag one frame behind, so we need to reproject based on previous camera position
 	//to know where to sample the colour. If the depth differences are too big then we don't use
