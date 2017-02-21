@@ -313,15 +313,23 @@ namespace Ogre
 
         ShaderParams *shaderParams = job->_getShaderParams( "default" );
         if( shaderParams )
-            shaderParams->updateParameters( pso.computeParams );
+            shaderParams->updateParameters( pso.computeParams, true );
 
         shaderParams = job->_getShaderParams( mShaderProfile );
         if( shaderParams )
-            shaderParams->updateParameters( pso.computeParams );
+            shaderParams->updateParameters( pso.computeParams, true );
 
         mRenderSystem->_hlmsComputePipelineStateObjectCreated( &pso );
 
         return pso;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsCompute::destroyComputeJob( IdString name )
+    {
+        HlmsComputeJobMap::iterator itor = mComputeJobs.find( name );
+
+        if( itor != mComputeJobs.end() )
+            mComputeJobs.erase( itor );
     }
     //-----------------------------------------------------------------------------------
     void HlmsCompute::destroyAllComputeJobs()
@@ -414,14 +422,14 @@ namespace Ogre
             ShaderParams *shaderParams = job->_getShaderParams( "default" );
             if( shaderParams && psoCache.paramsUpdateCounter != shaderParams->getUpdateCounter() )
             {
-                shaderParams->updateParameters( psoCache.pso.computeParams );
+                shaderParams->updateParameters( psoCache.pso.computeParams, false );
                 psoCache.paramsUpdateCounter = shaderParams->getUpdateCounter();
             }
 
             shaderParams = job->_getShaderParams( mShaderProfile );
             if( shaderParams && psoCache.paramsProfileUpdateCounter != shaderParams->getUpdateCounter() )
             {
-                shaderParams->updateParameters( psoCache.pso.computeParams );
+                shaderParams->updateParameters( psoCache.pso.computeParams, false );
                 psoCache.paramsProfileUpdateCounter = shaderParams->getUpdateCounter();
             }
         }

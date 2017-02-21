@@ -79,6 +79,10 @@ namespace Ogre
         {
             *static_cast<MetalRenderTargetCommon**>(pData) = this;
         }
+        else if( name == "mNumMRTs" )
+        {
+            *static_cast<uint8*>(pData) = 1u;
+        }
         else if( name == "MetalDevice" )
         {
             *static_cast<MetalDevice**>(pData) = this->getOwnerDevice();

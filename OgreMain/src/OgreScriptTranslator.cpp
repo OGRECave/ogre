@@ -4416,9 +4416,6 @@ namespace Ogre{
                             case ID_TESSELLATION_DOMAIN:
                                 mUnit->setBindingType(TextureUnitState::BT_TESSELLATION_DOMAIN);
                                 break;
-                            case ID_COMPUTE:
-                                mUnit->setBindingType(TextureUnitState::BT_COMPUTE);
-                                break;
                             default:
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                     atom->value + " is not a valid binding type (must be \"vertex\" or \"fragment\")");
@@ -6401,7 +6398,8 @@ namespace Ogre{
                     PixelFormat format = PixelUtil::getFormatFromName(atom->value, false);
                     if (format == PF_UNKNOWN)
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                           "Unrecognized PixelFormat");
                         return;
                     }
                     formats.push_back(format);
@@ -8071,6 +8069,10 @@ namespace Ogre{
                             AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(prop->values.front().get());
                             if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE)
                                 passQuad->mFrustumCorners = CompositorPassQuadDef::VIEW_SPACE_CORNERS;
+                            else if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE_NORMALIZED)
+                                passQuad->mFrustumCorners = CompositorPassQuadDef::VIEW_SPACE_CORNERS_NORMALIZED;
+                            else if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE_NORMALIZED_LH)
+                                passQuad->mFrustumCorners = CompositorPassQuadDef::VIEW_SPACE_CORNERS_NORMALIZED_LH;
                             else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)
                                 passQuad->mFrustumCorners = CompositorPassQuadDef::WORLD_SPACE_CORNERS;
                             else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE_CENTERED)
@@ -8458,6 +8460,56 @@ namespace Ogre{
                         if( !getBoolean( *it0, &passScene->mEnableForwardPlus ) )
                         {
                              compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_IS_PREPASS:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        bool createPrePass = false;
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getBoolean( *it0, &createPrePass ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        }
+                        else if( createPrePass )
+                        {
+                            passScene->mPrePassMode = PrePassCreate;
+                        }
+                    }
+                    break;
+                case ID_USE_PREPASS:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "use_prepass only supports 2 argument: the GBuffer's' "
+                                           "texture name & the SSR texture name");
+                    }
+                    else
+                    {
+                        IdString gbuffer, ssr;
+
+                        AbstractNodeList::const_iterator it1 = prop->values.begin();
+                        AbstractNodeList::const_iterator it0 = it1++;
+
+                        if( !getIdString( *it0, &gbuffer ) ||
+                            (it1 != prop->values.end() && !getIdString( *it1, &ssr )) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "use_prepass must be the name of a texture available in the local or global scope");
+                        }
+                        else
+                        {
+                            passScene->setUseDepthPrePass( gbuffer, ssr );
                         }
                     }
                     break;

@@ -153,7 +153,7 @@ namespace Ogre
                 this->_autogenerateMipmaps();
         }
 
-        return mpShaderResourceView;
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     ID3D11UnorderedAccessView* D3D11Texture::createUavView( int cacheIdx, int32 mipmapLevel,

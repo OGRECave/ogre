@@ -210,6 +210,8 @@ namespace Ogre
         mGridBuffer( 0 ),
         mGlobalLightListBuffer( 0 ),
         mTexUnitSlotStart( 0 ),
+        mPrePassTextures( 0 ),
+        mSsrTexture( 0 ),
         mIrradianceVolume( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
@@ -301,6 +303,15 @@ namespace Ogre
                 psParams->setNamedConstant( "f3dGrid",      1 );
                 psParams->setNamedConstant( "f3dLightList", 2 );
                 texUnit += 2;
+            }
+
+            if( mPrePassTextures )
+            {
+                psParams->setNamedConstant( "gBuf_normals",         texUnit++ );
+                psParams->setNamedConstant( "gBuf_shadowRoughness", texUnit++ );
+
+                if( mSsrTexture )
+                    psParams->setNamedConstant( "ssrTexture", texUnit++ );
             }
 
             if( mIrradianceVolume && getProperty( HlmsBaseProp::ShadowCaster ) == 0 )
@@ -722,6 +733,13 @@ namespace Ogre
 
         mTargetEnvMap.setNull();
 
+        mPrePassTextures = sceneManager->getCurrentPrePassTextures();
+        assert( !mPrePassTextures || mPrePassTextures->size() == 2u );
+
+        mSsrTexture = sceneManager->getCurrentSsrTexture();
+        assert( !(!mPrePassTextures && mSsrTexture) && "Using SSR *requires* to be in prepass mode" );
+        assert( !mSsrTexture || mSsrTexture->size() == 1u );
+
         AmbientLightMode ambientMode = mAmbientLightMode;
         ColourValue upperHemisphere = sceneManager->getAmbientLightUpperHemisphere();
         ColourValue lowerHemisphere = sceneManager->getAmbientLightLowerHemisphere();
@@ -837,6 +855,10 @@ namespace Ogre
             //              vec4 shadowRcv[numShadowMaps].invShadowMapSize +
             //mat3 invViewMatCubemap (upgraded to three vec4)
             mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMaps + 4 * 3 ) * 4;
+
+            //float windowHeight + padding
+            if( mPrePassTextures )
+                mapSize += 4 * 4;
 
             //vec3 ambientUpperHemi + float envMapScale
             if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere || envMapScale != 1.0f )
@@ -968,6 +990,16 @@ namespace Ogre
                 //Alignment: each row/column is one vec4, despite being 3x3
                 if( !( (i+1) % 3 ) )
                     ++passBufferPtr;
+            }
+
+            if( mPrePassTextures )
+            {
+                //vec4 windowHeight
+                const float windowHeight = renderTarget->getHeight();
+                *passBufferPtr++ = windowHeight;
+                *passBufferPtr++ = windowHeight;
+                *passBufferPtr++ = windowHeight;
+                *passBufferPtr++ = windowHeight;
             }
 
             //vec3 ambientUpperHemi + padding
@@ -1214,6 +1246,10 @@ namespace Ogre
             mTexUnitSlotStart += 1;
         if( mParallaxCorrectedCubemap )
             mTexUnitSlotStart += 1;
+        if( mPrePassTextures )
+            mTexUnitSlotStart += 2;
+        if( mSsrTexture )
+            mTexUnitSlotStart += 1;
 
         uploadDirtyDatablocks();
 
@@ -1280,6 +1316,20 @@ namespace Ogre
                             CbShaderBuffer( PixelShader, 1, mGridBuffer, 0, 0 );
                     *commandBuffer->addCommand<CbShaderBuffer>() =
                             CbShaderBuffer( PixelShader, 2, mGlobalLightListBuffer, 0, 0 );
+                }
+
+                if( mPrePassTextures )
+                {
+                    *commandBuffer->addCommand<CbTexture>() =
+                            CbTexture( texUnit++, true, (*mPrePassTextures)[0].get(), 0 );
+                    *commandBuffer->addCommand<CbTexture>() =
+                            CbTexture( texUnit++, true, (*mPrePassTextures)[1].get(), 0 );
+                }
+
+                if( mSsrTexture )
+                {
+                    *commandBuffer->addCommand<CbTexture>() =
+                            CbTexture( texUnit++, true, (*mSsrTexture)[0].get(), 0 );
                 }
 
                 if( mIrradianceVolume )

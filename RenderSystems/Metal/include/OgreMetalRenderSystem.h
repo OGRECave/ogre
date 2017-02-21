@@ -30,6 +30,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #define _OgreMetalRenderSystem_H_
 
 #include "OgreMetalPrerequisites.h"
+#include "OgreMetalPixelFormatToShaderType.h"
 
 #include "OgreRenderSystem.h"
 #include "OgreMetalDevice.h"
@@ -43,12 +44,6 @@ namespace Ogre
     {
         class HardwareBufferManager;
     }
-
-    class _OgreMetalExport MetalPixelFormatToShaderType : public PixelFormatToShaderType
-    {
-    public:
-        virtual const char* getPixelFormatType( PixelFormat pixelFormat ) const { return 0; }
-    };
 
     /**
        Implementation of Metal as a rendering system.
@@ -126,7 +121,7 @@ namespace Ogre
             size_t          offset;
             //size_t          sizeBytes;
 
-            Uav() : textureName( 0 ), buffer( 0 ) {}
+            Uav() : textureName( 0 ), buffer( 0 ), offset( 0 ) {}
         };
 
         Uav             mUavs[64];
@@ -248,6 +243,7 @@ namespace Ogre
         virtual VertexElementType getColourVertexElementType(void) const;
         virtual void _convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
                                                bool forGpuProgram = false);
+        virtual Real getRSDepthRange(void) const;
         virtual void _makeProjectionMatrix( Real left, Real right, Real bottom, Real top,
                                             Real nearPlane, Real farPlane, Matrix4& dest,
                                             bool forGpuProgram = false );

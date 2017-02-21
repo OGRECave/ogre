@@ -137,12 +137,12 @@ namespace Ogre {
                     ss << ".";
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GL3PlusFrameBufferObject::initialise");
                 }
-                if(mColour[x].buffer->getGLFormat() != format)
+                /*if(mColour[x].buffer->getGLFormat() != format)
                 {
                     StringStream ss;
                     ss << "Attachment " << x << " has incompatible format.";
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GL3PlusFrameBufferObject::initialise");
-                }
+                }*/
 
                 assert( !PixelUtil::isDepth( getFormat() ) );
 

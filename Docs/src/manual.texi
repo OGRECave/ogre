@@ -2490,9 +2490,9 @@ The shadow colour (for modulative shadows) as set via SceneManager::setShadowCol
 @item shadow_extrusion_distance
 The shadow extrusion distance as determined by the range of a non-directional light or set via SceneManager::setShadowDirectionalLightExtrusionDistance for directional lights.
 @item texture_size
-Provides texture size of the selected texture unit. Requires a texture unit index parameter. Provided as float4(width, height, depth, 1). For 2D-texture, depth sets to 1, for 1D-texture, height and depth sets to 1.
+Provides texture size of the selected texture unit. Requires a texture unit index parameter. Provided as float4(width, height, depth, max(width, height, depth)). For 2D-texture, depth sets to 1, for 1D-texture, height and depth sets to 1.
 @item inverse_texture_size
-Provides inverse texture size of the selected texture unit. Requires a texture unit index parameter. Provided as float4(1 / width, 1 / height, 1 / depth, 1). For 2D-texture, depth sets to 1, for 1D-texture, height and depth sets to 1.
+Provides inverse texture size of the selected texture unit. Requires a texture unit index parameter. Provided as float4(1 / width, 1 / height, 1 / depth, 1 / max(width, height, depth)). For 2D-texture, depth sets to 1, for 1D-texture, height and depth sets to 1.
 @item packed_texture_size
 Provides packed texture size of the selected texture unit. Requires a texture unit index parameter. Provided as float4(width, height, 1 / width, 1 / height). For 3D-texture, depth is ignored, for 1D-texture, height sets to 1.
 @anchor{pass_number}

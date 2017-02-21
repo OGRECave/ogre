@@ -39,6 +39,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalProgram.h"
 #include "OgreMetalProgramFactory.h"
 #include "OgreMetalTexture.h"
+#include "OgreMetalMultiRenderTarget.h"
 
 #include "OgreMetalHardwareBufferManager.h"
 #include "OgreMetalHardwareIndexBuffer.h"
@@ -196,6 +197,7 @@ namespace Ogre
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
         rsc->setMaxPointSize(256);
 
+        rsc->setCapability(RSC_COMPUTE_PROGRAM);
         rsc->setCapability(RSC_HW_GAMMA);
         rsc->setCapability(RSC_TEXTURE_GATHER);
         rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
@@ -329,9 +331,11 @@ namespace Ogre
         return win;
     }
     //-------------------------------------------------------------------------
-    MultiRenderTarget* MetalRenderSystem::createMultiRenderTarget(const String & name)
+    MultiRenderTarget* MetalRenderSystem::createMultiRenderTarget( const String & name )
     {
-        return 0;
+        MetalMultiRenderTarget *retVal = OGRE_NEW MetalMultiRenderTarget( name );
+        attachRenderTarget( *retVal );
+        return retVal;
     }
     //-------------------------------------------------------------------------
     String MetalRenderSystem::getErrorDescription(long errorNumber) const
@@ -484,7 +488,7 @@ namespace Ogre
             metalTexture = metalTex->getTextureForSampling( this );
         }
 
-        [computeEncoder setTexture:metalTexture atIndex:slot];
+        [computeEncoder setTexture:metalTexture atIndex:slot + OGRE_METAL_CS_UAV_SLOT_START];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
@@ -1295,6 +1299,11 @@ namespace Ogre
         dest[2][3] = (dest[2][3] + dest[3][3]) / 2;
     }
     //-------------------------------------------------------------------------
+    Real MetalRenderSystem::getRSDepthRange(void) const
+    {
+         return 1.0f;
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::_makeProjectionMatrix( Real left, Real right, Real bottom, Real top,
                                                    Real nearPlane, Real farPlane, Matrix4 &dest,
                                                    bool forGpuProgram )
@@ -1970,32 +1979,34 @@ namespace Ogre
             mCurrentColourRTs[0] = 0;
             //We need to set mCurrentColourRTs[0] to grab the active device,
             //even if we won't be drawing to colour target.
+            target->getCustomAttribute( "mNumMRTs", &mNumMRTs );
             target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
 
             MetalDevice *ownerDevice = 0;
 
             if( colourWrite )
             {
-                //TODO: Deal with MRT.
-                mNumMRTs = 1;
-                MTLRenderPassColorAttachmentDescriptor *desc =
-                        mCurrentColourRTs[0]->mColourAttachmentDesc;
-
-                //TODO. This information is stored in Texture. Metal needs it now.
-                const bool explicitResolve = false;
-
-                //TODO: Compositor should be able to tell us whether to use
-                //MTLStoreActionDontCare with some future enhancements.
-                if( target->getFSAA() > 1 && !explicitResolve )
+                for( size_t i=0; i<mNumMRTs; ++i )
                 {
-                    desc.storeAction = MTLStoreActionMultisampleResolve;
-                }
-                else
-                {
-                    desc.storeAction = MTLStoreActionStore;
-                }
+                    MTLRenderPassColorAttachmentDescriptor *desc =
+                            mCurrentColourRTs[i]->mColourAttachmentDesc;
 
-                ownerDevice = mCurrentColourRTs[0]->getOwnerDevice();
+                    //TODO. This information is stored in Texture. Metal needs it now.
+                    const bool explicitResolve = false;
+
+                    //TODO: Compositor should be able to tell us whether to use
+                    //MTLStoreActionDontCare with some future enhancements.
+                    if( target->getFSAA() > 1 && !explicitResolve )
+                    {
+                        desc.storeAction = MTLStoreActionMultisampleResolve;
+                    }
+                    else
+                    {
+                        desc.storeAction = MTLStoreActionStore;
+                    }
+
+                    ownerDevice = mCurrentColourRTs[i]->getOwnerDevice();
+                }
             }
             else
             {
@@ -2036,12 +2047,12 @@ namespace Ogre
         if( previousTarget )
         {
             bool mustClear = false;
+            uint8 numMRTs = 0;
             MetalRenderTargetCommon *currentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+            previousTarget->getCustomAttribute( "mNumMRTs", &numMRTs );
             previousTarget->getCustomAttribute( "MetalRenderTargetCommon", &currentColourRTs[0] );
 
-            //TODO: Deal with MRT
-            //for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
-            for( size_t i=0; i<1u; ++i )
+            for( size_t i=0; i<numMRTs; ++i )
             {
                 if( currentColourRTs[i] )
                 {

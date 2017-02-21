@@ -5,8 +5,8 @@ struct PS_INPUT
 @insertpiece( Terra_VStoPS_block )
 };
 
-@insertpiece( output_type ) main( PS_INPUT inPs
-@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) @insertpiece( output_type_sv )
+float4 main( PS_INPUT inPs
+@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end )
 {
 	float4 outColour;
 	outColour = float4( inPs.uv0.xy, 0.0, 1.0 );
@@ -129,12 +129,13 @@ float3 qmul( float4 q, float3 v )
 @piece( DarkenWithShadowFirstLight )* fShadow@end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
-@insertpiece( output_type ) main( PS_INPUT inPs
-@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) @insertpiece( output_type_sv )
-{
-	@insertpiece( custom_ps_preExecution )
+@insertpiece( DeclOutputType )
 
-	float4 outColour;
+@insertpiece( output_type ) main( PS_INPUT inPs
+@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end )
+{
+	PS_OUTPUT psOut;
+	@insertpiece( custom_ps_preExecution )
 
 	float4 diffuseCol;
 	@insertpiece( FresnelType ) F0;
@@ -363,25 +364,25 @@ float3 qmul( float4 q, float3 v )
 
 @property( !hw_gamma_write )
 	//Linear to Gamma space
-	outColour.xyz	= sqrt( finalColour );
+	psOut.colour0.xyz	= sqrt( finalColour );
 @end @property( hw_gamma_write )
-	outColour.xyz	= finalColour;
+	psOut.colour0.xyz	= finalColour;
 @end
 
 @property( hlms_alphablend )
 	@property( use_texture_alpha )
-		outColour.w		= material.F0.w * diffuseCol.w;
+		psOut.colour0.w		= material.F0.w * diffuseCol.w;
 	@end @property( !use_texture_alpha )
-		outColour.w		= material.F0.w;
+		psOut.colour0.w		= material.F0.w;
 	@end
 @end @property( !hlms_alphablend )
-	outColour.w		= 1.0;@end
+	psOut.colour0.w		= 1.0;@end
 @end
 
 	@insertpiece( custom_ps_posExecution )
 
 @property( !hlms_render_depth_only )
-	return outColour;
+	return psOut;
 @end
 }
 @end

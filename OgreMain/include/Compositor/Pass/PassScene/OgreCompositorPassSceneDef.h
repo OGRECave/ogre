@@ -84,6 +84,14 @@ namespace Ogre
         /// When empty, it implies mCameraName == mCullCameraName.
         IdString                mCullCameraName;
 
+        /// Only used if mPrePassMode == PrePassUse
+        IdString        mPrePassTexture;
+        IdString        mPrePassSsrTexture;
+
+        /// This is a depth pre-pass. Note: Implementations may write
+        /// to colour too for hybrid deferred & forward rendering.
+        PrePassMode     mPrePassMode;
+
         /// First Render Queue ID to render. Inclusive
         uint8           mFirstRQ;
         /// Last Render Queue ID to render. Not inclusive
@@ -130,6 +138,7 @@ namespace Ogre
             mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
             mFirstRQ( 0 ),
             mLastRQ( -1 ),
+            mPrePassMode( PrePassNone ),
             mEnableForwardPlus( true ),
             mCameraCubemapReorient( false ),
             mUpdateLodLists( true ),
@@ -144,6 +153,14 @@ namespace Ogre
         void setVisibilityMask( uint32 visibilityMask )
         {
             mVisibilityMask = visibilityMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
+        }
+
+        void setUseDepthPrePass( IdString textureName, IdString ssrTexture )
+        {
+            mPrePassMode = PrePassUse;
+            mPrePassTexture = textureName;
+            mPrePassSsrTexture = ssrTexture;
+            mExposedTextures.push_back( textureName );
         }
     };
 

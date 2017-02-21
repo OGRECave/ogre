@@ -1180,6 +1180,8 @@ bail:
             rsc->setCapability(RSC_READ_BACK_AS_TEXTURE);
         }
 
+        rsc->setCapability(RSC_EXPLICIT_FSAA_RESOLVE);
+
         // We always support compression, D3DX will decompress if device does not support
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
@@ -1929,6 +1931,11 @@ bail:
             dest[3][2] = -dest[3][2];
         }
     }
+    //-------------------------------------------------------------------------
+    Real D3D11RenderSystem::getRSDepthRange(void) const
+    {
+        return 1.0f;
+    }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, 
         Real farPlane, Matrix4& dest, bool forGpuProgram)
@@ -2082,14 +2089,6 @@ bail:
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setGeometryTexture(size_t stage, const TexturePtr& tex)
-    {
-        if (tex.isNull())
-            _setTexture(stage, false, tex.get());
-        else
-            _setTexture(stage, true, tex.get());
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setComputeTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())
             _setTexture(stage, false, tex.get());

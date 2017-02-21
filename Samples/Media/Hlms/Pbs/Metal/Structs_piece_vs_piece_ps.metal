@@ -37,6 +37,10 @@ struct PassData
 	//Pixel shader
 	float3x3 invViewMatCubemap;
 
+@property( hlms_use_prepass )
+	float4 windowHeight;
+@end
+
 @property( ambient_hemisphere || ambient_fixed || envmap_scale )
 	float4 ambientUpperHemi;
 @end

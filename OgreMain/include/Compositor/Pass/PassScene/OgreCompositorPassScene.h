@@ -67,6 +67,9 @@ namespace Ogre
         Camera                  *mCullCamera;
         bool                    mUpdateShadowNode;
 
+        TextureVec const        *mPrePassTextures;
+        TextureVec const        *mSsrTexture;
+
     public:
         /** Constructor
         @param definition

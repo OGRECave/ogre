@@ -79,6 +79,16 @@ namespace Ogre {
         NumVertexPass
     };
 
+    enum PrePassMode
+    {
+        /// This is a normal pass.
+        PrePassNone,
+        /// This is a depth pre-pass. Note: Implementations may write
+        /// to colour too for hybrid deferred & forward rendering.
+        PrePassCreate,
+        /// This pass will be using the results of a previous pre-pass
+        PrePassUse
+    };
 
     /** Comparison functions used for the depth/stencil buffer operations and 
         others. */

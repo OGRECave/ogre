@@ -192,13 +192,35 @@ namespace Ogre
             mCamera->setOrientation( oldCameraOrientation * CubemapRotations[sliceIdx] );
         }
 
-        if( mDefinition->mFrustumCorners == CompositorPassQuadDef::VIEW_SPACE_CORNERS )
+        if( mDefinition->mFrustumCorners >= CompositorPassQuadDef::VIEW_SPACE_CORNERS &&
+            mDefinition->mFrustumCorners <= CompositorPassQuadDef::VIEW_SPACE_CORNERS_NORMALIZED_LH )
         {
             const Ogre::Matrix4 &viewMat = mCamera->getViewMatrix(true);
             const Vector3 *corners = mCamera->getWorldSpaceCorners();
 
-            mFsRect->setNormals( viewMat * corners[5], viewMat * corners[6],
-                                 viewMat * corners[4], viewMat * corners[7] );
+            Vector3 finalCorners[4] =
+            {
+                viewMat * corners[5], viewMat * corners[6],
+                viewMat * corners[4], viewMat * corners[7]
+            };
+
+            if( mDefinition->mFrustumCorners >= CompositorPassQuadDef::VIEW_SPACE_CORNERS_NORMALIZED )
+            {
+                const Real farPlane = mCamera->getFarClipDistance();
+                for( int i=0; i<4; ++i )
+                {
+                    //finalCorners[i].z should always be == 1; (ignoring precision errors)
+                    finalCorners[i] /= farPlane;
+                    if( mDefinition->mFrustumCorners ==
+                            CompositorPassQuadDef::VIEW_SPACE_CORNERS_NORMALIZED_LH )
+                    {
+                        //Make it left handed: Flip Z.
+                        finalCorners[i].z = -finalCorners[i].z;
+                    }
+                }
+            }
+
+            mFsRect->setNormals( finalCorners[0], finalCorners[1], finalCorners[2], finalCorners[3] );
         }
         else if( mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS )
         {

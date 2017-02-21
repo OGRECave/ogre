@@ -6,6 +6,17 @@
 	@add( texUnit, 2 )
 @end
 
+@property( hlms_use_prepass )
+	@set( gBuf_normals, texUnit )
+	@add( gBuf_shadowRoughness, texUnit, 1 )
+	@add( texUnit, 2 )
+
+	@property( hlms_use_ssr )
+		@set( ssrTexture, texUnit )
+		@add( texUnit, 1 )
+	@end
+@end
+
 @property( irradiance_volumes )
 	@set( irradianceVolumeTexUnit, texUnit )
 	@add( texUnit, 1 )
@@ -61,6 +72,7 @@
 //diffuseCol always has some colour and is multiplied against material.kD in PixelShader_ps.
 @piece( kD )diffuseCol@end
 
+@property( !hlms_prepass )
 @property( !metallic_workflow )
 	@property( specular_map && !fresnel_workflow )
 		@piece( SampleSpecularMap )	specularCol = textureMaps@value( specular_map_idx ).sample( samplerStates@value(specular_map_idx), inPs.uv@value(uv_specular).xy, specularIdx ).xyz * material.kS.xyz;@end
@@ -94,6 +106,7 @@
 	@piece( metallicExtraParamDef ), float3 F0@end
 	@piece( metallicExtraParam ), F0@end
 @end
+@end
 
 @property( roughness_map )
 	@piece( SampleRoughnessMap )	ROUGHNESS = material.kS.w * textureMaps@value( roughness_map_idx ).sample( samplerStates@value( roughness_map_idx ), inPs.uv@value(uv_roughness).xy, roughnessIdx ).x;
@@ -115,4 +128,15 @@
 
 @property( envmap_scale )
 	@piece( ApplyEnvMapScale )* pass.ambientUpperHemi.w@end
+@end
+
+@property( !hlms_render_depth_only && !hlms_shadowcaster && hlms_prepass )
+	@undefpiece( DeclOutputType )
+	@piece( DeclOutputType )
+		struct PS_OUTPUT
+		{
+			float4 normals			[[ color(0) ]];
+			float2 shadowRoughness	[[ color(1) ]];
+		};
+	@end
 @end

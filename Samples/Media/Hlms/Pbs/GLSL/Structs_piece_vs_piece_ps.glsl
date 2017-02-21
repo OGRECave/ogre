@@ -36,6 +36,11 @@ layout(binding = 0) uniform PassBuffer
 	//Pixel shader
 	mat3 invViewMatCubemap;
 
+
+@property( hlms_use_prepass )
+	vec4 windowHeight;
+@end
+
 @property( ambient_hemisphere || ambient_fixed || envmap_scale )
 	vec4 ambientUpperHemi;
 @end

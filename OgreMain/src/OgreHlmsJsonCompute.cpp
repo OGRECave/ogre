@@ -324,6 +324,66 @@ namespace Ogre
 //        }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsJsonCompute::loadBasedOnTextureOrUav( const rapidjson::Value &objValue,
+                                                   const String &jobName, HlmsComputeJob *job,
+                                                   int _threadGroupsBasedOn )
+    {
+        HlmsComputeJob::ThreadGroupsBasedOn threadGroupsBasedOn =
+                static_cast<HlmsComputeJob::ThreadGroupsBasedOn>( _threadGroupsBasedOn );
+
+        if( objValue.IsUint() )
+        {
+            job->setNumThreadGroupsBasedOn( threadGroupsBasedOn,
+                                            static_cast<uint8>( objValue.GetUint() ),
+                                            1u, 1u, 1u );
+        }
+        else if( objValue.IsObject() )
+        {
+            uint8 slot = 0;
+            uint8 divisors[3] = { 1u, 1u, 1u };
+
+            bool hasError = false;
+
+            const rapidjson::Value &subobj = objValue;
+            rapidjson::Value::ConstMemberIterator itor = subobj.FindMember( "slot" );
+
+            if( itor != subobj.MemberEnd() && itor->value.IsUint() )
+                slot = static_cast<uint8>( itor->value.GetUint() );
+            else
+                hasError = true;
+
+            itor = subobj.FindMember( "divisor" );
+
+            if( itor != subobj.MemberEnd() && itor->value.IsArray() )
+            {
+                const rapidjson::Value &divArray = itor->value;
+                const rapidjson::SizeType arraySize = std::min( 3u, divArray.Size() );
+                for( rapidjson::SizeType i=0; i<arraySize; ++i )
+                {
+                    if( divArray[i].IsUint() )
+                    {
+                        divisors[i] = divArray[i].GetUint();
+                    }
+                    else
+                    {
+                        hasError = true;
+                        LogManager::getSingleton().logMessage(
+                                    "Array with 3 integers expected in " + jobName + ". "
+                                    "Syntax is thread_groups_based_on_texture : { \"slot\" "
+                                    ": 0, \"divisor\" : [1, 1, 1] } or the short form: "
+                                    "thread_groups_based_on_texture : 0 (with no divisors)" );
+                    }
+                }
+            }
+
+            if( !hasError )
+            {
+                job->setNumThreadGroupsBasedOn( threadGroupsBasedOn,
+                                                slot, divisors[0], divisors[1], divisors[2] );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsJsonCompute::loadJob( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                                    HlmsComputeJob *job, const String &jobName )
     {
@@ -388,17 +448,17 @@ namespace Ogre
             job->setInformHlmsOfTextureData( itor->value.GetBool() );
 
         itor = json.FindMember( "thread_groups_based_on_texture" );
-        if( itor != json.MemberEnd() && itor->value.IsUint() )
+        if( itor != json.MemberEnd() )
         {
-            job->setNumThreadGroupsBasedOn( HlmsComputeJob::ThreadGroupsBasedOnTexture,
-                                            static_cast<uint8>( itor->value.GetUint() ) );
+            loadBasedOnTextureOrUav( itor->value, jobName, job,
+                                     HlmsComputeJob::ThreadGroupsBasedOnTexture );
         }
 
         itor = json.FindMember( "thread_groups_based_on_uav" );
-        if( itor != json.MemberEnd() && itor->value.IsUint() )
+        if( itor != json.MemberEnd() )
         {
-            job->setNumThreadGroupsBasedOn( HlmsComputeJob::ThreadGroupsBasedOnUav,
-                                            static_cast<uint8>( itor->value.GetUint() ) );
+            loadBasedOnTextureOrUav( itor->value, jobName, job,
+                                     HlmsComputeJob::ThreadGroupsBasedOnUav );
         }
 
         itor = json.FindMember( "properties" );

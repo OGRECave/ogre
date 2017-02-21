@@ -10,6 +10,7 @@
 //diffuseCol always has some colour and is multiplied against material.kD in PixelShader_ps.
 @piece( kD )diffuseCol@end
 
+@property( !hlms_prepass )
 @property( !metallic_workflow )
 	@property( specular_map && !fresnel_workflow )
 		@piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).xyz * material.kS.xyz;@end
@@ -36,6 +37,7 @@
 @end /// SampleSpecularMap
 
 	@piece( kS )material.kS.xyz@end
+@end
 @end
 
 @property( roughness_map )

@@ -1,0 +1,263 @@
+//---------------------------------------------------------------------------------------
+// SSR/ScreenSpaceReflectionsVectors
+//---------------------------------------------------------------------------------------
+
+fragment_program SSR/ScreenSpaceReflectionsVectors_ps_GLSL glsl
+{
+	source ScreenSpaceReflectionsVectors_ps.glsl
+	default_params
+	{
+		param_named depthTexture			int 0
+		param_named gBuf_normals			int 1
+		param_named prevFrameDepthTexture	int 2
+	}
+}
+
+fragment_program SSR/ScreenSpaceReflectionsVectors_ps_HLSL hlsl
+{
+	source ScreenSpaceReflectionsVectors_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SSR/ScreenSpaceReflectionsVectors_ps_Metal metal
+{
+	source ScreenSpaceReflectionsVectors_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/QuadCameraDir_vs
+}
+
+fragment_program SSR/ScreenSpaceReflectionsVectors_ps unified
+{
+	delegate SSR/ScreenSpaceReflectionsVectors_ps_GLSL
+	delegate SSR/ScreenSpaceReflectionsVectors_ps_HLSL
+	delegate SSR/ScreenSpaceReflectionsVectors_ps_Metal
+}
+
+//---------------------------------------------------------------------------------------
+// SSR/ScreenSpaceReflectionsCombine
+//---------------------------------------------------------------------------------------
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_GLSL glsl
+{
+	source ScreenSpaceReflectionsCombine_ps.glsl
+	default_params
+	{
+		param_named depthTexture			int 0
+		param_named gBuf_normals			int 1
+		param_named gBuf_shadowRoughness	int 2
+		param_named prevFrame				int 3
+		param_named rayTraceBuffer			int 4
+		//param_named globalCubemap			int 5
+	}
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_HLSL hlsl
+{
+	source ScreenSpaceReflectionsCombine_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps_Metal metal
+{
+	source ScreenSpaceReflectionsCombine_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/QuadCameraDir_vs
+}
+
+fragment_program SSR/ScreenSpaceReflectionsCombine_ps unified
+{
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_GLSL
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_HLSL
+	delegate SSR/ScreenSpaceReflectionsCombine_ps_Metal
+}
+
+material SSR/ScreenSpaceReflectionsVectors
+{
+    technique
+    {
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/QuadCameraDir_vs
+			{
+			}
+
+			fragment_program_ref SSR/ScreenSpaceReflectionsVectors_ps
+			{
+				param_named_auto	depthBufferRes		texture_size 0
+				//See ScreenSpaceReflections::setupSSRValues
+				param_named			zThickness			float4	0.25 1 1 1
+				param_named_auto	nearPlaneZ			near_clip_distance
+
+				param_named			stride				float	4
+				param_named			maxSteps			float	200
+				param_named			maxDistance			float	1000
+
+				param_named			reprojectionMaxDistanceError	float	2
+
+				//projectionParams will be set from C++
+				param_named			projectionParams	float2	0 1
+				param_named_auto	invDepthBufferRes	inverse_texture_size 0;
+
+				//Set from C++
+				//param_named		viewToTextureSpaceMatrix	float4x4
+				//param_named		reprojectionMatrix			float4x4
+			}
+
+			texture_unit depthTexture
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit gBufferNormals
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit prevFrameDepthTexture
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material SSR/ScreenSpaceReflectionsCombine
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/QuadCameraDir_vs
+			{
+			}
+
+			fragment_program_ref SSR/ScreenSpaceReflectionsCombine_ps
+			{
+				param_named_auto	depthBufferRes		texture_size 0
+
+				//param_named			maxDistance		float	1000
+
+				param_named			fadeStart			float	0.95
+				//param_named		fadeEnd				float	1.00
+				// 1 / (fadeEnd - fadeStart)
+				param_named			invFadeRange		float	20
+
+				//Set from C++
+				param_named			projectionParams		float2	0 1
+				//param_named		textureSpaceToViewSpace	float4x4
+				//param_named		invViewMatCubemap		float4x4
+			}
+
+			texture_unit depthTexture
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit gBufferNormals
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit gBufferShadowRoughness
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit prevFrame
+			{
+				tex_address_mode clamp
+				filtering trilinear
+			}
+
+			texture_unit rayTraceBuffer
+			{
+				tex_address_mode clamp
+				filtering bilinear
+			}
+
+			/*texture_unit globalCubemap
+			{
+				tex_address_mode clamp
+				filtering trilinear
+			}*/
+		}
+	}
+}
+
+
+//---------------------------------------------------------------------------------------
+// SSR/Quincunx
+//---------------------------------------------------------------------------------------
+
+fragment_program SSR/Quincunx_ps_GLSL glsl
+{
+	source Quincunx_ps.glsl
+	default_params
+	{
+		param_named tex			int 0
+	}
+}
+
+fragment_program SSR/Quincunx_ps_HLSL hlsl
+{
+	source Quincunx_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SSR/Quincunx_ps_Metal metal
+{
+	source Quincunx_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
+fragment_program SSR/Quincunx_ps unified
+{
+	delegate SSR/Quincunx_ps_GLSL
+	delegate SSR/Quincunx_ps_HLSL
+	delegate SSR/Quincunx_ps_Metal
+}
+
+material SSR/Quincunx
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref SSR/Quincunx_ps
+			{
+			}
+
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}

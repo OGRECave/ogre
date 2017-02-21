@@ -771,6 +771,11 @@ namespace Ogre {
             }
         }
 
+        size_t braceCount = 0;
+
+        if( oArg.Type == Token::TK_PUNCTUATION && oArg.String[0] == '(' )
+            ++braceCount;
+
         size_t len = oArg.Length;
         while (true)
         {
@@ -782,12 +787,24 @@ namespace Ogre {
             case Token::TK_ERROR:
                 return Token (Token::TK_ERROR);
             case Token::TK_PUNCTUATION:
-                if (t.String [0] == ',' ||
-                    t.String [0] == ')')
+                if( t.String [0] == '(' )
                 {
-                    // Trim whitespaces at the end
-                    oArg.Length = len;
-                    return t;
+                    ++braceCount;
+                }
+                else if( !braceCount )
+                {
+                    if (t.String [0] == ',' ||
+                        t.String [0] == ')')
+                    {
+                        // Trim whitespaces at the end
+                        oArg.Length = len;
+                        return t;
+                    }
+                }
+                else
+                {
+                    if( t.String [0] == ')' )
+                        --braceCount;
                 }
                 break;
             case Token::TK_LINECONT:

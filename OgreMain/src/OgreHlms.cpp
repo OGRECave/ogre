@@ -112,6 +112,10 @@ namespace Ogre
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
+    const IdString HlmsBaseProp::PrePass            = IdString( "hlms_prepass" );
+    const IdString HlmsBaseProp::UsePrePass         = IdString( "hlms_use_prepass" );
+    const IdString HlmsBaseProp::UsePrePassMsaa     = IdString( "hlms_use_prepass_msaa" );
+    const IdString HlmsBaseProp::UseSsr             = IdString( "hlms_use_ssr" );
     const IdString HlmsBaseProp::EnableVpls         = IdString( "hlms_enable_vpls" );
     const IdString HlmsBaseProp::ForwardPlus        = IdString( "hlms_forwardplus" );
     const IdString HlmsBaseProp::ForwardPlusFlipY   = IdString( "hlms_forwardplus_flipY" );
@@ -447,8 +451,15 @@ namespace Ogre
         else
         {
             syntaxError = true;
+
+            char tmpData[64];
+            memset( tmpData, 0, sizeof(tmpData) );
+            strncpy( tmpData, &(*outSubString.begin()),
+                     std::min<size_t>( 63u, outSubString.getSize() ) );
+
             printf( "Syntax Error at line %lu: start block (e.g. @foreach; @property) "
-                    "without matching @end\n", calculateLineCount( outSubString ) );
+                    "without matching @end\nNear: '%s'\n", calculateLineCount( outSubString ),
+                    tmpData );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -1745,7 +1756,10 @@ namespace Ogre
             if( mDataFolder->exists( filename ) )
             {
                 if( mShaderProfile == "glsl" ) //TODO: String comparision
-                    setProperty( HlmsBaseProp::GL3Plus, 330 );
+                {
+                    setProperty( HlmsBaseProp::GL3Plus,
+                                 mRenderSystem->getNativeShadingLanguageVersion() );
+                }
 
                 setProperty( HlmsBaseProp::Syntax,  mShaderSyntax.mHash );
                 setProperty( HlmsBaseProp::Hlsl,    HlmsBaseProp::Hlsl.mHash );
@@ -2238,6 +2252,24 @@ namespace Ogre
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         setProperty( HlmsBaseProp::RenderDepthOnly,
                      renderTarget->getForceDisableColourWrites() ? 1 : 0 );
+
+        if( sceneManager->getCurrentPrePassMode() == PrePassCreate )
+            setProperty( HlmsBaseProp::PrePass, 1 );
+        else if( sceneManager->getCurrentPrePassMode() == PrePassUse )
+        {
+            setProperty( HlmsBaseProp::UsePrePass, 1 );
+            setProperty( HlmsBaseProp::VPos, 1 );
+
+            {
+                const TextureVec *prePassTextures = sceneManager->getCurrentPrePassTextures();
+                assert( prePassTextures && !prePassTextures->empty() );
+                if( (*prePassTextures)[0]->getFSAA() > 1 )
+                    setProperty( HlmsBaseProp::UsePrePassMsaa, 1 );
+            }
+
+            if( sceneManager->getCurrentSsrTexture() != 0 )
+                setProperty( HlmsBaseProp::UseSsr, 1 );
+        }
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 

@@ -38,6 +38,10 @@ namespace Ogre
         case PF_L8:
         case PF_A8:
         case PF_R8:
+        case PF_D16_UNORM:
+        case PF_D24_UNORM:
+        case PF_D24_UNORM_S8_UINT:
+        case PF_D24_UNORM_X8:
             return "unorm float";
         case PF_L16:
             return "unorm float";
@@ -130,6 +134,9 @@ namespace Ogre
         case PF_FLOAT16_R:
             return "float";
         case PF_FLOAT32_R:
+        case PF_D32_FLOAT:
+        case PF_D32_FLOAT_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_X8:
             return "float";
         case PF_FLOAT16_GR:
             return "float2";

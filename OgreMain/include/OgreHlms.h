@@ -675,6 +675,10 @@ namespace Ogre
         static const IdString ShadowCaster;
         static const IdString ShadowUsesDepthTexture;
         static const IdString RenderDepthOnly;
+        static const IdString PrePass;
+        static const IdString UsePrePass;
+        static const IdString UsePrePassMsaa;
+        static const IdString UseSsr;
         static const IdString EnableVpls;
         static const IdString ForwardPlus;
         static const IdString ForwardPlusFlipY;
@@ -700,6 +704,7 @@ namespace Ogre
         static const IdString Metal;
         static const IdString GL3Plus;
         static const IdString iOS;
+        static const IdString GLVersion;
         static const IdString HighQuality;
         static const IdString TexGather;
         static const IdString DisableStage;
