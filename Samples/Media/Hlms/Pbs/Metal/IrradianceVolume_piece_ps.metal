@@ -4,7 +4,7 @@
 	float3 worldPos = ( float4( inPs.pos.xyz, 1.0 ) * pass.invView ).xyz;
 
 	float3 irradiancePos = worldPos.xyz * pass.irradianceSize.xyz - pass.irradianceOrigin.xyz;
-	//Floor irradiancePos.y and put the fractional part so we can lerp.
+	//Floor irradiancePos.y and put the fractional part so we can mix.
 	irradiancePos.y -= 0.5f;	//Texel centers are at center. Move it to origin.
 	float origYPos;
 	float fIrradianceYWeight = modf( irradiancePos.y, origYPos );
@@ -39,21 +39,21 @@
 	irradiancePos.y		+= 6.0f * irradianceTexInvHeight;
 	tmpAmbientSample	= irradianceVolume.sample( irradianceVolumeSampler, irradiancePos ).xyz;
 
-	xAmbientSample = lerp( xAmbientSample, tmpAmbientSample, fIrradianceYWeight );
+	xAmbientSample = mix( xAmbientSample, tmpAmbientSample, fIrradianceYWeight );
 
 	irradiancePos.y		= (origYPos + (2.0f + isNegative.y)) * irradianceTexInvHeight;
 	float3 yAmbientSample	= irradianceVolume.sample( irradianceVolumeSampler, irradiancePos ).xyz;
 	irradiancePos.y		+= 6.0f * irradianceTexInvHeight;
 	tmpAmbientSample	= irradianceVolume.sample( irradianceVolumeSampler, irradiancePos ).xyz;
 
-	yAmbientSample = lerp( yAmbientSample, tmpAmbientSample, fIrradianceYWeight );
+	yAmbientSample = mix( yAmbientSample, tmpAmbientSample, fIrradianceYWeight );
 
 	irradiancePos.y		= (origYPos + (4.0f + isNegative.z)) * irradianceTexInvHeight;
 	float3 zAmbientSample = irradianceVolume.sample( irradianceVolumeSampler, irradiancePos ).xyz;
 	irradiancePos.y		+= 6.0f * irradianceTexInvHeight;
 	tmpAmbientSample	= irradianceVolume.sample( irradianceVolumeSampler, irradiancePos ).xyz;
 
-	zAmbientSample = lerp( zAmbientSample, tmpAmbientSample, fIrradianceYWeight );
+	zAmbientSample = mix( zAmbientSample, tmpAmbientSample, fIrradianceYWeight );
 
 
 	float3 worldNormalSq = worldNormal.xyz * worldNormal.xyz;
