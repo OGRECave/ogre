@@ -287,16 +287,6 @@ namespace Ogre {
         }
 
         _loadImages(imagePtrs);
-
-
-        // Generate mipmaps after all texture levels have been loaded
-        // This is required for compressed formats such as DXT
-        // If we can do automip generation and the user desires this, do so
-        if((mUsage & TU_AUTOMIPMAP) &&
-            mNumRequestedMipmaps && mMipmapsHardwareGenerated)
-        {
-            glGenerateMipmapEXT(getGLTextureTarget());
-        }
     }
 
     //*************************************************************************
@@ -314,18 +304,12 @@ namespace Ogre {
         mSurfaceList.clear();
         
         // For all faces and mipmaps, store surfaces as HardwarePixelBufferSharedPtr
-        bool wantGeneratedMips = (mUsage & TU_AUTOMIPMAP)!=0;
-        
-        // Do mipmapping in software? (uses GLU) For some cards, this is still needed. Of course,
-        // only when mipmap generation is desired.
-        bool doSoftware = wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps(); 
-        
         for(GLint face=0; face<static_cast<GLint>(getNumFaces()); face++)
         {
             for(uint32 mip=0; mip<=getNumMipmaps(); mip++)
             {
                 GLHardwarePixelBuffer *buf = new GLTextureBuffer(mGLSupport, mName, getGLTextureTarget(), mTextureID, face, mip,
-                        static_cast<HardwareBuffer::Usage>(mUsage), doSoftware && mip==0, mHwGamma, mFSAA);
+                        static_cast<HardwareBuffer::Usage>(mUsage), mHwGamma, mFSAA);
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
                 
                 /// Check for error

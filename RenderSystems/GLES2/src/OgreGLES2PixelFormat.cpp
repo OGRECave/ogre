@@ -247,7 +247,7 @@ namespace Ogre {
             case PF_FLOAT16_RGB:
             case PF_FLOAT16_RGBA:
 #if (GL_OES_texture_half_float && OGRE_PLATFORM != OGRE_PLATFORM_NACL) || (OGRE_NO_GLES3_SUPPORT == 0)
-                return GL_HALF_FLOAT_OES;
+                return OGRE_NO_GLES3_SUPPORT ? GL_HALF_FLOAT_OES : GL_HALF_FLOAT;
 #else
                 return 0;
 #endif
@@ -637,6 +637,7 @@ namespace Ogre {
                 {
                     case GL_UNSIGNED_SHORT_5_6_5:
                         return PF_B5G6R5;
+                    case GL_HALF_FLOAT:
                     case GL_HALF_FLOAT_OES:
                         return PF_FLOAT16_RGB;
                     case GL_FLOAT:
@@ -652,6 +653,7 @@ namespace Ogre {
                         return PF_A1R5G5B5;
                     case GL_UNSIGNED_SHORT_4_4_4_4:
                         return PF_A4R4G4B4;
+                    case GL_HALF_FLOAT:
                     case GL_HALF_FLOAT_OES:
                         return PF_FLOAT16_RGBA;
                     case GL_FLOAT:

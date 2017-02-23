@@ -123,11 +123,11 @@ void GLHardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBo
 }
 //********* GLTextureBuffer
 GLTextureBuffer::GLTextureBuffer(GLSupport& support, const String &baseName, GLenum target, GLuint id,
-                                 GLint face, GLint level, Usage usage, bool crappyCard, 
+                                 GLint face, GLint level, Usage usage,
                                  bool writeGamma, uint fsaa):
     GLHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
     mTarget(target), mFaceTarget(0), mTextureID(id), mFace(face), mLevel(level),
-    mSoftwareMipmap(crappyCard), mHwGamma(writeGamma), mSliceTRT(0), mGLSupport(support)
+    mHwGamma(writeGamma), mSliceTRT(0), mGLSupport(support)
 {
     // devise mWidth, mHeight and mDepth and mFormat
     GLint value = 0;
@@ -301,53 +301,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
                 break;
         }
         
-    } 
-    else if(mSoftwareMipmap)
-    {
-        GLenum format = GLPixelUtil::getClosestGLInternalFormat(mFormat);
-        if(data.getWidth() != data.rowPitch)
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch);
-        if(data.getHeight()*data.getWidth() != data.slicePitch)
-            glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth()));
-        if(data.left > 0 || data.top > 0 || data.front > 0)
-            glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        
-        switch(mTarget)
-        {
-        case GL_TEXTURE_1D:
-            gluBuild1DMipmaps(
-                GL_TEXTURE_1D, format,
-                dest.getWidth(),
-                GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
-                data.data);
-            break;
-        case GL_TEXTURE_2D:
-        case GL_TEXTURE_CUBE_MAP:
-            gluBuild2DMipmaps(
-                mFaceTarget,
-                format, dest.getWidth(), dest.getHeight(), 
-                GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format), 
-                data.data);
-            break;      
-        case GL_TEXTURE_3D:
-        case GL_TEXTURE_2D_ARRAY_EXT:
-            /* Requires GLU 1.3 which is harder to come by than cards doing hardware mipmapping
-                Most 3D textures don't need mipmaps?
-            gluBuild3DMipmaps(
-                GL_TEXTURE_3D, internalFormat, 
-                data.getWidth(), data.getHeight(), data.getDepth(),
-                GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
-                data.data);
-            */
-            glTexImage3D(
-                mTarget, 0, format, 
-                dest.getWidth(), dest.getHeight(), dest.getDepth(), 0, 
-                GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
-                data.data );
-            break;
-        }
-    } 
+    }
     else
     {
         if(data.getWidth() != data.rowPitch)
@@ -387,6 +341,14 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
                 break;
         }   
     }
+
+    // TU_AUTOMIPMAP is only enabled when there are no custom mips
+    // so we do not have to care about overwriting
+    if((mUsage & TU_AUTOMIPMAP) && (mLevel == 0))
+    {
+        glGenerateMipmapEXT(mTarget);
+    }
+
     // Restore defaults
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     if (GLEW_VERSION_1_2)
@@ -778,7 +740,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box 
         glTexImage2D(target, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
     /// GL texture buffer
-    GLTextureBuffer tex(mGLSupport, BLANKSTRING, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
+    GLTextureBuffer tex(mGLSupport, BLANKSTRING, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
     
     /// Upload data to 0,0,0 in temporary texture
     Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());

@@ -11,28 +11,18 @@
 
 file(GLOB HEADER_FILES "include/*.h")
 file(GLOB SOURCE_FILES "src/*.cpp")
+list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/glesw.c")
+if (APPLE_IOS)
+  set_source_files_properties(src/glesw.c PROPERTIES COMPILE_FLAGS "-x objective-c")
+endif()
 
 file(GLOB GLSLES_FILES "src/GLSLES/include/*.h" "src/GLSLES/src/*.cpp")
 
 list(REMOVE_ITEM GLSLES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/src/OgreGLSLESCgProgram.cpp")
 list(REMOVE_ITEM GLSLES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp")
 
-if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
-  set(GLESW_HEADER_INSTALL "GLES3")
-  file(GLOB GLESW_HEADERS "include/GLES3/*.h")
-  list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/gles3w.c")
-  if (APPLE_IOS)
-    set_source_files_properties(src/gles3w.c PROPERTIES COMPILE_FLAGS "-x objective-c")
-  endif()
-else()
-  set(GLESW_HEADER_INSTALL "GLES2")
-  file(GLOB GLESW_HEADERS "include/GLES2/*.h")
-  list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/gles2w.c")
-  if (APPLE_IOS)
-    set_source_files_properties(src/gles2w.c PROPERTIES COMPILE_FLAGS "-x objective-c")
-  endif()
-endif()
-
+set(GLESW_HEADER_INSTALL "GLES3")
+file(GLOB GLESW_HEADERS "include/GLES3/*.h")
 file(GLOB KHR_HEADERS "include/KHR/*.h")
 
 include_directories(src/StateCacheManager)
@@ -99,6 +89,7 @@ endif ()
 ogre_config_plugin(RenderSystem_GLES2)
 
 install(FILES ${HEADER_FILES} ${GLSUPPORT_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2)
+install(FILES "include/GLES2/gl2ext.h" DESTINATION include/OGRE/RenderSystems/GLES2/GLES2)
 install(FILES ${GLESW_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/${GLESW_HEADER_INSTALL})
 install(FILES ${KHR_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/KHR)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include/ DESTINATION include/OGRE/RenderSystems/GLES2/GLSLES)

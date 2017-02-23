@@ -59,14 +59,11 @@ namespace Ogre {
 #   include <wingdi.h>
 #   include <GL/glew.h>
 #   include <GL/wglew.h>
-#   include <GL/glu.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #   include <GL/glew.h>
-#   include <GL/glu.h>
 #   define GL_GLEXT_PROTOTYPES
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <GL/glew.h>
-#   include <OpenGL/glu.h>
 #endif
 
 /// Lots of generated code in here which triggers the new VC CRT security warnings

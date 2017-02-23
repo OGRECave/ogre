@@ -300,7 +300,7 @@ namespace Ogre {
                 + StringConverter::toString(hasCapability(RSC_GLSL_SSO_REDECLARE), true));
             pLog->logMessage(
                 " * Mipmaps for compressed formats: "
-                + StringConverter::toString(hasCapability(RSC_GLSL_SSO_REDECLARE), true));
+                + StringConverter::toString(hasCapability(RSC_AUTOMIPMAP_COMPRESSED), true));
         }
 
         if (mCategoryRelevant[CAPS_CATEGORY_D3D9])

@@ -317,7 +317,7 @@ namespace Ogre {
 
     void * EAGL2Support::getProcAddress(const char* name)
     {
-        return gleswGetProcAddress(name);
+        return (void*)gleswGetProcAddress(name);
     }
     
     void EAGL2Support::start()

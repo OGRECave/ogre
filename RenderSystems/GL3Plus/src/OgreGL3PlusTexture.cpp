@@ -376,13 +376,6 @@ namespace Ogre {
         }
 
         _loadImages(imagePtrs);
-
-        // Generate mipmaps after all texture levels have been loaded
-        // This is required for compressed formats such as DXT
-        if (mUsage & TU_AUTOMIPMAP && (mTextureType != TEX_TYPE_2D_ARRAY && mTextureType != TEX_TYPE_3D))
-        {
-            OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGL3PlusTextureTarget()));
-        }
     }
 
     void GL3PlusTexture::freeInternalResourcesImpl()

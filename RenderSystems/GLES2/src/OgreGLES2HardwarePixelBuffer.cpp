@@ -159,10 +159,10 @@ namespace Ogre {
     // TextureBuffer
     GLES2TextureBuffer::GLES2TextureBuffer(const String &baseName, GLenum target, GLuint id, 
                                            GLint width, GLint height, GLint depth, GLint internalFormat, GLint format,
-                                           GLint face, GLint level, Usage usage, bool crappyCard, 
+                                           GLint face, GLint level, Usage usage,
                                            bool writeGamma, uint fsaa)
     : GLES2HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-        mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level), mSoftwareMipmap(crappyCard)
+        mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level)
     {
         getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
         
@@ -250,12 +250,11 @@ namespace Ogre {
         mTextureID = textureID;
     }
 #endif
-    
-#if OGRE_NO_GLES3_SUPPORT == 0
+
     void GLES2TextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
         getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
-
+#if OGRE_NO_GLES3_SUPPORT == 0
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
         if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
@@ -320,7 +319,7 @@ namespace Ogre {
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Compressed images must be consecutive, in the source format",
                             "GLES2TextureBuffer::upload");
-            
+
             GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(mFormat);
             // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
             // for compressed formats
@@ -343,7 +342,7 @@ namespace Ogre {
                     break;
             }
 
-        } 
+        }
         else
         {
             if(data.getWidth() != data.rowPitch)
@@ -366,7 +365,7 @@ namespace Ogre {
             switch(mTarget) {
                 case GL_TEXTURE_2D:
                 case GL_TEXTURE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget, mLevel, 
+                    OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget, mLevel,
                                     dest.left, dest.top,
                                     dest.getWidth(), dest.getHeight(),
                                     GLES2PixelUtil::getGLOriginFormat(data.format), GLES2PixelUtil::getGLOriginDataType(data.format),
@@ -375,14 +374,17 @@ namespace Ogre {
                 case GL_TEXTURE_3D:
                 case GL_TEXTURE_2D_ARRAY:
                     OGRE_CHECK_GL_ERROR(glTexSubImage3D(
-                                    mTarget, mLevel, 
+                                    mTarget, mLevel,
                                     dest.left, dest.top, dest.front,
                                     dest.getWidth(), dest.getHeight(), dest.getDepth(),
                                     GLES2PixelUtil::getGLOriginFormat(data.format), GLES2PixelUtil::getGLOriginDataType(data.format),
                                     NULL));
                     break;
-            }   
-            if (mUsage & TU_AUTOMIPMAP && (mTarget == GL_TEXTURE_2D_ARRAY || mTarget == GL_TEXTURE_3D))
+            }
+
+            // TU_AUTOMIPMAP is only enabled when there are no custom mips
+            // so we do not have to care about overwriting
+            if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0))
             {
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
             }
@@ -398,17 +400,109 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
+#else
+#if OGRE_DEBUG_MODE
+        LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
+                                              " Target: " + StringConverter::toString(mTarget) +
+                                              " Format: " + PixelUtil::getFormatName(data.format) +
+                                              " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
+                                              " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
+#endif
+        if (PixelUtil::isCompressed(data.format))
+        {
+            if(data.format != mFormat || !data.isConsecutive())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Compressed images must be consecutive, in the source format",
+                            "GLES2TextureBuffer::upload");
+
+            GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(mFormat);
+            // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
+            // for compressed formats
+            if (dest.left == 0 && dest.top == 0)
+            {
+                OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(mFaceTarget, mLevel,
+                                       format,
+                                       dest.getWidth(),
+                                       dest.getHeight(),
+                                       0,
+                                       static_cast<GLsizei>(data.getConsecutiveSize()),
+                                       data.data));
+            }
+            else
+            {
+                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage2D(mFaceTarget, mLevel,
+                                          dest.left, dest.top,
+                                          dest.getWidth(), dest.getHeight(),
+                                          format, static_cast<GLsizei>(data.getConsecutiveSize()),
+                                          data.data));
+            }
+        }
+        else
+        {
+            if (data.getWidth() != data.rowPitch)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Unsupported texture format",
+                            "GLES2TextureBuffer::upload");
+            }
+
+            if (data.getHeight() * data.getWidth() != data.slicePitch)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Unsupported texture format",
+                            "GLES2TextureBuffer::upload");
+            }
+
+            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
+            {
+                // Standard alignment of 4 is not right
+                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+            }
+
+            switch(mTarget)
+            {
+                case GL_TEXTURE_2D:
+                case GL_TEXTURE_CUBE_MAP:
+                    OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget,
+                                    mLevel,
+                                    dest.left, dest.top,
+                                    dest.getWidth(), dest.getHeight(),
+                                    GLES2PixelUtil::getGLOriginFormat(data.format),
+                                    GLES2PixelUtil::getGLOriginDataType(data.format),
+                                    data.data));
+                    break;
+                case GL_TEXTURE_3D_OES:
+                    OGRE_CHECK_GL_ERROR(glTexSubImage3DOES(mFaceTarget,
+                                    mLevel,
+                                    dest.left, dest.top, dest.front,
+                                    dest.getWidth(), dest.getHeight(), dest.getDepth(),
+                                    GLES2PixelUtil::getGLOriginFormat(data.format),
+                                    GLES2PixelUtil::getGLOriginDataType(data.format),
+                                    data.data));
+                    break;
+            }
+
+            // TU_AUTOMIPMAP is only enabled when there are no custom mips
+            // so we do not have to care about overwriting
+            if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0) && (mTarget == GL_TEXTURE_2D || mTarget == GL_TEXTURE_CUBE_MAP))
+            {
+                OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
+            }
+        }
+
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
+#endif
     }
-    
+
     //-----------------------------------------------------------------------------  
     void GLES2TextureBuffer::download(const PixelBox &data)
     {
         if(data.getWidth() != getWidth() ||
            data.getHeight() != getHeight() ||
            data.getDepth() != getDepth())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL",
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL ES",
                         "GLES2TextureBuffer::download");
-
+#if OGRE_NO_GLES3_SUPPORT == 0
         // Upload data to PBO
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
         if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
@@ -434,7 +528,7 @@ namespace Ogre {
         if(PixelUtil::isCompressed(data.format))
         {
             if(data.format != mFormat || !data.isConsecutive())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Compressed images must be consecutive, in the source format",
                             "GLES2TextureBuffer::download");
         }
@@ -497,130 +591,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, 0));
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
         mBufferId = 0;
-    }
 #else
-    void GLES2TextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
-    {
-#if OGRE_DEBUG_MODE
-        LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
-                                              " Target: " + StringConverter::toString(mTarget) +
-                                              " Format: " + PixelUtil::getFormatName(data.format) +
-                                              " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
-                                              " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
-#endif
-        getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
-
-        if (PixelUtil::isCompressed(data.format))
-        {
-            if(data.format != mFormat || !data.isConsecutive())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Compressed images must be consecutive, in the source format",
-                            "GLES2TextureBuffer::upload");
-
-            GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(mFormat);
-            // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
-            // for compressed formats
-            if (dest.left == 0 && dest.top == 0)
-            {
-                OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(mFaceTarget, mLevel,
-                                       format,
-                                       dest.getWidth(),
-                                       dest.getHeight(),
-                                       0,
-                                       static_cast<GLsizei>(data.getConsecutiveSize()),
-                                       data.data));
-            }
-            else
-            {
-                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage2D(mFaceTarget, mLevel,
-                                          dest.left, dest.top,
-                                          dest.getWidth(), dest.getHeight(),
-                                          format, static_cast<GLsizei>(data.getConsecutiveSize()),
-                                          data.data));
-            }
-        }
-        else if (mSoftwareMipmap)
-        {
-            if (data.getWidth() != data.rowPitch)
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Unsupported texture format",
-                            "GLES2TextureBuffer::upload");
-            }
-
-            if (data.getHeight() * data.getWidth() != data.slicePitch)
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Unsupported texture format",
-                            "GLES2TextureBuffer::upload");
-            }
-
-            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
-            {
-                // Standard alignment of 4 is not right
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-            }
-
-            buildMipmaps(data);
-        }
-        else
-        {
-            if (data.getWidth() != data.rowPitch)
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Unsupported texture format",
-                            "GLES2TextureBuffer::upload");
-            }
-
-            if (data.getHeight() * data.getWidth() != data.slicePitch)
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Unsupported texture format",
-                            "GLES2TextureBuffer::upload");
-            }
-
-            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
-            {
-                // Standard alignment of 4 is not right
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-            }
-
-            switch(mTarget)
-            {
-                case GL_TEXTURE_2D:
-                case GL_TEXTURE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget,
-                                    mLevel,
-                                    dest.left, dest.top,
-                                    dest.getWidth(), dest.getHeight(),
-                                    GLES2PixelUtil::getGLOriginFormat(data.format),
-                                    GLES2PixelUtil::getGLOriginDataType(data.format),
-                                    data.data));
-                    break;
-                case GL_TEXTURE_3D_OES:
-                    OGRE_CHECK_GL_ERROR(glTexSubImage3DOES(mFaceTarget,
-                                    mLevel,
-                                    dest.left, dest.top, dest.front,
-                                    dest.getWidth(), dest.getHeight(), dest.getDepth(),
-                                    GLES2PixelUtil::getGLOriginFormat(data.format),
-                                    GLES2PixelUtil::getGLOriginDataType(data.format),
-                                    data.data));
-                    break;
-            }
-        }
-
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
-    }
-
-    //-----------------------------------------------------------------------------  
-    void GLES2TextureBuffer::download(const PixelBox &data)
-    {
-        if(data.getWidth() != getWidth() ||
-           data.getHeight() != getHeight() ||
-           data.getDepth() != getDepth())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL ES",
-                        "GLES2TextureBuffer::download");
-
         if(PixelUtil::isCompressed(data.format))
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -667,8 +638,9 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &tempFBO));
-    }
 #endif
+    }
+
     //-----------------------------------------------------------------------------  
     void GLES2TextureBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)
     {
@@ -687,16 +659,11 @@ namespace Ogre {
     void GLES2TextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
         GLES2TextureBuffer *srct = static_cast<GLES2TextureBuffer *>(src.get());
-        // TODO: Check for FBO support first
+        // TODO: blitFromTexture currently broken
         // Destination texture must be 2D or Cube
         // Source texture must be 2D
-        if(((src->getUsage() & TU_RENDERTARGET) == 0 && (srct->mTarget == GL_TEXTURE_2D))
-#if OGRE_NO_GLES3_SUPPORT == 0
-        || ((srct->mTarget == GL_TEXTURE_3D_OES) && (mTarget != GL_TEXTURE_2D_ARRAY))
-#else
-        || (srct->mTarget == GL_TEXTURE_3D_OES)
-#endif
-        )
+        if (false) //(((src->getUsage() & TU_RENDERTARGET) == 0 && (srct->mTarget == GL_TEXTURE_2D)) ||
+            //((srct->mTarget == GL_TEXTURE_3D_OES) && (mTarget != GL_TEXTURE_2D_ARRAY)))
         {
             blitFromTexture(srct, srcBox, dstBox);
         }
@@ -1044,7 +1011,7 @@ namespace Ogre {
 
         // GL texture buffer
         GLES2TextureBuffer tex(BLANKSTRING, target, id, width, height, depth, format, src.format,
-                              0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
+                              0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
         
         // Upload data to 0,0,0 in temporary texture
         Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
@@ -1062,111 +1029,6 @@ namespace Ogre {
         assert(mUsage & TU_RENDERTARGET);
         assert(zoffset < mDepth);
         return mSliceTRT[zoffset];
-    }
-
-    void GLES2TextureBuffer::buildMipmaps(const PixelBox &data)
-    {
-        GLsizei width;
-        GLsizei height;
-        GLsizei depth;
-        PixelBox scaled;
-        scaled.format = data.format;
-        scaled.left = 0;
-        scaled.right = mWidth;
-        scaled.top = 0;
-        scaled.bottom = mHeight;
-        scaled.front = 0;
-        scaled.back = mDepth;
-        scaled.setConsecutive();
-       
-        if (scaled.format == PF_R8G8B8)
-        {
-            size_t srcSize = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), data.format);
-            scaled.format = PF_B8G8R8;
-            scaled.data = new uint8[srcSize];
-            memcpy(scaled.data, data.data, srcSize);
-            PixelUtil::bulkPixelConversion(data, scaled);
-        }
-        else
-        {
-            size_t srcSize = scaled.getConsecutiveSize();
-            scaled.data = new uint8[srcSize];
-            Image::scale(data, scaled);
-        }
-        GLint maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
-        GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
-        
-        for (GLint level = 0; level <= maxMips; ++level)
-        {
-            width = (GLsizei)scaled.getWidth();
-            height = (GLsizei)scaled.getHeight();
-            depth = (GLsizei)scaled.getDepth();
-            
-            switch(mTarget)
-            {
-                case GL_TEXTURE_2D:
-                case GL_TEXTURE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
-                                                     level,
-                                                     mGLInternalFormat,
-                                                     width, height,
-                                                     0,
-                                                     mGLInternalFormat,
-                                                     dataType,
-                                                     scaled.data));
-                    break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-                case GL_TEXTURE_2D_ARRAY:
-#endif
-                case GL_TEXTURE_3D_OES:
-                    OGRE_CHECK_GL_ERROR(glTexImage3DOES(mFaceTarget,
-                                                     level,
-                                                     mGLInternalFormat,
-                                                     width, height, depth,
-                                                     0,
-                                                     mGLInternalFormat,
-                                                     dataType,
-                                                     scaled.data));
-                    break;
-            }
-            
-            bool squashX = (width > 1);
-            bool squashY = (height > 1);
-            bool squashZ = (mTarget == GL_TEXTURE_3D_OES && depth > 1);
-            if (squashX || squashY || squashZ)
-            {
-                size_t xMax = squashX ? width >> 1 : width;
-                size_t yMax = squashY ? height >> 1 : height;
-                size_t zMax = squashZ ? depth >> 1 : depth;
-                PixelBox newBox(xMax, yMax, zMax, scaled.format, scaled.data);
-                size_t xMask = 1, yMask = 1 << squashX, zMask = 1 << (squashX + squashY);
-                size_t mask = 1 << (squashX + squashY + squashZ);
-
-                // Generate next mipmap level by averaging together consecutive pixels from this level
-                for (size_t z = 0; z < zMax; ++z)
-                {
-                    for (size_t y = 0; y < yMax; ++y)
-                    {
-                        for (size_t x = 0; x < xMax; ++x)
-                        {
-                            ColourValue sum = ColourValue::ZERO;
-                            for (size_t i = 0; i < mask; ++i)
-                            {
-                                sum += scaled.getColourAt(squashX ? (x << 1) | (i & xMask ? 1 : 0) : x,
-                                                          squashY ? (y << 1) | (i & yMask ? 1 : 0) : y,
-                                                          squashZ ? (z << 1) | (i & zMask ? 1 : 0) : z);
-                            }
-                            newBox.setColourAt(sum / mask, x, y, z);
-                        }
-                    }
-                }
-                
-                scaled = newBox;
-            }
-        }
-        
-        delete[] (uint8*)scaled.data;
-        scaled.data = NULL;
     }
     
     //********* GLES2RenderBuffer

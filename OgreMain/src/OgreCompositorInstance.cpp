@@ -1300,7 +1300,8 @@ void CompositorInstance::notifyCameraChanged(Camera* camera)
     while (localMRTIter != localMRTIterEnd)
     {
         MultiRenderTarget* target = localMRTIter->second;
-        target->getViewport(0)->setCamera(camera);
+        if(target->getNumViewports())
+            target->getViewport(0)->setCamera(camera);
         ++localMRTIter;
     }
 }
