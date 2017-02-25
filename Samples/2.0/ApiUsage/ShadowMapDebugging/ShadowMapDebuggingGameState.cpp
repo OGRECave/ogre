@@ -152,7 +152,10 @@ namespace Demo
         macroblock.mDepthCheck = false;
         Ogre::HlmsBlendblock blendblock;
 
-        Ogre::CompositorShadowNode *shadowNode = workspace->findShadowNode( "ShadowMapDebuggingShadowNode" );
+        Ogre::CompositorShadowNode *shadowNode =
+                workspace->findShadowNode( "ShadowMapDebuggingShadowNode" );
+        const Ogre::CompositorShadowNodeDef *shadowNodeDef = shadowNode->getDefinition();
+
         for( int i=0; i<5; ++i )
         {
             const Ogre::String datablockName( "depthShadow" + Ogre::StringConverter::toString( i ) );
@@ -160,8 +163,23 @@ namespace Demo
                         datablockName, datablockName,
                         macroblock, blendblock,
                         Ogre::HlmsParamVec() );
-            Ogre::TexturePtr tex = shadowNode->getLocalTextures()[i].textures[0];
-            depthShadow->setTexture( 0, 0, tex, 0 );
+
+            const Ogre::ShadowTextureDefinition *shadowTexDef =
+                    shadowNodeDef->getShadowTextureDefinition( i );
+
+            Ogre::TexturePtr tex = shadowNode->getDefinedTexture( shadowTexDef->getTextureNameStr(),
+                                                                  shadowTexDef->mrtIndex );
+            depthShadow->setTexture( 0, shadowTexDef->arrayIdx, tex, 0 );
+
+            //If it's an UV atlas, then only display the relevant section
+            Ogre::Matrix4 uvOffsetScale;
+            uvOffsetScale.makeTransform( Ogre::Vector3( shadowTexDef->uvOffset.x,
+                                                        shadowTexDef->uvOffset.y, 0.0f ),
+                                         Ogre::Vector3( 1.0f / shadowTexDef->uvLength.x,
+                                                        1.0f / shadowTexDef->uvLength.y, 1.0f ),
+                                         Ogre::Quaternion::IDENTITY );
+            depthShadow->setEnableAnimationMatrix( 0, true );
+            depthShadow->setAnimationMatrix( 0, uvOffsetScale );
         }
 
         Ogre::v1::OverlayManager &overlayManager = Ogre::v1::OverlayManager::getSingleton();

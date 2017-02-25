@@ -175,7 +175,9 @@ namespace Ogre
         size_t getNumShadowTextureDefinitions() const   { return mShadowMapTexDefinitions.size(); }
 
         /// Retrieves a shadow texture definition by its index.
-        ShadowTextureDefinition* getShadowTextureDefinition( size_t texIndex )
+        const ShadowTextureDefinition* getShadowTextureDefinition( size_t texIndex ) const
+                                                        { return &mShadowMapTexDefinitions[texIndex]; }
+        ShadowTextureDefinition* getShadowTextureDefinitionNonConst( size_t texIndex )
                                                         { return &mShadowMapTexDefinitions[texIndex]; }
 
         /** Checks that paremeters are correctly set, and finalizes whatever needs to be

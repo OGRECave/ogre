@@ -7122,7 +7122,7 @@ namespace Ogre{
         //AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
         String texName = "";
-        uint8       mrtIndex;
+        uint8       mrtIndex = 0;
         Vector2     uvOffset( Vector2::ZERO );
         Vector2     uvLength( Vector2::UNIT_SCALE );
         uint8       arrayIdx = 0;

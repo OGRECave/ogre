@@ -151,6 +151,8 @@ namespace Ogre
                               const RenderTarget *finalTarget );
         virtual ~CompositorShadowNode();
 
+        const CompositorShadowNodeDef* getDefinition() const            { return mDefinition; }
+
         /** Renders into the shadow map, executes passes
         @param camera
             Camera used to calculate our shadow camera (in case of directional lights).
