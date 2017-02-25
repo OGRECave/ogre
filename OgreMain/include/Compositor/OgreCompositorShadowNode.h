@@ -44,6 +44,8 @@ namespace Ogre
     *  @{
     */
 
+    typedef vector<TexturePtr>::type TextureVec;
+
     /** Shadow Nodes are special nodes (not to be confused with @see CompositorNode)
         that are only used for rendering shadow maps.
         Normal Compositor Nodes can share or own a ShadowNode. The ShadowNode will
@@ -96,14 +98,27 @@ namespace Ogre
         {
             ShadowCameraSetupPtr    shadowCameraSetup;
             Camera                  *camera;
+            /// TexturePtr is at mLocalTextures[idxToLocalTextures]
+            uint32                  idxToLocalTextures;
+            /// Index to mContiguousShadowMapTex[idxToContiguousTex]
+            uint32                  idxToContiguousTex;
             /// @See ShadowCameraSetup mMinDistance
             Real                    minDistance;
             Real                    maxDistance;
+
+            /// passes[Light::LT_DIRECTIONAL] etc. (VPLs not allowed)
+            CompositorPassVec       passes[3];
         };
 
         typedef vector<ShadowMapCamera>::type ShadowMapCameraVec;
         /// One per shadow map (whether texture or atlas)
         ShadowMapCameraVec      mShadowMapCameras;
+
+        /// If all shadowmaps share the same texture (i.e. UV atlas), then
+        /// mContiguousShadowMapTex.size() == 1. We can't use mLocalTextures
+        /// directly because it could have textures unrelated to shadow mapping
+        /// (or indirectly related)
+        TextureVec              mContiguousShadowMapTex;
 
         Camera const *          mLastCamera;
         size_t                  mLastFrame;
@@ -129,9 +144,6 @@ namespace Ogre
             User camera to base our shadow map cameras from.
         */
         void buildClosestLightList(Camera *newCamera , const Camera *lodCamera);
-
-        CompositorChannel createShadowTexture( const ShadowTextureDefinition &textureDef,
-                                                const RenderTarget *finalTarget );
 
     public:
         CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,

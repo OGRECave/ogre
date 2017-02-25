@@ -155,7 +155,7 @@ namespace Ogre
             mVpWidth( 1 ), mVpHeight( 1 ),
             mVpScissorLeft( 0 ), mVpScissorTop( 0 ),
             mVpScissorWidth( 1 ), mVpScissorHeight( 1 ),
-            mShadowMapIdx( 0 ),
+            mShadowMapIdx( -1 ),
             mNumInitialPasses( -1 ), mIdentifier( 0 ),
             mBeginRtUpdate( true ), mEndRtUpdate( true ),
             mColourWrite( true ),
@@ -179,6 +179,15 @@ namespace Ogre
         /// @copydoc CompositorPass::mRtIndex
         uint32                  mRtIndex;
 
+        /// Used by shadow map passes only. Determines which light types are supposed
+        /// to be run with the current shadow casting light. i.e. usually point lights
+        /// need to be treated differently, and only directional lights are compatible
+        /// with PSSM. This bitmask contains:
+        ///     mShadowMapSupportedLightTypes & 1 << Light::LT_DIRECTIONAL
+        ///     mShadowMapSupportedLightTypes & 1 << Light::LT_POINT
+        ///     mShadowMapSupportedLightTypes & 1 << Light::LT_SPOTLIGHT
+        uint8                   mShadowMapSupportedLightTypes;
+
         CompositorNodeDef       *mParentNodeDef;
 
     public:
@@ -186,11 +195,15 @@ namespace Ogre
                              CompositorNodeDef *parentNodeDef ) :
                 mRenderTargetName( renderTargetName ),
                 mRtIndex( rtIndex ),
+                mShadowMapSupportedLightTypes( 0 ),
                 mParentNodeDef( parentNodeDef ) {}
         ~CompositorTargetDef();
 
         IdString getRenderTargetName() const            { return mRenderTargetName; }
         uint32 getRtIndex(void) const                   { return mRtIndex; }
+
+        void setShadowMapSupportedLightTypes( uint8 types ) { mShadowMapSupportedLightTypes = types; }
+        uint8 getShadowMapSupportedLightTypes(void) const   { return mShadowMapSupportedLightTypes; }
 
         /** Reserves enough memory for all passes (efficient allocation)
         @remarks

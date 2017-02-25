@@ -65,9 +65,6 @@ namespace Ogre
         mShadowMapCameras.reserve( definition->mShadowMapTexDefinitions.size() );
         mLocalTextures.reserve( mLocalTextures.size() + definition->mShadowMapTexDefinitions.size() );
 
-        //Normal textures must be defined last but were already created.
-        const size_t numNormalTextures = mLocalTextures.size();
-
         SceneManager *sceneManager = workspace->getSceneManager();
         SceneNode *pseudoRootNode = 0;
 
@@ -82,10 +79,6 @@ namespace Ogre
 
         while( itor != end )
         {
-            // We could still end up pushing a null RT & Texture
-            // to preserve the index order from getTextureSource.
-            mLocalTextures.push_back( createShadowTexture( *itor, finalTarget ) );
-
             // One map, one camera
             const size_t shadowMapIdx = itor - definition->mShadowMapTexDefinitions.begin();
             ShadowMapCamera shadowMapCamera;
@@ -95,6 +88,39 @@ namespace Ogre
             shadowMapCamera.camera->setFixedYawAxis( false );
             shadowMapCamera.minDistance = 0.0f;
             shadowMapCamera.maxDistance = 100000.0f;
+
+            {
+                //Find out the index to our texture in both mLocalTextures & mContiguousShadowMapTex
+                size_t index;
+                TextureDefinitionBase::TextureSource textureSource;
+                mDefinition->getTextureSource( itor->getTextureName(), index, textureSource );
+
+                // CompositorShadowNodeDef should've prevented this from not being true.
+                assert( textureSource == TextureDefinitionBase::TEXTURE_LOCAL );
+
+                shadowMapCamera.idxToLocalTextures = static_cast<uint32>( index );
+
+                if( itor->mrtIndex >= mLocalTextures[index].textures.size() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture " +
+                                 itor->getTextureNameStr() + " does not have MRT index " +
+                                 StringConverter::toString( itor->mrtIndex ),
+                                 "CompositorShadowNode::CompositorShadowNode" );
+                }
+
+                TexturePtr &refTex = mLocalTextures[index].textures[itor->mrtIndex];
+                TextureVec::const_iterator itContig = std::find( mContiguousShadowMapTex.begin(),
+                                                                 mContiguousShadowMapTex.end(), refTex );
+                if( itContig == mContiguousShadowMapTex.end() )
+                {
+                    mContiguousShadowMapTex.push_back( refTex );
+                    itContig = mContiguousShadowMapTex.end() - 1u;
+                }
+
+                shadowMapCamera.idxToContiguousTex = static_cast<uint32>(
+                            itContig - mContiguousShadowMapTex.begin() );
+            }
+
 
             {
                 //Attach the camera to a node that exists outside the scene, so that it
@@ -147,13 +173,6 @@ namespace Ogre
             ++itor;
         }
 
-        //Put normal textures in the back; we couldn't split the list earlier (less moves)
-        //because an Exception in the 'for' loop above would cause memory leaks
-        CompositorChannelVec normalTextures( mLocalTextures.begin(),
-                                             mLocalTextures.begin() + numNormalTextures );
-        mLocalTextures.erase( mLocalTextures.begin(), mLocalTextures.begin() + numNormalTextures );
-        mLocalTextures.insert( mLocalTextures.end(), normalTextures.begin(), normalTextures.end() );
-
         // Shadow Nodes don't have input; and global textures should be ready by
         // the time we get created. Therefore, we can safely initialize now as our
         // output may be used in regular nodes and we're created on-demand (as soon
@@ -178,99 +197,6 @@ namespace Ogre
 
         if( pseudoRootNode )
             sceneManager->destroySceneNode( pseudoRootNode );
-    }
-    //-----------------------------------------------------------------------------------
-    CompositorChannel CompositorShadowNode::createShadowTexture(
-                                                            const ShadowTextureDefinition &textureDef,
-                                                            const RenderTarget *finalTarget )
-    {
-        CompositorChannel newChannel;
-
-        //When format list is empty, then this definition is for a shadow map atlas.
-        if( !textureDef.formatList.empty() )
-        {
-            uint width  = textureDef.width;
-            uint height = textureDef.height;
-            if( finalTarget )
-            {
-                if( textureDef.width == 0 )
-                {
-                    width = static_cast<uint>( ceilf( finalTarget->getWidth() *
-                                                        textureDef.widthFactor ) );
-                }
-                if( textureDef.height == 0 )
-                {
-                    height = static_cast<uint>( ceilf( finalTarget->getHeight() *
-                                                        textureDef.heightFactor ) );
-                }
-            }
-
-            uint32 texUsageFlags = TU_RENDERTARGET;
-
-            if( textureDef.uav )
-                texUsageFlags |= TU_UAV;
-
-            assert( textureDef.depth > 0 &&
-                    (textureDef.depth == 1 || textureDef.textureType > TEX_TYPE_2D) &&
-                    (textureDef.depth == 6 || textureDef.textureType != TEX_TYPE_CUBE_MAP) );
-
-            String textureName = (textureDef.getName() + IdString( getId() )).getFriendlyText();
-            if( textureDef.formatList.size() == 1 )
-            {
-                //Normal RT
-                TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
-                                                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                                textureDef.textureType, width, height,
-                                                textureDef.depth, 0,
-                                                textureDef.formatList[0], (int)texUsageFlags, 0,
-                                                textureDef.hwGammaWrite, textureDef.fsaa,
-                                                BLANKSTRING, false,
-                                                textureDef.depthBufferId !=
-                                                        DepthBuffer::POOL_NON_SHAREABLE );
-                RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-                rt->setDepthBufferPool( textureDef.depthBufferId );
-                if( !PixelUtil::isDepth( textureDef.formatList[0] ) )
-                    rt->setPreferDepthTexture( textureDef.preferDepthTexture );
-                if( textureDef.depthBufferFormat != PF_UNKNOWN )
-                    rt->setDesiredDepthBufferFormat( textureDef.depthBufferFormat );
-                newChannel.target = rt;
-                newChannel.textures.push_back( tex );
-            }
-            else
-            {
-                //MRT
-                MultiRenderTarget* mrt = mRenderSystem->createMultiRenderTarget( textureName );
-                PixelFormatList::const_iterator pixIt = textureDef.formatList.begin();
-                PixelFormatList::const_iterator pixEn = textureDef.formatList.end();
-
-                mrt->setDepthBufferPool( textureDef.depthBufferId );
-                if( !PixelUtil::isDepth( textureDef.formatList[0] ) )
-                    mrt->setPreferDepthTexture( textureDef.preferDepthTexture );
-                if( textureDef.depthBufferFormat != PF_UNKNOWN )
-                    mrt->setDesiredDepthBufferFormat( textureDef.depthBufferFormat );
-                newChannel.target = mrt;
-
-                while( pixIt != pixEn )
-                {
-                    size_t rtNum = pixIt - textureDef.formatList.begin();
-                    TexturePtr tex = TextureManager::getSingleton().createManual(
-                                                textureName + StringConverter::toString( rtNum ),
-                                                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                                textureDef.textureType, width, height,
-                                                textureDef.depth, 0,
-                                                *pixIt, (int)texUsageFlags, 0, textureDef.hwGammaWrite,
-                                                textureDef.fsaa, BLANKSTRING, false,
-                                                textureDef.depthBufferId !=
-                                                        DepthBuffer::POOL_NON_SHAREABLE );
-                    RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-                    mrt->bindSurface( rtNum, rt );
-                    newChannel.textures.push_back( tex );
-                    ++pixIt;
-                }
-            }
-        }
-
-        return newChannel;
     }
     //-----------------------------------------------------------------------------------
     //An Input Iterator that is the same as doing vector<int> val( N ); and goes in increasing
@@ -704,64 +630,25 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::finalTargetResized( const RenderTarget *finalTarget )
     {
-        CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
-                                                        mDefinition->mShadowMapTexDefinitions.begin();
-        CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end  =
-                                                        mDefinition->mShadowMapTexDefinitions.end();
+        CompositorNode::finalTargetResized( finalTarget );
 
-        CompositorChannelVec::iterator itorTex = mLocalTextures.begin();
+        mContiguousShadowMapTex.clear();
+
+        CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itDef =
+                mDefinition->mShadowMapTexDefinitions.begin();
+        ShadowMapCameraVec::const_iterator itor = mShadowMapCameras.begin();
+        ShadowMapCameraVec::const_iterator end  = mShadowMapCameras.end();
 
         while( itor != end )
         {
-            if( (itor->width == 0 || itor->height == 0) && itorTex->isValid() )
+            if( itor->idxToContiguousTex >= mContiguousShadowMapTex.size() )
             {
-                for( size_t i=0; i<itorTex->textures.size(); ++i )
-                    TextureManager::getSingleton().remove( itorTex->textures[i]->getName() );
-
-                CompositorChannel newChannel = createShadowTexture( *itor, finalTarget );
-
-                CompositorPassVec::const_iterator passIt = mPasses.begin();
-                CompositorPassVec::const_iterator passEn = mPasses.end();
-                while( passIt != passEn )
-                {
-                    (*passIt)->notifyRecreated( *itorTex, newChannel );
-                    ++passIt;
-                }
-
-                CompositorNodeVec::const_iterator itNodes = mConnectedNodes.begin();
-                CompositorNodeVec::const_iterator enNodes = mConnectedNodes.end();
-
-                while( itNodes != enNodes )
-                {
-                    (*itNodes)->notifyRecreated( *itorTex, newChannel );
-                    ++itNodes;
-                }
-
-                if( !itorTex->isMrt() )
-                    mRenderSystem->destroyRenderTarget( itorTex->target->getName() );
-
-                *itorTex = newChannel;
+                mContiguousShadowMapTex.push_back(
+                            mLocalTextures[itor->idxToLocalTextures].textures[itDef->mrtIndex] );
             }
-            ++itorTex;
+
+            ++itDef;
             ++itor;
         }
-
-        //Now recreate the regular textures (i.e. local textures used for
-        //postprocessing and ping-ponging, which aren't shadow maps)
-        CompositorChannelVec normalLocalTextures;
-        const size_t normalStart = mDefinition->mShadowMapTexDefinitions.size();
-        normalLocalTextures.reserve( mLocalTextures.size() - normalStart );
-        normalLocalTextures.insert( normalLocalTextures.end(), mLocalTextures.begin() + normalStart,
-                                                                mLocalTextures.end() );
-        TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs, normalLocalTextures,
-                                                            finalTarget, mRenderSystem, mConnectedNodes,
-                                                            &mPasses );
-        mLocalTextures.erase( mLocalTextures.begin() + normalStart, mLocalTextures.end() );
-        mLocalTextures.insert( mLocalTextures.end(), normalLocalTextures.begin(),
-                                                     normalLocalTextures.end() );
-
-        TextureDefinitionBase::recreateResizableBuffers( mDefinition->mLocalBufferDefs, mBuffers,
-                                                         finalTarget, mRenderSystem, mConnectedNodes,
-                                                         &mPasses );
     }
 }

@@ -278,7 +278,7 @@ namespace Ogre{
     protected:
         CompositorShadowNodeDef *mShadowNodeDef;
         void translateShadowMapProperty( PropertyAbstractNode *prop, ScriptCompiler *compiler,
-                                         bool isAtlas, const ShadowTextureDefinition &defaultParams ) const;
+                                         const ShadowTextureDefinition &defaultParams ) const;
     public:
         CompositorShadowNodeTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
@@ -291,12 +291,19 @@ namespace Ogre{
         CompositorTargetTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     };
+    class _OgreExport CompositorShadowMapTargetTypeTranslator : public ScriptTranslator
+    {
+    public:
+        CompositorShadowMapTargetTypeTranslator();
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+    };
     class _OgreExport CompositorShadowMapTargetTranslator : public ScriptTranslator
     {
     protected:
         CompositorTargetDef *mTargetDef;
     public:
         CompositorShadowMapTargetTranslator();
+        static size_t calculateNumTargets( const AbstractNodePtr &node );
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     };
     class _OgreExport CompositorPassTranslator : public ScriptTranslator
@@ -350,6 +357,7 @@ namespace Ogre{
         CompositorNodeTranslator mCompositorNodeTranslator;
         CompositorShadowNodeTranslator mCompositorShadowNodeTranslator;
         CompositorTargetTranslator mCompositorTargetTranslator;
+        CompositorShadowMapTargetTypeTranslator mCompositorShadowMapTargetTypeTranslator;
         CompositorShadowMapTargetTranslator mCompositorShadowMapTargetTranslator;
         CompositorPassTranslator mCompositorPassTranslator;
     public:

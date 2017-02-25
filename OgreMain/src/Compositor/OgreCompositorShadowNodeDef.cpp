@@ -57,35 +57,23 @@ namespace Ogre
                         "OgreCompositorShadowNodeDef::addBufferInput" );
     }
     //-----------------------------------------------------------------------------------
-    IdString CompositorShadowNodeDef::addShadowTextureSourceName( const String &name, size_t index,
-                                                                  TextureSource textureSource )
+    ShadowTextureDefinition* CompositorShadowNodeDef::addShadowTextureDefinition(
+            size_t lightIdx, size_t split, const String &name, uint8 mrtIndex,
+            const Vector2 &uvOffset, const Vector2 &uvLength, uint8 arrayIdx )
     {
-        if( textureSource == TEXTURE_INPUT )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Shadow Nodes don't support input channels!"
-                            " Shadow Node: '" + mNameStr + "'",
-                            "OgreCompositorShadowNodeDef::addTextureSourceName" );
-        }
-
-        return CompositorNodeDef::addTextureSourceName( name, index, textureSource );
-    }
-    //-----------------------------------------------------------------------------------
-    ShadowTextureDefinition* CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx,
-                                                    size_t split, const String &name, bool isAtlas )
-    {
-        if( name.empty() && isAtlas )
+        if( name.empty() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                             "Shadow maps used as atlas can't have empty names."
                             " Light index #" + StringConverter::toString( lightIdx ),
-                            "OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
+                            "CompositorShadowNodeDef::addShadowTextureDefinition" );
         }
-
-        if( !mLocalTextureDefs.empty() )
+        if( name.find( "global_" ) == 0 )
         {
-            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                            "Shadow maps need to be defined before normal textures in a Shadow Node.",
-                            "OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                            "Shadow maps cannot reference global textures!"
+                            " Light index #" + StringConverter::toString( lightIdx ),
+                            "CompositorShadowNodeDef::addShadowTextureDefinition" );
         }
 
         ShadowMapTexDefVec::const_iterator itor = mShadowMapTexDefinitions.begin();
@@ -109,9 +97,8 @@ namespace Ogre
 
         mNumLights += newLight;
 
-        if( !isAtlas )
-            addShadowTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
-        mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name,
+        mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name, mrtIndex,
+                                                                     uvOffset, uvLength, arrayIdx,
                                                                      lightIdx, split ) );
         return &mShadowMapTexDefinitions.back();
     }
