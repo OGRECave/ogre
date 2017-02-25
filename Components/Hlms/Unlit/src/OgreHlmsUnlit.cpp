@@ -172,7 +172,7 @@ namespace Ogre
 
         GpuProgramParametersSharedPtr vsParams = retVal->pso.vertexShader->getDefaultParameters();
         vsParams->setNamedConstant( "worldMatBuf", 0 );
-        if( datablock->mNumEnabledAnimationMatrices )
+        if( getProperty( UnlitProperty::TextureMatrix ) )
             vsParams->setNamedConstant( "animationMatrixBuf", 1 );
 
         mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
