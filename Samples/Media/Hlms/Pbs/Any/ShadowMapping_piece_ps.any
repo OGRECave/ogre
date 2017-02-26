@@ -1,7 +1,7 @@
-@property( hlms_num_shadow_maps )
+@property( hlms_num_shadow_map_lights )
 
 @piece( DeclShadowMapMacros )
-@foreach( hlms_num_shadow_maps, n )
+@foreach( hlms_num_shadow_map_lights, n )
 	#define hlms_shadowmap@n texShadowMap@value( hlms_shadowmap@n )
 	#define hlms_shadowmap@n_uv_offset vec2( @value( hlms_shadowmap@n_uv_offset_x_int ).@value( hlms_shadowmap@n_uv_offset_x_fract ), @value( hlms_shadowmap@n_uv_offset_y_int ).@value( hlms_shadowmap@n_uv_offset_y_fract ) )
 	#define hlms_shadowmap@n_uv_length vec2( @value( hlms_shadowmap@n_uv_length_x_int ).@value( hlms_shadowmap@n_uv_length_x_fract ), @value( hlms_shadowmap@n_uv_length_y_int ).@value( hlms_shadowmap@n_uv_length_y_fract ) )
@@ -76,7 +76,7 @@
 	@property( hlms_shadow_uses_depth_texture )@piece( TEXTURE2DSHADOW )sampler2DShadow@end @end
 	@property( !hlms_shadow_uses_depth_texture )@piece( TEXTURE2DSHADOW )sampler2D@end @end
 	@piece( DeclShadowSamplers )
-		@foreach( hlms_num_shadow_maps, n )
+		@foreach( hlms_num_shadow_map_textures, n )
 			uniform @insertpiece( TEXTURE2DSHADOW ) texShadowMap@n;@end
 	@end
 @end
@@ -85,7 +85,7 @@
 	@piece( SamplerShadow )SamplerComparisonState shadowSampler, @end
 	@piece( DeclShadowSamplers )
 		SamplerComparisonState shadowSampler	: register(s@value(textureRegShadowMapStart));
-		@foreach( hlms_num_shadow_maps, n )
+		@foreach( hlms_num_shadow_map_textures, n )
 			Texture2D texShadowMap@n			: register(t@counter(textureRegShadowMapStart));@end
 	@end
 @end
@@ -94,7 +94,7 @@
 	@piece( SamplerShadow )sampler shadowSampler, @end
 	/// sampler shadowSampler is declared as constexpr in PixelShader_ps.metal
 	@piece( DeclShadowSamplers )
-		@foreach( hlms_num_shadow_maps, n )
+		@foreach( hlms_num_shadow_map_textures, n )
 			, depth2d<float> texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
 	@end
 @end

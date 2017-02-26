@@ -832,7 +832,7 @@ namespace Ogre
 
         int32 numLights             = getProperty( HlmsBaseProp::LightsSpot );
         int32 numDirectionalLights  = getProperty( HlmsBaseProp::LightsDirNonCaster );
-        int32 numShadowMaps         = getProperty( HlmsBaseProp::NumShadowMaps );
+        int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
         //mat4 viewProj;
@@ -857,12 +857,12 @@ namespace Ogre
                 mapSize += mParallaxCorrectedCubemap->getConstBufferSize();
             }
 
-            //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
-            //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
+            //mat4 view + mat4 shadowRcv[numShadowMapLights].texViewProj +
+            //              vec2 shadowRcv[numShadowMapLights].shadowDepthRange +
             //              vec2 padding +
-            //              vec4 shadowRcv[numShadowMaps].invShadowMapSize +
+            //              vec4 shadowRcv[numShadowMapLights].invShadowMapSize +
             //mat3 invViewMatCubemap (upgraded to three vec4)
-            mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMaps + 4 * 3 ) * 4;
+            mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMapLights + 4 * 3 ) * 4;
 
             //float windowHeight + padding
             if( mPrePassTextures )
@@ -941,14 +941,16 @@ namespace Ogre
             for( size_t i=0; i<16; ++i )
                 *passBufferPtr++ = (float)viewMatrix[0][i];
 
-            for( int32 i=0; i<numShadowMaps; ++i )
+            const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
+
+            for( int32 i=0; i<numShadowMapLights; ++i )
             {
-                //mat4 shadowRcv[numShadowMaps].texViewProj
+                //mat4 shadowRcv[numShadowMapLights].texViewProj
                 Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( i );
                 for( size_t j=0; j<16; ++j )
                     *passBufferPtr++ = (float)viewProjTex[0][j];
 
-                //vec2 shadowRcv[numShadowMaps].shadowDepthRange
+                //vec2 shadowRcv[numShadowMapLights].shadowDepthRange
                 Real fNear, fFar;
                 shadowNode->getMinMaxDepthRange( i, fNear, fFar );
                 const Real depthRange = fFar - fNear;
@@ -958,11 +960,12 @@ namespace Ogre
                 ++passBufferPtr; //Padding
 
 
-                //vec2 shadowRcv[numShadowMaps].invShadowMapSize
+                //vec2 shadowRcv[numShadowMapLights].invShadowMapSize
                 //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
                 //changes need to be done so that UV calculations land on the right place
-                uint32 texWidth  = shadowNode->getLocalTextures()[i].textures[0]->getWidth();
-                uint32 texHeight = shadowNode->getLocalTextures()[i].textures[0]->getHeight();
+                size_t shadowMapTexIdx = shadowNode->getIndexToContiguousShadowMapTex( (size_t)i );
+                uint32 texWidth  = contiguousShadowMapTex[shadowMapTexIdx]->getWidth();
+                uint32 texHeight = contiguousShadowMapTex[shadowMapTexIdx]->getHeight();
                 *passBufferPtr++ = 1.0f / texWidth;
                 *passBufferPtr++ = 1.0f / texHeight;
                 *passBufferPtr++ = static_cast<float>( texWidth );
@@ -1071,7 +1074,7 @@ namespace Ogre
 
             passBufferPtr += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
 
-            if( shadowNode )
+            if( shadowNode && numShadowMapLights > 0 )
             {
                 //All directional lights (caster and non-caster) are sent.
                 //Then non-directional shadow-casting shadow lights are sent.
@@ -1158,11 +1161,10 @@ namespace Ogre
                     ++passBufferPtr;
                 }
 
-                const TextureVec &contiguousShadowMaps = shadowNode->getContiguousShadowMapTex();
-                mPreparedPass.shadowMaps.reserve( contiguousShadowMaps.size() );
+                mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
 
-                TextureVec::const_iterator itShadowMap = contiguousShadowMaps.begin();
-                TextureVec::const_iterator enShadowMap = contiguousShadowMaps.end();
+                TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
+                TextureVec::const_iterator enShadowMap = contiguousShadowMapTex.end();
 
                 while( itShadowMap != enShadowMap )
                 {

@@ -138,7 +138,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	gl_Position.z	= (L - NearPlane) / (FarPlane - NearPlane);@end
 @end
 @piece( ShadowReceive )
-@foreach( hlms_num_shadow_maps, n )
+@foreach( hlms_num_shadow_map_lights, n )
 	outVs.posL@n = vec4(worldPos.xyz, 1.0f) * passBuf.shadowRcv[@n].texViewProj;@end
 @end
 
@@ -168,7 +168,7 @@ void main()
 
 @property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
-@foreach( hlms_num_shadow_maps, n )
+@foreach( hlms_num_shadow_map_lights, n )
 	outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;
 	outVs.posL@n.z = (outVs.posL@n.z * 0.5) + 0.5;@end
 

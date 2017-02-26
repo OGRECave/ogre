@@ -670,7 +670,8 @@ namespace Ogre
 
         //Change per scene pass
         static const IdString DualParaboloidMapping;
-        static const IdString NumShadowMaps;
+        static const IdString NumShadowMapLights;
+        static const IdString NumShadowMapTextures;
         static const IdString PssmSplits;
         static const IdString ShadowCaster;
         static const IdString ShadowUsesDepthTexture;

@@ -515,7 +515,7 @@ namespace Ogre
 
         int32 numLights             = getProperty( HlmsBaseProp::LightsSpot );
         int32 numDirectionalLights  = getProperty( HlmsBaseProp::LightsDirNonCaster );
-        int32 numShadowMaps         = getProperty( HlmsBaseProp::NumShadowMaps );
+        int32 numShadowMapLights   = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
         //mat4 viewProj + mat4 view;
@@ -532,12 +532,12 @@ namespace Ogre
             mGlobalLightListBuffer  = forwardPlus->getGlobalLightListBuffer( camera );
         }
 
-        //mat4 shadowRcv[numShadowMaps].texViewProj +
-        //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
+        //mat4 shadowRcv[numShadowMapLights].texViewProj +
+        //              vec2 shadowRcv[numShadowMapLights].shadowDepthRange +
         //              vec2 padding +
-        //              vec4 shadowRcv[numShadowMaps].invShadowMapSize +
+        //              vec4 shadowRcv[numShadowMapLights].invShadowMapSize +
         //mat3 invViewMatCubemap (upgraded to three vec4)
-        mapSize += ( (16 + 2 + 2 + 4) * numShadowMaps + 4 * 3 ) * 4;
+        mapSize += ( (16 + 2 + 2 + 4) * numShadowMapLights + 4 * 3 ) * 4;
 
         //vec3 ambientUpperHemi + float envMapScale
         if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere || envMapScale != 1.0f )
@@ -600,14 +600,14 @@ namespace Ogre
         for( size_t i=0; i<16; ++i )
             *passBufferPtr++ = (float)viewMatrix[0][i];
 
-        for( int32 i=0; i<numShadowMaps; ++i )
+        for( int32 i=0; i<numShadowMapLights; ++i )
         {
-            //mat4 shadowRcv[numShadowMaps].texViewProj
+            //mat4 shadowRcv[numShadowMapLights].texViewProj
             Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( i );
             for( size_t j=0; j<16; ++j )
                 *passBufferPtr++ = (float)viewProjTex[0][j];
 
-            //vec2 shadowRcv[numShadowMaps].shadowDepthRange
+            //vec2 shadowRcv[numShadowMapLights].shadowDepthRange
             Real fNear, fFar;
             shadowNode->getMinMaxDepthRange( i, fNear, fFar );
             const Real depthRange = fFar - fNear;
@@ -617,7 +617,7 @@ namespace Ogre
             ++passBufferPtr; //Padding
 
 
-            //vec2 shadowRcv[numShadowMaps].invShadowMapSize
+            //vec2 shadowRcv[numShadowMapLights].invShadowMapSize
             //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
             //changes need to be done so that UV calculations land on the right place
             uint32 texWidth  = shadowNode->getLocalTextures()[i].textures[0]->getWidth();
@@ -772,9 +772,10 @@ namespace Ogre
                 ++passBufferPtr;
             }
 
+            /*TODO
             mPreparedPass.shadowMaps.reserve( numShadowMaps );
             for( int32 i=0; i<numShadowMaps; ++i )
-                mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
+                mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );*/
         }
         else
         {

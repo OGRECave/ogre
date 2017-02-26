@@ -11,7 +11,7 @@ struct Light
 	vec3 position;
 	vec3 diffuse;
 	vec3 specular;
-@property( hlms_num_shadow_maps )
+@property( hlms_num_shadow_map_lights )
 	vec3 attenuation;
 	vec3 spotDirection;
 	vec3 spotParams;
@@ -29,7 +29,7 @@ layout(binding = 0) uniform PassBuffer
 @property( !hlms_shadowcaster )
 	//Vertex shader
 	mat4 view;
-	@property( hlms_num_shadow_maps )ShadowReceiverData shadowRcv[@value(hlms_num_shadow_maps)];@end
+	@property( hlms_num_shadow_map_lights )ShadowReceiverData shadowRcv[@value(hlms_num_shadow_map_lights)];@end
 
 	//-------------------------------------------------------------------------
 
@@ -164,7 +164,7 @@ layout(binding = 3) uniform ManualProbe
 		@foreach( hlms_uv_count, n )
 			vec@value( hlms_uv_count@n ) uv@n;@end
 
-		@foreach( hlms_num_shadow_maps, n )
+		@foreach( hlms_num_shadow_map_lights, n )
 			vec4 posL@n;@end
 		@property( hlms_pssm_splits )float depth;@end
 	@end

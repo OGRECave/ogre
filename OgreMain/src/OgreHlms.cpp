@@ -108,7 +108,8 @@ namespace Ogre
 
     //Change per scene pass
     const IdString HlmsBaseProp::DualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
-    const IdString HlmsBaseProp::NumShadowMaps      = IdString( "hlms_num_shadow_maps" );
+    const IdString HlmsBaseProp::NumShadowMapLights = IdString( "hlms_num_shadow_map_lights" );
+    const IdString HlmsBaseProp::NumShadowMapTextures= IdString("hlms_num_shadow_map_textures" );
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
@@ -267,7 +268,6 @@ namespace Ogre
         setProperty( HlmsBaseProp::UvCount1, 4 );
         setProperty( HlmsBaseProp::BonesPerVertex, 4 );
 
-        setProperty( HlmsBaseProp::NumShadowMaps, 3 );
         setProperty( HlmsBaseProp::PssmSplits, 3 );
         setProperty( HlmsBaseProp::ShadowCaster, 0 );
 
@@ -2092,10 +2092,13 @@ namespace Ogre
                     numPssmSplits = static_cast<int32>( pssmSplits->size() - 1 );
                 setProperty( HlmsBaseProp::PssmSplits, numPssmSplits );
 
-                size_t numShadowMaps = shadowNode->getNumShadowCastingLights();
+                const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
+
+                size_t numShadowMapLights = shadowNode->getNumShadowCastingLights();
                 if( numPssmSplits )
-                    numShadowMaps += numPssmSplits - 1;
-                setProperty( HlmsBaseProp::NumShadowMaps, numShadowMaps );
+                    numShadowMapLights += numPssmSplits - 1;
+                setProperty( HlmsBaseProp::NumShadowMapLights, numShadowMapLights );
+                setProperty( HlmsBaseProp::NumShadowMapTextures, contiguousShadowMapTex.size() );
 
                 {
                     const Ogre::CompositorShadowNodeDef *shadowNodeDef = shadowNode->getDefinition();
@@ -2106,7 +2109,7 @@ namespace Ogre
                     propName = "hlms_shadowmap";
                     const size_t basePropSize = propName.size() + 1u;
 
-                    for( size_t i=0; i<numShadowMaps; ++i )
+                    for( size_t i=0; i<numShadowMapLights; ++i )
                     {
                         const Ogre::ShadowTextureDefinition *shadowTexDef =
                                 shadowNodeDef->getShadowTextureDefinition( i );
@@ -2166,12 +2169,12 @@ namespace Ogre
 
                 int usesDepthTextures = -1;
 
-                const CompositorChannelVec &shadowTextures = shadowNode->getLocalTextures();
-                for( size_t i=0; i<numShadowMaps; ++i )
+                const size_t numShadowMapTextures = contiguousShadowMapTex.size();
+                for( size_t i=0; i<numShadowMapTextures; ++i )
                 {
                     bool missmatch = false;
 
-                    if( PixelUtil::isDepth( shadowTextures[i].textures[0]->getFormat() ) )
+                    if( PixelUtil::isDepth( contiguousShadowMapTex[i]->getFormat() ) )
                     {
                         missmatch = usesDepthTextures == 0;
                         usesDepthTextures = 1;
@@ -2302,7 +2305,8 @@ namespace Ogre
             setProperty( HlmsBaseProp::DualParaboloidMapping, dualParaboloid );
 
             setProperty( HlmsBaseProp::Forward3D,         0 );
-            setProperty( HlmsBaseProp::NumShadowMaps, 0 );
+            setProperty( HlmsBaseProp::NumShadowMapLights,0 );
+            setProperty( HlmsBaseProp::NumShadowMapTextures, 0 );
             setProperty( HlmsBaseProp::PssmSplits, 0 );
             setProperty( HlmsBaseProp::LightsAttenuation, 0 );
             setProperty( HlmsBaseProp::LightsSpotParams,  0 );
