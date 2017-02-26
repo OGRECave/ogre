@@ -175,8 +175,8 @@ namespace Demo
             Ogre::Matrix4 uvOffsetScale;
             uvOffsetScale.makeTransform( Ogre::Vector3( shadowTexDef->uvOffset.x,
                                                         shadowTexDef->uvOffset.y, 0.0f ),
-                                         Ogre::Vector3( 1.0f / shadowTexDef->uvLength.x,
-                                                        1.0f / shadowTexDef->uvLength.y, 1.0f ),
+                                         Ogre::Vector3( shadowTexDef->uvLength.x,
+                                                        shadowTexDef->uvLength.y, 1.0f ),
                                          Ogre::Quaternion::IDENTITY );
             depthShadow->setEnableAnimationMatrix( 0, true );
             depthShadow->setAnimationMatrix( 0, uvOffsetScale );

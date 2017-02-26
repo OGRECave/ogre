@@ -437,19 +437,25 @@ namespace Ogre
     void CompositorShadowNode::postInitializePass( CompositorPass *pass )
     {
         const CompositorPassDef *passDef = pass->getDefinition();
-        const ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
 
-        assert( (!smCamera.camera->getLastViewport() ||
-                smCamera.camera->getLastViewport() == pass->getViewport()) &&
-                "Two scene passes to the same shadow map have different viewport!" );
-
-        smCamera.camera->_notifyViewport( pass->getViewport() );
-
-        if( passDef->getType() == PASS_SCENE )
+        //passDef->mShadowMapIdx may be invalid if this is not a pass
+        //tied to a shadow map in particular (e.g. clearing an atlas)
+        if( passDef->mShadowMapIdx < mShadowMapCameras.size() )
         {
-            assert( dynamic_cast<CompositorPassScene*>(pass) );
-            static_cast<CompositorPassScene*>(pass)->_setCustomCamera( smCamera.camera );
-            static_cast<CompositorPassScene*>(pass)->_setCustomCullCamera( smCamera.camera );
+            const ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
+
+            assert( (!smCamera.camera->getLastViewport() ||
+                     smCamera.camera->getLastViewport() == pass->getViewport()) &&
+                    "Two scene passes to the same shadow map have different viewport!" );
+
+            smCamera.camera->_notifyViewport( pass->getViewport() );
+
+            if( passDef->getType() == PASS_SCENE )
+            {
+                assert( dynamic_cast<CompositorPassScene*>(pass) );
+                static_cast<CompositorPassScene*>(pass)->_setCustomCamera( smCamera.camera );
+                static_cast<CompositorPassScene*>(pass)->_setCustomCullCamera( smCamera.camera );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
@@ -568,7 +574,7 @@ namespace Ogre
         }
         else
         {
-            return false;
+            return true;
         }
     }
     //-----------------------------------------------------------------------------------

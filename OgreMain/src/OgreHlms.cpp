@@ -2119,8 +2119,8 @@ namespace Ogre
                         setProperty( propName.c_str(),
                                      shadowNode->getIndexToContiguousShadowMapTex( i ) );
 
-                        if( shadowTexDef->uvOffset == Vector2::ZERO &&
-                            shadowTexDef->uvLength == Vector2::UNIT_SCALE )
+                        if( shadowTexDef->uvOffset != Vector2::ZERO ||
+                            shadowTexDef->uvLength != Vector2::UNIT_SCALE )
                         {
                             propName.resize( basePropSize );
                             propName.a( "_uvs_fulltex" );
@@ -2131,34 +2131,35 @@ namespace Ogre
 
                         fractPart = modff( (float)shadowTexDef->uvOffset.x, &intPart );
                         propName.resize( basePropSize );
-                        propName.a( "_uv_offset_x_int" );
+                        propName.a( "_uv_min_x_int" );
                         setProperty( propName.c_str(), (int32)intPart );
                         propName.resize( basePropSize );
-                        propName.a( "_uv_offset_x_fract" );
+                        propName.a( "_uv_min_x_fract" );
                         setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
 
                         fractPart = modff( (float)shadowTexDef->uvOffset.y, &intPart );
                         propName.resize( basePropSize );
-                        propName.a( "_uv_offset_y_int" );
+                        propName.a( "_uv_min_y_int" );
                         setProperty( propName.c_str(), (int32)intPart );
                         propName.resize( basePropSize );
-                        propName.a( "_uv_offset_y_fract" );
+                        propName.a( "_uv_min_y_fract" );
                         setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
 
-                        fractPart = modff( (float)shadowTexDef->uvLength.x, &intPart );
+                        Vector2 uvMax = shadowTexDef->uvOffset + shadowTexDef->uvLength;
+                        fractPart = modff( (float)uvMax.x, &intPart );
                         propName.resize( basePropSize );
-                        propName.a( "_uv_length_x_int" );
+                        propName.a( "_uv_max_x_int" );
                         setProperty( propName.c_str(), (int32)intPart );
                         propName.resize( basePropSize );
-                        propName.a( "_uv_length_x_fract" );
+                        propName.a( "_uv_max_x_fract" );
                         setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
 
-                        fractPart = modff( (float)shadowTexDef->uvLength.y, &intPart );
+                        fractPart = modff( (float)uvMax.y, &intPart );
                         propName.resize( basePropSize );
-                        propName.a( "_uv_length_y_int" );
+                        propName.a( "_uv_max_y_int" );
                         setProperty( propName.c_str(), (int32)intPart );
                         propName.resize( basePropSize );
-                        propName.a( "_uv_length_y_fract" );
+                        propName.a( "_uv_max_y_fract" );
                         setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
 
                         propName.resize( basePropSize );

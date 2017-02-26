@@ -137,6 +137,20 @@ namespace Ogre
 
                 pass->mIncludeOverlays = false;
 
+                if( pass->mShadowMapIdx < mShadowMapTexDefinitions.size() )
+                {
+                    const ShadowTextureDefinition &texDef = mShadowMapTexDefinitions[pass->mShadowMapIdx];
+                    pass->mVpLeft   = static_cast<float>( texDef.uvOffset.x );
+                    pass->mVpTop    = static_cast<float>( texDef.uvOffset.y );
+                    pass->mVpWidth  = static_cast<float>( texDef.uvLength.x );
+                    pass->mVpHeight = static_cast<float>( texDef.uvLength.y );
+
+                    pass->mVpScissorLeft   = pass->mVpLeft;
+                    pass->mVpScissorTop    = pass->mVpTop;
+                    pass->mVpScissorWidth  = pass->mVpWidth;
+                    pass->mVpScissorHeight = pass->mVpHeight;
+                }
+
                 if( pass->getType() == PASS_SCENE )
                 {
                     //assert( dynamic_cast<CompositorPassSceneDef*>( pass ) );
@@ -156,39 +170,6 @@ namespace Ogre
                     passScene->mShadowNodeRecalculation = SHADOW_NODE_CASTER_PASS;
                 }
 
-                //Now check all PASS_SCENE from the same shadow map # render to
-                //the same viewport area (common mistake in case of UV atlas)
-                CompositorPassDefVec::const_iterator it2 = it + 1;
-                while( it2 != en )
-                {
-                    CompositorPassDef *otherPass = *it2;
-                    if( pass->getType() == PASS_SCENE &&
-                        pass->mShadowMapIdx == otherPass->mShadowMapIdx &&
-                        Math::Abs( pass->mVpLeft - otherPass->mVpLeft )     < EPSILON &&
-                        Math::Abs( pass->mVpTop - otherPass->mVpTop )       < EPSILON &&
-                        Math::Abs( pass->mVpWidth - otherPass->mVpWidth )   < EPSILON &&
-                        Math::Abs( pass->mVpHeight - otherPass->mVpHeight ) < EPSILON &&
-                        Math::Abs( pass->mVpScissorLeft - otherPass->mVpScissorLeft )     < EPSILON &&
-                        Math::Abs( pass->mVpScissorTop - otherPass->mVpScissorTop )       < EPSILON &&
-                        Math::Abs( pass->mVpScissorWidth - otherPass->mVpScissorWidth )   < EPSILON &&
-                        Math::Abs( pass->mVpScissorHeight - otherPass->mVpScissorHeight ) < EPSILON )
-                    {
-                        LogManager::getSingleton().logMessage( "WARNING: Not all scene passes render to "
-                                    "the same viewport! Attempting to fix. ShadowNode: '" +
-                                    mName.getFriendlyText() + "' Shadow map index: " +
-                                    StringConverter::toString( pass->mShadowMapIdx ) );
-                        pass->mVpLeft   = otherPass->mVpLeft;
-                        pass->mVpTop    = otherPass->mVpTop;
-                        pass->mVpWidth  = otherPass->mVpWidth;
-                        pass->mVpHeight = otherPass->mVpHeight;
-                        pass->mVpScissorLeft   = otherPass->mVpScissorLeft;
-                        pass->mVpScissorTop    = otherPass->mVpScissorTop;
-                        pass->mVpScissorWidth  = otherPass->mVpScissorWidth;
-                        pass->mVpScissorHeight = otherPass->mVpScissorHeight;
-                    }
-
-                    ++it2;
-                }
                 ++it;
             }
 
