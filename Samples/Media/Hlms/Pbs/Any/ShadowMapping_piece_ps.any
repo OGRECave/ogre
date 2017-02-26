@@ -1,0 +1,208 @@
+@property( hlms_num_shadow_maps )
+
+@piece( DeclShadowMapMacros )
+@foreach( hlms_num_shadow_maps, n )
+	#define hlms_shadowmap@n texShadowMap@value( hlms_shadowmap@n )
+	#define hlms_shadowmap@n_uv_offset vec2( @value( hlms_shadowmap@n_uv_offset_x_int ).@value( hlms_shadowmap@n_uv_offset_x_fract ), @value( hlms_shadowmap@n_uv_offset_y_int ).@value( hlms_shadowmap@n_uv_offset_y_fract ) )
+	#define hlms_shadowmap@n_uv_length vec2( @value( hlms_shadowmap@n_uv_length_x_int ).@value( hlms_shadowmap@n_uv_length_x_fract ), @value( hlms_shadowmap@n_uv_length_y_int ).@value( hlms_shadowmap@n_uv_length_y_fract ) )
+@end
+
+@property( syntax == glsl )
+	#define SH_HALF2 vec2
+	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) texture( tex, vec3( uv, fDepth ) )
+@end
+
+@property( syntax == hlsl )
+	#define SH_HALF2 float2
+	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.SampleCmpLevelZero( sampler, uv.xy, fDepth )
+@end
+
+@property( syntax == metal )
+	#define SH_HALF2 half2
+	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.sample_compare( sampler, float2( uv.xy ), fDepth )
+@end
+@end
+
+@property( syntax == glsl && !hlms_shadow_uses_depth_texture )
+@piece( regularTexturePcfGlSampling )
+	float2 fW;
+	float4 c;
+
+	float row[2];
+	row[0] = 0;
+	row[1] = 0;
+
+	@foreach( pcf_iterations, n )
+		@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * SH_HALF2( invShadowMapSize.xy );@end
+
+		// 2x2 PCF
+		//The 0.00196 is a magic number that prevents floating point
+		//precision problems ("1000" becomes "999.999" causing fW to
+		//be 0.999 instead of 0, hence ugly pixel-sized dot artifacts
+		//appear at the edge of the shadow).
+		fW = fract( uv * invShadowMapSize.zw + 0.00196 );
+
+		@property( !hlms_tex_gather )
+			c.w = texture(shadowMap, uv ).r;
+			c.z = texture(shadowMap, uv + float2( invShadowMapSize.x, 0.0 ) ).r;
+			c.x = texture(shadowMap, uv + float2( 0.0, invShadowMapSize.y ) ).r;
+			c.y = texture(shadowMap, uv + float2( invShadowMapSize.x, invShadowMapSize.y ) ).r;
+		@end @property( hlms_tex_gather )
+			c = textureGather( shadowMap, uv + invShadowMapSize.xy * 0.5 );
+		@end
+
+		c = step( fDepth, c );
+
+		@property( !pcf_3x3 && !pcf_4x4 )
+			//2x2 PCF: It's slightly faster to calculate this directly.
+			retVal += mix(
+						mix( c.w, c.z, fW.x ),
+						mix( c.x, c.y, fW.x ),
+						fW.y );
+		@end @property( pcf_3x3 || pcf_4x4 )
+			row[0] += mix( c.w, c.z, fW.x );
+			row[1] += mix( c.x, c.y, fW.x );
+		@end
+	@end
+
+	@property( (pcf_3x3 || pcf_4x4) )
+		//NxN PCF: It's much faster to leave the final mix out of the loop (when N > 2).
+		retVal = mix( row[0], row[1], fW.y );
+	@end
+@end
+@end
+
+@property( syntax == glsl )
+	@property( hlms_shadow_uses_depth_texture )@piece( TEXTURE2DSHADOW )sampler2DShadow@end @end
+	@property( !hlms_shadow_uses_depth_texture )@piece( TEXTURE2DSHADOW )sampler2D@end @end
+	@piece( DeclShadowSamplers )
+		@foreach( hlms_num_shadow_maps, n )
+			uniform @insertpiece( TEXTURE2DSHADOW ) texShadowMap@n;@end
+	@end
+@end
+@property( syntax == hlsl )
+	@piece( TEXTURE2DSHADOW )Texture2D@end
+	@piece( SamplerShadow )SamplerComparisonState shadowSampler, @end
+	@piece( DeclShadowSamplers )
+		SamplerComparisonState shadowSampler	: register(s@value(textureRegShadowMapStart));
+		@foreach( hlms_num_shadow_maps, n )
+			Texture2D texShadowMap@n			: register(t@counter(textureRegShadowMapStart));@end
+	@end
+@end
+@property( syntax == metal )
+	@piece( TEXTURE2DSHADOW )texture2d@end
+	@piece( SamplerShadow )sampler shadowSampler, @end
+	/// sampler shadowSampler is declared as constexpr in PixelShader_ps.metal
+	@piece( DeclShadowSamplers )
+		@foreach( hlms_num_shadow_maps, n )
+			, depth2d<float> texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
+	@end
+@end
+
+/// Declare getShadow twice (two overloads). The second one manually
+/// performs clamp to border to deal with UV atlases.
+@piece( DeclShadowSamplingFuncs )
+@foreach( 2, m )
+	@property( @m == 0 )
+		float getShadow( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
+						 float4 psPosLN, float4 invShadowMapSize )
+	@end @property( @m == 1 )
+		float getShadow( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
+						 float4 psPosLN, float4 invShadowMapSize, SH_HALF2 minUV, SH_HALF2 maxUV )
+	@end
+	{
+		float fDepth = psPosLN.z;
+		SH_HALF2 uv = SH_HALF2( psPosLN.xy / psPosLN.w );
+
+		float retVal = 0;
+
+	@property( pcf_3x3 || pcf_4x4 )
+		SH_HALF2 offsets[@value(pcf_iterations)] =
+		{
+		@property( pcf_3x3 )
+			SH_HALF2( 0, 0 ),	//0, 0
+			SH_HALF2( 1, 0 ),	//1, 0
+			SH_HALF2( 0, 1 ),	//1, 1
+			SH_HALF2( 0, 0 ) 	//1, 1
+		@end
+		@property( pcf_4x4 )
+			SH_HALF2( 0, 0 ),	//0, 0
+			SH_HALF2( 1, 0 ),	//1, 0
+			SH_HALF2( 1, 0 ),	//2, 0
+
+			SH_HALF2(-2, 1 ),	//0, 1
+			SH_HALF2( 1, 0 ),	//1, 1
+			SH_HALF2( 1, 0 ),	//2, 1
+
+			SH_HALF2(-2, 1 ),	//0, 2
+			SH_HALF2( 1, 0 ),	//1, 2
+			SH_HALF2( 1, 0 )	//2, 2
+		@end
+		};
+	@end
+
+		@insertpiece( regularTexturePcfGlSampling )
+		@property( syntax != glsl || hlms_shadow_uses_depth_texture )
+			@foreach( pcf_iterations, n )
+				@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * SH_HALF2( invShadowMapSize.xy );@end
+				retVal += OGRE_SAMPLE_SHADOW( shadowMap, shadowSampler, uv, fDepth ).x;@end
+		@end
+
+		@property( pcf_3x3 )
+			retVal *= 0.25;
+		@end @property( pcf_4x4 )
+			retVal *= 0.11111111111111;
+		@end
+
+		@property( @m == 0 && syntax == metal )
+			//Metal does not support clamp to border colour
+			retVal = (uv.x <= 0.0h || uv.x >= 1.0h ||
+					  uv.y <= 0.0h || uv.y >= 0.0h) ? 1.0 : retVal;
+		@end
+
+		@property( @m == 1 )
+			retVal = (uv.x <= minUV.x || uv.x >= maxUV.x ||
+					  uv.y <= minUV.y || uv.y >= maxUV.y) ? 1.0 : retVal;
+		@end
+
+		return retVal;
+	}
+	@end
+@end
+
+@property( syntax != glsl )
+	@piece( UseSamplerShadow )shadowSampler, @end
+@end
+
+@piece( DoDirectionalShadowMaps )
+@property( hlms_pssm_splits )
+	float fShadow = 1.0;
+	if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
+	{
+		fShadow = getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
+							 inPs.posL0,
+							 passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+	}
+	@foreach( hlms_pssm_splits, n, 1 )
+	else if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
+	{
+		fShadow = getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
+							 inPs.posL@n,
+							 passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+	}@end
+@end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
+	float fShadow = getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
+							   inPs.posL0,
+							   passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+@end
+@end
+
+@piece( DarkenWithShadowFirstLight )* fShadow@end @end
+
+@piece( DarkenWithShadow )
+		* getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
+					 inPs.posL@value(CurrentShadowMap),
+					 passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )
+@end
+
+@end

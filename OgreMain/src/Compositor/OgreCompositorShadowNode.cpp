@@ -602,7 +602,18 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Matrix4 CompositorShadowNode::getViewProjectionMatrix( size_t shadowMapIdx ) const
     {
-        return PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE *
+        const ShadowTextureDefinition &shadowTexDef =
+                mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+        Matrix4 clipToImageSpace;
+
+        Vector3 vScale(  0.5f * shadowTexDef.uvLength.x,
+                        -0.5f * shadowTexDef.uvLength.y, 1.0f );
+        clipToImageSpace.makeTransform( Vector3(  vScale.x + shadowTexDef.uvOffset.x,
+                                                 -vScale.y + shadowTexDef.uvOffset.y, 0.0f ),
+                                        Vector3(  vScale.x, vScale.y, 1.0f ),
+                                        Quaternion::IDENTITY );
+
+        return /*PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE*/clipToImageSpace *
                 mShadowMapCameras[shadowMapIdx].camera->getProjectionMatrixWithRSDepth() *
                 mShadowMapCameras[shadowMapIdx].camera->getViewMatrix( true );
     }
@@ -626,6 +637,11 @@ namespace Ogre
         }
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 CompositorShadowNode::getIndexToContiguousShadowMapTex( size_t shadowMapIdx ) const
+    {
+        return mShadowMapCameras[shadowMapIdx].idxToContiguousTex;
     }
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::finalTargetResized( const RenderTarget *finalTarget )

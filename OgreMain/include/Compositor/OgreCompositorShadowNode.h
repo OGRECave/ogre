@@ -205,6 +205,9 @@ namespace Ogre
 
         const LightsBitSet& getAffectedLightsBitSet(void) const     { return mAffectedLights; }
 
+        const TextureVec& getContiguousShadowMapTex(void) const     { return mContiguousShadowMapTex; }
+        uint32 getIndexToContiguousShadowMapTex( size_t shadowMapIdx ) const;
+
         /// @copydoc CompositorNode::finalTargetResized
         virtual void finalTargetResized( const RenderTarget *finalTarget );
     };

@@ -54,7 +54,7 @@ ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 @end
 
 @property( envmap_scale )
-	@piece( ApplyEnvMapScale )* pass.ambientUpperHemi.w@end
+	@piece( ApplyEnvMapScale )* passBuf.ambientUpperHemi.w@end
 @end
 
 @property( (envprobe_map && envprobe_map != target_envprobe_map) || parallax_correct_cubemaps )
@@ -63,7 +63,7 @@ ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 	@property( !envprobe_map || envprobe_map == target_envprobe_map )
 		/// "No cubemap"? Then we're in auto mode or...
 		/// We're rendering to the cubemap probe we're using as manual. Use the auto mode as fallback.
-		@piece( pccProbeSource )pass.autoProbe@end
+		@piece( pccProbeSource )passBuf.autoProbe@end
 		@set( use_parallax_correct_cubemaps, 1 )
 	@end
 	@property( envprobe_map && envprobe_map != target_envprobe_map && use_parallax_correct_cubemaps )

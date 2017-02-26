@@ -7151,10 +7151,10 @@ namespace Ogre{
                 }
 
                 // advance to next 4 to get the values.
-                AbstractNodeList::const_iterator it3 = it++;
-                AbstractNodeList::const_iterator it0 = it++;
-                AbstractNodeList::const_iterator it1 = it++;
-                AbstractNodeList::const_iterator it2 = it++;
+                AbstractNodeList::const_iterator it0 = ++it;
+                AbstractNodeList::const_iterator it1 = ++it;
+                AbstractNodeList::const_iterator it2 = ++it;
+                AbstractNodeList::const_iterator it3 = ++it;
                 atomIndex += 4;
 
                 if( !getFloat( *it0, &uvOffset.x ) || !getFloat( *it1, &uvOffset.y ) ||

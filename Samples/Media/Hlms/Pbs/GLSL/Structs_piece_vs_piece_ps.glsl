@@ -89,7 +89,7 @@ layout(binding = 0) uniform PassBuffer
 @end
 
 	@insertpiece( custom_passBuffer )
-} pass;
+} passBuf;
 @end
 
 @property( fresnel_scalar )@piece( FresnelType )vec3@end @piece( FresnelSwizzle )xyz@end @end

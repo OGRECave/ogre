@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
 #include "OgreDepthBuffer.h"
+#include "OgreLwString.h"
 
 #include "OgreHlmsListener.h"
 
@@ -2095,6 +2096,73 @@ namespace Ogre
                 if( numPssmSplits )
                     numShadowMaps += numPssmSplits - 1;
                 setProperty( HlmsBaseProp::NumShadowMaps, numShadowMaps );
+
+                {
+                    const Ogre::CompositorShadowNodeDef *shadowNodeDef = shadowNode->getDefinition();
+
+                    char tmpBuffer[64];
+                    LwString propName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+
+                    propName = "hlms_shadowmap";
+                    const size_t basePropSize = propName.size() + 1u;
+
+                    for( size_t i=0; i<numShadowMaps; ++i )
+                    {
+                        const Ogre::ShadowTextureDefinition *shadowTexDef =
+                                shadowNodeDef->getShadowTextureDefinition( i );
+
+                        propName.resize( basePropSize - 1u );
+                        propName.a( (uint32)i ); //hlms_shadowmap0
+                        setProperty( propName.c_str(),
+                                     shadowNode->getIndexToContiguousShadowMapTex( i ) );
+
+                        if( shadowTexDef->uvOffset == Vector2::ZERO &&
+                            shadowTexDef->uvLength == Vector2::UNIT_SCALE )
+                        {
+                            propName.resize( basePropSize );
+                            propName.a( "_uvs_fulltex" );
+                            setProperty( propName.c_str(), 1 );
+                        }
+
+                        float intPart, fractPart;
+
+                        fractPart = modff( (float)shadowTexDef->uvOffset.x, &intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_offset_x_int" );
+                        setProperty( propName.c_str(), (int32)intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_offset_x_fract" );
+                        setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                        fractPart = modff( (float)shadowTexDef->uvOffset.y, &intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_offset_y_int" );
+                        setProperty( propName.c_str(), (int32)intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_offset_y_fract" );
+                        setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                        fractPart = modff( (float)shadowTexDef->uvLength.x, &intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_length_x_int" );
+                        setProperty( propName.c_str(), (int32)intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_length_x_fract" );
+                        setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                        fractPart = modff( (float)shadowTexDef->uvLength.y, &intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_length_y_int" );
+                        setProperty( propName.c_str(), (int32)intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_length_y_fract" );
+                        setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                        propName.resize( basePropSize );
+                        propName.a( "_array_idx" );
+                        setProperty( propName.c_str(), shadowTexDef->arrayIdx );
+                    }
+                }
 
                 int usesDepthTextures = -1;
 

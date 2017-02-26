@@ -319,12 +319,20 @@ namespace Ogre
 
             if( !mPreparedPass.shadowMaps.empty() )
             {
+                char tmpData[32];
+                LwString texName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
+                texName = "texShadowMap";
+                const size_t baseTexSize = texName.size();
+
                 vector<int>::type shadowMaps;
                 shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
                 for( size_t i=0; i<mPreparedPass.shadowMaps.size(); ++i )
+                {
+                    texName.resize( baseTexSize );
+                    texName.a( (uint32)i );   //texShadowMap0
+                    psParams->setNamedConstant( texName.c_str(), &texUnit, 1, 1 );
                     shadowMaps.push_back( texUnit++ );
-
-                psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
+                }
             }
 
             int cubemapTexUnit = 0;
@@ -1150,9 +1158,17 @@ namespace Ogre
                     ++passBufferPtr;
                 }
 
-                mPreparedPass.shadowMaps.reserve( numShadowMaps );
-                for( int32 i=0; i<numShadowMaps; ++i )
-                    mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
+                const TextureVec &contiguousShadowMaps = shadowNode->getContiguousShadowMapTex();
+                mPreparedPass.shadowMaps.reserve( contiguousShadowMaps.size() );
+
+                TextureVec::const_iterator itShadowMap = contiguousShadowMaps.begin();
+                TextureVec::const_iterator enShadowMap = contiguousShadowMaps.end();
+
+                while( itShadowMap != enShadowMap )
+                {
+                    mPreparedPass.shadowMaps.push_back( itShadowMap->get() );
+                    ++itShadowMap;
+                }
             }
             else
             {
@@ -1344,11 +1360,11 @@ namespace Ogre
                 }
 
                 //We changed HlmsType, rebind the shared textures.
-                FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
-                FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
+                FastArray<Texture*>::const_iterator itor = mPreparedPass.shadowMaps.begin();
+                FastArray<Texture*>::const_iterator end  = mPreparedPass.shadowMaps.end();
                 while( itor != end )
                 {
-                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, itor->get(),
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, *itor,
                                                                          mCurrentShadowmapSamplerblock );
                     ++texUnit;
                     ++itor;

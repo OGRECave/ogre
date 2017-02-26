@@ -171,7 +171,7 @@ namespace Demo
                                                                   shadowTexDef->mrtIndex );
             depthShadow->setTexture( 0, shadowTexDef->arrayIdx, tex, 0 );
 
-            //If it's an UV atlas, then only display the relevant section
+            //If it's an UV atlas, then only display the relevant section.
             Ogre::Matrix4 uvOffsetScale;
             uvOffsetScale.makeTransform( Ogre::Vector3( shadowTexDef->uvOffset.x,
                                                         shadowTexDef->uvOffset.y, 0.0f ),
