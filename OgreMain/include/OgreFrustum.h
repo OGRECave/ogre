@@ -410,7 +410,7 @@ namespace Ogre
             projection matrix up to date if those values change. The custom 
             matrix will be returned from getProjectionMatrix and derivative
             functions.
-            Even when using your a custom projection matrix, you should still
+            Even when using a custom projection matrix, you should still
             call the methods that update the ner / far distances and field of 
             view.
         @param enable
