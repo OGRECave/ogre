@@ -401,7 +401,7 @@ namespace Ogre
         @remarks
             This is an advanced method which allows you to manually set
             the projection matrix on this frustum, rather than having it 
-            calculate itself based on the clipping distances or the feild 
+            calculate itself based on the clipping distances or the field 
             of view.
         @note
             After enabling a custom projection matrix, the frustum will no 
@@ -411,7 +411,7 @@ namespace Ogre
             matrix will be returned from getProjectionMatrix and derivative
             functions.
             Even when using your a custom projection matrix, you should still
-            call the methods that update the ner / far distances and feild of 
+            call the methods that update the ner / far distances and field of 
             view.
         @param enable
             If @c true, the custom projection matrix passed as the 
