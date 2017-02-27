@@ -183,9 +183,9 @@ namespace Ogre
         /// to be run with the current shadow casting light. i.e. usually point lights
         /// need to be treated differently, and only directional lights are compatible
         /// with PSSM. This bitmask contains:
-        ///     mShadowMapSupportedLightTypes & 1 << Light::LT_DIRECTIONAL
-        ///     mShadowMapSupportedLightTypes & 1 << Light::LT_POINT
-        ///     mShadowMapSupportedLightTypes & 1 << Light::LT_SPOTLIGHT
+        ///     mShadowMapSupportedLightTypes & 1u << Light::LT_DIRECTIONAL
+        ///     mShadowMapSupportedLightTypes & 1u << Light::LT_POINT
+        ///     mShadowMapSupportedLightTypes & 1u << Light::LT_SPOTLIGHT
         uint8                   mShadowMapSupportedLightTypes;
 
         CompositorNodeDef       *mParentNodeDef;

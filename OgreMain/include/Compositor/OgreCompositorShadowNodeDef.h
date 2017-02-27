@@ -112,7 +112,12 @@ namespace Ogre
 
     protected:
         typedef vector<ShadowTextureDefinition>::type   ShadowMapTexDefVec;
+        typedef vector<uint8>::type LightTypeMaskVec;
         ShadowMapTexDefVec  mShadowMapTexDefinitions;
+        /// Some shadow maps may only support a few light types (e.g.
+        /// PSSM only supports directional lights).
+        /// In the example this would be 1u << Light::LT_DIRECTIONAL
+        LightTypeMaskVec    mLightTypesMask;
         ShadowMapTechniques mDefaultTechnique;
 
         /// Not the same as mShadowMapTexDefinitions.size(), because splits aren't included
@@ -141,8 +146,7 @@ namespace Ogre
         @param numTex
             The number of shadow textures expected to contain.
         */
-        void setNumShadowTextureDefinitions( size_t numTex )
-                                                        { mShadowMapTexDefinitions.reserve( numTex ); }
+        void setNumShadowTextureDefinitions( size_t numTex );
 
         /** Adds a new ShadowTexture definition.
         @remarks

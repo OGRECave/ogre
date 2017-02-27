@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
+#include "OgreLight.h"
+
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 
@@ -55,6 +57,11 @@ namespace Ogre
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Shadow Nodes don't support input channels!"
                         " Shadow Node: '" + mNameStr + "'",
                         "OgreCompositorShadowNodeDef::addBufferInput" );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNodeDef::setNumShadowTextureDefinitions( size_t numTex )
+    {
+        mShadowMapTexDefinitions.reserve( numTex );
     }
     //-----------------------------------------------------------------------------------
     ShadowTextureDefinition* CompositorShadowNodeDef::addShadowTextureDefinition(
@@ -100,6 +107,7 @@ namespace Ogre
         mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name, mrtIndex,
                                                                      uvOffset, uvLength, arrayIdx,
                                                                      lightIdx, split ) );
+
         return &mShadowMapTexDefinitions.back();
     }
     //-----------------------------------------------------------------------------------
@@ -112,7 +120,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorShadowNodeDef::_validateAndFinish(void)
     {
-        const Real EPSILON = 1e-6f;
+        mLightTypesMask.resize( mNumLights, 0u );
 
         CompositorTargetDefVec::iterator itor = mTargetPasses.begin();
         CompositorTargetDefVec::iterator end  = mTargetPasses.end();
@@ -149,6 +157,25 @@ namespace Ogre
                     pass->mVpScissorTop    = pass->mVpTop;
                     pass->mVpScissorWidth  = pass->mVpWidth;
                     pass->mVpScissorHeight = pass->mVpHeight;
+
+                    if( texDef.shadowMapTechnique == SHADOWMAP_PSSM )
+                    {
+                        //PSSM only supports directional lights. This is for sure.
+                        itor->setShadowMapSupportedLightTypes( 1u << Light::LT_DIRECTIONAL );
+                    }
+                    else if( itor->getShadowMapSupportedLightTypes() == 0 )
+                    {
+                        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                            "Pass in shadow node " + mNameStr + " is assigned to shadow "
+                            "maps but says it does not support any light type. "
+                            "Did you forget to call setShadowMapSupportedLightTypes?",
+                            "CompositorShadowNodeDef::_validateAndFinish" );
+                    }
+
+                    //Accumulate the types of lights this shadow map supports
+                    //based on the passes that claim to be compatible with it.
+                    const size_t lightIdx = mShadowMapTexDefinitions[pass->mShadowMapIdx].light;
+                    mLightTypesMask[lightIdx] |= itor->getShadowMapSupportedLightTypes();
                 }
 
                 if( pass->getType() == PASS_SCENE )

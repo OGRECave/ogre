@@ -7657,11 +7657,11 @@ namespace Ogre{
             }
 
             if( lightTypeStr == "directional" )
-                shadowMapSupportedLightTypes |= Light::LT_DIRECTIONAL;
+                shadowMapSupportedLightTypes |= 1u << Light::LT_DIRECTIONAL;
             else if( lightTypeStr == "point" )
-                shadowMapSupportedLightTypes |= Light::LT_POINT;
+                shadowMapSupportedLightTypes |= 1u << Light::LT_POINT;
             else if( lightTypeStr == "spot" )
-                shadowMapSupportedLightTypes |= Light::LT_SPOTLIGHT;
+                shadowMapSupportedLightTypes |= 1u << Light::LT_SPOTLIGHT;
             else
             {
                 compiler->addError( ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,

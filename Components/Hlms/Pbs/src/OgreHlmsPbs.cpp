@@ -941,18 +941,24 @@ namespace Ogre
             for( size_t i=0; i<16; ++i )
                 *passBufferPtr++ = (float)viewMatrix[0][i];
 
+            size_t shadowMapTexIdx = 0;
             const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
 
             for( int32 i=0; i<numShadowMapLights; ++i )
             {
+                //Skip inactive lights (e.g. no directional lights are available
+                //and there's a shadow map that only accepts dir lights)
+                while( !shadowNode->isShadowMapIdxActive( shadowMapTexIdx ) )
+                    ++shadowMapTexIdx;
+
                 //mat4 shadowRcv[numShadowMapLights].texViewProj
-                Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( i );
+                Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( shadowMapTexIdx );
                 for( size_t j=0; j<16; ++j )
                     *passBufferPtr++ = (float)viewProjTex[0][j];
 
                 //vec2 shadowRcv[numShadowMapLights].shadowDepthRange
                 Real fNear, fFar;
-                shadowNode->getMinMaxDepthRange( i, fNear, fFar );
+                shadowNode->getMinMaxDepthRange( shadowMapTexIdx, fNear, fFar );
                 const Real depthRange = fFar - fNear;
                 *passBufferPtr++ = fNear;
                 *passBufferPtr++ = 1.0f / depthRange;
@@ -963,13 +969,16 @@ namespace Ogre
                 //vec2 shadowRcv[numShadowMapLights].invShadowMapSize
                 //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
                 //changes need to be done so that UV calculations land on the right place
-                size_t shadowMapTexIdx = shadowNode->getIndexToContiguousShadowMapTex( (size_t)i );
-                uint32 texWidth  = contiguousShadowMapTex[shadowMapTexIdx]->getWidth();
-                uint32 texHeight = contiguousShadowMapTex[shadowMapTexIdx]->getHeight();
+                size_t shadowMapTexContigIdx =
+                        shadowNode->getIndexToContiguousShadowMapTex( (size_t)shadowMapTexIdx );
+                uint32 texWidth  = contiguousShadowMapTex[shadowMapTexContigIdx]->getWidth();
+                uint32 texHeight = contiguousShadowMapTex[shadowMapTexContigIdx]->getHeight();
                 *passBufferPtr++ = 1.0f / texWidth;
                 *passBufferPtr++ = 1.0f / texHeight;
                 *passBufferPtr++ = static_cast<float>( texWidth );
                 *passBufferPtr++ = static_cast<float>( texHeight );
+
+                ++shadowMapTexIdx;
             }
 
             //---------------------------------------------------------------------------
@@ -1103,6 +1112,10 @@ namespace Ogre
                     }
                     else
                     {
+                        //Skip inactive lights (e.g. no directional lights are available
+                        //and there's a shadow map that only accepts dir lights)
+                        while( !lights[shadowLightIdx].light )
+                            ++shadowLightIdx;
                         light = lights[shadowLightIdx++].light;
                     }
 

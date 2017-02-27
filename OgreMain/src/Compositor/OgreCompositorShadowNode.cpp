@@ -60,7 +60,8 @@ namespace Ogre
             CompositorNode( id, definition->getName(), definition, workspace, renderSys, finalTarget ),
             mDefinition( definition ),
             mLastCamera( 0 ),
-            mLastFrame( -1 )
+            mLastFrame( -1 ),
+            mNumActiveShadowMapCastingLights( 0 )
     {
         mShadowMapCameras.reserve( definition->mShadowMapTexDefinitions.size() );
         mLocalTextures.reserve( mLocalTextures.size() + definition->mShadowMapTexDefinitions.size() );
@@ -178,6 +179,8 @@ namespace Ogre
         // output may be used in regular nodes and we're created on-demand (as soon
         // as a Node discovers it needs us for the first time, we get created)
         createPasses();
+
+        mShadowMapCastingLights.resize( mDefinition->mNumLights );
     }
     //-----------------------------------------------------------------------------------
     CompositorShadowNode::~CompositorShadowNode()
@@ -292,28 +295,36 @@ namespace Ogre
                                             sceneManager->getVisibilityMask();
 
         size_t startIndex = 0;
-        const size_t numLights = std::min( mDefinition->mNumLights, globalLightList.lights.size() );
-        mShadowMapCastingLights.clear();
-        mShadowMapCastingLights.reserve( numLights );
+        mShadowMapCastingLights.clear(); //TODO: Do not clear statically updated lights.
+        mShadowMapCastingLights.resize( mDefinition->mNumLights );
+        mNumActiveShadowMapCastingLights = 0;
+        size_t begEmptyLightIdx = 0;
+        size_t nxtEmptyLightIdx = 0;
+        findNextEmptyShadowCastingLightEntry( 1u << Light::LT_DIRECTIONAL,
+                                              &begEmptyLightIdx, &nxtEmptyLightIdx );
+
         mAffectedLights.clear();
         mAffectedLights.resize( globalLightList.lights.size(), false );
 
         {
-            //SceneManager put the directional lights first. Add them first as casters.
+            //SceneManager puts the directional lights first. Add them first as casters.
             LightArray::const_iterator itor = globalLightList.lights.begin();
             LightArray::const_iterator end  = globalLightList.lights.end();
 
             uint32 const * RESTRICT_ALIAS visibilityMask = globalLightList.visibilityMask;
 
             while( itor != end && (*itor)->getType() == Light::LT_DIRECTIONAL &&
-                   mShadowMapCastingLights.size() < numLights )
+                   nxtEmptyLightIdx < mShadowMapCastingLights.size() )
             {
                 if( (*visibilityMask & combinedVisibilityFlags) &&
                     (*visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) )
                 {
                     const size_t listIdx = itor - globalLightList.lights.begin();
                     mAffectedLights[listIdx] = true;
-                    mShadowMapCastingLights.push_back( LightClosest( *itor, listIdx, 0 ) );
+                    mShadowMapCastingLights[nxtEmptyLightIdx] = LightClosest( *itor, listIdx, 0 );
+                    findNextEmptyShadowCastingLightEntry( 1u << Light::LT_DIRECTIONAL,
+                                                          &begEmptyLightIdx, &nxtEmptyLightIdx );
+                    ++mNumActiveShadowMapCastingLights;
                 }
 
                 ++visibilityMask;
@@ -329,33 +340,76 @@ namespace Ogre
 
         const Vector3 &camPos( newCamera->getDerivedPosition() );
 
-        vector<size_t>::type sortedIndexes;
-        sortedIndexes.resize( numLights - mShadowMapCastingLights.size(), ~0 );
+        mTmpSortedIndexes.resize( mShadowMapCastingLights.size() - begEmptyLightIdx, ~0 );
         std::partial_sort_copy( MemoryLessInputIterator( startIndex ),
                             MemoryLessInputIterator( globalLightList.lights.size() ),
-                            sortedIndexes.begin(), sortedIndexes.end(),
+                            mTmpSortedIndexes.begin(), mTmpSortedIndexes.end(),
                             ShadowMappingLightCmp( &globalLightList, combinedVisibilityFlags, camPos ) );
 
-        vector<size_t>::type::const_iterator itor = sortedIndexes.begin();
-        vector<size_t>::type::const_iterator end  = sortedIndexes.end();
+        vector<size_t>::type::const_iterator itor = mTmpSortedIndexes.begin();
+        vector<size_t>::type::const_iterator end  = mTmpSortedIndexes.end();
 
         while( itor != end )
         {
             uint32 visibilityMask = globalLightList.visibilityMask[*itor];
             if( !(visibilityMask & combinedVisibilityFlags) ||
-                !(visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) )
+                !(visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) ||
+                begEmptyLightIdx >= mShadowMapCastingLights.size() )
             {
                 break;
             }
 
-            mAffectedLights[*itor] = true;
-            mShadowMapCastingLights.push_back( LightClosest( globalLightList.lights[*itor], *itor, 0 ) );
+            findNextEmptyShadowCastingLightEntry( 1u << globalLightList.lights[*itor]->getType(),
+                                                  &begEmptyLightIdx, &nxtEmptyLightIdx );
+
+            if( nxtEmptyLightIdx < mShadowMapCastingLights.size() )
+            {
+                mAffectedLights[*itor] = true;
+                mShadowMapCastingLights[nxtEmptyLightIdx] =
+                        LightClosest( globalLightList.lights[*itor], *itor, 0 );
+                ++mNumActiveShadowMapCastingLights;
+            }
             ++itor;
         }
 
         mCastersBox = sceneManager->_calculateCurrentCastersBox( viewport->getVisibilityMask(),
                                                                  mDefinition->mMinRq,
                                                                  mDefinition->mMaxRq );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::findNextEmptyShadowCastingLightEntry(
+            uint8 lightTypeMask,
+            size_t * RESTRICT_ALIAS startIdx,
+            size_t * RESTRICT_ALIAS entryToUse ) const
+    {
+        size_t lightIdx = *startIdx;
+
+        size_t newStartIdx = mShadowMapCastingLights.size();
+
+        LightClosestArray::const_iterator itCastingLight = mShadowMapCastingLights.begin() + lightIdx;
+        LightClosestArray::const_iterator enCastingLight = mShadowMapCastingLights.end();
+        while( itCastingLight != enCastingLight )
+        {
+            if( !itCastingLight->light )
+            {
+                newStartIdx = std::min( lightIdx, newStartIdx );
+                if( mDefinition->mLightTypesMask[lightIdx] & lightTypeMask )
+                {
+                    *startIdx = newStartIdx;
+                    *entryToUse = lightIdx;
+                    return;
+                }
+            }
+
+            ++lightIdx;
+            ++itCastingLight;
+        }
+
+        //If we get here entryToUse == mShadowMapCastingLights.size() but startIdx may still
+        //be valid (we found no entry that supports the requested light type but there could
+        //still be empty entries for other types of light)
+        *startIdx = newStartIdx;
+        *entryToUse = lightIdx;
     }
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::_update( Camera* camera, const Camera *lodCamera,
@@ -374,10 +428,10 @@ namespace Ogre
 
         while( itor != end )
         {
-            if( itor->light < mShadowMapCastingLights.size() )
-            {
-                Light const *light = mShadowMapCastingLights[itor->light].light;
+            Light const *light = mShadowMapCastingLights[itor->light].light;
 
+            if( light )
+            {
                 Camera *texCamera = itShadowCamera->camera;
 
                 //Use the material scheme of the main viewport
@@ -566,11 +620,9 @@ namespace Ogre
     {
         if( shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size() )
         {
-            //TODO: This does not account missing PSSM directional lights (Pbs shaders don't either).
-            //Or shadow maps exclusive to a lights type (also TODO).
             const ShadowTextureDefinition &shadowTexDef =
                     mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
-            return shadowTexDef.light < mShadowMapCastingLights.size();
+            return mShadowMapCastingLights[shadowTexDef.light].light != 0;
         }
         else
         {
@@ -631,7 +683,8 @@ namespace Ogre
         if( shadowMapIdx < mShadowMapCastingLights.size() )
         {
             if( mDefinition->mShadowMapTexDefinitions[shadowMapIdx].shadowMapTechnique ==
-                SHADOWMAP_PSSM )
+                SHADOWMAP_PSSM &&
+                isShadowMapIdxActive( shadowMapIdx ) )
             {
                 assert( dynamic_cast<PSSMShadowCameraSetup*>(
                         mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() ) );

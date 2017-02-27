@@ -122,7 +122,10 @@ namespace Ogre
 
         Camera const *          mLastCamera;
         size_t                  mLastFrame;
+        size_t                  mNumActiveShadowMapCastingLights;
         LightClosestArray       mShadowMapCastingLights;
+        FastArray<uint8>        mShadowMap;
+        vector<size_t>::type    mTmpSortedIndexes;
 
         /** Cached value. Contains the aabb of all caster-only objects (filtered by
             camera's visibility flags) from the minimum RQ used by our shadow render
@@ -144,6 +147,23 @@ namespace Ogre
             User camera to base our shadow map cameras from.
         */
         void buildClosestLightList(Camera *newCamera , const Camera *lodCamera);
+
+        /** Finds the first index to mShadowMapCastingLights[*startIdx] where
+            mShadowMapCastingLights[i].light == 0; starting from startIdx (inclusive).
+            and the first index to mShadowMapCastingLights[*entryToUse] where
+            lightTypeMask & mDefinition->mLightTypesMask[*entryToUse] != 0
+        @param startIdx [in/out]
+            [in] Where to start searching from.
+            [out] Where to start searching from the next time you call this function.
+                  Outputs mShadowMapCastingLights.size() if there are no more empty
+                  entries.
+        @param entryToUse [out]
+            What entry to use. Outputs mShadowMapCastingLights.size() if there are no more
+            empty that supports the requested light types.
+        */
+        void findNextEmptyShadowCastingLightEntry( uint8 lightTypeMask,
+                                                   size_t * RESTRICT_ALIAS inOutStartIdx,
+                                                   size_t * RESTRICT_ALIAS outEntryToUse ) const;
 
     public:
         CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
@@ -200,7 +220,8 @@ namespace Ogre
             changes to or from a value lower than the supported shadow casting lights by the
             definition.
         */
-        size_t getNumShadowCastingLights(void) const                { return mShadowMapCastingLights.size(); }
+        size_t getNumActiveShadowCastingLights(void) const
+                                                            { return mNumActiveShadowMapCastingLights; }
         const LightClosestArray& getShadowCastingLights(void) const { return mShadowMapCastingLights; }
 
         const LightsBitSet& getAffectedLightsBitSet(void) const     { return mAffectedLights; }

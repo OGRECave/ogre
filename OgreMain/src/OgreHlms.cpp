@@ -2094,7 +2094,7 @@ namespace Ogre
 
                 const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
 
-                size_t numShadowMapLights = shadowNode->getNumShadowCastingLights();
+                size_t numShadowMapLights = shadowNode->getNumActiveShadowCastingLights();
                 if( numPssmSplits )
                     numShadowMapLights += numPssmSplits - 1;
                 setProperty( HlmsBaseProp::NumShadowMapLights, numShadowMapLights );
@@ -2109,15 +2109,22 @@ namespace Ogre
                     propName = "hlms_shadowmap";
                     const size_t basePropSize = propName.size() + 1u;
 
+                    size_t shadowMapTexIdx = 0;
+
                     for( size_t i=0; i<numShadowMapLights; ++i )
                     {
+                        //Skip inactive lights (e.g. no directional lights are available
+                        //and there's a shadow map that only accepts dir lights)
+                        while( !shadowNode->isShadowMapIdxActive( shadowMapTexIdx ) )
+                            ++shadowMapTexIdx;
+
                         const Ogre::ShadowTextureDefinition *shadowTexDef =
-                                shadowNodeDef->getShadowTextureDefinition( i );
+                                shadowNodeDef->getShadowTextureDefinition( shadowMapTexIdx );
 
                         propName.resize( basePropSize - 1u );
                         propName.a( (uint32)i ); //hlms_shadowmap0
                         setProperty( propName.c_str(),
-                                     shadowNode->getIndexToContiguousShadowMapTex( i ) );
+                                     shadowNode->getIndexToContiguousShadowMapTex( shadowMapTexIdx ) );
 
                         if( shadowTexDef->uvOffset != Vector2::ZERO ||
                             shadowTexDef->uvLength != Vector2::UNIT_SCALE )
@@ -2165,6 +2172,8 @@ namespace Ogre
                         propName.resize( basePropSize );
                         propName.a( "_array_idx" );
                         setProperty( propName.c_str(), shadowTexDef->arrayIdx );
+
+                        ++shadowMapTexIdx;
                     }
                 }
 
@@ -2232,10 +2241,12 @@ namespace Ogre
                     LightClosestArray::const_iterator end  = lights.end();
                     while( itor != end )
                     {
-                        if( itor->light->getType() == Light::LT_DIRECTIONAL )
-                            ++shadowCasterDirectional;
-
-                        ++numLightsPerType[itor->light->getType()];
+                        if( itor->light )
+                        {
+                            if( itor->light->getType() == Light::LT_DIRECTIONAL )
+                                ++shadowCasterDirectional;
+                            ++numLightsPerType[itor->light->getType()];
+                        }
                         ++itor;
                     }
                 }
@@ -2265,7 +2276,7 @@ namespace Ogre
                     LightClosestArray::const_iterator end  = lights.end();
                     while( itor != end )
                     {
-                        if( itor->light->getType() == Light::LT_DIRECTIONAL )
+                        if( itor->light && itor->light->getType() == Light::LT_DIRECTIONAL )
                             ++shadowCasterDirectional;
                         ++itor;
                     }
