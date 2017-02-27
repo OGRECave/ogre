@@ -14,7 +14,7 @@ include(AndroidMacros)
 if(ANDROID)
     # Setup create_android_proj macro requirements
     SET(ANDROID_MOD_NAME "OgreJNI")
-    SET(JNI_PATH "${CMAKE_SOURCE_DIR}/OgreMain/src/Android/JNI")
+    SET(JNI_PATH ".")
     SET(JNI_SRC_FILES "OgreActivityJNI.cpp")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/${ANDROID_MOD_NAME}")
