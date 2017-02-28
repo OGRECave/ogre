@@ -57,7 +57,10 @@ namespace Ogre {
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#include <android_native_app_glue.h>
+#include <android/configuration.h>
+#include <android/asset_manager.h>
+#include <android/native_window.h>
+#include <android/input.h>
 #endif
 
 #include "OgreInput.h"
@@ -104,7 +107,7 @@ namespace OgreBites
         void initApp();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        void initAppForAndroid(AConfiguration* config, struct android_app* app);
+        void initAppForAndroid(AAssetManager* assetMgr, ANativeWindow* window);
 
         void _fireInputEventAndroid(AInputEvent* event, int wheel = 0);
 #endif
@@ -241,7 +244,8 @@ namespace OgreBites
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);
-        android_app* mAndroidApp;
+        AAssetManager* mAAssetMgr;
+        ANativeWindow* mAWindow;
         AConfiguration* mAConfig;
 #endif
 
