@@ -40,7 +40,7 @@ if(ANDROID)
         
     # Create CMake target
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp "int x = 23;")
-    ADD_LIBRARY(OgreJNIDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
+    ADD_LIBRARY(OgreJNIDummy SHARED ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
     
     set(JNI_PATH "${NDKOUT}/jni")
     create_android_proj(OgreJNIDummy)
