@@ -79,7 +79,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 		Runnable destroyer = new Runnable() {
 			public void run() {
-				OgreActivityJNI.destroy();
+				OgreActivityJNI.shutdown();
 			}
 		};
 		handler.post(destroyer);
@@ -95,8 +95,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 						assetMgr = getResources().getAssets();
 					}
 					
-					OgreActivityJNI.create(assetMgr);
-
 					renderer = new Runnable() {
 						public void run() {
 
@@ -105,7 +103,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 							if (!wndCreate && lastSurface != null) {
 								wndCreate = true;
-								OgreActivityJNI.initWindow(lastSurface);
+								OgreActivityJNI.init(assetMgr, lastSurface);
 								handler.post(this);
 								return;
 							}
