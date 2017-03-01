@@ -46,8 +46,9 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInp
     mFirstRun = true;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mAndroidApp = NULL;
+    mAAssetMgr = NULL;
     mAConfig = NULL;
+    mAWindow = NULL;
 #endif
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
@@ -309,7 +310,7 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     return mRoot->createRenderWindow(mAppName, mInitWidth, mInitHeight, false, &miscParams);
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAndroidApp->window));
+    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAWindow));
     miscParams["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAConfig));
     miscParams["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
 
@@ -358,17 +359,20 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-void ApplicationContext::initAppForAndroid(AConfiguration* config, struct android_app* app)
+void ApplicationContext::initAppForAndroid(AAssetManager* assetMgr, ANativeWindow* window)
 {
-    mAConfig = config;
-    mAndroidApp = app;
+    mAConfig = AConfiguration_new();
+    AConfiguration_fromAssetManager(mAConfig, assetMgr);
+    mAAssetMgr = assetMgr;
+    mAWindow = window;
+
     initApp();
 }
 
 Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName)
 {
     Ogre::DataStreamPtr stream;
-    AAsset* asset = AAssetManager_open(mAndroidApp->activity->assetManager, fileName.c_str(), AASSET_MODE_BUFFER);
+    AAsset* asset = AAssetManager_open(mAAssetMgr, fileName.c_str(), AASSET_MODE_BUFFER);
     if(asset)
     {
         off_t length = AAsset_getLength(asset);
@@ -506,8 +510,8 @@ void ApplicationContext::locateResources()
     // load resource paths from config file
     Ogre::ConfigFile cf;
 #   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAndroidApp->activity->assetManager) );
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAndroidApp->activity->assetManager) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAAssetMgr) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAAssetMgr) );
     cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
 #   else
     cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
@@ -704,6 +708,10 @@ void ApplicationContext::shutdown()
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
         mSDLWindow = NULL;
     }
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    AConfiguration_delete(mAConfig);
 #endif
 }
 

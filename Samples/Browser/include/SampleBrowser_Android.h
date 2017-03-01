@@ -114,19 +114,17 @@ namespace OgreBites
                 case APP_CMD_INIT_WINDOW:
                     if (app->window)
                     {
-                        AConfiguration* config = AConfiguration_new();
-                        AConfiguration_fromAssetManager(config, app->activity->assetManager);
-                        
                         if (!mBrowser.getRenderWindow())
                         {
-                            mBrowser.initAppForAndroid(config, app);
+                            mBrowser.initAppForAndroid(app->activity->assetManager, app->window);
                         }
                         else
                         {
+                            AConfiguration* config = AConfiguration_new();
+                            AConfiguration_fromAssetManager(config, app->activity->assetManager);
                             GLRenderSystemCommon::_createInternalResources(mBrowser.getRenderWindow(), app->window, config);
+                            AConfiguration_delete(config);
                         }
-                        
-                        AConfiguration_delete(config);
                     }
                     break;
                 case APP_CMD_TERM_WINDOW:

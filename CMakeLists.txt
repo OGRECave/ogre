@@ -519,11 +519,6 @@ endif ()
 # Setup samples
 add_subdirectory(Samples)
 
-# Add android JNI binding
-if(ANDROID AND OGRE_BUILD_ANDROID_JNI_SAMPLE)
-  include(toolchain/AndroidJNI)
-endif()
-
 # Setup command-line tools
 if (OGRE_BUILD_TOOLS)
   add_subdirectory(Tools)

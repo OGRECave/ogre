@@ -14,7 +14,7 @@ include(AndroidMacros)
 if(ANDROID)
     # Setup create_android_proj macro requirements
     SET(ANDROID_MOD_NAME "OgreJNI")
-    SET(JNI_PATH "${CMAKE_SOURCE_DIR}/OgreMain/src/Android/JNI")
+    SET(JNI_PATH ".")
     SET(JNI_SRC_FILES "OgreActivityJNI.cpp")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/${ANDROID_MOD_NAME}")
@@ -36,27 +36,12 @@ if(ANDROID)
 	file(COPY "${JNI_PATH}/MainActivity.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
 	file(COPY "${JNI_PATH}/OgreActivityJNI.cpp" DESTINATION "${NDKOUT}/jni")
 	
-    configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
-    configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
-    
-    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/models" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/particle" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/RTShaderLib" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/thumbnails" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/assets")
-    
-	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-hdpi" DESTINATION "${NDKOUT}/res")
-	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-ldpi" DESTINATION "${NDKOUT}/res")
-	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-mdpi" DESTINATION "${NDKOUT}/res")
-	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/res")
-    
+    copy_assets_to_android_proj()
+        
     # Create CMake target
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp "int x = 23;")
     ADD_LIBRARY(OgreJNIDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
     
     set(JNI_PATH "${NDKOUT}/jni")
     create_android_proj(OgreJNIDummy)
-    
-    
 endif()
