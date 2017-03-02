@@ -192,12 +192,12 @@ namespace Ogre {
 							static_cast<VertexElementSemantic>( i + 1u ) ) ];
 			}
 		}
-		for( uint32 i=0; i<8u; ++i )
-		{
-			NSString *key = [NSString stringWithFormat:@"VES_TEXTURE_COORDINATES%d", i];
-			preprocessorMacros[key] =
-					[NSNumber numberWithUnsignedInt:MetalVaoManager::getAttributeIndexFor(
-						static_cast<VertexElementSemantic>( VES_TEXTURE_COORDINATES + i ) )];
+        for( uint32 i=0; i<8u; ++i )
+        {
+            NSString *key = [NSString stringWithFormat:@"VES_TEXTURE_COORDINATES%d", i];
+            preprocessorMacros[key] =
+                    [NSNumber numberWithUnsignedInt:MetalVaoManager::getAttributeIndexFor(
+                        static_cast<VertexElementSemantic>( VES_TEXTURE_COORDINATES ) ) + i];
         }
         preprocessorMacros[@"CONST_SLOT_START"] =
                 [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
