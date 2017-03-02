@@ -748,6 +748,7 @@ EXAMPLE_RECURSIVE      = NO
 # the \image command).
 
 IMAGE_PATH             = "${OGRE_SOURCE_DIR}/Docs/src/tutorials/" \
+                         "${OGRE_SOURCE_DIR}/Docs/src/manual/" \
                          "${OGRE_SOURCE_DIR}/Docs/src/images/"
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
