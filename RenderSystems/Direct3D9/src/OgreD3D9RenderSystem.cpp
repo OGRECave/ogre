@@ -980,6 +980,7 @@ namespace Ogre
         rsc->setNumTextureUnits(1024);
         rsc->setCapability(RSC_ANISOTROPY);
         rsc->setCapability(RSC_AUTOMIPMAP);
+        rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
         rsc->setCapability(RSC_DOT3);
         rsc->setCapability(RSC_CUBEMAPPING);        
         rsc->setCapability(RSC_SCISSOR_TEST);       
@@ -1057,8 +1058,10 @@ namespace Ogre
                 rsc->unsetCapability(RSC_ANISOTROPY);
 
             // Check automatic mipmap generation.
-            if ((rkCurCaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP) == 0)
+            if ((rkCurCaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP) == 0) {
                 rsc->unsetCapability(RSC_AUTOMIPMAP);
+                rsc->unsetCapability(RSC_AUTOMIPMAP_COMPRESSED);
+            }
 
             // Check Dot product 3.
             if ((rkCurCaps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3) == 0)

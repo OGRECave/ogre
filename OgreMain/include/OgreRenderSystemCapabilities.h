@@ -192,6 +192,8 @@ namespace Ogre
         RSC_READ_BACK_AS_TEXTURE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
         /// Supports HW gamma, both in the framebuffer and as texture.
         RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 27),
+        /// GL ES2/ES3 does not support generating mipmaps for compressed formats in hardware
+        RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 28),
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
         RSC_PERSTAGECONSTANT = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 0),
@@ -226,9 +228,7 @@ namespace Ogre
         RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10),
         /// with Separate Shader Objects the gl_PerVertex interface block must be redeclared
         /// but some drivers misbehave and do not compile if we do so
-        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11),
-        /// GL ES2/ES3 does not support generating mipmaps for compressed formats
-        RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 12),
+        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11)
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9

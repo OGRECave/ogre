@@ -746,7 +746,7 @@ namespace Ogre {
         {
             if (Root::getSingleton().getRenderSystem() == NULL ||
                 !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT)
-                || (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP)
+                || (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP_COMPRESSED)
                 && !imgData->num_mipmaps))
             {
                 // We'll need to decompress
