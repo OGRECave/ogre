@@ -1669,33 +1669,21 @@ namespace Ogre
         const D3DCAPS9& rkCurCaps = device->getD3D9DeviceCaps();                        
         D3DFORMAT eBackBufferFormat = device->getBackBufferFormat();
 
-
-        // Hacky override - many (all?) cards seem to not be able to autogen on 
-        // textures which are not a power of two
-        // Can we even mipmap on 3D textures? Well
-        if ((mWidth & mWidth-1) || (mHeight & mHeight-1) || (mDepth & mDepth-1))
+        if (rkCurCaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP == 0)
             return false;
 
-        if (rkCurCaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP)
-        {
-            HRESULT hr;
-            // check for auto gen. mip maps support
-            hr = pD3D->CheckDeviceFormat(
-                    rkCurCaps.AdapterOrdinal, 
-                    rkCurCaps.DeviceType, 
-                    eBackBufferFormat, 
-                    srcUsage | D3DUSAGE_AUTOGENMIPMAP,
-                    srcType,
-                    srcFormat);
-            // this HR could a SUCCES
-            // but mip maps will not be generated
-            if (hr == D3D_OK)
-                return true;
-            else
-                return false;
-        }
-        else
-            return false;
+        HRESULT hr;
+        // check for auto gen. mip maps support
+        hr = pD3D->CheckDeviceFormat(
+                rkCurCaps.AdapterOrdinal,
+                rkCurCaps.DeviceType,
+                eBackBufferFormat,
+                srcUsage | D3DUSAGE_AUTOGENMIPMAP,
+                srcType,
+                srcFormat);
+        // this HR could a SUCCES
+        // but mip maps will not be generated
+        return hr == D3D_OK;
     }
     /****************************************************************************************/
     D3DFORMAT D3D9Texture::_chooseD3DFormat(IDirect3DDevice9* d3d9Device)

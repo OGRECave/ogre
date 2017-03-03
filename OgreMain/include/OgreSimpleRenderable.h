@@ -92,9 +92,6 @@ namespace Ogre {
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);
 
-        virtual ~SimpleRenderable();
-
-
         /** Overridden from MovableObject */
         virtual const String& getMovableType(void) const;
 

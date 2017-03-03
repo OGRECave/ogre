@@ -57,7 +57,7 @@ namespace Ogre {
         , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
         , mRenderQueueIDSet(false)
-        , mRenderQueuePriority(100)
+        , mRenderQueuePriority(OGRE_RENDERABLE_DEFAULT_PRIORITY)
         , mRenderQueuePrioritySet(false)
         , mQueryFlags(msDefaultQueryFlags)
         , mVisibilityFlags(msDefaultVisibilityFlags)
