@@ -50,11 +50,14 @@ namespace Ogre {
             case PF_FLOAT32_RGBA:
                 return GL_RGBA;
 #endif
-
-#if OGRE_NO_GLES3_SUPPORT
             case PF_BYTE_LA:
             case PF_SHORT_GR:
+#if OGRE_NO_GLES3_SUPPORT
                 return GL_LUMINANCE_ALPHA;
+#else
+                return GL_RG;
+#endif
+#if OGRE_NO_GLES3_SUPPORT
             case PF_L8:
             case PF_L16:
                 return GL_LUMINANCE;
@@ -155,6 +158,7 @@ namespace Ogre {
 #endif
 #if OGRE_NO_GLES3_SUPPORT == 0
             case PF_L8:
+            case PF_L16:
                 return GL_RED;
             case PF_R8_UINT:
             case PF_R16_UINT:
@@ -468,6 +472,8 @@ namespace Ogre {
                 return GL_R8;
             case PF_L16:
                 return GL_R16F_EXT;
+            case PF_BYTE_LA:
+                return GL_RG8;
 #else
             case PF_L8:
             case PF_L16:
