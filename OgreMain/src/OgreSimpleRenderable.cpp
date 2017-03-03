@@ -113,7 +113,7 @@ namespace Ogre {
 
     void SimpleRenderable::_updateRenderQueue(RenderQueue* queue)
     {
-        queue->addRenderable( this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY); 
+        queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority);
     }
 
     void SimpleRenderable::visitRenderables(Renderable::Visitor* visitor, 
@@ -122,9 +122,6 @@ namespace Ogre {
         visitor->visit(this, 0, false);
     }
 
-    SimpleRenderable::~SimpleRenderable()
-    {
-    }
     //-----------------------------------------------------------------------
     const String& SimpleRenderable::getMovableType(void) const
     {
