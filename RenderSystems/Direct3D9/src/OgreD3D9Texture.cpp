@@ -1672,7 +1672,6 @@ namespace Ogre
         if (rkCurCaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP == 0)
             return false;
 
-        HRESULT hr;
         // check for auto gen. mip maps support
         hr = pD3D->CheckDeviceFormat(
                 rkCurCaps.AdapterOrdinal,
