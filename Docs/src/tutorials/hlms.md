@@ -1,4 +1,4 @@
-#  HLMS: High Level Material System {#hlms}
+#  HLMS: High Level Material System {#hlms_tutorials}
 
 The HLMS is the new material system used in Ogre. It's more user
 friendly and performs faster.

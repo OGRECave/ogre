@@ -30,6 +30,7 @@ if(DOXYGEN_FOUND)
     endif ()
     
     file(GLOB TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/*.md)
+    file(GLOB MANUAL ${OGRE_SOURCE_DIR}/Docs/src/manual/*.md)
     
     set(CMAKE_DOXYGEN_INPUT_LIST 
         ${OGRE_SOURCE_DIR}/OgreMain
@@ -37,6 +38,7 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/Plugins
         ${OGRE_SOURCE_DIR}/RenderSystems
         ${OGRE_SOURCE_DIR}/Docs/src/apimainpage.md
+        ${MANUAL}
         ${TUTORIALS})
     string(REPLACE ";" " \\\n" CMAKE_DOXYGEN_INPUT_LIST "${CMAKE_DOXYGEN_INPUT_LIST}")
 	configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)

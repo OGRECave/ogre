@@ -1,3 +1,3 @@
 # Tutorials {#tutorials}
 
-- @subpage hlms
+- @subpage hlms_tutorials

@@ -401,7 +401,8 @@ namespace Ogre
         @remarks
             This is an advanced method which allows you to manually set
             the projection matrix on this frustum, rather than having it 
-            calculate itself based on it's position and orientation. 
+            calculate itself based on the clipping distances or the field 
+            of view.
         @note
             After enabling a custom projection matrix, the frustum will no 
             longer update on its own based on field of view and near / far
@@ -409,6 +410,9 @@ namespace Ogre
             projection matrix up to date if those values change. The custom 
             matrix will be returned from getProjectionMatrix and derivative
             functions.
+            Even when using a custom projection matrix, you should still
+            call the methods that update the ner / far distances and field of 
+            view.
         @param enable
             If @c true, the custom projection matrix passed as the 
             second parameter will be used in preference to an auto calculated 

@@ -2,13 +2,14 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 {
 	in 0 rt_renderwindow
 
-	texture mrtGBuffer target_width target_height PF_A2R10G10B10 PF_SHORT_GR depth_format PF_D32_FLOAT depth_texture depth_pool 1 explicit_resolve
-	texture mrtDepthBuffer target_width target_height PF_D32_FLOAT depth_pool 1
+	texture mrtGBuffer target_width target_height PF_A2R10G10B10 PF_SHORT_GR depth_format PF_D32_FLOAT depth_texture depth_pool 5 explicit_resolve
+	texture mrtDepthBuffer target_width target_height PF_D32_FLOAT depth_pool 5
 
 	texture prevFrame target_width target_height PF_R8G8B8A8 mipmap -1 no_fsaa no_gamma uav depth_pool 0
 	//Needed to calculate the difference in depths (if it's too high, then we can't use this result)
 	texture prevFrameDepthBuffer target_width target_height PF_FLOAT32_R no_fsaa uav
-	texture rtt target_width target_height PF_R8G8B8A8
+	//Must be marked as depth_texture so it can share the depth buffer with mrtGBuffer
+	texture rtt target_width target_height PF_R8G8B8A8 depth_format PF_D32_FLOAT depth_texture depth_pool 5
 
 	texture rayTracingBuffer target_width_scaled 0.5 target_height_scaled 0.5 PF_SHORT_RGBA depth_pool 0 no_fsaa
 	texture reflectionBuffer target_width target_height PF_R8G8B8A8 depth_pool 0 no_fsaa
@@ -93,6 +94,7 @@ compositor_node ScreenSpaceReflectionsRenderingNode
 		pass clear
 		{
 			colour_value 0.2 0.4 0.6 1
+			buffers colour
 		}
 
 		pass render_scene
