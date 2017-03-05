@@ -62,14 +62,15 @@ namespace Ogre
         CAPS_CATEGORY_COMMON_2 = 1,
         CAPS_CATEGORY_D3D9 = 2,
         CAPS_CATEGORY_GL = 3,
+        CAPS_CATEGORY_COMMON_3 = 4,
         /// Placeholder for max value
-        CAPS_CATEGORY_COUNT = 4
+        CAPS_CATEGORY_COUNT = 5
     };
 
     /// Enum describing the different hardware capabilities we want to check for
     /// OGRE_CAPS_VALUE(a, b) defines each capability
-    // a is the category (which can be from 0 to 15)
-    // b is the value (from 0 to 27)
+    /// a is the category (which can be from 0 to 15)
+    /// b is the value (from 0 to 27)
     enum Capabilities
     {
         /// Supports generating mipmaps in hardware
@@ -130,8 +131,6 @@ namespace Ogre
         RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
         /// Supports rendering to vertex buffers
         RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
-        /// Supports different texture bindings
-        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 28),
 
         /// Supports compressed textures
         RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),
@@ -192,8 +191,13 @@ namespace Ogre
         RSC_READ_BACK_AS_TEXTURE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
         /// Supports HW gamma, both in the framebuffer and as texture.
         RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 27),
+
         /// GL ES2/ES3 does not support generating mipmaps for compressed formats in hardware
-        RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 28),
+        RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 0),
+        /// Supports different texture bindings
+        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 1),
+
+
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
         RSC_PERSTAGECONSTANT = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 0),
