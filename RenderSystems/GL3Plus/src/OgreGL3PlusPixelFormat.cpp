@@ -68,10 +68,13 @@ namespace Ogre  {
             return GL_DEPTH_COMPONENT;
         case PF_A8:
             return GL_ALPHA;
+        case PF_R8:
         case PF_L8:
             return GL_RED;
         case PF_L16:
             return GL_RED;
+        case PF_A4L4:
+        case PF_RG8:
         case PF_BYTE_LA:
             return GL_RG;
         case PF_R3G3B2:
@@ -205,10 +208,28 @@ namespace Ogre  {
             return GL_COMPRESSED_RGBA8_ETC2_EAC;
         case PF_ETC2_RGB8A1:
             return GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-
-        default:
-            return 0;
+        // GL_IMG_texture_compression_pvrtc
+        case PF_PVRTC_RGB2:
+        case PF_PVRTC_RGB4:
+        case PF_PVRTC_RGBA2:
+        case PF_PVRTC_RGBA4:
+        // GL_IMG_texture_compression_pvrtc2
+        case PF_PVRTC2_2BPP:
+        case PF_PVRTC2_4BPP:
+        // GL_OES_compressed_ETC1_RGB8_texture
+        case PF_ETC1_RGB8:
+        // GL_AMD_compressed_ATC_texture
+        case PF_ATC_RGB:
+        case PF_ATC_RGBA_EXPLICIT_ALPHA:
+        case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+        // DXT (premultiplied alpha)
+        case PF_DXT2:
+        case PF_DXT4:
+        case PF_UNKNOWN:
+        case PF_COUNT:
+            break;
         }
+        return GL_NONE;
     }
 
     GLenum GL3PlusPixelUtil::getGLOriginDataType(PixelFormat format)
@@ -217,9 +238,11 @@ namespace Ogre  {
         {
         case PF_DEPTH:
             return GL_UNSIGNED_SHORT;
+        case PF_RG8:
         case PF_BYTE_LA:
         case PF_A8:
         case PF_L8:
+        case PF_R8:
         case PF_R8G8B8:
         case PF_B8G8R8:
             return GL_UNSIGNED_BYTE;
@@ -319,10 +342,40 @@ namespace Ogre  {
         case PF_R32G32B32_SINT:
         case PF_R32G32B32A32_SINT:
             return GL_INT;
-
-        default:
-            return 0;
+        // unsupported
+        case PF_A4L4:
+        // not applicable for compressed formats
+        case PF_BC4_UNORM:
+        case PF_BC4_SNORM:
+        case PF_BC5_UNORM:
+        case PF_BC5_SNORM:
+        case PF_BC6H_SF16:
+        case PF_BC6H_UF16:
+        case PF_BC7_UNORM:
+        case PF_BC7_UNORM_SRGB:
+        case PF_ETC2_RGB8:
+        case PF_ETC2_RGBA8:
+        case PF_ETC2_RGB8A1:
+        case PF_DXT1:
+        case PF_DXT3:
+        case PF_DXT5:
+        case PF_PVRTC_RGB2:
+        case PF_PVRTC_RGB4:
+        case PF_PVRTC_RGBA2:
+        case PF_PVRTC_RGBA4:
+        case PF_PVRTC2_2BPP:
+        case PF_PVRTC2_4BPP:
+        case PF_ETC1_RGB8:
+        case PF_ATC_RGB:
+        case PF_ATC_RGBA_EXPLICIT_ALPHA:
+        case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+        case PF_DXT2:
+        case PF_DXT4:
+        case PF_UNKNOWN:
+        case PF_COUNT:
+            break;
         }
+        return GL_NONE;
     }
 
     GLenum GL3PlusPixelUtil::getGLInternalFormat(PixelFormat format, bool hwGamma)
@@ -331,11 +384,13 @@ namespace Ogre  {
         {
         case PF_DEPTH:
             return GL_DEPTH_COMPONENT16;
+        case PF_R8:
         case PF_L8:
         case PF_A8:
             return GL_R8;
         case PF_L16:
             return GL_R16;
+        case PF_RG8:
         case PF_BYTE_LA:
             return GL_RG8;
         case PF_R3G3B2:
@@ -493,10 +548,24 @@ namespace Ogre  {
             return GL_COMPRESSED_RGBA8_ETC2_EAC;
         case PF_ETC2_RGB8A1:
             return GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-
-        default:
-            return GL_NONE;
+        case PF_A4L4:
+        case PF_PVRTC_RGB2:
+        case PF_PVRTC_RGB4:
+        case PF_PVRTC_RGBA2:
+        case PF_PVRTC_RGBA4:
+        case PF_PVRTC2_2BPP:
+        case PF_PVRTC2_4BPP:
+        case PF_ETC1_RGB8:
+        case PF_ATC_RGB:
+        case PF_ATC_RGBA_EXPLICIT_ALPHA:
+        case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+        case PF_DXT2:
+        case PF_DXT4:
+        case PF_UNKNOWN:
+        case PF_COUNT:
+            break;
         }
+        return GL_NONE;
     }
 
     GLenum GL3PlusPixelUtil::getClosestGLInternalFormat(PixelFormat format, bool hwGamma)
@@ -504,13 +573,10 @@ namespace Ogre  {
         GLenum GLformat = getGLInternalFormat(format, hwGamma);
         if (GLformat == GL_NONE)
         {
-            if (hwGamma)
-                return GL_SRGB8;
-            else
-                return GL_RGBA8;
+            return hwGamma ? GL_SRGB8 : GL_RGBA8;
         }
-        else
-            return GLformat;
+
+        return GLformat;
     }
 
 

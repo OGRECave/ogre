@@ -996,6 +996,7 @@ namespace Ogre
         rsc->setNumTextureUnits(16);
         rsc->setCapability(RSC_ANISOTROPY);
         rsc->setCapability(RSC_AUTOMIPMAP);
+        rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
         rsc->setCapability(RSC_BLENDING);
         rsc->setCapability(RSC_DOT3);
         // Cube map

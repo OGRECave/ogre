@@ -37,6 +37,8 @@ namespace Ogre  {
     {
         switch(mFormat)
         {
+            case PF_DEPTH:
+                return GL_DEPTH_COMPONENT;
             case PF_A8:
                 return GL_ALPHA;
             case PF_L8:
@@ -119,6 +121,8 @@ namespace Ogre  {
     {
         switch(mFormat)
         {
+            case PF_DEPTH:
+                return GL_UNSIGNED_SHORT;
             case PF_A8:
             case PF_L8:
             case PF_R8G8B8:
@@ -185,6 +189,8 @@ namespace Ogre  {
     GLenum GLPixelUtil::getGLInternalFormat(PixelFormat mFormat, bool hwGamma)
     {
         switch(mFormat) {
+            case PF_DEPTH:
+                return GL_DEPTH_COMPONENT16;
             case PF_L8:
                 return GL_LUMINANCE8;
             case PF_L16:
@@ -282,6 +288,12 @@ namespace Ogre  {
     {
         switch(fmt) 
         {
+        case GL_DEPTH_COMPONENT16:
+        case GL_DEPTH_COMPONENT24:
+        case GL_DEPTH_COMPONENT32:
+        case GL_DEPTH_COMPONENT32F:
+        case GL_DEPTH_COMPONENT:
+            return PF_DEPTH;
         case GL_LUMINANCE8:
             return PF_L8;
         case GL_LUMINANCE16:
