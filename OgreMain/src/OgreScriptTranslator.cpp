@@ -7852,10 +7852,21 @@ namespace Ogre{
         nodeDef = static_cast<CompositorShadowNodeDef*>(
                     any_cast<CompositorNodeDef*>(targetTypeParent->parent->context) );
 
-        if( obj->name.empty())
+        if( parentObj->id != ID_SHADOW_MAP_REPEAT )
         {
-            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, node->file, node->line);
-            return;
+            if( obj->name.empty() )
+            {
+                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, node->file, node->line);
+                return;
+            }
+        }
+        else
+        {
+            if( !obj->name.empty() )
+            {
+                compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, node->file, node->line);
+                return;
+            }
         }
 
         size_t numPasses = 0;
