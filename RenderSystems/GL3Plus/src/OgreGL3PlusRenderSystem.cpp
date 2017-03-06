@@ -2511,7 +2511,6 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
-        markProfileEvent("Begin Event: " + eventName);
         if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
             OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
     }
@@ -2519,7 +2518,6 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::endProfileEvent( void )
     {
-        markProfileEvent("End Event");
         if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
             OGRE_CHECK_GL_ERROR(glPopDebugGroup());
     }
@@ -2533,8 +2531,8 @@ namespace Ogre {
         if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
             glDebugMessageInsert(GL_DEBUG_SOURCE_THIRD_PARTY,
                                  GL_DEBUG_TYPE_PERFORMANCE,
-                                 GL_DEBUG_SEVERITY_LOW,
                                  0,
+                                 GL_DEBUG_SEVERITY_LOW,
                                  static_cast<GLint>(eventName.length()),
                                  eventName.c_str());
     }
