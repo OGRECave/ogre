@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNode.h"
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "OgreShadowCameraSetup.h"
+#include "OgreLight.h"
 
 namespace Ogre
 {
@@ -105,6 +106,7 @@ namespace Ogre
             /// @See ShadowCameraSetup mMinDistance
             Real                    minDistance;
             Real                    maxDistance;
+            Vector2                 scenePassesViewportSize[Light::NUM_LIGHT_TYPES];
         };
 
         typedef vector<ShadowMapCamera>::type ShadowMapCameraVec;

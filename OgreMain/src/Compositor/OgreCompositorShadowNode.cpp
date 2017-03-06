@@ -46,6 +46,11 @@ THE SOFTWARE.
 #include "OgreShadowCameraSetupFocused.h"
 #include "OgreShadowCameraSetupPSSM.h"
 
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+    #include <intrin.h>
+    #pragma intrinsic(_BitScanReverse)
+#endif
+
 namespace Ogre
 {
     const Matrix4 PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE(
@@ -53,6 +58,20 @@ namespace Ogre
         0,   -0.5,    0,  0.5,
         0,      0,    1,    0,
         0,      0,    0,    1);
+
+    inline uint32 ctz( uint32 value )
+    {
+        if( value == 0 )
+            return 32u;
+
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+        DWORD trailingZero = 0;
+        _BitScanForward( &trailingZero, value );
+        return trailingZero;
+#else
+        return __builtin_ctz( value );
+#endif
+    }
 
     CompositorShadowNode::CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
                                                 CompositorWorkspace *workspace, RenderSystem *renderSys,
@@ -89,6 +108,8 @@ namespace Ogre
             shadowMapCamera.camera->setFixedYawAxis( false );
             shadowMapCamera.minDistance = 0.0f;
             shadowMapCamera.maxDistance = 100000.0f;
+            for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
+                shadowMapCamera.scenePassesViewportSize[i] = -Vector2::UNIT_SCALE;
 
             {
                 //Find out the index to our texture in both mLocalTextures & mContiguousShadowMapTex
@@ -436,7 +457,9 @@ namespace Ogre
 
                 //Use the material scheme of the main viewport
                 //This is required to pick up the correct shadow_caster_material and similar properties.
-                texCamera->getLastViewport()->setMaterialScheme( viewport->getMaterialScheme() );
+                //dark_sylinc: removed. It's losing usefulness (Hlms), and it's broken (CompositorPassScene
+                //will overwrite it anyway)
+                //texCamera->getLastViewport()->setMaterialScheme( viewport->getMaterialScheme() );
 
                 // Associate main view camera as LOD camera
                 texCamera->setLodCamera( lodCamera );
@@ -466,8 +489,15 @@ namespace Ogre
                     }
                 }
 
+                //Set the viewport to 0, to explictly crash if accidentally using it. Compositors
+                //may have many passes of different sizes and resolutions that affect the same shadow
+                //map and it's impossible to tell which one is "the main one" (if there's any)
+                texCamera->_notifyViewport( 0 );
+
+                const Vector2 vpRealSize = itShadowCamera->scenePassesViewportSize[light->getType()];
                 itShadowCamera->shadowCameraSetup->getShadowCamera( sceneManager, camera, light,
-                                                                    texCamera, itor->split );
+                                                                    texCamera, itor->split,
+                                                                    vpRealSize );
 
                 itShadowCamera->minDistance = itShadowCamera->shadowCameraSetup->getMinDistance();
                 itShadowCamera->maxDistance = itShadowCamera->shadowCameraSetup->getMaxDistance();
@@ -496,16 +526,33 @@ namespace Ogre
         //tied to a shadow map in particular (e.g. clearing an atlas)
         if( passDef->mShadowMapIdx < mShadowMapCameras.size() )
         {
-            const ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
-
-            assert( (!smCamera.camera->getLastViewport() ||
-                     smCamera.camera->getLastViewport() == pass->getViewport()) &&
-                    "Two scene passes to the same shadow map have different viewport!" );
-
-            smCamera.camera->_notifyViewport( pass->getViewport() );
-
             if( passDef->getType() == PASS_SCENE )
             {
+                ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
+
+                const Viewport *vp = pass->getViewport();
+                const Vector2 vpSize = Vector2( vp->getActualWidth(), vp->getActualHeight() );
+
+                const CompositorTargetDef *targetPass = passDef->getParentTargetDef();
+                uint8 lightTypesLeft = targetPass->getShadowMapSupportedLightTypes();
+
+                uint32 firstBitSet = ctz( lightTypesLeft );
+                while( firstBitSet != 32u )
+                {
+                    assert( smCamera.scenePassesViewportSize[firstBitSet].x < Real( 0.0 ) ||
+                            smCamera.scenePassesViewportSize[firstBitSet].x < Real( 0.0 ) ||
+                            smCamera.scenePassesViewportSize[firstBitSet] == vpSize &&
+                            "Two scene passes to the same shadow map have different viewport sizes! "
+                            "Ogre cannot determine how to prevent jittering. Maybe you meant assign "
+                            "assign each light types to different passes but you assigned more than "
+                            "one light type (or the wrong one) to the same pass?" );
+
+                    smCamera.scenePassesViewportSize[firstBitSet] = vpSize;
+
+                    lightTypesLeft &= ~(1u << ((uint8)firstBitSet));
+                    firstBitSet = ctz( lightTypesLeft );
+                }
+
                 assert( dynamic_cast<CompositorPassScene*>(pass) );
                 static_cast<CompositorPassScene*>(pass)->_setCustomCamera( smCamera.camera );
                 static_cast<CompositorPassScene*>(pass)->_setCustomCullCamera( smCamera.camera );

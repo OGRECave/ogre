@@ -104,8 +104,9 @@ namespace Ogre
         uint getSplitCount() const { return mSplitCount; }
 
         /// Returns a LiSPSM shadow camera with PSSM splits base on iteration.
-        virtual void getShadowCamera(const Ogre::SceneManager *sm, const Ogre::Camera *cam,
-                                const Ogre::Light *light, Ogre::Camera *texCam, size_t iteration) const;
+        virtual void getShadowCamera( const Ogre::SceneManager *sm, const Ogre::Camera *cam,
+                                      const Ogre::Light *light, Ogre::Camera *texCam, size_t iteration,
+                                      const Vector2 &viewportRealSize ) const;
 
         /// Returns the calculated split points.
         inline const SplitPointList& getSplitPoints() const

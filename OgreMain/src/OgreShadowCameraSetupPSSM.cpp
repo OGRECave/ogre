@@ -75,8 +75,10 @@ namespace Ogre
         mSplitPoints = newSplitPoints;
     }
     //---------------------------------------------------------------------
-    void PSSMShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *sm, const Ogre::Camera *cam,
-                                const Ogre::Light *light, Ogre::Camera *texCam, size_t iteration) const
+    void PSSMShadowCameraSetup::getShadowCamera( const Ogre::SceneManager *sm, const Ogre::Camera *cam,
+                                                 const Ogre::Light *light, Ogre::Camera *texCam,
+                                                 size_t iteration,
+                                                 const Vector2 &viewportRealSize ) const
     {
         // apply the right clip distance.
         Real nearDist = mSplitPoints[iteration];
@@ -103,7 +105,8 @@ namespace Ogre
         _cam->setNearClipDistance(nearDist);
         _cam->setFarClipDistance(farDist);
 
-        FocusedShadowCameraSetup::getShadowCamera(sm, cam,  light, texCam, iteration);
+        FocusedShadowCameraSetup::getShadowCamera( sm, cam,  light, texCam,
+                                                   iteration, viewportRealSize );
 
         // restore near/far
         _cam->setNearClipDistance(oldNear);

@@ -163,8 +163,9 @@ namespace Ogre
         }
     }*/
     //-----------------------------------------------------------------------
-    void FocusedShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-                const Light *light, Camera *texCam, size_t iteration) const
+    void FocusedShadowCameraSetup::getShadowCamera( const SceneManager *sm, const Camera *cam,
+                                                    const Light *light, Camera *texCam, size_t iteration,
+                                                    const Vector2 &viewportRealSize ) const
     {
         // check availability - viewport not needed
         OgreAssert(sm != NULL, "SceneManager is NULL");
@@ -174,7 +175,8 @@ namespace Ogre
 
         if( light->getType() != Light::LT_DIRECTIONAL )
         {
-            DefaultShadowCameraSetup::getShadowCamera( sm, cam, light, texCam, iteration );
+            DefaultShadowCameraSetup::getShadowCamera( sm, cam, light, texCam,
+                                                       iteration, viewportRealSize );
             return;
         }
 

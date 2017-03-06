@@ -44,8 +44,9 @@ namespace Ogre
     DefaultShadowCameraSetup::~DefaultShadowCameraSetup() {}
     
     /// Default shadow camera setup implementation
-    void DefaultShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-                                    const Light *light, Camera *texCam, size_t iteration) const
+    void DefaultShadowCameraSetup::getShadowCamera( const SceneManager *sm, const Camera *cam,
+                                                    const Light *light, Camera *texCam, size_t iteration,
+                                                    const Vector2 &viewportRealSize ) const
     {
         Vector3 pos, dir;
 
@@ -100,7 +101,7 @@ namespace Ogre
             //~ pos.x -= fmod(pos.x, worldTexelSize);
             //~ pos.y -= fmod(pos.y, worldTexelSize);
             //~ pos.z -= fmod(pos.z, worldTexelSize);
-            Real worldTexelSize = (shadowDist * 2) / texCam->getLastViewport()->getActualWidth();
+            Vector2 worldTexelSize = (shadowDist * 2) / viewportRealSize;
 
              //get texCam orientation
 
@@ -124,8 +125,8 @@ namespace Ogre
              Vector3 lightSpacePos = q.Inverse() * pos;
              
              //snap to nearest texel
-             lightSpacePos.x -= fmod(lightSpacePos.x, worldTexelSize);
-             lightSpacePos.y -= fmod(lightSpacePos.y, worldTexelSize);
+             lightSpacePos.x -= fmod(lightSpacePos.x, worldTexelSize.x);
+             lightSpacePos.y -= fmod(lightSpacePos.y, worldTexelSize.y);
 
              //convert back to world space
              pos = q * lightSpacePos;
