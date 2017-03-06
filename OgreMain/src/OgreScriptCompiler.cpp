@@ -1335,6 +1335,7 @@ namespace Ogre
         mIds["pssm_split_padding"]      = ID_PSSM_SPLIT_PADDING;
         mIds["pssm_lambda"]             = ID_PSSM_LAMBDA;
         mIds["shadow_map_target_type"]  = ID_SHADOW_MAP_TARGET_TYPE;
+        mIds["shadow_map_repeat"]       = ID_SHADOW_MAP_REPEAT;
         mIds["shadow_map"]              = ID_SHADOW_MAP;
         mIds["fsaa"]                    = ID_FSAA;
         mIds["uv"]                      = ID_UV;

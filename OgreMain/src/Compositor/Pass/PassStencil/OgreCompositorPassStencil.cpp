@@ -38,8 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    CompositorPassStencilDef::CompositorPassStencilDef( uint32 rtIndex ) :
-            CompositorPassDef( PASS_STENCIL, rtIndex ),
+    CompositorPassStencilDef::CompositorPassStencilDef( CompositorTargetDef *parentTargetDef ) :
+            CompositorPassDef( PASS_STENCIL, parentTargetDef ),
             mStencilRef( 0 )
     {
         //Override default.

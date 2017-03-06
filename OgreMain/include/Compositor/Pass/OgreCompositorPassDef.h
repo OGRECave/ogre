@@ -60,6 +60,8 @@ namespace Ogre
         PASS_CUSTOM
     };
 
+    class CompositorTargetDef;
+
     /** Interface to abstract all types of pass definitions (@see CompositorPassType):
             * PASS_SCENE (@See CompositorPassSceneDef)
             * PASS_QUAD (@See CompositorPassQuadDef)
@@ -83,8 +85,7 @@ namespace Ogre
     {
         CompositorPassType  mPassType;
 
-        /// Used for cubemaps and 3D textures.
-        uint32              mRtIndex;
+        CompositorTargetDef *mParentTargetDef;
 
     public:
         /// Viewport's region to draw
@@ -149,8 +150,8 @@ namespace Ogre
         UavDependencyVec    mUavDependencies;
 
     public:
-        CompositorPassDef( CompositorPassType passType, uint32 rtIndex ) :
-            mPassType( passType ), mRtIndex( rtIndex ),
+        CompositorPassDef( CompositorPassType passType, CompositorTargetDef *parentTargetDef ) :
+            mPassType( passType ), mParentTargetDef( parentTargetDef ),
             mVpLeft( 0 ), mVpTop( 0 ),
             mVpWidth( 1 ), mVpHeight( 1 ),
             mVpScissorLeft( 0 ), mVpScissorTop( 0 ),
@@ -165,7 +166,8 @@ namespace Ogre
         virtual ~CompositorPassDef() {}
 
         CompositorPassType getType() const              { return mPassType; }
-        uint32 getRtIndex(void) const                   { return mRtIndex; }
+        uint32 getRtIndex(void) const;
+        const CompositorTargetDef* getParentTargetDef(void) const;
     };
 
     typedef vector<CompositorPassDef*>::type CompositorPassDefVec;
@@ -176,7 +178,7 @@ namespace Ogre
         IdString                mRenderTargetName;
         CompositorPassDefVec    mCompositorPasses;
 
-        /// @copydoc CompositorPass::mRtIndex
+        /// Used for cubemaps and 3D textures.
         uint32                  mRtIndex;
 
         /// Used by shadow map passes only. Determines which light types are supposed

@@ -7322,7 +7322,7 @@ namespace Ogre{
                     else if( nodeObj->id == ID_SHADOW_MAP_TARGET_TYPE )
                     {
                         numTargetPasses +=
-                                CompositorShadowMapTargetTranslator::calculateNumTargets( *i );
+                                CompositorShadowMapTargetTypeTranslator::calculateNumTargets( *i );
                     }
                 }
             }
@@ -7537,7 +7537,15 @@ namespace Ogre{
         ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
 
         mTargetDef = 0;
-        CompositorNodeDef *nodeDef = any_cast<CompositorNodeDef*>(obj->parent->context);
+        CompositorNodeDef *nodeDef = 0;
+
+        ObjectAbstractNode *parentObj = reinterpret_cast<ObjectAbstractNode*>(obj->parent);
+
+        if( parentObj->id == ID_SHADOW_MAP_REPEAT )
+            nodeDef = any_cast<CompositorNodeDef*>(obj->parent->parent->parent->context);
+        else
+            nodeDef = any_cast<CompositorNodeDef*>(obj->parent->context);
+
         if( !obj->name.empty() )
         {
             uint32 rtIndex = 0;
@@ -7624,6 +7632,37 @@ namespace Ogre{
     {
     }
     //-------------------------------------------------------------------------
+    size_t CompositorShadowMapTargetTypeTranslator::calculateNumTargets( const AbstractNodePtr &node )
+    {
+        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+        size_t numTargetPasses = 0;
+
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_OBJECT)
+            {
+                ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+                if( !nodeObj->abstract )
+                {
+                    if( nodeObj->id == ID_TARGET )
+                        ++numTargetPasses;
+                    else if( nodeObj->id == ID_SHADOW_MAP )
+                    {
+                        numTargetPasses += nodeObj->values.size() + 1;
+                    }
+                    else if( nodeObj->id == ID_SHADOW_MAP_REPEAT )
+                    {
+                        numTargetPasses +=
+                                CompositorShadowMapRepeatTranslator::calculateNumTargets( *i );
+                    }
+                }
+            }
+        }
+
+        return numTargetPasses;
+    }
+    //-------------------------------------------------------------------------
     void CompositorShadowMapTargetTypeTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
         ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
@@ -7688,17 +7727,19 @@ namespace Ogre{
     }
 
     /**************************************************************************
-     * CompositorShadowMapTargetTranslator
+     * CompositorShadowMapRepeatTranslator
      *************************************************************************/
-    CompositorShadowMapTargetTranslator::CompositorShadowMapTargetTranslator() : mTargetDef(0)
+    CompositorShadowMapRepeatTranslator::CompositorShadowMapRepeatTranslator()
     {
     }
     //-------------------------------------------------------------------------
-    size_t CompositorShadowMapTargetTranslator::calculateNumTargets( const AbstractNodePtr &node )
+    size_t CompositorShadowMapRepeatTranslator::calculateNumTargets( const AbstractNodePtr &node )
     {
         ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
 
         size_t numTargetPasses = 0;
+
+        size_t numRepeats = obj->values.size() + 1;
 
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -7707,46 +7748,23 @@ namespace Ogre{
                 ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
                 if( !nodeObj->abstract )
                 {
-                    if( nodeObj->id == ID_TARGET )
+                    if( nodeObj->id == ID_TARGET || nodeObj->id == ID_SHADOW_MAP )
                         ++numTargetPasses;
-                    else if( nodeObj->id == ID_SHADOW_MAP )
-                    {
-                        numTargetPasses += nodeObj->values.size() + 1;
-                    }
                 }
             }
         }
 
-        return numTargetPasses;
+        return numTargetPasses * numRepeats;
     }
     //-------------------------------------------------------------------------
-    void CompositorShadowMapTargetTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+    void CompositorShadowMapRepeatTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
         ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
 
-        mTargetDef = 0;
-        CompositorShadowNodeDef *nodeDef = 0;
+        const uint8 shadowMapSupportedLightTypes = any_cast<uint8>(obj->parent->context);
 
-        uint8 shadowMapSupportedLightTypes = any_cast<uint8>(obj->parent->context);
-
-        nodeDef = static_cast<CompositorShadowNodeDef*>(
+        CompositorShadowNodeDef *nodeDef = static_cast<CompositorShadowNodeDef*>(
                     any_cast<CompositorNodeDef*>(obj->parent->parent->context) );
-        if( obj->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, node->file, node->line);
-            return;
-        }
-
-        size_t numPasses = 0;
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
-        {
-            if((*i)->type == ANT_OBJECT)
-            {
-                ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
-                if( !nodeObj->abstract && nodeObj->id == ID_PASS )
-                    ++numPasses;
-            }
-        }
 
         String targetPassName;
         AbstractNodeList::const_iterator namesIt = obj->values.begin();
@@ -7771,6 +7789,121 @@ namespace Ogre{
                 compiler->addError( ScriptCompiler::CE_UNEXPECTEDTOKEN, obj->file, obj->line,
                                     "Shadow map '" + targetPassName + "' not found." );
                 return;
+            }
+
+            size_t lastNumTargetPasses = nodeDef->getNumTargetPasses();
+
+            obj->context = shadowMapIdx;
+
+            for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+            {
+                if((*i)->type == ANT_OBJECT)
+                {
+                    processNode(compiler, *i);
+                }
+                else
+                {
+                    compiler->addError( ScriptCompiler::CE_UNEXPECTEDTOKEN, (*i)->file, (*i)->line,
+                                        "token not recognized" );
+                }
+            }
+
+            size_t newNumTargetPasses = nodeDef->getNumTargetPasses();
+
+            for( size_t i=lastNumTargetPasses; i<newNumTargetPasses; ++i )
+            {
+                CompositorTargetDef *tagetDef = nodeDef->getTargetPass( i );
+
+                tagetDef->setShadowMapSupportedLightTypes( shadowMapSupportedLightTypes );
+
+                const CompositorPassDefVec &compositorPasses = tagetDef->getCompositorPasses();
+                CompositorPassDefVec::const_iterator itor = compositorPasses.begin();
+                CompositorPassDefVec::const_iterator end  = compositorPasses.end();
+
+                while( itor != end )
+                {
+                    (*itor)->mShadowMapIdx      = static_cast<uint32>(shadowMapIdx);
+                    (*itor)->mIncludeOverlays   = false;
+                    ++itor;
+                }
+            }
+        }
+    }
+
+    /**************************************************************************
+     * CompositorShadowMapTargetTranslator
+     *************************************************************************/
+    CompositorShadowMapTargetTranslator::CompositorShadowMapTargetTranslator() : mTargetDef(0)
+    {
+    }
+    //-------------------------------------------------------------------------
+    void CompositorShadowMapTargetTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+    {
+        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+        mTargetDef = 0;
+        CompositorShadowNodeDef *nodeDef = 0;
+
+        ObjectAbstractNode *parentObj = reinterpret_cast<ObjectAbstractNode*>(obj->parent);
+        AbstractNode *targetTypeParent = parentObj->id == ID_SHADOW_MAP_REPEAT ?
+                    obj->parent->parent : obj->parent;
+
+        const uint8 shadowMapSupportedLightTypes = any_cast<uint8>(targetTypeParent->context);
+        nodeDef = static_cast<CompositorShadowNodeDef*>(
+                    any_cast<CompositorNodeDef*>(targetTypeParent->parent->context) );
+
+        if( obj->name.empty())
+        {
+            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, node->file, node->line);
+            return;
+        }
+
+        size_t numPasses = 0;
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_OBJECT)
+            {
+                ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+                if( !nodeObj->abstract && nodeObj->id == ID_PASS )
+                    ++numPasses;
+            }
+        }
+
+        const size_t numShadowMaps = parentObj->id == ID_SHADOW_MAP_REPEAT ?
+                    1 : obj->values.size() + 1;
+
+        String targetPassName;
+        AbstractNodeList::const_iterator namesIt = obj->values.begin();
+        for( size_t j=0; j<numShadowMaps; ++j )
+        {
+            size_t shadowMapIdx = 0;
+
+            if( parentObj->id != ID_SHADOW_MAP_REPEAT )
+            {
+                if( !j )
+                    targetPassName = obj->name;
+                else
+                {
+                    if( !getString( *namesIt++, &targetPassName ) )
+                    {
+                        compiler->addError( ScriptCompiler::CE_STRINGEXPECTED, obj->file, obj->line );
+                        return;
+                    }
+                }
+
+                shadowMapIdx = StringConverter::parseUnsignedInt( targetPassName,
+                                                                  std::numeric_limits<size_t>::max() );
+
+                if( shadowMapIdx >= nodeDef->getNumShadowTextureDefinitions() )
+                {
+                    compiler->addError( ScriptCompiler::CE_UNEXPECTEDTOKEN, obj->file, obj->line,
+                                        "Shadow map '" + targetPassName + "' not found." );
+                    return;
+                }
+            }
+            else
+            {
+                shadowMapIdx = any_cast<size_t>( obj->parent->context );
             }
 
             const ShadowTextureDefinition *shadowMapDef =
@@ -9790,11 +9923,16 @@ namespace Ogre{
                 translator = &mCompositorNodeTranslator;
             else if(obj->id == ID_SHADOW_NODE)
                 translator = &mCompositorShadowNodeTranslator;
-            else if(obj->id == ID_TARGET && parent && (parent->id == ID_COMPOSITOR_NODE || parent->id == ID_SHADOW_NODE))
+            else if(obj->id == ID_TARGET && parent &&
+                    (parent->id == ID_COMPOSITOR_NODE || parent->id == ID_SHADOW_NODE ||
+                     parent->id == ID_SHADOW_MAP_REPEAT))
                 translator = &mCompositorTargetTranslator;
             else if(obj->id == ID_SHADOW_MAP_TARGET_TYPE && parent && parent->id == ID_SHADOW_NODE)
                 translator = &mCompositorShadowMapTargetTypeTranslator;
-            else if(obj->id == ID_SHADOW_MAP && parent && parent->id == ID_SHADOW_MAP_TARGET_TYPE)
+            else if(obj->id == ID_SHADOW_MAP_REPEAT && parent && parent->id == ID_SHADOW_MAP_TARGET_TYPE)
+                translator = &mCompositorShadowMapRepeatTranslator;
+            else if(obj->id == ID_SHADOW_MAP && parent &&
+                    (parent->id == ID_SHADOW_MAP_TARGET_TYPE || parent->id == ID_SHADOW_MAP_REPEAT))
                 translator = &mCompositorShadowMapTargetTranslator;
             else if(obj->id == ID_PASS && parent && (parent->id == ID_TARGET || parent->id == ID_SHADOW_MAP))
                 translator = &mCompositorPassTranslator;

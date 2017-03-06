@@ -83,7 +83,7 @@ namespace Ogre
         */
         virtual CompositorPassDef* addPassDef( CompositorPassType passType,
                                                IdString customId,
-                                               uint32 rtIndex,
+                                               CompositorTargetDef *parentTargetDef,
                                                CompositorNodeDef *parentNodeDef ) = 0;
 
         virtual CompositorPass* addPass( const CompositorPassDef *definition, Camera *defaultCamera,

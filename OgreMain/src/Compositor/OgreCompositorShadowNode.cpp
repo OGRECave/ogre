@@ -616,6 +616,11 @@ namespace Ogre
         return &mCurrentLightList;
     }
     //-----------------------------------------------------------------------------------
+    bool CompositorShadowNode::isShadowMapIdxInValidRange( uint32 shadowMapIdx ) const
+    {
+        return shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size();
+    }
+    //-----------------------------------------------------------------------------------
     bool CompositorShadowNode::isShadowMapIdxActive( uint32 shadowMapIdx ) const
     {
         if( shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size() )
@@ -628,6 +633,13 @@ namespace Ogre
         {
             return true;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    uint8 CompositorShadowNode::getShadowMapLightTypeMask( uint32 shadowMapIdx ) const
+    {
+        const ShadowTextureDefinition &shadowTexDef =
+                mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+        return 1u << mShadowMapCastingLights[shadowTexDef.light].light->getType();
     }
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::getMinMaxDepthRange( const Frustum *shadowMapCamera,

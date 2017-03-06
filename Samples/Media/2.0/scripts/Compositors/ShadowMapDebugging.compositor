@@ -18,11 +18,18 @@ compositor_node ShadowMapDebuggingRenderingNode
 	}
 }
 
+abstract target cubemap_target
+{
+	pass clear {}
+	pass render_scene {}
+}
+
 compositor_node_shadow ShadowMapDebuggingShadowNode
 {
 	technique pssm
 
 	texture atlas 2048 7168 PF_D32_FLOAT
+	//texture tmpCubemap 1024 1024 PF_FLOAT32_R cubemap
 
 	num_splits		3
 	pssm_lambda		0.95
@@ -61,6 +68,28 @@ compositor_node_shadow ShadowMapDebuggingShadowNode
 			}
 		}
 	}
+
+	/*shadow_map_target_type point
+	{
+		shadow_map_repeat 3 4
+		{
+			target tmpCubemap +X : cubemap_target {}
+			target tmpCubemap -X : cubemap_target {}
+			target tmpCubemap +Y : cubemap_target {}
+			target tmpCubemap -Y : cubemap_target {}
+			target tmpCubemap +Z : cubemap_target {}
+			target tmpCubemap -Z : cubemap_target {}
+
+			shadow_map
+			{
+				pass render_quad
+				{
+					material dpsm/converter
+					input 0 tmpCubemap
+				}
+			}
+		}
+	}*/
 }
 
 /*

@@ -49,7 +49,7 @@ namespace Ogre
         StencilParams           mStencilParams;
         uint32                  mStencilRef;
 
-        CompositorPassStencilDef( uint32 rtIndex );
+        CompositorPassStencilDef( CompositorTargetDef *parentTargetDef );
     };
 
     /** @} */

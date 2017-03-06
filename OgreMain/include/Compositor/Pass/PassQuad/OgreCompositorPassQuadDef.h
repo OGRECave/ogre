@@ -108,8 +108,8 @@ namespace Ogre
         FrustumCorners  mFrustumCorners;
         IdString        mCameraName;
 
-        CompositorPassQuadDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :
-            CompositorPassDef( PASS_QUAD, rtIndex ),
+        CompositorPassQuadDef( CompositorNodeDef *parentNodeDef, CompositorTargetDef *parentTargetDef ) :
+            CompositorPassDef( PASS_QUAD, parentTargetDef ),
             mParentNodeDef( parentNodeDef ),
             mUseQuad( false ),
             mIsResolve( false ),
