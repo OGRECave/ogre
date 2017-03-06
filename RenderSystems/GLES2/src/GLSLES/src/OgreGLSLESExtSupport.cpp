@@ -55,11 +55,8 @@ namespace Ogre
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-                {
-                    if(glIsProgramPipelineEXT(obj))
-                        OGRE_CHECK_GL_ERROR(glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength));
-                }
+                if(glIsProgramPipelineEXT(obj))
+                    OGRE_CHECK_GL_ERROR(glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength));
             }
 #endif
 
@@ -81,11 +78,8 @@ namespace Ogre
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
                 {
-                    OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-                    {
-                        if(glIsProgramPipelineEXT(obj))
-                            OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog));
-                    }
+                    if(glIsProgramPipelineEXT(obj))
+                        OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog));
                 }
 #endif
 

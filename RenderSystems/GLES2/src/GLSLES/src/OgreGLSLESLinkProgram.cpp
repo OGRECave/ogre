@@ -175,11 +175,8 @@ namespace Ogre {
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         if(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-            {
-                if(glIsProgramPipelineEXT(mGLProgramHandle))
-                    glValidateProgramPipelineEXT(mGLProgramHandle);
-            }
+            if(glIsProgramPipelineEXT(mGLProgramHandle))
+                glValidateProgramPipelineEXT(mGLProgramHandle);
         }
         else if(glIsProgram(mGLProgramHandle))
 #else

@@ -385,7 +385,9 @@ namespace Ogre {
 
         // Separate shader objects
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects")) {
+        OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+        if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects"))
+        {
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
             rsc->setCapability(RSC_GLSL_SSO_REDECLARE);
         }
