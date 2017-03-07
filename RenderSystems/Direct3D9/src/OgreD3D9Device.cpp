@@ -1306,7 +1306,7 @@ namespace Ogre
             if (FAILED(hr = mDevice->GetDisplayMode(0, &dm)))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Can't get display mode: " + Root::getSingleton().getErrorDescription(hr),
+                    "Can't get display mode: " + DXGetErrorDescription(hr),
                     "D3D9Device::copyContentsToMemory");
             }
 
@@ -1320,7 +1320,7 @@ namespace Ogre
                 0)))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Can't create offscreen buffer: " + Root::getSingleton().getErrorDescription(hr),
+                    "Can't create offscreen buffer: " + DXGetErrorDescription(hr),
                     "D3D9Device::copyContentsToMemory");
             }
 
@@ -1329,7 +1329,7 @@ namespace Ogre
             {
                 SAFE_RELEASE(pTempSurf);
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Can't get front buffer: " + Root::getSingleton().getErrorDescription(hr),
+                    "Can't get front buffer: " + DXGetErrorDescription(hr),
                     "D3D9Device::copyContentsToMemory");
             }
 
@@ -1354,7 +1354,7 @@ namespace Ogre
                 {
                     SAFE_RELEASE(pTempSurf);
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+                        "Can't lock rect: " + DXGetErrorDescription(hr),
                         "D3D9Device::copyContentsToMemory");
                 } 
             }
@@ -1382,7 +1382,7 @@ namespace Ogre
                 {
                     SAFE_RELEASE(pTempSurf);
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+                        "Can't lock rect: " + DXGetErrorDescription(hr),
                         "D3D9Device::copyContentsToMemory");
                 } 
             }
@@ -1394,14 +1394,14 @@ namespace Ogre
                 mDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Can't get back buffer: " + Root::getSingleton().getErrorDescription(hr),
+                    "Can't get back buffer: " + DXGetErrorDescription(hr),
                     "D3D9Device::copyContentsToMemory");
             }
 
             if(FAILED(hr = pSurf->GetDesc(&desc)))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Can't get description: " + Root::getSingleton().getErrorDescription(hr),
+                    "Can't get description: " + DXGetErrorDescription(hr),
                     "D3D9Device::copyContentsToMemory");
             }
 
@@ -1412,7 +1412,7 @@ namespace Ogre
                 0)))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Can't create offscreen surface: " + Root::getSingleton().getErrorDescription(hr),
+                    "Can't create offscreen surface: " + DXGetErrorDescription(hr),
                     "D3D9Device::copyContentsToMemory");
             }
 
@@ -1422,7 +1422,7 @@ namespace Ogre
                 {
                     SAFE_RELEASE(pTempSurf);
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Can't get render target data: " + Root::getSingleton().getErrorDescription(hr),
+                        "Can't get render target data: " + DXGetErrorDescription(hr),
                         "D3D9Device::copyContentsToMemory");
                 }
             }
@@ -1440,7 +1440,7 @@ namespace Ogre
                 {
                     SAFE_RELEASE(pTempSurf);
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Can't create render target: " + Root::getSingleton().getErrorDescription(hr),
+                        "Can't create render target: " + DXGetErrorDescription(hr),
                         "D3D9Device::copyContentsToMemory");
                 }
 
@@ -1449,7 +1449,7 @@ namespace Ogre
                     SAFE_RELEASE(pTempSurf);
                     SAFE_RELEASE(pStretchSurf);
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Can't stretch rect: " + Root::getSingleton().getErrorDescription(hr),
+                        "Can't stretch rect: " + DXGetErrorDescription(hr),
                         "D3D9Device::copyContentsToMemory");
                 }
                 if (FAILED(hr = mDevice->GetRenderTargetData(pStretchSurf, pTempSurf)))
@@ -1457,7 +1457,7 @@ namespace Ogre
                     SAFE_RELEASE(pTempSurf);
                     SAFE_RELEASE(pStretchSurf);
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Can't get render target data: " + Root::getSingleton().getErrorDescription(hr),
+                        "Can't get render target data: " + DXGetErrorDescription(hr),
                         "D3D9Device::copyContentsToMemory");
                 }
                 SAFE_RELEASE(pStretchSurf);
@@ -1482,7 +1482,7 @@ namespace Ogre
             {
                 SAFE_RELEASE(pTempSurf);
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+                    "Can't lock rect: " + DXGetErrorDescription(hr),
                     "D3D9Device::copyContentsToMemory");
             }
         }
