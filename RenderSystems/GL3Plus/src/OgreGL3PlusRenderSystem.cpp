@@ -808,11 +808,6 @@ namespace Ogre {
         delete pWin;
     }
 
-    String GL3PlusRenderSystem::getErrorDescription(long errorNumber) const
-    {
-        return BLANKSTRING;
-    }
-
     void GL3PlusRenderSystem::_setPointParameters(Real size,
                                                   bool attenuationEnabled, Real constant, Real linear, Real quadratic,
                                                   Real minSize, Real maxSize)

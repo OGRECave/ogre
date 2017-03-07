@@ -771,15 +771,6 @@ namespace Ogre {
             ++itMap;
         }
     }
-    
-    String GLES2RenderSystem::getErrorDescription(long errorNumber) const
-    {
-        // TODO find a way to get error string
-//        const GLubyte *errString = gluErrorString (errCode);
-//        return (errString != 0) ? String((const char*) errString) : BLANKSTRING;
-
-        return BLANKSTRING;
-    }
 
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {

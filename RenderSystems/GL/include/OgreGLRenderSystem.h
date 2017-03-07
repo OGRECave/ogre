@@ -240,8 +240,6 @@ namespace Ogre {
 
         void destroyRenderWindow(const String& name);
 
-        String getErrorDescription(long errorNumber) const;
-
         void setNormaliseNormals(bool normalise);
 
         // -----------------------------
