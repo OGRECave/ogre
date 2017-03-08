@@ -472,6 +472,13 @@ namespace Ogre {
             glVertexAttribDivisorEXT = glVertexAttribDivisorANGLE;
         }
 
+        if (mGLSupport->checkExtension("GL_EXT_debug_marker") &&
+            mGLSupport->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            rsc->setCapability(RSC_DEBUG);
+        }
+
 #if OGRE_NO_GLES3_SUPPORT == 0
         // Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
@@ -2113,13 +2120,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLES2RenderSystem::beginProfileEvent( const String &eventName )
     {
-        if(mGLSupport->checkExtension("GL_EXT_debug_marker"))
+        if(getCapabilities()->hasCapability(RSC_DEBUG))
             glPushGroupMarkerEXT(0, eventName.c_str());
     }
     //---------------------------------------------------------------------
     void GLES2RenderSystem::endProfileEvent( void )
     {
-        if(mGLSupport->checkExtension("GL_EXT_debug_marker"))
+        if(getCapabilities()->hasCapability(RSC_DEBUG))
             glPopGroupMarkerEXT();
     }
     //---------------------------------------------------------------------
@@ -2128,7 +2135,7 @@ namespace Ogre {
         if( eventName.empty() )
             return;
 
-        if(mGLSupport->checkExtension("GL_EXT_debug_marker"))
+        if(getCapabilities()->hasCapability(RSC_DEBUG))
            glInsertEventMarkerEXT(0, eventName.c_str());
     }
     //---------------------------------------------------------------------

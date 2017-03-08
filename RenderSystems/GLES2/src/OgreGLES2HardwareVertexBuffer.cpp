@@ -63,9 +63,8 @@ namespace Ogre {
         
         static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
         {
-            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Vertex Buffer #" + StringConverter::toString(mBufferId)).c_str()));
         }
 

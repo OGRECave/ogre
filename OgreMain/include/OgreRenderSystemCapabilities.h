@@ -232,7 +232,9 @@ namespace Ogre
         RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10),
         /// with Separate Shader Objects the gl_PerVertex interface block must be redeclared
         /// but some drivers misbehave and do not compile if we do so
-        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11)
+        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11),
+        /// Supports for debugging/ profiling events
+        RSC_DEBUG = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 12)
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9

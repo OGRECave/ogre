@@ -505,6 +505,9 @@ namespace Ogre {
         // Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
 
+        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+            rsc->setCapability(RSC_DEBUG);
+
         return rsc;
     }
 
@@ -2063,7 +2066,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
         }
 
-        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
         {
 #if ENABLE_GL_DEBUG_OUTPUT
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
@@ -2506,14 +2509,14 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
-        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
             OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
     }
 
 
     void GL3PlusRenderSystem::endProfileEvent( void )
     {
-        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
             OGRE_CHECK_GL_ERROR(glPopDebugGroup());
     }
 
@@ -2523,7 +2526,7 @@ namespace Ogre {
         if ( eventName.empty() )
             return;
 
-        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
             glDebugMessageInsert(GL_DEBUG_SOURCE_THIRD_PARTY,
                                  GL_DEBUG_TYPE_PERFORMANCE,
                                  0,

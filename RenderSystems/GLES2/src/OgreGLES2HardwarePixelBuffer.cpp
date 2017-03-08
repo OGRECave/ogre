@@ -260,7 +260,7 @@ namespace Ogre {
         // Upload data to PBO
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mBufferId));
 
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
         {
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Pixel Buffer #" + StringConverter::toString(mBufferId)).c_str()));
         }
@@ -447,7 +447,7 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, mBufferId));
 
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
         {
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Pixel Buffer #" + StringConverter::toString(mBufferId)).c_str()));
         }
@@ -984,9 +984,8 @@ namespace Ogre {
         
         // Generate renderbuffer
         OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &mRenderbufferID));
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
         {
-            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mRenderbufferID, 0, ("RB " + StringConverter::toString(mRenderbufferID) + " MSAA: " + StringConverter::toString(mNumSamples)).c_str()));
         }
 
