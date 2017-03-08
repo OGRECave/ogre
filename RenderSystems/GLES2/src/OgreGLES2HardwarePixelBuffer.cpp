@@ -343,16 +343,17 @@ namespace Ogre {
                                                   format, data.getConsecutiveSize(),
                                                   pdata));
                     break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-                case GL_TEXTURE_3D:
                 case GL_TEXTURE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glCompressedTexSubImage3D(mTarget, mLevel,
+#if OGRE_NO_GLES3_SUPPORT == 1
+                    break;
+#endif
+                case GL_TEXTURE_3D_OES:
+                    OGRE_CHECK_GL_ERROR(glCompressedTexSubImage3DOES(mTarget, mLevel,
                                               dest.left, dest.top, dest.front,
                                               dest.getWidth(), dest.getHeight(), dest.getDepth(),
                                               format, data.getConsecutiveSize(),
                                               pdata));
                     break;
-#endif
             }
         }
         else

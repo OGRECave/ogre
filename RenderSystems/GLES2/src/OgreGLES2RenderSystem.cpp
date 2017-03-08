@@ -87,6 +87,7 @@ static void gl2ext_to_gl3core() {
     glTexImage3DOES = (PFNGLTEXIMAGE3DOESPROC)glTexImage3D;
     glCompressedTexImage3DOES = glCompressedTexImage3D;
     glTexSubImage3DOES = glTexSubImage3D;
+    glCompressedTexSubImage3DOES = glCompressedTexSubImage3D;
 
     glFenceSyncAPPLE = glFenceSync;
     glClientWaitSyncAPPLE = glClientWaitSync;
