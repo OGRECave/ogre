@@ -31,8 +31,6 @@ THE SOFTWARE.
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareUniformBuffer.h"
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-
 namespace Ogre {
 
     /// Specialisation of HardwareUniformBuffer for OpenGL
@@ -70,4 +68,3 @@ namespace Ogre {
     };
 }
 #endif // __GLES2HARDWAREUNIFORMBUFFER_H__
-#endif

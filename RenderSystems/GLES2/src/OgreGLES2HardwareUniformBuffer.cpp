@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 #include "OgreGLES2HardwareBufferManager.h"
 
-#if OGRE_NO_GLES3_SUPPORT == 0
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
@@ -211,4 +210,3 @@ namespace Ogre {
         }
     }
 }
-#endif
