@@ -229,24 +229,6 @@ namespace Ogre {
         ArchiveManager::getSingleton().addArchiveFactory( mEmbeddedZipArchiveFactory );
 #   endif
 
-#if OGRE_NO_DDS_CODEC == 0
-        // Register image codecs
-        DDSCodec::startup();
-#endif
-#if OGRE_NO_FREEIMAGE == 0
-        // Register image codecs
-        FreeImageCodec::startup();
-#endif
-#if OGRE_NO_PVRTC_CODEC == 0
-        PVRTCCodec::startup();
-#endif
-#if OGRE_NO_ETC_CODEC == 0
-        ETCCodec::startup();
-#endif
-#if OGRE_NO_STBI_CODEC == 0
-        STBIImageCodec::startup();
-#endif
-
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
         mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
@@ -271,8 +253,27 @@ namespace Ogre {
         addMovableObjectFactory(mRibbonTrailFactory);
 
         // Load plugins
-        if (!pluginFileName.empty())
+        if (!pluginFileName.empty()) {
             loadPlugins(pluginFileName);
+        }
+
+#if OGRE_NO_DDS_CODEC == 0
+        // Register image codecs
+        DDSCodec::startup();
+#endif
+#if OGRE_NO_FREEIMAGE == 0
+        // Register image codecs
+        FreeImageCodec::startup();
+#endif
+#if OGRE_NO_PVRTC_CODEC == 0
+        PVRTCCodec::startup();
+#endif
+#if OGRE_NO_ETC_CODEC == 0
+        ETCCodec::startup();
+#endif
+#if OGRE_NO_STBI_CODEC == 0
+        STBIImageCodec::startup();
+#endif
 
         LogManager::getSingleton().logMessage("*-*-* OGRE Initialising");
         msg = "*-*-* Version " + mVersion;
