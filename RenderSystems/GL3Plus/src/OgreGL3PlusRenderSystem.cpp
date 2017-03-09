@@ -66,14 +66,14 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
 #endif
 
-#if OGRE_DEBUG_MODE && ENABLE_GL_DEBUG_OUTPUT
+#if ENABLE_GL_DEBUG_OUTPUT
 static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum type,
                                      GLuint id,
                                      GLenum severity,
                                      GLsizei length,
                                      const GLchar* message,
-                                     GLvoid* userParam)
+                                     const GLvoid* userParam)
 {
     char debSource[32] = {0}, debType[32] = {0}, debSev[32] = {0};
 
@@ -505,6 +505,9 @@ namespace Ogre {
         // Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
 
+        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+            rsc->setCapability(RSC_DEBUG);
+
         return rsc;
     }
 
@@ -806,11 +809,6 @@ namespace Ogre {
         }
 
         delete pWin;
-    }
-
-    String GL3PlusRenderSystem::getErrorDescription(long errorNumber) const
-    {
-        return BLANKSTRING;
     }
 
     void GL3PlusRenderSystem::_setPointParameters(Real size,
@@ -2068,9 +2066,9 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
         }
 
-        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
         {
-#if OGRE_DEBUG_MODE && ENABLE_GL_DEBUG_OUTPUT
+#if ENABLE_GL_DEBUG_OUTPUT
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
             OGRE_CHECK_GL_ERROR(glDebugMessageCallbackARB(&GLDebugCallback, NULL));
@@ -2511,16 +2509,14 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
-        markProfileEvent("Begin Event: " + eventName);
-        if (mGLSupport->checkExtension("ARB_debug_group") || mHasGL43)
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
             OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
     }
 
 
     void GL3PlusRenderSystem::endProfileEvent( void )
     {
-        markProfileEvent("End Event");
-        if (mGLSupport->checkExtension("ARB_debug_group") || mHasGL43)
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
             OGRE_CHECK_GL_ERROR(glPopDebugGroup());
     }
 
@@ -2530,11 +2526,11 @@ namespace Ogre {
         if ( eventName.empty() )
             return;
 
-        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
             glDebugMessageInsert(GL_DEBUG_SOURCE_THIRD_PARTY,
                                  GL_DEBUG_TYPE_PERFORMANCE,
-                                 GL_DEBUG_SEVERITY_LOW,
                                  0,
+                                 GL_DEBUG_SEVERITY_LOW,
                                  static_cast<GLint>(eventName.length()),
                                  eventName.c_str());
     }

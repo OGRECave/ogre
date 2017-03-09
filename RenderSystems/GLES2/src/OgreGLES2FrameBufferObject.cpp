@@ -46,11 +46,10 @@ namespace Ogre {
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
-        if(glSupport->checkExtension("GL_EXT_debug_label"))
-        {
-            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
-        }
+	   if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
+       {
+           OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
+       }
 
         // Check multisampling if supported
         GLint maxSamples = 0;
@@ -67,9 +66,8 @@ namespace Ogre {
         if (mNumSamples)
         {
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-            if(glSupport->checkExtension("GL_EXT_debug_label"))
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
             {
-                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
                 OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mMultisampleFB, 0, ("MSAA FBO #" + StringConverter::toString(mMultisampleFB)).c_str()));
             }
         }

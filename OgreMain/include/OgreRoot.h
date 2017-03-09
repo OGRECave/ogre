@@ -456,8 +456,9 @@ namespace Ogre
 
         /** Utility function for getting a better description of an error
             code.
+            @deprecated obsolete API
         */
-        String getErrorDescription(long errorNumber);
+        OGRE_DEPRECATED String getErrorDescription(long errorNumber);
 
         /** Registers a FrameListener which will be called back every frame.
             @remarks

@@ -257,13 +257,13 @@ namespace Ogre {
 #if OGRE_NO_GLES3_SUPPORT == 0
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        // Upload data to PBO
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mBufferId));
+
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
         {
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Pixel Buffer #" + StringConverter::toString(mBufferId)).c_str()));
         }
-
-        // Upload data to PBO
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mBufferId));
 
         // Calculate size for all mip levels of the texture
         size_t dataSize = 0;
@@ -312,6 +312,17 @@ namespace Ogre {
                         "Buffer data corrupted, please reload",
                         "GLES2TextureBuffer::upload");
         }
+        void* pdata = NULL;
+#else
+        void* pdata = data.data;
+#if OGRE_DEBUG_MODE
+        LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
+                                              " Target: " + StringConverter::toString(mTarget) +
+                                              " Format: " + PixelUtil::getFormatName(data.format) +
+                                              " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
+                                              " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
+#endif
+#endif
 
         if (PixelUtil::isCompressed(data.format))
         {
@@ -330,115 +341,31 @@ namespace Ogre {
                                                   dest.left, dest.top,
                                                   dest.getWidth(), dest.getHeight(),
                                                   format, data.getConsecutiveSize(),
-                                                  NULL));
+                                                  pdata));
                     break;
-                case GL_TEXTURE_3D:
                 case GL_TEXTURE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glCompressedTexSubImage3D(mTarget, mLevel,
+#if OGRE_NO_GLES3_SUPPORT == 1
+                    break;
+#endif
+                case GL_TEXTURE_3D_OES:
+                    OGRE_CHECK_GL_ERROR(glCompressedTexSubImage3DOES(mTarget, mLevel,
                                               dest.left, dest.top, dest.front,
                                               dest.getWidth(), dest.getHeight(), dest.getDepth(),
                                               format, data.getConsecutiveSize(),
-                                              NULL));
+                                              pdata));
                     break;
             }
-
         }
         else
         {
+#if OGRE_NO_GLES3_SUPPORT == 0
             if(data.getWidth() != data.rowPitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
             if(data.getHeight()*data.getWidth() != data.slicePitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
             if(data.left > 0 || data.top > 0 || data.front > 0)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-            if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
-                // Standard alignment of 4 is not right
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-            }
-#if OGRE_DEBUG_MODE
-            LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
-                                                  " Target: " + StringConverter::toString(mTarget) +
-                                                  " Format: " + PixelUtil::getFormatName(data.format) +
-                                                  " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
-                                                  " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
-#endif
-            switch(mTarget) {
-                case GL_TEXTURE_2D:
-                case GL_TEXTURE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget, mLevel,
-                                    dest.left, dest.top,
-                                    dest.getWidth(), dest.getHeight(),
-                                    GLES2PixelUtil::getGLOriginFormat(data.format), GLES2PixelUtil::getGLOriginDataType(data.format),
-                                    NULL));
-                    break;
-                case GL_TEXTURE_3D:
-                case GL_TEXTURE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glTexSubImage3D(
-                                    mTarget, mLevel,
-                                    dest.left, dest.top, dest.front,
-                                    dest.getWidth(), dest.getHeight(), dest.getDepth(),
-                                    GLES2PixelUtil::getGLOriginFormat(data.format), GLES2PixelUtil::getGLOriginDataType(data.format),
-                                    NULL));
-                    break;
-            }
-
-            // TU_AUTOMIPMAP is only enabled when there are no custom mips
-            // so we do not have to care about overwriting
-            if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0))
-            {
-                OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
-            }
-        }
-
-        // Delete PBO
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
-        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
-        mBufferId = 0;
-
-        // Restore defaults
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
 #else
-#if OGRE_DEBUG_MODE
-        LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
-                                              " Target: " + StringConverter::toString(mTarget) +
-                                              " Format: " + PixelUtil::getFormatName(data.format) +
-                                              " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
-                                              " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
-#endif
-        if (PixelUtil::isCompressed(data.format))
-        {
-            if(data.format != mFormat || !data.isConsecutive())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Compressed images must be consecutive, in the source format",
-                            "GLES2TextureBuffer::upload");
-
-            GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(mFormat);
-            // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
-            // for compressed formats
-            if (dest.left == 0 && dest.top == 0)
-            {
-                OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(mFaceTarget, mLevel,
-                                       format,
-                                       dest.getWidth(),
-                                       dest.getHeight(),
-                                       0,
-                                       static_cast<GLsizei>(data.getConsecutiveSize()),
-                                       data.data));
-            }
-            else
-            {
-                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage2D(mFaceTarget, mLevel,
-                                          dest.left, dest.top,
-                                          dest.getWidth(), dest.getHeight(),
-                                          format, static_cast<GLsizei>(data.getConsecutiveSize()),
-                                          data.data));
-            }
-        }
-        else
-        {
             if (data.getWidth() != data.rowPitch)
             {
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -452,46 +379,58 @@ namespace Ogre {
                             "Unsupported texture format",
                             "GLES2TextureBuffer::upload");
             }
-
-            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
-            {
+#endif
+            if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
             }
 
-            switch(mTarget)
-            {
+            switch(mTarget) {
                 case GL_TEXTURE_2D:
                 case GL_TEXTURE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget,
-                                    mLevel,
+                    OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget, mLevel,
                                     dest.left, dest.top,
                                     dest.getWidth(), dest.getHeight(),
-                                    GLES2PixelUtil::getGLOriginFormat(data.format),
-                                    GLES2PixelUtil::getGLOriginDataType(data.format),
-                                    data.data));
+                                    GLES2PixelUtil::getGLOriginFormat(data.format), GLES2PixelUtil::getGLOriginDataType(data.format),
+                                    pdata));
                     break;
+                case GL_TEXTURE_2D_ARRAY:
+#if OGRE_NO_GLES3_SUPPORT == 1
+                    break;
+#endif
                 case GL_TEXTURE_3D_OES:
-                    OGRE_CHECK_GL_ERROR(glTexSubImage3DOES(mFaceTarget,
-                                    mLevel,
+                    OGRE_CHECK_GL_ERROR(glTexSubImage3DOES(
+                                    mTarget, mLevel,
                                     dest.left, dest.top, dest.front,
                                     dest.getWidth(), dest.getHeight(), dest.getDepth(),
-                                    GLES2PixelUtil::getGLOriginFormat(data.format),
-                                    GLES2PixelUtil::getGLOriginDataType(data.format),
-                                    data.data));
+                                    GLES2PixelUtil::getGLOriginFormat(data.format), GLES2PixelUtil::getGLOriginDataType(data.format),
+                                    pdata));
                     break;
             }
 
             // TU_AUTOMIPMAP is only enabled when there are no custom mips
             // so we do not have to care about overwriting
-            if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0) && (mTarget == GL_TEXTURE_2D || mTarget == GL_TEXTURE_CUBE_MAP))
+            if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0)
+                    && (!OGRE_NO_GLES3_SUPPORT || mTarget == GL_TEXTURE_2D || mTarget == GL_TEXTURE_CUBE_MAP))
             {
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
             }
         }
 
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
+#if OGRE_NO_GLES3_SUPPORT == 0
+        // Delete PBO
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
+        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
+        mBufferId = 0;
 #endif
+
+        // Restore defaults
+#if OGRE_NO_GLES3_SUPPORT == 0
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
+#endif
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
     }
 
     //-----------------------------------------------------------------------------  
@@ -505,11 +444,13 @@ namespace Ogre {
 #if OGRE_NO_GLES3_SUPPORT == 0
         // Upload data to PBO
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, mBufferId));
+
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
         {
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Pixel Buffer #" + StringConverter::toString(mBufferId)).c_str()));
         }
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, mBufferId));
 
         OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, mSizeInBytes, NULL,
                                          GLES2HardwareBufferManager::getGLUsage(mUsage)));
@@ -682,7 +623,9 @@ namespace Ogre {
     // @author W.J. van der Laan
     void GLES2TextureBuffer::blitFromTexture(GLES2TextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
-        return; // todo - add a shader attach...
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Not implemented",
+                    "GLES2TextureBuffer::blitFromTexture");
+        // todo - add a shader attach...
 //        std::cerr << "GLES2TextureBuffer::blitFromTexture " <<
 //        src->mTextureID << ":" << srcBox.left << "," << srcBox.top << "," << srcBox.right << "," << srcBox.bottom << " " << 
 //        mTextureID << ":" << dstBox.left << "," << dstBox.top << "," << dstBox.right << "," << dstBox.bottom << std::endl;
@@ -1041,9 +984,8 @@ namespace Ogre {
         
         // Generate renderbuffer
         OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &mRenderbufferID));
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
         {
-            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mRenderbufferID, 0, ("RB " + StringConverter::toString(mRenderbufferID) + " MSAA: " + StringConverter::toString(mNumSamples)).c_str()));
         }
 

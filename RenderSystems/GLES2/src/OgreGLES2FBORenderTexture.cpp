@@ -322,13 +322,11 @@ namespace Ogre {
             GLenum fmt = GLES2PixelUtil::getGLOriginFormat((PixelFormat)x);
             GLenum type = GLES2PixelUtil::getGLOriginDataType((PixelFormat)x);
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            if(internalFormat == GL_NONE || fmt == GL_NONE || type == GL_NONE)
-                continue;
-#else
+            // Note: letting PF_UNKNOWN pass here is for pure depth/ stencil formats
+            // however there are reports that this crashes some unspecified android devices
             if((internalFormat == GL_NONE || fmt == GL_NONE || type == GL_NONE) && (x != 0))
                 continue;
-#endif
+
             // No test for compressed formats
             if(PixelUtil::isCompressed((PixelFormat)x))
                 continue;

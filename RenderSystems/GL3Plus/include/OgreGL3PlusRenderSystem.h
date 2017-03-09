@@ -205,8 +205,6 @@ namespace Ogre {
 
         void destroyRenderWindow(const String& name);
 
-        String getErrorDescription(long errorNumber) const;
-
         // -----------------------------
         // Low-level overridden members
         // -----------------------------

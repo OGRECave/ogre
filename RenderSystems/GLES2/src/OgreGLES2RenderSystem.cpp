@@ -87,6 +87,7 @@ static void gl2ext_to_gl3core() {
     glTexImage3DOES = (PFNGLTEXIMAGE3DOESPROC)glTexImage3D;
     glCompressedTexImage3DOES = glCompressedTexImage3D;
     glTexSubImage3DOES = glTexSubImage3D;
+    glCompressedTexSubImage3DOES = glCompressedTexSubImage3D;
 
     glFenceSyncAPPLE = glFenceSync;
     glClientWaitSyncAPPLE = glClientWaitSync;
@@ -385,7 +386,9 @@ namespace Ogre {
 
         // Separate shader objects
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects")) {
+        OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+        if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects"))
+        {
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
             rsc->setCapability(RSC_GLSL_SSO_REDECLARE);
         }
@@ -467,6 +470,13 @@ namespace Ogre {
             glDrawElementsInstancedEXT = glDrawElementsInstancedANGLE;
             glDrawArraysInstancedEXT = glDrawArraysInstancedANGLE;
             glVertexAttribDivisorEXT = glVertexAttribDivisorANGLE;
+        }
+
+        if (mGLSupport->checkExtension("GL_EXT_debug_marker") &&
+            mGLSupport->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            rsc->setCapability(RSC_DEBUG);
         }
 
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -768,15 +778,6 @@ namespace Ogre {
             
             ++itMap;
         }
-    }
-    
-    String GLES2RenderSystem::getErrorDescription(long errorNumber) const
-    {
-        // TODO find a way to get error string
-//        const GLubyte *errString = gluErrorString (errCode);
-//        return (errString != 0) ? String((const char*) errString) : BLANKSTRING;
-
-        return BLANKSTRING;
     }
 
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
@@ -2119,13 +2120,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLES2RenderSystem::beginProfileEvent( const String &eventName )
     {
-        if(mGLSupport->checkExtension("GL_EXT_debug_marker"))
+        if(getCapabilities()->hasCapability(RSC_DEBUG))
             glPushGroupMarkerEXT(0, eventName.c_str());
     }
     //---------------------------------------------------------------------
     void GLES2RenderSystem::endProfileEvent( void )
     {
-        if(mGLSupport->checkExtension("GL_EXT_debug_marker"))
+        if(getCapabilities()->hasCapability(RSC_DEBUG))
             glPopGroupMarkerEXT();
     }
     //---------------------------------------------------------------------
@@ -2134,7 +2135,7 @@ namespace Ogre {
         if( eventName.empty() )
             return;
 
-        if(mGLSupport->checkExtension("GL_EXT_debug_marker"))
+        if(getCapabilities()->hasCapability(RSC_DEBUG))
            glInsertEventMarkerEXT(0, eventName.c_str());
     }
     //---------------------------------------------------------------------

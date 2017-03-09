@@ -2163,12 +2163,6 @@ namespace Ogre {
         mColourWrite[3] = alpha;
     }
     //-----------------------------------------------------------------------------
-    String GLRenderSystem::getErrorDescription(long errCode) const
-    {
-        const GLubyte *errString = gluErrorString (errCode);
-        return (errString != 0) ? String((const char*) errString) : BLANKSTRING;
-    }
-    //-----------------------------------------------------------------------------
     void GLRenderSystem::setLightingEnabled(bool enabled)
     {
         mStateCacheManager->setEnabled(GL_LIGHTING, enabled);

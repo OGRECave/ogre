@@ -141,6 +141,9 @@ namespace Ogre {
     {
         OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
 
+        // PBOs have no advantage with this usage pattern
+        // but trigger VIDEO -> HOST transfers with NVIDIA 378.13
+#ifdef USE_PBO
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
         // Use PBO as a texture buffer.
@@ -173,7 +176,7 @@ namespace Ogre {
         // << " format: " << PixelUtil::getFormatName(mFormat);
         // LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
-        void* pBuffer = 0;
+        void* pBuffer = NULL;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(
             GL_PIXEL_UNPACK_BUFFER, 0, dataSize,
             GL_MAP_WRITE_BIT|GL_MAP_INVALIDATE_RANGE_BIT));
@@ -196,6 +199,11 @@ namespace Ogre {
                         "GL3PlusTextureBuffer::upload");
         }
 
+        void* pdata = NULL;
+#else
+        void* pdata = data.data;
+#endif
+
         if (PixelUtil::isCompressed(data.format))
         {
             if (data.format != mFormat || !data.isConsecutive())
@@ -216,7 +224,7 @@ namespace Ogre {
                     dest.left,
                     dest.getWidth(),
                     format, data.getConsecutiveSize(),
-                    NULL));
+                    pdata));
                 break;
             case GL_TEXTURE_2D:
             case GL_TEXTURE_CUBE_MAP:
@@ -226,7 +234,7 @@ namespace Ogre {
                     dest.left, dest.top,
                     dest.getWidth(), dest.getHeight(),
                     format, data.getConsecutiveSize(),
-                    NULL));
+                    pdata));
                 break;
             case GL_TEXTURE_3D:
             case GL_TEXTURE_2D_ARRAY:
@@ -235,7 +243,7 @@ namespace Ogre {
                     dest.left, dest.top, dest.front,
                     dest.getWidth(), dest.getHeight(), dest.getDepth(),
                     format, data.getConsecutiveSize(),
-                    NULL));
+                    pdata));
                 break;
             }
 
@@ -280,7 +288,7 @@ namespace Ogre {
                     dest.getWidth(),
                     GL3PlusPixelUtil::getGLOriginFormat(data.format),
                     type,
-                    NULL));
+                    pdata));
                 break;
             case GL_TEXTURE_2D:
             case GL_TEXTURE_CUBE_MAP:
@@ -291,7 +299,7 @@ namespace Ogre {
                     dest.getWidth(), dest.getHeight(),
                     GL3PlusPixelUtil::getGLOriginFormat(data.format),
                     type,
-                    NULL));
+                    pdata));
                 break;
             case GL_TEXTURE_3D:
             case GL_TEXTURE_2D_ARRAY:
@@ -301,7 +309,7 @@ namespace Ogre {
                     dest.getWidth(), dest.getHeight(), dest.getDepth(),
                     GL3PlusPixelUtil::getGLOriginFormat(data.format),
                     type,
-                    NULL));
+                    pdata));
                 break;
             }
         }
@@ -313,10 +321,12 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
         }
 
+#ifdef USE_PBO
         // Delete PBO.
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
         mBufferId = 0;
+#endif
 
         // Restore defaults.
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));

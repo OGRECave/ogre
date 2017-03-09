@@ -44,12 +44,6 @@ namespace Ogre {
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
-        {
-            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Uniform Buffer #" + StringConverter::toString(mBufferId)).c_str()));
-        }
-
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -58,6 +52,12 @@ namespace Ogre {
         }
 
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
+
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
+        {
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Uniform Buffer #" + StringConverter::toString(mBufferId)).c_str()));
+        }
+
         OGRE_CHECK_GL_ERROR(glBufferData(GL_UNIFORM_BUFFER, mSizeInBytes, NULL,
                                          GLES2HardwareBufferManager::getGLUsage(usage)));
 

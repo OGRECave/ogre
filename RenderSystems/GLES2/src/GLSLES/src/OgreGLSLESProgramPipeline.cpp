@@ -48,8 +48,7 @@ namespace Ogre
     GLSLESProgramPipeline::~GLSLESProgramPipeline()
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-            OGRE_CHECK_GL_ERROR(glDeleteProgramPipelinesEXT(1, &mGLProgramPipelineHandle));
+        OGRE_CHECK_GL_ERROR(glDeleteProgramPipelinesEXT(1, &mGLProgramPipelineHandle));
 #endif
     }
 
@@ -164,11 +163,10 @@ namespace Ogre
 
             // Validate pipeline
             GLSLES::logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
-            if(getVertexProgram() && mFragmentProgram && getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+            if(getVertexProgram() && mFragmentProgram && Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
             {
-                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-                    glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
-                                 (getVertexProgram()->getName() + "/" + mFragmentProgram->getName()).c_str());
+                glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
+                             (getVertexProgram()->getName() + "/" + mFragmentProgram->getName()).c_str());
             }
         }
 #endif
