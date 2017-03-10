@@ -931,7 +931,7 @@ namespace Ogre {
             glSupport->getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000);
 
         // Allocate texture memory
-#if OGRE_NO_GLES3_SUPPORT == 0 && 0
+#if OGRE_NO_GLES3_SUPPORT == 0
         if(src.getDepth() != 1)
         {
             OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, 1, format, GLsizei(width), GLsizei(height), GLsizei(depth)));
