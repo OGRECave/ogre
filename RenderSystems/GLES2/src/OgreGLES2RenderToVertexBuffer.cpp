@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 #include "OgreGLES2RenderToVertexBuffer.h"
 
-#if OGRE_NO_GLES3_SUPPORT == 0
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLES2HardwareVertexBuffer.h"
 #include "OgreGLES2VertexDeclaration.h"
@@ -282,4 +281,3 @@ namespace Ogre {
         }
     }
 }
-#endif

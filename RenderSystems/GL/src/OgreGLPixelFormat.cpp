@@ -315,7 +315,7 @@ namespace Ogre  {
             return PF_A4R4G4B4;
         case GL_RGB8:
         case GL_SRGB8:
-            return PF_X8R8G8B8;
+            return PF_R8G8B8;
         case GL_RGBA8:
         case GL_SRGB8_ALPHA8:
             return PF_A8R8G8B8;

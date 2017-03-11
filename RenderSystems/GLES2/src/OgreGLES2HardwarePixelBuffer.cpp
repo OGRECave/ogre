@@ -179,11 +179,7 @@ namespace Ogre {
         if(mHeight < 1)
             mHeight = 1;
 
-#if OGRE_NO_GLES3_SUPPORT == 0
         if(target != GL_TEXTURE_3D_OES && target != GL_TEXTURE_2D_ARRAY)
-#else
-        if(target != GL_TEXTURE_3D_OES)
-#endif
             mDepth = 1; // Depth always 1 for non-3D textures
         else
             mDepth = depth;
@@ -254,6 +250,8 @@ namespace Ogre {
     void GLES2TextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
         getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+
+        bool hasGLES30 = getGLES2SupportRef()->hasMinGLVersion(3, 0);
 #if OGRE_NO_GLES3_SUPPORT == 0
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
@@ -344,9 +342,9 @@ namespace Ogre {
                                                   pdata));
                     break;
                 case GL_TEXTURE_2D_ARRAY:
-#if OGRE_NO_GLES3_SUPPORT == 1
-                    break;
-#endif
+                    if(!hasGLES30)
+                        break;
+                    /* no break */
                 case GL_TEXTURE_3D_OES:
                     OGRE_CHECK_GL_ERROR(glCompressedTexSubImage3DOES(mTarget, mLevel,
                                               dest.left, dest.top, dest.front,
@@ -358,28 +356,28 @@ namespace Ogre {
         }
         else
         {
-#if OGRE_NO_GLES3_SUPPORT == 0
-            if(data.getWidth() != data.rowPitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
-            if(data.getHeight()*data.getWidth() != data.slicePitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-            if(data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-#else
             if (data.getWidth() != data.rowPitch)
             {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Unsupported texture format",
-                            "GLES2TextureBuffer::upload");
+                if(!hasGLES30)
+                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                                "Unsupported texture format",
+                                "GLES2TextureBuffer::upload");
+
+                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch))
             }
 
             if (data.getHeight() * data.getWidth() != data.slicePitch)
             {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Unsupported texture format",
-                            "GLES2TextureBuffer::upload");
+                if(!hasGLES30)
+                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                                "Unsupported texture format",
+                                "GLES2TextureBuffer::upload");
+                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
             }
-#endif
+
+            if(hasGLES30 && (data.left > 0 || data.top > 0 || data.front > 0))
+                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
+
             if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
@@ -395,9 +393,9 @@ namespace Ogre {
                                     pdata));
                     break;
                 case GL_TEXTURE_2D_ARRAY:
-#if OGRE_NO_GLES3_SUPPORT == 1
-                    break;
-#endif
+                    if(!hasGLES30)
+                        break;
+                    /* no break */
                 case GL_TEXTURE_3D_OES:
                     OGRE_CHECK_GL_ERROR(glTexSubImage3DOES(
                                     mTarget, mLevel,
@@ -411,7 +409,7 @@ namespace Ogre {
             // TU_AUTOMIPMAP is only enabled when there are no custom mips
             // so we do not have to care about overwriting
             if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0)
-                    && (!OGRE_NO_GLES3_SUPPORT || mTarget == GL_TEXTURE_2D || mTarget == GL_TEXTURE_CUBE_MAP))
+                    && (hasGLES30 || mTarget == GL_TEXTURE_2D || mTarget == GL_TEXTURE_CUBE_MAP))
             {
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
             }
@@ -425,11 +423,12 @@ namespace Ogre {
 #endif
 
         // Restore defaults
-#if OGRE_NO_GLES3_SUPPORT == 0
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
-#endif
+        if(hasGLES30) {
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
+        }
+
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
     }
 
@@ -931,7 +930,7 @@ namespace Ogre {
             glSupport->getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000);
 
         // Allocate texture memory
-#if OGRE_NO_GLES3_SUPPORT == 0 && 0
+#if OGRE_NO_GLES3_SUPPORT == 0
         if(src.getDepth() != 1)
         {
             OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, 1, format, GLsizei(width), GLsizei(height), GLsizei(depth)));

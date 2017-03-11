@@ -374,6 +374,8 @@ namespace Ogre {
         rsc->addShaderProfile("glsl");
 
         // Support for specific shader profiles
+        if (getNativeShadingLanguageVersion() >= 450)
+            rsc->addShaderProfile("glsl450");
         if (getNativeShadingLanguageVersion() >= 440)
             rsc->addShaderProfile("glsl440");
         if (getNativeShadingLanguageVersion() >= 430)

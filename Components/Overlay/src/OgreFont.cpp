@@ -276,10 +276,10 @@ namespace Ogre
 
         FT_Pos max_height = 0, max_width = 0;
 
-        // Backwards compatibility - if codepoints not supplied, assume 33-166
+        // If codepoints not supplied, assume ASCII
         if (mCodePointRangeList.empty())
         {
-            mCodePointRangeList.push_back(CodePointRange(33, 166));
+            mCodePointRangeList.push_back(CodePointRange(33, 126));
         }
 
         // Calculate maximum width, height and bearing

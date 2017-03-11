@@ -42,9 +42,7 @@ protected:
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") && 
             !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150") &&
-#if OGRE_NO_GLES3_SUPPORT == 0
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsles") &&
-#endif
+            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("gp4fp"))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "

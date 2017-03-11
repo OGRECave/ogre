@@ -52,19 +52,19 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("GL_RENDERER = " + tmpStr);
 
         // Set extension list
-        StringStream ext;
+        Log::Stream log = LogManager::getSingleton().stream();
         String str;
 
         GLint numExt;
         glGetIntegerv(GL_NUM_EXTENSIONS, &numExt);
 
-        LogManager::getSingleton().logMessage("GL_EXTENSIONS = ");
+        log << "GL_EXTENSIONS = ";
         for(int i = 0; i < numExt; i++)
         {
             const GLubyte* pcExt = glGetStringi(GL_EXTENSIONS, i);
             assert(pcExt && "Problems getting GL extension string using glGetString");
             str = String((const char*)pcExt);
-            LogManager::getSingleton().logMessage(str);
+            log << str << " ";
             extensionList.insert(str);
         }
     }
