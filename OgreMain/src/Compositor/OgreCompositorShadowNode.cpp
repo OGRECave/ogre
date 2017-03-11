@@ -93,6 +93,7 @@ namespace Ogre
                                                 StringConverter::toString( id ) + " Map " +
                                                 StringConverter::toString( shadowMapIdx ), false );
             shadowMapCamera.camera->setFixedYawAxis( false );
+            shadowMapCamera.camera->setAutoAspectRatio( true );
             shadowMapCamera.minDistance = 0.0f;
             shadowMapCamera.maxDistance = 100000.0f;
 
