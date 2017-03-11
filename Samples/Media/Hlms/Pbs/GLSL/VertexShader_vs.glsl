@@ -139,7 +139,8 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @end
 @piece( ShadowReceive )
 @foreach( hlms_num_shadow_map_lights, n )
-	outVs.posL@n = vec4(worldPos.xyz, 1.0f) * passBuf.shadowRcv[@n].texViewProj;@end
+	@property( !hlms_shadowmap@n_is_point_light )
+		outVs.posL@n = vec4(worldPos.xyz, 1.0f) * passBuf.shadowRcv[@n].texViewProj;@end @end
 @end
 
 void main()
@@ -169,18 +170,26 @@ void main()
 @property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
 @foreach( hlms_num_shadow_map_lights, n )
-	outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;
-	outVs.posL@n.z = (outVs.posL@n.z * 0.5) + 0.5;@end
+	@property( !hlms_shadowmap@n_is_point_light )
+		outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;
+		outVs.posL@n.z = (outVs.posL@n.z * 0.5) + 0.5;
+	@end
+@end
 
 @property( hlms_pssm_splits )	outVs.depth = gl_Position.z;@end
 
 @end @property( hlms_shadowcaster )
     float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[drawId].y );
 
-	@property( !hlms_shadow_uses_depth_texture )
+	@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point )
 		//Linear depth
 		outVs.depth	= (gl_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
 		outVs.depth = (outVs.depth * 0.5) + 0.5;
+	@end
+
+	@property( hlms_shadowcaster_point )
+		outVs.toCameraWS	= worldPos.xyz - passBuf.cameraPosWS.xyz;
+		outVs.constBias		= shadowConstantBias * passBuf.depthRange.y * passBuf.depthRange.y;
 	@end
 
 	//We can't make the depth buffer linear without Z out in the fragment shader;

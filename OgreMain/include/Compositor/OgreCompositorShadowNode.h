@@ -102,6 +102,10 @@ namespace Ogre
             /// TexturePtr is at mLocalTextures[idxToLocalTextures]
             uint32                  idxToLocalTextures;
             /// Index to mContiguousShadowMapTex[idxToContiguousTex]
+            /// mContiguousShadowMapTex keeps them together for binding quickly
+            /// during render.
+            /// Several shadow maps may reference the same texture (i.e. UV atlas)
+            /// Hence the need for this idx variable.
             uint32                  idxToContiguousTex;
             /// @See ShadowCameraSetup mMinDistance
             Real                    minDistance;
@@ -122,8 +126,9 @@ namespace Ogre
         Camera const *          mLastCamera;
         size_t                  mLastFrame;
         size_t                  mNumActiveShadowMapCastingLights;
+        /// mShadowMapCastingLights may have gaps (can happen if no light of
+        /// the types the shadow map supports could be assigned at this slot)
         LightClosestArray       mShadowMapCastingLights;
-        FastArray<uint8>        mShadowMap;
         vector<size_t>::type    mTmpSortedIndexes;
 
         /** Cached value. Contains the aabb of all caster-only objects (filtered by

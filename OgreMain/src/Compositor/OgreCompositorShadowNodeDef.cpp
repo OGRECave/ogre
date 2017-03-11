@@ -148,15 +148,21 @@ namespace Ogre
                 if( pass->mShadowMapIdx < mShadowMapTexDefinitions.size() )
                 {
                     const ShadowTextureDefinition &texDef = mShadowMapTexDefinitions[pass->mShadowMapIdx];
-                    pass->mVpLeft   = static_cast<float>( texDef.uvOffset.x );
-                    pass->mVpTop    = static_cast<float>( texDef.uvOffset.y );
-                    pass->mVpWidth  = static_cast<float>( texDef.uvLength.x );
-                    pass->mVpHeight = static_cast<float>( texDef.uvLength.y );
 
-                    pass->mVpScissorLeft   = pass->mVpLeft;
-                    pass->mVpScissorTop    = pass->mVpTop;
-                    pass->mVpScissorWidth  = pass->mVpWidth;
-                    pass->mVpScissorHeight = pass->mVpHeight;
+                    if( itor->getRenderTargetName() == texDef.getTextureName() )
+                    {
+                        //Only force the viewport settings to the passes
+                        //that directly rendering into the atlas
+                        pass->mVpLeft   = static_cast<float>( texDef.uvOffset.x );
+                        pass->mVpTop    = static_cast<float>( texDef.uvOffset.y );
+                        pass->mVpWidth  = static_cast<float>( texDef.uvLength.x );
+                        pass->mVpHeight = static_cast<float>( texDef.uvLength.y );
+
+                        pass->mVpScissorLeft   = pass->mVpLeft;
+                        pass->mVpScissorTop    = pass->mVpTop;
+                        pass->mVpScissorWidth  = pass->mVpWidth;
+                        pass->mVpScissorHeight = pass->mVpHeight;
+                    }
 
                     if( texDef.shadowMapTechnique == SHADOWMAP_PSSM )
                     {

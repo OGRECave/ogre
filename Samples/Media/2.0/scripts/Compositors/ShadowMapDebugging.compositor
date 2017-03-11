@@ -4,7 +4,6 @@ compositor_node ShadowMapDebuggingRenderingNode
 
 	target rt_renderwindow
 	{
-		
 		pass clear
 		{
 			colour_value 0.2 0.4 0.6 1
@@ -20,11 +19,56 @@ compositor_node ShadowMapDebuggingRenderingNode
 
 abstract target cubemap_target
 {
-	pass clear {}
-	pass render_scene {}
+	pass clear { colour_value 1 1 1 1 }
+	pass render_scene
+	{
+		camera_cubemap_reorient true
+	}
 }
 
 compositor_node_shadow ShadowMapDebuggingShadowNode
+{
+	technique focused
+
+	texture atlas 4096 2048 PF_D32_FLOAT
+	texture tmpCubemap 1024 1024 PF_FLOAT32_R cubemap
+
+	num_splits		3
+	pssm_lambda		0.95
+	shadow_map 0 atlas uv 0.0 0.0 1.0 1.0 light 0
+
+	target atlas
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+	}
+
+	shadow_map_target_type point
+	{
+		shadow_map_repeat 0
+		{
+			target tmpCubemap +X : cubemap_target {}
+			target tmpCubemap -X : cubemap_target {}
+			target tmpCubemap +Y : cubemap_target {}
+			target tmpCubemap -Y : cubemap_target {}
+			target tmpCubemap +Z : cubemap_target {}
+			target tmpCubemap -Z : cubemap_target {}
+
+			shadow_map
+			{
+				pass render_quad
+				{
+					material Ogre/DPSM/CubeToDpsm
+					input 0 tmpCubemap
+				}
+			}
+		}
+	}
+}
+
+compositor_node_shadow ShadowMapDebuggingShadowNode3
 {
 	technique pssm
 
@@ -84,7 +128,7 @@ compositor_node_shadow ShadowMapDebuggingShadowNode
 			{
 				pass render_quad
 				{
-					material dpsm/converter
+					material Ogre/DPSM/CubeToDpsm
 					input 0 tmpCubemap
 				}
 			}

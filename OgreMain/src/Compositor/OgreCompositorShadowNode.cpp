@@ -106,6 +106,7 @@ namespace Ogre
                                                 StringConverter::toString( id ) + " Map " +
                                                 StringConverter::toString( shadowMapIdx ), false );
             shadowMapCamera.camera->setFixedYawAxis( false );
+            shadowMapCamera.camera->setAutoAspectRatio( true );
             shadowMapCamera.minDistance = 0.0f;
             shadowMapCamera.maxDistance = 100000.0f;
             for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
@@ -536,6 +537,9 @@ namespace Ogre
                 const CompositorTargetDef *targetPass = passDef->getParentTargetDef();
                 uint8 lightTypesLeft = targetPass->getShadowMapSupportedLightTypes();
 
+                //Get the viewport size set for this shadow node (which may vary per light type,
+                //but for the same light type, it must remain constant for all passes to the
+                //same shadow map)
                 uint32 firstBitSet = ctz( lightTypesLeft );
                 while( firstBitSet != 32u )
                 {

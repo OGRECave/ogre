@@ -338,7 +338,7 @@ void main()
 	if( fDistance <= passBuf.lights[@n].attenuation.x )
 	{
 		lightDir *= 1.0 / fDistance;
-		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular )@insertpiece( DarkenWithShadow );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular )@insertpiece( DarkenWithShadowPoint );
 		float atten = 1.0 / (0.5 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
@@ -482,6 +482,10 @@ void main()
 		@property( detail_map@n )uint detailMapIdx@n;@end @end
 @end
 
+@property( hlms_shadowcaster_point )
+	@insertpiece( PassDecl )
+@end
+
 void main()
 {
 	@insertpiece( custom_ps_preExecution )
@@ -535,9 +539,15 @@ void main()
 		discard;
 @end /// !alpha_test
 
-@property( !hlms_render_depth_only )
+@property( !hlms_render_depth_only && !hlms_shadowcaster_point )
 	@property( GL3+ )outColour = inPs.depth;@end
 	@property( !GL3+ )gl_FragColor.x = inPs.depth;@end
+@end
+
+@property( hlms_shadowcaster_point )
+	float distanceToCamera = length( inPs.toCameraWS );
+	@property( GL3+ )outColour = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;@end
+	@property( !GL3+ )gl_FragColor.x = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;@end
 @end
 
 	@insertpiece( custom_ps_posExecution )

@@ -26,6 +26,10 @@ layout(binding = 0) uniform PassBuffer
 	//Vertex shader (common to both receiver and casters)
 	mat4 viewProj;
 
+@property( hlms_shadowcaster_point )
+	vec4 cameraPosWS;	//Camera position in world space
+@end
+
 @property( !hlms_shadowcaster )
 	//Vertex shader
 	mat4 view;
@@ -165,7 +169,8 @@ layout(binding = 3) uniform ManualProbe
 			vec@value( hlms_uv_count@n ) uv@n;@end
 
 		@foreach( hlms_num_shadow_map_lights, n )
-			vec4 posL@n;@end
+			@property( !hlms_shadowmap@n_is_point_light )
+				vec4 posL@n;@end @end
 		@property( hlms_pssm_splits )float depth;@end
 	@end
 	@property( hlms_shadowcaster )
@@ -174,8 +179,12 @@ layout(binding = 3) uniform ManualProbe
 			@foreach( hlms_uv_count, n )
 				vec@value( hlms_uv_count@n ) uv@n;@end
 		@end
-		@property( !hlms_shadow_uses_depth_texture )
+		@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point )
 			float depth;
+		@end
+		@property( hlms_shadowcaster_point )
+			vec3 toCameraWS;
+			flat float constBias;
 		@end
 	@end
 	@insertpiece( custom_VStoPS )

@@ -835,6 +835,8 @@ namespace Ogre
         int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
+        bool isShadowCastingPointLight = false;
+
         //mat4 viewProj;
         size_t mapSize = 16 * 4;
 
@@ -898,6 +900,10 @@ namespace Ogre
         }
         else
         {
+            isShadowCastingPointLight = getProperty( HlmsBaseProp::ShadowCasterPoint ) != 0;
+            //vec4 cameraPosWS
+            if( isShadowCastingPointLight )
+                mapSize += 4 * 4;
             mapSize += (2 + 2) * 4;
         }
 
@@ -930,6 +936,16 @@ namespace Ogre
         Matrix4 viewProjMatrix = projectionMatrix * viewMatrix;
         for( size_t i=0; i<16; ++i )
             *passBufferPtr++ = (float)viewProjMatrix[0][i];
+
+        //vec4 cameraPosWS;
+        if( isShadowCastingPointLight )
+        {
+            const Vector3 &camPos = camera->getDerivedPosition();
+            *passBufferPtr++ = (float)camPos.x;
+            *passBufferPtr++ = (float)camPos.y;
+            *passBufferPtr++ = (float)camPos.z;
+            *passBufferPtr++ = 1.0f;
+        }
 
         mPreparedPass.viewMatrix        = viewMatrix;
 

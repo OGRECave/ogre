@@ -112,6 +112,7 @@ namespace Ogre
     const IdString HlmsBaseProp::NumShadowMapTextures= IdString("hlms_num_shadow_map_textures" );
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
+    const IdString HlmsBaseProp::ShadowCasterPoint  = IdString( "hlms_shadowcaster_point" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
     const IdString HlmsBaseProp::PrePass            = IdString( "hlms_prepass" );
@@ -2111,6 +2112,7 @@ namespace Ogre
 
                     size_t shadowMapTexIdx = 0;
 
+                    const LightClosestArray &lights = shadowNode->getShadowCastingLights();
                     for( size_t i=0; i<numShadowMapLights; ++i )
                     {
                         //Skip inactive lights (e.g. no directional lights are available
@@ -2172,6 +2174,13 @@ namespace Ogre
                         propName.resize( basePropSize );
                         propName.a( "_array_idx" );
                         setProperty( propName.c_str(), shadowTexDef->arrayIdx );
+
+                        if( lights[shadowTexDef->light].light->getType() == Light::LT_POINT )
+                        {
+                            propName.resize( basePropSize );
+                            propName.a( "_is_point_light" );
+                            setProperty( propName.c_str(), 1 );
+                        }
 
                         ++shadowMapTexIdx;
                     }
@@ -2314,6 +2323,7 @@ namespace Ogre
         else
         {
             setProperty( HlmsBaseProp::ShadowCaster, casterPass );
+            setProperty( HlmsBaseProp::ShadowCasterPoint, casterPass ); //TODO
             setProperty( HlmsBaseProp::DualParaboloidMapping, dualParaboloid );
 
             setProperty( HlmsBaseProp::Forward3D,         0 );
