@@ -574,7 +574,7 @@ void TestContext::finishedTests()
     if ((mGenerateHtml || mSummaryOutputDir != "NONE") && !mReferenceSet)
     {
         const TestBatch* compareTo = 0;
-        TestBatchSetPtr batches;
+        TestBatchSet batches;
 
         Ogre::ConfigFile info;
         bool foundReference = true;
@@ -592,7 +592,7 @@ void TestContext::finishedTests()
             batches = TestBatch::loadTestBatches(mOutputDir);
             
             TestBatchSet::iterator i;
-            for (i = batches->begin(); i != batches->end(); ++i)
+            for (i = batches.begin(); i != batches.end(); ++i)
             {
                 if (mBatch->canCompareWith((*i)))
                 {
@@ -611,7 +611,7 @@ void TestContext::finishedTests()
 
         if (compareTo)
         {
-            ComparisonResultVectorPtr results = mBatch->compare(*compareTo);
+            ComparisonResultVector results = mBatch->compare(*compareTo);
 
             if(mGenerateHtml)
             {
@@ -635,8 +635,8 @@ void TestContext::finishedTests()
                 cppunitWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".xml");
             }
 
-            for(size_t i = 0; i < results->size(); i++) {
-                mSuccess = mSuccess && results->at(i).passed;
+            for(size_t i = 0; i < results.size(); i++) {
+                mSuccess = mSuccess && results[i].passed;
             }
         }
 

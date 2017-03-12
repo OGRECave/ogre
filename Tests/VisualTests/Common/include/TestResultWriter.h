@@ -39,8 +39,10 @@ class TestResultWriter : public Ogre::GeneralAllocatedObject
 {
 public:
 
-    TestResultWriter(const TestBatch& set1, const TestBatch& set2, ComparisonResultVectorPtr results)
+    TestResultWriter(const TestBatch& set1, const TestBatch& set2, const ComparisonResultVector& results)
         :mSet1(set1),mSet2(set2),mResults(results){}
+
+    virtual ~TestResultWriter() {}
 
     virtual void writeToFile(Ogre::String filename)
     {
@@ -59,7 +61,7 @@ protected:
 
     const TestBatch& mSet1;
     const TestBatch& mSet2;
-    ComparisonResultVectorPtr mResults;
+    const ComparisonResultVector& mResults;
 
 };
 

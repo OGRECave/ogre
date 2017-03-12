@@ -37,7 +37,7 @@ class HtmlWriter : public TestResultWriter
 {
 public:
 
-    HtmlWriter(const TestBatch& set1, const TestBatch& set2, ComparisonResultVectorPtr results)
+    HtmlWriter(const TestBatch& set1, const TestBatch& set2, const ComparisonResultVector& results)
         :TestResultWriter(set1, set2, results){}
 
 protected:
@@ -96,16 +96,16 @@ protected:
         size_t numPassed = 0;
         size_t numTests = 0;
 
-        for (unsigned int i = 0; i < mResults->size(); ++i)
+        for (unsigned int i = 0; i < mResults.size(); ++i)
         {
             ++numTests;
-            Ogre::String testName = (*mResults)[i].testName;
+            const Ogre::String& testName = mResults[i].testName;
             bool passed = true;
             unsigned int j = i;
 
-            for (; j < mResults->size() && (*mResults)[j].testName == testName; ++j)
+            for (; j < mResults.size() && mResults[j].testName == testName; ++j)
             {
-                if(!(*mResults)[j].passed)
+                if(!mResults[j].passed)
                     passed = false;
             }
 
@@ -122,30 +122,30 @@ protected:
         
         // add thumbnails
         HtmlElement* thumbs = contentDiv->appendElement("p");
-        for (unsigned int i = 0; i < mResults->size(); ++i)
+        for (unsigned int i = 0; i < mResults.size(); ++i)
         {
             HtmlElement* anchor = thumbs->appendElement("a");
-            anchor->appendAttribute("href", Ogre::String("#") + (*mResults)[i].testName);
-            anchor->appendAttribute("title", (*mResults)[i].testName);
+            anchor->appendAttribute("href", Ogre::String("#") + mResults[i].testName);
+            anchor->appendAttribute("title", mResults[i].testName);
             HtmlElement* img = anchor->appendElement("img");
-            img->appendAttribute("src",mSet2.name + "/" + (*mResults)[i].image);
-            img->appendAttribute("class", (*mResults)[i].passed ? "thumb" : "thumb_fail");
+            img->appendAttribute("src",mSet2.name + "/" + mResults[i].image);
+            img->appendAttribute("class", mResults[i].passed ? "thumb" : "thumb_fail");
         }
 
         // add side-by-side images and summary for each test
-        for (unsigned int i = 0; i < mResults->size(); ++i)
+        for (unsigned int i = 0; i < mResults.size(); ++i)
         {
             
             // since a test can have multiple images, we find all images with this tets name
-            Ogre::String testName = (*mResults)[i].testName;
+            const Ogre::String& testName = mResults[i].testName;
             bool passed = true;
             unsigned int j = i;
-            std::vector<ComparisonResult*> results;
+            std::vector<const ComparisonResult*> results;
 
-            for (; j < mResults->size() && (*mResults)[j].testName == testName; ++j)
+            for (; j < mResults.size() && mResults[j].testName == testName; ++j)
             {
-                results.push_back(&(*mResults)[j]);
-                if(!(*mResults)[j].passed)
+                results.push_back(&mResults[j]);
+                if(!mResults[j].passed)
                     passed = false;
             }
 
@@ -162,7 +162,7 @@ protected:
 
     /** Summarizes the results of a single test (side-by-side images, pass/fail,
      *    more stats and such to come...). Returns an html div with summary markup */
-    HtmlElement* summarizeSingleResult(const std::vector<ComparisonResult*>& result, bool passed, const TestBatch& set1, const TestBatch& set2)
+    HtmlElement* summarizeSingleResult(const std::vector<const ComparisonResult*>& result, bool passed, const TestBatch& set1, const TestBatch& set2)
     {
         // container and header
         HtmlElement* container = OGRE_NEW HtmlElement("div");

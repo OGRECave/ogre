@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 class TestBatch;
 typedef std::set<TestBatch,std::greater<TestBatch> > TestBatchSet;
-typedef Ogre::SharedPtr<TestBatchSet> TestBatchSetPtr;
 
 /** Represents the output from running a batch of tests
  *        (i.e. a single run of the TestContext) */
@@ -124,18 +123,18 @@ public:
     }
 
     /** Does image comparison on all images between these two sets */
-    ComparisonResultVectorPtr compare(const TestBatch& other) const
+    ComparisonResultVector compare(const TestBatch& other) const
     {
-        ComparisonResultVectorPtr out(OGRE_NEW_T(ComparisonResultVector, Ogre::MEMCATEGORY_GENERAL)(), Ogre::SPFM_DELETE_T);
+        ComparisonResultVector out;
         if (!canCompareWith(other))
         {
-            out.reset();
+            out.clear();
         }
         else
         {
             ImageValidator validator = ImageValidator(mDirectory, other.mDirectory);
             for (unsigned int i = 0; i < images.size(); ++i)
-                out->push_back(validator.compare(images[i]));
+                out.push_back(validator.compare(images[i]));
         }
         return out;
     }
@@ -174,9 +173,9 @@ public:
 
     /** Loads all test batches found in a directory and returns a reference counted ptr 
      *    to a set containing all the valid batches */
-    static TestBatchSetPtr loadTestBatches(Ogre::String directory)
+    static TestBatchSet loadTestBatches(Ogre::String directory)
     {
-        TestBatchSetPtr out(OGRE_NEW_T(TestBatchSet, Ogre::MEMCATEGORY_GENERAL)(), Ogre::SPFM_DELETE_T);
+        TestBatchSet out;
         // use ArchiveManager to get a list of all subdirectories
         Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(directory, "FileSystem", true);
         Ogre::StringVectorPtr tests = testDir->list(false, true);
@@ -189,12 +188,12 @@ public:
             {
                 info.load(directory + (*tests)[i] + "/info.cfg");
             }
-            catch (Ogre::FileNotFoundException e)
+            catch (Ogre::FileNotFoundException& e)
             {
                 continue;
             }
 
-            out->insert(TestBatch(info, directory + (*tests)[i]));
+            out.insert(TestBatch(info, directory + (*tests)[i]));
         }
 
         return out;
