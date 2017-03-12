@@ -693,6 +693,20 @@ namespace Ogre
         return 1u << mShadowMapCastingLights[shadowTexDef.light].light->getType();
     }
     //-----------------------------------------------------------------------------------
+    const Light* CompositorShadowNode::getLightAssociatedWith( uint32 shadowMapIdx ) const
+    {
+        Light const *retVal = 0;
+
+        if( shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size() )
+        {
+            const ShadowTextureDefinition &shadowTexDef =
+                    mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+            retVal = mShadowMapCastingLights[shadowTexDef.light].light;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorShadowNode::getMinMaxDepthRange( const Frustum *shadowMapCamera,
                                                     Real &outMin, Real &outMax ) const
     {

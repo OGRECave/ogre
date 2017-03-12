@@ -8,9 +8,13 @@
 	#define hlms_shadowmap@n texShadowMap@value( hlms_shadowmap@n )
 	#define hlms_shadowmap@n_uv_min vec2( @value( hlms_shadowmap@n_uv_min_x_int ).@value( hlms_shadowmap@n_uv_min_x_fract ), @value( hlms_shadowmap@n_uv_min_y_int ).@value( hlms_shadowmap@n_uv_min_y_fract ) )
 	#define hlms_shadowmap@n_uv_max vec2( @value( hlms_shadowmap@n_uv_max_x_int ).@value( hlms_shadowmap@n_uv_max_x_fract ), @value( hlms_shadowmap@n_uv_max_y_int ).@value( hlms_shadowmap@n_uv_max_y_fract ) )
-
 	@property( hlms_shadowmap@n_uvs_fulltex )
-		#define hlms_shadowmap@n_uv_param , hlms_shadowmap@n_uv_min, hlms_shadowmap@n_uv_max
+		@property( hlms_shadowmap@n_is_point_light )
+			#define hlms_shadowmap@n_uv_length vec2( @value( hlms_shadowmap@n_uv_length_x_int ).@value( hlms_shadowmap@n_uv_length_x_fract ), @value( hlms_shadowmap@n_uv_length_y_int ).@value( hlms_shadowmap@n_uv_length_y_fract ) )
+			#define hlms_shadowmap@n_uv_param , hlms_shadowmap@n_uv_min, hlms_shadowmap@n_uv_max, hlms_shadowmap@n_uv_length
+		@end @property( !hlms_shadowmap@n_is_point_light )
+			#define hlms_shadowmap@n_uv_param , hlms_shadowmap@n_uv_min, hlms_shadowmap@n_uv_max
+		@end
 	@end @property( !hlms_shadowmap@n_uvs_fulltex )
 		#define hlms_shadowmap@n_uv_param
 	@end
@@ -127,7 +131,7 @@
 	@end @property( @m == 3 )
 		float getShadowPoint( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
 							  float3 posVS, float3 lightPos, float4 invShadowMapSize, float2 invDepthRange,
-							  SH_HALF2 minUV, SH_HALF2 maxUV )
+							  SH_HALF2 minUV, SH_HALF2 maxUV, SH_HALF2 lengthUV )
 	@end
 	{
 	@property( @m < 2 )
@@ -146,6 +150,8 @@
 		uv.x = (cubemapDir.x / (1.0 + abs( cubemapDir.z ))) * 0.25 +
 				(cubemapDir.z < 0.0 ? SH_HALF( 0.75 ) : SH_HALF( 0.25 ));
 		uv.y = (cubemapDir.y / (1.0 + abs( cubemapDir.z ))) * 0.5 + 0.5;
+
+		@property( @m == 3 )uv.xy = uv.xy * lengthUV.xy + minUV.xy;@end
 	@end
 
 		float retVal = 0;
@@ -242,9 +248,11 @@
 					 passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize
 					 hlms_shadowmap@counter(CurrentShadowMap)_uv_param )
 @end
+
+@pset( CurrentPointLight, hlms_lights_directional_non_caster )
 @piece( DarkenWithShadowPoint )
 		* getShadowPoint( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
-						  inPs.pos.xyz, passBuf.lights[@value(CurrentShadowMap)].position.xyz,
+						  inPs.pos.xyz, passBuf.lights[@counter(CurrentPointLight)].position.xyz,
 						  passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize,
 						  passBuf.shadowRcv[@value(CurrentShadowMap)].shadowDepthRange.xy
 						  hlms_shadowmap@counter(CurrentShadowMap)_uv_param )

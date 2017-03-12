@@ -2112,7 +2112,6 @@ namespace Ogre
 
                     size_t shadowMapTexIdx = 0;
 
-                    const LightClosestArray &lights = shadowNode->getShadowCastingLights();
                     for( size_t i=0; i<numShadowMapLights; ++i )
                     {
                         //Skip inactive lights (e.g. no directional lights are available
@@ -2175,11 +2174,28 @@ namespace Ogre
                         propName.a( "_array_idx" );
                         setProperty( propName.c_str(), shadowTexDef->arrayIdx );
 
-                        if( lights[shadowTexDef->light].light->getType() == Light::LT_POINT )
+                        const Light *light = shadowNode->getLightAssociatedWith( shadowMapTexIdx );
+                        if( light->getType() == Light::LT_POINT )
                         {
                             propName.resize( basePropSize );
                             propName.a( "_is_point_light" );
                             setProperty( propName.c_str(), 1 );
+
+                            fractPart = modff( (float)shadowTexDef->uvLength.x, &intPart );
+                            propName.resize( basePropSize );
+                            propName.a( "_uv_length_x_int" );
+                            setProperty( propName.c_str(), (int32)intPart );
+                            propName.resize( basePropSize );
+                            propName.a( "_uv_length_x_fract" );
+                            setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                            fractPart = modff( (float)shadowTexDef->uvLength.y, &intPart );
+                            propName.resize( basePropSize );
+                            propName.a( "_uv_length_y_int" );
+                            setProperty( propName.c_str(), (int32)intPart );
+                            propName.resize( basePropSize );
+                            propName.a( "_uv_length_y_fract" );
+                            setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
                         }
 
                         ++shadowMapTexIdx;
@@ -2322,8 +2338,19 @@ namespace Ogre
         }
         else
         {
-            setProperty( HlmsBaseProp::ShadowCaster, casterPass );
-            setProperty( HlmsBaseProp::ShadowCasterPoint, casterPass ); //TODO
+            setProperty( HlmsBaseProp::ShadowCaster, 1 );
+
+            const CompositorShadowNode *shadowNode = sceneManager->getCurrentShadowNode();
+            const CompositorPass *pass = sceneManager->getCurrentCompositorPass();
+
+            if( pass )
+            {
+                const uint8 shadowMapIdx = pass->getDefinition()->mShadowMapIdx;
+                const Light *light = shadowNode->getLightAssociatedWith( shadowMapIdx );
+                if( light->getType() == Light::LT_POINT )
+                    setProperty( HlmsBaseProp::ShadowCasterPoint, 1 );
+            }
+
             setProperty( HlmsBaseProp::DualParaboloidMapping, dualParaboloid );
 
             setProperty( HlmsBaseProp::Forward3D,         0 );

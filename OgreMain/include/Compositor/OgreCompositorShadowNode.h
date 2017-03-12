@@ -203,6 +203,12 @@ namespace Ogre
         /// Do not call this if isShadowMapIdxActive == false or isShadowMapIdxInValidRange == false
         uint8 getShadowMapLightTypeMask( uint32 shadowMapIdx ) const;
 
+        /// Note: May return null if there is no such shadowMapIdx, or if there
+        /// is no light that could be linked with that shadow map index.
+        /// i.e. if isShadowMapIdxActive( shadowMapIdx ) is true, then we'll
+        /// return a valid pointer.
+        const Light* getLightAssociatedWith( uint32 shadowMapIdx ) const;
+
         /** Outputs the min & max depth range for the given camera. 0 & 100000 if camera not found
         @remarks
             Performs linear search O(N), except the overload that provides a shadowMapIdx

@@ -100,7 +100,7 @@ namespace Demo
 
         Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
 
-        /*Ogre::Light *light = sceneManager->createLight();
+        Ogre::Light *light = sceneManager->createLight();
         Ogre::SceneNode *lightNode = rootNode->createChildSceneNode();
         lightNode->attachObject( light );
         light->setPowerScale( 1.0f );
@@ -120,10 +120,7 @@ namespace Demo
         light->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
 
-        mLightNodes[1] = lightNode;*/
-
-        Ogre::Light *light = 0;
-        Ogre::SceneNode *lightNode = 0;
+        mLightNodes[1] = lightNode;
 
         light = sceneManager->createLight();
         lightNode = rootNode->createChildSceneNode();
@@ -131,9 +128,8 @@ namespace Demo
         light->setDiffuseColour( 0.2f, 0.4f, 0.8f ); //Cold
         light->setSpecularColour( 0.2f, 0.4f, 0.8f );
         light->setPowerScale( Ogre::Math::PI );
-        light->setType( Ogre::Light::LT_POINT );
+        light->setType( Ogre::Light::LT_SPOTLIGHT );
         lightNode->setPosition( 10.0f, 10.0f, -10.0f );
-        //lightNode->setPosition( 0.0f, 10.0f, 0.0f );
         light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
 
@@ -160,7 +156,7 @@ namespace Demo
                 workspace->findShadowNode( "ShadowMapDebuggingShadowNode" );
         const Ogre::CompositorShadowNodeDef *shadowNodeDef = shadowNode->getDefinition();
 
-        for( int i=0; i<1; ++i )
+        for( int i=0; i<5; ++i )
         {
             const Ogre::String datablockName( "depthShadow" + Ogre::StringConverter::toString( i ) );
             Ogre::HlmsUnlitDatablock *depthShadow = (Ogre::HlmsUnlitDatablock*)hlmsUnlit->createDatablock(
@@ -191,7 +187,7 @@ namespace Demo
         mDebugOverlayPSSM       = overlayManager.create("PSSM Overlays");
         mDebugOverlaySpotlights = overlayManager.create("Spotlight overlays");
 
-        for( int i=0; i<1; ++i )
+        for( int i=0; i<3; ++i )
         {
             // Create a panel
             Ogre::v1::OverlayContainer* panel = static_cast<Ogre::v1::OverlayContainer*>(
@@ -204,7 +200,7 @@ namespace Demo
             mDebugOverlayPSSM->add2D( panel );
         }
 
-        /*for( int i=3; i<5; ++i )
+        for( int i=3; i<5; ++i )
         {
             // Create a panel
             Ogre::v1::OverlayContainer* panel = static_cast<Ogre::v1::OverlayContainer*>(
@@ -215,7 +211,7 @@ namespace Demo
             panel->setDimensions( 1500, 1500 );
             panel->setMaterialName( "depthShadow" + Ogre::StringConverter::toString( i ) );
             mDebugOverlaySpotlights->add2D( panel );
-        }*/
+        }
 
         mDebugOverlayPSSM->show();
         mDebugOverlaySpotlights->show();
