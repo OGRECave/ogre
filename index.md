@@ -14,7 +14,7 @@ The latest stable release is **v1.10.2**. For more information see:
 * [New and Noteworthy](https://github.com/OGRECave/ogre/blob/v1.10.2/Docs/1.10-Notes.md) (compared to v1.9)
 
 ## Try it
-* [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/)
+* [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/) - [Web Assembly & WebGL2](https://ogrecave.github.io/ogre/wasm/)
 * Ubuntu Snap package: `sudo snap install ogre`
 
 ## OpenGL RenderSystem status
