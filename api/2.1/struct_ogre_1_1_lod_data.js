@@ -1,0 +1,28 @@
+var struct_ogre_1_1_lod_data =
+[
+    [ "Edge", "struct_ogre_1_1_lod_data_1_1_edge.html", "struct_ogre_1_1_lod_data_1_1_edge" ],
+    [ "IndexBufferInfo", "struct_ogre_1_1_lod_data_1_1_index_buffer_info.html", "struct_ogre_1_1_lod_data_1_1_index_buffer_info" ],
+    [ "IndexBufferPointer", "union_ogre_1_1_lod_data_1_1_index_buffer_pointer.html", "union_ogre_1_1_lod_data_1_1_index_buffer_pointer" ],
+    [ "Triangle", "struct_ogre_1_1_lod_data_1_1_triangle.html", "struct_ogre_1_1_lod_data_1_1_triangle" ],
+    [ "Vertex", "struct_ogre_1_1_lod_data_1_1_vertex.html", "struct_ogre_1_1_lod_data_1_1_vertex" ],
+    [ "VertexEqual", "struct_ogre_1_1_lod_data_1_1_vertex_equal.html", "struct_ogre_1_1_lod_data_1_1_vertex_equal" ],
+    [ "VertexHash", "struct_ogre_1_1_lod_data_1_1_vertex_hash.html", "struct_ogre_1_1_lod_data_1_1_vertex_hash" ],
+    [ "CollapseCostHeap", "struct_ogre_1_1_lod_data.html#adeaa821fb2b45eb3a22c2155711a9ba5", null ],
+    [ "IndexBufferInfoList", "struct_ogre_1_1_lod_data.html#a63aa238044611f899af901b5aae2a0ba", null ],
+    [ "TriangleList", "struct_ogre_1_1_lod_data.html#a5348da65897ff8c17af1ada6f3d1be3f", null ],
+    [ "UniqueVertexSet", "struct_ogre_1_1_lod_data.html#a449d259cfadb59b1b530e832a2977747", null ],
+    [ "VEdges", "struct_ogre_1_1_lod_data.html#ad442682ce19f3ac65702beb032a7a6df", null ],
+    [ "VertexList", "struct_ogre_1_1_lod_data.html#a32cd8e13260aee70438200ab684d235c", null ],
+    [ "VTriangles", "struct_ogre_1_1_lod_data.html#aed7b2a441e826b40396db08b743f9131", null ],
+    [ "LodData", "struct_ogre_1_1_lod_data.html#a8e9cd1fac7686aa15718a1b4895dd3ba", null ],
+    [ "getVectorIDFromPointer", "struct_ogre_1_1_lod_data.html#ad3c424670454076e0ebf1d4adc87d104", null ],
+    [ "mCollapseCostHeap", "struct_ogre_1_1_lod_data.html#a5cee720aeb853541d042adb33892b1b8", null ],
+    [ "mIndexBufferInfoList", "struct_ogre_1_1_lod_data.html#aff7b5cabe66e52756ffc1449b72672ac", null ],
+    [ "mMeshBoundingSphereRadius", "struct_ogre_1_1_lod_data.html#a0f4bf72e9fc1962cbc394affa672451a", null ],
+    [ "mTriangleList", "struct_ogre_1_1_lod_data.html#a9d0a2e539c50b250ae2ed5e0ca0b5037", null ],
+    [ "mUniqueVertexSet", "struct_ogre_1_1_lod_data.html#a97a93af607bf6c7fe8729d7032a43ee7", null ],
+    [ "mUseVertexNormals", "struct_ogre_1_1_lod_data.html#a41b7354e21e31fdffdbf57a3e2726936", null ],
+    [ "mVertexList", "struct_ogre_1_1_lod_data.html#a3cb3b991e80bfd68dae64c445b9743ed", null ],
+    [ "NEVER_COLLAPSE_COST", "struct_ogre_1_1_lod_data.html#a45d49919b94ad00023a4500cc9eaa241", null ],
+    [ "UNINITIALIZED_COLLAPSE_COST", "struct_ogre_1_1_lod_data.html#af95ac40c4f3bdd402aa2e0cc1e25fc9c", null ]
+];

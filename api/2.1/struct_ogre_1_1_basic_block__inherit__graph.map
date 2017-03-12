@@ -1,0 +1,5 @@
+<map id="Ogre::BasicBlock" name="Ogre::BasicBlock">
+<area shape="rect" id="node2" href="$struct_ogre_1_1_hlms_blendblock.html" title="A blend block contains settings that rarely change, and thus are common to many materials. " alt="" coords="5,80,172,107"/>
+<area shape="rect" id="node3" href="$struct_ogre_1_1_hlms_macroblock.html" title="A macro block contains settings that will rarely change, and thus are common to many materials..." alt="" coords="197,80,367,107"/>
+<area shape="rect" id="node4" href="$struct_ogre_1_1_hlms_samplerblock.html" title="A sampler block contains settings that go hand in hand with a texture, and thus are common to many te..." alt="" coords="391,80,575,107"/>
+</map>

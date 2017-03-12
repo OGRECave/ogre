@@ -1,0 +1,4 @@
+<map id="Ogre::CompositorPassStencil" name="Ogre::CompositorPassStencil">
+<area shape="rect" id="node2" href="$class_ogre_1_1_compositor_pass.html" title="Abstract class for compositor passes. " alt="" coords="27,80,194,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="34,5,187,32"/>
+</map>

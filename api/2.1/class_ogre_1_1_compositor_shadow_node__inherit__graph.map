@@ -1,0 +1,5 @@
+<map id="Ogre::CompositorShadowNode" name="Ogre::CompositorShadowNode">
+<area shape="rect" id="node2" href="$class_ogre_1_1_compositor_node.html" title="Compositor nodes are the core subject of compositing. " alt="" coords="75,80,246,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,5,159,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_id_object.html" title="Ogre::IdObject" alt="" coords="183,5,298,32"/>
+</map>

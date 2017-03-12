@@ -1,0 +1,50 @@
+<map id="Ogre::StringInterface" name="Ogre::StringInterface">
+<area shape="rect" id="node2" href="$class_ogre_1_1_external_texture_source.html" title="IMPORTANT: Plugins must override default dictionary name! Base class that texture plugins derive from..." alt="" coords="215,457,425,484"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_particle_affector.html" title="Abstract class defining the interface to be implemented by particle affectors. " alt="" coords="239,508,401,535"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_particle_emitter.html" title="Abstract class defining the interface to be implemented by particle emitters. " alt="" coords="241,559,399,585"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_particle_system.html" title="Class defining particle system based special effects. " alt="" coords="241,609,399,636"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_particle_system_renderer.html" title="Abstract class defining the interface required to be implemented by classes which provide rendering c..." alt="" coords="211,660,429,687"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource (e.g. " alt="" coords="259,711,381,737"/>
+<area shape="rect" id="node46" href="$class_ogre_1_1v1_1_1_overlay_element.html" title="Abstract definition of a 2D element to be displayed in an Overlay. " alt="" coords="225,1001,415,1028"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1v1_1_1_billboard_particle_renderer.html" title="Specialisation of ParticleSystemRenderer to render particles using a BillboardSet. " alt="" coords="481,409,673,450"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_font.html" title="Class representing a font in the system. " alt="" coords="531,475,622,501"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_gpu_program.html" title="Defines a program which runs on the GPU such as a vertex or fragment program. " alt="" coords="505,525,648,552"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_material.html" title="Class encapsulates rendering properties of an object. " alt="" coords="519,660,634,687"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_mesh.html" title="Resource holding data about 3D mesh. " alt="" coords="529,711,625,737"/>
+<area shape="rect" id="node33" href="$class_ogre_1_1_texture.html" title="Abstract class representing a Texture resource. " alt="" coords="521,761,632,788"/>
+<area shape="rect" id="node42" href="$class_ogre_1_1v1_1_1_mesh.html" title="Resource holding data about 3D mesh. " alt="" coords="517,824,637,851"/>
+<area shape="rect" id="node44" href="$class_ogre_1_1v1_1_1_skeleton.html" title="A collection of OldBone objects used to animate a skinned mesh. " alt="" coords="505,900,648,927"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_d3_d11_gpu_program.html" title="Direct3D implementation of a few things common to low&#45;level vertex &amp; fragment programs. " alt="" coords="744,132,931,159"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_d3_d9_gpu_program.html" title="Direct3D implementation of a few things common to low&#45;level vertex &amp; fragment programs. " alt="" coords="748,309,927,336"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_g_l3_plus_gpu_program.html" title="Generalised low&#45;level GL program, can be applied to multiple types (eg ARB and NV) ..." alt="" coords="740,385,935,412"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_g_l_e_s2_gpu_program.html" title="Generalised low&#45;level GL program, can be applied to multiple types (eg ARB and NV) ..." alt="" coords="746,487,929,513"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_high_level_gpu_program.html" title="Abstract base class representing a high&#45;level program (a vertex or fragment program). " alt="" coords="734,563,941,589"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_d3_d11_gpu_domain_program.html" title="Direct3D implementation of low&#45;level vertex programs. " alt="" coords="1005,5,1243,32"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_d3_d11_gpu_fragment_program.html" title="Direct3D implementation of low&#45;level fragment programs. " alt="" coords="999,56,1249,83"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_d3_d11_gpu_geometry_program.html" title="Direct3D implementation of low&#45;level geometry programs. " alt="" coords="999,107,1249,133"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_d3_d11_gpu_hull_program.html" title="Direct3D implementation of low&#45;level vertex programs. " alt="" coords="1018,157,1230,184"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_d3_d11_gpu_vertex_program.html" title="Direct3D implementation of low&#45;level vertex programs. " alt="" coords="1009,208,1239,235"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_d3_d9_gpu_fragment_program.html" title="Direct3D implementation of low&#45;level fragment programs. " alt="" coords="1003,259,1245,285"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_d3_d9_gpu_vertex_program.html" title="Direct3D implementation of low&#45;level vertex programs. " alt="" coords="1013,309,1235,336"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_g_l_s_l_gpu_program.html" title="GLSL low level compiled shader object &#45; this class is used to get at the linked program object and pr..." alt="" coords="1037,360,1211,387"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_g_l_s_l_e_s_gpu_program.html" title="GLSL ES low level compiled shader object &#45; this class is used to get at the linked program object and..." alt="" coords="1029,411,1219,437"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_d3_d11_h_l_s_l_program.html" title="Specialization of HighLevelGpuProgram to provide support for D3D11 High&#45;Level Shader Language (HLSL)..." alt="" coords="1028,461,1220,488"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_d3_d9_h_l_s_l_program.html" title="Specialisation of HighLevelGpuProgram to provide support for D3D9 High&#45;Level Shader Language (HLSL)..." alt="" coords="1032,512,1216,539"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_g_l_s_l_program.html" title="C++ encapsulation of GLSL program object. " alt="" coords="1050,563,1198,589"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_g_l_s_l_shader.html" title="Specialisation of HighLevelGpuProgram to encapsulate shader objects obtained from compiled shaders wr..." alt="" coords="1055,613,1193,640"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_metal_program.html" title="Specialisation of HighLevelGpuProgram to provide support for Metal Shader Language. " alt="" coords="1047,664,1201,691"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1_unified_high_level_gpu_program.html" title="Specialisation of HighLevelGpuProgram which just delegates its implementation to one other high level..." alt="" coords="1025,715,1223,757"/>
+<area shape="rect" id="node34" href="$class_ogre_1_1_d3_d11_texture.html" title="Ogre::D3D11Texture" alt="" coords="760,660,915,687"/>
+<area shape="rect" id="node37" href="$class_ogre_1_1_d3_d9_texture.html" title="Ogre::D3D9Texture" alt="" coords="764,711,911,737"/>
+<area shape="rect" id="node38" href="$class_ogre_1_1_g_l3_plus_texture.html" title="Ogre::GL3PlusTexture" alt="" coords="756,761,919,788"/>
+<area shape="rect" id="node40" href="$class_ogre_1_1_metal_texture.html" title="Ogre::MetalTexture" alt="" coords="763,812,911,839"/>
+<area shape="rect" id="node41" href="$class_ogre_1_1_n_u_l_l_texture.html" title="Ogre::NULLTexture" alt="" coords="765,863,909,889"/>
+<area shape="rect" id="node35" href="$class_ogre_1_1_d3_d11_depth_texture.html" title="Ogre::D3D11DepthTexture" alt="" coords="1027,781,1221,808"/>
+<area shape="rect" id="node36" href="$class_ogre_1_1_d3_d11_null_texture.html" title="Ogre::D3D11NullTexture" alt="" coords="1033,832,1215,859"/>
+<area shape="rect" id="node39" href="$class_ogre_1_1_g_l3_plus_depth_texture.html" title="Ogre::GL3PlusDepthTexture" alt="" coords="1023,883,1225,909"/>
+<area shape="rect" id="node43" href="$class_ogre_1_1v1_1_1_patch_mesh.html" title="Patch specialisation of Mesh. " alt="" coords="759,913,915,940"/>
+<area shape="rect" id="node45" href="$class_ogre_1_1v1_1_1_old_skeleton_instance.html" title="A OldSkeletonInstance is a single instance of a Skeleton used by a world object. " alt="" coords="728,964,947,991"/>
+<area shape="rect" id="node47" href="$class_ogre_1_1v1_1_1_overlay_container.html" title="A 2D element which contains other OverlayElement instances. " alt="" coords="477,1001,676,1028"/>
+<area shape="rect" id="node49" href="$class_ogre_1_1v1_1_1_text_area_overlay_element.html" title="This class implements an overlay element which contains simple unformatted text. " alt="" coords="479,1053,674,1094"/>
+<area shape="rect" id="node48" href="$class_ogre_1_1v1_1_1_panel_overlay_element.html" title="OverlayElement representing a flat, single&#45;material (or transparent) panel which can contain other el..." alt="" coords="724,1015,951,1041"/>
+</map>

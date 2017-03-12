@@ -1,0 +1,12 @@
+<map id="Ogre::TextureManager" name="Ogre::TextureManager">
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d11_texture_manager.html" title="Ogre::D3D11TextureManager" alt="" coords="651,5,863,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_d3_d9_texture_manager.html" title="Ogre::D3D9TextureManager" alt="" coords="655,56,859,83"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l3_plus_texture_manager.html" title="GL3Plus&#45;specific implementation of a TextureManager. " alt="" coords="647,107,867,133"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l_e_s2_texture_manager.html" title="GL ES&#45;specific implementation of a TextureManager. " alt="" coords="652,157,861,184"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_metal_texture_manager.html" title="Ogre::MetalTextureManager" alt="" coords="654,208,859,235"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_n_u_l_l_texture_manager.html" title="Ogre::NULLTextureManager" alt="" coords="656,259,857,285"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler. " alt="" coords="200,103,379,129"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,77,148,104"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="19,128,134,155"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Texture\lManager \&gt;" alt="" coords="196,154,383,195"/>
+</map>

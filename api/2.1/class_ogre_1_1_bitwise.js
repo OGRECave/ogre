@@ -1,0 +1,26 @@
+var class_ogre_1_1_bitwise =
+[
+    [ "bswap16", "class_ogre_1_1_bitwise.html#a8877f036fd67f850d524feef02e17b0f", null ],
+    [ "bswap32", "class_ogre_1_1_bitwise.html#ab801fe88a969d4b3a6b5a2b8c4d3cc8a", null ],
+    [ "bswap64", "class_ogre_1_1_bitwise.html#a969dba4985d15595389b5febf859b94c", null ],
+    [ "bswapBuffer", "class_ogre_1_1_bitwise.html#a26be444ef54cc196d29f801635352e59", null ],
+    [ "bswapChunks", "class_ogre_1_1_bitwise.html#ad1df153ede686f618fe227ea7c244127", null ],
+    [ "convertBitPattern", "class_ogre_1_1_bitwise.html#a65c7e2d0a2b2278e58450bb9d289e148", null ],
+    [ "firstPO2From", "class_ogre_1_1_bitwise.html#af1d86f2723f835a233138259c962a952", null ],
+    [ "fixedToFixed", "class_ogre_1_1_bitwise.html#aa59b3726641c31b63aa3e203559ca3bd", null ],
+    [ "fixedToFloat", "class_ogre_1_1_bitwise.html#a48006ba79d6f8c690e3131c7b4e441bf", null ],
+    [ "floatToFixed", "class_ogre_1_1_bitwise.html#ad3f4d30ecc1aa5ea112a38e63a47b9c8", null ],
+    [ "floatToHalf", "class_ogre_1_1_bitwise.html#aa02a9c5a117baf2da38ad562c2130681", null ],
+    [ "floatToHalfI", "class_ogre_1_1_bitwise.html#ad98268f6e1288301c0471e345e98cd1e", null ],
+    [ "floatToSnorm16", "class_ogre_1_1_bitwise.html#ac3ed6ee0b4a152185860c4b10cbf8957", null ],
+    [ "floatToSnorm8", "class_ogre_1_1_bitwise.html#a3c27bc22af6566613a85be74975d1261", null ],
+    [ "getBitShift", "class_ogre_1_1_bitwise.html#a60bde1c399a387326753a52f9d56939c", null ],
+    [ "halfToFloat", "class_ogre_1_1_bitwise.html#abb3cbaa74865420859ba7b1061f8d3f3", null ],
+    [ "halfToFloatI", "class_ogre_1_1_bitwise.html#a7ccd62b11c082f76d4972e27896c6028", null ],
+    [ "intRead", "class_ogre_1_1_bitwise.html#ad0fcaa2e4f445d1e9c1fb69291061dec", null ],
+    [ "intWrite", "class_ogre_1_1_bitwise.html#afa88e9d32bbc468ac3ee803ee4228ca1", null ],
+    [ "isPO2", "class_ogre_1_1_bitwise.html#acef0757b2a07e5b297c87247f38f1691", null ],
+    [ "mostSignificantBitSet", "class_ogre_1_1_bitwise.html#aa3fd3a659f416fe2f6e034c42b6a873c", null ],
+    [ "snorm16ToFloat", "class_ogre_1_1_bitwise.html#ad8269faf12edb5832204029f40da9188", null ],
+    [ "snorm8ToFloat", "class_ogre_1_1_bitwise.html#a2ac4db143f155c6d05d0dbcfa05b0775", null ]
+];

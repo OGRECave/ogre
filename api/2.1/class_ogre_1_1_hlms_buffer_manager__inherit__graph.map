@@ -1,0 +1,6 @@
+<map id="Ogre::HlmsBufferManager" name="Ogre::HlmsBufferManager">
+<area shape="rect" id="node4" href="$class_ogre_1_1_hlms_pbs.html" title="Physically based shading implementation specfically designed for OpenGL 3+, D3D11 and other RenderSys..." alt="" coords="5,229,124,256"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_hlms_unlit.html" title="Implementation without lighting or skeletal animation specfically designed for OpenGL 3+..." alt="" coords="148,229,275,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hlms.html" title="HLMS stands for &quot;High Level Material System&quot;. " alt="" coords="91,80,185,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="94,5,182,32"/>
+</map>

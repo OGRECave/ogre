@@ -1,0 +1,4 @@
+<map id="Ogre::RTShader::FFPTransformFactory" name="Ogre::RTShader::FFPTransformFactory">
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state_factory.html" title="Abstract factory interface for creating SubRenderState implementation instances. " alt="" coords="16,80,217,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="34,5,199,32"/>
+</map>

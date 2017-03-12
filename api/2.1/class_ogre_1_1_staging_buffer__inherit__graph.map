@@ -1,0 +1,7 @@
+<map id="Ogre::StagingBuffer" name="Ogre::StagingBuffer">
+<area shape="rect" id="node3" href="$class_ogre_1_1_d3_d11_staging_buffer.html" title="NOTE FOR D3D12 PORTING: The GL3Plus implementation should be used as reference, since it is much lowe..." alt="" coords="399,5,593,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_g_l3_plus_staging_buffer.html" title="A staging buffer is a buffer that resides on the GPU and be written to/from both CPU &amp; GPU However th..." alt="" coords="395,56,597,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_metal_staging_buffer.html" title="A staging buffer is a buffer that resides on the GPU and be written to/from both CPU &amp; GPU However th..." alt="" coords="403,107,589,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_n_u_l_l_staging_buffer.html" title="A staging buffer is a buffer that resides on the GPU and be written to/from both CPU &amp; GPU However th..." alt="" coords="404,157,588,184"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,81,148,108"/>
+</map>

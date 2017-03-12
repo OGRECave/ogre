@@ -1,0 +1,4 @@
+<map id="Ogre::v1::SkeletonSerializer" name="Ogre::v1::SkeletonSerializer">
+<area shape="rect" id="node2" href="$class_ogre_1_1_serializer.html" title="Generic class for serialising data to / from binary stream&#45;based files. " alt="" coords="45,80,168,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="49,5,164,32"/>
+</map>

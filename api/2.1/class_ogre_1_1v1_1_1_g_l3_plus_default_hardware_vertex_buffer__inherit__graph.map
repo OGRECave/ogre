@@ -1,0 +1,5 @@
+<map id="Ogre::v1::GL3PlusDefaultHardwareVertexBuffer" name="Ogre::v1::GL3PlusDefaultHardwareVertexBuffer">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_hardware_vertex_buffer.html" title="Specialisation of HardwareBuffer for a vertex buffer. " alt="" coords="5,155,196,196"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1v1_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="7,80,195,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="53,5,148,32"/>
+</map>

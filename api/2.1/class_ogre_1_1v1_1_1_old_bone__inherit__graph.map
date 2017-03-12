@@ -1,0 +1,5 @@
+<map id="Ogre::v1::OldBone" name="Ogre::v1::OldBone">
+<area shape="rect" id="node4" href="$class_ogre_1_1v1_1_1_tag_point.html" title="A tagged point on a skeleton, which can be used to attach entities to on specific other entities..." alt="" coords="5,229,148,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_old_node.html" title="Class representing a general&#45;purpose OldNode an articulated scene graph. " alt="" coords="6,80,147,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="33,5,121,32"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ogre::v1::GLES2DefaultHardwareIndexBuffer" name="Ogre::v1::GLES2DefaultHardwareIndexBuffer">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_hardware_index_buffer.html" title="Specialisation of HardwareBuffer for vertex index buffers, still abstract. " alt="" coords="12,155,236,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1v1_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="30,80,218,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="77,5,171,32"/>
+</map>

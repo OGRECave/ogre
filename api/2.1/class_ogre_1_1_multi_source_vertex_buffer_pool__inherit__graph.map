@@ -1,0 +1,6 @@
+<map id="Ogre::MultiSourceVertexBufferPool" name="Ogre::MultiSourceVertexBufferPool">
+<area shape="rect" id="node3" href="$class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html" title="Ogre::GL3PlusMultiSource\lVertexBufferPool" alt="" coords="506,5,697,47"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_metal_multi_source_vertex_buffer_pool.html" title="Ogre::MetalMultiSourceVertex\lBufferPool" alt="" coords="492,71,711,112"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_n_u_l_l_multi_source_vertex_buffer_pool.html" title="Ogre::NULLMultiSourceVertex\lBufferPool" alt="" coords="494,136,709,177"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,78,147,105"/>
+</map>

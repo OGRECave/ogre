@@ -1,0 +1,9 @@
+<map id="Ogre::D3D9GpuProgram" name="Ogre::D3D9GpuProgram">
+<area shape="rect" id="node7" href="$class_ogre_1_1_d3_d9_gpu_fragment_program.html" title="Direct3D implementation of low&#45;level fragment programs. " alt="" coords="5,304,247,331"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_d3_d9_gpu_vertex_program.html" title="Direct3D implementation of low&#45;level vertex programs. " alt="" coords="271,304,493,331"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_gpu_program.html" title="Defines a program which runs on the GPU such as a vertex or fragment program. " alt="" coords="96,155,239,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource (e.g. " alt="" coords="107,80,228,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style, self&#45;defining parameter set to callers. " alt="" coords="9,5,166,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="190,5,305,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d9_resource.html" title="Represents a Direct3D rendering resource. " alt="" coords="263,155,421,181"/>
+</map>

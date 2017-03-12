@@ -1,0 +1,9 @@
+<map id="Ogre::ArchiveFactory" name="Ogre::ArchiveFactory">
+<area shape="rect" id="node4" href="$class_ogre_1_1_a_p_k_file_system_archive_factory.html" title="Ogre::APKFileSystemArchive\lFactory" alt="" coords="482,5,691,47"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_file_system_archive_factory.html" title="Specialisation of ArchiveFactory for FileSystem files. " alt="" coords="471,71,703,98"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_zip_archive_factory.html" title="Specialisation of ArchiveFactory for Zip files. " alt="" coords="497,122,677,149"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_factory_obj.html" title="Ogre::FactoryObj\&lt; Archive \&gt;" alt="" coords="5,46,216,73"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="59,97,162,123"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_embedded_zip_archive_factory.html" title="Specialisation of ZipArchiveFactory for embedded Zip files. " alt="" coords="751,115,951,156"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_a_p_k_zip_archive_factory.html" title="Ogre::APKZipArchiveFactory" alt="" coords="999,122,1205,149"/>
+</map>

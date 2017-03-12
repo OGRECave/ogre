@@ -1,0 +1,20 @@
+<map id="Ogre::v1::HardwarePixelBuffer" name="Ogre::v1::HardwarePixelBuffer">
+<area shape="rect" id="node4" href="$class_ogre_1_1v1_1_1_d3_d11_depth_pixel_buffer.html" title="Ogre::v1::D3D11DepthPixel\lBuffer" alt="" coords="664,5,864,47"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1v1_1_1_d3_d11_hardware_pixel_buffer.html" title="Ogre::v1::D3D11HardwarePixel\lBuffer" alt="" coords="652,71,876,112"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1v1_1_1_d3_d11_null_pixel_buffer.html" title="Ogre::v1::D3D11NullPixel\lBuffer" alt="" coords="671,136,857,177"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1v1_1_1_g_l3_plus_depth_pixel_buffer.html" title="Ogre::v1::GL3PlusDepthPixel\lBuffer" alt="" coords="660,201,868,243"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1v1_1_1_g_l3_plus_hardware_pixel_buffer.html" title="Ogre::v1::GL3PlusHardware\lPixelBuffer" alt="" coords="664,267,864,308"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1v1_1_1_g_l3_plus_null_pixel_buffer.html" title="Ogre::v1::GL3PlusNullPixel\lBuffer" alt="" coords="667,332,861,373"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1v1_1_1_g_l_e_s2_hardware_pixel_buffer.html" title="Ogre::v1::GLES2HardwarePixel\lBuffer" alt="" coords="653,397,875,439"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1v1_1_1_metal_depth_pixel_buffer.html" title="Ogre::v1::MetalDepthPixel\lBuffer" alt="" coords="667,463,861,504"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1v1_1_1_metal_hardware_pixel_buffer.html" title="Ogre::v1::MetalHardwarePixel\lBuffer" alt="" coords="655,528,873,569"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1v1_1_1_metal_null_pixel_buffer.html" title="Ogre::v1::MetalNullPixel\lBuffer" alt="" coords="674,593,854,635"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1v1_1_1_n_u_l_l_hardware_pixel_buffer.html" title="Ogre::v1::NULLHardwarePixel\lBuffer" alt="" coords="657,659,871,700"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="148,339,336,366"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,339,100,366"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1v1_1_1_g_l3_plus_render_buffer.html" title="Renderbuffer surface. " alt="" coords="924,245,1147,271"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html" title="Texture surface. " alt="" coords="942,296,1129,337"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1v1_1_1_g_l_e_s2_render_buffer.html" title="Renderbuffer surface. " alt="" coords="929,383,1141,410"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1v1_1_1_g_l_e_s2_texture_buffer.html" title="Texture surface. " alt="" coords="927,434,1143,461"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1v1_1_1_metal_texture_buffer.html" title="Texture surface. " alt="" coords="929,535,1141,562"/>
+</map>

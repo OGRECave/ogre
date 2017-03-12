@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_pixel_format_to_shader_type.html" title="Ogre::PixelFormatToShaderType" alt="" coords="5,111,239,138"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_d3_d11_pixel_format_to_shader_type.html" title="Ogre::D3D11PixelFormatTo\lShaderType" alt="" coords="320,5,520,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_g_l3_plus_pixel_format_to_shader_type.html" title="Ogre::GL3PlusPixelFormat\lToShaderType" alt="" coords="324,71,516,112"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_metal_pixel_format_to_shader_type.html" title="Ogre::MetalPixelFormatTo\lShaderType" alt="" coords="323,136,517,177"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_n_u_l_l_pixel_format_to_shader_type.html" title="Ogre::NULLPixelFormatToShaderType" alt="" coords="287,202,553,229"/>
+</map>

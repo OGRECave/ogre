@@ -1,0 +1,4 @@
+<map id="Ogre::ParticleSystemTranslator" name="Ogre::ParticleSystemTranslator">
+<area shape="rect" id="node2" href="$class_ogre_1_1_script_translator.html" title="This class translates script AST (abstract syntax tree) into Ogre resources. " alt="" coords="36,80,200,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="39,5,197,32"/>
+</map>

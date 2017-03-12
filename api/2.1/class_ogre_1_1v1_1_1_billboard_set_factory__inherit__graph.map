@@ -1,0 +1,4 @@
+<map id="Ogre::v1::BillboardSetFactory" name="Ogre::v1::BillboardSetFactory">
+<area shape="rect" id="node2" href="$class_ogre_1_1_movable_object_factory.html" title="Interface definition for a factory class which produces a certain kind of MovableObject, and can be registered with Root in order to allow all clients to produce new instances of this object, integrated with the standard Ogre processing. " alt="" coords="8,80,216,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="57,5,167,32"/>
+</map>

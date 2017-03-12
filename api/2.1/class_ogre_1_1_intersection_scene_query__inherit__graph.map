@@ -1,0 +1,6 @@
+<map id="Ogre::IntersectionSceneQuery" name="Ogre::IntersectionSceneQuery">
+<area shape="rect" id="node5" href="$class_ogre_1_1_default_intersection_scene_query.html" title="Default implementation of IntersectionSceneQuery. " alt="" coords="81,244,268,285"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene. " alt="" coords="5,87,144,114"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="15,5,134,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_intersection_scene_query_listener.html" title="Alternative listener class for dealing with IntersectionSceneQuery. " alt="" coords="168,80,384,121"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::MemoryDataStream" name="Ogre::MemoryDataStream">
+<area shape="rect" id="node2" href="$class_ogre_1_1_data_stream.html" title="General purpose class used for encapsulating the reading and writing of data. " alt="" coords="33,80,171,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="51,5,153,32"/>
+</map>

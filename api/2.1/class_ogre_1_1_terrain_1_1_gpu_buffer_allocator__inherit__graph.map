@@ -1,0 +1,4 @@
+<map id="Ogre::Terrain::GpuBufferAllocator" name="Ogre::Terrain::GpuBufferAllocator">
+<area shape="rect" id="node3" href="$class_ogre_1_1_terrain_1_1_default_gpu_buffer_allocator.html" title="Standard implementation of a buffer allocator which re&#45;uses buffers. " alt="" coords="5,169,195,211"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="50,5,150,32"/>
+</map>

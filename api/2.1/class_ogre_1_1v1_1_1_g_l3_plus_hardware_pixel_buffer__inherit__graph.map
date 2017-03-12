@@ -1,0 +1,7 @@
+<map id="Ogre::v1::GL3PlusHardwarePixelBuffer" name="Ogre::v1::GL3PlusHardwarePixelBuffer">
+<area shape="rect" id="node5" href="$class_ogre_1_1v1_1_1_g_l3_plus_render_buffer.html" title="Renderbuffer surface. " alt="" coords="5,326,228,353"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html" title="Texture surface. " alt="" coords="253,319,439,360"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_hardware_pixel_buffer.html" title="Specialisation of HardwareBuffer for a pixel buffer. " alt="" coords="121,155,341,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1v1_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="137,80,325,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="184,5,279,32"/>
+</map>

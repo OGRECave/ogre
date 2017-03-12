@@ -1,0 +1,4 @@
+<map id="Ogre::v1::BorderPanelOverlayElementFactory" name="Ogre::v1::BorderPanelOverlayElementFactory">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_overlay_element_factory.html" title="Defines the interface which all components wishing to supply OverlayElement subclasses must implement..." alt="" coords="17,80,208,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="60,5,165,32"/>
+</map>

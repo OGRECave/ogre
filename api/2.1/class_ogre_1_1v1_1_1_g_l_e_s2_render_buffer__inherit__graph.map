@@ -1,0 +1,6 @@
+<map id="Ogre::v1::GLES2RenderBuffer" name="Ogre::v1::GLES2RenderBuffer">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_g_l_e_s2_hardware_pixel_buffer.html" title="Ogre::v1::GLES2HardwarePixel\lBuffer" alt="" coords="5,229,227,271"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1v1_1_1_hardware_pixel_buffer.html" title="Specialisation of HardwareBuffer for a pixel buffer. " alt="" coords="6,155,226,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1v1_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="22,80,210,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="69,5,163,32"/>
+</map>

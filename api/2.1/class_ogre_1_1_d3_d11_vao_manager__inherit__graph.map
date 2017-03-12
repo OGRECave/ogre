@@ -1,0 +1,4 @@
+<map id="Ogre::D3D11VaoManager" name="Ogre::D3D11VaoManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1_vao_manager.html" title="Ogre::VaoManager" alt="" coords="27,80,170,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="37,5,160,32"/>
+</map>

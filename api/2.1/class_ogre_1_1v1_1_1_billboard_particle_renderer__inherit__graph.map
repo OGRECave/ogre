@@ -1,0 +1,5 @@
+<map id="Ogre::v1::BillboardParticleRenderer" name="Ogre::v1::BillboardParticleRenderer">
+<area shape="rect" id="node2" href="$class_ogre_1_1_particle_system_renderer.html" title="Abstract class defining the interface required to be implemented by classes which provide rendering c..." alt="" coords="44,80,263,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style, self&#45;defining parameter set to callers. " alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="187,5,258,32"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="Ogre::RegionSceneQuery" name="Ogre::RegionSceneQuery">
+<area shape="rect" id="node5" href="$class_ogre_1_1_axis_aligned_box_scene_query.html" title="Specialises the SceneQuery class for querying within an axis aligned box. " alt="" coords="643,5,846,47"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_plane_bounded_volume_list_scene_query.html" title="Specialises the SceneQuery class for querying within a plane&#45;bounded volume. " alt="" coords="643,71,847,112"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_sphere_scene_query.html" title="Specialises the SceneQuery class for querying within a sphere. " alt="" coords="653,139,837,166"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene. " alt="" coords="198,53,337,79"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,53,124,79"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_scene_query_listener.html" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="172,103,363,130"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_default_axis_aligned_box_scene_query.html" title="Default implementation of AxisAlignedBoxSceneQuery. " alt="" coords="903,5,1089,47"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_default_plane_bounded_volume_list_scene_query.html" title="Default implementation of PlaneBoundedVolumeListSceneQuery. " alt="" coords="895,71,1097,112"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_default_sphere_scene_query.html" title="Default implementation of SphereSceneQuery. " alt="" coords="899,136,1093,177"/>
+</map>

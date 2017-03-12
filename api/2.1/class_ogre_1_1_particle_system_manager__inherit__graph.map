@@ -1,0 +1,5 @@
+<map id="Ogre::ParticleSystemManager" name="Ogre::ParticleSystemManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Particle\lSystemManager \&gt;" alt="" coords="5,5,192,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="217,13,359,39"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="383,13,454,39"/>
+</map>

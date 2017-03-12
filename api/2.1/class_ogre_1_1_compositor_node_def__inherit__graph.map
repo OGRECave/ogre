@@ -1,0 +1,5 @@
+<map id="Ogre::CompositorNodeDef" name="Ogre::CompositorNodeDef">
+<area shape="rect" id="node4" href="$class_ogre_1_1_compositor_shadow_node_def.html" title="Shadow Nodes are special nodes (not to be confused with. " alt="" coords="5,229,249,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_texture_definition_base.html" title="Centralized class for dealing with declarations of textures in Node &amp; Workspace definitions. " alt="" coords="24,80,231,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="51,5,204,32"/>
+</map>

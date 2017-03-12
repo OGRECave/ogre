@@ -1,0 +1,9 @@
+<map id="Ogre::v1::RibbonTrail" name="Ogre::v1::RibbonTrail">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_billboard_chain.html" title="Allows the rendering of a chain of connected billboards. " alt="" coords="246,155,426,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene. " alt="" coords="171,80,330,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose..." alt="" coords="5,5,171,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="195,5,306,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_id_object.html" title="Ogre::IdObject" alt="" coords="331,5,445,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement. " alt="" coords="354,80,489,107"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_node_1_1_listener.html" title="Listener which gets called back on Node events. " alt="" coords="451,155,605,181"/>
+</map>

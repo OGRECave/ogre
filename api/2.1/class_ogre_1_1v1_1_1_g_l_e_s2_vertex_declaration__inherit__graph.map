@@ -1,0 +1,4 @@
+<map id="Ogre::v1::GLES2VertexDeclaration" name="Ogre::v1::GLES2VertexDeclaration">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_vertex_declaration.html" title="This class declares the format of a set of vertex inputs, which can be issued to the rendering API th..." alt="" coords="26,80,229,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="63,5,191,32"/>
+</map>

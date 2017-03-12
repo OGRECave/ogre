@@ -1,0 +1,4 @@
+<map id="Ogre::TerrainAutoUpdateLod" name="Ogre::TerrainAutoUpdateLod">
+<area shape="rect" id="node3" href="$class_ogre_1_1_terrain_auto_update_lod_by_distance.html" title="Class implementing TerrainAutoUpdateLod interface. " alt="" coords="5,155,212,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="59,5,159,32"/>
+</map>

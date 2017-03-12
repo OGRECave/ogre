@@ -1,0 +1,5 @@
+<map id="Ogre::ForwardPlusBase" name="Ogre::ForwardPlusBase">
+<area shape="rect" id="node3" href="$class_ogre_1_1_forward3_d.html" title="Forward3D. " alt="" coords="5,155,137,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_forward_clustered.html" title="Implementation of Clustered Forward Shading. " alt="" coords="162,155,338,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="117,5,205,32"/>
+</map>

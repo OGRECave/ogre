@@ -1,0 +1,4 @@
+<map id="Ogre::HlmsUnlitMobileDatablock" name="Ogre::HlmsUnlitMobileDatablock">
+<area shape="rect" id="node2" href="$class_ogre_1_1_hlms_datablock.html" title="An hlms datablock contains individual information about a specific material. " alt="" coords="43,80,204,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="81,5,165,32"/>
+</map>

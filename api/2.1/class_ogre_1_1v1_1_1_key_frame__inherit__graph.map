@@ -1,0 +1,7 @@
+<map id="Ogre::v1::KeyFrame" name="Ogre::v1::KeyFrame">
+<area shape="rect" id="node3" href="$class_ogre_1_1v1_1_1_numeric_key_frame.html" title="Specialised KeyFrame which stores any numeric value. " alt="" coords="385,5,591,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1v1_1_1_transform_key_frame.html" title="Specialised KeyFrame which stores a full transform. " alt="" coords="379,56,597,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1v1_1_1_vertex_morph_key_frame.html" title="Specialised KeyFrame which stores absolute vertex positions for a complete buffer, designed to be interpolated with other keys in the same track. " alt="" coords="391,107,585,149"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1v1_1_1_vertex_pose_key_frame.html" title="Specialised KeyFrame which references a Mesh::Pose at a certain influence level, which stores offsets..." alt="" coords="375,173,601,200"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,85,127,112"/>
+</map>
