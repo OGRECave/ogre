@@ -131,8 +131,6 @@ WARNING: Disabling this will make the samples unusable.
 
 #cmakedefine01 OGRE_NO_TBB_SCHEDULER
 
-#cmakedefine01 OGRE_USE_BOOST
-
 /** If set to 1, profiling code will be included in the application. When you
     are deploying your application you will probably want to set this to 0 */
 #cmakedefine01 OGRE_PROFILING

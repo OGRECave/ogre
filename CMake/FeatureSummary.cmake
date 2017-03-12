@@ -204,7 +204,7 @@ var_to_string(OGRE_CONFIG_NODE_INHERIT_TRANSFORM _inherit_transform)
 var_to_string(OGRE_CONFIG_MEMTRACK_DEBUG _memtrack_debug)
 var_to_string(OGRE_CONFIG_MEMTRACK_RELEASE _memtrack_release)
 var_to_string(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR _string)
-var_to_string(OGRE_USE_BOOST _boost)
+
 # threading settings
 if (OGRE_CONFIG_THREADS EQUAL 0)
 	set(_threads "none")
@@ -237,7 +237,6 @@ set(_features "${_features}STL containers use allocator:    ${_containers}\n")
 set(_features "${_features}Strings use allocator:           ${_string}\n")
 set(_features "${_features}Memory tracker (debug):          ${_memtrack_debug}\n")
 set(_features "${_features}Memory tracker (release):        ${_memtrack_release}\n")
-set(_features "${_features}Use Boost:                       ${_boost}\n")
 
 
 set(_features "${_features}\n----------------------------------------------------------------------------\n")
