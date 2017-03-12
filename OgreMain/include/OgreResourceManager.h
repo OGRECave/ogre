@@ -368,12 +368,12 @@ namespace Ogre {
         resourceExists(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
 #endif
         {
-            return getResourceByName(name, group);
+            return (bool)getResourceByName(name, group);
         }
         /// Returns whether a resource with the given handle exists in this manager
         bool resourceExists(ResourceHandle handle)
         {
-            return getByHandle(handle);
+            return (bool)getByHandle(handle);
         }
 
         /** Notify this manager that a resource which it manages has been 

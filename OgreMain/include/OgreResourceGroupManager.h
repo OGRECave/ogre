@@ -268,7 +268,7 @@ namespace Ogre {
         /// Special resource group name which causes resource group to be automatically determined based on searching for the resource in all groups.
         static const String AUTODETECT_RESOURCE_GROUP_NAME;
         /// The number of reference counts held per resource by the resource system
-        static const size_t RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS;
+        static const long RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS;
         /// Nested struct defining a resource declaration
         struct ResourceDeclaration
         {

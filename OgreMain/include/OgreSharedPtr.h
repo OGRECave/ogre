@@ -285,7 +285,7 @@ namespace Ogre {
         /// @deprecated use use_count() instead
         OGRE_DEPRECATED unsigned int useCount() const { return use_count(); }
 
-        unsigned int use_count() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get(); }
+        long use_count() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get(); }
 
         /// @deprecated this API will be dropped
         OGRE_DEPRECATED void setUseCount(unsigned value) { assert(pInfo); pInfo->useCount = value; }
@@ -293,6 +293,12 @@ namespace Ogre {
         /// @deprecated use get() instead
         OGRE_DEPRECATED T* getPointer() const { return pRep; }
 
+#if __cplusplus >= 201103L
+        explicit operator bool() const
+        {
+            return pRep == 0 ? false : true;
+        }
+#else
         static void unspecified_bool( SharedPtr*** )
         {
         }
@@ -303,6 +309,7 @@ namespace Ogre {
         {
             return pRep == 0 ? 0 : unspecified_bool;
         }
+#endif
 
         /// @deprecated use SharedPtr::operator unspecified_bool_type() instead
         OGRE_DEPRECATED bool isNull(void) const { return pRep == 0; }
