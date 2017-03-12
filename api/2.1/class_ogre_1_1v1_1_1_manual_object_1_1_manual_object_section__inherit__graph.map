@@ -1,0 +1,4 @@
+<map id="Ogre::v1::ManualObject::ManualObjectSection" name="Ogre::v1::ManualObject::ManualObjectSection">
+<area shape="rect" id="node2" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement. " alt="" coords="5,5,140,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="164,5,275,32"/>
+</map>

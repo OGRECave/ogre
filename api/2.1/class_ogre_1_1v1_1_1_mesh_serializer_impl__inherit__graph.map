@@ -1,0 +1,8 @@
+<map id="Ogre::v1::MeshSerializerImpl" name="Ogre::v1::MeshSerializerImpl">
+<area shape="rect" id="node4" href="$class_ogre_1_1v1_1_1_mesh_serializer_impl__v1__10.html" title="Class for providing backwards&#45;compatibility for loading version 1.10 of the .mesh format..." alt="" coords="20,229,201,271"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_serializer.html" title="Generic class for serialising data to / from binary stream&#45;based files. " alt="" coords="49,80,172,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="53,5,168,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1v1_1_1_mesh_serializer_impl__v1__8.html" title="Class for providing backwards&#45;compatibility for loading version 1.8 of the .mesh format. " alt="" coords="20,319,201,360"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1v1_1_1_mesh_serializer_impl__v1__41.html" title="Class for providing backwards&#45;compatibility for loading version 1.41 of the .mesh format..." alt="" coords="20,408,201,449"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1v1_1_1_mesh_serializer_impl__v1__4.html" title="Class for providing backwards&#45;compatibility for loading version 1.4 of the .mesh format. " alt="" coords="20,497,201,539"/>
+</map>

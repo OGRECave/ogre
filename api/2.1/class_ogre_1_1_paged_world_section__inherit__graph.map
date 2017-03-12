@@ -1,0 +1,4 @@
+<map id="Ogre::PagedWorldSection" name="Ogre::PagedWorldSection">
+<area shape="rect" id="node3" href="$class_ogre_1_1_terrain_paged_world_section.html" title="A world section which includes paged terrain. " alt="" coords="5,155,239,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="79,5,165,32"/>
+</map>

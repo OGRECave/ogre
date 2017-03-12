@@ -1,0 +1,27 @@
+var class_ogre_1_1_d3_d9_hardware_occlusion_query =
+[
+    [ "D3D9HardwareOcclusionQuery", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a5838026ec1f7215eb83bef515d42c940", null ],
+    [ "~D3D9HardwareOcclusionQuery", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a813b479e18f0cdf7acb5ff0c1630191d", null ],
+    [ "beginOcclusionQuery", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#acea9a09b582738af4f7497b79181ab71", null ],
+    [ "endOcclusionQuery", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#aab645a1644bc652b7843d9b6459a7dbb", null ],
+    [ "getLastQuerysPixelcount", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a7cfe92f369eedb757df18d264d23cb9a", null ],
+    [ "getLastQuerysPixelcount", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#ad1c71c786e262908a3aa805287b815e3", null ],
+    [ "isStillOutstanding", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#ae49db96481f5d845767dcfcc7b076d20", null ],
+    [ "lockDeviceAccess", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#aa97afae987b0c0f16c3e232a7317fad5", null ],
+    [ "notifyOnDeviceCreate", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a7b0b0ad594195deeb8e5ef40aaa7bce8", null ],
+    [ "notifyOnDeviceDestroy", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a408cfb33ff98feb4f3f0b7941f746614", null ],
+    [ "notifyOnDeviceLost", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a6dea06e309f77051404ae1e0fb761e39", null ],
+    [ "notifyOnDeviceReset", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a25a10de153b672d9a7a64278cd57eeae", null ],
+    [ "operator delete", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
+    [ "operator delete", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a1c727e879a260c37b00ce5505fe8e144", null ],
+    [ "operator delete", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#acb46d4b0a597156d9ba5abc39d127792", null ],
+    [ "operator delete[]", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a93e6a86dde5483c053ca0f2a85bbfd6c", null ],
+    [ "operator delete[]", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a595ea4c05da8aa987d3800e65d23355d", null ],
+    [ "operator new", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a421b197ca3a38da17e2eb1531a645fa2", null ],
+    [ "operator new", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#ac4bdf968b7b9af8a5239a27da73d5711", null ],
+    [ "operator new", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#ab78a921e54419be677839cdf15d1f0b8", null ],
+    [ "operator new[]", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a4be37baef81876985aa1071ad5acc6dd", null ],
+    [ "operator new[]", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#afa2943846ba6a2b5824a12857139cf5e", null ],
+    [ "pullOcclusionQuery", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a46f3aaeae35802f03beaa0979ce71699", null ],
+    [ "unlockDeviceAccess", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a6fc9c0ebe4a4c559b172f25f3b5dc9d8", null ]
+];

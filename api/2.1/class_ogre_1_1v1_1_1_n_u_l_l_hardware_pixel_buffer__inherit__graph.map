@@ -1,0 +1,5 @@
+<map id="Ogre::v1::NULLHardwarePixelBuffer" name="Ogre::v1::NULLHardwarePixelBuffer">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_hardware_pixel_buffer.html" title="Specialisation of HardwareBuffer for a pixel buffer. " alt="" coords="5,155,225,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1v1_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="21,80,209,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="68,5,163,32"/>
+</map>

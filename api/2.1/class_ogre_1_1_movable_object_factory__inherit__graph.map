@@ -1,0 +1,14 @@
+<map id="Ogre::MovableObjectFactory" name="Ogre::MovableObjectFactory">
+<area shape="rect" id="node3" href="$class_ogre_1_1_item_factory.html" title="FItemy object for creating Item instances. " alt="" coords="462,5,602,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_light_factory.html" title="Factory object for creating Light instances. " alt="" coords="461,56,603,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_manual_object_factory.html" title="Factory object for creating ManualObject instances. " alt="" coords="432,107,632,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_particle_system_factory.html" title="Factory object for creating ParticleSystem instances. " alt="" coords="428,157,636,184"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1v1_1_1_billboard_chain_factory.html" title="Factory object for creating BillboardChain instances. " alt="" coords="442,209,622,250"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1v1_1_1_billboard_set_factory.html" title="Factory object for creating BillboardSet instances. " alt="" coords="425,275,639,301"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1v1_1_1_entity_factory.html" title="Factory object for creating Entity instances. " alt="" coords="446,325,618,352"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1v1_1_1_manual_object_factory.html" title="Factory object for creating ManualObject instances. " alt="" coords="420,376,644,403"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1v1_1_1_rectangle2_d_factory.html" title="Factory object for creating Entity instances. " alt="" coords="423,427,641,453"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1v1_1_1_ribbon_trail_factory.html" title="Factory object for creating RibbonTrail instances. " alt="" coords="428,477,636,504"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_wire_aabb_factory.html" title="Factory object for creating WireAabb instances. " alt="" coords="445,528,619,555"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,275,116,301"/>
+</map>

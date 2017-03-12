@@ -1,0 +1,4 @@
+<map id="Ogre::HlmsPbsMobile" name="Ogre::HlmsPbsMobile">
+<area shape="rect" id="node2" href="$class_ogre_1_1_hlms.html" title="HLMS stands for &quot;High Level Material System&quot;. " alt="" coords="39,80,134,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="43,5,131,32"/>
+</map>

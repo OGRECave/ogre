@@ -1,0 +1,10 @@
+<map id="Ogre::Hlms" name="Ogre::Hlms">
+<area shape="rect" id="node3" href="$class_ogre_1_1_hlms_buffer_manager.html" title="Managing constant and texture buffers for sending shader parameters is a very similar process to most..." alt="" coords="284,31,476,57"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_hlms_compute.html" title="HLMS implementation that handles compute shaders. " alt="" coords="303,81,457,108"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_hlms_low_level.html" title="This is an HLMS implementation that acts as proxy to use the Material system from Ogre 1..." alt="" coords="302,132,458,159"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_hlms_pbs_mobile.html" title="Physically based shading implementation specfically designed for OpenGL ES 2.0 and other RenderSystem..." alt="" coords="299,183,461,209"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_hlms_unlit_mobile.html" title="User Interface (2D) implementation specfically designed for OpenGL ES 2.0 and other RenderSystems whi..." alt="" coords="295,233,465,260"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,132,93,159"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_hlms_pbs.html" title="Physically based shading implementation specfically designed for OpenGL 3+, D3D11 and other RenderSys..." alt="" coords="528,5,647,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_hlms_unlit.html" title="Implementation without lighting or skeletal animation specfically designed for OpenGL 3+..." alt="" coords="524,56,651,83"/>
+</map>

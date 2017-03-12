@@ -1,0 +1,4 @@
+<map id="Ogre::Particle" name="Ogre::Particle">
+<area shape="rect" id="node3" href="$class_ogre_1_1_particle_emitter.html" title="Abstract class defining the interface to be implemented by particle emitters. " alt="" coords="5,155,164,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="49,5,120,32"/>
+</map>

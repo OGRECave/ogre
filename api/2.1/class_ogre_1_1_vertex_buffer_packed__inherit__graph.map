@@ -1,0 +1,5 @@
+<map id="Ogre::VertexBufferPacked" name="Ogre::VertexBufferPacked">
+<area shape="rect" id="node2" href="$class_ogre_1_1_buffer_packed.html" title="Ogre::BufferPacked" alt="" coords="89,80,237,107"/>
+<area shape="rect" id="node3" href="$struct_ogre_1_1_gpu_resource.html" title="Ogre::GpuResource" alt="" coords="5,5,152,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="176,5,317,32"/>
+</map>

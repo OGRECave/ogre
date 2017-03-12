@@ -1,0 +1,7 @@
+<map id="Ogre::MovablePlane" name="Ogre::MovablePlane">
+<area shape="rect" id="node2" href="$class_ogre_1_1_plane.html" title="Defines a plane in 3D space. " alt="" coords="50,80,147,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene. " alt="" coords="171,80,330,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose..." alt="" coords="5,5,171,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="195,5,306,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_id_object.html" title="Ogre::IdObject" alt="" coords="331,5,445,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::v1::D3D11HardwareBufferManagerBase" name="Ogre::v1::D3D11HardwareBufferManagerBase">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_hardware_buffer_manager_base.html" title="Base definition of a hardware buffer manager. " alt="" coords="27,80,215,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="74,5,169,32"/>
+</map>

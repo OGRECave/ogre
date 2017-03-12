@@ -1,0 +1,42 @@
+<map id="Ogre::RenderTarget" name="Ogre::RenderTarget">
+<area shape="rect" id="node4" href="$class_ogre_1_1_multi_render_target.html" title="This class represents a render target that renders to multiple RenderTextures at once. " alt="" coords="397,148,580,175"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_render_texture.html" title="This class represents a RenderTarget that renders to a Texture. " alt="" coords="410,595,567,621"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_render_window.html" title="Manages the target rendering window. " alt="" coords="409,1156,568,1183"/>
+<area shape="rect" id="node2" href="$struct_ogre_1_1_gpu_resource.html" title="Ogre::GpuResource" alt="" coords="5,569,152,596"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="17,620,140,647"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d11_multi_render_target.html" title="Ogre::D3D11MultiRenderTarget" alt="" coords="633,5,859,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d9_multi_render_target.html" title="Ogre::D3D9MultiRenderTarget" alt="" coords="637,56,855,83"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l3_plus_f_b_o_multi_render_target.html" title="MultiRenderTarget for OpenGL. " alt="" coords="637,107,855,149"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l_e_s2_f_b_o_multi_render_target.html" title="MultiRenderTarget for GL ES 2.x. " alt="" coords="642,173,850,214"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_metal_multi_render_target.html" title="Ogre::MetalMultiRenderTarget" alt="" coords="637,239,855,265"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_d3_d11_depth_texture_target.html" title="Ogre::D3D11DepthTextureTarget" alt="" coords="628,289,864,316"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_d3_d11_null_texture_target.html" title="Ogre::D3D11NullTextureTarget" alt="" coords="635,340,857,367"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_d3_d11_render_texture.html" title="RenderTexture implementation for D3D11. " alt="" coords="645,391,847,417"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_d3_d9_render_texture.html" title="RenderTexture implementation for D3D9. " alt="" coords="649,441,843,468"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_g_l3_plus_depth_texture_target.html" title="Ogre::GL3PlusDepthTexture\lTarget" alt="" coords="645,493,847,534"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_g_l3_plus_null_texture_target.html" title="Ogre::GL3PlusNullTexture\lTarget" alt="" coords="651,558,841,599"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_g_l3_plus_render_texture.html" title="Base class for GL Render Textures. " alt="" coords="641,624,851,651"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_g_l_e_s2_render_texture.html" title="Base class for GL Render Textures. " alt="" coords="647,675,845,701"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_metal_depth_texture_target.html" title="Ogre::MetalDepthTextureTarget" alt="" coords="631,725,861,752"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_metal_null_texture_target.html" title="Ogre::MetalNullTextureTarget" alt="" coords="638,776,854,803"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_metal_render_texture.html" title="Ogre::MetalRenderTexture" alt="" coords="649,827,843,853"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_n_u_l_l_render_texture.html" title="Ogre::NULLRenderTexture" alt="" coords="651,877,841,904"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_g_l3_plus_f_b_o_render_texture.html" title="RenderTexture for GL FBO. " alt="" coords="913,620,1149,647"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_g_l_e_s2_copying_render_texture.html" title="Ogre::GLES2CopyingRender\lTexture" alt="" coords="931,671,1132,713"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_cocoa_window.html" title="Ogre::CocoaWindow" alt="" coords="669,928,823,955"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_d3_d11_render_window_base.html" title="Ogre::D3D11RenderWindowBase" alt="" coords="629,979,863,1005"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_d3_d9_render_window.html" title="Ogre::D3D9RenderWindow" alt="" coords="649,1029,843,1056"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1_e_g_l_window.html" title="Ogre::EGLWindow" alt="" coords="677,1080,815,1107"/>
+<area shape="rect" id="node35" href="$class_ogre_1_1_g_l_x_window.html" title="Ogre::GLXWindow" alt="" coords="677,1131,815,1157"/>
+<area shape="rect" id="node36" href="$class_ogre_1_1_g_t_k_window.html" title="Ogre::GTKWindow" alt="" coords="676,1181,816,1208"/>
+<area shape="rect" id="node37" href="$class_ogre_1_1_metal_render_window.html" title="Ogre::MetalRenderWindow" alt="" coords="648,1232,844,1259"/>
+<area shape="rect" id="node38" href="$class_ogre_1_1_na_cl_window.html" title="Ogre::NaClWindow" alt="" coords="674,1283,818,1309"/>
+<area shape="rect" id="node39" href="$class_ogre_1_1_n_u_l_l_render_window.html" title="Ogre::NULLRenderWindow" alt="" coords="649,1333,843,1360"/>
+<area shape="rect" id="node40" href="$class_ogre_1_1_s_d_l_window.html" title="Ogre::SDLWindow" alt="" coords="677,1384,815,1411"/>
+<area shape="rect" id="node41" href="$class_ogre_1_1_win32_window.html" title="Ogre::Win32Window" alt="" coords="669,1435,823,1461"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_d3_d11_render_window_swap_chain_based.html" title="Ogre::D3D11RenderWindowSwap\lChainBased" alt="" coords="912,963,1151,1005"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_android_e_g_l_window.html" title="Ogre::AndroidEGLWindow" alt="" coords="937,1029,1125,1056"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_emscripten_e_g_l_window.html" title="Ogre::EmscriptenEGLWindow" alt="" coords="926,1080,1137,1107"/>
+<area shape="rect" id="node33" href="$class_ogre_1_1_win32_e_g_l_window.html" title="Ogre::Win32EGLWindow" alt="" coords="942,1131,1121,1157"/>
+<area shape="rect" id="node34" href="$class_ogre_1_1_x11_e_g_l_window.html" title="Ogre::X11EGLWindow" alt="" coords="950,1181,1113,1208"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::D3D11VertexArrayObject" name="Ogre::D3D11VertexArrayObject">
+<area shape="rect" id="node2" href="$struct_ogre_1_1_vertex_array_object.html" title="Vertex array objects (Vaos) are immutable objects that describe a combination of vertex buffers and i..." alt="" coords="27,80,209,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="31,5,205,32"/>
+</map>

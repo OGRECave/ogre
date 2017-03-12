@@ -1,0 +1,9 @@
+<map id="Ogre::Plugin" name="Ogre::Plugin">
+<area shape="rect" id="node3" href="$class_ogre_1_1_d3_d11_plugin.html" title="Plugin instance for D3D11 Manager. " alt="" coords="301,5,447,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d9_plugin.html" title="Plugin instance for D3D9 Manager. " alt="" coords="305,56,443,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_g_l3_plus_plugin.html" title="Plugin instance for GL3Plus Manager. " alt="" coords="297,107,451,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l_e_s2_plugin.html" title="Plugin instance for GL ES 2 Manager. " alt="" coords="303,157,445,184"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_metal_plugin.html" title="Plugin instance for Metal Manager. " alt="" coords="305,208,443,235"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_n_u_l_l_plugin.html" title="Plugin instance for NULL Manager. " alt="" coords="307,259,441,285"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,132,100,159"/>
+</map>

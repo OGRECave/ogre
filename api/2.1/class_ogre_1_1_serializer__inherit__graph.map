@@ -1,0 +1,15 @@
+<map id="Ogre::Serializer" name="Ogre::Serializer">
+<area shape="rect" id="node3" href="$class_ogre_1_1_gpu_named_constants_serializer.html" title="Simple class for loading / saving GpuNamedConstants. " alt="" coords="339,5,599,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_lod_config_serializer.html" title="Ogre::LodConfigSerializer" alt="" coords="375,56,562,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_mesh_serializer.html" title="Class for serialising mesh data to/from an OGRE .mesh file. " alt="" coords="390,107,547,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_mesh_serializer_impl.html" title="Internal implementation of Mesh reading / writing for the latest version of the .mesh format..." alt="" coords="375,157,562,184"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1v1_1_1_mesh_serializer.html" title="Class for serialising mesh data to/from an OGRE .mesh file. " alt="" coords="378,208,559,235"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1v1_1_1_mesh_serializer_impl.html" title="Internal implementation of Mesh reading / writing for the latest version of the .mesh format..." alt="" coords="363,259,574,285"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1v1_1_1_skeleton_serializer.html" title="Class for serialising skeleton data to/from an OGRE .skeleton file. " alt="" coords="367,309,570,336"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,157,120,184"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_mesh_serializer_impl__v2__1___r1.html" title="Ogre::MeshSerializerImpl\l_v2_1_R1" alt="" coords="647,150,833,191"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_mesh_serializer_impl__v2__1___r0.html" title="Ogre::MeshSerializerImpl\l_v2_1_R0" alt="" coords="881,150,1068,191"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1v1_1_1_mesh_serializer_impl__v1__10.html" title="Class for providing backwards&#45;compatibility for loading version 1.10 of the .mesh format..." alt="" coords="649,251,831,293"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1v1_1_1_mesh_serializer_impl__v1__8.html" title="Class for providing backwards&#45;compatibility for loading version 1.8 of the .mesh format. " alt="" coords="884,251,1065,293"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1v1_1_1_mesh_serializer_impl__v1__41.html" title="Class for providing backwards&#45;compatibility for loading version 1.41 of the .mesh format..." alt="" coords="1116,251,1297,293"/>
+</map>

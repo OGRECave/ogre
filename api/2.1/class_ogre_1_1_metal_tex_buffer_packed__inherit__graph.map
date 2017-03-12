@@ -1,0 +1,6 @@
+<map id="Ogre::MetalTexBufferPacked" name="Ogre::MetalTexBufferPacked">
+<area shape="rect" id="node2" href="$class_ogre_1_1_tex_buffer_packed.html" title="Represents Texture buffers (also known as tbuffers in D3D11) " alt="" coords="77,155,249,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_buffer_packed.html" title="Ogre::BufferPacked" alt="" coords="89,80,237,107"/>
+<area shape="rect" id="node4" href="$struct_ogre_1_1_gpu_resource.html" title="Ogre::GpuResource" alt="" coords="5,5,152,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="176,5,317,32"/>
+</map>

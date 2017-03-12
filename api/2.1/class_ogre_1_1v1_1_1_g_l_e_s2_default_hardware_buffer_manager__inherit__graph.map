@@ -1,0 +1,6 @@
+<map id="Ogre::v1::GLES2DefaultHardwareBufferManager" name="Ogre::v1::GLES2DefaultHardwareBufferManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_hardware_buffer_manager.html" title="Singleton wrapper for hardware buffer manager. " alt="" coords="115,169,303,211"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1v1_1_1_hardware_buffer_manager_base.html" title="Base definition of a hardware buffer manager. " alt="" coords="5,80,193,121"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="52,5,147,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Hardware\lBufferManager \&gt;" alt="" coords="218,80,418,121"/>
+</map>

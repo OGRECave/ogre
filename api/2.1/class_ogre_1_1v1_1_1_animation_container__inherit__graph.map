@@ -1,0 +1,6 @@
+<map id="Ogre::v1::AnimationContainer" name="Ogre::v1::AnimationContainer">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_mesh.html" title="Resource holding data about 3D mesh. " alt="" coords="51,80,171,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1v1_1_1_skeleton.html" title="A collection of OldBone objects used to animate a skinned mesh. " alt="" coords="209,80,352,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1v1_1_1_patch_mesh.html" title="Patch specialisation of Mesh. " alt="" coords="5,155,161,181"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1v1_1_1_old_skeleton_instance.html" title="A OldSkeletonInstance is a single instance of a Skeleton used by a world object. " alt="" coords="186,155,405,181"/>
+</map>

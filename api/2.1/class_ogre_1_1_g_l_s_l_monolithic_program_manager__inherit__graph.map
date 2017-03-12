@@ -1,0 +1,4 @@
+<map id="Ogre::GLSLMonolithicProgramManager" name="Ogre::GLSLMonolithicProgramManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1_g_l_s_l_program_manager.html" title="Ogre assumes that there are separate programs to deal with but GLSL has one program object that repre..." alt="" coords="5,13,211,39"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; GLSLMonolithic\lProgramManager \&gt;" alt="" coords="235,5,472,47"/>
+</map>

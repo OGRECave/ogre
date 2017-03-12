@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::TextureAtlasSamplerFactory" name="Ogre::RTShader::TextureAtlasSamplerFactory">
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state_factory.html" title="Abstract factory interface for creating SubRenderState implementation instances. " alt="" coords="219,5,420,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,13,171,39"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Texture\lAtlasSamplerFactory \&gt;" alt="" coords="226,71,413,112"/>
+</map>

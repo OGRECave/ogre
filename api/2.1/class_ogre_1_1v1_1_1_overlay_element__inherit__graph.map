@@ -1,0 +1,9 @@
+<map id="Ogre::v1::OverlayElement" name="Ogre::v1::OverlayElement">
+<area shape="rect" id="node5" href="$class_ogre_1_1v1_1_1_overlay_container.html" title="A 2D element which contains other OverlayElement instances. " alt="" coords="45,162,243,189"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1v1_1_1_text_area_overlay_element.html" title="This class implements an overlay element which contains simple unformatted text. " alt="" coords="268,155,463,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style, self&#45;defining parameter set to callers. " alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement. " alt="" coords="187,5,322,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="346,5,451,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1v1_1_1_panel_overlay_element.html" title="OverlayElement representing a flat, single&#45;material (or transparent) panel which can contain other el..." alt="" coords="31,244,257,271"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1v1_1_1_border_panel_overlay_element.html" title="A specialisation of the PanelOverlayElement to provide a panel with a border. " alt="" coords="37,319,251,360"/>
+</map>

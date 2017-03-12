@@ -1,0 +1,26 @@
+var struct_ogre_1_1_gpu_constant_definition =
+[
+    [ "GpuConstantDefinition", "struct_ogre_1_1_gpu_constant_definition.html#afce533b1a68d8e3f542cfeab53a643ae", null ],
+    [ "getBaseType", "struct_ogre_1_1_gpu_constant_definition.html#a756b2a33dcacfd3cca90be358cae3168", null ],
+    [ "getElementSize", "struct_ogre_1_1_gpu_constant_definition.html#a98b89162a969ef7c8cdce59979e486e9", null ],
+    [ "isBool", "struct_ogre_1_1_gpu_constant_definition.html#ad53ec6eedaf695a41ba9773112256ab7", null ],
+    [ "isBool", "struct_ogre_1_1_gpu_constant_definition.html#ad36eaae8146204ee76bf97e5ca432aaf", null ],
+    [ "isDouble", "struct_ogre_1_1_gpu_constant_definition.html#aa85afb9ccfaa33bccf8054370bf121ae", null ],
+    [ "isDouble", "struct_ogre_1_1_gpu_constant_definition.html#aabae16f5e6f35ed5e5370501a4eeede7", null ],
+    [ "isFloat", "struct_ogre_1_1_gpu_constant_definition.html#a7e8eb132b7b4e46045eb680f2734410a", null ],
+    [ "isFloat", "struct_ogre_1_1_gpu_constant_definition.html#a13ed935cc299f0b4bfdd2b308e96e459", null ],
+    [ "isInt", "struct_ogre_1_1_gpu_constant_definition.html#a134c40a7f7baddf559a6a771c0cd9149", null ],
+    [ "isInt", "struct_ogre_1_1_gpu_constant_definition.html#a3561315f96c261bf026da6b06955518f", null ],
+    [ "isSampler", "struct_ogre_1_1_gpu_constant_definition.html#a280838a1b7aa40b1e0dc5036b9a33b97", null ],
+    [ "isSampler", "struct_ogre_1_1_gpu_constant_definition.html#a59a70d25266c42c4d1c6cb3af15ff2cc", null ],
+    [ "isSubroutine", "struct_ogre_1_1_gpu_constant_definition.html#ae697e9c02150de15437ba260b8cf339b", null ],
+    [ "isSubroutine", "struct_ogre_1_1_gpu_constant_definition.html#a3fd6712d35b95b3c8e6f07263a3aa492", null ],
+    [ "isUnsignedInt", "struct_ogre_1_1_gpu_constant_definition.html#a4c59abf98a3fd610274815428eda0caa", null ],
+    [ "isUnsignedInt", "struct_ogre_1_1_gpu_constant_definition.html#a8044bcb2a6b93ce1f36ae705d3dbcb29", null ],
+    [ "arraySize", "struct_ogre_1_1_gpu_constant_definition.html#acaf52008903308ca818a1fc816d88231", null ],
+    [ "constType", "struct_ogre_1_1_gpu_constant_definition.html#a2313e6ce0fa661a5814099230846b82d", null ],
+    [ "elementSize", "struct_ogre_1_1_gpu_constant_definition.html#a2d71f0cd6e1f4fab8806905dd131abe6", null ],
+    [ "logicalIndex", "struct_ogre_1_1_gpu_constant_definition.html#a8579926ecde16841abf0d872689b672c", null ],
+    [ "physicalIndex", "struct_ogre_1_1_gpu_constant_definition.html#a46ccefd7dc110783ff07328cf105b19f", null ],
+    [ "variability", "struct_ogre_1_1_gpu_constant_definition.html#a51ccda09a2daaef201e0bfe014dfef1b", null ]
+];

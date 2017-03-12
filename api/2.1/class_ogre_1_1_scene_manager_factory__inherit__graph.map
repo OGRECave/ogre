@@ -1,0 +1,4 @@
+<map id="Ogre::SceneManagerFactory" name="Ogre::SceneManagerFactory">
+<area shape="rect" id="node3" href="$class_ogre_1_1_default_scene_manager_factory.html" title="Factory for default scene manager. " alt="" coords="6,155,211,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="49,5,168,32"/>
+</map>

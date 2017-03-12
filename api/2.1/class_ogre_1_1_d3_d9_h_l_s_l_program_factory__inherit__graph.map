@@ -1,0 +1,4 @@
+<map id="Ogre::D3D9HLSLProgramFactory" name="Ogre::D3D9HLSLProgramFactory">
+<area shape="rect" id="node2" href="$class_ogre_1_1_high_level_gpu_program_factory.html" title="Interface definition for factories of HighLevelGpuProgram. " alt="" coords="19,80,225,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="71,5,173,32"/>
+</map>

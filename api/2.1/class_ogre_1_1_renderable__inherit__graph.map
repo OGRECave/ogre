@@ -1,0 +1,29 @@
+<map id="Ogre::Renderable" name="Ogre::Renderable">
+<area shape="rect" id="node2" href="$class_ogre_1_1_frustum.html" title="A frustum represents a pyramid, capped at the near and far end which is used to represent either a vi..." alt="" coords="233,5,347,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_manual_object_1_1_manual_object_section.html" title="Built, renderable section of geometry. " alt="" coords="206,57,374,98"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_renderable_animated.html" title="Ogre::RenderableAnimated" alt="" coords="191,123,389,149"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1v1_1_1_billboard_chain.html" title="Allows the rendering of a chain of connected billboards. " alt="" coords="200,173,380,200"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1v1_1_1_billboard_set.html" title="A collection of billboards (faces which are always facing the given direction) with the same (default..." alt="" coords="208,224,372,251"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1v1_1_1_border_renderable.html" title="Class for rendering the border of a BorderPanelOverlayElement. " alt="" coords="189,275,391,301"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1v1_1_1_instance_batch.html" title="InstanceBatch forms part of the new Instancing system This is an abstract class that must be derived ..." alt="" coords="201,325,379,352"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1v1_1_1_manual_object_1_1_manual_object_section.html" title="Built, renderable section of geometry. " alt="" coords="203,377,377,418"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1v1_1_1_overlay_element.html" title="Abstract definition of a 2D element to be displayed in an Overlay. " alt="" coords="195,443,385,469"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1v1_1_1_rectangle2_d.html" title="Allows the rendering of a simple 2D rectangle This class renders a simple 2D rectangle; this rectangl..." alt="" coords="206,493,374,520"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1v1_1_1_simple_renderable.html" title="Simple implementation of MovableObject and Renderable for single&#45;part custom objects. " alt="" coords="188,544,392,571"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1v1_1_1_static_geometry_1_1_geometry_bucket.html" title="A GeometryBucket is a the lowest level bucket where geometry with the same vertex &amp; index format is s..." alt="" coords="197,595,383,637"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1v1_1_1_sub_entity.html" title="Utility class which defines the sub&#45;parts of an Entity. " alt="" coords="217,661,363,688"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_wire_aabb.html" title="Helper class to display the Aabb of a MovableObject as lines. " alt="" coords="228,712,352,739"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_camera.html" title="A viewpoint from which the scene will be rendered. " alt="" coords="501,5,613,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_sub_item.html" title="Utility class which defines the sub&#45;parts of an Item. " alt="" coords="500,123,615,149"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1v1_1_1_ribbon_trail.html" title="Subclass of BillboardChain which automatically leaves a trail behind one or more Node instances..." alt="" coords="478,173,637,200"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1v1_1_1_base_instance_batch_v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) This implementation..." alt="" coords="440,275,675,301"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1v1_1_1_instance_batch_h_w.html" title="This is technique requires true instancing hardware support. " alt="" coords="457,325,657,352"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1v1_1_1_instance_batch_shader.html" title="This is the same technique the old &quot;InstancedGeometry&quot; implementation used (with improvements). " alt="" coords="446,376,669,403"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1v1_1_1_instance_batch_h_w___v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and hardware instan..." alt="" coords="723,249,955,276"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1v1_1_1_instance_batch_v_t_f.html" title="Ogre::v1::InstanceBatchVTF" alt="" coords="737,300,940,327"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1v1_1_1_overlay_container.html" title="A 2D element which contains other OverlayElement instances. " alt="" coords="458,427,657,453"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1v1_1_1_text_area_overlay_element.html" title="This class implements an overlay element which contains simple unformatted text. " alt="" coords="460,478,655,519"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1v1_1_1_panel_overlay_element.html" title="OverlayElement representing a flat, single&#45;material (or transparent) panel which can contain other el..." alt="" coords="725,427,952,453"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1v1_1_1_border_panel_overlay_element.html" title="A specialisation of the PanelOverlayElement to provide a panel with a border. " alt="" coords="1003,419,1217,461"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1v1_1_1_wire_bounding_box.html" title="Allows the rendering of a wireframe bounding box. " alt="" coords="457,544,658,571"/>
+</map>

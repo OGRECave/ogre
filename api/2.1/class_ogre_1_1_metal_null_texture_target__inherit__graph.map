@@ -1,0 +1,6 @@
+<map id="Ogre::MetalNullTextureTarget" name="Ogre::MetalNullTextureTarget">
+<area shape="rect" id="node2" href="$class_ogre_1_1_render_texture.html" title="This class represents a RenderTarget that renders to a Texture. " alt="" coords="79,155,236,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation. " alt="" coords="83,80,232,107"/>
+<area shape="rect" id="node4" href="$struct_ogre_1_1_gpu_resource.html" title="Ogre::GpuResource" alt="" coords="5,5,152,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="176,5,299,32"/>
+</map>

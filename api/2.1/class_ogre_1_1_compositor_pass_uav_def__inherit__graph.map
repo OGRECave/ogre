@@ -1,0 +1,4 @@
+<map id="Ogre::CompositorPassUavDef" name="Ogre::CompositorPassUavDef">
+<area shape="rect" id="node2" href="$class_ogre_1_1_compositor_pass_def.html" title="Interface to abstract all types of pass definitions (. " alt="" coords="18,80,207,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="36,5,189,32"/>
+</map>

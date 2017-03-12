@@ -1,0 +1,4 @@
+<map id="Ogre::v1::DefaultHardwareBufferManagerBase" name="Ogre::v1::DefaultHardwareBufferManagerBase">
+<area shape="rect" id="node2" href="$class_ogre_1_1v1_1_1_hardware_buffer_manager_base.html" title="Base definition of a hardware buffer manager. " alt="" coords="9,80,197,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="56,5,151,32"/>
+</map>
