@@ -17,7 +17,7 @@ compositor_node ShadowMapDebuggingRenderingNode
 	}
 }
 
-abstract target cubemap_target
+abstract target cubemap_target_shadow
 {
 	pass clear { colour_value 1 1 1 1 }
 	pass render_scene
@@ -75,12 +75,12 @@ compositor_node_shadow ShadowMapDebuggingShadowNode
 	{
 		shadow_map_repeat 3 4
 		{
-			target tmpCubemap +X : cubemap_target {}
-			target tmpCubemap -X : cubemap_target {}
-			target tmpCubemap +Y : cubemap_target {}
-			target tmpCubemap -Y : cubemap_target {}
-			target tmpCubemap +Z : cubemap_target {}
-			target tmpCubemap -Z : cubemap_target {}
+			target tmpCubemap +X : cubemap_target_shadow {}
+			target tmpCubemap -X : cubemap_target_shadow {}
+			target tmpCubemap +Y : cubemap_target_shadow {}
+			target tmpCubemap -Y : cubemap_target_shadow {}
+			target tmpCubemap +Z : cubemap_target_shadow {}
+			target tmpCubemap -Z : cubemap_target_shadow {}
 
 			shadow_map
 			{

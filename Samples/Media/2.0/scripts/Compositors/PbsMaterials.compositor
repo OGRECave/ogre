@@ -18,11 +18,21 @@ compositor_node PbsMaterialsRenderingNode
 	}
 }
 
+abstract target cubemap_target_shadow
+{
+	pass clear { colour_value 1 1 1 1 }
+	pass render_scene
+	{
+		camera_cubemap_reorient true
+	}
+}
+
 compositor_node_shadow PbsMaterialsShadowNode
 {
 	technique pssm
 
 	texture atlas 2048 7168 PF_D32_FLOAT
+	texture tmpCubemap 1024 1024 PF_FLOAT32_R cubemap
 
 	num_splits		3
 	pssm_lambda		0.95
@@ -58,6 +68,28 @@ compositor_node_shadow PbsMaterialsShadowNode
 		{
 			pass render_scene
 			{
+			}
+		}
+	}
+
+	shadow_map_target_type point
+	{
+		shadow_map_repeat 3 4
+		{
+			target tmpCubemap +X : cubemap_target_shadow {}
+			target tmpCubemap -X : cubemap_target_shadow {}
+			target tmpCubemap +Y : cubemap_target_shadow {}
+			target tmpCubemap -Y : cubemap_target_shadow {}
+			target tmpCubemap +Z : cubemap_target_shadow {}
+			target tmpCubemap -Z : cubemap_target_shadow {}
+
+			shadow_map
+			{
+				pass render_quad
+				{
+					material Ogre/DPSM/CubeToDpsm
+					input 0 tmpCubemap
+				}
 			}
 		}
 	}
