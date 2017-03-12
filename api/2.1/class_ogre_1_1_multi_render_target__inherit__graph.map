@@ -1,0 +1,10 @@
+<map id="Ogre::MultiRenderTarget" name="Ogre::MultiRenderTarget">
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d11_multi_render_target.html" title="Ogre::D3D11MultiRenderTarget" alt="" coords="591,5,797,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d9_multi_render_target.html" title="Ogre::D3D9MultiRenderTarget" alt="" coords="595,56,793,83"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l3_plus_f_b_o_multi_render_target.html" title="MultiRenderTarget for OpenGL. " alt="" coords="591,107,797,149"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l_e_s2_f_b_o_multi_render_target.html" title="MultiRenderTarget for GL ES 2.x. " alt="" coords="595,173,793,214"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_metal_multi_render_target.html" title="Ogre::MetalMultiRenderTarget" alt="" coords="595,239,793,265"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation. " alt="" coords="192,115,329,141"/>
+<area shape="rect" id="node3" href="$struct_ogre_1_1_gpu_resource.html" title="Ogre::GpuResource" alt="" coords="5,89,144,116"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="17,140,133,167"/>
+</map>

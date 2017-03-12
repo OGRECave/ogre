@@ -1,0 +1,11 @@
+<map id="Ogre::CompositorPass" name="Ogre::CompositorPass">
+<area shape="rect" id="node3" href="$class_ogre_1_1_compositor_pass_clear.html" title="Implementation of CompositorPass This implementation will clear the RenderTarget using the parameters..." alt="" coords="413,5,600,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_compositor_pass_compute.html" title="Implementation of CompositorPass This implementation will render a fullscreen triangle/quad to the Re..." alt="" coords="403,56,611,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_compositor_pass_depth_copy.html" title="Implementation of CompositorPass This implementation will copy one DepthBuffer to another DepthBuffer..." alt="" coords="396,107,617,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_compositor_pass_mipmap.html" title="Implementation of CompositorPass This implementation will Mipmap the texture used by this RenderTarge..." alt="" coords="406,157,607,184"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_compositor_pass_quad.html" title="Implementation of CompositorPass This implementation will render a fullscreen triangle/quad to the Re..." alt="" coords="413,208,600,235"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_compositor_pass_scene.html" title="Implementation of CompositorPass This implementation will perform main rendering, selecting several p..." alt="" coords="411,259,603,285"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_compositor_pass_stencil.html" title="Implementation of CompositorPass This implementation will clear the RenderTarget using the parameters..." alt="" coords="409,309,604,336"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_compositor_pass_uav.html" title="Implementation of CompositorPass This implementation will set UAVs. " alt="" coords="417,360,596,387"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,183,145,209"/>
+</map>

@@ -1,0 +1,24 @@
+<map id="Ogre::ResourceManager" name="Ogre::ResourceManager">
+<area shape="rect" id="node4" href="$class_ogre_1_1_font_manager.html" title="Manages Font resources, parsing .fontdef files and generally organising them. " alt="" coords="429,116,564,143"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_gpu_program_manager.html" title="Ogre::GpuProgramManager" alt="" coords="406,167,587,193"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_high_level_gpu_program_manager.html" title="This ResourceManager manages high&#45;level vertex and fragment programs. " alt="" coords="402,235,591,277"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_material_manager.html" title="Class for managing Material settings for Ogre. " alt="" coords="419,301,574,328"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_mesh_manager.html" title="Handles the management of mesh resources. " alt="" coords="427,352,567,379"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_texture_manager.html" title="Class for loading &amp; managing textures. " alt="" coords="421,403,573,429"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1v1_1_1_mesh_manager.html" title="Handles the management of mesh resources. " alt="" coords="415,453,578,480"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1v1_1_1_old_skeleton_manager.html" title="Handles the management of skeleton resources. " alt="" coords="396,504,597,531"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,301,136,328"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="17,352,124,379"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d11_gpu_program_manager.html" title="Ogre::D3D11GpuProgramManager" alt="" coords="649,5,872,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_d3_d9_gpu_program_manager.html" title="Ogre::D3D9GpuProgramManager" alt="" coords="653,56,868,83"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l3_plus_gpu_program_manager.html" title="Ogre::GL3PlusGpuProgramManager" alt="" coords="645,107,876,133"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l_e_s2_gpu_program_manager.html" title="Ogre::GLES2GpuProgramManager" alt="" coords="649,157,872,184"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_g_l_s_l_shader_manager.html" title="Ogre::GLSLShaderManager" alt="" coords="669,208,852,235"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_metal_gpu_program_manager.html" title="Ogre::MetalGpuProgramManager" alt="" coords="654,259,867,285"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_d3_d11_texture_manager.html" title="Ogre::D3D11TextureManager" alt="" coords="664,309,857,336"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_d3_d9_texture_manager.html" title="Ogre::D3D9TextureManager" alt="" coords="667,360,854,387"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_g_l3_plus_texture_manager.html" title="GL3Plus&#45;specific implementation of a TextureManager. " alt="" coords="659,411,862,437"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_g_l_e_s2_texture_manager.html" title="GL ES&#45;specific implementation of a TextureManager. " alt="" coords="663,461,858,488"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_metal_texture_manager.html" title="Ogre::MetalTextureManager" alt="" coords="669,512,853,539"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_n_u_l_l_texture_manager.html" title="Ogre::NULLTextureManager" alt="" coords="667,563,854,589"/>
+</map>

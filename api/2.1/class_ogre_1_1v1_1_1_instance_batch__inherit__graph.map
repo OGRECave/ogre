@@ -1,0 +1,12 @@
+<map id="Ogre::v1::InstanceBatch" name="Ogre::v1::InstanceBatch">
+<area shape="rect" id="node7" href="$class_ogre_1_1v1_1_1_base_instance_batch_v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) This implementation..." alt="" coords="609,31,828,57"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1v1_1_1_instance_batch_h_w.html" title="This is technique requires true instancing hardware support. " alt="" coords="625,81,812,108"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1v1_1_1_instance_batch_shader.html" title="This is the same technique the old &quot;InstancedGeometry&quot; implementation used (with improvements). " alt="" coords="616,132,821,159"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement. " alt="" coords="215,56,339,83"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene. " alt="" coords="204,107,349,133"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose..." alt="" coords="5,56,156,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="31,107,131,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_id_object.html" title="Ogre::IdObject" alt="" coords="27,157,134,184"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1v1_1_1_instance_batch_h_w___v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and hardware instan..." alt="" coords="876,5,1095,32"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1v1_1_1_instance_batch_v_t_f.html" title="Ogre::v1::InstanceBatchVTF" alt="" coords="891,56,1080,83"/>
+</map>

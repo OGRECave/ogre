@@ -1,0 +1,37 @@
+<map id="Ogre::IdObject" name="Ogre::IdObject">
+<area shape="rect" id="node2" href="$class_ogre_1_1_bone.html" title="Class representing a Bone in the join hierarchy of a skeleton. " alt="" coords="225,335,313,361"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_compositor_node.html" title="Compositor nodes are the core subject of compositing. " alt="" coords="191,385,347,412"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_compositor_workspace.html" title="A compositor workspace is the main interface to render into an RT, be it a RenderWindow or an RTT (Re..." alt="" coords="174,436,365,463"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene. " alt="" coords="197,487,342,513"/>
+<area shape="rect" id="node33" href="$class_ogre_1_1_node.html" title="Class representing a general&#45;purpose node an articulated scene graph. " alt="" coords="225,537,314,564"/>
+<area shape="rect" id="node36" href="$class_ogre_1_1_parallax_corrected_cubemap.html" title="Ogre::ParallaxCorrectedCubemap" alt="" coords="160,588,379,615"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_compositor_shadow_node.html" title="Shadow Nodes are special nodes (not to be confused with. " alt="" coords="427,5,629,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_frustum.html" title="A frustum represents a pyramid, capped at the near and far end which is used to represent either a vi..." alt="" coords="475,56,581,83"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_item.html" title="Defines an instance of a discrete, movable object based on a Mesh. " alt="" coords="486,107,570,133"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_light.html" title="Representation of a dynamic light source in the scene. " alt="" coords="485,157,571,184"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_manual_object.html" title="Ogre::ManualObject" alt="" coords="459,208,597,235"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_movable_plane.html" title="Definition of a Plane that may be attached to a node, and the derived details of it retrieved simply..." alt="" coords="458,259,598,285"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_null_entity.html" title="Ogre::NullEntity" alt="" coords="471,309,585,336"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_particle_system.html" title="Class defining particle system based special effects. " alt="" coords="455,360,601,387"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1v1_1_1_billboard_chain.html" title="Allows the rendering of a chain of connected billboards. " alt="" coords="446,411,610,437"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1v1_1_1_billboard_set.html" title="A collection of billboards (faces which are always facing the given direction) with the same (default..." alt="" coords="453,461,603,488"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1v1_1_1_entity.html" title="Defines an instance of a discrete, movable object based on a Mesh. " alt="" coords="471,512,585,539"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1v1_1_1_instance_batch.html" title="InstanceBatch forms part of the new Instancing system This is an abstract class that must be derived ..." alt="" coords="446,563,610,589"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1v1_1_1_instanced_entity.html" title="Ogre::v1::InstancedEntity" alt="" coords="443,613,613,640"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1v1_1_1_manual_object.html" title="Class providing a much simplified interface to generating manual objects with custom geometry..." alt="" coords="448,664,608,691"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1v1_1_1_overlay.html" title="Represents a layer which is rendered on top of the &#39;normal&#39; scene contents. " alt="" coords="465,715,591,741"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1v1_1_1_rectangle2_d.html" title="Allows the rendering of a simple 2D rectangle This class renders a simple 2D rectangle; this rectangl..." alt="" coords="450,765,606,792"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1v1_1_1_simple_renderable.html" title="Simple implementation of MovableObject and Renderable for single&#45;part custom objects. " alt="" coords="435,816,621,843"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1v1_1_1_static_geometry_1_1_region.html" title="The details of a topological region which is the highest level of partitioning for this class..." alt="" coords="443,867,613,909"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_wire_aabb.html" title="Helper class to display the Aabb of a MovableObject as lines. " alt="" coords="471,933,585,960"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_camera.html" title="A viewpoint from which the scene will be rendered. " alt="" coords="735,56,839,83"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1v1_1_1_ribbon_trail.html" title="Subclass of BillboardChain which automatically leaves a trail behind one or more Node instances..." alt="" coords="713,411,860,437"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1v1_1_1_base_instance_batch_v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) This implementation..." alt="" coords="677,512,896,539"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1v1_1_1_instance_batch_h_w.html" title="This is technique requires true instancing hardware support. " alt="" coords="693,563,880,589"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1v1_1_1_instance_batch_shader.html" title="This is the same technique the old &quot;InstancedGeometry&quot; implementation used (with improvements). " alt="" coords="684,613,889,640"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1v1_1_1_instance_batch_h_w___v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and hardware instan..." alt="" coords="944,487,1163,513"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1v1_1_1_instance_batch_v_t_f.html" title="Ogre::v1::InstanceBatchVTF" alt="" coords="959,537,1148,564"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1v1_1_1_wire_bounding_box.html" title="Allows the rendering of a wireframe bounding box. " alt="" coords="695,816,879,843"/>
+<area shape="rect" id="node34" href="$class_ogre_1_1_scene_node.html" title="Class representing a node in the scene graph. " alt="" coords="465,984,591,1011"/>
+<area shape="rect" id="node35" href="$class_ogre_1_1_tag_point.html" title="TagPoints are like SceneNodes, that can be children of a Bone. " alt="" coords="731,984,842,1011"/>
+</map>

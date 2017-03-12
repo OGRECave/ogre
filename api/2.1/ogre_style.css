@@ -1,0 +1,31 @@
+h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
+	text-shadow: 0 0 15px #F5BA4E;
+}
+
+div.line.glow {
+	background-color: #F5BA4E;
+	box-shadow: 0 0 10px #F5BA4E;
+}
+
+.memberdecls td.glow, .fieldtable tr.glow {
+	background-color: #F5BA4E;
+	box-shadow: 0 0 15px #F5BA4E;
+}
+
+.memitem.glow {
+    box-shadow: 0 0 15px #F5BA4E;
+}
+
+.image
+{
+   text-align: left;
+}
+
+h1, h2
+{
+    margin-top: 50px;
+}
+h3, h4
+{
+    margin-top: 25px;
+}

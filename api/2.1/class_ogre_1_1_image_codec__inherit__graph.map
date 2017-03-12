@@ -1,0 +1,9 @@
+<map id="Ogre::ImageCodec" name="Ogre::ImageCodec">
+<area shape="rect" id="node4" href="$class_ogre_1_1_d_d_s_codec.html" title="Codec specialized in loading DDS (Direct Draw Surface) images. " alt="" coords="485,5,611,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_e_t_c_codec.html" title="Codec specialized in loading ETC (Ericsson Texture Compression) images. " alt="" coords="487,56,609,83"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_free_image_codec.html" title="Codec specialized in images loaded using FreeImage. " alt="" coords="469,107,627,133"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_p_v_r_t_c_codec.html" title="Codec specialized in loading PVRTC (PowerVR) images. " alt="" coords="477,157,619,184"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_s_t_b_i_image_codec.html" title="Codec specialized in images loaded using stbi (https://github.com/nothings/stb). " alt="" coords="467,208,629,235"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_codec.html" title="Abstract class that defines a &#39;codec&#39;. " alt="" coords="143,107,239,133"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="5,107,95,133"/>
+</map>

@@ -1,0 +1,28 @@
+var class_ogre_1_1_irradiance_volume =
+[
+    [ "IrradianceVolume", "class_ogre_1_1_irradiance_volume.html#adf403ef637fbcca96b6862ff35229c8e", null ],
+    [ "~IrradianceVolume", "class_ogre_1_1_irradiance_volume.html#afdd4cfcb5064f1c56661a3b77d74a283", null ],
+    [ "changeVolumeData", "class_ogre_1_1_irradiance_volume.html#ab73da949007542f72d9080c69bac3945", null ],
+    [ "clearVolumeData", "class_ogre_1_1_irradiance_volume.html#a2202a58267f60823b0949df278d72e0e", null ],
+    [ "createIrradianceVolumeTexture", "class_ogre_1_1_irradiance_volume.html#a17dccafb34da34dfbdd4dad49c424566", null ],
+    [ "destroyIrradianceVolumeTexture", "class_ogre_1_1_irradiance_volume.html#acc16d9d8d2c316ffe7511b694b6f5d25", null ],
+    [ "freeMemory", "class_ogre_1_1_irradiance_volume.html#a0c20d87ca82473adbb1b90ed092e4600", null ],
+    [ "gaussFilter", "class_ogre_1_1_irradiance_volume.html#ac48543226a5a226bf6eee5c93fa095b4", null ],
+    [ "gaussFilterX", "class_ogre_1_1_irradiance_volume.html#a8e5a4d1bb12e7be35465f1ee66a0c426", null ],
+    [ "gaussFilterY", "class_ogre_1_1_irradiance_volume.html#ac47eeebaee5bb4dab307febdb24996ce", null ],
+    [ "gaussFilterZ", "class_ogre_1_1_irradiance_volume.html#a9674afaeca82f9960a12758e4efb72f1", null ],
+    [ "getIrradianceCellSize", "class_ogre_1_1_irradiance_volume.html#a1bf621b776dd3659037e2afa045bc4b0", null ],
+    [ "getIrradianceMaxPower", "class_ogre_1_1_irradiance_volume.html#a7b1292569989503bff8d4ba70a10b1b6", null ],
+    [ "getIrradianceOrigin", "class_ogre_1_1_irradiance_volume.html#a309f0853e01f6c647323e2bbb1783064", null ],
+    [ "getIrradianceVolumeTexture", "class_ogre_1_1_irradiance_volume.html#a6e2ffa0f040b8a7683e1d4f1621d8bcf", null ],
+    [ "getIrradSamplerblock", "class_ogre_1_1_irradiance_volume.html#a69873517227d3961a800fae552361482", null ],
+    [ "getNumBlocksX", "class_ogre_1_1_irradiance_volume.html#a72d3855e18a4f90ab04ecd0381f349d0", null ],
+    [ "getNumBlocksY", "class_ogre_1_1_irradiance_volume.html#af73d8bb7edd522c7b4f3494b7c8b43c9", null ],
+    [ "getNumBlocksZ", "class_ogre_1_1_irradiance_volume.html#a28fa2ddaac8d20e4507717b9570df531", null ],
+    [ "getPowerScale", "class_ogre_1_1_irradiance_volume.html#ab8e3a34eff1f12db5eaae15d055754ee", null ],
+    [ "setIrradianceCellSize", "class_ogre_1_1_irradiance_volume.html#a04ed0f732b05f5ce5fd7bdf474fa0250", null ],
+    [ "setIrradianceMaxPower", "class_ogre_1_1_irradiance_volume.html#a5cddee6577bd892e5b5f2156f1ad7df1", null ],
+    [ "setIrradianceOrigin", "class_ogre_1_1_irradiance_volume.html#a1c0429e6d1319ffc3246f41043cccdfb", null ],
+    [ "setPowerScale", "class_ogre_1_1_irradiance_volume.html#ad509b0ba9467cbd3994556afb771e079", null ],
+    [ "updateIrradianceVolumeTexture", "class_ogre_1_1_irradiance_volume.html#aac37fddc5648a7530fe86a9c9e416476", null ]
+];

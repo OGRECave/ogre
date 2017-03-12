@@ -1,0 +1,6 @@
+<map id="Ogre::HlmsPbs" name="Ogre::HlmsPbs">
+<area shape="rect" id="node2" href="$class_ogre_1_1_hlms_buffer_manager.html" title="Managing constant and texture buffers for sending shader parameters is a very similar process to most..." alt="" coords="5,155,180,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hlms.html" title="HLMS stands for &quot;High Level Material System&quot;. " alt="" coords="48,80,137,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator..." alt="" coords="51,5,134,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_const_buffer_pool.html" title="Maintains a pool of buffers grouped by hash ID. " alt="" coords="205,155,359,181"/>
+</map>

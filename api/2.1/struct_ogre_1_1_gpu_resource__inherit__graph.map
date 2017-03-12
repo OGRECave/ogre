@@ -1,0 +1,50 @@
+<map id="Ogre::GpuResource" name="Ogre::GpuResource">
+<area shape="rect" id="node2" href="$class_ogre_1_1_buffer_packed.html" title="Ogre::BufferPacked" alt="" coords="192,364,329,391"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation. " alt="" coords="192,983,329,1009"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_const_buffer_packed.html" title="Represents constant buffers (also known as Uniform Buffers in GL) " alt="" coords="381,123,553,149"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_index_buffer_packed.html" title="Ogre::IndexBufferPacked" alt="" coords="383,263,552,289"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_indirect_buffer_packed.html" title="Represents Indirect buffers for storing draw call commands. " alt="" coords="377,313,557,340"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_tex_buffer_packed.html" title="Represents Texture buffers (also known as tbuffers in D3D11) " alt="" coords="388,364,547,391"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_uav_buffer_packed.html" title="Represents UAV buffers (also known as SSBOs in OpenGL) Uav buffers are supported in DX10/DX10..." alt="" coords="387,440,548,467"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_vertex_buffer_packed.html" title="Ogre::VertexBufferPacked" alt="" coords="380,491,555,517"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d11_const_buffer_packed.html" title="Ogre::D3D11ConstBufferPacked" alt="" coords="608,5,821,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_g_l3_plus_const_buffer_packed.html" title="Ogre::GL3PlusConstBuffer\lPacked" alt="" coords="625,57,804,98"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_metal_const_buffer_packed.html" title="Ogre::MetalConstBufferPacked" alt="" coords="613,123,817,149"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_n_u_l_l_const_buffer_packed.html" title="Ogre::NULLConstBufferPacked" alt="" coords="611,173,818,200"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_d3_d11_tex_buffer_packed.html" title="Ogre::D3D11TexBufferPacked" alt="" coords="615,224,815,251"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_g_l3_plus_tex_buffer_packed.html" title="Ogre::GL3PlusTexBufferPacked" alt="" coords="610,275,819,301"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_metal_tex_buffer_packed.html" title="Ogre::MetalTexBufferPacked" alt="" coords="619,325,810,352"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_n_u_l_l_tex_buffer_packed.html" title="Ogre::NULLTexBufferPacked" alt="" coords="618,376,811,403"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_d3_d11_uav_buffer_packed.html" title="Ogre::D3D11UavBufferPacked" alt="" coords="613,427,816,453"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_g_l3_plus_uav_buffer_packed.html" title="Ogre::GL3PlusUavBufferPacked" alt="" coords="609,477,820,504"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_metal_uav_buffer_packed.html" title="Ogre::MetalUavBufferPacked" alt="" coords="618,528,811,555"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_n_u_l_l_uav_buffer_packed.html" title="Ogre::NULLUavBufferPacked" alt="" coords="617,579,812,605"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_multi_render_target.html" title="This class represents a render target that renders to multiple RenderTextures at once. " alt="" coords="385,772,550,799"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_render_texture.html" title="This class represents a RenderTarget that renders to a Texture. " alt="" coords="395,1189,539,1216"/>
+<area shape="rect" id="node41" href="$class_ogre_1_1_render_window.html" title="Manages the target rendering window. " alt="" coords="394,1704,541,1731"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_d3_d11_multi_render_target.html" title="Ogre::D3D11MultiRenderTarget" alt="" coords="611,629,818,656"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_d3_d9_multi_render_target.html" title="Ogre::D3D9MultiRenderTarget" alt="" coords="615,680,814,707"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_g_l3_plus_f_b_o_multi_render_target.html" title="MultiRenderTarget for OpenGL. " alt="" coords="612,731,817,773"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_g_l_e_s2_f_b_o_multi_render_target.html" title="MultiRenderTarget for GL ES 2.x. " alt="" coords="616,797,813,838"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_metal_multi_render_target.html" title="Ogre::MetalMultiRenderTarget" alt="" coords="616,863,813,889"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_d3_d11_depth_texture_target.html" title="Ogre::D3D11DepthTextureTarget" alt="" coords="607,913,822,940"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1_d3_d11_null_texture_target.html" title="Ogre::D3D11NullTextureTarget" alt="" coords="613,964,816,991"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_d3_d11_render_texture.html" title="RenderTexture implementation for D3D11. " alt="" coords="622,1015,807,1041"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_d3_d9_render_texture.html" title="RenderTexture implementation for D3D9. " alt="" coords="625,1065,804,1092"/>
+<area shape="rect" id="node33" href="$class_ogre_1_1_g_l3_plus_depth_texture_target.html" title="Ogre::GL3PlusDepthTexture\lTarget" alt="" coords="621,1117,808,1158"/>
+<area shape="rect" id="node34" href="$class_ogre_1_1_g_l3_plus_null_texture_target.html" title="Ogre::GL3PlusNullTexture\lTarget" alt="" coords="627,1182,802,1223"/>
+<area shape="rect" id="node35" href="$class_ogre_1_1_g_l3_plus_render_texture.html" title="Base class for GL Render Textures. " alt="" coords="617,1248,812,1275"/>
+<area shape="rect" id="node36" href="$class_ogre_1_1_g_l_e_s2_render_texture.html" title="Base class for GL Render Textures. " alt="" coords="621,1299,808,1325"/>
+<area shape="rect" id="node37" href="$class_ogre_1_1_metal_depth_texture_target.html" title="Ogre::MetalDepthTextureTarget" alt="" coords="611,1349,818,1376"/>
+<area shape="rect" id="node38" href="$class_ogre_1_1_metal_null_texture_target.html" title="Ogre::MetalNullTextureTarget" alt="" coords="617,1400,812,1427"/>
+<area shape="rect" id="node39" href="$class_ogre_1_1_metal_render_texture.html" title="Ogre::MetalRenderTexture" alt="" coords="627,1451,803,1477"/>
+<area shape="rect" id="node40" href="$class_ogre_1_1_n_u_l_l_render_texture.html" title="Ogre::NULLRenderTexture" alt="" coords="625,1501,804,1528"/>
+<area shape="rect" id="node42" href="$class_ogre_1_1_cocoa_window.html" title="Ogre::CocoaWindow" alt="" coords="643,1552,786,1579"/>
+<area shape="rect" id="node43" href="$class_ogre_1_1_d3_d11_render_window_base.html" title="Ogre::D3D11RenderWindowBase" alt="" coords="605,1603,824,1629"/>
+<area shape="rect" id="node44" href="$class_ogre_1_1_d3_d9_render_window.html" title="Ogre::D3D9RenderWindow" alt="" coords="624,1653,805,1680"/>
+<area shape="rect" id="node45" href="$class_ogre_1_1_e_g_l_window.html" title="Ogre::EGLWindow" alt="" coords="649,1704,780,1731"/>
+<area shape="rect" id="node46" href="$class_ogre_1_1_g_l_x_window.html" title="Ogre::GLXWindow" alt="" coords="649,1755,780,1781"/>
+<area shape="rect" id="node47" href="$class_ogre_1_1_g_t_k_window.html" title="Ogre::GTKWindow" alt="" coords="649,1805,781,1832"/>
+<area shape="rect" id="node48" href="$class_ogre_1_1_metal_render_window.html" title="Ogre::MetalRenderWindow" alt="" coords="625,1856,804,1883"/>
+<area shape="rect" id="node49" href="$class_ogre_1_1_na_cl_window.html" title="Ogre::NaClWindow" alt="" coords="647,1907,782,1933"/>
+</map>
