@@ -4457,8 +4457,8 @@ namespace Ogre{
             compiler->addError(ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM, obj->file, obj->line, ", Shader name: " + obj->name);
             // Register the unsupported program so that materials that use it know that
             // it exists but is unsupported.
-            GpuProgramPtr unsupportedProg = GpuProgramManager::getSingleton().create(obj->name,
-                                                                                     compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax).staticCast<GpuProgram>();
+            GpuProgramPtr unsupportedProg = static_pointer_cast<GpuProgram>(GpuProgramManager::getSingleton().create(obj->name,
+                                                                                     compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax));
             return;
         }
 

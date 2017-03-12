@@ -118,7 +118,7 @@ void MeshSerializerTests::SetUp()
         copyFile(mMeshFullPath, mMeshFullPath + ".bak");
     }
     mSkeletonFullPath = "";
-    mSkeleton = SkeletonManager::getSingleton().load("jaiqua.skeleton", "General").staticCast<Skeleton>();
+    mSkeleton = static_pointer_cast<Skeleton>(SkeletonManager::getSingleton().load("jaiqua.skeleton", "General"));
     getResourceFullPath(mSkeleton, mSkeletonFullPath);
     if (!copyFile(mSkeletonFullPath + ".bak", mSkeletonFullPath)) {
         // If there is no backup, create one.

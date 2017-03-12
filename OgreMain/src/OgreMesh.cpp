@@ -511,7 +511,7 @@ namespace Ogre {
             {
                 // Load skeleton
                 try {
-                    mSkeleton = SkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
+                    mSkeleton = static_pointer_cast<Skeleton>(SkeletonManager::getSingleton().load(skelName, mGroup));
                 }
                 catch (...)
                 {

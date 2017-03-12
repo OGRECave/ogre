@@ -53,14 +53,14 @@ namespace Ogre
     //-----------------------------------------------------------------------
     SkeletonPtr SkeletonManager::getByName(const String& name, const String& groupName)
     {
-        return getResourceByName(name, groupName).staticCast<Skeleton>();
+        return static_pointer_cast<Skeleton>(getResourceByName(name, groupName));
     }
     //-----------------------------------------------------------------------
     SkeletonPtr SkeletonManager::create (const String& name, const String& group,
                                     bool isManual, ManualResourceLoader* loader,
                                     const NameValuePairList* createParams)
     {
-        return createResource(name,group,isManual,loader,createParams).staticCast<Skeleton>();
+        return static_pointer_cast<Skeleton>(createResource(name,group,isManual,loader,createParams));
     }
     //-----------------------------------------------------------------------
     SkeletonManager::~SkeletonManager()

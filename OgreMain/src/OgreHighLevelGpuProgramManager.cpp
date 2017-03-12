@@ -188,7 +188,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     HighLevelGpuProgramPtr HighLevelGpuProgramManager::getByName(const String& name, const String& groupName)
     {
-        return getResourceByName(name, groupName).staticCast<HighLevelGpuProgram>();
+        return static_pointer_cast<HighLevelGpuProgram>(getResourceByName(name, groupName));
     }
     //---------------------------------------------------------------------------
     HighLevelGpuProgramPtr HighLevelGpuProgramManager::createProgram(
@@ -199,7 +199,7 @@ namespace Ogre {
             getFactory(language)->create(this, name, getNextHandle(), 
             groupName, false, 0));
 
-        HighLevelGpuProgramPtr prg = ret.staticCast<HighLevelGpuProgram>();
+        HighLevelGpuProgramPtr prg = static_pointer_cast<HighLevelGpuProgram>(ret);
         prg->setType(gptype);
         prg->setSyntaxCode(language);
 

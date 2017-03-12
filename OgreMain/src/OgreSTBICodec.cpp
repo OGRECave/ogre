@@ -117,7 +117,7 @@ namespace Ogre {
     void STBIImageCodec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
-        MemoryDataStreamPtr data = encode(input, pData).staticCast<MemoryDataStream>();
+        MemoryDataStreamPtr data = static_pointer_cast<MemoryDataStream>(encode(input, pData));
         std::ofstream f(outFileName.c_str(), std::ios::out | std::ios::binary);
 
         if(!f.is_open()) {

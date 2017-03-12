@@ -145,7 +145,7 @@ try
 
         ResourceManager::ResourceMapIterator it = materialMgr.getResourceIterator();
         while(it.hasMoreElements()) {
-            matSer.queueForExport(it.getNext().staticCast<Ogre::Material>());
+            matSer.queueForExport(static_pointer_cast<Ogre::Material>(it.getNext()));
         }
 
         matSer.exportQueued(path + gBaseName + ".material");

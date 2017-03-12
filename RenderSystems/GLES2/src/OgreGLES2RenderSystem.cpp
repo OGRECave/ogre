@@ -787,7 +787,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GLES2TexturePtr tex = texPtr.staticCast<GLES2Texture>();
+        GLES2TexturePtr tex = static_pointer_cast<GLES2Texture>(texPtr);
 
         if (!mStateCacheManager->activateGLTextureUnit(stage))
             return;

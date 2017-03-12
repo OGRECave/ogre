@@ -1791,7 +1791,7 @@ namespace Ogre
     void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
     {
         static D3D11TexturePtr dt;
-        dt = tex.staticCast<D3D11Texture>();
+        dt = static_pointer_cast<D3D11Texture>(tex);
         if (enabled && dt && dt->getSize() > 0)
         {
             // note used

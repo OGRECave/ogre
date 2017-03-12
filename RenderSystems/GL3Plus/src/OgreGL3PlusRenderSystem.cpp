@@ -854,7 +854,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GL3PlusTexturePtr tex = texPtr.staticCast<GL3PlusTexture>();
+        GL3PlusTexturePtr tex = static_pointer_cast<GL3PlusTexture>(texPtr);
 
         if (!activateGLTextureUnit(stage))
             return;
