@@ -6,11 +6,11 @@
 @piece( DeclShadowMapMacros )
 @foreach( hlms_num_shadow_map_lights, n )
 	#define hlms_shadowmap@n texShadowMap@value( hlms_shadowmap@n )
-	#define hlms_shadowmap@n_uv_min vec2( @value( hlms_shadowmap@n_uv_min_x_int ).@value( hlms_shadowmap@n_uv_min_x_fract ), @value( hlms_shadowmap@n_uv_min_y_int ).@value( hlms_shadowmap@n_uv_min_y_fract ) )
-	#define hlms_shadowmap@n_uv_max vec2( @value( hlms_shadowmap@n_uv_max_x_int ).@value( hlms_shadowmap@n_uv_max_x_fract ), @value( hlms_shadowmap@n_uv_max_y_int ).@value( hlms_shadowmap@n_uv_max_y_fract ) )
+	#define hlms_shadowmap@n_uv_min float2( @value( hlms_shadowmap@n_uv_min_x_int ).@value( hlms_shadowmap@n_uv_min_x_fract ), @value( hlms_shadowmap@n_uv_min_y_int ).@value( hlms_shadowmap@n_uv_min_y_fract ) )
+	#define hlms_shadowmap@n_uv_max float2( @value( hlms_shadowmap@n_uv_max_x_int ).@value( hlms_shadowmap@n_uv_max_x_fract ), @value( hlms_shadowmap@n_uv_max_y_int ).@value( hlms_shadowmap@n_uv_max_y_fract ) )
 	@property( hlms_shadowmap@n_uvs_fulltex )
 		@property( hlms_shadowmap@n_is_point_light )
-			#define hlms_shadowmap@n_uv_length vec2( @value( hlms_shadowmap@n_uv_length_x_int ).@value( hlms_shadowmap@n_uv_length_x_fract ), @value( hlms_shadowmap@n_uv_length_y_int ).@value( hlms_shadowmap@n_uv_length_y_fract ) )
+			#define hlms_shadowmap@n_uv_length float2( @value( hlms_shadowmap@n_uv_length_x_int ).@value( hlms_shadowmap@n_uv_length_x_fract ), @value( hlms_shadowmap@n_uv_length_y_int ).@value( hlms_shadowmap@n_uv_length_y_fract ) )
 			#define hlms_shadowmap@n_uv_param , hlms_shadowmap@n_uv_min, hlms_shadowmap@n_uv_max, hlms_shadowmap@n_uv_length
 		@end @property( !hlms_shadowmap@n_is_point_light )
 			#define hlms_shadowmap@n_uv_param , hlms_shadowmap@n_uv_min, hlms_shadowmap@n_uv_max
@@ -143,7 +143,7 @@
 		float3 cubemapDir = posVS.xyz - lightPos.xyz;
 		float fDepth = length( cubemapDir );
 		cubemapDir *= 1.0 / fDepth;
-		cubemapDir = cubemapDir.xyz * passBuf.invViewMatCubemap;
+		cubemapDir = mul( cubemapDir.xyz, passBuf.invViewMatCubemap );
 		fDepth = (fDepth - invDepthRange.x) * invDepthRange.y;
 
 		SH_HALF2 uv;
@@ -232,7 +232,7 @@
 							 passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize
 							 hlms_shadowmap@counter(CurrentShadowMap)_uv_param );
 	}@end
-@end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
+@end @property( !hlms_pssm_splits && hlms_num_shadow_map_lights && hlms_lights_directional )
 	float fShadow = getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
 							   inPs.posL0,
 							   passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize

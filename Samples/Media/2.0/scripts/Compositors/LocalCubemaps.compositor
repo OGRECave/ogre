@@ -111,8 +111,8 @@ compositor_node_shadow LocalCubemapsShadowNode
 {
 	technique pssm
 
-	texture atlas 2048 7168 PF_D32_FLOAT
-	texture tmpCubemap 1024 1024 PF_FLOAT32_R cubemap
+	texture atlas 2048 7168 PF_D32_FLOAT no_fsaa
+	texture tmpCubemap 1024 1024 PF_FLOAT32_R cubemap no_fsaa
 
 	num_splits		3
 	pssm_lambda		0.95

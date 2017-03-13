@@ -352,7 +352,7 @@ compositor_node_shadow ScreenSpaceReflectionsShadowNode
 {
 	technique pssm
 
-	texture atlas 3072 2048 PF_D32_FLOAT
+	texture atlas 3072 2048 PF_D32_FLOAT no_fsaa
 
 	num_splits		3
 	pssm_lambda		0.95
@@ -362,7 +362,7 @@ compositor_node_shadow ScreenSpaceReflectionsShadowNode
 
 	shadow_map_target_type directional
 	{
-		shadow_map 0 1 2 directional
+		shadow_map 0 1 2
 		{
 			pass clear
 			{

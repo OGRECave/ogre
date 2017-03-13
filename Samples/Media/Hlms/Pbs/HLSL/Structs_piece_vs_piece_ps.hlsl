@@ -12,7 +12,7 @@ struct Light
 	float3 position;
 	float3 diffuse;
 	float3 specular;
-@property( hlms_num_shadow_maps )
+@property( hlms_num_shadow_map_lights )
 	float3 attenuation;
 	float3 spotDirection;
 	float3 spotParams;
@@ -29,10 +29,14 @@ cbuffer PassBuffer : register(b0)
 	//Vertex shader (common to both receiver and casters)
 	float4x4 viewProj;
 
+@property( hlms_shadowcaster_point )
+	float4 cameraPosWS;	//Camera position in world space
+@end
+
 @property( !hlms_shadowcaster )
 	//Vertex shader
 	float4x4 view;
-	@property( hlms_num_shadow_maps )ShadowReceiverData shadowRcv[@value(hlms_num_shadow_maps)];@end
+	@property( hlms_num_shadow_map_lights )ShadowReceiverData shadowRcv[@value(hlms_num_shadow_map_lights)];@end
 
 	//-------------------------------------------------------------------------
 
@@ -170,8 +174,9 @@ cbuffer ManualProbe : register(b3)
 		@foreach( hlms_uv_count, n )
 			float@value( hlms_uv_count@n ) uv@n	: TEXCOORD@counter(texcoord);@end
 
-		@foreach( hlms_num_shadow_maps, n )
-			float4 posL@n	: TEXCOORD@counter(texcoord);@end
+		@foreach( hlms_num_shadow_map_lights, n )
+			@property( !hlms_shadowmap@n_is_point_light )
+				float4 posL@n	: TEXCOORD@counter(texcoord);@end @end
 			
 		@property( hlms_pssm_splits )float depth	: TEXCOORD@counter(texcoord);@end
 	@end
@@ -182,8 +187,12 @@ cbuffer ManualProbe : register(b3)
 			@foreach( hlms_uv_count, n )
 				float@value( hlms_uv_count@n ) uv@n	: TEXCOORD@counter(texcoord);@end
 		@end
-		@property( !hlms_shadow_uses_depth_texture )
+		@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point )
 			float depth	: TEXCOORD@counter(texcoord);
+		@end
+		@property( hlms_shadowcaster_point )
+			float3 toCameraWS	: TEXCOORD@counter(texcoord);
+			nointerpolation float constBias	: TEXCOORD@counter(texcoord);
 		@end
 	@end
 

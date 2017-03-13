@@ -23,7 +23,7 @@
 @end
 
 @set( textureRegShadowMapStart, texUnit )
-@add( texUnit, hlms_num_shadow_maps )
+@add( texUnit, hlms_num_shadow_map_textures )
 
 @property( parallax_correct_cubemaps )
 	@set( globaPccTexUnit, texUnit )
