@@ -1,10 +1,10 @@
 @property( hlms_forwardplus )
 @piece( forward3dLighting )
 	@property( hlms_forwardplus == forward3d )
-		float f3dMinDistance	= pass.f3dData.x;
-		float f3dInvMaxDistance	= pass.f3dData.y;
-		float f3dNumSlicesSub1	= pass.f3dData.z;
-		uint cellsPerTableOnGrid0= as_type<uint>( pass.f3dData.w );
+		float f3dMinDistance	= passBuf.f3dData.x;
+		float f3dInvMaxDistance	= passBuf.f3dData.y;
+		float f3dNumSlicesSub1	= passBuf.f3dData.z;
+		uint cellsPerTableOnGrid0= as_type<uint>( passBuf.f3dData.w );
 
 		// See C++'s Forward3D::getSliceAtDepth
 		/*float fSlice = 1.0 - clamp( (-inPs.pos.z + f3dMinDistance) * f3dInvMaxDistance, 0.0, 1.0 );
@@ -18,20 +18,20 @@
 		//TODO: Profile performance: derive this mathematically or use a lookup table?
 		uint offset = cellsPerTableOnGrid0 * (((1u << (slice << 1u)) - 1u) / 3u);
 
-		float lightsPerCell = pass.f3dGridHWW[0].w;
-		float windowHeight = pass.f3dGridHWW[1].w; //renderTarget->height
+		float lightsPerCell = passBuf.f3dGridHWW[0].w;
+		float windowHeight = passBuf.f3dGridHWW[1].w; //renderTarget->height
 
-		//pass.f3dGridHWW[slice].x = grid_width / renderTarget->width;
-		//pass.f3dGridHWW[slice].y = grid_height / renderTarget->height;
-		//pass.f3dGridHWW[slice].z = grid_width * lightsPerCell;
+		//passBuf.f3dGridHWW[slice].x = grid_width / renderTarget->width;
+		//passBuf.f3dGridHWW[slice].y = grid_height / renderTarget->height;
+		//passBuf.f3dGridHWW[slice].z = grid_width * lightsPerCell;
 		//uint sampleOffset = 0;
 		uint sampleOffset = offset +
-							uint(floor( (windowHeight - inPs.gl_FragCoord.y) * pass.f3dGridHWW[slice].y ) * pass.f3dGridHWW[slice].z) +
-							uint(floor( inPs.gl_FragCoord.x * pass.f3dGridHWW[slice].x ) * lightsPerCell);
+							uint(floor( (windowHeight - inPs.gl_FragCoord.y) * passBuf.f3dGridHWW[slice].y ) * passBuf.f3dGridHWW[slice].z) +
+							uint(floor( inPs.gl_FragCoord.x * passBuf.f3dGridHWW[slice].x ) * lightsPerCell);
 	@end @property( hlms_forwardplus != forward3d )
-		float f3dMinDistance	= pass.f3dData.x;
-		float f3dInvExponentK	= pass.f3dData.y;
-		float f3dNumSlicesSub1	= pass.f3dData.z;
+		float f3dMinDistance	= passBuf.f3dData.x;
+		float f3dInvExponentK	= passBuf.f3dData.y;
+		float f3dNumSlicesSub1	= passBuf.f3dData.z;
 
 		// See C++'s ForwardClustered::getSliceAtDepth
 		float fSlice = log2( max( -inPs.pos.z - f3dMinDistance, 1.0 ) ) * f3dInvExponentK;
@@ -39,9 +39,9 @@
 		uint sliceSkip = uint( fSlice * @value( fwd_clustered_width_x_height ) );
 
 		uint sampleOffset = sliceSkip +
-							uint(floor( inPs.gl_FragCoord.x * pass.fwdScreenToGrid.x ));
-		float windowHeight = pass.f3dData.w; //renderTarget->height
-		sampleOffset += uint(floor( (windowHeight - inPs.gl_FragCoord.y) * pass.fwdScreenToGrid.y ) *
+							uint(floor( inPs.gl_FragCoord.x * passBuf.fwdScreenToGrid.x ));
+		float windowHeight = passBuf.f3dData.w; //renderTarget->height
+		sampleOffset += uint(floor( (windowHeight - inPs.gl_FragCoord.y) * passBuf.fwdScreenToGrid.y ) *
 							 @value( fwd_clustered_width ));
 
 		sampleOffset *= @value( fwd_clustered_lights_per_cell )u;
@@ -171,7 +171,7 @@
 
 	@property( hlms_forwardplus_debug )
 		@property( hlms_forwardplus == forward3d )
-			float occupancy = (totalNumLightsInGrid / pass.f3dGridHWW[0].w);
+			float occupancy = (totalNumLightsInGrid / passBuf.f3dGridHWW[0].w);
 		@end @property( hlms_forwardplus != forward3d )
 			float occupancy = (totalNumLightsInGrid / float( @value( fwd_clustered_lights_per_cell ) ));
 		@end

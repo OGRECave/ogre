@@ -5,14 +5,11 @@ SamplerState		samplerState : register(s0);
 struct PS_INPUT
 {
 	float2 uv0			: TEXCOORD0;
-
-	float4 gl_Position	: SV_Position;
 };
 
 float main
 (
-	PS_INPUT inPs,
-	float4 gl_FragCoord : SV_Position
+	PS_INPUT inPs
 ) : SV_Depth
 {
 	float3 cubeDir;

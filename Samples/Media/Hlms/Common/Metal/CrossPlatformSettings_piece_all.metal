@@ -8,4 +8,6 @@ struct float1
 	float1() {}
 	float1( float _x ) : x( _x ) {}
 };
+
+#define mul( x, y ) ((x) * (y))
 @end

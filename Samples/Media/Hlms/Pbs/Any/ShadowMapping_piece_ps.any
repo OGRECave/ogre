@@ -97,16 +97,16 @@
 	@end
 @end
 @property( syntax == hlsl )
-	@piece( TEXTURE2DSHADOW )Texture2D@end
+	@piece( TEXTURE2DSHADOW )Texture2D<float>@end
 	@piece( SamplerShadow )SamplerComparisonState shadowSampler, @end
 	@piece( DeclShadowSamplers )
 		SamplerComparisonState shadowSampler	: register(s@value(textureRegShadowMapStart));
 		@foreach( hlms_num_shadow_map_textures, n )
-			Texture2D texShadowMap@n			: register(t@counter(textureRegShadowMapStart));@end
+			Texture2D<float> texShadowMap@n		: register(t@counter(textureRegShadowMapStart));@end
 	@end
 @end
 @property( syntax == metal )
-	@piece( TEXTURE2DSHADOW )texture2d@end
+	@piece( TEXTURE2DSHADOW )depth2d<float>@end
 	@piece( SamplerShadow )sampler shadowSampler, @end
 	/// sampler shadowSampler is declared as constexpr in PixelShader_ps.metal
 	@piece( DeclShadowSamplers )
