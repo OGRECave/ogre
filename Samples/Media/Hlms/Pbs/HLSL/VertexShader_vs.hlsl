@@ -1,3 +1,5 @@
+@insertpiece( SetCrossPlatformSettings )
+
 @insertpiece( Common_Matrix_DeclUnpackMatrix4x4 )
 @insertpiece( Common_Matrix_DeclUnpackMatrix4x3 )
 

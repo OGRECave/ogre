@@ -21,4 +21,5 @@
 #define float4x4 mat4
 
 #define mul( x, y ) ((x) * (y))
+#define INLINE
 @end

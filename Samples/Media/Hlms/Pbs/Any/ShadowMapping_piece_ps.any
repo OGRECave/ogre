@@ -6,11 +6,11 @@
 @piece( DeclShadowMapMacros )
 @foreach( hlms_num_shadow_map_lights, n )
 	#define hlms_shadowmap@n texShadowMap@value( hlms_shadowmap@n )
-	#define hlms_shadowmap@n_uv_min float2( @value( hlms_shadowmap@n_uv_min_x_int ).@value( hlms_shadowmap@n_uv_min_x_fract ), @value( hlms_shadowmap@n_uv_min_y_int ).@value( hlms_shadowmap@n_uv_min_y_fract ) )
-	#define hlms_shadowmap@n_uv_max float2( @value( hlms_shadowmap@n_uv_max_x_int ).@value( hlms_shadowmap@n_uv_max_x_fract ), @value( hlms_shadowmap@n_uv_max_y_int ).@value( hlms_shadowmap@n_uv_max_y_fract ) )
+	#define hlms_shadowmap@n_uv_min SH_HALF2( @value( hlms_shadowmap@n_uv_min_x_int ).@value( hlms_shadowmap@n_uv_min_x_fract ), @value( hlms_shadowmap@n_uv_min_y_int ).@value( hlms_shadowmap@n_uv_min_y_fract ) )
+	#define hlms_shadowmap@n_uv_max SH_HALF2( @value( hlms_shadowmap@n_uv_max_x_int ).@value( hlms_shadowmap@n_uv_max_x_fract ), @value( hlms_shadowmap@n_uv_max_y_int ).@value( hlms_shadowmap@n_uv_max_y_fract ) )
 	@property( hlms_shadowmap@n_uvs_fulltex )
 		@property( hlms_shadowmap@n_is_point_light )
-			#define hlms_shadowmap@n_uv_length float2( @value( hlms_shadowmap@n_uv_length_x_int ).@value( hlms_shadowmap@n_uv_length_x_fract ), @value( hlms_shadowmap@n_uv_length_y_int ).@value( hlms_shadowmap@n_uv_length_y_fract ) )
+			#define hlms_shadowmap@n_uv_length SH_HALF2( @value( hlms_shadowmap@n_uv_length_x_int ).@value( hlms_shadowmap@n_uv_length_x_fract ), @value( hlms_shadowmap@n_uv_length_y_int ).@value( hlms_shadowmap@n_uv_length_y_fract ) )
 			#define hlms_shadowmap@n_uv_param , hlms_shadowmap@n_uv_min, hlms_shadowmap@n_uv_max, hlms_shadowmap@n_uv_length
 		@end @property( !hlms_shadowmap@n_is_point_light )
 			#define hlms_shadowmap@n_uv_param , hlms_shadowmap@n_uv_min, hlms_shadowmap@n_uv_max
@@ -23,19 +23,26 @@
 @property( syntax == glsl )
 	#define SH_HALF2 vec2
 	#define SH_HALF float
-	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) texture( tex, vec3( uv, fDepth ) )
+	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) texture( tex, vec3( uv, fDepth ) ).x
+	#define PASSBUF_ARG_DECL
+	#define PASSBUF_ARG
 @end
 
 @property( syntax == hlsl )
 	#define SH_HALF2 float2
 	#define SH_HALF float
-	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.SampleCmpLevelZero( sampler, uv.xy, fDepth )
+	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.SampleCmpLevelZero( sampler, uv.xy, fDepth ).x
+	#define PASSBUF_ARG_DECL
+	#define PASSBUF_ARG
 @end
 
 @property( syntax == metal )
 	#define SH_HALF2 half2
 	#define SH_HALF half
 	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.sample_compare( sampler, float2( uv.xy ), fDepth )
+
+	#define PASSBUF_ARG_DECL , constant PassData &passBuf
+	#define PASSBUF_ARG , passBuf
 @end
 @end
 
@@ -120,18 +127,20 @@
 @piece( DeclShadowSamplingFuncs )
 @foreach( 4, m )
 	@property( @m == 0 )
-		float getShadow( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
-						 float4 psPosLN, float4 invShadowMapSize )
+		INLINE float getShadow( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
+								float4 psPosLN, float4 invShadowMapSize )
 	@end @property( @m == 1 )
-		float getShadow( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
-						 float4 psPosLN, float4 invShadowMapSize, SH_HALF2 minUV, SH_HALF2 maxUV )
+		INLINE float getShadow( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
+								float4 psPosLN, float4 invShadowMapSize, SH_HALF2 minUV, SH_HALF2 maxUV )
 	@end @property( @m == 2 )
-		float getShadowPoint( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
-							  float3 posVS, float3 lightPos, float4 invShadowMapSize, float2 invDepthRange )
+		INLINE float getShadowPoint( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
+									 float3 posVS, float3 lightPos, float4 invShadowMapSize, float2 invDepthRange
+									 PASSBUF_ARG_DECL )
 	@end @property( @m == 3 )
-		float getShadowPoint( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
-							  float3 posVS, float3 lightPos, float4 invShadowMapSize, float2 invDepthRange,
-							  SH_HALF2 minUV, SH_HALF2 maxUV, SH_HALF2 lengthUV )
+		INLINE float getShadowPoint( @insertpiece( TEXTURE2DSHADOW ) shadowMap, @insertpiece( SamplerShadow )
+									 float3 posVS, float3 lightPos, float4 invShadowMapSize, float2 invDepthRange,
+									 SH_HALF2 minUV, SH_HALF2 maxUV, SH_HALF2 lengthUV
+									 PASSBUF_ARG_DECL )
 	@end
 	{
 	@property( @m < 2 )
@@ -185,7 +194,7 @@
 		@property( syntax != glsl || hlms_shadow_uses_depth_texture )
 			@foreach( pcf_iterations, n )
 				@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * SH_HALF2( invShadowMapSize.xy );@end
-				retVal += OGRE_SAMPLE_SHADOW( shadowMap, shadowSampler, uv, fDepth ).x;@end
+				retVal += OGRE_SAMPLE_SHADOW( shadowMap, shadowSampler, uv, fDepth );@end
 		@end
 
 		@property( pcf_3x3 )
@@ -197,7 +206,7 @@
 		@property( (@m == 0 || @m == 2) && syntax == metal )
 			//Metal does not support clamp to border colour
 			retVal = (uv.x <= 0.0h || uv.x >= 1.0h ||
-					  uv.y <= 0.0h || uv.y >= 0.0h) ? 1.0 : retVal;
+					  uv.y <= 0.0h || uv.y >= 1.0h) ? 1.0 : retVal;
 		@end
 
 		@property( @m == 1 || @m == 3 )
@@ -255,7 +264,7 @@
 						  inPs.pos.xyz, passBuf.lights[@counter(CurrentPointLight)].position.xyz,
 						  passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize,
 						  passBuf.shadowRcv[@value(CurrentShadowMap)].shadowDepthRange.xy
-						  hlms_shadowmap@counter(CurrentShadowMap)_uv_param )
+						  hlms_shadowmap@counter(CurrentShadowMap)_uv_param PASSBUF_ARG )
 @end
 
 @end

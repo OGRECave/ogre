@@ -10,4 +10,5 @@ struct float1
 };
 
 #define mul( x, y ) ((x) * (y))
+#define INLINE inline
 @end

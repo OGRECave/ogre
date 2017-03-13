@@ -473,7 +473,7 @@ float4 diffuseCol;
 @property( hlms_shadowcaster )
 
 @property( hlms_shadowcaster_point )
-	@insertpiece( PassDecl )
+	@insertpiece( PassStructDecl )
 @end
 
 @insertpiece( DeclOutputType )
@@ -485,6 +485,9 @@ fragment @insertpiece( output_type ) main_metal
 	// START UNIFORM DECLARATION
 	@property( !hlms_shadowcaster || alpha_test )
 		@insertpiece( MaterialDecl )
+	@end
+	@property( hlms_shadowcaster_point )
+		@insertpiece( PassDecl )
 	@end
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION

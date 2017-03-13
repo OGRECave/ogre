@@ -1,3 +1,4 @@
+@insertpiece( SetCrossPlatformSettings )
 
 // START UNIFORM DECLARATION
 @property( !hlms_shadowcaster || alpha_test )
