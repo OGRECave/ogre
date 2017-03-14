@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
     #include <intrin.h>
-    #pragma intrinsic(_BitScanReverse)
+    #pragma intrinsic(_BitScanForward)
 #endif
 
 namespace Ogre
@@ -65,7 +65,7 @@ namespace Ogre
             return 32u;
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-        DWORD trailingZero = 0;
+        unsigned long trailingZero = 0;
         _BitScanForward( &trailingZero, value );
         return trailingZero;
 #else
