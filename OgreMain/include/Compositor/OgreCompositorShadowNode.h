@@ -161,6 +161,14 @@ namespace Ogre
             [out] Where to start searching from the next time you call this function.
                   Outputs mShadowMapCastingLights.size() if there are no more empty
                   entries.
+            For example if our light types are like this:
+                dir point point dir point
+            And you're looking for all the directional lights, then sucessively calling
+            this function will return:
+                startIdx = 0, entryToUse = 0
+                startIdx = 1, entryToUse = 3
+                startIdx = 1, entryToUse = 5 --> 5 == mShadowMapCastingLights.size()
+            startIdx will always be 1 until that point light entry is filled.
         @param entryToUse [out]
             What entry to use. Outputs mShadowMapCastingLights.size() if there are no more
             empty that supports the requested light types.

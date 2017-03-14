@@ -362,7 +362,10 @@ namespace Ogre
 
         const Vector3 &camPos( newCamera->getDerivedPosition() );
 
-        mTmpSortedIndexes.resize( mShadowMapCastingLights.size() - begEmptyLightIdx, ~0 );
+        const size_t numTmpSortedLights = std::min( mShadowMapCastingLights.size() - begEmptyLightIdx,
+                                                    globalLightList.lights.size() );
+
+        mTmpSortedIndexes.resize( numTmpSortedLights, ~0 );
         std::partial_sort_copy( MemoryLessInputIterator( startIndex ),
                             MemoryLessInputIterator( globalLightList.lights.size() ),
                             mTmpSortedIndexes.begin(), mTmpSortedIndexes.end(),
@@ -373,6 +376,8 @@ namespace Ogre
 
         while( itor != end )
         {
+            assert( *itor < globalLightList.lights.size() ); //This should never happen.
+
             uint32 visibilityMask = globalLightList.visibilityMask[*itor];
             if( !(visibilityMask & combinedVisibilityFlags) ||
                 !(visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) ||
