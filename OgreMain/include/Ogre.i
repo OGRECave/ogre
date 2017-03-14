@@ -374,6 +374,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::Root::showConfigDialog(); // deprecated
 %ignore Ogre::Root::addResourceLocation; // deprecated
 %ignore Ogre::Root::removeResourceLocation; // deprecated
+%ignore Ogre::Root::getErrorDescription; // deprecated
 %include "OgreRoot.h"
 // dont wrap: platform specific
 // %include "OgreWindowEventUtilities.h"
