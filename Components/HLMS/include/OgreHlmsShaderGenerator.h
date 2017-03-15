@@ -101,6 +101,6 @@ namespace Ogre
 		static size_t calculateLineCount(const SubStringRef &subString);
 
 	public:
-		static String parse(String &inBuffer, PropertyMap &properties, StringVectorPtr pieceFiles);
+		static String parse(String &inBuffer, PropertyMap &properties, const StringVector& pieceFiles);
 	};
 }

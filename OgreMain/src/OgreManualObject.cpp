@@ -1087,7 +1087,7 @@ namespace Ogre {
         {
             // Load from default group. If user wants to use alternate groups,
             // they can define it and preload
-            mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName).staticCast<Material>();
+            mMaterial = static_pointer_cast<Material>(MaterialManager::getSingleton().load(mMaterialName, mGroupName));
         }
         return mMaterial;
     }

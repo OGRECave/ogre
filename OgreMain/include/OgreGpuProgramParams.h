@@ -1526,13 +1526,13 @@ namespace Ogre {
 
 
         /// Does this parameter set include named parameters?
-        bool hasNamedParameters() const { return mNamedConstants; }
+        bool hasNamedParameters() const { return (bool)mNamedConstants; }
         /** Does this parameter set include logically indexed parameters?
             @note Not mutually exclusive with hasNamedParameters since some high-level
             programs still use logical indexes to set the parameters on the
             rendersystem.
         */
-        bool hasLogicalIndexedParameters() const { return mFloatLogicalToPhysical; }
+        bool hasLogicalIndexedParameters() const { return (bool)mFloatLogicalToPhysical; }
 
         /** Sets a 4-element floating-point parameter to the program.
             @param index The logical constant index at which to place the parameter

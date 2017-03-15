@@ -66,7 +66,7 @@ namespace Ogre
 
     bool TerrainLodManager::isOpen() const
     {
-        return mDataStream;
+        return (bool)mDataStream;
     }
 
     void TerrainLodManager::init()

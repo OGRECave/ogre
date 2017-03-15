@@ -62,14 +62,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     TexturePtr TextureManager::getByName(const String& name, const String& groupName)
     {
-        return getResourceByName(name, groupName).staticCast<Texture>();
+        return static_pointer_cast<Texture>(getResourceByName(name, groupName));
     }
     //-----------------------------------------------------------------------
     TexturePtr TextureManager::create (const String& name, const String& group,
                                     bool isManual, ManualResourceLoader* loader,
                                     const NameValuePairList* createParams)
     {
-        return createResource(name,group,isManual,loader,createParams).staticCast<Texture>();
+        return static_pointer_cast<Texture>(createResource(name,group,isManual,loader,createParams));
     }
     //-----------------------------------------------------------------------
     TextureManager::ResourceCreateOrRetrieveResult TextureManager::createOrRetrieve(
@@ -82,7 +82,7 @@ namespace Ogre {
         // Was it created?
         if(res.second)
         {
-            TexturePtr tex = res.first.staticCast<Texture>();
+            TexturePtr tex = static_pointer_cast<Texture>(res.first);
             tex->setTextureType(texType);
             tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
                 static_cast<size_t>(numMipmaps));
@@ -100,7 +100,7 @@ namespace Ogre {
     {
         ResourceCreateOrRetrieveResult res =
             createOrRetrieve(name,group,false,0,0,texType,numMipmaps,gamma,isAlpha,desiredFormat,hwGamma);
-        TexturePtr tex = res.first.staticCast<Texture>();
+        TexturePtr tex = static_pointer_cast<Texture>(res.first);
         tex->prepare();
         return tex;
     }
@@ -111,7 +111,7 @@ namespace Ogre {
     {
         ResourceCreateOrRetrieveResult res =
             createOrRetrieve(name,group,false,0,0,texType,numMipmaps,gamma,isAlpha,desiredFormat,hwGamma);
-        TexturePtr tex = res.first.staticCast<Texture>();
+        TexturePtr tex = static_pointer_cast<Texture>(res.first);
         tex->load();
         return tex;
     }
@@ -121,7 +121,7 @@ namespace Ogre {
         const Image &img, TextureType texType, int numMipmaps, Real gamma, bool isAlpha, 
         PixelFormat desiredFormat, bool hwGamma)
     {
-        TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
+        TexturePtr tex = create(name, group, true);
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
@@ -140,7 +140,7 @@ namespace Ogre {
         PixelFormat format, TextureType texType, 
         int numMipmaps, Real gamma, bool hwGamma)
     {
-        TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
+        TexturePtr tex = create(name, group, true);
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
@@ -171,7 +171,7 @@ namespace Ogre {
         {
             usage = (usage & ~(int)TU_STATIC) | (int)TU_DYNAMIC;
         }
-        ret = createResource(name, group, true, loader).staticCast<Texture>();
+        ret = create(name, group, true, loader);
         ret->setTextureType(texType);
         ret->setWidth(width);
         ret->setHeight(height);

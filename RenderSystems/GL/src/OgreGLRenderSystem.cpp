@@ -1516,7 +1516,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GLTexturePtr tex = texPtr.staticCast<GLTexture>();
+        GLTexturePtr tex = static_pointer_cast<GLTexture>(texPtr);
         GLenum lastTextureType = mTextureTypes[stage];
 
         if (!mStateCacheManager->activateGLTextureUnit(stage))

@@ -49,8 +49,8 @@ private:
     unsigned char* mBuffer;
     Ogre::SceneNode* mNode;
 
-    void destroyMaterials( Ogre::String resourceGroupID );
-    void destroyTextures( Ogre::String resourceGroupID );
+    void destroyMaterials( const Ogre::String& resourceGroupID );
+    void destroyTextures( const Ogre::String& resourceGroupID );
     void unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName);
 
     void setup();

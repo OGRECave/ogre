@@ -66,25 +66,12 @@ namespace Ogre
 			{
 				String name, ext;
 				StringUtil::splitBaseFilename(it->filename, name, ext);
-
-				StringVectorPtr namesVec;
-				StringVecMap::iterator pieceFileNamesIt = pieceFileNames.find(ext);
-				if (pieceFileNamesIt == pieceFileNames.end())
-				{
-					namesVec = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
-					pieceFileNames[ext] = namesVec;
-				}
-				else
-				{
-					namesVec = pieceFileNames[ext];
-				}
-
-				namesVec->push_back(it->filename);
+				pieceFileNames[ext].push_back(it->filename);
 			}
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	StringVectorPtr ShaderPiecesManager::getPieces(const String& language, GpuProgramType shaderType, bool reload)
+	const StringVector& ShaderPiecesManager::getPieces(const String& language, GpuProgramType shaderType, bool reload)
 	{
 		String languageTemplateExtension = language + "t";
 
@@ -101,33 +88,26 @@ namespace Ogre
 		}
 		
 		StringVecMap::iterator loadedFilesIt = loadedPieces.find(languageTemplateExtension);
-		if (loadedFilesIt == loadedPieces.end())
+		if (loadedFilesIt != loadedPieces.end())
 		{
-			// the piece files for the given shader type and languarge are not loaded yet.
-			StringVecMap::iterator pieceFileNamesIt = pieceFileNames.find(languageTemplateExtension);
-			if (pieceFileNamesIt != pieceFileNames.end())
-			{
-				StringVectorPtr pieces = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
-
-				StringVector::iterator it = pieceFileNamesIt->second->begin();
-				StringVector::iterator end = pieceFileNamesIt->second->end();
-
-				for (; it != end; it++)
-				{
-					pieces->push_back(rgm.openResource(*it, mResorceGroup)->getAsString());
-				}
-
-				loadedPieces[languageTemplateExtension] = pieces;
-
-				return pieces;
-			}
-		}
-		else
-		{
-			return loadedFilesIt->second;
+		    return loadedFilesIt->second;
 		}
 
-		return StringVectorPtr();
+        // the piece files for the given shader type and languarge are not loaded yet.
+        StringVector& pieces = loadedPieces[languageTemplateExtension];
+        StringVecMap::iterator pieceFileNamesIt = pieceFileNames.find(languageTemplateExtension);
+        if (pieceFileNamesIt != pieceFileNames.end())
+        {
+            StringVector::iterator it = pieceFileNamesIt->second.begin();
+            StringVector::iterator end = pieceFileNamesIt->second.end();
+
+            for (; it != end; it++)
+            {
+                pieces.push_back(rgm.openResource(*it, mResorceGroup)->getAsString());
+            }
+        }
+
+        return pieces;
 	}
 	//-----------------------------------------------------------------------------------
 }

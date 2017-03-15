@@ -1025,7 +1025,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
-        mMaterial = MaterialManager::getSingleton().load(name, mResourceGroupName).staticCast<Material>();
+        mMaterial = static_pointer_cast<Material>(MaterialManager::getSingleton().load(name, mResourceGroupName));
         if (mIsRendererConfigured)
         {
             mMaterial->load();

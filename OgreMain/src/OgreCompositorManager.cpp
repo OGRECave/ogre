@@ -88,12 +88,12 @@ CompositorPtr CompositorManager::create (const String& name, const String& group
                                 bool isManual, ManualResourceLoader* loader,
                                 const NameValuePairList* createParams)
 {
-    return createResource(name,group,isManual,loader,createParams).staticCast<Compositor>();
+    return static_pointer_cast<Compositor>(createResource(name,group,isManual,loader,createParams));
 }
 //-----------------------------------------------------------------------
 CompositorPtr CompositorManager::getByName(const String& name, const String& groupName)
 {
-    return getResourceByName(name, groupName).staticCast<Compositor>();
+    return static_pointer_cast<Compositor>(getResourceByName(name, groupName));
 }
 //-----------------------------------------------------------------------
 void CompositorManager::initialise(void)

@@ -896,18 +896,18 @@ namespace Ogre
 		return syntaxError;
 	}
 	//-----------------------------------------------------------------------------------
-	String ShaderGenerator::parse(String &inBuffer, PropertyMap &properties, StringVectorPtr pieceFiles)
+	String ShaderGenerator::parse(String &inBuffer, PropertyMap &properties, const StringVector& pieceFiles)
 	{
 		String outBuffer;
 		outBuffer.reserve(inBuffer.size());
 
 		PiecesMap pieces;
 
-		if (pieceFiles)
+		if (!pieceFiles.empty())
 		{
 			//Collect pieces
-			StringVector::iterator itor = pieceFiles->begin();
-			StringVector::iterator end = pieceFiles->end();
+			StringVector::const_iterator itor = pieceFiles.begin();
+			StringVector::const_iterator end = pieceFiles.end();
 
 			String inPiece;
 			String outPiece;

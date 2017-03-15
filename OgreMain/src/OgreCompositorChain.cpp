@@ -137,8 +137,8 @@ void CompositorChain::createOriginalScene()
 
 
         /// Create base "original scene" compositor
-        scene = CompositorManager::getSingleton().load(compName,
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Compositor>();
+        scene = static_pointer_cast<Compositor>(CompositorManager::getSingleton().load(compName,
+            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME));
 
 
 

@@ -41,7 +41,7 @@ class CppUnitResultWriter : public TestResultWriter
 {
 public:
 
-    CppUnitResultWriter(const TestBatch& set1, const TestBatch& set2, ComparisonResultVectorPtr results)
+    CppUnitResultWriter(const TestBatch& set1, const TestBatch& set2, const ComparisonResultVector& results)
         :TestResultWriter(set1, set2, results){}
 
 protected:
@@ -54,15 +54,15 @@ protected:
         out << "<TestRun>" << std::endl;
 
         out << "  <FailedTests>" << std::endl;
-        for(size_t i = 0; i < mResults->size(); ++i)
+        for(size_t i = 0; i < mResults.size(); ++i)
         {
-            Ogre::String test = (*mResults)[i].testName;
+            Ogre::String test = mResults[i].testName;
             size_t j = i;
 
             // a test may have multiple images, so we check all, and fail the whole test if any one fails
-            for(; j < mResults->size() && (*mResults)[j].testName == test; ++j)
+            for(; j < mResults.size() && mResults[j].testName == test; ++j)
             {
-                if(!(*mResults)[j].passed)
+                if(!mResults[j].passed)
                 {
                     numFailed++;
 
@@ -80,15 +80,15 @@ protected:
         out << "  </FailedTests>" << std::endl;
 
         out << "  <SuccessfulTests>" << std::endl;
-        for(size_t i = 0; i < mResults->size(); ++i)
+        for(size_t i = 0; i < mResults.size(); ++i)
         {
-            Ogre::String test = (*mResults)[i].testName;
+            Ogre::String test = mResults[i].testName;
             size_t j = i;
 
             // a test may have multiple images, so we check all, and fail the whole test if any one fails
-            for(; j < mResults->size() && (*mResults)[j].testName == test; ++j)
+            for(; j < mResults.size() && mResults[j].testName == test; ++j)
             {
-                if((*mResults)[j].passed)
+                if(mResults[j].passed)
                 {
                     // Start counting at 10000 to make sure that they are unique test id's.
                     out << "    <Test id=\"" << i + 10000 << "\">" << std::endl;
@@ -102,7 +102,7 @@ protected:
         out << "  </SuccessfulTests>" << std::endl;
 
         out << "  <Statistics>" << std::endl;
-        out << "    <Tests>" << mResults->size() << "</Tests>" << std::endl;
+        out << "    <Tests>" << mResults.size() << "</Tests>" << std::endl;
         out << "    <FailuresTotal>" << numFailed << "</FailuresTotal>" << std::endl;
         out << "    <Errors>" << numFailed << "</Errors>" << std::endl;
         out << "    <Failures>0</Failures>" << std::endl;

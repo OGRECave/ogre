@@ -42,15 +42,15 @@ namespace Ogre
 	class _OgreHlmsExport ShaderPiecesManager : public PassAlloc
 	{
 	public:
-		ShaderPiecesManager(const String& pieseFilesResorceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		ShaderPiecesManager(const String& pieseFilesResorceGroup);
 		~ShaderPiecesManager();
 
 		void enumeratePieceFiles();
 
-		StringVectorPtr getPieces(const String& language, GpuProgramType shaderType, bool reload = false);
+		const StringVector& getPieces(const String& language, GpuProgramType shaderType, bool reload = false);
 
 	protected:
-		typedef std::map<String, StringVectorPtr> StringVecMap;
+		typedef std::map<String, StringVector> StringVecMap;
 
 		static const size_t mNumShaderTypes = 5;
 

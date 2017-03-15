@@ -28,29 +28,6 @@ THE SOFTWARE.
 #ifndef __Ogre_Iterator_Range_H__
 #define __Ogre_Iterator_Range_H__
 
-
-#if OGRE_USE_BOOST
-#   if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GNUC
-#       pragma GCC diagnostic push
-#if OGRE_COMPILER == OGRE_COMPILER_GNUC
-#       pragma GCC diagnostic ignored "-Wpragmas"
-#elif OGRE_COMPILER == OGRE_COMPILER_CLANG
-#       pragma GCC diagnostic ignored "-Wdocumentation"
-#endif
-#       pragma GCC diagnostic ignored "-Wshadow"
-#       pragma GCC diagnostic ignored "-Wpadded"
-#       pragma GCC diagnostic ignored "-Wweak-vtables"
-#       pragma GCC diagnostic ignored "-Wall"
-#       pragma GCC diagnostic ignored "-Wundef"
-#   endif
-
-#   include <boost/range.hpp>
-
-#   if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GNUC
-#       pragma GCC diagnostic pop
-#   endif
-#endif
-
 namespace Ogre {
 
 /** 
@@ -67,9 +44,6 @@ namespace Ogre {
 */
 template <typename T>
 class iterator_range{
-
-#if !OGRE_USE_BOOST
-    
     T mBegin, mEnd;
     
     public : 
@@ -122,11 +96,6 @@ class iterator_range{
             \n otherwise the type will be boost::iterator_range
         */
         typedef iterator_range<T> type;
-#else
-        /// defines (this) type as boost::iterator_range
-        public: typedef boost::iterator_range<T> type ;
-
-#endif
 }; 
 
 

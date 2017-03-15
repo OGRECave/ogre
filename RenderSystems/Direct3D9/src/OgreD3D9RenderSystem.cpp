@@ -2029,7 +2029,7 @@ namespace Ogre
     void D3D9RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
     {
         HRESULT hr;
-        D3D9TexturePtr dt = tex.staticCast<D3D9Texture>();
+        D3D9TexturePtr dt = static_pointer_cast<D3D9Texture>(tex);
         if (enabled && dt)
         {
             // note used
@@ -2108,7 +2108,7 @@ namespace Ogre
         }
         else
         {
-            D3D9TexturePtr dt = tex.staticCast<D3D9Texture>();
+            D3D9TexturePtr dt = static_pointer_cast<D3D9Texture>(tex);
             // note used
             dt->touch();
 

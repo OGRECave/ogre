@@ -82,7 +82,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	    add_static_libs_from_paths(${FreeImage_LIBRARIES})
     endif()
 
-    if(OGRE_USE_BOOST)
+    if(Boost_FOUND)
        list(OGRE_ANDROID_INCLUDES APPEND ${Boost_INCLUDE_DIRS})       
 	   add_static_libs_from_paths(${Boost_LIBRARIES})
     endif()

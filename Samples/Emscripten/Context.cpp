@@ -81,15 +81,15 @@ void Context::_mainLoop(void* target)
 
 void Context::unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName)
 {
-    Ogre::ResourcePtr rPtr = resMgr->getResourceByName(resourceName);
+    Ogre::ResourcePtr rPtr = resMgr->getResourceByName(resourceName, "General");
     if (!rPtr)
         return;
     
     rPtr->unload();
-    resMgr->remove(resourceName);
+    resMgr->remove(resourceName, "General");
 }
 
-void Context::destroyMaterials( Ogre::String resourceGroupID )
+void Context::destroyMaterials( const Ogre::String& resourceGroupID )
 {
     
     try
@@ -115,7 +115,7 @@ void Context::destroyMaterials( Ogre::String resourceGroupID )
         
         for( size_t i = 0; i < materialNamesToRemove.size(); ++i )
         {
-            materialManager->remove( materialNamesToRemove[i] );
+            materialManager->remove( materialNamesToRemove[i], resourceGroupID );
         }
         materialManager->removeUnreferencedResources();
     }
@@ -126,7 +126,7 @@ void Context::destroyMaterials( Ogre::String resourceGroupID )
     
 }
 
-void Context::destroyTextures( Ogre::String resourceGroupID )
+void Context::destroyTextures( const Ogre::String& resourceGroupID )
 {
     try
     {
@@ -149,7 +149,7 @@ void Context::destroyTextures( Ogre::String resourceGroupID )
         
         for( size_t i = 0; i < textureNamesToRemove.size(); ++i )
         {
-            textureManager->remove( textureNamesToRemove[i] );
+            textureManager->remove( textureNamesToRemove[i], resourceGroupID );
         }
     }
     catch( ... )
