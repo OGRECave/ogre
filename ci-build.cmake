@@ -38,7 +38,7 @@ endif()
 
 if(DEFINED ENV{APPVEYOR})
     set(CMAKE_BUILD_TYPE Release)
-    set(GENERATOR -G "Visual Studio 14")
+    set(GENERATOR -G "Visual Studio 15")
     set(RENDERSYSTEMS
         -DOGRE_BUILD_RENDERSYSTEM_D3D9=FALSE
         -DOGRE_BUILD_RENDERSYSTEM_GL=FALSE
