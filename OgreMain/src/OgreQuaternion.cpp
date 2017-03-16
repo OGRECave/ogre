@@ -376,10 +376,10 @@ namespace Ogre {
 
         if ( Math::Abs(w) < 1.0 )
         {
-			// According to Neil Dantam, atan2 has the best stability.
-			// http://www.neil.dantam.name/note/dantam-quaternion.pdf
-			Real fNormV = Math::Sqrt(x*x + y*y + z*z);
-			Radian fAngle ( Math::ATan2(fNormV, w) );
+            // According to Neil Dantam, atan2 has the best stability.
+            // http://www.neil.dantam.name/note/dantam-quaternion.pdf
+            Real fNormV = Math::Sqrt(x*x + y*y + z*z);
+            Radian fAngle ( Math::ATan2(fNormV, w) );
 
             Real fSin = Math::Sin(fAngle);
             if ( Math::Abs(fSin) >= msEpsilon )
