@@ -368,15 +368,19 @@ namespace Ogre {
     Quaternion Quaternion::Log () const
     {
         // If q = cos(A)+sin(A)*(x*i+y*j+z*k) where (x,y,z) is unit length, then
-        // log(q) = A*(x*i+y*j+z*k).  If sin(A) is near zero, use log(q) =
-        // sin(A)*(x*i+y*j+z*k) since sin(A)/A has limit 1.
+        // log(q) = (A/sin(A))*(x*i+y*j+z*k).  If sin(A) is near zero, use
+        // log(q) = (x*i+y*j+z*k) since A/sin(A) has limit 1.
 
         Quaternion kResult;
         kResult.w = 0.0;
 
         if ( Math::Abs(w) < 1.0 )
         {
-            Radian fAngle ( Math::ACos(w) );
+			// According to Neil Dantam, atan2 has the best stability.
+			// http://www.neil.dantam.name/note/dantam-quaternion.pdf
+			Real fNormV = Math::Sqrt(x*x + y*y + z*z);
+			Radian fAngle ( Math::ATan2(fNormV, w) );
+
             Real fSin = Math::Sin(fAngle);
             if ( Math::Abs(fSin) >= msEpsilon )
             {
