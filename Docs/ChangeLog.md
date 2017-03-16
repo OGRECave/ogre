@@ -1,13 +1,14 @@
-<p class="header" align="center"><img alt="" src="ogre-logo-wetfloor.gif" width="235" height="78"></p>
-<p class="header" align="center">OGRE (Object-Oriented Graphics Rendering Engine)</p>
-<p style="text-align:center;"><a href="http://www.ogre3d.org">www.ogre3d.org</a></p>
-<p class="header" align="center">Change Log</p>
+# Change Log
 
-<p class="mainheader">v1.9.0 [Ghadamon] (22 November 2013) - MAJOR RELEASE</p>
-<p>Change log in the Ogre3D wiki: <a href="http://www.ogre3d.org/tikiwiki/tiki-index.php?page=GhadamonNotes">Ogre 1.9 ChangeLog</a></p>
-<p>Closed JIRA tickets for Ogre 1.9: <a href="https://ogre3d.atlassian.net/issues/?jql=fixVersion%20in%20%28%221.9.0%22%2C%20%221.9.0%20RC1%22%2C%20%221.9.0%20RC2%22%29%20AND%20status%20in%20%28Resolved%2C%20Closed%29%20ORDER%20BY%20key%20DESC">Ogre 1.9 JIRA List </a></p>
+## v1.10.3 [Xalafu] (pending) - MAJOR RELEASE
+* [New and Noteworthy in OGRE 1.10](1.10-Notes.md)
+* [Closed JIRA tickets for Ogre 1.10](https://ogre3d.atlassian.net/browse/OGRE-536?jql=fixVersion%20in%20%28%221.10.0%22%29%20AND%20status%20in%20%28Resolved%2C%20Closed%29%20ORDER%20BY%20key%20DESC)
 
-<p class="mainheader">v1.8.1 [Byatis] (02 September 2012) - MAINTENANCE RELEASE</p>
+## v1.9.0 [Ghadamon] (22 November 2013) - MAJOR RELEASE
+* [Change log in the Ogre3D wiki](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=GhadamonNotes)
+* [Closed JIRA tickets for Ogre 1.9](https://ogre3d.atlassian.net/issues/?jql=fixVersion%20in%20%28%221.9.0%22%2C%20%221.9.0%20RC1%22%2C%20%221.9.0%20RC2%22%29%20AND%20status%20in%20%28Resolved%2C%20Closed%29%20ORDER%20BY%20key%20DESC)
+
+## v1.8.1 [Byatis] (02 September 2012) - MAINTENANCE RELEASE
 <ul>
     <li>[GLES2] Add missing shader for skeletal sample</li>
     <li>Fix crashes in OS X template code.</li>
@@ -92,12 +93,11 @@
     <li>Changed RenderSystems on Windows to interpret externalWindowHandle and parentWindowHandle parameters as size_t instead of unsigned int, which has the wrong size on 64bit platforms</li>
     <li>Fix Unity builds for OSX (SampleBrowser did not compile)</li>
 </ul>
-</p>
 
 
-<p class="mainheader">v1.8.0 [Byatis] (25 May 2012) - MAJOR RELEASE</p>
+## v1.8.0 [Byatis] (25 May 2012) - MAJOR RELEASE
 There have been well over 1000 commits since the release of v1.7.0. The following list
-shows only the highlights of new features.<p></p>
+shows only the highlights of new features.
 
 <ul>
 <li><b>Platform support</b>
@@ -192,8 +192,7 @@ shows only the highlights of new features.<p></p>
 </ul>
 
 
-<p class="mainheader">
-v1.7.4 [Cthugha] (14 January 2012) - MAINTENANCE RELEASE</p>
+## v1.7.4 [Cthugha] (14 January 2012) - MAINTENANCE RELEASE
 <ul>
 <li>iOS: Fix the fix I did for libraries that are included in SDK builds. Use iOS 3.2 when building SDKs</li>
 <li>OS X: Add visibility attributes to Cocoa classes so the symbols are exported. Apparently symbol visibility only has an effect for Objective-C on x86_64 targets.</li>
@@ -220,9 +219,7 @@ v1.7.4 [Cthugha] (14 January 2012) - MAINTENANCE RELEASE</p>
 <li>Have D3D9 rendersystem clean up properly when creating a renderwindow fails</li>
 </ul>
 
-
-<p class="mainheader">
-v1.7.3 [Cthugha] (08 May 2011) - MAINTENANCE RELEASE</p>
+## v1.7.3 [Cthugha] (08 May 2011) - MAINTENANCE RELEASE
 <ul>
 <li>iOS: Remove the animation timer.  Since DisplayLink is used by default now, this only hurts performance of things like input.</li>
 <li>Some small changes to ensure that the terrain and paging libs are added to linker flags for SDK sample builds.</li>
@@ -311,8 +308,7 @@ v1.7.3 [Cthugha] (08 May 2011) - MAINTENANCE RELEASE</p>
 <li>iOS: Normalize the case of the word Media in scripts.  Simplifies a little scripting.</li>
 </ul>
 
-<p class="mainheader">
-v1.7.2 [Cthugha] (03 November 2010) - MAINTENANCE RELEASE</p>
+## v1.7.2 [Cthugha] (03 November 2010) - MAINTENANCE RELEASE
 <ul>
 <li>Fix bug 240: TextAreaOverlayElement incorrectly loads Font in background thread (OGRE_THREAD_SUPPORT == 2)</li>
 <li>Report errors if installable DLLs missing (e.g. cg.dll)<br>
@@ -428,10 +424,9 @@ v1.7.2 [Cthugha] (03 November 2010) - MAINTENANCE RELEASE</p>
 <li>Remove a couple patterns from the Boost header exclude list.  Some headers in these directories are needed indirectly.</li>
 <li>Add missing CMake file to list of scripts to install</li>
 </ul>
-</p>
 
-<p class="mainheader">
-v1.7.1 [Cthugha] (25 April 2010) - MAINTENANCE RELEASE</p>
+## v1.7.1 [Cthugha] (25 April 2010) - MAINTENANCE RELEASE
+
 <ul>
 <li> Terrain: Fix memory leak after updating lightmaps</li>
 <li> Terrain: Ensure that imported position is used when preparing from ImportData</li>
@@ -549,8 +544,7 @@ demomedia.wxi.in was generated using 'heat dir Media -gg -cg OgreMedia -out demo
 
 </ul>
 
-<p class="mainheader">
-v1.7.0 [Cthugha] (28 February 2010) - MAJOR RELEASE</p>
+## v1.7.0 [Cthugha] (28 February 2010) - MAJOR RELEASE
 <a href="#changessince1.7.0RC1">[View changes since RC1]</a>
 
 <ul><li> <b>License changes</b>
@@ -703,7 +697,7 @@ v1.7.0 [Cthugha] (28 February 2010) - MAJOR RELEASE</p>
     </li></ul>
 </li></ul>
 
-<p><a name="changessince1.7.0RC1">Changes since 1.7.0 RC1 (highlights only)</a></p>
+<a name="changessince1.7.0RC1">Changes since 1.7.0 RC1 (highlights only)</a>
 <ul>
     <li>Fix GPU-extruded stencil shadows on Dx9</li>
     <li>Allow Terrain to have layers inserted / removed at any point in the stack</li>
