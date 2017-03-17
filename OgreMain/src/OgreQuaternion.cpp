@@ -348,7 +348,7 @@ namespace Ogre {
         Quaternion kResult;
         kResult.w = fExpW*Math::Cos(fAngle);
 
-        if ( Math::Abs(fSin) >= msEpsilon )
+        if ( Math::Abs(fAngle.valueRadians()) >= msEpsilon )
         {
             Real fCoeff = fExpW*(fSin/(fAngle.valueRadians()));
             kResult.x = fCoeff*x;
