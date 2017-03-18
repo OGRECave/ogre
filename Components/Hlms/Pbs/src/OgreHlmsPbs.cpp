@@ -1099,7 +1099,7 @@ namespace Ogre
 
             passBufferPtr += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
 
-            if( shadowNode && numShadowMapLights > 0 )
+            if( shadowNode )
             {
                 //All directional lights (caster and non-caster) are sent.
                 //Then non-directional shadow-casting shadow lights are sent.
