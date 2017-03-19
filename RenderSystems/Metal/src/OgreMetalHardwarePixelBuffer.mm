@@ -362,7 +362,7 @@ namespace v1 {
                 [mTexture replaceRegion:MTLRegionMake2D( dest.left, dest.top,
                                                          dest.getWidth(), dest.getHeight() )
                             mipmapLevel:mLevel
-                                  slice:dest.getDepth() - 1u
+                                  slice:dest.front
                               withBytes:data.data
                             bytesPerRow:rowPitch
                           bytesPerImage:bytesPerImage];
@@ -390,7 +390,7 @@ namespace v1 {
                                                          dest.getHeight(),
                                                          dest.getDepth() )
                             mipmapLevel:mLevel
-                                  slice:dest.getDepth()
+                                  slice:dest.front
                               withBytes:data.data
                             bytesPerRow:rowPitch
                           bytesPerImage:bytesPerImage];
