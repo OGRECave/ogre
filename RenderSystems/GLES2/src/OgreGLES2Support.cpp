@@ -74,10 +74,15 @@ namespace Ogre {
         OgreAssert(pcExt, "Problems getting GL extension string using glGetString");
         ext << pcExt;
         
-        LogManager::getSingleton().logMessage("GL_EXTENSIONS = " + String((const char*)pcExt));
-
+        Log::Stream log = LogManager::getSingleton().stream();
+        log << "GL_EXTENSIONS = ";
         while (ext >> str)
         {
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+            if (str.substr(0, 3) != "GL_") // emscripten gives us both prefixed and unprefixed forms
+                continue;
+#endif
+            log << str << " ";
             extensionList.insert(str);
         }
     }
