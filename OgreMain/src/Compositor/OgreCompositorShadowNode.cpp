@@ -359,7 +359,7 @@ namespace Ogre
         const Vector3 &camPos( newCamera->getDerivedPosition() );
 
         const size_t numTmpSortedLights = std::min( mShadowMapCastingLights.size() - begEmptyLightIdx,
-                                                    globalLightList.lights.size() );
+                                                    globalLightList.lights.size() - startIndex );
 
         mTmpSortedIndexes.resize( numTmpSortedLights, ~0 );
         std::partial_sort_copy( MemoryLessInputIterator( startIndex ),
