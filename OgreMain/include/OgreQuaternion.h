@@ -195,9 +195,7 @@ namespace Ogre {
         // functions of a quaternion
         /// Returns the dot product of the quaternion
         Real Dot (const Quaternion& rkQ) const;
-        /* Returns the normal length of this quaternion.
-            @note This does <b>not</b> alter any values.
-        */
+        /// Returns the normal length of this quaternion.
         Real Norm () const;
         /// Normalises this quaternion, and returns the previous length
         Real normalise(void); 
