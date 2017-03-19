@@ -508,7 +508,7 @@ namespace Ogre
             while( itor != end )
             {
                 if( itor->light )
-                    globalLightList.lights[itor->globalIndex]->setVisible( false );
+                    itor->light->setVisible( false );
                 ++itor;
             }
 
@@ -521,7 +521,7 @@ namespace Ogre
             while( itor != end )
             {
                 if( itor->light )
-                    globalLightList.lights[itor->globalIndex]->setVisible( true );
+                    itor->light->setVisible( true );
                 ++itor;
             }
         }

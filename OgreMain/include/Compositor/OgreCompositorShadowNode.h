@@ -177,6 +177,9 @@ namespace Ogre
                                                    size_t * RESTRICT_ALIAS inOutStartIdx,
                                                    size_t * RESTRICT_ALIAS outEntryToUse ) const;
 
+        void clearShadowCastingLights( const LightListInfo &globalLightList );
+        void restoreStaticShadowCastingLights( const LightListInfo &globalLightList );
+
     public:
         CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
                               CompositorWorkspace *workspace, RenderSystem *renderSys,
@@ -207,6 +210,8 @@ namespace Ogre
         ///     * There are 3 shadow maps, but only 2 shadow casting lights
         ///     * There are 3 directional maps for directional PSSM, but no directional light.
         bool isShadowMapIdxActive( uint32 shadowMapIdx ) const;
+
+        bool _shouldUpdateShadowMapIdx( uint32 shadowMapIdx ) const;
 
         /// Do not call this if isShadowMapIdxActive == false or isShadowMapIdxInValidRange == false
         uint8 getShadowMapLightTypeMask( uint32 shadowMapIdx ) const;
@@ -251,6 +256,51 @@ namespace Ogre
 
         const TextureVec& getContiguousShadowMapTex(void) const     { return mContiguousShadowMapTex; }
         uint32 getIndexToContiguousShadowMapTex( size_t shadowMapIdx ) const;
+
+        /** Marks a shadow map as statically updated, and ties the given light to always use
+            that shadow map.
+        @remarks
+            By default Ogre recalculates the shadow maps every single frame (even if nothing
+            has changed). However if you know that whatever a light is illuminating is not
+            changing at all (or barely changing), with static shadow maps you are the one who
+            tells Ogre when to update it (e.g. you may only need to update it three times during
+            the whole level); hence the framerate goes up.
+            Perceived quality may also go up because by default Ogre applies shadow mapping on the
+            closest lights; so shadows flip on and off as you move the camera (because lights that
+            had no shadows get closer while lights that were using shadows get farther away).
+            While often this is desirable, there are cases where the artist may want a particular
+            light to always have shadows (regardless of distance); with static shadow maps you can
+            force that; hence the perceived quality may go up (but that's up to the talent of the
+            artist and the scene in particular).
+        @par
+            Note that for point & spot lights, you have to consider if the light changed
+            (e.g. moved, rotated) or if anything that is or could be lit by the light has moved
+            Directional lights are harder because they depend on the camera placement as well.
+        @par
+            Use setStaticShadowMapDirty to tell Ogre to update the shadow map in the next render.
+        @par
+            Ogre may call light->setCastShadows( true ); on the light.
+        @par
+            IMPORTANT: Do not put static and dynamic shadow maps in the same UV atlas.
+            It's asking for trouble and will probably not work. Keep the atlas separate.
+        @param shadowMapIdx
+            Shadow map index to tie this light to. If this shadow map index is part of a PSSM
+            split, all PSSM splits will be affected (thus you only need to call it once for
+            any of the split that belong to the same set)
+        @param light
+            Light to tie to the given shadow map. Null pointer disables it.
+        */
+        void setLightFixedToShadowMap( size_t shadowMapIdx, Light *light );
+
+        /// Tags a static shadow map as dirty, causing Ogre to update it on the next time this
+        /// Shadow node gets executed.
+        /// If drawing to a texture atlas, multiple shadow maps may be sharing the same texture,
+        /// thus if you're doing a clear on the whole atlas, you will need to update all of
+        /// the shadow maps, not just this one. Use includeLinked=true to mark as dirty all
+        /// static shadow maps that share the same atlas.
+        /// Set it to false if that's explicitly what you want, or if you're already going
+        /// to call it for every shadow map (otherwise you will trigger a O(N^2) behavior).
+        void setStaticShadowMapDirty( size_t shadowMapIdx, bool includeLinked=true );
 
         /// @copydoc CompositorNode::finalTargetResized
         virtual void finalTargetResized( const RenderTarget *finalTarget );

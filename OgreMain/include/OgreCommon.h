@@ -666,14 +666,22 @@ namespace Ogre {
     /// Used as the light list, sorted
     struct LightClosest
     {
-        Light const *light;
+        Light       *light;
+        /// Index to SceneManager::mGlobalLightList.
+        /// globalIndex may be == SceneManager::mGlobalLightList.size() if
+        /// it holds a static light (see CompositorShadowNode::setLightFixedToShadowMap)
+        /// that is not currently in camera.
         size_t      globalIndex; //Index to SceneManager::mGlobalLightList
         Real        distance;
+        bool        isStatic;
+        bool        isDirty;
 
-        LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ) {}
+        LightClosest() :
+            light( 0 ),globalIndex( 0 ),distance( 0.0f ),
+            isStatic( false ), isDirty( false ) {}
         LightClosest( Light *_light, size_t _globalIndex, Real _distance ) :
-            light( _light ), globalIndex( _globalIndex ),
-            distance( _distance ) {}
+            light( _light ), globalIndex( _globalIndex ), distance( _distance ),
+            isStatic( false ), isDirty( false ) {}
 
         inline bool operator < ( const LightClosest &right ) const
         {

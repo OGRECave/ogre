@@ -858,6 +858,7 @@ namespace Ogre
                         ID_ALLOW_WRITE_AFTER_WRITE, //Used inside ID_USES_UAV
                     //ID_COLOUR_WRITE,
                     ID_EXPOSE,
+                    ID_SHADOW_MAP_FULL_VIEWPORT,
 
                     //Used by PASS_SCENE
                     ID_LOD_BIAS,

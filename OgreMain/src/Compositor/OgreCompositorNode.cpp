@@ -995,7 +995,7 @@ namespace Ogre
 
             if( executionMask & passDef->mExecutionMask &&
                 (!shadowNode || (!shadowNode->isShadowMapIdxInValidRange( passDef->mShadowMapIdx )
-                || (shadowNode->isShadowMapIdxActive( passDef->mShadowMapIdx )
+                || (shadowNode->_shouldUpdateShadowMapIdx( passDef->mShadowMapIdx )
                 && (shadowNode->getShadowMapLightTypeMask( passDef->mShadowMapIdx ) &
                     targetDef->getShadowMapSupportedLightTypes())))) )
             {

@@ -117,6 +117,7 @@ namespace Ogre
         /// Some shadow maps may only support a few light types (e.g.
         /// PSSM only supports directional lights).
         /// In the example this would be 1u << Light::LT_DIRECTIONAL
+        /// The size is one per light, not per shadow map.
         LightTypeMaskVec    mLightTypesMask;
         ShadowMapTechniques mDefaultTechnique;
 

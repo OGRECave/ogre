@@ -8069,6 +8069,7 @@ namespace Ogre{
                 case ID_VIEWPORT_MODIFIER_MASK:
                 case ID_USES_UAV:
                 case ID_COLOUR_WRITE:
+                case ID_SHADOW_MAP_FULL_VIEWPORT:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -8327,6 +8328,7 @@ namespace Ogre{
                 case ID_USES_UAV:
                 case ID_EXPOSE:
                 case ID_COLOUR_WRITE:
+                case ID_SHADOW_MAP_FULL_VIEWPORT:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -8679,6 +8681,7 @@ namespace Ogre{
                 case ID_USES_UAV:
                 case ID_EXPOSE:
                 case ID_COLOUR_WRITE:
+                case ID_SHADOW_MAP_FULL_VIEWPORT:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -8787,6 +8790,7 @@ namespace Ogre{
                 case ID_VIEWPORT_MODIFIER_MASK:
                 case ID_USES_UAV:
                 case ID_COLOUR_WRITE:
+                case ID_SHADOW_MAP_FULL_VIEWPORT:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -9070,6 +9074,7 @@ namespace Ogre{
                 case ID_VIEWPORT_MODIFIER_MASK:
                 //case ID_USES_UAV:
                 //case ID_COLOUR_WRITE:
+                case ID_SHADOW_MAP_FULL_VIEWPORT:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -9375,6 +9380,7 @@ namespace Ogre{
                 case ID_VIEWPORT_MODIFIER_MASK:
                 //case ID_USES_UAV:
                 //case ID_COLOUR_WRITE:
+                case ID_SHADOW_MAP_FULL_VIEWPORT:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -9873,6 +9879,26 @@ namespace Ogre{
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                 "colour_write argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+                        }
+                    }
+                    break;
+                case ID_SHADOW_MAP_FULL_VIEWPORT:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "shadow_map_full_viewport only supports 1 argument");
+                    }
+                    else
+                    {
+                        if( !getBoolean( prop->values.front(), &mPassDef->mShadowMapFullViewport ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "shadow_map_full_viewport argument must be \"true\", "
+                                "\"false\", \"yes\", \"no\", \"on\", or \"off\"");
                         }
                     }
                     break;

@@ -127,6 +127,11 @@ namespace Ogre
         uint8               mExecutionMask;
         uint8               mViewportModifierMask;
 
+        /// Only used if mShadowMapIdx is valid (if pass is owned by Shadow Nodes). If true,
+        /// we won't force the viewport to fit the region of the UV atlas on the texture,
+        /// and respect mVp* settings instead.
+        bool                mShadowMapFullViewport;
+
         IdStringVec         mExposedTextures;
 
         struct UavDependency
@@ -162,7 +167,8 @@ namespace Ogre
             mColourWrite( true ),
             mIncludeOverlays( false ),
             mExecutionMask( 0xFF ),
-            mViewportModifierMask( 0xFF ) {}
+            mViewportModifierMask( 0xFF ),
+            mShadowMapFullViewport( false ) {}
         virtual ~CompositorPassDef() {}
 
         CompositorPassType getType() const              { return mPassType; }

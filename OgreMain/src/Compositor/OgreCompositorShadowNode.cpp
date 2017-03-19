@@ -316,17 +316,13 @@ namespace Ogre
         uint32 combinedVisibilityFlags = viewport->getVisibilityMask() &
                                             sceneManager->getVisibilityMask();
 
+        clearShadowCastingLights( globalLightList );
+
         size_t startIndex = 0;
-        mShadowMapCastingLights.clear(); //TODO: Do not clear statically updated lights.
-        mShadowMapCastingLights.resize( mDefinition->mNumLights );
-        mNumActiveShadowMapCastingLights = 0;
         size_t begEmptyLightIdx = 0;
         size_t nxtEmptyLightIdx = 0;
         findNextEmptyShadowCastingLightEntry( 1u << Light::LT_DIRECTIONAL,
                                               &begEmptyLightIdx, &nxtEmptyLightIdx );
-
-        mAffectedLights.clear();
-        mAffectedLights.resize( globalLightList.lights.size(), false );
 
         {
             //SceneManager puts the directional lights first. Add them first as casters.
@@ -399,6 +395,8 @@ namespace Ogre
             ++itor;
         }
 
+        restoreStaticShadowCastingLights( globalLightList );
+
         mCastersBox = sceneManager->_calculateCurrentCastersBox( viewport->getVisibilityMask(),
                                                                  mDefinition->mMinRq,
                                                                  mDefinition->mMaxRq );
@@ -439,11 +437,71 @@ namespace Ogre
         *entryToUse = lightIdx;
     }
     //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::clearShadowCastingLights( const LightListInfo &globalLightList )
+    {
+        mAffectedLights.clear();
+        //Reserve last place for avoid crashing with static
+        //lights that weren't collected into globalLightList
+        mAffectedLights.resize( globalLightList.lights.size() + 1u, false );
+
+        mNumActiveShadowMapCastingLights = 0;
+
+        LightClosestArray::iterator itor = mShadowMapCastingLights.begin();
+        LightClosestArray::iterator end  = mShadowMapCastingLights.end();
+
+        while( itor != end )
+        {
+            if( !itor->isStatic )
+            {
+                *itor = LightClosest();
+            }
+            else
+            {
+                LightArray::const_iterator it = std::find( globalLightList.lights.begin(),
+                                                           globalLightList.lights.end(),
+                                                           itor->light );
+
+                if( it != globalLightList.lights.end() )
+                {
+                    itor->globalIndex = it - globalLightList.lights.begin();
+                    mAffectedLights[itor->globalIndex] = true;
+
+                    //Force this light to "not cast shadow" to fool buildClosestLightList
+                    //and prevent assigning this light into any other shadow map by accident
+                    itor->light->setCastShadows( false );
+                    globalLightList.visibilityMask[itor->globalIndex] =itor->light->getVisibilityFlags();
+                }
+                else
+                {
+                    itor->globalIndex = mAffectedLights.size() - 1u;
+                }
+
+                ++mNumActiveShadowMapCastingLights;
+            }
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::restoreStaticShadowCastingLights( const LightListInfo &globalLightList )
+    {
+        LightClosestArray::iterator itor = mShadowMapCastingLights.begin();
+        LightClosestArray::iterator end  = mShadowMapCastingLights.end();
+
+        while( itor != end )
+        {
+            if( itor->isStatic && itor->globalIndex < globalLightList.lights.size() )
+            {
+                itor->light->setCastShadows( true );
+                globalLightList.visibilityMask[itor->globalIndex] = itor->light->getVisibilityFlags();
+            }
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorShadowNode::_update( Camera* camera, const Camera *lodCamera,
                                         SceneManager *sceneManager )
     {
         ShadowMapCameraVec::iterator itShadowCamera = mShadowMapCameras.begin();
-        const Viewport *viewport    = camera->getLastViewport();
 
         buildClosestLightList( camera, lodCamera );
 
@@ -522,6 +580,17 @@ namespace Ogre
         CompositorNode::_update( lodCamera, sceneManager );
 
         sceneManager->_setCurrentRenderStage( previous );
+
+        {
+            LightClosestArray::iterator itor = mShadowMapCastingLights.begin();
+            LightClosestArray::iterator end  = mShadowMapCastingLights.end();
+
+            while( itor != end )
+            {
+                itor->isDirty = false;
+                ++itor;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::postInitializePass( CompositorPass *pass )
@@ -691,6 +760,26 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    bool CompositorShadowNode::_shouldUpdateShadowMapIdx( uint32 shadowMapIdx ) const
+    {
+        bool retVal = true;
+
+        if( shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size() )
+        {
+            const ShadowTextureDefinition &shadowTexDef =
+                    mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+
+            if( !mShadowMapCastingLights[shadowTexDef.light].light ||
+                (mShadowMapCastingLights[shadowTexDef.light].isStatic &&
+                !mShadowMapCastingLights[shadowTexDef.light].isDirty ) )
+            {
+                retVal = false;
+            }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     uint8 CompositorShadowNode::getShadowMapLightTypeMask( uint32 shadowMapIdx ) const
     {
         const ShadowTextureDefinition &shadowTexDef =
@@ -783,6 +872,48 @@ namespace Ogre
     uint32 CompositorShadowNode::getIndexToContiguousShadowMapTex( size_t shadowMapIdx ) const
     {
         return mShadowMapCameras[shadowMapIdx].idxToContiguousTex;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::setLightFixedToShadowMap( size_t shadowMapIdx, Light *light )
+    {
+        assert( shadowMapIdx < mShadowMapCameras.size() );
+
+        const size_t lightIdx = mDefinition->mShadowMapTexDefinitions[shadowMapIdx].light;
+        assert( mDefinition->mLightTypesMask[lightIdx] & (1u << light->getType()) &&
+                "The shadow map says that type of light is not supported!" );
+
+        mShadowMapCastingLights[lightIdx].light = light;
+        mShadowMapCastingLights[lightIdx].isStatic = light != 0;
+        mShadowMapCastingLights[lightIdx].isDirty = true;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::setStaticShadowMapDirty( size_t shadowMapIdx, bool includeLinked )
+    {
+        assert( shadowMapIdx < mShadowMapCameras.size() );
+
+        const ShadowTextureDefinition &shadowTexDef =
+                mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+        const size_t lightIdx = mDefinition->mShadowMapTexDefinitions[shadowMapIdx].light;
+        assert( mShadowMapCastingLights[lightIdx].isStatic &&
+                "Shadow Map is not static! Did you forget to call setLightFixedToShadowMap?" );
+
+        mShadowMapCastingLights[lightIdx].isDirty = true;
+
+        if( includeLinked )
+        {
+            CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
+                    mDefinition->mShadowMapTexDefinitions.begin();
+            CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end =
+                    mDefinition->mShadowMapTexDefinitions.end();
+
+            while( itor != end )
+            {
+                if( shadowTexDef.getTextureName() == itor->getTextureName() )
+                    mShadowMapCastingLights[itor->light].isDirty = true;
+
+                ++itor;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::finalTargetResized( const RenderTarget *finalTarget )

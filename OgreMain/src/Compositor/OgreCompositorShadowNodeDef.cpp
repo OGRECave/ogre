@@ -149,7 +149,8 @@ namespace Ogre
                 {
                     const ShadowTextureDefinition &texDef = mShadowMapTexDefinitions[pass->mShadowMapIdx];
 
-                    if( itor->getRenderTargetName() == texDef.getTextureName() )
+                    if( itor->getRenderTargetName() == texDef.getTextureName() &&
+                        !pass->mShadowMapFullViewport )
                     {
                         //Only force the viewport settings to the passes
                         //that directly rendering into the atlas
