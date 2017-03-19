@@ -530,13 +530,11 @@ namespace Ogre
 
                 // set base
                 if( light->getType() != Light::LT_POINT )
-                {
                     texCamera->setOrientation( light->getParentNode()->_getDerivedOrientation() );
-                }
+                else
+                    texCamera->setOrientation( Quaternion::IDENTITY );
                 if( light->getType() != Light::LT_DIRECTIONAL )
-                {
                     texCamera->setPosition( light->getParentNode()->_getDerivedPosition() );
-                }
 
                 if( itor->shadowMapTechnique == SHADOWMAP_PSSM )
                 {
