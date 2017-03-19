@@ -178,13 +178,13 @@ namespace Ogre
 
         for( size_t y=0; y<mHeight; ++y )
         {
-            const Real yStep = y;
+            const Real yStep = static_cast<Real>( y );
 
             for( size_t x=0; x<mWidth / ARRAY_PACKED_REALS; ++x )
             {
                 for( size_t i=0; i<ARRAY_PACKED_REALS; ++i )
                 {
-                    const Real xStep = x * ARRAY_PACKED_REALS + i;
+                    const Real xStep = static_cast<Real>( x * ARRAY_PACKED_REALS + i);
 
                     const Real newLeft   = origFrustumLeft + xStep * frustumHorizLength;
                     const Real newRight  = newLeft + frustumHorizLength;
