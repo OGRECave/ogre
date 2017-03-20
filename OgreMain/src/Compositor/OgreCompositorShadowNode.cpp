@@ -93,7 +93,6 @@ namespace Ogre
                                                 StringConverter::toString( id ) + " Map " +
                                                 StringConverter::toString( shadowMapIdx ), false );
             shadowMapCamera.camera->setFixedYawAxis( false );
-            shadowMapCamera.camera->setAutoAspectRatio( true );
             shadowMapCamera.minDistance = 0.0f;
             shadowMapCamera.maxDistance = 100000.0f;
 
@@ -464,12 +463,18 @@ namespace Ogre
 
                 // set base
                 if( light->getType() != Light::LT_POINT )
-                {
                     texCamera->setOrientation( light->getParentNode()->_getDerivedOrientation() );
-                }
+                else
+                    texCamera->setOrientation( Quaternion::IDENTITY );
+
                 if( light->getType() != Light::LT_DIRECTIONAL )
                 {
                     texCamera->setPosition( light->getParentNode()->_getDerivedPosition() );
+                    texCamera->setAutoAspectRatio( true );
+                }
+                else
+                {
+                    texCamera->setAutoAspectRatio( false );
                 }
 
                 if( itor->shadowMapTechnique == SHADOWMAP_PSSM )
