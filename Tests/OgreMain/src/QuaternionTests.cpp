@@ -100,7 +100,7 @@ TEST(QuaternionTests,Exp)
     /** Comparison values got from the Octave quaternion package. */
 
     // Case a quaternion for which angle is 0 degrees.
-    Quaternion quatA = Quaternion(1., 0., 0., 0.);
+    Quaternion quatA(1., 0., 0., 0.);
     Quaternion expQuatA = quatA.Exp();
     EXPECT_NEAR(expQuatA.w, 2.71828182845905, 1e-6);
     EXPECT_NEAR(expQuatA.x, 0., 1e-6);
@@ -108,7 +108,7 @@ TEST(QuaternionTests,Exp)
     EXPECT_NEAR(expQuatA.z, 0., 1e-6);
 
     // Case of a common quaternion (no specific rotation).
-    Quaternion quatB = Quaternion(0.2, 0.7, Ogre::Math::PI, 0.9);
+    Quaternion quatB(0.2, 0.7, Ogre::Math::PI, 0.9);
     Quaternion expQuatB = quatB.Exp();
     EXPECT_NEAR(expQuatB.w, -1.19693377635754, 1e-6);
     EXPECT_NEAR(expQuatB.x, -0.05095014937169, 1e-6);
@@ -122,4 +122,18 @@ TEST(QuaternionTests,Exp)
     EXPECT_NEAR(expUnitQuatB.x, 0.186879761760123, 1e-6);
     EXPECT_NEAR(expUnitQuatB.y, 0.838714409500305, 1e-6);
     EXPECT_NEAR(expUnitQuatB.z, 0.240273979405873, 1e-6);
+}
+
+TEST(QuaternionTests,Log)
+{
+    /** Comparison values got from the Octave quaternion package. */
+
+    // Case of a common quaternion (no specific rotation).
+    Quaternion quat(0.85, Ogre::Math::PI, 0.6, 0.2);
+    quat.normalise() ;
+    Quaternion logUnitQuat = quat.Log();
+    EXPECT_NEAR(quat.w, 0., 1e-6);
+    EXPECT_NEAR(quat.x, 1.28572906735070, 1e-6);
+    EXPECT_NEAR(quat.y, 0.24555616385496, 1e-6);
+    EXPECT_NEAR(quat.z, 0.08185205461832, 1e-6);
 }
