@@ -132,8 +132,8 @@ TEST(QuaternionTests,Log)
     Quaternion quat(0.85, Ogre::Math::PI, 0.6, 0.2);
     quat.normalise() ;
     Quaternion logUnitQuat = quat.Log();
-    EXPECT_NEAR(quat.w, 0., 1e-6);
-    EXPECT_NEAR(quat.x, 1.28572906735070, 1e-6);
-    EXPECT_NEAR(quat.y, 0.24555616385496, 1e-6);
-    EXPECT_NEAR(quat.z, 0.08185205461832, 1e-6);
+    EXPECT_NEAR(logUnitQuat.w, 0., 1e-6);
+    EXPECT_NEAR(logUnitQuat.x, 1.28572906735070, 1e-6);
+    EXPECT_NEAR(logUnitQuat.y, 0.24555616385496, 1e-6);
+    EXPECT_NEAR(logUnitQuat.z, 0.08185205461832, 1e-6);
 }
