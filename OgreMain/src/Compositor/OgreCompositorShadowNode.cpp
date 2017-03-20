@@ -884,7 +884,8 @@ namespace Ogre
         assert( shadowMapIdx < mShadowMapCameras.size() );
 
         const size_t lightIdx = mDefinition->mShadowMapTexDefinitions[shadowMapIdx].light;
-        assert( mDefinition->mLightTypesMask[lightIdx] & (1u << light->getType()) &&
+        assert( (!light ||
+                mDefinition->mLightTypesMask[lightIdx] & (1u << light->getType())) &&
                 "The shadow map says that type of light is not supported!" );
 
         mShadowMapCastingLights[lightIdx].light = light;
