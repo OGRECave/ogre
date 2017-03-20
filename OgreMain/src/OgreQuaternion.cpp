@@ -311,7 +311,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real Quaternion::Norm () const
     {
-        return w*w+x*x+y*y+z*z;
+        return Math::Sqrt(w * w + x * x + y * y + z * z);
     }
     //-----------------------------------------------------------------------
     Quaternion Quaternion::Inverse () const
@@ -510,7 +510,7 @@ namespace Ogre {
     Real Quaternion::normalise(void)
     {
         Real len = Norm();
-        Real factor = 1.0f / Math::Sqrt(len);
+        Real factor = 1.0f / len;
         *this = *this * factor;
         return len;
     }
