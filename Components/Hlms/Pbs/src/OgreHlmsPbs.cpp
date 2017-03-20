@@ -65,6 +65,7 @@ namespace Ogre
     const IdString PbsProperty::SignedIntTex      = IdString( "signed_int_textures" );
     const IdString PbsProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
     const IdString PbsProperty::LowerGpuOverhead  = IdString( "lower_gpu_overhead" );
+    const IdString PbsProperty::DebugPssmSplits   = IdString( "debug_pssm_splits" );
 
     const IdString PbsProperty::NumTextures     = IdString( "num_textures" );
     const char *PbsProperty::DiffuseMap         = "diffuse_map";
@@ -215,6 +216,7 @@ namespace Ogre
         mIrradianceVolume( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
+        mDebugPssmSplits( false ),
         mShadowFilter( PCF_3x3 ),
         mAmbientLightMode( AmbientAuto )
     {
@@ -736,6 +738,18 @@ namespace Ogre
             else
             {
                 setProperty( PbsProperty::PcfIterations, 1 );
+            }
+
+            if( mDebugPssmSplits )
+            {
+                int32 numPssmSplits = 0;
+                const vector<Real>::type *pssmSplits = shadowNode->getPssmSplits( 0 );
+                if( pssmSplits )
+                {
+                    numPssmSplits = static_cast<int32>( pssmSplits->size() - 1 );
+                    if( numPssmSplits > 0 )
+                        setProperty( PbsProperty::DebugPssmSplits, 1 );
+                }
             }
         }
 
@@ -1709,6 +1723,11 @@ namespace Ogre
     {
         HlmsBufferManager::frameEnded();
         mCurrentPassBuffer  = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setDebugPssmSplits( bool bDebug )
+    {
+        mDebugPssmSplits = bDebug;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::setShadowSettings( ShadowFilter filter )

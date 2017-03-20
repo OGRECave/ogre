@@ -457,6 +457,10 @@ void main()
 		@end @property( !hlms_normal && !hlms_qtangent )
 			outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
 		@end
+
+		@property( debug_pssm_splits )
+			outColour.xyz = mix( outColour.xyz, debugPssmSplit.xyz, 0.2f );
+		@end
 	@end @property( hlms_prepass )
 		outNormals			= vec4( nNormal * 0.5 + 0.5, 1.0 );
 		@property( hlms_pssm_splits )

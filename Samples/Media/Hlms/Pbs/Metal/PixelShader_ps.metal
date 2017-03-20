@@ -454,6 +454,10 @@ float4 diffuseCol;
 	@end @property( !hlms_normal && !hlms_qtangent )
 		outPs.colour0 = float4( 1.0, 1.0, 1.0, 1.0 );
 	@end
+
+	@property( debug_pssm_splits )
+		outPs.colour0.xyz = mix( outPs.colour0.xyz, debugPssmSplit.xyz, 0.2f );
+	@end
 @end @property( hlms_prepass )
 	outPs.normals			= float4( nNormal * 0.5 + 0.5, 1.0 );
 	@property( hlms_pssm_splits )
