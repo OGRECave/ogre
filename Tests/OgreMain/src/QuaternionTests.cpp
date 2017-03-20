@@ -102,24 +102,24 @@ TEST(QuaternionTests,Exp)
     // Case a quaternion for which angle is 0 degrees.
     Quaternion quatA = Quaternion(1., 0., 0., 0.);
     Quaternion expQuatA = quatA.Exp();
-    EXPECT_EQ(expQuatA.w, 2.71828);
-    EXPECT_EQ(expQuatA.x, 0.);
-    EXPECT_EQ(expQuatA.y, 0.);
-    EXPECT_EQ(expQuatA.z, 0.);
+    EXPECT_DOUBLE_EQ(expQuatA.w, 2.71828);
+    EXPECT_DOUBLE_EQ(expQuatA.x, 0.);
+    EXPECT_DOUBLE_EQ(expQuatA.y, 0.);
+    EXPECT_DOUBLE_EQ(expQuatA.z, 0.);
 
     // Case of a common quaternion (no specific rotation).
     Quaternion quatB = Quaternion(0.2, 0.7, Ogre::Math::PI, 0.9);
     Quaternion expQuatB = quatB.Exp();
-    EXPECT_EQ(expQuatB.w, -1.19693);
-    EXPECT_EQ(expQuatB.x, -0.0509502);
-    EXPECT_EQ(expQuatB.y, -0.228664);
-    EXPECT_EQ(expQuatB.z, -0.0655073);
+    EXPECT_DOUBLE_EQ(expQuatB.w, -1.19693);
+    EXPECT_DOUBLE_EQ(expQuatB.x, -0.0509502);
+    EXPECT_DOUBLE_EQ(expQuatB.y, -0.228664);
+    EXPECT_DOUBLE_EQ(expQuatB.z, -0.0655073);
 
     // Normalised quaternion B.
     quatB.normalise() ;
     Quaternion expUnitQuatB = quatB.Exp();
-    EXPECT_EQ(expUnitQuatB.w, 0.575155);
-    EXPECT_EQ(expUnitQuatB.x, 0.18688);
-    EXPECT_EQ(expUnitQuatB.y, 0.838715);
-    EXPECT_EQ(expUnitQuatB.z, 0.240274);
+    EXPECT_DOUBLE_EQ(expUnitQuatB.w, 0.575155);
+    EXPECT_DOUBLE_EQ(expUnitQuatB.x, 0.18688);
+    EXPECT_DOUBLE_EQ(expUnitQuatB.y, 0.838715);
+    EXPECT_DOUBLE_EQ(expUnitQuatB.z, 0.240274);
 }
