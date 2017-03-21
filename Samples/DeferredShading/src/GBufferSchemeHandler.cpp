@@ -22,6 +22,7 @@ using namespace Ogre;
 
 const String GBufferSchemeHandler::NORMAL_MAP_PATTERN = "normal";
 
+//! [schemenotfound]
 Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex, 
         const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
         const Renderable* rend)
@@ -74,6 +75,7 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
     
     return gBufferTech;
 }
+//! [schemenotfound]
 
 bool GBufferSchemeHandler::checkNormalMap(
     TextureUnitState* tus, GBufferSchemeHandler::PassProperties& props)

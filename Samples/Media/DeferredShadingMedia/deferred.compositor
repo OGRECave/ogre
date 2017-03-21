@@ -1,4 +1,5 @@
 //Postfilter generating the GBuffer
+//! [gbuffer]
 compositor DeferredShading/GBuffer
 {
 	technique
@@ -27,8 +28,10 @@ compositor DeferredShading/GBuffer
 		}
 	}
 }
+//! [gbuffer]
 
 //Postfilter lighting the scene using the GBuffer
+//! [showlit]
 compositor DeferredShading/ShowLit
 {
 
@@ -79,6 +82,7 @@ compositor DeferredShading/ShowLit
 		}
 	}
 }
+//! [showlit]
 
 // Postfilter that shows the colour channel
 compositor DeferredShading/ShowColour
