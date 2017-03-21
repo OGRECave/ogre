@@ -698,11 +698,11 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
     for (unsigned int i=0; i < entity->getNumSubEntities(); ++i)
     {
         SubEntity* curSubEntity = entity->getSubEntity(i);
-        const String& curMaterialName = curSubEntity->getMaterialName();
+        MaterialPtr curMaterial = curSubEntity->getMaterial();
         bool success;
 
         // Create the shader based technique of this material.
-        success = mShaderGenerator->createShaderBasedTechnique(curMaterialName, 
+        success = mShaderGenerator->createShaderBasedTechnique(*curMaterial,
                             MaterialManager::DEFAULT_SCHEME_NAME,
                             RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
@@ -710,7 +710,6 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
         // Setup custom shader sub render states according to current setup.
         if (success)
         {                   
-            MaterialPtr curMaterial = MaterialManager::getSingleton().getByName(curMaterialName);
             Pass* curPass = curMaterial->getTechnique(0)->getPass(0);
 
             if (mSpecularEnable)
@@ -727,7 +726,10 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 
             // Grab the first pass render state. 
             // NOTE: For more complicated samples iterate over the passes and build each one of them as desired.
-            RTShader::RenderState* renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName, 0);
+            RTShader::RenderState* renderState =
+                mShaderGenerator->getRenderState(
+                    RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                    curMaterial->getName(), 0);
 
             // Remove all sub render states.
             renderState->reset();
@@ -814,8 +816,10 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
             }
                                 
             // Invalidate this material in order to re-generate its shaders.
-            mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName);
-        }       
+            mShaderGenerator->invalidateMaterial(
+                RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                curMaterial->getName());
+        }
     }
 }
 
@@ -1169,7 +1173,7 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
     MaterialPtr materialPtr = MaterialManager::getSingleton().getByName(materialName);
 
     // Create shader based technique.
-    bool success = mShaderGenerator->createShaderBasedTechnique(materialName,
+    bool success = mShaderGenerator->createShaderBasedTechnique(*materialPtr,
         MaterialManager::DEFAULT_SCHEME_NAME,
         RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 

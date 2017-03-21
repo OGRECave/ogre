@@ -160,13 +160,13 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         // materials have shaders and as such is not automatically
         // reflected in the RTSS system.
         RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-            ent->getSubEntity(0)->getMaterialName(),
+            *ent->getSubEntity(0)->getMaterial(),
             Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
             Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
             true);
 
         RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-            entDQ->getSubEntity(0)->getMaterialName(),
+            *entDQ->getSubEntity(0)->getMaterial(),
             Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
             Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
             true);
