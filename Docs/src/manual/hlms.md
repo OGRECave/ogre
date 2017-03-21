@@ -390,16 +390,16 @@ Which will print:
   diffuse = surfaceDiffuse * lightDiffuse;   diffuse = surfaceDiffuse ;
 ```
 
-### @foreach( scopedVar, count, [start] ) {#HlmsPreprocessorSyntaxForeach}
+### @foreach( count, scopedVar, [start] ) {#HlmsPreprocessorSyntaxForeach}
 
 Loop that prints the text inside the block, The text is repeated `count - start` times. Must be finalized with `@end`.
 
+-   count The number of times to repeat the loop (if start = 0). Count
+	can read variables.
 -   `scopedVar` is a variable that can be used to print the
     current iteration of the loop while inside the block. i.e.
     `@scopedVar` will be converted into a number in the range \[start;
     count)
--   count The number of times to repeat the loop (if start = 0). Count
-    can read variables.
 -   start Optional. Allows to start from a value different than 0. Start
     can read variables.
 
