@@ -970,6 +970,14 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             // does the vertex program want surface and light params passed to rendersystem?
             passSurfaceAndLightParams = pass->getVertexProgram()->getPassSurfaceAndLightStates();
         }
+        else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "RenderSystem does not support FixedFunction, "
+                        "but technique has no Vertex Shader: " +
+                            pass->getParent()->getParent()->getName(),
+                        "SceneManager::_setPass");
+        }
         else
         {
             // Unbind program?
@@ -1063,6 +1071,14 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             bindGpuProgram(pass->getFragmentProgram()->_getBindingDelegate());
             // bind parameters later 
             passFogParams = pass->getFragmentProgram()->getPassFogStates();
+        }
+        else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "RenderSystem does not support FixedFunction, "
+                        "but technique has no Fragment Shader: " +
+                            pass->getParent()->getParent()->getName(),
+                        "SceneManager::_setPass");
         }
         else
         {
