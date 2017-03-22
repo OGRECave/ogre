@@ -60,6 +60,9 @@ namespace Demo
         "they do in ShadowMapDebugging sample. This gives the artist the ability to\n"
         "have better control over a scene's shadows, which can result in an improved\n"
         "experience.\n"
+        "This demo is not exactly the same as ShadowMapDebugging:\n"
+        "   * The resolution for the static shadow maps is much higher.\n"
+        "   * We use 1 point & 1 spot lights; instead of 2 spot lights.\n"
         "\n"
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/scripts/Compositors/StaticShadowMaps.compositor" );

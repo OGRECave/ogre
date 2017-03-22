@@ -62,29 +62,10 @@ compositor_node_shadow StaticShadowMapsShadowNode
 		}
 	}
 
-	shadow_map_target_type directional spot
-	{
-		shadow_map 3
-		{
-			pass clear
-			{
-				colour_value 1 1 1 1
-				//Any of the shadow maps that use this atlas will do. We need
-				//to do this so that the clear is not executed when the
-				//static shadow maps aren't dirty.
-				//The only issue is that you MUST have a light assigned to shadow_map 3
-				//if you want shadow_map 4 to work correctly as well.
-				shadow_map_full_viewport yes
-			}
-		}
-		shadow_map 3 4
-		{
-			pass render_scene
-			{
-			}
-		}
-	}
-
+	//Target "shadow_map_target_type point" must be defined first in order to work correctly
+	//(otherwise if a point light is assigned to idx#3 and a spotlight to idx#4, the spotlight
+	//render_scene will be executed first and then the point light's clear will be executed on
+	//top of it).
 	shadow_map_target_type point
 	{
 		shadow_map 3
@@ -112,6 +93,29 @@ compositor_node_shadow StaticShadowMapsShadowNode
 					material Ogre/DPSM/CubeToDpsm
 					input 0 tmpCubemap
 				}
+			}
+		}
+	}
+
+	shadow_map_target_type directional spot
+	{
+		shadow_map 3
+		{
+			pass clear
+			{
+				colour_value 1 1 1 1
+				//Any of the shadow maps that use this atlas will do. We need
+				//to do this so that the clear is not executed when the
+				//static shadow maps aren't dirty.
+				//The only issue is that you MUST have a light assigned to shadow_map 3
+				//if you want shadow_map 4 to work correctly as well.
+				shadow_map_full_viewport yes
+			}
+		}
+		shadow_map 3 4
+		{
+			pass render_scene
+			{
 			}
 		}
 	}
