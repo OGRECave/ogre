@@ -280,5 +280,59 @@ namespace Ogre
 
             ++it1;
         }
+
+        {
+            //These setups are invalid:
+            //  SP D
+            //  S  D
+            //  P  D
+            //  DS P
+            //  S  P
+            // "SP  D" means: A shadow map that only supports Spot & Point lights comes
+            // before a shadow map that supports directional lights.
+            bool cannotUseType[Light::NUM_LIGHT_TYPES];
+            for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
+                cannotUseType[i] = false;
+
+            LightTypeMaskVec::const_iterator it = mLightTypesMask.begin();
+            LightTypeMaskVec::const_iterator en = mLightTypesMask.end();
+
+            while( it != en )
+            {
+                bool isError = false;
+                for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
+                {
+                    if( *it & (1u << i) && cannotUseType[i] )
+                        isError = true;
+                }
+
+                if( isError )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                        "Error in shadow node " + mNameStr + ": Ogre requires lights to be "
+                        "sent to GPU in the following order: Directional, Point, Spotlight. "
+                        "But your shadow node forces this order to be violated. A shadow map"
+                        " that does not support directional lights cannot come before a "
+                        "shadow map that does support them. A shadow map that "
+                        "does not support point lights but supports spotlights cannot "
+                        "come before a shadow map that supports point lights",
+                        "CompositorShadowNodeDef::_validateAndFinish" );
+                }
+                else
+                {
+                    //A shadow map that does not support directional
+                    //lights cannot come before a shadow map that does.
+                    if( !(*it & (1u << Light::LT_DIRECTIONAL)) )
+                        cannotUseType[Light::LT_DIRECTIONAL] = true;
+
+                    //A shadow map that does not support point lights but supports spotlights
+                    //cannot come before a shadow map that supports point lights.
+                    if( (*it & (1u << Light::LT_SPOTLIGHT)) && !(*it & (1u << Light::LT_POINT)) )
+                        cannotUseType[Light::LT_POINT] = true;
+                }
+
+                ++it;
+            }
+        }
     }
 }

@@ -283,6 +283,15 @@ namespace Ogre
         @par
             IMPORTANT: Do not put static and dynamic shadow maps in the same UV atlas.
             It's asking for trouble and will probably not work. Keep the atlas separate.
+        @par
+            VERY IMPORTANT: You *must* respect lights are set in the following order:
+                1. Directional
+                2. Point
+                3. Spot
+            If you have shadow maps defined that support both point & spotlight, and you want
+            to mix both static lights with dynamic ones; set fixed point lights in the first
+            shadow map indices and spotlight in the last indices, to avoid Ogre automatically
+            (e.g.) placing a point light after your static spot light.
         @param shadowMapIdx
             Shadow map index to tie this light to. If this shadow map index is part of a PSSM
             split, all PSSM splits will be affected (thus you only need to call it once for

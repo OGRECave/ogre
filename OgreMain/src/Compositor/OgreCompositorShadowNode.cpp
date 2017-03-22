@@ -296,6 +296,23 @@ namespace Ogre
             return fDistL < fDistR;
         }
     };
+    class SortByLightTypeCmp
+    {
+        LightListInfo const *mLightList;
+
+    public:
+        SortByLightTypeCmp( LightListInfo const *lightList ) :
+            mLightList( lightList )
+        {
+        }
+
+        bool operator()( size_t _l, size_t _r ) const
+        {
+            assert( _l < mLightList->lights.size() ); //This should never happen.
+            assert( _r < mLightList->lights.size() ); //This should never happen.
+            return mLightList->lights[_l]->getType() < mLightList->lights[_r]->getType();
+        }
+    };
     void CompositorShadowNode::buildClosestLightList( Camera *newCamera, const Camera *lodCamera )
     {
         const size_t currentFrameCount = mWorkspace->getFrameCount();
@@ -365,6 +382,9 @@ namespace Ogre
                             MemoryLessInputIterator( globalLightList.lights.size() ),
                             mTmpSortedIndexes.begin(), mTmpSortedIndexes.end(),
                             ShadowMappingLightCmp( &globalLightList, combinedVisibilityFlags, camPos ) );
+
+        std::sort( mTmpSortedIndexes.begin(), mTmpSortedIndexes.end(),
+                   SortByLightTypeCmp( &globalLightList ) );
 
         vector<size_t>::type::const_iterator itor = mTmpSortedIndexes.begin();
         vector<size_t>::type::const_iterator end  = mTmpSortedIndexes.end();
