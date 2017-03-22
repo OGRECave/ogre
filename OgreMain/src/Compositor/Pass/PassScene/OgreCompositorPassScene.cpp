@@ -209,7 +209,10 @@ namespace Ogre
         sceneManager->_setCurrentCompositorPass( 0 );
 
         if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )
+        {
             sceneManager->_setCurrentShadowNode( 0, false );
+            sceneManager->_setForwardPlusEnabledInPass( false );
+        }
 
         if( listener )
             listener->passPosExecute( this );
