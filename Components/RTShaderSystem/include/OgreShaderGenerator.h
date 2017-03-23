@@ -298,29 +298,24 @@ public:
      */
     bool hasShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
 
-    /** 
-    Create shader based technique from a given technique. 
+    /**
+    Create shader based technique from a given technique.
     Return true upon success. Failure may occur if the source technique is not FFP pure, or different
     source technique is mapped to the requested destination scheme.
-    @param materialName The source material name.
+    @param srcMat The source material.
     @param srcTechniqueSchemeName The source technique scheme name.
     @param dstTechniqueSchemeName The destination shader based technique scheme name.
     @param overProgrammable If true a shader will be created even if the material has shaders
     */
-    bool createShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
+    bool createShaderBasedTechnique(const Material& srcMat, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
-    /**
-     Create shader based technique from a given technique.
-     Return true upon success. Failure may occur if the source technique is not FFP pure, or different
-     source technique is mapped to the requested destination scheme.
-     @param materialName The source material name.
-     @param groupName The source group name.
-     @param srcTechniqueSchemeName The source technique scheme name.
-     @param dstTechniqueSchemeName The destination shader based technique scheme name.
-     @param overProgrammable If true a shader will be created even if the material has shaders
-     */
-    bool createShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
+    /// @overload
+    /// @deprecated use ShaderGenerator::createShaderBasedTechnique(srcMat, ...)
+    OGRE_DEPRECATED bool createShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
+    /// @overload
+    /// @deprecated use ShaderGenerator::createShaderBasedTechnique(srcMat, ...)
+    OGRE_DEPRECATED bool createShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
     /** 
     Remove shader based technique from a given technique. 
@@ -911,10 +906,14 @@ protected:
     void _destroy();
 
     /** Find source technique to generate shader based technique based on it. */
-    Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable);
+    static Technique* findSourceTechnique(const Material& material, const String& srcTechniqueSchemeName, bool allowProgrammable);
+
+    /// @overload
+    /// @deprecated use ShaderGenerator::findSourceTechnique(material, ...)
+    OGRE_DEPRECATED static Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable);
 
     /** Checks if a given technique has passes with shaders. */
-    bool isProgrammable(Technique* tech) const;
+    static bool isProgrammable(Technique* tech);
  
     /** Called from the sub class of the RenderObjectLister when single object is rendered. */
     void notifyRenderSingleObject(Renderable* rend, const Pass* pass,  const AutoParamDataSource* source, const LightList* pLightList, bool suppressRenderStateChanges);

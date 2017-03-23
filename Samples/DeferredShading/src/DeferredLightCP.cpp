@@ -63,7 +63,7 @@ void injectTechnique(SceneManager* sm, Technique* tech, Renderable* rend, const 
         
     }
 }
-//-----------------------------------------------------------------------
+//! [execute]
 void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
 {
     Ogre::Camera* cam = mViewport->getCamera();
@@ -119,6 +119,7 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
         injectTechnique(sm, tech, dLight, &ll);
     }
 }
+//! [execute]
 //-----------------------------------------------------------------------
 DeferredLightRenderOperation::~DeferredLightRenderOperation()
 {

@@ -701,15 +701,14 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
     return createShaderBasedTechnique(materialName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
         srcTechniqueSchemeName, dstTechniqueSchemeName, overProgrammable);
 }
+
 //-----------------------------------------------------------------------------
-bool ShaderGenerator::createShaderBasedTechnique(const String& materialName, 
-                                                 const String& groupName, 
-                                                 const String& srcTechniqueSchemeName, 
+bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
+                                                 const String& groupName,
+                                                 const String& srcTechniqueSchemeName,
                                                  const String& dstTechniqueSchemeName,
                                                  bool overProgrammable)
 {
-    OGRE_LOCK_AUTO_MUTEX;
-
     // Make sure material exists.
     MaterialPtr srcMat = MaterialManager::getSingleton().getByName(materialName, groupName);
     if (!srcMat)
@@ -719,11 +718,26 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
     const String& trueGroupName = srcMat->getGroup();
 
     // Case the requested material belongs to different group and it is not AUTODETECT_RESOURCE_GROUP_NAME.
-    if (trueGroupName != groupName && 
+    if (trueGroupName != groupName &&
         groupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
     {
         return false;
     }
+
+    return createShaderBasedTechnique(*srcMat, srcTechniqueSchemeName, dstTechniqueSchemeName, overProgrammable);
+}
+
+//-----------------------------------------------------------------------------
+bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
+                                                 const String& srcTechniqueSchemeName, 
+                                                 const String& dstTechniqueSchemeName,
+                                                 bool overProgrammable)
+{
+    OGRE_LOCK_AUTO_MUTEX;
+
+    // Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
+    const String& materialName = srcMat.getName();
+    const String& trueGroupName = srcMat.getGroup();
         
     SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName, trueGroupName);
     
@@ -755,7 +769,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
     // No technique created -> check if one can be created from the given source technique scheme.  
     Technique* srcTechnique = NULL;
-    srcTechnique = findSourceTechnique(materialName, trueGroupName, srcTechniqueSchemeName, overProgrammable);
+    srcTechnique = findSourceTechnique(srcMat, srcTechniqueSchemeName, overProgrammable);
 
     // No appropriate source technique found.
     if (srcTechnique == NULL)
@@ -977,7 +991,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
             
             //for every technique in the source material create a shader based technique in the 
             //destination material
-            if (createShaderBasedTechnique(dstMaterialName, trueDstGroupName, srcFromTechniqueScheme, srcToTechniqueScheme))
+            if (createShaderBasedTechnique(*dstMat, srcFromTechniqueScheme, srcToTechniqueScheme))
             {
                 //check for custom render states in the source material
                 unsigned short passCount =  (*itTechEntry)->getSourceTechnique()->getNumPasses();
@@ -1022,16 +1036,21 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
         removeAllShaderBasedTechniques(itMatEntry->first.first, itMatEntry->first.second);
     }
 }
-                                                 
 //-----------------------------------------------------------------------------
  Technique* ShaderGenerator::findSourceTechnique(const String& materialName, 
                 const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable)
  {
      MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
+     return findSourceTechnique(*mat, srcTechniqueSchemeName, allowProgrammable);
+ }
 
+//-----------------------------------------------------------------------------
+ Technique* ShaderGenerator::findSourceTechnique(const Material& mat,
+                const String& srcTechniqueSchemeName, bool allowProgrammable)
+ {
      // Find the source technique and make sure it is not programmable.
      Material::Techniques::const_iterator it;
-     for(it = mat->getTechniques().begin(); it != mat->getTechniques().end(); ++it)
+     for(it = mat.getTechniques().begin(); it != mat.getTechniques().end(); ++it)
      {
          Technique *curTechnique = *it;
 
@@ -1045,7 +1064,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
  }
 
  //-----------------------------------------------------------------------------
- bool ShaderGenerator::isProgrammable(Technique* tech) const
+ bool ShaderGenerator::isProgrammable(Technique* tech)
  {
      if (tech != NULL)
      {

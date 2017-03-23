@@ -16,11 +16,13 @@ same license as the rest of the engine.
 
 #include "OgreMaterialManager.h"
 #include "OgreTechnique.h"
+#include "OgreRTShaderSystem.h"
 
 using namespace Ogre;
 
 const String GBufferSchemeHandler::NORMAL_MAP_PATTERN = "normal";
 
+//! [schemenotfound]
 Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex, 
         const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
         const Renderable* rend)
@@ -35,9 +37,14 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
     gBufferTech->removeAllPasses();
     gBufferTech->setSchemeName(schemeName);
 
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+    RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
+    rtShaderGen.createShaderBasedTechnique(*originalMaterial, originalTechnique->getSchemeName(), "NoGBuffer");
+#else
     Technique* noGBufferTech = originalMaterial->createTechnique();
     noGBufferTech->removeAllPasses();
     noGBufferTech->setSchemeName("NoGBuffer");
+#endif
 
     for (unsigned short i=0; i<originalTechnique->getNumPasses(); i++)
     {
@@ -46,9 +53,13 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
         
         if (!props.isDeferred)
         {
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+            rtShaderGen.validateMaterial("NoGBuffer", originalMaterial->getName(), originalMaterial->getGroup());
+#else
             //Just copy the technique so it gets rendered regularly
             Pass* clonePass = noGBufferTech->createPass();
             *clonePass = *originalPass;
+#endif
             continue;
         }
 
@@ -64,6 +75,7 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
     
     return gBufferTech;
 }
+//! [schemenotfound]
 
 bool GBufferSchemeHandler::checkNormalMap(
     TextureUnitState* tus, GBufferSchemeHandler::PassProperties& props)
