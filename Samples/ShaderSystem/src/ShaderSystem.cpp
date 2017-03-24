@@ -365,7 +365,9 @@ void Sample_ShaderSystem::setupContent()
     childNode->attachObject(mLayeredBlendingEntity);
 
     // Grab the render state of the material.
-    RTShader::RenderState* renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending", 0);
+    RTShader::RenderState* renderState = mShaderGenerator->getRenderState(
+        RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending",
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 0);
 
     if (renderState != NULL)
     {           
@@ -729,7 +731,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
             RTShader::RenderState* renderState =
                 mShaderGenerator->getRenderState(
                     RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                    curMaterial->getName(), 0);
+                    curMaterial->getName(), curMaterial->getGroup(), 0);
 
             // Remove all sub render states.
             renderState->reset();
@@ -818,7 +820,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
             // Invalidate this material in order to re-generate its shaders.
             mShaderGenerator->invalidateMaterial(
                 RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                curMaterial->getName());
+                curMaterial->getName(), curMaterial->getGroup());
         }
     }
 }
@@ -1181,7 +1183,7 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
     if (success)
     {
         // Force shader generation of the given material.
-        RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, materialName);
+        RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, materialName, materialPtr->getGroup());
 
         // Grab the RTSS material serializer listener.
         MaterialSerializer::Listener* matRTSSListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
@@ -1266,8 +1268,10 @@ void Sample_ShaderSystem::unloadResources()
 {
     destroyPrivateResourceGroup();
 
-    mShaderGenerator->removeAllShaderBasedTechniques("Panels");
-    mShaderGenerator->removeAllShaderBasedTechniques("Panels_RTSS_Export");
+    mShaderGenerator->removeAllShaderBasedTechniques(
+        "Panels", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+    mShaderGenerator->removeAllShaderBasedTechniques(
+        "Panels_RTSS_Export", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
     if (mReflectionMapFactory != NULL)
     {   
@@ -1384,8 +1388,10 @@ void Sample_ShaderSystem::changeTextureLayerBlendMode()
     }
 
     
-    mLayerBlendSubRS->setBlendMode(1, nextBlendMode);           
-    mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending");
+    mLayerBlendSubRS->setBlendMode(1, nextBlendMode);
+    mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                                         "RTSS/LayeredBlending",
+                                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     // Update the caption.
     updateLayerBlendingCaption(nextBlendMode);

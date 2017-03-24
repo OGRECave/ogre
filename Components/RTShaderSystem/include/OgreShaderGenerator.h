@@ -215,16 +215,6 @@ public:
     */
     bool hasRenderState(const String& schemeName) const;
     
-
-    /** 
-    Get render state of specific pass.
-    Using this method allows the user to customize the behavior of a specific pass.
-    @param schemeName The destination scheme name.
-    @param materialName The specific material name.
-    @param passIndex The pass index.
-    */
-    RenderState* getRenderState(const String& schemeName, const String& materialName, unsigned short passIndex);
-
     /**
      Get render state of specific pass.
      Using this method allows the user to customize the behavior of a specific pass.
@@ -234,6 +224,12 @@ public:
      @param passIndex The pass index.
      */
     RenderState* getRenderState(const String& schemeName, const String& materialName, const String& groupName, unsigned short passIndex);
+
+#if !OGRE_RESOURCEMANAGER_STRICT
+    /// @overload
+    /// @deprecated use ShaderGenerator::getRenderState(const String& schemeName, const String& materialName, const String& groupName, ...)
+    OGRE_DEPRECATED RenderState* getRenderState(const String& schemeName, const String& materialName, unsigned short passIndex);
+#endif
 
     /** 
     Add sub render state factory. Plugins or 3d party applications may implement sub classes of
@@ -309,23 +305,15 @@ public:
     */
     bool createShaderBasedTechnique(const Material& srcMat, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
+#if !OGRE_RESOURCEMANAGER_STRICT
     /// @overload
     /// @deprecated use ShaderGenerator::createShaderBasedTechnique(srcMat, ...)
     OGRE_DEPRECATED bool createShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
+#endif
 
     /// @overload
     /// @deprecated use ShaderGenerator::createShaderBasedTechnique(srcMat, ...)
     OGRE_DEPRECATED bool createShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
-
-    /** 
-    Remove shader based technique from a given technique. 
-    Return true upon success. Failure may occur if the given source technique was not previously
-    registered successfully using the createShaderBasedTechnique method.
-    @param materialName The source material name.
-    @param srcTechniqueSchemeName The source technique scheme name.
-    @param dstTechniqueSchemeName The destination shader based technique scheme name.
-    */
-    bool removeShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
 
     /**
      Remove shader based technique from a given technique.
@@ -338,6 +326,10 @@ public:
      */
     bool removeShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
 
+#if !OGRE_RESOURCEMANAGER_STRICT
+    /// @overload
+    OGRE_DEPRECATED bool removeShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
+#endif
 
     /** 
     Remove all shader based techniques of the given material. 
@@ -345,7 +337,12 @@ public:
     @param materialName The source material name.   
     @param groupName The source group name. 
     */
-    bool removeAllShaderBasedTechniques(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+    bool
+#if OGRE_RESOURCEMANAGER_STRICT
+    removeAllShaderBasedTechniques(const String& materialName, const String& groupName);
+#else
+    removeAllShaderBasedTechniques(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
 
     /** 
     Clone all shader based techniques from one material to another.
@@ -392,7 +389,12 @@ public:
     @param materialName The material to invalidate.
     @param groupName The source group name. 
     */
-    void invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+    void
+#if OGRE_RESOURCEMANAGER_STRICT
+    invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName);
+#else
+    invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
 
     /** 
     Validate specific material scheme. This action will generate shader programs for the technique of the
@@ -401,7 +403,12 @@ public:
     @param materialName The material to validate.
     @param groupName The source group name. 
     */
-    bool validateMaterial(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);    
+    bool
+#if OGRE_RESOURCEMANAGER_STRICT
+    validateMaterial(const String& schemeName, const String& materialName, const String& groupName);
+#else
+    validateMaterial(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
 
 	/**
 	Invalidate specific material scheme. This action will lead to shader regeneration of the technique belongs to the
@@ -410,7 +417,12 @@ public:
 	@param materialName The material to invalidate.
 	@param groupName The source group name.
 	*/
-	void invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+    void
+#if OGRE_RESOURCEMANAGER_STRICT
+    invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName);
+#else
+	invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
 
 	/**
 	Validate specific material scheme. This action will generate shader programs illumination passes of the technique of the
@@ -419,7 +431,12 @@ public:
 	@param materialName The material to validate.
 	@param groupName The source group name.
 	*/
-	bool validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+	bool
+#if OGRE_RESOURCEMANAGER_STRICT
+    validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName);
+#else
+	validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+#endif
 
     /** 
     Return custom material Serializer of the shader generator.
@@ -728,22 +745,22 @@ protected:
         /** Invalidate specific material.
         @see ShaderGenerator::invalidateMaterial.
         */
-        void invalidate(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        void invalidate(const String& materialName, const String& groupName);
 
         /** Validate specific material.
         @see ShaderGenerator::validateMaterial.
         */
-        bool validate(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        bool validate(const String& materialName, const String& groupName);
 
 		/** Validate illumination passes of the specific material.
 		@see ShaderGenerator::invalidateMaterialIlluminationPasses.
 		*/
-		void invalidateIlluminationPasses(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        void invalidateIlluminationPasses(const String& materialName, const String& groupName);
 
 		/** Validate illumination passes of the specific material.
 		@see ShaderGenerator::validateMaterialIlluminationPasses.
 		*/
-		bool validateIlluminationPasses(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        bool validateIlluminationPasses(const String& materialName, const String& groupName);
 
         /** Add a technique to current techniques list. */
         void addTechniqueEntry(SGTechnique* techEntry);
@@ -907,10 +924,6 @@ protected:
 
     /** Find source technique to generate shader based technique based on it. */
     static Technique* findSourceTechnique(const Material& material, const String& srcTechniqueSchemeName, bool allowProgrammable);
-
-    /// @overload
-    /// @deprecated use ShaderGenerator::findSourceTechnique(material, ...)
-    OGRE_DEPRECATED static Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable);
 
     /** Checks if a given technique has passes with shaders. */
     static bool isProgrammable(Technique* tech);
