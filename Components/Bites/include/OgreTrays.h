@@ -1120,8 +1120,6 @@ namespace OgreBites
             windowUpdate();
         }
 
-        void resourceGroupScriptingEnded(const Ogre::String& groupName) {}
-
         void resourceGroupLoadStarted(const Ogre::String& groupName, size_t resourceCount)
         {
             mLoadInc = mGroupLoadProportion / resourceCount;
@@ -1152,8 +1150,6 @@ namespace OgreBites
             mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
             windowUpdate();
         }
-
-        void resourceGroupLoadEnded(const Ogre::String& groupName) {}
 
         /**
         Toggles visibility of advanced statistics.

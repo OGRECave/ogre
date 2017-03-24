@@ -52,7 +52,7 @@ namespace Ogre {
     /** \addtogroup Resources
     *  @{
     */
-    /** This abstract class defines an interface which is called back during
+    /** This class defines an interface which is called back during
         resource group loading to indicate the progress of the load. 
     @remarks
         Resource group loading is in 2 phases - creating resources from 
@@ -96,7 +96,7 @@ namespace Ogre {
         @param groupName The name of the group 
         @param scriptCount The number of scripts which will be parsed
         */
-        virtual void resourceGroupScriptingStarted(const String& groupName, size_t scriptCount) = 0;
+        virtual void resourceGroupScriptingStarted(const String& groupName, size_t scriptCount) {}
         /** This event is fired when a script is about to be parsed.
             @param scriptName Name of the to be parsed
             @param skipThisScript A boolean passed by reference which is by default set to 
@@ -104,13 +104,13 @@ namespace Ogre {
             parsed. Note that in this case the scriptParseEnded event will not be raised
             for this script.
         */
-        virtual void scriptParseStarted(const String& scriptName, bool& skipThisScript) = 0;
+        virtual void scriptParseStarted(const String& scriptName, bool& skipThisScript) {}
 
         /** This event is fired when the script has been fully parsed.
         */
-        virtual void scriptParseEnded(const String& scriptName, bool skipped) = 0;
+        virtual void scriptParseEnded(const String& scriptName, bool skipped) {}
         /** This event is fired when a resource group finished parsing scripts. */
-        virtual void resourceGroupScriptingEnded(const String& groupName) = 0;
+        virtual void resourceGroupScriptingEnded(const String& groupName) {}
 
         /** This event is fired  when a resource group begins preparing.
         @param groupName The name of the group being prepared
@@ -151,27 +151,27 @@ namespace Ogre {
         @param resourceCount The number of resources which will be loaded, including
             a number of stages required to load any linked world geometry
         */
-        virtual void resourceGroupLoadStarted(const String& groupName, size_t resourceCount) = 0;
+        virtual void resourceGroupLoadStarted(const String& groupName, size_t resourceCount) {}
         /** This event is fired when a declared resource is about to be loaded. 
         @param resource Weak reference to the resource loaded.
         */
-        virtual void resourceLoadStarted(const ResourcePtr& resource) = 0;
+        virtual void resourceLoadStarted(const ResourcePtr& resource) {}
         /** This event is fired when the resource has been loaded. 
         */
-        virtual void resourceLoadEnded(void) = 0;
+        virtual void resourceLoadEnded(void) {}
         /** This event is fired when a stage of loading linked world geometry 
             is about to start. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
         @param description Text description of what was just loaded
         */
-        virtual void worldGeometryStageStarted(const String& description) = 0;
+        virtual void worldGeometryStageStarted(const String& description){}
         /** This event is fired when a stage of loading linked world geometry 
             has been completed. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
         */
-        virtual void worldGeometryStageEnded(void) = 0;
+        virtual void worldGeometryStageEnded(void) {}
         /** This event is fired when a resource group finished loading. */
-        virtual void resourceGroupLoadEnded(const String& groupName) = 0;
+        virtual void resourceGroupLoadEnded(const String& groupName) {}
         /** This event is fired when a resource was just created.
         @param resource Weak reference to the resource created.
         */
