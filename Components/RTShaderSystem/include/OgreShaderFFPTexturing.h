@@ -84,10 +84,12 @@ public:
     */
     virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
     
+    //Direct3D HLSL specific methods
+    /// Wraps a sampler with a SamplerData[x]D struct defined in FFPLib_Texturing.hlsl
     static void AddTextureSampleWrapperInvocation(UniformParameterPtr textureSampler,UniformParameterPtr textureSamplerState,
         GpuConstantType samplerType, Function* function, int groupOrder, int& internalCounter);
 
-    
+    /// Get a sampler wrapper type according to the sampler type
 	static ParameterPtr GetSamplerWrapperParam(UniformParameterPtr sampler, Function* function);
 
     static String Type;
