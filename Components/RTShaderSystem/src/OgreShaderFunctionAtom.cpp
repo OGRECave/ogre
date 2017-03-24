@@ -247,6 +247,7 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
 //-----------------------------------------------------------------------
 void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, int indirectionLevel)
 {
+    OgreAssert(parameter, "NULL parameter not allowed");
     mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
 }
 
