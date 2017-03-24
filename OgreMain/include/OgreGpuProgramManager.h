@@ -77,7 +77,12 @@ namespace Ogre {
 
         /// Get a resource by name
         /// @see GpuProgramManager::getResourceByName
-        GpuProgramPtr getByName(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, bool preferHighLevelPrograms = true);
+        GpuProgramPtr
+#if OGRE_RESOURCEMANAGER_STRICT
+        getByName(const String& name, const String& group, bool preferHighLevelPrograms = true);
+#else
+        getByName(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, bool preferHighLevelPrograms = true);
+#endif
 
         /** Loads a GPU program from a file of assembly. 
         @remarks

@@ -2488,13 +2488,13 @@ namespace Ogre{
             }
         }
     }
-    //-------------------------------------------------------------------------
-    void PassTranslator::translateFragmentProgramRef(Ogre::ScriptCompiler *compiler, Ogre::ObjectAbstractNode *node)
+
+    static Pass* getPass(ScriptCompiler* compiler, ObjectAbstractNode* node)
     {
         if(node->name.empty())
         {
             compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
+            return NULL;
         }
 
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
@@ -2503,15 +2503,25 @@ namespace Ogre{
         if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
         {
             //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
+            if (!GpuProgramManager::getSingleton().getByName(
+                    evt.mName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
             {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
+                compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file,
+                                   node->line);
+                return NULL;
             }
         }
 
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setFragmentProgram(evt.mName);
+        return any_cast<Pass*>(node->parent->context);
+    }
+
+    //-------------------------------------------------------------------------
+    void PassTranslator::translateFragmentProgramRef(Ogre::ScriptCompiler *compiler, Ogre::ObjectAbstractNode *node)
+    {
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
+
+        pass->setFragmentProgram(node->name);
         if(pass->getFragmentProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getFragmentProgramParameters();
@@ -2521,27 +2531,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setVertexProgram(evt.mName);
+        pass->setVertexProgram(node->name);
         if(pass->getVertexProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getVertexProgramParameters();
@@ -2551,27 +2544,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateGeometryProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setGeometryProgram(evt.mName);
+        pass->setGeometryProgram(node->name);
         if(pass->getGeometryProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getGeometryProgramParameters();
@@ -2581,27 +2557,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateTessellationHullProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setTessellationHullProgram(evt.mName);
+        pass->setTessellationHullProgram(node->name);
         if(pass->getTessellationHullProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getTessellationHullProgramParameters();
@@ -2611,27 +2570,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateTessellationDomainProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setTessellationDomainProgram(evt.mName);
+        pass->setTessellationDomainProgram(node->name);
         if(pass->getTessellationDomainProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getTessellationDomainProgramParameters();
@@ -2641,27 +2583,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateComputeProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setComputeProgram(evt.mName);
+        pass->setComputeProgram(node->name);
         if(pass->getComputeProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getComputeProgramParameters();
@@ -2671,27 +2596,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setShadowCasterVertexProgram(evt.mName);
+        pass->setShadowCasterVertexProgram(node->name);
         if(pass->getShadowCasterVertexProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getShadowCasterVertexProgramParameters();
@@ -2701,27 +2609,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setShadowCasterFragmentProgram(evt.mName);
+        pass->setShadowCasterFragmentProgram(node->name);
         if(pass->getShadowCasterFragmentProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getShadowCasterFragmentProgramParameters();
@@ -2731,27 +2622,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setShadowReceiverVertexProgram(evt.mName);
+        pass->setShadowReceiverVertexProgram(node->name);
         if(pass->getShadowReceiverVertexProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getShadowReceiverVertexProgramParameters();
@@ -2761,27 +2635,10 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowReceiverFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        if(node->name.empty())
-        {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return;
-        }
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
-
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(evt.mName))
-            {
-              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-              return;
-            }
-        }
-
-        Pass *pass = any_cast<Pass*>(node->parent->context);
-        pass->setShadowReceiverFragmentProgram(evt.mName);
+        pass->setShadowReceiverFragmentProgram(node->name);
         if(pass->getShadowReceiverFragmentProgram()->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getShadowReceiverFragmentProgramParameters();

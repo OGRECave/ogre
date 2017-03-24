@@ -67,8 +67,9 @@ namespace Ogre
         
         //Look again without the group if not found
         if (!mProgram)
-            mProgram = GpuProgramManager::getSingleton().getByName(name);
-        
+            mProgram = GpuProgramManager::getSingleton().getByName(
+                name, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
         if (!mProgram)
         {
             String progType = "fragment";
