@@ -32,14 +32,18 @@ compositor_node_shadow Tutorial_TerrainShadowNode
 	shadow_map 1 atlas uv 0.666666666666667 0.0 0.333333333333333 0.5 light 0 split 1
 	shadow_map 2 atlas uv 0.666666666666667 0.5 0.333333333333333 0.5 light 0 split 2
 
+	target atlas
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+	}
+
 	shadow_map_target_type directional
 	{
 		shadow_map 0 1 2
 		{
-			pass clear
-			{
-				colour_value 1 1 1 1
-			}
 			pass render_scene
 			{
 			}
