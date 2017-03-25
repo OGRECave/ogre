@@ -899,6 +899,27 @@ protected:
         ShaderGenerator* mOwner;
     };
 
+    class _OgreRTSSExport SGResourceGroupListener : public ResourceGroupListener
+    {
+    public:
+        SGResourceGroupListener(ShaderGenerator* owner)
+        {
+            mOwner = owner;
+        }
+
+        /// sync our internal list if material gets dropped
+        virtual void resourceRemove(const ResourcePtr& resource)
+        {
+            if(!dynamic_cast<Material*>(resource.get()))
+                return;
+            mOwner->removeAllShaderBasedTechniques(resource->getName(), resource->getGroup());
+        }
+
+    protected:
+        // The shader generator instance.
+        ShaderGenerator* mOwner;
+    };
+
     //-----------------------------------------------------------------------------
     typedef map<String, SubRenderStateFactory*>::type       SubRenderStateFactoryMap;
     typedef SubRenderStateFactoryMap::iterator              SubRenderStateFactoryIterator;
@@ -1029,6 +1050,8 @@ protected:
     SGScriptTranslatorManager* mScriptTranslatorManager;
     // Custom material Serializer listener - allows exporting material that contains shader generated techniques.
     SGMaterialSerializerListener* mMaterialSerializerListener;
+    // get notified if materials get dropped
+    SGResourceGroupListener* mResourceGroupListener;
     // A map of the registered custom script translators.
     SGScriptTranslatorMap mScriptTranslatorsMap;
     // The core translator of the RT Shader System.

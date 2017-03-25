@@ -164,11 +164,13 @@ bool ShaderGenerator::_initialize()
     // Create the default scheme.
     createScheme(DEFAULT_SCHEME_NAME);
 	
-	if (Ogre::Root::getSingleton().getRenderSystem()->getName().find("Direct3D11") != String::npos)
+	if (Root::getSingleton().getRenderSystem()->getName().find("Direct3D11") != String::npos)
 	{
 		this->setTargetLanguage("hlsl",4.0);
 	}
-	
+
+	mResourceGroupListener = new SGResourceGroupListener(this);
+	ResourceGroupManager::getSingleton().addResourceGroupListener(mResourceGroupListener);
 
     return true;
 }
@@ -302,6 +304,13 @@ void ShaderGenerator::_destroy()
     {
         OGRE_DELETE mMaterialSerializerListener;
         mMaterialSerializerListener = NULL;
+    }
+
+    ResourceGroupManager::getSingleton().removeResourceGroupListener(mResourceGroupListener);
+    if (mResourceGroupListener != NULL)
+    {
+        OGRE_DELETE mResourceGroupListener;
+        mResourceGroupListener = NULL;
     }
 
     // Remove all scene managers.   
