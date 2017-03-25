@@ -1084,7 +1084,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             // bind parameters later 
             passFogParams = pass->getFragmentProgram()->getPassFogStates();
         }
-        else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION))
+        else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION) &&
+                 !pass->hasGeometryProgram())
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                         "RenderSystem does not support FixedFunction, "
