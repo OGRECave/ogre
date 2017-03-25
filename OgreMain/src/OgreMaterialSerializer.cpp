@@ -42,12 +42,12 @@ THE SOFTWARE.
 #include "OgreDistanceLodStrategy.h"
 #include "OgreHighLevelGpuProgram.h"
 
-namespace Ogre
+//-----------------------------------------------------------------------
+// Internal parser methods
+//-----------------------------------------------------------------------
+namespace 
 {
-
-    //-----------------------------------------------------------------------
-    // Internal parser methods
-    //-----------------------------------------------------------------------
+    using namespace Ogre;
     void logParseError(const String& error, const MaterialScriptContext& context)
     {
         // log material name only if filename not specified
@@ -2645,7 +2645,8 @@ namespace Ogre
         // passed in params
         if (!context.program)
         {
-            context.program = GpuProgramManager::getSingleton().getByName(params);
+            context.program = GpuProgramManager::getSingleton().getByName(
+                params, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
             if (!context.program)
             {
                 // Unknown program
@@ -2695,7 +2696,8 @@ namespace Ogre
         // passed in params
         if (!context.program)
         {
-            context.program = GpuProgramManager::getSingleton().getByName(params);
+            context.program = GpuProgramManager::getSingleton().getByName(
+                params, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
             if (!context.program)
             {
                 // Unknown program
@@ -2730,7 +2732,8 @@ namespace Ogre
         // update section
         context.section = MSS_PROGRAM_REF;
 
-        context.program = GpuProgramManager::getSingleton().getByName(params);
+        context.program = GpuProgramManager::getSingleton().getByName(
+            params, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         if (!context.program)
         {
             // Unknown program
@@ -2764,7 +2767,8 @@ namespace Ogre
         // update section
         context.section = MSS_PROGRAM_REF;
 
-        context.program = GpuProgramManager::getSingleton().getByName(params);
+        context.program = GpuProgramManager::getSingleton().getByName(
+            params, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         if (!context.program)
         {
             // Unknown program
@@ -2798,7 +2802,8 @@ namespace Ogre
         // update section
         context.section = MSS_PROGRAM_REF;
 
-        context.program = GpuProgramManager::getSingleton().getByName(params);
+        context.program = GpuProgramManager::getSingleton().getByName(
+            params, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         if (!context.program)
         {
             // Unknown program
@@ -2833,7 +2838,8 @@ namespace Ogre
         // update section
         context.section = MSS_PROGRAM_REF;
 
-        context.program = GpuProgramManager::getSingleton().getByName(params);
+        context.program = GpuProgramManager::getSingleton().getByName(
+            params, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         if (!context.program)
         {
             // Unknown program
@@ -2883,7 +2889,8 @@ namespace Ogre
         // passed in params
         if (!context.program)
         {
-            context.program = GpuProgramManager::getSingleton().getByName(params);
+            context.program = GpuProgramManager::getSingleton().getByName(
+                params, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
             if (!context.program)
             {
                 // Unknown program
@@ -3196,6 +3203,9 @@ namespace Ogre
 
         return false;
     }
+}
+namespace Ogre
+{
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     MaterialSerializer::MaterialSerializer()
@@ -5622,7 +5632,8 @@ namespace Ogre
         while (currentDef != endDef)
         {
             // get gpu program from gpu program manager
-            GpuProgramPtr program = GpuProgramManager::getSingleton().getByName((*currentDef));
+            GpuProgramPtr program = GpuProgramManager::getSingleton().getByName(
+                *currentDef, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
             // write gpu program definition type to buffer
             // check program type for vertex program
             // write program type

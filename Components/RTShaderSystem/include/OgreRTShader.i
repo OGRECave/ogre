@@ -15,6 +15,9 @@
 %include "OgreShaderScriptTranslator.h"
 %include "OgreShaderSubRenderState.h"
 %include "OgreShaderProgramWriter.h"
+%ignore Ogre::RTShader::ShaderGenerator::createShaderBasedTechnique(const String&, const String&, const String&, const String&);
+%ignore Ogre::RTShader::ShaderGenerator::createShaderBasedTechnique(const String&, const String&, const String&, const String&, bool);
+%ignore Ogre::RTShader::ShaderGenerator::removeShaderBasedTechnique(const String&, const String&, const String&);
 %include "OgreShaderGenerator.h"
 %include "OgreShaderRenderState.h"
 %include "OgreShaderFFPTransform.h"

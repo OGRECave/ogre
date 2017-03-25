@@ -757,7 +757,8 @@ namespace Ogre {
 			for (unsigned short v = 0; v < OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS; ++v)
 			{
 				// Create debug extruders
-				if (!GpuProgramManager::getSingleton().getByName(programNames[v]))
+				if (!GpuProgramManager::getSingleton().getByName(programNames[v],
+				        ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME))
 				{
 					if (syntax == "vs_4_0")
 					{
