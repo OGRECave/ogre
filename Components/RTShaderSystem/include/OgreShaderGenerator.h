@@ -308,7 +308,7 @@ public:
 #if !OGRE_RESOURCEMANAGER_STRICT
     /// @overload
     /// @deprecated use ShaderGenerator::createShaderBasedTechnique(srcMat, ...)
-    OGRE_DEPRECATED bool createShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
+    bool createShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 #endif
 
     /// @overload
