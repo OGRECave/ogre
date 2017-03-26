@@ -192,10 +192,13 @@ namespace Ogre {
         size_t src_len = mSource.size ();
         char *out = cpp.Parse (src, src_len, out_size);
         if (!out || !out_size)
+        {
+            mCompileError = true;
             // Failed to preprocess, break out
             OGRE_EXCEPT (Exception::ERR_RENDERINGAPI_ERROR,
                          "Failed to preprocess shader " + mName,
                          __FUNCTION__);
+        }
 
         mSource = String (out, out_size);
         if (out < src || out > src + src_len)
@@ -294,6 +297,9 @@ namespace Ogre {
 
         if (!mCompiled)
         {
+            mCompileError = true;
+            dumpSourceIfHasIncludeEnabled();
+
             String shaderType = getShaderTypeLabel(mType);
             StringUtil::toTitleCase(shaderType);
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
