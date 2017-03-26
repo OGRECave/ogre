@@ -1,0 +1,75 @@
+compositor_node TutorialSMAA_RenderingNode
+{
+	texture rt0 target_width target_height PF_R8G8B8A8
+	texture rt1 target_width target_height PF_R8G8B8A8
+
+	target rt0
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		pass render_scene
+		{
+			overlays	on
+			shadows		ShadowMapDebuggingShadowNode
+		}
+	}
+
+	//Play nice with Multi-GPU setups. See Postprocessing sample.
+	target rt1
+	{
+		pass clear
+		{
+			colour_value	0 1 0 1
+			buffers			colour
+			discard_only	true
+		}
+	}
+
+	out 0 rt0
+	out 1 rt1
+}
+
+compositor_node FinalComposition
+{
+	in 0 rt_output
+	in 1 rtN
+
+	target rt_output
+	{
+		//Play nice with Multi-GPU setups. See Postprocessing sample.
+		pass clear
+		{
+			colour_value	1 0 0 1
+			buffers			colour
+			discard_only	true
+		}
+
+		pass render_quad
+		{
+			material Ogre/Copy/4xFP32
+			input 0 rtN
+		}
+
+		pass render_scene
+		{
+			lod_update_list	off
+
+			//Render Overlays
+			overlays	on
+			rq_first	254
+			rq_last		255
+		}
+	}
+}
+
+workspace TutorialSMAA_Workspace
+{
+	connect TutorialSMAA_RenderingNode 0 SMAANode 0
+	connect TutorialSMAA_RenderingNode 1 SMAANode 1
+
+	connect_output FinalComposition 0
+	connect SMAANode 0 FinalComposition 1
+}

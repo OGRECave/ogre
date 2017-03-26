@@ -1,0 +1,40 @@
+
+compositor_node SMAANode
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	texture edgesTex target_width target_height PF_RG8
+	texture blendTex target_width target_height PF_R8G8B8A8
+
+	target edgesTex
+	{
+		pass render_quad
+		{
+			material SMAA/EdgeDetection
+			input 0 rt_input
+		}
+	}
+
+	target blendTex
+	{
+		pass render_quad
+		{
+			material SMAA/BlendingWeightCalculation
+			input 0 edgesTex
+		}
+	}
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			material SMAA/NeighborhoodBlending
+			input 0 rt_input
+			input 1 blendTex
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}

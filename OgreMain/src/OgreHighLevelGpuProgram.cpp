@@ -243,7 +243,7 @@ namespace Ogre
                     String content = includeStream->getAsString();
                     source.replace( startPos, ( length + 1u ) - startPos, content );
                 }
-                catch( FileNotFoundException &e )
+                catch( FileNotFoundException& )
                 {
                     //Leave an empty string, try to compile it still.
                     source.replace( startPos, ( length + 1u ) - startPos, "" );
