@@ -13,26 +13,10 @@ in block
 	vec4 offset[3];
 } inPs;
 
-uniform sampler2D rt_input;  //Must not be be sRGB
+uniform sampler2D rt_input;  //Must not be sRGB
 #if SMAA_PREDICATION
 	uniform sampler2D depthTex;
 #endif
-
-/*float toSRGB( float3 x )
-{
-	if (x <= 0.0031308)
-		return 12.92 * x;
-	else
-		return 1.055 * pow( x,(1.0 / 2.4) ) - 0.055;
-}
-
-float fromSRGB( float3 x )
-{
-	if( x <= 0.040449907 )
-		return x / 12.92;
-	else
-		return pow( (x + 0.055) / 1.055, 2.4 );
-}*/
 
 void main()
 {

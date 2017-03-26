@@ -1,0 +1,27 @@
+
+#include "SMAA_HLSL.hlsl"
+#include "SMAA.hlsl"
+
+struct PS_INPUT
+{
+	float2 uv0			: TEXCOORD0;
+	float4 offset[3]    : TEXCOORD1;
+	float4 gl_Position	: SV_Position;
+};
+
+Texture2D<float4> rt_input		: register(t0); //Must not be sRGB
+#if SMAA_PREDICATION
+	Texture2D<float> depthTex	: register(t1);
+#endif
+
+float2 main
+(
+	PS_INPUT inPs
+) : SV_Target
+{
+	#if SMAA_PREDICATION
+		return SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input, depthTex );
+	#else
+		return SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input );
+	#endif
+}

@@ -10,7 +10,7 @@ vertex_program SMAA/EdgeDetection_vs_GLSL glsl
 vertex_program SMAA/EdgeDetection_vs_HLSL hlsl
 {
 	source SMAA_EdgeDetection_vs.hlsl
-	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point main
 }
 
@@ -110,7 +110,7 @@ vertex_program SMAA/BlendingWeightCalculation_vs_GLSL glsl
 vertex_program SMAA/BlendingWeightCalculation_vs_HLSL hlsl
 {
 	source SMAA_BlendingWeightCalculation_vs.hlsl
-	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point main
 }
 
@@ -220,7 +220,7 @@ vertex_program SMAA/NeighborhoodBlending_vs_GLSL glsl
 vertex_program SMAA/NeighborhoodBlending_vs_HLSL hlsl
 {
 	source SMAA_NeighborhoodBlending_vs.hlsl
-	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point main
 }
 
