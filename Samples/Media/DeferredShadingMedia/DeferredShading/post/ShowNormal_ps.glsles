@@ -39,5 +39,5 @@ void main()
 {
 	vec4 a1 = texture(Tex1, oUv0); // Attribute 1: Normal+depth
 
-    fragColour = vec4((a1.xyz+1)*0.5,0);
+    fragColour = vec4((a1.xyz+1.0)*0.5,0.0);
 }

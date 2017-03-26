@@ -301,10 +301,10 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         else
         {
             ss << "#version " << shadingLangVersion << std::endl;
-            if(shadingLangVersion >= 150)
-            {
-                ss << "out vec4 fragData[2];";
-            }
+        }
+        if(shadingLangVersion >= 150)
+        {
+            ss << "out vec4 fragData[2];";
         }
 #ifdef WRITE_LINEAR_DEPTH
         ss << inSemantic << " vec3 oViewPos;" << std::endl;
