@@ -421,7 +421,7 @@ namespace Ogre {
 
             if (cur->NumArgs != 0)
             {
-                Token t = GetArguments (nargs, args, cur->ExpandFunc ? false : true);
+                Token t = GetArguments (nargs, args, cur->ExpandFunc ? false : true, false);
                 if (t.Type == Token::TK_ERROR)
                 {
                     delete [] args;
@@ -741,7 +741,8 @@ namespace Ogre {
     }
 
 
-    CPreprocessor::Token CPreprocessor::GetArgument (Token &oArg, bool iExpand)
+    CPreprocessor::Token CPreprocessor::GetArgument (Token &oArg, bool iExpand,
+                                                     bool shouldAppendArg)
     {
         do
         {
@@ -798,6 +799,18 @@ namespace Ogre {
                     {
                         // Trim whitespaces at the end
                         oArg.Length = len;
+
+                        //Append "__arg_" to all macro arguments, otherwise if user does:
+                        //  #define mad( a, b, c ) fma( a, b, c )
+                        //  mad( x.s, y, a );
+                        //It will be translated to:
+                        //  fma( x.s, y, x.s );
+                        //instead of:
+                        //  fma( x.s, y, a );
+                        //This does not fix the problem by the root, but
+                        //typing "__arg_" by the user is extremely rare.
+                        if( shouldAppendArg )
+                            oArg.Append( "__arg_", 6 );
                         return t;
                     }
                 }
@@ -832,7 +845,7 @@ namespace Ogre {
 
 
     CPreprocessor::Token CPreprocessor::GetArguments (int &oNumArgs, Token *&oArgs,
-                                                      bool iExpand)
+                                                      bool iExpand, bool shouldAppendArg)
     {
         Token args [MAX_MACRO_ARGS];
         int nargs = 0;
@@ -841,15 +854,25 @@ namespace Ogre {
         oNumArgs = 0;
         oArgs = NULL;
 
+        bool isFirstTokenParsed = false;
+        bool isFirstTokenNotAnOpenBrace = false;
+
         Token t;
         do
         {
             t = GetToken (iExpand);
+
+            if( !isFirstTokenParsed &&
+                (t.Type != Token::TK_PUNCTUATION || t.String [0] != '(') )
+            {
+                isFirstTokenNotAnOpenBrace = true;
+            }
+            isFirstTokenParsed = true;
         } while (t.Type == Token::TK_WHITESPACE ||
                  t.Type == Token::TK_COMMENT ||
                  t.Type == Token::TK_LINECOMMENT);
 
-        if (t.Type != Token::TK_PUNCTUATION || t.String [0] != '(')
+        if( isFirstTokenNotAnOpenBrace )
         {
             oNumArgs = 0;
             oArgs = NULL;
@@ -864,7 +887,7 @@ namespace Ogre {
                 return Token (Token::TK_ERROR);
             }
 
-            t = GetArgument (args [nargs++], iExpand);
+            t = GetArgument (args [nargs++], iExpand, shouldAppendArg);
 
             switch (t.Type)
             {
@@ -910,7 +933,7 @@ namespace Ogre {
 
         Macro *m = new Macro (t);
         m->Body = iBody;
-        t = cpp.GetArguments (m->NumArgs, m->Args, false);
+        t = cpp.GetArguments (m->NumArgs, m->Args, false, true);
         while (t.Type == Token::TK_WHITESPACE)
             t = cpp.GetToken (false);
 
@@ -931,6 +954,25 @@ namespace Ogre {
             assert (t.String + t.Length == cpp.Source);
             t.Length = cpp.SourceEnd - t.String;
             break;
+        }
+
+        if( m->NumArgs > 0 )
+        {
+            CPreprocessor cpp2;
+
+            //We need to convert:
+            //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a, b, c )
+            //into:
+            //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a__arg_, b__arg_, c__arg_ )
+            for( int i = 0; i < m->NumArgs; ++i )
+            {
+                cpp2.Define( m->Args[i].String, m->Args[i].Length - 6,
+                             m->Args[i].String, m->Args[i].Length );
+            }
+
+            // Now run the macro expansion through the supplimentary preprocessor
+            Token xt = cpp2.Parse( t );
+            t = xt;
         }
 
         m->Value = t;
