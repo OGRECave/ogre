@@ -236,7 +236,6 @@ namespace Demo
         Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
 
         TutorialGameState::generateDebugText( timeSinceLast, outText );
-        TutorialGameState::generateDebugText( timeSinceLast, outText );
         outText += "\nPress F2 to toggle animation. ";
         outText += mAnimateObjects ? "[On]" : "[Off]";
         outText += "\nPress F3 to show/hide PSSM splits. ";
