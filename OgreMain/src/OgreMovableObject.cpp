@@ -373,14 +373,14 @@ namespace Ogre {
             ArrayMatrix4 parentMat;
             ArrayVector3 parentScale;
 
+            //Profiling shows these prefetches do make a difference. Perhaps playing with them could
+            //achieve even greater speed ups. This function is terribly bounded by memory latency
+            //Last tested on:
+            //  * Intel Quad Core Extreme QX9650 3Ghz
+            OGRE_PREFETCH_NTA( (const char*)(objData.mParents[OGRE_PREFETCH_SLOT_DISTANCE]) );
+
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
-                //Profiling shows these prefetches do make a difference. Perhaps playing with them could
-                //achieve even greater speed ups. This function is terribly bounded by memory latency
-                //Last tested on:
-                //  * Intel Quad Core Extreme QX9650 3Ghz
-                OGRE_PREFETCH_NTA( (const char*)(objData.mParents[i+OGRE_PREFETCH_SLOT_DISTANCE]) );
-
                 Vector3 scale;
                 const Transform &parentTransform = objData.mParents[j]->_getTransform();
                 parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
