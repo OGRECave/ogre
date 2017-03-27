@@ -9,7 +9,7 @@
 	#define SMAA_HLSL_4 1
 #endif
 
-float toSRGB( float x )
+/*float toSRGB( float x )
 {
 	if (x <= 0.0031308)
 		return 12.92 * x;
@@ -23,6 +23,16 @@ float fromSRGB( float x )
 		return x / 12.92;
 	else
 		return pow( (x + 0.055) / 1.055, 2.4 );
+}*/
+
+float toSRGB( float x )
+{
+	return (x < 0.0031308 ? x * 12.92 : 1.055 * pow( x, 0.41666 ) - 0.055 );
+}
+
+float fromSRGB( float x )
+{
+	return (x <= 0.040449907) ? x / 12.92 : pow( (x + 0.055) / 1.055, 2.4 );
 }
 
 float4 fromSRGB( float4 x )
