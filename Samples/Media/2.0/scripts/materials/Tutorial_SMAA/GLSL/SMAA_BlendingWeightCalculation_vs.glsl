@@ -1,6 +1,4 @@
 
-#version 410 core
-
 #include "SMAA_GLSL.glsl"
 #define SMAA_INCLUDE_VS 1
 #define SMAA_INCLUDE_PS 0

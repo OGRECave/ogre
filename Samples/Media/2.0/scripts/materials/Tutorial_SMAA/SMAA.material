@@ -28,7 +28,8 @@ vertex_program SMAA/EdgeDetection_vs unified
 
 	default_params
 	{
-		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto worldViewProj	worldviewproj_matrix
+		param_named_auto viewportSize	viewport_size
 	}
 }
 
@@ -62,6 +63,11 @@ fragment_program SMAA/EdgeDetection_ps unified
 	delegate SMAA/EdgeDetection_ps_GLSL
 	delegate SMAA/EdgeDetection_ps_HLSL
 	delegate SMAA/EdgeDetection_ps_Metal
+
+	default_params
+	{
+		param_named_auto viewportSize	viewport_size
+	}
 }
 
 material SMAA/EdgeDetection
@@ -128,7 +134,8 @@ vertex_program SMAA/BlendingWeightCalculation_vs unified
 
 	default_params
 	{
-		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto worldViewProj	worldviewproj_matrix
+		param_named_auto viewportSize	viewport_size
 	}
 }
 
@@ -163,6 +170,11 @@ fragment_program SMAA/BlendingWeightCalculation_ps unified
 	delegate SMAA/BlendingWeightCalculation_ps_GLSL
 	delegate SMAA/BlendingWeightCalculation_ps_HLSL
 	delegate SMAA/BlendingWeightCalculation_ps_Metal
+
+	default_params
+	{
+		param_named_auto viewportSize	viewport_size
+	}
 }
 
 material SMAA/BlendingWeightCalculation
@@ -238,7 +250,8 @@ vertex_program SMAA/NeighborhoodBlending_vs unified
 
 	default_params
 	{
-		param_named_auto worldViewProj worldviewproj_matrix
+	param_named_auto worldViewProj	worldviewproj_matrix
+	param_named_auto viewportSize	viewport_size
 	}
 }
 
@@ -273,6 +286,11 @@ fragment_program SMAA/NeighborhoodBlending_ps unified
 	delegate SMAA/NeighborhoodBlending_ps_GLSL
 	delegate SMAA/NeighborhoodBlending_ps_HLSL
 	delegate SMAA/NeighborhoodBlending_ps_Metal
+
+	default_params
+	{
+		param_named_auto viewportSize	viewport_size
+	}
 }
 
 material SMAA/NeighborhoodBlending

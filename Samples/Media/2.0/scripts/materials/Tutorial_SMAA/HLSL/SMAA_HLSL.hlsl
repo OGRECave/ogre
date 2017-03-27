@@ -1,8 +1,13 @@
 #ifndef SMAA_RT_METRICS
-    #define SMAA_RT_METRICS float4( 1.0 / 1600.0, 1.0 / 900.0, 1600, 900 )
+	#define SMAA_RT_METRICS viewportSize.zwxy
 #endif
-#define SMAA_PRESET_ULTRA 1
-#define SMAA_HLSL_4_1 1
+
+#if !SMAA_INITIALIZED
+	//Leave compatible defaults in case this file gets compiled
+	//before calling SmaaUtils::initialize from C++
+	#define SMAA_PRESET_ULTRA 1
+	#define SMAA_HLSL_4 1
+#endif
 
 float toSRGB( float x )
 {

@@ -16,7 +16,8 @@ Texture2D<float4> blendTex			: register(t1);
 
 float4 main
 (
-	PS_INPUT inPs
+	PS_INPUT inPs,
+	uniform float4 viewportSize
 ) : SV_Target
 {
 #if SMAA_REPROJECTION

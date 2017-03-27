@@ -16,7 +16,8 @@ Texture2D searchTex		: register(t2);
 
 float4 main
 (
-	PS_INPUT inPs
+	PS_INPUT inPs,
+	uniform float4 viewportSize
 ) : SV_Target
 {
 	return SMAABlendingWeightCalculationPS( inPs.uv0, inPs.pixcoord0, inPs.offset,

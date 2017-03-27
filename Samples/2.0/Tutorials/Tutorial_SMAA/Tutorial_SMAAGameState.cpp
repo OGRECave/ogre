@@ -20,6 +20,8 @@
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
+#include "Utils/SmaaUtils.h"
+
 
 using namespace Demo;
 
@@ -35,6 +37,9 @@ namespace Demo
     void Tutorial_SMAAGameState::createScene01(void)
     {
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+
+        SmaaUtils::initialize( mGraphicsSystem->getRoot()->getRenderSystem(),
+                               SmaaUtils::SMAA_PRESET_ULTRA );
 
         Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
                                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,

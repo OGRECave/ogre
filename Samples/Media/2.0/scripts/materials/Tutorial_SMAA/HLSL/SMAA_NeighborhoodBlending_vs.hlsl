@@ -19,7 +19,8 @@ struct PS_INPUT
 PS_INPUT main
 (
 	VS_INPUT input,
-	uniform float4x4 worldViewProj
+	uniform float4x4 worldViewProj,
+	uniform float4 viewportSize
 )
 {
 	PS_INPUT outVs;

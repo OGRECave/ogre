@@ -1,8 +1,21 @@
-#ifndef SMAA_RT_METRICS
-	#define SMAA_RT_METRICS vec4( 1.0 / 1600.0, 1.0 / 900.0, 1600, 900 )
+#if SMAA_GLSL_4
+	#version 410 core
+#else
+	#version 330 core
 #endif
-#define SMAA_PRESET_ULTRA 1
-#define SMAA_GLSL_4 1
+
+#ifndef SMAA_RT_METRICS
+	#define SMAA_RT_METRICS viewportSize.zwxy
+#endif
+
+#if !SMAA_INITIALIZED
+	//Leave compatible defaults in case this file gets compiled
+	//before calling SmaaUtils::initialize from C++
+	#define SMAA_PRESET_ULTRA 1
+	#define SMAA_GLSL_3 1
+#endif
+
+uniform vec4 viewportSize;
 
 float toSRGB( float x )
 {
