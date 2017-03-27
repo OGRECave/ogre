@@ -18,9 +18,17 @@ uniform sampler2D rt_input;  //Must not be sRGB
 
 void main()
 {
+#if !SMAA_EDGE_DETECTION_MODE || SMAA_EDGE_DETECTION_MODE == 2
 	#if SMAA_PREDICATION
 		gl_FragColor.xy = SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input, depthTex );
 	#else
 		gl_FragColor.xy = SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input );
 	#endif
+#else
+	#if SMAA_PREDICATION
+		gl_FragColor.xy = SMAALumaEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input, depthTex );
+	#else
+		gl_FragColor.xy = SMAALumaEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input );
+	#endif
+#endif
 }

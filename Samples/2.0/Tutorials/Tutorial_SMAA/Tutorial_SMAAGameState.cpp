@@ -39,7 +39,8 @@ namespace Demo
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
         SmaaUtils::initialize( mGraphicsSystem->getRoot()->getRenderSystem(),
-                               SmaaUtils::SMAA_PRESET_ULTRA );
+                               SmaaUtils::SMAA_PRESET_ULTRA,
+                               SmaaUtils::EdgeDetectionColour );
 
         Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
                                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,

@@ -10,7 +10,8 @@
 
 namespace Demo
 {
-    void SmaaUtils::initialize( Ogre::RenderSystem *renderSystem, PresetQuality quality )
+    void SmaaUtils::initialize( Ogre::RenderSystem *renderSystem, PresetQuality quality,
+                                EdgeDetectionMode edgeDetectionMode )
     {
         const Ogre::RenderSystemCapabilities *caps = renderSystem->getCapabilities();
 
@@ -36,6 +37,23 @@ namespace Demo
             break;
         case SMAA_PRESET_ULTRA:
             preprocessorDefines += "-DSMAA_PRESET_ULTRA=1,";
+            break;
+        }
+
+        //Actually these macros (EdgeDetectionMode) only
+        //affect pixel shader SMAA/EdgeDetection_ps
+        switch( edgeDetectionMode )
+        {
+        case EdgeDetectionDepth:
+            OGRE_EXCEPT( Ogre::Exception::ERR_NOT_IMPLEMENTED,
+                         "EdgeDetectionDepth not implemented.",
+                         "SmaaUtils::initialize" );
+            break;
+        case EdgeDetectionLuma:
+            preprocessorDefines += "-DSMAA_EDGE_DETECTION_MODE=1,";
+            break;
+        case EdgeDetectionColour:
+            preprocessorDefines += "-DSMAA_EDGE_DETECTION_MODE=2,";
             break;
         }
 
