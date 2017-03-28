@@ -7,11 +7,11 @@ OGRE is a scene-oriented, flexible 3D engine written in C++ designed to make it 
 * [Manual](https://ogrecave.github.io/ogre/api/1.10/manual.html)
 
 # Latest release
-The latest stable release is **v1.10.2**. For more information see:
+The latest stable release is **v1.10.3**. For more information see:
 
-* [Download v1.10.2](https://github.com/OGRECave/ogre/releases/tag/v1.10.2)
+* [Download v1.10.3](https://github.com/OGRECave/ogre/releases/tag/v1.10.3)
 * [API documentation](https://ogrecave.github.io/ogre/api/1.10/)
-* [New and Noteworthy](https://github.com/OGRECave/ogre/blob/v1.10.2/Docs/1.10-Notes.md) (compared to v1.9)
+* [New and Noteworthy](https://github.com/OGRECave/ogre/blob/v1.10.3/Docs/1.10-Notes.md) (compared to v1.9)
 
 ## Try it
 * [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/) - [Web Assembly & WebGL2](https://ogrecave.github.io/ogre/wasm/)
