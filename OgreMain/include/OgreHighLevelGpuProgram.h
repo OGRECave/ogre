@@ -146,7 +146,7 @@ namespace Ogre {
                     #include "MyFile.h" --> file will be included anyway.
                 * /
 
-            Preprocessor macros are note supported, but should not matter:
+            Preprocessor macros are not supported, but should not matter:
                 #if SOME_MACRO
                     #include "MyFile.h" --> file will be included anyway.
                 #endif

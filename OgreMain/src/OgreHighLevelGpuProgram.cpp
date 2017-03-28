@@ -65,7 +65,7 @@ namespace Ogre
             "         #include \"MyFile.h\" --> file will be included anyway.\n"
             "     * /\n"
             "\n"
-            "Preprocessor macros are note supported, but should not matter:\n"
+            "Preprocessor macros are not supported, but should not matter:\n"
             "     #if SOME_MACRO\n"
             "         #include \"MyFile.h\" --> file will be included anyway.\n"
             "     #endif\n"
