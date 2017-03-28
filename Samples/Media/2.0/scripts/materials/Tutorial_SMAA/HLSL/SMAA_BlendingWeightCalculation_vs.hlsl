@@ -1,6 +1,5 @@
 
 #include "SMAA_HLSL.hlsl"
-#include "SMAA.hlsl"
 
 struct VS_INPUT
 {
@@ -26,7 +25,7 @@ PS_INPUT main
 	PS_INPUT outVs;
 	outVs.gl_Position	= mul( worldViewProj, input.vertex ).xyzw;
 	outVs.uv0 = input.uv0.xy;
-	SMAABlendingWeightCalculationVS( input.uv0.xy, outVs.pixcoord0, outVs.offset );
+	SMAABlendingWeightCalculationVS( input.uv0.xy, outVs.pixcoord0, outVs.offset SMAA_EXTRA_PARAM_ARG );
 
 	return outVs;
 }

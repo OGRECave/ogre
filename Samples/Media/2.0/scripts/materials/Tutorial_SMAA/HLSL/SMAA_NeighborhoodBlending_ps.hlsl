@@ -1,6 +1,5 @@
 
 #include "SMAA_HLSL.hlsl"
-#include "SMAA.hlsl"
 
 struct PS_INPUT
 {
@@ -25,6 +24,6 @@ float4 main
 									   rt_input, blendTex, velocityTex );
 #else
 	return SMAANeighborhoodBlendingPS( inPs.uv0, inPs.offset,
-									   rt_input, blendTex );
+									   rt_input, blendTex SMAA_EXTRA_PARAM_ARG );
 #endif
 }

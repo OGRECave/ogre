@@ -2,6 +2,9 @@
 	#define SMAA_RT_METRICS viewportSize.zwxy
 #endif
 
+#define SMAA_EXTRA_PARAM_ARG_DECL , float4 viewportSize
+#define SMAA_EXTRA_PARAM_ARG , viewportSize
+
 #if !SMAA_INITIALIZED
 	//Leave compatible defaults in case this file gets compiled
 	//before calling SmaaUtils::initialize from C++
@@ -39,3 +42,5 @@ float4 fromSRGB( float4 x )
 {
     return float4( fromSRGB( x.x ), fromSRGB( x.y ), fromSRGB( x.z ), x.w );
 }
+
+#include "SMAA.hlsl"

@@ -1,6 +1,5 @@
 
 #include "SMAA_HLSL.hlsl"
-#include "SMAA.hlsl"
 
 struct PS_INPUT
 {
@@ -22,5 +21,5 @@ float4 main
 {
 	return SMAABlendingWeightCalculationPS( inPs.uv0, inPs.pixcoord0, inPs.offset,
 											edgeTex, areaTex, searchTex,
-											float4( 0, 0, 0, 0 ) );
+											float4( 0, 0, 0, 0 ) SMAA_EXTRA_PARAM_ARG );
 }

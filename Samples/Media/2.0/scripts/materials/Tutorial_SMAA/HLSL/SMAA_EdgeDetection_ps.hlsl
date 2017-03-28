@@ -1,6 +1,5 @@
 
 #include "SMAA_HLSL.hlsl"
-#include "SMAA.hlsl"
 
 struct PS_INPUT
 {
@@ -23,6 +22,6 @@ float2 main
 	#if SMAA_PREDICATION
 		return SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input, depthTex );
 	#else
-		return SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input );
+		return SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset, rt_input SMAA_EXTRA_PARAM_ARG );
 	#endif
 }
