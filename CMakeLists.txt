@@ -440,7 +440,7 @@ set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING
   2 - nedmalloc - NOT RECOMMENDED - Only useful in WinXP & for debugging mem. corruption - Has known issues see https://github.com/ned14/nedmalloc/issues/15
   3 - User-provided allocator
   4 - nedmalloc with pooling - NOT RECOMMENDED - See nedmalloc issues.
-  5 - Debug allocator that will assert on most forms of memory corruption and provides deterministic memory addressing (for easier debugging w/ data breakpoints). Not indended for release or deployment."
+  5 - Debug allocator that will assert on most forms of memory corruption and provides deterministic memory addressing (for easier debugging w/ data breakpoints). Not indended for release or deployment. You may want to tweak OGRE_TRACK_POOL_SIZE in OgreMain/src/OgreMemoryTrackAlloc.cpp."
 )
 endif ()
 

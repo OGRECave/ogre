@@ -38,8 +38,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-//1GB pool
-#define OGRE_TRACK_POOL_SIZE 1024*1024*1024
+    extern const size_t OGRE_TRACK_POOL_SIZE;
 
     /** \addtogroup Core
     *  @{
