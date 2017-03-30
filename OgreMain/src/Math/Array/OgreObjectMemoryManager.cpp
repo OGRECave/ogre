@@ -188,6 +188,22 @@ namespace Ogre
         return retVal + 1;
     }
     //-----------------------------------------------------------------------------------
+    size_t ObjectMemoryManager::calculateTotalNumObjectDataIncludingFragmentedSlots() const
+    {
+        size_t retVal = 0;
+
+        ArrayMemoryManagerVec::const_iterator itor = mMemoryManagers.begin();
+        ArrayMemoryManagerVec::const_iterator end  = mMemoryManagers.end();
+
+        while( itor != end )
+        {
+            retVal += itor->getNumUsedSlotsIncludingFragmented();
+            ++itor;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     size_t ObjectMemoryManager::getFirstObjectData( ObjectData &outObjectData, size_t renderQueue )
     {
         return mMemoryManagers[renderQueue].getFirstNode( outObjectData );

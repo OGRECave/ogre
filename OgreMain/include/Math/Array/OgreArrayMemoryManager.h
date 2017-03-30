@@ -214,6 +214,11 @@ namespace Ogre
         */
         void destroy();
 
+        /// Returns mUsedMemory. When ARRAY_PACKED_REALS = 4, and 4 objects have been
+        /// created but the 2nd one has been deleted, getNumUsedSlotsIncludingFragmented
+        /// will still return 4 until the 4th object is removed or a cleanup is performed
+        size_t getNumUsedSlotsIncludingFragmented() const;
+
         /// Gets available memory in bytes
         size_t getFreeMemory() const;
         /// Gets used memory in bytes (not including waste)

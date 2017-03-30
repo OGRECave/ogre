@@ -418,17 +418,23 @@ void SceneManager::clearFrameData(void)
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight()
 {
-    const size_t totalNumObjects = mLightMemoryManager.getTotalNumObjects() + 1;
-    if( mGlobalLightList.lights.capacity() < totalNumObjects )
+    //We need calculateTotalNumObjectDataIncludingFragmentedSlots instead of getTotalNumObjects
+    //because of the "skips" we perform when doing multithreading
+    //(see BuildLightListRequest::startLightIdx). And these skips include fragmented slots
+    //(unused slots). If we use getTotalNumObjects, we'll get memory corruption when writing
+    //to visibilityMask and boundingSphere from the last thread.
+    const size_t requiredCapacity =
+            mLightMemoryManager.calculateTotalNumObjectDataIncludingFragmentedSlots() + 1u;
+    if( mGlobalLightList.lights.capacity() < requiredCapacity )
     {
         assert( mGlobalLightList.lights.empty() &&
                 "Don't create objects in the middle of a scene update!" );
-        mGlobalLightList.lights.reserve( totalNumObjects );
+        mGlobalLightList.lights.reserve( requiredCapacity );
         OGRE_FREE_SIMD( mGlobalLightList.visibilityMask, MEMCATEGORY_SCENE_CONTROL );
         OGRE_FREE_SIMD( mGlobalLightList.boundingSphere, MEMCATEGORY_SCENE_CONTROL );
-        mGlobalLightList.visibilityMask = OGRE_ALLOC_T_SIMD( uint32, totalNumObjects,
+        mGlobalLightList.visibilityMask = OGRE_ALLOC_T_SIMD( uint32, requiredCapacity,
                                                             MEMCATEGORY_SCENE_CONTROL );
-        mGlobalLightList.boundingSphere = OGRE_ALLOC_T_SIMD( Sphere, totalNumObjects,
+        mGlobalLightList.boundingSphere = OGRE_ALLOC_T_SIMD( Sphere, requiredCapacity,
                                                             MEMCATEGORY_SCENE_CONTROL );
     }
 

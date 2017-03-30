@@ -123,6 +123,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    size_t ArrayMemoryManager::getNumUsedSlotsIncludingFragmented() const
+    {
+        return mUsedMemory;
+    }
+    //-----------------------------------------------------------------------------------
     size_t ArrayMemoryManager::getFreeMemory() const
     {
         return ( mMaxMemory - OGRE_PREFETCH_SLOT_DISTANCE - mUsedMemory + mAvailableSlots.size() )

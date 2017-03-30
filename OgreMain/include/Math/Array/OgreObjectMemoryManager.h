@@ -144,8 +144,13 @@ namespace Ogre
         /** Retrieves the sum of the number of objects in all render queues.
         @remarks
             The value is cached to avoid iterating through all RQ levels, however
-            be **very careful** with this value it may not be equal to the sum of
+            be **VERY CAREFUL** with this value it may not be equal to the sum of
             all getFirstObjectData() from all render queues.
+            Specially careful when distributing work to different threads, since you may have to
+            include skipping unassigned slots, and thus the last thread may end up writing out
+            of bounds if you use getTotalNumObjects to allocate a buffer to hold results instead of
+            calculateTotalNumObjectDataIncludingFragmentedSlots (depends on how your algorithm
+            works).
         @par
             When ARRAY_PACKED_REALS = 4, and 4 objects have been created but
             the 2nd one has been deleted, getFirstObjectData will still return
@@ -153,6 +158,10 @@ namespace Ogre
             getTotalNumObjects will return the actual number of objects.
         */
         size_t getTotalNumObjects() const                   { return mTotalObjects; }
+
+        /// This is the opposite of getTotalNumObjects. This function returns the sum
+        /// of the return values of getFirstObjectData
+        size_t calculateTotalNumObjectDataIncludingFragmentedSlots() const;
 
         /// Returns the pointer to the dummy node (useful when detaching)
         SceneNode* _getDummyNode() const                    { return mDummyNode; }
