@@ -177,9 +177,9 @@ namespace Ogre {
 
         StencilParams() :
             enabled( false ),
-            padding( 0 ),
             readMask( 0xFF ),
-            writeMask( 0xFF ) {}
+            writeMask( 0xFF ),
+            padding( 0 ) {}
 
         bool operator < ( const StencilParams &other ) const
         {

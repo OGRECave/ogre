@@ -231,8 +231,22 @@ namespace Ogre
                 source[lineStartPos + 1] != '/' || source[lineStartPos + 2] != '/' )
             {
                 size_t pos = startPos + includeKeyword.length() + 1u;
-                size_t length = source.find( "\"", pos );
-                String file = source.substr( pos, length - pos );
+                size_t eolMarkerPos = source.find( '\n', pos );
+                size_t endPos0 = source.find( '"', pos );
+                size_t endPos1 = source.find( '>', pos );
+                size_t endPos = std::min( endPos0, endPos1 );
+
+                if( endPos == String::npos || (endPos >= eolMarkerPos && eolMarkerPos != String::npos) )
+                {
+                    mCompileError = true;
+                    dumpSourceIfHasIncludeEnabled();
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 "Invalid #include syntax near " + source.substr(
+                                     startPos, std::min( startPos + 10u, source.size() - startPos ) ),
+                                 "HighLevelGpuProgram::parseIncludeFile" );
+                }
+
+                String file = source.substr( pos, endPos - pos );
 
                 try
                 {
@@ -241,12 +255,12 @@ namespace Ogre
                                 file, mGroup, true, this );
 
                     String content = includeStream->getAsString();
-                    source.replace( startPos, ( length + 1u ) - startPos, content );
+                    source.replace( startPos, ( endPos + 1u ) - startPos, content );
                 }
                 catch( FileNotFoundException& )
                 {
                     //Leave an empty string, try to compile it still.
-                    source.replace( startPos, ( length + 1u ) - startPos, "" );
+                    source.replace( startPos, ( endPos + 1u ) - startPos, "" );
                 }
             }
 
