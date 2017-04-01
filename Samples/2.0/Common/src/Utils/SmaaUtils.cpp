@@ -22,21 +22,21 @@ namespace Demo
             "SMAA/NeighborhoodBlending"
         };
 
-        Ogre::String preprocessorDefines = "-DSMAA_INITIALIZED=1,";
+        Ogre::String preprocessorDefines = "SMAA_INITIALIZED=1,";
 
         switch( quality )
         {
         case SMAA_PRESET_LOW:
-            preprocessorDefines += "-DSMAA_PRESET_LOW=1,";
+            preprocessorDefines += "SMAA_PRESET_LOW=1,";
             break;
         case SMAA_PRESET_MEDIUM:
-            preprocessorDefines += "-DSMAA_PRESET_MEDIUM=1,";
+            preprocessorDefines += "SMAA_PRESET_MEDIUM=1,";
             break;
         case SMAA_PRESET_HIGH:
-            preprocessorDefines += "-DSMAA_PRESET_HIGH=1,";
+            preprocessorDefines += "SMAA_PRESET_HIGH=1,";
             break;
         case SMAA_PRESET_ULTRA:
-            preprocessorDefines += "-DSMAA_PRESET_ULTRA=1,";
+            preprocessorDefines += "SMAA_PRESET_ULTRA=1,";
             break;
         }
 
@@ -50,21 +50,21 @@ namespace Demo
                          "SmaaUtils::initialize" );
             break;
         case EdgeDetectionLuma:
-            preprocessorDefines += "-DSMAA_EDGE_DETECTION_MODE=1,";
+            preprocessorDefines += "SMAA_EDGE_DETECTION_MODE=1,";
             break;
         case EdgeDetectionColour:
-            preprocessorDefines += "-DSMAA_EDGE_DETECTION_MODE=2,";
+            preprocessorDefines += "SMAA_EDGE_DETECTION_MODE=2,";
             break;
         }
 
         if( caps->isShaderProfileSupported( "ps_4_1" ) )
-            preprocessorDefines += "-DSMAA_HLSL_4_1=1,";
+            preprocessorDefines += "SMAA_HLSL_4_1=1,";
         else if( caps->isShaderProfileSupported( "ps_4_0" ) )
-            preprocessorDefines += "-DSMAA_HLSL_4=1,";
+            preprocessorDefines += "SMAA_HLSL_4=1,";
         else if( caps->isShaderProfileSupported( "glsl410" ) )
-            preprocessorDefines += "-DSMAA_GLSL_4=1,";
+            preprocessorDefines += "SMAA_GLSL_4=1,";
         else if( caps->isShaderProfileSupported( "glsl330" ) )
-            preprocessorDefines += "-DSMAA_GLSL_3=1,";
+            preprocessorDefines += "SMAA_GLSL_3=1,";
 
         for( size_t i=0; i<sizeof(materialNames) / sizeof(materialNames[0]); ++i )
         {

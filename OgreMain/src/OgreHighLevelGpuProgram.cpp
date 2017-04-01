@@ -259,8 +259,9 @@ namespace Ogre
                 }
                 catch( FileNotFoundException& )
                 {
-                    //Leave an empty string, try to compile it still.
-                    source.replace( startPos, ( endPos + 1u ) - startPos, "" );
+                    //Leave the included header, fallback to the compiler
+                    //(e.g. Metal can include system headers)
+                    startPos = endPos;
                 }
             }
 

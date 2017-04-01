@@ -166,7 +166,6 @@ namespace Ogre
         
         /// Flag indicating if shader object successfully compiled
         bool mCompiled;
-        bool mCompilerErrors;
         /// Preprocessor options
         String mPreprocessorDefines;
         String mEntryPoint;

@@ -52,7 +52,6 @@ namespace Ogre {
         mFunction( nil ),
         mDevice( device ),
         mCompiled( false ),
-        mCompilerErrors( false ),
         mConstantsBytesToWrite( 0 )
     {
         if (createParamDictionary("MetalProgram"))
@@ -101,97 +100,97 @@ namespace Ogre {
     {
         compile( true );
     }
-	//-----------------------------------------------------------------------
-	void MetalProgram::parsePreprocessorDefinitions( NSMutableDictionary<NSString*,
-													 NSObject*> *inOutMacros )
-	{
-		if( mPreprocessorDefines.empty() )
-			return;
-		String::size_type pos = 0;
-		while( pos != String::npos )
-		{
-			// Find delims
-			String::size_type endPos = mPreprocessorDefines.find_first_of( ";,=", pos );
-			if( endPos != String::npos )
-			{
-				String::size_type macro_name_start = pos;
-				size_t macro_name_len = endPos - pos;
-				pos = endPos;
+    //-----------------------------------------------------------------------
+    void MetalProgram::parsePreprocessorDefinitions( NSMutableDictionary<NSString*,
+                                                     NSObject*> *inOutMacros )
+    {
+        if( mPreprocessorDefines.empty() )
+            return;
+        String::size_type pos = 0;
+        while( pos != String::npos )
+        {
+            // Find delims
+            String::size_type endPos = mPreprocessorDefines.find_first_of( ";,=", pos );
+            if( endPos != String::npos )
+            {
+                String::size_type macro_name_start = pos;
+                size_t macro_name_len = endPos - pos;
+                pos = endPos;
 
-				// Check definition part
-				if( mPreprocessorDefines[pos] == '=' )
-				{
-					// Set up a definition, skip delim
-					++pos;
-					String::size_type macro_val_start = pos;
-					size_t macro_val_len;
+                // Check definition part
+                if( mPreprocessorDefines[pos] == '=' )
+                {
+                    // Set up a definition, skip delim
+                    ++pos;
+                    String::size_type macro_val_start = pos;
+                    size_t macro_val_len;
 
-					endPos = mPreprocessorDefines.find_first_of(";,", pos);
-					if (endPos == String::npos)
-					{
-						macro_val_len = mPreprocessorDefines.size () - pos;
-						pos = endPos;
-					}
-					else
-					{
-						macro_val_len = endPos - pos;
-						pos = endPos+1;
-					}
-					String tmpStr;
-					tmpStr = mPreprocessorDefines.substr( macro_name_start, macro_name_len );
-					NSString *key = [NSString stringWithUTF8String:tmpStr.c_str()];
+                    endPos = mPreprocessorDefines.find_first_of(";,", pos);
+                    if (endPos == String::npos)
+                    {
+                        macro_val_len = mPreprocessorDefines.size () - pos;
+                        pos = endPos;
+                    }
+                    else
+                    {
+                        macro_val_len = endPos - pos;
+                        pos = endPos+1;
+                    }
+                    String tmpStr;
+                    tmpStr = mPreprocessorDefines.substr( macro_name_start, macro_name_len );
+                    NSString *key = [NSString stringWithUTF8String:tmpStr.c_str()];
 
-					tmpStr = mPreprocessorDefines.substr( macro_val_start, macro_val_len );
-					NSString *value = [NSString stringWithUTF8String:tmpStr.c_str()];
-					inOutMacros[key] = value;
-				}
-				else
-				{
-					// No definition part, define as "1"
-					++pos;
+                    tmpStr = mPreprocessorDefines.substr( macro_val_start, macro_val_len );
+                    NSString *value = [NSString stringWithUTF8String:tmpStr.c_str()];
+                    inOutMacros[key] = value;
+                }
+                else
+                {
+                    // No definition part, define as "1"
+                    ++pos;
 
-					String tmpStr;
-					tmpStr = mPreprocessorDefines.substr( macro_name_start, macro_name_len );
-					NSString *key = [NSString stringWithUTF8String:tmpStr.c_str()];
-					inOutMacros[key] = [NSNumber numberWithUnsignedInt:1];
-				}
-			}
-			else
-				pos = endPos;
-		}
-	}
+                    String tmpStr;
+                    tmpStr = mPreprocessorDefines.substr( macro_name_start, macro_name_len );
+                    NSString *key = [NSString stringWithUTF8String:tmpStr.c_str()];
+                    inOutMacros[key] = [NSNumber numberWithUnsignedInt:1];
+                }
+            }
+            else
+                pos = endPos;
+        }
+    }
     //-----------------------------------------------------------------------
     bool MetalProgram::compile(const bool checkErrors)
     {
-        mCompilerErrors = true; //Set to true until we've confirmed otherwise.
+        mCompileError = true; //Set to true until we've confirmed otherwise.
 
-		//Send fixed vertex attributes as macros/definitions.
-		MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
-		NSMutableDictionary<NSString *, NSObject *> *preprocessorMacros =
-				[NSMutableDictionary dictionary];
-		NSString *names[VES_COUNT] =
-		{
-			@"VES_POSITION",
-			@"VES_BLEND_WEIGHTS",
-			@"VES_BLEND_INDICES",
-			@"VES_NORMAL",
-			@"VES_DIFFUSE",
-			@"VES_SPECULAR",
-			@"VES_TEXTURE_COORDINATES",
-			@"VES_BINORMAL",
-			@"VES_TANGENT",
-			@"VES_BLEND_WEIGHTS2",
-			@"VES_BLEND_INDICES2"
-		};
-		for( size_t i=0; i<VES_COUNT; ++i )
-		{
-			if( i + 1u != VES_BINORMAL )
-			{
-				preprocessorMacros[names[i]] =
-						[NSNumber numberWithUnsignedInt:MetalVaoManager::getAttributeIndexFor(
-							static_cast<VertexElementSemantic>( i + 1u ) ) ];
-			}
-		}
+        //Send fixed vertex attributes as macros/definitions.
+        MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
+        NSMutableDictionary<NSString *, NSObject *> *preprocessorMacros =
+                [NSMutableDictionary dictionary];
+        NSString *names[VES_COUNT] =
+        {
+            @"VES_POSITION",
+            @"VES_BLEND_WEIGHTS",
+            @"VES_BLEND_INDICES",
+            @"VES_NORMAL",
+            @"VES_DIFFUSE",
+            @"VES_SPECULAR",
+            @"VES_TEXTURE_COORDINATES",
+            @"VES_BINORMAL",
+            @"VES_TANGENT",
+            @"VES_BLEND_WEIGHTS2",
+            @"VES_BLEND_INDICES2"
+        };
+        for( size_t i=0; i<VES_COUNT; ++i )
+        {
+            if( i + 1u != VES_BINORMAL )
+            {
+                preprocessorMacros[names[i]] =
+                        [NSNumber numberWithUnsignedInt:MetalVaoManager::getAttributeIndexFor(
+                            static_cast<VertexElementSemantic>( i + 1u ) ) ];
+            }
+        }
         for( uint32 i=0; i<8u; ++i )
         {
             NSString *key = [NSString stringWithFormat:@"VES_TEXTURE_COORDINATES%d", i];
@@ -212,14 +211,14 @@ namespace Ogre {
                 [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
                     OGRE_METAL_PARAMETER_SLOT : OGRE_METAL_CS_PARAMETER_SLOT];
 
-		parsePreprocessorDefinitions( preprocessorMacros );
+        parsePreprocessorDefinitions( preprocessorMacros );
 
-		options.preprocessorMacros = preprocessorMacros;
+        options.preprocessorMacros = preprocessorMacros;
 
         NSError *error;
-		mLibrary = [mDevice->mDevice newLibraryWithSource:[NSString stringWithUTF8String:mSource.c_str()]
-												  options:options
-													error:&error];
+        mLibrary = [mDevice->mDevice newLibraryWithSource:[NSString stringWithUTF8String:mSource.c_str()]
+                                                  options:options
+                                                    error:&error];
 
         if( !mLibrary && checkErrors )
         {
@@ -258,6 +257,8 @@ namespace Ogre {
         if( mCompiled && checkErrors )
             LogManager::getSingleton().logMessage( "Shader " + mName + " compiled successfully." );
 
+        mCompileError = !mCompiled;
+
         if( !mCompiled )
         {
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
@@ -266,7 +267,6 @@ namespace Ogre {
                          "MetalProgram::compile" );
         }
 
-        mCompilerErrors = !mCompiled;
         return mCompiled;
     }
 
@@ -558,7 +558,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------------
     void MetalProgram::unloadImpl()
-    {   
+    {
         // We didn't create mAssemblerProgram through a manager, so override this
         // implementation so that we don't try to remove it from one. Since getCreator()
         // is used, it might target a different matching handle!
@@ -595,7 +595,7 @@ namespace Ogre {
             return;
         }
 
-        if( mCompilerErrors )
+        if( mCompileError )
             return;
 
         if( !mLibrary )
