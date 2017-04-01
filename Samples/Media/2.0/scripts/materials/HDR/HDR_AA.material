@@ -1,0 +1,62 @@
+fragment_program HDR/Resolve_4xFP32_HDR_Box_ps_GLSL glsl
+{
+	source Resolve_4xFP32_HDR_Box_ps.glsl
+	default_params
+	{
+		param_named rt0			int 0
+		param_named oldLumRt	int 1
+	}
+}
+
+fragment_program HDR/Resolve_4xFP32_HDR_Box_ps_HLSL hlsl
+{
+	source Resolve_4xFP32_HDR_Box_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program HDR/Resolve_4xFP32_HDR_Box_ps_Metal metal
+{
+	source Resolve_4xFP32_HDR_Box_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
+fragment_program HDR/Resolve_4xFP32_HDR_Box_ps unified
+{
+	delegate HDR/Resolve_4xFP32_HDR_Box_ps_GLSL
+	delegate HDR/Resolve_4xFP32_HDR_Box_ps_HLSL
+	delegate HDR/Resolve_4xFP32_HDR_Box_ps_Metal
+}
+
+material HDR/Resolve_4xFP32_HDR_Box
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref HDR/Resolve_4xFP32_HDR_Box_ps
+			{
+			}
+
+			texture_unit rt0
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+
+			texture_unit oldLumRt
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+		}
+	}
+}
