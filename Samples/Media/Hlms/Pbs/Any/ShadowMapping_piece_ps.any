@@ -264,7 +264,7 @@
 @end
 @end
 
-@piece( DarkenWithShadowFirstLight )* fShadow@end @end
+@piece( DarkenWithShadowFirstLight )* fShadow@end
 
 @piece( DarkenWithShadow )
 		* getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
