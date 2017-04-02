@@ -276,7 +276,8 @@ void ApplicationContext::destroyDummyScene()
     mRoot->destroySceneManager(dummyScene);
 }
 
-void ApplicationContext::enableShaderCache() {
+void ApplicationContext::enableShaderCache() const
+{
     Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
 
     // Load for a package version of the shaders.
@@ -290,7 +291,8 @@ void ApplicationContext::enableShaderCache() {
     }
 }
 
-bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt) {
+bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt)
+{
     for(std::set<InputListener*>::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it) {
         (*it)->frameRendered(evt);
@@ -440,7 +442,8 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
 }
 #endif
 
-void ApplicationContext::_fireInputEvent(const Event& event) {
+void ApplicationContext::_fireInputEvent(const Event& event) const
+{
     for(std::set<InputListener*>::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it) {
         InputListener& l = **it;
