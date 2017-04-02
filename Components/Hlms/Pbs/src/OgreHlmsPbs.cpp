@@ -997,8 +997,6 @@ namespace Ogre
 
 
                 //vec2 shadowRcv[numShadowMapLights].invShadowMapSize
-                //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
-                //changes need to be done so that UV calculations land on the right place
                 size_t shadowMapTexContigIdx =
                         shadowNode->getIndexToContiguousShadowMapTex( (size_t)shadowMapTexIdx );
                 uint32 texWidth  = contiguousShadowMapTex[shadowMapTexContigIdx]->getWidth();

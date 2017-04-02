@@ -15,6 +15,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_recursive( ./src SOURCE_FILES )
 add_recursive( ./include HEADER_FILES )
+set( SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} )
 
 include_directories( ./include )
 include_directories( ./include/Hlms )

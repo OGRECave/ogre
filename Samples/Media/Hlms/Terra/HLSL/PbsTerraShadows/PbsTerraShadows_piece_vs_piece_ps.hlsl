@@ -29,9 +29,9 @@
     outVs.terrainShadow = lerp( terraShadowData.x, 1.0, saturate( terraHeightWeight ) );
 @end
 
-@property( hlms_num_shadow_maps )
+@property( hlms_num_shadow_map_lights )
     @piece( custom_ps_preLights )fShadow *= inPs.terrainShadow;@end
-@end @property( !hlms_num_shadow_maps )
+@end @property( !hlms_num_shadow_map_lights )
     @piece( custom_ps_preLights )float fShadow = inPs.terrainShadow;@end
     @piece( DarkenWithShadowFirstLight )* fShadow@end
 @end

@@ -36,9 +36,9 @@ uniform sampler2D heightMap;
 
 @piece( VertexTransform )
 	//Lighting is in view space
-	outVs.pos		= ( vec4(worldPos.xyz, 1.0f) * pass.view ).xyz;
+	outVs.pos		= ( vec4(worldPos.xyz, 1.0f) * passBuf.view ).xyz;
 @property( !hlms_dual_paraboloid_mapping )
-	gl_Position = vec4(worldPos.xyz, 1.0f) * pass.viewProj;@end
+	gl_Position = vec4(worldPos.xyz, 1.0f) * passBuf.viewProj;@end
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	gl_Position.w	= 1.0f;
@@ -49,8 +49,9 @@ uniform sampler2D heightMap;
 	gl_Position.z	= (L - NearPlane) / (FarPlane - NearPlane);@end
 @end
 @piece( ShadowReceive )
-@foreach( hlms_num_shadow_maps, n )
-	outVs.posL@n = vec4(worldPos.xyz, 1.0f) * pass.shadowRcv[@n].texViewProj;@end
+@foreach( hlms_num_shadow_map_lights, n )
+	@property( !hlms_shadowmap@n_is_point_light )
+		outVs.posL@n = vec4(worldPos.xyz, 1.0f) * passBuf.shadowRcv[@n].texViewProj;@end @end
 @end
 
 void main()
@@ -111,9 +112,12 @@ void main()
 	outVs.uv0.xy = vec2( uVertexPos.xy ) * vec2( cellData.pos.w, cellData.scale.w );
 
 	@insertpiece( ShadowReceive )
-@foreach( hlms_num_shadow_maps, n )
-	outVs.posL@n.z = outVs.posL@n.z * pass.shadowRcv[@n].shadowDepthRange.y;
-	outVs.posL@n.z = (outVs.posL@n.z * 0.5) + 0.5;@end
+@foreach( hlms_num_shadow_map_lights, n )
+	@property( !hlms_shadowmap@n_is_point_light )
+		outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;
+		outVs.posL@n.z = (outVs.posL@n.z * 0.5) + 0.5;
+	@end
+@end
 
 @property( hlms_pssm_splits )	outVs.depth = gl_Position.z;@end
 

@@ -36,8 +36,9 @@ layout(binding = 2) uniform InstanceBuffer
 	vec3 pos;
 	vec2 uv0;
 
-	@foreach( hlms_num_shadow_maps, n )
-		vec4 posL@n;@end
+	@foreach( hlms_num_shadow_map_lights, n )
+		@property( !hlms_shadowmap@n_is_point_light )
+			vec4 posL@n;@end @end
 	@property( hlms_pssm_splits )float depth;@end
 	@insertpiece( custom_VStoPS )
 @end

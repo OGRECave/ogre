@@ -43,8 +43,9 @@ cbuffer InstanceBuffer : register(b2)
 @piece( Terra_VStoPS_block )
 	float3 pos : TEXCOORD@counter(texcoord);
 	float2 uv0 : TEXCOORD@counter(texcoord);
-	@foreach( hlms_num_shadow_maps, n )
-		float4 posL@n	: TEXCOORD@counter(texcoord);@end
+	@foreach( hlms_num_shadow_map_lights, n )
+		@property( !hlms_shadowmap@n_is_point_light )
+			float4 posL@n	: TEXCOORD@counter(texcoord);@end @end
 
 	@property( hlms_pssm_splits )float depth	: TEXCOORD@counter(texcoord);@end
 	@insertpiece( custom_VStoPS )
