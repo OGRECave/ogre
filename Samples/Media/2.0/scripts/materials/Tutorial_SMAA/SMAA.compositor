@@ -1,5 +1,5 @@
 
-compositor_node SMAANode
+compositor_node SmaaNode
 {
 	in 0 rt_input
 	in 1 rt_output

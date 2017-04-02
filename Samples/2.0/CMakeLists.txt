@@ -63,6 +63,7 @@ if( OGRE_BUILD_SAMPLES2 )
 
 	add_subdirectory(Showcase/Forward3D)
 	add_subdirectory(Showcase/Hdr)
+	add_subdirectory(Showcase/HdrSmaa)
 	add_subdirectory(Showcase/PbsMaterials)
 	add_subdirectory(Showcase/Postprocessing)
 

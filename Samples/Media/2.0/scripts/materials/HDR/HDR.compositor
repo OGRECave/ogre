@@ -87,6 +87,8 @@ compositor_node HdrPostprocessingNode
 	texture rtIter1	 16  16 PF_FLOAT16_R	no_fsaa depth_pool 0
 	texture rtIter2	  4   4 PF_FLOAT16_R	no_fsaa depth_pool 0
 
+	texture rtt0 target_width target_height PF_R8G8B8A8 no_fsaa
+
 	//Calculate luminosity
 	target rtIter0 : discardTarget
 	{
@@ -226,7 +228,17 @@ compositor_node HdrPostprocessingNode
 			input		1	lumRt0
 			input		2	rtBlur0
 		}
+	}
 
+	out 0 rt_output
+}
+
+compositor_node HdrRenderUi
+{
+	in 0 rt_output
+
+	target rt_output
+	{
 		pass render_scene
 		{
 			lod_update_list	off
@@ -237,15 +249,14 @@ compositor_node HdrPostprocessingNode
 			rq_last		255
 		}
 	}
-
-	out 0 rt0
 }
 
 workspace HdrWorkspace
 {
-	connect HdrRenderingNode 0 HdrPostprocessingNode 0
-	connect HdrRenderingNode 1 HdrPostprocessingNode 1
-	connect_output HdrPostprocessingNode 2
+	connect HdrRenderingNode 0		HdrPostprocessingNode 0
+	connect HdrRenderingNode 1		HdrPostprocessingNode 1
+	connect_output					HdrPostprocessingNode 2
+	connect	HdrPostprocessingNode 0	HdrRenderUi 0
 }
 
 workspace HdrWorkspaceMsaa
@@ -255,4 +266,5 @@ workspace HdrWorkspaceMsaa
 	connect HdrMsaaResolve 0 HdrPostprocessingNode 0
 	connect HdrRenderingNode 1 HdrPostprocessingNode 1
 	connect_output HdrPostprocessingNode 2
+	connect HdrPostprocessingNode 2 HdrRenderUi 0
 }

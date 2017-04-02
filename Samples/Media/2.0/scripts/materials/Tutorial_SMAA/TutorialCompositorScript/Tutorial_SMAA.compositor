@@ -67,9 +67,9 @@ compositor_node FinalComposition
 
 workspace TutorialSMAA_Workspace
 {
-	connect TutorialSMAA_RenderingNode 0 SMAANode 0
-	connect TutorialSMAA_RenderingNode 1 SMAANode 1
+	connect TutorialSMAA_RenderingNode 0 SmaaNode 0
+	connect TutorialSMAA_RenderingNode 1 SmaaNode 1
 
 	connect_output FinalComposition 0
-	connect SMAANode 0 FinalComposition 1
+	connect SmaaNode 0 FinalComposition 1
 }

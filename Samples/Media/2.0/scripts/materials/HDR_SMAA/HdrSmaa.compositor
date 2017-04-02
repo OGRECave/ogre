@@ -1,0 +1,15 @@
+compositor_node HdrSmaaRttNode
+{
+	texture rt0 target_width target_height PF_R8G8B8A8 no_fsaa
+	out 0 rt0
+}
+
+workspace HdrSmaaWorkspace
+{
+	connect HdrRenderingNode 0		HdrPostprocessingNode 0
+	connect HdrRenderingNode 1		HdrPostprocessingNode 1
+	connect HdrSmaaRttNode 0		HdrPostprocessingNode 2
+	connect HdrPostprocessingNode 0 SmaaNode 0
+	connect_output					SmaaNode 1
+	connect SmaaNode 0				HdrRenderUi 0
+}
