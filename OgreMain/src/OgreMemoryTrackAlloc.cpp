@@ -34,6 +34,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    //1GB pool
+    const size_t OGRE_TRACK_POOL_SIZE = 1024u * 1024u * 1024u;
+
     /*char* cleanMemory( size_t bytes )
     {
         char *retVal = (char*)malloc( bytes );

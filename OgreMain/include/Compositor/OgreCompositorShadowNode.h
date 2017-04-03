@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNode.h"
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "OgreShadowCameraSetup.h"
+#include "OgreLight.h"
 
 namespace Ogre
 {
@@ -43,6 +44,8 @@ namespace Ogre
     /** \addtogroup Effects
     *  @{
     */
+
+    typedef vector<TexturePtr>::type TextureVec;
 
     /** Shadow Nodes are special nodes (not to be confused with @see CompositorNode)
         that are only used for rendering shadow maps.
@@ -96,18 +99,37 @@ namespace Ogre
         {
             ShadowCameraSetupPtr    shadowCameraSetup;
             Camera                  *camera;
+            /// TexturePtr is at mLocalTextures[idxToLocalTextures]
+            uint32                  idxToLocalTextures;
+            /// Index to mContiguousShadowMapTex[idxToContiguousTex]
+            /// mContiguousShadowMapTex keeps them together for binding quickly
+            /// during render.
+            /// Several shadow maps may reference the same texture (i.e. UV atlas)
+            /// Hence the need for this idx variable.
+            uint32                  idxToContiguousTex;
             /// @See ShadowCameraSetup mMinDistance
             Real                    minDistance;
             Real                    maxDistance;
+            Vector2                 scenePassesViewportSize[Light::NUM_LIGHT_TYPES];
         };
 
         typedef vector<ShadowMapCamera>::type ShadowMapCameraVec;
         /// One per shadow map (whether texture or atlas)
         ShadowMapCameraVec      mShadowMapCameras;
 
+        /// If all shadowmaps share the same texture (i.e. UV atlas), then
+        /// mContiguousShadowMapTex.size() == 1. We can't use mLocalTextures
+        /// directly because it could have textures unrelated to shadow mapping
+        /// (or indirectly related)
+        TextureVec              mContiguousShadowMapTex;
+
         Camera const *          mLastCamera;
         size_t                  mLastFrame;
+        size_t                  mNumActiveShadowMapCastingLights;
+        /// mShadowMapCastingLights may have gaps (can happen if no light of
+        /// the types the shadow map supports could be assigned at this slot)
         LightClosestArray       mShadowMapCastingLights;
+        vector<size_t>::type    mTmpSortedIndexes;
 
         /** Cached value. Contains the aabb of all caster-only objects (filtered by
             camera's visibility flags) from the minimum RQ used by our shadow render
@@ -130,14 +152,41 @@ namespace Ogre
         */
         void buildClosestLightList(Camera *newCamera , const Camera *lodCamera);
 
-        CompositorChannel createShadowTexture( const ShadowTextureDefinition &textureDef,
-                                                const RenderTarget *finalTarget );
+        /** Finds the first index to mShadowMapCastingLights[*startIdx] where
+            mShadowMapCastingLights[i].light == 0; starting from startIdx (inclusive).
+            and the first index to mShadowMapCastingLights[*entryToUse] where
+            lightTypeMask & mDefinition->mLightTypesMask[*entryToUse] != 0
+        @param startIdx [in/out]
+            [in] Where to start searching from.
+            [out] Where to start searching from the next time you call this function.
+                  Outputs mShadowMapCastingLights.size() if there are no more empty
+                  entries.
+            For example if our light types are like this:
+                dir point point dir point
+            And you're looking for all the directional lights, then sucessively calling
+            this function will return:
+                startIdx = 0, entryToUse = 0
+                startIdx = 1, entryToUse = 3
+                startIdx = 1, entryToUse = 5 --> 5 == mShadowMapCastingLights.size()
+            startIdx will always be 1 until that point light entry is filled.
+        @param entryToUse [out]
+            What entry to use. Outputs mShadowMapCastingLights.size() if there are no more
+            empty that supports the requested light types.
+        */
+        void findNextEmptyShadowCastingLightEntry( uint8 lightTypeMask,
+                                                   size_t * RESTRICT_ALIAS inOutStartIdx,
+                                                   size_t * RESTRICT_ALIAS outEntryToUse ) const;
+
+        void clearShadowCastingLights( const LightListInfo &globalLightList );
+        void restoreStaticShadowCastingLights( const LightListInfo &globalLightList );
 
     public:
         CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
                               CompositorWorkspace *workspace, RenderSystem *renderSys,
                               const RenderTarget *finalTarget );
         virtual ~CompositorShadowNode();
+
+        const CompositorShadowNodeDef* getDefinition() const            { return mDefinition; }
 
         /** Renders into the shadow map, executes passes
         @param camera
@@ -155,10 +204,23 @@ namespace Ogre
         /// @See mCastersBox
         const AxisAlignedBox& getCastersBox(void) const     { return mCastersBox; }
 
+        bool isShadowMapIdxInValidRange( uint32 shadowMapIdx ) const;
+
         /// Returns true if the shadow map index is not active. For example:
         ///     * There are 3 shadow maps, but only 2 shadow casting lights
         ///     * There are 3 directional maps for directional PSSM, but no directional light.
         bool isShadowMapIdxActive( uint32 shadowMapIdx ) const;
+
+        bool _shouldUpdateShadowMapIdx( uint32 shadowMapIdx ) const;
+
+        /// Do not call this if isShadowMapIdxActive == false or isShadowMapIdxInValidRange == false
+        uint8 getShadowMapLightTypeMask( uint32 shadowMapIdx ) const;
+
+        /// Note: May return null if there is no such shadowMapIdx, or if there
+        /// is no light that could be linked with that shadow map index.
+        /// i.e. if isShadowMapIdxActive( shadowMapIdx ) is true, then we'll
+        /// return a valid pointer.
+        const Light* getLightAssociatedWith( uint32 shadowMapIdx ) const;
 
         /** Outputs the min & max depth range for the given camera. 0 & 100000 if camera not found
         @remarks
@@ -186,10 +248,68 @@ namespace Ogre
             changes to or from a value lower than the supported shadow casting lights by the
             definition.
         */
-        size_t getNumShadowCastingLights(void) const                { return mShadowMapCastingLights.size(); }
+        size_t getNumActiveShadowCastingLights(void) const
+                                                            { return mNumActiveShadowMapCastingLights; }
         const LightClosestArray& getShadowCastingLights(void) const { return mShadowMapCastingLights; }
 
         const LightsBitSet& getAffectedLightsBitSet(void) const     { return mAffectedLights; }
+
+        const TextureVec& getContiguousShadowMapTex(void) const     { return mContiguousShadowMapTex; }
+        uint32 getIndexToContiguousShadowMapTex( size_t shadowMapIdx ) const;
+
+        /** Marks a shadow map as statically updated, and ties the given light to always use
+            that shadow map.
+        @remarks
+            By default Ogre recalculates the shadow maps every single frame (even if nothing
+            has changed). However if you know that whatever a light is illuminating is not
+            changing at all (or barely changing), with static shadow maps you are the one who
+            tells Ogre when to update it (e.g. you may only need to update it three times during
+            the whole level); hence the framerate goes up.
+            Perceived quality may also go up because by default Ogre applies shadow mapping on the
+            closest lights; so shadows flip on and off as you move the camera (because lights that
+            had no shadows get closer while lights that were using shadows get farther away).
+            While often this is desirable, there are cases where the artist may want a particular
+            light to always have shadows (regardless of distance); with static shadow maps you can
+            force that; hence the perceived quality may go up (but that's up to the talent of the
+            artist and the scene in particular).
+        @par
+            Note that for point & spot lights, you have to consider if the light changed
+            (e.g. moved, rotated) or if anything that is or could be lit by the light has moved
+            Directional lights are harder because they depend on the camera placement as well.
+        @par
+            Use setStaticShadowMapDirty to tell Ogre to update the shadow map in the next render.
+        @par
+            Ogre may call light->setCastShadows( true ); on the light.
+        @par
+            IMPORTANT: Do not put static and dynamic shadow maps in the same UV atlas.
+            It's asking for trouble and will probably not work. Keep the atlas separate.
+        @par
+            VERY IMPORTANT: You *must* respect lights are set in the following order:
+                1. Directional
+                2. Point
+                3. Spot
+            If you have shadow maps defined that support both point & spotlight, and you want
+            to mix both static lights with dynamic ones; set fixed point lights in the first
+            shadow map indices and spotlight in the last indices, to avoid Ogre automatically
+            (e.g.) placing a point light after your static spot light.
+        @param shadowMapIdx
+            Shadow map index to tie this light to. If this shadow map index is part of a PSSM
+            split, all PSSM splits will be affected (thus you only need to call it once for
+            any of the split that belong to the same set)
+        @param light
+            Light to tie to the given shadow map. Null pointer disables it.
+        */
+        void setLightFixedToShadowMap( size_t shadowMapIdx, Light *light );
+
+        /// Tags a static shadow map as dirty, causing Ogre to update it on the next time this
+        /// Shadow node gets executed.
+        /// If drawing to a texture atlas, multiple shadow maps may be sharing the same texture,
+        /// thus if you're doing a clear on the whole atlas, you will need to update all of
+        /// the shadow maps, not just this one. Use includeLinked=true to mark as dirty all
+        /// static shadow maps that share the same atlas.
+        /// Set it to false if that's explicitly what you want, or if you're already going
+        /// to call it for every shadow map (otherwise you will trigger a O(N^2) behavior).
+        void setStaticShadowMapDirty( size_t shadowMapIdx, bool includeLinked=true );
 
         /// @copydoc CompositorNode::finalTargetResized
         virtual void finalTargetResized( const RenderTarget *finalTarget );

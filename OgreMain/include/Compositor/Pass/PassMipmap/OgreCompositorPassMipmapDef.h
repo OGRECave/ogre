@@ -74,8 +74,8 @@ namespace Ogre
         uint8 mKernelRadius;
 
     public:
-        CompositorPassMipmapDef() :
-            CompositorPassDef( PASS_MIPMAP, 0 ),
+        CompositorPassMipmapDef( CompositorTargetDef *parentTargetDef ) :
+            CompositorPassDef( PASS_MIPMAP, parentTargetDef ),
             mMipmapGenerationMethod( ApiDefault ),
             mGaussianDeviationFactor( 0.5f ),
             mKernelRadius( 8 )

@@ -104,6 +104,7 @@ mForwardPlusSystem( 0 ),
 mForwardPlusImpl( 0 ),
 mCameraInProgress(0),
 mCurrentViewport(0),
+mCurrentPass(0),
 mCurrentShadowNode(0),
 mShadowNodeIsReused( false ),
 mSkyPlaneEntity(0),
@@ -3503,6 +3504,11 @@ void SceneManager::removeRenderObjectListener(RenderObjectListener* delListener)
             break;
         }
     }
+}
+//---------------------------------------------------------------------
+void SceneManager::_setCurrentCompositorPass( CompositorPass *pass )
+{
+    mCurrentPass = pass;
 }
 //---------------------------------------------------------------------
 void SceneManager::_setCurrentShadowNode( CompositorShadowNode *shadowNode, bool isReused )

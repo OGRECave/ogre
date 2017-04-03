@@ -6,6 +6,8 @@ namespace Demo
     class HdrUtils
     {
     public:
+        static void init( Ogre::uint8 fsaa );
+
         static void setSkyColour( const Ogre::ColourValue &colour,
                                   float multiplier );
 

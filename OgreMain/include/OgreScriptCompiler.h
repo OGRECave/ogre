@@ -858,6 +858,7 @@ namespace Ogre
                         ID_ALLOW_WRITE_AFTER_WRITE, //Used inside ID_USES_UAV
                     //ID_COLOUR_WRITE,
                     ID_EXPOSE,
+                    ID_SHADOW_MAP_FULL_VIEWPORT,
 
                     //Used by PASS_SCENE
                     ID_LOD_BIAS,
@@ -946,8 +947,11 @@ namespace Ogre
             ID_NUM_SPLITS,
             ID_PSSM_SPLIT_PADDING,
             ID_PSSM_LAMBDA,
+            ID_SHADOW_MAP_TARGET_TYPE,
+            ID_SHADOW_MAP_REPEAT,
             ID_SHADOW_MAP,
-            ID_SHADOW_ATLAS,
+                ID_UV,
+                ID_ARRAY_INDEX,
                 ID_FSAA,
                 ID_LIGHT,
                 ID_SPLIT,

@@ -30,58 +30,6 @@ struct PS_INPUT
 @end
 @end
 
-@property( hlms_num_shadow_maps )
-inline float getShadow( depth2d<float> shadowMap, sampler shadowSampler,
-						float4 psPosLN, float4 invShadowMapSize )
-{
-	float fDepth = psPosLN.z;
-	half2 uv = half2( psPosLN.xy / psPosLN.w );
-	/*float c = shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
-	return c;*/
-
-	float retVal = 0;
-
-@property( pcf_3x3 || pcf_4x4 )
-	half2 offsets[@value(pcf_iterations)] =
-	{
-	@property( pcf_3x3 )
-		half2( 0.0h, 0.0h ),	//0, 0
-		half2( 1.0h, 0.0h ),	//1, 0
-		half2( 0.0h, 1.0h ),	//1, 1
-		half2( 0.0h, 0.0h ) 	//1, 1
-	@end
-	@property( pcf_4x4 )
-		half2( 0.0h, 0.0h ),	//0, 0
-		half2( 1.0h, 0.0h ),	//1, 0
-		half2( 1.0h, 0.0h ),	//2, 0
-
-		half2(-2.0h, 1.0h ),	//0, 1
-		half2( 1.0h, 0.0h ),	//1, 1
-		half2( 1.0h, 0.0h ),	//2, 1
-
-		half2(-2.0h, 1.0h ),	//0, 2
-		half2( 1.0h, 0.0h ),	//1, 2
-		half2( 1.0h, 0.0h )		//2, 2
-	@end
-	};
-@end
-
-	@foreach( pcf_iterations, n )
-		@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * half2(invShadowMapSize.xy);@end
-		// 2x2 PCF
-		retVal += shadowMap.sample_compare( shadowSampler, float2(uv.xy), fDepth );
-	@end
-
-	@property( pcf_3x3 )
-		retVal *= 0.25;
-	@end @property( pcf_4x4 )
-		retVal *= 0.11111111111111;
-	@end
-
-	return retVal;
-}
-@end
-
 @property( hlms_lights_spot_textured )@insertpiece( DeclQuat_zAxis )
 inline float3 qmul( float4 q, float3 v )
 {
@@ -123,8 +71,8 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 @insertpiece( DeclParallaxLocalCorrect )
 @end
 
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
+@insertpiece( DeclShadowMapMacros )
+@insertpiece( DeclShadowSamplingFuncs )
 
 constexpr sampler shadowSampler = sampler( coord::normalized,
 										   address::clamp_to_edge,
@@ -185,8 +133,7 @@ fragment @insertpiece( output_type ) main_metal
 		, sampler envMapSamplerState [[sampler(@value(envMapReg))]]@end
 	@foreach( numSamplerStates, n )
 		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
-	@foreach( hlms_num_shadow_maps, n )
-		, depth2d<float> texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
+	@insertpiece( DeclShadowSamplers )
 )
 {
 	PS_OUTPUT outPs;
@@ -326,15 +273,7 @@ float4 diffuseCol;
 		nNormal = normalize( TBN * nNormal );
 	@end
 
-	@property( hlms_pssm_splits )
-		float fShadow = 1.0;
-		if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-			fShadow = getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-	@foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-			fShadow = getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-	@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
-		float fShadow = getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-	@end
+	@insertpiece( DoDirectionalShadowMaps )
 
 	@insertpiece( SampleRoughnessMap )
 
@@ -370,19 +309,19 @@ float4 diffuseCol;
 @property( !ambient_fixed )
 	float3 finalColour = float3(0, 0, 0);
 @end @property( ambient_fixed )
-	float3 finalColour = pass.ambientUpperHemi.xyz * @insertpiece( kD ).xyz;
+	float3 finalColour = passBuf.ambientUpperHemi.xyz * @insertpiece( kD ).xyz;
 @end
 
 	@insertpiece( custom_ps_preLights )
 
 @property( !custom_disable_directional_lights )
 @property( hlms_lights_directional )
-	finalColour += BRDF( pass.lights[0].position, viewDir, NdotV, pass.lights[0].diffuse, pass.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) ) @insertpiece( DarkenWithShadowFirstLight );
+	finalColour += BRDF( passBuf.lights[0].position, viewDir, NdotV, passBuf.lights[0].diffuse, passBuf.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) ) @insertpiece( DarkenWithShadowFirstLight );
 @end
 @foreach( hlms_lights_directional, n, 1 )
-	finalColour += BRDF( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );@end
+	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );@end
 @foreach( hlms_lights_directional_non_caster, n, hlms_lights_directional )
-	finalColour += BRDF( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
+	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
 @end
 
 @property( hlms_lights_point || hlms_lights_spot )	float3 lightDir;
@@ -392,13 +331,13 @@ float4 diffuseCol;
 
 	//Point lights
 @foreach( hlms_lights_point, n, hlms_lights_directional_non_caster )
-	lightDir = pass.lights[@n].position - inPs.pos;
+	lightDir = passBuf.lights[@n].position - inPs.pos;
 	fDistance= length( lightDir );
-	if( fDistance <= pass.lights[@n].attenuation.x )
+	if( fDistance <= passBuf.lights[@n].attenuation.x )
 	{
 		lightDir *= 1.0 / fDistance;
-		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (0.5 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadowPoint );
+		float atten = 1.0 / (0.5 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
@@ -407,11 +346,11 @@ float4 diffuseCol;
 	//spotParams[@value(spot_params)].y = cos( OuterAngle / 2 )
 	//spotParams[@value(spot_params)].z = falloff
 @foreach( hlms_lights_spot, n, hlms_lights_point )
-	lightDir = pass.lights[@n].position - inPs.pos;
+	lightDir = passBuf.lights[@n].position - inPs.pos;
 	fDistance= length( lightDir );
-@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - pass.lights[@n].position ), pass.lights[@n].spotDirection );@end
-@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - pass.lights[@n].position ), zAxis( pass.lights[@n].spotQuaternion ) );@end
-	if( fDistance <= pass.lights[@n].attenuation.x && spotCosAngle >= pass.lights[@n].spotParams.y )
+@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position ), passBuf.lights[@n].spotDirection );@end
+@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position ), zAxis( passBuf.lights[@n].spotQuaternion ) );@end
+	if( fDistance <= passBuf.lights[@n].attenuation.x && spotCosAngle >= passBuf.lights[@n].spotParams.y )
 	{
 		lightDir *= 1.0 / fDistance;
 	@property( hlms_lights_spot_textured )
@@ -419,11 +358,11 @@ float4 diffuseCol;
 		float spotAtten = texture( texSpotLight, normalize( posInLightSpace ).xy ).x; //TODO
 	@end
 	@property( !hlms_lights_spot_textured )
-		float spotAtten = saturate( (spotCosAngle - pass.lights[@n].spotParams.y) * pass.lights[@n].spotParams.x );
-		spotAtten = pow( spotAtten, pass.lights[@n].spotParams.z );
+		float spotAtten = saturate( (spotCosAngle - passBuf.lights[@n].spotParams.y) * passBuf.lights[@n].spotParams.x );
+		spotAtten = pow( spotAtten, passBuf.lights[@n].spotParams.z );
 	@end
-		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (0.5 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
+		float atten = 1.0 / (0.5 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
 
@@ -458,8 +397,8 @@ float4 diffuseCol;
 				envColourD = float3( 0, 0, 0 );
 			}
 		@end @property( !use_parallax_correct_cubemaps )
-			float3 envColourS = texEnvProbeMap.sample( envMapSamplerState, reflDir * pass.invViewMatCubemap, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
-			float3 envColourD = texEnvProbeMap.sample( envMapSamplerState, nNormal * pass.invViewMatCubemap, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+			float3 envColourS = texEnvProbeMap.sample( envMapSamplerState, reflDir * passBuf.invViewMatCubemap, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+			float3 envColourD = texEnvProbeMap.sample( envMapSamplerState, nNormal * passBuf.invViewMatCubemap, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
 		@end
 		@property( !hw_gamma_read )	//Gamma to linear space
 			envColourS = envColourS * envColourS;
@@ -479,15 +418,15 @@ float4 diffuseCol;
 	@end
 
 	@property( ambient_hemisphere )
-		float ambientWD = dot( pass.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
-		float ambientWS = dot( pass.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
+		float ambientWD = dot( passBuf.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
+		float ambientWS = dot( passBuf.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
 		@property( use_envprobe_map || hlms_use_ssr )
-			envColourS	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
-			envColourD	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
+			envColourS	+= mix( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
+			envColourD	+= mix( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
 		@end @property( !use_envprobe_map && !hlms_use_ssr )
-			float3 envColourS = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
-			float3 envColourD = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
+			float3 envColourS = mix( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
+			float3 envColourD = mix( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
 		@end
 	@end
 
@@ -515,6 +454,10 @@ float4 diffuseCol;
 	@end @property( !hlms_normal && !hlms_qtangent )
 		outPs.colour0 = float4( 1.0, 1.0, 1.0, 1.0 );
 	@end
+
+	@property( debug_pssm_splits )
+		outPs.colour0.xyz = mix( outPs.colour0.xyz, debugPssmSplit.xyz, 0.2f );
+	@end
 @end @property( hlms_prepass )
 	outPs.normals			= float4( nNormal * 0.5 + 0.5, 1.0 );
 	@property( hlms_pssm_splits )
@@ -533,6 +476,10 @@ float4 diffuseCol;
 @end
 @property( hlms_shadowcaster )
 
+@property( hlms_shadowcaster_point )
+	@insertpiece( PassStructDecl )
+@end
+
 @insertpiece( DeclOutputType )
 
 fragment @insertpiece( output_type ) main_metal
@@ -542,6 +489,9 @@ fragment @insertpiece( output_type ) main_metal
 	// START UNIFORM DECLARATION
 	@property( !hlms_shadowcaster || alpha_test )
 		@insertpiece( MaterialDecl )
+	@end
+	@property( hlms_shadowcaster_point )
+		@insertpiece( PassDecl )
 	@end
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
@@ -611,8 +561,14 @@ fragment @insertpiece( output_type ) main_metal
 
 	@insertpiece( custom_ps_posExecution )
 
-@property( !hlms_render_depth_only )
+@property( !hlms_render_depth_only && !hlms_shadowcaster_point )
 	outPs.colour0 = inPs.depth;
+	return outPs;
+@end
+
+@property( hlms_shadowcaster_point )
+	float distanceToCamera = length( inPs.toCameraWS );
+	outPs.colour0 = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;
 	return outPs;
 @end
 }

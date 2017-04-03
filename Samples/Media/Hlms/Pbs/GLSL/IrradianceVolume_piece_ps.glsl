@@ -1,9 +1,9 @@
 @property( irradiance_volumes )
 @piece( applyIrradianceVolumes )
-	vec3 worldNormal = nNormal.xyz * mat3(pass.invView);
-	vec3 worldPos = (vec4( inPs.pos.xyz, 1.0 ) * pass.invView).xyz;
+	vec3 worldNormal = nNormal.xyz * mat3(passBuf.invView);
+	vec3 worldPos = (vec4( inPs.pos.xyz, 1.0 ) * passBuf.invView).xyz;
 
-	vec3 irradiancePos = worldPos.xyz * pass.irradianceSize.xyz - pass.irradianceOrigin.xyz;
+	vec3 irradiancePos = worldPos.xyz * passBuf.irradianceSize.xyz - passBuf.irradianceOrigin.xyz;
 	//Floor irradiancePos.y and put the fractional part so we can lerp.
 	irradiancePos.y -= 0.5f;	//Texel centers are at center. Move it to origin.
 	float origYPos;
@@ -32,7 +32,7 @@
 	filtering around the Y axis)
 	**/
 
-	float irradianceTexInvHeight = pass.irradianceSize.w;
+	float irradianceTexInvHeight = passBuf.irradianceSize.w;
 
 	irradiancePos.y		= (origYPos + isNegative.x) * irradianceTexInvHeight;
 	vec3 xAmbientSample	= texture( irradianceVolume, irradiancePos ).xyz;
@@ -60,7 +60,7 @@
 	vec3 ambientTerm =	worldNormalSq.x * xAmbientSample.xyz +
 						worldNormalSq.y * yAmbientSample.xyz +
 						worldNormalSq.z * zAmbientSample.xyz;
-	ambientTerm *= pass.irradianceOrigin.w; //irradianceOrigin.w = irradianceMaxPower
+	ambientTerm *= passBuf.irradianceOrigin.w; //irradianceOrigin.w = irradianceMaxPower
 
 	finalColour.xyz += ambientTerm.xyz * @insertpiece( kD ).xyz;
 @end

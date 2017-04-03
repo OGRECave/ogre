@@ -1,0 +1,334 @@
+//
+//	SMAA/EdgeDetection
+//
+vertex_program SMAA/EdgeDetection_vs_GLSL glsl
+{
+	source SMAA_EdgeDetection_vs.glsl
+	enable_include_header true
+}
+
+vertex_program SMAA/EdgeDetection_vs_HLSL hlsl
+{
+	source SMAA_EdgeDetection_vs.hlsl
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	entry_point main
+}
+
+vertex_program SMAA/EdgeDetection_vs_Metal metal
+{
+	source SMAA_EdgeDetection_vs.metal
+	enable_include_header true
+}
+
+vertex_program SMAA/EdgeDetection_vs unified
+{
+	delegate SMAA/EdgeDetection_vs_GLSL
+	delegate SMAA/EdgeDetection_vs_HLSL
+	delegate SMAA/EdgeDetection_vs_Metal
+
+	default_params
+	{
+		param_named_auto worldViewProj	worldviewproj_matrix
+		param_named_auto viewportSize	viewport_size
+	}
+}
+
+fragment_program SMAA/EdgeDetection_ps_GLSL glsl
+{
+	source SMAA_EdgeDetection_ps.glsl
+	enable_include_header true
+	default_params
+	{
+		param_named rt_input	int 0
+		param_named depthTex	int 1
+	}
+}
+
+fragment_program SMAA/EdgeDetection_ps_HLSL hlsl
+{
+	source SMAA_EdgeDetection_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SMAA/EdgeDetection_ps_Metal metal
+{
+	source SMAA_EdgeDetection_ps.metal
+	enable_include_header true
+	shader_reflection_pair_hint SMAA/EdgeDetection_vs
+}
+
+fragment_program SMAA/EdgeDetection_ps unified
+{
+	delegate SMAA/EdgeDetection_ps_GLSL
+	delegate SMAA/EdgeDetection_ps_HLSL
+	delegate SMAA/EdgeDetection_ps_Metal
+
+	default_params
+	{
+		param_named_auto viewportSize	viewport_size
+	}
+}
+
+material SMAA/EdgeDetection
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref SMAA/EdgeDetection_vs
+			{
+			}
+
+			fragment_program_ref SMAA/EdgeDetection_ps
+			{
+			}
+
+			texture_unit rt_input
+			{
+				filtering none
+				tex_address_mode clamp
+			}
+
+			texture_unit depthTex
+			{
+				filtering bilinear
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+//
+//	SMAA/BlendingWeightCalculation
+//
+vertex_program SMAA/BlendingWeightCalculation_vs_GLSL glsl
+{
+	source SMAA_BlendingWeightCalculation_vs.glsl
+	enable_include_header true
+}
+
+vertex_program SMAA/BlendingWeightCalculation_vs_HLSL hlsl
+{
+	source SMAA_BlendingWeightCalculation_vs.hlsl
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	entry_point main
+}
+
+vertex_program SMAA/BlendingWeightCalculation_vs_Metal metal
+{
+	source SMAA_BlendingWeightCalculation_vs.metal
+	enable_include_header true
+}
+
+vertex_program SMAA/BlendingWeightCalculation_vs unified
+{
+	delegate SMAA/BlendingWeightCalculation_vs_GLSL
+	delegate SMAA/BlendingWeightCalculation_vs_HLSL
+	delegate SMAA/BlendingWeightCalculation_vs_Metal
+
+	default_params
+	{
+		param_named_auto worldViewProj	worldviewproj_matrix
+		param_named_auto viewportSize	viewport_size
+	}
+}
+
+fragment_program SMAA/BlendingWeightCalculation_ps_GLSL glsl
+{
+	source SMAA_BlendingWeightCalculation_ps.glsl
+	enable_include_header true
+	default_params
+	{
+		param_named edgeTex		int 0
+		param_named areaTex		int 1
+		param_named searchTex	int 2
+	}
+}
+
+fragment_program SMAA/BlendingWeightCalculation_ps_HLSL hlsl
+{
+	source SMAA_BlendingWeightCalculation_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SMAA/BlendingWeightCalculation_ps_Metal metal
+{
+	source SMAA_BlendingWeightCalculation_ps.metal
+	enable_include_header true
+	shader_reflection_pair_hint SMAA/BlendingWeightCalculation_vs
+}
+
+fragment_program SMAA/BlendingWeightCalculation_ps unified
+{
+	delegate SMAA/BlendingWeightCalculation_ps_GLSL
+	delegate SMAA/BlendingWeightCalculation_ps_HLSL
+	delegate SMAA/BlendingWeightCalculation_ps_Metal
+
+	default_params
+	{
+		param_named_auto viewportSize	viewport_size
+	}
+}
+
+material SMAA/BlendingWeightCalculation
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref SMAA/BlendingWeightCalculation_vs
+			{
+			}
+
+			fragment_program_ref SMAA/BlendingWeightCalculation_ps
+			{
+			}
+
+			texture_unit edgeTex
+			{
+				filtering bilinear
+				tex_address_mode clamp
+			}
+
+			texture_unit areaTex
+			{
+				texture AreaTexDX10.dds
+				filtering bilinear
+				tex_address_mode clamp
+			}
+
+			texture_unit searchTex
+			{
+				texture SearchTex.dds
+				filtering bilinear
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+
+//
+//	SMAA/NeighborhoodBlending
+//
+vertex_program SMAA/NeighborhoodBlending_vs_GLSL glsl
+{
+	source SMAA_NeighborhoodBlending_vs.glsl
+	enable_include_header true
+}
+
+vertex_program SMAA/NeighborhoodBlending_vs_HLSL hlsl
+{
+	source SMAA_NeighborhoodBlending_vs.hlsl
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	entry_point main
+}
+
+vertex_program SMAA/NeighborhoodBlending_vs_Metal metal
+{
+	source SMAA_NeighborhoodBlending_vs.metal
+	enable_include_header true
+}
+
+vertex_program SMAA/NeighborhoodBlending_vs unified
+{
+	delegate SMAA/NeighborhoodBlending_vs_GLSL
+	delegate SMAA/NeighborhoodBlending_vs_HLSL
+	delegate SMAA/NeighborhoodBlending_vs_Metal
+
+	default_params
+	{
+	param_named_auto worldViewProj	worldviewproj_matrix
+	param_named_auto viewportSize	viewport_size
+	}
+}
+
+fragment_program SMAA/NeighborhoodBlending_ps_GLSL glsl
+{
+	source SMAA_NeighborhoodBlending_ps.glsl
+	enable_include_header true
+	default_params
+	{
+		param_named rt_input		int 0
+		param_named blendTex		int 1
+		param_named velocityTex		int 2
+	}
+}
+
+fragment_program SMAA/NeighborhoodBlending_ps_HLSL hlsl
+{
+	source SMAA_NeighborhoodBlending_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program SMAA/NeighborhoodBlending_ps_Metal metal
+{
+	source SMAA_NeighborhoodBlending_ps.metal
+	enable_include_header true
+	shader_reflection_pair_hint SMAA/NeighborhoodBlending_vs
+}
+
+fragment_program SMAA/NeighborhoodBlending_ps unified
+{
+	delegate SMAA/NeighborhoodBlending_ps_GLSL
+	delegate SMAA/NeighborhoodBlending_ps_HLSL
+	delegate SMAA/NeighborhoodBlending_ps_Metal
+
+	default_params
+	{
+		param_named_auto viewportSize	viewport_size
+	}
+}
+
+material SMAA/NeighborhoodBlending
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref SMAA/NeighborhoodBlending_vs
+			{
+			}
+
+			fragment_program_ref SMAA/NeighborhoodBlending_ps
+			{
+			}
+
+			texture_unit rt_input
+			{
+				filtering bilinear
+				tex_address_mode clamp
+			}
+
+			texture_unit blendTex
+			{
+				filtering bilinear
+				tex_address_mode clamp
+			}
+
+			texture_unit velocityTex
+			{
+				filtering bilinear
+				tex_address_mode clamp
+			}
+		}
+	}
+}

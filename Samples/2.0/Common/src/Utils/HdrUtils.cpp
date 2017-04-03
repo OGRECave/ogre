@@ -18,6 +18,38 @@
 
 namespace Demo
 {
+    void HdrUtils::init( Ogre::uint8 fsaa )
+    {
+        if( fsaa <= 1 )
+            return;
+
+        Ogre::String preprocessorDefines = "MSAA_INITIALIZED=1,";
+
+        preprocessorDefines += "MSAA_SUBSAMPLE_WEIGHT=";
+        preprocessorDefines += Ogre::StringConverter::toString( 1.0f / (float)fsaa );
+        preprocessorDefines += ",MSAA_NUM_SUBSAMPLES=";
+        preprocessorDefines += Ogre::StringConverter::toString( fsaa );
+
+        Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().load(
+                    "HDR/Resolve_4xFP32_HDR_Box",
+                    Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+                staticCast<Ogre::Material>();
+
+        Ogre::Pass *pass = material->getTechnique(0)->getPass(0);
+
+        Ogre::GpuProgram *shader = 0;
+        Ogre::GpuProgramParametersSharedPtr oldParams;
+
+        //Save old manual & auto params
+        oldParams = pass->getFragmentProgramParameters();
+        //Retrieve the HLSL/GLSL/Metal shader and rebuild it with the right settings.
+        shader = pass->getFragmentProgram()->_getBindingDelegate();
+        shader->setParameter( "preprocessor_defines", preprocessorDefines );
+        pass->getFragmentProgram()->reload();
+        //Restore manual & auto params to the newly compiled shader
+        pass->getFragmentProgramParameters()->copyConstantsFrom( *oldParams );
+    }
+    //-----------------------------------------------------------------------------------
     void HdrUtils::setSkyColour( const Ogre::ColourValue &colour,
                                  float multiplier )
     {

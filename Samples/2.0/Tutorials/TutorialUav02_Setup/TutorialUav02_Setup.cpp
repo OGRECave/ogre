@@ -37,11 +37,8 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[6] =
+            const char *c_locations[3] =
             {
-                "2.0/scripts/materials/Common",
-                "2.0/scripts/materials/Common/GLSL",
-                "2.0/scripts/materials/Common/HLSL",
                 "2.0/scripts/materials/TutorialUav02_Setup",
                 "2.0/scripts/materials/TutorialUav02_Setup/GLSL",
                 "2.0/scripts/materials/TutorialUav02_Setup/HLSL",

@@ -46,6 +46,11 @@ THE SOFTWARE.
 #include "OgreShadowCameraSetupFocused.h"
 #include "OgreShadowCameraSetupPSSM.h"
 
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+    #include <intrin.h>
+    #pragma intrinsic(_BitScanForward)
+#endif
+
 namespace Ogre
 {
     const Matrix4 PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE(
@@ -54,19 +59,31 @@ namespace Ogre
         0,      0,    1,    0,
         0,      0,    0,    1);
 
+    inline uint32 ctz( uint32 value )
+    {
+        if( value == 0 )
+            return 32u;
+
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+        unsigned long trailingZero = 0;
+        _BitScanForward( &trailingZero, value );
+        return trailingZero;
+#else
+        return __builtin_ctz( value );
+#endif
+    }
+
     CompositorShadowNode::CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
                                                 CompositorWorkspace *workspace, RenderSystem *renderSys,
                                                 const RenderTarget *finalTarget ) :
             CompositorNode( id, definition->getName(), definition, workspace, renderSys, finalTarget ),
             mDefinition( definition ),
             mLastCamera( 0 ),
-            mLastFrame( -1 )
+            mLastFrame( -1 ),
+            mNumActiveShadowMapCastingLights( 0 )
     {
         mShadowMapCameras.reserve( definition->mShadowMapTexDefinitions.size() );
         mLocalTextures.reserve( mLocalTextures.size() + definition->mShadowMapTexDefinitions.size() );
-
-        //Normal textures must be defined last but were already created.
-        const size_t numNormalTextures = mLocalTextures.size();
 
         SceneManager *sceneManager = workspace->getSceneManager();
         SceneNode *pseudoRootNode = 0;
@@ -82,10 +99,6 @@ namespace Ogre
 
         while( itor != end )
         {
-            // We could still end up pushing a null RT & Texture
-            // to preserve the index order from getTextureSource.
-            mLocalTextures.push_back( createShadowTexture( *itor, finalTarget ) );
-
             // One map, one camera
             const size_t shadowMapIdx = itor - definition->mShadowMapTexDefinitions.begin();
             ShadowMapCamera shadowMapCamera;
@@ -95,6 +108,41 @@ namespace Ogre
             shadowMapCamera.camera->setFixedYawAxis( false );
             shadowMapCamera.minDistance = 0.0f;
             shadowMapCamera.maxDistance = 100000.0f;
+            for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
+                shadowMapCamera.scenePassesViewportSize[i] = -Vector2::UNIT_SCALE;
+
+            {
+                //Find out the index to our texture in both mLocalTextures & mContiguousShadowMapTex
+                size_t index;
+                TextureDefinitionBase::TextureSource textureSource;
+                mDefinition->getTextureSource( itor->getTextureName(), index, textureSource );
+
+                // CompositorShadowNodeDef should've prevented this from not being true.
+                assert( textureSource == TextureDefinitionBase::TEXTURE_LOCAL );
+
+                shadowMapCamera.idxToLocalTextures = static_cast<uint32>( index );
+
+                if( itor->mrtIndex >= mLocalTextures[index].textures.size() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture " +
+                                 itor->getTextureNameStr() + " does not have MRT index " +
+                                 StringConverter::toString( itor->mrtIndex ),
+                                 "CompositorShadowNode::CompositorShadowNode" );
+                }
+
+                TexturePtr &refTex = mLocalTextures[index].textures[itor->mrtIndex];
+                TextureVec::const_iterator itContig = std::find( mContiguousShadowMapTex.begin(),
+                                                                 mContiguousShadowMapTex.end(), refTex );
+                if( itContig == mContiguousShadowMapTex.end() )
+                {
+                    mContiguousShadowMapTex.push_back( refTex );
+                    itContig = mContiguousShadowMapTex.end() - 1u;
+                }
+
+                shadowMapCamera.idxToContiguousTex = static_cast<uint32>(
+                            itContig - mContiguousShadowMapTex.begin() );
+            }
+
 
             {
                 //Attach the camera to a node that exists outside the scene, so that it
@@ -147,18 +195,13 @@ namespace Ogre
             ++itor;
         }
 
-        //Put normal textures in the back; we couldn't split the list earlier (less moves)
-        //because an Exception in the 'for' loop above would cause memory leaks
-        CompositorChannelVec normalTextures( mLocalTextures.begin(),
-                                             mLocalTextures.begin() + numNormalTextures );
-        mLocalTextures.erase( mLocalTextures.begin(), mLocalTextures.begin() + numNormalTextures );
-        mLocalTextures.insert( mLocalTextures.end(), normalTextures.begin(), normalTextures.end() );
-
         // Shadow Nodes don't have input; and global textures should be ready by
         // the time we get created. Therefore, we can safely initialize now as our
         // output may be used in regular nodes and we're created on-demand (as soon
         // as a Node discovers it needs us for the first time, we get created)
         createPasses();
+
+        mShadowMapCastingLights.resize( mDefinition->mNumLights );
     }
     //-----------------------------------------------------------------------------------
     CompositorShadowNode::~CompositorShadowNode()
@@ -178,99 +221,6 @@ namespace Ogre
 
         if( pseudoRootNode )
             sceneManager->destroySceneNode( pseudoRootNode );
-    }
-    //-----------------------------------------------------------------------------------
-    CompositorChannel CompositorShadowNode::createShadowTexture(
-                                                            const ShadowTextureDefinition &textureDef,
-                                                            const RenderTarget *finalTarget )
-    {
-        CompositorChannel newChannel;
-
-        //When format list is empty, then this definition is for a shadow map atlas.
-        if( !textureDef.formatList.empty() )
-        {
-            uint width  = textureDef.width;
-            uint height = textureDef.height;
-            if( finalTarget )
-            {
-                if( textureDef.width == 0 )
-                {
-                    width = static_cast<uint>( ceilf( finalTarget->getWidth() *
-                                                        textureDef.widthFactor ) );
-                }
-                if( textureDef.height == 0 )
-                {
-                    height = static_cast<uint>( ceilf( finalTarget->getHeight() *
-                                                        textureDef.heightFactor ) );
-                }
-            }
-
-            uint32 texUsageFlags = TU_RENDERTARGET;
-
-            if( textureDef.uav )
-                texUsageFlags |= TU_UAV;
-
-            assert( textureDef.depth > 0 &&
-                    (textureDef.depth == 1 || textureDef.textureType > TEX_TYPE_2D) &&
-                    (textureDef.depth == 6 || textureDef.textureType != TEX_TYPE_CUBE_MAP) );
-
-            String textureName = (textureDef.getName() + IdString( getId() )).getFriendlyText();
-            if( textureDef.formatList.size() == 1 )
-            {
-                //Normal RT
-                TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
-                                                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                                textureDef.textureType, width, height,
-                                                textureDef.depth, 0,
-                                                textureDef.formatList[0], (int)texUsageFlags, 0,
-                                                textureDef.hwGammaWrite, textureDef.fsaa,
-                                                BLANKSTRING, false,
-                                                textureDef.depthBufferId !=
-                                                        DepthBuffer::POOL_NON_SHAREABLE );
-                RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-                rt->setDepthBufferPool( textureDef.depthBufferId );
-                if( !PixelUtil::isDepth( textureDef.formatList[0] ) )
-                    rt->setPreferDepthTexture( textureDef.preferDepthTexture );
-                if( textureDef.depthBufferFormat != PF_UNKNOWN )
-                    rt->setDesiredDepthBufferFormat( textureDef.depthBufferFormat );
-                newChannel.target = rt;
-                newChannel.textures.push_back( tex );
-            }
-            else
-            {
-                //MRT
-                MultiRenderTarget* mrt = mRenderSystem->createMultiRenderTarget( textureName );
-                PixelFormatList::const_iterator pixIt = textureDef.formatList.begin();
-                PixelFormatList::const_iterator pixEn = textureDef.formatList.end();
-
-                mrt->setDepthBufferPool( textureDef.depthBufferId );
-                if( !PixelUtil::isDepth( textureDef.formatList[0] ) )
-                    mrt->setPreferDepthTexture( textureDef.preferDepthTexture );
-                if( textureDef.depthBufferFormat != PF_UNKNOWN )
-                    mrt->setDesiredDepthBufferFormat( textureDef.depthBufferFormat );
-                newChannel.target = mrt;
-
-                while( pixIt != pixEn )
-                {
-                    size_t rtNum = pixIt - textureDef.formatList.begin();
-                    TexturePtr tex = TextureManager::getSingleton().createManual(
-                                                textureName + StringConverter::toString( rtNum ),
-                                                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                                textureDef.textureType, width, height,
-                                                textureDef.depth, 0,
-                                                *pixIt, (int)texUsageFlags, 0, textureDef.hwGammaWrite,
-                                                textureDef.fsaa, BLANKSTRING, false,
-                                                textureDef.depthBufferId !=
-                                                        DepthBuffer::POOL_NON_SHAREABLE );
-                    RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-                    mrt->bindSurface( rtNum, rt );
-                    newChannel.textures.push_back( tex );
-                    ++pixIt;
-                }
-            }
-        }
-
-        return newChannel;
     }
     //-----------------------------------------------------------------------------------
     //An Input Iterator that is the same as doing vector<int> val( N ); and goes in increasing
@@ -346,6 +296,23 @@ namespace Ogre
             return fDistL < fDistR;
         }
     };
+    class SortByLightTypeCmp
+    {
+        LightListInfo const *mLightList;
+
+    public:
+        SortByLightTypeCmp( LightListInfo const *lightList ) :
+            mLightList( lightList )
+        {
+        }
+
+        bool operator()( size_t _l, size_t _r ) const
+        {
+            assert( _l < mLightList->lights.size() ); //This should never happen.
+            assert( _r < mLightList->lights.size() ); //This should never happen.
+            return mLightList->lights[_l]->getType() < mLightList->lights[_r]->getType();
+        }
+    };
     void CompositorShadowNode::buildClosestLightList( Camera *newCamera, const Camera *lodCamera )
     {
         const size_t currentFrameCount = mWorkspace->getFrameCount();
@@ -365,29 +332,33 @@ namespace Ogre
         uint32 combinedVisibilityFlags = viewport->getVisibilityMask() &
                                             sceneManager->getVisibilityMask();
 
+        clearShadowCastingLights( globalLightList );
+
         size_t startIndex = 0;
-        const size_t numLights = std::min( mDefinition->mNumLights, globalLightList.lights.size() );
-        mShadowMapCastingLights.clear();
-        mShadowMapCastingLights.reserve( numLights );
-        mAffectedLights.clear();
-        mAffectedLights.resize( globalLightList.lights.size(), false );
+        size_t begEmptyLightIdx = 0;
+        size_t nxtEmptyLightIdx = 0;
+        findNextEmptyShadowCastingLightEntry( 1u << Light::LT_DIRECTIONAL,
+                                              &begEmptyLightIdx, &nxtEmptyLightIdx );
 
         {
-            //SceneManager put the directional lights first. Add them first as casters.
+            //SceneManager puts the directional lights first. Add them first as casters.
             LightArray::const_iterator itor = globalLightList.lights.begin();
             LightArray::const_iterator end  = globalLightList.lights.end();
 
             uint32 const * RESTRICT_ALIAS visibilityMask = globalLightList.visibilityMask;
 
             while( itor != end && (*itor)->getType() == Light::LT_DIRECTIONAL &&
-                   mShadowMapCastingLights.size() < numLights )
+                   nxtEmptyLightIdx < mShadowMapCastingLights.size() )
             {
                 if( (*visibilityMask & combinedVisibilityFlags) &&
                     (*visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) )
                 {
                     const size_t listIdx = itor - globalLightList.lights.begin();
                     mAffectedLights[listIdx] = true;
-                    mShadowMapCastingLights.push_back( LightClosest( *itor, listIdx, 0 ) );
+                    mShadowMapCastingLights[nxtEmptyLightIdx] = LightClosest( *itor, listIdx, 0 );
+                    findNextEmptyShadowCastingLightEntry( 1u << Light::LT_DIRECTIONAL,
+                                                          &begEmptyLightIdx, &nxtEmptyLightIdx );
+                    ++mNumActiveShadowMapCastingLights;
                 }
 
                 ++visibilityMask;
@@ -403,40 +374,153 @@ namespace Ogre
 
         const Vector3 &camPos( newCamera->getDerivedPosition() );
 
-        vector<size_t>::type sortedIndexes;
-        sortedIndexes.resize( numLights - mShadowMapCastingLights.size(), ~0 );
+        const size_t numTmpSortedLights = std::min( mShadowMapCastingLights.size() - begEmptyLightIdx,
+                                                    globalLightList.lights.size() - startIndex );
+
+        mTmpSortedIndexes.resize( numTmpSortedLights, ~0 );
         std::partial_sort_copy( MemoryLessInputIterator( startIndex ),
                             MemoryLessInputIterator( globalLightList.lights.size() ),
-                            sortedIndexes.begin(), sortedIndexes.end(),
+                            mTmpSortedIndexes.begin(), mTmpSortedIndexes.end(),
                             ShadowMappingLightCmp( &globalLightList, combinedVisibilityFlags, camPos ) );
 
-        vector<size_t>::type::const_iterator itor = sortedIndexes.begin();
-        vector<size_t>::type::const_iterator end  = sortedIndexes.end();
+        std::sort( mTmpSortedIndexes.begin(), mTmpSortedIndexes.end(),
+                   SortByLightTypeCmp( &globalLightList ) );
+
+        vector<size_t>::type::const_iterator itor = mTmpSortedIndexes.begin();
+        vector<size_t>::type::const_iterator end  = mTmpSortedIndexes.end();
 
         while( itor != end )
         {
+            assert( *itor < globalLightList.lights.size() ); //This should never happen.
+
             uint32 visibilityMask = globalLightList.visibilityMask[*itor];
             if( !(visibilityMask & combinedVisibilityFlags) ||
-                !(visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) )
+                !(visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) ||
+                begEmptyLightIdx >= mShadowMapCastingLights.size() )
             {
                 break;
             }
 
-            mAffectedLights[*itor] = true;
-            mShadowMapCastingLights.push_back( LightClosest( globalLightList.lights[*itor], *itor, 0 ) );
+            findNextEmptyShadowCastingLightEntry( 1u << globalLightList.lights[*itor]->getType(),
+                                                  &begEmptyLightIdx, &nxtEmptyLightIdx );
+
+            if( nxtEmptyLightIdx < mShadowMapCastingLights.size() )
+            {
+                mAffectedLights[*itor] = true;
+                mShadowMapCastingLights[nxtEmptyLightIdx] =
+                        LightClosest( globalLightList.lights[*itor], *itor, 0 );
+                ++mNumActiveShadowMapCastingLights;
+            }
             ++itor;
         }
+
+        restoreStaticShadowCastingLights( globalLightList );
 
         mCastersBox = sceneManager->_calculateCurrentCastersBox( viewport->getVisibilityMask(),
                                                                  mDefinition->mMinRq,
                                                                  mDefinition->mMaxRq );
     }
     //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::findNextEmptyShadowCastingLightEntry(
+            uint8 lightTypeMask,
+            size_t * RESTRICT_ALIAS startIdx,
+            size_t * RESTRICT_ALIAS entryToUse ) const
+    {
+        size_t lightIdx = *startIdx;
+
+        size_t newStartIdx = mShadowMapCastingLights.size();
+
+        LightClosestArray::const_iterator itCastingLight = mShadowMapCastingLights.begin() + lightIdx;
+        LightClosestArray::const_iterator enCastingLight = mShadowMapCastingLights.end();
+        while( itCastingLight != enCastingLight )
+        {
+            if( !itCastingLight->light )
+            {
+                newStartIdx = std::min( lightIdx, newStartIdx );
+                if( mDefinition->mLightTypesMask[lightIdx] & lightTypeMask )
+                {
+                    *startIdx = newStartIdx;
+                    *entryToUse = lightIdx;
+                    return;
+                }
+            }
+
+            ++lightIdx;
+            ++itCastingLight;
+        }
+
+        //If we get here entryToUse == mShadowMapCastingLights.size() but startIdx may still
+        //be valid (we found no entry that supports the requested light type but there could
+        //still be empty entries for other types of light)
+        *startIdx = newStartIdx;
+        *entryToUse = lightIdx;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::clearShadowCastingLights( const LightListInfo &globalLightList )
+    {
+        mAffectedLights.clear();
+        //Reserve last place for avoid crashing with static
+        //lights that weren't collected into globalLightList
+        mAffectedLights.resize( globalLightList.lights.size() + 1u, false );
+
+        mNumActiveShadowMapCastingLights = 0;
+
+        LightClosestArray::iterator itor = mShadowMapCastingLights.begin();
+        LightClosestArray::iterator end  = mShadowMapCastingLights.end();
+
+        while( itor != end )
+        {
+            if( !itor->isStatic )
+            {
+                *itor = LightClosest();
+            }
+            else
+            {
+                LightArray::const_iterator it = std::find( globalLightList.lights.begin(),
+                                                           globalLightList.lights.end(),
+                                                           itor->light );
+
+                if( it != globalLightList.lights.end() )
+                {
+                    itor->globalIndex = it - globalLightList.lights.begin();
+                    mAffectedLights[itor->globalIndex] = true;
+
+                    //Force this light to "not cast shadow" to fool buildClosestLightList
+                    //and prevent assigning this light into any other shadow map by accident
+                    itor->light->setCastShadows( false );
+                    globalLightList.visibilityMask[itor->globalIndex] =itor->light->getVisibilityFlags();
+                }
+                else
+                {
+                    itor->globalIndex = mAffectedLights.size() - 1u;
+                }
+
+                ++mNumActiveShadowMapCastingLights;
+            }
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::restoreStaticShadowCastingLights( const LightListInfo &globalLightList )
+    {
+        LightClosestArray::iterator itor = mShadowMapCastingLights.begin();
+        LightClosestArray::iterator end  = mShadowMapCastingLights.end();
+
+        while( itor != end )
+        {
+            if( itor->isStatic && itor->globalIndex < globalLightList.lights.size() )
+            {
+                itor->light->setCastShadows( true );
+                globalLightList.visibilityMask[itor->globalIndex] = itor->light->getVisibilityFlags();
+            }
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorShadowNode::_update( Camera* camera, const Camera *lodCamera,
                                         SceneManager *sceneManager )
     {
         ShadowMapCameraVec::iterator itShadowCamera = mShadowMapCameras.begin();
-        const Viewport *viewport    = camera->getLastViewport();
 
         buildClosestLightList( camera, lodCamera );
 
@@ -448,15 +532,17 @@ namespace Ogre
 
         while( itor != end )
         {
-            if( itor->light < mShadowMapCastingLights.size() )
-            {
-                Light const *light = mShadowMapCastingLights[itor->light].light;
+            Light const *light = mShadowMapCastingLights[itor->light].light;
 
+            if( light )
+            {
                 Camera *texCamera = itShadowCamera->camera;
 
                 //Use the material scheme of the main viewport
                 //This is required to pick up the correct shadow_caster_material and similar properties.
-                texCamera->getLastViewport()->setMaterialScheme( viewport->getMaterialScheme() );
+                //dark_sylinc: removed. It's losing usefulness (Hlms), and it's broken (CompositorPassScene
+                //will overwrite it anyway)
+                //texCamera->getLastViewport()->setMaterialScheme( viewport->getMaterialScheme() );
 
                 // Associate main view camera as LOD camera
                 texCamera->setLodCamera( lodCamera );
@@ -492,8 +578,15 @@ namespace Ogre
                     }
                 }
 
+                //Set the viewport to 0, to explictly crash if accidentally using it. Compositors
+                //may have many passes of different sizes and resolutions that affect the same shadow
+                //map and it's impossible to tell which one is "the main one" (if there's any)
+                texCamera->_notifyViewport( 0 );
+
+                const Vector2 vpRealSize = itShadowCamera->scenePassesViewportSize[light->getType()];
                 itShadowCamera->shadowCameraSetup->getShadowCamera( sceneManager, camera, light,
-                                                                    texCamera, itor->split );
+                                                                    texCamera, itor->split,
+                                                                    vpRealSize );
 
                 itShadowCamera->minDistance = itShadowCamera->shadowCameraSetup->getMinDistance();
                 itShadowCamera->maxDistance = itShadowCamera->shadowCameraSetup->getMaxDistance();
@@ -512,24 +605,61 @@ namespace Ogre
         CompositorNode::_update( lodCamera, sceneManager );
 
         sceneManager->_setCurrentRenderStage( previous );
+
+        {
+            LightClosestArray::iterator itor = mShadowMapCastingLights.begin();
+            LightClosestArray::iterator end  = mShadowMapCastingLights.end();
+
+            while( itor != end )
+            {
+                itor->isDirty = false;
+                ++itor;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::postInitializePass( CompositorPass *pass )
     {
         const CompositorPassDef *passDef = pass->getDefinition();
-        const ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
 
-        assert( (!smCamera.camera->getLastViewport() ||
-                smCamera.camera->getLastViewport() == pass->getViewport()) &&
-                "Two scene passes to the same shadow map have different viewport!" );
-
-        smCamera.camera->_notifyViewport( pass->getViewport() );
-
-        if( passDef->getType() == PASS_SCENE )
+        //passDef->mShadowMapIdx may be invalid if this is not a pass
+        //tied to a shadow map in particular (e.g. clearing an atlas)
+        if( passDef->mShadowMapIdx < mShadowMapCameras.size() )
         {
-            assert( dynamic_cast<CompositorPassScene*>(pass) );
-            static_cast<CompositorPassScene*>(pass)->_setCustomCamera( smCamera.camera );
-            static_cast<CompositorPassScene*>(pass)->_setCustomCullCamera( smCamera.camera );
+            if( passDef->getType() == PASS_SCENE )
+            {
+                ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
+
+                const Viewport *vp = pass->getViewport();
+                const Vector2 vpSize = Vector2( vp->getActualWidth(), vp->getActualHeight() );
+
+                const CompositorTargetDef *targetPass = passDef->getParentTargetDef();
+                uint8 lightTypesLeft = targetPass->getShadowMapSupportedLightTypes();
+
+                //Get the viewport size set for this shadow node (which may vary per light type,
+                //but for the same light type, it must remain constant for all passes to the
+                //same shadow map)
+                uint32 firstBitSet = ctz( lightTypesLeft );
+                while( firstBitSet != 32u )
+                {
+                    assert( smCamera.scenePassesViewportSize[firstBitSet].x < Real( 0.0 ) ||
+                            smCamera.scenePassesViewportSize[firstBitSet].x < Real( 0.0 ) ||
+                            smCamera.scenePassesViewportSize[firstBitSet] == vpSize &&
+                            "Two scene passes to the same shadow map have different viewport sizes! "
+                            "Ogre cannot determine how to prevent jittering. Maybe you meant assign "
+                            "assign each light types to different passes but you assigned more than "
+                            "one light type (or the wrong one) to the same pass?" );
+
+                    smCamera.scenePassesViewportSize[firstBitSet] = vpSize;
+
+                    lightTypesLeft &= ~(1u << ((uint8)firstBitSet));
+                    firstBitSet = ctz( lightTypesLeft );
+                }
+
+                assert( dynamic_cast<CompositorPassScene*>(pass) );
+                static_cast<CompositorPassScene*>(pass)->_setCustomCamera( smCamera.camera );
+                static_cast<CompositorPassScene*>(pass)->_setCustomCullCamera( smCamera.camera );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
@@ -636,20 +766,64 @@ namespace Ogre
         return &mCurrentLightList;
     }
     //-----------------------------------------------------------------------------------
+    bool CompositorShadowNode::isShadowMapIdxInValidRange( uint32 shadowMapIdx ) const
+    {
+        return shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size();
+    }
+    //-----------------------------------------------------------------------------------
     bool CompositorShadowNode::isShadowMapIdxActive( uint32 shadowMapIdx ) const
     {
         if( shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size() )
         {
-            //TODO: This does not account missing PSSM directional lights (Pbs shaders don't either).
-            //Or shadow maps exclusive to a lights type (also TODO).
             const ShadowTextureDefinition &shadowTexDef =
                     mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
-            return shadowTexDef.light < mShadowMapCastingLights.size();
+            return mShadowMapCastingLights[shadowTexDef.light].light != 0;
         }
         else
         {
-            return false;
+            return true;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    bool CompositorShadowNode::_shouldUpdateShadowMapIdx( uint32 shadowMapIdx ) const
+    {
+        bool retVal = true;
+
+        if( shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size() )
+        {
+            const ShadowTextureDefinition &shadowTexDef =
+                    mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+
+            if( !mShadowMapCastingLights[shadowTexDef.light].light ||
+                (mShadowMapCastingLights[shadowTexDef.light].isStatic &&
+                !mShadowMapCastingLights[shadowTexDef.light].isDirty ) )
+            {
+                retVal = false;
+            }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    uint8 CompositorShadowNode::getShadowMapLightTypeMask( uint32 shadowMapIdx ) const
+    {
+        const ShadowTextureDefinition &shadowTexDef =
+                mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+        return 1u << mShadowMapCastingLights[shadowTexDef.light].light->getType();
+    }
+    //-----------------------------------------------------------------------------------
+    const Light* CompositorShadowNode::getLightAssociatedWith( uint32 shadowMapIdx ) const
+    {
+        Light const *retVal = 0;
+
+        if( shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size() )
+        {
+            const ShadowTextureDefinition &shadowTexDef =
+                    mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+            retVal = mShadowMapCastingLights[shadowTexDef.light].light;
+        }
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::getMinMaxDepthRange( const Frustum *shadowMapCamera,
@@ -682,7 +856,18 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Matrix4 CompositorShadowNode::getViewProjectionMatrix( size_t shadowMapIdx ) const
     {
-        return PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE *
+        const ShadowTextureDefinition &shadowTexDef =
+                mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+        Matrix4 clipToImageSpace;
+
+        Vector3 vScale(  0.5f * shadowTexDef.uvLength.x,
+                        -0.5f * shadowTexDef.uvLength.y, 1.0f );
+        clipToImageSpace.makeTransform( Vector3(  vScale.x + shadowTexDef.uvOffset.x,
+                                                 -vScale.y + shadowTexDef.uvOffset.y, 0.0f ),
+                                        Vector3(  vScale.x, vScale.y, 1.0f ),
+                                        Quaternion::IDENTITY );
+
+        return /*PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE*/clipToImageSpace *
                 mShadowMapCameras[shadowMapIdx].camera->getProjectionMatrixWithRSDepth() *
                 mShadowMapCameras[shadowMapIdx].camera->getViewMatrix( true );
     }
@@ -694,7 +879,8 @@ namespace Ogre
         if( shadowMapIdx < mShadowMapCastingLights.size() )
         {
             if( mDefinition->mShadowMapTexDefinitions[shadowMapIdx].shadowMapTechnique ==
-                SHADOWMAP_PSSM )
+                SHADOWMAP_PSSM &&
+                isShadowMapIdxActive( shadowMapIdx ) )
             {
                 assert( dynamic_cast<PSSMShadowCameraSetup*>(
                         mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() ) );
@@ -708,66 +894,75 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    uint32 CompositorShadowNode::getIndexToContiguousShadowMapTex( size_t shadowMapIdx ) const
+    {
+        return mShadowMapCameras[shadowMapIdx].idxToContiguousTex;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::setLightFixedToShadowMap( size_t shadowMapIdx, Light *light )
+    {
+        assert( shadowMapIdx < mShadowMapCameras.size() );
+
+        const size_t lightIdx = mDefinition->mShadowMapTexDefinitions[shadowMapIdx].light;
+        assert( (!light ||
+                mDefinition->mLightTypesMask[lightIdx] & (1u << light->getType())) &&
+                "The shadow map says that type of light is not supported!" );
+
+        mShadowMapCastingLights[lightIdx].light = light;
+        mShadowMapCastingLights[lightIdx].isStatic = light != 0;
+        mShadowMapCastingLights[lightIdx].isDirty = true;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::setStaticShadowMapDirty( size_t shadowMapIdx, bool includeLinked )
+    {
+        assert( shadowMapIdx < mShadowMapCameras.size() );
+
+        const ShadowTextureDefinition &shadowTexDef =
+                mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+        const size_t lightIdx = mDefinition->mShadowMapTexDefinitions[shadowMapIdx].light;
+        assert( mShadowMapCastingLights[lightIdx].isStatic &&
+                "Shadow Map is not static! Did you forget to call setLightFixedToShadowMap?" );
+
+        mShadowMapCastingLights[lightIdx].isDirty = true;
+
+        if( includeLinked )
+        {
+            CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
+                    mDefinition->mShadowMapTexDefinitions.begin();
+            CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end =
+                    mDefinition->mShadowMapTexDefinitions.end();
+
+            while( itor != end )
+            {
+                if( shadowTexDef.getTextureName() == itor->getTextureName() )
+                    mShadowMapCastingLights[itor->light].isDirty = true;
+
+                ++itor;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorShadowNode::finalTargetResized( const RenderTarget *finalTarget )
     {
-        CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
-                                                        mDefinition->mShadowMapTexDefinitions.begin();
-        CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end  =
-                                                        mDefinition->mShadowMapTexDefinitions.end();
+        CompositorNode::finalTargetResized( finalTarget );
 
-        CompositorChannelVec::iterator itorTex = mLocalTextures.begin();
+        mContiguousShadowMapTex.clear();
+
+        CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itDef =
+                mDefinition->mShadowMapTexDefinitions.begin();
+        ShadowMapCameraVec::const_iterator itor = mShadowMapCameras.begin();
+        ShadowMapCameraVec::const_iterator end  = mShadowMapCameras.end();
 
         while( itor != end )
         {
-            if( (itor->width == 0 || itor->height == 0) && itorTex->isValid() )
+            if( itor->idxToContiguousTex >= mContiguousShadowMapTex.size() )
             {
-                for( size_t i=0; i<itorTex->textures.size(); ++i )
-                    TextureManager::getSingleton().remove( itorTex->textures[i]->getName() );
-
-                CompositorChannel newChannel = createShadowTexture( *itor, finalTarget );
-
-                CompositorPassVec::const_iterator passIt = mPasses.begin();
-                CompositorPassVec::const_iterator passEn = mPasses.end();
-                while( passIt != passEn )
-                {
-                    (*passIt)->notifyRecreated( *itorTex, newChannel );
-                    ++passIt;
-                }
-
-                CompositorNodeVec::const_iterator itNodes = mConnectedNodes.begin();
-                CompositorNodeVec::const_iterator enNodes = mConnectedNodes.end();
-
-                while( itNodes != enNodes )
-                {
-                    (*itNodes)->notifyRecreated( *itorTex, newChannel );
-                    ++itNodes;
-                }
-
-                if( !itorTex->isMrt() )
-                    mRenderSystem->destroyRenderTarget( itorTex->target->getName() );
-
-                *itorTex = newChannel;
+                mContiguousShadowMapTex.push_back(
+                            mLocalTextures[itor->idxToLocalTextures].textures[itDef->mrtIndex] );
             }
-            ++itorTex;
+
+            ++itDef;
             ++itor;
         }
-
-        //Now recreate the regular textures (i.e. local textures used for
-        //postprocessing and ping-ponging, which aren't shadow maps)
-        CompositorChannelVec normalLocalTextures;
-        const size_t normalStart = mDefinition->mShadowMapTexDefinitions.size();
-        normalLocalTextures.reserve( mLocalTextures.size() - normalStart );
-        normalLocalTextures.insert( normalLocalTextures.end(), mLocalTextures.begin() + normalStart,
-                                                                mLocalTextures.end() );
-        TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs, normalLocalTextures,
-                                                            finalTarget, mRenderSystem, mConnectedNodes,
-                                                            &mPasses );
-        mLocalTextures.erase( mLocalTextures.begin() + normalStart, mLocalTextures.end() );
-        mLocalTextures.insert( mLocalTextures.end(), normalLocalTextures.begin(),
-                                                     normalLocalTextures.end() );
-
-        TextureDefinitionBase::recreateResizableBuffers( mDefinition->mLocalBufferDefs, mBuffers,
-                                                         finalTarget, mRenderSystem, mConnectedNodes,
-                                                         &mPasses );
     }
 }

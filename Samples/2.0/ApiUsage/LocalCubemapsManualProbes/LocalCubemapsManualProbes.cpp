@@ -52,12 +52,8 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[9] =
+            const char *c_locations[5] =
             {
-                "2.0/scripts/materials/Common",
-                "2.0/scripts/materials/Common/GLSL",
-                "2.0/scripts/materials/Common/HLSL",
-                "2.0/scripts/materials/Common/Metal",
                 "2.0/scripts/materials/LocalCubemaps/",
                 "2.0/scripts/materials/LocalCubemaps/GLSL",
                 "2.0/scripts/materials/LocalCubemaps/HLSL",
@@ -65,7 +61,7 @@ namespace Demo
                 "2.0/scripts/materials/TutorialSky_Postprocess"
             };
 
-            for( size_t i=0; i<9; ++i )
+            for( size_t i=0; i<5; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );

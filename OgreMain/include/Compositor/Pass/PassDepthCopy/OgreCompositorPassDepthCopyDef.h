@@ -69,8 +69,9 @@ namespace Ogre
 
     public:
 
-        CompositorPassDepthCopyDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :
-            CompositorPassDef( PASS_DEPTHCOPY, rtIndex ),
+        CompositorPassDepthCopyDef( CompositorNodeDef *parentNodeDef,
+                                    CompositorTargetDef *parentTargetDef ) :
+            CompositorPassDef( PASS_DEPTHCOPY, parentTargetDef ),
             mAliasDepthBufferOnCopyFailure( false ),
             mParentNodeDef( parentNodeDef )
         {

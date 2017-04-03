@@ -24,25 +24,29 @@ compositor_node_shadow Tutorial_TerrainShadowNode
 {
 	technique pssm
 
+	texture atlas 3072 2048 PF_D32_FLOAT no_fsaa
+
 	num_splits		3
 	pssm_lambda		0.95
-	shadow_map 0 2048 2048 PF_D32_FLOAT light 0 split 0
-	shadow_map 1 1024 1024 PF_D32_FLOAT light 0 split 1
-	shadow_map 2 1024 1024 PF_D32_FLOAT light 0 split 2
+	shadow_map 0 atlas uv 0.000000000000000 0.0 0.666666666666667 1.0 light 0 split 0
+	shadow_map 1 atlas uv 0.666666666666667 0.0 0.333333333333333 0.5 light 0 split 1
+	shadow_map 2 atlas uv 0.666666666666667 0.5 0.333333333333333 0.5 light 0 split 2
 
-	technique focused
-	//shadow_map 4 2048 2048 PF_D32_FLOAT light 1
-	//shadow_map 5 2048 2048 PF_D32_FLOAT light 2
-
-	//shadow_map 0 1 2 4 5
-	shadow_map 0 1 2
+	target atlas
 	{
 		pass clear
 		{
 			colour_value 1 1 1 1
 		}
-		pass render_scene
+	}
+
+	shadow_map_target_type directional
+	{
+		shadow_map 0 1 2
 		{
+			pass render_scene
+			{
+			}
 		}
 	}
 }

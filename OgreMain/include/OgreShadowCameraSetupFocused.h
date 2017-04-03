@@ -69,8 +69,9 @@ namespace Ogre {
 
         /** Returns a uniform shadow camera with a focused view.
         */
-        virtual void getShadowCamera(const SceneManager *sm, const Camera *cam, 
-                                    const Light *light, Camera *texCam, size_t iteration) const;
+        virtual void getShadowCamera( const SceneManager *sm, const Camera *cam,
+                                      const Light *light, Camera *texCam, size_t iteration,
+                                      const Vector2 &viewportRealSize ) const;
 
     };
 

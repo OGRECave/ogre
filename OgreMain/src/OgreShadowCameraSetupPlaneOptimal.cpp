@@ -294,8 +294,10 @@ namespace Ogre
     PlaneOptimalShadowCameraSetup::~PlaneOptimalShadowCameraSetup() {}
 
     /// Implements the plane optimal shadow camera setup algorithm
-    void PlaneOptimalShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-                        const Light *light, Camera *texCam, size_t iteration) const
+    void PlaneOptimalShadowCameraSetup::getShadowCamera( const SceneManager *sm, const Camera *cam,
+                                                         const Light *light, Camera *texCam,
+                                                         size_t iteration,
+                                                         const Vector2 &viewportRealSize ) const
     {
         // get the plane transformed by the parent node(s)
         // Also, make sure the plane is normalized

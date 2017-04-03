@@ -560,7 +560,7 @@ namespace Ogre
 
         if( !casterPass )
         {
-            int32 numShadowMaps = getProperty( HlmsBaseProp::NumShadowMaps );
+            int32 numShadowMaps = getProperty( HlmsBaseProp::NumShadowMapLights );
             mPreparedPass.vertexShaderSharedBuffer.clear();
             mPreparedPass.vertexShaderSharedBuffer.reserve( (16 + 2) * numShadowMaps + 16 * 2 );
 

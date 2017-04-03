@@ -278,7 +278,7 @@ namespace Ogre{
     protected:
         CompositorShadowNodeDef *mShadowNodeDef;
         void translateShadowMapProperty( PropertyAbstractNode *prop, ScriptCompiler *compiler,
-                                         bool isAtlas, const ShadowTextureDefinition &defaultParams ) const;
+                                         const ShadowTextureDefinition &defaultParams ) const;
     public:
         CompositorShadowNodeTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
@@ -289,6 +289,20 @@ namespace Ogre{
         CompositorTargetDef *mTargetDef;
     public:
         CompositorTargetTranslator();
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+    };
+    class _OgreExport CompositorShadowMapTargetTypeTranslator : public ScriptTranslator
+    {
+    public:
+        CompositorShadowMapTargetTypeTranslator();
+        static size_t calculateNumTargets( const AbstractNodePtr &node );
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+    };
+    class _OgreExport CompositorShadowMapRepeatTranslator : public ScriptTranslator
+    {
+    public:
+        CompositorShadowMapRepeatTranslator();
+        static size_t calculateNumTargets( const AbstractNodePtr &node );
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     };
     class _OgreExport CompositorShadowMapTargetTranslator : public ScriptTranslator
@@ -350,6 +364,8 @@ namespace Ogre{
         CompositorNodeTranslator mCompositorNodeTranslator;
         CompositorShadowNodeTranslator mCompositorShadowNodeTranslator;
         CompositorTargetTranslator mCompositorTargetTranslator;
+        CompositorShadowMapTargetTypeTranslator mCompositorShadowMapTargetTypeTranslator;
+        CompositorShadowMapRepeatTranslator mCompositorShadowMapRepeatTranslator;
         CompositorShadowMapTargetTranslator mCompositorShadowMapTargetTranslator;
         CompositorPassTranslator mCompositorPassTranslator;
     public:

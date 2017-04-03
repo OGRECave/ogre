@@ -132,8 +132,8 @@ namespace Ogre
         */
         String          mMaterialScheme;
 
-        CompositorPassSceneDef( uint32 rtIndex ) :
-            CompositorPassDef( PASS_SCENE, rtIndex ),
+        CompositorPassSceneDef( CompositorTargetDef *parentTargetDef ) :
+            CompositorPassDef( PASS_SCENE, parentTargetDef ),
             mVisibilityMask( VisibilityFlags::RESERVED_VISIBILITY_FLAGS ),
             mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
             mFirstRQ( 0 ),

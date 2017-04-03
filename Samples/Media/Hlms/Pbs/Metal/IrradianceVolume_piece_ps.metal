@@ -1,9 +1,9 @@
 @property( irradiance_volumes )
 @piece( applyIrradianceVolumes )
-	float3 worldNormal = nNormal.xyz * toMat3x3( pass.invView );
-	float3 worldPos = ( float4( inPs.pos.xyz, 1.0 ) * pass.invView ).xyz;
+	float3 worldNormal = nNormal.xyz * toMat3x3( passBuf.invView );
+	float3 worldPos = ( float4( inPs.pos.xyz, 1.0 ) * passBuf.invView ).xyz;
 
-	float3 irradiancePos = worldPos.xyz * pass.irradianceSize.xyz - pass.irradianceOrigin.xyz;
+	float3 irradiancePos = worldPos.xyz * passBuf.irradianceSize.xyz - passBuf.irradianceOrigin.xyz;
 	//Floor irradiancePos.y and put the fractional part so we can mix.
 	irradiancePos.y -= 0.5f;	//Texel centers are at center. Move it to origin.
 	float origYPos;
@@ -32,7 +32,7 @@
 	filtering around the Y axis)
 	**/
 
-	float irradianceTexInvHeight = pass.irradianceSize.w;
+	float irradianceTexInvHeight = passBuf.irradianceSize.w;
 
 	irradiancePos.y		= (origYPos + isNegative.x) * irradianceTexInvHeight;
 	float3 xAmbientSample	= irradianceVolume.sample( irradianceVolumeSampler, irradiancePos ).xyz;
@@ -60,7 +60,7 @@
 	float3 ambientTerm =	worldNormalSq.x * xAmbientSample.xyz +
 							worldNormalSq.y * yAmbientSample.xyz +
 							worldNormalSq.z * zAmbientSample.xyz;
-	ambientTerm *= pass.irradianceOrigin.w; //irradianceOrigin.w = irradianceMaxPower
+	ambientTerm *= passBuf.irradianceOrigin.w; //irradianceOrigin.w = irradianceMaxPower
 
 	if( irradiancePos.x < 0 || irradiancePos.x > 1 ||
 		irradiancePos.z < 0 || irradiancePos.z > 1 ||

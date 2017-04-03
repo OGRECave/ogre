@@ -534,7 +534,8 @@ namespace Ogre {
         /// Current Viewport
         Viewport* mCurrentViewport;
 
-        CompositorShadowNode*   mCurrentShadowNode;
+        CompositorPass          *mCurrentPass;
+        CompositorShadowNode    *mCurrentShadowNode;
         bool                    mShadowNodeIsReused;
 
         /// Root scene node
@@ -2725,6 +2726,10 @@ namespace Ogre {
             techniques may be used for hardware fallback.
         */
         virtual void setShadowTextureCasterMaterial(const String& name);
+
+        void _setCurrentCompositorPass( CompositorPass *pass );
+        /// Note: May be null.
+        const CompositorPass* getCurrentCompositorPass(void) const      { return mCurrentPass; }
 
         void _setCurrentShadowNode( CompositorShadowNode *shadowNode, bool isReused );
         const CompositorShadowNode* getCurrentShadowNode(void) const    { return mCurrentShadowNode; }

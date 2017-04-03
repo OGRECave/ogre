@@ -44,8 +44,9 @@ namespace Ogre
     DefaultShadowCameraSetup::~DefaultShadowCameraSetup() {}
     
     /// Default shadow camera setup implementation
-    void DefaultShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-                                    const Light *light, Camera *texCam, size_t iteration) const
+    void DefaultShadowCameraSetup::getShadowCamera( const SceneManager *sm, const Camera *cam,
+                                                    const Light *light, Camera *texCam, size_t iteration,
+                                                    const Vector2 &viewportRealSize ) const
     {
         Vector3 pos, dir;
 
@@ -100,7 +101,7 @@ namespace Ogre
             //~ pos.x -= fmod(pos.x, worldTexelSize);
             //~ pos.y -= fmod(pos.y, worldTexelSize);
             //~ pos.z -= fmod(pos.z, worldTexelSize);
-            Real worldTexelSize = (shadowDist * 2) / texCam->getLastViewport()->getActualWidth();
+            Vector2 worldTexelSize = (shadowDist * 2) / viewportRealSize;
 
              //get texCam orientation
 
@@ -124,8 +125,8 @@ namespace Ogre
              Vector3 lightSpacePos = q.Inverse() * pos;
              
              //snap to nearest texel
-             lightSpacePos.x -= fmod(lightSpacePos.x, worldTexelSize);
-             lightSpacePos.y -= fmod(lightSpacePos.y, worldTexelSize);
+             lightSpacePos.x -= fmod(lightSpacePos.x, worldTexelSize.x);
+             lightSpacePos.y -= fmod(lightSpacePos.y, worldTexelSize.y);
 
              //convert back to world space
              pos = q * lightSpacePos;
@@ -157,53 +158,8 @@ namespace Ogre
         {
             // Set perspective projection
             texCam->setProjectionType(PT_PERSPECTIVE);
-            // Use 120 degree FOV for point light to ensure coverage more area
-            texCam->setFOVy(Degree(120));
-
-            // Calculate look at position
-            // We want to look at a spot shadowOffset away from near plane
-            // 0.5 is a little too close for angles
-            Vector3 target = cam->getDerivedPosition() + 
-                (cam->getDerivedDirection() * shadowOffset);
-
-            // Calculate position, which same as point light position
-            pos = light->getParentNode()->_getDerivedPosition();
-
-            dir = (pos - target); // backwards since point down -z
-            dir.normalise();
-
-            // Calculate orientation based on direction calculated above
-            /*
-            // Next section (camera oriented shadow map) abandoned
-            // Always point in the same direction, if we don't do this then
-            // we get 'shadow swimming' as camera rotates
-            // As it is, we get swimming on moving but this is less noticeable
-
-            // calculate up vector, we want it aligned with cam direction
-            Vector3 up = cam->getDerivedDirection();
-            // Check it's not coincident with dir
-            if (up.dotProduct(dir) >= 1.0f)
-            {
-            // Use camera up
-            up = cam->getUp();
-            }
-            */
-            Vector3 up = Vector3::UNIT_Y;
-            // Check it's not coincident with dir
-            if (Math::Abs(up.dotProduct(dir)) >= 1.0f)
-            {
-                // Use camera up
-                up = Vector3::UNIT_Z;
-            }
-            // cross twice to rederive, only direction is unaltered
-            Vector3 left = dir.crossProduct(up);
-            left.normalise();
-            up = dir.crossProduct(left);
-            up.normalise();
-            // Derive quaternion from axes
-            Quaternion q;
-            q.FromAxes(left, up, dir);
-            texCam->setOrientation(q);
+            // Use 90 degree FOV for point light
+            texCam->setFOVy( Radian( Math::HALF_PI ) );
         }
     }
 

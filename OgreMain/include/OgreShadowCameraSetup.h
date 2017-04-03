@@ -72,8 +72,9 @@ namespace Ogre {
 
     public:
         /// Function to implement -- must set the shadow camera properties
-        virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 
-                                      const Light *light, Camera *texCam, size_t iteration) const = 0;
+        virtual void getShadowCamera( const SceneManager *sm, const Camera *cam,
+                                      const Light *light, Camera *texCam, size_t iteration,
+                                      const Vector2 &viewportRealSize ) const = 0;
         ShadowCameraSetup() : mMinDistance( 0.0f ), mMaxDistance( 1000000.0f ) {}
         /// Need virtual destructor in case subclasses use it
         virtual ~ShadowCameraSetup() {}
@@ -98,8 +99,9 @@ namespace Ogre {
         virtual ~DefaultShadowCameraSetup();
 
         /// Default shadow camera setup
-        virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 
-                                      const Light *light, Camera *texCam, size_t iteration) const;
+        virtual void getShadowCamera( const SceneManager *sm, const Camera *cam,
+                                      const Light *light, Camera *texCam, size_t iteration,
+                                      const Vector2 &viewportRealSize ) const;
     };
 
     /** @} */

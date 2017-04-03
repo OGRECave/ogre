@@ -169,7 +169,7 @@
 
 	@property( hlms_forwardplus_debug )
 		@property( hlms_forwardplus == forward3d )
-			float occupancy = (totalNumLightsInGrid / pass.f3dGridHWW[0].w);
+			float occupancy = (totalNumLightsInGrid / passBuf.f3dGridHWW[0].w);
 		@end @property( hlms_forwardplus != forward3d )
 			float occupancy = (totalNumLightsInGrid / float( @value( fwd_clustered_lights_per_cell ) ));
 		@end

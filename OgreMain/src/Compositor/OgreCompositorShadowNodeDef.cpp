@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
+#include "OgreLight.h"
+
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 
@@ -57,35 +59,28 @@ namespace Ogre
                         "OgreCompositorShadowNodeDef::addBufferInput" );
     }
     //-----------------------------------------------------------------------------------
-    IdString CompositorShadowNodeDef::addShadowTextureSourceName( const String &name, size_t index,
-                                                                  TextureSource textureSource )
+    void CompositorShadowNodeDef::setNumShadowTextureDefinitions( size_t numTex )
     {
-        if( textureSource == TEXTURE_INPUT )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Shadow Nodes don't support input channels!"
-                            " Shadow Node: '" + mNameStr + "'",
-                            "OgreCompositorShadowNodeDef::addTextureSourceName" );
-        }
-
-        return CompositorNodeDef::addTextureSourceName( name, index, textureSource );
+        mShadowMapTexDefinitions.reserve( numTex );
     }
     //-----------------------------------------------------------------------------------
-    ShadowTextureDefinition* CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx,
-                                                    size_t split, const String &name, bool isAtlas )
+    ShadowTextureDefinition* CompositorShadowNodeDef::addShadowTextureDefinition(
+            size_t lightIdx, size_t split, const String &name, uint8 mrtIndex,
+            const Vector2 &uvOffset, const Vector2 &uvLength, uint8 arrayIdx )
     {
-        if( name.empty() && isAtlas )
+        if( name.empty() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                             "Shadow maps used as atlas can't have empty names."
                             " Light index #" + StringConverter::toString( lightIdx ),
-                            "OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
+                            "CompositorShadowNodeDef::addShadowTextureDefinition" );
         }
-
-        if( !mLocalTextureDefs.empty() )
+        if( name.find( "global_" ) == 0 )
         {
-            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                            "Shadow maps need to be defined before normal textures in a Shadow Node.",
-                            "OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                            "Shadow maps cannot reference global textures!"
+                            " Light index #" + StringConverter::toString( lightIdx ),
+                            "CompositorShadowNodeDef::addShadowTextureDefinition" );
         }
 
         ShadowMapTexDefVec::const_iterator itor = mShadowMapTexDefinitions.begin();
@@ -109,10 +104,10 @@ namespace Ogre
 
         mNumLights += newLight;
 
-        if( !isAtlas )
-            addShadowTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
-        mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name,
+        mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name, mrtIndex,
+                                                                     uvOffset, uvLength, arrayIdx,
                                                                      lightIdx, split ) );
+
         return &mShadowMapTexDefinitions.back();
     }
     //-----------------------------------------------------------------------------------
@@ -125,7 +120,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorShadowNodeDef::_validateAndFinish(void)
     {
-        const Real EPSILON = 1e-6f;
+        mLightTypesMask.resize( mNumLights, 0u );
 
         CompositorTargetDefVec::iterator itor = mTargetPasses.begin();
         CompositorTargetDefVec::iterator end  = mTargetPasses.end();
@@ -150,6 +145,46 @@ namespace Ogre
 
                 pass->mIncludeOverlays = false;
 
+                if( pass->mShadowMapIdx < mShadowMapTexDefinitions.size() )
+                {
+                    const ShadowTextureDefinition &texDef = mShadowMapTexDefinitions[pass->mShadowMapIdx];
+
+                    if( itor->getRenderTargetName() == texDef.getTextureName() &&
+                        !pass->mShadowMapFullViewport )
+                    {
+                        //Only force the viewport settings to the passes
+                        //that directly rendering into the atlas
+                        pass->mVpLeft   = static_cast<float>( texDef.uvOffset.x );
+                        pass->mVpTop    = static_cast<float>( texDef.uvOffset.y );
+                        pass->mVpWidth  = static_cast<float>( texDef.uvLength.x );
+                        pass->mVpHeight = static_cast<float>( texDef.uvLength.y );
+
+                        pass->mVpScissorLeft   = pass->mVpLeft;
+                        pass->mVpScissorTop    = pass->mVpTop;
+                        pass->mVpScissorWidth  = pass->mVpWidth;
+                        pass->mVpScissorHeight = pass->mVpHeight;
+                    }
+
+                    if( texDef.shadowMapTechnique == SHADOWMAP_PSSM )
+                    {
+                        //PSSM only supports directional lights. This is for sure.
+                        itor->setShadowMapSupportedLightTypes( 1u << Light::LT_DIRECTIONAL );
+                    }
+                    else if( itor->getShadowMapSupportedLightTypes() == 0 )
+                    {
+                        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                            "Pass in shadow node " + mNameStr + " is assigned to shadow "
+                            "maps but says it does not support any light type. "
+                            "Did you forget to call setShadowMapSupportedLightTypes?",
+                            "CompositorShadowNodeDef::_validateAndFinish" );
+                    }
+
+                    //Accumulate the types of lights this shadow map supports
+                    //based on the passes that claim to be compatible with it.
+                    const size_t lightIdx = mShadowMapTexDefinitions[pass->mShadowMapIdx].light;
+                    mLightTypesMask[lightIdx] |= itor->getShadowMapSupportedLightTypes();
+                }
+
                 if( pass->getType() == PASS_SCENE )
                 {
                     //assert( dynamic_cast<CompositorPassSceneDef*>( pass ) );
@@ -169,39 +204,6 @@ namespace Ogre
                     passScene->mShadowNodeRecalculation = SHADOW_NODE_CASTER_PASS;
                 }
 
-                //Now check all PASS_SCENE from the same shadow map # render to
-                //the same viewport area (common mistake in case of UV atlas)
-                CompositorPassDefVec::const_iterator it2 = it + 1;
-                while( it2 != en )
-                {
-                    CompositorPassDef *otherPass = *it2;
-                    if( pass->getType() == PASS_SCENE &&
-                        pass->mShadowMapIdx == otherPass->mShadowMapIdx &&
-                        Math::Abs( pass->mVpLeft - otherPass->mVpLeft )     < EPSILON &&
-                        Math::Abs( pass->mVpTop - otherPass->mVpTop )       < EPSILON &&
-                        Math::Abs( pass->mVpWidth - otherPass->mVpWidth )   < EPSILON &&
-                        Math::Abs( pass->mVpHeight - otherPass->mVpHeight ) < EPSILON &&
-                        Math::Abs( pass->mVpScissorLeft - otherPass->mVpScissorLeft )     < EPSILON &&
-                        Math::Abs( pass->mVpScissorTop - otherPass->mVpScissorTop )       < EPSILON &&
-                        Math::Abs( pass->mVpScissorWidth - otherPass->mVpScissorWidth )   < EPSILON &&
-                        Math::Abs( pass->mVpScissorHeight - otherPass->mVpScissorHeight ) < EPSILON )
-                    {
-                        LogManager::getSingleton().logMessage( "WARNING: Not all scene passes render to "
-                                    "the same viewport! Attempting to fix. ShadowNode: '" +
-                                    mName.getFriendlyText() + "' Shadow map index: " +
-                                    StringConverter::toString( pass->mShadowMapIdx ) );
-                        pass->mVpLeft   = otherPass->mVpLeft;
-                        pass->mVpTop    = otherPass->mVpTop;
-                        pass->mVpWidth  = otherPass->mVpWidth;
-                        pass->mVpHeight = otherPass->mVpHeight;
-                        pass->mVpScissorLeft   = otherPass->mVpScissorLeft;
-                        pass->mVpScissorTop    = otherPass->mVpScissorTop;
-                        pass->mVpScissorWidth  = otherPass->mVpScissorWidth;
-                        pass->mVpScissorHeight = otherPass->mVpScissorHeight;
-                    }
-
-                    ++it2;
-                }
                 ++it;
             }
 
@@ -277,6 +279,60 @@ namespace Ogre
             }
 
             ++it1;
+        }
+
+        {
+            //These setups are invalid:
+            //  SP D
+            //  S  D
+            //  P  D
+            //  DS P
+            //  S  P
+            // "SP  D" means: A shadow map that only supports Spot & Point lights comes
+            // before a shadow map that supports directional lights.
+            bool cannotUseType[Light::NUM_LIGHT_TYPES];
+            for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
+                cannotUseType[i] = false;
+
+            LightTypeMaskVec::const_iterator it = mLightTypesMask.begin();
+            LightTypeMaskVec::const_iterator en = mLightTypesMask.end();
+
+            while( it != en )
+            {
+                bool isError = false;
+                for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
+                {
+                    if( *it & (1u << i) && cannotUseType[i] )
+                        isError = true;
+                }
+
+                if( isError )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                        "Error in shadow node " + mNameStr + ": Ogre requires lights to be "
+                        "sent to GPU in the following order: Directional, Point, Spotlight. "
+                        "But your shadow node forces this order to be violated. A shadow map"
+                        " that does not support directional lights cannot come before a "
+                        "shadow map that does support them. A shadow map that "
+                        "does not support point lights but supports spotlights cannot "
+                        "come before a shadow map that supports point lights",
+                        "CompositorShadowNodeDef::_validateAndFinish" );
+                }
+                else
+                {
+                    //A shadow map that does not support directional
+                    //lights cannot come before a shadow map that does.
+                    if( !(*it & (1u << Light::LT_DIRECTIONAL)) )
+                        cannotUseType[Light::LT_DIRECTIONAL] = true;
+
+                    //A shadow map that does not support point lights but supports spotlights
+                    //cannot come before a shadow map that supports point lights.
+                    if( (*it & (1u << Light::LT_SPOTLIGHT)) && !(*it & (1u << Light::LT_POINT)) )
+                        cannotUseType[Light::LT_POINT] = true;
+                }
+
+                ++it;
+            }
         }
     }
 }

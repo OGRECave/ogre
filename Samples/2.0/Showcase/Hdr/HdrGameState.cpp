@@ -43,6 +43,8 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void HdrGameState::createScene01(void)
     {
+        HdrUtils::init( (Ogre::uint8)mGraphicsSystem->getRenderWindow()->getFSAA() );
+
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
         const float armsLength = 2.5f;

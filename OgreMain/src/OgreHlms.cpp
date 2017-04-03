@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
 #include "OgreDepthBuffer.h"
+#include "OgreLwString.h"
 
 #include "OgreHlmsListener.h"
 
@@ -107,9 +108,11 @@ namespace Ogre
 
     //Change per scene pass
     const IdString HlmsBaseProp::DualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
-    const IdString HlmsBaseProp::NumShadowMaps      = IdString( "hlms_num_shadow_maps" );
+    const IdString HlmsBaseProp::NumShadowMapLights = IdString( "hlms_num_shadow_map_lights" );
+    const IdString HlmsBaseProp::NumShadowMapTextures= IdString("hlms_num_shadow_map_textures" );
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
+    const IdString HlmsBaseProp::ShadowCasterPoint  = IdString( "hlms_shadowcaster_point" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
     const IdString HlmsBaseProp::PrePass            = IdString( "hlms_prepass" );
@@ -266,7 +269,6 @@ namespace Ogre
         setProperty( HlmsBaseProp::UvCount1, 4 );
         setProperty( HlmsBaseProp::BonesPerVertex, 4 );
 
-        setProperty( HlmsBaseProp::NumShadowMaps, 3 );
         setProperty( HlmsBaseProp::PssmSplits, 3 );
         setProperty( HlmsBaseProp::ShadowCaster, 0 );
 
@@ -2091,19 +2093,123 @@ namespace Ogre
                     numPssmSplits = static_cast<int32>( pssmSplits->size() - 1 );
                 setProperty( HlmsBaseProp::PssmSplits, numPssmSplits );
 
-                size_t numShadowMaps = shadowNode->getNumShadowCastingLights();
+                const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
+
+                size_t numShadowMapLights = shadowNode->getNumActiveShadowCastingLights();
                 if( numPssmSplits )
-                    numShadowMaps += numPssmSplits - 1;
-                setProperty( HlmsBaseProp::NumShadowMaps, numShadowMaps );
+                    numShadowMapLights += numPssmSplits - 1;
+                setProperty( HlmsBaseProp::NumShadowMapLights, numShadowMapLights );
+                setProperty( HlmsBaseProp::NumShadowMapTextures, contiguousShadowMapTex.size() );
+
+                {
+                    const Ogre::CompositorShadowNodeDef *shadowNodeDef = shadowNode->getDefinition();
+
+                    char tmpBuffer[64];
+                    LwString propName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+
+                    propName = "hlms_shadowmap";
+                    const size_t basePropSize = propName.size() + 1u;
+
+                    size_t shadowMapTexIdx = 0;
+
+                    for( size_t i=0; i<numShadowMapLights; ++i )
+                    {
+                        //Skip inactive lights (e.g. no directional lights are available
+                        //and there's a shadow map that only accepts dir lights)
+                        while( !shadowNode->isShadowMapIdxActive( shadowMapTexIdx ) )
+                            ++shadowMapTexIdx;
+
+                        const Ogre::ShadowTextureDefinition *shadowTexDef =
+                                shadowNodeDef->getShadowTextureDefinition( shadowMapTexIdx );
+
+                        propName.resize( basePropSize - 1u );
+                        propName.a( (uint32)i ); //hlms_shadowmap0
+                        setProperty( propName.c_str(),
+                                     shadowNode->getIndexToContiguousShadowMapTex( shadowMapTexIdx ) );
+
+                        if( shadowTexDef->uvOffset != Vector2::ZERO ||
+                            shadowTexDef->uvLength != Vector2::UNIT_SCALE )
+                        {
+                            propName.resize( basePropSize );
+                            propName.a( "_uvs_fulltex" );
+                            setProperty( propName.c_str(), 1 );
+                        }
+
+                        float intPart, fractPart;
+
+                        fractPart = modff( (float)shadowTexDef->uvOffset.x, &intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_min_x_int" );
+                        setProperty( propName.c_str(), (int32)intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_min_x_fract" );
+                        setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                        fractPart = modff( (float)shadowTexDef->uvOffset.y, &intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_min_y_int" );
+                        setProperty( propName.c_str(), (int32)intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_min_y_fract" );
+                        setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                        Vector2 uvMax = shadowTexDef->uvOffset + shadowTexDef->uvLength;
+                        fractPart = modff( (float)uvMax.x, &intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_max_x_int" );
+                        setProperty( propName.c_str(), (int32)intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_max_x_fract" );
+                        setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                        fractPart = modff( (float)uvMax.y, &intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_max_y_int" );
+                        setProperty( propName.c_str(), (int32)intPart );
+                        propName.resize( basePropSize );
+                        propName.a( "_uv_max_y_fract" );
+                        setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                        propName.resize( basePropSize );
+                        propName.a( "_array_idx" );
+                        setProperty( propName.c_str(), shadowTexDef->arrayIdx );
+
+                        const Light *light = shadowNode->getLightAssociatedWith( shadowMapTexIdx );
+                        if( light->getType() == Light::LT_POINT )
+                        {
+                            propName.resize( basePropSize );
+                            propName.a( "_is_point_light" );
+                            setProperty( propName.c_str(), 1 );
+
+                            fractPart = modff( (float)shadowTexDef->uvLength.x, &intPart );
+                            propName.resize( basePropSize );
+                            propName.a( "_uv_length_x_int" );
+                            setProperty( propName.c_str(), (int32)intPart );
+                            propName.resize( basePropSize );
+                            propName.a( "_uv_length_x_fract" );
+                            setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+
+                            fractPart = modff( (float)shadowTexDef->uvLength.y, &intPart );
+                            propName.resize( basePropSize );
+                            propName.a( "_uv_length_y_int" );
+                            setProperty( propName.c_str(), (int32)intPart );
+                            propName.resize( basePropSize );
+                            propName.a( "_uv_length_y_fract" );
+                            setProperty( propName.c_str(), (int32)(fractPart * 100000.0f) );
+                        }
+
+                        ++shadowMapTexIdx;
+                    }
+                }
 
                 int usesDepthTextures = -1;
 
-                const CompositorChannelVec &shadowTextures = shadowNode->getLocalTextures();
-                for( size_t i=0; i<numShadowMaps; ++i )
+                const size_t numShadowMapTextures = contiguousShadowMapTex.size();
+                for( size_t i=0; i<numShadowMapTextures; ++i )
                 {
                     bool missmatch = false;
 
-                    if( PixelUtil::isDepth( shadowTextures[i].textures[0]->getFormat() ) )
+                    if( PixelUtil::isDepth( contiguousShadowMapTex[i]->getFormat() ) )
                     {
                         missmatch = usesDepthTextures == 0;
                         usesDepthTextures = 1;
@@ -2160,10 +2266,12 @@ namespace Ogre
                     LightClosestArray::const_iterator end  = lights.end();
                     while( itor != end )
                     {
-                        if( itor->light->getType() == Light::LT_DIRECTIONAL )
-                            ++shadowCasterDirectional;
-
-                        ++numLightsPerType[itor->light->getType()];
+                        if( itor->light )
+                        {
+                            if( itor->light->getType() == Light::LT_DIRECTIONAL )
+                                ++shadowCasterDirectional;
+                            ++numLightsPerType[itor->light->getType()];
+                        }
                         ++itor;
                     }
                 }
@@ -2193,7 +2301,7 @@ namespace Ogre
                     LightClosestArray::const_iterator end  = lights.end();
                     while( itor != end )
                     {
-                        if( itor->light->getType() == Light::LT_DIRECTIONAL )
+                        if( itor->light && itor->light->getType() == Light::LT_DIRECTIONAL )
                             ++shadowCasterDirectional;
                         ++itor;
                     }
@@ -2230,11 +2338,24 @@ namespace Ogre
         }
         else
         {
-            setProperty( HlmsBaseProp::ShadowCaster, casterPass );
+            setProperty( HlmsBaseProp::ShadowCaster, 1 );
+
+            const CompositorShadowNode *shadowNode = sceneManager->getCurrentShadowNode();
+            const CompositorPass *pass = sceneManager->getCurrentCompositorPass();
+
+            if( pass )
+            {
+                const uint8 shadowMapIdx = pass->getDefinition()->mShadowMapIdx;
+                const Light *light = shadowNode->getLightAssociatedWith( shadowMapIdx );
+                if( light->getType() == Light::LT_POINT )
+                    setProperty( HlmsBaseProp::ShadowCasterPoint, 1 );
+            }
+
             setProperty( HlmsBaseProp::DualParaboloidMapping, dualParaboloid );
 
             setProperty( HlmsBaseProp::Forward3D,         0 );
-            setProperty( HlmsBaseProp::NumShadowMaps, 0 );
+            setProperty( HlmsBaseProp::NumShadowMapLights,0 );
+            setProperty( HlmsBaseProp::NumShadowMapTextures, 0 );
             setProperty( HlmsBaseProp::PssmSplits, 0 );
             setProperty( HlmsBaseProp::LightsAttenuation, 0 );
             setProperty( HlmsBaseProp::LightsSpotParams,  0 );

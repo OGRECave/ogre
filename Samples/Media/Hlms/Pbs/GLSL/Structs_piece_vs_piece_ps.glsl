@@ -11,7 +11,7 @@ struct Light
 	vec3 position;
 	vec3 diffuse;
 	vec3 specular;
-@property( hlms_num_shadow_maps )
+@property( hlms_num_shadow_map_lights )
 	vec3 attenuation;
 	vec3 spotDirection;
 	vec3 spotParams;
@@ -26,10 +26,14 @@ layout(binding = 0) uniform PassBuffer
 	//Vertex shader (common to both receiver and casters)
 	mat4 viewProj;
 
+@property( hlms_shadowcaster_point )
+	vec4 cameraPosWS;	//Camera position in world space
+@end
+
 @property( !hlms_shadowcaster )
 	//Vertex shader
 	mat4 view;
-	@property( hlms_num_shadow_maps )ShadowReceiverData shadowRcv[@value(hlms_num_shadow_maps)];@end
+	@property( hlms_num_shadow_map_lights )ShadowReceiverData shadowRcv[@value(hlms_num_shadow_map_lights)];@end
 
 	//-------------------------------------------------------------------------
 
@@ -89,7 +93,7 @@ layout(binding = 0) uniform PassBuffer
 @end
 
 	@insertpiece( custom_passBuffer )
-} pass;
+} passBuf;
 @end
 
 @property( fresnel_scalar )@piece( FresnelType )vec3@end @piece( FresnelSwizzle )xyz@end @end
@@ -164,8 +168,9 @@ layout(binding = 3) uniform ManualProbe
 		@foreach( hlms_uv_count, n )
 			vec@value( hlms_uv_count@n ) uv@n;@end
 
-		@foreach( hlms_num_shadow_maps, n )
-			vec4 posL@n;@end
+		@foreach( hlms_num_shadow_map_lights, n )
+			@property( !hlms_shadowmap@n_is_point_light )
+				vec4 posL@n;@end @end
 		@property( hlms_pssm_splits )float depth;@end
 	@end
 	@property( hlms_shadowcaster )
@@ -174,8 +179,12 @@ layout(binding = 3) uniform ManualProbe
 			@foreach( hlms_uv_count, n )
 				vec@value( hlms_uv_count@n ) uv@n;@end
 		@end
-		@property( !hlms_shadow_uses_depth_texture )
+		@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point )
 			float depth;
+		@end
+		@property( hlms_shadowcaster_point )
+			vec3 toCameraWS;
+			flat float constBias;
 		@end
 	@end
 	@insertpiece( custom_VStoPS )

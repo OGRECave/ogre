@@ -105,8 +105,8 @@ namespace Ogre
         /// @see RenderSystem::setUavStartingSlot
         uint8   mStartingSlot;
 
-        CompositorPassUavDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :
-            CompositorPassDef( PASS_UAV, rtIndex ),
+        CompositorPassUavDef( CompositorNodeDef *parentNodeDef, CompositorTargetDef *parentTargetDef ) :
+            CompositorPassDef( PASS_UAV, parentTargetDef ),
             mParentNodeDef( parentNodeDef ),
             //mNeedsFlush( false ),
             mKeepPreviousUavs( true ),

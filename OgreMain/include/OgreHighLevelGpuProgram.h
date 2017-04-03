@@ -62,9 +62,22 @@ namespace Ogre {
     */
     class _OgreExport HighLevelGpuProgram : public GpuProgram
     {
+    public:
+        /// Command object for enabling include in shaders
+        class _OgrePrivate CmdEnableIncludeHeader : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+
+        static CmdEnableIncludeHeader msEnableIncludeHeaderCmd;
+
     protected:
         /// Whether the high-level program (and it's parameter defs) is loaded
         bool mHighLevelLoaded;
+        /// See setEnableIncludeHeader
+        bool mEnableIncludeHeader;
         /// The underlying assembler program
         GpuProgramPtr mAssemblerProgram;
         /// Have we built the name->index parameter map yet?
@@ -74,6 +87,9 @@ namespace Ogre {
         virtual void loadHighLevel(void);
         /// Internal unload high-level portion if loaded
         virtual void unloadHighLevel(void);
+
+        void dumpSourceIfHasIncludeEnabled(void);
+        void parseIncludeFile( String &inOutSourceFile );
         /** Internal load implementation, loads just the high-level portion, enough to 
             get parameters.
         */
@@ -92,6 +108,8 @@ namespace Ogre {
             maps must also be populated.
         */
         virtual void buildConstantDefinitions() const = 0;
+
+        void setupBaseParamDictionary(void);
 
         /** @copydoc Resource::loadImpl */
         void loadImpl();
@@ -114,6 +132,33 @@ namespace Ogre {
         GpuProgramParametersSharedPtr createParameters(void);
         /** @copydoc GpuProgram::_getBindingDelegate */
         GpuProgram* _getBindingDelegate(void) { return mAssemblerProgram.getPointer(); }
+
+        /** Whether we should parse the source code looking for include files and
+            embedding the file. Disabled by default to avoid slowing down when
+            #include is not used. Not needed if the API natively supports it (D3D11).
+        @remarks
+            Single line comments are supported:
+                // #include "MyFile.h" --> won't be included.
+
+            Block comment lines are not supported, but may not matter if
+            the included file does not close the block:
+                / *
+                    #include "MyFile.h" --> file will be included anyway.
+                * /
+
+            Preprocessor macros are not supported, but should not matter:
+                #if SOME_MACRO
+                    #include "MyFile.h" --> file will be included anyway.
+                #endif
+        @par
+            Recursive includes are supported (e.g. header includes a header)
+        @par
+            Beware included files mess up error reporting (wrong lines)
+        @param bEnable
+            True to support #include. Must be toggled before loading the source file.
+        */
+        void setEnableIncludeHeader( bool bEnable );
+        bool getEnableIncludeHeader(void) const;
 
         /** Get the full list of GpuConstantDefinition instances.
         @note

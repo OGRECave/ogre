@@ -454,6 +454,9 @@ namespace Demo
         Ogre::Archive *archiveLibraryAny = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Common/Any",
                         "FileSystem", true );
+        Ogre::Archive *archivePbsLibraryAny = Ogre::ArchiveManager::getSingletonPtr()->load(
+                        dataFolder + "Hlms/Pbs/Any",
+                        "FileSystem", true );
 
         Ogre::ArchiveVec library;
         library.push_back( archiveLibrary );
@@ -469,8 +472,10 @@ namespace Demo
         Ogre::Archive *archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Pbs/" + shaderSyntax,
                         "FileSystem", true );
+        library.push_back( archivePbsLibraryAny );
         Ogre::HlmsPbs *hlmsPbs = OGRE_NEW Ogre::HlmsPbs( archivePbs, &library );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsPbs );
+        library.pop_back();
 
         if( renderSystem->getName() == "Direct3D11 Rendering Subsystem" )
         {

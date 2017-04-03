@@ -65,6 +65,7 @@ namespace Ogre
     const IdString PbsProperty::SignedIntTex      = IdString( "signed_int_textures" );
     const IdString PbsProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
     const IdString PbsProperty::LowerGpuOverhead  = IdString( "lower_gpu_overhead" );
+    const IdString PbsProperty::DebugPssmSplits   = IdString( "debug_pssm_splits" );
 
     const IdString PbsProperty::NumTextures     = IdString( "num_textures" );
     const char *PbsProperty::DiffuseMap         = "diffuse_map";
@@ -215,6 +216,7 @@ namespace Ogre
         mIrradianceVolume( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
+        mDebugPssmSplits( false ),
         mShadowFilter( PCF_3x3 ),
         mAmbientLightMode( AmbientAuto )
     {
@@ -319,12 +321,20 @@ namespace Ogre
 
             if( !mPreparedPass.shadowMaps.empty() )
             {
+                char tmpData[32];
+                LwString texName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
+                texName = "texShadowMap";
+                const size_t baseTexSize = texName.size();
+
                 vector<int>::type shadowMaps;
                 shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
                 for( size_t i=0; i<mPreparedPass.shadowMaps.size(); ++i )
+                {
+                    texName.resize( baseTexSize );
+                    texName.a( (uint32)i );   //texShadowMap0
+                    psParams->setNamedConstant( texName.c_str(), &texUnit, 1, 1 );
                     shadowMaps.push_back( texUnit++ );
-
-                psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
+                }
             }
 
             int cubemapTexUnit = 0;
@@ -729,6 +739,18 @@ namespace Ogre
             {
                 setProperty( PbsProperty::PcfIterations, 1 );
             }
+
+            if( mDebugPssmSplits )
+            {
+                int32 numPssmSplits = 0;
+                const vector<Real>::type *pssmSplits = shadowNode->getPssmSplits( 0 );
+                if( pssmSplits )
+                {
+                    numPssmSplits = static_cast<int32>( pssmSplits->size() - 1 );
+                    if( numPssmSplits > 0 )
+                        setProperty( PbsProperty::DebugPssmSplits, 1 );
+                }
+            }
         }
 
         mTargetEnvMap.setNull();
@@ -824,8 +846,10 @@ namespace Ogre
 
         int32 numLights             = getProperty( HlmsBaseProp::LightsSpot );
         int32 numDirectionalLights  = getProperty( HlmsBaseProp::LightsDirNonCaster );
-        int32 numShadowMaps         = getProperty( HlmsBaseProp::NumShadowMaps );
+        int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
+
+        bool isShadowCastingPointLight = false;
 
         //mat4 viewProj;
         size_t mapSize = 16 * 4;
@@ -849,12 +873,12 @@ namespace Ogre
                 mapSize += mParallaxCorrectedCubemap->getConstBufferSize();
             }
 
-            //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
-            //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
+            //mat4 view + mat4 shadowRcv[numShadowMapLights].texViewProj +
+            //              vec2 shadowRcv[numShadowMapLights].shadowDepthRange +
             //              vec2 padding +
-            //              vec4 shadowRcv[numShadowMaps].invShadowMapSize +
+            //              vec4 shadowRcv[numShadowMapLights].invShadowMapSize +
             //mat3 invViewMatCubemap (upgraded to three vec4)
-            mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMaps + 4 * 3 ) * 4;
+            mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMapLights + 4 * 3 ) * 4;
 
             //float windowHeight + padding
             if( mPrePassTextures )
@@ -890,6 +914,10 @@ namespace Ogre
         }
         else
         {
+            isShadowCastingPointLight = getProperty( HlmsBaseProp::ShadowCasterPoint ) != 0;
+            //vec4 cameraPosWS
+            if( isShadowCastingPointLight )
+                mapSize += 4 * 4;
             mapSize += (2 + 2) * 4;
         }
 
@@ -923,6 +951,16 @@ namespace Ogre
         for( size_t i=0; i<16; ++i )
             *passBufferPtr++ = (float)viewProjMatrix[0][i];
 
+        //vec4 cameraPosWS;
+        if( isShadowCastingPointLight )
+        {
+            const Vector3 &camPos = camera->getDerivedPosition();
+            *passBufferPtr++ = (float)camPos.x;
+            *passBufferPtr++ = (float)camPos.y;
+            *passBufferPtr++ = (float)camPos.z;
+            *passBufferPtr++ = 1.0f;
+        }
+
         mPreparedPass.viewMatrix        = viewMatrix;
 
         mPreparedPass.shadowMaps.clear();
@@ -933,16 +971,24 @@ namespace Ogre
             for( size_t i=0; i<16; ++i )
                 *passBufferPtr++ = (float)viewMatrix[0][i];
 
-            for( int32 i=0; i<numShadowMaps; ++i )
+            size_t shadowMapTexIdx = 0;
+            const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
+
+            for( int32 i=0; i<numShadowMapLights; ++i )
             {
-                //mat4 shadowRcv[numShadowMaps].texViewProj
-                Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( i );
+                //Skip inactive lights (e.g. no directional lights are available
+                //and there's a shadow map that only accepts dir lights)
+                while( !shadowNode->isShadowMapIdxActive( shadowMapTexIdx ) )
+                    ++shadowMapTexIdx;
+
+                //mat4 shadowRcv[numShadowMapLights].texViewProj
+                Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( shadowMapTexIdx );
                 for( size_t j=0; j<16; ++j )
                     *passBufferPtr++ = (float)viewProjTex[0][j];
 
-                //vec2 shadowRcv[numShadowMaps].shadowDepthRange
+                //vec2 shadowRcv[numShadowMapLights].shadowDepthRange
                 Real fNear, fFar;
-                shadowNode->getMinMaxDepthRange( i, fNear, fFar );
+                shadowNode->getMinMaxDepthRange( shadowMapTexIdx, fNear, fFar );
                 const Real depthRange = fFar - fNear;
                 *passBufferPtr++ = fNear;
                 *passBufferPtr++ = 1.0f / depthRange;
@@ -950,15 +996,17 @@ namespace Ogre
                 ++passBufferPtr; //Padding
 
 
-                //vec2 shadowRcv[numShadowMaps].invShadowMapSize
-                //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
-                //changes need to be done so that UV calculations land on the right place
-                uint32 texWidth  = shadowNode->getLocalTextures()[i].textures[0]->getWidth();
-                uint32 texHeight = shadowNode->getLocalTextures()[i].textures[0]->getHeight();
+                //vec2 shadowRcv[numShadowMapLights].invShadowMapSize
+                size_t shadowMapTexContigIdx =
+                        shadowNode->getIndexToContiguousShadowMapTex( (size_t)shadowMapTexIdx );
+                uint32 texWidth  = contiguousShadowMapTex[shadowMapTexContigIdx]->getWidth();
+                uint32 texHeight = contiguousShadowMapTex[shadowMapTexContigIdx]->getHeight();
                 *passBufferPtr++ = 1.0f / texWidth;
                 *passBufferPtr++ = 1.0f / texHeight;
                 *passBufferPtr++ = static_cast<float>( texWidth );
                 *passBufferPtr++ = static_cast<float>( texHeight );
+
+                ++shadowMapTexIdx;
             }
 
             //---------------------------------------------------------------------------
@@ -1092,6 +1140,10 @@ namespace Ogre
                     }
                     else
                     {
+                        //Skip inactive lights (e.g. no directional lights are available
+                        //and there's a shadow map that only accepts dir lights)
+                        while( !lights[shadowLightIdx].light )
+                            ++shadowLightIdx;
                         light = lights[shadowLightIdx++].light;
                     }
 
@@ -1150,9 +1202,16 @@ namespace Ogre
                     ++passBufferPtr;
                 }
 
-                mPreparedPass.shadowMaps.reserve( numShadowMaps );
-                for( int32 i=0; i<numShadowMaps; ++i )
-                    mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
+                mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
+
+                TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
+                TextureVec::const_iterator enShadowMap = contiguousShadowMapTex.end();
+
+                while( itShadowMap != enShadowMap )
+                {
+                    mPreparedPass.shadowMaps.push_back( itShadowMap->get() );
+                    ++itShadowMap;
+                }
             }
             else
             {
@@ -1344,11 +1403,11 @@ namespace Ogre
                 }
 
                 //We changed HlmsType, rebind the shared textures.
-                FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
-                FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
+                FastArray<Texture*>::const_iterator itor = mPreparedPass.shadowMaps.begin();
+                FastArray<Texture*>::const_iterator end  = mPreparedPass.shadowMaps.end();
                 while( itor != end )
                 {
-                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, itor->get(),
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, *itor,
                                                                          mCurrentShadowmapSamplerblock );
                     ++texUnit;
                     ++itor;
@@ -1662,6 +1721,11 @@ namespace Ogre
     {
         HlmsBufferManager::frameEnded();
         mCurrentPassBuffer  = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setDebugPssmSplits( bool bDebug )
+    {
+        mDebugPssmSplits = bDebug;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::setShadowSettings( ShadowFilter filter )

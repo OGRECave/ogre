@@ -1259,6 +1259,7 @@ namespace Ogre
         mIds["uses_uav"]        = ID_USES_UAV;
         mIds["allow_write_after_write"] = ID_ALLOW_WRITE_AFTER_WRITE;
         mIds["expose"]          = ID_EXPOSE;
+        mIds["shadow_map_full_viewport"]= ID_SHADOW_MAP_FULL_VIEWPORT;
         mIds["lod_bias"]        = ID_LOD_BIAS;
         mIds["lod_update_list"] = ID_LOD_UPDATE_LIST;
         mIds["lod_camera"]      = ID_LOD_CAMERA;
@@ -1334,9 +1335,12 @@ namespace Ogre
         mIds["num_splits"]              = ID_NUM_SPLITS;
         mIds["pssm_split_padding"]      = ID_PSSM_SPLIT_PADDING;
         mIds["pssm_lambda"]             = ID_PSSM_LAMBDA;
+        mIds["shadow_map_target_type"]  = ID_SHADOW_MAP_TARGET_TYPE;
+        mIds["shadow_map_repeat"]       = ID_SHADOW_MAP_REPEAT;
         mIds["shadow_map"]              = ID_SHADOW_MAP;
-        mIds["shadow_atlas"]            = ID_SHADOW_ATLAS;
         mIds["fsaa"]                    = ID_FSAA;
+        mIds["uv"]                      = ID_UV;
+        mIds["array_index"]             = ID_ARRAY_INDEX;
         mIds["light"]                   = ID_LIGHT;
         mIds["split"]                   = ID_SPLIT;
 

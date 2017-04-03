@@ -11,6 +11,12 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/models
 FileSystem=@OGRE_MEDIA_TEXTURES_DIR@/textures
 FileSystem=@OGRE_MEDIA_TEXTURES_DIR@/textures/Cubemaps
 
+[General]
+FileSystem=@OGRE_MEDIA_DIR_REL@/2.0/scripts/materials/Common
+FileSystem=@OGRE_MEDIA_DIR_REL@/2.0/scripts/materials/Common/GLSL
+FileSystem=@OGRE_MEDIA_DIR_REL@/2.0/scripts/materials/Common/HLSL
+FileSystem=@OGRE_MEDIA_DIR_REL@/2.0/scripts/materials/Common/Metal
+
 # Do not load this as a resource. It's here merely to tell the code where
 # the Hlms templates are located
 [Hlms]

@@ -991,8 +991,13 @@ namespace Ogre
                 lastTarget = pass->getRenderTarget();
             }
 
+            const CompositorTargetDef *targetDef = passDef->getParentTargetDef();
+
             if( executionMask & passDef->mExecutionMask &&
-                (!shadowNode || shadowNode->isShadowMapIdxActive( passDef->mShadowMapIdx ) ) )
+                (!shadowNode || (!shadowNode->isShadowMapIdxInValidRange( passDef->mShadowMapIdx )
+                || (shadowNode->_shouldUpdateShadowMapIdx( passDef->mShadowMapIdx )
+                && (shadowNode->getShadowMapLightTypeMask( passDef->mShadowMapIdx ) &
+                    targetDef->getShadowMapSupportedLightTypes())))) )
             {
                 //Make explicitly exposed textures available to materials during this pass.
                 const size_t oldNumTextures = sceneManager->getNumCompositorTextures();

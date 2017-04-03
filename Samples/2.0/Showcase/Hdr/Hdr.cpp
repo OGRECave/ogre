@@ -30,8 +30,15 @@ namespace Demo
         virtual Ogre::CompositorWorkspace* setupCompositor()
         {
             Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+            Ogre::RenderSystem *renderSystem = mRoot->getRenderSystem();
+            const Ogre::RenderSystemCapabilities *caps = renderSystem->getCapabilities();
+
+            Ogre::String compositorName = "HdrWorkspace";
+            if( mRenderWindow->getFSAA() > 1u && caps->hasCapability( Ogre::RSC_EXPLICIT_FSAA_RESOLVE ) )
+                compositorName = "HdrWorkspaceMsaa";
+
             return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-                                                    "HdrWorkspace", true );
+                                                    compositorName, true );
         }
 
         virtual void setupResources(void)
@@ -48,12 +55,8 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[9] =
+            const char *c_locations[5] =
             {
-                "2.0/scripts/materials/Common",
-                "2.0/scripts/materials/Common/GLSL",
-                "2.0/scripts/materials/Common/HLSL",
-                "2.0/scripts/materials/Common/Metal",
                 "2.0/scripts/materials/HDR",
                 "2.0/scripts/materials/HDR/GLSL",
                 "2.0/scripts/materials/HDR/HLSL",
@@ -61,7 +64,7 @@ namespace Demo
                 "2.0/scripts/materials/PbsMaterials"
             };
 
-            for( size_t i=0; i<9; ++i )
+            for( size_t i=0; i<5; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );
@@ -97,6 +100,12 @@ namespace Demo
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/materials/Common/Copyback.material (Copyback_1xFP32_ps)\n"
         "   * Samples/Media/2.0/materials/HDR/*.*\n"
+        "\n"
+        "Additionally, this sample shows how to do high quality MSAA by using a reversible \n"
+        "tonemap operator with a custom resolve. More information can be found at:\n"
+        "   * https://mynameismjp.wordpress.com/2012/10/24/msaa-overview/\n"
+        "   * http://graphicrants.blogspot.com.ar/2013/12/tone-mapping.html\n"
+        "   * http://gpuopen.com/optimized-reversible-tonemapper-for-resolve/\n"
         "\n"
         "\n"
         "LEGAL: Uses Saint Peter's Basilica (C) by Emil Persson under CC Attrib 3.0 Unported\n"

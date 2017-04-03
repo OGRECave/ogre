@@ -8,7 +8,8 @@ abstract target discardTarget
 
 compositor_node HdrRenderingNode
 {
-	texture rt0 target_width target_height PF_FLOAT16_RGBA
+	texture rt0         target_width target_height PF_FLOAT16_RGBA explicit_resolve
+	texture oldLumRt   1   1 PF_FLOAT16_R	no_fsaa depth_pool 0
 
 	target rt0
 	{
@@ -26,28 +27,67 @@ compositor_node HdrRenderingNode
 			overlays			off
 		}
 	}
-	
+
+	//Initialize lumRt1 at startup, to avoid NaNs.
+	target oldLumRt
+	{
+		pass clear
+		{
+			num_initial 1
+			colour_value 0.01 0.01 0.01 1
+		}
+	}
+
 	out 0 rt0
+	out 1 oldLumRt
+}
+
+compositor_node HdrMsaaResolve
+{
+	in 0 hdr_msaa_rt
+	in 1 oldLumRt
+
+	texture resolvedRt target_width target_height PF_FLOAT16_RGBA no_fsaa depth_pool 0
+
+	target resolvedRt
+	{
+		pass clear
+		{
+			discard_only yes
+		}
+
+		pass render_quad
+		{
+			material HDR/Resolve_4xFP32_HDR_Box
+			input 0 hdr_msaa_rt
+			input 1 oldLumRt
+		}
+	}
+
+	out 0 resolvedRt
 }
 
 compositor_node HdrPostprocessingNode
 {
 	in 0 rt0
-	in 1 rt_output
-	
+	in 1 lumRt1
+	in 2 rt_output
+
 	//For maximum quality use these as FLOAT16_RGBA, however they're slower on
 	//AMD cards (0.748ms slower on AMD Radeon HD 7770 at 1920x1080).
-	//texture rtBlur0	256 256 PF_FLOAT16_RGBA	depth_pool 0
-	//texture rtBlur1	256 256 PF_FLOAT16_RGBA	depth_pool 0
+	//texture rtBlur0	256 256 PF_FLOAT16_RGBA	no_fsaa depth_pool 0
+	//texture rtBlur1	256 256 PF_FLOAT16_RGBA	no_fsaa depth_pool 0
 
-	texture rtBlur0	256 256 PF_A2R10G10B10	depth_pool 0
-	texture rtBlur1	256 256 PF_A2R10G10B10	depth_pool 0
+	texture rtBlur0	256 256 PF_A2R10G10B10	no_fsaa depth_pool 0
+	texture rtBlur1	256 256 PF_A2R10G10B10	no_fsaa depth_pool 0
 
-	texture lumRt0	  1   1 PF_FLOAT16_R	depth_pool 0
-	texture lumRt1	  1   1 PF_FLOAT16_R	depth_pool 0
-	texture rtIter0	 64  64 PF_FLOAT16_R	depth_pool 0
-	texture rtIter1	 16  16 PF_FLOAT16_R	depth_pool 0
-	texture rtIter2	  4   4 PF_FLOAT16_R	depth_pool 0
+	texture lumRt0	  1   1 PF_FLOAT16_R	no_fsaa depth_pool 0
+	//texture lumRt1 1   1 PF_FLOAT16_R	no_fsaa depth_pool 0
+	texture rtIter0	 64  64 PF_FLOAT16_R	no_fsaa depth_pool 0
+	texture rtIter1	 16  16 PF_FLOAT16_R	no_fsaa depth_pool 0
+	texture rtIter2	  4   4 PF_FLOAT16_R	no_fsaa depth_pool 0
+
+	texture rtt0 target_width target_height PF_R8G8B8A8 no_fsaa
 
 	//Calculate luminosity
 	target rtIter0 : discardTarget
@@ -58,7 +98,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rt0
 		}
 	}
-	
+
 	target rtIter1 : discardTarget
 	{
 		pass render_quad
@@ -67,7 +107,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtIter0
 		}
 	}
-	
+
 	target rtIter2 : discardTarget
 	{
 		pass render_quad
@@ -76,17 +116,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtIter1
 		}
 	}
-	
-	//Initialize lumRt1 at startup, to avoid NaNs.
-	target lumRt1
-	{
-		pass clear
-		{
-			num_initial 1
-			colour_value 0.01 0.01 0.01 1
-		}
-	}
-	
+
 	target lumRt0 : discardTarget
 	{
 		pass render_quad
@@ -96,7 +126,7 @@ compositor_node HdrPostprocessingNode
 			input		1	lumRt1
 		}
 	}
-	
+
 	target lumRt1 : discardTarget
 	{
 		pass render_quad
@@ -106,7 +136,7 @@ compositor_node HdrPostprocessingNode
 		}
 	}
 
-	//Perform Bloom	
+	//Perform Bloom
 	target rtBlur0 : discardTarget
 	{
 		pass render_quad
@@ -116,7 +146,7 @@ compositor_node HdrPostprocessingNode
 			input		1	lumRt0
 		}
 	}
-	
+
 	target rtBlur1 : discardTarget
 	{
 		pass render_quad
@@ -125,7 +155,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtBlur0
 		}
 	}
-	
+
 	target rtBlur0
 	{
 		pass render_quad
@@ -134,7 +164,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtBlur1
 		}
 	}
-	
+
 	target rtBlur1
 	{
 		pass render_quad
@@ -143,7 +173,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtBlur0
 		}
 	}
-	
+
 	target rtBlur0
 	{
 		pass render_quad
@@ -152,7 +182,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtBlur1
 		}
 	}
-	
+
 	target rtBlur1
 	{
 		pass render_quad
@@ -161,7 +191,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtBlur0
 		}
 	}
-	
+
 	target rtBlur0
 	{
 		pass render_quad
@@ -170,7 +200,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtBlur1
 		}
 	}
-	
+
 	target rtBlur1
 	{
 		pass render_quad
@@ -179,7 +209,7 @@ compositor_node HdrPostprocessingNode
 			input		0	rtBlur0
 		}
 	}
-	
+
 	target rtBlur0
 	{
 		pass render_quad
@@ -198,7 +228,17 @@ compositor_node HdrPostprocessingNode
 			input		1	lumRt0
 			input		2	rtBlur0
 		}
-		
+	}
+
+	out 0 rt_output
+}
+
+compositor_node HdrRenderUi
+{
+	in 0 rt_output
+
+	target rt_output
+	{
 		pass render_scene
 		{
 			lod_update_list	off
@@ -209,12 +249,22 @@ compositor_node HdrPostprocessingNode
 			rq_last		255
 		}
 	}
-	
-	out 0 rt0
 }
 
 workspace HdrWorkspace
 {
-	connect HdrRenderingNode 0 HdrPostprocessingNode 0
-	connect_output HdrPostprocessingNode 1
+	connect HdrRenderingNode 0		HdrPostprocessingNode 0
+	connect HdrRenderingNode 1		HdrPostprocessingNode 1
+	connect_output					HdrPostprocessingNode 2
+	connect	HdrPostprocessingNode 0	HdrRenderUi 0
+}
+
+workspace HdrWorkspaceMsaa
+{
+	connect HdrRenderingNode 0 HdrMsaaResolve 0
+	connect HdrRenderingNode 1 HdrMsaaResolve 1
+	connect HdrMsaaResolve 0 HdrPostprocessingNode 0
+	connect HdrRenderingNode 1 HdrPostprocessingNode 1
+	connect_output HdrPostprocessingNode 2
+	connect HdrPostprocessingNode 2 HdrRenderUi 0
 }

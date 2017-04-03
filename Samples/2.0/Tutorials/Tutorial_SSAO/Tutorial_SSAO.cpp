@@ -48,20 +48,16 @@ namespace Demo
             else if( *(dataFolder.end() - 1) != '/' )
                 dataFolder += "/";
 
-            const char *c_locations[9] =
+            const char *c_locations[5] =
             {
                 "2.0/scripts/materials/Tutorial_SSAO",
                 "2.0/scripts/materials/Tutorial_SSAO/GLSL",
                 "2.0/scripts/materials/Tutorial_SSAO/HLSL",
                 "2.0/scripts/materials/Tutorial_SSAO/Metal",
-                "2.0/scripts/materials/PbsMaterials",
-                "2.0/scripts/materials/Common",
-                "2.0/scripts/materials/Common/GLSL",
-                "2.0/scripts/materials/Common/HLSL",
-                "2.0/scripts/materials/Common/Metal"
+                "2.0/scripts/materials/PbsMaterials"
             };
 
-            for (size_t i = 0; i<9; ++i)
+            for (size_t i = 0; i<5; ++i)
             {
                 Ogre::String dataFolderFull = dataFolder + c_locations[i];
                 addResourceLocation(dataFolderFull, "FileSystem", "General");

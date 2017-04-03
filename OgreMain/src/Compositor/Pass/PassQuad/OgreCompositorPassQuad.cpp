@@ -263,6 +263,8 @@ namespace Ogre
 
         mTarget->setFsaaResolveDirty();
 
+        sceneManager->_setCurrentCompositorPass( this );
+
         //sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
         if( !mMaterial.isNull() )
             mFsRect->setMaterial( mMaterial ); //Low level material
@@ -275,6 +277,8 @@ namespace Ogre
             //Restore orientation
             mCamera->setOrientation( oldCameraOrientation );
         }
+
+        sceneManager->_setCurrentCompositorPass( 0 );
 
         if( listener )
             listener->passPosExecute( this );

@@ -1,3 +1,4 @@
+@insertpiece( SetCrossPlatformSettings )
 
 // START UNIFORM DECLARATION
 @property( !hlms_shadowcaster || alpha_test )
@@ -57,60 +58,6 @@ SamplerState envMapSamplerState : register(s@value(envMapReg));@end
 @end
 @end
 
-@property( hlms_num_shadow_maps )
-Texture2D texShadowMap[@value(hlms_num_shadow_maps)] : register(t@value(textureRegShadowMapStart));
-SamplerComparisonState shadowSampler : register(s@value(textureRegShadowMapStart));
-
-float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
-{
-	float fDepth = psPosLN.z;
-	float2 uv = psPosLN.xy / psPosLN.w;
-	/*float c = shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
-	return c;*/
-	
-	float retVal = 0;
-
-@property( pcf_3x3 || pcf_4x4 )
-	float2 offsets[@value(pcf_iterations)] =
-	{
-	@property( pcf_3x3 )
-		float2( 0, 0 ),	//0, 0
-		float2( 1, 0 ),	//1, 0
-		float2( 0, 1 ),	//1, 1
-		float2( 0, 0 ) 	//1, 1
-	@end
-	@property( pcf_4x4 )
-		float2( 0, 0 ),	//0, 0
-		float2( 1, 0 ),	//1, 0
-		float2( 1, 0 ),	//2, 0
-
-		float2(-2, 1 ),	//0, 1
-		float2( 1, 0 ),	//1, 1
-		float2( 1, 0 ),	//2, 1
-
-		float2(-2, 1 ),	//0, 2
-		float2( 1, 0 ),	//1, 2
-		float2( 1, 0 )	//2, 2
-	@end
-	};
-@end
-
-	@foreach( pcf_iterations, n )
-		@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * invShadowMapSize.xy;@end
-		// 2x2 PCF
-		retVal += shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
-	@end
-
-	@property( pcf_3x3 )
-		retVal *= 0.25;
-	@end @property( pcf_4x4 )
-		retVal *= 0.11111111111111;
-	@end
-
-	return retVal;
-}
-@end
-
 @property( hlms_lights_spot_textured )@insertpiece( DeclQuat_zAxis )
 float3 qmul( float4 q, float3 v )
 {
@@ -164,8 +111,9 @@ float3 qmul( float4 q, float3 v )
 @insertpiece( DeclParallaxLocalCorrect )
 @end
 
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
+@insertpiece( DeclShadowMapMacros )
+@insertpiece( DeclShadowSamplers )
+@insertpiece( DeclShadowSamplingFuncs )
 
 @insertpiece( DeclOutputType )
 
@@ -309,15 +257,7 @@ float4 diffuseCol;
 		nNormal = normalize( mul( nNormal, TBN ) );
 	@end
 
-	@property( hlms_pssm_splits )
-		float fShadow = 1.0;
-		if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
-			fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-	@foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
-			fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-	@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
-		float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-	@end
+	@insertpiece( DoDirectionalShadowMaps )
 
 	@insertpiece( SampleRoughnessMap )
 
@@ -380,7 +320,7 @@ float4 diffuseCol;
 	if( fDistance <= passBuf.lights[@n].attenuation.x )
 	{
 		lightDir *= 1.0 / fDistance;
-		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadowPoint );
 		float atten = 1.0 / (0.5 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
@@ -498,6 +438,10 @@ float4 diffuseCol;
 	@end @property( !hlms_normal && !hlms_qtangent )
 		outPs.colour0 = float4( 1.0, 1.0, 1.0, 1.0 );
 	@end
+
+	@property( debug_pssm_splits )
+		outPs.colour0.xyz = lerp( outPs.colour0.xyz, debugPssmSplit.xyz, 0.2f );
+	@end
 @end @property( hlms_prepass )
 	outPs.normals			= float4( nNormal * 0.5 + 0.5, 1.0 );
 	@property( hlms_pssm_splits )
@@ -517,6 +461,10 @@ float4 diffuseCol;
 @property( hlms_shadowcaster )
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+
+@property( hlms_shadowcaster_point )
+	@insertpiece( PassDecl )
+@end
 
 @insertpiece( DeclOutputType )
 
@@ -583,8 +531,14 @@ float4 diffuseCol;
 
 	@insertpiece( custom_ps_posExecution )
 
-@property( !hlms_render_depth_only )
+@property( !hlms_render_depth_only && !hlms_shadowcaster_point )
 	outPs.colour0 = inPs.depth;
+	return outPs;
+@end
+
+@property( hlms_shadowcaster_point )
+	float distanceToCamera = length( inPs.toCameraWS );
+	outPs.colour0 = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;
 	return outPs;
 @end
 }

@@ -23,34 +23,6 @@ namespace Demo
                                                     "StencilTestWorkspace", true );
         }
 
-        virtual void setupResources(void)
-        {
-            GraphicsSystem::setupResources();
-
-            Ogre::ConfigFile cf;
-            cf.load(mResourcePath + "resources2.cfg");
-
-            Ogre::String originalDataFolder = cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
-
-            if( originalDataFolder.empty() )
-                originalDataFolder = "./";
-            else if( *(originalDataFolder.end() - 1) != '/' )
-                originalDataFolder += "/";
-
-            const char *c_locations[3] =
-            {
-                "2.0/scripts/materials/Common",
-                "2.0/scripts/materials/Common/GLSL",
-                "2.0/scripts/materials/Common/HLSL"
-            };
-
-            for( size_t i=0; i<3; ++i )
-            {
-                Ogre::String dataFolder = originalDataFolder + c_locations[i];
-                addResourceLocation( dataFolder, "FileSystem", "General" );
-            }
-        }
-
     public:
         StencilTestGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )

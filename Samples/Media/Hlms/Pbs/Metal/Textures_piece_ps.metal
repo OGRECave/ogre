@@ -23,7 +23,7 @@
 @end
 
 @set( textureRegShadowMapStart, texUnit )
-@add( texUnit, hlms_num_shadow_maps )
+@add( texUnit, hlms_num_shadow_map_textures )
 
 @property( parallax_correct_cubemaps )
 	@set( globaPccTexUnit, texUnit )
@@ -43,7 +43,7 @@
 	@property( !envprobe_map || envprobe_map == target_envprobe_map )
 		/// "No cubemap"? Then we're in auto mode or...
 		/// We're rendering to the cubemap probe we're using as manual. Use the auto mode as fallback.
-		@piece( pccProbeSource )pass.autoProbe@end
+		@piece( pccProbeSource )passBuf.autoProbe@end
 		@set( use_parallax_correct_cubemaps, 1 )
 		/// Auto cubemap textures are set at the beginning. Manual cubemaps are the end.
 		@set( envMapReg, globaPccTexUnit )
@@ -127,7 +127,7 @@
 @end
 
 @property( envmap_scale )
-	@piece( ApplyEnvMapScale )* pass.ambientUpperHemi.w@end
+	@piece( ApplyEnvMapScale )* passBuf.ambientUpperHemi.w@end
 @end
 
 @property( !hlms_render_depth_only && !hlms_shadowcaster && hlms_prepass )

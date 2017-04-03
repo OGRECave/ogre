@@ -182,6 +182,7 @@ namespace Ogre
         }
         sceneManager->_setForwardPlusEnabledInPass( mDefinition->mEnableForwardPlus );
         sceneManager->_setPrePassMode( mDefinition->mPrePassMode, mPrePassTextures, mSsrTexture );
+        sceneManager->_setCurrentCompositorPass( this );
 
         if( !mDefinition->mReuseCullData )
         {
@@ -205,6 +206,13 @@ namespace Ogre
         mViewport->setMaterialScheme(oldViewportMatScheme);
 
         sceneManager->_setPrePassMode( PrePassNone, 0, 0 );
+        sceneManager->_setCurrentCompositorPass( 0 );
+
+        if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )
+        {
+            sceneManager->_setCurrentShadowNode( 0, false );
+            sceneManager->_setForwardPlusEnabledInPass( false );
+        }
 
         if( listener )
             listener->passPosExecute( this );

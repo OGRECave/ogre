@@ -60,6 +60,8 @@ namespace Ogre
         PASS_CUSTOM
     };
 
+    class CompositorTargetDef;
+
     /** Interface to abstract all types of pass definitions (@see CompositorPassType):
             * PASS_SCENE (@See CompositorPassSceneDef)
             * PASS_QUAD (@See CompositorPassQuadDef)
@@ -83,8 +85,7 @@ namespace Ogre
     {
         CompositorPassType  mPassType;
 
-        /// Used for cubemaps and 3D textures.
-        uint32              mRtIndex;
+        CompositorTargetDef *mParentTargetDef;
 
     public:
         /// Viewport's region to draw
@@ -126,6 +127,11 @@ namespace Ogre
         uint8               mExecutionMask;
         uint8               mViewportModifierMask;
 
+        /// Only used if mShadowMapIdx is valid (if pass is owned by Shadow Nodes). If true,
+        /// we won't force the viewport to fit the region of the UV atlas on the texture,
+        /// and respect mVp* settings instead.
+        bool                mShadowMapFullViewport;
+
         IdStringVec         mExposedTextures;
 
         struct UavDependency
@@ -149,23 +155,25 @@ namespace Ogre
         UavDependencyVec    mUavDependencies;
 
     public:
-        CompositorPassDef( CompositorPassType passType, uint32 rtIndex ) :
-            mPassType( passType ), mRtIndex( rtIndex ),
+        CompositorPassDef( CompositorPassType passType, CompositorTargetDef *parentTargetDef ) :
+            mPassType( passType ), mParentTargetDef( parentTargetDef ),
             mVpLeft( 0 ), mVpTop( 0 ),
             mVpWidth( 1 ), mVpHeight( 1 ),
             mVpScissorLeft( 0 ), mVpScissorTop( 0 ),
             mVpScissorWidth( 1 ), mVpScissorHeight( 1 ),
-            mShadowMapIdx( 0 ),
+            mShadowMapIdx( -1 ),
             mNumInitialPasses( -1 ), mIdentifier( 0 ),
             mBeginRtUpdate( true ), mEndRtUpdate( true ),
             mColourWrite( true ),
             mIncludeOverlays( false ),
             mExecutionMask( 0xFF ),
-            mViewportModifierMask( 0xFF ) {}
+            mViewportModifierMask( 0xFF ),
+            mShadowMapFullViewport( false ) {}
         virtual ~CompositorPassDef() {}
 
         CompositorPassType getType() const              { return mPassType; }
-        uint32 getRtIndex(void) const                   { return mRtIndex; }
+        uint32 getRtIndex(void) const;
+        const CompositorTargetDef* getParentTargetDef(void) const;
     };
 
     typedef vector<CompositorPassDef*>::type CompositorPassDefVec;
@@ -176,8 +184,17 @@ namespace Ogre
         IdString                mRenderTargetName;
         CompositorPassDefVec    mCompositorPasses;
 
-        /// @copydoc CompositorPass::mRtIndex
+        /// Used for cubemaps and 3D textures.
         uint32                  mRtIndex;
+
+        /// Used by shadow map passes only. Determines which light types are supposed
+        /// to be run with the current shadow casting light. i.e. usually point lights
+        /// need to be treated differently, and only directional lights are compatible
+        /// with PSSM. This bitmask contains:
+        ///     mShadowMapSupportedLightTypes & 1u << Light::LT_DIRECTIONAL
+        ///     mShadowMapSupportedLightTypes & 1u << Light::LT_POINT
+        ///     mShadowMapSupportedLightTypes & 1u << Light::LT_SPOTLIGHT
+        uint8                   mShadowMapSupportedLightTypes;
 
         CompositorNodeDef       *mParentNodeDef;
 
@@ -186,11 +203,15 @@ namespace Ogre
                              CompositorNodeDef *parentNodeDef ) :
                 mRenderTargetName( renderTargetName ),
                 mRtIndex( rtIndex ),
+                mShadowMapSupportedLightTypes( 0 ),
                 mParentNodeDef( parentNodeDef ) {}
         ~CompositorTargetDef();
 
         IdString getRenderTargetName() const            { return mRenderTargetName; }
         uint32 getRtIndex(void) const                   { return mRtIndex; }
+
+        void setShadowMapSupportedLightTypes( uint8 types ) { mShadowMapSupportedLightTypes = types; }
+        uint8 getShadowMapSupportedLightTypes(void) const   { return mShadowMapSupportedLightTypes; }
 
         /** Reserves enough memory for all passes (efficient allocation)
         @remarks

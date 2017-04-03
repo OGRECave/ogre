@@ -64,28 +64,28 @@ namespace Ogre
         switch( passType )
         {
         case PASS_CLEAR:
-            retVal = OGRE_NEW CompositorPassClearDef( mRtIndex );
+            retVal = OGRE_NEW CompositorPassClearDef( this );
             break;
         case PASS_QUAD:
-            retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef, mRtIndex );
+            retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef, this );
             break;
         case PASS_SCENE:
-            retVal = OGRE_NEW CompositorPassSceneDef( mRtIndex );
+            retVal = OGRE_NEW CompositorPassSceneDef( this );
             break;
         case PASS_STENCIL:
-            retVal = OGRE_NEW CompositorPassStencilDef( mRtIndex );
+            retVal = OGRE_NEW CompositorPassStencilDef( this );
             break;
         case PASS_DEPTHCOPY:
-            retVal = OGRE_NEW CompositorPassDepthCopyDef( mParentNodeDef, mRtIndex );
+            retVal = OGRE_NEW CompositorPassDepthCopyDef( mParentNodeDef, this );
             break;
         case PASS_UAV:
-            retVal = OGRE_NEW CompositorPassUavDef( mParentNodeDef, mRtIndex );
+            retVal = OGRE_NEW CompositorPassUavDef( mParentNodeDef, this );
             break;
         case PASS_MIPMAP:
-            retVal = OGRE_NEW CompositorPassMipmapDef();
+            retVal = OGRE_NEW CompositorPassMipmapDef( this );
             break;
         case PASS_COMPUTE:
-            retVal = OGRE_NEW CompositorPassComputeDef( mParentNodeDef, mRtIndex );
+            retVal = OGRE_NEW CompositorPassComputeDef( mParentNodeDef, this );
             break;
         case PASS_CUSTOM:
             {
@@ -98,7 +98,7 @@ namespace Ogre
                                  "CompositorTargetDef::addPass" );
                 }
 
-                retVal = passProvider->addPassDef( passType, customId, mRtIndex, mParentNodeDef );
+                retVal = passProvider->addPassDef( passType, customId, this, mParentNodeDef );
             }
             break;
         default:
@@ -112,4 +112,13 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    uint32 CompositorPassDef::getRtIndex() const
+    {
+        return mParentTargetDef->getRtIndex();
+    }
+    //-----------------------------------------------------------------------------------
+    const CompositorTargetDef* CompositorPassDef::getParentTargetDef() const
+    {
+        return mParentTargetDef;
+    }
 }

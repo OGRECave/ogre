@@ -26,6 +26,13 @@ namespace Demo
 {
     class InstantRadiosityGraphicsSystem : public GraphicsSystem
     {
+        virtual Ogre::CompositorWorkspace* setupCompositor()
+        {
+            Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+            return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
+                                                    "ShadowMapDebuggingWorkspace", true );
+        }
+
     public:
         InstantRadiosityGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )

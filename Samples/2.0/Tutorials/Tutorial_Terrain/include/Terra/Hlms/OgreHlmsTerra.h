@@ -93,7 +93,7 @@ namespace Ogre
 
         struct PassData
         {
-            FastArray<TexturePtr>   shadowMaps;
+            FastArray<Texture*> shadowMaps;
             FastArray<float>    vertexShaderSharedBuffer;
             FastArray<float>    pixelShaderSharedBuffer;
 
@@ -116,6 +116,8 @@ namespace Ogre
 
         uint32 mLastTextureHash;
         MovableObject const *mLastMovableObject;
+
+        bool mDebugPssmSplits;
 
         ShadowFilter mShadowFilter;
         AmbientLightMode mAmbientLightMode;
@@ -173,6 +175,9 @@ namespace Ogre
 
         virtual void frameEnded(void);
 
+        void setDebugPssmSplits( bool bDebug );
+        bool getDebugPssmSplits(void) const                 { return mDebugPssmSplits; }
+
         void setShadowSettings( ShadowFilter filter );
         ShadowFilter getShadowFilter(void) const            { return mShadowFilter; }
 
@@ -198,6 +203,7 @@ namespace Ogre
         static const IdString HwGammaWrite;
         static const IdString SignedIntTex;
         static const IdString MaterialsPerBuffer;
+        static const IdString DebugPssmSplits;
 
         static const IdString UseSkirts;
 

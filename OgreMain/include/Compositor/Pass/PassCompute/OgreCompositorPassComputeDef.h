@@ -110,8 +110,9 @@ namespace Ogre
         IdString mJobName;
         IdString mCameraName;
 
-		CompositorPassComputeDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :
-            CompositorPassDef( PASS_COMPUTE, rtIndex ),
+        CompositorPassComputeDef( CompositorNodeDef *parentNodeDef,
+                                  CompositorTargetDef *parentTargetDef ) :
+            CompositorPassDef( PASS_COMPUTE, parentTargetDef ),
             mParentNodeDef( parentNodeDef )
         {
         }
