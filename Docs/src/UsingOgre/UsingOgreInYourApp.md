@@ -93,11 +93,14 @@ Uncomment it, and run the CMakeLists.txt script.
     -# Copy Samples/2.0/Tutorials/EmptyProject to wherever you want. We'll refer to its location now as "EmptyProject"
     -# Copy Ogre repository (or use symbolic links) to EmptyProject/Dependencies/Ogre
     -# Run CMake on EmptyProject and build into EmptyProject/build (though you can choose a different path if you want).
+    -# On Linux, CMake may complain that EmptyProject/Dependencies/Ogre/build/RelWithDebInfo was not found
+       if you didn't build that version. In that case modify CMAKE_BUILD_TYPE and OGRE_BINARIES to point to the
+       correct build type (e.g. Debug instead) and run Configure again.
     -# Compile the project.
     -# Run it. If necessary, configure the working directory to be EmptyProject/bin/Release
        (on Visual Studio, Alt+F7 -> Debugging -> Working Directory)
 
-### Copied files Samples/2.0/Common
+### A note about copied files from Samples/2.0/Common {#AnoteaboutcopiedfilesfromSamples_20_Common}
 The script will copy all the files from Samples/2.0/Common so you already have a system in place
 that takes care of window management and input and other misc stuff.
 
