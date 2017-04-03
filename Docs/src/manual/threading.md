@@ -16,13 +16,13 @@ The number of worker threads must be provided by the user when creating
 the SceneManager:
 
 ```cpp
- constsize_t numThreads =4;
+const size_t numThreads = 4;
 InstancingTheadedCullingMethod
-		threadedCullingMethod =INSTANCING_CULLING_THREADED;
+        threadedCullingMethod = INSTANCING_CULLING_THREADED;
 
-mSceneMgr =mRoot->createSceneManager(ST_GENERIC,numThreads,
-						threadedCullingMethod,
-						"ExampleSMInstance");	 
+mSceneMgr = mRoot->createSceneManager( ST_GENERIC,numThreads,
+                                       threadedCullingMethod,
+                                       "ExampleSMInstance" );
 ```
 
 The other threading parameter besides the number of threads, is the
@@ -131,9 +131,10 @@ The following tasks are partitioned into multiple threads:
     receiver's aabb data from RQs 0 to 3; which aren't available. It is
     very similar to frustum culling; except that the cull list isn't
     produced, only the aabb is calculated. Since aabb merges are
-    associative: ![](aabb_merge.gif) we can join the results from all threads after
-    they've done. In fact, we even use this associative property to
-    process them using SIMD.
+    associative: ![](aabb_merge.svg)
+    we can join the results from all threads after they're done.
+    In fact, we even exploit this associative property to process them
+    using SIMD.
 -   Node transform updates: Updating all scene nodes' derived position
     and orientation by inheriting from their parent's derived position &
     orientation. We have to wait for every parent level depth due to
@@ -157,24 +158,24 @@ worker threads:
 ```cpp
 #include <Threading/OgreUniformScalableTask.h>
 
-classMyThreadedTask :publicOgre::UniformScalableTask
+class MyThreadedTask : public Ogre::UniformScalableTask
 {
 public:
-	virtualvoidexecute(size_t threadId,size_t numThreads )
-	{
-		printf("Hello world from thread %i",threadId );
-	}
+    virtual void execute( size_t threadId, size_t numThreads )
+    {
+        printf( "Hello world from thread %i",threadId );
+    }
 };
 
-intmain()
+int main()
 {
-	/** assumes Ogre is initialized and sceneMgr is a valid ptr **/
-	Ogre::SceneManager *sceneMgr;
-	
-	MyThreadedTask myThreadedTask;
-	sceneMgr->executeUserScalableTask(myThreadedTask,true);
-	
-	return0;
+    // assumes Ogre is initialized and sceneMgr is a valid ptr
+    Ogre::SceneManager *sceneMgr;
+
+    MyThreadedTask myThreadedTask;
+    sceneMgr->executeUserScalableTask( myThreadedTask,true );
+
+    return 0;
 }
 ```
 
@@ -186,28 +187,28 @@ that SceneManager.
 not wish to block; you can pass false to the second argument and then
 call `waitForPendingUserScalableTask` to block until done:
 
-```
+```cpp
 int main()
 {
-	/** assumes Ogre is intialized and sceneMgr is a valid ptr **/
-	SceneManager *sceneMgr;
-	
-	MyThreadedTask myThreadedTask;
-	sceneMgr->executeUserScalableTask(myThreadedTask,false);
+    // assumes Ogre is intialized and sceneMgr is a valid ptr
+    SceneManager *sceneMgr;
 
-	doSomeWork();
-	printf("I am going to sleep now");
+    MyThreadedTask myThreadedTask;
+    sceneMgr->executeUserScalableTask( myThreadedTask, false );
 
-	sceneMgr->waitForPendingUserScalableTask();
+    doSomeWork();
+    printf( "I am going to sleep now" );
 
-	printf("All worker threads finished. Resuming execution of main thread");
-	
-	return0;
+    sceneMgr->waitForPendingUserScalableTask();
+
+    printf( "All worker threads finished. Resuming execution of main thread" );
+
+    return 0;
 }
 ```
 
 >  Attention!
->  
+>
 >  You **must** call *waitForPendingUserScalableTask* after calling *executeUserScalableTask*( myThreadedTask, false ) before *executeUserScalableTask* can be called again.
 >  Otherwise deadlocks are bound to happen and Ogre makes no integrity checks. Queuing or scheduling of multiples tasks is not supported. This system is for synchronous multithreading, not for asynchronous tasks.
 

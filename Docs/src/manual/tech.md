@@ -33,7 +33,7 @@ handles all the `ObjectDataArrayMemoryManager`.
         rotations, scale, the derived pos, rot, scales; etc) which is
         all SoA pointers.
 
-![](node_mm.gif)
+![](node_mm.svg)
 
 `ObjectDataMemoryManager`
 
@@ -43,7 +43,7 @@ handles all the `ObjectDataArrayMemoryManager`.
         world space, radius, visibility masks; etc) which is all SoA
         pointers.
 
-![](object_mm.gif)
+![](object_mm.svg)
 
 ## SIMD Coherence {#SIMDCoherence}
 
