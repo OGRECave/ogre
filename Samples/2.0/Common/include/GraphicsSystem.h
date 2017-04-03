@@ -35,6 +35,8 @@ namespace Demo
         Ogre::SceneManager          *mSceneManager;
         Ogre::Camera                *mCamera;
         Ogre::CompositorWorkspace   *mWorkspace;
+        Ogre::String                mPluginsPath;
+        Ogre::String                mWriteAccessFolder;
         Ogre::String                mResourcePath;
 
         Ogre::v1::OverlaySystem     *mOverlaySystem;

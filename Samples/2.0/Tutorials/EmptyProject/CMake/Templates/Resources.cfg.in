@@ -1,0 +1,14 @@
+[Essential]
+Zip=@OGRE_MEDIA_DIR@Data/DebugPack.zip
+
+[Popular]
+FileSystem=@OGRE_MEDIA_DIR@Data
+FileSystem=@OGRE_MEDIA_DIR@Data/Materials/Common
+FileSystem=@OGRE_MEDIA_DIR@Data/Materials/Common/GLSL
+FileSystem=@OGRE_MEDIA_DIR@Data/Materials/Common/HLSL
+FileSystem=@OGRE_MEDIA_DIR@Data/Materials/Common/Metal
+
+# Do not load this as a resource. It's here merely to tell the code where
+# the Hlms templates are located
+[Hlms]
+DoNotUseAsResource=@OGRE_MEDIA_DIR@Data

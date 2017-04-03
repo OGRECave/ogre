@@ -1,0 +1,9 @@
+build/
+bin/Debug
+bin/MinSizeRel
+bin/Release
+bin/RelWithDebInfo
+bin/Data/Hlms/Common
+bin/Data/Hlms/Pbs
+bin/Data/Hlms/Unlit
+bin/Data/Materials/Common

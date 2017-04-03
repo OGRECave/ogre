@@ -81,15 +81,15 @@ namespace Demo
         // only use plugins.cfg if not static
     #ifndef OGRE_STATIC_LIB
     #if OGRE_DEBUG_MODE
-        pluginsPath = mResourcePath + "plugins_d.cfg";
+        pluginsPath = mPluginsPath + "plugins_d.cfg";
     #else
-        pluginsPath = mResourcePath + "plugins.cfg";
+        pluginsPath = mPluginsPath + "plugins.cfg";
     #endif
     #endif
 
         mRoot = OGRE_NEW Ogre::Root( pluginsPath,
-                                     mResourcePath + "ogre.cfg",
-                                     mResourcePath + "Ogre.log" );
+                                     mWriteAccessFolder + "ogre.cfg",
+                                     mWriteAccessFolder + "Ogre.log" );
 
     #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         mResourcePath = Ogre::macBundlePath() + '/';

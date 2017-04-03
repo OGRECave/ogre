@@ -1,0 +1,8 @@
+# Defines plugins to load
+
+# Define plugin folder
+PluginFolder=@OGRE_PLUGIN_DIR@
+
+# Define plugins
+@OGRE_PLUGIN_RS_D3D11@
+@OGRE_PLUGIN_RS_GL3PLUS@

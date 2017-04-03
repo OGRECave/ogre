@@ -29,7 +29,11 @@ if(DOXYGEN_FOUND)
       )
     endif ()
     
-    file(GLOB MANUAL ${OGRE_SOURCE_DIR}/Docs/src/manual/*.md)
+	file(GLOB MANUAL
+			${OGRE_SOURCE_DIR}/Docs/src/manual/*.md
+			${OGRE_SOURCE_DIR}/Docs/src/SettingUpOgre/*.md
+			${OGRE_SOURCE_DIR}/Docs/src/UsingOgre/*.md
+		)
     
     set(CMAKE_DOXYGEN_INPUT_LIST 
         ${OGRE_SOURCE_DIR}/OgreMain
