@@ -145,7 +145,7 @@ namespace Ogre {
     
     }
     //-----------------------------------------------------------------------
-    DataStreamPtr ZipArchive::open(const String& filename, bool readOnly)
+    DataStreamPtr ZipArchive::open(const String& filename, bool readOnly) const
     {
         // zziplib is not threadsafe
         OGRE_LOCK_AUTO_MUTEX;
@@ -209,12 +209,12 @@ namespace Ogre {
             "ZipArchive::remove");
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr ZipArchive::list(bool recursive, bool dirs)
+    StringVectorPtr ZipArchive::list(bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
         StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
-        FileInfoList::iterator i, iend;
+        FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
             if ((dirs == (i->compressedSize == size_t (-1))) &&
@@ -224,7 +224,7 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    FileInfoListPtr ZipArchive::listFileInfo(bool recursive, bool dirs)
+    FileInfoListPtr ZipArchive::listFileInfo(bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
         FileInfoList* fil = OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)();
@@ -238,7 +238,7 @@ namespace Ogre {
         return FileInfoListPtr(fil, SPFM_DELETE_T);
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr ZipArchive::find(const String& pattern, bool recursive, bool dirs)
+    StringVectorPtr ZipArchive::find(const String& pattern, bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
         StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
@@ -247,7 +247,7 @@ namespace Ogre {
                           (pattern.find ('\\') != String::npos);
         bool wildCard = pattern.find("*") != String::npos;
             
-        FileInfoList::iterator i, iend;
+        FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
             if ((dirs == (i->compressedSize == size_t (-1))) &&
@@ -260,7 +260,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     FileInfoListPtr ZipArchive::findFileInfo(const String& pattern, 
-        bool recursive, bool dirs)
+        bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
         FileInfoListPtr ret = FileInfoListPtr(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
@@ -289,7 +289,7 @@ namespace Ogre {
         }
     };
     //-----------------------------------------------------------------------
-    bool ZipArchive::exists(const String& filename)
+    bool ZipArchive::exists(const String& filename) const
     {       
         OGRE_LOCK_AUTO_MUTEX;
         String cleanName = filename;
@@ -304,7 +304,7 @@ namespace Ogre {
         return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), cleanName)) != mFileList.end();
     }
     //---------------------------------------------------------------------
-    time_t ZipArchive::getModifiedTime(const String& filename)
+    time_t ZipArchive::getModifiedTime(const String& filename) const
     {
         // Zziplib doesn't yet support getting the modification time of individual files
         // so just check the mod time of the zip itself

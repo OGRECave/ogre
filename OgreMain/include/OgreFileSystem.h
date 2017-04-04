@@ -61,7 +61,7 @@ namespace Ogre {
             Populated if retrieving a detailed list.
         */
         void findFiles(const String& pattern, bool recursive, bool dirs,
-            StringVector* simpleList, FileInfoList* detailList);
+            StringVector* simpleList, FileInfoList* detailList) const;
 
         OGRE_AUTO_MUTEX;
     public:
@@ -77,7 +77,7 @@ namespace Ogre {
         void unload();
 
         /// @copydoc Archive::open
-        DataStreamPtr open(const String& filename, bool readOnly = true);
+        DataStreamPtr open(const String& filename, bool readOnly = true) const;
 
         /// @copydoc Archive::create
         DataStreamPtr create(const String& filename);
@@ -86,24 +86,24 @@ namespace Ogre {
         void remove(const String& filename);
 
         /// @copydoc Archive::list
-        StringVectorPtr list(bool recursive = true, bool dirs = false);
+        StringVectorPtr list(bool recursive = true, bool dirs = false) const;
 
         /// @copydoc Archive::listFileInfo
-        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false);
+        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const;
 
         /// @copydoc Archive::find
         StringVectorPtr find(const String& pattern, bool recursive = true,
-            bool dirs = false);
+            bool dirs = false) const;
 
         /// @copydoc Archive::findFileInfo
         FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true,
-            bool dirs = false);
+            bool dirs = false) const;
 
         /// @copydoc Archive::exists
-        bool exists(const String& filename);
+        bool exists(const String& filename) const;
 
         /// @copydoc Archive::getModifiedTime
-        time_t getModifiedTime(const String& filename);
+        time_t getModifiedTime(const String& filename) const;
 
         /// Set whether filesystem enumeration will include hidden files or not.
         /// This should be called prior to declaring and/or initializing filesystem

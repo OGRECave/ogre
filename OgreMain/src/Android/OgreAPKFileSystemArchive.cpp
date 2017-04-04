@@ -62,7 +62,7 @@ namespace Ogre{
 
 	}
 
-	DataStreamPtr APKFileSystemArchive::open(const Ogre::String &filename, bool readOnly)
+	DataStreamPtr APKFileSystemArchive::open(const Ogre::String &filename, bool readOnly) const
 	{
 		DataStreamPtr stream;
 		AAsset* asset = AAssetManager_open(mAssetMgr, (mPathPreFix + filename).c_str(), AASSET_MODE_BUFFER);
@@ -88,7 +88,7 @@ namespace Ogre{
 
 	}
 
-	StringVectorPtr APKFileSystemArchive::list(bool recursive, bool dirs)
+	StringVectorPtr APKFileSystemArchive::list(bool recursive, bool dirs) const
 	{
 		StringVectorPtr files(new StringVector);
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
@@ -100,7 +100,7 @@ namespace Ogre{
 		return files;
 	}
 
-	FileInfoListPtr APKFileSystemArchive::listFileInfo(bool recursive, bool dirs)
+	FileInfoListPtr APKFileSystemArchive::listFileInfo(bool recursive, bool dirs) const
 	{
 		FileInfoListPtr files(new FileInfoList);
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
@@ -124,7 +124,7 @@ namespace Ogre{
 		return files;
 	}
 
-	StringVectorPtr APKFileSystemArchive::find(const String& pattern, bool recursive, bool dirs)
+	StringVectorPtr APKFileSystemArchive::find(const String& pattern, bool recursive, bool dirs) const
 	{
 		StringVectorPtr files(new StringVector);
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
@@ -137,7 +137,7 @@ namespace Ogre{
 		return files;
 	}
 
-	FileInfoListPtr APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs)
+	FileInfoListPtr APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs) const
 	{
 		FileInfoListPtr files(new FileInfoList);
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
@@ -163,7 +163,7 @@ namespace Ogre{
 		return files;
 	}
 
-	bool APKFileSystemArchive::exists(const String& filename)
+	bool APKFileSystemArchive::exists(const String& filename) const
 	{
 		AAsset* asset = AAssetManager_open(mAssetMgr, (mPathPreFix + filename).c_str(), AASSET_MODE_UNKNOWN);
 		if(asset)
@@ -174,7 +174,7 @@ namespace Ogre{
 		return false;
 	}
 
-	time_t APKFileSystemArchive::getModifiedTime(const Ogre::String &filename)
+	time_t APKFileSystemArchive::getModifiedTime(const Ogre::String &filename) const
 	{
 		return 0;
 	}
