@@ -89,7 +89,7 @@ You will find the first line of CMakeLists.txt to be commented:
 Uncomment it, and run the CMakeLists.txt script.
 
 
-## Creating your application {#CreatingYourApplication}
+## Creating your application with 'EmptyProject' script {#CreatingYourApplication}
     -# Copy Samples/2.0/Tutorials/EmptyProject to wherever you want. We'll refer to its location now as "EmptyProject"
     -# Copy Ogre repository (or use symbolic links) to EmptyProject/Dependencies/Ogre
     -# Run CMake on EmptyProject and build into EmptyProject/build (though you can choose a different path if you want).

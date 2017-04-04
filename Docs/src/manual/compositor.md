@@ -195,32 +195,32 @@ channels, however for temporary rtts (or rtts that are accessed very
 frequently, i.e. a deferred shader's G Buffer) it would lead to
 connection hell; and hence global textures are a much better fit.
 
--   in &lt;channel\_id&gt; &lt;local\_texture\_name&gt;
+-   in \<channel\_id\>; \<local\_texture\_name\>;
 
 channel\_id is a number in range \[0; inf) but must be consecutive and
 continuous (no gaps, i.e. define channel 0, 2, but not 1).
 loca\_texture\_name cannot start with `global_`. A node definition may
 have no input.
 
--   out &lt;channel\_id&gt; &lt;local\_texture\_name&gt;
+-   out \<channel\_id\>; \<local\_texture\_name\>;
 
 channel\_id is a number in range \[0; inf) but must be consecutive and
 continuous (no gaps, i.e. define channel 0, 2, but not 1).
 loca\_texture\_name cannot start with `global_`. A node definition may
 have no output.
 
--   in\_buffer &lt;channel\_id&gt; &lt;buffer\_name&gt;
+-   in\_buffer \<channel\_id\>; \<buffer\_name\>;
 
 For UAV buffers. Same as with regular textures, except you can reference
 global buffers, and global buffers don't have to start with `global_`.
 If a local buffer and a global buffer have the same name, the local
 buffer takes precedence.
 
--   out\_buffer &lt;channel\_id&gt; &lt;buffer\_name&gt;
+-   out\_buffer \<channel\_id\>; \<buffer\_name\>;
 
 For UAV buffer connections. See `in_buffer`.
 
--   custom\_id &lt;string&gt;
+-   custom\_id \<string\>;
 
 Custom string that will be hashed to identify this Node definition.
 Useful for classifying nodes into categories.
@@ -285,7 +285,7 @@ Planned passes are:
 
 All passes support the following script parameters:
 
--   pass &lt;type&gt; \[customId\]
+-   pass \<type\>; \[customId\]
 
 '*type*' must be one of the supported types: clear, quad, resolve,
 render\_scene, stencil, custom.
@@ -294,7 +294,7 @@ The *customId* parameter is optional and is used by custom passes to
 give the registered custom pass provider the means to identify multiple
 types, in case there are more than one type of custom passes.
 
--   num\_initial &lt;number&gt;
+-   num\_initial \<number\>;
 
 Number of times this will be executed. Default is -1, which means always
 execute. When the execution count hits that value, it won't executed
@@ -303,26 +303,26 @@ execution count is reset and executed N times again)
 
 This parameter replaces the `only_initial` parameter in Ogre 1.x.
 
--   identifier &lt;number&gt;
+-   identifier \<number\>;
 
 An arbitrary user-defined numeric ID used for identifying individual
 passes in the C++ code.
 
--   execution\_mask &lt;hex number&gt;
+-   execution\_mask \<hex number\>;
 
 8-bit hex value. Specifies the execution mask. For more information see
 [Stereo and Split-Screen Rendering for more
 information](#4.5.Stereo and Split-Screen Rendering|outline). Default is
 0xFF except for clear passes, which default to 0x01.
 
--   viewport\_modifier\_mask &lt;hex number&gt;
+-   viewport\_modifier\_mask \<hex number\>;
 
 8-bit hex value. Specifies the viewport modifier mask. For more
 information see [Stereo and Split-Screen Rendering for more
 information](#4.5.Stereo and Split-Screen Rendering|outline). Default is
 0xFF except for clear passes, which default to 0x00.
 
--   colour\_write &lt;off|on&gt;
+-   colour\_write \<off|on\>;
 
 Disables colour writes. Useful for Z prepass passes; or pixel shaders
 that output to an UAV instead of a regular RenderTarget (like a Render
@@ -373,12 +373,12 @@ therefore textures have to use no\_gamma modifier.
 `compute_hq` (Experimental) uses a high quality gaussian filter. Useful
 for fast & high quality mipmap generation.
 
--   kernel\_radius &lt;8&gt;
+-   kernel\_radius \<8\>;
 
 Integer value. Default is 8. Must be positive, even number. Defines the
 kernel radius of the compute gaussian filter.
 
--   gauss\_deviation &lt;0,5&gt;
+-   gauss\_deviation \<0,5\>;
 
 The standard deviation of the gaussian filter. The default is 0,5.
 
@@ -423,7 +423,7 @@ For an explanation of why this is a performance optimization, refer to
 [Optimizing the basic rasterizer](http://fgiesen.wordpress.com/2013/02/10/optimizing-the-basic-rasterizer/)
 by Fabien Giesen.
 
--   expose &lt;textureName&gt;
+-   expose \<textureName\>;
 
 Low level materials can access local and global textures via the old
 'content\_type compositor' setting, and Hlms materials can access them
@@ -487,20 +487,20 @@ for more information.
 The syntax is also similar to 1.x; but there were a couple
 modifications:
 
--   rq\_first &lt;id&gt;
+-   rq\_first \<id\>;
 
 Replaces first\_render\_queue. The default is 0. Must be a value between
 0 and 255. The value is inclusive
 
--   rq\_last &lt;id&gt;
+-   rq\_last \<id\>;
 
 Replaces last\_render\_queue. The default is `max` which is a special
 parameter that implies the last active render queue ID. If numeric,
 value must be between 0 and 255. The value is **not** inclusive.
 
--   viewport &lt;left&gt; &lt;top&gt; &lt;width&gt; &lt;height&gt;
-    \[&lt;scissor\_left&gt; &lt;scissor\_top&gt; &lt;scissor\_width&gt;
-    &lt;scissor\_height&gt;\]
+-   viewport \<left\>; \<top\>; \<width\>; \<height\>;
+    \[\<scissor\_left\>; \<scissor\_top\>; \<scissor\_width\>;
+    \<scissor\_height\>;\]
 
 Specifies the viewport. Also supported by all other passes (i.e. clear &
 quads), The default is `0 0 1 1` which covers the entire screen. Values
@@ -515,7 +515,7 @@ The Compositor will automatically share Viewport pointers between
 different passes to the same RenderTarget (even for different nodes) as
 long as they share the exact same parameters.
 
--   visibility\_mask &lt;number&gt;
+-   visibility\_mask \<number\>;
 
 Visibility mask to be used by the pass' viewport. Those entities that
 fail the test '*entityMask & visibility\_mask*' will not be rendered.
@@ -523,8 +523,8 @@ There are no significant changes to Ogre 1.x, except that the script
 compiler now accepts hexadecimal values with the 0x prefix; not just
 decimal values.
 
--   shadows &lt;off|shadow\_node\_name&gt;
-    &lt;reuse|recalculate|first&gt;
+-   shadows \<off|shadow\_node\_name\>;
+    \<reuse|recalculate|first\>;
 
 Off by default. Specifies the shadow node to use for rendering with
 shadow maps. See section about [*Shadow
@@ -532,7 +532,7 @@ Nodes*](#3.2.4.Reuse, recalculate & first|outline) for more information.
 When a shadow node's name is provided, the second parameter defaults to
 *first*.
 
--   overlays &lt;off|on&gt;
+-   overlays \<off|on\>;
 
 Whether to Overlays from the OverlaySystem component. On by default for
 regular nodes, Off by default on shadow nodes. The goal is that
@@ -540,7 +540,7 @@ eventually Overlays obey RenderQueue IDs like everything else, but it
 was too hard to port (Overlay system is tad bit complex...) so this
 hack/flag was created. It will be eventually removed.
 
--   camera &lt;camera\_name&gt;
+-   camera \<camera\_name\>;
 
 When not specified, the default camera is used for rendering the pass
 (this default camera is specified when instantiating the workspace from
@@ -552,7 +552,7 @@ wants to be in control of the camera, while the Compositor is associated
 with it. The Camera must be created by the user before the workspace is
 instantiated and remain valid until the workspace is destroyed.
 
--   lod\_camera &lt;camera\_name&gt;
+-   lod\_camera \<camera\_name\>;
 
 The camera point of view from which the LOD calculations will be based
 from (i.e. useful for shadow mapping, which needs the LOD to match that
@@ -573,7 +573,7 @@ effectively turn lodding off (and alleviate the CPU). Default: Yes;
 except for passes belonging to shadow nodes, which is forced to false
 unless lod\_camera is a non-empty string.
 
--   lod\_bias &lt;bias&gt;
+-   lod\_bias \<bias\>;
 
 Applies a bias multiplier to the lod. Valid values are in range \[0;
 Inf). A higher lod bias causes LOD to pop up sooner. Default: 1.0
@@ -605,7 +605,7 @@ saving if F3D didn't already have a cache from a previous pass during
 the same frame, with the exact same camera and angle). GPU side, the
 pixel shaders will be lighter.
 
--   expose &lt;textureName&gt;
+-   expose \<textureName\>;
 
 Low level materials can access local and global textures via the old
 'content\_type compositor' setting, and Hlms materials can access them
@@ -614,6 +614,19 @@ that, you need to expose them to the pass. This is necessary so Ogre can
 know which textures may or will be used during the pass so resource
 transitions and barriers can be issued in explicit APIs like DX12 and
 Vulkan.
+
+-   is_prepass \[yes|no\];
+
+Indicates this is a prepass render. HlmsPbs implementation will render a GBuffer
+with normals and shadow mapping information.
+See ScreenSpaceReflections sample for an example on how to use it.
+
+-   use_prepass \<GBuffer\> \[reflectionBuffer\]
+
+Indicates this pass will take advantage of the data generated during the prepass,
+which means depth buffer writes may be forced to off; normals will be sourced
+for the GBuffer. And if present, a reflection texture will be used for calculating
+SSR (Screen Space Reflections).
 
 ### stencil {#CompositorNodesPassesStencil}
 
@@ -685,7 +698,7 @@ you abide to certain rules).
 Because D3D11 is more restrictive than OpenGL, our interface resemble's
 D3D11.
 
--   starting\_slot &lt;number&gt;
+-   starting\_slot \<number\>;
 
 Offset for all UAV slots. For example if you bind an uav to slot 3 and
 the starting slot is 2; the uav will actually be bound to uav slot 5.
@@ -694,8 +707,8 @@ made.
 
 Default: 255 (by default Ogre sets it to 1).
 
--   uav &lt;slot&gt; &lt;texture\_name&gt; \[mrt \#\] &lt;read&gt;
-    &lt;write&gt; \[pixel\_format\] \[&lt;mipmap&gt; \#\]
+-   uav \<slot\>; \<texture\_name\>; \[mrt \#\] \<read\>;
+    \<write\>; \[pixel\_format\] \[\<mipmap\>; \#\]
 
 Sets a texture visible in the current compositor scope (i.e. global
 textures, input textures, local textures). Slot, name and at least read
@@ -724,8 +737,8 @@ Exactly the same as uav. But instead of sourcing the texture by name
 from the Compositor scope, the name is referencing a texture that can be
 accessed via `TextureManager::getByName`.
 
--   uav\_buffer &lt;slot&gt; &lt;bufferName&gt; &lt;read&gt;
-    &lt;write&gt; \[offsetBytes\] \[sizeBytes\]
+-   uav\_buffer \<slot\>; \<bufferName\>; \<read\>;
+    \<write\>; \[offsetBytes\] \[sizeBytes\]
 
 Sets an UAV buffer visible in the current compositor scope (i.e. global
 buffers, input buffers, local buffers). Slot, name and at least read or
@@ -783,27 +796,27 @@ section!!!
 Compute passes let you run a compute job. It can read textures,
 read/write to UAV textures, and read/write to UAV buffers.
 
--   job &lt;job\_name&gt;
+-   job \<job\_name\>;
 
 Sets the name of the compute job to run (an HlmsComputeJob).
 
--   uav &lt;slot&gt; &lt;texture\_name&gt; \[mrt \#\] &lt;read&gt;
-    &lt;write&gt; \[pixel\_format\] \[&lt;mipmap&gt; \#\]
+-   uav \<slot\>; \<texture\_name\>; \[mrt \#\] \<read\>;
+    \<write\>; \[pixel\_format\] \[\<mipmap\>; \#\]
     \[allow\_write\_after\_write\]
 
 See `uav_queue`'s description. The presense of `allow_write_after_write`
 means the compositor will not insert a barrier between to consecutive
 passes that writes to the UAV without reading.
 
--   uav\_buffer &lt;slot&gt; &lt;bufferName&gt; &lt;read&gt;
-    &lt;write&gt; \[offsetBytes\] \[sizeBytes\]
+-   uav\_buffer \<slot\>; \<bufferName\>; \<read\>;
+    \<write\>; \[offsetBytes\] \[sizeBytes\]
     \[allow\_write\_after\_write\]
 
 See `uav_queue`'s description. The presense of `allow_write_after_write`
 means the compositor will not insert a barrier between to consecutive
 passes that writes to the UAV without reading.
 
--   input &lt;slot&gt; &lt;texture\_name&gt; \[mrt \#\]
+-   input \<slot\>; \<texture\_name\>; \[mrt \#\]
 
 Binds a texture to the texture unit. Syntax is the same as `pass_quad`.
 The slot is not shared with the uav's.
@@ -876,6 +889,99 @@ compositor_node MyNode
 >  Don't interleave compute and graphics passes. For optimum performance, try to batch everything together.
 
 ## Textures {#CompositorNodesTextures}
+
+```cpp
+texture <name> <width> <height> [depth] <pixel_format> [<mrt_pixel_format2>] [<pixel_formatN>] [no_gamma]
+[no_fsaa] [depth_texture] [depth_pool <poolId>] [uav] [2d_array|3d|cubemap] [mipmaps <numMips>] [automipmaps]
+[explicit_resolve]
+```
+
+-   \<name\>
+
+A locally unique name must be assigned (and cannot start with *global\_* prefix).
+
+-   \<width\> \<height\>
+
+The dimensions of the render texture. You can either specify a fixed width and height,
+or you can request that the texture is based on the physical dimensions of the viewport
+to which the compositor is attached. The options for the latter are ’target_width’,
+’target_height’, ’target_width_scaled <factor>’ and ’target_height_scaled <factor>’ -
+where ’factor’ is the amount by which you wish to multiply the size of the main target
+to derive the dimensions.
+
+-   \<depth\>
+
+Used by 2d\_array and 3d textures. Specifies their depth / number of
+slices. It's automatically forced to 1 for 2d textures and 6 for
+cubemaps.
+
+-   \<pixel_format\>
+
+The pixel format of the render texture. This affects how much memory it will take,
+what colour channels will be available, and what precision you will have within those channels.
+Most common options are PF_A8R8G8B8, PF_R8G8B8A8, PF_FLOAT16_RGBA, PF_FLOAT16_RGB,
+PF_FLOAT16_R, PF_FLOAT32_RGBA, PF_FLOAT32_RGB, PF_FLOAT32_R.
+
+-   no_fsaa
+
+When this keyword is present, the texture will not be using FSAA.
+The FSAA setting is determined by the main render target.
+
+-   no_gamma
+
+By default Ogre will perform automatic HW gamma conversion for you (when supported by
+the hardware) based on system settings. But when this is present, you can override
+that behavior.
+
+-   depth_pool
+
+When present, this directive has to be followed by an integer. This one sets from
+which Depth buffer pool the depth buffer will be chosen from. All RTs from all compositors
+with the same pool ID share the same depth buffers as long as it's possible
+(must have the same resolution, must have the same depth_texture setting).
+RenderWindows can**not** share their depth buffers due to API limitations on some RenderSystems.
+When the pool ID is 0, no depth buffer is used. This can be helpful for passes that don’t
+require a Depth buffer at all, potentially saving performance and memory. Default value is 1.
+
+-   depth\_texture
+
+When present, the RTT indicates you want to later access the depth buffer's contents
+as a texture in a shader.
+RTTs using depth_texture with the same depth pool ID will share depth buffers, but
+they won't share depth buffers with other RTTs of the same depth pool IDs who don't
+have depth_texture setting.
+This setting is implicit when using a depth pixel format such as PF\_D24\_UNORM\_X8
+
+-   uav
+
+When present, the texture can be used as an UAV.
+
+-   2d\_array|3d|cubemap
+
+When present, the texture will be created as a 2d\_array, 3d or cubemap.
+Mostly relevant for UAVs but is also useful for rendering. See
+[Target](#4.1.2.Target|outline) slice parameter.
+
+-   mipmaps \<num Mipmaps\>
+
+Default: 0; Indicates how many mipmaps to use. 0 for none. Use -1 to
+fill all mipmaps until 1x1
+
+-   automipmaps
+
+When present, automipmapping is used. Every time you alter an RTT (e.g.
+by rendering to it, by clearing it, etc), it is tagged as dirty. When
+it's used as a texture again, mipmaps will be autogenerated. This can be
+problematic in certain cases where ping ponging RTTs is involved and you
+only want to get mipmaps generated at the end. In such cases, consider
+using using a PASS\_ instead to manually generate them.
+
+-   explicit\_resolve
+
+When present, Ogre shall not resolve the MSAA contents every time you
+want to access it as a texture; but rather when you do that explicitly,
+thus until it's not manually resolved; you can access the internal
+MSAA contents.
 
 ### MSAA: Explicit vs Implicit resolves {#CompositorNodesTexturesMsaa}
 
@@ -1048,9 +1154,13 @@ The solution is the following:
 ```cpp
 compositor_node Example2_fixed
 {
-        //Instruct we want to use a depth texture (32-bit float). The "depth_texture" keyword is necessary. Specifying The depth format is optional and so is the depth pool. However recommended to specify them to avoid surprises.
+        //Instruct we want to use a depth texture (32-bit float). The "depth_texture" keyword is necessary.
+        //Specifying The depth format is optional and so is the depth pool. However recommended to specify
+        //them to avoid surprises.
         texture firstPass 512 512 PF_R8G8B8 depth_format PF_D32_FLOAT depth_texture depth_pool 1
-        //Declare the depth texture view (which becomes so by using PF_D32_FLOAT as format). Settings MUST match (depth format, pools, resolution). Specifying the depth pool is necessary, otherwise the depth texture will get its own depth buffer, instead of becoming a view.
+        //Declare the depth texture view (which becomes so by using PF_D32_FLOAT as format).
+        //Settings MUST match (depth format, pools, resolution). Specifying the depth pool is necessary,
+        //otherwise the depth texture will get its own depth buffer, instead of becoming a view.
         texture firstPassDepthTexture 512 512 PF_D32_FLOAT depth_pool 1
         texture finalColour 512 512 PF_R8G8B8
         //Draw everything, colour and depth
@@ -1111,51 +1221,20 @@ Shadow nodes work very similar to regular nodes. Perhaps their most
 noticeable difference is how are RTTs defined. The following keywords
 are supposed at shadow node scope:
 
--   technique &lt;uniform|planeoptimal|focused|lispsm|pssm&gt;
+-   technique \<uniform|planeoptimal|focused|pssm\>;
 
 Specifies which shadow technique to use for the subsequent shadow map
 declarations. The default is uniform.
 
->  **Note:** at the time of writing, lispsm technique is broken and has terrible artifacts. This bug seems to affect both Ogre 1.9 & 2.0. Use focused technique instead.
->  
->  planeoptimal has also not been implemented yet.
+>  **Note:** planeoptimal has also not been implemented yet.
 
--   use\_aggressive\_focus\_region &lt;true|false&gt;
-
-Used by Focused, LispSM & PSSM techniques. Default is true. If you're
-having shadow mapping glitches, try setting this value to false. Note
-however, quality degradation for disabling it can be noticeable.
-
--   optimal\_adjust\_factor &lt;factor&gt;
-
-Used by LispSM & PSSM techniques. Default is 5. Lower values improve the
-quality of shadow maps closer to camera, while higher values reduce the
-"projection skew" which is the key feature of lispsm; thus causing
-quality to revert and look more like focused.
-
-Tip: When this value is negative, lispsm reverts to a focused shadow map
-technique. This is very useful for users who want to use PSSM techniques
-with focused setups instead of LispSM.
-
--   light\_direction\_threshold &lt;angle\_in\_degrees&gt;
-
-Used by LispSM & PSSM techniques. Default is 25. Originally, LispSM
-produces artifacts when the camera's direction is parallel to the
-light's direction. When the angle between the camera direction and the
-light's is lower than the threshold Ogre begins to gradually increase
-the `optimal_adjust_factor` so that it reverts back to focused setup,
-thus getting rid of these artifacts.
-
-Notes: When `optimal_adjust_factor` is negative (i.e. pssm + focused),
-this setting is ignored.
-
--   num\_splits &lt;num\_splits&gt;
+-   num\_splits \<num\_splits\>
 
 Only used by PSSM techniques. Specifies the number of splits per light.
 Can vary per shadow map. The number of splits must be greater than 2.
 Default is 3.
 
--   pssm\_lambda &lt;lambda&gt;
+-   pssm\_lambda \<lambda\>
 
 Only used by PSSM techniques. Value usually between 0 & 1. The default
 is 0.95. PSSM's lambda is a weight value for a linear interpolation
@@ -1164,13 +1243,10 @@ lambda will use exponential distribution, thus closer shadows will
 improve quality. A lower lambda will use a linear distribution, pushing
 the splits further, improving the quality of shadows in the distance.
 
--   shadow\_atlas &lt;name&gt; light &lt;light index&gt; \[split
-    &lt;split index&gt;\]
-
-See [shadow atlas section](#3.2.3.Shadow map atlas|outline).
 
 ```cpp
-shadow_map <Name> <Width> <Height> [Depth] <Pixel Format> [<MRT Pixel Format2>] [<MRT Pixel FormatN>]  [gamma] [fsaa <fsaa_level>] [depth_texture] [depth_pool <poolId>] light <lightIndex> [split <index>] [uav] [2d_array|3d|cubemap] [mipmaps <numMips>] [automipmaps]
+shadow_map <number> <texture_name> light <lightIndex> [split <index>]
+shadow_map <number> [atlas <texture_name> <left> <top> <width> <height>] light <lightIndex> [split <index>]
 ```
 
 Shadow maps declaration order is important. The first shadow map
@@ -1179,73 +1255,26 @@ declared becomes shadow map \#0; the second shadow map declared becomes
 textures. So only the new settings or the ones that behave differently
 will be described:
 
--   &lt;Name&gt;
+-   texture_name
 
-Like regular textures, a locally unique name must be assigned (and
-cannot start with *global\_* prefix). To avoid confusions, it is highly
-recommended that you name them by the number of shadow map. i.e. name
-the first shadow map "0", the second one "1"
+What texture to use that has already been declared,
+where the shadow map contents will be stored.
 
--   &lt;Depth&gt;
+-   atlas \<texture_name\> \<left\> \<top\> \<width\> \<height\>
 
-Used by 2d\_array and 3d textures. Specifies their depth / number of
-slices. It's automatically forced to 1 for 2d textures and 6 for
-cubemaps.
+Instead of using the whole atlas content, you can use a region of it.
+The values are in range \[0;1\]
 
--   &lt;fsaa&gt;
-
-The default value is always 0 regardless of system settings. Setting
-this to higher values will activate fsaa. This behavior differs from
-regular texture declarations.
-
--   &lt;gamma&gt;
-
-When not present, shadow maps will never use HW gamma conversion,
-regardless of system settings. When this setting is present, the texture
-will perform automatic HW gamma conversion for you (when supported by
-the hardware). This behavior differs from regular texture declarations.
-
--   &lt;depth\_texture&gt;
-
-When not present, shadow maps will use a regular depth buffer. When
-present, the shadow maps will use a depth buffer that can be used for
-reading as a texture. This setting is implicit when using a depth pixel
-format such as PF\_D24\_UNORM\_X8
-
--   light &lt;index&gt;
+-   light \<index\>;
 
 Indicates which light index will be associated with this shadow map.
 i.e. the Shadow map \#0 may contain the Nth closest shadow mapping light
 to the entity, not necessarily the first one.
 
--   split &lt;split index&gt;
+-   split \<split index\>;
 
 Default: 0; only necessary when using PSSM techniques. Indicates which
 split this shadow map refers to.
-
--   uav
-
-When present, the texture can be used as an UAV.
-
--   \[2d\_array|3d|cubemap\]
-
-When present, the texture will be created as a 2d\_array, 3d or cubemap.
-Mostly relevant for UAVs but is also useful for rendering. See
-[Target](#4.1.2.Target|outline) slice parameter.
-
--   mipmaps &lt;num Mipmaps&gt;
-
-Default: 0; Indicates how many mipmaps to use. 0 for none. Use -1 to
-fill all mipmaps until 1x1
-
--   \[automipmaps\]
-
-When present, automipmapping is used. Every time you alter an RTT (e.g.
-by rendering to it, by clearing it, etc), it is tagged as dirty. When
-it's used as a texture again, mipmaps will be autogenerated. This can be
-problematic in certain cases where ping ponging RTTs is involved and you
-only want to get mipmaps generated at the end. In such cases, consider
-using using a PASS\_ instead to manually generate them.
 
 ```cpp
 shadow_map <shadowMapName0> <shadowMapName1> {}
@@ -1268,17 +1297,21 @@ focused setup:
 compositor_node_shadow myShadowNode
 {
 	technique focused
-	shadow_map 0 2048 2048 PF_FLOAT16_R light 0
+    texture focusedTex 2048 2048 PF_D32_FLOAT no_fsaa
+    shadow_map 0 focusedTex light 0
 	//Render shadow map "0"
-	shadow_map 0
-	{
-		pass clear { colour_value 1 1 1 1 }
-		pass render_scene
-		{
-			rq_first 0
-			rq_last max
-		}
-	}
+    shadow_map_target_type directional spot
+    {
+        shadow_map 0
+        {
+            pass clear { colour_value 1 1 1 1 }
+            pass render_scene
+            {
+                rq_first 0
+                rq_last max
+            }
+        }
+    }
 }
 ```
 
@@ -1293,12 +1326,6 @@ additional ones for the remaining lights:
 ```cpp
 compositor_node_shadow myShadowNode
 {
-	technique pssm
-	//Render 1st closest light, splits 0 1 & 2
-	shadow_map myStringName 2048 2048 PF_FLOAT16_R light 0 split 0
-	shadow_map 1 1024 1024 PF_FLOAT16_R light 0 split 1
-	shadow_map 2 1024 1024 PF_FLOAT16_R light 0 split 2
-	
 	//Change to focused from now on
 	technique focused
 	shadow_map 3 1024 1024 PF_FLOAT16_R light 1
@@ -1315,139 +1342,178 @@ compositor_node_shadow myShadowNode
 			rq_last max
 		}
 	}
+    technique pssm
+
+    texture pssm0 2048 2048 PF_D32_FLOAT
+    texture pssm1 1024 1024 PF_D32_FLOAT
+    texture pssm2 1024 1024 PF_D32_FLOAT
+
+    texture spot0 2048 2048 PF_D32_FLOAT
+    texture spot1 2048 2048 PF_D32_FLOAT
+
+    num_splits		3
+    pssm_lambda		0.95
+    //Render 1st closest light, splits 0 1 & 2
+    shadow_map 0 pssm0 light 0 split 0
+    shadow_map 1 pssm1 light 0 split 1
+    shadow_map 2 pssm2 light 0 split 2
+
+    //Change to focused from now on
+    technique focused
+    shadow_map 3 spot0 light 1
+    shadow_map 4 spot1 light 2
+
+    shadow_map_target_type directional
+    {
+        //Render shadow maps 0, 1 and 2.
+        //Can only be used by directional lights.
+        shadow_map 0 1 2
+        {
+            pass clear
+            {
+                colour_value 1 1 1 1
+            }
+            pass render_scene
+            {
+            }
+        }
+    }
+
+    shadow_map_target_type directional spot
+    {
+        //Render shadow maps 3 and 4
+        //Can only be used by either directional lights or spot lights.
+        shadow_map 3 4
+        {
+            pass clear
+            {
+                colour_value 1 1 1 1
+            }
+            pass render_scene
+            {
+            }
+        }
+    }
 }
 ```
 
-Showing off the full flexibility of shadow nodes: The following example
-is a bit large but shows off that shadow map rendering can be done in
-any order, with different settings, custom render queues for just one of
-the maps, etc. The user has a lot of power on defining how the shadow
-maps will be rendered:
+## Shadow map atlas & Point Lights {#CompositorShadowNodesAtlasAndPointLights}
+
+Instead of rendering each PSSM split into a different texture, you can use an atlas:
 
 ```cpp
-compositor_node_shadow myShadowNode
+compositor_node_shadow PssmWithAtlas
 {
-	technique pssm
-	//Render 1st closest light, splits 0 1 & 2
-	shadow_map myStringName 2048 2048 PF_FLOAT16_R light 0 split 0
-	shadow_map 1 1024 1024 PF_FLOAT16_R light 0 split 1
-	shadow_map 2 1024 1024 PF_FLOAT16_R light 0 split 2
-	
-	//Change to focused from now on
-	//(we can also change optimal_adjust_factor, etc)
-	technique focused
-	 //Render 2nd closest light in the 4th shadow map
-	//(could be directional, point, spot)
-	shadow_map 3 1024 1024 PF_FLOAT16_R light 1
-	//Render 3rd closest light in the 5th shadow map
-	shadow_map 4 1024 1024 PF_FLOAT16_R light 2
+    technique pssm
 
-	//Don't use aggressive focus region on shadow map 5 (and from anything
-	//declared from now on, we can also turn it back on later) just for
-	//showcasing how this works
-	use_aggressive_focus_region false
-	shadow_map 5 target_width_scaled 0.25 1024 PF_FLOAT16_R light 3
+    texture atlas 3072 2048 PF_D32_FLOAT no_fsaa
 
-	//Render shadow maps "myStringName", "1", "2", and "5"
-	shadow_map myStringName 1 2 5
-	{
-		pass clear { colour_value 1 1 1 1 }
-		pass render_scene
-		{
-			visibility_mask 0xffffffff
-			rq_first 0
-			rq_last max //Special value implying maximum
-		}
-	}
-	//Render shadow map "4" with a different setting
-	shadow_map 4
-	{
-		pass clear { colour_value 1 1 1 1 }
-		pass render_scene
-		{
-			shadow_map_idx	4 //Note this is needed!
-			visibility_mask 0xfaffffff
-			rq_first	40
-			rq_last	51
-		}
-	}
-	//Regular way of declaring passes also works.
-	target 3
-	{
-		pass clear { colour_value 1 1 1 1 }
-		pass render_scene
-		{
-			shadow_map_idx	3 //Note this is needed!
-			visibility_mask 0xfaffffff
-			rq_first	42
-			rq_last	51
-		}
-	}
+    //The splits are distributed in the atlas like this:
+    //  -------------
+    //  |     |  2  |
+    //  |  1  |-----|
+    //  |     |  3  |
+    //  -------------
+    num_splits		3
+    pssm_lambda		0.95
+    shadow_map 0 atlas uv 0.000000000000000 0.0 0.666666666666667 1.0 light 0 split 0
+    shadow_map 1 atlas uv 0.666666666666667 0.0 0.333333333333333 0.5 light 0 split 1
+    shadow_map 2 atlas uv 0.666666666666667 0.5 0.333333333333333 0.5 light 0 split 2
 
-	//Send this RTT to the output channel. Other nodes can now use it.
-	out 0 myStringName
+    //Before doing anything, clear the whole atlas in one go. This is not
+    //recommended on iOS & Android though; but recommended on Desktop.
+    target atlas
+    {
+        pass clear
+        {
+            colour_value 1 1 1 1
+        }
+    }
+
+    shadow_map_target_type directional
+    {
+        shadow_map 0 1 2
+        {
+            pass render_scene
+            {
+                //The viewport settings will be automatically
+                //adjusted to constrain to the atlas regions.
+            }
+        }
+    }
 }
 ```
 
-Setting up a shadow node is very flexible and very powerful. When
-environment-mapped passes are implemented, it should be possible to
-implement point lights that can fully render their 360° surrounding.
+Point light shadow mapping has to exploit the powerful compositor scripting
+capabilities: Ogre uses DPSM (Dual Paraboloid Shadow Maps).
+Please note we will be rendering to cubemaps, then converting to DPSM.
 
-## Shadow map atlas {#CompositorShadowNodesAtlas}
+We won't be rendering directly to DPSM as testing shows it deforms too much when
+tessellation is low. We could support it, but it's not a priority.
+So Ogre first needs to render to a cubemap, which can be shared by all shadow maps,
+and then a converter transforms it to DPSM.
 
->  **Warning:** The following feature is experimental and may crash, not work as expected, and may be subject to change.
+The reason to use scene -> Cubemap -> DPSM is so that we keep a reasonable memory
+footprint and be atlas friendly. If we use cubemaps directly and want to support
+8 point lights at 1024x1024, then we would have to do 1024x1024x6x8 = 192MB.
+However with DPSM it would be 8 DPSM and 1 cubemap: 1024x1024x4x8 + 1024x1024x4x6 = 56MB.
 
-The new Compositor supports shadow map atlas. Instead of writing one
-shadow map per RTT, it is now possible to render multiple shadow maps
-into the same RTT, just different non-overlapping viewport regions.
-
-The first thing to do is to declare a regular shadow map. Then the
-subsequent shadow maps need to be declared using the `shadow_atlas`
-keyword:
+So, to setup a point light with a temporary cubemap, it goes as follows:
 
 ```cpp
-compositor_node_shadow myShadowNode
+abstract target cubemap_target_shadow
 {
-	technique pssm
-	//Render 1st closest light, splits 0 1 & 2, and 2nd light into myAtlas
-	shadow_map myAtlas 2048 2048 PF_FLOAT16_R light 0 split 0 viewport 0 0 0.5 0.5
-	shadow_atlas myAtlas light 0 split 1 viewport 0 0.5 0.5 0.5
-	shadow_atlas myAtlas light 0 split 2 viewport 0.5 0 0.5 0.5
-	technique focused
-	shadow_atlas myAtlas light 1 viewport 0.5 0.5 0.5 0.5
-	/* ... */
+    pass clear { colour_value 1 1 1 1 }
+    pass render_scene
+    {
+        camera_cubemap_reorient true
+    }
+}
+compositor_node_shadow PointLight
+{
+    technique pssm
+
+    texture pointLightTex0 2048 2048 PF_D32_FLOAT no_fsaa
+    texture pointLightTex1 2048 2048 PF_D32_FLOAT no_fsaa
+    texture tmpCubemap 1024 1024 PF_FLOAT32_R cubemap no_fsaa
+
+    technique focused
+    shadow_map 0 pointLightTex0 light 0
+    shadow_map 1 pointLightTex1 light 1
+
+    shadow_map_target_type point
+    {
+        //shadow_map_repeat tells to repeat what's inside its body for shadow map 0 & 1
+        shadow_map_repeat 0 1
+        {
+            //Render to the cubemap with the camera settings of
+            //the currently iterated point light shadow map
+            target tmpCubemap +X : cubemap_target_shadow {}
+            target tmpCubemap -X : cubemap_target_shadow {}
+            target tmpCubemap +Y : cubemap_target_shadow {}
+            target tmpCubemap -Y : cubemap_target_shadow {}
+            target tmpCubemap +Z : cubemap_target_shadow {}
+            target tmpCubemap -Z : cubemap_target_shadow {}
+
+            //Render to the current shadow map being iterated.
+            shadow_map
+            {
+                pass render_quad
+                {
+                    //This material can be found in Samples/Media/2.0/materials/Common
+                    material Ogre/DPSM/CubeToDpsm
+                    input 0 tmpCubemap
+                }
+            }
+        }
+    }
 }
 ```
 
-Now we just need to declare the render\_scene passes. We'll avoid using
-the convenient shadow\_map so that we can perform one full clear instead
-of 4.
+See Samples/Media/2.0/scripts/Compositors/ShadowMapDebugging.compositor for an
+example of a full script that can support directional, spot & point lights all
+in one, in a single atlas.
 
-```cpp
-	/* ... */
-	target myAtlas
-	{
-		pass clear { colour_value 1 1 1 1 }
-		pass render_scene { viewport 0.0 0.0 0.5 0.5 }
-		pass render_scene { viewport 0.5 0.0 0.5 0.5 }
-		pass render_scene { viewport 0.0 0.5 0.5 0.5 }
-		pass render_scene { viewport 0.5 0.5 0.5 0.5 }
-	}
-	/* ... */
-```
-
-The Compositor Node should automatically detect which shadow map you're
-referring to based on the viewport coordinates. It should throw an error
-if the viewport settings don't match any of the declared shadow map
-atlases.
-
-**Tip:** You may want to explore Ogre's powerful scripting capabilities
-(i.e. [abstract
-passes](http://www.ogre3d.org/docs/manual/manual_27.html#Script-Variables))
-instead of copy pasting each render\_scene pass.
-
-On receiver objects, the texture projection matrix should already be
-scaled to point in the viewport range.
 
 ## Reuse, recalculate and first {#CompositorShadowNodesReuseEtc}
 
@@ -1576,18 +1642,6 @@ camera's far plane)
 Most of the time, this is one of the best choices for general shadow
 mapping.
 
-### LispSM {#CompositorShadowNodesTypesLispSM}
-
-LispSM inherits from Focused shadow camera setup, and hence all that
-applies to Focused shadow maps applies to LispSM as well.
-
-LispSM goes one step further by modifying the projection matrix,
-applying some "skewing" to the rendered image. This results in better
-quality for shadows closer to the camera, but can introduce some
-artifacts. `optimal_adjust_factor` can control how strong the skewing
-is, thus giving a blend between artifacts and quality.
-
->  **Note:** at the time of writing, lispsm technique is broken and has terrible artifacts. This bug seems to affect both Ogre 1.9 & 2.0
 
 ### PSSM / CSM {#CompositorShadowNodesTypesPssm}
 
@@ -1597,12 +1651,6 @@ Shadow maps are divided into "cascades" or "splits"; in order to improve
 quality. So instead of getting one RTT per light, the user gets multiple
 RTTs per light. Usually the depth in camera space is determining factor
 to know which cascade/split to use.
-
-Ogre's PSSM inherits from LispSM and hence has separate lispsm settings
-for each split. Because of the bug that causes LispSM to be filled with
-strong artifacts, it is advised that users set optimal\_adjust\_factor
-for all splits to a negative value, thus causing PSSM to use Focused
-setups.
 
 There's a lot of resources on internet regarding PSSM / CSM:
 
@@ -1662,22 +1710,22 @@ channels. This implicitly means "Node Name 1" & "Node Name 2" will be
 used and executed by the workspace (even if they're isolated and never
 reach the screen)
 
--   &lt;Node Name 1&gt;
+-   \<Node Name 1\>;
 
 The name of the Node that will be executed before "Node Name 2"
 
--   \[&lt;output ch \#&gt;\] \[&lt;output ch \#&gt;\] … \[&lt;output ch
-    \#&gt;\]
+-   \[\<output ch \#\>;\] \[\<output ch \#\>;\] … \[\<output ch
+    \#\>;\]
 
 Channel numbers from "Node Name 1"'s output channels that will be
 connected to "Node Name 2".
 
--   &lt;Node Name 2&gt;
+-   \<Node Name 2\>;
 
 The name of the Node that will be executed after "Node Name 1"
 
--   \[&lt;input ch \#&gt;\] \[&lt;input ch \#&gt;\] … \[&lt;input ch
-    \#&gt;\]
+-   \[\<input ch \#\>;\] \[\<input ch \#\>;\] … \[\<input ch
+    \#\>;\]
 
 Channel numbers from "Node Name 2"'s inputs channels that will be
 connected from "Node Name 1" bindings.
@@ -1729,15 +1777,15 @@ are passed in C++ code when initializing the Workspace.
 It is possible for a Workspace to not use this variable (though rather
 pointless)
 
--   &lt;external channel \#&gt;
+-   \<external channel \#\>;
 
     The index to the external UAV buffer passed to addWorkspace.
 
--   &lt;Node Name 1&gt;
+-   \<Node Name 1\>;
 
 The name of the Node that will receive the final RTT
 
--   &lt;input channel \#&gt;
+-   \<input channel \#\>;
 
 The number of the input channel from "Node Name 1".
 
@@ -1777,11 +1825,11 @@ and hence that's what node aliasing does. Once an alias is declared, the
 node will be instantiated with a different name (its aliased name), and
 will be possible to make connections with it.
 
--   &lt;Node Name&gt;
+-   \<Node Name\>;
 
 The name of the original instance
 
--   &lt;Aliased Name&gt;
+-   \<Aliased Name\>;
 
 The alias name to give to this separate instance. The alias must be
 unique across the workspace, and must also be unique across the names of
@@ -1806,18 +1854,18 @@ buffer <buffer_name> <num_elements> <bytes_per_element> [target_width] [target_w
 
 Creates an UAV buffer.
 
--   &lt;buffer\_name&gt;
+-   \<buffer\_name\>;
 
 The name of the buffer. Unlike textures, there are no naming
 restrictions (i.e. no `global_` prefix). If a buffer local to the node
 and a global buffer have the same name, the local one takes precedence
 and a warning is logged.
 
--   &lt;num\_elements&gt;
+-   \<num\_elements\>;
 
 The number of elements in the UAV. Must be a number higher than 0.
 
--   &lt;bytes\_per\_element&gt;
+-   \<bytes\_per\_element\>;
 
 Bytes per element. Must be a number higher than 0.
 
@@ -1862,7 +1910,7 @@ In this case, numElements = 16 means we can address up to
 myLights\[15\]; and bytesPerElement = 36.
 
 bytesPerElement must account padding according to the HLSL rules (4 x 4
-x 3 =&gt; 4 floats x sizeof(float) x 3).
+x 3 =\>; 4 floats x sizeof(float) x 3).
 
 Because calculation of bytesPerElement can get really tricky by hand (or
 may change dynamically at runtime), complex cases are best if the UAV is
@@ -1921,15 +1969,15 @@ when instantiating the Workspace via addWorkspace in C++.
 It is possible for a Workspace to not use this variable (though rather
 pointless)
 
--   &lt;external channel \#&gt;
+-   \<external channel \#\>;
 
 The index to the external UAV buffer passed to addWorkspace.
 
--   &lt;Node Name&gt;
+-   \<Node Name\>;
 
 The name of the Node that will receive the external UAV
 
--   &lt;input channel \#&gt;
+-   \<input channel \#\>;
 
 The number of the input channel from "Node Name".
 

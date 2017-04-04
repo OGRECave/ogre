@@ -20,3 +20,12 @@ div.line.glow {
 {
    text-align: left;
 }
+
+h1, h2
+{
+    margin-top: 50px;
+}
+h3, h4
+{
+    margin-top: 25px;
+}
