@@ -12,6 +12,7 @@ The latest stable release is **v1.10.3**. For more information see:
 * [Download v1.10.3](https://github.com/OGRECave/ogre/releases/tag/v1.10.3)
 * [API documentation](https://ogrecave.github.io/ogre/api/1.10/)
 * [New and Noteworthy](https://github.com/OGRECave/ogre/blob/v1.10.3/Docs/1.10-Notes.md) (compared to v1.9)
+* [API/ ABI changes](https://abi-laboratory.pro/tracker/timeline/ogre/) (since v1.7)
 
 ## Try it
 * [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/) - [Web Assembly & WebGL2](https://ogrecave.github.io/ogre/wasm/)
