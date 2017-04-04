@@ -585,6 +585,12 @@ namespace Ogre
     {
         if( mRenderSystem )
         {
+            for( size_t i=0; i<HLMS_MAX; ++i )
+            {
+                if( mRegisteredHlms[i] )
+                    mRegisteredHlms[i]->_clearShaderCache();
+            }
+
             BlockIdxVec::const_iterator itor = mActiveBlocks[BLOCK_MACRO].begin();
             BlockIdxVec::const_iterator end  = mActiveBlocks[BLOCK_MACRO].end();
             while( itor != end )

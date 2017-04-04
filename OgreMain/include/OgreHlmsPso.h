@@ -115,6 +115,8 @@ namespace Ogre
         /// For multi-GPU support
         uint32      adapterId;
 
+        bool strongMacroblock;
+
         bool operator == ( const HlmsPassPso &_r ) const
         {
             //This will work correctly, because padded bytes are explicit.

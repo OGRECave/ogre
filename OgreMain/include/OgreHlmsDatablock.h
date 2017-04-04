@@ -109,6 +109,11 @@ namespace Ogre
 
         HlmsMacroblock();
 
+        bool operator == ( const HlmsMacroblock &_r ) const
+        {
+            return !(*this != _r);
+        }
+
         bool operator != ( const HlmsMacroblock &_r ) const
         {
             //Don't include the ID in the comparision

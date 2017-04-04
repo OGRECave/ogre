@@ -196,5 +196,9 @@ cbuffer ManualProbe : register(b3)
 		@end
 	@end
 
+	@property( hlms_use_prepass_msaa > 1 )
+		float2 zwDepth	: TEXCOORD@counter(texcoord);
+	@end
+
 	@insertpiece( custom_VStoPS )
 @end

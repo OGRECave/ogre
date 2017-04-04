@@ -1664,17 +1664,24 @@ namespace Ogre
     {
         mPassCache.clear();
 
-        HlmsCacheVec::const_iterator itor = mShaderCache.begin();
-        HlmsCacheVec::const_iterator end  = mShaderCache.end();
+        //Empty mShaderCache so that mHlmsManager->destroyMacroblock would
+        //be harmless even if _notifyMacroblockDestroyed gets called.
+        HlmsCacheVec shaderCache;
+        shaderCache.swap( mShaderCache );
+        HlmsCacheVec::const_iterator itor = shaderCache.begin();
+        HlmsCacheVec::const_iterator end  = shaderCache.end();
 
         while( itor != end )
         {
             mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+            if( (*itor)->pso.pass.strongMacroblock )
+                mHlmsManager->destroyMacroblock( (*itor)->pso.macroblock );
+
             delete *itor;
             ++itor;
         }
 
-        mShaderCache.clear();
+        shaderCache.clear();
     }
     //-----------------------------------------------------------------------------------
     void Hlms::processPieces( Archive *archive, const StringVector &pieceFiles )
@@ -1884,6 +1891,19 @@ namespace Ogre
         pso.macroblock = datablock->getMacroblock( casterPass );
         pso.blendblock = datablock->getBlendblock( casterPass );
         pso.pass = passCache.pso.pass;
+
+        if( !pso.macroblock->mDepthWrite )
+        {
+            //Depth writes is already off, we don't need to hold a strong reference.
+            pso.pass.strongMacroblock = false;
+        }
+        else if( pso.pass.strongMacroblock )
+        {
+            //This is a depth prepass, disable depth writes and keep a hard copy (strong ref.)
+            HlmsMacroblock prepassMacroblock = *pso.macroblock;
+            prepassMacroblock.mDepthWrite = false;
+            pso.macroblock = mHlmsManager->getMacroblock( prepassMacroblock );
+        }
 
         //TODO: Configurable somehow (likely should be in datablock).
         pso.sampleMask = 0xffffffff;
@@ -2385,7 +2405,7 @@ namespace Ogre
                 const TextureVec *prePassTextures = sceneManager->getCurrentPrePassTextures();
                 assert( prePassTextures && !prePassTextures->empty() );
                 if( (*prePassTextures)[0]->getFSAA() > 1 )
-                    setProperty( HlmsBaseProp::UsePrePassMsaa, 1 );
+                    setProperty( HlmsBaseProp::UsePrePassMsaa, (*prePassTextures)[0]->getFSAA() );
             }
 
             if( sceneManager->getCurrentSsrTexture() != 0 )
@@ -2437,6 +2457,8 @@ namespace Ogre
         passPso.multisampleCount   = std::max( renderTarget->getFSAA(), 1u );
         passPso.multisampleQuality = StringConverter::parseInt( renderTarget->getFSAAHint() );
         passPso.adapterId = 1; //TODO: Ask RenderSystem current adapter ID.
+
+        passPso.strongMacroblock = sceneManager->getCurrentPrePassMode() == PrePassUse;
 
         return passPso;
     }
@@ -2513,14 +2535,25 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::_notifyMacroblockDestroyed( uint16 id )
     {
+        bool wasUsedInWeakRefs = false;
+        bool hasPsosWithStrongRefs = false;
+        HlmsMacroblock macroblock;
         HlmsCacheVec::iterator itor = mShaderCache.begin();
         HlmsCacheVec::iterator end  = mShaderCache.end();
 
         while( itor != end )
         {
+            if( (*itor)->pso.pass.strongMacroblock )
+                hasPsosWithStrongRefs = true;
+
             if( (*itor)->pso.macroblock->mId == id )
             {
                 mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+                if( !(*itor)->pso.pass.strongMacroblock )
+                {
+                    wasUsedInWeakRefs = true;
+                    macroblock = *(*itor)->pso.macroblock;
+                }
                 delete *itor;
                 itor = mShaderCache.erase( itor );
                 end  = mShaderCache.end();
@@ -2530,10 +2563,41 @@ namespace Ogre
                 ++itor;
             }
         }
+
+        if( hasPsosWithStrongRefs && wasUsedInWeakRefs )
+        {
+            //It's possible we made a hard clone of this macroblock with depth writes
+            //disabled. We need to remove these cloned PSOs to avoid wasting memory.
+            macroblock.mDepthWrite = false;
+            vector<const HlmsMacroblock*>::type macroblocksToDelete;
+            itor = mShaderCache.begin();
+            end  = mShaderCache.end();
+
+            while( itor != end )
+            {
+                if( (*itor)->pso.pass.strongMacroblock && *(*itor)->pso.macroblock == macroblock )
+                    macroblocksToDelete.push_back( (*itor)->pso.macroblock );
+                ++itor;
+            }
+
+            //We need to delete the macroblocks at the end because destroying a
+            //macroblock could trigger _notifyMacroblockDestroyed, thus invalidating
+            //iterators in mShaderCache.
+            vector<const HlmsMacroblock*>::type::const_iterator itMacroblock =
+                    macroblocksToDelete.begin();
+            vector<const HlmsMacroblock*>::type::const_iterator enMacroblock =
+                    macroblocksToDelete.end();
+            while( itMacroblock != enMacroblock )
+            {
+                mHlmsManager->destroyMacroblock( *itMacroblock );
+                ++itMacroblock;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void Hlms::_notifyBlendblockDestroyed( uint16 id )
     {
+        vector<const HlmsMacroblock*>::type macroblocksToDelete;
         HlmsCacheVec::iterator itor = mShaderCache.begin();
         HlmsCacheVec::iterator end  = mShaderCache.end();
 
@@ -2542,6 +2606,8 @@ namespace Ogre
             if( (*itor)->pso.blendblock->mId == id )
             {
                 mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+                if( (*itor)->pso.pass.strongMacroblock )
+                    macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                 delete *itor;
                 itor = mShaderCache.erase( itor );
                 end  = mShaderCache.end();
@@ -2551,10 +2617,22 @@ namespace Ogre
                 ++itor;
             }
         }
+
+        //We need to delete the macroblocks at the end because destroying a
+        //macroblock could trigger _notifyMacroblockDestroyed, thus invalidating
+        //iterators in mShaderCache.
+        vector<const HlmsMacroblock*>::type::const_iterator itMacroblock = macroblocksToDelete.begin();
+        vector<const HlmsMacroblock*>::type::const_iterator enMacroblock = macroblocksToDelete.end();
+        while( itMacroblock != enMacroblock )
+        {
+            mHlmsManager->destroyMacroblock( *itMacroblock );
+            ++itMacroblock;
+        }
     }
     //-----------------------------------------------------------------------------------
     void Hlms::_notifyInputLayoutDestroyed( uint16 id )
     {
+        vector<const HlmsMacroblock*>::type macroblocksToDelete;
         HlmsCacheVec::iterator itor = mShaderCache.begin();
         HlmsCacheVec::iterator end  = mShaderCache.end();
 
@@ -2568,6 +2646,8 @@ namespace Ogre
                 {
                     //This is a v2 input layout.
                     mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+                    if( (*itor)->pso.pass.strongMacroblock )
+                        macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                     delete *itor;
                     itor = mShaderCache.erase( itor );
                     end  = mShaderCache.end();
@@ -2582,10 +2662,22 @@ namespace Ogre
                 ++itor;
             }
         }
+
+        //We need to delete the macroblocks at the end because destroying a
+        //macroblock could trigger _notifyMacroblockDestroyed, thus invalidating
+        //iterators in mShaderCache.
+        vector<const HlmsMacroblock*>::type::const_iterator itMacroblock = macroblocksToDelete.begin();
+        vector<const HlmsMacroblock*>::type::const_iterator enMacroblock = macroblocksToDelete.end();
+        while( itMacroblock != enMacroblock )
+        {
+            mHlmsManager->destroyMacroblock( *itMacroblock );
+            ++itMacroblock;
+        }
     }
     //-----------------------------------------------------------------------------------
     void Hlms::_notifyV1InputLayoutDestroyed( uint16 id )
     {
+        vector<const HlmsMacroblock*>::type macroblocksToDelete;
         HlmsCacheVec::iterator itor = mShaderCache.begin();
         HlmsCacheVec::iterator end  = mShaderCache.end();
 
@@ -2599,6 +2691,8 @@ namespace Ogre
                 {
                     //This is a v1 input layout.
                     mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+                    if( (*itor)->pso.pass.strongMacroblock )
+                        macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                     delete *itor;
                     itor = mShaderCache.erase( itor );
                     end  = mShaderCache.end();
@@ -2613,6 +2707,22 @@ namespace Ogre
                 ++itor;
             }
         }
+
+        //We need to delete the macroblocks at the end because destroying a
+        //macroblock could trigger _notifyMacroblockDestroyed, thus invalidating
+        //iterators in mShaderCache.
+        vector<const HlmsMacroblock*>::type::const_iterator itMacroblock = macroblocksToDelete.begin();
+        vector<const HlmsMacroblock*>::type::const_iterator enMacroblock = macroblocksToDelete.end();
+        while( itMacroblock != enMacroblock )
+        {
+            mHlmsManager->destroyMacroblock( *itMacroblock );
+            ++itMacroblock;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::_clearShaderCache(void)
+    {
+        clearShaderCache();
     }
     //-----------------------------------------------------------------------------------
     void Hlms::_changeRenderSystem( RenderSystem *newRs )

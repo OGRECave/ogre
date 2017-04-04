@@ -40,6 +40,17 @@ namespace Ogre {
     /** \addtogroup RenderSystem
     *  @{
     */
+
+    enum ViewportRenderTargetFlags
+    {
+        /// Do not write colour, only depth/stencil
+        VP_RTT_COLOUR_WRITE         = 1u << 0u,
+        /// Assume stencil is read only (it's a hint, not an enforcement)
+        VP_RTT_READ_ONLY_DEPTH      = 1u << 1u,
+        /// Assume stencil is read only (it's a hint, not an enforcement)
+        VP_RTT_READ_ONLY_STENCIL    = 1u << 2u,
+    };
+
     /** An abstraction of a viewport, i.e. a rendering region on a render
         target.
         @remarks
@@ -294,8 +305,13 @@ namespace Ogre {
         uint getVisibilityMask(void) const { return mVisibilityMask; }
 
         void setColourWrite( bool colourWrite );
+        bool getColourWrite(void) const;
 
-        bool getColourWrite(void) const { return mColourWrite; }
+        void setReadOnly( bool readOnlyDepth, bool readOnlyStencil );
+        bool getReadOnlyDepth(void) const;
+        bool getReadOnlStencil(void) const;
+
+        uint8 getViewportRenderTargetFlags(void) const          { return mViewportRenderTargetFlags; }
 
         /** Convert oriented input point coordinates to screen coordinates. */
         void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv);
@@ -335,7 +351,7 @@ namespace Ogre {
 
         /// Z-order
         int mZOrder;
-        bool mColourWrite;
+        uint8  mViewportRenderTargetFlags; /// See ViewportRenderTargetFlags
         /// Background options
         bool mUpdated;
         bool mShowOverlays;

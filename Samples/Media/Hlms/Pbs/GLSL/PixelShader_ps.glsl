@@ -26,6 +26,7 @@ layout(std140) uniform;
 	@end @property( hlms_use_prepass_msaa )
 		uniform sampler2DMS gBuf_normals;
 		uniform sampler2DMS gBuf_shadowRoughness;
+		uniform sampler2DMS gBuf_depthTexture;
 	@end
 
 	@property( hlms_use_ssr )
@@ -278,16 +279,43 @@ void main()
 	@insertpiece( SampleRoughnessMap )
 
 @end @property( hlms_use_prepass )
+	ivec2 iFragCoord = ivec2( gl_FragCoord.x,
+							  @property( !hlms_forwardplus_flipY )passBuf.windowHeight.x - @end
+							  gl_FragCoord.y );
+
 	@property( hlms_use_prepass_msaa )
+		//SV_Coverage/gl_SampleMaskIn is always before depth & stencil tests,
+		//so we need to perform the test ourselves
+		//See http://www.yosoygames.com.ar/wp/2017/02/beware-of-sv_coverage/
+		float msaaDepth;
+		int subsampleDepthMask;
+		float pixelDepthZ;
+		float pixelDepthW;
+		float pixelDepth;
+		int intPixelDepth;
+		int intMsaaDepth;
+		//Unfortunately there are precision errors, so we allow some ulp errors.
+		//200 & 5 are arbitrary, but were empirically found to be very good values.
+		int ulpError = int( lerp( 200.0, 5.0, gl_FragCoord.z ) );
+		@foreach( hlms_use_prepass_msaa, n )
+			pixelDepthZ = interpolateAtSample( inPs.zwDepth.x, @n );
+			pixelDepthW = interpolateAtSample( inPs.zwDepth.y, @n );
+			pixelDepth = pixelDepthZ / pixelDepthW;
+			msaaDepth = texelFetch( gBuf_depthTexture, iFragCoord.xy, @n );
+			intPixelDepth = floatBitsToInt( pixelDepth );
+			intMsaaDepth = floatBitsToInt( msaaDepth );
+			subsampleDepthMask = int( (abs( intPixelDepth - intMsaaDepth ) <= ulpError) ? 0xffffffffu : ~(1u << @nu) );
+			//subsampleDepthMask = int( (pixelDepth <= msaaDepth) ? 0xffffffffu : ~(1u << @nu) );
+			gl_SampleMaskIn &= subsampleDepthMask;
+		@end
+
+		gl_SampleMaskIn[0] = gl_SampleMaskIn[0] == 0u ? 1u : gl_SampleMaskIn[0];
+
 		int gBufSubsample = findLSB( gl_SampleMaskIn[0] );
 	@end @property( !hlms_use_prepass_msaa )
 		//On non-msaa RTTs gBufSubsample is the LOD level.
 		int gBufSubsample = 0;
 	@end
-
-	ivec2 iFragCoord = ivec2( gl_FragCoord.x,
-							  @property( !hlms_forwardplus_flipY )passBuf.windowHeight.x - @end
-							  gl_FragCoord.y );
 
 	nNormal = normalize( texelFetch( gBuf_normals, iFragCoord, gBufSubsample ).xyz * 2.0 - 1.0 );
 	vec2 shadowRoughness = texelFetch( gBuf_shadowRoughness, iFragCoord, gBufSubsample ).xy;

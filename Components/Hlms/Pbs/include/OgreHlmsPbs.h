@@ -117,6 +117,7 @@ namespace Ogre
         uint32                  mTexUnitSlotStart;
 
         TextureVec const        *mPrePassTextures;
+        TexturePtr              mPrePassMsaaDepthTexture;
         TextureVec const        *mSsrTexture;
         IrradianceVolume       *mIrradianceVolume;
 

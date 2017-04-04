@@ -368,7 +368,7 @@ namespace Ogre
         return 1.0f;
     }
     //-------------------------------------------------------------------------
-    void NULLRenderSystem::_setRenderTarget(RenderTarget *target, bool colourWrite)
+    void NULLRenderSystem::_setRenderTarget(RenderTarget *target, uint8 viewportRenderTargetFlags)
     {
     }
     //-------------------------------------------------------------------------

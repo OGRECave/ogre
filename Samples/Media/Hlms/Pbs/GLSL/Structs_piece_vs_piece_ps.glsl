@@ -172,6 +172,9 @@ layout(binding = 3) uniform ManualProbe
 			@property( !hlms_shadowmap@n_is_point_light )
 				vec4 posL@n;@end @end
 		@property( hlms_pssm_splits )float depth;@end
+		@property( hlms_use_prepass_msaa > 1 )
+			float2 zwDepth;
+		@end
 	@end
 	@property( hlms_shadowcaster )
 		@property( alpha_test )

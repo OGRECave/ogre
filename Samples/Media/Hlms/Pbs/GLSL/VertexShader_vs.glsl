@@ -205,5 +205,9 @@ void main()
 @property( (!hlms_shadowcaster || alpha_test) && !lower_gpu_overhead )
 	outVs.drawId = drawId;@end
 
+	@property( hlms_use_prepass_msaa > 1 )
+		outVs.zwDepth.xy = outVs.gl_Position.zw;
+	@end
+
 	@insertpiece( custom_vs_posExecution )
 }

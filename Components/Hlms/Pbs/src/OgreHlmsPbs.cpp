@@ -312,6 +312,9 @@ namespace Ogre
                 psParams->setNamedConstant( "gBuf_normals",         texUnit++ );
                 psParams->setNamedConstant( "gBuf_shadowRoughness", texUnit++ );
 
+                if( mPrePassMsaaDepthTexture )
+                    psParams->setNamedConstant( "gBuf_depthTexture", texUnit++ );
+
                 if( mSsrTexture )
                     psParams->setNamedConstant( "ssrTexture", texUnit++ );
             }
@@ -757,6 +760,18 @@ namespace Ogre
 
         mPrePassTextures = sceneManager->getCurrentPrePassTextures();
         assert( !mPrePassTextures || mPrePassTextures->size() == 2u );
+
+        mPrePassMsaaDepthTexture.reset();
+        if( mPrePassTextures && (*mPrePassTextures)[0]->getFSAA() > 1u )
+        {
+            const TextureVec *msaaDepthTexture = sceneManager->getCurrentPrePassDepthTexture();
+            if( msaaDepthTexture )
+                mPrePassMsaaDepthTexture = (*msaaDepthTexture)[0];
+            assert( !mPrePassTextures ||
+                    (mPrePassMsaaDepthTexture &&
+                     mPrePassMsaaDepthTexture->getFSAA() == (*mPrePassTextures)[0]->getFSAA()) &&
+                    "Prepass + MSAA must specify an MSAA depth texture" );
+        }
 
         mSsrTexture = sceneManager->getCurrentSsrTexture();
         assert( !(!mPrePassTextures && mSsrTexture) && "Using SSR *requires* to be in prepass mode" );
@@ -1383,6 +1398,12 @@ namespace Ogre
                             CbTexture( texUnit++, true, (*mPrePassTextures)[0].get(), 0 );
                     *commandBuffer->addCommand<CbTexture>() =
                             CbTexture( texUnit++, true, (*mPrePassTextures)[1].get(), 0 );
+                }
+
+                if( mPrePassMsaaDepthTexture )
+                {
+                    *commandBuffer->addCommand<CbTexture>() =
+                            CbTexture( texUnit++, true, mPrePassMsaaDepthTexture.get(), 0 );
                 }
 
                 if( mSsrTexture )

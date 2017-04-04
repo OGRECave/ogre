@@ -52,7 +52,7 @@ namespace Ogre {
         , mScissorRelHeight(height)
         , mCoversEntireTarget(true)
         , mScissorsMatchViewport(true)
-        , mColourWrite( true )
+        , mViewportRenderTargetFlags( VP_RTT_COLOUR_WRITE )
         // Actual dimensions will update later
         , mUpdated(false)
         , mShowOverlays(true)
@@ -350,8 +350,39 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Viewport::setColourWrite( bool colourWrite )
     {
-        mColourWrite = colourWrite;
+        if( !colourWrite )
+            mViewportRenderTargetFlags &= ~VP_RTT_COLOUR_WRITE;
+        else
+            mViewportRenderTargetFlags |= VP_RTT_COLOUR_WRITE;
         mUpdated = true;
+    }
+    //-----------------------------------------------------------------------
+    bool Viewport::getColourWrite(void) const
+    {
+        return (mViewportRenderTargetFlags & VP_RTT_COLOUR_WRITE) != 0;
+    }
+    //-----------------------------------------------------------------------
+    void Viewport::setReadOnly( bool readOnlyDepth, bool readOnlyStencil )
+    {
+        if( !readOnlyDepth )
+            mViewportRenderTargetFlags &= ~VP_RTT_READ_ONLY_DEPTH;
+        else
+            mViewportRenderTargetFlags |= VP_RTT_READ_ONLY_DEPTH;
+        if( !readOnlyStencil )
+            mViewportRenderTargetFlags &= ~VP_RTT_READ_ONLY_STENCIL;
+        else
+            mViewportRenderTargetFlags |= VP_RTT_READ_ONLY_STENCIL;
+        mUpdated = true;
+    }
+    //-----------------------------------------------------------------------
+    bool Viewport::getReadOnlyDepth(void) const
+    {
+        return (mViewportRenderTargetFlags & VP_RTT_READ_ONLY_DEPTH) != 0;
+    }
+    //-----------------------------------------------------------------------
+    bool Viewport::getReadOnlStencil(void) const
+    {
+        return (mViewportRenderTargetFlags & VP_RTT_READ_ONLY_STENCIL) != 0;
     }
     //-----------------------------------------------------------------------
     void Viewport::pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv)

@@ -114,6 +114,8 @@ namespace Ogre
                 Math::Abs( vp->getScissorWidth() - scWidth ) < EPSILON &&
                 Math::Abs( vp->getScissorHeight() - scHeight )<EPSILON &&
                 vp->getColourWrite() == mDefinition->mColourWrite &&
+                vp->getReadOnlyDepth() == mDefinition->mReadOnlyDepth &&
+                vp->getReadOnlStencil() == mDefinition->mReadOnlyStencil &&
                 vp->getOverlaysEnabled() == mDefinition->mIncludeOverlays )
             {
                 mViewport = vp;
@@ -125,6 +127,7 @@ namespace Ogre
             mViewport = mTarget->addViewport( left, top, width, height );
             mViewport->setScissors( scLeft, scTop, scWidth, scHeight );
             mViewport->setColourWrite( mDefinition->mColourWrite );
+            mViewport->setReadOnly( mDefinition->mReadOnlyDepth, mDefinition->mReadOnlyStencil );
             mViewport->setOverlaysEnabled( mDefinition->mIncludeOverlays );
         }
 

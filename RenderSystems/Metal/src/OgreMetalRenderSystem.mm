@@ -795,7 +795,7 @@ namespace Ogre
                 if( vp->getTarget() != mActiveRenderTarget ||
                     vp->getColourWrite() != activeHasColourWrites )
                 {
-                    _setRenderTarget( vp->getTarget(), vp->getColourWrite() );
+                    _setRenderTarget( vp->getTarget(), vp->getViewportRenderTargetFlags() );
                 }
 
                 if( mActiveRenderEncoder || ( !mActiveRenderEncoder &&
@@ -1961,11 +1961,12 @@ namespace Ogre
         return 1.0f;
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::_setRenderTarget(RenderTarget *target, bool colourWrite)
+    void MetalRenderSystem::_setRenderTarget(RenderTarget *target, uint8 viewportRenderTargetFlags)
     {
         {
             const bool activeHasColourWrites = mNumMRTs != 0;
-            if( mActiveRenderTarget == target && activeHasColourWrites == colourWrite )
+            if( mActiveRenderTarget == target &&
+                activeHasColourWrites == (viewportRenderTargetFlags & VP_RTT_COLOUR_WRITE) )
             {
                 if( mActiveRenderEncoder && mUavsDirty )
                     flushUAVs();
@@ -1980,7 +1981,8 @@ namespace Ogre
 
         if( target )
         {
-            colourWrite &= !target->getForceDisableColourWrites();
+            if( target->getForceDisableColourWrites() )
+                viewportRenderTargetFlags &= ~VP_RTT_COLOUR_WRITE;
 
             mCurrentColourRTs[0] = 0;
             //We need to set mCurrentColourRTs[0] to grab the active device,
@@ -1990,7 +1992,7 @@ namespace Ogre
 
             MetalDevice *ownerDevice = 0;
 
-            if( colourWrite )
+            if( viewportRenderTargetFlags & VP_RTT_COLOUR_WRITE )
             {
                 for( size_t i=0; i<mNumMRTs; ++i )
                 {

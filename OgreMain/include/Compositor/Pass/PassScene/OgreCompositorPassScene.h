@@ -68,6 +68,7 @@ namespace Ogre
         bool                    mUpdateShadowNode;
 
         TextureVec const        *mPrePassTextures;
+        TextureVec const        *mPrePassDepthTexture;
         TextureVec const        *mSsrTexture;
 
     public:

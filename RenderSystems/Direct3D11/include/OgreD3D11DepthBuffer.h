@@ -48,18 +48,20 @@ namespace Ogre
         /// @copydoc DepthBuffer::isCompatible
         virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
 
-        ID3D11DepthStencilView* getDepthStencilView() const;
+        ID3D11DepthStencilView* getDepthStencilView( uint8 viewportRenderTargetFlags );
         ID3D11ShaderResourceView* getDepthTextureView() const;
         /// internal method, gets called when the renderwindow was resized
         void _resized(ID3D11DepthStencilView *depthBufferView, uint32 width, uint32 height);
 
     protected:
-        ID3D11DepthStencilView      *mDepthStencilView; //aka. actual "DepthBuffer"
+        ID3D11DepthStencilView      *mDepthStencilView[2]; //aka. actual "DepthBuffer"
         ID3D11ShaderResourceView    *mDepthTextureView;
         uint32                      mMultiSampleQuality;
         ID3D11Texture2D             *mDepthStencilResource;
 
         virtual bool copyToImpl( DepthBuffer *destination );
+
+        void createReadOnlySRV(void);
     };
 }
 #endif
