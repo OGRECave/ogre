@@ -271,6 +271,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     struct FileNameCompare
     {
+        typedef FileInfo first_argument_type;
+        typedef String second_argument_type;
+        typedef bool result_type;
+
         bool operator()(const Ogre::FileInfo& lhs, const String& filename) const
         {
             return lhs.filename == filename;

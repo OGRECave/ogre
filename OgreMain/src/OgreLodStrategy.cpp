@@ -74,6 +74,10 @@ namespace Ogre {
     //---------------------------------------------------------------------
     struct LodUsageSortLess
     {
+        typedef const v1::MeshLodUsage& first_argument_type;
+        typedef const v1::MeshLodUsage& second_argument_type;
+        typedef bool result_type;
+
         bool operator() (const v1::MeshLodUsage& mesh1, const v1::MeshLodUsage& mesh2)
         {
             // Sort ascending
