@@ -67,11 +67,13 @@ endmacro()
 if(@OGRE_BUILD_COMPONENT_BITES@)
     ogre_declare_component(Bites)
     
-    list(APPEND OGRE_Bites_INCLUDE_DIRS @SDL2_INCLUDE_DIR@)
-    list(APPEND OGRE_Bites_LIBRARIES @SDL2_LIBRARY@)
-    
-    list(APPEND OGRE_INCLUDE_DIRS @SDL2_INCLUDE_DIR@)
-    list(APPEND OGRE_LIBRARIES @SDL2_LIBRARY@)
+    if(@SDL2_FOUND@)
+        list(APPEND OGRE_Bites_INCLUDE_DIRS @SDL2_INCLUDE_DIR@)
+        list(APPEND OGRE_Bites_LIBRARIES @SDL2_LIBRARY@)
+        
+        list(APPEND OGRE_INCLUDE_DIRS @SDL2_INCLUDE_DIR@)
+        list(APPEND OGRE_LIBRARIES @SDL2_LIBRARY@)
+    endif()
 endif()
 if(@OGRE_BUILD_COMPONENT_HLMS@)
     ogre_declare_component(HLMS)
