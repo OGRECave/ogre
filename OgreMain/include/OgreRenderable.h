@@ -315,7 +315,7 @@ namespace Ogre {
         @param override true means that a lower camera detail will override this
             renderables detail level, false means it won't.
         */
-        virtual void setPolygonModeOverrideable(bool override)
+        void setPolygonModeOverrideable(bool override)
         {
             mPolygonModeOverrideable = override;
         }
@@ -323,7 +323,7 @@ namespace Ogre {
         /** Gets whether this renderable's chosen detail level can be
             overridden (downgraded) by the camera setting. 
         */
-        virtual bool getPolygonModeOverrideable(void) const
+        bool getPolygonModeOverrideable(void) const
         {
             return mPolygonModeOverrideable;
         }
@@ -335,12 +335,12 @@ namespace Ogre {
             this Renderable. This can be a pointer back to one of your own
             classes for instance.
         */
-        OGRE_DEPRECATED virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
+        OGRE_DEPRECATED void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
         /** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
             Retrieves the custom user value associated with this object.
         */
-        OGRE_DEPRECATED virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
+        OGRE_DEPRECATED const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
 
         /** Return an instance of user objects binding associated with this class.
             You can use it to associate one or more custom objects with this class instance.
@@ -390,7 +390,7 @@ namespace Ogre {
         @remarks
             This should only be used by a RenderSystem
         */
-        virtual const RenderSystemDataPtr& getRenderSystemData() const 
+        const RenderSystemDataPtr& getRenderSystemData() const
         { 
             return mRenderSystemData; 
         }
@@ -398,7 +398,7 @@ namespace Ogre {
         @remarks
             This should only be used by a RenderSystem
         */
-        virtual void setRenderSystemData(RenderSystemDataPtr val) const
+        void setRenderSystemData(RenderSystemDataPtr val) const
         { 
             mRenderSystemData = val; 
         }
