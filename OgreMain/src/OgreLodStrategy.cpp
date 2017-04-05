@@ -72,8 +72,7 @@ namespace Ogre {
         return true;
     }
     //---------------------------------------------------------------------
-    struct LodUsageSortLess :
-    public std::binary_function<const v1::MeshLodUsage&, const v1::MeshLodUsage&, bool>
+    struct LodUsageSortLess
     {
         bool operator() (const v1::MeshLodUsage& mesh1, const v1::MeshLodUsage& mesh2)
         {

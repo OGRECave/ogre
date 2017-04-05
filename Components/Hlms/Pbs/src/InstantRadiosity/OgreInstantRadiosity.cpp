@@ -59,7 +59,7 @@ namespace Ogre
 {
     class RandomNumberGenerator
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || ( OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1910 )
         std::mt19937        mRng;
 #else
         std::tr1::mt19937   mRng;

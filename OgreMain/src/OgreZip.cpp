@@ -269,7 +269,7 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    struct FileNameCompare : public std::binary_function<FileInfo, String, bool>
+    struct FileNameCompare
     {
         bool operator()(const Ogre::FileInfo& lhs, const String& filename) const
         {
@@ -287,7 +287,7 @@ namespace Ogre {
             cleanName = tokens[tokens.size() - 1];
         }
 
-        return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), cleanName)) != mFileList.end();
+        return std::find_if (mFileList.begin(), mFileList.end(), std::bind(FileNameCompare(), std::placeholders::_1, cleanName)) != mFileList.end();
     }
     //---------------------------------------------------------------------
     time_t ZipArchive::getModifiedTime(const String& filename)
