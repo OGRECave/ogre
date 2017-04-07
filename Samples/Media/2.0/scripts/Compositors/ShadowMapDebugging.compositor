@@ -206,7 +206,7 @@ compositor_node_shadow ShadowMapDebuggingEsmShadowNode
 			{
 				pass render_quad
 				{
-					material Ogre/DPSM/CubeToDpsm
+					material Ogre/DPSM/CubeToDpsmColour
 					input 0 tmpCubemap
 				}
 			}

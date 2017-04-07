@@ -8,6 +8,10 @@ fragment_program Ogre/DPSM/CubeToDpsm_ps_GLSL glsl
 		param_named depthTexture int 0
 	}
 }
+fragment_program Ogre/DPSM/CubeToDpsm_Colour_ps_GLSL glsl : Ogre/DPSM/CubeToDpsm_ps_GLSL
+{
+	preprocessor_defines OUTPUT_TO_COLOUR=1
+}
 
 fragment_program Ogre/DPSM/CubeToDpsm_ps_HLSL hlsl
 {
@@ -15,11 +19,19 @@ fragment_program Ogre/DPSM/CubeToDpsm_ps_HLSL hlsl
 	entry_point main
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
+fragment_program Ogre/DPSM/CubeToDpsm_Colour_ps_HLSL hlsl : Ogre/DPSM/CubeToDpsm_ps_HLSL
+{
+	preprocessor_defines OUTPUT_TO_COLOUR=1
+}
 
 fragment_program Ogre/DPSM/CubeToDpsm_ps_Metal metal
 {
 	source CubeToDpsm_ps.metal
 	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+fragment_program Ogre/DPSM/CubeToDpsm_Colour_ps_Metal metal : Ogre/DPSM/CubeToDpsm_ps_Metal
+{
+	preprocessor_defines OUTPUT_TO_COLOUR=1
 }
 
 fragment_program Ogre/DPSM/CubeToDpsm_ps unified
@@ -27,6 +39,12 @@ fragment_program Ogre/DPSM/CubeToDpsm_ps unified
 	delegate Ogre/DPSM/CubeToDpsm_ps_GLSL
 	delegate Ogre/DPSM/CubeToDpsm_ps_HLSL
 	delegate Ogre/DPSM/CubeToDpsm_ps_Metal
+}
+fragment_program Ogre/DPSM/CubeToDpsm_Colour_ps unified
+{
+	delegate Ogre/DPSM/CubeToDpsm_Colour_ps_GLSL
+	delegate Ogre/DPSM/CubeToDpsm_Colour_ps_HLSL
+	delegate Ogre/DPSM/CubeToDpsm_Colour_ps_Metal
 }
 
 // Converts a cubemap to DPSM in the pixel shader.
@@ -55,6 +73,19 @@ material Ogre/DPSM/CubeToDpsm
 			{
 				filtering			none
 				tex_address_mode	clamp
+			}
+		}
+	}
+}
+
+material Ogre/DPSM/CubeToDpsmColour : Ogre/DPSM/CubeToDpsm
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Ogre/DPSM/CubeToDpsm_Colour_ps
+			{
 			}
 		}
 	}
