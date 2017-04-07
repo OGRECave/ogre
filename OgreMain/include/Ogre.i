@@ -104,6 +104,7 @@
 %ignore Ogre::SharedPtr::setNull;
 %ignore Ogre::SharedPtr::isNull;
 %ignore Ogre::SharedPtr::setUseCount;
+%ignore Ogre::SharedPtr::unspecified_bool; // c++11 compatibility
 %include "OgreSharedPtr.h"
 %ignore Ogre::Any::getType; // deprecated
 %include "OgreAny.h"

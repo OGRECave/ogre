@@ -44,10 +44,6 @@ if(OGRE_BUILD_COMPONENT_BITES)
         include_directories(${SDL2_INCLUDE_DIR})
         list(APPEND CMAKE_SWIG_FLAGS -DOGRE_BITES_HAVE_SDL=1)
     endif()
-
-    if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-        list(APPEND CMAKE_SWIG_FLAGS)
-    endif()
     
     ogre_add_component_include_dir(Bites)
     set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
