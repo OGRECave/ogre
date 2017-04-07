@@ -1112,6 +1112,8 @@ namespace OgreBites
             Ogre::StringVector sampleList = cfg.getMultiSetting("SamplePlugin");
             Ogre::String startupSampleTitle = cfg.getSetting("StartupSample");
 
+            sampleDir = Ogre::FileSystemLayer::resolveBundlePath(sampleDir);
+
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
             if (sampleDir.empty()) sampleDir = ".";   // user didn't specify plugins folder, try current one
 #endif

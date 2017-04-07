@@ -306,7 +306,7 @@ namespace Ogre {
             Although lights themselves are not 'visible', setting a light to invisible
             means it no longer affects the scene.
         */
-        void setVisible(bool visible);
+        void setVisible(bool visible) { MovableObject::setVisible(visible); }
 
         /** @copydoc MovableObject::getBoundingRadius */
         Real getBoundingRadius(void) const { return 0; /* not visible */ }

@@ -276,7 +276,8 @@ void ApplicationContext::destroyDummyScene()
     mRoot->destroySceneManager(dummyScene);
 }
 
-void ApplicationContext::enableShaderCache() {
+void ApplicationContext::enableShaderCache() const
+{
     Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
 
     // Load for a package version of the shaders.
@@ -290,7 +291,8 @@ void ApplicationContext::enableShaderCache() {
     }
 }
 
-bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt) {
+bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt)
+{
     for(std::set<InputListener*>::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it) {
         (*it)->frameRendered(evt);
@@ -440,7 +442,8 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
 }
 #endif
 
-void ApplicationContext::_fireInputEvent(const Event& event) {
+void ApplicationContext::_fireInputEvent(const Event& event) const
+{
     for(std::set<InputListener*>::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it) {
         InputListener& l = **it;
@@ -517,13 +520,6 @@ void ApplicationContext::locateResources()
     cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
 #   endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    Ogre::String bundle = Ogre::macBundlePath();
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-    char* env_SNAP = getenv("SNAP");
-    Ogre::String bundle(env_SNAP ? env_SNAP : "");
-#endif
-
     Ogre::String sec, type, arch;
     // go through all specified resource groups
     Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
@@ -536,19 +532,8 @@ void ApplicationContext::locateResources()
         for (i = settings.begin(); i != settings.end(); i++)
         {
             type = i->first;
-            arch = i->second;
+            arch = Ogre::FileSystemLayer::resolveBundlePath(i->second);
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            // OS X does not set the working directory relative to the app,
-            // In order to make things portable on OS X we need to provide
-            // the loading with it's own bundle path location
-            if (!Ogre::StringUtil::startsWith(arch, "/", false)) // only adjust relative dirs
-                arch = bundle + "/" + arch;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-            // With Ubuntu Snappy changes absolute paths are relative to the snap package.
-            if (Ogre::StringUtil::startsWith(arch, "/", false)) // only adjust absolute dirs
-                arch = bundle + arch;
-#endif
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
         }
     }

@@ -88,16 +88,16 @@ namespace OgreBites
 
         virtual ~ApplicationContext();
 
-        Ogre::RenderWindow* getRenderWindow()
+        Ogre::RenderWindow* getRenderWindow() const
         {
             return mWindow;
         }
 
-        Ogre::Root* getRoot() {
+        Ogre::Root* getRoot() const {
             return mRoot;
         }
 
-        Ogre::OverlaySystem* getOverlaySystem() {
+        Ogre::OverlaySystem* getOverlaySystem() const {
             return mOverlaySystem;
         }
 
@@ -135,7 +135,7 @@ namespace OgreBites
          * inspect the event and call one of the corresponding functions on the registered InputListener
          * @param event Input Event
          */
-        void _fireInputEvent(const Event& event);
+        void _fireInputEvent(const Event& event) const;
 
         /**
           Initialize the RT Shader system.
@@ -222,7 +222,7 @@ namespace OgreBites
          *
          * also loads any existing cache
          */
-        void enableShaderCache();
+        void enableShaderCache() const;
 
         /// attach input listener
         void addInputListener(InputListener* lis) {

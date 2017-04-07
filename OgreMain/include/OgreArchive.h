@@ -50,7 +50,7 @@ namespace Ogre {
     struct FileInfo {
         /// The archive in which the file has been found (for info when performing
         /// multi-Archive searches, note you should still open through ResourceGroupManager)
-        Archive* archive;
+        const Archive* archive;
         /// The file's fully qualified name
         String filename;
         /// Path name; separated by '/' and ending with '/'
@@ -141,7 +141,7 @@ namespace Ogre {
             read / write the file. If the file is not present, returns a null
             shared pointer.
         */
-        virtual DataStreamPtr open(const String& filename, bool readOnly = true) = 0;
+        virtual DataStreamPtr open(const String& filename, bool readOnly = true) const = 0;
 
         /** Create a new file (or overwrite one already there). 
         @note If the archive is read-only then this method will fail.
@@ -167,7 +167,7 @@ namespace Ogre {
             instead of files
         @return A list of filenames matching the criteria, all are fully qualified
         */
-        virtual StringVectorPtr list(bool recursive = true, bool dirs = false) = 0;
+        virtual StringVectorPtr list(bool recursive = true, bool dirs = false) const = 0;
         
         /** List all files in the archive with accompanying information.
         @param recursive Whether all paths of the archive are searched (if the 
@@ -177,7 +177,7 @@ namespace Ogre {
         @return A list of structures detailing quite a lot of information about
             all the files in the archive.
         */
-        virtual FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) = 0;
+        virtual FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const = 0;
 
         /** Find all file or directory names matching a given pattern
             in this archive.
@@ -192,13 +192,13 @@ namespace Ogre {
         @return A list of filenames matching the criteria, all are fully qualified
         */
         virtual StringVectorPtr find(const String& pattern, bool recursive = true,
-            bool dirs = false) = 0;
+            bool dirs = false) const = 0;
 
         /** Find out if the named file exists (note: fully qualified filename required) */
-        virtual bool exists(const String& filename) = 0; 
+        virtual bool exists(const String& filename) const = 0;
 
         /** Retrieve the modification time of a given file */
-        virtual time_t getModifiedTime(const String& filename) = 0; 
+        virtual time_t getModifiedTime(const String& filename) const = 0;
 
 
         /** Find all files or directories matching a given pattern in this
@@ -212,7 +212,7 @@ namespace Ogre {
             the criteria.
         */
         virtual FileInfoListPtr findFileInfo(const String& pattern, 
-            bool recursive = true, bool dirs = false) = 0;
+            bool recursive = true, bool dirs = false) const = 0;
 
         /// Return the type code of this Archive
         const String& getType(void) const { return mType; }

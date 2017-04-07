@@ -332,10 +332,15 @@ namespace Ogre {
          * @param iExpand
          *     If false, parameters are not expanded and no expressions are
          *     allowed; only a single keyword is expected per argument.
+         * @param shouldAppendArg
+         *     When true, the argument will be appended the word word __arg_
+         *     e.g. #define myMacro(x) --> #define myMacro(x__arg_)
+         *     This workaround a bug where calling myMacro( x ) would cause
+         *     issues.
          * @return
          *     The first unhandled token after argument.
          */
-        Token GetArgument (Token &oArg, bool iExpand);
+        Token GetArgument (Token &oArg, bool iExpand, bool shouldAppendArg);
 
         /**
          * Get all the arguments of a macro: '(' arg1 { ',' arg2 { ',' ... }} ')'
@@ -343,11 +348,13 @@ namespace Ogre {
          *     Number of parsed arguments is stored into this variable.
          * @param oArgs
          *     This is set to a pointer to an array of parsed arguments.
+         * @param shouldAppendArg
+         *      See GetArgument.
          * @param iExpand
          *     If false, parameters are not expanded and no expressions are
          *     allowed; only a single keyword is expected per argument.
          */
-        Token GetArguments (int &oNumArgs, Token *&oArgs, bool iExpand);
+        Token GetArguments (int &oNumArgs, Token *&oArgs, bool iExpand, bool shouldAppendArg);
 
         /**
          * Parse an expression, compute it and return the result.
