@@ -14,7 +14,8 @@ namespace Demo
 
 		assert( !(kernelRadius & 0x01) && "kernelRadius must be even!" );
 
-		job->setProperty( "kernel_radius", kernelRadius );
+        if( job->getProperty( "kernel_radius" ) != kernelRadius )
+            job->setProperty( "kernel_radius", kernelRadius );
 		ShaderParams &shaderParams = job->getShaderParams( "default" );
 
 		std::vector<float> weights( kernelRadius + 1u );
