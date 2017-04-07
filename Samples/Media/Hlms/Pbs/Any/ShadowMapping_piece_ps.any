@@ -42,6 +42,7 @@
 	#define SH_HALF2 half2
 	#define SH_HALF half
 	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.sample_compare( sampler, float2( uv.xy ), fDepth )
+	#define OGRE_SAMPLE_SHADOW_ESM( tex, sampler, uv ) tex.sample( sampler, uv ).x
 
 	#define PASSBUF_ARG_DECL , constant PassData &passBuf
 	#define PASSBUF_ARG , passBuf
@@ -328,7 +329,7 @@
 		@end
 	@end
 
-	@property( syntax == hlsl )
+	@property( syntax == hlsl || syntax == metal )
 		#define outDepth outPs.colour0
 	@end
 @end
