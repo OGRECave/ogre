@@ -10,7 +10,11 @@ struct PS_INPUT
 float main
 (
 	PS_INPUT inPs
+#if OUTPUT_TO_COLOUR
+) : SV_Target0
+#else
 ) : SV_Depth
+#endif
 {
 	float3 cubeDir;
 

@@ -2,6 +2,9 @@
 struct ShadowReceiverData
 {
 	float4x4 texViewProj;
+@property( exponential_shadow_maps )
+	float4 texViewZRow;
+@end
 	float2 shadowDepthRange;
 	float2 padding;
 	float4 invShadowMapSize;
@@ -65,6 +68,7 @@ cbuffer PassBuffer : register(b0)
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
+	@property( exponential_shadow_maps )float4 viewZRow;@end
 	float2 depthRange;
 @end
 
@@ -126,7 +130,7 @@ struct Material
 
 cbuffer MaterialBuf : register(b1)
 {
-	Material materialArray[@insertpiece( materials_per_buffer )];
+	Material materialArray[2/*@insertpiece( materials_per_buffer )*/];
 };
 @end
 
@@ -143,7 +147,7 @@ cbuffer InstanceBuffer : register(b2)
     //shadowConstantBias. Send the bias directly to avoid an
     //unnecessary indirection during the shadow mapping pass.
     //Must be loaded with uintBitsToFloat
-	uint4 worldMaterialIdx[4096];
+	uint4 worldMaterialIdx[2/*4096*/];
 };
 @end
 
@@ -179,6 +183,10 @@ cbuffer ManualProbe : register(b3)
 				float4 posL@n	: TEXCOORD@counter(texcoord);@end @end
 			
 		@property( hlms_pssm_splits )float depth	: TEXCOORD@counter(texcoord);@end
+
+		@property( hlms_use_prepass_msaa > 1 )
+			float2 zwDepth	: TEXCOORD@counter(texcoord);
+		@end
 	@end
 	
 	@property( hlms_shadowcaster )
@@ -187,17 +195,15 @@ cbuffer ManualProbe : register(b3)
 			@foreach( hlms_uv_count, n )
 				float@value( hlms_uv_count@n ) uv@n	: TEXCOORD@counter(texcoord);@end
 		@end
-		@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point )
+		@property( (!hlms_shadow_uses_depth_texture || exponential_shadow_maps) && !hlms_shadowcaster_point )
 			float depth	: TEXCOORD@counter(texcoord);
 		@end
 		@property( hlms_shadowcaster_point )
 			float3 toCameraWS	: TEXCOORD@counter(texcoord);
-			nointerpolation float constBias	: TEXCOORD@counter(texcoord);
+			@property( !exponential_shadow_maps )
+				nointerpolation float constBias	: TEXCOORD@counter(texcoord);
+			@end
 		@end
-	@end
-
-	@property( hlms_use_prepass_msaa > 1 )
-		float2 zwDepth	: TEXCOORD@counter(texcoord);
 	@end
 
 	@insertpiece( custom_VStoPS )

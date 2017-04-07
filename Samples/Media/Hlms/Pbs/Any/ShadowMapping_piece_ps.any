@@ -33,6 +33,7 @@
 	#define SH_HALF2 float2
 	#define SH_HALF float
 	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.SampleCmpLevelZero( sampler, uv.xy, fDepth ).x
+	#define OGRE_SAMPLE_SHADOW_ESM( tex, sampler, uv ) tex.Sample( sampler, uv ).x
 	#define PASSBUF_ARG_DECL
 	#define PASSBUF_ARG
 @end
@@ -111,11 +112,17 @@
 @end
 @property( syntax == hlsl )
 	@piece( TEXTURE2DSHADOW )Texture2D<float>@end
-	@piece( SamplerShadow )SamplerComparisonState shadowSampler, @end
+	@property( !exponential_shadow_maps )
+		@piece( SAMPLERSTATESHADOW )SamplerComparisonState@end
+	@end
+	@property( exponential_shadow_maps )
+		@piece( SAMPLERSTATESHADOW )SamplerState@end
+	@end
+	@piece( SamplerShadow )@insertpiece( SAMPLERSTATESHADOW ) shadowSampler, @end
 	@piece( DeclShadowSamplers )
-		SamplerComparisonState shadowSampler	: register(s@value(textureRegShadowMapStart));
+		@insertpiece( SAMPLERSTATESHADOW ) shadowSampler: register(s@value(textureRegShadowMapStart));
 		@foreach( hlms_num_shadow_map_textures, n )
-			Texture2D<float> texShadowMap@n		: register(t@counter(textureRegShadowMapStart));@end
+			Texture2D<float> texShadowMap@n				: register(t@counter(textureRegShadowMapStart));@end
 	@end
 @end
 @property( syntax == metal )
@@ -307,16 +314,22 @@
 ///--------------------------------------------------------------------------------------
 
 @piece( DeclShadowCasterMacros )
-	@property( !hlms_render_depth_only )
-		@property( GL3+ )
-			#define outDepth outColour
+	@property( syntax == glsl )
+		@property( !hlms_render_depth_only )
+			@property( GL3+ )
+				#define outDepth outColour
+			@end
+			@property( !GL3+ )
+				#define outDepth gl_FragColor
+			@end
 		@end
-		@property( !GL3+ )
-			#define outDepth gl_FragColor
+		@property( hlms_render_depth_only )
+			#define outDepth gl_FragDepth
 		@end
 	@end
-	@property( hlms_render_depth_only )
-		#define outDepth gl_FragDepth
+
+	@property( syntax == hlsl )
+		#define outDepth outPs.colour0
 	@end
 @end
 
