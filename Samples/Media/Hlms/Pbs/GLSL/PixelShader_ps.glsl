@@ -504,6 +504,8 @@ void main()
 @end
 @property( hlms_shadowcaster )
 
+@insertpiece( DeclShadowCasterMacros )
+
 @property( alpha_test )
 	Material material;
 	float diffuseCol;
@@ -514,7 +516,7 @@ void main()
 		@property( detail_map@n )uint detailMapIdx@n;@end @end
 @end
 
-@property( hlms_shadowcaster_point )
+@property( hlms_shadowcaster_point || exponential_shadow_maps )
 	@insertpiece( PassDecl )
 @end
 
@@ -571,16 +573,7 @@ void main()
 		discard;
 @end /// !alpha_test
 
-@property( !hlms_render_depth_only && !hlms_shadowcaster_point )
-	@property( GL3+ )outColour = inPs.depth;@end
-	@property( !GL3+ )gl_FragColor.x = inPs.depth;@end
-@end
-
-@property( hlms_shadowcaster_point )
-	float distanceToCamera = length( inPs.toCameraWS );
-	@property( GL3+ )outColour = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;@end
-	@property( !GL3+ )gl_FragColor.x = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;@end
-@end
+	@insertpiece( DoShadowCastPS )
 
 	@insertpiece( custom_ps_posExecution )
 }

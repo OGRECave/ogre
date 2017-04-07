@@ -127,6 +127,9 @@ namespace Demo
         Ogre::Camera* getCamera(void) const                     { return mCamera; }
         Ogre::CompositorWorkspace* getCompositorWorkspace(void) const { return mWorkspace; }
         Ogre::v1::OverlaySystem* getOverlaySystem(void) const   { return mOverlaySystem; }
+
+        virtual void stopCompositor(void);
+        virtual void restartCompositor(void);
     };
 }
 

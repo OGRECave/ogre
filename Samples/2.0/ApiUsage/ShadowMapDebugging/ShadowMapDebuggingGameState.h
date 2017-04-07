@@ -19,9 +19,12 @@ namespace Demo
         Ogre::v1::Overlay *mDebugOverlayPSSM;
         Ogre::v1::Overlay *mDebugOverlaySpotlights;
 
+        void setupShadowNode( bool forEsm );
+
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
         void createShadowMapDebugOverlays(void);
+        void destroyShadowMapDebugOverlays(void);
 
     public:
         ShadowMapDebuggingGameState( const Ogre::String &helpDescription );

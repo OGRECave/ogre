@@ -58,6 +58,8 @@ THE SOFTWARE.
 
 #include "Animation/OgreSkeletonInstance.h"
 
+#include "OgreLogManager.h"
+
 namespace Ogre
 {
     const IdString PbsProperty::HwGammaRead       = IdString( "hw_gamma_read" );
@@ -134,6 +136,7 @@ namespace Ogre
     const IdString PbsProperty::Pcf3x3            = IdString( "pcf_3x3" );
     const IdString PbsProperty::Pcf4x4            = IdString( "pcf_4x4" );
     const IdString PbsProperty::PcfIterations     = IdString( "pcf_iterations" );
+    const IdString PbsProperty::ExponentialShadowMaps= IdString( "exponential_shadow_maps" );
 
     const IdString PbsProperty::EnvMapScale       = IdString( "envmap_scale" );
     const IdString PbsProperty::AmbientFixed      = IdString( "ambient_fixed" );
@@ -205,6 +208,7 @@ namespace Ogre
                          ConstBufferPool::ExtraBufferParams() ),
         mShadowmapSamplerblock( 0 ),
         mShadowmapCmpSamplerblock( 0 ),
+        mShadowmapEsmSamplerblock( 0 ),
         mCurrentShadowmapSamplerblock( 0 ),
         mParallaxCorrectedCubemap( 0 ),
         mCurrentPassBuffer( 0 ),
@@ -265,6 +269,17 @@ namespace Ogre
 
                 if( !mShadowmapSamplerblock )
                     mShadowmapSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+            }
+
+            if( !mShadowmapEsmSamplerblock )
+            {
+                samplerblock.mMinFilter     = FO_ANISOTROPIC;
+                samplerblock.mMagFilter     = FO_ANISOTROPIC;
+                samplerblock.mMipFilter     = FO_ANISOTROPIC;
+                samplerblock.mMaxAnisotropy = 8.0f;
+
+                mShadowmapEsmSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+                samplerblock.mMaxAnisotropy = 1.0f;
             }
 
             samplerblock.mMinFilter     = FO_LINEAR;
@@ -718,6 +733,9 @@ namespace Ogre
     {
         mSetProperties.clear();
 
+        if( shadowNode && mShadowFilter == ExponentialShadowMaps )
+            setProperty( PbsProperty::ExponentialShadowMaps, 1 );
+
         //The properties need to be set before preparePassHash so that
         //they are considered when building the HlmsCache's hash.
         if( shadowNode && !casterPass )
@@ -737,6 +755,11 @@ namespace Ogre
             {
                 setProperty( PbsProperty::Pcf4x4, 1 );
                 setProperty( PbsProperty::PcfIterations, 9 );
+            }
+            else if( mShadowFilter == ExponentialShadowMaps )
+            {
+                //Already set
+                //setProperty( PbsProperty::ExponentialShadowMaps, 1 );
             }
             else
             {
@@ -895,6 +918,10 @@ namespace Ogre
             //mat3 invViewMatCubemap (upgraded to three vec4)
             mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMapLights + 4 * 3 ) * 4;
 
+            //vec4 shadowRcv[numShadowMapLights].texViewZRow
+            if( mShadowFilter == ExponentialShadowMaps )
+                mapSize += (4 * 4) * numShadowMapLights;
+
             //float windowHeight + padding
             if( mPrePassTextures )
                 mapSize += 4 * 4;
@@ -933,6 +960,10 @@ namespace Ogre
             //vec4 cameraPosWS
             if( isShadowCastingPointLight )
                 mapSize += 4 * 4;
+            //vec4 viewZRow
+            if( mShadowFilter == ExponentialShadowMaps )
+                mapSize += 4 * 4;
+            //vec3 depthRange
             mapSize += (2 + 2) * 4;
         }
 
@@ -1000,6 +1031,16 @@ namespace Ogre
                 Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( shadowMapTexIdx );
                 for( size_t j=0; j<16; ++j )
                     *passBufferPtr++ = (float)viewProjTex[0][j];
+
+                //vec4 texViewZRow;
+                if( mShadowFilter == ExponentialShadowMaps )
+                {
+                    const Matrix4 &viewTex = shadowNode->getViewMatrix( shadowMapTexIdx );
+                    *passBufferPtr++ = viewTex[2][0];
+                    *passBufferPtr++ = viewTex[2][1];
+                    *passBufferPtr++ = viewTex[2][2];
+                    *passBufferPtr++ = viewTex[2][3];
+                }
 
                 //vec2 shadowRcv[numShadowMapLights].shadowDepthRange
                 Real fNear, fFar;
@@ -1278,6 +1319,15 @@ namespace Ogre
         }
         else
         {
+            //vec4 viewZRow
+            if( mShadowFilter == ExponentialShadowMaps )
+            {
+                *passBufferPtr++ = viewMatrix[2][0];
+                *passBufferPtr++ = viewMatrix[2][1];
+                *passBufferPtr++ = viewMatrix[2][2];
+                *passBufferPtr++ = viewMatrix[2][3];
+            }
+
             //vec2 depthRange;
             Real fNear, fFar;
             shadowNode->getMinMaxDepthRange( camera, fNear, fFar );
@@ -1308,7 +1358,9 @@ namespace Ogre
 
         mLastBoundPool = 0;
 
-        if( mShadowmapSamplerblock && !getProperty( HlmsBaseProp::ShadowUsesDepthTexture ) )
+        if( mShadowFilter == ExponentialShadowMaps )
+            mCurrentShadowmapSamplerblock = mShadowmapEsmSamplerblock;
+        else if( mShadowmapSamplerblock && !getProperty( HlmsBaseProp::ShadowUsesDepthTexture ) )
             mCurrentShadowmapSamplerblock = mShadowmapSamplerblock;
         else
             mCurrentShadowmapSamplerblock = mShadowmapCmpSamplerblock;
@@ -1752,6 +1804,14 @@ namespace Ogre
     void HlmsPbs::setShadowSettings( ShadowFilter filter )
     {
         mShadowFilter = filter;
+
+        if( mShadowFilter == ExponentialShadowMaps && mHlmsManager->getShadowMappingUseBackFaces() )
+        {
+            LogManager::getSingleton().logMessage(
+                        "QUALITY WARNING: It is highly recommended that you call "
+                        "mHlmsManager->setShadowMappingUseBackFaces( false ) when using Exponential "
+                        "Shadow Maps (HlmsPbs::setShadowSettings)" );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::setAmbientLightMode( AmbientLightMode mode )

@@ -231,6 +231,8 @@ namespace Ogre
 
         /// Returns the texture view projection matrix for the given shadow map index
         Matrix4 getViewProjectionMatrix( size_t shadowMapIdx ) const;
+        /// Returns the texture view matrix for the given shadow map index
+        const Matrix4& getViewMatrix( size_t shadowMapIdx ) const;
 
         /** Returns a list of points with the limits of each PSSM split in projection space
             for the given shadow map index.

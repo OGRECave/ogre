@@ -27,6 +27,13 @@
 #include "OgreOverlayContainer.h"
 #include "OgreOverlay.h"
 
+#include "Compositor/OgreCompositorManager2.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
+
+#include "OgreHlmsCompute.h"
+#include "OgreHlmsComputeJob.h"
+#include "Utils/MiscUtils.h"
+
 using namespace Demo;
 
 namespace Demo
@@ -35,7 +42,8 @@ namespace Demo
     {
         "PCF 2x2",
         "PCF 3x3",
-        "PCF 4x4"
+        "PCF 4x4",
+        "ESM"
     };
 
     ShadowMapDebuggingGameState::ShadowMapDebuggingGameState( const Ogre::String &helpDescription ) :
@@ -139,11 +147,57 @@ namespace Demo
 
         createShadowMapDebugOverlays();
 
+        Ogre::HlmsManager *hlmsManager = Ogre::Root::getSingleton().getHlmsManager();
+        Ogre::HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
+
+        Ogre::uint8 kernelRadius = 8;
+        float gaussianDeviationFactor = 0.5f;
+        Ogre::HlmsComputeJob *job = 0;
+        job = hlmsCompute->findComputeJob( "ESM/GaussianLogFilterH" );
+        MiscUtils::setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
+        job = hlmsCompute->findComputeJob( "ESM/GaussianLogFilterV" );
+        MiscUtils::setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
+
         TutorialGameState::createScene01();
+    }
+    //-----------------------------------------------------------------------------------
+    void ShadowMapDebuggingGameState::setupShadowNode( bool forEsm )
+    {
+        Ogre::Root *root = mGraphicsSystem->getRoot();
+        Ogre::CompositorManager2 *compositorManager = root->getCompositorManager2();
+
+        Ogre::CompositorNodeDef *nodeDef =
+                compositorManager->getNodeDefinitionNonConst( "ShadowMapDebuggingRenderingNode" );
+
+        Ogre::CompositorTargetDef *targetDef = nodeDef->getTargetPass( 0 );
+        const Ogre::CompositorPassDefVec &passes = targetDef->getCompositorPasses();
+
+        assert( dynamic_cast<Ogre::CompositorPassSceneDef*>( passes[1] ) );
+        Ogre::CompositorPassSceneDef *passSceneDef =
+                static_cast<Ogre::CompositorPassSceneDef*>( passes[1] );
+
+        if( forEsm && passSceneDef->mShadowNode == "ShadowMapDebuggingShadowNode" )
+        {
+            destroyShadowMapDebugOverlays();
+            mGraphicsSystem->stopCompositor();
+            passSceneDef->mShadowNode = "ShadowMapDebuggingEsmShadowNode";
+            mGraphicsSystem->restartCompositor();
+            createShadowMapDebugOverlays();
+        }
+        else if( !forEsm && passSceneDef->mShadowNode != "ShadowMapDebuggingShadowNode" )
+        {
+            destroyShadowMapDebugOverlays();
+            mGraphicsSystem->stopCompositor();
+            passSceneDef->mShadowNode = "ShadowMapDebuggingShadowNode";
+            mGraphicsSystem->restartCompositor();
+            createShadowMapDebugOverlays();
+        }
     }
     //-----------------------------------------------------------------------------------
     void ShadowMapDebuggingGameState::createShadowMapDebugOverlays(void)
     {
+        destroyShadowMapDebugOverlays();
+
         Ogre::Root *root = mGraphicsSystem->getRoot();
         Ogre::CompositorWorkspace *workspace = mGraphicsSystem->getCompositorWorkspace();
         Ogre::Hlms *hlmsUnlit = root->getHlmsManager()->getHlms( Ogre::HLMS_UNLIT );
@@ -152,17 +206,35 @@ namespace Demo
         macroblock.mDepthCheck = false;
         Ogre::HlmsBlendblock blendblock;
 
-        Ogre::CompositorShadowNode *shadowNode =
-                workspace->findShadowNode( "ShadowMapDebuggingShadowNode" );
+        bool isUsingEsm = false;
+        {
+            Ogre::Hlms *hlms = root->getHlmsManager()->getHlms( Ogre::HLMS_PBS );
+            assert( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
+            Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
+            isUsingEsm = pbs->getShadowFilter() == Ogre::HlmsPbs::ExponentialShadowMaps;
+        }
+
+
+        const int numShadowMaps = isUsingEsm ? 4 : 5;
+        const int numPssmMaps   = isUsingEsm ? 2 : 3;
+        const Ogre::String shadowNodeName = isUsingEsm ? "ShadowMapDebuggingEsmShadowNode" :
+                                                         "ShadowMapDebuggingShadowNode";
+
+        Ogre::CompositorShadowNode *shadowNode = workspace->findShadowNode( shadowNodeName );
         const Ogre::CompositorShadowNodeDef *shadowNodeDef = shadowNode->getDefinition();
 
-        for( int i=0; i<5; ++i )
+        for( int i=0; i<numShadowMaps; ++i )
         {
             const Ogre::String datablockName( "depthShadow" + Ogre::StringConverter::toString( i ) );
-            Ogre::HlmsUnlitDatablock *depthShadow = (Ogre::HlmsUnlitDatablock*)hlmsUnlit->createDatablock(
-                        datablockName, datablockName,
-                        macroblock, blendblock,
-                        Ogre::HlmsParamVec() );
+            Ogre::HlmsUnlitDatablock *depthShadow =
+                    (Ogre::HlmsUnlitDatablock*)hlmsUnlit->getDatablock( datablockName );
+
+            if( !depthShadow )
+            {
+                depthShadow = (Ogre::HlmsUnlitDatablock*)hlmsUnlit->createDatablock(
+                            datablockName, datablockName, macroblock, blendblock,
+                            Ogre::HlmsParamVec() );
+            }
 
             const Ogre::ShadowTextureDefinition *shadowTexDef =
                     shadowNodeDef->getShadowTextureDefinition( i );
@@ -187,7 +259,7 @@ namespace Demo
         mDebugOverlayPSSM       = overlayManager.create("PSSM Overlays");
         mDebugOverlaySpotlights = overlayManager.create("Spotlight overlays");
 
-        for( int i=0; i<3; ++i )
+        for( int i=0; i<numPssmMaps; ++i )
         {
             // Create a panel
             Ogre::v1::OverlayContainer* panel = static_cast<Ogre::v1::OverlayContainer*>(
@@ -200,7 +272,7 @@ namespace Demo
             mDebugOverlayPSSM->add2D( panel );
         }
 
-        for( int i=3; i<5; ++i )
+        for( int i=numPssmMaps; i<numShadowMaps; ++i )
         {
             // Create a panel
             Ogre::v1::OverlayContainer* panel = static_cast<Ogre::v1::OverlayContainer*>(
@@ -215,6 +287,37 @@ namespace Demo
 
         mDebugOverlayPSSM->show();
         mDebugOverlaySpotlights->show();
+    }
+    //-----------------------------------------------------------------------------------
+    void ShadowMapDebuggingGameState::destroyShadowMapDebugOverlays(void)
+    {
+        Ogre::v1::OverlayManager &overlayManager = Ogre::v1::OverlayManager::getSingleton();
+
+        if( mDebugOverlayPSSM )
+        {
+            Ogre::v1::Overlay::Overlay2DElementsIterator itor =
+                    mDebugOverlayPSSM->get2DElementsIterator();
+            while( itor.hasMoreElements() )
+            {
+                Ogre::v1::OverlayContainer *panel = itor.getNext();
+                overlayManager.destroyOverlayElement( panel );
+            }
+            overlayManager.destroy( mDebugOverlayPSSM );
+            mDebugOverlayPSSM = 0;
+        }
+
+        if( mDebugOverlaySpotlights )
+        {
+            Ogre::v1::Overlay::Overlay2DElementsIterator itor =
+                    mDebugOverlaySpotlights->get2DElementsIterator();
+            while( itor.hasMoreElements() )
+            {
+                Ogre::v1::OverlayContainer *panel = itor.getNext();
+                overlayManager.destroyOverlayElement( panel );
+            }
+            overlayManager.destroy( mDebugOverlaySpotlights );
+            mDebugOverlaySpotlights = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     void ShadowMapDebuggingGameState::update( float timeSinceLast )
@@ -278,9 +381,20 @@ namespace Demo
             assert( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
             Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
 
-            pbs->setShadowSettings( static_cast<Ogre::HlmsPbs::ShadowFilter>(
-                                        (pbs->getShadowFilter() + 1) %
-                                        Ogre::HlmsPbs::NumShadowFilter ) );
+            Ogre::HlmsPbs::ShadowFilter nextFilter = static_cast<Ogre::HlmsPbs::ShadowFilter>(
+                        (pbs->getShadowFilter() + 1) % Ogre::HlmsPbs::NumShadowFilter );
+
+            if( nextFilter == Ogre::HlmsPbs::ExponentialShadowMaps )
+                pbs->getHlmsManager()->setShadowMappingUseBackFaces( false );
+            else
+                pbs->getHlmsManager()->setShadowMappingUseBackFaces( true );
+
+            pbs->setShadowSettings( nextFilter );
+
+            if( nextFilter == Ogre::HlmsPbs::ExponentialShadowMaps )
+                setupShadowNode( true );
+            else
+                setupShadowNode( false );
         }
         else
         {
