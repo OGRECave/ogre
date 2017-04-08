@@ -147,7 +147,7 @@ compositor_node_shadow ShadowMapDebuggingShadowNode2
 	}
 }*/
 
-compositor_node_shadow ShadowMapDebuggingEsmShadowNode
+abstract compositor_node_shadow ShadowMapDebuggingEsmShadowNodeBase
 {
 	texture atlas 2048 2048 PF_L16 no_fsaa uav
 	texture tmpGaussianFilter 2048 2048 PF_L16 no_fsaa depth_pool 0 uav
@@ -212,7 +212,17 @@ compositor_node_shadow ShadowMapDebuggingEsmShadowNode
 			}
 		}
 	}
+}
 
+compositor_node_shadow ShadowMapDebuggingEsmShadowNodeCompute : ShadowMapDebuggingEsmShadowNodeBase
+{
+	//Skip already defined passes
+	target atlas {}
+	shadow_map_target_type directional {}
+	shadow_map_target_type directional spot {}
+	shadow_map_target_type point {}
+
+	//Add a compute-based gauss filter
 	target atlas
 	{
 		pass compute
@@ -227,6 +237,34 @@ compositor_node_shadow ShadowMapDebuggingEsmShadowNode
 			job ESM/GaussianLogFilterV
 			input 0 tmpGaussianFilter
 			uav 0 atlas write
+		}
+	}
+}
+
+compositor_node_shadow ShadowMapDebuggingEsmShadowNodePixelShader : ShadowMapDebuggingEsmShadowNodeBase
+{
+	//Skip already defined passes
+	target atlas {}
+	shadow_map_target_type directional {}
+	shadow_map_target_type directional spot {}
+	shadow_map_target_type point {}
+
+	//Add a pixel-based gauss filter
+	target tmpGaussianFilter
+	{
+		pass render_quad
+		{
+			material ESM/GaussianLogFilterH
+			input 0 atlas
+		}
+	}
+
+	target atlas
+	{
+		pass render_quad
+		{
+			material ESM/GaussianLogFilterV
+			input 0 tmpGaussianFilter
 		}
 	}
 }

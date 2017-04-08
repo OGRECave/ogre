@@ -54,6 +54,7 @@ material Ogre/DPSM/CubeToDpsm
 	{
 		pass
 		{
+			//Depth writes must be on, since we write directly to the depth buffer.
 			depth_check on
 			depth_write on
 
@@ -78,14 +79,29 @@ material Ogre/DPSM/CubeToDpsm
 	}
 }
 
-material Ogre/DPSM/CubeToDpsmColour : Ogre/DPSM/CubeToDpsm
+material Ogre/DPSM/CubeToDpsmColour
 {
 	technique
 	{
 		pass
 		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
 			fragment_program_ref Ogre/DPSM/CubeToDpsm_Colour_ps
 			{
+			}
+
+			texture_unit depthTexture
+			{
+				filtering			none
+				tex_address_mode	clamp
 			}
 		}
 	}

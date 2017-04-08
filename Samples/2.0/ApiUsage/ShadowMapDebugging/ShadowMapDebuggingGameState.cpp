@@ -147,18 +147,57 @@ namespace Demo
 
         createShadowMapDebugOverlays();
 
+        //For ESM, setup the filter settings (radius and gaussian deviation).
+        //It controls how blurry the shadows will look.
         Ogre::HlmsManager *hlmsManager = Ogre::Root::getSingleton().getHlmsManager();
         Ogre::HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
 
         Ogre::uint8 kernelRadius = 8;
         float gaussianDeviationFactor = 0.5f;
         Ogre::HlmsComputeJob *job = 0;
+
+        //Setup compute shader filter (faster for large kernels; but
+        //beware of mobile hardware where compute shaders are slow)
+        //For reference large kernels means kernelRadius > 2 (approx)
         job = hlmsCompute->findComputeJob( "ESM/GaussianLogFilterH" );
         MiscUtils::setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
         job = hlmsCompute->findComputeJob( "ESM/GaussianLogFilterV" );
         MiscUtils::setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
 
+        //Setup pixel shader filter (faster for small kernels, also to use as a fallback
+        //on GPUs that don't support compute shaders, or where compute shaders are slow).
+        MiscUtils::setGaussianFilterParams( "ESM/GaussianLogFilterH", kernelRadius,
+                                            gaussianDeviationFactor );
+        MiscUtils::setGaussianFilterParams( "ESM/GaussianLogFilterV", kernelRadius,
+                                            gaussianDeviationFactor );
+
         TutorialGameState::createScene01();
+    }
+    //-----------------------------------------------------------------------------------
+    const char* ShadowMapDebuggingGameState::chooseEsmShadowNode(void)
+    {
+        Ogre::Root *root = mGraphicsSystem->getRoot();
+        Ogre::RenderSystem *renderSystem = root->getRenderSystem();
+
+        const Ogre::RenderSystemCapabilities *capabilities = renderSystem->getCapabilities();
+        bool hasCompute = capabilities->hasCapability( Ogre::RSC_COMPUTE_PROGRAM );
+
+        if( !hasCompute )
+        {
+            //There's no choice.
+            return "ShadowMapDebuggingEsmShadowNodePixelShader";
+        }
+        else
+        {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            //On iOS, the A7 GPUs have slow compute shaders.
+            Ogre::DriverVersion driverVersion = capabilities->getDriverVersion();
+            if( driverVersion.major == 1 );
+                return "ShadowMapDebuggingEsmShadowNodePixelShader";
+#else
+            return "ShadowMapDebuggingEsmShadowNodeCompute";
+#endif
+        }
     }
     //-----------------------------------------------------------------------------------
     void ShadowMapDebuggingGameState::setupShadowNode( bool forEsm )
@@ -180,7 +219,7 @@ namespace Demo
         {
             destroyShadowMapDebugOverlays();
             mGraphicsSystem->stopCompositor();
-            passSceneDef->mShadowNode = "ShadowMapDebuggingEsmShadowNode";
+            passSceneDef->mShadowNode = chooseEsmShadowNode();
             mGraphicsSystem->restartCompositor();
             createShadowMapDebugOverlays();
         }
@@ -217,7 +256,7 @@ namespace Demo
 
         const int numShadowMaps = isUsingEsm ? 4 : 5;
         const int numPssmMaps   = isUsingEsm ? 2 : 3;
-        const Ogre::String shadowNodeName = isUsingEsm ? "ShadowMapDebuggingEsmShadowNode" :
+        const Ogre::String shadowNodeName = isUsingEsm ? chooseEsmShadowNode() :
                                                          "ShadowMapDebuggingShadowNode";
 
         Ogre::CompositorShadowNode *shadowNode = workspace->findShadowNode( shadowNodeName );
