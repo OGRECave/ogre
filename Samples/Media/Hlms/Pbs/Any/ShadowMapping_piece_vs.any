@@ -26,7 +26,7 @@
 			@end
 		@end
 
-		@property( !exponential_shadow_maps || !hlms_shadow_uses_depth_texture )
+		@property( !exponential_shadow_maps )
 			//We can't make the depth buffer linear without Z out in the fragment shader;
 			//however we can use a cheap approximation ("pseudo linear depth")
 			//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
