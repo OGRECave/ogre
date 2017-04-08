@@ -17,15 +17,15 @@ float4 main
 	float outColour;
 	float firstSmpl;
 
-	firstSmpl = tex.Load( int2( gl_FragCoord.xy ) - int3( HORIZONTAL_STEP	* (NUM_WEIGHTS - 1),
-														  VERTICAL_STEP		* (NUM_WEIGHTS - 1), 0 ) ).x;
+	firstSmpl = tex.Load( int3( int2( gl_FragCoord.xy ) - int2( HORIZONTAL_STEP	* (NUM_WEIGHTS - 1),
+																VERTICAL_STEP	* (NUM_WEIGHTS - 1) ), 0 ) ).x;
 	outColour = weights[0];
 
 	int i;
 	for( i=NUM_WEIGHTS - 1; (--i) > 0; )
 	{
-		val = tex.Load( int2( gl_FragCoord.xy ) - int3( HORIZONTAL_STEP	* i,
-														VERTICAL_STEP	* i , 0 ) ).x;
+		val = tex.Load( int3( int2( gl_FragCoord.xy ) - int2( HORIZONTAL_STEP	* i,
+															  VERTICAL_STEP		* i ), 0 ) ).x;
 		outColour += exp( val - firstSmpl ) * weights[NUM_WEIGHTS-i-1];
 	}
 
@@ -34,8 +34,8 @@ float4 main
 
 	for( i=0; i<NUM_WEIGHTS - 1; ++i )
 	{
-		val = tex.Load( int2( gl_FragCoord.xy ) + int3( HORIZONTAL_STEP	* (i+1),
-														VERTICAL_STEP	* (i+1), 0 ) ).x;
+		val = tex.Load( int3( int2( gl_FragCoord.xy ) + int2( HORIZONTAL_STEP	* (i+1),
+															  VERTICAL_STEP		* (i+1) ), 0 ) ).x;
 		outColour += exp( val - firstSmpl ) * weights[i];
 	}
 
