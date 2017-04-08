@@ -188,6 +188,7 @@ namespace Ogre
                                          bool casterPass, uint32 lastCacheHash,
                                          CommandBuffer *commandBuffer );
 
+        virtual void postCommandBufferExecution( CommandBuffer *commandBuffer );
         virtual void frameEnded(void);
 
         void setDebugPssmSplits( bool bDebug );

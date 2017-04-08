@@ -1788,6 +1788,21 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbs::postCommandBufferExecution( CommandBuffer *commandBuffer )
+    {
+        HlmsBufferManager::postCommandBufferExecution( commandBuffer );
+
+        if( mPrePassMsaaDepthTexture )
+        {
+            //We need to unbind the depth texture, it may be used as a depth buffer later.
+            size_t texUnit = mGridBuffer ? 1 : 3;
+            if( mPrePassTextures )
+                texUnit += 2;
+
+            mRenderSystem->_setTexture( texUnit, false, 0 );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbs::frameEnded(void)
     {
         HlmsBufferManager::frameEnded();
