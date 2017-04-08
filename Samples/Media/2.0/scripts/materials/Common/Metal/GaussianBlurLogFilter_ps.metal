@@ -1,10 +1,12 @@
 #include <metal_stdlib>
 using namespace metal;
 
+#define gl_FragCoord inPs.inputPos
+
 struct PS_INPUT
 {
 	float2 uv0;
-	float4 gl_FragCoord [[position]];
+	float4 inputPos [[position]];
 };
 
 struct Params
@@ -15,7 +17,7 @@ struct Params
 fragment float main_metal
 (
 	PS_INPUT inPs [[stage_in]],
-	constant float &p,
+	constant Params &p                  [[buffer(PARAMETER_SLOT)]],
 	texture2d<float, access::read>	tex [[texture(0)]]
 )
 {

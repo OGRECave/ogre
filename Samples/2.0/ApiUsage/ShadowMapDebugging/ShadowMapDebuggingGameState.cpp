@@ -194,9 +194,8 @@ namespace Demo
             Ogre::DriverVersion driverVersion = capabilities->getDriverVersion();
             if( driverVersion.major == 1 );
                 return "ShadowMapDebuggingEsmShadowNodePixelShader";
-#else
-            return "ShadowMapDebuggingEsmShadowNodeCompute";
 #endif
+            return "ShadowMapDebuggingEsmShadowNodeCompute";
         }
     }
     //-----------------------------------------------------------------------------------
