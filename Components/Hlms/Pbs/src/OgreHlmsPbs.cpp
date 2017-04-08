@@ -273,13 +273,11 @@ namespace Ogre
 
             if( !mShadowmapEsmSamplerblock )
             {
-                samplerblock.mMinFilter     = FO_ANISOTROPIC;
-                samplerblock.mMagFilter     = FO_ANISOTROPIC;
-                samplerblock.mMipFilter     = FO_ANISOTROPIC;
-                samplerblock.mMaxAnisotropy = 8.0f;
+                samplerblock.mMinFilter     = FO_LINEAR;
+                samplerblock.mMagFilter     = FO_LINEAR;
+                samplerblock.mMipFilter     = FO_NONE;
 
                 mShadowmapEsmSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
-                samplerblock.mMaxAnisotropy = 1.0f;
             }
 
             samplerblock.mMinFilter     = FO_LINEAR;

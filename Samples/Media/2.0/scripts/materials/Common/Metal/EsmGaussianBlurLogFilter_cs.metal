@@ -10,7 +10,9 @@
 
 @piece( data_type )float@end
 @piece( lds_data_type )float@end
-@piece( lds_definition )threadgroup float g_f3LDS[ 2 ] [ @value( samples_per_threadgroup ) ];@end
+@piece( lds_definition )
+	threadgroup float g_f3LDS[ 2 ] [ @value( samples_per_threadgroup ) ]
+@end
 
 @piece( image_sample )
 	return inputImage.sample( inputSampler, f2SamplePosition, level(0) ).x;
@@ -18,6 +20,6 @@
 
 @piece( image_store )
 	@foreach( 4, iPixel )
-		outputImage.write( float4( outColour[ @iPixel ], 0.0, 0.0, 1.0 ),
+		outputImage.write( outColour[ @iPixel ],
 						   uint2( i2Center +  @iPixel * i2Inc ), 0 );@end
 @end

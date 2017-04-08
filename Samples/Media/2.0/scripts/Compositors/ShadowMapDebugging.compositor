@@ -149,9 +149,9 @@ compositor_node_shadow ShadowMapDebuggingShadowNode2
 
 compositor_node_shadow ShadowMapDebuggingEsmShadowNode
 {
-	texture atlas 2048 2048 PF_FLOAT32_R no_fsaa uav
-	texture tmpGaussianFilter 2048 2048 PF_FLOAT32_R no_fsaa depth_pool 0 uav
-	texture tmpCubemap 1024 1024 PF_FLOAT32_R cubemap no_fsaa
+	texture atlas 2048 2048 PF_L16 no_fsaa uav
+	texture tmpGaussianFilter 2048 2048 PF_L16 no_fsaa depth_pool 0 uav
+	texture tmpCubemap 512 512 PF_L16 cubemap no_fsaa
 
 	technique pssm
 	num_splits		2
@@ -227,10 +227,6 @@ compositor_node_shadow ShadowMapDebuggingEsmShadowNode
 			job ESM/GaussianLogFilterV
 			input 0 tmpGaussianFilter
 			uav 0 atlas write
-		}
-
-		pass generate_mipmaps
-		{
 		}
 	}
 }

@@ -84,11 +84,6 @@ using namespace metal;
 	@div( num_thread_groups_y, pixelsPerRow )
 @end
 
-/*inline uint ldsIdx( uint i, uint j )
-{
-	return i * @value( samples_per_threadgroup ) + j;
-}*/
-
 struct Params
 {
 	float4 g_f4OutputSize;
@@ -119,7 +114,7 @@ inline void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Cente
 		@insertpiece( data_type ) firstSmpl[ 4 ];
 	@end @property( downscale_lq )
 		@insertpiece( data_type ) outColour[ 2 ];
-		@insertpiece( data_type ) firstSmpl[ 4 ];
+		@insertpiece( data_type ) firstSmpl[ 2 ];
 	@end
 	@insertpiece( data_type ) RDI[ 4 ] ;
 
