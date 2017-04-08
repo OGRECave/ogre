@@ -44,7 +44,7 @@ fragment float main_metal
 	{
 		val = tex.read( uint2( gl_FragCoord.xy ) + uint2( HORIZONTAL_STEP	* (i+1),
 														  VERTICAL_STEP		* (i+1) ), 0 ).x;
-		outColour += exp( val - firstSmpl ) * p.weights[i];
+		outColour += exp( val - firstSmpl ) * p.weights[NUM_WEIGHTS-i-2];
 	}
 
 	return firstSmpl + log( outColour );
