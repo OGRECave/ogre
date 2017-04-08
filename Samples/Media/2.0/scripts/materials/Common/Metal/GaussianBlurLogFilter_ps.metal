@@ -34,18 +34,18 @@ fragment float main_metal
 	{
 		val = tex.read( uint2( gl_FragCoord.xy ) - uint2( HORIZONTAL_STEP	* i,
 														  VERTICAL_STEP		* i ), 0 ).x;
-		outColour += exp( val - firstSmpl ) * p.weights[NUM_WEIGHTS-i-1];
+		outColour += exp( K * (val - firstSmpl) ) * p.weights[NUM_WEIGHTS-i-1];
 	}
 
 	val = tex.read( uint2( gl_FragCoord.xy ), 0 ).x;
-	outColour += exp( val - firstSmpl ) * p.weights[NUM_WEIGHTS-1];
+	outColour += exp( K * (val - firstSmpl) ) * p.weights[NUM_WEIGHTS-1];
 
 	for( i=0; i<NUM_WEIGHTS - 1; ++i )
 	{
 		val = tex.read( uint2( gl_FragCoord.xy ) + uint2( HORIZONTAL_STEP	* (i+1),
 														  VERTICAL_STEP		* (i+1) ), 0 ).x;
-		outColour += exp( val - firstSmpl ) * p.weights[NUM_WEIGHTS-i-2];
+		outColour += exp( K * (val - firstSmpl) ) * p.weights[NUM_WEIGHTS-i-2];
 	}
 
-	return firstSmpl + log( outColour );
+	return firstSmpl + log( outColour ) / K;
 }

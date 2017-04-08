@@ -154,22 +154,23 @@ namespace Demo
 
         Ogre::uint8 kernelRadius = 8;
         float gaussianDeviationFactor = 0.5f;
+        Ogre::uint16 K = 80;
         Ogre::HlmsComputeJob *job = 0;
 
         //Setup compute shader filter (faster for large kernels; but
         //beware of mobile hardware where compute shaders are slow)
         //For reference large kernels means kernelRadius > 2 (approx)
         job = hlmsCompute->findComputeJob( "ESM/GaussianLogFilterH" );
-        MiscUtils::setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
+        MiscUtils::setGaussianLogFilterParams( job, kernelRadius, gaussianDeviationFactor, K );
         job = hlmsCompute->findComputeJob( "ESM/GaussianLogFilterV" );
-        MiscUtils::setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
+        MiscUtils::setGaussianLogFilterParams( job, kernelRadius, gaussianDeviationFactor, K );
 
         //Setup pixel shader filter (faster for small kernels, also to use as a fallback
         //on GPUs that don't support compute shaders, or where compute shaders are slow).
-        MiscUtils::setGaussianFilterParams( "ESM/GaussianLogFilterH", kernelRadius,
-                                            gaussianDeviationFactor );
-        MiscUtils::setGaussianFilterParams( "ESM/GaussianLogFilterV", kernelRadius,
-                                            gaussianDeviationFactor );
+        MiscUtils::setGaussianLogFilterParams( "ESM/GaussianLogFilterH", kernelRadius,
+                                               gaussianDeviationFactor, K );
+        MiscUtils::setGaussianLogFilterParams( "ESM/GaussianLogFilterV", kernelRadius,
+                                               gaussianDeviationFactor, K );
 
         TutorialGameState::createScene01();
     }
@@ -252,16 +253,13 @@ namespace Demo
             isUsingEsm = pbs->getShadowFilter() == Ogre::HlmsPbs::ExponentialShadowMaps;
         }
 
-
-        const int numShadowMaps = isUsingEsm ? 4 : 5;
-        const int numPssmMaps   = isUsingEsm ? 2 : 3;
         const Ogre::String shadowNodeName = isUsingEsm ? chooseEsmShadowNode() :
                                                          "ShadowMapDebuggingShadowNode";
 
         Ogre::CompositorShadowNode *shadowNode = workspace->findShadowNode( shadowNodeName );
         const Ogre::CompositorShadowNodeDef *shadowNodeDef = shadowNode->getDefinition();
 
-        for( int i=0; i<numShadowMaps; ++i )
+        for( int i=0; i<5; ++i )
         {
             const Ogre::String datablockName( "depthShadow" + Ogre::StringConverter::toString( i ) );
             Ogre::HlmsUnlitDatablock *depthShadow =
@@ -297,7 +295,7 @@ namespace Demo
         mDebugOverlayPSSM       = overlayManager.create("PSSM Overlays");
         mDebugOverlaySpotlights = overlayManager.create("Spotlight overlays");
 
-        for( int i=0; i<numPssmMaps; ++i )
+        for( int i=0; i<3; ++i )
         {
             // Create a panel
             Ogre::v1::OverlayContainer* panel = static_cast<Ogre::v1::OverlayContainer*>(
@@ -310,7 +308,7 @@ namespace Demo
             mDebugOverlayPSSM->add2D( panel );
         }
 
-        for( int i=numPssmMaps; i<numShadowMaps; ++i )
+        for( int i=3; i<5; ++i )
         {
             // Create a panel
             Ogre::v1::OverlayContainer* panel = static_cast<Ogre::v1::OverlayContainer*>(

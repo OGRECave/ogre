@@ -14,15 +14,13 @@
 //	= exp( d0 ) * exp( log( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) ) )
 //	= exp( d0 + log( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) ) )
 //	exp( filteredDepth ) = exp( d0 + log( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) ) )
-//Final formula:
+//Almost final formula:
 //	filteredDepth = d0 + log( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) )
 //
-//It's technically not OK, because we should be doing:
+//The formula is actually:
 //	exp( K * filteredDepth ) = w0 * exp( K * d0 ) + w1 * exp( K * d1 ) + w2 * exp( K * d2 ) + ...
-//	= K * d0 + log( w0 + w1 * exp( K * (d1 - d0) ) + w2 * exp( K * (d2 - d0) ) )
-//However when K is considered, the shadows become blurrier in some cases, but also in other scenes
-//the results just don't work either shadows completely disappear, or they don't get any filtering).
-//So to put it bluntly: we don't include K because it doesn't look good.
+//Final formula:
+//	= d0 + log( w0 + w1 * exp( K * (d1 - d0) ) + w2 * exp( K * (d2 - d0) ) ) / K
 
 //Like in the original filter:
 //	* Each thread works on 4 pixels at a time (for VLIW hardware, i.e. Radeon HD 5000 & 6000 series).
@@ -136,10 +134,10 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 	@foreach( kernel_radius, iIteration )
 		@property( !downscale_lq )
 			@foreach( 4, iPixel )
-				outColour[ @iPixel ].x += exp(RDI[ @iPixel ] - firstSmpl[ @iPixel ]) * c_weights[ @iIteration >> 2u ][ @iIteration & 3u ];@end
+				outColour[ @iPixel ].x += exp(@value(K)*(RDI[ @iPixel ] - firstSmpl[ @iPixel ])) * c_weights[ @iIteration >> 2u ][ @iIteration & 3u ];@end
 		@end @property( downscale_lq )
 			@foreach( 2, iPixel )
-				outColour[ @iPixel ].x += exp(RDI[ @iPixel * 2 ] - firstSmpl[ @iPixel ]) * c_weights[ @iIteration >> 2u ][ @iIteration & 3u ];@end
+				outColour[ @iPixel ].x += exp(@value(K)*(RDI[ @iPixel * 2 ] - firstSmpl[ @iPixel ])) * c_weights[ @iIteration >> 2u ][ @iIteration & 3u ];@end
 		@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
@@ -161,10 +159,10 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 	@foreach( kernel_radius2x_plus1, iIteration, kernel_radius_plus1 )
 		@property( !downscale_lq )
 			@foreach( 4, iPixel )
-				outColour[ @iPixel ].x += exp( RDI[ @iPixel ] - firstSmpl[ @iPixel ]) * c_weights[ (@value( kernel_radius2x ) - @iIteration) >> 2u ][ (@value( kernel_radius2x ) - @iIteration) & 3u ];@end
+				outColour[ @iPixel ].x += exp(@value(K)*(RDI[ @iPixel ] - firstSmpl[ @iPixel ])) * c_weights[ (@value( kernel_radius2x ) - @iIteration) >> 2u ][ (@value( kernel_radius2x ) - @iIteration) & 3u ];@end
 		@end @property( downscale_lq )
 			@foreach( 2, iPixel )
-				outColour[ @iPixel ].x += exp( RDI[ @iPixel * 2 ] - firstSmpl[ @iPixel ]) * c_weights[ (@value( kernel_radius2x ) - @iIteration) >> 2u ][ (@value( kernel_radius2x ) - @iIteration) & 3u ];@end
+				outColour[ @iPixel ].x += exp(@value(K)*(RDI[ @iPixel * 2 ] - firstSmpl[ @iPixel ])) * c_weights[ (@value( kernel_radius2x ) - @iIteration) >> 2u ][ (@value( kernel_radius2x ) - @iIteration) & 3u ];@end
 		@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
@@ -174,10 +172,10 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 
 	@property( !downscale_lq )
 		@foreach( 4, iPixel )
-			outColour[ @iPixel ] = firstSmpl[ @iPixel ] + log( outColour[ @iPixel ] );@end
+			outColour[ @iPixel ] = firstSmpl[ @iPixel ] + log( outColour[ @iPixel ] ) / @value(K);@end
 	@end @property( downscale_lq )
 		@foreach( 2, iPixel )
-			outColour[ @iPixel ] = firstSmpl[ @iPixel ] + log( outColour[ @iPixel ] );@end
+			outColour[ @iPixel ] = firstSmpl[ @iPixel ] + log( outColour[ @iPixel ] ) / @value(K);@end
 	@end
 
 	/*

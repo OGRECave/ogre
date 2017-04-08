@@ -28,18 +28,18 @@ void main()
 	{
 		val = texelFetch( tex, ivec2( gl_FragCoord.xy ) - ivec2( HORIZONTAL_STEP* i,
 																 VERTICAL_STEP	* i ), 0 ).x;
-		outColour += exp( val - firstSmpl ) * weights[NUM_WEIGHTS-i-1];
+		outColour += exp( K * (val - firstSmpl) ) * weights[NUM_WEIGHTS-i-1];
 	}
 
 	val = texelFetch( tex, ivec2( gl_FragCoord.xy ), 0 ).x;
-	outColour += exp( val - firstSmpl ) * weights[NUM_WEIGHTS-1];
+	outColour += exp( K * (val - firstSmpl) ) * weights[NUM_WEIGHTS-1];
 
 	for( i=0; i<NUM_WEIGHTS - 1; ++i )
 	{
 		val = texelFetch( tex, ivec2( gl_FragCoord.xy ) + ivec2( HORIZONTAL_STEP* (i+1),
 																 VERTICAL_STEP	* (i+1) ), 0 ).x;
-		outColour += exp( val - firstSmpl ) * weights[NUM_WEIGHTS-i-2];
+		outColour += exp( K * (val - firstSmpl) ) * weights[NUM_WEIGHTS-i-2];
 	}
 
-	fragColour = firstSmpl + log( outColour );
+	fragColour = firstSmpl + log( outColour ) / K;
 }

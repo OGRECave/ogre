@@ -1,7 +1,7 @@
 fragment_program ESM/GaussianLogFilterH_ps_GLSL glsl
 {
 	source GaussianBlurLogFilter_ps.glsl
-	preprocessor_defines NUM_WEIGHTS=9,HORIZONTAL_STEP=1,VERTICAL_STEP=0
+	preprocessor_defines NUM_WEIGHTS=9,K=80,K=80,HORIZONTAL_STEP=1,VERTICAL_STEP=0
 	default_params
 	{
 		param_named tex int 0
@@ -10,7 +10,7 @@ fragment_program ESM/GaussianLogFilterH_ps_GLSL glsl
 
 fragment_program ESM/GaussianLogFilterV_ps_GLSL glsl : ESM/GaussianLogFilterH_ps_GLSL
 {
-	preprocessor_defines NUM_WEIGHTS=9,HORIZONTAL_STEP=0,VERTICAL_STEP=1
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=0,VERTICAL_STEP=1
 }
 
 fragment_program ESM/GaussianLogFilterH_ps_HLSL hlsl
@@ -18,24 +18,24 @@ fragment_program ESM/GaussianLogFilterH_ps_HLSL hlsl
 	source GaussianBlurLogFilter_ps.hlsl
 	entry_point main
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-	preprocessor_defines NUM_WEIGHTS=9,HORIZONTAL_STEP=1,VERTICAL_STEP=0
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=1,VERTICAL_STEP=0
 }
 
 fragment_program ESM/GaussianLogFilterV_ps_HLSL hlsl : ESM/GaussianLogFilterH_ps_HLSL
 {
-	preprocessor_defines NUM_WEIGHTS=9,HORIZONTAL_STEP=0,VERTICAL_STEP=1
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=0,VERTICAL_STEP=1
 }
 
 fragment_program ESM/GaussianLogFilterH_ps_Metal metal
 {
 	source GaussianBlurLogFilter_ps.metal
 	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
-	preprocessor_defines NUM_WEIGHTS=9,HORIZONTAL_STEP=1,VERTICAL_STEP=0
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=1,VERTICAL_STEP=0
 }
 
 fragment_program ESM/GaussianLogFilterV_ps_Metal metal : ESM/GaussianLogFilterH_ps_Metal
 {
-	preprocessor_defines NUM_WEIGHTS=9,HORIZONTAL_STEP=0,VERTICAL_STEP=1
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=0,VERTICAL_STEP=1
 }
 
 fragment_program ESM/GaussianLogFilterH_ps unified

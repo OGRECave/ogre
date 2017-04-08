@@ -54,7 +54,8 @@
 			"properties" :
 			{
 				"horizontal_pass" : 1,
-				"kernel_radius" : 8
+				"kernel_radius" : 8,
+				"K" : 80
 			}
 		},
 
@@ -92,7 +93,8 @@
 			"properties" :
 			{
 				"horizontal_pass" : 0,
-				"kernel_radius" : 8
+				"kernel_radius" : 8,
+				"K" : 80
 			}
 		}
 	}

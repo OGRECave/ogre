@@ -26,18 +26,18 @@ float4 main
 	{
 		val = tex.Load( int3( int2( gl_FragCoord.xy ) - int2( HORIZONTAL_STEP	* i,
 															  VERTICAL_STEP		* i ), 0 ) ).x;
-		outColour += exp( val - firstSmpl ) * weights[(NUM_WEIGHTS-i-1u) >> 2u][(NUM_WEIGHTS-i-1u) & 3u];
+		outColour += exp( K * (val - firstSmpl) ) * weights[(NUM_WEIGHTS-i-1u) >> 2u][(NUM_WEIGHTS-i-1u) & 3u];
 	}
 
 	val = tex.Load( int3( gl_FragCoord.xy, 0 ) ).x;
-	outColour += exp( val - firstSmpl ) * weights[(NUM_WEIGHTS-1u) >> 2u][(NUM_WEIGHTS-1u) & 3u];
+	outColour += exp( K * (val - firstSmpl) ) * weights[(NUM_WEIGHTS-1u) >> 2u][(NUM_WEIGHTS-1u) & 3u];
 
 	for( i=0; i<NUM_WEIGHTS - 1; ++i )
 	{
 		val = tex.Load( int3( int2( gl_FragCoord.xy ) + int2( HORIZONTAL_STEP	* (i+1),
 															  VERTICAL_STEP		* (i+1) ), 0 ) ).x;
-		outColour += exp( val - firstSmpl ) * weights[(NUM_WEIGHTS-i-2u) >> 2u][(NUM_WEIGHTS-i-2u) & 3u];
+		outColour += exp( K * (val - firstSmpl) ) * weights[(NUM_WEIGHTS-i-2u) >> 2u][(NUM_WEIGHTS-i-2u) & 3u];
 	}
 
-	return firstSmpl + log( outColour );
+	return firstSmpl + log( outColour ) / K;
 }

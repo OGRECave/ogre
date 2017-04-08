@@ -11,8 +11,8 @@
 
 namespace Demo
 {
-    void MiscUtils::setGaussianFilterParams( Ogre::HlmsComputeJob *job, Ogre::uint8 kernelRadius,
-                                             float gaussianDeviationFactor)
+    void MiscUtils::setGaussianLogFilterParams( Ogre::HlmsComputeJob *job, Ogre::uint8 kernelRadius,
+                                                float gaussianDeviationFactor, Ogre::uint16 K )
     {
         using namespace Ogre;
 
@@ -20,6 +20,8 @@ namespace Demo
 
         if( job->getProperty( "kernel_radius" ) != kernelRadius )
             job->setProperty( "kernel_radius", kernelRadius );
+        if( job->getProperty( "K" ) != K )
+            job->setProperty( "K", K );
         ShaderParams &shaderParams = job->getShaderParams( "default" );
 
         std::vector<float> weights( kernelRadius + 1u );
@@ -111,8 +113,10 @@ namespace Demo
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void MiscUtils::setGaussianFilterParams( const Ogre::String &materialName, Ogre::uint8 kernelRadius,
-                                             float gaussianDeviationFactor)
+    void MiscUtils::setGaussianLogFilterParams( const Ogre::String &materialName,
+                                                Ogre::uint8 kernelRadius,
+                                                float gaussianDeviationFactor,
+                                                Ogre::uint16 K )
     {
         using namespace Ogre;
 
@@ -136,7 +140,8 @@ namespace Demo
 
         String preprocessDefines = psShader->getParameter( "preprocessor_defines" );
         int oldNumWeights = retrievePreprocessorParameter( preprocessDefines, "NUM_WEIGHTS" );
-        if( oldNumWeights != (kernelRadius + 1) )
+        int oldK = retrievePreprocessorParameter( preprocessDefines, "K" );
+        if( oldNumWeights != (kernelRadius + 1) || oldK != K )
         {
             int horizontalStep  = retrievePreprocessorParameter( preprocessDefines, "HORIZONTAL_STEP" );
             int verticalStep    = retrievePreprocessorParameter( preprocessDefines, "VERTICAL_STEP" );
@@ -145,6 +150,7 @@ namespace Demo
             LwString preprocessString( LwString::FromEmptyPointer( tmp, sizeof(tmp) ) );
 
             preprocessString.a( "NUM_WEIGHTS=",     kernelRadius + 1u );
+            preprocessString.a( ",K=",              K );
             preprocessString.a( ",HORIZONTAL_STEP=",horizontalStep );
             preprocessString.a( ",VERTICAL_STEP=",  verticalStep );
 
