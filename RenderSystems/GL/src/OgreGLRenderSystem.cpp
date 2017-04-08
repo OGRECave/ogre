@@ -381,7 +381,7 @@ namespace Ogre {
                 rsc->addShaderProfile("vp40");
             }
 
-            if (GLEW_NV_vertex_program4)
+            if (GLEW_NV_gpu_program4)
             {
                 rsc->addShaderProfile("gp4vp");
                 rsc->addShaderProfile("gpu_vp");
@@ -436,7 +436,7 @@ namespace Ogre {
                 rsc->addShaderProfile("fp40");
             }
 
-            if (GLEW_NV_fragment_program4)
+            if (GLEW_NV_gpu_program4)
             {
                 rsc->addShaderProfile("gp4fp");
                 rsc->addShaderProfile("gpu_fp");
@@ -464,12 +464,6 @@ namespace Ogre {
             GLEW_EXT_geometry_shader4)
         {
             rsc->setCapability(RSC_GEOMETRY_PROGRAM);
-            rsc->addShaderProfile("nvgp4");
-
-            //Also add the CG profiles
-            rsc->addShaderProfile("gpu_gp");
-            rsc->addShaderProfile("gp4gp");
-
             rsc->setGeometryProgramConstantBoolCount(0);
             rsc->setGeometryProgramConstantIntCount(0);
 
@@ -480,6 +474,16 @@ namespace Ogre {
             GLint maxOutputVertices;
             glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT,&maxOutputVertices);
             rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
+        }
+
+        if(GLEW_NV_gpu_program4)
+        {
+            rsc->setCapability(RSC_GEOMETRY_PROGRAM);
+            rsc->addShaderProfile("nvgp4");
+
+            //Also add the CG profiles
+            rsc->addShaderProfile("gpu_gp");
+            rsc->addShaderProfile("gp4gp");
         }
 
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary"))
