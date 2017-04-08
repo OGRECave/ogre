@@ -177,9 +177,9 @@ material Ogre/ParticleGS/Generate
 			}
 			
 			// This texture unit will be filled at runtime.
-			texture_unit randomTexture
+			texture_unit RandomTexture
 			{
-		            tex_address_mode wrap
+		        tex_address_mode wrap
 			    filtering none
 			}
 		}
