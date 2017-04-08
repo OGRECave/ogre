@@ -10,6 +10,10 @@ in block
 in vec4 gl_FragCoord;
 //out float gl_FragDepth;
 
+#if OUTPUT_TO_COLOUR
+	out float fragColour;
+#endif
+
 void main()
 {
 	vec3 cubeDir;
@@ -22,5 +26,9 @@ void main()
 
 	float depthValue = textureLod( depthTexture, cubeDir.xyz, 0 ).x;
 
+#if OUTPUT_TO_COLOUR
+	fragColour = depthValue;
+#else
 	gl_FragDepth = depthValue;
+#endif
 }

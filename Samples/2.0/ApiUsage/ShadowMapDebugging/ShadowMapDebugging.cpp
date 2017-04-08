@@ -29,8 +29,9 @@ namespace Demo
         virtual Ogre::CompositorWorkspace* setupCompositor()
         {
             Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-            return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-                                                    "ShadowMapDebuggingWorkspace", true );
+            mWorkspace = compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
+                                                          "ShadowMapDebuggingWorkspace", true );
+            return mWorkspace;
         }
 
     public:
@@ -59,6 +60,11 @@ namespace Demo
         "\n"
         "The first 3 maps are the directional light (3 split PSSM) and the other 2 are\n"
         "the 2 spotlights\n"
+        "\n"
+        "The ESM filtering mode is much more expensive, however we can achieve convincing\n"
+        "results with much lower resolution and less splits to get competing performance "
+        "\nback. When in ESM, we use 2 splits for the PSSM, and 2 shadow maps for the\n"
+        "spotlights. We also lowered the resolution.\n"
         "\n"
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/scripts/Compositors/ShadowMapDebugging.compositor" );

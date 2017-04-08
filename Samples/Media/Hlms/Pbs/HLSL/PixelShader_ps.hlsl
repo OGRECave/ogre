@@ -508,10 +508,13 @@ float4 diffuseCol;
 }
 @end
 @property( hlms_shadowcaster )
+
+@insertpiece( DeclShadowCasterMacros )
+
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
-@property( hlms_shadowcaster_point )
+@property( hlms_shadowcaster_point || exponential_shadow_maps )
 	@insertpiece( PassDecl )
 @end
 
@@ -578,18 +581,11 @@ float4 diffuseCol;
 		discard;
 @end /// !alpha_test
 
+	@insertpiece( DoShadowCastPS )
+
 	@insertpiece( custom_ps_posExecution )
 
-@property( !hlms_render_depth_only && !hlms_shadowcaster_point )
-	outPs.colour0 = inPs.depth;
 	return outPs;
-@end
-
-@property( hlms_shadowcaster_point )
-	float distanceToCamera = length( inPs.toCameraWS );
-	outPs.colour0 = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;
-	return outPs;
-@end
 }
 @end
 

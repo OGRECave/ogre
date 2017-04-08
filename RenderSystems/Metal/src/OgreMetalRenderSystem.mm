@@ -209,6 +209,9 @@ namespace Ogre
         rsc->setFragmentProgramConstantFloatCount( 16384 );
         rsc->setFragmentProgramConstantBoolCount( 16384 );
         rsc->setFragmentProgramConstantIntCount( 16384 );
+        rsc->setComputeProgramConstantFloatCount( 16384 );
+        rsc->setComputeProgramConstantBoolCount( 16384 );
+        rsc->setComputeProgramConstantIntCount( 16384 );
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         uint8 mrtCount = 8u;
@@ -243,41 +246,47 @@ namespace Ogre
 #endif
         rsc->setMaximumResolutions( max2DResolution, 2048, max2DResolution );
 
-        //TODO: Compute
-        //rsc->setCapability(RSC_COMPUTE_PROGRAM);
+        //TODO: UAVs
         //rsc->setCapability(RSC_UAV);
         //rsc->setCapability(RSC_ATOMIC_COUNTERS);
-//        rsc->setComputeProgramConstantFloatCount( 16384 );
-//        rsc->setComputeProgramConstantBoolCount( 16384 );
-//        rsc->setComputeProgramConstantIntCount( 16384 );
 
         rsc->addShaderProfile( "metal" );
+
+        DriverVersion driverVersion;
 
         struct FeatureSets
         {
             MTLFeatureSet featureSet;
             const char* name;
+            int major;
+            int minor;
         };
 
         FeatureSets featureSets[] =
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            { MTLFeatureSet_iOS_GPUFamily1_v1, "iOS_GPUFamily1_v1" },
-            { MTLFeatureSet_iOS_GPUFamily2_v1, "iOS_GPUFamily2_v1" },
+            { MTLFeatureSet_iOS_GPUFamily1_v1, "iOS_GPUFamily1_v1", 1, 1 },
+            { MTLFeatureSet_iOS_GPUFamily2_v1, "iOS_GPUFamily2_v1", 2, 1 },
 
-            { MTLFeatureSet_iOS_GPUFamily1_v2, "iOS_GPUFamily1_v2" },
-            { MTLFeatureSet_iOS_GPUFamily2_v2, "iOS_GPUFamily2_v2" },
-            { MTLFeatureSet_iOS_GPUFamily3_v1, "iOS_GPUFamily3_v2" },
+            { MTLFeatureSet_iOS_GPUFamily1_v2, "iOS_GPUFamily1_v2", 1, 2 },
+            { MTLFeatureSet_iOS_GPUFamily2_v2, "iOS_GPUFamily2_v2", 2, 2 },
+            { MTLFeatureSet_iOS_GPUFamily3_v1, "iOS_GPUFamily3_v2", 3, 2 },
 #else
-            { MTLFeatureSet_OSX_GPUFamily1_v1, "OSX_GPUFamily1_v1" },
+            { MTLFeatureSet_OSX_GPUFamily1_v1, "OSX_GPUFamily1_v1", 1, 1 },
 #endif
         };
 
         for( int i=0; i<sizeof(featureSets) / sizeof(featureSets[0]); ++i )
         {
             if( [mActiveDevice->mDevice supportsFeatureSet:featureSets[i].featureSet] )
+            {
                 LogManager::getSingleton().logMessage( "Supports: " + String(featureSets[i].name) );
+                driverVersion.major = featureSets[i].major;
+                driverVersion.minor = featureSets[i].minor;
+            }
         }
+
+        rsc->setDriverVersion( driverVersion );
 
         return rsc;
     }
@@ -311,6 +320,7 @@ namespace Ogre
             const long c_inFlightCommandBuffers = 3;
             mMainGpuSyncSemaphore = dispatch_semaphore_create(c_inFlightCommandBuffers);
             mRealCapabilities = createRenderSystemCapabilities();
+            mDriverVersion = mRealCapabilities->getDriverVersion();
 
             if (!mUseCustomCapabilities)
                 mCurrentCapabilities = mRealCapabilities;

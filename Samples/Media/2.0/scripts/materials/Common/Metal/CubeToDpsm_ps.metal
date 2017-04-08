@@ -8,7 +8,11 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
+#if OUTPUT_TO_COLOUR
+	float depth [[color(0)]];
+#else
 	float depth [[depth(any)]];
+#endif
 };
 
 fragment PS_OUTPUT main_metal

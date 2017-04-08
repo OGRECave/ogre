@@ -476,7 +476,9 @@ float4 diffuseCol;
 @end
 @property( hlms_shadowcaster )
 
-@property( hlms_shadowcaster_point )
+@insertpiece( DeclShadowCasterMacros )
+
+@property( hlms_shadowcaster_point || exponential_shadow_maps )
 	@insertpiece( PassStructDecl )
 @end
 
@@ -559,18 +561,11 @@ fragment @insertpiece( output_type ) main_metal
 		discard;
 @end /// !alpha_test
 
+	@insertpiece( DoShadowCastPS )
+
 	@insertpiece( custom_ps_posExecution )
 
-@property( !hlms_render_depth_only && !hlms_shadowcaster_point )
-	outPs.colour0 = inPs.depth;
 	return outPs;
-@end
-
-@property( hlms_shadowcaster_point )
-	float distanceToCamera = length( inPs.toCameraWS );
-	outPs.colour0 = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;
-	return outPs;
-@end
 }
 @end
 

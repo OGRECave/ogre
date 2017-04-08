@@ -67,6 +67,12 @@ namespace Ogre
             /// Use RSC_TEXTURE_GATHER to check whether it will be slow or not.
             PCF_4x4,
 
+            /// High quality. Produces soft shadows. It's much more expensive but given
+            /// its blurry results, you can reduce resolution and/or use less PSSM splits
+            /// which gives you very competing performance with great results.
+            /// ESM stands for Exponential Shadow Maps.
+            ExponentialShadowMaps,
+
             NumShadowFilter
         };
 
@@ -105,6 +111,7 @@ namespace Ogre
         ConstBufferPackedVec    mPassBuffers;
         HlmsSamplerblock const  *mShadowmapSamplerblock;    /// GL3+ only when not using depth textures
         HlmsSamplerblock const  *mShadowmapCmpSamplerblock; /// For depth textures & D3D11
+        HlmsSamplerblock const  *mShadowmapEsmSamplerblock; /// For ESM.
         HlmsSamplerblock const  *mCurrentShadowmapSamplerblock;
         TexturePtr              mTargetEnvMap;
         ParallaxCorrectedCubemap    *mParallaxCorrectedCubemap;
@@ -290,6 +297,7 @@ namespace Ogre
         static const IdString Pcf3x3;
         static const IdString Pcf4x4;
         static const IdString PcfIterations;
+        static const IdString ExponentialShadowMaps;
 
         static const IdString AmbientHemisphere;
         static const IdString EnvMapScale;

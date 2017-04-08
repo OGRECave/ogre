@@ -758,7 +758,10 @@ namespace Ogre
                             }
                             else
                             {
-                                addError(CE_DUPLICATEOVERRIDE, node->file, node->line);
+                                //Ignore override duplicates in Compositors,
+                                //since passes don't have unique names
+                                if( source->file.find( ".compositor" ) == String::npos )
+                                    addError(CE_DUPLICATEOVERRIDE, node->file, node->line);
                             }
 
                             if(!wildcardMatch)

@@ -31,7 +31,7 @@ in uint drawId;
 
 @insertpiece( custom_vs_attributes )
 
-@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture || alpha_test )
+@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture || alpha_test || exponential_shadow_maps )
 out block
 {
 @insertpiece( VStoPS_block )

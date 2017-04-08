@@ -1,11 +1,31 @@
 #version 430
 
-//Based on GPUOpen's samples SeparableFilter11
-//https://github.com/GPUOpen-LibrariesAndSDKs/SeparableFilter11
-//For better understanding, read "Efficient Compute Shader Programming" from Bill Bilodeau
-//http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2012/10/Efficient%20Compute%20Shader%20Programming.pps
+//See GaussianBlurBase_cs for the original.
+//This is a derived version which is used for filtering ESM (Exponential Shadow Maps).
+//Normally ESM is in exponential space: exp( K * linearSpaceDepth );
+//Filtering should be done in that space.
+//However because of precision reasons, we store linearSpaceDepth instead. In order to perform
+//correct filtering, we use the following formula:
+//	exp( filteredDepth ) = w0 * exp( d0 ) + w1 * exp( d1 ) + w2 * exp( d2 ) + ...
+//
+//But this is not precision friendly. So we do instead:
+//	= w0 * exp( d0 ) + w1 * exp( d1 ) + w2 * exp( d2 )
+//	= exp( d0 ) * ( w0 + w1 * exp( d1 ) / exp( d0 ) + w2 * exp( d2 ) / exp( d0 ) )
+//	= exp( d0 ) * ( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) )
+//	= exp( d0 ) * exp( log( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) ) )
+//	= exp( d0 + log( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) ) )
+//	exp( filteredDepth ) = exp( d0 + log( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) ) )
+//Final formula:
+//	filteredDepth = d0 + log( w0 + w1 * exp( d1 - d0 ) + w2 * exp( d2 - d0 ) )
+//
+//It's technically not OK, because we should be doing:
+//	exp( K * filteredDepth ) = w0 * exp( K * d0 ) + w1 * exp( K * d1 ) + w2 * exp( K * d2 ) + ...
+//	= K * d0 + log( w0 + w1 * exp( K * (d1 - d0) ) + w2 * exp( K * (d2 - d0) ) )
+//However when K is considered, the shadows become blurrier in some cases, but also in other scenes
+//the results just don't work either shadows completely disappear, or they don't get any filtering).
+//So to put it bluntly: we don't include K because it doesn't look good.
 
-//TL;DR:
+//Like in the original filter:
 //	* Each thread works on 4 pixels at a time (for VLIW hardware, i.e. Radeon HD 5000 & 6000 series).
 //	* 256 pixels per threadgroup. Each threadgroup works on 2 rows of 128 pixels each.
 //	  That means 32x2 threads = 64. 64 threads x 4 pixels per thread = 256
@@ -88,8 +108,10 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, ivec2 i2Center, ive
 {
 	@property( !downscale_lq )
 		@insertpiece( data_type ) outColour[ 4 ];
+		@insertpiece( data_type ) firstSmpl[ 4 ];
 	@end @property( downscale_lq )
 		@insertpiece( data_type ) outColour[ 2 ];
+		@insertpiece( data_type ) firstSmpl[ 4 ];
 	@end
 	@insertpiece( data_type ) RDI[ 4 ] ;
 
@@ -98,10 +120,12 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, ivec2 i2Center, ive
 
 	@property( !downscale_lq )
 		@foreach( 4, iPixel )
-			outColour[ @iPixel ].xyz = RDI[ @iPixel ] * c_weights[ @value( kernel_radius ) ];@end
+			firstSmpl[ @iPixel ].x = RDI[ @iPixel ];
+			outColour[ @iPixel ].x = c_weights[ @value( kernel_radius ) ];@end
 	@end @property( downscale_lq )
 		@foreach( 2, iPixel )
-			outColour[ @iPixel ].xyz = RDI[ @iPixel * 2 ] * c_weights[ @value( kernel_radius ) ];@end
+			firstSmpl[ @iPixel ].x = RDI[ @iPixel * 2 ];
+			outColour[ @iPixel ].x = c_weights[ @value( kernel_radius ) ];@end
 	@end
 
 	@foreach( 4, iPixel )
@@ -114,10 +138,10 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, ivec2 i2Center, ive
 	@foreach( kernel_radius, iIteration )
 		@property( !downscale_lq )
 			@foreach( 4, iPixel )
-				outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @iIteration ];@end
+				outColour[ @iPixel ].x += exp(RDI[ @iPixel ] - firstSmpl[ @iPixel ].x) * c_weights[ @iIteration ];@end
 		@end @property( downscale_lq )
 			@foreach( 2, iPixel )
-				outColour[ @iPixel ].xyz += RDI[ @iPixel * 2 ] * c_weights[ @iIteration ];@end
+				outColour[ @iPixel ].x += exp(RDI[ @iPixel * 2 ] - firstSmpl[ @iPixel ].x) * c_weights[ @iIteration ];@end
 		@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
@@ -139,15 +163,23 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, ivec2 i2Center, ive
 	@foreach( kernel_radius2x_plus1, iIteration, kernel_radius_plus1 )
 		@property( !downscale_lq )
 			@foreach( 4, iPixel )
-				outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
+				outColour[ @iPixel ].x += exp(RDI[ @iPixel ] - firstSmpl[ @iPixel ].x) * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
 		@end @property( downscale_lq )
 			@foreach( 2, iPixel )
-				outColour[ @iPixel ].xyz += RDI[ @iPixel * 2 ] * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
+				outColour[ @iPixel ].x += exp(RDI[ @iPixel * 2 ] - firstSmpl[ @iPixel ].x) * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
 		@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
 		@foreach( 1, iPixel )
 			RDI[ 4 - 1 + @iPixel ] = @insertpiece( decode_lds )( g_f3LDS[ iLineOffset ][ iPixelOffset + @iIteration + @iPixel ] );@end
+	@end
+
+	@property( !downscale_lq )
+		@foreach( 4, iPixel )
+			outColour[ @iPixel ] = firstSmpl[ @iPixel ].x + log( outColour[ @iPixel ].x );@end
+	@end @property( downscale_lq )
+		@foreach( 2, iPixel )
+			outColour[ @iPixel ] = firstSmpl[ @iPixel ].x + log( outColour[ @iPixel ].x );@end
 	@end
 
 	/*

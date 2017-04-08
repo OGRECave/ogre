@@ -2,6 +2,9 @@
 struct ShadowReceiverData
 {
 	float4x4 texViewProj;
+@property( exponential_shadow_maps )
+	float4 texViewZRow;
+@end
 	float2 shadowDepthRange;
 	float2 padding;
 	float4 invShadowMapSize;
@@ -62,6 +65,7 @@ struct PassData
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
+	@property( exponential_shadow_maps )float4 viewZRow;@end
 	float2 depthRange;
 @end
 
@@ -193,12 +197,14 @@ struct Material
 			@foreach( hlms_uv_count, n )
 				float@value( hlms_uv_count@n ) uv@n;@end
 		@end
-		@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point )
+		@property( (!hlms_shadow_uses_depth_texture || exponential_shadow_maps) && !hlms_shadowcaster_point )
 			float depth;
 		@end
 		@property( hlms_shadowcaster_point )
 			float3 toCameraWS;
-			float constBias [[flat]];
+			@property( !exponential_shadow_maps )
+				float constBias [[flat]];
+			@end
 		@end
 	@end
 

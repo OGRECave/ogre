@@ -24,6 +24,7 @@
 	#define SH_HALF2 vec2
 	#define SH_HALF float
 	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) texture( tex, vec3( uv, fDepth ) ).x
+	#define OGRE_SAMPLE_SHADOW_ESM( tex, sampler, uv ) textureLod( tex, uv, 0 ).x
 	#define PASSBUF_ARG_DECL
 	#define PASSBUF_ARG
 @end
@@ -32,6 +33,7 @@
 	#define SH_HALF2 float2
 	#define SH_HALF float
 	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.SampleCmpLevelZero( sampler, uv.xy, fDepth ).x
+	#define OGRE_SAMPLE_SHADOW_ESM( tex, sampler, uv ) tex.SampleLevel( sampler, uv, 0 ).x
 	#define PASSBUF_ARG_DECL
 	#define PASSBUF_ARG
 @end
@@ -40,6 +42,7 @@
 	#define SH_HALF2 half2
 	#define SH_HALF half
 	#define OGRE_SAMPLE_SHADOW( tex, sampler, uv, depth ) tex.sample_compare( sampler, float2( uv.xy ), fDepth )
+	#define OGRE_SAMPLE_SHADOW_ESM( tex, sampler, uv ) tex.sample( sampler, float2( uv.xy ), level(0) ).x
 
 	#define PASSBUF_ARG_DECL , constant PassData &passBuf
 	#define PASSBUF_ARG , passBuf
@@ -96,8 +99,13 @@
 @end
 
 @property( syntax == glsl )
-	@property( hlms_shadow_uses_depth_texture )@piece( TEXTURE2DSHADOW )sampler2DShadow@end @end
-	@property( !hlms_shadow_uses_depth_texture )@piece( TEXTURE2DSHADOW )sampler2D@end @end
+	@property( !exponential_shadow_maps )
+		@property( hlms_shadow_uses_depth_texture )@piece( TEXTURE2DSHADOW )sampler2DShadow@end @end
+		@property( !hlms_shadow_uses_depth_texture )@piece( TEXTURE2DSHADOW )sampler2D@end @end
+	@end
+	@property( exponential_shadow_maps )
+		@piece( TEXTURE2DSHADOW )sampler2D@end
+	@end
 	@piece( DeclShadowSamplers )
 		@foreach( hlms_num_shadow_map_textures, n )
 			uniform @insertpiece( TEXTURE2DSHADOW ) texShadowMap@n;@end
@@ -105,20 +113,31 @@
 @end
 @property( syntax == hlsl )
 	@piece( TEXTURE2DSHADOW )Texture2D<float>@end
-	@piece( SamplerShadow )SamplerComparisonState shadowSampler, @end
+	@property( !exponential_shadow_maps )
+		@piece( SAMPLERSTATESHADOW )SamplerComparisonState@end
+	@end
+	@property( exponential_shadow_maps )
+		@piece( SAMPLERSTATESHADOW )SamplerState@end
+	@end
+	@piece( SamplerShadow )@insertpiece( SAMPLERSTATESHADOW ) shadowSampler, @end
 	@piece( DeclShadowSamplers )
-		SamplerComparisonState shadowSampler	: register(s@value(textureRegShadowMapStart));
+		@insertpiece( SAMPLERSTATESHADOW ) shadowSampler: register(s@value(textureRegShadowMapStart));
 		@foreach( hlms_num_shadow_map_textures, n )
-			Texture2D<float> texShadowMap@n		: register(t@counter(textureRegShadowMapStart));@end
+			Texture2D<float> texShadowMap@n				: register(t@counter(textureRegShadowMapStart));@end
 	@end
 @end
 @property( syntax == metal )
-	@piece( TEXTURE2DSHADOW )depth2d<float>@end
+	@property( !exponential_shadow_maps )
+		@piece( TEXTURE2DSHADOW )depth2d<float>@end
+	@end
+	@property( exponential_shadow_maps )
+		@piece( TEXTURE2DSHADOW )texture2d<float>@end
+	@end
 	@piece( SamplerShadow )sampler shadowSampler, @end
 	/// sampler shadowSampler is declared as constexpr in PixelShader_ps.metal
 	@piece( DeclShadowSamplers )
 		@foreach( hlms_num_shadow_map_textures, n )
-			, depth2d<float> texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
+			, @insertpiece( TEXTURE2DSHADOW ) texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
 	@end
 @end
 
@@ -163,32 +182,33 @@
 		@property( @m == 3 )uv.xy = uv.xy * lengthUV.xy + minUV.xy;@end
 	@end
 
+	@property( !exponential_shadow_maps )
 		float retVal = 0;
 
-	@property( pcf_3x3 || pcf_4x4 )
-		SH_HALF2 offsets[@value(pcf_iterations)] =
-		{
-		@property( pcf_3x3 )
-			SH_HALF2( 0, 0 ),	//0, 0
-			SH_HALF2( 1, 0 ),	//1, 0
-			SH_HALF2( 0, 1 ),	//1, 1
-			SH_HALF2( 0, 0 ) 	//1, 1
-		@end
-		@property( pcf_4x4 )
-			SH_HALF2( 0, 0 ),	//0, 0
-			SH_HALF2( 1, 0 ),	//1, 0
-			SH_HALF2( 1, 0 ),	//2, 0
+		@property( pcf_3x3 || pcf_4x4 )
+			SH_HALF2 offsets[@value(pcf_iterations)] =
+			{
+			@property( pcf_3x3 )
+				SH_HALF2( 0, 0 ),	//0, 0
+				SH_HALF2( 1, 0 ),	//1, 0
+				SH_HALF2( 0, 1 ),	//1, 1
+				SH_HALF2( 0, 0 ) 	//1, 1
+			@end
+			@property( pcf_4x4 )
+				SH_HALF2( 0, 0 ),	//0, 0
+				SH_HALF2( 1, 0 ),	//1, 0
+				SH_HALF2( 1, 0 ),	//2, 0
 
-			SH_HALF2(-2, 1 ),	//0, 1
-			SH_HALF2( 1, 0 ),	//1, 1
-			SH_HALF2( 1, 0 ),	//2, 1
+				SH_HALF2(-2, 1 ),	//0, 1
+				SH_HALF2( 1, 0 ),	//1, 1
+				SH_HALF2( 1, 0 ),	//2, 1
 
-			SH_HALF2(-2, 1 ),	//0, 2
-			SH_HALF2( 1, 0 ),	//1, 2
-			SH_HALF2( 1, 0 )	//2, 2
+				SH_HALF2(-2, 1 ),	//0, 2
+				SH_HALF2( 1, 0 ),	//1, 2
+				SH_HALF2( 1, 0 )	//2, 2
+			@end
+			};
 		@end
-		};
-	@end
 
 		@insertpiece( regularTexturePcfGlSampling )
 		@property( syntax != glsl || hlms_shadow_uses_depth_texture )
@@ -202,21 +222,27 @@
 		@end @property( pcf_4x4 )
 			retVal *= 0.11111111111111;
 		@end
+	@end	///! exponential_shadow_maps
+	@property( exponential_shadow_maps )
+		float expDepth = OGRE_SAMPLE_SHADOW_ESM( shadowMap, shadowSampler, uv );
+		float retVal = exp( 200.0 * (expDepth - fDepth) );
+		retVal = min( retVal, 1.0 );
+	@end    ///! exponential_shadow_maps
 
-		@property( (@m == 0 || @m == 2) && syntax == metal )
-			//Metal does not support clamp to border colour
-			retVal = (uv.x <= 0.0h || uv.x >= 1.0h ||
-					  uv.y <= 0.0h || uv.y >= 1.0h) ? 1.0 : retVal;
-		@end
+	@property( (@m == 0 || @m == 2) && syntax == metal )
+		//Metal does not support clamp to border colour
+		retVal = (uv.x <= 0.0h || uv.x >= 1.0h ||
+				  uv.y <= 0.0h || uv.y >= 1.0h) ? 1.0 : retVal;
+	@end
 
-		@property( @m == 1 || @m == 3 )
-			retVal = (uv.x <= minUV.x || uv.x >= maxUV.x ||
-					  uv.y <= minUV.y || uv.y >= maxUV.y) ? 1.0 : retVal;
-		@end
+	@property( @m == 1 || @m == 3 )
+		retVal = (uv.x <= minUV.x || uv.x >= maxUV.x ||
+				  uv.y <= minUV.y || uv.y >= maxUV.y) ? 1.0 : retVal;
+	@end
 
 		return retVal;
 	}
-	@end
+@end
 @end
 
 @property( syntax != glsl )
@@ -282,4 +308,42 @@
 						  hlms_shadowmap@counter(CurrentShadowMap)_uv_param PASSBUF_ARG )
 @end
 
+@end
+
+///--------------------------------------------------------------------------------------
+/// Caster
+///--------------------------------------------------------------------------------------
+
+@piece( DeclShadowCasterMacros )
+	@property( syntax == glsl )
+		@property( !hlms_render_depth_only )
+			@property( GL3+ )
+				#define outDepth outColour
+			@end
+			@property( !GL3+ )
+				#define outDepth gl_FragColor
+			@end
+		@end
+		@property( hlms_render_depth_only )
+			#define outDepth gl_FragDepth
+		@end
+	@end
+
+	@property( syntax == hlsl || syntax == metal )
+		#define outDepth outPs.colour0
+	@end
+@end
+
+@piece( DoShadowCastPS )
+	@property( !hlms_shadowcaster_point )
+		outDepth = inPs.depth;
+	@end
+	@property( hlms_shadowcaster_point )
+		float distanceToCamera = length( inPs.toCameraWS );
+		@property( !exponential_shadow_maps )
+			outDepth = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;
+		@end @property( exponential_shadow_maps )
+			outDepth = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y;
+		@end
+	@end
 @end

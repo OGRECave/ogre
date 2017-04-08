@@ -94,6 +94,7 @@ compositor_node_shadow ShadowMapDebuggingShadowNode
 	}
 }
 
+
 /*
 One shadow map per light version, just as an example.
 compositor_node_shadow ShadowMapDebuggingShadowNode2
@@ -145,6 +146,122 @@ compositor_node_shadow ShadowMapDebuggingShadowNode2
 		}
 	}
 }*/
+
+abstract compositor_node_shadow ShadowMapDebuggingEsmShadowNodeBase
+{
+	texture atlas 2048 2048 PF_L16 no_fsaa uav
+	texture tmpGaussianFilter 2048 2048 PF_L16 no_fsaa depth_pool 0 uav
+	texture tmpCubemap 512 512 PF_L16 cubemap no_fsaa
+
+	technique pssm
+	num_splits		2
+	pssm_lambda		0.70
+	shadow_map 0 atlas uv 0.0 0.0 0.5 0.5 light 0 split 0
+	shadow_map 1 atlas uv 0.5 0.0 0.5 0.5 light 0 split 1
+
+	technique focused
+	shadow_map 2 atlas uv 0.0 0.5 0.5 0.5 light 1
+	shadow_map 3 atlas uv 0.5 0.5 0.5 0.5 light 2
+
+	target atlas
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+	}
+
+	shadow_map_target_type directional
+	{
+		shadow_map 0 1
+		{
+			pass render_scene
+			{
+			}
+		}
+	}
+
+	shadow_map_target_type directional spot
+	{
+		shadow_map 2 3
+		{
+			pass render_scene
+			{
+			}
+		}
+	}
+
+	shadow_map_target_type point
+	{
+		shadow_map_repeat 2 3
+		{
+			target tmpCubemap +X : cubemap_target_shadow {}
+			target tmpCubemap -X : cubemap_target_shadow {}
+			target tmpCubemap +Y : cubemap_target_shadow {}
+			target tmpCubemap -Y : cubemap_target_shadow {}
+			target tmpCubemap +Z : cubemap_target_shadow {}
+			target tmpCubemap -Z : cubemap_target_shadow {}
+
+			shadow_map
+			{
+				pass render_quad
+				{
+					material Ogre/DPSM/CubeToDpsmColour
+					input 0 tmpCubemap
+				}
+			}
+		}
+	}
+}
+
+compositor_node_shadow ShadowMapDebuggingEsmShadowNodeCompute : ShadowMapDebuggingEsmShadowNodeBase
+{
+	//Skip already defined "target atlas" which does the clear. We do not want to override it.
+	target atlas {}
+
+	//Add a compute-based gauss filter
+	target atlas
+	{
+		pass compute
+		{
+			job ESM/GaussianLogFilterH
+			input 0 atlas
+			uav 0 tmpGaussianFilter write
+		}
+
+		pass compute
+		{
+			job ESM/GaussianLogFilterV
+			input 0 tmpGaussianFilter
+			uav 0 atlas write
+		}
+	}
+}
+
+compositor_node_shadow ShadowMapDebuggingEsmShadowNodePixelShader : ShadowMapDebuggingEsmShadowNodeBase
+{
+	//Skip already defined "target atlas" which does the clear. We do not want to override it.
+	target atlas {}
+
+	//Add a pixel-based gauss filter
+	target tmpGaussianFilter
+	{
+		pass render_quad
+		{
+			material ESM/GaussianLogFilterH
+			input 0 atlas
+		}
+	}
+
+	target atlas
+	{
+		pass render_quad
+		{
+			material ESM/GaussianLogFilterV
+			input 0 tmpGaussianFilter
+		}
+	}
+}
 
 workspace ShadowMapDebuggingWorkspace
 {
