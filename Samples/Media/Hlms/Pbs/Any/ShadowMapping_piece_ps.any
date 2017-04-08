@@ -225,7 +225,7 @@
 	@end	///! exponential_shadow_maps
 	@property( exponential_shadow_maps )
 		float expDepth = OGRE_SAMPLE_SHADOW_ESM( shadowMap, shadowSampler, uv );
-		float retVal = exp( 600.0 * (expDepth - fDepth) );
+		float retVal = exp( @value( exponential_shadow_maps ).0 * (expDepth - fDepth) );
 		retVal = min( retVal, 1.0 );
 	@end    ///! exponential_shadow_maps
 

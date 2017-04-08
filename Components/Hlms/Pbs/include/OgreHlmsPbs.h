@@ -134,7 +134,8 @@ namespace Ogre
 
         bool mDebugPssmSplits;
 
-        ShadowFilter mShadowFilter;
+        ShadowFilter    mShadowFilter;
+        uint16          mEsmK; /// K parameter for ESM.
         AmbientLightMode mAmbientLightMode;
 
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
@@ -196,6 +197,24 @@ namespace Ogre
 
         void setShadowSettings( ShadowFilter filter );
         ShadowFilter getShadowFilter(void) const            { return mShadowFilter; }
+
+        /** Sets the 'K' parameter of ESM filter. Defaults to 600.
+            Small values will give weak shadows, and light bleeding (specially if the
+            caster is close to the receiver; particularly noticeable at contact points).
+            It also gives the chance of over darkening to appear (the shadow of a small
+            caster in front of a large caster looks darker; thus the large caster appers
+            like if it were made of glass instead of being solid).
+
+            Large values give strong, dark shadows; but the higher the value, the more
+            you push floating point limits.
+            This value is related to K in MiscUtils::setGaussianLogFilterParams. You don't
+            have to set them to the same value; but you'll notice that if you change this
+            value here, you'll likely have to change the log filter's too.
+        @param K
+            In range (0; infinite).
+        */
+        void setEsmK( uint16 K );
+        uint16 getEsmK(void) const                          { return mEsmK; }
 
         void setAmbientLightMode( AmbientLightMode mode );
         AmbientLightMode getAmbientLightMode(void) const    { return mAmbientLightMode; }

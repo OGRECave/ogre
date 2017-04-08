@@ -222,6 +222,7 @@ namespace Ogre
         mLastTextureHash( 0 ),
         mDebugPssmSplits( false ),
         mShadowFilter( PCF_3x3 ),
+        mEsmK( 600u ),
         mAmbientLightMode( AmbientAuto )
     {
         //Override defaults
@@ -732,7 +733,7 @@ namespace Ogre
         mSetProperties.clear();
 
         if( shadowNode && mShadowFilter == ExponentialShadowMaps )
-            setProperty( PbsProperty::ExponentialShadowMaps, 1 );
+            setProperty( PbsProperty::ExponentialShadowMaps, mEsmK );
 
         //The properties need to be set before preparePassHash so that
         //they are considered when building the HlmsCache's hash.
@@ -1825,6 +1826,12 @@ namespace Ogre
                         "mHlmsManager->setShadowMappingUseBackFaces( false ) when using Exponential "
                         "Shadow Maps (HlmsPbs::setShadowSettings)" );
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setEsmK( uint16 K )
+    {
+        assert( K != 0 && "A value of K = 0 is invalid!" );
+        mEsmK = K;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::setAmbientLightMode( AmbientLightMode mode )
