@@ -216,11 +216,8 @@ abstract compositor_node_shadow ShadowMapDebuggingEsmShadowNodeBase
 
 compositor_node_shadow ShadowMapDebuggingEsmShadowNodeCompute : ShadowMapDebuggingEsmShadowNodeBase
 {
-	//Skip already defined passes
+	//Skip already defined "target atlas" which does the clear. We do not want to override it.
 	target atlas {}
-	shadow_map_target_type directional {}
-	shadow_map_target_type directional spot {}
-	shadow_map_target_type point {}
 
 	//Add a compute-based gauss filter
 	target atlas
@@ -243,11 +240,8 @@ compositor_node_shadow ShadowMapDebuggingEsmShadowNodeCompute : ShadowMapDebuggi
 
 compositor_node_shadow ShadowMapDebuggingEsmShadowNodePixelShader : ShadowMapDebuggingEsmShadowNodeBase
 {
-	//Skip already defined passes
+	//Skip already defined "target atlas" which does the clear. We do not want to override it.
 	target atlas {}
-	shadow_map_target_type directional {}
-	shadow_map_target_type directional spot {}
-	shadow_map_target_type point {}
 
 	//Add a pixel-based gauss filter
 	target tmpGaussianFilter
