@@ -27,15 +27,19 @@ fragment float2 main_metal
 
 #if !SMAA_EDGE_DETECTION_MODE || SMAA_EDGE_DETECTION_MODE == 2
 	#if SMAA_PREDICATION
-		return SMAAColorEdgeDetectionPS( inPs.uv0, offset, rt_input, depthTex, p.viewportSize );
+		return SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset0, inPs.offset1,
+										 inPs.offset2, rt_input, depthTex, p.viewportSize );
 	#else
-		return SMAAColorEdgeDetectionPS( inPs.uv0, offset, rt_input, p.viewportSize );
+		return SMAAColorEdgeDetectionPS( inPs.uv0, inPs.offset0, inPs.offset1,
+										 inPs.offset2, rt_input, p.viewportSize );
 	#endif
 #else
 	#if SMAA_PREDICATION
-		return SMAALumaEdgeDetectionPS( inPs.uv0, offset, rt_input, depthTex, p.viewportSize );
+		return SMAALumaEdgeDetectionPS( inPs.uv0, inPs.offset0, inPs.offset1,
+										inPs.offset2, rt_input, depthTex, p.viewportSize );
 	#else
-		return SMAALumaEdgeDetectionPS( inPs.uv0, offset, rt_input, p.viewportSize );
+		return SMAALumaEdgeDetectionPS( inPs.uv0, inPs.offset0, inPs.offset1,
+										inPs.offset2, rt_input, p.viewportSize );
 	#endif
 #endif
 }

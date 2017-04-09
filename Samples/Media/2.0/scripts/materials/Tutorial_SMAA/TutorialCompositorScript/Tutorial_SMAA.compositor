@@ -12,7 +12,7 @@ compositor_node TutorialSMAA_RenderingNode
 
 		pass render_scene
 		{
-			overlays	on
+			overlays	off
 			shadows		ShadowMapDebuggingShadowNode
 		}
 	}

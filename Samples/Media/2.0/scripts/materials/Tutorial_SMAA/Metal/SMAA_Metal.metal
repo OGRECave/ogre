@@ -7,12 +7,12 @@ using namespace metal;
 
 #define SMAA_EXTRA_PARAM_ARG_DECL , float4 viewportSize
 #define SMAA_EXTRA_PARAM_ARG , viewportSize
+#define SMAA_METAL 1
 
 #if !SMAA_INITIALIZED
 	//Leave compatible defaults in case this file gets compiled
 	//before calling SmaaUtils::initialize from C++
 	#define SMAA_PRESET_ULTRA 1
-	#define SMAA_METAL 1
 #endif
 
 /*float toSRGB( float x )
@@ -43,10 +43,10 @@ inline float fromSRGB( float x )
 
 inline float4 fromSRGB( float4 x )
 {
-    return float4( fromSRGB( x.x ), fromSRGB( x.y ), fromSRGB( x.z ), x.w );
+	return float4( fromSRGB( x.x ), fromSRGB( x.y ), fromSRGB( x.z ), x.w );
 }
 
-#include "SMAA.hlsl"
+#include "SMAA.metal"
 
 struct Params
 {
