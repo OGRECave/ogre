@@ -57,6 +57,8 @@ namespace Ogre
         /// @see HlmsBlendblock::BlendChannelMasks
         static MTLColorWriteMask get( uint8 mask );
 
+        static MTLStencilOperation get( StencilOperation op );
+
         static MTLCompareFunction get( CompareFunction cmp );
 
         static MTLVertexFormat get( VertexElementType vertexElemType );

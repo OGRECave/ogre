@@ -986,13 +986,43 @@ namespace Ogre
             depthStateDesc.depthCompareFunction = MetalMappings::get( depthState.depthFunc );
             depthStateDesc.depthWriteEnabled    = depthState.depthWrite;
 
-            //TODO: Convert stencil params
             if( pso->pass.stencilParams.enabled )
             {
-//                pso->pass.stencilParams.readMask;
-//                pso->pass.stencilParams.writeMask;
-//                depthStateDesc.frontFaceStencil =;
-//                depthStateDesc.backFaceStencil =;
+                if( pso->pass.stencilParams.stencilFront != StencilStateOp() )
+                {
+                    const StencilStateOp &stencilOp = pso->pass.stencilParams.stencilFront;
+
+                    MTLStencilDescriptor *stencilDesc = [MTLStencilDescriptor alloc];
+                    stencilDesc.stencilCompareFunction = MetalMappings::get( stencilOp.compareOp );
+                    stencilDesc.stencilFailureOperation = MetalMappings::get( stencilOp.stencilFailOp );
+                    stencilDesc.depthFailureOperation =
+                            MetalMappings::get( stencilOp.stencilDepthFailOp );
+                    stencilDesc.depthStencilPassOperation =
+                            MetalMappings::get( stencilOp.stencilPassOp );
+
+                    stencilDesc.readMask = pso->pass.stencilParams.readMask;
+                    stencilDesc.writeMask = pso->pass.stencilParams.writeMask;
+
+                    depthStateDesc.frontFaceStencil = stencilDesc;
+                }
+
+                if( pso->pass.stencilParams.stencilBack != StencilStateOp() )
+                {
+                    const StencilStateOp &stencilOp = pso->pass.stencilParams.stencilBack;
+
+                    MTLStencilDescriptor *stencilDesc = [MTLStencilDescriptor alloc];
+                    stencilDesc.stencilCompareFunction = MetalMappings::get( stencilOp.compareOp );
+                    stencilDesc.stencilFailureOperation = MetalMappings::get( stencilOp.stencilFailOp );
+                    stencilDesc.depthFailureOperation =
+                            MetalMappings::get( stencilOp.stencilDepthFailOp );
+                    stencilDesc.depthStencilPassOperation =
+                            MetalMappings::get( stencilOp.stencilPassOp );
+
+                    stencilDesc.readMask = pso->pass.stencilParams.readMask;
+                    stencilDesc.writeMask = pso->pass.stencilParams.writeMask;
+
+                    depthStateDesc.backFaceStencil = stencilDesc;
+                }
             }
 
             depthState.depthStencilState =

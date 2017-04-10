@@ -117,7 +117,7 @@ compositor_node StencilTestNode
 		
 		pass render_quad
 		{
-			material Ogre/Copy/3xFP32
+			material Ogre/Copy/4xFP32
 			input 0 rtt
 		}
 	}
