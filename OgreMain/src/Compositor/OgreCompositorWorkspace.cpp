@@ -37,6 +37,7 @@ THE SOFTWARE.
 
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderTexture.h"
+#include "OgreViewport.h"
 
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
@@ -85,7 +86,7 @@ namespace Ogre
 
         //We need this so OpenGL can switch contexts (if needed) before creating the textures
         if( finalTarget )
-            mRenderSys->_setRenderTarget( finalTarget, true );
+            mRenderSys->_setRenderTarget( finalTarget, VP_RTT_COLOUR_WRITE );
 
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
@@ -103,7 +104,7 @@ namespace Ogre
 
         //Some RenderSystems assume we start the frame with empty pointer.
         if( finalTarget )
-            mRenderSys->_setRenderTarget( 0, true );
+            mRenderSys->_setRenderTarget( 0, VP_RTT_COLOUR_WRITE );
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace::~CompositorWorkspace()
@@ -641,7 +642,7 @@ namespace Ogre
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that _beginFrame calls go to the right device.
         RenderTarget *finalTarget = getFinalTarget();
-        mRenderSys->_setRenderTarget( finalTarget, true );
+        mRenderSys->_setRenderTarget( finalTarget, VP_RTT_COLOUR_WRITE );
         if( finalTarget->isRenderWindow() || forceBeginFrame )
         {
             // Begin the frame
@@ -654,7 +655,7 @@ namespace Ogre
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that _endFrame calls go to the right device.
         RenderTarget *finalTarget = getFinalTarget();
-        mRenderSys->_setRenderTarget( finalTarget, true );
+        mRenderSys->_setRenderTarget( finalTarget, VP_RTT_COLOUR_WRITE );
         if( finalTarget->isRenderWindow() || forceEndFrame )
         {
             // End the frame
@@ -684,7 +685,7 @@ namespace Ogre
         RenderTarget *finalTarget = getFinalTarget();
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that our calls go to the right device.
-        mRenderSys->_setRenderTarget( finalTarget, true );
+        mRenderSys->_setRenderTarget( finalTarget, VP_RTT_COLOUR_WRITE );
 
         if( mCurrentWidth != finalTarget->getWidth() || mCurrentHeight != finalTarget->getHeight() )
         {
@@ -779,7 +780,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::_validateFinalTarget(void)
     {
-        mRenderSys->_setRenderTarget( getFinalTarget(), true );
+        mRenderSys->_setRenderTarget( getFinalTarget(), VP_RTT_COLOUR_WRITE );
     }
     //-----------------------------------------------------------------------------------
     CompositorShadowNode* CompositorWorkspace::findShadowNode( IdString nodeDefName ) const

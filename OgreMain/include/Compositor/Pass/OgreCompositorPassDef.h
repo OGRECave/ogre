@@ -118,6 +118,8 @@ namespace Ogre
         /// the RTT is actually an UAV.
         /// Some passes may ignore this setting (e.g. Clear passes)
         bool                mColourWrite;
+        bool                mReadOnlyDepth;
+        bool                mReadOnlyStencil;
 
         /** TODO: Refactor OgreOverlay to remove this design atrocity.
             A custom overlay pass is a better alternative (or just use their own RQ)
@@ -165,6 +167,8 @@ namespace Ogre
             mNumInitialPasses( -1 ), mIdentifier( 0 ),
             mBeginRtUpdate( true ), mEndRtUpdate( true ),
             mColourWrite( true ),
+            mReadOnlyDepth( false ),
+            mReadOnlyStencil( false ),
             mIncludeOverlays( false ),
             mExecutionMask( 0xFF ),
             mViewportModifierMask( 0xFF ),

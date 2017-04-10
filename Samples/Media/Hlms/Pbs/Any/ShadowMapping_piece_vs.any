@@ -1,0 +1,80 @@
+
+//#include "SyntaxHighlightingMisc.h"
+
+@property( hlms_shadowcaster )
+	@piece( DoShadowCasterVS )
+		@property( syntax == glsl )
+			float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[drawId].y );
+		@end
+		@property( syntax == hlsl )
+			float shadowConstantBias = asfloat( worldMaterialIdx[input.drawId].y );
+		@end
+		@property( syntax == metal )
+			float shadowConstantBias = as_type<float>( worldMaterialIdx[drawId].y );
+		@end
+
+		@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point && !exponential_shadow_maps )
+			//Linear depth
+			outVs.depth	= (outVs_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
+			@property( syntax == glsl )outVs.depth = (outVs.depth * 0.5) + 0.5;@end
+		@end
+
+		@property( hlms_shadowcaster_point )
+			outVs.toCameraWS	= worldPos.xyz - passBuf.cameraPosWS.xyz;
+			@property( !exponential_shadow_maps )
+				outVs.constBias = shadowConstantBias * passBuf.depthRange.y * passBuf.depthRange.y;
+			@end
+		@end
+
+		@property( !exponential_shadow_maps )
+			//We can't make the depth buffer linear without Z out in the fragment shader;
+			//however we can use a cheap approximation ("pseudo linear depth")
+			//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
+			outVs_Position.z = (outVs_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y * outVs_Position.w;
+		@end
+
+		@property( exponential_shadow_maps && !hlms_shadowcaster_point )
+			//It's the same as (float4( worldPos.xyz, 1 ) * viewMatrix).z
+			float linearZ = -(dot( worldPos.xyz, passBuf.viewZRow.xyz ) + passBuf.viewZRow.w);
+            //linearZ += (shadowConstantBias * passBuf.depthRange.y);
+			outVs.depth = (linearZ - passBuf.depthRange.x) * passBuf.depthRange.y;
+		@end
+	@end
+@end
+
+@property( !hlms_shadowcaster )
+	@property( !exponential_shadow_maps )
+	@piece( DoShadowReceiveVS )
+		@foreach( hlms_num_shadow_map_lights, n )
+			@property( !hlms_shadowmap@n_is_point_light )
+				outVs.posL@n = mul( float4(worldPos.xyz, 1.0f), passBuf.shadowRcv[@n].texViewProj );@end @end
+
+		@foreach( hlms_num_shadow_map_lights, n )
+			@property( !hlms_shadowmap@n_is_point_light )
+				outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;
+				@property( syntax == glsl )outVs.posL@n.z = (outVs.posL@n.z * 0.5) + 0.5;@end
+			@end
+		@end
+
+		@property( hlms_pssm_splits )outVs.depth = outVs_Position.z;@end
+	@end
+	@end
+	@property( exponential_shadow_maps )
+	@piece( DoShadowReceiveVS )
+		@foreach( hlms_num_shadow_map_lights, n )
+			@property( !hlms_shadowmap@n_is_point_light )
+				outVs.posL@n = mul( float4(worldPos.xyz, 1.0f), passBuf.shadowRcv[@n].texViewProj );@end @end
+
+		@foreach( hlms_num_shadow_map_lights, n )
+			@property( !hlms_shadowmap@n_is_point_light )
+				//It's the same as (float4( worldPos.xyz, 1 ) * texViewMatrix).z
+				outVs.posL@n.z = -(dot( worldPos.xyz, passBuf.shadowRcv[@n].texViewZRow.xyz ) + passBuf.shadowRcv[@n].texViewZRow.w);
+				outVs.posL@n.z = (outVs.posL@n.z - passBuf.shadowRcv[@n].shadowDepthRange.x)
+									* passBuf.shadowRcv[@n].shadowDepthRange.y;
+			@end
+		@end
+
+		@property( hlms_pssm_splits )outVs.depth = outVs_Position.z;@end
+	@end
+	@end
+@end

@@ -11,6 +11,11 @@
 	@add( gBuf_shadowRoughness, texUnit, 1 )
 	@add( texUnit, 2 )
 
+	@property( hlms_use_prepass_msaa )
+		@set( gBuf_depthTexture, texUnit )
+		@add( texUnit, 1 )
+	@end
+
 	@property( hlms_use_ssr )
 		@set( ssrTexture, texUnit )
 		@add( texUnit, 1 )

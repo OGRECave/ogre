@@ -25,6 +25,7 @@ struct PS_INPUT
 	@end @property( hlms_use_prepass_msaa )
 		Texture2DMS<unorm float4> gBuf_normals			: register(t@value(gBuf_normals));
 		Texture2DMS<unorm float2> gBuf_shadowRoughness	: register(t@value(gBuf_shadowRoughness));
+		Texture2DMS<float> gBuf_depthTexture			: register(t@value(gBuf_depthTexture));
 	@end
 
 	@property( hlms_use_ssr )
@@ -265,7 +266,35 @@ float4 diffuseCol;
 	int2 iFragCoord = int2( gl_FragCoord.xy );
 
 	@property( hlms_use_prepass_msaa )
-		int gBufSubsample = firstbitlow( gl_SampleMask );
+		uint gl_SampleMaskIn = gl_SampleMask;
+		//SV_Coverage/gl_SampleMaskIn is always before depth & stencil tests,
+		//so we need to perform the test ourselves
+		//See http://www.yosoygames.com.ar/wp/2017/02/beware-of-sv_coverage/
+		float msaaDepth;
+		int subsampleDepthMask;
+		float pixelDepthZ;
+		float pixelDepthW;
+		float pixelDepth;
+		int intPixelDepth;
+		int intMsaaDepth;
+		//Unfortunately there are precision errors, so we allow some ulp errors.
+		//200 & 5 are arbitrary, but were empirically found to be very good values.
+		int ulpError = int( lerp( 200, 5, gl_FragCoord.z ) );
+		@foreach( hlms_use_prepass_msaa, n )
+			pixelDepthZ = EvaluateAttributeAtSample( inPs.zwDepth.x, @n );
+			pixelDepthW = EvaluateAttributeAtSample( inPs.zwDepth.y, @n );
+			pixelDepth = pixelDepthZ / pixelDepthW;
+			msaaDepth = gBuf_depthTexture.Load( iFragCoord.xy, @n );
+			intPixelDepth = asint( pixelDepth );
+			intMsaaDepth = asint( msaaDepth );
+			subsampleDepthMask = int( (abs( intPixelDepth - intMsaaDepth ) <= ulpError) ? 0xffffffffu : ~(1u << @nu) );
+			//subsampleDepthMask = int( (pixelDepth <= msaaDepth) ? 0xffffffffu : ~(1u << @nu) );
+			gl_SampleMaskIn &= subsampleDepthMask;
+		@end
+
+		gl_SampleMaskIn = gl_SampleMaskIn == 0 ? 1 : gl_SampleMaskIn;
+
+		int gBufSubsample = firstbitlow( gl_SampleMaskIn );
 
 		nNormal = normalize( gBuf_normals.Load( iFragCoord, gBufSubsample ).xyz * 2.0 - 1.0 );
 		float2 shadowRoughness = gBuf_shadowRoughness.Load( iFragCoord, gBufSubsample ).xy;
@@ -451,6 +480,26 @@ float4 diffuseCol;
 	@end
 @end
 
+	@property( hlms_use_prepass_msaa && false )
+		//Useful debug stuff for debugging precision issues.
+		/*float testD = gBuf_depthTexture.Load( iFragCoord.xy, 0 );
+		outPs.colour0.xyz = testD * testD * testD * testD * testD * testD * testD * testD;*/
+		/*float3 col3 = lerp( outPs.colour0.xyz, float3( 1, 1, 1 ), 0.85 );
+		outPs.colour0.xyz = 0;
+		if( gl_SampleMaskIn & 0x1 )
+			outPs.colour0.x = col3.x;
+		if( gl_SampleMaskIn & 0x2 )
+			outPs.colour0.y = col3.y;
+		if( gl_SampleMaskIn & 0x4 )
+			outPs.colour0.z = col3.z;
+		if( gl_SampleMaskIn & 0x8 )
+			outPs.colour0.w = 1.0;*/
+		/*outPs.colour0.x = pixelDepth;
+		outPs.colour0.y = msaaDepth;
+		outPs.colour0.z = 0;
+		outPs.colour0.w = 1;*/
+	@end
+
 	@insertpiece( custom_ps_posExecution )
 
 @property( !hlms_render_depth_only )
@@ -459,10 +508,13 @@ float4 diffuseCol;
 }
 @end
 @property( hlms_shadowcaster )
+
+@insertpiece( DeclShadowCasterMacros )
+
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
-@property( hlms_shadowcaster_point )
+@property( hlms_shadowcaster_point || exponential_shadow_maps )
 	@insertpiece( PassDecl )
 @end
 
@@ -529,18 +581,11 @@ float4 diffuseCol;
 		discard;
 @end /// !alpha_test
 
+	@insertpiece( DoShadowCastPS )
+
 	@insertpiece( custom_ps_posExecution )
 
-@property( !hlms_render_depth_only && !hlms_shadowcaster_point )
-	outPs.colour0 = inPs.depth;
 	return outPs;
-@end
-
-@property( hlms_shadowcaster_point )
-	float distanceToCamera = length( inPs.toCameraWS );
-	outPs.colour0 = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;
-	return outPs;
-@end
 }
 @end
 

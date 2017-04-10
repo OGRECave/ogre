@@ -1,11 +1,11 @@
 {
 	"samplers" :
 	{
-		"LinearClamp" :
+		"PointClamp" :
 		{
-			"min" : "linear",
-			"mag" : "linear",
-			"mip" : "linear",
+			"min" : "point",
+			"mag" : "point",
+			"mip" : "point",
 			"u" : "clamp",
 			"v" : "clamp",
 			"w" : "clamp",
@@ -28,12 +28,12 @@
 			"source" : "TerraShadowGenerator",
 
 			"uav_units" : 1,
-			
+
 			"textures" :
 			[
 				{}
 			],
-			
+
 			"params" :
 			[
 				["xyStep",     		[1], "int"],
@@ -41,7 +41,7 @@
 				["delta",			[1.0, 0.0]],
 				["heightDelta",     [0.001]]
 			],
-			
+
 			"params_glsl" :
 			[
 				["shadowMap",		[0], "int"],
@@ -59,19 +59,19 @@
 			"inform_shader_of_texture_data_change" : true,
 
 			"uav_units" : 1,
-			
+
 			"textures" :
 			[
 				{
-					"sampler" : "LinearClamp"
+					"sampler" : "PointClamp"
 				}
 			],
-			
+
 			"params" :
 			[
 				["g_f4OutputSize",	"packed_texture_size", 0]
 			],
-			
+
 			"params_glsl" :
 			[
 				["inputImage",		[0], "int"],
@@ -95,19 +95,19 @@
 			"inform_shader_of_texture_data_change" : true,
 
 			"uav_units" : 1,
-			
+
 			"textures" :
 			[
 				{
-					"sampler" : "LinearClamp"
+					"sampler" : "PointClamp"
 				}
 			],
-			
+
 			"params" :
 			[
 				["g_f4OutputSize",	"packed_texture_size", 0]
 			],
-			
+
 			"params_glsl" :
 			[
 				["inputImage",		[0], "int"],

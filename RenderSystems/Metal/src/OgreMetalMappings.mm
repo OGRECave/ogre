@@ -260,6 +260,21 @@ namespace Ogre
                ((mask & HlmsBlendblock::BlendChannelAlpha) >> (3u - 0u));
     }
     //-----------------------------------------------------------------------------------
+    MTLStencilOperation MetalMappings::get( StencilOperation op )
+    {
+        switch( op )
+        {
+        case SOP_KEEP:              return MTLStencilOperationKeep;
+        case SOP_ZERO:              return MTLStencilOperationZero;
+        case SOP_REPLACE:           return MTLStencilOperationReplace;
+        case SOP_INCREMENT:         return MTLStencilOperationIncrementClamp;
+        case SOP_DECREMENT:         return MTLStencilOperationDecrementClamp;
+        case SOP_INCREMENT_WRAP:    return MTLStencilOperationIncrementWrap;
+        case SOP_DECREMENT_WRAP:    return MTLStencilOperationDecrementWrap;
+        case SOP_INVERT:            return MTLStencilOperationInvert;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     MTLCompareFunction MetalMappings::get( CompareFunction cmp )
     {
         switch( cmp )

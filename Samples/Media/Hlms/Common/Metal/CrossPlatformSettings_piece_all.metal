@@ -11,4 +11,6 @@ struct float1
 
 #define mul( x, y ) ((x) * (y))
 #define INLINE inline
+
+#define outVs_Position outVs.gl_Position
 @end

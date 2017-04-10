@@ -930,10 +930,12 @@ void SceneManager::_setForwardPlusEnabledInPass( bool bEnable )
 }
 //-----------------------------------------------------------------------
 void SceneManager::_setPrePassMode( PrePassMode mode, const TextureVec *prepassTextures,
+                                    const TextureVec *prepassDepthTexture,
                                     const TextureVec *ssrTexture )
 {
     mPrePassMode = mode;
     mPrePassTextures = prepassTextures;
+    mPrePassDepthTexture = prepassDepthTexture;
     mSsrTexture = ssrTexture;
 }
 //-----------------------------------------------------------------------

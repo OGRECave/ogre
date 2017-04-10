@@ -528,7 +528,7 @@ namespace Ogre {
         /**
          * Set current render target to target, enabling its GL context if needed
          */
-        void _setRenderTarget(RenderTarget *target, bool colourWrite);
+        void _setRenderTarget( RenderTarget *target, uint8 viewportRenderTargetFlags );
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op) const;

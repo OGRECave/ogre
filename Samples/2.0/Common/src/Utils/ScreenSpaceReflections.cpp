@@ -147,37 +147,30 @@ namespace Demo
         pass->getFragmentProgramParameters()->copyConstantsFrom( *oldParams );
 
         Ogre::CompositorNodeDef *nodeDef = 0;
+        nodeDef = compositorManager->getNodeDefinitionNonConst("ScreenSpaceReflectionsPostprocessNode");
+        Ogre::TextureDefinitionBase::TextureDefinitionVec &textureDefs =
+                nodeDef->getLocalTextureDefinitionsNonConst();
 
-        Ogre::IdString nodeNames[2] = { "ScreenSpaceReflectionsRenderingNode",
-                                        "ScreenSpaceReflectionsRenderingNodeMSAA" };
+        Ogre::TextureDefinitionBase::TextureDefinitionVec::iterator itor = textureDefs.begin();
+        Ogre::TextureDefinitionBase::TextureDefinitionVec::iterator end  = textureDefs.end();
 
-        for( int i=0; i<2; ++i )
+        while( itor != end )
         {
-            nodeDef = compositorManager->getNodeDefinitionNonConst( nodeNames[i] );
-            Ogre::TextureDefinitionBase::TextureDefinitionVec &textureDefs =
-                    nodeDef->getLocalTextureDefinitionsNonConst();
-
-            Ogre::TextureDefinitionBase::TextureDefinitionVec::iterator itor = textureDefs.begin();
-            Ogre::TextureDefinitionBase::TextureDefinitionVec::iterator end  = textureDefs.end();
-
-            while( itor != end )
+            if( itor->getName() == "rayTracingBuffer" )
             {
-                if( itor->getName() == "rayTracingBuffer" )
+                if( useHq )
                 {
-                    if( useHq )
-                    {
-                        itor->widthFactor   = 1.0f;
-                        itor->heightFactor  = 1.0f;
-                    }
-                    else
-                    {
-                        itor->widthFactor   = 0.5f;
-                        itor->heightFactor  = 0.5f;
-                    }
-                    break;
+                    itor->widthFactor   = 1.0f;
+                    itor->heightFactor  = 1.0f;
                 }
-                ++itor;
+                else
+                {
+                    itor->widthFactor   = 0.5f;
+                    itor->heightFactor  = 0.5f;
+                }
+                break;
             }
+            ++itor;
         }
     }
     //-----------------------------------------------------------------------------------

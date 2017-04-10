@@ -42,16 +42,12 @@ namespace Demo
 
             ScreenSpaceReflections::setupSSR( useMsaa, true, compositorManager );
 
+            Ogre::String compositorName = "ScreenSpaceReflectionsWorkspace";
             if( useMsaa )
-            {
-                return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-                                                        "ScreenSpaceReflectionsWorkspaceMSAA", true );
-            }
-            else
-            {
-                return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-                                                        "ScreenSpaceReflectionsWorkspace", true );
-            }
+                compositorName = "ScreenSpaceReflectionsWorkspaceMsaa";
+
+            return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
+                                                    compositorName, true );
         }
 
         virtual void setupResources(void)

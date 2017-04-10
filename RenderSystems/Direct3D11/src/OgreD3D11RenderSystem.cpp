@@ -2149,7 +2149,7 @@ bail:
         mStencilRef = refValue;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setRenderTarget( RenderTarget *target, bool colourWrite )
+    void D3D11RenderSystem::_setRenderTarget( RenderTarget *target, uint8 viewportRenderTargetFlags )
     {
         mActiveViewport = 0;
         mActiveRenderTarget = target;
@@ -2179,12 +2179,12 @@ bail:
                     "D3D11RenderSystem::_setRenderTarget");
             }
 
-            _setRenderTargetViews( colourWrite );
+            _setRenderTargetViews( viewportRenderTargetFlags );
         }
     }
 
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setRenderTargetViews( bool colourWrite )
+    void D3D11RenderSystem::_setRenderTargetViews( uint8 viewportRenderTargetFlags )
     {
         RenderTarget *target = mActiveRenderTarget;
 
@@ -2206,10 +2206,11 @@ bail:
             //Retrieve depth buffer again (it may have changed)
             depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
 
-            if( !colourWrite )
+            if( !(viewportRenderTargetFlags & VP_RTT_COLOUR_WRITE) )
                 mNumberOfViews = 0;
 
-            mDepthStencilView = depthBuffer ? depthBuffer->getDepthStencilView() : 0;
+            mDepthStencilView = depthBuffer ?
+                        depthBuffer->getDepthStencilView( viewportRenderTargetFlags ) : 0;
 
             if( mMaxModifiedUavPlusOne )
             {
@@ -2249,7 +2250,7 @@ bail:
         if (!vp)
         {
             mActiveViewport = NULL;
-            _setRenderTarget(NULL, true);
+            _setRenderTarget(NULL, VP_RTT_COLOUR_WRITE);
         }
         else if( vp != mActiveViewport || vp->_isUpdated() )
         {
@@ -2260,7 +2261,7 @@ bail:
             RenderTarget* target;
             target = vp->getTarget();
 
-            _setRenderTarget(target, vp->getColourWrite());
+            _setRenderTarget(target, vp->getViewportRenderTargetFlags());
 
             mActiveViewport = vp;
 
@@ -2323,7 +2324,7 @@ bail:
                 assert( dynamic_cast<D3D11RenderWindowBase*>(vp->getTarget()) );
 
                 if( static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer() )
-                    _setRenderTargetViews( vp->getColourWrite() );
+                    _setRenderTargetViews( vp->getViewportRenderTargetFlags() );
             }
             else if( mUavsDirty )
             {
@@ -2517,10 +2518,10 @@ bail:
     {
         mUavsDirty = false;
 
-        bool colourWrite = true;
+        uint8 flags = VP_RTT_COLOUR_WRITE;
         if( mActiveViewport )
-            colourWrite = mActiveViewport->getColourWrite();
-        _setRenderTargetViews( colourWrite );
+            flags = mActiveViewport->getViewportRenderTargetFlags();
+        _setRenderTargetViews( flags );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_bindTextureUavCS( uint32 slot, Texture *texture,
@@ -3724,7 +3725,7 @@ bail:
                 mDevice.GetImmediateContext()->OMSetRenderTargets(
                     numberOfViews,
                     pRTView,
-                    depthBuffer->getDepthStencilView());
+                    depthBuffer->getDepthStencilView(0));
 
                 if (mDevice.isError())
                 {
@@ -3734,7 +3735,7 @@ bail:
                         "D3D11RenderSystem::_renderUsingReadBackAsTexture");
                 }
                 
-                mDevice.GetImmediateContext()->ClearDepthStencilView(depthBuffer->getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+                mDevice.GetImmediateContext()->ClearDepthStencilView(depthBuffer->getDepthStencilView(0), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
                 float ClearColor[4];
                 //D3D11Mappings::get(colour, ClearColor);
@@ -4122,7 +4123,7 @@ bail:
                 if( depthBuffer )
                 {
                     mDevice.GetImmediateContext()->ClearDepthStencilView(
-                                                        depthBuffer->getDepthStencilView(),
+                                                        depthBuffer->getDepthStencilView(0),
                                                         ClearFlags, depth, static_cast<UINT8>(stencil) );
                 }
             }

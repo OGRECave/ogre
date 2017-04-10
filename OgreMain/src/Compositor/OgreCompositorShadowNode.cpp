@@ -872,6 +872,11 @@ namespace Ogre
                 mShadowMapCameras[shadowMapIdx].camera->getViewMatrix( true );
     }
     //-----------------------------------------------------------------------------------
+    const Matrix4& CompositorShadowNode::getViewMatrix( size_t shadowMapIdx ) const
+    {
+        return mShadowMapCameras[shadowMapIdx].camera->getViewMatrix( true );
+    }
+    //-----------------------------------------------------------------------------------
     const vector<Real>::type* CompositorShadowNode::getPssmSplits( size_t shadowMapIdx ) const
     {
         vector<Real>::type const *retVal = 0;

@@ -67,6 +67,12 @@ namespace Ogre
             /// Use RSC_TEXTURE_GATHER to check whether it will be slow or not.
             PCF_4x4,
 
+            /// High quality. Produces soft shadows. It's much more expensive but given
+            /// its blurry results, you can reduce resolution and/or use less PSSM splits
+            /// which gives you very competing performance with great results.
+            /// ESM stands for Exponential Shadow Maps.
+            ExponentialShadowMaps,
+
             NumShadowFilter
         };
 
@@ -105,6 +111,7 @@ namespace Ogre
         ConstBufferPackedVec    mPassBuffers;
         HlmsSamplerblock const  *mShadowmapSamplerblock;    /// GL3+ only when not using depth textures
         HlmsSamplerblock const  *mShadowmapCmpSamplerblock; /// For depth textures & D3D11
+        HlmsSamplerblock const  *mShadowmapEsmSamplerblock; /// For ESM.
         HlmsSamplerblock const  *mCurrentShadowmapSamplerblock;
         TexturePtr              mTargetEnvMap;
         ParallaxCorrectedCubemap    *mParallaxCorrectedCubemap;
@@ -117,6 +124,7 @@ namespace Ogre
         uint32                  mTexUnitSlotStart;
 
         TextureVec const        *mPrePassTextures;
+        TexturePtr              mPrePassMsaaDepthTexture;
         TextureVec const        *mSsrTexture;
         IrradianceVolume       *mIrradianceVolume;
 
@@ -126,7 +134,8 @@ namespace Ogre
 
         bool mDebugPssmSplits;
 
-        ShadowFilter mShadowFilter;
+        ShadowFilter    mShadowFilter;
+        uint16          mEsmK; /// K parameter for ESM.
         AmbientLightMode mAmbientLightMode;
 
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
@@ -180,6 +189,7 @@ namespace Ogre
                                          bool casterPass, uint32 lastCacheHash,
                                          CommandBuffer *commandBuffer );
 
+        virtual void postCommandBufferExecution( CommandBuffer *commandBuffer );
         virtual void frameEnded(void);
 
         void setDebugPssmSplits( bool bDebug );
@@ -187,6 +197,24 @@ namespace Ogre
 
         void setShadowSettings( ShadowFilter filter );
         ShadowFilter getShadowFilter(void) const            { return mShadowFilter; }
+
+        /** Sets the 'K' parameter of ESM filter. Defaults to 600.
+            Small values will give weak shadows, and light bleeding (specially if the
+            caster is close to the receiver; particularly noticeable at contact points).
+            It also gives the chance of over darkening to appear (the shadow of a small
+            caster in front of a large caster looks darker; thus the large caster appers
+            like if it were made of glass instead of being solid).
+
+            Large values give strong, dark shadows; but the higher the value, the more
+            you push floating point limits.
+            This value is related to K in MiscUtils::setGaussianLogFilterParams. You don't
+            have to set them to the same value; but you'll notice that if you change this
+            value here, you'll likely have to change the log filter's too.
+        @param K
+            In range (0; infinite).
+        */
+        void setEsmK( uint16 K );
+        uint16 getEsmK(void) const                          { return mEsmK; }
 
         void setAmbientLightMode( AmbientLightMode mode );
         AmbientLightMode getAmbientLightMode(void) const    { return mAmbientLightMode; }
@@ -289,6 +317,7 @@ namespace Ogre
         static const IdString Pcf3x3;
         static const IdString Pcf4x4;
         static const IdString PcfIterations;
+        static const IdString ExponentialShadowMaps;
 
         static const IdString AmbientHemisphere;
         static const IdString EnvMapScale;

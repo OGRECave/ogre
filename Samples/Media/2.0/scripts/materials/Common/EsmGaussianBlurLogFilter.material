@@ -1,0 +1,104 @@
+fragment_program ESM/GaussianLogFilterH_ps_GLSL glsl
+{
+	source GaussianBlurLogFilter_ps.glsl
+	preprocessor_defines NUM_WEIGHTS=9,K=80,K=80,HORIZONTAL_STEP=1,VERTICAL_STEP=0
+	default_params
+	{
+		param_named tex int 0
+	}
+}
+
+fragment_program ESM/GaussianLogFilterV_ps_GLSL glsl : ESM/GaussianLogFilterH_ps_GLSL
+{
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=0,VERTICAL_STEP=1
+}
+
+fragment_program ESM/GaussianLogFilterH_ps_HLSL hlsl
+{
+	source GaussianBlurLogFilter_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=1,VERTICAL_STEP=0
+}
+
+fragment_program ESM/GaussianLogFilterV_ps_HLSL hlsl : ESM/GaussianLogFilterH_ps_HLSL
+{
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=0,VERTICAL_STEP=1
+}
+
+fragment_program ESM/GaussianLogFilterH_ps_Metal metal
+{
+	source GaussianBlurLogFilter_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=1,VERTICAL_STEP=0
+}
+
+fragment_program ESM/GaussianLogFilterV_ps_Metal metal : ESM/GaussianLogFilterH_ps_Metal
+{
+	preprocessor_defines NUM_WEIGHTS=9,K=80,HORIZONTAL_STEP=0,VERTICAL_STEP=1
+}
+
+fragment_program ESM/GaussianLogFilterH_ps unified
+{
+	delegate ESM/GaussianLogFilterH_ps_GLSL
+	delegate ESM/GaussianLogFilterH_ps_HLSL
+	delegate ESM/GaussianLogFilterH_ps_Metal
+
+	default_params
+	{
+		param_named weights float9 0.013960189 0.022308320 0.033488754 0.047226712 0.062565230 0.077863686 0.091031872 0.099978946 0.10315263
+	}
+}
+
+fragment_program ESM/GaussianLogFilterV_ps unified
+{
+	delegate ESM/GaussianLogFilterV_ps_GLSL
+	delegate ESM/GaussianLogFilterV_ps_HLSL
+	delegate ESM/GaussianLogFilterV_ps_Metal
+
+	default_params
+	{
+		param_named weights float9 0.013960189 0.022308320 0.033488754 0.047226712 0.062565230 0.077863686 0.091031872 0.099978946 0.10315263
+	}
+}
+
+material ESM/GaussianLogFilterH
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref ESM/GaussianLogFilterH_ps
+			{
+			}
+
+			texture_unit tex
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+		}
+	}
+}
+
+material ESM/GaussianLogFilterV : ESM/GaussianLogFilterH
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref ESM/GaussianLogFilterV_ps
+			{
+			}
+		}
+	}
+}

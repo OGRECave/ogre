@@ -4,11 +4,30 @@ compositor_node SmaaNode
 	in 0 rt_input
 	in 1 rt_output
 
-	texture edgesTex target_width target_height PF_RG8
-	texture blendTex target_width target_height PF_R8G8B8A8
+	texture edgesTex target_width target_height PF_RG8		depth_pool 8 depth_format PF_D24_UNORM_S8_UINT
+	texture blendTex target_width target_height PF_R8G8B8A8	depth_pool 8 depth_format PF_D24_UNORM_S8_UINT
 
 	target edgesTex
 	{
+		pass clear {}
+		pass stencil
+		{
+			check true
+
+			mask		0xff
+			read_mask	0xff
+
+			ref_value	1
+
+			both
+			{
+				pass_op			replace
+				depth_fail_op	keep
+				fail_op			keep
+
+				comp_func		always_pass
+			}
+		}
 		pass render_quad
 		{
 			material SMAA/EdgeDetection
@@ -18,15 +37,43 @@ compositor_node SmaaNode
 
 	target blendTex
 	{
+		pass stencil
+		{
+			check true
+
+			mask		0xff
+			read_mask	0xff
+
+			ref_value	1
+
+			both
+			{
+				pass_op			keep
+				depth_fail_op	keep
+				fail_op			keep
+
+				comp_func		equal
+			}
+		}
+		pass clear
+		{
+			discard_only yes
+			buffers colour
+		}
 		pass render_quad
 		{
 			material SMAA/BlendingWeightCalculation
 			input 0 edgesTex
 		}
+		pass stencil
+		{
+			check false
+		}
 	}
 
 	target rt_output
 	{
+		pass clear { discard_only yes }
 		pass render_quad
 		{
 			material SMAA/NeighborhoodBlending

@@ -151,8 +151,8 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, ivec2 i2Center, ive
 	@end
 
 	/*
-	@foreach( 4, iPixel )
-		imageStore( outputImage, ivec2( i2Center +  @iPixel * i2Inc ), vec4( outColour[ @iPixel ], 1.0 ) );@end
+	foreach( 4, iPixel )
+		imageStore( outputImage, ivec2( i2Center +  iPixel * i2Inc ), vec4( outColour[ iPixel ], 1.0 ) );end
 	*/
 	@insertpiece( image_store )
 }

@@ -159,8 +159,8 @@ inline void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Cente
 	@end
 
 	/*
-	@foreach( 4, iPixel )
-		outputImage.write( i2Center +  @iPixel * i2Inc, float4( outColour[ @iPixel ], 1.0 ) );@end
+	foreach( 4, iPixel )
+		outputImage.write( i2Center +  iPixel * i2Inc, float4( outColour[ iPixel ], 1.0 ) );end
 	*/
 	@insertpiece( image_store )
 }

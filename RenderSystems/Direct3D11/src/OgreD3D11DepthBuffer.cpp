@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11DepthTexture.h"
 #include "OgreD3D11Texture.h"
 #include "OgreD3D11Mappings.h"
+#include "OgreViewport.h"
 
 namespace Ogre
 {
@@ -42,13 +43,15 @@ namespace Ogre
                                         bool isDepthTexture, bool isManual ) :
                 DepthBuffer( poolId, 0, width, height, fsaa, "", pixelFormat,
                              isDepthTexture, isManual, renderSystem ),
-                mDepthStencilView( depthBufferView ),
                 mDepthTextureView( depthTextureView ),
                 mMultiSampleQuality( multiSampleQuality ),
                 mDepthStencilResource( depthStencilResource )
     {
+        mDepthStencilView[0] = depthBufferView;
+        mDepthStencilView[1] = 0;
+
         D3D11_DEPTH_STENCIL_VIEW_DESC pDesc;
-        mDepthStencilView->GetDesc( &pDesc );
+        mDepthStencilView[0]->GetDesc( &pDesc );
         // Unknown PixelFormat at the moment
         PixelFormat format = D3D11Mappings::_getPF(pDesc.Format);
 		mBitDepth = PixelUtil::getNumElemBytes(format) * 8;
@@ -58,14 +61,18 @@ namespace Ogre
     {
         if( !mManual )
         {
-            mDepthStencilView->Release();
+            mDepthStencilView[0]->Release();
 
             if( mDepthTextureView )
                 mDepthTextureView->Release();
 
             mDepthStencilResource->Release();
         }
-        mDepthStencilView       = 0;
+
+        if( mDepthStencilView[1] )
+            mDepthStencilView[1]->Release();
+        mDepthStencilView[0]    = 0;
+        mDepthStencilView[1]    = 0;
         mDepthTextureView       = 0;
         mDepthStencilResource   = 0;
     }
@@ -129,9 +136,48 @@ namespace Ogre
         return retVal;
     }
     //---------------------------------------------------------------------
-    ID3D11DepthStencilView* D3D11DepthBuffer::getDepthStencilView() const
+    void D3D11DepthBuffer::createReadOnlySRV(void)
     {
-        return mDepthStencilView;
+        if( mDepthStencilView[1] )
+        {
+            mDepthStencilView[1]->Release();
+            mDepthStencilView[1] = 0;
+        }
+
+        D3D11_DEPTH_STENCIL_VIEW_DESC pDesc;
+        mDepthStencilView[0]->GetDesc( &pDesc );
+        pDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH;
+
+        if( pDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT ||
+            pDesc.Format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT )
+        {
+            pDesc.Flags |= D3D11_DSV_READ_ONLY_STENCIL;
+        }
+
+        D3D11RenderSystem *renderSystem = static_cast<D3D11RenderSystem*>( mRenderSystem );
+        D3D11Device &device = renderSystem->_getDevice();
+
+        HRESULT hr;
+        hr = device->CreateDepthStencilView( mDepthStencilResource, &pDesc, &mDepthStencilView[1] );
+        if( FAILED(hr) )
+        {
+            String errorDescription = device.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Unable to create depth stencil view\nError Description:" + errorDescription,
+                "D3D11DepthBuffer::createReadOnlySRV");
+        }
+    }
+    //---------------------------------------------------------------------
+    ID3D11DepthStencilView* D3D11DepthBuffer::getDepthStencilView( uint8 viewportRenderTargetFlags )
+    {
+        if( viewportRenderTargetFlags & (VP_RTT_READ_ONLY_DEPTH|VP_RTT_READ_ONLY_STENCIL) )
+        {
+            if( !mDepthStencilView[1] )
+                createReadOnlySRV();
+            return mDepthStencilView[1];
+        }
+
+        return mDepthStencilView[0];
     }
     //---------------------------------------------------------------------
     ID3D11ShaderResourceView* D3D11DepthBuffer::getDepthTextureView() const
@@ -144,6 +190,8 @@ namespace Ogre
         mHeight = height;
         mWidth = width;
 
-        mDepthStencilView = depthBufferView;
+        mDepthStencilView[0] = depthBufferView;
+        if( mDepthStencilView[1] )
+            createReadOnlySRV();
     }
 }

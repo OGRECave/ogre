@@ -558,6 +558,22 @@ namespace Demo
                                                 workspaceName, true );
     }
     //-----------------------------------------------------------------------------------
+    void GraphicsSystem::stopCompositor(void)
+    {
+        if( mWorkspace )
+        {
+            Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+            compositorManager->removeWorkspace( mWorkspace );
+            mWorkspace = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void GraphicsSystem::restartCompositor(void)
+    {
+        stopCompositor();
+        mWorkspace = setupCompositor();
+    }
+    //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     struct GameEntityCmp
     {

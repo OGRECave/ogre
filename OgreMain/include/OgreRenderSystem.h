@@ -1268,11 +1268,12 @@ namespace Ogre
 
         /**
          * Set current render target to target, enabling its device context if needed
-        @param colourWrite
-            False to disable colour writes. @see CompositorPassDef::mColourWrite
+        @param viewportRenderTargetFlags
+            See ViewportRenderTargetFlags
+            See CompositorPassDef::mColourWrite
             The RenderTarget is needed to know the depth/stencil information.
          */
-        virtual void _setRenderTarget(RenderTarget *target, bool colourWrite) = 0;
+        virtual void _setRenderTarget( RenderTarget *target, uint8 viewportRenderTargetFlags ) = 0;
 
         /** This function was created because of Metal. The Metal API doesn't have a
             'device->clear( texture )' function. Instead we must specify we want to

@@ -1,0 +1,101 @@
+{
+	"samplers" :
+	{
+		"PointClamp" :
+		{
+			"min" : "point",
+			"mag" : "point",
+			"mip" : "point",
+			"u" : "clamp",
+			"v" : "clamp",
+			"w" : "clamp",
+			"miplodbias" : 0,
+			"max_anisotropic" : 1,
+			"compare_function" : "disabled",
+			"border" : [1, 1, 1, 1],
+			"min_lod" : -3.40282347E+38,
+			"max_lod" : 3.40282347E+38
+		}
+	},
+
+	"compute" :
+	{
+		"ESM/GaussianLogFilterH" :
+		{
+			"threads_per_group" : [32, 2, 1],
+			"thread_groups" : [8, 512, 1],
+
+			"source" : "GaussianBlurLogFilterBase_cs",
+			"pieces" : ["EsmGaussianBlurLogFilter_cs"],
+			"inform_shader_of_texture_data_change" : true,
+
+			"uav_units" : 1,
+			
+			"textures" :
+			[
+				{
+					"sampler" : "PointClamp"
+				}
+			],
+			
+			"params" :
+			[
+				["g_f4OutputSize",	"packed_texture_size", 0],
+				["c_weights[0]",	[0.013960189, 0.022308320, 0.033488754, 0.047226712,
+									 0.062565230, 0.077863686, 0.091031872, 0.099978946, 0.10315263]]
+			],
+			
+			"params_glsl" :
+			[
+				["inputImage",		[0], "int"],
+				["outputImage",		[0], "int"]
+			],
+
+			"properties" :
+			{
+				"horizontal_pass" : 1,
+				"kernel_radius" : 8,
+				"K" : 80
+			}
+		},
+
+		"ESM/GaussianLogFilterV" :
+		{
+			"threads_per_group" : [32, 2, 1],
+			"thread_groups" : [512, 8, 1],
+
+			"source" : "GaussianBlurLogFilterBase_cs",
+			"pieces" : ["EsmGaussianBlurLogFilter_cs"],
+			"inform_shader_of_texture_data_change" : true,
+
+			"uav_units" : 1,
+			
+			"textures" :
+			[
+				{
+					"sampler" : "PointClamp"
+				}
+			],
+			
+			"params" :
+			[
+				["g_f4OutputSize",	"packed_texture_size", 0],
+				["c_weights[0]",	[0.013960189, 0.022308320, 0.033488754, 0.047226712,
+									 0.062565230, 0.077863686, 0.091031872, 0.099978946, 0.10315263]]
+			],
+			
+			"params_glsl" :
+			[
+				["inputImage",		[0], "int"],
+				["outputImage",		[0], "int"]
+			],
+
+			"properties" :
+			{
+				"horizontal_pass" : 0,
+				"kernel_radius" : 8,
+				"K" : 80
+			}
+		}
+	}
+}

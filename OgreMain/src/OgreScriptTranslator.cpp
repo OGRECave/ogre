@@ -8632,28 +8632,30 @@ namespace Ogre{
                     {
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                     }
-                    else if(prop->values.size() > 2)
+                    else if(prop->values.size() != 2 && prop->values.size() != 3)
                     {
                         compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "use_prepass only supports 2 argument: the GBuffer's' "
-                                           "texture name & the SSR texture name");
+                                           "use_prepass only supports 2 or 3 arguments: the GBuffer's' "
+                                           "texture name, the depth texture, & optionally the SSR texture name");
                     }
                     else
                     {
-                        IdString gbuffer, ssr;
+                        IdString gbuffer, gbufDepthTexture, ssr;
 
-                        AbstractNodeList::const_iterator it1 = prop->values.begin();
-                        AbstractNodeList::const_iterator it0 = it1++;
+                        AbstractNodeList::const_iterator it2 = prop->values.begin();
+                        AbstractNodeList::const_iterator it0 = it2++;
+                        AbstractNodeList::const_iterator it1 = it2++;
 
                         if( !getIdString( *it0, &gbuffer ) ||
-                            (it1 != prop->values.end() && !getIdString( *it1, &ssr )) )
+                            !getIdString( *it1, &gbufDepthTexture ) ||
+                            (it2 != prop->values.end() && !getIdString( *it2, &ssr )) )
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                 "use_prepass must be the name of a texture available in the local or global scope");
                         }
                         else
                         {
-                            passScene->setUseDepthPrePass( gbuffer, ssr );
+                            passScene->setUseDepthPrePass( gbuffer, gbufDepthTexture, ssr );
                         }
                     }
                     break;

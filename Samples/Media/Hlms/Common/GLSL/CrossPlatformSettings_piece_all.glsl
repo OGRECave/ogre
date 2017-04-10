@@ -22,4 +22,6 @@
 
 #define mul( x, y ) ((x) * (y))
 #define INLINE
+
+#define outVs_Position gl_Position
 @end

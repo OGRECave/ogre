@@ -129,11 +129,6 @@ Buffer<float4> worldMatBuf : register(t0);
 	outVs.gl_Position.xy	/= outVs.gl_Position.z;
 	outVs.gl_Position.z	= (L - NearPlane) / (FarPlane - NearPlane);@end
 @end
-@piece( ShadowReceive )
-@foreach( hlms_num_shadow_map_lights, n )
-	@property( !hlms_shadowmap@n_is_point_light )
-		outVs.posL@n = mul( float4(worldPos.xyz, 1.0f), passBuf.shadowRcv[@n].texViewProj );@end @end
-@end
 
 PS_INPUT main( VS_INPUT input )
 {
@@ -163,32 +158,8 @@ PS_INPUT main( VS_INPUT input )
 	@insertpiece( SkeletonTransform )
 	@insertpiece( VertexTransform )
 
-@property( !hlms_shadowcaster )
-	@insertpiece( ShadowReceive )
-@foreach( hlms_num_shadow_map_lights, n )
-	@property( !hlms_shadowmap@n_is_point_light )
-		outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;@end @end
-
-@property( hlms_pssm_splits )	outVs.depth = outVs.gl_Position.z;@end
-
-@end @property( hlms_shadowcaster )
-	float shadowConstantBias = asfloat( worldMaterialIdx[input.drawId].y );
-	
-	@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point )
-		//Linear depth
-		outVs.depth	= (outVs.gl_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
-	@end
-
-	@property( hlms_shadowcaster_point )
-		outVs.toCameraWS	= worldPos.xyz - passBuf.cameraPosWS.xyz;
-		outVs.constBias		= shadowConstantBias * passBuf.depthRange.y * passBuf.depthRange.y;
-	@end
-
-	//We can't make the depth buffer linear without Z out in the fragment shader;
-	//however we can use a cheap approximation ("pseudo linear depth")
-	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
-	outVs.gl_Position.z = (outVs.gl_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y * outVs.gl_Position.w;
-@end
+	@insertpiece( DoShadowReceiveVS )
+	@insertpiece( DoShadowCasterVS )
 
 	/// hlms_uv_count will be 0 on shadow caster passes w/out alpha test
 @foreach( hlms_uv_count, n )
@@ -196,6 +167,10 @@ PS_INPUT main( VS_INPUT input )
 
 @property( (!hlms_shadowcaster || alpha_test) && !lower_gpu_overhead )
 	outVs.drawId = input.drawId;@end
+
+	@property( hlms_use_prepass_msaa > 1 )
+		outVs.zwDepth.xy = outVs.gl_Position.zw;
+	@end
 
 	@insertpiece( custom_vs_posExecution )
 

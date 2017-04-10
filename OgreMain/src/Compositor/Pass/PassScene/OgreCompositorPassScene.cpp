@@ -53,6 +53,7 @@ namespace Ogre
                 mCullCamera( 0 ),
                 mUpdateShadowNode( false ),
                 mPrePassTextures( 0 ),
+                mPrePassDepthTexture( 0 ),
                 mSsrTexture( 0 )
     {
         CompositorWorkspace *workspace = parentNode->getWorkspace();
@@ -88,6 +89,14 @@ namespace Ogre
             const CompositorChannel *channel = parentNode->_getDefinedTexture(
                         mDefinition->mPrePassTexture );
             mPrePassTextures = &channel->textures;
+
+            if( mDefinition->mPrePassDepthTexture != IdString() )
+            {
+                const CompositorChannel *channel = parentNode->_getDefinedTexture(
+                            mDefinition->mPrePassDepthTexture );
+                mPrePassDepthTexture = &channel->textures;
+                assert( mPrePassDepthTexture->size() == 1u );
+            };
 
             if( mDefinition->mPrePassSsrTexture != IdString() )
             {
@@ -181,7 +190,8 @@ namespace Ogre
             mTarget->_beginUpdate();
         }
         sceneManager->_setForwardPlusEnabledInPass( mDefinition->mEnableForwardPlus );
-        sceneManager->_setPrePassMode( mDefinition->mPrePassMode, mPrePassTextures, mSsrTexture );
+        sceneManager->_setPrePassMode( mDefinition->mPrePassMode, mPrePassTextures,
+                                       mPrePassDepthTexture, mSsrTexture );
         sceneManager->_setCurrentCompositorPass( this );
 
         if( !mDefinition->mReuseCullData )
@@ -205,7 +215,7 @@ namespace Ogre
         //restore viewport material scheme
         mViewport->setMaterialScheme(oldViewportMatScheme);
 
-        sceneManager->_setPrePassMode( PrePassNone, 0, 0 );
+        sceneManager->_setPrePassMode( PrePassNone, 0, 0, 0 );
         sceneManager->_setCurrentCompositorPass( 0 );
 
         if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )
@@ -258,6 +268,23 @@ namespace Ogre
                 }
 
                 ++itor;
+            }
+        }
+
+        //Check <anything> -> DepthTexture (Depth Texture)
+        if( mPrePassDepthTexture )
+        {
+            const TexturePtr &texture = (*mPrePassDepthTexture)[0];
+            RenderTarget *renderTarget = texture->getBuffer()->getRenderTarget();
+
+            ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( renderTarget );
+
+            if( (currentLayout->second != ResourceLayout::Texture && explicitApi) ||
+                currentLayout->second == ResourceLayout::Uav )
+            {
+                addResourceTransition( currentLayout,
+                                       ResourceLayout::Texture,
+                                       ReadBarrier::Texture );
             }
         }
 

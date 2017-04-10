@@ -626,6 +626,8 @@ namespace Ogre
         /// @copydoc _notifyMacroblockDestroyed
         void _notifyV1InputLayoutDestroyed( uint16 id );
 
+        void _clearShaderCache(void);
+
         virtual void _changeRenderSystem( RenderSystem *newRs );
 
         RenderSystem* getRenderSystem(void) const           { return mRenderSystem; }

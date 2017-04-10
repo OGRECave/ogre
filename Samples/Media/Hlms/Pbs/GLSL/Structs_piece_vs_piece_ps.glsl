@@ -2,6 +2,9 @@
 struct ShadowReceiverData
 {
     mat4 texViewProj;
+@property( exponential_shadow_maps )
+	vec4 texViewZRow;
+@end
 	vec2 shadowDepthRange;
 	vec4 invShadowMapSize;
 };
@@ -64,6 +67,7 @@ layout(binding = 0) uniform PassBuffer
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
+	@property( exponential_shadow_maps )vec4 viewZRow;@end
 	vec2 depthRange;
 @end
 
@@ -172,6 +176,9 @@ layout(binding = 3) uniform ManualProbe
 			@property( !hlms_shadowmap@n_is_point_light )
 				vec4 posL@n;@end @end
 		@property( hlms_pssm_splits )float depth;@end
+		@property( hlms_use_prepass_msaa > 1 )
+			float2 zwDepth;
+		@end
 	@end
 	@property( hlms_shadowcaster )
 		@property( alpha_test )
@@ -179,12 +186,14 @@ layout(binding = 3) uniform ManualProbe
 			@foreach( hlms_uv_count, n )
 				vec@value( hlms_uv_count@n ) uv@n;@end
 		@end
-		@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point )
+		@property( (!hlms_shadow_uses_depth_texture || exponential_shadow_maps) && !hlms_shadowcaster_point )
 			float depth;
 		@end
 		@property( hlms_shadowcaster_point )
 			vec3 toCameraWS;
-			flat float constBias;
+			@property( !exponential_shadow_maps )
+				flat float constBias;
+			@end
 		@end
 	@end
 	@insertpiece( custom_VStoPS )
