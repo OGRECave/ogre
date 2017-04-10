@@ -266,5 +266,5 @@ workspace HdrWorkspaceMsaa
 	connect HdrMsaaResolve 0 HdrPostprocessingNode 0
 	connect HdrRenderingNode 1 HdrPostprocessingNode 1
 	connect_output HdrPostprocessingNode 2
-	connect HdrPostprocessingNode 2 HdrRenderUi 0
+	connect HdrPostprocessingNode 0 HdrRenderUi 0
 }
