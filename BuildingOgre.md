@@ -5,7 +5,7 @@ Ogre uses CMake as its build system on all supported platforms. This
 guide will explain to you how to use CMake to build Ogre from source.
 
 
-1. What is CMake?
+What is CMake?
 -------------------
 
 CMake is a cross-platform build system - or perhaps more accurately a
@@ -16,66 +16,61 @@ The build process is configurable via CMake. Ogre provides several
 options which you can use to customise your build.
 
 
-2. Getting CMake
+Getting CMake
 ------------------
 
-CMake is available from http://www.cmake.org (Resources -> Downloads).
+CMake is available from https://cmake.org/download/.
 You can get its sources, but there are precompiled binaries for all
 platforms. Furthermore, if you are on a Linux system, chances are high
 that your distributor offers a package for CMake. You need a CMake
-version >= 2.6.
+version >= 2.8.6.
 For Ubuntu, type the following in a console to install CMake:
 
     sudo apt-get install cmake-gui
 
 
-3. Getting dependencies
+Getting dependencies
 -------------------------
 
 Ogre requires the freetype library, but there are other dependencies we
 strongly recommend you to use unless you know what you are doing. You
 can get source or binary packages for each from their respective websites
-listed below. We also offer precompiled dependencies or bundled source
-packages for certain platforms, please refer to our download page:
-  http://www.ogre3d.org/download/source
-Linux distributions usually offer packages for each dependency. On Ubuntu
-Karmic, the following command will install all of the dependencies:
+listed below.
+Linux distributions usually offer packages for each dependency. On Ubuntu, the following command will install all of the dependencies:
 
-     sudo apt-get install libfreetype6-dev libboost-date-time-dev \
-       libboost-thread-dev nvidia-cg-toolkit libfreeimage-dev \
-       zlib1g-dev libzzip-dev libsdl2-dev libcppunit-dev doxygen \
-       libxt-dev libxaw7-dev libxxf86vm-dev libxrandr-dev
+     sudo apt-get install libfreetype6-dev libzzip-dev nvidia-cg-toolkit \
+          libgles2-mesa-dev libxt-dev libxaw7-dev libsdl2-dev doxygen
+   
 
 If you cannot obtain prebuilt binaries of a dependency for your platform,
 please refer to the list below and get a source package from the website,
 then build it according to its documentation.
 
 Required dependencies:
+
 * freetype: http://www.freetype.org
 
 Recommended dependencies:
-* Boost: http://www.boost.org (+)
-* Cg: http://developer.nvidia.com/object/cg_toolkit.html
-* DirectX SDK: http://msdn.microsoft.com/en-us/directx/
+
 * zlib: http://www.zlib.net
-* zziplib: http://zziplib.sourceforge.net
+* zziplib: https://github.com/paroj/ZZIPlib
+* SDL: https://www.libsdl.org/
 
 Optional dependencies:
+
+* DirectX SDK: http://msdn.microsoft.com/en-us/directx/
 * FreeImage: http://freeimage.sourceforge.net
-* CppUnit: http://cppunit.sourceforge.net
 * Doxygen: http://doxygen.org
-* SDL: https://www.libsdl.org/
+* Cg: http://developer.nvidia.com/object/cg_toolkit.html
+* Boost: http://www.boost.org (+)
 * POCO: http://pocoproject.org (+)
 * TBB: http://www.threadingbuildingblocks.org (+)
 
-(+) Boost is used to build threaded versions of Ogre. Only the
-boost-thread and boost-date-time libraries are required. For Visual C++
-you can find binary installers at http://www.boostpro.com.
-Alternatively, you can use either POCO or TBB instead of Boost to
-enable thread support in Ogre.
+(+) used to build threaded versions of Ogre. 
+You can use either C++11, POCO or TBB instead of Boost. When using Boost, only the boost-thread, boost-system and boost-date-time libraries are required.
 
 
-4. Preparing the build environment
+Preparing the build environment
 ------------------------------------
 
 You should now create a build directory for Ogre somewhere outside
@@ -96,7 +91,7 @@ put it somewhere else, but you will then need to tell CMake the location
 as described below.
 
 
-5. Running CMake
+Running CMake
 ------------------
 
 Now start the program cmake-gui by either typing the name in a console
@@ -131,7 +126,7 @@ where the dependency can be found and click Ok. Once you are done, hit
 'Configure' again.
 
 
-6. Building Ogre
+Building Ogre
 ------------------
 
 Go to your chosen build directory. CMake has generated a build system for
@@ -154,7 +149,7 @@ the header files. In Visual Studio, just select and build the target
      make OgreDoc
 
 
-7. Installing Ogre
+Installing Ogre
 --------------------
 
 Once the build is complete, you can optionally have the build system
@@ -165,14 +160,16 @@ In Visual Studio, just select and build the target 'INSTALL'. This will
 create the folder 'sdk' inside your build directory and copy all the
 required libraries there. For Makefile based generators, type:
 
-     make install  (or sudo make install, if root privileges are required)
+```sh
+make install  # (or sudo make install, if root privileges are required)
+```
 
 On Linux Ogre will by default be installed to /usr/local. You can change
-the install location by changing the variable CMAKE_INSTALL_PREFIX in
+the install location by changing the variable `CMAKE_INSTALL_PREFIX` in
 CMake.
 
 
-8. Building Ogre on Mac OS X for iOS OS
+Building Ogre on Mac OS X for iOS OS
 --------------------------------------------
 
 To build Ogre for iOS, you need to specify the ios cross toolchain to cmake as
@@ -196,11 +193,8 @@ And another thing.  You will need to manually set the Bundle Identifier property
 the Info.plist file to match the App ID of the chosen code signing identity.
 This can be done from the Target Properties panel.  It must match the bundle
 identifier of a valid developer certificate if you are building for devices.
-See the following PDF for information under Generating an App ID:
-http://developer.apple.com/library/ios/documentation/Xcode/Conceptual/iphone_development/index.html
 
-
-9. Building Ogre as Windows Store or Windows Phone application
+Building Ogre as Windows Store or Windows Phone application
 -------------------------------------------------------------------
 
 You need Windows 8.0 or later, Windows 10 is recommended.
@@ -228,11 +222,13 @@ for OGRE_DEPENDENCIES_DIR, "Configure", should be no more errors, then press
 
 Select SampleBrowser as the start up project and run.
 
-Note 1: The code and generated CMake solution should be on local NTFS drive,
+### Notes
+
+1. The code and generated CMake solution should be on local NTFS drive,
 and can't be on a network drive, including VMWare shared folders - or
 you will get a errors when you will try to compile/link/run resulting exe.
 
-Note 2: Ogre uses d3dcompiler_xx.dll to compile shaders, and WinStore and
+2. Ogre uses d3dcompiler_xx.dll to compile shaders, and WinStore and
 WinPhone 8.1 projects can use it without restriction as it is part of OS.
 But WinStore and WinPhone 8.0 applications should load already compiled
 shaders from cache, as d3dcompiler_xx.dll is available to them only during
@@ -240,7 +236,7 @@ development. Therefore to avoid necessity to deploy d3dcompiler_xx.dll
 during development (additional configurations with d3dcompiler_xx.dll)
 and generation of such cache - use version 8.1 of these platforms.
 
-Note 3: Running WinPhone emulator in OS running under VMware:
+3. Running WinPhone emulator in OS running under VMware:
 We were able to run the emulation and debug without an issue by using two
 steps: (a) Under the settings of the VM > CPU, make sure you have the
 option to pass-through the Intel VT-x/EPT feature, (b) Edit the config
@@ -249,7 +245,7 @@ All versions of Visual Studio 2012 have a window refresh issue when running
 in VMware and the window is maximized, the solution is just to change the
 size of the Visual Studio window to be less the the screen width and height.
 
-10. Building Ogre on Ubuntu for Android
+Building Ogre on Ubuntu for Android
 --------------------------------------------
 
 To build Ogre for Android, you need to specify the ios cross toolchain to cmake as
@@ -268,7 +264,7 @@ this will build the native library. Then run
 
 to generate the APK and install it on your device.
 
-11. Buinding Ogre for HTML5 (Emscripten)
+Building Ogre for HTML5 (Emscripten)
 -----------------------------------------
 Install the Emscripten SDK and make sure that the environment variables are correctly set.
 
@@ -278,7 +274,7 @@ Run cmake in cross compile mode using emscripten as following:
 cmake -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake .
 ```
 
-in cmkae GUI change `CMAKE_AR` to `emcc`. Then run `make`.
+in cmake GUI change `CMAKE_AR` to `emcc`. Then run `make`.
 
 this will not build the full SampleBrowser, but just a minimal Sample. The resulting `EmscriptenSample.html` will be placed in `${CMAKE_BINARY_DIR}/bin/`.
 
