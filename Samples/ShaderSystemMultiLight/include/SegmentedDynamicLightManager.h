@@ -76,6 +76,10 @@ public:
     virtual void postFindVisibleObjects(SceneManager* source, 
         SceneManager::IlluminationRenderStage irs, Viewport* v);
     
+    /// @copydoc Singleton::getSingleton()
+    static SegmentedDynamicLightManager& getSingleton(void);
+    /// @copydoc Singleton::getSingleton()
+    static SegmentedDynamicLightManager* getSingletonPtr(void);
 private:
         
     class LightData 

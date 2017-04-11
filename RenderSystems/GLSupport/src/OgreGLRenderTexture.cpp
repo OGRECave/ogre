@@ -37,6 +37,19 @@ namespace Ogre {
 
     template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = NULL;
 
+    GLRTTManager* GLRTTManager::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+    GLRTTManager& GLRTTManager::getSingleton(void)
+    {
+        assert( msSingleton );  return ( *msSingleton );
+    }
+
+    GLRTTManager::GLRTTManager() {}
+    // need to implement in cpp due to how Ogre::Singleton works
+    GLRTTManager::~GLRTTManager() {}
+
     MultiRenderTarget* GLRTTManager::createMultiRenderTarget(const String & name)
     {
         // TODO: Check rendersystem capabilities before throwing the exception

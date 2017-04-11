@@ -95,6 +95,8 @@ namespace Ogre
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
+    // need to implement in cpp due to how Ogre::Singleton works
+    TerrainGlobalOptions::~TerrainGlobalOptions() {}
     //---------------------------------------------------------------------
     TerrainGlobalOptions::TerrainGlobalOptions()
         : mSkirtSize(30)

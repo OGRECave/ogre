@@ -44,6 +44,23 @@ namespace Ogre
     template<> SharedData* Singleton<SharedData>::msSingleton = 0;
 }
 
+SharedData::SharedData()
+    : iLastFrameTime(0), iRoot(0), iCamera(0), iWindow(0), iSystem(0), iActivate(false),
+      iGlobalActivate(false), mMLAnimState(0), iMainLight(0)
+{
+}
+
+SharedData::~SharedData() {}
+
+SharedData* SharedData::getSingletonPtr(void)
+{
+    return msSingleton;
+}
+SharedData& SharedData::getSingleton(void)
+{
+    assert( msSingleton );  return ( *msSingleton );
+}
+
 using namespace Ogre;
 
 const Ogre::uint8 DeferredShadingSystem::PRE_GBUFFER_RENDER_QUEUE = Ogre::RENDER_QUEUE_1;
