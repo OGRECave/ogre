@@ -22,17 +22,13 @@ class SharedData : public Ogre::Singleton<SharedData> {
 
 public:
 
-    SharedData()
-        : iRoot(0),
-          iCamera(0),
-          iWindow(0),
-          mMLAnimState(0),
-          iMainLight(0)
-    {
-        iActivate = false;
-    }
+        SharedData();
+        ~SharedData();
 
-        ~SharedData() {}
+        /// @copydoc Singleton::getSingleton()
+        static SharedData& getSingleton(void);
+        /// @copydoc Singleton::getSingleton()
+        static SharedData* getSingletonPtr(void);
 
         // shared data across the application
         Ogre::Real iLastFrameTime;

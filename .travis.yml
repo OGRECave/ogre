@@ -21,7 +21,7 @@ before_script:
     # we start compilation afterwards anyway, so no need to sleep
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
     - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 ; fi
-osx_image: xcode8.2
+osx_image: xcode8.3
 env:
     - TEST=TRUE
     - GL3ES=TRUE # build GL3Plus and GLES2 Rendersystems

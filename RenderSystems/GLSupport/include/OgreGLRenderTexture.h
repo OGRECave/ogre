@@ -66,7 +66,8 @@ namespace Ogre {
     class _OgreGLExport GLRTTManager : public Singleton<GLRTTManager>
     {
     public:
-        virtual ~GLRTTManager() {}
+        GLRTTManager();
+        virtual ~GLRTTManager();
 
         /** Create a texture rendertarget object
          */
@@ -108,6 +109,11 @@ namespace Ogre {
         /** Get the closest supported alternative format. If format is supported, returns format.
          */
         PixelFormat getSupportedAlternative(PixelFormat format);
+
+        /// @copydoc Singleton::getSingleton()
+        static GLRTTManager& getSingleton(void);
+        /// @copydoc Singleton::getSingleton()
+        static GLRTTManager* getSingletonPtr(void);
     protected:
         /** Frame Buffer Object properties for a certain texture format.
          */

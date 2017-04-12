@@ -11,11 +11,21 @@
 
 #define SDL_LIGHT_DATA_SIZE 3 // 12 floats divided by 4 slots (rgba) 
 
-using namespace Ogre;
 namespace Ogre
 {
     template<> SegmentedDynamicLightManager* Singleton<SegmentedDynamicLightManager>::msSingleton = 0;
 }
+
+SegmentedDynamicLightManager* SegmentedDynamicLightManager::getSingletonPtr(void)
+{
+    return msSingleton;
+}
+SegmentedDynamicLightManager& SegmentedDynamicLightManager::getSingleton(void)
+{
+    assert( msSingleton );  return ( *msSingleton );
+}
+
+using namespace Ogre;
 
 const String c_SDLTextureName = "Simigon/SDLTexture";
 
