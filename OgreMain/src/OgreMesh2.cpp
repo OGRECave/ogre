@@ -75,12 +75,13 @@ namespace Ogre {
         unload();
     }
     //-----------------------------------------------------------------------
-    SubMesh* Mesh::createSubMesh()
+    SubMesh* Mesh::createSubMesh( short index )
     {
         SubMesh* sub = OGRE_NEW SubMesh();
         sub->mParent = this;
 
-        mSubMeshes.push_back( sub );
+        SubMeshVec::iterator pos = (index == -1 ? mSubMeshes.end() : std::next( mSubMeshes.begin(), index ));
+        mSubMeshes.insert( pos, sub );
 
         if( isLoaded() )
             _dirtyState();

@@ -165,8 +165,12 @@ namespace Ogre {
             Method for manually creating geometry for the mesh.
             Note - use with extreme caution - you must be sure that
             you have set up the geometry properly.
+        @param index
+            Optional param that will insert the submesh at the specified index.
+            This should be less than getNumSubMeshes(). the default value of -1
+            indicates the new submesh will simply be appended to the submesh list.
         */
-        SubMesh* createSubMesh(void);
+        SubMesh* createSubMesh( short index = -1 );
 
         /** Gets the number of sub meshes which comprise this mesh.
         */
