@@ -36,7 +36,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     /** To store the generated dual cells in a vector.
     */
     typedef struct _OgreVolumeExport DualCell
@@ -345,6 +350,8 @@ namespace Volume {
             return mDualCells[i];
         }
     };
+    /** @} */
+    /** @} */
 }
 }
 

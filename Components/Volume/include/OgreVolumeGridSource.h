@@ -35,7 +35,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     class CSGOperationSource;
 
     /** A volume source from a discrete 3d grid.
@@ -193,7 +198,8 @@ namespace Volume {
         Real getVolumeSpaceToWorldSpaceFactor(void) const;
 
     };
-
+    /** @} */
+    /** @} */
 }
 }
 

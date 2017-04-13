@@ -34,7 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     /** Simplex Noise ported from public domain Java Implementation
      http://webstaff.itn.liu.se/~stegu/simplexnoise/SimplexNoise.java
      Thanks Stefan Gustavson!
@@ -116,7 +121,8 @@ namespace Volume {
         long getSeed(void) const;
 
     };
-
+    /** @} */
+    /** @} */
 }
 }
 

@@ -37,7 +37,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     class Source;
     class MeshBuilderCallback;
     class ChunkHandler;
@@ -448,6 +453,8 @@ namespace Volume {
         ChunkParameters* getChunkParameters(void);
 
     };
+    /** @} */
+    /** @} */
 }
 }
 

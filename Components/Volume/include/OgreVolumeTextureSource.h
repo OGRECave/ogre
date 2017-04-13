@@ -33,7 +33,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     /** A volume source from a 3D texture.
     */
     class _OgreVolumeExport TextureSource : public GridSource
@@ -79,7 +84,8 @@ namespace Volume {
         ~TextureSource(void);
 
     };
-
+    /** @} */
+    /** @} */
 }
 }
 

@@ -36,7 +36,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     /** Lightweight struct to represent a mesh vertex.
     */
     typedef struct _OgreVolumeExport Vertex
@@ -336,6 +341,8 @@ namespace Volume {
         void executeCallback(MeshBuilderCallback *callback, const SimpleRenderable *simpleRenderable, size_t level, int inProcess) const;
 
     };
+    /** @} */
+    /** @} */
 }
 }
 

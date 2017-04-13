@@ -35,7 +35,12 @@ THE SOFTWARE.
 namespace Ogre {
 
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     class OctreeNodeSplitPolicy;
     class Source;
 
@@ -532,6 +537,8 @@ namespace Volume {
             return Math::Abs(mCenterValue.w) < (mFrom - mTo).length() * NEAR_FACTOR;
         }
     };
+    /** @} */
+    /** @} */
 }
 }
 

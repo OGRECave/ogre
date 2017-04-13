@@ -34,7 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     class OctreeNode;
     class Source;
 
@@ -112,7 +117,8 @@ namespace Volume {
         */
         virtual bool doSplit(OctreeNode *node, const Real geometricError) const;
     };
-
+    /** @} */
+    /** @} */
 }
 }
 

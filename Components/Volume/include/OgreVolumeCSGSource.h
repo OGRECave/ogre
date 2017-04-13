@@ -36,7 +36,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     /** A sphere.
     */
     class _OgreVolumeExport CSGSphereSource : public Source
@@ -466,7 +471,8 @@ namespace Volume {
         */
         long getSeed(void) const;
     };
-
+    /** @} */
+    /** @} */
 }
 }
 
