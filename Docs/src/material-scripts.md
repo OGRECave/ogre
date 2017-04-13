@@ -56,7 +56,7 @@ material walls/funkywall1
 
 Every material in the script must be given a name, which is the line ’material &lt;blah&gt;’ before the first opening ’{’. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string. If you include spaces in the name, it must be enclosed in double quotes.
 
-**NOTE: ’:’ is the delimiter for specifying material copy in the script so it can’t be used as part of the material name.** 
+@note ’:’ is the delimiter for specifying material copy in the script so it can’t be used as part of the material name.
 
 A material can inherit from a previously defined material by using a *colon* **:** after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just *parts* of a material from others; all this is covered in See [Script Inheritance](#Script-Inheritance)). You can also use variables in your script which can be replaced in inheriting versions, see See [Script Variables](#Script-Variables).
 
@@ -894,7 +894,7 @@ material Fur
 }
 ```
 
-Note: use gpu program auto parameters [pass\_number](#pass_005fnumber) and [pass\_iteration\_number](#pass_005fiteration_005fnumber) to tell the vertex, geometry or fragment program the pass number and iteration number.
+@note use gpu program auto parameters [pass\_number](#pass_005fnumber) and [pass\_iteration\_number](#pass_005fiteration_005fnumber) to tell the vertex, geometry or fragment program the pass number and iteration number.
 
 <a name="point_005fsize"></a><a name="point_005fsize-1"></a>
 
@@ -902,7 +902,7 @@ Note: use gpu program auto parameters [pass\_number](#pass_005fnumber) and [pass
 
 This setting allows you to change the size of points when rendering a point list, or a list of point sprites. The interpretation of this command depends on the [point\_size\_attenuation](#point_005fsize_005fattenuation) option - if it is off (the default), the point size is in screen pixels, if it is on, it expressed as normalised screen coordinates (1.0 is the height of the screen) when the point is at the origin. 
 
-NOTE: Some drivers have an upper limit on the size of points they support - this can even vary between APIs on the same card! Don’t rely on point sizes that cause the points to get very large on screen, since they may get clamped on some cards. Upper sizes can range from 64 to 256 pixels.
+@note Some drivers have an upper limit on the size of points they support - this can even vary between APIs on the same card! Don’t rely on point sizes that cause the points to get very large on screen, since they may get clamped on some cards. Upper sizes can range from 64 to 256 pixels.
 
 Format: point\_size &lt;size&gt; Default: point\_size 1.0
 
@@ -1296,7 +1296,7 @@ Format: content\_type &lt;named|shadow|compositor&gt; \[&lt;Referenced Composito
 
 Sets which texture coordinate set is to be used for this texture layer. A mesh can define multiple sets of texture coordinates, this sets which one this material uses.
 
-**Note:** Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
+@note Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
 
 Format: tex\_coord\_set &lt;set\_num&gt;
 
@@ -1409,7 +1409,7 @@ Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 
 ## colour\_op
 
-Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer). **Note:** Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
+Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer). @note Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
 
 Format: colour\_op &lt;replace|add|modulate|alpha\_blend&gt;
 
@@ -1440,7 +1440,7 @@ Default: colour\_op modulate
 
 ## colour\_op\_ex
 
-This is an extended version of the [colour\_op](#colour_005fop) attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blending, but you are limited to the number of texture units which are available in hardware. **Note:** Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
+This is an extended version of the [colour\_op](#colour_005fop) attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blending, but you are limited to the number of texture units which are available in hardware. @note Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
 
 Format: colour\_op\_ex &lt;operation&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manual\_factor&gt;\] \[&lt;manual\_colour1&gt;\] \[&lt;manual\_colour2&gt;\]
 
@@ -1563,13 +1563,13 @@ The parameters are the same as in the scene\_blend attribute; this is because mu
 
 ## alpha\_op\_ex
 
-Behaves in exactly the same away as [colour\_op\_ex](#colour_005fop_005fex) except that it determines how alpha values are combined between texture layers rather than colour values.The only difference is that the 2 manual colours at the end of colour\_op\_ex are just single floating-point values in alpha\_op\_ex. **Note:** Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
+Behaves in exactly the same away as [colour\_op\_ex](#colour_005fop_005fex) except that it determines how alpha values are combined between texture layers rather than colour values.The only difference is that the 2 manual colours at the end of colour\_op\_ex are just single floating-point values in alpha\_op\_ex. @note Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
 
 <a name="env_005fmap"></a><a name="env_005fmap-1"></a>
 
 ## env\_map
 
-Turns on/off texture coordinate effect that makes this layer an environment map. **Note:** Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect.
+Turns on/off texture coordinate effect that makes this layer an environment map. @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect.
 
 Format: env\_map &lt;off|spherical|planar|cubic\_reflection|cubic\_normal&gt;
 
@@ -1600,7 +1600,7 @@ Default: env\_map off<br>
 
 ## scroll
 
-Sets a fixed scroll offset for the texture. **Note:** Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Sets a fixed scroll offset for the texture. @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 Format: scroll &lt;x&gt; &lt;y&gt;
 
@@ -1610,7 +1610,7 @@ This method offsets the texture in this layer by a fixed amount. Useful for smal
 
 ## scroll\_anim
 
-Sets up an animated scroll for the texture layer. Useful for creating fixed-speed scrolling effects on a texture layer (for varying scroll speeds, see [wave\_xform](#wave_005fxform)). **Note:** Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Sets up an animated scroll for the texture layer. Useful for creating fixed-speed scrolling effects on a texture layer (for varying scroll speeds, see [wave\_xform](#wave_005fxform)). @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 Format: scroll\_anim &lt;xspeed&gt; &lt;yspeed&gt;<br>
 
@@ -1618,19 +1618,19 @@ Format: scroll\_anim &lt;xspeed&gt; &lt;yspeed&gt;<br>
 
 ## rotate
 
-Rotates a texture to a fixed angle. This attribute changes the rotational orientation of a texture to a fixed angle, useful for fixed adjustments. If you wish to animate the rotation, see [rotate\_anim](#rotate_005fanim). **Note:** Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Rotates a texture to a fixed angle. This attribute changes the rotational orientation of a texture to a fixed angle, useful for fixed adjustments. If you wish to animate the rotation, see [rotate\_anim](#rotate_005fanim). @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 Format: rotate &lt;angle&gt;
 
 The parameter is a anti-clockwise angle in degrees.
 
-**Note:** Only applies to the fixed-function pipeline, if you’re using a vertex shader this will have no effect unless you use the texture\_matrix auto-param.
+@note Only applies to the fixed-function pipeline, if you’re using a vertex shader this will have no effect unless you use the texture\_matrix auto-param.
 
 <a name="rotate_005fanim"></a><a name="rotate_005fanim-1"></a>
 
 ## rotate\_anim
 
-Sets up an animated rotation effect of this layer. Useful for creating fixed-speed rotation animations (for varying speeds, see [wave\_xform](#wave_005fxform)). **Note:** Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Sets up an animated rotation effect of this layer. Useful for creating fixed-speed rotation animations (for varying speeds, see [wave\_xform](#wave_005fxform)). @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 Format: rotate\_anim &lt;revs\_per\_second&gt;
 
@@ -1640,7 +1640,7 @@ The parameter is a number of anti-clockwise revolutions per second.
 
 ## scale
 
-Adjusts the scaling factor applied to this texture layer. Useful for adjusting the size of textures without making changes to geometry. This is a fixed scaling factor, if you wish to animate this see [wave\_xform](#wave_005fxform). **Note:** Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Adjusts the scaling factor applied to this texture layer. Useful for adjusting the size of textures without making changes to geometry. This is a fixed scaling factor, if you wish to animate this see [wave\_xform](#wave_005fxform). @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 Format: scale &lt;x\_scale&gt; &lt;y\_scale&gt;
 
@@ -1650,7 +1650,7 @@ Valid scale values are greater than 0, with a scale factor of 2 making the textu
 
 ## wave\_xform
 
-Sets up a transformation animation based on a wave function. Useful for more advanced texture layer transform effects. You can add multiple instances of this attribute to a single texture layer if you wish. **Note:** Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Sets up a transformation animation based on a wave function. Useful for more advanced texture layer transform effects. You can add multiple instances of this attribute to a single texture layer if you wish. @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 Format: wave\_xform &lt;xform\_type&gt; &lt;wave\_type&gt; &lt;base&gt; &lt;frequency&gt; &lt;phase&gt; &lt;amplitude&gt;
 
@@ -1727,7 +1727,7 @@ The range of the output of the wave will be {base, base+amplitude}. So the examp
 
 ## transform
 
-This attribute allows you to specify a static 4x4 transformation matrix for the texture unit, thus replacing the individual scroll, rotate and scale attributes mentioned above.  **Note:** Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+This attribute allows you to specify a static 4x4 transformation matrix for the texture unit, thus replacing the individual scroll, rotate and scale attributes mentioned above.  @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m33
 
@@ -1790,11 +1790,11 @@ Another nVidia-specific OpenGL vertex shader syntax. It is a superset of vs 3.0,
 
 </dd> <dt>ps\_1\_1, ps\_1\_2, ps\_1\_3</dt> <dd>
 
-DirectX pixel shader (i.e. fragment program) assembler syntax. <br> Supported on cards from: ATI Radeon 8500, nVidia GeForce 3 <br> NOTE: for ATI 8500, 9000, 9100, 9200 hardware, this profile can also be used in OpenGL. The ATI 8500 to 9200 do not support arbfp1 but do support atifs extension in OpenGL which is very similar in function to ps\_1\_4 in DirectX. Ogre has a built in ps\_1\_x to atifs compiler that is automatically invoked when ps\_1\_x is used in OpenGL on ATI hardware.
+DirectX pixel shader (i.e. fragment program) assembler syntax. <br> Supported on cards from: ATI Radeon 8500, nVidia GeForce 3 <br> @note for ATI 8500, 9000, 9100, 9200 hardware, this profile can also be used in OpenGL. The ATI 8500 to 9200 do not support arbfp1 but do support atifs extension in OpenGL which is very similar in function to ps\_1\_4 in DirectX. Ogre has a built in ps\_1\_x to atifs compiler that is automatically invoked when ps\_1\_x is used in OpenGL on ATI hardware.
 
 </dd> <dt>ps\_1\_4</dt> <dd>
 
-DirectX pixel shader (i.e. fragment program) assembler syntax. <br> Supported on cards from: ATI Radeon 8500, nVidia GeForce FX 5 series <br> NOTE: for ATI 8500, 9000, 9100, 9200 hardware, this profile can also be used in OpenGL. The ATI 8500 to 9200 do not support arbfp1 but do support atifs extension in OpenGL which is very similar in function to ps\_1\_4 in DirectX. Ogre has a built in ps\_1\_x to atifs compiler that is automatically invoked when ps\_1\_x is used in OpenGL on ATI hardware.
+DirectX pixel shader (i.e. fragment program) assembler syntax. <br> Supported on cards from: ATI Radeon 8500, nVidia GeForce FX 5 series <br> @note for ATI 8500, 9000, 9100, 9200 hardware, this profile can also be used in OpenGL. The ATI 8500 to 9200 do not support arbfp1 but do support atifs extension in OpenGL which is very similar in function to ps\_1\_4 in DirectX. Ogre has a built in ps\_1\_x to atifs compiler that is automatically invoked when ps\_1\_x is used in OpenGL on ATI hardware.
 
 </dd> <dt>ps\_2\_0</dt> <dd>
 
@@ -1962,7 +1962,7 @@ The parent pass name must be known and the pass must be in the correct technique
 
 If a new technique or pass needs to be added to a copied material then use a unique name for the technique or pass that does not exist in the parent material. Using an index for the name that is one greater than the last index in the parent will do the same thing. The new technique/pass will be added to the end of the techniques/passes copied from the parent material.
 
-Note: if passes or techniques aren’t given a name, they will take on a default name based on their index. For example the first pass has index 0 so its name will be 0.
+@note if passes or techniques aren’t given a name, they will take on a default name based on their index. For example the first pass has index 0 so its name will be 0.
 
 ## Identifying Texture Units to override values {#Identifying-Texture-Units-to-override-values}
 
