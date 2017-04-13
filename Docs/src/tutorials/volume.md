@@ -29,7 +29,7 @@ volumeRoot->load(volumeRootNode, mSceneMgr, "volumeTerrain.cfg");
 The first line creates the volume chunk which is the MovableObject holding the Volume-Root. Next, a SceneNode is created where the volume(-tree) is attached to. And lastly, the volume is loaded from the configuration file "volumeTerrain.cfg".
 mSceneMgr is the SceneManager who should show the volume. Later, when you don't need it anymore, you have to free the volumeRoot Chunk via OGRE_DELETE.
 
-# Manual creation of a CSG-Tree {#manual}
+# Manual creation of a CSG-Tree {#creation}
 
 This example skips the configuration file and loads a simple CSG-Scene: An union of a 3D Texture and a sphere with 5 LOD levels. It also setups a material LOD system.
 First, create a sphere with the radius 5 at the coordinates 128, 150, 128:

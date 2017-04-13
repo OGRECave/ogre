@@ -106,15 +106,6 @@ namespace Ogre {
         GLSLProgramManager(const GL3PlusSupport& support);
 
         /** Populate a list of uniforms based on an OpenGL program object.
-            @param programObject Handle to the program object to query.
-            @param vertexConstantDefs Definition of the uniforms extracted from the
-            vertex program, used to match up physical buffer indexes with program
-            uniforms. May be null if there is no vertex program.
-            @param fragmentConstantDefs Definition of the uniforms extracted from the
-            fragment program, used to match up physical buffer indexes with program
-            uniforms. May be null if there is no fragment program.
-            @param uniformList The list to populate (will not be cleared before adding, clear
-            it yourself before calling this if that's what you want).
         */
         void extractUniformsFromProgram(
             GLuint programObject,

@@ -37,7 +37,7 @@ namespace Volume {
     /** \addtogroup Optional
     *  @{
     */
-    /** \defgroup Volume
+    /** \defgroup Volume Volume
     * Volume Rendering with LOD aimed at terrain
     *  @{
     */

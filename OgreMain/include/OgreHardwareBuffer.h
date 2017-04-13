@@ -233,10 +233,7 @@ namespace Ogre {
                 return ret;
             }
 
-            /** Lock the entire buffer for (potentially) reading / writing.
-            @param options Locking options
-            @return Pointer to the locked memory
-            */
+            /// @overload
             void* lock(LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT)
             {
                 return this->lock(0, mSizeInBytes, options, uploadOpt);
