@@ -897,11 +897,15 @@ namespace Ogre {
             /// The current world matrix, inverted & transposed
             ACT_INVERSE_TRANSPOSE_WORLD_MATRIX,
 
-            /// The current array of world matrices, as a 3x4 matrix, used for blending
+            /// An array of world matrices, each represented as only a 3x4 matrix (3 rows of
+            /// 4columns) usually for doing hardware skinning.
+            /// You should make enough entries available in your vertex program for the number of
+            /// bones in use, i.e. an array of numBones*3 float4’s.
             ACT_WORLD_MATRIX_ARRAY_3x4,
             /// The current array of world matrices, used for blending
             ACT_WORLD_MATRIX_ARRAY,
-            /// The current array of world matrices transformed to an array of dual quaternions, represented as a 2x4 matrix
+            /// The current array of world matrices transformed to an array of dual quaternions,
+            /// represented as a 2x4 matrix
             ACT_WORLD_DUALQUATERNION_ARRAY_2x4,
             /// The scale and shear components of the current array of world matrices
             ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4,
@@ -919,7 +923,6 @@ namespace Ogre {
             */
             ACT_INVERSE_TRANSPOSE_VIEW_MATRIX,
 
-
             /// The current projection matrix
             ACT_PROJECTION_MATRIX,
             /** Provides inverse of projection matrix.
@@ -934,7 +937,6 @@ namespace Ogre {
                 Equivalent to RenderMonkey's "ProjectionInverseTranspose".
             */
             ACT_INVERSE_TRANSPOSE_PROJECTION_MATRIX,
-
 
             /// The current view & projection matrices concatenated
             ACT_VIEWPROJ_MATRIX,
@@ -951,7 +953,6 @@ namespace Ogre {
             */
             ACT_INVERSE_TRANSPOSE_VIEWPROJ_MATRIX,
 
-
             /// The current world & view matrices concatenated
             ACT_WORLDVIEW_MATRIX,
             /// The current world & view matrices concatenated, then inverted
@@ -962,8 +963,7 @@ namespace Ogre {
             ACT_TRANSPOSE_WORLDVIEW_MATRIX,
             /// The current world & view matrices concatenated, then inverted & transposed
             ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX,
-            /// view matrices.
-
+            // view matrices.
 
             /// The current world, view & projection matrices concatenated
             ACT_WORLDVIEWPROJ_MATRIX,
@@ -980,10 +980,10 @@ namespace Ogre {
             */
             ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX,
 
-
-            /// render target related values
+            // render target related values
             /** -1 if requires texture flipping, +1 otherwise. It's useful when you bypassed
-                projection matrix transform, still able use this value to adjust transformed y position.
+                projection matrix transform, still able use this value to adjust transformed y
+               position.
             */
             ACT_RENDER_TARGET_FLIPPING,
 
@@ -996,7 +996,6 @@ namespace Ogre {
             /// Fog params: density, linear start, linear end, 1/(end-start)
             ACT_FOG_PARAMS,
 
-
             /// Surface ambient colour, as set in Pass::setAmbient
             ACT_SURFACE_AMBIENT_COLOUR,
             /// Surface diffuse colour, as set in Pass::setDiffuse
@@ -1007,18 +1006,24 @@ namespace Ogre {
             ACT_SURFACE_EMISSIVE_COLOUR,
             /// Surface shininess, as set in Pass::setShininess
             ACT_SURFACE_SHININESS,
-            /// Surface alpha rejection value, not as set in Pass::setAlphaRejectionValue, but a floating number between 0.0f and 1.0f instead (255.0f / Pass::getAlphaRejectionValue())
+            /// Surface alpha rejection value, not as set in Pass::setAlphaRejectionValue, but a
+            /// floating number between 0.0f and 1.0f instead (255.0f /
+            /// Pass::getAlphaRejectionValue())
             ACT_SURFACE_ALPHA_REJECTION_VALUE,
-
 
             /// The number of active light sources (better than gl_MaxLights)
             ACT_LIGHT_COUNT,
-
 
             /// The ambient light colour set in the scene
             ACT_AMBIENT_LIGHT_COLOUR,
 
             /// Light diffuse colour (index determined by setAutoConstant call)
+            ///
+            /// this requires an index in the ’extra_params’ field, and relates to the ’nth’ closest
+            /// light which could affect this object
+            /// (i.e. 0 refers to the closest light - note that directional lights are always first
+            /// in the list and always present).
+            /// NB if there are no lights this close, then the parameter will be set to black.
             ACT_LIGHT_DIFFUSE_COLOUR,
             /// Light specular colour (index determined by setAutoConstant call)
             ACT_LIGHT_SPECULAR_COLOUR,
@@ -1030,13 +1035,25 @@ namespace Ogre {
                 Also for non-spotlights the inner and outer factors are 1 and nearly 1 respectively
             */
             ACT_SPOTLIGHT_PARAMS,
-            /// A light position in world space (index determined by setAutoConstant call)
+            /** A light position in world space (index determined by setAutoConstant call)
+
+             This requires an index in the ’extra_params’ field, and relates to the ’nth’ closest
+             light which could affect this object (i.e. 0 refers to the closest light).
+             NB if there are no lights this close, then the parameter will be set to all zeroes.
+             Note that this property will work with all kinds of lights, even directional lights,
+             since the parameter is set as a 4D vector.
+             Point lights will be (pos.x, pos.y, pos.z, 1.0f) whilst directional lights will be
+             (-dir.x, -dir.y, -dir.z, 0.0f).
+             Operations like dot products will work consistently on both.
+             */
             ACT_LIGHT_POSITION,
             /// A light position in object space (index determined by setAutoConstant call)
             ACT_LIGHT_POSITION_OBJECT_SPACE,
             /// A light position in view space (index determined by setAutoConstant call)
             ACT_LIGHT_POSITION_VIEW_SPACE,
             /// A light direction in world space (index determined by setAutoConstant call)
+            /// @deprecated this property only works on directional lights, and we recommend that
+            /// you use light_position instead since that returns a generic 4D vector.
             ACT_LIGHT_DIRECTION,
             /// A light direction in object space (index determined by setAutoConstant call)
             ACT_LIGHT_DIRECTION_OBJECT_SPACE,
@@ -1047,11 +1064,14 @@ namespace Ogre {
                 calculations.
             */
             ACT_LIGHT_DISTANCE_OBJECT_SPACE,
-            /** Light power level, a single scalar as set in Light::setPowerScale  (index determined by setAutoConstant call) */
+            /** Light power level, a single scalar as set in Light::setPowerScale  (index determined
+               by setAutoConstant call) */
             ACT_LIGHT_POWER_SCALE,
-            /// Light diffuse colour pre-scaled by Light::setPowerScale (index determined by setAutoConstant call)
+            /// Light diffuse colour pre-scaled by Light::setPowerScale (index determined by
+            /// setAutoConstant call)
             ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED,
-            /// Light specular colour pre-scaled by Light::setPowerScale (index determined by setAutoConstant call)
+            /// Light specular colour pre-scaled by Light::setPowerScale (index determined by
+            /// setAutoConstant call)
             ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED,
             /// Array of light diffuse colours (count set by extra param)
             ACT_LIGHT_DIFFUSE_COLOUR_ARRAY,
@@ -1061,7 +1081,8 @@ namespace Ogre {
             ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY,
             /// Array of light specular colours scaled by light power (count set by extra param)
             ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED_ARRAY,
-            /// Array of light attenuation parameters, Vector4(range, constant, linear, quadric) (count set by extra param)
+            /// Array of light attenuation parameters, Vector4(range, constant, linear, quadric)
+            /// (count set by extra param)
             ACT_LIGHT_ATTENUATION_ARRAY,
             /// Array of light positions in world space (count set by extra param)
             ACT_LIGHT_POSITION_ARRAY,
@@ -1105,7 +1126,8 @@ namespace Ogre {
 
             /** The derived light diffuse colour (index determined by setAutoConstant call),
                 with 'r', 'g' and 'b' components filled with product of surface diffuse colour,
-                light power scale and light diffuse colour, respectively, and 'a' component filled with surface
+                light power scale and light diffuse colour, respectively, and 'a' component filled
+               with surface
                 diffuse alpha component.
             */
             ACT_DERIVED_LIGHT_DIFFUSE_COLOUR,
@@ -1127,11 +1149,12 @@ namespace Ogre {
                 This binding provides the global light index for a local index.
             */
             ACT_LIGHT_NUMBER,
-            /// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra param)
+            /// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra
+            /// param)
             ACT_LIGHT_CASTS_SHADOWS,
-            /// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra param)
+            /// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra
+            /// param)
             ACT_LIGHT_CASTS_SHADOWS_ARRAY,
-
 
             /** The distance a shadow volume should be extruded when using
                 finite extrusion programs.
@@ -1141,7 +1164,16 @@ namespace Ogre {
             ACT_CAMERA_POSITION,
             /// The current camera's position in object space
             ACT_CAMERA_POSITION_OBJECT_SPACE,
-            /// The view/projection matrix of the assigned texture projection frustum
+            /** The view/projection matrix of the assigned texture projection frustum
+
+             Applicable to vertex programs which have been specified as the ’shadow receiver’ vertex
+             program alternative, or where a texture unit is marked as content_type shadow; this
+             provides details of the view/projection matrix for the current shadow projector. The
+             optional ’extra_params’ entry specifies which light the projector refers to (for the
+             case of content_type shadow where more than one shadow texture may be present in a
+             single pass), where 0 is the default and refers to the first light referenced in this
+             pass.
+             */
             ACT_TEXTURE_VIEWPROJ_MATRIX,
             /// Array of view/projection matrices of the first n texture projection frustums
             ACT_TEXTURE_VIEWPROJ_MATRIX_ARRAY,
@@ -1163,7 +1195,17 @@ namespace Ogre {
                 combined with the current world matrix
             */
             ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY,
-            /// A custom parameter which will come from the renderable, using 'data' as the identifier
+            /** A custom parameter which will come from the renderable, using 'data' as the
+             identifier
+
+             This allows you to map a custom parameter on an individual Renderable (see
+             Renderable::setCustomParameter) to a parameter on a GPU program. It requires that you
+             complete the ’extra_params’ field with the index that was used in the
+             Renderable::setCustomParameter call, and this will ensure that whenever this Renderable
+             is used, it will have it’s custom parameter mapped in. It’s very important that this
+             parameter has been defined on all Renderables that are assigned the material that
+             contains this automatic mapping, otherwise the process will fail.
+             */
             ACT_CUSTOM,
             /** provides current elapsed time
              */
@@ -1216,7 +1258,7 @@ namespace Ogre {
             ACT_FRAME_TIME,
             /// provides the calculated frames per second, returned as a floating point value.
             ACT_FPS,
-            /// viewport-related values
+            // viewport-related values
             /** Current viewport width (in pixels) as floating point value.
                 Equivalent to RenderMonkey's "ViewportWidth".
             */
@@ -1238,7 +1280,7 @@ namespace Ogre {
             */
             ACT_VIEWPORT_SIZE,
 
-            /// view parameters
+            // view parameters
             /** This variable provides the view direction vector (world space).
                 Equivalent to RenderMonkey's "ViewDirection".
             */
@@ -1275,9 +1317,23 @@ namespace Ogre {
             */
             ACT_PASS_ITERATION_NUMBER,
 
-
             /** Provides a parametric animation value [0..1], only available
                 where the renderable specifically implements it.
+
+               For morph animation, sets the parametric value
+               (0..1) representing the distance between the first position keyframe (bound to
+               positions) and the second position keyframe (bound to the first free texture
+               coordinate) so that the vertex program can interpolate between them. For pose
+               animation, indicates a group of up to 4 parametric weight values applying to a
+               sequence of up to 4 poses (each one bound to x, y, z and w of the constant), one for
+               each pose. The original positions are held in the usual position buffer, and the
+               offsets to take those positions to the pose where weight == 1.0 are in the first ’n’
+               free texture coordinates; ’n’ being determined by the value passed to
+               includes_pose_animation. If more than 4 simultaneous poses are required, then you’ll
+               need more than 1 shader constant to hold the parametric values, in which case you
+               should use this binding more than once, referencing a different constant entry; the
+               second one will contain the parametrics for poses 5-8, the third for poses 9-12, and
+               so on.
             */
             ACT_ANIMATION_PARAMETRIC,
 
@@ -1316,17 +1372,25 @@ namespace Ogre {
                 call). Packed as float4(width, height, depth, 1)
             */
             ACT_TEXTURE_SIZE,
-            /** Provides inverse texture size of the texture unit (index determined by setAutoConstant
+            /** Provides inverse texture size of the texture unit (index determined by
+               setAutoConstant
                 call). Packed as float4(1 / width, 1 / height, 1 / depth, 1)
             */
             ACT_INVERSE_TEXTURE_SIZE,
-            /** Provides packed texture size of the texture unit (index determined by setAutoConstant
+            /** Provides packed texture size of the texture unit (index determined by
+               setAutoConstant
                 call). Packed as float4(width, height, 1 / width, 1 / height)
             */
             ACT_PACKED_TEXTURE_SIZE,
 
-            /** Provides the current transform matrix of the texture unit (index determined by setAutoConstant
+            /** Provides the current transform matrix of the texture unit (index determined by
+               setAutoConstant
                 call), as seen by the fixed-function pipeline.
+
+                This requires an index in the ’extra_params’ field, and relates to the ’nth’ texture
+               unit of the pass in question.
+                NB if the given index exceeds the number of texture units available for this pass,
+               then the parameter will be set to Matrix4::IDENTITY.
             */
             ACT_TEXTURE_MATRIX,
 
