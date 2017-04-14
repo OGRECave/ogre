@@ -64,8 +64,13 @@ namespace Ogre {
     {
         GLRenderSystemCommon *rs =
             static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+        try {
+            _destroyInternalResources();
+        } catch(RenderingAPIException&) {
+            // EGL_CHECK_ERROR might throw
+            // just ignore as it will get logged anyway.
+        }
 
-        _destroyInternalResources();
         rs->_unregisterContext(this);
     }
     

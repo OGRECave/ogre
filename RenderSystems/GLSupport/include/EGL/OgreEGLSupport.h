@@ -46,7 +46,7 @@ THE SOFTWARE.
             char msgBuf[4096]; \
             sprintf(msgBuf, "EGL error 0x%04X in %s at line %i\n", e, __PRETTY_FUNCTION__, __LINE__); \
             LogManager::getSingleton().logMessage(msgBuf); \
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msgBuf, __PRETTY_FUNCTION__); \
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, msgBuf, __PRETTY_FUNCTION__); \
         } \
     }
 #else
