@@ -11,15 +11,15 @@ Vertex buffers, index buffers and pixel buffers inherit most of their features f
 The HardwareBufferManager class is the factory hub of all the objects in the new geometry system. You create and destroy the majority of the objects you use to define geometry through this class. It’s a Singleton, so you access it by doing HardwareBufferManager::getSingleton() - however be aware that it is only guaranteed to exist after the RenderSystem has been initialised (after you call Root::initialise); this is because the objects created are invariably API-specific, although you will deal with them through one common interface.  For example:
 
 ```cpp
-VertexDeclaration* decl = HardwareBufferManager::getSingleton().createVertexDeclaration();
+Ogre::VertexDeclaration* decl = HardwareBufferManager::getSingleton().createVertexDeclaration();
 ```
 
 ```cpp
-HardwareVertexBufferSharedPtr vbuf = 
-    HardwareBufferManager::getSingleton().createVertexBuffer(
+Ogre::HardwareVertexBufferSharedPtr vbuf = 
+    Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
         3*sizeof(Real), // size of one whole vertex
         numVertices, // number of vertices
-        HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+        Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
         false); // no shadow buffer
 ```
 
@@ -27,30 +27,7 @@ Don’t worry about the details of the above, we’ll cover that in the later se
 
 # Buffer Usage {#Buffer-Usage}
 
-Because the memory in a hardware buffer is likely to be under significant contention during the rendering of a scene, the kind of access you need to the buffer over the time it is used is extremely important; whether you need to update the contents of the buffer regularly, whether you need to be able to read information back from it, these are all important factors to how the graphics card manages the buffer. The method and exact parameters used to create a buffer depends on whether you are creating an index or vertex buffer (See [Hardware Vertex Buffers](#Hardware-Vertex-Buffers) and See [Hardware Index Buffers](#Hardware-Index-Buffers)), however one creation parameter is common to them both - the ’usage’.  The most optimal type of hardware buffer is one which is not updated often, and is never read from. The usage parameter of createVertexBuffer or createIndexBuffer can be one of the following:
-
-<dl compact="compact">
-<dt>`HBU_STATIC`</dt> <dd>
-
-This means you do not need to update the buffer very often, but you might occasionally want to read from it.
-
-</dd> <dt>`HBU_STATIC_WRITE_ONLY`</dt> <dd>
-
-This means you do not need to update the buffer very often, and you do not need to read from it. However, you may read from it’s shadow buffer if you set one up (See [Shadow Buffers](#Shadow-Buffers)). This is the optimal buffer usage setting.
-
-</dd> <dt>`HBU_DYNAMIC`</dt> <dd>
-
-This means you expect to update the buffer often, and that you may wish to read from it. This is the least optimal buffer setting.
-
-</dd> <dt>`HBU_DYNAMIC_WRITE_ONLY`</dt> <dd>
-
-This means you expect to update the buffer often, but that you never want to read from it. However, you may read from it’s shadow buffer if you set one up (See [Shadow Buffers](#Shadow-Buffers)). If you use this option, and replace the entire contents of the buffer every frame, then you should use HBU\_DYNAMIC\_WRITE\_ONLY\_DISCARDABLE instead, since that has better performance characteristics on some platforms.
-
-</dd> <dt>`HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE`</dt> <dd>
-
-This means that you expect to replace the entire contents of the buffer on an extremely regular basis, most likely every frame. By selecting this option, you free the system up from having to be concerned about losing the existing contents of the buffer at any time, because if it does lose them, you will be replacing them next frame anyway. On some platforms this can make a significant performance difference, so you should try to use this whenever you have a buffer you need to update regularly. Note that if you create a buffer this way, you should use the HBL\_DISCARD flag when locking the contents of it for writing.
-
-</dd> </dl>
+Because the memory in a hardware buffer is likely to be under significant contention during the rendering of a scene, the kind of access you need to the buffer over the time it is used is extremely important; whether you need to update the contents of the buffer regularly, whether you need to be able to read information back from it, these are all important factors to how the graphics card manages the buffer. The method and exact parameters used to create a buffer depends on whether you are creating an index or vertex buffer (See [Hardware Vertex Buffers](#Hardware-Vertex-Buffers) and See [Hardware Index Buffers](#Hardware-Index-Buffers)), however one creation parameter is common to them both - the ’usage’.  The most optimal type of hardware buffer is one which is not updated often, and is never read from. The usage parameter of createVertexBuffer or createIndexBuffer can be one of Ogre::HardwareBuffer::Usage.
 
 Choosing the usage of your buffers carefully is important to getting optimal performance out of your geometry. If you have a situation where you need to update a vertex buffer often, consider whether you actually need to update **all** the parts of it, or just some. If it’s the latter, consider using more than one buffer, with only the data you need to modify in the HBU\_DYNAMIC buffer.  Always try to use the \_WRITE\_ONLY forms. This just means that you cannot read *directly* from the hardware buffer, which is good practice because reading from hardware buffers is very slow. If you really need to read data back, use a shadow buffer, described in the next section.
 
@@ -75,26 +52,7 @@ pBuffer->lock(lockType);
 pBuffer->lock(start, length, lockType);
 ```
 
-The first call locks the entire buffer, the second locks only the section from ’start’ (as a byte offset), for ’length’ bytes. This could be faster than locking the entire buffer since less is transferred, but not if you later update the rest of the buffer too, because doing it in small chunks like this means you cannot use HBL\_DISCARD (see below).  The lockType parameter can have a large effect on the performance of your application, especially if you are not using a shadow buffer.
-
-<dl compact="compact">
-<dt>`HBL_NORMAL`</dt> <dd>
-
-This kind of lock allows reading and writing from the buffer - it’s also the least optimal because basically you’re telling the card you could be doing anything at all. If you’re not using a shadow buffer, it requires the buffer to be transferred from the card and back again. If you’re using a shadow buffer the effect is minimal.
-
-</dd> <dt>`HBL_READ_ONLY`</dt> <dd>
-
-This means you only want to read the contents of the buffer. Best used when you created the buffer with a shadow buffer because in that case the data does not have to be downloaded from the card.
-
-</dd> <dt>`HBL_DISCARD`</dt> <dd>
-
-This means you are happy for the card to discard the *entire current contents* of the buffer. Implicitly this means you are not going to read the data - it also means that the card can avoid any stalls if the buffer is currently being rendered from, because it will actually give you an entirely different one. Use this wherever possible when you are locking a buffer which was not created with a shadow buffer. If you are using a shadow buffer it matters less, although with a shadow buffer it’s preferable to lock the entire buffer at once, because that allows the shadow buffer to use HBL\_DISCARD when it uploads the updated contents to the real buffer.
-
-</dd> <dt>`HBL_NO_OVERWRITE`</dt> <dd>
-
-This is useful if you are locking just part of the buffer and thus cannot use HBL\_DISCARD. It tells the card that you promise not to modify any section of the buffer which has already been used in a rendering operation this frame. Again this is only useful on buffers with no shadow buffer.
-
-</dd> </dl>
+The first call locks the entire buffer, the second locks only the section from ’start’ (as a byte offset), for ’length’ bytes. This could be faster than locking the entire buffer since less is transferred, but not if you later update the rest of the buffer too, because doing it in small chunks like this means you cannot use Ogre::HardwareBuffer::HBL_DISCARD.  The lockType parameter can have a large effect on the performance of your application, especially if you are not using a shadow buffer. See Ogre::HardwareBuffer::LockOptions.
 
 Once you have locked a buffer, you can use the pointer returned however you wish (just don’t bother trying to read the data that’s there if you’ve used HBL\_DISCARD, or write the data if you’ve used HBL\_READ\_ONLY). Modifying the contents depends on the type of buffer, See [Hardware Vertex Buffers](#Hardware-Vertex-Buffers) and See [Hardware Index Buffers](#Hardware-Index-Buffers)
 
@@ -113,7 +71,7 @@ This section covers specialised hardware buffers which contain vertex data. For 
 
 ## The VertexData class {#The-VertexData-class}
 
-The VertexData class collects together all the vertex-related information used to render geometry. The new RenderOperation requires a pointer to a VertexData object, and it is also used in Mesh and SubMesh to store the vertex positions, normals, texture coordinates etc. VertexData can either be used alone (in order to render unindexed geometry, where the stream of vertices defines the triangles), or in combination with IndexData where the triangles are defined by indexes which refer to the entries in VertexData.  It’s worth noting that you don’t necessarily have to use VertexData to store your applications geometry; all that is required is that you can build a VertexData structure when it comes to rendering. This is pretty easy since all of VertexData’s members are pointers, so you could maintain your vertex buffers and declarations in alternative structures if you like, so long as you can convert them for rendering. The VertexData class has a number of important members:
+The Ogre::VertexData class collects together all the vertex-related information used to render geometry. The new RenderOperation requires a pointer to a VertexData object, and it is also used in Mesh and SubMesh to store the vertex positions, normals, texture coordinates etc. VertexData can either be used alone (in order to render unindexed geometry, where the stream of vertices defines the triangles), or in combination with IndexData where the triangles are defined by indexes which refer to the entries in VertexData.  It’s worth noting that you don’t necessarily have to use VertexData to store your applications geometry; all that is required is that you can build a VertexData structure when it comes to rendering. This is pretty easy since all of VertexData’s members are pointers, so you could maintain your vertex buffers and declarations in alternative structures if you like, so long as you can convert them for rendering. The VertexData class has a number of important members:
 
 <dl compact="compact">
 <dt>vertexStart</dt> <dd>
@@ -136,7 +94,7 @@ A pointer to a VertexBufferBinding object which defines which vertex buffers are
 
 ## Vertex Declarations {#Vertex-Declarations}
 
-Vertex declarations define the vertex inputs used to render the geometry you want to appear on the screen. Basically this means that for each vertex, you want to feed a certain set of data into the graphics pipeline, which (you hope) will affect how it all looks when the triangles are drawn. Vertex declarations let you pull items of data (which we call vertex elements, represented by the VertexElement class) from any number of buffers, both shared and dedicated to that particular element. It’s your job to ensure that the contents of the buffers make sense when interpreted in the way that your VertexDeclaration indicates that they should. To add an element to a VertexDeclaration, you call it’s addElement method. The parameters to this method are:
+Vertex declarations define the vertex inputs used to render the geometry you want to appear on the screen. Basically this means that for each vertex, you want to feed a certain set of data into the graphics pipeline, which (you hope) will affect how it all looks when the triangles are drawn. Vertex declarations let you pull items of data (which we call vertex elements, represented by the VertexElement class) from any number of buffers, both shared and dedicated to that particular element. It’s your job to ensure that the contents of the buffers make sense when interpreted in the way that your VertexDeclaration indicates that they should. To add an element to a VertexDeclaration, you call Ogre::VertexDeclaration::addElement method. The parameters to this method are:
 
 <dl compact="compact">
 <dt>source</dt> <dd>
@@ -189,7 +147,7 @@ Firstly, lets look at how you create a vertex buffer:
 
 ```cpp
 HardwareVertexBufferSharedPtr vbuf = 
-    HardwareBufferManager::getSingleton().createVertexBuffer(
+    Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
         3*sizeof(Real), // size of one whole vertex
         numVertices, // number of vertices
         HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
@@ -297,7 +255,7 @@ The index buffer which is used to source the indexes.
 Index buffers are created using See [The Hardware Buffer Manager](#The-Hardware-Buffer-Manager) just like vertex buffers, here’s how:
 
 ```cpp
-HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
+HardwareIndexBufferSharedPtr ibuf = Ogre::HardwareBufferManager::getSingleton().
     createIndexBuffer(
         HardwareIndexBuffer::IT_16BIT, // type of index
         numIndexes, // number of indexes
@@ -351,41 +309,24 @@ A texture is an image that can be applied onto the surface of a three dimensiona
 Textures are created through the TextureManager. In most cases they are created from image files directly by the Ogre resource system. If you are reading this, you most probably want to create a texture manually so that you can provide it with image data yourself. This is done through TextureManager::createManual:
 
 ```cpp
-ptex = TextureManager::getSingleton().createManual(
+ptex = Ogre::TextureManager::getSingleton().createManual(
     "MyManualTexture", // Name of texture
     "General", // Name of resource group in which the texture should be created
-    TEX_TYPE_2D, // Texture type
+    Ogre::TEX_TYPE_2D, // Texture type
     256, // Width
     256, // Height
     1, // Depth (Must be 1 for two dimensional textures)
-    0, // Number of mipmaps
-    PF_A8R8G8B8, // Pixel format
-    TU_DYNAMIC_WRITE_ONLY // usage
+    0, // No mipmaps
+    PF_A8R8G8B8, // internal Pixel format
+    Ogre::TU_DYNAMIC_WRITE_ONLY // usage
 );
 ```
 
-This example creates a texture named *MyManualTexture* in resource group *General*. It is a square *two dimensional* texture, with width 256 and height 256. It has *no mipmaps*, internal format *PF\_A8R8G8B8* and usage *TU\_DYNAMIC\_WRITE\_ONLY*.
+This example creates a texture named *MyManualTexture* in resource group *General*. It is a square *two dimensional* texture, with width 256 and height 256.
 
-The different texture types will be discussed in [Texture Types](#Texture-Types). Pixel formats are summarised in [Pixel Formats](#Pixel-Formats).
+The different texture types will be discussed in Ogre::TextureType. Pixel formats are summarised in [Pixel Formats](#Pixel-Formats).
 
-### Texture usages {#Texture-usages}
-
-In addition to the hardware buffer usages as described in See [Buffer Usage](#Buffer-Usage) there are some usage flags specific to textures:
-
-<dl compact="compact">
-<dt>TU\_AUTOMIPMAP</dt> <dd>
-
-Mipmaps for this texture will be automatically generated by the graphics hardware. The exact algorithm used is not defined, but you can assume it to be a 2x2 box filter.
-
-</dd> <dt>TU\_RENDERTARGET</dt> <dd>
-
-This texture will be a render target, i.e. used as a target for render to texture. Setting this flag will ignore all other texture usages except TU\_AUTOMIPMAP.
-
-</dd> <dt>TU\_DEFAULT</dt> <dd>
-
-This is actually a combination of usage flags, and is equivalent to TU\_AUTOMIPMAP | TU\_STATIC\_WRITE\_ONLY. The resource system uses these flags for textures that are loaded from images.
-
-</dd> </dl>
+In addition to the hardware buffer usages as described in Ogre::HardwareBuffer::Usage there are some usage flags specific to textures: Ogre::TextureUsage.
 
 ## Getting a PixelBuffer {#Getting-a-PixelBuffer}
 
@@ -404,7 +345,7 @@ HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
 
 ## Updating Pixel Buffers {#Updating-Pixel-Buffers}
 
-Pixel Buffers can be updated in two different ways; a simple, convenient way and a more difficult (but in some cases faster) method. Both methods make use of PixelBox objects (See [Pixel boxes](#Pixel-boxes)) to represent image data in memory.
+Pixel Buffers can be updated in two different ways; a simple, convenient way and a more difficult (but in some cases faster) method. Both methods make use of Ogre::PixelBox objects to represent image data in memory.
 
 ## Blit from memory {#blitFromMemory}
 
@@ -412,15 +353,15 @@ The easy method to get an image into a PixelBuffer is by using HardwarePixelBuff
 
 ```cpp
 // Manually loads an image and puts the contents in a manually created texture
-Image img;
+Ogre::Image img;
 img.load("elephant.png", "General");
 // Create RGB texture with 5 mipmaps
-TexturePtr tex = TextureManager::getSingleton().createManual(
+TexturePtr tex = Ogre::TextureManager::getSingleton().createManual(
     "elephant",
     "General",
-    TEX_TYPE_2D,
+    Ogre::TEX_TYPE_2D,
     img.getWidth(), img.getHeight(),
-    5, PF_X8R8G8B8);
+    5, Ogre::PF_X8R8G8B8);
 // Copy face 0 mipmap 0 of the image to face 0 mipmap 0 of the texture.
 tex->getBuffer(0,0)->blitFromMemory(img.getPixelBox(0,0));
 ```
@@ -432,7 +373,7 @@ A more advanced method to transfer image data from and to a PixelBuffer is to us
 ```cpp
 /// Lock the buffer so we can write to it
 buffer->lock(HardwareBuffer::HBL_DISCARD);
-const PixelBox &pb = buffer->getCurrentLock();
+const Ogre::PixelBox &pb = buffer->getCurrentLock();
 
 /// Update the contents of pb here
 /// Image data starts at pb.data and has format pb.format
@@ -456,30 +397,11 @@ buffer->unlock();
 
 ## Texture Types {#Texture-Types}
 
-There are four types of textures supported by current hardware, three of them only differ in the amount of dimensions they have (one, two or three). The fourth one is special. The different texture types are:
-
-<dl compact="compact">
-<dt>TEX\_TYPE\_1D</dt> <dd>
-
-One dimensional texture, used in combination with 1D texture coordinates.
-
-</dd> <dt>TEX\_TYPE\_2D</dt> <dd>
-
-Two dimensional texture, used in combination with 2D texture coordinates.
-
-</dd> <dt>TEX\_TYPE\_3D</dt> <dd>
-
-Three dimensional volume texture, used in combination with 3D texture coordinates.
-
-</dd> <dt>TEX\_TYPE\_CUBE\_MAP</dt> <dd>
-
-Cube map (six two dimensional textures, one for each cube face), used in combination with 3D texture coordinates.
-
-</dd> </dl>
+There are several types of textures supported by current hardware (see Ogre::TextureType), the first three only differ in the amount of dimensions they have (one, two or three).
 
 ## Cube map textures {#Cube-map-textures}
 
-The cube map texture type (TEX\_TYPE\_CUBE\_MAP) is a different beast from the others; a cube map texture represents a series of six two dimensional images addressed by 3D texture coordinates.
+The cube map texture type (Ogre::TEX_TYPE_CUBE_MAP) is a different beast from the others; a cube map texture represents a series of six two dimensional images addressed by 3D texture coordinates.
 
 <dl compact="compact">
 <dt>+X (face 0)</dt> <dd>
@@ -535,7 +457,7 @@ These formats have one 32 bit floating point number per channel, and their chann
 
 </dd> <dt>Compressed formats (PF\_DXT\[1-5\])</dt> <dd>
 
-S3TC compressed texture formats, a good description can be found at | Wikipedia (http://en.wikipedia.org/wiki/S3TC)
+S3TC compressed texture formats, [a good description can be found at Wikipedia](http://en.wikipedia.org/wiki/S3TC)
 
 </dd> </dl>
 
@@ -572,7 +494,7 @@ This component is completely ignored.
 
 If none of red, green and blue components, or luminance is defined in a format, these default to 0. For the alpha channel this is different; if no alpha is defined, it defaults to 1.
 
-## Complete list of pixel formats {#Complete-list-of-pixel-formats}
+## List of pixel formats {#Complete-list-of-pixel-formats}
 
 This pixel formats supported by the current version of Ogre are
 
@@ -615,9 +537,11 @@ PF\_DXT1, PF\_DXT2, PF\_DXT3, PF\_DXT4, PF\_DXT5
 
 </dd> </dl>
 
+For a complete list see Ogre::PixelFormat.
+
 ## Pixel boxes {#Pixel-boxes}
 
-All methods in Ogre that take or return raw image data return a PixelBox object.
+All methods in Ogre that take or return raw image data return a Ogre::PixelBox object.
 
 A PixelBox is a primitive describing a volume (3D), image (2D) or line (1D) of pixels in CPU memory. It describes the location and data format of a region of memory used for image data, but does not do any memory management in itself.
 
@@ -625,70 +549,4 @@ Inside the memory pointed to by the *data* member of a pixel box, pixels are sto
 
 Dimensions that are not used must be 1. For example, a one dimensional image will have extents (width,1,1). A two dimensional image has extents (width,height,1).
 
-A PixelBox has the following members:
-
-<dl compact="compact">
-<dt>data</dt> <dd>
-
-The pointer to the first component of the image data in memory.
-
-</dd> <dt>format</dt> <dd>
-
-The pixel format (See [Pixel Formats](#Pixel-Formats)) of the image data.
-
-</dd> <dt>rowPitch</dt> <dd>
-
-The number of elements between the leftmost pixel of one row and the left pixel of the next. This value must always be equal to getWidth() (consecutive) for compressed formats.
-
-</dd> <dt>slicePitch</dt> <dd>
-
-The number of elements between the top left pixel of one (depth) slice and the top left pixel of the next. Must be a multiple of rowPitch. This value must always be equal to getWidth()\*getHeight() (consecutive) for compressed formats.
-
-</dd> <dt>left, top, right, bottom, front, back</dt> <dd>
-
-Extents of the box in three dimensional integer space. Note that the left, top, and front edges are included but the right, bottom and top ones are not. *left* must always be smaller or equal to *right*, *top* must always be smaller or equal to *bottom*, and *front* must always be smaller or equal to *back*.
-
-</dd> </dl>
-
-It also has some useful methods:
-
-<dl compact="compact">
-<dt>getWidth()</dt> <dd>
-
-Get the width of this box
-
-</dd> <dt>getHeight()</dt> <dd>
-
-Get the height of this box. This is 1 for one dimensional images.
-
-</dd> <dt>getDepth()</dt> <dd>
-
-Get the depth of this box. This is 1 for one and two dimensional images.
-
-</dd> <dt>setConsecutive()</dt> <dd>
-
-Set the rowPitch and slicePitch so that the buffer is laid out consecutive in memory.
-
-</dd> <dt>getRowSkip()</dt> <dd>
-
-Get the number of elements between one past the rightmost pixel of one row and the leftmost pixel of the next row. This is zero if rows are consecutive.
-
-</dd> <dt>getSliceSkip()</dt> <dd>
-
-Get the number of elements between one past the right bottom pixel of one slice and the left top pixel of the next slice. This is zero if slices are consecutive.
-
-</dd> <dt>isConsecutive()</dt> <dd>
-
-Return whether this buffer is laid out consecutive in memory (i.e. the pitches are equal to the dimensions)
-
-</dd> <dt>getConsecutiveSize()</dt> <dd>
-
-Return the size (in bytes) this image would take if it was laid out consecutive in memory
-
-</dd> <dt>getSubVolume(const Box &def)</dt> <dd>
-
-Return a subvolume of this PixelBox, as a PixelBox.
-
-</dd> </dl>
-
-For more information about these methods consult the API documentation.
+For more information about the members consult the API documentation Ogre::PixelBox.
