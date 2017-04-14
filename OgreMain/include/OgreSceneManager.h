@@ -1324,6 +1324,7 @@ namespace Ogre {
             @param
                 meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
                 mesh will be loaded if it is not already.
+            @param groupName The resource name where the mesh lives
         */
         virtual Entity* createEntity(const String& entityName, const String& meshName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
@@ -1631,6 +1632,7 @@ namespace Ogre {
         virtual void setWorldGeometry(const String& filename);
 
         /** @overload
+            @param stream Data stream containing data to load
             @param typeName String identifying the type of world geometry
                 contained in the stream - not required if this manager only 
                 supports one type of world geometry.

@@ -45,7 +45,7 @@ namespace Ogre
     *  @{
     */
     /** \defgroup Terrain Terrain
-    *
+    *   Editable %Terrain System with LOD, serialization and \ref Paging support
     *  @{
     */
 
@@ -861,22 +861,26 @@ namespace Ogre
         /** Translate a vector from world space to local terrain space based on the alignment options.
         @param inVec The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
+        @param[out] outVec
         */
         void getTerrainVector(const Vector3& inVec, Vector3* outVec) const;
         /** Translate a vector from world space to local terrain space based on a specified alignment.
         @param inVec The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
+        @param[out] outVec
         */
         void getTerrainVectorAlign(const Vector3& inVec, Alignment align, Vector3* outVec) const;
 
         /** Translate a vector from world space to local terrain space based on the alignment options.
         @param x, y, z The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
+        @param[out] outVec
         */
         void getTerrainVector(Real x, Real y, Real z, Vector3* outVec) const;
         /** Translate a vector from world space to local terrain space based on a specified alignment.
         @param x, y, z The vector in world space, where x/y represents the 
         terrain plane and z represents the up vector
+        @param[out] outVec
         */
         void getTerrainVectorAlign(Real x, Real y, Real z, Alignment align, Vector3* outVec) const;
 
@@ -888,17 +892,20 @@ namespace Ogre
         /** Translate a vector into world space based on a specified alignment.
         @param inVec The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
+        @param[out] outVec
         */
         void getVectorAlign(const Vector3& inVec, Alignment align, Vector3* outVec) const;
 
         /** Translate a vector into world space based on the alignment options.
         @param x, y, z The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
+        @param[out] outVec
         */
         void getVector(Real x, Real y, Real z, Vector3* outVec) const;
         /** Translate a vector into world space based on a specified alignment.
         @param x, y, z The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
+        @param[out] outVec
         */
         void getVectorAlign(Real x, Real y, Real z, Alignment align, Vector3* outVec) const;
 

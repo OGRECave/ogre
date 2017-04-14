@@ -520,11 +520,14 @@ This command sets the value of an indexed parameter.
 
 format: param\_indexed &lt;index&gt; &lt;type&gt; &lt;value&gt; example: param\_indexed 0 float4 10.0 0 0 0
 
-The ’index’ is simply a number representing the position in the parameter list which the value should be written, and you should derive this from your program definition. The index is relative to the way constants are stored on the card, which is in 4-element blocks. For example if you defined a float4 parameter at index 0, the next index would be 1. If you defined a matrix4x4 at index 0, the next usable index would be 4, since a 4x4 matrix takes up 4 indexes.
+@param index
+simply a number representing the position in the parameter list which the value should be written, and you should derive this from your program definition. The index is relative to the way constants are stored on the card, which is in 4-element blocks. For example if you defined a float4 parameter at index 0, the next index would be 1. If you defined a matrix4x4 at index 0, the next usable index would be 4, since a 4x4 matrix takes up 4 indexes.
 
-The value of ’type’ can be float4, matrix4x4, float&lt;n&gt;, int4, int&lt;n&gt;. Note that ’int’ parameters are only available on some more advanced program syntaxes, check the D3D or GL vertex / fragment program documentation for full details. Typically the most useful ones will be float4 and matrix4x4. Note that if you use a type which is not a multiple of 4, then the remaining values up to the multiple of 4 will be filled with zeroes for you (since GPUs always use banks of 4 floats per constant even if only one is used).
+@param type
+can be float4, matrix4x4, float&lt;n&gt;, int4, int&lt;n&gt;. Note that ’int’ parameters are only available on some more advanced program syntaxes, check the D3D or GL vertex / fragment program documentation for full details. Typically the most useful ones will be float4 and matrix4x4. Note that if you use a type which is not a multiple of 4, then the remaining values up to the multiple of 4 will be filled with zeroes for you (since GPUs always use banks of 4 floats per constant even if only one is used).
 
-’value’ is simply a space or tab-delimited list of values which can be converted into the type you have specified.
+@param value
+a space or tab-delimited list of values which can be converted into the type you have specified.
 
 <a name="param_005findexed_005fauto"></a><a name="param_005findexed_005fauto-1"></a>
 

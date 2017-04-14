@@ -545,9 +545,7 @@ namespace Ogre
         */
         virtual void _setTexture(size_t unit, bool enabled, 
             const TexturePtr &texPtr) = 0;
-        /** @overload
-        @param texname The name of the texture to use - this should have
-        already been loaded with TextureManager::load.
+        /**
         @deprecated do not use
         */
         OGRE_DEPRECATED virtual void _setTexture(size_t unit, bool enabled, const String &texname);
@@ -607,6 +605,7 @@ namespace Ogre
         virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
 
         /** @overload
+        @param unit The texture unit to set the filtering options for
         @param minFilter The filter used when a texture is reduced in size
         @param magFilter The filter used when a texture is magnified
         @param mipFilter The filter used between mipmap levels, FO_NONE disables mipmapping
@@ -718,8 +717,8 @@ namespace Ogre
         */
         virtual void _beginFrame(void) = 0;
         
-        //Dummy structure for render system contexts - implementing RenderSystems can extend
-        //as needed
+        /// Dummy structure for render system contexts - implementing RenderSystems can extend
+        /// as needed
         struct RenderSystemContext { };
         /**
         * Pause rendering for a frame. This has to be called after _beginFrame and before _endFrame.
@@ -998,6 +997,7 @@ namespace Ogre
         @param twoSidedOperation If set to true, then if you render both back and front faces 
         (you'll have to turn off culling) then these parameters will apply for front faces, 
         and the inverse of them will happen for back faces (keep remains the same).
+        @param readBackAsTexture D3D11 specific @see _renderUsingReadBackAsTexture
         */
         virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
             uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
@@ -1005,7 +1005,7 @@ namespace Ogre
             StencilOperation depthFailOp = SOP_KEEP,
             StencilOperation passOp = SOP_KEEP, 
             bool twoSidedOperation = false,
-            bool readBackAsTexture = false) {};
+            bool readBackAsTexture = false) = 0;
 
 
 
