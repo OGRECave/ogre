@@ -158,7 +158,7 @@ namespace Ogre
 							// Recreate all texture unit states
 							if (HasShaderChanged)
 							{
-								hlmsMaterial->createTexturUnits(pass);
+								hlmsMaterial->createTextureUnits(pass);
 							}
 						}
 					}

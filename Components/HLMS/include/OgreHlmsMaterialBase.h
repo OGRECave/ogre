@@ -52,13 +52,13 @@ namespace Ogre
 
 		PropertyMap& getPropertyMap(){ return mPropertyMap; }
 
-		// this is called once per frame
+		/// this is called once per frame
 		virtual void updatePropertyMap(Camera* camera, const LightList* pLightList){}
 
-		// this is called once per frame if the shader has changed. (it is guaranteed that there are not texture units in the pass)
-		virtual void createTexturUnits(Pass* pass){}
+		/// this is called once per frame if the shader has changed. (it is guaranteed that there are not texture units in the pass)
+		virtual void createTextureUnits(Pass* pass){}
 
-		// this is called for every renderable before it is renderd with the given pass
+		/// this is called for every renderable before it is renderd with the given pass
 		virtual void updateUniforms(const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList) {}
 
 		bool IsDirty;
