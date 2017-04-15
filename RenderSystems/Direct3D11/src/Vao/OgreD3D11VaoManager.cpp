@@ -1499,6 +1499,110 @@ namespace Ogre
         return mDynamicBufferCurrentFrame;
     }
     //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::waitForSpecificFrameToFinish( uint32 frameCount )
+    {
+        if( frameCount == mFrameCount )
+        {
+            //Full stall
+            ID3D11Query *fence = createFence();
+            waitFor( fence );
+            fence->Release();
+            fence = 0;
+        }
+        else if( mFrameCount - frameCount <= mDynamicBufferMultiplier )
+        {
+            //Let's wait on one of our existing fences...
+            //frameDiff has to be in range [1; mDynamicBufferMultiplier]
+            size_t frameDiff = mFrameCount - frameCount;
+            const size_t idx = (mDynamicBufferCurrentFrame +
+                                mDynamicBufferMultiplier - frameDiff) % mDynamicBufferMultiplier;
+            if( mFrameSyncVec[idx] )
+            {
+                waitFor( mFrameSyncVec[idx] );
+                mFrameSyncVec[idx]->Release();
+                mFrameSyncVec[idx] = 0;
+
+                //Delete all the fences until this frame we've just waited.
+                size_t nextIdx = mDynamicBufferCurrentFrame;
+                while( nextIdx != idx )
+                {
+                    if( mFrameSyncVec[nextIdx] )
+                    {
+                        mFrameSyncVec[nextIdx]->Release();
+                        mFrameSyncVec[nextIdx] = 0;
+                    }
+                    nextIdx = (nextIdx + 1u) % mDynamicBufferMultiplier;
+                }
+            }
+        }
+        else
+        {
+            //No stall
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    bool D3D11VaoManager::isFrameFinished( uint32 frameCount )
+    {
+        bool retVal = true;
+        if( frameCount == mFrameCount )
+        {
+            //Full stall
+            //retVal = true;
+        }
+        else if( mFrameCount - frameCount <= mDynamicBufferMultiplier )
+        {
+            //frameDiff has to be in range [1; mDynamicBufferMultiplier]
+            size_t frameDiff = mFrameCount - frameCount;
+            const size_t idx = (mDynamicBufferCurrentFrame +
+                                mDynamicBufferMultiplier - frameDiff) % mDynamicBufferMultiplier;
+
+            if( mFrameSyncVec[idx] )
+            {
+                HRESULT hr = mDevice.GetImmediateContext()->GetData( mFrameSyncVec[idx], NULL, 0, 0 );
+
+                if( FAILED( hr ) )
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "Failure while waiting for a D3D11 Fence. Could be out of GPU memory. "
+                                 "Update your video card drivers. If that doesn't help, "
+                                 "contact the developers.",
+                                 "D3D11VaoManager::isFrameFinished" );
+                }
+
+                retVal = hr != S_FALSE;
+
+                if( retVal )
+                {
+                    mFrameSyncVec[idx]->Release();
+                    mFrameSyncVec[idx] = 0;
+
+                    //Delete all the fences until this frame we've just waited.
+                    size_t nextIdx = mDynamicBufferCurrentFrame;
+                    while( nextIdx != idx )
+                    {
+                        if( mFrameSyncVec[nextIdx] )
+                        {
+                            mFrameSyncVec[nextIdx]->Release();
+                            mFrameSyncVec[nextIdx] = 0;
+                        }
+                        nextIdx = (nextIdx + 1u) % mDynamicBufferMultiplier;
+                    }
+                }
+            }
+            else
+            {
+                retVal = false;
+            }
+        }
+        else
+        {
+            //No stall
+            retVal = false;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     ID3D11Query* D3D11VaoManager::waitFor( ID3D11Query *fenceName, ID3D11DeviceContextN *deviceContext )
     {
         HRESULT hr = S_FALSE;

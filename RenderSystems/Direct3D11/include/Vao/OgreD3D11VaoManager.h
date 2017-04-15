@@ -290,6 +290,12 @@ namespace Ogre
         /// @see VaoManager::waitForTailFrameToFinish
         virtual uint8 waitForTailFrameToFinish(void);
 
+        /// See VaoManager::waitForSpecificFrameToFinish
+        virtual void waitForSpecificFrameToFinish( uint32 frameCount );
+
+        /// See VaoManager::isFrameFinished
+        virtual bool isFrameFinished( uint32 frameCount );
+
         static ID3D11Query* createFence( D3D11Device &device );
         ID3D11Query* createFence(void);
 
