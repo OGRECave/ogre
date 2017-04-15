@@ -1324,6 +1324,7 @@ namespace Ogre {
             @param
                 meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
                 mesh will be loaded if it is not already.
+            @param groupName The resource name where the mesh lives
         */
         virtual Entity* createEntity(const String& entityName, const String& meshName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
@@ -1631,6 +1632,7 @@ namespace Ogre {
         virtual void setWorldGeometry(const String& filename);
 
         /** @overload
+            @param stream Data stream containing data to load
             @param typeName String identifying the type of world geometry
                 contained in the stream - not required if this manager only 
                 supports one type of world geometry.
@@ -1894,7 +1896,7 @@ namespace Ogre {
             Real tiling = 10, bool drawFirst = true, Real bow = 0, 
             int xsegments = 1, int ysegments = 1, 
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-        /** @overload
+        /** @overload setSkyPlane
             @param
                 renderQueue The render queue to use when rendering this object
         */        
@@ -1951,6 +1953,8 @@ namespace Ogre {
                 ensure that the distance value is large enough that no
                 objects will 'poke through' the sky box when it is rendered.
             @param
+                renderQueue The render queue to use when rendering this object
+            @param
                 orientation Optional parameter to specify the orientation
                 of the box. By default the 'top' of the box is deemed to be
                 in the +y direction, and the 'front' at the -z direction.
@@ -1963,7 +1967,7 @@ namespace Ogre {
             bool drawFirst = true, const Quaternion& orientation = Quaternion::IDENTITY,
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-        /** @overload
+        /** @overload setSkyBox
             @param
                 renderQueue The render queue to use when rendering this object
         */
@@ -2046,7 +2050,7 @@ namespace Ogre {
             int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-        /** @overload
+        /** @overload setSkyDome
             @param
                 renderQueue The render queue to use when rendering this object
                 */        

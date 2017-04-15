@@ -219,6 +219,8 @@ namespace Ogre {
         @param resType The type of the resource 
             (from ResourceManager::getResourceType())
         @param name The name of the Resource
+        @param listener Optional callback interface, take note of warnings in
+            the header and only use if you understand them.
         */
         virtual BackgroundProcessTicket unload(
             const String& resType, const String& name, 
@@ -229,6 +231,8 @@ namespace Ogre {
         @param resType The type of the resource 
             (from ResourceManager::getResourceType())
         @param handle Handle to the resource 
+        @param listener Optional callback interface, take note of warnings in
+            the header and only use if you understand them.
         */
         virtual BackgroundProcessTicket unload(
             const String& resType, ResourceHandle handle, 
@@ -237,6 +241,8 @@ namespace Ogre {
         /** Unloads a resource group in the background.
         @see ResourceGroupManager::unloadResourceGroup
         @param name The name of the resource group to load
+        @param listener Optional callback interface, take note of warnings in
+            the header and only use if you understand them.
         @return Ticket identifying the request, use isProcessComplete() to 
             determine if completed if not using listener
         */
@@ -258,6 +264,8 @@ namespace Ogre {
         @param loadParams Optional pointer to a list of name/value pairs 
             containing loading parameters for this type of resource. Remember 
             that this must have a lifespan longer than the return of this call!
+        @param listener Optional callback interface, take note of warnings in
+            the header and only use if you understand them.
         */
         virtual BackgroundProcessTicket prepare(
             const String& resType, const String& name, 
@@ -280,6 +288,8 @@ namespace Ogre {
         @param loadParams Optional pointer to a list of name/value pairs 
             containing loading parameters for this type of resource. Remember 
             that this must have a lifespan longer than the return of this call!
+        @param listener Optional callback interface, take note of warnings in
+            the header and only use if you understand them.
         */
         virtual BackgroundProcessTicket load(
             const String& resType, const String& name, 

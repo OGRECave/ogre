@@ -33,7 +33,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     /** A volume source from a 16 Bit float 3D grid capable of loading volume
     serializations.
     */
@@ -92,7 +97,8 @@ namespace Volume {
         ~HalfFloatGridSource(void);
 
     };
-
+    /** @} */
+    /** @} */
 }
 }
 

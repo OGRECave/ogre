@@ -667,7 +667,7 @@ namespace Ogre {
         typedef TRect< long > Rect;
 
         /** Structure used to define a box in a 3-D integer space.
-            Note that the left, top, and front edges are included but the right, 
+            Note that the left, top, and front edges are included but the right,
             bottom and back ones are not.
          */
         struct Box
@@ -684,8 +684,7 @@ namespace Ogre {
                 @param  t   y value of top edge
                 @param  r   x value of right edge
                 @param  b   y value of bottom edge
-                @note Note that the left, top, and front edges are included 
-                    but the right, bottom and back ones are not.
+                @note @copydetails Ogre::Box
             */
             Box( uint32 l, uint32 t, uint32 r, uint32 b ):
                 left(l),
@@ -705,8 +704,7 @@ namespace Ogre {
                 @param  r   x value of right edge
                 @param  b   y value of bottom edge
                 @param  bb  z value of back edge
-                @note Note that the left, top, and front edges are included 
-                    but the right, bottom and back ones are not.
+                @note @copydetails Ogre::Box
             */
             Box( uint32 l, uint32 t, uint32 ff, uint32 r, uint32 b, uint32 bb ):
                 left(l),

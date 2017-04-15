@@ -1,8 +1,10 @@
 # Tutorials {#tutorials}
 
 - @subpage setup
-- @subpage rtss
-- @subpage hlms
-- @subpage trays
+- Components
+    - @subpage rtss
+    - @subpage hlms
+    - @subpage trays
+    - @subpage volume
 - @subpage deferred
 - @subpage pczscenemanager

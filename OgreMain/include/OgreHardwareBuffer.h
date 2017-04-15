@@ -76,68 +76,98 @@ namespace Ogre {
 
         public:
             /// Enums describing buffer usage; not mutually exclusive
-            enum Usage 
+            enum Usage
             {
-                /** Static buffer which the application rarely modifies once created. Modifying 
+                /** Static buffer which the application rarely modifies once created. Modifying
                 the contents of this buffer will involve a performance hit.
                 */
                 HBU_STATIC = 1,
                 /** Indicates the application would like to modify this buffer with the CPU
-                fairly often. 
-                Buffers created with this flag will typically end up in AGP memory rather 
+                fairly often.
+                Buffers created with this flag will typically end up in AGP memory rather
                 than video memory.
+
+                This is the least optimal buffer setting.
                 */
                 HBU_DYNAMIC = 2,
-                /** Indicates the application will never read the contents of the buffer back, 
-                it will only ever write data. Locking a buffer with this flag will ALWAYS 
-                return a pointer to new, blank memory rather than the memory associated 
-                with the contents of the buffer; this avoids DMA stalls because you can 
-                write to a new memory area while the previous one is being used. 
+                /** Indicates the application will never read the contents of the buffer back,
+                it will only ever write data. Locking a buffer with this flag will ALWAYS
+                return a pointer to new, blank memory rather than the memory associated
+                with the contents of the buffer; this avoids DMA stalls because you can
+                write to a new memory area while the previous one is being used.
+
+                However, you may read from it’s shadow buffer if you set one up
                 */
                 HBU_WRITE_ONLY = 4,
                 /** Indicates that the application will be refilling the contents
                 of the buffer regularly (not just updating, but generating the
-                contents from scratch), and therefore does not mind if the contents 
+                contents from scratch), and therefore does not mind if the contents
                 of the buffer are lost somehow and need to be recreated. This
                 allows and additional level of optimisation on the buffer.
-                This option only really makes sense when combined with 
+                This option only really makes sense when combined with
                 HBU_DYNAMIC_WRITE_ONLY.
                 */
                 HBU_DISCARDABLE = 8,
-                /// Combination of HBU_STATIC and HBU_WRITE_ONLY
-                HBU_STATIC_WRITE_ONLY = 5, 
-                /** Combination of HBU_DYNAMIC and HBU_WRITE_ONLY. If you use 
+                /** Combination of HBU_STATIC and HBU_WRITE_ONLY
+                This is the optimal buffer usage setting.
+                */
+                HBU_STATIC_WRITE_ONLY = 5,
+                /** Combination of HBU_DYNAMIC and HBU_WRITE_ONLY. If you use
                 this, strongly consider using HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
-                instead if you update the entire contents of the buffer very 
-                regularly. 
+                instead if you update the entire contents of the buffer very
+                regularly.
                 */
                 HBU_DYNAMIC_WRITE_ONLY = 6,
-                /// Combination of HBU_DYNAMIC, HBU_WRITE_ONLY and HBU_DISCARDABLE
+                /** Combination of HBU_DYNAMIC, HBU_WRITE_ONLY and HBU_DISCARDABLE
+                 This means that you expect to replace the entire contents of the buffer on an
+                 extremely regular basis, most likely every frame. By selecting this option, you
+                 free the system up from having to be concerned about losing the existing contents
+                 of the buffer at any time, because if it does lose them, you will be replacing them
+                 next frame anyway. On some platforms this can make a significant performance
+                 difference, so you should try to use this whenever you have a buffer you need to
+                 update regularly. Note that if you create a buffer this way, you should use the
+                 HBL_DISCARD flag when locking the contents of it for writing.
+                 */
                 HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE = 14
-
 
             };
             /// Locking options
             enum LockOptions
             {
-                /** Normal mode, ie allows read/write and contents are preserved. */
+                /** Normal mode, ie allows read/write and contents are preserved.
+                 This kind of lock allows reading and writing from the buffer - it’s also the least
+                 optimal because basically you’re telling the card you could be doing anything at
+                 all. If you’re not using a shadow buffer, it requires the buffer to be transferred
+                 from the card and back again. If you’re using a shadow buffer the effect is
+                 minimal.
+                 */
                 HBL_NORMAL,
-                /** Discards the <em>entire</em> buffer while locking; this allows optimisation to be 
-                performed because synchronisation issues are relaxed. Only allowed on buffers 
-                created with the HBU_DYNAMIC flag. 
+                /** Discards the <em>entire</em> buffer while locking.
+                This means you are happy for the card to discard the entire current contents of the
+                buffer. Implicitly this means you are not going to read the data - it also means
+                that the card can avoid any stalls if the buffer is currently being rendered from,
+                because it will actually give you an entirely different one. Use this wherever
+                possible when you are locking a buffer which was not created with a shadow buffer.
+                If you are using a shadow buffer it matters less, although with a shadow buffer it’s
+                preferable to lock the entire buffer at once, because that allows the shadow buffer
+                to use HBL_DISCARD when it uploads the updated contents to the real buffer. Only
+                allowed on buffers
+                created with the HBU_DYNAMIC flag.
                 */
                 HBL_DISCARD,
-                /** Lock the buffer for reading only. Not allowed in buffers which are created with HBU_WRITE_ONLY. 
-                Mandatory on static buffers, i.e. those created without the HBU_DYNAMIC flag. 
-                */ 
+                /** Lock the buffer for reading only. Not allowed in buffers which are created with
+                HBU_WRITE_ONLY.
+                Mandatory on static buffers, i.e. those created without the HBU_DYNAMIC flag.
+                */
                 HBL_READ_ONLY,
-                /** As HBL_DISCARD, except the application guarantees not to overwrite any 
+                /** As HBL_DISCARD, except the application guarantees not to overwrite any
                 region of the buffer which has already been used in this frame, can allow
-                some optimisation on some APIs. */
+                some optimisation on some APIs.
+                This is only useful on buffers with no shadow buffer.*/
                 HBL_NO_OVERWRITE,
                 /** Lock the buffer for writing only.*/
                 HBL_WRITE_ONLY
-                
+
             };
 
             /// Device load options
@@ -233,10 +263,7 @@ namespace Ogre {
                 return ret;
             }
 
-            /** Lock the entire buffer for (potentially) reading / writing.
-            @param options Locking options
-            @return Pointer to the locked memory
-            */
+            /// @overload
             void* lock(LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT)
             {
                 return this->lock(0, mSizeInBytes, options, uploadOpt);

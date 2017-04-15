@@ -46,14 +46,20 @@ namespace Ogre {
      */
     enum TextureUsage
     {
-        /// @copydoc HardwareBuffer::Usage
+        /// same as HardwareBuffer::HBU_STATIC
         TU_STATIC = HardwareBuffer::HBU_STATIC,
+        /// same as HardwareBuffer::HBU_DYNAMIC
         TU_DYNAMIC = HardwareBuffer::HBU_DYNAMIC,
+        /// same as HardwareBuffer::HBU_WRITE_ONLY
         TU_WRITE_ONLY = HardwareBuffer::HBU_WRITE_ONLY,
-        TU_STATIC_WRITE_ONLY = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+        /// same as HardwareBuffer::HBU_STATIC_WRITE_ONLY
+        TU_STATIC_WRITE_ONLY = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+        /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY
         TU_DYNAMIC_WRITE_ONLY = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+        /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
         TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-        /// Mipmaps will be automatically generated for this texture
+        /// Mipmaps will be automatically generated for this texture. The exact algorithm used is not
+        /// defined, but you can assume it to be a 2x2 box filter.
         TU_AUTOMIPMAP = 16,
         /** This texture will be a render target, i.e. used as a target for render to texture
             setting this flag will ignore all other texture usages except TU_AUTOMIPMAP */
@@ -81,7 +87,8 @@ namespace Ogre {
         TEX_TYPE_2D = 2,
         /// 3D volume texture, used in combination with 3D texture coordinates
         TEX_TYPE_3D = 3,
-        /// 3D cube map, used in combination with 3D texture coordinates
+        /// cube map (six two dimensional textures, one for each cube face), used in combination with 3D
+        /// texture coordinates
         TEX_TYPE_CUBE_MAP = 4,
         /// 2D texture array
         TEX_TYPE_2D_ARRAY = 5,

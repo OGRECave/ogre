@@ -33,7 +33,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     class Source;
     class MeshBuilder;
 
@@ -101,6 +106,8 @@ namespace Volume {
         */
         virtual void addMarchingSquaresTriangles(const Vector3 *corners, const Vector4 *volumeValues, const size_t *indices, const Real maxDistance, MeshBuilder *mb) const = 0;
     };
+    /** @} */
+    /** @} */
 }
 }
 

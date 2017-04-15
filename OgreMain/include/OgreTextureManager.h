@@ -81,7 +81,7 @@ namespace Ogre {
 
         using ResourceManager::createOrRetrieve;
 
-        /** @overload ResourceManager::createOrRetrieve
+        /** @overload createOrRetrieve
 
             @param
                 texType The type of texture to load/create, defaults to normal 2D textures
@@ -367,6 +367,7 @@ namespace Ogre {
             channels or packing the channels differently, without it making and qualitative 
             differences to the texture. If you want to just detect whether the quality of a
             given texture will be reduced, use isEquivalentFormatSupport instead.
+        @param ttype The type of texture
         @param format The pixel format requested
         @param usage The kind of usage this texture is intended for, a combination of 
             the TextureUsage flags.

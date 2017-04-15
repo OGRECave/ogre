@@ -34,7 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-    
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Volume
+    *  @{
+    */
     /** Forward declaration.
     */
     class Chunk;
@@ -130,6 +135,8 @@ namespace Volume {
         void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
         
     };
+    /** @} */
+    /** @} */
 }
 }
 

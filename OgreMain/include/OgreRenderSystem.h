@@ -296,257 +296,42 @@ namespace Ogre
         Options are case sensitive. Unrecognised parameters will be ignored silently.
         These values might be platform dependent, but these are present for all platforms unless
         indicated otherwise:
-        <table>
-        <tr>
-            <td><b>Key</b></td>
-            <td><b>Type/Values</b></td>
-            <td><b>Default</b></td>
-            <td><b>Description</b></td>
-            <td><b>Notes</b></td>
-        </tr>
-        <tr>
-            <td>title</td>
-            <td>Any string</td>
-            <td>RenderTarget name</td>
-            <td>The title of the window that will appear in the title bar</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>colourDepth</td>
-            <td>16, 32</td>
-            <td>Desktop depth</td>
-            <td>Colour depth of the resulting rendering window; only applies if fullScreen</td>
-            <td>Win32 Specific</td>
-        </tr>
-        <tr>
-            <td>left</td>
-            <td>Positive integers</td>
-            <td>Centred</td>
-            <td>Screen x coordinate from left</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>top</td>
-            <td>Positive integers</td>
-            <td>Centred</td>
-            <td>Screen y coordinate from left</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>depthBuffer</td>
-            <td>true, false</td>
-            <td>true</td>
-            <td>Use depth buffer</td>
-            <td>DirectX9 specific</td>
-        </tr>
-        <tr>
-            <td>externalWindowHandle</td>
-            <td>Win32: HWND as integer<br/>
-                GLX: poslong:posint:poslong (display*:screen:windowHandle) or poslong:posint:poslong:poslong (display*:screen:windowHandle:XVisualInfo*)<br/>
-                OS X Cocoa: OgreGLView address as an integer. You can pass NSView or NSWindow too, but should perform OgreGLView callbacks into the Ogre manually.
-                OS X Carbon: WindowRef as an integer
-                iOS: UIWindow address as an integer
-            </td>
-            <td>0 (none)</td>
-            <td>External window handle, for embedding the OGRE render in an existing window</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>externalGLControl</td>
-            <td>true, false</td>
-            <td>false</td>
-            <td>Let the external window control OpenGL i.e. don't select a pixel format for the window,
-            do not change v-sync and do not swap buffer. When set to true, the calling application
-            is responsible of OpenGL initialization and buffer swapping. It should also create an
-            OpenGL context for its own rendering, Ogre will create one for its use. Then the calling
-            application must also enable Ogre OpenGL context before calling any Ogre function and
-            restore its OpenGL context after these calls.</td>
-            <td>OpenGL specific</td>
-        </tr>
-        <tr>
-            <td>currentGLContext</td>
-            <td>true, false</td>
-            <td>false</td>
-            <td>Use an externally created GL context. (Must be current)</td>
-            <td>OpenGL Specific</td>
-        </tr>
-        <tr>
-            <td>parentWindowHandle</td>
-            <td>Win32: HWND as integer<br/>
-                GLX: poslong:posint:poslong (display*:screen:windowHandle) or poslong:posint:poslong:poslong (display*:screen:windowHandle:XVisualInfo*)</td>
-            <td>0 (none)</td>
-            <td>Parent window handle, for embedding the OGRE in a child of an external window</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>macAPI</td>
-            <td>String: "cocoa" or "carbon"</td>
-            <td>"carbon"</td>
-            <td>Specifies the type of rendering window on the Mac Platform.</td>
-            <td>Mac OS X Specific</td>
-            <td>&nbsp;</td>
-         </tr>
-         <tr>
-             <td>contentScalingFactor</td>
-             <td>Positive Float greater than 1.0</td>
-             <td>The default content scaling factor of the screen</td>
-             <td>Specifies the CAEAGLLayer content scaling factor.  Only supported on iOS 4 or greater.
-                 This can be useful to limit the resolution of the OpenGL ES backing store.  For example, the iPhone 4's
-                 native resolution is 960 x 640.  Windows are always 320 x 480, if you would like to limit the display
-                 to 720 x 480, specify 1.5 as the scaling factor.
-             </td>
-             <td>iOS Specific</td>
-             <td>&nbsp;</td>
-         </tr>
-         <tr>
-             <td>externalViewHandle</td>
-             <td>UIView pointer as an integer</td>
-             <td>0</td>
-             <td>External view handle, for rendering OGRE render in an existing view</td>
-             <td>iOS Specific</td>
-             <td>&nbsp;</td>
-         </tr>
-         <tr>
-             <td>externalViewControllerHandle</td>
-             <td>UIViewController pointer as an integer</td>
-             <td>0</td>
-             <td>External view controller handle, for embedding OGRE in an existing view controller</td>
-             <td>iOS Specific</td>
-             <td>&nbsp;</td>
-         </tr>
-         <tr>
-             <td>externalSharegroup</td>
-             <td>EAGLSharegroup pointer as an integer</td>
-             <td>0</td>
-             <td>External sharegroup, used to shared GL resources between contexts</td>
-             <td>iOS Specific</td>
-             <td>&nbsp;</td>
-         </tr>
-         <tr>
-             <td>Full Screen</td>
-             <td>true, false</td>
-             <td>false</td>
-             <td>Specify whether to create the window in full screen mode</td>
-             <td>OS X Specific</td>
-             <td>&nbsp;</td>
-         </tr>
-         <tr>
-            <td>FSAA</td>
-            <td>Positive integer (usually 0, 2, 4, 8, 16)</td>
-            <td>0</td>
-            <td>Full screen antialiasing factor</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>FSAAHint</td>
-            <td>Depends on RenderSystem and hardware. Currently supports:<br/>
-            "Quality": on systems that have an option to prefer higher AA quality over speed, use it</td>
-            <td>Blank</td>
-            <td>Full screen antialiasing hint</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>displayFrequency</td>
-            <td>Refresh rate in Hertz (e.g. 60, 75, 100)</td>
-            <td>Desktop vsync rate</td>
-            <td>Display frequency rate, for fullscreen mode</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>vsync</td>
-            <td>true, false</td>
-            <td>false</td>
-            <td>Synchronize buffer swaps to monitor vsync, eliminating tearing at the expense of a fixed frame rate</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>vsyncInterval</td>
-            <td>1, 2, 3, 4</td>
-            <td>1</td>
-            <td>If vsync is enabled, the minimum number of vertical blanks that should occur between renders. 
-            For example if vsync is enabled, the refresh rate is 60 and this is set to 2, then the
-            frame rate will be locked at 30.</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>border</td>
-            <td>none, fixed, resize</td>
-            <td>resize</td>
-            <td>The type of window border (in windowed mode)</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>outerDimensions</td>
-            <td>true, false</td>
-            <td>false</td>
-            <td>Whether the width/height is expressed as the size of the 
-            outer window, rather than the content area</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>useNVPerfHUD</td>
-            <td>true, false</td>
-            <td>false</td>
-            <td>Enable the use of nVidia NVPerfHUD</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>gamma</td>
-            <td>true, false</td>
-            <td>false</td>
-            <td>Enable hardware conversion from linear colour space to gamma
-            colour space on rendering to the window.</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>enableDoubleClick</td>
-            <td>true, false</td>
-            <td>false</td>
-            <td>Enable the window to keep track and transmit double click messages.</td>
-            <td>Win32 Specific</td>
-        </tr>
-        <tr>
-            <td>MSAA</td>
-            <td>Positive integer (usually 0, 2, 4, 8, 16)</td>
-            <td>0</td>
-            <td>Full screen antialiasing factor</td>	  
-            <td>Android Specific</td>
-        </tr>  
-        <tr>
-            <td>CSAA</td>
-            <td>Positive integer (usually 0, 2, 4, 8, 16)</td>
-            <td>0</td>
-            <td>Coverage sampling factor (https://www.khronos.org/registry/egl/extensions/NV/EGL_NV_coverage_sample.txt)</td>	  
-            <td>Android Specific</td>
-        </tr>	
-        <tr>
-            <td>maxColourBufferSize</td>
-            <td>Positive integer (usually 16, 32)</td>
-            <td>32</td>
-            <td>Max EGL_BUFFER_SIZE</td>	  
-            <td>Android Specific</td>
-        </tr>	 
-        <tr>
-            <td>minColourBufferSize</td>
-            <td>Positive integer (usually 16, 32)</td>
-            <td>16</td>
-            <td>Min EGL_BUFFER_SIZE</td>	  
-            <td>Android Specific</td>
-        </tr>  
-        <tr>
-            <td>maxStencilBufferSize</td>
-            <td>Positive integer (usually 0, 8)</td>
-            <td>0</td>
-            <td>EGL_STENCIL_SIZE</td>	  
-            <td>Android Specific</td>
-        </tr>	
-        <tr>
-            <td>maxDepthBufferSize</td>
-            <td>Positive integer (usually 0, 16, 24)</td>
-            <td>16</td>
-            <td>EGL_DEPTH_SIZE</td>	  
-            <td>Android Specific</td>
-        </tr>
+        | Key | Type / Values | Default | Description | Notes |
+        |-----|---------------|---------|-------------|-------|
+        | title | Any string | RenderTarget name | The title of the window that will appear in the title bar |  |
+        | left | Positive integers | Centred | Screen x coordinate from left |  |
+        | top | Positive integers | Centred | Screen y coordinate from left |  |
+        | border | none, fixed, resize | resize | The type of window border (in windowed mode) |  |
+        | hidden | true, false | false | hide the created window | |
+        | FSAA | Positive integer (usually 0, 2, 4, 8, 16) | 0 | Full screen antialiasing factor |  |
+        | gamma | true, false | false | Enable hardware conversion from linear colour space to gamma colour space on rendering to the window. |  |
+        | vsync | true, false | false | Synchronize buffer swaps to monitor vsync, eliminating tearing at the expense of a fixed frame rate |  |
+        | vsyncInterval | 1, 2, 3, 4 | 1 | If vsync is enabled, the minimum number of vertical blanks that should occur between renders. For example if vsync is enabled, the refresh rate is 60 and this is set to 2, then the frame rate will be locked at 30. |  |
+        | Full Screen | true, false | false | Specify whether to create the window in full screen mode | |
+        | displayFrequency | Refresh rate in Hertz (e.g. 60, 75, 100) | Desktop vsync rate | Display frequency rate, for fullscreen mode |  |
+        | parentWindowHandle | <ul><li>Win32: HWND as integer<li>GLX: poslong:posint:poslong (display*:screen:windowHandle) or poslong:posint:poslong:poslong (display*:screen:windowHandle:XVisualInfo*) | 0 (none) | Parent window handle, for embedding the OGRE in a child of an external window |  |
+        | externalWindowHandle | <ul><li>Win32: HWND as integer<li>GLX: poslong:posint:poslong (display*:screen:windowHandle) or poslong:posint:poslong:poslong (display*:screen:windowHandle:XVisualInfo*)<li>OS X Cocoa: OgreGLView address as an integer. You can pass NSView or NSWindow too, but should perform OgreGLView callbacks into the Ogre manually.<li>OS X Carbon: WindowRef as an integer<li>iOS: UIWindow address as an integer</ul> | 0 (none) | External window handle, for embedding the OGRE render in an existing window |  |
+        | externalGLControl | true, false | false | Let the external window control OpenGL i.e. don't select a pixel format for the window, do not change v-sync and do not swap buffer. When set to true, the calling application is responsible of OpenGL initialization and buffer swapping. It should also create an OpenGL context for its own rendering, Ogre will create one for its use. Then the calling application must also enable Ogre OpenGL context before calling any Ogre function and restore its OpenGL context after these calls. | OpenGL Specific |
+        | currentGLContext | true, false | false | Use an externally created GL context. (Must be current) | OpenGL Specific |
+        | colourDepth | 16, 32 | Desktop depth | Colour depth of the resulting rendering window; only applies if fullScreen | Win32 Specific |
+        | FSAAHint | Depends on RenderSystem and hardware. Currently supports:"Quality": on systems that have an option to prefer higher AA quality over speed, use it | Blank | Full screen antialiasing hint | Win32 Specific |
+        | outerDimensions | true, false | false | Whether the width/height is expressed as the size of the outer window, rather than the content area | Win32 Specific  |
+        | monitorIndex | | -1 | | Win 32 Specific |
+        | monitorHandle | | 0 (none) | | Win 32 Specific (OpenGL) |
+        | enableDoubleClick | true, false | false | Enable the window to keep track and transmit double click messages. | Win32 Specific |
+        | useNVPerfHUD | true, false | false | Enable the use of nVidia NVPerfHUD | DirectX Specific |
+        | depthBuffer | true, false | true | Use depth buffer | DirectX9 Specific |
+        | macAPI | String: "cocoa" or "carbon" | "carbon" | Specifies the type of rendering window on the Mac Platform. | Mac OS X Specific |
+        | contentScalingFactor | Positive Float greater than 1.0 | The default content scaling factor of the screen | Specifies the CAEAGLLayer content scaling factor. Only supported on iOS 4 or greater. This can be useful to limit the resolution of the OpenGL ES backing store. For example, the iPhone 4's native resolution is 960 x 640\. Windows are always 320 x 480, if you would like to limit the display to 720 x 480, specify 1.5 as the scaling factor. | iOS Specific |
+        | externalViewHandle | UIView pointer as an integer | 0 | External view handle, for rendering OGRE render in an existing view | iOS Specific |
+        | externalViewControllerHandle | UIViewController pointer as an integer | 0 | External view controller handle, for embedding OGRE in an existing view controller | iOS Specific |
+        | externalSharegroup | EAGLSharegroup pointer as an integer | 0 | External sharegroup, used to shared GL resources between contexts | iOS Specific |
+        | MSAA | Positive integer (usually 0, 2, 4, 8, 16) | 0 | Full screen antialiasing factor | Android Specific |
+        | CSAA | Positive integer (usually 0, 2, 4, 8, 16) | 0 | [Coverage sampling factor](https://www.khronos.org/registry/egl/extensions/NV/EGL_NV_coverage_sample.txt) | Android Specific |
+        | maxColourBufferSize | Positive integer (usually 16, 32) | 32 | Max EGL_BUFFER_SIZE | Android Specific |
+        | minColourBufferSize | Positive integer (usually 16, 32) | 16 | Min EGL_BUFFER_SIZE | Android Specific |
+        | maxStencilBufferSize | Positive integer (usually 0, 8) | 0 | EGL_STENCIL_SIZE | Android Specific |
+        | maxDepthBufferSize | Positive integer (usually 0, 16, 24) | 16 | EGL_DEPTH_SIZE | Android Specific |
         */
         virtual RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0) = 0;
@@ -760,9 +545,7 @@ namespace Ogre
         */
         virtual void _setTexture(size_t unit, bool enabled, 
             const TexturePtr &texPtr) = 0;
-        /** @overload
-        @param texname The name of the texture to use - this should have
-        already been loaded with TextureManager::load.
+        /**
         @deprecated do not use
         */
         OGRE_DEPRECATED virtual void _setTexture(size_t unit, bool enabled, const String &texname);
@@ -822,6 +605,7 @@ namespace Ogre
         virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
 
         /** @overload
+        @param unit The texture unit to set the filtering options for
         @param minFilter The filter used when a texture is reduced in size
         @param magFilter The filter used when a texture is magnified
         @param mipFilter The filter used between mipmap levels, FO_NONE disables mipmapping
@@ -933,8 +717,8 @@ namespace Ogre
         */
         virtual void _beginFrame(void) = 0;
         
-        //Dummy structure for render system contexts - implementing RenderSystems can extend
-        //as needed
+        /// Dummy structure for render system contexts - implementing RenderSystems can extend
+        /// as needed
         struct RenderSystemContext { };
         /**
         * Pause rendering for a frame. This has to be called after _beginFrame and before _endFrame.
@@ -1213,6 +997,7 @@ namespace Ogre
         @param twoSidedOperation If set to true, then if you render both back and front faces 
         (you'll have to turn off culling) then these parameters will apply for front faces, 
         and the inverse of them will happen for back faces (keep remains the same).
+        @param readBackAsTexture D3D11 specific @see _renderUsingReadBackAsTexture
         */
         virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
             uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
@@ -1220,7 +1005,7 @@ namespace Ogre
             StencilOperation depthFailOp = SOP_KEEP,
             StencilOperation passOp = SOP_KEEP, 
             bool twoSidedOperation = false,
-            bool readBackAsTexture = false) {};
+            bool readBackAsTexture = false) = 0;
 
 
 

@@ -34,6 +34,14 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \defgroup Volume Volume
+    * %Volume Rendering with LOD aimed at terrain
+    *  @{
+    */
+
     /** Abstract class defining the density function.
     */
     class _OgreVolumeExport Source
@@ -151,6 +159,8 @@ namespace Volume {
         Real getVolumeSpaceToWorldSpaceFactor(void) const;
     };
 
+    /** @} */
+    /** @} */
 }
 }
 

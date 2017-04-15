@@ -299,6 +299,8 @@ namespace Ogre {
         In case of a rectangle, depth must be 1. 
         Pixels are stored as a succession of "depth" slices, each containing "height" rows of 
         "width" pixels.
+
+        @copydetails Ogre::Box
     */
     class _OgreExport PixelBox: public Box, public ImageAlloc {
     public:

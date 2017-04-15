@@ -234,17 +234,17 @@ One Ogre::OverlaySystem per application is enough but you need to call addRender
 
 ## Creating 2D Elements
 
-The OverlayElement class abstracts the details of 2D elements which are added to overlays. All items which can be added to overlays are derived from this class. It is possible (and encouraged) for users of OGRE to define their own custom subclasses of OverlayElement in order to provide their own user controls. The key common features of all OverlayElements are things like size, position, basic material name etc. Subclasses extend this behaviour to include more complex properties and behaviour.
+The Ogre::OverlayElement class abstracts the details of 2D elements which are added to overlays. All items which can be added to overlays are derived from this class. It is possible (and encouraged) for users of OGRE to define their own custom subclasses of OverlayElement in order to provide their own user controls. The key common features of all OverlayElements are things like size, position, basic material name etc. Subclasses extend this behaviour to include more complex properties and behaviour.
 
-An important built-in subclass of OverlayElement is OverlayContainer. OverlayContainer is the same as a OverlayElement, except that it can contain other OverlayElements, grouping them together (allowing them to be moved together for example) and providing them with a local coordinate origin for easier lineup.
+An important built-in subclass of OverlayElement is Ogre::OverlayContainer. OverlayContainer is the same as a OverlayElement, except that it can contain other OverlayElements, grouping them together (allowing them to be moved together for example) and providing them with a local coordinate origin for easier lineup.
 
-The third important class is OverlayManager. Whenever an application wishes to create a 2D element to add to an overlay (or a container), it should call OverlayManager::createOverlayElement. The type of element you wish to create is identified by a string, the reason being that it allows plugins to register new types of OverlayElement for you to create without you having to link specifically to those libraries. For example, to create a panel (a plain rectangular area which can contain other OverlayElements) you would call OverlayManager::getSingleton().createOverlayElement("Panel", "myNewPanel");
+The third important class is Ogre::OverlayManager. Whenever an application wishes to create a 2D element to add to an overlay (or a container), it should call Ogre::OverlayManager::createOverlayElement. The type of element you wish to create is identified by a string, the reason being that it allows plugins to register new types of OverlayElement for you to create without you having to link specifically to those libraries. For example, to create a panel (a plain rectangular area which can contain other OverlayElements) you would call `OverlayManager::getSingleton().createOverlayElement("Panel", "myNewPanel");`.
 
 <a name="Adding-2D-Elements-to-the-Overlay"></a>
 
 ## Adding 2D Elements to the Overlay
 
-Only OverlayContainers can be added direct to an overlay. The reason is that each level of container establishes the Zorder of the elements contained within it, so if you nest several containers, inner containers have a higher Zorder than outer ones to ensure they are displayed correctly. To add a container (such as a Panel) to the overlay, simply call Ogre::Overlay::add2D.
+Only OverlayContainers can be added direct to an overlay. The reason is that each level of container establishes the Zorder of the elements contained within it, so if you nest several containers, inner containers have a higher Z-order than outer ones to ensure they are displayed correctly. To add a container (such as a Panel) to the overlay, simply call Ogre::Overlay::add2D.
 
 If you wish to add child elements to that container, call Ogre::OverlayContainer::addChild. Child elements can be Ogre::OverlayElements or Ogre::OverlayContainer instances themselves. Remember that the position of a child element is relative to the top-left corner of it’s parent.
 
@@ -268,7 +268,7 @@ This mode is useful when you want items in the overlay to be the same size on th
 <a name="Transforming-Overlays"></a>
 ## Transforming Overlays
 
-Another nice feature of overlays is being able to rotate, scroll and scale them as a whole. You can use this for zooming in / out menu systems, dropping them in from off screen and other nice effects. See the Ogre::Overlay::scroll, Ogre::Overlay::rotate and Ogre::Overlay::scale methods for more information.
+Another nice feature of overlays is being able to rotate, scroll and scale them as a whole. You can use this for zooming in / out menu systems, dropping them in from off screen and other nice effects. See the Ogre::Overlay::scroll, Ogre::Overlay::rotate and Ogre::Overlay::setScale methods for more information.
 
 <a name="Scripting-overlays"></a>
 
@@ -280,7 +280,7 @@ Overlays can also be defined in scripts. See [Overlay Scripts](@ref Overlay-Scri
 
 ## GUI systems
 
-Overlays are only really designed for non-interactive screen elements, although you can use them as a crude GUI. For a far more complete GUI solution, we recommend [CEGui](<http://www.cegui.org.uk>), [MyGUI](<http://mygui.info/>) or [libRocket](<http://librocket.com/>)
+Overlays are only really designed for non-interactive screen elements, although you can create a simple GUI using the [Trays System](@ref trays). For a far more complete GUI solution, we recommend [CEGui](<http://www.cegui.org.uk>), [MyGUI](<http://mygui.info/>) or [libRocket](<http://librocket.com/>)
 
 @page Scripts Scripts
 
@@ -1202,7 +1202,7 @@ Sets the width of a space in relation to the screen.
 
 @page Font-Definition-Scripts Font Definition Scripts
 
-Ogre uses texture-based fonts to render the TextAreaOverlayElement. You can also use the Font object for your own purpose if you wish. The final form of a font is a Material object generated by the font, and a set of ’glyph’ (character) texture coordinate information.
+Ogre uses texture-based fonts to render the Ogre::TextAreaOverlayElement. You can also use the Font object for your own purpose if you wish. The final form of a font is a Material object generated by the font, and a set of ’glyph’ (character) texture coordinate information.
 
 There are 2 ways you can get a font into OGRE:
 

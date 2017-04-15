@@ -1,4 +1,4 @@
-# Intro to the Trays GUI System {#trays}
+# Introduction to the Trays GUI System {#trays}
 
 Ever wanted really simple GUI controls for your sample? Don't want to write one from scratch, but CEGUI's just a little too much? The Trays system was created to address this issue. It's a simple GUI system based on the OGRE Overlay system and designed just for samples. Because it's simple, you're not going to be able to skin it or build very unique interfaces, but you'll also find it much easier to use. The entire system is based on the OGRE Overlay system.
 

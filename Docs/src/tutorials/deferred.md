@@ -234,7 +234,7 @@ Some notes :
 Which will cause the binding code to run whenever an instance of this compositor is created.
 * 'Regular' compositors that don't use the GBuffer are also still possible of course, they can be used regularly, as long as they are placed after the DeferredShading/ShowLit compositor.
 
-# Integration in real projects {#integration}
+# Integration in real projects {#realprojects}
 The framework that this demo uses was designed to be pluggable into other projects. Some of the design considerations that contribute to that are :
 1. The scene setup does not change in any way. You still set the scene up with normal lights and modify their parameters just like you would regularly.
 2. The GBuffer scheme handler and shader generator allow existing materials to work in a deferred shading pipeline unmodified. It might not cover all the cases, but it can.

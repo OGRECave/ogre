@@ -49,9 +49,6 @@ namespace Ogre
 
 
     /** Check for GL errors and report them in the Ogre Log.
-
-    @param forceInfoLog if true then message from GL info log is obtained
-    @param forceException if true then exception is generated if a GL error found
     */
     void reportGLSLError(GLenum glErr, const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog = false, const bool forceException = false);
 
