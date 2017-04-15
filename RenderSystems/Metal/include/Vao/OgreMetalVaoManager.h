@@ -264,7 +264,13 @@ namespace Ogre
         void _notifyDeviceStalled(void);
 
         /// @see VaoManager::waitForTailFrameToFinish
-        uint8 waitForTailFrameToFinish(void);
+        virtual uint8 waitForTailFrameToFinish(void);
+
+        /// See VaoManager::waitForSpecificFrameToFinish
+        virtual void waitForSpecificFrameToFinish( uint32 frameCount );
+
+        /// See VaoManager::isFrameFinished
+        virtual bool isFrameFinished( uint32 frameCount );
 
         /** Will stall undefinitely until GPU finishes (signals the sync object).
         @param fenceName

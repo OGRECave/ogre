@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "Vao/OgreIndirectBufferPacked.h"
 
 #include "OgreMetalDevice.h"
+#include "OgreMetalRenderSystem.h"
 
 #include "OgreRenderQueue.h"
 #include "OgreRoot.h"
@@ -967,8 +968,35 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     uint8 MetalVaoManager::waitForTailFrameToFinish(void)
     {
-        //Don't wait because MetalRenderSystem::_beginFrameOnce does a global waiting for us.
+        //MetalRenderSystem::_beginFrameOnce does a global waiting for us, but if we're outside
+        //the render loop (i.e. user is manually uploading data) we may have to call this earlier.
+        mDevice->mRenderSystem->_waitForTailFrameToFinish();
         return mDynamicBufferCurrentFrame;
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalVaoManager::waitForSpecificFrameToFinish( uint32 frameCount )
+    {
+        if( mFrameCount - frameCount == mDynamicBufferMultiplier )
+        {
+            //Used last frame. We may be able to wait just for that frame.
+            waitForTailFrameToFinish();
+        }
+        else if( mFrameCount - frameCount <= mDynamicBufferMultiplier )
+        {
+            mDevice->stall();
+        }
+        else
+        {
+            //No stall
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    bool MetalVaoManager::isFrameFinished( uint32 frameCount )
+    {
+        if( mFrameCount - frameCount == mDynamicBufferMultiplier )
+            return mDevice->mRenderSystem->_willTailFrameStall();
+
+        return mFrameCount - frameCount > mDynamicBufferMultiplier;
     }
     //-----------------------------------------------------------------------------------
     dispatch_semaphore_t MetalVaoManager::waitFor( dispatch_semaphore_t fenceName, MetalDevice *device )

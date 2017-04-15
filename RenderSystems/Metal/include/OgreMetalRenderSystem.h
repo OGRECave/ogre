@@ -139,6 +139,8 @@ namespace Ogre
 
         MetalDevice             mDevice;
         dispatch_semaphore_t    mMainGpuSyncSemaphore;
+        bool                    mMainSemaphoreAlreadyWaited;
+        bool                    mBeginFrameOnceStarted;
 
         void setActiveDevice( MetalDevice *device );
         void createRenderEncoder(void);
@@ -223,6 +225,10 @@ namespace Ogre
 
         virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget,
                                                     bool exactMatchFormat );
+
+        /// See VaoManager::waitForTailFrameToFinish
+        virtual void _waitForTailFrameToFinish(void);
+        virtual bool _willTailFrameStall(void);
 
         virtual void _beginFrameOnce(void);
         virtual void _endFrameOnce(void);

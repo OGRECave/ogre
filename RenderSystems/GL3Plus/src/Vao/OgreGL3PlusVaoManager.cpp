@@ -1101,6 +1101,104 @@ namespace Ogre
         return mDynamicBufferCurrentFrame;
     }
     //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::waitForSpecificFrameToFinish( uint32 frameCount )
+    {
+        if( frameCount == mFrameCount )
+        {
+            //Full stall
+            glFinish();
+
+            //All of the other per-fences are not needed anymore.
+            GLSyncVec::const_iterator itor = mFrameSyncVec.begin();
+            GLSyncVec::const_iterator end  = mFrameSyncVec.end();
+
+            while( itor != end )
+            {
+                if( *itor )
+                    OCGE( glDeleteSync( *itor ) );
+                ++itor;
+            }
+        }
+        else if( mFrameCount - frameCount <= mDynamicBufferMultiplier )
+        {
+            //Let's wait on one of our existing fences...
+            //frameDiff has to be in range [1; mDynamicBufferMultiplier]
+            size_t frameDiff = mFrameCount - frameCount;
+            const size_t idx = (mDynamicBufferCurrentFrame +
+                                mDynamicBufferMultiplier - frameDiff) % mDynamicBufferMultiplier;
+            if( mFrameSyncVec[idx] )
+            {
+                mFrameSyncVec[idx] = waitFor( mFrameSyncVec[idx] );
+
+                //Delete all the fences until this frame we've just waited.
+                size_t nextIdx = mDynamicBufferCurrentFrame;
+                while( nextIdx != idx )
+                {
+                    if( mFrameSyncVec[nextIdx] )
+                    {
+                        OCGE( glDeleteSync( mFrameSyncVec[nextIdx] ) );
+                        mFrameSyncVec[nextIdx] = 0;
+                    }
+                    nextIdx = (nextIdx + 1u) % mDynamicBufferMultiplier;
+                }
+            }
+        }
+        else
+        {
+            //No stall
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    bool GL3PlusVaoManager::isFrameFinished( uint32 frameCount )
+    {
+        bool retVal = true;
+        if( frameCount == mFrameCount )
+        {
+            //Full stall
+            //retVal = true;
+        }
+        else if( mFrameCount - frameCount <= mDynamicBufferMultiplier )
+        {
+            //frameDiff has to be in range [1; mDynamicBufferMultiplier]
+            size_t frameDiff = mFrameCount - frameCount;
+            const size_t idx = (mDynamicBufferCurrentFrame +
+                                mDynamicBufferMultiplier - frameDiff) % mDynamicBufferMultiplier;
+
+            if( mFrameSyncVec[idx] )
+            {
+                //Ask GL API to return immediately and tells us about the fence
+                GLenum waitRet = glClientWaitSync( mFrameSyncVec[idx], 0, 0 );
+                if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
+                {
+                    //Delete all the fences until this frame we've just waited.
+                    size_t nextIdx = mDynamicBufferCurrentFrame;
+                    while( nextIdx != idx )
+                    {
+                        if( mFrameSyncVec[nextIdx] )
+                        {
+                            OCGE( glDeleteSync( mFrameSyncVec[nextIdx] ) );
+                            mFrameSyncVec[nextIdx] = 0;
+                        }
+                        nextIdx = (nextIdx + 1u) % mDynamicBufferMultiplier;
+                    }
+
+                    retVal = false;
+                }
+            }
+            else
+            {
+                retVal = false;
+            }
+        }
+        else
+        {
+            //No stall
+            retVal = false;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     GLsync GL3PlusVaoManager::waitFor( GLsync fenceName )
     {
         GLbitfield waitFlags    = 0;

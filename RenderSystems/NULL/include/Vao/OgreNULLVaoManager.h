@@ -200,6 +200,8 @@ namespace Ogre
         /// times). But first stalls until that mDynamicBufferMultiplier-1 frame behind
         /// is finished.
         uint8 waitForTailFrameToFinish(void);
+        virtual void waitForSpecificFrameToFinish( uint32 frameCount );
+        virtual bool isFrameFinished( uint32 frameCount );
     };
 }
 
