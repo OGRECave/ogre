@@ -70,9 +70,8 @@ namespace Ogre
 			MS_D2
 		};
 
-		class TextureAddressing
+		struct TextureAddressing
 		{
-		public:
 			TextureAddressing() : u(TextureUnitState::TAM_WRAP), v(TextureUnitState::TAM_WRAP)
 			{}
 
@@ -81,7 +80,7 @@ namespace Ogre
 
 			TextureUnitState::TextureAddressingMode u;
 			TextureUnitState::TextureAddressingMode v;
-			bool operator ==(TextureAddressing& b){ return u == b.u && v == b.v; }
+			bool operator ==(const TextureAddressing& b){ return u == b.u && v == b.v; }
 		};
 
 	private:
@@ -176,21 +175,19 @@ namespace Ogre
 		void setLightRoughnessOffset(Real val){ mLightRoughnessOffset = val; }
 
 		void setAlbedoTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float blendFactor = 0);
-		void setNormalrTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), float normalBlendFactor = 0, float rBlendFactor = 0);
+		/// set texture containing normals and roughness
+		void setNormalRTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), float normalBlendFactor = 0, float rBlendFactor = 0);
 		void setF0Texture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float blendFactor = 0);
 		void setOffsetAndScale(MapSlot mapSlot, Vector2 offset, Vector2 scale);
 		void setUvSetIndex(MapSlot mapSlot, uint index);
 
-		// this is called once per frame
 		void updatePropertyMap(Camera* camera, const LightList* pLightList);
 
-		// this is called once per frame if the shader has changed. (it is guaranteed that there are not texture units in the pass)
-		void createTexturUnits(Pass* pass);
+		void createTextureUnits(Pass* pass);
 
-		// this is called for every renderable before it is renderd with the given pass
 		void updateUniforms(const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 
-		void updateTexturUnits(TextureUnitState* textureUnitState, GpuProgramParametersSharedPtr fragmentParams, SamplerContainer& s, int index);
+		void updateTextureUnits(TextureUnitState* textureUnitState, GpuProgramParametersSharedPtr fragmentParams, SamplerContainer& s, int index);
 
 	protected:
 
@@ -229,7 +226,7 @@ namespace Ogre
 		float mLightColors[PBS_MAX_LIGHT_COUNT * 3];
 		float mLightParameters[PBS_MAX_LIGHT_COUNT * 3];
 
-		void setTexture(SamplerType samplerType, TexturePtr tex, TextureAddressing uTextureAddr,
+		void setTexture(SamplerType samplerType, const TexturePtr& tex, const TextureAddressing& uTextureAddr,
 			float blendFactor1 = 0, float blendFactor2 = 0, BlendFunction blendFunc = BF_ALPHA, float intensityFactor = 1.0);
 	};
 }
