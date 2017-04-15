@@ -21,6 +21,8 @@ if(DEFINED ENV{IOS})
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake)
 
     set(OTHER
+        -DCMAKE_CXX_FLAGS=-std=c++11
+        -DOGRE_CONFIG_THREAD_PROVIDER=std
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
         ${CROSS})
     set(BUILD_DEPS TRUE)
