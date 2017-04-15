@@ -286,7 +286,7 @@ if (OGRE_CONFIG_ENABLE_STBI)
   list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
   
   if(UNIX)
-    set_source_files_properties(src/OgreSTBICodec.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function")
+    set_source_files_properties(src/OgreSTBICodec.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function -Wno-shadow")
   endif()
   
   if(CMAKE_COMPILER_IS_GNUCXX)
