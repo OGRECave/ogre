@@ -1,0 +1,10 @@
+image: ubuntu:zesty
+
+pipelines:
+  default:
+    - step:
+        script:
+          - apt-get update
+          - apt-get install -y cmake g++ libxaw7-dev libzzip-dev libxrandr-dev libfreetype6-dev libxt-dev rapidjson-dev mesa-common-dev libsdl2-dev
+          - cmake -DOGRE_BUILD_SAMPLES2=TRUE .
+          - make
