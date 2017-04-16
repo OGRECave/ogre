@@ -1669,16 +1669,15 @@ void Sample_ShaderSystem::createInstancedViewports()
             *buf = 0; buf++;
             *buf = 1; buf++;
         }
-        vbuf->unlock();
+    vbuf->unlock();
 
-        mRoot->getRenderSystem()->setGlobalInstanceVertexBuffer(vbuf);
-        mRoot->getRenderSystem()->setGlobalInstanceVertexBufferVertexDeclaration(vertexDeclaration);
-        mRoot->getRenderSystem()->setGlobalNumberOfInstances(monitorCount.x * monitorCount.y);
+    mRoot->getRenderSystem()->setGlobalInstanceVertexBuffer(vbuf);
+    mRoot->getRenderSystem()->setGlobalInstanceVertexBufferVertexDeclaration(vertexDeclaration);
+    mRoot->getRenderSystem()->setGlobalNumberOfInstances(monitorCount.x * monitorCount.y);
 
-        // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-        mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        mShaderGenerator->validateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
+    // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+    mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mShaderGenerator->validateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 }
 
 void Sample_ShaderSystem::createMaterialForTexture( const String & texName, bool isTextureAtlasTexture )
