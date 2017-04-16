@@ -151,9 +151,9 @@ set (CMAKE_CXX_FLAGS_INIT "-fvisibility=hidden -fvisibility-inlines-hidden -isys
 # set the architecture for iOS
 # NOTE: Currently both ARCHS_STANDARD_32_BIT and ARCHS_UNIVERSAL_IPHONE_OS set armv7 only, so set both manually
 if (${IOS_PLATFORM} STREQUAL "OS")
-  set (IOS_ARCH armv6 armv7)
+  set (IOS_ARCH armv7 arm64)
 else ()
-  set (IOS_ARCH i386)
+  set (IOS_ARCH x86_64)
 endif ()
 
 set (CMAKE_OSX_ARCHITECTURES ${IOS_ARCH} CACHE string  "Build architecture for iOS")
