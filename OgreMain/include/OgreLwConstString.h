@@ -43,8 +43,11 @@
 #endif
 #include <stdio.h>
 
-#pragma warning( push ) // CRT deprecation
-#pragma warning( disable : 4996 )
+
+#ifdef _MSC_VER
+    #pragma warning( push ) // CRT deprecation
+    #pragma warning( disable : 4996 )
+#endif
 
 namespace Ogre
 {
@@ -195,6 +198,8 @@ namespace Ogre
     };
 }
 
-#pragma warning( pop )
+#ifdef _MSC_VER
+    #pragma warning( pop )
+#endif
 
 #endif

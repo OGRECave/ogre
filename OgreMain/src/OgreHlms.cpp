@@ -1329,17 +1329,11 @@ namespace Ogre
 
             if( !syntaxError )
             {
-                IdString dstProperty;
-                IdString srcProperty;
-                int op1Value;
-                int op2Value;
-
                 if( argValues.size() == 1 )
                 {
-                    dstProperty = argValues[0];
-                    srcProperty = dstProperty;
-                    op1Value    = getProperty( srcProperty );
-                    op2Value    = op1Value;
+                    const IdString dstProperty = argValues[0];
+                    const IdString srcProperty = dstProperty;
+                    int op1Value = getProperty( srcProperty );
 
                     //@value & @counter write, the others are invisible
                     char tmp[16];
@@ -2360,7 +2354,6 @@ namespace Ogre
         {
             setProperty( HlmsBaseProp::ShadowCaster, 1 );
 
-            const CompositorShadowNode *shadowNode = sceneManager->getCurrentShadowNode();
             const CompositorPass *pass = sceneManager->getCurrentCompositorPass();
 
             if( pass )

@@ -12,22 +12,22 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     TextureAnimationControllerValue::TextureAnimationControllerValue( HlmsDatablock *datablock,
                                                                       uint8 textureUnit )
-        : mDatablock(datablock)
-        , mTextureUnit(textureUnit)
-        , mTransU(false)
+        : mTransU(false)
         , mTransV(false)
         , mScaleU(false)
         , mScaleV(false)
         , mRotate(false)
+        , mTextureUnit(textureUnit)
+        , mDatablock(datablock)
         , mUMod(0)
         , mVMod(0)
         , mUScale(1)
         , mVScale(1)
         , mRotation(0)
         , mTexModMatrix(Matrix4::IDENTITY)
-        , mLastFrame(0)
         , mNumFramesHorizontal(0)
         , mNumFramesVertical(0)
+        , mLastFrame(0)
         , mCurrentVerticalFrame(0)
     {
     }

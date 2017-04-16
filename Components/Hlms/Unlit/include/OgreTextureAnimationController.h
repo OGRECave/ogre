@@ -25,8 +25,8 @@ namespace Ogre
         bool mScaleU, mScaleV;
         bool mRotate;
 
-        HlmsDatablock   *mDatablock;
         uint8           mTextureUnit;
+        HlmsDatablock   *mDatablock;
 
         Real    mUMod, mVMod;
         Real    mUScale, mVScale;

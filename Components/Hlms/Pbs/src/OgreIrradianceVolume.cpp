@@ -40,13 +40,15 @@ namespace Ogre
 {
     IrradianceVolume::IrradianceVolume( HlmsManager *hlmsManager ) :
         mHlmsManager( hlmsManager ),
-        mVolumeData( 0 ),
-        mBlurredVolumeData( 0 ),
         mPowerScale( 1.0f ),
         mIrradianceMaxPower( 1 ),
         mIrradianceOrigin( Vector3::ZERO ),
         mIrradianceCellSize( Vector3::UNIT_SCALE ),
-        mIrradianceSamplerblock( 0 )
+        mIrradianceSamplerblock( 0 ),
+        mVolumeData( 0 ),
+        mBlurredVolumeData( 0 ),
+        mRowPitch( 0 ),
+        mSlicePitch( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -301,7 +303,7 @@ namespace Ogre
     void IrradianceVolume::changeVolumeData(uint32 x, uint32 y, uint32 z, uint32 direction_id, const Vector3& delta)
     {
         assert( mVolumeData );
-        assert( direction_id >= 0 && direction_id < 6 );
+        assert( direction_id < 6 );
 
         const size_t idx = z * mSlicePitch + (y * 6 + direction_id) * mRowPitch + x * 3u;
         mVolumeData[idx + 0] += delta.x;

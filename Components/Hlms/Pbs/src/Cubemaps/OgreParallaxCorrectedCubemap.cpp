@@ -945,9 +945,9 @@ namespace Ogre
                     mCopyWorkspace->_endUpdate( true );
 
                     mSceneManager->_frameEnded();
-                    for( size_t i=0; i<HLMS_MAX; ++i )
+                    for( size_t k=0; k<HLMS_MAX; ++k )
                     {
-                        Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+                        Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( k ) );
                         if( hlms )
                             hlms->frameEnded();
                     }

@@ -607,13 +607,13 @@ namespace Ogre
         sceneManager->_setCurrentRenderStage( previous );
 
         {
-            LightClosestArray::iterator itor = mShadowMapCastingLights.begin();
-            LightClosestArray::iterator end  = mShadowMapCastingLights.end();
+            LightClosestArray::iterator it = mShadowMapCastingLights.begin();
+            LightClosestArray::iterator en = mShadowMapCastingLights.end();
 
-            while( itor != end )
+            while( it != en )
             {
-                itor->isDirty = false;
-                ++itor;
+                it->isDirty = false;
+                ++it;
             }
         }
     }
@@ -642,9 +642,9 @@ namespace Ogre
                 uint32 firstBitSet = ctz( lightTypesLeft );
                 while( firstBitSet != 32u )
                 {
-                    assert( smCamera.scenePassesViewportSize[firstBitSet].x < Real( 0.0 ) ||
-                            smCamera.scenePassesViewportSize[firstBitSet].x < Real( 0.0 ) ||
-                            smCamera.scenePassesViewportSize[firstBitSet] == vpSize &&
+                    assert( (smCamera.scenePassesViewportSize[firstBitSet].x < Real( 0.0 ) ||
+                             smCamera.scenePassesViewportSize[firstBitSet].x < Real( 0.0 ) ||
+                             smCamera.scenePassesViewportSize[firstBitSet] == vpSize) &&
                             "Two scene passes to the same shadow map have different viewport sizes! "
                             "Ogre cannot determine how to prevent jittering. Maybe you meant assign "
                             "assign each light types to different passes but you assigned more than "
