@@ -80,7 +80,7 @@ namespace Ogre
         ID3D11Buffer* getVboName(void) const        { return mVboName; }
 
         /// Assumes mVboName is already bound to GL_COPY_WRITE_BUFFER!!!
-        DECL_MALLOC void* map( size_t start, size_t count, size_t &outTicket );
+        void* RESTRICT_ALIAS_RETURN map( size_t start, size_t count, size_t &outTicket );
 
         /// Unmaps given ticket (got from @see map).
         /// Assumes mVboName is already bound to GL_COPY_WRITE_BUFFER!!!

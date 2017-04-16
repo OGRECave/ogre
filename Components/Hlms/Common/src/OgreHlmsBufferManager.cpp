@@ -113,7 +113,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC uint32* HlmsBufferManager::mapNextConstBuffer( CommandBuffer *commandBuffer )
+    uint32* RESTRICT_ALIAS_RETURN HlmsBufferManager::mapNextConstBuffer( CommandBuffer *commandBuffer )
     {
         unmapConstBuffer();
 
@@ -173,7 +173,8 @@ namespace Ogre
         mTexLastOffset = alignToNextMultiple( mTexLastOffset, mVaoManager->getTexBufferAlignment() );
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC float* HlmsBufferManager::mapNextTexBuffer( CommandBuffer *commandBuffer, size_t minimumSizeBytes )
+    float* RESTRICT_ALIAS_RETURN HlmsBufferManager::mapNextTexBuffer( CommandBuffer *commandBuffer,
+                                                                      size_t minimumSizeBytes )
     {
         unmapTexBuffer( commandBuffer );
 

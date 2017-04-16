@@ -61,8 +61,9 @@ namespace Ogre
         mBuffer->mBufferType = originalBufferType;
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC void* MetalBufferInterface::map( size_t elementStart, size_t elementCount,
-                                                   MappingState prevMappingState, bool bAdvanceFrame )
+    void* RESTRICT_ALIAS_RETURN MetalBufferInterface::map( size_t elementStart, size_t elementCount,
+                                                           MappingState prevMappingState,
+                                                           bool bAdvanceFrame )
     {
         size_t bytesPerElement = mBuffer->mBytesPerElement;
 

@@ -49,9 +49,10 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC void* D3D11CompatBufferInterface::map( size_t elementStart, size_t elementCount,
-                                                       MappingState prevMappingState,
-                                                       bool bAdvanceFrame )
+    void* RESTRICT_ALIAS_RETURN D3D11CompatBufferInterface::map( size_t elementStart,
+                                                                 size_t elementCount,
+                                                                 MappingState prevMappingState,
+                                                                 bool bAdvanceFrame )
     {
         assert( elementStart <= mBuffer->mNumElements &&
                 elementStart + elementCount <= mBuffer->mNumElements );
