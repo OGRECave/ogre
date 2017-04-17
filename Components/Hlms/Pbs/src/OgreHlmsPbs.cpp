@@ -360,8 +360,8 @@ namespace Ogre
                 cubemapTexUnit = texUnit++;
 
             assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
-//            const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
-//                                                        queuedRenderable.renderable->getDatablock() );
+            const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
+                                                        queuedRenderable.renderable->getDatablock() );
 
             int numTextures = getProperty( PbsProperty::NumTextures );
             for( int i=0; i<numTextures; ++i )
