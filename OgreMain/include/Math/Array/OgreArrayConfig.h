@@ -42,8 +42,8 @@ THE SOFTWARE.
             }
         #else
             #ifndef __MINGW32__
-                #include <xmmintrin.h>
-                #include <emmintrin.h>  //SSE Math library still needs SSE2
+                #include <intrin.h>
+                
             #else
                 #include <x86intrin.h> //Including separate intrinsics headers under MinGW causes compilation errors
             #endif
