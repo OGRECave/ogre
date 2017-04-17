@@ -645,12 +645,12 @@ namespace Ogre
 
         {
             //Notify the listeners
-            CompositorWorkspaceListenerVec::const_iterator itor = mListeners.begin();
-            CompositorWorkspaceListenerVec::const_iterator end  = mListeners.end();
-            while( itor != end )
+            CompositorWorkspaceListenerVec::const_iterator itListener = mListeners.begin();
+            CompositorWorkspaceListenerVec::const_iterator enListener = mListeners.end();
+            while( itListener != enListener )
             {
-                (*itor)->allWorkspacesBeforeBeginUpdate();
-                ++itor;
+                (*itListener)->allWorkspacesBeforeBeginUpdate();
+                ++itListener;
             }
         }
 
@@ -680,12 +680,12 @@ namespace Ogre
 
         {
             //Notify the listeners
-            CompositorWorkspaceListenerVec::const_iterator itor = mListeners.begin();
-            CompositorWorkspaceListenerVec::const_iterator end  = mListeners.end();
-            while( itor != end )
+            CompositorWorkspaceListenerVec::const_iterator itListener = mListeners.begin();
+            CompositorWorkspaceListenerVec::const_iterator enListener = mListeners.end();
+            while( itListener != enListener )
             {
-                (*itor)->allWorkspacesBeginUpdate();
-                ++itor;
+                (*itListener)->allWorkspacesBeginUpdate();
+                ++itListener;
             }
         }
 

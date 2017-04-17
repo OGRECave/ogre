@@ -405,13 +405,13 @@ namespace Ogre
 
         ArrayReal fAngle = sqrt( x * x + y * y + z * z );
 
-        ArrayReal w, fSin;
-        MathlibC::SinCos4( fAngle, fSin, w );
+        ArrayReal localW, fSin;
+        MathlibC::SinCos4( fAngle, fSin, localW );
 
         //coeff = Abs(fSin) >= msEpsilon ? (fSin / fAngle) : 1.0f;
         ArrayReal coeff = MathlibC::CmovRobust( fSin / fAngle, 1.0f,
                                                 Math::Abs( fSin ) >= MathlibC::fEpsilon );
-        return ArrayQuaternion( w, x * coeff, y * coeff, z * coeff );
+        return ArrayQuaternion( localW, x * coeff, y * coeff, z * coeff );
     }
     //-----------------------------------------------------------------------------------
     inline ArrayQuaternion ArrayQuaternion::Log( void ) const
