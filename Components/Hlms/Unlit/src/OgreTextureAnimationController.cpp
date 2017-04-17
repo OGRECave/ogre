@@ -61,9 +61,9 @@ namespace Ogre {
             // The current animation frame.
             unsigned int currentFrame = ((int)(value * mNumFramesHorizontal) % mNumFramesHorizontal);
 
-            if (mLastFrame == 0 && currentFrame == (mNumFramesHorizontal - 1))
+            if (mLastFrame == 0 && currentFrame == (mNumFramesHorizontal - 1u))
             {
-                if (mCurrentVerticalFrame == (mNumFramesVertical - 1))
+                if (mCurrentVerticalFrame == (mNumFramesVertical - 1u))
                     mCurrentVerticalFrame = 0;
                 else
                     mCurrentVerticalFrame++;

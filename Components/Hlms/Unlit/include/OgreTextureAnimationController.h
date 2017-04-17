@@ -34,7 +34,7 @@ namespace Ogre
         mutable Matrix4 mTexModMatrix;
 
         //---- Tiled Texture
-        int mNumFramesHorizontal, mNumFramesVertical;
+        uint32 mNumFramesHorizontal, mNumFramesVertical;
         uint16 mLastFrame, mCurrentVerticalFrame;
 
     public:

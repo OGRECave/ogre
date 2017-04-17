@@ -35,10 +35,10 @@ namespace Demo
         TutorialGameState( helpDescription ),
         mLightNode( 0 ),
         mLight( 0 ),
+        mCurrentType( Ogre::Light::LT_SPOTLIGHT ),
         mInstantRadiosity( 0 ),
         mIrradianceVolume( 0 ),
-        mIrradianceCellSize(1.5f),
-        mCurrentType( Ogre::Light::LT_SPOTLIGHT )
+        mIrradianceCellSize(1.5f)
     {
         mDisplayHelpMode        = 2;
         mNumDisplayHelpModes    = 3;

@@ -41,8 +41,8 @@ namespace Demo
         TutorialGameState( helpDescription ),
         mAnimateObjects( true ),
         mNumSpheres( 0 ),
-        mPowerScale( 1.5f ),
-        mKernelRadius( 1.0f )
+        mKernelRadius( 1.0f ),
+        mPowerScale( 1.5f )
 	{
         memset( mSceneNode, 0, sizeof(mSceneNode) );
 	}
