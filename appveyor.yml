@@ -7,6 +7,7 @@ build:
 build_script:
  - cmake -P ci-build.cmake
  - cmake --build .
+ - ctest -R Test_Ogre
 cache:
 - ogredeps -> CMake/Dependencies.cmake
 branches:
