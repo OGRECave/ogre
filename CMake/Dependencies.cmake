@@ -151,6 +151,24 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         ${CMAKE_BINARY_DIR}/freetype-2.6.5
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs)
     execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs --target install)
+
+    if(MSVC) # other platforms dont need this
+        message(STATUS "Building SDL2")
+        file(DOWNLOAD
+            https://libsdl.org/release/SDL2-2.0.5.tar.gz
+            ${OGRE_BINARY_DIR}/SDL2-2.0.5.tar.gz)
+        execute_process(COMMAND cmake -E tar xf SDL2-2.0.5.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
+        execute_process(COMMAND cmake -E make_directory ${OGRE_BINARY_DIR}/SDL2-build)
+        execute_process(COMMAND cmake
+            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DSDL_STATIC=FALSE
+            -G ${CMAKE_GENERATOR}
+            ${CROSS}
+            ${OGRE_BINARY_DIR}/SDL2-2.0.5
+            WORKING_DIRECTORY ${OGRE_BINARY_DIR}/SDL2-build)
+        execute_process(COMMAND cmake --build ${OGRE_BINARY_DIR}/SDL2-build --target install)
+    endif()
 endif()
 
 #######################################################################
