@@ -281,7 +281,13 @@ namespace Ogre {
     size_t StringConverter::parseSizeT(const String& val, size_t defaultValue)
     {
         size_t ret;
-        return sscanf(val.c_str(), "%zu", &ret) == 1 ? ret : defaultValue;
+        return sscanf(val.c_str(),
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1900
+                "%Iu"
+#else
+                "%zu"
+#endif
+                , &ret) == 1 ? ret : defaultValue;
     }
     //-----------------------------------------------------------------------
     bool StringConverter::parseBool(const String& val, bool defaultValue)
