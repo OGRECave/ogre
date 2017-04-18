@@ -188,6 +188,16 @@ TEST_F(StringTests,ParseUnsignedLong)
     EXPECT_EQ(r, t);
 }
 //--------------------------------------------------------------------------
+TEST_F(StringTests,ParseSizeT)
+{
+    size_t r = 223546;
+
+    String s = StringConverter::toString(r);
+    size_t t = StringConverter::parseSizeT(s);
+
+    EXPECT_EQ(r, t);
+}
+//--------------------------------------------------------------------------
 TEST_F(StringTests,ParseVector3)
 {
     Vector3 r(0.12, 3.22, -4.04);
