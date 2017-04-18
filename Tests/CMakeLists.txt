@@ -173,6 +173,8 @@ if (OGRE_BUILD_TESTS)
     add_dependencies(Test_Ogre googletest)
     ogre_install_target(Test_Ogre "" FALSE)
     target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} gtest)
+
+    add_test(NAME Test_Ogre COMMAND Test_Ogre)
     
     if(ANDROID)
         set_target_properties(Test_Ogre PROPERTIES LINK_FLAGS -pie)
