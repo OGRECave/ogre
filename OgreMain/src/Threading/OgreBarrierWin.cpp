@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include <windows.h>
 
 #ifndef __MINGW32__
-	#include "intrin.h"
+	#include <intrin.h>
 #else
     // MinGW needs some extra headers and define MemoryBarrier manually
 	#include <x86intrin.h>

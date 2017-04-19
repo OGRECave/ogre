@@ -38,10 +38,10 @@
 #ifndef _MSC_VER
     #define OGRE_LWSTRING_SNPRINTF_DEFINED
     #define _snprintf snprintf
+#else
+    #pragma warning( push ) // CRT deprecation
+    #pragma warning( disable : 4996 )
 #endif
-
-#pragma warning( push ) // CRT deprecation
-#pragma warning( disable : 4996 )
 
 namespace Ogre
 {
@@ -415,8 +415,8 @@ namespace Ogre
 
 #ifdef OGRE_LWSTRING_SNPRINTF_DEFINED
     #undef _snprintf
+#else
+    #pragma warning( pop )
 #endif
-
-#pragma warning( pop )
 
 #endif

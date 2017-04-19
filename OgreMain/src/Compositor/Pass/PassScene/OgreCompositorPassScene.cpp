@@ -86,9 +86,11 @@ namespace Ogre
 
         if( mDefinition->mPrePassMode == PrePassUse && mDefinition->mPrePassTexture != IdString() )
         {
-            const CompositorChannel *channel = parentNode->_getDefinedTexture(
-                        mDefinition->mPrePassTexture );
-            mPrePassTextures = &channel->textures;
+            {
+                const CompositorChannel *channel = parentNode->_getDefinedTexture(
+                            mDefinition->mPrePassTexture );
+                mPrePassTextures = &channel->textures;
+            }
 
             if( mDefinition->mPrePassDepthTexture != IdString() )
             {

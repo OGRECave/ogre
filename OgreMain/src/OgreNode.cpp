@@ -440,7 +440,7 @@ namespace Ogre {
     {
         //child->getParent() can be null if we're calling this
         //function from the destructor. See ~Node notes.
-        assert( !child->getParent() || child->getParent() == this && "Node says it's not our child" );
+        assert( (!child->getParent() || child->getParent() == this) && "Node says it's not our child" );
         assert( child->mParentIndex < mChildren.size() && "mParentIndex was out of date!!!" );
 
         if( child->mParentIndex < mChildren.size() )

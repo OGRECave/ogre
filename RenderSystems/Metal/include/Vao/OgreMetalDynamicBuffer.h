@@ -77,7 +77,7 @@ namespace Ogre
 
         id<MTLBuffer> getVboName(void) const        { return mVboName; }
 
-        DECL_MALLOC void* map( size_t start, size_t count, size_t &outTicket );
+        void* RESTRICT_ALIAS_RETURN map( size_t start, size_t count, size_t &outTicket );
 
         /// Flushes the region of the given ticket. start is 0-based.
         void flush( size_t ticket, size_t start, size_t count );

@@ -322,7 +322,7 @@ namespace Demo
         //and will probably be *very* slow since the memory region is often write combined.
         //Sometimes you need to check the assembly to see the compiler isn't reading from
         //that memory even though the C++ code doesn't.
-        float *cubeVertices = reinterpret_cast<float*>(
+        float * RESTRICT_ALIAS cubeVertices = reinterpret_cast<float*RESTRICT_ALIAS>(
                     mDynamicVertexBuffer[0]->map( 0, mDynamicVertexBuffer[0]->getNumElements() ) );
 
         for( size_t i=0; i<8; ++i )
@@ -353,18 +353,21 @@ namespace Demo
         //         unless you know you haven't issued draw calls that are using this region yet.
 
         //The last 'false' indicates the buffer not to advance forward.
-        cubeVertices = reinterpret_cast<float*>( mDynamicVertexBuffer[1]->map( 0, 2, false ) );
+        cubeVertices = reinterpret_cast<float*RESTRICT_ALIAS>(
+                    mDynamicVertexBuffer[1]->map( 0, 2, false ) );
         updateDynamicBuffer01( cubeVertices, c_originalVertices, 0, 2 );
         mDynamicVertexBuffer[1]->unmap( Ogre::UO_KEEP_PERSISTENT );
 
         //We do not regress the frame, because we haven't advanced yet.
-        cubeVertices = reinterpret_cast<float*>( mDynamicVertexBuffer[1]->map( 2, 4, true ) );
+        cubeVertices = reinterpret_cast<float*RESTRICT_ALIAS>(
+                    mDynamicVertexBuffer[1]->map( 2, 4, true ) );
         updateDynamicBuffer01( cubeVertices, c_originalVertices, 2, 4 );
         mDynamicVertexBuffer[1]->unmap( Ogre::UO_KEEP_PERSISTENT );
 
         //We regress the frame, because the previous map had advanced automatically by passing 'true'.
         mDynamicVertexBuffer[1]->regressFrame();
-        cubeVertices = reinterpret_cast<float*>( mDynamicVertexBuffer[1]->map( 4, 6, false ) );
+        cubeVertices = reinterpret_cast<float*RESTRICT_ALIAS>(
+                    mDynamicVertexBuffer[1]->map( 4, 6, false ) );
         updateDynamicBuffer01( cubeVertices, c_originalVertices, 4, 6 );
         mDynamicVertexBuffer[1]->unmap( Ogre::UO_KEEP_PERSISTENT );
         mDynamicVertexBuffer[1]->advanceFrame();    //Make sure we advance when we're done and
@@ -374,7 +377,8 @@ namespace Demo
 
         //We regress the frame, because the previous map had advanced it; and the frame isn't over yet.
         mDynamicVertexBuffer[1]->regressFrame();
-        cubeVertices = reinterpret_cast<float*>( mDynamicVertexBuffer[1]->map( 6, 8, false ) );
+        cubeVertices = reinterpret_cast<float*RESTRICT_ALIAS>(
+                    mDynamicVertexBuffer[1]->map( 6, 8, false ) );
         updateDynamicBuffer01( cubeVertices, c_originalVertices, 6, 8 );
         mDynamicVertexBuffer[1]->unmap( Ogre::UO_KEEP_PERSISTENT );
         mDynamicVertexBuffer[1]->advanceFrame();    //Make sure we advance when we're done and

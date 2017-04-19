@@ -64,8 +64,7 @@ namespace Ogre
         return ticket;
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC void* MetalDynamicBuffer::map( size_t start, size_t count,
-                                                 size_t &outTicket )
+    void* RESTRICT_ALIAS_RETURN MetalDynamicBuffer::map( size_t start, size_t count, size_t &outTicket )
     {
         assert( start <= mVboSize && start + count <= mVboSize );
 

@@ -127,7 +127,7 @@ namespace Ogre
         void unmapConstBuffer(void);
 
         /// Warning: Calling this function affects BOTH mCurrentConstBuffer and mCurrentTexBuffer
-        DECL_MALLOC uint32* mapNextConstBuffer( CommandBuffer *commandBuffer );
+        uint32* RESTRICT_ALIAS_RETURN mapNextConstBuffer( CommandBuffer *commandBuffer );
 
         /// Texture buffers are treated differently than Const buffers. We first map it.
         /// Once we're done with it, we save our progress (in mTexLastOffset) and in the
@@ -144,7 +144,8 @@ namespace Ogre
         ///
         /// (*) D3D11.1 allows using MAP_NO_OVERWRITE for texture buffers.
         void unmapTexBuffer( CommandBuffer *commandBuffer );
-        DECL_MALLOC float* mapNextTexBuffer( CommandBuffer *commandBuffer, size_t minimumSizeBytes );
+        float* RESTRICT_ALIAS_RETURN mapNextTexBuffer( CommandBuffer *commandBuffer,
+                                                       size_t minimumSizeBytes );
 
         /** Rebinds the texture buffer. Finishes the last bind command to the tbuffer.
         @param resetOffset

@@ -76,8 +76,9 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC void* D3D11BufferInterface::map( size_t elementStart, size_t elementCount,
-                                                 MappingState prevMappingState, bool bAdvanceFrame )
+    void* RESTRICT_ALIAS_RETURN D3D11BufferInterface::map( size_t elementStart, size_t elementCount,
+                                                           MappingState prevMappingState,
+                                                           bool bAdvanceFrame )
     {
         size_t bytesPerElement = mBuffer->mBytesPerElement;
 

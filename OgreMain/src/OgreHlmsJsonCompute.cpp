@@ -466,18 +466,18 @@ namespace Ogre
         {
             const rapidjson::Value &subobj = itor->value;
 
-            rapidjson::Value::ConstMemberIterator itor = subobj.MemberBegin();
-            rapidjson::Value::ConstMemberIterator end  = subobj.MemberEnd();
+            rapidjson::Value::ConstMemberIterator itSubObj = subobj.MemberBegin();
+            rapidjson::Value::ConstMemberIterator enSubObj = subobj.MemberEnd();
 
-            while( itor != end )
+            while( itSubObj != enSubObj )
             {
-                if( itor->value.IsInt() )
+                if( itSubObj->value.IsInt() )
                 {
-                    job->setProperty( itor->name.GetString(),
-                                      static_cast<int32>(itor->value.GetInt()) );
+                    job->setProperty( itSubObj->name.GetString(),
+                                      static_cast<int32>(itSubObj->value.GetInt()) );
                 }
 
-                ++itor;
+                ++itSubObj;
             }
         }
 

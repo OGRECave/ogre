@@ -25,8 +25,8 @@ namespace Ogre
         bool mScaleU, mScaleV;
         bool mRotate;
 
-        HlmsDatablock   *mDatablock;
         uint8           mTextureUnit;
+        HlmsDatablock   *mDatablock;
 
         Real    mUMod, mVMod;
         Real    mUScale, mVScale;
@@ -34,7 +34,7 @@ namespace Ogre
         mutable Matrix4 mTexModMatrix;
 
         //---- Tiled Texture
-        int mNumFramesHorizontal, mNumFramesVertical;
+        uint32 mNumFramesHorizontal, mNumFramesVertical;
         uint16 mLastFrame, mCurrentVerticalFrame;
 
     public:

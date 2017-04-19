@@ -130,8 +130,8 @@ namespace Ogre {
             {
                 if( t.mOwner[j] )
                 {
-                    Bone *parentBone = static_cast<TagPoint*>( t.mOwner[j] )->mParentBone;
-                    const BoneTransform &boneTransform = parentBone->_getTransform();
+                    Bone *parentBonePtr = static_cast<TagPoint*>( t.mOwner[j] )->mParentBone;
+                    const BoneTransform &boneTransform = parentBonePtr->_getTransform();
                     parentBoneParentNodeTransform[j] =
                             boneTransform.mParentNodeTransform[boneTransform.mIndex];
                     parentBoneTransform[j] = &boneTransform.mDerivedTransform[boneTransform.mIndex];

@@ -175,21 +175,22 @@ namespace Ogre
         mp.elementType = ElementFloat;
         mp.dataSizeBytes = sizeof(float) * 16u;
         const Real * RESTRICT_ALIAS value = reinterpret_cast<const Real * RESTRICT_ALIAS>( &_value );
+        float * RESTRICT_ALIAS dstValue = reinterpret_cast<float*RESTRICT_ALIAS>( mp.dataBytes );
 
-        reinterpret_cast<float*>(mp.dataBytes)[0]  = static_cast<float>( value[0] );
-        reinterpret_cast<float*>(mp.dataBytes)[1]  = static_cast<float>( value[1] );
-        reinterpret_cast<float*>(mp.dataBytes)[2]  = static_cast<float>( value[2] );
-        reinterpret_cast<float*>(mp.dataBytes)[3]  = 0;
+        dstValue[0] = static_cast<float>( value[0] );
+        dstValue[1] = static_cast<float>( value[1] );
+        dstValue[2] = static_cast<float>( value[2] );
+        dstValue[3] = 0;
 
-        reinterpret_cast<float*>(mp.dataBytes)[4]  = static_cast<float>( value[3] );
-        reinterpret_cast<float*>(mp.dataBytes)[5]  = static_cast<float>( value[4] );
-        reinterpret_cast<float*>(mp.dataBytes)[6]  = static_cast<float>( value[5] );
-        reinterpret_cast<float*>(mp.dataBytes)[7]  = 0;
+        dstValue[4] = static_cast<float>( value[3] );
+        dstValue[5] = static_cast<float>( value[4] );
+        dstValue[6] = static_cast<float>( value[5] );
+        dstValue[7] = 0;
 
-        reinterpret_cast<float*>(mp.dataBytes)[8]  = static_cast<float>( value[6] );
-        reinterpret_cast<float*>(mp.dataBytes)[9]  = static_cast<float>( value[7] );
-        reinterpret_cast<float*>(mp.dataBytes)[10] = static_cast<float>( value[8] );
-        reinterpret_cast<float*>(mp.dataBytes)[11] = 0;
+        dstValue[8] = static_cast<float>( value[6] );
+        dstValue[9] = static_cast<float>( value[7] );
+        dstValue[10]= static_cast<float>( value[8] );
+        dstValue[11]= 0;
     }
     //-----------------------------------------------------------------------------------
     void ShaderParams::Param::setManualValue( const Matrix4 &_value )

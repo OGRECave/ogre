@@ -151,15 +151,18 @@ namespace Ogre
     InstantRadiosity::InstantRadiosity( SceneManager *sceneManager, HlmsManager *hlmsManager ) :
         mSceneManager( sceneManager ),
         mHlmsManager( hlmsManager ),
-        mVisibilityMask( 0xffffffff ),
         mFirstRq( 0 ),
         mLastRq( 255 ),
+        mVisibilityMask( 0xffffffff ),
         mLightMask( 0xffffffff ),
         //mNumRays( 10000 ),
         mNumRays( 128 ),
         mNumRayBounces( 1 ),
         mSurvivingRayFraction( 0.5f ),
         mCellSize( 3 ),
+        mBias( 0.982f ),
+        mNumSpreadIterations( 1 ),
+        mSpreadThreshold( 0.0004 ),
         mVplMaxRange( 8 ),
         mVplConstAtten( 0.5 ),
         mVplLinearAtten( 0.5 ),
@@ -168,9 +171,6 @@ namespace Ogre
         mVplPowerBoost( 1.4f ),
         mVplUseIntensityForMaxRange( true ),
         mVplIntensityRangeMultiplier( 100.0 ),
-        mBias( 0.982f ),
-        mNumSpreadIterations( 1 ),
-        mSpreadThreshold( 0.0004 ),
         mMipmapBias( 0 ),
         mTotalNumRays( 0 ),
         mEnableDebugMarkers( false ),
@@ -1162,10 +1162,10 @@ namespace Ogre
 
                             if( mUseTextures )
                             {
-                                for( int i=0; i<4; ++i )
+                                for( int k=0; k<4; ++k )
                                 {
                                     const PbsTextureTypes texType = static_cast<PbsTextureTypes>(
-                                                                                PBSM_DETAIL0 + i );
+                                                                                PBSM_DETAIL0 + k );
                                     TexturePtr detailTex = pbsDatablock->getTexture( texType );
                                     if( !detailTex.isNull() )
                                     {

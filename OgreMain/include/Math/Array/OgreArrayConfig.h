@@ -42,8 +42,14 @@ THE SOFTWARE.
             }
         #else
             #ifndef __MINGW32__
-                #include <xmmintrin.h>
-                #include <emmintrin.h>  //SSE Math library still needs SSE2
+                #if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1910
+                    //VS 2017
+                    #include <intrin.h>
+                #else
+                    #include <xmmintrin.h>
+                    #include <emmintrin.h>
+                #endif
+                
             #else
                 #include <x86intrin.h> //Including separate intrinsics headers under MinGW causes compilation errors
             #endif

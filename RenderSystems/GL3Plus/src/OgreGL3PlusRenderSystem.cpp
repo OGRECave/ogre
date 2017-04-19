@@ -2971,8 +2971,8 @@ namespace Ogre {
         RenderTarget* target = mActiveViewport->getTarget();
         bool scissorsNeeded = mActiveViewport->getActualLeft() != 0 ||
                                 mActiveViewport->getActualTop() != 0 ||
-                                mActiveViewport->getActualWidth() != target->getWidth() ||
-                                mActiveViewport->getActualHeight() != target->getHeight();
+                                mActiveViewport->getActualWidth() != (int)target->getWidth() ||
+                                mActiveViewport->getActualHeight() != (int)target->getHeight();
 
         if( scissorsNeeded )
         {

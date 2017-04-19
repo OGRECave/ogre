@@ -47,8 +47,9 @@ namespace Ogre
 
         void upload( const void *data, size_t elementStart, size_t elementCount );
 
-        virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
-                                       MappingState prevMappingState, bool advanceFrame = true ) = 0;
+        virtual void* RESTRICT_ALIAS_RETURN map( size_t elementStart, size_t elementCount,
+                                                 MappingState prevMappingState,
+                                                 bool advanceFrame = true ) = 0;
         virtual void unmap( UnmapOptions unmapOption,
                             size_t flushStartElem = 0, size_t flushSizeElem = 0 ) = 0;
         virtual void advanceFrame(void) = 0;

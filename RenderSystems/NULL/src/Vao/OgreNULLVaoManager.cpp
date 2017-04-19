@@ -377,6 +377,15 @@ namespace Ogre
         return mDynamicBufferCurrentFrame;
     }
     //-----------------------------------------------------------------------------------
+    void NULLVaoManager::waitForSpecificFrameToFinish( uint32 frameCount )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    bool NULLVaoManager::isFrameFinished( uint32 frameCount )
+    {
+        return true;
+    }
+    //-----------------------------------------------------------------------------------
     NULLVaoManager::VboFlag NULLVaoManager::bufferTypeToVboFlag( BufferType bufferType )
     {
         return static_cast<VboFlag>( std::max( 0, (bufferType - BT_DYNAMIC_DEFAULT) +

@@ -789,9 +789,9 @@ namespace Ogre
             const TextureVec *msaaDepthTexture = sceneManager->getCurrentPrePassDepthTexture();
             if( msaaDepthTexture )
                 mPrePassMsaaDepthTexture = (*msaaDepthTexture)[0];
-            assert( !mPrePassTextures ||
+            assert( (!mPrePassTextures ||
                     (mPrePassMsaaDepthTexture &&
-                     mPrePassMsaaDepthTexture->getFSAA() == (*mPrePassTextures)[0]->getFSAA()) &&
+                     mPrePassMsaaDepthTexture->getFSAA() == (*mPrePassTextures)[0]->getFSAA())) &&
                     "Prepass + MSAA must specify an MSAA depth texture" );
         }
 

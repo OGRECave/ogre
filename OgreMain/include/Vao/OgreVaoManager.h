@@ -431,6 +431,21 @@ namespace Ogre
         /// times). But first stalls until that mDynamicBufferMultiplier-1 frame behind
         /// is finished.
         virtual uint8 waitForTailFrameToFinish(void) = 0;
+
+        /** Waits for a specific frame to be ready.
+            Calling waitForSpecificFrameToFinish( mFrameCount - mDynamicBufferMultiplier )
+            equals to calling waitForTailFrameToFinish.
+        @remarks
+            WARNING: calling waitForSpecificFrameToFinish( mFrameCount ); will perform
+            a full stall!
+        @par
+            Avoid calling this function. Some implementations may decide to always full stall
+            unless (mFrameCount - frameCount) >= mDynamicBufferMultiplier
+        */
+        virtual void waitForSpecificFrameToFinish( uint32 frameCount ) = 0;
+
+        /// If this returns true, then waitForSpecificFrameToFinish is guaranteed to return immediately.
+        virtual bool isFrameFinished( uint32 frameCount ) = 0;
     };
 }
 

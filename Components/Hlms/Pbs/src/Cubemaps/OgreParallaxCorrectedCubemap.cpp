@@ -244,7 +244,7 @@ namespace Ogre
         const size_t matNameSize = materialName.size();
 
         //Create the Items using that geometry
-        for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+        for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
         {
             mProxyItems[i] = mSceneManager->createItem( mProxyMesh, SCENE_DYNAMIC );
             mProxyNodes[i] = mSceneManager->getRootSceneNode()->createChildSceneNode();
@@ -254,14 +254,14 @@ namespace Ogre
             mProxyNodes[i]->attachObject( mProxyItems[i] );
 
             materialName.resize( matNameSize );
-            materialName.a( i );
+            materialName.a( (uint32)i );
             mProxyItems[i]->setMaterialName( materialName.c_str() );
         }
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::destroyProxyItems(void)
     {
-        for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+        for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
         {
             if( mProxyNodes[i] )
             {
@@ -757,7 +757,7 @@ namespace Ogre
 
         mCurrentMip = 0;
 
-        for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+        for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
         {
             mCollectedProbes[i] = 0;
             mProbeNDFs[i] = std::numeric_limits<Real>::max();
@@ -791,7 +791,7 @@ namespace Ogre
                         int highestNdfIdx = OGRE_MAX_CUBE_PROBES;
 
                         //Drop the probe with the highest NDF (note: we may drop this probe)
-                        for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+                        for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
                         {
                             if( ndf < mProbeNDFs[i] && mProbeNDFs[i] >= highestNdf )
                             {
@@ -945,9 +945,9 @@ namespace Ogre
                     mCopyWorkspace->_endUpdate( true );
 
                     mSceneManager->_frameEnded();
-                    for( size_t i=0; i<HLMS_MAX; ++i )
+                    for( size_t k=0; k<HLMS_MAX; ++k )
                     {
-                        Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+                        Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( k ) );
                         if( hlms )
                             hlms->frameEnded();
                     }

@@ -85,7 +85,9 @@ namespace Ogre
         mActiveDevice( 0 ),
         mActiveRenderEncoder( 0 ),
         mDevice( this ),
-        mMainGpuSyncSemaphore( 0 )
+        mMainGpuSyncSemaphore( 0 ),
+        mMainSemaphoreAlreadyWaited( false ),
+        mBeginFrameOnceStarted( false )
     {
         memset( mHistoricalAutoParamsSize, 0, sizeof(mHistoricalAutoParamsSize) );
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
@@ -319,6 +321,8 @@ namespace Ogre
 
             const long c_inFlightCommandBuffers = 3;
             mMainGpuSyncSemaphore = dispatch_semaphore_create(c_inFlightCommandBuffers);
+            mMainSemaphoreAlreadyWaited = false;
+            mBeginFrameOnceStarted = false;
             mRealCapabilities = createRenderSystemCapabilities();
             mDriverVersion = mRealCapabilities->getDriverVersion();
 
@@ -655,15 +659,48 @@ namespace Ogre
         return retVal;
     }
     //-------------------------------------------------------------------------
+    void MetalRenderSystem::_waitForTailFrameToFinish(void)
+    {
+        if( !mMainSemaphoreAlreadyWaited )
+        {
+            dispatch_semaphore_wait( mMainGpuSyncSemaphore, DISPATCH_TIME_FOREVER );
+            mMainSemaphoreAlreadyWaited = true;
+        }
+    }
+    //-------------------------------------------------------------------------
+    bool MetalRenderSystem::_willTailFrameStall(void)
+    {
+        bool retVal = mMainSemaphoreAlreadyWaited;
+
+        if( !mMainSemaphoreAlreadyWaited )
+        {
+            const long result = dispatch_semaphore_wait( mMainGpuSyncSemaphore, DISPATCH_TIME_NOW );
+            if( result == 0 )
+            {
+                retVal = true;
+                //Semaphore was just grabbed, so ensure we don't grab it twice.
+                mMainSemaphoreAlreadyWaited = true;
+            }
+        }
+
+        return retVal;
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::_beginFrameOnce(void)
     {
         mHardwareBufferManager->_updateDirtyInputLayouts();
+
+        assert( !mBeginFrameOnceStarted &&
+                "Calling MetalRenderSystem::_beginFrameOnce more than once "
+                "without matching call to _endFrameOnce!!!" );
 
         //Allow the renderer to preflight 3 frames on the CPU (using a semapore as a guard) and
         //commit them to the GPU. This semaphore will get signaled once the GPU completes a
         //frame's work via addCompletedHandler callback below, signifying the CPU can go ahead
         //and prepare another frame.
-        dispatch_semaphore_wait( mMainGpuSyncSemaphore, DISPATCH_TIME_FOREVER );
+        _waitForTailFrameToFinish();
+
+        mBeginFrameOnceStarted = true;
 
         mActiveRenderTarget = 0;
         mActiveViewport = 0;
@@ -689,6 +726,8 @@ namespace Ogre
         mActiveRenderTarget = 0;
         mActiveViewport = 0;
         mActiveDevice->mFrameAborted = false;
+        mMainSemaphoreAlreadyWaited = false;
+        mBeginFrameOnceStarted = false;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::cleanAutoParamsBuffers(void)

@@ -263,8 +263,14 @@ namespace Ogre
 
         virtual void _update(void);
 
-        /// @see VaoManager::waitForTailFrameToFinish
+        /// See VaoManager::waitForTailFrameToFinish
         virtual uint8 waitForTailFrameToFinish(void);
+
+        /// See VaoManager::waitForSpecificFrameToFinish
+        virtual void waitForSpecificFrameToFinish( uint32 frameCount );
+
+        /// See VaoManager::isFrameFinished
+        virtual bool isFrameFinished( uint32 frameCount );
 
         /** Will stall undefinitely until GPU finishes (signals the sync object).
         @param fenceName

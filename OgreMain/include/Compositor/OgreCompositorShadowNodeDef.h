@@ -79,11 +79,11 @@ namespace Ogre
         ShadowTextureDefinition( ShadowMapTechniques t, const String &texRefName, uint8 _mrtIndex,
                                  const Vector2 &_uvOffset, const Vector2 &_uvLength,
                                  uint8 _arrayIdx, size_t _light, size_t _split ) :
-                texName( texRefName ), texNameStr( texRefName ),
                 uvOffset( _uvOffset ), uvLength( _uvLength ),
                 arrayIdx( _arrayIdx ), mrtIndex( _mrtIndex ),
                 light(_light), split(_split), shadowMapTechnique(t),
                 pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),
+                texName( texRefName ), texNameStr( texRefName ),
                 sharesSetupWith( -1 ) {}
 
         IdString getTextureName() const             { return texName; }

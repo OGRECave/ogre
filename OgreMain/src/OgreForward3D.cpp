@@ -137,7 +137,7 @@ namespace Ogre
         //(lights set to cast shadows but currently not casting shadows are also included)
         if( mSceneManager->getCurrentShadowNode() )
         {
-            const LightListInfo &globalLightList = mSceneManager->getGlobalLightList();
+            //const LightListInfo &globalLightList = mSceneManager->getGlobalLightList();
             const CompositorShadowNode *shadowNode = mSceneManager->getCurrentShadowNode();
 
             //Exclude shadow casting lights

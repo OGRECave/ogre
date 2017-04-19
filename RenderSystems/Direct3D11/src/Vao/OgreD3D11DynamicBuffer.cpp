@@ -65,8 +65,7 @@ namespace Ogre
         return ticket;
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC void* D3D11DynamicBuffer::map( size_t start, size_t count,
-                                               size_t &outTicket )
+    void* RESTRICT_ALIAS_RETURN D3D11DynamicBuffer::map( size_t start, size_t count, size_t &outTicket )
     {
         assert( start <= mVboSize && start + count <= mVboSize );
 
