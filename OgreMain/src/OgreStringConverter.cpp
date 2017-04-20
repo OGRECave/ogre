@@ -253,7 +253,7 @@ namespace Ogre {
     int StringConverter::parseInt(const String& val, int defaultValue)
     {
         char* end;
-        int ret = (int)strtoul_l(val.c_str(), &end, 0, _numLocale);
+        int ret = (int)strtol_l(val.c_str(), &end, 0, _numLocale);
         return val.c_str() == end ? defaultValue : ret;
     }
     //-----------------------------------------------------------------------

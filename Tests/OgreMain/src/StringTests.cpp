@@ -160,7 +160,7 @@ TEST_F(StringTests,ParseReal)
 //--------------------------------------------------------------------------
 TEST_F(StringTests,ParseInt)
 {
-    int r = 223546;
+    int r = -223546;
 
     String s = StringConverter::toString(r);
     int t = StringConverter::parseInt(s);
