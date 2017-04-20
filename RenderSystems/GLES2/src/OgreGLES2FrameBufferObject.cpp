@@ -41,8 +41,6 @@ namespace Ogre {
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
-        GLES2Support* glSupport = getGLES2SupportRef();
-
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
@@ -53,7 +51,7 @@ namespace Ogre {
 
         // Check multisampling if supported
         GLint maxSamples = 0;
-        if(glSupport->hasMinGLVersion(3, 0))
+        if(!OGRE_NO_GLES3_SUPPORT)
         {
             // Check samples supported
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
