@@ -42,11 +42,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
         // Check samples supported
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
-
         GLint maxSamples;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
         mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
 
         // Will we need a second FBO to do multisampling?
