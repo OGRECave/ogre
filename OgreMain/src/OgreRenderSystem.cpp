@@ -669,8 +669,8 @@ namespace Ogre {
 
                 bAttached = renderTarget->attachDepthBuffer( newDepthBuffer );
 
-                assert( bAttached && "A new DepthBuffer for a RenderTarget was created, but after creation"
-                                     "it says it's incompatible with that RT" );
+                OgreAssert( bAttached ,"A new DepthBuffer for a RenderTarget was created, but after creation"
+                                     " it says it's incompatible with that RT" );
             }
             else
                 LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited DepthBuffer"

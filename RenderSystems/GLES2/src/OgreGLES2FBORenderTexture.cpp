@@ -41,8 +41,8 @@ namespace Ogre {
 //-----------------------------------------------------------------------------    
     GLES2FBORenderTexture::GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name,
         const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa):
-        GLES2RenderTexture(name, target, writeGamma, fsaa),
-        mFB(manager, fsaa)
+        GLES2RenderTexture(name, target, writeGamma, std::min(manager->getMaxFSAASamples(), (int)fsaa)),
+        mFB(manager, mFSAA)
     {
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
@@ -153,11 +153,18 @@ namespace Ogre {
     };
     #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
-    GLES2FBOManager::GLES2FBOManager()
+    GLES2FBOManager::GLES2FBOManager() : mMaxFSAASamples(0)
     {
         detectFBOFormats();
         
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
+
+        // Check multisampling if supported
+        if(!OGRE_NO_GLES3_SUPPORT)
+        {
+            // Check samples supported
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &mMaxFSAASamples));
+        }
     }
 
     GLES2FBOManager::~GLES2FBOManager()

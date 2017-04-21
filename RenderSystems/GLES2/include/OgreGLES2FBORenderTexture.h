@@ -106,6 +106,8 @@ namespace Ogre {
         /** Detects all supported fbo's and recreates the tempory fbo */
         void _reload();
         
+        GLint getMaxFSAASamples() { return mMaxFSAASamples; }
+
     private:
         // map(format, sizex, sizey) -> [GLSurface*,refcount]
         
@@ -113,6 +115,8 @@ namespace Ogre {
          */
         GLuint mTempFBO;
         
+        GLint mMaxFSAASamples;
+
         /** Detect allowed FBO formats */
         void detectFBOFormats();
         GLuint _tryFormat(GLenum depthFormat, GLenum stencilFormat);
