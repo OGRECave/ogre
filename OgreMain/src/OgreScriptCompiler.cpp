@@ -591,14 +591,20 @@ namespace Ogre
 
         if(!nodes && ResourceGroupManager::getSingletonPtr())
         {
-            DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(name, mGroup);
-            if(stream)
+            DataStreamPtr stream;
+            try
             {
-                ScriptLexer lexer;
-                ScriptTokenListPtr tokens = lexer.tokenize(stream->getAsString(), name);
-                ScriptParser parser;
-                nodes = parser.parse(tokens);
+                stream = ResourceGroupManager::getSingleton().openResource(name, mGroup);
             }
+            catch (FileNotFoundException&)
+            {
+                return retval;
+            }
+
+            ScriptLexer lexer;
+            ScriptTokenListPtr tokens = lexer.tokenize(stream->getAsString(), name);
+            ScriptParser parser;
+            nodes = parser.parse(tokens);
         }
 
         if(nodes)

@@ -1180,27 +1180,24 @@ namespace Ogre {
     DataStreamPtr Root::openFileStream(const String& filename, const String& groupName,
         const String& locationPattern)
     {
-        DataStreamPtr stream;
-        if (ResourceGroupManager::getSingleton().resourceExists(
-            groupName, filename))
+        try
         {
-            stream = ResourceGroupManager::getSingleton().openResource(
-                filename, groupName);
+            return ResourceGroupManager::getSingleton().openResource(filename, groupName);
         }
-        else
+        catch (FileNotFoundException&)
         {
-            // try direct
-            std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
-            ifs->open(filename.c_str(), std::ios::in | std::ios::binary);
-            if(!*ifs)
-            {
-                OGRE_DELETE_T(ifs, basic_ifstream, MEMCATEGORY_GENERAL);
-                OGRE_EXCEPT(
-                    Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
-            }
-            stream.reset(OGRE_NEW FileStreamDataStream(filename, ifs));
         }
-        return stream;
+
+        // try direct
+        std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
+        ifs->open(filename.c_str(), std::ios::in | std::ios::binary);
+        if(!*ifs)
+        {
+            OGRE_DELETE_T(ifs, basic_ifstream, MEMCATEGORY_GENERAL);
+            OGRE_EXCEPT(
+                Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
+        }
+        return DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, ifs));
     }
     //-----------------------------------------------------------------------
     void Root::convertColourValue(const ColourValue& colour, uint32* pDest)

@@ -400,7 +400,7 @@ namespace Ogre {
                 dstream = ResourceGroupManager::getSingleton().openResource(
                         mName, mGroup);
             }
-            catch (Exception&)
+            catch (FileNotFoundException&)
             {
             }
             if (!dstream && getTextureType() == TEX_TYPE_CUBE_MAP)
@@ -411,7 +411,7 @@ namespace Ogre {
                     dstream = ResourceGroupManager::getSingleton().openResource(
                         mName + "_rt", mGroup);
                 }
-                catch (Exception&)
+                catch (FileNotFoundException&)
                 {
                 }
             }
