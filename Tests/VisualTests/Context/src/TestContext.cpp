@@ -368,10 +368,6 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
 
         if (mCurrentTest->isDone())
         {
-#ifdef INCLUDE_RTSHADER_SYSTEM
-            mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
-#endif
-
             createDummyScene();
 
             // continue onto the next test
