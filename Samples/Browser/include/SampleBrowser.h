@@ -1243,11 +1243,6 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void unloadSamples()
         {
-#ifdef INCLUDE_RTSHADER_SYSTEM
-            // Generator might still be uninitialized e. g. if we directly quit the browser from the config dialog.
-            if(mShaderGenerator != NULL)
-                mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
-#endif
 #ifdef OGRE_STATIC_LIB
             const Ogre::Root::PluginInstanceList pluginList = mRoot->getInstalledPlugins();
             for(unsigned int i = 0; i < pluginList.size(); i++)

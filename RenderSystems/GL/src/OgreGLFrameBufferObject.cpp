@@ -47,10 +47,8 @@ namespace Ogre {
         if (GLEW_EXT_framebuffer_blit && GLEW_EXT_framebuffer_multisample)
         {
             // check samples supported
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
             GLint maxSamples;
             glGetIntegerv(GL_MAX_SAMPLES_EXT, &maxSamples);
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
         }
         else

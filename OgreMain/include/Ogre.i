@@ -113,8 +113,8 @@
 ADD_REPR(Degree)
 ADD_REPR(Radian)
 %include "OgreStringVector.h"
-%template(_StringVector) Ogre::vector<Ogre::String>;
-%template(StringVector) std::vector<Ogre::String>;
+%template(_StringVector) Ogre::vector<Ogre::String>; // instantiate vector<T>::type
+%template(StringVector) std::vector<Ogre::String>;  // actual vector<T>
 %template(StringVectorPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
 // Linear Algebra
 %include "OgreVector2.h"
@@ -190,6 +190,11 @@ ADD_REPR(ColourValue)
 %include "OgreHardwareOcclusionQuery.h"
 %include "OgreHardwareBuffer.h"
 %include "OgreParticleIterator.h"
+
+%template(_ParameterList) Ogre::vector<Ogre::ParameterDef>;
+%ignore std::vector<Ogre::ParameterDef>::resize; // non default constructible
+%ignore std::vector<Ogre::ParameterDef>::vector;
+%template(ParameterList) std::vector<Ogre::ParameterDef>;
 %include "OgreStringInterface.h"
     %include "OgreParticleAffector.h"
         %include "OgreParticleAffectorFactory.h"
