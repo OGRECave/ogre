@@ -201,10 +201,8 @@ namespace Ogre{
     public:
         SharedParamsTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
-        template <class T, BaseConstantType baseType>
-        void translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters *sharedParams, PropertyAbstractNode *prop, String pName, GpuConstantType constType);
-        template <class T, BaseConstantType baseType>
-        T parseParameter(const String& param);
+                template <class T>
+                void translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters *sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType);
     protected:
     };
 
