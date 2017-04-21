@@ -1,5 +1,5 @@
 language: cpp
-sudo: required
+sudo: false
 dist: trusty
 branches:
   only:
@@ -17,7 +17,7 @@ addons:
     - libgles2-mesa-dev
     - python3-dev
 before_script:
-    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse" && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty-backports universe" && sudo apt-get update -qq && sudo apt-get install -qq nvidia-cg-dev swig3.0 ; fi
+    # - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse" && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty-backports universe" && sudo apt-get update -qq && sudo apt-get install -qq nvidia-cg-dev swig3.0 ; fi
     # we start compilation afterwards anyway, so no need to sleep
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
     - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 ; fi
