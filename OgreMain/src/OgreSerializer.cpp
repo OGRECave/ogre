@@ -350,7 +350,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     String Serializer::readString(DataStreamPtr& stream, size_t numChars)
     {
-        assert (numChars <= 255);
+        OgreAssert(numChars <= 255, "");
         char str[255];
         stream->read(str, numChars);
         str[numChars] = '\0';

@@ -1871,7 +1871,7 @@ namespace Ogre {
             sourceVertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
         const VertexElement* srcElemBlendWeights =
             sourceVertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS);
-        assert (srcElemPos && srcElemBlendIndices && srcElemBlendWeights &&
+        OgreAssert(srcElemPos && srcElemBlendIndices && srcElemBlendWeights,
             "You must supply at least positions, blend indices and blend weights");
         // Get elements for target
         const VertexElement* destElemPos =

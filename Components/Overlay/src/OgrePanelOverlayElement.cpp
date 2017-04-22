@@ -150,8 +150,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void PanelOverlayElement::setTiling(Real x, Real y, ushort layer)
     {
-        assert (layer < OGRE_MAX_TEXTURE_COORD_SETS);
-        assert (x != 0 && y != 0);
+        OgreAssert (layer < OGRE_MAX_TEXTURE_COORD_SETS, "out of bounds");
+        OgreAssert (x != 0 && y != 0, "tile number must be > 0");
 
         mTileX[layer] = x;
         mTileY[layer] = y;
