@@ -271,6 +271,7 @@ namespace OgreBites
             mCamera = mSceneMgr->createCamera("MainCamera");
             mCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
             mCameraNode->attachObject(mCamera);
+            mCameraNode->setFixedYawAxis(true);
             mViewport = mWindow->addViewport(mCamera);
             mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
             mCamera->setAutoAspectRatio(true);
