@@ -122,7 +122,7 @@ protected:
         mTrayMgr->createCheckBox(TL_BOTTOM, DEBUG_MODE_CHECKBOX, "Show Grid", 240)->setChecked(false, false);
 
         // Set our camera to orbit around the origin at a suitable distance
-        mCamera->setPosition(0, 100, 600);
+        mCameraNode->setPosition(0, 100, 600);
 
         mTrayMgr->showCursor();
 

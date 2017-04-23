@@ -89,7 +89,7 @@ protected:
 
         // set initial camera position
         mCameraMan->setStyle(CS_MANUAL);
-        mCamera->setPosition(0, 0, 200);
+        mCameraNode->setPosition(0, 0, 200);
 
         mTrayMgr->showCursor();
 

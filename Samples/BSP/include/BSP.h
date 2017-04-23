@@ -119,11 +119,11 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         ViewPoint vp = mSceneMgr->getSuggestedViewpoint(true);
 
         // Quake uses the Z axis as the up axis, so make necessary adjustments
-        mCamera->setFixedYawAxis(true, Vector3::UNIT_Z);
-        mCamera->pitch(Degree(90));
+        mCameraNode->setFixedYawAxis(true, Vector3::UNIT_Z);
+        mCameraNode->pitch(Degree(90));
 
-        mCamera->setPosition(vp.position);
-        mCamera->rotate(vp.orientation);
+        mCameraNode->setPosition(vp.position);
+        mCameraNode->rotate(vp.orientation);
 
         mCameraMan->setTopSpeed(350);   // make the camera move a bit faster
     }

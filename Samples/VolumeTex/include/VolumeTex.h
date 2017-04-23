@@ -59,8 +59,8 @@ protected:
         SdkSample::setupView();
 
         // Create the camera
-        mCamera->setPosition(Vector3(220,-2,176));
-        mCamera->lookAt(Vector3(0,0,0));
+        mCameraNode->setPosition(Vector3(220,-2,176));
+        mCameraNode->lookAt(Vector3(0,0,0), Node::TS_PARENT);
         mCamera->setNearClipDistance(5);
     }
 

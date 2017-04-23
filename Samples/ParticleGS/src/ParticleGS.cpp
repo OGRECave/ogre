@@ -137,8 +137,8 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
     {
         demoTime = 0;
 
-        mCamera->setPosition(0,35,-100);
-        mCamera->lookAt(0,35,0);
+        mCameraNode->setPosition(0,35,-100);
+        mCameraNode->lookAt(Vector3(0,35,0), Node::TS_PARENT);
 
         mSceneMgr->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
 

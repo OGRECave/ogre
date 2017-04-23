@@ -43,7 +43,7 @@ void CubeMappingTest::setupContent()
     Ogre::Entity* head = mSceneMgr->createEntity("ogrehead.mesh");
     node->attachObject(head);
     head->setMaterialName("Examples/MorningCubeMap");
-    mCamera->setPosition(0,0,100);
+    mCameraNode->setPosition(0,0,100);
 }
 //-----------------------------------------------------------------------
 

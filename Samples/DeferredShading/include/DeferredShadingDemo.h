@@ -305,8 +305,8 @@ protected:
         //Turn this on to have the directional light cast shadows
         l1->setCastShadows(false);
         
-        mCamera->setPosition(25, 5, 0);
-        mCamera->lookAt(0,0,0);
+        mCameraNode->setPosition(25, 5, 0);
+        mCameraNode->lookAt(Vector3::ZERO, Node::TS_PARENT);
         mCamera->setFarClipDistance(1000.0);
         mCamera->setNearClipDistance(0.5);
         setDragLook(true);

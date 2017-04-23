@@ -40,12 +40,12 @@ public:
         mHead->setVisible(false);  // hide the head
 
         // point the camera in the right direction based on which face of the cubemap this is
-        mCubeCamera->setOrientation(Quaternion::IDENTITY);
-        if (evt.source == mTargets[0]) mCubeCamera->yaw(Degree(-90));
-        else if (evt.source == mTargets[1]) mCubeCamera->yaw(Degree(90));
-        else if (evt.source == mTargets[2]) mCubeCamera->pitch(Degree(90));
-        else if (evt.source == mTargets[3]) mCubeCamera->pitch(Degree(-90));
-        else if (evt.source == mTargets[5]) mCubeCamera->yaw(Degree(180));
+        mCubeCameraNode->setOrientation(Quaternion::IDENTITY);
+        if (evt.source == mTargets[0]) mCubeCameraNode->yaw(Degree(-90));
+        else if (evt.source == mTargets[1]) mCubeCameraNode->yaw(Degree(90));
+        else if (evt.source == mTargets[2]) mCubeCameraNode->pitch(Degree(90));
+        else if (evt.source == mTargets[3]) mCubeCameraNode->pitch(Degree(-90));
+        else if (evt.source == mTargets[5]) mCubeCameraNode->yaw(Degree(180));
     }
 
     void postRenderTargetUpdate(const RenderTargetEvent& evt)
@@ -99,11 +99,14 @@ protected:
     void createCubeMap()
     {
         // create the camera used to render to our cubemap
-        mCubeCamera = mSceneMgr->createCamera("CubeMapCamera");
-        mCubeCamera->setFOVy(Degree(90));
-        mCubeCamera->setAspectRatio(1);
-        mCubeCamera->setFixedYawAxis(false);
-        mCubeCamera->setNearClipDistance(5);
+        Camera* cubeCamera = mSceneMgr->createCamera("CubeMapCamera");
+        cubeCamera->setFOVy(Degree(90));
+        cubeCamera->setAspectRatio(1);
+        cubeCamera->setNearClipDistance(5);
+
+        mCubeCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        mCubeCameraNode->attachObject(cubeCamera);
+        mCubeCameraNode->setFixedYawAxis(false);
 
         // create our dynamic cube map texture
         TexturePtr tex = TextureManager::getSingleton().createManual("dyncubemap",
@@ -113,7 +116,7 @@ protected:
         for (unsigned int i = 0; i < 6; i++)
         {
             mTargets[i] = tex->getBuffer(i)->getRenderTarget();
-            mTargets[i]->addViewport(mCubeCamera)->setOverlaysEnabled(false);
+            mTargets[i]->addViewport(cubeCamera)->setOverlaysEnabled(false);
             mTargets[i]->addListener(this);
         }
     }
@@ -126,13 +129,13 @@ protected:
 			mTargets[i]->removeListener(this);
 		}
 			
-		mSceneMgr->destroyCamera(mCubeCamera);
+		//mSceneMgr->destroyCamera(mCubeCamera);
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         TextureManager::getSingleton().remove("dyncubemap", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     Entity* mHead;
-    Camera* mCubeCamera;
+    SceneNode* mCubeCameraNode;
     RenderTarget* mTargets[6];
     SceneNode* mPivot;
     AnimationState* mFishSwim;

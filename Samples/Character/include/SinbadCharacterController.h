@@ -222,7 +222,7 @@ private:
         // this is where the camera should be soon, and it spins around the pivot
         mCameraGoal = mCameraPivot->createChildSceneNode(Vector3(0, 0, 15));
         // this is where the camera actually is
-        mCameraNode = cam->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+        mCameraNode = cam->getParentSceneNode();
         mCameraNode->setPosition(mCameraPivot->getPosition() + mCameraGoal->getPosition());
 
         mCameraPivot->setFixedYawAxis(true);
@@ -232,7 +232,6 @@ private:
         // our model is quite small, so reduce the clipping planes
         cam->setNearClipDistance(0.1);
         cam->setFarClipDistance(100);
-        mCameraNode->attachObject(cam);
 
         mPivotPitch = 0;
     }
@@ -423,12 +422,12 @@ private:
         Vector3 goalOffset = mCameraGoal->_getDerivedPosition() - mCameraNode->getPosition();
         mCameraNode->translate(goalOffset * deltaTime * 9.0f);
         // always look at the pivot
-        mCameraNode->lookAt(mCameraPivot->_getDerivedPosition(), Node::TS_WORLD);
+        mCameraNode->lookAt(mCameraPivot->_getDerivedPosition(), Node::TS_PARENT);
     }
 
     void updateCameraGoal(Real deltaYaw, Real deltaPitch, Real deltaZoom)
     {
-        mCameraPivot->yaw(Degree(deltaYaw), Node::TS_WORLD);
+        mCameraPivot->yaw(Degree(deltaYaw), Node::TS_PARENT);
 
         // bound the pitch
         if (!(mPivotPitch + deltaPitch > 25 && deltaPitch > 0) &&

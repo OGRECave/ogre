@@ -384,8 +384,8 @@ protected:
         l->setType(Light::LT_DIRECTIONAL);
         l->setDirection(-0.5, -0.5, 0);
 
-        mCamera->setPosition(500,500, 1500);
-        mCamera->lookAt(0,0,0);
+        mCameraNode->setPosition(500,500, 1500);
+        mCameraNode->lookAt(Vector3(0,0,0), Node::TS_PARENT);
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         setDragLook(true);
 #endif

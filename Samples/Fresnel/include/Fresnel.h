@@ -106,7 +106,7 @@ protected:
 
     void setupContent()
     {
-        mCamera->setPosition(-50, 125, 760);
+        mCameraNode->setPosition(-50, 125, 760);
         mCameraMan->setTopSpeed(280);
 
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));  // set ambient light

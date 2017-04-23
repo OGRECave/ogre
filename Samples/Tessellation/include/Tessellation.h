@@ -50,9 +50,9 @@ class _OgreSampleClassExport Sample_Tessellation : public SdkSample
         // set our camera
         mTrayMgr->showCursor();
         mCameraMan->setStyle(CS_ORBIT);
-        Camera* cam = mCameraMan->getCamera();
-        cam->setPosition(0, 5, -30);
-        cam->setPolygonMode(PM_WIREFRAME);
+
+        mCameraNode->setPosition(0, 5, -30);
+        mCamera->setPolygonMode(PM_WIREFRAME);
 
         // create material and set the texture unit to our texture
         MaterialPtr tMat = static_pointer_cast<Material>(MaterialManager::getSingleton().createOrRetrieve("Ogre/TessellationExample", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first);

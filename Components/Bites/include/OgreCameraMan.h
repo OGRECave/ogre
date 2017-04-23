@@ -56,14 +56,14 @@ namespace OgreBites
     class _OgreBitesExport CameraMan : public InputListener
     {
     public:
-        CameraMan(Ogre::Camera* cam);
+        CameraMan(Ogre::SceneNode* cam);
 
         /**
         Swaps the camera on our camera man for another camera.
         */
-        void setCamera(Ogre::Camera* cam);
+        void setCamera(Ogre::SceneNode* cam);
 
-        Ogre::Camera* getCamera()
+        Ogre::SceneNode* getCamera()
         {
             return mCamera;
         }
@@ -144,7 +144,7 @@ namespace OgreBites
 
     protected:
 
-        Ogre::Camera* mCamera;
+        Ogre::SceneNode* mCamera;
         CameraStyle mStyle;
         Ogre::SceneNode* mTarget;
         bool mOrbiting;

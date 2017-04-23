@@ -40,7 +40,7 @@ void TransparencyTest::setupContent()
 {
     mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
-    mCamera->setPosition(0, 0, 300);   // set camera's starting position
+    mCameraNode->setPosition(0, 0, 300);   // set camera's starting position
 
     mSceneMgr->createLight()->setPosition(20, 80, 50);   // add basic point light
 

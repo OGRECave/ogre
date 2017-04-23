@@ -98,8 +98,8 @@ Sample_Compositor::Sample_Compositor()
 void Sample_Compositor::setupView()
 {
     SdkSample::setupView();
-    mCamera->setPosition(Ogre::Vector3(0,0,0));
-    mCamera->lookAt(Ogre::Vector3(0,0,-300));
+    mCameraNode->setPosition(Ogre::Vector3(0,0,0));
+    mCameraNode->lookAt(Ogre::Vector3(0,0,-300), Ogre::Node::TS_PARENT);
     mCamera->setNearClipDistance(1);
 }
 
@@ -430,8 +430,8 @@ void Sample_Compositor::setupScene(void)
     pPlaneEnt->setCastShadows(false);
     mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
 
-    mCamera->setPosition(-400, 50, 900);
-    mCamera->lookAt(0,80,0);
+    mCameraNode->setPosition(-400, 50, 900);
+    mCameraNode->lookAt(Ogre::Vector3(0,80,0), Ogre::Node::TS_PARENT);
 }
 
 

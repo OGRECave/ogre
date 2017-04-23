@@ -215,7 +215,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         if (!mFly)
         {
             // clamp to terrain
-            Vector3 camPos = mCamera->getPosition();
+            Vector3 camPos = mCameraNode->getPosition();
             Ray ray;
             ray.setOrigin(Vector3(camPos.x, mTerrainPos.y + 10000, camPos.z));
             ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
@@ -234,7 +234,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
                 }
                 newy = std::max(rayResult.position.y + distanceAboveTerrain, newy);
-                mCamera->setPosition(camPos.x, newy, camPos.z);
+                mCameraNode->setPosition(camPos.x, newy, camPos.z);
 
             }
 
@@ -704,8 +704,8 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     {
         SdkSample::setupView();
 
-        mCamera->setPosition(mTerrainPos + Vector3(1683, 50, 2116));
-        mCamera->lookAt(Vector3(1963, 50, 1660));
+        mCameraNode->setPosition(mTerrainPos + Vector3(1683, 50, 2116));
+        mCameraNode->lookAt(Vector3(1963, 50, 1660), Node::TS_PARENT);
         mCamera->setNearClipDistance(0.1);
         mCamera->setFarClipDistance(50000);
 

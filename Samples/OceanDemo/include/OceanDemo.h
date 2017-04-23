@@ -184,9 +184,9 @@ void Sample_Ocean::setupContent(void)
     setupGUI();
     
     // Position it at 500 in Z direction
-    mCamera->setPosition(Ogre::Vector3(0,0,0));
+    mCameraNode->setPosition(Ogre::Vector3(0,0,0));
     // Look back along -Z
-    mCamera->lookAt(Ogre::Vector3(0,0,-300));
+    mCameraNode->lookAt(Ogre::Vector3(0,0,-300), Ogre::Node::TS_PARENT);
     mCamera->setNearClipDistance(1);
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
@@ -226,8 +226,8 @@ void Sample_Ocean::setupScene()
     }
 
     // move the camera a bit right and make it look at the knot
-    mCamera->moveRelative(Ogre::Vector3(50, 0, 100));
-    mCamera->lookAt(0, 0, 0);
+    mCameraNode->translate(Ogre::Vector3(50, 0, 100), Node::TS_LOCAL);
+    mCameraNode->lookAt(Vector3(0, 0, 0), Node::TS_PARENT);
 
     // Define a plane mesh that will be used for the ocean surface
     Ogre::Plane oceanSurface;

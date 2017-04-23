@@ -67,7 +67,7 @@ protected:
 
         mSceneMgr->setFog(FOG_LINEAR, ColourValue::White, 0, 500, 1000);
         
-        mCamera->setPosition(0, -20, 470);
+        mCameraNode->setPosition(0, -20, 470);
 
         mTrayMgr->showCursor();
 
