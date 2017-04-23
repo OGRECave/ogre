@@ -228,45 +228,55 @@ namespace Ogre {
         PolygonMode getPolygonMode(void) const;
 
         /** Sets the camera's position.
+        @deprecated attach to SceneNode and use SceneNode::setPosition
         */
-        void setPosition(Real x, Real y, Real z);
+        OGRE_DEPRECATED void setPosition(Real x, Real y, Real z);
 
         /// @overload
+        /// @deprecated attach to SceneNode and use SceneNode::setPosition
         void setPosition(const Vector3& vec);
 
         /** Retrieves the camera's position.
+        @deprecated attach to SceneNode and use SceneNode::getPosition
         */
-        const Vector3& getPosition(void) const;
+        OGRE_DEPRECATED const Vector3& getPosition(void) const;
 
         /** Moves the camera's position by the vector offset provided along world axes.
+        @deprecated attach to SceneNode and use SceneNode::translate
         */
-        void move(const Vector3& vec);
+        OGRE_DEPRECATED void move(const Vector3& vec);
 
         /** Moves the camera's position by the vector offset provided along it's own axes (relative to orientation).
+        @deprecated attach to SceneNode and use SceneNode::translate(vec, Node::TS_LOCAL)
         */
-        void moveRelative(const Vector3& vec);
+        OGRE_DEPRECATED void moveRelative(const Vector3& vec);
 
         /** Sets the camera's direction vector.
         @remarks
             Note that the 'up' vector for the camera will automatically be recalculated based on the
             current 'up' vector (i.e. the roll will remain the same).
+        @deprecated attach to SceneNode and use SceneNode::setDirection
         */
-        void setDirection(Real x, Real y, Real z);
+        OGRE_DEPRECATED void setDirection(Real x, Real y, Real z);
 
         /// @overload
+        /// @deprecated attach to SceneNode and use SceneNode::setDirection
         void setDirection(const Vector3& vec);
 
         /** Gets the camera's direction.
+        @deprecated attach to SceneNode and use SceneNode::getLocalAxes
         */
-        Vector3 getDirection(void) const;
+        OGRE_DEPRECATED Vector3 getDirection(void) const;
 
         /** Gets the camera's up vector.
+        @deprecated attach to SceneNode and use SceneNode::getLocalAxes
         */
-        Vector3 getUp(void) const;
+        OGRE_DEPRECATED Vector3 getUp(void) const;
 
         /** Gets the camera's right vector.
+        @deprecated attach to SceneNode and use SceneNode::getLocalAxes
         */
-        Vector3 getRight(void) const;
+        OGRE_DEPRECATED Vector3 getRight(void) const;
 
         /** Points the camera at a location in worldspace.
         @remarks
@@ -275,28 +285,35 @@ namespace Ogre {
             and the supplied look-at point.
         @param
             targetPoint A vector specifying the look at point.
+        @deprecated attach to SceneNode and use SceneNode::lookAt
         */
         void lookAt( const Vector3& targetPoint );
         /// @overload
-        void lookAt(Real x, Real y, Real z);
+        /// @deprecated attach to SceneNode and use SceneNode::lookAt
+        OGRE_DEPRECATED void lookAt(Real x, Real y, Real z);
 
         /** Rolls the camera anticlockwise, around its local z axis.
+        @deprecated attach to SceneNode and use SceneNode::roll
         */
-        void roll(const Radian& angle);
+        OGRE_DEPRECATED void roll(const Radian& angle);
 
         /** Rotates the camera anticlockwise around it's local y axis.
+        @deprecated attach to SceneNode and use SceneNode::yaw
         */
-        void yaw(const Radian& angle);
+        OGRE_DEPRECATED void yaw(const Radian& angle);
 
         /** Pitches the camera up/down anticlockwise around it's local z axis.
+        @deprecated attach to SceneNode and use SceneNode::pitch
         */
-        void pitch(const Radian& angle);
+        OGRE_DEPRECATED void pitch(const Radian& angle);
 
         /** Rotate the camera around an arbitrary axis.
+        @deprecated attach to SceneNode and use SceneNode::rotate
         */
         void rotate(const Vector3& axis, const Radian& angle);
 
         /// @overload
+        /// @deprecated attach to SceneNode and use SceneNode::rotate
         void rotate(const Quaternion& q);
 
         /** Tells the camera whether to yaw around it's own local Y axis or a 
@@ -317,15 +334,18 @@ namespace Ogre {
             If false, the camera yaws around the local Y.
         @param fixedAxis
             The axis to use if the first parameter is true.
+        @deprecated attach to SceneNode and use SceneNode::yaw(angle, Node::TS_PARENT)
         */
-        void setFixedYawAxis( bool useFixed, const Vector3& fixedAxis = Vector3::UNIT_Y );
+        OGRE_DEPRECATED void setFixedYawAxis( bool useFixed, const Vector3& fixedAxis = Vector3::UNIT_Y );
 
 
         /** Returns the camera's current orientation.
+        @deprecated attach to SceneNode and use SceneNode::getOrientation
         */
-        const Quaternion& getOrientation(void) const;
+        OGRE_DEPRECATED const Quaternion& getOrientation(void) const;
 
         /** Sets the camera's orientation.
+        @deprecated attach to SceneNode and use SceneNode::setOrientation
         */
         void setOrientation(const Quaternion& q);
 
@@ -411,8 +431,9 @@ namespace Ogre {
             delete it so be careful of this). Can be null if and only if the enabled param is false.
         @param offset If supplied, the camera targets this point in local space of the target node
             instead of the origin of the target node. Good for fine tuning the look at point.
+        @deprecated attach to SceneNode and use SceneNode::setAutoTracking
         */
-        void setAutoTracking(bool enabled, SceneNode* const target = 0, 
+        OGRE_DEPRECATED void setAutoTracking(bool enabled, SceneNode* const target = 0,
             const Vector3& offset = Vector3::ZERO);
 
 

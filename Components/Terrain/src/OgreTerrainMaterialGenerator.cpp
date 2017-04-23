@@ -92,7 +92,7 @@ namespace Ogre
             float camDist = 100;
             float halfCamDist = camDist * 0.5f;
             mCompositeMapCam = mCompositeMapSM->createCamera("cam");
-            mCompositeMapCam->setPosition(0, 0, camDist);
+            mCompositeMapCam->setPosition(Vector3(0, 0, camDist));
             mCompositeMapCam->lookAt(Vector3::ZERO);
             mCompositeMapCam->setProjectionType(PT_ORTHOGRAPHIC);
             mCompositeMapCam->setNearClipDistance(10);
