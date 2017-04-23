@@ -74,10 +74,14 @@ void MyTestApp::setup(void)
     light->setPosition(0, 10, 15);
     
     // also need to tell where we are
+    Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
+    camNode->setPosition(0, 0, 15);
+    camNode->lookAt(Ogre::Vector3(0, 0, -1), Ogre::Node::TS_PARENT);
+    
+    // the actual camera
     Ogre::Camera* cam = scnMgr->createCamera("myCam");
-    cam->setPosition(0, 0, 15);
-    cam->lookAt(0, 0, -1);
     cam->setNearClipDistance(5); // specific to this sample
+    camNode->attachObject(camNode);
     
     // finally something to render
     Ogre::Entity* ent = scnMgr->createEntity("Sinbad.mesh");
