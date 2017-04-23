@@ -7157,8 +7157,8 @@ namespace Ogre{
                 AbstractNodeList::const_iterator it3 = ++it;
                 atomIndex += 4;
 
-                if( !getFloat( *it0, &uvOffset.x ) || !getFloat( *it1, &uvOffset.y ) ||
-                        !getFloat( *it2, &uvLength.x ) || !getFloat( *it3, &uvLength.y ) )
+                if( !getReal( *it0, &uvOffset.x ) || !getReal( *it1, &uvOffset.y ) ||
+                        !getReal( *it2, &uvLength.x ) || !getReal( *it3, &uvLength.y ) )
                 {
                     compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
                 }
