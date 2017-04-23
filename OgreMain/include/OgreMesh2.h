@@ -167,10 +167,10 @@ namespace Ogre {
             you have set up the geometry properly.
         @param index
             Optional param that will insert the submesh at the specified index.
-            This should be less than getNumSubMeshes(). the default value of -1
-            indicates the new submesh will simply be appended to the submesh list.
+            This should be less than getNumSubMeshes(), otherwise it indicates
+            the new submesh will simply be appended to the submesh list.
         */
-        SubMesh* createSubMesh( short index = -1 );
+        SubMesh* createSubMesh( size_t index = ~0u );
 
         /** Gets the number of sub meshes which comprise this mesh.
         */
