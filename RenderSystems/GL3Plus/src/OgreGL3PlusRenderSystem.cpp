@@ -681,6 +681,10 @@ namespace Ogre {
 
         mGLInitialised = 0;
 
+        OCGE( glBindVertexArray( 0 ) );
+        OCGE( glDeleteVertexArrays( 1, &mGlobalVao ) );
+        mGlobalVao = 0;
+
         // RenderSystem::shutdown();
     }
 
