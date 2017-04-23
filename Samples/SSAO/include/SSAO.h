@@ -425,15 +425,15 @@ protected:
         // set our camera to orbit around the origin and show cursor
         mCameraMan->setStyle(CS_FREELOOK);
         mCameraMan->setTopSpeed(20.0);
-        mCamera->move(Vector3(0, 10, 0));
+        mCameraNode->translate(Vector3(0, 10, 0));
         mCamera->setFOVy(Radian(Degree(45).valueRadians())); // i.e. 60deg * 1.3.. maya and ogre use fovX and fovY
         mCamera->setFarClipDistance(400);
         mCamera->setNearClipDistance(0.1);
         mTrayMgr->showCursor();
         
         // sibenik
-        mCamera->setPosition(27, 9, -2);
-        mCamera->lookAt(Vector3(-6, 2, 1));;
+        mCameraNode->setPosition(27, 9, -2);
+        mCameraNode->lookAt(Vector3(-6, 2, 1), Node::TS_PARENT);;
         
         // setup all meshes
         for (unsigned int i = 0; i < mMeshNames.size(); i++) {
@@ -617,13 +617,13 @@ protected:
         {
             if (menu->getSelectedItem() == SSAO_CAMERA_SIBENIK)
             {
-                mCamera->setPosition(27, 9, -2);
-                mCamera->lookAt(Vector3(-6, 2, 1));
+                mCameraNode->setPosition(27, 9, -2);
+                mCameraNode->lookAt(Vector3(-6, 2, 1), Node::TS_PARENT);
             }
             else if (menu->getSelectedItem() == SSAO_CAMERA_CORNELL)
             {
-                mCamera->setPosition(0, 5, 20);
-                mCamera->lookAt(Vector3(0, 5, 0));
+                mCameraNode->setPosition(0, 5, 20);
+                mCameraNode->lookAt(Vector3(0, 5, 0), Node::TS_PARENT);
             }
         }
     }

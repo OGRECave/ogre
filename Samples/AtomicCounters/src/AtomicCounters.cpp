@@ -74,7 +74,7 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
     // Just override the mandatory create scene method
     void setupContent(void)
     {
-        mCamera->setPosition(0, 0, -40);
+        mCameraNode->setPosition(0, 0, -40);
         mCamera->lookAt(0,0,0);
         // mCamera->setNearClipDistance(0.1);
         // mCamera->setFarClipDistance(100);

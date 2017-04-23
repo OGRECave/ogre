@@ -158,7 +158,7 @@ protected:
 		}
 
 		mCameraMan->setTopSpeed(5);
-        mCamera->setPosition(0, 5, 20);
+        mCameraNode->setPosition(0, 5, 20);
 		mCamera->setNearClipDistance(1);
     }
 

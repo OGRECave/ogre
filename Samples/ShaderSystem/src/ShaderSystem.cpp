@@ -432,8 +432,8 @@ void Sample_ShaderSystem::setupContent()
     setupUI();
 
 
-    mCamera->setPosition(0.0, 300.0, 450.0);
-    mCamera->lookAt(0.0, 150.0, 0.0);
+    mCameraNode->setPosition(0.0, 300.0, 450.0);
+    mCameraNode->lookAt(Vector3(0.0, 150.0, 0.0), Node::TS_PARENT);
 
     // Make this viewport work with shader generator scheme.
     mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);

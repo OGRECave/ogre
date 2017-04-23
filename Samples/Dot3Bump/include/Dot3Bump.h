@@ -120,7 +120,7 @@ protected:
         setupLights();
         setupControls();
 
-        mCamera->setPosition(0, 0, 500);
+        mCameraNode->setPosition(0, 0, 500);
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         setDragLook(true);

@@ -97,7 +97,7 @@ public:
 		if (!mFly)
 		{
 			// clamp to terrain
-			Vector3 camPos = mCamera->getPosition();
+			Vector3 camPos = mCameraNode->getPosition();
 			Ray ray;
 			ray.setOrigin(Vector3(camPos.x, mTerrainPos.y + 10000, camPos.z));
 			ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
@@ -105,7 +105,7 @@ public:
 			TerrainGroup::RayResult rayResult = mTerrainGroup->rayIntersects(ray);
 			const Real distanceAboveTerrain = 50;
 			if (rayResult.hit)
-				mCamera->setPosition(camPos.x, rayResult.position.y + distanceAboveTerrain, camPos.z);
+				mCameraNode->setPosition(camPos.x, rayResult.position.y + distanceAboveTerrain, camPos.z);
 		}
 
 		if (mTerrainGroup->isDerivedDataUpdateInProgress())
@@ -337,8 +337,8 @@ protected:
 			0,
 			-(ENDLESS_PAGE_MAX_Y+ENDLESS_PAGE_MIN_Y) / 2 * TERRAIN_WORLD_SIZE
 			);
-		mCamera->setPosition(mTerrainPos+worldCenter);
-		mCamera->lookAt(mTerrainPos);
+		mCameraNode->setPosition(mTerrainPos+worldCenter);
+		mCameraNode->lookAt(mTerrainPos, Node::TS_PARENT);
 		mCamera->setNearClipDistance(0.1);
 		mCamera->setFarClipDistance(50000);
 

@@ -61,23 +61,17 @@ class VisualTest : public OgreBites::Sample
         mScreenshotFrames.insert(frame);
     }
 
-    /** Clean up */
-    virtual void _shutdown()
-    {
-        mSceneMgr->destroyCamera(mCamera);
-        OgreBites::Sample::_shutdown();
-    }
-
     /** set up the camera and viewport */
     virtual void setupView()
     {
         mCamera = mSceneMgr->createCamera("MainCamera");
+        mCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        mCameraNode->attachObject(mCamera);
+        mCameraNode->setFixedYawAxis(true); // fix lookAt calls
         mViewport = mWindow->addViewport(mCamera);
         mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
         mCamera->setNearClipDistance(0.5f);
         mCamera->setFarClipDistance(10000.f);
-        mCamera->setPosition(Ogre::Vector3::ZERO);
-        mCamera->setOrientation(Ogre::Quaternion::IDENTITY);
     }
 
     /** Unload all resources used by this sample */
@@ -128,6 +122,7 @@ class VisualTest : public OgreBites::Sample
 
     // The camera for this sample
     Ogre::Camera* mCamera;
+    Ogre::SceneNode* mCameraNode;
     // The viewport for this sample
     Ogre::Viewport* mViewport;
 

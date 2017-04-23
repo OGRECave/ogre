@@ -57,8 +57,8 @@ void TextureEffectsTest::setupContent()
         ent->setMaterialName(matNames[i]);  // give it the material we prepared
     }
 
-    mCamera->setPosition(0,0,125);
-    mCamera->setDirection(0,0,-1);
+    mCameraNode->setPosition(0,0,125);
+    mCameraNode->setDirection(0,0,-1);
 }
 //-----------------------------------------------------------------------
 

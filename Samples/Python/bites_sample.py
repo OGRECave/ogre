@@ -59,8 +59,10 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
         cam = scn_mgr.createCamera("myCam")
         cam.setNearClipDistance(5)
         cam.setAutoAspectRatio(True)
+        camnode = scn_mgr.getRootSceneNode().createChildSceneNode()
+        camnode.attachObject(cam)
 
-        self.camman = OgreBites.CameraMan(cam)
+        self.camman = OgreBites.CameraMan(camnode)
         self.camman.setStyle(OgreBites.CS_ORBIT)
         self.camman.setYawPitchDist(Ogre.Radian(0), Ogre.Radian(0.3), 15)
         self.addInputListener(self.camman)

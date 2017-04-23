@@ -70,14 +70,20 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void ShaderTemplate::load()
 	{
-		if (mTemplateFileName.empty()) return;
+        if (mTemplateFileName.empty()) return;
 
-		if (ResourceGroupManager::getSingletonPtr()->resourceExists(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, mTemplateFileName))
-		{
-			DataStreamPtr logoCornersFile = ResourceGroupManager::getSingletonPtr()->openResource(mTemplateFileName);
-			mTemplate = logoCornersFile->getAsString();
-			mHash = calcHash(mTemplate);
-		}
+		DataStreamPtr logoCornersFile;
+        try
+        {
+            logoCornersFile = ResourceGroupManager::getSingletonPtr()->openResource(mTemplateFileName);
+        }
+        catch (FileNotFoundException&)
+        {
+            return;
+        }
+
+        mTemplate = logoCornersFile->getAsString();
+        mHash = calcHash(mTemplate);
 	}
 	//-----------------------------------------------------------------------------------
 }

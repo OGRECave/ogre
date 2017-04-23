@@ -159,8 +159,8 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
     }
     mMeshEntity = mSceneMgr->createEntity(name, mLodConfig.mesh);
     mMeshNode->attachObject(mMeshEntity);
-    mCamera->setPosition(Vector3(0, 0, 0));
-    mCamera->moveRelative(Vector3(0, 0, mLodConfig.mesh->getBoundingSphereRadius() * 2));
+    mCameraNode->setPosition(Vector3(0, 0, 0));
+    mCameraNode->translate(Vector3(0, 0, mLodConfig.mesh->getBoundingSphereRadius() * 2), Node::TS_LOCAL);
     mCamera->setNearClipDistance(mLodConfig.mesh->getBoundingSphereRadius() / 16);
     mCamera->setFarClipDistance(mLodConfig.mesh->getBoundingSphereRadius() * 256);
 
@@ -392,7 +392,7 @@ void Sample_MeshLod::removeInitialLodLevel()
 Real Sample_MeshLod::getCameraDistance()
 {
     if(mLodConfig.mesh->getBoundingSphereRadius() != 0.0){
-        return PixelCountLodStrategy::getSingleton().getValue(mMeshEntity, mCameraMan->getCamera());
+        return PixelCountLodStrategy::getSingleton().getValue(mMeshEntity, mCamera);
     } else {
         return 0.0;
     }
@@ -404,31 +404,31 @@ void Sample_MeshLod::moveCameraToPixelDistance( Real pixels )
     Real distance = mLodConfig.mesh->getBoundingSphereRadius() * 4;
     const Real epsilon = pixels * 0.000001;
     const int iterations = 64;
-    mCamera->setPosition(Vector3(0, 0, 0));
-    mCamera->moveRelative(Vector3(0, 0, distance));
+    mCameraNode->setPosition(Vector3(0, 0, 0));
+    mCameraNode->translate(Vector3(0, 0, distance), Node::TS_LOCAL);
     // We need to find a distance, which is bigger then requested
     for(int i=0;i<iterations;i++){
-        Real curPixels = strategy.getValue(mMeshEntity, mCameraMan->getCamera());
+        Real curPixels = strategy.getValue(mMeshEntity, mCamera);
         if (curPixels > pixels) {
             distance *= 2.0;
-            mCamera->moveRelative(Vector3(0, 0, distance));
+            mCameraNode->translate(Vector3(0, 0, distance), Node::TS_LOCAL);
         } else {
             break;
         }
     }
     // Binary search for distance
     for(int i=0;i<iterations;i++){
-        Real curPixels = strategy.getValue(mMeshEntity, mCameraMan->getCamera());
+        Real curPixels = strategy.getValue(mMeshEntity, mCamera);
         if(std::abs(curPixels - pixels) < epsilon){
             break;
         }
         distance /= 2;
         if (curPixels > pixels) {
             // move camera further
-            mCamera->moveRelative(Vector3(0, 0, distance));
+            mCameraNode->translate(Vector3(0, 0, distance), Node::TS_LOCAL);
         } else {
             // move camera nearer
-            mCamera->moveRelative(Vector3(0, 0, -distance));
+            mCameraNode->translate(Vector3(0, 0, -distance), Node::TS_LOCAL);
         }
     }
 }
@@ -514,7 +514,7 @@ void Sample_MeshLod::checkBoxToggled( CheckBox * box )
         mLodConfig.advanced.useVertexNormals = box->isChecked();
         loadUserLod();
     } else if (box->getName() == "chkShowWireframe") {
-        mCameraMan->getCamera()->setPolygonMode(mWireframe->isChecked() ? PM_WIREFRAME : PM_SOLID);
+        mCamera->setPolygonMode(mWireframe->isChecked() ? PM_WIREFRAME : PM_SOLID);
     }
 }
 

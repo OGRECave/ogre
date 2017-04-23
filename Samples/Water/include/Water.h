@@ -319,10 +319,8 @@ protected:
         //~ mCamera->setAutoTracking(true, headNode);
         
         // Create the camera node, set its position & attach camera
-        SceneNode* camNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        camNode->translate(0, 500, PLANE_SIZE);
-        camNode->yaw(Degree(-45));
-        camNode->attachObject(mCamera);
+        mCameraNode->translate(0, 500, PLANE_SIZE);
+        mCameraNode->yaw(Degree(-45));
         
         // Create light node
         SceneNode* lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();

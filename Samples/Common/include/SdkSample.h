@@ -54,6 +54,7 @@ namespace OgreBites
             mTrayMgr = 0;
             mCameraMan = 0;
             mCamera = 0;
+            mCameraNode = 0;
             mViewport = 0;
             mControls = 0;
             mCursorWasVisible = false;
@@ -75,8 +76,8 @@ namespace OgreBites
         {
             if (mCameraMan->getStyle() == CS_FREELOOK)
             {
-                state["CameraPosition"] = Ogre::StringConverter::toString(mCamera->getPosition());
-                state["CameraOrientation"] = Ogre::StringConverter::toString(mCamera->getOrientation());
+                state["CameraPosition"] = Ogre::StringConverter::toString(mCameraNode->getPosition());
+                state["CameraOrientation"] = Ogre::StringConverter::toString(mCameraNode->getOrientation());
             }
         }
 
@@ -88,8 +89,8 @@ namespace OgreBites
             if (state.find("CameraPosition") != state.end() && state.find("CameraOrientation") != state.end())
             {
                 mCameraMan->setStyle(CS_FREELOOK);
-                mCamera->setPosition(Ogre::StringConverter::parseVector3(state["CameraPosition"]));
-                mCamera->setOrientation(Ogre::StringConverter::parseQuaternion(state["CameraOrientation"]));
+                mCameraNode->setPosition(Ogre::StringConverter::parseVector3(state["CameraPosition"]));
+                mCameraNode->setOrientation(Ogre::StringConverter::parseQuaternion(state["CameraOrientation"]));
             }
         }
 
@@ -268,12 +269,14 @@ namespace OgreBites
         {
             // setup default viewport layout and camera
             mCamera = mSceneMgr->createCamera("MainCamera");
+            mCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+            mCameraNode->attachObject(mCamera);
             mViewport = mWindow->addViewport(mCamera);
             mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
             mCamera->setAutoAspectRatio(true);
             mCamera->setNearClipDistance(5);
 
-            mCameraMan = new CameraMan(mCamera);   // create a default camera controller
+            mCameraMan = new CameraMan(mCameraNode);   // create a default camera controller
         }
 
         virtual void setDragLook(bool enabled)
@@ -294,6 +297,7 @@ namespace OgreBites
 
         Ogre::Viewport* mViewport;          // main viewport
         Ogre::Camera* mCamera;              // main camera
+        Ogre::SceneNode* mCameraNode;       // camera node
         TrayManager* mTrayMgr;           // tray interface manager
         CameraMan* mCameraMan;           // basic camera controller
         AdvancedRenderControls* mControls; // sample details panel

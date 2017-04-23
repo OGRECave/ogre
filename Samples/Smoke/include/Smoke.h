@@ -50,7 +50,7 @@ protected:
         headNode->attachObject(mSceneMgr->createEntity("Head", "ogrehead.mesh"));
         headNode->attachObject(mSceneMgr->createParticleSystem("Smoke", "Examples/Smoke"));
 
-        mCamera->setPosition(0, 30, 350);
+        mCameraNode->setPosition(0, 30, 350);
     }
 
     SceneNode* mPivot;

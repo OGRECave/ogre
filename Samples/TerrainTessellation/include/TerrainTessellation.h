@@ -101,7 +101,7 @@ public:
             TerrainGroup::RayResult rayResult = mTerrainGroup->rayIntersects(ray);
             const Real distanceAboveTerrain = 50;
             if (rayResult.hit)
-                mCamera->setPosition(camPos.x, rayResult.position.y + distanceAboveTerrain, camPos.z);
+                mCameraNode->setPosition(camPos.x, rayResult.position.y + distanceAboveTerrain, camPos.z);
         }
 
         return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
@@ -218,7 +218,7 @@ protected:
         mCamera->setFOVy(Ogre::Degree(50.0));
         mCamera->setNearClipDistance(0.01f);
         mCamera->lookAt(Ogre::Vector3::ZERO);
-        mCamera->setPosition(0, 0, 500);
+        mCameraNode->setPosition(0, 0, 500);
         mCameraMan->setTopSpeed(100);
 
         setDragLook(true);
@@ -265,7 +265,7 @@ protected:
         SdkSample::setupView();
         // put camera at world center, so that it's difficult to reach the edge
         Vector3 worldCenter(0,0,0);
-        mCamera->setPosition(mTerrainPos+worldCenter);
+        mCameraNode->setPosition(mTerrainPos+worldCenter);
         mCamera->lookAt(mTerrainPos);
         mCamera->setNearClipDistance(0.1);
         mCamera->setFarClipDistance(50000);

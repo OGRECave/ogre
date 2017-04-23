@@ -23,7 +23,7 @@ If you're using the full source release, this will help you build it. If you're 
 A high-level guide to the major parts of the engine and script reference.
 * [API Reference](https://ogrecave.github.io/ogre/api/1.10/)  
 The full OGRE API documentation, as generated from the (heavily!) commented source.
-* [The OGRE Wiki](http://www.ogre3d.org/wiki)  
+* [The OGRE Tutorials](https://ogrecave.github.io/ogre/api/1.10/tutorials.html)  
 A gold mine of tutorials, tips and code snippets which will help you get up to speed with the engine.
 
 ## Contributing

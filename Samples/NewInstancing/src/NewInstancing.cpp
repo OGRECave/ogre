@@ -168,7 +168,7 @@ void Sample_NewInstancing::setupContent()
     setupLighting();
 
     // set initial camera position and speed
-    mCamera->setPosition( 0, 120, 100 );
+    mCameraNode->setPosition( 0, 120, 100 );
 
     setupGUI();
 

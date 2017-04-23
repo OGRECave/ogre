@@ -1,6 +1,6 @@
-# Overview of the Run Time Shader System {#rtss}
+# RTSS: Run Time Shader System {#rtss}
 
-The Run Time Shader System, or RTSS for short, is a component of Ogre. This component is used to generate shaders on the fly based on object material properties, scene setup and other user definitions.
+This component is used to generate shaders on the fly based on object material properties, scene setup and other user definitions.
 
 @tableofcontents
 

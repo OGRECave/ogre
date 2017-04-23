@@ -142,8 +142,8 @@ protected:
         mCamera->setFOVy(Ogre::Degree(50.0));
         mCamera->setFOVy(Ogre::Degree(50.0));
         mCamera->setNearClipDistance(0.01f);
-        mCamera->lookAt(Ogre::Vector3::ZERO);
-        mCamera->setPosition(0, 0, 500);
+        mCameraNode->lookAt(Ogre::Vector3::ZERO, Ogre::Node::TS_PARENT);
+        mCameraNode->setPosition(0, 0, 500);
         
 
         // Set our camera to orbit around the origin at a suitable distance

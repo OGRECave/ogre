@@ -53,7 +53,7 @@ void ParticleTest::setupContent()
     //mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150, 0, 0))->attachObject(ps);
     //ps = mSceneMgr->createParticleSystem("Nimbus2", "Examples/GreenyNimbus");
     //mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-150, 0, 0))->attachObject(ps);
-    mCamera->setPosition(0,150,500);
+    mCameraNode->setPosition(0,150,500);
 }
 //-----------------------------------------------------------------------
 

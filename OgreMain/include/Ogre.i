@@ -307,6 +307,23 @@ ADD_REPR(ColourValue)
         %include "OgreShadowCameraSetupPlaneOptimal.h"
         %include "OgreShadowCameraSetupPSSM.h"
     %include "OgreFrustum.h"
+        %ignore Ogre::Camera::setPosition;
+        %ignore Ogre::Camera::getPosition;
+        %ignore Ogre::Camera::setDirection;
+        %ignore Ogre::Camera::getDirection;
+        %ignore Ogre::Camera::setOrientation;
+        %ignore Ogre::Camera::getOrientation;
+        %ignore Ogre::Camera::rotate;
+        %ignore Ogre::Camera::getUp;
+        %ignore Ogre::Camera::getRight;
+        %ignore Ogre::Camera::lookAt;
+        %ignore Ogre::Camera::roll;
+        %ignore Ogre::Camera::yaw;
+        %ignore Ogre::Camera::pitch;
+        %ignore Ogre::Camera::setFixedYawAxis;
+        %ignore Ogre::Camera::setAutoTracking;
+        %ignore Ogre::Camera::move;
+        %ignore Ogre::Camera::moveRelative;
         %include "OgreCamera.h"
         ADD_REPR(Camera)
     %include "OgreManualObject.h"

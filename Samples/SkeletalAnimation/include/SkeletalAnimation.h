@@ -228,8 +228,8 @@ protected:
         mSceneMgr->getRootSceneNode()->attachObject(floor);
 
         // set camera initial transform and speed
-        mCamera->setPosition(100, 20, 0);
-        mCamera->lookAt(0, 10, 0);
+        mCameraNode->setPosition(100, 20, 0);
+        mCameraNode->lookAt(Vector3(0, 10, 0), Node::TS_PARENT);
         mCameraMan->setTopSpeed(50);
 
         setupModels();

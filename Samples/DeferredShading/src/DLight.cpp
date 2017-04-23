@@ -341,7 +341,7 @@ void DLight::updateFromCamera(Ogre::Camera* camera)
         //Get the shadow camera position
         if (params->_findNamedConstantDefinition("shadowCamPos")) 
         {
-            params->setNamedConstant("shadowCamPos", shadowCam.getPosition());
+            params->setNamedConstant("shadowCamPos", shadowCam.getDerivedPosition());
         }
         if (params->_findNamedConstantDefinition("shadowFarClip"))
         {

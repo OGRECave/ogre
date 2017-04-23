@@ -33,8 +33,8 @@ protected:
         mSceneMgr->getRootSceneNode()->attachObject(mSceneMgr->createEntity("Dragon", "dragon.mesh"));
 
         // turn around and look at the DRAGON!
-        mCamera->yaw(Degree(210));
-        mCamera->pitch(Degree(-10));
+        mCameraNode->yaw(Degree(210));
+        mCameraNode->pitch(Degree(-10));
     }
 };
 

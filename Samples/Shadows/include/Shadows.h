@@ -387,8 +387,8 @@ protected:
         // incase infinite far distance is not supported
         mCamera->setFarClipDistance(100000);
 
-        mCamera->setPosition(250, 20, 400);
-        mCamera->lookAt(0, 10, 0);
+        mCameraNode->setPosition(250, 20, 400);
+        mCameraNode->lookAt(Vector3(0, 10, 0), Node::TS_WORLD);
     }
     
     virtual void cleanupContent()

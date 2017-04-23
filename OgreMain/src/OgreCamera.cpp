@@ -66,7 +66,9 @@ namespace Ogre {
         mFarDist = 100000.0f;
         mAspect = 1.33333333333333f;
         mProjType = PT_PERSPECTIVE;
-        setFixedYawAxis(true);    // Default to fixed yaw, like freelook since most people expect this
+
+        mYawFixed = true; // Default to fixed yaw, like freelook since most people expect this
+        mYawFixedAxis = Vector3::UNIT_Y;
 
         invalidateFrustum();
         invalidateView();
@@ -1126,9 +1128,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Camera::synchroniseBaseSettingsWith(const Camera* cam)
     {
-        this->setPosition(cam->getPosition());
+        mPosition = cam->mPosition;
         this->setProjectionType(cam->getProjectionType());
-        this->setOrientation(cam->getOrientation());
+        mOrientation = cam->mOrientation;
+        invalidateView();
         this->setAspectRatio(cam->getAspectRatio());
         this->setNearClipDistance(cam->getNearClipDistance());
         this->setFarClipDistance(cam->getFarClipDistance());
