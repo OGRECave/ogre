@@ -7,3 +7,7 @@ bin/Data/Hlms/Common
 bin/Data/Hlms/Pbs
 bin/Data/Hlms/Unlit
 bin/Data/Materials/Common
+bin/Data/DebugPack.zip
+bin/Data/resources2.cfg
+
+Dependencies/Ogre
