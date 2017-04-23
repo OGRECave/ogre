@@ -297,7 +297,7 @@ namespace Volume {
 
     Real Chunk::getSquaredViewDepth(const Camera* camera) const
     {
-        return (mBox.getCenter() * mShared->parameters->scale).squaredDistance(camera->getPosition());
+        return (mBox.getCenter() * mShared->parameters->scale).squaredDistance(camera->getDerivedPosition());
     }
     
     //-----------------------------------------------------------------------
