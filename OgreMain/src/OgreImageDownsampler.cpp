@@ -467,16 +467,16 @@ namespace Ogre
     #endif
 
     #ifdef OGRE_DOWNSAMPLE_R
-                dstPtr[OGRE_DOWNSAMPLE_R] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumR * invDivisor ) );
+                dstPtr[OGRE_DOWNSAMPLE_R] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumR * invDivisor ) + 0.5f );
     #endif
     #ifdef OGRE_DOWNSAMPLE_G
-                dstPtr[OGRE_DOWNSAMPLE_G] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumG * invDivisor ) );
+                dstPtr[OGRE_DOWNSAMPLE_G] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumG * invDivisor ) + 0.5f );
     #endif
     #ifdef OGRE_DOWNSAMPLE_B
-                dstPtr[OGRE_DOWNSAMPLE_B] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumB * invDivisor ) );
+                dstPtr[OGRE_DOWNSAMPLE_B] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumB * invDivisor ) + 0.5f );
     #endif
     #ifdef OGRE_DOWNSAMPLE_A
-                dstPtr[OGRE_DOWNSAMPLE_A] = static_cast<OGRE_UINT8>( accumA / divisor );
+                dstPtr[OGRE_DOWNSAMPLE_A] = static_cast<OGRE_UINT8>( (accumA + divisor - 1u) / divisor );
     #endif
 
                 dstPtr += OGRE_TOTAL_SIZE;
@@ -594,16 +594,16 @@ namespace Ogre
     #endif
 
     #ifdef OGRE_DOWNSAMPLE_R
-                dstPtr[OGRE_DOWNSAMPLE_R] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumR * invDivisor ) );
+                dstPtr[OGRE_DOWNSAMPLE_R] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumR * invDivisor ) + 0.5f );
     #endif
     #ifdef OGRE_DOWNSAMPLE_G
-                dstPtr[OGRE_DOWNSAMPLE_G] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumG * invDivisor ) );
+                dstPtr[OGRE_DOWNSAMPLE_G] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumG * invDivisor ) + 0.5f );
     #endif
     #ifdef OGRE_DOWNSAMPLE_B
-                dstPtr[OGRE_DOWNSAMPLE_B] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumB * invDivisor ) );
+                dstPtr[OGRE_DOWNSAMPLE_B] = static_cast<OGRE_UINT8>( OGRE_LIN_TO_GAM( accumB * invDivisor ) + 0.5f );
     #endif
     #ifdef OGRE_DOWNSAMPLE_A
-                dstPtr[OGRE_DOWNSAMPLE_A] = static_cast<OGRE_UINT8>( accumA / divisor );
+                dstPtr[OGRE_DOWNSAMPLE_A] = static_cast<OGRE_UINT8>( (accumA + divisor - 1u) / divisor );
     #endif
 
                 dstPtr += OGRE_TOTAL_SIZE;
