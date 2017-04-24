@@ -22,6 +22,10 @@
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    #include "shlobj.h"
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
 #else
 int mainApp( int argc, const char *argv[] )
@@ -62,9 +66,6 @@ namespace Demo
         EmptyProjectGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            mPluginsPath = "Plugins/";
-#endif
             mResourcePath = "../Data/";
 
             //It's recommended that you set this path to:

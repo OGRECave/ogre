@@ -215,6 +215,7 @@ if( NOT APPLE )
 endif()
 
 if( NOT IOS )
+	set( CMAKE_PREFIX_PATH "${OGRE_SOURCE}/Dependencies ${CMAKE_PREFIX_PATH}" )
 	find_package( SDL2 )
 	if( NOT SDL2_FOUND )
 		message( "Could not find SDL2. https://www.libsdl.org/" )
