@@ -329,7 +329,10 @@ namespace Ogre
         HlmsComputeJobMap::iterator itor = mComputeJobs.find( name );
 
         if( itor != mComputeJobs.end() )
+        {
+            OGRE_DELETE itor->second.computeJob;
             mComputeJobs.erase( itor );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsCompute::destroyAllComputeJobs()
