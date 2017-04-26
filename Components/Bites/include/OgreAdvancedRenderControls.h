@@ -59,6 +59,7 @@ class ParamsPanel;
 class _OgreBitesExport AdvancedRenderControls : public InputListener {
 public:
     AdvancedRenderControls(TrayManager* trayMgr, Ogre::Camera* cam);
+    ~AdvancedRenderControls();
 
     bool keyPressed(const KeyboardEvent& evt);
 
