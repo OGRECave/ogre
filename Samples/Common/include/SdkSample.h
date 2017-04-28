@@ -254,9 +254,9 @@ namespace OgreBites
         {
             Sample::_shutdown();
 
+            delete mControls;
             delete mTrayMgr;
             delete mCameraMan;
-            delete mControls;
 
             // restore settings we may have changed, so as not to affect other samples
             Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_BILINEAR);
