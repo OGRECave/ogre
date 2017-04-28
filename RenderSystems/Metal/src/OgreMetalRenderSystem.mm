@@ -278,7 +278,7 @@ namespace Ogre
 #endif
         };
 
-        for( int i=0; i<sizeof(featureSets) / sizeof(featureSets[0]); ++i )
+        for( size_t i=0; i<sizeof(featureSets) / sizeof(featureSets[0]); ++i )
         {
             if( [mActiveDevice->mDevice supportsFeatureSet:featureSets[i].featureSet] )
             {
