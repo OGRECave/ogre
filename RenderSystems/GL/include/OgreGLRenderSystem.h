@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 
 #include "OgreGLRenderSystemCommon.h"
+#include "OgreGLStateCacheManager.h"
 
 namespace Ogre {
     /** \addtogroup RenderSystems RenderSystems
@@ -49,8 +50,6 @@ namespace Ogre {
     namespace GLSL {
         class GLSLProgramFactory;
     }
-
-    class GLStateCacheManager;
 
     /**
       Implementation of GL as a rendering system.
