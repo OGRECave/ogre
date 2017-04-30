@@ -2122,7 +2122,7 @@ namespace Ogre
                     LwString propName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
 
                     propName = "hlms_shadowmap";
-                    const size_t basePropSize = propName.size() + 1u;
+                    const size_t basePropNameSize = propName.size();
 
                     size_t shadowMapTexIdx = 0;
 
@@ -2136,8 +2136,11 @@ namespace Ogre
                         const Ogre::ShadowTextureDefinition *shadowTexDef =
                                 shadowNodeDef->getShadowTextureDefinition( shadowMapTexIdx );
 
-                        propName.resize( basePropSize - 1u );
+                        propName.resize( basePropNameSize );
                         propName.a( (uint32)i ); //hlms_shadowmap0
+
+                        const size_t basePropSize = propName.size();
+
                         setProperty( propName.c_str(),
                                      shadowNode->getIndexToContiguousShadowMapTex( shadowMapTexIdx ) );
 

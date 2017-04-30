@@ -96,15 +96,17 @@ namespace Ogre
         LwString propName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
 
         propName = propTexture; //It's either ComputeProperty::Texture or ComputeProperty::Uav
-        const size_t texturePropSize = propName.size() + 1u;
+        const size_t texturePropNameSize = propName.size();
 
         uint8 maxTexUnitReached = outMaxTexUnitReached;
 
         //Remove everything from any previous run.
         for( uint8 i=0; i<maxTexUnitReached; ++i )
         {
-            propName.resize( texturePropSize - 1u );
+            propName.resize( texturePropNameSize );
             propName.a( i );                        //texture0 or uav0
+
+            const size_t texturePropSize = propName.size();
 
             propName.a( "_width" );                 //texture0_width
             removeProperty( propName.c_str() );
@@ -180,8 +182,9 @@ namespace Ogre
             while( itor != end )
             {
                 const size_t slotIdx = itor - begin;
-                propName.resize( texturePropSize - 1u );
+                propName.resize( texturePropNameSize );
                 propName.a( static_cast<uint32>(slotIdx) ); //texture0 or uav0
+                const size_t texturePropSize = propName.size();
                 setProperty( propName.c_str(), 1 );
 
                 if( !itor->texture.isNull() )
