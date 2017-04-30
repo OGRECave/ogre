@@ -240,7 +240,7 @@ namespace Ogre
                 }
                 else
                 {
-                    setProperty( "texture_bind" + StringConverter::toString( numArrayTextures ),
+                    setProperty( "texture_bind" + StringConverter::toString( numTextures ),
                                  texUnit );
                     ++numTextures;
                 }
