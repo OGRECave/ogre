@@ -150,7 +150,7 @@ namespace Ogre
         const PixelBox& box = shadowTex->getBuffer()->getCurrentLock();
 
         // set high-values across all bytes of the format 
-        PixelUtil::packColour( 1.0f, 1.0f, 1.0f, 1.0f, format, box.data );
+        PixelUtil::packColour( 1.0f, 1.0f, 1.0f, 1.0f, shadowTex->getFormat(), box.data );
 
         shadowTex->getBuffer()->unlock();
 
