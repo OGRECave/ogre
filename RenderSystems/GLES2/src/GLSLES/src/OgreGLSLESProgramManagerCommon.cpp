@@ -56,7 +56,8 @@ namespace Ogre {
         mTypeEnumMap.insert(StringToEnumMap::value_type("mat2", GL_FLOAT_MAT2));
         mTypeEnumMap.insert(StringToEnumMap::value_type("mat3", GL_FLOAT_MAT3));
         mTypeEnumMap.insert(StringToEnumMap::value_type("mat4", GL_FLOAT_MAT4));
-#if OGRE_NO_GLES3_SUPPORT == 0
+        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler3D", GL_SAMPLER_3D_OES));
+        // GLES3 types
         mTypeEnumMap.insert(StringToEnumMap::value_type("mat2x3", GL_FLOAT_MAT2x3));
         mTypeEnumMap.insert(StringToEnumMap::value_type("mat3x2", GL_FLOAT_MAT3x2));
         mTypeEnumMap.insert(StringToEnumMap::value_type("mat3x4", GL_FLOAT_MAT3x4));
@@ -70,8 +71,6 @@ namespace Ogre {
         mTypeEnumMap.insert(StringToEnumMap::value_type("uvec2", GL_UNSIGNED_INT_VEC2));
         mTypeEnumMap.insert(StringToEnumMap::value_type("uvec3", GL_UNSIGNED_INT_VEC3));
         mTypeEnumMap.insert(StringToEnumMap::value_type("uvec4", GL_UNSIGNED_INT_VEC4));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler3D", GL_SAMPLER_3D));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DShadow", GL_SAMPLER_2D_SHADOW));
         mTypeEnumMap.insert(StringToEnumMap::value_type("samplerCubeShadow", GL_SAMPLER_CUBE_SHADOW));
         mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DArray", GL_SAMPLER_2D_ARRAY));
         mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DArrayShadow", GL_SAMPLER_2D_ARRAY_SHADOW));
@@ -83,7 +82,7 @@ namespace Ogre {
         mTypeEnumMap.insert(StringToEnumMap::value_type("usampler3D", GL_UNSIGNED_INT_SAMPLER_3D));
         mTypeEnumMap.insert(StringToEnumMap::value_type("usamplerCube", GL_UNSIGNED_INT_SAMPLER_CUBE));
         mTypeEnumMap.insert(StringToEnumMap::value_type("usampler2DArray", GL_UNSIGNED_INT_SAMPLER_2D_ARRAY));
-#endif
+
         
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -126,7 +125,6 @@ namespace Ogre {
         case GL_FLOAT_VEC4:
             defToUpdate.constType = GCT_FLOAT4;
             break;
-#if OGRE_NO_GLES3_SUPPORT == 0
         case GL_SAMPLER_3D:
         case GL_INT_SAMPLER_3D:
         case GL_UNSIGNED_INT_SAMPLER_3D:
@@ -137,15 +135,12 @@ namespace Ogre {
         case GL_INT_SAMPLER_2D:
         case GL_INT_SAMPLER_2D_ARRAY:
         case GL_SAMPLER_2D_ARRAY:
-#endif
         case GL_SAMPLER_2D:
             defToUpdate.constType = GCT_SAMPLER2D;
             break;
-#if OGRE_NO_GLES3_SUPPORT == 0
         case GL_SAMPLER_CUBE_SHADOW:
         case GL_INT_SAMPLER_CUBE:
         case GL_UNSIGNED_INT_SAMPLER_CUBE:
-#endif
         case GL_SAMPLER_CUBE:
             defToUpdate.constType = GCT_SAMPLERCUBE;
             break;
@@ -173,7 +168,6 @@ namespace Ogre {
         case GL_FLOAT_MAT4:
             defToUpdate.constType = GCT_MATRIX_4X4;
             break;
-#if OGRE_NO_GLES3_SUPPORT == 0
         case GL_FLOAT_MAT2x3:
             defToUpdate.constType = GCT_MATRIX_2X3;
             break;
@@ -192,7 +186,6 @@ namespace Ogre {
         case GL_FLOAT_MAT4x3:
             defToUpdate.constType = GCT_MATRIX_4X3;
             break;
-#endif
         default:
             defToUpdate.constType = GCT_UNKNOWN;
             break;
