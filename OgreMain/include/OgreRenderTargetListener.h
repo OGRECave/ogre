@@ -111,7 +111,7 @@ namespace Ogre {
         virtual void postRenderTargetUpdate(const RenderTargetEvent& evt)
         { (void)evt; }
 
-        /* Called just before a Viewport on a RenderTarget is to be updated.
+        /** Called just before a Viewport on a RenderTarget is to be updated.
         @remarks
             This method is called before each viewport on the RenderTarget is
             rendered to. You can use this to perform per-viewport settings changes,
@@ -120,7 +120,7 @@ namespace Ogre {
         virtual void preViewportUpdate(const RenderTargetViewportEvent& evt)
         { (void)evt; }
 
-        /* Called just after a Viewport on a RenderTarget is to be updated.
+        /** Called just after a Viewport on a RenderTarget is to be updated.
         @remarks
             This method is called after each viewport on the RenderTarget is
             rendered to. 

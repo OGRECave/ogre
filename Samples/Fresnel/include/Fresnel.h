@@ -125,6 +125,7 @@ protected:
 
     void setupWater()
     {
+        mCamera->setAutoAspectRatio(false);
         // create our reflection & refraction render textures, and setup their render targets
         for (unsigned int i = 0; i < 2; i++)
         {
@@ -138,7 +139,7 @@ protected:
             if (i == 0) mRefractionTarget = rtt;
             else mReflectionTarget = rtt;
         }
-
+        mCamera->setAutoAspectRatio(true);
         // create our water plane mesh
         mWaterPlane = Plane(Vector3::UNIT_Y, 0);
         MeshManager::getSingleton().createPlane("water", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
