@@ -30,7 +30,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareCounterBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGL3PlusRenderSystem.h"
-
+#include "OgreGL3PlusStateCacheManager.h"
 #include <iostream>
 
 #ifndef GL_ATOMIC_COUNTER_BUFFER

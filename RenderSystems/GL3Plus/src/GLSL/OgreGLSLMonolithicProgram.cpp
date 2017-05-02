@@ -36,6 +36,7 @@
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
+#include "OgreGL3PlusStateCacheManager.h"
 
 namespace Ogre {
 

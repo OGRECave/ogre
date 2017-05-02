@@ -29,6 +29,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareIndexBuffer.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGL3PlusRenderSystem.h"
+#include "OgreGL3PlusStateCacheManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {

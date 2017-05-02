@@ -31,6 +31,7 @@
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusFBORenderTexture.h"
+#include "OgreGL3PlusStateCacheManager.h"
 #include "OgreGL3PlusRenderSystem.h"
 
 #include "OgreRoot.h"
