@@ -31,6 +31,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreGL3PlusSupport.h"
 
 namespace Ogre {
     // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
@@ -41,6 +42,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
     protected:
+        GL3PlusSupport* mGLSupport;
         char* mScratchBufferPool;
         OGRE_MUTEX(mScratchMutex);
         size_t mMapBufferThreshold;

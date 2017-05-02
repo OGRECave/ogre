@@ -31,6 +31,7 @@
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusFBORenderTexture.h"
+#include "OgreGL3PlusRenderSystem.h"
 
 #include "OgreRoot.h"
 #include "OgreGLSLMonolithicProgramManager.h"
@@ -45,6 +46,7 @@ namespace Ogre {
                                                            HardwareBuffer::Usage usage)
         : GLHardwarePixelBufferCommon(inWidth, inHeight, inDepth, inFormat, usage)
     {
+        mGLSupport = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef();
     }
 
     void GL3PlusHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)

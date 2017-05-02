@@ -26,6 +26,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   -----------------------------------------------------------------------------
 */
 #include "OgreGL3PlusVertexArrayObject.h"
+#include "OgreGL3PlusSupport.h"
+#include "OgreGL3PlusRenderSystem.h"
+#include "OgreRoot.h"
 #include "OgreLogManager.h"
 
 namespace Ogre {
@@ -34,6 +37,8 @@ namespace Ogre {
         mVAO(0),
         mInitialised(false)
     {
+        mGLSupport = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef();
+
         OGRE_CHECK_GL_ERROR(glGenVertexArrays(1, &mVAO));
 
         if (!mVAO)

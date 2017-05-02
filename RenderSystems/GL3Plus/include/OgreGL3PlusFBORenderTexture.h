@@ -92,6 +92,8 @@ namespace Ogre {
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
          */
         GLuint getTemporaryFBO(size_t i);
+
+        const GL3PlusSupport& getGLSupportRef() {return mGLSupport;}
     private:
         /** Temporary FBO identifier
          */

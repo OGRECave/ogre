@@ -35,6 +35,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
     class _OgreGL3PlusExport GL3PlusHardwarePixelBuffer: public GLHardwarePixelBufferCommon
     {
+
+    protected:
+        GL3PlusSupport* mGLSupport;
     public:
         /// Should be called by HardwareBufferManager
         GL3PlusHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,

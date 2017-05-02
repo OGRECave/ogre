@@ -310,6 +310,8 @@ namespace Ogre {
         void preExtraThreadsStarted();
         void postExtraThreadsStarted();
         void setClipPlanesImpl(const Ogre::PlaneList& planeList);
+        GL3PlusSupport* getGLSupportRef() { return mGLSupport; }
+
 
         // ----------------------------------
         // GL3PlusRenderSystem specific members
