@@ -33,6 +33,7 @@
 #include "OgreGpuProgramManager.h"
 #include "OgreGLUtil.h"
 #include "OgreLogManager.h"
+#include "OgreGL3PlusUniformCache.h"
 
 namespace Ogre
 {
@@ -381,31 +382,37 @@ namespace Ogre
         }
 
         GLuint progID = 0;
+        GL3PlusUniformCache * uniformCache=0;
         if (fromProgType == GPT_VERTEX_PROGRAM)
         {
             progID = getVertexShader()->getGLProgramHandle();
+            uniformCache = getVertexShader()->getUniformCache();
         }
         else if (fromProgType == GPT_FRAGMENT_PROGRAM)
         {
             progID = mFragmentShader->getGLProgramHandle();
+            uniformCache = mFragmentShader->getUniformCache();
         }
         else if (fromProgType == GPT_GEOMETRY_PROGRAM)
         {
             progID = mGeometryShader->getGLProgramHandle();
+            uniformCache = mGeometryShader->getUniformCache();
         }
         else if (fromProgType == GPT_HULL_PROGRAM)
         {
             progID = mHullShader->getGLProgramHandle();
+            uniformCache = mHullShader->getUniformCache();
         }
         else if (fromProgType == GPT_DOMAIN_PROGRAM)
         {
             progID = mDomainShader->getGLProgramHandle();
+            uniformCache = mDomainShader->getUniformCache();
         }
         else if (fromProgType == GPT_COMPUTE_PROGRAM)
         {
             progID = mComputeShader->getGLProgramHandle();
+            uniformCache = mComputeShader->getUniformCache();
         }
-
         for (; currentUniform != endUniform; ++currentUniform)
         {
             // Only pull values from buffer it's supposed to be in (vertex or fragment)
@@ -416,6 +423,37 @@ namespace Ogre
                 if (def->variability & mask)
                 {
                     GLsizei glArraySize = (GLsizei)def->arraySize;
+
+                    bool shouldUpdate = true;
+
+                    switch (def->constType)
+                    {
+                        case GCT_INT1:
+                        case GCT_INT2:
+                        case GCT_INT3:
+                        case GCT_INT4:
+                        case GCT_SAMPLER1D:
+                        case GCT_SAMPLER1DSHADOW:
+                        case GCT_SAMPLER2D:
+                        case GCT_SAMPLER2DSHADOW:
+                        case GCT_SAMPLER2DARRAY:
+                        case GCT_SAMPLER3D:
+                        case GCT_SAMPLERCUBE:
+                            shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
+                                                                        params->getIntPointer(def->physicalIndex),
+                                                                        static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
+                            break;
+                        default:
+                            shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
+                                                                        params->getFloatPointer(def->physicalIndex),
+                                                                        static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(float)));
+                            break;
+
+                    }
+                    if(!shouldUpdate)
+                    {
+                        continue;
+                    }
 
                     // Get the index in the parameter real list
                     switch (def->constType)

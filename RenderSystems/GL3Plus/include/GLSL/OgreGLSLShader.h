@@ -33,6 +33,8 @@
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
+
+        class GL3PlusUniformCache;
     /** Specialisation of HighLevelGpuProgram to encapsulate shader
         objects obtained from compiled shaders written in the OpenGL
         Shader Language (GLSL).
@@ -103,6 +105,9 @@ namespace Ogre {
         /// Since GLSL has no assembly, use this shader for binding.
         GpuProgram* _getBindingDelegate(void) { return this; }
 
+        /// Get the uniform cache for this shader
+        GL3PlusUniformCache*    getUniformCache(){return mUniformCache;}
+
     protected:
         /** Internal method for creating a dummy low-level program for
             this high-level program.  GLSL does not give access to the
@@ -133,6 +138,9 @@ namespace Ogre {
         GLuint mGLShaderHandle;
         /// GL handle for program object the shader is bound to.
         GLuint mGLProgramHandle;
+        
+        /// Pointer to the uniform cache for this shader
+        GL3PlusUniformCache*    mUniformCache;
     };
 }
 
