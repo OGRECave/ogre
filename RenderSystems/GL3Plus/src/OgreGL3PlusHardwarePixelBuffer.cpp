@@ -146,7 +146,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &mRenderbufferID));
 
         // Bind it to FBO
-        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mRenderbufferID));
+        mGLSupport->getStateCacheManager()->bindGLBuffer( GL_RENDERBUFFER, mRenderbufferID );
 
         // Allocate storage for depth buffer
         if (numSamples > 0)
@@ -163,8 +163,8 @@ namespace Ogre {
 
     GL3PlusRenderBuffer::~GL3PlusRenderBuffer()
     {
-        // Generate renderbuffer
-        OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &mRenderbufferID));
+        // Delete renderbuffer
+        mGLSupport->getStateCacheManager()->deleteGLBuffer(GL_RENDERBUFFER,mRenderbufferID);
     }
 
     void GL3PlusRenderBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)

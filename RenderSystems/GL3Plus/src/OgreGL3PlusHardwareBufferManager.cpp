@@ -33,6 +33,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareShaderStorageBuffer.h"
 #include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreGL3PlusRenderToVertexBuffer.h"
+#include "OgreGL3PlusRenderSystem.h"
+#include "OgreGL3PlusStateCacheManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -51,6 +53,9 @@ namespace Ogre {
     GL3PlusHardwareBufferManagerBase::GL3PlusHardwareBufferManagerBase()
         : mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
+
+        mGLSupport = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef();
+
         // Init scratch pool
         // TODO make it a configurable size?
         // 32-bit aligned buffer

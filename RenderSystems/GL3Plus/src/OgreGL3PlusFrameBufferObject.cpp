@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusDepthBuffer.h"
+#include "OgreGL3PlusSupport.h"
+#include "OgreGL3PlusStateCacheManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -42,6 +44,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
         // Check samples supported
+        mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, mFB );
+
         GLint maxSamples;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
         mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
@@ -71,10 +75,10 @@ namespace Ogre {
         mManager->releaseRenderBuffer(mStencil);
         mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // Delete framebuffer object
-        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mFB));
+        mManager->getGLSupportRef().getStateCacheManager()->deleteGLBuffer(GL_FRAMEBUFFER,mFB);
 
         if (mMultisampleFB)
-            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mMultisampleFB));
+            mManager->getGLSupportRef().getStateCacheManager()->deleteGLBuffer(GL_FRAMEBUFFER,mMultisampleFB);
     }
     
     void GL3PlusFrameBufferObject::bindSurface(size_t attachment, const GL3PlusSurfaceDesc &target)
@@ -121,7 +125,7 @@ namespace Ogre {
         ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
         // Bind simple buffer to add colour attachments
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
+        mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, mFB );
 
         // Bind all attachment points to frame buffer
         for(unsigned int x = 0; x < maxSupportedMRTs; ++x)
@@ -160,7 +164,7 @@ namespace Ogre {
         if (mMultisampleFB)
         {
             // Bind multisample buffer
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB));
+            mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, mMultisampleFB );
 
             // Create AA render buffer (colour)
             // note, this can be shared too because we blit it to the final FBO
@@ -219,7 +223,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
         // Bind main buffer
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, 0 );
 
         switch(status)
         {
@@ -242,7 +246,7 @@ namespace Ogre {
     {
         // Bind it to FBO
         const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fb));
+        mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, fb );
     }
 
     void GL3PlusFrameBufferObject::swapBuffers()
@@ -255,18 +259,19 @@ namespace Ogre {
             // Blit from multisample buffer to final buffer, triggers resolve
             uint32 width = mColour[0].buffer->getWidth();
             uint32 height = mColour[0].buffer->getHeight();
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mMultisampleFB));
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFB));
+            mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_READ_FRAMEBUFFER, mMultisampleFB );
+            mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_DRAW_FRAMEBUFFER, mFB );
+
             OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
             // Unbind
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
+            mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, oldfb );
         }
     }
 
     void GL3PlusFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
         GL3PlusDepthBuffer *glDepthBuffer = static_cast<GL3PlusDepthBuffer*>(depthBuffer);
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
+        mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
 
         if( glDepthBuffer )
         {
@@ -291,7 +296,7 @@ namespace Ogre {
     
     void GL3PlusFrameBufferObject::detachDepthBuffer()
     {
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
+        mManager->getGLSupportRef().getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
                                                       GL_RENDERBUFFER, 0 ));
