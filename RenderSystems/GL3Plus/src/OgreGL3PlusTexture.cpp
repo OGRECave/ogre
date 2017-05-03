@@ -117,7 +117,7 @@ namespace Ogre {
 
         // Bind texture object to its type, making it the active texture object
         // for that type.
-        OGRE_CHECK_GL_ERROR(glBindTexture(texTarget, mTextureID));
+        mGLSupport.getStateCacheManager()->bindGLTexture( texTarget, mTextureID );
 
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps));

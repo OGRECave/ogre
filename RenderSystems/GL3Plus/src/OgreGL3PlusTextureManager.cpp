@@ -28,6 +28,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreGL3PlusTextureManager.h"
 #include "OgreGL3PlusRenderTexture.h"
+#include "OgreGL3PlusStateCacheManager.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 
@@ -98,7 +99,7 @@ namespace Ogre {
 
         // Create GL resource
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mWarningTextureID));
-        OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, mWarningTextureID));
+        mGLSupport.getStateCacheManager()->bindGLTexture( GL_TEXTURE_2D, mWarningTextureID );
         OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, (void*)data));

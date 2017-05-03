@@ -33,6 +33,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusFBOMultiRenderTarget.h"
 #include "OgreGL3PlusSupport.h"
+#include "OgreGL3PlusStateCacheManager.h"
 
 namespace Ogre {
     static const size_t TEMP_FBOS = 2;
@@ -163,7 +164,7 @@ namespace Ogre {
 
             // Create and attach texture
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tid));
-            OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, tid));
+            mGLSupport.getStateCacheManager()->bindGLTexture( GL_TEXTURE_2D, tid );
 
             // Set some default parameters
             OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));

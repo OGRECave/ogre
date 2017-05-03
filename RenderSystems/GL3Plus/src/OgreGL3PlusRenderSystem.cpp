@@ -879,17 +879,17 @@ namespace Ogre {
 
             if (tex)
             {
-                OGRE_CHECK_GL_ERROR(glBindTexture( mTextureTypes[stage], tex->getGLID() ));
+                mStateCacheManager->bindGLTexture( mTextureTypes[stage], tex->getGLID() );
             }
             else
             {
-                OGRE_CHECK_GL_ERROR(glBindTexture( mTextureTypes[stage], static_cast<GL3PlusTextureManager*>(mTextureManager)->getWarningTextureID() ));
+                mStateCacheManager->bindGLTexture( mTextureTypes[stage], static_cast<GL3PlusTextureManager*>(mTextureManager)->getWarningTextureID() );
             }
         }
         else
         {
             // Bind zero texture.
-            OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
+            mStateCacheManager->bindGLTexture(GL_TEXTURE_2D, 0);
         }
 
         activateGLTextureUnit(0);
