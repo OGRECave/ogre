@@ -862,7 +862,7 @@ namespace Ogre {
     {
         GL3PlusTexturePtr tex = static_pointer_cast<GL3PlusTexture>(texPtr);
 
-        if (!activateGLTextureUnit(stage))
+        if (!mStateCacheManager->activateGLTextureUnit(stage))
             return;
 
         if (enabled)
@@ -892,7 +892,7 @@ namespace Ogre {
             mStateCacheManager->bindGLTexture(GL_TEXTURE_2D, 0);
         }
 
-        activateGLTextureUnit(0);
+        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setVertexTexture( size_t unit, const TexturePtr &tex )
@@ -942,31 +942,33 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw)
     {
-        if (!activateGLTextureUnit(stage))
+        if (!mStateCacheManager->activateGLTextureUnit(stage))
             return;
-        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u)));
-        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v)));
-        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w)));
-
-        activateGLTextureUnit(0);
+        mStateCacheManager->setTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S,
+                         getTextureAddressingMode(uvw.u));
+        mStateCacheManager->setTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T,
+                         getTextureAddressingMode(uvw.v));
+        mStateCacheManager->setTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R,
+                         getTextureAddressingMode(uvw.w));
+        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
     {
         GLfloat border[4] = { colour.r, colour.g, colour.b, colour.a };
-        if (activateGLTextureUnit(stage))
+        if (mStateCacheManager->activateGLTextureUnit(stage))
         {
             OGRE_CHECK_GL_ERROR(glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border));
-            activateGLTextureUnit(0);
+            mStateCacheManager->activateGLTextureUnit(0);
         }
     }
 
     void GL3PlusRenderSystem::_setTextureMipmapBias(size_t stage, float bias)
     {
-        if (activateGLTextureUnit(stage))
+        if (mStateCacheManager->activateGLTextureUnit(stage))
         {
             OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[stage], GL_TEXTURE_LOD_BIAS, bias));
-            activateGLTextureUnit(0);
+            mStateCacheManager->activateGLTextureUnit(0);
         }
     }
 
@@ -1444,7 +1446,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
     {
-        if (!activateGLTextureUnit(unit))
+        if (!mStateCacheManager->activateGLTextureUnit(unit))
             return;
 
         switch (ftype)
@@ -1453,9 +1455,9 @@ namespace Ogre {
             mMinFilter = fo;
 
             // Combine with existing mip filter
-            OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit],
+            mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                                 GL_TEXTURE_MIN_FILTER,
-                                                getCombinedMinMipFilter()));
+                                                getCombinedMinMipFilter());
             break;
 
         case FT_MAG:
@@ -1463,15 +1465,15 @@ namespace Ogre {
             {
             case FO_ANISOTROPIC: // GL treats linear and aniso the same
             case FO_LINEAR:
-                OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit],
+                mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                                     GL_TEXTURE_MAG_FILTER,
-                                                    GL_LINEAR));
+                                                    GL_LINEAR);
                 break;
             case FO_POINT:
             case FO_NONE:
-                OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit],
+                mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                                     GL_TEXTURE_MAG_FILTER,
-                                                    GL_NEAREST));
+                                                    GL_NEAREST);
                 break;
             }
             break;
@@ -1479,9 +1481,9 @@ namespace Ogre {
             mMipFilter = fo;
 
             // Combine with existing min filter
-            OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit],
+            mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                                 GL_TEXTURE_MIN_FILTER,
-                                                getCombinedMinMipFilter()));
+                                                getCombinedMinMipFilter());
             break;
         }
 
@@ -1514,12 +1516,12 @@ namespace Ogre {
         if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
             return;
 
-        if (!activateGLTextureUnit(unit))
+        if (!mStateCacheManager->activateGLTextureUnit(unit))
             return;
 
         maxAnisotropy = std::min<uint>(mLargestSupportedAnisotropy, maxAnisotropy);
         if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-            OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
+            mStateCacheManager->setTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 
         activateGLTextureUnit(0);
     }

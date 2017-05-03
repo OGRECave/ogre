@@ -49,6 +49,7 @@ namespace Ogre {
 
         // Delete warning texture
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mWarningTextureID));
+        mGLSupport.getStateCacheManager()->invalidateStateForTexture( mWarningTextureID );
     }
 
     Resource* GL3PlusTextureManager::createImpl(const String& name, ResourceHandle handle,

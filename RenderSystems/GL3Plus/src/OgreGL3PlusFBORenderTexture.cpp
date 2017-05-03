@@ -160,7 +160,10 @@ namespace Ogre {
         if (fmt != GL_NONE)
         {
             if (tid)
+            {
                 OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
+                mGLSupport.getStateCacheManager()->invalidateStateForTexture( tid );
+            }
 
             // Create and attach texture
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tid));
@@ -417,6 +420,7 @@ namespace Ogre {
                 if (internalFormat != GL_NONE) 
                 {
                     OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
+                    mGLSupport.getStateCacheManager()->invalidateStateForTexture( tid );
                     tid = 0;
                 }
             }

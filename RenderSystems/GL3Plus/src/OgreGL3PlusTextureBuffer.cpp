@@ -637,6 +637,7 @@ namespace Ogre {
         // Restore old framebuffer
         mGLSupport->getStateCacheManager()->bindGLBuffer( GL_DRAW_FRAMEBUFFER, oldfb);
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tempTex));
+        mGLSupport->getStateCacheManager()->invalidateStateForTexture( tempTex );
     }
 
     void GL3PlusTextureBuffer::_bindToFramebuffer(GLenum attachment, uint32 zoffset, GLenum which)
@@ -757,6 +758,7 @@ namespace Ogre {
 
         // Delete temp texture
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &id));
+        mGLSupport->getStateCacheManager()->invalidateStateForTexture( id );
     }
 
 

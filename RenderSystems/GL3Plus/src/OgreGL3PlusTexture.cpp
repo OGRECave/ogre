@@ -119,38 +119,43 @@ namespace Ogre {
         // for that type.
         mGLSupport.getStateCacheManager()->bindGLTexture( texTarget, mTextureID );
 
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps));
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0);
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
 
         // Set some misc default parameters, these can of course be changed later.
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
-                                            GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
-                                            GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
-                                            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
-                                            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+                                            GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+                                            GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+                                            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+                                            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         bool hasGL33 = mGLSupport.hasMinGLVersion(3, 3);
         bool hasGL42 = mGLSupport.hasMinGLVersion(4, 2);
 
         // Set up texture swizzling.
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+	
         if (PixelUtil::isLuminance(mFormat) && (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || hasGL33))
         {
             if (PixelUtil::getComponentCount(mFormat) == 2)
             {
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_GREEN));
+                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
+                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED);
+                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
+                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_GREEN);
             }
             else
             {
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED));
-                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE));
+                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
+                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED);
+                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
+                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE);
             }
         }
 
@@ -383,6 +388,7 @@ namespace Ogre {
     {
         mSurfaceList.clear();
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
+        mGLSupport.getStateCacheManager()->invalidateStateForTexture( mTextureID );
     }
 
     void GL3PlusTexture::_createSurfaceList()
