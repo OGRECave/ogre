@@ -1718,8 +1718,8 @@ namespace Ogre {
 
             if (op.useIndexes)
             {
-                OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                                                 static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
+                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                                                 static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
                 GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
@@ -1736,8 +1736,8 @@ namespace Ogre {
         }
         else if (op.useIndexes)
         {
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                                             static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
+            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                                             static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
             void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                  op.indexData->indexBuffer->getIndexSize());
@@ -1812,6 +1812,7 @@ namespace Ogre {
             // Unbind the vertex array object.
             // Marks the end of what state will be included.
             OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
+            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,0); //needed after each call of glBindVertexArray
         }
 
 
@@ -2618,8 +2619,8 @@ namespace Ogre {
         // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
         // if (updateVAO)
         {
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER,
-                                             hwGlBuffer->getGLBufferId()));
+            mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER,
+                                             hwGlBuffer->getGLBufferId());
             void* pBufferData = GL_BUFFER_OFFSET(elem.getOffset());
 
             if (vertexStart)

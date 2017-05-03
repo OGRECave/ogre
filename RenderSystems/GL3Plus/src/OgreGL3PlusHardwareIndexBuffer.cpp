@@ -52,7 +52,7 @@ namespace Ogre {
                         "GL3PlusHardwareIndexBuffer::GL3PlusHardwareIndexBuffer");
         }
 
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId));
+        static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
         OGRE_CHECK_GL_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(usage)));
@@ -61,7 +61,7 @@ namespace Ogre {
 
     GL3PlusHardwareIndexBuffer::~GL3PlusHardwareIndexBuffer()
     {
-        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
+        static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
     }
 
     void* GL3PlusHardwareIndexBuffer::lockImpl(size_t offset,
@@ -77,8 +77,7 @@ namespace Ogre {
 
         void* retPtr = 0;
         GLenum access = 0;
-
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId));
+        static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
         // Use glMapBuffer
         if (mUsage & HBU_WRITE_ONLY)
@@ -137,7 +136,7 @@ namespace Ogre {
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId));
+            static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
             if (mUsage & HBU_WRITE_ONLY)
             {
@@ -152,7 +151,6 @@ namespace Ogre {
                             "Buffer data corrupted, please reload",
                             "GL3PlusHardwareIndexBuffer::unlock");
             }
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
         }
         mIsLocked = false;
     }
@@ -170,7 +168,7 @@ namespace Ogre {
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId ));
+            static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
             OGRE_CHECK_GL_ERROR(glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, length, pDest));
         }
     }
@@ -179,7 +177,7 @@ namespace Ogre {
                                                const void* pSource,
                                                bool discardWholeBuffer)
     {
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId));
+        static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
         // Update the shadow buffer
         if (mUseShadowBuffer)
@@ -218,22 +216,18 @@ namespace Ogre {
         }
         else
         {
-            // Unbind the current buffer
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-
             // Zero out this(destination) buffer
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId));
+            static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
             OGRE_CHECK_GL_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, length, 0, GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-
+            
             // Do it the fast way.
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, static_cast<GL3PlusHardwareIndexBuffer &>(srcBuffer).getGLBufferId()));
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, mBufferId));
+            static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_COPY_READ_BUFFER, static_cast<GL3PlusHardwareIndexBuffer &>(srcBuffer).getGLBufferId());
+            static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_COPY_WRITE_BUFFER, mBufferId);
 
             OGRE_CHECK_GL_ERROR(glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, srcOffset, dstOffset, length));
 
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, 0));
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
+            static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_COPY_READ_BUFFER, 0);
+            static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_COPY_WRITE_BUFFER, 0);
         }
     }
 
@@ -244,7 +238,7 @@ namespace Ogre {
             const void *srcData = mShadowBuffer->lock(mLockStart, mLockSize,
                                                       HBL_READ_ONLY);
 
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId));
+            static_cast<GL3PlusHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
             // Update whole buffer if possible, otherwise normal
             if (mLockStart == 0 && mLockSize == mSizeInBytes)

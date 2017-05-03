@@ -42,6 +42,7 @@ namespace Ogre {
         /// Is this VAO initialised?
         bool mInitialised;
 
+    protected:
         GL3PlusSupport* mGLSupport;
 
     public:
