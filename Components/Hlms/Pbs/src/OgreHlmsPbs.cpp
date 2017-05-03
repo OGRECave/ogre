@@ -338,19 +338,25 @@ namespace Ogre
 
             if( !mPreparedPass.shadowMaps.empty() )
             {
-                char tmpData[32];
-                LwString texName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
-                texName = "texShadowMap";
-                const size_t baseTexSize = texName.size();
-
-                vector<int>::type shadowMaps;
-                shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
-                for( size_t i=0; i<mPreparedPass.shadowMaps.size(); ++i )
+                if( getProperty( HlmsBaseProp::NumShadowMapLights ) != 0 )
                 {
-                    texName.resize( baseTexSize );
-                    texName.a( (uint32)i );   //texShadowMap0
-                    psParams->setNamedConstant( texName.c_str(), &texUnit, 1, 1 );
-                    shadowMaps.push_back( texUnit++ );
+                    char tmpData[32];
+                    LwString texName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
+                    texName = "texShadowMap";
+                    const size_t baseTexSize = texName.size();
+
+                    for( size_t i=0; i<mPreparedPass.shadowMaps.size(); ++i )
+                    {
+                        texName.resize( baseTexSize );
+                        texName.a( (uint32)i );   //texShadowMap0
+                        psParams->setNamedConstant( texName.c_str(), &texUnit, 1, 1 );
+                        ++texUnit;
+                    }
+                }
+                else
+                {
+                    //No visible lights casting shadow maps.
+                    texUnit += mPreparedPass.shadowMaps.size();
                 }
             }
 
