@@ -1749,25 +1749,11 @@ namespace Ogre {
 
                 if (hasInstanceData)
                 {
-                    if (mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || mHasGL32)
-                    {
-                        OGRE_CHECK_GL_ERROR(glDrawElementsInstancedBaseVertex(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances, op.vertexData->vertexStart));
-                    }
-                    else
-                    {
-                        OGRE_CHECK_GL_ERROR(glDrawElementsInstanced(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
-                    }
+                    OGRE_CHECK_GL_ERROR(glDrawElementsInstanced(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
                 }
                 else
                 {
-                    if (mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || mHasGL32)
-                    {
-                        OGRE_CHECK_GL_ERROR(glDrawElementsBaseVertex(primType, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
-                    }
-                    else
-                    {
-                        OGRE_CHECK_GL_ERROR(glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData));
-                    }
+                    OGRE_CHECK_GL_ERROR(glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData));
                 }
             } while (updatePassIterationRenderState());
         }
