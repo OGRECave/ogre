@@ -148,7 +148,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
         // Use PBO as a texture buffer.
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mBufferId));
+        mGLSupport->getStateCacheManager()->bindGLBuffer( GL_PIXEL_UNPACK_BUFFER, mBufferId );
 
         // Calculate size for all mip levels of the texture.
         size_t dataSize = 0;
@@ -347,7 +347,7 @@ namespace Ogre {
 
         // Upload data to PBO
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, mBufferId));
+        mGLSupport->getStateCacheManager()->bindGLBuffer(GL_PIXEL_PACK_BUFFER, mBufferId);
 
         OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, mSizeInBytes, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
@@ -437,8 +437,8 @@ namespace Ogre {
         }
 
         // Delete PBO
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, 0));
-        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
+        mGLSupport->getStateCacheManager()->bindGLBuffer(GL_PIXEL_PACK_BUFFER, 0);
+        mGLSupport->getStateCacheManager()->deleteGLBuffer(GL_PIXEL_PACK_BUFFER, mBufferId);
         mBufferId = 0;
     }
 
