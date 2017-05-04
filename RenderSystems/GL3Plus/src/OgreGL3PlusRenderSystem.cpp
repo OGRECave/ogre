@@ -1266,19 +1266,15 @@ namespace Ogre {
     {
         if (enabled)
         {
-            OGRE_CHECK_GL_ERROR(glClearDepth(1.0));
-            OGRE_CHECK_GL_ERROR(glEnable(GL_DEPTH_TEST));
+            mStateCacheManager->setClearDepth(1.0f);
         }
-        else
-        {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_DEPTH_TEST));
-        }
+        mStateCacheManager->setEnabled(GL_DEPTH_TEST, enabled);
     }
 
     void GL3PlusRenderSystem::_setDepthBufferWriteEnabled(bool enabled)
     {
         GLboolean flag = enabled ? GL_TRUE : GL_FALSE;
-        OGRE_CHECK_GL_ERROR(glDepthMask(flag));
+        mStateCacheManager->setDepthMask( flag );
 
         // Store for reference in _beginFrame
         mDepthWrite = enabled;
@@ -1286,30 +1282,26 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setDepthBufferFunction(CompareFunction func)
     {
-        OGRE_CHECK_GL_ERROR(glDepthFunc(convertCompareFunction(func)));
+        mStateCacheManager->setDepthFunc(convertCompareFunction(func));
     }
 
     void GL3PlusRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
         //FIXME glPolygonOffset currently is buggy in GL3+ RS but not GL RS.
-        if (constantBias != 0 || slopeScaleBias != 0)
+        bool enable = constantBias != 0 || slopeScaleBias != 0;
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL, enable);
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_POINT, enable);
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_LINE, enable);
+
+        if (enable)
         {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_POLYGON_OFFSET_FILL));
-            OGRE_CHECK_GL_ERROR(glEnable(GL_POLYGON_OFFSET_POINT));
-            OGRE_CHECK_GL_ERROR(glEnable(GL_POLYGON_OFFSET_LINE));
-            OGRE_CHECK_GL_ERROR(glPolygonOffset(-slopeScaleBias, -constantBias));
-        }
-        else
-        {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_POLYGON_OFFSET_FILL));
-            OGRE_CHECK_GL_ERROR(glDisable(GL_POLYGON_OFFSET_POINT));
-            OGRE_CHECK_GL_ERROR(glDisable(GL_POLYGON_OFFSET_LINE));
+            glPolygonOffset(-slopeScaleBias, -constantBias);
         }
     }
 
     void GL3PlusRenderSystem::_setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
     {
-        OGRE_CHECK_GL_ERROR(glColorMask(red, green, blue, alpha));
+        mStateCacheManager->setColourMask(red, green, blue, alpha);
 
         // record this
         mColourWrite[0] = red;
@@ -1347,14 +1339,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::setStencilCheckEnabled(bool enabled)
     {
-        if (enabled)
-        {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_STENCIL_TEST));
-        }
-        else
-        {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_STENCIL_TEST));
-        }
+        mStateCacheManager->setEnabled(GL_STENCIL_TEST, enabled);
     }
 
     void GL3PlusRenderSystem::setStencilBufferParams(CompareFunction func,
@@ -1397,7 +1382,7 @@ namespace Ogre {
         else
         {
             flip = false;
-            OGRE_CHECK_GL_ERROR(glStencilMask(writeMask));
+            mStateCacheManager->setStencilMask(writeMask);
             OGRE_CHECK_GL_ERROR(glStencilFunc(convertCompareFunction(func), refValue, compareMask));
             OGRE_CHECK_GL_ERROR(glStencilOp(
                 convertStencilOp(stencilFailOp, flip),
@@ -1894,9 +1879,9 @@ namespace Ogre {
             // Enable buffer for writing if it isn't
             if (colourMask)
             {
-                OGRE_CHECK_GL_ERROR(glColorMask(true, true, true, true));
+                mStateCacheManager->setColourMask(true, true, true, true);
             }
-            OGRE_CHECK_GL_ERROR(glClearColor(colour.r, colour.g, colour.b, colour.a));
+            mStateCacheManager->setClearColour(colour.r, colour.g, colour.b, colour.a);
         }
         if (buffers & FBT_DEPTH)
         {
@@ -1904,15 +1889,15 @@ namespace Ogre {
             // Enable buffer for writing if it isn't
             if (!mDepthWrite)
             {
-                OGRE_CHECK_GL_ERROR(glDepthMask(GL_TRUE));
+                mStateCacheManager->setDepthMask( GL_TRUE );
             }
-            OGRE_CHECK_GL_ERROR(glClearDepth(depth));
+            mStateCacheManager->setClearDepth(depth);
         }
         if (buffers & FBT_STENCIL)
         {
             flags |= GL_STENCIL_BUFFER_BIT;
             // Enable buffer for writing if it isn't
-            OGRE_CHECK_GL_ERROR(glStencilMask(0xFFFFFFFF));
+            mStateCacheManager->setStencilMask(0xFFFFFFFF);
             OGRE_CHECK_GL_ERROR(glClearStencil(stencil));
         }
 
@@ -1952,17 +1937,17 @@ namespace Ogre {
         // Reset buffer write state
         if (!mDepthWrite && (buffers & FBT_DEPTH))
         {
-            OGRE_CHECK_GL_ERROR(glDepthMask(GL_FALSE));
+            mStateCacheManager->setDepthMask( GL_FALSE );
         }
 
         if (colourMask && (buffers & FBT_COLOUR))
         {
-            OGRE_CHECK_GL_ERROR(glColorMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]));
+            mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
         }
 
         if (buffers & FBT_STENCIL)
         {
-            OGRE_CHECK_GL_ERROR(glStencilMask(mStencilWriteMask));
+            mStateCacheManager->setStencilMask(mStencilWriteMask);
         }
     }
 
@@ -2062,9 +2047,9 @@ namespace Ogre {
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
-        OGRE_CHECK_GL_ERROR(glDepthMask(mDepthWrite));
-        OGRE_CHECK_GL_ERROR(glColorMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]));
-        OGRE_CHECK_GL_ERROR(glStencilMask(mStencilWriteMask));
+        mStateCacheManager->setDepthMask(mDepthWrite);
+        mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
+        mStateCacheManager->setStencilMask(mStencilWriteMask);
     }
 
     void GL3PlusRenderSystem::_unregisterContext(GL3PlusContext *context)
