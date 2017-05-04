@@ -1159,10 +1159,14 @@ namespace Ogre {
                 y = target->getHeight() - h - y;
             }
 
-            OGRE_CHECK_GL_ERROR(glViewport(x, y, w, h));
+            mStateCacheManager->setViewport(x, y, w, h);
 
             // Configure the viewport clipping
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            glScissor(x, y, w, h);
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
 
             vp->_clearUpdatedFlag();
         }
@@ -1176,16 +1180,16 @@ namespace Ogre {
                         "GL3PlusRenderSystem::_beginFrame");
 
         mScissorsEnabled = true;
-        OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
     }
 
     void GL3PlusRenderSystem::_endFrame(void)
     {
         // Deactivate the viewport clipping.
         mScissorsEnabled = false;
-        OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
 
-        OGRE_CHECK_GL_ERROR(glDisable(GL_DEPTH_CLAMP));
+        mStateCacheManager->setEnabled(GL_DEPTH_CLAMP, false);
 
         // unbind GPU programs at end of frame
         // this is mostly to avoid holding bound programs that might get deleted
@@ -1834,7 +1838,7 @@ namespace Ogre {
 
         if (enabled)
         {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
             // NB GL uses width / height rather than right / bottom
             x = left;
             if (flipping)
@@ -1847,10 +1851,15 @@ namespace Ogre {
                                           static_cast<GLsizei>(y),
                                           static_cast<GLsizei>(w),
                                           static_cast<GLsizei>(h)));
+
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
             // GL requires you to reset the scissor when disabling
             w = mActiveViewport->getActualWidth();
             h = mActiveViewport->getActualHeight();
@@ -1863,6 +1872,11 @@ namespace Ogre {
                                           static_cast<GLsizei>(y),
                                           static_cast<GLsizei>(w),
                                           static_cast<GLsizei>(h)));
+
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
         }
     }
 
@@ -1906,16 +1920,15 @@ namespace Ogre {
         // relied on scissor box bounds.
         if (!mScissorsEnabled)
         {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
         }
 
         // Sets the scissor box as same as viewport
-        GLint viewport[4], scissor[4];
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_SCISSOR_BOX, scissor));
+        GLint viewport[4];
+        mStateCacheManager->getViewport(viewport);
         bool scissorBoxDifference =
-            viewport[0] != scissor[0] || viewport[1] != scissor[1] ||
-            viewport[2] != scissor[2] || viewport[3] != scissor[3];
+            viewport[0] != mScissorBox[0] || viewport[1] != mScissorBox[1] ||
+            viewport[2] != mScissorBox[2] || viewport[3] != mScissorBox[3];
         if (scissorBoxDifference)
         {
             OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
@@ -1927,13 +1940,13 @@ namespace Ogre {
         // Restore scissor box
         if (scissorBoxDifference)
         {
-            OGRE_CHECK_GL_ERROR(glScissor(scissor[0], scissor[1], scissor[2], scissor[3]));
+            OGRE_CHECK_GL_ERROR(glScissor(mScissorBox[0], mScissorBox[1], mScissorBox[2], mScissorBox[3]));
         }
 
         // Restore scissor test
         if (!mScissorsEnabled)
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
         }
 
         // Reset buffer write state

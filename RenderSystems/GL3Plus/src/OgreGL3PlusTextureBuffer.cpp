@@ -548,12 +548,12 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
             // Set viewport to size of destination slice
-            OGRE_CHECK_GL_ERROR(glViewport(0, 0, dstBox.getWidth(), dstBox.getHeight()));
+            mGLSupport->getStateCacheManager()->setViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
         }
         else
         {
             // We are going to bind directly, so set viewport to size and position of destination slice
-            OGRE_CHECK_GL_ERROR(glViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight()));
+            mGLSupport->getStateCacheManager()->setViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight());
         }
 
         // Process each destination slice
