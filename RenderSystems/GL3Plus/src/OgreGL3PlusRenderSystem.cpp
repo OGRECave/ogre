@@ -842,14 +842,14 @@ namespace Ogre {
             // val[2] = quadratic * correction;
             // val[3] = 1;
 
-            OGRE_CHECK_GL_ERROR(glEnable(GL_PROGRAM_POINT_SIZE));
+            mStateCacheManager->setEnabled(GL_PROGRAM_POINT_SIZE,true);
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_PROGRAM_POINT_SIZE));
+            mStateCacheManager->setEnabled(GL_PROGRAM_POINT_SIZE,false);
         }
 
-        OGRE_CHECK_GL_ERROR(glPointSize(size));
+         mStateCacheManager->setPointSize(size);
         //OGRE_CHECK_GL_ERROR(glPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, 64.0));
     }
 
@@ -1008,12 +1008,12 @@ namespace Ogre {
         GLenum destBlend = getBlendMode(destFactor);
         if (sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_BLEND));
+            mStateCacheManager->setEnabled(GL_BLEND, false);
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_BLEND));
-            OGRE_CHECK_GL_ERROR(glBlendFunc(sourceBlend, destBlend));
+            mStateCacheManager->setEnabled(GL_BLEND, true);
+            mStateCacheManager->setBlendFunc(sourceBlend, destBlend);
         }
 
         GLint func = GL_FUNC_ADD;
@@ -1036,7 +1036,7 @@ namespace Ogre {
             break;
         }
 
-        OGRE_CHECK_GL_ERROR(glBlendEquation(func));
+        mStateCacheManager->setBlendEquation(func);
     }
 
     void GL3PlusRenderSystem::_setSeparateSceneBlending(
@@ -1052,11 +1052,11 @@ namespace Ogre {
         if (sourceFactor == SBF_ONE && destFactor == SBF_ZERO &&
             sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_BLEND));
+            mStateCacheManager->setEnabled(GL_BLEND, false);
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_BLEND));
+            mStateCacheManager->setEnabled(GL_BLEND, true);
             OGRE_CHECK_GL_ERROR(glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha));
         }
 
@@ -1100,7 +1100,7 @@ namespace Ogre {
             break;
         }
 
-        OGRE_CHECK_GL_ERROR(glBlendEquationSeparate(func, alphaFunc));
+        mStateCacheManager->setBlendEquation(func, alphaFunc);
     }
 
     void GL3PlusRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
@@ -1115,14 +1115,7 @@ namespace Ogre {
 
         if (a2c != lasta2c)
         {
-            if (a2c)
-            {
-                OGRE_CHECK_GL_ERROR(glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE));
-            }
-            else
-            {
-                OGRE_CHECK_GL_ERROR(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
-            }
+            mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, a2c);
 
             lasta2c = a2c;
         }
@@ -1221,7 +1214,7 @@ namespace Ogre {
         switch( mode )
         {
         case CULL_NONE:
-            OGRE_CHECK_GL_ERROR(glDisable(GL_CULL_FACE));
+            mStateCacheManager->setEnabled( GL_CULL_FACE, false );
             return;
 
         default:
@@ -1251,8 +1244,8 @@ namespace Ogre {
             break;
         }
 
-        OGRE_CHECK_GL_ERROR(glEnable(GL_CULL_FACE));
-        OGRE_CHECK_GL_ERROR(glCullFace(cullMode));
+        mStateCacheManager->setEnabled( GL_CULL_FACE, true );
+        mStateCacheManager->setCullFace( cullMode );
     }
 
     void GL3PlusRenderSystem::_setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction)
@@ -1334,7 +1327,7 @@ namespace Ogre {
             mPolygonMode = GL_FILL;
             break;
         }
-        OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode));
+        mStateCacheManager->setPolygonMode(mPolygonMode);
     }
 
     void GL3PlusRenderSystem::setStencilCheckEnabled(bool enabled)
