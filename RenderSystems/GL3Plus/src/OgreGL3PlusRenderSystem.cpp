@@ -2576,9 +2576,8 @@ namespace Ogre {
                                                  static_cast<v1::GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
-                GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
                 GLenum indexType = (op.indexData->indexBuffer->getType() == v1::HardwareIndexBuffer::IT_32BIT) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
-                OGRE_CHECK_GL_ERROR(glDrawRangeElements(GL_PATCHES, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                OGRE_CHECK_GL_ERROR(glDrawElements(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData));
                 //OGRE_CHECK_GL_ERROR(glDrawElements(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
@@ -2611,14 +2610,14 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 
-                GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
                 if(hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstancedBaseVertex(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances, op.vertexData->vertexStart));
                 }
                 else
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
+                    OGRE_CHECK_GL_ERROR( glDrawElementsBaseVertex( primType, op.indexData->indexCount, indexType,
+                                                                   pBufferData, op.vertexData->vertexStart ) );
                 }
             } while (updatePassIterationRenderState());
         }
