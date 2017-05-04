@@ -31,7 +31,18 @@ if(NOT APPLE)
     ${OPENGL_INCLUDE_DIR}
   )
 endif()
-
+include_directories(src/StateCacheManager)
+if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
+  list(APPEND SOURCE_FILES
+      src/StateCacheManager/OgreGL3PlusStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGL3PlusUniformCacheImp.cpp
+  )
+else()
+  list(APPEND SOURCE_FILES
+      src/StateCacheManager/OgreGL3PlusNullStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGL3PlusNullUniformCacheImp.cpp
+  )
+endif()
 ogre_add_library_to_folder(RenderSystems RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_GL3Plus OgreMain ${GLSUPPORT_LIBS} ${OPENGL_LIBRARIES})
 
