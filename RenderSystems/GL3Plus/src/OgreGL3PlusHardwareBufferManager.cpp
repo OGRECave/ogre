@@ -34,7 +34,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreGL3PlusRenderToVertexBuffer.h"
 #include "OgreGL3PlusRenderSystem.h"
-#include "OgreGL3PlusStateCacheManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {

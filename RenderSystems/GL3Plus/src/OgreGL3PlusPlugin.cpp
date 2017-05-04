@@ -29,7 +29,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusPlugin.h"
 #include "OgreRoot.h"
 #include "OgreGL3PlusRenderSystem.h"
-#include "OgreGL3PlusStateCacheManager.h"
 
 namespace Ogre
 {

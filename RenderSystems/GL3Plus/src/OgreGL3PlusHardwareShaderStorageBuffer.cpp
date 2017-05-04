@@ -30,7 +30,6 @@
 #include "OgreGL3PlusHardwareShaderStorageBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGL3PlusRenderSystem.h"
-#include "OgreGL3PlusStateCacheManager.h"
 
 namespace Ogre {
     GL3PlusHardwareShaderStorageBuffer::GL3PlusHardwareShaderStorageBuffer(

@@ -35,6 +35,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLShader.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLRenderSystemCommon.h"
+#include "OgreGL3PlusStateCacheManager.h"
 
 namespace Ogre {
     /** \addtogroup RenderSystems RenderSystems
