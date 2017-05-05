@@ -1564,12 +1564,7 @@ namespace Ogre {
                 }
                 else
                 {
-#if OGRE_NO_GLES3_SUPPORT == 0
-                    GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
-                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData));
-#else
                     OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData));
-#endif
                 }
 
             } while (updatePassIterationRenderState());
