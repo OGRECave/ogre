@@ -57,7 +57,7 @@ namespace Ogre {
     {
         GLES2HardwareVertexBuffer* buf = 0;
 
-        if(!OGRE_NO_GLES3_SUPPORT
+        if((!OGRE_NO_GLES3_SUPPORT && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN)
                 || mGLSupport->checkExtension("GL_EXT_map_buffer_range")
                 || mGLSupport->checkExtension("GL_OES_mapbuffer"))
             buf = OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
@@ -78,7 +78,7 @@ namespace Ogre {
                                                                               bool useShadowBuffer)
     {
         GLES2HardwareIndexBuffer* buf = 0;
-        if(!OGRE_NO_GLES3_SUPPORT
+        if((!OGRE_NO_GLES3_SUPPORT && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN)
                 || mGLSupport->checkExtension("GL_EXT_map_buffer_range")
                 || mGLSupport->checkExtension("GL_OES_mapbuffer"))
             buf = OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
