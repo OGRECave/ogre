@@ -94,6 +94,10 @@
 %include "OgreConfig.h"
 %include "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
+%template(_NameValuePairList) Ogre::map<Ogre::String, Ogre::String>;
+%template(NameValuePairList) std::map<Ogre::String, Ogre::String>;
+%ignore Ogre::findCommandLineOpts; // not needed in python
+
 // Basic Data Types
 %include "OgreException.h"
 %include "OgreAtomicScalar.h"
