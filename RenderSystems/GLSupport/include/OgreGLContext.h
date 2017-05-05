@@ -45,6 +45,13 @@ namespace Ogre {
         virtual ~GLContext() {}
 
         /**
+         * Sequence gl commands enqueued in current context to be completed before commands that would be enqueued by other contexts after this moment, does not wait for completion.
+         * This ensures for example that resources created in the current context would be available in other shared contexts.
+         * Implementation could flush commands from per-context CPU queue to single GPU queue, use glFenceSync/glWaitSync, eglWaitClient or any other mechanism to accomplish the goal.
+         */
+        virtual void barrier() {}
+
+        /**
          * Enable the context. All subsequent rendering commands will go here.
          */
         virtual void setCurrent() = 0;
