@@ -490,7 +490,7 @@ namespace Ogre {
                                               ::EGLContext shareList) const 
     {
         EGLint contextAttrs[] = {
-            EGL_CONTEXT_CLIENT_VERSION, OGRE_NO_GLES3_SUPPORT ? 2 : 3,
+            EGL_CONTEXT_CLIENT_VERSION, (OGRE_NO_GLES3_SUPPORT || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN) ? 2 : 3,
             EGL_NONE
         };
 
