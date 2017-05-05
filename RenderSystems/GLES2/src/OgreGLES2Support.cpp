@@ -79,7 +79,9 @@ namespace Ogre {
         while (ext >> str)
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-            if (str.substr(0, 3) != "GL_") // emscripten gives us both prefixed and unprefixed forms
+            // emscripten gives us both prefixed (GL_) and unprefixed (EXT_) forms
+            // use prefixed form (GL_EXT) unless its a WebGL extension (WEBGL_)
+            if ((str.substr(0, 3) != "GL_" && str.substr(0, 6) != "WEBGL_") || str.substr(0, 9) == "GL_WEBGL_")
                 continue;
 #endif
             log << str << " ";
