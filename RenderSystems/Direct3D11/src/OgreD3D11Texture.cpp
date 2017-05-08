@@ -371,7 +371,10 @@ namespace Ogre
         if((mUsage & TU_RENDERTARGET) != 0 && (mUsage & TU_DYNAMIC) == 0)
         {
             D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-            rsys->determineFSAASettings(mFSAA, mFSAAHint, mD3DFormat, &mFSAAType);
+            // http://msdn.microsoft.com/en-us/library/windows/desktop/ff476150%28v=vs.85%29.aspx#ID3D11Device_CreateTexture2D
+            // 10Level9, When using D3D11_BIND_SHADER_RESOURCE, SampleDesc.Count must be 1.
+            if(rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0 || (mUsage & TU_NOTSHADERRESOURCE))
+                rsys->determineFSAASettings(mFSAA, mFSAAHint, mD3DFormat, &mFSAAType);
         }
 
         // load based on tex.type
@@ -453,7 +456,7 @@ namespace Ogre
         mSRVDesc.Format = desc.Format;
         mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
         mSRVDesc.Texture1D.MipLevels = desc.MipLevels;
-        hr = mDevice->CreateShaderResourceView(mp1DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf());
+        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp1DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
@@ -584,7 +587,7 @@ namespace Ogre
             break;
         }
 
-        hr = mDevice->CreateShaderResourceView(mp2DTex.Get(), &mSRVDesc,mpShaderResourceView.ReleaseAndGetAddressOf());
+        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp2DTex.Get(), &mSRVDesc,mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
@@ -653,7 +656,7 @@ namespace Ogre
         mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
         mSRVDesc.Texture3D.MostDetailedMip = 0;
         mSRVDesc.Texture3D.MipLevels = desc.MipLevels;
-        hr = mDevice->CreateShaderResourceView(mp3DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf());
+        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp3DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);

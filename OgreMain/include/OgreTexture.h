@@ -62,8 +62,10 @@ namespace Ogre {
         /// defined, but you can assume it to be a 2x2 box filter.
         TU_AUTOMIPMAP = 16,
         /** This texture will be a render target, i.e. used as a target for render to texture
-            setting this flag will ignore all other texture usages except TU_AUTOMIPMAP */
+            setting this flag will ignore all other texture usages except TU_AUTOMIPMAP and TU_NOTSHADERRESOURCE */
         TU_RENDERTARGET = 32,
+        /// Hint, that could be combined with TU_RENDERTARGET to remove possible limitations on some hardware
+        TU_NOTSHADERRESOURCE = 64,
         /// Default to automatic mipmap generation static textures
         TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY
     };

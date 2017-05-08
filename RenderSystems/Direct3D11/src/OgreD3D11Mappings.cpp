@@ -730,7 +730,8 @@ namespace Ogre
 			}
 		}
 
-		return isRenderTarget ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
+		return (isRenderTarget ? D3D11_BIND_RENDER_TARGET : 0)
+			| ((usage & TU_NOTSHADERRESOURCE) ? 0 : D3D11_BIND_SHADER_RESOURCE);
 	}
 
     UINT D3D11Mappings::_getTextureMiscFlags(UINT bindflags, TextureType textype, TextureUsage usage)
