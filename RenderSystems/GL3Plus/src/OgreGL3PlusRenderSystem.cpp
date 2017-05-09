@@ -679,11 +679,14 @@ namespace Ogre {
         // delete mTextureManager;
         // mTextureManager = 0;
 
-        mGLInitialised = 0;
+        if( mGlobalVao )
+        {
+            OCGE( glBindVertexArray( 0 ) );
+            OCGE( glDeleteVertexArrays( 1, &mGlobalVao ) );
+            mGlobalVao = 0;
+        }
 
-        OCGE( glBindVertexArray( 0 ) );
-        OCGE( glDeleteVertexArrays( 1, &mGlobalVao ) );
-        mGlobalVao = 0;
+        mGLInitialised = 0;
 
         // RenderSystem::shutdown();
     }
