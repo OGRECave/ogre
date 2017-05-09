@@ -1379,6 +1379,8 @@ namespace Ogre
             mTexUnitSlotStart += 1;
         if( mPrePassTextures )
             mTexUnitSlotStart += 2;
+        if( mPrePassMsaaDepthTexture )
+            mTexUnitSlotStart += 1;
         if( mSsrTexture )
             mTexUnitSlotStart += 1;
 
