@@ -94,7 +94,25 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         # freetype does not like shared build on MSVC and it generally eases distribution there
         set(OGREDEPS_SHARED FALSE)
     endif()
-
+        
+    if(MSVC) # other platforms dont need this
+        message(STATUS "Building SDL2")
+        file(DOWNLOAD 
+            https://libsdl.org/release/SDL2-2.0.5.tar.gz
+            ./SDL2-2.0.5.tar.gz)
+        execute_process(COMMAND cmake -E tar xf SDL2-2.0.5.tar.gz)
+        execute_process(COMMAND cmake -E make_directory ./SDL2-build)
+        execute_process(COMMAND cmake
+            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+            -G ${CMAKE_GENERATOR}
+            ${CROSS}
+            ../SDL2-2.0.5
+            WORKING_DIRECTORY SDL2-build)
+        execute_process(COMMAND cmake --build SDL2-build --target install)
+    endif()
+    
     if(MSVC OR EMSCRIPTEN) # other platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD 
