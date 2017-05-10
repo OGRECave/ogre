@@ -1091,7 +1091,7 @@ namespace Ogre {
     {
         fireResourceRemove(res);
 
-        if (mCurrentGroup)
+        if (mCurrentGroup && res->getGroup() == mCurrentGroup->name)
         {
             // Do nothing - we're batch unloading so list will be cleared
         }
