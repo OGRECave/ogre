@@ -681,9 +681,7 @@ namespace Ogre {
         OGRE_DEPRECATED GPUDeviceNameRuleIterator getGPUDeviceNameRuleIterator() const;
 
         /// Get the currently registered device name rules.
-        GPUDeviceNameRuleList getGPUDeviceNameRules() const {
-            return mGPUDeviceNameRules;
-        }
+        const GPUDeviceNameRuleList& getGPUDeviceNameRules() const { return mGPUDeviceNameRules; }
 
         /** Return an instance of user objects binding associated with this class.
         You can use it to associate one or more custom objects with this class instance.
