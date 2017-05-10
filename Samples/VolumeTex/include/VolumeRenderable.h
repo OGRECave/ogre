@@ -48,6 +48,5 @@ protected:
     float mRadius;
     Ogre::Matrix3 mFakeOrientation;
     Ogre::String mTexture;
-    Ogre::TextureUnitState *mUnit;
 };
 #endif
