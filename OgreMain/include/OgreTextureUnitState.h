@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreBlendMode.h"
 #include "OgreMatrix4.h"
 #include "OgreTexture.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -1219,5 +1220,6 @@ protected:
 
 } // namespace Ogre
 
+#include "OgreHeaderSuffix.h"
 
 #endif // __TextureUnitState_H__

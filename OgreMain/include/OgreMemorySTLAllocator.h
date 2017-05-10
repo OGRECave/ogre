@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define _MemorySTLAllocator_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -221,6 +222,7 @@ namespace Ogre
 }// namespace Ogre
 
 
+#include "OgreHeaderSuffix.h"
 
 #endif // _MemorySTLAllocator_H__
 

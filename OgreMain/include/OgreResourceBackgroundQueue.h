@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreResource.h"
 #include "OgreWorkQueue.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -337,6 +338,7 @@ namespace Ogre {
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif
 

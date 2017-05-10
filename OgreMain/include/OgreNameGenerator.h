@@ -40,6 +40,7 @@ THE SOFTWARE.
 #   pragma GCC visibility pop
 #endif
 
+#include "OgreHeaderPrefix.h"
 
 #include "Threading/OgreThreadHeaders.h"
 
@@ -100,5 +101,6 @@ namespace Ogre {
     /** @} */
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

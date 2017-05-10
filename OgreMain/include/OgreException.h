@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreString.h"
 #include <exception>
+#include "OgreHeaderPrefix.h"
 
 // Check for OGRE assert mode
 
@@ -318,5 +319,6 @@ namespace Ogre {
 
 } // Namespace Ogre
 
+#include "OgreHeaderSuffix.h"
 
 #endif

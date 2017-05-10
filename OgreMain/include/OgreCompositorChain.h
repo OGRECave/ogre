@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreRenderQueueListener.h"
 #include "OgreCompositorInstance.h"
 #include "OgreViewport.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -251,5 +252,6 @@ namespace Ogre {
     /** @} */
 } // namespace Ogre
 
+#include "OgreHeaderSuffix.h"
 
 #endif // __CompositorChain_H__

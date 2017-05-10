@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreMatrix4.h"
 #include "OgreRenderable.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -696,5 +697,6 @@ namespace Ogre {
 
 } // namespace Ogre
 
+#include "OgreHeaderSuffix.h"
 
 #endif // _Node_H__

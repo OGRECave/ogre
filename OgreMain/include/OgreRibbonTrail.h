@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreBillboardChain.h"
 #include "OgreNode.h"
 #include "OgreControllerManager.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -240,5 +241,6 @@ namespace Ogre {
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

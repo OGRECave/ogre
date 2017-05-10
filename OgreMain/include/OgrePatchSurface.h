@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreAxisAlignedBox.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -236,5 +237,6 @@ namespace Ogre {
 
 } // namespace
 
+#include "OgreHeaderSuffix.h"
 
 #endif

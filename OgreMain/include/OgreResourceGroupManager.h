@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
 #include <ctime>
+#include "OgreHeaderPrefix.h"
 
 // If X11/Xlib.h gets included before this header (for example it happens when
 // including wxWidgets and FLTK), Status is defined as an int which we don't
@@ -1054,5 +1055,6 @@ namespace Ogre {
     /** @} */
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

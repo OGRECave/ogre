@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSphere.h"
 #include "OgreMath.h"
 #include "OgrePlane.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -131,6 +132,7 @@ namespace Ogre {
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif
 

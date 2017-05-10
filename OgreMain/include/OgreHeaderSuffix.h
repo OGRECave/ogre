@@ -1,11 +1,10 @@
-/*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+/*-------------------------------------------------------------------------
+This source file is a part of OGRE
+(Object-oriented Graphics Rendering Engine)
+
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -22,41 +21,20 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
-*/
+THE SOFTWARE
+-------------------------------------------------------------------------*/
+// ATTENTION: No header guard as this header is meant to be included
+// multiple times.
+//#ifndef __OgreHeaderSuffix_H__
+//#define __OgreHeaderSuffix_H__
 
-#ifndef __SCRIPTPARSER_H_
-#define __SCRIPTPARSER_H_
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 
-#include "OgrePrerequisites.h"
-#include "OgreScriptCompiler.h"
-#include "OgreScriptLexer.h"
-#include "OgreHeaderPrefix.h"
+// restore previous warnings settings
+#   pragma warning (pop)
 
-namespace Ogre {
-
-    /** \addtogroup Core
-    *  @{
-    */
-    /** \addtogroup General
-    *  @{
-    */
-
-    class _OgreExport ScriptParser : public ScriptCompilerAlloc
-    {
-    public:
-        static ConcreteNodeListPtr parse(const ScriptTokenListPtr &tokens);
-        static ConcreteNodeListPtr parseChunk(const ScriptTokenListPtr &tokens);
-    private:
-        static ScriptToken *getToken(ScriptTokenList::iterator i, ScriptTokenList::iterator end, int offset);
-        static ScriptTokenList::iterator skipNewlines(ScriptTokenList::iterator i, ScriptTokenList::iterator end);
-    };
-    
-    /** @} */
-    /** @} */
-}
-
-#include "OgreHeaderSuffix.h"
 
 #endif
+
+
+//#endif

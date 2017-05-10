@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __ScriptLexer_H_
 
 #include "OgrePrerequisites.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -86,5 +87,6 @@ namespace Ogre {
     /** @} */
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

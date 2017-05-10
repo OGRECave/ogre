@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreTextureUnitState.h"
 #include "OgreSharedPtr.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -268,5 +269,6 @@ namespace Ogre {
 
 } // namespace Ogre
 
+#include "OgreHeaderSuffix.h"
 
 #endif // __ControllerManager_H__

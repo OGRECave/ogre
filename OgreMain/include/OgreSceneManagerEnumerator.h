@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreSceneManager.h"
 #include "OgreSingleton.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     
@@ -201,5 +202,6 @@ namespace Ogre {
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef __WIN32ERRORDIALOG_H__
 #define __WIN32ERRORDIALOG_H__
 
+#include "OgreHeaderPrefix.h"
 
 #define WIN32_LEAN_AND_MEAN
 #if !defined(NOMINMAX) && defined(_MSC_VER)
@@ -76,5 +77,6 @@ namespace Ogre
     /** @} */
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

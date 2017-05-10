@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgrePlane.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -1483,5 +1484,6 @@ namespace Ogre
     /** @} */
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

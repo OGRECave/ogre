@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreMesh.h"
 #include "OgreMaterial.h"
 
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -128,5 +129,6 @@ namespace Ogre {
 
 } // namespace
 
+#include "OgreHeaderSuffix.h"
 
 #endif

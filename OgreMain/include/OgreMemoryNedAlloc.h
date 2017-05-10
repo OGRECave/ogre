@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NED
 
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -135,6 +136,7 @@ namespace Ogre
 
 }// namespace Ogre
 
+#include "OgreHeaderSuffix.h"
 
 #endif 
 

@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
+#include "OgreHeaderPrefix.h"
 #include "Threading/OgreThreadHeaders.h"
 
 // Forward declaration for zziplib to avoid header file dependency.
@@ -197,5 +198,6 @@ namespace Ogre {
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

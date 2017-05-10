@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __AnimationTrack_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreHeaderPrefix.h"
 #include "OgreSimpleSpline.h"
 #include "OgreRotationalSpline.h"
 #include "OgrePose.h"
@@ -578,5 +579,6 @@ namespace Ogre
     /** @} */
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

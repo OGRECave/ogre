@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreSharedPtr.h"
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -581,6 +582,7 @@ namespace Ogre
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif
 

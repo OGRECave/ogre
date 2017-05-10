@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "Threading/OgreThreadHeaders.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -573,6 +574,7 @@ namespace Ogre {
     /** @} */
 } // namespace Ogre
 
+#include "OgreHeaderSuffix.h"
 
 #endif // __HardwareBufferManager__
 

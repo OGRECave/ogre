@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreQuaternion.h"
 #include "OgreAny.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre 
 {
@@ -251,6 +252,7 @@ namespace Ogre
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif
 

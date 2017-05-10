@@ -1,11 +1,10 @@
-/*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+/*-------------------------------------------------------------------------
+This source file is a part of OGRE
+(Object-oriented Graphics Rendering Engine)
+
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -22,41 +21,29 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
-*/
+THE SOFTWARE
+-------------------------------------------------------------------------*/
+// ATTENTION: No header guard as this header is meant to be included
+// multiple times.
+//#ifndef __OgreHeaderPrefix_H__
+//#define __OgreHeaderPrefix_H__
 
-#ifndef __SCRIPTPARSER_H_
-#define __SCRIPTPARSER_H_
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
 
-#include "OgrePrerequisites.h"
-#include "OgreScriptCompiler.h"
-#include "OgreScriptLexer.h"
-#include "OgreHeaderPrefix.h"
+// Save warnings state
+#   pragma warning (push)
 
-namespace Ogre {
+// disable: "<type> needs to have dll-interface to be used by clients'
+// Happens on STL member variables which are not public therefore is ok
+#   pragma warning (disable : 4251)
 
-    /** \addtogroup Core
-    *  @{
-    */
-    /** \addtogroup General
-    *  @{
-    */
-
-    class _OgreExport ScriptParser : public ScriptCompilerAlloc
-    {
-    public:
-        static ConcreteNodeListPtr parse(const ScriptTokenListPtr &tokens);
-        static ConcreteNodeListPtr parseChunk(const ScriptTokenListPtr &tokens);
-    private:
-        static ScriptToken *getToken(ScriptTokenList::iterator i, ScriptTokenList::iterator end, int offset);
-        static ScriptTokenList::iterator skipNewlines(ScriptTokenList::iterator i, ScriptTokenList::iterator end);
-    };
-    
-    /** @} */
-    /** @} */
-}
-
-#include "OgreHeaderSuffix.h"
+// disable: "non dll-interface class used as base for dll-interface class"
+// Happens when deriving from std::exception
+#   pragma warning (disable : 4275)
 
 #endif
+
+
+//#endif
+
+

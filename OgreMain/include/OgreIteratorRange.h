@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef __Ogre_Iterator_Range_H__
 #define __Ogre_Iterator_Range_H__
 
+#include "OgreHeaderPrefix.h"
 namespace Ogre {
 
 /** 
@@ -306,6 +307,7 @@ struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
     
 };
 
+#include "OgreHeaderSuffix.h"
 
 }
 #endif
