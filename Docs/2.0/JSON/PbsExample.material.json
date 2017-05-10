@@ -58,6 +58,7 @@
             "alpha_test" : ["disabled", 0.5],
             "shadow_const_bias" : 0.01,
             "two_sided"  :  false,
+            "receive_shadows"	:	true,
 
             "workflow" : "specular_fresnel",
 

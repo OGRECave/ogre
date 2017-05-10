@@ -281,6 +281,10 @@ namespace Ogre
                                                pbsDatablock->getMacroblock(true)->mCullMode );
         }
 
+        itor = json.FindMember( "receive_shadows" );
+        if( itor != json.MemberEnd() && itor->value.IsBool() )
+            pbsDatablock->setReceiveShadows( itor->value.GetBool() );
+
         itor = json.FindMember("transparency");
         if( itor != json.MemberEnd() && itor->value.IsObject() )
         {
@@ -688,6 +692,9 @@ namespace Ogre
 
         if( pbsDatablock->getTwoSidedLighting() )
             outString += ",\n\t\t\t\"two_sided\" : true";
+
+        if( !pbsDatablock->getReceiveShadows() )
+            outString += ",\n\t\t\t\"receive_shadows\" : false";
 
         if( pbsDatablock->getTransparencyMode() != HlmsPbsDatablock::None )
         {

@@ -62,6 +62,7 @@ namespace Ogre
         mTwoSided( false ),
         mUseAlphaFromTextures( true ),
         mWorkflow( SpecularWorkflow ),
+        mReceiveShadows( true ),
         mTransparencyMode( None ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         _padding0( 1 ),
@@ -988,6 +989,20 @@ namespace Ogre
         scheduleConstBufferUpdate();
         if( mustFlush )
             flushRenderables();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setReceiveShadows( bool receiveShadows )
+    {
+        if( mReceiveShadows != receiveShadows )
+        {
+            mReceiveShadows = receiveShadows;
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsPbsDatablock::getReceiveShadows(void) const
+    {
+        return mReceiveShadows;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setCubemapProbe( CubemapProbe *probe )

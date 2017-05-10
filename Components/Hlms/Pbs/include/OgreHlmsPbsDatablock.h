@@ -179,6 +179,7 @@ namespace Ogre
         bool    mTwoSided;
         bool    mUseAlphaFromTextures;
         uint8	mWorkflow;
+        bool    mReceiveShadows;
         TransparencyModes mTransparencyMode;
 
         float	mBgDiffuse[4];
@@ -584,6 +585,18 @@ namespace Ogre
         float getTransparency(void) const                           { return mTransparencyValue; }
         TransparencyModes getTransparencyMode(void) const           { return mTransparencyMode; }
         bool getUseAlphaFromTextures(void) const                    { return mUseAlphaFromTextures; }
+
+        /** When false, objects with this material will not receive shadows (independent of
+            whether they case shadows or not)
+        @remarks
+            Changing this parameter will cause a flushRenderables
+            Shadow casting lights (which are normally processed in a Forward way)
+            will still lit the object, it just won't have shadows in it.
+        @param receiveShadows
+            Whether to enable or disable receiving shadows.
+        */
+        void setReceiveShadows( bool receiveShadows );
+        bool getReceiveShadows(void) const;
 
         /** Manually set a probe to affect this particular material.
         @remarks

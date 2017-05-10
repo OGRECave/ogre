@@ -92,6 +92,7 @@ namespace Ogre
     const IdString PbsProperty::FresnelWorkflow   = IdString( "fresnel_workflow" );
     const IdString PbsProperty::MetallicWorkflow  = IdString( "metallic_workflow" );
     const IdString PbsProperty::TwoSidedLighting  = IdString( "two_sided_lighting" );
+    const IdString PbsProperty::ReceiveShadows    = IdString( "receive_shadows" );
 
     const IdString PbsProperty::NormalWeight          = IdString( "normal_weight" );
     const IdString PbsProperty::NormalWeightTex       = IdString( "normal_weight_tex" );
@@ -517,6 +518,9 @@ namespace Ogre
 
         if( datablock->getTwoSidedLighting() )
             setProperty( PbsProperty::TwoSidedLighting, 1 );
+
+        if( datablock->getReceiveShadows() )
+            setProperty( PbsProperty::ReceiveShadows, 1 );
 
         uint32 brdf = datablock->getBrdf();
         if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::Default )
