@@ -308,10 +308,10 @@ namespace Ogre {
         /// @deprecated use get() instead
         OGRE_DEPRECATED T* getPointer() const { return pRep; }
 
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1800
         explicit operator bool() const
         {
-            return pRep == 0 ? false : true;
+            return pRep != 0;
         }
 #else
         static void unspecified_bool( SharedPtr*** )
