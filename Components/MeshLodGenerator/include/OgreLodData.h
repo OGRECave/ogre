@@ -33,6 +33,7 @@
 #include "OgreVectorSet.h"
 #include "OgreVectorSetImpl.h"
 #include "OgreVector3.h"
+#include "OgreHeaderPrefix.h"
 
 #ifndef MESHLOD_QUALITY
 /// MESHLOD_QUALITY=1 is fastest processing time.
@@ -174,4 +175,7 @@ struct _OgreLodExport LodData {
 /** @} */
 /** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

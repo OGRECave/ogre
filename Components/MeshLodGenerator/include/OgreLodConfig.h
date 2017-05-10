@@ -31,6 +31,7 @@
 
 #include "OgreLodPrerequisites.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -168,4 +169,7 @@ struct _OgreLodExport LodConfig {
 /** @} */
 /** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

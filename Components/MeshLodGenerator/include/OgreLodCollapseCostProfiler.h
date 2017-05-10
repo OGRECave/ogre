@@ -34,6 +34,7 @@
 #include "OgreLodCollapseCost.h"
 #include "OgreLodData.h"
 #include "OgreLodConfig.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -68,6 +69,7 @@ protected:
 };
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif
-
-

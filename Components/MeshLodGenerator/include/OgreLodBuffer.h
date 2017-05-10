@@ -31,6 +31,7 @@
 
 #include "OgreLodPrerequisites.h"
 #include "OgreSharedPtr.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -82,4 +83,7 @@ struct _OgreLodExport LodOutputBuffer {
 /** @} */
 /** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

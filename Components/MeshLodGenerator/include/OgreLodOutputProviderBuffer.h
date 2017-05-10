@@ -33,6 +33,7 @@
 #include "OgreLodPrerequisites.h"
 #include "OgreLodOutputProvider.h"
 #include "OgreLodBuffer.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -54,6 +55,7 @@ protected:
 };
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif
-
-

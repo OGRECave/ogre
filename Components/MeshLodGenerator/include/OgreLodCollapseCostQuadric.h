@@ -34,6 +34,7 @@
 #include "OgreLodCollapseCost.h"
 #include "OgreLodData.h"
 #include "OgreMatrix4.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -57,6 +58,9 @@ protected:
 };
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif
 
 

@@ -36,6 +36,7 @@
 #include "OgreSharedPtr.h"
 #include "OgreLogManager.h"
 #include "OgreRenderOperation.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -137,6 +138,9 @@ protected:
 };
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif
 
 

@@ -36,6 +36,7 @@
 #include "OgreLodOutputProvider.h"
 #include "OgreLodCollapseCost.h"
 #include "OgreLodCollapser.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -49,4 +50,7 @@ struct _OgreLodExport LodWorkQueueRequest {
 };
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

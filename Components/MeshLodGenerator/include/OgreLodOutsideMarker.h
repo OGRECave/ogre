@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreLodPrerequisites.h"
 #include "OgreLodData.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -127,5 +128,7 @@ private:
 /** @} */
 /** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif /* ifndef __OutsideMarker_H__ */
