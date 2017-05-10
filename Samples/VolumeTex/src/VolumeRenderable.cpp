@@ -75,7 +75,11 @@ void VolumeRenderable::_notifyCurrentCamera( Camera* cam )
     Matrix4 rotMat = Matrix4::IDENTITY;
     rotMat = tempMat;
     rotMat.setTrans(Vector3(0.5f, 0.5f, 0.5f));
-    mUnit->setTextureTransform(rotMat);
+
+    // RTSS creates and switches to a second technique
+    Pass* pass = mMaterial->getTechniques().size() == 1 ? mMaterial->getTechnique(0)->getPass(0)
+                                                        : mMaterial->getBestTechnique()->getPass(0);
+    pass->getTextureUnitState(0)->setTextureTransform(rotMat);
 }
 
 
@@ -216,7 +220,6 @@ void VolumeRenderable::initialise()
     textureUnit->setTextureName(mTexture, TEX_TYPE_3D);
     textureUnit->setTextureFiltering(TFO_TRILINEAR);
     
-    mUnit = textureUnit;
     mMaterial = material;
 }
 
