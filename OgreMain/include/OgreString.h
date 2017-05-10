@@ -62,6 +62,8 @@ namespace __gnu_cxx
 #   define strtod_l _strtod_l
 #   define strtoul_l _strtoul_l
 #   define strtol_l _strtol_l
+#   define stricmp _stricmp
+#   define strnicmp _strnicmp
 #else
 #   define stricmp strcasecmp
 #   define strnicmp strncasecmp
