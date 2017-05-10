@@ -28,7 +28,7 @@ THE SOFTWARE
 //#ifndef __OgreHeaderSuffix_H__
 //#define __OgreHeaderSuffix_H__
 
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
 
 // restore previous warnings settings
 #   pragma warning (pop)

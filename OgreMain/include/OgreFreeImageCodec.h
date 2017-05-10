@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _FreeImageCodec_H__
 
 #include "OgreImageCodec.h"
+#include "OgreHeaderPrefix.h"
 // Forward-declaration to avoid external dependency on FreeImage
 struct FIBITMAP;
 
@@ -83,5 +84,7 @@ namespace Ogre {
     /** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

@@ -484,7 +484,7 @@ namespace Ogre {
             // Don't trim whitespace
             cfg.load(mConfigFileName, "\t:=", false);
         }
-        catch (FileNotFoundException& e)
+        catch (FileNotFoundException&)
         {
             return false;
         }

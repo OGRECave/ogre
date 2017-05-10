@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreRenderSystemCapabilities.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -702,4 +703,7 @@ namespace Ogre {
     /** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

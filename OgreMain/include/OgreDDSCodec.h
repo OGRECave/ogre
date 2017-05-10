@@ -29,6 +29,8 @@ THE SOFTWARE.
 #define __OgreDDSCodec_H__
 
 #include "OgreImageCodec.h"
+#include "OgreHeaderPrefix.h"
+
 namespace Ogre {
     /** \addtogroup Core
     *  @{
@@ -94,6 +96,8 @@ namespace Ogre {
     /** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif
 

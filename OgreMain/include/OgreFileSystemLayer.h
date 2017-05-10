@@ -30,6 +30,7 @@
 
 #include "OgrePrerequisites.h"
 #include "OgreStringVector.h"
+#include "OgreHeaderPrefix.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
@@ -167,5 +168,6 @@ namespace Ogre
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

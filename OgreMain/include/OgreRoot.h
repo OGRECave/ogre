@@ -38,6 +38,7 @@ THE SOFTWARE.
 #endif
 
 #include <exception>
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -1081,4 +1082,7 @@ namespace Ogre
     /** @} */
     /** @} */
 } // Namespace Ogre
+
+#include "OgreHeaderSuffix.h"
+
 #endif

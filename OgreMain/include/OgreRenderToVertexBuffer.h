@@ -30,6 +30,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgrePrerequisites.h"
 #include "OgreRenderOperation.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -146,5 +147,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

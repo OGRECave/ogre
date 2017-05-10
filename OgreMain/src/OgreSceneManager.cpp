@@ -4764,7 +4764,7 @@ void SceneManager::initShadowVolumeMaterials(void)
                     mInfiniteExtrusionParams->setNamedAutoConstant(
                         "light_position_object_space",
                         GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE);
-                } catch(InvalidParametersException& e) {} // ignore
+                } catch(InvalidParametersException&) {} // ignore
             }   
             matDebug->compile();
 
@@ -4821,7 +4821,7 @@ void SceneManager::initShadowVolumeMaterials(void)
                     mFiniteExtrusionParams->setNamedAutoConstant(
                         "shadow_extrusion_distance",
                         GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE);
-                } catch(InvalidParametersException& e) {} // ignore
+                } catch(InvalidParametersException&) {} // ignore
             }
             matStencil->compile();
             // Nothing else, we don't use this like a 'real' pass anyway,

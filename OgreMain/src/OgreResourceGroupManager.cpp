@@ -1582,7 +1582,7 @@ namespace Ogre {
                 "ResourceGroupManager::resourceExists");
         }
 
-        return resourceExists(grp, resourceName);
+        return resourceExists(grp, resourceName) != 0;
     }
     //-----------------------------------------------------------------------
     Archive* ResourceGroupManager::resourceExists(ResourceGroup* grp, const String& resourceName) const
@@ -1671,7 +1671,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::resourceExistsInAnyGroup(const String& filename) const
     {
-        return resourceExistsInAnyGroupImpl(filename).first;
+        return resourceExistsInAnyGroupImpl(filename).first != 0;
     }
     //-----------------------------------------------------------------------
     const String& ResourceGroupManager::findGroupContainingResource(const String& filename) const

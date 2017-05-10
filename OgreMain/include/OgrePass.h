@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreTextureUnitState.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -1853,5 +1854,7 @@ namespace Ogre {
     /** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

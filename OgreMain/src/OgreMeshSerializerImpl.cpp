@@ -928,7 +928,7 @@ namespace Ogre {
                     try {
                         readGeometry(stream, pMesh, pMesh->sharedVertexData);
                     }
-                    catch (ItemIdentityException& e)
+                    catch (ItemIdentityException&)
                     {
                         // duff geometry data entry with 0 vertices
                         OGRE_DELETE pMesh->sharedVertexData;
