@@ -33,7 +33,7 @@ if(NOT APPLE)
 endif()
 
 ogre_add_library_to_folder(RenderSystems RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL3Plus OgreMain ${OPENGL_LIBRARIES} ${GLSUPPORT_LIBS})
+target_link_libraries(RenderSystem_GL3Plus OgreMain ${GLSUPPORT_LIBS} ${OPENGL_LIBRARIES})
 
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_GL3Plus ${OGRE_THREAD_LIBRARIES})
