@@ -74,7 +74,7 @@ include_directories(
 )
 
 ogre_add_library_to_folder(RenderSystems RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} SEPARATE ${GLSLES_FILES})
-target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES3_LIBRARIES} ${OPENGLES2_LIBRARIES} ${GLSUPPORT_LIBS})
+target_link_libraries(RenderSystem_GLES2 OgreMain ${GLSUPPORT_LIBS} ${OPENGLES3_LIBRARIES} ${OPENGLES2_LIBRARIES})
 
 if (NOT OGRE_STATIC)
   set_target_properties(RenderSystem_GLES2 PROPERTIES
