@@ -131,22 +131,22 @@ namespace Ogre
             VertexElement2Vec::const_iterator itElements = elements.begin();
             VertexElement2Vec::const_iterator enElements = elements.end();
 
-            while( itElements != enElements && itElements->mSemantic != semantic )
+            while( itElements != enElements && matchFoundCount <= repeat )
             {
-                accumOffset += v1::VertexElement::getTypeSize( itElements->mType );
-                ++itElements;
+                if( itElements->mSemantic == semantic )
+                    ++matchFoundCount;
+                if( matchFoundCount <= repeat )
+                {
+                    accumOffset += v1::VertexElement::getTypeSize( itElements->mType );
+                    ++itElements;
+                }
             }
 
-            if( itElements != enElements && itElements->mSemantic == semantic )
+            if( itElements != enElements )
             {
-                if( matchFoundCount >= repeat )
-                {
-                    outIndex = itBuffers - mVertexBuffers.begin();
-                    outOffset = accumOffset;
-                    retVal = &(*itElements);
-                }
-
-                ++matchFoundCount;
+                outIndex = itBuffers - mVertexBuffers.begin();
+                outOffset = accumOffset;
+                retVal = &(*itElements);
             }
 
             ++itBuffers;
