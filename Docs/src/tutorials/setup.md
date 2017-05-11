@@ -3,13 +3,7 @@
 # CMake Configuration {#cmake}
 Ogre uses CMake as its build system. It is recommended that you use it in your project as well.  
 Then all you need is to add the following three lines to your project
-```php
-# specify which version you need
-find_package(OGRE 1.10 REQUIRED)
-# the search paths
-include_directories(${OGRE_INCLUDE_DIRS})
-link_directories(${OGRE_LIBRARY_DIRS})
-```
+@snippet Samples/Bootstrap/CMakeLists.txt discover_ogre
 These settings include all available components and third party libraries OGRE depends on (e.g. boost) - nothing more to do.
 
 If you installed OGRE in a non-standard path, you will have to set `OGRE_DIR` to the location of `OGREConfig.cmake` so `find_package` can figure out the rest.
@@ -36,67 +30,16 @@ class MyTestApp : public OgreBites::ApplicationContext, public OgreBites::InputL
 }
 ```
 in the constructor we register ourself as a InputListener
-```cpp
-MyTestApp() : OgreBites::ApplicationContext("MyTestApp")
-{
-    addInputListener(this);
-}
-```
+@snippet Samples/Bootstrap/main.cpp constructor
+
 to handle input events, we then override the according method
-```cpp
-bool MyTestApp::keyPressed(const OgreBites::KeyboardEvent& evt)
-{
-	if (evt.keysym.sym == SDLK_ESCAPE)
-	{
-		getRoot()->queueEndRendering();
-	}
+@snippet Samples/Bootstrap/main.cpp key_handler
 
-	return true;
-}
-```
 the interesting part however is the setup method
-```cpp
-void MyTestApp::setup(void)
-{
-    // do not forget to call the base first
-	OgreBites::ApplicationContext::setup();
+@snippet Samples/Bootstrap/main.cpp setup
 
-    // get a pointer to the already created root
-	Ogre::Root* root = getRoot();
-	Ogre::SceneManager* scnMgr = root->createSceneManager(Ogre::ST_GENERIC);
-
-    // register our scene with the RTSS
-	Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-	shadergen->addSceneManager(scnMgr);
-    
-    // without light we would just get a black screen    
-    Ogre::Light* light = scnMgr->createLight("MainLight");
-    light->setPosition(0, 10, 15);
-    
-    // also need to tell where we are
-    Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-    camNode->setPosition(0, 0, 15);
-    camNode->lookAt(Ogre::Vector3(0, 0, -1), Ogre::Node::TS_PARENT);
-    
-    // the actual camera
-    Ogre::Camera* cam = scnMgr->createCamera("myCam");
-    cam->setNearClipDistance(5); // specific to this sample
-    camNode->attachObject(camNode);
-    
-    // finally something to render
-    Ogre::Entity* ent = scnMgr->createEntity("Sinbad.mesh");
-    Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
-    node->attachObject(ent);
-}
-```
 finally we start everything as
-```cpp
-int main(void)
-{
-	MyTestApp app;
-	app.initApp();
-	app.getRoot()->startRendering();
-	app.closeApp();
-}
-```
+@snippet Samples/Bootstrap/main.cpp main
+@note you can find the full code in `Samples/Bootstrap`.
+
 OgreBites itself is also a good starting point if you want to do more sophisticated things like embedding OGRE into a Qt application or similar.
