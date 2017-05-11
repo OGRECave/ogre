@@ -128,57 +128,42 @@ namespace Ogre {
 
         }
 
-        if (!result.second)
+        // Attempt to resolve the collision
+        ResourceLoadingListener* listener = ResourceGroupManager::getSingleton().getLoadingListener();
+        if (!result.second && listener)
         {
-            // Attempt to resolve the collision
-            if(ResourceGroupManager::getSingleton().getLoadingListener())
+            if(listener->resourceCollision(res.get(), this) == false)
             {
-                if(ResourceGroupManager::getSingleton().getLoadingListener()->resourceCollision(res.get(), this))
-                {
-                    // Try to do the addition again, no seconds attempts to resolve collisions are allowed
-                    std::pair<ResourceMap::iterator, bool> insertResult;
-                    if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
-                    {
-                        insertResult = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
-                    }
-                    else
-                    {
-                        ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
-                        insertResult = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
-                    }
-                    if (!insertResult.second)
-                    {
-                        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() + 
-                            " already exists.", "ResourceManager::add");
-                    }
+                // explicitly use previous instance
+                return;
+            }
 
-                    std::pair<ResourceHandleMap::iterator, bool> resultHandle = 
-                        mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
-                    if (!resultHandle.second)
-                    {
-                        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " + 
-                            StringConverter::toString((long) (res->getHandle())) + 
-                            " already exists.", "ResourceManager::add");
-                    }
-                }
+            // Try to do the addition again, no seconds attempts to resolve collisions are allowed
+            if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
+            {
+                result = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
             }
             else
             {
-                OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() +
-                    " already exists.", "ResourceManager::add");
+                ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
+                result = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
             }
         }
-        else
+
+        if (!result.second)
         {
-            // Insert the handle
-            std::pair<ResourceHandleMap::iterator, bool> resultHandle = 
-                mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
-            if (!resultHandle.second)
-            {
-                OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " + 
-                    StringConverter::toString((long) (res->getHandle())) + 
-                    " already exists.", "ResourceManager::add");
-            }
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() +
+                " already exists.", "ResourceManager::add");
+        }
+
+        // Insert the handle
+        std::pair<ResourceHandleMap::iterator, bool> resultHandle =
+            mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
+        if (!resultHandle.second)
+        {
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " +
+                StringConverter::toString((long) (res->getHandle())) +
+                " already exists.", "ResourceManager::add");
         }
     }
     //-----------------------------------------------------------------------

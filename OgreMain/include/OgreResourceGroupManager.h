@@ -206,6 +206,8 @@ namespace Ogre {
         virtual void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) = 0;
 
         /** This event is called when a resource collides with another existing one in a resource manager
+
+            return false to skip registration of the conflicting resource and continue using the previous instance.
           */
         virtual bool resourceCollision(Resource *resource, ResourceManager *resourceManager) = 0;
     };
