@@ -1,5 +1,11 @@
 @property( hlms_forwardplus )
+@property( hlms_forwardplus_fine_light_mask )
+	@piece( andObjLightMaskCmp )&& ((inPs.objLightMask & as_type<uint>( lightDiffuse.w )) != 0u)@end
+@end
 @piece( forward3dLighting )
+	@property( hlms_forwardplus_fine_light_mask )
+		uint objLightMask = instance.worldMaterialIdx[inPs.drawId].z;
+	@end
 	@property( hlms_forwardplus == forward3d )
 		float f3dMinDistance	= passBuf.f3dData.x;
 		float f3dInvMaxDistance	= passBuf.f3dData.y;
@@ -59,7 +65,11 @@
 		//Get the light
 		float4 posAndType = f3dLightList[int(idx)];
 
+	@property( !hlms_forwardplus_fine_light_mask )
 		float3 lightDiffuse	= f3dLightList[int(idx + 1u)].xyz;
+	@end @property( hlms_forwardplus_fine_light_mask )
+		float4 lightDiffuse	= f3dLightList[int(idx + 1u)].xyzw;
+	@end
 		float3 lightSpecular= f3dLightList[int(idx + 2u)].xyz;
 		float4 attenuation	= f3dLightList[int(idx + 3u)].xyzw;
 
@@ -75,7 +85,7 @@
 			@end
 
 			//Point light
-			float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular,
+			float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse.xyz, lightSpecular,
 									 material, nNormal @insertpiece( brdfExtraParams ) );
 			finalColour += tmpColour * atten;
 		}
@@ -94,7 +104,11 @@
 		//Get the light
 		float4 posAndType = f3dLightList[int(idx)];
 
+	@property( !hlms_forwardplus_fine_light_mask )
 		float3 lightDiffuse	= f3dLightList[int(idx + 1u)].xyz;
+	@end @property( hlms_forwardplus_fine_light_mask )
+		float4 lightDiffuse	= f3dLightList[int(idx + 1u)].xyzw;
+	@end
 		float3 lightSpecular= f3dLightList[int(idx + 2u)].xyz;
 		float4 attenuation	= f3dLightList[int(idx + 3u)].xyzw;
 		float3 spotDirection= f3dLightList[int(idx + 4u)].xyz;
@@ -124,7 +138,7 @@
 
 			if( spotCosAngle >= spotParams.y )
 			{
-				float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular,
+				float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse.xyz, lightSpecular,
 										 material, nNormal @insertpiece( brdfExtraParams ) );
 				finalColour += tmpColour * atten;
 			}

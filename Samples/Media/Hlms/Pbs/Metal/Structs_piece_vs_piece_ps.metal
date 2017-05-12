@@ -174,6 +174,9 @@ struct Material
 		@property( !lower_gpu_overhead )
 			ushort materialId [[flat]];
 		@end
+		@property( hlms_forwardplus_fine_light_mask )
+			uint objLightMask [[flat]];
+		@end
 		@property( hlms_normal || hlms_qtangent )
 			float3 pos;
 			float3 normal;
