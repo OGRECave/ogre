@@ -114,11 +114,11 @@
 		//Get the light
 		vec4 posAndType = texelFetch( f3dLightList, int(idx) );
 
-		@property( !hlms_forwardplus_fine_light_mask )
-			vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyz;
-		@end @property( hlms_forwardplus_fine_light_mask )
-			vec4 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyzw;
-		@end
+	@property( !hlms_forwardplus_fine_light_mask )
+		vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyz;
+	@end @property( hlms_forwardplus_fine_light_mask )
+		vec4 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyzw;
+	@end
 		vec3 lightSpecular	= texelFetch( f3dLightList, int(idx + 2u) ).xyz;
 		vec4 attenuation	= texelFetch( f3dLightList, int(idx + 3u) ).xyzw;
 		vec3 spotDirection	= texelFetch( f3dLightList, int(idx + 4u) ).xyz;
