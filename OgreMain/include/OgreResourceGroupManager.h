@@ -425,6 +425,12 @@ namespace Ogre {
          */
         Archive* resourceExists(ResourceGroup* group, const String& filename) const;
 
+        /** Open resource with optional searching in other groups if it is not found. Internal use only */
+        DataStreamPtr openResourceImpl(const String& resourceName,
+            const String& groupName,
+            bool searchGroupsIfNotFound,
+            Resource* resourceBeingLoaded) const;
+
         /// Stored current group - optimisation for when bulk loading a group
         ResourceGroup* mCurrentGroup;
     public:
@@ -739,7 +745,10 @@ namespace Ogre {
         */
         DataStreamPtr openResource(const String& resourceName,
                                    const String& groupName = DEFAULT_RESOURCE_GROUP_NAME,
-                                   Resource* resourceBeingLoaded = NULL) const;
+                                   Resource* resourceBeingLoaded = NULL) const
+        {
+            return openResourceImpl(resourceName, groupName, false, resourceBeingLoaded);
+        }
 
         /// @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
         OGRE_DEPRECATED DataStreamPtr openResource(const String& resourceName,
@@ -747,9 +756,7 @@ namespace Ogre {
                                                    bool searchGroupsIfNotFound,
                                                    Resource* resourceBeingLoaded = 0) const
         {
-            return openResource(resourceName,
-                                searchGroupsIfNotFound ? AUTODETECT_RESOURCE_GROUP_NAME : groupName,
-                                resourceBeingLoaded);
+            return openResourceImpl(resourceName, groupName, searchGroupsIfNotFound, resourceBeingLoaded);
         }
 
         /** Open all resources matching a given pattern (which can contain

@@ -657,8 +657,9 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    DataStreamPtr ResourceGroupManager::openResource(const String& resourceName,
+    DataStreamPtr ResourceGroupManager::openResourceImpl(const String& resourceName,
                                                      const String& groupName,
+                                                     bool searchGroupsIfNotFound,
                                                      Resource* resourceBeingLoaded) const
     {
         OgreAssert(!resourceName.empty(), "resourceName is empty string");
@@ -679,10 +680,11 @@ namespace Ogre {
                 "ResourceGroupManager::openResource");
         }
 
-        Archive* pArch = NULL;
+        Archive* pArch = resourceExists(grp, resourceName);
 
-        if (groupName == AUTODETECT_RESOURCE_GROUP_NAME || grp->inGlobalPool ||
-            (!OGRE_RESOURCEMANAGER_STRICT && (groupName == DEFAULT_RESOURCE_GROUP_NAME)))
+        if (pArch == NULL && (searchGroupsIfNotFound ||
+            groupName == AUTODETECT_RESOURCE_GROUP_NAME || grp->inGlobalPool ||
+            (!OGRE_RESOURCEMANAGER_STRICT && (groupName == DEFAULT_RESOURCE_GROUP_NAME))))
         {
             std::pair<Archive*, ResourceGroup*> ret = resourceExistsInAnyGroupImpl(resourceName);
 
@@ -691,8 +693,6 @@ namespace Ogre {
             }
 
             pArch = ret.first;
-        } else {
-            pArch = resourceExists(grp, resourceName);
         }
 
         if (pArch)
