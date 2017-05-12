@@ -1,5 +1,11 @@
 @property( hlms_forwardplus )
+@property( hlms_forwardplus_fine_light_mask )
+	@piece( andObjLightMaskCmp )&& ((objLightMask & floatBitsToUint( lightDiffuse.w )) != 0u)@end
+@end
 @piece( forward3dLighting )
+	@property( hlms_forwardplus_fine_light_mask )
+		uint objLightMask = instance.worldMaterialIdx[inPs.drawId].z;
+	@end
 	@property( hlms_forwardplus == forward3d )
 		float f3dMinDistance	= passBuf.f3dData.x;
 		float f3dInvMaxDistance	= passBuf.f3dData.y;
@@ -70,14 +76,18 @@
 		//Get the light
 		vec4 posAndType = texelFetch( f3dLightList, int(idx) );
 
+	@property( !hlms_forwardplus_fine_light_mask )
 		vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyz;
+	@end @property( hlms_forwardplus_fine_light_mask )
+		vec4 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyzw;
+	@end
 		vec3 lightSpecular	= texelFetch( f3dLightList, int(idx + 2u) ).xyz;
 		vec4 attenuation	= texelFetch( f3dLightList, int(idx + 3u) ).xyzw;
 
 		vec3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
 
-		if( fDistance <= attenuation.x )
+		if( fDistance <= attenuation.x @insertpiece( andObjLightMaskCmp ) )
 		{
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
@@ -86,7 +96,7 @@
 			@end
 
 			//Point light
-			vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
+			vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse.xyz, lightSpecular );
 			finalColour += tmpColour * atten;
 		}
 	}
@@ -104,7 +114,11 @@
 		//Get the light
 		vec4 posAndType = texelFetch( f3dLightList, int(idx) );
 
-		vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyz;
+		@property( !hlms_forwardplus_fine_light_mask )
+			vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyz;
+		@end @property( hlms_forwardplus_fine_light_mask )
+			vec4 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyzw;
+		@end
 		vec3 lightSpecular	= texelFetch( f3dLightList, int(idx + 2u) ).xyz;
 		vec4 attenuation	= texelFetch( f3dLightList, int(idx + 3u) ).xyzw;
 		vec3 spotDirection	= texelFetch( f3dLightList, int(idx + 4u) ).xyz;
@@ -113,7 +127,7 @@
 		vec3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
 
-		if( fDistance <= attenuation.x )
+		if( fDistance <= attenuation.x @insertpiece( andObjLightMaskCmp ) )
 		{
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
@@ -134,7 +148,7 @@
 
 			if( spotCosAngle >= spotParams.y )
 			{
-				vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
+				vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse.xyz, lightSpecular );
 				finalColour += tmpColour * atten;
 			}
 		}

@@ -1741,6 +1741,9 @@ namespace Ogre
 
         *reinterpret_cast<float * RESTRICT_ALIAS>( currentMappedConstBuffer+1 ) = datablock->
                                                                                     mShadowConstantBias;
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+        *( currentMappedConstBuffer+2u ) = queuedRenderable.movableObject->getLightMask();
+#endif
         currentMappedConstBuffer += 4;
 
         //---------------------------------------------------------------------------

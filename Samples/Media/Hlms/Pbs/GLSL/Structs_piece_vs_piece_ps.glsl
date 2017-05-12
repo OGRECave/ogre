@@ -144,6 +144,9 @@ layout(binding = 2) uniform InstanceBuffer
     //shadowConstantBias. Send the bias directly to avoid an
     //unnecessary indirection during the shadow mapping pass.
     //Must be loaded with uintBitsToFloat
+    //
+    //.z =
+    //lightMask. Ogre must have been compiled with OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
     uvec4 worldMaterialIdx[4096];
 } instance;
 @end
