@@ -343,7 +343,7 @@
 @end
 
 @piece( DoShadowCastPS )
-	@property( !hlms_shadowcaster_point )
+	@property( (!hlms_shadow_uses_depth_texture || exponential_shadow_maps) && !hlms_shadowcaster_point )
 		outDepth = inPs.depth;
 	@end
 	@property( hlms_shadowcaster_point )
