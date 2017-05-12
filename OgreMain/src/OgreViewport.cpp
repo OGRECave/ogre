@@ -348,6 +348,12 @@ namespace Ogre {
         return mShowSkies;
     }
     //-----------------------------------------------------------------------
+    void Viewport::_setVisibilityMask( uint32 mask, uint32 lightMask )
+    {
+        mVisibilityMask = mask;
+        mLightVisibilityMask = lightMask;
+    }
+    //-----------------------------------------------------------------------
     void Viewport::setColourWrite( bool colourWrite )
     {
         if( !colourWrite )

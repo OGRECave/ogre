@@ -868,6 +868,7 @@ namespace Ogre
                     ID_CULL_CAMERA,
                     ID_MATERIAL_SCHEME,
                     ID_VISIBILITY_MASK,
+                    ID_LIGHT_VISIBILITY_MASK,
                     ID_SHADOWS_ENABLED,
                     ID_CAMERA,
                     ID_FIRST_RENDER_QUEUE,

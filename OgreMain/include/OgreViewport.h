@@ -297,12 +297,13 @@ namespace Ogre {
             Viewport's visibility mask assumes the user knows what he's doing
             with the reserved flags!
         */
-        void _setVisibilityMask(uint32 mask) { mVisibilityMask = mask; }
+        void _setVisibilityMask( uint32 mask, uint32 lightMask );
 
         /** Gets a per-viewport visibility mask.
         @see Viewport::setVisibilityMask
         */
-        uint getVisibilityMask(void) const { return mVisibilityMask; }
+        uint32 getVisibilityMask(void) const        { return mVisibilityMask; }
+        uint32 getLightVisibilityMask(void) const   { return mLightVisibilityMask; }
 
         void setColourWrite( bool colourWrite );
         bool getColourWrite(void) const;
@@ -357,6 +358,7 @@ namespace Ogre {
         bool mShowOverlays;
         bool mShowSkies;
         uint32 mVisibilityMask;
+        uint32 mLightVisibilityMask;
         /// Material scheme
         String mMaterialSchemeName;
         /// Viewport orientation mode
