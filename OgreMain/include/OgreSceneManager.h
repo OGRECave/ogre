@@ -163,6 +163,7 @@ namespace Ogre {
         bool                            casterPass;
         /// Whether we should immediately add to render queue v2 objects
         bool                            addToRenderQueue;
+        bool                            cullingLights;
         /** Memory manager of the objects to cull. Could contain all Lights, all Entity, etc.
             Could be more than one depending on the high level cull system (i.e. tree-based sys)
             Must be const (it is read only for all threads).
@@ -175,16 +176,16 @@ namespace Ogre {
 
         CullFrustumRequest() :
             firstRq( 0 ), lastRq( 0 ), casterPass( false ), addToRenderQueue( true ),
-            objectMemManager( 0 ), camera( 0 ), lodCamera( 0 )
+            cullingLights( false ), objectMemManager( 0 ), camera( 0 ), lodCamera( 0 )
         {
         }
         CullFrustumRequest( uint8 _firstRq, uint8 _lastRq, bool _casterPass,
-                            bool _addToRenderQueue,
+                            bool _addToRenderQueue, bool _cullingLights,
                             const ObjectMemoryManagerVec *_objectMemManager,
                             const Camera *_camera, const Camera *_lodCamera ) :
             firstRq( _firstRq ), lastRq( _lastRq ), casterPass( _casterPass ),
-            addToRenderQueue( _addToRenderQueue ), objectMemManager( _objectMemManager ),
-            camera( _camera ), lodCamera( _lodCamera )
+            addToRenderQueue( _addToRenderQueue ), cullingLights( _cullingLights ),
+            objectMemManager( _objectMemManager ), camera( _camera ), lodCamera( _lodCamera )
         {
         }
     };
@@ -200,7 +201,7 @@ namespace Ogre {
         UpdateLodRequest( uint8 _firstRq, uint8 _lastRq,
                             const ObjectMemoryManagerVec *_objectMemManager,
                             const Camera *_camera, const Camera *_lodCamera, Real _lodBias ) :
-            CullFrustumRequest( _firstRq, _lastRq, false, false,
+            CullFrustumRequest( _firstRq, _lastRq, false, false, false,
                                 _objectMemManager, _camera, _lodCamera ),
             lodBias( _lodBias )
         {

@@ -523,6 +523,16 @@ There are no significant changes to Ogre 1.x, except that the script
 compiler now accepts hexadecimal values with the 0x prefix; not just
 decimal values.
 
+-   light\_visibility\_mask \<number\>;
+
+Visibility mask to be used by the pass for culling lights in Forward+.
+Those entities that fail the test '*entityMask & light\_visibility\_mask*'
+will not be used as non-shadow-casting lights during this pass.
+This will give you a relatively efficient way to control with coarse
+granularity which lights affect which objects.
+Note that this uses the mask set via light->setVisibilityMask, not
+the one set via light->setLightMask.
+
 -   shadows \<off|shadow\_node\_name\>;
     \<reuse|recalculate|first\>;
 

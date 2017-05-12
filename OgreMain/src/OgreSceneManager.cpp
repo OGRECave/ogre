@@ -1049,7 +1049,7 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
             camera->_setRenderedRqs( realFirstRq, realLastRq );
 
             CullFrustumRequest cullRequest( realFirstRq, realLastRq,
-                                            mIlluminationStage == IRS_RENDER_TO_TEXTURE, true,
+                                            mIlluminationStage == IRS_RENDER_TO_TEXTURE, true, false,
                                             &mEntitiesMemoryManagerCulledList, camera, lodCamera );
             fireCullFrustumThreads( cullRequest );
         }
@@ -1211,7 +1211,7 @@ void SceneManager::cullLights( Camera *camera, Light::LightTypes startType,
                                Light::LightTypes endType, LightArray &outLights )
 {
     mVisibleObjects.swap( mTmpVisibleObjects );
-    CullFrustumRequest cullRequest( startType, endType, false, false,
+    CullFrustumRequest cullRequest( startType, endType, false, false, true,
                                     &mLightsMemoryManagerCulledList, camera, camera );
     fireCullFrustumThreads( cullRequest );
 
@@ -2242,6 +2242,13 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
 
     const Camera *camera    = request.camera;
     const Camera *lodCamera = request.lodCamera;
+
+    const uint32 visibilityMask = request.cullingLights ?
+                camera->getLastViewport()->getLightVisibilityMask() :
+                ((camera->getLastViewport()->getVisibilityMask() & this->getVisibilityMask()) |
+                 (camera->getLastViewport()->getVisibilityMask() &
+                                    ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS));
+
     ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
     ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
 
@@ -2273,11 +2280,8 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
             numObjs = std::min( numObjs, totalObjs - toAdvance );
             objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
-            MovableObject::cullFrustum( numObjs, objData, camera,
-                    (camera->getLastViewport()->getVisibilityMask() & getVisibilityMask()) |
-                    (camera->getLastViewport()->getVisibilityMask() &
-                                        ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
-                    outVisibleObjects, lodCamera );
+            MovableObject::cullFrustum( numObjs, objData, camera, visibilityMask,
+                                        outVisibleObjects, lodCamera );
 
             if( mRenderQueue->getRenderQueueMode(i) == RenderQueue::FAST && request.addToRenderQueue )
             {

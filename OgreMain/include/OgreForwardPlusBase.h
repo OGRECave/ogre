@@ -76,6 +76,7 @@ namespace Ogre
             bool                    reflection;
             /// Cameras can change their AR depending on the RTT they're rendering to.
             Real                    aspectRatio;
+            uint32                  visibilityMask;
             /// Cameras w/out shadows have a different light list from cameras that do.
             CompositorShadowNode const *shadowNode;
             /// Last frame this cache was updated.

@@ -73,6 +73,8 @@ namespace Ogre
     public:
         /// Viewport's visibility mask while rendering our pass
         uint32                  mVisibilityMask;
+        /// Used by Forward+ to determine which lights should be used (via Light::setVisibilityFlags)
+        uint32                  mLightVisibilityMask;
         IdString                mShadowNode;
         ShadowNodeRecalculation mShadowNodeRecalculation; //Only valid if mShadowNode is not empty
         /// When empty, uses the default camera.
@@ -138,6 +140,7 @@ namespace Ogre
         CompositorPassSceneDef( CompositorTargetDef *parentTargetDef ) :
             CompositorPassDef( PASS_SCENE, parentTargetDef ),
             mVisibilityMask( VisibilityFlags::RESERVED_VISIBILITY_FLAGS ),
+            mLightVisibilityMask( VisibilityFlags::RESERVED_VISIBILITY_FLAGS ),
             mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
             mPrePassMode( PrePassNone ),
             mFirstRQ( 0 ),
@@ -156,6 +159,11 @@ namespace Ogre
         void setVisibilityMask( uint32 visibilityMask )
         {
             mVisibilityMask = visibilityMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
+        }
+
+        void setLightVisibilityMask( uint32 visibilityMask )
+        {
+            mLightVisibilityMask = visibilityMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
         }
 
         void setUseDepthPrePass( IdString textureName, IdString depthTextureName, IdString ssrTexture )
