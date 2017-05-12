@@ -192,6 +192,9 @@ vertex PS_INPUT main_metal
 @property( (!hlms_shadowcaster || alpha_test) && !lower_gpu_overhead )
 	outVs.materialId = worldMaterialIdx[drawId].x & 0x1FFu;@end
 
+@property( hlms_forwardplus_fine_light_mask )
+	outVs.objLightMask = worldMaterialIdx[drawId].z;@end
+
 	@insertpiece( custom_vs_posExecution )
 
 	return outVs;
