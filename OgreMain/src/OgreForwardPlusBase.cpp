@@ -48,6 +48,9 @@ namespace Ogre
         mDebugMode( false ),
         mFadeAttenuationRange( true ),
         mEnableVpls( false )
+  #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+    ,   mFineLightMaskGranularity( true )
+  #endif
     {
     }
     //-----------------------------------------------------------------------------------
@@ -165,6 +168,9 @@ namespace Ogre
             *lightData++ = colour.r;
             *lightData++ = colour.g;
             *lightData++ = colour.b;
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+            *reinterpret_cast<uint32 * RESTRICT_ALIAS>( lightData ) = light->getLightMask();
+#endif
             ++lightData;
 
             //vec3 lights[numLights].specular
@@ -396,5 +402,10 @@ namespace Ogre
 
         if( mEnableVpls )
             hlms->_setProperty( HlmsBaseProp::EnableVpls, 1 );
+
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+        if( mFineLightMaskGranularity )
+            hlms->_setProperty( HlmsBaseProp::ForwardPlusFineLightMask, 1 );
+#endif
     }
 }
