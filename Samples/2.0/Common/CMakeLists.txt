@@ -29,6 +29,7 @@ add_recursive( ./include HEADER_FILES )
 ogre_add_component_include_dir(Hlms/Pbs)
 ogre_add_component_include_dir(Hlms/Unlit)
 ogre_add_component_include_dir(Hlms/Common)
+ogre_add_component_include_dir(Overlay)
 
 if( OGRE_STATIC )
 	# Static linking means we need to directly use plugins
