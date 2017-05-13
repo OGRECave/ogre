@@ -113,42 +113,44 @@ namespace Ogre {
         mPointAttenuation[1] = 0;
         mPointAttenuation[2] = 0;
     }
-    
+    void GL3PlusStateCacheManager::bindGLFrameBuffer(GLenum target, GLuint buffer, bool force)
+    {
+        // Update GL
+        glBindFramebuffer(target, buffer);
+    }
+    void GL3PlusStateCacheManager::bindGLRenderBuffer(GLuint buffer, bool force)
+    {
+        // Update GL
+        glBindRenderbuffer(GL_RENDERBUFFER, buffer);
+    }
     void GL3PlusStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         // Update GL
-        if(target == GL_FRAMEBUFFER)
-        {
-            glBindFramebuffer(target, buffer);
-        }
-        else if(target == GL_RENDERBUFFER)
-        {
-            glBindRenderbuffer(target, buffer);
-        }
-        else
-        {
-            glBindBuffer(target, buffer);
-        }
+        glBindBuffer(target, buffer);
     }
-    
-    void GL3PlusStateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
+    void GL3PlusStateCacheManager::deleteGLFrameBuffer(GLenum target, GLuint buffer)
+    {
+         // Buffer name 0 is reserved and we should never try to delete it
+        if(buffer == 0)
+            return;
+
+        glDeleteFramebuffers(1, &buffer);
+    }
+    void GL3PlusStateCacheManager::deleteGLRenderBuffer(GLuint buffer)
+    {
+         // Buffer name 0 is reserved and we should never try to delete it
+        if(buffer == 0)
+            return;
+
+        glDeleteRenderbuffers(1, &buffer);
+    }
+    void GL3PlusStateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
             return;
 
-        if(target == GL_FRAMEBUFFER)
-        {
-            glDeleteFramebuffers(1, &buffer);
-        }
-        else if(target == GL_RENDERBUFFER)
-        {
-            glDeleteRenderbuffers(1, &buffer);
-        }
-        else
-        {
-            glDeleteBuffers(1, &buffer);
-        }
+        glDeleteBuffers(1, &buffer);
     }
     
     void GL3PlusStateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)

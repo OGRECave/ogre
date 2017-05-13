@@ -86,6 +86,10 @@ namespace Ogre
         /// Stores the currently enabled texcoord generation types per texture unit
         OGRE_HashMap <GLenum, TexGenParams> mTextureCoordGen;
 
+        /// Stores the currently bound draw frame buffer value
+        GLuint mActiveDrawFrameBuffer;
+        /// Stores the currently bound read frame buffer value
+        GLuint mActiveReadFrameBuffer;
         /// A map of different buffer types and the currently bound buffer for each type
         BindBufferMap mActiveBufferMap;
         /// A map of texture parameters for each texture unit
@@ -141,6 +145,20 @@ namespace Ogre
         */
         void clearCache();
         
+
+        /** Bind an OpenGL frame buffer.
+         @param target The buffer target.
+         @param buffer The buffer ID.
+         @param force Optional parameter to force an update.
+         */
+        void bindGLFrameBuffer(GLenum target,GLuint buffer, bool force = false);
+
+        /** Bind an OpenGL frame buffer.
+         @param buffer The buffer ID.
+         @param force Optional parameter to force an update.
+         */
+        void bindGLRenderBuffer(GLuint buffer, bool force = false);
+
         /** Bind an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
@@ -148,12 +166,24 @@ namespace Ogre
          */
         void bindGLBuffer(GLenum target, GLuint buffer, bool force = false);
 
+        /** Delete an OpenGL frame buffer.
+         @param target The buffer target.
+         @param buffer The buffer ID.
+         @param force Optional parameter to force an update.
+         */
+        void deleteGLFrameBuffer(GLenum target, GLuint buffer);
+
+        /** Delete an OpenGL render buffer.
+         @param buffer The buffer ID.
+         @param force Optional parameter to force an update.
+         */
+        void deleteGLRenderBuffer(GLuint buffer);
         /** Delete an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
-        void deleteGLBuffer(GLenum target, GLuint buffer, bool force = false);
+        void deleteGLBuffer(GLenum target, GLuint buffer);
 
         /** Bind an OpenGL texture of any type.
          @param target The texture target.

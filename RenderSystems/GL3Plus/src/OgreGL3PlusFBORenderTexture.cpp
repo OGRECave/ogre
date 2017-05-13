@@ -149,14 +149,14 @@ namespace Ogre {
 
         for (size_t i = 0; i < Ogre::TEMP_FBOS; i++)
         {
-            mGLSupport.getStateCacheManager()->deleteGLBuffer(GL_FRAMEBUFFER,mTempFBO[i]);
+            mGLSupport.getStateCacheManager()->deleteGLFrameBuffer(GL_FRAMEBUFFER,mTempFBO[i]);
         }
     }
 
     void GL3PlusFBOManager::_createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
     {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &fb));
-        mGLSupport.getStateCacheManager()->bindGLBuffer( GL_DRAW_FRAMEBUFFER, fb );
+        mGLSupport.getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, fb );
         if (fmt != GL_NONE)
         {
             if (tid)
@@ -210,7 +210,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &depthRB));
 
             // Bind it to FBO
-            mGLSupport.getStateCacheManager()->bindGLBuffer( GL_RENDERBUFFER, depthRB );
+            mGLSupport.getStateCacheManager()->bindGLRenderBuffer( depthRB );
 
             // Allocate storage for depth buffer
             OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, depthFormat,
@@ -225,7 +225,7 @@ namespace Ogre {
             // Generate stencil renderbuffer
             OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &stencilRB));
             // Bind it to FBO
-            mGLSupport.getStateCacheManager()->bindGLBuffer( GL_RENDERBUFFER, stencilRB );
+            mGLSupport.getStateCacheManager()->bindGLRenderBuffer( stencilRB );
 
             // Allocate storage for stencil buffer
             OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, stencilFormat, PROBE_SIZE, PROBE_SIZE));
@@ -243,10 +243,10 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0));
 
         if (depthRB)
-            mGLSupport.getStateCacheManager()->deleteGLBuffer(GL_RENDERBUFFER,depthRB);
+            mGLSupport.getStateCacheManager()->deleteGLRenderBuffer(depthRB);
 
         if (stencilRB)
-            mGLSupport.getStateCacheManager()->deleteGLBuffer(GL_RENDERBUFFER,stencilRB);
+            mGLSupport.getStateCacheManager()->deleteGLRenderBuffer(stencilRB);
 
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
@@ -263,7 +263,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &packedRB));
 
         // Bind it to FBO
-        mGLSupport.getStateCacheManager()->bindGLBuffer( GL_RENDERBUFFER, packedRB );
+        mGLSupport.getStateCacheManager()->bindGLRenderBuffer( packedRB );
 
         // Allocate storage for buffer
         OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, packedFormat, PROBE_SIZE, PROBE_SIZE));
@@ -282,7 +282,7 @@ namespace Ogre {
         // Detach and destroy
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0));
-        mGLSupport.getStateCacheManager()->deleteGLBuffer(GL_RENDERBUFFER,packedRB);
+        mGLSupport.getStateCacheManager()->deleteGLRenderBuffer(packedRB);
 
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
@@ -414,8 +414,8 @@ namespace Ogre {
 
             if (!hasInternalFormatQuery) {
                 // Delete texture and framebuffer
-                mGLSupport.getStateCacheManager()->bindGLBuffer( GL_DRAW_FRAMEBUFFER, 0 );
-                mGLSupport.getStateCacheManager()->deleteGLBuffer(GL_FRAMEBUFFER,fb);
+                mGLSupport.getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, 0 );
+                mGLSupport.getStateCacheManager()->deleteGLRenderBuffer(fb);
 
                 if (internalFormat != GL_NONE) 
                 {
@@ -495,7 +495,7 @@ namespace Ogre {
             fbo->bind();
         else
             // Old style context (window/pbuffer) or copying render texture
-            mGLSupport.getStateCacheManager()->bindGLBuffer( GL_FRAMEBUFFER, 0 );
+            mGLSupport.getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
     }
 
     GL3PlusSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)

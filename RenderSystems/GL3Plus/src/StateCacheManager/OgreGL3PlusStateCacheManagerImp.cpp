@@ -119,6 +119,9 @@ namespace Ogre {
         mPointAttenuation[0] = 1.0f;
         mPointAttenuation[1] = 0.0f;
         mPointAttenuation[2] = 0.0f;
+
+        mActiveDrawFrameBuffer=0;
+        mActiveReadFrameBuffer=0;
     }
     
     GL3PlusStateCacheManager::~GL3PlusStateCacheManager(void)
@@ -129,6 +132,67 @@ namespace Ogre {
         mBoolStateMap.clear();
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
+    }
+    void GL3PlusStateCacheManager::bindGLFrameBuffer(GLenum target,GLuint buffer, bool force)
+    {
+        bool update = false;
+       
+        //GL_FRAMEBUFFER sets both GL_DRAW_FRAMEBUFFER and GL_READ_FRAMEBUFFER
+        if(target==GL_FRAMEBUFFER)
+        {
+            if( buffer != mActiveDrawFrameBuffer
+             || buffer != mActiveReadFrameBuffer)
+            {
+                update = true;
+                mActiveReadFrameBuffer=buffer;
+                mActiveDrawFrameBuffer=buffer;
+            }
+        }
+        else if( target == GL_DRAW_FRAMEBUFFER)
+        {
+            if(buffer != mActiveDrawFrameBuffer)
+            {
+                update = true;
+                mActiveDrawFrameBuffer=buffer;
+            }
+        }
+        else if( target == GL_READ_FRAMEBUFFER)
+        {
+            if(buffer != mActiveReadFrameBuffer)
+            {
+                update = true;
+                mActiveReadFrameBuffer=buffer;
+            }
+        }
+
+        // Update GL
+        if(update)
+        {
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(target, buffer));
+        }
+    }
+    void GL3PlusStateCacheManager::bindGLRenderBuffer(GLuint buffer, bool force)
+    {
+        bool update = false;
+       
+        BindBufferMap::iterator i = mActiveBufferMap.find(GL_RENDERBUFFER);
+        if (i == mActiveBufferMap.end())
+        {
+            // Haven't cached this state yet.  Insert it into the map
+            mActiveBufferMap.insert(BindBufferMap::value_type(GL_RENDERBUFFER, buffer));
+            update = true;
+        }
+        else if((*i).second != buffer || force) // Update the cached value if needed
+        {
+            (*i).second = buffer;
+            update = true;
+        }
+
+        // Update GL
+        if(update)
+        {
+            OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, buffer));
+        }
     }
     
     void GL3PlusStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
@@ -151,45 +215,61 @@ namespace Ogre {
         // Update GL
         if(update)
         {
-            if(target == GL_FRAMEBUFFER)
-            {
-                OGRE_CHECK_GL_ERROR(glBindFramebuffer(target, buffer));
-            }
-            else if(target == GL_RENDERBUFFER)
-            {
-                OGRE_CHECK_GL_ERROR(glBindRenderbuffer(target, buffer));
-            }
-            else
-            {
-                OGRE_CHECK_GL_ERROR(glBindBuffer(target, buffer));
-            }
+            OGRE_CHECK_GL_ERROR(glBindBuffer(target, buffer));
         }
 
     }
+    void GL3PlusStateCacheManager::deleteGLFrameBuffer(GLenum target, GLuint buffer)
+    {   
+        // Buffer name 0 is reserved and we should never try to delete it
+        if(buffer == 0)
+            return;
+        
+        //always delete the buffer, even if not currently bound
+        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &buffer));
 
-    void GL3PlusStateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
+        if (buffer == mActiveDrawFrameBuffer )
+        {
+            // Currently bound read frame buffer is being deleted, update the cached values to 0,
+            mActiveDrawFrameBuffer = 0;
+        }
+        if ( buffer == mActiveReadFrameBuffer)
+        {
+            // Currently bound read frame buffer is being deleted, update the cached values to 0,
+            mActiveReadFrameBuffer = 0;
+        }
+    }
+    void GL3PlusStateCacheManager::deleteGLRenderBuffer(GLuint buffer)
+    {
+        // Buffer name 0 is reserved and we should never try to delete it
+        if(buffer == 0)
+            return;
+
+        //always delete the buffer, even if not currently bound
+        OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &buffer));
+        
+        BindBufferMap::iterator i = mActiveBufferMap.find(GL_RENDERBUFFER);
+        if (i != mActiveBufferMap.end() && ((*i).second == buffer))
+        {
+            // Currently bound render buffer is being deleted, update the cached value to 0,
+            // which it likely the buffer that will be bound by the driver.
+            // An update will be forced next time we try to bind on this target.
+            (*i).second = 0;
+        }
+    }
+    void GL3PlusStateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
             return;
         
+        //always delete the buffer, even if not currently bound
+        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
+
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         
-        if (i != mActiveBufferMap.end() && ((*i).second == buffer || force))
+        if (i != mActiveBufferMap.end() && ((*i).second == buffer))
         {
-            if(target == GL_FRAMEBUFFER)
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &buffer));
-            }
-            else if(target == GL_RENDERBUFFER)
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &buffer));
-            }
-            else
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
-            }
-
             // Currently bound buffer is being deleted, update the cached value to 0,
             // which it likely the buffer that will be bound by the driver.
             // An update will be forced next time we try to bind on this target.
