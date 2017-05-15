@@ -192,18 +192,6 @@ SceneManager::~SceneManager()
     clearScene();
     destroyAllCameras();
 
-    // remove any shadow materials we created
-    String shadowMats[] = {"Ogre/Debug/ShadowVolumes", "Ogre/StencilShadowVolumes",
-                           "Ogre/StencilShadowModulationPass", "Ogre/TextureShadowCaster",
-                           "Ogre/TextureShadowReceiver"};
-    for (size_t i = 0; i < sizeof(shadowMats) / sizeof(shadowMats[0]); i++)
-    {
-        MaterialPtr mat = MaterialManager::getSingleton().getByName(shadowMats[i]);
-        if (mat)
-            MaterialManager::getSingleton().remove(
-                shadowMats[i], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-    }
-
     // clear down movable object collection map
     {
             OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
