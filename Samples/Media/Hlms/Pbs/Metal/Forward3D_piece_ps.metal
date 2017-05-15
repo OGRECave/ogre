@@ -3,9 +3,6 @@
 	@piece( andObjLightMaskCmp )&& ((inPs.objLightMask & as_type<uint>( lightDiffuse.w )) != 0u)@end
 @end
 @piece( forward3dLighting )
-	@property( hlms_forwardplus_fine_light_mask )
-		uint objLightMask = instance.worldMaterialIdx[inPs.drawId].z;
-	@end
 	@property( hlms_forwardplus == forward3d )
 		float f3dMinDistance	= passBuf.f3dData.x;
 		float f3dInvMaxDistance	= passBuf.f3dData.y;
