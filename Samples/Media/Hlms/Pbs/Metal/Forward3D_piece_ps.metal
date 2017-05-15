@@ -73,7 +73,7 @@
 		float3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
 
-		if( fDistance <= attenuation.x )
+		if( fDistance <= attenuation.x @insertpiece( andObjLightMaskCmp ) )
 		{
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
@@ -114,7 +114,7 @@
 		float3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
 
-		if( fDistance <= attenuation.x )
+		if( fDistance <= attenuation.x @insertpiece( andObjLightMaskCmp ) )
 		{
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );

@@ -68,7 +68,7 @@
 	@property( !hlms_forwardplus_fine_light_mask )
 		float3 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyz;
 	@end @property( hlms_forwardplus_fine_light_mask )
-		float4 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyw;
+		float4 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyzw;
 	@end
 		float3 lightSpecular= f3dLightList.Load( int(idx + 2u) ).xyz;
 		float4 attenuation	= f3dLightList.Load( int(idx + 3u) ).xyzw;
@@ -106,7 +106,7 @@
 	@property( !hlms_forwardplus_fine_light_mask )
 		float3 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyz;
 	@end @property( hlms_forwardplus_fine_light_mask )
-		float4 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyw;
+		float4 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyzw;
 	@end
 		float3 lightSpecular= f3dLightList.Load( int(idx + 2u) ).xyz;
 		float4 attenuation	= f3dLightList.Load( int(idx + 3u) ).xyzw;
