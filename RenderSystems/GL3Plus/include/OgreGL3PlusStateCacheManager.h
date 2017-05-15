@@ -124,6 +124,10 @@ namespace Ogre
         unsigned int mDiscardBuffers;
         /// Stores the current depth clearing colour
         GLclampf mClearDepth;
+
+        /// Stores the currently bound separable program pipeline
+        GLuint mActiveProgramPipeline;
+
         /// Viewport origin and size
         int mViewport[4];
 
@@ -327,6 +331,11 @@ namespace Ogre
          @param face The face culling mode to use.
          */
         void setCullFace(GLenum face);
+
+         /** Bind an OpenGL separable program pipeline
+         @param handle The handle to the program pipeline
+         */
+        void bindGLProgramPipeline(GLuint handle);
 
         /// Enable the specified texture coordinate generation option for the currently active texture unit
         void enableTextureCoordGen(GLenum type);

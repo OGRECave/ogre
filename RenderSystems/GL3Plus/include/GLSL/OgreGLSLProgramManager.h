@@ -131,6 +131,8 @@ namespace Ogre {
         */
         void extractUniformsFromGLSL(
             const String& src, GpuNamedConstants& constantDefs, const String& filename);
+
+        const GL3PlusSupport& getGLSupportRef() {return mGLSupport;}
     };
 
 }

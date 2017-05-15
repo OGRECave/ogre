@@ -554,4 +554,12 @@ namespace Ogre {
             }
         }
     }
+    void GL3PlusStateCacheManager::bindGLProgramPipeline(GLuint handle)
+    {
+        if(mActiveProgramPipeline != handle)
+        {
+            mActiveProgramPipeline = handle;
+            OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mActiveProgramPipeline));
+        }
+    }
 }

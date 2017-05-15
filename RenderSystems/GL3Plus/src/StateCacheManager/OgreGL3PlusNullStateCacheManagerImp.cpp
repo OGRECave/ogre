@@ -343,4 +343,10 @@ namespace Ogre {
         mPolygonMode = mode;
         glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode);
     }
+
+    void GL3PlusStateCacheManager::bindGLProgramPipeline(GLuint handle)
+    {
+        mActiveProgramPipeline = handle;
+        glBindProgramPipeline(mActiveProgramPipeline);
+    }
 }
