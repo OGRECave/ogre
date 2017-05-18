@@ -92,6 +92,8 @@ namespace Ogre
         GLuint mActiveReadFrameBuffer;
         /// A map of different buffer types and the currently bound buffer for each type
         BindBufferMap mActiveBufferMap;
+        /// Stores the currently bound vertex array object
+        GLuint mActiveVertexArray;
         /// A map of texture parameters for each texture unit
         TexUnitsMap mTexUnitsMap;
         /// Array of each OpenGL feature that is enabled i.e. blending, depth test, etc.
@@ -189,6 +191,11 @@ namespace Ogre
          */
         void deleteGLBuffer(GLenum target, GLuint buffer);
 
+        /** Bind an OpenGL Vertex array object.
+         @param vao The vertex array object ID.
+         */
+        void bindGLVertexArray(GLuint vao);
+        
         /** Bind an OpenGL texture of any type.
          @param target The texture target.
          @param texture The texture ID.

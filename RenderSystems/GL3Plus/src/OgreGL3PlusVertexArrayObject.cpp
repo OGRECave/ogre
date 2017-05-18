@@ -56,6 +56,7 @@ namespace Ogre {
         if (mVAO)
         {
             OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &mVAO));
+            mGLSupport->getStateCacheManager()->bindGLVertexArray(0);
             mVAO = 0;
         }
     }
@@ -65,9 +66,7 @@ namespace Ogre {
     {
         if (mVAO)
         {
-            OGRE_CHECK_GL_ERROR(glBindVertexArray(mVAO));
-            //we need to clear the cached GL_ELEMENT_ARRAY_BUFFER value, as it is invalidated by glBindVertexArray
-            mGLSupport->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            mGLSupport->getStateCacheManager()->bindGLVertexArray(mVAO);
         }
     }
 

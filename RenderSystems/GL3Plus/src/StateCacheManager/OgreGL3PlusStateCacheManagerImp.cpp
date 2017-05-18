@@ -122,6 +122,8 @@ namespace Ogre {
 
         mActiveDrawFrameBuffer=0;
         mActiveReadFrameBuffer=0;
+
+        mActiveVertexArray = 0;
     }
     
     GL3PlusStateCacheManager::~GL3PlusStateCacheManager(void)
@@ -274,6 +276,17 @@ namespace Ogre {
             // which it likely the buffer that will be bound by the driver.
             // An update will be forced next time we try to bind on this target.
             (*i).second = 0;
+        }
+    }
+
+    void GL3PlusStateCacheManager::bindGLVertexArray(GLuint vao)
+    {
+        if(mActiveVertexArray != vao)
+        {
+            mActiveVertexArray = vao;
+            OGRE_CHECK_GL_ERROR(glBindVertexArray(vao));
+            //we also need to clear the cached GL_ELEMENT_ARRAY_BUFFER value, as it is invalidated by glBindVertexArray
+            bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
     }
 

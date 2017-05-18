@@ -1793,8 +1793,7 @@ namespace Ogre {
 
             // Unbind the vertex array object.
             // Marks the end of what state will be included.
-            OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
-            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,0); //needed after each call of glBindVertexArray
+            mStateCacheManager->bindGLVertexArray(0);
         }
 
 

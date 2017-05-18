@@ -152,7 +152,10 @@ namespace Ogre {
 
         glDeleteBuffers(1, &buffer);
     }
-    
+    void GL3PlusStateCacheManager::bindGLVertexArray(GLuint vao)
+    {
+        glBindVertexArray(vao);
+    }
     void GL3PlusStateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         // Update GL
