@@ -5647,6 +5647,9 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
         mDestRenderSystem->unbindGpuProgram(GPT_GEOMETRY_PROGRAM);
     }
 
+    mDestRenderSystem->_setAlphaRejectSettings(mShadowStencilPass->getAlphaRejectFunction(),
+        mShadowStencilPass->getAlphaRejectValue(), mShadowStencilPass->isAlphaToCoverageEnabled());
+
     // Turn off colour writing and depth writing
     mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
     mDestRenderSystem->_disableTextureUnitsFrom(0);
