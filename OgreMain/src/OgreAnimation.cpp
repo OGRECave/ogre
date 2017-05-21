@@ -149,6 +149,24 @@ namespace v1 {
 		return i->second;
 	}
     //---------------------------------------------------------------------
+    void Animation::destroyNodeTrack( unsigned short handle )
+    {
+        NodeTrackList::iterator it = mNodeTrackList.begin();
+        NodeTrackList::iterator en = mNodeTrackList.end();
+
+        while( it != en && (*it)->getHandle() != handle )
+        {
+            ++it;
+        }
+
+        if( it != en )
+        {
+            OGRE_DELETE *it;
+            mNodeTrackList.erase( it );
+            _keyFrameListChanged();
+        }
+    }
+    //---------------------------------------------------------------------
     void Animation::destroyAllNodeTracks(void)
     {
         NodeTrackList::iterator i;
