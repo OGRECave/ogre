@@ -229,6 +229,9 @@ namespace v1 {
         /** Does a track exist with the given handle? */
         bool hasVertexTrack(unsigned short handle) const;
 
+        /** Destroys the node track with the given handle. */
+        void destroyNodeTrack(unsigned short handle);
+
 		/** Destroys the node track with the given handle. */
 		void destroyOldNodeTrack(unsigned short handle);
 
