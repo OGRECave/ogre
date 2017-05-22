@@ -39,7 +39,6 @@ THE SOFTWARE.
     OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #   include "OgreSearchOps.h"
 #   include <sys/param.h>
-#   define MAX_PATH MAXPATHLEN
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
