@@ -147,6 +147,7 @@ namespace Demo
 
         createShadowMapDebugOverlays();
 
+#if !OGRE_NO_JSON
         //For ESM, setup the filter settings (radius and gaussian deviation).
         //It controls how blurry the shadows will look.
         Ogre::HlmsManager *hlmsManager = Ogre::Root::getSingleton().getHlmsManager();
@@ -171,6 +172,7 @@ namespace Demo
                                                gaussianDeviationFactor, K );
         MiscUtils::setGaussianLogFilterParams( "ESM/GaussianLogFilterV", kernelRadius,
                                                gaussianDeviationFactor, K );
+#endif
 
         TutorialGameState::createScene01();
     }
@@ -418,7 +420,15 @@ namespace Demo
             Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
 
             Ogre::HlmsPbs::ShadowFilter nextFilter = static_cast<Ogre::HlmsPbs::ShadowFilter>(
-                        (pbs->getShadowFilter() + 1) % Ogre::HlmsPbs::NumShadowFilter );
+                        (pbs->getShadowFilter() + 1u) % Ogre::HlmsPbs::NumShadowFilter );
+
+#if OGRE_NO_JSON
+            if( nextFilter == Ogre::HlmsPbs::ExponentialShadowMaps )
+            {
+                nextFilter = static_cast<Ogre::HlmsPbs::ShadowFilter>(
+                                 (nextFilter + 1u) % Ogre::HlmsPbs::NumShadowFilter );
+            }
+#endif
 
             if( nextFilter == Ogre::HlmsPbs::ExponentialShadowMaps )
                 pbs->getHlmsManager()->setShadowMappingUseBackFaces( false );
