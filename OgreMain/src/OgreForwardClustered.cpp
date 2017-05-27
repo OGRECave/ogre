@@ -317,6 +317,8 @@ namespace Ogre
             {
                 //Spotlight. Do pyramid vs frustum intersection. This pyramid
                 //has 5 sides and encloses the spotlight's cone.
+                //See www.yosoygames.com.ar/wp/2016/12/
+                //frustum-vs-pyramid-intersection-also-frustum-vs-frustum/
 
                 Node *lightNode = (*itLight)->getParentNode();
 

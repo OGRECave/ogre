@@ -44,10 +44,14 @@ namespace Ogre
     {
         typedef vector<PlanarReflectionActor*>::type PlanarReflectionActorVec;
 
-        PlanarReflectionActorVec mActors;
+        PlanarReflectionActorVec    mActors;
+        ArrayActorPlane             *mActorsSoA;
+        size_t                      mCapacityActorsSoA;
 
         SceneManager        *mSceneManager;
         CompositorManager2  *mCompositorManager;
+
+        void pushActor( PlanarReflectionActor *actor );
 
     public:
         PlanarReflections( SceneManager *sceneManager, CompositorManager2 *compositorManager );
@@ -84,6 +88,8 @@ namespace Ogre
                                          PixelFormat pixelFormat, bool mipmapMethodCompute );
         void destroyActor( PlanarReflectionActor *actor );
         void destroyAllActors(void);
+
+        void update(void);
     };
 
     /** @} */

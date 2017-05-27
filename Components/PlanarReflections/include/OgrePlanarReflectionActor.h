@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePlanarReflectionsPrerequisites.h"
 #include "OgreIdString.h"
 #include "OgrePlane.h"
+#include "Math/Array/OgreArrayConfig.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -42,27 +43,85 @@ namespace Ogre
     *  @{
     */
 
-    struct _OgrePlanarReflectionsExport PlanarReflectionActor
+    /** Actors are defined by a plane and a rectangle that limits that plane.
+        Planes are normally infinite, but Actors limit them to a rectangle.
+        In 3D, this means a plane has 4 additional planes to limit them
+        (north, west, south & east)
+        To hold those 5 planes, we only need 5 "d" from Plane, and 5 normals
+        (one for the main plane, 2 for north & south, 2 for west & east).
+        However a Quaternion can represent all 5 normals: zAxis is normal,
+        +/- yAxis is north & south, +/- xAxis is west & east.
+    */
+    struct ArrayActorPlane
     {
-        Plane   plane;
-        Vector3 center;
-        Vector3 halfSize;
-        Camera  *masterCamera;
-        Camera  *reflectionCamera;
-        IdString workspaceName;
-        CompositorWorkspace *workspace;
-        TexturePtr  reflectionTexture;
+        ArrayQuaternion planeNormals;
+        /// Arrangement is:
+        /// 0 = main plane
+        /// 1 = +Y plane (north)
+        /// 2 = -Y plane (south)
+        /// 3 = +X plane (east)
+        /// 4 = -X plane (west)
+        ArrayReal       planeNegD[5];
+        ArrayVector3    center;
+        ArrayReal       xyHalfSize[2];
+    };
 
+    class _OgrePlanarReflectionsExport PlanarReflectionActor
+    {
+        friend class PlanarReflections;
+    protected:
+        Plane       mPlane;
+        Vector3     mCenter;
+        Vector2     mHalfSize;
+        Quaternion  mOrientation;
+    public:
+        Camera      *mMasterCamera;
+    protected:
+        Camera      *mReflectionCamera;
+        IdString    mWorkspaceName;
+        CompositorWorkspace *mWorkspace;
+        TexturePtr  mReflectionTexture;
+
+        uint8           mIndex;
+        ArrayActorPlane *mActorPlane;
+
+        void updateArrayActorPlane(void);
+
+    public:
         PlanarReflectionActor() :
-            center( Vector3::ZERO ), halfSize( Vector3::UNIT_SCALE ),
-            masterCamera( 0 ), reflectionCamera( 0 ), workspace( 0 ) {}
+            mCenter( Vector3::ZERO ), mHalfSize( Vector2::UNIT_SCALE ),
+            mOrientation( Quaternion::IDENTITY ), mMasterCamera( 0 ),
+            mReflectionCamera( 0 ), mWorkspace( 0 ),
+            mIndex( 0 ), mActorPlane( 0 )
+        {
+        }
 
-        PlanarReflectionActor( const Vector3 &_center, const Vector3 &_halfSize,
-                               const Vector3 &normal, Camera *_masterCamera,
-                               IdString _workspaceName ) :
-            plane( normal, _center ), center( _center ),
-            halfSize( _halfSize ), masterCamera( _masterCamera ),
-            reflectionCamera( 0 ), workspaceName( _workspaceName ), workspace( 0 ) {}
+        PlanarReflectionActor( const Vector3 &center, const Vector2 &halfSize,
+                               const Quaternion orientation, Camera *masterCamera,
+                               IdString workspaceName ) :
+            mPlane( orientation.zAxis(), center ), mCenter( center ),
+            mHalfSize( halfSize ), mOrientation( orientation ), mMasterCamera( masterCamera ),
+            mReflectionCamera( 0 ), mWorkspaceName( workspaceName ), mWorkspace( 0 ),
+            mIndex( 0 ), mActorPlane( 0 )
+        {
+        }
+
+        /** Sets the plane's position, size and orientation
+        @param center
+            XYZ position, in world coordinates
+        @param halfSize
+            2D half size of the rectangle that this plane creates, in local space.
+        @param orientation
+            Quaternion containing the normal and roll of the plane. Asumed to be unit-length
+            The plane's normal is orientation.zAxis();
+        */
+        void setPlane( const Vector3 &center, const Vector2 &halfSize, const Quaternion &orientation );
+
+        const Vector3& getCenter(void) const;
+        const Vector2& getHalfSize(void) const;
+        const Quaternion& getOrientation(void) const;
+        const Vector3& getNormal(void) const;
+        const Plane& getPlane(void) const;
     };
 
     /** @} */

@@ -50,7 +50,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    struct PlanarReflectionActor;
+    class PlanarReflectionActor;
     class PlanarReflections;
 }
 
