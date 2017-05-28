@@ -179,3 +179,8 @@ float3 BRDF_IR( float3 lightDir, float3 lightDiffuse,
 	finalColour += envColourD * @insertpiece( kD ).xyz * fresnelD +
 					envColourS * @insertpiece( kS ).xyz * fresnelS;
 @end
+
+@property( hlms_fine_light_mask )
+	@piece( ObjLightMaskCmp )if( (inPs.objLightMask & as_type<uint>( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u )@end
+	@piece( andObjLightMaskCmp )&& ((inPs.objLightMask & as_type<uint>( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u)@end
+@end

@@ -12,7 +12,7 @@ struct ShadowReceiverData
 
 struct Light
 {
-	float3 position;
+	float4 position; //.w contains the objLightMask
 	float3 diffuse;
 	float3 specular;
 @property( hlms_num_shadow_map_lights )
@@ -174,7 +174,7 @@ struct Material
 		@property( !lower_gpu_overhead )
 			ushort materialId [[flat]];
 		@end
-		@property( hlms_forwardplus_fine_light_mask )
+		@property( hlms_fine_light_mask || hlms_forwardplus_fine_light_mask )
 			uint objLightMask [[flat]];
 		@end
 		@property( hlms_normal || hlms_qtangent )
