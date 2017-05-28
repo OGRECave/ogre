@@ -11,7 +11,7 @@ struct ShadowReceiverData
 
 struct Light
 {
-	vec3 position;
+	vec4 position; //.w contains the objLightMask
 	vec3 diffuse;
 	vec3 specular;
 @property( hlms_num_shadow_map_lights )

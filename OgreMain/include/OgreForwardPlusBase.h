@@ -184,6 +184,15 @@ namespace Ogre
         bool getEnableVpls(void) const                                  { return mEnableVpls; }
 
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+        /// Toggles whether light masks will be obeyed per object & per light by doing:
+        /// if( movableObject->getLightMask() & light->getLightMask() )
+        ///     doLighting( movableObject light );
+        /// Note this toggle only affects Forward+ lights.
+        /// You may want to see HlmsPbs::setFineLightMaskGranularity
+        /// for control over Forward lights.
+        /// If you only need coarse granularity control over Forward+ lights, you
+        /// may get higher performance via CompositorPassSceneDef::mLightVisibilityMask
+        /// (light_visibility_mask keyword in scripts).
         void setFineLightMaskGranularity( bool useFineGranularity )
                                                     { mFineLightMaskGranularity = useFineGranularity; }
         bool getFineLightMaskGranularity(void) const{ return mFineLightMaskGranularity; }

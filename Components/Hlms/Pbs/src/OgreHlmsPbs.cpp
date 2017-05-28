@@ -221,6 +221,9 @@ namespace Ogre
         mIrradianceVolume( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+        mFineLightMaskGranularity( true ),
+#endif
         mDebugPssmSplits( false ),
         mShadowFilter( PCF_3x3 ),
         mEsmK( 600u ),
@@ -860,6 +863,11 @@ namespace Ogre
 
             if( mIrradianceVolume )
                 setProperty( PbsProperty::IrradianceVolumes, 1 );
+
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+            if( mFineLightMaskGranularity )
+                setProperty( HlmsBaseProp::FineLightMask, 1 );
+#endif
         }
 
         if( mOptimizationStrategy == LowerGpuOverhead )
@@ -1224,6 +1232,9 @@ namespace Ogre
                     *passBufferPtr++ = lightPos.x;
                     *passBufferPtr++ = lightPos.y;
                     *passBufferPtr++ = lightPos.z;
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+                    *reinterpret_cast<uint32 * RESTRICT_ALIAS>( passBufferPtr ) = light->getLightMask();
+#endif
                     ++passBufferPtr;
 
                     //vec3 lights[numLights].diffuse
@@ -1294,6 +1305,10 @@ namespace Ogre
                     *passBufferPtr++ = lightPos.x;
                     *passBufferPtr++ = lightPos.y;
                     *passBufferPtr++ = lightPos.z;
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+                    *reinterpret_cast<uint32 * RESTRICT_ALIAS>( passBufferPtr ) =
+                            globalLightList.lights[i]->getLightMask();
+#endif
                     ++passBufferPtr;
 
                     //vec3 lights[numLights].diffuse
