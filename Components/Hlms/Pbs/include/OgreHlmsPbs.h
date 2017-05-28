@@ -131,7 +131,9 @@ namespace Ogre
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
         uint32 mLastTextureHash;
-
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+        bool mFineLightMaskGranularity;
+#endif
         bool mDebugPssmSplits;
 
         ShadowFilter    mShadowFilter;
@@ -191,6 +193,19 @@ namespace Ogre
 
         virtual void postCommandBufferExecution( CommandBuffer *commandBuffer );
         virtual void frameEnded(void);
+
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+        /// Toggles whether light masks will be obeyed per object by doing:
+        /// if( movableObject->getLightMask() & light->getLightMask() )
+        ///     doLighting( movableObject light );
+        /// Note this toggle only affects forward lights
+        /// (i.e. Directional lights + shadow casting lights).
+        /// You may want to see ForwardPlusBase::setFineLightMaskGranularity
+        /// for control over Forward+ lights.
+        void setFineLightMaskGranularity( bool useFineGranularity )
+                                                    { mFineLightMaskGranularity = useFineGranularity; }
+        bool getFineLightMaskGranularity(void) const{ return mFineLightMaskGranularity; }
+#endif
 
         void setDebugPssmSplits( bool bDebug );
         bool getDebugPssmSplits(void) const                 { return mDebugPssmSplits; }

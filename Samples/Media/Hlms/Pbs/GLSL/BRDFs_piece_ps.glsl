@@ -180,3 +180,9 @@ vec3 BRDF_IR( vec3 lightDir, vec3 lightDiffuse )
 	finalColour += envColourD * @insertpiece( kD ).xyz * fresnelD +
 					envColourS * @insertpiece( kS ).xyz * fresnelS;
 @end
+
+@property( hlms_fine_light_mask )
+	@piece( DeclareObjLightMask )uint objLightMask = instance.worldMaterialIdx[inPs.drawId].z;@end
+	@piece( ObjLightMaskCmp )if( (objLightMask & floatBitsToUint( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u )@end
+	@piece( andObjLightMaskCmp )&& ((objLightMask & floatBitsToUint( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u)@end
+@end
