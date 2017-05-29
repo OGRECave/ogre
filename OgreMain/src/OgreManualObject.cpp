@@ -94,67 +94,47 @@ namespace Ogre {
     {
         // Calculate byte size
         // Use decl if we know it by now, otherwise default size to pos/norm/texcoord*2
-        size_t newSize;
-        if (!mFirstVertex)
-        {
-            newSize = mDeclSize * numVerts;
+        size_t newSize = (mFirstVertex ? TEMP_VERTEXSIZE_GUESS : mDeclSize) * numVerts;
+
+        if(newSize <= mTempVertexSize && mTempVertexBuffer) {
+            return;
         }
-        else
+
+        // init or increase to at least double current
+        newSize = std::max(newSize, mTempVertexBuffer ? mTempVertexSize*2 : mTempVertexSize);
+
+        // copy old data
+        char* tmp = mTempVertexBuffer;
+        mTempVertexBuffer = OGRE_ALLOC_T(char, newSize, MEMCATEGORY_GEOMETRY);
+        if (tmp)
         {
-            // estimate - size checks will deal for subsequent verts
-            newSize = TEMP_VERTEXSIZE_GUESS * numVerts;
+            memcpy(mTempVertexBuffer, tmp, mTempVertexSize);
+            // delete old buffer
+            OGRE_FREE(tmp, MEMCATEGORY_GEOMETRY);
         }
-        if (newSize > mTempVertexSize || !mTempVertexBuffer)
-        {
-            if (!mTempVertexBuffer)
-            {
-                // init
-                newSize = mTempVertexSize;
-            }
-            else
-            {
-                // increase to at least double current
-                newSize = std::max(newSize, mTempVertexSize*2);
-            }
-            // copy old data
-            char* tmp = mTempVertexBuffer;
-            mTempVertexBuffer = OGRE_ALLOC_T(char, newSize, MEMCATEGORY_GEOMETRY);
-            if (tmp)
-            {
-                memcpy(mTempVertexBuffer, tmp, mTempVertexSize);
-                // delete old buffer
-                OGRE_FREE(tmp, MEMCATEGORY_GEOMETRY);
-            }
-            mTempVertexSize = newSize;
-        }
+        mTempVertexSize = newSize;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::resizeTempIndexBufferIfNeeded(size_t numInds)
     {
         size_t newSize = numInds * sizeof(uint32);
-        if (newSize > mTempIndexSize || !mTempIndexBuffer)
-        {
-            if (!mTempIndexBuffer)
-            {
-                // init
-                newSize = mTempIndexSize;
-            }
-            else
-            {
-                // increase to at least double current
-                newSize = std::max(newSize, mTempIndexSize*2);
-            }
-            numInds = newSize / sizeof(uint32);
-            uint32* tmp = mTempIndexBuffer;
-            mTempIndexBuffer = OGRE_ALLOC_T(uint32, numInds, MEMCATEGORY_GEOMETRY);
-            if (tmp)
-            {
-                memcpy(mTempIndexBuffer, tmp, mTempIndexSize);
-                OGRE_FREE(tmp, MEMCATEGORY_GEOMETRY);
-            }
-            mTempIndexSize = newSize;
+
+        if(newSize <= mTempIndexSize && mTempIndexBuffer) {
+            return;
         }
 
+        // init or increase to at least double current
+        newSize = std::max(newSize, mTempIndexBuffer ? mTempIndexSize*2 : mTempIndexSize);
+
+        numInds = newSize / sizeof(uint32);
+        uint32* tmp = mTempIndexBuffer;
+        mTempIndexBuffer = OGRE_ALLOC_T(uint32, numInds, MEMCATEGORY_GEOMETRY);
+        if (tmp)
+        {
+            memcpy(mTempIndexBuffer, tmp, mTempIndexSize);
+            OGRE_FREE(tmp, MEMCATEGORY_GEOMETRY);
+        }
+        mTempIndexSize = newSize;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::estimateVertexCount(size_t vcount)
