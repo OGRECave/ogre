@@ -12,6 +12,10 @@ macro( add_recursive dir retVal )
 endmacro()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+ogre_add_component_include_dir(Hlms/Pbs)
+ogre_add_component_include_dir(Hlms/Unlit)
+ogre_add_component_include_dir(Hlms/Common)
+ogre_add_component_include_dir(Overlay)
 
 add_recursive( ./ SOURCE_FILES )
 

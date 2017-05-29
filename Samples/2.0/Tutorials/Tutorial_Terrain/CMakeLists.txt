@@ -19,7 +19,10 @@ set( SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} )
 
 include_directories( ./include )
 include_directories( ./include/Hlms )
+ogre_add_component_include_dir(Hlms/Pbs)
+ogre_add_component_include_dir(Hlms/Unlit)
 ogre_add_component_include_dir(Hlms/Common)
+ogre_add_component_include_dir(Overlay)
 
 ogre_add_executable(Sample_Tutorial_Terrain WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES})
 
