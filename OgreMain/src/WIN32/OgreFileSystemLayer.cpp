@@ -41,7 +41,6 @@ namespace Ogre
     {
         // need to convert to narrow (OEM or ANSI) codepage so that fstream can use it 
         // properly on international systems.
-        char npath[MAX_PATH];
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         // Note, that on legacy CRT versions codepage for narrow CRT file functions can be changed using 
         // SetFileApisANSI/OEM, but on modern runtimes narrow pathes are always widened using ANSI codepage.
@@ -51,14 +50,17 @@ namespace Ogre
         // Runtime is modern, narrow calls are widened inside CRT using CP_ACP codepage.
         UINT codepage = CP_ACP;
 #endif
-        if(0 == WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, -1, npath, sizeof(npath), NULL, NULL))
+        const int wlength = static_cast<int>(wcslen(wpath));
+        const int length = WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, wlength, NULL, 0, NULL, NULL);
+        if(length <= 0)
         {
             dest.clear();
             return false;
         }
 
         // success
-        dest = npath;
+        dest.resize(length);
+        WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, wlength, &dest[0], (int)dest.size(), NULL, NULL);
         return true;
     }
 
