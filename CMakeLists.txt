@@ -201,9 +201,10 @@ if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
 endif ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
 
 # determine system endianess
-if (MSVC OR ANDROID OR EMSCRIPTEN)
+if (MSVC OR ANDROID OR EMSCRIPTEN OR APPLE_IOS)
   # This doesn't work on VS 2010
   # MSVC only builds for intel anyway
+  # all IOS devices are little endian
   set(OGRE_TEST_BIG_ENDIAN FALSE)
 else()
   include(TestBigEndian)
