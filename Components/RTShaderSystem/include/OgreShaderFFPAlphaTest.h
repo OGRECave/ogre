@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define _OgreShaderExAlphaTest_
 
 #include "OgreShaderPrerequisites.h"
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderFFPTexturing.h"
 #include "OgreShaderSubRenderState.h"
 
