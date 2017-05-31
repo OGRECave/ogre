@@ -40,7 +40,7 @@ namespace RTShader {
 A factory that enables creation of LayeredBlending instances.
 @remarks Sub class of SubRenderStateFactory
 */
-	class FFPAlphaTest : public SubRenderState
+	class _OgreRTSSExport FFPAlphaTest : public SubRenderState
 	{
 	
 	private:
@@ -100,7 +100,7 @@ public:
 
 	};
 
-class FFPAlphaTestFactory : public SubRenderStateFactory
+class _OgreRTSSExport FFPAlphaTestFactory : public SubRenderStateFactory
 {
 
 public:
