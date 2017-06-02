@@ -1,9 +1,9 @@
 @property( hlms_forwardplus )
 @property( hlms_forwardplus_fine_light_mask )
-	@piece( andObjLightMaskCmp )&& ((objLightMask & asuint( lightDiffuse.w )) != 0u)@end
+	@piece( andObjLightMaskFwdPlusCmp )&& ((objLightMask & asuint( lightDiffuse.w )) != 0u)@end
 @end
 @piece( forward3dLighting )
-	@property( hlms_forwardplus_fine_light_mask )
+	@property( hlms_forwardplus_fine_light_mask && !hlms_fine_light_mask )
 		uint objLightMask = worldMaterialIdx[inPs.drawId].z;
 	@end
 	@property( hlms_forwardplus == forward3d )
@@ -76,7 +76,7 @@
 		float3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
 
-		[branch]if( fDistance <= attenuation.x @insertpiece( andObjLightMaskCmp ) )
+		[branch]if( fDistance <= attenuation.x @insertpiece( andObjLightMaskFwdPlusCmp ) )
 		{
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
@@ -116,7 +116,7 @@
 		float3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
 
-		[branch]if( fDistance <= attenuation.x @insertpiece( andObjLightMaskCmp ) )
+		[branch]if( fDistance <= attenuation.x @insertpiece( andObjLightMaskFwdPlusCmp ) )
 		{
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
