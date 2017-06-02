@@ -1826,7 +1826,7 @@ namespace Ogre
         if( mPrePassMsaaDepthTexture )
         {
             //We need to unbind the depth texture, it may be used as a depth buffer later.
-            size_t texUnit = mGridBuffer ? 1 : 3;
+            size_t texUnit = mGridBuffer ? 3 : 1;
             if( mPrePassTextures )
                 texUnit += 2;
 
