@@ -14,6 +14,9 @@ layout(location = FRAG_COLOR, index = 0) out float outColour;
 @end
 
 // START UNIFORM DECLARATION
+@property( has_planar_reflections )
+	@insertpiece( PassDecl )
+@end
 @property( !hlms_shadowcaster )
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )

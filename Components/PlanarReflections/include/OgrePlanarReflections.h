@@ -111,7 +111,7 @@ namespace Ogre
         void destroyAllActors(void);
 
         void beginFrame(void);
-        void update( Camera *camera );
+        void update( Camera *camera, Real aspectRatio );
 
         /// Returns the amount of bytes that fillConstBufferData is going to fill.
 //        size_t getConstBufferSize(void) const;

@@ -33,15 +33,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-
-
-
     const IdString UnlitProperty::HwGammaRead       = IdString( "hw_gamma_read" );
     const IdString UnlitProperty::HwGammaWrite      = IdString( "hw_gamma_write" );
     const IdString UnlitProperty::SignedIntTex      = IdString( "signed_int_textures" );
     const IdString UnlitProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
     const IdString UnlitProperty::AnimationMatricesPerBuffer = IdString( "animation_matrices_per_buffer" );
     const IdString UnlitProperty::TextureMatrix     = IdString( "texture_matrix" );
+    const IdString UnlitProperty::HasPlanarReflections  = IdString( "has_planar_reflections" );
 
     const IdString UnlitProperty::TexMatrixCount        = IdString( "hlms_texture_matrix_count" );
     const IdString UnlitProperty::TexMatrixCount0       = IdString( "hlms_texture_matrix_count0" );

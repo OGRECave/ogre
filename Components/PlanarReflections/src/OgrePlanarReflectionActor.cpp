@@ -35,6 +35,8 @@ namespace Ogre
 {
     void PlanarReflectionActor::updateArrayActorPlane(void)
     {
+        mReflectionCamera->enableReflection( mPlane );
+
         mActorPlane->planeNormals.setFromQuaternion( mOrientation, mIndex );
 
         Mathlib::Set( mActorPlane->planeNegD[0], -mPlane.d, mIndex );
@@ -87,6 +89,11 @@ namespace Ogre
     const Plane& PlanarReflectionActor::getPlane(void) const
     {
         return mPlane;
+    }
+    //-----------------------------------------------------------------------------------
+    TexturePtr PlanarReflectionActor::getReflectionTexture(void) const
+    {
+        return mReflectionTexture;
     }
     //-----------------------------------------------------------------------------------
     Real PlanarReflectionActor::getSquaredDistanceTo( const Vector3 &pos ) const

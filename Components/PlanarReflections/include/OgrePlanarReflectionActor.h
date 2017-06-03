@@ -118,6 +118,7 @@ namespace Ogre
         const Quaternion& getOrientation(void) const;
         const Vector3& getNormal(void) const;
         const Plane& getPlane(void) const;
+        TexturePtr getReflectionTexture(void) const;
 
         Real getSquaredDistanceTo( const Vector3 &pos ) const;
     };

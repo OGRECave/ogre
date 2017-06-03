@@ -123,8 +123,7 @@ namespace Ogre
         PlanarReflectionActor *newActor = mActors.back();
         String cameraName = "PlanarReflectionActor #" + StringConverter::toString( uniqueId );
         newActor->mReflectionCamera = mSceneManager->createCamera( cameraName, useAccurateLighting );
-        newActor->mReflectionCamera->enableReflection( newActor->mPlane );
-        newActor->mReflectionCamera->setAutoAspectRatio( true );
+        newActor->mReflectionCamera->setAutoAspectRatio( false );
 
         int usage = TU_RENDERTARGET;
         usage |= (withMipmaps && mipmapMethodCompute) ? TU_UAV : TU_AUTOMIPMAP;
@@ -205,7 +204,7 @@ namespace Ogre
             return _l->getSquaredDistanceTo( point ) < _r->getSquaredDistanceTo( point );
         }
     };
-    void PlanarReflections::update( Camera *camera )
+    void PlanarReflections::update( Camera *camera, Real aspectRatio )
     {
         if( mLockCamera && camera != mLockCamera )
             return; //This is not the camera we are allowed to work with
@@ -248,6 +247,7 @@ namespace Ogre
             actor->mReflectionCamera->setOrientation( camRot );
             actor->mReflectionCamera->setNearClipDistance( nearPlane );
             actor->mReflectionCamera->setFarClipDistance( farPlane );
+            actor->mReflectionCamera->setAspectRatio( aspectRatio );
             ++itor;
         }
 

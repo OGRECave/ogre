@@ -7,6 +7,9 @@ layout(binding = 0) uniform PassBuffer
 	@property( hlms_shadowcaster )
 		vec4 depthRange;
 	@end
+
+	//Pixel Shader
+	vec4 invWindowSize;
 	@insertpiece( custom_passBuffer )
 } pass;
 @end

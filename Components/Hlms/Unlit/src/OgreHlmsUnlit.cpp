@@ -260,6 +260,7 @@ namespace Ogre
 
         bool hasAnimationMatrices = false;
         UvOutputVec uvOutputs;
+        bool hasPlanarReflection = false;
 
         for( uint8 i=0; i<NUM_UNLIT_TEXTURE_TYPES; ++i )
         {
@@ -281,10 +282,20 @@ namespace Ogre
                              "HlmsUnlit::calculateHashForPreCreate" );
             }
 
-            if( !texture.isNull() && texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+            if( !texture.isNull() )
             {
-                IdString diffuseMapNArray( diffuseMapNStr + "_array" );
-                setProperty( diffuseMapNArray, 1 );
+                if( texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+                {
+                    IdString diffuseMapNArray( diffuseMapNStr + "_array" );
+                    setProperty( diffuseMapNArray, 1 );
+                }
+
+                if( datablock->getEnablePlanarReflection( i ) )
+                {
+                    IdString diffuseMapNReflection( diffuseMapNStr + "_reflection" );
+                    setProperty( diffuseMapNReflection, 1 );
+                    hasPlanarReflection = true;
+                }
             }
 
             //Set the blend mode
@@ -364,6 +375,12 @@ namespace Ogre
 
         if( hasAnimationMatrices )
             setProperty( UnlitProperty::TextureMatrix, 1 );
+
+        if( hasPlanarReflection )
+        {
+            setProperty( HlmsBaseProp::VPos, 1 );
+            setProperty( UnlitProperty::HasPlanarReflections, 1 );
+        }
 
         size_t halfUvOutputs = (uvOutputs.size() + 1u) >> 1u;
         setProperty( UnlitProperty::OutUvCount, static_cast<int32>( uvOutputs.size() ) );
@@ -490,8 +507,8 @@ namespace Ogre
 
         mSetProperties.clear();
 
-        //mat4 viewProj[2];
-        size_t mapSize = (16 + 16) * 4;
+        //mat4 viewProj[2] + vec4 invWindowSize;
+        size_t mapSize = (16 + 16 + 4) * 4;
 
         if( casterPass )
         {
@@ -541,6 +558,12 @@ namespace Ogre
             *passBufferPtr++ = 1.0f / depthRange;
             passBufferPtr += 2;
         }
+
+        //vec4 invWindowSize;
+        *passBufferPtr++ = 1.0f / (float)renderTarget->getWidth();
+        *passBufferPtr++ = 1.0f / (float)renderTarget->getHeight();
+        *passBufferPtr++ = 1.0f;
+        *passBufferPtr++ = 1.0f;
 
         passBufferPtr = mListener->preparePassBuffer( shadowNode, casterPass, dualParaboloid,
                                                       sceneManager, passBufferPtr );
