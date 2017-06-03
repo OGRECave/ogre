@@ -88,4 +88,16 @@ namespace Ogre
     {
         return mPlane;
     }
+    //-----------------------------------------------------------------------------------
+    Real PlanarReflectionActor::getSquaredDistanceTo( const Vector3 &pos ) const
+    {
+        Vector3 projectedPos = pos - mPlane.normal * mPlane.getDistance( pos );
+
+        Vector3 localPos = mOrientation.Inverse() * (projectedPos - mCenter);
+        localPos.makeFloor( Vector3( mHalfSize.x, mHalfSize.y, 0.0f ) );
+        localPos.makeCeil( -Vector3( mHalfSize.x, mHalfSize.y, 0.0f ) );
+
+        Vector3 clampedProjPos = mCenter + mOrientation * localPos;
+        return clampedProjPos.squaredDistance( pos );
+    }
 }

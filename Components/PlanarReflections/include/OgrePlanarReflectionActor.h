@@ -74,9 +74,6 @@ namespace Ogre
         Vector3     mCenter;
         Vector2     mHalfSize;
         Quaternion  mOrientation;
-    public:
-        Camera      *mMasterCamera;
-    protected:
         Camera      *mReflectionCamera;
         IdString    mWorkspaceName;
         CompositorWorkspace *mWorkspace;
@@ -90,17 +87,16 @@ namespace Ogre
     public:
         PlanarReflectionActor() :
             mCenter( Vector3::ZERO ), mHalfSize( Vector2::UNIT_SCALE ),
-            mOrientation( Quaternion::IDENTITY ), mMasterCamera( 0 ),
+            mOrientation( Quaternion::IDENTITY ),
             mReflectionCamera( 0 ), mWorkspace( 0 ),
             mIndex( 0 ), mActorPlane( 0 )
         {
         }
 
         PlanarReflectionActor( const Vector3 &center, const Vector2 &halfSize,
-                               const Quaternion orientation, Camera *masterCamera,
-                               IdString workspaceName ) :
+                               const Quaternion orientation, IdString workspaceName ) :
             mPlane( orientation.zAxis(), center ), mCenter( center ),
-            mHalfSize( halfSize ), mOrientation( orientation ), mMasterCamera( masterCamera ),
+            mHalfSize( halfSize ), mOrientation( orientation ),
             mReflectionCamera( 0 ), mWorkspaceName( workspaceName ), mWorkspace( 0 ),
             mIndex( 0 ), mActorPlane( 0 )
         {
@@ -122,6 +118,8 @@ namespace Ogre
         const Quaternion& getOrientation(void) const;
         const Vector3& getNormal(void) const;
         const Plane& getPlane(void) const;
+
+        Real getSquaredDistanceTo( const Vector3 &pos ) const;
     };
 
     /** @} */

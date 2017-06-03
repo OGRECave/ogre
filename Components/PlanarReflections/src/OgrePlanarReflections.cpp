@@ -34,15 +34,23 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderTexture.h"
 #include "Compositor/OgreCompositorManager2.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 #include "Math/Array/OgreBooleanMask.h"
 #include "OgreLogManager.h"
 
 namespace Ogre
 {
     PlanarReflections::PlanarReflections( SceneManager *sceneManager,
-                                          CompositorManager2 *compositorManager ) :
+                                          CompositorManager2 *compositorManager,
+                                          size_t maxActiveActors, Camera *lockCamera ) :
         mActorsSoA( 0 ),
         mCapacityActorsSoA( 0 ),
+        mLastAspectRatio( 0 ),
+        mLastCameraPos( Vector3::ZERO ),
+        mLastCameraRot( Quaternion::IDENTITY ),
+        mLastCamera( 0 ),
+        mLockCamera( lockCamera ),
+        mMaxActiveActors( maxActiveActors ),
         mSceneManager( sceneManager ),
         mCompositorManager( compositorManager )
     {
@@ -111,8 +119,7 @@ namespace Ogre
 
         pushActor( new PlanarReflectionActor( actor ) );
         PlanarReflectionActor *newActor = mActors.back();
-        String cameraName = actor.mMasterCamera->getName();
-        cameraName += "_PlanarReflectionActor #" + StringConverter::toString( uniqueId );
+        String cameraName = "PlanarReflectionActor #" + StringConverter::toString( uniqueId );
         newActor->mReflectionCamera = mSceneManager->createCamera( cameraName, useAccurateLighting );
         newActor->mReflectionCamera->enableReflection( newActor->mPlane );
         newActor->mReflectionCamera->setAutoAspectRatio( true );
@@ -134,7 +141,7 @@ namespace Ogre
         channels.push_back( channel );
         newActor->mWorkspace = mCompositorManager->addWorkspace( mSceneManager, channels,
                                                                  newActor->mReflectionCamera,
-                                                                 newActor->mWorkspaceName, false );
+                                                                 newActor->mWorkspaceName, false, 0 );
         newActor->updateArrayActorPlane();
         return newActor;
     }
@@ -176,13 +183,51 @@ namespace Ogre
         mActors.clear();
     }
     //-----------------------------------------------------------------------------------
-    void PlanarReflections::update(void)
+    void PlanarReflections::beginFrame(void)
     {
+        mLastCamera = 0;
+        mLastAspectRatio = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    struct OrderPlanarReflectionActorsByDistanceToPoint
+    {
+        Vector3 point;
+
+        OrderPlanarReflectionActorsByDistanceToPoint( const Vector3 &p ) :
+            point( p ) {}
+
+        bool operator () ( PlanarReflectionActor *_l, PlanarReflectionActor *_r ) const
+        {
+            return _l->getSquaredDistanceTo( point ) < _r->getSquaredDistanceTo( point );
+        }
+    };
+    void PlanarReflections::update( Camera *camera )
+    {
+        if( mLockCamera && camera != mLockCamera )
+            return; //This is not the camera we are allowed to work with
+
+        if( mLastCamera == camera &&
+            mLastAspectRatio == camera->getAspectRatio() &&
+            (!mLockCamera &&
+             mLastCameraPos == camera->getDerivedPosition() &&
+             mLastCameraRot == camera->getDerivedOrientation()) )
+        {
+            return;
+        }
+
+        mLastAspectRatio = camera->getAspectRatio();
+        mLastCameraPos = camera->getDerivedPosition();
+        mLastCameraRot = camera->getDerivedOrientation();
+        mLastCamera = camera;
+
         struct ArrayPlane
         {
             ArrayVector3    normal;
             ArrayReal       negD;
         };
+
+        const Vector3 camPos( camera->getDerivedPosition() );
+        const Quaternion camRot( camera->getDerivedOrientation() );
 
         //Update reflection cameras to keep up their data with the master camera.
         PlanarReflectionActorVec::iterator itor = mActors.begin();
@@ -191,8 +236,8 @@ namespace Ogre
         while( itor != end )
         {
             PlanarReflectionActor *actor = *itor;
-            actor->mReflectionCamera->setPosition( actor->mMasterCamera->getDerivedPosition() );
-            actor->mReflectionCamera->setOrientation( actor->mMasterCamera->getDerivedOrientation() );
+            actor->mReflectionCamera->setPosition( camPos );
+            actor->mReflectionCamera->setOrientation( camRot );
             ++itor;
         }
 
@@ -216,69 +261,21 @@ namespace Ogre
 
         ArrayActorPlane * RESTRICT_ALIAS actorsPlanes = mActorsSoA;
 
+        {
+            const Vector3 *corners = camera->getWorldSpaceCorners();
+            for( int i=0; i<8; ++i )
+                worldSpaceCorners[i].setAll( corners[i] );
+
+            const Plane *planes = camera->getFrustumPlanes();
+            for( int i=0; i<6; ++i )
+            {
+                frustums[i].normal.setAll( planes[i].normal );
+                frustums[i].negD = Mathlib::SetAll( -planes[i].d );
+            }
+        }
+
         for( size_t i=0; i<numActors; i += ARRAY_PACKED_REALS )
         {
-            bool bCamerasChanged = false;
-            for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-            {
-                TODO_mActors_out_of_bounds;
-                Camera *masterCamera = mActors[i + j]->mMasterCamera;
-                bCamerasChanged |= prevCameras[j] != masterCamera;
-                prevCameras[j] = masterCamera;
-            }
-
-            if( bCamerasChanged )
-            {
-                OGRE_ALIGNED_DECL( Vector4, aosCameraNormal[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
-                OGRE_ALIGNED_DECL( Vector4, aosWorldCorners[4u][ARRAY_PACKED_REALS],
-                                   OGRE_SIMD_ALIGNMENT );
-
-                //Load world space corners from AoS -> SoA
-                //We only need to convert 4, then derive the other 4 in SoA.
-                for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-                {
-                    TODO_mActors_out_of_bounds;
-                    Camera *masterCamera = mActors[i + j]->mMasterCamera;
-                    const Vector3 *corners = masterCamera->getWorldSpaceCorners();
-                    aosWorldCorners[0][j] = corners[0];
-                    aosWorldCorners[1][j] = corners[2];
-                    aosWorldCorners[2][j] = corners[4];
-                    aosWorldCorners[3][j] = corners[6];
-                }
-
-                worldSpaceCorners[0].loadFromAoS( aosWorldCorners[0][0].ptr() );
-                worldSpaceCorners[2].loadFromAoS( aosWorldCorners[1][0].ptr() );
-                worldSpaceCorners[4].loadFromAoS( aosWorldCorners[2][0].ptr() );
-                worldSpaceCorners[6].loadFromAoS( aosWorldCorners[3][0].ptr() );
-                worldSpaceCorners[1] = ArrayVector3( worldSpaceCorners[2].mChunkBase[0],
-                                                     worldSpaceCorners[0].mChunkBase[1],
-                                                     worldSpaceCorners[0].mChunkBase[2] );
-                worldSpaceCorners[3] = ArrayVector3( worldSpaceCorners[0].mChunkBase[0],
-                                                     worldSpaceCorners[2].mChunkBase[1],
-                                                     worldSpaceCorners[0].mChunkBase[2] );
-                worldSpaceCorners[5] = ArrayVector3( worldSpaceCorners[6].mChunkBase[0],
-                                                     worldSpaceCorners[4].mChunkBase[1],
-                                                     worldSpaceCorners[4].mChunkBase[2] );
-                worldSpaceCorners[7] = ArrayVector3( worldSpaceCorners[4].mChunkBase[0],
-                                                     worldSpaceCorners[6].mChunkBase[1],
-                                                     worldSpaceCorners[4].mChunkBase[2] );
-
-                //Load 4 cameras at a time (6 frustums per camera)
-                for( int k=0; k<6; ++k )
-                {
-                    for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-                    {
-                        TODO_mActors_out_of_bounds;
-                        Camera *masterCamera = mActors[i + j]->mMasterCamera;
-                        const Plane *planes = masterCamera->getFrustumPlanes();
-                        aosCameraNormal[j] = planes[k].normal;
-                        Mathlib::Set( frustums[k].negD, -planes[k].d, j );
-                    }
-
-                    frustums[k].normal.loadFromAoS( aosCameraNormal[0].ptr() );
-                }
-            }
-
             ArrayMaskR mask;
             mask = BooleanMask4::getAllSetMask();
 
@@ -412,11 +409,34 @@ namespace Ogre
 
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
-                if( IS_BIT_SET( j, scalarMask ) )
+                if( i + j < mActors.size() )
                 {
-                    TODO;
+                    if( IS_BIT_SET( j, scalarMask ) )
+                        mTmpActors.push_back( mActors[i + j] );
+                    else
+                        mActors[i + j]->mWorkspace->setEnabled( false );
                 }
             }
         }
+
+        std::sort( mTmpActors.begin(), mTmpActors.end(),
+                   OrderPlanarReflectionActorsByDistanceToPoint( camPos ) );
+
+        itor = mTmpActors.begin();
+        end  = mTmpActors.end();
+
+        while( itor != end )
+        {
+            const size_t idx = itor - mTmpActors.begin();
+            if( idx < mMaxActiveActors )
+                (*itor)->mWorkspace->setEnabled( true );
+            else
+                (*itor)->mWorkspace->setEnabled( false );
+            ++itor;
+        }
+
+        mTmpActors.resize( std::min( mTmpActors.size(), mMaxActiveActors ) );
+
+        mTmpActors.clear();
     }
 }

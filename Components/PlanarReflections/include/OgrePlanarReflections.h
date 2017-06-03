@@ -48,13 +48,22 @@ namespace Ogre
         ArrayActorPlane             *mActorsSoA;
         size_t                      mCapacityActorsSoA;
 
+        Real                        mLastAspectRatio;
+        Vector3                     mLastCameraPos;
+        Quaternion                  mLastCameraRot;
+        Camera                      *mLastCamera;
+        Camera                      *mLockCamera;
+        PlanarReflectionActorVec    mTmpActors;
+
+        size_t              mMaxActiveActors;
         SceneManager        *mSceneManager;
         CompositorManager2  *mCompositorManager;
 
         void pushActor( PlanarReflectionActor *actor );
 
     public:
-        PlanarReflections( SceneManager *sceneManager, CompositorManager2 *compositorManager );
+        PlanarReflections( SceneManager *sceneManager, CompositorManager2 *compositorManager,
+                           size_t maxActiveActors, Camera *lockCamera );
         ~PlanarReflections();
 
         /** Adds an actor plane that other objects can use as source for reflections if they're
@@ -89,7 +98,8 @@ namespace Ogre
         void destroyActor( PlanarReflectionActor *actor );
         void destroyAllActors(void);
 
-        void update(void);
+        void beginFrame(void);
+        void update( Camera *camera );
     };
 
     /** @} */
