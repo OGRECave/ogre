@@ -42,6 +42,16 @@ namespace Ogre
 
     class _OgrePlanarReflectionsExport PlanarReflections
     {
+        struct TrackedRenderable
+        {
+            Renderable      *renderable;
+            MovableObject   *movableObject;
+            Vector3         reflNormal;
+            Vector3         renderableCenter;
+        };
+
+        typedef FastArray<TrackedRenderable> TrackedRenderableArray;
+
         typedef vector<PlanarReflectionActor*>::type PlanarReflectionActorVec;
 
         PlanarReflectionActorVec    mActors;
@@ -53,9 +63,11 @@ namespace Ogre
         Quaternion                  mLastCameraRot;
         Camera                      *mLastCamera;
         Camera                      *mLockCamera;
-        PlanarReflectionActorVec    mTmpActors;
+        PlanarReflectionActorVec    mActiveActors;
+        TrackedRenderableArray      mTrackedRenderables;
 
-        size_t              mMaxActiveActors;
+        uint8               mMaxActiveActors;
+        Real                mMaxSqDistance;
         SceneManager        *mSceneManager;
         CompositorManager2  *mCompositorManager;
 
@@ -63,7 +75,7 @@ namespace Ogre
 
     public:
         PlanarReflections( SceneManager *sceneManager, CompositorManager2 *compositorManager,
-                           size_t maxActiveActors, Camera *lockCamera );
+                           uint8 maxActiveActors, Real maxSqDistance, Camera *lockCamera );
         ~PlanarReflections();
 
         /** Adds an actor plane that other objects can use as source for reflections if they're
@@ -100,6 +112,17 @@ namespace Ogre
 
         void beginFrame(void);
         void update( Camera *camera );
+
+        /// Returns the amount of bytes that fillConstBufferData is going to fill.
+//        size_t getConstBufferSize(void) const;
+//        /** Fills 'passBufferPtr' with the necessary data for PlanarReflections.
+//            @see getConstBufferSize
+//        @remarks
+//            Assumes 'passBufferPtr' is aligned to a vec4/float4 boundary.
+//        */
+//        void fillConstBufferData( RenderTarget *renderTarget,
+//                                  float * RESTRICT_ALIAS passBufferPtr ) const;
+        TexturePtr getTexture( uint8 actorIdx ) const;
     };
 
     /** @} */

@@ -42,7 +42,8 @@ namespace Ogre
 {
     PlanarReflections::PlanarReflections( SceneManager *sceneManager,
                                           CompositorManager2 *compositorManager,
-                                          size_t maxActiveActors, Camera *lockCamera ) :
+                                          uint8 maxActiveActors, Real maxSqDistance,
+                                          Camera *lockCamera ) :
         mActorsSoA( 0 ),
         mCapacityActorsSoA( 0 ),
         mLastAspectRatio( 0 ),
@@ -51,6 +52,7 @@ namespace Ogre
         mLastCamera( 0 ),
         mLockCamera( lockCamera ),
         mMaxActiveActors( maxActiveActors ),
+        mMaxSqDistance( maxSqDistance ),
         mSceneManager( sceneManager ),
         mCompositorManager( compositorManager )
     {
@@ -187,6 +189,8 @@ namespace Ogre
     {
         mLastCamera = 0;
         mLastAspectRatio = 0;
+
+        mActiveActors.clear();
     }
     //-----------------------------------------------------------------------------------
     struct OrderPlanarReflectionActorsByDistanceToPoint
@@ -215,6 +219,8 @@ namespace Ogre
             return;
         }
 
+        mActiveActors.clear();
+
         mLastAspectRatio = camera->getAspectRatio();
         mLastCameraPos = camera->getDerivedPosition();
         mLastCameraRot = camera->getDerivedOrientation();
@@ -228,6 +234,8 @@ namespace Ogre
 
         const Vector3 camPos( camera->getDerivedPosition() );
         const Quaternion camRot( camera->getDerivedOrientation() );
+        Real nearPlane = camera->getNearClipDistance();
+        Real farPlane = camera->getFarClipDistance();
 
         //Update reflection cameras to keep up their data with the master camera.
         PlanarReflectionActorVec::iterator itor = mActors.begin();
@@ -238,6 +246,8 @@ namespace Ogre
             PlanarReflectionActor *actor = *itor;
             actor->mReflectionCamera->setPosition( camPos );
             actor->mReflectionCamera->setOrientation( camRot );
+            actor->mReflectionCamera->setNearClipDistance( nearPlane );
+            actor->mReflectionCamera->setFarClipDistance( farPlane );
             ++itor;
         }
 
@@ -412,22 +422,22 @@ namespace Ogre
                 if( i + j < mActors.size() )
                 {
                     if( IS_BIT_SET( j, scalarMask ) )
-                        mTmpActors.push_back( mActors[i + j] );
+                        mActiveActors.push_back( mActors[i + j] );
                     else
                         mActors[i + j]->mWorkspace->setEnabled( false );
                 }
             }
         }
 
-        std::sort( mTmpActors.begin(), mTmpActors.end(),
+        std::sort( mActiveActors.begin(), mActiveActors.end(),
                    OrderPlanarReflectionActorsByDistanceToPoint( camPos ) );
 
-        itor = mTmpActors.begin();
-        end  = mTmpActors.end();
+        itor = mActiveActors.begin();
+        end  = mActiveActors.end();
 
         while( itor != end )
         {
-            const size_t idx = itor - mTmpActors.begin();
+            const size_t idx = itor - mActiveActors.begin();
             if( idx < mMaxActiveActors )
                 (*itor)->mWorkspace->setEnabled( true );
             else
@@ -435,8 +445,60 @@ namespace Ogre
             ++itor;
         }
 
-        mTmpActors.resize( std::min( mTmpActors.size(), mMaxActiveActors ) );
+        mActiveActors.resize( std::min<size_t>( mActiveActors.size(), mMaxActiveActors ) );
 
-        mTmpActors.clear();
+        TrackedRenderableArray::const_iterator itTracked = mTrackedRenderables.begin();
+        TrackedRenderableArray::const_iterator enTracked = mTrackedRenderables.end();
+
+        while( itTracked != enTracked )
+        {
+            if( itTracked->movableObject->getVisible() )
+            {
+                const Matrix4 &fullTransform = itTracked->movableObject->_getParentNodeFullTransform();
+                Matrix3 rotMat3x3;
+                fullTransform.extract3x3Matrix( rotMat3x3 );
+                const Vector3 reflNormal = rotMat3x3 * itTracked->reflNormal;
+                const Vector3 rendCenter = fullTransform * itTracked->renderableCenter;
+
+                uint8 bestActorIdx = mMaxActiveActors;
+                Real bestCosAngle = -1;
+                Real bestSqDistance = std::numeric_limits<Real>::max();
+
+                itor = mActiveActors.begin();
+                end  = mActiveActors.end();
+
+                while( itor != end )
+                {
+                    PlanarReflectionActor *actor = *itor;
+                    const Real cosAngle = actor->getNormal().dotProduct( reflNormal );
+
+                    const Real cos20 = 0.939692621f;
+
+                    if( cosAngle < cos20 &&
+                        (cosAngle < bestCosAngle ||
+                        Math::Abs(cosAngle - bestCosAngle) < Real( 0.060307379f )) )
+                    {
+                        Real sqDistance = actor->getSquaredDistanceTo( rendCenter );
+                        if( sqDistance < mMaxSqDistance && sqDistance <= bestSqDistance )
+                        {
+                            bestActorIdx = static_cast<uint8>( itor - mActiveActors.begin() );
+                        }
+                    }
+
+                    ++itor;
+                }
+
+                itTracked->renderable->mCustomParameter = bestActorIdx;
+            }
+
+            ++itTracked;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    TexturePtr PlanarReflections::getTexture( uint8 actorIdx ) const
+    {
+        if( actorIdx >= mActiveActors.size() )
+            return TexturePtr();
+        return mActiveActors[actorIdx]->mReflectionTexture;
     }
 }

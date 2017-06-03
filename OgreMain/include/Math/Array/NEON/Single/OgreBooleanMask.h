@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class BooleanMask4
+    class _OgreExport BooleanMask4
     {
     public:
         enum

@@ -37,6 +37,9 @@ namespace Ogre
 {
     class CompositorShadowNode;
     struct QueuedRenderable;
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+    class PlanarReflections;
+#endif
 
     /** \addtogroup Component
     *  @{
@@ -116,7 +119,7 @@ namespace Ogre
         TexturePtr              mTargetEnvMap;
         ParallaxCorrectedCubemap    *mParallaxCorrectedCubemap;
 
-        uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
+        uint32                  mCurrentPassBuffer;     /// Resets to zero every new frame.
 
         TexBufferPacked         *mGridBuffer;
         TexBufferPacked         *mGlobalLightListBuffer;
@@ -126,7 +129,12 @@ namespace Ogre
         TextureVec const        *mPrePassTextures;
         TexturePtr              mPrePassMsaaDepthTexture;
         TextureVec const        *mSsrTexture;
-        IrradianceVolume       *mIrradianceVolume;
+        IrradianceVolume        *mIrradianceVolume;
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+        //TODO: After texture refactor it should be possible to abstract this,
+        //so we don't have to be aware of PlanarReflections class.
+        PlanarReflections       *mPlanarReflections;
+#endif
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
