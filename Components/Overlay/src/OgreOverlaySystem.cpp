@@ -49,7 +49,7 @@ namespace v1 {
 
         mFontManager = OGRE_NEW FontManager();
 #if OGRE_PROFILING
-		mProfileListener = new Ogre::v1::OverlayProfileSessionListener();
+        mProfileListener = new Ogre::v1::OverlayProfileSessionListener();
         Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
         if (prof)
         {
