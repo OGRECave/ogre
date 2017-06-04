@@ -290,8 +290,6 @@ namespace Ogre
             mask = BooleanMask4::getAllSetMask();
 
             //Test all 4 quad vertices against each of the 6 frustum planes.
-            ArrayVector3 halfSize( actorsPlanes->xyHalfSize[0], actorsPlanes->xyHalfSize[1],
-                                   ARRAY_REAL_ZERO );
             for( int k=0; k<6; ++k )
             {
                 ArrayMaskR vertexMask = ARRAY_MASK_ZERO;
@@ -299,27 +297,27 @@ namespace Ogre
 
                 ArrayVector3 tangentDir, vertexPoint;
 
-                tangentDir = actorsPlanes->planeNormals.yAxis();
-                vertexPoint = actorsPlanes->center + tangentDir * halfSize;
+                tangentDir = actorsPlanes->planeNormals.yAxis() * actorsPlanes->xyHalfSize[1];
+                vertexPoint = actorsPlanes->center + tangentDir;
                 dotResult = frustums[k].normal.dotProduct( vertexPoint ) - frustums[k].negD;
                 vertexMask = Mathlib::Or( vertexMask,
                                           Mathlib::CompareGreater( dotResult,
                                                                    ARRAY_REAL_ZERO ) );
 
-                vertexPoint = actorsPlanes->center - tangentDir * halfSize;
+                vertexPoint = actorsPlanes->center - tangentDir;
                 dotResult = frustums[k].normal.dotProduct( vertexPoint ) - frustums[k].negD;
                 vertexMask = Mathlib::Or( vertexMask,
                                           Mathlib::CompareGreater( dotResult,
                                                                    ARRAY_REAL_ZERO ) );
 
-                tangentDir = actorsPlanes->planeNormals.xAxis();
-                vertexPoint = actorsPlanes->center + tangentDir * halfSize;
+                tangentDir = actorsPlanes->planeNormals.xAxis() * actorsPlanes->xyHalfSize[0];
+                vertexPoint = actorsPlanes->center + tangentDir;
                 dotResult = frustums[k].normal.dotProduct( vertexPoint ) - frustums[k].negD;
                 vertexMask = Mathlib::Or( vertexMask,
                                           Mathlib::CompareGreater( dotResult,
                                                                    ARRAY_REAL_ZERO ) );
 
-                vertexPoint = actorsPlanes->center - tangentDir * halfSize;
+                vertexPoint = actorsPlanes->center - tangentDir;
                 dotResult = frustums[k].normal.dotProduct( vertexPoint ) - frustums[k].negD;
                 vertexMask = Mathlib::Or( vertexMask,
                                           Mathlib::CompareGreater( dotResult,
@@ -340,7 +338,11 @@ namespace Ogre
                 actorPlaneNormal = actorsPlanes->planeNormals.zAxis();
                 actorPlaneNegD = actorsPlanes->planeNegD[0];
                 vertexMask = ARRAY_MASK_ZERO;
-                for( int l=0; l<8; ++l )
+                //Only test against the vertices from the near frustum. If they're all
+                //in the negative side of this plane, then this plane is looking
+                //away from the camera
+                //for( int l=0; l<8; ++l )
+                for( int l=0; l<4; ++l )
                 {
                     dotResult = actorPlaneNormal.dotProduct( worldSpaceCorners[l] ) - actorPlaneNegD;
                     vertexMask = Mathlib::Or( vertexMask,
