@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreOverlayManager.h"
 #include "OgreOverlayElementFactory.h"
+#include "OgreOverlayProfileSessionListener.h"
 #include "OgreFontManager.h"
 
 namespace Ogre {
@@ -48,7 +49,7 @@ namespace v1 {
 
         mFontManager = OGRE_NEW FontManager();
 #if OGRE_PROFILING
-        mProfileListener = new Ogre::OverlayProfileSessionListener();
+		mProfileListener = new Ogre::v1::OverlayProfileSessionListener();
         Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
         if (prof)
         {
