@@ -21,6 +21,9 @@ struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 	float4 gl_Position [[position]];
+@property( hlms_global_clip_distances )
+	float gl_ClipDistance0 [[clip_distance]];
+@end
 };
 
 @property( !hlms_identity_world )
@@ -101,6 +104,10 @@ vertex PS_INPUT main_metal
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	outVs.gl_Position.z = outVs.gl_Position.z * (outVs.gl_Position.w * pass.depthRange.y);
+@end
+
+@property( hlms_global_clip_distances )
+	outVs.gl_ClipDistance0 = dot( float4( worldPos.xyz, 1.0 ), pass.clipPlane0.xyzw );
 @end
 
 	@insertpiece( custom_vs_posExecution )

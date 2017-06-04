@@ -100,7 +100,7 @@ void main()
 @end
 
 @property( hlms_global_clip_distances )
-	gl_ClipDistance[0] = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
+	gl_ClipDistance[0] = dot( float4( worldPos.xyz, 1.0 ), pass.clipPlane0.xyzw );
 @end
 
 	@insertpiece( custom_vs_posExecution )

@@ -6,6 +6,9 @@ cbuffer PassBuffer : register(b0)
 	{
 	//Vertex shader
 	float4x4 viewProj[2];
+	@property( hlms_global_clip_distances )
+		float4 clipPlane0;
+	@end
 	@property( hlms_shadowcaster )
 		float4 depthRange;
 	@end

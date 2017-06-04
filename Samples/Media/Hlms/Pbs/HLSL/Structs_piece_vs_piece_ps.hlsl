@@ -32,6 +32,10 @@ cbuffer PassBuffer : register(b0)
 	//Vertex shader (common to both receiver and casters)
 	float4x4 viewProj;
 
+@property( hlms_global_clip_distances )
+	float4 clipPlane0;
+@end
+
 @property( hlms_shadowcaster_point )
 	float4 cameraPosWS;	//Camera position in world space
 @end
