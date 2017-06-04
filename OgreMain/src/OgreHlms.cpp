@@ -107,6 +107,7 @@ namespace Ogre
     const IdString HlmsBaseProp::LightsSpotParams   = IdString( "hlms_lights_spotparams" );
 
     //Change per scene pass
+    const IdString HlmsBaseProp::GlobalClipDistances= IdString( "hlms_global_clip_distances" );
     const IdString HlmsBaseProp::DualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
     const IdString HlmsBaseProp::NumShadowMapLights = IdString( "hlms_num_shadow_map_lights" );
     const IdString HlmsBaseProp::NumShadowMapTextures= IdString("hlms_num_shadow_map_textures" );
@@ -1902,6 +1903,9 @@ namespace Ogre
             pso.macroblock = mHlmsManager->getMacroblock( prepassMacroblock );
         }
 
+        const size_t numGlobalClipDistances = (size_t)getProperty( HlmsBaseProp::GlobalClipDistances );
+        pso.clipDistances = (1u << numGlobalClipDistances) - 1u;
+
         //TODO: Configurable somehow (likely should be in datablock).
         pso.sampleMask = 0xffffffff;
 
@@ -2388,6 +2392,10 @@ namespace Ogre
             setProperty( HlmsBaseProp::ShadowUsesDepthTexture,
                          renderTarget->getForceDisableColourWrites() ? 1 : 0 );
         }
+
+        Camera *camera = sceneManager->getCameraInProgress();
+        if( camera->isReflected() )
+            setProperty( HlmsBaseProp::GlobalClipDistances, 1 );
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         setProperty( HlmsBaseProp::RenderDepthOnly,

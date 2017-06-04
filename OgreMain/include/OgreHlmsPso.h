@@ -159,7 +159,8 @@ namespace Ogre
         VertexElement2VecVec    vertexElements;
         OperationType           operationType;
         bool                    enablePrimitiveRestart;
-        uint8                   padding[3];
+        uint8                   clipDistances; //Bitmask. Only needed by GL.
+        uint8                   padding[2];
 
         HlmsMacroblock const    *macroblock;
         HlmsBlendblock const    *blendblock;
@@ -191,6 +192,7 @@ namespace Ogre
             sampleMask = 0;
             operationType = OT_POINT_LIST;
             enablePrimitiveRestart = false;
+            clipDistances = 0;
             memset( padding, 0, sizeof(padding) );
             memset( &pass, 0, sizeof(HlmsPassPso) );
             rsData = 0;

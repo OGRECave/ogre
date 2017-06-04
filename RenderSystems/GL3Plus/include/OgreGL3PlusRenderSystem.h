@@ -167,7 +167,8 @@ namespace Ogre {
 
         unsigned char *mSwIndirectBufferPtr;
 
-        GL3PlusHlmsPso const *mPso;
+        uint8                   mClipDistances;
+        GL3PlusHlmsPso const    *mPso;
         GLSLShader *mCurrentComputeShader;
 
         struct Uav

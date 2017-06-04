@@ -183,6 +183,7 @@ namespace Ogre {
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
         mSwIndirectBufferPtr = 0;
+        mClipDistances = 0;
         mPso = 0;
         mCurrentComputeShader = 0;
         mLargestSupportedAnisotropy = 1;
@@ -2006,6 +2007,29 @@ namespace Ogre {
         GLSLShader::unbindAll();
 
         RenderSystem::_setPipelineStateObject( pso );
+
+        uint8 newClipDistances = 0;
+        if( pso )
+            newClipDistances = pso->clipDistances;
+
+        if( mClipDistances != newClipDistances )
+        {
+            for( size_t i=0; i<8u; ++i )
+            {
+                const uint8 bitFlag = 1u << i;
+                bool oldClipSet = (mClipDistances & bitFlag) != 0;
+                bool newClipSet = (newClipDistances & bitFlag) != 0;
+                if( oldClipSet != newClipSet )
+                {
+                    if( newClipSet )
+                        glEnable( GL_CLIP_DISTANCE0 + i );
+                    else
+                        glDisable( GL_CLIP_DISTANCE0 + i );
+                }
+            }
+
+            mClipDistances = newClipDistances;
+        }
 
         mUseAdjacency   = false;
         mPso            = 0;

@@ -984,6 +984,11 @@ namespace Ogre
             mapSize += (2 + 2) * 4;
         }
 
+        const bool isCameraReflected = camera->isReflected();
+        //vec4 clipPlane0
+        if( isCameraReflected )
+            mapSize += 4 * 4;
+
         mapSize += mListener->getPassBufferSize( shadowNode, casterPass, dualParaboloid,
                                                  sceneManager );
 
@@ -1013,6 +1018,16 @@ namespace Ogre
         Matrix4 viewProjMatrix = projectionMatrix * viewMatrix;
         for( size_t i=0; i<16; ++i )
             *passBufferPtr++ = (float)viewProjMatrix[0][i];
+
+        //vec4 clipPlane0
+        if( isCameraReflected )
+        {
+            const Plane &reflPlane = camera->getReflectionPlane();
+            *passBufferPtr++ = (float)reflPlane.normal.x;
+            *passBufferPtr++ = (float)reflPlane.normal.y;
+            *passBufferPtr++ = (float)reflPlane.normal.z;
+            *passBufferPtr++ = (float)reflPlane.d;
+        }
 
         //vec4 cameraPosWS;
         if( isShadowCastingPointLight )

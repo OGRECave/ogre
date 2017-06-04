@@ -3,6 +3,9 @@
 out gl_PerVertex
 {
 	vec4 gl_Position;
+@property( hlms_global_clip_distances )
+	float gl_ClipDistance[1];
+@end
 };
 
 layout(std140) uniform;
@@ -95,5 +98,10 @@ void main()
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	gl_Position.z = (gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y * gl_Position.w;
 @end
+
+@property( hlms_global_clip_distances )
+	gl_ClipDistance[0] = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
+@end
+
 	@insertpiece( custom_vs_posExecution )
 }

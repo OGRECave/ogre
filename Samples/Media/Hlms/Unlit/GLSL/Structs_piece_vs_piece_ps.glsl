@@ -4,6 +4,9 @@ layout(binding = 0) uniform PassBuffer
 {
 	//Vertex shader
 	mat4 viewProj[2];
+	@property( hlms_global_clip_distances )
+		vec4 clipPlane0;
+	@end
 	@property( hlms_shadowcaster )
 		vec4 depthRange;
 	@end

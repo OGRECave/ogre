@@ -516,6 +516,11 @@ namespace Ogre
             mapSize += 4 * 4;
         }
 
+        const bool isCameraReflected = camera->isReflected();
+        //vec4 clipPlane0
+        if( isCameraReflected )
+            mapSize += 4 * 4;
+
         mapSize += mListener->getPassBufferSize( shadowNode, casterPass,
                                                  dualParaboloid, sceneManager );
 
@@ -547,6 +552,16 @@ namespace Ogre
         //mat4 viewProj[1] (identityProj);
         for( size_t i=0; i<16; ++i )
             *passBufferPtr++ = (float)mPreparedPass.viewProjMatrix[1][0][i];
+
+        //vec4 clipPlane0
+        if( isCameraReflected )
+        {
+            const Plane &reflPlane = camera->getReflectionPlane();
+            *passBufferPtr++ = (float)reflPlane.normal.x;
+            *passBufferPtr++ = (float)reflPlane.normal.y;
+            *passBufferPtr++ = (float)reflPlane.normal.z;
+            *passBufferPtr++ = (float)reflPlane.d;
+        }
 
         if( casterPass )
         {
