@@ -167,6 +167,7 @@ namespace Ogre
             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
             HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
             HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
+#ifdef OGRE_TEXTURE_ATLAS
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
@@ -175,6 +176,16 @@ namespace Ogre
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+#else
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+#endif
             HlmsTextureManager::TEXTURE_TYPE_ENV_MAP
         };
 

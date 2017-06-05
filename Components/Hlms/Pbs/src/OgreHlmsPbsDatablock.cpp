@@ -467,6 +467,7 @@ namespace Ogre
             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
             HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
             HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
+#ifdef OGRE_TEXTURE_ATLAS
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
@@ -475,6 +476,16 @@ namespace Ogre
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+#else
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+#endif
             HlmsTextureManager::TEXTURE_TYPE_ENV_MAP
         };
 
@@ -1109,15 +1120,25 @@ namespace Ogre
         case PBSM_DETAIL1:
         case PBSM_DETAIL2:
         case PBSM_DETAIL3:
+#ifdef OGRE_TEXTURE_ATLAS
             retVal = HlmsTextureManager::TEXTURE_TYPE_DETAIL;
+#else
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+#endif
             break;
 
         case PBSM_NORMAL:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_NORMALS;
+            break;
         case PBSM_DETAIL0_NM:
         case PBSM_DETAIL1_NM:
         case PBSM_DETAIL2_NM:
         case PBSM_DETAIL3_NM:
+#ifdef OGRE_TEXTURE_ATLAS
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP;
+#else
             retVal = HlmsTextureManager::TEXTURE_TYPE_NORMALS;
+#endif
             break;
 
         case PBSM_ROUGHNESS:
