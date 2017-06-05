@@ -675,7 +675,7 @@ namespace Ogre
                 textures[i].samplerBlock = hlmsManager->getSamplerblock( samplerBlockRef );
             }
 
-            mSamplerblocks[i] = packedTextures[i].samplerblock;
+            mSamplerblocks[i] = textures[i].samplerBlock;
         }
 
         bakeTextures( textures );
