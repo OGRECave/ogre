@@ -58,6 +58,10 @@ THE SOFTWARE.
 
 #include "Animation/OgreSkeletonInstance.h"
 
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+    #include "OgrePlanarReflections.h"
+#endif
+
 #include "OgreLogManager.h"
 
 namespace Ogre
@@ -956,6 +960,10 @@ namespace Ogre
             if( mIrradianceVolume )
                 mapSize += (4 + 4 + 4*4) * 4;
 
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+            if( mPlanarReflections )
+                mapSize += mPlanarReflections->getConstBufferSize();
+#endif
             //float pssmSplitPoints N times.
             mapSize += numPssmSplits * 4;
             mapSize = alignToNextMultiple( mapSize, 16 );
@@ -1350,6 +1358,13 @@ namespace Ogre
                 passBufferPtr += forwardPlus->getConstBufferSize() >> 2u;
             }
 
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+            if( mPlanarReflections )
+            {
+                mPlanarReflections->fillConstBufferData( renderTarget, projectionMatrix, passBufferPtr );
+                passBufferPtr += mPlanarReflections->getConstBufferSize() >> 2u;
+            }
+#endif
             if( mParallaxCorrectedCubemap )
             {
                 mParallaxCorrectedCubemap->fillConstBufferData( viewMatrix, passBufferPtr );

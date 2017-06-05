@@ -67,6 +67,7 @@ namespace Ogre
         TrackedRenderableArray      mTrackedRenderables;
 
         uint8               mMaxActiveActors;
+        Real                mInvMaxDistance;
         Real                mMaxSqDistance;
         SceneManager        *mSceneManager;
         CompositorManager2  *mCompositorManager;
@@ -75,7 +76,7 @@ namespace Ogre
 
     public:
         PlanarReflections( SceneManager *sceneManager, CompositorManager2 *compositorManager,
-                           uint8 maxActiveActors, Real maxSqDistance, Camera *lockCamera );
+                           uint8 maxActiveActors, Real maxDistance, Camera *lockCamera );
         ~PlanarReflections();
 
         /** Adds an actor plane that other objects can use as source for reflections if they're
@@ -114,14 +115,15 @@ namespace Ogre
         void update( Camera *camera, Real aspectRatio );
 
         /// Returns the amount of bytes that fillConstBufferData is going to fill.
-//        size_t getConstBufferSize(void) const;
-//        /** Fills 'passBufferPtr' with the necessary data for PlanarReflections.
-//            @see getConstBufferSize
-//        @remarks
-//            Assumes 'passBufferPtr' is aligned to a vec4/float4 boundary.
-//        */
-//        void fillConstBufferData( RenderTarget *renderTarget,
-//                                  float * RESTRICT_ALIAS passBufferPtr ) const;
+        size_t getConstBufferSize(void) const;
+
+        /** Fills 'passBufferPtr' with the necessary data for PlanarReflections.
+            @see getConstBufferSize
+        @remarks
+            Assumes 'passBufferPtr' is aligned to a vec4/float4 boundary.
+        */
+        void fillConstBufferData( RenderTarget *renderTarget, const Matrix4 &projectionMatrix,
+                                  float * RESTRICT_ALIAS passBufferPtr ) const;
         TexturePtr getTexture( uint8 actorIdx ) const;
     };
 

@@ -21,6 +21,8 @@ file(
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+add_definitions( -DOgrePlanarReflections_EXPORTS )
+
 ogre_add_library(OgrePlanarReflections ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgrePlanarReflections PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgrePlanarReflections OgreMain)

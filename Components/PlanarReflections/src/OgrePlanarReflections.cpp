@@ -40,9 +40,15 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    static const Ogre::Matrix4 PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE(
+            0.5,    0,    0,  0.5,
+            0,   -0.5,    0,  0.5,
+            0,      0,    1,    0,
+            0,      0,    0,    1 );
+
     PlanarReflections::PlanarReflections( SceneManager *sceneManager,
                                           CompositorManager2 *compositorManager,
-                                          uint8 maxActiveActors, Real maxSqDistance,
+                                          uint8 maxActiveActors, Real maxDistance,
                                           Camera *lockCamera ) :
         mActorsSoA( 0 ),
         mCapacityActorsSoA( 0 ),
@@ -52,7 +58,8 @@ namespace Ogre
         mLastCamera( 0 ),
         mLockCamera( lockCamera ),
         mMaxActiveActors( maxActiveActors ),
-        mMaxSqDistance( maxSqDistance ),
+        mInvMaxDistance( Real(1.0) / maxDistance ),
+        mMaxSqDistance( maxDistance * maxDistance ),
         mSceneManager( sceneManager ),
         mCompositorManager( compositorManager )
     {
@@ -495,6 +502,39 @@ namespace Ogre
 
             ++itTracked;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    size_t PlanarReflections::getConstBufferSize(void) const
+    {
+        return (4u * mMaxActiveActors + 4u * 4u + 4u) * sizeof(float);
+    }
+    //-----------------------------------------------------------------------------------
+    void PlanarReflections::fillConstBufferData( RenderTarget *renderTarget,
+                                                 const Matrix4 &projectionMatrix,
+                                                 float * RESTRICT_ALIAS passBufferPtr ) const
+    {
+        PlanarReflectionActorVec::const_iterator itor = mActiveActors.begin();
+        PlanarReflectionActorVec::const_iterator end  = mActiveActors.end();
+
+        while( itor != end )
+        {
+            const Plane &plane = (*itor)->mPlane;
+            *passBufferPtr++ = static_cast<float>( plane.normal.x );
+            *passBufferPtr++ = static_cast<float>( plane.normal.y );
+            *passBufferPtr++ = static_cast<float>( plane.normal.z );
+            *passBufferPtr++ = static_cast<float>( plane.d );
+
+            ++itor;
+        }
+
+        Matrix4 reflProjMat = PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * projectionMatrix;
+        for( size_t i=0; i<16; ++i )
+            *passBufferPtr++ = (float)reflProjMat[0][i];
+
+        *passBufferPtr++ = static_cast<float>( mInvMaxDistance );
+        *passBufferPtr++ = 1.0f;
+        *passBufferPtr++ = 1.0f;
+        *passBufferPtr++ = 1.0f;
     }
     //-----------------------------------------------------------------------------------
     TexturePtr PlanarReflections::getTexture( uint8 actorIdx ) const
