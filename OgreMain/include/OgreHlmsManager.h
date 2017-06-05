@@ -115,6 +115,9 @@ namespace Ogre
         /// Returns a registered HLMS based on type. May be null.
         Hlms* getHlms( HlmsTypes type )                 { return mRegisteredHlms[type]; }
 
+        /// Returns a registered HLMS based on name. May be null.
+        Hlms* getHlms( IdString name );
+
         HlmsCompute* getComputeHlms(void)               { return mComputeHlms; }
 
         /** Creates a macroblock that matches the same parameter as the input. If it already exists,

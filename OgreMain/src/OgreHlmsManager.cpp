@@ -119,6 +119,21 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    Hlms* HlmsManager::getHlms( IdString name )
+    {
+        Hlms* retVal = NULL;
+
+        for( size_t i=0; i<HLMS_MAX && !retVal; ++i )
+        {
+            if( mRegisteredHlms[i] && mRegisteredHlms[i]->getTypeName() == name )
+            {
+                retVal = mRegisteredHlms[i];
+            }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsManager::addReference( const BasicBlock *block )
     {
         BasicBlock *realBlock = mBlocks[block->mBlockType][block->mId];
