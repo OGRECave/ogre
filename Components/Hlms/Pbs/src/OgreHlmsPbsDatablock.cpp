@@ -464,7 +464,11 @@ namespace Ogre
         {
             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
             HlmsTextureManager::TEXTURE_TYPE_NORMALS,
-            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+
+            mWorkflow == MetallicWorkflow
+                ? HlmsTextureManager::TEXTURE_TYPE_MONOCHROME
+                : HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+
             HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
             HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
 #ifdef OGRE_TEXTURE_ATLAS
@@ -1110,8 +1114,17 @@ namespace Ogre
         {
         default:
         case PBSM_DIFFUSE:
-        case PBSM_SPECULAR:
             retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+            break;
+        case PBSM_SPECULAR:
+            if( mWorkflow == MetallicWorkflow )
+            {
+                retVal = HlmsTextureManager::TEXTURE_TYPE_MONOCHROME;
+            }
+            else
+            {
+                retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+            }
             break;
         case PBSM_DETAIL_WEIGHT:
             retVal = HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA;

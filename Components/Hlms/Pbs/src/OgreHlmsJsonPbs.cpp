@@ -164,7 +164,11 @@ namespace Ogre
         {
             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
             HlmsTextureManager::TEXTURE_TYPE_NORMALS,
-            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+
+            datablock->getWorkflow() == HlmsPbsDatablock::MetallicWorkflow
+                ? HlmsTextureManager::TEXTURE_TYPE_MONOCHROME
+                : HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+
             HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
             HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
 #ifdef OGRE_TEXTURE_ATLAS
