@@ -678,7 +678,7 @@ namespace Ogre
             You could create an alias however, and thus have two copies of the same texture with
             different loading parameters.
         */
-        static HlmsTextureManager::TextureMapType suggestMapTypeBasedOnTextureType(
+        HlmsTextureManager::TextureMapType suggestMapTypeBasedOnTextureType(
                                                                 PbsTextureTypes type );
 
         virtual void calculateHash();
