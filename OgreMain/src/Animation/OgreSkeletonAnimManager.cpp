@@ -38,7 +38,7 @@ namespace Ogre
 {
     BySkeletonDef::BySkeletonDef( const SkeletonDef *_skeletonDef, size_t threadCount ) :
         skeletonDef( _skeletonDef ),
-        skeletonDefName( _skeletonDef->getName() )
+        skeletonDefName( _skeletonDef->getNameStr() )
     {
         threadStarts.resize( threadCount + 1, 0 );
     }
@@ -90,7 +90,7 @@ namespace Ogre
     SkeletonInstance* SkeletonAnimManager::createSkeletonInstance( const SkeletonDef *skeletonDef,
                                                                     size_t numWorkerThreads )
     {
-        IdString defName( skeletonDef->getName() );
+        IdString defName( skeletonDef->getNameStr() );
         BySkeletonDefList::iterator itor = std::find( bySkeletonDefs.begin(), bySkeletonDefs.end(),
                                                         defName );
         if( itor == bySkeletonDefs.end() )
@@ -150,7 +150,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void SkeletonAnimManager::destroySkeletonInstance( SkeletonInstance *skeletonInstance )
     {
-        IdString defName( skeletonInstance->getDefinition()->getName() );
+        IdString defName( skeletonInstance->getDefinition()->getNameStr() );
         BySkeletonDefList::iterator itor = std::find( bySkeletonDefs.begin(), bySkeletonDefs.end(),
                                                         defName );
 

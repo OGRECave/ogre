@@ -438,7 +438,7 @@ namespace Ogre
         /// The reason this String doesn't live in HlmsDatablock is to prevent
         /// cache trashing (datablocks are hot iterated every frame, and the
         /// full name is rarely ever used)
-        const String* getFullNameString( IdString name ) const;
+        const String* getNameStr(IdString name) const;
 
         /// Returns the filaname & resource group a datablock was created from, and
         /// is associated with its hashed name (this was passed as in @createDatablock).

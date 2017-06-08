@@ -899,7 +899,7 @@ namespace v1 {
         mMaterialName.clear();
         mMaterialGroup.clear();
 
-        const String *fullDatablockName = datablock->getFullName();
+        const String *fullDatablockName = datablock->getNameStr();
         if( fullDatablockName )
         {
             mMaterialName = *fullDatablockName;
