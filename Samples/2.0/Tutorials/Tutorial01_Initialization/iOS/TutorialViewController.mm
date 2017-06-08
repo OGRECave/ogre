@@ -129,7 +129,7 @@ using namespace Demo;
     _startTime = endTime;
 
     _graphicsSystem->beginFrameParallel();
-    _graphicsSystem->update( timeSinceLast );
+    _graphicsSystem->update( _timeSinceLast );
     _graphicsSystem->finishFrameParallel();
     _graphicsSystem->finishFrame();
 }

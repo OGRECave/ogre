@@ -33,6 +33,8 @@
     #include "OSX/macUtils.h"
     #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         #include "System/iOS/iOSUtils.h"
+    #else
+        #include "System/OSX/OSXUtils.h"
     #endif
 #endif
 
@@ -77,23 +79,29 @@ namespace Demo
         }
     #endif
 
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        // Note:  macBundlePath works for iOS too. It's misnamed.
+        mResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
+    #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        mResourcePath = Ogre::macBundlePath() + "/";
+    #endif
+
         Ogre::String pluginsPath;
         // only use plugins.cfg if not static
     #ifndef OGRE_STATIC_LIB
-    #if OGRE_DEBUG_MODE
-        pluginsPath = mPluginsPath + "plugins_d.cfg";
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+         mPluginsPath += mResourcePath;
+    #endif
+    #if OGRE_DEBUG_MODE && !((OGRE_PLATFORM == OGRE_PLATFORM_APPLE) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS))
+        pluginsPath = mResourcePath + "plugins_d.cfg";
     #else
-        pluginsPath = mPluginsPath + "plugins.cfg";
+        pluginsPath = mResourcePath + "plugins.cfg";
     #endif
     #endif
 
         mRoot = OGRE_NEW Ogre::Root( pluginsPath,
-                                     mWriteAccessFolder + "ogre.cfg",
-                                     mWriteAccessFolder + "Ogre.log" );
-
-    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        mResourcePath = Ogre::macBundlePath() + '/';
-    #endif
+                                     mResourcePath + "ogre.cfg",
+                                     mResourcePath + "Ogre.log" );
 
         mStaticPluginLoader.install( mRoot );
 
@@ -388,7 +396,7 @@ namespace Demo
     void GraphicsSystem::addResourceLocation( const Ogre::String &archName, const Ogre::String &typeName,
                                               const Ogre::String &secName )
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
         // OS X does not set the working directory relative to the app,
         // In order to make things portable on OS X we need to provide
         // the loading with it's own bundle path location
@@ -433,7 +441,7 @@ namespace Demo
         Ogre::ConfigFile cf;
         cf.load( mResourcePath + "resources2.cfg" );
 
-        Ogre::String dataFolder = mResourcePath + cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+        Ogre::String dataFolder = Ogre::macBundlePath() + '/' + cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
 
         if( dataFolder.empty() )
             dataFolder = "./";

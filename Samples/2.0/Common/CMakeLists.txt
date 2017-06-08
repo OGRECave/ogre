@@ -18,6 +18,11 @@ if( OGRE_BUILD_PLATFORM_APPLE_IOS )
 		"${CMAKE_CURRENT_SOURCE_DIR}/src/System/iOS/*.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/src/System/iOS/*.mm" )
 	set( SOURCE_FILES ${SOURCE_FILES} ${IOS_SOURCE_FILES} )
+elseif( APPLE )
+    file( GLOB OSX_SOURCE_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/System/Desktop/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/System/OSX/*.mm" )
+	set( SOURCE_FILES ${SOURCE_FILES} ${OSX_SOURCE_FILES} )
 else()
 	file( GLOB DESKTOP_SOURCE_FILES
 		"${CMAKE_CURRENT_SOURCE_DIR}/src/System/Desktop/*.cpp" )

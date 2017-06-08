@@ -91,6 +91,11 @@ namespace Ogre
     protected:
 #ifdef __OBJC__
         OgreConfigWindowDelegate *mWindowDelegate;
+#else
+        // This object is allocated in C++, but used in Objective-C. The original code was only defining
+        // mWindowDelegate for the ObjC case. This led to a size mismatch and a memory smash. The fix is
+        // to make the C++ code aware of the space needed, which is the size of one native pointer.
+        void* pad;
 #endif
         RenderSystem *mSelectedRenderSystem;
     };

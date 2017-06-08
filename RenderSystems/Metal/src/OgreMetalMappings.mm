@@ -41,11 +41,15 @@ namespace Ogre
         case PF_A8:                     return MTLPixelFormatA8Unorm;
         case PF_A4L4:                   return MTLPixelFormatInvalid;
         case PF_BYTE_LA:                return MTLPixelFormatInvalid;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         case PF_R5G6B5:                 return MTLPixelFormatB5G6R5Unorm;
         case PF_B5G6R5:                 return MTLPixelFormatB5G6R5Unorm;
+#endif
         case PF_R3G3B2:                 return MTLPixelFormatInvalid;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         case PF_A4R4G4B4:               return MTLPixelFormatABGR4Unorm;
         case PF_A1R5G5B5:               return MTLPixelFormatBGR5A1Unorm;
+#endif
 
         case PF_X8R8G8B8:
         case PF_A8R8G8B8:
@@ -80,10 +84,12 @@ namespace Ogre
         case PF_SHORT_RGBA:             return MTLPixelFormatRGBA16Snorm;
         case PF_SHORT_GR:               return MTLPixelFormatRG16Snorm;
         case PF_SHORT_RGB:              return MTLPixelFormatRGBA16Snorm;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         case PF_PVRTC_RGB2:             return !isGamma ? MTLPixelFormatPVRTC_RGB_2BPP  : MTLPixelFormatPVRTC_RGB_2BPP_sRGB;
         case PF_PVRTC_RGBA2:            return !isGamma ? MTLPixelFormatPVRTC_RGBA_2BPP : MTLPixelFormatPVRTC_RGBA_2BPP_sRGB;
         case PF_PVRTC_RGB4:             return !isGamma ? MTLPixelFormatPVRTC_RGB_4BPP  : MTLPixelFormatPVRTC_RGB_4BPP_sRGB;
         case PF_PVRTC_RGBA4:            return !isGamma ? MTLPixelFormatPVRTC_RGBA_4BPP : MTLPixelFormatPVRTC_RGBA_4BPP_sRGB;
+#endif
         case PF_PVRTC2_2BPP:            return MTLPixelFormatInvalid;
         case PF_PVRTC2_4BPP:            return MTLPixelFormatInvalid;
         case PF_R11G11B10_FLOAT:        return MTLPixelFormatRG11B10Float;
@@ -122,8 +128,13 @@ namespace Ogre
         case PF_BC7_UNORM:              return MTLPixelFormatBC7_RGBAUnorm;
         case PF_BC7_UNORM_SRGB:         return MTLPixelFormatBC7_RGBAUnorm_sRGB;
 #endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         case PF_R8:                     return !isGamma ? MTLPixelFormatR8Unorm : MTLPixelFormatR8Unorm_sRGB;
         case PF_RG8:                    return !isGamma ? MTLPixelFormatRG8Unorm : MTLPixelFormatRG8Unorm_sRGB;
+#else
+        case PF_R8:                     return MTLPixelFormatR8Unorm;
+        case PF_RG8:                    return MTLPixelFormatRG8Unorm;
+#endif
         case PF_R8_SNORM:               return MTLPixelFormatR8Snorm;
         case PF_R8G8_SNORM:             return MTLPixelFormatRG8Snorm;
         case PF_R8G8B8_SNORM:           return MTLPixelFormatRGBA8Snorm;
@@ -132,10 +143,12 @@ namespace Ogre
         case PF_R16G16_SNORM:           return MTLPixelFormatRG16Snorm;
         case PF_R16G16B16_SNORM:        return MTLPixelFormatRGBA16Snorm;
         case PF_R16G16B16A16_SNORM:     return MTLPixelFormatRGBA16Snorm;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         case PF_ETC1_RGB8:              return !isGamma ? MTLPixelFormatETC2_RGB8 : MTLPixelFormatETC2_RGB8_sRGB;
         case PF_ETC2_RGB8:              return !isGamma ? MTLPixelFormatETC2_RGB8 : MTLPixelFormatETC2_RGB8_sRGB;
         case PF_ETC2_RGBA8:             return !isGamma ? MTLPixelFormatEAC_RGBA8 : MTLPixelFormatEAC_RGBA8_sRGB;
         case PF_ETC2_RGB8A1:            return !isGamma ? MTLPixelFormatETC2_RGB8A1 : MTLPixelFormatETC2_RGB8A1_sRGB;
+#endif
         case PF_ATC_RGB:                        return MTLPixelFormatInvalid;
         case PF_ATC_RGBA_EXPLICIT_ALPHA:        return MTLPixelFormatInvalid;
         case PF_ATC_RGBA_INTERPOLATED_ALPHA:    return MTLPixelFormatInvalid;

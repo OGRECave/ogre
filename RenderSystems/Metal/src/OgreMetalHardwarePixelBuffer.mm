@@ -253,7 +253,8 @@ namespace v1 {
             << " face " << mFace << " level " << mLevel << ":"
             << " width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
             << " format=" << PixelUtil::getFormatName(mFormat)
-            << " MTLformat=" << format;
+            << " MTLformat=" << format
+            << " rowPitch=" << mRowPitch;
         LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 #endif
 

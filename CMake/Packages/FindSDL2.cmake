@@ -151,7 +151,7 @@ IF(SDL2_LIBRARY_TEMP)
   # I think it has something to do with the CACHE STRING.
   # So I use a temporary variable until the end so I can set the
   # "real" variable in one-shot.
-  IF(APPLE)
+  IF(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} "-framework Cocoa")
   ENDIF(APPLE)
 

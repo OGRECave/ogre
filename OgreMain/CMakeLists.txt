@@ -429,7 +429,9 @@ if (APPLE)
   endif ()
 
   # Framework is called 'Ogre'
-  set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
+  if (OGRE_BUILD_LIBS_AS_FRAMEWORKS)
+    set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
+  endif ()
 endif ()
 target_link_libraries(OgreMain ${LIBRARIES})
 if (MINGW)

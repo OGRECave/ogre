@@ -30,7 +30,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 
-using namespace Ogre;
+namespace Ogre
+{
 
 GLenum getGLShaderType(GpuProgramType programType);
 
@@ -77,3 +78,5 @@ size_t GL3PlusGpuProgram::calculateSize(void) const
 
     return memSize;
 }
+
+} // namespace Ogre

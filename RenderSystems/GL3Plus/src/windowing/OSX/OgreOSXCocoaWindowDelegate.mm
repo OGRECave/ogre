@@ -86,8 +86,6 @@ using namespace Ogre;
 - (void)dealloc {
     // Stop observing notifications
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    [super dealloc];
 }
 
 - (void)windowDidResize:(NSNotification *)notification
