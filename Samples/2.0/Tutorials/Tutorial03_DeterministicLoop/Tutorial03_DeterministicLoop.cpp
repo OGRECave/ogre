@@ -37,6 +37,11 @@ namespace Demo
         delete graphicsSystem;
         delete graphicsGameState;
     }
+    
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Demonstrating determinsitic frame loop timing";
+    }
 #endif
 }
 
