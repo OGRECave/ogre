@@ -138,7 +138,7 @@ namespace Ogre
         */
         SkeletonDef( const v1::Skeleton *originalSkeleton, Real frameRate );
 
-        const String& getName(void) const                               { return mName; }
+        const String& getNameStr(void) const                            { return mName; }
 
         const BoneDataVec& getBones(void) const                         { return mBones; }
         const SkeletonAnimationDefVec& getAnimationDefs(void) const     { return mAnimationDefs; }

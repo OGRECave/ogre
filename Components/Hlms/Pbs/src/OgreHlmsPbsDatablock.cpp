@@ -464,9 +464,14 @@ namespace Ogre
         {
             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
             HlmsTextureManager::TEXTURE_TYPE_NORMALS,
-            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+
+            mWorkflow == MetallicWorkflow
+                ? HlmsTextureManager::TEXTURE_TYPE_MONOCHROME
+                : HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+
             HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
             HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
+#ifdef OGRE_TEXTURE_ATLAS
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
@@ -475,6 +480,16 @@ namespace Ogre
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+#else
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+#endif
             HlmsTextureManager::TEXTURE_TYPE_ENV_MAP
         };
 
@@ -660,7 +675,7 @@ namespace Ogre
                 textures[i].samplerBlock = hlmsManager->getSamplerblock( samplerBlockRef );
             }
 
-            mSamplerblocks[i] = packedTextures[i].samplerblock;
+            mSamplerblocks[i] = textures[i].samplerBlock;
         }
 
         bakeTextures( textures );
@@ -973,14 +988,14 @@ namespace Ogre
             if( mTransparencyMode == None && mBlendblock[0]->mIsTransparent )
             {
                 LogManager::getSingleton().logMessage(
-                            "WARNING: PBS Datablock '" + *getFullName() +
+                            "WARNING: PBS Datablock '" + *getNameStr() +
                             "' disabling transparency but forcing a blendblock to"
                             " keep using alpha blending. Performance will be affected." );
             }
             else if( mTransparencyMode != None && !mBlendblock[0]->mIsTransparent )
             {
                 LogManager::getSingleton().logMessage(
-                            "WARNING: PBS Datablock '" + *getFullName() +
+                            "WARNING: PBS Datablock '" + *getNameStr() +
                             "' enabling transparency but forcing a blendblock to avoid"
                             " alpha blending. Results may not look as expected." );
             }
@@ -1099,8 +1114,17 @@ namespace Ogre
         {
         default:
         case PBSM_DIFFUSE:
-        case PBSM_SPECULAR:
             retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+            break;
+        case PBSM_SPECULAR:
+            if( mWorkflow == MetallicWorkflow )
+            {
+                retVal = HlmsTextureManager::TEXTURE_TYPE_MONOCHROME;
+            }
+            else
+            {
+                retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+            }
             break;
         case PBSM_DETAIL_WEIGHT:
             retVal = HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA;
@@ -1109,15 +1133,25 @@ namespace Ogre
         case PBSM_DETAIL1:
         case PBSM_DETAIL2:
         case PBSM_DETAIL3:
+#ifdef OGRE_TEXTURE_ATLAS
             retVal = HlmsTextureManager::TEXTURE_TYPE_DETAIL;
+#else
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+#endif
             break;
 
         case PBSM_NORMAL:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_NORMALS;
+            break;
         case PBSM_DETAIL0_NM:
         case PBSM_DETAIL1_NM:
         case PBSM_DETAIL2_NM:
         case PBSM_DETAIL3_NM:
+#ifdef OGRE_TEXTURE_ATLAS
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP;
+#else
             retVal = HlmsTextureManager::TEXTURE_TYPE_NORMALS;
+#endif
             break;
 
         case PBSM_ROUGHNESS:

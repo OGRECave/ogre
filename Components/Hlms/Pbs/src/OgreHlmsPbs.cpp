@@ -1013,7 +1013,7 @@ namespace Ogre
             mapSize += numPssmSplits * 4;
             mapSize = alignToNextMultiple( mapSize, 16 );
 
-            if( shadowNode )
+            if( numShadowMapLights > 0 )
             {
                 //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
                 mapSize += ( 6 * 4 * 4 ) * numLights;
@@ -1252,7 +1252,7 @@ namespace Ogre
 
             passBufferPtr += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
 
-            if( shadowNode )
+            if( numShadowMapLights > 0 )
             {
                 //All directional lights (caster and non-caster) are sent.
                 //Then non-directional shadow-casting shadow lights are sent.
