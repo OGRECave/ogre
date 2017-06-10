@@ -406,7 +406,7 @@ void main()
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )
 
-@property( use_envprobe_map || hlms_use_ssr || planar_reflections || ambient_hemisphere )
+@property( use_envprobe_map || hlms_use_ssr || use_planar_reflections || ambient_hemisphere )
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 
 	@property( use_envprobe_map )
@@ -460,10 +460,10 @@ void main()
 		float ambientWD = dot( passBuf.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( passBuf.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
-		@property( use_envprobe_map || hlms_use_ssr || planar_reflections )
+		@property( use_envprobe_map || hlms_use_ssr || use_planar_reflections )
 			envColourS	+= mix( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			envColourD	+= mix( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
-		@end @property( !use_envprobe_map && !hlms_use_ssr && !planar_reflections )
+		@end @property( !use_envprobe_map && !hlms_use_ssr && !use_planar_reflections )
 			vec3 envColourS = mix( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			vec3 envColourD = mix( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
 		@end
