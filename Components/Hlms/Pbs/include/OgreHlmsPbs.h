@@ -252,6 +252,11 @@ namespace Ogre
                                                     { mIrradianceVolume = irradianceVolume; }
         IrradianceVolume* getIrradianceVolume(void) const  { return mIrradianceVolume; }
 
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+        void setPlanarReflections( PlanarReflections *planarReflections );
+        PlanarReflections* getPlanarReflections(void) const;
+#endif
+
 #if !OGRE_NO_JSON
         /// @copydoc Hlms::_loadJson
         virtual void _loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,

@@ -669,10 +669,11 @@ namespace Ogre
         }
 
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
-        if( mPlanarReflections )
+        if( mPlanarReflections && mPlanarReflections->hasPlanarReflections( renderable ) )
         {
-            const bool usesPlanarReflections = renderable->mCustomParameter & 0x80;
-            if( usesPlanarReflections )
+            if( !mPlanarReflections->_isUpdatingRenderablesHlms() )
+                mPlanarReflections->_notifyRenderableFlushedHlmsDatablock( renderable );
+            else
                 setProperty( PbsProperty::UsePlanarReflections, 1 );
         }
 #endif
@@ -909,7 +910,8 @@ namespace Ogre
                 mPlanarReflections->cameraMatches( sceneManager->getCameraInProgress() ) )
             {
                 mHasPlanarReflections = true;
-                setProperty( PbsProperty::HasPlanarReflections, 1 );
+                setProperty( PbsProperty::HasPlanarReflections,
+                             mPlanarReflections->getMaxActiveActors() );
             }
 #endif
 
@@ -1406,7 +1408,8 @@ namespace Ogre
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
             if( mPlanarReflections )
             {
-                mPlanarReflections->fillConstBufferData( renderTarget, projectionMatrix, passBufferPtr );
+                mPlanarReflections->fillConstBufferData( renderTarget, camera,
+                                                         projectionMatrix, passBufferPtr );
                 passBufferPtr += mPlanarReflections->getConstBufferSize() >> 2u;
             }
 #endif
@@ -1964,6 +1967,18 @@ namespace Ogre
     {
         mAmbientLightMode = mode;
     }
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setPlanarReflections( PlanarReflections *planarReflections )
+    {
+        mPlanarReflections = planarReflections;
+    }
+    //-----------------------------------------------------------------------------------
+    PlanarReflections* HlmsPbs::getPlanarReflections(void) const
+    {
+        return mPlanarReflections;
+    }
+#endif
 #if !OGRE_NO_JSON
     //-----------------------------------------------------------------------------------
     void HlmsPbs::_loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,

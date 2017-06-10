@@ -1,14 +1,6 @@
 
 //#include "SyntaxHighlightingMisc.h"
 
-@property( has_planar_reflections )
-
-@piece( DeclPlanarReflUniforms )
-	float4		planarReflections[@value(planar_reflections)];
-	float4x4	planarReflProjectionMat;
-	float4		invMaxDistanceToPlanarRefl;
-@end
-
 @property( use_planar_reflections )
 
 @piece( DeclPlanarReflTextures )
@@ -45,5 +37,3 @@
 @end
 
 @end ///use_planar_reflections
-
-@end ///planar_reflections

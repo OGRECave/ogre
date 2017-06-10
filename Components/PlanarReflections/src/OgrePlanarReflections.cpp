@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Math/Array/OgreBooleanMask.h"
+#include "OgreHlmsDatablock.h"
+#include "OgreHlms.h"
 #include "OgreLogManager.h"
 
 namespace Ogre
@@ -57,6 +59,8 @@ namespace Ogre
         mLastCameraRot( Quaternion::IDENTITY ),
         mLastCamera( 0 ),
         //mLockCamera( lockCamera ),
+        mUpdatingRenderablesHlms( false ),
+        mAnyPendingFlushRenderable( false ),
         mMaxActiveActors( maxActiveActors ),
         mInvMaxDistance( Real(1.0) / maxDistance ),
         mMaxSqDistance( maxDistance * maxDistance ),
@@ -191,6 +195,94 @@ namespace Ogre
         mActors.clear();
     }
     //-----------------------------------------------------------------------------------
+    void PlanarReflections::updateFlushedRenderables(void)
+    {
+        mUpdatingRenderablesHlms = true;
+
+        TrackedRenderableArray::iterator itor = mTrackedRenderables.begin();
+        TrackedRenderableArray::iterator end  = mTrackedRenderables.end();
+
+        while( itor != end )
+        {
+            TrackedRenderable &trackedRenderable = *itor;
+            if( hasFlushPending( trackedRenderable.renderable ) )
+            {
+                HlmsDatablock *datablock = trackedRenderable.renderable->getDatablock();
+
+                try
+                {
+                    Hlms *hlms = datablock->getCreator();
+
+                    trackedRenderable.hlmsHashes[0] = trackedRenderable.renderable->getHlmsHash();
+
+                    uint32 hash, casterHash;
+                    hlms->calculateHashFor( trackedRenderable.renderable, hash, casterHash );
+                    trackedRenderable.hlmsHashes[1] = hash;
+                }
+                catch( Exception &e )
+                {
+                    trackedRenderable.hlmsHashes[1] = trackedRenderable.hlmsHashes[0];
+
+                    const String *datablockNamePtr = datablock->getNameStr();
+                    String datablockName = datablockNamePtr ? *datablockNamePtr :
+                                                              datablock->getName().getFriendlyText();
+
+                    LogManager::getSingleton().logMessage( e.getFullDescription() );
+                    LogManager::getSingleton().logMessage(
+                                "Couldn't apply planar reflections change to datablock '" +
+                                datablockName + "' for this renderable. Disabling reflections. "
+                                "Check previous log messages to see if there's more information.",
+                                LML_CRITICAL );
+                }
+            }
+
+            ++itor;
+        }
+
+        mUpdatingRenderablesHlms = false;
+    }
+    //-----------------------------------------------------------------------------------
+    void PlanarReflections::addRenderable( const TrackedRenderable &trackedRenderable )
+    {
+        assert( trackedRenderable.renderable->mCustomParameter == 0 );
+        trackedRenderable.renderable->mCustomParameter = FlushPending;
+        mTrackedRenderables.push_back( trackedRenderable );
+        _notifyRenderableFlushedHlmsDatablock( trackedRenderable.renderable );
+    }
+    //-----------------------------------------------------------------------------------
+    void PlanarReflections::removeRenderable( Renderable *renderable )
+    {
+        TrackedRenderableArray::iterator itor = mTrackedRenderables.begin();
+        TrackedRenderableArray::iterator end  = mTrackedRenderables.end();
+
+        while( itor != end && itor->renderable != renderable )
+            ++itor;
+
+        assert( itor != end && "Item not found or already removed from this PlanarReflection!" );
+
+        if( itor != end )
+        {
+            itor->renderable->mCustomParameter = 0;
+            if( !hasFlushPending( itor->renderable ) )
+            {
+                //Restore the Hlms setting. If a flush is pending, then it's already up to date,
+                //and our TrackedRenderable::hlmsHashes[0] could be out of date.
+                itor->renderable->_setHlmsHashes( itor->hlmsHashes[0],
+                                                  itor->renderable->getHlmsCasterHash() );
+            }
+            efficientVectorRemove( mTrackedRenderables, itor );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void PlanarReflections::_notifyRenderableFlushedHlmsDatablock( Renderable *renderable )
+    {
+        if( !mUpdatingRenderablesHlms )
+        {
+            renderable->mCustomParameter = FlushPending;
+            mAnyPendingFlushRenderable = true;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void PlanarReflections::beginFrame(void)
     {
         mLastCamera = 0;
@@ -224,6 +316,12 @@ namespace Ogre
         {
             return;
         }*/
+
+        if( mAnyPendingFlushRenderable )
+        {
+            updateFlushedRenderables();
+            mAnyPendingFlushRenderable = false;
+        }
 
         mActiveActors.clear();
 
@@ -463,7 +561,10 @@ namespace Ogre
         {
             if( itTracked->movableObject->getVisible() )
             {
-                const Matrix4 &fullTransform = itTracked->movableObject->_getParentNodeFullTransform();
+                //const Matrix4 &fullTransform = itTracked->movableObject->_getParentNodeFullTransform();
+                //TODO
+                const Matrix4 &fullTransform = itTracked->movableObject->
+                        getParentNode()->_getFullTransformUpdated();
                 Matrix3 rotMat3x3;
                 fullTransform.extract3x3Matrix( rotMat3x3 );
                 const Vector3 reflNormal = rotMat3x3 * itTracked->reflNormal;
@@ -483,8 +584,8 @@ namespace Ogre
 
                     const Real cos20 = 0.939692621f;
 
-                    if( cosAngle < cos20 &&
-                        (cosAngle < bestCosAngle ||
+                    if( cosAngle >= cos20 &&
+                        (cosAngle >= bestCosAngle ||
                         Math::Abs(cosAngle - bestCosAngle) < Real( 0.060307379f )) )
                     {
                         Real sqDistance = actor->getSquaredDistanceTo( rendCenter );
@@ -497,7 +598,18 @@ namespace Ogre
                     ++itor;
                 }
 
-                itTracked->renderable->mCustomParameter = bestActorIdx;
+                if( bestActorIdx < mMaxActiveActors )
+                {
+                    itTracked->renderable->mCustomParameter = (UseActiveActor | bestActorIdx);
+                    itTracked->renderable->_setHlmsHashes( itTracked->hlmsHashes[1],
+                                                           itTracked->renderable->getHlmsCasterHash() );
+                }
+                else
+                {
+                    itTracked->renderable->mCustomParameter = InactiveActor;
+                    itTracked->renderable->_setHlmsHashes( itTracked->hlmsHashes[0],
+                                                           itTracked->renderable->getHlmsCasterHash() );
+                }
             }
 
             ++itTracked;
@@ -509,20 +621,32 @@ namespace Ogre
         return (4u * mMaxActiveActors + 4u * 4u + 4u) * sizeof(float);
     }
     //-----------------------------------------------------------------------------------
-    void PlanarReflections::fillConstBufferData( RenderTarget *renderTarget,
+    void PlanarReflections::fillConstBufferData( RenderTarget *renderTarget, Camera *camera,
                                                  const Matrix4 &projectionMatrix,
                                                  float * RESTRICT_ALIAS passBufferPtr ) const
     {
+        const Matrix4 viewMatrix = camera->getViewMatrix( true );
+        Matrix3 viewMat3x3;
+        viewMatrix.extract3x3Matrix( viewMat3x3 );
+
         PlanarReflectionActorVec::const_iterator itor = mActiveActors.begin();
         PlanarReflectionActorVec::const_iterator end  = mActiveActors.end();
 
         while( itor != end )
         {
             const Plane &plane = (*itor)->mPlane;
-            *passBufferPtr++ = static_cast<float>( plane.normal.x );
-            *passBufferPtr++ = static_cast<float>( plane.normal.y );
-            *passBufferPtr++ = static_cast<float>( plane.normal.z );
-            *passBufferPtr++ = static_cast<float>( plane.d );
+
+            //We need to send the plane data for PBS (which will
+            //be processed in pixel shader)in view space.
+            const Vector3 viewSpacePointInPlane = viewMatrix * (plane.normal * -plane.d);
+            const Vector3 viewSpaceNormal       = viewMat3x3 * plane.normal;
+
+            Plane planeVS( viewSpaceNormal, viewSpacePointInPlane );
+
+            *passBufferPtr++ = static_cast<float>( planeVS.normal.x );
+            *passBufferPtr++ = static_cast<float>( planeVS.normal.y );
+            *passBufferPtr++ = static_cast<float>( planeVS.normal.z );
+            *passBufferPtr++ = static_cast<float>( planeVS.d );
 
             ++itor;
         }
@@ -550,5 +674,27 @@ namespace Ogre
                 mLastAspectRatio == camera->getAspectRatio() &&
                 mLastCameraPos == camera->getDerivedPosition() &&
                 mLastCameraRot == camera->getDerivedOrientation();
+    }
+    //-----------------------------------------------------------------------------------
+    bool PlanarReflections::_isUpdatingRenderablesHlms(void) const
+    {
+        return mUpdatingRenderablesHlms;
+    }
+    //-----------------------------------------------------------------------------------
+    bool PlanarReflections::hasPlanarReflections( const Renderable *renderable ) const
+    {
+        return  renderable->mCustomParameter & UseActiveActor ||
+                renderable->mCustomParameter == FlushPending ||
+                renderable->mCustomParameter == InactiveActor;
+    }
+    //-----------------------------------------------------------------------------------
+    bool PlanarReflections::hasFlushPending( const Renderable *renderable ) const
+    {
+        return renderable->mCustomParameter == FlushPending;
+    }
+    //-----------------------------------------------------------------------------------
+    bool PlanarReflections::hasActiveActor( const Renderable *renderable ) const
+    {
+        return renderable->mCustomParameter & UseActiveActor;
     }
 }

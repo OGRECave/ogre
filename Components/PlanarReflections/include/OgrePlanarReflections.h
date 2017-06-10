@@ -40,16 +40,29 @@ namespace Ogre
     *  @{
     */
 
+    typedef FastArray<Renderable*> RenderableArray;
+
     class _OgrePlanarReflectionsExport PlanarReflections
     {
+    public:
         struct TrackedRenderable
         {
             Renderable      *renderable;
             MovableObject   *movableObject;
             Vector3         reflNormal;
             Vector3         renderableCenter;
+            uint32          hlmsHashes[2];
+
+            TrackedRenderable( Renderable *_renderable, MovableObject *_movableObject,
+                               const Vector3 &_reflNormal, const Vector3 &_renderableCenter ) :
+                renderable( _renderable ), movableObject( _movableObject ),
+                reflNormal( _reflNormal ), renderableCenter( _renderableCenter )
+            {
+                memset( hlmsHashes, 0, sizeof( hlmsHashes ) );
+            }
         };
 
+    protected:
         typedef FastArray<TrackedRenderable> TrackedRenderableArray;
 
         typedef vector<PlanarReflectionActor*>::type PlanarReflectionActorVec;
@@ -65,6 +78,8 @@ namespace Ogre
         //Camera                      *mLockCamera;
         PlanarReflectionActorVec    mActiveActors;
         TrackedRenderableArray      mTrackedRenderables;
+        bool                        mUpdatingRenderablesHlms;
+        bool                        mAnyPendingFlushRenderable;
 
         uint8               mMaxActiveActors;
         Real                mInvMaxDistance;
@@ -73,6 +88,8 @@ namespace Ogre
         CompositorManager2  *mCompositorManager;
 
         void pushActor( PlanarReflectionActor *actor );
+
+        void updateFlushedRenderables(void);
 
     public:
         PlanarReflections( SceneManager *sceneManager, CompositorManager2 *compositorManager,
@@ -111,8 +128,14 @@ namespace Ogre
         void destroyActor( PlanarReflectionActor *actor );
         void destroyAllActors(void);
 
+        void addRenderable( const TrackedRenderable &trackedRenderable );
+        void removeRenderable( Renderable *renderable );
+        void _notifyRenderableFlushedHlmsDatablock( Renderable *renderable );
+
         void beginFrame(void);
         void update( Camera *camera, Real aspectRatio );
+
+        uint8 getMaxActiveActors(void) const            { return mMaxActiveActors; }
 
         /// Returns the amount of bytes that fillConstBufferData is going to fill.
         size_t getConstBufferSize(void) const;
@@ -122,13 +145,27 @@ namespace Ogre
         @remarks
             Assumes 'passBufferPtr' is aligned to a vec4/float4 boundary.
         */
-        void fillConstBufferData( RenderTarget *renderTarget, const Matrix4 &projectionMatrix,
+        void fillConstBufferData( RenderTarget *renderTarget, Camera *camera,
+                                  const Matrix4 &projectionMatrix,
                                   float * RESTRICT_ALIAS passBufferPtr ) const;
         TexturePtr getTexture( uint8 actorIdx ) const;
 
         /// Returns true if the Camera settings (position, orientation, aspect ratio, etc)
         /// match with the reflection we have in cache.
         bool cameraMatches( const Camera *camera );
+
+        bool _isUpdatingRenderablesHlms(void) const;
+
+        bool hasPlanarReflections( const Renderable *renderable ) const;
+        bool hasFlushPending( const Renderable *renderable ) const;
+        bool hasActiveActor( const Renderable *renderable ) const;
+
+        enum CustomParameterBits
+        {
+            UseActiveActor      = 0x80,
+            FlushPending        = 0x60,
+            InactiveActor       = 0x40
+        };
     };
 
     /** @} */

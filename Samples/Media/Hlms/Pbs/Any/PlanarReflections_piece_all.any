@@ -1,0 +1,12 @@
+
+//#include "SyntaxHighlightingMisc.h"
+
+@property( has_planar_reflections )
+
+@piece( DeclPlanarReflUniforms )
+	float4		planarReflections[@value(has_planar_reflections)];
+	float4x4	planarReflProjectionMat;
+	float4		invMaxDistanceToPlanarRefl;
+@end
+
+@end ///has_planar_reflections
