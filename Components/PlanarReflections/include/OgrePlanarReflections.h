@@ -62,7 +62,7 @@ namespace Ogre
         Vector3                     mLastCameraPos;
         Quaternion                  mLastCameraRot;
         Camera                      *mLastCamera;
-        Camera                      *mLockCamera;
+        //Camera                      *mLockCamera;
         PlanarReflectionActorVec    mActiveActors;
         TrackedRenderableArray      mTrackedRenderables;
 
@@ -125,6 +125,10 @@ namespace Ogre
         void fillConstBufferData( RenderTarget *renderTarget, const Matrix4 &projectionMatrix,
                                   float * RESTRICT_ALIAS passBufferPtr ) const;
         TexturePtr getTexture( uint8 actorIdx ) const;
+
+        /// Returns true if the Camera settings (position, orientation, aspect ratio, etc)
+        /// match with the reflection we have in cache.
+        bool cameraMatches( const Camera *camera );
     };
 
     /** @} */

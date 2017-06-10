@@ -1,16 +1,18 @@
 
 //#include "SyntaxHighlightingMisc.h"
 
-@property( planar_reflections )
-
-@piece( DeclPlanarReflTextures )
-	uniform sampler2D planarReflectionTex;
-@end
+@property( has_planar_reflections )
 
 @piece( DeclPlanarReflUniforms )
 	float4		planarReflections[@value(planar_reflections)];
 	float4x4	planarReflProjectionMat;
 	float4		invMaxDistanceToPlanarRefl;
+@end
+
+@property( use_planar_reflections )
+
+@piece( DeclPlanarReflTextures )
+	uniform sampler2D planarReflectionTex;
 @end
 
 @piece( DoPlanarReflections )
@@ -41,5 +43,7 @@
 		float3 envColourD = vec3( 0, 0, 0 );
 	@end
 @end
+
+@end ///use_planar_reflections
 
 @end ///planar_reflections

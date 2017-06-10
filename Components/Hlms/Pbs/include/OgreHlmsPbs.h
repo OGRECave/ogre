@@ -134,6 +134,9 @@ namespace Ogre
         //TODO: After texture refactor it should be possible to abstract this,
         //so we don't have to be aware of PlanarReflections class.
         PlanarReflections       *mPlanarReflections;
+        HlmsSamplerblock const  *mPlanarReflectionsSamplerblock;
+        bool                    mHasPlanarReflections;
+        uint8                   mLastBoundPlanarReflection;
 #endif
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
@@ -270,6 +273,7 @@ namespace Ogre
         static const IdString MaterialsPerBuffer;
         static const IdString LowerGpuOverhead;
         static const IdString DebugPssmSplits;
+        static const IdString HasPlanarReflections;
 
         static const IdString NumTextures;
         static const char *DiffuseMap;
@@ -295,6 +299,7 @@ namespace Ogre
         static const IdString MetallicWorkflow;
         static const IdString TwoSidedLighting;
         static const IdString ReceiveShadows;
+        static const IdString UsePlanarReflections;
 
         static const IdString NormalWeight;
         static const IdString NormalWeightTex;

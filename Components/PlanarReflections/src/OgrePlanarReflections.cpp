@@ -56,7 +56,7 @@ namespace Ogre
         mLastCameraPos( Vector3::ZERO ),
         mLastCameraRot( Quaternion::IDENTITY ),
         mLastCamera( 0 ),
-        mLockCamera( lockCamera ),
+        //mLockCamera( lockCamera ),
         mMaxActiveActors( maxActiveActors ),
         mInvMaxDistance( Real(1.0) / maxDistance ),
         mMaxSqDistance( maxDistance * maxDistance ),
@@ -213,7 +213,7 @@ namespace Ogre
     };
     void PlanarReflections::update( Camera *camera, Real aspectRatio )
     {
-        if( mLockCamera && camera != mLockCamera )
+        /*if( mLockCamera && camera != mLockCamera )
             return; //This is not the camera we are allowed to work with
 
         if( mLastCamera == camera &&
@@ -223,7 +223,7 @@ namespace Ogre
              mLastCameraRot == camera->getDerivedOrientation()) )
         {
             return;
-        }
+        }*/
 
         mActiveActors.clear();
 
@@ -542,5 +542,13 @@ namespace Ogre
         if( actorIdx >= mActiveActors.size() )
             return TexturePtr();
         return mActiveActors[actorIdx]->mReflectionTexture;
+    }
+    //-----------------------------------------------------------------------------------
+    bool PlanarReflections::cameraMatches( const Camera *camera )
+    {
+        return  !camera->isReflected() &&
+                mLastAspectRatio == camera->getAspectRatio() &&
+                mLastCameraPos == camera->getDerivedPosition() &&
+                mLastCameraRot == camera->getDerivedOrientation();
     }
 }

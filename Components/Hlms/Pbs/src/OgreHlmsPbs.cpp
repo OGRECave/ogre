@@ -72,6 +72,7 @@ namespace Ogre
     const IdString PbsProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
     const IdString PbsProperty::LowerGpuOverhead  = IdString( "lower_gpu_overhead" );
     const IdString PbsProperty::DebugPssmSplits   = IdString( "debug_pssm_splits" );
+    const IdString PbsProperty::HasPlanarReflections=IdString( "has_planar_reflections" );
 
     const IdString PbsProperty::NumTextures     = IdString( "num_textures" );
     const char *PbsProperty::DiffuseMap         = "diffuse_map";
@@ -97,6 +98,7 @@ namespace Ogre
     const IdString PbsProperty::MetallicWorkflow  = IdString( "metallic_workflow" );
     const IdString PbsProperty::TwoSidedLighting  = IdString( "two_sided_lighting" );
     const IdString PbsProperty::ReceiveShadows    = IdString( "receive_shadows" );
+    const IdString PbsProperty::UsePlanarReflections=IdString( "use_planar_reflections" );
 
     const IdString PbsProperty::NormalWeight          = IdString( "normal_weight" );
     const IdString PbsProperty::NormalWeightTex       = IdString( "normal_weight_tex" );
@@ -223,6 +225,11 @@ namespace Ogre
         mPrePassTextures( 0 ),
         mSsrTexture( 0 ),
         mIrradianceVolume( 0 ),
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+        mPlanarReflections( 0 ),
+        mHasPlanarReflections( false ),
+        mLastBoundPlanarReflection( 0u ),
+#endif
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
@@ -296,6 +303,18 @@ namespace Ogre
 
             if( !mShadowmapCmpSamplerblock )
                 mShadowmapCmpSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+            if( mPlanarReflectionsSamplerblock )
+            {
+                samplerblock.mMinFilter     = FO_LINEAR;
+                samplerblock.mMagFilter     = FO_LINEAR;
+                samplerblock.mMipFilter     = FO_LINEAR;
+                samplerblock.mCompareFunction   = NUM_COMPARE_FUNCTIONS;
+
+                mPlanarReflectionsSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+            }
+#endif
         }
     }
     //-----------------------------------------------------------------------------------
@@ -394,6 +413,12 @@ namespace Ogre
                 else
                     psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
             }
+
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+            const bool usesPlanarReflections = getProperty( PbsProperty::UsePlanarReflections ) != 0;
+            if( usesPlanarReflections )
+                psParams->setNamedConstant( "planarReflectionTex", texUnit++ );
+#endif
         }
 
         GpuProgramParametersSharedPtr vsParams = retVal->pso.vertexShader->getDefaultParameters();
@@ -643,6 +668,15 @@ namespace Ogre
                 setProperty( PbsProperty::TransparentMode, 1 );
         }
 
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+        if( mPlanarReflections )
+        {
+            const bool usesPlanarReflections = renderable->mCustomParameter & 0x80;
+            if( usesPlanarReflections )
+                setProperty( PbsProperty::UsePlanarReflections, 1 );
+        }
+#endif
+
         String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
         inOutPieces[VertexShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
         inOutPieces[PixelShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
@@ -867,6 +901,17 @@ namespace Ogre
 
             if( mIrradianceVolume )
                 setProperty( PbsProperty::IrradianceVolumes, 1 );
+
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+            mHasPlanarReflections = false;
+            mLastBoundPlanarReflection = 0u;
+            if( mPlanarReflections &&
+                mPlanarReflections->cameraMatches( sceneManager->getCameraInProgress() ) )
+            {
+                mHasPlanarReflections = true;
+                setProperty( PbsProperty::HasPlanarReflections, 1 );
+            }
+#endif
 
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
             if( mFineLightMaskGranularity )
@@ -1432,6 +1477,8 @@ namespace Ogre
             mTexUnitSlotStart += 1;
         if( mSsrTexture )
             mTexUnitSlotStart += 1;
+        if( mHasPlanarReflections )
+            mTexUnitSlotStart += 1;
 
         uploadDirtyDatablocks();
 
@@ -1573,6 +1620,9 @@ namespace Ogre
 
             rebindTexBuffer( commandBuffer );
 
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+            mLastBoundPlanarReflection = 0u;
+#endif
             mListener->hlmsTypeChanged( casterPass, commandBuffer, datablock );
         }
 
@@ -1789,6 +1839,9 @@ namespace Ogre
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         *( currentMappedConstBuffer+2u ) = queuedRenderable.movableObject->getLightMask();
 #endif
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+        *( currentMappedConstBuffer+3u ) = queuedRenderable.renderable->mCustomParameter & 0x7F;
+#endif
         currentMappedConstBuffer += 4;
 
         //---------------------------------------------------------------------------
@@ -1797,6 +1850,19 @@ namespace Ogre
 
         if( !casterPass || datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
         {
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+            if( mHasPlanarReflections &&
+                (queuedRenderable.renderable->mCustomParameter & 0x80) &&
+                mLastBoundPlanarReflection != queuedRenderable.renderable->mCustomParameter )
+            {
+                const uint8 activeActorIdx = queuedRenderable.renderable->mCustomParameter & 0x7F;
+                TexturePtr planarReflTex = mPlanarReflections->getTexture( activeActorIdx );
+                *commandBuffer->addCommand<CbTexture>() =
+                        CbTexture( mTexUnitSlotStart, true, planarReflTex.get(),
+                                   mPlanarReflectionsSamplerblock );
+                mLastBoundPlanarReflection = queuedRenderable.renderable->mCustomParameter;
+            }
+#endif
             if( datablock->mTextureHash != mLastTextureHash )
             {
                 //Rebind textures
