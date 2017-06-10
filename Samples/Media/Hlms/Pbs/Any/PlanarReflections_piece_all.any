@@ -1,6 +1,10 @@
 
 //#include "SyntaxHighlightingMisc.h"
 
+@property( !has_planar_reflections )
+	@set( use_planar_reflections, 0 )
+@end
+
 @property( has_planar_reflections )
 
 @piece( DeclPlanarReflUniforms )
