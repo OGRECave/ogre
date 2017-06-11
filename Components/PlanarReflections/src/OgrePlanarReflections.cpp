@@ -534,6 +534,8 @@ namespace Ogre
                         mActors[i + j]->mWorkspace->setEnabled( false );
                 }
             }
+
+            ++actorsPlanes;
         }
 
         std::sort( mActiveActors.begin(), mActiveActors.end(),
@@ -650,6 +652,9 @@ namespace Ogre
 
             ++itor;
         }
+
+        memset( passBufferPtr, 0, (mMaxActiveActors - mActiveActors.size()) * 4u * sizeof(float) );
+        passBufferPtr += (mMaxActiveActors - mActiveActors.size()) * 4u;
 
         Matrix4 reflProjMat = PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * projectionMatrix;
         for( size_t i=0; i<16; ++i )

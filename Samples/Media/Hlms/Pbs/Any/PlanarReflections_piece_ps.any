@@ -29,7 +29,7 @@
 		uint planarReflectionIdx = asuint( worldMaterialIdx[inPs.drawId].w );
 	@end
 	@property( syntax == metal )
-		uint planarReflectionIdx = asuint( inPs.planarReflectionIdx );
+		ushort planarReflectionIdx = inPs.planarReflectionIdx;
 	@end
 
 	float4 planarReflection = passBuf.planarReflections[planarReflectionIdx];
