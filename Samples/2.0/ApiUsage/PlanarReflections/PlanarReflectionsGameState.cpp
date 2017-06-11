@@ -79,8 +79,8 @@ namespace Demo
         Ogre::Item *item = sceneManager->createItem( planeMesh, Ogre::SCENE_DYNAMIC );
         Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
                 createChildSceneNode( Ogre::SCENE_DYNAMIC );
-        sceneNode->setPosition( -5, 0, 0 );
-        sceneNode->setOrientation( Ogre::Quaternion( Ogre::Radian( Ogre::Math::HALF_PI ),
+        sceneNode->setPosition( 5, 5, 0 );
+        sceneNode->setOrientation( Ogre::Quaternion( Ogre::Radian( -Ogre::Math::HALF_PI ),
                                                      Ogre::Vector3::UNIT_Y ) );
         sceneNode->attachObject( item );
         //item->setCastShadows( false );
@@ -116,14 +116,15 @@ namespace Demo
         item = sceneManager->createItem( planeMesh, Ogre::SCENE_DYNAMIC );
         sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
                 createChildSceneNode( Ogre::SCENE_DYNAMIC );
-        sceneNode->setPosition( 5, 0, 0 );
-        sceneNode->setOrientation( Ogre::Quaternion( Ogre::Radian( -Ogre::Math::HALF_PI ),
+        sceneNode->setPosition( -5, 2.5f, 0 );
+        sceneNode->setOrientation( Ogre::Quaternion( Ogre::Radian( Ogre::Math::HALF_PI ),
                                                      Ogre::Vector3::UNIT_Y ) );
-        //sceneNode->setScale( Ogre::Vector3( 0.5f ) );
+        sceneNode->setScale( Ogre::Vector3( 0.75f, 0.5f, 1.0f ) );
         sceneNode->attachObject( item );
 
         actor = mPlanarReflections->addActor( Ogre::PlanarReflectionActor(
-                                                  sceneNode->getPosition(), mirrorSize,
+                                                  sceneNode->getPosition(),
+                                                  mirrorSize * Ogre::Vector2( 0.75f, 0.5f ),
                                                   sceneNode->getOrientation(),
                                                   "PlanarReflectionsReflectiveWorkspace" ),
                                               true, 512, 512,true, Ogre::PF_R8G8B8A8, false );

@@ -41,7 +41,26 @@ namespace Ogre
     */
 
     typedef FastArray<Renderable*> RenderableArray;
+    /** Planar Reflections can be used with both Unlit and PBS, but they're setup
+        differently. Unlit is very fast, but also very basic. It's mostly useful for
+        perfect mirrors.
 
+        An unlit datablock is tied to a particular Actor (reflection plane).
+        PBS on the other hand, can dynamically assign Renderables to the closest actor that
+        aligns with the Renderable's (predominant) normal, regardless of the pbs datablock
+        it uses. If the actor is close enough but not an exact match, PBS will attempt to
+        project the reflection in an attempt to correct this, however it's an approximation.
+
+        If you want perfect reflections, the reflection plane of the actor must match and align
+        exactly the surface being drawn; or rely on a fallback (Local Cubemaps, SSR, etc).
+
+        Furthermore, PBS will automatically disable reflections while rendering reflections
+        (but Unlit won't do this, so it's your job to leave it out of rendering i.e.
+        via visibility masks).
+
+        Actors are culled against the camera, thus if they're no longer visible Ogre will
+        stop updating those actors, improving performance.
+    */
     class _OgrePlanarReflectionsExport PlanarReflections
     {
     public:

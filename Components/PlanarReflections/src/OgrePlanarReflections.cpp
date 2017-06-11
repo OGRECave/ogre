@@ -569,8 +569,11 @@ namespace Ogre
                         getParentNode()->_getFullTransformUpdated();
                 Matrix3 rotMat3x3;
                 fullTransform.extract3x3Matrix( rotMat3x3 );
-                const Vector3 reflNormal = rotMat3x3 * itTracked->reflNormal;
+                Vector3 reflNormal = rotMat3x3 * itTracked->reflNormal;
                 const Vector3 rendCenter = fullTransform * itTracked->renderableCenter;
+
+                //Undo any scale
+                reflNormal.normalise();
 
                 uint8 bestActorIdx = mMaxActiveActors;
                 Real bestCosAngle = -1;
