@@ -454,7 +454,7 @@ void main()
 		@end
 	@end
 
-	@insertpiece( DoPlanarReflections )
+	@insertpiece( DoPlanarReflectionsPS )
 
 	@property( ambient_hemisphere )
 		float ambientWD = dot( passBuf.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;

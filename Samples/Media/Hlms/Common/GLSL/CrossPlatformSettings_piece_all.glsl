@@ -21,6 +21,8 @@
 #define float4x4 mat4
 
 #define mul( x, y ) ((x) * (y))
+#define saturate(x) clamp( (x), 0.0, 1.0 )
+#define lerp mix
 #define INLINE
 
 #define outVs_Position gl_Position
