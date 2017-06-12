@@ -198,6 +198,9 @@ vertex PS_INPUT main_metal
 @property( hlms_fine_light_mask || hlms_forwardplus_fine_light_mask )
 	outVs.objLightMask = worldMaterialIdx[drawId].z;@end
 
+@property( use_planar_reflections )
+	outVs.planarReflectionIdx = as_type<ushort>( worldMaterialIdx[drawId].w );@end
+
 @property( hlms_global_clip_distances )
 	outVs.gl_ClipDistance0 = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
 @end

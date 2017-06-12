@@ -94,6 +94,8 @@ struct PassData
 	@end
 @end
 
+	@insertpiece( DeclPlanarReflUniforms )
+
 @property( parallax_correct_cubemaps )
 	CubemapProbe autoProbe;
 @end
@@ -180,6 +182,9 @@ struct Material
 		@end
 		@property( hlms_fine_light_mask || hlms_forwardplus_fine_light_mask )
 			uint objLightMask [[flat]];
+		@end
+		@property( use_planar_reflections )
+			ushort planarReflectionIdx [[flat]];
 		@end
 		@property( hlms_normal || hlms_qtangent )
 			float3 pos;
