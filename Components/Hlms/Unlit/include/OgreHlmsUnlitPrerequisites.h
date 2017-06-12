@@ -28,6 +28,8 @@ THE SOFTWARE.
 #ifndef _OgreHlmsUnlitPrerequisites_H_
 #define _OgreHlmsUnlitPrerequisites_H_
 
+#include "OgrePrerequisites.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #   if defined( OGRE_STATIC_LIB ) || defined( OGRE_UNLIT_STATIC_LIB )
 #       define _OgreHlmsUnlitExport

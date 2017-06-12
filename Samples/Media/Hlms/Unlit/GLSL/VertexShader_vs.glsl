@@ -22,7 +22,7 @@ in uint drawId;
 
 @insertpiece( custom_vs_attributes )
 
-@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture )
+@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture || exponential_shadow_maps )
 out block
 {
 @insertpiece( VStoPS_block )
@@ -41,9 +41,9 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	@piece( worldViewProj )worldViewProj@end
 @end @property( hlms_identity_world )
 	@property( !hlms_identity_viewproj_dynamic )
-		@piece( worldViewProj )pass.viewProj[@value(hlms_identity_viewproj)]@end
+		@piece( worldViewProj )passBuf.viewProj[@value(hlms_identity_viewproj)]@end
 	@end @property( hlms_identity_viewproj_dynamic )
-		@piece( worldViewProj )pass.viewProj[instance.materialIdx[drawId].z]@end
+		@piece( worldViewProj )passBuf.viewProj[instance.worldMaterialIdx[drawId].z]@end
 	@end
 @end
 
@@ -76,7 +76,7 @@ void main()
 
 @foreach( out_uv_count, n )
 	@property( out_uv@n_texture_matrix )
-		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.materialIdx[drawId].x << 4u) + @value( out_uv@n_tex_unit )u );
+		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.worldMaterialIdx[drawId].x << 4u) + @value( out_uv@n_tex_unit )u );
 		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = (vec4( uv@value( out_uv@n_source_uv ).xy, 0, 1 ) * textureMatrix).xy;
 	@end @property( !out_uv@n_texture_matrix )
 		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@value( out_uv@n_source_uv ).xy;
@@ -84,20 +84,12 @@ void main()
 
 	outVs.drawId = drawId;
 
-@end @property( hlms_shadowcaster )
-	float shadowConstantBias = uintBitsToFloat( instance.materialIdx[drawId].y );
-
-	@property( !hlms_shadow_uses_depth_texture )
-		//Linear depth
-		outVs.depth	= (gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y;
-		outVs.depth = (outVs.depth * 0.5) + 0.5;
-	@end
-
-	//We can't make the depth buffer linear without Z out in the fragment shader;
-	//however we can use a cheap approximation ("pseudo linear depth")
-	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
-	gl_Position.z = (gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y * gl_Position.w;
 @end
+
+	@property( hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point) )
+		float3 worldPos = (gl_Position * passBuf.invViewProj).xyz;
+	@end
+	@insertpiece( DoShadowCasterVS )
 
 @property( hlms_global_clip_distances )
 	gl_ClipDistance[0] = dot( float4( worldPos.xyz, 1.0 ), pass.clipPlane0.xyzw );

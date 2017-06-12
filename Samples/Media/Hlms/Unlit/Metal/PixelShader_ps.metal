@@ -87,14 +87,24 @@ fragment @insertpiece( output_type ) main_metal
 	@property( hlms_render_depth_only )
 		@set( hlms_disable_stage, 1 )
 	@end
-fragment @insertpiece( output_type ) main_metal( PS_INPUT inPs
-@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) : SV_Target0
+@insertpiece( DeclShadowCasterMacros )
+@property( hlms_shadowcaster_point )
+	@insertpiece( PassStructDecl )
+@end
+
+@insertpiece( DeclOutputType )
+fragment @insertpiece( output_type ) main_metal
+(
+	PS_INPUT inPs [[stage_in]]
+	@property( hlms_vpos ), float4 gl_FragCoord [[position]]@end
+	@property( hlms_shadowcaster_point )
+		@insertpiece( PassDecl )
+	@end
+)
 {
-	@insertpiece( custom_ps_preExecution )
-
 	PS_OUTPUT outPs;
-	outPs.colour0.x = inPs.depth.x;
-
+	@insertpiece( custom_ps_preExecution )
+	@insertpiece( DoShadowCastPS )
 	@insertpiece( custom_ps_posExecution )
 
 	return outPs;

@@ -41,7 +41,7 @@ SamplerState samplerState@n : register(s@counter(samplerStateBind));@end
 	@property( diffuse_map || alpha_test || diffuse )Material material;@end
 
 @property( diffuse_map || alpha_test || diffuse )
-	uint materialId	= materialIdx[inPs.drawId].x;
+	uint materialId	= worldMaterialIdx[inPs.drawId].x;
 	material = materialArray[materialId];
 @end
 
@@ -83,11 +83,20 @@ SamplerState samplerState@n : register(s@counter(samplerStateBind));@end
 	@property( hlms_render_depth_only )
 		@set( hlms_disable_stage, 1 )
 	@end
-float main( PS_INPUT inPs
-@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) : SV_Target0
+@insertpiece( DeclShadowCasterMacros )
+
+@property( hlms_shadowcaster_point )
+	@insertpiece( PassDecl )
+@end
+
+@insertpiece( DeclOutputType )
+@insertpiece( output_type ) main( PS_INPUT inPs
+@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end )
 {
+	PS_OUTPUT outPs;
 	@insertpiece( custom_ps_preExecution )
+	@insertpiece( DoShadowCastPS )
 	@insertpiece( custom_ps_posExecution )
-	return inPs.depth;
+	return outPs;
 }
 @end

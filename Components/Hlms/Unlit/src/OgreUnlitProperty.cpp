@@ -39,6 +39,7 @@ namespace Ogre
     const IdString UnlitProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
     const IdString UnlitProperty::AnimationMatricesPerBuffer = IdString( "animation_matrices_per_buffer" );
     const IdString UnlitProperty::TextureMatrix     = IdString( "texture_matrix" );
+    const IdString UnlitProperty::ExponentialShadowMaps = IdString( "exponential_shadow_maps" );
     const IdString UnlitProperty::HasPlanarReflections  = IdString( "has_planar_reflections" );
 
     const IdString UnlitProperty::TexMatrixCount        = IdString( "hlms_texture_matrix_count" );

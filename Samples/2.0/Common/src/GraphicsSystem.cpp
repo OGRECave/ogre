@@ -457,6 +457,9 @@ namespace Demo
         Ogre::Archive *archivePbsLibraryAny = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Pbs/Any",
                         "FileSystem", true );
+        Ogre::Archive *archiveUnlitLibraryAny = Ogre::ArchiveManager::getSingletonPtr()->load(
+                        dataFolder + "Hlms/Unlit/Any",
+                        "FileSystem", true );
 
         Ogre::ArchiveVec library;
         library.push_back( archiveLibrary );
@@ -466,8 +469,10 @@ namespace Demo
                         dataFolder + "Hlms/Unlit/" + shaderSyntax,
                         "FileSystem", true );
 
+        library.push_back( archiveUnlitLibraryAny );
         Ogre::HlmsUnlit *hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit( archiveUnlit, &library );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsUnlit );
+        library.pop_back();
 
         Ogre::Archive *archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Pbs/" + shaderSyntax,

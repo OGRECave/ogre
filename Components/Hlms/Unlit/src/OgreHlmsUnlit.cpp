@@ -48,6 +48,9 @@ THE SOFTWARE.
 #include "Vao/OgreTexBufferPacked.h"
 #include "Vao/OgreStagingBuffer.h"
 
+#include "OgreHlmsManager.h"
+#include "OgreLogManager.h"
+
 #include "CommandBuffer/OgreCommandBuffer.h"
 #include "CommandBuffer/OgreCbTexture.h"
 #include "CommandBuffer/OgreCbShaderBuffer.h"
@@ -63,7 +66,9 @@ namespace Ogre
                          ExtraBufferParams( 64 * NUM_UNLIT_TEXTURE_TYPES ) ),
         mCurrentPassBuffer( 0 ),
         mLastBoundPool( 0 ),
-        mLastTextureHash( 0 )
+        mLastTextureHash( 0 ),
+        mUsingExponentialShadowMaps( false ),
+        mEsmK( 600u )
     {
         //Override defaults
         mLightGatheringMode = LightGatherNone;
@@ -78,7 +83,9 @@ namespace Ogre
         ExtraBufferParams(64 * NUM_UNLIT_TEXTURE_TYPES)),
         mCurrentPassBuffer(0),
         mLastBoundPool(0),
-        mLastTextureHash(0)
+        mLastTextureHash(0),
+        mUsingExponentialShadowMaps( false ),
+        mEsmK( 600u )
     {
         //Override defaults
         mLightGatheringMode = LightGatherNone;
@@ -450,7 +457,11 @@ namespace Ogre
 
         //Set the properties and create/retrieve the cache.
         if( casterPass )
+        {
             setProperty( HlmsBaseProp::ShadowCaster, 1 );
+            if( mUsingExponentialShadowMaps )
+                setProperty( UnlitProperty::ExponentialShadowMaps, mEsmK );
+        }
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         setProperty( HlmsBaseProp::ShadowUsesDepthTexture,
@@ -507,13 +518,25 @@ namespace Ogre
 
         mSetProperties.clear();
 
+        bool isShadowCastingPointLight = false;
+
         //mat4 viewProj[2] + vec4 invWindowSize;
         size_t mapSize = (16 + 16 + 4) * 4;
 
         if( casterPass )
         {
-            //vec2 depthRange; (+padding)
-            mapSize += 4 * 4;
+            isShadowCastingPointLight = getProperty( HlmsBaseProp::ShadowCasterPoint ) != 0;
+            //mat4 invViewProj
+            if( mUsingExponentialShadowMaps || isShadowCastingPointLight )
+                mapSize += 16 * 4;
+            //vec4 viewZRow
+            if( mUsingExponentialShadowMaps )
+                mapSize += 4 * 4;
+            //vec4 depthRange
+            mapSize += (2 + 2) * 4;
+            //vec4 cameraPosWS
+            if( isShadowCastingPointLight )
+                mapSize += 4 * 4;
         }
 
         const bool isCameraReflected = camera->isReflected();
@@ -565,6 +588,24 @@ namespace Ogre
 
         if( casterPass )
         {
+            if( mUsingExponentialShadowMaps || isShadowCastingPointLight )
+            {
+                //We don't care about the inverse of the identity proj because that's not
+                //really compatible with shadows anyway.
+                Matrix4 invViewProj = mPreparedPass.viewProjMatrix[0].inverse();
+                for( size_t i=0; i<16; ++i )
+                    *passBufferPtr++ = (float)invViewProj[0][i];
+            }
+
+            //vec4 viewZRow
+            if( mUsingExponentialShadowMaps )
+            {
+                *passBufferPtr++ = viewMatrix[2][0];
+                *passBufferPtr++ = viewMatrix[2][1];
+                *passBufferPtr++ = viewMatrix[2][2];
+                *passBufferPtr++ = viewMatrix[2][3];
+            }
+
             //vec2 depthRange;
             Real fNear, fFar;
             shadowNode->getMinMaxDepthRange( camera, fNear, fFar );
@@ -572,6 +613,16 @@ namespace Ogre
             *passBufferPtr++ = fNear;
             *passBufferPtr++ = 1.0f / depthRange;
             passBufferPtr += 2;
+
+            //vec4 cameraPosWS;
+            if( isShadowCastingPointLight )
+            {
+                const Vector3 &camPos = camera->getDerivedPosition();
+                *passBufferPtr++ = (float)camPos.x;
+                *passBufferPtr++ = (float)camPos.y;
+                *passBufferPtr++ = (float)camPos.z;
+                *passBufferPtr++ = 1.0f;
+            }
         }
 
         //vec4 invWindowSize;
@@ -806,6 +857,25 @@ namespace Ogre
     {
         HlmsBufferManager::frameEnded();
         mCurrentPassBuffer  = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsUnlit::setShadowSettings( bool useExponentialShadowMaps )
+    {
+        mUsingExponentialShadowMaps = useExponentialShadowMaps;
+
+        if( mUsingExponentialShadowMaps && mHlmsManager->getShadowMappingUseBackFaces() )
+        {
+            LogManager::getSingleton().logMessage(
+                        "QUALITY WARNING: It is highly recommended that you call "
+                        "mHlmsManager->setShadowMappingUseBackFaces( false ) when using Exponential "
+                        "Shadow Maps (HlmsUnlit::setShadowSettings)" );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsUnlit::setEsmK( uint16 K )
+    {
+        assert( K != 0 && "A value of K = 0 is invalid!" );
+        mEsmK = K;
     }
 #if !OGRE_NO_JSON
 	//-----------------------------------------------------------------------------------

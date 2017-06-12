@@ -2,19 +2,8 @@
 //Uniforms that change per pass
 layout(binding = 0) uniform PassBuffer
 {
-	//Vertex shader
-	mat4 viewProj[2];
-	@property( hlms_global_clip_distances )
-		vec4 clipPlane0;
-	@end
-	@property( hlms_shadowcaster )
-		vec4 depthRange;
-	@end
-
-	//Pixel Shader
-	vec4 invWindowSize;
-	@insertpiece( custom_passBuffer )
-} pass;
+	@insertpiece( PassInternalDecl )
+} passBuf;
 @end
 
 @piece( MaterialDecl )
@@ -47,9 +36,9 @@ layout(binding = 2) uniform InstanceBuffer
 	//Must be loaded with uintBitsToFloat
 	//
 	//.z =
-	//Contains 0 or 1 to index into pass.viewProj[]. Only used
+	//Contains 0 or 1 to index into passBuf.viewProj[]. Only used
 	//if hlms_identity_viewproj_dynamic is set.
-	uvec4 materialIdx[4096];
+	uvec4 worldMaterialIdx[4096];
 } instance;
 @end
 
@@ -60,6 +49,16 @@ layout(binding = 2) uniform InstanceBuffer
 		@foreach( out_uv_half_count, n )
 			vec@value( out_uv_half_count@n ) uv@n;@end
 	@end
-	@property( hlms_shadowcaster && !hlms_shadow_uses_depth_texture )	float depth;@end
+	@property( hlms_shadowcaster )
+		@property( (!hlms_shadow_uses_depth_texture || exponential_shadow_maps) && !hlms_shadowcaster_point )
+			float depth;
+		@end
+		@property( hlms_shadowcaster_point )
+			vec3 toCameraWS;
+			@property( !exponential_shadow_maps )
+				flat float constBias;
+			@end
+		@end
+	@end
 	@insertpiece( custom_VStoPS )
 @end

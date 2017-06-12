@@ -2,15 +2,7 @@
 //Uniforms that change per pass
 struct PassData
 {
-//Vertex shader
-float4x4 viewProj[2];
-@property( hlms_global_clip_distances )
-	float4 clipPlane0;
-@end
-@property( hlms_shadowcaster )
-	float4 depthRange;
-@end
-@insertpiece( custom_passBuffer )
+	@insertpiece( PassInternalDecl )
 };@end
 
 @piece( PassDecl )
@@ -43,9 +35,9 @@ struct Material
 //Must be loaded with uintBitsToFloat
 //
 //.z =
-//Contains 0 or 1 to index into pass.viewProj[]. Only used
+//Contains 0 or 1 to index into passBuf.viewProj[]. Only used
 //if hlms_identity_viewproj_dynamic is set.
-, constant uint4 *materialIdx [[buffer(CONST_SLOT_START+2)]]
+, constant uint4 *worldMaterialIdx [[buffer(CONST_SLOT_START+2)]]
 @end
 
 //Reset texcoord to 0 for every shader stage (since values are preserved).
@@ -58,6 +50,16 @@ struct Material
 		@foreach( out_uv_half_count, n )
 			float@value( out_uv_half_count@n ) uv@n;@end
 	@end
-	@property( hlms_shadowcaster )	float depth;@end
+	@property( hlms_shadowcaster )
+		@property( (!hlms_shadow_uses_depth_texture || exponential_shadow_maps) && !hlms_shadowcaster_point )
+			float depth;
+		@end
+		@property( hlms_shadowcaster_point )
+			float3 toCameraWS;
+			@property( !exponential_shadow_maps )
+				float constBias [[flat]];
+			@end
+		@end
+	@end
 	@insertpiece( custom_VStoPS )
 @end
