@@ -86,6 +86,7 @@ SamplerState samplerState@n : register(s@counter(samplerStateBind));@end
 	@insertpiece( PassDecl )
 @end
 
+@insertpiece( DeclOutputType )
 @insertpiece( output_type ) main( PS_INPUT inPs
 @property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end )
 {

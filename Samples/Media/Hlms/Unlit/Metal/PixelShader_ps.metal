@@ -92,6 +92,7 @@ fragment @insertpiece( output_type ) main_metal
 	@insertpiece( PassStructDecl )
 @end
 
+@insertpiece( DeclOutputType )
 fragment @insertpiece( output_type ) main_metal
 (
 	PS_INPUT inPs [[stage_in]]
