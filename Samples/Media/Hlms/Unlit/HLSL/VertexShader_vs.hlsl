@@ -80,7 +80,7 @@ PS_INPUT main( VS_INPUT input )
 
 @end
 
-	@property( hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point) )
+	@property( hlms_global_clip_distances || (hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point)) )
 		float3 worldPos = mul(outVs.gl_Position, passBuf.invViewProj).xyz;
 	@end
 	@insertpiece( DoShadowCasterVS )

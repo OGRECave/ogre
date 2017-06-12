@@ -461,6 +461,15 @@ namespace Ogre
             setProperty( HlmsBaseProp::ShadowCaster, 1 );
             if( mUsingExponentialShadowMaps )
                 setProperty( UnlitProperty::ExponentialShadowMaps, mEsmK );
+
+            const CompositorPass *pass = sceneManager->getCurrentCompositorPass();
+            if( pass )
+            {
+                const uint8 shadowMapIdx = pass->getDefinition()->mShadowMapIdx;
+                const Light *light = shadowNode->getLightAssociatedWith( shadowMapIdx );
+                if( light->getType() == Light::LT_POINT )
+                    setProperty( HlmsBaseProp::ShadowCasterPoint, 1 );
+            }
         }
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
@@ -468,6 +477,10 @@ namespace Ogre
                      renderTarget->getForceDisableColourWrites() ? 1 : 0 );
         setProperty( HlmsBaseProp::RenderDepthOnly,
                      renderTarget->getForceDisableColourWrites() ? 1 : 0 );
+
+        Camera *camera = sceneManager->getCameraInProgress();
+        if( camera->isReflected() )
+            setProperty( HlmsBaseProp::GlobalClipDistances, 1 );
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 
@@ -491,7 +504,6 @@ namespace Ogre
         retVal.setProperties = mSetProperties;
         retVal.pso.pass = passCache.passPso;
 
-        Camera *camera = sceneManager->getCameraInProgress();
         Matrix4 viewMatrix = camera->getViewMatrix(true);
 
         Matrix4 projectionMatrix = camera->getProjectionMatrixWithRSDepth();
@@ -523,12 +535,15 @@ namespace Ogre
         //mat4 viewProj[2] + vec4 invWindowSize;
         size_t mapSize = (16 + 16 + 4) * 4;
 
+        const bool isCameraReflected = camera->isReflected();
+        //mat4 invViewProj
+        if( isCameraReflected || (casterPass && (mUsingExponentialShadowMaps || isShadowCastingPointLight)) )
+            mapSize += 16 * 4;
+
         if( casterPass )
         {
             isShadowCastingPointLight = getProperty( HlmsBaseProp::ShadowCasterPoint ) != 0;
-            //mat4 invViewProj
-            if( mUsingExponentialShadowMaps || isShadowCastingPointLight )
-                mapSize += 16 * 4;
+
             //vec4 viewZRow
             if( mUsingExponentialShadowMaps )
                 mapSize += 4 * 4;
@@ -538,8 +553,6 @@ namespace Ogre
             if( isShadowCastingPointLight )
                 mapSize += 4 * 4;
         }
-
-        const bool isCameraReflected = camera->isReflected();
         //vec4 clipPlane0
         if( isCameraReflected )
             mapSize += 4 * 4;
@@ -586,17 +599,17 @@ namespace Ogre
             *passBufferPtr++ = (float)reflPlane.d;
         }
 
+        if( isCameraReflected || (casterPass && (mUsingExponentialShadowMaps || isShadowCastingPointLight)) )
+        {
+            //We don't care about the inverse of the identity proj because that's not
+            //really compatible with shadows anyway.
+            Matrix4 invViewProj = mPreparedPass.viewProjMatrix[0].inverse();
+            for( size_t i=0; i<16; ++i )
+                *passBufferPtr++ = (float)invViewProj[0][i];
+        }
+
         if( casterPass )
         {
-            if( mUsingExponentialShadowMaps || isShadowCastingPointLight )
-            {
-                //We don't care about the inverse of the identity proj because that's not
-                //really compatible with shadows anyway.
-                Matrix4 invViewProj = mPreparedPass.viewProjMatrix[0].inverse();
-                for( size_t i=0; i<16; ++i )
-                    *passBufferPtr++ = (float)invViewProj[0][i];
-            }
-
             //vec4 viewZRow
             if( mUsingExponentialShadowMaps )
             {
