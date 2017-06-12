@@ -47,7 +47,7 @@ namespace Ogre
         //Macroblock data
         GLboolean   depthWrite;
         GLenum      depthFunc;
-        GLenum      cullMode[2];
+        GLenum      cullMode;
         GLenum      polygonMode;
 
         //Blendblock data

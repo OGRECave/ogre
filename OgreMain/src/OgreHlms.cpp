@@ -1672,7 +1672,7 @@ namespace Ogre
         while( itor != end )
         {
             mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-            if( (*itor)->pso.pass.strongMacroblock )
+            if( (*itor)->pso.pass.hasStrongMacroblock() )
                 mHlmsManager->destroyMacroblock( (*itor)->pso.macroblock );
 
             delete *itor;
@@ -1893,13 +1893,28 @@ namespace Ogre
         if( !pso.macroblock->mDepthWrite )
         {
             //Depth writes is already off, we don't need to hold a strong reference.
-            pso.pass.strongMacroblock = false;
+            pso.pass.strongMacroblockBits &= ~HlmsPassPso::ForceDisableDepthWrites;
         }
-        else if( pso.pass.strongMacroblock )
+        if( pso.macroblock->mCullMode == CULL_NONE )
         {
-            //This is a depth prepass, disable depth writes and keep a hard copy (strong ref.)
+            //Without culling there's nothing to invert, we don't need to hold a strong reference.
+            pso.pass.strongMacroblockBits &= ~HlmsPassPso::InvertVertexWinding;
+        }
+
+        if( pso.pass.hasStrongMacroblock() )
+        {
             HlmsMacroblock prepassMacroblock = *pso.macroblock;
-            prepassMacroblock.mDepthWrite = false;
+
+            //This is a depth prepass, disable depth writes and keep a hard copy (strong ref.)
+            if( pso.pass.strongMacroblockBits & HlmsPassPso::ForceDisableDepthWrites )
+                prepassMacroblock.mDepthWrite = false;
+            //We need to invert culling mode.
+            if( pso.pass.strongMacroblockBits & HlmsPassPso::InvertVertexWinding )
+            {
+                prepassMacroblock.mCullMode = prepassMacroblock.mCullMode == CULL_CLOCKWISE ?
+                            CULL_ANTICLOCKWISE : CULL_CLOCKWISE;
+            }
+
             pso.macroblock = mHlmsManager->getMacroblock( prepassMacroblock );
         }
 
@@ -2465,7 +2480,16 @@ namespace Ogre
         passPso.multisampleQuality = StringConverter::parseInt( renderTarget->getFSAAHint() );
         passPso.adapterId = 1; //TODO: Ask RenderSystem current adapter ID.
 
-        passPso.strongMacroblock = sceneManager->getCurrentPrePassMode() == PrePassUse;
+        if( sceneManager->getCurrentPrePassMode() == PrePassUse )
+            passPso.strongMacroblockBits |= HlmsPassPso::ForceDisableDepthWrites;
+
+        const bool invertVertexWinding = mRenderSystem->getInvertVertexWinding();
+
+        if( (renderTarget->requiresTextureFlipping() && invertVertexWinding) ||
+            (!renderTarget->requiresTextureFlipping() && !invertVertexWinding) )
+        {
+            passPso.strongMacroblockBits |= HlmsPassPso::InvertVertexWinding;
+        }
 
         return passPso;
     }
@@ -2550,13 +2574,13 @@ namespace Ogre
 
         while( itor != end )
         {
-            if( (*itor)->pso.pass.strongMacroblock )
+            if( (*itor)->pso.pass.hasStrongMacroblock() )
                 hasPsosWithStrongRefs = true;
 
             if( (*itor)->pso.macroblock->mId == id )
             {
                 mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                if( !(*itor)->pso.pass.strongMacroblock )
+                if( !(*itor)->pso.pass.hasStrongMacroblock() )
                 {
                     wasUsedInWeakRefs = true;
                     macroblock = *(*itor)->pso.macroblock;
@@ -2582,7 +2606,7 @@ namespace Ogre
 
             while( itor != end )
             {
-                if( (*itor)->pso.pass.strongMacroblock && *(*itor)->pso.macroblock == macroblock )
+                if( (*itor)->pso.pass.hasStrongMacroblock() && *(*itor)->pso.macroblock == macroblock )
                     macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                 ++itor;
             }
@@ -2613,7 +2637,7 @@ namespace Ogre
             if( (*itor)->pso.blendblock->mId == id )
             {
                 mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                if( (*itor)->pso.pass.strongMacroblock )
+                if( (*itor)->pso.pass.hasStrongMacroblock() )
                     macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                 delete *itor;
                 itor = mShaderCache.erase( itor );
@@ -2653,7 +2677,7 @@ namespace Ogre
                 {
                     //This is a v2 input layout.
                     mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                    if( (*itor)->pso.pass.strongMacroblock )
+                    if( (*itor)->pso.pass.hasStrongMacroblock() )
                         macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                     delete *itor;
                     itor = mShaderCache.erase( itor );
@@ -2698,7 +2722,7 @@ namespace Ogre
                 {
                     //This is a v1 input layout.
                     mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                    if( (*itor)->pso.pass.strongMacroblock )
+                    if( (*itor)->pso.pass.hasStrongMacroblock() )
                         macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                     delete *itor;
                     itor = mShaderCache.erase( itor );

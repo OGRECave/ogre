@@ -115,7 +115,7 @@ namespace Ogre
         /// For multi-GPU support
         uint32      adapterId;
 
-        bool strongMacroblock;
+        uint8 strongMacroblockBits;
         uint8 padding0[3];
 
         bool operator == ( const HlmsPassPso &_r ) const
@@ -131,6 +131,14 @@ namespace Ogre
         {
             return memcmp( this, &_r, sizeof(HlmsPassPso) ) < 0;
         }
+
+        bool hasStrongMacroblock(void) const    { return strongMacroblockBits != 0u; }
+
+        enum StrongMacroblockBits
+        {
+            ForceDisableDepthWrites     = 1u << 0u,
+            InvertVertexWinding         = 1u << 1u,
+        };
     };
 
     /** Defines a PipelineStateObject as required by Vulkan, Metal & DX12.
