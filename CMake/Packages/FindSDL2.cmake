@@ -153,7 +153,7 @@ IF(SDL2_LIBRARY_TEMP)
   # "real" variable in one-shot.
   IF(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} "-framework Cocoa")
-  ENDIF(APPLE)
+  ENDIF()
 
   # For threads, as mentioned Apple doesn't need this.
   # In fact, there seems to be a problem if I used the Threads package
