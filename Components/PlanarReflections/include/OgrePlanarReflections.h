@@ -72,6 +72,21 @@ namespace Ogre
             Vector3         renderableCenter;
             uint32          hlmsHashes[2];
 
+            /**
+            @param _renderable
+                SubItem/SubEntity/etc that will have planar reflections
+            @param _movableObject
+                Parent of the Renderable (usually Item/Entity/etc, but in some cases the
+                Renderable & MovableObject can be the same class)
+            @param _reflNormal
+                The predominant normal of the reflection of this Renderable, in local space.
+                We'll use the MovableObject's node transform to convert it to object space.
+                Actors that are close enough and have a direction that resembles enough
+                this reflNormal will be considered.
+            @param _renderableCenter
+                The center of the Renderable, in local space. We'll use this center to determine
+                how close this Renderable is to each Actor.
+            */
             TrackedRenderable( Renderable *_renderable, MovableObject *_movableObject,
                                const Vector3 &_reflNormal, const Vector3 &_renderableCenter ) :
                 renderable( _renderable ), movableObject( _movableObject ),
@@ -147,6 +162,16 @@ namespace Ogre
         void destroyActor( PlanarReflectionActor *actor );
         void destroyAllActors(void);
 
+        /** Once you add a Renderable, we will automatically update its PBS material to use
+            reflection if it's close to any active actor. If no active actor is close, we'll
+            disable the reflections for that frame.
+        @remarks
+            You must call removeRenderable before destroying the Renderable.
+            You can use PlanarReflections::hasPlanarReflections( renderable ) to tell
+            whether this Renderable has already been added.
+        @param trackedRenderable
+            See TrackedRenderable::TrackedRenderable.
+        */
         void addRenderable( const TrackedRenderable &trackedRenderable );
         void removeRenderable( Renderable *renderable );
         void _notifyRenderableFlushedHlmsDatablock( Renderable *renderable );
