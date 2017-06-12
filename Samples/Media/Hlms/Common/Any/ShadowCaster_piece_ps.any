@@ -1,0 +1,40 @@
+
+//#include "SyntaxHighlightingMisc.h"
+
+///--------------------------------------------------------------------------------------
+/// Caster
+///--------------------------------------------------------------------------------------
+
+@piece( DeclShadowCasterMacros )
+	@property( syntax == glsl )
+		@property( !hlms_render_depth_only )
+			@property( GL3+ )
+				#define outDepth outColour
+			@end
+			@property( !GL3+ )
+				#define outDepth gl_FragColor
+			@end
+		@end
+		@property( hlms_render_depth_only )
+			#define outDepth gl_FragDepth
+		@end
+	@end
+
+	@property( syntax == hlsl || syntax == metal )
+		#define outDepth outPs.colour0
+	@end
+@end
+
+@piece( DoShadowCastPS )
+	@property( (!hlms_shadow_uses_depth_texture || exponential_shadow_maps) && !hlms_shadowcaster_point )
+		outDepth = inPs.depth;
+	@end
+	@property( hlms_shadowcaster_point )
+		float distanceToCamera = length( inPs.toCameraWS );
+		@property( !exponential_shadow_maps )
+			outDepth = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y + inPs.constBias;
+		@end @property( exponential_shadow_maps )
+			outDepth = (distanceToCamera - passBuf.depthRange.x) * passBuf.depthRange.y;
+		@end
+	@end
+@end

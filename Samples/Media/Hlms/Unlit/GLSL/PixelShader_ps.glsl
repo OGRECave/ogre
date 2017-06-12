@@ -37,7 +37,7 @@ void main()
 {
 	@insertpiece( custom_ps_preExecution )
 @property( diffuse_map || alpha_test || diffuse )
-	uint materialId	= instance.materialIdx[inPs.drawId].x;
+	uint materialId	= instance.worldMaterialIdx[inPs.drawId].x;
 	material = materialArray.m[materialId];
 @end
 	@insertpiece( custom_ps_posMaterialLoad )
@@ -75,10 +75,17 @@ void main()
 	@property( hlms_render_depth_only )
 		@set( hlms_disable_stage, 1 )
 	@end
+
+@insertpiece( DeclShadowCasterMacros )
+
+@property( hlms_shadowcaster_point )
+	@insertpiece( PassDecl )
+@end
+
 void main()
 {
 	@insertpiece( custom_ps_preExecution )
-	outColour = inPs.depth;
+	@insertpiece( DoShadowCastPS )
 	@insertpiece( custom_ps_posExecution )
 }
 @end

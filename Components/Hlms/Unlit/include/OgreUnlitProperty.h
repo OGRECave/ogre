@@ -43,6 +43,7 @@ namespace Ogre
         static const IdString MaterialsPerBuffer;
         static const IdString AnimationMatricesPerBuffer; //TODO: Seems dead
         static const IdString TextureMatrix;
+        static const IdString ExponentialShadowMaps;
 
         static const IdString TexMatrixCount;
         static const IdString TexMatrixCount0;

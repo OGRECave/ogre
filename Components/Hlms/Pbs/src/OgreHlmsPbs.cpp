@@ -980,7 +980,7 @@ namespace Ogre
             //vec4 viewZRow
             if( mShadowFilter == ExponentialShadowMaps )
                 mapSize += 4 * 4;
-            //vec3 depthRange
+            //vec4 depthRange
             mapSize += (2 + 2) * 4;
         }
 
