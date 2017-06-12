@@ -392,6 +392,15 @@ namespace Ogre
             if( parallaxCorrectCubemaps )
                 cubemapTexUnit = texUnit++;
 
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+            if( mHasPlanarReflections )
+            {
+                const bool usesPlanarReflections = getProperty( PbsProperty::UsePlanarReflections ) != 0;
+                if( usesPlanarReflections )
+                    psParams->setNamedConstant( "planarReflectionTex", texUnit );
+                ++texUnit;
+            }
+#endif
             assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
             const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
                                                         queuedRenderable.renderable->getDatablock() );
@@ -413,12 +422,6 @@ namespace Ogre
                 else
                     psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
             }
-
-#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
-            const bool usesPlanarReflections = getProperty( PbsProperty::UsePlanarReflections ) != 0;
-            if( usesPlanarReflections )
-                psParams->setNamedConstant( "planarReflectionTex", texUnit++ );
-#endif
         }
 
         GpuProgramParametersSharedPtr vsParams = retVal->pso.vertexShader->getDefaultParameters();

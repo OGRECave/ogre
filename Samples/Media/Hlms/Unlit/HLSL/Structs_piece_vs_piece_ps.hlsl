@@ -12,6 +12,9 @@ cbuffer PassBuffer : register(b0)
 	@property( hlms_shadowcaster )
 		float4 depthRange;
 	@end
+
+	//Pixel Shader
+	float4 invWindowSize;
 	@insertpiece( custom_passBuffer )
 	} passBuf;
 };

@@ -653,6 +653,10 @@ namespace Ogre
                                                                            0, passBuffer, 0,
                                                                            passBuffer->
                                                                            getTotalSizeBytes() );
+            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( PixelShader,
+                                                                           0, passBuffer, 0,
+                                                                           passBuffer->
+                                                                           getTotalSizeBytes() );
 
             //layout(binding = 2) uniform InstanceBuffer {} instance
             if( mCurrentConstBuffer < mConstBuffers.size() &&

@@ -97,6 +97,8 @@ cbuffer PassBuffer : register(b0)
 	@end
 @end
 
+	@insertpiece( DeclPlanarReflUniforms )
+
 @property( parallax_correct_cubemaps )
 	CubemapProbe autoProbe;
 @end
