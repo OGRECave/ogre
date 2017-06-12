@@ -1608,10 +1608,10 @@ namespace Ogre {
             break;
         default:
         case CULL_CLOCKWISE:
-            pso->cullMode = GL_FRONT;
+            pso->cullMode = GL_BACK;
             break;
         case CULL_ANTICLOCKWISE:
-            pso->cullMode = GL_BACK;
+            pso->cullMode = GL_FRONT;
             break;
         }
 

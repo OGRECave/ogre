@@ -2485,8 +2485,8 @@ namespace Ogre
 
         const bool invertVertexWinding = mRenderSystem->getInvertVertexWinding();
 
-        if( (renderTarget->requiresTextureFlipping() && invertVertexWinding) ||
-            (!renderTarget->requiresTextureFlipping() && !invertVertexWinding) )
+        if( (renderTarget->requiresTextureFlipping() && !invertVertexWinding) ||
+            (!renderTarget->requiresTextureFlipping() && invertVertexWinding) )
         {
             passPso.strongMacroblockBits |= HlmsPassPso::InvertVertexWinding;
         }

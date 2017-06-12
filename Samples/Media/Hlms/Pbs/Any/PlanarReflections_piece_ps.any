@@ -35,11 +35,7 @@
 	float4 planarReflection = passBuf.planarReflections[planarReflectionIdx];
 	float distanceToPlanarReflPlane = dot( planarReflection.xyz, inPs.pos.xyz ) + planarReflection.w;
 	float3 pointInPlane = inPs.pos.xyz - nNormal * distanceToPlanarReflPlane;
-	@property( syntax != hlsl )
-		float3 projPointInPlane = mul( float4( pointInPlane.xyz, 1.0 ), passBuf.planarReflProjectionMat ).xyw;
-	@end @property( syntax == hlsl )
-		float3 projPointInPlane = mul( passBuf.planarReflProjectionMat, float4( pointInPlane.xyz, 1.0 ) ).xyw;
-	@end
+	float3 projPointInPlane = mul( float4( pointInPlane.xyz, 1.0 ), passBuf.planarReflProjectionMat ).xyw;
 	float2 planarReflUVs = projPointInPlane.xy / projPointInPlane.z;
 
 	float3 planarReflectionS = OGRE_SampleLevel( planarReflectionTex, planarReflectionSampler,
