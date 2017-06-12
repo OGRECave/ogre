@@ -6,7 +6,7 @@ struct PassData
 };@end
 
 @piece( PassDecl )
-, constant PassData &pass [[buffer(CONST_SLOT_START+0)]]
+, constant PassData &passBuf [[buffer(CONST_SLOT_START+0)]]
 @end
 
 @piece( MaterialStructDecl )

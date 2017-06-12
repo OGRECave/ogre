@@ -113,11 +113,11 @@
 		@property( diffuse_map@n_array )
 			@piece( TextureOrigin@n )textureMapsArray@value(diffuse_map@n_idx)@end
 			@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
-			@piece( SamplerUV@n )inPs.gl_FragCoord.xy * passBuf.invWindowSize.xy, material.diffuseIdx@n@end
+			@piece( SamplerUV@n )gl_FragCoord.xy * passBuf.invWindowSize.xy, material.diffuseIdx@n@end
 		@end @property( !diffuse_map@n_array )
 			@piece( TextureOrigin@n )textureMaps@value(diffuse_map@n_idx)@end
 			@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
-			@piece( SamplerUV@n )inPs.gl_FragCoord.xy * passBuf.invWindowSize.xy@end
+			@piece( SamplerUV@n )gl_FragCoord.xy * passBuf.invWindowSize.xy@end
 		@end
 	@end
 @end

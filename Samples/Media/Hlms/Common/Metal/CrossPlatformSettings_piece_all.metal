@@ -10,6 +10,7 @@ struct float1
 };
 
 #define mul( x, y ) ((x) * (y))
+#define lerp mix
 #define INLINE inline
 
 #define outVs_Position outVs.gl_Position
