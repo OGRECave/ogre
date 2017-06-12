@@ -80,6 +80,12 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void PlanarReflections::setMaxDistance( Real maxDistance )
+    {
+        mMaxSqDistance = maxDistance * maxDistance;
+        mInvMaxDistance = Real(1.0) / maxDistance;
+    }
+    //-----------------------------------------------------------------------------------
     void PlanarReflections::setMaxActiveActors( uint8 maxActiveActors )
     {
         mMaxActiveActors = maxActiveActors;
@@ -708,6 +714,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     bool PlanarReflections::hasActiveActor( const Renderable *renderable ) const
     {
-        return renderable->mCustomParameter & UseActiveActor;
+        return (renderable->mCustomParameter & UseActiveActor) != 0;
     }
 }
