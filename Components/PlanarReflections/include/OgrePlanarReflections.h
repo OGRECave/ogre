@@ -130,6 +130,11 @@ namespace Ogre
                            uint8 maxActiveActors, Real maxDistance, Camera *lockCamera );
         ~PlanarReflections();
 
+        /// Note HlmsPbs hardcodes the max number of actors, so changing
+        /// this value after having rendered a few frames could cause many
+        /// shaders to be recompiled.
+        void setMaxActiveActors( uint8 maxActiveActors );
+
         /** Adds an actor plane that other objects can use as source for reflections if they're
             close enough to it (and aligned enough to the normal).
         @param actor

@@ -80,6 +80,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void PlanarReflections::setMaxActiveActors( uint8 maxActiveActors )
+    {
+        mMaxActiveActors = maxActiveActors;
+    }
+    //-----------------------------------------------------------------------------------
     void PlanarReflections::pushActor( PlanarReflectionActor *actor )
     {
         mActors.push_back( actor );
