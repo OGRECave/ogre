@@ -122,15 +122,15 @@
 	@end @property( diffuse_map@n_reflection )
 		@property( !hlms_forwardplus_flipY )
 			@property( diffuse_map@n_array )
-				@piece( SamplerUV@n )vec3( gl_FragCoord.x * pass.invWindowSize.x, 1.0 - gl_FragCoord.y * pass.invWindowSize.y, @insertpiece( diffuseIdx@n ) )@end
+				@piece( SamplerUV@n )vec3( gl_FragCoord.x * passBuf.invWindowSize.x, 1.0 - gl_FragCoord.y * passBuf.invWindowSize.y, @insertpiece( diffuseIdx@n ) )@end
 			@end @property( !diffuse_map@n_array )
-				@piece( SamplerUV@n )vec2( gl_FragCoord.x * pass.invWindowSize.x, 1.0 - gl_FragCoord.y * pass.invWindowSize.y )@end
+				@piece( SamplerUV@n )vec2( gl_FragCoord.x * passBuf.invWindowSize.x, 1.0 - gl_FragCoord.y * passBuf.invWindowSize.y )@end
 			@end
 		@end @property( hlms_forwardplus_flipY )
 			@property( diffuse_map@n_array )
-				@piece( SamplerUV@n )vec3( gl_FragCoord.xy * pass.invWindowSize.xy, @insertpiece( diffuseIdx@n ) )@end
+				@piece( SamplerUV@n )vec3( gl_FragCoord.xy * passBuf.invWindowSize.xy, @insertpiece( diffuseIdx@n ) )@end
 			@end @property( !diffuse_map@n_array )
-				@piece( SamplerUV@n )vec2( gl_FragCoord.xy * pass.invWindowSize.xy )@end
+				@piece( SamplerUV@n )vec2( gl_FragCoord.xy * passBuf.invWindowSize.xy )@end
 			@end
 		@end
 	@end
