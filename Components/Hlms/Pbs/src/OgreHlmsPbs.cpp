@@ -305,7 +305,7 @@ namespace Ogre
                 mShadowmapCmpSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
 
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
-            if( mPlanarReflectionsSamplerblock )
+            if( !mPlanarReflectionsSamplerblock )
             {
                 samplerblock.mMinFilter     = FO_LINEAR;
                 samplerblock.mMagFilter     = FO_LINEAR;
