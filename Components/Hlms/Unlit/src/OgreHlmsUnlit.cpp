@@ -479,7 +479,7 @@ namespace Ogre
                      renderTarget->getForceDisableColourWrites() ? 1 : 0 );
 
         Camera *camera = sceneManager->getCameraInProgress();
-        if( camera->isReflected() )
+        if( camera && camera->isReflected() )
             setProperty( HlmsBaseProp::GlobalClipDistances, 1 );
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );

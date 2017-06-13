@@ -2409,7 +2409,7 @@ namespace Ogre
         }
 
         Camera *camera = sceneManager->getCameraInProgress();
-        if( camera->isReflected() )
+        if( camera && camera->isReflected() )
             setProperty( HlmsBaseProp::GlobalClipDistances, 1 );
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
