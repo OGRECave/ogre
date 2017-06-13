@@ -1483,8 +1483,10 @@ namespace Ogre
             mTexUnitSlotStart += 1;
         if( mSsrTexture )
             mTexUnitSlotStart += 1;
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
         if( mHasPlanarReflections )
             mTexUnitSlotStart += 1;
+#endif
 
         uploadDirtyDatablocks();
 
