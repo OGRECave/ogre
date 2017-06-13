@@ -227,6 +227,7 @@ namespace Ogre
         mIrradianceVolume( 0 ),
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
         mPlanarReflections( 0 ),
+        mPlanarReflectionsSamplerblock( 0 ),
         mHasPlanarReflections( false ),
         mLastBoundPlanarReflection( 0u ),
 #endif
