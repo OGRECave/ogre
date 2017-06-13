@@ -63,7 +63,7 @@ namespace Ogre
 
         PassData                mPreparedPass;
         ConstBufferPackedVec    mPassBuffers;
-        uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
+        uint32                  mCurrentPassBuffer;     /// Resets to zero every new frame.
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 

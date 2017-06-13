@@ -32,6 +32,10 @@ if (OGRE_BUILD_COMPONENT_PAGING)
   add_subdirectory(Paging)
 endif ()
 
+if (OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS)
+  add_subdirectory(PlanarReflections)
+endif ()
+
 if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
   add_subdirectory(MeshLodGenerator)
 endif ()

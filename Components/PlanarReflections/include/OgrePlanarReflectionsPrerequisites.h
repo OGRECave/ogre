@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2017 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,43 +25,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef _OgrePlanarReflectionsPrerequisites_H_
+#define _OgrePlanarReflectionsPrerequisites_H_
 
-#ifndef _C_BooleanMask_H_
-#define _C_BooleanMask_H_
+#include "OgrePrerequisites.h"
 
-#ifndef __BooleanMask_H__
-    #error "Don't include this file directly. include Math/Array/OgreBooleanMask.h"
-#endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   if defined( OGRE_STATIC_LIB )
+#       define _OgrePlanarReflectionsExport
+#   else
+#       if defined( OgrePlanarReflections_EXPORTS )
+#           define _OgrePlanarReflectionsExport __declspec( dllexport )
+#       else
+#           if defined( __MINGW32__ )
+#               define _OgrePlanarReflectionsExport
+#           else
+#               define _OgrePlanarReflectionsExport __declspec( dllimport )
+#           endif
+#       endif
+#   endif
+#elif defined ( OGRE_GCC_VISIBILITY )
+#   define _OgrePlanarReflectionsExport __attribute__ ((visibility("default")))
+#else
+#   define _OgrePlanarReflectionsExport
+#endif 
 
 namespace Ogre
 {
-    class _OgreExport BooleanMask4
-    {
-    public:
-        enum
-        {
-            MASK_NONE           = 0,
-            MASK_X              = 1,
-            NUM_MASKS           = 2
-        };
-    public:
-        inline static ArrayMaskR getMask( bool x );
-        inline static ArrayMaskR getMask( bool booleans[1] );
-
-        inline static ArrayMaskR getAllSetMask(void);
-
-        /// Returns true if alls bit in mask0[i] and mask1[i] are set.
-        inline static bool allBitsSet( bool mask0[1], bool mask1[1] );
-
-        /** Converts a SIMD mask into a mask that fits in 32-bit number
-        @remarks
-            @See IS_SET_MASK_X & co. to read the mask, since the result may need
-            byteswapping in some architectures (i.e. SSE2)
-        */
-        inline static uint32 getScalarMask( ArrayMaskR mask );
-    };
+    class PlanarReflectionActor;
+    class PlanarReflections;
 }
-
-#include "OgreBooleanMask.inl"
 
 #endif

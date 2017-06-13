@@ -30,6 +30,11 @@
 	@add( texUnit, 1 )
 @end
 
+@property( has_planar_reflections )
+	@set( planarReflectionTexUnit, texUnit )
+	@add( texUnit, 1 )
+@end
+
 @set( textureRegStart, texUnit )
 @set( samplerStateStart, texUnit )
 @set( numSamplerStates, num_textures )

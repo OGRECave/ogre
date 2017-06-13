@@ -115,7 +115,7 @@ namespace Ogre
         /// For multi-GPU support
         uint32      adapterId;
 
-        bool strongMacroblock;
+        uint8 strongMacroblockBits;
         uint8 padding0[3];
 
         bool operator == ( const HlmsPassPso &_r ) const
@@ -131,6 +131,14 @@ namespace Ogre
         {
             return memcmp( this, &_r, sizeof(HlmsPassPso) ) < 0;
         }
+
+        bool hasStrongMacroblock(void) const    { return strongMacroblockBits != 0u; }
+
+        enum StrongMacroblockBits
+        {
+            ForceDisableDepthWrites     = 1u << 0u,
+            InvertVertexWinding         = 1u << 1u,
+        };
     };
 
     /** Defines a PipelineStateObject as required by Vulkan, Metal & DX12.
@@ -159,7 +167,8 @@ namespace Ogre
         VertexElement2VecVec    vertexElements;
         OperationType           operationType;
         bool                    enablePrimitiveRestart;
-        uint8                   padding[3];
+        uint8                   clipDistances; //Bitmask. Only needed by GL.
+        uint8                   padding[2];
 
         HlmsMacroblock const    *macroblock;
         HlmsBlendblock const    *blendblock;
@@ -191,6 +200,7 @@ namespace Ogre
             sampleMask = 0;
             operationType = OT_POINT_LIST;
             enablePrimitiveRestart = false;
+            clipDistances = 0;
             memset( padding, 0, sizeof(padding) );
             memset( &pass, 0, sizeof(HlmsPassPso) );
             rsData = 0;

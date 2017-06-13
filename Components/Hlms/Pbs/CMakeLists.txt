@@ -29,9 +29,17 @@ file(
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/include)
 
+if( OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS )
+	ogre_add_component_include_dir( PlanarReflections )
+endif()
+
 ogre_add_library(OgreHlmsPbs ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreHlmsPbs PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreHlmsPbs OgreMain)
+
+if( OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS )
+	target_link_libraries( OgreHlmsPbs OgrePlanarReflections )
+endif()
 
 ogre_config_framework(OgreHlmsPbs)
 ogre_config_component(OgreHlmsPbs)

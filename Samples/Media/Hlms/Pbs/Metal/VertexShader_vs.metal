@@ -34,6 +34,9 @@ struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 	float4 gl_Position [[position]];
+@property( hlms_global_clip_distances )
+	float gl_ClipDistance0 [[clip_distance]];
+@end
 };
 
 // START UNIFORM STRUCT DECLARATION
@@ -194,6 +197,13 @@ vertex PS_INPUT main_metal
 
 @property( hlms_fine_light_mask || hlms_forwardplus_fine_light_mask )
 	outVs.objLightMask = worldMaterialIdx[drawId].z;@end
+
+@property( use_planar_reflections )
+	outVs.planarReflectionIdx = (ushort)(as_type<uint>( worldMaterialIdx[drawId].w ));@end
+
+@property( hlms_global_clip_distances )
+	outVs.gl_ClipDistance0 = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
+@end
 
 	@insertpiece( custom_vs_posExecution )
 

@@ -10,7 +10,9 @@ struct float1
 };
 
 #define mul( x, y ) ((x) * (y))
+#define lerp mix
 #define INLINE inline
 
 #define outVs_Position outVs.gl_Position
+#define OGRE_SampleLevel( tex, sampler, uv, lod ) tex.sample( sampler, float2( uv ), level( lod ) )
 @end

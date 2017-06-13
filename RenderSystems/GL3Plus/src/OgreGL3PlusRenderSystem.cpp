@@ -183,6 +183,7 @@ namespace Ogre {
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
         mSwIndirectBufferPtr = 0;
+        mClipDistances = 0;
         mPso = 0;
         mCurrentComputeShader = 0;
         mLargestSupportedAnisotropy = 1;
@@ -1603,17 +1604,14 @@ namespace Ogre {
         switch( newBlock->macroblock->mCullMode )
         {
         case CULL_NONE:
-            pso->cullMode[0] = 0;
-            pso->cullMode[1] = 0;
+            pso->cullMode = 0;
             break;
         default:
         case CULL_CLOCKWISE:
-            pso->cullMode[0] = GL_FRONT;
-            pso->cullMode[1] = GL_BACK;
+            pso->cullMode = GL_BACK;
             break;
         case CULL_ANTICLOCKWISE:
-            pso->cullMode[0] = GL_BACK;
-            pso->cullMode[1] = GL_FRONT;
+            pso->cullMode = GL_FRONT;
             break;
         }
 
@@ -1876,23 +1874,14 @@ namespace Ogre {
 
 
         //Cull mode
-        if( pso->cullMode[0] == 0 )
+        if( pso->cullMode == 0 )
         {
             OCGE( glDisable( GL_CULL_FACE ) );
         }
         else
         {
-            // NB: Because two-sided stencil API dependence of the front face, we must
-            // use the same 'winding' for the front face everywhere. As the OGRE default
-            // culling mode is clockwise, we also treat anticlockwise winding as front
-            // face for consistently. On the assumption that, we can't change the front
-            // face by glFrontFace anywhere.
-            size_t cullIdx = !(mActiveRenderTarget &&
-                    ((mActiveRenderTarget->requiresTextureFlipping() && !mInvertVertexWinding) ||
-                     (!mActiveRenderTarget->requiresTextureFlipping() && mInvertVertexWinding)));
-
             OCGE( glEnable( GL_CULL_FACE ) );
-            OCGE( glCullFace( pso->cullMode[cullIdx] ) );
+            OCGE( glCullFace( pso->cullMode ) );
         }
 
         //Polygon mode
@@ -2006,6 +1995,29 @@ namespace Ogre {
         GLSLShader::unbindAll();
 
         RenderSystem::_setPipelineStateObject( pso );
+
+        uint8 newClipDistances = 0;
+        if( pso )
+            newClipDistances = pso->clipDistances;
+
+        if( mClipDistances != newClipDistances )
+        {
+            for( size_t i=0; i<8u; ++i )
+            {
+                const uint8 bitFlag = 1u << i;
+                bool oldClipSet = (mClipDistances & bitFlag) != 0;
+                bool newClipSet = (newClipDistances & bitFlag) != 0;
+                if( oldClipSet != newClipSet )
+                {
+                    if( newClipSet )
+                        glEnable( GL_CLIP_DISTANCE0 + i );
+                    else
+                        glDisable( GL_CLIP_DISTANCE0 + i );
+                }
+            }
+
+            mClipDistances = newClipDistances;
+        }
 
         mUseAdjacency   = false;
         mPso            = 0;

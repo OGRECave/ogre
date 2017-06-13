@@ -2,13 +2,18 @@
 @piece( PassInternalDecl )
 	//Vertex shader
 	float4x4 viewProj[2];
+	@property( hlms_global_clip_distances )
+		float4 clipPlane0;
+	@end
+	@property( hlms_global_clip_distances || exponential_shadow_maps || hlms_shadowcaster_point )float4x4 invViewProj;@end
 	@property( hlms_shadowcaster )
-		@property( exponential_shadow_maps || hlms_shadowcaster_point )float4x4 invViewProj;@end
 		@property( exponential_shadow_maps )float4 viewZRow;@end
 		float4 depthRange;
 		@property( hlms_shadowcaster_point )
 			float4 cameraPosWS;	//Camera position in world space
 		@end
 	@end
+	//Pixel Shader
+	float4 invWindowSize;
 	@insertpiece( custom_passBuffer )
 @end

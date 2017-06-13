@@ -21,6 +21,9 @@ struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 	float4 gl_Position [[position]];
+@property( hlms_global_clip_distances )
+	float gl_ClipDistance0 [[clip_distance]];
+@end
 };
 
 @property( !hlms_identity_world )
@@ -94,10 +97,14 @@ vertex PS_INPUT main_metal
 
 @end
 
-	@property( hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point) )
+	@property( hlms_global_clip_distances || (hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point)) )
 		float3 worldPos = (outVs.gl_Position * passBuf.invViewProj).xyz;
 	@end
 	@insertpiece( DoShadowCasterVS )
+
+@property( hlms_global_clip_distances )
+	outVs.gl_ClipDistance0 = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
+@end
 
 	@insertpiece( custom_vs_posExecution )
 

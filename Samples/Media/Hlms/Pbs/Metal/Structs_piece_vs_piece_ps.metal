@@ -30,6 +30,10 @@ struct PassData
 	//Vertex shader (common to both receiver and casters)
 	float4x4 viewProj;
 
+@property( hlms_global_clip_distances )
+	float4 clipPlane0;
+@end
+
 @property( hlms_shadowcaster_point )
 	float4 cameraPosWS;	//Camera position in world space
 @end
@@ -89,6 +93,8 @@ struct PassData
 		float4 fwdScreenToGrid;
 	@end
 @end
+
+	@insertpiece( DeclPlanarReflUniforms )
 
 @property( parallax_correct_cubemaps )
 	CubemapProbe autoProbe;
@@ -176,6 +182,9 @@ struct Material
 		@end
 		@property( hlms_fine_light_mask || hlms_forwardplus_fine_light_mask )
 			uint objLightMask [[flat]];
+		@end
+		@property( use_planar_reflections )
+			ushort planarReflectionIdx [[flat]];
 		@end
 		@property( hlms_normal || hlms_qtangent )
 			float3 pos;

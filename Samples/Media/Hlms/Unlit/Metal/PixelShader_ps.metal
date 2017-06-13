@@ -1,6 +1,9 @@
 @insertpiece( SetCrossPlatformSettings )
 
 // START UNIFORM STRUCT DECLARATION
+@property( has_planar_reflections )
+	@insertpiece( PassStructDecl )
+@end
 @property( !hlms_shadowcaster )
 @insertpiece( MaterialStructDecl )
 @end
@@ -24,12 +27,15 @@ fragment @insertpiece( output_type ) main_metal
 (
 	PS_INPUT inPs [[stage_in]]
 	// START UNIFORM DECLARATION
+	@property( has_planar_reflections )
+		@insertpiece( PassDecl )
+	@end
 	@property( !hlms_shadowcaster )
 		@insertpiece( MaterialDecl )
 	@end
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
-	@property( hlms_vpos ), float4 gl_FragCoord : [[position]]@end
+	@property( hlms_vpos ), float4 gl_FragCoord [[position]]@end
 
 	@foreach( num_array_textures, n )
 		, texture2d_array<float> textureMapsArray@n [[texture(@value(array_texture_bind@n))]]@end

@@ -99,13 +99,25 @@
 	@sub( diffuse_map@n_idx, diffuse_map@n, 1 ) @end
 
 @foreach( diffuse_map, n )
-	@property( diffuse_map@n_array )
-		@piece( TextureOrigin@n )textureMapsArray@value(diffuse_map@n_idx)@end
-		@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
-		@piece( SamplerUV@n )inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), material.diffuseIdx@n @end
-	@end @property( !diffuse_map@n_array )
-		@piece( TextureOrigin@n )textureMaps@value(diffuse_map@n_idx)@end
-		@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
-		@piece( SamplerUV@n )inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n )@end
+	@property( !diffuse_map@n_reflection )
+		@property( diffuse_map@n_array )
+			@piece( TextureOrigin@n )textureMapsArray@value(diffuse_map@n_idx)@end
+			@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
+			@piece( SamplerUV@n )inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), material.diffuseIdx@n @end
+		@end @property( !diffuse_map@n_array )
+			@piece( TextureOrigin@n )textureMaps@value(diffuse_map@n_idx)@end
+			@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
+			@piece( SamplerUV@n )inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n )@end
+		@end
+	@end @property( diffuse_map@n_reflection )
+		@property( diffuse_map@n_array )
+			@piece( TextureOrigin@n )textureMapsArray@value(diffuse_map@n_idx)@end
+			@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
+			@piece( SamplerUV@n )gl_FragCoord.xy * passBuf.invWindowSize.xy, material.diffuseIdx@n@end
+		@end @property( !diffuse_map@n_array )
+			@piece( TextureOrigin@n )textureMaps@value(diffuse_map@n_idx)@end
+			@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
+			@piece( SamplerUV@n )gl_FragCoord.xy * passBuf.invWindowSize.xy@end
+		@end
 	@end
 @end

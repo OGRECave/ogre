@@ -1,6 +1,9 @@
 @insertpiece( SetCrossPlatformSettings )
 
 // START UNIFORM DECLARATION
+@property( has_planar_reflections )
+	@insertpiece( PassDecl )
+@end
 @property( !hlms_shadowcaster )
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )

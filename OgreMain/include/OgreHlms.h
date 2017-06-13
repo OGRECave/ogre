@@ -671,6 +671,7 @@ namespace Ogre
         static const IdString LightsSpotParams;
 
         //Change per scene pass
+        static const IdString GlobalClipDistances;
         static const IdString DualParaboloidMapping;
         static const IdString NumShadowMapLights;
         static const IdString NumShadowMapTextures;

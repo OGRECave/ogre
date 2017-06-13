@@ -107,6 +107,7 @@ namespace Ogre
     const IdString HlmsBaseProp::LightsSpotParams   = IdString( "hlms_lights_spotparams" );
 
     //Change per scene pass
+    const IdString HlmsBaseProp::GlobalClipDistances= IdString( "hlms_global_clip_distances" );
     const IdString HlmsBaseProp::DualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
     const IdString HlmsBaseProp::NumShadowMapLights = IdString( "hlms_num_shadow_map_lights" );
     const IdString HlmsBaseProp::NumShadowMapTextures= IdString("hlms_num_shadow_map_textures" );
@@ -1671,7 +1672,7 @@ namespace Ogre
         while( itor != end )
         {
             mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-            if( (*itor)->pso.pass.strongMacroblock )
+            if( (*itor)->pso.pass.hasStrongMacroblock() )
                 mHlmsManager->destroyMacroblock( (*itor)->pso.macroblock );
 
             delete *itor;
@@ -1892,15 +1893,33 @@ namespace Ogre
         if( !pso.macroblock->mDepthWrite )
         {
             //Depth writes is already off, we don't need to hold a strong reference.
-            pso.pass.strongMacroblock = false;
+            pso.pass.strongMacroblockBits &= ~HlmsPassPso::ForceDisableDepthWrites;
         }
-        else if( pso.pass.strongMacroblock )
+        if( pso.macroblock->mCullMode == CULL_NONE )
         {
-            //This is a depth prepass, disable depth writes and keep a hard copy (strong ref.)
+            //Without culling there's nothing to invert, we don't need to hold a strong reference.
+            pso.pass.strongMacroblockBits &= ~HlmsPassPso::InvertVertexWinding;
+        }
+
+        if( pso.pass.hasStrongMacroblock() )
+        {
             HlmsMacroblock prepassMacroblock = *pso.macroblock;
-            prepassMacroblock.mDepthWrite = false;
+
+            //This is a depth prepass, disable depth writes and keep a hard copy (strong ref.)
+            if( pso.pass.strongMacroblockBits & HlmsPassPso::ForceDisableDepthWrites )
+                prepassMacroblock.mDepthWrite = false;
+            //We need to invert culling mode.
+            if( pso.pass.strongMacroblockBits & HlmsPassPso::InvertVertexWinding )
+            {
+                prepassMacroblock.mCullMode = prepassMacroblock.mCullMode == CULL_CLOCKWISE ?
+                            CULL_ANTICLOCKWISE : CULL_CLOCKWISE;
+            }
+
             pso.macroblock = mHlmsManager->getMacroblock( prepassMacroblock );
         }
+
+        const size_t numGlobalClipDistances = (size_t)getProperty( HlmsBaseProp::GlobalClipDistances );
+        pso.clipDistances = (1u << numGlobalClipDistances) - 1u;
 
         //TODO: Configurable somehow (likely should be in datablock).
         pso.sampleMask = 0xffffffff;
@@ -2389,6 +2408,10 @@ namespace Ogre
                          renderTarget->getForceDisableColourWrites() ? 1 : 0 );
         }
 
+        Camera *camera = sceneManager->getCameraInProgress();
+        if( camera->isReflected() )
+            setProperty( HlmsBaseProp::GlobalClipDistances, 1 );
+
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         setProperty( HlmsBaseProp::RenderDepthOnly,
                      renderTarget->getForceDisableColourWrites() ? 1 : 0 );
@@ -2457,7 +2480,16 @@ namespace Ogre
         passPso.multisampleQuality = StringConverter::parseInt( renderTarget->getFSAAHint() );
         passPso.adapterId = 1; //TODO: Ask RenderSystem current adapter ID.
 
-        passPso.strongMacroblock = sceneManager->getCurrentPrePassMode() == PrePassUse;
+        if( sceneManager->getCurrentPrePassMode() == PrePassUse )
+            passPso.strongMacroblockBits |= HlmsPassPso::ForceDisableDepthWrites;
+
+        const bool invertVertexWinding = mRenderSystem->getInvertVertexWinding();
+
+        if( (renderTarget->requiresTextureFlipping() && !invertVertexWinding) ||
+            (!renderTarget->requiresTextureFlipping() && invertVertexWinding) )
+        {
+            passPso.strongMacroblockBits |= HlmsPassPso::InvertVertexWinding;
+        }
 
         return passPso;
     }
@@ -2542,13 +2574,13 @@ namespace Ogre
 
         while( itor != end )
         {
-            if( (*itor)->pso.pass.strongMacroblock )
+            if( (*itor)->pso.pass.hasStrongMacroblock() )
                 hasPsosWithStrongRefs = true;
 
             if( (*itor)->pso.macroblock->mId == id )
             {
                 mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                if( !(*itor)->pso.pass.strongMacroblock )
+                if( !(*itor)->pso.pass.hasStrongMacroblock() )
                 {
                     wasUsedInWeakRefs = true;
                     macroblock = *(*itor)->pso.macroblock;
@@ -2574,7 +2606,7 @@ namespace Ogre
 
             while( itor != end )
             {
-                if( (*itor)->pso.pass.strongMacroblock && *(*itor)->pso.macroblock == macroblock )
+                if( (*itor)->pso.pass.hasStrongMacroblock() && *(*itor)->pso.macroblock == macroblock )
                     macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                 ++itor;
             }
@@ -2605,7 +2637,7 @@ namespace Ogre
             if( (*itor)->pso.blendblock->mId == id )
             {
                 mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                if( (*itor)->pso.pass.strongMacroblock )
+                if( (*itor)->pso.pass.hasStrongMacroblock() )
                     macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                 delete *itor;
                 itor = mShaderCache.erase( itor );
@@ -2645,7 +2677,7 @@ namespace Ogre
                 {
                     //This is a v2 input layout.
                     mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                    if( (*itor)->pso.pass.strongMacroblock )
+                    if( (*itor)->pso.pass.hasStrongMacroblock() )
                         macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                     delete *itor;
                     itor = mShaderCache.erase( itor );
@@ -2690,7 +2722,7 @@ namespace Ogre
                 {
                     //This is a v1 input layout.
                     mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                    if( (*itor)->pso.pass.strongMacroblock )
+                    if( (*itor)->pso.pass.hasStrongMacroblock() )
                         macroblocksToDelete.push_back( (*itor)->pso.macroblock );
                     delete *itor;
                     itor = mShaderCache.erase( itor );

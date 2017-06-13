@@ -3,6 +3,9 @@
 out gl_PerVertex
 {
 	vec4 gl_Position;
+@property( hlms_global_clip_distances )
+	float gl_ClipDistance[1];
+@end
 };
 
 layout(std140) uniform;
@@ -175,6 +178,10 @@ void main()
 	@property( hlms_use_prepass_msaa > 1 )
 		outVs.zwDepth.xy = outVs.gl_Position.zw;
 	@end
+
+@property( hlms_global_clip_distances )
+	gl_ClipDistance[0] = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
+@end
 
 	@insertpiece( custom_vs_posExecution )
 }

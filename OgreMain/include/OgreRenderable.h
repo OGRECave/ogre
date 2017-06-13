@@ -440,6 +440,8 @@ namespace Ogre {
         uint32              mHlmsCasterHash;
         HlmsDatablock       *mHlmsDatablock;
         MaterialPtr         mMaterial; /// Only valid when using low level materials
+        public: uint8       mCustomParameter;
+    protected:
         uint8               mRenderQueueSubGroup;
         bool                    mHasSkeletonAnimation;
         uint8                   mCurrentMaterialLod;

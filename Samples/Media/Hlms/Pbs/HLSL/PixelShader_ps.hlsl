@@ -33,6 +33,8 @@ struct PS_INPUT
 	@end
 @end
 
+@insertpiece( DeclPlanarReflTextures )
+
 @property( two_sided_lighting )
 @piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
 @end
@@ -387,7 +389,7 @@ float4 diffuseCol;
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )
 
-@property( use_envprobe_map || ambient_hemisphere )
+@property( use_envprobe_map || hlms_use_ssr || use_planar_reflections || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 	
 	@property( use_envprobe_map )
@@ -435,14 +437,16 @@ float4 diffuseCol;
 		@end
 	@end
 
+	@insertpiece( DoPlanarReflectionsPS )
+
 	@property( ambient_hemisphere )
 		float ambientWD = dot( passBuf.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( passBuf.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
-		@property( use_envprobe_map || hlms_use_ssr )
+		@property( use_envprobe_map || hlms_use_ssr || use_planar_reflections )
 			envColourS	+= lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			envColourD	+= lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
-		@end @property( !use_envprobe_map && !hlms_use_ssr )
+		@end @property( !use_envprobe_map && !hlms_use_ssr && !use_planar_reflections )
 			float3 envColourS = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			float3 envColourD = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
 		@end

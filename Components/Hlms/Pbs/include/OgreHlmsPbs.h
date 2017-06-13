@@ -37,6 +37,9 @@ namespace Ogre
 {
     class CompositorShadowNode;
     struct QueuedRenderable;
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+    class PlanarReflections;
+#endif
 
     /** \addtogroup Component
     *  @{
@@ -116,7 +119,7 @@ namespace Ogre
         TexturePtr              mTargetEnvMap;
         ParallaxCorrectedCubemap    *mParallaxCorrectedCubemap;
 
-        uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
+        uint32                  mCurrentPassBuffer;     /// Resets to zero every new frame.
 
         TexBufferPacked         *mGridBuffer;
         TexBufferPacked         *mGlobalLightListBuffer;
@@ -126,7 +129,15 @@ namespace Ogre
         TextureVec const        *mPrePassTextures;
         TexturePtr              mPrePassMsaaDepthTexture;
         TextureVec const        *mSsrTexture;
-        IrradianceVolume       *mIrradianceVolume;
+        IrradianceVolume        *mIrradianceVolume;
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+        //TODO: After texture refactor it should be possible to abstract this,
+        //so we don't have to be aware of PlanarReflections class.
+        PlanarReflections       *mPlanarReflections;
+        HlmsSamplerblock const  *mPlanarReflectionsSamplerblock;
+        bool                    mHasPlanarReflections;
+        uint8                   mLastBoundPlanarReflection;
+#endif
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
@@ -241,6 +252,11 @@ namespace Ogre
                                                     { mIrradianceVolume = irradianceVolume; }
         IrradianceVolume* getIrradianceVolume(void) const  { return mIrradianceVolume; }
 
+#ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
+        void setPlanarReflections( PlanarReflections *planarReflections );
+        PlanarReflections* getPlanarReflections(void) const;
+#endif
+
 #if !OGRE_NO_JSON
         /// @copydoc Hlms::_loadJson
         virtual void _loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
@@ -262,6 +278,7 @@ namespace Ogre
         static const IdString MaterialsPerBuffer;
         static const IdString LowerGpuOverhead;
         static const IdString DebugPssmSplits;
+        static const IdString HasPlanarReflections;
 
         static const IdString NumTextures;
         static const char *DiffuseMap;
@@ -287,6 +304,7 @@ namespace Ogre
         static const IdString MetallicWorkflow;
         static const IdString TwoSidedLighting;
         static const IdString ReceiveShadows;
+        static const IdString UsePlanarReflections;
 
         static const IdString NormalWeight;
         static const IdString NormalWeightTex;
