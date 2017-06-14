@@ -73,7 +73,7 @@ namespace Ogre
             * PASS_MIPMAP (@See CompositorPassMipmapDef)
         This class doesn't do much on its own. See the derived types for more information
         A definition is shared by all pass instantiations (i.e. Five CompositorPassScene can
-        share the same CompositorPassSceneDef) and are asumed to remain const throughout
+        share the same CompositorPassSceneDef) and are assumed to remain const throughout
         their lifetime.
     @par
         Modifying a definition while there are active instantiations is undefined. Some
