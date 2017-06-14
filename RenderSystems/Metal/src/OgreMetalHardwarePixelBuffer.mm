@@ -310,20 +310,23 @@ namespace v1 {
         size_t bytesPerImage = PixelUtil::getMemorySize( dest.getWidth(), dest.getHeight(),
                                                          1, data.format );
 
-        if (data.getWidth() != data.rowPitch)
+        if (!PixelUtil::isCompressed(data.format))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Unsupported texture format",
-                        "MetalTextureBuffer::upload");
-        }
+            if (data.getWidth() != data.rowPitch)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Unsupported texture format",
+                            "MetalTextureBuffer::upload");
+            }
 
-        if (data.getHeight() * data.getWidth() != data.slicePitch)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Unsupported texture format",
-                        "MetalTextureBuffer::upload");
+            if (data.getHeight() * data.getWidth() != data.slicePitch)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Unsupported texture format",
+                            "MetalTextureBuffer::upload");
+            }
         }
-
+        
         NSUInteger rowPitch = data.rowPitchAlwaysBytes();
 
         // PVR textures should have 0 row size and data size
