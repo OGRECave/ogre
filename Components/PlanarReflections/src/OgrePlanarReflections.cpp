@@ -351,6 +351,8 @@ namespace Ogre
         const Quaternion camRot( camera->getDerivedOrientation() );
         Real nearPlane = camera->getNearClipDistance();
         Real farPlane = camera->getFarClipDistance();
+        Real focalLength = camera->getFocalLength();
+        Radian fov = camera->getFOVy();
 
         //Update reflection cameras to keep up their data with the master camera.
         PlanarReflectionActorVec::iterator itor = mActors.begin();
@@ -364,6 +366,8 @@ namespace Ogre
             actor->mReflectionCamera->setNearClipDistance( nearPlane );
             actor->mReflectionCamera->setFarClipDistance( farPlane );
             actor->mReflectionCamera->setAspectRatio( aspectRatio );
+            actor->mReflectionCamera->setFocalLength( focalLength );
+            actor->mReflectionCamera->setFOVy( fov );
             ++itor;
         }
 
