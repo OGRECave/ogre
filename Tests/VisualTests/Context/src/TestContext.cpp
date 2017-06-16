@@ -517,6 +517,9 @@ bool TestContext::oneTimeConfig()
             rs->setConfigOption("Full Screen", "No");
             rs->setConfigOption("Video Mode", "640x 480");
 
+            // test alpha to coverage and MSAA resolve
+            rs->setConfigOption("FSAA", "2");
+
             try {
                 rs->setConfigOption("Fixed Pipeline Enabled", "No");
             } catch(...) {}
