@@ -40,12 +40,6 @@ namespace Ogre {
 
 		String FFPAlphaTest::Type = "FFP_Alpha_Test";
 		
-	
-		//-----------------------------------------------------------------------
-		FFPAlphaTest::FFPAlphaTest()
-		{
-
-		}
 
 		//-----------------------------------------------------------------------
 		const Ogre::String& FFPAlphaTest::getType() const
@@ -60,7 +54,7 @@ namespace Ogre {
 			Program* psProgram  = programSet->getCpuFragmentProgram();
 			Function* psMain = psProgram->getEntryPointFunction();
 			  
-			mPSAlphaRef = psProgram->resolveParameter(GCT_FLOAT1 ,-1, (uint16)GPV_GLOBAL, "gAlphaRef");
+			mPSAlphaRef = psProgram->resolveAutoParameterReal(GpuProgramParameters::ACT_SURFACE_ALPHA_REJECTION_VALUE, 0);
 			mPSAlphaFunc = psProgram->resolveParameter(GCT_FLOAT1,-1, (uint16)GPV_GLOBAL, "gAlphaFunc");
 			
 			mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
@@ -91,10 +85,9 @@ namespace Ogre {
 			Function* psMain = psProgram->getEntryPointFunction();
 
 			FunctionInvocation *curFuncInvocation;
-			int internalCounter = 0;
 
 			//Fragment shader invocations
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ALPHA_TEST, FFP_PS_ALPHA_TEST, internalCounter++);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ALPHA_TEST, FFP_PS_ALPHA_TEST, 0);
 			curFuncInvocation->pushOperand(mPSAlphaFunc, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSAlphaRef, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
@@ -111,13 +104,12 @@ namespace Ogre {
 
 		bool FFPAlphaTest::preAddToRenderState( const RenderState* renderState, Pass* srcPass, Pass* dstPass )
 		{
-			return true;
+			return srcPass->getAlphaRejectFunction() != CMPF_ALWAYS_PASS;
 		}
 
 		void FFPAlphaTest::updateGpuProgramsParams( Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList )
 		{
 			mPSAlphaFunc->setGpuParameter((float)pass->getAlphaRejectFunction());
-			mPSAlphaRef->setGpuParameter((float)(pass->getAlphaRejectValue() / 255.0));
 		}
 
 		//----------------------Factory Implementation---------------------------
@@ -128,33 +120,9 @@ namespace Ogre {
 		}
 
 		//-----------------------------------------------------------------------
-		SubRenderState*	FFPAlphaTestFactory::createInstance(ScriptCompiler* compiler, 
-			PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator)
-		{
-			return NULL;
-		}
-
-		//-----------------------------------------------------------------------
-		void FFPAlphaTestFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
-			const TextureUnitState* srcTextureState, const TextureUnitState* dstTextureState)
-		{
-	
-		}
-
-		//-----------------------------------------------------------------------
 		SubRenderState*	FFPAlphaTestFactory::createInstanceImpl()
 		{
 			return OGRE_NEW FFPAlphaTest;
-		}
-
-		//-----------------------------------------------------------------------
-		FFPAlphaTest* FFPAlphaTestFactory::createOrRetrieveSubRenderState(SGScriptTranslator* translator)
-		{
-			FFPAlphaTest* alphaTestBlendState;
-			//check if we already create a blend srs
-			SubRenderState*	subState = translator->getGeneratedSubRenderState(getType());
-			alphaTestBlendState = (FFPAlphaTest*)subState;
-			return alphaTestBlendState;
 		}
 	}
 }
