@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderFFPAlphaTest.h"
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderFunctionAtom.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderProgramSet.h"

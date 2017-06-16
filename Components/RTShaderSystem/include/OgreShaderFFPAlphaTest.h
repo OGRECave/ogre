@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define _OgreShaderExAlphaTest_
 
 #include "OgreShaderPrerequisites.h"
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderFFPTexturing.h"
 #include "OgreShaderSubRenderState.h"
 
@@ -40,7 +40,7 @@ namespace RTShader {
 A factory that enables creation of LayeredBlending instances.
 @remarks Sub class of SubRenderStateFactory
 */
-	class FFPAlphaTest : public SubRenderState
+	class _OgreRTSSExport FFPAlphaTest : public SubRenderState
 	{
 	
 	private:
@@ -100,7 +100,7 @@ public:
 
 	};
 
-class FFPAlphaTestFactory : public SubRenderStateFactory
+class _OgreRTSSExport FFPAlphaTestFactory : public SubRenderStateFactory
 {
 
 public:
