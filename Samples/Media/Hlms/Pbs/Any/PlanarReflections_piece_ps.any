@@ -51,9 +51,9 @@
 	fadeOnBorder *= 1.0 - saturate( (boundary.y - 0.975) * 40 );
 	fadeOnBorder = smoothstep( 0.0, 1.0, fadeOnBorder );
 	planarWeight *= lerp( fadeOnBorder, 1.0, 1.0 - min( abs(distanceToPlanarReflPlane) * 1000.0, 1.0 ) );
-	@property( hlms_use_ssr || use_envprobe_map )
+	@property( hlms_use_ssr || ((envprobe_map && envprobe_map != target_envprobe_map) || parallax_correct_cubemaps) )
 		envColourS = lerp( envColourS, planarReflectionS, planarWeight );
-	@end @property( !hlms_use_ssr && !use_envprobe_map )
+	@end @property( !hlms_use_ssr && !((envprobe_map && envprobe_map != target_envprobe_map) || parallax_correct_cubemaps) )
 		float3 envColourS = planarReflectionS * planarWeight;
 		float3 envColourD = float3( 0, 0, 0 );
 	@end
