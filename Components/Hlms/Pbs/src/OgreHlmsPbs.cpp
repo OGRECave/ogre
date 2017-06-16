@@ -1012,7 +1012,7 @@ namespace Ogre
                 mapSize += (4 + 4 + 4*4) * 4;
 
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
-            if( mPlanarReflections )
+            if( mHasPlanarReflections )
                 mapSize += mPlanarReflections->getConstBufferSize();
 #endif
             //float pssmSplitPoints N times.
@@ -1410,7 +1410,7 @@ namespace Ogre
             }
 
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
-            if( mPlanarReflections )
+            if( mHasPlanarReflections )
             {
                 mPlanarReflections->fillConstBufferData( renderTarget, camera,
                                                          projectionMatrix, passBufferPtr );
