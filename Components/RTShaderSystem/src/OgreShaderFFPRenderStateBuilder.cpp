@@ -144,10 +144,7 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Ta
     // Build fog sub state.
     buildFFPSubRenderState(FFP_FOG, FFPFog::Type, sgPass, renderState);
 
-	if (sgPass->getSrcPass()->getAlphaRejectFunction() != CMPF_ALWAYS_PASS)
-	{
-		buildFFPSubRenderState(FFP_ALPHA_TEST, FFPAlphaTest::Type, sgPass, renderState);
-	}
+    buildFFPSubRenderState(FFP_ALPHA_TEST, FFPAlphaTest::Type, sgPass, renderState);
 	
     // Resolve colour stage flags.
     resolveColourStageFlags(sgPass, renderState);
