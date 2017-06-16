@@ -14,7 +14,7 @@
 //6 - CMPF_GREATER_EQUAL,
 //7 - CMPF_GREATER
 
-bool Is_Alpha_Pass(int func, float alphaRef, float alphaValue)
+bool Alpha_Func(in int func, in float alphaRef, in float alphaValue)
 {
     bool result = true;
     switch (func)
@@ -50,6 +50,7 @@ bool Is_Alpha_Pass(int func, float alphaRef, float alphaValue)
 
 void FFP_Alpha_Test(in float func, in float alphaRef, in vec4 texel)
 {
-    if (!Is_Alpha_Pass(int(func), alphaRef, texel.a))
+    bool pass = Alpha_Func(int(func), alphaRef, texel.a);
+    if (!pass)
         discard;
 }
