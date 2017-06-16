@@ -872,6 +872,7 @@ namespace Ogre {
         bool GLSLESProgramWriter::isBasicType(String &type)
         {
             if(type == "void" ||
+               type == "bool" ||
                type == "float" ||
                type == "vec2" ||
                type == "vec3" ||
