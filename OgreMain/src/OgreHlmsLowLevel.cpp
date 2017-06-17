@@ -125,6 +125,8 @@ namespace Ogre
             pso.enablePrimitiveRestart = true;
         }
 
+        applyStrongMacroblockRules( pso );
+
         mRenderSystem->_hlmsPipelineStateObjectCreated( &pso );
 
         const HlmsCache* retVal = addShaderCache( finalHash, pso );

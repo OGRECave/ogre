@@ -274,6 +274,13 @@ namespace Ogre
 
         void processPieces( Archive *archive, const StringVector &pieceFiles );
 
+        /** Modifies the PSO's macroblock if there are reasons to do that, and creates
+            a strong reference to the macroblock that the PSO will own.
+        @param pso [in/out]
+            PSO to (potentially) modify.
+        */
+        void applyStrongMacroblockRules( HlmsPso &pso );
+
         /** Creates a shader based on input parameters. Caller is responsible for ensuring
             this shader hasn't already been created.
             Shader template files will be processed and then compiled.
