@@ -1351,17 +1351,6 @@ namespace Ogre
                     *passBufferPtr++ = light->getSpotlightFalloff();
                     ++passBufferPtr;
                 }
-
-                mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
-
-                TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
-                TextureVec::const_iterator enShadowMap = contiguousShadowMapTex.end();
-
-                while( itShadowMap != enShadowMap )
-                {
-                    mPreparedPass.shadowMaps.push_back( itShadowMap->get() );
-                    ++itShadowMap;
-                }
             }
             else
             {
@@ -1399,6 +1388,21 @@ namespace Ogre
                     *passBufferPtr++ = colour.g;
                     *passBufferPtr++ = colour.b;
                     ++passBufferPtr;
+                }
+            }
+
+            if( shadowNode )
+            {
+                const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
+                mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
+
+                TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
+                TextureVec::const_iterator enShadowMap = contiguousShadowMapTex.end();
+
+                while( itShadowMap != enShadowMap )
+                {
+                    mPreparedPass.shadowMaps.push_back( itShadowMap->get() );
+                    ++itShadowMap;
                 }
             }
 
