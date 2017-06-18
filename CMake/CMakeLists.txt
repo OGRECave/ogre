@@ -20,7 +20,6 @@ else()
 endif()
 
 set(INST_FILES
-  Packages/FindOGRE.cmake
   Utils/FindPkgMacros.cmake
   Utils/MacroLogFeature.cmake
   Utils/PreprocessorUtils.cmake
