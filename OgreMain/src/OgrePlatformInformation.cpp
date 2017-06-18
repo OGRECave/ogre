@@ -517,9 +517,9 @@ namespace Ogre {
     static uint _detectCpuFeatures(void)
     {
         uint features = 0;
+#if OGRE_CPU == OGRE_CPU_ARM
         uint64_t cpufeatures = android_getCpuFeatures();
-        
-        if (cpufeatures & ANDROID_CPU_ARM_FEATURE_NEON) 
+        if (cpufeatures & ANDROID_CPU_ARM_FEATURE_NEON)
         {
             features |= PlatformInformation::CPU_FEATURE_NEON;
         }
@@ -528,6 +528,12 @@ namespace Ogre {
         {
             features |= PlatformInformation::CPU_FEATURE_VFP;
         }
+#elif OGRE_CPU == OGRE_CPU_X86
+        // see https://developer.android.com/ndk/guides/abis.html
+        features |= PlatformInformation::CPU_FEATURE_SSE;
+        features |= PlatformInformation::CPU_FEATURE_SSE2;
+        features |= PlatformInformation::CPU_FEATURE_SSE3;
+#endif
         return features;
     }
     //---------------------------------------------------------------------
