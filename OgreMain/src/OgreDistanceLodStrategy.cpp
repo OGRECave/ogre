@@ -170,7 +170,10 @@ namespace Ogre {
         // more computation (including a sqrt) so we approximate 
         // it with d^2 - r^2, which is good enough for determining 
         // LOD.
-        return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadius());
+
+        const Vector3& scl = movableObject->getParentNode()->_getDerivedScale();
+        Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+        return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadius() * factor);
     }
     //-----------------------------------------------------------------------
 
