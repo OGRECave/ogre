@@ -31,6 +31,8 @@
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusFBORenderTexture.h"
+#include "OgreGL3PlusStateCacheManager.h"
+#include "OgreGL3PlusRenderSystem.h"
 
 #include "OgreRoot.h"
 #include "OgreGLSLMonolithicProgramManager.h"
@@ -45,6 +47,7 @@ namespace Ogre {
                                                            HardwareBuffer::Usage usage)
         : GLHardwarePixelBufferCommon(inWidth, inHeight, inDepth, inFormat, usage)
     {
+        mGLSupport = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef();
     }
 
     void GL3PlusHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
@@ -143,7 +146,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &mRenderbufferID));
 
         // Bind it to FBO
-        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mRenderbufferID));
+        mGLSupport->getStateCacheManager()->bindGLRenderBuffer( mRenderbufferID );
 
         // Allocate storage for depth buffer
         if (numSamples > 0)
@@ -160,8 +163,8 @@ namespace Ogre {
 
     GL3PlusRenderBuffer::~GL3PlusRenderBuffer()
     {
-        // Generate renderbuffer
-        OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &mRenderbufferID));
+        // Delete renderbuffer
+        mGLSupport->getStateCacheManager()->deleteGLRenderBuffer(mRenderbufferID);
     }
 
     void GL3PlusRenderBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)

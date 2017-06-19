@@ -35,6 +35,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLShader.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLRenderSystemCommon.h"
+#include "OgreGL3PlusStateCacheManager.h"
 
 namespace Ogre {
     /** \addtogroup RenderSystems RenderSystems
@@ -48,6 +49,8 @@ namespace Ogre {
     class GLSLShaderManager;
     class GLSLShaderFactory;
     class HardwareBufferManager;
+
+    class GL3PlusStateCacheManager;
 
     /**
        Implementation of GL 3 as a rendering system.
@@ -80,6 +83,9 @@ namespace Ogre {
         /// Store last scissor enable state
         bool mScissorsEnabled;
 
+        /// Store scissor box
+        int mScissorBox[4];
+
         /// Store last stencil mask state
         uint32 mStencilWriteMask;
 
@@ -95,6 +101,11 @@ namespace Ogre {
         typedef list<GL3PlusContext*>::type GL3PlusContextList;
         /// List of background thread contexts
         GL3PlusContextList mBackgroundContextList;
+
+        // statecaches are per context
+        typedef map<GLContext*, GL3PlusStateCacheManager>::type CachesMap;
+        CachesMap mCaches;
+        GL3PlusStateCacheManager* mStateCacheManager;
 
         GLSLShaderManager *mShaderManager;
         GLSLShaderFactory* mGLSLShaderFactory;
@@ -156,6 +167,17 @@ namespace Ogre {
                                      vector<GLuint>::type &attribsBound,
                                      vector<GLuint>::type &instanceAttribsBound,
                                      bool updateVAO);
+
+        /**
+         * GL state is tracked per context, so call this function to drop all
+         * recorded state for a given context before you destroy it.
+         */
+        void unregisterContextCache (GLContext* id);
+
+        /**
+         * @param id new context to switch to for state tracking
+         */
+        void switchContextCache (GLContext* id);
 
     public:
         // Default constructor / destructor
@@ -310,6 +332,8 @@ namespace Ogre {
         void preExtraThreadsStarted();
         void postExtraThreadsStarted();
         void setClipPlanesImpl(const Ogre::PlaneList& planeList);
+        GL3PlusSupport* getGLSupportRef() { return mGLSupport; }
+
 
         // ----------------------------------
         // GL3PlusRenderSystem specific members

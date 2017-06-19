@@ -42,6 +42,9 @@ namespace Ogre {
         /// Is this VAO initialised?
         bool mInitialised;
 
+    protected:
+        GL3PlusSupport* mGLSupport;
+
     public:
         GL3PlusVertexArrayObject();
         ~GL3PlusVertexArrayObject();

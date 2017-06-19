@@ -34,6 +34,7 @@
 #include "OgreGL3PlusTextureBuffer.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusFBORenderTexture.h"
+#include "OgreGL3PlusStateCacheManager.h"
 
 #include "OgreGLSLMonolithicProgram.h"
 #include "OgreGLSLMonolithicProgramManager.h"
@@ -51,7 +52,7 @@ namespace Ogre {
         // devise mWidth, mHeight and mDepth and mFormat
         GLint value = 0;
 
-        OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
+        mGLSupport->getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
 
         // Get face identifier
         mFaceTarget = mTarget;
@@ -139,7 +140,7 @@ namespace Ogre {
 
     void GL3PlusTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
-        OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
+        mGLSupport->getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
 
         // PBOs have no advantage with this usage pattern
         // but trigger VIDEO -> HOST transfers with NVIDIA 378.13
@@ -147,7 +148,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
         // Use PBO as a texture buffer.
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mBufferId));
+        mGLSupport->getStateCacheManager()->bindGLBuffer( GL_PIXEL_UNPACK_BUFFER, mBufferId );
 
         // Calculate size for all mip levels of the texture.
         size_t dataSize = 0;
@@ -346,7 +347,7 @@ namespace Ogre {
 
         // Upload data to PBO
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, mBufferId));
+        mGLSupport->getStateCacheManager()->bindGLBuffer(GL_PIXEL_PACK_BUFFER, mBufferId);
 
         OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, mSizeInBytes, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
@@ -360,7 +361,8 @@ namespace Ogre {
         //        << " format: " << PixelUtil::getFormatName(mFormat);
         //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
-        OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
+        mGLSupport->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+
         if (PixelUtil::isCompressed(data.format))
         {
             if (data.format != mFormat || !data.isConsecutive())
@@ -435,8 +437,8 @@ namespace Ogre {
         }
 
         // Delete PBO
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, 0));
-        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
+        mGLSupport->getStateCacheManager()->bindGLBuffer(GL_PIXEL_PACK_BUFFER, 0);
+        mGLSupport->getStateCacheManager()->deleteGLBuffer(GL_PIXEL_PACK_BUFFER, mBufferId);
         mBufferId = 0;
     }
 
@@ -451,7 +453,7 @@ namespace Ogre {
 
     void GL3PlusTextureBuffer::copyFromFramebuffer(uint32 zoffset)
     {
-        OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
+        mGLSupport->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
         switch(mTarget)
         {
         case GL_TEXTURE_1D:
@@ -523,8 +525,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
         // Set up temporary FBO
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboMan->getTemporaryFBO(0)));
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, fboMan->getTemporaryFBO(1)));
+        mGLSupport->getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, fboMan->getTemporaryFBO(0) );
+        mGLSupport->getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, fboMan->getTemporaryFBO(1) );
 
         GLuint tempTex = 0;
         if (!fboMan->checkFormat(mFormat))
@@ -532,7 +534,7 @@ namespace Ogre {
             // If target format not directly supported, create intermediate texture
             GLenum tempFormat = GL3PlusPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
-            OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, tempTex));
+            mGLSupport->getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
             OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
             OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 
@@ -546,12 +548,12 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
             // Set viewport to size of destination slice
-            OGRE_CHECK_GL_ERROR(glViewport(0, 0, dstBox.getWidth(), dstBox.getHeight()));
+            mGLSupport->getStateCacheManager()->setViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
         }
         else
         {
             // We are going to bind directly, so set viewport to size and position of destination slice
-            OGRE_CHECK_GL_ERROR(glViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight()));
+            mGLSupport->getStateCacheManager()->setViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight());
         }
 
         // Process each destination slice
@@ -609,13 +611,13 @@ namespace Ogre {
             // Generate mipmaps
             if (mUsage & TU_AUTOMIPMAP)
             {
-                OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
+                mGLSupport->getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
             }
         }
 
         // Reset source texture to sane state
-        OGRE_CHECK_GL_ERROR(glBindTexture(src->mTarget, src->mTextureID));
+        mGLSupport->getStateCacheManager()->bindGLTexture( src->mTarget, src->mTextureID );
 
         if (mFormat == PF_DEPTH)
         {
@@ -630,11 +632,12 @@ namespace Ogre {
 
         // Reset read buffer/framebuffer
         OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
+        mGLSupport->getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, 0 );
 
         // Restore old framebuffer
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, oldfb));
+        mGLSupport->getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, oldfb);
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tempTex));
+        mGLSupport->getStateCacheManager()->invalidateStateForTexture( tempTex );
     }
 
     void GL3PlusTextureBuffer::_bindToFramebuffer(GLenum attachment, uint32 zoffset, GLenum which)
@@ -642,7 +645,7 @@ namespace Ogre {
         assert(zoffset < mDepth);
         assert(which == GL_READ_FRAMEBUFFER || which == GL_DRAW_FRAMEBUFFER || which == GL_FRAMEBUFFER);
 
-        OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
+        mGLSupport->getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
         switch(mTarget)
         {
         case GL_TEXTURE_1D:
@@ -710,7 +713,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &id));
 
         // Set texture type
-        OGRE_CHECK_GL_ERROR(glBindTexture(target, id));
+        mGLSupport->getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
 
         // Set automatic mipmap generation; nice for minimisation
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0));
@@ -755,6 +758,7 @@ namespace Ogre {
 
         // Delete temp texture
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &id));
+        mGLSupport->getStateCacheManager()->invalidateStateForTexture( id );
     }
 
 

@@ -38,10 +38,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    class GL3PlusStateCacheManager;
+
     class _OgreGL3PlusExport GL3PlusSupport
     {
         public:
-            GL3PlusSupport(GLNativeSupport* native) : mNative(native) { }
+            GL3PlusSupport(GLNativeSupport* native) : mStateCacheManager(0), mNative(native) { }
             virtual ~GL3PlusSupport() {
                 delete mNative;
             }
@@ -83,6 +85,16 @@ namespace Ogre
                                             bool fullScreen,
                                             const NameValuePairList *miscParams = 0) {
                 return mNative->newWindow(name, width, height, fullScreen, miscParams);
+            }
+
+            GL3PlusStateCacheManager* getStateCacheManager() const
+            {
+                return mStateCacheManager;
+            }
+
+            void setStateCacheManager(GL3PlusStateCacheManager* stateCacheMgr)
+            {
+                mStateCacheManager = stateCacheMgr;
             }
 
             /**
@@ -180,6 +192,9 @@ namespace Ogre
             String mVendor;
             String mShaderCachePath;
             String mShaderLibraryPath;
+
+
+            GL3PlusStateCacheManager* mStateCacheManager;
 
             GLNativeSupport* mNative;
 
