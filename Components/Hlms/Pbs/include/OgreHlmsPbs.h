@@ -135,6 +135,8 @@ namespace Ogre
         //so we don't have to be aware of PlanarReflections class.
         PlanarReflections       *mPlanarReflections;
         HlmsSamplerblock const  *mPlanarReflectionsSamplerblock;
+        /// Whether the current active pass can use mPlanarReflections (i.e. we can't
+        /// use the reflections if they were built for a different camera angle)
         bool                    mHasPlanarReflections;
         uint8                   mLastBoundPlanarReflection;
 #endif

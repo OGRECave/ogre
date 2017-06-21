@@ -227,6 +227,7 @@ namespace Ogre
         mIrradianceVolume( 0 ),
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
         mPlanarReflections( 0 ),
+        mPlanarReflectionsSamplerblock( 0 ),
         mHasPlanarReflections( false ),
         mLastBoundPlanarReflection( 0u ),
 #endif
@@ -1011,7 +1012,7 @@ namespace Ogre
                 mapSize += (4 + 4 + 4*4) * 4;
 
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
-            if( mPlanarReflections )
+            if( mHasPlanarReflections )
                 mapSize += mPlanarReflections->getConstBufferSize();
 #endif
             //float pssmSplitPoints N times.
@@ -1350,17 +1351,6 @@ namespace Ogre
                     *passBufferPtr++ = light->getSpotlightFalloff();
                     ++passBufferPtr;
                 }
-
-                mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
-
-                TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
-                TextureVec::const_iterator enShadowMap = contiguousShadowMapTex.end();
-
-                while( itShadowMap != enShadowMap )
-                {
-                    mPreparedPass.shadowMaps.push_back( itShadowMap->get() );
-                    ++itShadowMap;
-                }
             }
             else
             {
@@ -1401,6 +1391,20 @@ namespace Ogre
                 }
             }
 
+            if( shadowNode )
+            {
+                mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
+
+                TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
+                TextureVec::const_iterator enShadowMap = contiguousShadowMapTex.end();
+
+                while( itShadowMap != enShadowMap )
+                {
+                    mPreparedPass.shadowMaps.push_back( itShadowMap->get() );
+                    ++itShadowMap;
+                }
+            }
+
             ForwardPlusBase *forwardPlus = sceneManager->_getActivePassForwardPlus();
             if( forwardPlus )
             {
@@ -1409,7 +1413,7 @@ namespace Ogre
             }
 
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
-            if( mPlanarReflections )
+            if( mHasPlanarReflections )
             {
                 mPlanarReflections->fillConstBufferData( renderTarget, camera,
                                                          projectionMatrix, passBufferPtr );

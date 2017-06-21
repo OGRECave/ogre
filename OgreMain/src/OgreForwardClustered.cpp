@@ -154,8 +154,8 @@ namespace Ogre
         Camera *camera = mThreadCameras[threadId];
 
         camera->resetFrustumExtents();
-        camera->setPosition( mCurrentCamera->_getCachedDerivedPosition() );
-        camera->setOrientation( mCurrentCamera->_getCachedDerivedOrientation() );
+        camera->setPosition( mCurrentCamera->_getCachedRealPosition() );
+        camera->setOrientation( mCurrentCamera->_getCachedRealOrientation() );
 
         camera->setProjectionType( mCurrentCamera->getProjectionType() );
         camera->setAspectRatio( mCurrentCamera->getAspectRatio() );
@@ -165,6 +165,10 @@ namespace Ogre
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         camera->setOrientationMode( mCurrentCamera->getOrientationMode() );
 #endif
+        if( !mCurrentCamera->isReflected() && camera->isReflected() )
+            camera->disableReflection();
+        else if( mCurrentCamera->isReflected() )
+            camera->enableReflection( mCurrentCamera->getReflectionPlane() );
 
         camera->setNearClipDistance( nearDepthAtSlice );
         camera->setFarClipDistance( farDepthAtSlice );

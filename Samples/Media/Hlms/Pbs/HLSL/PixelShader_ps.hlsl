@@ -318,7 +318,7 @@ float4 diffuseCol;
 
 @property( !hlms_prepass )
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forwardplus )
+@property( hlms_lights_spot || use_envprobe_map || hlms_use_ssr || use_planar_reflections || hlms_forwardplus )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );
 @end

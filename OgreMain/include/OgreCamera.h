@@ -417,6 +417,9 @@ namespace Ogre {
             rotation inherited from a node attachment. */
         Vector3 getRealRight(void) const;
 
+        const Vector3& _getCachedRealPosition(void) const               { return mRealPosition; }
+        const Quaternion& _getCachedRealOrientation(void) const         { return mRealOrientation; }
+
         /** Overridden from Frustum/Renderable */
         void getWorldTransforms(Matrix4* mat) const;
 

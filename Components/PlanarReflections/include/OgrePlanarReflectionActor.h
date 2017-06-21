@@ -108,7 +108,7 @@ namespace Ogre
         @param halfSize
             2D half size of the rectangle that this plane creates, in local space.
         @param orientation
-            Quaternion containing the normal and roll of the plane. Asumed to be unit-length
+            Quaternion containing the normal and roll of the plane. Assumed to be unit-length
             The plane's normal is orientation.zAxis();
         */
         void setPlane( const Vector3 &center, const Vector2 &halfSize, const Quaternion &orientation );

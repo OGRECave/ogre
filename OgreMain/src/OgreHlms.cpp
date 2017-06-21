@@ -1718,6 +1718,37 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::applyStrongMacroblockRules( HlmsPso &pso )
+    {
+        if( !pso.macroblock->mDepthWrite )
+        {
+            //Depth writes is already off, we don't need to hold a strong reference.
+            pso.pass.strongMacroblockBits &= ~HlmsPassPso::ForceDisableDepthWrites;
+        }
+        if( pso.macroblock->mCullMode == CULL_NONE )
+        {
+            //Without culling there's nothing to invert, we don't need to hold a strong reference.
+            pso.pass.strongMacroblockBits &= ~HlmsPassPso::InvertVertexWinding;
+        }
+
+        if( pso.pass.hasStrongMacroblock() )
+        {
+            HlmsMacroblock prepassMacroblock = *pso.macroblock;
+
+            //This is a depth prepass, disable depth writes and keep a hard copy (strong ref.)
+            if( pso.pass.strongMacroblockBits & HlmsPassPso::ForceDisableDepthWrites )
+                prepassMacroblock.mDepthWrite = false;
+            //We need to invert culling mode.
+            if( pso.pass.strongMacroblockBits & HlmsPassPso::InvertVertexWinding )
+            {
+                prepassMacroblock.mCullMode = prepassMacroblock.mCullMode == CULL_CLOCKWISE ?
+                            CULL_ANTICLOCKWISE : CULL_CLOCKWISE;
+            }
+
+            pso.macroblock = mHlmsManager->getMacroblock( prepassMacroblock );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::createShaderCacheEntry( uint32 renderableHash, const HlmsCache &passCache,
                                                    uint32 finalHash,
                                                    const QueuedRenderable &queuedRenderable )
@@ -1890,33 +1921,7 @@ namespace Ogre
         pso.blendblock = datablock->getBlendblock( casterPass );
         pso.pass = passCache.pso.pass;
 
-        if( !pso.macroblock->mDepthWrite )
-        {
-            //Depth writes is already off, we don't need to hold a strong reference.
-            pso.pass.strongMacroblockBits &= ~HlmsPassPso::ForceDisableDepthWrites;
-        }
-        if( pso.macroblock->mCullMode == CULL_NONE )
-        {
-            //Without culling there's nothing to invert, we don't need to hold a strong reference.
-            pso.pass.strongMacroblockBits &= ~HlmsPassPso::InvertVertexWinding;
-        }
-
-        if( pso.pass.hasStrongMacroblock() )
-        {
-            HlmsMacroblock prepassMacroblock = *pso.macroblock;
-
-            //This is a depth prepass, disable depth writes and keep a hard copy (strong ref.)
-            if( pso.pass.strongMacroblockBits & HlmsPassPso::ForceDisableDepthWrites )
-                prepassMacroblock.mDepthWrite = false;
-            //We need to invert culling mode.
-            if( pso.pass.strongMacroblockBits & HlmsPassPso::InvertVertexWinding )
-            {
-                prepassMacroblock.mCullMode = prepassMacroblock.mCullMode == CULL_CLOCKWISE ?
-                            CULL_ANTICLOCKWISE : CULL_CLOCKWISE;
-            }
-
-            pso.macroblock = mHlmsManager->getMacroblock( prepassMacroblock );
-        }
+        applyStrongMacroblockRules( pso );
 
         const size_t numGlobalClipDistances = (size_t)getProperty( HlmsBaseProp::GlobalClipDistances );
         pso.clipDistances = (1u << numGlobalClipDistances) - 1u;
@@ -2409,7 +2414,7 @@ namespace Ogre
         }
 
         Camera *camera = sceneManager->getCameraInProgress();
-        if( camera->isReflected() )
+        if( camera && camera->isReflected() )
             setProperty( HlmsBaseProp::GlobalClipDistances, 1 );
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
