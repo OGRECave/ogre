@@ -54,7 +54,10 @@ namespace Demo
 
         //Setup PlanarReflections
         mPlanarReflections = new Ogre::PlanarReflections( sceneManager, root->getCompositorManager2(),
-                                                          2u, 1.0, 0 );
+                                                          1.0, 0 );
+        mPlanarReflections->setMaxActiveActors( 2u, "PlanarReflectionsReflectiveWorkspace",
+                                                true, 512, 512, true,
+                                                Ogre::PF_R8G8B8A8, false );
         const Ogre::Vector2 mirrorSize( 10.0f, 10.0f );
 
         //Create the plane mesh
@@ -89,9 +92,7 @@ namespace Demo
         Ogre::PlanarReflectionActor *actor =
                 mPlanarReflections->addActor( Ogre::PlanarReflectionActor(
                                                  sceneNode->getPosition(), mirrorSize,
-                                                 sceneNode->getOrientation(),
-                                                 "PlanarReflectionsReflectiveWorkspace" ),
-                                              true, 512, 512,true, Ogre::PF_R8G8B8A8, false );
+                                                 sceneNode->getOrientation() ) );
 
         Ogre::Hlms *hlmsUnlit = root->getHlmsManager()->getHlms( Ogre::HLMS_UNLIT );
 
@@ -101,7 +102,11 @@ namespace Demo
         Ogre::HlmsUnlitDatablock *mirror = static_cast<Ogre::HlmsUnlitDatablock*>(
                     hlmsUnlit->createDatablock( datablockName, datablockName,
                                                 macroblock, blendblock, Ogre::HlmsParamVec() ) );
-        mirror->setTexture( 0, 0, actor->getReflectionTexture() );
+        mPlanarReflections->reserve( 0, actor );
+        //Make sure it's always activated (i.e. always win against other actors)
+        //unless it's not visible by the camera.
+        actor->mActivationPriority = 0;
+        mirror->setTexture( 0, 0, mPlanarReflections->getTexture( 0 ) );
         mirror->setEnablePlanarReflection( 0, true );
         item->setDatablock( mirror );
 
@@ -125,9 +130,7 @@ namespace Demo
         actor = mPlanarReflections->addActor( Ogre::PlanarReflectionActor(
                                                   sceneNode->getPosition(),
                                                   mirrorSize * Ogre::Vector2( 0.75f, 0.5f ),
-                                                  sceneNode->getOrientation(),
-                                                  "PlanarReflectionsReflectiveWorkspace" ),
-                                              true, 512, 512,true, Ogre::PF_R8G8B8A8, false );
+                                                  sceneNode->getOrientation() ) );
 
         Ogre::PlanarReflections::TrackedRenderable trackedRenderable(
                     item->getSubItem(0), item,

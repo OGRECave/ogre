@@ -50,8 +50,7 @@ namespace Ogre
 
     PlanarReflections::PlanarReflections( SceneManager *sceneManager,
                                           CompositorManager2 *compositorManager,
-                                          uint8 maxActiveActors, Real maxDistance,
-                                          Camera *lockCamera ) :
+                                          Real maxDistance, Camera *lockCamera ) :
         mActorsSoA( 0 ),
         mCapacityActorsSoA( 0 ),
         mLastAspectRatio( 0 ),
@@ -61,11 +60,12 @@ namespace Ogre
         //mLockCamera( lockCamera ),
         mUpdatingRenderablesHlms( false ),
         mAnyPendingFlushRenderable( false ),
-        mMaxActiveActors( maxActiveActors ),
+        mMaxActiveActors( 0 ),
         mInvMaxDistance( Real(1.0) / maxDistance ),
         mMaxSqDistance( maxDistance * maxDistance ),
         mSceneManager( sceneManager ),
-        mCompositorManager( compositorManager )
+        mCompositorManager( compositorManager ),
+        mDummyActor()
     {
     }
     //-----------------------------------------------------------------------------------
@@ -78,6 +78,19 @@ namespace Ogre
             mActorsSoA = 0;
             mCapacityActorsSoA = 0;
         }
+
+        ActiveActorDataVec::const_iterator itor = mActiveActorData.begin();
+        ActiveActorDataVec::const_iterator end  = mActiveActorData.end();
+
+        while( itor != end )
+        {
+            mCompositorManager->removeWorkspace( itor->workspace );
+            mSceneManager->destroyCamera( itor->reflectionCamera );
+            TextureManager::getSingleton().remove( itor->reflectionTexture );
+            ++itor;
+        }
+
+        mActiveActorData.clear();
     }
     //-----------------------------------------------------------------------------------
     void PlanarReflections::setMaxDistance( Real maxDistance )
@@ -86,13 +99,92 @@ namespace Ogre
         mInvMaxDistance = Real(1.0) / maxDistance;
     }
     //-----------------------------------------------------------------------------------
-    void PlanarReflections::setMaxActiveActors( uint8 maxActiveActors )
+    void PlanarReflections::setMaxActiveActors( uint8 maxActiveActors, IdString workspaceName,
+                                                bool useAccurateLighting, uint32 width, uint32 height,
+                                                bool withMipmaps, PixelFormat pixelFormat,
+                                                bool mipmapMethodCompute )
     {
+        if( maxActiveActors < mMaxActiveActors )
+        {
+            //Shrinking
+            ActiveActorDataVec::const_iterator itor = mActiveActorData.begin() + maxActiveActors;
+            ActiveActorDataVec::const_iterator end  = mActiveActorData.end();
+
+            while( itor != end )
+            {
+                mCompositorManager->removeWorkspace( itor->workspace );
+                mSceneManager->destroyCamera( itor->reflectionCamera );
+                TextureManager::getSingleton().remove( itor->reflectionTexture );
+                if( itor->isReserved )
+                {
+                    const size_t slotIdx = itor - mActiveActorData.begin();
+                    PlanarReflectionActorVec::iterator itActor = mActors.begin();
+                    PlanarReflectionActorVec::iterator enActor = mActors.end();
+
+                    while( itActor != enActor &&
+                           (!(*itActor)->hasReservation() ||
+                            (*itActor)->mCurrentBoundSlot != slotIdx) )
+                    {
+                        ++itActor;
+                    }
+
+                    assert( itActor != enActor &&
+                            "Slot was reserved but we couldn't find "
+                            "any Actor that had that reservation" );
+
+                    (*itActor)->mHasReservation     = false;
+                    (*itActor)->mCurrentBoundSlot   = 0xFF;
+                }
+
+                ++itor;
+            }
+
+            mActiveActorData.resize( maxActiveActors );
+        }
+
+        const uint8 oldValue = mMaxActiveActors;
         mMaxActiveActors = maxActiveActors;
+
+        if( oldValue < mMaxActiveActors )
+        {
+            //Enlarging
+            mActiveActorData.reserve( mMaxActiveActors );
+            const size_t numNewActiveActors = mMaxActiveActors - oldValue;
+            for( size_t i=0; i<numNewActiveActors; ++i )
+            {
+                ActiveActorData actorData;
+                const size_t uniqueId = Id::generateNewId<PlanarReflections>();
+                String cameraName = "PlanarReflectionActor #" + StringConverter::toString( uniqueId );
+                actorData.reflectionCamera = mSceneManager->createCamera( cameraName, useAccurateLighting );
+                actorData.reflectionCamera->setAutoAspectRatio( false );
+
+                int usage = TU_RENDERTARGET;
+                usage |= (withMipmaps && mipmapMethodCompute) ? TU_UAV : TU_AUTOMIPMAP;
+                const uint32 numMips = withMipmaps ? 0 : PixelUtil::getMaxMipmapCount( width, height, 1u );
+
+                actorData.reflectionTexture =
+                        TextureManager::getSingleton().createManual(
+                            "PlanarReflections #" + StringConverter::toString( uniqueId ),
+                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                            TEX_TYPE_2D, width, height, numMips, pixelFormat, usage, 0, true );
+
+                CompositorChannel channel;
+                channel.textures.push_back( actorData.reflectionTexture );
+                channel.target = actorData.reflectionTexture->getBuffer()->getRenderTarget();
+                CompositorChannelVec channels;
+                channels.push_back( channel );
+                actorData.workspace = mCompositorManager->addWorkspace( mSceneManager, channels,
+                                                                        actorData.reflectionCamera,
+                                                                        workspaceName, false, 0 );
+                actorData.isReserved = false;
+                mActiveActorData.push_back( actorData );
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
-    void PlanarReflections::pushActor( PlanarReflectionActor *actor )
+    PlanarReflectionActor* PlanarReflections::addActor( const PlanarReflectionActor &actorRef )
     {
+        PlanarReflectionActor *actor = new PlanarReflectionActor( actorRef );
         mActors.push_back( actor );
 
         if( mCapacityActorsSoA < mActors.capacity() )
@@ -131,42 +223,10 @@ namespace Ogre
 
         actor->mIndex       = (mActors.size() - 1u) % ARRAY_PACKED_REALS;
         actor->mActorPlane  = mActorsSoA + ( (mActors.size() - 1u) / ARRAY_PACKED_REALS );
-    }
-    //-----------------------------------------------------------------------------------
-    PlanarReflectionActor* PlanarReflections::addActor( const PlanarReflectionActor &actor,
-                                                        bool useAccurateLighting,
-                                                        uint32 width, uint32 height, bool withMipmaps,
-                                                        PixelFormat pixelFormat,
-                                                        bool mipmapMethodCompute )
-    {
-        const size_t uniqueId = Id::generateNewId<PlanarReflections>();
 
-        pushActor( new PlanarReflectionActor( actor ) );
-        PlanarReflectionActor *newActor = mActors.back();
-        String cameraName = "PlanarReflectionActor #" + StringConverter::toString( uniqueId );
-        newActor->mReflectionCamera = mSceneManager->createCamera( cameraName, useAccurateLighting );
-        newActor->mReflectionCamera->setAutoAspectRatio( false );
+        actor->updateArrayActorPlane();
 
-        int usage = TU_RENDERTARGET;
-        usage |= (withMipmaps && mipmapMethodCompute) ? TU_UAV : TU_AUTOMIPMAP;
-        const uint32 numMips = withMipmaps ? 0 : PixelUtil::getMaxMipmapCount( width, height, 1u );
-
-        newActor->mReflectionTexture =
-                TextureManager::getSingleton().createManual(
-                    "PlanarReflections #" + StringConverter::toString( uniqueId ),
-                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                    TEX_TYPE_2D, width, height, numMips, pixelFormat, usage, 0, true );
-
-        CompositorChannel channel;
-        channel.textures.push_back( newActor->mReflectionTexture );
-        channel.target = newActor->mReflectionTexture->getBuffer()->getRenderTarget();
-        CompositorChannelVec channels;
-        channels.push_back( channel );
-        newActor->mWorkspace = mCompositorManager->addWorkspace( mSceneManager, channels,
-                                                                 newActor->mReflectionCamera,
-                                                                 newActor->mWorkspaceName, false, 0 );
-        newActor->updateArrayActorPlane();
-        return newActor;
+        return actor;
     }
     //-----------------------------------------------------------------------------------
     void PlanarReflections::destroyActor( PlanarReflectionActor *actor )
@@ -180,9 +240,12 @@ namespace Ogre
                          "or was already destroyed!", "PlanarReflections::destroyActor" );
         }
 
-        mCompositorManager->removeWorkspace( actor->mWorkspace );
-        mSceneManager->destroyCamera( actor->mReflectionCamera );
-        TextureManager::getSingleton().remove( actor->mReflectionTexture );
+        if( actor->hasReservation() )
+        {
+            assert( actor->mCurrentBoundSlot < mActiveActorData.size() );
+            mActiveActorData[actor->mCurrentBoundSlot].isReserved = false;
+        }
+
         delete actor;
 
         efficientVectorRemove( mActors, itor );
@@ -194,16 +257,43 @@ namespace Ogre
         PlanarReflectionActorVec::iterator end  = mActors.end();
 
         while( itor != end )
-        {
-            PlanarReflectionActor *actor = *itor;
-            mCompositorManager->removeWorkspace( actor->mWorkspace );
-            mSceneManager->destroyCamera( actor->mReflectionCamera );
-            TextureManager::getSingleton().remove( actor->mReflectionTexture );
-            delete actor;
-            ++itor;
-        }
+            delete *itor++;
 
         mActors.clear();
+
+        ActiveActorDataVec::iterator itData = mActiveActorData.begin();
+        ActiveActorDataVec::iterator enData = mActiveActorData.end();
+
+        while( itData != enData )
+        {
+            itData->isReserved = false;
+            ++itData;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void PlanarReflections::reserve( uint8 activeActorSlot, PlanarReflectionActor *actor )
+    {
+        assert( activeActorSlot < mActiveActorData.size() );
+        assert( !mActiveActorData[activeActorSlot].isReserved &&
+                "Slot is already reserved for another actor!" );
+        assert( !actor->hasReservation() && "Actor already has a reservation!" );
+
+        mActiveActorData[activeActorSlot].isReserved = true;
+        actor->mHasReservation      = true;
+        actor->mCurrentBoundSlot    = activeActorSlot;
+    }
+    //-----------------------------------------------------------------------------------
+    void PlanarReflections::releaseReservation( PlanarReflectionActor *actor )
+    {
+        assert( actor->hasReservation() && "Actor didn't have a reservation!" );
+        assert( actor->mCurrentBoundSlot < mActiveActorData.size() &&
+                "Actor has an invalid reservation! Does it belong to this PlanarReflections?" );
+        assert( mActiveActorData[actor->mCurrentBoundSlot].isReserved &&
+                "Slot wasn't reserved! Does the actor belong to this PlanarReflections?" );
+
+        mActiveActorData[actor->mCurrentBoundSlot].isReserved = false;
+        actor->mHasReservation      = false;
+        actor->mCurrentBoundSlot    = 0xFF;
     }
     //-----------------------------------------------------------------------------------
     void PlanarReflections::updateFlushedRenderables(void)
@@ -309,10 +399,18 @@ namespace Ogre
         OrderPlanarReflectionActorsByDistanceToPoint( const Vector3 &p ) :
             point( p ) {}
 
-        bool operator () ( PlanarReflectionActor *_l, PlanarReflectionActor *_r ) const
+        bool operator () ( const PlanarReflectionActor *_l, const PlanarReflectionActor *_r ) const
         {
-            return _l->getSquaredDistanceTo( point ) < _r->getSquaredDistanceTo( point );
+            if( _l->mActivationPriority != _r->mActivationPriority )
+                return _l->getSquaredDistanceTo( point ) < _r->getSquaredDistanceTo( point );
+
+            return _l->mActivationPriority < _r->mActivationPriority;
         }
+    };
+    static bool OrderPlanarReflectionActorsByBindingSlot( const PlanarReflectionActor *_l,
+                                                          const PlanarReflectionActor *_r )
+    {
+        return _l->getCurrentBoundSlot() < _r->getCurrentBoundSlot();
     };
     void PlanarReflections::update( Camera *camera, Real aspectRatio )
     {
@@ -346,30 +444,6 @@ namespace Ogre
             ArrayVector3    normal;
             ArrayReal       negD;
         };
-
-        const Vector3 camPos( camera->getDerivedPosition() );
-        const Quaternion camRot( camera->getDerivedOrientation() );
-        Real nearPlane = camera->getNearClipDistance();
-        Real farPlane = camera->getFarClipDistance();
-        Real focalLength = camera->getFocalLength();
-        Radian fov = camera->getFOVy();
-
-        //Update reflection cameras to keep up their data with the master camera.
-        PlanarReflectionActorVec::iterator itor = mActors.begin();
-        PlanarReflectionActorVec::iterator end  = mActors.end();
-
-        while( itor != end )
-        {
-            PlanarReflectionActor *actor = *itor;
-            actor->mReflectionCamera->setPosition( camPos );
-            actor->mReflectionCamera->setOrientation( camRot );
-            actor->mReflectionCamera->setNearClipDistance( nearPlane );
-            actor->mReflectionCamera->setFarClipDistance( farPlane );
-            actor->mReflectionCamera->setAspectRatio( aspectRatio );
-            actor->mReflectionCamera->setFocalLength( focalLength );
-            actor->mReflectionCamera->setFOVy( fov );
-            ++itor;
-        }
 
         //Cull actors against their master cameras (under SSE2, we cull 4 actors at the same time).
         //The culling algorithm is very similar to what is done in OgreForwardClustered.cpp which
@@ -545,31 +619,83 @@ namespace Ogre
                 {
                     if( IS_BIT_SET( j, scalarMask ) )
                         mActiveActors.push_back( mActors[i + j] );
-                    else
-                        mActors[i + j]->mWorkspace->setEnabled( false );
                 }
             }
 
             ++actorsPlanes;
         }
 
+        const Vector3 camPos( camera->getDerivedPosition() );
         std::sort( mActiveActors.begin(), mActiveActors.end(),
                    OrderPlanarReflectionActorsByDistanceToPoint( camPos ) );
 
-        itor = mActiveActors.begin();
-        end  = mActiveActors.end();
+        mActiveActors.resize( std::min<size_t>( mActiveActors.size(), mMaxActiveActors ) );
+
+        {
+            ActiveActorDataVec::iterator itor = mActiveActorData.begin();
+            ActiveActorDataVec::iterator end  = mActiveActorData.end();
+
+            while( itor != end )
+            {
+                itor->workspace->setEnabled( false );
+                ++itor;
+            }
+        }
+
+        const Quaternion camRot( camera->getDerivedOrientation() );
+        Real nearPlane = camera->getNearClipDistance();
+        Real farPlane = camera->getFarClipDistance();
+        Real focalLength = camera->getFocalLength();
+        Radian fov = camera->getFOVy();
+
+        uint8 nextFreeActorData = 0;
+        PlanarReflectionActorVec::const_iterator itor = mActiveActors.begin();
+        PlanarReflectionActorVec::const_iterator end  = mActiveActors.end();
 
         while( itor != end )
         {
-            const size_t idx = itor - mActiveActors.begin();
-            if( idx < mMaxActiveActors )
-                (*itor)->mWorkspace->setEnabled( true );
+            PlanarReflectionActor *actor = *itor;
+            ActiveActorData *actorData = 0;
+            if( actor->hasReservation() )
+            {
+                //Actor is bound to a specifc slot
+                const size_t idx = actor->mCurrentBoundSlot;
+                assert( idx < mActiveActorData.size() );
+                assert( mActiveActorData[idx].isReserved &&
+                        "Actor says he has a reservation on this slot, but the slot disagrees." );
+                actorData = &mActiveActorData[idx];
+            }
             else
-                (*itor)->mWorkspace->setEnabled( false );
+            {
+                while( nextFreeActorData < mActiveActorData.size() &&
+                       mActiveActorData[nextFreeActorData].isReserved )
+                {
+                    ++nextFreeActorData;
+                }
+
+                if( nextFreeActorData < mActiveActorData.size() )
+                {
+                    actorData = &mActiveActorData[nextFreeActorData];
+                    //Grab whatever non-reserved slot we can get.
+                    actor->mCurrentBoundSlot = nextFreeActorData;
+                }
+            }
+
+            if( actorData )
+            {
+                actorData->workspace->setEnabled( true );
+                actorData->reflectionCamera->setPosition( camPos );
+                actorData->reflectionCamera->setOrientation( camRot );
+                actorData->reflectionCamera->setNearClipDistance( nearPlane );
+                actorData->reflectionCamera->setFarClipDistance( farPlane );
+                actorData->reflectionCamera->setAspectRatio( aspectRatio );
+                actorData->reflectionCamera->setFocalLength( focalLength );
+                actorData->reflectionCamera->setFOVy( fov );
+                actorData->reflectionCamera->enableReflection( actor->mPlane );
+            }
+
             ++itor;
         }
-
-        mActiveActors.resize( std::min<size_t>( mActiveActors.size(), mMaxActiveActors ) );
 
         TrackedRenderableArray::const_iterator itTracked = mTrackedRenderables.begin();
         TrackedRenderableArray::const_iterator enTracked = mTrackedRenderables.end();
@@ -611,7 +737,7 @@ namespace Ogre
                         Real sqDistance = actor->getSquaredDistanceTo( rendCenter );
                         if( sqDistance < mMaxSqDistance && sqDistance <= bestSqDistance )
                         {
-                            bestActorIdx = static_cast<uint8>( itor - mActiveActors.begin() );
+                            bestActorIdx = (*itor)->mCurrentBoundSlot;
                         }
                     }
 
@@ -633,6 +759,36 @@ namespace Ogre
             }
 
             ++itTracked;
+        }
+
+        //Now force mActiveActors & mActiveActorData to match, that means
+        //mActiveActors[idx]->getCurrentBoundSlot() == idx.
+
+        //mActiveActors may not be sorted due to reserved slots (i.e. mActiveActors[5]
+        //may have had the reservation on mActiveActorData[0]
+        std::sort( mActiveActors.begin(), mActiveActors.end(),
+                   OrderPlanarReflectionActorsByBindingSlot );
+
+        //Now fill in the gaps. Due to the reservation system, it's possible we have 0, 1, 3, 4
+        //because slot 2 is reserved and actor was not activated. If this is the case, fill
+        //in a dummy.
+        size_t lastIdx = std::numeric_limits<size_t>::max();
+        PlanarReflectionActorVec::iterator itActor = mActiveActors.begin();
+        PlanarReflectionActorVec::iterator enActor = mActiveActors.end();
+        while( itActor != enActor )
+        {
+            if( lastIdx + 1u != (*itActor)->mCurrentBoundSlot )
+            {
+                const size_t diff = (*itActor)->mCurrentBoundSlot - (lastIdx + 1u);
+                const size_t newIdx = itActor - mActiveActors.begin() + diff;
+                mActiveActors.insert( itActor, diff, &mDummyActor );
+                itActor = mActiveActors.begin() + newIdx;
+                enActor = mActiveActors.end();
+                lastIdx += diff;
+            }
+
+            ++lastIdx;
+            ++itActor;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -686,9 +842,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     TexturePtr PlanarReflections::getTexture( uint8 actorIdx ) const
     {
-        if( actorIdx >= mActiveActors.size() )
+        if( actorIdx >= mActiveActorData.size() )
             return TexturePtr();
-        return mActiveActors[actorIdx]->mReflectionTexture;
+        return mActiveActorData[actorIdx].reflectionTexture;
     }
     //-----------------------------------------------------------------------------------
     bool PlanarReflections::cameraMatches( const Camera *camera )
