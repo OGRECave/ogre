@@ -1,27 +1,3 @@
-material jaiquaDualQuatTest
-{
-	// Hardware skinning technique
-	technique
-	{
-		pass
-		{
-			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
-			{
-			}
-
-			shadow_caster_vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster
-			{
-			}
- 
-			texture_unit
-			{
-				texture blue_jaiqua.jpg
-				tex_address_mode clamp
-			}
-		}
-	}
-}
-
 material spine
 {
 	// Hardware skinning technique - GLES2 passthrough fragment program
