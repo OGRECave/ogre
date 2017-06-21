@@ -1393,7 +1393,6 @@ namespace Ogre
 
             if( shadowNode )
             {
-                const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
                 mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
 
                 TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
