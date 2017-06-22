@@ -32,7 +32,7 @@
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareUniformBuffer.h"
-#include "OgreGLES2UniformCache.h"
+#include "OgreGLUniformCache.h"
 #include "OgreGLSLProgramCommon.h"
 #include "OgreGLSLESProgram.h"
 
@@ -46,7 +46,7 @@ namespace Ogre {
     protected:
         /// Linked fragment program
         GLSLESProgram* mFragmentProgram;
-        GLES2UniformCache *mUniformCache;
+        GLUniformCache *mUniformCache;
 
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
@@ -65,7 +65,7 @@ namespace Ogre {
 
         GLSLESProgram* getVertexProgram(void) const { return static_cast<GLSLESProgram*>(mVertexShader); }
         GLSLESProgram* getFragmentProgram(void) const { return mFragmentProgram; }
-        GLES2UniformCache * getUniformCache(void) { return mUniformCache; }
+        GLUniformCache * getUniformCache(void) { return mUniformCache; }
     };
 }
 

@@ -42,7 +42,7 @@ namespace Ogre {
     , mFragmentProgram(fragmentProgram)
     {
         // Initialise uniform cache
-        mUniformCache = new GLES2UniformCache();
+        mUniformCache = new GLUniformCache();
     }
     
     //-----------------------------------------------------------------------

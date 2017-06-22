@@ -26,28 +26,25 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GL3PlusUniformCache_H__
-#define __GL3PlusUniformCache_H__
+#ifndef __GLUniformCache_H__
+#define __GLUniformCache_H__
 
-#include "OgreGL3PlusPrerequisites.h"
+#include "OgreGLSupportPrerequisites.h"
 
 typedef Ogre::GeneralAllocatedObject UniformCacheAlloc;
 
 namespace Ogre
 {
     /** An in memory cache of the OpenGL uniforms. */
-    class _OgreGL3PlusExport GL3PlusUniformCache : public UniformCacheAlloc
+    class _OgreGLExport GLUniformCache : public UniformCacheAlloc
     {
     protected:
-        typedef OGRE_HashMap<GLint, uint32> UniformMap;
+        typedef OGRE_HashMap<int, uint32> UniformMap;
 
         /// A map of uniform names and a hash of their values
         UniformMap mUniformValueMap;
 
     public:
-        GL3PlusUniformCache(void);
-        ~GL3PlusUniformCache(void);
-
         /** Clears all cached values
         */
         void clearCache();
@@ -55,7 +52,7 @@ namespace Ogre
         /** Update a uniform
          @return A boolean value indicating whether this uniform needs to be updated in the GL.
          */
-        bool updateUniform(GLint location, const void *value, GLsizei length);
+        bool updateUniform(int location, const void *value, int length);
     };
 }
 

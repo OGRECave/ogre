@@ -33,7 +33,7 @@
 #include "OgreGpuProgramManager.h"
 #include "OgreGLUtil.h"
 #include "OgreLogManager.h"
-#include "OgreGL3PlusUniformCache.h"
+#include "OgreGLUniformCache.h"
 #include "OgreGL3PlusSupport.h"
 #include "OgreGL3PlusStateCacheManager.h"
 
@@ -384,7 +384,7 @@ namespace Ogre
         }
 
         GLuint progID = 0;
-        GL3PlusUniformCache * uniformCache=0;
+        GLUniformCache * uniformCache=0;
         if (fromProgType == GPT_VERTEX_PROGRAM)
         {
             progID = getVertexShader()->getGLProgramHandle();

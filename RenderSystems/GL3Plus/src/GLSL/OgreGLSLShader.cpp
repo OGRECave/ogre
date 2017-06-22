@@ -38,7 +38,7 @@
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGLUtil.h"
-#include "OgreGL3PlusUniformCache.h"
+#include "OgreGLUniformCache.h"
 
 namespace Ogre {
     GLSLShader::GLSLShader(
@@ -92,7 +92,7 @@ namespace Ogre {
         mLoadFromFile = false;
 
         // Create the uniform cache
-        mUniformCache = new GL3PlusUniformCache();
+        mUniformCache = new GLUniformCache();
     }
 
     GLSLShader::~GLSLShader()
