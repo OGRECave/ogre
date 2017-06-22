@@ -232,7 +232,8 @@ function(ogre_config_component LIBNAME)
 endfunction(ogre_config_component)
 
 function(ogre_config_framework LIBNAME)
-  if (APPLE AND NOT APPLE_IOS)
+  get_target_property(targetType ${LIBNAME} TYPE)
+  if (APPLE AND NOT APPLE_IOS AND NOT (${targetType} STREQUAL "STATIC_LIBRARY"))
       set_target_properties(${LIBNAME} PROPERTIES FRAMEWORK TRUE)
 
       # Set the INSTALL_PATH so that frameworks can be installed in the application package
