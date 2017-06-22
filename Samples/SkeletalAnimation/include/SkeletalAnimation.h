@@ -261,7 +261,7 @@ protected:
                 mat->getTechnique(0)->getPass(0)->setShadowCasterFragmentProgram("Ogre/BasicFragmentPrograms/PassthroughFpGLSLES");
             }
 #endif
-            ent->setMaterialName("jaiqua"); //"jaiquaDualQuatTest"
+            ent->setMaterialName("jaiqua");
             sn->attachObject(ent);
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)

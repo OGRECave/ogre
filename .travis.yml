@@ -15,6 +15,9 @@ addons:
     - libxt-dev
     - libboost-all-dev
     - libgles2-mesa-dev
+    - mesa-common-dev
+    - libgl1-mesa-dev
+    - libglu1-mesa-dev # legacy GL RenderSystem only
     - python3-dev
 before_script:
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse" && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty-backports universe" && sudo apt-get update -qq && sudo apt-get install -qq nvidia-cg-dev swig3.0 ; fi

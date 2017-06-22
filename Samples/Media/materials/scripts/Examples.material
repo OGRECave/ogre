@@ -2055,7 +2055,6 @@ fragment_program Examples/ShowUV_pGLSLES glsles
 fragment_program Examples/ShowUV_pGLSL glsl
 {
 	source ShowUV.glsl
-	syntax glsl150
 }
 
 fragment_program Examples/ShowUV_p unified
@@ -2096,7 +2095,6 @@ fragment_program Examples/ShowUVdir3D_pGLSLES glsles
 fragment_program Examples/ShowUVdir3D_pGLSL glsl
 {
 	source ShowUVdir3D.glsl
-	syntax glsl150
 }
 
 fragment_program Examples/ShowUVdir3D_p unified
@@ -2143,7 +2141,6 @@ vertex_program Examples/ShowTangents_vGLSLES glsles
 vertex_program Examples/ShowTangents_vGLSL glsl
 {
 	source ShowTangents.glsl
-	syntax glsl150
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -2193,7 +2190,6 @@ vertex_program Examples/ShowNormals_vGLSLES glsles
 vertex_program Examples/ShowNormals_vGLSL glsl
 {
 	source ShowNormals.glsl
-	syntax glsl150
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix

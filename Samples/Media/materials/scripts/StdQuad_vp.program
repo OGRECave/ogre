@@ -70,7 +70,6 @@ vertex_program Ogre/Compositor/StdQuad_GLSL_vp glsl
 vertex_program Ogre/Compositor/StdQuad_Tex2_GLSL_vp glsl
 {
 	source StdQuad_Tex2_vp.glsl
-	syntax glsl150
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -80,7 +79,6 @@ vertex_program Ogre/Compositor/StdQuad_Tex2_GLSL_vp glsl
 vertex_program Ogre/Compositor/StdQuad_Tex2a_GLSL_vp glsl
 {
 	source StdQuad_Tex2a_vp.glsl
-	syntax glsl150
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -90,7 +88,6 @@ vertex_program Ogre/Compositor/StdQuad_Tex2a_GLSL_vp glsl
 vertex_program Ogre/Compositor/StdQuad_Tex3_GLSL_vp glsl
 {
 	source StdQuad_Tex3_vp.glsl
-	syntax glsl150
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -100,7 +97,6 @@ vertex_program Ogre/Compositor/StdQuad_Tex3_GLSL_vp glsl
 vertex_program Ogre/Compositor/StdQuad_Tex4_GLSL_vp glsl
 {
 	source StdQuad_Tex4_vp.glsl
-	syntax glsl150
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix

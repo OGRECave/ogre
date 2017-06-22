@@ -80,7 +80,6 @@ fragment_program Examples/OffsetMappingFP/GLSLES glsles
 fragment_program Examples/OffsetMappingPS/GLSL glsl
 { 
     source OffsetMapping_specular.glsl
-    syntax glsl150
     default_params
     {
         // Parallax Height scale and bias 
@@ -92,14 +91,12 @@ fragment_program Examples/OffsetMappingPS/GLSL glsl
 vertex_program Examples/OffsetMappingVP/GLSL glsl
 { 
     source OffsetMappingVp.glsl
-    syntax glsl150
 }
 
 // Bump map with parallax fragment program 
 fragment_program Examples/OffsetMappingFP/GLSL glsl
 { 
     source OffsetMappingFp.glsl
-    syntax glsl150
     default_params
     {
         // assign samplers as required by GLSL

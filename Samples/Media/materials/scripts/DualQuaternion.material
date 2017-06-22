@@ -1,52 +1,5 @@
-material jaiquaDualQuatTest
-{
-	// Hardware skinning technique
-	technique
-	{
-		pass
-		{
-			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
-			{
-			}
-
-			shadow_caster_vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster
-			{
-			}
- 
-			texture_unit
-			{
-				texture blue_jaiqua.jpg
-				tex_address_mode clamp
-			}
-		}
-	}
-}
-
 material spine
 {
-	// Hardware skinning technique - GLES2 passthrough fragment program
-	technique
-	{
-		pass
-		{
-			diffuse 1 1 1		
-			texture_unit
-			{
-				texture circuit.dds
-			}
-
-			vertex_program_ref Ogre/HardwareSkinningTwoWeights
-			{
-			}
-			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
-			{
-				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-				param_named_auto viewProjectionMatrix viewproj_matrix
-				param_named_auto ambient ambient_light_colour
-			}
-		}
-	}
-
 	// Hardware skinning technique - no fragment program
 	technique
 	{
@@ -69,19 +22,6 @@ material spine
 				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
 				param_named_auto viewProjectionMatrix viewproj_matrix
 				param_named_auto ambient ambient_light_colour
-			}
-		}
-	}
-
-	// Software blending technique
-	technique
-	{
-		pass
-		{
-			diffuse 1 1 1		
-			texture_unit
-			{
-				texture circuit.dds
 			}
 		}
 	}

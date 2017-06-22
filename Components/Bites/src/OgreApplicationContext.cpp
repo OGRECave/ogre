@@ -565,6 +565,8 @@ void ApplicationContext::locateResources()
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
     {
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL120", type, sec);
+
         if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
         {
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL150", type, sec);
