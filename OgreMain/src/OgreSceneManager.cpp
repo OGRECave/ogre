@@ -2384,7 +2384,7 @@ void SceneManager::buildLightList()
             {
                 const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, 0 );
 
-                for( size_t i=0; i<totalObjs; ++i )
+                for( size_t i=0; i<totalObjs; i += ARRAY_PACKED_REALS )
                 {
                     for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
                     {
