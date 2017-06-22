@@ -302,14 +302,6 @@ namespace Ogre {
         return language;
     }
 
-
-    Ogre::GpuProgramParametersSharedPtr GLSLShader::createParameters(void)
-    {
-        GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
-        return params;
-    }
-
-
     void GLSLShader::checkAndFixInvalidDefaultPrecisionError(String &message)
     {
         String precisionQualifierErrorString = ": 'Default Precision Qualifier' :  invalid type Type for default precision qualifier can be only float or int";
