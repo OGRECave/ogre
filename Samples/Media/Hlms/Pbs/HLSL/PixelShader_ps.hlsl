@@ -531,7 +531,9 @@ float4 diffuseCol;
 
 @insertpiece( output_type ) main( PS_INPUT inPs )
 {
+@property( !hlms_render_depth_only || exponential_shadow_maps || hlms_shadowcaster_point )
 	PS_OUTPUT outPs;
+@end
 	@insertpiece( custom_ps_preExecution )
 
 	
@@ -594,7 +596,9 @@ float4 diffuseCol;
 
 	@insertpiece( custom_ps_posExecution )
 
+@property( !hlms_render_depth_only || exponential_shadow_maps || hlms_shadowcaster_point )
 	return outPs;
+@end
 }
 @end
 

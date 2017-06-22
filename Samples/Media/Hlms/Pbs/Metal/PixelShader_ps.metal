@@ -511,7 +511,9 @@ fragment @insertpiece( output_type ) main_metal
 		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
 )
 {
+@property( !hlms_render_depth_only || exponential_shadow_maps || hlms_shadowcaster_point )
 	PS_OUTPUT outPs;
+@end
 	@insertpiece( custom_ps_preExecution )
 
 @property( alpha_test )
@@ -572,7 +574,9 @@ fragment @insertpiece( output_type ) main_metal
 
 	@insertpiece( custom_ps_posExecution )
 
+@property( !hlms_render_depth_only || exponential_shadow_maps || hlms_shadowcaster_point )
 	return outPs;
+@end
 }
 @end
 

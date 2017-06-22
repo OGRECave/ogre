@@ -1,7 +1,7 @@
 
-@property( !hlms_render_depth_only )
+@property( !hlms_render_depth_only || (hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point)) )
 	@piece( output_type )PS_OUTPUT@end
-@end @property( hlms_render_depth_only )
+@end @property( !(!hlms_render_depth_only || (hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point))) )
 	@piece( output_type )void@end
 @end
 
