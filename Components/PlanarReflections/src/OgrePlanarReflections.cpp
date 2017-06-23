@@ -678,6 +678,7 @@ namespace Ogre
                     actorData = &mActiveActorData[nextFreeActorData];
                     //Grab whatever non-reserved slot we can get.
                     actor->mCurrentBoundSlot = nextFreeActorData;
+                    ++nextFreeActorData;
                 }
             }
 
