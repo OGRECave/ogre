@@ -161,4 +161,19 @@ namespace Ogre {
         // Add to the microcode to the cache
         GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
     }
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    void GLSLESProgramCommon::notifyOnContextLost()
+    {
+        mLinked = false;
+        mTriedToLinkAndFailed = false;
+        mUniformRefsBuilt = false;
+        mUniformCache->clearCache();
+    }
+
+    void GLSLESProgramCommon::notifyOnContextReset()
+    {
+        activate();
+    }
+#endif
 } // namespace Ogre

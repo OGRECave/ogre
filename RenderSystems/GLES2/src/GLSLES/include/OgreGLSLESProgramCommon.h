@@ -41,7 +41,7 @@ namespace Ogre {
      
      */
 
-    class _OgreGLES2Export GLSLESProgramCommon : public GLSLProgramCommon
+    class _OgreGLES2Export GLSLESProgramCommon : public GLSLProgramCommon MANAGED_RESOURCE
     {
     protected:
         /// Linked fragment program
@@ -53,6 +53,12 @@ namespace Ogre {
         static bool getMicrocodeFromCache(const String& name, GLuint programHandle);
         /// Put a program in use
         virtual void _useProgram(void) = 0;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        virtual void notifyOnContextLost();
+
+        virtual void notifyOnContextReset();
+#endif
 
         static void _writeToCache(const String& name, GLuint programHandle);
     public:

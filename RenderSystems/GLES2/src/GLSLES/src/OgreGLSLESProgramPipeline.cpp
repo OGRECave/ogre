@@ -182,6 +182,15 @@ namespace Ogre
         }
     }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    void GLSLESProgramPipeline::notifyOnContextLost()
+    {
+        OGRE_CHECK_GL_ERROR(glDeleteProgramPipelinesEXT(1, &mGLProgramPipelineHandle));
+        mGLProgramPipelineHandle = 0;
+        GLSLESProgramCommon::notifyOnContextLost();
+    }
+#endif
+
     //-----------------------------------------------------------------------
     GLint GLSLESProgramPipeline::getAttributeIndex(VertexElementSemantic semantic, uint index)
     {

@@ -242,6 +242,7 @@ namespace Ogre {
             mGLShaderHandle = 0;
             mGLProgramHandle = 0;
             mCompiled = 0;
+            mLinked = 0;
         }
     }
     //-----------------------------------------------------------------------
