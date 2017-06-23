@@ -23,10 +23,10 @@
 
 @piece( DoPlanarReflectionsPS )
 	@property( syntax == glsl )
-		uint planarReflectionIdx = floatBitsToUint( instance.worldMaterialIdx[inPs.drawId].w );
+		uint planarReflectionIdx = instance.worldMaterialIdx[inPs.drawId].w;
 	@end
 	@property( syntax == hlsl )
-		uint planarReflectionIdx = asuint( worldMaterialIdx[inPs.drawId].w );
+		uint planarReflectionIdx = worldMaterialIdx[inPs.drawId].w;
 	@end
 	@property( syntax == metal )
 		ushort planarReflectionIdx = inPs.planarReflectionIdx;

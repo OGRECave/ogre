@@ -648,54 +648,65 @@ namespace Ogre
         Real focalLength = camera->getFocalLength();
         Radian fov = camera->getFOVy();
 
-        uint8 nextFreeActorData = 0;
-        PlanarReflectionActorVec::const_iterator itor = mActiveActors.begin();
-        PlanarReflectionActorVec::const_iterator end  = mActiveActors.end();
-
-        while( itor != end )
         {
-            PlanarReflectionActor *actor = *itor;
-            ActiveActorData *actorData = 0;
-            if( actor->hasReservation() )
+            uint8 nextFreeActorData = 0;
+            PlanarReflectionActorVec::iterator itor = mActiveActors.begin();
+            PlanarReflectionActorVec::iterator end  = mActiveActors.end();
+
+            while( itor != end )
             {
-                //Actor is bound to a specifc slot
-                const size_t idx = actor->mCurrentBoundSlot;
-                assert( idx < mActiveActorData.size() );
-                assert( mActiveActorData[idx].isReserved &&
-                        "Actor says he has a reservation on this slot, but the slot disagrees." );
-                actorData = &mActiveActorData[idx];
-            }
-            else
-            {
-                while( nextFreeActorData < mActiveActorData.size() &&
-                       mActiveActorData[nextFreeActorData].isReserved )
+                PlanarReflectionActor *actor = *itor;
+                ActiveActorData *actorData = 0;
+                if( actor->hasReservation() )
                 {
-                    ++nextFreeActorData;
+                    //Actor is bound to a specifc slot
+                    const size_t idx = actor->mCurrentBoundSlot;
+                    assert( idx < mActiveActorData.size() );
+                    assert( mActiveActorData[idx].isReserved &&
+                            "Actor says he has a reservation on this slot, but the slot disagrees." );
+                    actorData = &mActiveActorData[idx];
+                }
+                else
+                {
+                    while( nextFreeActorData < mActiveActorData.size() &&
+                           mActiveActorData[nextFreeActorData].isReserved )
+                    {
+                        ++nextFreeActorData;
+                    }
+
+                    if( nextFreeActorData < mActiveActorData.size() )
+                    {
+                        actorData = &mActiveActorData[nextFreeActorData];
+                        //Grab whatever non-reserved slot we can get.
+                        actor->mCurrentBoundSlot = nextFreeActorData;
+                        ++nextFreeActorData;
+                    }
                 }
 
-                if( nextFreeActorData < mActiveActorData.size() )
+                if( actorData )
                 {
-                    actorData = &mActiveActorData[nextFreeActorData];
-                    //Grab whatever non-reserved slot we can get.
-                    actor->mCurrentBoundSlot = nextFreeActorData;
-                    ++nextFreeActorData;
+                    actorData->workspace->setEnabled( true );
+                    actorData->reflectionCamera->setPosition( camPos );
+                    actorData->reflectionCamera->setOrientation( camRot );
+                    actorData->reflectionCamera->setNearClipDistance( nearPlane );
+                    actorData->reflectionCamera->setFarClipDistance( farPlane );
+                    actorData->reflectionCamera->setAspectRatio( aspectRatio );
+                    actorData->reflectionCamera->setFocalLength( focalLength );
+                    actorData->reflectionCamera->setFOVy( fov );
+                    actorData->reflectionCamera->enableReflection( actor->mPlane );
+
+                    ++itor;
+                }
+                else
+                {
+                    //If we're here we don't have a reservation and there are no
+                    //more free slots for us to grab. We can't activate this actor.
+                    const size_t idx = itor - mActiveActors.begin();
+                    mActiveActors.erase( itor );
+                    itor = mActiveActors.begin() + idx;
+                    end  = mActiveActors.end();
                 }
             }
-
-            if( actorData )
-            {
-                actorData->workspace->setEnabled( true );
-                actorData->reflectionCamera->setPosition( camPos );
-                actorData->reflectionCamera->setOrientation( camRot );
-                actorData->reflectionCamera->setNearClipDistance( nearPlane );
-                actorData->reflectionCamera->setFarClipDistance( farPlane );
-                actorData->reflectionCamera->setAspectRatio( aspectRatio );
-                actorData->reflectionCamera->setFocalLength( focalLength );
-                actorData->reflectionCamera->setFOVy( fov );
-                actorData->reflectionCamera->enableReflection( actor->mPlane );
-            }
-
-            ++itor;
         }
 
         TrackedRenderableArray::const_iterator itTracked = mTrackedRenderables.begin();
@@ -721,8 +732,8 @@ namespace Ogre
                 Real bestCosAngle = -1;
                 Real bestSqDistance = std::numeric_limits<Real>::max();
 
-                itor = mActiveActors.begin();
-                end  = mActiveActors.end();
+                PlanarReflectionActorVec::const_iterator itor = mActiveActors.begin();
+                PlanarReflectionActorVec::const_iterator end  = mActiveActors.end();
 
                 while( itor != end )
                 {
@@ -739,6 +750,7 @@ namespace Ogre
                         if( sqDistance < mMaxSqDistance && sqDistance <= bestSqDistance )
                         {
                             bestActorIdx = (*itor)->mCurrentBoundSlot;
+                            bestSqDistance = sqDistance;
                         }
                     }
 
@@ -762,17 +774,22 @@ namespace Ogre
             ++itTracked;
         }
 
-        //Now force mActiveActors & mActiveActorData to match, that means
-        //mActiveActors[idx]->getCurrentBoundSlot() == idx.
+        //Now force mActiveActors & mActiveActorData to match, that means:
+        //  mActiveActors[idx]->getCurrentBoundSlot() == idx.
 
         //mActiveActors may not be sorted due to reserved slots (i.e. mActiveActors[5]
         //may have had the reservation on mActiveActorData[0]
         std::sort( mActiveActors.begin(), mActiveActors.end(),
                    OrderPlanarReflectionActorsByBindingSlot );
 
-        //Now fill in the gaps. Due to the reservation system, it's possible we have 0, 1, 3, 4
+        //Now fill in the gaps. Due to the reservation system, it's possible we have
+        //  0, 1, 3, 4
         //because slot 2 is reserved and actor was not activated. If this is the case, fill
-        //in a dummy.
+        //in a dummy (note that dummies will have dummy->mCurrentBoundSlot = 0xFF because
+        //we only reuse the same dummy pointer for all missing slots). Afterwards it will read:
+        //  0, 1, 255(dummy), 3, 4
+        //which for all purposes we need, it's the same as:
+        //  0, 1, 2, 3, 4
         size_t lastIdx = std::numeric_limits<size_t>::max();
         PlanarReflectionActorVec::iterator itActor = mActiveActors.begin();
         PlanarReflectionActorVec::iterator enActor = mActiveActors.end();
