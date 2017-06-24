@@ -100,9 +100,29 @@ namespace Ogre {
             ResourceGroupMap::value_type(name, grp));
     }
     //-----------------------------------------------------------------------
+    class ScopedCLocale
+    {
+        char mSavedLocale[64];
+    public:
+        ScopedCLocale()
+        {
+            const char *currentLocale = setlocale( LC_NUMERIC, 0 );
+            strncpy( mSavedLocale, currentLocale, 64u );
+            setlocale( LC_NUMERIC, "C" );
+        }
+        ~ScopedCLocale()
+        {
+            //Restore
+            setlocale( LC_NUMERIC, mSavedLocale );
+        }
+    };
+    //-----------------------------------------------------------------------
     void ResourceGroupManager::initialiseResourceGroup(const String& name)
     {
             OGRE_LOCK_AUTO_MUTEX;
+
+        ScopedCLocale scopedCLocale;
+
         LogManager::getSingleton().logMessage("Initialising resource group " + name);
         ResourceGroup* grp = getResourceGroup(name);
         if (!grp)
@@ -132,6 +152,8 @@ namespace Ogre {
     void ResourceGroupManager::initialiseAllResourceGroups(void)
     {
             OGRE_LOCK_AUTO_MUTEX;
+
+        ScopedCLocale scopedCLocale;
 
         // Intialise all declared resource groups
         ResourceGroupMap::iterator i, iend;

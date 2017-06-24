@@ -40,6 +40,14 @@ namespace Ogre
     *  @{
     */
 
+    struct ActiveActorData
+    {
+        Camera              *reflectionCamera;
+        CompositorWorkspace *workspace;
+        TexturePtr          reflectionTexture;
+        bool                isReserved;
+    };
+
     typedef FastArray<Renderable*> RenderableArray;
     /** Planar Reflections can be used with both Unlit and PBS, but they're setup
         differently. Unlit is very fast, but also very basic. It's mostly useful for
@@ -99,6 +107,8 @@ namespace Ogre
     protected:
         typedef FastArray<TrackedRenderable> TrackedRenderableArray;
 
+        typedef vector<ActiveActorData>::type ActiveActorDataVec;
+
         typedef vector<PlanarReflectionActor*>::type PlanarReflectionActorVec;
 
         PlanarReflectionActorVec    mActors;
@@ -111,6 +121,7 @@ namespace Ogre
         Camera                      *mLastCamera;
         //Camera                      *mLockCamera;
         PlanarReflectionActorVec    mActiveActors;
+        ActiveActorDataVec          mActiveActorData;
         TrackedRenderableArray      mTrackedRenderables;
         bool                        mUpdatingRenderablesHlms;
         bool                        mAnyPendingFlushRenderable;
@@ -121,26 +132,41 @@ namespace Ogre
         SceneManager        *mSceneManager;
         CompositorManager2  *mCompositorManager;
 
-        void pushActor( PlanarReflectionActor *actor );
+        PlanarReflectionActor   mDummyActor;
 
         void updateFlushedRenderables(void);
 
     public:
+        /**
+        @param sceneManager
+        @param compositorManager
+        @param maxActiveActors
+        @param maxDistance
+        @param lockCamera
+        */
         PlanarReflections( SceneManager *sceneManager, CompositorManager2 *compositorManager,
-                           uint8 maxActiveActors, Real maxDistance, Camera *lockCamera );
+                           Real maxDistance, Camera *lockCamera );
         ~PlanarReflections();
 
         void setMaxDistance( Real maxDistance );
 
-        /// Note HlmsPbs hardcodes the max number of actors, so changing
-        /// this value after having rendered a few frames could cause many
-        /// shaders to be recompiled.
-        void setMaxActiveActors( uint8 maxActiveActors );
-
-        /** Adds an actor plane that other objects can use as source for reflections if they're
-            close enough to it (and aligned enough to the normal).
-        @param actor
-            Actor to use, with some data prefilled (see PlanarReflectionActor constructor)
+        /** Setups how many actors can be active at the same time.
+            You may have many actors (i.e. 1000 actors), but for performance and memory
+            reasons you may only want 1-5 actors at the same time. Actors are dynamically
+            activated based on distance to camera.
+        @remarks
+            Note HlmsPbs hardcodes the max number of actors, so changing
+            this value after having rendered a few frames could cause many
+            shaders to be recompiled.
+        @param maxActiveActors
+            New max active actors. Can be lower or higher than its previous value.
+            When this value is less or equal than current value, all the next parameters
+            are ignored.
+            When this value is higher than its previous, value, the new active actors
+            will use these parameters; which don't have to necessarily match previous
+            calls.
+        @param workspaceName
+            Workspace to use for rendering.
         @param useAccurateLighting
             When true, overall scene CPU usage may be higher, but lighting information
             in the reflections will be accurate.
@@ -160,14 +186,42 @@ namespace Ogre
         @param mipmapMethodCompute
             Set to true if the workspace assigned via PlanarReflectionActor::workspaceName
             will filter the RTT with a compute filter (usually for higher quality).
-        @return
-            ID of the actor.
         */
-        PlanarReflectionActor* addActor( const PlanarReflectionActor &actor, bool useAccurateLighting,
-                                         uint32 width, uint32 height, bool withMipmaps,
-                                         PixelFormat pixelFormat, bool mipmapMethodCompute );
+        void setMaxActiveActors( uint8 maxActiveActors, IdString workspaceName, bool useAccurateLighting,
+                                 uint32 width, uint32 height, bool withMipmaps, PixelFormat pixelFormat,
+                                 bool mipmapMethodCompute );
+
+        /** Adds an actor plane that other objects can use as source for reflections if they're
+            close enough to it (and aligned enough to the normal).
+        @param actor
+            Actor to use, with some data prefilled (see
+            PlanarReflectionActor::PlanarReflectionActor constructor)
+        @return
+            Pointer to the created actor for further manipulation.
+        */
+        PlanarReflectionActor* addActor( const PlanarReflectionActor &actor );
         void destroyActor( PlanarReflectionActor *actor );
         void destroyAllActors(void);
+
+        /** Reserves a particular slot (i.e. texture) to be used only with a specifc actor.
+            A slot can only be reserved by one actor at a time.
+            If this actor doesn't activate (i.e. it's culled by the camera), the slot won't
+            be used and thus the contents of the texture will remain unchanged.
+        @remarks
+            Reservation is useful to have a texture be linked always with the same actor,
+            which can be used to avoid updating it while still showing a (partially wrong)
+            reflection (as a performance improvement) or for using actors with HlmsUnlit,
+            which can only bind reflection textures with materials; rather than binding
+            actors with materials.
+        @param activeActorSlot
+            Slot to reserve. Must be in range [0; mMaxActiveActors)
+        @param actor
+            Actor to link this reservation with.
+        */
+        void reserve( uint8 activeActorSlot, PlanarReflectionActor *actor );
+        /// Releases a reservation made with reserve().
+        /// This is done automatically if you call destroyActor
+        void releaseReservation( PlanarReflectionActor *actor );
 
         /** Once you add a Renderable, we will automatically update its PBS material to use
             reflection if it's close to any active actor. If no active actor is close, we'll

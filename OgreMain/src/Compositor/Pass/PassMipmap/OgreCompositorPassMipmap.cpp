@@ -449,9 +449,12 @@ namespace Ogre
                             }
                             else
                             {
+                                //The RTT will be first used as a texture, then
+                                //as an UAV, then as texture again, then UAV, etc.
+                                //So we need to set to Texture first.
                                 addResourceTransition( currentLayout,
-                                                       ResourceLayout::Uav,
-                                                       ReadBarrier::Uav );
+                                                       ResourceLayout::Texture,
+                                                       ReadBarrier::Texture );
                             }
                         }
                     }

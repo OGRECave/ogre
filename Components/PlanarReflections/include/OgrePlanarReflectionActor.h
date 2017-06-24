@@ -43,6 +43,8 @@ namespace Ogre
     *  @{
     */
 
+    struct ActiveActorData;
+
     /** Actors are defined by a plane and a rectangle that limits that plane.
         Planes are normally infinite, but Actors limit them to a rectangle.
         In 3D, this means a plane has 4 additional planes to limit them
@@ -74,11 +76,28 @@ namespace Ogre
         Vector3     mCenter;
         Vector2     mHalfSize;
         Quaternion  mOrientation;
-        Camera      *mReflectionCamera;
-        IdString    mWorkspaceName;
-        CompositorWorkspace *mWorkspace;
-        TexturePtr  mReflectionTexture;
 
+        bool        mHasReservation;
+        uint8       mCurrentBoundSlot;
+        /** Ogre tries to activate visible planar reflections, sorting those
+            that are closest to the camera, as long as they have equal priority.
+            However distance to camera may not be convenient in all cases (such as when you
+            have four small mirrors close and one huge mirror a bit further away).
+            For such cases, you can use priority to allow a particular actor "to win" against
+            others. It's also very possible you want to only set priority to 0 for actors
+            that have reserved slots.
+        @par
+            There is no particular overhead/performance cost associated with this call.
+        @remarks
+            If the actor fails frustum culling, it won't be activated even if priority == 0.
+            This shouldn't matter.
+        @par
+            Value is in range [0; 255]. Default value is 127.
+            A priority of 0 means always activate first.
+            A priority of 255 means activate last.
+        */
+        public: uint8   mActivationPriority;
+    protected:
         uint8           mIndex;
         ArrayActorPlane *mActorPlane;
 
@@ -87,18 +106,16 @@ namespace Ogre
     public:
         PlanarReflectionActor() :
             mCenter( Vector3::ZERO ), mHalfSize( Vector2::UNIT_SCALE ),
-            mOrientation( Quaternion::IDENTITY ),
-            mReflectionCamera( 0 ), mWorkspace( 0 ),
-            mIndex( 0 ), mActorPlane( 0 )
+            mOrientation( Quaternion::IDENTITY ), mHasReservation( false ),
+            mCurrentBoundSlot( 0xFF ), mActivationPriority( 127 ), mIndex( 0 ), mActorPlane( 0 )
         {
         }
 
         PlanarReflectionActor( const Vector3 &center, const Vector2 &halfSize,
-                               const Quaternion orientation, IdString workspaceName ) :
+                               const Quaternion orientation ) :
             mPlane( orientation.zAxis(), center ), mCenter( center ),
-            mHalfSize( halfSize ), mOrientation( orientation ),
-            mReflectionCamera( 0 ), mWorkspaceName( workspaceName ), mWorkspace( 0 ),
-            mIndex( 0 ), mActorPlane( 0 )
+            mHalfSize( halfSize ), mOrientation( orientation ), mHasReservation( false ),
+            mCurrentBoundSlot( 0xFF ), mActivationPriority( 127 ), mIndex( 0 ), mActorPlane( 0 )
         {
         }
 
@@ -118,7 +135,10 @@ namespace Ogre
         const Quaternion& getOrientation(void) const;
         const Vector3& getNormal(void) const;
         const Plane& getPlane(void) const;
-        TexturePtr getReflectionTexture(void) const;
+        /// See PlanarReflections::reserve
+        bool hasReservation(void) const;
+        /// This value may have some meaning even if there is no reservation.
+        uint8 getCurrentBoundSlot(void) const;
 
         Real getSquaredDistanceTo( const Vector3 &pos ) const;
     };

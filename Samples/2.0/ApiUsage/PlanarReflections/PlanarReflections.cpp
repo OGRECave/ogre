@@ -34,6 +34,32 @@ namespace Demo
             return mWorkspace;
         }
 
+        virtual void setupResources(void)
+        {
+            GraphicsSystem::setupResources();
+
+            Ogre::ConfigFile cf;
+            cf.load(mResourcePath + "resources2.cfg");
+
+            Ogre::String originalDataFolder = cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+
+            if( originalDataFolder.empty() )
+                originalDataFolder = "./";
+            else if( *(originalDataFolder.end() - 1) != '/' )
+                originalDataFolder += "/";
+
+            const char *c_locations[1] =
+            {
+                "2.0/scripts/materials/PlanarReflections"
+            };
+
+            for( size_t i=0; i<1; ++i )
+            {
+                Ogre::String dataFolder = originalDataFolder + c_locations[i];
+                addResourceLocation( dataFolder, "FileSystem", "General" );
+            }
+        }
+
     public:
         PlanarReflectionsGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
@@ -65,7 +91,8 @@ namespace Demo
         "stop updating those actors, improving performance.\n"
         "\n"
         "This sample depends on the media files:\n"
-        "   * Samples/Media/2.0/scripts/Compositors/PlanarReflections.compositor" );
+        "   * Samples/Media/2.0/scripts/Compositors/PlanarReflections.compositor\n"
+        "   * Samples/Media/2.0/scripts/materials/PlanarReflections/*.*\n" );
 
         GraphicsSystem *graphicsSystem = new PlanarReflectionsGraphicsSystem( gfxGameState );
 

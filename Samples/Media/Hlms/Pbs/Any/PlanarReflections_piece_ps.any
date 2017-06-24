@@ -23,10 +23,10 @@
 
 @piece( DoPlanarReflectionsPS )
 	@property( syntax == glsl )
-		uint planarReflectionIdx = floatBitsToUint( instance.worldMaterialIdx[inPs.drawId].w );
+		uint planarReflectionIdx = instance.worldMaterialIdx[inPs.drawId].w;
 	@end
 	@property( syntax == hlsl )
-		uint planarReflectionIdx = asuint( worldMaterialIdx[inPs.drawId].w );
+		uint planarReflectionIdx = worldMaterialIdx[inPs.drawId].w;
 	@end
 	@property( syntax == metal )
 		ushort planarReflectionIdx = inPs.planarReflectionIdx;
@@ -51,6 +51,11 @@
 	fadeOnBorder *= 1.0 - saturate( (boundary.y - 0.975) * 40 );
 	fadeOnBorder = smoothstep( 0.0, 1.0, fadeOnBorder );
 	planarWeight *= lerp( fadeOnBorder, 1.0, 1.0 - min( abs(distanceToPlanarReflPlane) * 1000.0, 1.0 ) );
+	//Fade out across a 20° tolerance between surface normal and reflection plane.
+	//	(x - cos20) / (1-cos20);
+	//	x/(1-cos20) - cos20/(1-cos20);
+	//	x * 16.581718739 - 15.581718739;
+	planarWeight *= saturate( dot( planarReflection.xyz, nNormal.xyz ) * 16.581718739 - 15.581718739 );
 	@property( hlms_use_ssr || ((envprobe_map && envprobe_map != target_envprobe_map) || parallax_correct_cubemaps) )
 		envColourS = lerp( envColourS, planarReflectionS, planarWeight );
 	@end @property( !hlms_use_ssr && !((envprobe_map && envprobe_map != target_envprobe_map) || parallax_correct_cubemaps) )
