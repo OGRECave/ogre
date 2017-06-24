@@ -13,6 +13,8 @@ namespace Ogre
 
 namespace Demo
 {
+    class PlanarReflectionsWorkspaceListener;
+
     class PlanarReflectionsGameState : public TutorialGameState
     {
         Ogre::SceneNode     *mSceneNode[16];
@@ -21,7 +23,8 @@ namespace Demo
 
         bool                mAnimateObjects;
 
-        Ogre::PlanarReflections *mPlanarReflections;
+        Ogre::PlanarReflections             *mPlanarReflections;
+        PlanarReflectionsWorkspaceListener  *mWorkspaceListener;
 
         void createReflectiveSurfaces(void);
 
@@ -31,6 +34,7 @@ namespace Demo
         PlanarReflectionsGameState( const Ogre::String &helpDescription );
 
         virtual void createScene01(void);
+        virtual void destroyScene(void);
 
         virtual void update( float timeSinceLast );
 

@@ -123,6 +123,10 @@ namespace Ogre
             --mNumPassesLeft;
         }
 
+        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+        if( listener )
+            listener->passEarlyPreExecute( this );
+
         Camera const *usedLodCamera = mLodCamera;
         if( lodCamera && mCamera == mLodCamera )
             usedLodCamera = lodCamera;
@@ -167,9 +171,8 @@ namespace Ogre
         mViewport->_setVisibilityMask( mDefinition->mVisibilityMask, mDefinition->mLightVisibilityMask );
 
         //Fire the listener in case it wants to change anything
-        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
-            listener->passPreExecute( this );        
+            listener->passPreExecute( this );
 
         if( mUpdateShadowNode && shadowNode )
         {

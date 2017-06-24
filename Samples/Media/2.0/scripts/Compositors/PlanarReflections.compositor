@@ -13,6 +13,9 @@ compositor_node PlanarReflectionsStandardRenderingNode
 		{
 			overlays		on
 			shadows			PlanarReflectionsShadowNode
+
+			//Used by C++ to identify this pass wants planar reflections
+			identifier	25001
 		}
 	}
 }

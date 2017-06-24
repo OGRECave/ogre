@@ -394,15 +394,6 @@ namespace Ogre
         mLastAspectRatio = 0;
 
         mActiveActors.clear();
-
-        ActiveActorDataVec::iterator itor = mActiveActorData.begin();
-        ActiveActorDataVec::iterator end  = mActiveActorData.end();
-
-        while( itor != end )
-        {
-            itor->workspace->setEnabled( false );
-            ++itor;
-        }
     }
     //-----------------------------------------------------------------------------------
     struct OrderPlanarReflectionActorsByDistanceToPoint
@@ -718,10 +709,7 @@ namespace Ogre
         {
             if( itTracked->movableObject->getVisible() )
             {
-                //const Matrix4 &fullTransform = itTracked->movableObject->_getParentNodeFullTransform();
-                //TODO
-                const Matrix4 &fullTransform = itTracked->movableObject->
-                        getParentNode()->_getFullTransformUpdated();
+                const Matrix4 &fullTransform = itTracked->movableObject->_getParentNodeFullTransform();
                 Matrix3 rotMat3x3;
                 fullTransform.extract3x3Matrix( rotMat3x3 );
                 Vector3 reflNormal = rotMat3x3 * itTracked->reflNormal;
@@ -809,6 +797,23 @@ namespace Ogre
 
             ++lastIdx;
             ++itActor;
+        }
+
+        {
+            ActiveActorDataVec::const_iterator itor = mActiveActorData.begin();
+            ActiveActorDataVec::const_iterator end  = mActiveActorData.end();
+
+            while( itor != end )
+            {
+                const ActiveActorData &actorData = *itor;
+                if( actorData.workspace->getEnabled() )
+                {
+                    actorData.workspace->_update();
+                    actorData.workspace->setEnabled( false );
+                }
+
+                ++itor;
+            }
         }
     }
     //-----------------------------------------------------------------------------------

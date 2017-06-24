@@ -68,12 +68,16 @@ namespace Ogre
             --mNumPassesLeft;
         }
 
-        //Fire the listener in case it wants to change anything
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+        if( listener )
+            listener->passEarlyPreExecute( this );
+
+        executeResourceTransitions();
+
+        //Fire the listener in case it wants to change anything
         if( listener )
             listener->passPreExecute( this );
 
-        executeResourceTransitions();        
         mRenderSystem->setStencilBufferParams( mDefinition->mStencilRef, mDefinition->mStencilParams );
 
         if( listener )

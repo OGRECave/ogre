@@ -60,12 +60,15 @@ namespace Ogre
             --mNumPassesLeft;
         }
 
+        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+        if( listener )
+            listener->passEarlyPreExecute( this );
+
         executeResourceTransitions();
 
         mSceneManager->_setViewport( mViewport );
 
         //Fire the listener in case it wants to change anything
-        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
             listener->passPreExecute( this );
 

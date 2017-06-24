@@ -28,6 +28,8 @@
 #include "OgreOverlay.h"
 
 #include "Compositor/OgreCompositorManager2.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
 #include "OgreHlmsCompute.h"
@@ -40,6 +42,45 @@ using namespace Demo;
 
 namespace Demo
 {
+    class PlanarReflectionsWorkspaceListener : public Ogre::CompositorWorkspaceListener
+    {
+        Ogre::PlanarReflections *mPlanarReflections;
+
+    public:
+        PlanarReflectionsWorkspaceListener( Ogre::PlanarReflections *planarReflections ) :
+            mPlanarReflections( planarReflections ) {}
+        virtual ~PlanarReflectionsWorkspaceListener() {}
+
+        virtual void workspacePreUpdate( Ogre::CompositorWorkspace *workspace )
+        {
+            mPlanarReflections->beginFrame();
+        }
+
+        virtual void passEarlyPreExecute( Ogre::CompositorPass *pass )
+        {
+            //Ignore non-scene passes
+            if( pass->getType() != Ogre::PASS_SCENE )
+                return;
+            assert( dynamic_cast<const Ogre::CompositorPassSceneDef*>( pass->getDefinition() ) );
+            const Ogre::CompositorPassSceneDef *passDef =
+                    static_cast<const Ogre::CompositorPassSceneDef*>( pass->getDefinition() );
+
+            //Ignore scene passes that belong to a shadow node.
+            if( passDef->mShadowNodeRecalculation == Ogre::SHADOW_NODE_CASTER_PASS )
+                return;
+
+            //Ignore scene passes we haven't specifically tagged to receive reflections
+            if( passDef->mIdentifier != 25001 )
+                return;
+
+            Ogre::CompositorPassScene *passScene = static_cast<Ogre::CompositorPassScene*>( pass );
+            Ogre::Camera *camera = passScene->getCamera();
+
+            //Note: The Aspect Ratio must match that of the camera we're reflecting.
+            mPlanarReflections->update( camera, camera->getAspectRatio() );
+        }
+    };
+
     PlanarReflectionsGameState::PlanarReflectionsGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mAnimateObjects( true )
@@ -61,6 +102,12 @@ namespace Demo
         //Setup PlanarReflections
         mPlanarReflections = new Ogre::PlanarReflections( sceneManager, root->getCompositorManager2(),
                                                           1.0, 0 );
+        mWorkspaceListener = new PlanarReflectionsWorkspaceListener( mPlanarReflections );
+        {
+            Ogre::CompositorWorkspace *workspace = mGraphicsSystem->getCompositorWorkspace();
+            workspace->setListener( mWorkspaceListener );
+        }
+
         //The perfect mirror doesn't need mipmaps.
         mPlanarReflections->setMaxActiveActors( 1u, "PlanarReflectionsReflectiveWorkspace",
                                                 true, 512, 512, false,
@@ -249,6 +296,16 @@ namespace Demo
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
+    void PlanarReflectionsGameState::destroyScene(void)
+    {
+        Ogre::CompositorWorkspace *workspace = mGraphicsSystem->getCompositorWorkspace();
+        workspace->setListener( (Ogre::CompositorWorkspaceListener*)0 );
+        delete mWorkspaceListener;
+        mWorkspaceListener = 0;
+        delete mPlanarReflections;
+        mPlanarReflections = 0;
+    }
+    //-----------------------------------------------------------------------------------
     void PlanarReflectionsGameState::update( float timeSinceLast )
     {
         if( mAnimateObjects )
@@ -258,14 +315,6 @@ namespace Demo
         }
 
         TutorialGameState::update( timeSinceLast );
-
-        mPlanarReflections->beginFrame();
-        //Note: If the camera was used in multiple RTTs with different Aspect Ratios,
-        //getCamera()->getAspectRatio() may be wrong (causing reflections to not match
-        //perfectly and slide). If that's the case, you need to specify the actual
-        //Aspect Ratio (width / height) of the main RenderTarget you're rendering to.
-        mPlanarReflections->update( mGraphicsSystem->getCamera(),
-                                    mGraphicsSystem->getCamera()->getAspectRatio() );
     }
     //-----------------------------------------------------------------------------------
     void PlanarReflectionsGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )

@@ -50,6 +50,11 @@ namespace Ogre
             @CompositorWorkspace::_beginUpdate( forceBeginFrame=true )
         */
         virtual void workspacePreUpdate( CompositorWorkspace *workspace ) {}
+        /** Called early on in pass' execution. Happens before passPreExecute,
+            before the pass has set anything.
+            Warning: calling pass->execute can result in recursive calls.
+        */
+        virtual void passEarlyPreExecute( CompositorPass *pass ) {}
         /** Called when each pass is about to be executed.
             Warning: calling pass->execute can result in recursive calls.
         */

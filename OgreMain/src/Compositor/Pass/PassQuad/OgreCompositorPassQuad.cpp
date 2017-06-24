@@ -151,6 +151,10 @@ namespace Ogre
             --mNumPassesLeft;
         }
 
+        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+        if( listener )
+            listener->passEarlyPreExecute( this );
+
         //Call beginUpdate if we're the first to use this RT
         if( mDefinition->mBeginRtUpdate )
             mTarget->_beginUpdate();
@@ -257,7 +261,6 @@ namespace Ogre
         sceneManager->_setViewport( mViewport );
 
         //Fire the listener in case it wants to change anything
-        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
             listener->passPreExecute( this );
 
