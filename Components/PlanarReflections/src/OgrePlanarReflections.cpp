@@ -394,6 +394,15 @@ namespace Ogre
         mLastAspectRatio = 0;
 
         mActiveActors.clear();
+
+        ActiveActorDataVec::iterator itor = mActiveActorData.begin();
+        ActiveActorDataVec::iterator end  = mActiveActorData.end();
+
+        while( itor != end )
+        {
+            itor->workspace->setEnabled( false );
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     struct OrderPlanarReflectionActorsByDistanceToPoint
@@ -634,17 +643,6 @@ namespace Ogre
                    OrderPlanarReflectionActorsByDistanceToPoint( camPos ) );
 
         mActiveActors.resize( std::min<size_t>( mActiveActors.size(), mMaxActiveActors ) );
-
-        {
-            ActiveActorDataVec::iterator itor = mActiveActorData.begin();
-            ActiveActorDataVec::iterator end  = mActiveActorData.end();
-
-            while( itor != end )
-            {
-                itor->workspace->setEnabled( false );
-                ++itor;
-            }
-        }
 
         const Quaternion camRot( camera->getDerivedOrientation() );
         Real nearPlane = camera->getNearClipDistance();
