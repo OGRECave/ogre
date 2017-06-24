@@ -160,13 +160,17 @@ namespace Ogre
 
                 int usage = TU_RENDERTARGET;
                 usage |= (withMipmaps && mipmapMethodCompute) ? TU_UAV : TU_AUTOMIPMAP;
-                const uint32 numMips = withMipmaps ? 0 : PixelUtil::getMaxMipmapCount( width, height, 1u );
+                uint32 numMips = !withMipmaps ? 0 : PixelUtil::getMaxMipmapCount( width, height, 1u );
+                numMips = numMips - std::min( 4u, numMips ); //Mips below 16x16 are problematic.
+
+                //Always use HW Gamma, except when using compute mipmaps, which has issues.
+                const bool hwGamma = !(withMipmaps && mipmapMethodCompute);
 
                 actorData.reflectionTexture =
                         TextureManager::getSingleton().createManual(
                             "PlanarReflections #" + StringConverter::toString( uniqueId ),
                             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                            TEX_TYPE_2D, width, height, numMips, pixelFormat, usage, 0, true );
+                            TEX_TYPE_2D, width, height, numMips, pixelFormat, usage, 0, hwGamma );
 
                 CompositorChannel channel;
                 channel.textures.push_back( actorData.reflectionTexture );

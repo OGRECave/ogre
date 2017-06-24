@@ -34,6 +34,11 @@ compositor_node PlanarReflectionsReflectiveRenderingNode
 			visibility_mask 0xfffffffe
 			shadows			PlanarReflectionsShadowNode
 		}
+
+		pass generate_mipmaps
+		{
+			mipmap_method compute_hq
+		}
 	}
 }
 

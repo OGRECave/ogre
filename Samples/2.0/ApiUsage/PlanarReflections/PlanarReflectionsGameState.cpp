@@ -52,12 +52,23 @@ namespace Demo
         Ogre::Root *root = mGraphicsSystem->getRoot();
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
+        bool useComputeMipmaps = false;
+#if !OGRE_NO_JSON
+        useComputeMipmaps =
+                root->getRenderSystem()->getCapabilities()->hasCapability( Ogre::RSC_COMPUTE_PROGRAM );
+#endif
+
         //Setup PlanarReflections
         mPlanarReflections = new Ogre::PlanarReflections( sceneManager, root->getCompositorManager2(),
                                                           1.0, 0 );
+        //The perfect mirror doesn't need mipmaps.
+        mPlanarReflections->setMaxActiveActors( 1u, "PlanarReflectionsReflectiveWorkspace",
+                                                true, 512, 512, false,
+                                                Ogre::PF_R8G8B8A8, useComputeMipmaps );
+        //The rest of the reflections do.
         mPlanarReflections->setMaxActiveActors( 2u, "PlanarReflectionsReflectiveWorkspace",
                                                 true, 512, 512, true,
-                                                Ogre::PF_R8G8B8A8, false );
+                                                Ogre::PF_R8G8B8A8, useComputeMipmaps );
         const Ogre::Vector2 mirrorSize( 10.0f, 10.0f );
 
         //Create the plane mesh
@@ -68,7 +79,7 @@ namespace Demo
                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                     Ogre::Plane( Ogre::Vector3::UNIT_Z, 0.0f ),
                     mirrorSize.x, mirrorSize.y,
-                    1, 1, true, 1, 4.0f, 4.0f, Ogre::Vector3::NEGATIVE_UNIT_Y,
+                    1, 1, true, 1, 1.0f, 1.0f, Ogre::Vector3::UNIT_Y,
                     Ogre::v1::HardwareBuffer::HBU_STATIC,
                     Ogre::v1::HardwareBuffer::HBU_STATIC );
         Ogre::MeshPtr planeMesh = Ogre::MeshManager::getSingleton().createManual(
@@ -119,6 +130,7 @@ namespace Demo
         pbs->setPlanarReflections( mPlanarReflections );
 
         item = sceneManager->createItem( planeMesh, Ogre::SCENE_DYNAMIC );
+        item->setDatablock( "GlassRoughness" );
         sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
                 createChildSceneNode( Ogre::SCENE_DYNAMIC );
         sceneNode->setPosition( -5, 2.5f, 0 );

@@ -313,6 +313,10 @@ namespace Ogre
                 samplerblock.mMipFilter     = FO_LINEAR;
                 samplerblock.mCompareFunction   = NUM_COMPARE_FUNCTIONS;
 
+                samplerblock.mU             = TAM_CLAMP;
+                samplerblock.mV             = TAM_CLAMP;
+                samplerblock.mW             = TAM_CLAMP;
+
                 mPlanarReflectionsSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
             }
 #endif
@@ -935,8 +939,9 @@ namespace Ogre
 
         const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();
         setProperty( PbsProperty::HwGammaRead, capabilities->hasCapability( RSC_HW_GAMMA ) );
-        setProperty( PbsProperty::HwGammaWrite, capabilities->hasCapability( RSC_HW_GAMMA ) &&
-                                                        renderTarget->isHardwareGammaEnabled() );
+//        setProperty( PbsProperty::HwGammaWrite, capabilities->hasCapability( RSC_HW_GAMMA ) &&
+//                                                        renderTarget->isHardwareGammaEnabled() );
+        setProperty( PbsProperty::HwGammaWrite, 1 );
         setProperty( PbsProperty::SignedIntTex, capabilities->hasCapability(
                                                             RSC_TEXTURE_SIGNED_INT ) );
         retVal.setProperties = mSetProperties;

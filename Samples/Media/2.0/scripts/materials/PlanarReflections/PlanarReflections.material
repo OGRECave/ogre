@@ -1,0 +1,7 @@
+hlms GlassRoughness pbs
+{
+	roughness	1
+	//fresnel		1.33
+
+	roughness_map	GlassRoughness.png
+}
