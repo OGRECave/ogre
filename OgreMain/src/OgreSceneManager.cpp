@@ -1198,6 +1198,9 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
                               mIlluminationStage == IRS_RENDER_TO_TEXTURE, false );
     }
 
+    //Restore vertex winding
+    mDestRenderSystem->setInvertVertexWinding(false);
+
     // Notify camera of vis faces
     camera->_notifyRenderedFaces(mDestRenderSystem->_getFaceCount());
 

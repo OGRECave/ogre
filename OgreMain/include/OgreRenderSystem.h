@@ -1181,7 +1181,7 @@ namespace Ogre
 
         /** Sets whether or not vertex windings set should be inverted; this can be important
         for rendering reflections. */
-        virtual void setInvertVertexWinding(bool invert);
+        void setInvertVertexWinding(bool invert);
 
         /** Indicates whether or not the vertex windings set will be inverted for the current render (e.g. reflections)
         @see RenderSystem::setInvertVertexWinding
