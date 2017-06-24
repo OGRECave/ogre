@@ -503,14 +503,25 @@ namespace Ogre {
             has occurred (e.g. a group per game level), you must remember to call this
             method for the groups you create after this.
 
-        @param name The name of the resource group to initialise
+        @param name
+            The name of the resource group to initialise
+        @param changeLocaleTemporarily
+            Ogre regrettably relies on locale conversion for parsing scripts, which means
+            a script with value "1.76" will be read as "1" in some systems because the
+            locale is configured to expect "1,76" instead.
+            When you pass true to this function, we will temporarily change the locale
+            to "C" and then restore it back when we're done.
+            However this is not ideal as it may affect your program if you have
+            other threads; or it could affect your code if a listener is triggered
+            and you expect a particular locale; therefore the final decision of changing
+            the locale is left to you.
         */
-        void initialiseResourceGroup(const String& name);
+        void initialiseResourceGroup( const String& name, bool changeLocaleTemporarily );
 
         /** Initialise all resource groups which are yet to be initialised.
         @see ResourceGroupManager::intialiseResourceGroup
         */
-        void initialiseAllResourceGroups(void);
+        void initialiseAllResourceGroups( bool changeLocaleTemporarily );
 
         /** Prepares a resource group.
         @remarks

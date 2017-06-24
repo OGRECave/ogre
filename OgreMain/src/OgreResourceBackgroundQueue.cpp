@@ -85,7 +85,7 @@ namespace Ogre {
         return addRequest(req);
 #else
         // synchronous
-        ResourceGroupManager::getSingleton().initialiseResourceGroup(name);
+        ResourceGroupManager::getSingleton().initialiseResourceGroup(name, false);
         return 0; 
 #endif
     }
@@ -102,7 +102,7 @@ namespace Ogre {
         return addRequest(req);
 #else
         // synchronous
-        ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+        ResourceGroupManager::getSingleton().initialiseAllResourceGroups( false );
         return 0; 
 #endif
     }
@@ -318,10 +318,10 @@ namespace Ogre {
             {
             case RT_INITIALISE_GROUP:
                 ResourceGroupManager::getSingleton().initialiseResourceGroup(
-                    resreq.groupName);
+                    resreq.groupName, false);
                 break;
             case RT_INITIALISE_ALL_GROUPS:
-                ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+                ResourceGroupManager::getSingleton().initialiseAllResourceGroups( false );
                 break;
             case RT_PREPARE_GROUP:
                 ResourceGroupManager::getSingleton().prepareResourceGroup(

@@ -103,25 +103,35 @@ namespace Ogre {
     class ScopedCLocale
     {
         char mSavedLocale[64];
+        bool mChangeLocaleTemporarily;
     public:
-        ScopedCLocale()
+        ScopedCLocale( bool changeLocaleTemporarily ) :
+            mChangeLocaleTemporarily( changeLocaleTemporarily )
         {
-            const char *currentLocale = setlocale( LC_NUMERIC, 0 );
-            strncpy( mSavedLocale, currentLocale, 64u );
-            setlocale( LC_NUMERIC, "C" );
+            if( mChangeLocaleTemporarily )
+            {
+                const char *currentLocale = setlocale( LC_NUMERIC, 0 );
+                strncpy( mSavedLocale, currentLocale, 64u );
+                mSavedLocale[63] = '\0';
+                setlocale( LC_NUMERIC, "C" );
+            }
         }
         ~ScopedCLocale()
         {
-            //Restore
-            setlocale( LC_NUMERIC, mSavedLocale );
+            if( mChangeLocaleTemporarily )
+            {
+                //Restore
+                setlocale( LC_NUMERIC, mSavedLocale );
+            }
         }
     };
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::initialiseResourceGroup(const String& name)
+    void ResourceGroupManager::initialiseResourceGroup( const String& name,
+                                                        bool changeLocaleTemporarily )
     {
             OGRE_LOCK_AUTO_MUTEX;
 
-        ScopedCLocale scopedCLocale;
+        ScopedCLocale scopedCLocale( changeLocaleTemporarily );
 
         LogManager::getSingleton().logMessage("Initialising resource group " + name);
         ResourceGroup* grp = getResourceGroup(name);
@@ -149,11 +159,11 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::initialiseAllResourceGroups(void)
+    void ResourceGroupManager::initialiseAllResourceGroups( bool changeLocaleTemporarily )
     {
             OGRE_LOCK_AUTO_MUTEX;
 
-        ScopedCLocale scopedCLocale;
+        ScopedCLocale scopedCLocale( changeLocaleTemporarily );
 
         // Intialise all declared resource groups
         ResourceGroupMap::iterator i, iend;
