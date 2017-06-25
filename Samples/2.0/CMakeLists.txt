@@ -6,6 +6,7 @@ include_directories(${CMAKE_SOURCE_DIR}/Components/Overlay/include)
 set( SAMPLE_COMMON_BASIC_RESOURCES "" )
 set( SAMPLE_COMMON_RESOURCES "" )
 set( SAMPLES_PLIST "" )
+set( SAMPLE_COMMON_STORYBOARD_RESOURCE "" )
 
 set (OGRE_BUILD_SAMPLES2_SKIP 0 )
 
@@ -28,9 +29,15 @@ if( OGRE_BUILD_SAMPLES2_SKIP )
 endif()
 
 if( APPLE )
+        if( OGRE_BUILD_PLATFORM_APPLE_IOS )
+            # This needs to be first in the list in order show up in the Copy Bundle Resources build phase.
+            set( SAMPLE_COMMON_STORYBOARD_RESOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/System/iOS/Resources/Main.storyboard )
+        endif()
+
 	set( SAMPLE_COMMON_BASIC_RESOURCES ${SAMPLE_COMMON_BASIC_RESOURCES}
-		 ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/System/iOS/Resources/Main.storyboard
+                 ${SAMPLE_COMMON_STORYBOARD_RESOURCE}
 		 ${CMAKE_BINARY_DIR}/bin/resources2.cfg
+                 ${CMAKE_BINARY_DIR}/bin/plugins.cfg
 		 ${CMAKE_SOURCE_DIR}/Samples/Media/2.0
 		 ${CMAKE_SOURCE_DIR}/Samples/Media/Hlms
 		 ${CMAKE_SOURCE_DIR}/Samples/Media/packs/DebugPack.zip )
@@ -39,7 +46,11 @@ if( APPLE )
 		 ${CMAKE_SOURCE_DIR}/Samples/Media/models
 		 ${CMAKE_SOURCE_DIR}/Samples/Media/materials/textures )
 
-	set( SAMPLES_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/System/iOS/Resources/Info.plist )
+        if( OGRE_BUILD_PLATFORM_APPLE_IOS )
+            set( SAMPLES_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/System/iOS/Resources/Info.plist )
+        else()
+            set( SAMPLES_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/System/OSX/Resources/Info.plist )
+        endif()
 endif()
 
 if( OGRE_BUILD_SAMPLES2 AND NOT OGRE_BUILD_SAMPLES2_SKIP )

@@ -118,7 +118,7 @@ namespace Ogre
         for( size_t i=CPU_ACCESSIBLE_DEFAULT; i<=CPU_ACCESSIBLE_PERSISTENT_COHERENT; ++i )
             mDefaultPoolSize[i] = 32 * 1024 * 1024;
 
-        mSupportsIndirectBuffers    = true;
+        mSupportsIndirectBuffers    = false; // TODO: the _render() overload is not implemented yet!
 #endif
 
         mConstBufferMaxSize = 64 * 1024;        //64kb
@@ -860,10 +860,16 @@ namespace Ogre
 
         MTLResourceOptions resourceOptions = 0;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        resourceOptions |= MTLResourceStorageModeShared;
+#else
+        resourceOptions |= MTLResourceStorageModeManaged;
+#endif
+
         if( forUpload )
-            resourceOptions = MTLResourceCPUCacheModeWriteCombined|MTLResourceStorageModeShared;
+            resourceOptions |= MTLResourceCPUCacheModeWriteCombined;
         else
-            resourceOptions = MTLResourceCPUCacheModeDefaultCache|MTLResourceStorageModeShared;
+            resourceOptions |= MTLResourceCPUCacheModeDefaultCache;
 
         id<MTLBuffer> bufferName = [mDevice->mDevice newBufferWithLength:sizeBytes
                                                                          options:resourceOptions];

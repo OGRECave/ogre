@@ -16,13 +16,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_recursive( ./ SOURCE_FILES )
 
 set( TUTORIAL_RESOURCES ${SAMPLE_COMMON_BASIC_RESOURCES} )
-if( APPLE )
+if( OGRE_BUILD_PLATFORM_APPLE_IOS )
 	set( TUTORIAL_RESOURCES ${SAMPLE_COMMON_BASIC_RESOURCES}
 		 ${CMAKE_CURRENT_SOURCE_DIR}/iOS/Tutorial.storyboard )
 	set( SOURCE_FILES ${SOURCE_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/iOS/TutorialViewController.mm )
 endif()
 
-ogre_add_executable(Sample_Tutorial02_VariableFramerate WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${TUTORIAL_RESOURCES} )
+if( OGRE_BUILD_SAMPLES_AS_BUNDLES )
+    ogre_add_executable(Sample_Tutorial02_VariableFramerate WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${TUTORIAL_RESOURCES} )
+else()
+    ogre_add_executable(Sample_Tutorial02_VariableFramerate WIN32 ${SOURCE_FILES} ${TUTORIAL_RESOURCES} )
+endif( OGRE_BUILD_SAMPLES_AS_BUNDLES )
 
 target_link_libraries(Sample_Tutorial02_VariableFramerate ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_Tutorial02_VariableFramerate)

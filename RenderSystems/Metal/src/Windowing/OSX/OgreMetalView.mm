@@ -29,6 +29,7 @@ THE SOFTWARE.
 #import "OgreMetalView.h"
 
 #import <SpriteKit/SpriteKit.h>
+#import <QuartzCore/QuartzCore.h>
 
 @implementation OgreMetalView
 {
@@ -41,21 +42,24 @@ THE SOFTWARE.
 
 - (void)initCommon
 {
-    self.opaque             = YES;
-    self.backgroundColor    = nil;
-    self.scaleToNative      = true;
-    self.nativeScaleFactor  = 1.0;
-    self.presentationTime   = -1.0;
-}
-
-- (void)didMoveToWindow
-{
-    if( self.scaleToNative )
-        [super setContentScaleFactor:self.window.screen.nativeScale * self.nativeScaleFactor];
+    self.layer = [CAMetalLayer layer];
+    self.wantsLayer = YES;
+    
     _layerSizeDidUpdate = YES;
 }
 
+- (void)viewDidMoveToWindow
+{
+    //if(self.scaleToNative)
+    //    [setContentScaleFactor:self.window.screen.backingScaleFactor * self.nativeScaleFactor];
+    _layerSizeDidUpdate = YES;
+}
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 - (id)initWithFrame:(CGRect)frame
+#else
+- (id)initWithFrame:(NSRect)frame
+#endif
 {
     self = [super initWithFrame:frame];
     
@@ -81,31 +85,26 @@ THE SOFTWARE.
 - (void)setContentScaleFactor:(CGFloat)contentScaleFactor
 {
     self.scaleToNative = false;
-    [super setContentScaleFactor:contentScaleFactor];
+    //[super setContentScaleFactor:contentScaleFactor];
     _layerSizeDidUpdate = YES;
 }
 
-- (void)layoutSubviews
+- (void)setFrameSize:(NSSize)newSize
 {
-    [super layoutSubviews];
-    
+    [super setFrameSize:newSize];
     _layerSizeDidUpdate = YES;
 }
 
-//- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-//{
-//}
+- (void)setBoundsSize:(NSSize)newSize
+{
+    [super setBoundsSize:newSize];
+    _layerSizeDidUpdate = YES;
+}
 
-//- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-//{
-//}
-
-//- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-//{
-//}
-
-//- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
-//{
-//}
+- (void)viewDidChangeBackingProperties
+{
+    [super viewDidChangeBackingProperties];
+    _layerSizeDidUpdate = YES;
+}
 
 @end

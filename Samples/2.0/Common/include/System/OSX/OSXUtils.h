@@ -1,10 +1,10 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,28 +25,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#import "OgreErrorDialog.h"
 
-#import <Cocoa/Cocoa.h>
+#ifndef OSXUTILS_H
+#define OSXUTILS_H
 
-using namespace Ogre;
+#include <SDL_syswm.h>
 
-ErrorDialog::ErrorDialog()
+namespace Demo
 {
+extern unsigned long WindowContentViewHandle(const SDL_SysWMinfo &info);
 }
 
-void ErrorDialog::display(const String& errorMessage, String logName)
-{
-#pragma unused(logName)
-    // Because Carbon is missing 64-bit support we have to use Cocoa
-    NSApplicationLoad();
-    @autoreleasepool {
-        NSAlert *alert = [[NSAlert alloc] init];
-
-        [alert setMessageText:@"An error has occurred!"];
-        [alert setAlertStyle:NSCriticalAlertStyle];
-        [alert setInformativeText:[NSString stringWithCString:errorMessage.c_str()
-                                                     encoding:NSASCIIStringEncoding]];
-        [alert runModal];
-    }
-}
+#endif //  OSXUTILS_H

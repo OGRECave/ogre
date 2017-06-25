@@ -1,3 +1,5 @@
+
+
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
@@ -42,7 +44,7 @@ namespace Ogre {
 	
 	ConfigDialog::~ConfigDialog()
 	{
-        [mWindowDelegate release]; mWindowDelegate = nil;
+        mWindowDelegate = nil;
 	}
 	
 	void ConfigDialog::initialise()
@@ -100,7 +102,6 @@ namespace Ogre {
             // Add to the drop down
             NSString *renderSystemName = [[NSString alloc] initWithCString:rs->getName().c_str() encoding:NSASCIIStringEncoding];
             [[mWindowDelegate getRenderSystemsPopUp] addItemWithTitle:renderSystemName];
-            [renderSystemName release];
             
             // Get detected option values and add them to our config dictionary
             const ConfigOptionMap& opts = rs->getConfigOptions();
@@ -115,8 +116,6 @@ namespace Ogre {
 
                         if(![fsaaOptions containsObject:optionString])
                              [fsaaOptions addObject:optionString];
-
-                        [optionString release];
                     }
                 }
                 else if(pOpt->first == "Video Mode")
@@ -128,8 +127,6 @@ namespace Ogre {
                         
                         if(![videoModeOptions containsObject:optionString])
                             [videoModeOptions addObject:optionString];
-                        
-                        [optionString release];
                     }
                 }
             }
@@ -148,16 +145,6 @@ namespace Ogre {
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		[stereoModeOptions release];
 #endif
-        [fullScreenOptions release];
-        [fsaaOptions release];
-        [colourDepthOptions release];
-        [rttOptions release];
-        [videoModeOptions release];
-        [sRGBOptions release];
-        [macAPIOptions release];
-        [contentScaleOptions release];
-        [keys release];
-        [objects release];
 
         // Reload table data
         [[mWindowDelegate getOptionsTable] reloadData];
@@ -167,32 +154,31 @@ namespace Ogre {
 	{
         // Select previously selected rendersystem
         mSelectedRenderSystem = Root::getSingleton().getRenderSystem();
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        initialise();
-
-        // Run a modal dialog, Abort means cancel, Stop means Ok
         long retVal = 0;
-        NSModalSession modalSession = [NSApp beginModalSessionForWindow:[mWindowDelegate getConfigWindow]];
-        for (;;) {
-            retVal = [NSApp runModalSession:modalSession];
+        
+        @autoreleasepool {
+            initialise();
 
-            // User pressed a button
-            if (retVal != NSRunContinuesResponse)
-                break;
+            // Run a modal dialog, Abort means cancel, Stop means Ok
+            NSModalSession modalSession = [NSApp beginModalSessionForWindow:[mWindowDelegate getConfigWindow]];
+            for (;;) {
+                retVal = [NSApp runModalSession:modalSession];
+
+                // User pressed a button
+                if (retVal != NSRunContinuesResponse)
+                    break;
+            }
+            [NSApp endModalSession:modalSession];
+
+            // Set the rendersystem
+            String selectedRenderSystemName = String([[[[mWindowDelegate getRenderSystemsPopUp] selectedItem] title]    UTF8String]);
+            RenderSystem *rs = Root::getSingleton().getRenderSystemByName(selectedRenderSystemName);
+            Root::getSingleton().setRenderSystem(rs);
+        
+            // Relinquish control of the table
+            [[mWindowDelegate getOptionsTable] setDataSource:nil];
+            [[mWindowDelegate getOptionsTable] setDelegate:nil];
         }
-        [NSApp endModalSession:modalSession];
-
-        // Set the rendersystem
-        String selectedRenderSystemName = String([[[[mWindowDelegate getRenderSystemsPopUp] selectedItem] title] UTF8String]);
-        RenderSystem *rs = Root::getSingleton().getRenderSystemByName(selectedRenderSystemName);
-        Root::getSingleton().setRenderSystem(rs);
-        
-        // Relinquish control of the table
-        [[mWindowDelegate getOptionsTable] setDataSource:nil];
-        [[mWindowDelegate getOptionsTable] setDelegate:nil];
-        
-        // Drain the auto release pool
-        [pool drain];
 
         return (retVal == NSRunStoppedResponse) ? true : false;
 	}
@@ -242,11 +228,9 @@ namespace Ogre {
         [logoPath appendString:@"/ogrelogo.png"];
 
         NSImage *image = [[NSImage alloc] initWithContentsOfFile:logoPath];
-        [logoPath release];
         [mOgreLogo setImage:image];
         [mOgreLogo setImageScaling:NSScaleToFit];
         [mOgreLogo setEditable:NO];
-        [image release];
         [[mConfigWindow contentView] addSubview:mOgreLogo];
 
         // Popup menu for rendersystems.  On OS X this is always OpenGL
@@ -261,7 +245,6 @@ namespace Ogre {
         [renderSystemLabel setAlignment:NSNaturalTextAlignment];
         [renderSystemLabel setBezeled:NO];
         [[mConfigWindow contentView] addSubview:renderSystemLabel];
-        [renderSystemLabel release];
 
         // The pretty box to contain the table and options
         NSBox *tableBox = [[NSBox alloc] initWithFrame:NSMakeRect(19, 54, 477, 203)];
@@ -283,7 +266,6 @@ namespace Ogre {
         [column setEditable:NO];
         [column setMinWidth:437];
         [mOptionsTable addTableColumn:column];
-        [column release];
 
         // Scroll view to hold the table in case the list grows some day
         NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(22, 42, 439, 135)];
@@ -293,7 +275,6 @@ namespace Ogre {
         [scrollView setDocumentView:mOptionsTable];
         
         [[tableBox contentView] addSubview:scrollView];
-        [scrollView release];
 
         mOptionLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(15, 15, 173, 17)];
         [mOptionLabel setStringValue:NSLocalizedString(@"Select an Option", @"optionLabelString")];
@@ -310,23 +291,8 @@ namespace Ogre {
         [mOptionsPopUp setTarget:self];
 
         [[mConfigWindow contentView] addSubview:tableBox];
-        [tableBox release];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [mConfigWindow release]; mConfigWindow = nil;
-    [mOptionsPopUp release]; mOptionsPopUp = nil;
-    [mOptionLabel release]; mOptionLabel = nil;
-    [mOptionsTable release]; mOptionsTable = nil;
-    [mRenderSystemsPopUp release]; mRenderSystemsPopUp = nil;
-    [mOgreLogo release]; mOgreLogo = nil;
-    [mCancelButton release]; mCancelButton = nil;
-    [mOkButton release]; mOkButton = nil;
-
-    [super dealloc];
 }
 
 #pragma mark Window and Control delegate methods

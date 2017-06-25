@@ -95,7 +95,7 @@ elseif (UNIX)
   )
   if (APPLE)
     set(OGRE_PREFIX_GUESSES 
-      ${CMAKE_CURRENT_SOURCE_DIR}/lib/macosx
+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE}
       ${OGRE_PREFIX_GUESSES}
     )
   endif ()
@@ -175,6 +175,7 @@ if(NOT OGRE_STATIC)
       /Network/Library/Frameworks
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/macosx/Release
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/macosx/Debug
+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE}
     )
 else()
 	set(OGRE_LIBRARY_FWK "")
