@@ -84,7 +84,7 @@ if (DEFINED _rendersystems)
 endif ()
 
 # summarise programs
-if (OGRE_BUILD_SAMPLES)
+if (OGRE_BUILD_SAMPLES2)
 	set(_programs "${_programs}  + Samples\n")
 endif ()
 if (OGRE_BUILD_TESTS)
