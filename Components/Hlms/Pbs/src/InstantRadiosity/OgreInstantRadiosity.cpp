@@ -237,9 +237,9 @@ namespace Ogre
                 interpUV.x = fmod( interpUV.x, texWidth );
                 interpUV.y = fmod( interpUV.y, texHeight );
                 if( interpUV.x < 0 )
-                    interpUV.x += 1.0f;
+                    interpUV.x += texWidth;
                 if( interpUV.y < 0 )
-                    interpUV.y += 1.0f;
+                    interpUV.y += texHeight;
 
                 //TODO: Do blending modes
                 ColourValue colourVal =
