@@ -27,15 +27,9 @@ file(GLOB KHR_HEADERS "include/KHR/*.h")
 
 include_directories(src/StateCacheManager)
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
-  list(APPEND SOURCE_FILES
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2UniformCacheImp.cpp
-  )
+  list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp)
 else()
-  list(APPEND SOURCE_FILES
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullUniformCacheImp.cpp
-  )
+  list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp)
 endif()
 
 if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)

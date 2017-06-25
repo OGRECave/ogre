@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -27,38 +27,15 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGL3PlusUniformCache.h"
-#include "OgreCommon.h"
+#include "OgreGLUniformCache.h"
 
 namespace Ogre {
-    
-    GL3PlusUniformCache::GL3PlusUniformCache(void)
+    void GLUniformCache::clearCache()
     {
-        clearCache();
     }
-    
-    void GL3PlusUniformCache::clearCache()
-    {
-        mUniformValueMap.clear();
-    }
-    
-    GL3PlusUniformCache::~GL3PlusUniformCache(void)
-    {
-        mUniformValueMap.clear();
-    }
-    
-    bool GL3PlusUniformCache::updateUniform(GLint location, const void *value, GLsizei length)
-    {
-        uint32 current = mUniformValueMap[location];
-        uint32 hash = Ogre::FastHash((const char *)value, length);
-        // First check if the uniform name is in the map. If not, this is new so insert it into the map.
-        if (!current || (current != hash))
-        {
-            // Haven't cached this state yet or the value has changed
-            mUniformValueMap[location] = hash;
-            return true;
-        }
 
-        return false;
+    bool GLUniformCache::updateUniform(int location, const void *value, int length)
+    {
+        return true;
     }
 }

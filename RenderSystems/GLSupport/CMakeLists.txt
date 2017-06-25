@@ -86,6 +86,13 @@ set(GLSUPPORT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/  ${CMAKE_CURRENT_
 
 include_directories(${NATIVE_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/)
 file(GLOB GLSL_SOURCES src/GLSL/*.cpp)
+
+if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
+    list(APPEND GLSL_SOURCES src/OgreGLUniformCacheImp.cpp)
+else()
+    list(APPEND GLSL_SOURCES src/OgreGLNullUniformCacheImp.cpp)
+endif()
+
 ogre_add_library_to_folder(RenderSystems OgreGLSupport STATIC 
     ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES} 
     src/OgreGLRenderSystemCommon.cpp 

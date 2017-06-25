@@ -27,24 +27,28 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLES2UniformCache.h"
+#include "OgreGLUniformCache.h"
+#include "OgreCommon.h"
 
 namespace Ogre {
-    
-    GLES2UniformCache::GLES2UniformCache(void)
+
+    void GLUniformCache::clearCache()
     {
+        mUniformValueMap.clear();
     }
 
-    void GLES2UniformCache::clearCache()
+    bool GLUniformCache::updateUniform(int location, const void *value, int length)
     {
-    }
+        uint32 current = mUniformValueMap[location];
+        uint32 hash = Ogre::FastHash((const char *)value, length);
+        // First check if the uniform name is in the map. If not, this is new so insert it into the map.
+        if (!current || (current != hash))
+        {
+            // Haven't cached this state yet or the value has changed
+            mUniformValueMap[location] = hash;
+            return true;
+        }
 
-    GLES2UniformCache::~GLES2UniformCache(void)
-    {
-    }
-
-    bool GLES2UniformCache::updateUniform(GLint location, const void *value, GLsizei length)
-    {
-        return true;
+        return false;
     }
 }

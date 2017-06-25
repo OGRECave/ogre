@@ -32,7 +32,7 @@
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareUniformBuffer.h"
-#include "OgreGLES2UniformCache.h"
+#include "OgreGLUniformCache.h"
 #include "OgreGLSLProgramCommon.h"
 #include "OgreGLSLESProgram.h"
 
@@ -41,18 +41,24 @@ namespace Ogre {
      
      */
 
-    class _OgreGLES2Export GLSLESProgramCommon : public GLSLProgramCommon
+    class _OgreGLES2Export GLSLESProgramCommon : public GLSLProgramCommon MANAGED_RESOURCE
     {
     protected:
         /// Linked fragment program
         GLSLESProgram* mFragmentProgram;
-        GLES2UniformCache *mUniformCache;
+        GLUniformCache *mUniformCache;
 
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
         static bool getMicrocodeFromCache(const String& name, GLuint programHandle);
         /// Put a program in use
         virtual void _useProgram(void) = 0;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        virtual void notifyOnContextLost();
+
+        virtual void notifyOnContextReset();
+#endif
 
         static void _writeToCache(const String& name, GLuint programHandle);
     public:
@@ -65,7 +71,7 @@ namespace Ogre {
 
         GLSLESProgram* getVertexProgram(void) const { return static_cast<GLSLESProgram*>(mVertexShader); }
         GLSLESProgram* getFragmentProgram(void) const { return mFragmentProgram; }
-        GLES2UniformCache * getUniformCache(void) { return mUniformCache; }
+        GLUniformCache * getUniformCache(void) { return mUniformCache; }
     };
 }
 
