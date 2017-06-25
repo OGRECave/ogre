@@ -441,7 +441,12 @@ namespace Demo
         Ogre::ConfigFile cf;
         cf.load( mResourcePath + "resources2.cfg" );
 
-        Ogre::String dataFolder = Ogre::macBundlePath() + '/' + cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        Ogre::String dataFolder = Ogre::macBundlePath() + '/' +
+                                  cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+#else
+        Ogre::String dataFolder = mResourcePath + cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+#endif
 
         if( dataFolder.empty() )
             dataFolder = "./";

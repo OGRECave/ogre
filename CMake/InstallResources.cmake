@@ -183,14 +183,19 @@ endif (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
 if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE))
-  set(OGRE_MEDIA_DIR_REL "Contents/Resources")
-  set(OGRE_MEDIA_DIR_DBG "Contents/Resources")
-  set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Tests/Media")
-  set(OGRE_TEST_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Tests/Media")
+	if( NOT APPLE )
+		set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/Media")
+		set(OGRE_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Samples/Media")
+	else()
+		set(OGRE_MEDIA_DIR_REL "Contents/Resources")
+		set(OGRE_MEDIA_DIR_DBG "Contents/Resources")
+	endif()
+	set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Tests/Media")
+	set(OGRE_TEST_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Tests/Media")
 else ()
-  # iOS needs to use relative paths in the config files
-  set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
-  set(OGRE_TEST_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
+	# iOS needs to use relative paths in the config files
+	set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
+	set(OGRE_TEST_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
 endif ()
 
 if( APPLE )
