@@ -75,6 +75,7 @@ namespace Ogre
 
     const IdString TerraProperty::FresnelScalar     = IdString( "fresnel_scalar" );
     const IdString TerraProperty::MetallicWorkflow  = IdString( "metallic_workflow" );
+    const IdString TerraProperty::ReceiveShadows    = IdString( "receive_shadows" );
 
     const IdString TerraProperty::DetailOffsets0   = IdString( "detail_offsets0" );
     const IdString TerraProperty::DetailOffsets1   = IdString( "detail_offsets1" );
@@ -375,6 +376,8 @@ namespace Ogre
         assert( dynamic_cast<HlmsTerraDatablock*>( renderable->getDatablock() ) );
         HlmsTerraDatablock *datablock = static_cast<HlmsTerraDatablock*>(
                                                         renderable->getDatablock() );
+
+        setProperty( TerraProperty::ReceiveShadows, 1 );
 
         uint32 brdf = datablock->getBrdf();
         if( (brdf & TerraBrdf::BRDF_MASK) == TerraBrdf::Default )
@@ -717,7 +720,7 @@ namespace Ogre
 
         passBufferPtr += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
 
-        if( shadowNode )
+        if( numShadowMapLights > 0 )
         {
             //All directional lights (caster and non-caster) are sent.
             //Then non-directional shadow-casting shadow lights are sent.
@@ -807,17 +810,6 @@ namespace Ogre
                 *passBufferPtr++ = light->getSpotlightFalloff();
                 ++passBufferPtr;
             }
-
-            mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
-
-            TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
-            TextureVec::const_iterator enShadowMap = contiguousShadowMapTex.end();
-
-            while( itShadowMap != enShadowMap )
-            {
-                mPreparedPass.shadowMaps.push_back( itShadowMap->get() );
-                ++itShadowMap;
-            }
         }
         else
         {
@@ -851,6 +843,20 @@ namespace Ogre
                 *passBufferPtr++ = colour.g;
                 *passBufferPtr++ = colour.b;
                 ++passBufferPtr;
+            }
+        }
+
+        if( shadowNode )
+        {
+            mPreparedPass.shadowMaps.reserve( contiguousShadowMapTex.size() );
+
+            TextureVec::const_iterator itShadowMap = contiguousShadowMapTex.begin();
+            TextureVec::const_iterator enShadowMap = contiguousShadowMapTex.end();
+
+            while( itShadowMap != enShadowMap )
+            {
+                mPreparedPass.shadowMaps.push_back( itShadowMap->get() );
+                ++itShadowMap;
             }
         }
 

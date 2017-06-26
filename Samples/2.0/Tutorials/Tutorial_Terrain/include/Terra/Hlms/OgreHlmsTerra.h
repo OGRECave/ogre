@@ -218,6 +218,7 @@ namespace Ogre
 
         static const IdString FresnelScalar;
         static const IdString MetallicWorkflow;
+        static const IdString ReceiveShadows;
 
         static const IdString DetailOffsets0;
         static const IdString DetailOffsets1;
