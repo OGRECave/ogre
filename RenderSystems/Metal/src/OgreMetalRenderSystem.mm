@@ -1575,6 +1575,11 @@ namespace Ogre
         CbDrawIndexed *drawCmd = reinterpret_cast<CbDrawIndexed*>(
                                     mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
 
+        if (mStencilEnabled)
+        {
+            [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
+        }
+
         const MTLIndexType indexType = static_cast<MTLIndexType>( vao->mIndexBuffer->getIndexType() );
         const MTLPrimitiveType primType =  std::min(
                     MTLPrimitiveTypeTriangleStrip,
@@ -1704,6 +1709,11 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_render( const v1::CbDrawCallIndexed *cmd )
     {
+        if (mStencilEnabled)
+        {
+            [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
+        }
+
         const MTLIndexType indexType = static_cast<MTLIndexType>(
                     mCurrentIndexBuffer->indexBuffer->getType() );
 
@@ -1768,6 +1778,11 @@ namespace Ogre
     {
         // Call super class.
         RenderSystem::_render(op);
+
+        if (mStencilEnabled)
+        {
+            [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
+        }
 
         const size_t numberOfInstances = op.numberOfInstances;
         const bool hasInstanceData = mCurrentVertexBuffer->vertexBufferBinding->getHasInstanceData();
@@ -2221,4 +2236,16 @@ namespace Ogre
         mMetalProgramFactory = new MetalProgramFactory( &mDevice );
         HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
     }
-}
+    
+    void MetalRenderSystem::setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams )
+    {
+        RenderSystem::setStencilBufferParams( refValue, stencilParams );
+        
+        // Save this info until we know what encoder to transfer it into.
+        mStencilEnabled = stencilParams.enabled;
+        if (mStencilEnabled)
+        {
+            mStencilRefValue = refValue;
+        }
+    }
+ }
