@@ -977,6 +977,11 @@ namespace Ogre
         static_cast<MetalVaoManager*>( mVaoManager )->bindDrawId();
         [mActiveRenderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
         flushUAVs();
+        
+        if (mStencilEnabled)
+        {
+            [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
@@ -1575,11 +1580,6 @@ namespace Ogre
         CbDrawIndexed *drawCmd = reinterpret_cast<CbDrawIndexed*>(
                                     mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
 
-        if (mStencilEnabled)
-        {
-            [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
-        }
-
         const MTLIndexType indexType = static_cast<MTLIndexType>( vao->mIndexBuffer->getIndexType() );
         const MTLPrimitiveType primType =  std::min(
                     MTLPrimitiveTypeTriangleStrip,
@@ -1709,11 +1709,6 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_render( const v1::CbDrawCallIndexed *cmd )
     {
-        if (mStencilEnabled)
-        {
-            [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
-        }
-
         const MTLIndexType indexType = static_cast<MTLIndexType>(
                     mCurrentIndexBuffer->indexBuffer->getType() );
 
@@ -1778,11 +1773,6 @@ namespace Ogre
     {
         // Call super class.
         RenderSystem::_render(op);
-
-        if (mStencilEnabled)
-        {
-            [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
-        }
 
         const size_t numberOfInstances = op.numberOfInstances;
         const bool hasInstanceData = mCurrentVertexBuffer->vertexBufferBinding->getHasInstanceData();
@@ -2241,11 +2231,23 @@ namespace Ogre
     {
         RenderSystem::setStencilBufferParams( refValue, stencilParams );
         
-        // Save this info until we know what encoder to transfer it into.
+        // There are two main cases:
+        // 1. The active render encoder is valid and will be subsequently used for drawing.
+        //      We need to set the stencil reference value on this encoder. We do this below.
+        // 2. The active render is invalid or is about to go away.
+        //      In this case, we need to set the stencil reference value on the new encoder when it is created
+        //      (see createRenderEncoder). (In this case, the setStencilReferenceValue below in this wasted, but it is inexpensive).
+
+        // Save this info so we can transfer it into a new encoder if necessary
         mStencilEnabled = stencilParams.enabled;
         if (mStencilEnabled)
         {
             mStencilRefValue = refValue;
+
+            if( !mActiveRenderEncoder )
+            {
+                [mActiveRenderEncoder setStencilReferenceValue:refValue];
+            }
         }
     }
  }
