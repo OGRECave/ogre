@@ -183,7 +183,7 @@ namespace Ogre {
         // Set us up with an external window, or create our own.
         if(!mIsExternal)
         {
-            mWindow = [[[UIWindow alloc] initWithFrame:CGRectMake(0, 0, w, h)] retain];
+            mWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, w, h)];
         }
         
         OgreAssert(mWindow != nil, "EAGL2Window: Failed to create native window");
