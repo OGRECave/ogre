@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 
 #import "OgreEAGL2ViewController.h"
+#include "ARCMacros.h"
 
 using namespace Ogre;
 
@@ -52,7 +53,7 @@ using namespace Ogre;
 
 - (void)dealloc
 {
-    [super dealloc];
+    SAFE_ARC_SUPER_DEALLOC();
 }
 
 - (void)didReceiveMemoryWarning

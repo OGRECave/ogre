@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreEAGL2Support.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
+#include "ARCMacros.h"
 
 namespace Ogre {
     EAGLES2Context::EAGLES2Context(CAEAGLLayer *drawable, EAGLSharegroup *group)
@@ -45,7 +46,7 @@ namespace Ogre {
         mSampleRenderbuffer(0)
     {
 
-        mDrawable = [drawable retain];
+        mDrawable = SAFE_ARC_RETAIN(drawable);
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         EAGLRenderingAPI renderingAPI = kEAGLRenderingAPIOpenGLES3;
@@ -92,8 +93,8 @@ namespace Ogre {
             [EAGLContext setCurrentContext:nil];
         }
         
-        [mContext release];
-        [mDrawable release];
+        SAFE_ARC_RELEASE(mContext);
+        SAFE_ARC_RELEASE(mDrawable);
     }
 
     void EAGLES2Context::bindSampleFramebuffer()

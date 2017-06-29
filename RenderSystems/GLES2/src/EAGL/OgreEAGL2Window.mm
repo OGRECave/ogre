@@ -39,6 +39,7 @@ THE SOFTWARE.
 
 #import <UIKit/UIWindow.h>
 #import <UIKit/UIGraphics.h>
+#include "ARCMacros.h"
 
 namespace Ogre {
     EAGL2Window::EAGL2Window(EAGL2Support *glsupport)
@@ -86,7 +87,7 @@ namespace Ogre {
         {
             WindowEventUtilities::_removeRenderWindow(this);
         
-            [mWindow release];
+            SAFE_ARC_RELEASE(mWindow);
             mWindow = nil;
         }
 
@@ -96,7 +97,7 @@ namespace Ogre {
         }
 
         if(!mUsingExternalViewController)
-            [mViewController release];
+            SAFE_ARC_RELEASE(mViewController);
     }
 
     void EAGL2Window::setFullscreen(bool fullscreen, uint width, uint height)
@@ -160,7 +161,7 @@ namespace Ogre {
         // If the window, view or view controller objects are nil at this point, it is safe
         // to assume that external handles are either not being used or are invalid and
         // we can create our own.
-        NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+        SAFE_ARC_AUTORELEASE_POOL_START()
         
         uint w = 0, h = 0;
         
@@ -236,7 +237,7 @@ namespace Ogre {
             
             if ((option = miscParams->find("externalSharegroup")) != miscParams->end())
             {
-                group = (EAGLSharegroup *)StringConverter::parseUnsignedLong(option->second);
+                group = (__bridge EAGLSharegroup *)(void*)StringConverter::parseUnsignedLong(option->second);
                 LogManager::getSingleton().logMessage("iOS: Using an external EAGLSharegroup");
             }
             
@@ -257,7 +258,7 @@ namespace Ogre {
             mWindow.rootViewController = mViewController;
         
         if(!mUsingExternalView)
-            [mView release];
+            SAFE_ARC_RELEASE(mView);
     
         if(!mUsingExternalViewController)
             [mWindow makeKeyAndVisible];
@@ -276,7 +277,7 @@ namespace Ogre {
         }
         LogManager::getSingleton().logMessage(ss.str());
         
-        [pool release];
+        SAFE_ARC_AUTORELEASE_POOL_END()
     }
     
     void EAGL2Window::create(const String& name, uint width, uint height,
@@ -343,14 +344,14 @@ namespace Ogre {
 
             if ((opt = miscParams->find("externalWindowHandle")) != end)
             {
-                mWindow = (UIWindow *)StringConverter::parseUnsignedLong(opt->second);
+                mWindow = (__bridge UIWindow *)(void*)StringConverter::parseUnsignedLong(opt->second);
                 mIsExternal = true;
                 LogManager::getSingleton().logMessage("iOS: Using an external window handle");
             }
         
             if ((opt = miscParams->find("externalViewHandle")) != end)
             {
-                mView = (EAGL2View *)StringConverter::parseUnsignedLong(opt->second);
+                mView = (__bridge EAGL2View *)(void*)StringConverter::parseUnsignedLong(opt->second);
                 CGRect b = [mView bounds];
                 mWidth = b.size.width;
                 mHeight = b.size.height;
@@ -360,7 +361,7 @@ namespace Ogre {
         
             if ((opt = miscParams->find("externalViewControllerHandle")) != end)
             {
-                mViewController = (EAGL2ViewController *)StringConverter::parseUnsignedLong(opt->second);
+                mViewController = (__bridge EAGL2ViewController *)(void*)StringConverter::parseUnsignedLong(opt->second);
                 if(mViewController.view != nil)
                     mView = (EAGL2View *)mViewController.view;
                 mUsingExternalViewController = true;
@@ -451,25 +452,25 @@ namespace Ogre {
 
         if( name == "SHAREGROUP" )
 		{
-            *(void**)(pData) = mContext->getContext().sharegroup;
+            *(void**)(pData) = (__bridge void*)mContext->getContext().sharegroup;
             return;
 		}
 
 		if( name == "WINDOW" )
 		{
-            *(void**)(pData) = mWindow;
+            *(void**)(pData) = (__bridge void*)mWindow;
 			return;
 		}
         
 		if( name == "VIEW" )
 		{
-            *(void**)(pData) = mViewController.view;
+            *(void**)(pData) = (__bridge void*)mViewController.view;
             return;
 		}
 
         if( name == "VIEWCONTROLLER" )
 		{
-            *(void**)(pData) = mViewController;
+            *(void**)(pData) = (__bridge void*)mViewController;
             return;
 		}
 	}
