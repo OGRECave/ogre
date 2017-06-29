@@ -57,8 +57,7 @@ static GLESWglProc get_proc(const char *proc)
     return res;
 }
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
-#import <CoreFoundation/CoreFoundation.h>
-#import <UIKit/UIDevice.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 CFBundleRef bundle;
 CFURLRef bundleURL;

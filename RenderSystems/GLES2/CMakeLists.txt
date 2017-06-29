@@ -12,9 +12,6 @@
 file(GLOB HEADER_FILES "include/*.h")
 file(GLOB SOURCE_FILES "src/*.cpp")
 list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/glesw.c")
-if (APPLE_IOS)
-  set_source_files_properties(src/glesw.c PROPERTIES COMPILE_FLAGS "-x objective-c")
-endif()
 
 file(GLOB GLSLES_FILES "src/GLSLES/include/*.h" "src/GLSLES/src/*.cpp")
 
