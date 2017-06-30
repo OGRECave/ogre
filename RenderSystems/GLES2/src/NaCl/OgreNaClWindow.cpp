@@ -64,7 +64,7 @@ namespace Ogre {
         }
         else if(name == "GLCONTEXT")
         {
-            *static_cast<GLES2Context **>(pData) = mContext;
+            *static_cast<GLContext **>(pData) = mContext;
             return;
         }
     }

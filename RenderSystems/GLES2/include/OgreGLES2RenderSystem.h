@@ -78,14 +78,14 @@ namespace Ogre {
             GLES2StateCacheManager* mStateCacheManager;
             
             /* The main GL context - main thread only */
-            GLES2Context *mMainContext;
+            GLContext *mMainContext;
 
             /* The current GL context  - main thread only */
-            GLES2Context *mCurrentContext;
+            GLContext *mCurrentContext;
 
-            typedef list<GLES2Context*>::type GLES2ContextList;
+            typedef list<GLContext*>::type GLContextList;
             /// List of background thread contexts
-            GLES2ContextList mBackgroundContextList;
+            GLContextList mBackgroundContextList;
 
             GLES2GpuProgramManager *mGpuProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
@@ -266,18 +266,18 @@ namespace Ogre {
             // GLES2RenderSystem specific members
             // ----------------------------------
             /** Returns the main context */
-            GLES2Context* _getMainContext() { return mMainContext; }
+            GLContext* _getMainContext() { return mMainContext; }
             /** Unregister a render target->context mapping. If the context of target 
              is the current context, change the context to the main context so it
              can be destroyed safely. 
              
              @note This is automatically called by the destructor of 
-             GLES2Context.
+             GLContext.
              */
-            void _unregisterContext(GLES2Context *context);
+            void _unregisterContext(GLContext *context);
             /** Switch GL context, dealing with involved internal cached states too
              */
-            void _switchContext(GLES2Context *context);
+            void _switchContext(GLContext *context);
             /** One time initialization for the RenderState of a context. Things that
              only need to be set once, like the LightingModel can be defined here.
              */

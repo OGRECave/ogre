@@ -456,7 +456,7 @@ namespace Ogre {
     {
 		if( name == "GLCONTEXT" )
 		{
-			*static_cast<EAGLES2Context**>(pData) = mContext;
+			*static_cast<GLContext**>(pData) = mContext;
 			return;
 		}
 

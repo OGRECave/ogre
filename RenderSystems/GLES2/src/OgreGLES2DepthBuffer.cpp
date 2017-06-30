@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    GLES2DepthBuffer::GLES2DepthBuffer( uint16 poolId, GLES2RenderSystem *renderSystem, GLES2Context *creatorContext,
+    GLES2DepthBuffer::GLES2DepthBuffer( uint16 poolId, GLES2RenderSystem *renderSystem, GLContext *creatorContext,
                                     GLES2RenderBuffer *depth, GLES2RenderBuffer *stencil,
                                     uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
                                     bool manual ) :
@@ -98,7 +98,7 @@ namespace Ogre
 
         if( !fbo )
         {
-            GLES2Context *windowContext = 0;
+            GLContext *windowContext = 0;
             renderTarget->getCustomAttribute( "GLCONTEXT", &windowContext );
 
             //Non-FBO targets and FBO depth surfaces don't play along, only dummies which match the same

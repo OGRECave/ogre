@@ -592,7 +592,7 @@ namespace Ogre {
 	{
 		if( name == "GLCONTEXT" ) 
 		{
-			*static_cast<CocoaContext**>(pData) = mContext;
+			*static_cast<GLContext**>(pData) = mContext;
 			return;
 		} 
 		else if( name == "WINDOW" ) 

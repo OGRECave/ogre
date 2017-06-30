@@ -37,7 +37,7 @@ THE SOFTWARE.
 namespace Ogre {
     class NaClGLSupport;
 
-    class _OgrePrivate NaClGLContext : public GLES2Context, public pp::Graphics3DClient
+    class _OgrePrivate NaClGLContext : public GLContext, public pp::Graphics3DClient
     {
         private:
             const NaClGLSupport *mGLSupport;
@@ -53,7 +53,7 @@ namespace Ogre {
 
             virtual void setCurrent();
             virtual void endCurrent();
-            GLES2Context* clone() const;
+            GLContext* clone() const;
 
             void swapBuffers();
 

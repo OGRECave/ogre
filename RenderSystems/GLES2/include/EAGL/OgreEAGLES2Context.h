@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class _OgrePrivate EAGLES2Context : public GLES2Context
+    class _OgrePrivate EAGLES2Context : public GLContext
     {
         protected:
 #ifdef __OBJC__
@@ -56,7 +56,7 @@ namespace Ogre {
 
             virtual void setCurrent();
             virtual void endCurrent();
-            virtual GLES2Context * clone() const;
+            virtual GLContext * clone() const;
 
             bool createFramebuffer();
             void destroyFramebuffer();

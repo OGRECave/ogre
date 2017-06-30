@@ -877,7 +877,7 @@ namespace Ogre {
     void Win32Window::getCustomAttribute( const String& name, void* pData )
     {
         if( name == "GLCONTEXT" ) {
-            *static_cast<Win32Context**>(pData) = mContext;
+            *static_cast<GLContext**>(pData) = mContext;
             return;
         } else if( name == "WINDOW" )
         {

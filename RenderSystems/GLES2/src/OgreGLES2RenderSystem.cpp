@@ -565,10 +565,10 @@ namespace Ogre {
         mTextureManager = 0;
 
         // Delete extra threads contexts
-        for (GLES2ContextList::iterator i = mBackgroundContextList.begin();
+        for (GLContextList::iterator i = mBackgroundContextList.begin();
              i != mBackgroundContextList.end(); ++i)
         {
-            GLES2Context* pCurContext = *i;
+            GLContext* pCurContext = *i;
 
             pCurContext->releaseContext();
 
@@ -662,7 +662,7 @@ namespace Ogre {
         {
             // Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
             // Only Copy does, but Copy means only one depth buffer...
-            GLES2Context *windowContext = 0;
+            GLContext *windowContext = 0;
             win->getCustomAttribute( "GLCONTEXT", &windowContext );
             GLES2DepthBuffer *depthBuffer = OGRE_NEW GLES2DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                             windowContext, 0, 0,
@@ -746,7 +746,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_destroyDepthBuffer(RenderTarget* pWin)
     {
-        GLES2Context *windowContext = 0;
+        GLContext *windowContext = 0;
         pWin->getCustomAttribute("GLCONTEXT", &windowContext);
         
         // 1 Window <-> 1 Context, should be always true
@@ -767,7 +767,7 @@ namespace Ogre {
                 // A DepthBuffer with no depth & stencil pointers is a dummy one,
                 // look for the one that matches the same GL context
                 GLES2DepthBuffer *depthBuffer = static_cast<GLES2DepthBuffer*>(*itor);
-                GLES2Context *glContext = depthBuffer->getGLContext();
+                GLContext *glContext = depthBuffer->getGLContext();
                 
                 if( glContext == windowContext &&
                    (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
@@ -1745,7 +1745,7 @@ namespace Ogre {
         }
     }
 
-    void GLES2RenderSystem::_switchContext(GLES2Context *context)
+    void GLES2RenderSystem::_switchContext(GLContext *context)
     {
         // Unbind GPU programs and rebind to new context later, because
         // scene manager treat render system as ONE 'context' ONLY, and it
@@ -1788,7 +1788,7 @@ namespace Ogre {
         mStateCacheManager->setDepthMask(depthMask);
     }
 
-    void GLES2RenderSystem::_unregisterContext(GLES2Context *context)
+    void GLES2RenderSystem::_unregisterContext(GLContext *context)
     {
         if (mCurrentContext == context)
         {
@@ -1867,7 +1867,7 @@ namespace Ogre {
         if (target && mRTTManager)
         {
             // Switch context if different from current one
-            GLES2Context *newContext = 0;
+            GLContext *newContext = 0;
             target->getCustomAttribute("GLCONTEXT", &newContext);
             if (newContext && mCurrentContext != newContext)
             {
@@ -2079,7 +2079,7 @@ namespace Ogre {
         // will ensure that resources are shared with the main context
         // We want a separate context so that we can safely create GL
         // objects in parallel with the main thread
-        GLES2Context* newContext = mMainContext->clone();
+        GLContext* newContext = mMainContext->clone();
         mBackgroundContextList.push_back(newContext);
 
         // Bind this new context to this thread.

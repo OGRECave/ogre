@@ -235,7 +235,7 @@ namespace Ogre {
         // Do nothing
     }
 
-    GLES2Context * EAGLES2Context::clone() const
+    GLContext * EAGLES2Context::clone() const
     {
 		return new EAGLES2Context(mDrawable, [mContext sharegroup]);
     }

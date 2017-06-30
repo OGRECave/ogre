@@ -99,7 +99,7 @@ namespace Ogre {
         glSetCurrentContextPPAPI(0);
     }
 
-    GLES2Context* NaClGLContext::clone() const
+    GLContext* NaClGLContext::clone() const
     {
         NaClGLContext* res = new NaClGLContext(mWindow, mGLSupport, mInstance, mSwapCallback);
         res->mInstance = this->mInstance;

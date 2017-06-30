@@ -107,7 +107,7 @@ namespace Ogre {
                * WINDOW         The NativeWindowType target for rendering.
                * VIEW           The EAGLView object that is drawn into.
                * VIEWCONTROLLER The UIViewController used for handling view rotation.
-               * GLCONTEXT      The Ogre GLES2Context used for rendering.
+               * GLCONTEXT      The Ogre GLContext used for rendering.
                * SHAREGROUP     The EAGLShareGroup object associated with the main context.
                */
             virtual void getCustomAttribute(const String& name, void* pData);
