@@ -94,21 +94,6 @@ namespace Ogre {
         return PF_A8R8G8B8;
     }
 
-    void GLRTTManager::requestRenderBuffer(const GLSurfaceDesc &surface)
-    {
-        if(surface.buffer == 0)
-            return;
-        RBFormat key(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
-        RenderBufferMap::iterator it = mRenderBufferMap.find(key);
-        assert(it != mRenderBufferMap.end());
-        if (it != mRenderBufferMap.end())   // Just in case
-        {
-            assert(it->second.buffer == surface.buffer);
-            // Increase refcount
-            ++it->second.refcount;
-        }
-    }
-
     void GLRTTManager::releaseRenderBuffer(const GLSurfaceDesc &surface)
     {
         if(surface.buffer == 0)

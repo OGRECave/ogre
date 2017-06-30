@@ -73,11 +73,6 @@ namespace Ogre {
          */
         virtual RenderTexture *createRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa) = 0;
 
-        /** Request the specify render buffer in case shared somewhere. Ignore
-            silently if surface.buffer is 0.
-        */
-        void requestRenderBuffer(const GLSurfaceDesc &surface);
-
         /** Release a render buffer. Ignore silently if surface.buffer is 0.
          */
         void releaseRenderBuffer(const GLSurfaceDesc &surface);
