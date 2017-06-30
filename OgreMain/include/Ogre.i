@@ -290,6 +290,7 @@ ADD_REPR(ColourValue)
 %include "OgreCompositorInstance.h"
 %include "OgreCompositionPass.h"
 %include "OgreMaterialSerializer.h"
+%ignore Ogre::UserObjectBindings::getEmptyUserAny;
 %include "OgreUserObjectBindings.h"
 %rename(MaterialManager_Listener) Ogre::MaterialManager::Listener;
 %include "OgreMaterialManager.h"
