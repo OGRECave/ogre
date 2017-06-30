@@ -45,6 +45,7 @@ namespace Ogre {
     EAGL2Window::EAGL2Window(EAGL2Support *glsupport)
         :   mClosed(false),
             mVisible(false),
+            mHidden(false),
             mIsExternal(false),
             mUsingExternalView(false),
             mUsingExternalViewController(false),
@@ -98,6 +99,15 @@ namespace Ogre {
 
         if(!mUsingExternalViewController)
             SAFE_ARC_RELEASE(mViewController);
+    }
+
+    void EAGL2Window::setHidden(bool hidden)
+    {
+        mHidden = hidden;
+        if (!mIsExternal)
+        {
+            [mWindow setHidden:hidden];
+        }
     }
 
     void EAGL2Window::setFullscreen(bool fullscreen, uint width, uint height)

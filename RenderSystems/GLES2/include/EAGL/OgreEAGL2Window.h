@@ -52,6 +52,7 @@ namespace Ogre {
         protected:
             bool mClosed;
             bool mVisible;
+            bool mHidden;
             /// Is this using an external window handle?
             bool mIsExternal;
             /// Is this using an external view handle?
@@ -92,8 +93,9 @@ namespace Ogre {
             void destroy(void);
             bool isClosed(void) const { return mClosed; }
             bool isVisible(void) const { return mVisible; }
-
             void setVisible(bool visible) { mVisible = visible; }
+            bool isHidden(void) const { return mHidden; }
+            void setHidden(bool hidden);
             void setClosed(bool closed) { mClosed = closed; }
             void swapBuffers();
             void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
