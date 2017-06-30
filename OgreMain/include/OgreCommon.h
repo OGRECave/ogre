@@ -44,7 +44,7 @@ namespace Ogre {
     */
 
     /// Fast general hashing algorithm
-    inline uint32 FastHash (const char * data, int len, uint32 hashSoFar = 0) {
+    inline uint32 FastHash (const char * data, size_t len, uint32 hashSoFar = 0) {
         uint32 ret;
         MurmurHash3_x86_32(data, len, hashSoFar, &ret);
         return ret;
