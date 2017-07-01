@@ -153,7 +153,11 @@ cbuffer InstanceBuffer : register(b2)
     //shadowConstantBias. Send the bias directly to avoid an
     //unnecessary indirection during the shadow mapping pass.
     //Must be loaded with uintBitsToFloat
-	uint4 worldMaterialIdx[4096];
+	@property( fast_shader_build_hack )
+		uint4 worldMaterialIdx[2];
+	@end @property( !fast_shader_build_hack )
+		uint4 worldMaterialIdx[4096];
+	@end
 };
 @end
 

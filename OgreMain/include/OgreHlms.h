@@ -157,6 +157,7 @@ namespace Ogre
         String          mOutputPath;
         bool            mDebugOutput;
         bool            mHighQuality;
+        bool            mFastShaderBuildHack;
 
         /// The default datablock occupies the name IdString(); which is not the same as IdString("")
         HlmsDatablock   *mDefaultDatablock;
@@ -720,6 +721,7 @@ namespace Ogre
         static const IdString iOS;
         static const IdString GLVersion;
         static const IdString HighQuality;
+        static const IdString FastShaderBuildHack;
         static const IdString TexGather;
         static const IdString DisableStage;
 

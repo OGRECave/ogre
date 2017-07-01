@@ -149,6 +149,7 @@ namespace Ogre
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
     const IdString HlmsBaseProp::iOS            = IdString( "iOS" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
+    const IdString HlmsBaseProp::FastShaderBuildHack= IdString( "fast_shader_build_hack" );
     const IdString HlmsBaseProp::TexGather      = IdString( "hlms_tex_gather" );
     const IdString HlmsBaseProp::DisableStage   = IdString( "hlms_disable_stage" );
 
@@ -214,6 +215,7 @@ namespace Ogre
         mShaderFileExt( "unset!" ),
         mDebugOutput( true ),
         mHighQuality( false ),
+        mFastShaderBuildHack( false ),
         mDefaultDatablock( 0 ),
         mType( type ),
         mTypeName( typeName ),
@@ -1810,6 +1812,9 @@ namespace Ogre
 #endif
                 setProperty( HlmsBaseProp::HighQuality, mHighQuality );
 
+                if( mFastShaderBuildHack )
+                    setProperty( HlmsBaseProp::FastShaderBuildHack, 1 );
+
                 //Library piece files first
                 LibraryVec::const_iterator itor = mLibrary.begin();
                 LibraryVec::const_iterator end  = mLibrary.end();
@@ -2773,6 +2778,14 @@ namespace Ogre
 
         if( mRenderSystem )
         {
+            {
+                mFastShaderBuildHack = false;
+                const ConfigOptionMap &rsConfigOptions = newRs->getConfigOptions();
+                ConfigOptionMap::const_iterator itor = rsConfigOptions.find( "Fast Shader Build Hack" );
+                if( itor != rsConfigOptions.end() )
+                    mFastShaderBuildHack = StringConverter::parseBool( itor->second.currentValue );
+            }
+
             //Prefer glsl over glsles
             const String shaderProfiles[4] = { "hlsl", "glsles", "glsl", "metal" };
             const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();

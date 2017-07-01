@@ -67,7 +67,6 @@ namespace Ogre
         mCurrentPassBuffer( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
-        mFastShaderBuildHack( false ),
         mUsingExponentialShadowMaps( false ),
         mEsmK( 600u )
     {
@@ -110,14 +109,6 @@ namespace Ogre
 
         if( newRs )
         {
-            {
-                mFastShaderBuildHack = false;
-                const ConfigOptionMap &rsConfigOptions = newRs->getConfigOptions();
-                ConfigOptionMap::const_iterator itor = rsConfigOptions.find( "Fast Shader Build Hack" );
-                if( itor != rsConfigOptions.end() )
-                    mFastShaderBuildHack = StringConverter::parseBool( itor->second.currentValue );
-            }
-
             HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
             HlmsDatablockMap::const_iterator end  = mDatablocks.end();
 

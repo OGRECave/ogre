@@ -236,7 +236,6 @@ namespace Ogre
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         mFineLightMaskGranularity( true ),
 #endif
-        mFastShaderBuildHack( false ),
         mDebugPssmSplits( false ),
         mShadowFilter( PCF_3x3 ),
         mEsmK( 600u ),
@@ -258,14 +257,6 @@ namespace Ogre
 
         if( newRs )
         {
-            {
-                mFastShaderBuildHack = false;
-                const ConfigOptionMap &rsConfigOptions = newRs->getConfigOptions();
-                ConfigOptionMap::const_iterator itor = rsConfigOptions.find( "Fast Shader Build Hack" );
-                if( itor != rsConfigOptions.end() )
-                    mFastShaderBuildHack = StringConverter::parseBool( itor->second.currentValue );
-            }
-
             HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
             HlmsDatablockMap::const_iterator end  = mDatablocks.end();
 

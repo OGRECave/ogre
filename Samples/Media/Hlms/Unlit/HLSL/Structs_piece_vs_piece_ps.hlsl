@@ -40,8 +40,12 @@ cbuffer instance : register(b2)
     //
     //.z =
 	//Contains 0 or 1 to index into passBuf.viewProj[]. Only used
-    //if hlms_identity_viewproj_dynamic is set.
-	uint4 worldMaterialIdx[4096];
+	//if hlms_identity_viewproj_dynamic is set.
+	@property( fast_shader_build_hack )
+		uint4 worldMaterialIdx[2];
+	@end @property( !fast_shader_build_hack )
+		uint4 worldMaterialIdx[4096];
+	@end
 };
 @end
 
