@@ -148,7 +148,7 @@ endif()
 cmake_policy(POP)
 
 if(@OGRE_STATIC@)
-    list(APPEND OGRE_LIBRARIES OgreGLSupport@OGRE_LIB_SUFFIX@)
+    list(APPEND OGRE_LIBRARIES OgreGLSupport@OGRE_LIB_SUFFIX@ @CMAKE_DL_LIBS@) # glXXw uses dlopen
     list(APPEND OGRE_LIBRARY_DIRS "${OGRE_LIBRARY_DIRS}/OGRE") # plugins folder
 endif()
 
