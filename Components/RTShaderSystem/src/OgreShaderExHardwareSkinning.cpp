@@ -444,7 +444,7 @@ void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, Sk
 }
 
 //-----------------------------------------------------------------------
-bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, unsigned int subEntityIndex, ushort& boneCount, ushort& weightCount)
+bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, size_t subEntityIndex, ushort& boneCount, ushort& weightCount)
 {
     bool isValidData = false;
     boneCount = 0;

@@ -345,7 +345,7 @@ namespace Ogre {
         return mMesh;
     }
     //-----------------------------------------------------------------------
-    SubEntity* Entity::getSubEntity(unsigned int index) const
+    SubEntity* Entity::getSubEntity(size_t index) const
     {
         if (index >= mSubEntityList.size())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -360,9 +360,9 @@ namespace Ogre {
         return getSubEntity(index);
     }
     //-----------------------------------------------------------------------
-    unsigned int Entity::getNumSubEntities(void) const
+    size_t Entity::getNumSubEntities(void) const
     {
-        return static_cast< unsigned int >( mSubEntityList.size() );
+        return mSubEntityList.size();
     }
     //-----------------------------------------------------------------------
     Entity* Entity::clone( const String& newName) const
