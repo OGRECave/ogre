@@ -69,6 +69,7 @@ namespace Ogre
 
         uint32 mLastTextureHash;
 
+        bool    mFastShaderBuildHack;
         bool    mUsingExponentialShadowMaps;
         uint16  mEsmK; /// K parameter for ESM.
 

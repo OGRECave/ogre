@@ -411,10 +411,6 @@ namespace Ogre
         setTextureProperty( TerraProperty::DiffuseMap,      datablock, TERRA_DIFFUSE );
         setTextureProperty( TerraProperty::EnvProbeMap,     datablock, TERRA_REFLECTION );
         setTextureProperty( TerraProperty::DetailWeightMap, datablock, TERRA_DETAIL_WEIGHT );
-
-        String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
-        inOutPieces[VertexShader][TerraProperty::MaterialsPerBuffer] = slotsPerPoolStr;
-        inOutPieces[PixelShader][TerraProperty::MaterialsPerBuffer] = slotsPerPoolStr;
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsTerra::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,

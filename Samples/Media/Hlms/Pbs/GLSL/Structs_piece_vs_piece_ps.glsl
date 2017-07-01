@@ -134,7 +134,7 @@ struct Material
 
 layout(binding = 1) uniform MaterialBuf
 {
-	Material m[@insertpiece( materials_per_buffer )];
+	Material m[@value( materials_per_buffer )];
 } materialArray;
 @end
 

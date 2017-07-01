@@ -136,7 +136,7 @@ struct Material
 
 cbuffer MaterialBuf : register(b1)
 {
-	Material materialArray[@insertpiece( materials_per_buffer )];
+	Material materialArray[@value( materials_per_buffer )];
 };
 @end
 

@@ -327,6 +327,7 @@ bail:
         ConfigOption optMaxFeatureLevels;
         ConfigOption optExceptionsErrorLevel;
         ConfigOption optDriverType;
+        ConfigOption optFastShaderBuildHack;
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		ConfigOption optStereoMode;
 #endif
@@ -481,6 +482,25 @@ bail:
         optDriverType.currentValue = "Hardware";
         optDriverType.immutable = false;
 
+        //This option improves shader compilation times by massive amounts
+        //(requires Hlms to be aware of it), making shader compile times comparable
+        //to GL (which is measured in milliseconds per shader, instead of seconds).
+        //There's two possible reasons to disable this hack:
+        //  1. Easier debugging. Shader structs like "Material m[256];" get declared
+        //     as "Material m[2];" which cause debuggers to show only 2 entires,
+        //     instead of all of them. Some debuggers (like RenderDoc) allow changing
+        //     the amount of elements displayed and workaround it; nonetheless
+        //     disabling it makes your life easier.
+        //  2. Troubleshooting an obscure GPU/driver combination. I tested this hack
+        //     with a lot of hardware and it seems to work. However the possibility
+        //     that it breaks with a specific GPU/driver combo always exists. In
+        //     such case, the end user should be able to turn this off.
+        optFastShaderBuildHack.name = "Fast Shader Build Hack";
+        optFastShaderBuildHack.possibleValues.push_back( "Yes" );
+        optFastShaderBuildHack.possibleValues.push_back( "No" );
+        optFastShaderBuildHack.currentValue = "Yes";
+        optFastShaderBuildHack.immutable = false;
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		optStereoMode.name = "Stereo Mode";
 		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
@@ -504,12 +524,12 @@ bail:
         mOptions[optMaxFeatureLevels.name] = optMaxFeatureLevels;
         mOptions[optExceptionsErrorLevel.name] = optExceptionsErrorLevel;
         mOptions[optDriverType.name] = optDriverType;
+        mOptions[optFastShaderBuildHack.name] = optFastShaderBuildHack;
 
 		mOptions[optBackBufferCount.name] = optBackBufferCount;
 
         
         refreshD3DSettings();
-
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::refreshD3DSettings()

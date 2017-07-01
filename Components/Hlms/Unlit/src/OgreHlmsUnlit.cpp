@@ -67,6 +67,7 @@ namespace Ogre
         mCurrentPassBuffer( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
+        mFastShaderBuildHack( false ),
         mUsingExponentialShadowMaps( false ),
         mEsmK( 600u )
     {
@@ -109,6 +110,14 @@ namespace Ogre
 
         if( newRs )
         {
+            {
+                mFastShaderBuildHack = false;
+                const ConfigOptionMap &rsConfigOptions = newRs->getConfigOptions();
+                ConfigOptionMap::const_iterator itor = rsConfigOptions.find( "Fast Shader Build Hack" );
+                if( itor != rsConfigOptions.end() )
+                    mFastShaderBuildHack = StringConverter::parseBool( itor->second.currentValue );
+            }
+
             HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
             HlmsDatablockMap::const_iterator end  = mDatablocks.end();
 
@@ -413,9 +422,10 @@ namespace Ogre
             inOutPieces[VertexShader][outPrefix + "_swizzle"] = i % 2 ? "zw" : "xy";
         }
 
-        String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
-        inOutPieces[VertexShader][UnlitProperty::MaterialsPerBuffer] = slotsPerPoolStr;
-        inOutPieces[PixelShader][UnlitProperty::MaterialsPerBuffer]  = slotsPerPoolStr;
+        if( mFastShaderBuildHack )
+            setProperty( UnlitProperty::MaterialsPerBuffer, static_cast<int>( 2 ) );
+        else
+            setProperty( UnlitProperty::MaterialsPerBuffer, static_cast<int>( mSlotsPerPool ) );
     }
     //-----------------------------------------------------------------------------------
     void HlmsUnlit::calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces )
@@ -445,9 +455,10 @@ namespace Ogre
             }
         }
 
-        String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
-        inOutPieces[VertexShader][UnlitProperty::MaterialsPerBuffer] = slotsPerPoolStr;
-        inOutPieces[PixelShader][UnlitProperty::MaterialsPerBuffer] = slotsPerPoolStr;
+        if( mFastShaderBuildHack )
+            setProperty( UnlitProperty::MaterialsPerBuffer, static_cast<int>( 2 ) );
+        else
+            setProperty( UnlitProperty::MaterialsPerBuffer, static_cast<int>( mSlotsPerPool ) );
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsUnlit::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,

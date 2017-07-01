@@ -147,6 +147,7 @@ namespace Ogre
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         bool mFineLightMaskGranularity;
 #endif
+        bool mFastShaderBuildHack;
         bool mDebugPssmSplits;
 
         ShadowFilter    mShadowFilter;
