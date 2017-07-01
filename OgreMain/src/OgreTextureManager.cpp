@@ -85,7 +85,7 @@ namespace Ogre {
             TexturePtr tex = static_pointer_cast<Texture>(res.first);
             tex->setTextureType(texType);
             tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
-                static_cast<size_t>(numMipmaps));
+                static_cast<uint32>(numMipmaps));
             tex->setGamma(gamma);
             tex->setTreatLuminanceAsAlpha(isAlpha);
             tex->setFormat(desiredFormat);
@@ -125,7 +125,7 @@ namespace Ogre {
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
-            static_cast<size_t>(numMipmaps));
+            static_cast<uint32>(numMipmaps));
         tex->setGamma(gamma);
         tex->setTreatLuminanceAsAlpha(isAlpha);
         tex->setFormat(desiredFormat);
@@ -144,7 +144,7 @@ namespace Ogre {
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
-            static_cast<size_t>(numMipmaps));
+            static_cast<uint32>(numMipmaps));
         tex->setGamma(gamma);
         tex->setHardwareGammaEnabled(hwGamma);
         tex->loadRawData(stream, uWidth, uHeight, format);
@@ -177,7 +177,7 @@ namespace Ogre {
         ret->setHeight(height);
         ret->setDepth(depth);
         ret->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
-            static_cast<size_t>(numMipmaps));
+            static_cast<uint32>(numMipmaps));
         ret->setFormat(format);
         ret->setUsage(usage);
         ret->setHardwareGammaEnabled(hwGamma);
@@ -272,7 +272,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void TextureManager::setDefaultNumMipmaps( size_t num )
+    void TextureManager::setDefaultNumMipmaps( uint32 num )
     {
         mDefaultNumMipmaps = num;
     }

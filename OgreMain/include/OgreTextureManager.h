@@ -435,11 +435,11 @@ namespace Ogre {
             @note
                 The default value is 0.
         */
-        virtual void setDefaultNumMipmaps(size_t num);
+        virtual void setDefaultNumMipmaps(uint32 num);
 
         /** Gets the default number of mipmaps to be used for loaded textures.
         */
-        virtual size_t getDefaultNumMipmaps()
+        virtual uint32 getDefaultNumMipmaps()
         {
             return mDefaultNumMipmaps;
         }
@@ -453,7 +453,7 @@ namespace Ogre {
 
         ushort mPreferredIntegerBitDepth;
         ushort mPreferredFloatBitDepth;
-        size_t mDefaultNumMipmaps;
+        uint32 mDefaultNumMipmaps;
     };
     /** @} */
     /** @} */
