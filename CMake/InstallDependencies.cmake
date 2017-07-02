@@ -14,9 +14,7 @@ if (NOT APPLE AND NOT WIN32)
   return()
 endif()
 
-# TODO - most of this file assumes a common dependencies root folder
-# This is not robust, we should instead source dependencies from their individual locations
-get_filename_component(OGRE_DEP_DIR ${FREETYPE_INCLUDE_DIR}/../../ ABSOLUTE)
+set(OGRE_DEP_DIR ${OGREDEPS_PATH})
 
 option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
 option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
@@ -98,6 +96,10 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		install(FILES DESTINATION lib/release CONFIGURATIONS Release)
 		install(FILES DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
 	endif () # WIN32
+
+    if (EXISTS ${OGRE_DEP_DIR}/bin/)
+        install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION bin)
+    endif ()
 endif () # OGRE_INSTALL_DEPENDENCIES
     
   if(WIN32)
@@ -222,15 +224,12 @@ endif ()
 if (OGRE_COPY_DEPENDENCIES)
 
   if (WIN32)
-    # copy the required DLLs to the build directory (configure_file is the only copy-like op I found in CMake)
-	if( (OGRE_BUILD_SAMPLES OR OGRE_BUILD_TESTS) AND NOT (WINDOWS_STORE OR WINDOWS_PHONE) )
-		if(EXISTS "${SDL2_LIBRARY}")
-		  file(COPY ${SDL2_LIBRARY} DESTINATION ${OGRE_BINARY_DIR}/bin/debug)
-		  file(COPY ${SDL2_LIBRARY} DESTINATION ${OGRE_BINARY_DIR}/bin/release)
-		  file(COPY ${SDL2_LIBRARY} DESTINATION ${OGRE_BINARY_DIR}/bin/relwithdebinfo)
-		  file(COPY ${SDL2_LIBRARY} DESTINATION ${OGRE_BINARY_DIR}/bin/minsizerel)
-		endif()
-	endif()
+    # copy the required DLLs to the build directory
+    file(GLOB DLLS ${OGRE_DEP_DIR}/bin/*.dll)
+    file(COPY ${DLLS} DESTINATION ${OGRE_BINARY_DIR}/bin/debug)
+    file(COPY ${DLLS} DESTINATION ${OGRE_BINARY_DIR}/bin/release)
+    file(COPY ${DLLS} DESTINATION ${OGRE_BINARY_DIR}/bin/relwithdebinfo)
+    file(COPY ${DLLS} DESTINATION ${OGRE_BINARY_DIR}/bin/minsizerel)
 
     if (OGRE_BUILD_PLUGIN_CG)
       if (EXISTS ${Cg_BINARY_DBG} AND EXISTS ${Cg_BINARY_REL})
