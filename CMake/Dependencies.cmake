@@ -95,6 +95,8 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         set(OGREDEPS_SHARED FALSE)
     endif()
 
+    set(BUILD_COMMAND_OPTS --target install --config ${CMAKE_BUILD_TYPE})
+
     if(MSVC OR EMSCRIPTEN) # other platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD 
@@ -110,7 +112,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             ${CROSS}
             ${CMAKE_BINARY_DIR}/zlib-1.2.11
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/zlib-1.2.11)
-        execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/zlib-1.2.11 --target install)
+        execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/zlib-1.2.11 ${BUILD_COMMAND_OPTS})
     endif()
 
     message(STATUS "Building ZZIPlib")
@@ -127,7 +129,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         ${CROSS}
         ${CMAKE_BINARY_DIR}/ZZIPlib-master
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ZZIPlib-master)
-    execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/ZZIPlib-master --target install)
+    execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/ZZIPlib-master ${BUILD_COMMAND_OPTS})
     
     message(STATUS "Building freetype")
     file(DOWNLOAD
@@ -150,7 +152,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -G ${CMAKE_GENERATOR}
         ${CMAKE_BINARY_DIR}/freetype-2.6.5
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs)
-    execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs --target install)
+    execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs ${BUILD_COMMAND_OPTS})
 
     if(MSVC) # other platforms dont need this
         message(STATUS "Building SDL2")
@@ -167,7 +169,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             ${CROSS}
             ${OGRE_BINARY_DIR}/SDL2-2.0.5
             WORKING_DIRECTORY ${OGRE_BINARY_DIR}/SDL2-build)
-        execute_process(COMMAND cmake --build ${OGRE_BINARY_DIR}/SDL2-build --target install)
+        execute_process(COMMAND cmake --build ${OGRE_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
     endif()
 endif()
 
