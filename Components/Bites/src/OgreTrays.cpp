@@ -1551,7 +1551,7 @@ ProgressBar *TrayManager::createProgressBar(TrayLocation trayLoc, const Ogre::St
     return pb;
 }
 
-void TrayManager::showFrameStats(TrayLocation trayLoc, int place)
+void TrayManager::showFrameStats(TrayLocation trayLoc, size_t place)
 {
     if (!areFrameStatsVisible())
     {
@@ -1582,7 +1582,7 @@ void TrayManager::hideFrameStats()
     }
 }
 
-void TrayManager::showLogo(TrayLocation trayLoc, int place)
+void TrayManager::showLogo(TrayLocation trayLoc, size_t place)
 {
     if (!isLogoVisible()) mLogo = createDecorWidget(TL_NONE, mName + "/Logo", "SdkTrays/Logo");
     moveWidgetToTray(mLogo, trayLoc, place);
@@ -1899,7 +1899,7 @@ void TrayManager::destroyAllWidgets()
     }
 }
 
-void TrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, int place)
+void TrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, size_t place)
 {
     if (!widget) OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, "Widget does not exist.", "TrayManager::moveWidgetToTray");
 
@@ -1913,7 +1913,7 @@ void TrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, int pla
     }
 
     // insert widget into new tray at given position, or at the end if unspecified or invalid
-    if (place == -1 || place > (int)mWidgets[trayLoc].size()) place = (int)mWidgets[trayLoc].size();
+    if (place > mWidgets[trayLoc].size()) place = mWidgets[trayLoc].size();
     mWidgets[trayLoc].insert(mWidgets[trayLoc].begin() + place, widget);
     mTrays[trayLoc]->addChild(widget->getOverlayElement());
 
