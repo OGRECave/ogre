@@ -385,7 +385,7 @@ void TextBox::filterLines()
     mTextArea->setCaption(shown);    // show just the filtered lines
 }
 
-SelectMenu::SelectMenu(const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real boxWidth, unsigned int maxItemsShown)
+SelectMenu::SelectMenu(const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real boxWidth, size_t maxItemsShown)
     : mHighlightIndex(0)
     , mDisplayIndex(0)
     , mDragOffset(0.0f)
@@ -492,7 +492,7 @@ void SelectMenu::removeItem(const Ogre::DisplayString &item)
     }
 }
 
-void SelectMenu::removeItem(unsigned int index)
+void SelectMenu::removeItem(size_t index)
 {
     if(index >= mItems.size()){
         Ogre::String desc = "Menu \"" + getName() + "\" contains no item at position " +
@@ -528,7 +528,7 @@ void SelectMenu::clearItems()
     mSmallTextArea->setCaption("");
 }
 
-void SelectMenu::selectItem(unsigned int index, bool notifyListener)
+void SelectMenu::selectItem(size_t index, bool notifyListener)
 {
     if (index >= mItems.size())
     {
@@ -537,7 +537,7 @@ void SelectMenu::selectItem(unsigned int index, bool notifyListener)
         OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "SelectMenu::selectItem");
     }
 
-    mSelectionIndex = index;
+    mSelectionIndex = (int)index;
     fitCaptionToArea(mItems[index], mSmallTextArea, mSmallBox->getWidth() - mSmallTextArea->getLeft() * 2);
 
     if (mListener && notifyListener) mListener->itemSelected(this);

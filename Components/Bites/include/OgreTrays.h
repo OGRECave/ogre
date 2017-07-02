@@ -350,7 +350,7 @@ namespace OgreBites
 
         /// Do not instantiate any widgets directly. Use TrayManager.
         SelectMenu(const Ogre::String& name, const Ogre::DisplayString& caption, Ogre::Real width,
-            Ogre::Real boxWidth, unsigned int maxItemsShown);
+            Ogre::Real boxWidth, size_t maxItemsShown);
         void copyItemsFrom(SelectMenu* other);
         bool isExpanded()
         {
@@ -382,7 +382,7 @@ namespace OgreBites
             setItems(mItems);
         }
 
-        void insertItem(int index, const Ogre::DisplayString& item)
+        void insertItem(size_t index, const Ogre::DisplayString& item)
         {
             mItems.insert(mItems.begin() + index, item);
             setItems(mItems);
@@ -390,16 +390,17 @@ namespace OgreBites
 
         void removeItem(const Ogre::DisplayString& item);
 
-        void removeItem(unsigned int index);
+        void removeItem(size_t index);
 
         void clearItems();
 
-        size_t getItemsCount()
+        /// @deprecated use getNumItems
+        OGRE_DEPRECATED size_t getItemsCount()
         {
             return mItems.size();
         }
 
-        void selectItem(unsigned int index, bool notifyListener = true);
+        void selectItem(size_t index, bool notifyListener = true);
 
         bool containsItem(const Ogre::DisplayString& item);
 
@@ -445,8 +446,8 @@ namespace OgreBites
         Ogre::BorderPanelOverlayElement* mScrollTrack;
         Ogre::PanelOverlayElement* mScrollHandle;
         std::vector<Ogre::BorderPanelOverlayElement*> mItemElements;
-        unsigned int mMaxItemsShown;
-        unsigned int mItemsShown;
+        size_t mMaxItemsShown;
+        size_t mItemsShown;
         bool mCursorOver;
         bool mExpanded;
         bool mFitToContents;
