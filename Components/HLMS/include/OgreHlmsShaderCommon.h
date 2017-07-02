@@ -137,7 +137,7 @@ namespace Ogre
         return _left.first < _right.first;
     }
 
-	inline uint32 calcHash(const void* data, int size)
+	inline uint32 calcHash(const void* data, size_t size)
 	{
 		uint32 finalHash;
 		MurmurHash3_x86_32(data, size, IdString::Seed, &finalHash);

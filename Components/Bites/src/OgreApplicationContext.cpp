@@ -320,7 +320,7 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
 #else
     Ogre::ConfigOptionMap ropts = mRoot->getRenderSystem()->getConfigOptions();
 
-    size_t w, h;
+    Ogre::uint32 w, h;
 
     std::istringstream mode(ropts["Video Mode"].currentValue);
     Ogre::String token;

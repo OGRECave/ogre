@@ -367,7 +367,7 @@ namespace Ogre {
         /** Gets a pointer to a SubEntity, ie a part of an Entity.
          @deprecated use getSubEntities()
         */
-        SubEntity* getSubEntity(unsigned int index) const;
+        SubEntity* getSubEntity(size_t index) const;
 
         /** Gets a pointer to a SubEntity by name
         @remarks 
@@ -378,7 +378,7 @@ namespace Ogre {
         /** Retrieves the number of SubEntity objects making up this entity.
         * @deprecated use getSubEntities()
         */
-        unsigned int getNumSubEntities(void) const;
+        size_t getNumSubEntities(void) const;
 
         /** Retrieves SubEntity objects making up this entity.
         */

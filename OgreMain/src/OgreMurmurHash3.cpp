@@ -96,7 +96,7 @@ FORCE_INLINE uint64_t fmix64 ( uint64_t k )
 
 //-----------------------------------------------------------------------------
 
-void _OgreExport MurmurHash3_x86_32 ( const void * key, const int len,
+void _OgreExport MurmurHash3_x86_32 ( const void * key, const size_t len,
                           uint32_t seed, void * out )
 {
   const uint8_t * data = (const uint8_t*)key;
@@ -152,7 +152,7 @@ void _OgreExport MurmurHash3_x86_32 ( const void * key, const int len,
 
 //-----------------------------------------------------------------------------
 
-void _OgreExport MurmurHash3_x86_128 ( const void * key, const int len,
+void _OgreExport MurmurHash3_x86_128 ( const void * key, const size_t len,
                            uint32_t seed, void * out )
 {
   const uint8_t * data = (const uint8_t*)key;
@@ -257,7 +257,7 @@ void _OgreExport MurmurHash3_x86_128 ( const void * key, const int len,
 
 //-----------------------------------------------------------------------------
 
-void _OgreExport MurmurHash3_x64_128 ( const void * key, const int len,
+void _OgreExport MurmurHash3_x64_128 ( const void * key, const size_t len,
                            const uint32_t seed, void * out )
 {
   const uint8_t * data = (const uint8_t*)key;

@@ -152,20 +152,23 @@ endif()
 configure_file(${OGRE_TEMPLATES_DIR}/OgreBuildSettings.h.in ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h @ONLY)
 install(FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h DESTINATION include/OGRE)
 
+set(OGRE_LIB_SUFFIX "")
+
+if (OGRE_STATIC)
+  set(OGRE_LIB_SUFFIX "${OGRE_LIB_SUFFIX}Static")
+endif ()
+if (OGRE_BUILD_TYPE STREQUAL "debug")
+  set(OGRE_LIB_SUFFIX "${OGRE_LIB_SUFFIX}_d")
+endif ()
 
 # Create the pkg-config package files on Unix systems
 if (UNIX)
-  set(OGRE_LIB_SUFFIX "")
   set(OGRE_PLUGIN_PREFIX "")
   set(OGRE_PLUGIN_EXT ".so")
   set(OGRE_PAGING_ADDITIONAL_PACKAGES "")
   if (OGRE_STATIC)
-    set(OGRE_LIB_SUFFIX "${OGRE_LIB_SUFFIX}Static")
     set(OGRE_PLUGIN_PREFIX "lib")
     set(OGRE_PLUGIN_EXT ".a")
-  endif ()
-  if (OGRE_BUILD_TYPE STREQUAL "debug")
-    set(OGRE_LIB_SUFFIX "${OGRE_LIB_SUFFIX}_d")
   endif ()
 
   set(OGRE_ADDITIONAL_LIBS "")

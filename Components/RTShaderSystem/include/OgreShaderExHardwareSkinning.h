@@ -288,7 +288,7 @@ protected:
         @param weightCount The maximum number of weights used by the entity.
         @return Returns true if the entity can use HS. False if not. 
     */
-    bool extractSkeletonData(const Entity* pEntity, unsigned int subEntityIndex,
+    bool extractSkeletonData(const Entity* pEntity, size_t subEntityIndex,
         ushort& boneCount, ushort& weightCount);
 
     /** 

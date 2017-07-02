@@ -97,7 +97,7 @@ namespace Ogre {
 
         /** Returns empty user any object.
         */
-        static const Any& getEmptyUserAny() { return msEmptyAny; }
+        OGRE_DEPRECATED static const Any& getEmptyUserAny() { return msEmptyAny; }
 
     // copying
     public:

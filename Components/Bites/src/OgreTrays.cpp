@@ -385,7 +385,7 @@ void TextBox::filterLines()
     mTextArea->setCaption(shown);    // show just the filtered lines
 }
 
-SelectMenu::SelectMenu(const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real boxWidth, unsigned int maxItemsShown)
+SelectMenu::SelectMenu(const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real boxWidth, size_t maxItemsShown)
     : mHighlightIndex(0)
     , mDisplayIndex(0)
     , mDragOffset(0.0f)
@@ -461,7 +461,7 @@ void SelectMenu::setItems(const Ogre::StringVector &items)
     }
     mItemElements.clear();
 
-    mItemsShown = std::max<int>(2, std::min<int>(mMaxItemsShown, (int)mItems.size()));
+    mItemsShown = Ogre::Math::Clamp<size_t>(mMaxItemsShown, 2, mItems.size());
 
     for (unsigned int i = 0; i < mItemsShown; i++)   // create all the item elements
     {
@@ -492,7 +492,7 @@ void SelectMenu::removeItem(const Ogre::DisplayString &item)
     }
 }
 
-void SelectMenu::removeItem(unsigned int index)
+void SelectMenu::removeItem(size_t index)
 {
     if(index >= mItems.size()){
         Ogre::String desc = "Menu \"" + getName() + "\" contains no item at position " +
@@ -528,7 +528,7 @@ void SelectMenu::clearItems()
     mSmallTextArea->setCaption("");
 }
 
-void SelectMenu::selectItem(unsigned int index, bool notifyListener)
+void SelectMenu::selectItem(size_t index, bool notifyListener)
 {
     if (index >= mItems.size())
     {
@@ -537,7 +537,7 @@ void SelectMenu::selectItem(unsigned int index, bool notifyListener)
         OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "SelectMenu::selectItem");
     }
 
-    mSelectionIndex = index;
+    mSelectionIndex = (int)index;
     fitCaptionToArea(mItems[index], mSmallTextArea, mSmallBox->getWidth() - mSmallTextArea->getLeft() * 2);
 
     if (mListener && notifyListener) mListener->itemSelected(this);
@@ -1551,7 +1551,7 @@ ProgressBar *TrayManager::createProgressBar(TrayLocation trayLoc, const Ogre::St
     return pb;
 }
 
-void TrayManager::showFrameStats(TrayLocation trayLoc, int place)
+void TrayManager::showFrameStats(TrayLocation trayLoc, size_t place)
 {
     if (!areFrameStatsVisible())
     {
@@ -1582,7 +1582,7 @@ void TrayManager::hideFrameStats()
     }
 }
 
-void TrayManager::showLogo(TrayLocation trayLoc, int place)
+void TrayManager::showLogo(TrayLocation trayLoc, size_t place)
 {
     if (!isLogoVisible()) mLogo = createDecorWidget(TL_NONE, mName + "/Logo", "SdkTrays/Logo");
     moveWidgetToTray(mLogo, trayLoc, place);
@@ -1899,7 +1899,7 @@ void TrayManager::destroyAllWidgets()
     }
 }
 
-void TrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, int place)
+void TrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, size_t place)
 {
     if (!widget) OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, "Widget does not exist.", "TrayManager::moveWidgetToTray");
 
@@ -1913,7 +1913,7 @@ void TrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, int pla
     }
 
     // insert widget into new tray at given position, or at the end if unspecified or invalid
-    if (place == -1 || place > (int)mWidgets[trayLoc].size()) place = (int)mWidgets[trayLoc].size();
+    if (place > mWidgets[trayLoc].size()) place = mWidgets[trayLoc].size();
     mWidgets[trayLoc].insert(mWidgets[trayLoc].begin() + place, widget);
     mTrays[trayLoc]->addChild(widget->getOverlayElement());
 

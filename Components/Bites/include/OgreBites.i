@@ -56,5 +56,6 @@
 %ignore OgreBites::TrayManager::getWidget(TrayLocation, unsigned int);
 %ignore OgreBites::TrayManager::getNumWidgets(TrayLocation);
 %ignore OgreBites::TrayManager::getWidgetIterator;
+%ignore OgreBites::SelectMenu::getItemsCount;
 %include "OgreTrays.h"
 %include "OgreAdvancedRenderControls.h"

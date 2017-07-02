@@ -350,7 +350,7 @@ namespace OgreBites
 
         /// Do not instantiate any widgets directly. Use TrayManager.
         SelectMenu(const Ogre::String& name, const Ogre::DisplayString& caption, Ogre::Real width,
-            Ogre::Real boxWidth, unsigned int maxItemsShown);
+            Ogre::Real boxWidth, size_t maxItemsShown);
         void copyItemsFrom(SelectMenu* other);
         bool isExpanded()
         {
@@ -382,7 +382,7 @@ namespace OgreBites
             setItems(mItems);
         }
 
-        void insertItem(int index, const Ogre::DisplayString& item)
+        void insertItem(size_t index, const Ogre::DisplayString& item)
         {
             mItems.insert(mItems.begin() + index, item);
             setItems(mItems);
@@ -390,16 +390,17 @@ namespace OgreBites
 
         void removeItem(const Ogre::DisplayString& item);
 
-        void removeItem(unsigned int index);
+        void removeItem(size_t index);
 
         void clearItems();
 
-        size_t getItemsCount()
+        /// @deprecated use getNumItems
+        OGRE_DEPRECATED size_t getItemsCount()
         {
             return mItems.size();
         }
 
-        void selectItem(unsigned int index, bool notifyListener = true);
+        void selectItem(size_t index, bool notifyListener = true);
 
         bool containsItem(const Ogre::DisplayString& item);
 
@@ -445,8 +446,8 @@ namespace OgreBites
         Ogre::BorderPanelOverlayElement* mScrollTrack;
         Ogre::PanelOverlayElement* mScrollHandle;
         std::vector<Ogre::BorderPanelOverlayElement*> mItemElements;
-        unsigned int mMaxItemsShown;
-        unsigned int mItemsShown;
+        size_t mMaxItemsShown;
+        size_t mItemsShown;
         bool mCursorOver;
         bool mExpanded;
         bool mFitToContents;
@@ -895,7 +896,7 @@ namespace OgreBites
         /**
         Shows frame statistics widget set in the specified location.
         */
-        void showFrameStats(TrayLocation trayLoc, int place = -1);
+        void showFrameStats(TrayLocation trayLoc, size_t place = -1);
 
         /**
         Hides frame statistics widget set.
@@ -918,7 +919,7 @@ namespace OgreBites
         /**
         Shows logo in the specified location.
         */
-        void showLogo(TrayLocation trayLoc, int place = -1);
+        void showLogo(TrayLocation trayLoc, size_t place = -1);
 
         void hideLogo();
 
@@ -1013,7 +1014,7 @@ namespace OgreBites
         */
         void destroyWidget(Widget* widget);
 
-        void destroyWidget(TrayLocation trayLoc, unsigned int place)
+        void destroyWidget(TrayLocation trayLoc, size_t place)
         {
             destroyWidget(mWidgets[trayLoc][place]);
         }
@@ -1039,23 +1040,23 @@ namespace OgreBites
         void destroyAllWidgets();
 
         /**
-        Adds a widget to a specified tray.
+        Adds a widget to a specified tray at given position, or at the end if unspecified or invalid
         */
-        void moveWidgetToTray(Widget* widget, TrayLocation trayLoc, int place = -1);
+        void moveWidgetToTray(Widget* widget, TrayLocation trayLoc, size_t place = -1);
 
-        void moveWidgetToTray(const Ogre::String& name, TrayLocation trayLoc, unsigned int place = -1)
+        void moveWidgetToTray(const Ogre::String& name, TrayLocation trayLoc, size_t place = -1)
         {
             moveWidgetToTray(getWidget(name), trayLoc, place);
         }
 
         void moveWidgetToTray(TrayLocation currentTrayLoc, const Ogre::String& name, TrayLocation targetTrayLoc,
-            int place = -1)
+            size_t place = -1)
         {
             moveWidgetToTray(getWidget(currentTrayLoc, name), targetTrayLoc, place);
         }
 
-        void moveWidgetToTray(TrayLocation currentTrayLoc, unsigned int currentPlace, TrayLocation targetTrayLoc,
-            int targetPlace = -1)
+        void moveWidgetToTray(TrayLocation currentTrayLoc, size_t currentPlace, TrayLocation targetTrayLoc,
+            size_t targetPlace = -1)
         {
             moveWidgetToTray(mWidgets[currentTrayLoc][currentPlace], targetTrayLoc, targetPlace);
         }
@@ -1078,7 +1079,7 @@ namespace OgreBites
             removeWidgetFromTray(getWidget(trayLoc, name));
         }
 
-        void removeWidgetFromTray(TrayLocation trayLoc, int place)
+        void removeWidgetFromTray(TrayLocation trayLoc, size_t place)
         {
             removeWidgetFromTray(mWidgets[trayLoc][place]);
         }

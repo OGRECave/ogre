@@ -429,7 +429,7 @@ namespace Ogre {
     void Texture::convertToImage(Image& destImage, bool includeMipMaps)
     {
 
-        size_t numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
+        uint32 numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
         size_t dataSize = Image::calculateSize(numMips,
             getNumFaces(), getWidth(), getHeight(), getDepth(), getFormat());
 
@@ -442,7 +442,7 @@ namespace Ogre {
             uint32 width = getWidth();
             uint32 height = getHeight();
             uint32 depth = getDepth();
-            for (size_t mip = 0; mip < numMips; ++mip)
+            for (uint32 mip = 0; mip < numMips; ++mip)
             {
                 size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
 

@@ -582,7 +582,7 @@ namespace Ogre
 				counterVar = argValues[0];
 
 				// Agr 2 (start)
-				int start = strtol(argValues[1].c_str(), &endPtr, 10);
+				long start = strtol(argValues[1].c_str(), &endPtr, 10);
 				if (argValues[1].c_str() == endPtr)
 				{
 					//This isn't a number. Let's try if it's a variable
@@ -590,7 +590,7 @@ namespace Ogre
 				}
 
 				// Arg 3 (count)
-				int count = strtol(argValues[2].c_str(), &endPtr, 10);
+				long count = strtol(argValues[2].c_str(), &endPtr, 10);
 				if (argValues[2].c_str() == endPtr)
 				{
 					//This isn't a number. Let's try if it's a variable
