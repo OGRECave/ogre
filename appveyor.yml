@@ -7,7 +7,7 @@ build:
 build_script:
  - cmake -P ci-build.cmake
  - cmake --build .
- - set PATH=%PATH%;ogredeps\bin;gtest\lib
+ - set PATH=%PATH%;gtest\lib
  - bin\debug\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
 cache:
 - ogredeps -> CMake/Dependencies.cmake
