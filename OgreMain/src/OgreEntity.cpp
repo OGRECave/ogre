@@ -2544,7 +2544,7 @@ namespace Ogre {
             e != mLodEntityList.end(); ++e, ++lodi)
         {
             if(*e != this) {
-                uint nsub = (*e)->getNumSubEntities();
+                size_t nsub = (*e)->getNumSubEntities();
                 for (uint s = 0; s < nsub; ++s)
                 {
                     visitor->visit((*e)->getSubEntity(s), lodi, false);

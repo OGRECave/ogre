@@ -461,7 +461,7 @@ void SelectMenu::setItems(const Ogre::StringVector &items)
     }
     mItemElements.clear();
 
-    mItemsShown = std::max<int>(2, std::min<int>(mMaxItemsShown, (int)mItems.size()));
+    mItemsShown = Ogre::Math::Clamp<size_t>(mMaxItemsShown, 2, mItems.size());
 
     for (unsigned int i = 0; i < mItemsShown; i++)   // create all the item elements
     {

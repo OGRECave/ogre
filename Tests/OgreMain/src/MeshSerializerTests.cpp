@@ -368,8 +368,8 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
 
     EXPECT_TRUE(a->getNumSubMeshes() == b->getNumSubMeshes());
     int numLods = std::min(a->getNumLodLevels(), b->getNumLodLevels());
-    int numSubmeshes = a->getNumSubMeshes();
-    for (int i = 0; i < numSubmeshes; i++) {
+    size_t numSubmeshes = a->getNumSubMeshes();
+    for (size_t i = 0; i < numSubmeshes; i++) {
         SubMesh* aSubmesh = a->getSubMesh(i);
         SubMesh* bSubmesh = b->getSubMesh(i);
 

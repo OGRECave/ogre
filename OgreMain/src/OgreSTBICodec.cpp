@@ -99,7 +99,7 @@ namespace Ogre {
         }
 
         ImageData* pImgData = static_cast<ImageData*>(pData.get());
-        int channels = PixelUtil::getComponentCount(pImgData->format);
+        int channels = (int)PixelUtil::getComponentCount(pImgData->format);
 
         int len;
         uchar *data = stbi_write_png_to_mem(input->getPtr(), pImgData->width*channels,

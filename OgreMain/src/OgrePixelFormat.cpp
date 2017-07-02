@@ -702,7 +702,7 @@ namespace Ogre {
             if(src.format == dst.format && src.left == 0 && src.top == 0 && dst.left == 0 && dst.top == 0)
             {
                 // we can copy with slice granularity, useful for Tex2DArray handling
-                uint32 bytesPerSlice = getMemorySize(src.getWidth(), src.getHeight(), 1, src.format);
+                size_t bytesPerSlice = getMemorySize(src.getWidth(), src.getHeight(), 1, src.format);
                 memcpy(
                     (uint8*)dst.data + bytesPerSlice * dst.front,
                     (uint8*)src.data + bytesPerSlice * src.front,

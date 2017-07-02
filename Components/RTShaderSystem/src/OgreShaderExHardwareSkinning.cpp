@@ -429,8 +429,8 @@ void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, Sk
             const Entity* pCurEntity = pEntity;
             if (indexLod > 0) pCurEntity = pEntity->getManualLodLevel(indexLod - 1);
 
-            unsigned int numSubEntities = pCurEntity->getNumSubEntities();
-            for(unsigned int indexSub = 0 ; indexSub < numSubEntities ; ++indexSub)
+            size_t numSubEntities = pCurEntity->getNumSubEntities();
+            for(size_t indexSub = 0 ; indexSub < numSubEntities ; ++indexSub)
             {
                 ushort boneCount = 0,weightCount = 0;
                 bool isValid = extractSkeletonData(pCurEntity, indexSub, boneCount, weightCount);
