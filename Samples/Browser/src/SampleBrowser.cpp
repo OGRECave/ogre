@@ -96,9 +96,6 @@ int main(int argc, char *argv[]) {
 
     return retVal;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    // Make sure glue isn't stripped.
-    app_dummy();
-    
     OgreAndroidBridge::init(state);
     OgreAndroidBridge::go(state);
 #else

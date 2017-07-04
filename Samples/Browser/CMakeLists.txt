@@ -179,7 +179,11 @@ if(ANDROID)
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
     
-    
+    # Force export ANativeActivity_onCreate()  
+    # Refer to: https://github.com/android-ndk/ndk/issues/381.
+    # Only needed when building with NDK-R14 and older
+    SET(OGRE_ANDROID_LDFLAGS "-u ANativeActivity_onCreate")
+
     SET(PKG_NAME "org.ogre.browser")
     # Set this variable to false if no java code will be present (google android:hasCode for more info)
     SET(HAS_CODE "false")
