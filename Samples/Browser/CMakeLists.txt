@@ -175,7 +175,7 @@ if(ANDROID)
     
     SET(ANDROID_MOD_NAME "OgreSampleBrowser")
     SET(JNI_PATH "${CMAKE_SOURCE_DIR}/Samples/Browser/src")
-    SET(JNI_SRC_FILES "SampleBrowser.cpp")
+    SET(JNI_SRC_FILES "SampleBrowser.cpp gestureDetector.cpp")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
     

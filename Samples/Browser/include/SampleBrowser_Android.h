@@ -30,23 +30,17 @@
 #define __SampleBrowser_Android_H__
 
 #include <android_native_app_glue.h>
-#include <android/log.h>
+
 #include "OgrePlatform.h"
 #include "SampleBrowser.h"
 #include "OgreInput.h"
 #include "OgreGLRenderSystemCommon.h"
 
-#include <gestureDetector.h>
-
-#undef LOGI
-#undef LOGW
+#include "gestureDetector.h"
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #   error This header is for use with Android only
 #endif
-
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "Ogre", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "Ogre", __VA_ARGS__))
 
 namespace OgreBites
 {
@@ -87,11 +81,11 @@ namespace OgreBites
                 if(s & ndk_helper::GESTURE_STATE_START) {
                     ndk_helper::Vec2 p1, p2;
                     mPinchGesture.GetPointers(p1, p2);
-                    len = (p1 - p2).Length();
+                    len = (p1 - p2).length();
                 } else if (s & ndk_helper::GESTURE_STATE_MOVE) {
                     ndk_helper::Vec2 p1, p2;
                     mPinchGesture.GetPointers(p1, p2);
-                    float curr = (p1 - p2).Length();
+                    float curr = (p1 - p2).length();
 
                     if(fabs(curr - len)/mBrowser.getRenderWindow()->getWidth() > 0.01) {
                         wheel = (curr - len) > 0 ? 1 : -1;
