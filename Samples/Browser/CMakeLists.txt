@@ -175,18 +175,22 @@ if(ANDROID)
     
     SET(ANDROID_MOD_NAME "OgreSampleBrowser")
     SET(JNI_PATH "${CMAKE_SOURCE_DIR}/Samples/Browser/src")
-    SET(JNI_SRC_FILES "SampleBrowser.cpp")
+    SET(JNI_SRC_FILES "SampleBrowser.cpp gestureDetector.cpp")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
     
-    
+    # Force export ANativeActivity_onCreate()  
+    # Refer to: https://github.com/android-ndk/ndk/issues/381.
+    # Only needed when building with NDK-R14 and older
+    SET(OGRE_ANDROID_LDFLAGS "-u ANativeActivity_onCreate")
+
     SET(PKG_NAME "org.ogre.browser")
     # Set this variable to false if no java code will be present (google android:hasCode for more info)
     SET(HAS_CODE "false")
     
     SET(MAIN_ACTIVITY "android.app.NativeActivity")
     SET(HEADERS "")
-    SET(SAMPLE_LDLIBS "")
+    SET(SAMPLE_LDLIBS "android_native_app_glue")
     
     add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_Water" "Sample_Ocean" "Sample_NewInstancing" "Sample_ShaderSystem" "Sample_DeferredShading" "Sample_EndlessWorld" "Sample_VolumeCSG" "Sample_VolumeTerrain" "Sample_Terrain" "Sample_ShaderSystemMultiLight" "Sample_ShaderSystemTexturedFog")
 	add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Fresnel" "Sample_Grass" "Sample_ParticleFX" "Sample_MeshLod" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
