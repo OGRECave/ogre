@@ -707,7 +707,7 @@ namespace Ogre
         const HlmsUnlitDatablock *datablock = static_cast<const HlmsUnlitDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
-        if( OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( lastCacheHash ) != HLMS_UNLIT )
+        if( OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( lastCacheHash ) != mType )
         {
             //We changed HlmsType, rebind the shared textures.
             mLastTextureHash = 0;
