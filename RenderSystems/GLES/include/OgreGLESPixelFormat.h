@@ -90,7 +90,7 @@ namespace Ogre {
                     For compressed formats, constraints apply on minimum size and alignment
                     so this might differ.
             */
-            static size_t getMaxMipmaps(size_t width, size_t height, size_t depth, PixelFormat format);
+            static uint32 getMaxMipmaps(uint32 width, uint32 height, uint32 depth, PixelFormat format);
 
             /** Returns next power-of-two size if required by render system, in case
                 RSC_NON_POWER_OF_2_TEXTURES is supported it returns value as-is.

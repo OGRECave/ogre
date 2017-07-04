@@ -843,9 +843,9 @@ namespace Ogre  {
     }
 
 
-    size_t GL3PlusPixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth, PixelFormat format)
+    uint32 GL3PlusPixelUtil::getMaxMipmaps(uint32 width, uint32 height, uint32 depth, PixelFormat format)
     {
-        size_t count = 0;
+        uint32 count = 0;
         do {
             if(width>1)     width = width/2;
             if(height>1)    height = height/2;

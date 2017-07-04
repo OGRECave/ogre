@@ -103,7 +103,7 @@ namespace Ogre {
         GLenum texTarget = getGLES2TextureTarget();
 
         // Check requested number of mipmaps
-        size_t maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
+        uint32 maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
         
         if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
             mNumRequestedMipmaps = 0;

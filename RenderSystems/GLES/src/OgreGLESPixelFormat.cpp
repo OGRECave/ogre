@@ -350,10 +350,10 @@ namespace Ogre  {
         };
     }
 
-    size_t GLESPixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth,
+    uint32 GLESPixelUtil::getMaxMipmaps(uint32 width, uint32 height, uint32 depth,
                                       PixelFormat format)
     {
-        size_t count = 0;
+        uint32 count = 0;
         if((width > 0) && (height > 0) && (depth > 0))
         {
             do {

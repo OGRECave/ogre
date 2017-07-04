@@ -89,7 +89,7 @@ namespace Ogre {
                     For compressed formats, constraints apply on minimum size and alignment
                     so this might differ.
             */
-            static size_t getMaxMipmaps(uint32 width, uint32 height, uint32 depth, PixelFormat format);
+            static uint32 getMaxMipmaps(uint32 width, uint32 height, uint32 depth, PixelFormat format);
     };
 }
 

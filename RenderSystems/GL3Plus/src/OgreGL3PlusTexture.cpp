@@ -94,7 +94,7 @@ namespace Ogre {
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
 
         // Check requested number of mipmaps.
-        size_t maxMips = GL3PlusPixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
+        uint32 maxMips = GL3PlusPixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
 
         if (PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
             mNumRequestedMipmaps = 0;
