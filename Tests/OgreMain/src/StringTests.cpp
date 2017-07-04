@@ -147,6 +147,11 @@ TEST_F(StringTests,MatchSuperGlobtastic)
     EXPECT_TRUE(StringUtil::match(testFileNoPath, "*e*tf*e.t*t", true));
 }
 //--------------------------------------------------------------------------
+TEST_F(StringTests,MatchSuperGlobEnd)
+{
+    EXPECT_TRUE(StringUtil::match("normal", "*normal*", true));
+}
+//--------------------------------------------------------------------------
 TEST_F(StringTests,ParseReal)
 {
     Real r = 23.454;
