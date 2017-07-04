@@ -91,6 +91,8 @@ namespace Ogre {
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
+        /// Overridden from GpuProgram
+        GpuProgramParametersSharedPtr createParameters(void);
 
         /// compile source into shader object
         bool compile( const bool checkErrors = false);

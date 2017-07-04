@@ -296,7 +296,13 @@ namespace Ogre {
 
         return language;
     }
-
+    //-----------------------------------------------------------------------
+    Ogre::GpuProgramParametersSharedPtr GLSLESProgram::createParameters( void )
+    {
+        GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
+        params->setTransposeMatrices(true);
+        return params;
+    }
     //-----------------------------------------------------------------------
     void GLSLESProgram::checkAndFixInvalidDefaultPrecisionError( String &message )
     {
