@@ -453,7 +453,7 @@ namespace Ogre {
 
         }
         // If we reached the end of both the pattern and the string, we succeeded
-        if (patIt == tmpPattern.end() && strIt == tmpStr.end())
+        if ((patIt == tmpPattern.end() || (*patIt == '*' && patIt + 1 == tmpPattern.end())) && strIt == tmpStr.end())
         {
             return true;
         }
