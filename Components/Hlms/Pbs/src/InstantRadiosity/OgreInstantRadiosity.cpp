@@ -1154,8 +1154,7 @@ namespace Ogre
                             }
                             else if( mUseTextures )
                             {
-                                material.image[imageIdx] = &downloadTexture(
-                                            pbsDatablock->getTexture( PBSM_DIFFUSE ) );
+                                material.image[imageIdx] = &downloadTexture( diffuseTex );
                                 material.uvSet[imageIdx] =
                                         pbsDatablock->getTextureUvSource( PBSM_DIFFUSE );
                                 material.needsUv = true;
