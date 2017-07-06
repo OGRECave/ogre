@@ -142,7 +142,6 @@ namespace Ogre
         GLfloat mPointSizeMax;
     public:
         GL3PlusStateCacheManager(void);
-        ~GL3PlusStateCacheManager();
         
         /// See GL3PlusStateCacheManager.initializeCache.
         void initializeCache();
