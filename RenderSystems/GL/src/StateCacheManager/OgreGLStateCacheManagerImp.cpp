@@ -199,29 +199,29 @@ namespace Ogre {
 
     }
 
-    void GLStateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
+    void GLStateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
             return;
         
+        if(target == GL_FRAMEBUFFER)
+        {
+            glDeleteFramebuffers(1, &buffer);
+        }
+        else if(target == GL_RENDERBUFFER)
+        {
+            glDeleteRenderbuffers(1, &buffer);
+        }
+        else
+        {
+            glDeleteBuffers(1, &buffer);
+        }
+
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         
-        if (i != mActiveBufferMap.end() && ((*i).second == buffer || force))
+        if (i != mActiveBufferMap.end() && ((*i).second == buffer))
         {
-            if(target == GL_FRAMEBUFFER)
-            {
-                glDeleteFramebuffers(1, &buffer);
-            }
-            else if(target == GL_RENDERBUFFER)
-            {
-                glDeleteRenderbuffers(1, &buffer);
-            }
-            else
-            {
-                glDeleteBuffers(1, &buffer);
-            }
-
             // Currently bound buffer is being deleted, update the cached value to 0,
             // which it likely the buffer that will be bound by the driver.
             // An update will be forced next time we try to bind on this target.

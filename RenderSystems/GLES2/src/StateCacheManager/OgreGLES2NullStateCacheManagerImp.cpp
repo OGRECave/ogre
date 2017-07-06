@@ -112,7 +112,7 @@ namespace Ogre {
         }
     }
     
-    void GLES2StateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
+    void GLES2StateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
