@@ -96,6 +96,7 @@ namespace Ogre {
         mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
         
+#ifdef OGRE_ENABLE_STATE_CACHE
         mEnableVector.reserve(25);
         mEnableVector.clear();
         mActiveBufferMap.clear();
@@ -103,19 +104,12 @@ namespace Ogre {
 
         mEnabledVertexAttribs.reserve(64);
         mEnabledVertexAttribs.clear();
+#endif
     }
-    
-    GLES2StateCacheManager::~GLES2StateCacheManager(void)
-    {
-        mColourMask.clear();
-        mClearColour.clear();
-        mActiveBufferMap.clear();
-        mEnableVector.clear();
-        mTexUnitsMap.clear();
-    }
-    
+
     void GLES2StateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         bool update = false;
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         if (i == mActiveBufferMap.end())
@@ -132,6 +126,7 @@ namespace Ogre {
 
         // Update GL
         if(update)
+#endif
         {
             if(target == GL_FRAMEBUFFER)
             {
@@ -167,7 +162,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
         }
 
-
+#ifdef OGRE_ENABLE_STATE_CACHE
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         
         if (i != mActiveBufferMap.end() && ((*i).second == buffer))
@@ -177,16 +172,20 @@ namespace Ogre {
             // An update will be forced next time we try to bind on this target.
             (*i).second = 0;
         }
+#endif
     }
 
     void GLES2StateCacheManager::invalidateStateForTexture(GLuint texture)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         mTexUnitsMap.erase(texture);
+#endif
     }
 
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
     void GLES2StateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
         if (it == mTexUnitsMap.end())
@@ -221,10 +220,14 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
             }
         }
+#else
+        OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
+#endif
     }
 
     void GLES2StateCacheManager::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
         if (it == mTexUnitsMap.end())
@@ -259,10 +262,14 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glTexParameterf(target, pname, param));
             }
         }
+#else
+        OGRE_CHECK_GL_ERROR(glTexParameterf(target, pname, param));
+#endif
     }
 
     void GLES2StateCacheManager::getTexParameterfv(GLenum target, GLenum pname, GLfloat* params)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         // Check if we have a map entry for this texture id.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
 
@@ -270,6 +277,9 @@ namespace Ogre {
         TexParameterfMap::iterator i = (*it).second.mTexParameterfMap.find(pname);
 
         *params = i->second;
+#else
+        OGRE_CHECK_GL_ERROR(glGetTexParameterfv(target, pname, params));
+#endif
     }
 
     void GLES2StateCacheManager::bindGLTexture(GLenum target, GLuint texture)
@@ -309,7 +319,9 @@ namespace Ogre {
     // TODO: Store as high/low bits of a GLuint
     void GLES2StateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mBlendFuncSource != source || mBlendFuncDest != dest)
+#endif
         {
             mBlendFuncSource = source;
             mBlendFuncDest = dest;
@@ -320,7 +332,9 @@ namespace Ogre {
     
     void GLES2StateCacheManager::setBlendEquation(GLenum eq)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mBlendEquation != eq)
+#endif
         {
             mBlendEquation = eq;
             
@@ -413,17 +427,22 @@ namespace Ogre {
     
     void GLES2StateCacheManager::setDisabled(GLenum flag)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         vector<GLenum>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
         if(iter != mEnableVector.end())
         {
             mEnableVector.erase(iter);
-            
+
             OGRE_CHECK_GL_ERROR(glDisable(flag));
         }
+#else
+        OGRE_CHECK_GL_ERROR(glDisable(flag));
+#endif
     }
 
     void GLES2StateCacheManager::setVertexAttribEnabled(GLuint attrib)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         bool found = std::find(mEnabledVertexAttribs.begin(), mEnabledVertexAttribs.end(), attrib) != mEnabledVertexAttribs.end();
         if(!found)
         {
@@ -431,10 +450,14 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
         }
+#else
+        OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
+#endif
     }
 
     void GLES2StateCacheManager::setVertexAttribDisabled(GLuint attrib)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         vector<GLuint>::iterator iter = std::find(mEnabledVertexAttribs.begin(), mEnabledVertexAttribs.end(), attrib);
         if(iter != mEnabledVertexAttribs.end())
         {
@@ -442,6 +465,9 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(attrib));
         }
+#else
+        OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(attrib));
+#endif
     }
 
     void GLES2StateCacheManager::setCullFace(GLenum face)

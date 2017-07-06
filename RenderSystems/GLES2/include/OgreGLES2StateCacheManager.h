@@ -112,7 +112,6 @@ namespace Ogre
         GLclampf mClearDepth;
     public:
         GLES2StateCacheManager(void);
-        ~GLES2StateCacheManager(void);
 
         /** Initialize our cache variables and sets the
             GL states on the current context.
