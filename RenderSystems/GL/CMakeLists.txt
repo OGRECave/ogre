@@ -37,11 +37,9 @@ source_group(NVparse FILES ${NVPARSE_SOURCE} ${NVPARSE_HEADERS})
 source_group(ATIFS FILES ${ATIFS_SOURCE} ${ATIFS_HEADERS})
 source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
 
-include_directories(src/StateCacheManager)
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
-  list(APPEND SOURCE_FILES src/StateCacheManager/OgreGLStateCacheManagerImp.cpp)
-else()
-  list(APPEND SOURCE_FILES src/StateCacheManager/OgreGLNullStateCacheManagerImp.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLStateCacheManager.cpp 
+    PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
 endif()
 
 list(APPEND HEADER_FILES

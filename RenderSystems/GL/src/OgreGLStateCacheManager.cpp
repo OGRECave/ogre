@@ -153,19 +153,10 @@ namespace Ogre {
         mPointAttenuation[1] = 0.0f;
         mPointAttenuation[2] = 0.0f;
     }
-    
-    GLStateCacheManager::~GLStateCacheManager(void)
-    {
-        mColourMask.clear();
-        mClearColour.clear();
-        mActiveBufferMap.clear();
-        mBoolStateMap.clear();
-        mTexUnitsMap.clear();
-        mTextureCoordGen.clear();
-    }
-    
+
     void GLStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         bool update = false;
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         if (i == mActiveBufferMap.end())
@@ -182,6 +173,7 @@ namespace Ogre {
 
         // Update GL
         if(update)
+#endif
         {
             if(target == GL_FRAMEBUFFER)
             {
@@ -218,6 +210,7 @@ namespace Ogre {
             glDeleteBuffers(1, &buffer);
         }
 
+#ifdef OGRE_ENABLE_STATE_CACHE
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         
         if (i != mActiveBufferMap.end() && ((*i).second == buffer))
@@ -227,16 +220,20 @@ namespace Ogre {
             // An update will be forced next time we try to bind on this target.
             (*i).second = 0;
         }
+#endif
     }
 
     void GLStateCacheManager::invalidateStateForTexture(GLuint texture)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         mTexUnitsMap.erase(texture);
+#endif
     }
 
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
     void GLStateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
         if (it == mTexUnitsMap.end())
@@ -271,6 +268,9 @@ namespace Ogre {
                 glTexParameteri(target, pname, param);
             }
         }
+#else
+        glTexParameteri(target, pname, param);
+#endif
     }
     
     void GLStateCacheManager::bindGLTexture(GLenum target, GLuint texture)
@@ -310,7 +310,9 @@ namespace Ogre {
     // TODO: Store as high/low bits of a GLuint
     void GLStateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mBlendFuncSource != source || mBlendFuncDest != dest)
+#endif
         {
             mBlendFuncSource = source;
             mBlendFuncDest = dest;
@@ -393,7 +395,11 @@ namespace Ogre {
     
     void GLStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if (mBoolStateMap[flag] == enabled)
+#else
+        if(enabled)
+#endif
         {
             glDisable(flag);
         }
@@ -405,10 +411,12 @@ namespace Ogre {
 
     void GLStateCacheManager::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if((mViewport[0] != x) ||
            (mViewport[1] != y) ||
            (mViewport[2] != width) ||
            (mViewport[3] != height))
+#endif
         {
             mViewport[0] = x;
             mViewport[1] = y;
@@ -625,6 +633,7 @@ namespace Ogre {
 
     void GLStateCacheManager::enableTextureCoordGen(GLenum type)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         OGRE_HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
         if (it == mTextureCoordGen.end())
         {
@@ -639,10 +648,14 @@ namespace Ogre {
                 it->second.mEnabled.insert(type);
             }
         }
+#else
+        glEnable(type);
+#endif
     }
 
     void GLStateCacheManager::disableTextureCoordGen(GLenum type)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         OGRE_HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
         if (it != mTextureCoordGen.end())
         {
@@ -653,5 +666,8 @@ namespace Ogre {
                 it->second.mEnabled.erase(found);
             }
         }
+#else
+        glDisable(type);
+#endif
     }
 }

@@ -140,7 +140,6 @@ namespace Ogre
         GLfloat mPointSizeMax;
     public:
         GLStateCacheManager(void);
-        ~GLStateCacheManager();
         
         /// See GLStateCacheManager.initializeCache.
         void initializeCache();
