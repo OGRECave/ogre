@@ -44,9 +44,9 @@ namespace Ogre {
         glBlendEquation(GL_FUNC_ADD);
 
         glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-        
+
         glBlendFunc(GL_ONE, GL_ZERO);
-        
+
         glCullFace(mCullFace);
 
         glDepthFunc(mDepthFunc);
@@ -125,18 +125,10 @@ namespace Ogre {
 
         mActiveVertexArray = 0;
     }
-    
-    GL3PlusStateCacheManager::~GL3PlusStateCacheManager(void)
-    {
-        mColourMask.clear();
-        mClearColour.clear();
-        mActiveBufferMap.clear();
-        mBoolStateMap.clear();
-        mTexUnitsMap.clear();
-        mTextureCoordGen.clear();
-    }
+
     void GL3PlusStateCacheManager::bindGLFrameBuffer(GLenum target,GLuint buffer, bool force)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         bool update = false;
        
         //GL_FRAMEBUFFER sets both GL_DRAW_FRAMEBUFFER and GL_READ_FRAMEBUFFER
@@ -169,12 +161,14 @@ namespace Ogre {
 
         // Update GL
         if(update)
+#endif
         {
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(target, buffer));
         }
     }
     void GL3PlusStateCacheManager::bindGLRenderBuffer(GLuint buffer, bool force)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         bool update = false;
        
         BindBufferMap::iterator i = mActiveBufferMap.find(GL_RENDERBUFFER);
@@ -192,6 +186,7 @@ namespace Ogre {
 
         // Update GL
         if(update)
+#endif
         {
             OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, buffer));
         }
@@ -199,6 +194,7 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         bool update = false;
        
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
@@ -216,6 +212,7 @@ namespace Ogre {
 
         // Update GL
         if(update)
+#endif
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(target, buffer));
         }
@@ -230,6 +227,7 @@ namespace Ogre {
         //always delete the buffer, even if not currently bound
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &buffer));
 
+#ifdef OGRE_ENABLE_STATE_CACHE
         if (buffer == mActiveDrawFrameBuffer )
         {
             // Currently bound read frame buffer is being deleted, update the cached values to 0,
@@ -240,6 +238,7 @@ namespace Ogre {
             // Currently bound read frame buffer is being deleted, update the cached values to 0,
             mActiveReadFrameBuffer = 0;
         }
+#endif
     }
     void GL3PlusStateCacheManager::deleteGLRenderBuffer(GLuint buffer)
     {
@@ -250,6 +249,7 @@ namespace Ogre {
         //always delete the buffer, even if not currently bound
         OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &buffer));
         
+#ifdef OGRE_ENABLE_STATE_CACHE
         BindBufferMap::iterator i = mActiveBufferMap.find(GL_RENDERBUFFER);
         if (i != mActiveBufferMap.end() && ((*i).second == buffer))
         {
@@ -258,6 +258,7 @@ namespace Ogre {
             // An update will be forced next time we try to bind on this target.
             (*i).second = 0;
         }
+#endif
     }
     void GL3PlusStateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer)
     {
@@ -268,6 +269,7 @@ namespace Ogre {
         //always delete the buffer, even if not currently bound
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
 
+#ifdef OGRE_ENABLE_STATE_CACHE
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         
         if (i != mActiveBufferMap.end() && ((*i).second == buffer))
@@ -277,10 +279,12 @@ namespace Ogre {
             // An update will be forced next time we try to bind on this target.
             (*i).second = 0;
         }
+#endif
     }
 
     void GL3PlusStateCacheManager::bindGLVertexArray(GLuint vao)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mActiveVertexArray != vao)
         {
             mActiveVertexArray = vao;
@@ -288,16 +292,22 @@ namespace Ogre {
             //we also need to clear the cached GL_ELEMENT_ARRAY_BUFFER value, as it is invalidated by glBindVertexArray
             bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
+#else
+        OGRE_CHECK_GL_ERROR(glBindVertexArray(vao));
+#endif
     }
 
     void GL3PlusStateCacheManager::invalidateStateForTexture(GLuint texture)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         mTexUnitsMap.erase(texture);
+#endif
     }
 
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
     void GL3PlusStateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
         if (it == mTexUnitsMap.end())
@@ -317,7 +327,6 @@ namespace Ogre {
         {
             // Haven't cached this state yet.  Insert it into the map
             myMap.insert(TexParameteriMap::value_type(pname, param));
-            
             // Update GL
             OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
         }
@@ -332,11 +341,16 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
             }
         }
+#else
+        OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
+#endif
     }
     
     void GL3PlusStateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         mLastBoundTexID = texture;
+#endif
         
         // Update GL
         OGRE_CHECK_GL_ERROR(glBindTexture(target, texture));
@@ -344,34 +358,32 @@ namespace Ogre {
     
     bool GL3PlusStateCacheManager::activateGLTextureUnit(size_t unit)
     {
-        if (mActiveTextureUnit != unit)
+        if (mActiveTextureUnit == unit)
+            return true;
+
+        if (unit < static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
         {
-            if (unit < static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
-            {
-                OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
-                mActiveTextureUnit = unit;
-                return true;
-            }
-            else if (!unit)
-            {
-                // always ok to use the first unit
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
+            mActiveTextureUnit = unit;
+            return true;
+        }
+        else if (!unit)
+        {
+            // always ok to use the first unit
+            return true;
         }
         else
         {
-            return true;
+            return false;
         }
     }
     
     // TODO: Store as high/low bits of a GLuint
     void GL3PlusStateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mBlendFuncSource != source || mBlendFuncDest != dest)
+#endif
         {
             mBlendFuncSource = source;
             mBlendFuncDest = dest;
@@ -454,7 +466,11 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if (mBoolStateMap[flag] == enabled)
+#else
+        if (enabled)
+#endif
         {
             OGRE_CHECK_GL_ERROR(glDisable(flag));
         }
@@ -466,10 +482,12 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if((mViewport[0] != x) ||
            (mViewport[1] != y) ||
            (mViewport[2] != width) ||
            (mViewport[3] != height))
+#endif
         {
             mViewport[0] = x;
             mViewport[1] = y;
@@ -497,7 +515,9 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setBlendEquation(GLenum eq)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mBlendEquationRGB != eq || mBlendEquationAlpha != eq)
+#endif
         {
             mBlendEquationRGB = eq;
             mBlendEquationAlpha = eq;
@@ -508,7 +528,9 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setBlendEquation(GLenum eqRGB, GLenum eqAlpha)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mBlendEquationRGB != eqRGB || mBlendEquationAlpha != eqAlpha)
+#endif
         {
             mBlendEquationRGB = eqRGB;
             mBlendEquationAlpha = eqAlpha;
@@ -519,7 +541,9 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setPolygonMode(GLenum mode)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if (mPolygonMode != mode)
+#endif
         {
             mPolygonMode = mode;
             OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode));
@@ -538,6 +562,7 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::enableTextureCoordGen(GLenum type)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         OGRE_HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
         if (it == mTextureCoordGen.end())
         {
@@ -552,10 +577,14 @@ namespace Ogre {
                 it->second.mEnabled.insert(type);
             }
         }
+#else
+        OGRE_CHECK_GL_ERROR(glEnable(type));
+#endif
     }
 
     void GL3PlusStateCacheManager::disableTextureCoordGen(GLenum type)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         OGRE_HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
         if (it != mTextureCoordGen.end())
         {
@@ -566,10 +595,15 @@ namespace Ogre {
                 it->second.mEnabled.erase(found);
             }
         }
+#else
+        OGRE_CHECK_GL_ERROR(glDisable(type));
+#endif
     }
     void GL3PlusStateCacheManager::bindGLProgramPipeline(GLuint handle)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mActiveProgramPipeline != handle)
+#endif
         {
             mActiveProgramPipeline = handle;
             OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mActiveProgramPipeline));

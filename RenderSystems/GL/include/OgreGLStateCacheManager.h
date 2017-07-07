@@ -140,7 +140,6 @@ namespace Ogre
         GLfloat mPointSizeMax;
     public:
         GLStateCacheManager(void);
-        ~GLStateCacheManager();
         
         /// See GLStateCacheManager.initializeCache.
         void initializeCache();
@@ -159,9 +158,8 @@ namespace Ogre
         /** Delete an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
-         @param force Optional parameter to force an update.
          */
-        void deleteGLBuffer(GLenum target, GLuint buffer, bool force = false);
+        void deleteGLBuffer(GLenum target, GLuint buffer);
 
         /** Bind an OpenGL texture of any type.
          @param target The texture target.

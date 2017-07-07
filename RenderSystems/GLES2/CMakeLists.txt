@@ -22,11 +22,9 @@ set(GLESW_HEADER_INSTALL "GLES3")
 file(GLOB GLESW_HEADERS "include/GLES3/*.h")
 file(GLOB KHR_HEADERS "include/KHR/*.h")
 
-include_directories(src/StateCacheManager)
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
-  list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp)
-else()
-  list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLES2StateCacheManager.cpp 
+    PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
 endif()
 
 if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
