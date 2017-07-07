@@ -61,15 +61,6 @@ namespace Ogre {
             const String& getName() const { return mName; }
 
     };
-
-    /** Shared pointer implementation used to share uniform buffers. */
-    class _OgreExport HardwareUniformBufferSharedPtr : public SharedPtr<HardwareUniformBuffer>
-    {
-    public:
-        HardwareUniformBufferSharedPtr() : SharedPtr<HardwareUniformBuffer>() {}
-        explicit HardwareUniformBufferSharedPtr(HardwareUniformBuffer* buf);
-    };
-
 }
 
 #include "OgreHeaderSuffix.h"

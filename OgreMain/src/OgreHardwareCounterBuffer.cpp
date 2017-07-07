@@ -56,11 +56,4 @@ namespace Ogre {
         }
         OGRE_DELETE mShadowBuffer;
     }
-
-    //-----------------------------------------------------------------------------
-    HardwareCounterBufferSharedPtr::HardwareCounterBufferSharedPtr(HardwareCounterBuffer* buf)
-        : SharedPtr<HardwareCounterBuffer>(buf)
-    {
-
-    }
 }

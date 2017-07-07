@@ -151,10 +151,4 @@ namespace Ogre {
         return true;
     }
     */
-    //-----------------------------------------------------------------------------
-    HardwareUniformBufferSharedPtr::HardwareUniformBufferSharedPtr(HardwareUniformBuffer* buf)
-        : SharedPtr<HardwareUniformBuffer>(buf)
-    {
-
-    }
 }
