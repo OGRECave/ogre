@@ -491,8 +491,9 @@ namespace Ogre {
                 The format of the area
             @remarks For non-compressed formats, this is always true. For DXT formats,
             only sizes with a width and height multiple of 4 and depth 1 are allowed.
+            @deprecated do not use
         */
-        static bool isValidExtent(size_t width, size_t height, size_t depth, PixelFormat format);
+        OGRE_DEPRECATED static bool isValidExtent(size_t width, size_t height, size_t depth, PixelFormat format);
 
         /** Gives the number of bits (RGBA) for a format. See remarks.          
           @remarks      For non-colour formats (dxt, depth) this returns [0,0,0,0].
