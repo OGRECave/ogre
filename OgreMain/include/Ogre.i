@@ -221,20 +221,15 @@ ADD_REPR(ColourValue)
 %include "OgreCompositionTechnique.h"
 %include "OgreCompositionTargetPass.h"
 %include "OgreResourceBackgroundQueue.h"
-// instantiated in c++ code
-// %template(HardwareVertexBufferPtr) Ogre::SharedPtr<Ogre::HardwareVertexBuffer>;
+%template(HardwareVertexBufferPtr) Ogre::SharedPtr<Ogre::HardwareVertexBuffer>;
 %include "OgreHardwareVertexBuffer.h"
-// instantiated in c++ code
-// %template(HardwareIndexBufferPtr) Ogre::SharedPtr<Ogre::HardwareIndexBuffer>;
+%template(HardwareIndexBufferPtr) Ogre::SharedPtr<Ogre::HardwareIndexBuffer>;
 %include "OgreHardwareIndexBuffer.h"
-// instantiated in c++ code
-// %template(HardwarePixelBufferPtr) Ogre::SharedPtr<Ogre::HardwarePixelBuffer>;
+%template(HardwarePixelBufferPtr) Ogre::SharedPtr<Ogre::HardwarePixelBuffer>;
 %include "OgreHardwarePixelBuffer.h"
-// instantiated in c++ code
-// %template(HardwareCounterBufferPtr) Ogre::SharedPtr<Ogre::HardwareCounterBuffer>;
+%template(HardwareCounterBufferPtr) Ogre::SharedPtr<Ogre::HardwareCounterBuffer>;
 %include "OgreHardwareCounterBuffer.h"
-// instantiated in c++ code
-// %template(HardwareUniformBufferPtr) Ogre::SharedPtr<Ogre::HardwareUniformBuffer>;
+%template(HardwareUniformBufferPtr) Ogre::SharedPtr<Ogre::HardwareUniformBuffer>;
 %include "OgreHardwareUniformBuffer.h"
 %include "OgreHardwareBufferManager.h"
 %include "OgreVertexIndexData.h"

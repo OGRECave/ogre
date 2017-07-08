@@ -36,8 +36,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class HardwareVertexBufferSharedPtr;
-    
     /** \addtogroup Optional
     *  @{
     */

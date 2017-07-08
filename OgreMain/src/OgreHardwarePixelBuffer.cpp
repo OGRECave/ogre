@@ -179,14 +179,6 @@ namespace Ogre
                 "Not yet implemented for this rendersystem.",
                 "HardwarePixelBuffer::getRenderTarget");
     }
-
-    //-----------------------------------------------------------------------------    
-    
-    HardwarePixelBufferSharedPtr::HardwarePixelBufferSharedPtr(HardwarePixelBuffer* buf)
-        : SharedPtr<HardwarePixelBuffer>(buf)
-    {
-
-    }   
     //-----------------------------------------------------------------------------    
 
     void HardwarePixelBuffer::_clearSliceRTT(size_t zoffset)

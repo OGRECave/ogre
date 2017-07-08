@@ -73,15 +73,6 @@ namespace Ogre {
 
             // NB subclasses should override lock, unlock, readData, writeData
     };
-
-
-    /** Shared pointer implementation used to share index buffers. */
-    class _OgreExport HardwareIndexBufferSharedPtr : public SharedPtr<HardwareIndexBuffer>
-    {
-    public:
-        HardwareIndexBufferSharedPtr() : SharedPtr<HardwareIndexBuffer>() {}
-        explicit HardwareIndexBufferSharedPtr(HardwareIndexBuffer* buf);
-    };
     
     /** Locking helper. */    
     typedef HardwareBufferLockGuard<HardwareIndexBufferSharedPtr> HardwareIndexBufferLockGuard;

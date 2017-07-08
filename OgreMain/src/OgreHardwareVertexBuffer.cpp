@@ -811,12 +811,6 @@ namespace Ogre {
         }
         return false;
     }
-    //-----------------------------------------------------------------------------
-    HardwareVertexBufferSharedPtr::HardwareVertexBufferSharedPtr(HardwareVertexBuffer* buf)
-        : SharedPtr<HardwareVertexBuffer>(buf)
-    {
-
-    }
 
 
 

@@ -62,14 +62,6 @@ namespace Ogre {
 
     };
 
-    /** Shared pointer implementation used to share counter buffers. */
-    class _OgreExport HardwareCounterBufferSharedPtr : public SharedPtr<HardwareCounterBuffer>
-    {
-    public:
-        HardwareCounterBufferSharedPtr() : SharedPtr<HardwareCounterBuffer>() {}
-        explicit HardwareCounterBufferSharedPtr(HardwareCounterBuffer* buf);
-    };
-
 }
 
 #include "OgreHeaderSuffix.h"

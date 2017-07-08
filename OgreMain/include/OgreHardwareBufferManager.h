@@ -112,8 +112,6 @@ namespace Ogre {
     */
     class _OgreExport HardwareBufferManagerBase : public BufferAlloc
     {
-        friend class HardwareVertexBufferSharedPtr;
-        friend class HardwareIndexBufferSharedPtr;
     protected:
         /** WARNING: The following two members should place before all other members.
             Members destruct order is very important here, because destructing other
@@ -428,8 +426,6 @@ namespace Ogre {
     /** Singleton wrapper for hardware buffer manager. */
     class _OgreExport HardwareBufferManager : public HardwareBufferManagerBase, public Singleton<HardwareBufferManager>
     {
-        friend class HardwareVertexBufferSharedPtr;
-        friend class HardwareIndexBufferSharedPtr;
     protected:
         HardwareBufferManagerBase* mImpl;
     public:

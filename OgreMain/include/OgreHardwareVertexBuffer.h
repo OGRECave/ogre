@@ -82,16 +82,6 @@ namespace Ogre {
 
     };
 
-    /** Shared pointer implementation used to share vertex buffers. */
-    class _OgreExport HardwareVertexBufferSharedPtr : public SharedPtr<HardwareVertexBuffer>
-    {
-    public:
-        HardwareVertexBufferSharedPtr() : SharedPtr<HardwareVertexBuffer>() {}
-        explicit HardwareVertexBufferSharedPtr(HardwareVertexBuffer* buf);
-
-
-    };
-
     /** Locking helper. */    
     typedef HardwareBufferLockGuard<HardwareVertexBufferSharedPtr> HardwareVertexBufferLockGuard;
 
