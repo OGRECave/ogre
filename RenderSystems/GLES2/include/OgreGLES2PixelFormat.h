@@ -72,24 +72,6 @@ namespace Ogre {
                 @remarks It is valid for this function to always return PF_A8R8G8B8.
             */
             static PixelFormat getClosestOGREFormat(GLenum fmt, GLenum dataType);
-
-            /** Returns the maximum number of Mipmaps that can be generated until we reach
-                the mininum format possible. This does not count the base level.
-                @param width
-                    The width of the area
-                @param height
-                    The height of the area
-                @param depth
-                    The depth of the area
-                @param format
-                    The format of the area
-                @remarks
-                    In case that the format is non-compressed, this simply returns
-                    how many times we can divide this texture in 2 until we reach 1x1.
-                    For compressed formats, constraints apply on minimum size and alignment
-                    so this might differ.
-            */
-            static uint32 getMaxMipmaps(uint32 width, uint32 height, uint32 depth, PixelFormat format);
     };
 }
 

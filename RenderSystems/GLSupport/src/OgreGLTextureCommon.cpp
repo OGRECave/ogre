@@ -76,6 +76,27 @@ void GLTextureCommon::getCustomAttribute(const String& name, void* pData)
         *static_cast<uint*>(pData) = mTextureID;
 }
 
+uint32 GLTextureCommon::getMaxMipmaps() {
+    uint32 count = 0;
+    uint32 width = mWidth, height = mHeight, depth = mDepth;
+    do {
+        if(width>1)     width = width/2;
+        if(height>1)    height = height/2;
+        if(depth>1)     depth = depth/2;
+        /*
+          NOT needed, compressed formats will have mipmaps up to 1x1
+          if(PixelUtil::isValidExtent(width, height, depth, format))
+          count ++;
+          else
+          break;
+        */
+
+        count++;
+    } while(!(width == 1 && height == 1 && depth == 1));
+
+    return count;
+}
+
 void GLTextureCommon::prepareImpl(void)
 {
     if (mUsage & TU_RENDERTARGET)
