@@ -88,9 +88,8 @@ include_directories(${NATIVE_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${CM
 file(GLOB GLSL_SOURCES src/GLSL/*.cpp)
 
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
-    list(APPEND GLSL_SOURCES src/OgreGLUniformCacheImp.cpp)
-else()
-    list(APPEND GLSL_SOURCES src/OgreGLNullUniformCacheImp.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLUniformCache.cpp 
+    PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
 endif()
 
 ogre_add_library_to_folder(RenderSystems OgreGLSupport STATIC 
@@ -99,6 +98,7 @@ ogre_add_library_to_folder(RenderSystems OgreGLSupport STATIC
     src/OgreGLTextureCommon.cpp
     src/OgreGLRenderTexture.cpp
     src/OgreGLHardwarePixelBufferCommon.cpp
+    src/OgreGLUniformCache.cpp
 )
 target_link_libraries(OgreGLSupport OgreMain ${PLATFORM_LIBS})
 generate_export_header(OgreGLSupport 
