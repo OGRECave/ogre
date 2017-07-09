@@ -71,9 +71,9 @@ namespace Ogre {
         StringToEnumMap mTypeEnumMap;
 
         /// Use type to complete other information
-        void completeDefInfo(GLenum gltype, GpuConstantDefinition& defToUpdate);
+        static void completeDefInfo(GLenum gltype, GpuConstantDefinition& defToUpdate);
         /// Find where the data for a specific uniform should come from, populate
-        bool completeParamSource(const String& paramName,
+        static bool completeParamSource(const String& paramName,
             const GpuConstantDefinitionMap* vertexConstantDefs, 
             const GpuConstantDefinitionMap* geometryConstantDefs,
             const GpuConstantDefinitionMap* fragmentConstantDefs,
@@ -121,7 +121,7 @@ namespace Ogre {
         @param list The list to populate (will not be cleared before adding, clear
         it yourself before calling this if that's what you want).
         */
-        void extractUniforms(GLhandleARB programObject, 
+        static void extractUniforms(GLhandleARB programObject,
             const GpuConstantDefinitionMap* vertexConstantDefs, 
             const GpuConstantDefinitionMap* geometryConstantDefs,
             const GpuConstantDefinitionMap* fragmentConstantDefs,
@@ -132,7 +132,7 @@ namespace Ogre {
         it yourself before calling this if that's what you want).
         @param filename The file name this came from, for logging errors.
         */
-        void extractConstantDefs(const String& src, GpuNamedConstants& constantDefs, 
+        void extractConstantDefs(const String& src, GpuNamedConstants& constantDefs,
             const String& filename);
 
         static GLSLLinkProgramManager& getSingleton(void);

@@ -68,12 +68,12 @@ namespace Ogre {
 
         /**  Convert GL uniform size and type to OGRE constant types
              and associate uniform definitions together. */
-        void convertGLUniformtoOgreType(GLenum gltype, 
+        static void convertGLUniformtoOgreType(GLenum gltype,
                                         GpuConstantDefinition& defToUpdate);
         /** Find the data source definition for a given uniform name
             and reference. Return true if found and pair the reference
             with its data source. */
-        bool findUniformDataSource(
+        static bool findUniformDataSource(
             const String& paramName,
             const GpuConstantDefinitionMap* vertexConstantDefs,
             const GpuConstantDefinitionMap* hullConstantDefs,
@@ -85,7 +85,7 @@ namespace Ogre {
         /** Find the data source definition for a given atomic counter
             uniform name and reference. Return true if found and pair
             the reference with its data source. */
-        bool findAtomicCounterDataSource(
+        static bool findAtomicCounterDataSource(
             const String& paramName,
             const GpuConstantDefinitionMap* vertexConstantDefs,
             const GpuConstantDefinitionMap* hullConstantDefs,
