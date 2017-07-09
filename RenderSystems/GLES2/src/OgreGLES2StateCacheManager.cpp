@@ -416,6 +416,7 @@ namespace Ogre {
     
     void GLES2StateCacheManager::setEnabled(GLenum flag)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         bool found = std::find(mEnableVector.begin(), mEnableVector.end(), flag) != mEnableVector.end();
         if(!found)
         {
@@ -423,6 +424,9 @@ namespace Ogre {
             
             OGRE_CHECK_GL_ERROR(glEnable(flag));
         }
+#else
+        OGRE_CHECK_GL_ERROR(glEnable(flag));
+#endif
     }
     
     void GLES2StateCacheManager::setDisabled(GLenum flag)
