@@ -136,10 +136,6 @@ namespace Ogre
         D3D11RenderingAPIException(int hr, const String& inDescription, const String& inSource, const char* inFile, long inLine)
             : RenderingAPIException(hr, inDescription, inSource, inFile, inLine) {}
 
-        int getNumber(void) const throw() {
-            return number;
-        }
-
         const String& getFullDescription(void) const {
             StringStream ss(RenderingAPIException::getFullDescription());
             ss << " HRESULT=" << number;
