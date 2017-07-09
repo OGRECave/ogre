@@ -398,7 +398,7 @@ namespace Ogre {
 #ifdef OGRE_ENABLE_STATE_CACHE
         if (mBoolStateMap[flag] == enabled)
 #else
-        if(enabled)
+        if(!enabled)
 #endif
         {
             glDisable(flag);
