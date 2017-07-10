@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreGLTextureManager.h"
 #include "OgreGLHardwareVertexBuffer.h"
 #include "OgreGLHardwareIndexBuffer.h"
-#include "OgreGLDefaultHardwareBufferManager.h"
+#include "OgreDefaultHardwareBufferManager.h"
 #include "OgreGLUtil.h"
 #include "OgreGLGpuProgram.h"
 #include "OgreGLGpuNvparseProgram.h"
@@ -723,7 +723,7 @@ namespace Ogre {
         }
         else
         {
-            mHardwareBufferManager = new GLDefaultHardwareBufferManager;
+            mHardwareBufferManager = new DefaultHardwareBufferManager;
         }
 
         // XXX Need to check for nv2 support and make a program manager for it
@@ -2849,9 +2849,11 @@ namespace Ogre {
             }
             else
             {
-                pBufferData = static_cast<GLDefaultHardwareIndexBuffer*>(
-                    op.indexData->indexBuffer.get())->getDataPtr(
-                        op.indexData->indexStart * op.indexData->indexBuffer->getIndexSize());
+                // DefaultHardwareIndexBuffer: fancy way to get data pointer
+                pBufferData = op.indexData->indexBuffer->lock(
+                    op.indexData->indexStart * op.indexData->indexBuffer->getIndexSize(), 0,
+                    HardwareBuffer::HBL_NORMAL);
+                op.indexData->indexBuffer->unlock();
             }
 
             GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
@@ -3575,7 +3577,9 @@ namespace Ogre {
         }
         else
         {
-            pBufferData = static_cast<const GLDefaultHardwareVertexBuffer*>(vertexBuffer.get())->getDataPtr(elem.getOffset());
+            // DefaultHardwareVertexBuffer: fancy way to get data pointer
+            pBufferData = vertexBuffer->lock(elem.getOffset(), 0, HardwareBuffer::HBL_NORMAL);
+            vertexBuffer->unlock();
         }
         if (vertexStart)
         {
