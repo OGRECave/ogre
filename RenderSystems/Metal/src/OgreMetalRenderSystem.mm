@@ -977,6 +977,11 @@ namespace Ogre
         static_cast<MetalVaoManager*>( mVaoManager )->bindDrawId();
         [mActiveRenderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
         flushUAVs();
+        
+        if (mStencilEnabled)
+        {
+            [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
@@ -2239,4 +2244,28 @@ namespace Ogre
         mMetalProgramFactory = new MetalProgramFactory( &mDevice );
         HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
     }
-}
+    
+    void MetalRenderSystem::setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams )
+    {
+        RenderSystem::setStencilBufferParams( refValue, stencilParams );
+        
+        // There are two main cases:
+        // 1. The active render encoder is valid and will be subsequently used for drawing.
+        //      We need to set the stencil reference value on this encoder. We do this below.
+        // 2. The active render is invalid or is about to go away.
+        //      In this case, we need to set the stencil reference value on the new encoder when it is created
+        //      (see createRenderEncoder). (In this case, the setStencilReferenceValue below in this wasted, but it is inexpensive).
+
+        // Save this info so we can transfer it into a new encoder if necessary
+        mStencilEnabled = stencilParams.enabled;
+        if (mStencilEnabled)
+        {
+            mStencilRefValue = refValue;
+
+            if( !mActiveRenderEncoder )
+            {
+                [mActiveRenderEncoder setStencilReferenceValue:refValue];
+            }
+        }
+    }
+ }
