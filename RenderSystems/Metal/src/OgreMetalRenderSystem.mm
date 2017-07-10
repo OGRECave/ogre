@@ -1603,6 +1603,13 @@ namespace Ogre
 
         for( uint32 i=cmd->numDraws; i--; )
         {
+#if OGRE_DEBUG_MODE
+            assert( ((drawCmd->firstVertexIndex * bytesPerIndexElement) & 0x03) == 0
+                    && "Index Buffer must be aligned to 4 bytes. If you're messing with "
+                    "VertexArrayObject::setPrimitiveRange, you've entered an invalid "
+                    "primStart; not supported by the Metal API." );
+#endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             for( size_t j=0; j<numVertexBuffers; ++j )
             {
                 //Manually set vertex buffer offsets since in iOS baseVertex is not supported
@@ -1615,19 +1622,22 @@ namespace Ogre
             [mActiveRenderEncoder setVertexBufferOffset:drawCmd->baseInstance * sizeof(uint32)
                                                 atIndex:15];
 
-#if OGRE_DEBUG_MODE
-            assert( ((drawCmd->firstVertexIndex * bytesPerIndexElement) & 0x03) == 0
-                    && "Index Buffer must be aligned to 4 bytes. If you're messing with "
-                    "VertexArrayObject::setPrimitiveRange, you've entered an invalid "
-                    "primStart; not supported by the Metal API." );
-#endif
-
             [mActiveRenderEncoder drawIndexedPrimitives:primType
                        indexCount:drawCmd->primCount
                         indexType:indexType
                       indexBuffer:indexBuffer
                 indexBufferOffset:drawCmd->firstVertexIndex * bytesPerIndexElement
                     instanceCount:drawCmd->instanceCount];
+#else
+            [mActiveRenderEncoder drawIndexedPrimitives:primType
+                       indexCount:drawCmd->primCount
+                        indexType:indexType
+                      indexBuffer:indexBuffer
+                indexBufferOffset:drawCmd->firstVertexIndex * bytesPerIndexElement
+                    instanceCount:drawCmd->instanceCount
+                       baseVertex:drawCmd->baseVertex
+                     baseInstance:drawCmd->baseInstance];
+#endif
             ++drawCmd;
         }
     }
@@ -1651,6 +1661,7 @@ namespace Ogre
 
         for( uint32 i=cmd->numDraws; i--; )
         {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             //Setup baseInstance.
             [mActiveRenderEncoder setVertexBufferOffset:drawCmd->baseInstance * sizeof(uint32)
                                                 atIndex:15];
@@ -1658,6 +1669,13 @@ namespace Ogre
                       vertexStart:drawCmd->firstVertexIndex
                       vertexCount:drawCmd->primCount
                     instanceCount:drawCmd->instanceCount];
+#else
+            [mActiveRenderEncoder drawPrimitives:primType
+                      vertexStart:drawCmd->firstVertexIndex
+                      vertexCount:drawCmd->primCount
+                    instanceCount:drawCmd->instanceCount
+                     baseInstance:drawCmd->baseInstance];
+#endif
             ++drawCmd;
         }
     }
