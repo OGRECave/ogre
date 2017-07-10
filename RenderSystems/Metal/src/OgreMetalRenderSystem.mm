@@ -2262,10 +2262,8 @@ namespace Ogre
         {
             mStencilRefValue = refValue;
 
-            if( !mActiveRenderEncoder )
-            {
+            if( mActiveRenderEncoder )
                 [mActiveRenderEncoder setStencilReferenceValue:refValue];
-            }
         }
     }
  }
