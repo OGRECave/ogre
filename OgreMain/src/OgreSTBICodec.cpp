@@ -131,12 +131,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Codec::DecodeResult STBIImageCodec::decode(DataStreamPtr& input) const
     {
-        // Buffer stream into memory (TODO: override IO functions instead?)
-        MemoryDataStream memStream(input, true);
+        String contents = input->getAsString();
 
         int width, height, components;
-        stbi_uc* pixelData = stbi_load_from_memory(memStream.getPtr(),
-                static_cast<int>(memStream.size()), &width, &height, &components, 0);
+        stbi_uc* pixelData = stbi_load_from_memory((uchar*)contents.data(),
+                static_cast<int>(contents.size()), &width, &height, &components, 0);
 
         if (!pixelData)
         {
