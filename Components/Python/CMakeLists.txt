@@ -27,6 +27,9 @@ swig_add_module(Ogre python ../../OgreMain/include/Ogre.i)
 swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
 ogre_python_module(Ogre)
 
+# always install OgreNumpy
+install(FILES OgreNumpy.py DESTINATION ${PYTHON_SITE_PACKAGES})
+
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     ogre_add_component_include_dir(RTShaderSystem)
     set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON)
