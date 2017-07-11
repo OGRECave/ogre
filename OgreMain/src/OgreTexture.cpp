@@ -307,12 +307,10 @@ namespace Ogre {
                 if(mGamma != 1.0f) {
                     // Apply gamma correction
                     // Do not overwrite original image but do gamma correction in temporary buffer
-                    MemoryDataStreamPtr buf; // for scoped deletion of conversion buffer
-                    buf.reset(OGRE_NEW MemoryDataStream(
-                        PixelUtil::getMemorySize(
-                            src.getWidth(), src.getHeight(), src.getDepth(), src.format)));
-                    
-                    PixelBox corrected = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), src.format, buf->getPtr());
+                    MemoryDataStream buf(PixelUtil::getMemorySize(src.getWidth(), src.getHeight(),
+                                                                  src.getDepth(), src.format));
+
+                    PixelBox corrected = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), src.format, buf.getPtr());
                     PixelUtil::bulkPixelConversion(src, corrected);
                     
                     Image::applyGamma(static_cast<uint8*>(corrected.data), mGamma, corrected.getConsecutiveSize(), 
