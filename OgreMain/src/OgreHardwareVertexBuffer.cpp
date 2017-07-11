@@ -236,11 +236,8 @@ namespace Ogre {
     VertexElementType VertexElement::multiplyTypeCount(VertexElementType baseType, 
         unsigned short count)
     {
-        if ( count < 1 || count > 4 )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Count out of range",
-                "VertexElement::multiplyTypeCount" );
-        }
+        OgreAssert(count > 0 && count < 5, "Count out of range");
+
         switch (baseType)
         {
         case VET_FLOAT1:

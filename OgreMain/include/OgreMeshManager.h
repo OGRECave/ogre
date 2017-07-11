@@ -403,13 +403,9 @@ namespace Ogre {
         @remarks
         This takes effect when meshes are loaded.  Default is VET_FLOAT1.
         Valid values are:
-        VET_UBYTE4:        8-bit blend weights.  Lowest memory cost but may have precision issues.  Shader must multiply incoming blend weights with 1/255.  No software skinning.
         VET_UBYTE4_NORM:   8-bit blend weights.  Lowest memory cost but may have precision issues.  Requires SM2.0+ vertex shader.  No software skinning.
-        VET_USHORT2:       16-bit blend weights.  Shader must multiply incoming blend weights with 1/65535.  No software skinning.
         VET_USHORT2_NORM:  16-bit blend weights.  Requires SM2.0+ vertex shader.  No software skinning.
-        VET_SHORT2:        15-bit blend weights.  Shader must multiply incoming blend weights with 1/32767.  No software skinning.
-        VET_SHORT2_NORM:   15-bit blend weights.  May work on platforms that do not support VET_USHORT2_NORM.  No software skinning.
-        VET_FLOAT1:        23-bit blend weights.  Highest memory cost.  Supports hardware and software skinning.
+        VET_FLOAT1:        32-bit blend weights.  Highest memory cost.  Supports hardware and software skinning.
         */
         void setBlendWeightsBaseElementType( VertexElementType vet );
 

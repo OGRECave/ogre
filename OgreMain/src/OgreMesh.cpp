@@ -861,17 +861,17 @@ namespace Ogre {
         // keeping a switch out of the loop
         switch ( weightsBaseType )
         {
+            default:
+            	OgreAssert(false, "Invalid BlendWeightsBaseElementType");
+            	break;
             case VET_FLOAT1:
                 break;
-            case VET_UBYTE4:
             case VET_UBYTE4_NORM:
                 maxIntWt = 0xff;
                 break;
-            case VET_USHORT2:
             case VET_USHORT2_NORM:
                 maxIntWt = 0xffff;
                 break;
-            case VET_SHORT2:
             case VET_SHORT2_NORM:
                 maxIntWt = 0x7fff;
                 break;
@@ -938,7 +938,7 @@ namespace Ogre {
                 }
 
                 // now write the weights
-                if ( weightsBaseType == VET_UBYTE4 || weightsBaseType == VET_UBYTE4_NORM )
+                if ( weightsBaseType == VET_UBYTE4_NORM )
                 {
                     // write out the weights as bytes
                     unsigned char* pWeight;

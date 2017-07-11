@@ -109,7 +109,13 @@ namespace Ogre {
         VES_COUNT = 9
     };
 
-    /// Vertex element type, used to identify the base types of the vertex contents
+    /**
+     * Vertex element type, used to identify the base types of the vertex contents
+     *
+     * @note VET_SHORT1, VET_SHORT3, VET_USHORT1 and VET_USHORT3 should never be used
+     * because they aren't supported on any known hardware - they are unaligned as their size
+     * is not a multiple of 4 bytes. Therefore drivers usually must add padding on upload.
+     */
     enum VertexElementType
     {
         VET_FLOAT1 = 0,
@@ -118,9 +124,9 @@ namespace Ogre {
         VET_FLOAT4 = 3,
         /// alias to more specific colour type - use the current rendersystem's colour packing
         VET_COLOUR = 4,
-        VET_SHORT1 = 5,  /// AVOID (see note below)
+        VET_SHORT1 = 5,  /// @deprecated (see note)
         VET_SHORT2 = 6,
-        VET_SHORT3 = 7,  /// AVOID (see note below)
+        VET_SHORT3 = 7,  /// @deprecated (see note)
         VET_SHORT4 = 8,
         VET_UBYTE4 = 9,
         /// D3D style compact colour
@@ -133,10 +139,10 @@ namespace Ogre {
         VET_DOUBLE2 = 13,
         VET_DOUBLE3 = 14,
         VET_DOUBLE4 = 15,
-        VET_USHORT1 = 16,  /// AVOID (see note below)
+        VET_USHORT1 = 16,  /// @deprecated (see note)
         VET_USHORT2 = 17,
-        VET_USHORT3 = 18,  /// AVOID (see note below)
-        VET_USHORT4 = 19,      
+        VET_USHORT3 = 18,  /// @deprecated (see note)
+        VET_USHORT4 = 19,
         VET_INT1 = 20,
         VET_INT2 = 21,
         VET_INT3 = 22,
@@ -145,20 +151,13 @@ namespace Ogre {
         VET_UINT2 = 25,
         VET_UINT3 = 26,
         VET_UINT4 = 27,
-        VET_BYTE4 = 28,  // signed bytes
-        // normalized types (range is either 0 to 1 or -1 to 1)
-        VET_BYTE4_NORM = 29,   // signed normalized bytes
-        VET_UBYTE4_NORM = 30,  // unsigned normalized bytes
-        VET_SHORT2_NORM = 31,  // signed normalized shorts
+        VET_BYTE4 = 28,  /// signed bytes
+        VET_BYTE4_NORM = 29,   /// signed bytes (normalized to -1..1)
+        VET_UBYTE4_NORM = 30,  /// unsigned bytes (normalized to 0..1)
+        VET_SHORT2_NORM = 31,  /// signed shorts (normalized to -1..1)
         VET_SHORT4_NORM = 32,
-        VET_USHORT2_NORM = 33, // unsigned normalized shorts
+        VET_USHORT2_NORM = 33, /// unsigned shorts (normalized to 0..1)
         VET_USHORT4_NORM = 34
-
-        // Note that SHORT1, SHORT3, USHORT1 and USHORT3 should never be used
-        // because they aren't supported on any known hardware -- their size
-        // is not a multiple of 4 bytes.
-        // These values should be removed when possible.  Try to avoid breaking the mesh
-        // serializer though.
     };
 
     /** This class declares the usage of a single vertex buffer as a component
