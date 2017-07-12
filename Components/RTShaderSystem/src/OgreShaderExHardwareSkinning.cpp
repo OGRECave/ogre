@@ -478,11 +478,24 @@ bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, size_t 
             isValidData = true;
             switch (pDeclWeights->getType())
             {
-            case VET_FLOAT1: weightCount = 1; break;
-            case VET_FLOAT2: weightCount = 2; break;
-            case VET_FLOAT3: weightCount = 3; break;
-            case VET_FLOAT4: weightCount = 4; break;
-            default: isValidData = false; 
+            case VET_FLOAT1:
+                weightCount = 1;
+                break;
+            case VET_USHORT2_NORM:
+            case VET_FLOAT2:
+                weightCount = 2;
+                break;
+            case VET_FLOAT3:
+                weightCount = 3;
+                break;
+            case VET_USHORT4_NORM:
+            case VET_UBYTE4_NORM:
+            case VET_FLOAT4:
+                weightCount = 4;
+                break;
+            default:
+                isValidData = false;
+                break;
             }
         }
     }
