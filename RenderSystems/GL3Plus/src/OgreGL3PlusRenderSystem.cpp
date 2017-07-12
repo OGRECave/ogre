@@ -40,7 +40,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareShaderStorageBuffer.h"
 #include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreGL3PlusHardwareIndexBuffer.h"
-#include "OgreGL3PlusDefaultHardwareBufferManager.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLShaderManager.h"
 #include "OgreException.h"

@@ -334,7 +334,9 @@ namespace Ogre
         LogManager::getSingleton().logMessage("Font " + mName + " using texture size " +
             StringConverter::toString(finalWidth) + "x" + StringConverter::toString(finalHeight));
 
-        uchar* imageData = OGRE_ALLOC_T(uchar, data_size, MEMCATEGORY_GENERAL);
+        DataStreamPtr memStream(OGRE_NEW MemoryDataStream(data_size));
+        uchar* imageData = static_cast<MemoryDataStream*>(memStream.get())->getPtr();
+
         // Reset content (White, transparent)
         for (size_t i = 0; i < data_size; i += pixel_bytes)
         {
@@ -417,9 +419,6 @@ namespace Ogre
                 }
             }
         }
-
-        DataStreamPtr memStream(
-            OGRE_NEW MemoryDataStream(imageData, data_size, true));
 
         Image img;
         img.loadRawData( memStream, finalWidth, finalHeight, 1, PF_BYTE_LA );

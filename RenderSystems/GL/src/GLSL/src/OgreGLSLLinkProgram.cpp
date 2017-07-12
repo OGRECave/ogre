@@ -252,7 +252,7 @@ namespace Ogre {
                 fragParams = &(mFragmentProgram->getConstantDefinitions().map);
             }
 
-            GLSLLinkProgramManager::getSingleton().extractUniforms(
+            GLSLLinkProgramManager::extractUniforms(
                 mGLHandle, vertParams, geomParams, fragParams, mGLUniformReferences);
 
             mUniformRefsBuilt = true;

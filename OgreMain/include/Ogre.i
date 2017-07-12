@@ -176,6 +176,7 @@ ADD_REPR(Plane)
 // More Data Types
 %include "OgreColourValue.h"
 ADD_REPR(ColourValue)
+%ignore Ogre::PixelUtil::isValidExtent; // deprecated
 %include "OgrePixelFormat.h"
 %include "OgreBlendMode.h"
 %include "OgreRay.h"

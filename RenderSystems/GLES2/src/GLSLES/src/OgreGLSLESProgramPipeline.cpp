@@ -270,14 +270,14 @@ namespace Ogre
             if (getVertexProgram())
             {
                 vertParams = &(getVertexProgram()->getConstantDefinitions().map);
-                GLSLESProgramPipelineManager::getSingleton().extractUniforms(getVertexProgram()->getGLProgramHandle(),
+                GLSLESProgramPipelineManager::extractUniforms(getVertexProgram()->getGLProgramHandle(),
                     vertParams, NULL, mGLUniformReferences, mGLUniformBufferReferences);
             }
             if (mFragmentProgram)
             {
                 fragParams = &(mFragmentProgram->getConstantDefinitions().map);
-                GLSLESProgramPipelineManager::getSingleton().extractUniforms(mFragmentProgram->getGLProgramHandle(),
-                                                                         NULL, fragParams, mGLUniformReferences, mGLUniformBufferReferences);
+                GLSLESProgramPipelineManager::extractUniforms(mFragmentProgram->getGLProgramHandle(),
+                                                              NULL, fragParams, mGLUniformReferences, mGLUniformBufferReferences);
             }
 
             mUniformRefsBuilt = true;

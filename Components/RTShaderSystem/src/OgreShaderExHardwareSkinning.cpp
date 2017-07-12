@@ -247,6 +247,8 @@ HardwareSkinningFactory::HardwareSkinningFactory() :
 
 }
 
+HardwareSkinningFactory::~HardwareSkinningFactory() {}
+
 //-----------------------------------------------------------------------
 const String& HardwareSkinningFactory::getType() const
 {

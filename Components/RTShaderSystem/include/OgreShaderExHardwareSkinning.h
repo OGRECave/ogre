@@ -181,6 +181,7 @@ class _OgreRTSSExport HardwareSkinningFactory : public SubRenderStateFactory,
 {
 public:
     HardwareSkinningFactory();
+    ~HardwareSkinningFactory();
     
     /** 
     @see SubRenderStateFactory::getType.

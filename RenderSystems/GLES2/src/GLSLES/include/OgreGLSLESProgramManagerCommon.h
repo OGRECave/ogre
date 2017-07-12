@@ -64,9 +64,9 @@ namespace Ogre {
         struct glslopt_ctx *mGLSLOptimiserContext;
 #endif
         /// Use type to complete other information
-        void completeDefInfo(GLenum gltype, GpuConstantDefinition& defToUpdate);
+        static void completeDefInfo(GLenum gltype, GpuConstantDefinition& defToUpdate);
         /// Find where the data for a specific uniform should come from, populate
-        bool completeParamSource(const String& paramName,
+        static bool completeParamSource(const String& paramName,
             const GpuConstantDefinitionMap* vertexConstantDefs, 
             const GpuConstantDefinitionMap* fragmentConstantDefs,
             GLUniformReference& refToUpdate);
@@ -97,7 +97,7 @@ namespace Ogre {
         @param list The list to populate (will not be cleared before adding, clear
         it yourself before calling this if that's what you want).
         */
-        void extractUniforms(GLuint programObject, 
+        static void extractUniforms(GLuint programObject,
             const GpuConstantDefinitionMap* vertexConstantDefs, 
             const GpuConstantDefinitionMap* fragmentConstantDefs,
             GLUniformReferenceList& list, GLUniformBufferList& sharedList);
