@@ -250,6 +250,12 @@ namespace Ogre {
                 group = (__bridge EAGLSharegroup *)(void*)StringConverter::parseUnsignedLong(option->second);
                 LogManager::getSingleton().logMessage("iOS: Using an external EAGLSharegroup");
             }
+            else
+            {
+                GLRenderSystemCommon *rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+                if(EAGLES2Context* mContext = (EAGLES2Context*)rs->_getMainContext())
+                    group = mContext->getContext().sharegroup;
+            }
             
             mContext = mGLSupport->createNewContext(eaglLayer, group);
 
