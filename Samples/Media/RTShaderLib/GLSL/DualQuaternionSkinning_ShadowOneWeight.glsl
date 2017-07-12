@@ -1,8 +1,8 @@
 #version 120
 
-vec3 calculateBlendPosition(vec4 position, mat2x4 blendDQ);
+vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ);
 
-uniform mat4x2 worldDualQuaternion2x4Array[24];
+uniform vec4 worldDualQuaternion2x4Array[48];
 uniform mat4x4 viewProjectionMatrix;
 uniform vec4   ambient;
 
@@ -15,12 +15,14 @@ varying vec4 colour;
 //Shadow caster pass
 void main()
 {
-	mat2x4 blendDQ = blendWeights.x * worldDualQuaternion2x4Array[blendIndices.x];
+	mat2x4 dq0 = mat2x4(worldDualQuaternion2x4Array[int(blendIndices.x) * 2], 
+	                    worldDualQuaternion2x4Array[int(blendIndices.x) * 2 + 1]);
+	mat2x4 blendDQ = blendWeights.x * dq0;
 
 	float len = length(blendDQ[0]);
 	blendDQ /= len;
 
-	vec3 blendPosition = calculateBlendPosition(vertex, blendDQ);
+	vec3 blendPosition = calculateBlendPosition(vertex.xyz, blendDQ);
 
 	// view / projection
 	gl_Position = viewProjectionMatrix * vec4(blendPosition, 1.0);
