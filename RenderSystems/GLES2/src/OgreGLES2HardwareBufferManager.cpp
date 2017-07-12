@@ -150,12 +150,18 @@ namespace Ogre {
             case VET_SHORT2:
             case VET_SHORT3:
             case VET_SHORT4:
+            case VET_SHORT2_NORM:
+            case VET_SHORT4_NORM:
                 return GL_SHORT;
             case VET_COLOUR:
             case VET_COLOUR_ABGR:
             case VET_COLOUR_ARGB:
             case VET_UBYTE4:
+            case VET_UBYTE4_NORM:
                 return GL_UNSIGNED_BYTE;
+            case VET_BYTE4:
+            case VET_BYTE4_NORM:
+                return GL_BYTE;
             case VET_INT1:
             case VET_INT2:
             case VET_INT3:
@@ -174,6 +180,8 @@ namespace Ogre {
             case VET_USHORT2:
             case VET_USHORT3:
             case VET_USHORT4:
+            case VET_USHORT2_NORM:
+            case VET_USHORT4_NORM:
 #if OGRE_NO_GLES3_SUPPORT == 0
                 return GL_UNSIGNED_SHORT;
 #endif

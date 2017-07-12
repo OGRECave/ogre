@@ -2263,6 +2263,13 @@ namespace Ogre {
                     typeCount = 4;
                     normalised = GL_TRUE;
                     break;
+                case VET_UBYTE4_NORM:
+                case VET_SHORT2_NORM:
+                case VET_USHORT2_NORM:
+                case VET_SHORT4_NORM:
+                case VET_USHORT4_NORM:
+                    normalised = GL_TRUE;
+                    break;
                 default:
                     break;
             };
