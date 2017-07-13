@@ -132,7 +132,7 @@ struct _OgreLodExport LodConfig {
     typedef vector<LodLevel>::type LodLevelList;
     LodLevelList levels; /// Info about Lod levels
 
-    LodConfig(MeshPtr & _mesh, LodStrategy * _strategy = DistanceLodStrategy::getSingletonPtr());
+    LodConfig(MeshPtr & _mesh, LodStrategy * _strategy = DistanceLodBoxStrategy::getSingletonPtr());
     LodConfig();
 
     // Helper functions:

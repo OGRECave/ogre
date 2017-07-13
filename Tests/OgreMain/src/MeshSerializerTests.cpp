@@ -349,8 +349,8 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
 
     if ((a->getNumLodLevels() > 1 || b->getNumLodLevels() > 1) &&
         ((version < MESH_VERSION_1_8 || (!isLodMixed(a) && !isLodMixed(b))) && // mixed lod only supported in v1.10+
-         (version < MESH_VERSION_1_4 || (a->getLodStrategy() == DistanceLodStrategy::getSingletonPtr() &&
-                                         b->getLodStrategy() == DistanceLodStrategy::getSingletonPtr())))) { // Lod Strategy only supported in v1.41+
+         (version < MESH_VERSION_1_4 || (a->getLodStrategy() == DistanceLodBoxStrategy::getSingletonPtr() &&
+                                         b->getLodStrategy() == DistanceLodBoxStrategy::getSingletonPtr())))) { // Lod Strategy only supported in v1.41+
         EXPECT_TRUE(a->getNumLodLevels() == b->getNumLodLevels());
         EXPECT_TRUE(a->hasManualLodLevel() == b->hasManualLodLevel());
         EXPECT_TRUE(a->getLodStrategy() == b->getLodStrategy());
