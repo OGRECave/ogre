@@ -42,7 +42,7 @@ private:
 
 public:
     
-    SinbadCharacterController(Camera* cam)
+    SinbadCharacterController(Camera* cam) : mBaseAnimID(ANIM_NONE), mTopAnimID(ANIM_NONE)
     {
         setupBody(cam->getSceneManager());
         setupCamera(cam);
@@ -192,7 +192,7 @@ private:
         // this is very important due to the nature of the exported animations
         mBodyEnt->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
 
-        String animNames[] =
+        String animNames[NUM_ANIMS] =
         {"IdleBase", "IdleTop", "RunBase", "RunTop", "HandsClosed", "HandsRelaxed", "DrawSwords",
         "SliceVertical", "SliceHorizontal", "Dance", "JumpStart", "JumpLoop", "JumpEnd"};
 
