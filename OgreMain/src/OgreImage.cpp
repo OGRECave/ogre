@@ -92,7 +92,7 @@ namespace Ogre {
         mNumMipmaps = img.mNumMipmaps;
         mAutoDelete = img.mAutoDelete;
         //Only create/copy when previous data was not dynamic data
-        if( mAutoDelete )
+        if( img.mBuffer && mAutoDelete )
         {
             mBuffer = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
             memcpy( mBuffer, img.mBuffer, mBufSize );
