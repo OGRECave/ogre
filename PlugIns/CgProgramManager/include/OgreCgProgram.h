@@ -105,7 +105,6 @@ namespace Ogre {
         String mSelectedProfile;
         String mProgramString;
         CGprofile mSelectedCgProfile;
-        String mCompileArgs;
         // Unfortunately Cg uses char** for arguments - bleh
         // This is a null-terminated list of char* (each null terminated)
         char** mCgArguments;
@@ -147,10 +146,6 @@ namespace Ogre {
         void setProfiles(const StringVector& profiles);
         /** Gets the Cg profiles which can be supported by the program. */
         const StringVector& getProfiles(void) const { return mProfiles; }
-        /** Sets the compilation arguments for this program ie the first method called. */
-        void setCompileArguments(const String& args) { mCompileArgs = args; }
-        /** Gets the entry point defined for this program. */
-        const String& getCompileArguments(void) const { return mCompileArgs; }
         /// Overridden from GpuProgram
         bool isSupported(void) const;
         /// Overridden from GpuProgram

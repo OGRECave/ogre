@@ -119,8 +119,8 @@ namespace Ogre {
 	void CgProgram::buildArgs(void)
 	{
 		StringVector args;
-		if (!mCompileArgs.empty())
-			args = StringUtil::split(mCompileArgs);
+		if (!mPreprocessorDefines.empty())
+			args = StringUtil::split(mPreprocessorDefines);
 
 		StringVector::const_iterator i;
 		if (mSelectedCgProfile == CG_PROFILE_VS_1_1)
@@ -1408,11 +1408,11 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	String CgProgram::CmdArgs::doGet(const void *target) const
 	{
-		return static_cast<const CgProgram*>(target)->getCompileArguments();
+		return static_cast<const CgProgram*>(target)->getPreprocessorDefines();
 	}
 	void CgProgram::CmdArgs::doSet(void *target, const String& val)
 	{
-		static_cast<CgProgram*>(target)->setCompileArguments(val);
+		static_cast<CgProgram*>(target)->setPreprocessorDefines(val);
 	}
 
 }
