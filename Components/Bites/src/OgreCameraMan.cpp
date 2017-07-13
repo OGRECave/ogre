@@ -5,6 +5,7 @@ namespace OgreBites {
 
 CameraMan::CameraMan(Ogre::SceneNode *cam)
     : mCamera(0)
+    , mStyle(CS_MANUAL)
     , mTarget(0)
     , mOrbiting(false)
     , mZooming(false)
