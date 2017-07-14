@@ -298,7 +298,7 @@ namespace Ogre {
         if(GLEW_EXT_texture_filter_anisotropic)
         {
             GLfloat maxAnisotropy = 0;
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy));
+            glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
             rsc->setMaxSupportedAnisotropy(maxAnisotropy);
             rsc->setCapability(RSC_ANISOTROPY);
         }
