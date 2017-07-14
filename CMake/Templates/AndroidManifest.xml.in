@@ -2,18 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="@PKG_NAME@"
     android:versionCode="1"
-    android:versionName="1.0" 
+    android:versionName="@OGRE_VERSION@" 
 	android:installLocation="auto">
 
     <uses-sdk android:minSdkVersion="@ANDROID_NATIVE_API_LEVEL@" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />  
-
+ 
     <application android:label="@ANDROID_MOD_NAME@" android:icon="@drawable/ic_launcher" android:hasCode="@HAS_CODE@">
         <activity android:name="@MAIN_ACTIVITY@" 
                   android:label="@ANDROID_MOD_NAME@"
                   android:configChanges="orientation@SCREEN_SIZE@|keyboardHidden"
-		   android:debuggable="true"
 		  android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
 		  <!-- Tell NativeActivity the name of or .so -->
           <meta-data android:name="android.app.lib_name" android:value="@ANDROID_MOD_NAME@" />
