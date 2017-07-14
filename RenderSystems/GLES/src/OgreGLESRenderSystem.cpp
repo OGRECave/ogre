@@ -298,8 +298,14 @@ namespace Ogre {
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ATC);
         }
 
+        // Check for Anisotropy support
         if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
+        {
+            GLfloat maxAnisotropy = 0;
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy));
+            rsc->setMaxSupportedAnisotropy(maxAnisotropy);
             rsc->setCapability(RSC_ANISOTROPY);
+        }
 
         // FIXME: DJR - causes GL errors on 3GS
 //        if (mGLSupport->checkExtension("GL_APPLE_texture_2D_limited_npot"))
@@ -2155,8 +2161,7 @@ namespace Ogre {
         if (!mStateCacheManager->activateGLTextureUnit(unit))
             return;
 
-        GLfloat largest_supported_anisotropy = 0;
-        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+        Real largest_supported_anisotropy = mCurrentCapabilities->getMaxSupportedAnisotropy();
         if (maxAnisotropy > largest_supported_anisotropy)
             maxAnisotropy = largest_supported_anisotropy ? 
             static_cast<uint>(largest_supported_anisotropy) : 1;

@@ -266,7 +266,12 @@ namespace Ogre {
 
         // Check for Anisotropy support
         if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
+        {
+            GLfloat maxAnisotropy = 0;
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy));
+            rsc->setMaxSupportedAnisotropy(maxAnisotropy);
             rsc->setCapability(RSC_ANISOTROPY);
+        }
 
         // DOT3 support is standard
         rsc->setCapability(RSC_DOT3);
@@ -1501,8 +1506,7 @@ namespace Ogre {
             return;
 
         maxAnisotropy = std::min<uint>(mLargestSupportedAnisotropy, maxAnisotropy);
-        if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-            mStateCacheManager->setTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+        mStateCacheManager->setTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 
         activateGLTextureUnit(0);
     }

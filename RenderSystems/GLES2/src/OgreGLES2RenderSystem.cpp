@@ -312,8 +312,14 @@ namespace Ogre {
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ATC);
         }
 
+        // Check for Anisotropy support
         if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
+        {
+            GLfloat maxAnisotropy = 0;
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy));
+            rsc->setMaxSupportedAnisotropy(maxAnisotropy);
             rsc->setCapability(RSC_ANISOTROPY);
+        }
 
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -351,14 +357,6 @@ namespace Ogre {
         GLfloat psRange[2] = {0.0, 0.0};
         OGRE_CHECK_GL_ERROR(glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, psRange));
         rsc->setMaxPointSize(psRange[1]);
-
-        if(mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
-        {
-            // Max anisotropy
-            GLfloat aniso = 0;
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &aniso));
-            rsc->setMaxSupportedAnisotropy(aniso);
-        }
 
         // Point sprites
         rsc->setCapability(RSC_POINT_SPRITES);
@@ -1413,7 +1411,7 @@ namespace Ogre {
     GLfloat GLES2RenderSystem::_getCurrentAnisotropy(size_t unit)
     {
         GLfloat curAniso = 0;
-        if(mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
+        if(mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
             mStateCacheManager->getTexParameterfv(mTextureTypes[unit],
                                                   GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso);
 
@@ -1428,15 +1426,12 @@ namespace Ogre {
         if (!mStateCacheManager->activateGLTextureUnit(unit))
             return;
 
-        if(mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
-        {
-            if (maxAnisotropy > mCurrentCapabilities->getMaxSupportedAnisotropy())
-                maxAnisotropy = mCurrentCapabilities->getMaxSupportedAnisotropy() ? 
-                static_cast<uint>(mCurrentCapabilities->getMaxSupportedAnisotropy()) : 1;
+        if (maxAnisotropy > mCurrentCapabilities->getMaxSupportedAnisotropy())
+            maxAnisotropy = mCurrentCapabilities->getMaxSupportedAnisotropy() ? 
+            static_cast<uint>(mCurrentCapabilities->getMaxSupportedAnisotropy()) : 1;
 
-            mStateCacheManager->setTexParameterf(mTextureTypes[unit],
-                                                  GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)maxAnisotropy);
-        }
+        mStateCacheManager->setTexParameterf(mTextureTypes[unit],
+                                              GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)maxAnisotropy);
 
         mStateCacheManager->activateGLTextureUnit(0);
     }
