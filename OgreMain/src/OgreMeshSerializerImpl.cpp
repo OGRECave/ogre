@@ -3397,7 +3397,7 @@ namespace Ogre {
     }
     size_t MeshSerializerImpl_v1_4::calcLodLevelSize(const Mesh* pMesh)
     {
-        if (isLodMixed(pMesh) || pMesh->getLodStrategy() != DistanceLodStrategy::getSingletonPtr()) {
+        if (isLodMixed(pMesh) || pMesh->getLodStrategy() != DistanceLodBoxStrategy::getSingletonPtr()) {
             return 0; // Supported in v1_9+
         }
         exportedLodCount = pMesh->getNumLodLevels();
@@ -3427,7 +3427,7 @@ namespace Ogre {
     {
         if (isLodMixed(pMesh)) {
             LogManager::getSingleton().logMessage("MeshSerializer_v1_4 or older mesh format is incompatible with mixed manual/generated Lod levels. Lod levels will not be exported.");
-        } else if (pMesh->getLodStrategy() != DistanceLodStrategy::getSingletonPtr()) {
+        } else if (pMesh->getLodStrategy() != DistanceLodBoxStrategy::getSingletonPtr()) {
             LogManager::getSingleton().logMessage("MeshSerializer_v1_4 or older mesh format is only compatible with Distance Lod Strategy. Lod levels will not be exported.");
         } else {
             exportedLodCount = pMesh->getNumLodLevels();

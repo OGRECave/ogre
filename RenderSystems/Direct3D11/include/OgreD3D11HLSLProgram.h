@@ -114,7 +114,6 @@ namespace Ogre {
 		
         String mTarget;
         String mEntryPoint;
-        String mPreprocessorDefines;
         bool mColumnMajorMatrices;
         bool mEnableBackwardsCompatibility;
 
@@ -307,10 +306,6 @@ namespace Ogre {
         /** Sets shader macros created manually*/
         void setShaderMacros(D3D_SHADER_MACRO* shaderMacros);
 
-        /** Sets the preprocessor defines use to compile the program. */
-        void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
-        /** Sets the preprocessor defines use to compile the program. */
-        const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
         /** Sets whether matrix packing in column-major order. */ 
         void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }
         /** Gets whether matrix packed in column-major order. */
