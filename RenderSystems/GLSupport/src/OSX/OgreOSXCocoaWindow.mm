@@ -194,7 +194,8 @@ namespace Ogre {
 
         if(miscParams && miscParams->find("externalGLContext") == miscParams->end())
         {
-            int profile = StringConverter::parseInt(miscParams->find("contextProfile")->second);
+            opt = miscParams->find("contextProfile");
+            int profile = opt != miscParams->end() ? StringConverter::parseInt(opt->second) : GLNativeSupport::CONTEXT_COMPATIBILITY;
 
             NSOpenGLPixelFormatAttribute attribs[30];
             int i = 0;
