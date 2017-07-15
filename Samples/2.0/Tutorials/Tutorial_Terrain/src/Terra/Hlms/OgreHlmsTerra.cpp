@@ -96,6 +96,7 @@ namespace Ogre
 
     const IdString TerraProperty::BrdfDefault       = IdString( "BRDF_Default" );
     const IdString TerraProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
+    const IdString TerraProperty::BrdfBlinnPhong    = IdString( "BRDF_BlinnPhong" );
     const IdString TerraProperty::FresnelSeparateDiffuse  = IdString( "fresnel_separate_diffuse" );
     const IdString TerraProperty::GgxHeightCorrelated     = IdString( "GGX_height_correlated" );
 
@@ -389,6 +390,8 @@ namespace Ogre
         }
         else if( (brdf & TerraBrdf::BRDF_MASK) == TerraBrdf::CookTorrance )
             setProperty( TerraProperty::BrdfCookTorrance, 1 );
+        else if( (brdf & TerraBrdf::BRDF_MASK) == TerraBrdf::BlinnPhong )
+            setProperty( TerraProperty::BrdfBlinnPhong, 1 );
 
         if( brdf & TerraBrdf::FLAG_SPERATE_DIFFUSE_FRESNEL )
             setProperty( TerraProperty::FresnelSeparateDiffuse, 1 );

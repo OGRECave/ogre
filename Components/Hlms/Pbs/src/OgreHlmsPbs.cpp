@@ -155,8 +155,11 @@ namespace Ogre
 
     const IdString PbsProperty::BrdfDefault       = IdString( "BRDF_Default" );
     const IdString PbsProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
+    const IdString PbsProperty::BrdfBlinnPhong    = IdString( "BRDF_BlinnPhong" );
     const IdString PbsProperty::FresnelSeparateDiffuse  = IdString( "fresnel_separate_diffuse" );
     const IdString PbsProperty::GgxHeightCorrelated     = IdString( "GGX_height_correlated" );
+    const IdString PbsProperty::LegacyMathBrdf          = IdString( "legacy_math_brdf" );
+    const IdString PbsProperty::RoughnessIsShininess    = IdString( "roughness_is_shininess" );
 
     const IdString *PbsProperty::UvSourcePtrs[NUM_PBSM_SOURCES] =
     {
@@ -572,9 +575,16 @@ namespace Ogre
         }
         else if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::CookTorrance )
             setProperty( PbsProperty::BrdfCookTorrance, 1 );
+        else if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::BlinnPhong )
+            setProperty( PbsProperty::BrdfBlinnPhong, 1 );
 
         if( brdf & PbsBrdf::FLAG_SPERATE_DIFFUSE_FRESNEL )
             setProperty( PbsProperty::FresnelSeparateDiffuse, 1 );
+
+        if( brdf & PbsBrdf::FLAG_LEGACY_MATH )
+            setProperty( PbsProperty::LegacyMathBrdf, 1 );
+        if( brdf & PbsBrdf::FLAG_FULL_LEGACY )
+            setProperty( PbsProperty::RoughnessIsShininess, 1 );
 
         for( size_t i=0; i<PBSM_REFLECTION; ++i )
         {

@@ -33,6 +33,53 @@
 	@property( !hlms_amd_trinary_minmax )@piece( getMaxFresnelS )max( fresnelS.x, max( fresnelS.y, fresnelS.z ) )@end @end
 @end
 
+@property( BRDF_BlinnPhong )
+@piece( DeclareBRDF )
+//Blinn-Phong
+vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lightSpecular )
+{
+	vec3 halfWay= normalize( lightDir + viewDir );
+	float NdotL = clamp( dot( nNormal, lightDir ), 0.0, 1.0 );	//Diffuse (Lambert)
+	float NdotH = clamp( dot( nNormal, halfWay ), 0.001, 1.0 );	//Specular
+	@property( !legacy_math_brdf )
+		float VdotH = clamp( dot( viewDir, halfWay ), 0.001, 1.0 ); //Fresnel
+
+		//Fresnel term (Schlick's approximation)
+		@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnel );
+		@property( fresnel_separate_diffuse )
+			@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
+		@end @property( !fresnel_separate_diffuse )
+			float fresnelD = 1.0f - @insertpiece( getMaxFresnelS );
+		@end
+	@end
+
+	@property( !roughness_is_shininess )
+		float shininess = exp2( 10.0 * (1.0 - ROUGHNESS) + 1.0 ) * 0.25;
+	@end @property( roughness_is_shininess )
+		float shininess = ROUGHNESS;
+	@end
+	float blinnPhong = pow( NdotH, shininess );
+
+	@property( !legacy_math_brdf )
+		//Normalize Blinn-Phong using (n + 8) / (8 * pi)
+		//Note this factor is an approximation. The real normalization is
+		//*much* more expensive. See:
+		//http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/
+		blinnPhong *= (shininess + 8.0) / (8.0 * 3.141592654);
+
+		//Avoid very small denominators, they go to NaN or cause aliasing artifacts
+		@insertpiece( FresnelType ) Rs = ( fresnelS * blinnPhong ) / max( 4.0 * NdotV * NdotL, 0.01 );
+	@end @property( legacy_math_brdf )
+		float Rs = blinnPhong;
+		float fresnelD = 1.0;
+	@end
+
+	return NdotL * (@insertpiece( kS ).xyz * lightSpecular * Rs +
+					@insertpiece( kD ).xyz * lightDiffuse * fresnelD);
+}
+@end
+@end
+
 @property( BRDF_CookTorrance )
 @piece( DeclareBRDF )
 //Cook-Torrance

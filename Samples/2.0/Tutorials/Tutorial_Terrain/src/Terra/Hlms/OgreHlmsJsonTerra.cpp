@@ -53,12 +53,16 @@ namespace Ogre
             return TerraBrdf::Default;
         if( !strcmp( value, "cook_torrance" ) )
             return TerraBrdf::CookTorrance;
+        if( !strcmp( value, "blinn_phong" ) )
+            return TerraBrdf::BlinnPhong;
         if( !strcmp( value, "default_uncorrelated" ) )
             return TerraBrdf::DefaultUncorrelated;
         if( !strcmp( value, "default_separate_diffuse_fresnel" ) )
             return TerraBrdf::DefaultSeparateDiffuseFresnel;
         if( !strcmp( value, "cook_torrance_separate_diffuse_fresnel" ) )
             return TerraBrdf::CookTorranceSeparateDiffuseFresnel;
+        if( !strcmp( value, "blinn_phong_separate_diffuse_fresnel" ) )
+            return TerraBrdf::BlinnPhongSeparateDiffuseFresnel;
 
         return TerraBrdf::Default;
     }

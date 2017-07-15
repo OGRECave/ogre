@@ -79,12 +79,20 @@ namespace Ogre
             return PbsBrdf::Default;
         if( !strcmp( value, "cook_torrance" ) )
             return PbsBrdf::CookTorrance;
+        if( !strcmp( value, "blinn_phong" ) )
+            return PbsBrdf::BlinnPhong;
         if( !strcmp( value, "default_uncorrelated" ) )
             return PbsBrdf::DefaultUncorrelated;
         if( !strcmp( value, "default_separate_diffuse_fresnel" ) )
             return PbsBrdf::DefaultSeparateDiffuseFresnel;
         if( !strcmp( value, "cook_torrance_separate_diffuse_fresnel" ) )
             return PbsBrdf::CookTorranceSeparateDiffuseFresnel;
+        if( !strcmp( value, "blinn_phong_separate_diffuse_fresnel" ) )
+            return PbsBrdf::BlinnPhongSeparateDiffuseFresnel;
+        if( !strcmp( value, "blinn_phong_legacy_math" ) )
+            return PbsBrdf::BlinnPhongLegacyMath;
+        if( !strcmp( value, "blinn_phong_full_legacy" ) )
+            return PbsBrdf::BlinnPhongFullLegacy;
 
         return PbsBrdf::Default;
     }
@@ -516,6 +524,9 @@ namespace Ogre
         case PbsBrdf::CookTorrance:
             outString += "cook_torrance";
             break;
+        case PbsBrdf::BlinnPhong:
+            outString += "blinn_phong";
+            break;
         case PbsBrdf::DefaultUncorrelated:
             outString += "default_uncorrelated";
             break;
@@ -524,6 +535,15 @@ namespace Ogre
             break;
         case PbsBrdf::CookTorranceSeparateDiffuseFresnel:
             outString += "cook_torrance_separate_diffuse_fresnel";
+            break;
+        case PbsBrdf::BlinnPhongSeparateDiffuseFresnel:
+            outString += "blinn_phong_separate_diffuse_fresnel";
+            break;
+        case PbsBrdf::BlinnPhongLegacyMath:
+            outString += "blinn_phong_legacy_math";
+            break;
+        case PbsBrdf::BlinnPhongFullLegacy:
+            outString += "blinn_phong_full_legacy";
             break;
         default:
             outString += "unknown / custom";

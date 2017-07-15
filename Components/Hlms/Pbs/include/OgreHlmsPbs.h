@@ -365,8 +365,11 @@ namespace Ogre
 
         static const IdString BrdfDefault;
         static const IdString BrdfCookTorrance;
+        static const IdString BrdfBlinnPhong;
         static const IdString FresnelSeparateDiffuse;
         static const IdString GgxHeightCorrelated;
+        static const IdString LegacyMathBrdf;
+        static const IdString RoughnessIsShininess;
 
         static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
         static const IdString *BlendModes[4];

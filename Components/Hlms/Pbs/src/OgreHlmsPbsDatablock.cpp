@@ -537,7 +537,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDiffuse( const Vector3 &diffuseColour )
     {
-        const float invPI = 0.318309886f;
+        const float invPI = getBrdf() == PbsBrdf::BlinnPhongFullLegacy ? 1.0f : 0.318309886f;
         mkDr = diffuseColour.x * invPI;
         mkDg = diffuseColour.y * invPI;
         mkDb = diffuseColour.z * invPI;
@@ -546,20 +546,24 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Vector3 HlmsPbsDatablock::getDiffuse(void) const
     {
-        return Vector3( mkDr, mkDg, mkDb ) * Ogre::Math::PI;
+        const Real pi = getBrdf() == PbsBrdf::BlinnPhongFullLegacy ? 1.0f : Math::PI;
+        return Vector3( mkDr, mkDg, mkDb ) * pi;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setSpecular( const Vector3 &specularColour )
     {
-        mkSr = specularColour.x;
-        mkSg = specularColour.y;
-        mkSb = specularColour.z;
+        const float invPI = getBrdf() == PbsBrdf::BlinnPhongLegacyMath ? 0.318309886f : 1.0f;
+
+        mkSr = specularColour.x * invPI;
+        mkSg = specularColour.y * invPI;
+        mkSb = specularColour.z * invPI;
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     Vector3 HlmsPbsDatablock::getSpecular(void) const
     {
-        return Vector3( mkSr, mkSg, mkSb );
+        const Real pi = getBrdf() == PbsBrdf::BlinnPhongLegacyMath ? Math::PI : 1.0f;
+        return Vector3( mkSr, mkSg, mkSb ) * pi;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setRoughness( float roughness )
@@ -1050,7 +1054,22 @@ namespace Ogre
     {
         if( mBrdf != brdf )
         {
+            const PbsBrdf::PbsBrdf oldBrdf = (PbsBrdf::PbsBrdf)getBrdf();
+            const PbsBrdf::PbsBrdf newBrdf = brdf;
             mBrdf = brdf;
+
+            //BlinnPhongFullLegacy expects diffuse in range [0; 1]; we have it in range [0; 1 / PI]
+            if( oldBrdf == PbsBrdf::BlinnPhongFullLegacy && newBrdf != PbsBrdf::BlinnPhongFullLegacy )
+                setDiffuse( Vector3( mkDr, mkDg, mkDb ) ); //Will be divided by PI.
+            if( oldBrdf != PbsBrdf::BlinnPhongFullLegacy && newBrdf == PbsBrdf::BlinnPhongFullLegacy )
+                setDiffuse( Vector3( mkDr, mkDg, mkDb ) * Math::PI ); //Increase by PI, won't be divided.
+
+            //BlinnPhongLegacyMath expects specular in range [0; 1 / PI]; we have it in range [0; 1]
+            if( oldBrdf == PbsBrdf::BlinnPhongLegacyMath && newBrdf != PbsBrdf::BlinnPhongLegacyMath )
+                setSpecular( Vector3( mkSr, mkSg, mkSb ) * Math::PI );
+            if( oldBrdf != PbsBrdf::BlinnPhongLegacyMath && newBrdf == PbsBrdf::BlinnPhongLegacyMath )
+                setSpecular( Vector3( mkSr, mkSg, mkSb ) );
+
             flushRenderables();
         }
     }

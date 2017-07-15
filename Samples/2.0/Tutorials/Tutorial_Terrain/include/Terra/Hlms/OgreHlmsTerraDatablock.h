@@ -96,6 +96,11 @@ namespace Ogre
         /// Ideal for silk (use high roughness values), synthetic fabric
         CookTorrance    = 0x00000001,
 
+        /// Implements Normalized Blinn Phong using a normalization
+        /// factor of (n + 8) / (8 * pi)
+        /// The main reason to use this BRDF is performance. It's cheap.
+        BlinnPhong      = 0x00000002,
+
         /// Same as Default, but the geometry term is not height-correlated
         /// which most notably causes edges to be dimmer and is less correct.
         /// Unity (Marmoset too?) use an uncorrelated term, so you may want to
@@ -128,6 +133,8 @@ namespace Ogre
         /// Ideal for shiny objects like glass toy marbles, some types of rubber.
         /// silk, synthetic fabric.
         CookTorranceSeparateDiffuseFresnel  = CookTorrance|FLAG_SPERATE_DIFFUSE_FRESNEL,
+
+        BlinnPhongSeparateDiffuseFresnel    = BlinnPhong|FLAG_SPERATE_DIFFUSE_FRESNEL,
     };
     }
 
