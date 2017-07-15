@@ -644,9 +644,6 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
-        , mTarget()
-        , mEntryPoint()
-        , mPreprocessorDefines()
         , mColumnMajorMatrices(true)
         , mBackwardsCompatibility(false)
         , mMicroCode(NULL)
