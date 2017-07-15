@@ -72,6 +72,7 @@ namespace Ogre
         mIsExternal = false;
         mIsExternalGLControl = false;
         mClosed = false;
+        mVisible = true;
         mActive = false;
         mHidden = false;
         mVSync = false;
