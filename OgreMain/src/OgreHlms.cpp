@@ -214,6 +214,7 @@ namespace Ogre
         mShaderSyntax( "unset!" ),
         mShaderFileExt( "unset!" ),
         mDebugOutput( true ),
+        mDebugOutputProperties( true ),
         mHighQuality( false ),
         mFastShaderBuildHack( false ),
         mDefaultDatablock( 0 ),
@@ -1720,6 +1721,54 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::dumpProperties( std::ofstream &outFile )
+    {
+        outFile.write( "#if 0", sizeof( "#if 0" ) - 1u );
+
+        char tmpBuffer[64];
+        char friendlyText[32];
+        LwString value( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+
+        {
+            HlmsPropertyVec::const_iterator itor = mSetProperties.begin();
+            HlmsPropertyVec::const_iterator end  = mSetProperties.end();
+
+            while( itor != end )
+            {
+                itor->keyName.getFriendlyText( friendlyText, 32 );
+                value.clear();
+                value.a( itor->value );
+
+                outFile.write( "\n\t***\t", sizeof( "\n\t***\t" ) - 1u );
+                outFile.write( friendlyText, strnlen( friendlyText, 32 ) );
+                outFile.write( "\t", sizeof( "\t" ) - 1u );
+                outFile.write( value.c_str(), value.size() );
+                ++itor;
+            }
+        }
+
+        outFile.write( "\n\tDONE DUMPING PROPERTIES",
+                       sizeof( "\n\tDONE DUMPING PROPERTIES" ) - 1u );
+
+        {
+            PiecesMap::const_iterator itor = mPieces.begin();
+            PiecesMap::const_iterator end  = mPieces.end();
+
+            while( itor != end )
+            {
+                itor->first.getFriendlyText( friendlyText, 32 );
+                outFile.write( "\n\t***\t", sizeof( "\n\t***\t" ) - 1u );
+                outFile.write( friendlyText, strnlen( friendlyText, 32 ) );
+                outFile.write( "\t", sizeof( "\t" ) - 1u );
+                outFile.write( itor->second.c_str(), itor->second.size() );
+                ++itor;
+            }
+        }
+
+        outFile.write( "\n\tDONE DUMPING PIECES\n#endif\n",
+                       sizeof( "\n\tDONE DUMPING PIECES\n#endif\n" ) - 1u );
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::applyStrongMacroblockRules( HlmsPso &pso )
     {
         if( !pso.macroblock->mDepthWrite )
@@ -1815,6 +1864,22 @@ namespace Ogre
                 if( mFastShaderBuildHack )
                     setProperty( HlmsBaseProp::FastShaderBuildHack, 1 );
 
+                String debugFilenameOutput;
+                std::ofstream debugDumpFile;
+                if( mDebugOutput )
+                {
+                    debugFilenameOutput = mOutputPath + "./" +
+                                            StringConverter::toString( finalHash ) +
+                                            ShaderFiles[i] + mShaderFileExt;
+                    debugDumpFile.open( debugFilenameOutput.c_str(), std::ios::out | std::ios::binary );
+
+                    //We need to dump the properties before processing the files, as these
+                    //may be overwritten or polñuted by the files, thus hiding why we
+                    //got this permutation.
+                    if( mDebugOutputProperties )
+                        dumpProperties( debugDumpFile );
+                }
+
                 //Library piece files first
                 LibraryVec::const_iterator itor = mLibrary.begin();
                 LibraryVec::const_iterator end  = mLibrary.end();
@@ -1864,17 +1929,9 @@ namespace Ogre
                                                            ShaderFiles[i] );
                 }
 
-                String debugFilenameOutput;
-
+                //Now dump the processed file.
                 if( mDebugOutput )
-                {
-                    debugFilenameOutput = mOutputPath + "./" +
-                                            StringConverter::toString( finalHash ) +
-                                            ShaderFiles[i] + mShaderFileExt;
-                    std::ofstream outFile( debugFilenameOutput.c_str(),
-                                           std::ios::out | std::ios::binary );
-                    outFile.write( &outString[0], outString.size() );
-                }
+                    debugDumpFile.write( &outString[0], outString.size() );
 
                 //Don't create and compile if template requested not to
                 if( !getProperty( HlmsBaseProp::DisableStage ) )
@@ -2541,10 +2598,11 @@ namespace Ogre
         return lastReturnedValue;
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::setDebugOutputPath( bool enableDebugOutput, const String &path )
+    void Hlms::setDebugOutputPath( bool enableDebugOutput, bool outputProperties, const String &path )
     {
-        mDebugOutput	= enableDebugOutput;
-        mOutputPath		= path;
+        mDebugOutput            = enableDebugOutput;
+        mDebugOutputProperties  = outputProperties;
+        mOutputPath             = path;
     }
     //-----------------------------------------------------------------------------------
     void Hlms::setListener( HlmsListener *listener )

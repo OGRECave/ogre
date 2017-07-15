@@ -156,6 +156,7 @@ namespace Ogre
         String          mShaderFileExt; /// Either glsl or hlsl
         String          mOutputPath;
         bool            mDebugOutput;
+        bool            mDebugOutputProperties;
         bool            mHighQuality;
         bool            mFastShaderBuildHack;
 
@@ -274,6 +275,8 @@ namespace Ogre
         virtual void clearShaderCache(void);
 
         void processPieces( Archive *archive, const StringVector &pieceFiles );
+
+        void dumpProperties( std::ofstream &outFile );
 
         /** Modifies the PSO's macroblock if there are reasons to do that, and creates
             a strong reference to the macroblock that the PSO will own.
@@ -583,11 +586,18 @@ namespace Ogre
             You should call this function at start up
         @param enableDebugOutput
             Whether to enable or disable dumping the shaders into a folder
+        @param outputProperties
+            Whether to dump properties and pieces at the beginning of the shader file.
+            This is very useful for determining what caused Ogre to compile a new variation.
+            Note that this setting may not always produce valid shader code in the dumped files
+            (but it we'll still produce valid shader code while at runtime)
+            If you want to compile the dumped file and it is invalid, just strip this info.
         @param path
             Path location on where to dump it. Should end with slash for proper concatenation
             (i.e. C:/path/ instead of C:/path; or /home/user/ instead of /home/user)
         */
-        void setDebugOutputPath( bool enableDebugOutput, const String &path = BLANKSTRING );
+        void setDebugOutputPath( bool enableDebugOutput, bool outputProperties,
+                                 const String &path = BLANKSTRING );
 
         /** Sets a listener to extend an existing Hlms implementation's with custom code,
             without having to rewrite it or modify the source code directly.

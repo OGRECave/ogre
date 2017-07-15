@@ -279,6 +279,53 @@ namespace Ogre
             #pragma warning( pop )
         #endif
         }
+
+        /** C String version. Zero allocations.
+        @param outCStr
+            C String to store the string.
+        @param stringSize
+            Size of of outCStr. Recommended size: OGRE_DEBUG_STR_SIZE
+        */
+        void getFriendlyText( char *outCStr, size_t stringSize ) const
+        {
+#if OGRE_DEBUG_MODE
+            size_t minSize = std::min<size_t>( OGRE_DEBUG_STR_SIZE, stringSize );
+            memcpy( outCStr, mDebugString, minSize );
+            outCStr[minSize - 1u] = '\0';
+#else
+            getReleaseText( outCStr, stringSize );
+#endif
+        }
+
+        /// C String version. Zero allocations. See getFriendlyText.
+        void getReleaseText( char *outCStr, size_t stringSize ) const
+        {
+        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
+            #pragma warning( push )
+            #pragma warning( disable: 4996 ) //Unsecure CRT deprecation warning
+        #endif
+
+            if( stringSize < (OGRE_HASH_BITS >> 2u)+10u )
+            {
+                //Not big enough. Use a temp buffer and then copy + truncate.
+                char tmp[(OGRE_HASH_BITS >> 2)+10];
+                sprintf( tmp, "[Hash 0x%.8x]", mHash );
+                tmp[(OGRE_HASH_BITS >> 2)+10-1] = '\0';
+
+                memcpy( outCStr, tmp, stringSize );
+                outCStr[stringSize - 1u] = '\0';
+            }
+            else
+            {
+                //Write directly to the output buffer. It's big enough.
+                sprintf( outCStr, "[Hash 0x%.8x]", mHash );
+                outCStr[(OGRE_HASH_BITS >> 2)+10-1] = '\0';
+            }
+
+        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
+            #pragma warning( pop )
+        #endif
+        }
     };
 
     typedef vector<IdString>::type IdStringVec;
