@@ -67,9 +67,6 @@ namespace Ogre
 	//Change per material (hash can be cached on the renderable)
 	const IdString DefaultProperties::AlphaTest = IdString("alpha_test");
 
-	const IdString DefaultProperties::GL3Plus = IdString("GL3+");
-	const IdString DefaultProperties::HighQuality = IdString("hlms_high_quality");
-
 	const IdString *DefaultProperties::UvCountPtrs[8] =
 	{
 		&DefaultProperties::UvCount0,

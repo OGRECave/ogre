@@ -79,9 +79,6 @@ namespace Ogre
 		//Change per material (hash can be cached on the renderable)
 		static const IdString AlphaTest;
 
-		static const IdString GL3Plus;
-		static const IdString HighQuality;
-
 		static const IdString *UvCountPtrs[8];
 	};
 }
