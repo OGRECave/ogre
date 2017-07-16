@@ -36,7 +36,6 @@
 	@piece( getMaxFresnelS )max( fresnelS.x, max( fresnelS.y, fresnelS.z ) )@end
 @end
 
-@property( BRDF_CookTorrance )
 @property( BRDF_BlinnPhong )
 @piece( DeclareBRDF )
 //Blinn-Phong
