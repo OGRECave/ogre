@@ -192,7 +192,6 @@ namespace Ogre
 	protected:
 
 		bool mCanHardwareGamma;
-		bool mIsGLES;
 
 		ColourValue mAlbedo;
 		ColourValue mF0;

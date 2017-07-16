@@ -77,8 +77,6 @@ namespace Ogre
 			language = "glsles";
 		}
 
-        mIsGLES = language == "glsles";
-
 		mVertexDatablock.setLanguage(language);
 		mFragmentDatablock.setLanguage(language);
 
@@ -196,9 +194,6 @@ namespace Ogre
 		mPropertyMap.setProperty("lights_spot_count", mSpotLightCount);
 
 		mPropertyMap.setProperty("lights_count", mDirectionalLightCount + mPointLightCount + mSpotLightCount);
-
-		// tell the shader some details about the render system
-		mPropertyMap.setProperty("is_gles", mIsGLES);
 
 		// tell the shader if the hardware supports hardware gamma correction or not 
 		mPropertyMap.setProperty("hw_gamma_read", mCanHardwareGamma);
