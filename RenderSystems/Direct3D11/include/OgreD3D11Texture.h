@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __D3D11TEXTURE_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreD3D11Device.h"
 #include "OgreTexture.h"
 #include "OgreRenderTexture.h"
 #include "OgreSharedPtr.h"

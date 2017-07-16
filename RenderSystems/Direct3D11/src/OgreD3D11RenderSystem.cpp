@@ -694,9 +694,9 @@ bail:
                     optFSAA->possibleValues.push_back(StringConverter::toString(n));
 
                     // 8x could mean 8xCSAA, and we need other designation for 8xMSAA
-                    if(n == 8 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 8    // 8x CSAA
-                    || n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 16  // 16x CSAA
-                    || n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 8, &numLevels)) && numLevels > 16) // 16xQ CSAA
+                    if((n == 8 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 8)    // 8x CSAA
+                    || (n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 16)  // 16x CSAA
+                    || (n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 8, &numLevels)) && numLevels > 16)) // 16xQ CSAA
                     {
                         optFSAA->possibleValues.push_back(StringConverter::toString(n) + " [Quality]");
                     }
@@ -938,11 +938,12 @@ bail:
             {
                 temp = mActiveD3DDriver->getVideoModeList()->item(j)->getDescription();
 
-                // In full screen we only want to allow supported resolutions, so temp and opt->second.currentValue need to 
-                // match exactly, but in windowed mode we can allow for arbitrary window sized, so we only need
-                // to match the colour values
-                if(fullScreen && (temp == opt->second.currentValue) ||
-                  !fullScreen && (temp.substr(temp.rfind('@')+1) == colourDepth))
+                // In full screen we only want to allow supported resolutions, so temp and
+                // opt->second.currentValue need to match exactly, but in windowed mode we
+                // can allow for arbitrary window sized, so we only need to match the
+                // colour values
+                if( (fullScreen && (temp == opt->second.currentValue)) ||
+                    (!fullScreen && (temp.substr(temp.rfind('@')+1) == colourDepth)) )
                 {
                     videoMode = mActiveD3DDriver->getVideoModeList()->item(j);
                     break;
@@ -1183,9 +1184,12 @@ bail:
 
         rsc->setCapability(RSC_VBO);
         UINT formatSupport;
-        if(mFeatureLevel >= D3D_FEATURE_LEVEL_9_2
-        || SUCCEEDED(mDevice->CheckFormatSupport(DXGI_FORMAT_R32_UINT, &formatSupport)) && 0 != (formatSupport & D3D11_FORMAT_SUPPORT_IA_INDEX_BUFFER))
+        if( mFeatureLevel >= D3D_FEATURE_LEVEL_9_2 ||
+            (SUCCEEDED( mDevice->CheckFormatSupport(DXGI_FORMAT_R32_UINT, &formatSupport)) &&
+            0 != (formatSupport & D3D11_FORMAT_SUPPORT_IA_INDEX_BUFFER)) )
+        {
             rsc->setCapability(RSC_32BIT_INDEX);
+        }
 
         // Set number of texture units, always 16
         rsc->setNumTextureUnits(16);
@@ -3206,8 +3210,8 @@ bail:
         v1::HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         v1::VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
 
-        bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
-                    !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
+        bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
+                    !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL)
                 || op.vertexData->vertexBufferBinding->getHasInstanceData();
 
         size_t numberOfInstances = op.numberOfInstances;
@@ -4380,7 +4384,7 @@ bail:
         {
             unsigned modeFSAA = std::max(mode->Count, mode->Quality);
             bool modeQuality = mode->Count >= 8 && mode->Quality != 0;
-            bool tooHQ = (modeFSAA > fsaa || modeFSAA == fsaa && modeQuality && !qualityHint);
+            bool tooHQ = (modeFSAA > fsaa || (modeFSAA == fsaa && modeQuality && !qualityHint));
             if(!tooHQ)
                 break;
         }
