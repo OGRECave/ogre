@@ -13,9 +13,8 @@ code for an HLMS is much low level than the old Materials have ever been
 
 #  A lot of data is stored in “Blocks” {#data}
 
-Described in detail in the [*Blocks section*](#toc52), many parameters
-have been grouped into blocks. Changing depth checks means changing the
-whole Macroblock.
+Described in detail in the [*Datablocks section*](#toc52), many parameters
+have been grouped into blocks.
 
 You could be thinking the reason I came up with these two is to fit with
 D3D11′s grand scheme of things while being compatible with OpenGL. But
@@ -89,15 +88,6 @@ However, materials are still useful for:
     doesn’t matter much either, because it’s not like there are 100
     fullscreen passes. Usually there’s less than 10.
 
-Under the hood there is an HLMS C++ implementation (hlms_LOW\_LEVEL)
-that acts just as a proxy to the material. The HLMS is an integral part
-of Ogre 2.0, not just a fancy add-in.
-
-Materials have been refactored, and thus your old code may need a few
-changes. Most notably Macroblocks & Blendblocks have been added to
-Materials, thus functions like Pass::setDepthCheck & Co have been
-replaced by a two calls: Pass::setMacroblock & Pass::setBlendblock.
-
 #  The three components {#components}
 
 1.  Scripts. To set the material properties (i.e. type of Hlms to use:
@@ -148,78 +138,24 @@ modular.
 
 ![](hlms_components.svg)
 
-## Blocks {#toc52}
+## Datablocks {#toc52}
 
-We’re introducing the concept of blocks, most of them are immutable.
-Being immutable means you can’t change the Macro- Blend- & Samplerblocks
-after being created. If you want to make a change, you have to create a
-new block and assign the new one. The previous one won’t be destroyed
-until asked explicitly.
-
-Technically on OpenGL render systems (GL3+, GLES2) you could const\_cast
-the pointers, change the block’s parameters (mind you, the pointer is
-shared by other datablocks, so you will be changing them as well as side
-effect) and it would probably work. But it will definitely fail on D3D11
-render system.
-
-###  Datablocks
-
-A Datablock is a “material” from the user’s perspective. It is the only
-mutable block. It holds data (i.e. material properties) that will be
-passed directly to the shaders, and also holds which Macroblock,
-Blendblocks and Samplerblocks are assigned to it.
-
-Most Hlms implementations will create a derived class for Datablocks to
-hold their data. For example, HlmsPbs creates a datablock called
-HlmsPbsDatablock. This datablock contains roughness and fresnel values,
-which do not make any sense in (e.g.) a GUI implementation.
-
-###  Macroblocks
-
-Named like that because most entities end up using the macroblock.
-Except for transparents, we sort by macroblock first. These contain
-information like depth check & depth write, culling mode, polygon mode
-(point, wireframe, solid). They’re quite analogous to
-D3D11\_RASTERIZER\_DESC. And not without reason: under the hood
-Macroblocks hold a ID3D11RasterizerState, and thanks to render queue’s
-sorting, we change them as little as possible. In other words, reduce
-API overhead. On GL backends, we just change the individual states on
-each block change. Macroblocks can be shared by many Datablocks.
-
-Even in OpenGL, there are performance benefits, because there are
-enumeration translations (i.e. CMPF\_LESS -&gt; GL\_LESS) that are
-performed and cached when the macroblock gets created, instead of doing
-it every time the setting changes.
-
-###  Blendblocks
-
-Blendblocks are like Macroblocks, but they hold alpha blending operation
-information (blend factors: One, One\_Minus\_Src\_Alpha; blending modes:
-add, substract, min, max. etc). They’re analogous to D3D11\_BLEND\_DESC.
-We also sort by blendblocks to reduce state changes.
-
-###  Samplerblocks
-
-Samplerblocks hold information about texture units, like filtering
-options, addressing modes (wrap, clamp, etc), Lod bias, anisotropy,
-border colour, etc. They're analogous to D3D11\_SAMPLER\_DESC.
-
-GL3+ and D3D11 both support samplerblocks natively. On GLES2, the
-functionality is emulated (still performance has improved since we can
-cache the samplerblock's GL value translations and whether a texture has
-already set to a given samplerblock's paremeters).
+We’re introducing the concept of Datablocks.
+A Datablock is a “material” from the user’s perspective.
+It holds data (i.e. material properties) that will be
+passed directly to the shaders.
 
 ![](hlms_blocks.svg)
 
-The diagram shows a typical layout of a datablock. Note that
+The diagram shows a typical layout of a datablock.
 Samplerblocks do not live inside base HlmsDatablock, but rather in its
 derived implementation. This is because some implementations may not
 need textures at all, and the number of samplerblocks is unknown. Some
 implementations may want one samplerblock per texture, whereas others
 may just need one.
 
-Macroblocks and Blendblocks on the other hand, we just need one per
-material.
+@note Macroblocks and Blendblocks are only available from Ogre 2.1 on.
+For 1.x you still have to call Ogre::Pass::setDepthCheckEnabled etc. to change the respective properties.
 
 ## Hlms templates {#toc69}
 
@@ -596,7 +532,7 @@ illustrates the process:
 Note: This section is relevant to those seeking to write their own Hlms
 implementation.
 
-C++ can use Hlms::setProperty( "key", value ) to set “key” to the given
+C++ can use Ogre::HlmsMaterialBase::getPropertyMap().setProperty( "key", value ) to set “key” to the given
 value. This value can be read by \@property, \@foreach,
 \@add/sub/mul/div/mod, \@counter, \@value and \@padd/psub/pmul/pdiv/pmod
 
@@ -624,9 +560,7 @@ The function Hlms::createShaderCacheEntry is the main responsible for
 generating the shaders and parsing the template through the Hlms
 preprocessor. If you overload it, you can ignore pieces, properties;
 basically override the entire Hlms system and provide the source for the
-shaders yourself. See the HlmsLowLevel implementation which overrides
-the Hlms entirely and acts as a mere proxy to the old Material system
-from Ogre 1.x; the flexibility is really high.
+shaders yourself.
 
 ##  Common conventions
 
@@ -649,12 +583,6 @@ Propierties and pieces starting with 'custom\_' are for user
 customizations of the template
 
 TBD
-
-##  Hot reloading
-
-Hlms supports modifying the template files externally and reloading
-them, taking immediate effect. Call Hlms::reloadFrom to achieve this.
-How to get notified when the files were changed is up to the user.
 
 ##  Disabling a stage
 
