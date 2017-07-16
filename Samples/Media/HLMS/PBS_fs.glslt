@@ -1,8 +1,8 @@
-@property( !is_gles )
+#ifndef GL_ES
 #version 120
 
 #extension GL_ARB_shader_texture_lod : require  
-@end @property( is_gles )
+#else
 #version 300 es
 
 #define varying in
@@ -15,7 +15,7 @@ out highp vec4 FragColor;
 precision highp int;
 precision highp float;
 precision highp samplerCube;
-@end
+#endif
 
 #define ROUGHNESS_BIAS 0.005
 

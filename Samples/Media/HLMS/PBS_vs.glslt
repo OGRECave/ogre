@@ -1,6 +1,6 @@
-@property( !is_gles )
+#ifndef GL_ES
 #version 120
-@end @property( is_gles )
+#else
 #version 300 es
 
 #define varying out
@@ -8,7 +8,7 @@
 
 precision highp int;
 precision highp float;
-@end
+#endif
 
 uniform mat4 mvpMat;
 uniform mat4 mvMat;
