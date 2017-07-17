@@ -357,9 +357,6 @@ namespace Ogre {
 		mLeft = left;
 		mTop = top;
 
-        // Resize, taking content scaling factor into account
-        resize(mWidth, mHeight);
-
 		mActive = true;
 		mVisible = true;
 		mClosed = false;
