@@ -401,9 +401,7 @@ namespace Ogre
 				SubStringRef subString(&inSubString.getOriginalBuffer(), itor + 1);
 				if (subString.find(counterVar) == 0)
 				{
-					char tmp[16];
-					sprintf(tmp, "%zu", passNum);
-					outBuffer += tmp;
+					outBuffer += StringConverter::toString(passNum);
 					itor += counterVar.size() + 1;
 				}
 				else
