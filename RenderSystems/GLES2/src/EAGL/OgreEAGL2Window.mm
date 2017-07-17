@@ -160,7 +160,7 @@ namespace Ogre {
         mContext->bindSampleFramebuffer();
     }
 
-    void EAGL2Window::initNativeCreatedWindow(const NameValuePairList *miscParams)
+    void EAGL2Window::createNativeWindow(uint widthPt, uint heightPt, const NameValuePairList *miscParams)
     {
         // This method is called from within create() and after parameters have been parsed.
         // If the window, view or view controller objects are nil at this point, it is safe
@@ -168,28 +168,10 @@ namespace Ogre {
         // we can create our own.
         SAFE_ARC_AUTORELEASE_POOL_START()
         
-        uint w = 0, h = 0;
-        
-        ConfigOptionMap::const_iterator opt;
-        ConfigOptionMap::const_iterator end = mGLSupport->getConfigOptions().end();
-        NameValuePairList::const_iterator param;
-
-        if ((opt = mGLSupport->getConfigOptions().find("Video Mode")) != end)
-        {
-            String val = opt->second.currentValue;
-            String::size_type pos = val.find('x');
-            
-            if (pos != String::npos)
-            {
-                w = StringConverter::parseUnsignedInt(val.substr(0, pos));
-                h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
-            }
-        }
-
         // Set us up with an external window, or create our own.
         if(!mIsExternal)
         {
-            mWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, w, h)];
+            mWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, widthPt, heightPt)];
         }
         
         OgreAssert(mWindow != nil, "EAGL2Window: Failed to create native window");
@@ -197,7 +179,7 @@ namespace Ogre {
         // Set up the view
         if(!mUsingExternalView)
         {
-            mView = [[EAGL2View alloc] initWithFrame:CGRectMake(0, 0, w, h)];
+            mView = [[EAGL2View alloc] initWithFrame:CGRectMake(0, 0, widthPt, heightPt)];
             mView.opaque = YES;
 
             // Use the default scale factor of the screen
@@ -273,14 +255,20 @@ namespace Ogre {
     
         if(!mUsingExternalViewController)
             [mWindow makeKeyAndVisible];
-
+        
+        // Obtain effective view size and scale
+        CGSize sz = mView.frame.size;
+        mContentScalingFactor = mView.contentScaleFactor;
+        mWidth = _getPixelFromPoint(sz.width);
+        mHeight = _getPixelFromPoint(sz.height);
+        
         mContext->createFramebuffer();
         
         // If content scaling is supported, the window size will be smaller than the GL pixel buffer
         // used to render.  Report the buffer size for reference.
         StringStream ss;
             
-        ss  << "iOS: Window created " << w << " x " << h
+        ss  << "iOS: Window created " << widthPt << " x " << heightPt
             << " with backing store size " << mContext->mBackingWidth << " x " << mContext->mBackingHeight
             << " using content scaling factor " << std::fixed << std::setprecision(1) << getViewPointToPixelScale();
         LogManager::getSingleton().logMessage(ss.str());
@@ -288,7 +276,7 @@ namespace Ogre {
         SAFE_ARC_AUTORELEASE_POOL_END()
     }
     
-    void EAGL2Window::create(const String& name, uint width, uint height,
+    void EAGL2Window::create(const String& name, uint widthPt, uint heightPt,
                                 bool fullScreen, const NameValuePairList *miscParams)
     {
         short frequency = 0;
@@ -298,9 +286,7 @@ namespace Ogre {
         
         mIsFullScreen = fullScreen;
         mName = name;
-        mWidth = width;
-        mHeight = height;
-
+        
         // Check the configuration. This may be overridden later by the value sent via miscParams
         ConfigOptionMap::const_iterator configOpt;
         ConfigOptionMap::const_iterator configEnd = mGLSupport->getConfigOptions().end();
@@ -360,9 +346,6 @@ namespace Ogre {
             if ((opt = miscParams->find("externalViewHandle")) != end)
             {
                 mView = (__bridge EAGL2View *)(void*)StringConverter::parseUnsignedLong(opt->second);
-                CGRect b = [mView bounds];
-                mWidth = b.size.width;
-                mHeight = b.size.height;
                 mUsingExternalView = true;
                 LogManager::getSingleton().logMessage("iOS: Using an external view handle");
             }
@@ -377,7 +360,7 @@ namespace Ogre {
             }
 		}
         
-        initNativeCreatedWindow(miscParams);
+        createNativeWindow(widthPt, heightPt, miscParams);
 
         left = top = 0;
         mLeft = left;

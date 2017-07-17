@@ -72,7 +72,7 @@ namespace Ogre {
             EAGL2ViewController *mViewController;
 #endif
 
-            void initNativeCreatedWindow(const NameValuePairList *miscParams);
+            void createNativeWindow(uint widthPt, uint heightPt, const NameValuePairList *miscParams);
             void reposition(int leftPt, int topPt);
             void resize(unsigned int widthPt, unsigned int heightPt);
             void windowMovedOrResized();
