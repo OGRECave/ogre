@@ -92,11 +92,6 @@ namespace Ogre {
             mWindow = nil;
         }
 
-        if (mIsFullScreen)
-        {
-            switchFullScreen(false);
-        }
-
         if(!mUsingExternalViewController)
             SAFE_ARC_RELEASE(mViewController);
     }
@@ -110,30 +105,30 @@ namespace Ogre {
         }
     }
 
-    void EAGL2Window::setFullscreen(bool fullscreen, uint width, uint height)
+    void EAGL2Window::setFullscreen(bool fullscreen, uint widthPt, uint heightPt)
     {
     }
 
-    void EAGL2Window::reposition(int left, int top)
+    void EAGL2Window::reposition(int leftPt, int topPt)
 	{
 	}
     
-	void EAGL2Window::resize(unsigned int width, unsigned int height)
+	void EAGL2Window::resize(unsigned int widthPt, unsigned int heightPt)
 	{
         if(!mWindow) return;
 
-        Real w = width * mContentScalingFactor;
-        Real h = height * mContentScalingFactor;
+        Real widthPx = _getPixelFromPoint(widthPt);
+        Real heightPx = _getPixelFromPoint(heightPt);
 
         // Check if the window size really changed
-        if(mWidth == w && mHeight == h)
+        if(mWidth == widthPx && mHeight == heightPx)
             return;
         
         // Destroy and recreate the framebuffer with new dimensions 
         mContext->destroyFramebuffer();
         
-        mWidth = w;
-        mHeight = h;
+        mWidth = widthPx;
+        mHeight = heightPx;
         
         mContext->createFramebuffer();
 
@@ -146,10 +141,10 @@ namespace Ogre {
 	void EAGL2Window::windowMovedOrResized()
 	{
 		CGRect frame = [mView frame];
-        mWidth = (unsigned int)frame.size.width * mContentScalingFactor;
-        mHeight = (unsigned int)frame.size.height * mContentScalingFactor;
-        mLeft = (int)frame.origin.x * mContentScalingFactor;
-        mTop = ((int)frame.origin.y + (int)frame.size.height) * mContentScalingFactor;
+        mWidth = _getPixelFromPoint(frame.size.width);
+        mHeight = _getPixelFromPoint(frame.size.height);
+        mLeft = _getPixelFromPoint(frame.origin.x);
+        mTop = _getPixelFromPoint(frame.origin.y + frame.size.height);
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
@@ -286,11 +281,8 @@ namespace Ogre {
         StringStream ss;
             
         ss  << "iOS: Window created " << w << " x " << h
-            << " with backing store size " << mContext->mBackingWidth << " x " << mContext->mBackingHeight;
-        if(mIsContentScalingSupported)
-        {
-            ss << " using content scaling factor " << std::fixed << std::setprecision(1) << mContentScalingFactor;
-        }
+            << " with backing store size " << mContext->mBackingWidth << " x " << mContext->mBackingHeight
+            << " using content scaling factor " << std::fixed << std::setprecision(1) << getViewPointToPixelScale();
         LogManager::getSingleton().logMessage(ss.str());
         
         SAFE_ARC_AUTORELEASE_POOL_END()

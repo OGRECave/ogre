@@ -73,13 +73,11 @@ namespace Ogre {
             EAGLViewController *mViewController;
 #endif
 
-            void switchFullScreen(bool fullscreen) { }
-            void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
             void initNativeCreatedWindow(const NameValuePairList *miscParams);
-            void createNativeWindow(int &left, int &top, uint &width, uint &height, String &title);
-            void reposition(int left, int top);
-            void resize(unsigned int width, unsigned int height);
+            void reposition(int leftPt, int topPt);
+            void resize(unsigned int widthPt, unsigned int heightPt);
             void windowMovedOrResized();
+            int _getPixelFromPoint(float viewPt) { return mIsContentScalingSupported ? (int)viewPt * mContentScalingFactor : (int)viewPt; }
             virtual void _beginUpdate();
 
     public:
@@ -87,10 +85,10 @@ namespace Ogre {
             virtual ~EAGLWindow();
 
             float getViewPointToPixelScale() { return mIsContentScalingSupported ? mContentScalingFactor : 1.0f; }
-            void create(const String& name, unsigned int width, unsigned int height,
+            void create(const String& name, unsigned int widthPt, unsigned int heightPt,
                         bool fullScreen, const NameValuePairList *miscParams);
 
-            virtual void setFullscreen(bool fullscreen, uint width, uint height);
+            virtual void setFullscreen(bool fullscreen, uint widthPt, uint heightPt);
             void destroy(void);
             bool isClosed(void) const { return mClosed; }
             bool isVisible(void) const { return mVisible; }
