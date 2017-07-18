@@ -83,7 +83,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     endif()
 
     if(Boost_FOUND)
-       list(OGRE_ANDROID_INCLUDES APPEND ${Boost_INCLUDE_DIRS})       
+       list(APPEND OGRE_ANDROID_INCLUDES ${Boost_INCLUDE_DIRS})       
 	   add_static_libs_from_paths(${Boost_LIBRARIES})
     endif()
 
