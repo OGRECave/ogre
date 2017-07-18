@@ -1831,7 +1831,7 @@ namespace Ogre {
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // EAGL2Support redirects to glesw for get_proc. Overwriting it there would create an infinite loop.
-        if (gleswInit())
+        if (glGetError == NULL && gleswInit())
 #else
         if (gleswInit2(get_proc))
 #endif
