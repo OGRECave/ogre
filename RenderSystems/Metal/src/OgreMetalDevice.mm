@@ -117,7 +117,10 @@ namespace Ogre
         endAllEncoders();
         //Push the command buffer to the GPU
         [mCurrentCommandBuffer commit];
-        mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
+        @autoreleasepool
+        {
+            mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
+        }
     }
     //-------------------------------------------------------------------------
     id<MTLBlitCommandEncoder> MetalDevice::getBlitEncoder(void)
@@ -127,7 +130,10 @@ namespace Ogre
             endRenderEncoder();
             endComputeEncoder();
 
-            mBlitEncoder = [mCurrentCommandBuffer blitCommandEncoder];
+            @autoreleasepool
+            {
+                mBlitEncoder = [mCurrentCommandBuffer blitCommandEncoder];
+            }
         }
 
         return mBlitEncoder;
