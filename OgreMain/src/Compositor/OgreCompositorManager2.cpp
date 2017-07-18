@@ -629,6 +629,15 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorManager2::_update( SceneManagerEnumerator &sceneManagers, HlmsManager *hlmsManager )
     {
+        //The Apple render systems need to run the update in a special way.
+        //So we defer to the render system.
+        //If the render system doesn't need to do anything special it
+        //should just call compositorManager->_updateImplementation.
+        mRenderSystem->updateCompositorManager( this, sceneManagers, hlmsManager );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::_updateImplementation( SceneManagerEnumerator &sceneManagers, HlmsManager *hlmsManager )
+    {
         addQueuedWorkspaces();
 
         WorkspaceVec::const_iterator itor = mWorkspaces.begin();

@@ -310,7 +310,11 @@ namespace Ogre
         virtual bool hasAnisotropicMipMapFilter() const         { return true; }
 
         virtual void setClipPlanesImpl(const PlaneList& clipPlanes);
-        virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
+        virtual void initialiseFromRenderSystemCapabilities( RenderSystemCapabilities* caps,
+                                                             RenderTarget* primary );
+        virtual void updateCompositorManager( CompositorManager2 *compositorManager,
+                                              SceneManagerEnumerator &sceneManagers,
+                                              HlmsManager *hlmsManager );
 
         MetalDevice* getActiveDevice(void)                      { return mActiveDevice; }
         MetalProgramFactory* getMetalProgramFactory(void)       { return mMetalProgramFactory; }

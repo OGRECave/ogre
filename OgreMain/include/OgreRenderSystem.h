@@ -949,6 +949,13 @@ namespace Ogre
         /// Called once per frame, regardless of how many active workspaces there are
         void _update(void);
 
+        /// This gives the renderer a chance to perform the compositor update in a special way.
+        /// When the render system is ready to perform the actual update it should just
+        /// compositorManager->_updateImplementation.
+        virtual void updateCompositorManager( CompositorManager2 *compositorManager,
+                                              SceneManagerEnumerator &sceneManagers,
+                                              HlmsManager *hlmsManager );
+
         /**
         Sets the provided viewport as the active one for future
         rendering operations. This viewport is aware of it's own
@@ -1446,7 +1453,7 @@ namespace Ogre
         virtual bool checkExtension( const String &ext ) const      { return false; }
 
         virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const = 0;
-
+   
     protected:
 
         void cleanReleasedDepthBuffers(void);

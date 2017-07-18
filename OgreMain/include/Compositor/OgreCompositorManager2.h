@@ -372,7 +372,14 @@ namespace Ogre
         /// Calls @see CompositorNode::_validateAndFinish on all objects who aren't yet validated
         void validateAllNodes();
 
+        /// Will call the renderSystem which in turns calls _updateImplementation
         void _update( SceneManagerEnumerator &sceneManagers, HlmsManager *hlmsManager );
+        
+        /// This should be called by the render system to
+        /// perform the actual compositor manager update.
+        /// DO NOT CALL THIS DIRECTLY.
+        void _updateImplementation( SceneManagerEnumerator &sceneManagers, HlmsManager *hlmsManager );
+
         void _swapAllFinalTargets(void);
 
         /** Utility helper to create a basic workspace to get you out of the rush. Advanced users will

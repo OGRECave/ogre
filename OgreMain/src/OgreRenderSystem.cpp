@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
 #include "OgreHlmsPso.h"
+#include "Compositor/OgreCompositorManager2.h"
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreVertexArrayObject.h"
 
@@ -1018,6 +1019,13 @@ namespace Ogre {
     {
         mVaoManager->_update();
         cleanReleasedDepthBuffers();
+    }
+    //---------------------------------------------------------------------
+    void RenderSystem::updateCompositorManager( CompositorManager2 *compositorManager,
+                                                SceneManagerEnumerator &sceneManagers,
+                                                HlmsManager *hlmsManager )
+    {
+        compositorManager->_updateImplementation( sceneManagers, hlmsManager );
     }
     //---------------------------------------------------------------------
     const String& RenderSystem::_getDefaultViewportMaterialScheme( void ) const

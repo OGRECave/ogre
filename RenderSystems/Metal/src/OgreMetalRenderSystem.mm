@@ -53,11 +53,13 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreFrustum.h"
 #include "OgreViewport.h"
+#include "Compositor/OgreCompositorManager2.h"
 
 #include "OgreMetalMappings.h"
 
 #import <Metal/Metal.h>
 #import <Foundation/NSEnumerator.h>
+
 
 namespace Ogre
 {
@@ -2244,7 +2246,19 @@ namespace Ogre
         mMetalProgramFactory = new MetalProgramFactory( &mDevice );
         HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
     }
-    
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::updateCompositorManager( CompositorManager2 *compositorManager,
+                                                     SceneManagerEnumerator &sceneManagers,
+                                                     HlmsManager *hlmsManager )
+    {
+        // Metal requires that a frame's worth of rendering be invoked inside an autorelease pool.
+        // This is true for both iOS and macOS.
+        @autoreleasepool
+        {
+            compositorManager->_updateImplementation( sceneManagers, hlmsManager );
+        }
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams )
     {
         RenderSystem::setStencilBufferParams( refValue, stencilParams );
