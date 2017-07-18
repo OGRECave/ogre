@@ -61,12 +61,15 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalDevice::init(void)
     {
-        mDevice = MTLCreateSystemDefaultDevice();
-        mMainCommandQueue = [mDevice newCommandQueue];
-        mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
-        mBlitEncoder = 0;
-        mComputeEncoder = 0;
-        mRenderEncoder = 0;
+        @autoreleasepool
+        {
+            mDevice = MTLCreateSystemDefaultDevice();
+            mMainCommandQueue = [mDevice newCommandQueue];
+            mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
+            mBlitEncoder = 0;
+            mComputeEncoder = 0;
+            mRenderEncoder = 0;
+        }
     }
     //-------------------------------------------------------------------------
     void MetalDevice::endBlitEncoder(void)
