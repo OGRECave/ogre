@@ -42,6 +42,8 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
+    class SubStringRef;
+
 	class _OgreHlmsExport ShaderGenerator : public PassAlloc
 	{
 	protected:
