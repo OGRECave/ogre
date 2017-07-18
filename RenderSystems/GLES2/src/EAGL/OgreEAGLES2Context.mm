@@ -195,10 +195,17 @@ namespace Ogre {
 
     void EAGLES2Context::destroyFramebuffer()
     {
-        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mViewFramebuffer));
-        mViewFramebuffer = 0;
-        OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &mViewRenderbuffer));
-        mViewRenderbuffer = 0;
+        if(mViewFramebuffer)
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mViewFramebuffer));
+            mViewFramebuffer = 0;
+        }
+        
+        if(mViewRenderbuffer)
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &mViewRenderbuffer));
+            mViewRenderbuffer = 0;
+        }
         
         if(mSampleRenderbuffer)
         {
