@@ -1754,9 +1754,12 @@ namespace Ogre {
         _disableTextureUnitsFrom(0);
 
         // It's ready for switching
-        if(mCurrentContext)
+        if (mCurrentContext!=context)
+        {
+            mCurrentContext->barrier(); // ensure that gl resources created in the current context would be visible after context switching
             mCurrentContext->endCurrent();
-        mCurrentContext = context;
+            mCurrentContext = context;
+        }
         mCurrentContext->setCurrent();
 
         // Check if the context has already done one-time initialisation

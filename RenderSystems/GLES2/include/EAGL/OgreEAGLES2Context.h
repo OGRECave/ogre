@@ -54,6 +54,7 @@ namespace Ogre {
 #endif
             virtual ~EAGLES2Context();
 
+            virtual void barrier();
             virtual void setCurrent();
             virtual void endCurrent();
             virtual GLContext * clone() const;

@@ -230,8 +230,8 @@ namespace Ogre {
             else
             {
                 GLRenderSystemCommon *rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
-                if(EAGLES2Context* mContext = (EAGLES2Context*)rs->_getMainContext())
-                    group = mContext->getContext().sharegroup;
+                if(EAGLES2Context* mainContext = (EAGLES2Context*)rs->_getMainContext())
+                    group = mainContext->getContext().sharegroup;
             }
             
             mContext = mGLSupport->createNewContext(eaglLayer, group);

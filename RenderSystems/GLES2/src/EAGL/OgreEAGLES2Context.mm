@@ -226,6 +226,11 @@ namespace Ogre {
         }
     }
 
+    void EAGLES2Context::barrier()
+    {
+        glFlush();
+    }
+
     void EAGLES2Context::setCurrent()
     {
         BOOL ret = [EAGLContext setCurrentContext:mContext];
@@ -239,7 +244,7 @@ namespace Ogre {
 
     void EAGLES2Context::endCurrent()
     {
-        // Do nothing
+        [EAGLContext setCurrentContext:nil];
     }
 
     GLContext * EAGLES2Context::clone() const
