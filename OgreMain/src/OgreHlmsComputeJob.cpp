@@ -705,5 +705,16 @@ namespace Ogre
         IdString originalName = dstJob->mName;
         *dstJob = *this;
         dstJob->mName = originalName;
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        TextureSlotVec::const_iterator itor = dstJob->mTextureSlots.begin();
+        TextureSlotVec::const_iterator end  = dstJob->mTextureSlots.end();
+
+        while( itor != end )
+        {
+            if( itor->samplerblock )
+                hlmsManager->addReference( itor->samplerblock );
+            ++itor;
+        }
     }
 }

@@ -50,11 +50,11 @@ namespace Ogre
     public:
         enum ThreadGroupsBasedOn
         {
-            /// Disabled. (obey @see setNumThreadGroups)
+            /// Disabled. (obey setNumThreadGroups)
             ThreadGroupsBasedOnNothing,
-            /// Based the number of thread groups on a texture. @see setNumThreadGroupsBasedOn
+            /// Based the number of thread groups on a texture. See setNumThreadGroupsBasedOn
             ThreadGroupsBasedOnTexture,
-            /// Based the number of thread groups on a UAV. @see setNumThreadGroupsBasedOn
+            /// Based the number of thread groups on a UAV. See setNumThreadGroupsBasedOn
             ThreadGroupsBasedOnUav,
         };
 
@@ -84,6 +84,7 @@ namespace Ogre
             size_t offset;
             size_t sizeBytes;
             TexturePtr texture;
+            /// Samplerblock is only used by regular textures (not UAVs or buffers)
             HlmsSamplerblock const *samplerblock;
 
             //Used by UAVs:
@@ -108,9 +109,9 @@ namespace Ogre
         String          mSourceFilename;
         StringVector    mIncludedPieceFiles;
 
-        /// @see setThreadsPerGroup
+        /// See setThreadsPerGroup
         uint32  mThreadsPerGroup[3];
-        /// @see setNumThreadGroups
+        /// See setNumThreadGroups
         uint32  mNumThreadGroups[3];
 
         ThreadGroupsBasedOn mThreadGroupsBasedOnTexture;
@@ -125,7 +126,7 @@ namespace Ogre
         uint8 mMaxTexUnitReached;
         uint8 mMaxUavUnitReached;
         HlmsPropertyVec mSetProperties;
-        /// Don't add or remove directly! @see setPiece and @see removePiece
+        /// Don't add or remove directly! See setPiece and see removePiece
         PiecesMap       mPieces;
         size_t          mPsoCacheHash;
 
@@ -220,7 +221,7 @@ namespace Ogre
             If no texture/uav is bound at the given slot (or no such slot exists), we
             will log a warning.
         @param source
-            What to use as source for the calculations. @see ThreadGroupsBasedOn
+            What to use as source for the calculations. See ThreadGroupsBasedOn
         @param texSlot
             Index of the texture/uav unit.
         @param divisorX divisorY divisorZ
@@ -232,7 +233,7 @@ namespace Ogre
                                         uint8 divisorX, uint8 divisorY, uint8 divisorZ );
 
         /// INTERNAL USE. Calculates the number of thread groups as specified
-        /// in @see setNumThreadGroupsBasedOn, overriding setNumThreadGroups.
+        /// in setNumThreadGroupsBasedOn, overriding setNumThreadGroups.
         void _calculateNumThreadGroupsBasedOnSetting();
 
         /** Sets an arbitrary property to pass to the shader.
@@ -266,7 +267,7 @@ namespace Ogre
         */
         void setPiece( IdString pieceName, const String &pieceContent );
 
-        /// Removes an existing piece. @see setPiece.
+        /// Removes an existing piece. See setPiece.
         /// Does nothing if the piece didn't exist.
         void removePiece( IdString pieceName );
 
@@ -282,7 +283,7 @@ namespace Ogre
 
         /// Gets a shader parameter with the given key.
         /// e.g. "default" "glsl" "hlsl".
-        /// Returns null if doesn't exist. @see createShaderParams
+        /// Returns null if doesn't exist. See createShaderParams
         ShaderParams* _getShaderParams( IdString key );
 
         /** Sets a const/uniform bufferat the given slot ID.
@@ -316,13 +317,13 @@ namespace Ogre
             function will remove the settings from previous setTexture calls
             to the same slot index.
         @par
-            May trigger a recompilation if @see setInformHlmsOfTextureData
+            May trigger a recompilation if setInformHlmsOfTextureData
             is enabled.
         @par
             Setting a RenderTarget that could be used for writing is dangerous
             in explicit APIs (DX12, Vulkan). Use the CompositorPassComputeDef
         @param slotIdx
-            @see setNumTexUnits.
+            See setNumTexUnits.
             The slot index to bind this texture buffer
             In OpenGL, a few cards support between to 16-18 texture units,
             while most cards support up to 32
@@ -350,10 +351,10 @@ namespace Ogre
             D3D11. For best compatibility, assume they're shared and put
             the UAVs in the first slots.
         @par
-            May trigger a recompilation if @see setInformHlmsOfTextureData
+            May trigger a recompilation if setInformHlmsOfTextureData
             is enabled.
         @param slotIdx
-            @see setNumTexUnits.
+            See setNumTexUnits.
             The slot index to bind this texture
             In OpenGL, some cards support up to 16-18 texture units, while most
             cards support up to 32
@@ -371,7 +372,7 @@ namespace Ogre
 
         /** Sets a samplerblock based on reference parameters
         @param slotIdx
-            @see setNumTexUnits.
+            See setNumTexUnits.
         @param refParams
             We'll create (or retrieve an existing) samplerblock based on the input parameters.
         */
@@ -379,7 +380,7 @@ namespace Ogre
 
         /** Sets a samplerblock directly. For internal use / advanced users.
         @param slotIdx
-            @see setNumTexUnits.
+            See setNumTexUnits.
         @param refParams
             Direct samplerblock. Reference count is assumed to already have been increased.
             We won't increase it ourselves.
@@ -394,7 +395,7 @@ namespace Ogre
             function will remove the settings from previous setUavTexture calls
             to the same slot index.
         @par
-            May trigger a recompilation if @see setInformHlmsOfTextureData
+            May trigger a recompilation if setInformHlmsOfTextureData
             is enabled.
         @par
             Be very careful when calling this directly. The Compositor needs to
@@ -402,7 +403,7 @@ namespace Ogre
             memory barriers can result in hazards/race conditions in some APIs.
             If in doubt, change the CompositorPassComputeDef instead.
         @param slotIdx
-            @see setNumUavUnits.
+            See setNumUavUnits.
             The slot index to bind this UAV buffer.
         @param access
             Access. Should match what the shader expects. Needed by Ogre to
@@ -428,7 +429,7 @@ namespace Ogre
             function will remove the settings from previous setUavBuffer calls
             to the same slot index.
         @par
-            May trigger a recompilation if @see setInformHlmsOfTextureData
+            May trigger a recompilation if setInformHlmsOfTextureData
             is enabled.
         @par
             Be very careful when calling this directly. The Compositor needs to
@@ -436,7 +437,7 @@ namespace Ogre
             memory barriers can result in hazards/race conditions in some APIs.
             If in doubt, change the CompositorPassComputeDef instead.
         @param slot
-            @see setNumUavUnits.
+            See setNumUavUnits.
         @param texture
         @param textureArrayIndex
         @param access
