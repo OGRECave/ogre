@@ -1281,22 +1281,24 @@ namespace Ogre
         /** Tell the rendersystem to perform any prep tasks it needs to directly
         before other threads which might access the rendering API are registered.
         @remarks
-        Call this from your main thread before starting your other threads
-        (which themselves should call registerThread()). Note that if you
-        start your own threads, there is a specific startup sequence which 
+        Call this from your main thread before starting your other threads.
+        @note
+        If you start your own threads, there is a specific startup sequence which
         must be respected and requires synchronisation between the threads:
-        <ol>
-        <li>[Main thread]Call preExtraThreadsStarted</li>
-        <li>[Main thread]Start other thread, wait</li>
-        <li>[Other thread]Call registerThread, notify main thread & continue</li>
-        <li>[Main thread]Wake up & call postExtraThreadsStarted</li>
-        </ol>
+
+        @note
+        1. [Main thread] Call preExtraThreadsStarted()
+        2. [Main thread] Start other thread, wait
+        3. [Other thread] Call registerThread(), notify main thread & continue
+        4. [Main thread] Wake up & call postExtraThreadsStarted()
+
+        @note
         Once this init sequence is completed the threads are independent but
         this startup sequence must be respected.
         */
         virtual void preExtraThreadsStarted() = 0;
 
-        /* Tell the rendersystem to perform any tasks it needs to directly
+        /** Tell the rendersystem to perform any tasks it needs to directly
         after other threads which might access the rendering API are registered.
         @see RenderSystem::preExtraThreadsStarted
         */
