@@ -42,4 +42,8 @@ finally we start everything as
 @snippet Samples/Bootstrap/main.cpp main
 @note you can find the full code in `Samples/Bootstrap`.
 
-OgreBites itself is also a good starting point if you want to do more sophisticated things like embedding OGRE into a Qt application or similar.
+OgreBites itself is also a good starting point if you need more control over the Camera or the Window creation.
+For instance to render into an existing Qt Window.
+
+@see Ogre::RenderSystem::_createRenderWindow
+@see Ogre::RenderSystem::preExtraThreadsStarted
