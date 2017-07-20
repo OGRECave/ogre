@@ -475,15 +475,19 @@ namespace Ogre {
 				return PF_R11G11B10_FLOAT;
 			case 28: // DXGI_FORMAT_R8G8B8A8_UNORM
 			case 29: // DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
-			case 30: // DXGI_FORMAT_R8G8B8A8_UINT
-			case 31: // DXGI_FORMAT_R8G8B8A8_SNORM
-			case 32: // DXGI_FORMAT_R8G8B8A8_SINT
 				return PF_A8B8G8R8;
+			case 30: // DXGI_FORMAT_R8G8B8A8_UINT
+				return PF_R8G8B8A8_UINT;
+			case 31: // DXGI_FORMAT_R8G8B8A8_SNORM
+				return PF_R8G8B8A8_SNORM;
+			case 32: // DXGI_FORMAT_R8G8B8A8_SINT
+				return PF_R8G8B8A8_SINT;
 			case 34: // DXGI_FORMAT_R16G16_FLOAT
 				return PF_FLOAT16_GR;
 			case 35: // DXGI_FORMAT_R16G16_UNORM
+				return PF_SHORT_GR;
 			case 36: // DXGI_FORMAT_R16G16_UINT
-				return PF_R16G16B16_UINT;
+				return PF_R16G16_UINT;
 			case 37: // DXGI_FORMAT_R16G16_SNORM
 				return PF_R16G16_SNORM;
 			case 38: // DXGI_FORMAT_R16G16_SINT
@@ -510,6 +514,7 @@ namespace Ogre {
 			case 55: // DXGI_FORMAT_D16_UNORM
 				return PF_D16_UNORM;
 			case 56: // DXGI_FORMAT_R16_UNORM
+				return PF_L16;
 			case 57: // DXGI_FORMAT_R16_UINT
 				return PF_R16_UINT;
 			case 58: // DXGI_FORMAT_R16_SNORM
@@ -517,6 +522,7 @@ namespace Ogre {
 			case 59: // DXGI_FORMAT_R16_SINT
 				return PF_R16_SINT;
 			case 61: // DXGI_FORMAT_R8_UNORM
+				return PF_R8;
 			case 62: // DXGI_FORMAT_R8_UINT
 				return PF_R8_UINT;
 			case 63: // DXGI_FORMAT_R8_SNORM
