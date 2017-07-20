@@ -477,6 +477,13 @@ namespace Ogre {
             rsc->setCapability(RSC_DEBUG);
         }
 
+        if((!OGRE_NO_GLES3_SUPPORT && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN)
+                        || mGLSupport->checkExtension("GL_EXT_map_buffer_range")
+                        || mGLSupport->checkExtension("GL_OES_mapbuffer"))
+        {
+            rsc->setCapability(RSC_MAPBUFFER);
+        }
+
 #if OGRE_NO_GLES3_SUPPORT == 0
         // Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);

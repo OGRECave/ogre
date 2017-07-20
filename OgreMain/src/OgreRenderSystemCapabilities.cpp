@@ -301,6 +301,12 @@ namespace Ogre {
             pLog->logMessage(
                 " * GLSL SSO redeclare interface block: "
                 + StringConverter::toString(hasCapability(RSC_GLSL_SSO_REDECLARE), true));
+            pLog->logMessage(
+                " * Debugging/ profiling events: "
+                + StringConverter::toString(hasCapability(RSC_DEBUG), true));
+            pLog->logMessage(
+                " * Map buffer storage: "
+                + StringConverter::toString(hasCapability(RSC_MAPBUFFER), true));
         }
 
         if (mCategoryRelevant[CAPS_CATEGORY_D3D9])
