@@ -103,8 +103,6 @@ namespace Ogre {
         GL3PlusContextList mBackgroundContextList;
 
         // statecaches are per context
-        typedef map<GLContext*, GL3PlusStateCacheManager>::type CachesMap;
-        CachesMap mCaches;
         GL3PlusStateCacheManager* mStateCacheManager;
 
         GLSLShaderManager *mShaderManager;
@@ -167,17 +165,6 @@ namespace Ogre {
                                      vector<GLuint>::type &attribsBound,
                                      vector<GLuint>::type &instanceAttribsBound,
                                      bool updateVAO);
-
-        /**
-         * GL state is tracked per context, so call this function to drop all
-         * recorded state for a given context before you destroy it.
-         */
-        void unregisterContextCache (GLContext* id);
-
-        /**
-         * @param id new context to switch to for state tracking
-         */
-        void switchContextCache (GLContext* id);
 
     public:
         // Default constructor / destructor

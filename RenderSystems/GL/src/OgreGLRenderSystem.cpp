@@ -1196,7 +1196,8 @@ namespace Ogre {
         // Get extension function pointers
         glewInit();
 
-        switchContextCache(mCurrentContext);
+        mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLStateCacheManager>();
+        mGLSupport->setStateCacheManager(mStateCacheManager);
     }
 
 
@@ -3319,49 +3320,6 @@ namespace Ogre {
         static_cast<GLTextureManager*>(mTextureManager)->createWarningTexture();
     }
 
-    void GLRenderSystem::switchContextCache(GLContext* id)
-    {
-        CachesMap::iterator it = mCaches.find(id);
-        if (it != mCaches.end())
-        {
-            // Already have a cache for this context
-            mStateCacheManager = &it->second;
-        }
-        else
-        {
-            // No cache for this context yet
-            mStateCacheManager = &mCaches[id];
-            mStateCacheManager->initializeCache();
-        }
-
-        mGLSupport->setStateCacheManager(mStateCacheManager);
-    }
-
-    void GLRenderSystem::unregisterContextCache(GLContext* id)
-    {
-        CachesMap::iterator it = mCaches.find(id);
-        if (it != mCaches.end())
-        {
-            if (mStateCacheManager == &it->second)
-                mStateCacheManager = NULL;
-            mCaches.erase(it);
-        }
-
-        // Always keep a valid cache, even if no contexts are left.
-        // This is needed due to the way GLRenderSystem::shutdown works -
-        // HardwareBufferManager destructor may call deleteGLBuffer even after all contexts
-        // have been deleted
-        if (!mStateCacheManager)
-        {
-            // Therefore we add a "dummy" cache if none are left
-            if (mCaches.empty())
-                mCaches[0];
-            mStateCacheManager = &mCaches.begin()->second;
-        }
-
-        mGLSupport->setStateCacheManager(mStateCacheManager);
-    }
-
     //---------------------------------------------------------------------
     void GLRenderSystem::_switchContext(GLContext *context)
     {
@@ -3395,7 +3353,8 @@ namespace Ogre {
         }
         mCurrentContext->setCurrent();
 
-        switchContextCache(mCurrentContext);
+        mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLStateCacheManager>();
+        mGLSupport->setStateCacheManager(mStateCacheManager);
 
         // Check if the context has already done one-time initialisation
         if(!mCurrentContext->getInitialized())
@@ -3478,7 +3437,6 @@ namespace Ogre {
                 mMainContext = 0;
             }
         }
-        unregisterContextCache(context);
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::registerThread()

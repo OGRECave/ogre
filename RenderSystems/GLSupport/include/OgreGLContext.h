@@ -29,6 +29,8 @@ THE SOFTWARE.
 #define __OgreGLContext_H__
 
 #include "OgreGLSupportPrerequisites.h"
+#include "OgreGLStateCacheManagerCommon.h"
+#include "OgreSharedPtr.h"
 
 namespace Ogre {
 
@@ -74,8 +76,23 @@ namespace Ogre {
         * Release the render context.
         */
         virtual void releaseContext() {}
+
+        /**
+        * Get the state cache manager, creating it on demand
+        */
+        template<class StateCacheManager>
+        StateCacheManager* createOrRetrieveStateCacheManager() {
+            if(!mStateCacheManager) {
+                StateCacheManager* stateCache = OGRE_NEW StateCacheManager;
+                stateCache->initializeCache();
+                mStateCacheManager = SharedPtr<GLStateCacheManagerCommon>(stateCache);
+            }
+            return static_cast<StateCacheManager*>(mStateCacheManager.get());
+        }
+
     protected:
         bool initialized;
+        SharedPtr<GLStateCacheManagerCommon> mStateCacheManager;
     };
 }
 
