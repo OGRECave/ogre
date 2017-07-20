@@ -28,6 +28,8 @@ THE SOFTWARE
 
 namespace Ogre
 {
+    /// wrapper around `thread_local std::unique_ptr<T>`
+    /// that can be used as a class member
     template< typename T > class ThreadLocalPtr
     {
     private:
@@ -43,21 +45,16 @@ namespace Ogre
 
         std::unique_ptr<T>& _get() const
         {
-            return *std::next(std::begin(_getVect()), static_cast<int>(m_LocalID));
+            return *std::next(std::begin(_getVect()), m_LocalID);
         }
     public:
         ThreadLocalPtr() : m_LocalID(m_VarCounter++) {}
-
-        inline T* release()
-        {
-            _get().reset();
-        }
 
         inline void reset(T* a = 0)
         {
             auto& vect = _getVect();
             if (vect.size() <= m_LocalID)
-                vect.resize(static_cast<int>(m_LocalID) + 1);
+                vect.resize(m_LocalID + 1);
             _get().reset(a);
         }
 
@@ -76,12 +73,12 @@ namespace Ogre
             return *_get();
         }
 
-        static thread_local std::int64_t m_VarCounter;
-        const std::int64_t m_LocalID;
+        static thread_local std::size_t m_VarCounter;
+        const std::size_t m_LocalID;
     };
 
     template< typename T >
-    thread_local std::int64_t ThreadLocalPtr<T>::m_VarCounter = 0;
+    thread_local std::size_t ThreadLocalPtr<T>::m_VarCounter = 0;
 }
 
 #define OGRE_TOKEN_PASTE(x, y) x ## y

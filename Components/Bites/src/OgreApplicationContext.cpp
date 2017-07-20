@@ -538,6 +538,9 @@ void ApplicationContext::locateResources()
 
     sec = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
     const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(sec);
+
+    OgreAssert(!genLocs.empty(), ("Resource Group '"+sec+"' must contain at least one entry").c_str());
+
     arch = genLocs.front()->archive->getName();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE

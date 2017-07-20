@@ -81,15 +81,6 @@ namespace Ogre
 		static bool insertPieces(String &inBuffer, String &outBuffer, PropertyMap &properties, PiecesMap& pieces);
 		static bool parseCounter(const String &inBuffer, String &outBuffer, PropertyMap &properties);
 
-		/** Goes through 'buffer', starting from startPos (inclusive) looking for the given
-			character while skipping whitespace. If any character other than whitespace or
-			EOLs if found returns String::npos
-			@return
-			String::npos if not found or wasn't the next character. If found, the position
-			in the buffer, from start
-			*/
-		static size_t findNextCharacter(const String &buffer, size_t startPos, char character);
-
 		static void findBlockEnd(SubStringRef &outSubString, bool &syntaxError);
 
 		static bool evaluateExpression(SubStringRef &outSubString, bool &outSyntaxError, PropertyMap &properties);
