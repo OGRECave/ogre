@@ -72,7 +72,9 @@ namespace Demo
     void GraphicsSystem::initialize( const Ogre::String &windowTitle )
     {
     #if OGRE_USE_SDL2
-        if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
+        //if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
+        if( SDL_Init( SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK |
+                      SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS ) != 0 )
         {
             OGRE_EXCEPT( Ogre::Exception::ERR_INTERNAL_ERROR, "Cannot initialize SDL2!",
                          "GraphicsSystem::initialize" );
