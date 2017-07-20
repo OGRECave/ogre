@@ -133,9 +133,7 @@ namespace Ogre {
         mResourceManager = OGRE_NEW GLES2ManagedResourceManager();
 #endif
         
-        mStateCacheManager = OGRE_NEW GLES2StateCacheManager();
         mGLSupport = new GLES2Support(getGLSupport(GLNativeSupport::CONTEXT_ES));
-        mGLSupport->setStateCacheManager(mStateCacheManager);
         
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         glsupport = mGLSupport;
@@ -173,9 +171,6 @@ namespace Ogre {
         mRenderTargets.clear();
         OGRE_DELETE mGLSupport;
         mGLSupport = 0;
-
-        OGRE_DELETE mStateCacheManager;
-        mStateCacheManager = 0;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         if (mResourceManager != NULL)
@@ -1762,6 +1757,9 @@ namespace Ogre {
         }
         mCurrentContext->setCurrent();
 
+        mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLES2StateCacheManager>();
+        mGLSupport->setStateCacheManager(mStateCacheManager);
+
         // Check if the context has already done one-time initialisation
         if (!mCurrentContext->getInitialized())
         {
@@ -1843,6 +1841,9 @@ namespace Ogre {
 
         // Setup GLSupport
         mGLSupport->initialiseExtensions();
+
+        mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLES2StateCacheManager>();
+        mGLSupport->setStateCacheManager(mStateCacheManager);
 
         mHasGLES30 = mGLSupport->hasMinGLVersion(3, 0);
 
