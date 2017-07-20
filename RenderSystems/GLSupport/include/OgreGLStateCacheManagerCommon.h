@@ -30,11 +30,12 @@ THE SOFTWARE.
 #define __GLStateCacheManagerCommon_H__
 
 #include "OgreGLSupportPrerequisites.h"
-
-typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
+#include "OgreMemoryAllocatorConfig.h"
 
 namespace Ogre
 {
+    typedef GeneralAllocatedObject StateCacheAlloc;
+
     /** An in memory cache of the OpenGL state.
      @remarks
      State changes can be particularly expensive time wise. This is because
