@@ -109,6 +109,8 @@ namespace Ogre
         unsigned int mDiscardBuffers;
         /// Stores the current depth clearing colour
         GLclampf mClearDepth;
+        /// Viewport origin and size
+        int mViewport[4];
     public:
         GLES2StateCacheManager(void);
 
@@ -298,6 +300,9 @@ namespace Ogre
          @param face The face culling mode to use.
          */
         void setCullFace(GLenum face);
+
+        void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+        void getViewport(int* array);
     };
 }
 

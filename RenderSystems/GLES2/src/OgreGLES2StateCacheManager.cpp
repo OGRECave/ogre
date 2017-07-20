@@ -95,6 +95,11 @@ namespace Ogre {
         
         mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
+
+        mViewport[0] = 0.0f;
+        mViewport[1] = 0.0f;
+        mViewport[2] = 0.0f;
+        mViewport[3] = 0.0f;
         
 #ifdef OGRE_ENABLE_STATE_CACHE
         mEnableVector.reserve(25);
@@ -483,4 +488,28 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glCullFace(face));
         }
     }
+
+    void GLES2StateCacheManager::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
+    {
+#ifdef OGRE_ENABLE_STATE_CACHE
+        if((mViewport[0] != x) ||
+           (mViewport[1] != y) ||
+           (mViewport[2] != width) ||
+           (mViewport[3] != height))
+#endif
+        {
+            mViewport[0] = x;
+            mViewport[1] = y;
+            mViewport[2] = width;
+            mViewport[3] = height;
+            OGRE_CHECK_GL_ERROR(glViewport(x, y, width, height));
+        }
+    }
+
+    void GLES2StateCacheManager::getViewport(int *array)
+    {
+        for (int i = 0; i < 4; ++i)
+            array[i] = mViewport[i];
+    }
+
 }

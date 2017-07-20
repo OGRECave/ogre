@@ -1052,13 +1052,7 @@ namespace Ogre {
                 }
             }
 #endif
-            if(mViewport[0] != x || mViewport[1] != y ||
-               mViewport[2] != w || mViewport[3] != h)
-            {
-                mViewport[0] = x; mViewport[1] = y;
-                mViewport[2] = w; mViewport[3] = h;
-                OGRE_CHECK_GL_ERROR(glViewport(x, y, w, h));
-            }
+            mStateCacheManager->setViewport(x, y, w, h);
 
             if(mScissor[0] != x || mScissor[1] != y ||
                mScissor[2] != w || mScissor[3] != h)
@@ -1693,15 +1687,14 @@ namespace Ogre {
          mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
 
         // Sets the scissor box as same as viewport
-        GLint viewport[4], scissor[4];
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_SCISSOR_BOX, scissor));
+        GLint viewport[4];
+        mStateCacheManager->getViewport(viewport);
         bool scissorBoxDifference =
-            mViewport[0] != mScissor[0] || mViewport[1] != mScissor[1] ||
-            mViewport[2] != mScissor[2] || mViewport[3] != mScissor[3];
+            viewport[0] != mScissor[0] || viewport[1] != mScissor[1] ||
+            viewport[2] != mScissor[2] || viewport[3] != mScissor[3];
         if (scissorBoxDifference)
         {
-            OGRE_CHECK_GL_ERROR(glScissor(mViewport[0], mViewport[1], mViewport[2], mViewport[3]));
+            OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
         }
 
         mStateCacheManager->setDiscardBuffers(buffers);
