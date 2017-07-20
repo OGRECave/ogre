@@ -30,8 +30,7 @@ THE SOFTWARE.
 #define __GLES2StateCacheManager_H__
 
 #include "OgreGLES2Prerequisites.h"
-
-typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
+#include "OgreGLStateCacheManagerCommon.h"
 
 namespace Ogre
 {
@@ -48,7 +47,7 @@ namespace Ogre
      does need to be updated. This leads to improved performance all around and 
      can be somewhat dramatic in some cases.
      */
-    class _OgreGLES2Export GLES2StateCacheManager : public StateCacheAlloc
+    class _OgreGLES2Export GLES2StateCacheManager : public GLStateCacheManagerCommon
     {
     protected:
         typedef OGRE_HashMap<GLenum, GLuint> BindBufferMap;

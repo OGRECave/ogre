@@ -30,15 +30,12 @@ THE SOFTWARE.
 #define __GL3PlusStateCacheManager_H__
 
 #include "OgreGL3PlusPrerequisites.h"
+#include "OgreGLStateCacheManagerCommon.h"
 #include "OgreStdHeaders.h"
 #include "OgreIteratorWrappers.h"
 
-typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
-
 namespace Ogre
 {
-    class GL3PlusStateCacheManagerImp;
-
     /** An in memory cache of the OpenGL state.
      @remarks
      State changes can be particularly expensive time wise. This is because
@@ -52,7 +49,7 @@ namespace Ogre
      does need to be updated. This leads to improved performance all around and 
      can be somewhat dramatic in some cases.
      */
-    class _OgreGL3PlusExport GL3PlusStateCacheManager : public StateCacheAlloc
+    class _OgreGL3PlusExport GL3PlusStateCacheManager : public GLStateCacheManagerCommon
     {
     protected:
         typedef OGRE_HashMap<GLenum, GLuint> BindBufferMap;
