@@ -55,15 +55,10 @@ namespace Ogre {
                                                       HardwareBuffer::Usage usage,
                                                       bool useShadowBuffer)
     {
-        GLES2HardwareVertexBuffer* buf = 0;
+        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_MAPBUFFER))
+            useShadowBuffer = true;
 
-        if((!OGRE_NO_GLES3_SUPPORT && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN)
-                || mGLSupport->checkExtension("GL_EXT_map_buffer_range")
-                || mGLSupport->checkExtension("GL_OES_mapbuffer"))
-            buf = OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
-        else
-            // always use shadowBuffer
-            buf = OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, true);
+        GLES2HardwareVertexBuffer* buf = OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
 
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex);
@@ -77,14 +72,10 @@ namespace Ogre {
                                                                               HardwareBuffer::Usage usage,
                                                                               bool useShadowBuffer)
     {
-        GLES2HardwareIndexBuffer* buf = 0;
-        if((!OGRE_NO_GLES3_SUPPORT && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN)
-                || mGLSupport->checkExtension("GL_EXT_map_buffer_range")
-                || mGLSupport->checkExtension("GL_OES_mapbuffer"))
-            buf = OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
-        else
-            // always use shadowBuffer
-            buf = OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, true);
+        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_MAPBUFFER))
+            useShadowBuffer = true;
+
+        GLES2HardwareIndexBuffer* buf = OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
 
         {
             OGRE_LOCK_MUTEX(mIndexBuffersMutex);
