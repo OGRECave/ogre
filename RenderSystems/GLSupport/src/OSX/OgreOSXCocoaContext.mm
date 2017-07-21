@@ -29,7 +29,6 @@ THE SOFTWARE.
 #import "OgreOSXCocoaContext.h"
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
-#include <OpenGL/glext.h>
 
 namespace Ogre
 {
@@ -48,11 +47,6 @@ namespace Ogre
 
         if(mNSGLPixelFormat)
             [mNSGLPixelFormat release];
-    }
-    
-    void CocoaContext::barrier()
-    {
-        glFlushRenderAPPLE();
     }
 
     void CocoaContext::setCurrent()

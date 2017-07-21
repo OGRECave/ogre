@@ -41,9 +41,6 @@ namespace Ogre {
         CocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat);
 
         virtual ~CocoaContext();
-
-        /** See GLContext */
-        virtual void barrier();
         
         /** See GLContext */
         virtual void setCurrent();
