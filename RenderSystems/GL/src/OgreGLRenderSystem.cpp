@@ -58,6 +58,10 @@ THE SOFTWARE.
 
 #include "OgreGLPixelFormat.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+extern "C" void glFlushRenderAPPLE();
+#endif
+
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -3348,7 +3352,10 @@ namespace Ogre {
         // It's ready for switching
         if (mCurrentContext!=context)
         {
-            mCurrentContext->barrier(); // ensure that gl resources created in the current context would be visible after context switching
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            // NSGLContext::makeCurrentContext does not flush automatically. everybody else does.
+            glFlushRenderAPPLE();
+#endif
             mCurrentContext->endCurrent();
             mCurrentContext = context;
         }

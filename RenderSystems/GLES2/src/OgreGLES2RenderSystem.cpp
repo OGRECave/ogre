@@ -1757,7 +1757,11 @@ namespace Ogre {
         // It's ready for switching
         if (mCurrentContext!=context)
         {
-            mCurrentContext->barrier(); // ensure that gl resources created in the current context would be visible after context switching
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            // EAGLContext::setCurrentContext does not flush automatically. everybody else does.
+            // see https://developer.apple.com/library/content/qa/qa1612/_index.html
+            glFlush();
+#endif
             mCurrentContext->endCurrent();
             mCurrentContext = context;
         }
