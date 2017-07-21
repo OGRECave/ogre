@@ -109,7 +109,7 @@ namespace Ogre {
         bool hasMapBufferRange = !OGRE_NO_GLES3_SUPPORT || support->checkExtension("GL_EXT_map_buffer_range");
         if ((mUsage & HBU_WRITE_ONLY) && hasMapBufferRange)
         {
-            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRangeEXT(GL_ELEMENT_ARRAY_BUFFER, mLockStart, mLockSize));
+            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRangeEXT(GL_ELEMENT_ARRAY_BUFFER, 0, mLockSize));
         }
 
         if(hasMapBufferRange || support->checkExtension("GL_OES_mapbuffer")) {

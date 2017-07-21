@@ -143,7 +143,7 @@ namespace Ogre {
 
             if (mUsage & HBU_WRITE_ONLY)
             {
-                OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ARRAY_BUFFER, mLockStart, mLockSize));
+                OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ARRAY_BUFFER, 0, mLockSize));
             }
 
             GLboolean mapped;
