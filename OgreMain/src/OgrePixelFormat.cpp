@@ -211,11 +211,15 @@ namespace Ogre {
                 case PF_PVRTC2_4BPP:
                     return (std::max((int)width, 8) * std::max((int)height, 8) * 4 + 7) / 8;
 
+                // Size calculations from the ETC spec
+                // https://www.khronos.org/registry/OpenGL/extensions/OES/OES_compressed_ETC1_RGB8_texture.txt
+                // Basically, 8 bytes is the minimum texture size. Smaller textures are padded up to 8 bytes
                 case PF_ETC1_RGB8:
                 case PF_ETC2_RGB8:
                 case PF_ETC2_RGBA8:
                 case PF_ETC2_RGB8A1:
-                    return ((width * height) >> 1);
+                    return std::max<size_t>((width * height) >> 1, 8);
+
                 case PF_ATC_RGB:
                     return ((width + 3) / 4) * ((height + 3) / 4) * 8;
                 case PF_ATC_RGBA_EXPLICIT_ALPHA:
