@@ -455,48 +455,48 @@ namespace Demo
         else if( *(dataFolder.end() - 1) != '/' )
             dataFolder += "/";
 
+        //At this point dataFolder should be a valid path to the Hlms data folder
+
+        //For retrieval of the paths to the different folders needed
+        Ogre::String dataFolderPath;
+        Ogre::StringVector libraryFoldersPaths;
+        Ogre::StringVector::const_iterator libraryFolderPathIterator;
+
+        //Get the path to all the subdirectories used by HlmsUnlit
+        Ogre::HlmsUnlit::getDefaultPaths(dataFolderPath, libraryFoldersPaths);
+        
+        //Create the Ogre::Archive objects needed
+        Ogre::Archive* archiveUnlit = Ogre::ArchiveManager::getSingletonPtr()->load(dataFolder + dataFolderPath, "FileSystem", true);
+        Ogre::ArchiveVec archiveUnlitLibraryFolders;
+        for(libraryFolderPathIterator = libraryFoldersPaths.begin(); libraryFolderPathIterator != libraryFoldersPaths.end(); ++libraryFolderPathIterator)
+        {
+            Ogre::Archive* archiveLibrary = Ogre::ArchiveManager::getSingletonPtr()->load(dataFolder + *libraryFolderPathIterator, "FileSystem", true);
+            archiveUnlitLibraryFolders.push_back(archiveLibrary);
+        }
+
+        //Create and register the unlit Hlms
+        Ogre::HlmsUnlit* hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit(archiveUnlit, &archiveUnlitLibraryFolders);
+        Ogre::Root::getSingleton().getHlmsManager()->registerHlms(hlmsUnlit);
+
+        //Do the same for HlmsPbs:
+
+        Ogre::HlmsPbs::getDefaultPaths(dataFolderPath, libraryFoldersPaths);
+        Ogre::Archive* archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(dataFolder + dataFolderPath, "FileSystem", true);
+
+        //Get the library archive(s)
+        Ogre::ArchiveVec archivePbsLibraryFolders;
+        for(libraryFolderPathIterator = libraryFoldersPaths.begin(); libraryFolderPathIterator != libraryFoldersPaths.end(); ++libraryFolderPathIterator)
+        {
+            Ogre::Archive* archiveLibrary = Ogre::ArchiveManager::getSingletonPtr()->load(dataFolder + *libraryFolderPathIterator, "FileSystem", true);
+            archivePbsLibraryFolders.push_back(archiveLibrary);
+        }
+
+        //Create and register
+        Ogre::HlmsPbs* hlmsPbs = OGRE_NEW Ogre::HlmsPbs(archivePbs, &archivePbsLibraryFolders);
+        Ogre::Root::getSingleton().getHlmsManager()->registerHlms(hlmsPbs);
+
+
         Ogre::RenderSystem *renderSystem = mRoot->getRenderSystem();
-
-        Ogre::String shaderSyntax = "GLSL";
-        if( renderSystem->getName() == "Direct3D11 Rendering Subsystem" )
-            shaderSyntax = "HLSL";
-        else if( renderSystem->getName() == "Metal Rendering Subsystem" )
-            shaderSyntax = "Metal";
-
-        Ogre::Archive *archiveLibrary = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        dataFolder + "Hlms/Common/" + shaderSyntax,
-                        "FileSystem", true );
-        Ogre::Archive *archiveLibraryAny = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        dataFolder + "Hlms/Common/Any",
-                        "FileSystem", true );
-        Ogre::Archive *archivePbsLibraryAny = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        dataFolder + "Hlms/Pbs/Any",
-                        "FileSystem", true );
-        Ogre::Archive *archiveUnlitLibraryAny = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        dataFolder + "Hlms/Unlit/Any",
-                        "FileSystem", true );
-
-        Ogre::ArchiveVec library;
-        library.push_back( archiveLibrary );
-        library.push_back( archiveLibraryAny );
-
-        Ogre::Archive *archiveUnlit = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        dataFolder + "Hlms/Unlit/" + shaderSyntax,
-                        "FileSystem", true );
-
-        library.push_back( archiveUnlitLibraryAny );
-        Ogre::HlmsUnlit *hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit( archiveUnlit, &library );
-        Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsUnlit );
-        library.pop_back();
-
-        Ogre::Archive *archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        dataFolder + "Hlms/Pbs/" + shaderSyntax,
-                        "FileSystem", true );
-        library.push_back( archivePbsLibraryAny );
-        Ogre::HlmsPbs *hlmsPbs = OGRE_NEW Ogre::HlmsPbs( archivePbs, &library );
-        Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsPbs );
-        library.pop_back();
-
         if( renderSystem->getName() == "Direct3D11 Rendering Subsystem" )
         {
             //Set lower limits 512kb instead of the default 4MB per Hlms in D3D 11.0

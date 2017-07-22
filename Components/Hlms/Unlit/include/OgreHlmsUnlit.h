@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHlmsBufferManager.h"
 #include "OgreConstBufferPool.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -132,6 +133,19 @@ namespace Ogre
         /// @copydoc HlmsPbs::setEsmK
         void setEsmK( uint16 K );
         uint16 getEsmK(void) const                          { return mEsmK; }
+
+        /** Fill the provided string and string vector with all the sub-folder needed to instantiate
+         *  an HlmsUnlit object with the default distribution of the HlmsResources.
+         *  These paths are dependent of the current RenderSystem.
+         *  
+         *  This method can only be called after a valid RenderSysttem has been chosen.
+         *  
+         *  All output parameter's content will be replaced with the new set of paths.
+         *  
+         *  \param outDataFolderPath Path (as a String) used for creating the "dataFolder" Archive the constructor will need
+         *  \param outLibraryFoldersPaths Vector of String used for creating the ArchiveVector "libraryFolders" the constructor will need
+         */
+        static void getDefaultPaths(String& outDataFolderPath, StringVector& outLibraryFoldersPaths);
 
 #if !OGRE_NO_JSON
 		/// @copydoc Hlms::_loadJson
