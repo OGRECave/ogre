@@ -131,7 +131,10 @@ void TestContext::setup()
     mode >> token; // 'x' as seperator between width and height
     mode >> h; // height
 
-    mWindow = mRoot->createRenderWindow("OGRE Sample Browser", w, h, false);
+    miscParams["FSAA"] = ropts["FSAA"].currentValue;
+    miscParams["vsync"] = ropts["VSync"].currentValue;
+
+    mWindow = mRoot->createRenderWindow("OGRE Sample Browser", w, h, false, &miscParams);
 #endif
 
     mWindow->setDeactivateOnFocusChange(false);
@@ -524,7 +527,7 @@ bool TestContext::oneTimeConfig()
                 rs->setConfigOption("Fixed Pipeline Enabled", "No");
             } catch(...) {}
             try {
-                rs->setConfigOption("VSync", "Yes");
+                rs->setConfigOption("VSync", "No");
             } catch(...) {}
         }
     }
