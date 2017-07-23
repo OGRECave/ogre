@@ -141,6 +141,8 @@ namespace Ogre {
 
         mGLSupport->addConfig();
 
+        mStateCacheManager = 0;
+
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
             // Dummy value
@@ -153,6 +155,8 @@ namespace Ogre {
         mGLInitialised = false;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
+        mHasGLES30 = false;
+        mPolygonMode = GL_FILL;
         mCurrentVertexProgram = 0;
         mCurrentFragmentProgram = 0;
     }
@@ -995,27 +999,17 @@ namespace Ogre {
                 break;
         }
         
-        OGRE_CHECK_GL_ERROR(glBlendEquationSeparate(func, alphaFunc));
+        mStateCacheManager->setBlendEquation(func, alphaFunc);
     }
 
     void GLES2RenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
-        bool a2c = false;
-        static bool lasta2c = false;
-
-        if(func != CMPF_ALWAYS_PASS)
+        if (getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
         {
-            a2c = alphaToCoverage;
-        }
-
-        if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
-        {
-            if (a2c)
+            if ((func != CMPF_ALWAYS_PASS) && alphaToCoverage)
                 mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE);
             else
                 mStateCacheManager->setDisabled(GL_SAMPLE_ALPHA_TO_COVERAGE);
-
-            lasta2c = a2c;
         }
     }
 
@@ -1239,14 +1233,14 @@ namespace Ogre {
         switch(level)
         {
         case PM_POINTS:
-            mStateCacheManager->setPolygonMode(GL_POINTS);
+            mPolygonMode = GL_POINTS;
             break;
         case PM_WIREFRAME:
-            mStateCacheManager->setPolygonMode(GL_LINE_STRIP);
+            mPolygonMode = GL_LINE_STRIP;
             break;
         default:
         case PM_SOLID:
-            mStateCacheManager->setPolygonMode(GL_FILL);
+            mPolygonMode = GL_FILL;
             break;
         }
     }
@@ -1410,16 +1404,6 @@ namespace Ogre {
         mStateCacheManager->activateGLTextureUnit(0);
     }
 
-    GLfloat GLES2RenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        GLfloat curAniso = 0;
-        if(mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
-            mStateCacheManager->getTexParameterfv(mTextureTypes[unit],
-                                                  GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso);
-
-        return curAniso ? curAniso : 1;
-    }
-    
     void GLES2RenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
     {
         if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
@@ -1532,7 +1516,7 @@ namespace Ogre {
                 break;
         }
 
-        GLenum polyMode = mStateCacheManager->getPolygonMode();
+        GLenum polyMode = mPolygonMode;
         if (op.useIndexes)
         {
             // If we are using VAO's then only bind the buffer the first time through. Otherwise, always bind.
@@ -1664,7 +1648,7 @@ namespace Ogre {
                                             const ColourValue& colour,
                                             Real depth, unsigned short stencil)
     {
-        vector<GLboolean>::type &colourWrite = mStateCacheManager->getColourMask();
+        uchar* colourWrite = mStateCacheManager->getColourMask();
         bool colourMask = !colourWrite[0] || !colourWrite[1] ||
                           !colourWrite[2] || !colourWrite[3];
         GLuint stencilMask = mStateCacheManager->getStencilMask();
@@ -1710,7 +1694,9 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
         }
 
-        mStateCacheManager->setDiscardBuffers(buffers);
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        static_cast<EAGLES2Context*>(mCurrentContext)->mDiscardBuffers = buffers;
+#endif
 
         // Clear buffers
         OGRE_CHECK_GL_ERROR(glClear(flags));
@@ -1786,7 +1772,7 @@ namespace Ogre {
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
-        vector<GLboolean>::type &colourWrite = mStateCacheManager->getColourMask();
+        uchar* colourWrite = mStateCacheManager->getColourMask();
         GLuint stencilMask = mStateCacheManager->getStencilMask();
         GLboolean depthMask = mStateCacheManager->getDepthMask();
         mStateCacheManager->setStencilMask(stencilMask);
@@ -2194,11 +2180,6 @@ namespace Ogre {
     void GLES2RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
         //no effect in GLES2 rendersystem
-    }
-
-    unsigned int GLES2RenderSystem::getDiscardBuffers(void)
-    {
-        return mStateCacheManager->getDiscardBuffers();
     }
 
     void GLES2RenderSystem::bindVertexElementToGpu( const VertexElement &elem,

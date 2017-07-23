@@ -170,7 +170,6 @@ namespace Ogre {
         mCurrentHullShader = 0;
         mCurrentDomainShader = 0;
         mCurrentComputeShader = 0;
-        mPolygonMode = GL_FILL;
         mEnableFixedPipeline = false;
         mLargestSupportedAnisotropy = 1;
     }
@@ -1114,20 +1113,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
-        bool a2c = false;
-        static bool lasta2c = false;
-
-        if (func != CMPF_ALWAYS_PASS)
-        {
-            a2c = alphaToCoverage;
-        }
-
-        if (a2c != lasta2c)
-        {
-            mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, a2c);
-
-            lasta2c = a2c;
-        }
+        mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, (func != CMPF_ALWAYS_PASS) && alphaToCoverage);
     }
 
     void GL3PlusRenderSystem::_setViewport(Viewport *vp)
@@ -1190,8 +1176,6 @@ namespace Ogre {
         // Deactivate the viewport clipping.
         mScissorsEnabled = false;
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
-
-        mStateCacheManager->setEnabled(GL_DEPTH_CLAMP, false);
 
         // unbind GPU programs at end of frame
         // this is mostly to avoid holding bound programs that might get deleted
@@ -1324,19 +1308,15 @@ namespace Ogre {
         switch(level)
         {
         case PM_POINTS:
-            //mPolygonMode = GL_POINTS;
-            mPolygonMode = GL_POINT;
+            mStateCacheManager->setPolygonMode(GL_POINT);
             break;
         case PM_WIREFRAME:
-            //mPolygonMode = GL_LINE_STRIP;
-            mPolygonMode = GL_LINE;
+            mStateCacheManager->setPolygonMode(GL_LINE);
             break;
-        default:
         case PM_SOLID:
-            mPolygonMode = GL_FILL;
+            mStateCacheManager->setPolygonMode(GL_FILL);
             break;
         }
-        mStateCacheManager->setPolygonMode(mPolygonMode);
     }
 
     void GL3PlusRenderSystem::setStencilCheckEnabled(bool enabled)
@@ -1479,15 +1459,6 @@ namespace Ogre {
         }
 
         activateGLTextureUnit(0);
-    }
-
-    GLfloat GL3PlusRenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        GLfloat curAniso = 0;
-        OGRE_CHECK_GL_ERROR(glGetTexParameterfv(mTextureTypes[unit],
-                                                GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso));
-
-        return curAniso ? curAniso : 1;
     }
 
     void GL3PlusRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
@@ -2452,9 +2423,8 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::setClipPlanesImpl(const Ogre::PlaneList& planeList)
+    void GL3PlusRenderSystem::setClipPlanesImpl(const PlaneList& planeList)
     {
-        OGRE_CHECK_GL_ERROR(glEnable(GL_DEPTH_CLAMP));
     }
 
     void GL3PlusRenderSystem::registerThread()

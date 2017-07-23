@@ -112,6 +112,8 @@ namespace Ogre {
             vector<GLuint>::type mRenderAttribsBound;
             vector<GLuint>::type mRenderInstanceAttribsBound;
 
+            GLenum mPolygonMode;
+
             GLint getCombinedMinMipFilter(void) const;
 
             GLSLESProgram* mCurrentVertexProgram;
@@ -307,13 +309,8 @@ namespace Ogre {
             /// @copydoc RenderSystem::getDisplayMonitorCount
             unsigned int getDisplayMonitorCount() const;
 
-            /// Internal method for anisotropy validation
-            GLfloat _getCurrentAnisotropy(size_t unit);
-
             void _setSceneBlendingOperation(SceneBlendOperation op);
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
-
-            unsigned int getDiscardBuffers(void);
 
             void _destroyDepthBuffer(RenderTarget* pRenderWnd);
         

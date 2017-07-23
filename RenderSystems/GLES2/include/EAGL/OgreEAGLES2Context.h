@@ -77,6 +77,9 @@ namespace Ogre {
             GLsizei mNumSamples;
             GLuint mSampleFramebuffer;
             GLuint mSampleRenderbuffer;
+
+            /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
+            unsigned int mDiscardBuffers;
     };
 }
 

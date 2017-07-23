@@ -37,7 +37,7 @@ namespace Ogre
     typedef GeneralAllocatedObject StateCacheAlloc;
 
     /** An in memory cache of the OpenGL state.
-     @remarks
+
      State changes can be particularly expensive time wise. This is because
      a change requires OpenGL to re-evaluate and update the state machine.
      Because of the general purpose nature of OGRE we often set the state for
@@ -51,9 +51,60 @@ namespace Ogre
      */
     class _OgreGLExport GLStateCacheManagerCommon : public StateCacheAlloc
     {
+    protected:
+        typedef OGRE_HashMap<uint32, uint32> BindBufferMap;
+        typedef OGRE_HashMap<uint32, int> TexParameteriMap;
+        typedef OGRE_HashMap<uint32, float> TexParameterfMap;
+
+        /* These variables are used for caching OpenGL state.
+         They are cached because state changes can be quite expensive,
+         which is especially important on mobile or embedded systems.
+         */
+
+        /// Array of each OpenGL feature that is enabled i.e. blending, depth test, etc.
+        vector<uint32>::type mEnableVector;
+        /// Stores the current clear colour
+        float mClearColour[4];
+        /// Stores the current depth clearing colour
+        float mClearDepth;
+        /// Stores the current colour write mask
+        uchar mColourMask[4];
+        /// Stores the current depth write mask
+        uchar mDepthMask;
+        /// Stores the current stencil mask
+        uint32 mStencilMask;
+        /// Viewport origin and size
+        int mViewport[4];
+        /// A map of different buffer types and the currently bound buffer for each type
+        BindBufferMap mActiveBufferMap;
+        /// Stores the current face culling setting
+        uint32 mCullFace;
+        /// Stores the current depth test function
+        uint32 mDepthFunc;
+        /// Stores the current blend equation
+        uint32 mBlendEquationRGB;
+        uint32 mBlendEquationAlpha;
+        /// Stores the currently active texture unit
+        size_t mActiveTextureUnit;
     public:
-        GLStateCacheManagerCommon(void) {}
         virtual ~GLStateCacheManagerCommon() {}
+
+        void getViewport(int* array);
+
+        /** Gets the current colour mask setting.
+         @return An array containing the mask in RGBA order.
+         */
+        uchar* getColourMask() { return mColourMask; }
+
+        /** Gets the current depth mask setting.
+         @return The current depth mask.
+         */
+        uchar getDepthMask() const { return mDepthMask; }
+
+        /** Gets the current stencil mask.
+         @return The stencil mask.
+         */
+        uint32 getStencilMask(void) const { return mStencilMask; }
     };
 }
 

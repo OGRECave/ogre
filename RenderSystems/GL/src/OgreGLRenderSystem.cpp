@@ -1978,22 +1978,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
-        bool a2c = false;
-        static bool lasta2c = false;
         bool enable = func != CMPF_ALWAYS_PASS;
 
         mStateCacheManager->setEnabled(GL_ALPHA_TEST, enable);
 
         if(enable)
         {
-            a2c = alphaToCoverage;
             glAlphaFunc(convertCompareFunction(func), value / 255.0f);
         }
 
-        if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
+        if (getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
         {
-            mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, a2c);
-            lasta2c = a2c;
+            mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, alphaToCoverage && enable);
         }
 
     }
@@ -2455,14 +2451,6 @@ namespace Ogre {
     void GLRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
         //TODO: implement (opengl 3 only?)
-    }
-    //---------------------------------------------------------------------
-    GLfloat GLRenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        GLfloat curAniso = 0;
-        glGetTexParameterfv(mTextureTypes[unit],
-                            GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso);
-        return curAniso ? curAniso : 1;
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
