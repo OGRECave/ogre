@@ -45,7 +45,7 @@ void StencilShadowTest::setupContent()
     mSceneMgr->setAmbientLight(ColourValue(0.0, 0.0, 0.0));
 
     // turn on stencil shadows
-    mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+    mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
     
     // add a couple lights
     Ogre::Light* light = mSceneMgr->createLight("Light1");
