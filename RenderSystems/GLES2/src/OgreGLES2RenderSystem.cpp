@@ -1710,7 +1710,9 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
         }
 
-        mStateCacheManager->setDiscardBuffers(buffers);
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        static_cast<EAGLES2Context*>(mCurrentContext)->mDiscardBuffers = buffers;
+#endif
 
         // Clear buffers
         OGRE_CHECK_GL_ERROR(glClear(flags));
@@ -2194,11 +2196,6 @@ namespace Ogre {
     void GLES2RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
         //no effect in GLES2 rendersystem
-    }
-
-    unsigned int GLES2RenderSystem::getDiscardBuffers(void)
-    {
-        return mStateCacheManager->getDiscardBuffers();
     }
 
     void GLES2RenderSystem::bindVertexElementToGpu( const VertexElement &elem,

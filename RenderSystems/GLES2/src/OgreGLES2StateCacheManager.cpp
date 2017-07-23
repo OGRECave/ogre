@@ -81,7 +81,6 @@ namespace Ogre {
         mDepthFunc = GL_LESS;
         mStencilMask = 0xFFFFFFFF;
         mActiveTextureUnit = 0;
-        mDiscardBuffers = 0;
         mClearDepth = 1.0f;
         mLastBoundTexID = 0;
         

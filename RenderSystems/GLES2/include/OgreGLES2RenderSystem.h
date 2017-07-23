@@ -313,8 +313,6 @@ namespace Ogre {
             void _setSceneBlendingOperation(SceneBlendOperation op);
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
 
-            unsigned int getDiscardBuffers(void);
-
             void _destroyDepthBuffer(RenderTarget* pRenderWnd);
         
             /// @copydoc RenderSystem::beginProfileEvent

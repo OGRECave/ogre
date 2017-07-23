@@ -105,8 +105,6 @@ namespace Ogre
         GLuint mLastBoundTexID;
         /// Stores the currently active texture unit
         GLenum mActiveTextureUnit;
-        /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
-        unsigned int mDiscardBuffers;
         /// Stores the current depth clearing colour
         GLclampf mClearDepth;
         /// Viewport origin and size
@@ -270,16 +268,6 @@ namespace Ogre
          @param attrib The attribute to disable.
          */
         void setVertexAttribDisabled(GLuint attrib);
-
-        /** Gets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
-         @return The buffer mask.
-         */
-        unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }
-
-        /** Sets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
-         @param flags The bit mask of buffers to be discarded. Stored as Ogre::FrameBufferType.
-         */
-        void setDiscardBuffers(unsigned int flags) { mDiscardBuffers = flags; }
 
         /** Gets the current polygon rendering mode, fill, wireframe, points, etc.
          @return The current polygon rendering mode.
