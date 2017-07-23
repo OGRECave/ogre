@@ -170,7 +170,6 @@ namespace Ogre {
         mCurrentHullShader = 0;
         mCurrentDomainShader = 0;
         mCurrentComputeShader = 0;
-        mPolygonMode = GL_FILL;
         mEnableFixedPipeline = false;
         mLargestSupportedAnisotropy = 1;
     }
@@ -1309,19 +1308,15 @@ namespace Ogre {
         switch(level)
         {
         case PM_POINTS:
-            //mPolygonMode = GL_POINTS;
-            mPolygonMode = GL_POINT;
+            mStateCacheManager->setPolygonMode(GL_POINT);
             break;
         case PM_WIREFRAME:
-            //mPolygonMode = GL_LINE_STRIP;
-            mPolygonMode = GL_LINE;
+            mStateCacheManager->setPolygonMode(GL_LINE);
             break;
-        default:
         case PM_SOLID:
-            mPolygonMode = GL_FILL;
+            mStateCacheManager->setPolygonMode(GL_FILL);
             break;
         }
-        mStateCacheManager->setPolygonMode(mPolygonMode);
     }
 
     void GL3PlusRenderSystem::setStencilCheckEnabled(bool enabled)

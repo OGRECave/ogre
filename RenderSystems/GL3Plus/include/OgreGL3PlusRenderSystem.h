@@ -142,11 +142,6 @@ namespace Ogre {
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
 #endif
 
-        /**
-            Cache the polygon mode value
-        */
-        GLenum mPolygonMode;
-
         GLint getCombinedMinMipFilter(void) const;
 
         GLSLShader* mCurrentVertexShader;
@@ -367,8 +362,6 @@ namespace Ogre {
 
         /// Internal method for anisotropy validation
         GLfloat _getCurrentAnisotropy(size_t unit);
-
-        GLenum _getPolygonMode(void) { return mPolygonMode; }
 
         void _setSceneBlendingOperation(SceneBlendOperation op);
         void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
