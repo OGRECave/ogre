@@ -377,11 +377,11 @@ namespace Ogre {
             return false;
         }
     }
-    
-    // TODO: Store as high/low bits of a GLuint
+
     void GL3PlusStateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {
-#ifdef OGRE_ENABLE_STATE_CACHE
+#if 0
+        // TODO glBlendFuncSeparate missing
         if(mBlendFuncSource != source || mBlendFuncDest != dest)
 #endif
         {
