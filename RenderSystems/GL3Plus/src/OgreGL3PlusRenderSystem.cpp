@@ -1191,8 +1191,6 @@ namespace Ogre {
         mScissorsEnabled = false;
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
 
-        mStateCacheManager->setEnabled(GL_DEPTH_CLAMP, false);
-
         // unbind GPU programs at end of frame
         // this is mostly to avoid holding bound programs that might get deleted
         // outside via the resource manager
@@ -2452,9 +2450,8 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::setClipPlanesImpl(const Ogre::PlaneList& planeList)
+    void GL3PlusRenderSystem::setClipPlanesImpl(const PlaneList& planeList)
     {
-        OGRE_CHECK_GL_ERROR(glEnable(GL_DEPTH_CLAMP));
     }
 
     void GL3PlusRenderSystem::registerThread()
