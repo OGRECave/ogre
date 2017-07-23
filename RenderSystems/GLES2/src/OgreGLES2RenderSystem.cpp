@@ -141,6 +141,8 @@ namespace Ogre {
 
         mGLSupport->addConfig();
 
+        mStateCacheManager = 0;
+
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
             // Dummy value
@@ -153,6 +155,8 @@ namespace Ogre {
         mGLInitialised = false;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
+        mHasGLES30 = false;
+        mPolygonMode = GL_FILL;
         mCurrentVertexProgram = 0;
         mCurrentFragmentProgram = 0;
     }
@@ -1229,14 +1233,14 @@ namespace Ogre {
         switch(level)
         {
         case PM_POINTS:
-            mStateCacheManager->setPolygonMode(GL_POINTS);
+            mPolygonMode = GL_POINTS;
             break;
         case PM_WIREFRAME:
-            mStateCacheManager->setPolygonMode(GL_LINE_STRIP);
+            mPolygonMode = GL_LINE_STRIP;
             break;
         default:
         case PM_SOLID:
-            mStateCacheManager->setPolygonMode(GL_FILL);
+            mPolygonMode = GL_FILL;
             break;
         }
     }
@@ -1522,7 +1526,7 @@ namespace Ogre {
                 break;
         }
 
-        GLenum polyMode = mStateCacheManager->getPolygonMode();
+        GLenum polyMode = mPolygonMode;
         if (op.useIndexes)
         {
             // If we are using VAO's then only bind the buffer the first time through. Otherwise, always bind.

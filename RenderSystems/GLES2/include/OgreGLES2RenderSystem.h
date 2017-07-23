@@ -112,6 +112,8 @@ namespace Ogre {
             vector<GLuint>::type mRenderAttribsBound;
             vector<GLuint>::type mRenderInstanceAttribsBound;
 
+            GLenum mPolygonMode;
+
             GLint getCombinedMinMipFilter(void) const;
 
             GLSLESProgram* mCurrentVertexProgram;
