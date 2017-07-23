@@ -1978,22 +1978,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
-        bool a2c = false;
-        static bool lasta2c = false;
         bool enable = func != CMPF_ALWAYS_PASS;
 
         mStateCacheManager->setEnabled(GL_ALPHA_TEST, enable);
 
         if(enable)
         {
-            a2c = alphaToCoverage;
             glAlphaFunc(convertCompareFunction(func), value / 255.0f);
         }
 
-        if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
+        if (getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
         {
-            mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, a2c);
-            lasta2c = a2c;
+            mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, alphaToCoverage && enable);
         }
 
     }

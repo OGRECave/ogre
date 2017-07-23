@@ -1000,22 +1000,12 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
-        bool a2c = false;
-        static bool lasta2c = false;
-
-        if(func != CMPF_ALWAYS_PASS)
+        if (getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
         {
-            a2c = alphaToCoverage;
-        }
-
-        if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
-        {
-            if (a2c)
+            if ((func != CMPF_ALWAYS_PASS) && alphaToCoverage)
                 mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE);
             else
                 mStateCacheManager->setDisabled(GL_SAMPLE_ALPHA_TO_COVERAGE);
-
-            lasta2c = a2c;
         }
     }
 

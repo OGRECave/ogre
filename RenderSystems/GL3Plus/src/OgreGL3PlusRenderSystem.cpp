@@ -1114,20 +1114,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
-        bool a2c = false;
-        static bool lasta2c = false;
-
-        if (func != CMPF_ALWAYS_PASS)
-        {
-            a2c = alphaToCoverage;
-        }
-
-        if (a2c != lasta2c)
-        {
-            mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, a2c);
-
-            lasta2c = a2c;
-        }
+        mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, (func != CMPF_ALWAYS_PASS) && alphaToCoverage);
     }
 
     void GL3PlusRenderSystem::_setViewport(Viewport *vp)
