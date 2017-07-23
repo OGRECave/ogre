@@ -86,14 +86,12 @@ namespace Ogre {
     void GLStateCacheManager::clearCache()
     {
         mDepthMask = GL_TRUE;
-        mBlendEquation = GL_FUNC_ADD;
         mBlendEquationRGB = GL_FUNC_ADD;
         mBlendEquationAlpha = GL_FUNC_ADD;
         mCullFace = GL_BACK;
         mDepthFunc = GL_LESS;
         mStencilMask = 0xFFFFFFFF;
         mActiveTextureUnit = 0;
-        mDiscardBuffers = 0;
         mClearDepth = 1.0f;
         mLastBoundTexID = 0;
         mShininess = 0.0f;
@@ -105,13 +103,13 @@ namespace Ogre {
         mBlendFuncSource = GL_ONE;
         mBlendFuncDest = GL_ZERO;
         
-        mClearColour.resize(4);
         mClearColour[0] = mClearColour[1] = mClearColour[2] = mClearColour[3] = 0.0f;
-        
-        mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
 
-        mBoolStateMap.clear();
+#ifdef OGRE_ENABLE_STATE_CACHE
+        mEnableVector.reserve(25);
+        mEnableVector.clear();
+#endif
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
@@ -177,7 +175,7 @@ namespace Ogre {
         {
             if(target == GL_FRAMEBUFFER)
             {
-                glBindFramebufferEXT(target, buffer);
+                OgreAssert(false, "not implemented");
             }
             else if(target == GL_RENDERBUFFER)
             {
@@ -285,7 +283,7 @@ namespace Ogre {
     {
         if (mActiveTextureUnit != unit)
         {
-            if (unit < dynamic_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
+            if (unit < Root::getSingleton().getRenderSystem()->getCapabilities()->getNumTextureUnits())
             {
                 glActiveTexture(GL_TEXTURE0 + unit);
                 mActiveTextureUnit = unit;
@@ -396,10 +394,22 @@ namespace Ogre {
     void GLStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
-        if (mBoolStateMap[flag] == enabled)
-#else
+        vector<uint32>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
+        bool was_enabled = iter != mEnableVector.end();
+
+        if(was_enabled == enabled)
+            return; // no change
+
         if(!enabled)
+        {
+            mEnableVector.erase(iter);
+        }
+        else
+        {
+            mEnableVector.push_back(flag);
+        }
 #endif
+        if(!enabled)
         {
             glDisable(flag);
         }
@@ -424,12 +434,6 @@ namespace Ogre {
             mViewport[3] = height;
             glViewport(x, y, width, height);
         }
-    }
-
-    void GLStateCacheManager::getViewport(int *array)
-    {
-        for (int i = 0; i < 4; ++i)
-            array[i] = mViewport[i];
     }
 
     void GLStateCacheManager::setCullFace(GLenum face)

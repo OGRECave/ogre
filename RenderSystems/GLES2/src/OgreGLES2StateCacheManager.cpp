@@ -75,8 +75,8 @@ namespace Ogre {
     void GLES2StateCacheManager::clearCache()
     {
         mDepthMask = GL_TRUE;
-        mPolygonMode = GL_FILL;
-        mBlendEquation = GL_FUNC_ADD;
+        mBlendEquationRGB = GL_FUNC_ADD;
+        mBlendEquationAlpha = GL_FUNC_ADD;
         mCullFace = GL_BACK;
         mDepthFunc = GL_LESS;
         mStencilMask = 0xFFFFFFFF;
@@ -89,10 +89,7 @@ namespace Ogre {
         mBlendFuncSource = GL_ONE;
         mBlendFuncDest = GL_ZERO;
         
-        mClearColour.resize(4);
         mClearColour[0] = mClearColour[1] = mClearColour[2] = mClearColour[3] = 0.0f;
-        
-        mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
 
         mViewport[0] = 0.0f;
@@ -134,7 +131,7 @@ namespace Ogre {
         {
             if(target == GL_FRAMEBUFFER)
             {
-                OGRE_CHECK_GL_ERROR(glBindFramebuffer(target, buffer));
+                OgreAssert(false, "not implemented");
             }
             else if(target == GL_RENDERBUFFER)
             {
@@ -271,21 +268,6 @@ namespace Ogre {
 #endif
     }
 
-    void GLES2StateCacheManager::getTexParameterfv(GLenum target, GLenum pname, GLfloat* params)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        // Check if we have a map entry for this texture id.
-        TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
-
-        // Get a local copy of the parameter map and search for this parameter
-        TexParameterfMap::iterator i = (*it).second.mTexParameterfMap.find(pname);
-
-        *params = i->second;
-#else
-        OGRE_CHECK_GL_ERROR(glGetTexParameterfv(target, pname, params));
-#endif
-    }
-
     void GLES2StateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
         mLastBoundTexID = texture;
@@ -298,7 +280,7 @@ namespace Ogre {
     {
         if (mActiveTextureUnit != unit)
         {
-            if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
+            if (unit < Root::getSingleton().getRenderSystem()->getCapabilities()->getNumTextureUnits())
             {
                 OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
                 mActiveTextureUnit = unit;
@@ -337,12 +319,26 @@ namespace Ogre {
     void GLES2StateCacheManager::setBlendEquation(GLenum eq)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
-        if(mBlendEquation != eq)
+        if(mBlendEquationRGB != eq || mBlendEquationAlpha != eq)
 #endif
         {
-            mBlendEquation = eq;
-            
+            mBlendEquationRGB = eq;
+            mBlendEquationAlpha = eq;
+
             OGRE_CHECK_GL_ERROR(glBlendEquation(eq));
+        }
+    }
+
+    void GLES2StateCacheManager::setBlendEquation(GLenum eqRGB, GLenum eqAlpha)
+    {
+#ifdef OGRE_ENABLE_STATE_CACHE
+        if(mBlendEquationRGB != eqRGB || mBlendEquationAlpha != eqAlpha)
+#endif
+        {
+            mBlendEquationRGB = eqRGB;
+            mBlendEquationAlpha = eqAlpha;
+
+            OGRE_CHECK_GL_ERROR(glBlendEquationSeparate(eqRGB, eqAlpha));
         }
     }
     
@@ -503,12 +499,6 @@ namespace Ogre {
             mViewport[3] = height;
             OGRE_CHECK_GL_ERROR(glViewport(x, y, width, height));
         }
-    }
-
-    void GLES2StateCacheManager::getViewport(int *array)
-    {
-        for (int i = 0; i < 4; ++i)
-            array[i] = mViewport[i];
     }
 
 }

@@ -999,7 +999,7 @@ namespace Ogre {
                 break;
         }
         
-        OGRE_CHECK_GL_ERROR(glBlendEquationSeparate(func, alphaFunc));
+        mStateCacheManager->setBlendEquation(func, alphaFunc);
     }
 
     void GLES2RenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
@@ -1648,7 +1648,7 @@ namespace Ogre {
                                             const ColourValue& colour,
                                             Real depth, unsigned short stencil)
     {
-        vector<GLboolean>::type &colourWrite = mStateCacheManager->getColourMask();
+        uchar* colourWrite = mStateCacheManager->getColourMask();
         bool colourMask = !colourWrite[0] || !colourWrite[1] ||
                           !colourWrite[2] || !colourWrite[3];
         GLuint stencilMask = mStateCacheManager->getStencilMask();
@@ -1772,7 +1772,7 @@ namespace Ogre {
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
-        vector<GLboolean>::type &colourWrite = mStateCacheManager->getColourMask();
+        uchar* colourWrite = mStateCacheManager->getColourMask();
         GLuint stencilMask = mStateCacheManager->getStencilMask();
         GLboolean depthMask = mStateCacheManager->getDepthMask();
         mStateCacheManager->setStencilMask(stencilMask);

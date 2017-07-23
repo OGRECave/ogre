@@ -36,33 +36,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** An in memory cache of the OpenGL state.
-     @remarks
-     State changes can be particularly expensive time wise. This is because
-     a change requires OpenGL to re-evaluate and update the state machine.
-     Because of the general purpose nature of OGRE we often set the state for
-     a specific texture, material, buffer, etc. But this may be the same as the
-     current status of the state machine and is therefore redundant and causes
-     unnecessary work to be performed by OpenGL.
-     @par
-     Instead we are caching the state so that we can check whether it actually
-     does need to be updated. This leads to improved performance all around and 
-     can be somewhat dramatic in some cases.
-     */
     class _OgreGLExport GLStateCacheManager : public GLStateCacheManagerCommon
     {
     protected:
-        typedef OGRE_HashMap<GLenum, GLuint> BindBufferMap;
-        typedef OGRE_HashMap<GLenum, GLint> TexParameteriMap;
-        typedef OGRE_HashMap<GLenum, bool> GLbooleanStateMap;
-
         struct TextureUnitParams
         {
-            ~TextureUnitParams()
-            {
-                mTexParameteriMap.clear();
-            }
-
             TexParameteriMap mTexParameteriMap;
         };
 
@@ -83,45 +61,17 @@ namespace Ogre
         /// Stores the currently enabled texcoord generation types per texture unit
         OGRE_HashMap <GLenum, TexGenParams> mTextureCoordGen;
 
-        /// A map of different buffer types and the currently bound buffer for each type
-        BindBufferMap mActiveBufferMap;
         /// A map of texture parameters for each texture unit
         TexUnitsMap mTexUnitsMap;
-        /// Array of each OpenGL feature that is enabled i.e. blending, depth test, etc.
-        GLbooleanStateMap mBoolStateMap;
-        /// Stores the current clear colour
-        vector<GLclampf>::type mClearColour;
-        /// Stores the current colour write mask
-        vector<GLboolean>::type mColourMask;
-        /// Stores the current depth write mask
-        GLboolean mDepthMask;
         /// Stores the current polygon rendering mode
         GLenum mPolygonMode;
-        /// Stores the current blend equation
-        GLenum mBlendEquation;
         /// Stores the current blend source function
         GLenum mBlendFuncSource;
         /// Stores the current blend destination function
         GLenum mBlendFuncDest;
-        /// Stores the current face culling setting
-        GLenum mCullFace;
-        /// Stores the current depth test function
-        GLenum mDepthFunc;
-        /// Stores the current stencil mask
-        GLuint mStencilMask;
         /// Stores the last bound texture id
         GLuint mLastBoundTexID;
-        /// Stores the currently active texture unit
-        size_t mActiveTextureUnit;
-        /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
-        unsigned int mDiscardBuffers;
-        /// Stores the current depth clearing colour
-        GLclampf mClearDepth;
-        /// Viewport origin and size
-        int mViewport[4];
 
-        GLenum mBlendEquationRGB;
-        GLenum mBlendEquationAlpha;
         GLenum mShadeModel;
 
         GLfloat mAmbient[4];
@@ -182,11 +132,6 @@ namespace Ogre
          */
         bool activateGLTextureUnit(size_t unit);
 
-        /** Gets the current blend equation setting.
-         @return The blend equation.
-         */
-        GLenum getBlendEquation(void) const { return mBlendEquation; }
-
         /** Sets the current blend equation setting.
          @param eq The blend equation to use.
          */
@@ -204,11 +149,6 @@ namespace Ogre
         void setShadeModel(GLenum model);
 
         void setLightAmbient(GLfloat r, GLfloat g, GLfloat b);
-
-        /** Gets the current depth mask setting.
-         @return The current depth mask.
-         */
-        GLboolean getDepthMask(void) const { return mDepthMask; }
 
         /** Sets the current depth mask setting.
          @param mask The depth mask to use.
@@ -243,10 +183,6 @@ namespace Ogre
          */
         void setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
 
-        /** Gets the current colour mask setting.
-         @return An array containing the mask in RGBA order.
-         */
-        vector<GLboolean>::type & getColourMask(void) { return mColourMask; }
 
         /** Sets the current colour mask.
          @param red The red component.
@@ -255,11 +191,6 @@ namespace Ogre
          @param alpha The alpha component.
          */
         void setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
-
-        /** Gets the current stencil mask.
-         @return The stencil mask.
-         */
-        GLuint getStencilMask(void) const { return mStencilMask; }
 
         /** Sets the stencil mask.
          @param mask The stencil mask to use
@@ -270,16 +201,6 @@ namespace Ogre
          @param flag The function to enable.
          */
         void setEnabled(GLenum flag, bool enabled);
-
-        /** Gets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
-         @return The buffer mask.
-         */
-        unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }
-
-        /** Sets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
-         @param flags The bit mask of buffers to be discarded. Stored as Ogre::FrameBufferType.
-         */
-        void setDiscardBuffers(unsigned int flags) { mDiscardBuffers = flags; }
 
         /** Gets the current polygon rendering mode, fill, wireframe, points, etc.
          @return The current polygon rendering mode.
@@ -316,7 +237,7 @@ namespace Ogre
         void setPointParameters(GLfloat* attenuation, float minSize, float maxSize);
 
         void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
-        void getViewport(int* array);
+
     };
 }
 

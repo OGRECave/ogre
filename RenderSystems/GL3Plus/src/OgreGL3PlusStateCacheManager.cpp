@@ -79,14 +79,12 @@ namespace Ogre {
     void GL3PlusStateCacheManager::clearCache()
     {
         mDepthMask = GL_TRUE;
-        mBlendEquation = GL_FUNC_ADD;
         mBlendEquationRGB = GL_FUNC_ADD;
         mBlendEquationAlpha = GL_FUNC_ADD;
         mCullFace = GL_BACK;
         mDepthFunc = GL_LESS;
         mStencilMask = 0xFFFFFFFF;
         mActiveTextureUnit = 0;
-        mDiscardBuffers = 0;
         mClearDepth = 1.0f;
         mLastBoundTexID = 0;
 
@@ -97,13 +95,13 @@ namespace Ogre {
         mBlendFuncSource = GL_ONE;
         mBlendFuncDest = GL_ZERO;
         
-        mClearColour.resize(4);
         mClearColour[0] = mClearColour[1] = mClearColour[2] = mClearColour[3] = 0.0f;
-        
-        mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
 
-        mBoolStateMap.clear();
+#ifdef OGRE_ENABLE_STATE_CACHE
+        mEnableVector.reserve(25);
+        mEnableVector.clear();
+#endif
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
@@ -114,11 +112,6 @@ namespace Ogre {
         mViewport[3] = 0.0f;
 
         mPointSize = 1.0f;
-        mPointSizeMin = 1.0f;
-        mPointSizeMax = 1.0f;
-        mPointAttenuation[0] = 1.0f;
-        mPointAttenuation[1] = 0.0f;
-        mPointAttenuation[2] = 0.0f;
 
         mActiveDrawFrameBuffer=0;
         mActiveReadFrameBuffer=0;
@@ -361,7 +354,7 @@ namespace Ogre {
         if (mActiveTextureUnit == unit)
             return true;
 
-        if (unit < static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
+        if (unit < Root::getSingleton().getRenderSystem()->getCapabilities()->getNumTextureUnits())
         {
             OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
             mActiveTextureUnit = unit;
@@ -467,10 +460,22 @@ namespace Ogre {
     void GL3PlusStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
-        if (mBoolStateMap[flag] == enabled)
-#else
-        if (!enabled)
+        vector<uint32>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
+        bool was_enabled = iter != mEnableVector.end();
+
+        if(was_enabled == enabled)
+            return; // no change
+
+        if(!enabled)
+        {
+            mEnableVector.erase(iter);
+        }
+        else
+        {
+            mEnableVector.push_back(flag);
+        }
 #endif
+        if (!enabled)
         {
             OGRE_CHECK_GL_ERROR(glDisable(flag));
         }
@@ -495,12 +500,6 @@ namespace Ogre {
             mViewport[3] = height;
             OGRE_CHECK_GL_ERROR(glViewport(x, y, width, height));
         }
-    }
-
-    void GL3PlusStateCacheManager::getViewport(int *array)
-    {
-        for (int i = 0; i < 4; ++i)
-            array[i] = mViewport[i];
     }
 
     void GL3PlusStateCacheManager::setCullFace(GLenum face)

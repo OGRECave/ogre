@@ -99,6 +99,7 @@ ogre_add_library_to_folder(RenderSystems OgreGLSupport STATIC
     src/OgreGLRenderTexture.cpp
     src/OgreGLHardwarePixelBufferCommon.cpp
     src/OgreGLUniformCache.cpp
+    src/OgreGLStateCacheManagerCommon.cpp
 )
 target_link_libraries(OgreGLSupport OgreMain ${PLATFORM_LIBS})
 generate_export_header(OgreGLSupport 
