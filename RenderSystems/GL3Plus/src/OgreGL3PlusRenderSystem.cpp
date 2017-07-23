@@ -1461,15 +1461,6 @@ namespace Ogre {
         activateGLTextureUnit(0);
     }
 
-    GLfloat GL3PlusRenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        GLfloat curAniso = 0;
-        OGRE_CHECK_GL_ERROR(glGetTexParameterfv(mTextureTypes[unit],
-                                                GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso));
-
-        return curAniso ? curAniso : 1;
-    }
-
     void GL3PlusRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
     {
         // TODO: Sampler objects, GL 3.3 or GL_ARB_sampler_objects required. For example:

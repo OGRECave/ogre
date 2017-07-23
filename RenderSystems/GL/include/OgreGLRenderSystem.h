@@ -109,9 +109,6 @@ namespace Ogre {
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;
-
-        /// Internal method for anisotropy validation
-        GLfloat _getCurrentAnisotropy(size_t unit);
         
         /// GL support class, used for creating windows etc.
         GLSupport* mGLSupport;

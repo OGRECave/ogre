@@ -1404,16 +1404,6 @@ namespace Ogre {
         mStateCacheManager->activateGLTextureUnit(0);
     }
 
-    GLfloat GLES2RenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        GLfloat curAniso = 0;
-        if(mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
-            mStateCacheManager->getTexParameterfv(mTextureTypes[unit],
-                                                  GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso);
-
-        return curAniso ? curAniso : 1;
-    }
-    
     void GLES2RenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
     {
         if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))

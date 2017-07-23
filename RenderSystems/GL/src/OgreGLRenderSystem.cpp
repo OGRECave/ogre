@@ -2453,14 +2453,6 @@ namespace Ogre {
         //TODO: implement (opengl 3 only?)
     }
     //---------------------------------------------------------------------
-    GLfloat GLRenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        GLfloat curAniso = 0;
-        glGetTexParameterfv(mTextureTypes[unit],
-                            GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso);
-        return curAniso ? curAniso : 1;
-    }
-    //---------------------------------------------------------------------
     void GLRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
     {
         if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
