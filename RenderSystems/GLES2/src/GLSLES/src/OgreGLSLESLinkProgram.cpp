@@ -421,13 +421,7 @@ namespace Ogre {
                 // Get the index in the parameter real list
                 if (index == currentUniform->mConstantDef->physicalIndex)
                 {
-                    // this is a monolitic program so we can use the cache of any attached shader
-                    GLUniformCache* uniformCache =  mVertexShader->getUniformCache();
-                    uniformCache->updateUniform(currentUniform->mLocation,
-                                                  params->getFloatPointer(index),
-                                                  static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
-                                                  currentUniform->mConstantDef->arraySize *
-                                                  sizeof(float)));
+                    OGRE_CHECK_GL_ERROR(glUniform1fv(currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     // There will only be one multipass entry
                     return;
                 }

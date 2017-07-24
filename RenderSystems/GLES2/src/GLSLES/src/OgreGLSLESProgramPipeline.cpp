@@ -512,30 +512,15 @@ namespace Ogre
                 if (index == currentUniform->mConstantDef->physicalIndex)
                 {
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-
                     GLuint progID = 0;
-                    GLUniformCache* uniformCache = 0;
                     if (getVertexProgram() && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
-                        uniformCache = getVertexProgram()->getUniformCache();
-                        if(!uniformCache->updateUniform(currentUniform->mLocation,
-                                                        params->getFloatPointer(index),
-                                                        static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
-                                                        currentUniform->mConstantDef->arraySize * sizeof(float))))
-                            return;
-                        
                         progID = getVertexProgram()->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     }
                     
                     if (mFragmentProgram && currentUniform->mSourceProgType == GPT_FRAGMENT_PROGRAM)
                     {
-                        uniformCache = mFragmentProgram->getUniformCache();
-                        if(!uniformCache->updateUniform(currentUniform->mLocation,
-                                                        params->getFloatPointer(index),
-                                                        static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
-                                                        currentUniform->mConstantDef->arraySize * sizeof(float))))
-                            return;
                         progID = mFragmentProgram->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     }

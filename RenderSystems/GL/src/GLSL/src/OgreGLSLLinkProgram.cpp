@@ -452,12 +452,8 @@ namespace Ogre {
                 // get the index in the parameter real list
                 if (index == currentUniform->mConstantDef->physicalIndex)
                 {
-                    if(!mUniformCache->updateUniform(currentUniform->mLocation,
-                                                     params->getFloatPointer(index),
-                                                     static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
-                                                     currentUniform->mConstantDef->arraySize *
-                                                     sizeof(float))))
-                        return;
+                    glUniform1fvARB(currentUniform->mLocation, 1, params->getFloatPointer(index));
+                    return;
                 }
             }
         }
