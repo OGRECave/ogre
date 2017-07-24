@@ -46,7 +46,6 @@ namespace Ogre {
     protected:
         /// Linked fragment program
         GLSLESProgram* mFragmentProgram;
-        GLUniformCache *mUniformCache;
 
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
@@ -71,7 +70,6 @@ namespace Ogre {
 
         GLSLESProgram* getVertexProgram(void) const { return static_cast<GLSLESProgram*>(mVertexShader); }
         GLSLESProgram* getFragmentProgram(void) const { return mFragmentProgram; }
-        GLUniformCache * getUniformCache(void) { return mUniformCache; }
     };
 }
 

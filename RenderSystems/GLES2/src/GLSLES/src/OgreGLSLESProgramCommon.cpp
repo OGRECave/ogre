@@ -41,17 +41,12 @@ namespace Ogre {
     : GLSLProgramCommon(vertexProgram)
     , mFragmentProgram(fragmentProgram)
     {
-        // Initialise uniform cache
-        mUniformCache = new GLUniformCache();
     }
     
     //-----------------------------------------------------------------------
     GLSLESProgramCommon::~GLSLESProgramCommon(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-
-        delete mUniformCache;
-        mUniformCache = 0;
     }
     
     //-----------------------------------------------------------------------
@@ -168,7 +163,8 @@ namespace Ogre {
         mLinked = false;
         mTriedToLinkAndFailed = false;
         mUniformRefsBuilt = false;
-        mUniformCache->clearCache();
+        getVertexProgram()->getUniformCache()->clearCache();
+        mFragmentProgram->getUniformCache()->clearCache();
     }
 
     void GLSLESProgramCommon::notifyOnContextReset()

@@ -293,13 +293,16 @@ namespace Ogre
         GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         GLuint progID = 0;
+        GLUniformCache* uniformCache=0;
         if(fromProgType == GPT_VERTEX_PROGRAM)
         {
             progID = getVertexProgram()->getGLProgramHandle();
+            uniformCache = getVertexProgram()->getUniformCache();
         }
         else if(fromProgType == GPT_FRAGMENT_PROGRAM)
         {
             progID = mFragmentProgram->getGLProgramHandle();
+            uniformCache = mFragmentProgram->getUniformCache();
         }
 
         for (;currentUniform != endUniform; ++currentUniform)
@@ -329,12 +332,12 @@ namespace Ogre
 #if OGRE_NO_GLES3_SUPPORT == 0
                         case GCT_SAMPLER2DARRAY:
 #endif
-                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
+                            shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getIntPointer(def->physicalIndex),
                                                                         static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
                             break;
                         default:
-                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
+                            shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getFloatPointer(def->physicalIndex),
                                                                         static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(float)));
                             break;
@@ -511,13 +514,14 @@ namespace Ogre
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 
                     GLuint progID = 0;
+                    GLUniformCache* uniformCache = 0;
                     if (getVertexProgram() && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
-                        if(!mUniformCache->updateUniform(currentUniform->mLocation,
-                                                                             params->getFloatPointer(index),
-                                                                             static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
-                                                                             currentUniform->mConstantDef->arraySize *
-                                                                             sizeof(float))))
+                        uniformCache = getVertexProgram()->getUniformCache();
+                        if(!uniformCache->updateUniform(currentUniform->mLocation,
+                                                        params->getFloatPointer(index),
+                                                        static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
+                                                        currentUniform->mConstantDef->arraySize * sizeof(float))))
                             return;
                         
                         progID = getVertexProgram()->getGLProgramHandle();
@@ -526,11 +530,11 @@ namespace Ogre
                     
                     if (mFragmentProgram && currentUniform->mSourceProgType == GPT_FRAGMENT_PROGRAM)
                     {
-                        if(!mUniformCache->updateUniform(currentUniform->mLocation,
-                                                                               params->getFloatPointer(index),
-                                                                               static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
-                                                                               currentUniform->mConstantDef->arraySize *
-                                                                               sizeof(float))))
+                        uniformCache = mFragmentProgram->getUniformCache();
+                        if(!uniformCache->updateUniform(currentUniform->mLocation,
+                                                        params->getFloatPointer(index),
+                                                        static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
+                                                        currentUniform->mConstantDef->arraySize * sizeof(float))))
                             return;
                         progID = mFragmentProgram->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));

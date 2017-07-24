@@ -105,9 +105,6 @@ namespace Ogre {
         /// Since GLSL has no assembly, use this shader for binding.
         GpuProgram* _getBindingDelegate(void) { return this; }
 
-        /// Get the uniform cache for this shader
-        GLUniformCache*    getUniformCache(){return mUniformCache;}
-
     protected:
         /** Internal method for creating a dummy low-level program for
             this high-level program.  GLSL does not give access to the
@@ -138,9 +135,6 @@ namespace Ogre {
         GLuint mGLShaderHandle;
         /// GL handle for program object the shader is bound to.
         GLuint mGLProgramHandle;
-        
-        /// Pointer to the uniform cache for this shader
-        GLUniformCache*    mUniformCache;
     };
 }
 
