@@ -1797,6 +1797,8 @@ namespace Ogre {
                 mCurrentContext->endCurrent();
                 mCurrentContext = 0;
                 mMainContext = 0;
+                mStateCacheManager = 0;
+                mGLSupport->setStateCacheManager(0);
             }
         }
     }
