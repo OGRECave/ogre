@@ -379,8 +379,11 @@ namespace Ogre {
     void GLES2Texture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();
-        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
-        mGLSupport.getStateCacheManager()->invalidateStateForTexture( mTextureID );
+        if (GLES2StateCacheManager* stateCacheManager = mGLSupport.getStateCacheManager())
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
+            stateCacheManager->invalidateStateForTexture(mTextureID);
+        }
         mTextureID = 0;
     }
     

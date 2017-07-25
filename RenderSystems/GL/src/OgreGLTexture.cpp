@@ -294,8 +294,11 @@ namespace Ogre {
     void GLTexture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();
-        glDeleteTextures( 1, &mTextureID );
-        mGLSupport.getStateCacheManager()->invalidateStateForTexture( mTextureID );
+        if (GLStateCacheManager* stateCacheManager = mGLSupport.getStateCacheManager())
+        {
+            glDeleteTextures(1, &mTextureID);
+            stateCacheManager->invalidateStateForTexture(mTextureID);
+        }
     }
     
     //---------------------------------------------------------------------------------------------
