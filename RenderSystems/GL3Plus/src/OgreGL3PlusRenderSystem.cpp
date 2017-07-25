@@ -134,6 +134,7 @@ namespace Ogre {
           mShaderManager(0),
           mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
+          mStateCacheManager(0),
           mRTTManager(0),
           mActiveTextureUnit(0)
     {
@@ -221,11 +222,6 @@ namespace Ogre {
                                                    const String& windowTitle)
     {
         mGLSupport->start();
-
-        if(!mStateCacheManager)
-            mStateCacheManager = OGRE_NEW GL3PlusStateCacheManager();
-
-        mGLSupport->setStateCacheManager(mStateCacheManager);
 
         RenderWindow *autoWindow = mGLSupport->createWindow(autoCreateWindow,
                                                             this, windowTitle);

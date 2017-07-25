@@ -114,7 +114,8 @@ namespace Ogre {
 #endif
 
     GLES2RenderSystem::GLES2RenderSystem()
-        : mGpuProgramManager(0),
+        : mStateCacheManager(0),
+          mGpuProgramManager(0),
           mGLSLESProgramFactory(0),
           mHardwareBufferManager(0),
           mRTTManager(0),
@@ -140,8 +141,6 @@ namespace Ogre {
 #endif
 
         mGLSupport->addConfig();
-
-        mStateCacheManager = 0;
 
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {

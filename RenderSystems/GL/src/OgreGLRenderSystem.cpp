@@ -115,6 +115,7 @@ namespace Ogre {
         mHardwareBufferManager(0),
         mGpuProgramManager(0),
         mGLSLProgramFactory(0),
+        mStateCacheManager(0),
         mRTTManager(0),
         mActiveTextureUnit(0),
         mMaxBuiltInTextureAttribIndex(0)
@@ -206,11 +207,6 @@ namespace Ogre {
     RenderWindow* GLRenderSystem::_initialise(bool autoCreateWindow, const String& windowTitle)
     {
         mGLSupport->start();
-
-        if(!mStateCacheManager)
-            mStateCacheManager = OGRE_NEW GLStateCacheManager();
-
-        mGLSupport->setStateCacheManager(mStateCacheManager);
 
         // Create the texture manager
         mTextureManager = new GLTextureManager(*mGLSupport);
