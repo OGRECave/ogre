@@ -278,28 +278,15 @@ namespace Ogre {
     
     bool GLES2StateCacheManager::activateGLTextureUnit(uchar unit)
     {
-        if (mActiveTextureUnit != unit)
-        {
-            if (unit < Root::getSingleton().getRenderSystem()->getCapabilities()->getNumTextureUnits())
-            {
-                OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
-                mActiveTextureUnit = unit;
-                return true;
-            }
-            else if (!unit)
-            {
-                // always ok to use the first unit
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
+        if (mActiveTextureUnit == unit)
             return true;
-        }
+
+        if (unit >= Root::getSingleton().getRenderSystem()->getCapabilities()->getNumTextureUnits())
+            return false;
+
+        OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
+        mActiveTextureUnit = unit;
+        return true;
     }
 
     void GLES2StateCacheManager::setBlendFunc(GLenum source, GLenum dest)
