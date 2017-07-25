@@ -59,7 +59,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     GLHardwareVertexBuffer::~GLHardwareVertexBuffer()
     {
-        static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
+        if(GLStateCacheManager* stateCacheManager = static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager())
+            stateCacheManager->deleteGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
     }
     //---------------------------------------------------------------------
     void* GLHardwareVertexBuffer::lockImpl(size_t offset, 

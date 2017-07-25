@@ -83,7 +83,8 @@ namespace Ogre {
     void GLES2HardwareIndexBuffer::destroyBuffer()
     {
         // Delete the cached value
-        static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        if(GLES2StateCacheManager* stateCacheManager = static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager())
+            stateCacheManager->deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
     }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN

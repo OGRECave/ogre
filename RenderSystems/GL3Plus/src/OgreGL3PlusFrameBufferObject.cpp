@@ -75,10 +75,12 @@ namespace Ogre {
         mManager->releaseRenderBuffer(mStencil);
         mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // Delete framebuffer object
-        mManager->getGLSupportRef().getStateCacheManager()->deleteGLFrameBuffer(GL_FRAMEBUFFER,mFB);
-
-        if (mMultisampleFB)
-            mManager->getGLSupportRef().getStateCacheManager()->deleteGLFrameBuffer(GL_FRAMEBUFFER,mMultisampleFB);
+        if (GL3PlusStateCacheManager* stateCacheManager = mManager->getGLSupportRef().getStateCacheManager())
+        {
+            stateCacheManager->deleteGLFrameBuffer(GL_FRAMEBUFFER, mFB);
+            if (mMultisampleFB)
+                stateCacheManager->deleteGLFrameBuffer(GL_FRAMEBUFFER, mMultisampleFB);
+        }
     }
     
     void GL3PlusFrameBufferObject::bindSurface(size_t attachment, const GL3PlusSurfaceDesc &target)

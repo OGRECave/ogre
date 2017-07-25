@@ -58,7 +58,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     GLHardwareIndexBuffer::~GLHardwareIndexBuffer()
     {
-        static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
+        if(GLStateCacheManager* stateCacheManager = static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager())
+            stateCacheManager->deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
     }
     //---------------------------------------------------------------------
     void* GLHardwareIndexBuffer::lockImpl(size_t offset, 

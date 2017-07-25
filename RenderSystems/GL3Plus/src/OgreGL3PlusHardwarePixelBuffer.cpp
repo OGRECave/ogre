@@ -164,7 +164,8 @@ namespace Ogre {
     GL3PlusRenderBuffer::~GL3PlusRenderBuffer()
     {
         // Delete renderbuffer
-        mGLSupport->getStateCacheManager()->deleteGLRenderBuffer(mRenderbufferID);
+        if(GL3PlusStateCacheManager* stateCacheManager = mGLSupport->getStateCacheManager())
+            stateCacheManager->deleteGLRenderBuffer(mRenderbufferID);
     }
 
     void GL3PlusRenderBuffer::bindToFramebuffer(uint32 attachment, uint32 zoffset)
