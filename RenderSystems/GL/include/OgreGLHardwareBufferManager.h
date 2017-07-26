@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreGLPrerequisites.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLSupport.h"
 
 namespace Ogre {
 
@@ -43,7 +42,7 @@ namespace Ogre {
     class _OgreGLExport GLHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
     protected:
-        GLSupport* mGLSupport;
+        GLRenderSystem* mRenderSystem;
         char* mScratchBufferPool;
         OGRE_MUTEX(mScratchMutex);
         size_t mMapBufferThreshold;
@@ -71,7 +70,7 @@ namespace Ogre {
         /// Utility function to get the correct GL type based on VET's
         static GLenum getGLType(unsigned int type);
 
-        GLStateCacheManager * getStateCacheManager() { return mGLSupport->getStateCacheManager(); }
+        GLStateCacheManager * getStateCacheManager();
 
         /** Allocator method to allow us to use a pool of memory as a scratch
             area for hardware buffers. This is because glMapBuffer is incredibly

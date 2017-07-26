@@ -50,7 +50,7 @@ namespace Ogre {
     GLHardwareBufferManagerBase::GLHardwareBufferManagerBase() 
         : mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
-        mGLSupport = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef();
+        mRenderSystem = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
 
         // Init scratch pool
         // TODO make it a configurable size?
@@ -68,6 +68,11 @@ namespace Ogre {
         destroyAllBindings();
 
         OGRE_FREE_ALIGN(mScratchBufferPool, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT);
+    }
+    //-----------------------------------------------------------------------
+    GLStateCacheManager * GLHardwareBufferManagerBase::getStateCacheManager()
+    {
+        return mRenderSystem->_getStateCacheManager();
     }
     //-----------------------------------------------------------------------
     HardwareVertexBufferSharedPtr GLHardwareBufferManagerBase::createVertexBuffer(

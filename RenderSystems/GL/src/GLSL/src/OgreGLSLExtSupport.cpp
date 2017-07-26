@@ -26,9 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreGLSLExtSupport.h"
-#include "OgreGLSupport.h"
 
 namespace Ogre
 {

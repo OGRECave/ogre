@@ -34,8 +34,8 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
-    GLTextureManager::GLTextureManager(GLSupport& support)
-        : TextureManager(), mGLSupport(support), mWarningTextureID(0)
+    GLTextureManager::GLTextureManager(GLRenderSystem* renderSystem)
+        : TextureManager(), mRenderSystem(renderSystem), mWarningTextureID(0)
     {
         // register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
@@ -53,7 +53,7 @@ namespace Ogre {
         const String& group, bool isManual, ManualResourceLoader* loader, 
         const NameValuePairList* createParams)
     {
-        return new GLTexture(this, name, handle, group, isManual, loader, mGLSupport);
+        return new GLTexture(this, name, handle, group, isManual, loader, mRenderSystem);
     }
 
     //-----------------------------------------------------------------------------

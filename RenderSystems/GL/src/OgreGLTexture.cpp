@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLTexture.h"
-#include "OgreGLSupport.h"
+#include "OgreGLRenderSystem.h"
 #include "OgreGLPixelFormat.h"
 #include "OgreGLHardwarePixelBuffer.h"
 
@@ -60,9 +60,9 @@ namespace Ogre {
 
     GLTexture::GLTexture(ResourceManager* creator, const String& name, 
         ResourceHandle handle, const String& group, bool isManual, 
-        ManualResourceLoader* loader, GLSupport& support) 
+        ManualResourceLoader* loader, GLRenderSystem* renderSystem) 
         : GLTextureCommon(creator, name, handle, group, isManual, loader),
-          mGLSupport(support)
+          mRenderSystem(renderSystem)
     {
     }
 
@@ -136,26 +136,26 @@ namespace Ogre {
         glGenTextures( 1, &mTextureID );
         
         // Set texture type
-        mGLSupport.getStateCacheManager()->bindGLTexture( getGLTextureTarget(), mTextureID );
+        mRenderSystem->_getStateCacheManager()->bindGLTexture( getGLTextureTarget(), mTextureID );
         
         // This needs to be set otherwise the texture doesn't get rendered
         if (GLEW_VERSION_1_2)
-            mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(),
+            mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(),
                 GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
         
         // Set some misc default parameters so NVidia won't complain, these can of course be changed later
-        mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         if (GLEW_VERSION_1_2)
         {
-            mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
 
         if((mUsage & TU_AUTOMIPMAP) &&
             mNumRequestedMipmaps && mMipmapsHardwareGenerated)
         {
-            mGLSupport.getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
+            mRenderSystem->_getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
         }
         
         // Allocate internal buffer so that glTexSubImageXD can be used
@@ -294,7 +294,7 @@ namespace Ogre {
     void GLTexture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();
-        if (GLStateCacheManager* stateCacheManager = mGLSupport.getStateCacheManager())
+        if (GLStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
         {
             glDeleteTextures(1, &mTextureID);
             stateCacheManager->invalidateStateForTexture(mTextureID);
@@ -311,7 +311,7 @@ namespace Ogre {
         {
             for(uint32 mip=0; mip<=getNumMipmaps(); mip++)
             {
-                GLHardwarePixelBuffer *buf = new GLTextureBuffer(mGLSupport, mName, getGLTextureTarget(), mTextureID, face, mip,
+                GLHardwarePixelBuffer *buf = new GLTextureBuffer(mRenderSystem, mName, getGLTextureTarget(), mTextureID, face, mip,
                         static_cast<HardwareBuffer::Usage>(mUsage), mHwGamma, mFSAA);
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
                 

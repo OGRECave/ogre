@@ -38,12 +38,10 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-class GLStateCacheManager;
-
 class _OgreGLExport GLSupport
 {
 public:
-    GLSupport(GLNativeSupport* native) : mStateCacheManager(0), mNative(native) { }
+    GLSupport(GLNativeSupport* native) : mNative(native) { }
     virtual ~GLSupport() {
         delete mNative;
     }
@@ -87,16 +85,6 @@ public:
 
     GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height) {
         return mNative->createPBuffer(format, width, height);
-    }
-
-    GLStateCacheManager* getStateCacheManager() const
-    {
-        return mStateCacheManager;
-    }
-
-    void setStateCacheManager(GLStateCacheManager* stateCacheMgr)
-    {
-        mStateCacheManager = stateCacheMgr;
     }
 
     /**
@@ -164,8 +152,6 @@ protected:
 private:
     String mVersion;
     String mVendor;
-
-    GLStateCacheManager* mStateCacheManager;
 
     GLNativeSupport* mNative;
 

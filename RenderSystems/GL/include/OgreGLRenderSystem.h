@@ -387,7 +387,10 @@ namespace Ogre {
          */
         void _unregisterContext(GLContext *context);
         /** Returns the main context */
-        GLContext* _getMainContext() {return mMainContext;} 
+        GLContext* _getMainContext() { return mMainContext; }
+
+        GLContext* _getCurrentContext() { return mCurrentContext; }
+        GLStateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
 
         /// @copydoc RenderSystem::getDisplayMonitorCount
         unsigned int getDisplayMonitorCount() const;

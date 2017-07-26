@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 #include "OgreRenderTexture.h"
 #include "OgreGLTextureCommon.h"
-#include "OgreGLSupport.h"
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
@@ -44,7 +43,7 @@ namespace Ogre {
         // Constructor
         GLTexture(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader, 
-            GLSupport& support);
+            GLRenderSystem* renderSystem);
 
         virtual ~GLTexture();      
 
@@ -67,7 +66,7 @@ namespace Ogre {
         void _createSurfaceList();
 
     private:
-        GLSupport& mGLSupport;
+        GLRenderSystem* mRenderSystem;
     };
 }
 

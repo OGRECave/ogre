@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 
 #include "OgreGLRenderSystem.h"
-#include "OgreRenderSystem.h"
+#include "OgreGLSupport.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreLight.h"
@@ -209,7 +209,7 @@ namespace Ogre {
         mGLSupport->start();
 
         // Create the texture manager
-        mTextureManager = new GLTextureManager(*mGLSupport);
+        mTextureManager = new GLTextureManager(this);
 
         RenderWindow* autoWindow = mGLSupport->createWindow(autoCreateWindow, this, windowTitle);
 
@@ -1198,7 +1198,6 @@ namespace Ogre {
         glewInit();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLStateCacheManager>();
-        mGLSupport->setStateCacheManager(mStateCacheManager);
     }
 
 
@@ -3346,7 +3345,6 @@ namespace Ogre {
         mCurrentContext->setCurrent();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLStateCacheManager>();
-        mGLSupport->setStateCacheManager(mStateCacheManager);
 
         // Check if the context has already done one-time initialisation
         if(!mCurrentContext->getInitialized())
@@ -3428,7 +3426,6 @@ namespace Ogre {
                 mCurrentContext = 0;
                 mMainContext = 0;
                 mStateCacheManager = 0;
-                mGLSupport->setStateCacheManager(0);
             }
         }
     }

@@ -53,7 +53,7 @@ namespace Ogre {
     {
     public:
         /** Texture constructor */
-        GLTextureBuffer(GLSupport& support, const String &baseName, GLenum target, GLuint id, GLint face,
+        GLTextureBuffer(GLRenderSystem* renderSystem, const String &baseName, GLenum target, GLuint id, GLint face,
             GLint level, Usage usage, bool writeGamma, uint fsaa);
         ~GLTextureBuffer();
         
@@ -92,7 +92,7 @@ namespace Ogre {
         typedef vector<RenderTexture*>::type SliceTRT;
         SliceTRT mSliceTRT;
 
-        GLSupport& mGLSupport;
+        GLRenderSystem* mRenderSystem;
     };
      /** Renderbuffer surface.  Needs FBO extension.
      */
