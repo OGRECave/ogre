@@ -166,6 +166,7 @@ namespace Ogre {
         const ushort mNumLods;
         MeshLodUsageList mMeshLodUsageList;
 #endif
+        HardwareBufferManagerBase* mBufferManager;
         HardwareBuffer::Usage mVertexBufferUsage;
         HardwareBuffer::Usage mIndexBufferUsage;
         bool mVertexBufferShadowBuffer;
@@ -528,6 +529,29 @@ namespace Ogre {
         /** Removes all LOD data from this Mesh. */
         void removeLodLevels(void);
 
+        /** Sets the manager for the vertex and index buffers to be used when loading
+            this Mesh.
+        @remarks
+            By default, when loading the Mesh, static, write-only vertex and index buffers 
+            will be used where possible in order to improve rendering performance. 
+            However, such buffers cannot be manipulated on the fly by CPU code 
+            (although shader code can). If you wish to use the CPU to modify these buffers
+            and will never use it with GPU, you should call this method. Note,
+            however, that it only takes effect after the Mesh has been reloaded. Note that you
+            still have the option of manually repacing the buffers in this mesh with your
+            own if you see fit too, in which case you don't need to call this method since it
+            only affects buffers created by the mesh itself.
+        @par
+            You can define the approach to a Mesh by changing the default parameters to 
+            MeshManager::load if you wish; this means the Mesh is loaded with those options
+            the first time instead of you having to reload the mesh after changing these options.
+        @param bufferManager
+            If set to @c DefaultHardwareBufferManager, the buffers will be created in system memory
+            only, without hardware counterparts. Such mesh could not be rendered, but LODs could be
+            generated for such mesh, it could be cloned, transformed and serialized.
+        */
+        void setHardwareBufferManager(HardwareBufferManagerBase* bufferManager) { mBufferManager = bufferManager; }
+        HardwareBufferManagerBase* getHardwareBufferManager();
         /** Sets the policy for the vertex buffers to be used when loading
             this Mesh.
         @remarks

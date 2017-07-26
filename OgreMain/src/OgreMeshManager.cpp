@@ -467,9 +467,9 @@ namespace Ogre
 
         // Allocate vertex buffer
         HardwareVertexBufferSharedPtr vbuf = 
-            HardwareBufferManager::getSingleton().
-            createVertexBuffer(vertexDecl->getVertexSize(0), vertexData->vertexCount,
-            params.vertexBufferUsage, params.vertexShadowBuffer);
+            pMesh->getHardwareBufferManager()->createVertexBuffer(
+                vertexDecl->getVertexSize(0), vertexData->vertexCount,
+                params.vertexBufferUsage, params.vertexShadowBuffer);
 
         // Set up the binding (one source only)
         VertexBufferBinding* binding = vertexData->vertexBufferBinding;
@@ -616,11 +616,9 @@ namespace Ogre
 
         // Allocate memory
         HardwareVertexBufferSharedPtr vbuf = 
-            HardwareBufferManager::getSingleton().createVertexBuffer(
-            offset, 
-            pMesh->sharedVertexData->vertexCount, 
-            params.vertexBufferUsage, 
-            params.vertexShadowBuffer);
+            pMesh->getHardwareBufferManager()->createVertexBuffer(
+                offset, pMesh->sharedVertexData->vertexCount, 
+                params.vertexBufferUsage, params.vertexShadowBuffer);
         bind->setBinding(0, vbuf);
 
         // Work out the transform required
@@ -779,9 +777,9 @@ namespace Ogre
 
         // Allocate vertex buffer
         HardwareVertexBufferSharedPtr vbuf = 
-            HardwareBufferManager::getSingleton().
-            createVertexBuffer(vertexDecl->getVertexSize(0), vertexData->vertexCount,
-            params.vertexBufferUsage, params.vertexShadowBuffer);
+            pMesh->getHardwareBufferManager()->createVertexBuffer(
+                vertexDecl->getVertexSize(0), vertexData->vertexCount,
+                params.vertexBufferUsage, params.vertexShadowBuffer);
 
         // Set up the binding (one source only)
         VertexBufferBinding* binding = vertexData->vertexBufferBinding;

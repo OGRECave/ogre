@@ -462,11 +462,11 @@ namespace Ogre {
         // This is a bit like a copy constructor, but with the additional aspect of registering the clone with
         //  the MeshManager
 
-        SubMesh* newSub;
-        if(!parentMesh)
-            newSub = parent->createSubMesh(newName);
-        else
-            newSub = parentMesh->createSubMesh(newName);
+        if(parentMesh == NULL)
+            parentMesh = parent;
+
+        HardwareBufferManagerBase* bufferManager = parentMesh->getHardwareBufferManager();
+        SubMesh* newSub = parentMesh->createSubMesh(newName);
 
         newSub->mMaterialName = this->mMaterialName;
         newSub->mMatInitialised = this->mMatInitialised;
@@ -477,14 +477,14 @@ namespace Ogre {
         if (!this->useSharedVertices)
         {
             // Copy unique vertex data
-            newSub->vertexData = this->vertexData->clone();
+            newSub->vertexData = this->vertexData->clone(true, bufferManager);
             // Copy unique index map
             newSub->blendIndexToBoneIndexMap = this->blendIndexToBoneIndexMap;
         }
 
         // Copy index data
         OGRE_DELETE newSub->indexData;
-        newSub->indexData = this->indexData->clone();
+        newSub->indexData = this->indexData->clone(true, bufferManager);
         // Copy any bone assignments
         newSub->mBoneAssignments = this->mBoneAssignments;
         newSub->mBoneAssignmentsOutOfDate = this->mBoneAssignmentsOutOfDate;
@@ -495,7 +495,7 @@ namespace Ogre {
         newSub->mLodFaceList.reserve(this->mLodFaceList.size());
         SubMesh::LODFaceList::const_iterator facei;
         for (facei = this->mLodFaceList.begin(); facei != this->mLodFaceList.end(); ++facei) {
-            IndexData* newIndexData = (*facei)->clone();
+            IndexData* newIndexData = (*facei)->clone(true, bufferManager);
             newSub->mLodFaceList.push_back(newIndexData);
         }
         return newSub;

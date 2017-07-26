@@ -58,6 +58,7 @@ namespace Ogre {
         mLodStrategy(LodStrategyManager::getSingleton().getDefaultStrategy()),
         mHasManualLodLevel(false),
         mNumLods(1),
+        mBufferManager(0),
         mVertexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
         mIndexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
         mVertexBufferShadowBuffer(true),
@@ -85,6 +86,11 @@ namespace Ogre {
         // have to call this here reather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         unload();
+    }
+    //-----------------------------------------------------------------------
+    HardwareBufferManagerBase* Mesh::getHardwareBufferManager()
+    {
+        return mBufferManager ? mBufferManager : HardwareBufferManager::getSingletonPtr();
     }
     //-----------------------------------------------------------------------
     SubMesh* Mesh::createSubMesh()
@@ -317,18 +323,23 @@ namespace Ogre {
         }
         MeshPtr newMesh = MeshManager::getSingleton().createManual(newName, theGroup);
 
+        newMesh->mBufferManager = mBufferManager;
+        newMesh->mVertexBufferUsage = mVertexBufferUsage;
+        newMesh->mIndexBufferUsage = mIndexBufferUsage;
+        newMesh->mVertexBufferShadowBuffer = mVertexBufferShadowBuffer;
+        newMesh->mIndexBufferShadowBuffer = mIndexBufferShadowBuffer;
+
         // Copy submeshes first
         vector<SubMesh*>::type::iterator subi;
         for (subi = mSubMeshList.begin(); subi != mSubMeshList.end(); ++subi)
         {
             (*subi)->clone("", newMesh.get());
-
         }
 
         // Copy shared geometry and index map, if any
         if (sharedVertexData)
         {
-            newMesh->sharedVertexData = sharedVertexData->clone();
+            newMesh->sharedVertexData = sharedVertexData->clone(true, mBufferManager);
             newMesh->sharedBlendIndexToBoneIndexMap = sharedBlendIndexToBoneIndexMap;
         }
 
@@ -361,12 +372,8 @@ namespace Ogre {
             newLod.value = lod.value;
             if (lod.edgeData) {
                 newLod.edgeData = lod.edgeData->clone();
+            }
         }
-        }
-        newMesh->mVertexBufferUsage = mVertexBufferUsage;
-        newMesh->mIndexBufferUsage = mIndexBufferUsage;
-        newMesh->mVertexBufferShadowBuffer = mVertexBufferShadowBuffer;
-        newMesh->mIndexBufferShadowBuffer = mIndexBufferShadowBuffer;
 
         newMesh->mSkeletonName = mSkeletonName;
         newMesh->mSkeleton = mSkeleton;
@@ -815,8 +822,7 @@ namespace Ogre {
         // type of Weights is settable on the MeshManager.
         VertexElementType weightsBaseType = MeshManager::getSingleton().getBlendWeightsBaseElementType();
         VertexElementType weightsVertexElemType = VertexElement::multiplyTypeCount( weightsBaseType, numBlendWeightsPerVertex );
-        HardwareVertexBufferSharedPtr vbuf =
-            HardwareBufferManager::getSingleton().createVertexBuffer(
+        HardwareVertexBufferSharedPtr vbuf = getHardwareBufferManager()->createVertexBuffer(
             sizeof( unsigned char ) * 4 + VertexElement::getTypeSize( weightsVertexElemType ),
                 targetVertexData->vertexCount,
                 HardwareBuffer::HBU_STATIC_WRITE_ONLY,
@@ -1417,7 +1423,7 @@ namespace Ogre {
                     prevTexCoordElem->getSource());
             // Now create a new buffer, which includes the previous contents
             // plus extra space for the 3D coords
-            newBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
+            newBuffer = getHardwareBufferManager()->createVertexBuffer(
                 origBuffer->getVertexSize() + 3*sizeof(float),
                 vertexData->vertexCount,
                 origBuffer->getUsage(),

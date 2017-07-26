@@ -817,7 +817,7 @@ namespace Ogre {
 
         // Create / populate vertex buffer
         HardwareVertexBufferSharedPtr vbuf;
-        vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
+        vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             vertexSize,
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
@@ -1013,8 +1013,7 @@ namespace Ogre {
         {
             if (idx32bit)
             {
-                ibuf = HardwareBufferManager::getSingleton().
-                    createIndexBuffer(
+                ibuf = pMesh->getHardwareBufferManager()->createIndexBuffer(
                         HardwareIndexBuffer::IT_32BIT,
                         sm->indexData->indexCount,
                         pMesh->mIndexBufferUsage,
@@ -1029,8 +1028,7 @@ namespace Ogre {
             }
             else // 16-bit
             {
-                ibuf = HardwareBufferManager::getSingleton().
-                    createIndexBuffer(
+                ibuf = pMesh->getHardwareBufferManager()->createIndexBuffer(
                         HardwareIndexBuffer::IT_16BIT,
                         sm->indexData->indexCount,
                         pMesh->mIndexBufferUsage,
@@ -1596,8 +1594,8 @@ namespace Ogre {
                 unsigned int buffIndexCount;
                 readInts(stream, &buffIndexCount, 1);
 
-                indexData->indexBuffer = HardwareBufferManager::getSingleton().
-                    createIndexBuffer(idx32Bit ? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT,
+                indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
+                    idx32Bit ? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT,
                     buffIndexCount, pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
                 void* pIdx = static_cast<unsigned int*>(indexData->indexBuffer->lock(
                     0, indexData->indexBuffer->getSizeInBytes(), HardwareBuffer::HBL_DISCARD));
@@ -2632,7 +2630,7 @@ namespace Ogre {
                 switch(streamID)
                 {
                 case M_ANIMATION_MORPH_KEYFRAME:
-                    readMorphKeyFrame(stream, track);
+                    readMorphKeyFrame(stream, pMesh, track);
                     break;
                 case M_ANIMATION_POSE_KEYFRAME:
                     readPoseKeyFrame(stream, track);
@@ -2654,7 +2652,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl::readMorphKeyFrame(DataStreamPtr& stream, VertexAnimationTrack* track)
+    void MeshSerializerImpl::readMorphKeyFrame(DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track)
     {
         // float time
         float timePos;
@@ -2670,7 +2668,7 @@ namespace Ogre {
         size_t vertexCount = track->getAssociatedVertexData()->vertexCount;
         size_t vertexSize = sizeof(float) * (includesNormals ? 6 : 3);
         HardwareVertexBufferSharedPtr vbuf =
-            HardwareBufferManager::getSingleton().createVertexBuffer(
+            pMesh->getHardwareBufferManager()->createVertexBuffer(
                 vertexSize, vertexCount,
                 HardwareBuffer::HBU_STATIC, true);
         // float x,y,z          // repeat by number of vertices in original geometry
@@ -3029,8 +3027,8 @@ namespace Ogre {
                 // unsigned short*/int* faceIndexes;  ((v1, v2, v3) * numFaces)
                 if (idx32Bit)
                 {
-                    indexData->indexBuffer = HardwareBufferManager::getSingleton().
-                        createIndexBuffer(HardwareIndexBuffer::IT_32BIT, indexData->indexCount,
+                    indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
+                        HardwareIndexBuffer::IT_32BIT, indexData->indexCount,
                         pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
                     unsigned int* pIdx = static_cast<unsigned int*>(
                         indexData->indexBuffer->lock(
@@ -3044,8 +3042,8 @@ namespace Ogre {
                 }
                 else
                 {
-                    indexData->indexBuffer = HardwareBufferManager::getSingleton().
-                        createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexData->indexCount,
+                    indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
+                        HardwareIndexBuffer::IT_16BIT, indexData->indexCount,
                         pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
                     unsigned short* pIdx = static_cast<unsigned short*>(
                         indexData->indexBuffer->lock(
@@ -3248,7 +3246,7 @@ namespace Ogre {
         kf->getVertexBuffer()->unlock();
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl_v1_41::readMorphKeyFrame(DataStreamPtr& stream, VertexAnimationTrack* track)
+    void MeshSerializerImpl_v1_41::readMorphKeyFrame(DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track)
     {
         // float time
         float timePos;
@@ -3259,7 +3257,7 @@ namespace Ogre {
         // Create buffer, allow read and use shadow buffer
         size_t vertexCount = track->getAssociatedVertexData()->vertexCount;
         HardwareVertexBufferSharedPtr vbuf =
-            HardwareBufferManager::getSingleton().createVertexBuffer(
+            pMesh->getHardwareBufferManager()->createVertexBuffer(
                 VertexElement::getTypeSize(VET_FLOAT3), vertexCount,
                 HardwareBuffer::HBU_STATIC, true);
         // float x,y,z          // repeat by number of vertices in original geometry
@@ -4125,7 +4123,7 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf;
         // float* pVertices (x, y, z order x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_FLOAT3, VES_POSITION);
-        vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
+        vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
@@ -4144,7 +4142,7 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf;
         // float* pNormals (x, y, z order x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_FLOAT3, VES_NORMAL);
-        vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
+        vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
@@ -4163,7 +4161,7 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf;
         // unsigned long* pColours (RGBA 8888 format x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_COLOUR, VES_DIFFUSE);
-        vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
+        vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
@@ -4190,7 +4188,7 @@ namespace Ogre {
             VertexElement::multiplyTypeCount(VET_FLOAT1, dim),
             VES_TEXTURE_COORDINATES,
             texCoordSet);
-        vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
+        vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
@@ -4229,7 +4227,7 @@ namespace Ogre {
             VertexElement::multiplyTypeCount(VET_FLOAT1, dim),
             VES_TEXTURE_COORDINATES,
             texCoordSet);
-        vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
+        vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
             pMesh->getVertexBufferUsage(),
