@@ -58,7 +58,7 @@ namespace Ogre {
             if (GL3PlusStateCacheManager* stateCacheManager = mGLSupport->getStateCacheManager())
             {
                 OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &mVAO));
-                mGLSupport->getStateCacheManager()->bindGLVertexArray(0);
+                stateCacheManager->bindGLVertexArray(0);
             }
             mVAO = 0;
         }
