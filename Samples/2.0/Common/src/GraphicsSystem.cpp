@@ -444,56 +444,75 @@ namespace Demo
         cf.load( mResourcePath + "resources2.cfg" );
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        Ogre::String dataFolder = Ogre::macBundlePath() + '/' +
+        Ogre::String rootHlmsFolder = Ogre::macBundlePath() + '/' +
                                   cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
 #else
-        Ogre::String dataFolder = mResourcePath + cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+        Ogre::String rootHlmsFolder = mResourcePath + cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
 #endif
 
-        if( dataFolder.empty() )
-            dataFolder = "./";
-        else if( *(dataFolder.end() - 1) != '/' )
-            dataFolder += "/";
+        if( rootHlmsFolder.empty() )
+            rootHlmsFolder = "./";
+        else if( *(rootHlmsFolder.end() - 1) != '/' )
+            rootHlmsFolder += "/";
 
-        //At this point dataFolder should be a valid path to the Hlms data folder
+        //At this point rootHlmsFolder should be a valid path to the Hlms data folder
+
+        Ogre::HlmsUnlit *hlmsUnlit = 0;
+        Ogre::HlmsPbs *hlmsPbs = 0;
 
         //For retrieval of the paths to the different folders needed
-        Ogre::String dataFolderPath;
+        Ogre::String mainFolderPath;
         Ogre::StringVector libraryFoldersPaths;
-        Ogre::StringVector::const_iterator libraryFolderPathIterator;
+        Ogre::StringVector::const_iterator libraryFolderPathIt;
+        Ogre::StringVector::const_iterator libraryFolderPathEn;
 
-        //Get the path to all the subdirectories used by HlmsUnlit
-        Ogre::HlmsUnlit::getDefaultPaths(dataFolderPath, libraryFoldersPaths);
+        Ogre::ArchiveManager &archiveManager = Ogre::ArchiveManager::getSingleton();
         
-        //Create the Ogre::Archive objects needed
-        Ogre::Archive* archiveUnlit = Ogre::ArchiveManager::getSingletonPtr()->load(dataFolder + dataFolderPath, "FileSystem", true);
-        Ogre::ArchiveVec archiveUnlitLibraryFolders;
-        for(libraryFolderPathIterator = libraryFoldersPaths.begin(); libraryFolderPathIterator != libraryFoldersPaths.end(); ++libraryFolderPathIterator)
         {
-            Ogre::Archive* archiveLibrary = Ogre::ArchiveManager::getSingletonPtr()->load(dataFolder + *libraryFolderPathIterator, "FileSystem", true);
-            archiveUnlitLibraryFolders.push_back(archiveLibrary);
+            //Create & Register HlmsUnlit
+            //Get the path to all the subdirectories used by HlmsUnlit
+            Ogre::HlmsUnlit::getDefaultPaths( mainFolderPath, libraryFoldersPaths );
+            Ogre::Archive *archiveUnlit = archiveManager.load( rootHlmsFolder + mainFolderPath,
+                                                               "FileSystem", true );
+            Ogre::ArchiveVec archiveUnlitLibraryFolders;
+            libraryFolderPathIt = libraryFoldersPaths.begin();
+            libraryFolderPathEn = libraryFoldersPaths.end();
+            while( libraryFolderPathIt != libraryFolderPathEn )
+            {
+                Ogre::Archive *archiveLibrary =
+                        archiveManager.load( rootHlmsFolder + *libraryFolderPathIt, "FileSystem", true );
+                archiveUnlitLibraryFolders.push_back( archiveLibrary );
+                ++libraryFolderPathIt;
+            }
+
+            //Create and register the unlit Hlms
+            hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit( archiveUnlit, &archiveUnlitLibraryFolders );
+            Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsUnlit );
         }
 
-        //Create and register the unlit Hlms
-        Ogre::HlmsUnlit* hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit(archiveUnlit, &archiveUnlitLibraryFolders);
-        Ogre::Root::getSingleton().getHlmsManager()->registerHlms(hlmsUnlit);
-
-        //Do the same for HlmsPbs:
-
-        Ogre::HlmsPbs::getDefaultPaths(dataFolderPath, libraryFoldersPaths);
-        Ogre::Archive* archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(dataFolder + dataFolderPath, "FileSystem", true);
-
-        //Get the library archive(s)
-        Ogre::ArchiveVec archivePbsLibraryFolders;
-        for(libraryFolderPathIterator = libraryFoldersPaths.begin(); libraryFolderPathIterator != libraryFoldersPaths.end(); ++libraryFolderPathIterator)
         {
-            Ogre::Archive* archiveLibrary = Ogre::ArchiveManager::getSingletonPtr()->load(dataFolder + *libraryFolderPathIterator, "FileSystem", true);
-            archivePbsLibraryFolders.push_back(archiveLibrary);
-        }
+            //Create & Register HlmsPbs
+            //Do the same for HlmsPbs:
+            Ogre::HlmsPbs::getDefaultPaths( mainFolderPath, libraryFoldersPaths );
+            Ogre::Archive *archivePbs = archiveManager.load( rootHlmsFolder + mainFolderPath,
+                                                             "FileSystem", true );
 
-        //Create and register
-        Ogre::HlmsPbs* hlmsPbs = OGRE_NEW Ogre::HlmsPbs(archivePbs, &archivePbsLibraryFolders);
-        Ogre::Root::getSingleton().getHlmsManager()->registerHlms(hlmsPbs);
+            //Get the library archive(s)
+            Ogre::ArchiveVec archivePbsLibraryFolders;
+            libraryFolderPathIt = libraryFoldersPaths.begin();
+            libraryFolderPathEn = libraryFoldersPaths.end();
+            while( libraryFolderPathIt != libraryFolderPathEn )
+            {
+                Ogre::Archive *archiveLibrary =
+                        archiveManager.load( rootHlmsFolder + *libraryFolderPathIt, "FileSystem", true );
+                archivePbsLibraryFolders.push_back( archiveLibrary );
+                ++libraryFolderPathIt;
+            }
+
+            //Create and register
+            hlmsPbs = OGRE_NEW Ogre::HlmsPbs( archivePbs, &archivePbsLibraryFolders );
+            Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsPbs );
+        }
 
 
         Ogre::RenderSystem *renderSystem = mRoot->getRenderSystem();
