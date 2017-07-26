@@ -29,27 +29,14 @@
 #define __GLSLProgramManager_H__
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "OgreSingleton.h"
+#include "OgreGLSLProgramManagerCommon.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLProgram.h"
 #include "OgreGLSLExtSupport.h"
 
 namespace Ogre {
 
-    /** Ogre assumes that there are separate programs to deal with but
-        GLSL has one program object that represents the active shader
-        objects during a rendering state.  GLSL shader objects are
-        compiled separately and then attached to a program object and
-        then the program object is linked.  Since Ogre can only handle
-        one program being active in a pass, the GLSL Link Program
-        Manager does the same.  The GLSL Link program manager acts as
-        a state machine and activates a program object based on the
-        active programs.  Previously created program objects are
-        stored along with a unique key in a hash_map for quick
-        retrieval the next time the program object is required.
-    */
-
-    class _OgreGL3PlusExport GLSLProgramManager
+    class _OgreGL3PlusExport GLSLProgramManager : public GLSLProgramManagerCommon
     {
     protected:
         /// Active shader objects defining the active program object.
@@ -62,13 +49,9 @@ namespace Ogre {
 
         GL3PlusRenderSystem* mRenderSystem;
 
-        typedef map<String, GLenum>::type StringToEnumMap;
-        /// 
-        StringToEnumMap mTypeEnumMap;
-
         /**  Convert GL uniform size and type to OGRE constant types
              and associate uniform definitions together. */
-        static void convertGLUniformtoOgreType(GLenum gltype,
+        void convertGLUniformtoOgreType(GLenum gltype,
                                         GpuConstantDefinition& defToUpdate);
         /** Find the data source definition for a given uniform name
             and reference. Return true if found and pair the reference
@@ -94,13 +77,6 @@ namespace Ogre {
             const GpuConstantDefinitionMap* fragmentConstantDefs,
             const GpuConstantDefinitionMap* computeConstantDefs,
             GLAtomicCounterReference& refToUpdate);
-        /** Parse an individual uniform from a GLSL source file and
-            store it in a GpuNamedConstant. */
-        void parseGLSLUniform(
-            const String& src, GpuNamedConstants& defs,
-            String::size_type currPos,
-            const String& filename, GpuSharedParametersPtr sharedParams);
-
     public:
 
         GLSLProgramManager(GL3PlusRenderSystem* renderSystem);

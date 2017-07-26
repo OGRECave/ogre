@@ -228,8 +228,11 @@ namespace Ogre {
                 if (def->variability & mask)
                 {
                     GLsizei glArraySize = (GLsizei)def->arraySize;
+
                     bool shouldUpdate = true;
 
+                    // this is a monolitic program so we can use the cache of any attached shader
+                    GLUniformCache* uniformCache =  mVertexShader->getUniformCache();
                     switch (def->constType)
                     {
                         case GCT_INT1:
@@ -242,14 +245,14 @@ namespace Ogre {
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
-                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
-                                                                                  params->getIntPointer(def->physicalIndex),
-                                                                                  static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
+                            shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
+                                                                       params->getIntPointer(def->physicalIndex),
+                                                                       static_cast<GLsizei>(def->elementSize * glArraySize * sizeof(int)));
                             break;
                         default:
-                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
-                                                                                  params->getFloatPointer(def->physicalIndex),
-                                                                                  static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(float)));
+                            shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
+                                                                       params->getFloatPointer(def->physicalIndex),
+                                                                       static_cast<GLsizei>(def->elementSize * glArraySize * sizeof(float)));
                             break;
                     }
 
@@ -418,11 +421,7 @@ namespace Ogre {
                 // Get the index in the parameter real list
                 if (index == currentUniform->mConstantDef->physicalIndex)
                 {
-                     mUniformCache->updateUniform(currentUniform->mLocation,
-                                                  params->getFloatPointer(index),
-                                                  static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
-                                                  currentUniform->mConstantDef->arraySize *
-                                                  sizeof(float)));
+                    OGRE_CHECK_GL_ERROR(glUniform1fv(currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     // There will only be one multipass entry
                     return;
                 }

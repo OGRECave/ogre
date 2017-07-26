@@ -1458,7 +1458,7 @@ namespace Ogre {
             break;
         }
 
-        activateGLTextureUnit(0);
+        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
@@ -1484,7 +1484,7 @@ namespace Ogre {
         maxAnisotropy = std::min<uint>(mLargestSupportedAnisotropy, maxAnisotropy);
         mStateCacheManager->setTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 
-        activateGLTextureUnit(0);
+        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_render(const RenderOperation& op)
@@ -1578,7 +1578,7 @@ namespace Ogre {
             }
         }
 
-        activateGLTextureUnit(0);
+        mStateCacheManager->activateGLTextureUnit(0);
 
         // Launch compute shader job(s).
         if (mCurrentComputeShader) // && mComputeProgramPosition == CP_PRERENDER && mComputeProgramExecutions <= compute_execution_cap)
@@ -2504,36 +2504,6 @@ namespace Ogre {
                                  GL_DEBUG_SEVERITY_LOW,
                                  static_cast<GLint>(eventName.length()),
                                  eventName.c_str());
-    }
-
-    bool GL3PlusRenderSystem::activateGLTextureUnit(size_t unit)
-    {
-        if (mActiveTextureUnit != unit)
-        {
-            if (unit < getCapabilities()->getNumTextureUnits())
-            {
-                OGRE_CHECK_GL_ERROR(glActiveTexture(static_cast<uint32>(GL_TEXTURE0 + unit)));
-                mActiveTextureUnit = static_cast<GLenum>(unit);
-                return true;
-            }
-            else if (!unit)
-            {
-                //FIXME If the above case fails, should this case ever be taken?
-                // Also switch to (unit == number) unless not operation is actually
-                // faster on some architectures.
-
-                // Always OK to use the first unit.
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return true;
-        }
     }
 
     void GL3PlusRenderSystem::bindVertexElementToGpu( const VertexElement &elem,

@@ -464,6 +464,7 @@ protected:
 		if(mTerrainPaging)
 		{
 			OGRE_DELETE mTerrainPaging;
+			mPageManager->removeCamera(mCamera);
 			mPageManager->destroyWorld( mPagedWorld );
 			OGRE_DELETE mPageManager;
 		}

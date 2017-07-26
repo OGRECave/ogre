@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreRenderOperation.h"
+#include "OgreGLUniformCache.h"
 
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to provide support for OpenGL
@@ -142,6 +143,9 @@ namespace Ogre {
         /// Get the OGRE assigned shader ID.
         uint getShaderID(void) const { return mShaderID; }
 
+        /// Get the uniform cache for this shader
+        GLUniformCache*    getUniformCache(){return &mUniformCache;}
+
         /// Command object for setting macro defines
         class CmdPreprocessorDefines : public ParamCommand
         {
@@ -212,6 +216,9 @@ namespace Ogre {
 
         /// OGRE assigned shader ID.
         uint mShaderID;
+
+        /// Pointer to the uniform cache for this shader
+        GLUniformCache    mUniformCache;
 
         /// Keep track of the number of shaders created.
         static uint mShaderCount;

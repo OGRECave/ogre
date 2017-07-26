@@ -145,7 +145,6 @@ namespace Ogre {
         GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
-        bool activateGLTextureUnit(size_t unit);
         void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
                                      const size_t vertexStart,
                                      vector<GLuint>::type &attribsBound,

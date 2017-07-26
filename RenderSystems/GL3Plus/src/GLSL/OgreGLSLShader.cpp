@@ -90,9 +90,6 @@ namespace Ogre {
         
         // There is nothing to load
         mLoadFromFile = false;
-
-        // Create the uniform cache
-        mUniformCache = new GLUniformCache();
     }
 
     GLSLShader::~GLSLShader()
@@ -107,9 +104,6 @@ namespace Ogre {
         {
             unloadHighLevel();
         }
-
-        delete mUniformCache;
-        mUniformCache= 0;
     }
 
     bool GLSLShader::compile(bool checkErrors)
