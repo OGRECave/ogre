@@ -135,7 +135,7 @@ namespace Ogre
         uint16 getEsmK(void) const                          { return mEsmK; }
 
         /// @copydoc HlmsPbs::getDefaultPaths
-        static void getDefaultPaths(String& outDataFolderPath, StringVector& outLibraryFoldersPaths);
+        static void getDefaultPaths( String& outDataFolderPath, StringVector& outLibraryFoldersPaths );
 
 #if !OGRE_NO_JSON
 		/// @copydoc Hlms::_loadJson
