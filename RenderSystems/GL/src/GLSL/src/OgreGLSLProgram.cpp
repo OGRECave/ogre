@@ -145,8 +145,8 @@ namespace Ogre {
 
         // Therefore instead, parse the source code manually and extract the uniforms
         createParameterMappingStructures(true);
-        GLSLLinkProgramManager::getSingleton().extractConstantDefs(
-            mSource, *mConstantDefs.get(), mName);
+        GLSLLinkProgramManager::getSingleton().extractUniformsFromGLSL(
+            mSource, *mConstantDefs, mName);
 
         // Also parse any attached sources
         for (GLSLProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
@@ -154,8 +154,8 @@ namespace Ogre {
         {
             GLSLShaderCommon* childShader = *i;
 
-            GLSLLinkProgramManager::getSingleton().extractConstantDefs(
-                childShader->getSource(), *mConstantDefs.get(), childShader->getName());
+            GLSLLinkProgramManager::getSingleton().extractUniformsFromGLSL(
+                childShader->getSource(), *mConstantDefs, childShader->getName());
 
         }
     }

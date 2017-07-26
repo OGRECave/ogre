@@ -76,8 +76,8 @@ namespace Ogre {
             calling this if that's what you want).  
             @param filename The file name this came from, for logging errors.
         */
-        //void extractUniformsFromGLSL(
-        //    const String& src, GpuNamedConstants& constantDefs, const String& filename);
+        void extractUniformsFromGLSL(
+            const String& src, GpuNamedConstants& constantDefs, const String& filename);
     };
 
 }

@@ -167,4 +167,104 @@ namespace Ogre {
             }
         }
     }
+
+    void GLSLProgramManagerCommon::extractUniformsFromGLSL(const String& src,
+        GpuNamedConstants& defs, const String& filename)
+    {
+        // Parse the output string and collect all uniforms
+        // NOTE this relies on the source already having been preprocessed
+        // which is done in GLSLESProgram::loadFromSource
+        String line;
+        String::size_type currPos = src.find("uniform");
+        while (currPos != String::npos)
+        {
+            // Now check for using the word 'uniform' in a larger string & ignore
+            bool inLargerString = false;
+            if (currPos != 0)
+            {
+                char prev = src.at(currPos - 1);
+                if (prev != ' ' && prev != '\t' && prev != '\r' && prev != '\n'
+                    && prev != ';')
+                    inLargerString = true;
+            }
+            if (!inLargerString && currPos + 7 < src.size())
+            {
+                char next = src.at(currPos + 7);
+                if (next != ' ' && next != '\t' && next != '\r' && next != '\n')
+                    inLargerString = true;
+            }
+
+            // skip 'uniform'
+            currPos += 7;
+
+            if (!inLargerString)
+            {
+                String::size_type endPos;
+                String typeString;
+                GpuSharedParametersPtr blockSharedParams;
+
+                // Check for a type. If there is one, then the semicolon is missing
+                // otherwise treat as if it is a uniform block
+                String::size_type lineEndPos = src.find_first_of("\n\r", currPos);
+                line = src.substr(currPos, lineEndPos - currPos);
+                StringVector parts = StringUtil::split(line, " \t");
+
+                // Skip over precision keywords
+                if(StringUtil::match((parts.front()), "lowp") ||
+                   StringUtil::match((parts.front()), "mediump") ||
+                   StringUtil::match((parts.front()), "highp"))
+                    typeString = parts[1];
+                else
+                    typeString = parts[0];
+
+                StringToEnumMap::iterator typei = mTypeEnumMap.find(typeString);
+                if (typei == mTypeEnumMap.end())
+                {
+                    // Gobble up the external name
+                    String externalName = parts.front();
+
+                    // Now there should be an opening brace
+                    String::size_type openBracePos = src.find("{", currPos);
+                    if (openBracePos != String::npos)
+                    {
+                        currPos = openBracePos + 1;
+                    }
+                    else
+                    {
+                        LogManager::getSingleton().logMessage("Missing opening brace in GLSL Uniform Block in file "
+                                                              + filename);
+                        break;
+                    }
+
+                    // First we need to find the internal name for the uniform block
+                    String::size_type endBracePos = src.find("}", currPos);
+
+                    // Find terminating semicolon
+                    currPos = endBracePos + 1;
+                    endPos = src.find(";", currPos);
+                    if (endPos == String::npos)
+                    {
+                        // problem, missing semicolon, abort
+                        break;
+                    }
+                }
+                else
+                {
+                    // find terminating semicolon
+                    endPos = src.find(";", currPos);
+                    if (endPos == String::npos)
+                    {
+                        // problem, missing semicolon, abort
+                        break;
+                    }
+
+                    parseGLSLUniform(src, defs, currPos, filename, blockSharedParams);
+                }
+                line = src.substr(currPos, endPos - currPos);
+            } // not commented or a larger symbol
+
+            // Find next one
+            currPos = src.find("uniform", currPos);
+        }
+    }
 }

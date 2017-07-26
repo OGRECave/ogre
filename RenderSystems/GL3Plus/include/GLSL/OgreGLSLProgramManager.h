@@ -97,16 +97,6 @@ namespace Ogre {
             SharedParamsBufferMap& sharedParamsBufferMap,
             //GLShaderStorageBufferList& shaderStorageBufferList,
             GLCounterBufferList& counterBufferList);
-        /** Populate a list of uniforms based on GLSL source and store
-            them in GpuNamedConstants.  
-            @param src Reference to the source code.
-            @param constantDefs The defs to populate (will
-            not be cleared before adding, clear it yourself before
-            calling this if that's what you want).  
-            @param filename The file name this came from, for logging errors.
-        */
-        void extractUniformsFromGLSL(
-            const String& src, GpuNamedConstants& constantDefs, const String& filename);
 
         GL3PlusStateCacheManager* getStateCacheManager();
     };
