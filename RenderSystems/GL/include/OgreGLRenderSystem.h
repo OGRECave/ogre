@@ -134,10 +134,6 @@ namespace Ogre {
         GLGpuProgram* mCurrentFragmentProgram;
         GLGpuProgram* mCurrentGeometryProgram;
 
-        /* The main GL context - main thread only */
-        GLContext *mMainContext;
-        /* The current GL context  - main thread only */
-        GLContext *mCurrentContext;
         typedef list<GLContext*>::type GLContextList;
         /// List of background thread contexts
         GLContextList mBackgroundContextList;
@@ -386,10 +382,7 @@ namespace Ogre {
             GLContext.
          */
         void _unregisterContext(GLContext *context);
-        /** Returns the main context */
-        GLContext* _getMainContext() { return mMainContext; }
 
-        GLContext* _getCurrentContext() { return mCurrentContext; }
         GLStateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
 
         /// @copydoc RenderSystem::getDisplayMonitorCount

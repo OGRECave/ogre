@@ -75,12 +75,6 @@ namespace Ogre {
 
             /// State cache manager which responsible to reduce redundant state changes
             GLES2StateCacheManager* mStateCacheManager;
-            
-            /* The main GL context - main thread only */
-            GLContext *mMainContext;
-
-            /* The current GL context  - main thread only */
-            GLContext *mCurrentContext;
 
             typedef list<GLContext*>::type GLContextList;
             /// List of background thread contexts
@@ -267,10 +261,6 @@ namespace Ogre {
             bool hasMinGLVersion(int major, int minor) const;
             bool checkExtension(const String& ext) const;
         
-            /** Returns the main context */
-            GLContext* _getMainContext() { return mMainContext; }
-        
-            GLContext* _getCurrentContext() { return mCurrentContext; }
             GLES2StateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
         
             /** Unregister a render target->context mapping. If the context of target 

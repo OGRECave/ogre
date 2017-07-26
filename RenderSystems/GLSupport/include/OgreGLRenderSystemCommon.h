@@ -37,6 +37,12 @@ namespace Ogre {
 
     class _OgreGLExport GLRenderSystemCommon : public RenderSystem
     {
+    protected:
+        /* The main GL context - main thread only */
+        GLContext* mMainContext;
+
+        /* The current GL context  - main thread only */
+        GLContext* mCurrentContext;
     public:
         virtual ~GLRenderSystemCommon() {}
 
@@ -45,7 +51,9 @@ namespace Ogre {
                                            RenderWindow::FrameBuffer buffer) = 0;
 
         /** Returns the main context */
-        virtual GLContext* _getMainContext() = 0;
+        GLContext* _getMainContext() {
+            return mMainContext;
+        }
 
         /** Unregister a render target->context mapping. If the context of target
             is the current context, change the context to the main context so it

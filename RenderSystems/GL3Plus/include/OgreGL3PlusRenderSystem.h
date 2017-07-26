@@ -89,12 +89,6 @@ namespace Ogre {
         /// GL support class, used for creating windows etc.
         GL3PlusSupport *mGLSupport;
 
-        /* The main GL context - main thread only */
-        GL3PlusContext *mMainContext;
-
-        /* The current GL context  - main thread only */
-        GL3PlusContext *mCurrentContext;
-
         typedef list<GL3PlusContext*>::type GL3PlusContextList;
         /// List of background thread contexts
         GL3PlusContextList mBackgroundContextList;
@@ -313,10 +307,6 @@ namespace Ogre {
         bool hasMinGLVersion(int major, int minor) const;
         bool checkExtension(const String& ext) const;
 
-        /** Returns the main context */
-        GL3PlusContext* _getMainContext() { return mMainContext; }
-
-        GL3PlusContext* _getCurrentContext() { return mCurrentContext; }
         GL3PlusStateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
 
         /** Unregister a render target->context mapping. If the context of target
