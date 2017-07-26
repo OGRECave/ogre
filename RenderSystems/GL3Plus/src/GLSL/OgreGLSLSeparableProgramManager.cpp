@@ -47,8 +47,8 @@ namespace Ogre
     }
 
 
-    GLSLSeparableProgramManager::GLSLSeparableProgramManager(const GL3PlusSupport& support) :
-        GLSLProgramManager(support), mActiveSeparableProgram(NULL) { }
+    GLSLSeparableProgramManager::GLSLSeparableProgramManager(GL3PlusRenderSystem* renderSystem) :
+        GLSLProgramManager(renderSystem), mActiveSeparableProgram(NULL) { }
 
 
     GLSLSeparableProgramManager::~GLSLSeparableProgramManager(void)

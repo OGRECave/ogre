@@ -45,12 +45,9 @@ namespace Ogre {
     * Implementation of GL 3 as a rendering system.
     *  @{
     */
-    class GL3PlusSupport;
     class GLSLShaderManager;
     class GLSLShaderFactory;
     class HardwareBufferManager;
-
-    class GL3PlusStateCacheManager;
 
     /**
        Implementation of GL 3 as a rendering system.
@@ -125,12 +122,6 @@ namespace Ogre {
 
         /// Check if the GL system has already been initialised
         bool mGLInitialised;
-
-        // check if GL 4.3 is supported
-        bool mHasGL43;
-
-        // check if GL 3.2 is supported
-        bool mHasGL32;
 
         // local data members of _render that were moved here to improve performance
         // (save allocations)
@@ -320,8 +311,15 @@ namespace Ogre {
         // ----------------------------------
         // GL3PlusRenderSystem specific members
         // ----------------------------------
+        bool hasMinGLVersion(int major, int minor) const;
+        bool checkExtension(const String& ext) const;
+
         /** Returns the main context */
         GL3PlusContext* _getMainContext() { return mMainContext; }
+
+        GL3PlusContext* _getCurrentContext() { return mCurrentContext; }
+        GL3PlusStateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
+
         /** Unregister a render target->context mapping. If the context of target
             is the current context, change the context to the main context so it
             can be destroyed safely.

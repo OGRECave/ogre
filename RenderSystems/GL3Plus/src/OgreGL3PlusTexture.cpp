@@ -41,9 +41,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
     GL3PlusTexture::GL3PlusTexture(ResourceManager* creator, const String& name,
                                    ResourceHandle handle, const String& group, bool isManual,
-                                   ManualResourceLoader* loader, GL3PlusSupport& support)
+                                   ManualResourceLoader* loader, GL3PlusRenderSystem* renderSystem)
         : GLTextureCommon(creator, name, handle, group, isManual, loader),
-          mGLSupport(support)
+          mRenderSystem(renderSystem)
     {
         mMipmapsHardwareGenerated = true;
     }
@@ -117,45 +117,42 @@ namespace Ogre {
 
         // Bind texture object to its type, making it the active texture object
         // for that type.
-        mGLSupport.getStateCacheManager()->bindGLTexture( texTarget, mTextureID );
+        mRenderSystem->_getStateCacheManager()->bindGLTexture( texTarget, mTextureID );
 
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0);
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
 
         // Set some misc default parameters, these can of course be changed later.
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                             GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                             GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        bool hasGL33 = mGLSupport.hasMinGLVersion(3, 3);
-        bool hasGL42 = mGLSupport.hasMinGLVersion(4, 2);
-
         // Set up texture swizzling.
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	
-        if (PixelUtil::isLuminance(mFormat) && (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || hasGL33))
+        if (PixelUtil::isLuminance(mFormat) && (mRenderSystem->hasMinGLVersion(3, 3) || mRenderSystem->checkExtension("GL_ARB_texture_swizzle")))
         {
             if (PixelUtil::getComponentCount(mFormat) == 2)
             {
-                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
-                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED);
-                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
-                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_GREEN);
+                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
+                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED);
+                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
+                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_GREEN);
             }
             else
             {
-                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
-                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED);
-                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
-                mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
+                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED);
+                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
+                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE);
             }
         }
 
@@ -245,7 +242,7 @@ namespace Ogre {
         }
         else
         {
-            if (mGLSupport.checkExtension("GL_ARB_texture_storage") || hasGL42)
+            if (mRenderSystem->hasMinGLVersion(4, 2) || mRenderSystem->checkExtension("GL_ARB_texture_storage"))
             {
                 switch(mTextureType)
                 {
@@ -387,7 +384,7 @@ namespace Ogre {
     void GL3PlusTexture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();
-        if (GL3PlusStateCacheManager* stateCacheManager = mGLSupport.getStateCacheManager())
+        if (GL3PlusStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
         {
             OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
             stateCacheManager->invalidateStateForTexture(mTextureID);
@@ -491,7 +488,7 @@ namespace Ogre {
         //         mLayered.find('all') != str::npos ? GL_TRUE : GL_FALSE, mLayer,
         //         mImageAccess (READ, WRITE, READ_WRITE), 
         //         toImageFormat(mFormatInShader))); //GL_RGBA8)); //GL_R32UI)); GL_READ_WRITE
-        if (mGLSupport.checkExtension("GL_ARB_shader_image_load_store") || mGLSupport.hasMinGLVersion(4, 2))
+        if (mRenderSystem->hasMinGLVersion(4, 2) || mRenderSystem->checkExtension("GL_ARB_shader_image_load_store"))
         {
             OGRE_CHECK_GL_ERROR(glBindImageTexture(bindPoint, mTextureID, mipmapLevel, isArrayTexture, textureArrayIndex, GlAccess, GlFormat));
         }

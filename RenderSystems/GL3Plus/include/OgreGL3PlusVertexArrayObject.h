@@ -43,7 +43,7 @@ namespace Ogre {
         bool mInitialised;
 
     protected:
-        GL3PlusSupport* mGLSupport;
+        GL3PlusRenderSystem* mRenderSystem;
 
     public:
         GL3PlusVertexArrayObject();

@@ -32,7 +32,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreTextureManager.h"
 #include "OgreGL3PlusTexture.h"
-#include "OgreGL3PlusSupport.h"
 
 #include <vector>
 
@@ -44,7 +43,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusTextureManager : public TextureManager
     {
     public:
-        GL3PlusTextureManager(GL3PlusSupport& support);
+        GL3PlusTextureManager(GL3PlusRenderSystem* renderSystem);
         virtual ~GL3PlusTextureManager();
 
         GLuint getWarningTextureID() { return mWarningTextureID; }
@@ -72,7 +71,7 @@ namespace Ogre {
         /// Internal method to create a warning texture (bound when a texture unit is blank)
         void createWarningTexture();
 
-        GL3PlusSupport& mGLSupport;
+        GL3PlusRenderSystem* mRenderSystem;
         GLuint mWarningTextureID;
 
     private:

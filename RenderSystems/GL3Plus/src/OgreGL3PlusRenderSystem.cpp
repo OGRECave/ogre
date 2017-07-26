@@ -27,6 +27,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusRenderSystem.h"
+#include "OgreGL3PlusSupport.h"
 
 #include "OgreGLUtil.h"
 #include "OgreRenderSystem.h"
@@ -218,6 +219,16 @@ namespace Ogre {
         return mGLSupport->validateConfig();
     }
 
+    bool GL3PlusRenderSystem::hasMinGLVersion(int major, int minor) const
+    {
+        return mGLSupport->hasMinGLVersion(major, minor);
+    }
+
+    bool GL3PlusRenderSystem::checkExtension(const String& ext) const
+    {
+        return mGLSupport->checkExtension(ext);
+    }
+
     RenderWindow* GL3PlusRenderSystem::_initialise(bool autoCreateWindow,
                                                    const String& windowTitle)
     {
@@ -245,12 +256,6 @@ namespace Ogre {
         rsc->setRenderSystemName(getName());
         rsc->parseVendorFromString(mGLSupport->getGLVendor());
 
-        bool hasGL31 = mGLSupport->hasMinGLVersion(3, 1);
-        bool hasGL33 = mGLSupport->hasMinGLVersion(3, 3);
-        bool hasGL40 = mGLSupport->hasMinGLVersion(4, 0);
-        bool hasGL41 = mGLSupport->hasMinGLVersion(4, 1);
-        bool hasGL42 = mGLSupport->hasMinGLVersion(4, 2);
-
         // Check for hardware mipmapping support.
         rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
@@ -264,7 +269,7 @@ namespace Ogre {
         rsc->setNumTextureUnits(std::min<ushort>(16, units));
 
         // Check for Anisotropy support
-        if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
+        if (checkExtension("GL_EXT_texture_filter_anisotropic"))
         {
             GLfloat maxAnisotropy = 0;
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy));
@@ -301,19 +306,19 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 
         // Check for dxt compression
-        if (mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc"))
+        if (checkExtension("GL_EXT_texture_compression_s3tc"))
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
         }
 
         // Check for etc compression
-        if (mGLSupport->checkExtension("GL_ARB_ES3_compatibility") || mHasGL43)
+        if (hasMinGLVersion(4, 3) || checkExtension("GL_ARB_ES3_compatibility"))
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC2);
         }
 
         // Check for vtc compression
-        if (mGLSupport->checkExtension("GL_NV_texture_compression_vtc"))
+        if (checkExtension("GL_NV_texture_compression_vtc"))
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_VTC);
         }
@@ -322,7 +327,7 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
 
         // BPTC(BC6H/BC7) is supported by the extension or OpenGL 4.2 or higher
-        if (mGLSupport->checkExtension("GL_ARB_texture_compression_bptc") || hasGL42)
+        if (hasMinGLVersion(4, 2) || checkExtension("GL_ARB_texture_compression_bptc"))
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         }
@@ -347,12 +352,11 @@ namespace Ogre {
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
         // Check for non-power-of-2 texture support
-        if (mGLSupport->checkExtension("GL_ARB_texture_rectangle") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") ||
-                hasGL31)
+        if (hasMinGLVersion(3, 1) || checkExtension("GL_ARB_texture_rectangle") || checkExtension("GL_ARB_texture_non_power_of_two"))
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
         // Check for atomic counter support
-        if (mGLSupport->checkExtension("GL_ARB_shader_atomic_counters") || hasGL42)
+        if (hasMinGLVersion(4, 2) || checkExtension("GL_ARB_shader_atomic_counters"))
             rsc->setCapability(RSC_ATOMIC_COUNTERS);
 
         // Scissor test is standard
@@ -406,7 +410,7 @@ namespace Ogre {
             rsc->addShaderProfile("glsl130");
 
         // FIXME: This isn't working right yet in some rarer cases
-        if (mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || hasGL41) {
+        if (hasMinGLVersion(4, 1) || checkExtension("GL_ARB_separate_shader_objects")) {
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
             rsc->setCapability(RSC_GLSL_SSO_REDECLARE);
         }
@@ -429,7 +433,7 @@ namespace Ogre {
         rsc->setFragmentProgramConstantIntCount((Ogre::ushort)constantCount);
 
         // Geometry Program Properties
-        if(mHasGL32 || mGLSupport->checkExtension("ARB_geometry_shader4")) {
+        if (hasMinGLVersion(3, 2) || checkExtension("ARB_geometry_shader4")) {
             rsc->setCapability(RSC_GEOMETRY_PROGRAM);
 
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
@@ -446,7 +450,7 @@ namespace Ogre {
         }
 
         // Tessellation Program Properties
-        if (mGLSupport->checkExtension("GL_ARB_tessellation_shader") || hasGL40)
+        if (hasMinGLVersion(4, 0) || checkExtension("GL_ARB_tessellation_shader"))
         {
             rsc->setCapability(RSC_TESSELLATION_HULL_PROGRAM);
             rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
@@ -469,7 +473,7 @@ namespace Ogre {
         }
 
         // Compute Program Properties
-        if (mGLSupport->checkExtension("GL_ARB_compute_shader") || mHasGL43)
+        if (hasMinGLVersion(4, 3) || checkExtension("GL_ARB_compute_shader"))
         {
             rsc->setCapability(RSC_COMPUTE_PROGRAM);
 
@@ -484,7 +488,7 @@ namespace Ogre {
             // OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &workgroupInvocations));
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || hasGL41)
+        if (hasMinGLVersion(4, 1) || checkExtension("GL_ARB_get_program_binary"))
         {
             GLint formats = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
@@ -493,7 +497,7 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || hasGL33)
+        if (hasMinGLVersion(3, 3) || checkExtension("GL_ARB_instanced_arrays"))
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
@@ -517,7 +521,7 @@ namespace Ogre {
         // Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
 
-        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
+        if (hasMinGLVersion(4, 3) || checkExtension("GL_KHR_debug"))
             rsc->setCapability(RSC_DEBUG);
 
         return rsc;
@@ -535,7 +539,7 @@ namespace Ogre {
         mShaderManager = OGRE_NEW GLSLShaderManager();
 
         // Create GLSL shader factory
-        mGLSLShaderFactory = new GLSLShaderFactory(*mGLSupport);
+        mGLSLShaderFactory = new GLSLShaderFactory(this);
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLShaderFactory);
 
         // Use VBO's by default
@@ -544,7 +548,7 @@ namespace Ogre {
         // Use FBO's for RTT, PBuffers and Copy are no longer supported
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL3+: Using FBOs for rendering to textures");
-        mRTTManager = new GL3PlusFBOManager(*mGLSupport);
+        mRTTManager = new GL3PlusFBOManager(this);
         caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
         Log* defaultLog = LogManager::getSingleton().getDefaultLog();
@@ -554,7 +558,7 @@ namespace Ogre {
         }
 
         // Create the texture manager
-        mTextureManager = new GL3PlusTextureManager(*mGLSupport);
+        mTextureManager = new GL3PlusTextureManager(this);
 
         if (caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
         {
@@ -1952,7 +1956,6 @@ namespace Ogre {
         mCurrentContext->setCurrent();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GL3PlusStateCacheManager>();
-        mGLSupport->setStateCacheManager(mStateCacheManager);
 
         // Check if the context has already done one-time initialisation
         if (!mCurrentContext->getInitialized())
@@ -2001,7 +2004,6 @@ namespace Ogre {
                 mCurrentContext = 0;
                 mMainContext = 0;
                 mStateCacheManager = 0;
-                mGLSupport->setStateCacheManager(0);
             }
         }
     }
@@ -2020,18 +2022,18 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Using FSAA.");
         }
 
-     	if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
+        if (checkExtension("GL_EXT_texture_filter_anisotropic"))
         {
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map") || mHasGL32)
+        if (hasMinGLVersion(3, 2) || checkExtension("GL_ARB_seamless_cube_map"))
         {
             // Enable seamless cube maps
             OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_provoking_vertex") || mHasGL32)
+        if (hasMinGLVersion(3, 2) || checkExtension("GL_ARB_provoking_vertex"))
         {
             // Set provoking vertex convention
             OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
@@ -2070,10 +2072,6 @@ namespace Ogre {
         mGLSupport->initialiseExtensions();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GL3PlusStateCacheManager>();
-        mGLSupport->setStateCacheManager(mStateCacheManager);
-
-        mHasGL32 = mGLSupport->hasMinGLVersion(3, 2);
-        mHasGL43 = mGLSupport->hasMinGLVersion(4, 3);
 
         LogManager::getSingleton().logMessage("**************************************");
         LogManager::getSingleton().logMessage("***   OpenGL 3+ Renderer Started   ***");

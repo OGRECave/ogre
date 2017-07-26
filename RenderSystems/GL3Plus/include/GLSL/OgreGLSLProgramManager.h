@@ -60,7 +60,7 @@ namespace Ogre {
         GLSLShader* mActiveFragmentShader;
         GLSLShader* mActiveComputeShader;
 
-        const GL3PlusSupport& mGLSupport;
+        GL3PlusRenderSystem* mRenderSystem;
 
         typedef map<String, GLenum>::type StringToEnumMap;
         /// 
@@ -103,7 +103,7 @@ namespace Ogre {
 
     public:
 
-        GLSLProgramManager(const GL3PlusSupport& support);
+        GLSLProgramManager(GL3PlusRenderSystem* renderSystem);
 
         /** Populate a list of uniforms based on an OpenGL program object.
         */
@@ -132,7 +132,7 @@ namespace Ogre {
         void extractUniformsFromGLSL(
             const String& src, GpuNamedConstants& constantDefs, const String& filename);
 
-        const GL3PlusSupport& getGLSupportRef() {return mGLSupport;}
+        GL3PlusStateCacheManager* getStateCacheManager();
     };
 
 }

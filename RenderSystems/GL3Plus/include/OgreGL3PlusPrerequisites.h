@@ -38,8 +38,9 @@ namespace Ogre {
     class GLRTTManager;
     typedef GLContext GL3PlusContext;
     typedef GLRTTManager GL3PlusRTTManager;
-    class GL3PlusSupport;
     class GL3PlusRenderSystem;
+    class GL3PlusStateCacheManager;
+    class GL3PlusSupport;
     class GL3PlusTexture;
     class GL3PlusTextureManager;
     class GL3PlusFBOManager;

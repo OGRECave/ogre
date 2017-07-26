@@ -71,7 +71,7 @@ namespace Ogre {
 
     public:
 
-        GLSLMonolithicProgramManager(const GL3PlusSupport& support);
+        GLSLMonolithicProgramManager(GL3PlusRenderSystem* renderSystem);
 
         ~GLSLMonolithicProgramManager(void);
 

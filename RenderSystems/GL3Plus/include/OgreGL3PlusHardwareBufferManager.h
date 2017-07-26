@@ -31,12 +31,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGL3PlusSupport.h"
 
 namespace Ogre {
 
-
-    class GL3PlusStateCacheManager;
 
     // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
     //TODO Double check that this still holds.
@@ -46,7 +43,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
     protected:
-        GL3PlusSupport* mGLSupport;
+        GL3PlusRenderSystem* mRenderSystem;
         char* mScratchBufferPool;
         OGRE_MUTEX(mScratchMutex);
         size_t mMapBufferThreshold;
@@ -82,7 +79,7 @@ namespace Ogre {
         /// Utility function to get the correct GL type based on VET's
         static GLenum getGLType(VertexElementType type);
 
-        GL3PlusStateCacheManager * getStateCacheManager() { return mGLSupport->getStateCacheManager(); }
+        GL3PlusStateCacheManager * getStateCacheManager();
 
         /** Allocator method to allow us to use a pool of memory as a scratch
             area for hardware buffers. This is because glMapBuffer is incredibly

@@ -47,7 +47,7 @@ namespace Ogre {
                                                            HardwareBuffer::Usage usage)
         : GLHardwarePixelBufferCommon(inWidth, inHeight, inDepth, inFormat, usage)
     {
-        mGLSupport = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef();
+        mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
     }
 
     void GL3PlusHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
@@ -146,7 +146,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &mRenderbufferID));
 
         // Bind it to FBO
-        mGLSupport->getStateCacheManager()->bindGLRenderBuffer( mRenderbufferID );
+        mRenderSystem->_getStateCacheManager()->bindGLRenderBuffer( mRenderbufferID );
 
         // Allocate storage for depth buffer
         if (numSamples > 0)
@@ -164,7 +164,7 @@ namespace Ogre {
     GL3PlusRenderBuffer::~GL3PlusRenderBuffer()
     {
         // Delete renderbuffer
-        if(GL3PlusStateCacheManager* stateCacheManager = mGLSupport->getStateCacheManager())
+        if(GL3PlusStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
             stateCacheManager->deleteGLRenderBuffer(mRenderbufferID);
     }
 

@@ -53,7 +53,7 @@ namespace Ogre {
         : mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
 
-        mGLSupport = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef();
+        mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
 
         // Init scratch pool
         // TODO make it a configurable size?
@@ -75,6 +75,11 @@ namespace Ogre {
 
         OGRE_FREE_ALIGN(mScratchBufferPool, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT);
     }
+
+	GL3PlusStateCacheManager * GL3PlusHardwareBufferManagerBase::getStateCacheManager()
+	{
+		return mRenderSystem->_getStateCacheManager();
+	}
 
     HardwareVertexBufferSharedPtr
     GL3PlusHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize,

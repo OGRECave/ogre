@@ -29,12 +29,12 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusTextureManager.h"
 #include "OgreGL3PlusRenderTexture.h"
 #include "OgreGL3PlusStateCacheManager.h"
+#include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 
 namespace Ogre {
-    GL3PlusTextureManager::GL3PlusTextureManager(GL3PlusSupport& support)
-        : TextureManager(), mGLSupport(support), mWarningTextureID(0)//, mImages()
+    GL3PlusTextureManager::GL3PlusTextureManager(GL3PlusRenderSystem* renderSystem)
+        : TextureManager(), mRenderSystem(renderSystem), mWarningTextureID(0)//, mImages()
     {
         // Register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
@@ -48,7 +48,7 @@ namespace Ogre {
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
 
         // Delete warning texture
-        if (GL3PlusStateCacheManager* stateCacheManager = mGLSupport.getStateCacheManager())
+        if (GL3PlusStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
         {
             OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mWarningTextureID));
             stateCacheManager->invalidateStateForTexture(mWarningTextureID);
@@ -60,7 +60,7 @@ namespace Ogre {
                                                 ManualResourceLoader* loader,
                                                 const NameValuePairList* createParams)
     {
-        return new GL3PlusTexture(this, name, handle, group, isManual, loader, mGLSupport);
+        return new GL3PlusTexture(this, name, handle, group, isManual, loader, mRenderSystem);
     }
 
 
@@ -103,7 +103,7 @@ namespace Ogre {
 
         // Create GL resource
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mWarningTextureID));
-        mGLSupport.getStateCacheManager()->bindGLTexture( GL_TEXTURE_2D, mWarningTextureID );
+        mRenderSystem->_getStateCacheManager()->bindGLTexture( GL_TEXTURE_2D, mWarningTextureID );
         OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, (void*)data));

@@ -41,17 +41,17 @@ namespace Ogre
     String GLSLShaderFactory::mLanguageName = "glsl";
     
 
-    GLSLShaderFactory::GLSLShaderFactory(const GL3PlusSupport& support)
+    GLSLShaderFactory::GLSLShaderFactory(GL3PlusRenderSystem* renderSystem)
     {
         if (mMonolithicProgramManager == NULL)
         {
-            mMonolithicProgramManager = new GLSLMonolithicProgramManager(support);
+            mMonolithicProgramManager = new GLSLMonolithicProgramManager(renderSystem);
         }
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             if (mSeparableProgramManager == NULL)
             {
-                mSeparableProgramManager = new GLSLSeparableProgramManager(support);
+                mSeparableProgramManager = new GLSLSeparableProgramManager(renderSystem);
             }
         }
     }

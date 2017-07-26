@@ -30,7 +30,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #define __GL3PlusTexture_H__
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "OgreGL3PlusSupport.h"
 #include "OgrePlatform.h"
 #include "OgreRenderTexture.h"
 #include "OgreGLTextureCommon.h"
@@ -43,7 +42,7 @@ namespace Ogre {
         // Constructor
         GL3PlusTexture(ResourceManager* creator, const String& name, ResourceHandle handle,
                        const String& group, bool isManual, ManualResourceLoader* loader,
-                       GL3PlusSupport& support);
+                       GL3PlusRenderSystem* renderSystem);
 
         virtual ~GL3PlusTexture();
 
@@ -69,7 +68,7 @@ namespace Ogre {
         void _createSurfaceList();
 
     private:
-        GL3PlusSupport& mGLSupport;
+        GL3PlusRenderSystem* mRenderSystem;
     };
 }
 

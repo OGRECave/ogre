@@ -34,7 +34,6 @@
 #include "OgreGLUtil.h"
 #include "OgreLogManager.h"
 #include "OgreGLUniformCache.h"
-#include "OgreGL3PlusSupport.h"
 #include "OgreGL3PlusStateCacheManager.h"
 
 namespace Ogre
@@ -301,7 +300,7 @@ namespace Ogre
 
         if (mLinked)
         {
-            GLSLSeparableProgramManager::getSingleton().getGLSupportRef().getStateCacheManager()->bindGLProgramPipeline(mGLProgramPipelineHandle);
+            GLSLSeparableProgramManager::getSingleton().getStateCacheManager()->bindGLProgramPipeline(mGLProgramPipelineHandle);
         }
     }
 

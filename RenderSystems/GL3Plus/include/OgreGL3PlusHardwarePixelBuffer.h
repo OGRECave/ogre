@@ -37,7 +37,7 @@ namespace Ogre {
     {
 
     protected:
-        GL3PlusSupport* mGLSupport;
+        GL3PlusRenderSystem* mRenderSystem;
     public:
         /// Should be called by HardwareBufferManager
         GL3PlusHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,

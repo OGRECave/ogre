@@ -35,6 +35,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
     class GL3PlusFBOManager;
     class GL3PlusRenderBuffer;
+    class GL3PlusStateCacheManager;
 
     /** RenderTexture for GL FBO
      */
@@ -61,7 +62,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusFBOManager: public GL3PlusRTTManager
     {
     public:
-        GL3PlusFBOManager(const GL3PlusSupport& support);
+        GL3PlusFBOManager(GL3PlusRenderSystem* renderSystem);
         ~GL3PlusFBOManager();
 
         /** Bind a certain render target if it is a FBO. If it is not a FBO, bind the
@@ -93,13 +94,13 @@ namespace Ogre {
          */
         GLuint getTemporaryFBO(size_t i);
 
-        const GL3PlusSupport& getGLSupportRef() {return mGLSupport;}
+        GL3PlusStateCacheManager* getStateCacheManager();
     private:
         /** Temporary FBO identifier
          */
         std::vector<GLuint> mTempFBO;
 
-        const GL3PlusSupport& mGLSupport;
+        GL3PlusRenderSystem* mRenderSystem;
 
         /** Detect allowed FBO formats */
         void detectFBOFormats();

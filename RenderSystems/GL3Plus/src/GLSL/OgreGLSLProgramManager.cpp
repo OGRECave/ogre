@@ -32,22 +32,22 @@
 #include "OgreGLSLShader.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
+#include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
-#include "OgreGL3PlusSupport.h"
 
 #include <iostream>
 
 namespace Ogre {
 
     
-    GLSLProgramManager::GLSLProgramManager(const GL3PlusSupport& support) :
+    GLSLProgramManager::GLSLProgramManager(GL3PlusRenderSystem* renderSystem) :
         mActiveVertexShader(NULL),
         mActiveHullShader(NULL),
         mActiveDomainShader(NULL),
         mActiveGeometryShader(NULL),
         mActiveFragmentShader(NULL),
         mActiveComputeShader(NULL),
-        mGLSupport(support)
+        mRenderSystem(renderSystem)
     {
         // Fill in the relationship between type names and enums
         mTypeEnumMap.insert(StringToEnumMap::value_type("float", GL_FLOAT));
@@ -182,7 +182,12 @@ namespace Ogre {
         // GL 4.2
         mTypeEnumMap.insert(StringToEnumMap::value_type("atomic_uint", GL_UNSIGNED_INT_ATOMIC_COUNTER));
     }
-    
+
+    GL3PlusStateCacheManager* GLSLProgramManager::getStateCacheManager()
+    {
+        return mRenderSystem->_getStateCacheManager();
+    }
+
     void GLSLProgramManager::convertGLUniformtoOgreType(GLenum gltype,
                                                         GpuConstantDefinition& defToUpdate)
     {
@@ -757,8 +762,8 @@ namespace Ogre {
         // Now deal with shader storage blocks
 
         //TODO Need easier, more robust feature checking.
-        // if (mGLSupport.checkExtension("GL_ARB_program_interface_query") || gl3wIsSupported(4, 3))
-        if (mGLSupport.hasMinGLVersion(4, 3))
+        // if (mRenderSystem->checkExtension("GL_ARB_program_interface_query") || gl3wIsSupported(4, 3))
+        if (mRenderSystem->hasMinGLVersion(4, 3))
         {
             OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(programObject, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &blockCount));
 
@@ -825,8 +830,8 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, bufferBinding));
             }
         }
-        // if (mGLSupport.checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
-        if (mGLSupport.hasMinGLVersion(4, 2))
+        // if (mRenderSystem->checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
+        if (mRenderSystem->hasMinGLVersion(4, 2))
         {
             // Now deal with atomic counters buffers
             OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));

@@ -65,7 +65,7 @@ namespace Ogre
 
     public:
 
-        GLSLSeparableProgramManager(const GL3PlusSupport& support);
+        GLSLSeparableProgramManager(GL3PlusRenderSystem* renderSystem);
         ~GLSLSeparableProgramManager(void);
 
         /** Get the program pipeline that combines the current program
