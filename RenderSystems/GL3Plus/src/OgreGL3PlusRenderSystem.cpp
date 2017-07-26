@@ -131,10 +131,10 @@ namespace Ogre {
         : mDepthWrite(true),
           mScissorsEnabled(false),
           mStencilWriteMask(0xFFFFFFFF),
+          mStateCacheManager(0),
           mShaderManager(0),
           mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
-          mStateCacheManager(0),
           mRTTManager(0),
           mActiveTextureUnit(0)
     {
