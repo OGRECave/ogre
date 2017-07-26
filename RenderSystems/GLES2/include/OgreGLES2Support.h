@@ -43,7 +43,7 @@ namespace Ogre
     class _OgreGLES2Export GLES2Support
     {
         public:
-            GLES2Support(GLNativeSupport* native) : mNative(native), mStateCacheMgr(0)  { }
+            GLES2Support(GLNativeSupport* native) : mNative(native) { }
             virtual ~GLES2Support() { }
 
             /**
@@ -162,22 +162,6 @@ namespace Ogre
             }
 
             /**
-            * Get the state cache manager
-            */
-            GLES2StateCacheManager* getStateCacheManager() const
-            {
-                return mStateCacheMgr;
-            }
-        
-            /**
-            * Set a valid state cache manager
-            */
-            void setStateCacheManager(GLES2StateCacheManager* stateCacheMgr)
-            {
-                mStateCacheMgr = stateCacheMgr;
-            }
-            
-            /**
             * Start anything special
             */
             void start() {
@@ -205,9 +189,6 @@ namespace Ogre
             set<String>::type extensionList;
             
             GLNativeSupport* mNative;
-
-            // State cache management
-            GLES2StateCacheManager* mStateCacheMgr;
     };
 
 }

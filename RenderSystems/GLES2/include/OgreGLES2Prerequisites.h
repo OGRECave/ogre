@@ -78,7 +78,7 @@ extern float EAGLCurrentOSVersion;
 #define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers)
 #endif
 
-#define getGLES2SupportRef() dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef()
+#define getGLES2RenderSystem() dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())
 
 // Copy this definition from desktop GL.  Used for polygon modes.
 #ifndef GL_FILL
@@ -119,7 +119,7 @@ namespace Ogre {
 #    define _OgreGLES2Export
 #endif
 
-#define ENABLE_GL_CHECK 0
+#define ENABLE_GL_CHECK 1
 
 #if ENABLE_GL_CHECK
 #define OGRE_CHECK_GL_ERROR(glFunc) \

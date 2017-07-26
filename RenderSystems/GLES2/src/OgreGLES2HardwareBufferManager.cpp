@@ -40,13 +40,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLES2HardwareBufferManagerBase::GLES2HardwareBufferManagerBase()
     {
-        mGLSupport = getGLES2SupportRef();
+        mRenderSystem = getGLES2RenderSystem();
     }
 
     GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()
     {
         destroyAllDeclarations();
         destroyAllBindings();
+    }
+
+    GLES2StateCacheManager * GLES2HardwareBufferManagerBase::getStateCacheManager()
+    {
+        return mRenderSystem->_getStateCacheManager();
     }
 
     HardwareVertexBufferSharedPtr

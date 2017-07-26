@@ -44,7 +44,6 @@ namespace Ogre {
     * Implementation of GL ES 2.x as a rendering system.
     *  @{
     */
-    class GLES2Support;
     class GLRTTManager;
     typedef GLRTTManager GLES2RTTManager;
     class GLES2GpuProgramManager;
@@ -103,9 +102,6 @@ namespace Ogre {
 
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
-
-            // check if GLES 3.0 is supported
-            bool mHasGLES30;
 
             // local data member of _render that were moved here to improve performance
             // (save allocations)
@@ -268,8 +264,15 @@ namespace Ogre {
             // ----------------------------------
             // GLES2RenderSystem specific members
             // ----------------------------------
+            bool hasMinGLVersion(int major, int minor) const;
+            bool checkExtension(const String& ext) const;
+        
             /** Returns the main context */
             GLContext* _getMainContext() { return mMainContext; }
+        
+            GLContext* _getCurrentContext() { return mCurrentContext; }
+            GLES2StateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
+        
             /** Unregister a render target->context mapping. If the context of target 
              is the current context, change the context to the main context so it
              can be destroyed safely. 
@@ -291,7 +294,6 @@ namespace Ogre {
              */
             void _setRenderTarget(RenderTarget *target);
 
-            GLES2Support* getGLES2Support() { return mGLSupport; }
             GLint convertCompareFunction(CompareFunction func) const;
             GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 

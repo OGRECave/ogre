@@ -33,8 +33,8 @@ THE SOFTWARE.
 #include "OgreGLES2StateCacheManager.h"
 
 namespace Ogre {
-    GLES2TextureManager::GLES2TextureManager(GLES2Support& support)
-        : TextureManager(), mGLSupport(support), mWarningTextureID(0)
+    GLES2TextureManager::GLES2TextureManager(GLES2RenderSystem* renderSystem)
+        : TextureManager(), mRenderSystem(renderSystem), mWarningTextureID(0)
     {
         // Register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
@@ -54,7 +54,7 @@ namespace Ogre {
                                            ManualResourceLoader* loader,
                                            const NameValuePairList* createParams)
     {
-        return OGRE_NEW GLES2Texture(this, name, handle, group, isManual, loader, mGLSupport);
+        return OGRE_NEW GLES2Texture(this, name, handle, group, isManual, loader, mRenderSystem);
     }
 
     //-----------------------------------------------------------------------------

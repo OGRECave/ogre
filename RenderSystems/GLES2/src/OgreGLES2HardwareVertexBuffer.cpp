@@ -109,10 +109,10 @@ namespace Ogre {
         // Use glMapBuffer
         static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
-        GLES2Support* support = getGLES2SupportRef();
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
 
         void* pBuffer = NULL;
-        if(!OGRE_NO_GLES3_SUPPORT || support->checkExtension("GL_EXT_map_buffer_range"))
+        if(!OGRE_NO_GLES3_SUPPORT || rs->checkExtension("GL_EXT_map_buffer_range"))
         {
             if (mUsage & HBU_WRITE_ONLY)
             {
@@ -134,7 +134,7 @@ namespace Ogre {
             offset = 0;
         }
 #if OGRE_NO_GLES3_SUPPORT == 1
-        else if(support->checkExtension("GL_OES_mapbuffer"))
+        else if(rs->checkExtension("GL_OES_mapbuffer"))
         {
             // Use glMapBuffer
             if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
@@ -167,15 +167,15 @@ namespace Ogre {
     {
         static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
-        GLES2Support* support = getGLES2SupportRef();
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
 
-        bool hasMapBufferRange = !OGRE_NO_GLES3_SUPPORT || support->checkExtension("GL_EXT_map_buffer_range");
+        bool hasMapBufferRange = !OGRE_NO_GLES3_SUPPORT || rs->checkExtension("GL_EXT_map_buffer_range");
         if ((mUsage & HBU_WRITE_ONLY) && hasMapBufferRange)
         {
             OGRE_CHECK_GL_ERROR(glFlushMappedBufferRangeEXT(GL_ARRAY_BUFFER, 0, mLockSize));
         }
 
-        if(hasMapBufferRange || support->checkExtension("GL_OES_mapbuffer")) {
+        if(hasMapBufferRange || rs->checkExtension("GL_OES_mapbuffer")) {
             GLboolean mapped;
             OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ARRAY_BUFFER));
             if(!mapped)
@@ -199,9 +199,9 @@ namespace Ogre {
         }
         else
         {
-            GLES2Support* glSupport = getGLES2SupportRef();
+            GLES2RenderSystem* rs = getGLES2RenderSystem();
 
-            if(!OGRE_NO_GLES3_SUPPORT || glSupport->checkExtension("GL_EXT_map_buffer_range"))
+            if(!OGRE_NO_GLES3_SUPPORT || rs->checkExtension("GL_EXT_map_buffer_range"))
             {
                 // Map the buffer range then copy out of it into our destination buffer
                 void* srcData;

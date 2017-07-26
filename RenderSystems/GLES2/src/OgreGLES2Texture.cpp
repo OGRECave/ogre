@@ -39,9 +39,9 @@ THE SOFTWARE.
 namespace Ogre {
     GLES2Texture::GLES2Texture(ResourceManager* creator, const String& name,
                              ResourceHandle handle, const String& group, bool isManual,
-                             ManualResourceLoader* loader, GLES2Support& support)
+                             ManualResourceLoader* loader, GLES2RenderSystem* renderSystem)
         : GLTextureCommon(creator, name, handle, group, isManual, loader),
-          mGLSupport(support)
+          mRenderSystem(renderSystem)
     {
     }
 
@@ -116,7 +116,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
            
         // Set texture type
-        mGLSupport.getStateCacheManager()->bindGLTexture(texTarget, mTextureID);
+        mRenderSystem->_getStateCacheManager()->bindGLTexture(texTarget, mTextureID);
         
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated = !PixelUtil::isCompressed(mFormat);
@@ -125,19 +125,17 @@ namespace Ogre {
         if((mUsage & TU_AUTOMIPMAP) && mMipmapsHardwareGenerated && mNumRequestedMipmaps)
             mNumMipmaps = maxMips;
 
-        GLES2Support* glSupport = getGLES2SupportRef();
-
-        if(glSupport->checkExtension("GL_APPLE_texture_max_level") || glSupport->hasMinGLVersion(3, 0))
-            mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
+        if(mRenderSystem->hasMinGLVersion(3, 0) || mRenderSystem->checkExtension("GL_APPLE_texture_max_level"))
+            mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
 
         // Set some misc default parameters, these can of course be changed later
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MIN_FILTER, ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         // Set up texture swizzling
@@ -169,7 +167,7 @@ namespace Ogre {
         uint32 height = mHeight;
         uint32 depth = mDepth;
         
-        bool hasGLES30 = mGLSupport.hasMinGLVersion(3, 0);
+        bool hasGLES30 = mRenderSystem->hasMinGLVersion(3, 0);
 
         if (PixelUtil::isCompressed(mFormat))
         {
@@ -379,7 +377,7 @@ namespace Ogre {
     void GLES2Texture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();
-        if (GLES2StateCacheManager* stateCacheManager = mGLSupport.getStateCacheManager())
+        if (GLES2StateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
         {
             OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
             stateCacheManager->invalidateStateForTexture(mTextureID);

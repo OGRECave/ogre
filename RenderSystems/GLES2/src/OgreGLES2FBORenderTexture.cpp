@@ -390,7 +390,7 @@ namespace Ogre {
                             }
                         }
                     }
-                    else if(getGLES2SupportRef()->checkExtension("GL_OES_packed_depth_stencil") )
+                    else if(getGLES2RenderSystem()->checkExtension("GL_OES_packed_depth_stencil") )
                     {
                         // Packed depth/stencil format
                         if (_tryPackedFormat(depthFormats[depth]))
@@ -454,8 +454,8 @@ namespace Ogre {
         int bestscore = -1;
         bool requestDepthOnly = internalFormat == PF_DEPTH;
 
-        GLES2Support* glSupport = getGLES2SupportRef();
-        bool hasPackedStencil = glSupport->checkExtension("GL_OES_packed_depth_stencil") || glSupport->hasMinGLVersion(3, 0);
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
+        bool hasPackedStencil = rs->hasMinGLVersion(3, 0) || rs->checkExtension("GL_OES_packed_depth_stencil");
 
         for(size_t mode = 0; mode < props.modes.size(); mode++)
         {

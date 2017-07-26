@@ -154,7 +154,6 @@ namespace Ogre {
         mGLInitialised = false;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
-        mHasGLES30 = false;
         mPolygonMode = GL_FILL;
         mCurrentVertexProgram = 0;
         mCurrentFragmentProgram = 0;
@@ -206,13 +205,23 @@ namespace Ogre {
         return mGLSupport->validateConfig();
     }
 
+    bool GLES2RenderSystem::hasMinGLVersion(int major, int minor) const
+    {
+        return mGLSupport->hasMinGLVersion(major, minor);
+    }
+
+    bool GLES2RenderSystem::checkExtension(const String& ext) const
+    {
+        return mGLSupport->checkExtension(ext);
+    }
+
     RenderWindow* GLES2RenderSystem::_initialise(bool autoCreateWindow,
                                                  const String& windowTitle)
     {
         mGLSupport->start();
 
         // Create the texture manager
-        mTextureManager = OGRE_NEW GLES2TextureManager(*mGLSupport); 
+        mTextureManager = OGRE_NEW GLES2TextureManager(this);
 
         RenderWindow *autoWindow = mGLSupport->createWindow(autoCreateWindow,
                                                             this, windowTitle);
@@ -253,9 +262,8 @@ namespace Ogre {
             rsc->setStencilBufferBitDepth(stencil);
         }
 
-        if(mHasGLES30 ||
-                (mGLSupport->checkExtension("GL_EXT_sRGB")
-                 && mGLSupport->checkExtension("GL_NV_sRGB_formats")))
+        if(hasMinGLVersion(3, 0) ||
+                (checkExtension("GL_EXT_sRGB") && checkExtension("GL_NV_sRGB_formats")))
             rsc->setCapability(RSC_HW_GAMMA);
 
         // Scissor test is standard
@@ -263,11 +271,11 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported by OpenGL ES
         rsc->setCapability(RSC_VBO);
-        if(mGLSupport->checkExtension("GL_OES_element_index_uint") || mHasGLES30)
+        if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_element_index_uint"))
             rsc->setCapability(RSC_32BIT_INDEX);
 
         // Check for hardware occlusion support
-        if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean") || mHasGLES30)
+        if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_occlusion_query_boolean"))
         {
             rsc->setCapability(RSC_HWOCCLUSION);
         }
@@ -275,43 +283,43 @@ namespace Ogre {
         // OpenGL ES - Check for these extensions too
         // For 2.0, http://www.khronos.org/registry/gles/api/2.0/gl2ext.h
 
-        if (mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
-            mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") ||
-            mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc") ||
-            mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
-            mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
-            mGLSupport->checkExtension("WEBGL_compressed_texture_s3tc") ||
-            mGLSupport->checkExtension("WEBGL_compressed_texture_atc") ||
-            mGLSupport->checkExtension("WEBGL_compressed_texture_pvrtc") ||
-            mGLSupport->checkExtension("WEBGL_compressed_texture_etc1"))
+        if (checkExtension("GL_IMG_texture_compression_pvrtc") ||
+            checkExtension("GL_EXT_texture_compression_dxt1") ||
+            checkExtension("GL_EXT_texture_compression_s3tc") ||
+            checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
+            checkExtension("GL_AMD_compressed_ATC_texture") ||
+            checkExtension("WEBGL_compressed_texture_s3tc") ||
+            checkExtension("WEBGL_compressed_texture_atc") ||
+            checkExtension("WEBGL_compressed_texture_pvrtc") ||
+            checkExtension("WEBGL_compressed_texture_etc1"))
 
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 
-            if(mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
-               mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc2") ||
-               mGLSupport->checkExtension("WEBGL_compressed_texture_pvrtc"))
+            if(checkExtension("GL_IMG_texture_compression_pvrtc") ||
+               checkExtension("GL_IMG_texture_compression_pvrtc2") ||
+               checkExtension("WEBGL_compressed_texture_pvrtc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
                 
-            if((mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") &&
-               mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc")) ||
-               mGLSupport->checkExtension("WEBGL_compressed_texture_s3tc"))
+            if((checkExtension("GL_EXT_texture_compression_dxt1") &&
+               checkExtension("GL_EXT_texture_compression_s3tc")) ||
+               checkExtension("WEBGL_compressed_texture_s3tc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
 
-            if(mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
-               mGLSupport->checkExtension("WEBGL_compressed_texture_etc1"))
+            if(checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
+               checkExtension("WEBGL_compressed_texture_etc1"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC1);
 
-            if(mHasGLES30)
+            if(hasMinGLVersion(3, 0))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC2);
 
-            if(mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
-               mGLSupport->checkExtension("WEBGL_compressed_texture_atc"))
+            if(checkExtension("GL_AMD_compressed_ATC_texture") ||
+               checkExtension("WEBGL_compressed_texture_atc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ATC);
         }
 
         // Check for Anisotropy support
-        if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
+        if (checkExtension("GL_EXT_texture_filter_anisotropic"))
         {
             GLfloat maxAnisotropy = 0;
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy));
@@ -388,7 +396,7 @@ namespace Ogre {
         // Separate shader objects
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-        if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects"))
+        if(checkExtension("GL_EXT_separate_shader_objects"))
         {
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
             rsc->setCapability(RSC_GLSL_SSO_REDECLARE);
@@ -422,21 +430,21 @@ namespace Ogre {
         rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
         // Check for Float textures
-        if(mGLSupport->checkExtension("GL_OES_texture_float") || mGLSupport->checkExtension("GL_OES_texture_half_float") || mHasGLES30)
+        if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_float") || checkExtension("GL_OES_texture_half_float"))
             rsc->setCapability(RSC_TEXTURE_FLOAT);
 
         rsc->setCapability(RSC_TEXTURE_1D);
 
-        if(mHasGLES30 || mGLSupport->checkExtension("GL_OES_texture_3D"))
+        if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_3D"))
             rsc->setCapability(RSC_TEXTURE_3D);
 
         // ES 3 always supports NPOT textures
-        if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || mHasGLES30)
+        if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_npot") || checkExtension("GL_ARB_texture_non_power_of_two"))
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
             rsc->setNonPOW2TexturesLimited(false);
         }
-        else if(mGLSupport->checkExtension("GL_APPLE_texture_2D_limited_npot"))
+        else if(checkExtension("GL_APPLE_texture_2D_limited_npot"))
         {
             rsc->setNonPOW2TexturesLimited(true);
         }
@@ -448,10 +456,10 @@ namespace Ogre {
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
         
-        if(mHasGLES30 || mGLSupport->checkExtension("GL_OES_vertex_array_object"))
+        if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_vertex_array_object"))
             rsc->setCapability(RSC_VAO);
 
-        if (mHasGLES30 || mGLSupport->checkExtension("GL_OES_get_program_binary"))
+        if (hasMinGLVersion(3, 0) || checkExtension("GL_OES_get_program_binary"))
         {
             // http://www.khronos.org/registry/gles/extensions/OES/OES_get_program_binary.txt
             GLint formats;
@@ -461,11 +469,11 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
 
-        if (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
+        if (hasMinGLVersion(3, 0) || checkExtension("GL_EXT_instanced_arrays"))
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
-        else if(mGLSupport->checkExtension("GL_ANGLE_instanced_arrays"))
+        else if(checkExtension("GL_ANGLE_instanced_arrays"))
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
             glDrawElementsInstancedEXT = glDrawElementsInstancedANGLE;
@@ -473,16 +481,16 @@ namespace Ogre {
             glVertexAttribDivisorEXT = glVertexAttribDivisorANGLE;
         }
 
-        if (mGLSupport->checkExtension("GL_EXT_debug_marker") &&
-            mGLSupport->checkExtension("GL_EXT_debug_label"))
+        if (checkExtension("GL_EXT_debug_marker") &&
+            checkExtension("GL_EXT_debug_label"))
         {
             OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
             rsc->setCapability(RSC_DEBUG);
         }
 
         if((!OGRE_NO_GLES3_SUPPORT && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN)
-                        || mGLSupport->checkExtension("GL_EXT_map_buffer_range")
-                        || mGLSupport->checkExtension("GL_OES_mapbuffer"))
+                        || checkExtension("GL_EXT_map_buffer_range")
+                        || checkExtension("GL_OES_mapbuffer"))
         {
             rsc->setCapability(RSC_MAPBUFFER);
         }
@@ -921,11 +929,11 @@ namespace Ogre {
             func = GL_FUNC_REVERSE_SUBTRACT;
             break;
         case SBO_MIN:
-            if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
+            if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
                 func = GL_MIN_EXT;
             break;
         case SBO_MAX:
-            if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
+            if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
                 func = GL_MAX_EXT;
             break;
         }
@@ -968,11 +976,11 @@ namespace Ogre {
                 func = GL_FUNC_REVERSE_SUBTRACT;
                 break;
             case SBO_MIN:
-                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
+                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
                     func = GL_MIN_EXT;
                 break;
             case SBO_MAX:
-                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
+                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
                     func = GL_MAX_EXT;
                 break;
         }
@@ -989,11 +997,11 @@ namespace Ogre {
                 alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
                 break;
             case SBO_MIN:
-                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
+                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
                     alphaFunc = GL_MIN_EXT;
                 break;
             case SBO_MAX:
-                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
+                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
                     alphaFunc = GL_MAX_EXT;
                 break;
         }
@@ -1215,7 +1223,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     HardwareOcclusionQuery* GLES2RenderSystem::createHardwareOcclusionQuery(void)
     {
-        if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean") || mHasGLES30)
+        if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_occlusion_query_boolean"))
         {
             GLES2HardwareOcclusionQuery* ret = new GLES2HardwareOcclusionQuery(); 
             mHwOcclusionQueries.push_back(ret);
@@ -1753,7 +1761,6 @@ namespace Ogre {
         mCurrentContext->setCurrent();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLES2StateCacheManager>();
-        mGLSupport->setStateCacheManager(mStateCacheManager);
 
         // Check if the context has already done one-time initialisation
         if (!mCurrentContext->getInitialized())
@@ -1797,7 +1804,6 @@ namespace Ogre {
                 mCurrentContext = 0;
                 mMainContext = 0;
                 mStateCacheManager = 0;
-                mGLSupport->setStateCacheManager(0);
             }
         }
     }
@@ -1840,11 +1846,8 @@ namespace Ogre {
         mGLSupport->initialiseExtensions();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLES2StateCacheManager>();
-        mGLSupport->setStateCacheManager(mStateCacheManager);
 
-        mHasGLES30 = mGLSupport->hasMinGLVersion(3, 0);
-
-        if(mHasGLES30) {
+        if(hasMinGLVersion(3, 0)) {
             gl2ext_to_gl3core();
         }
 
@@ -2290,7 +2293,7 @@ namespace Ogre {
                 "GLES2RenderSystem::_copyContentsToMemory" );
         }
 
-        bool hasPackImage = mHasGLES30 || mGLSupport->checkExtension("GL_NV_pack_subimage");
+        bool hasPackImage = hasMinGLVersion(3, 0) || checkExtension("GL_NV_pack_subimage");
         OgreAssert(dst.getWidth() == dst.rowPitch || hasPackImage, "GL_PACK_ROW_LENGTH not supported");
 
         // Switch context if different from current one
@@ -2304,7 +2307,7 @@ namespace Ogre {
         // Must change the packing to ensure no overruns!
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
-        if(mHasGLES30) {
+        if(hasMinGLVersion(3, 0)) {
             glReadBuffer((buffer == RenderWindow::FB_FRONT) ? GL_FRONT : GL_BACK);
         }
 

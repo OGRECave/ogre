@@ -40,7 +40,7 @@ namespace Ogre {
     class _OgreGLES2Export GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         protected:
-            GLES2Support* mGLSupport;
+            GLES2RenderSystem* mRenderSystem;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
             VertexDeclaration* createVertexDeclarationImpl(void);
             /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
@@ -73,7 +73,7 @@ namespace Ogre {
             /// Utility function to get the correct GL type based on VET's
             static GLenum getGLType(VertexElementType type);
 
-            GLES2StateCacheManager * getStateCacheManager() { return mGLSupport->getStateCacheManager(); }
+            GLES2StateCacheManager * getStateCacheManager();
     };
 
     /// GLES2HardwareBufferManagerBase as a Singleton

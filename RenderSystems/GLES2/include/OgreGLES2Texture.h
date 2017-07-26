@@ -44,7 +44,7 @@ namespace Ogre {
             // Constructor
             GLES2Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
                 const String& group, bool isManual, ManualResourceLoader* loader, 
-                GLES2Support& support);
+                GLES2RenderSystem* renderSystem);
 
             virtual ~GLES2Texture();
 
@@ -78,7 +78,7 @@ namespace Ogre {
 #endif
 
         private:
-            GLES2Support& mGLSupport;
+            GLES2RenderSystem* mRenderSystem;
     };
 }
 

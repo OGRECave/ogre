@@ -164,7 +164,7 @@ namespace Ogre {
     : GLES2HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
         mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level)
     {
-        getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+        getGLES2RenderSystem()->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
         
         // Get face identifier
         mFaceTarget = mTarget;
@@ -249,9 +249,11 @@ namespace Ogre {
 
     void GLES2TextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
-        getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
 
-        bool hasGLES30 = getGLES2SupportRef()->hasMinGLVersion(3, 0);
+        rs->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+
+        bool hasGLES30 = rs->hasMinGLVersion(3, 0);
 #if OGRE_NO_GLES3_SUPPORT == 0
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
@@ -464,7 +466,7 @@ namespace Ogre {
         << " format: " << PixelUtil::getFormatName(mFormat);
         LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 #endif
-        getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+        getGLES2RenderSystem()->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
         if(PixelUtil::isCompressed(data.format))
         {
             if(data.format != mFormat || !data.isConsecutive())
@@ -591,7 +593,7 @@ namespace Ogre {
     
     void GLES2TextureBuffer::copyFromFramebuffer(size_t zoffset)
     {
-        getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+        getGLES2RenderSystem()->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
         OGRE_CHECK_GL_ERROR(glCopyTexSubImage2D(mFaceTarget, mLevel, 0, 0, 0, 0, mWidth, mHeight));
     }
 
@@ -644,8 +646,8 @@ namespace Ogre {
         glDisable(GL_CULL_FACE);
 
         // Set up source texture
-        GLES2Support* glSupport = getGLES2SupportRef();
-        glSupport->getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
+        rs->_getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
         
         // Set filtering modes depending on the dimensions and source
         if(srcBox.getWidth() == dstBox.getWidth() &&
@@ -707,10 +709,10 @@ namespace Ogre {
             // If target format not directly supported, create intermediate texture
             GLenum tempFormat = GLES2PixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
-            glSupport->getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
+            rs->_getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
 
-            if(glSupport->checkExtension("GL_APPLE_texture_max_level") || glSupport->hasMinGLVersion(3, 0))
-                glSupport->getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
+            if(rs->hasMinGLVersion(3, 0) || rs->checkExtension("GL_APPLE_texture_max_level"))
+                rs->_getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 
             const RenderSystemCapabilities *renderCaps =
                     Root::getSingleton().getRenderSystem()->getCapabilities();
@@ -761,7 +763,7 @@ namespace Ogre {
             w = (w+0.5f) / (float)src->mDepth;
             
             // Finally we're ready to rumble    
-            getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
+            getGLES2RenderSystem()->_getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
             OGRE_CHECK_GL_ERROR(glEnable(src->mTarget));
 
             GLfloat squareVertices[] = {
@@ -815,7 +817,7 @@ namespace Ogre {
             if(tempTex)
             {
                 // Copy temporary texture
-                glSupport->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+                rs->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
                 switch(mTarget)
                 {
                     case GL_TEXTURE_2D:
@@ -833,13 +835,13 @@ namespace Ogre {
             // Generate mipmaps
             if(mUsage & TU_AUTOMIPMAP)
             {
-                glSupport->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
+                rs->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
             }
         }
         
         // Reset source texture to sane state
-        glSupport->getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
+        rs->_getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, 0));
@@ -923,11 +925,11 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &id));
         
         // Set texture type
-        GLES2Support* glSupport = getGLES2SupportRef();
-        glSupport->getStateCacheManager()->bindGLTexture(target, id);
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
+        rs->_getStateCacheManager()->bindGLTexture(target, id);
 
-        if(glSupport->checkExtension("GL_APPLE_texture_max_level") || glSupport->hasMinGLVersion(3, 0))
-            glSupport->getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000);
+        if(rs->hasMinGLVersion(3, 0) || rs->checkExtension("GL_APPLE_texture_max_level"))
+            rs->_getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000);
 
         // Allocate texture memory
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -994,8 +996,8 @@ namespace Ogre {
         // Allocate storage for depth buffer
         if (mNumSamples > 0)
         {
-            GLES2Support* glSupport = getGLES2SupportRef();
-            if(glSupport->checkExtension("GL_APPLE_framebuffer_multisample") || glSupport->hasMinGLVersion(3, 0))
+            GLES2RenderSystem* rs = getGLES2RenderSystem();
+            if(rs->hasMinGLVersion(3, 0) || rs->checkExtension("GL_APPLE_framebuffer_multisample"))
             {
                 OGRE_CHECK_GL_ERROR(glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,
                                                                           mNumSamples, mGLInternalFormat, mWidth, mHeight));
