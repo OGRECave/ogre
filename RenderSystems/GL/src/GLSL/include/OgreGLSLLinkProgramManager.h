@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgreGLPrerequisites.h"
 #include "OgreSingleton.h"
-
+#include "OgreGLSLProgramManagerCommon.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLSLLinkProgram.h"
 
@@ -38,19 +38,7 @@ namespace Ogre {
 
     namespace GLSL {
 
-    /** Ogre assumes that there are separate vertex and fragment programs to deal with but
-        GLSL has one program object that represents the active vertex and fragment shader objects
-        during a rendering state.  GLSL Vertex and fragment 
-        shader objects are compiled separately and then attached to a program object and then the
-        program object is linked.  Since Ogre can only handle one vertex program and one fragment
-        program being active in a pass, the GLSL Link Program Manager does the same.  The GLSL Link
-        program manager acts as a state machine and activates a program object based on the active
-        vertex and fragment program.  Previously created program objects are stored along with a unique
-        key in a hash_map for quick retrieval the next time the program object is required.
-
-    */
-
-    class _OgreGLExport GLSLLinkProgramManager : public Singleton<GLSLLinkProgramManager>
+    class _OgreGLExport GLSLLinkProgramManager : public Singleton<GLSLLinkProgramManager>, public GLSLProgramManagerCommon
     {
 
     private:
@@ -67,11 +55,8 @@ namespace Ogre {
         GLSLProgram* mActiveFragmentGpuProgram;
         GLSLLinkProgram* mActiveLinkProgram;
 
-        typedef map<String, GLenum>::type StringToEnumMap;
-        StringToEnumMap mTypeEnumMap;
-
         /// Use type to complete other information
-        static void completeDefInfo(GLenum gltype, GpuConstantDefinition& defToUpdate);
+        void convertGLUniformtoOgreType(GLenum gltype, GpuConstantDefinition& defToUpdate);
         /// Find where the data for a specific uniform should come from, populate
         static bool completeParamSource(const String& paramName,
             const GpuConstantDefinitionMap* vertexConstantDefs, 
