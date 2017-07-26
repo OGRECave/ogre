@@ -33,14 +33,11 @@
 namespace Ogre {
 
     void GLSLProgramManagerCommon::parseGLSLUniform(
-        const String& src, GpuNamedConstants& defs,
-        String::size_type currPos,
+        String line, GpuNamedConstants& defs,
         const String& filename, const GpuSharedParametersPtr& sharedParams)
     {
         GpuConstantDefinition def;
         String paramName = "";
-        String::size_type endPos = src.find(";", currPos);
-        String line = src.substr(currPos, endPos - currPos);
 
         // Remove spaces before opening square braces, otherwise
         // the following split() can split the line at inappropriate
@@ -258,7 +255,7 @@ namespace Ogre {
                         break;
                     }
 
-                    parseGLSLUniform(src, defs, currPos, filename, blockSharedParams);
+                    parseGLSLUniform(src.substr(currPos, endPos - currPos), defs, filename, blockSharedParams);
                 }
                 line = src.substr(currPos, endPos - currPos);
             } // not commented or a larger symbol

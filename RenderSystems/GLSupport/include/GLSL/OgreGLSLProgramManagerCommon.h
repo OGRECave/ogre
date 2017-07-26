@@ -61,8 +61,7 @@ namespace Ogre {
         /** Parse an individual uniform from a GLSL source file and
             store it in a GpuNamedConstant. */
         void parseGLSLUniform(
-            const String& src, GpuNamedConstants& defs,
-            String::size_type currPos,
+            String line, GpuNamedConstants& defs,
             const String& filename, const GpuSharedParametersPtr& sharedParams);
 
     public:
