@@ -339,6 +339,7 @@ find_package(OpenEXR)
 macro_log_feature(OPENEXR_FOUND "OpenEXR" "Load High dynamic range images" "http://www.openexr.com/" FALSE "" "")
 
 # Python
+set(Python_ADDITIONAL_VERSIONS 3.4) # allows using python3 on Ubuntu 14.04
 find_package(PythonInterp)
 find_package(PythonLibs)
 macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from Python" "http://www.python.org/" FALSE "" "")
