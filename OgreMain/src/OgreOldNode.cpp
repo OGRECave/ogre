@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreException.h"
 #include "OgreMath.h"
+#include "OgreCamera.h"
 
 namespace Ogre {
 namespace v1 {

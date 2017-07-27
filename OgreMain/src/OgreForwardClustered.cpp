@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreForwardClustered.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
+#include "OgreCamera.h"
 
 #include "Math/Array/OgreArraySphere.h"
 #include "Math/Array/OgreBooleanMask.h"

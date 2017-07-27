@@ -34,11 +34,15 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreLogManager.h"
+#include "OgreBitwise.h"
 
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreAsyncTicket.h"
 
+#include "OgreMesh.h"
+
 #include "OgreVertexShadowMapHelper.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------

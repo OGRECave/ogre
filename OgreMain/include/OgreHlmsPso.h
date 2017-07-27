@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePixelFormat.h"
 #include "Vao/OgreVertexBufferPacked.h"
+#include "OgreGpuProgram.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

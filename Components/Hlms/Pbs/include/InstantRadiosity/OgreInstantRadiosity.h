@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreConstBufferPool.h"
 #include "OgreRay.h"
 #include "OgreRawPtr.h"
+#include "OgreVector2.h"
 #include "Math/Array/OgreArrayRay.h"
 #include "OgreHeaderPrefix.h"
 

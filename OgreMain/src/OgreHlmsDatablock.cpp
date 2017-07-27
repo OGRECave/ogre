@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 #include "OgreHlmsManager.h"
 #include "OgreTexture.h"
+#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 
 #include "OgrePass.h"

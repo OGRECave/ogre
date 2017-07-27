@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreSubMesh2.h"
 #include "OgreMesh2.h"
+#include "OgreMaterial.h"
 
 #include "Vao/OgreAsyncTicket.h"
 #include "Vao/OgreVaoManager.h"

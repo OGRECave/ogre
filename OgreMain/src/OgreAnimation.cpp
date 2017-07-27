@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreSkeleton.h"
 #include "OgreOldBone.h"
 #include "OgreMesh.h"
+#include "OgreStringConverter.h"
 
 #include "OgreSubEntity.h"
 

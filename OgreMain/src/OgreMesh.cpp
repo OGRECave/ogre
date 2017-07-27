@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreVertexShadowMapHelper.h"
+#include "OgreStringConverter.h"
 
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonManager.h"

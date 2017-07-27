@@ -28,6 +28,8 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
+#include "OgreCamera.h"
+
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspace.h"

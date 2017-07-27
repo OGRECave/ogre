@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreSubMesh.h"
 #include "OgreLogManager.h"
 #include "OgreMesh.h"
+#include "OgreCamera.h"
 #include "OgreException.h"
 
 namespace Ogre {

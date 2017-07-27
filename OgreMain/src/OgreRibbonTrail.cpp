@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreSceneNode.h"
 #include "OgreController.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {

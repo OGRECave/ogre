@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _OgrePlanarReflections_H_
 
 #include "OgrePlanarReflectionActor.h"
+#include "OgreTexture.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

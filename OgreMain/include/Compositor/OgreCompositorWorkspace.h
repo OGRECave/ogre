@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 #include "Compositor/OgreCompositorChannel.h"
+#include "OgreVector4.h"
+#include "OgreCamera.h"
 #include "OgreResourceTransition.h"
 
 namespace Ogre

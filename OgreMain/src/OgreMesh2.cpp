@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreSkeleton.h"
 #include "OgreLodStrategyManager.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreMovableObject.h"
 
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonManager.h"

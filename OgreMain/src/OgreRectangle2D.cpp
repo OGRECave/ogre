@@ -28,8 +28,11 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRectangle2D.h"
 
+#include "OgreVertexIndexData.h"
+
 #include "OgreHardwareBufferManager.h"
 #include "OgreMaterialManager.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {

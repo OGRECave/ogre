@@ -28,8 +28,10 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreNode.h"
 
+#include "OgreCamera.h"
 #include "OgreException.h"
 #include "OgreMath.h"
+#include "OgreStringConverter.h"
 
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreBooleanMask.h"

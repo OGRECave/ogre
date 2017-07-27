@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreRenderSystemCapabilities.h"
 
+#include "OgreDataStream.h"
+
 #include <fstream>
 
 

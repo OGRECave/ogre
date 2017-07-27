@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _OgreHlmsLowLevel_H_
 
 #include "OgreHlms.h"
+#include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

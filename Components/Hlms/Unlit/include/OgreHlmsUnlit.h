@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreHlmsUnlitPrerequisites.h"
 #include "OgreHlmsBufferManager.h"
 #include "OgreConstBufferPool.h"
+#include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreRoot.h"
 

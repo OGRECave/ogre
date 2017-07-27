@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreUserObjectBindings.h"
 #include "OgreId.h"
+#include "OgreVector3.h"
 #include "Math/Array/OgreTransform.h"
 #include "OgreHeaderPrefix.h"
 

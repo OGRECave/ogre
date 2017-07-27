@@ -33,6 +33,7 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/OgreCompositorCommon.h"
+#include "OgreMaterial.h"
 
 namespace Ogre
 {

@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    typedef FastArray<VertexArrayObject*> VertexArrayObjectArray;
+
     class VertexShadowMapHelper
     {
     public:

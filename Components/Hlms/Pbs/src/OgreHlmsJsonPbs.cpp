@@ -37,6 +37,8 @@ THE SOFTWARE.
 
 #include "OgreLwString.h"
 
+#include "OgreStringConverter.h"
+
 #include "rapidjson/document.h"
 
 namespace Ogre

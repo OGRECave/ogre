@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreAlignedAllocator.h"
 
 #include "OgrePlatformInformation.h"
+#include "OgreBitwise.h"
 
 /**
 *

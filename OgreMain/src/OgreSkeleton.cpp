@@ -36,6 +36,7 @@ THE SOFTWARE.
 // Just for logging
 #include "OgreAnimationTrack.h"
 #include "OgreKeyFrame.h"
+#include "OgreStringConverter.h"
 
 
 namespace Ogre {

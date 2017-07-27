@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
+#include "OgreBitwise.h"
 #include "OgreLogManager.h"
 
 namespace Ogre

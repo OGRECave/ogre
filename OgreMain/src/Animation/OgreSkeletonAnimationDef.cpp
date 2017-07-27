@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreOldBone.h"
 #include "OgreKeyFrame.h"
 #include "OgreSkeleton.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {

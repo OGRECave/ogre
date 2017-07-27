@@ -33,6 +33,7 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "OgreMath.h"
+#include "OgreVector2.h"
 
 namespace Ogre
 {

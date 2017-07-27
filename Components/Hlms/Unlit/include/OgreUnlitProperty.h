@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "OgreHlmsUnlitPrerequisites.h"
 
+#include "OgreIdString.h"
+
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

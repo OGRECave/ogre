@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "OgreKeyFrame.h"
 #include "OgreOldNode.h"
 #include "OgreMesh.h"
+#include "OgreAnimable.h"
+#include "OgreNode.h"
+#include "OgreVertexIndexData.h"
 #include "OgreException.h"
 
 namespace Ogre {

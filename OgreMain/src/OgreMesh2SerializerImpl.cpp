@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreBitwise.h"
 
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreMultiSourceVertexBufferPool.h"

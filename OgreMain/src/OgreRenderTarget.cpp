@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreDepthBuffer.h"
 #include "OgreProfiler.h"
 #include "OgreTimer.h"
+#include "OgreCamera.h"
 #include <iomanip>
 
 namespace Ogre {

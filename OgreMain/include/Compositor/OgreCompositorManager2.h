@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreCompositorCommon.h"
 #include "OgreIdString.h"
 #include "OgreResourceTransition.h"
+#include "OgreVector4.h"
 #include "Compositor/OgreCompositorChannel.h"
 
 #include "OgreTexture.h"

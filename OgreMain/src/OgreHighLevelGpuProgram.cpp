@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreLogManager.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {

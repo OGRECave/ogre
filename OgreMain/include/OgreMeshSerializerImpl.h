@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreSerializer.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreKeyFrame.h"
+#include "OgreAnimationTrack.h"
 #include "OgreVertexBoneAssignment.h"
 
 namespace Ogre {

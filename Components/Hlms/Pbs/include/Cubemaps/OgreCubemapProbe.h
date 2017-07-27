@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Math/Simple/OgreAabb.h"
 #include "OgreIdString.h"
 #include "OgrePixelFormat.h"
+#include "OgreTexture.h"
 #include "OgreHeaderPrefix.h"
 
 //It's slightly more accurate if we render the cubemaps and generate the cubemaps, then blend.

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define _OgreCbShaderBuffer_H_
 
 #include "CommandBuffer/OgreCbCommon.h"
+#include "OgreCommon.h"
 
 namespace Ogre
 {

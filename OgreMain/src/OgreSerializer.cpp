@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreVector3.h"
 #include "OgreQuaternion.h"
+#include "OgreStringConverter.h"
 
 
 namespace Ogre {

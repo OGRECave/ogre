@@ -32,6 +32,9 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgreScriptLoader.h"
+#include "OgreId.h"
+#include "OgreIteratorWrappers.h"
+#include "OgreMovableObject.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "OgreHeaderPrefix.h"
 

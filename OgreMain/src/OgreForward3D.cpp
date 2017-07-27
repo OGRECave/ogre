@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreForward3D.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
+#include "OgreCamera.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
 

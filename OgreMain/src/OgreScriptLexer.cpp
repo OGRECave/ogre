@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreException.h"
 #include "OgreScriptLexer.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre{
 

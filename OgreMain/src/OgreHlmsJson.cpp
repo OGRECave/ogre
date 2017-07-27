@@ -34,7 +34,9 @@ THE SOFTWARE.
 #include "OgreHlmsJsonCompute.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
+#include "OgreVector2.h"
 #include "OgreLwString.h"
+#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 
 #include "rapidjson/document.h"

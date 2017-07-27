@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreLogManager.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre 
 {

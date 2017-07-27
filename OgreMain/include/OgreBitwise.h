@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreMath.h"
+
 #ifndef __has_builtin
     // Compatibility with non-clang compilers
     #define __has_builtin(x) 0

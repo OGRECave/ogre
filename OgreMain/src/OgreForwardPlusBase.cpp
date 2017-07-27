@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreForwardPlusBase.h"
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
+#include "OgreCamera.h"
 
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreTexBufferPacked.h"

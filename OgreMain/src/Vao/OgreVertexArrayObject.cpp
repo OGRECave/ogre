@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "Vao/OgreAsyncTicket.h"
 #include "Vao/OgreVaoManager.h"
 
+#include "OgreStringConverter.h"
+
 namespace Ogre
 {
     VertexBufferPacked VertexArrayObject::msDummyVertexBuffer( 0, 0, 1, 0, BT_DEFAULT, 0, false, 0,

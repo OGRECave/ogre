@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsTextureManager.h"
 #include "OgreConstBufferPool.h"
+#include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreItem.h"
 #include "OgreLwString.h"
 
+#include "OgreBitwise.h"
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 

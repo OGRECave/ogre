@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRenderToVertexBuffer.h"
 #include "OgreMaterialManager.h"
+#include "OgreMaterial.h"
 
 namespace Ogre {
 namespace v1 {

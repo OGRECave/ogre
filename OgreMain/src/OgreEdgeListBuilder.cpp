@@ -30,6 +30,9 @@ THE SOFTWARE.
 #include "OgreVertexIndexData.h"
 #include "OgreException.h"
 #include "OgreOptimisedUtil.h"
+#include "OgreStringConverter.h"
+
+#include "OgreLogManager.h"
 
 namespace Ogre {
 namespace v1 {

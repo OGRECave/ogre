@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreETCCodec.h"
 #include "OgreImage.h"
 #include "OgreException.h"
+#include "OgreDataStream.h"
 
 #include "OgreLogManager.h"
 #include "OgreBitwise.h"

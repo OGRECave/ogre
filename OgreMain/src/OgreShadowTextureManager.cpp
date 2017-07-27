@@ -32,6 +32,7 @@ Torus Knot Software Ltd.
 #include "OgreResourceGroupManager.h"
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {

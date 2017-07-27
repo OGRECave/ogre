@@ -43,6 +43,7 @@ THE SOFTWARE.
 #include "OgreRay.h"
 #include "OgreSphere.h"
 #include "OgreDeflate.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {

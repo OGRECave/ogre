@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreRenderOperation.h"
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
 

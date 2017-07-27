@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
+#include "OgreVector3.h"
 #include "OgreQuaternion.h"
 #include "OgreString.h"
 #include "OgreRenderable.h"

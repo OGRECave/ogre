@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
 #include "OgreMesh.h"
+#include "OgreHardwareIndexBuffer.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreLogManager.h"
 #include "OgreForward3D.h"
+#include "OgreCamera.h"
 //#include "OgreMovableObject.h"
 //#include "OgreRenderable.h"
 #include "OgreViewport.h"
