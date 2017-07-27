@@ -52,24 +52,17 @@ namespace Ogre {
 
     GL3PlusVertexArrayObject::~GL3PlusVertexArrayObject()
     {
-        if (mVAO)
+        if (GL3PlusStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
         {
-            if (GL3PlusStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &mVAO));
-                stateCacheManager->bindGLVertexArray(0);
-            }
-            mVAO = 0;
+            OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &mVAO));
+            stateCacheManager->bindGLVertexArray(0);
         }
     }
 
 
     void GL3PlusVertexArrayObject::bind(void)
     {
-        if (mVAO)
-        {
-            mRenderSystem->_getStateCacheManager()->bindGLVertexArray(mVAO);
-        }
+        mRenderSystem->_getStateCacheManager()->bindGLVertexArray(mVAO);
     }
 
 
