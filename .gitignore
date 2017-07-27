@@ -1,0 +1,31 @@
+syntax: glob
+*.dll
+#*.vcxproj
+#*.filters
+*.vcxproj.user
+*.pdb
+*.ilk
+*.tlog
+*.obj
+*.rule
+*.sdf
+.DS_Store
+Dependencies/*
+iOSDependencies
+build/*
+SDK/OSX/sdk_contents
+SDK/iOS/sdk_contents
+Samples/Browser/WinRT/Debug
+Samples/Browser/WinRT/Release
+Samples/Browser/WinRT/Generated Files
+Samples/Browser/WinRT/Media
+Samples/Browser/WinRT.Xaml/Debug
+Samples/Browser/WinRT.Xaml/Release
+Samples/Browser/WinRT.Xaml/Generated Files
+Samples/Browser/WinRT.Xaml/Media
+AndroidBuild/
+AndroidDependencies/
+Build/
+EmscriptenDependencies
+EmscriptenBuild
+buildx64

@@ -97,20 +97,18 @@ if (OGRE_BUILD_TESTS)
         set(CROSS ${CROSS} -DCMAKE_CXX_FLAGS=-stdlib=libc++)
     endif()
     
-    set(GTEST_INSTALL_DIR ${CMAKE_BINARY_DIR}/gtest)
-    include(ExternalProject)
-    ExternalProject_Add(googletest
-        URL https://github.com/google/googletest/archive/release-1.8.0.tar.gz
-        SOURCE_DIR ${GTEST_INSTALL_DIR}
-        CMAKE_ARGS
-            -DCMAKE_INSTALL_PREFIX=${GTEST_INSTALL_DIR}
-            -DBUILD_SHARED_LIBS=${GTEST_SHARED}
-            -G ${CMAKE_GENERATOR}
-            ${CROSS})
+    add_subdirectory(gtest)
 
     # unit tests are go!
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include ${GTEST_INSTALL_DIR}/include)
-    link_directories(${GTEST_INSTALL_DIR}/lib)
+    include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include
+        ${CMAKE_CURRENT_BINARY_DIR}/gtest/src/googletest/googletest/include
+        ${GTEST_INSTALL_DIR}/include
+        )
+    link_directories(
+        ${GTEST_INSTALL_DIR}/lib
+        ${CMAKE_CURRENT_BINARY_DIR}/gtest/src/googletest-build/googlemock/gtest/DebugLibs
+        )
     
     file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include/*.h")
     file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/src/*.cpp"
