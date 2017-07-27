@@ -81,7 +81,7 @@ if(DEFINED ENV{ANDROID})
     endif()
 endif()
 
-execute_process(COMMAND cmake
+execute_process(COMMAND ${CMAKE_COMMAND}
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DOGRE_BUILD_TESTS=ON
     -DOGRE_RESOURCEMANAGER_STRICT=ON

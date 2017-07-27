@@ -71,7 +71,7 @@ function (TestRenderSystem render_system)
 
   # Run a CMake script that handles the test context
   add_test(NAME "TestContext_${render_system_nospace}"
-    COMMAND "cmake" 
+    COMMAND "${CMAKE_COMMAND}"
     "-D" # executable name
       "TEST_CONTEXT_EXECUTABLE=$<TARGET_FILE_NAME:TestContext>"
     "-D" # path to executable (this one's tricker than it seems, since it'll vary based on build config)
