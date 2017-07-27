@@ -1518,15 +1518,15 @@ namespace Ogre {
         // FIXME: this fixes some rendering issues but leaves VAO's useless
         bool updateVAO = true; // !vao->isInitialised();
 
+        GLSLProgram* program = NULL;
         if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLSeparableProgram* separableProgram =
-                GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-            if (separableProgram)
+            program = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+            if (program)
             {
                 if (!op.renderToVertexBuffer)
                 {
-                    separableProgram->activate();
+                    program->activate();
                 }
             }
             else
@@ -1537,8 +1537,8 @@ namespace Ogre {
         }
         else
         {
-            GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-            if (!monolithicProgram)
+            program = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            if (!program)
             {
                 Ogre::LogManager::getSingleton().logMessage(
                     "ERROR: Failed to create monolithic program.", LML_CRITICAL);
@@ -1557,7 +1557,7 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
 
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, updateVAO);
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, program, updateVAO);
         }
 
         if ( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
@@ -1566,7 +1566,7 @@ namespace Ogre {
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, updateVAO);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program, updateVAO);
             }
         }
 
@@ -2481,7 +2481,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::bindVertexElementToGpu( const VertexElement &elem,
                                                       HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
-                                                      bool updateVAO)
+                                                      GLSLProgram* program, bool updateVAO)
     {
         const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
 
@@ -2502,27 +2502,12 @@ namespace Ogre {
             GLuint attrib = 0;
             unsigned short elemIndex = elem.getIndex();
 
-            if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            if (!program->isAttributeValid(sem, elemIndex))
             {
-                GLSLSeparableProgram* separableProgram =
-                    GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-                if (!separableProgram || !separableProgram->isAttributeValid(sem, elemIndex))
-                {
-                    return;
-                }
-
-                attrib = (GLuint)separableProgram->getAttributeIndex(sem, elemIndex);
+                return;
             }
-            else
-            {
-                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-                if (!monolithicProgram || !monolithicProgram->isAttributeValid(sem, elemIndex))
-                {
-                    return;
-                }
 
-                attrib = (GLuint)monolithicProgram->getAttributeIndex(sem, elemIndex);
-            }
+            attrib = (GLuint)program->getAttributeIndex(sem, elemIndex);
 
             if (mCurrentVertexShader)
             {

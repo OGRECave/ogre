@@ -47,6 +47,7 @@ namespace Ogre {
     */
     class GLSLShaderManager;
     class GLSLShaderFactory;
+    class GLSLProgram;
     class HardwareBufferManager;
 
     /**
@@ -135,7 +136,7 @@ namespace Ogre {
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
         void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
-                                     const size_t vertexStart, bool updateVAO);
+                                     const size_t vertexStart, GLSLProgram* program, bool updateVAO);
 
     public:
         // Default constructor / destructor
