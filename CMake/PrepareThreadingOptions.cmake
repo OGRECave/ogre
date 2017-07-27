@@ -12,7 +12,7 @@
 # build, depending on the dependencies found.
 #######################################################################
 
-set(OGRE_THREAD_DEFAULT_PROVIDER "none")
+set(OGRE_THREAD_DEFAULT_PROVIDER "std")
 set(OGRE_THREAD_TYPE "0")
 
 if (Boost_THREAD_FOUND AND Boost_DATE_TIME_FOUND)
