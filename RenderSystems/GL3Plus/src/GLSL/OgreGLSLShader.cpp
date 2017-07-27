@@ -230,11 +230,11 @@ namespace Ogre {
         createParameterMappingStructures(true);
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLSeparableProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs.get(), mName);
+            GLSLSeparableProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, mName);
         }
         else
         {
-            GLSLMonolithicProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs.get(), mName);
+            GLSLMonolithicProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, mName);
         }
 
         // Also parse any attached sources.
@@ -246,12 +246,12 @@ namespace Ogre {
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 GLSLSeparableProgramManager::getSingleton().extractUniformsFromGLSL(childShader->getSource(),
-                                                                                    *mConstantDefs.get(), childShader->getName());
+                                                                                    *mConstantDefs, childShader->getName());
             }
             else
             {
                 GLSLMonolithicProgramManager::getSingleton().extractUniformsFromGLSL(childShader->getSource(),
-                                                                                     *mConstantDefs.get(), childShader->getName());
+                                                                                     *mConstantDefs, childShader->getName());
             }
         }
     }

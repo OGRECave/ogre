@@ -83,14 +83,6 @@ namespace Ogre {
             const GpuConstantDefinitionMap* vertexConstantDefs, 
             const GpuConstantDefinitionMap* fragmentConstantDefs,
             GLUniformReferenceList& list, GLUniformBufferList& sharedList);
-        /** Populate a list of uniforms based on GLSL ES source.
-        @param src Reference to the source code
-        @param constantDefs The defs to populate (will not be cleared before adding, clear
-        it yourself before calling this if that's what you want).
-        @param filename The file name this came from, for logging errors.
-        */
-        void extractConstantDefs(const String& src, GpuNamedConstants& constantDefs, 
-            const String& filename);
     };
 
 }

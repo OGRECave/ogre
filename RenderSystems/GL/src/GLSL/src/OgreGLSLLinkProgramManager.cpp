@@ -396,58 +396,5 @@ namespace Ogre {
         } // end for
 
     }
-    //---------------------------------------------------------------------
-    void GLSLLinkProgramManager::extractConstantDefs(const String& src,
-        GpuNamedConstants& defs, const String& filename)
-    {
-        // Parse the output string and collect all uniforms
-        // NOTE this relies on the source already having been preprocessed
-        // which is done in GLSLProgram::loadFromSource
-        String line;
-        String::size_type currPos = src.find("uniform");
-        while (currPos != String::npos)
-        {
-            GpuConstantDefinition def;
-            String paramName;
-
-            // Now check for using the word 'uniform' in a larger string & ignore
-            bool inLargerString = false;
-            if (currPos != 0)
-            {
-                char prev = src.at(currPos - 1);
-                if (prev != ' ' && prev != '\t' && prev != '\r' && prev != '\n'
-                    && prev != ';')
-                    inLargerString = true;
-            }
-            if (!inLargerString && currPos + 7 < src.size())
-            {
-                char next = src.at(currPos + 7);
-                if (next != ' ' && next != '\t' && next != '\r' && next != '\n')
-                    inLargerString = true;
-            }
-
-            // skip 'uniform'
-            currPos += 7;
-
-            if (!inLargerString)
-            {
-                // find terminating semicolon
-                String::size_type endPos = src.find(";", currPos);
-                if (endPos == String::npos)
-                {
-                    // problem, missing semicolon, abort
-                    break;
-                }
-
-                parseGLSLUniform(src, defs, currPos, filename, GpuSharedParametersPtr());
-            } // not commented or a larger symbol
-
-            // Find next one
-            currPos = src.find("uniform", currPos);
-
-        }
-        
-    }
-
 }
 }

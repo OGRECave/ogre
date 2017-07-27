@@ -255,11 +255,11 @@ namespace Ogre {
         createParameterMappingStructures(true);
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLESProgramPipelineManager::getSingleton().extractConstantDefs(mSource, *mConstantDefs.get(), mName);
+            GLSLESProgramPipelineManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, mName);
         }
         else
         {
-            GLSLESLinkProgramManager::getSingleton().extractConstantDefs(mSource, *mConstantDefs.get(), mName);
+            GLSLESLinkProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, mName);
         }
     }
 
