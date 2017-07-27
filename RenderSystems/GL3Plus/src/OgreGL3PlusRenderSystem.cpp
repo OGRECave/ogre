@@ -1512,8 +1512,15 @@ namespace Ogre {
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
 
+        GL3PlusVertexArrayObject* vao =
+            static_cast<GL3PlusVertexArrayObject*>(op.vertexData->vertexDeclaration);
+
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
-        bool updateVAO = true;
+        vao->bind();
+
+        // FIXME: this fixes some rendering issues but leaves VAO's useless
+        bool updateVAO = true; // !vao->isInitialised();
+
         if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLSeparableProgram* separableProgram =
@@ -1524,10 +1531,6 @@ namespace Ogre {
                 {
                     separableProgram->activate();
                 }
-
-                updateVAO = !separableProgram->getVertexArrayObject()->isInitialised();
-
-                separableProgram->getVertexArrayObject()->bind();
             }
             else
             {
@@ -1538,13 +1541,7 @@ namespace Ogre {
         else
         {
             GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-            if (monolithicProgram)
-            {
-                updateVAO = !monolithicProgram->getVertexArrayObject()->isInitialised();
-
-                monolithicProgram->getVertexArrayObject()->bind();
-            }
-            else
+            if (!monolithicProgram)
             {
                 Ogre::LogManager::getSingleton().logMessage(
                     "ERROR: Failed to create monolithic program.", LML_CRITICAL);
@@ -1679,7 +1676,8 @@ namespace Ogre {
 
             if (op.useIndexes)
             {
-                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                if(updateVAO)
+                    mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                                                  static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
@@ -1697,7 +1695,8 @@ namespace Ogre {
         }
         else if (op.useIndexes)
         {
-            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+            if(updateVAO)
+                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                                              static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
             void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
@@ -1749,32 +1748,14 @@ namespace Ogre {
             } while (updatePassIterationRenderState());
         }
 
-        // Unbind VAO (if updated).
         if (updateVAO)
         {
-            if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                GLSLSeparableProgram* separableProgram =
-                    GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-                if (separableProgram)
-                {
-                    separableProgram->getVertexArrayObject()->setInitialised(true);
-                }
-            }
-            else
-            {
-                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-                if (monolithicProgram)
-                {
-                    monolithicProgram->getVertexArrayObject()->setInitialised(true);
-                }
-            }
-
-            // Unbind the vertex array object.
-            // Marks the end of what state will be included.
-            mStateCacheManager->bindGLVertexArray(0);
+            vao->setInitialised(true);
         }
 
+        // Unbind the vertex array object.
+        // Marks the end of what state will be included.
+        mStateCacheManager->bindGLVertexArray(0);
 
         mRenderAttribsBound.clear();
         mRenderInstanceAttribsBound.clear();
@@ -2514,8 +2495,7 @@ namespace Ogre {
     {
         const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
 
-        // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
-        // if (updateVAO)
+        if (updateVAO)
         {
             mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER,
                                              hwGlBuffer->getGLBufferId());

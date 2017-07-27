@@ -51,7 +51,6 @@ namespace Ogre
                     fragmentShader,
                     computeShader)
     {
-        mVertexArrayObject = new GL3PlusVertexArrayObject();
     }
 
     GLSLSeparableProgram::~GLSLSeparableProgram()
@@ -66,8 +65,6 @@ namespace Ogre
 
         OGRE_CHECK_GL_ERROR(glGenProgramPipelines(1, &mGLProgramPipelineHandle));
         //OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
-
-        mVertexArrayObject->bind();
 
         loadIndividualProgram(getVertexShader());
         loadIndividualProgram(mDomainShader);

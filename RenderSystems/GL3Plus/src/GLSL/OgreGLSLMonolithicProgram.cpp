@@ -96,9 +96,6 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::compileAndLink()
     {
-        mVertexArrayObject = new GL3PlusVertexArrayObject();
-        mVertexArrayObject->bind();
-
         // Compile and attach Vertex Program
         if (mVertexShader)
         {

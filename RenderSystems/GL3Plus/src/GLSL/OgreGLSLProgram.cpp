@@ -46,7 +46,6 @@ namespace Ogre {
         , mGeometryShader(geometryShader)
         , mFragmentShader(fragmentShader)
         , mComputeShader(computeShader)
-        , mVertexArrayObject(0)
     {
     }
 
@@ -54,9 +53,6 @@ namespace Ogre {
     GLSLProgram::~GLSLProgram(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-
-        delete mVertexArrayObject;
-        mVertexArrayObject = 0;
     }
 
 

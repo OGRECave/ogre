@@ -85,7 +85,6 @@ namespace Ogre {
         GLSLShader* getGeometryShader() const { return mGeometryShader; }
         GLSLShader* getFragmentShader() const { return mFragmentShader; }
         GLSLShader* getComputeShader() const { return mComputeShader; }
-        GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
 
     protected:
         /// Container of atomic counter uniform references that are active in the program object
@@ -105,8 +104,6 @@ namespace Ogre {
         GLSLShader* mFragmentShader;
         /// Linked compute shader.
         GLSLShader* mComputeShader;
-        /// GL handle for the vertex array object
-        GL3PlusVertexArrayObject* mVertexArrayObject;
 
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache

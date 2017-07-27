@@ -278,7 +278,6 @@ namespace Ogre {
 
         void setVertexDeclaration(VertexDeclaration* decl) {}
 
-        void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding) {}
         /** See
             RenderSystem.
         */

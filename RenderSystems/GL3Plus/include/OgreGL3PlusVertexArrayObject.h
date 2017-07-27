@@ -34,7 +34,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
 
     /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
-    class GL3PlusVertexArrayObject
+    class GL3PlusVertexArrayObject : public VertexDeclaration
     {
     protected:
         /// OpenGL id for the vertex array object
