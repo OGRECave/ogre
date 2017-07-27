@@ -143,9 +143,6 @@ namespace Ogre {
 
         LogManager::getSingleton().logMessage(getName() + " created.");
 
-        mRenderAttribsBound.reserve(100);
-        mRenderInstanceAttribsBound.reserve(100);
-
         // Get our GLSupport
         mGLSupport = new GL3PlusSupport(getGLSupport());
         glsupport = mGLSupport;
@@ -1560,8 +1557,7 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
 
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
-                                   mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, updateVAO);
         }
 
         if ( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
@@ -1570,8 +1566,7 @@ namespace Ogre {
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
-                                       mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, updateVAO);
             }
         }
 
@@ -1756,9 +1751,6 @@ namespace Ogre {
         // Unbind the vertex array object.
         // Marks the end of what state will be included.
         mStateCacheManager->bindGLVertexArray(0);
-
-        mRenderAttribsBound.clear();
-        mRenderInstanceAttribsBound.clear();
     }
 
     void GL3PlusRenderSystem::setScissorTest(bool enabled, size_t left,
@@ -2489,8 +2481,6 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::bindVertexElementToGpu( const VertexElement &elem,
                                                       HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
-                                                      vector<GLuint>::type &attribsBound,
-                                                      vector<GLuint>::type &instanceAttribsBound,
                                                       bool updateVAO)
     {
         const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
@@ -2539,7 +2529,7 @@ namespace Ogre {
                 if (hwGlBuffer->getIsInstanceData())
                 {
                     OGRE_CHECK_GL_ERROR(glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate()));
-                    instanceAttribsBound.push_back(attrib);
+                    //instanceAttribsBound.push_back(attrib);
                 }
             }
 
@@ -2588,7 +2578,7 @@ namespace Ogre {
             // If this attribute hasn't been enabled, do so and keep a record of it.
             OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
 
-            attribsBound.push_back(attrib);
+            // attribsBound.push_back(attrib);
         }
     }
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0

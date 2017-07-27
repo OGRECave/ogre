@@ -42,9 +42,11 @@ namespace Ogre {
         /// Is this VAO initialised?
         bool mInitialised;
 
-    protected:
         GL3PlusRenderSystem* mRenderSystem;
 
+        // TODO: cache used program attributes here and invalidate on change
+        vector<GLuint>::type mAttribsBound;
+        vector<GLuint>::type mInstanceAttribsBound;
     public:
         GL3PlusVertexArrayObject();
         ~GL3PlusVertexArrayObject();
