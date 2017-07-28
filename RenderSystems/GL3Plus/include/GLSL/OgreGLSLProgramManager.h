@@ -58,24 +58,14 @@ namespace Ogre {
             with its data source. */
         static bool findUniformDataSource(
             const String& paramName,
-            const GpuConstantDefinitionMap* vertexConstantDefs,
-            const GpuConstantDefinitionMap* hullConstantDefs,
-            const GpuConstantDefinitionMap* domainConstantDefs,
-            const GpuConstantDefinitionMap* geometryConstantDefs,
-            const GpuConstantDefinitionMap* fragmentConstantDefs,
-            const GpuConstantDefinitionMap* computeConstantDefs,
+            const GpuConstantDefinitionMap* (&constantDefs)[6],
             GLUniformReference& refToUpdate);
         /** Find the data source definition for a given atomic counter
             uniform name and reference. Return true if found and pair
             the reference with its data source. */
         static bool findAtomicCounterDataSource(
             const String& paramName,
-            const GpuConstantDefinitionMap* vertexConstantDefs,
-            const GpuConstantDefinitionMap* hullConstantDefs,
-            const GpuConstantDefinitionMap* domainConstantDefs,
-            const GpuConstantDefinitionMap* geometryConstantDefs,
-            const GpuConstantDefinitionMap* fragmentConstantDefs,
-            const GpuConstantDefinitionMap* computeConstantDefs,
+            const GpuConstantDefinitionMap* (&constantDefs)[6],
             GLAtomicCounterReference& refToUpdate);
     public:
 
@@ -85,12 +75,7 @@ namespace Ogre {
         */
         void extractUniformsFromProgram(
             GLuint programObject,
-            const GpuConstantDefinitionMap* vertexConstantDefs,
-            const GpuConstantDefinitionMap* hullConstantDefs,
-            const GpuConstantDefinitionMap* domainConstantDefs,
-            const GpuConstantDefinitionMap* geometryConstantDefs,
-            const GpuConstantDefinitionMap* fragmentConstantDefs,
-            const GpuConstantDefinitionMap* computeConstantDefs,
+            const GpuConstantDefinitionMap* (&constantDefs)[6],
             GLUniformReferenceList& uniformList,
             GLAtomicCounterReferenceList& counterList,
             GLUniformBufferList& uniformBufferList,

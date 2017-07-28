@@ -304,69 +304,34 @@ namespace Ogre
 
     void GLSLSeparableProgram::buildGLUniformReferences(void)
     {
-        if (!mUniformRefsBuilt)
+        if (mUniformRefsBuilt)
         {
-            const GpuConstantDefinitionMap* vertParams = 0;
-            const GpuConstantDefinitionMap* hullParams = 0;
-            const GpuConstantDefinitionMap* domainParams = 0;
-            const GpuConstantDefinitionMap* geomParams = 0;
-            const GpuConstantDefinitionMap* fragParams = 0;
-            const GpuConstantDefinitionMap* computeParams = 0;
-            if (mVertexShader)
-            {
-                vertParams = &(mVertexShader->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(getVertexShader()->getGLProgramHandle(),
-                                                                                       vertParams, NULL, NULL, NULL, NULL, NULL,
-                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
-            }
-            if (mHullShader)
-            {
-                hullParams = &(mHullShader->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mHullShader->getGLProgramHandle(),
-                                                                                       NULL, NULL, NULL, hullParams, NULL, NULL,
-                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
-            }
-            if (mDomainShader)
-            {
-                domainParams = &(mDomainShader->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mDomainShader->getGLProgramHandle(),
-                                                                                       NULL, NULL, NULL, NULL, domainParams, NULL,
-                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
-            }
-            if (mGeometryShader)
-            {
-                geomParams = &(mGeometryShader->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mGeometryShader->getGLProgramHandle(),
-                                                                                       NULL, geomParams, NULL, NULL, NULL, NULL,
-                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
-            }
-            if (mFragmentShader)
-            {
-                fragParams = &(mFragmentShader->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mFragmentShader->getGLProgramHandle(),
-                                                                                       NULL, NULL, fragParams, NULL, NULL, NULL,
-                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
-            }
-            if (mComputeShader)
-            {
-                computeParams = &(mComputeShader->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mComputeShader->getGLProgramHandle(),
-                                                                                       NULL, NULL, NULL, NULL, NULL, computeParams,
-                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
-            }
-
-            mUniformRefsBuilt = true;
+            return;
         }
+
+        // order must match GpuProgramType
+        GLSLShader* shaders[6] = {getVertexShader(), mFragmentShader, mGeometryShader, mDomainShader, mHullShader, mComputeShader};
+
+        for (int i = 0; i < 6; i++)
+        {
+            if (!shaders[i])
+                continue;
+
+            const GpuConstantDefinitionMap* params[6] = {NULL};
+            params[i] = &(shaders[i]->getConstantDefinitions().map);
+            GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(
+                shaders[i]->getGLProgramHandle(), params, mGLUniformReferences,
+                mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap,
+                mGLCounterBufferReferences);
+        }
+
+        mUniformRefsBuilt = true;
     }
 
 
     void GLSLSeparableProgram::updateUniforms(GpuProgramParametersSharedPtr params,
                                               uint16 mask, GpuProgramType fromProgType)
     {
-        // Iterate through uniform reference list and update uniform values
-        GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
-        GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
-
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
         if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!getVertexShader()->getColumnMajorMatrices())) ||
@@ -411,6 +376,10 @@ namespace Ogre
             progID = mComputeShader->getGLProgramHandle();
             uniformCache = mComputeShader->getUniformCache();
         }
+
+        // Iterate through uniform reference list and update uniform values
+        GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
+        GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
         for (; currentUniform != endUniform; ++currentUniform)
         {
             // Only pull values from buffer it's supposed to be in (vertex or fragment)
