@@ -53,10 +53,14 @@ namespace Ogre {
     {
         mIsTopLevel = false;
         mIsFullScreen = false;
+        mIsExternal = false;
+        mIsExternalGLControl = false;
         mClosed = false;
         mActive = true;//todo
         mIsExternalGLControl = false;
         mVisible = false;
+        mVSync = false;
+        mVSyncInterval = 1;
     }
 
     EGLWindow::~EGLWindow()
