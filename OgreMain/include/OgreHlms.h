@@ -680,6 +680,10 @@ namespace Ogre
         static const IdString UvCount6;
         static const IdString UvCount7;
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        static const IdString BaseInstance;
+#endif
+        
         //Change per frame (grouped together with scene pass)
         static const IdString LightsDirectional;
         static const IdString LightsDirNonCaster;
@@ -729,6 +733,7 @@ namespace Ogre
         static const IdString Metal;
         static const IdString GL3Plus;
         static const IdString iOS;
+        static const IdString macOS;
         static const IdString GLVersion;
         static const IdString HighQuality;
         static const IdString FastShaderBuildHack;

@@ -357,12 +357,18 @@ namespace Ogre {
             { "uv",             VES_TEXTURE_COORDINATES },
         };
 
+        GLint max_vertex_attribs = 16;
+        glGetIntegerv( GLenum(GL_MAX_VERTEX_ATTRIBS) , &max_vertex_attribs);
         for( size_t i=0; i<OGRE_NUM_SEMANTICS - 1; ++i )
         {
             const SemanticNameTable &entry = attributesTable[i];
-            OCGE( glBindAttribLocation( programName,
-                                        GL3PlusVaoManager::getAttributeIndexFor( entry.semantic ),
-                                        entry.semanticName ) );
+            GLint attrIdx = GL3PlusVaoManager::getAttributeIndexFor( entry.semantic );
+            if(attrIdx<max_vertex_attribs)
+            {
+                OCGE( glBindAttribLocation( programName,
+                                            attrIdx,
+                                            entry.semanticName ) );
+            }
         }
 
         for( size_t i=0; i<8; ++i )
@@ -374,6 +380,7 @@ namespace Ogre {
                                         ("uv" + StringConverter::toString( i )).c_str() ) );
         }
 
+        assert(max_vertex_attribs>=16);
         OCGE( glBindAttribLocation( programName, 15, "drawId" ) );
     }
 

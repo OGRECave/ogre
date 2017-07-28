@@ -40,6 +40,15 @@ namespace Ogre
     {
         GLuint mTexName;
         GLenum mInternalFormat;
+        
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        bool mUseLegacyTechnique;
+        GLenum mOriginFormat;
+        GLenum mOriginDataType;
+        size_t mMaxTexSize;
+        size_t mInternalNumElemBytes;
+        size_t mInternalNumElements;
+#endif
 
         inline void bindBuffer( uint16 slot, size_t offset, size_t sizeBytes );
 

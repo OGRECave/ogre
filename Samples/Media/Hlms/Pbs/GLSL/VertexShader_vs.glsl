@@ -44,8 +44,14 @@ out block
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
 @property( hlms_skeleton || hlms_shadowcaster )@insertpiece( InstanceDecl )@end
+@property( GL3+ >= 430 )
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
+@end
+@property( GL3+ < 430 )
+uniform sampler2D worldMatBuf;
+@end
 @insertpiece( custom_vs_uniformDeclaration )
+@property( hlms_base_instance )uniform uint baseInstance;@end
 // END UNIFORM DECLARATION
 
 @property( hlms_qtangent )
@@ -67,11 +73,11 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
 	uint _idx = (blendIndices[0] << 1u) + blendIndices[0]; //blendIndices[0] * 3u; a 32-bit int multiply is 4 cycles on GCN! (and mul24 is not exposed to GLSL...)
-        uint matStart = instance.worldMaterialIdx[drawId].x >> 9u;
+        uint matStart = instance.worldMaterialIdx[finalInstancedId].x >> 9u;
 	vec4 worldMat[3];
-        worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0u) );
-        worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1u) );
-        worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2u) );
+        worldMat[0] = TEXEL_FETCH( worldMatBuf, int(matStart + _idx + 0u) );
+        worldMat[1] = TEXEL_FETCH( worldMatBuf, int(matStart + _idx + 1u) );
+        worldMat[2] = TEXEL_FETCH( worldMatBuf, int(matStart + _idx + 2u) );
     vec4 worldPos;
     worldPos.x = dot( worldMat[0], vertex );
     worldPos.y = dot( worldMat[1], vertex );
@@ -93,9 +99,9 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	tmp.w = 1.0;@end //!NeedsMoreThan1BonePerVertex
 	@foreach( hlms_bones_per_vertex, n, 1 )
 	_idx = (blendIndices[@n] << 1u) + blendIndices[@n]; //blendIndices[@n] * 3; a 32-bit int multiply is 4 cycles on GCN! (and mul24 is not exposed to GLSL...)
-        worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0u) );
-        worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1u) );
-        worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2u) );
+        worldMat[0] = TEXEL_FETCH( worldMatBuf, int(matStart + _idx + 0u) );
+        worldMat[1] = TEXEL_FETCH( worldMatBuf, int(matStart + _idx + 1u) );
+        worldMat[2] = TEXEL_FETCH( worldMatBuf, int(matStart + _idx + 2u) );
 	tmp.x = dot( worldMat[0], vertex );
 	tmp.y = dot( worldMat[1], vertex );
 	tmp.z = dot( worldMat[2], vertex );
@@ -143,13 +149,22 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 void main()
 {
-    @insertpiece( custom_vs_preExecution )
-@property( !hlms_skeleton )
-	mat3x4 worldMat = UNPACK_MAT3x4( worldMatBuf, drawId @property( !hlms_shadowcaster )<< 1u@end );
-	@property( hlms_normal || hlms_qtangent )
-    mat4 worldView = UNPACK_MAT4( worldMatBuf, (drawId << 1u) + 1u );
-	@end
+@property( hlms_base_instance )
+    uint finalInstancedId = baseInstance + drawId;
+@end
+@property( !hlms_base_instance )
+    uint finalInstancedId = drawId;
+@end
 
+    @insertpiece( custom_vs_preExecution )
+    
+@property( !hlms_skeleton )
+    
+	mat3x4 worldMat = UNPACK_MAT3x4( worldMatBuf, finalInstancedId @property( !hlms_shadowcaster )<< 1u@end );
+	@property( hlms_normal || hlms_qtangent )
+    mat4 worldView = UNPACK_MAT4( worldMatBuf, (finalInstancedId << 1u) + 1u );
+	@end
+    
 	vec4 worldPos = vec4( (vertex * worldMat).xyz, 1.0f );
 @end
 
@@ -173,7 +188,7 @@ void main()
 	outVs.uv@n = uv@n;@end
 
 @property( (!hlms_shadowcaster || alpha_test) && !lower_gpu_overhead )
-	outVs.drawId = drawId;@end
+	outVs.drawId = finalInstancedId;@end
 
 	@property( hlms_use_prepass_msaa > 1 )
 		outVs.zwDepth.xy = outVs.gl_Position.zw;

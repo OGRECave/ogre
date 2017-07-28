@@ -65,6 +65,9 @@ namespace Ogre
             formatType = GL_UNSIGNED_INT_24_8;
             break;
         case GL_DEPTH_COMPONENT32:
+            mBitDepth = 32;
+            formatType = GL_UNSIGNED_INT;
+            break;
         case GL_DEPTH_COMPONENT32F:
             mBitDepth = 32;
             formatType = GL_FLOAT;
@@ -104,6 +107,13 @@ namespace Ogre
                 OCGE( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0 ) );
                 OCGE( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 ) );
 
+                OCGE( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE) );
+                OCGE( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE) );
+                OCGE( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST) );
+                OCGE( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST) );
+                OCGE( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE) );
+                OCGE( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL) );
+                
                 if( hasGL42 || support->checkExtension("GL_ARB_texture_storage") )
                 {
                     OCGE( glTexStorage2D( GL_TEXTURE_2D, GLint(1), depthFormat,
@@ -115,6 +125,7 @@ namespace Ogre
                                         GLsizei(mWidth), GLsizei(mHeight),
                                         0, GL_DEPTH_COMPONENT, formatType, NULL ) );
                 }
+                
             }
             else
             {
@@ -242,7 +253,7 @@ namespace Ogre
                     "with separate stencil format. We should have never hit this path." );
 
             OCGE( glFramebufferTexture( target, GL_DEPTH_ATTACHMENT, mDepthBufferName, 0 ) );
-
+            
             if( mStencilBufferName )
                 OCGE( glFramebufferTexture( target, GL_STENCIL_ATTACHMENT, mStencilBufferName, 0 ) );
         }

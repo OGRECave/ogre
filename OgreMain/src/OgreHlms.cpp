@@ -99,6 +99,10 @@ namespace Ogre
     const IdString HlmsBaseProp::UvCount6           = IdString( "hlms_uv_count6" );
     const IdString HlmsBaseProp::UvCount7           = IdString( "hlms_uv_count7" );
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+    const IdString HlmsBaseProp::BaseInstance       = IdString( "hlms_base_instance" );
+#endif
+    
     //Change per frame (grouped together with scene pass)
     const IdString HlmsBaseProp::LightsDirectional  = IdString( "hlms_lights_directional" );
     const IdString HlmsBaseProp::LightsDirNonCaster = IdString( "hlms_lights_directional_non_caster" );
@@ -149,6 +153,7 @@ namespace Ogre
     const IdString HlmsBaseProp::Metal          = IdString( "metal" );
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
     const IdString HlmsBaseProp::iOS            = IdString( "iOS" );
+    const IdString HlmsBaseProp::macOS          = IdString( "macOS" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
     const IdString HlmsBaseProp::FastShaderBuildHack= IdString( "fast_shader_build_hack" );
     const IdString HlmsBaseProp::TexGather      = IdString( "hlms_tex_gather" );
@@ -1849,6 +1854,10 @@ namespace Ogre
                 {
                     setProperty( HlmsBaseProp::GL3Plus,
                                  mRenderSystem->getNativeShadingLanguageVersion() );
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+                    if(mRenderSystem->getNativeShadingLanguageVersion()<420)
+                        setProperty( HlmsBaseProp::BaseInstance, 1 );
+#endif
                 }
 
                 setProperty( HlmsBaseProp::Syntax,  mShaderSyntax.mHash );
@@ -1859,6 +1868,9 @@ namespace Ogre
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 setProperty( HlmsBaseProp::iOS, 1 );
+#endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+                setProperty( HlmsBaseProp::macOS, 1 );
 #endif
                 setProperty( HlmsBaseProp::HighQuality, mHighQuality );
 

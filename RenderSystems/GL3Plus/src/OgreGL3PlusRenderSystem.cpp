@@ -1583,6 +1583,10 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_executeResourceTransition( ResourceTransition *resTransition )
     {
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        if(!glMemoryBarrier)
+            return;
+#endif
         GLbitfield barriers = static_cast<GLbitfield>( reinterpret_cast<intptr_t>(
                                                            resTransition->mRsData ) );
 
@@ -2716,6 +2720,24 @@ namespace Ogre {
         GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
                                                             GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        if(!glMultiDrawElementsIndirect)
+        {
+            if(glMultiDrawElements)
+            {
+                const uint8_t* args = (const uint8_t*)cmd->indirectBufferOffset;
+                GLsizei stride = sizeof(CbDrawStrip);
+                uint32 drawcount = cmd->numDraws;
+                for (uint32 ii = 0; ii < drawcount; ++ii)
+                {
+                    OCGE( glDrawElementsIndirect(mode, indexType, (void*)args) );
+                    args += stride;
+                }
+            }
+            return;
+        }
+#endif
+        
         OCGE( glMultiDrawElementsIndirect( mode, indexType, cmd->indirectBufferOffset,
                                            cmd->numDraws, sizeof(CbDrawIndexed) ) );
     }
@@ -2725,6 +2747,24 @@ namespace Ogre {
         const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( cmd->vao );
         GLenum mode = mPso->domainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        if(!glMultiDrawArraysIndirect)
+        {
+            if(glDrawArraysIndirect)
+            {
+                const uint8_t* args = (const uint8_t*)cmd->indirectBufferOffset;
+                GLsizei stride = sizeof(CbDrawStrip);
+                uint32 drawcount = cmd->numDraws;
+                for (uint32 ii = 0; ii < drawcount; ++ii)
+                {
+                    OCGE(glDrawArraysIndirect(mode, (void*)args) );
+                    args += stride;
+                }
+            }
+            return;
+        }
+#endif
+        
         OCGE( glMultiDrawArraysIndirect( mode, cmd->indirectBufferOffset,
                                          cmd->numDraws, sizeof(CbDrawStrip) ) );
     }
@@ -2742,6 +2782,34 @@ namespace Ogre {
 
         const size_t bytesPerIndexElement = vao->mIndexBuffer->getBytesPerElement();
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        if(getNativeShadingLanguageVersion()<420) //check in the same way as in Hlms::createShaderCacheEntry() for "baseInstance"
+        {            
+            GLSLMonolithicProgram* activeLinkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            const GpuConstantDefinition* def = mActiveVertexGpuProgramParameters->_findNamedConstantDefinition("baseInstance", false);
+            
+            for( uint32 i=cmd->numDraws; i--; )
+            {
+                if (def)
+                {
+                    mActiveVertexGpuProgramParameters->_writeRawConstant(def->physicalIndex, drawCmd->baseInstance);
+                    activeLinkProgram->updateUniform(def, mActiveVertexGpuProgramParameters, GPV_ALL, GPT_VERTEX_PROGRAM );
+                }
+                
+                OCGE( glDrawElementsInstancedBaseVertex(
+                        mode,
+                        drawCmd->primCount,
+                        indexType,
+                        reinterpret_cast<void*>( drawCmd->firstVertexIndex * bytesPerIndexElement ),
+                        drawCmd->instanceCount,
+                        drawCmd->baseVertex ) );
+                ++drawCmd;
+            }
+    
+            return;
+        }
+#endif
+        
         for( uint32 i=cmd->numDraws; i--; )
         {
             OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
@@ -2764,6 +2832,32 @@ namespace Ogre {
         CbDrawStrip *drawCmd = reinterpret_cast<CbDrawStrip*>(
                                     mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        if(getNativeShadingLanguageVersion()<420) //check in the same way as in Hlms::createShaderCacheEntry() for "baseInstance"
+        {
+            GLSLMonolithicProgram* activeLinkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            const GpuConstantDefinition* def = mActiveVertexGpuProgramParameters->_findNamedConstantDefinition("baseInstance", false);
+            
+            for( uint32 i=cmd->numDraws; i--; )
+            {
+                if (def)
+                {
+                    mActiveVertexGpuProgramParameters->_writeRawConstant(def->physicalIndex, drawCmd->baseInstance);
+                    activeLinkProgram->updateUniform(def, mActiveVertexGpuProgramParameters, GPV_ALL, GPT_VERTEX_PROGRAM );
+                }
+                
+                OCGE( glDrawArraysInstanced(
+                        mode,
+                        drawCmd->firstVertexIndex,
+                        drawCmd->primCount,
+                        drawCmd->instanceCount ) );
+                ++drawCmd;
+            }
+            
+            return;
+        }
+#endif
+        
         for( uint32 i=cmd->numDraws; i--; )
         {
             OCGE( glDrawArraysInstancedBaseInstance(
@@ -2931,6 +3025,27 @@ namespace Ogre {
 
         const size_t bytesPerIndexElement = mCurrentIndexBuffer->indexBuffer->getIndexSize();
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        if(getNativeShadingLanguageVersion()<420) //check in the same way as in Hlms::createShaderCacheEntry() for "baseInstance"
+        {
+            GLSLMonolithicProgram* activeLinkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            const GpuConstantDefinition* def = mActiveVertexGpuProgramParameters->_findNamedConstantDefinition("baseInstance", false);
+            if (def)
+            {
+                mActiveVertexGpuProgramParameters->_writeRawConstant(def->physicalIndex, cmd->baseInstance);
+                activeLinkProgram->updateUniform(def, mActiveVertexGpuProgramParameters, GPV_ALL, GPT_VERTEX_PROGRAM );
+            }
+            
+            OCGE( glDrawElementsInstancedBaseVertex(
+                        mCurrentPolygonMode,
+                        cmd->primCount,
+                        indexType,
+                        reinterpret_cast<void*>(cmd->firstVertexIndex * bytesPerIndexElement),
+                        cmd->instanceCount,
+                        mCurrentVertexBuffer->vertexStart ) );
+            return;
+        }
+#endif
         OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
                     mCurrentPolygonMode,
                     cmd->primCount,
@@ -2943,6 +3058,25 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_render( const v1::CbDrawCallStrip *cmd )
     {
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        if(getNativeShadingLanguageVersion()<420) //check in the same way as in Hlms::createShaderCacheEntry() for "baseInstance"
+        {
+            GLSLMonolithicProgram* activeLinkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            const GpuConstantDefinition* def = mActiveVertexGpuProgramParameters->_findNamedConstantDefinition("baseInstance", false);
+            if (def)
+            {
+                mActiveVertexGpuProgramParameters->_writeRawConstant(def->physicalIndex, cmd->baseInstance);
+                activeLinkProgram->updateUniform(def, mActiveVertexGpuProgramParameters, GPV_ALL, GPT_VERTEX_PROGRAM );
+            }
+            
+            OCGE( glDrawArraysInstanced(
+                        mCurrentPolygonMode,
+                        cmd->firstVertexIndex,
+                        cmd->primCount,
+                        cmd->instanceCount ) );
+            return;
+        }
+#endif
         OCGE( glDrawArraysInstancedBaseInstance(
                     mCurrentPolygonMode,
                     cmd->firstVertexIndex,
@@ -3359,7 +3493,7 @@ namespace Ogre {
                     {
                         //Attach the depth buffer to this no-colour framebuffer
                         depthBuffer->bindToFramebuffer();
-                    }
+                     }
                     else
                     {
                         //Detach all depth buffers from this no-colour framebuffer
@@ -3375,7 +3509,8 @@ namespace Ogre {
 
                         OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_SAMPLES,
                                                        target->getFSAA() > 1 ? target->getFSAA() : 0 ) );
-                    }
+                        
+                     }
                 }
 
                 //Do not render to colour Render Targets.

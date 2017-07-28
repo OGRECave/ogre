@@ -2,7 +2,7 @@
 @property( GL3+ >= 430 )#version 430 core
 @end @property( GL3+ < 430 )
 #version 330 core
-#extension GL_ARB_shading_language_420pack: require
+//#extension GL_ARB_shading_language_420pack: require
 @end
 
 #define float2 vec2
@@ -27,4 +27,26 @@
 
 #define outVs_Position gl_Position
 #define OGRE_SampleLevel( tex, sampler, uv, lod ) textureLod( tex, uv.xy, lod )
+
+@property( GL3+ >= 430 )
+#define TEXEL_FETCH texelFetch
+@end
+@property( GL3+ < 430 )
+vec4 TEXEL_FETCH(in sampler2D sampl, in int pixelIdx)
+{
+    ivec2 pos = ivec2(mod(pixelIdx, 2048), int(uint(pixelIdx) >> 11u));
+    return texelFetch( sampl, pos, 0 );
+}
+ivec4 TEXEL_FETCH(in isampler2D sampl, in int pixelIdx)
+{
+    ivec2 pos = ivec2(mod(pixelIdx, 2048), int(uint(pixelIdx) >> 11u));
+    return texelFetch( sampl, pos, 0 );
+}
+uvec4 TEXEL_FETCH(in usampler2D sampl, in int pixelIdx)
+{
+    ivec2 pos = ivec2(mod(pixelIdx, 2048), int(uint(pixelIdx) >> 11u));
+    return texelFetch( sampl, pos, 0 );
+}
+@end
+
 @end

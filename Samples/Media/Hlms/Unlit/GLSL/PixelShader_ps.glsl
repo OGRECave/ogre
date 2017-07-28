@@ -23,10 +23,12 @@ layout(location = FRAG_COLOR, index = 0) out float outColour;
 @end
 @insertpiece( custom_ps_uniformDeclaration )
 // END UNIFORM DECLARATION
+@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture || exponential_shadow_maps )
 in block
 {
 @insertpiece( VStoPS_block )
 } inPs;
+@end
 
 @property( !hlms_shadowcaster )
 @property( num_array_textures )uniform sampler2DArray	textureMapsArray[@value( num_array_textures )];@end
@@ -75,7 +77,7 @@ void main()
 }
 
 @end @property( hlms_shadowcaster )
-	@property( hlms_render_depth_only )
+	@property( hlms_render_depth_only && !macOS)
 		@set( hlms_disable_stage, 1 )
 	@end
 

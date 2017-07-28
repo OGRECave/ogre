@@ -45,6 +45,12 @@ THE SOFTWARE.
 
 #include "OgreTimer.h"
 #include "OgreStringConverter.h"
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+#include "OgreRoot.h"
+#include "OgreGL3PlusRenderSystem.h"
+#include "OgreGL3PlusPixelFormat.h"
+#endif
+
 
 namespace Ogre
 {
@@ -91,25 +97,29 @@ namespace Ogre
 
         //The minimum alignment for these buffers is 16 because some
         //places of Ogre assume such alignment for SIMD reasons.
-        GLint alignment;
-        glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment );
+        GLint alignment = 1; //initial value according to specs
+        OCGE( glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment ) );
         mConstBufferAlignment = alignment;
+        alignment = 1; //initial value according to specs
         glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
+        glGetError(); //skip error that might be rised above on legacy GL < 4.3
         mTexBufferAlignment = std::max<uint32>( alignment, 16u );
         if( _supportsSsbo )
         {
-            glGetIntegerv( GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &alignment );
+            alignment = 1; //initial value according to specs
+            OCGE( glGetIntegerv( GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &alignment ) );
             mUavBufferAlignment = std::max<uint32>( alignment, 16u );
         }
 
-        GLint maxBufferSize;
-        glGetIntegerv( GL_MAX_UNIFORM_BLOCK_SIZE, &maxBufferSize );
+        GLint maxBufferSize = 16384; //minimum value according to specs
+        OCGE( glGetIntegerv( GL_MAX_UNIFORM_BLOCK_SIZE, &maxBufferSize ) );
         mConstBufferMaxSize = static_cast<size_t>( maxBufferSize );
-        glGetIntegerv( GL_MAX_TEXTURE_BUFFER_SIZE, &maxBufferSize );
+        maxBufferSize = 65536; //minimum value according to specs
+        OCGE( glGetIntegerv( GL_MAX_TEXTURE_BUFFER_SIZE, &maxBufferSize ) );
         mTexBufferMaxSize = static_cast<size_t>( maxBufferSize );
         if( _supportsSsbo )
         {
-            glGetIntegerv( GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxBufferSize );
+            OCGE( glGetIntegerv( GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxBufferSize ) );
             mUavBufferMaxSize = static_cast<size_t>( maxBufferSize );
         }
 
@@ -566,6 +576,18 @@ namespace Ogre
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        GL3PlusRenderSystem* pRenderSystem = static_cast<GL3PlusRenderSystem*>(Ogre::Root::getSingleton().getRenderSystem());
+        assert(pRenderSystem);
+        if(pRenderSystem->getNativeShadingLanguageVersion()<430)
+        {
+            // Align to the texture size since we must copy the PBO to a texture.
+            ushort maxTexSizeBytes = 2048 * PixelUtil::getNumElemBytes( pixelFormat );
+            // We need another line of maxTexSizeBytes for uploading to create a rectangle when calling glTexSubImage2D().
+            sizeBytes = sizeBytes = alignToNextMultiple( sizeBytes, maxTexSizeBytes );
+        }
+#endif
+        
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
             //For dynamic buffers, the size will be 3x times larger

@@ -48,8 +48,15 @@ uniform sampler2D terrainNormals;
 uniform sampler2D terrainShadows;
 
 @property( hlms_forwardplus )
+@property( GL3+ >= 430 )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
-/*layout(binding = 2) */uniform samplerBuffer f3dLightList;@end
+/*layout(binding = 2) */uniform samplerBuffer f3dLightList;
+@end
+@property( GL3+ < 430 )
+uniform usampler2D f3dGrid;
+uniform sampler2D f3dLightList;@end
+@end
+@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 @property( envprobe_map )uniform samplerCube	texEnvProbeMap;@end
 

@@ -195,6 +195,13 @@ namespace Ogre {
 
         // GL 4.2
         mTypeEnumMap.insert(StringToEnumMap::value_type("atomic_uint", GL_UNSIGNED_INT_ATOMIC_COUNTER));
+        
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        mBindingLocationMap.insert( StringToBindingMap::value_type( "PassBuffer", 0 ) );
+        mBindingLocationMap.insert( StringToBindingMap::value_type( "MaterialBuf", 1 ) );
+        mBindingLocationMap.insert( StringToBindingMap::value_type( "InstanceBuffer", 2 ) );
+#endif
+
     }
     
     void GLSLProgramManager::convertGLUniformtoOgreType(GLenum gltype,
@@ -718,7 +725,12 @@ namespace Ogre {
             // Map uniform block to binding point of GL buffer of
             // shared param bearing the same name.
 
-            GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+            GpuSharedParametersPtr blockSharedParams;
+            try {
+                blockSharedParams = GpuProgramManager::getSingleton().createSharedParameters(uniformName);
+            } catch (Exception& e) {
+                blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+            }
             //TODO error handling for when buffer has no associated shared parameter?
             //if (bufferi == mSharedParamGLBufferMap.end()) continue;
 
@@ -883,6 +895,80 @@ namespace Ogre {
                 counterBufferList.push_back(newCounterBuffer);
             }
         }
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        else
+        {
+            OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
+            
+            for (GLint index = 0; index < blockCount; index++)
+            {
+                OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockName(programObject, index, uniformLength, NULL, uniformName));
+                
+                // Map uniform block to binding point of GL buffer of
+                // shared param bearing the same name.
+                
+                GpuSharedParametersPtr blockSharedParams;
+                try {
+                    blockSharedParams = GpuProgramManager::getSingleton().createSharedParameters(uniformName);
+                } catch (Exception& e) {
+                    blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+                }
+                //TODO error handling for when buffer has no associated shared parameter?
+                //if (bufferi == mSharedParamGLBufferMap.end()) continue;
+                
+                v1::GL3PlusHardwareUniformBuffer* hwGlBuffer;
+                SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
+                if (bufferMapi != sharedParamsBufferMap.end())
+                {
+                    hwGlBuffer = static_cast<v1::GL3PlusHardwareUniformBuffer*>(bufferMapi->second.get());
+                }
+                else
+                {
+                    
+                    StringToBindingMap::iterator uniformBinding = mBindingLocationMap.find( uniformName );
+                    if( uniformBinding == mBindingLocationMap.end() )
+                    {
+                        continue;
+                    }
+                    
+                    // Create buffer and add entry to buffer map.
+                    GLint blockSize;
+                    OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
+                    v1::HardwareUniformBufferSharedPtr newUniformBuffer = v1::HardwareBufferManager::getSingleton().
+                    createUniformBuffer(blockSize, v1::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
+                    hwGlBuffer = static_cast<v1::GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
+                    hwGlBuffer->setGLBufferBinding(uniformBinding->second);
+                    std::pair<GpuSharedParametersPtr, v1::HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newUniformBuffer);
+                    sharedParamsBufferMap.insert(newPair);
+                    
+                    // Get active block parameter properties.
+                    GpuConstantDefinitionIterator sharedParamDef = blockSharedParams->getConstantDefinitionIterator();
+                    std::vector<const char*> sharedParamNames;
+                    for (; sharedParamDef.current() != sharedParamDef.end(); sharedParamDef.moveNext())
+                    {
+                        sharedParamNames.push_back(sharedParamDef.current()->first.c_str());
+                    }
+                    
+                    std::vector<GLuint> uniformParamIndices (sharedParamNames.size(), 0);
+                    std::vector<GLint> uniformParamOffsets (sharedParamNames.size(), -2);
+                    OGRE_CHECK_GL_ERROR(glGetUniformIndices(programObject, sharedParamNames.size(), &sharedParamNames[0], &uniformParamIndices[0]));
+                    //FIXME debug this (see stdout)
+                    OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, uniformParamIndices.size(), &uniformParamIndices[0], GL_UNIFORM_OFFSET, &uniformParamOffsets[0]));
+                    //TODO handle uniform arrays
+                    //GL_UNIFORM_ARRAY_STRIDE
+                    //TODO handle matrices
+                    //GL_UNIFORM_MATRIX_STRIDE
+                    
+                    hwGlBuffer->mBufferParamsLayout.indices = uniformParamIndices;
+                    hwGlBuffer->mBufferParamsLayout.offsets = uniformParamOffsets;
+                }
+                
+                GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
+                OCGE( glUniformBlockBinding( programObject, index, bufferBinding) );
+            }
+        }
+#endif
+        
     }
     
     void GLSLProgramManager::extractUniformsFromGLSL(

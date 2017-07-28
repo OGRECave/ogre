@@ -183,6 +183,11 @@ namespace Ogre
         if( getProperty( UnlitProperty::TextureMatrix ) )
             vsParams->setNamedConstant( "animationMatrixBuf", 1 );
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+        if(mRenderSystem->getNativeShadingLanguageVersion()<420)
+            vsParams->setNamedConstant( "baseInstance", uint32(0) );
+#endif        
+        
         mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
                                             mSetProperties, queuedRenderable );
 

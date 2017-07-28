@@ -32,6 +32,7 @@ out block
 @insertpiece( TerraInstanceDecl )
 uniform sampler2D heightMap;
 @insertpiece( custom_vs_uniformDeclaration )
+@property( hlms_base_instance )uniform uint baseInstance;@end
 // END UNIFORM DECLARATION
 
 @piece( VertexTransform )
@@ -56,9 +57,16 @@ uniform sampler2D heightMap;
 
 void main()
 {
+@property( hlms_base_instance )
+    uint finalInstancedId = baseInstance + drawId;
+@end
+@property( !hlms_base_instance )
+    uint finalInstancedId = drawId;
+@end
+
     @insertpiece( custom_vs_preExecution )
 
-    CellData cellData = instance.cellData[drawId];
+    CellData cellData = instance.cellData[finalInstancedId];
 
 	//Map pointInLine from range [0; 12) to range [0; 9] so that it reads:
 	// 0 0 1 2 3 4 5 6 7 8 9 9

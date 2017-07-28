@@ -59,17 +59,25 @@ in vec4 gl_FragCoord;
 @end
 @insertpiece( custom_ps_uniformDeclaration )
 // END UNIFORM DECLARATION
+@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture || alpha_test || exponential_shadow_maps )
 in block
 {
 @insertpiece( VStoPS_block )
 } inPs;
+@end
 
 @property( !hlms_shadowcaster )
 
 @property( hlms_forwardplus )
+@property( GL3+ >= 430 )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
-/*layout(binding = 2) */uniform samplerBuffer f3dLightList;@end
-
+/*layout(binding = 2) */uniform samplerBuffer f3dLightList;
+@end
+@property( GL3+ < 430 )
+uniform usampler2D f3dGrid;
+uniform sampler2D f3dLightList;
+@end
+@end
 @property( irradiance_volumes )
 	uniform sampler3D irradianceVolume;
 @end

@@ -251,7 +251,7 @@ namespace Ogre {
             [mGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
             
             if(miscParams)
-                opt = miscParams->find("externalWindowHandle");
+                opt = miscParams->find("parentWindowHandle");
             
             // Make active
             setHidden(hidden);

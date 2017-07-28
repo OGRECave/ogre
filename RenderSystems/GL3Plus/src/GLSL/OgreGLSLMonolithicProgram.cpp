@@ -491,6 +491,206 @@ namespace Ogre {
         } // End for
     }
 
+#ifdef OGRE_LEGACY_GL_COMPATIBLE
+    void GLSLMonolithicProgram::updateUniform(const GpuConstantDefinition* uniformDef, GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType)
+    {
+        // Iterate through uniform reference list and update uniform values
+        GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
+        GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
+        
+        // determine if we need to transpose matrices when binding
+        int transpose = GL_TRUE;
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainShader && (!mDomainShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeShader && (!mComputeShader->getColumnMajorMatrices())))
+        {
+            transpose = GL_FALSE;
+        }
+        
+        for (;currentUniform != endUniform; ++currentUniform)
+        {
+            // Only pull values from buffer it's supposed to be in (vertex or fragment)
+            // This method will be called twice, once for vertex program params,
+            // and once for fragment program params.
+            if (fromProgType == currentUniform->mSourceProgType)
+            {
+                const GpuConstantDefinition* def = currentUniform->mConstantDef;
+                if (def==uniformDef && (def->variability & mask))
+                {
+                    GLsizei glArraySize = (GLsizei)def->arraySize;
+                    
+                    // Get the index in the parameter real list
+                    switch (def->constType)
+                    {
+                        case GCT_FLOAT1:
+                            OGRE_CHECK_GL_ERROR(glUniform1fv(currentUniform->mLocation, glArraySize,
+                                                             params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_FLOAT2:
+                            OGRE_CHECK_GL_ERROR(glUniform2fv(currentUniform->mLocation, glArraySize,
+                                                             params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_FLOAT3:
+                            OGRE_CHECK_GL_ERROR(glUniform3fv(currentUniform->mLocation, glArraySize,
+                                                             params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_FLOAT4:
+                            OGRE_CHECK_GL_ERROR(glUniform4fv(currentUniform->mLocation, glArraySize,
+                                                             params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_DOUBLE1:
+                            OGRE_CHECK_GL_ERROR(glUniform1dv(currentUniform->mLocation, glArraySize,
+                                                             params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_DOUBLE2:
+                            OGRE_CHECK_GL_ERROR(glUniform2dv(currentUniform->mLocation, glArraySize,
+                                                             params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_DOUBLE3:
+                            OGRE_CHECK_GL_ERROR(glUniform3dv(currentUniform->mLocation, glArraySize,
+                                                             params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_DOUBLE4:
+                            OGRE_CHECK_GL_ERROR(glUniform4dv(currentUniform->mLocation, glArraySize,
+                                                             params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_2X2:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix2dv(currentUniform->mLocation, glArraySize,
+                                                                   transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_2X3:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix2x3dv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_2X4:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix2x4dv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_3X2:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix3x2dv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_3X3:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix3dv(currentUniform->mLocation, glArraySize,
+                                                                   transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_3X4:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix3x4dv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_4X2:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix4x2dv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_4X3:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix4x3dv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_DOUBLE_4X4:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix4dv(currentUniform->mLocation, glArraySize,
+                                                                   transpose, params->getDoublePointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_2X2:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix2fv(currentUniform->mLocation, glArraySize,
+                                                                   transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_2X3:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix2x3fv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_2X4:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix2x4fv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_3X2:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix3x2fv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_3X3:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix3fv(currentUniform->mLocation, glArraySize,
+                                                                   transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_3X4:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix3x4fv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_4X2:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix4x2fv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_4X3:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix4x3fv(currentUniform->mLocation, glArraySize,
+                                                                     transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_4X4:
+                            OGRE_CHECK_GL_ERROR(glUniformMatrix4fv(currentUniform->mLocation, glArraySize,
+                                                                   transpose, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_INT1:
+                            OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize,
+                                                             (GLint*)params->getIntPointer(def->physicalIndex)));
+                            break;
+                        case GCT_INT2:
+                            OGRE_CHECK_GL_ERROR(glUniform2iv(currentUniform->mLocation, glArraySize,
+                                                             (GLint*)params->getIntPointer(def->physicalIndex)));
+                            break;
+                        case GCT_INT3:
+                            OGRE_CHECK_GL_ERROR(glUniform3iv(currentUniform->mLocation, glArraySize,
+                                                             (GLint*)params->getIntPointer(def->physicalIndex)));
+                            break;
+                        case GCT_INT4:
+                            OGRE_CHECK_GL_ERROR(glUniform4iv(currentUniform->mLocation, glArraySize,
+                                                             (GLint*)params->getIntPointer(def->physicalIndex)));
+                            break;
+                        case GCT_UINT1:
+                        case GCT_BOOL1:
+                            OGRE_CHECK_GL_ERROR(glUniform1uiv(currentUniform->mLocation, glArraySize,
+                                                              (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
+                            break;
+                        case GCT_UINT2:
+                        case GCT_BOOL2:
+                            OGRE_CHECK_GL_ERROR(glUniform2uiv(currentUniform->mLocation, glArraySize,
+                                                              (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
+                            break;
+                        case GCT_UINT3:
+                        case GCT_BOOL3:
+                            OGRE_CHECK_GL_ERROR(glUniform3uiv(currentUniform->mLocation, glArraySize,
+                                                              (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
+                            break;
+                        case GCT_UINT4:
+                        case GCT_BOOL4:
+                            OGRE_CHECK_GL_ERROR(glUniform4uiv(currentUniform->mLocation, glArraySize,
+                                                              (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
+                            break;
+                            
+                        case GCT_SAMPLER1D:
+                        case GCT_SAMPLER1DSHADOW:
+                        case GCT_SAMPLER2D:
+                        case GCT_SAMPLER2DSHADOW:
+                        case GCT_SAMPLER2DARRAY:
+                        case GCT_SAMPLER3D:
+                        case GCT_SAMPLERCUBE:
+                        case GCT_SAMPLERRECT:
+                            // Samplers handled like 1-element ints
+                            OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize,
+                                                             (GLint*)params->getIntPointer(def->physicalIndex)));
+                            break;
+                        default:
+                            break;
+                            
+                    } // End switch
+                    
+                    break; //we update only one uniform so can skip the rest
+                    
+                } // Variability & mask
+            } // fromProgType == currentUniform->mSourceProgType
+            
+        } // End for
+    }
+#endif
 
     void GLSLMonolithicProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
                                                     uint16 mask, GpuProgramType fromProgType)

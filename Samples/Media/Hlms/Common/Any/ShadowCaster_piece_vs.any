@@ -4,7 +4,7 @@
 @property( hlms_shadowcaster )
 	@piece( DoShadowCasterVS )
 		@property( syntax == glsl )
-			float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[drawId].y );
+			float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[finalInstancedId].y );
 		@end
 		@property( syntax == hlsl )
 			float shadowConstantBias = asfloat( worldMaterialIdx[input.drawId].y );
