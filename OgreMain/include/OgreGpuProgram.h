@@ -47,7 +47,7 @@ namespace Ogre {
     /** Enumerates the types of programs which can run on the GPU. */
     enum GpuProgramType
     {
-        GPT_VERTEX_PROGRAM,
+        GPT_VERTEX_PROGRAM = 0,
         GPT_FRAGMENT_PROGRAM,
         GPT_GEOMETRY_PROGRAM,
         GPT_DOMAIN_PROGRAM,

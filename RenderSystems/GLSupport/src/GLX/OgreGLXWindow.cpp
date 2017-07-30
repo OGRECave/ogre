@@ -74,6 +74,7 @@ namespace Ogre
         mClosed = false;
         mActive = false;
         mHidden = false;
+        mVisible = false;
         mVSync = false;
         mVSyncInterval = 1;
     }
@@ -460,7 +461,7 @@ namespace Ogre
         mTop = top;
         mActive = true;
         mClosed = false;
-
+        mVisible = true;
     }
 
     //-------------------------------------------------------------------------------------------------//

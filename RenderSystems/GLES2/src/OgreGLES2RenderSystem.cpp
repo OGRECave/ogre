@@ -1463,11 +1463,11 @@ namespace Ogre {
         GLES2VertexDeclaration* gles2decl = 
             static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
-        // Use a little shorthand
-        bool useVAO = (gles2decl && gles2decl->isInitialised());
-
-        if(useVAO)
+        if(getCapabilities()->hasCapability(RSC_VAO))
             setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
+
+        // FIXME: this fixes some rendering issues but leaves VAO's useless
+        bool updateVAO = true; // !gles2decl->isInitialised() && getCapabilities()->hasCapability(RSC_VAO);
 
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
@@ -1480,7 +1480,7 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(elemSource);
             bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
-                                   mRenderAttribsBound, mRenderInstanceAttribsBound, true);
+                                   mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
         }
 
         if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
@@ -1492,8 +1492,7 @@ namespace Ogre {
                 {
                     const VertexElement & elem = *elemIter;
                     bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
-                                           mRenderAttribsBound, mRenderInstanceAttribsBound, true);
-                    continue;
+                                           mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
                 }
             }
         }
@@ -1527,7 +1526,7 @@ namespace Ogre {
         if (op.useIndexes)
         {
             // If we are using VAO's then only bind the buffer the first time through. Otherwise, always bind.
-            if (!useVAO || (useVAO && gles2decl && !gles2decl->isInitialised()))
+            if (updateVAO)
                 mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                          static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
@@ -1580,7 +1579,7 @@ namespace Ogre {
             } while (updatePassIterationRenderState());
         }
 
-        if (useVAO && gles2decl && !gles2decl->isInitialised())
+        if (updateVAO)
         {
             gles2decl->setInitialised(true);
         }

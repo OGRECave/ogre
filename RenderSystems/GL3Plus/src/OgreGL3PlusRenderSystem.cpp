@@ -143,9 +143,6 @@ namespace Ogre {
 
         LogManager::getSingleton().logMessage(getName() + " created.");
 
-        mRenderAttribsBound.reserve(100);
-        mRenderInstanceAttribsBound.reserve(100);
-
         // Get our GLSupport
         mGLSupport = new GL3PlusSupport(getGLSupport());
         glsupport = mGLSupport;
@@ -1512,22 +1509,25 @@ namespace Ogre {
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
 
+        GL3PlusVertexArrayObject* vao =
+            static_cast<GL3PlusVertexArrayObject*>(op.vertexData->vertexDeclaration);
+
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
-        bool updateVAO = true;
+        vao->bind();
+
+        // FIXME: this fixes some rendering issues but leaves VAO's useless
+        bool updateVAO = true; // !vao->isInitialised();
+
+        GLSLProgram* program = NULL;
         if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLSeparableProgram* separableProgram =
-                GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-            if (separableProgram)
+            program = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+            if (program)
             {
                 if (!op.renderToVertexBuffer)
                 {
-                    separableProgram->activate();
+                    program->activate();
                 }
-
-                updateVAO = !separableProgram->getVertexArrayObject()->isInitialised();
-
-                separableProgram->getVertexArrayObject()->bind();
             }
             else
             {
@@ -1537,14 +1537,8 @@ namespace Ogre {
         }
         else
         {
-            GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-            if (monolithicProgram)
-            {
-                updateVAO = !monolithicProgram->getVertexArrayObject()->isInitialised();
-
-                monolithicProgram->getVertexArrayObject()->bind();
-            }
-            else
+            program = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            if (!program)
             {
                 Ogre::LogManager::getSingleton().logMessage(
                     "ERROR: Failed to create monolithic program.", LML_CRITICAL);
@@ -1563,8 +1557,7 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
 
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
-                                   mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, program, updateVAO);
         }
 
         if ( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
@@ -1573,8 +1566,7 @@ namespace Ogre {
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
-                                       mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program, updateVAO);
             }
         }
 
@@ -1679,7 +1671,8 @@ namespace Ogre {
 
             if (op.useIndexes)
             {
-                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                if(updateVAO)
+                    mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                                                  static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
@@ -1697,7 +1690,8 @@ namespace Ogre {
         }
         else if (op.useIndexes)
         {
-            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+            if(updateVAO)
+                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                                              static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
             void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
@@ -1749,35 +1743,14 @@ namespace Ogre {
             } while (updatePassIterationRenderState());
         }
 
-        // Unbind VAO (if updated).
         if (updateVAO)
         {
-            if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                GLSLSeparableProgram* separableProgram =
-                    GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-                if (separableProgram)
-                {
-                    separableProgram->getVertexArrayObject()->setInitialised(true);
-                }
-            }
-            else
-            {
-                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-                if (monolithicProgram)
-                {
-                    monolithicProgram->getVertexArrayObject()->setInitialised(true);
-                }
-            }
-
-            // Unbind the vertex array object.
-            // Marks the end of what state will be included.
-            mStateCacheManager->bindGLVertexArray(0);
+            vao->setInitialised(true);
         }
 
-
-        mRenderAttribsBound.clear();
-        mRenderInstanceAttribsBound.clear();
+        // Unbind the vertex array object.
+        // Marks the end of what state will be included.
+        mStateCacheManager->bindGLVertexArray(0);
     }
 
     void GL3PlusRenderSystem::setScissorTest(bool enabled, size_t left,
@@ -2508,14 +2481,11 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::bindVertexElementToGpu( const VertexElement &elem,
                                                       HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
-                                                      vector<GLuint>::type &attribsBound,
-                                                      vector<GLuint>::type &instanceAttribsBound,
-                                                      bool updateVAO)
+                                                      GLSLProgram* program, bool updateVAO)
     {
         const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
 
-        // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
-        // if (updateVAO)
+        if (updateVAO)
         {
             mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER,
                                              hwGlBuffer->getGLBufferId());
@@ -2532,34 +2502,19 @@ namespace Ogre {
             GLuint attrib = 0;
             unsigned short elemIndex = elem.getIndex();
 
-            if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            if (!program->isAttributeValid(sem, elemIndex))
             {
-                GLSLSeparableProgram* separableProgram =
-                    GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-                if (!separableProgram || !separableProgram->isAttributeValid(sem, elemIndex))
-                {
-                    return;
-                }
-
-                attrib = (GLuint)separableProgram->getAttributeIndex(sem, elemIndex);
+                return;
             }
-            else
-            {
-                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-                if (!monolithicProgram || !monolithicProgram->isAttributeValid(sem, elemIndex))
-                {
-                    return;
-                }
 
-                attrib = (GLuint)monolithicProgram->getAttributeIndex(sem, elemIndex);
-            }
+            attrib = (GLuint)program->getAttributeIndex(sem, elemIndex);
 
             if (mCurrentVertexShader)
             {
                 if (hwGlBuffer->getIsInstanceData())
                 {
                     OGRE_CHECK_GL_ERROR(glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate()));
-                    instanceAttribsBound.push_back(attrib);
+                    //instanceAttribsBound.push_back(attrib);
                 }
             }
 
@@ -2608,7 +2563,7 @@ namespace Ogre {
             // If this attribute hasn't been enabled, do so and keep a record of it.
             OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
 
-            attribsBound.push_back(attrib);
+            // attribsBound.push_back(attrib);
         }
     }
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0

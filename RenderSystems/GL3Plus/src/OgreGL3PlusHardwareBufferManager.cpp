@@ -35,6 +35,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusRenderToVertexBuffer.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
+#include "OgreGL3PlusVertexArrayObject.h"
 
 namespace Ogre {
 
@@ -146,6 +147,16 @@ namespace Ogre {
     RenderToVertexBufferSharedPtr GL3PlusHardwareBufferManagerBase::createRenderToVertexBuffer()
     {
         return RenderToVertexBufferSharedPtr(new GL3PlusRenderToVertexBuffer);
+    }
+
+    VertexDeclaration* GL3PlusHardwareBufferManagerBase::createVertexDeclarationImpl(void)
+    {
+        return OGRE_NEW GL3PlusVertexArrayObject();
+    }
+
+    void GL3PlusHardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)
+    {
+        OGRE_DELETE decl;
     }
 
     GLenum GL3PlusHardwareBufferManagerBase::getGLUsage(unsigned int usage)

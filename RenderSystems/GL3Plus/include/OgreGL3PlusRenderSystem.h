@@ -47,6 +47,7 @@ namespace Ogre {
     */
     class GLSLShaderManager;
     class GLSLShaderFactory;
+    class GLSLProgram;
     class HardwareBufferManager;
 
     /**
@@ -117,11 +118,6 @@ namespace Ogre {
         /// Check if the GL system has already been initialised
         bool mGLInitialised;
 
-        // local data members of _render that were moved here to improve performance
-        // (save allocations)
-        vector<GLuint>::type mRenderAttribsBound;
-        vector<GLuint>::type mRenderInstanceAttribsBound;
-
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
@@ -140,10 +136,7 @@ namespace Ogre {
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
         void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
-                                     const size_t vertexStart,
-                                     vector<GLuint>::type &attribsBound,
-                                     vector<GLuint>::type &instanceAttribsBound,
-                                     bool updateVAO);
+                                     const size_t vertexStart, GLSLProgram* program, bool updateVAO);
 
     public:
         // Default constructor / destructor
@@ -278,7 +271,6 @@ namespace Ogre {
 
         void setVertexDeclaration(VertexDeclaration* decl) {}
 
-        void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding) {}
         /** See
             RenderSystem.
         */

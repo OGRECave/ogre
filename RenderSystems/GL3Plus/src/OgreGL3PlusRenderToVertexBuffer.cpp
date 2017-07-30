@@ -288,12 +288,6 @@ namespace Ogre {
             GLSLSeparableProgram* separableProgram =
                 GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
             separableProgram->activate();
-            separableProgram->getVertexArrayObject()->bind();
-        }
-        else
-        {
-            GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-            monolithicProgram->getVertexArrayObject()->bind();
         }
 
         // 'Render' data to the transform buffer.

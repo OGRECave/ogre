@@ -50,6 +50,8 @@ namespace Ogre {
 
         UniformBufferList mShaderStorageBuffers;
 
+        VertexDeclaration* createVertexDeclarationImpl(void);
+        void destroyVertexDeclarationImpl(VertexDeclaration* decl);
     public:
         GL3PlusHardwareBufferManagerBase();
         ~GL3PlusHardwareBufferManagerBase();

@@ -367,78 +367,20 @@ namespace Ogre {
     
     bool GLSLProgramManager::findUniformDataSource(
         const String& paramName,
-        const GpuConstantDefinitionMap* vertexConstantDefs,
-        const GpuConstantDefinitionMap* hullConstantDefs,
-        const GpuConstantDefinitionMap* domainConstantDefs,
-        const GpuConstantDefinitionMap* geometryConstantDefs,
-        const GpuConstantDefinitionMap* fragmentConstantDefs,
-        const GpuConstantDefinitionMap* computeConstantDefs,
+        const GpuConstantDefinitionMap* (&constantDefs)[6],
         GLUniformReference& refToUpdate)
     {
-        if (vertexConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                vertexConstantDefs->find(paramName);
-            if (parami != vertexConstantDefs->end())
+        for(int i = 0; i < 6; i++) {
+            if (constantDefs[i])
             {
-                refToUpdate.mSourceProgType = GPT_VERTEX_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (geometryConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                geometryConstantDefs->find(paramName);
-            if (parami != geometryConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_GEOMETRY_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (fragmentConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                fragmentConstantDefs->find(paramName);
-            if (parami != fragmentConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_FRAGMENT_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (hullConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                hullConstantDefs->find(paramName);
-            if (parami != hullConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_HULL_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (domainConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                domainConstantDefs->find(paramName);
-            if (parami != domainConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_DOMAIN_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (computeConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                computeConstantDefs->find(paramName);
-            if (parami != computeConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_COMPUTE_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
+                GpuConstantDefinitionMap::const_iterator parami =
+                        constantDefs[i]->find(paramName);
+                if (parami != constantDefs[i]->end())
+                {
+                    refToUpdate.mSourceProgType = static_cast<GpuProgramType>(i);
+                    refToUpdate.mConstantDef = &(parami->second);
+                    return true;
+                }
             }
         }
         return false;
@@ -449,78 +391,20 @@ namespace Ogre {
     // and AtomicCounterReference
     bool GLSLProgramManager::findAtomicCounterDataSource(
         const String& paramName,
-        const GpuConstantDefinitionMap* vertexConstantDefs,
-        const GpuConstantDefinitionMap* hullConstantDefs,
-        const GpuConstantDefinitionMap* domainConstantDefs,
-        const GpuConstantDefinitionMap* geometryConstantDefs,
-        const GpuConstantDefinitionMap* fragmentConstantDefs,
-        const GpuConstantDefinitionMap* computeConstantDefs,
+        const GpuConstantDefinitionMap* (&constantDefs)[6],
         GLAtomicCounterReference& refToUpdate)
     {
-        if (vertexConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                vertexConstantDefs->find(paramName);
-            if (parami != vertexConstantDefs->end())
+        for(int i = 0; i < 6; i++) {
+            if (constantDefs[i])
             {
-                refToUpdate.mSourceProgType = GPT_VERTEX_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (geometryConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                geometryConstantDefs->find(paramName);
-            if (parami != geometryConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_GEOMETRY_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (fragmentConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                fragmentConstantDefs->find(paramName);
-            if (parami != fragmentConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_FRAGMENT_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (hullConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                hullConstantDefs->find(paramName);
-            if (parami != hullConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_HULL_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (domainConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                domainConstantDefs->find(paramName);
-            if (parami != domainConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_DOMAIN_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        if (computeConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami =
-                computeConstantDefs->find(paramName);
-            if (parami != computeConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_COMPUTE_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
+                GpuConstantDefinitionMap::const_iterator parami =
+                        constantDefs[i]->find(paramName);
+                if (parami != constantDefs[i]->end())
+                {
+                    refToUpdate.mSourceProgType = static_cast<GpuProgramType>(i);
+                    refToUpdate.mConstantDef = &(parami->second);
+                    return true;
+                }
             }
         }
         return false;
@@ -530,12 +414,7 @@ namespace Ogre {
     
     void GLSLProgramManager::extractUniformsFromProgram(
         GLuint programObject,
-        const GpuConstantDefinitionMap* vertexConstantDefs,
-        const GpuConstantDefinitionMap* hullConstantDefs,
-        const GpuConstantDefinitionMap* domainConstantDefs,
-        const GpuConstantDefinitionMap* geometryConstantDefs,
-        const GpuConstantDefinitionMap* fragmentConstantDefs,
-        const GpuConstantDefinitionMap* computeConstantDefs,
+        const GpuConstantDefinitionMap* (&constantDefs)[6],
         GLUniformReferenceList& uniformList,
         GLAtomicCounterReferenceList& counterList,
         GLUniformBufferList& uniformBufferList,
@@ -593,12 +472,7 @@ namespace Ogre {
                 }
 
                 // Find out which params object this comes from
-                bool foundSource = findUniformDataSource(
-                    paramName,
-                    vertexConstantDefs, geometryConstantDefs,
-                    fragmentConstantDefs, hullConstantDefs,
-                    domainConstantDefs, computeConstantDefs,
-                    newGLUniformReference);
+                bool foundSource = findUniformDataSource(paramName, constantDefs, newGLUniformReference);
 
                 // Only add this parameter if we found the source
                 if (foundSource)
@@ -647,11 +521,7 @@ namespace Ogre {
 
                 // Find out which params object this comes from
                 bool foundSource = findAtomicCounterDataSource(
-                    paramName,
-                    vertexConstantDefs, geometryConstantDefs,
-                    fragmentConstantDefs, hullConstantDefs,
-                    domainConstantDefs, computeConstantDefs,
-                    newGLAtomicCounterReference);
+                    paramName, constantDefs,newGLAtomicCounterReference);
 
                 // Only add this parameter if we found the source
                 if (foundSource)

@@ -34,7 +34,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
 
     /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
-    class GL3PlusVertexArrayObject
+    class GL3PlusVertexArrayObject : public VertexDeclaration
     {
     protected:
         /// OpenGL id for the vertex array object
@@ -42,9 +42,11 @@ namespace Ogre {
         /// Is this VAO initialised?
         bool mInitialised;
 
-    protected:
         GL3PlusRenderSystem* mRenderSystem;
 
+        // TODO: cache used program attributes here and invalidate on change
+        vector<GLuint>::type mAttribsBound;
+        vector<GLuint>::type mInstanceAttribsBound;
     public:
         GL3PlusVertexArrayObject();
         ~GL3PlusVertexArrayObject();
