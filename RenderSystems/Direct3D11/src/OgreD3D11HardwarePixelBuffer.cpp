@@ -70,7 +70,9 @@ namespace v1 {
             {
                 String name;
                 name = "rtt/"+StringConverter::toString((size_t)mParentTexture) + "/" +
-                        StringConverter::toString(mSubresourceIndex) + "/" + parentTexture->getName();
+                        StringConverter::toString(mSubresourceIndex) + "/" +
+                        StringConverter::toString(mFace) + "/" +
+                        StringConverter::toString(zoffset) + "/" + parentTexture->getName();
 
                 RenderTexture *trt = new D3D11RenderTexture(name, this, mHwGamma, fsaa, fsaaHint, mDevice);
                 mSliceTRT.push_back(trt);

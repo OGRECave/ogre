@@ -1077,7 +1077,7 @@ namespace Ogre
             {
                 size_t width  = mWidth;
                 size_t height = mHeight;
-                size_t depth  = mDepth;
+                size_t depth  = getTextureType() == TEX_TYPE_CUBE_MAP ? 1u : mDepth;
                 for(size_t mip=0; mip<=mNumMipmaps; ++mip)
                 { 
 
