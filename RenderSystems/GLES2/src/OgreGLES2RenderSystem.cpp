@@ -1116,11 +1116,6 @@ namespace Ogre {
 
     void GLES2RenderSystem::setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)
     {
-        GLES2VertexDeclaration* gles2decl = 
-            static_cast<GLES2VertexDeclaration*>(decl);
-
-        if(gles2decl)
-            gles2decl->bind();
     }
 
     void GLES2RenderSystem::_setCullingMode(CullingMode mode)
@@ -1454,23 +1449,36 @@ namespace Ogre {
             }
         }
 
+        GLSLESProgramCommon* program = NULL;
+        if (getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            program = GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+        }
+        else
+        {
+            program = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+        }
+
         void* pBufferData = 0;
 
         const VertexDeclaration::VertexElementList& decl =
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
-        GLES2VertexDeclaration* gles2decl = 
-            static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
+
+        GLES2VertexDeclaration* vao = static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
         if(getCapabilities()->hasCapability(RSC_VAO))
-            setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
+            vao->bind();
 
         // FIXME: this fixes some rendering issues but leaves VAO's useless
         bool updateVAO = true; // !gles2decl->isInitialised() && getCapabilities()->hasCapability(RSC_VAO);
 
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
+            if(!updateVAO)
+                break;
+
             const VertexElement & elem = *elemIter;
             unsigned short elemSource = elem.getSource();
 
@@ -1479,20 +1487,18 @@ namespace Ogre {
  
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(elemSource);
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
-                                   mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, program);
         }
 
         if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
         {
-            if( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
+            if( globalInstanceVertexBuffer && globalVertexDeclaration && updateVAO)
             {
                 elemEnd = globalVertexDeclaration->getElements().end();
                 for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
                 {
                     const VertexElement & elem = *elemIter;
-                    bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
-                                           mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
+                    bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program);
                 }
             }
         }
@@ -1581,7 +1587,7 @@ namespace Ogre {
 
         if (updateVAO)
         {
-            gles2decl->setInitialised(true);
+            vao->setInitialised(true);
         }
 
         if(getCapabilities()->hasCapability(RSC_VAO))
@@ -2185,99 +2191,72 @@ namespace Ogre {
         //no effect in GLES2 rendersystem
     }
 
-    void GLES2RenderSystem::bindVertexElementToGpu( const VertexElement &elem,
-                                                     HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
-                                                     vector<GLuint>::type &attribsBound,
-                                                     vector<GLuint>::type &instanceAttribsBound,
-                                                     bool updateVAO)
+    void GLES2RenderSystem::bindVertexElementToGpu(
+        const VertexElement& elem, const HardwareVertexBufferSharedPtr& vertexBuffer,
+        const size_t vertexStart, GLSLESProgramCommon* program)
     {
-        void* pBufferData = 0;
+        VertexElementSemantic sem = elem.getSemantic();
+        unsigned short elemIndex = elem.getIndex();
+
+        if (!program->isAttributeValid(sem, elemIndex))
+        {
+            return;
+        }
+
         const GLES2HardwareVertexBuffer* hwGlBuffer = static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get());
 
-        if (updateVAO)
+        mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER, hwGlBuffer->getGLBufferId());
+        void* pBufferData = VBO_BUFFER_OFFSET(elem.getOffset() + vertexStart * vertexBuffer->getVertexSize());
+
+        unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
+        GLboolean normalised = GL_FALSE;
+        GLuint attrib = 0;
+
+        attrib = (GLuint)program->getAttributeIndex(sem, elemIndex);
+
+        if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
         {
-            mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER,
-                                             hwGlBuffer->getGLBufferId());
-            pBufferData = VBO_BUFFER_OFFSET(elem.getOffset());
-
-            if (vertexStart)
+            if (mCurrentVertexProgram)
             {
-                pBufferData = static_cast<char*>(pBufferData) + vertexStart * vertexBuffer->getVertexSize();
-            }
-
-            VertexElementSemantic sem = elem.getSemantic();
-            unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
-            GLboolean normalised = GL_FALSE;
-            GLuint attrib = 0;
-            unsigned short elemIndex = elem.getIndex();
-
-            if(getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                GLSLESProgramPipeline* programPipeline =
-                GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
-                if (!programPipeline || !programPipeline->isAttributeValid(sem, elemIndex))
+                if (hwGlBuffer->getIsInstanceData())
                 {
-                    return;
-                }
-
-                attrib = (GLuint)programPipeline->getAttributeIndex(sem, elemIndex);
-            }
-            else
-            {
-                GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
-                if (!linkProgram || !linkProgram->isAttributeValid(sem, elemIndex))
-                {
-                    return;
-                }
-
-                attrib = (GLuint)linkProgram->getAttributeIndex(sem, elemIndex);
-            }
-
-            if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
-            {
-                if (mCurrentVertexProgram)
-                {
-                    if (hwGlBuffer->getIsInstanceData())
-                    {
-                        OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(hwGlBuffer->getInstanceDataStepRate())));
-                        instanceAttribsBound.push_back(attrib);
-                    }
+                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(hwGlBuffer->getInstanceDataStepRate())));
+                    mRenderInstanceAttribsBound.push_back(attrib);
                 }
             }
-
-            switch(elem.getType())
-            {
-                case VET_COLOUR:
-                case VET_COLOUR_ABGR:
-                case VET_COLOUR_ARGB:
-                    // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
-                    // VertexElement::getTypeCount treats them as 1 (RGBA)
-                    // Also need to normalise the fixed-point data
-                    typeCount = 4;
-                    normalised = GL_TRUE;
-                    break;
-                case VET_UBYTE4_NORM:
-                case VET_SHORT2_NORM:
-                case VET_USHORT2_NORM:
-                case VET_SHORT4_NORM:
-                case VET_USHORT4_NORM:
-                    normalised = GL_TRUE;
-                    break;
-                default:
-                    break;
-            };
-
-            OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
-                                                      typeCount,
-                                                      GLES2HardwareBufferManager::getGLType(elem.getType()),
-                                                      normalised,
-                                                      static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                                      pBufferData));
-
-            mStateCacheManager->setVertexAttribEnabled(attrib);
-//                OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
-            attribsBound.push_back(attrib);
         }
+
+        switch(elem.getType())
+        {
+            case VET_COLOUR:
+            case VET_COLOUR_ABGR:
+            case VET_COLOUR_ARGB:
+                // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+                // VertexElement::getTypeCount treats them as 1 (RGBA)
+                // Also need to normalise the fixed-point data
+                typeCount = 4;
+                normalised = GL_TRUE;
+                break;
+            case VET_UBYTE4_NORM:
+            case VET_SHORT2_NORM:
+            case VET_USHORT2_NORM:
+            case VET_SHORT4_NORM:
+            case VET_USHORT4_NORM:
+                normalised = GL_TRUE;
+                break;
+            default:
+                break;
+        };
+
+        OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
+                                                  typeCount,
+                                                  GLES2HardwareBufferManager::getGLType(elem.getType()),
+                                                  normalised,
+                                                  static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                                  pBufferData));
+
+        mStateCacheManager->setVertexAttribEnabled(attrib);
+        mRenderAttribsBound.push_back(attrib);
     }
 
     void GLES2RenderSystem::_copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox& dst,

@@ -163,9 +163,9 @@ namespace Ogre {
 
     protected:
         void setClipPlanesImpl(const PlaneList& clipPlanes);
-        void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
-                const size_t vertexStart, 
-                vector<GLuint>::type &attribsBound, vector<GLuint>::type &instanceAttribsBound );
+        void bindVertexElementToGpu(const VertexElement& elem,
+                                    const HardwareVertexBufferSharedPtr& vertexBuffer,
+                                    const size_t vertexStart);
 
     public:
         // Default constructor / destructor

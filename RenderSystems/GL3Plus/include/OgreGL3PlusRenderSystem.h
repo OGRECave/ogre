@@ -135,8 +135,9 @@ namespace Ogre {
         GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
-        void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
-                                     const size_t vertexStart, GLSLProgram* program, bool updateVAO);
+        void bindVertexElementToGpu(const VertexElement& elem,
+                                    const HardwareVertexBufferSharedPtr& vertexBuffer,
+                                    const size_t vertexStart, GLSLProgram* program);
 
     public:
         // Default constructor / destructor

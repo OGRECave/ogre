@@ -47,6 +47,7 @@ namespace Ogre {
     class GLRTTManager;
     typedef GLRTTManager GLES2RTTManager;
     class GLES2GpuProgramManager;
+    class GLSLESProgramCommon;
     class GLSLESProgramFactory;
     class GLES2StateCacheManager;
 #if !OGRE_NO_GLES2_CG_SUPPORT
@@ -111,11 +112,9 @@ namespace Ogre {
 
             GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
-            void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
-                                        const size_t vertexStart,
-                                        vector<GLuint>::type &attribsBound,
-                                        vector<GLuint>::type &instanceAttribsBound,
-                                        bool updateVAO);
+            void bindVertexElementToGpu(const VertexElement& elem,
+                                        const HardwareVertexBufferSharedPtr& vertexBuffer,
+                                        const size_t vertexStart, GLSLESProgramCommon* program);
 
             // Mipmap count of the actual bounded texture
             size_t mCurTexMipCount;

@@ -1493,8 +1493,8 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
-                                globalInstanceVertexBuffer && (globalVertexDeclaration != NULL))
-            || op.vertexData->vertexBufferBinding->getHasInstanceData();
+                                globalInstanceVertexBuffer && globalVertexDeclaration) ||
+                               op.vertexData->vertexBufferBinding->getHasInstanceData();
 
         size_t numberOfInstances = op.numberOfInstances;
 
@@ -1502,21 +1502,6 @@ namespace Ogre {
         {
             numberOfInstances *= getGlobalNumberOfInstances();
         }
-
-        // Get vertex array organization.
-        const VertexDeclaration::VertexElementList& decl =
-            op.vertexData->vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
-        elemEnd = decl.end();
-
-        GL3PlusVertexArrayObject* vao =
-            static_cast<GL3PlusVertexArrayObject*>(op.vertexData->vertexDeclaration);
-
-        // Bind VAO (set of per-vertex attributes: position, normal, etc.).
-        vao->bind();
-
-        // FIXME: this fixes some rendering issues but leaves VAO's useless
-        bool updateVAO = true; // !vao->isInitialised();
 
         GLSLProgram* program = NULL;
         if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
@@ -1545,9 +1530,25 @@ namespace Ogre {
             }
         }
 
+        GL3PlusVertexArrayObject* vao =
+            static_cast<GL3PlusVertexArrayObject*>(op.vertexData->vertexDeclaration);
+        // Bind VAO (set of per-vertex attributes: position, normal, etc.).
+        vao->bind();
+
+        // FIXME: this fixes some rendering issues but leaves VAO's useless
+        bool updateVAO = true;
+
+        // Get vertex array organization.
+        const VertexDeclaration::VertexElementList& decl =
+            op.vertexData->vertexDeclaration->getElements();
+        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
+        elemEnd = decl.end();
         // Bind the appropriate VBOs to the active attributes of the VAO.
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
+            if(!updateVAO)
+                break;
+
             const VertexElement & elem = *elemIter;
             uint16 source = elem.getSource();
 
@@ -1557,18 +1558,22 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
 
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, program, updateVAO);
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, program);
         }
 
-        if ( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
+        if ( globalInstanceVertexBuffer && globalVertexDeclaration && updateVAO)
         {
             elemEnd = globalVertexDeclaration->getElements().end();
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program, updateVAO);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program);
             }
         }
+
+        if(updateVAO && op.useIndexes)
+            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                                         static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
         mStateCacheManager->activateGLTextureUnit(0);
 
@@ -1671,9 +1676,6 @@ namespace Ogre {
 
             if (op.useIndexes)
             {
-                if(updateVAO)
-                    mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                                                 static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
                 GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
@@ -1690,10 +1692,6 @@ namespace Ogre {
         }
         else if (op.useIndexes)
         {
-            if(updateVAO)
-                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                                             static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
-
             void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                  op.indexData->indexBuffer->getIndexSize());
 
@@ -2479,92 +2477,75 @@ namespace Ogre {
                                  eventName.c_str());
     }
 
-    void GL3PlusRenderSystem::bindVertexElementToGpu( const VertexElement &elem,
-                                                      HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
-                                                      GLSLProgram* program, bool updateVAO)
+    void GL3PlusRenderSystem::bindVertexElementToGpu(const VertexElement& elem,
+                                                     const HardwareVertexBufferSharedPtr& vertexBuffer,
+                                                     const size_t vertexStart, GLSLProgram* program)
     {
-        const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
+        VertexElementSemantic sem = elem.getSemantic();
+        unsigned short elemIndex = elem.getIndex();
 
-        if (updateVAO)
+        if (!program->isAttributeValid(sem, elemIndex))
         {
-            mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER,
-                                             hwGlBuffer->getGLBufferId());
-            void* pBufferData = GL_BUFFER_OFFSET(elem.getOffset());
-
-            if (vertexStart)
-            {
-                pBufferData = static_cast<char*>(pBufferData) + vertexStart * vertexBuffer->getVertexSize();
-            }
-
-            VertexElementSemantic sem = elem.getSemantic();
-            unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
-            GLboolean normalised = GL_FALSE;
-            GLuint attrib = 0;
-            unsigned short elemIndex = elem.getIndex();
-
-            if (!program->isAttributeValid(sem, elemIndex))
-            {
-                return;
-            }
-
-            attrib = (GLuint)program->getAttributeIndex(sem, elemIndex);
-
-            if (mCurrentVertexShader)
-            {
-                if (hwGlBuffer->getIsInstanceData())
-                {
-                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate()));
-                    //instanceAttribsBound.push_back(attrib);
-                }
-            }
-
-            switch(elem.getType())
-            {
-            case VET_COLOUR:
-            case VET_COLOUR_ABGR:
-            case VET_COLOUR_ARGB:
-                // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
-                // VertexElement::getTypeCount treats them as 1 (RGBA)
-                // Also need to normalise the fixed-point data
-                typeCount = 4;
-                normalised = GL_TRUE;
-                break;
-            case VET_UBYTE4_NORM:
-            case VET_SHORT2_NORM:
-            case VET_USHORT2_NORM:
-            case VET_SHORT4_NORM:
-            case VET_USHORT4_NORM:
-                normalised = GL_TRUE;
-                break;
-            default:
-                break;
-            };
-
-            switch(elem.getBaseType(elem.getType()))
-            {
-            default:
-            case VET_FLOAT1:
-                OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
-                                                          typeCount,
-                                                          GL3PlusHardwareBufferManager::getGLType(elem.getType()),
-                                                          normalised,
-                                                          static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                                          pBufferData));
-                break;
-            case VET_DOUBLE1:
-                OGRE_CHECK_GL_ERROR(glVertexAttribLPointer(attrib,
-                                                           typeCount,
-                                                           GL3PlusHardwareBufferManager::getGLType(elem.getType()),
-                                                           static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                                           pBufferData));
-                break;
-            }
-
-            // If this attribute hasn't been enabled, do so and keep a record of it.
-            OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
-
-            // attribsBound.push_back(attrib);
+            return;
         }
+
+        GLuint attrib = (GLuint)program->getAttributeIndex(sem, elemIndex);
+
+        const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
+        mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER, hwGlBuffer->getGLBufferId());
+        void* pBufferData = GL_BUFFER_OFFSET(elem.getOffset() + vertexStart * vertexBuffer->getVertexSize());
+
+        if (hwGlBuffer->getIsInstanceData())
+        {
+            OGRE_CHECK_GL_ERROR(glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate()));
+        }
+
+        unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
+        GLboolean normalised = GL_FALSE;
+        switch(elem.getType())
+        {
+        case VET_COLOUR:
+        case VET_COLOUR_ABGR:
+        case VET_COLOUR_ARGB:
+            // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+            // VertexElement::getTypeCount treats them as 1 (RGBA)
+            // Also need to normalise the fixed-point data
+            typeCount = 4;
+            normalised = GL_TRUE;
+            break;
+        case VET_UBYTE4_NORM:
+        case VET_SHORT2_NORM:
+        case VET_USHORT2_NORM:
+        case VET_SHORT4_NORM:
+        case VET_USHORT4_NORM:
+            normalised = GL_TRUE;
+            break;
+        default:
+            break;
+        };
+
+        switch(elem.getBaseType(elem.getType()))
+        {
+        default:
+        case VET_FLOAT1:
+            OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
+                                                      typeCount,
+                                                      GL3PlusHardwareBufferManager::getGLType(elem.getType()),
+                                                      normalised,
+                                                      static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                                      pBufferData));
+            break;
+        case VET_DOUBLE1:
+            OGRE_CHECK_GL_ERROR(glVertexAttribLPointer(attrib,
+                                                       typeCount,
+                                                       GL3PlusHardwareBufferManager::getGLType(elem.getType()),
+                                                       static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                                       pBufferData));
+            break;
+        }
+
+        // If this attribute hasn't been enabled, do so and keep a record of it.
+        OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
     }
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 	bool GL3PlusRenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
