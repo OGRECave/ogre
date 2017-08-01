@@ -162,7 +162,7 @@ namespace Ogre {
     GLenum GL3PlusHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
         // this is also used with Textures, so unset non HBU related flags
-        usage = usage & ~(TU_AUTOMIPMAP | TU_RENDERTARGET);
+        usage = usage & ~(TU_AUTOMIPMAP | TU_RENDERTARGET | TU_NOTSHADERRESOURCE);
 
         switch(HardwareBuffer::Usage(usage))
         {

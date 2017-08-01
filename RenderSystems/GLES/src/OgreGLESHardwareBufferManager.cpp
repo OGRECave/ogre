@@ -112,6 +112,9 @@ namespace Ogre {
 
     GLenum GLESHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
+        // this is also used with Textures, so unset non HBU related flags
+        usage = usage & ~(TU_AUTOMIPMAP | TU_RENDERTARGET | TU_NOTSHADERRESOURCE);
+
         switch(usage)
         {
             case HardwareBuffer::HBU_STATIC:
