@@ -112,21 +112,9 @@ namespace Ogre {
 
     GLenum GLESHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
-        // this is also used with Textures, so unset non HBU related flags
-        usage = usage & ~(TU_AUTOMIPMAP | TU_RENDERTARGET | TU_NOTSHADERRESOURCE);
-
-        switch(usage)
-        {
-            case HardwareBuffer::HBU_STATIC:
-            case HardwareBuffer::HBU_STATIC_WRITE_ONLY:
-                return GL_STATIC_DRAW;
-            case HardwareBuffer::HBU_DYNAMIC:
-            case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
-                return GL_DYNAMIC_DRAW;
-            case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
-            default:
-                return GL_DYNAMIC_DRAW;
-        };
+        return  (usage & HardwareBuffer::HBU_DISCARDABLE) ? GL_STREAM_DRAW :
+                (usage & HardwareBuffer::HBU_STATIC) ? GL_STATIC_DRAW :
+                GL_DYNAMIC_DRAW;
     }
 
     GLenum GLESHardwareBufferManagerBase::getGLType(unsigned int type)

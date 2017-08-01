@@ -161,25 +161,9 @@ namespace Ogre {
 
     GLenum GL3PlusHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
-        // this is also used with Textures, so unset non HBU related flags
-        usage = usage & ~(TU_AUTOMIPMAP | TU_RENDERTARGET | TU_NOTSHADERRESOURCE);
-
-        switch(HardwareBuffer::Usage(usage))
-        {
-        case HardwareBuffer::HBU_STATIC:
-        case HardwareBuffer::HBU_WRITE_ONLY:
-        case HardwareBuffer::HBU_STATIC_WRITE_ONLY:
-            return GL_STATIC_DRAW;
-        case HardwareBuffer::HBU_DYNAMIC:
-        case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
-            return GL_DYNAMIC_DRAW;
-        case HardwareBuffer::HBU_DISCARDABLE:
-        case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
-            return GL_STREAM_DRAW;
-        };
-
-        OgreAssert(false, "unknown usage flags");
-        return GL_DYNAMIC_DRAW;
+        return  (usage & HardwareBuffer::HBU_DISCARDABLE) ? GL_STREAM_DRAW :
+                (usage & HardwareBuffer::HBU_STATIC) ? GL_STATIC_DRAW :
+                GL_DYNAMIC_DRAW;
     }
 
     GLenum GL3PlusHardwareBufferManagerBase::getGLType(VertexElementType type)
