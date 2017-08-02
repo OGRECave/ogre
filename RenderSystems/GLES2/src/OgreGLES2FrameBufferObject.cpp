@@ -41,11 +41,19 @@ namespace Ogre {
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        GLint oldfb = 0;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
+#endif
+
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
 	   if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
        {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+           OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS 
+#endif
            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
        }
 
@@ -57,6 +65,9 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
             {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS 
+#endif
                 OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mMultisampleFB, 0, ("MSAA FBO #" + StringConverter::toString(mMultisampleFB)).c_str()));
             }
         }
@@ -64,6 +75,10 @@ namespace Ogre {
         {
             mMultisampleFB = 0;
         }
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
+#endif
 
         // Initialise state
         mDepth.buffer = 0;
