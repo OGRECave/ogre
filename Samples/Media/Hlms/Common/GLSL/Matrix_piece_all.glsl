@@ -1,4 +1,4 @@
-@property( GL3+ >= 430 )
+@property( GL_ARB_texture_buffer_range )
 @piece( Common_Matrix_DeclUnpackMatrix4x4 )
 mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
 {
@@ -21,7 +21,7 @@ mat3x4 UNPACK_MAT3x4( samplerBuffer matrixBuf, uint pixelIdx )
 @end
 @end
 
-@property( GL3+ < 430 )
+@property( !GL_ARB_texture_buffer_range )
 @piece( Common_Matrix_DeclUnpackMatrix4x4 )
 mat4 UNPACK_MAT4( in sampler2D matrixBuf, in uint pixelIdx )
 {

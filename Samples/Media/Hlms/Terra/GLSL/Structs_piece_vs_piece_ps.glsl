@@ -1,11 +1,6 @@
 
 @piece( TerraMaterialDecl )
-@property( GL3+ >= 420 )
 layout(binding = 1) uniform MaterialBuf
-@end
-@property( GL3+ < 420 )
-uniform MaterialBuf
-@end
 {
 	/* kD is already divided by PI to make it energy conserving.
 	  (formula is finalDiffuse = NdotL * surfaceDiffuse / PI)
@@ -30,12 +25,8 @@ struct CellData
 	vec4 pos;		//.w contains 1.0 / xzTexPosBounds.z
 	vec4 scale;		//.w contains 1.0 / xzTexPosBounds.w
 };
-@property( GL3+ >= 420 )
+
 layout(binding = 2) uniform InstanceBuffer
-@end
-@property( GL3+ < 420 )
-uniform InstanceBuffer
-@end
 {
 	CellData cellData[256];
 } instance;

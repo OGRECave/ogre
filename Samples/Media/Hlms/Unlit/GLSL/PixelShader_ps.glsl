@@ -1,4 +1,5 @@
 @insertpiece( SetCrossPlatformSettings )
+@insertpiece( SetCompatibilityLayer )
 
 layout(std140) uniform;
 #define FRAG_COLOR		0

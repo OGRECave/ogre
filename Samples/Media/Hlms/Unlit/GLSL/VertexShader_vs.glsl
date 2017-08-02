@@ -1,4 +1,5 @@
 @insertpiece( SetCrossPlatformSettings )
+@insertpiece( SetCompatibilityLayer )
 
 out gl_PerVertex
 {
@@ -18,7 +19,9 @@ in vec4 vertex;
 @foreach( hlms_uv_count, n )
 in vec@value( hlms_uv_count@n ) uv@n;@end
 
-in uint drawId;
+@property( hlms_base_instance )
+	in uint drawId;
+@end
 
 @insertpiece( custom_vs_attributes )
 
@@ -32,14 +35,8 @@ out block
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
 @insertpiece( InstanceDecl )
-@property( GL3+ >= 430 )
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @property( texture_matrix )layout(binding = 1) uniform samplerBuffer animationMatrixBuf;@end
-@end
-@property( GL3+ < 430 )
-uniform sampler2D worldMatBuf;
-@property( texture_matrix )uniform sampler2D animationMatrixBuf;@end
-@end
 @insertpiece( custom_vs_uniformDeclaration )
 @property( hlms_base_instance )uniform uint baseInstance;@end
 // END UNIFORM DECLARATION
@@ -50,23 +47,20 @@ uniform sampler2D worldMatBuf;
 	@property( !hlms_identity_viewproj_dynamic )
 		@piece( worldViewProj )passBuf.viewProj[@value(hlms_identity_viewproj)]@end
 	@end @property( hlms_identity_viewproj_dynamic )
-		@piece( worldViewProj )passBuf.viewProj[instance.worldMaterialIdx[finalInstancedId].z]@end
+		@piece( worldViewProj )passBuf.viewProj[instance.worldMaterialIdx[drawId].z]@end
 	@end
 @end
 
 void main()
 {
 @property( hlms_base_instance )
-    uint finalInstancedId = baseInstance + drawId;
-@end
-@property( !hlms_base_instance )
-    uint finalInstancedId = drawId;
+    uint drawId = baseInstance + uint( gl_InstanceID );
 @end
     
 	@insertpiece( custom_vs_preExecution )
 	@property( !hlms_identity_world )
 		mat4 worldViewProj;
-        worldViewProj = UNPACK_MAT4( worldMatBuf, finalInstancedId );
+		worldViewProj = UNPACK_MAT4( worldMatBuf, drawId );
 	@end
 
 @property( !hlms_dual_paraboloid_mapping )
@@ -90,13 +84,13 @@ void main()
 
 @foreach( out_uv_count, n )
 	@property( out_uv@n_texture_matrix )
- 		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.worldMaterialIdx[finalInstancedId].x << 4u) + @value( out_uv@n_tex_unit )u );
+		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.worldMaterialIdx[drawId].x << 4u) + @value( out_uv@n_tex_unit )u );
  		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = (vec4( uv@value( out_uv@n_source_uv ).xy, 0, 1 ) * textureMatrix).xy;
 	@end @property( !out_uv@n_texture_matrix )
 		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@value( out_uv@n_source_uv ).xy;
 	@end @end
 
-	outVs.drawId = finalInstancedId;
+	outVs.drawId = drawId;
 
 @end
 

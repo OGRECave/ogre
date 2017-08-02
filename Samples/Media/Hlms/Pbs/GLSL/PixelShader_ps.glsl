@@ -3,6 +3,7 @@
 @property( hlms_tex_gather )#extension GL_ARB_texture_gather: require@end
 @end
 @property( hlms_amd_trinary_minmax )#extension GL_AMD_shader_trinary_minmax: require@end
+@insertpiece( SetCompatibilityLayer )
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
@@ -69,14 +70,8 @@ in block
 @property( !hlms_shadowcaster )
 
 @property( hlms_forwardplus )
-@property( GL3+ >= 430 )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
 /*layout(binding = 2) */uniform samplerBuffer f3dLightList;
-@end
-@property( GL3+ < 430 )
-uniform usampler2D f3dGrid;
-uniform sampler2D f3dLightList;
-@end
 @end
 @property( irradiance_volumes )
 	uniform sampler3D irradianceVolume;

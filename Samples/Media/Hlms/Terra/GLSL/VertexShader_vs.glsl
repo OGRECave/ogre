@@ -1,4 +1,5 @@
 @insertpiece( SetCrossPlatformSettings )
+@insertpiece( SetCompatibilityLayer )
 
 out gl_PerVertex
 {
@@ -18,7 +19,9 @@ layout(std140) uniform;
 //So you'll need a total of 24 vertices.
 //in int gl_VertexID;
 
-in uint drawId;
+@property( hlms_base_instance )
+	in uint drawId;
+@end
 
 @insertpiece( custom_vs_attributes )
 
@@ -58,15 +61,12 @@ uniform sampler2D heightMap;
 void main()
 {
 @property( hlms_base_instance )
-    uint finalInstancedId = baseInstance + drawId;
-@end
-@property( !hlms_base_instance )
-    uint finalInstancedId = drawId;
+    uint drawId = baseInstance + uint( gl_InstanceID );
 @end
 
     @insertpiece( custom_vs_preExecution )
 
-    CellData cellData = instance.cellData[finalInstancedId];
+    CellData cellData = instance.cellData[drawId];
 
 	//Map pointInLine from range [0; 12) to range [0; 9] so that it reads:
 	// 0 0 1 2 3 4 5 6 7 8 9 9

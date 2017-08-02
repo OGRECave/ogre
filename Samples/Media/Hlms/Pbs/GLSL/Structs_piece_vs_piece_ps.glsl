@@ -24,12 +24,7 @@ struct Light
 @insertpiece( DeclCubemapProbeStruct )
 
 //Uniforms that change per pass
-@property( GL3+ >= 420 )
 layout(binding = 0) uniform PassBuffer
-@end
-@property( GL3+ < 420 )
-uniform PassBuffer
-@end
 {
 	//Vertex shader (common to both receiver and casters)
 	mat4 viewProj;
@@ -137,12 +132,7 @@ struct Material
 	uvec4 indices4_7;
 };
 
-@property( GL3+ >= 420 )
 layout(binding = 1) uniform MaterialBuf
-@end
-@property( GL3+ < 420 )
-uniform MaterialBuf
-@end
 {
 	Material m[@value( materials_per_buffer )];
 } materialArray;
@@ -150,12 +140,7 @@ uniform MaterialBuf
 
 @piece( InstanceDecl )
 //Uniforms that change per Item/Entity
-@property( GL3+ >= 420 )
 layout(binding = 2) uniform InstanceBuffer
-@end
-@property( GL3+ < 420 )
-uniform InstanceBuffer
-@end
 {
     //.x =
 	//The lower 9 bits contain the material's start index.
@@ -174,12 +159,7 @@ uniform InstanceBuffer
 
 @property( envprobe_map && envprobe_map != target_envprobe_map && use_parallax_correct_cubemaps )
 @piece( PccManualProbeDecl )
-@property( GL3+ >= 420 )
 layout(binding = 3) uniform ManualProbe
-@end
-@property( GL3+ < 420 )
-uniform ManualProbe
-@end
 {
 	CubemapProbe probe;
 } manualProbe;
