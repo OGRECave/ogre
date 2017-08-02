@@ -1578,7 +1578,7 @@ namespace Ogre {
 
         if(getCapabilities()->hasCapability(RSC_VAO))
             // Unbind the vertex array object.  Marks the end of what state will be included.
-            OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
+            mStateCacheManager->bindGLVertexArray(0);
 
         // Unbind all attributes
         for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)

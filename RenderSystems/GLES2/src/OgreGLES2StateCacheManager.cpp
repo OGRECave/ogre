@@ -97,6 +97,8 @@ namespace Ogre {
         mViewport[2] = 0.0f;
         mViewport[3] = 0.0f;
         
+        mActiveVertexArray = 0;
+
 #ifdef OGRE_ENABLE_STATE_CACHE
         mEnableVector.reserve(25);
         mEnableVector.clear();
@@ -173,6 +175,21 @@ namespace Ogre {
             // An update will be forced next time we try to bind on this target.
             (*i).second = 0;
         }
+#endif
+    }
+
+    void GLES2StateCacheManager::bindGLVertexArray(GLuint vao)
+    {
+#ifdef OGRE_ENABLE_STATE_CACHE
+        if(mActiveVertexArray != vao)
+        {
+            mActiveVertexArray = vao;
+            OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(vao));
+            //we also need to clear the cached GL_ELEMENT_ARRAY_BUFFER value, as it is invalidated by glBindVertexArray
+            mActiveBufferMap[GL_ELEMENT_ARRAY_BUFFER] = 0;
+        }
+#else
+        OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(vao));
 #endif
     }
 
