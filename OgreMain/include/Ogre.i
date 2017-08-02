@@ -280,6 +280,8 @@ ADD_REPR(ColourValue)
 %ignore Ogre::RenderSystem::addClipPlane(Real, Real, Real, Real);
 %ignore Ogre::RenderSystem::getFixedPipelineEnabled;
 %ignore Ogre::RenderSystem::setFixedPipelineEnabled;
+%ignore Ogre::RenderSystem::setVertexDeclaration;
+%ignore Ogre::RenderSystem::setVertexBufferBinding;
 %ignore Ogre::RenderSystem::_setTexture(size_t, bool, const String&);
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"

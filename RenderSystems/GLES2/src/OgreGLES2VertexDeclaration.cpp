@@ -30,16 +30,17 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
+#include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2StateCacheManager.h"
 
 namespace Ogre {
 
     //-----------------------------------------------------------------------
     GLES2VertexDeclaration::GLES2VertexDeclaration()
-        :
-        mVAO(0),
-        mIsInitialised(false)
     {
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_VAO)) {
+        mRenderSystem = static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
+
+        if(mRenderSystem->getCapabilities()->hasCapability(RSC_VAO)) {
             OGRE_CHECK_GL_ERROR(glGenVertexArraysOES(1, &mVAO));
     //        LogManager::getSingleton().logMessage("Created VAO " + StringConverter::toString(mVAO));
 
@@ -55,18 +56,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLES2VertexDeclaration::~GLES2VertexDeclaration()
     {
-        if(mVAO) {
-//          LogManager::getSingleton().logMessage("Deleting VAO " + StringConverter::toString(mVAO));
+        if (GLES2StateCacheManager* stateCacheManager =
+                static_cast<GLES2RenderSystem*>(mRenderSystem)->_getStateCacheManager())
+        {
             OGRE_CHECK_GL_ERROR(glDeleteVertexArraysOES(1, &mVAO));
+            stateCacheManager->bindGLVertexArray(0);
         }
     }
 
     //-----------------------------------------------------------------------
     void GLES2VertexDeclaration::bind(void)
     {
-        if(mVAO) {
-//        LogManager::getSingleton().logMessage("Binding VAO " + StringConverter::toString(mVAO));
-            OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(mVAO));
-        }
+        static_cast<GLES2RenderSystem*>(mRenderSystem)
+            ->_getStateCacheManager()
+            ->bindGLVertexArray(mVAO);
     }
 }

@@ -29,31 +29,19 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #define __GL3PlusVERTEXARRAYOBJECT_H__
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "OgreHardwareVertexBuffer.h"
+#include "OgreGLVertexArrayObject.h"
 
 namespace Ogre {
+    class GLSLProgramCommon;
 
     /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
-    class GL3PlusVertexArrayObject : public VertexDeclaration
+    class GL3PlusVertexArrayObject : public GLVertexArrayObject
     {
-    protected:
-        /// OpenGL id for the vertex array object
-        GLuint mVAO;
-        /// Is this VAO initialised?
-        bool mInitialised;
-
-        GL3PlusRenderSystem* mRenderSystem;
-
-        // TODO: cache used program attributes here and invalidate on change
-        vector<GLuint>::type mAttribsBound;
-        vector<GLuint>::type mInstanceAttribsBound;
     public:
         GL3PlusVertexArrayObject();
         ~GL3PlusVertexArrayObject();
         /// Bind a VAO
         void bind(void);
-        bool isInitialised(void) { return mInitialised; }
-        void setInitialised(bool flag) { mInitialised = flag; }
     };
 
 }

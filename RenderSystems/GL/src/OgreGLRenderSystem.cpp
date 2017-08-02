@@ -2716,14 +2716,6 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void GLRenderSystem::setVertexDeclaration(VertexDeclaration* decl)
-    {
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::setVertexBufferBinding(VertexBufferBinding* binding)
-    {
-    }
-    //---------------------------------------------------------------------
     void GLRenderSystem::_render(const RenderOperation& op)
     {
         // Call super class
@@ -2760,16 +2752,11 @@ namespace Ogre {
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
-        size_t maxSource = 0;
 
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
             const VertexElement & elem = *elemIter;
             size_t source = elem.getSource();
-            if ( maxSource < source )
-            {
-                maxSource = source;
-            }
 
             if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
                 continue; // skip unbound elements
@@ -2777,8 +2764,7 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
 
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
-                                   mRenderAttribsBound, mRenderInstanceAttribsBound);
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, NULL);
         }
 
         if( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
@@ -2787,8 +2773,7 @@ namespace Ogre {
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
-                                       mRenderAttribsBound, mRenderInstanceAttribsBound);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, NULL);
 
             }
         }
@@ -3511,10 +3496,9 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    void GLRenderSystem::bindVertexElementToGpu( const VertexElement &elem,
-                                                 HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
-                                                 vector<GLuint>::type &attribsBound,
-                                                 vector<GLuint>::type &instanceAttribsBound )
+    void GLRenderSystem::bindVertexElementToGpu(const VertexElement& elem,
+                                                const HardwareVertexBufferSharedPtr& vertexBuffer,
+                                                const size_t vertexStart, GLSLProgramCommon*)
     {
         void* pBufferData = 0;
         const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get());
@@ -3548,7 +3532,7 @@ namespace Ogre {
             {
                 GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
                 glVertexAttribDivisorARB(attrib, hwGlBuffer->getInstanceDataStepRate() );
-                instanceAttribsBound.push_back(attrib);
+                mRenderInstanceAttribsBound.push_back(attrib);
             }
         }
 
@@ -3592,7 +3576,7 @@ namespace Ogre {
                 pBufferData);
             glEnableVertexAttribArrayARB(attrib);
 
-            attribsBound.push_back(attrib);
+            mRenderAttribsBound.push_back(attrib);
         }
         else
         {

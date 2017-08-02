@@ -25,42 +25,44 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
-#include "OgreGL3PlusVertexArrayObject.h"
-#include "OgreGL3PlusRenderSystem.h"
-#include "OgreGL3PlusStateCacheManager.h"
-#include "OgreRoot.h"
-#include "OgreLogManager.h"
-#include "OgreGLSLProgramCommon.h"
+#ifndef __GLVERTEXARRAYOBJECT_H__
+#define __GLVERTEXARRAYOBJECT_H__
+
+#include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
+    class GLSLProgramCommon;
+    class GLRenderSystemCommon;
 
-    GL3PlusVertexArrayObject::GL3PlusVertexArrayObject()
+    /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
+    class GLVertexArrayObject : public VertexDeclaration
     {
-        OGRE_CHECK_GL_ERROR(glGenVertexArrays(1, &mVAO));
-
-        if (!mVAO)
+    protected:
+        struct AttribBinding
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Cannot create GL Vertex Array Object",
-                        "GL3PlusVertexArrayObject::GL3PlusVertexArrayObject");
-        }
-    }
+            uint32 index;
+            VertexElementSemantic semantic;
+            HardwareVertexBuffer* buffer;
 
+            bool operator==(const AttribBinding& o) {
+                return index == o.index && semantic == o.semantic && buffer == o.buffer;
+            }
+        };
 
-    GL3PlusVertexArrayObject::~GL3PlusVertexArrayObject()
-    {
-        if (GL3PlusStateCacheManager* stateCacheManager =
-                static_cast<GL3PlusRenderSystem*>(mRenderSystem)->_getStateCacheManager())
-        {
-            OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &mVAO));
-            stateCacheManager->bindGLVertexArray(0);
-        }
-    }
+        vector<AttribBinding>::type mAttribsBound;
+        vector<uint32>::type mInstanceAttribsBound;
 
-    void GL3PlusVertexArrayObject::bind(void)
-    {
-        static_cast<GL3PlusRenderSystem*>(mRenderSystem)
-            ->_getStateCacheManager()
-            ->bindGLVertexArray(mVAO);
-    }
+        size_t mVertexStart;
+        uint32 mVAO;
+
+        GLRenderSystemCommon* mRenderSystem;
+    public:
+        GLVertexArrayObject();
+
+        bool needsUpdate(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
+        void bindToShader(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
+    };
+
 }
+
+#endif

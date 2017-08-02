@@ -45,6 +45,8 @@ namespace Ogre
 
         typedef OGRE_HashMap<GLuint, TextureUnitParams> TexUnitsMap;
 
+        /// Stores the currently bound vertex array object
+        GLuint mActiveVertexArray;
         /// A map of texture parameters for each texture unit
         TexUnitsMap mTexUnitsMap;
         /// Stores the currently enabled vertex attributes
@@ -79,6 +81,11 @@ namespace Ogre
          @param buffer The buffer ID.
          */
         void deleteGLBuffer(GLenum target, GLuint buffer);
+
+        /** Bind an OpenGL Vertex array object.
+         @param vao The vertex array object ID.
+         */
+        void bindGLVertexArray(GLuint vao);
 
         /** Bind an OpenGL texture of any type.
          @param target The texture target.
