@@ -77,7 +77,7 @@ public:
                                                                          */
     bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
-    /// Is a non-standard attribute bound in the linked code?
+    /// has the attribute been found in the linked code?
     bool isAttributeValid(VertexElementSemantic semantic, uint index) {
         return getAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
     }

@@ -25,27 +25,37 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
-#ifndef __GL3PlusVERTEXARRAYOBJECT_H__
-#define __GL3PlusVERTEXARRAYOBJECT_H__
+#ifndef __GLVERTEXARRAYOBJECT_H__
+#define __GLVERTEXARRAYOBJECT_H__
 
-#include "OgreGL3PlusPrerequisites.h"
-#include "OgreGLVertexArrayObject.h"
+#include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
     class GLSLProgramCommon;
 
     /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
-    class GL3PlusVertexArrayObject : public GLVertexArrayObject
+    class GLVertexArrayObject : public VertexDeclaration
     {
     protected:
-        /// OpenGL id for the vertex array object
-        GLuint mVAO;
-        GL3PlusRenderSystem* mRenderSystem;
+        struct AttribBinding
+        {
+            uint32 index;
+            VertexElementSemantic semantic;
+            HardwareVertexBuffer* buffer;
+
+            bool operator==(const AttribBinding& o) {
+                return index == o.index && semantic == o.semantic && buffer == o.buffer;
+            }
+        };
+
+        vector<AttribBinding>::type mAttribsBound;
+        vector<uint32>::type mInstanceAttribsBound;
+
+        size_t mVertexStart;
     public:
-        GL3PlusVertexArrayObject();
-        ~GL3PlusVertexArrayObject();
-        /// Bind a VAO
-        void bind(void);
+        GLVertexArrayObject() : mVertexStart(0) {}
+
+        bool needsUpdate(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
     };
 
 }

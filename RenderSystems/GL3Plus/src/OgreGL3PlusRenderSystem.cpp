@@ -1535,8 +1535,8 @@ namespace Ogre {
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
         vao->bind();
 
-        // FIXME: this fixes some rendering issues but leaves VAO's useless
-        bool updateVAO = true;
+        bool updateVAO = vao->needsUpdate(program, op.vertexData->vertexBufferBinding,
+                                          op.vertexData->vertexStart);
 
         // Get vertex array organization.
         const VertexDeclaration::VertexElementList& decl =
@@ -1739,11 +1739,6 @@ namespace Ogre {
                     OGRE_CHECK_GL_ERROR(glDrawArrays(primType, 0, op.vertexData->vertexCount));
                 }
             } while (updatePassIterationRenderState());
-        }
-
-        if (updateVAO)
-        {
-            vao->setInitialised(true);
         }
 
         // Unbind the vertex array object.

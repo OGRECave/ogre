@@ -30,12 +30,11 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusStateCacheManager.h"
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
+#include "OgreGLSLProgramCommon.h"
 
 namespace Ogre {
 
-    GL3PlusVertexArrayObject::GL3PlusVertexArrayObject() :
-        mVAO(0),
-        mInitialised(false)
+    GL3PlusVertexArrayObject::GL3PlusVertexArrayObject() : mVAO(0)
     {
         mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
 
@@ -64,6 +63,4 @@ namespace Ogre {
     {
         mRenderSystem->_getStateCacheManager()->bindGLVertexArray(mVAO);
     }
-
-
 }

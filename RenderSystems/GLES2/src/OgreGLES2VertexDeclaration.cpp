@@ -36,8 +36,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLES2VertexDeclaration::GLES2VertexDeclaration()
         :
-        mVAO(0),
-        mIsInitialised(false)
+        mVAO(0)
     {
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_VAO)) {
             OGRE_CHECK_GL_ERROR(glGenVertexArraysOES(1, &mVAO));
@@ -55,18 +54,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLES2VertexDeclaration::~GLES2VertexDeclaration()
     {
-        if(mVAO) {
-//          LogManager::getSingleton().logMessage("Deleting VAO " + StringConverter::toString(mVAO));
-            OGRE_CHECK_GL_ERROR(glDeleteVertexArraysOES(1, &mVAO));
-        }
+        OGRE_CHECK_GL_ERROR(glDeleteVertexArraysOES(1, &mVAO));
     }
 
     //-----------------------------------------------------------------------
     void GLES2VertexDeclaration::bind(void)
     {
-        if(mVAO) {
-//        LogManager::getSingleton().logMessage("Binding VAO " + StringConverter::toString(mVAO));
-            OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(mVAO));
-        }
+        OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(mVAO));
     }
 }

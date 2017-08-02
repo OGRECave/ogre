@@ -1457,11 +1457,13 @@ namespace Ogre {
 
         GLES2VertexDeclaration* vao = static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
+        bool updateVAO = true;
         if(getCapabilities()->hasCapability(RSC_VAO))
+        {
             vao->bind();
-
-        // FIXME: this fixes some rendering issues but leaves VAO's useless
-        bool updateVAO = true; // !gles2decl->isInitialised() && getCapabilities()->hasCapability(RSC_VAO);
+            updateVAO = vao->needsUpdate(program, op.vertexData->vertexBufferBinding,
+                                         op.vertexData->vertexStart);
+        }
 
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
@@ -1572,11 +1574,6 @@ namespace Ogre {
                     OGRE_CHECK_GL_ERROR(glDrawArrays((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount)));
                 }
             } while (updatePassIterationRenderState());
-        }
-
-        if (updateVAO)
-        {
-            vao->setInitialised(true);
         }
 
         if(getCapabilities()->hasCapability(RSC_VAO))
