@@ -137,7 +137,7 @@ namespace Ogre {
 
         void bindVertexElementToGpu(const VertexElement& elem,
                                     const HardwareVertexBufferSharedPtr& vertexBuffer,
-                                    const size_t vertexStart, GLSLProgram* program);
+                                    const size_t vertexStart, GLSLProgramCommon* program);
 
     public:
         // Default constructor / destructor

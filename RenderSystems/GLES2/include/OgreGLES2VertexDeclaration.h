@@ -37,10 +37,6 @@ namespace Ogre {
     /** Specialisation of VertexDeclaration for OpenGL ES 2 Vertex Array Object usage */
     class GLES2VertexDeclaration : public GLVertexArrayObject
     {
-    protected:
-        /// OpenGL id for the vertex array object
-        GLuint mVAO;
-        GLES2RenderSystem* mRenderSystem;
     public:
         GLES2VertexDeclaration();
         ~GLES2VertexDeclaration();

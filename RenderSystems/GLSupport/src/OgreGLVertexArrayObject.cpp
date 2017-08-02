@@ -29,12 +29,17 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
 #include "OgreGLSLProgramCommon.h"
+#include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
-    bool GLVertexArrayObject::needsUpdate(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart)
-    {
-        bool update = false;
+    GLVertexArrayObject::GLVertexArrayObject() : mVertexStart(0), mVAO(0) {
+        mRenderSystem = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+    }
 
+    bool GLVertexArrayObject::needsUpdate(GLSLProgramCommon* program,
+                                          VertexBufferBinding* vertexBufferBinding,
+                                          size_t vertexStart)
+    {
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = mElementList.end();
 
@@ -59,28 +64,34 @@ namespace Ogre {
             AttribBinding binding = {attrib, sem, vertexBuffer.get()};
             if (std::find(mAttribsBound.begin(), mAttribsBound.end(), binding) ==
                 mAttribsBound.end())
-                update = true;
+                return true;
 
             if (vertexBuffer->getIsInstanceData() &&
                 std::find(mInstanceAttribsBound.begin(), mInstanceAttribsBound.end(), attrib) ==
                     mInstanceAttribsBound.end())
-                update = true;
+                return true;
         }
 
         if(vertexStart != mVertexStart) {
-            update = true;
+            return true;
         }
 
-        if(!update) {
-            return false;
-        }
+        return false;
+    }
 
+    void GLVertexArrayObject::bindToShader(GLSLProgramCommon* program,
+                                           VertexBufferBinding* vertexBufferBinding,
+                                           size_t vertexStart)
+    {
         mAttribsBound.clear();
         mInstanceAttribsBound.clear();
 
+        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
+        elemEnd = mElementList.end();
+
         for (elemIter = mElementList.begin(); elemIter != elemEnd; ++elemIter)
         {
-            const VertexElement & elem = *elemIter;
+            const VertexElement& elem = *elemIter;
 
             uint16 source = elem.getSource();
 
@@ -100,10 +111,12 @@ namespace Ogre {
             AttribBinding binding = {attrib, sem, vertexBuffer.get()};
             mAttribsBound.push_back(binding);
 
+            mRenderSystem->bindVertexElementToGpu(elem, vertexBuffer, vertexStart, program);
+
             if (vertexBuffer->getIsInstanceData())
                 mInstanceAttribsBound.push_back(attrib);
         }
 
-        return true;
+        mVertexStart = vertexStart;
     }
 }

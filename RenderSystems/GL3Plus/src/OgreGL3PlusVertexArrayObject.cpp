@@ -34,10 +34,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
 
-    GL3PlusVertexArrayObject::GL3PlusVertexArrayObject() : mVAO(0)
+    GL3PlusVertexArrayObject::GL3PlusVertexArrayObject()
     {
-        mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
-
         OGRE_CHECK_GL_ERROR(glGenVertexArrays(1, &mVAO));
 
         if (!mVAO)
@@ -51,16 +49,18 @@ namespace Ogre {
 
     GL3PlusVertexArrayObject::~GL3PlusVertexArrayObject()
     {
-        if (GL3PlusStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
+        if (GL3PlusStateCacheManager* stateCacheManager =
+                static_cast<GL3PlusRenderSystem*>(mRenderSystem)->_getStateCacheManager())
         {
             OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &mVAO));
             stateCacheManager->bindGLVertexArray(0);
         }
     }
 
-
     void GL3PlusVertexArrayObject::bind(void)
     {
-        mRenderSystem->_getStateCacheManager()->bindGLVertexArray(mVAO);
+        static_cast<GL3PlusRenderSystem*>(mRenderSystem)
+            ->_getStateCacheManager()
+            ->bindGLVertexArray(mVAO);
     }
 }

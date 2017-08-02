@@ -1534,34 +1534,21 @@ namespace Ogre {
             static_cast<GL3PlusVertexArrayObject*>(op.vertexData->vertexDeclaration);
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
         vao->bind();
-
         bool updateVAO = vao->needsUpdate(program, op.vertexData->vertexBufferBinding,
                                           op.vertexData->vertexStart);
 
-        // Get vertex array organization.
-        const VertexDeclaration::VertexElementList& decl =
-            op.vertexData->vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
-        elemEnd = decl.end();
-        // Bind the appropriate VBOs to the active attributes of the VAO.
-        for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
-        {
-            if(!updateVAO)
-                break;
+        if (updateVAO) {
+            vao->bindToShader(program, op.vertexData->vertexBufferBinding,
+                              op.vertexData->vertexStart);
 
-            const VertexElement & elem = *elemIter;
-            uint16 source = elem.getSource();
-
-            if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
-                continue; // Skip unbound elements.
-
-            HardwareVertexBufferSharedPtr vertexBuffer =
-                op.vertexData->vertexBufferBinding->getBuffer(source);
-
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, program);
+            if(op.useIndexes)
+                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                                             static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
         }
 
-        if ( globalInstanceVertexBuffer && globalVertexDeclaration && updateVAO)
+        // unconditionally modify VAO for global instance data (FIXME bad API)
+        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
+        if ( globalInstanceVertexBuffer && globalVertexDeclaration )
         {
             elemEnd = globalVertexDeclaration->getElements().end();
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
@@ -1570,10 +1557,6 @@ namespace Ogre {
                 bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program);
             }
         }
-
-        if(updateVAO && op.useIndexes)
-            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                                         static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
         mStateCacheManager->activateGLTextureUnit(0);
 
@@ -2474,7 +2457,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::bindVertexElementToGpu(const VertexElement& elem,
                                                      const HardwareVertexBufferSharedPtr& vertexBuffer,
-                                                     const size_t vertexStart, GLSLProgram* program)
+                                                     const size_t vertexStart, GLSLProgramCommon* program)
     {
         VertexElementSemantic sem = elem.getSemantic();
         unsigned short elemIndex = elem.getIndex();

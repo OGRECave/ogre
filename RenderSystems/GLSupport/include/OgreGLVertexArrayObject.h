@@ -32,6 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
     class GLSLProgramCommon;
+    class GLRenderSystemCommon;
 
     /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
     class GLVertexArrayObject : public VertexDeclaration
@@ -52,10 +53,14 @@ namespace Ogre {
         vector<uint32>::type mInstanceAttribsBound;
 
         size_t mVertexStart;
+        uint32 mVAO;
+
+        GLRenderSystemCommon* mRenderSystem;
     public:
-        GLVertexArrayObject() : mVertexStart(0) {}
+        GLVertexArrayObject();
 
         bool needsUpdate(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
+        void bindToShader(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
     };
 
 }

@@ -2752,16 +2752,11 @@ namespace Ogre {
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
-        size_t maxSource = 0;
 
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
             const VertexElement & elem = *elemIter;
             size_t source = elem.getSource();
-            if ( maxSource < source )
-            {
-                maxSource = source;
-            }
 
             if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
                 continue; // skip unbound elements
@@ -2769,7 +2764,7 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
 
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart);
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, NULL);
         }
 
         if( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
@@ -2778,7 +2773,7 @@ namespace Ogre {
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, NULL);
 
             }
         }
@@ -3503,7 +3498,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLRenderSystem::bindVertexElementToGpu(const VertexElement& elem,
                                                 const HardwareVertexBufferSharedPtr& vertexBuffer,
-                                                const size_t vertexStart)
+                                                const size_t vertexStart, GLSLProgramCommon*)
     {
         void* pBufferData = 0;
         const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get());

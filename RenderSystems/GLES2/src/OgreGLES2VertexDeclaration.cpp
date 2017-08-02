@@ -37,12 +37,10 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     GLES2VertexDeclaration::GLES2VertexDeclaration()
-        :
-        mVAO(0)
     {
         mRenderSystem = static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
 
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_VAO)) {
+        if(mRenderSystem->getCapabilities()->hasCapability(RSC_VAO)) {
             OGRE_CHECK_GL_ERROR(glGenVertexArraysOES(1, &mVAO));
     //        LogManager::getSingleton().logMessage("Created VAO " + StringConverter::toString(mVAO));
 
@@ -58,7 +56,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLES2VertexDeclaration::~GLES2VertexDeclaration()
     {
-        if (GLES2StateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
+        if (GLES2StateCacheManager* stateCacheManager =
+                static_cast<GLES2RenderSystem*>(mRenderSystem)->_getStateCacheManager())
         {
             OGRE_CHECK_GL_ERROR(glDeleteVertexArraysOES(1, &mVAO));
             stateCacheManager->bindGLVertexArray(0);
@@ -68,6 +67,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLES2VertexDeclaration::bind(void)
     {
-        mRenderSystem->_getStateCacheManager()->bindGLVertexArray(mVAO);
+        static_cast<GLES2RenderSystem*>(mRenderSystem)
+            ->_getStateCacheManager()
+            ->bindGLVertexArray(mVAO);
     }
 }

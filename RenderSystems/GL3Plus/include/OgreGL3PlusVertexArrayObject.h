@@ -37,10 +37,6 @@ namespace Ogre {
     /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
     class GL3PlusVertexArrayObject : public GLVertexArrayObject
     {
-    protected:
-        /// OpenGL id for the vertex array object
-        GLuint mVAO;
-        GL3PlusRenderSystem* mRenderSystem;
     public:
         GL3PlusVertexArrayObject();
         ~GL3PlusVertexArrayObject();

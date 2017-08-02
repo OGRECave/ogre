@@ -1450,11 +1450,6 @@ namespace Ogre {
 
         void* pBufferData = 0;
 
-        const VertexDeclaration::VertexElementList& decl =
-            op.vertexData->vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
-        elemEnd = decl.end();
-
         GLES2VertexDeclaration* vao = static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
         bool updateVAO = true;
@@ -1465,32 +1460,26 @@ namespace Ogre {
                                          op.vertexData->vertexStart);
         }
 
-        for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
-        {
-            if(!updateVAO)
-                break;
+        if (updateVAO) {
+            vao->bindToShader(program, op.vertexData->vertexBufferBinding,
+                              op.vertexData->vertexStart);
 
-            const VertexElement & elem = *elemIter;
-            unsigned short elemSource = elem.getSource();
+            if (op.useIndexes)
+                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                         static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
-            if (!op.vertexData->vertexBufferBinding->isBufferBound(elemSource))
-                continue; // skip unbound elements
- 
-            HardwareVertexBufferSharedPtr vertexBuffer =
-                op.vertexData->vertexBufferBinding->getBuffer(elemSource);
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, program);
         }
 
-        if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
+        if (getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA)
+            && globalInstanceVertexBuffer && globalVertexDeclaration)
         {
-            if( globalInstanceVertexBuffer && globalVertexDeclaration && updateVAO)
+            VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
+            elemEnd = globalVertexDeclaration->getElements().end();
+            for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd;
+                 ++elemIter)
             {
-                elemEnd = globalVertexDeclaration->getElements().end();
-                for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
-                {
-                    const VertexElement & elem = *elemIter;
-                    bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program);
-                }
+                const VertexElement& elem = *elemIter;
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program);
             }
         }
 
@@ -1522,11 +1511,6 @@ namespace Ogre {
         GLenum polyMode = mPolygonMode;
         if (op.useIndexes)
         {
-            // If we are using VAO's then only bind the buffer the first time through. Otherwise, always bind.
-            if (updateVAO)
-                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                         static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
-
             pBufferData = VBO_BUFFER_OFFSET(op.indexData->indexStart *
                                             op.indexData->indexBuffer->getIndexSize());
 
@@ -2179,7 +2163,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::bindVertexElementToGpu(
         const VertexElement& elem, const HardwareVertexBufferSharedPtr& vertexBuffer,
-        const size_t vertexStart, GLSLESProgramCommon* program)
+        const size_t vertexStart, GLSLProgramCommon* program)
     {
         VertexElementSemantic sem = elem.getSemantic();
         unsigned short elemIndex = elem.getIndex();
