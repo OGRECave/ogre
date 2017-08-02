@@ -283,7 +283,7 @@ namespace Ogre {
             mActiveVertexArray = vao;
             OGRE_CHECK_GL_ERROR(glBindVertexArray(vao));
             //we also need to clear the cached GL_ELEMENT_ARRAY_BUFFER value, as it is invalidated by glBindVertexArray
-            bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            mActiveBufferMap[GL_ELEMENT_ARRAY_BUFFER] = 0;
         }
 #else
         OGRE_CHECK_GL_ERROR(glBindVertexArray(vao));
