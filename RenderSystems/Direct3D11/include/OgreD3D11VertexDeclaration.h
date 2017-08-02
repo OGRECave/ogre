@@ -43,8 +43,6 @@ namespace Ogre {
     protected:
         D3D11Device & mlpD3DDevice;
 
-        bool mNeedsRebuild;
-
         typedef map<D3D11HLSLProgram*, ComPtr<ID3D11InputLayout>>::type ShaderToILayoutMap;
         typedef ShaderToILayoutMap::iterator ShaderToILayoutMapIterator;
         typedef map<D3D11HLSLProgram*, vector<D3D11_INPUT_ELEMENT_DESC>::type>::type ShaderToInputDesc;
@@ -67,31 +65,9 @@ namespace Ogre {
         ~D3D11VertexDeclaration();
 
         /** See VertexDeclaration */
-        const VertexElement& addElement(unsigned short source, size_t offset, VertexElementType theType,
-            VertexElementSemantic semantic, unsigned short index = 0);
-
-        /** See VertexDeclaration */
-        const VertexElement& insertElement(unsigned short atPosition,
-            unsigned short source, size_t offset, VertexElementType theType,
-            VertexElementSemantic semantic, unsigned short index = 0);
-
-        /** See VertexDeclaration */
-        void removeElement(unsigned short elem_index);
-
-        /** See VertexDeclaration */
-        void removeElement(VertexElementSemantic semantic, unsigned short index = 0);
-
-        /** See VertexDeclaration */
-        void removeAllElements(void);
-
-
-        /** See VertexDeclaration */
-        void modifyElement(unsigned short elem_index, unsigned short source, size_t offset, VertexElementType theType,
-            VertexElementSemantic semantic, unsigned short index = 0);
-
+        void notifyChanged();
 
         void bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
-
     };
 
 }

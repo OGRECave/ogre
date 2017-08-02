@@ -36,12 +36,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     D3D11VertexDeclaration::D3D11VertexDeclaration(D3D11Device &  device) 
         : mlpD3DDevice(device)
-        , mNeedsRebuild(true)
     {
     }
     //-----------------------------------------------------------------------
     D3D11VertexDeclaration::~D3D11VertexDeclaration()
     {
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::notifyChanged()
+    {
+        clearCache();
     }
     //-----------------------------------------------------------------------
     void D3D11VertexDeclaration::notifyDeviceLost(D3D11Device* device)
@@ -57,49 +61,6 @@ namespace Ogre {
     {
         mD3delems.clear();
         mShaderToILayoutMap.clear();
-        mNeedsRebuild = false;
-    }
-    //-----------------------------------------------------------------------
-    const VertexElement& D3D11VertexDeclaration::addElement(unsigned short source, 
-        size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
-    {
-        mNeedsRebuild = true;
-        return VertexDeclaration::addElement(source, offset, theType, semantic, index);
-    }
-    //-----------------------------------------------------------------------------
-    const VertexElement& D3D11VertexDeclaration::insertElement(unsigned short atPosition,
-        unsigned short source, size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
-    {
-        mNeedsRebuild = true;
-        return VertexDeclaration::insertElement(atPosition, source, offset, theType, semantic, index);
-    }
-    //-----------------------------------------------------------------------
-    void D3D11VertexDeclaration::removeElement(unsigned short elem_index)
-    {
-        VertexDeclaration::removeElement(elem_index);
-        mNeedsRebuild = true;
-    }
-    //-----------------------------------------------------------------------
-    void D3D11VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
-    {
-        VertexDeclaration::removeElement(semantic, index);
-        mNeedsRebuild = true;
-    }
-    //-----------------------------------------------------------------------
-    void D3D11VertexDeclaration::removeAllElements(void)
-    {
-        VertexDeclaration::removeAllElements();
-        mNeedsRebuild = true;
-    }
-    //-----------------------------------------------------------------------
-    void D3D11VertexDeclaration::modifyElement(unsigned short elem_index, 
-        unsigned short source, size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
-    {
-        VertexDeclaration::modifyElement(elem_index, source, offset, theType, semantic, index);
-        mNeedsRebuild = true;
     }
     //-----------------------------------------------------------------------
     D3D11_INPUT_ELEMENT_DESC * D3D11VertexDeclaration::getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
@@ -223,9 +184,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11VertexDeclaration::bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
-        if(mNeedsRebuild)
-            clearCache();
-
         // Set the input layout
         ID3D11InputLayout*  pVertexLayout = getILayoutByShader(boundVertexProgram, binding);
         mlpD3DDevice.GetImmediateContext()->IASetInputLayout( pVertexLayout);

@@ -422,8 +422,9 @@ namespace Ogre {
             theType = VertexElement::getBestColourVertexElementType();
         }
         mElementList.push_back(
-            VertexElement(source, offset, theType, semantic, index)
-            );
+            VertexElement(source, offset, theType, semantic, index));
+
+        notifyChanged();
         return mElementList.back();
     }
     //-----------------------------------------------------------------------------
@@ -442,8 +443,9 @@ namespace Ogre {
 
         i = mElementList.insert(i, 
             VertexElement(source, offset, theType, semantic, index));
-        return *i;
 
+        notifyChanged();
+        return *i;
     }
     //-----------------------------------------------------------------------------
     const VertexElement* VertexDeclaration::getElement(unsigned short index) const
@@ -465,6 +467,7 @@ namespace Ogre {
         for (unsigned short n = 0; n < elem_index; ++n)
             ++i;
         mElementList.erase(i);
+        notifyChanged();
     }
     //-----------------------------------------------------------------------------
     void VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
@@ -476,6 +479,7 @@ namespace Ogre {
             if (ei->getSemantic() == semantic && ei->getIndex() == index)
             {
                 mElementList.erase(ei);
+                notifyChanged();
                 break;
             }
         }
@@ -484,6 +488,7 @@ namespace Ogre {
     void VertexDeclaration::removeAllElements(void)
     {
         mElementList.clear();
+        notifyChanged();
     }
     //-----------------------------------------------------------------------------
     void VertexDeclaration::modifyElement(unsigned short elem_index, 
@@ -494,6 +499,7 @@ namespace Ogre {
         VertexElementList::iterator i = mElementList.begin();
         std::advance(i, elem_index);
         (*i) = VertexElement(source, offset, theType, semantic, index);
+        notifyChanged();
     }
     //-----------------------------------------------------------------------------
     const VertexElement* VertexDeclaration::findElementBySemantic(

@@ -363,6 +363,9 @@ namespace Ogre {
         /** Get a single element. */
         const VertexElement* getElement(unsigned short index) const;
 
+        /** Notify derived class that it is time to invalidate cached state, such as VAO or ID3D11InputLayout */
+        virtual void notifyChanged() {}
+
         /** Sorts the elements in this list to be compatible with the maximum
             number of rendering APIs / graphics cards.
         @remarks
