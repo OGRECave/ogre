@@ -141,6 +141,8 @@ namespace Ogre {
         GLSLShader* getComputeShader() const { return mComputeShader; }
         GL3PlusOldVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
 
+        GLint mBaseInstanceLocation;
+
     protected:
         /// Container of uniform references that are active in the program object
         GLUniformReferenceList mGLUniformReferences;
@@ -206,6 +208,7 @@ namespace Ogre {
         const char * getAttributeSemanticString(VertexElementSemantic semantic);
 
         void bindFixedAttributes( GLuint programName );
+        void setupBaseInstance( GLuint programName );
     };
 
 

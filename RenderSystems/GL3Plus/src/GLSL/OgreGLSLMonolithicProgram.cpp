@@ -224,6 +224,7 @@ namespace Ogre {
 
         if(mLinked)
         {
+            setupBaseInstance( mGLProgramHandle );
             if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
             {
                 // add to the microcode to the cache

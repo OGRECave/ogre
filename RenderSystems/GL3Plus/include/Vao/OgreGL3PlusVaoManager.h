@@ -146,6 +146,7 @@ namespace Ogre
 
         /// True if ARB_buffer_storage is supported (Persistent Mapping and immutable buffers)
         bool    mArbBufferStorage;
+        bool    mEmulateTexBuffers;
 
         static const GLuint VERTEX_ATTRIBUTE_INDEX[VES_COUNT];
         VertexBufferPacked  *mDrawId;
@@ -242,7 +243,8 @@ namespace Ogre
         static VboFlag bufferTypeToVboFlag( BufferType bufferType );
 
     public:
-        GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers,
+        GL3PlusVaoManager( bool supportsArbBufferStorage, bool emulateTexBuffers,
+                           bool supportsIndirectBuffers, bool _supportsBaseInstance,
                            bool supportsSsbo );
         virtual ~GL3PlusVaoManager();
 

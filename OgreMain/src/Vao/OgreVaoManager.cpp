@@ -46,6 +46,7 @@ namespace Ogre
         mDefaultStagingBufferLifetime( 300000 ), //5 minutes
         mSupportsPersistentMapping( false ),
         mSupportsIndirectBuffers( false ),
+        mSupportsBaseInstance( true ),
         mDynamicBufferMultiplier( 3 ),
         mDynamicBufferCurrentFrame( 0 ),
         mNextStagingBufferTimestampCheckpoint( ~0 ),

@@ -65,8 +65,10 @@ namespace Ogre
 
         static CommandBufferExecuteFunc execute_setVao;
         static CommandBufferExecuteFunc execute_setIndirectBuffer;
+        static CommandBufferExecuteFunc execute_drawCallIndexedEmulatedNoBaseInstance;
         static CommandBufferExecuteFunc execute_drawCallIndexedEmulated;
         static CommandBufferExecuteFunc execute_drawCallIndexed;
+        static CommandBufferExecuteFunc execute_drawCallStripEmulatedNoBaseInstance;
         static CommandBufferExecuteFunc execute_drawCallStripEmulated;
         static CommandBufferExecuteFunc execute_drawCallStrip;
         static CommandBufferExecuteFunc execute_setConstantBufferVS;
@@ -88,7 +90,9 @@ namespace Ogre
         static CommandBufferExecuteFunc execute_disableTextureUnitsFrom;
         static CommandBufferExecuteFunc execute_startV1LegacyRendering;
         static CommandBufferExecuteFunc execute_setV1RenderOp;
+        static CommandBufferExecuteFunc execute_drawV1IndexedNoBaseInstance;
         static CommandBufferExecuteFunc execute_drawV1Indexed;
+        static CommandBufferExecuteFunc execute_drawV1StripNoBaseInstance;
         static CommandBufferExecuteFunc execute_drawV1Strip;
         static CommandBufferExecuteFunc execute_lowLevelMaterial;
         static CommandBufferExecuteFunc execute_invalidCommand;

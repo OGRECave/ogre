@@ -128,6 +128,9 @@ namespace Ogre
             OGRE_CHECK_GL_ERROR(glValidateProgramPipeline(mGLProgramPipelineHandle));
             logObjectInfo( getCombinedName() + String("GLSL program pipeline validation result: "), mGLProgramPipelineHandle );
 
+            if( mVertexShader && mVertexShader->isLinked() )
+                setupBaseInstance( mGLProgramPipelineHandle );
+
             //            if (getGLSupport()->checkExtension("GL_KHR_debug") || mHasGL43)
             //                glObjectLabel(GL_PROGRAM_PIPELINE, mGLProgramPipelineHandle, 0,
             //                                 (mVertexShader->getName() + "/" + mFragmentShader->getName()).c_str());

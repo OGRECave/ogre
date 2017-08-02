@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusVertexArrayObject.h"
 #include "Vao/OgreGL3PlusBufferInterface.h"
 #include "Vao/OgreGL3PlusConstBufferPacked.h"
+#include "Vao/OgreGL3PlusTexBufferEmulatedPacked.h"
 #include "Vao/OgreGL3PlusTexBufferPacked.h"
 #include "Vao/OgreGL3PlusUavBufferPacked.h"
 #include "Vao/OgreGL3PlusMultiSourceVertexBufferPool.h"
@@ -81,9 +82,12 @@ namespace Ogre
     };
 
     GL3PlusVaoManager::GL3PlusVaoManager( bool _supportsArbBufferStorage,
+                                          bool emulateTexBuffers,
                                           bool _supportsIndirectBuffers,
+                                          bool _supportsBaseInstance,
                                           bool _supportsSsbo ) :
         mArbBufferStorage( _supportsArbBufferStorage ),
+        mEmulateTexBuffers( emulateTexBuffers ),
         mDrawId( 0 )
     {
         //Keep pools of 128MB each for static meshes
@@ -125,6 +129,7 @@ namespace Ogre
 
         mSupportsPersistentMapping  = mArbBufferStorage;
         mSupportsIndirectBuffers    = _supportsIndirectBuffers;
+        mSupportsBaseInstance       = _supportsBaseInstance;
 
         VertexElement2Vec vertexElements;
         vertexElements.push_back( VertexElement2( VET_UINT1, VES_COUNT ) );
@@ -576,17 +581,13 @@ namespace Ogre
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-#ifdef OGRE_LEGACY_GL_COMPATIBLE
-        GL3PlusRenderSystem* pRenderSystem = static_cast<GL3PlusRenderSystem*>(Ogre::Root::getSingleton().getRenderSystem());
-        assert(pRenderSystem);
-        if(pRenderSystem->getNativeShadingLanguageVersion()<430)
+        if( mEmulateTexBuffers )
         {
             // Align to the texture size since we must copy the PBO to a texture.
             ushort maxTexSizeBytes = 2048 * PixelUtil::getNumElemBytes( pixelFormat );
             // We need another line of maxTexSizeBytes for uploading to create a rectangle when calling glTexSubImage2D().
             sizeBytes = sizeBytes = alignToNextMultiple( sizeBytes, maxTexSizeBytes );
         }
-#endif
         
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
@@ -602,11 +603,22 @@ namespace Ogre
         Vbo &vbo = mVbos[vboFlag][vboIdx];
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
-        TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
-                                                        bufferOffset, requestedSize, 1,
-                                                        (sizeBytes - requestedSize) / 1,
-                                                        bufferType, initialData, keepAsShadow,
-                                                        this, bufferInterface, pixelFormat );
+        TexBufferPacked *retVal;
+
+        if( !mEmulateTexBuffers )
+        {
+            retVal = OGRE_NEW GL3PlusTexBufferPacked( bufferOffset, requestedSize, 1,
+                                                      (sizeBytes - requestedSize) / 1,
+                                                      bufferType, initialData, keepAsShadow,
+                                                      this, bufferInterface, pixelFormat );
+        }
+        else
+        {
+            retVal = OGRE_NEW GL3PlusTexBufferEmulatedPacked( bufferOffset, requestedSize, 1,
+                                                              (sizeBytes - requestedSize) / 1,
+                                                              bufferType, initialData, keepAsShadow,
+                                                              this, bufferInterface, pixelFormat );
+        }
 
         if( initialData )
             bufferInterface->_firstUpload( initialData, 0, requestedSize );

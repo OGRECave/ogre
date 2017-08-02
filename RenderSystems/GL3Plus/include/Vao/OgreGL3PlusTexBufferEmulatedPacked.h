@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_GL3PlusTexBufferPacked_H_
-#define _Ogre_GL3PlusTexBufferPacked_H_
+#ifndef _Ogre_GL3PlusTexBufferEmulatedPacked_H_
+#define _Ogre_GL3PlusTexBufferEmulatedPacked_H_
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "Vao/OgreTexBufferPacked.h"
@@ -36,20 +36,27 @@ namespace Ogre
 {
     class GL3PlusBufferInterface;
 
-    class _OgreGL3PlusExport GL3PlusTexBufferPacked : public TexBufferPacked
+    class _OgreGL3PlusExport GL3PlusTexBufferEmulatedPacked : public TexBufferPacked
     {
         GLuint mTexName;
         GLenum mInternalFormat;
 
+        GLenum mOriginFormat;
+        GLenum mOriginDataType;
+        size_t mMaxTexSize;
+        size_t mInternalNumElemBytes;
+        size_t mInternalNumElements;
+
         inline void bindBuffer( uint16 slot, size_t offset, size_t sizeBytes );
 
     public:
-        GL3PlusTexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                                uint32 numElementsPadding, BufferType bufferType,
-                                void *initialData, bool keepAsShadow,
-                                VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface,
-                                Ogre::PixelFormat pf );
-        virtual ~GL3PlusTexBufferPacked();
+        GL3PlusTexBufferEmulatedPacked( size_t internalBufStartBytes, size_t numElements,
+                                        uint32 bytesPerElement, uint32 numElementsPadding,
+                                        BufferType bufferType,
+                                        void *initialData, bool keepAsShadow,
+                                        VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface,
+                                        Ogre::PixelFormat pf );
+        virtual ~GL3PlusTexBufferEmulatedPacked();
 
         virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
         virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );

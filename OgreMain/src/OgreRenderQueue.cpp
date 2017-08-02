@@ -524,7 +524,11 @@ namespace Ogre
         HlmsCache const *lastHlmsCache = &c_dummyCache;
         uint32 lastHlmsCacheHash = 0;
 
-        bool supportsIndirectBuffers = mVaoManager->supportsIndirectBuffers();
+        int baseInstanceAndIndirectBuffers = 0;
+        if( mVaoManager->supportsIndirectBuffers() )
+            baseInstanceAndIndirectBuffers = 2;
+        else if( mVaoManager->supportsBaseInstance() )
+            baseInstanceAndIndirectBuffers = 1;
 
         uint32 instanceCount = 1;
 
@@ -587,13 +591,13 @@ namespace Ogre
                 if( vao->getIndexBuffer() )
                 {
                     CbDrawCallIndexed *drawCall = mCommandBuffer->addCommand<CbDrawCallIndexed>();
-                    *drawCall = CbDrawCallIndexed( supportsIndirectBuffers, vao, offset );
+                    *drawCall = CbDrawCallIndexed( baseInstanceAndIndirectBuffers, vao, offset );
                     drawCmd = drawCall;
                 }
                 else
                 {
                     CbDrawCallStrip *drawCall = mCommandBuffer->addCommand<CbDrawCallStrip>();
-                    *drawCall = CbDrawCallStrip( supportsIndirectBuffers, vao, offset );
+                    *drawCall = CbDrawCallStrip( baseInstanceAndIndirectBuffers, vao, offset );
                     drawCmd = drawCall;
                 }
 
@@ -663,6 +667,8 @@ namespace Ogre
         HlmsCache const *lastHlmsCache = &c_dummyCache;
         uint32 lastHlmsCacheHash = 0;
 
+        const bool supportsBaseInstance = mVaoManager->supportsBaseInstance();
+
         uint32 instanceCount = 1;
 
         v1::CbDrawCall *drawCmd = 0;
@@ -727,7 +733,7 @@ namespace Ogre
                 {
                     v1::CbDrawCallIndexed *drawCall =
                             mCommandBuffer->addCommand<v1::CbDrawCallIndexed>();
-                    *drawCall = v1::CbDrawCallIndexed();
+                    *drawCall = v1::CbDrawCallIndexed( supportsBaseInstance );
 
                     /*drawCall->useGlobalInstancingVertexBufferIsAvailable =
                             renderOp.useGlobalInstancingVertexBufferIsAvailable;*/
@@ -744,7 +750,7 @@ namespace Ogre
                 {
                     v1::CbDrawCallStrip *drawCall =
                             mCommandBuffer->addCommand<v1::CbDrawCallStrip>();
-                    *drawCall = v1::CbDrawCallStrip();
+                    *drawCall = v1::CbDrawCallStrip( supportsBaseInstance );
 
                     /*drawCall->useGlobalInstancingVertexBufferIsAvailable =
                             renderOp.useGlobalInstancingVertexBufferIsAvailable;*/

@@ -54,7 +54,7 @@ namespace Ogre {
     };
 
     
-    GLSLProgramManager::GLSLProgramManager(const GL3PlusSupport& support) :
+    GLSLProgramManager::GLSLProgramManager( const GL3PlusSupport& support ) :
         mActiveVertexShader(NULL),
         mActiveHullShader(NULL),
         mActiveDomainShader(NULL),
@@ -968,7 +968,6 @@ namespace Ogre {
             }
         }
 #endif
-        
     }
     
     void GLSLProgramManager::extractUniformsFromGLSL(

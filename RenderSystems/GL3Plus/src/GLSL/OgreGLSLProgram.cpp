@@ -42,7 +42,8 @@ namespace Ogre {
                              GLSLShader* geometryShader,
                              GLSLShader* fragmentShader,
                              GLSLShader* computeShader)
-        : mVertexShader(vertexShader)
+        : mBaseInstanceLocation( -1 )
+        , mVertexShader(vertexShader)
         , mHullShader(hullShader)
         , mDomainShader(domainShader)
         , mGeometryShader(geometryShader)
@@ -382,6 +383,13 @@ namespace Ogre {
 
         assert(max_vertex_attribs>=16);
         OCGE( glBindAttribLocation( programName, 15, "drawId" ) );
+    }
+
+    void GLSLProgram::setupBaseInstance( GLuint programName )
+    {
+        VaoManager *vaoManager = Root::getSingleton().getRenderSystem()->getVaoManager();
+        if( !vaoManager->supportsBaseInstance() )
+            mBaseInstanceLocation = glGetUniformLocation( programName, "baseInstance" );
     }
 
 } // namespace Ogre
