@@ -19,7 +19,7 @@ layout(std140) uniform;
 //So you'll need a total of 24 vertices.
 //in int gl_VertexID;
 
-@property( hlms_base_instance )
+@property( GL_ARB_base_instance )
 	in uint drawId;
 @end
 
@@ -35,7 +35,7 @@ out block
 @insertpiece( TerraInstanceDecl )
 uniform sampler2D heightMap;
 @insertpiece( custom_vs_uniformDeclaration )
-@property( hlms_base_instance )uniform uint baseInstance;@end
+@property( !GL_ARB_base_instance )uniform uint baseInstance;@end
 // END UNIFORM DECLARATION
 
 @piece( VertexTransform )
@@ -60,7 +60,7 @@ uniform sampler2D heightMap;
 
 void main()
 {
-@property( hlms_base_instance )
+@property( !GL_ARB_base_instance )
     uint drawId = baseInstance + uint( gl_InstanceID );
 @end
 

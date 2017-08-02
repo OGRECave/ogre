@@ -98,10 +98,6 @@ namespace Ogre
     const IdString HlmsBaseProp::UvCount5           = IdString( "hlms_uv_count5" );
     const IdString HlmsBaseProp::UvCount6           = IdString( "hlms_uv_count6" );
     const IdString HlmsBaseProp::UvCount7           = IdString( "hlms_uv_count7" );
-
-#ifdef OGRE_LEGACY_GL_COMPATIBLE
-    const IdString HlmsBaseProp::BaseInstance       = IdString( "hlms_base_instance" );
-#endif
     
     //Change per frame (grouped together with scene pass)
     const IdString HlmsBaseProp::LightsDirectional  = IdString( "hlms_lights_directional" );
@@ -1854,10 +1850,6 @@ namespace Ogre
                 {
                     setProperty( HlmsBaseProp::GL3Plus,
                                  mRenderSystem->getNativeShadingLanguageVersion() );
-#ifdef OGRE_LEGACY_GL_COMPATIBLE
-                    if(mRenderSystem->getNativeShadingLanguageVersion()<420)
-                        setProperty( HlmsBaseProp::BaseInstance, 1 );
-#endif
                 }
 
                 setProperty( HlmsBaseProp::Syntax,  mShaderSyntax.mHash );
@@ -2893,6 +2885,28 @@ namespace Ogre
 
                 if( mRenderSystem->checkExtension( "GL_AMD_shader_trinary_minmax" ) )
                     mRsSpecificExtensions.push_back( HlmsBaseProp::GlAmdTrinaryMinMax );
+
+                struct Extensions
+                {
+                    const char *extName;
+                    uint32 minGlVersion;
+                };
+
+                Extensions extensions[] =
+                {
+                    { "GL_ARB_base_instance",               420 },
+                    { "GL_ARB_shading_language_420pack",    420 },
+                    { "GL_ARB_texture_buffer_range",        430 },
+                };
+
+                for( size_t i=0; i<sizeof(extensions) / sizeof(extensions[0]); ++i )
+                {
+                    if( mRenderSystem->getNativeShadingLanguageVersion() >= extensions[i].minGlVersion ||
+                        mRenderSystem->checkExtension( extensions[i].extName ) )
+                    {
+                        mRsSpecificExtensions.push_back( extensions[i].extName );
+                    }
+                }
             }
 
             if( !mDefaultDatablock )

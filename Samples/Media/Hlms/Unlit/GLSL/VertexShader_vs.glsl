@@ -19,7 +19,7 @@ in vec4 vertex;
 @foreach( hlms_uv_count, n )
 in vec@value( hlms_uv_count@n ) uv@n;@end
 
-@property( hlms_base_instance )
+@property( GL_ARB_base_instance )
 	in uint drawId;
 @end
 
@@ -38,7 +38,7 @@ out block
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @property( texture_matrix )layout(binding = 1) uniform samplerBuffer animationMatrixBuf;@end
 @insertpiece( custom_vs_uniformDeclaration )
-@property( hlms_base_instance )uniform uint baseInstance;@end
+@property( !GL_ARB_base_instance )uniform uint baseInstance;@end
 // END UNIFORM DECLARATION
 
 @property( !hlms_identity_world )
@@ -53,7 +53,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 void main()
 {
-@property( hlms_base_instance )
+@property( !GL_ARB_base_instance )
     uint drawId = baseInstance + uint( gl_InstanceID );
 @end
     
