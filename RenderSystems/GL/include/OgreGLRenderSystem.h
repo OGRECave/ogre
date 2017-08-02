@@ -331,10 +331,6 @@ namespace Ogre {
 
         void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
 
-        void setVertexDeclaration(VertexDeclaration* decl);
-
-        void setVertexBufferBinding(VertexBufferBinding* binding);
-
         void _render(const RenderOperation& op);
 
         void bindGpuProgram(GpuProgram* prg);

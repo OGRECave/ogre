@@ -1107,17 +1107,6 @@ namespace Ogre {
 #endif
     }
 
-    void GLES2RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
-    {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                    "Cannot directly call setVertexDeclaration in the GLES2 render system - cast then use 'setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)' .", 
-                    "GLES2RenderSystem::setVertexDeclaration" );
-    }
-
-    void GLES2RenderSystem::setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)
-    {
-    }
-
     void GLES2RenderSystem::_setCullingMode(CullingMode mode)
     {
         mCullingMode = mode;

@@ -232,12 +232,6 @@ namespace Ogre {
 
             virtual bool hasAnisotropicMipMapFilter() const { return false; }   
 
-            void setVertexDeclaration(VertexDeclaration* decl);
-
-            void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
-
-            void setVertexBufferBinding(VertexBufferBinding* binding) {}
-
             void _render(const RenderOperation& op);
 
             void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);

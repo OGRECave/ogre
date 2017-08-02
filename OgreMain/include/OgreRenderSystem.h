@@ -1010,10 +1010,12 @@ namespace Ogre
 
 
 
-        /** Sets the current vertex declaration, ie the source of vertex data. */
-        virtual void setVertexDeclaration(VertexDeclaration* decl) = 0;
-        /** Sets the current vertex buffer binding state. */
-        virtual void setVertexBufferBinding(VertexBufferBinding* binding) = 0;
+        /** Sets the current vertex declaration, ie the source of vertex data.
+         @deprecated use RenderOperation */
+        OGRE_DEPRECATED virtual void setVertexDeclaration(VertexDeclaration* decl) {}
+        /** Sets the current vertex buffer binding state.
+         @deprecated use RenderOperation */
+        virtual void setVertexBufferBinding(VertexBufferBinding* binding) {}
 
         /** Sets whether or not normals are to be automatically normalised.
         @remarks

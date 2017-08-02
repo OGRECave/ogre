@@ -2716,14 +2716,6 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void GLRenderSystem::setVertexDeclaration(VertexDeclaration* decl)
-    {
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::setVertexBufferBinding(VertexBufferBinding* binding)
-    {
-    }
-    //---------------------------------------------------------------------
     void GLRenderSystem::_render(const RenderOperation& op)
     {
         // Call super class
