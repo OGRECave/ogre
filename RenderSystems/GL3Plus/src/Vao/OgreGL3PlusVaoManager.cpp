@@ -98,11 +98,14 @@ namespace Ogre
         //places of Ogre assume such alignment for SIMD reasons.
         GLint alignment = 1; //initial value according to specs
         OCGE( glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment ) );
-        mConstBufferAlignment = alignment;
-        alignment = 1; //initial value according to specs
-        glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
-        glGetError(); //skip error that might be rised above on legacy GL < 4.3
-        mTexBufferAlignment = std::max<uint32>( alignment, 16u );
+        mConstBufferAlignment = std::max<uint32>( alignment, 16u );
+        mTexBufferAlignment = 16;
+        if( !emulateTexBuffers )
+        {
+            alignment = 1; //initial value according to specs
+            OCGE( glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment ) );
+            mTexBufferAlignment = std::max<uint32>( alignment, 16u );
+        }
         if( _supportsSsbo )
         {
             alignment = 1; //initial value according to specs

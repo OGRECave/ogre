@@ -65,11 +65,6 @@ namespace Ogre {
         typedef map<String, GLenum>::type StringToEnumMap;
         /// 
         StringToEnumMap mTypeEnumMap;
-  
-#ifdef OGRE_LEGACY_GL_COMPATIBLE
-        typedef map<String, uint>::type StringToBindingMap;
-        StringToBindingMap mBindingLocationMap;
-#endif
 
         /**  Convert GL uniform size and type to OGRE constant types
              and associate uniform definitions together. */

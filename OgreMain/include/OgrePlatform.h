@@ -495,10 +495,6 @@ typedef signed char int8;
 // We have this issue in OgreMemorySTLAlloc.h - so we see it over and over
 #   pragma warning (disable : 4345)
 #endif
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE)
-#define OGRE_LEGACY_GL_COMPATIBLE 1
-#endif
     
 }
 

@@ -77,9 +77,7 @@ namespace Ogre {
             occurs.
         */
         void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-#ifdef OGRE_LEGACY_GL_COMPATIBLE
-        void updateUniform(const GpuConstantDefinition* uniformDef, GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType); //special case to update one uniform only
-#endif
+
         /** Updates program object uniform blocks using data from
             GpuProgramParameters.  normally called by
             GLSLShader::bindParameters() just before rendering
