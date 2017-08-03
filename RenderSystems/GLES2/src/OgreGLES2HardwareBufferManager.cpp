@@ -30,9 +30,9 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareVertexBuffer.h"
 #include "OgreGLES2HardwareIndexBuffer.h"
 #include "OgreGLES2HardwareUniformBuffer.h"
-#include "OgreGLES2VertexDeclaration.h"
 #include "OgreGLES2RenderToVertexBuffer.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreGLVertexArrayObject.h"
 #include "OgreGLUtil.h"
 #include "OgreRoot.h"
 
@@ -101,7 +101,7 @@ namespace Ogre {
 
     VertexDeclaration* GLES2HardwareBufferManagerBase::createVertexDeclarationImpl(void)
     {
-        return OGRE_NEW GLES2VertexDeclaration();
+        return OGRE_NEW GLVertexArrayObject();
     }
 
     void GLES2HardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)

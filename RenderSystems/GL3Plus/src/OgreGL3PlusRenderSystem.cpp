@@ -55,7 +55,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreGLSLMonolithicProgramManager.h"
-#include "OgreGL3PlusVertexArrayObject.h"
+#include "OgreGLVertexArrayObject.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
@@ -1530,15 +1530,15 @@ namespace Ogre {
             }
         }
 
-        GL3PlusVertexArrayObject* vao =
-            static_cast<GL3PlusVertexArrayObject*>(op.vertexData->vertexDeclaration);
+        GLVertexArrayObject* vao =
+            static_cast<GLVertexArrayObject*>(op.vertexData->vertexDeclaration);
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
-        vao->bind();
+        vao->bind(this);
         bool updateVAO = vao->needsUpdate(program, op.vertexData->vertexBufferBinding,
                                           op.vertexData->vertexStart);
 
         if (updateVAO) {
-            vao->bindToShader(program, op.vertexData->vertexBufferBinding,
+            vao->bindToShader(this, program, op.vertexData->vertexBufferBinding,
                               op.vertexData->vertexStart);
 
             if(op.useIndexes)

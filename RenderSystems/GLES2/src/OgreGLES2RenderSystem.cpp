@@ -37,7 +37,7 @@ THE SOFTWARE.
 #include "OgreGLUtil.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2HardwareOcclusionQuery.h"
-#include "OgreGLES2VertexDeclaration.h"
+#include "OgreGLVertexArrayObject.h"
 #include "OgreGLSLESProgramFactory.h"
 #include "OgreRoot.h"
 #include "OgreViewport.h"
@@ -1450,18 +1450,18 @@ namespace Ogre {
 
         void* pBufferData = 0;
 
-        GLES2VertexDeclaration* vao = static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
+        GLVertexArrayObject* vao = static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
         bool updateVAO = true;
         if(getCapabilities()->hasCapability(RSC_VAO))
         {
-            vao->bind();
+            vao->bind(this);
             updateVAO = vao->needsUpdate(program, op.vertexData->vertexBufferBinding,
                                          op.vertexData->vertexStart);
         }
 
         if (updateVAO) {
-            vao->bindToShader(program, op.vertexData->vertexBufferBinding,
+            vao->bindToShader(this, program, op.vertexData->vertexBufferBinding,
                               op.vertexData->vertexStart);
 
             if (op.useIndexes)

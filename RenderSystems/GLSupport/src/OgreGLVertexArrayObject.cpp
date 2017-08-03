@@ -32,14 +32,35 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
-    GLVertexArrayObject::GLVertexArrayObject() : mVertexStart(0), mVAO(0) {
-        mRenderSystem = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+    GLVertexArrayObject::GLVertexArrayObject() : mCreatorContext(0), mVAO(0), mNeedsUpdate(true), mVertexStart(0) {
+    }
+
+    void GLVertexArrayObject::bind(GLRenderSystemCommon* rs)
+    {
+        if(mCreatorContext && mCreatorContext != rs->_getCurrentContext()) // VAO is unusable with current context, destroy it
+        {
+            if(mVAO != 0)
+                rs->_destroyVao(mCreatorContext, mVAO);
+            mCreatorContext = 0;
+            mVAO = 0;
+            mNeedsUpdate = true;
+        }
+        if(!mCreatorContext && rs->getCapabilities()->hasCapability(RSC_VAO)) // create VAO lazy or recreate after destruction
+        {
+            mCreatorContext = rs->_getCurrentContext();
+            mVAO = rs->_createVao();
+            mNeedsUpdate = true;
+        }
+        rs->_bindVao(mCreatorContext, mVAO);
     }
 
     bool GLVertexArrayObject::needsUpdate(GLSLProgramCommon* program,
                                           VertexBufferBinding* vertexBufferBinding,
                                           size_t vertexStart)
     {
+        if(mNeedsUpdate)
+            return true;
+
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = mElementList.end();
 
@@ -79,7 +100,8 @@ namespace Ogre {
         return false;
     }
 
-    void GLVertexArrayObject::bindToShader(GLSLProgramCommon* program,
+    void GLVertexArrayObject::bindToShader(GLRenderSystemCommon* rs,
+                                           GLSLProgramCommon* program,
                                            VertexBufferBinding* vertexBufferBinding,
                                            size_t vertexStart)
     {
@@ -111,12 +133,13 @@ namespace Ogre {
             AttribBinding binding = {attrib, sem, vertexBuffer.get()};
             mAttribsBound.push_back(binding);
 
-            mRenderSystem->bindVertexElementToGpu(elem, vertexBuffer, vertexStart, program);
+            rs->bindVertexElementToGpu(elem, vertexBuffer, vertexStart, program);
 
             if (vertexBuffer->getIsInstanceData())
                 mInstanceAttribsBound.push_back(attrib);
         }
 
         mVertexStart = vertexStart;
+        mNeedsUpdate = false;
     }
 }

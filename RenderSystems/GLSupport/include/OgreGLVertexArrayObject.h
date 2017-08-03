@@ -31,6 +31,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
+    class GLContext;
     class GLSLProgramCommon;
     class GLRenderSystemCommon;
 
@@ -38,6 +39,12 @@ namespace Ogre {
     class GLVertexArrayObject : public VertexDeclaration
     {
     protected:
+        /// Context that was used to create VAO. It could already be destroyed, so do not dereference this field blindly
+        GLContext* mCreatorContext;
+        /// VAOs are not shared between contexts, nor even could be destroyed using the wrong context.
+        uint32 mVAO;
+        bool mNeedsUpdate;
+
         struct AttribBinding
         {
             uint32 index;
@@ -51,16 +58,15 @@ namespace Ogre {
 
         vector<AttribBinding>::type mAttribsBound;
         vector<uint32>::type mInstanceAttribsBound;
-
         size_t mVertexStart;
-        uint32 mVAO;
 
-        GLRenderSystemCommon* mRenderSystem;
     public:
         GLVertexArrayObject();
 
+        void notifyChanged() { mNeedsUpdate = true; }
+        void bind(GLRenderSystemCommon* rs);
         bool needsUpdate(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
-        void bindToShader(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
+        void bindToShader(GLRenderSystemCommon* rs, GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
     };
 
 }
