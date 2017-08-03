@@ -54,6 +54,13 @@ namespace Ogre {
         return mRenderSystem->_getStateCacheManager();
     }
 
+    void GLES2HardwareBufferManagerBase::::notifyContextDestroyed(GLContext* context)
+    {
+        OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
+        for(VertexDeclarationList::iterator it = mVertexDeclarations.begin(), it_end = mVertexDeclarations.end(); it != it_end; ++it)
+            static_cast<GLVertexArrayObject*>(*it)->notifyContextDestroyed(context);
+    }
+
     HardwareVertexBufferSharedPtr
         GLES2HardwareBufferManagerBase::createVertexBuffer(size_t vertexSize,
                                                       size_t numVerts,

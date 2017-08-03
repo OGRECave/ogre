@@ -77,10 +77,17 @@ namespace Ogre {
         OGRE_FREE_ALIGN(mScratchBufferPool, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT);
     }
 
-	GL3PlusStateCacheManager * GL3PlusHardwareBufferManagerBase::getStateCacheManager()
-	{
-		return mRenderSystem->_getStateCacheManager();
-	}
+    GL3PlusStateCacheManager * GL3PlusHardwareBufferManagerBase::getStateCacheManager()
+    {
+        return mRenderSystem->_getStateCacheManager();
+    }
+
+    void GL3PlusHardwareBufferManagerBase::notifyContextDestroyed(GLContext* context)
+    {
+        OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
+        for(VertexDeclarationList::iterator it = mVertexDeclarations.begin(), it_end = mVertexDeclarations.end(); it != it_end; ++it)
+            static_cast<GLVertexArrayObject*>(*it)->notifyContextDestroyed(context);
+    }
 
     HardwareVertexBufferSharedPtr
     GL3PlusHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize,

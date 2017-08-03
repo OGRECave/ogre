@@ -64,6 +64,7 @@ namespace Ogre {
         GLVertexArrayObject();
 
         void notifyChanged() { mNeedsUpdate = true; }
+        void notifyContextDestroyed(GLContext* context) { if(mCreatorContext == context) { mCreatorContext = 0; mVAO = 0; } }
         void bind(GLRenderSystemCommon* rs);
         bool needsUpdate(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
         void bindToShader(GLRenderSystemCommon* rs, GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);

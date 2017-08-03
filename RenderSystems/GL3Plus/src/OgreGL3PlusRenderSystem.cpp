@@ -1938,6 +1938,8 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_unregisterContext(GL3PlusContext *context)
     {
+        static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
+
         if (mCurrentContext == context)
         {
             // Change the context to something else so that a valid context

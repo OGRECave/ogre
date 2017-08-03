@@ -82,6 +82,7 @@ namespace Ogre {
         static GLenum getGLType(VertexElementType type);
 
         GL3PlusStateCacheManager * getStateCacheManager();
+        void notifyContextDestroyed(GLContext* context);
 
         /** Allocator method to allow us to use a pool of memory as a scratch
             area for hardware buffers. This is because glMapBuffer is incredibly
@@ -108,8 +109,8 @@ namespace Ogre {
     //     UniformBufferList mShaderStorageBuffers;
 
     public:
-    GL3PlusHardwareBufferManager()
-        : HardwareBufferManager(OGRE_NEW GL3PlusHardwareBufferManagerBase())
+        GL3PlusHardwareBufferManager()
+            : HardwareBufferManager(OGRE_NEW GL3PlusHardwareBufferManagerBase())
         {
 
         }
@@ -118,6 +119,10 @@ namespace Ogre {
             // mShaderStorageBuffers.clear();
             OGRE_DELETE mImpl;
         }
+
+        /// Utility function to notify context depended resources
+        void notifyContextDestroyed(GLContext* context)
+            { static_cast<GL3PlusHardwareBufferManagerBase*>(mImpl)->notifyContextDestroyed(context); }
 
         /// Utility function to get the correct GL usage based on HBU's.
         static GLenum getGLUsage(unsigned int usage)

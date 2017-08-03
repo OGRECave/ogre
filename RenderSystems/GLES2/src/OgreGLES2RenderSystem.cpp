@@ -1764,6 +1764,8 @@ namespace Ogre {
 
     void GLES2RenderSystem::_unregisterContext(GLContext *context)
     {
+        static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
+
         if (mCurrentContext == context)
         {
             // Change the context to something else so that a valid context

@@ -74,6 +74,7 @@ namespace Ogre {
             static GLenum getGLType(VertexElementType type);
 
             GLES2StateCacheManager * getStateCacheManager();
+            void notifyContextDestroyed(GLContext* context);
     };
 
     /// GLES2HardwareBufferManagerBase as a Singleton
@@ -89,6 +90,10 @@ namespace Ogre {
         {
             OGRE_DELETE mImpl;
         }
+
+        /// Utility function to notify context depended resources
+        void notifyContextDestroyed(GLContext* context)
+            { static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->notifyContextDestroyed(context); }
 
         /// Utility function to get the correct GL usage based on HBU's
         static GLenum getGLUsage(unsigned int usage) 
