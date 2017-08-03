@@ -1450,7 +1450,7 @@ namespace Ogre {
 
         void* pBufferData = 0;
 
-        GLVertexArrayObject* vao = static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
+        GLVertexArrayObject* vao = static_cast<GLVertexArrayObject*>(op.vertexData->vertexDeclaration);
 
         bool updateVAO = true;
         if(getCapabilities()->hasCapability(RSC_VAO))
