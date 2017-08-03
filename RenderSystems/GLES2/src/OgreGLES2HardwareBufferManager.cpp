@@ -54,7 +54,7 @@ namespace Ogre {
         return mRenderSystem->_getStateCacheManager();
     }
 
-    void GLES2HardwareBufferManagerBase::::notifyContextDestroyed(GLContext* context)
+    void GLES2HardwareBufferManagerBase::notifyContextDestroyed(GLContext* context)
     {
         OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
         for(VertexDeclarationList::iterator it = mVertexDeclarations.begin(), it_end = mVertexDeclarations.end(); it != it_end; ++it)
