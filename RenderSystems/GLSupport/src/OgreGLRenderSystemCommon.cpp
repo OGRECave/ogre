@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreGLRenderSystemCommon.h"
+#include "OgreGLContext.h"
 #include "OgreFrustum.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
@@ -157,6 +158,19 @@ namespace Ogre {
         matrix[2][1] = c.y;
         matrix[2][2] = c.z + 1.0F;
         matrix[2][3] = c.w;
+    }
+
+    void GLRenderSystemCommon::_completeDeferredVaoDestruction()
+    {
+        if(GLContext* ctx = mCurrentContext)
+        {
+            vector<uint32>::type& vaos = ctx->_getVaoDeferredForDestruction();
+            while(!vaos.empty())
+            {
+                _destroyVao(ctx, vaos.back());
+                vaos.pop_back();
+            }
+        }
     }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN

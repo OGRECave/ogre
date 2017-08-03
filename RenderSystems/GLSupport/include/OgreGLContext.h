@@ -83,9 +83,13 @@ namespace Ogre {
             return static_cast<StateCacheManager*>(mStateCacheManager.get());
         }
 
+        /// VAOs deferred for destruction in proper GL context
+        vector<uint32>::type& _getVaoDeferredForDestruction() { return mVaoDeferredForDestruction; }
+
     protected:
         bool initialized;
         SharedPtr<GLStateCacheManagerCommon> mStateCacheManager;
+        vector<uint32>::type mVaoDeferredForDestruction;
     };
 }
 

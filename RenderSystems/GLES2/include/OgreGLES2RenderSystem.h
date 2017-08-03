@@ -256,6 +256,13 @@ namespace Ogre {
         
             GLES2StateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
         
+            /** Create VAO on current context */
+            uint32 _createVao();
+            /** Bind VAO, context should be equal to current context, as VAOs are not shared  */
+            void _bindVao(GLContext* context, uint32 vao);
+            /** Destroy VAO immediately or defer if it was created on other context */
+            void _destroyVao(GLContext* context, uint32 vao);
+
             /** Unregister a render target->context mapping. If the context of target 
              is the current context, change the context to the main context so it
              can be destroyed safely. 

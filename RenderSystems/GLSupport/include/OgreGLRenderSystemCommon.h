@@ -52,9 +52,10 @@ namespace Ogre {
                                            RenderWindow::FrameBuffer buffer) = 0;
 
         /** Returns the main context */
-        GLContext* _getMainContext() {
-            return mMainContext;
-        }
+        GLContext* _getMainContext() { return mMainContext; }
+
+        /** Returns the current context */
+        GLContext* _getCurrentContext() { return mCurrentContext; }
 
         /** Unregister a render target->context mapping. If the context of target
             is the current context, change the context to the main context so it
@@ -101,6 +102,15 @@ namespace Ogre {
 
         void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
                                           bool forGpuProgram);
+
+        /** Create VAO on current context */
+        virtual uint32 _createVao() { return 0; }
+        /** Bind VAO, context should be equal to current context, as VAOs are not shared  */
+        virtual void _bindVao(GLContext* context, uint32 vao) {}
+        /** Destroy VAO immediately or defer if it was created on other context */
+        virtual void _destroyVao(GLContext* context, uint32 vao) {}
+        /** Complete destruction of VAOs deferred while creator context was not current */
+        void _completeDeferredVaoDestruction();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         static void _destroyInternalResources(RenderWindow* pRenderWnd);

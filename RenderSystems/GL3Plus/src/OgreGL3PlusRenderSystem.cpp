@@ -1905,6 +1905,7 @@ namespace Ogre {
         mCurrentContext->setCurrent();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GL3PlusStateCacheManager>();
+        _completeDeferredVaoDestruction();
 
         // Check if the context has already done one-time initialisation
         if (!mCurrentContext->getInitialized())
@@ -1955,6 +1956,27 @@ namespace Ogre {
                 mStateCacheManager = 0;
             }
         }
+    }
+
+    uint32 GL3PlusRenderSystem::_createVao()
+    {
+        uint32 vao = 0;
+        OGRE_CHECK_GL_ERROR(glGenVertexArrays(1, &vao));
+        return vao;
+    }
+
+    void GL3PlusRenderSystem::_destroyVao(GLContext* context, uint32 vao)
+    {
+        if(context != mCurrentContext)
+            context->_getVaoDeferredForDestruction().push_back(vao);
+        else
+            OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &vao));
+    }
+
+    void GL3PlusRenderSystem::_bindVao(GLContext* context, uint32 vao)
+    {
+        OgreAssert(context == mCurrentContext, "VAO used in wrong OpenGL context");
+        _getStateCacheManager()->bindGLVertexArray(vao);
     }
 
     void GL3PlusRenderSystem::_oneTimeContextInitialization()
