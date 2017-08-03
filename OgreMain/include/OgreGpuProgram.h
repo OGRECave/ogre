@@ -464,6 +464,9 @@ namespace Ogre {
     */
     virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
 
+    /// For GL only. Program must be bound when calling.
+    virtual void setUniformBlockBinding( const char *blockName, uint32 bindingSlot ) {}
+
     /// @copydoc Resource::calculateSize
     virtual size_t calculateSize(void) const;
 

@@ -46,11 +46,6 @@ THE SOFTWARE.
 
 #include "OgreTimer.h"
 #include "OgreStringConverter.h"
-#ifdef OGRE_LEGACY_GL_COMPATIBLE
-#include "OgreRoot.h"
-#include "OgreGL3PlusRenderSystem.h"
-#include "OgreGL3PlusPixelFormat.h"
-#endif
 
 
 namespace Ogre
@@ -585,7 +580,8 @@ namespace Ogre
         {
             // Align to the texture size since we must copy the PBO to a texture.
             ushort maxTexSizeBytes = 2048 * PixelUtil::getNumElemBytes( pixelFormat );
-            // We need another line of maxTexSizeBytes for uploading to create a rectangle when calling glTexSubImage2D().
+            // We need another line of maxTexSizeBytes for uploading
+            //to create a rectangle when calling glTexSubImage2D().
             sizeBytes = sizeBytes = alignToNextMultiple( sizeBytes, maxTexSizeBytes );
         }
         

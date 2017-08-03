@@ -209,6 +209,7 @@ namespace Ogre
         /// Not set for D3D11, and GL. Doesn't mean ResourceTransition aren't
         /// required (i.e. GL needs them for UAVs and Compute Shaders)
         RSC_EXPLICIT_API = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 5),
+        RSC_CONST_BUFFER_SLOTS_IN_SHADER     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 6),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

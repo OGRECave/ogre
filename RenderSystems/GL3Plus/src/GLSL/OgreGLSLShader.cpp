@@ -608,6 +608,31 @@ namespace Ogre {
         }
     }
 
+    void GLSLShader::setUniformBlockBinding( const char *blockName, uint32 bindingSlot )
+    {
+        GLuint programHandle = 0;
+
+        const RenderSystemCapabilities *caps = Root::getSingleton().getRenderSystem()->getCapabilities();
+        if( caps->hasCapability( RSC_SEPARATE_SHADER_OBJECTS ) )
+        {
+            GLSLSeparableProgram *activeLinkProgram =
+                    GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+            programHandle = activeLinkProgram->getGLProgramHandle();
+        }
+        else
+        {
+            GLSLMonolithicProgram *activeLinkProgram =
+                    GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            programHandle = activeLinkProgram->getGLProgramHandle();
+        }
+
+        GLuint blockIdx = glGetUniformBlockIndex( programHandle, blockName );
+        if( blockIdx != GL_INVALID_INDEX )
+        {
+            OCGE( glUniformBlockBinding( programHandle, blockIdx, bindingSlot ) );
+        }
+    }
+
 
     OperationType parseOperationType(const String& val)
     {

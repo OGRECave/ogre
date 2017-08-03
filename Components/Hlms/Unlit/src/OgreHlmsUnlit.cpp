@@ -183,11 +183,6 @@ namespace Ogre
         if( getProperty( UnlitProperty::TextureMatrix ) )
             vsParams->setNamedConstant( "animationMatrixBuf", 1 );
 
-#ifdef OGRE_LEGACY_GL_COMPATIBLE
-        if(mRenderSystem->getNativeShadingLanguageVersion()<420)
-            vsParams->setNamedConstant( "baseInstance", uint32(0) );
-#endif        
-        
         mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
                                             mSetProperties, queuedRenderable );
 
@@ -198,6 +193,14 @@ namespace Ogre
         {
             GpuProgramParametersSharedPtr psParams = retVal->pso.pixelShader->getDefaultParameters();
             mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, GPV_ALL );
+        }
+
+        if( !mRenderSystem->getCapabilities()->hasCapability( RSC_CONST_BUFFER_SLOTS_IN_SHADER ) )
+        {
+            //Setting it to the vertex shader will set it to the PSO actually.
+            retVal->pso.vertexShader->setUniformBlockBinding( "PassBuffer", 0 );
+            retVal->pso.vertexShader->setUniformBlockBinding( "MaterialBuf", 1 );
+            retVal->pso.vertexShader->setUniformBlockBinding( "InstanceBuffer", 2 );
         }
 
         return retVal;

@@ -560,6 +560,12 @@ namespace Ogre {
         // Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
 
+        if( (mDriverVersion.major >= 4 && mDriverVersion.minor >= 2) ||
+            mGLSupport->checkExtension("GL_ARB_shading_language_420pack" ) )
+        {
+            rsc->setCapability(RSC_CONST_BUFFER_SLOTS_IN_SHADER);
+        }
+
         return rsc;
     }
 
@@ -768,8 +774,8 @@ namespace Ogre {
             assert( !mVaoManager );
             mVaoManager = OGRE_NEW GL3PlusVaoManager(
                               mGLSupport->checkExtension("GL_ARB_buffer_storage"),
-                              (mGLSupport->checkExtension("GL_ARB_texture_buffer_range") ||
-                               (mDriverVersion.major >= 4 && mDriverVersion.minor >= 3)),
+                              !(((mDriverVersion.major >= 4 && mDriverVersion.minor >= 3) ||
+                               mGLSupport->checkExtension("GL_ARB_texture_buffer_range"))),
                               mGLSupport->checkExtension("GL_ARB_multi_draw_indirect"),
                               (mDriverVersion.major >= 4 && mDriverVersion.major >= 2) ||
                               mGLSupport->checkExtension("GL_ARB_base_instance"),

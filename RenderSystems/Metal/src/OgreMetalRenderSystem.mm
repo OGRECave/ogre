@@ -205,6 +205,7 @@ namespace Ogre
         rsc->setCapability(RSC_HW_GAMMA);
         rsc->setCapability(RSC_TEXTURE_GATHER);
         rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
+        rsc->setCapability(RSC_CONST_BUFFER_SLOTS_IN_SHADER);
 
         //These don't make sense on Metal, so just use flexible defaults.
         rsc->setVertexProgramConstantFloatCount( 16384 );
