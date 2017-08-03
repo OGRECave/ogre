@@ -1460,15 +1460,16 @@ namespace Ogre {
                                          op.vertexData->vertexStart);
         }
 
-        if (updateVAO) {
+        if (updateVAO)
             vao->bindToShader(this, program, op.vertexData->vertexBufferBinding,
                               op.vertexData->vertexStart);
 
-            if (op.useIndexes)
-                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                         static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
+        // We treat index buffer binding inside VAO as volatile, always updating and never relying onto it,
+        // as one shared vertex buffer could be rendered with several index buffers, from submeshes and/or LODs
+        if (op.useIndexes)
+            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
-        }
 
         if (getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA)
             && globalInstanceVertexBuffer && globalVertexDeclaration)
