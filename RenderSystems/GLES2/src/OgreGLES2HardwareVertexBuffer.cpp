@@ -140,7 +140,7 @@ namespace Ogre {
             if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
             {
                 // Discard the buffer
-                OGRE_CHECK_GL_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, NULL,
+                OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, NULL,
                                                  GLES2HardwareBufferManager::getGLUsage(mUsage)));
             }
             if (mUsage & HBU_WRITE_ONLY)
