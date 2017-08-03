@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLES2HardwareVertexBuffer.h"
-#include "OgreGLES2VertexDeclaration.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"

@@ -34,7 +34,6 @@
 #include "OgreGL3PlusHardwareUniformBuffer.h"
 #include "OgreGL3PlusHardwareShaderStorageBuffer.h"
 #include "OgreGL3PlusHardwareCounterBuffer.h"
-#include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreGLSLProgramCommon.h"
 #include "OgreGLSLShader.h"
 

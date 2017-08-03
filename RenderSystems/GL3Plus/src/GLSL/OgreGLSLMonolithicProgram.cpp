@@ -31,7 +31,6 @@
 #include "OgreGLSLShader.h"
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusRenderSystem.h"
-#include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreStringVector.h"
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"

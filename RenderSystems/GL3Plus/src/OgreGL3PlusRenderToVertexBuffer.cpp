@@ -29,7 +29,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusRenderToVertexBuffer.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreGL3PlusHardwareVertexBuffer.h"
-#include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
