@@ -99,11 +99,34 @@ namespace Ogre {
         }
 
         ImageData* pImgData = static_cast<ImageData*>(pData.get());
-        int channels = (int)PixelUtil::getComponentCount(pImgData->format);
+        PixelFormat format = pImgData->format;
+        uchar* inputData = input->getPtr();
 
+        // Convert image data to ABGR format for STBI (unless it's already compatible)
+        uchar* tempData = 0;
+        if(format != Ogre::PF_A8B8G8R8 && format != PF_B8G8R8 && format != PF_BYTE_LA && 
+            format != PF_L8 && format != PF_R8)
+        {   
+            format = Ogre::PF_A8B8G8R8;
+            size_t tempDataSize = pImgData->width * pImgData->height * pImgData->depth * Ogre::PixelUtil::getNumElemBytes(format);
+            tempData = OGRE_ALLOC_T(unsigned char, tempDataSize, Ogre::MEMCATEGORY_GENERAL);
+            Ogre::PixelBox pbIn(pImgData->width, pImgData->height, pImgData->depth, pImgData->format, inputData);
+            Ogre::PixelBox pbOut(pImgData->width, pImgData->height, pImgData->depth, format, tempData);
+            PixelUtil::bulkPixelConversion(pbIn, pbOut);
+
+            inputData = tempData;
+        }
+
+        // Save to PNG
+        int channels = (int)PixelUtil::getComponentCount(format);
+        int stride = pImgData->width * (int)PixelUtil::getNumElemBytes(format);
         int len;
-        uchar *data = stbi_write_png_to_mem(input->getPtr(), pImgData->width*channels,
-                pImgData->width, pImgData->height, channels, &len);
+        uchar* data = stbi_write_png_to_mem(inputData, stride, pImgData->width, pImgData->height, channels, &len);
+
+        if(tempData)
+        {
+            OGRE_FREE(tempData, MEMCATEGORY_GENERAL);
+        }
 
         if (!data) {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
