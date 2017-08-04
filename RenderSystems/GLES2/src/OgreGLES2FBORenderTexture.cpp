@@ -160,11 +160,9 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
 
         // Check multisampling if supported
-        if(!OGRE_NO_GLES3_SUPPORT)
-        {
-            // Check samples supported
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &mMaxFSAASamples));
-        }
+#if OGRE_NO_GLES3_SUPPORT == 0 || GL_APPLE_framebuffer_multisample
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &mMaxFSAASamples));
+#endif
     }
 
     GLES2FBOManager::~GLES2FBOManager()

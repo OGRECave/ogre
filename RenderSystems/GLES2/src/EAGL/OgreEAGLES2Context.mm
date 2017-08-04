@@ -130,12 +130,12 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &mBackingHeight));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mViewRenderbuffer));
 
-#if GL_APPLE_framebuffer_multisample || OGRE_NO_GLES3_SUPPORT == 0
+#if OGRE_NO_GLES3_SUPPORT == 0 || GL_APPLE_framebuffer_multisample
         if(mIsMultiSampleSupported && mNumSamples > 0)
         {
             // Determine how many MSAA samples to use
             GLint maxSamplesAllowed;
-            glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamplesAllowed);
+            glGetIntegerv(GL_MAX_SAMPLES, &maxSamplesAllowed);
             int samplesToUse = (mNumSamples > maxSamplesAllowed) ? maxSamplesAllowed : mNumSamples;
             
             // Create the FSAA framebuffer (offscreen)
