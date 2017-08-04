@@ -82,7 +82,7 @@ namespace Ogre {
         }
     }
     
-    void GL3PlusFrameBufferObject::bindSurface(size_t attachment, const GL3PlusSurfaceDesc &target)
+    void GL3PlusFrameBufferObject::bindSurface(size_t attachment, const GLSurfaceDesc &target)
     {
         assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
         mColour[attachment] = target;

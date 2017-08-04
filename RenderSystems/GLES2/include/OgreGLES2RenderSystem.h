@@ -45,7 +45,6 @@ namespace Ogre {
     *  @{
     */
     class GLRTTManager;
-    typedef GLRTTManager GLES2RTTManager;
     class GLES2GpuProgramManager;
     class GLSLESProgramCommon;
     class GLSLESProgramFactory;
@@ -93,7 +92,7 @@ namespace Ogre {
                 to pbuffers, which depend on the GL support used and are generally 
                 unwieldy and slow. However, FBO support for stencil buffers is poor.
               */
-            GLES2RTTManager *mRTTManager;
+            GLRTTManager *mRTTManager;
 
             /// Check if the GL system has already been initialised
             bool mGLInitialised;

@@ -40,8 +40,8 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------    
     GLES2FBORenderTexture::GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name,
-        const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa):
-        GLES2RenderTexture(name, target, writeGamma, std::min(manager->getMaxFSAASamples(), (int)fsaa)),
+        const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
+        GLRenderTexture(name, target, writeGamma, std::min(manager->getMaxFSAASamples(), (int)fsaa)),
         mFB(manager, mFSAA)
     {
         // Bind target to surface 0 and initialise
@@ -73,7 +73,7 @@ namespace Ogre {
     
     void GLES2FBORenderTexture::notifyOnContextReset()
     {
-        GLES2SurfaceDesc target;
+        GLSurfaceDesc target;
         target.buffer = static_cast<GLES2HardwarePixelBuffer*>(mBuffer);
         target.zoffset = mZOffset;
         
@@ -87,7 +87,7 @@ namespace Ogre {
     bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
         bool result;
-        if( (result = GLES2RenderTexture::attachDepthBuffer( depthBuffer )) )
+        if( (result = GLRenderTexture::attachDepthBuffer( depthBuffer )) )
             mFB.attachDepthBuffer( depthBuffer );
 
         return result;
@@ -96,13 +96,13 @@ namespace Ogre {
     void GLES2FBORenderTexture::detachDepthBuffer()
     {
         mFB.detachDepthBuffer();
-        GLES2RenderTexture::detachDepthBuffer();
+        GLRenderTexture::detachDepthBuffer();
     }
     //-----------------------------------------------------------------------------
     void GLES2FBORenderTexture::_detachDepthBuffer()
     {
         mFB.detachDepthBuffer();
-        GLES2RenderTexture::_detachDepthBuffer();
+        GLRenderTexture::_detachDepthBuffer();
     }
    
     // Size of probe texture
@@ -495,7 +495,7 @@ namespace Ogre {
     }
 
     GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 
-        const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa)
+        const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
         GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
@@ -526,9 +526,9 @@ namespace Ogre {
 #endif
     }
     
-    GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
+    GLSurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
-        GLES2SurfaceDesc retval;
+        GLSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
         if(format != GL_NONE)
         {

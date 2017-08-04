@@ -28,7 +28,8 @@ THE SOFTWARE.
 #ifndef __OgreGL3PlusFBO_H__
 #define __OgreGL3PlusFBO_H__
 
-#include "OgreGL3PlusRenderTexture.h"
+#include "OgreGL3PlusPrerequisites.h"
+#include "OgreGLRenderTexture.h"
 #include "OgreGLContext.h"
 
 namespace Ogre {
@@ -46,7 +47,7 @@ namespace Ogre {
         /** Bind a surface to a certain attachment point.
             attachment: 0..OGRE_MAX_MULTIPLE_RENDER_TARGETS-1
         */
-        void bindSurface(size_t attachment, const GL3PlusSurfaceDesc &target);
+        void bindSurface(size_t attachment, const GLSurfaceDesc &target);
         /** Unbind attachment
         */
         void unbindSurface(size_t attachment);
@@ -79,17 +80,17 @@ namespace Ogre {
         GLsizei getFSAA();
         
         GL3PlusFBOManager *getManager() { return mManager; }
-        const GL3PlusSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
+        const GLSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
     private:
         GL3PlusFBOManager *mManager;
         GLsizei mNumSamples;
         GLuint mFB;
         GLuint mMultisampleFB;
-        GL3PlusSurfaceDesc mMultisampleColourBuffer;
-        GL3PlusSurfaceDesc mDepth;
-        GL3PlusSurfaceDesc mStencil;
+        GLSurfaceDesc mMultisampleColourBuffer;
+        GLSurfaceDesc mDepth;
+        GLSurfaceDesc mStencil;
         // Arbitrary number of texture surfaces
-        GL3PlusSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        GLSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 
 
         /** Initialise object (find suitable depth and stencil format).

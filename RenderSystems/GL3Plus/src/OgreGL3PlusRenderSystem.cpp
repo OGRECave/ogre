@@ -713,7 +713,7 @@ namespace Ogre {
             // Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
             // Only Copy does, but Copy means only one depth buffer...
             GL3PlusContext *windowContext = 0;
-            win->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
+            win->getCustomAttribute( GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
             GL3PlusDepthBuffer *depthBuffer = new GL3PlusDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                                       windowContext, 0, 0,
                                                                       win->getWidth(), win->getHeight(),
@@ -736,7 +736,7 @@ namespace Ogre {
         // else creates dummy (empty) containers
         // retVal = mRTTManager->_createDepthBufferFor( renderTarget );
         GL3PlusFrameBufferObject *fbo = 0;
-        renderTarget->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo);
+        renderTarget->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
 
         if ( fbo )
         {
@@ -784,7 +784,7 @@ namespace Ogre {
         OgreAssert(pWin, "unknown RenderWindow name");
 
         GL3PlusContext *windowContext = 0;
-        pWin->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
+        pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
 
         // 1 Window <-> 1 Context, should be always true.
         assert( windowContext );
@@ -2028,7 +2028,7 @@ namespace Ogre {
     {
         // Set main and current context
         mMainContext = 0;
-        primary->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
+        primary->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
         mCurrentContext = mMainContext;
 
         // Set primary context as active
@@ -2063,7 +2063,7 @@ namespace Ogre {
         {
             // Switch context if different from current one
             GL3PlusContext *newContext = 0;
-            target->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &newContext);
+            target->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &newContext);
             if (newContext && mCurrentContext != newContext)
             {
                 _switchContext(newContext);

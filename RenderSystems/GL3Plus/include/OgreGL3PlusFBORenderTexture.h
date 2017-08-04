@@ -28,7 +28,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #ifndef __OgreGL3PlusFBORTT_H__
 #define __OgreGL3PlusFBORTT_H__
 
-#include "OgreGL3PlusRenderTexture.h"
+#include "OgreGLRenderTexture.h"
 #include "OgreGLContext.h"
 #include "OgreGL3PlusFrameBufferObject.h"
 
@@ -42,7 +42,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusFBORenderTexture: public GLRenderTexture
     {
     public:
-        GL3PlusFBORenderTexture(GL3PlusFBOManager *manager, const String &name, const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa);
+        GL3PlusFBORenderTexture(GL3PlusFBOManager *manager, const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
 
         virtual void getCustomAttribute(const String& name, void* pData);
 
@@ -81,7 +81,7 @@ namespace Ogre {
         /** Create a texture rendertarget object
          */
         virtual GL3PlusFBORenderTexture *createRenderTexture(const String &name,
-                                                             const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa);
+                                                             const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
 
         /** Create a multi render target
          */
@@ -89,7 +89,7 @@ namespace Ogre {
 
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
          */
-        GL3PlusSurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
+        GLSurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
          */
         GLuint getTemporaryFBO(size_t i);

@@ -40,8 +40,8 @@ namespace Ogre {
 
     GL3PlusFBORenderTexture::GL3PlusFBORenderTexture(
         GL3PlusFBOManager *manager, const String &name,
-        const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa):
-        GL3PlusRenderTexture(name, target, writeGamma, fsaa),
+        const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
+        GLRenderTexture(name, target, writeGamma, fsaa),
         mFB(manager, fsaa)
     {
         // Bind target to surface 0 and initialise
@@ -54,7 +54,7 @@ namespace Ogre {
 
     void GL3PlusFBORenderTexture::getCustomAttribute(const String& name, void* pData)
     {
-        if(name == GL3PlusRenderTexture::CustomAttributeString_FBO)
+        if(name == GLRenderTexture::CustomAttributeString_FBO)
         {
             *static_cast<GL3PlusFrameBufferObject **>(pData) = &mFB;
         }
@@ -76,7 +76,7 @@ namespace Ogre {
     bool GL3PlusFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
         bool result;
-        if( (result = GL3PlusRenderTexture::attachDepthBuffer( depthBuffer )) )
+        if( (result = GLRenderTexture::attachDepthBuffer( depthBuffer )) )
             mFB.attachDepthBuffer( depthBuffer );
 
         return result;
@@ -85,13 +85,13 @@ namespace Ogre {
     void GL3PlusFBORenderTexture::detachDepthBuffer()
     {
         mFB.detachDepthBuffer();
-        GL3PlusRenderTexture::detachDepthBuffer();
+        GLRenderTexture::detachDepthBuffer();
     }
 
     void GL3PlusFBORenderTexture::_detachDepthBuffer()
     {
         mFB.detachDepthBuffer();
-        GL3PlusRenderTexture::_detachDepthBuffer();
+        GLRenderTexture::_detachDepthBuffer();
     }
 
     // Size of probe texture
@@ -481,7 +481,7 @@ namespace Ogre {
     }
 
     GL3PlusFBORenderTexture *GL3PlusFBOManager::createRenderTexture(const String &name,
-                                                                    const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa)
+                                                                    const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
         GL3PlusFBORenderTexture *retval = new GL3PlusFBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
@@ -495,7 +495,7 @@ namespace Ogre {
     {
         // Check if the render target is in the rendertarget->FBO map
         GL3PlusFrameBufferObject *fbo = 0;
-        target->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo);
+        target->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
         if(fbo)
             fbo->bind();
         else
@@ -503,9 +503,9 @@ namespace Ogre {
             mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
     }
 
-    GL3PlusSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
+    GLSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
-        GL3PlusSurfaceDesc retval;
+        GLSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
         if(format != GL_NONE)
         {

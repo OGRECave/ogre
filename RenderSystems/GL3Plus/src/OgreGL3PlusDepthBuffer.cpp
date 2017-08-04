@@ -98,12 +98,12 @@ namespace Ogre
 
         //Now check this is the appropriate format
         GL3PlusFrameBufferObject *fbo = 0;
-        renderTarget->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo);
+        renderTarget->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
 
         if( !fbo )
         {
             GL3PlusContext *windowContext = 0;
-            renderTarget->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
+            renderTarget->getCustomAttribute( GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
 
             //Non-FBO targets and FBO depth surfaces don't play along, only dummies which match the same
             //context

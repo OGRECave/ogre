@@ -28,10 +28,10 @@ THE SOFTWARE.
 #ifndef __OgreGLES2FBORTT_H__
 #define __OgreGLES2FBORTT_H__
 
-#include "OgreGLES2RenderTexture.h"
-#include "OgreGLContext.h"
 #include "OgreGLES2FrameBufferObject.h"
 #include "OgreGLES2ManagedResource.h"
+#include "OgreGLRenderTexture.h"
+#include "OgreGLContext.h"
 
 namespace Ogre {
     class GLES2FBOManager;
@@ -39,10 +39,10 @@ namespace Ogre {
 
     /** RenderTexture for GL ES 2 FBO
     */
-    class _OgreGLES2Export GLES2FBORenderTexture: public GLES2RenderTexture MANAGED_RESOURCE
+    class _OgreGLES2Export GLES2FBORenderTexture: public GLRenderTexture MANAGED_RESOURCE
     {
     public:
-        GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name, const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa);
+        GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
         
         virtual void getCustomAttribute(const String& name, void* pData);
 
@@ -67,7 +67,7 @@ namespace Ogre {
     
     /** Factory for GL ES 2 Frame Buffer Objects, and related things.
     */
-    class _OgreGLES2Export GLES2FBOManager: public GLES2RTTManager 
+    class _OgreGLES2Export GLES2FBOManager: public GLRTTManager 
     {
     public:
         GLES2FBOManager();
@@ -89,7 +89,7 @@ namespace Ogre {
         /** Create a texture rendertarget object
         */
         virtual GLES2FBORenderTexture *createRenderTexture(const String &name, 
-            const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa);
+            const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
 
         /** Create a multi render target 
         */
@@ -97,7 +97,7 @@ namespace Ogre {
         
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
         */
-        GLES2SurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
+        GLSurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
 
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
         */

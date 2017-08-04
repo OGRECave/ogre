@@ -113,7 +113,7 @@ namespace Ogre {
             {
                 String name;
                 name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
-                GL3PlusSurfaceDesc surface;
+                GLSurfaceDesc surface;
                 surface.buffer = this;
                 surface.zoffset = zoffset;
                 RenderTexture *trt = GL3PlusRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);

@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __OgreGLES2FBO_H__
 #define __OgreGLES2FBO_H__
 
-#include "OgreGLES2RenderTexture.h"
+#include "OgreGLRenderTexture.h"
 #include "OgreGLContext.h"
 #include "OgreGLES2ManagedResource.h"
 
@@ -47,7 +47,7 @@ namespace Ogre {
         /** Bind a surface to a certain attachment point.
             attachment: 0..OGRE_MAX_MULTIPLE_RENDER_TARGETS-1
         */
-        void bindSurface(size_t attachment, const GLES2SurfaceDesc &target);
+        void bindSurface(size_t attachment, const GLSurfaceDesc &target);
         /** Unbind attachment
         */
         void unbindSurface(size_t attachment);
@@ -75,14 +75,14 @@ namespace Ogre {
         GLsizei getFSAA();
         
         GLES2FBOManager *getManager() { return mManager; }
-        const GLES2SurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
+        const GLSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
         
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /** See AndroidResource. */
         void notifyOnContextLost();
         
         /** See AndroidResource. */
-        void notifyOnContextReset(const GLES2SurfaceDesc &target);
+        void notifyOnContextReset(const GLSurfaceDesc &target);
 #endif
         
     private:
@@ -90,11 +90,11 @@ namespace Ogre {
         GLsizei mNumSamples;
         GLuint mFB;
         GLuint mMultisampleFB;
-        GLES2SurfaceDesc mMultisampleColourBuffer;
-        GLES2SurfaceDesc mDepth;
-        GLES2SurfaceDesc mStencil;
+        GLSurfaceDesc mMultisampleColourBuffer;
+        GLSurfaceDesc mDepth;
+        GLSurfaceDesc mStencil;
         // Arbitrary number of texture surfaces
-        GLES2SurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        GLSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 
 
         /** Initialise object (find suitable depth and stencil format).

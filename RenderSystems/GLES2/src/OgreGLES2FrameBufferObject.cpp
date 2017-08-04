@@ -114,7 +114,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mMultisampleFB));
     }
     
-    void GLES2FrameBufferObject::notifyOnContextReset(const GLES2SurfaceDesc &target)
+    void GLES2FrameBufferObject::notifyOnContextReset(const GLSurfaceDesc &target)
     {
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
@@ -126,7 +126,7 @@ namespace Ogre {
 #endif
     
     
-    void GLES2FrameBufferObject::bindSurface(size_t attachment, const GLES2SurfaceDesc &target)
+    void GLES2FrameBufferObject::bindSurface(size_t attachment, const GLSurfaceDesc &target)
     {
         assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
         mColour[attachment] = target;

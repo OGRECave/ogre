@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLES2TextureManager.h"
-#include "OgreGLES2RenderTexture.h"
+#include "OgreGLRenderTexture.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreGLES2StateCacheManager.h"
@@ -109,7 +109,7 @@ namespace Ogre {
         {
             /// Get closest supported alternative
             /// If mFormat is supported it's returned
-            return GLES2RTTManager::getSingleton().getSupportedAlternative(format);
+            return GLRTTManager::getSingleton().getSupportedAlternative(format);
         }
 
         // Supported
