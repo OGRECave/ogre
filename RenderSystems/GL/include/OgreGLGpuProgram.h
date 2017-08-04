@@ -66,9 +66,6 @@ namespace Ogre {
         */
         virtual bool isAttributeValid(VertexElementSemantic semantic, uint index);
 
-        /** Get the fixed attribute bindings normally used by GL for a semantic. */
-        static GLuint getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
-
     protected:
         /** Overridden from GpuProgram, do nothing */
         void loadFromSource(void) {}

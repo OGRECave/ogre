@@ -41,14 +41,9 @@ namespace Ogre {
 
     */
 
-    class _OgreGLExport GLSLLinkProgram
+    class _OgreGLExport GLSLLinkProgram : public GLSLProgramCommon
     {
     private:
-        /// Container of uniform references that are active in the program object
-        GLUniformReferenceList mGLUniformReferences;
-
-        /// Linked vertex program
-        GLSLProgram* mVertexProgram;
         /// Linked geometry program
         GLSLProgram* mGeometryProgram;
         /// Linked fragment program
@@ -57,14 +52,6 @@ namespace Ogre {
 
         /// Flag to indicate that uniform references have already been built
         bool        mUniformRefsBuilt;
-        /// GL handle for the program object
-        GLhandleARB mGLHandle;
-        /// Flag indicating that the program object has been successfully linked
-        GLint       mLinked;
-        /// Flag indicating that the program object has tried to link and failed
-        bool        mTriedToLinkAndFailed;
-        /// Flag indicating skeletal animation is being performed
-        bool mSkeletalAnimation;
 
         /// Build uniform references from active named uniforms
         void buildGLUniformReferences(void);
@@ -74,17 +61,6 @@ namespace Ogre {
         typedef set<GLuint>::type AttributeSet;
         /// Custom attribute bindings
         AttributeSet mValidAttributes;
-
-        /// Name / attribute list
-        struct CustomAttribute
-        {
-            String name;
-            GLuint attrib;
-            CustomAttribute(const String& _name, GLuint _attrib)
-                :name(_name), attrib(_attrib) {}
-        };
-
-        static CustomAttribute msCustomAttributes[];
 
         String getCombinedName();       
         /// Compiles and links the the vertex and fragment programs
@@ -105,34 +81,18 @@ namespace Ogre {
         normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
         */
         void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+
+        void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) {}
+
         /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
         normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
         */
         void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
         /// Get the GL Handle for the program object
-        GLhandleARB getGLHandle(void) const { return mGLHandle; }
-        /** Sets whether the linked program includes the required instructions
-        to perform skeletal animation. 
-        @remarks
-        If this is set to true, OGRE will not blend the geometry according to 
-        skeletal animation, it will expect the vertex program to do it.
-        */
-        void setSkeletalAnimationIncluded(bool included) 
-        { mSkeletalAnimation = included; }
-
-        /** Returns whether the linked program includes the required instructions
-            to perform skeletal animation. 
-        @remarks
-            If this returns true, OGRE will not blend the geometry according to 
-            skeletal animation, it will expect the vertex program to do it.
-        */
-        bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
+        GLhandleARB getGLHandle(void) const { return mGLProgramHandle; }
 
         /// Get the index of a non-standard attribute bound in the linked code
-        GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
-        /// Is a non-standard attribute bound in the linked code?
-        bool isAttributeValid(VertexElementSemantic semantic, uint index);
-
+        int getAttributeIndex(VertexElementSemantic semantic, uint index);
     };
 
     }

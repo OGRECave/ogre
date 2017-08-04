@@ -34,45 +34,10 @@ THE SOFTWARE.
 #include "OgreGLSLLinkProgramManager.h"
 #include "OgreException.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreGLSLProgramCommon.h"
 
 namespace Ogre {
     namespace GLSL {
-
-    //  a  builtin              custom attrib name
-    // ----------------------------------------------
-    //  0  gl_Vertex            vertex
-    //  1  n/a                  blendWeights        
-    //  2  gl_Normal            normal
-    //  3  gl_Color             colour
-    //  4  gl_SecondaryColor    secondary_colour
-    //  5  gl_FogCoord          fog_coord
-    //  7  n/a                  blendIndices
-    //  8  gl_MultiTexCoord0    uv0
-    //  9  gl_MultiTexCoord1    uv1
-    //  10 gl_MultiTexCoord2    uv2
-    //  11 gl_MultiTexCoord3    uv3
-    //  12 gl_MultiTexCoord4    uv4
-    //  13 gl_MultiTexCoord5    uv5
-    //  14 gl_MultiTexCoord6    uv6, tangent
-    //  15 gl_MultiTexCoord7    uv7, binormal
-    GLSLLinkProgram::CustomAttribute GLSLLinkProgram::msCustomAttributes[] = {
-        CustomAttribute("vertex", GLGpuProgram::getFixedAttributeIndex(VES_POSITION, 0)),
-        CustomAttribute("blendWeights", GLGpuProgram::getFixedAttributeIndex(VES_BLEND_WEIGHTS, 0)),
-        CustomAttribute("normal", GLGpuProgram::getFixedAttributeIndex(VES_NORMAL, 0)),
-        CustomAttribute("colour", GLGpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0)),
-        CustomAttribute("secondary_colour", GLGpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0)),
-        CustomAttribute("blendIndices", GLGpuProgram::getFixedAttributeIndex(VES_BLEND_INDICES, 0)),
-        CustomAttribute("uv0", GLGpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 0)),
-        CustomAttribute("uv1", GLGpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 1)),
-        CustomAttribute("uv2", GLGpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 2)),
-        CustomAttribute("uv3", GLGpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 3)),
-        CustomAttribute("uv4", GLGpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 4)),
-        CustomAttribute("uv5", GLGpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 5)),
-        CustomAttribute("uv6", GLGpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 6)),
-        CustomAttribute("uv7", GLGpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 7)),
-        CustomAttribute("tangent", GLGpuProgram::getFixedAttributeIndex(VES_TANGENT, 0)),
-        CustomAttribute("binormal", GLGpuProgram::getFixedAttributeIndex(VES_BINORMAL, 0)),
-    };
 
     GLint getGLGeometryInputPrimitiveType(RenderOperation::OperationType operationType, bool requiresAdjacency)
     {
@@ -111,13 +76,10 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     GLSLLinkProgram::GLSLLinkProgram(GLSLProgram* vertexProgram, GLSLProgram* geometryProgram, GLSLProgram* fragmentProgram)
-        : mVertexProgram(vertexProgram)
+        : GLSLProgramCommon(vertexProgram)
         , mGeometryProgram(geometryProgram)
         , mFragmentProgram(fragmentProgram)
         , mUniformRefsBuilt(false)
-        , mLinked(false)
-        , mTriedToLinkAndFailed(false)
-        , mSkeletalAnimation(false)
     {
         // Initialise uniform cache
         mUniformCache = new GLUniformCache();
@@ -126,7 +88,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLLinkProgram::~GLSLLinkProgram(void)
     {
-        glDeleteObjectARB(mGLHandle);
+        glDeleteObjectARB(mGLProgramHandle);
 
         delete mUniformCache;
         mUniformCache = 0;
@@ -139,7 +101,7 @@ namespace Ogre {
         {           
             glGetError(); //Clean up the error. Otherwise will flood log.
 
-            mGLHandle = glCreateProgramObjectARB();
+            mGLProgramHandle = glCreateProgramObjectARB();
 
             GLenum glErr = glGetError();
             if(glErr != GL_NO_ERROR)
@@ -166,16 +128,16 @@ namespace Ogre {
             if(glErr != GL_NO_ERROR)
             {
                 reportGLSLError( glErr, "GLSLLinkProgram::Activate",
-                    "Error prior to using GLSL Program Object : ", mGLHandle, false, false);
+                    "Error prior to using GLSL Program Object : ", mGLProgramHandle, false, false);
             }
 
-            glUseProgramObjectARB( mGLHandle );
+            glUseProgramObjectARB( mGLProgramHandle );
 
             glErr = glGetError();
             if(glErr != GL_NO_ERROR)
             {
                 reportGLSLError( glErr, "GLSLLinkProgram::Activate",
-                    "Error using GLSL Program Object : ", mGLHandle, false, false);
+                    "Error using GLSL Program Object : ", mGLProgramHandle, false, false);
             }
         }
     }
@@ -188,13 +150,13 @@ namespace Ogre {
         GLenum binaryFormat = *((GLenum *)(cacheMicrocode->getPtr()));
         uint8 * programBuffer = cacheMicrocode->getPtr() + sizeof(GLenum);
         size_t sizeOfBuffer = cacheMicrocode->size() - sizeof(GLenum);
-        glProgramBinary(mGLHandle, 
+        glProgramBinary(mGLProgramHandle,
                         binaryFormat, 
                         programBuffer,
                         static_cast<GLsizei>(sizeOfBuffer)
                         );
 
-        glGetProgramiv(mGLHandle, GL_LINK_STATUS, &mLinked);
+        glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &mLinked);
         if (!mLinked)
         {
             //
@@ -213,7 +175,7 @@ namespace Ogre {
         for (size_t i = 0; i < numAttribs; ++i)
         {
             const CustomAttribute& a = msCustomAttributes[i];
-            GLint attrib = glGetAttribLocationARB(mGLHandle, a.name.c_str());
+            GLint attrib = glGetAttribLocationARB(mGLProgramHandle, a.name);
 
             if (attrib != -1)
             {
@@ -222,14 +184,9 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    GLuint GLSLLinkProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
+    int GLSLLinkProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
     {
-        return GLGpuProgram::getFixedAttributeIndex(semantic, index);
-    }
-    //-----------------------------------------------------------------------
-    bool GLSLLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
-    {
-        return mValidAttributes.find(getAttributeIndex(semantic, index)) != mValidAttributes.end();
+        return GLSLProgramCommon::getFixedAttributeIndex(semantic, index);
     }
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::buildGLUniformReferences(void)
@@ -239,9 +196,9 @@ namespace Ogre {
             const GpuConstantDefinitionMap* vertParams = 0;
             const GpuConstantDefinitionMap* fragParams = 0;
             const GpuConstantDefinitionMap* geomParams = 0;
-            if (mVertexProgram)
+            if (mVertexShader)
             {
-                vertParams = &(mVertexProgram->getConstantDefinitions().map);
+                vertParams = &(mVertexShader->getConstantDefinitions().map);
             }
             if (mGeometryProgram)
             {
@@ -253,7 +210,7 @@ namespace Ogre {
             }
 
             GLSLLinkProgramManager::extractUniforms(
-                mGLHandle, vertParams, geomParams, fragParams, mGLUniformReferences);
+                    mGLProgramHandle, vertParams, geomParams, fragParams, mGLUniformReferences);
 
             mUniformRefsBuilt = true;
         }
@@ -269,7 +226,7 @@ namespace Ogre {
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getColumnMajorMatrices())) ||
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getColumnMajorMatrices())) ||
             (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getColumnMajorMatrices())) ||
             (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getColumnMajorMatrices())))
         {
@@ -463,10 +420,10 @@ namespace Ogre {
     Ogre::String GLSLLinkProgram::getCombinedName()
     {
         String name;
-        if (mVertexProgram)
+        if (mVertexShader)
         {
             name += "Vertex Program:" ;
-            name += mVertexProgram->getName();
+            name += mVertexShader->getName();
         }
         if (mFragmentProgram)
         {
@@ -483,16 +440,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::compileAndLink()
     {
-        if (mVertexProgram)
+        if (mVertexShader)
         {
             // compile and attach Vertex Program
-            if (!mVertexProgram->compile(true))
+            if (!mVertexShader->compile(true))
             {
                 // todo error
                 return;
             }
-            mVertexProgram->attachToProgramObject(mGLHandle);
-            setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
+            mVertexShader->attachToProgramObject(mGLProgramHandle);
+            setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
 
             // Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
 
@@ -504,7 +461,7 @@ namespace Ogre {
             // until it is linked (chicken and egg!) we have to parse the source
 
             size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
-            const String& vpSource = mVertexProgram->getSource();
+            const String& vpSource = mVertexShader->getSource();
             for (size_t i = 0; i < numAttribs; ++i)
             {
                 const CustomAttribute& a = msCustomAttributes[i];
@@ -524,16 +481,16 @@ namespace Ogre {
                     if (startpos != String::npos && startpos < pos)
                     {
                         // final check 
-                        String expr = vpSource.substr(startpos, pos + a.name.length() - startpos);
+                        String expr = vpSource.substr(startpos, pos + strlen(a.name) - startpos);
                         StringVector vec = StringUtil::split(expr);
                         if ((vec[0] == "in" || vec[0] == "attribute") && vec[2] == a.name)
                         {
-                            glBindAttribLocationARB(mGLHandle, a.attrib, a.name.c_str());
+                            glBindAttribLocationARB(mGLProgramHandle, a.attrib, a.name);
                             foundAttr = true;
                         }
                     }
                     // Find the position of the next occurrence if needed
-                    pos = vpSource.find(a.name, pos + a.name.length());
+                    pos = vpSource.find(a.name, pos + strlen(a.name));
                 }
             }
         }
@@ -547,20 +504,20 @@ namespace Ogre {
                 return;
             }
 
-            mGeometryProgram->attachToProgramObject(mGLHandle);
+            mGeometryProgram->attachToProgramObject(mGLProgramHandle);
 
             //Don't set adjacency flag. We handle it internally and expose "false"
 
             RenderOperation::OperationType inputOperationType = mGeometryProgram->getInputOperationType();
-            glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
+            glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
                 getGLGeometryInputPrimitiveType(inputOperationType, mGeometryProgram->isAdjacencyInfoRequired()));
 
             RenderOperation::OperationType outputOperationType = mGeometryProgram->getOutputOperationType();
 
-            glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT,
+            glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT,
                 getGLGeometryOutputPrimitiveType(outputOperationType));
 
-            glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_VERTICES_OUT_EXT,
+            glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_VERTICES_OUT_EXT,
                 mGeometryProgram->getMaxOutputVertices());
         }
 
@@ -572,14 +529,14 @@ namespace Ogre {
                 // todo error
                 return;
             }       
-            mFragmentProgram->attachToProgramObject(mGLHandle);
+            mFragmentProgram->attachToProgramObject(mGLProgramHandle);
         }
 
         
         // now the link
 
-        glLinkProgramARB( mGLHandle );
-        glGetObjectParameterivARB( mGLHandle, GL_OBJECT_LINK_STATUS_ARB, &mLinked );
+        glLinkProgramARB( mGLProgramHandle );
+        glGetObjectParameterivARB( mGLProgramHandle, GL_OBJECT_LINK_STATUS_ARB, &mLinked );
         mTriedToLinkAndFailed = !mLinked;
 
         // force logging and raise exception if not linked
@@ -587,12 +544,12 @@ namespace Ogre {
         if(glErr != GL_NO_ERROR)
         {
             reportGLSLError( glErr, "GLSLLinkProgram::compileAndLink",
-                "Error linking GLSL Program Object : ", mGLHandle, !mLinked, !mLinked );
+                "Error linking GLSL Program Object : ", mGLProgramHandle, !mLinked, !mLinked );
         }
         
         if(mLinked)
         {
-            logObjectInfo(  getCombinedName() + String(" GLSL link result : "), mGLHandle );
+            logObjectInfo(  getCombinedName() + String(" GLSL link result : "), mGLProgramHandle );
         }
 
         if (mLinked)
@@ -605,7 +562,7 @@ namespace Ogre {
 
                 // get buffer size
                 GLint binaryLength = 0;
-                glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
+                glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
 
                 // turns out we need this param when loading
                 // it will be the first bytes of the array in the microcode
@@ -617,7 +574,7 @@ namespace Ogre {
 
                 // get binary
                 uint8 * programBuffer = newMicrocode->getPtr() + sizeof(GLenum);
-                glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, programBuffer);
+                glGetProgramBinary(mGLProgramHandle, binaryLength, NULL, &binaryFormat, programBuffer);
 
                 // save binary format
                 memcpy(newMicrocode->getPtr(), &binaryFormat, sizeof(GLenum));
