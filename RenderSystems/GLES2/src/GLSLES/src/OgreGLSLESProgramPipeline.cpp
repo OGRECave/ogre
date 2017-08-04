@@ -194,38 +194,6 @@ namespace Ogre
 #endif
 
     //-----------------------------------------------------------------------
-    GLint GLSLESProgramPipeline::getAttributeIndex(VertexElementSemantic semantic, uint index)
-    {
-        GLint res = mCustomAttributesIndexes[semantic-1][index];
-        if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
-        {
-            GLuint handle = getVertexProgram()->getGLProgramHandle();
-            const char * attString = getAttributeSemanticString(semantic);
-            GLint attrib;
-            OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attString));
-
-            // Sadly position is a special case 
-            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
-            {
-                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, "position"));
-            }
-            
-            // For uv and other case the index is a part of the name
-            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
-            {
-                String attStringWithSemantic = String(attString) + StringConverter::toString(index);
-                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attStringWithSemantic.c_str()));
-            }
-            
-            // Update mCustomAttributesIndexes with the index we found (or didn't find) 
-            mCustomAttributesIndexes[semantic-1][index] = attrib;
-            res = attrib;
-        }
-        
-        return res;
-    }
-
-    //-----------------------------------------------------------------------
     void GLSLESProgramPipeline::activate(void)
     {
         if (!mLinked && !mTriedToLinkAndFailed)

@@ -78,15 +78,12 @@ public:
     bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
     /// has the attribute been found in the linked code?
-    bool isAttributeValid(VertexElementSemantic semantic, uint index) {
-        return getAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
+    static bool isAttributeValid(VertexElementSemantic semantic, uint index) {
+        return getFixedAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
     }
 
     /// Get the GL Handle for the program object
     uint getGLProgramHandle(void) const { return mGLProgramHandle; }
-
-    /// Get the index of a non-standard attribute bound in the linked code
-    virtual int getAttributeIndex(VertexElementSemantic semantic, uint index) = 0;
 
     /** Makes a program object active by making sure it is linked and then putting it in use.
      */
@@ -108,7 +105,7 @@ public:
     virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
 
     /** Get the fixed attribute bindings normally used by GL for a semantic. */
-    static uint32 getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
+    static int32 getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
 protected:
     /// Container of uniform references that are active in the program object
     GLUniformReferenceList mGLUniformReferences;
@@ -146,7 +143,7 @@ protected:
     struct CustomAttribute
     {
         const char* name;
-        uint32 attrib;
+        int32 attrib;
         VertexElementSemantic semantic;
     };
     static CustomAttribute msCustomAttributes[16];

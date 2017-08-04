@@ -687,20 +687,8 @@ namespace Ogre {
                 u1, v2, w
             };
 
-            GLuint posAttrIndex = 0;
-            GLuint texAttrIndex = 0;
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                GLSLESProgramPipeline* programPipeline = GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
-                posAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_POSITION, 0);
-                texAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
-            }
-            else
-            {
-                GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
-                posAttrIndex = (GLuint)linkProgram->getAttributeIndex(VES_POSITION, 0);
-                texAttrIndex = (GLuint)linkProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
-            }
+            GLuint posAttrIndex = GLSLProgramCommon::getFixedAttributeIndex(VES_POSITION, 0);
+            GLuint texAttrIndex = GLSLProgramCommon::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 0);
 
             // Draw the textured quad
             OGRE_CHECK_GL_ERROR(glVertexAttribPointer(posAttrIndex,

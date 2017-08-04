@@ -66,11 +66,6 @@ GLGpuProgram::~GLGpuProgram()
     unload(); 
 }
 
-GLuint GLGpuProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
-{
-    return GLSLProgramCommon::getFixedAttributeIndex(semantic, index);
-}
-
 bool GLGpuProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
 {
     // default implementation

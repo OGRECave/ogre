@@ -20,6 +20,7 @@ VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(String type)
     }
 
     OgreAssertDbg(false, "Missing attribute!");
+    return VertexElementSemantic(0);
 }
 
 GLSLProgramCommon::GLSLProgramCommon(GLSLShaderCommon* vertexShader)
@@ -176,7 +177,7 @@ GLSLProgramCommon::CustomAttribute GLSLProgramCommon::msCustomAttributes[16] = {
     {"binormal", getFixedAttributeIndex(VES_BINORMAL, 0), VES_BINORMAL},
 };
 
-uint32 GLSLProgramCommon::getFixedAttributeIndex(VertexElementSemantic semantic, uint index)
+int32 GLSLProgramCommon::getFixedAttributeIndex(VertexElementSemantic semantic, uint index)
 {
     switch(semantic)
     {
@@ -200,7 +201,7 @@ uint32 GLSLProgramCommon::getFixedAttributeIndex(VertexElementSemantic semantic,
         return 15;
     default:
         OgreAssertDbg(false, "Missing attribute!");
-        return 0;
+        return NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
     };
 }
 } /* namespace Ogre */

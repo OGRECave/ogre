@@ -61,6 +61,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreViewport.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusStateCacheManager.h"
+#include "OgreGLSLProgramCommon.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 extern "C" void glFlushRenderAPPLE();
@@ -1534,12 +1535,11 @@ namespace Ogre {
             static_cast<GLVertexArrayObject*>(op.vertexData->vertexDeclaration);
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
         vao->bind(this);
-        bool updateVAO = vao->needsUpdate(program, op.vertexData->vertexBufferBinding,
+        bool updateVAO = vao->needsUpdate(op.vertexData->vertexBufferBinding,
                                           op.vertexData->vertexStart);
 
         if (updateVAO)
-            vao->bindToShader(this, program, op.vertexData->vertexBufferBinding,
-                              op.vertexData->vertexStart);
+            vao->bindToGpu(this, op.vertexData->vertexBufferBinding, op.vertexData->vertexStart);
 
         // We treat index buffer binding inside VAO as volatile, always updating and never relying onto it,
         // as one shared vertex buffer could be rendered with several index buffers, from submeshes and/or LODs
@@ -1555,7 +1555,7 @@ namespace Ogre {
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
             }
         }
 
@@ -2482,17 +2482,17 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::bindVertexElementToGpu(const VertexElement& elem,
                                                      const HardwareVertexBufferSharedPtr& vertexBuffer,
-                                                     const size_t vertexStart, GLSLProgramCommon* program)
+                                                     const size_t vertexStart)
     {
         VertexElementSemantic sem = elem.getSemantic();
         unsigned short elemIndex = elem.getIndex();
 
-        if (!program->isAttributeValid(sem, elemIndex))
+        if (!GLSLProgramCommon::isAttributeValid(sem, elemIndex))
         {
             return;
         }
 
-        GLuint attrib = (GLuint)program->getAttributeIndex(sem, elemIndex);
+        GLuint attrib = (GLuint)GLSLProgramCommon::getFixedAttributeIndex(sem, elemIndex);
 
         const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
         mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER, hwGlBuffer->getGLBufferId());

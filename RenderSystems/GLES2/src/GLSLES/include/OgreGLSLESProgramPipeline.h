@@ -80,9 +80,6 @@ namespace Ogre
          */
         void activate(void);
 
-        /// Get the index of a non-standard attribute bound in the linked code
-        virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         virtual void notifyOnContextLost();
 #endif

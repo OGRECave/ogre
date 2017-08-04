@@ -99,35 +99,6 @@ namespace Ogre {
         return name;
     }
 
-    GLint GLSLProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
-    {
-        GLint res = mCustomAttributesIndexes[semantic-1][index];
-        if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
-        {
-            const char * attString = getAttributeSemanticString(semantic);
-            GLint attrib;
-            OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attString));
-
-            // Sadly position is a special case.
-            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
-            {
-                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, "position"));
-            }
-
-            // For uv and other case the index is a part of the name.
-            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
-            {
-                String attStringWithSemantic = String(attString) + StringConverter::toString(index);
-                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attStringWithSemantic.c_str()));
-            }
-
-            // Update mCustomAttributesIndexes with the index we found (or didn't find).
-            mCustomAttributesIndexes[semantic-1][index] = attrib;
-            res = attrib;
-        }
-        return res;
-    }
-
     void GLSLProgram::bindFixedAttributes(GLuint program)
     {
         GLint max_vertex_attribs = 16;

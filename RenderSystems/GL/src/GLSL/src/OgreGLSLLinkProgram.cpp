@@ -184,11 +184,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    int GLSLLinkProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
-    {
-        return GLSLProgramCommon::getFixedAttributeIndex(semantic, index);
-    }
-    //-----------------------------------------------------------------------
     void GLSLLinkProgram::buildGLUniformReferences(void)
     {
         if (!mUniformRefsBuilt)

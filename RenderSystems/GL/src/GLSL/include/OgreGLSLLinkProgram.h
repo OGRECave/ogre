@@ -90,9 +90,6 @@ namespace Ogre {
         void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
         /// Get the GL Handle for the program object
         GLhandleARB getGLHandle(void) const { return mGLProgramHandle; }
-
-        /// Get the index of a non-standard attribute bound in the linked code
-        int getAttributeIndex(VertexElementSemantic semantic, uint index);
     };
 
     }

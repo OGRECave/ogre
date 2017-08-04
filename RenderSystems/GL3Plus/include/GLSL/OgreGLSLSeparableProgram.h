@@ -118,11 +118,6 @@ namespace Ogre
         */
         void activate(void);
 
-        /** Get the index of a non-standard attribute bound in the
-            linked code.
-        */
-        GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
-
     protected:
         /// GL handle for pipeline object.
         GLuint mGLProgramPipelineHandle;
