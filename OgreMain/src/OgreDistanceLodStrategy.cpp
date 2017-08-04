@@ -198,7 +198,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real DistanceLodBoxStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
-        return Math::Sqr(movableObject->getBoundingBox().distance(camera->getDerivedPosition()));
+        return movableObject->getWorldBoundingBox().squaredDistance(camera->getDerivedPosition());
     }
     //-----------------------------------------------------------------------
 
