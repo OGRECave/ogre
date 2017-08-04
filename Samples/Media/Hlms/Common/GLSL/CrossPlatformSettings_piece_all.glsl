@@ -2,9 +2,14 @@
 @property( GL3+ >= 430 )#version 430 core
 @end @property( GL3+ < 430 )
 #version 330 core
+@end
+
 @property( GL_ARB_shading_language_420pack )
     #extension GL_ARB_shading_language_420pack: require
+    #define layout_constbuffer(x) layout( std140, x )
 @end
+@property( GL_ARB_texture_buffer_range )
+    #define bufferFetch texelFetch
 @end
 
 #define float2 vec2
@@ -34,7 +39,6 @@
 @property( !GL_ARB_texture_buffer_range || !GL_ARB_shading_language_420pack )
 @piece( SetCompatibilityLayer )
     @property( !GL_ARB_texture_buffer_range )
-        #define bufferFetch texelFetch
         #define samplerBuffer sampler2D
         #define isamplerBuffer isampler2D
         #define usamplerBuffer usampler2D
@@ -55,7 +59,7 @@
         }
     @end
     @property( !GL_ARB_shading_language_420pack )
-        #define layout(x)
+        #define layout_constbuffer(x) layout( std140 )
     @end
 @end
 @end

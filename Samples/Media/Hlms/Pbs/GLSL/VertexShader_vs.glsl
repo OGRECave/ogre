@@ -47,7 +47,7 @@ out block
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
 @property( hlms_skeleton || hlms_shadowcaster )@insertpiece( InstanceDecl )@end
-layout(binding = 0) uniform samplerBuffer worldMatBuf;
+/*layout(binding = 0) */uniform samplerBuffer worldMatBuf;
 @insertpiece( custom_vs_uniformDeclaration )
 @property( !GL_ARB_base_instance )uniform uint baseInstance;@end
 // END UNIFORM DECLARATION

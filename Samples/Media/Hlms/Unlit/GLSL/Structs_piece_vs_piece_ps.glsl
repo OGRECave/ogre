@@ -1,6 +1,6 @@
 @piece( PassDecl )
 //Uniforms that change per pass
-layout(binding = 0) uniform PassBuffer
+layout_constbuffer(binding = 0) uniform PassBuffer
 {
 	@insertpiece( PassInternalDecl )
 } passBuf;
@@ -16,7 +16,7 @@ struct Material
 	uvec4 indices4_7;
 };
 
-layout(binding = 1) uniform MaterialBuf
+layout_constbuffer(binding = 1) uniform MaterialBuf
 {
 	Material m[@value( materials_per_buffer )];
 } materialArray;
@@ -25,7 +25,7 @@ layout(binding = 1) uniform MaterialBuf
 
 @piece( InstanceDecl )
 //Uniforms that change per Item/Entity
-layout(binding = 2) uniform InstanceBuffer
+layout_constbuffer(binding = 2) uniform InstanceBuffer
 {
 	//.x =
 	//Contains the material's start index.
