@@ -442,98 +442,7 @@ namespace Ogre {
            data.getDepth() != getDepth())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL ES",
                         "GLES2TextureBuffer::download");
-#if OGRE_NO_GLES3_SUPPORT == 0
-        // Upload data to PBO
-        OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, mBufferId));
-
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
-        {
-            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Pixel Buffer #" + StringConverter::toString(mBufferId)).c_str()));
-        }
-
-        OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, mSizeInBytes, NULL,
-                                         GLES2HardwareBufferManager::getGLUsage(mUsage)));
-
-#if OGRE_DEBUG_MODE
-        std::stringstream str;
-        str << "GLES2TextureBuffer::download: " << mTextureID
-        << " pixel buffer: " << mBufferId
-        << " bytes: " << mSizeInBytes
-        << " face: " << mFace << " level: " << mLevel
-        << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
-        << " format: " << PixelUtil::getFormatName(mFormat);
-        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
-#endif
-        getGLES2RenderSystem()->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
-        if(PixelUtil::isCompressed(data.format))
-        {
-            if(data.format != mFormat || !data.isConsecutive())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Compressed images must be consecutive, in the source format",
-                            "GLES2TextureBuffer::download");
-        }
-        else
-        {
-            if(data.getWidth() != data.rowPitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, (GLint)data.rowPitch));
-            if(data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, (GLint)(data.left + data.rowPitch * data.top + data.slicePitch * data.front)));
-            if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
-                // Standard alignment of 4 is not right
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
-            }
-
-            // Restore defaults
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, 0));
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
-        }
-
-        GLint offsetInBytes = 0;
-        size_t width = mWidth;
-        size_t height = mHeight;
-        size_t depth = mDepth;
-        for(GLint i = 0; i < mLevel; i++)
-        {
-            offsetInBytes += PixelUtil::getMemorySize(width, height, depth, data.format);
-
-            if(width > 1)
-                width = width / 2;
-            if(height > 1)
-                height = height / 2;
-            if(depth > 1)
-                depth = depth / 2;
-        }
-
-        void* pBuffer;
-        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_PACK_BUFFER, offsetInBytes, mSizeInBytes, GL_MAP_READ_BIT));
-
-        if(pBuffer == 0)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Texture Buffer: Out of memory",
-                        "GLES2TextureBuffer::download");
-        }
-
-        // Copy to destination buffer
-        memcpy(data.data, pBuffer, mSizeInBytes);
-
-        GLboolean mapped;
-        OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_PIXEL_PACK_BUFFER));
-        if(!mapped)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Buffer data corrupted, please reload",
-                        "GLES2TextureBuffer::download");
-        }
-
-        // Delete PBO
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, 0));
-        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
-        mBufferId = 0;
-#else
         if(PixelUtil::isCompressed(data.format))
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -580,7 +489,6 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &tempFBO));
-#endif
     }
 
     //-----------------------------------------------------------------------------  
