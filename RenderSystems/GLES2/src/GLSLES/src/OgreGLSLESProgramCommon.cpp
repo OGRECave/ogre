@@ -97,6 +97,24 @@ namespace Ogre {
         }
         return res;
     }
+
+    void GLSLESProgramCommon::bindFixedAttributes(GLuint program)
+    {
+        GLint max_vertex_attribs = 16;
+        glGetIntegerv( GL_MAX_VERTEX_ATTRIBS , &max_vertex_attribs);
+
+        size_t numAttribs = sizeof(msCustomAttributes) / sizeof(CustomAttribute);
+        for (size_t i = 0; i < numAttribs; ++i)
+        {
+            const CustomAttribute& a = msCustomAttributes[i];
+            if (a.attrib < max_vertex_attribs)
+            {
+
+                OGRE_CHECK_GL_ERROR(glBindAttribLocation(program, a.attrib, a.name));
+            }
+        }
+    }
+
     //-----------------------------------------------------------------------
     bool GLSLESProgramCommon::getMicrocodeFromCache(const String& name, GLuint programHandle)
     {

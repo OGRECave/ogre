@@ -155,6 +155,8 @@ namespace Ogre {
 
         mFragmentProgram->attachToProgramObject(mGLProgramHandle);
         
+        bindFixedAttributes( mGLProgramHandle );
+
         // The link
         OGRE_CHECK_GL_ERROR(glLinkProgram( mGLProgramHandle ));
         OGRE_CHECK_GL_ERROR(glGetProgramiv( mGLProgramHandle, GL_LINK_STATUS, &mLinked ));

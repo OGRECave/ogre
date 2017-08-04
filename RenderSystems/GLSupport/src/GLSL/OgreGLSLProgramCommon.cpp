@@ -12,16 +12,14 @@ namespace Ogre
 {
 VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(String type)
 {
-    VertexElementSemantic semantic = mSemanticTypeMap[type];
-    if (semantic > 0)
+    size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
+    for (size_t i = 0; i < numAttribs; ++i)
     {
-        return semantic;
+        if (msCustomAttributes[i].name == type)
+            return msCustomAttributes[i].semantic;
     }
-    else
-    {
-        OgreAssertDbg(false, "Missing attribute!");
-        return (VertexElementSemantic)0;
-    }
+
+    OgreAssertDbg(false, "Missing attribute!");
 }
 
 GLSLProgramCommon::GLSLProgramCommon(GLSLShaderCommon* vertexShader)
@@ -40,26 +38,18 @@ GLSLProgramCommon::GLSLProgramCommon(GLSLShaderCommon* vertexShader)
             mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
         }
     }
-
-    // Initialize the attribute to semantic map
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("vertex", VES_POSITION));
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("blendWeights", VES_BLEND_WEIGHTS));
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("normal", VES_NORMAL));
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("colour", VES_DIFFUSE));
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("secondary_colour", VES_SPECULAR));
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("blendIndices", VES_BLEND_INDICES));
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("tangent", VES_TANGENT));
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("binormal", VES_BINORMAL));
-    mSemanticTypeMap.insert(SemanticToStringMap::value_type("uv", VES_TEXTURE_COORDINATES));
 }
 
 const char* GLSLProgramCommon::getAttributeSemanticString(VertexElementSemantic semantic)
 {
-    for (SemanticToStringMap::iterator i = mSemanticTypeMap.begin(); i != mSemanticTypeMap.end();
-         ++i)
+    if(semantic == VES_TEXTURE_COORDINATES)
+        return "uv";
+
+    size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
+    for (size_t i = 0; i < numAttribs; ++i)
     {
-        if ((*i).second == semantic)
-            return (*i).first.c_str();
+        if (msCustomAttributes[i].semantic == semantic)
+            return msCustomAttributes[i].name;
     }
 
     OgreAssertDbg(false, "Missing attribute!");
@@ -130,7 +120,7 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
         if (attrName == "position")
             semantic = getAttributeSemanticEnum("vertex");
         else if(uvPos == 0)
-            semantic = getAttributeSemanticEnum("uv"); // treat "uvXY" as "uv"
+            semantic = getAttributeSemanticEnum("uv0"); // treat "uvXY" as "uv0"
         else
             semantic = getAttributeSemanticEnum(attrName);
 
@@ -145,5 +135,72 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
 
         currPos = shaderSource.find("layout", currPos);
     }
+}
+
+// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
+// and end up aliasing existing built-ins. So avoid! Fixed builtins are:
+
+//  a  builtin              custom attrib name
+// ----------------------------------------------
+//  0  gl_Vertex            vertex
+//  1  n/a                  blendWeights
+//  2  gl_Normal            normal
+//  3  gl_Color             colour
+//  4  gl_SecondaryColor    secondary_colour
+//  5  gl_FogCoord          fog_coord
+//  7  n/a                  blendIndices
+//  8  gl_MultiTexCoord0    uv0
+//  9  gl_MultiTexCoord1    uv1
+//  10 gl_MultiTexCoord2    uv2
+//  11 gl_MultiTexCoord3    uv3
+//  12 gl_MultiTexCoord4    uv4
+//  13 gl_MultiTexCoord5    uv5
+//  14 gl_MultiTexCoord6    uv6, tangent
+//  15 gl_MultiTexCoord7    uv7, binormal
+GLSLProgramCommon::CustomAttribute GLSLProgramCommon::msCustomAttributes[16] = {
+    {"vertex", getFixedAttributeIndex(VES_POSITION, 0), VES_POSITION},
+    {"blendWeights", getFixedAttributeIndex(VES_BLEND_WEIGHTS, 0), VES_BLEND_WEIGHTS},
+    {"normal", getFixedAttributeIndex(VES_NORMAL, 0), VES_NORMAL},
+    {"colour", getFixedAttributeIndex(VES_DIFFUSE, 0), VES_DIFFUSE},
+    {"secondary_colour", getFixedAttributeIndex(VES_SPECULAR, 0), VES_SPECULAR},
+    {"blendIndices", getFixedAttributeIndex(VES_BLEND_INDICES, 0), VES_BLEND_INDICES},
+    {"uv0", getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 0), VES_TEXTURE_COORDINATES},
+    {"uv1", getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 1), VES_TEXTURE_COORDINATES},
+    {"uv2", getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 2), VES_TEXTURE_COORDINATES},
+    {"uv3", getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 3), VES_TEXTURE_COORDINATES},
+    {"uv4", getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 4), VES_TEXTURE_COORDINATES},
+    {"uv5", getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 5), VES_TEXTURE_COORDINATES},
+    {"uv6", getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 6), VES_TEXTURE_COORDINATES},
+    {"uv7", getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 7), VES_TEXTURE_COORDINATES},
+    {"tangent", getFixedAttributeIndex(VES_TANGENT, 0), VES_TANGENT},
+    {"binormal", getFixedAttributeIndex(VES_BINORMAL, 0), VES_BINORMAL},
+};
+
+uint32 GLSLProgramCommon::getFixedAttributeIndex(VertexElementSemantic semantic, uint index)
+{
+    switch(semantic)
+    {
+    case VES_POSITION:
+        return 0;
+    case VES_BLEND_WEIGHTS:
+        return 1;
+    case VES_NORMAL:
+        return 2;
+    case VES_DIFFUSE:
+        return 3;
+    case VES_SPECULAR:
+        return 4;
+    case VES_BLEND_INDICES:
+        return 7;
+    case VES_TEXTURE_COORDINATES:
+        return 8 + index;
+    case VES_TANGENT:
+        return 14;
+    case VES_BINORMAL:
+        return 15;
+    default:
+        OgreAssertDbg(false, "Missing attribute!");
+        return 0;
+    };
 }
 } /* namespace Ogre */

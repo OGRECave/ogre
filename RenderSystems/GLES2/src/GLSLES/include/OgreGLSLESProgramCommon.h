@@ -68,6 +68,8 @@ namespace Ogre {
         /// Get the index of a non-standard attribute bound in the linked code
         virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
 
+        void bindFixedAttributes(GLuint program);
+
         GLSLESProgram* getVertexProgram(void) const { return static_cast<GLSLESProgram*>(mVertexShader); }
         GLSLESProgram* getFragmentProgram(void) const { return mFragmentProgram; }
     };

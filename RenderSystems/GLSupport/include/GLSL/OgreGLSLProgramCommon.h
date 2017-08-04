@@ -106,6 +106,9 @@ public:
         Normally called by GLSLShader::bindMultiPassParameters() just before multi pass rendering occurs.
     */
     virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
+
+    /** Get the fixed attribute bindings normally used by GL for a semantic. */
+    static uint32 getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
 protected:
     /// Container of uniform references that are active in the program object
     GLUniformReferenceList mGLUniformReferences;
@@ -136,11 +139,17 @@ protected:
     /// Compiles and links the vertex and fragment programs
     virtual void compileAndLink(void) = 0;
 
-    typedef map<String, VertexElementSemantic>::type SemanticToStringMap;
-    SemanticToStringMap mSemanticTypeMap;
+    static VertexElementSemantic getAttributeSemanticEnum(String type);
+    static const char * getAttributeSemanticString(VertexElementSemantic semantic);
 
-    VertexElementSemantic getAttributeSemanticEnum(String type);
-    const char * getAttributeSemanticString(VertexElementSemantic semantic);
+    /// Name / attribute list
+    struct CustomAttribute
+    {
+        const char* name;
+        uint32 attrib;
+        VertexElementSemantic semantic;
+    };
+    static CustomAttribute msCustomAttributes[16];
 };
 
 } /* namespace Ogre */

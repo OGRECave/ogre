@@ -84,8 +84,10 @@ namespace Ogre
                     mTriedToLinkAndFailed = true;
                     return;
                 }
-
                 GLuint programHandle = getVertexProgram()->getGLProgramHandle();
+
+                bindFixedAttributes( programHandle );
+
                 OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
                 getVertexProgram()->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
