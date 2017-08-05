@@ -59,9 +59,7 @@ namespace Ogre
 
         // Static 'free list' of polygons to save reallocation, shared between all bodies
         static PolygonList msFreePolygons;
-#if OGRE_THREAD_SUPPORT
         OGRE_STATIC_MUTEX(msFreePolygonsMutex);
-#endif
 
     public:
         ConvexBody();
