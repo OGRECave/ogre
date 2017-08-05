@@ -3,7 +3,7 @@
 set(HEADER_FILES include/SkyBox.h)
 set(SOURCE_FILES src/SkyBox.cpp)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_PROJECT_SOURCE_DIR}/ogremain/include)
 
 ogre_add_library_to_folder(Samples Sample_SkyBox ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 

@@ -24,7 +24,7 @@ if (UNIX)
 endif (UNIX)
 
 # now run the context
-exec_program("cmake" ARGS -E chdir ${TEST_CONTEXT_PATH} ${TEST_CONTEXT_EXECUTABLE}
+exec_program("${CMAKE_COMMAND}" ARGS -E chdir ${TEST_CONTEXT_PATH} ${TEST_CONTEXT_EXECUTABLE}
   -rs "\"${TEST_CONTEXT_RENDER_SYSTEM}\""                 # Pick rendersystem
   -n "AutomatedTest"                                      # Name it, so it overwrites itself each run
   -m "\"Automated Test - ${TEST_CONTEXT_RENDER_SYSTEM}\"" # A brief comment
