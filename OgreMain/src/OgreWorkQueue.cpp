@@ -35,7 +35,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     uint16 WorkQueue::getChannel(const String& channelName)
     {
-            OGRE_LOCK_MUTEX(mChannelMapMutex);
+            OGRE_WQ_LOCK_MUTEX(mChannelMapMutex);
 
         ChannelMap::iterator i = mChannelMap.find(channelName);
         if (i == mChannelMap.end())
@@ -129,7 +129,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::addRequestHandler(uint16 channel, RequestHandler* rh)
     {
-            OGRE_LOCK_RW_MUTEX_WRITE(mRequestHandlerMutex);
+            OGRE_WQ_LOCK_RW_MUTEX_WRITE(mRequestHandlerMutex);
 
         RequestHandlerListByChannel::iterator i = mRequestHandlers.find(channel);
         if (i == mRequestHandlers.end())
@@ -152,7 +152,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::removeRequestHandler(uint16 channel, RequestHandler* rh)
     {
-        OGRE_LOCK_RW_MUTEX_WRITE(mRequestHandlerMutex);
+        OGRE_WQ_LOCK_RW_MUTEX_WRITE(mRequestHandlerMutex);
 
         RequestHandlerListByChannel::iterator i = mRequestHandlers.find(channel);
         if (i != mRequestHandlers.end())
@@ -207,7 +207,7 @@ namespace Ogre {
 
         {
             // lock to acquire rid and push request to the queue
-                    OGRE_LOCK_MUTEX(mRequestMutex);
+                    OGRE_WQ_LOCK_MUTEX(mRequestMutex);
 
             if (!mAcceptRequests || mShuttingDown)
                 return 0;
@@ -230,7 +230,7 @@ namespace Ogre {
 #endif
         }
         if(OGRE_THREAD_SUPPORT && idleThread){
-            OGRE_LOCK_MUTEX(mIdleMutex);
+            OGRE_WQ_LOCK_MUTEX(mIdleMutex);
             mIdleRequestQueue.push_back(req);
             if(!mIdleThreadRunning)
             {
@@ -247,7 +247,7 @@ namespace Ogre {
         uint16 requestType, const Any& rData, uint8 retryCount)
     {
         // lock to push request to the queue
-            OGRE_LOCK_MUTEX(mRequestMutex);
+            OGRE_WQ_LOCK_MUTEX(mRequestMutex);
 
         if (mShuttingDown)
             return;
@@ -269,7 +269,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::abortRequest(RequestID id)
     {
-            OGRE_LOCK_MUTEX(mProcessMutex);
+            OGRE_WQ_LOCK_MUTEX(mProcessMutex);
 
         // NOTE: Pending requests are exist any of RequestQueue, ProcessQueue and
         // ResponseQueue when keeping ProcessMutex, so we check all of these queues.
@@ -284,7 +284,7 @@ namespace Ogre {
         }
 
         {
-                    OGRE_LOCK_MUTEX(mRequestMutex);
+                    OGRE_WQ_LOCK_MUTEX(mRequestMutex);
 
             for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
             {
@@ -302,7 +302,7 @@ namespace Ogre {
                 mIdleProcessed->abortRequest();
             }
 
-            OGRE_LOCK_MUTEX(mIdleMutex);
+            OGRE_WQ_LOCK_MUTEX(mIdleMutex);
             for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
             {
                 (*i)->abortRequest();
@@ -310,7 +310,7 @@ namespace Ogre {
         }
 
         {
-                    OGRE_LOCK_MUTEX(mResponseMutex);
+                    OGRE_WQ_LOCK_MUTEX(mResponseMutex);
 
             for (ResponseQueue::iterator i = mResponseQueue.begin(); i != mResponseQueue.end(); ++i)
             {
@@ -325,7 +325,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::abortRequestsByChannel(uint16 channel)
     {
-            OGRE_LOCK_MUTEX(mProcessMutex);
+            OGRE_WQ_LOCK_MUTEX(mProcessMutex);
 
         for (RequestQueue::iterator i = mProcessQueue.begin(); i != mProcessQueue.end(); ++i)
         {
@@ -336,7 +336,7 @@ namespace Ogre {
         }
 
         {
-                    OGRE_LOCK_MUTEX(mRequestMutex);
+                    OGRE_WQ_LOCK_MUTEX(mRequestMutex);
 
             for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
             {
@@ -352,7 +352,7 @@ namespace Ogre {
                 mIdleProcessed->abortRequest();
             }
 
-            OGRE_LOCK_MUTEX(mIdleMutex);
+            OGRE_WQ_LOCK_MUTEX(mIdleMutex);
 
             for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
             {
@@ -364,7 +364,7 @@ namespace Ogre {
         }
 
         {
-                    OGRE_LOCK_MUTEX(mResponseMutex);
+                    OGRE_WQ_LOCK_MUTEX(mResponseMutex);
 
             for (ResponseQueue::iterator i = mResponseQueue.begin(); i != mResponseQueue.end(); ++i)
             {
@@ -379,7 +379,7 @@ namespace Ogre {
     void DefaultWorkQueueBase::abortPendingRequestsByChannel(uint16 channel)
     {
         {
-                    OGRE_LOCK_MUTEX(mRequestMutex);
+                    OGRE_WQ_LOCK_MUTEX(mRequestMutex);
             for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
             {
                 if ((*i)->getChannel() == channel)
@@ -389,7 +389,7 @@ namespace Ogre {
             }
         }
         {
-                    OGRE_LOCK_MUTEX(mIdleMutex);
+                    OGRE_WQ_LOCK_MUTEX(mIdleMutex);
 
                 for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
                 {
@@ -403,7 +403,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::abortAllRequests()
     {
-            OGRE_LOCK_MUTEX(mProcessMutex);
+            OGRE_WQ_LOCK_MUTEX(mProcessMutex);
         {
             for (RequestQueue::iterator i = mProcessQueue.begin(); i != mProcessQueue.end(); ++i)
             {
@@ -413,7 +413,7 @@ namespace Ogre {
         
 
         {
-                    OGRE_LOCK_MUTEX(mRequestMutex);
+                    OGRE_WQ_LOCK_MUTEX(mRequestMutex);
 
             for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
             {
@@ -428,7 +428,7 @@ namespace Ogre {
                 mIdleProcessed->abortRequest();
             }
 
-            OGRE_LOCK_MUTEX(mIdleMutex);
+            OGRE_WQ_LOCK_MUTEX(mIdleMutex);
 
             for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
             {
@@ -437,7 +437,7 @@ namespace Ogre {
         }
 
         {
-                    OGRE_LOCK_MUTEX(mResponseMutex);
+                    OGRE_WQ_LOCK_MUTEX(mResponseMutex);
 
             for (ResponseQueue::iterator i = mResponseQueue.begin(); i != mResponseQueue.end(); ++i)
             {
@@ -449,7 +449,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::setPaused(bool pause)
     {
-            OGRE_LOCK_MUTEX(mRequestMutex);
+            OGRE_WQ_LOCK_MUTEX(mRequestMutex);
 
         mPaused = pause;
     }
@@ -461,7 +461,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::setRequestsAccepted(bool accept)
     {
-            OGRE_LOCK_MUTEX(mRequestMutex);
+            OGRE_WQ_LOCK_MUTEX(mRequestMutex);
 
         mAcceptRequests = accept;
     }
@@ -480,9 +480,9 @@ namespace Ogre {
         Request* request = 0;
         {
             // scoped to only lock while retrieving the next request
-                    OGRE_LOCK_MUTEX(mProcessMutex);
+                    OGRE_WQ_LOCK_MUTEX(mProcessMutex);
             {
-                            OGRE_LOCK_MUTEX(mRequestMutex);
+                            OGRE_WQ_LOCK_MUTEX(mRequestMutex);
 
                 if (!mRequestQueue.empty())
                 {
@@ -505,7 +505,7 @@ namespace Ogre {
     {
         Response* response = processRequest(r);
 
-        OGRE_LOCK_MUTEX(mProcessMutex);
+        OGRE_WQ_LOCK_MUTEX(mProcessMutex);
 
         RequestQueue::iterator it;
         for( it = mProcessQueue.begin(); it != mProcessQueue.end(); ++it )
@@ -548,7 +548,7 @@ namespace Ogre {
                     response->abortRequest();
                 }
                 // Queue response
-                OGRE_LOCK_MUTEX(mResponseMutex);
+                OGRE_WQ_LOCK_MUTEX(mResponseMutex);
                 mResponseQueue.push_back(response);
                 // no need to wake thread, this is processed by the main thread
             }
@@ -579,7 +579,7 @@ namespace Ogre {
         {
             Response* response = 0;
             {
-                            OGRE_LOCK_MUTEX(mResponseMutex);
+                            OGRE_WQ_LOCK_MUTEX(mResponseMutex);
 
                 if (mResponseQueue.empty())
                     break; // exit loop
@@ -613,7 +613,7 @@ namespace Ogre {
         RequestHandlerListByChannel handlerListCopy;
         {
             // lock the list only to make a copy of it, to maximise parallelism
-                    OGRE_LOCK_RW_MUTEX_READ(mRequestHandlerMutex);
+                    OGRE_WQ_LOCK_RW_MUTEX_READ(mRequestHandlerMutex);
             
             handlerListCopy = mRequestHandlers;
             
@@ -684,7 +684,7 @@ namespace Ogre {
     bool DefaultWorkQueueBase::processIdleRequests()
     {
         {
-                    OGRE_LOCK_MUTEX(mIdleMutex);
+                    OGRE_WQ_LOCK_MUTEX(mIdleMutex);
             if(mIdleRequestQueue.empty() || mIdleThreadRunning){
                 return false;
             } else {
@@ -694,9 +694,9 @@ namespace Ogre {
         try {
             while(1){
                 {
-                                    OGRE_LOCK_MUTEX(mProcessMutex); // mProcessMutex needs to be the top mutex to prevent livelocks
+                                    OGRE_WQ_LOCK_MUTEX(mProcessMutex); // mProcessMutex needs to be the top mutex to prevent livelocks
                     {
-                                            OGRE_LOCK_MUTEX(mIdleMutex);
+                                            OGRE_WQ_LOCK_MUTEX(mIdleMutex);
                         if(!mIdleRequestQueue.empty()){
                             mIdleProcessed = mIdleRequestQueue.front();
                             mIdleRequestQueue.pop_front();
@@ -712,9 +712,9 @@ namespace Ogre {
         } catch (...) { // Normally this should not happen.
             {
                 // It is very important to clean up or the idle thread will be locked forever!
-                            OGRE_LOCK_MUTEX(mProcessMutex);
+                            OGRE_WQ_LOCK_MUTEX(mProcessMutex);
                 {
-                                    OGRE_LOCK_MUTEX(mIdleMutex);
+                                    OGRE_WQ_LOCK_MUTEX(mIdleMutex);
                     if(mIdleProcessed){
                         mIdleProcessed->abortRequest();
                     }
