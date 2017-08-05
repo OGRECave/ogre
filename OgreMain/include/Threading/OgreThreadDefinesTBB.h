@@ -28,13 +28,27 @@ THE SOFTWARE
 
 #define OGRE_TOKEN_PASTE(x, y) x ## y
 #define OGRE_TOKEN_PASTE_EXTRA(x, y) OGRE_TOKEN_PASTE(x, y)
+
+#define OGRE_THREAD_HARDWARE_CONCURRENCY tbb::task_scheduler_init::default_num_threads()
+#define OGRE_THREAD_CURRENT_ID tbb::this_tbb_thread::get_id()
+#define OGRE_THREAD_WORKER_INHERIT
+
+#define OGRE_WQ_MUTEX(name) mutable tbb::recursive_mutex name
+#define OGRE_WQ_LOCK_MUTEX(name) tbb::recursive_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
+#define OGRE_WQ_LOCK_MUTEX_NAMED(mutexName, lockName) tbb::recursive_mutex::scoped_lock lockName(mutexName)
+
+// Read-write mutex
+#define OGRE_WQ_RW_MUTEX(name) mutable tbb::queuing_rw_mutex name
+#define OGRE_WQ_LOCK_RW_MUTEX_READ(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, false)
+#define OGRE_WQ_LOCK_RW_MUTEX_WRITE(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, true)
+
+#if OGRE_THREAD_SUPPORT != 3
 #define OGRE_AUTO_MUTEX mutable tbb::recursive_mutex OGRE_AUTO_MUTEX_NAME
 #define OGRE_LOCK_AUTO_MUTEX tbb::recursive_mutex::scoped_lock ogreAutoMutexLock(OGRE_AUTO_MUTEX_NAME)
-#define OGRE_MUTEX(name) mutable tbb::recursive_mutex name
+
 #define OGRE_STATIC_MUTEX(name) static tbb::recursive_mutex name
 #define OGRE_STATIC_MUTEX_INSTANCE(name) tbb::recursive_mutex name
-#define OGRE_LOCK_MUTEX(name) tbb::recursive_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
-#define OGRE_LOCK_MUTEX_NAMED(mutexName, lockName) tbb::recursive_mutex::scoped_lock lockName(mutexName)
+
 // like OGRE_AUTO_MUTEX but mutex held by pointer
 #define OGRE_AUTO_SHARED_MUTEX mutable tbb::recursive_mutex *OGRE_AUTO_MUTEX_NAME
 #define OGRE_LOCK_AUTO_SHARED_MUTEX assert(OGRE_AUTO_MUTEX_NAME); tbb::recursive_mutex::scoped_lock ogreAutoMutexLock(*OGRE_AUTO_MUTEX_NAME)
@@ -43,10 +57,7 @@ THE SOFTWARE
 #define OGRE_COPY_AUTO_SHARED_MUTEX(from) assert(!OGRE_AUTO_MUTEX_NAME); OGRE_AUTO_MUTEX_NAME = from
 #define OGRE_SET_AUTO_SHARED_MUTEX_NULL OGRE_AUTO_MUTEX_NAME = 0
 #define OGRE_MUTEX_CONDITIONAL(mutex) if (mutex)
-// Read-write mutex
-#define OGRE_RW_MUTEX(name) mutable tbb::queuing_rw_mutex name
-#define OGRE_LOCK_RW_MUTEX_READ(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, false)
-#define OGRE_LOCK_RW_MUTEX_WRITE(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, true)
+
 // Thread-local pointer
 #define OGRE_THREAD_POINTER(T, var) tbb::enumerable_thread_specific<SharedPtr<T> > var
 #define OGRE_THREAD_POINTER_INIT(var) var()
@@ -55,12 +66,10 @@ THE SOFTWARE
 #define OGRE_THREAD_POINTER_SET(var, expr) do { var.local().reset(); var.local().bind(expr); } while (0)
 #define OGRE_THREAD_POINTER_DELETE(var) var.local().reset()
 // Utility
-#define OGRE_THREAD_HARDWARE_CONCURRENCY tbb::task_scheduler_init::default_num_threads()
-#define OGRE_THREAD_CURRENT_ID tbb::this_tbb_thread::get_id() 
 #define OGRE_THREAD_SLEEP(ms) tbb::this_tbb_thread::sleep(tbb::tick_count::interval_t(double(ms)/1000))
-#define OGRE_THREAD_WORKER_INHERIT
 #define OGRE_THREAD_ID_TYPE tbb::tbb_thread::id
 #define OGRE_THREAD_YIELD tbb::this_tbb_thread::yield()
+#endif
 
 #endif
 

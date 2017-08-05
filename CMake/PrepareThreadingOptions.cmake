@@ -46,9 +46,10 @@ set(OGRE_CONFIG_THREADS ${OGRE_THREAD_TYPE} CACHE STRING
 	"Enable Ogre thread safety support for multithreading. Possible values:
 	0 - no thread safety. DefaultWorkQueue is not threaded.
 	1 - background resource preparation and loading is thread safe. Threaded DefaultWorkQueue. [DEPRECATED]
-	2 - only background resource preparation is thread safe. Threaded DefaultWorkQueue. [DEPRECATED]"
+	2 - only background resource preparation is thread safe. Threaded DefaultWorkQueue. [DEPRECATED]
+	3 - no thread safety. Threaded DefaultWorkQueue."
 )
-set_property(CACHE OGRE_CONFIG_THREADS PROPERTY STRINGS 0 1 2)
+set_property(CACHE OGRE_CONFIG_THREADS PROPERTY STRINGS 0 1 2 3)
 set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER} CACHE STRING
 	"Select the library to use for thread support. Possible values:
 	boost - Boost thread library. [DEPRECATED]

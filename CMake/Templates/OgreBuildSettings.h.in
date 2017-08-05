@@ -79,6 +79,8 @@ OGRE_THREAD_SUPPORT = 2
     thread. Has a lower synchronisation primitive overhead than full threading
     while still allowing the major blocking aspects of resource management (I/O)
     to be done in the background.
+OGRE_THREAD_SUPPORT = 3
+    No synchronisation primitive overhead. WorkQueue is threaded.
 */
 #define OGRE_THREAD_SUPPORT @OGRE_SET_THREADS@
 
