@@ -38,7 +38,18 @@ namespace Ogre {
     /** \addtogroup General
     *  @{
     */
+#if OGRE_USE_STD11
+    struct SharedPtrFreeMethod {
+        template<class T>
+        void operator()(T* p) {
+            OGRE_DELETE_T(p, T, MEMCATEGORY_GENERAL);
+        }
+    };
+    extern SharedPtrFreeMethod SPFM_DELETE_T;
 
+    using std::static_pointer_cast;
+    using std::dynamic_pointer_cast;
+#else
     /// The method to use to free memory on destruction
     enum SharedPtrFreeMethod
     {
@@ -388,6 +399,7 @@ namespace Ogre {
     }
     /** @} */
     /** @} */
+#endif
 }
 
 
