@@ -32,7 +32,13 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgrePlatformInformation.h"
 
-#if (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
+#if OGRE_USE_STD11
+#include <atomic>
+
+namespace Ogre {
+    template<class T> using AtomicScalar = std::atomic<T>;
+}
+#elif (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
 
 // Atomics are not yet supported for the unsigned long long int(ResourceHandle) type as of Clang 5.0. So only GCC for now.
 #if ((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 473))
