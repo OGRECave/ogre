@@ -146,7 +146,7 @@ protected:
         int32 attrib;
         VertexElementSemantic semantic;
     };
-    static CustomAttribute msCustomAttributes[16];
+    static CustomAttribute msCustomAttributes[17];
 };
 
 } /* namespace Ogre */
