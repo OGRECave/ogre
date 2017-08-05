@@ -40,7 +40,8 @@ namespace Ogre {
     /** \addtogroup General
     *  @{
     */
-    template <class T> class AtomicObject {
+    /// @deprecated do not use
+    template <class T> class OGRE_DEPRECATED AtomicObject {
 
         public:
 
