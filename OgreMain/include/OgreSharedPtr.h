@@ -306,12 +306,12 @@ namespace Ogre {
             pRep = rep;
         }
 
-        inline bool unique() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get() == 1; }
+        inline bool unique() const { assert(pInfo && pInfo->useCount.load()); return pInfo->useCount.load() == 1; }
 
         /// @deprecated use use_count() instead
         OGRE_DEPRECATED unsigned int useCount() const { return use_count(); }
 
-        long use_count() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get(); }
+        long use_count() const { assert(pInfo && pInfo->useCount.load()); return pInfo->useCount.load(); }
 
         /// @deprecated this API will be dropped
         OGRE_DEPRECATED void setUseCount(unsigned value) { assert(pInfo); pInfo->useCount = value; }

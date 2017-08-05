@@ -89,7 +89,7 @@ namespace Ogre {
         mReceiveShadows = rhs.mReceiveShadows;
         mTransparencyCastsShadows = rhs.mTransparencyCastsShadows;
 
-        mLoadingState = rhs.mLoadingState;
+        mLoadingState.store(rhs.mLoadingState.load());
         mIsBackgroundLoaded = rhs.mIsBackgroundLoaded;
 
         // Copy Techniques

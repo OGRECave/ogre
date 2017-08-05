@@ -180,7 +180,7 @@ namespace Ogre {
         size_t getMemoryBudget(void) const;
 
         /** Gets the current memory usage, in bytes. */
-        size_t getMemoryUsage(void) const { return mMemoryUsage.get(); }
+        size_t getMemoryUsage(void) const { return mMemoryUsage.load(); }
 
         /** Unloads a single resource by name.
         @remarks

@@ -59,19 +59,20 @@ namespace Ogre
     void Resource::prepare(bool background)
     {
         // quick check that avoids any synchronisation
-        LoadingState old = mLoadingState.get();
+        LoadingState old = mLoadingState.load();
         if (old != LOADSTATE_UNLOADED && old != LOADSTATE_PREPARING) return;
 
         // atomically do slower check to make absolutely sure,
         // and set the load state to PREPARING
-        if (!mLoadingState.cas(LOADSTATE_UNLOADED,LOADSTATE_PREPARING))
+        old = LOADSTATE_UNLOADED;
+        if (!mLoadingState.compare_exchange_strong(old,LOADSTATE_PREPARING))
         {
-            while( mLoadingState.get() == LOADSTATE_PREPARING )
+            while( mLoadingState.load() == LOADSTATE_PREPARING )
             {
                             OGRE_LOCK_AUTO_MUTEX;
             }
 
-            LoadingState state = mLoadingState.get();
+            LoadingState state = mLoadingState.load();
             if( state != LOADSTATE_PREPARED && state != LOADSTATE_LOADING && state != LOADSTATE_LOADED )
             {
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Another thread failed in resource operation",
@@ -116,7 +117,7 @@ namespace Ogre
         }
         catch (...)
         {
-            mLoadingState.set(LOADSTATE_UNLOADED);
+            mLoadingState.store(LOADSTATE_UNLOADED);
 
             OGRE_LOCK_AUTO_MUTEX;
             unloadImpl();
@@ -124,7 +125,7 @@ namespace Ogre
             throw;
         }
 
-        mLoadingState.set(LOADSTATE_PREPARED);
+        mLoadingState.store(LOADSTATE_PREPARED);
 
         // Since we don't distinguish between GPU and CPU RAM, this
         // seems pointless
@@ -156,29 +157,29 @@ namespace Ogre
         while (keepChecking)
         {
             // quick check that avoids any synchronisation
-            old = mLoadingState.get();
+            old = mLoadingState.load();
 
             if ( old == LOADSTATE_PREPARING )
             {
-                while( mLoadingState.get() == LOADSTATE_PREPARING )
+                while( mLoadingState.load() == LOADSTATE_PREPARING )
                 {
                                     OGRE_LOCK_AUTO_MUTEX;
                 }
-                old = mLoadingState.get();
+                old = mLoadingState.load();
             }
 
             if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED && old!=LOADSTATE_LOADING) return;
 
             // atomically do slower check to make absolutely sure,
             // and set the load state to LOADING
-            if (old==LOADSTATE_LOADING || !mLoadingState.cas(old,LOADSTATE_LOADING))
+            if (old==LOADSTATE_LOADING || !mLoadingState.compare_exchange_strong(old,LOADSTATE_LOADING))
             {
-                while( mLoadingState.get() == LOADSTATE_LOADING )
+                while( mLoadingState.load() == LOADSTATE_LOADING )
                 {
                                     OGRE_LOCK_AUTO_MUTEX;
                 }
 
-                LoadingState state = mLoadingState.get();
+                LoadingState state = mLoadingState.load();
                 if( state == LOADSTATE_PREPARED || state == LOADSTATE_PREPARING )
                 {
                     // another thread is preparing, loop around
@@ -252,7 +253,7 @@ namespace Ogre
             // We reset it to UNLOADED because the only other case is when
             // old == PREPARED in which case the loadImpl should wipe out
             // any prepared data since it might be invalid.
-            mLoadingState.set(LOADSTATE_UNLOADED);
+            mLoadingState.store(LOADSTATE_UNLOADED);
 
             OGRE_LOCK_AUTO_MUTEX;
             unloadImpl();
@@ -261,7 +262,7 @@ namespace Ogre
             throw;
         }
 
-        mLoadingState.set(LOADSTATE_LOADED);
+        mLoadingState.store(LOADSTATE_LOADED);
         _dirtyState();
 
         // Notify manager
@@ -313,11 +314,11 @@ namespace Ogre
     void Resource::unload(void) 
     { 
         // Early-out without lock (mitigate perf cost of ensuring unloaded)
-        LoadingState old = mLoadingState.get();
+        LoadingState old = mLoadingState.load();
         if (old!=LOADSTATE_LOADED && old!=LOADSTATE_PREPARED) return;
 
 
-        if (!mLoadingState.cas(old,LOADSTATE_UNLOADING)) return;
+        if (!mLoadingState.compare_exchange_strong(old,LOADSTATE_UNLOADING)) return;
 
         // Scope lock for actual unload
         {
@@ -331,7 +332,7 @@ namespace Ogre
             }
         }
 
-        mLoadingState.set(LOADSTATE_UNLOADED);
+        mLoadingState.store(LOADSTATE_UNLOADED);
 
         // Notify manager
         // Note if we have gone from PREPARED to UNLOADED, then we haven't actually
@@ -347,7 +348,7 @@ namespace Ogre
     void Resource::reload(LoadingFlags flags)
     { 
             OGRE_LOCK_AUTO_MUTEX;
-        if (mLoadingState.get() == LOADSTATE_LOADED)
+        if (mLoadingState.load() == LOADSTATE_LOADED)
         {
             unload();
             load();

@@ -346,7 +346,7 @@ namespace Ogre {
         virtual bool isPrepared(void) const 
         { 
             // No lock required to read this state since no modify
-            return (mLoadingState.get() == LOADSTATE_PREPARED); 
+            return (mLoadingState.load() == LOADSTATE_PREPARED);
         }
 
         /** Returns true if the Resource has been loaded, false otherwise.
@@ -354,7 +354,7 @@ namespace Ogre {
         virtual bool isLoaded(void) const 
         { 
             // No lock required to read this state since no modify
-            return (mLoadingState.get() == LOADSTATE_LOADED); 
+            return (mLoadingState.load() == LOADSTATE_LOADED);
         }
 
         /** Change the Resource loading state to loaded.
@@ -362,7 +362,7 @@ namespace Ogre {
         virtual void setToLoaded(void) 
         { 
             // No lock required to read this state since no modify
-            mLoadingState.set(LOADSTATE_LOADED); 
+            mLoadingState.store(LOADSTATE_LOADED);
         }
 
         /** Returns whether the resource is currently in the process of
@@ -370,14 +370,14 @@ namespace Ogre {
         */
         virtual bool isLoading() const
         {
-            return (mLoadingState.get() == LOADSTATE_LOADING);
+            return (mLoadingState.load() == LOADSTATE_LOADING);
         }
 
         /** Returns the current loading state.
         */
         virtual LoadingState getLoadingState() const
         {
-            return mLoadingState.get();
+            return mLoadingState.load();
         }
 
 

@@ -93,10 +93,10 @@ namespace Ogre {
     void Texture::loadImage( const Image &img )
     {
 
-        LoadingState old = mLoadingState.get();
+        LoadingState old = mLoadingState.load();
         if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED) return;
 
-        if (!mLoadingState.cas(old,LOADSTATE_LOADING)) return;
+        if (!mLoadingState.compare_exchange_strong(old,LOADSTATE_LOADING)) return;
 
         // Scope lock for actual loading
         try
@@ -110,12 +110,12 @@ namespace Ogre {
         catch (...)
         {
             // Reset loading in-progress flag in case failed for some reason
-            mLoadingState.set(old);
+            mLoadingState.store(old);
             // Re-throw
             throw;
         }
 
-        mLoadingState.set(LOADSTATE_LOADED);
+        mLoadingState.store(LOADSTATE_LOADED);
 
         // Notify manager
         if(mCreator)
