@@ -206,7 +206,7 @@ var_to_string(OGRE_CONFIG_MEMTRACK_RELEASE _memtrack_release)
 var_to_string(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR _string)
 
 # threading settings
-if (OGRE_CONFIG_THREADS EQUAL 0)
+if (OGRE_CONFIG_THREADS EQUAL 0 OR OGRE_CONFIG_THREADS EQUAL 3)
 	set(_threads "none")
 elseif (OGRE_CONFIG_THREADS EQUAL 1)
 	set(_threads "resource loading (${OGRE_CONFIG_THREAD_PROVIDER}) [DEPRECATED]")
