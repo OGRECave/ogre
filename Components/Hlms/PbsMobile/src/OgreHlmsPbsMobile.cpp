@@ -40,6 +40,8 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
+#include "OgreCamera.h"
+
 namespace Ogre
 {
     const IdString PbsMobileProperty::HwGammaRead       = IdString( "hw_gamma_read" );

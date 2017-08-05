@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgrePbsMobileShaderCreationData.h"
 #include "OgreTexture.h"
 #include "OgreLogManager.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {

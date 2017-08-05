@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
 #include "Compositor/OgreCompositorShadowNode.h"
+#include "OgreCamera.h"
 
 namespace Ogre
 {

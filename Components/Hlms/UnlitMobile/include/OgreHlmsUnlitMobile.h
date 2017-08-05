@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreHlmsUnlitMobilePrerequisites.h"
 #include "OgreHlms.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreMatrix4.h"
 
 namespace Ogre
 {
