@@ -1438,16 +1438,6 @@ namespace Ogre {
             }
         }
 
-        GLSLESProgramCommon* program = NULL;
-        if (getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            program = GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
-        }
-        else
-        {
-            program = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
-        }
-
         void* pBufferData = 0;
 
         GLVertexArrayObject* vao = static_cast<GLVertexArrayObject*>(op.vertexData->vertexDeclaration);
@@ -1456,13 +1446,12 @@ namespace Ogre {
         if(getCapabilities()->hasCapability(RSC_VAO))
         {
             vao->bind(this);
-            updateVAO = vao->needsUpdate(program, op.vertexData->vertexBufferBinding,
+            updateVAO = vao->needsUpdate(op.vertexData->vertexBufferBinding,
                                          op.vertexData->vertexStart);
         }
 
         if (updateVAO)
-            vao->bindToShader(this, program, op.vertexData->vertexBufferBinding,
-                              op.vertexData->vertexStart);
+            vao->bindToGpu(this, op.vertexData->vertexBufferBinding, op.vertexData->vertexStart);
 
         // We treat index buffer binding inside VAO as volatile, always updating and never relying onto it,
         // as one shared vertex buffer could be rendered with several index buffers, from submeshes and/or LODs
@@ -1480,7 +1469,7 @@ namespace Ogre {
                  ++elemIter)
             {
                 const VertexElement& elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, program);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
             }
         }
 
@@ -2189,12 +2178,12 @@ namespace Ogre {
 
     void GLES2RenderSystem::bindVertexElementToGpu(
         const VertexElement& elem, const HardwareVertexBufferSharedPtr& vertexBuffer,
-        const size_t vertexStart, GLSLProgramCommon* program)
+        const size_t vertexStart)
     {
         VertexElementSemantic sem = elem.getSemantic();
         unsigned short elemIndex = elem.getIndex();
 
-        if (!program->isAttributeValid(sem, elemIndex))
+        if (!GLSLProgramCommon::isAttributeValid(sem, elemIndex))
         {
             return;
         }
@@ -2208,7 +2197,7 @@ namespace Ogre {
         GLboolean normalised = GL_FALSE;
         GLuint attrib = 0;
 
-        attrib = (GLuint)program->getAttributeIndex(sem, elemIndex);
+        attrib = (GLuint)GLSLProgramCommon::getFixedAttributeIndex(sem, elemIndex);
 
         if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
         {

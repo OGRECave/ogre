@@ -56,18 +56,9 @@ namespace Ogre {
         /// @copydoc Resource::calculateSize
         virtual size_t calculateSize(void) const;
 
-        /** Get the attribute index for a given semantic. 
-        @remarks
-            This can be used to identify the attribute index to bind non-builtin
-            attributes like tangent and binormal.
-        */
-        virtual GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
         /** Test whether attribute index for a given semantic is valid. 
         */
         virtual bool isAttributeValid(VertexElementSemantic semantic, uint index);
-
-        /** Get the fixed attribute bindings normally used by GL for a semantic. */
-        static GLuint getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
 
     protected:
         /** Overridden from GpuProgram, do nothing */

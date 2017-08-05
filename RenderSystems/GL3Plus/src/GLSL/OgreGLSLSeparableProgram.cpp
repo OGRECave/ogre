@@ -185,6 +185,9 @@ namespace Ogre
                         return;
                     }
 
+                    if( program->getType() == GPT_VERTEX_PROGRAM )
+                        bindFixedAttributes( programHandle );
+
                     program->attachToProgramObject(programHandle);
                     OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                     OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
@@ -247,39 +250,6 @@ namespace Ogre
     //        OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
     //     }
     // }
-
-
-    GLint GLSLSeparableProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
-    {
-        GLint res = mCustomAttributesIndexes[semantic-1][index];
-        if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
-        {
-            GLuint handle = getVertexShader()->getGLProgramHandle();
-            const char * attString = getAttributeSemanticString(semantic);
-            GLint attrib;
-            OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attString));
-
-            // Sadly position is a special case.
-            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
-            {
-                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, "position"));
-            }
-
-            // For UV and other cases the index is a part of the name.
-            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
-            {
-                String attStringWithSemantic = String(attString) + StringConverter::toString(index);
-                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attStringWithSemantic.c_str()));
-            }
-
-            // Update mCustomAttributesIndexes with the index we found (or didn't find)
-            mCustomAttributesIndexes[semantic - 1][index] = attrib;
-            res = attrib;
-        }
-
-        return res;
-    }
-
 
     void GLSLSeparableProgram::activate(void)
     {

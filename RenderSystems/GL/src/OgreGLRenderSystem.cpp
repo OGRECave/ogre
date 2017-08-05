@@ -58,6 +58,8 @@ THE SOFTWARE.
 
 #include "OgreGLPixelFormat.h"
 
+#include "OgreGLSLProgramCommon.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 extern "C" void glFlushRenderAPPLE();
 #endif
@@ -2764,7 +2766,7 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
 
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, NULL);
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart);
         }
 
         if( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
@@ -2773,7 +2775,7 @@ namespace Ogre {
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, NULL);
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
 
             }
         }
@@ -3498,7 +3500,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLRenderSystem::bindVertexElementToGpu(const VertexElement& elem,
                                                 const HardwareVertexBufferSharedPtr& vertexBuffer,
-                                                const size_t vertexStart, GLSLProgramCommon*)
+                                                const size_t vertexStart)
     {
         void* pBufferData = 0;
         const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get());
@@ -3530,7 +3532,7 @@ namespace Ogre {
 
             if (hwGlBuffer->getIsInstanceData())
             {
-                GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
+                GLint attrib = GLSLProgramCommon::getFixedAttributeIndex(sem, elem.getIndex());
                 glVertexAttribDivisorARB(attrib, hwGlBuffer->getInstanceDataStepRate() );
                 mRenderInstanceAttribsBound.push_back(attrib);
             }
@@ -3542,7 +3544,7 @@ namespace Ogre {
         // builtins may be done this way too
         if (isCustomAttrib)
         {
-            GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
+            GLint attrib = GLSLProgramCommon::getFixedAttributeIndex(sem, elem.getIndex());
             unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
             GLboolean normalised = GL_FALSE;
             switch(elem.getType())

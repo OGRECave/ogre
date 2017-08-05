@@ -113,7 +113,7 @@ namespace Ogre {
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
             void bindVertexElementToGpu(const VertexElement& elem,
                                         const HardwareVertexBufferSharedPtr& vertexBuffer,
-                                        const size_t vertexStart, GLSLProgramCommon* program);
+                                        const size_t vertexStart);
 
             // Mipmap count of the actual bounded texture
             size_t mCurTexMipCount;

@@ -66,8 +66,8 @@ namespace Ogre {
         void notifyChanged() { mNeedsUpdate = true; }
         void notifyContextDestroyed(GLContext* context) { if(mCreatorContext == context) { mCreatorContext = 0; mVAO = 0; } }
         void bind(GLRenderSystemCommon* rs);
-        bool needsUpdate(GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
-        void bindToShader(GLRenderSystemCommon* rs, GLSLProgramCommon* program, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
+        bool needsUpdate(VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
+        void bindToGpu(GLRenderSystemCommon* rs, VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
     };
 
 }

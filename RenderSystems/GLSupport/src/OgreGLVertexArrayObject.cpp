@@ -54,8 +54,7 @@ namespace Ogre {
         rs->_bindVao(mCreatorContext, mVAO);
     }
 
-    bool GLVertexArrayObject::needsUpdate(GLSLProgramCommon* program,
-                                          VertexBufferBinding* vertexBufferBinding,
+    bool GLVertexArrayObject::needsUpdate(VertexBufferBinding* vertexBufferBinding,
                                           size_t vertexStart)
     {
         if(mNeedsUpdate)
@@ -76,10 +75,10 @@ namespace Ogre {
             VertexElementSemantic sem = elem.getSemantic();
             unsigned short elemIndex = elem.getIndex();
 
-            if (!program->isAttributeValid(sem, elemIndex))
+            if (!GLSLProgramCommon::isAttributeValid(sem, elemIndex))
                 continue; // Skip unused elements
 
-            uint32 attrib = (uint32)program->getAttributeIndex(sem, elemIndex);
+            uint32 attrib = (uint32)GLSLProgramCommon::getFixedAttributeIndex(sem, elemIndex);
 
             const HardwareVertexBufferSharedPtr& vertexBuffer = vertexBufferBinding->getBuffer(source);
             AttribBinding binding = {attrib, sem, vertexBuffer.get()};
@@ -100,10 +99,9 @@ namespace Ogre {
         return false;
     }
 
-    void GLVertexArrayObject::bindToShader(GLRenderSystemCommon* rs,
-                                           GLSLProgramCommon* program,
-                                           VertexBufferBinding* vertexBufferBinding,
-                                           size_t vertexStart)
+    void GLVertexArrayObject::bindToGpu(GLRenderSystemCommon* rs,
+                                        VertexBufferBinding* vertexBufferBinding,
+                                        size_t vertexStart)
     {
         mAttribsBound.clear();
         mInstanceAttribsBound.clear();
@@ -123,17 +121,17 @@ namespace Ogre {
             VertexElementSemantic sem = elem.getSemantic();
             unsigned short elemIndex = elem.getIndex();
 
-            if (!program->isAttributeValid(sem, elemIndex))
+            if (!GLSLProgramCommon::isAttributeValid(sem, elemIndex))
                 continue; // Skip unused elements
 
-            uint32 attrib = (uint32)program->getAttributeIndex(sem, elemIndex);
+            uint32 attrib = (uint32)GLSLProgramCommon::getFixedAttributeIndex(sem, elemIndex);
 
             const HardwareVertexBufferSharedPtr& vertexBuffer = vertexBufferBinding->getBuffer(source);
 
             AttribBinding binding = {attrib, sem, vertexBuffer.get()};
             mAttribsBound.push_back(binding);
 
-            rs->bindVertexElementToGpu(elem, vertexBuffer, vertexStart, program);
+            rs->bindVertexElementToGpu(elem, vertexBuffer, vertexStart);
 
             if (vertexBuffer->getIsInstanceData())
                 mInstanceAttribsBound.push_back(attrib);

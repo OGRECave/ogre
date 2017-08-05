@@ -75,8 +75,7 @@ namespace Ogre {
                     GLSLShader* computeProgram);
         virtual ~GLSLProgram(void);
 
-        /// Get the index of a non-standard attribute bound in the linked code
-        virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
+        void bindFixedAttributes(GLuint program);
 
         GLSLShader* getVertexShader() const { return static_cast<GLSLShader*>(mVertexShader); }
         GLSLShader* getHullShader() const { return mHullShader; }

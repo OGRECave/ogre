@@ -63,9 +63,6 @@ namespace Ogre {
         void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
         /// Execute the pass iteration param binding functions for this program
         void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
-
-        /// @copydoc GLGpuProgram::getAttributeIndex
-        GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
         
         /// @copydoc GLGpuProgram::isAttributeValid
         bool isAttributeValid(VertexElementSemantic semantic, uint index);

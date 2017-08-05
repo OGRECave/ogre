@@ -68,7 +68,7 @@ namespace Ogre {
 
         virtual void bindVertexElementToGpu(const VertexElement& elem,
                                             const HardwareVertexBufferSharedPtr& vertexBuffer,
-                                            const size_t vertexStart, GLSLProgramCommon* program) = 0;
+                                            const size_t vertexStart) = 0;
 
         Real getHorizontalTexelOffset(void) { return 0.0; }               // No offset in GL
         Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
