@@ -44,9 +44,7 @@ namespace Ogre
     // Statics
     //-----------------------------------------------------------------------
     ConvexBody::PolygonList ConvexBody::msFreePolygons;
-#if OGRE_THREAD_SUPPORT
     OGRE_STATIC_MUTEX_INSTANCE(ConvexBody::msFreePolygonsMutex);
-#endif
     //-----------------------------------------------------------------------
     void ConvexBody::_initialisePool()
     {

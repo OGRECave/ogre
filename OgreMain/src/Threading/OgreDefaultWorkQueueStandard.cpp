@@ -60,11 +60,7 @@ namespace Ogre
 
         LogManager::getSingleton().stream() <<
             "DefaultWorkQueue('" << mName << "') initialising on thread " <<
-#if OGRE_THREAD_SUPPORT
             OGRE_THREAD_CURRENT_ID
-#else
-            "main"
-#endif
             << ".";
 
 #if OGRE_THREAD_SUPPORT
@@ -111,11 +107,7 @@ namespace Ogre
 
         LogManager::getSingleton().stream() <<
             "DefaultWorkQueue('" << mName << "') shutting down on thread " <<
-#if OGRE_THREAD_SUPPORT
             OGRE_THREAD_CURRENT_ID
-#else
-            "main"
-#endif
             << ".";
 
         mShuttingDown = true;

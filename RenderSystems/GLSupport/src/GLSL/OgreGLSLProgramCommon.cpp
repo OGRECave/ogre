@@ -143,12 +143,12 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
 
 //  a  builtin              custom attrib name
 // ----------------------------------------------
-//  0  gl_Vertex            vertex
+//  0  gl_Vertex            vertex/ position
 //  1  n/a                  blendWeights
 //  2  gl_Normal            normal
 //  3  gl_Color             colour
 //  4  gl_SecondaryColor    secondary_colour
-//  5  gl_FogCoord          fog_coord
+//  5  gl_FogCoord          n/a
 //  7  n/a                  blendIndices
 //  8  gl_MultiTexCoord0    uv0
 //  9  gl_MultiTexCoord1    uv1
@@ -158,8 +158,9 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
 //  13 gl_MultiTexCoord5    uv5
 //  14 gl_MultiTexCoord6    uv6, tangent
 //  15 gl_MultiTexCoord7    uv7, binormal
-GLSLProgramCommon::CustomAttribute GLSLProgramCommon::msCustomAttributes[16] = {
+GLSLProgramCommon::CustomAttribute GLSLProgramCommon::msCustomAttributes[17] = {
     {"vertex", getFixedAttributeIndex(VES_POSITION, 0), VES_POSITION},
+    {"position", getFixedAttributeIndex(VES_POSITION, 0), VES_POSITION}, // allow alias for "vertex"
     {"blendWeights", getFixedAttributeIndex(VES_BLEND_WEIGHTS, 0), VES_BLEND_WEIGHTS},
     {"normal", getFixedAttributeIndex(VES_NORMAL, 0), VES_NORMAL},
     {"colour", getFixedAttributeIndex(VES_DIFFUSE, 0), VES_DIFFUSE},

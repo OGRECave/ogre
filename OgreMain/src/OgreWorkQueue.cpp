@@ -217,11 +217,7 @@ namespace Ogre {
 
             LogManager::getSingleton().stream(LML_TRIVIAL) << 
                 "DefaultWorkQueueBase('" << mName << "') - QUEUED(thread:" <<
-#if OGRE_THREAD_SUPPORT
                 OGRE_THREAD_CURRENT_ID
-#else
-                "main"
-#endif
                 << "): ID=" << rid
                 << " channel=" << channel << " requestType=" << requestType;
 #if OGRE_THREAD_SUPPORT
@@ -260,11 +256,7 @@ namespace Ogre {
 
         LogManager::getSingleton().stream(LML_TRIVIAL) << 
             "DefaultWorkQueueBase('" << mName << "') - REQUEUED(thread:" <<
-#if OGRE_THREAD_SUPPORT
             OGRE_THREAD_CURRENT_ID
-#else
-            "main"
-#endif
             << "): ID=" << rid
                    << " channel=" << channel << " requestType=" << requestType;
 #if OGRE_THREAD_SUPPORT
@@ -631,11 +623,7 @@ namespace Ogre {
 
         StringStream dbgMsg;
         dbgMsg <<
-#if OGRE_THREAD_SUPPORT
-            OGRE_THREAD_CURRENT_ID
-#else
             "main"
-#endif
             << "): ID=" << r->getID() << " channel=" << r->getChannel() 
             << " requestType=" << r->getType();
 
@@ -668,11 +656,7 @@ namespace Ogre {
     {
         StringStream dbgMsg;
         dbgMsg << "thread:" <<
-#if OGRE_THREAD_SUPPORT
             OGRE_THREAD_CURRENT_ID
-#else
-            "main"
-#endif
             << "): ID=" << r->getRequest()->getID()
             << " success=" << r->succeeded() << " messages=[" << r->getMessages() << "] channel=" 
             << r->getRequest()->getChannel() << " requestType=" << r->getRequest()->getType();
