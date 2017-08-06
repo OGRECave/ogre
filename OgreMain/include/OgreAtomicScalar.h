@@ -32,7 +32,13 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgrePlatformInformation.h"
 
-#if (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
+#if OGRE_USE_STD11
+#include <atomic>
+
+namespace Ogre {
+    template<class T> using AtomicScalar = std::atomic<T>;
+}
+#elif (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
 
 // Atomics are not yet supported for the unsigned long long int(ResourceHandle) type as of Clang 5.0. So only GCC for now.
 #if ((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 473))
@@ -74,17 +80,30 @@ namespace Ogre {
             mField = cousin.mField;
         }
 
-        T get (void) const
+        T load() const { return mField; }
+
+        /// @deprecated use load()
+        OGRE_DEPRECATED T get (void) const
         {
             return mField;
         }
 
-        void set (const T &v)
+        void store(const T& v) { mField = v; }
+
+        /// @deprecated use store()
+        OGRE_DEPRECATED void set (const T &v)
         {
             mField = v; 
         }   
 
-        bool cas (const T &old, const T &nu)
+        /// @deprecated use compare_exchange_strong()
+        OGRE_DEPRECATED bool cas (const T &old, const T &nu)
+        {
+            T _old = old;
+            return compare_exchange_strong(_old, nu);
+        }
+
+        bool compare_exchange_strong(T &old, const T &nu)
         {
             return __sync_bool_compare_and_swap (&mField, old, nu);
         }
@@ -235,16 +254,28 @@ namespace Ogre {
             mField = cousin.mField;
         }
 
-        T get (void) const
+        T load() const { return mField; }
+
+        /// @deprecated use load()
+        OGRE_DEPRECATED T get (void) const
         {
             return mField;
         }
 
-        void set (const T &v)
+        void store(const T& v) { mField = v; }
+
+        /// @deprecated use store()
+        OGRE_DEPRECATED void set (const T &v)
         {
             mField = v;
         }   
 
+        bool compare_exchange_strong(T &old, const T &nu)
+        {
+            return cas(old, nu);
+        }
+
+        /// @deprecated use compare_exchange_strong()
         bool cas (const T &old, const T &nu)
         {
             if (sizeof(T)==2) {
@@ -413,7 +444,10 @@ namespace Ogre {
             mField = cousin.mField;
         }
 
-        T get (void) const
+        T load() const { return mField; }
+
+        /// @deprecated use load()
+        OGRE_DEPRECATED T get (void) const
         {
             // no lock required here
             // since get will not interfere with set or cas
@@ -421,12 +455,22 @@ namespace Ogre {
             return mField;
         }
 
-        void set (const T &v)
+        void store(const T& v) { mField = v; }
+
+        /// @deprecated use store()
+        OGRE_DEPRECATED void set (const T &v)
         {
             mField = v;
         }
 
-        bool cas (const T &old, const T &nu)
+        /// @deprecated use compare_exchange_strong()
+        OGRE_DEPRECATED bool cas (const T &old, const T &nu)
+        {
+            T _old = old;
+            return compare_exchange_strong(_old, nu);
+        }
+
+        bool compare_exchange_strong(T &old, const T &nu)
         {
             OGRE_LOCK_AUTO_MUTEX;
             if (mField != old) return false;
