@@ -893,7 +893,6 @@ namespace Ogre
         assert( K != 0 && "A value of K = 0 is invalid!" );
         mEsmK = K;
     }
-#if !OGRE_NO_JSON
     //-----------------------------------------------------------------------------------
     void HlmsUnlit::getDefaultPaths( String &outDataFolderPath, StringVector &outLibraryFoldersPaths )
     {
@@ -915,6 +914,7 @@ namespace Ogre
         //Fill the data folder path
         outDataFolderPath = "Hlms/Unlit/" + shaderSyntax;
     }
+#if !OGRE_NO_JSON
 	//-----------------------------------------------------------------------------------
 	void HlmsUnlit::_loadJson(const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
 		HlmsDatablock *datablock) const
