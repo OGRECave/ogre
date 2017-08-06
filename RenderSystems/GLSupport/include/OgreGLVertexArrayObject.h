@@ -60,10 +60,9 @@ namespace Ogre {
         vector<uint32>::type mInstanceAttribsBound;
         size_t mVertexStart;
 
+        void notifyChanged() { mNeedsUpdate = true; }
     public:
         GLVertexArrayObject();
-
-        void notifyChanged() { mNeedsUpdate = true; }
         void notifyContextDestroyed(GLContext* context) { if(mCreatorContext == context) { mCreatorContext = 0; mVAO = 0; } }
         void bind(GLRenderSystemCommon* rs);
         bool needsUpdate(VertexBufferBinding* vertexBufferBinding, size_t vertexStart);

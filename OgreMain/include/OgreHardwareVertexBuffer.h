@@ -351,6 +351,9 @@ namespace Ogre {
         static bool vertexElementLess(const VertexElement& e1, const VertexElement& e2);
     protected:
         VertexElementList mElementList;
+
+        /** Notify derived class that it is time to invalidate cached state, such as VAO or ID3D11InputLayout */
+        virtual void notifyChanged() {}
     public:
         /// Standard constructor, not you should use HardwareBufferManager::createVertexDeclaration
         VertexDeclaration();
@@ -362,9 +365,6 @@ namespace Ogre {
         const VertexElementList& getElements(void) const;
         /** Get a single element. */
         const VertexElement* getElement(unsigned short index) const;
-
-        /** Notify derived class that it is time to invalidate cached state, such as VAO or ID3D11InputLayout */
-        virtual void notifyChanged() {}
 
         /** Sorts the elements in this list to be compatible with the maximum
             number of rendering APIs / graphics cards.
@@ -420,7 +420,7 @@ namespace Ogre {
         @param index Optional index for multi-input elements like texture coordinates
         @return A reference to the VertexElement added.
         */
-        virtual const VertexElement& addElement(unsigned short source, size_t offset, VertexElementType theType,
+        const VertexElement& addElement(unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
         /** Inserts a new VertexElement at a given position in this declaration.
         @remarks
@@ -435,12 +435,12 @@ namespace Ogre {
         @param index Optional index for multi-input elements like texture coordinates
         @return A reference to the VertexElement added.
         */
-        virtual const VertexElement& insertElement(unsigned short atPosition,
+        const VertexElement& insertElement(unsigned short atPosition,
             unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
 
         /** Remove the element at the given index from this declaration. */
-        virtual void removeElement(unsigned short elem_index);
+        void removeElement(unsigned short elem_index);
 
         /** Remove the element with the given semantic and usage index.
         @remarks
@@ -448,17 +448,17 @@ namespace Ogre {
             as texture coordinates. For other elements this will always be 0 and does
             not refer to the index in the vector.
         */
-        virtual void removeElement(VertexElementSemantic semantic, unsigned short index = 0);
+        void removeElement(VertexElementSemantic semantic, unsigned short index = 0);
 
         /** Remove all elements. */
-        virtual void removeAllElements(void);
+        void removeAllElements(void);
 
         /** Modify an element in-place, params as addElement.
        @remarks
        <b>Please read the information in VertexDeclaration about
         the importance of ordering and structure for compatibility with older D3D drivers</b>.
      */
-        virtual void modifyElement(unsigned short elem_index, unsigned short source, size_t offset, VertexElementType theType,
+        void modifyElement(unsigned short elem_index, unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
 
         /** Finds a VertexElement with the given semantic, and index if there is more than
@@ -466,7 +466,7 @@ namespace Ogre {
         @remarks
             If the element is not found, this method returns null.
         */
-        virtual const VertexElement* findElementBySemantic(VertexElementSemantic sem, unsigned short index = 0) const;
+        const VertexElement* findElementBySemantic(VertexElementSemantic sem, unsigned short index = 0) const;
         /** Based on the current elements, gets the size of the vertex for a given buffer source.
         @param source The buffer binding index for which to get the vertex size.
         */
@@ -476,21 +476,21 @@ namespace Ogre {
             Note that the list of elements is returned by value therefore is separate from
             the declaration as soon as this method returns.
         */
-        virtual VertexElementList findElementsBySource(unsigned short source) const;
+        VertexElementList findElementsBySource(unsigned short source) const;
 
         /** Gets the vertex size defined by this declaration for a given source. */
-        virtual size_t getVertexSize(unsigned short source) const;
+        size_t getVertexSize(unsigned short source) const;
         
         /** Return the index of the next free texture coordinate set which may be added
             to this declaration.
         */
-        virtual unsigned short getNextFreeTextureCoordinate() const;
+        unsigned short getNextFreeTextureCoordinate() const;
 
         /** Clones this declaration. 
         @param mgr Optional HardwareBufferManager to use for creating the clone
             (if null, use the current default).
         */
-        virtual VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0) const;
+        VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0) const;
 
         inline bool operator== (const VertexDeclaration& rhs) const
         {
