@@ -64,14 +64,14 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void Terra::createHeightmapTexture( const Ogre::Image &image )
+    void Terra::createHeightmapTexture( const Ogre::Image &image, const String &imageName )
     {
         destroyHeightmapTexture();
 
         if( image.getBPP() != 8 && image.getBPP() != 16 && image.getFormat() != PF_FLOAT32_R )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "Texture must be 8 bpp, 16 bpp, or 32-bit Float",
+                         "Texture " + imageName + "must be 8 bpp, 16 bpp, or 32-bit Float",
                          "Terra::createHeightmapTexture" );
         }
 
@@ -96,7 +96,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void Terra::createHeightmap( Image &image )
+    void Terra::createHeightmap( Image &image, const String &imageName )
     {
         m_width = image.getWidth();
         m_depth = image.getHeight();
@@ -107,13 +107,13 @@ namespace Ogre
         if( PixelUtil::getComponentCount( image.getFormat() ) != 1 )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "Only grayscale images supported!",
+                         "Only grayscale images supported! " + imageName,
                          "Terra::createHeightmap" );
         }
 
         //image.generateMipmaps( false, Image::FILTER_NEAREST );
 
-        createHeightmapTexture( image );
+        createHeightmapTexture( image, imageName );
 
         m_heightMap.resize( m_width * m_depth );
 
@@ -500,17 +500,17 @@ namespace Ogre
         Ogre::Image image;
         image.load( texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
 
-        load( image, center, dimensions );
+        load( image, center, dimensions, texName );
     }
     //-----------------------------------------------------------------------------------
-    void Terra::load( Image &image, const Vector3 center, const Vector3 &dimensions )
+    void Terra::load( Image &image, const Vector3 center, const Vector3 &dimensions, const String &imageName )
     {
         m_terrainOrigin = center - dimensions * 0.5f;
         m_xzDimensions = Vector2( dimensions.x, dimensions.z );
         m_xzInvDimensions = 1.0f / m_xzDimensions;
         m_height = dimensions.y;
         m_basePixelDimension = 64u;
-        createHeightmap( image );
+        createHeightmap( image, imageName );
 
         m_xzRelativeSize = m_xzDimensions / Vector2( static_cast<Real>(m_width),
                                                      static_cast<Real>(m_depth) );
