@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 #include "OgreCommon.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreMath.h"
+#include "OgreVector3.h"
 
 namespace Ogre {
     /** \addtogroup Core
