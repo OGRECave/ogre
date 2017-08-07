@@ -56,11 +56,11 @@ namespace Ogre
 
         void loadTexture( const rapidjson::Value &json, const char *keyName,
                           TerraTextureTypes textureType, HlmsTerraDatablock *datablock,
-                          PackedTexture textures[NUM_TERRA_TEXTURE_TYPES] );
+                          TerraPackedTexture textures[NUM_TERRA_TEXTURE_TYPES] );
 
         void loadTexture( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                           TerraTextureTypes textureType, HlmsTerraDatablock *datablock,
-                          PackedTexture textures[NUM_TERRA_TEXTURE_TYPES] );
+                          TerraPackedTexture textures[NUM_TERRA_TEXTURE_TYPES] );
 
         void saveTexture( const char *blockName,
                           TerraTextureTypes textureType,

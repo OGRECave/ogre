@@ -263,7 +263,7 @@ namespace Ogre
         return mMetalness[detailMapIdx];
     }
     //-----------------------------------------------------------------------------------
-    void HlmsTerraDatablock::_setTextures( const PackedTexture packedTextures[NUM_TERRA_TEXTURE_TYPES] )
+    void HlmsTerraDatablock::_setTextures( const TerraPackedTexture packedTextures[NUM_TERRA_TEXTURE_TYPES] )
     {
         TerraBakedTexture textures[NUM_TERRA_TEXTURE_TYPES];
 

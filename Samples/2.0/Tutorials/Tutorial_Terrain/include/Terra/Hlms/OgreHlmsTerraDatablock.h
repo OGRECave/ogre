@@ -46,12 +46,12 @@ namespace Ogre
 
     /// Used by JSON serialization, but can also be used outside of it.
     /// @see HlmsTerraDatablock::_setTextures
-    struct PackedTexture
+    struct TerraPackedTexture
     {
         TexturePtr  texture;
         uint16      xIdx;
         HlmsSamplerblock const * samplerblock;
-        PackedTexture() : xIdx( NUM_TERRA_TEXTURE_TYPES ), samplerblock( 0 ) {}
+        TerraPackedTexture() : xIdx( NUM_TERRA_TEXTURE_TYPES ), samplerblock( 0 ) {}
     };
 
     struct TerraBakedTexture
@@ -206,7 +206,7 @@ namespace Ogre
             increased prior to calling this function. We will not increase.
             If null, a default samplerblock will be assigned
         */
-        void _setTextures( const PackedTexture packedTextures[] );
+        void _setTextures( const TerraPackedTexture packedTextures[] );
 
         /** Sets a new texture for rendering. Calling this function may trigger an
             HlmsDatablock::flushRenderables if the texture or the samplerblock changes.
