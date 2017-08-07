@@ -61,10 +61,10 @@ namespace Ogre
 
         /// Creates the Ogre texture based on the image data.
         /// Called by @see createHeightmap
-        void createHeightmapTexture( const String &imageName, const Ogre::Image &image );
+        void createHeightmapTexture( const Ogre::Image &image );
 
         /// Calls createHeightmapTexture, loads image data to our CPU-side buffers
-        void createHeightmap( const String &imageName );
+        void createHeightmap( Image &image );
 
         void createNormalTexture(void);
         void destroyNormalTexture(void);
@@ -111,6 +111,7 @@ namespace Ogre
         void update( const Vector3 &lightDir, float lightEpsilon=1e-6f );
 
         void load( const String &texName, const Vector3 center, const Vector3 &dimensions );
+        void load( Image &image, const Vector3 center, const Vector3 &dimensions );
 
         /** Gets the interpolated height at the given location.
             If outside the bounds, it leaves the height untouched.
