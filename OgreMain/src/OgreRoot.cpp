@@ -1012,9 +1012,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::shutdown(void)
     {
-        if(!mIsInitialised)
-            return;
-
         if(mActiveRenderer)
             mActiveRenderer->_setViewport(NULL);
 
@@ -1023,7 +1020,8 @@ namespace Ogre {
         mResourceBackgroundQueue->shutdown();
         mWorkQueue->shutdown();
 
-        SceneManagerEnumerator::getSingleton().shutdownAll();
+        if(mSceneManagerEnum)
+            mSceneManagerEnum->shutdownAll();
         shutdownPlugins();
         OGRE_DELETE mSceneManagerEnum;
 
