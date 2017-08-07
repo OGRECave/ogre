@@ -441,39 +441,57 @@ namespace Ogre
         return mBrdf;
     }
     //-----------------------------------------------------------------------------------
-//    HlmsTextureManager::TextureMapType HlmsTerraDatablock::suggestMapTypeBasedOnTextureType(
-//                                                                        TerraTextureTypes type )
-//    {
-//        HlmsTextureManager::TextureMapType retVal;
-//        switch( type )
-//        {
-//        default:
-//        case TERRA_DIFFUSE:
-//        case TERRA_SPECULAR:
-//        case TERRA_DETAIL_WEIGHT:
-//        case TERRA_DETAIL0:
-//        case TERRA_DETAIL1:
-//        case TERRA_DETAIL2:
-//        case TERRA_DETAIL3:
-//            retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
-//            break;
+    HlmsTextureManager::TextureMapType HlmsTerraDatablock::suggestMapTypeBasedOnTextureType(
+                                                                        TerraTextureTypes type )
+    {
+        HlmsTextureManager::TextureMapType retVal;
+        switch( type )
+        {
+        default:
+        case TERRA_DIFFUSE:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+            break;
+        case TERRA_DETAIL_WEIGHT:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA;
+            break;
+        case TERRA_DETAIL0:
+        case TERRA_DETAIL1:
+        case TERRA_DETAIL2:
+        case TERRA_DETAIL3:
+#ifdef OGRE_TEXTURE_ATLAS
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DETAIL;
+#else
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+#endif
+            break;
 
-//        case TERRA_DETAIL0_NM:
-//        case TERRA_DETAIL1_NM:
-//        case TERRA_DETAIL2_NM:
-//        case TERRA_DETAIL3_NM:
-//            retVal = HlmsTextureManager::TEXTURE_TYPE_NORMALS;
-//            break;
+        case TERRA_DETAIL0_NM:
+        case TERRA_DETAIL1_NM:
+        case TERRA_DETAIL2_NM:
+        case TERRA_DETAIL3_NM:
+#ifdef OGRE_TEXTURE_ATLAS
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP;
+#else
+            retVal = HlmsTextureManager::TEXTURE_TYPE_NORMALS;
+#endif
+            break;
 
-//        case TERRA_DETAIL_ROUGHNESS:
-//            retVal = HlmsTextureManager::TEXTURE_TYPE_MONOCHROME;asd;
-//            break;
+        case TERRA_DETAIL_ROUGHNESS0:
+        case TERRA_DETAIL_ROUGHNESS1:
+        case TERRA_DETAIL_ROUGHNESS2:
+        case TERRA_DETAIL_ROUGHNESS3:
+        case TERRA_DETAIL_METALNESS0:
+        case TERRA_DETAIL_METALNESS1:
+        case TERRA_DETAIL_METALNESS2:
+        case TERRA_DETAIL_METALNESS3:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_MONOCHROME;
+            break;
 
-//        case TERRA_REFLECTION:
-//            retVal = HlmsTextureManager::TEXTURE_TYPE_ENV_MAP;
-//            break;
-//        }
+        case TERRA_REFLECTION:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_ENV_MAP;
+            break;
+        }
 
-//        return retVal;
-//    }
+        return retVal;
+    }
 }
