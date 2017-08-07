@@ -540,7 +540,7 @@ namespace Ogre {
     public:
         /// Constructor, should not be called direct, use HardwareBufferManager::createVertexBufferBinding
         VertexBufferBinding();
-        virtual ~VertexBufferBinding();
+        ~VertexBufferBinding();
         /** Set a binding, associating a vertex buffer with a given index.
         @remarks
             If the index is already associated with a vertex buffer,
@@ -549,39 +549,39 @@ namespace Ogre {
             You should assign bindings from 0 and not leave gaps, although you can
             bind them in any order.
         */
-        virtual void setBinding(unsigned short index, const HardwareVertexBufferSharedPtr& buffer);
+        void setBinding(unsigned short index, const HardwareVertexBufferSharedPtr& buffer);
         /** Removes an existing binding. */
-        virtual void unsetBinding(unsigned short index);
+        void unsetBinding(unsigned short index);
 
         /** Removes all the bindings. */
-        virtual void unsetAllBindings(void);
+        void unsetAllBindings(void);
 
         /// Gets a read-only version of the buffer bindings
-        virtual const VertexBufferBindingMap& getBindings(void) const;
+        const VertexBufferBindingMap& getBindings(void) const;
 
         /// Gets the buffer bound to the given source index
-        virtual const HardwareVertexBufferSharedPtr& getBuffer(unsigned short index) const;
+        const HardwareVertexBufferSharedPtr& getBuffer(unsigned short index) const;
         /// Gets whether a buffer is bound to the given source index
-        virtual bool isBufferBound(unsigned short index) const;
+        bool isBufferBound(unsigned short index) const;
 
-        virtual size_t getBufferCount(void) const { return mBindingMap.size(); }
+        size_t getBufferCount(void) const { return mBindingMap.size(); }
 
         /** Gets the highest index which has already been set, plus 1.
         @remarks
             This is to assist in binding the vertex buffers such that there are
             not gaps in the list.
         */
-        virtual unsigned short getNextIndex(void) const { return mHighIndex++; }
+        unsigned short getNextIndex(void) const { return mHighIndex++; }
 
         /** Gets the last bound index.
         */
-        virtual unsigned short getLastBoundIndex(void) const;
+        unsigned short getLastBoundIndex(void) const;
 
         typedef map<ushort, ushort>::type BindingIndexMap;
 
         /** Check whether any gaps in the bindings.
         */
-        virtual bool hasGaps(void) const;
+        bool hasGaps(void) const;
 
         /** Remove any gaps in the bindings.
         @remarks
@@ -595,10 +595,10 @@ namespace Ogre {
             translation old index to new index; will be cleared by this method
             before fill-in.
         */
-        virtual void closeGaps(BindingIndexMap& bindingIndexMap);
+        void closeGaps(BindingIndexMap& bindingIndexMap);
 
         /// Returns true if this binding has an element that contains instance data
-        virtual bool getHasInstanceData() const;
+        bool getHasInstanceData() const;
 
 
     };
