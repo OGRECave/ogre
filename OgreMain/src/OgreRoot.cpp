@@ -1012,6 +1012,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::shutdown(void)
     {
+        if(!mIsInitialised)
+            return;
+
         if(mActiveRenderer)
             mActiveRenderer->_setViewport(NULL);
 
