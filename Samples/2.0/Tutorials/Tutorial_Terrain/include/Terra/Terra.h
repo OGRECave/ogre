@@ -129,6 +129,9 @@ namespace Ogre
         //MovableObject overloads
         const String& getMovableType(void) const;
 
+        Camera* getCamera() const                       { return m_camera; }
+        void setCamera( Camera *camera )                { m_camera = camera; }
+
         const ShadowMapper* getShadowMapper(void) const { return m_shadowMapper; }
 
         Ogre::TexturePtr getHeightMapTex(void) const    { return m_heightMapTex; }
