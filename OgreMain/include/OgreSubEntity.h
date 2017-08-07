@@ -146,10 +146,10 @@ namespace Ogre {
         void setMaterial( const MaterialPtr& material );
 
         /** Tells this SubEntity whether to be visible or not. */
-        virtual void setVisible(bool visible);
+        void setVisible(bool visible);
 
         /** Returns whether or not this SubEntity is supposed to be visible. */
-        virtual bool isVisible(void) const;
+        bool isVisible(void) const;
 
         /** Sets the render queue group this SubEntity will be rendered through.
         @remarks
@@ -162,7 +162,7 @@ namespace Ogre {
         @param queueID Enumerated value of the queue group to use. See the
             enum RenderQueueGroupID for what kind of values can be used here.
         */
-        virtual void setRenderQueueGroup(uint8 queueID);
+        void setRenderQueueGroup(uint8 queueID);
 
         /** Sets the render queue group and group priority this SubEntity will be rendered through.
         @remarks
@@ -177,19 +177,19 @@ namespace Ogre {
             enum RenderQueueGroupID for what kind of values can be used here.
         @param priority The priority within a group to use.
         */
-        virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual uint8 getRenderQueueGroup(void) const;
+        uint8 getRenderQueueGroup(void) const;
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual ushort getRenderQueuePriority(void) const;
+        ushort getRenderQueuePriority(void) const;
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual bool isRenderQueueGroupSet(void) const;
+        bool isRenderQueueGroupSet(void) const;
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual bool isRenderQueuePrioritySet(void) const;
+        bool isRenderQueuePrioritySet(void) const;
 
         /** Accessor method to read mesh data.
         */
