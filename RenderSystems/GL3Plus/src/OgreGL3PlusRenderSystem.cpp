@@ -764,7 +764,7 @@ namespace Ogre {
 
             mDriverVersion = mGLSupport->getGLVersion();
 
-            if( !(mDriverVersion.major >= 3 && mDriverVersion.minor >= 3) )
+            if( !mDriverVersion.hasMinVersion( 3, 3 ) )
             {
                 OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
                              "OpenGL 3.3 or greater required. Try updating your drivers.",
@@ -772,14 +772,19 @@ namespace Ogre {
             }
 
             assert( !mVaoManager );
-            mVaoManager = OGRE_NEW GL3PlusVaoManager(
-                              mGLSupport->checkExtension("GL_ARB_buffer_storage"),
-                              !(((mDriverVersion.major >= 4 && mDriverVersion.minor >= 3) ||
-                               mGLSupport->checkExtension("GL_ARB_texture_buffer_range"))),
-                              mGLSupport->checkExtension("GL_ARB_multi_draw_indirect"),
-                              (mDriverVersion.major >= 4 && mDriverVersion.major >= 2) ||
-                              mGLSupport->checkExtension("GL_ARB_base_instance"),
-                              mGLSupport->checkExtension("GL_ARB_shader_storage_buffer_object") );
+            bool supportsArbBufferStorage   = mDriverVersion.hasMinVersion( 4, 4 ) ||
+                    mGLSupport->checkExtension("GL_ARB_buffer_storage");
+            bool emulateTexBuffers          = !(mHasGL43 ||
+                    mGLSupport->checkExtension("GL_ARB_buffer_storage"));
+            bool supportsIndirectBuffers    = mDriverVersion.hasMinVersion( 4, 6 ) ||
+                    mGLSupport->checkExtension("GL_ARB_multi_draw_indirect");
+            bool supportsBaseInstance       = mDriverVersion.hasMinVersion( 4, 2 ) ||
+                    mGLSupport->checkExtension("GL_ARB_base_instance");
+            bool supportsSsbo               = mHasGL43 ||
+                    mGLSupport->checkExtension("GL_ARB_shader_storage_buffer_object");
+            mVaoManager = OGRE_NEW GL3PlusVaoManager( supportsArbBufferStorage, emulateTexBuffers,
+                                                      supportsIndirectBuffers, supportsBaseInstance,
+                                                      supportsSsbo );
 
             //Bind the Draw ID
             OCGE( glGenVertexArrays( 1, &mGlobalVao ) );

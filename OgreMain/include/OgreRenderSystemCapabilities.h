@@ -274,7 +274,11 @@ namespace Ogre
                 if (tokens.size() > 3)
                     build = StringConverter::parseInt(tokens[3]);
             }
+        }
 
+        bool hasMinVersion( int minMajor, int minMinor ) const
+        {
+            return major > minMajor || (major == minMajor && minor >= minMinor);
         }
     };
 
