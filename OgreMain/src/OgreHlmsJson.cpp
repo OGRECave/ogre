@@ -456,7 +456,12 @@ namespace Ogre
             const rapidjson::Value& array = itor->value;
             const rapidjson::SizeType arraySize = array.Size();
             if( arraySize > 0 && array[0].IsString() )
-                datablock->setAlphaTest( parseCompareFunction( array[0].GetString() ) );
+            {
+                CompareFunction alphaTestCmp = parseCompareFunction( array[0].GetString() );
+                if( alphaTestCmp == NUM_COMPARE_FUNCTIONS )
+                    alphaTestCmp = CMPF_ALWAYS_PASS;
+                datablock->setAlphaTest( alphaTestCmp );
+            }
 
             if( arraySize > 1 && array[1].IsNumber() )
                 datablock->setAlphaTestThreshold( static_cast<float>( array[1].GetDouble() ) );
