@@ -29,10 +29,24 @@ Currently only the legacy GL RenderSystem is able to pass all VTests from the su
 
 If you want to dive deeper into the OGRE ecosystem here are your options.
 
+## Who is using it?
+
+**Open Source**
+- [OpenSpace 3D - Open Source Platform For 3D Environments](http://www.openspace3d.com/)
+- [Rigs of Rods - Soft Body Physics Simulator](https://rigsofrods.org/)
+- [Gazebo - Robot simulation](http://gazebosim.org/)
+- [ROS 3D Robot Visualizer](http://wiki.ros.org/rviz)
+
+**Closed Source**
+- [Torchlight II](http://store.steampowered.com/app/200710/Torchlight_II/)
+- [Battlezone 98 Redux](http://store.steampowered.com/app/301650/Battlezone_98_Redux/)
+- [Live Home 3D - Home Design Software](https://www.livehome3d.com/)
+
 ## Literature
-There are 2 books written on OGRE
+There are 3 books written on OGRE
 
 * [OGRE 3D 1.7 Beginner's Guide](https://www.packtpub.com/game-development/ogre-3d-17-beginners-guide)
+* [OGRE 3D 1.7 Application Development Cookbook](https://www.packtpub.com/game-development/ogre-3d-17-application-development-cookbook)
 * [Pro OGRE 3D Programming](https://www.apress.com/us/book/9781590597101)
 
 ## Useful Add-Ons
