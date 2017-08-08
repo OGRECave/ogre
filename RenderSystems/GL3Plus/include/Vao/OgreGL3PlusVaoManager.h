@@ -148,6 +148,8 @@ namespace Ogre
         bool    mArbBufferStorage;
         bool    mEmulateTexBuffers;
 
+        GLint   mMaxVertexAttribs;
+
         static const GLuint VERTEX_ATTRIBUTE_INDEX[VES_COUNT];
         VertexBufferPacked  *mDrawId;
 
@@ -252,6 +254,7 @@ namespace Ogre
         void bindDrawId(void);
 
         bool supportsArbBufferStorage(void) const       { return mArbBufferStorage; }
+        GLint getMaxVertexAttribs(void) const           { return mMaxVertexAttribs; }
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks

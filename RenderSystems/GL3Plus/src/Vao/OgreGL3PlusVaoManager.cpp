@@ -83,6 +83,7 @@ namespace Ogre
                                           bool _supportsSsbo ) :
         mArbBufferStorage( _supportsArbBufferStorage ),
         mEmulateTexBuffers( emulateTexBuffers ),
+        mMaxVertexAttribs( 30 ),
         mDrawId( 0 )
     {
         //Keep pools of 128MB each for static meshes
@@ -93,6 +94,17 @@ namespace Ogre
             mDefaultPoolSize[i] = 32 * 1024 * 1024;
 
         mFrameSyncVec.resize( mDynamicBufferMultiplier, 0 );
+
+        OCGE( glGetIntegerv( GLenum(GL_MAX_VERTEX_ATTRIBS), &mMaxVertexAttribs ) );
+
+        if( mMaxVertexAttribs < 16 )
+        {
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "GL_MAX_VERTEX_ATTRIBS = " + StringConverter::toString( mMaxVertexAttribs ) +
+                         " this value must be >= 16 for Ogre to function "
+                         "properly. Try updating your video card drivers.",
+                         "GL3PlusVaoManager::GL3PlusVaoManager" );
+        }
 
         //The minimum alignment for these buffers is 16 because some
         //places of Ogre assume such alignment for SIMD reasons.

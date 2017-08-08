@@ -358,13 +358,16 @@ namespace Ogre {
             { "uv",             VES_TEXTURE_COORDINATES },
         };
 
-        GLint max_vertex_attribs = 16;
-        glGetIntegerv( GLenum(GL_MAX_VERTEX_ATTRIBS) , &max_vertex_attribs);
+        VaoManager *vaoManagerBase = Root::getSingleton().getRenderSystem()->getVaoManager();
+        GL3PlusVaoManager *vaoManager = static_cast<GL3PlusVaoManager*>( vaoManagerBase );
+
+        const GLint maxVertexAttribs = vaoManager->getMaxVertexAttribs();
+
         for( size_t i=0; i<OGRE_NUM_SEMANTICS - 1; ++i )
         {
             const SemanticNameTable &entry = attributesTable[i];
             GLint attrIdx = GL3PlusVaoManager::getAttributeIndexFor( entry.semantic );
-            if(attrIdx<max_vertex_attribs)
+            if( attrIdx < maxVertexAttribs )
             {
                 OCGE( glBindAttribLocation( programName,
                                             attrIdx,
@@ -381,9 +384,6 @@ namespace Ogre {
                                         ("uv" + StringConverter::toString( i )).c_str() ) );
         }
 
-        assert(max_vertex_attribs>=16);
-
-        VaoManager *vaoManager = Root::getSingleton().getRenderSystem()->getVaoManager();
         if( vaoManager->supportsBaseInstance() )
             OCGE( glBindAttribLocation( programName, 15, "drawId" ) );
     }
