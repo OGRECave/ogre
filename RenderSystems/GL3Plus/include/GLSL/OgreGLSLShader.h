@@ -248,6 +248,8 @@ namespace Ogre {
         */
         void checkAndFixInvalidDefaultPrecisionError( String &message );
 
+        virtual void setUniformBlockBinding( const char *blockName, uint32 bindingSlot );
+
 
         // /// @copydoc Resource::loadImpl
         // void loadImpl(void) {}

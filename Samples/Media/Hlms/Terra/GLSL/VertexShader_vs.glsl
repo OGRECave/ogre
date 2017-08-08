@@ -1,4 +1,5 @@
 @insertpiece( SetCrossPlatformSettings )
+@insertpiece( SetCompatibilityLayer )
 
 out gl_PerVertex
 {
@@ -18,7 +19,9 @@ layout(std140) uniform;
 //So you'll need a total of 24 vertices.
 //in int gl_VertexID;
 
-in uint drawId;
+@property( GL_ARB_base_instance )
+	in uint drawId;
+@end
 
 @insertpiece( custom_vs_attributes )
 
@@ -32,6 +35,7 @@ out block
 @insertpiece( TerraInstanceDecl )
 uniform sampler2D heightMap;
 @insertpiece( custom_vs_uniformDeclaration )
+@property( !GL_ARB_base_instance )uniform uint baseInstance;@end
 // END UNIFORM DECLARATION
 
 @piece( VertexTransform )
@@ -56,6 +60,10 @@ uniform sampler2D heightMap;
 
 void main()
 {
+@property( !GL_ARB_base_instance )
+    uint drawId = baseInstance + uint( gl_InstanceID );
+@end
+
     @insertpiece( custom_vs_preExecution )
 
     CellData cellData = instance.cellData[drawId];

@@ -1,5 +1,6 @@
 @property( false )
 @insertpiece( SetCrossPlatformSettings )
+@insertpiece( SetCompatibilityLayer )
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
@@ -24,6 +25,7 @@ void main()
 @property( hlms_tex_gather )#extension GL_ARB_texture_gather: require@end
 @end
 @property( hlms_amd_trinary_minmax )#extension GL_AMD_shader_trinary_minmax: require@end
+@insertpiece( SetCompatibilityLayer )
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
@@ -49,7 +51,8 @@ uniform sampler2D terrainShadows;
 
 @property( hlms_forwardplus )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
-/*layout(binding = 2) */uniform samplerBuffer f3dLightList;@end
+/*layout(binding = 2) */uniform samplerBuffer f3dLightList;
+@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 @property( envprobe_map )uniform samplerCube	texEnvProbeMap;@end
 

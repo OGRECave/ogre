@@ -972,7 +972,8 @@ namespace Ogre {
 
             // Now run the macro expansion through the supplimentary preprocessor
             Token xt = cpp2.Parse( t );
-            t = xt;
+            if( xt.String )
+                t = xt;
         }
 
         m->Value = t;

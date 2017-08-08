@@ -42,7 +42,8 @@ namespace Ogre {
                              GLSLShader* geometryShader,
                              GLSLShader* fragmentShader,
                              GLSLShader* computeShader)
-        : mVertexShader(vertexShader)
+        : mBaseInstanceLocation( GL_INVALID_INDEX )
+        , mVertexShader(vertexShader)
         , mHullShader(hullShader)
         , mDomainShader(domainShader)
         , mGeometryShader(geometryShader)
@@ -357,12 +358,21 @@ namespace Ogre {
             { "uv",             VES_TEXTURE_COORDINATES },
         };
 
+        VaoManager *vaoManagerBase = Root::getSingleton().getRenderSystem()->getVaoManager();
+        GL3PlusVaoManager *vaoManager = static_cast<GL3PlusVaoManager*>( vaoManagerBase );
+
+        const GLint maxVertexAttribs = vaoManager->getMaxVertexAttribs();
+
         for( size_t i=0; i<OGRE_NUM_SEMANTICS - 1; ++i )
         {
             const SemanticNameTable &entry = attributesTable[i];
-            OCGE( glBindAttribLocation( programName,
-                                        GL3PlusVaoManager::getAttributeIndexFor( entry.semantic ),
-                                        entry.semanticName ) );
+            GLint attrIdx = GL3PlusVaoManager::getAttributeIndexFor( entry.semantic );
+            if( attrIdx < maxVertexAttribs )
+            {
+                OCGE( glBindAttribLocation( programName,
+                                            attrIdx,
+                                            entry.semanticName ) );
+            }
         }
 
         for( size_t i=0; i<8; ++i )
@@ -374,7 +384,15 @@ namespace Ogre {
                                         ("uv" + StringConverter::toString( i )).c_str() ) );
         }
 
-        OCGE( glBindAttribLocation( programName, 15, "drawId" ) );
+        if( vaoManager->supportsBaseInstance() )
+            OCGE( glBindAttribLocation( programName, 15, "drawId" ) );
+    }
+
+    void GLSLProgram::setupBaseInstance( GLuint programName )
+    {
+        VaoManager *vaoManager = Root::getSingleton().getRenderSystem()->getVaoManager();
+        if( !vaoManager->supportsBaseInstance() )
+            mBaseInstanceLocation = glGetUniformLocation( programName, "baseInstance" );
     }
 
 } // namespace Ogre

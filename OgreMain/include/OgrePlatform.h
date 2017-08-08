@@ -495,7 +495,7 @@ typedef signed char int8;
 // We have this issue in OgreMemorySTLAlloc.h - so we see it over and over
 #   pragma warning (disable : 4345)
 #endif
-
+    
 }
 
 #endif

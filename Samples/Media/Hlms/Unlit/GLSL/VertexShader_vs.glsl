@@ -1,4 +1,5 @@
 @insertpiece( SetCrossPlatformSettings )
+@insertpiece( SetCompatibilityLayer )
 
 out gl_PerVertex
 {
@@ -18,7 +19,9 @@ in vec4 vertex;
 @foreach( hlms_uv_count, n )
 in vec@value( hlms_uv_count@n ) uv@n;@end
 
-in uint drawId;
+@property( GL_ARB_base_instance )
+	in uint drawId;
+@end
 
 @insertpiece( custom_vs_attributes )
 
@@ -32,9 +35,10 @@ out block
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
 @insertpiece( InstanceDecl )
-layout(binding = 0) uniform samplerBuffer worldMatBuf;
-@property( texture_matrix )layout(binding = 1) uniform samplerBuffer animationMatrixBuf;@end
+/*layout(binding = 0) */uniform samplerBuffer worldMatBuf;
+@property( texture_matrix )/*layout(binding = 1) */uniform samplerBuffer animationMatrixBuf;@end
 @insertpiece( custom_vs_uniformDeclaration )
+@property( !GL_ARB_base_instance )uniform uint baseInstance;@end
 // END UNIFORM DECLARATION
 
 @property( !hlms_identity_world )
@@ -49,6 +53,10 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 void main()
 {
+@property( !GL_ARB_base_instance )
+    uint drawId = baseInstance + uint( gl_InstanceID );
+@end
+    
 	@insertpiece( custom_vs_preExecution )
 	@property( !hlms_identity_world )
 		mat4 worldViewProj;
@@ -77,7 +85,7 @@ void main()
 @foreach( out_uv_count, n )
 	@property( out_uv@n_texture_matrix )
 		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.worldMaterialIdx[drawId].x << 4u) + @value( out_uv@n_tex_unit )u );
-		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = (vec4( uv@value( out_uv@n_source_uv ).xy, 0, 1 ) * textureMatrix).xy;
+ 		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = (vec4( uv@value( out_uv@n_source_uv ).xy, 0, 1 ) * textureMatrix).xy;
 	@end @property( !out_uv@n_texture_matrix )
 		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@value( out_uv@n_source_uv ).xy;
 	@end @end

@@ -98,7 +98,7 @@ namespace Ogre
     const IdString HlmsBaseProp::UvCount5           = IdString( "hlms_uv_count5" );
     const IdString HlmsBaseProp::UvCount6           = IdString( "hlms_uv_count6" );
     const IdString HlmsBaseProp::UvCount7           = IdString( "hlms_uv_count7" );
-
+    
     //Change per frame (grouped together with scene pass)
     const IdString HlmsBaseProp::LightsDirectional  = IdString( "hlms_lights_directional" );
     const IdString HlmsBaseProp::LightsDirNonCaster = IdString( "hlms_lights_directional_non_caster" );
@@ -149,6 +149,7 @@ namespace Ogre
     const IdString HlmsBaseProp::Metal          = IdString( "metal" );
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
     const IdString HlmsBaseProp::iOS            = IdString( "iOS" );
+    const IdString HlmsBaseProp::macOS          = IdString( "macOS" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
     const IdString HlmsBaseProp::FastShaderBuildHack= IdString( "fast_shader_build_hack" );
     const IdString HlmsBaseProp::TexGather      = IdString( "hlms_tex_gather" );
@@ -1860,6 +1861,9 @@ namespace Ogre
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 setProperty( HlmsBaseProp::iOS, 1 );
 #endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+                setProperty( HlmsBaseProp::macOS, 1 );
+#endif
                 setProperty( HlmsBaseProp::HighQuality, mHighQuality );
 
                 if( mFastShaderBuildHack )
@@ -2881,6 +2885,28 @@ namespace Ogre
 
                 if( mRenderSystem->checkExtension( "GL_AMD_shader_trinary_minmax" ) )
                     mRsSpecificExtensions.push_back( HlmsBaseProp::GlAmdTrinaryMinMax );
+
+                struct Extensions
+                {
+                    const char *extName;
+                    uint32 minGlVersion;
+                };
+
+                Extensions extensions[] =
+                {
+                    { "GL_ARB_base_instance",               420 },
+                    { "GL_ARB_shading_language_420pack",    420 },
+                    { "GL_ARB_texture_buffer_range",        430 },
+                };
+
+                for( size_t i=0; i<sizeof(extensions) / sizeof(extensions[0]); ++i )
+                {
+                    if( mRenderSystem->getNativeShadingLanguageVersion() >= extensions[i].minGlVersion ||
+                        mRenderSystem->checkExtension( extensions[i].extName ) )
+                    {
+                        mRsSpecificExtensions.push_back( extensions[i].extName );
+                    }
+                }
             }
 
             if( !mDefaultDatablock )

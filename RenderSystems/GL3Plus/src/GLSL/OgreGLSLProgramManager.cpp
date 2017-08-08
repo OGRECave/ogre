@@ -54,7 +54,7 @@ namespace Ogre {
     };
 
     
-    GLSLProgramManager::GLSLProgramManager(const GL3PlusSupport& support) :
+    GLSLProgramManager::GLSLProgramManager( const GL3PlusSupport& support ) :
         mActiveVertexShader(NULL),
         mActiveHullShader(NULL),
         mActiveDomainShader(NULL),
@@ -718,7 +718,12 @@ namespace Ogre {
             // Map uniform block to binding point of GL buffer of
             // shared param bearing the same name.
 
-            GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+            GpuSharedParametersPtr blockSharedParams;
+            try {
+                blockSharedParams = GpuProgramManager::getSingleton().createSharedParameters(uniformName);
+            } catch (Exception& e) {
+                blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+            }
             //TODO error handling for when buffer has no associated shared parameter?
             //if (bufferi == mSharedParamGLBufferMap.end()) continue;
 

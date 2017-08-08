@@ -1117,6 +1117,8 @@ namespace Ogre
         virtual void _render( const CbDrawCallStrip *cmd ) = 0;
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd ) = 0;
         virtual void _renderEmulated( const CbDrawCallStrip *cmd ) = 0;
+        virtual void _renderEmulatedNoBaseInstance( const CbDrawCallIndexed *cmd ) {}
+        virtual void _renderEmulatedNoBaseInstance( const CbDrawCallStrip *cmd ) {}
 
         /// May override the current VertexArrayObject!
         virtual void _startLegacyV1Rendering(void) {}
@@ -1124,6 +1126,8 @@ namespace Ogre
         /// Renders a V1 RenderOperation. Assumes _setRenderOperation has already been called.
         virtual void _render( const v1::CbDrawCallIndexed *cmd ) = 0;
         virtual void _render( const v1::CbDrawCallStrip *cmd ) = 0;
+        virtual void _renderNoBaseInstance( const v1::CbDrawCallIndexed *cmd ) {}
+        virtual void _renderNoBaseInstance( const v1::CbDrawCallStrip *cmd ) {}
 
         virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot);
 

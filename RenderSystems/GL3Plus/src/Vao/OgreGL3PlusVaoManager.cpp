@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusVertexArrayObject.h"
 #include "Vao/OgreGL3PlusBufferInterface.h"
 #include "Vao/OgreGL3PlusConstBufferPacked.h"
+#include "Vao/OgreGL3PlusTexBufferEmulatedPacked.h"
 #include "Vao/OgreGL3PlusTexBufferPacked.h"
 #include "Vao/OgreGL3PlusUavBufferPacked.h"
 #include "Vao/OgreGL3PlusMultiSourceVertexBufferPool.h"
@@ -45,6 +46,7 @@ THE SOFTWARE.
 
 #include "OgreTimer.h"
 #include "OgreStringConverter.h"
+
 
 namespace Ogre
 {
@@ -75,9 +77,13 @@ namespace Ogre
     };
 
     GL3PlusVaoManager::GL3PlusVaoManager( bool _supportsArbBufferStorage,
+                                          bool emulateTexBuffers,
                                           bool _supportsIndirectBuffers,
+                                          bool _supportsBaseInstance,
                                           bool _supportsSsbo ) :
         mArbBufferStorage( _supportsArbBufferStorage ),
+        mEmulateTexBuffers( emulateTexBuffers ),
+        mMaxVertexAttribs( 30 ),
         mDrawId( 0 )
     {
         //Keep pools of 128MB each for static meshes
@@ -89,32 +95,51 @@ namespace Ogre
 
         mFrameSyncVec.resize( mDynamicBufferMultiplier, 0 );
 
+        OCGE( glGetIntegerv( GLenum(GL_MAX_VERTEX_ATTRIBS), &mMaxVertexAttribs ) );
+
+        if( mMaxVertexAttribs < 16 )
+        {
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "GL_MAX_VERTEX_ATTRIBS = " + StringConverter::toString( mMaxVertexAttribs ) +
+                         " this value must be >= 16 for Ogre to function "
+                         "properly. Try updating your video card drivers.",
+                         "GL3PlusVaoManager::GL3PlusVaoManager" );
+        }
+
         //The minimum alignment for these buffers is 16 because some
         //places of Ogre assume such alignment for SIMD reasons.
-        GLint alignment;
-        glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment );
-        mConstBufferAlignment = alignment;
-        glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
-        mTexBufferAlignment = std::max<uint32>( alignment, 16u );
+        GLint alignment = 1; //initial value according to specs
+        OCGE( glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment ) );
+        mConstBufferAlignment = std::max<uint32>( alignment, 16u );
+        mTexBufferAlignment = 16;
+        if( !emulateTexBuffers )
+        {
+            alignment = 1; //initial value according to specs
+            OCGE( glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment ) );
+            mTexBufferAlignment = std::max<uint32>( alignment, 16u );
+        }
         if( _supportsSsbo )
         {
-            glGetIntegerv( GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &alignment );
+            alignment = 1; //initial value according to specs
+            OCGE( glGetIntegerv( GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &alignment ) );
             mUavBufferAlignment = std::max<uint32>( alignment, 16u );
         }
 
-        GLint maxBufferSize;
-        glGetIntegerv( GL_MAX_UNIFORM_BLOCK_SIZE, &maxBufferSize );
+        GLint maxBufferSize = 16384; //minimum value according to specs
+        OCGE( glGetIntegerv( GL_MAX_UNIFORM_BLOCK_SIZE, &maxBufferSize ) );
         mConstBufferMaxSize = static_cast<size_t>( maxBufferSize );
-        glGetIntegerv( GL_MAX_TEXTURE_BUFFER_SIZE, &maxBufferSize );
+        maxBufferSize = 65536; //minimum value according to specs
+        OCGE( glGetIntegerv( GL_MAX_TEXTURE_BUFFER_SIZE, &maxBufferSize ) );
         mTexBufferMaxSize = static_cast<size_t>( maxBufferSize );
         if( _supportsSsbo )
         {
-            glGetIntegerv( GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxBufferSize );
+            OCGE( glGetIntegerv( GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxBufferSize ) );
             mUavBufferMaxSize = static_cast<size_t>( maxBufferSize );
         }
 
         mSupportsPersistentMapping  = mArbBufferStorage;
         mSupportsIndirectBuffers    = _supportsIndirectBuffers;
+        mSupportsBaseInstance       = _supportsBaseInstance;
 
         VertexElement2Vec vertexElements;
         vertexElements.push_back( VertexElement2( VET_UINT1, VES_COUNT ) );
@@ -566,6 +591,15 @@ namespace Ogre
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
+        if( mEmulateTexBuffers )
+        {
+            // Align to the texture size since we must copy the PBO to a texture.
+            ushort maxTexSizeBytes = 2048 * PixelUtil::getNumElemBytes( pixelFormat );
+            // We need another line of maxTexSizeBytes for uploading
+            //to create a rectangle when calling glTexSubImage2D().
+            sizeBytes = sizeBytes = alignToNextMultiple( sizeBytes, maxTexSizeBytes );
+        }
+        
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
             //For dynamic buffers, the size will be 3x times larger
@@ -580,11 +614,22 @@ namespace Ogre
         Vbo &vbo = mVbos[vboFlag][vboIdx];
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
-        TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
-                                                        bufferOffset, requestedSize, 1,
-                                                        (sizeBytes - requestedSize) / 1,
-                                                        bufferType, initialData, keepAsShadow,
-                                                        this, bufferInterface, pixelFormat );
+        TexBufferPacked *retVal;
+
+        if( !mEmulateTexBuffers )
+        {
+            retVal = OGRE_NEW GL3PlusTexBufferPacked( bufferOffset, requestedSize, 1,
+                                                      (sizeBytes - requestedSize) / 1,
+                                                      bufferType, initialData, keepAsShadow,
+                                                      this, bufferInterface, pixelFormat );
+        }
+        else
+        {
+            retVal = OGRE_NEW GL3PlusTexBufferEmulatedPacked( bufferOffset, requestedSize, 1,
+                                                              (sizeBytes - requestedSize) / 1,
+                                                              bufferType, initialData, keepAsShadow,
+                                                              this, bufferInterface, pixelFormat );
+        }
 
         if( initialData )
             bufferInterface->_firstUpload( initialData, 0, requestedSize );

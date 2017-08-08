@@ -68,13 +68,13 @@ namespace Ogre
 
     struct _OgreExport CbDrawCallIndexed : public CbDrawCall
     {
-        CbDrawCallIndexed( bool supportsIndirectBuffers, VertexArrayObject *_vao,
+        CbDrawCallIndexed( int baseInstanceAndIndirectBuffers, VertexArrayObject *_vao,
                            void *_indirectBufferOffset );
     };
 
     struct _OgreExport CbDrawCallStrip : public CbDrawCall
     {
-        CbDrawCallStrip( bool supportsIndirectBuffers, VertexArrayObject *_vao,
+        CbDrawCallStrip( int baseInstanceAndIndirectBuffers, VertexArrayObject *_vao,
                          void *_indirectBufferOffset );
     };
 
@@ -111,12 +111,12 @@ namespace v1
 
     struct _OgreExport CbDrawCallIndexed : public CbDrawCall
     {
-        CbDrawCallIndexed();
+        CbDrawCallIndexed( bool supportsBaseInstance );
     };
 
     struct _OgreExport CbDrawCallStrip : public CbDrawCall
     {
-        CbDrawCallStrip();
+        CbDrawCallStrip( bool supportsBaseInstance );
     };
 }
 }

@@ -448,6 +448,14 @@ namespace Ogre
             mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, GPV_ALL );
         }
 
+        if( !mRenderSystem->getCapabilities()->hasCapability( RSC_CONST_BUFFER_SLOTS_IN_SHADER ) )
+        {
+            //Setting it to the vertex shader will set it to the PSO actually.
+            retVal->pso.vertexShader->setUniformBlockBinding( "PassBuffer", 0 );
+            retVal->pso.vertexShader->setUniformBlockBinding( "MaterialBuf", 1 );
+            retVal->pso.vertexShader->setUniformBlockBinding( "InstanceBuffer", 2 );
+        }
+
         return retVal;
     }
     //-----------------------------------------------------------------------------------

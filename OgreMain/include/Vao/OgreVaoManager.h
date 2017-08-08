@@ -56,6 +56,7 @@ namespace Ogre
 
         bool            mSupportsPersistentMapping;
         bool            mSupportsIndirectBuffers;
+        bool            mSupportsBaseInstance;
         uint8           mDynamicBufferMultiplier;
         uint8           mDynamicBufferCurrentFrame;
         unsigned long   mNextStagingBufferTimestampCheckpoint;
@@ -367,6 +368,7 @@ namespace Ogre
         /// When false, IndirectBufferPacked will emulate the mapping behavior,
         /// and we need to use the emulated calls in RenderSystem.
         bool supportsIndirectBuffers(void) const        { return mSupportsIndirectBuffers; }
+        bool supportsBaseInstance(void) const           { return mSupportsBaseInstance; }
 
         Timer* getTimer(void)               { return mTimer; }
 

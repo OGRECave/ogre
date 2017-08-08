@@ -46,6 +46,7 @@ namespace Ogre
         mDefaultStagingBufferLifetime( 300000 ), //5 minutes
         mSupportsPersistentMapping( false ),
         mSupportsIndirectBuffers( false ),
+        mSupportsBaseInstance( true ),
         mDynamicBufferMultiplier( 3 ),
         mDynamicBufferCurrentFrame( 0 ),
         mNextStagingBufferTimestampCheckpoint( ~0 ),
@@ -55,7 +56,7 @@ namespace Ogre
         mTexBufferAlignment( 256 ),
         mUavBufferAlignment( 256 ),
         mConstBufferMaxSize( 16 * 1024 * 1024 ), //Minimum guaranteed by GL.
-        mTexBufferMaxSize( 128 * 1024 * 1024 ),  //Minimum guaranteed by GL.
+        mTexBufferMaxSize( 64 * 1024 * 1024 ),  //Minimum guaranteed by GL. Intel HD Graphics 3000-5000/Iris provide 64M only
         mUavBufferMaxSize( 16 * 1024 * 1024 )    //Minimum guaranteed by GL.
     {
         mTimer = OGRE_NEW Timer();

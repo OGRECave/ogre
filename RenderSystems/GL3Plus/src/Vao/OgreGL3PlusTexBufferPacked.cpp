@@ -77,7 +77,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void GL3PlusTexBufferPacked::bindBufferVS( uint16 slot, size_t offset, size_t sizeBytes )
     {
-        bindBuffer( slot, offset, sizeBytes );
+        bindBuffer( slot, offset, sizeBytes);
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusTexBufferPacked::bindBufferPS( uint16 slot, size_t offset, size_t sizeBytes )
