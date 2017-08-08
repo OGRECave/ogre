@@ -923,7 +923,7 @@ namespace Ogre
         const HlmsTerraDatablock *datablock = static_cast<const HlmsTerraDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
-        if( OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( lastCacheHash ) != HLMS_USER3 )
+        if( OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( lastCacheHash ) != mType )
         {
             //layout(binding = 0) uniform PassBuffer {} pass
             ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer-1];

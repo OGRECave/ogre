@@ -64,7 +64,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void Terra::createHeightmapTexture( const String &imageName, const Ogre::Image &image )
+    void Terra::createHeightmapTexture( const Ogre::Image &image, const String &imageName )
     {
         destroyHeightmapTexture();
 
@@ -96,12 +96,8 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void Terra::createHeightmap( const String &imageName )
+    void Terra::createHeightmap( Image &image, const String &imageName )
     {
-        Ogre::Image image;
-
-        image.load( imageName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
-
         m_width = image.getWidth();
         m_depth = image.getHeight();
         m_depthWidthRatio = m_depth / (float)(m_width);
@@ -117,7 +113,7 @@ namespace Ogre
 
         //image.generateMipmaps( false, Image::FILTER_NEAREST );
 
-        createHeightmapTexture( imageName, image );
+        createHeightmapTexture( image, imageName );
 
         m_heightMap.resize( m_width * m_depth );
 
@@ -501,12 +497,20 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Terra::load( const String &texName, const Vector3 center, const Vector3 &dimensions )
     {
+        Ogre::Image image;
+        image.load( texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+
+        load( image, center, dimensions, texName );
+    }
+    //-----------------------------------------------------------------------------------
+    void Terra::load( Image &image, const Vector3 center, const Vector3 &dimensions, const String &imageName )
+    {
         m_terrainOrigin = center - dimensions * 0.5f;
         m_xzDimensions = Vector2( dimensions.x, dimensions.z );
         m_xzInvDimensions = 1.0f / m_xzDimensions;
         m_height = dimensions.y;
         m_basePixelDimension = 64u;
-        createHeightmap( texName );
+        createHeightmap( image, imageName );
 
         m_xzRelativeSize = m_xzDimensions / Vector2( static_cast<Real>(m_width),
                                                      static_cast<Real>(m_depth) );
