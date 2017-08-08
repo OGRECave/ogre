@@ -1022,10 +1022,14 @@ namespace Ogre {
 
         if(mSceneManagerEnum)
             mSceneManagerEnum->shutdownAll();
-        shutdownPlugins();
+        if(mFirstTimePostWindowInit)
+            shutdownPlugins();
         OGRE_DELETE mSceneManagerEnum;
+        mSceneManagerEnum = NULL;
 
         OGRE_DELETE mShadowTextureManager;
+        mShadowTextureManager = NULL;
+
         ShadowVolumeExtrudeProgram::shutdown();
         ResourceGroupManager::getSingleton().shutdownAll();
 
