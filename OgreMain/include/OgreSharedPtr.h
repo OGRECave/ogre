@@ -39,13 +39,18 @@ namespace Ogre {
     *  @{
     */
 #if OGRE_USE_STD11
-    struct SharedPtrFreeMethod {
+    struct SPFMDeleteT {
         template<class T>
         void operator()(T* p) {
             OGRE_DELETE_T(p, T, MEMCATEGORY_GENERAL);
         }
     };
-    extern SharedPtrFreeMethod SPFM_DELETE_T;
+    extern SPFMDeleteT SPFM_DELETE_T;
+
+    struct SPFMNone {
+        void operator()(void*) {}
+    };
+    extern SPFMNone SPFM_NONE;
 
     using std::static_pointer_cast;
     using std::dynamic_pointer_cast;

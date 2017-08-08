@@ -81,9 +81,8 @@ namespace Ogre {
             uint32 attrib = (uint32)GLSLProgramCommon::getFixedAttributeIndex(sem, elemIndex);
 
             const HardwareVertexBufferSharedPtr& vertexBuffer = vertexBufferBinding->getBuffer(source);
-            AttribBinding binding = {attrib, sem, vertexBuffer.get()};
-            if (std::find(mAttribsBound.begin(), mAttribsBound.end(), binding) ==
-                mAttribsBound.end())
+            if (std::find(mAttribsBound.begin(), mAttribsBound.end(),
+                          std::make_pair(attrib, vertexBuffer.get())) == mAttribsBound.end())
                 return true;
 
             if (vertexBuffer->getIsInstanceData() &&
@@ -128,8 +127,7 @@ namespace Ogre {
 
             const HardwareVertexBufferSharedPtr& vertexBuffer = vertexBufferBinding->getBuffer(source);
 
-            AttribBinding binding = {attrib, sem, vertexBuffer.get()};
-            mAttribsBound.push_back(binding);
+            mAttribsBound.push_back(std::make_pair(attrib, vertexBuffer.get()));
 
             rs->bindVertexElementToGpu(elem, vertexBuffer, vertexStart);
 

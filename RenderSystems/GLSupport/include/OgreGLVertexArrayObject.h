@@ -45,25 +45,13 @@ namespace Ogre {
         uint32 mVAO;
         bool mNeedsUpdate;
 
-        struct AttribBinding
-        {
-            uint32 index;
-            VertexElementSemantic semantic;
-            HardwareVertexBuffer* buffer;
-
-            bool operator==(const AttribBinding& o) {
-                return index == o.index && semantic == o.semantic && buffer == o.buffer;
-            }
-        };
-
-        vector<AttribBinding>::type mAttribsBound;
+        vector<std::pair<uint32, HardwareVertexBuffer*> >::type mAttribsBound;
         vector<uint32>::type mInstanceAttribsBound;
         size_t mVertexStart;
 
+        void notifyChanged() { mNeedsUpdate = true; }
     public:
         GLVertexArrayObject();
-
-        void notifyChanged() { mNeedsUpdate = true; }
         void notifyContextDestroyed(GLContext* context) { if(mCreatorContext == context) { mCreatorContext = 0; mVAO = 0; } }
         void bind(GLRenderSystemCommon* rs);
         bool needsUpdate(VertexBufferBinding* vertexBufferBinding, size_t vertexStart);

@@ -60,12 +60,10 @@ namespace Ogre {
         void notifyDeviceLost(D3D11Device* device);
         void notifyDeviceRestored(D3D11Device* device);
 
+        void notifyChanged();
     public:
         D3D11VertexDeclaration(D3D11Device &  device);
         ~D3D11VertexDeclaration();
-
-        /** See VertexDeclaration */
-        void notifyChanged();
 
         void bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
     };

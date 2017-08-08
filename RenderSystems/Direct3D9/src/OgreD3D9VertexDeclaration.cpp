@@ -43,47 +43,10 @@ namespace Ogre {
     {
        releaseDeclaration();
     }
-    //-----------------------------------------------------------------------
-    const VertexElement& D3D9VertexDeclaration::addElement(unsigned short source, 
-        size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
+
+    void D3D9VertexDeclaration::notifyChanged()
     {
-        releaseDeclaration();   
-        return VertexDeclaration::addElement(source, offset, theType, semantic, index);
-    }
-    //-----------------------------------------------------------------------------
-    const VertexElement& D3D9VertexDeclaration::insertElement(unsigned short atPosition,
-        unsigned short source, size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
-    {
-        releaseDeclaration();   
-        return VertexDeclaration::insertElement(atPosition, source, offset, theType, semantic, index);
-    }
-    //-----------------------------------------------------------------------
-    void D3D9VertexDeclaration::removeElement(unsigned short elem_index)
-    {
-        VertexDeclaration::removeElement(elem_index);
-        releaseDeclaration();   
-    }
-    //-----------------------------------------------------------------------
-    void D3D9VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
-    {
-        VertexDeclaration::removeElement(semantic, index);
-        releaseDeclaration();   
-    }
-    //-----------------------------------------------------------------------
-    void D3D9VertexDeclaration::removeAllElements(void)
-    {
-        VertexDeclaration::removeAllElements();
-        releaseDeclaration();   
-    }
-    //-----------------------------------------------------------------------
-    void D3D9VertexDeclaration::modifyElement(unsigned short elem_index, 
-        unsigned short source, size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
-    {
-        VertexDeclaration::modifyElement(elem_index, source, offset, theType, semantic, index);
-        releaseDeclaration();       
+        releaseDeclaration();
     }
 
      //-----------------------------------------------------------------------
