@@ -90,8 +90,8 @@ protected:
 		mLightNodes[2] = lightNode;
 
 
-		mViewport->setBackgroundColour(ColourValue(1.0f, 1.0f, 0.8f));
-		mSceneMgr->setFog(Ogre::FOG_LINEAR, ColourValue(1.0f, 1.0f, 0.8f), 0, 15, 100);
+		mViewport->setBackgroundColour(ColourValue(0.8f, 1.0f, 1.0f));
+		mSceneMgr->setFog(Ogre::FOG_LINEAR, ColourValue(0.8f, 1.0f, 1.0f), 0, 15, 100);
 
 		// create a floor mesh resource
 		mFloor = MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -110,7 +110,7 @@ protected:
 		const float startX = (numX - 1) / 2.0f;
 		const float startZ = (numZ - 1) / 2.0f;
 		
-		TexturePtr cubeMap = Ogre::TextureManager::getSingletonPtr()->load("SaintPetersBasilica.dds", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_CUBE_MAP);
+		TexturePtr cubeMap = Ogre::TextureManager::getSingletonPtr()->load("cubescene.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_CUBE_MAP);
 		//TexturePtr anisoTex = Ogre::TextureManager::getSingletonPtr()->load("hlms_aniso_baked.png", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 		//
 		//{			
