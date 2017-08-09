@@ -54,7 +54,7 @@ endif()
 
 if(DEFINED ENV{ANDROID})
     set(CROSS
-        -DANDROID_NATIVE_API_LEVEL=21
+        -DANDROID_NATIVE_API_LEVEL=16
         -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r15b
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/CMake/toolchain/android.toolchain.cmake
         "-DANDROID_ABI=armeabi-v7a with NEON")
