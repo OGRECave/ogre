@@ -61,6 +61,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
 #include "Compositor/Pass/PassUav/OgreCompositorPassUavDef.h"
+#include "Compositor/Pass/OgreCompositorPassProvider.h"
 
 namespace Ogre{
 
@@ -9636,6 +9637,14 @@ namespace Ogre{
             }
 
             mPassDef = target->addPass( PASS_CUSTOM, customId );
+
+            //allow the custom pass provider to add any custom properties to pass definition
+            CompositorManager2* compMgr = Root::getSingleton().getCompositorManager2();
+            CompositorPassProvider* passProv = compMgr->getCompositorPassProvider();
+            if (passProv)
+            {
+                passProv->translateCustomPass(node, mPassDef);
+            }
         }
         else
         {

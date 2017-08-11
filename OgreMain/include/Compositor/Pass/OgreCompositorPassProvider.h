@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorCommon.h"
 #include "OgreCompositorPassDef.h"
+#include "OgreScriptParser.h"
 
 namespace Ogre
 {
@@ -72,7 +73,7 @@ namespace Ogre
     class _OgreExport CompositorPassProvider : public ResourceAlloc
     {
     public:
-        /**
+        /** Called from CompositorTargetDef::addPass when adding a Compositor Pass of type 'custom'
         @param passType
         @param customId
             Arbitrary ID in case there is more than one type of custom pass you want to implement.
@@ -86,9 +87,22 @@ namespace Ogre
                                                CompositorTargetDef *parentTargetDef,
                                                CompositorNodeDef *parentNodeDef ) = 0;
 
+        /** Creates a CompositorPass from a CompositorPassDef for Compositor Pass of type 'custom'
+        @remarks    If you have multiple custom pass types then you will need to use dynamic_cast<>()
+                    on the CompositorPassDef to determine what custom pass it is.
+        */
         virtual CompositorPass* addPass( const CompositorPassDef *definition, Camera *defaultCamera,
                                          CompositorNode *parentNode, const CompositorChannel &target,
                                          SceneManager *sceneManager ) = 0;
+
+        /** Optional override which allows users to define custom properties in the compositor scripts for custom passes.
+        @remarks    Please note this is called after CompositorPassProvider::addPassDef and similar to addPass
+                    you will need to dynamic_cast<>() to determine custom pass type.
+        @param node             The AST node for this pass
+        @param customPassDef    The CompositorPassDef returned in CompositorPassProvider::addPassDef
+
+        */
+        virtual void translateCustomPass(const AbstractNodePtr &node, CompositorPassDef* customPassDef) {}
     };
 
     /** @} */
