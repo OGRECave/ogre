@@ -99,7 +99,10 @@ namespace Ogre {
                         "Mesh::removeSubMesh");
         }
 
-        mSubMeshes.erase( mSubMeshes.begin() + index );
+        SubMeshVec::iterator itor = mSubMeshes.begin() + index;
+        OGRE_DELETE *itor;
+
+        mSubMeshes.erase( itor );
 
         if (isLoaded())
             _dirtyState();

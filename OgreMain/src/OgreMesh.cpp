@@ -129,6 +129,7 @@ namespace v1 {
         }
         SubMeshList::iterator i = mSubMeshList.begin();
         std::advance(i, index);
+        OGRE_DELETE *i;
         mSubMeshList.erase(i);
         
         // Fix up any name/index entries
