@@ -77,7 +77,7 @@ This means every class, type etc should be prefixed with Ogre, e.g. Ogre::Camera
 
 # Overview from 10,000 feet
 
-Shown below is a diagram of some of the core objects and where they ’sit’ in the grand scheme of things. This is not all the classes by a long shot, just a few examples of the more more significant ones to give you an idea of how it slots together. ![](images/uml-overview.png)
+Shown below is a diagram of some of the core objects and where they ’sit’ in the grand scheme of things. This is not all the classes by a long shot, just a few examples of the more more significant ones to give you an idea of how it slots together. ![](images/uml-overview.svg)
 
 At the very top of the diagram is the Root object. This is your ’way in’ to the OGRE system, and it’s where you tend to create the top-level objects that you need to deal with, like scene managers, rendering systems and render windows, loading plugins, all the fundamental stuff. If you don’t know where to start, Root is it for almost everything, although often it will just give you another object which will actually do the detail work, since Root itself is more of an organiser and facilitator object.
 
@@ -1439,7 +1439,7 @@ Notice that the first two param/value pairs are defined in the ExternalTextureSo
 
 This diagram uses ffmpegVideoPlugin as example, but all plug ins will work the same in how they are registered/used here. Also note that TextureSource Plugins are loaded/registered before scripts are parsed. This does not mean that they are initialized... Plugins are not initialized until they are set active! This is to ensure that a rendersystem is set up before the plugins might make a call the rendersystem.
 
-![](images/TextureSource.jpg)
+![](images/TextureSource.svg)
 
 @page Shadows Shadows
 

@@ -1,0 +1,40 @@
+@startuml
+hide empty members
+set namespaceSeparator none
+class ExternalTextureSource {
++ setParameter()
+}
+class ExternalTextureSourceManager {
++ setExternalTextureSource()
++ setCurrentPlugin()
+}
+ExternalTextureSource -up-o ExternalTextureSourceManager
+class MaterialSerializer {
+    * Set "video" plugin active
+    * Parse & Set parameters
+    * Create Texture
+}
+class Plugin_ffmpegVideoSystem {
++ dllStartPlugin()
+}
+object Plugins.cfg {
+    Plugin=Plugin_ffmpegVideoSystem
+    Plugin=..
+    Plugin=..
+}
+Plugins.cfg -- Plugin_ffmpegVideoSystem
+Plugin_ffmpegVideoSystem -down-> ExternalTextureSourceManager
+MaterialSerializer -down-> ExternalTextureSourceManager
+
+object "Sample Material Script" as material {
+pass
+&#123;
+\tfilename test.mpeg
+\tplay_mode play
+\tsound_mode on
+&#125;
+}
+material -- MaterialSerializer
+
+@enduml 
+
