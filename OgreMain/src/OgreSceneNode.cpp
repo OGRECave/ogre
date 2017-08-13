@@ -213,7 +213,13 @@ namespace Ogre {
 #endif
             MovableObject* ret = ITER_VAL(i);
 
+#if OGRE_NODE_STORAGE_LEGACY
             mObjectsByName.erase(i);
+#else
+            std::swap(*i, mObjectsByName.back());
+            mObjectsByName.pop_back();
+#endif
+
             ret->_notifyAttached((SceneNode*)0);
 
             // Make sure bounds get updated (must go right to the top)
@@ -244,7 +250,12 @@ namespace Ogre {
 
         MovableObject* ret = ITER_VAL(it);
 
+#if OGRE_NODE_STORAGE_LEGACY
         mObjectsByName.erase(it);
+#else
+        std::swap(*it, mObjectsByName.back());
+        mObjectsByName.pop_back();
+#endif
         ret->_notifyAttached((SceneNode*)0);
         // Make sure bounds get updated (must go right to the top)
         needUpdate();
@@ -261,7 +272,12 @@ namespace Ogre {
         {
             if (ITER_VAL(i) == obj)
             {
+#if OGRE_NODE_STORAGE_LEGACY
                 mObjectsByName.erase(i);
+#else
+                std::swap(*i, mObjectsByName.back());
+                mObjectsByName.pop_back();
+#endif
                 break;
             }
         }

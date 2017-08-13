@@ -384,7 +384,12 @@ namespace Ogre {
             // cancel any pending update
             cancelUpdate(ret);
 
+#if OGRE_NODE_STORAGE_LEGACY
             mChildren.erase(i);
+#else
+            std::swap(*i, mChildren.back());
+            mChildren.pop_back();
+#endif
             ret->setParent(NULL);
             return ret;
         }
@@ -421,7 +426,12 @@ namespace Ogre {
                 // cancel any pending update
                 cancelUpdate(child);
 
+#if OGRE_NODE_STORAGE_LEGACY
                 mChildren.erase(i);
+#else
+                std::swap(*i, mChildren.back());
+                mChildren.pop_back();
+#endif
                 child->setParent(NULL);
             }
         }
@@ -804,7 +814,12 @@ namespace Ogre {
         // Cancel any pending update
         cancelUpdate(ret);
 
+#if OGRE_NODE_STORAGE_LEGACY
         mChildren.erase(i);
+#else
+        std::swap(*i, mChildren.back());
+        mChildren.pop_back();
+#endif
         ret->setParent(NULL);
 
         return ret;
