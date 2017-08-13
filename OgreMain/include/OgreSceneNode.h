@@ -57,9 +57,15 @@ namespace Ogre {
     class _OgreExport SceneNode : public Node
     {
     public:
+#if OGRE_NODE_STORAGE_LEGACY
         typedef OGRE_HashMap<String, MovableObject*> ObjectMap;
         typedef MapIterator<ObjectMap> ObjectIterator;
         typedef ConstMapIterator<ObjectMap> ConstObjectIterator;
+#else
+        typedef vector<MovableObject*>::type ObjectMap;
+        typedef VectorIterator<ObjectMap> ObjectIterator;
+        typedef ConstVectorIterator<ObjectMap> ConstObjectIterator;
+#endif
 
     protected:
         ObjectMap mObjectsByName;

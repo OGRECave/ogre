@@ -69,9 +69,15 @@ namespace Ogre {
             /// Transform is relative to world space
             TS_WORLD
         };
+#if OGRE_NODE_STORAGE_LEGACY
         typedef OGRE_HashMap<String, Node*> ChildNodeMap;
         typedef MapIterator<ChildNodeMap> ChildNodeIterator;
         typedef ConstMapIterator<ChildNodeMap> ConstChildNodeIterator;
+#else
+        typedef vector<Node*>::type ChildNodeMap;
+        typedef VectorIterator<ChildNodeMap> ChildNodeIterator;
+        typedef ConstVectorIterator<ChildNodeMap> ConstChildNodeIterator;
+#endif
 
         /** Listener which gets called back on Node events.
         */
@@ -119,7 +125,7 @@ namespace Ogre {
     protected:
         /// Pointer to parent node
         Node* mParent;
-        /// Collection of pointers to direct children; hashmap for efficiency
+        /// Collection of pointers to direct children
         ChildNodeMap mChildren;
 
         typedef set<Node*>::type ChildUpdateSet;

@@ -128,7 +128,7 @@ public:
     void _getCullBounds( AxisAlignedBox * ) const;
 
 
-    typedef list< OctreeNode * >::type NodeList;
+    typedef vector< OctreeNode * >::type NodeList;
     /** Public list of SceneNodes attached to this particular octree
     */
     NodeList mNodes;
