@@ -499,6 +499,11 @@ namespace Ogre {
 		frame.origin.y = screenFrame.size.height - frame.size.height - topPt;
         mWindowOriginPt = frame.origin;
 		[mWindow setFrame:frame display:YES];
+
+        // Keep our size up to date
+        NSRect b = [mView bounds];
+        mWidth = _getPixelFromPoint((int)b.size.width);
+        mHeight = _getPixelFromPoint((int)b.size.height);
     }
 
     void CocoaWindow::resize(unsigned int widthPt, unsigned int heightPt)
