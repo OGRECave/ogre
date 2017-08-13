@@ -131,6 +131,7 @@ namespace Ogre {
         NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winxPt = 0, winyPt = 0;
 		int depth = 32;
+        int surfaceOrder = 1;
         NameValuePairList::const_iterator opt;
 		
         mIsFullScreen = fullScreen;
@@ -180,6 +181,10 @@ namespace Ogre {
             opt = miscParams->find("contentScalingFactor");
             if(opt != miscParams->end())
                 mContentScalingFactor = StringConverter::parseReal(opt->second);
+
+            opt = miscParams->find("NSOpenGLCPSurfaceOrder");
+            if(opt != miscParams->end())
+                surfaceOrder = StringConverter::parseInt(opt->second);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			opt = miscParams->find("stereoMode");
@@ -269,6 +274,8 @@ namespace Ogre {
         // Set vsync
         GLint swapInterval = (GLint)mVSync;
         [mGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
+        GLint order = (GLint)surfaceOrder;
+        [mGLContext setValues:&order forParameter:NSOpenGLCPSurfaceOrder];
 
         if(miscParams)
             opt = miscParams->find("externalWindowHandle");
