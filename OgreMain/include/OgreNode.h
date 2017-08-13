@@ -477,12 +477,14 @@ namespace Ogre {
         void addChild(Node* child);
 
         /** Reports the number of child nodes under this one.
+        @deprecated use getChildren()
         */
         uint16 numChildren(void) const { return static_cast< uint16 >( mChildren.size() ); }
 
         /** Gets a pointer to a child node.
         @remarks
             There is an alternate getChild method which returns a named child.
+        @deprecated use getChildren()
         */
         Node* getChild(unsigned short index) const;
 
@@ -499,11 +501,17 @@ namespace Ogre {
             later use, nor should you add / remove children whilst iterating through it;
             store up changes for later. Note that calling methods on returned items in 
             the iterator IS allowed and does not invalidate the iterator.
+        @deprecated use getChildren()
         */
         ChildNodeIterator getChildIterator(void);
 
         /// @overload
         ConstChildNodeIterator getChildIterator(void) const;
+
+#if !OGRE_NODE_STORAGE_LEGACY
+        /// List of sub-nodes of this Node
+        const ChildNodeMap& getChildren() const { return mChildren; }
+#endif
 
         /** Drops the specified child from this node. 
         @remarks

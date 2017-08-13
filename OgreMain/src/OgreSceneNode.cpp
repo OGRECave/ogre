@@ -412,7 +412,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(unsigned short index)
     {
+#if OGRE_NODE_STORAGE_LEGACY
         SceneNode* pChild = static_cast<SceneNode*>(getChild(index));
+#else
+        SceneNode* pChild = static_cast<SceneNode*>(mChildren[index]);
+#endif
         pChild->removeAndDestroyAllChildren();
 
         removeChild(index);
