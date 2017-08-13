@@ -68,11 +68,11 @@ elseif (UNIX)
   if(APPLE AND APPLE_IOS)
     set(OGRE_LIB_RELEASE_PATH "/Release")
   endif(APPLE AND APPLE_IOS)
-  if (APPLE)
+  if (OGRE_BUILD_LIBS_AS_FRAMEWORKS)
     set(OGRE_PLUGIN_PATH "/")
   else()
     set(OGRE_PLUGIN_PATH "/OGRE")
-  endif(APPLE)
+  endif()
   set(OGRE_SAMPLE_PATH "/OGRE/Samples")
 endif ()
 
@@ -232,8 +232,7 @@ function(ogre_config_component LIBNAME)
 endfunction(ogre_config_component)
 
 function(ogre_config_framework LIBNAME)
-  get_target_property(targetType ${LIBNAME} TYPE)
-  if (APPLE AND NOT APPLE_IOS AND NOT (${targetType} STREQUAL "STATIC_LIBRARY"))
+  if (OGRE_BUILD_LIBS_AS_FRAMEWORKS)
       set_target_properties(${LIBNAME} PROPERTIES FRAMEWORK TRUE)
 
       # Set the INSTALL_PATH so that frameworks can be installed in the application package
