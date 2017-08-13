@@ -155,13 +155,20 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Renderable::setMaterialName( const String& name, const String& groupName )
     {
-        MaterialPtr material = MaterialManager::getSingleton().getByName( name, groupName );
+        MaterialPtr material;
+
+        if( !name.empty() )
+            material = MaterialManager::getSingleton().getByName( name, groupName );
 
         if( material.isNull() )
         {
-            LogManager::getSingleton().logMessage( "Can't assign material " + name +
-                " because this Material does not exist. Have you forgotten to define it in a "
-                ".material script?", LML_CRITICAL );
+            if( !name.empty() )
+            {
+                LogManager::getSingleton().logMessage( "Can't assign material " + name +
+                                                       " because this Material does not exist. "
+                                                       "Have you forgotten to define it in a "
+                                                       ".material script?", LML_CRITICAL );
+            }
 
             HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
             setDatablock( hlmsManager->getDefaultDatablock() );
