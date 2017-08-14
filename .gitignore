@@ -4,6 +4,13 @@
 
 # Ignore build directories
 cmake-build-*/
+/build/
+/installed/
+/android-build/
+/embuild/
+/eminstall/
 
 # Meta data of macOS's Finder.app
 .DS_Store
+
+/Samples/Media/RTShaderLib/cache/
