@@ -45,12 +45,12 @@ namespace Ogre {
             OGRE_DELETE_T(p, T, MEMCATEGORY_GENERAL);
         }
     };
-    extern SPFMDeleteT SPFM_DELETE_T;
+    const SPFMDeleteT SPFM_DELETE_T;
 
     struct SPFMNone {
         void operator()(void*) {}
     };
-    extern SPFMNone SPFM_NONE;
+    const SPFMNone SPFM_NONE;
 
     using std::static_pointer_cast;
     using std::dynamic_pointer_cast;
