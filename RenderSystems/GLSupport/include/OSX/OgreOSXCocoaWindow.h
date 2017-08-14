@@ -64,6 +64,7 @@ namespace Ogre {
         String mWindowTitle;
         bool mUseOgreGLView;
         float mContentScalingFactor;
+        NSWindowStyleMask mStyleMask;
         
         int _getPixelFromPoint(int viewPt) const;
         void _setWindowParameters(unsigned int widthPt, unsigned int heightPt);

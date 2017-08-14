@@ -1,0 +1,9 @@
+# Ignore CLion project directory and iml files
+.idea/
+*.iml
+
+# Ignore build directories
+cmake-build-*/
+
+# Meta data of macOS's Finder.app
+.DS_Store

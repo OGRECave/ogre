@@ -63,7 +63,7 @@ namespace Ogre {
 
     CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
         mWindowDelegate(NULL), mActive(false), mClosed(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
-        mUseOgreGLView(true), mContentScalingFactor(1.0)
+        mUseOgreGLView(true), mContentScalingFactor(1.0), mStyleMask(NSResizableWindowMask|NSTitledWindowMask)
     {
         // Set vsync by default to save battery and reduce tearing
     }
@@ -131,6 +131,7 @@ namespace Ogre {
         NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winxPt = 0, winyPt = 0;
 		int depth = 32;
+        int surfaceOrder = 1;
         NameValuePairList::const_iterator opt;
 		
         mIsFullScreen = fullScreen;
@@ -180,6 +181,25 @@ namespace Ogre {
             opt = miscParams->find("contentScalingFactor");
             if(opt != miscParams->end())
                 mContentScalingFactor = StringConverter::parseReal(opt->second);
+
+            opt = miscParams->find("border");
+            if(opt != miscParams->end())
+            {
+                String border = opt->second;
+                if (border == "none")
+                {
+                    mStyleMask = NSBorderlessWindowMask;
+                }
+                else if (border == "fixed")
+                {
+                    mStyleMask = NSTitledWindowMask;
+                }
+                // Default case set in initializer.
+            }
+
+            opt = miscParams->find("NSOpenGLCPSurfaceOrder");
+            if(opt != miscParams->end())
+                surfaceOrder = StringConverter::parseInt(opt->second);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			opt = miscParams->find("stereoMode");
@@ -269,6 +289,8 @@ namespace Ogre {
         // Set vsync
         GLint swapInterval = (GLint)mVSync;
         [mGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
+        GLint order = (GLint)surfaceOrder;
+        [mGLContext setValues:&order forParameter:NSOpenGLCPSurfaceOrder];
 
         if(miscParams)
             opt = miscParams->find("externalWindowHandle");
@@ -499,6 +521,11 @@ namespace Ogre {
 		frame.origin.y = screenFrame.size.height - frame.size.height - topPt;
         mWindowOriginPt = frame.origin;
 		[mWindow setFrame:frame display:YES];
+
+        // Keep our size up to date
+        NSRect b = [mView bounds];
+        mWidth = _getPixelFromPoint((int)b.size.width);
+        mHeight = _getPixelFromPoint((int)b.size.height);
     }
 
     void CocoaWindow::resize(unsigned int widthPt, unsigned int heightPt)
@@ -632,7 +659,7 @@ namespace Ogre {
             windowRect = NSMakeRect(0.0, 0.0, widthPt, heightPt);
 
         mWindow = [[OgreGLWindow alloc] initWithContentRect:windowRect
-                                              styleMask:mIsFullScreen ? NSBorderlessWindowMask : NSResizableWindowMask|NSTitledWindowMask
+                                              styleMask:mIsFullScreen ? NSBorderlessWindowMask : mStyleMask
                                                 backing:NSBackingStoreBuffered
                                                   defer:YES];
         [mWindow setTitle:[NSString stringWithCString:title.c_str() encoding:NSUTF8StringEncoding]];
@@ -718,7 +745,7 @@ namespace Ogre {
                 NSRect viewRect = NSMakeRect(mWindowOriginPt.x, mWindowOriginPt.y, widthPt, heightPt);
                 [mWindow setFrame:viewRect display:YES];
                 [mView setFrame:viewRect];
-                [mWindow setStyleMask:NSResizableWindowMask|NSTitledWindowMask];
+                [mWindow setStyleMask:mStyleMask];
                 [mWindow setOpaque:YES];
                 [mWindow setHidesOnDeactivate:NO];
                 [mWindow setContentView:mView];
