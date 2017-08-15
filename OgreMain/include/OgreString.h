@@ -76,6 +76,14 @@ namespace __gnu_cxx
 #   define strtol_l(ptr, end, base, l) strtol(ptr, end, base)
 #endif
 
+// If compiling with make on macOS, these headers need to be included to get
+// definitions of locale_t, strtod_l, etc...
+// See: http://www.unix.com/man-page/osx/3/strtod_l/
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#   include <stdlib.h>
+#   include <xlocale.h>
+#endif
+
 namespace Ogre {
     /** \addtogroup Core
      *  @{
