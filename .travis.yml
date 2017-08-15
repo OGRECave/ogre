@@ -6,6 +6,9 @@ branches:
     - master
 addons:
   apt:
+    sources:
+    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse"
+    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ trusty-backports universe"
     packages:
     - cmake
     - libxaw7-dev
@@ -19,8 +22,9 @@ addons:
     - libgl1-mesa-dev
     - libglu1-mesa-dev # legacy GL RenderSystem only
     - python3-dev
+    - nvidia-cg-dev
+    - swig3.0
 before_script:
-    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse" && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty-backports universe" && sudo apt-get update -qq && sudo apt-get install -qq nvidia-cg-dev swig3.0 ; fi
     # we start compilation afterwards anyway, so no need to sleep
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
     - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 ; fi
