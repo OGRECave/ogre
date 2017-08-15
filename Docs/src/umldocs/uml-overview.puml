@@ -1,0 +1,47 @@
+@startuml
+'left to right direction
+hide members
+hide methods
+class Root
+package SceneManagement {
+    MovableObject <|-- Entity
+    MovableObject <|-- Camera
+    MovableObject <|-- Light
+    class SceneNode
+    class SceneManager
+}
+package Plugin as Plugin1 #DDD {
+    SceneManager <|-- OctreeSceneManager
+}
+package "Resource Management" {
+    class ResourceGroupManager
+    class ResourceManager
+    class ArchiveFactory
+    class Mesh
+    class Material
+    class GpuProgram
+    class Texture
+}
+package Plugin as Plugin2 #DDD {
+    ArchiveFactory <|-down- CustomArchiveFactory
+}
+package Rendering {
+    class RenderWindow
+    class Renderable
+    class RenderSystem
+    class HardwareBufferManager
+}
+package Plugin as Plugin3 #DDD {
+    Texture <|-- GLTexture
+    RenderSystem <|-- GLRenderSystem
+}
+
+'some dummy connection to get the desired layout
+Root -right[hidden]- SceneManagement
+Light -down[hidden]- Rendering
+Light -down[hidden] "Resource Management"
+ResourceGroupManager -down[hidden]- Texture
+ResourceGroupManager -down[hidden]- ArchiveFactory
+HardwareBufferManager -down[hidden]- RenderSystem
+@enduml 
+

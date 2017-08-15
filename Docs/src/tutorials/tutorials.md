@@ -6,5 +6,6 @@
     - @subpage hlms
     - @subpage trays
     - @subpage volume
+- @subpage External-Texture-Sources
 - @subpage deferred
 - @subpage pczscenemanager

@@ -1,0 +1,29 @@
+@startuml
+hide footbox
+
+SceneManager -> ShaderGenerator: preFindVisObjects
+ShaderGenerator -> SGScheme: validate
+activate SGScheme
+SGScheme -> SGScheme: syncWithSceneLights
+SGScheme -> SGScheme: syncWithSceneFog
+SGScheme -> SGTechniqe: buildRenderState
+deactivate SGScheme
+SGTechniqe -> SGPass: buildRenderState
+activate SGPass
+SGPass -> FFPBuilder: buildFFPRenderState
+SGPass -> SGPass: appendCustomRenderState
+SGPass --> ShaderGenerator: cacheFinalRenderState
+deactivate SGPass
+ShaderGenerator -> SGPass: return RenderState
+SGScheme -> SGTechniqe: acquirePrograms
+SGTechniqe -> SGPass: acquirePrograms
+SGPass -> ProgramManager: acquirePrograms
+activate ProgramManager
+ProgramManager -> ProgramManager: createCpuPrograms
+ProgramManager -> ProgramWriter: writeShaderSourceCode
+activate ProgramWriter
+ProgramWriter --> ProgramManager: return sourceCode
+deactivate ProgramWriter
+ProgramManager -> ProgramManager: createGpuPrograms
+
+@enduml

@@ -80,7 +80,7 @@ mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::Mater
 // Apply the shader generated based techniques.
 mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 ```
-![](CreateShaderBasedTech.PNG)
+![](CreateShaderBasedTech.svg)
 
 ## Runtime shader generation
 During the application runtime the ShaderGenerator instance receives notifications on per frame basis from its target SceneManager.
@@ -90,7 +90,7 @@ The first step is to loop over every SGTechnique associated with this SGScheme a
 The second step is to loop again on every SGTechnique and acquire a program set for each SGPass. The actual acquiring process is done by the ProgramManager that generates CPU program representation, send them to a matching ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
 The result of this entire process is that each technique associated with the SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
 
-![](RuntimeShaderGeneration.PNG)
+![](RuntimeShaderGeneration.svg)
 
 # High system overview
 # Main components
