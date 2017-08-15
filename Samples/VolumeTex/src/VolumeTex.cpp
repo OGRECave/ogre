@@ -24,14 +24,13 @@ same license as the rest of the engine.
 #include "ThingRenderable.h"
 #include "Julia.h"
 
-
+namespace {
 TexturePtr ptex;
 SimpleRenderable *vrend;
 SimpleRenderable *trend;
-Overlay* overlay;
-float xtime = 0.0f;
 SceneNode *snode,*fnode;
 AnimationState* mOgreAnimState = 0;
+}
 
 #ifndef OGRE_STATIC_LIB
 
@@ -128,8 +127,6 @@ void Sample_VolumeTex::setupContent()
 
 bool Sample_VolumeTex::frameRenderingQueued(const FrameEvent &evt)
 {
-    xtime += evt.timeSinceLastFrame;
-    xtime = fmod(xtime, 10.0f);
     //snode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
     //fnode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
     static_cast<ThingRenderable*>(trend)->addTime(evt.timeSinceLastFrame * 0.05f);
