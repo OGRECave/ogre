@@ -124,23 +124,7 @@ namespace OgreBites
 
             if (mTrayMgr->isDialogVisible()) return true;   // don't process any more keys if dialog is up
 
-            if (key == SDLK_F6)   // take a screenshot
-            {
-                mWindow->writeContentsToTimestampedFile("screenshot", ".png");
-            }
-#if OGRE_PROFILING
-            // Toggle visibility of profiler window
-            else if (key == 'p')
-            {
-                Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
-                if (prof)
-                    prof->setEnabled(!prof->getEnabled());
-            }
-#endif // OGRE_PROFILING
-            else {
-                mControls->keyPressed(evt);
-            }
-
+            mControls->keyPressed(evt);
             mCameraMan->keyPressed(evt);
             return true;
         }
