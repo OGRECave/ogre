@@ -119,7 +119,7 @@ ADD_REPR(Radian)
 %include "OgreStringVector.h"
 %template() Ogre::vector<Ogre::String>; // instantiate vector<T>::type
 %template(StringVector) std::vector<Ogre::String>;  // actual vector<T>
-%template() Ogre::SharedPtr<std::vector<Ogre::String> >;
+%template(StringVectorPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
 // Linear Algebra
 %include "OgreVector2.h"
 ADD_REPR(Vector2)
@@ -206,18 +206,18 @@ ADD_REPR(ColourValue)
     %include "OgreParticleEmitterCommands.h"
     %include "OgreParticleEmitter.h"
         %include "OgreParticleEmitterFactory.h"
-    %template() Ogre::SharedPtr<Ogre::Resource>;
+    %template(ResourcePtr) Ogre::SharedPtr<Ogre::Resource>;
     %include "OgreResource.h"
-        %template() Ogre::SharedPtr<Ogre::Texture>;
+        %template(TexturePtr) Ogre::SharedPtr<Ogre::Texture>;
         %include "OgreTexture.h"
-        %template() Ogre::SharedPtr<Ogre::GpuProgram>;
+        %template(GpuProgramPtr) Ogre::SharedPtr<Ogre::GpuProgram>;
         %include "OgreGpuProgram.h"
-            %template() Ogre::SharedPtr<Ogre::HighLevelGpuProgram>;
+            %template(HighLevelGpuProgramPtr) Ogre::SharedPtr<Ogre::HighLevelGpuProgram>;
             %include "OgreHighLevelGpuProgram.h"
 %include "OgreScriptCompiler.h"
 %include "OgreTextureUnitState.h"
 %include "OgreControllerManager.h"
-%template() Ogre::SharedPtr<Ogre::Compositor>;
+%template(CompositorPtr) Ogre::SharedPtr<Ogre::Compositor>;
 %include "OgreCompositor.h"
 %include "OgreCompositionTechnique.h"
 %include "OgreCompositionTargetPass.h"
@@ -257,7 +257,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::AnimationStateSet::getEnabledAnimationStateIterator;
 %include "OgreAnimationState.h"
 %include "OgreAnimation.h"
-%template() Ogre::SharedPtr<Ogre::Skeleton>;
+%template(SkeletonPtr) Ogre::SharedPtr<Ogre::Skeleton>;
 // deprecated
 %ignore Ogre::Skeleton::getRootBone;
 %ignore Ogre::Skeleton::getRootBoneIterator;
@@ -273,7 +273,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::Material::getTechniqueIterator;
 %ignore Ogre::Material::getSupportedTechnique;
 %ignore Ogre::Material::getNumSupportedTechniques;
-%template() Ogre::SharedPtr<Ogre::Material>;
+%template(MaterialPtr) Ogre::SharedPtr<Ogre::Material>;
 %template() Ogre::vector<Ogre::Technique*>;
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
@@ -303,7 +303,7 @@ ADD_REPR(ColourValue)
     %include "OgreNode.h"
         %include "OgreBone.h"
         %include "OgreSceneNode.h"
-    %template() Ogre::SharedPtr<Ogre::ShadowCameraSetup>;
+    %template(ShadowCameraSetupPtr) Ogre::SharedPtr<Ogre::ShadowCameraSetup>;
     %include "OgreShadowCameraSetup.h"
         %include "OgreShadowCameraSetupFocused.h"
         %include "OgreShadowCameraSetupLiSPSM.h"
@@ -352,7 +352,7 @@ ADD_REPR(ColourValue)
 %template(PoseList) std::vector<Ogre::Pose*>;
 %template() Ogre::vector<Ogre::SubMesh*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
-%template() Ogre::SharedPtr<Ogre::Mesh>;
+%template(MeshPtr) Ogre::SharedPtr<Ogre::Mesh>;
 %include "OgreMesh.h"
 %include "OgreSubMesh.h"
 %include "OgreStaticGeometry.h"
