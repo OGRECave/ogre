@@ -69,6 +69,13 @@ namespace Ogre {
         mMaterial->load();
     }
 
+    void SimpleRenderable::setMaterial( const MaterialPtr& mat )
+    {
+        mMaterial = mat;
+        // Won't load twice anyway
+        mMaterial->load();
+    }
+
     const MaterialPtr& SimpleRenderable::getMaterial(void) const
     {
         return mMaterial;
