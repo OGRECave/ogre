@@ -94,7 +94,7 @@
 %include "OgreConfig.h"
 %include "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
-%template(_NameValuePairList) Ogre::map<Ogre::String, Ogre::String>;
+%template() Ogre::map<Ogre::String, Ogre::String>;
 %template(NameValuePairList) std::map<Ogre::String, Ogre::String>;
 %ignore Ogre::findCommandLineOpts; // not needed in python
 
@@ -117,9 +117,9 @@
 ADD_REPR(Degree)
 ADD_REPR(Radian)
 %include "OgreStringVector.h"
-%template(_StringVector) Ogre::vector<Ogre::String>; // instantiate vector<T>::type
+%template() Ogre::vector<Ogre::String>; // instantiate vector<T>::type
 %template(StringVector) std::vector<Ogre::String>;  // actual vector<T>
-%template(StringVectorPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
+%template() Ogre::SharedPtr<std::vector<Ogre::String> >;
 // Linear Algebra
 %include "OgreVector2.h"
 ADD_REPR(Vector2)
@@ -147,9 +147,9 @@ ADD_REPR(Plane)
 %ignore Ogre::ConfigFile::load; // conflicting overloads
 %ignore Ogre::ConfigFile::getSettingsIterator; // deprecated
 %ignore Ogre::ConfigFile::getSectionIterator;
-%template(_SettingsBySection) Ogre::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
+%template() Ogre::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
 %template(SettingsBySection) std::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
-%template(_SettingsMultiMap) Ogre::multimap<Ogre::String, Ogre::String>;
+%template() Ogre::multimap<Ogre::String, Ogre::String>;
 %template(SettingsMultiMap) std::multimap<Ogre::String, Ogre::String>;
 %include "OgreConfigFile.h"
 %feature("valuewrapper") Ogre::Log::Stream;
@@ -196,7 +196,7 @@ ADD_REPR(ColourValue)
 %include "OgreHardwareBuffer.h"
 %include "OgreParticleIterator.h"
 
-%template(_ParameterList) Ogre::vector<Ogre::ParameterDef>;
+%template() Ogre::vector<Ogre::ParameterDef>;
 %ignore std::vector<Ogre::ParameterDef>::resize; // non default constructible
 %ignore std::vector<Ogre::ParameterDef>::vector;
 %template(ParameterList) std::vector<Ogre::ParameterDef>;
@@ -206,18 +206,18 @@ ADD_REPR(ColourValue)
     %include "OgreParticleEmitterCommands.h"
     %include "OgreParticleEmitter.h"
         %include "OgreParticleEmitterFactory.h"
-    %template(ResourcePtr) Ogre::SharedPtr<Ogre::Resource>;
+    %template() Ogre::SharedPtr<Ogre::Resource>;
     %include "OgreResource.h"
-        %template(TexturePtr) Ogre::SharedPtr<Ogre::Texture>;
+        %template() Ogre::SharedPtr<Ogre::Texture>;
         %include "OgreTexture.h"
-        %template(GpuProgramPtr) Ogre::SharedPtr<Ogre::GpuProgram>;
+        %template() Ogre::SharedPtr<Ogre::GpuProgram>;
         %include "OgreGpuProgram.h"
-            %template(HighLevelGpuProgramPtr) Ogre::SharedPtr<Ogre::HighLevelGpuProgram>;
+            %template() Ogre::SharedPtr<Ogre::HighLevelGpuProgram>;
             %include "OgreHighLevelGpuProgram.h"
 %include "OgreScriptCompiler.h"
 %include "OgreTextureUnitState.h"
 %include "OgreControllerManager.h"
-%template(CompositorPtr) Ogre::SharedPtr<Ogre::Compositor>;
+%template() Ogre::SharedPtr<Ogre::Compositor>;
 %include "OgreCompositor.h"
 %include "OgreCompositionTechnique.h"
 %include "OgreCompositionTargetPass.h"
@@ -257,7 +257,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::AnimationStateSet::getEnabledAnimationStateIterator;
 %include "OgreAnimationState.h"
 %include "OgreAnimation.h"
-%template(SkeletonPtr) Ogre::SharedPtr<Ogre::Skeleton>;
+%template() Ogre::SharedPtr<Ogre::Skeleton>;
 // deprecated
 %ignore Ogre::Skeleton::getRootBone;
 %ignore Ogre::Skeleton::getRootBoneIterator;
@@ -273,8 +273,8 @@ ADD_REPR(ColourValue)
 %ignore Ogre::Material::getTechniqueIterator;
 %ignore Ogre::Material::getSupportedTechnique;
 %ignore Ogre::Material::getNumSupportedTechniques;
-%template(MaterialPtr) Ogre::SharedPtr<Ogre::Material>;
-%template(_Techniques) Ogre::vector<Ogre::Technique*>;
+%template() Ogre::SharedPtr<Ogre::Material>;
+%template() Ogre::vector<Ogre::Technique*>;
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
 %ignore Ogre::RenderSystem::addClipPlane(Real, Real, Real, Real);
@@ -303,7 +303,7 @@ ADD_REPR(ColourValue)
     %include "OgreNode.h"
         %include "OgreBone.h"
         %include "OgreSceneNode.h"
-    %template(ShadowCameraSetupPtr) Ogre::SharedPtr<Ogre::ShadowCameraSetup>;
+    %template() Ogre::SharedPtr<Ogre::ShadowCameraSetup>;
     %include "OgreShadowCameraSetup.h"
         %include "OgreShadowCameraSetupFocused.h"
         %include "OgreShadowCameraSetupLiSPSM.h"
@@ -330,7 +330,7 @@ ADD_REPR(ColourValue)
         %include "OgreCamera.h"
         ADD_REPR(Camera)
     %include "OgreManualObject.h"
-    %template(_SubEntityList) Ogre::vector<Ogre::SubEntity*>;
+    %template() Ogre::vector<Ogre::SubEntity*>;
     %template(SubEntityList) std::vector<Ogre::SubEntity*>;
     %include "OgreEntity.h"
     %include "OgreSubEntity.h"
@@ -348,11 +348,11 @@ ADD_REPR(ColourValue)
 %ignore Ogre::Mesh::getPoseCount;
 %ignore Ogre::Mesh::getPose;
 %ignore Ogre::Mesh::getPoseIterator;
-%template(_PoseList) Ogre::vector<Ogre::Pose*>;
+%template() Ogre::vector<Ogre::Pose*>;
 %template(PoseList) std::vector<Ogre::Pose*>;
-%template(_SubMeshList) Ogre::vector<Ogre::SubMesh*>;
+%template() Ogre::vector<Ogre::SubMesh*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
-%template(MeshPtr) Ogre::SharedPtr<Ogre::Mesh>;
+%template() Ogre::SharedPtr<Ogre::Mesh>;
 %include "OgreMesh.h"
 %include "OgreSubMesh.h"
 %include "OgreStaticGeometry.h"
@@ -360,16 +360,16 @@ ADD_REPR(ColourValue)
     %include "OgrePatchMesh.h"
 %include "OgreMeshManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
-%template(_TextureUnitStates) Ogre::vector<Ogre::TextureUnitState*>;
+%template() Ogre::vector<Ogre::TextureUnitState*>;
 %template(TextureUnitStates) std::vector<Ogre::TextureUnitState*>;
 %include "OgrePass.h"
     %ignore Ogre::Technique::getGPUVendorRuleIterator;
     %ignore Ogre::Technique::getGPUDeviceNameRuleIterator;
     %ignore Ogre::Technique::getIlluminationPassIterator;
     %ignore Ogre::Technique::getPassIterator();
-    %template(_Passes) Ogre::vector<Ogre::Pass*>;
+    %template() Ogre::vector<Ogre::Pass*>;
     %template(Passes) std::vector<Ogre::Pass*>;
-    %template(_IlluminationPassList) Ogre::vector<Ogre::IlluminationPass*>;
+    %template() Ogre::vector<Ogre::IlluminationPass*>;
     %template(IlluminationPassList) std::vector<Ogre::IlluminationPass*>;
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);

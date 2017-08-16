@@ -140,6 +140,7 @@ namespace Ogre {
     void STBIImageCodec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         MemoryDataStreamPtr data = static_pointer_cast<MemoryDataStream>(encode(input, pData));
         std::ofstream f(outFileName.c_str(), std::ios::out | std::ios::binary);
 
@@ -150,6 +151,7 @@ namespace Ogre {
         }
 
         f.write((char*)data->getPtr(), data->size());
+#endif
     }
     //---------------------------------------------------------------------
     Codec::DecodeResult STBIImageCodec::decode(DataStreamPtr& input) const

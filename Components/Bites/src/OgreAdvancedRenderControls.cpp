@@ -138,7 +138,19 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
     {
         Ogre::TextureManager::getSingleton().reloadAll();
     }
-
+    else if (key == SDLK_F6)   // take a screenshot
+    {
+        mCamera->getViewport()->getTarget()->writeContentsToTimestampedFile("screenshot", ".png");
+    }
+#if OGRE_PROFILING
+    // Toggle visibility of profiler window
+    else if (key == 'p')
+    {
+        Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
+        if (prof)
+            prof->setEnabled(!prof->getEnabled());
+    }
+#endif // OGRE_PROFILING
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     // Toggle schemes.
     else if (key == SDLK_F2) {
