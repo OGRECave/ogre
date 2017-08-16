@@ -19,7 +19,9 @@
 %include std_string.i
 %include std_pair.i
 %include std_map.i
+#ifdef SWIGPYTHON
 %include std_multimap.i
+#endif
 %include std_vector.i
 %include exception.i
  
@@ -45,20 +47,46 @@
 %ignore Ogre::ExceptionFactory::throwExceptionEx; // deprecated
 %rename(OgreException) Ogre::Exception; // confilcts with Python Exception
 
+#ifdef __ANDROID__
+%{
+#include <android/native_window_jni.h>
+static JavaVM *cached_jvm = 0;
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
+  cached_jvm = jvm;
+  return JNI_VERSION_1_2;
+}
+
+JNIEnv* OgreJNIGetEnv() {
+  JNIEnv *env;
+  jint rc = cached_jvm->GetEnv((void **)&env, JNI_VERSION_1_2);
+  if (rc == JNI_EDETACHED)
+    throw std::runtime_error("current thread not attached");
+  if (rc == JNI_EVERSION)
+    throw std::runtime_error("jni version not supported");
+  return env;
+}
+%}
+#endif
+
+#ifdef SWIG_DIRECTORS
 %feature("director:except") {
     if ($error != NULL) {
         throw Swig::DirectorMethodException();
     }
 }
+#endif
 
 // convert c++ exceptions to language native exceptions
 %exception {
     try {
         $action
-    }  
+    }
+#ifdef SWIG_DIRECTORS
     catch (Swig::DirectorException &e) { 
         SWIG_fail;
     }
+#endif
     catch (const std::exception& e) {
         SWIG_exception(SWIG_RuntimeError, e.what());
     }
@@ -67,15 +95,27 @@
 // connect operator<< to tp_repr
 %ignore ::operator<<;
 %feature("python:slot", "tp_repr", functype="reprfunc") *::__repr__;
+
+#ifdef SWIGJAVA
+#define REPRFUNC toString
+#else
+#define REPRFUNC __repr__
+#endif
+
 %define ADD_REPR(classname)
 %extend Ogre::classname {
-    const std::string __repr__() {
+    const std::string REPRFUNC() {
         std::ostringstream out;
         out << *$self;
         return out.str();
     }
 }
 %enddef
+
+#ifdef SWIGJAVA
+// conflicts with SWIG method
+%ignore *::getType;
+#endif
 
 // connect operator[] to __getitem__
 %feature("python:slot", "sq_item", functype="ssizeargfunc") *::operator[];
@@ -150,11 +190,18 @@ ADD_REPR(Plane)
 %template() Ogre::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
 %template(SettingsBySection) std::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
 %template() Ogre::multimap<Ogre::String, Ogre::String>;
+#ifdef SWIGPYTHON
 %template(SettingsMultiMap) std::multimap<Ogre::String, Ogre::String>;
+#endif
 %include "OgreConfigFile.h"
 %feature("valuewrapper") Ogre::Log::Stream;
 %include "OgreLog.h"
 %include "OgreLogManager.h"
+#ifdef SWIGJAVA
+// conflicts with SWIG interal func
+%ignore Ogre::MemoryDataStream::MemoryDataStream(size_t, bool);
+%ignore Ogre::AtomAbstractNode::getValue;
+#endif
 %include "OgreDataStream.h"
 %include "OgreArchive.h"
 %include "OgreFactoryObj.h"
@@ -196,10 +243,12 @@ ADD_REPR(ColourValue)
 %include "OgreHardwareBuffer.h"
 %include "OgreParticleIterator.h"
 
+#ifndef SWIGJAVA
 %template() Ogre::vector<Ogre::ParameterDef>;
 %ignore std::vector<Ogre::ParameterDef>::resize; // non default constructible
 %ignore std::vector<Ogre::ParameterDef>::vector;
 %template(ParameterList) std::vector<Ogre::ParameterDef>;
+#endif
 %include "OgreStringInterface.h"
     %include "OgreParticleAffector.h"
         %include "OgreParticleAffectorFactory.h"
@@ -227,6 +276,9 @@ ADD_REPR(ColourValue)
 %template(HardwareIndexBufferPtr) Ogre::SharedPtr<Ogre::HardwareIndexBuffer>;
 %include "OgreHardwareIndexBuffer.h"
 %template(HardwarePixelBufferPtr) Ogre::SharedPtr<Ogre::HardwarePixelBuffer>;
+#ifdef __ANDROID__
+%ignore Ogre::HardwarePixelBuffer::lock;  // duplicate definition
+#endif
 %include "OgreHardwarePixelBuffer.h"
 %template(HardwareCounterBufferPtr) Ogre::SharedPtr<Ogre::HardwareCounterBuffer>;
 %include "OgreHardwareCounterBuffer.h"
