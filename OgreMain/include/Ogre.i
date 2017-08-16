@@ -337,6 +337,7 @@ ADD_REPR(ColourValue)
     %include "OgreParticleSystem.h"
     %include "OgreInstancedEntity.h"
     %include "OgreInstanceBatch.h"
+    %ignore Ogre::SimpleRenderable::setMaterial(const String&);
     %include "OgreSimpleRenderable.h"
         %include "OgreRectangle2D.h"
         %include "OgreWireBoundingBox.h"

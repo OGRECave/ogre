@@ -417,11 +417,15 @@ namespace Volume {
             The created chunk.
         */
         virtual Chunk* createInstance(void);
-        
+
         /** Overridden from SimpleRenderable.
             Sets the material of this chunk and all of his children.
         */
-        virtual void setMaterial(const String& matName);
+        void setMaterial(const MaterialPtr& mat);
+
+        /// @overload
+        /// @deprecated use setMaterial(const MaterialPtr& mat)
+        OGRE_DEPRECATED void setMaterial(const String& matName);
 
         /** Sets the material of all chunks of a specific level in the tree.
         This allows LODs where the lower levels (== less detail and more far away)
@@ -431,7 +435,11 @@ namespace Volume {
         @param matName
             The material name to set.
         */
-        virtual void setMaterialOfLevel(size_t level, const String& matName);
+        void setMaterialOfLevel(size_t level, const MaterialPtr& mat);
+
+        /// @overload
+        /// @deprecated use setMaterialOfLevel(size_t level, const MaterialPtr& mat)
+        OGRE_DEPRECATED void setMaterialOfLevel(size_t level, const String& matName);
 
         /** A list of Chunks.
         */

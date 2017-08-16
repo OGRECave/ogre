@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreVolumeChunk.h"
 #include "OgreVolumeMeshBuilder.h"
 #include "OgreVolumeOctreeNode.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre {
 namespace Volume {
@@ -393,17 +394,19 @@ namespace Volume {
             delete textureSource;
         }
 
-        String material = config.getSetting("material");
-        setMaterial(material);
+        MaterialPtr mat = MaterialManager::getSingleton().getByName(config.getSetting("material"));
+        setMaterial(mat);
 
         for (size_t i = 0; i < level; ++i)
         {
             StringStream stream;
             stream << "materialOfLevel" << i;
+
             String materialOfLevel = config.getSetting(stream.str());
             if (materialOfLevel != BLANKSTRING)
             {
-                setMaterialOfLevel(i, materialOfLevel);
+                mat = MaterialManager::getSingleton().getByName(config.getSetting(stream.str()));
+                setMaterialOfLevel(i, mat);
             }
         }
     }
@@ -572,45 +575,54 @@ namespace Volume {
 
     void Chunk::setMaterial(const String& matName)
     {
-        SimpleRenderable::setMaterial(matName);
+        setMaterial(MaterialManager::getSingleton().getByName(matName));
+    }
+
+    void Chunk::setMaterial(const MaterialPtr& mat)
+    {
+        SimpleRenderable::setMaterial(mat);
 
         if (mChildren)
         {
-            mChildren[0]->setMaterial(matName);
+            mChildren[0]->setMaterial(mat);
             if (mChildren[1])
             {
-                mChildren[1]->setMaterial(matName);
-                mChildren[2]->setMaterial(matName);
-                mChildren[3]->setMaterial(matName);
-                mChildren[4]->setMaterial(matName);
-                mChildren[5]->setMaterial(matName);
-                mChildren[6]->setMaterial(matName);
-                mChildren[7]->setMaterial(matName);
+                mChildren[1]->setMaterial(mat);
+                mChildren[2]->setMaterial(mat);
+                mChildren[3]->setMaterial(mat);
+                mChildren[4]->setMaterial(mat);
+                mChildren[5]->setMaterial(mat);
+                mChildren[6]->setMaterial(mat);
+                mChildren[7]->setMaterial(mat);
             }
         }
     }
     
     //-----------------------------------------------------------------------
-
     void Chunk::setMaterialOfLevel(size_t level, const String& matName)
+    {
+        setMaterialOfLevel(level, MaterialManager::getSingleton().getByName(matName));
+    }
+
+    void Chunk::setMaterialOfLevel(size_t level, const MaterialPtr& mat)
     {
         if (level == 0)
         {
-            SimpleRenderable::setMaterial(matName);
+            SimpleRenderable::setMaterial(mat);
         }
         
         if (level > 0 && mChildren)
         {
-            mChildren[0]->setMaterialOfLevel(level - 1, matName);
+            mChildren[0]->setMaterialOfLevel(level - 1, mat);
             if (mChildren[1])
             {
-                mChildren[1]->setMaterialOfLevel(level - 1, matName);
-                mChildren[2]->setMaterialOfLevel(level - 1, matName);
-                mChildren[3]->setMaterialOfLevel(level - 1, matName);
-                mChildren[4]->setMaterialOfLevel(level - 1, matName);
-                mChildren[5]->setMaterialOfLevel(level - 1, matName);
-                mChildren[6]->setMaterialOfLevel(level - 1, matName);
-                mChildren[7]->setMaterialOfLevel(level - 1, matName);
+                mChildren[1]->setMaterialOfLevel(level - 1, mat);
+                mChildren[2]->setMaterialOfLevel(level - 1, mat);
+                mChildren[3]->setMaterialOfLevel(level - 1, mat);
+                mChildren[4]->setMaterialOfLevel(level - 1, mat);
+                mChildren[5]->setMaterialOfLevel(level - 1, mat);
+                mChildren[6]->setMaterialOfLevel(level - 1, mat);
+                mChildren[7]->setMaterialOfLevel(level - 1, mat);
             }
         }
     }
