@@ -306,21 +306,25 @@ namespace Ogre
             };
 
             fbConfig = mGLSupport->selectFBConfig(minAttribs, maxAttribs);
+        }
 
-            // Now check the actual supported fsaa value
-            GLint maxSamples;
-            mGLSupport->getFBConfigAttrib(fbConfig, GLX_SAMPLES, &maxSamples);
-            mFSAA = maxSamples;
+        if (fbConfig)
+        {
+            // Now check the actual fsaa and gamma value
+
+            GLint fsaa;
+            mGLSupport->getFBConfigAttrib(fbConfig, GLX_SAMPLES, &fsaa);            
+            mFSAA = fsaa;
 
             if (gamma != 0)
             {
                 mGLSupport->getFBConfigAttrib(fbConfig, GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &gamma);
             }
-
             mHwGamma = (gamma != 0);
-        }
 
-        if (! fbConfig)
+            LogManager::getSingleton().logMessage("Actual frame buffer FSAA: " + StringConverter::toString(mFSAA) + ", gamma: " + StringConverter::toString(mHwGamma));
+        }
+        else
         {
             // This should never happen.
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unexpected failure to determine a GLXFBConfig","GLXWindow::create");
