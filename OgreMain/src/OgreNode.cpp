@@ -221,7 +221,11 @@ namespace Ogre {
                 itend = mChildren.end();
                 for (it = mChildren.begin(); it != itend; ++it)
                 {
+#if OGRE_NODE_STORAGE_LEGACY
                     Node* child = it->second;
+#else
+                    Node* child = *it;
+#endif
                     child->_update(true, true);
                 }
             }
@@ -340,7 +344,11 @@ namespace Ogre {
                 "Node::addChild");
         }
 
+#if OGRE_NODE_STORAGE_LEGACY
         mChildren.insert(ChildNodeMap::value_type(child->getName(), child));
+#else
+        mChildren.push_back(child);
+#endif
         child->setParent(this);
 
     }
@@ -349,9 +357,13 @@ namespace Ogre {
     {
         if( index < mChildren.size() )
         {
+#if OGRE_NODE_STORAGE_LEGACY
             ChildNodeMap::const_iterator i = mChildren.begin();
             while (index--) ++i;
             return i->second;
+#else
+            return mChildren[index];
+#endif
         }
         else
             return NULL;
@@ -362,12 +374,22 @@ namespace Ogre {
         if (index < mChildren.size())
         {
             ChildNodeMap::iterator i = mChildren.begin();
+#if OGRE_NODE_STORAGE_LEGACY
             while (index--) ++i;
             Node* ret = i->second;
+#else
+            i += index;
+            Node* ret = *i;
+#endif
             // cancel any pending update
             cancelUpdate(ret);
 
+#if OGRE_NODE_STORAGE_LEGACY
             mChildren.erase(i);
+#else
+            std::swap(*i, mChildren.back());
+            mChildren.pop_back();
+#endif
             ret->setParent(NULL);
             return ret;
         }
@@ -381,18 +403,35 @@ namespace Ogre {
         return 0;
     }
     //-----------------------------------------------------------------------
+    struct NodeNameExists {
+        const String& name;
+        bool operator()(const Node* mo) {
+            return mo->getName() == name;
+        }
+    };
     Node* Node::removeChild(Node* child)
     {
         if (child)
         {
+#if OGRE_NODE_STORAGE_LEGACY
             ChildNodeMap::iterator i = mChildren.find(child->getName());
             // ensure it's our child
             if (i != mChildren.end() && i->second == child)
+#else
+            NodeNameExists pred = {child->getName()};
+            ChildNodeMap::iterator i = std::find_if(mChildren.begin(), mChildren.end(), pred);
+            if(i != mChildren.end() && *i == child)
+#endif
             {
                 // cancel any pending update
                 cancelUpdate(child);
 
+#if OGRE_NODE_STORAGE_LEGACY
                 mChildren.erase(i);
+#else
+                std::swap(*i, mChildren.back());
+                mChildren.pop_back();
+#endif
                 child->setParent(NULL);
             }
         }
@@ -665,7 +704,11 @@ namespace Ogre {
         iend = mChildren.end();
         for (i = mChildren.begin(); i != iend; ++i)
         {
+#if OGRE_NODE_STORAGE_LEGACY
             i->second->setParent(0);
+#else
+            (*i)->setParent(0);
+#endif
         }
         mChildren.clear();
         mChildrenToUpdate.clear();
@@ -730,32 +773,53 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Node* Node::getChild(const String& name) const
     {
+#if OGRE_NODE_STORAGE_LEGACY
         ChildNodeMap::const_iterator i = mChildren.find(name);
+#else
+        NodeNameExists pred = {name};
+        ChildNodeMap::const_iterator i = std::find_if(mChildren.begin(), mChildren.end(), pred);
+#endif
 
         if (i == mChildren.end())
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Child node named " + name +
                 " does not exist.", "Node::getChild");
         }
+#if OGRE_NODE_STORAGE_LEGACY
         return i->second;
-
+#else
+        return *i;
+#endif
     }
     //-----------------------------------------------------------------------
     Node* Node::removeChild(const String& name)
     {
+#if OGRE_NODE_STORAGE_LEGACY
         ChildNodeMap::iterator i = mChildren.find(name);
-
+#else
+        NodeNameExists pred = {name};
+        ChildNodeMap::iterator i = std::find_if(mChildren.begin(), mChildren.end(), pred);
+#endif
         if (i == mChildren.end())
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Child node named " + name +
                 " does not exist.", "Node::removeChild");
         }
 
+#if OGRE_NODE_STORAGE_LEGACY
         Node* ret = i->second;
+#else
+        Node* ret = *i;
+#endif
         // Cancel any pending update
         cancelUpdate(ret);
 
+#if OGRE_NODE_STORAGE_LEGACY
         mChildren.erase(i);
+#else
+        std::swap(*i, mChildren.back());
+        mChildren.pop_back();
+#endif
         ret->setParent(NULL);
 
         return ret;

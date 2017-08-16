@@ -57,9 +57,15 @@ namespace Ogre {
     class _OgreExport SceneNode : public Node
     {
     public:
+#if OGRE_NODE_STORAGE_LEGACY
         typedef OGRE_HashMap<String, MovableObject*> ObjectMap;
         typedef MapIterator<ObjectMap> ObjectIterator;
         typedef ConstMapIterator<ObjectMap> ConstObjectIterator;
+#else
+        typedef vector<MovableObject*>::type ObjectMap;
+        typedef VectorIterator<ObjectMap> ObjectIterator;
+        typedef ConstVectorIterator<ObjectMap> ConstObjectIterator;
+#endif
 
     protected:
         ObjectMap mObjectsByName;
@@ -126,12 +132,14 @@ namespace Ogre {
         virtual void attachObject(MovableObject* obj);
 
         /** Reports the number of objects attached to this node.
+        @deprecated use getAttachedObjects()
         */
         unsigned short numAttachedObjects(void) const;
 
         /** Retrieves a pointer to an attached object.
         @remarks Retrieves by index, see alternate version to retrieve by name. The index
         of an object may change as other objects are added / removed.
+        @deprecated use getAttachedObjects()
         */
         MovableObject* getAttachedObject(unsigned short index);
 
@@ -224,6 +232,7 @@ namespace Ogre {
             as transient, and don't add / remove items as you go through the iterator, save changes
             until the end, or retrieve a new iterator after making the change. Making changes to
             the object returned through the iterator is OK though.
+        @deprecated use getAttachedObjects()
         */
         ObjectIterator getAttachedObjectIterator(void) {
             return ObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
@@ -237,10 +246,18 @@ namespace Ogre {
             as transient, and don't add / remove items as you go through the iterator, save changes
             until the end, or retrieve a new iterator after making the change. Making changes to
             the object returned through the iterator is OK though.
+        @deprecated use getAttachedObjects()
         */
         ConstObjectIterator getAttachedObjectIterator(void) const {
             return ConstObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
         }
+
+#if !OGRE_NODE_STORAGE_LEGACY
+        /// The MovableObjects associated with this node
+        const ObjectMap& getAttachedObjects() const {
+            return mObjectsByName;
+        }
+#endif
 
         /** Gets the creator of this scene node. 
         @remarks

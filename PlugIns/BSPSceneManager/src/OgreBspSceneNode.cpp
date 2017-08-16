@@ -28,6 +28,12 @@ THE SOFTWARE.
 #include "OgreBspSceneNode.h"
 #include "OgreBspSceneManager.h"
 
+#if OGRE_NODE_STORAGE_LEGACY
+#define ITER_VAL(it) it->second
+#else
+#define ITER_VAL(it) (*it)
+#endif
+
 namespace Ogre {
 
 
@@ -51,7 +57,7 @@ namespace Ogre {
             itend = mObjectsByName.end();
             for (it = mObjectsByName.begin(); it != itend; ++it)
             {
-                MovableObject* mov = it->second;
+                MovableObject* mov = ITER_VAL(it);
 
                 static_cast<BspSceneManager*>(mCreator)->_notifyObjectMoved(
                     mov, this->_getDerivedPosition());
@@ -83,7 +89,7 @@ namespace Ogre {
         for (i = mObjectsByName.begin(); i != iend; ++i)
         {
             static_cast<BspSceneManager*>(mCreator)
-                ->_notifyObjectDetached(i->second);
+                ->_notifyObjectDetached(ITER_VAL(i));
         }
         SceneNode::detachAllObjects();
     }
@@ -100,13 +106,13 @@ namespace Ogre {
                 {
                     // Equivalent to detaching
                     static_cast<BspSceneManager*>(mCreator)
-                        ->_notifyObjectDetached(i->second);
+                        ->_notifyObjectDetached(ITER_VAL(i));
                 }
                 else
                 {
                     // move deals with re-adding
                     static_cast<BspSceneManager*>(mCreator)->_notifyObjectMoved(
-                        i->second, this->_getDerivedPosition());
+                        ITER_VAL(i), this->_getDerivedPosition());
                 }
             }
         }
