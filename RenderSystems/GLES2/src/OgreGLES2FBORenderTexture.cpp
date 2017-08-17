@@ -318,6 +318,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("[GLES2] : detectFBOFormats is disabled on this platform (due performance reasons)");
 #else
         // Try all formats, and report which ones work as target
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
         GLuint fb = 0, tid = 0;
 
         for(size_t x = 0; x < PF_COUNT; ++x)
@@ -390,7 +391,7 @@ namespace Ogre {
                             }
                         }
                     }
-                    else if(getGLES2RenderSystem()->checkExtension("GL_OES_packed_depth_stencil") )
+                    else if(rs->hasMinGLVersion(3, 0) || rs->checkExtension("GL_OES_packed_depth_stencil") )
                     {
                         // Packed depth/stencil format
                         if (_tryPackedFormat(depthFormats[depth]))

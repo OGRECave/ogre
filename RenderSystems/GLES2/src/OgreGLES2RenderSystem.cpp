@@ -720,8 +720,6 @@ namespace Ogre {
             {
                 stencilBuffer = OGRE_NEW GLES2RenderBuffer( stencilFormat, fbo->getWidth(),
                                                            fbo->getHeight(), fbo->getFSAA() );
-            } else {
-                stencilBuffer = NULL;
             }
 
             // No "custom-quality" multisample for now in GL
