@@ -40,7 +40,7 @@ class _OgreGLExport GLHardwarePixelBufferCommon : public HardwarePixelBuffer
 {
 protected:
     /// Lock a box
-    PixelBox lockImpl(const Image::Box &lockBox,  LockOptions options);
+    PixelBox lockImpl(const Box &lockBox,  LockOptions options);
 
     /// Unlock a box
     void unlockImpl(void);
@@ -57,7 +57,7 @@ protected:
     void freeBuffer();
 
     // Upload a box of pixels to this buffer on the card
-    virtual void upload(const PixelBox &data, const Image::Box &dest);
+    virtual void upload(const PixelBox &data, const Box &dest);
 
     // Download a box of pixels from the card
     virtual void download(const PixelBox &data);

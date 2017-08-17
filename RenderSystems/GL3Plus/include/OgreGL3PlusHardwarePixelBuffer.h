@@ -45,10 +45,10 @@ namespace Ogre {
                                HardwareBuffer::Usage usage);
 
         /// @copydoc HardwarePixelBuffer::blitFromMemory
-        void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
+        void blitFromMemory(const PixelBox &src, const Box &dstBox);
 
         /// @copydoc HardwarePixelBuffer::blitToMemory
-        void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
+        void blitToMemory(const Box &srcBox, const PixelBox &dst);
     };
 
     /** Renderbuffer surface.  Needs FBO extension.

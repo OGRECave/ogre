@@ -73,7 +73,7 @@ namespace Ogre
     {
         float* pDst = mData;
         // Download data
-        Image::Box box(0, 0, mBuffer->getWidth(), mBuffer->getHeight());
+        Box box(0, 0, mBuffer->getWidth(), mBuffer->getHeight());
         uint8* pSrc = static_cast<uint8*>(mBuffer->lock(box, HardwareBuffer::HBL_READ_ONLY).data);
         pSrc += mChannelOffset;
         size_t srcInc = PixelUtil::getNumElemBytes(mBuffer->getFormat());

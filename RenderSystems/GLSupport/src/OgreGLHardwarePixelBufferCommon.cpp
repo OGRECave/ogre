@@ -64,7 +64,7 @@ void GLHardwarePixelBufferCommon::freeBuffer()
     }
 }
 
-PixelBox GLHardwarePixelBufferCommon::lockImpl(const Image::Box& lockBox, LockOptions options)
+PixelBox GLHardwarePixelBufferCommon::lockImpl(const Box& lockBox, LockOptions options)
 {
     allocateBuffer();
     if (options != HardwareBuffer::HBL_DISCARD)
@@ -87,7 +87,7 @@ void GLHardwarePixelBufferCommon::unlockImpl(void)
     freeBuffer();
 }
 
-void GLHardwarePixelBufferCommon::upload(const PixelBox &data, const Image::Box &dest)
+void GLHardwarePixelBufferCommon::upload(const PixelBox &data, const Box &dest)
 {
     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                 "Upload not possible for this pixelbuffer type",

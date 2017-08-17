@@ -49,13 +49,13 @@ namespace Ogre {
         RenderTexture* getRenderTarget(size_t);
 
         /// Upload a box of pixels to this buffer on the card.
-        virtual void upload(const PixelBox &data, const Image::Box &dest);
+        virtual void upload(const PixelBox &data, const Box &dest);
 
         /// Download a box of pixels from the card.
         virtual void download(const PixelBox &data);
 
         /// Hardware implementation of blitFromMemory.
-        virtual void blitFromMemory(const PixelBox &src_orig, const Image::Box &dstBox);
+        virtual void blitFromMemory(const PixelBox &src_orig, const Box &dstBox);
 
         /// Notify TextureBuffer of destruction of render target.
         void _clearSliceRTT(size_t zoffset)
@@ -68,10 +68,10 @@ namespace Ogre {
 
         /// @copydoc HardwarePixelBuffer::blit
         void blit(const HardwarePixelBufferSharedPtr &src,
-                  const Image::Box &srcBox, const Image::Box &dstBox);
+                  const Box &srcBox, const Box &dstBox);
         // Blitting implementation
         void blitFromTexture(GL3PlusTextureBuffer *src,
-                             const Image::Box &srcBox, const Image::Box &dstBox);
+                             const Box &srcBox, const Box &dstBox);
 
     protected:
         // In case this is a texture level.

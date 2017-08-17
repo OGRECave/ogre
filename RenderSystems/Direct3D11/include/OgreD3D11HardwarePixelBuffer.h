@@ -40,7 +40,7 @@ namespace Ogre {
     {
     protected:
         /// Lock a box
-        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
+        PixelBox lockImpl(const Box &lockBox, LockOptions options);
 
         /// Unlock a box
         void unlockImpl(void);
@@ -55,7 +55,7 @@ namespace Ogre {
         // if the usage is static - alloc at lock then use device UpdateSubresource when unlock and free memory
         vector<int8>::type mDataForStaticUsageLock; 
 
-        Image::Box mLockBox;
+        Box mLockBox;
         LockOptions mCurrentLockOptions;
 
         /// Render targets
@@ -77,13 +77,13 @@ namespace Ogre {
             size_t width, size_t height, size_t depth, UINT face, PixelFormat format, HardwareBuffer::Usage usage);
 
         /// @copydoc HardwarePixelBuffer::blit
-        void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
+        void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
 
         /// @copydoc HardwarePixelBuffer::blitFromMemory
-        void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
+        void blitFromMemory(const PixelBox &src, const Box &dstBox);
 
         /// @copydoc HardwarePixelBuffer::blitToMemory
-        void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
+        void blitToMemory(const Box &srcBox, const PixelBox &dst);
 
         /// Internal function to update mipmaps on update of level 0
         void _genMipmaps();
@@ -107,7 +107,7 @@ namespace Ogre {
 
         UINT getFace() const;
         UINT getSubresourceIndex(size_t box_front) const;
-        D3D11_BOX getSubresourceBox(const Image::Box &box) const;
+        D3D11_BOX getSubresourceBox(const Box &box) const;
     };
 };
 #endif

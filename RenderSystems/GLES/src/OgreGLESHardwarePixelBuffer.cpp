@@ -92,7 +92,7 @@ namespace Ogre {
         }
     }
 
-    PixelBox GLESHardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
+    PixelBox GLESHardwarePixelBuffer::lockImpl(const Box &lockBox,  LockOptions options)
     {
         allocateBuffer();
         if (options != HardwareBuffer::HBL_DISCARD &&
@@ -116,7 +116,7 @@ namespace Ogre {
         freeBuffer();
     }
 
-    void GLESHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
+    void GLESHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     {
         if (!mBuffer.contains(dstBox))
         {
@@ -166,7 +166,7 @@ namespace Ogre {
         freeBuffer();
     }
 
-    void GLESHardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBox &dst)
+    void GLESHardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     {
         if (!mBuffer.contains(srcBox))
         {
@@ -209,7 +209,7 @@ namespace Ogre {
         }
     }
 
-    void GLESHardwarePixelBuffer::upload(const PixelBox &data, const Image::Box &dest)
+    void GLESHardwarePixelBuffer::upload(const PixelBox &data, const Box &dest)
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                     "Upload not possible for this pixelbuffer type",
@@ -317,7 +317,7 @@ namespace Ogre {
     }
 #endif
     
-    void GLESTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
+    void GLESTextureBuffer::upload(const PixelBox &data, const Box &dest)
     {
         glBindTexture(mTarget, mTextureID);
         GL_CHECK_ERROR;
@@ -444,7 +444,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------  
-    void GLESTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox)
+    void GLESTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox)
     {
         GLESTextureBuffer *srct = static_cast<GLESTextureBuffer *>(src.get());
         // TODO: Check for FBO support first
@@ -467,7 +467,7 @@ namespace Ogre {
     // Supports compressed formats as both source and destination format, it will use the hardware DXT compressor
     // if available.
     // @author W.J. van der Laan
-    void GLESTextureBuffer::blitFromTexture(GLESTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
+    void GLESTextureBuffer::blitFromTexture(GLESTextureBuffer *src, const Box &srcBox, const Box &dstBox)
     {
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_FBO) == false)
         {
@@ -660,7 +660,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------------  
     // blitFromMemory doing hardware trilinear scaling
-    void GLESTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box &dstBox)
+    void GLESTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Box &dstBox)
     {
         // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
         // - FBO is not supported
@@ -726,7 +726,7 @@ namespace Ogre {
                               0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
         
         // Upload data to 0,0,0 in temporary texture
-        Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
+        Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
         tex.upload(src, tempTarget);
         
         // Blit

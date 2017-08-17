@@ -79,8 +79,8 @@ namespace Ogre {
         OGRE_STATIC_MUTEX(msDeviceAccessMutex);
     protected:
         /// Lock a box
-        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
-        PixelBox lockBuffer(BufferResources* bufferResources, const Image::Box &lockBox, DWORD flags);
+        PixelBox lockImpl(const Box &lockBox, LockOptions options);
+        PixelBox lockBuffer(BufferResources* bufferResources, const Box &lockBox, DWORD flags);
 
         /// Unlock a box
         void unlockImpl(void);
@@ -95,12 +95,12 @@ namespace Ogre {
         void destroyRenderTexture();
 
         void blit(IDirect3DDevice9* d3d9Device, const HardwarePixelBufferSharedPtr &src,
-                const Image::Box &srcBox, const Image::Box &dstBox, 
+                const Box &srcBox, const Box &dstBox, 
                 BufferResources* srcBufferResources, 
                 BufferResources* dstBufferResources);
-        void blitFromMemory(const PixelBox &src, const Image::Box &dstBox, BufferResources* dstBufferResources);
+        void blitFromMemory(const PixelBox &src, const Box &dstBox, BufferResources* dstBufferResources);
 
-        void blitToMemory(const Image::Box &srcBox, const PixelBox &dst, BufferResources* srcBufferResources, IDirect3DDevice9* d3d9Device);
+        void blitToMemory(const Box &srcBox, const PixelBox &dst, BufferResources* srcBufferResources, IDirect3DDevice9* d3d9Device);
             
     public:
         D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
@@ -113,13 +113,13 @@ namespace Ogre {
         void bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *mVolume, IDirect3DBaseTexture9 *mipTex);
         
         /// @copydoc HardwarePixelBuffer::blit
-        void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
+        void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
         
         /// @copydoc HardwarePixelBuffer::blitFromMemory
-        void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
+        void blitFromMemory(const PixelBox &src, const Box &dstBox);
     
         /// @copydoc HardwarePixelBuffer::blitToMemory
-        void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
+        void blitToMemory(const Box &srcBox, const PixelBox &dst);
         
         /// Internal function to update mipmaps on update of level 0
         void _genMipmaps(IDirect3DBaseTexture9* mipTex);

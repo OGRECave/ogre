@@ -170,7 +170,7 @@ namespace Ogre
         // That's because in non-update scenarios we don't want to keep an RTT
         // around. We use a single RTT to serve all terrain pages which is more
         // efficient.
-        Image::Box box(static_cast<uint32>(rect.left),
+        Box box(static_cast<uint32>(rect.left),
                        static_cast<uint32>(rect.top),
                        static_cast<uint32>(rect.right),
                        static_cast<uint32>(rect.bottom));
