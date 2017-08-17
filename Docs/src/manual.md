@@ -4,6 +4,7 @@ Manual {#manual}
 - @subpage Introduction
 - @subpage The-Core-Objects
 - @subpage Scripts
+- @subpage High-level-Programs
 - @subpage Mesh-Tools
 - @subpage Hardware-Buffers
 - @subpage Shadows
