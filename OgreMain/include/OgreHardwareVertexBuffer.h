@@ -124,9 +124,9 @@ namespace Ogre {
         VET_FLOAT4 = 3,
         /// alias to more specific colour type - use the current rendersystem's colour packing
         VET_COLOUR = 4,
-        VET_SHORT1 = 5,  /// @deprecated (see note)
+        VET_SHORT1 = 5,  ///< @deprecated (see #VertexElementType note)
         VET_SHORT2 = 6,
-        VET_SHORT3 = 7,  /// @deprecated (see note)
+        VET_SHORT3 = 7,  ///< @deprecated (see #VertexElementType note)
         VET_SHORT4 = 8,
         VET_UBYTE4 = 9,
         /// D3D style compact colour
@@ -139,9 +139,9 @@ namespace Ogre {
         VET_DOUBLE2 = 13,
         VET_DOUBLE3 = 14,
         VET_DOUBLE4 = 15,
-        VET_USHORT1 = 16,  /// @deprecated (see note)
+        VET_USHORT1 = 16,  ///< @deprecated (see #VertexElementType note)
         VET_USHORT2 = 17,
-        VET_USHORT3 = 18,  /// @deprecated (see note)
+        VET_USHORT3 = 18,  ///< @deprecated (see #VertexElementType note)
         VET_USHORT4 = 19,
         VET_INT1 = 20,
         VET_INT2 = 21,
