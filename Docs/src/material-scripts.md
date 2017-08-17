@@ -1,14 +1,14 @@
 # Material Scripts {#Material-Scripts}
 
-Material scripts offer you the ability to define complex materials in a script which can be reused easily. Whilst you could set up all materials for a scene in code using the methods of the Material and TextureLayer classes, in practice it’s a bit unwieldy. Instead you can store material definitions in text files which can then be loaded whenever required.
+Material scripts offer you the ability to define complex materials in a script which can be reused easily. Whilst you could set up all materials for a scene in code using the methods of the Material and TextureLayer classes, in practice it's a bit unwieldy. Instead you can store material definitions in text files which can then be loaded whenever required.
 
 @tableofcontents
 
 # Loading scripts {#Loading-scripts}
 
-Material scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Root::addResourceLocation) for files with the ’.material’ extension and parses them. If you want to parse files manually, use MaterialSerializer::parseScript.
+Material scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Ogre::ResourceGroupManager::addResourceLocation) for files with the ’.material’ extension and parses them. If you want to parse files manually, use Ogre::MaterialSerializer::parseScript.
 
-It’s important to realise that materials are not loaded completely by this parsing process: only the definition is loaded, no textures or other resources are loaded. This is because it is common to have a large library of materials, but only use a relatively small subset of them in any one scene. To load every material completely in every script would therefore cause unnecessary memory overhead. You can access a ’deferred load’ Material in the normal way (MaterialManager::getSingleton().getByName()), but you must call the ’load’ method before trying to use it. Ogre does this for you when using the normal material assignment methods of entities etc.
+It’s important to realise that materials are not loaded completely by this parsing process: only the definition is loaded, no textures or other resources are loaded. This is because it is common to have a large library of materials, but only use a relatively small subset of them in any one scene. To load every material completely in every script would therefore cause unnecessary memory overhead. You can access a ’deferred load’ Material in the normal way (Ogre::MaterialManager::getSingleton().getByName()), but you must call the ’load’ method before trying to use it. Ogre does this for you when using the normal material assignment methods of entities etc.
 
 Another important factor is that material names must be unique throughout ALL scripts loaded by the system, since materials are always identified by name.
 
@@ -1278,9 +1278,7 @@ Example colour\_op\_ex add\_signed src\_manual src\_current 0.5
 
 See the IMPORTANT note below about the issues between multipass and multitexturing that using this method can create. Texture colour operations determine how the final colour of the surface appears when rendered. Texture units are used to combine colour values from various sources (e.g. the diffuse colour of the surface from lighting calculations, combined with the colour of the texture). This method allows you to specify the ’operation’ to be used, i.e. the calculation such as adds or multiplies, and which values to use as arguments, such as a fixed value or a value from a previous calculation.
 
-<dl compact="compact">
-<dt>Operation options</dt> <dd>
-
+@param operation
 <dl compact="compact">
 <dt>source1</dt> <dd>
 
@@ -1342,8 +1340,10 @@ The dot product of source1 and source2
 
 Use interpolated colour value from vertices to scale source1, then add source2 scaled by (1-colour).
 
-</dd> </dl> </dd> <dt>Source1 and source2 options</dt> <dd>
+</dd> </dl>
 
+@param source1
+@param source2
 <dl compact="compact">
 <dt>src\_current</dt> <dd>
 
@@ -1365,7 +1365,7 @@ The interpolated specular colour from the vertices.
 
 The manual colour specified at the end of the command.
 
-</dd> </dl> </dd> </dl> <br>
+</dd> </dl> <br>
 
 For example ’modulate’ takes the colour results of the previous layer, and multiplies them with the new texture being applied. Bear in mind that colours are RGB values from 0.0-1.0 so multiplying them together will result in values in the same range, ’tinted’ by the multiply. Note however that a straight multiply normally has the effect of darkening the textures - for this reason there are brightening operations like modulate\_x2. Note that because of the limitations on some underlying APIs (Direct3D included) the ’texture’ argument can only be used as the first argument, not the second. 
 
@@ -1486,9 +1486,7 @@ Format: wave\_xform &lt;xform\_type&gt; &lt;wave\_type&gt; &lt;base&gt; &lt;freq
 
 Example: wave\_xform scale\_x sine 1.0 0.2 0.0 5.0
 
-<dl compact="compact">
-<dt>xform\_type</dt> <dd>
-
+@param xform\_type
 <dl compact="compact">
 <dt>scroll\_x</dt> <dd>
 
@@ -1510,8 +1508,9 @@ Animate the x scale value
 
 Animate the y scale value
 
-</dd> </dl> </dd> <dt>wave\_type</dt> <dd>
+</dd> </dl>
 
+@param wave\_type
 <dl compact="compact">
 <dt>sine</dt> <dd>
 
@@ -1533,23 +1532,21 @@ Gradual steady increase from min to max over the period with an instant return t
 
 Gradual steady decrease from max to min over the period, with an instant return to max at the end.
 
-</dd> </dl> </dd> <dt>base</dt> <dd>
+</dd> </dl> 
 
+@param base
 The base value, the minimum if amplitude &gt; 0, the maximum if amplitude &lt; 0
 
-</dd> <dt>frequency</dt> <dd>
-
+@param frequency
 The number of wave iterations per second, i.e. speed
 
-</dd> <dt>phase</dt> <dd>
-
+@param phase
 Offset of the wave start
 
-</dd> <dt>amplitude</dt> <dd>
-
+@param amplitude
 The size of the wave
 
-</dd> </dl> <br>
+<br>
 
 The range of the output of the wave will be {base, base+amplitude}. So the example above scales the texture in the x direction between 1 (normal size) and 5 along a sine wave at one cycle every 5 second (0.2 waves per second).
 
