@@ -50,7 +50,7 @@ namespace Ogre {
         mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
     }
 
-    void GL3PlusHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
+    void GL3PlusHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     {
         if (!mBuffer.contains(dstBox))
         {
@@ -90,7 +90,7 @@ namespace Ogre {
         freeBuffer();
     }
 
-    void GL3PlusHardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBox &dst)
+    void GL3PlusHardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     {
         if (!mBuffer.contains(srcBox))
         {

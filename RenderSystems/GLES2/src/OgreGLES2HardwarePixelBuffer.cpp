@@ -49,7 +49,7 @@ namespace Ogre {
     {
     }
 
-    void GLES2HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
+    void GLES2HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     {
         if (!mBuffer.contains(dstBox))
         {
@@ -113,7 +113,7 @@ namespace Ogre {
         }
     }
 
-    void GLES2HardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBox &dst)
+    void GLES2HardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     {
         if (!mBuffer.contains(srcBox))
         {
@@ -247,7 +247,7 @@ namespace Ogre {
     }
 #endif
 
-    void GLES2TextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
+    void GLES2TextureBuffer::upload(const PixelBox &data, const Box &dest)
     {
         GLES2RenderSystem* rs = getGLES2RenderSystem();
 
@@ -506,7 +506,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------  
-    void GLES2TextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox)
+    void GLES2TextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox)
     {
         GLES2TextureBuffer *srct = static_cast<GLES2TextureBuffer *>(src.get());
         // TODO: blitFromTexture currently broken
@@ -530,7 +530,7 @@ namespace Ogre {
     // Supports compressed formats as both source and destination format, it will use the hardware DXT compressor
     // if available.
     // @author W.J. van der Laan
-    void GLES2TextureBuffer::blitFromTexture(GLES2TextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
+    void GLES2TextureBuffer::blitFromTexture(GLES2TextureBuffer *src, const Box &srcBox, const Box &dstBox)
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Not implemented",
                     "GLES2TextureBuffer::blitFromTexture");
@@ -760,7 +760,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------------  
     // blitFromMemory doing hardware trilinear scaling
-    void GLES2TextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box &dstBox)
+    void GLES2TextureBuffer::blitFromMemory(const PixelBox &src_orig, const Box &dstBox)
     {
         // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
         // - FBO is not supported
@@ -854,7 +854,7 @@ namespace Ogre {
                               0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
         
         // Upload data to 0,0,0 in temporary texture
-        Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
+        Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
         tex.upload(src, tempTarget);
         
         // Blit

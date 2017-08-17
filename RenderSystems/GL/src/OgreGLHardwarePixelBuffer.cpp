@@ -47,7 +47,7 @@ GLHardwarePixelBuffer::GLHardwarePixelBuffer(uint32 inWidth, uint32 inHeight, ui
 }
 
 //-----------------------------------------------------------------------------  
-void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
+void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
 {
     if(!mBuffer.contains(dstBox))
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range",
@@ -83,7 +83,7 @@ void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box
     freeBuffer();
 }
 //-----------------------------------------------------------------------------  
-void GLHardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBox &dst)
+void GLHardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
 {
     if(!mBuffer.contains(srcBox))
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "source box out of range",
@@ -218,7 +218,7 @@ GLTextureBuffer::~GLTextureBuffer()
     }
 }
 //-----------------------------------------------------------------------------
-void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
+void GLTextureBuffer::upload(const PixelBox &data, const Box &dest)
 {
     mRenderSystem->_getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
     if(PixelUtil::isCompressed(data.format))
@@ -440,7 +440,7 @@ void GLTextureBuffer::copyFromFramebuffer(uint32 zoffset)
     }
 }
 //-----------------------------------------------------------------------------  
-void GLTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox)
+void GLTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox)
 {
     GLTextureBuffer *srct = static_cast<GLTextureBuffer *>(src.get());
     /// Check for FBO support first
@@ -468,7 +468,7 @@ void GLTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image:
 /// Supports compressed formats as both source and destination format, it will use the hardware DXT compressor
 /// if available.
 /// @author W.J. van der Laan
-void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
+void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, const Box &dstBox)
 {
     //std::cerr << "GLTextureBuffer::blitFromTexture " <<
     //src->mTextureID << ":" << srcBox.left << "," << srcBox.top << "," << srcBox.right << "," << srcBox.bottom << " " << 
@@ -676,7 +676,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
 }
 //-----------------------------------------------------------------------------  
 /// blitFromMemory doing hardware trilinear scaling
-void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box &dstBox)
+void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Box &dstBox)
 {
     /// Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
     /// - FBO is not supported
@@ -743,7 +743,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box 
     GLTextureBuffer tex(mRenderSystem, BLANKSTRING, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
     
     /// Upload data to 0,0,0 in temporary texture
-    Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
+    Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
     tex.upload(src, tempTarget);
     
     /// Blit

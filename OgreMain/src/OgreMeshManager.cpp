@@ -491,7 +491,7 @@ namespace Ogre
         {
             //upVector must be wrong
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "The upVector you supplied is parallel to the plane normal, so is not valid.",
-                "MeshManager::createPlane");
+                "MeshManager::loadManualPlane");
         }
         xAxis.normalise();
 

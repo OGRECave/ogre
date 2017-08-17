@@ -146,7 +146,7 @@ namespace Ogre
 
         /** Blits a set of values into a region on the blend map. 
             @param src      PixelBox containing the source pixels and format 
-            @param dstBox   Image::Box describing the destination region in this map
+            @param dstBox   Box describing the destination region in this map
             @remarks The source and destination regions dimensions don't have to match, in which
             case scaling is done. 
             @note You can call this method in a background thread if you want.

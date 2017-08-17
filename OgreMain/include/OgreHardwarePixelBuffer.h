@@ -61,11 +61,11 @@ namespace Ogre {
         /// Currently locked region (local coords)
         PixelBox mCurrentLock;
         /// The current locked box of this surface (entire surface coords)
-        Image::Box mLockedBox;
+        Box mLockedBox;
 
         
         /// Internal implementation of lock(), must be overridden in subclasses
-        virtual PixelBox lockImpl(const Image::Box &lockBox,  LockOptions options) = 0;
+        virtual PixelBox lockImpl(const Box &lockBox,  LockOptions options) = 0;
 
         /** Internal implementation of lock(), do not OVERRIDE or CALL this
             for HardwarePixelBuffer implementations, but override the previous method */
@@ -94,12 +94,12 @@ namespace Ogre {
             @return PixelBox containing the locked region, the pitches and
                 the pixel format
         */
-        virtual const PixelBox& lock(const Image::Box& lockBox, LockOptions options);
+        virtual const PixelBox& lock(const Box& lockBox, LockOptions options);
         /// @copydoc HardwareBuffer::lock
         virtual void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
 
         /** Get the current locked region. This is the same value as returned
-            by lock(const Image::Box, LockOptions)
+            by lock(const Box, LockOptions)
             @return PixelBox containing the locked region
         */        
         const PixelBox& getCurrentLock();
@@ -113,14 +113,14 @@ namespace Ogre {
         /** Copies a box from another PixelBuffer to a region of the 
             this PixelBuffer. 
             @param src      Source pixel buffer
-            @param srcBox   Image::Box describing the source region in src
-            @param dstBox   Image::Box describing the destination region in this buffer
+            @param srcBox   Box describing the source region in src
+            @param dstBox   Box describing the destination region in this buffer
             @remarks The source and destination regions dimensions don't have to match, in which
             case scaling is done. This scaling is generally done using a bilinear filter in hardware,
             but it is faster to pass the source image in the right dimensions.
             @note Only call this function when both  buffers are unlocked. 
          */        
-        virtual void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
+        virtual void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
 
         /** Convenience function that blits the entire source pixel buffer to this buffer. 
             If source and destination dimensions don't match, scaling is done.
@@ -132,13 +132,13 @@ namespace Ogre {
         /** Copies a region from normal memory to a region of this pixelbuffer. The source
             image can be in any pixel format supported by OGRE, and in any size. 
             @param src      PixelBox containing the source pixels and format in memory
-            @param dstBox   Image::Box describing the destination region in this buffer
+            @param dstBox   Box describing the destination region in this buffer
             @remarks The source and destination regions dimensions don't have to match, in which
             case scaling is done. This scaling is generally done using a bilinear filter in hardware,
             but it is faster to pass the source image in the right dimensions.
             @note Only call this function when the buffer is unlocked. 
         */
-        virtual void blitFromMemory(const PixelBox &src, const Image::Box &dstBox) = 0;
+        virtual void blitFromMemory(const PixelBox &src, const Box &dstBox) = 0;
         
         /** Convenience function that blits a pixelbox from memory to the entire 
             buffer. The source image is scaled as needed.
@@ -151,13 +151,13 @@ namespace Ogre {
         }
         
         /** Copies a region of this pixelbuffer to normal memory.
-            @param srcBox   Image::Box describing the source region of this buffer
+            @param srcBox   Box describing the source region of this buffer
             @param dst      PixelBox describing the destination pixels and format in memory
             @remarks The source and destination regions don't have to match, in which
             case scaling is done.
             @note Only call this function when the buffer is unlocked. 
          */
-        virtual void blitToMemory(const Image::Box &srcBox, const PixelBox &dst) = 0;
+        virtual void blitToMemory(const Box &srcBox, const PixelBox &dst) = 0;
 
         /** Convenience function that blits this entire buffer to a pixelbox.
             The image is scaled as needed.
