@@ -6,61 +6,6 @@ One way to support both HLSL and GLSL is to include separate techniques in the m
 
 @tableofcontents
 
-# Skeletal Animation in Vertex Programs {#Skeletal-Animation-in-Vertex-Programs}
-
-You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter ’world\_matrix\_array\_3x4’). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your vertex\_program definition:
-
-```cpp
-   includes_skeletal_animation true
-```
-
-When you do this, any skeletally animated entity which uses this material will forgo the usual animation blend and will expect the vertex program to do it, for both vertex positions and normals. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See [Animation](#Animation)) then all techniques must be hardware accelerated for any to be.
-
-
-# Morph Animation in Vertex Programs {#Morph-Animation-in-Vertex-Programs}
-
-You can implement morph animation in hardware by writing a vertex program which linearly blends between the first and second position keyframes passed as positions and the first free texture coordinate set, and by binding the animation\_parametric value to a parameter (which tells you how far to interpolate between the two). However, you need to communicate this support to Ogre so it does not perform morph animation in software for you. You do this by adding the following attribute to your vertex\_program definition:
-
-```cpp
-   includes_morph_animation true
-```
-
-When you do this, any skeletally animated entity which uses this material will forgo the usual software morph and will expect the vertex program to do it. Note that if your model includes both skeletal animation and morph animation, they must both be implemented in the vertex program if either is to be hardware acceleration. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See [Animation](#Animation)) then all techniques must be hardware accelerated for any to be.
-
-# Pose Animation in Vertex Programs {#Pose-Animation-in-Vertex-Programs}
-
-You can implement pose animation (blending between multiple poses based on weight) in a vertex program by pulling in the original vertex data (bound to position), and as many pose offset buffers as you’ve defined in your ’includes\_pose\_animation’ declaration, which will be in the first free texture unit upwards. You must also use the animation\_parametric parameter to define the starting point of the constants which will contain the pose weights; they will start at the parameter you define and fill ’n’ constants, where ’n’ is the max number of poses this shader can blend, i.e. the parameter to includes\_pose\_animation.
-
-```cpp
-   includes_pose_animation 4
-```
-
-Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See [Animation](#Animation)) then all techniques must be hardware accelerated for any to be.
-
-# Vertex texture fetching in vertex programs {#Vertex-texture-fetching-in-vertex-programs}
-
-If your vertex program makes use of [Vertex Texture Fetch](#Vertex-Texture-Fetch), you should declare that with the ’uses\_vertex\_texture\_fetch’ directive. This is enough to tell Ogre that your program uses this feature and that hardware support for it should be checked.
-
-```cpp
-   uses_vertex_texture_fetch true
-```
-
-# Adjacency information in Geometry Programs {#Adjacency-information-in-Geometry-Programs}
-
-Some geometry programs require adjacency information from the geometry. It means that a geometry shader doesn’t only get the information of the primitive it operates on, it also has access to its neighbours (in the case of lines or triangles). This directive will tell Ogre to send the information to the geometry shader.
-
-```cpp
-   uses_adjacency_information true
-```
-
-# Vertex Programs With Shadows {#Vertex-Programs-With-Shadows}
-
-When using shadows (See [Shadows](@ref Shadows)), the use of vertex programs can add some additional complexities, because Ogre can only automatically deal with everything when using the fixed-function pipeline. If you use vertex programs, and you are also using shadows, you may need to make some adjustments. 
-
-If you use **stencil shadows**, then any vertex programs which do vertex deformation can be a problem, because stencil shadows are calculated on the CPU, which does not have access to the modified vertices. If the vertex program is doing standard skeletal animation, this is ok (see section above) because Ogre knows how to replicate the effect in software, but any other vertex deformation cannot be replicated, and you will either have to accept that the shadow will not reflect this deformation, or you should turn off shadows for that object. 
-
-If you use **texture shadows**, then vertex deformation is acceptable; however, when rendering the object into a shadow texture (the shadow caster pass), the shadow has to be rendered in a solid colour (linked to the ambient colour for modulative shadows, black for additive shadows). You must therefore provide an alternative vertex program, so Ogre provides you with a way of specifying one to use when rendering the caster, See [Shadows and Vertex Programs](#Shadows-and-Vertex-Programs).
-
 # Cg programs {#Cg}
 
 In order to define Cg programs, you have to have to load Plugin\_CgProgramManager.so/.dll at startup, either through plugins.cfg or through your own plugin loading code. They are very easy to define:
@@ -247,39 +192,39 @@ In addition to the built in attributes described in section 7.3 of the GLSL manu
 <dl compact="compact">
 <dt>vertex</dt> <dd>
 
-Binds VES\_POSITION, declare as ’attribute vec4 vertex;’.
+Binds Ogre::VES\_POSITION, declare as ’attribute vec4 vertex;’.
 
 </dd> <dt>normal</dt> <dd>
 
-Binds VES\_NORMAL, declare as ’attribute vec3 normal;’.
+Binds Ogre::VES\_NORMAL, declare as ’attribute vec3 normal;’.
 
 </dd> <dt>colour</dt> <dd>
 
-Binds VES\_DIFFUSE, declare as ’attribute vec4 colour;’.
+Binds Ogre::VES\_DIFFUSE, declare as ’attribute vec4 colour;’.
 
 </dd> <dt>secondary\_colour</dt> <dd>
 
-Binds VES\_SPECULAR, declare as ’attribute vec4 secondary\_colour;’.
+Binds Ogre::VES\_SPECULAR, declare as ’attribute vec4 secondary\_colour;’.
 
 </dd> <dt>uv0 - uv7</dt> <dd>
 
-Binds VES\_TEXTURE\_COORDINATES, declare as ’attribute vec4 uv0;’. Note that uv6 and uv7 share attributes with tangent and binormal respectively so cannot both be present.
+Binds Ogre::VES\_TEXTURE\_COORDINATES, declare as ’attribute vec4 uv0;’. Note that uv6 and uv7 share attributes with tangent and binormal respectively so cannot both be present.
 
 </dd> <dt>tangent</dt> <dd>
 
-Binds VES\_TANGENT, declare as ’attribute vec3 tangent;’.
+Binds Ogre::VES\_TANGENT, declare as ’attribute vec3 tangent;’.
 
 </dd> <dt>binormal</dt> <dd>
 
-Binds VES\_BINORMAL, declare as ’attribute vec3 binormal;’.
+Binds Ogre::VES\_BINORMAL, declare as ’attribute vec3 binormal;’.
 
 </dd> <dt>blendIndices</dt> <dd>
 
-Binds VES\_BLEND\_INDICES, declare as ’attribute vec4 blendIndices;’.
+Binds Ogre::VES\_BLEND\_INDICES, declare as ’attribute vec4 blendIndices;’.
 
 </dd> <dt>blendWeights</dt> <dd>
 
-Binds VES\_BLEND\_WEIGHTS, declare as ’attribute vec4 blendWeights;’.
+Binds Ogre::VES\_BLEND\_WEIGHTS, declare as ’attribute vec4 blendWeights;’.
 
 </dd> </dl>
 
@@ -605,6 +550,54 @@ shadow_receiver_fragment_program_ref myShadowReceiverFragmentProgram
 ```
 
 You should pass the projected shadow coordinates from the custom vertex program. As for textures, texture unit 0 will always be the shadow texture. Any other textures which you bind in your pass will be carried across too, but will be moved up by 1 unit to make room for the shadow texture. Therefore your shadow receiver fragment program is likely to be the same as the bare lighting pass of your normal material, except that you insert an extra texture sampler at index 0, which you will use to adjust the result by (modulating diffuse and specular components).
+
+# Skeletal Animation in Vertex Programs {#Skeletal-Animation-in-Vertex-Programs}
+
+You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter ’world\_matrix\_array\_3x4’). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your vertex\_program definition:
+
+```cpp
+   includes_skeletal_animation true
+```
+
+When you do this, any skeletally animated entity which uses this material will forgo the usual animation blend and will expect the vertex program to do it, for both vertex positions and normals. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See [Animation](@ref Animation)) then all techniques must be hardware accelerated for any to be.
+
+
+# Morph Animation in Vertex Programs {#Morph-Animation-in-Vertex-Programs}
+
+You can implement morph animation in hardware by writing a vertex program which linearly blends between the first and second position keyframes passed as positions and the first free texture coordinate set, and by binding the animation\_parametric value to a parameter (which tells you how far to interpolate between the two). However, you need to communicate this support to Ogre so it does not perform morph animation in software for you. You do this by adding the following attribute to your vertex\_program definition:
+
+```cpp
+   includes_morph_animation true
+```
+
+When you do this, any skeletally animated entity which uses this material will forgo the usual software morph and will expect the vertex program to do it. Note that if your model includes both skeletal animation and morph animation, they must both be implemented in the vertex program if either is to be hardware acceleration. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See [Animation](#Animation)) then all techniques must be hardware accelerated for any to be.
+
+# Pose Animation in Vertex Programs {#Pose-Animation-in-Vertex-Programs}
+
+You can implement pose animation (blending between multiple poses based on weight) in a vertex program by pulling in the original vertex data (bound to position), and as many pose offset buffers as you’ve defined in your ’includes\_pose\_animation’ declaration, which will be in the first free texture unit upwards. You must also use the animation\_parametric parameter to define the starting point of the constants which will contain the pose weights; they will start at the parameter you define and fill ’n’ constants, where ’n’ is the max number of poses this shader can blend, i.e. the parameter to includes\_pose\_animation.
+
+```cpp
+   includes_pose_animation 4
+```
+
+Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See [Animation](#Animation)) then all techniques must be hardware accelerated for any to be.
+
+# Vertex texture fetching in vertex programs {#Vertex-texture-fetching-in-vertex-programs}
+
+If your vertex program makes use of [Vertex Texture Fetch](#Vertex-Texture-Fetch), you should declare that with the ’uses\_vertex\_texture\_fetch’ directive. This is enough to tell Ogre that your program uses this feature and that hardware support for it should be checked.
+
+```cpp
+   uses_vertex_texture_fetch true
+```
+
+# Adjacency information in Geometry Programs {#Adjacency-information-in-Geometry-Programs}
+
+Some geometry programs require adjacency information from the geometry. It means that a geometry shader doesn’t only get the information of the primitive it operates on, it also has access to its neighbours (in the case of lines or triangles). This directive will tell Ogre to send the information to the geometry shader.
+
+```cpp
+   uses_adjacency_information true
+```
+
 
 # Vertex Texture Fetch {#Vertex-Texture-Fetch}
 
