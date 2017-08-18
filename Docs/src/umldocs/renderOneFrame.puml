@@ -1,0 +1,42 @@
+@startuml
+hide footbox
+
+Application -> Root: renderOneFrame
+activate Root
+Root -> RenderSystem: _updateAllRenderTargets
+activate RenderSystem
+RenderSystem -> RenderTarget: update
+activate RenderTarget
+'RenderTarget -> RenderTarget: _updateAutoUpdatedViewports
+RenderTarget -> Viewport: update
+activate Viewport
+Viewport -> Camera: _renderScene
+activate Camera
+Camera -> SceneManager: _renderScene
+activate SceneManager
+SceneManager -> SceneManager: _renderVisibleObjects
+SceneManager -> SceneManager: _renderQueueGroupObjects
+loop
+SceneManager -> SceneManager: _issueRenderOp
+SceneManager -> Renderable: getRenderOperation
+activate Renderable
+Renderable --> SceneManager: RenderOperation
+deactivate Renderable
+SceneManager -> RenderSystem: _render
+activate RenderSystem
+RenderSystem --> SceneManager
+deactivate RenderSystem
+end
+SceneManager --> Camera
+deactivate SceneManager
+Camera --> Viewport
+deactivate Camera
+Viewport --> RenderTarget
+deactivate Viewport
+RenderTarget --> RenderSystem
+deactivate RenderTarget
+RenderSystem --> Root
+deactivate RenderSystem
+Root --> Application
+deactivate Root
+@enduml
