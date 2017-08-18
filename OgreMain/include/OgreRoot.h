@@ -532,14 +532,16 @@ namespace Ogre
         */
         void startRendering(void);
 
-        /** Render one frame. 
-        @remarks
-            Updates all the render targets automatically and then returns,
-            raising frame events before and after.
+        /** Updates all the render targets automatically
+
+            Raises frame events before and after.
+
+            Overview of the render cycle
+            ![](renderOneFrame.svg)
         */
         bool renderOneFrame(void);
 
-        /** Render one frame, with custom frame time information. 
+        /** Updates all the render targets with custom frame time information
         @remarks
         Updates all the render targets automatically and then returns,
         raising frame events before and after - all per-frame times are based on
