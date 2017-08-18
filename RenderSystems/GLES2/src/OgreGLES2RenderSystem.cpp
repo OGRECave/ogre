@@ -1079,6 +1079,16 @@ namespace Ogre {
 
             vp->_clearUpdatedFlag();
         }
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        else
+        {
+            // On iOS RenderWindow is FBO based, renders to multisampled FBO and then resolves
+            // to non-multisampled FBO, therefore we need to restore FBO binding even when
+            // rendering to the same viewport.
+            RenderTarget* target = vp->getTarget();
+            mRTTManager->bind(target);
+        }
+#endif
     }
 
     void GLES2RenderSystem::_beginFrame(void)
@@ -1101,10 +1111,6 @@ namespace Ogre {
         // outside via the resource manager
         unbindGpuProgram(GPT_VERTEX_PROGRAM);
 		unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        static_cast<EAGLES2Context*>(mMainContext)->bindSampleFramebuffer();
-#endif
     }
 
     void GLES2RenderSystem::_setCullingMode(CullingMode mode)

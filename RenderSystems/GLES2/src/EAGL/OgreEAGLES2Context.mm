@@ -97,15 +97,6 @@ namespace Ogre {
         SAFE_ARC_RELEASE(mDrawable);
     }
 
-    void EAGLES2Context::bindSampleFramebuffer()
-    {
-        if(mIsMultiSampleSupported && mNumSamples > 0)
-        {
-            // Bind the FSAA buffer if we're doing multisampling
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mSampleFramebuffer));
-        }
-    }
-
     bool EAGLES2Context::createFramebuffer()
     {
         GLES2RenderSystem *rs = static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());

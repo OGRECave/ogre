@@ -164,14 +164,6 @@ namespace Ogre {
         }
 	}
 
-    void EAGL2Window::_beginUpdate(void)
-    {
-        // Call the base class method first
-        RenderTarget::_beginUpdate();
-
-        mContext->bindSampleFramebuffer();
-    }
-
     void EAGL2Window::createNativeWindow(uint widthPt, uint heightPt, const NameValuePairList *miscParams)
     {
         // This method is called from within create() and after parameters have been parsed.
@@ -447,6 +439,12 @@ namespace Ogre {
 			*static_cast<GLContext**>(pData) = mContext;
 			return;
 		}
+
+        if( name == "GLFBO" )
+        {
+            *static_cast<GLuint*>(pData) = (mContext->mIsMultiSampleSupported && mContext->mNumSamples>0) ? mContext->mSampleFramebuffer : mContext->mViewFramebuffer;
+            return;
+        }
 
         if( name == "SHAREGROUP" )
 		{

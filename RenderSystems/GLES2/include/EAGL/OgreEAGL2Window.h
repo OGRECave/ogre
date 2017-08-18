@@ -81,7 +81,6 @@ namespace Ogre {
             void resize(unsigned int widthPt, unsigned int heightPt);
             void windowMovedOrResized();
             int _getPixelFromPoint(float viewPt) { return mIsContentScalingSupported ? (int)viewPt * mContentScalingFactor : (int)viewPt; }
-            virtual void _beginUpdate();
 
     public:
             EAGL2Window(EAGL2Support* glsupport);
