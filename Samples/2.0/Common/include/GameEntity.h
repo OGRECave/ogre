@@ -78,6 +78,11 @@ namespace Demo
         {
             return mId < _r->mId;
         }
+
+        static bool OrderById( const GameEntity *_l, const GameEntity *_r )
+        {
+            return _l->mId < _r->mId;
+        }
     };
 
     typedef std::vector<GameEntity*> GameEntityVec;
