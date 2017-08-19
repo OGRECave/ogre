@@ -159,9 +159,9 @@ namespace Ogre
         if( !strcmp( value, "not_equal" ) )
             return CMPF_NOT_EQUAL;
         if( !strcmp( value, "greater_equal" ) )
-            return CMPF_GREATER;
-        if( !strcmp( value, "greater" ) )
             return CMPF_GREATER_EQUAL;
+        if( !strcmp( value, "greater" ) )
+            return CMPF_GREATER;
         if( !strcmp( value, "never" ) )
             return CMPF_ALWAYS_FAIL;
         if( !strcmp( value, "always" ) )
