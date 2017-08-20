@@ -118,16 +118,19 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
 
     file(MAKE_DIRECTORY "${NDKOUT}")
-    file(MAKE_DIRECTORY "${NDKOUT}/jni")
     file(MAKE_DIRECTORY "${NDKOUT}/assets")	
     file(MAKE_DIRECTORY "${NDKOUT}/res")	
 	file(MAKE_DIRECTORY "${NDKOUT}/src")
 
-    file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
-    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_NDK_ABI_NAME}\nLOCAL_ARM_NEON := ${NEON}\nAPP_STL := gnustl_static\nNDK_TOOLCHAIN_VERSION := ${ANDROID_COMPILER_VERSION}")
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
-	configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
-    
+    file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
+
+    if(JNI_SRC_FILES)
+        file(MAKE_DIRECTORY "${NDKOUT}/jni")
+        file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_NDK_ABI_NAME}\nLOCAL_ARM_NEON := ${NEON}\nAPP_STL := gnustl_static\nNDK_TOOLCHAIN_VERSION := ${ANDROID_COMPILER_VERSION}")
+        configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+    endif()
+
     if(DEBUG)    
         add_custom_command(
                             TARGET ${ANDROID_PROJECT_TARGET}
@@ -135,7 +138,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
                             COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
                             WORKING_DIRECTORY ${NDKOUT}
                           )
-    else()
+    elseif(JNI_SRC_FILES)
         add_custom_command(
                             TARGET ${ANDROID_PROJECT_TARGET}
                             POST_BUILD

@@ -26,10 +26,11 @@ else()
 endif()
 
 set(CMAKE_SWIG_FLAGS -w401,314 -package org.Ogre)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/java/jni")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/java/libs")
 set(CMAKE_SWIG_OUTDIR "${OGRE_BINARY_DIR}/java/src/org/Ogre")
 
 if(ANDROID)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${ANDROID_NDK_OUTPUT_ABI_NAME}")
 	list(APPEND CMAKE_SWIG_FLAGS -D__ANDROID__)
 endif()
 
@@ -66,4 +67,7 @@ endif()
 
 swig_add_module(OgreJNI java ${SWIG_INPUT_MODULES})
 swig_link_libraries(OgreJNI OgreBites OgreOverlay OgreRTShaderSystem OgreMain ${JNI_LIBRARIES})
-set_target_properties(${SWIG_MODULE_OgreJNI_REAL_NAME} PROPERTIES NO_SONAME OFF) # workaround for SWIG/ android interop
+if(ANDROID)
+	set_target_properties(${SWIG_MODULE_OgreJNI_REAL_NAME} PROPERTIES LINK_FLAGS -s) # strip symbols
+	set_target_properties(${SWIG_MODULE_OgreJNI_REAL_NAME} PROPERTIES NO_SONAME OFF) # workaround for SWIG/ android interop
+endif()
