@@ -98,6 +98,7 @@ namespace Ogre {
     GLSLMonolithicProgram::~GLSLMonolithicProgram(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+        mGLProgramHandle = 0;
     }
 
 
