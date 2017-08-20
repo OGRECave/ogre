@@ -116,14 +116,14 @@ namespace OgreBites
                         {
                             AConfiguration* config = AConfiguration_new();
                             AConfiguration_fromAssetManager(config, app->activity->assetManager);
-                            GLRenderSystemCommon::_createInternalResources(mBrowser.getRenderWindow(), app->window, config);
+                            mBrowser.getRenderWindow()->_notifySurfaceCreated(app->window, config);
                             AConfiguration_delete(config);
                         }
                     }
                     break;
                 case APP_CMD_TERM_WINDOW:
                     if(mBrowser.getRenderWindow())
-                        GLRenderSystemCommon::_destroyInternalResources(mBrowser.getRenderWindow());
+                        mBrowser.getRenderWindow()->_notifySurfaceDestroyed();
                     break;
                 case APP_CMD_GAINED_FOCUS:
                     break;

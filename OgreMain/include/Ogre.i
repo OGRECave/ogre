@@ -437,6 +437,16 @@ ADD_REPR(ColourValue)
 %ignore Ogre::RenderTarget::getTriangleCount;
 %ignore Ogre::RenderTarget::getBatchCount;
 %include "OgreRenderTarget.h"
+#ifdef __ANDROID__
+    %ignore Ogre::RenderWindow::_notifySurfaceCreated(void*);
+    %ignore Ogre::RenderWindow::_notifySurfaceCreated(void*, void*);
+    %extend Ogre::RenderWindow {
+        void _notifySurfaceCreated(jobject surface) {
+            ANativeWindow* nativeWnd = ANativeWindow_fromSurface(OgreJNIGetEnv(), surface);
+            $self->_notifySurfaceCreated(nativeWnd, NULL);
+        }
+    }
+#endif
     %include "OgreRenderWindow.h"
     %include "OgreRenderTexture.h"
 %include "OgreViewport.h"

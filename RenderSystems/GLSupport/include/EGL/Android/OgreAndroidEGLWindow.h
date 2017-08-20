@@ -67,8 +67,8 @@ namespace Ogre {
         void create(const String& name, unsigned int width, unsigned int height,
                     bool fullScreen, const NameValuePairList *miscParams);
         
-        void _destroyInternalResources();
-        void _createInternalResources(NativeWindowType window, void* config);
+        void _notifySurfaceDestroyed();
+        void _notifySurfaceCreated(void* window, void* config);
     };
 }
 

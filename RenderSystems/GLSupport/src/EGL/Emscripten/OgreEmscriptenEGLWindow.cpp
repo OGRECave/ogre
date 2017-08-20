@@ -201,7 +201,7 @@ namespace Ogre {
         
         if (!mEglConfig)
         {
-            _createInternalResources(mWindow);
+            _notifySurfaceCreated(&mWindow);
             mHwGamma = false;
         }
         
@@ -222,18 +222,18 @@ namespace Ogre {
     int EmscriptenEGLWindow::contextLostCallback(int eventType, const void *reserved, void *userData)
     {
         Ogre::EmscriptenEGLWindow* thiz = static_cast<Ogre::EmscriptenEGLWindow*>(userData);
-        thiz->_destroyInternalResources();
+        thiz->_notifySurfaceDestroyed();
         return 0;
     }
     
     int EmscriptenEGLWindow::contextRestoredCallback(int eventType, const void *reserved, void *userData)
     {
         Ogre::EmscriptenEGLWindow* thiz = static_cast<Ogre::EmscriptenEGLWindow*>(userData);
-        thiz->_createInternalResources(thiz->mWindow);
+        thiz->_notifySurfaceCreated(&thiz->mWindow);
         return 0;
     }
     
-    void EmscriptenEGLWindow::_destroyInternalResources()
+    void EmscriptenEGLWindow::_notifySurfaceDestroyed()
     {
         mContext->setCurrent();
         
@@ -254,9 +254,9 @@ namespace Ogre {
         mClosed = true;
     }
     
-    void EmscriptenEGLWindow::_createInternalResources(NativeWindowType window, void*)
+    void EmscriptenEGLWindow::_notifySurfaceCreated(void* window, void*)
     {
-        mWindow = window;
+        mWindow = *reinterpret_cast<EGLNativeWindowType*>(window);
         
         int minAttribs[] = {
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,

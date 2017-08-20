@@ -210,7 +210,7 @@ namespace Ogre {
         
         if (!mEglConfig)
         {
-            _createInternalResources(mWindow, config);
+            _notifySurfaceCreated(mWindow, config);
             mHwGamma = false;
         }
         
@@ -227,7 +227,7 @@ namespace Ogre {
         mPreserveContext = preserveContextOpt;
     }
 
-    void AndroidEGLWindow::_destroyInternalResources()
+    void AndroidEGLWindow::_notifySurfaceDestroyed()
     {
         if(mClosed)
             return;
@@ -236,7 +236,7 @@ namespace Ogre {
         {
             mContext->setCurrent();
 
-            static_cast<GLRenderSystemCommon*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->notifyOnContextLost();
+            static_cast<GLRenderSystemCommon*>(Root::getSingletonPtr()->getRenderSystem())->notifyOnContextLost();
             mContext->_destroyInternalResources();
         }
         
@@ -254,15 +254,15 @@ namespace Ogre {
         mClosed = true;
     }
     
-    void AndroidEGLWindow::_createInternalResources(NativeWindowType window, void* config)
+    void AndroidEGLWindow::_notifySurfaceCreated(void* window, void* config)
     {
-        mWindow = window;
+        mWindow = reinterpret_cast<EGLNativeWindowType>(window);
         
         if (mPreserveContext)
         {
             mEglDisplay = mGLSupport->getGLDisplay();
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
-            static_cast<EGLContext*>(mContext)->_updateInternalResources(mEglDisplay, mEglConfig, mEglSurface);
+            mContext->_updateInternalResources(mEglDisplay, mEglConfig, mEglSurface);
         }
         else
         {
