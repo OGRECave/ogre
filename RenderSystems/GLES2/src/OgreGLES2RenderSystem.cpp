@@ -2121,6 +2121,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2RenderSystem::notifyOnContextLost() {
+        static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(mCurrentContext);
         GLES2RenderSystem::mResourceManager->notifyOnContextLost();
     }
 
