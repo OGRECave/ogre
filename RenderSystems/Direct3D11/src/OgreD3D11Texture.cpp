@@ -166,6 +166,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResourcesImpl()
     {
+        mSurfaceList.clear();
         mpTex.Reset();
         mpShaderResourceView.Reset();
         mp1DTex.Reset();
@@ -744,59 +745,38 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::_createSurfaceList(void)
     {
-        unsigned int bufusage;
-        if ((mUsage & TU_DYNAMIC))
+        // Create new list of surfaces
+        mSurfaceList.clear();
+        PixelFormat format = D3D11Mappings::_getClosestSupportedPF(mFormat);
+        size_t depth = mDepth;
+
+        for(size_t face=0; face<getNumFaces(); ++face)
         {
-            bufusage = HardwareBuffer::HBU_DYNAMIC;
-        }
-        else
-        {
-            bufusage = HardwareBuffer::HBU_STATIC;
-        }
-        if (mUsage & TU_RENDERTARGET)
-        {
-            bufusage |= TU_RENDERTARGET;
-        }
+            size_t width = mWidth;
+            size_t height = mHeight;
+            for(size_t mip=0; mip<=mNumMipmaps; ++mip)
+            { 
 
-        bool updateOldList = mSurfaceList.size() == (getNumFaces() * (mNumMipmaps + 1));
-        if(!updateOldList)
-        {   
-            // Create new list of surfaces
-            mSurfaceList.clear();
-            PixelFormat format = D3D11Mappings::_getClosestSupportedPF(mFormat);
-            size_t depth = mDepth;
+                D3D11HardwarePixelBuffer *buffer;
+                buffer = new D3D11HardwarePixelBuffer(
+                    this, // parentTexture
+                    mDevice, // device
+                    mip, 
+                    width, 
+                    height, 
+                    depth,
+                    face,
+                    format,
+                    (HardwareBuffer::Usage)mUsage
+                    ); 
 
-            for(size_t face=0; face<getNumFaces(); ++face)
-            {
-                size_t width = mWidth;
-                size_t height = mHeight;
-                for(size_t mip=0; mip<=mNumMipmaps; ++mip)
-                { 
+                mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buffer));
 
-                    D3D11HardwarePixelBuffer *buffer;
-                    buffer = new D3D11HardwarePixelBuffer(
-                        this, // parentTexture
-                        mDevice, // device
-                        mip, 
-                        width, 
-                        height, 
-                        depth,
-                        face,
-                        format,
-                        (HardwareBuffer::Usage)bufusage // usage
-                        ); 
-
-                    mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buffer));
-
-                    if(width > 1) width /= 2;
-                    if(height > 1) height /= 2;
-                    if(depth > 1 && getTextureType() != TEX_TYPE_2D_ARRAY) depth /= 2;
-                }
+                if(width > 1) width /= 2;
+                if(height > 1) height /= 2;
+                if(depth > 1 && getTextureType() != TEX_TYPE_2D_ARRAY) depth /= 2;
             }
         }
-
-        // do we need to bind?
-
     }
     //---------------------------------------------------------------------
     HardwarePixelBufferSharedPtr D3D11Texture::getBuffer(size_t face, size_t mipmap) 
