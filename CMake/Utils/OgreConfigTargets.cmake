@@ -189,6 +189,16 @@ function(ogre_config_common TARGETNAME)
   ogre_create_vcproj_userfile(${TARGETNAME})
 endfunction(ogre_config_common)
 
+# checks whether the target LIBNAME produces a pdb file
+function(ogre_produces_pdb VARNAME LIBNAME)
+  get_target_property(TYPE ${LIBNAME} TYPE)
+  if (TYPE STREQUAL "SHARED_LIBRARY" OR TYPE STREQUAL "MODULE_LIBRARY" OR TYPE STREQUAL "EXECUTABLE")
+    set(${VARNAME} ON PARENT_SCOPE)
+  else ()
+    set(${VARNAME} OFF PARENT_SCOPE)
+  endif ()
+endfunction(ogre_produces_pdb)
+
 # setup library build
 function(ogre_config_lib LIBNAME EXPORT)
   ogre_config_common(${LIBNAME})
@@ -215,14 +225,17 @@ function(ogre_config_lib LIBNAME EXPORT)
 		CONFIGURATIONS RelWithDebInfo
 	  )
 	else ()
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${LIBNAME}_d.pdb
+    ogre_produces_pdb(PRODUCES_PDB ${LIBNAME})
+    if (PRODUCES_PDB)
+	  install(FILES $<TARGET_PDB_FILE:${LIBNAME}>
 	    DESTINATION bin${OGRE_DEBUG_PATH}
 		CONFIGURATIONS Debug
 	  )
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${LIBNAME}.pdb
+	  install(FILES $<TARGET_PDB_FILE:${LIBNAME}>
 	    DESTINATION bin${OGRE_RELWDBG_PATH}
 		CONFIGURATIONS RelWithDebInfo
 	  )
+    endif ()
 	endif ()
   endif ()
 endfunction(ogre_config_lib)
@@ -284,14 +297,17 @@ function(ogre_config_plugin PLUGINNAME)
 		CONFIGURATIONS RelWithDebInfo
 	  )
 	else ()
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${PLUGINNAME}_d.pdb
+    ogre_produces_pdb(PRODUCES_PDB ${PLUGINNAME})
+    if(PRODUCES_PDB)
+	  install(FILES $<TARGET_PDB_FILE:${PLUGINNAME}>
 	    DESTINATION bin${OGRE_DEBUG_PATH}
 		CONFIGURATIONS Debug
 	  )
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${PLUGINNAME}.pdb
+	  install(FILES $<TARGET_PDB_FILE:${PLUGINNAME}>
 	    DESTINATION bin${OGRE_RELWDBG_PATH}
 		CONFIGURATIONS RelWithDebInfo
 	  )
+    endif ()
 	endif ()
   endif ()
 endfunction(ogre_config_plugin)
@@ -341,11 +357,11 @@ function(ogre_config_sample_exe SAMPLENAME)
   ogre_config_sample_common(${SAMPLENAME})
   if (OGRE_INSTALL_PDB AND OGRE_INSTALL_SAMPLES)
 	  # install debug pdb files - no _d on exe
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}.pdb
+	  install(FILES $<TARGET_PDB_FILE:${SAMPLENAME}>
 		  DESTINATION bin${OGRE_DEBUG_PATH}
 		  CONFIGURATIONS Debug
 		  )
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${SAMPLENAME}.pdb
+	  install(FILES $<TARGET_PDB_FILE:${SAMPLENAME}>
 		  DESTINATION bin${OGRE_RELWDBG_PATH}
 		  CONFIGURATIONS RelWithDebInfo
 		  )
@@ -366,14 +382,17 @@ function(ogre_config_sample_lib SAMPLENAME)
   ogre_config_sample_common(${SAMPLENAME})
   if (OGRE_INSTALL_PDB AND OGRE_INSTALL_SAMPLES)
 	  # install debug pdb files - with a _d on lib
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}_d.pdb
+    ogre_produces_pdb(PRODUCES_PDB ${SAMPLENAME})
+    if (PRODUCES_PDB)
+	  install(FILES $<TARGET_PDB_FILE:${SAMPLENAME}>
 		  DESTINATION bin${OGRE_DEBUG_PATH}
 		  CONFIGURATIONS Debug
 		  )
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${SAMPLENAME}.pdb
+	  install(FILES $<TARGET_PDB_FILE:${SAMPLENAME}>
 		  DESTINATION bin${OGRE_RELWDBG_PATH}
 		  CONFIGURATIONS RelWithDebInfo
 		  )
+    endif ()
   endif ()
 
   if (APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
@@ -415,11 +434,11 @@ function(ogre_config_tool TOOLNAME)
     ogre_install_target(${TOOLNAME} "" FALSE)
     if (OGRE_INSTALL_PDB)
       # install debug pdb files
-      install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${TOOLNAME}_d.pdb
+      install(FILES $<TARGET_PDB_FILE:${TOOLNAME}>
         DESTINATION bin${OGRE_DEBUG_PATH}
         CONFIGURATIONS Debug
         )
-      install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${TOOLNAME}.pdb
+      install(FILES $<TARGET_PDB_FILE:${TOOLNAME}>
         DESTINATION bin${OGRE_RELWDBG_PATH}
         CONFIGURATIONS RelWithDebInfo
         )
