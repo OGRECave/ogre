@@ -584,6 +584,10 @@ namespace Ogre {
     
     void CocoaWindow::windowMovedOrResized()
     {
+        mContentScalingFactor =
+            ([mView respondsToSelector:@selector(wantsBestResolutionOpenGLSurface)] && [(id)mView wantsBestResolutionOpenGLSurface]) ?
+            (mView.window.screen ?: [NSScreen mainScreen]).backingScaleFactor : 1.0f;
+
         NSRect winFrame = [mWindow frame];
         NSRect viewFrame = [mView frame];
         NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
