@@ -400,10 +400,10 @@ if (OGRE_INSTALL_SAMPLES)
 	ogre_install_target(SampleBrowser "" FALSE)
 	if (OGRE_INSTALL_PDB)
 		# install debug pdb files
-		install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/SampleBrowser_d.pdb
+		install(FILES $<TARGET_PDB_FILE:SampleBrowser>
 			DESTINATION bin${OGRE_DEBUG_PATH} CONFIGURATIONS Debug
 			)
-		install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/SampleBrowser.pdb
+		install(FILES $<TARGET_PDB_FILE:SampleBrowser>
 			DESTINATION bin${OGRE_RELWDBG_PATH} CONFIGURATIONS RelWithDebInfo
 			)
 	endif ()
