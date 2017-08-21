@@ -40,6 +40,7 @@ THE SOFTWARE.
 #import <UIKit/UIWindow.h>
 #import <UIKit/UIGraphics.h>
 #include "ARCMacros.h"
+#include "OgreDepthBuffer.h"
 
 namespace Ogre {
 
@@ -70,6 +71,7 @@ namespace Ogre {
         mIsFullScreen = true;
         mActive = true;
         mHwGamma = false;
+        mDepthBufferPoolId = DepthBuffer::POOL_NO_DEPTH;
     }
 
     EAGL2Window::~EAGL2Window()
