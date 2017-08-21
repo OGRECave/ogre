@@ -1732,7 +1732,7 @@ namespace Ogre {
         mCurrentContext->setCurrent();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLES2StateCacheManager>();
-        _completeDeferredVaoDestruction();
+        _completeDeferredVaoFboDestruction();
 
         // Check if the context has already done one-time initialisation
         if (!mCurrentContext->getInitialized())
@@ -1761,7 +1761,19 @@ namespace Ogre {
     void GLES2RenderSystem::_unregisterContext(GLContext *context)
     {
         static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
-
+        
+        for(RenderTargetMap::iterator it = mRenderTargets.begin(); it!=mRenderTargets.end(); ++it)
+        {
+            RenderTarget* target = it->second;
+            if(target)
+            {
+                GLES2FrameBufferObject *fbo = 0;
+                target->getCustomAttribute("FBO", &fbo);
+                if(fbo)
+                    fbo->notifyContextDestroyed(context);
+            }
+        }
+        
         if (mCurrentContext == context)
         {
             // Change the context to something else so that a valid context
@@ -1796,6 +1808,14 @@ namespace Ogre {
             context->_getVaoDeferredForDestruction().push_back(vao);
         else
             OGRE_CHECK_GL_ERROR(glDeleteVertexArraysOES(1, &vao));
+    }
+    
+    void GLES2RenderSystem::_destroyFbo(GLContext* context, uint32 fbo)
+    {
+        if(context != mCurrentContext)
+            context->_getFboDeferredForDestruction().push_back(fbo);
+        else
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fbo));
     }
 
     void GLES2RenderSystem::_bindVao(GLContext* context, uint32 vao)

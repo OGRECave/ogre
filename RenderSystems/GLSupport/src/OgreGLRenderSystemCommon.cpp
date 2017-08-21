@@ -160,7 +160,7 @@ namespace Ogre {
         matrix[2][3] = c.w;
     }
 
-    void GLRenderSystemCommon::_completeDeferredVaoDestruction()
+    void GLRenderSystemCommon::_completeDeferredVaoFboDestruction()
     {
         if(GLContext* ctx = mCurrentContext)
         {
@@ -170,6 +170,14 @@ namespace Ogre {
                 _destroyVao(ctx, vaos.back());
                 vaos.pop_back();
             }
+            
+            vector<uint32>::type& fbos = ctx->_getFboDeferredForDestruction();
+            while(!fbos.empty())
+            {
+                _destroyFbo(ctx, fbos.back());
+                fbos.pop_back();
+            }
+
         }
     }
 

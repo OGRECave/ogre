@@ -39,13 +39,16 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
-        mManager(manager), mNumSamples(fsaa)
+        mManager(manager), mNumSamples(fsaa), mContext(NULL)
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         GLint oldfb = 0;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 #endif
 
+        GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+        mContext = rs->_getCurrentContext();
+        
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
@@ -95,10 +98,14 @@ namespace Ogre {
         mManager->releaseRenderBuffer(mStencil);
         mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // Delete framebuffer object
-        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mFB));
-        
-        if (mMultisampleFB)
-            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mMultisampleFB));
+        if(mContext && mFB)
+        {
+            GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+            rs->_destroyFbo(mContext, mFB);
+            
+            if (mMultisampleFB)
+                rs->_destroyFbo(mContext, mMultisampleFB);
+        }
     }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
@@ -146,6 +153,8 @@ namespace Ogre {
     
     void GLES2FrameBufferObject::initialise()
     {
+        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+        
         // Release depth and stencil, if they were bound
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
@@ -294,6 +303,8 @@ namespace Ogre {
     
     void GLES2FrameBufferObject::bind()
     {
+        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+
         // Bind it to FBO
         const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fb));
@@ -321,6 +332,8 @@ namespace Ogre {
 
     void GLES2FrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
+        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+
         GLES2DepthBuffer *glDepthBuffer = static_cast<GLES2DepthBuffer*>(depthBuffer);
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
 
@@ -348,6 +361,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLES2FrameBufferObject::detachDepthBuffer()
     {
+        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,

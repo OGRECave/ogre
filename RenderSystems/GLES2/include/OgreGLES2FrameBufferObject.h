@@ -55,7 +55,9 @@ namespace Ogre {
         /** Bind FrameBufferObject
         */
         void bind();
-
+        
+        GLContext* getContext(){ return mContext; }
+        
         /** Swap buffers - only useful when using multisample buffers.
         */
         void swapBuffers();
@@ -84,6 +86,7 @@ namespace Ogre {
         /** See AndroidResource. */
         void notifyOnContextReset(const GLSurfaceDesc &target);
 #endif
+        void notifyContextDestroyed(GLContext* context) { if(mContext == context) { mContext = 0; mFB = 0; mMultisampleFB = 0; } }
         
     private:
         GLES2FBOManager *mManager;
@@ -95,7 +98,7 @@ namespace Ogre {
         GLSurfaceDesc mStencil;
         // Arbitrary number of texture surfaces
         GLSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-
+        GLContext* mContext;
 
         /** Initialise object (find suitable depth and stencil format).
             Must be called every time the bindings change.

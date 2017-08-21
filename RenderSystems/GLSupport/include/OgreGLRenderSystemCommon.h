@@ -109,8 +109,10 @@ namespace Ogre {
         virtual void _bindVao(GLContext* context, uint32 vao) {}
         /** Destroy VAO immediately or defer if it was created on other context */
         virtual void _destroyVao(GLContext* context, uint32 vao) {}
-        /** Complete destruction of VAOs deferred while creator context was not current */
-        void _completeDeferredVaoDestruction();
+        /** Destroy FBO immediately or defer if it was created on other context */
+        virtual void _destroyFbo(GLContext* context, uint32 fbo) {}
+        /** Complete destruction of VAOs and FBOs deferred while creator context was not current */
+        void _completeDeferredVaoFboDestruction();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /// @deprecated use RenderWindow::_notifySurfaceDestroyed

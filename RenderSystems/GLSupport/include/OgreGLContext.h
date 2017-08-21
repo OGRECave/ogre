@@ -85,11 +85,14 @@ namespace Ogre {
 
         /// VAOs deferred for destruction in proper GL context
         vector<uint32>::type& _getVaoDeferredForDestruction() { return mVaoDeferredForDestruction; }
-
+        /// FBOs deferred for destruction in proper GL context
+        vector<uint32>::type& _getFboDeferredForDestruction() { return mFboDeferredForDestruction; }
+        
     protected:
         bool initialized;
         SharedPtr<GLStateCacheManagerCommon> mStateCacheManager;
         vector<uint32>::type mVaoDeferredForDestruction;
+        vector<uint32>::type mFboDeferredForDestruction;
     };
 }
 

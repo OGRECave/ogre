@@ -58,6 +58,13 @@ namespace Ogre {
         {
             *static_cast<GLES2FrameBufferObject **>(pData) = &mFB;
         }
+        
+        if( name == "GLCONTEXT" )
+        {
+            *static_cast<GLContext**>(pData) = mFB.getContext();
+            return;
+        }
+
     }
 
     void GLES2FBORenderTexture::swapBuffers()
