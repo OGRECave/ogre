@@ -51,3 +51,7 @@ endif ()
 if (OGRE_BUILD_COMPONENT_PYTHON)
     add_subdirectory(Python)
 endif()
+
+if (OGRE_BUILD_COMPONENT_JAVA)
+  add_subdirectory(Java)
+endif()

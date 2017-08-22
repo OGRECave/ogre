@@ -9,6 +9,7 @@ addons:
     sources:
     - sourceline: "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse"
     - sourceline: "deb http://archive.ubuntu.com/ubuntu/ trusty-backports universe"
+    - sourceline: "ppa:nschloe/swig-backports"
     packages:
     - cmake
     - libxaw7-dev

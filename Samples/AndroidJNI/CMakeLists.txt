@@ -11,11 +11,11 @@
 # and add_static_libs macro to define additional target static libs
 include(AndroidMacros)
 
-if(ANDROID)
+if(ANDROID AND OGRE_BUILD_COMPONENT_JAVA)
     # Setup create_android_proj macro requirements
     SET(ANDROID_MOD_NAME "OgreJNI")
     SET(JNI_PATH ".")
-    SET(JNI_SRC_FILES "OgreActivityJNI.cpp")
+    #SET(JNI_SRC_FILES "OgreActivityJNI.cpp")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/${ANDROID_MOD_NAME}")
     
@@ -24,24 +24,24 @@ if(ANDROID)
     # Set this variable to false if no java code will be present (google android:hasCode for more info)
     SET(HAS_CODE "true")
     
-    SET(MAIN_ACTIVITY "org.ogre3d.android.MainActivity")
+    SET(MAIN_ACTIVITY "org.Ogre.example.MainActivity")
     SET(HEADERS "")
     SET(SAMPLE_LDLIBS "")
     
     # Copy and create resource files
-    file(MAKE_DIRECTORY "${NDKOUT}/src/org")
-    file(MAKE_DIRECTORY "${NDKOUT}/src/org/ogre3d")
-	file(MAKE_DIRECTORY "${NDKOUT}/src/org/ogre3d/android")	
-	file(COPY "${JNI_PATH}/OgreActivityJNI.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
-	file(COPY "${JNI_PATH}/MainActivity.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
-	file(COPY "${JNI_PATH}/OgreActivityJNI.cpp" DESTINATION "${NDKOUT}/jni")
-	
+	# file(COPY "${JNI_PATH}/OgreActivityJNI.java" DESTINATION "${NDKOUT}/src/org/ogre/android")
+	file(COPY "${JNI_PATH}/MainActivity.java" DESTINATION "${NDKOUT}/src/org/Ogre/example")
+    
     copy_assets_to_android_proj()
         
     # Create CMake target
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp "int x = 23;")
     ADD_LIBRARY(OgreJNIDummy SHARED ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
     
-    set(JNI_PATH "${NDKOUT}/jni")
+    # copy the SDK
+    add_custom_command(TARGET OgreJNIDummy PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${OGRE_BINARY_DIR}/java" "${NDKOUT}")
+
+    # set(JNI_PATH "${NDKOUT}/jni")
     create_android_proj(OgreJNIDummy)
 endif()

@@ -114,11 +114,6 @@ namespace Ogre {
             virtual void getCustomAttribute(const String& name, void* pData);
 
             bool requiresTextureFlipping() const;
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-            virtual void _destroyInternalResources() = 0;
-            virtual void _createInternalResources(NativeWindowType window, void* config = NULL) = 0;
-#endif
     };
 }
 

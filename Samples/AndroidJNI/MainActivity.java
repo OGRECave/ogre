@@ -26,9 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-package org.ogre3d.android;
+package org.Ogre.example;
 
-import org.ogre3d.android.OgreActivityJNI;
+import org.Ogre.*;
 
 import android.app.Activity;
 import android.hardware.Sensor;
@@ -51,6 +51,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 	private boolean paused = false;
 	private boolean initOGRE = false;
 	private AssetManager assetMgr = null;
+	
+	ApplicationContext ogreApp = null;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +81,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 		Runnable destroyer = new Runnable() {
 			public void run() {
-				OgreActivityJNI.shutdown();
+			    ogreApp.shutdown();
 			}
 		};
 		handler.post(destroyer);
@@ -103,13 +105,43 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 							if (!wndCreate && lastSurface != null) {
 								wndCreate = true;
-								OgreActivityJNI.init(assetMgr, lastSurface);
+								
+								if(ogreApp == null) {
+                                    ogreApp = new ApplicationContext();
+                                    ogreApp.initAppForAndroid(assetMgr, lastSurface);
+                                    
+                                    SceneManager scnMgr = ogreApp.getRoot().createSceneManager(SceneType.ST_GENERIC.swigValue());
+                                    ShaderGenerator.getSingleton().addSceneManager(scnMgr);
+                                    
+                                    Light light = scnMgr.createLight("MainLight");
+                                    light.setPosition(0, 10, 15);
+                                    
+                                    Camera cam = scnMgr.createCamera("myCam");
+                                    cam.setNearClipDistance(5);
+                                    cam.setAutoAspectRatio(true);
+                                    
+                                    SceneNode camnode = scnMgr.getRootSceneNode().createChildSceneNode();
+                                    camnode.attachObject(cam);
+                                    camnode.translate(new Vector3(0, 0, 15), Node.TransformSpace.TS_LOCAL);
+                                    
+                                    Entity ent = scnMgr.createEntity("Sinbad.mesh");
+                                    SceneNode node = scnMgr.getRootSceneNode().createChildSceneNode();
+                                    node.attachObject(ent);
+                                    
+                                    Viewport vp = ogreApp.getRenderWindow().addViewport(cam);
+                                    vp.setBackgroundColour(new ColourValue(0.3f, 0.3f, 0.3f));
+								} else {
+								    ogreApp.getRenderWindow()._notifySurfaceCreated(lastSurface);
+								}
+                                
 								handler.post(this);
 								return;
 							}
 
-							if (initOGRE && wndCreate)
-								OgreActivityJNI.renderOneFrame();
+                            if (initOGRE && wndCreate) {
+                                ogreApp.getRenderWindow().windowMovedOrResized();
+                                ogreApp.getRoot().renderOneFrame();
+                            }
 
 							handler.post(this);
 						}
@@ -123,7 +155,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 		SurfaceView view = new SurfaceView(this);
 		SurfaceHolder holder = view.getHolder();
-		// holder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
 		surfaceView = view;
 
 		holder.addCallback(new Callback() {
@@ -141,7 +172,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 					lastSurface = null;
 					handler.post(new Runnable() {
 						public void run() {
-							OgreActivityJNI.termWindow();
+						    ogreApp.getRenderWindow()._notifySurfaceDestroyed();
 						}
 					});
 				}
