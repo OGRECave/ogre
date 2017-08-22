@@ -70,6 +70,10 @@ namespace Ogre {
             NativeWindowType mWindow;
             EAGL2View *mView;
             EAGL2ViewController *mViewController;
+#else
+            void *mWindowPlaceholder;
+            void *mViewPlaceholder;
+            void *mViewControllerPlaceholder;
 #endif
 
             void createNativeWindow(uint widthPt, uint heightPt, const NameValuePairList *miscParams);

@@ -44,6 +44,9 @@ namespace Ogre {
 #ifdef __OBJC__
             CAEAGLLayer *mDrawable;
             EAGLContext *mContext;
+#else
+            void *mDrawablePlaceholder;
+            void *mContextPlaceholder;
 #endif
 
         public:
