@@ -1157,7 +1157,7 @@ namespace Ogre {
             GLRenderBuffer *depthBuffer = new GLRenderBuffer( depthFormat, fbo->getWidth(),
                                                               fbo->getHeight(), fbo->getFSAA() );
 
-            GLRenderBuffer *stencilBuffer = depthBuffer;
+            GLRenderBuffer *stencilBuffer = stencilFormat ? depthBuffer : NULL;
             if( depthFormat != GL_DEPTH24_STENCIL8_EXT && stencilFormat )
             {
                 stencilBuffer = new GLRenderBuffer( stencilFormat, fbo->getWidth(),
