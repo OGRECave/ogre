@@ -453,7 +453,8 @@ namespace Ogre
         /** Sets the world transform matrix.
          * @deprecated only needed for fixed function APIs */
         virtual void _setWorldMatrix(const Matrix4 &m) {}
-        /** Sets multiple world matrices (vertex blending). */
+        /** Sets multiple world matrices (vertex blending).
+         * @deprecated unused. for FFP vertex blending, which never existed. */
         virtual void _setWorldMatrices(const Matrix4* m, unsigned short count);
         /** Sets the view transform matrix
          * @deprecated only needed for fixed function APIs */
