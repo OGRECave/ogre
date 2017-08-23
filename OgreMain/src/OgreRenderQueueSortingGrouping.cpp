@@ -277,19 +277,7 @@ namespace Ogre {
         :mOrganisationMode(0)
     {
     }
-    //-----------------------------------------------------------------------
-    QueuedRenderableCollection::~QueuedRenderableCollection(void)
-    {
-        // destroy all the pass map entries (rather than clearing)
-        PassGroupRenderableMap::iterator i, iend;
-        iend = mGrouped.end();
-        for (i = mGrouped.begin(); i != iend; ++i)
-        {
-            // Free the list associated with this pass
-            OGRE_DELETE_T(i->second, RenderableList, MEMCATEGORY_SCENE_CONTROL);
-        }
-        
-    }
+
     //-----------------------------------------------------------------------
     void QueuedRenderableCollection::clear(void)
     {
@@ -298,7 +286,7 @@ namespace Ogre {
         for (i = mGrouped.begin(); i != iend; ++i)
         {
             // Clear the list associated with this pass, but leave the pass entry
-            i->second->clear();
+            i->second.clear();
         }
 
         // Clear sorted list
@@ -312,8 +300,6 @@ namespace Ogre {
         i = mGrouped.find(p);
         if (i != mGrouped.end())
         {
-            // free memory
-            OGRE_DELETE_T(i->second, RenderableList, MEMCATEGORY_SCENE_CONTROL);
             // erase from map
             mGrouped.erase(i);
         }
@@ -376,14 +362,13 @@ namespace Ogre {
                 // engine shuts down, or a pass is destroyed or has it's hash
                 // recalculated, although the lists will be cleared
                 retPair = mGrouped.insert(
-                    PassGroupRenderableMap::value_type(
-                        pass, OGRE_NEW_T(RenderableList, MEMCATEGORY_SCENE_CONTROL)() ));
+                    PassGroupRenderableMap::value_type(pass, RenderableList()));
                 assert(retPair.second && 
                     "Error inserting new pass entry into PassGroupRenderableMap");
                 i = retPair.first;
             }
             // Insert renderable
-            i->second->push_back(rend);
+            i->second.push_back(rend);
             
         }
         
@@ -431,16 +416,16 @@ namespace Ogre {
         for (ipass = mGrouped.begin(); ipass != ipassend; ++ipass)
         {
             // Fast bypass if this group is now empty
-            if (ipass->second->empty()) continue;
+            if (ipass->second.empty()) continue;
 
             // Visit Pass - allow skip
             if (!visitor->visit(ipass->first))
                 continue;
 
-            RenderableList* rendList = ipass->second;
+            const RenderableList& rendList = ipass->second;
             RenderableList::const_iterator irend, irendend;
-            irendend = rendList->end();
-            for (irend = rendList->begin(); irend != irendend; ++irend)
+            irendend = rendList.end();
+            for (irend = rendList.begin(); irend != irendend; ++irend)
             {
                 // Visit Renderable
                 visitor->visit(const_cast<Renderable*>(*irend));
@@ -492,15 +477,14 @@ namespace Ogre {
                 // engine shuts down, or a pass is destroyed or has it's hash
                 // recalculated, although the lists will be cleared
                 retPair = mGrouped.insert(
-                    PassGroupRenderableMap::value_type(
-                        srcGroup->first, OGRE_NEW_T(RenderableList, MEMCATEGORY_SCENE_CONTROL)() ));
+                    PassGroupRenderableMap::value_type(srcGroup->first, RenderableList()));
                 assert(retPair.second && 
                     "Error inserting new pass entry into PassGroupRenderableMap");
                 dstGroup = retPair.first;
             }
 
             // Insert renderable
-            dstGroup->second->insert( dstGroup->second->end(), srcGroup->second->begin(), srcGroup->second->end() );
+            dstGroup->second.insert( dstGroup->second.end(), srcGroup->second.begin(), srcGroup->second.end() );
         }
     }
 
