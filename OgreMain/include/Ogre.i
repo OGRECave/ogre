@@ -24,6 +24,7 @@
 #endif
 %include std_vector.i
 %include exception.i
+%include typemaps.i
  
 /* Parse the header file to generate wrappers */
 #define _OgreExport
@@ -361,6 +362,7 @@ ADD_REPR(ColourValue)
         %include "OgreShadowCameraSetupLiSPSM.h"
         %include "OgreShadowCameraSetupPlaneOptimal.h"
         %include "OgreShadowCameraSetupPSSM.h"
+    %apply Ogre::Real& OUTPUT {Ogre::Real& outleft, Ogre::Real& outright, Ogre::Real& outtop, Ogre::Real& outbottom};        
     %include "OgreFrustum.h"
         %ignore Ogre::Camera::setPosition;
         %ignore Ogre::Camera::getPosition;
