@@ -17,7 +17,6 @@
 cmake_minimum_required(VERSION 2.8.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
-cmake_policy(SET CMP0042 NEW)
 
 if(CMAKE_VS_PLATFORM_NAME STREQUAL "Tegra-Android")
 	set(CMAKE_LINK_LIBRARY_FLAG "")
@@ -32,6 +31,8 @@ if(WIN32)
 endif()
 
 if (APPLE AND NOT ANDROID)
+  cmake_policy(SET CMP0042 NEW)
+
   if(CMAKE_VERSION VERSION_LESS 3.0.0)
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER(clang GNU)
