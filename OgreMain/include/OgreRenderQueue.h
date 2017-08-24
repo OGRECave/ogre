@@ -93,10 +93,7 @@ namespace Ogre {
     {
     public:
 
-        typedef map< uint8, RenderQueueGroup* >::type RenderQueueGroupMap;
-        /// Iterator over queue groups
-        typedef MapIterator<RenderQueueGroupMap> QueueGroupIterator;
-        typedef ConstMapIterator<RenderQueueGroupMap> ConstQueueGroupIterator;
+        typedef std::unique_ptr<RenderQueueGroup> RenderQueueGroupMap[RENDER_QUEUE_MAX];
 
         /** Class to listen in on items being added to the render queue. 
         @remarks
@@ -239,9 +236,10 @@ namespace Ogre {
         */
         void setDefaultQueueGroup(uint8 grp);
         
-        /** Internal method, returns an iterator for the queue groups. */
-        QueueGroupIterator _getQueueGroupIterator(void);
-        ConstQueueGroupIterator _getQueueGroupIterator(void) const;
+        /** Internal method, returns the queue groups. */
+        const RenderQueueGroupMap& _getQueueGroups() const {
+            return mGroups;
+        }
 
         /** Sets whether or not the queue will split passes by their lighting type,
             ie ambient, per-light and decal. 

@@ -42,15 +42,9 @@ namespace Ogre {
         , mRenderableListener(0)
     {
         // Create the 'main' queue up-front since we'll always need that
-        mGroups.insert(
-            RenderQueueGroupMap::value_type(
-                RENDER_QUEUE_MAIN, 
-                OGRE_NEW RenderQueueGroup(this,
-                    mSplitPassesByLightingType,
-                    mSplitNoShadowPasses,
-                    mShadowCastersCannotBeReceivers)
-                )
-            );
+        mGroups[RENDER_QUEUE_MAIN].reset(new RenderQueueGroup(this, mSplitPassesByLightingType,
+                                                              mSplitNoShadowPasses,
+                                                              mShadowCastersCannotBeReceivers));
 
         // set default queue
         mDefaultQueueGroup = RENDER_QUEUE_MAIN;
@@ -63,16 +57,6 @@ namespace Ogre {
         
         // trigger the pending pass updates, otherwise we could leak
         Pass::processPendingPassUpdates();
-        
-        // Destroy the queues for good
-        RenderQueueGroupMap::iterator i, iend;
-        i = mGroups.begin();
-        iend = mGroups.end();
-        for (; i != iend; ++i)
-        {
-            OGRE_DELETE i->second;
-        }
-        mGroups.clear();
     }
     //-----------------------------------------------------------------------
     void RenderQueue::addRenderable(Renderable* pRend, uint8 groupID, ushort priority)
@@ -130,12 +114,10 @@ namespace Ogre {
             SceneManager* sceneMgr = scnIt.getNext();
             RenderQueue* queue = sceneMgr->getRenderQueue();
 
-            RenderQueueGroupMap::iterator i, iend;
-            i = queue->mGroups.begin();
-            iend = queue->mGroups.end();
-            for (; i != iend; ++i)
+            for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
             {
-                i->second->clear(destroyPassMaps);
+                if(queue->mGroups[i])
+                    queue->mGroups[i]->clear(destroyPassMaps);
             }
         }
 
@@ -146,16 +128,6 @@ namespace Ogre {
         // We're assuming that frame-by-frame, the same groups are likely to 
         //  be used, so no point destroying the vectors and incurring the overhead
         //  that would cause, let them be destroyed in the destructor.
-    }
-    //-----------------------------------------------------------------------
-    RenderQueue::QueueGroupIterator RenderQueue::_getQueueGroupIterator(void)
-    {
-        return QueueGroupIterator(mGroups.begin(), mGroups.end());
-    }
-    //-----------------------------------------------------------------------
-    RenderQueue::ConstQueueGroupIterator RenderQueue::_getQueueGroupIterator(void) const
-    {
-        return ConstQueueGroupIterator(mGroups.begin(), mGroups.end());
     }
     //-----------------------------------------------------------------------
     void RenderQueue::addRenderable(Renderable* pRend, uint8 groupID)
@@ -192,26 +164,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     RenderQueueGroup* RenderQueue::getQueueGroup(uint8 groupID)
     {
-        // Find group
-        RenderQueueGroupMap::iterator groupIt;
-        RenderQueueGroup* pGroup;
-
-        groupIt = mGroups.find(groupID);
-        if (groupIt == mGroups.end())
+        if (!mGroups[groupID])
         {
             // Insert new
-            pGroup = OGRE_NEW RenderQueueGroup(this,
-                mSplitPassesByLightingType,
-                mSplitNoShadowPasses,
-                mShadowCastersCannotBeReceivers);
-            mGroups.insert(RenderQueueGroupMap::value_type(groupID, pGroup));
-        }
-        else
-        {
-            pGroup = groupIt->second;
+            mGroups[groupID].reset(new RenderQueueGroup(this, mSplitPassesByLightingType,
+                                                        mSplitNoShadowPasses,
+                                                        mShadowCastersCannotBeReceivers));
         }
 
-        return pGroup;
+        return mGroups[groupID].get();
 
     }
     //-----------------------------------------------------------------------
@@ -219,12 +180,10 @@ namespace Ogre {
     {
         mSplitPassesByLightingType = split;
 
-        RenderQueueGroupMap::iterator i, iend;
-        i = mGroups.begin();
-        iend = mGroups.end();
-        for (; i != iend; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
         {
-            i->second->setSplitPassesByLightingType(split);
+            if(mGroups[i])
+                mGroups[i]->setSplitPassesByLightingType(split);
         }
     }
     //-----------------------------------------------------------------------
@@ -237,12 +196,10 @@ namespace Ogre {
     {
         mSplitNoShadowPasses = split;
 
-        RenderQueueGroupMap::iterator i, iend;
-        i = mGroups.begin();
-        iend = mGroups.end();
-        for (; i != iend; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
         {
-            i->second->setSplitNoShadowPasses(split);
+            if(mGroups[i])
+                mGroups[i]->setSplitNoShadowPasses(split);
         }
     }
     //-----------------------------------------------------------------------
@@ -255,12 +212,10 @@ namespace Ogre {
     {
         mShadowCastersCannotBeReceivers = ind;
 
-        RenderQueueGroupMap::iterator i, iend;
-        i = mGroups.begin();
-        iend = mGroups.end();
-        for (; i != iend; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
         {
-            i->second->setShadowCastersCannotBeReceivers(ind);
+            if(mGroups[i])
+                mGroups[i]->setShadowCastersCannotBeReceivers(ind);
         }
     }
     //-----------------------------------------------------------------------
@@ -271,15 +226,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderQueue::merge( const RenderQueue* rhs )
     {
-        ConstQueueGroupIterator it = rhs->_getQueueGroupIterator( );
-
-        while( it.hasMoreElements() )
+        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
         {
-            uint8 groupID = it.peekNextKey();
-            RenderQueueGroup* pSrcGroup = it.getNext();
-            RenderQueueGroup* pDstGroup = getQueueGroup( groupID );
+            if(!rhs->mGroups[i])
+                continue;
 
-            pDstGroup->merge( pSrcGroup );
+            RenderQueueGroup* pDstGroup = getQueueGroup( i );
+            pDstGroup->merge( rhs->mGroups[i].get() );
         }
     }
 
