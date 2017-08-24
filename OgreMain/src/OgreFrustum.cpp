@@ -947,6 +947,10 @@ namespace Ogre {
         return mMaterial;
     }
     //-----------------------------------------------------------------------
+    void Frustum::setMaterial(const MaterialPtr& mat) {
+        mMaterial = mat;
+    }
+    //-----------------------------------------------------------------------
     void Frustum::getRenderOperation(RenderOperation& op) 
     {
         updateVertexData();

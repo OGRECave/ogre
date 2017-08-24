@@ -489,6 +489,9 @@ namespace Ogre
         /** Overridden from MovableObject */
         void _notifyCurrentCamera(Camera* cam);
 
+        /// material to use for debug display
+        void setMaterial(const MaterialPtr& mat);
+
         /** Overridden from Renderable */
         const MaterialPtr& getMaterial(void) const;
 

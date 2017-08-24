@@ -194,7 +194,7 @@ namespace Ogre {
         typedef vector<RenderablePass>::type RenderablePassList;
         typedef vector<Renderable*>::type RenderableList;
         /** Map of pass to renderable lists, this is a grouping by pass. */
-        typedef map<Pass*, RenderableList*, PassGroupLess>::type PassGroupRenderableMap;
+        typedef map<Pass*, RenderableList, PassGroupLess>::type PassGroupRenderableMap;
 
         /// Functor for accessing sort value 1 for radix sort (Pass)
         struct RadixSortFunctorPass
@@ -246,7 +246,6 @@ namespace Ogre {
 
     public:
         QueuedRenderableCollection();
-        ~QueuedRenderableCollection();
 
         /// Empty the collection
         void clear(void);
