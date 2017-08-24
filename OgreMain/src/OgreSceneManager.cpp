@@ -1335,11 +1335,12 @@ void SceneManager::prepareRenderQueue(void)
 
             // Default all the queue groups that are there, new ones will be created
             // with defaults too
-            RenderQueue::QueueGroupIterator groupIter = q->_getQueueGroupIterator();
-            while (groupIter.hasMoreElements())
+            for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
             {
-                RenderQueueGroup* g = groupIter.getNext();
-                g->defaultOrganisationMode();
+                if(!q->_getQueueGroups()[i])
+                    continue;
+
+                q->_getQueueGroups()[i]->defaultOrganisationMode();
             }
         }
 
@@ -2360,16 +2361,15 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
     firePreRenderQueues();
 
     // Render each separate queue
-    RenderQueue::QueueGroupIterator queueIt = getRenderQueue()->_getQueueGroupIterator();
+    const RenderQueue::RenderQueueGroupMap& groups = getRenderQueue()->_getQueueGroups();
 
-    // NB only queues which have been created are rendered, no time is wasted
-    //   parsing through non-existent queues (even though there are 10 available)
-
-    while (queueIt.hasMoreElements())
+    for (uint8 qId = 0; qId < RENDER_QUEUE_MAX; ++qId)
     {
+        if(!groups[qId])
+            continue;
+
         // Get queue group id
-        uint8 qId = queueIt.peekNextKey();
-        RenderQueueGroup* pGroup = queueIt.getNext();
+        RenderQueueGroup* pGroup = groups[qId].get();
         // Skip this one if not to be processed
         if (!isRenderQueueToBeProcessed(qId))
             continue;
