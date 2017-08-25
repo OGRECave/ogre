@@ -328,12 +328,6 @@ namespace Ogre
             refreshConfig();
         }
     }
-    //-------------------------------------------------------------------------------------------------//
-    String GLXGLSupport::validateConfig(void)
-    {
-        //TODO
-        return BLANKSTRING;
-    }
 
     //-------------------------------------------------------------------------------------------------//
     RenderWindow* GLXGLSupport::createWindow(RenderSystem* renderSystem, const String& windowTitle)

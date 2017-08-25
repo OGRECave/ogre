@@ -91,7 +91,6 @@ namespace Ogre {
             void start(void);
             void stop(void);
             void addConfig(void);
-            String validateConfig(void);
             void setConfigOption(const String &name, const String &value);
             virtual String getDisplayName (void);
             EGLDisplay getGLDisplay(void);

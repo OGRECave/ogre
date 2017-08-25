@@ -249,12 +249,6 @@ namespace Ogre {
         }
     }
 
-    String Win32GLSupport::validateConfig()
-    {
-        // TODO, DX9
-        return BLANKSTRING;
-    }
-
     RenderWindow* Win32GLSupport::createWindow(RenderSystem* renderSystem, const String& windowTitle)
     {
         ConfigOptionMap::iterator opt = mOptions.find("Full Screen");

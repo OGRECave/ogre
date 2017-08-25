@@ -174,12 +174,6 @@ namespace Ogre {
         }
     }
 
-    String EGLSupport::validateConfig(void)
-    {
-        // TODO
-        return BLANKSTRING;
-    }
-
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
         mGLDisplay = eglGetDisplay(mNativeDisplay);

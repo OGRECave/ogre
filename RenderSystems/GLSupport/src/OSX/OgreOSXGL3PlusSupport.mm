@@ -238,11 +238,6 @@ void OSXGLSupport::addConfig( void )
     //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Resources/RTShaderLib/GLSL150");
 }
 
-String OSXGLSupport::validateConfig( void )
-{
-	return String( "" );
-}
-
 RenderWindow* OSXGLSupport::createWindow( RenderSystem* renderSystem, const String& windowTitle )
 {
     ConfigOptionMap::iterator opt = mOptions.find( "Full Screen" );

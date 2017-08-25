@@ -79,7 +79,9 @@ namespace Ogre
             * Make sure all the extra options are valid
             * @return string with error message
             */
-            virtual String validateConfig() = 0;
+            virtual String validateConfig() {
+                return "";
+            }
 
             virtual RenderWindow* createWindow(RenderSystem *renderSystem,
                                                const String& windowTitle) = 0;

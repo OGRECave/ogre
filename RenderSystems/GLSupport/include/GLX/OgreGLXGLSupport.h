@@ -49,9 +49,6 @@ namespace Ogre {
         /** @copydoc see GLNativeSupport::addConfig */
         void addConfig(void);
 
-        /** @copydoc see GLNativeSupport::validateConfig */
-        String validateConfig(void);
-
         /** @copydoc see GLNativeSupport::setConfigOption */
         void setConfigOption(const String &name, const String &value);
 

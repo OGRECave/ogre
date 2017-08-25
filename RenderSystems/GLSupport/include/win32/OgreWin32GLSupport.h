@@ -47,11 +47,6 @@ namespace Ogre
 
         void setConfigOption(const String &name, const String &value);
 
-        /**
-        * Make sure all the extra options are valid
-        */
-        String validateConfig();
-
         virtual RenderWindow* createWindow(RenderSystem* renderSystem, const String& windowTitle);
         
         /// @copydoc RenderSystem::_createRenderWindow

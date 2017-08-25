@@ -47,11 +47,6 @@ public:
     */
     void addConfig( void );
 
-    /**
-    * Make sure all the extra options are valid
-    */
-    String validateConfig( void );
-
     /// @copydoc GLNativeSupport::createWindow
     RenderWindow* createWindow(RenderSystem* renderSystem, const String& windowTitle );
     
