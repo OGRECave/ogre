@@ -238,12 +238,12 @@ void OSXGLSupport::addConfig( void )
     //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Resources/RTShaderLib/GLSL150");
 }
 
-RenderWindow* OSXGLSupport::createWindow( RenderSystem* renderSystem, const String& windowTitle )
+NameValuePairList OSXGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
 {
     ConfigOptionMap::iterator opt = mOptions.find( "Full Screen" );
     if( opt == mOptions.end() )
         OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find full screen options!", "OSXGLSupport::createWindow" );
-    bool fullscreen = ( opt->second.currentValue == "Yes" );
+    fullscreen = ( opt->second.currentValue == "Yes" );
     opt = mOptions.find( "Video Mode" );
     if( opt == mOptions.end() )
         OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find video mode options!", "OSXGLSupport::createWindow" );
@@ -252,12 +252,11 @@ RenderWindow* OSXGLSupport::createWindow( RenderSystem* renderSystem, const Stri
     if( pos == String::npos )
         OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Invalid Video Mode provided", "OSXGLSupport::createWindow" );
 
-    unsigned int w = StringConverter::parseUnsignedInt( val.substr( 0, pos ) );
-    unsigned int h = StringConverter::parseUnsignedInt( val.substr( pos + 1 ) );
+    w = StringConverter::parseUnsignedInt( val.substr( 0, pos ) );
+    h = StringConverter::parseUnsignedInt( val.substr( pos + 1 ) );
 
     // Parse FSAA config
     NameValuePairList winOptions;
-    winOptions[ "title" ] = windowTitle;
     opt = mOptions.find( "FSAA" );
     if( opt != mOptions.end() )
     {
@@ -301,7 +300,7 @@ RenderWindow* OSXGLSupport::createWindow( RenderSystem* renderSystem, const Stri
 
     winOptions["contextProfile"] = StringConverter::toString(int(mContextProfile));
 
-    return renderSystem->_createRenderWindow( windowTitle, w, h, fullscreen, &winOptions );
+    return winOptions;
 }
 
 RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, 

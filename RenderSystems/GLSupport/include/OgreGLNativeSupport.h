@@ -83,8 +83,7 @@ namespace Ogre
                 return "";
             }
 
-            virtual RenderWindow* createWindow(RenderSystem *renderSystem,
-                                               const String& windowTitle) = 0;
+            virtual NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen) = 0;
 
             /// @copydoc RenderSystem::_createRenderWindow
             virtual RenderWindow* newWindow(const String &name,

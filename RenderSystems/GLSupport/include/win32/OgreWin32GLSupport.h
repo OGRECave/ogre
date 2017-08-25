@@ -47,7 +47,7 @@ namespace Ogre
 
         void setConfigOption(const String &name, const String &value);
 
-        virtual RenderWindow* createWindow(RenderSystem* renderSystem, const String& windowTitle);
+        NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
         
         /// @copydoc RenderSystem::_createRenderWindow
         virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 

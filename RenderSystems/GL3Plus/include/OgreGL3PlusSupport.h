@@ -71,9 +71,8 @@ namespace Ogre
                 return mNative->getConfigOptions();
             }
 
-            RenderWindow* createWindow(RenderSystem *renderSystem,
-                                               const String& windowTitle) {
-                return mNative->createWindow(renderSystem, windowTitle);
+            NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen) {
+                return mNative->parseOptions(w, h, fullscreen);
             }
 
             /// @copydoc RenderSystem::_createRenderWindow

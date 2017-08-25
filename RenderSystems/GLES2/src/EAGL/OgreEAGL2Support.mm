@@ -232,16 +232,15 @@ namespace Ogre {
         return glConfig;
     }
     
-    RenderWindow * EAGL2Support::createWindow(RenderSystem* renderSystem,
-                                           const String& windowTitle)
+    NameValuePairList EAGL2Support::parseOptions(uint& w, uint& h, bool& fullscreen)
     {
         ConfigOptionMap::iterator opt;
         ConfigOptionMap::iterator end = mOptions.end();
         NameValuePairList miscParams;
 
         CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-        bool fullscreen = false;
-        uint w = (uint)screenSize.width, h = (uint)screenSize.height;
+        fullscreen = false;
+        w = (uint)screenSize.width, h = (uint)screenSize.height;
 
         if ((opt = mOptions.find("Full Screen")) != end)
         {
@@ -275,7 +274,7 @@ namespace Ogre {
             miscParams["FSAA"] = opt->second.currentValue;
         }
 
-        return renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
+        return miscParams;
     }
 
     RenderWindow * EAGL2Support::newWindow(const String &name,

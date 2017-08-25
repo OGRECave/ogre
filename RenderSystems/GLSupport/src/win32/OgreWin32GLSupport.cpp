@@ -249,12 +249,12 @@ namespace Ogre {
         }
     }
 
-    RenderWindow* Win32GLSupport::createWindow(RenderSystem* renderSystem, const String& windowTitle)
+    NameValuePairList Win32GLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
     {
         ConfigOptionMap::iterator opt = mOptions.find("Full Screen");
         if (opt == mOptions.end())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find full screen options!", "Win32GLSupport::createWindow");
-        bool fullscreen = (opt->second.currentValue == "Yes");
+        fullscreen = (opt->second.currentValue == "Yes");
 
         opt = mOptions.find("Video Mode");
         if (opt == mOptions.end())
@@ -264,8 +264,8 @@ namespace Ogre {
         if (pos == String::npos)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid Video Mode provided", "Win32GLSupport::createWindow");
 
-        unsigned int w = StringConverter::parseUnsignedInt(val.substr(0, pos));
-        unsigned int h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
+        w = StringConverter::parseUnsignedInt(val.substr(0, pos));
+        h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
 
         // Parse optional parameters
         NameValuePairList winOptions;
@@ -321,7 +321,7 @@ namespace Ogre {
         bool hwGamma = (opt->second.currentValue == "Yes");
         winOptions["gamma"] = StringConverter::toString(hwGamma);
 
-        return renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &winOptions);
+        return winOptions;
     }
 
     BOOL CALLBACK Win32GLSupport::sCreateMonitorsInfoEnumProc(

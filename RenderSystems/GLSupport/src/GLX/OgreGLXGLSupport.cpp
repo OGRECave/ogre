@@ -330,14 +330,14 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    RenderWindow* GLXGLSupport::createWindow(RenderSystem* renderSystem, const String& windowTitle)
+    NameValuePairList GLXGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
     {
         ConfigOptionMap::iterator opt;
         ConfigOptionMap::iterator end = mOptions.end();
         NameValuePairList miscParams;
 
-        bool fullscreen = false;
-        uint w = 800, h = 600;
+        fullscreen = false;
+        w = 800, h = 600;
 
         if((opt = mOptions.find("Full Screen")) != end)
             fullscreen = (opt->second.currentValue == "Yes");
@@ -373,7 +373,7 @@ namespace Ogre
         miscParams["stereoMode"] = opt->second.currentValue;
 #endif
 
-        return renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
+        return miscParams;
     }
 
     //-------------------------------------------------------------------------------------------------//

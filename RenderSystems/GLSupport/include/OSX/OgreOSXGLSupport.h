@@ -47,8 +47,7 @@ public:
     */
     void addConfig( void );
 
-    /// @copydoc GLNativeSupport::createWindow
-    RenderWindow* createWindow(RenderSystem* renderSystem, const String& windowTitle );
+    NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
     
     /// @copydoc RenderSystem::createRenderWindow
     virtual RenderWindow* newWindow( const String &name, unsigned int width, unsigned int height, 

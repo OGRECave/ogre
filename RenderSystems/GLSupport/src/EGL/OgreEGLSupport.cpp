@@ -428,15 +428,14 @@ namespace Ogre {
                           mOriginalMode.first.second, mOriginalMode.second);
     }
 
-    RenderWindow* EGLSupport::createWindow(RenderSystem* renderSystem,
-                                           const String& windowTitle)
+    NameValuePairList EGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
     {
         ConfigOptionMap::iterator opt;
         ConfigOptionMap::iterator end = mOptions.end();
         NameValuePairList miscParams;
 
-        bool fullscreen = false;
-        uint w = 640, h = 480;
+        fullscreen = false;
+        w = 640, h = 480;
 
         if ((opt = mOptions.find("Full Screen")) != end)
         {
@@ -468,7 +467,7 @@ namespace Ogre {
         if((opt = mOptions.find("VSync")) != end)
             miscParams["vsync"] = opt->second.currentValue;
 
-        return renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
+        return miscParams;
     }
 
     ::EGLContext EGLSupport::createNewContext(EGLDisplay eglDisplay,
