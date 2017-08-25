@@ -54,13 +54,6 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-    template<class C> void removeDuplicates(C& c)
-    {
-        std::sort(c.begin(), c.end());
-        typename C::iterator p = std::unique(c.begin(), c.end());
-        c.erase(p, c.end());
-    }
-
     class _OgrePrivate EGLSupport : public GLNativeSupport
     {
         protected:

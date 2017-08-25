@@ -43,13 +43,6 @@ namespace Ogre {
     class EAGL2Window;
     class EAGLES2Context;
 
-    template<class C> void removeDuplicates(C& c)
-    {
-        std::sort(c.begin(), c.end());
-        typename C::iterator p = std::unique(c.begin(), c.end());
-        c.erase(p, c.end());
-    }
-
     class _OgrePrivate EAGL2Support : public GLNativeSupport
     {
         public:

@@ -133,6 +133,14 @@ namespace Ogre
             ExtensionList extensionList;
 
             ContextProfile mContextProfile;
+
+            template<class C>
+            static void removeDuplicates(C& c)
+            {
+                std::sort(c.begin(), c.end());
+                typename C::iterator p = std::unique(c.begin(), c.end());
+                c.erase(p, c.end());
+            }
     };
     /** @} */
     /** @} */

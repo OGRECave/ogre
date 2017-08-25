@@ -60,13 +60,6 @@ namespace Ogre {
 #endif
     } 
 
-    template<class C> void remove_duplicates(C& c)
-    {
-        std::sort(c.begin(), c.end());
-        typename C::iterator p = std::unique(c.begin(), c.end());
-        c.erase(p, c.end());
-    }
-
     void Win32GLSupport::addConfig()
     {
         //TODO: EnumDisplayDevices http://msdn.microsoft.com/library/en-us/gdi/devcons_2303.asp
@@ -112,7 +105,7 @@ namespace Ogre {
             str << DevMode.dmPelsWidth << " x " << DevMode.dmPelsHeight;
             optVideoMode.possibleValues.push_back(str.str());
         }
-        remove_duplicates(optVideoMode.possibleValues);
+        removeDuplicates(optVideoMode.possibleValues);
         optVideoMode.currentValue = optVideoMode.possibleValues.front();
 
         optColourDepth.name = "Colour Depth";
@@ -214,8 +207,8 @@ namespace Ogre {
             optColourDepth->possibleValues.push_back(StringConverter::toString((unsigned int)i->dmBitsPerPel));
             optDisplayFrequency->possibleValues.push_back(StringConverter::toString((unsigned int)i->dmDisplayFrequency));
         }
-        remove_duplicates(optColourDepth->possibleValues);
-        remove_duplicates(optDisplayFrequency->possibleValues);
+        removeDuplicates(optColourDepth->possibleValues);
+        removeDuplicates(optDisplayFrequency->possibleValues);
         optColourDepth->currentValue = optColourDepth->possibleValues.back();
         bool freqValid = std::find(optDisplayFrequency->possibleValues.begin(),
             optDisplayFrequency->possibleValues.end(),
@@ -590,7 +583,7 @@ namespace Ogre {
                             mFSAALevels.push_back(samples);
                         }
                     }
-                    remove_duplicates(mFSAALevels);
+                    removeDuplicates(mFSAALevels);
                 }
             }
             
