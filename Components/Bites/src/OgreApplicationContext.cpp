@@ -191,7 +191,7 @@ void ApplicationContext::destroyRTShaderSystem()
 
 void ApplicationContext::setup()
 {
-    mWindow = createWindow();
+    mWindow = createWindow(mAppName);
     setupInput(mGrabInput);
     locateResources();
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
@@ -301,15 +301,15 @@ bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt)
     return true;
 }
 
-Ogre::RenderWindow *ApplicationContext::createWindow()
+Ogre::RenderWindow *ApplicationContext::createWindow(const Ogre::String& name)
 {
-    mRoot->initialise(false, mAppName);
+    mRoot->initialise(false);
     Ogre::NameValuePairList miscParams;
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
     miscParams["pp::Instance"] = Ogre::StringConverter::toString((unsigned long)mNaClInstance);
     miscParams["SwapCallback"] = Ogre::StringConverter::toString((unsigned long)mNaClSwapCallback);
     // create 1x1 window - we will resize later
-    return mRoot->createRenderWindow(mAppName, mInitWidth, mInitHeight, false, &miscParams);
+    return mRoot->createRenderWindow(name, mInitWidth, mInitHeight, false, &miscParams);
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAWindow));
@@ -336,7 +336,7 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
         SDL_InitSubSystem(SDL_INIT_VIDEO);
     }
 
-    mSDLWindow = SDL_CreateWindow(mAppName.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
+    mSDLWindow = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     SDL_GL_CreateContext(mSDLWindow);
@@ -356,7 +356,7 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.cocoa.window));
 #endif
 #endif
-    return mRoot->createRenderWindow(mAppName, w, h, false, &miscParams);
+    return mRoot->createRenderWindow(name, w, h, false, &miscParams);
 #endif
 }
 
