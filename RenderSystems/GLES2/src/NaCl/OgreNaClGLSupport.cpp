@@ -76,32 +76,24 @@ namespace Ogre {
         
     }
     
-    RenderWindow* NaClGLSupport::createWindow(bool autoCreateWindow,
-                                            GLES2RenderSystem *renderSystem,
+    RenderWindow* NaClGLSupport::createWindow(GLES2RenderSystem *renderSystem,
                                             const String& windowTitle)
     {
         LogManager::getSingleton().logMessage("\tGLSupport createWindow called");
         
-        RenderWindow *window = 0;
+        ConfigOptionMap::iterator opt;
+        ConfigOptionMap::iterator end = mOptions.end();
+        NameValuePairList miscParams;
 
-        if (autoCreateWindow)
+        bool fullscreen = true;
+        unsigned int w = 1, h = 1;
+
+        if ((opt = mOptions.find("Display Frequency")) != end)
         {
-            ConfigOptionMap::iterator opt;
-            ConfigOptionMap::iterator end = mOptions.end();
-            NameValuePairList miscParams;
-
-            bool fullscreen = true;
-            unsigned int w = 1, h = 1;
-
-            if ((opt = mOptions.find("Display Frequency")) != end)
-            {
-                miscParams["displayFrequency"] = opt->second.currentValue;
-            }
-
-            window = renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
+            miscParams["displayFrequency"] = opt->second.currentValue;
         }
 
-        return window;
+        return renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
     }
 
     RenderWindow* NaClGLSupport::newWindow(const String &name,

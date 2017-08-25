@@ -102,9 +102,7 @@ namespace Ogre {
             void* getProcAddress(const char* name);
             ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;
 
-            RenderWindow* createWindow(bool autoCreateWindow,
-                                       RenderSystem *renderSystem,
-                                       const String& windowTitle);
+            RenderWindow* createWindow(RenderSystem *renderSystem, const String& windowTitle);
 
             RenderWindow* newWindow(const String& name,
                                     unsigned int width, unsigned int height,

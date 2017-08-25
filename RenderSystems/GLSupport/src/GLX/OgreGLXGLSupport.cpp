@@ -336,57 +336,50 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    RenderWindow* GLXGLSupport::createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle)
+    RenderWindow* GLXGLSupport::createWindow(RenderSystem* renderSystem, const String& windowTitle)
     {
-        RenderWindow *window = 0;
+        ConfigOptionMap::iterator opt;
+        ConfigOptionMap::iterator end = mOptions.end();
+        NameValuePairList miscParams;
 
-        if (autoCreateWindow)
+        bool fullscreen = false;
+        uint w = 800, h = 600;
+
+        if((opt = mOptions.find("Full Screen")) != end)
+            fullscreen = (opt->second.currentValue == "Yes");
+
+        if((opt = mOptions.find("Display Frequency")) != end)
+            miscParams["displayFrequency"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("Video Mode")) != end)
         {
-            ConfigOptionMap::iterator opt;
-            ConfigOptionMap::iterator end = mOptions.end();
-            NameValuePairList miscParams;
+            String val = opt->second.currentValue;
+            String::size_type pos = val.find('x');
 
-            bool fullscreen = false;
-            uint w = 800, h = 600;
-
-            if((opt = mOptions.find("Full Screen")) != end)
-                fullscreen = (opt->second.currentValue == "Yes");
-
-            if((opt = mOptions.find("Display Frequency")) != end)
-                miscParams["displayFrequency"] = opt->second.currentValue;
-
-            if((opt = mOptions.find("Video Mode")) != end)
+            if (pos != String::npos)
             {
-                String val = opt->second.currentValue;
-                String::size_type pos = val.find('x');
-
-                if (pos != String::npos)
-                {
-                    w = StringConverter::parseUnsignedInt(val.substr(0, pos));
-                    h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
-                }
+                w = StringConverter::parseUnsignedInt(val.substr(0, pos));
+                h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
             }
-
-            if((opt = mOptions.find("FSAA")) != end)
-                miscParams["FSAA"] = opt->second.currentValue;
-
-            if((opt = mOptions.find("VSync")) != end)
-                miscParams["vsync"] = opt->second.currentValue;
-
-            if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
-                miscParams["gamma"] = opt->second.currentValue;
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			opt = mOptions.find("Stereo Mode");
-			if (opt == mOptions.end())
-				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "GLXGLSupport::createWindow");
-			miscParams["stereoMode"] = opt->second.currentValue;			
-#endif
-
-            window = renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
         }
 
-        return window;
+        if((opt = mOptions.find("FSAA")) != end)
+            miscParams["FSAA"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("VSync")) != end)
+            miscParams["vsync"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
+            miscParams["gamma"] = opt->second.currentValue;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        opt = mOptions.find("Stereo Mode");
+        if (opt == mOptions.end())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "GLXGLSupport::createWindow");
+        miscParams["stereoMode"] = opt->second.currentValue;
+#endif
+
+        return renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
     }
 
     //-------------------------------------------------------------------------------------------------//

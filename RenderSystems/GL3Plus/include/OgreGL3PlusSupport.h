@@ -71,10 +71,9 @@ namespace Ogre
                 return mNative->getConfigOptions();
             }
 
-            RenderWindow* createWindow(bool autoCreateWindow,
-                                               RenderSystem *renderSystem,
+            RenderWindow* createWindow(RenderSystem *renderSystem,
                                                const String& windowTitle) {
-                return mNative->createWindow(autoCreateWindow, renderSystem, windowTitle);
+                return mNative->createWindow(renderSystem, windowTitle);
             }
 
             /// @copydoc RenderSystem::_createRenderWindow

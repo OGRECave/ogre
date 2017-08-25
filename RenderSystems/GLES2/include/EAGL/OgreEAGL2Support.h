@@ -64,9 +64,7 @@ namespace Ogre {
             CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
             void * getProcAddress(const char* name);
-            RenderWindow * createWindow(bool autoCreateWindow,
-                                           RenderSystem *renderSystem,
-                                           const String& windowTitle);
+            RenderWindow* createWindow(RenderSystem* renderSystem, const String& windowTitle);
 
             RenderWindow * newWindow(const String& name,
                                         unsigned int width, unsigned int height,

@@ -81,8 +81,7 @@ namespace Ogre
             */
             virtual String validateConfig() = 0;
 
-            virtual RenderWindow* createWindow(bool autoCreateWindow,
-                                               RenderSystem *renderSystem,
+            virtual RenderWindow* createWindow(RenderSystem *renderSystem,
                                                const String& windowTitle) = 0;
 
             /// @copydoc RenderSystem::_createRenderWindow

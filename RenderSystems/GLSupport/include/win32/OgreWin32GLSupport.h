@@ -52,7 +52,7 @@ namespace Ogre
         */
         String validateConfig();
 
-        virtual RenderWindow* createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle = "OGRE Render Window");
+        virtual RenderWindow* createWindow(RenderSystem* renderSystem, const String& windowTitle);
         
         /// @copydoc RenderSystem::_createRenderWindow
         virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 

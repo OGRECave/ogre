@@ -232,58 +232,50 @@ namespace Ogre {
         return glConfig;
     }
     
-    RenderWindow * EAGL2Support::createWindow(bool autoCreateWindow,
-                                           RenderSystem* renderSystem,
+    RenderWindow * EAGL2Support::createWindow(RenderSystem* renderSystem,
                                            const String& windowTitle)
     {
-        RenderWindow *window = 0;
+        ConfigOptionMap::iterator opt;
+        ConfigOptionMap::iterator end = mOptions.end();
+        NameValuePairList miscParams;
 
-        if (autoCreateWindow)
+        CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+        bool fullscreen = false;
+        uint w = (uint)screenSize.width, h = (uint)screenSize.height;
+
+        if ((opt = mOptions.find("Full Screen")) != end)
         {
-            ConfigOptionMap::iterator opt;
-            ConfigOptionMap::iterator end = mOptions.end();
-            NameValuePairList miscParams;
-
-            CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-            bool fullscreen = false;
-            uint w = (uint)screenSize.width, h = (uint)screenSize.height;
-
-            if ((opt = mOptions.find("Full Screen")) != end)
-            {
-                fullscreen = (opt->second.currentValue == "Yes");
-            }
-
-            if ((opt = mOptions.find("Display Frequency")) != end)
-            {
-                miscParams["displayFrequency"] = opt->second.currentValue;
-            }
-
-            if ((opt = mOptions.find("Content Scaling Factor")) != end)
-            {
-                miscParams["contentScalingFactor"] = opt->second.currentValue;
-            }
-            
-            if ((opt = mOptions.find("Video Mode")) != end)
-            {
-                String val = opt->second.currentValue;
-                String::size_type pos = val.find('x');
-
-                if (pos != String::npos)
-                {
-                    w = StringConverter::parseUnsignedInt(val.substr(0, pos));
-                    h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
-                }
-            }
-
-            if ((opt = mOptions.find("FSAA")) != end)
-            {
-                miscParams["FSAA"] = opt->second.currentValue;
-            }
-
-            window = renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
+            fullscreen = (opt->second.currentValue == "Yes");
         }
 
-        return window;
+        if ((opt = mOptions.find("Display Frequency")) != end)
+        {
+            miscParams["displayFrequency"] = opt->second.currentValue;
+        }
+
+        if ((opt = mOptions.find("Content Scaling Factor")) != end)
+        {
+            miscParams["contentScalingFactor"] = opt->second.currentValue;
+        }
+
+        if ((opt = mOptions.find("Video Mode")) != end)
+        {
+            String val = opt->second.currentValue;
+            String::size_type pos = val.find('x');
+
+            if (pos != String::npos)
+            {
+                w = StringConverter::parseUnsignedInt(val.substr(0, pos));
+                h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
+            }
+        }
+
+        if ((opt = mOptions.find("FSAA")) != end)
+        {
+            miscParams["FSAA"] = opt->second.currentValue;
+        }
+
+        return renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
     }
 
     RenderWindow * EAGL2Support::newWindow(const String &name,

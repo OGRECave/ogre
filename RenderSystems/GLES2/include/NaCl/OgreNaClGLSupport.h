@@ -43,8 +43,7 @@ namespace Ogre {
             void switchMode(uint& width, uint& height, short& frequency);
             String getDisplayName(void);
 
-            RenderWindow* createWindow(bool autoCreateWindow,
-                                       GLES2RenderSystem *renderSystem,
+            RenderWindow* createWindow(GLES2RenderSystem *renderSystem,
                                        const String& windowTitle);
                                        
             RenderWindow* newWindow(const String& name,

@@ -53,7 +53,7 @@ public:
     String validateConfig( void );
 
     /// @copydoc GLNativeSupport::createWindow
-    RenderWindow* createWindow( bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle );
+    RenderWindow* createWindow(RenderSystem* renderSystem, const String& windowTitle );
     
     /// @copydoc RenderSystem::createRenderWindow
     virtual RenderWindow* newWindow( const String &name, unsigned int width, unsigned int height, 
