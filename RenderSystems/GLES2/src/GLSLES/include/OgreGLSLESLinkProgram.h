@@ -49,8 +49,6 @@ namespace Ogre {
 
         /// Compiles and links the vertex and fragment programs
         virtual void compileAndLink(void);
-        /// Put a program in use
-        virtual void _useProgram(void);
 
         void buildGLUniformReferences(void);
 

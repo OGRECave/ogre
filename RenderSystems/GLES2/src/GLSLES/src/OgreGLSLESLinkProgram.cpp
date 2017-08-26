@@ -59,13 +59,6 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
     }
 
-    void GLSLESLinkProgram::_useProgram(void)
-    {
-        if (mLinked)
-        {
-            OGRE_CHECK_GL_ERROR(glUseProgram( mGLProgramHandle ));
-        }
-    }
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLSLESLinkProgram::notifyOnContextLost()
     {
@@ -126,7 +119,10 @@ namespace Ogre {
             buildGLUniformReferences();
         }
 
-        _useProgram();
+        if (mLinked)
+        {
+            OGRE_CHECK_GL_ERROR(glUseProgram( mGLProgramHandle ));
+        }
     }
 
     //-----------------------------------------------------------------------

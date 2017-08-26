@@ -50,8 +50,6 @@ namespace Ogre {
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
         static bool getMicrocodeFromCache(const String& name, GLuint programHandle);
-        /// Put a program in use
-        virtual void _useProgram(void) = 0;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         virtual void notifyOnContextLost();

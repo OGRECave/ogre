@@ -95,8 +95,7 @@ namespace Ogre
 
         /// Compiles and links the separate vertex and fragment programs
         virtual void compileAndLink(void);
-        /// Put a program pipeline in use
-        virtual void _useProgram(void);
+
         /// Build uniform references from active named uniforms
         virtual void buildGLUniformReferences(void);
     };

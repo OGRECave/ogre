@@ -174,16 +174,6 @@ namespace Ogre
 #endif
     }
 
-    void GLSLESProgramPipeline::_useProgram(void)
-    {
-        if (mLinked)
-        {
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramPipelineHandle));
-#endif
-        }
-    }
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLSLESProgramPipeline::notifyOnContextLost()
     {
@@ -227,7 +217,12 @@ namespace Ogre
             buildGLUniformReferences();
         }
 
-        _useProgram();
+        if (mLinked)
+        {
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+            OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramPipelineHandle));
+#endif
+        }
     }
 
     //-----------------------------------------------------------------------
