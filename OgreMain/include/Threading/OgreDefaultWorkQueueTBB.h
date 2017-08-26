@@ -39,7 +39,7 @@ namespace Ogre
     {
     public:
         DefaultWorkQueue(const String& name = BLANKSTRING);
-        virtual ~DefaultWorkQueue();
+        virtual ~DefaultWorkQueue(void) noexcept(true);
         /** Process the next request on the queue. 
         @remarks
             This method is public, but only intended for advanced users to call. 
