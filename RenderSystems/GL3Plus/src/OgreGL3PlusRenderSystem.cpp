@@ -1509,31 +1509,20 @@ namespace Ogre {
             numberOfInstances *= getGlobalNumberOfInstances();
         }
 
-        GLSLProgram* program = NULL;
+        GLSLProgram* program;
         if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             program = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-            if (program)
-            {
-                if (!op.renderToVertexBuffer)
-                {
-                    program->activate();
-                }
-            }
-            else
-            {
-                Ogre::LogManager::getSingleton().logMessage(
-                    "ERROR: Failed to create separable program.", LML_CRITICAL);
-            }
         }
         else
         {
             program = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-            if (!program)
-            {
-                Ogre::LogManager::getSingleton().logMessage(
-                    "ERROR: Failed to create monolithic program.", LML_CRITICAL);
-            }
+        }
+
+        if (!program)
+        {
+            LogManager::getSingleton().logMessage("ERROR: Failed to create shader program.",
+                                                  LML_CRITICAL);
         }
 
         GLVertexArrayObject* vao =

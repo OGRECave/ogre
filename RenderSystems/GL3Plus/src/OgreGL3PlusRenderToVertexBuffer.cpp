@@ -249,7 +249,6 @@ namespace Ogre {
             // Use current front buffer to render to back buffer.
             this->getRenderOperation(renderOp);
         }
-        renderOp.renderToVertexBuffer = true;
         targetRenderSystem->_render(renderOp);
         // OGRE_CHECK_GL_ERROR(glDrawArrays(GL_POINTS, 0, 1));
 

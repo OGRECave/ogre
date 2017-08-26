@@ -115,6 +115,7 @@ namespace Ogre {
         size_t numberOfInstances;
 
         /// Specifies whether rendering to the vertex buffer.
+        /// @deprecated do not use
         bool renderToVertexBuffer;
 
         /** A flag to indicate that it is possible for this operation to use a global
