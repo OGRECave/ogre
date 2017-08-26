@@ -31,6 +31,7 @@
 #include "OgreGpuProgramManager.h"
 #include "OgreGLSLShader.h"
 #include "OgreRoot.h"
+#include "OgreGLSLExtSupport.h"
 
 namespace Ogre {
 
@@ -114,6 +115,63 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glBindAttribLocation(program, a.attrib, a.name));
             }
         }
+    }
+
+    void GLSLProgram::setTransformFeedbackVaryings(const std::vector<String>& nameStrings)
+    {
+        // Get program object ID.
+        GLuint programId;
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            //TODO include tessellation stages
+            GLSLShader* glslGpuProgram = getGeometryShader();
+            if (!glslGpuProgram)
+                glslGpuProgram = getVertexShader();
+
+            programId = glslGpuProgram->getGLProgramHandle();
+
+            // force re-link
+            GpuProgramManager::getSingleton().removeMicrocodeFromCache(glslGpuProgram->getName());
+            glslGpuProgram->setLinked(false);
+        }
+        else
+        {
+            programId = getGLProgramHandle();
+
+            // force re-link
+            GpuProgramManager::getSingleton().removeMicrocodeFromCache(getCombinedName());
+        }
+        mLinked = false;
+
+        // Convert to const char * for GL
+        std::vector<const char*> names;
+        for (uint e = 0; e < nameStrings.size(); e++)
+        {
+            names.push_back(nameStrings[e].c_str());
+        }
+
+        // TODO replace glTransformFeedbackVaryings with in-shader specification (GL 4.4)
+        OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(programId, nameStrings.size(), &names[0],
+                                                        GL_INTERLEAVED_ATTRIBS));
+
+#if OGRE_DEBUG_MODE
+        activate();
+        // Check if varyings were successfully set.
+        GLchar Name[64];
+        GLsizei Length(0);
+        GLsizei Size(0);
+        GLenum Type(0);
+        // bool Validated = false;
+        for (size_t i = 0; i < nameStrings.size(); i++)
+        {
+            OGRE_CHECK_GL_ERROR(
+                glGetTransformFeedbackVarying(programId, i, 64, &Length, &Size, &Type, Name));
+            LogManager::getSingleton().stream() << "Varying " << i << ": " << Name << " " << Length
+                                                << " " << Size << " " << Type;
+            // Validated = (Size == 1) && (Type == GL_FLOAT_VEC3);
+            // std::cout << Validated << " " << GL_FLOAT_VEC3 << std::endl;
+        }
+#endif
     }
 
     void GLSLProgram::getMicrocodeFromCache(void)

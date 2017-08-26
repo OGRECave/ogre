@@ -38,7 +38,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreStringConverter.h"
 #include "OgreTechnique.h"
-#include <iostream>
 
 namespace Ogre {
 
@@ -115,25 +114,6 @@ namespace Ogre {
         if (elemCount == 0)
             return;
 
-        // Get program object ID.
-        GLuint programId = 0;
-        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            GLSLSeparableProgram* separableProgram =
-                GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-            GLSLShader* glslGpuProgram = 0;
-            if ((glslGpuProgram = separableProgram->getGeometryShader()))
-                programId = glslGpuProgram->getGLProgramHandle();
-            //TODO include tessellation stages
-            else // vertex program
-                programId = separableProgram->getVertexShader()->getGLProgramHandle();
-        }
-        else
-        {
-            GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-            programId = monolithicProgram->getGLProgramHandle();
-        }
-
         // Store the output in a buffer.  The buffer has the same
         // structure as the shader output vertex data.
         // Note: 64 is the minimum number of interleaved
@@ -153,7 +133,7 @@ namespace Ogre {
 
         // Dynamically determine shader output variable names.
         std::vector<String> nameStrings;
-        std::vector<const GLchar*> names;
+
         for (uint e = 0; e < elemCount; e++)
         {
             const VertexElement* element = declaration->getElement(e);
@@ -161,53 +141,18 @@ namespace Ogre {
             nameStrings.push_back(name);
         }
 
-        // Convert to const char * for GL
-        for (uint e = 0; e < elemCount; e++)
+        GLSLProgram* program;
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
+                RSC_SEPARATE_SHADER_OBJECTS))
         {
-            names.push_back(nameStrings[e].c_str());
-        }
-
-        //TODO replace glTransformFeedbackVaryings with in-shader specification (GL 4.4)
-        OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(programId, elemCount, &names[0], GL_INTERLEAVED_ATTRIBS));
-
-        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            GLSLSeparableProgram* separableProgram =
-                GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-            separableProgram->activate();
+            program = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glLinkProgram(programId));
+            program = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
         }
 
-#if OGRE_DEBUG_MODE
-        // Check if program linking was successful.
-        GLint didLink = 0;
-        OGRE_CHECK_GL_ERROR(glGetProgramiv(programId, GL_LINK_STATUS, &didLink));
-        logObjectInfo(String("RVB GLSL link result : "), programId);
-        if (glIsProgram(programId))
-        {
-            glValidateProgram(programId);
-        }
-        logObjectInfo(String("RVB GLSL validation result : "), programId);
-
-        // Check if varyings were successfully set.
-        GLchar Name[64];
-        GLsizei Length(0);
-        GLsizei Size(0);
-        GLenum Type(0);
-        // bool Validated = false;
-        for (size_t i = 0; i < elemCount; i++)
-        {
-            OGRE_CHECK_GL_ERROR(glGetTransformFeedbackVarying(
-                programId, i, 64, &Length, &Size, &Type, Name
-            ));
-            std::cout << "Varying " << i << ": " << Name <<" "<< Length <<" "<< Size <<" "<< Type << std::endl;
-            // Validated = (Size == 1) && (Type == GL_FLOAT_VEC3);
-            // std::cout << Validated << " " << GL_FLOAT_VEC3 << std::endl;
-        }
-#endif
+        program->setTransformFeedbackVaryings(nameStrings);
     }
 
 

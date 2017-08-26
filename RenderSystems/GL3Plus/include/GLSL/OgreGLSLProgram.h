@@ -84,6 +84,7 @@ namespace Ogre {
         GLSLShader* getFragmentShader() const { return mFragmentShader; }
         GLSLShader* getComputeShader() const { return mComputeShader; }
 
+        void setTransformFeedbackVaryings(const std::vector<String>& nameStrings);
     protected:
         /// Container of atomic counter uniform references that are active in the program object
         GLAtomicCounterReferenceList mGLAtomicCounterReferences;
