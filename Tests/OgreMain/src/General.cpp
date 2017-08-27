@@ -28,9 +28,21 @@ THE SOFTWARE.
 #include <gtest/gtest.h>
 
 #include "OgreRoot.h"
+#include "OgreSceneNode.h"
+
+using namespace Ogre;
 
 TEST(Root,shutdown)
 {
-    Ogre::Root root;
+    Root root;
     root.shutdown();
+}
+
+TEST(SceneManager,removeAndDestroyAllChildren)
+{
+    Root root;
+    SceneManager* sm = root.createSceneManager(ST_GENERIC);
+    sm->getRootSceneNode()->createChildSceneNode();
+    sm->getRootSceneNode()->createChildSceneNode();
+    sm->getRootSceneNode()->removeAndDestroyAllChildren();
 }
