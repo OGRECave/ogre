@@ -52,14 +52,14 @@ void StencilShadowTest::setupContent()
     light->setDiffuseColour(0.5f,0.4f,0.35f);
     light->setSpecularColour(0, 0, 0);
     light->setAttenuation(8000,1,0.0005,0);
-    light->setPosition(220,100,0);
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(220, 100, 0))->attachObject(light);
     light->setCastShadows(true);
     light->setType(Light::LT_POINT);
     light = mSceneMgr->createLight("Light2");
     light->setDiffuseColour(0.5f,0.4f,0.35f);
     light->setSpecularColour(0, 0, 0);
     light->setAttenuation(8000,1,0.0005,0);
-    light->setPosition(220,100,-200);
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(220, 100, -200))->attachObject(light);
     light->setCastShadows(true);
     light->setType(Light::LT_POINT);
     

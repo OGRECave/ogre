@@ -85,7 +85,9 @@ protected:
 
         // setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-        mSceneMgr->createLight()->setPosition(20, 80, 50);
+        mSceneMgr->getRootSceneNode()
+            ->createChildSceneNode(Vector3(20, 80, 50))
+            ->attachObject(mSceneMgr->createLight());
 
         // set initial camera position
         mCameraMan->setStyle(CS_MANUAL);

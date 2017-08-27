@@ -99,14 +99,14 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         lightsBbsNode->attachObject(bbs);
 
         Light* l = mSceneMgr->createLight();
-        Vector3 dir;
+        Vector3 pos(30, 70, 40);
         l->setType(Light::LT_POINT);
-        l->setPosition(30, 70, 40);
-        dir = -l->getPosition();
-        dir.normalise();
-        l->setDirection(dir);
+        mSceneMgr->getRootSceneNode()
+            ->createChildSceneNode(pos)
+            ->attachObject(l);
+        l->setDirection(-pos.normalisedCopy());
         l->setDiffuseColour(1, 1, 1);
-        bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
+        bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
 
         // Create a floor mesh resource.
         MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,

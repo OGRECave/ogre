@@ -53,7 +53,9 @@ protected:
     {
         // setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-        mSceneMgr->createLight()->setPosition(100, 100, 100);
+        mSceneMgr->getRootSceneNode()
+            ->createChildSceneNode(Vector3(100, 100, 100))
+            ->attachObject(mSceneMgr->createLight());
 
         // define the control point vertices for our patch
         PatchVertex verts[9] =

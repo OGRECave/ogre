@@ -704,7 +704,7 @@ protected:
                 CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", true);
                 mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
                 mLight = mSceneMgr->createLight();
-                mLight->setPosition(30, 80, 30);
+                mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(30, 80, 30))->attachObject(mLight);
             }
             else
             {  

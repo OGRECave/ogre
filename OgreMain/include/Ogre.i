@@ -352,6 +352,8 @@ ADD_REPR(ColourValue)
 %include "OgreShadowCaster.h"
 %include "OgreMovableObject.h"
     %include "OgreMovablePlane.h"
+    %ignore Ogre::Light::setPosition;
+    %ignore Ogre::Light::getPosition;
     %include "OgreLight.h"
     %include "OgreNode.h"
         %include "OgreBone.h"

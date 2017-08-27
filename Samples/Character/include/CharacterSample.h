@@ -88,7 +88,9 @@ protected:
         // add a bright light above the scene
         Light* light = mSceneMgr->createLight();
         light->setType(Light::LT_POINT);
-        light->setPosition(-10, 40, 20);
+        mSceneMgr->getRootSceneNode()
+            ->createChildSceneNode(Vector3(-10, 40, 20))
+            ->attachObject(light);
         light->setSpecularColour(ColourValue::White);
 
         // create a floor mesh resource

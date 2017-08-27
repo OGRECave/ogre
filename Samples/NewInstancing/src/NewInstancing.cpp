@@ -188,7 +188,7 @@ void Sample_NewInstancing::setupLighting()
     //Create main (point) light
     Light* light = mSceneMgr->createLight();
     light->setDiffuseColour(lightColour);
-    light->setPosition( 0.0f, 25.0f, 0.0f );
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3( 0.0f, 25.0f, 0.0f ))->attachObject(light);
     light->setSpecularColour( 0.6, 0.82, 1.0 );
     light->setAttenuation( 3500, 0.085, 0.00008, 0.00006 );
     light->setCastShadows( false );
@@ -197,7 +197,7 @@ void Sample_NewInstancing::setupLighting()
     light = mSceneMgr->createLight();
     light->setType( Light::LT_SPOTLIGHT );
     light->setDiffuseColour( ColourValue( 0.15f, 0.35f, 0.44f ) );
-    light->setPosition( 250.0f, 200.0f, 250.0f );
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3( 250.0f, 200.0f, 250.0f ))->attachObject(light);
     light->setDirection( (Vector3::UNIT_SCALE * -1.0f).normalisedCopy() );
     light->setSpecularColour( 0.2, 0.12, 0.11 );
     light->setAttenuation( 3500, 0.005, 0.00002, 0.00001 );

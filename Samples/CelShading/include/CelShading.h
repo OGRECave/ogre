@@ -55,13 +55,12 @@ protected:
         mCameraMan->setStyle(CS_ORBIT);
         mTrayMgr->showCursor();
 
-        // create a basic point light with an offset
-        Light* light = mSceneMgr->createLight();
-        light->setPosition(20, 40, 50);
-
         // attach the light to a pivot node
         mLightPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        mLightPivot->attachObject(light);
+
+        // create a basic point light with an offset
+        Light* light = mSceneMgr->createLight();
+        mLightPivot->createChildSceneNode(Vector3(20, 40, 50))->attachObject(light);
 
         // create our model, give it the shader material, and place it at the origin
         Entity *ent = mSceneMgr->createEntity("Head", "ogrehead.mesh");
