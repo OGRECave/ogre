@@ -67,8 +67,10 @@ namespace Ogre {
         mListener(0), 
         mDebug(0)
     {
+#if OGRE_NODE_STORAGE_LEGACY
         // Generate a name
         mName = msNameGenerator.generate();
+#endif
 
         needUpdate();
 
@@ -326,6 +328,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Node* Node::createChild(const String& name, const Vector3& inTranslate, const Quaternion& inRotate)
     {
+        OgreAssert(!name.empty(), "name must not be empty");
         Node* newNode = createChildImpl(name);
         newNode->setPosition(inTranslate);
         newNode->setOrientation(inRotate);
@@ -797,6 +800,7 @@ namespace Ogre {
 #if OGRE_NODE_STORAGE_LEGACY
         ChildNodeMap::iterator i = mChildren.find(name);
 #else
+        OgreAssert(!name.empty(), "name must not be empty");
         NodeNameExists pred = {name};
         ChildNodeMap::iterator i = std::find_if(mChildren.begin(), mChildren.end(), pred);
 #endif
