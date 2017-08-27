@@ -436,7 +436,7 @@ namespace Ogre {
         pChild->removeAndDestroyAllChildren();
 
         removeChild(index);
-        pChild->getCreator()->destroySceneNode(pChild->getName());
+        pChild->getCreator()->destroySceneNode(pChild);
     }
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyAllChildren(void)

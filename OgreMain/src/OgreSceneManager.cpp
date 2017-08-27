@@ -69,6 +69,12 @@ THE SOFTWARE.
 
 #include <cstdio>
 
+#if OGRE_NODE_STORAGE_LEGACY
+#define ITER_VAL(it) it->second
+#else
+#define ITER_VAL(it) (*it)
+#endif
+
 namespace Ogre {
 
 //-----------------------------------------------------------------------
@@ -789,7 +795,7 @@ void SceneManager::clearScene(void)
     for (SceneNodeList::iterator i = mSceneNodes.begin();
         i != mSceneNodes.end(); ++i)
     {
-        OGRE_DELETE i->second;
+        OGRE_DELETE ITER_VAL(i);
     }
     mSceneNodes.clear();
     mAutoTrackingSceneNodes.clear();
@@ -824,15 +830,19 @@ SceneNode* SceneManager::createSceneNodeImpl(const String& name)
 SceneNode* SceneManager::createSceneNode(void)
 {
     SceneNode* sn = createSceneNodeImpl();
+#if OGRE_NODE_STORAGE_LEGACY
     assert(mSceneNodes.find(sn->getName()) == mSceneNodes.end());
     mSceneNodes[sn->getName()] = sn;
+#else
+    mSceneNodes.push_back(sn);
+#endif
     return sn;
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNode(const String& name)
 {
     // Check name not used
-    if (mSceneNodes.find(name) != mSceneNodes.end())
+    if (hasSceneNode(name))
     {
         OGRE_EXCEPT(
             Exception::ERR_DUPLICATE_ITEM,
@@ -841,17 +851,39 @@ SceneNode* SceneManager::createSceneNode(const String& name)
     }
 
     SceneNode* sn = createSceneNodeImpl(name);
+#if OGRE_NODE_STORAGE_LEGACY
     mSceneNodes[sn->getName()] = sn;
+#else
+    mSceneNodes.push_back(sn);
+#endif
     return sn;
 }
 //-----------------------------------------------------------------------
+struct SceneNodeNameExists {
+    const String& name;
+    bool operator()(const SceneNode* sn) {
+        return sn->getName() == name;
+    }
+};
 void SceneManager::destroySceneNode(const String& name)
 {
-    SceneNodeList::iterator i = mSceneNodes.find(name);
+    SceneNodeList::iterator i;
+#if OGRE_NODE_STORAGE_LEGACY
+    i = mSceneNodes.find(name);
+#else
+    OgreAssert(!name.empty(), "name must not be empty");
+    SceneNodeNameExists pred = {name};
+    i = std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred);
+#endif
+    _destroySceneNode(i);
+}
+
+void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
+{
 
     if (i == mSceneNodes.end())
     {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.",
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + ITER_VAL(i)->getName() + "' not found.",
             "SceneManager::destroySceneNode");
     }
 
@@ -864,13 +896,13 @@ void SceneManager::destroySceneNode(const String& name)
         AutoTrackingSceneNodes::iterator curri = ai++;
         SceneNode* n = *curri;
         // Tracking this node
-        if (n->getAutoTrackTarget() == i->second)
+        if (n->getAutoTrackTarget() == ITER_VAL(i))
         {
             // turn off, this will notify SceneManager to remove
             n->setAutoTracking(false);
         }
         // node is itself a tracker
-        else if (n == i->second)
+        else if (n == ITER_VAL(i))
         {
             mAutoTrackingSceneNodes.erase(curri);
         }
@@ -878,13 +910,19 @@ void SceneManager::destroySceneNode(const String& name)
 
     // detach from parent (don't do this in destructor since bulk destruction
     // behaves differently)
-    Node* parentNode = i->second->getParent();
+    Node* parentNode = ITER_VAL(i)->getParent();
     if (parentNode)
     {
-        parentNode->removeChild(i->second);
+        parentNode->removeChild(ITER_VAL(i));
     }
-    OGRE_DELETE i->second;
+    OGRE_DELETE ITER_VAL(i);
+
+#if OGRE_NODE_STORAGE_LEGACY
     mSceneNodes.erase(i);
+#else
+    std::swap(*i, mSceneNodes.back());
+    mSceneNodes.pop_back();
+#endif
 }
 //---------------------------------------------------------------------
 void SceneManager::destroySceneNode(SceneNode* sn)
@@ -892,7 +930,11 @@ void SceneManager::destroySceneNode(SceneNode* sn)
     if(!sn)
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
 
+#if OGRE_NODE_STORAGE_LEGACY
     destroySceneNode(sn->getName());
+#else
+    _destroySceneNode(std::find(mSceneNodes.begin(), mSceneNodes.end(), sn));
+#endif
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode(void)
@@ -909,7 +951,14 @@ SceneNode* SceneManager::getRootSceneNode(void)
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getSceneNode(const String& name) const
 {
-    SceneNodeList::const_iterator i = mSceneNodes.find(name);
+    SceneNodeList::const_iterator i;
+#if OGRE_NODE_STORAGE_LEGACY
+    i = mSceneNodes.find(name);
+#else
+    OgreAssert(!name.empty(), "name must not be empty");
+    SceneNodeNameExists pred = {name};
+    i = std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred);
+#endif
 
     if (i == mSceneNodes.end())
     {
@@ -917,13 +966,19 @@ SceneNode* SceneManager::getSceneNode(const String& name) const
             "SceneManager::getSceneNode");
     }
 
-    return i->second;
+    return ITER_VAL(i);
 
 }
 //-----------------------------------------------------------------------
 bool SceneManager::hasSceneNode(const String& name) const
 {
+#if OGRE_NODE_STORAGE_LEGACY
     return (mSceneNodes.find(name) != mSceneNodes.end());
+#else
+    OgreAssert(!name.empty(), "name must not be empty");
+    SceneNodeNameExists pred = {name};
+    return std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred) != mSceneNodes.end();
+#endif
 }
 
 //-----------------------------------------------------------------------

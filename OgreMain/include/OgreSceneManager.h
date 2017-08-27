@@ -410,7 +410,11 @@ namespace Ogre {
         typedef map<String, InstanceManager*>::type InstanceManagerMap;
         InstanceManagerMap  mInstanceManagerMap;
 
+#if OGRE_NODE_STORAGE_LEGACY
         typedef map<String, SceneNode*>::type SceneNodeList;
+#else
+        typedef vector<SceneNode*>::type SceneNodeList;
+#endif
 
         /** Central list of SceneNodes - for easy memory management.
             @note
@@ -796,6 +800,7 @@ namespace Ogre {
         /** Updates all instance managaers with dirty instance batches. @see _addDirtyInstanceManager */
         void updateDirtyInstanceManagers(void);
         
+        void _destroySceneNode(SceneNodeList::iterator it);
     public:
         /// Method for preparing shadow textures ready for use in a regular render
         /// Do not call manually unless before frame start or rendering is paused

@@ -60,7 +60,8 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
     {
         mParticleSystem = static_cast<ProceduralManualObject*>
             (mSceneMgr->createMovableObject("ParticleGSEntity", ProceduralManualObjectFactory::FACTORY_TYPE_NAME));
-        mParticleSystem->setMaterial("Ogre/ParticleGS/Display");
+        MaterialPtr mat = MaterialManager::getSingleton().getByName("Ogre/ParticleGS/Display", "General");
+        mParticleSystem->setMaterial(mat);
 
         // Generate the geometry that will seed the particle system.
         ManualObject* particleSystemSeed = mSceneMgr->createManualObject("ParticleSeed");
