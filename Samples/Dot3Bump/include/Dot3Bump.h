@@ -237,7 +237,7 @@ protected:
 
         // create white light
         l = mSceneMgr->createLight();
-        l->setPosition(200, 0, 0);
+        mLightPivot1->createChildSceneNode(Vector3(200, 0, 0))->attachObject(l);
         l->setDiffuseColour(1, 1, 1);
         l->setSpecularColour(1, 1, 1);
         // create white flare
@@ -245,12 +245,11 @@ protected:
         bbs->setMaterialName("Examples/Flare");
         bbs->createBillboard(200, 0, 0)->setColour(ColourValue::White);
 
-        mLightPivot1->attachObject(l);
         mLightPivot1->attachObject(bbs);
 
         // create red light
         l = mSceneMgr->createLight();
-        l->setPosition(40, 200, 50);
+        mLightPivot2->createChildSceneNode(Vector3(50, 200, 50))->attachObject(l);
         l->setDiffuseColour(1, 0, 0);
         l->setSpecularColour(1, 0.8, 0.8);
         // create white flare
@@ -258,7 +257,6 @@ protected:
         bbs->setMaterialName("Examples/Flare");
         bbs->createBillboard(50, 200, 50)->setColour(ColourValue::Red);
 
-        mLightPivot2->attachObject(l);
         mLightPivot2->attachObject(bbs);
     }
 

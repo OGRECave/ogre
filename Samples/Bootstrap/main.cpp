@@ -43,7 +43,9 @@ void MyTestApp::setup(void)
 
     // without light we would just get a black screen    
     Ogre::Light* light = scnMgr->createLight("MainLight");
-    light->setPosition(0, 10, 15);
+    Ogre::SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
+    lightNode->setPosition(0, 10, 15);
+    lightNode->attachObject(light);
 
     // also need to tell where we are
     Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();

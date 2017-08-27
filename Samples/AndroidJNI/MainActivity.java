@@ -114,7 +114,9 @@ public class MainActivity extends Activity implements SensorEventListener {
                                     ShaderGenerator.getSingleton().addSceneManager(scnMgr);
                                     
                                     Light light = scnMgr.createLight("MainLight");
-                                    light.setPosition(0, 10, 15);
+                                    SceneNode lightnode = scnMgr.getRootSceneNode().createChildSceneNode();
+                                    lightnode.setPosition(0, 10, 15);
+                                    lightnode.attachObject(light);
                                     
                                     Camera cam = scnMgr.createCamera("myCam");
                                     cam.setNearClipDistance(5);
@@ -122,7 +124,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                                     
                                     SceneNode camnode = scnMgr.getRootSceneNode().createChildSceneNode();
                                     camnode.attachObject(cam);
-                                    camnode.translate(new Vector3(0, 0, 15), Node.TransformSpace.TS_LOCAL);
+                                    camnode.setPosition(0, 0, 15);
                                     
                                     Entity ent = scnMgr.createEntity("Sinbad.mesh");
                                     SceneNode node = scnMgr.getRootSceneNode().createChildSceneNode();

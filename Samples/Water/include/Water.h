@@ -294,11 +294,8 @@ protected:
         mSceneMgr->setAmbientLight(ColourValue(0.75, 0.75, 0.75));
         
         // Create a light
-        Light* l = mSceneMgr->createLight("MainLight");
         // Accept default settings: point light, white diffuse, just set position
-        // NB I could attach the light to a SceneNode if I wanted it to move automatically with
-        //  other objects, but I don't
-        l->setPosition(200,300,100);
+        Light* l = mSceneMgr->createLight("MainLight");
         
         // Create water mesh and entity
         waterMesh = new WaterMesh(MESH_NAME, PLANE_SIZE, COMPLEXITY);
@@ -322,6 +319,7 @@ protected:
         
         // Create light node
         SceneNode* lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        lightNode->setPosition(200,300,100);
         lightNode->attachObject(l);
         
         // set up spline animation of light node

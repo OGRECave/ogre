@@ -54,7 +54,9 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
         scn_mgr.setAmbientLight(Ogre.ColourValue(.1, .1, .1))
 
         light = scn_mgr.createLight("MainLight")
-        light.setPosition(0, 10, 15)
+        lightnode = scn_mgr.getRootSceneNode().createChildSceneNode()
+        lightnode.setPosition(0, 10, 15)
+        lightnode.attachObject(light)
 
         cam = scn_mgr.createCamera("myCam")
         cam.setNearClipDistance(5)

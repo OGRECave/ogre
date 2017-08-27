@@ -73,8 +73,7 @@ void Sample_VolumeTex::setupContent()
     Light* l = mSceneMgr->createLight("MainLight");
     l->setDiffuseColour(0.75, 0.75, 0.80);
     l->setSpecularColour(0.9, 0.9, 1);
-    l->setPosition(-100,80,50);
-    mSceneMgr->getRootSceneNode()->attachObject(l);
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-100,80,50))->attachObject(l);
 
     // Create volume renderable
     snode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));

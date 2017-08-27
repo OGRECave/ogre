@@ -229,12 +229,11 @@ protected:
         // Fixed light, dim
         mSunLight = mSceneMgr->createLight("SunLight");
         mSunLight->setType(Light::LT_SPOTLIGHT);
-        mSunLight->setPosition(1500,1750,1300);
+
+        Vector3 pos(1500,1750,1300);
+        mSceneMgr->getRootSceneNode()->createChildSceneNode(pos)->attachObject(mSunLight);
         mSunLight->setSpotlightRange(Degree(30), Degree(50));
-        Vector3 dir;
-        dir = -mSunLight->getPosition();
-        dir.normalise();
-        mSunLight->setDirection(dir);
+        mSunLight->setDirection(-pos.normalisedCopy());
         mSunLight->setDiffuseColour(0.35, 0.35, 0.38);
         mSunLight->setSpecularColour(0.9, 0.9, 1);
 

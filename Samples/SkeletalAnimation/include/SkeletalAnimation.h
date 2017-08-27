@@ -197,25 +197,26 @@ protected:
 
         // add a blue spotlight
         Light* l = mSceneMgr->createLight();
-        Vector3 dir;
+        Vector3 pos(-40, 180, -10);
+        SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
+        ln->attachObject(l);
         l->setType(Light::LT_SPOTLIGHT);
-        l->setPosition(-40, 180, -10);
-        dir = -l->getPosition();
-        dir.normalise();
-        l->setDirection(dir);
+        l->setDirection(Vector3::NEGATIVE_UNIT_Z);
+        ln->setDirection(-pos);
         l->setDiffuseColour(0.0, 0.0, 0.5);
-        bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
+        bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
         
 
         // add a green spotlight.
         l = mSceneMgr->createLight();
         l->setType(Light::LT_SPOTLIGHT);
-        l->setPosition(0, 150, -100);
-        dir = -l->getPosition();
-        dir.normalise();
-        l->setDirection(dir);
+        l->setDirection(Vector3::NEGATIVE_UNIT_Z);
+        pos = Vector3(0, 150, -100);
+        ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
+        ln->attachObject(l);
+        ln->setDirection(-pos);
         l->setDiffuseColour(0.0, 0.5, 0.0);     
-        bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
+        bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
 
         // create a floor mesh resource
         MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,

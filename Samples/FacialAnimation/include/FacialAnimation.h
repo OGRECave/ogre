@@ -48,8 +48,12 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
     {
         // setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-        mSceneMgr->createLight()->setPosition(40, 60, 50);
-        mSceneMgr->createLight()->setPosition(-120, -80, -50);
+        mSceneMgr->getRootSceneNode()
+            ->createChildSceneNode(Vector3(40, 60, 50))
+            ->attachObject(mSceneMgr->createLight());
+        mSceneMgr->getRootSceneNode()
+            ->createChildSceneNode(Vector3(-120, -80, -50))
+            ->attachObject(mSceneMgr->createLight());
 
         // pre-load the mesh so that we can tweak it with a manual animation
         mHeadMesh = MeshManager::getSingleton().load("facial.mesh", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
