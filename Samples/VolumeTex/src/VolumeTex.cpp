@@ -83,7 +83,8 @@ void Sample_VolumeTex::setupContent()
     snode->attachObject( vrend );
 
     trend = new ThingRenderable(90.0f, 32, 7.5f);
-    trend->setMaterial("Examples/VTDarkStuff");
+    MaterialPtr mat = MaterialManager::getSingleton().getByName("Examples/VTDarkStuff", "General");
+    trend->setMaterial(mat);
     snode->attachObject(trend);
 
     // Ogre head node
