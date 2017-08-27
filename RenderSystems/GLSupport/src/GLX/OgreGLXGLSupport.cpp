@@ -65,14 +65,6 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    template<class C> void remove_duplicates(C& c)
-    {
-        std::sort(c.begin(), c.end());
-        typename C::iterator p = std::unique(c.begin(), c.end());
-        c.erase(p, c.end());
-    }
-
-    //-------------------------------------------------------------------------------------------------//
     GLXGLSupport::GLXGLSupport(int profile) : GLNativeSupport(profile), mGLDisplay(0), mXDisplay(0)
     {
         // A connection that might be shared with the application for GL rendering:
@@ -156,7 +148,7 @@ namespace Ogre
 
         XFree (fbConfigs);
 
-        remove_duplicates(mSampleLevels);
+        removeDuplicates(mSampleLevels);
     }
 
     //-------------------------------------------------------------------------------------------------//
@@ -218,7 +210,7 @@ namespace Ogre
             optVideoMode.possibleValues.push_back(mode);
         }
 
-        remove_duplicates(optVideoMode.possibleValues);
+        removeDuplicates(optVideoMode.possibleValues);
 
         optVideoMode.currentValue = StringConverter::toString(mCurrentMode.first.first,4) + " x " + StringConverter::toString(mCurrentMode.first.second,4);
 
@@ -328,65 +320,52 @@ namespace Ogre
             refreshConfig();
         }
     }
-    //-------------------------------------------------------------------------------------------------//
-    String GLXGLSupport::validateConfig(void)
-    {
-        //TODO
-        return BLANKSTRING;
-    }
 
     //-------------------------------------------------------------------------------------------------//
-    RenderWindow* GLXGLSupport::createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle)
+    NameValuePairList GLXGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
     {
-        RenderWindow *window = 0;
+        ConfigOptionMap::iterator opt;
+        ConfigOptionMap::iterator end = mOptions.end();
+        NameValuePairList miscParams;
 
-        if (autoCreateWindow)
+        fullscreen = false;
+        w = 800, h = 600;
+
+        if((opt = mOptions.find("Full Screen")) != end)
+            fullscreen = (opt->second.currentValue == "Yes");
+
+        if((opt = mOptions.find("Display Frequency")) != end)
+            miscParams["displayFrequency"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("Video Mode")) != end)
         {
-            ConfigOptionMap::iterator opt;
-            ConfigOptionMap::iterator end = mOptions.end();
-            NameValuePairList miscParams;
+            String val = opt->second.currentValue;
+            String::size_type pos = val.find('x');
 
-            bool fullscreen = false;
-            uint w = 800, h = 600;
-
-            if((opt = mOptions.find("Full Screen")) != end)
-                fullscreen = (opt->second.currentValue == "Yes");
-
-            if((opt = mOptions.find("Display Frequency")) != end)
-                miscParams["displayFrequency"] = opt->second.currentValue;
-
-            if((opt = mOptions.find("Video Mode")) != end)
+            if (pos != String::npos)
             {
-                String val = opt->second.currentValue;
-                String::size_type pos = val.find('x');
-
-                if (pos != String::npos)
-                {
-                    w = StringConverter::parseUnsignedInt(val.substr(0, pos));
-                    h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
-                }
+                w = StringConverter::parseUnsignedInt(val.substr(0, pos));
+                h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
             }
-
-            if((opt = mOptions.find("FSAA")) != end)
-                miscParams["FSAA"] = opt->second.currentValue;
-
-            if((opt = mOptions.find("VSync")) != end)
-                miscParams["vsync"] = opt->second.currentValue;
-
-            if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
-                miscParams["gamma"] = opt->second.currentValue;
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			opt = mOptions.find("Stereo Mode");
-			if (opt == mOptions.end())
-				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "GLXGLSupport::createWindow");
-			miscParams["stereoMode"] = opt->second.currentValue;			
-#endif
-
-            window = renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
         }
 
-        return window;
+        if((opt = mOptions.find("FSAA")) != end)
+            miscParams["FSAA"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("VSync")) != end)
+            miscParams["vsync"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
+            miscParams["gamma"] = opt->second.currentValue;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        opt = mOptions.find("Stereo Mode");
+        if (opt == mOptions.end())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "GLXGLSupport::createWindow");
+        miscParams["stereoMode"] = opt->second.currentValue;
+#endif
+
+        return miscParams;
     }
 
     //-------------------------------------------------------------------------------------------------//

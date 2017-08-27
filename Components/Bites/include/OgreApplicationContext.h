@@ -240,7 +240,7 @@ namespace OgreBites
          * You must use SDL and not an auto-created window as SDL does not get the events
          * otherwise.
          */
-        virtual Ogre::RenderWindow* createWindow();
+        virtual Ogre::RenderWindow* createWindow(const Ogre::String& name);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);

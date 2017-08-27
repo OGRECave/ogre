@@ -43,13 +43,6 @@ namespace Ogre {
     class EAGL2Window;
     class EAGLES2Context;
 
-    template<class C> void removeDuplicates(C& c)
-    {
-        std::sort(c.begin(), c.end());
-        typename C::iterator p = std::unique(c.begin(), c.end());
-        c.erase(p, c.end());
-    }
-
     class _OgrePrivate EAGL2Support : public GLNativeSupport
     {
         public:
@@ -64,9 +57,7 @@ namespace Ogre {
             CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
             void * getProcAddress(const char* name);
-            RenderWindow * createWindow(bool autoCreateWindow,
-                                           RenderSystem *renderSystem,
-                                           const String& windowTitle);
+            NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
 
             RenderWindow * newWindow(const String& name,
                                         unsigned int width, unsigned int height,

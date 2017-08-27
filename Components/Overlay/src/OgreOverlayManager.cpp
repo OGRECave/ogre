@@ -63,9 +63,10 @@ namespace Ogre {
     //---------------------------------------------------------------------
     OverlayManager::~OverlayManager()
     {
+        destroyAll();
+        // Overlays notify OverlayElements of their destruction, so we destroy Overlays first
         destroyAllOverlayElements(false);
         destroyAllOverlayElements(true);
-        destroyAll();
 
         for(FactoryMap::iterator i = mFactories.begin(); i != mFactories.end(); ++i)
         {

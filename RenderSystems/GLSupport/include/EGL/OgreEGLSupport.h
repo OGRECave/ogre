@@ -54,13 +54,6 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-    template<class C> void removeDuplicates(C& c)
-    {
-        std::sort(c.begin(), c.end());
-        typename C::iterator p = std::unique(c.begin(), c.end());
-        c.erase(p, c.end());
-    }
-
     class _OgrePrivate EGLSupport : public GLNativeSupport
     {
         protected:
@@ -91,7 +84,6 @@ namespace Ogre {
             void start(void);
             void stop(void);
             void addConfig(void);
-            String validateConfig(void);
             void setConfigOption(const String &name, const String &value);
             virtual String getDisplayName (void);
             EGLDisplay getGLDisplay(void);
@@ -102,9 +94,7 @@ namespace Ogre {
             void* getProcAddress(const char* name);
             ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;
 
-            RenderWindow* createWindow(bool autoCreateWindow,
-                                       RenderSystem *renderSystem,
-                                       const String& windowTitle);
+            NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
 
             RenderWindow* newWindow(const String& name,
                                     unsigned int width, unsigned int height,

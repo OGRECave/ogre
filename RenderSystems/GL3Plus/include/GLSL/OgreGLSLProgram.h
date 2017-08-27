@@ -84,6 +84,7 @@ namespace Ogre {
         GLSLShader* getFragmentShader() const { return mFragmentShader; }
         GLSLShader* getComputeShader() const { return mComputeShader; }
 
+        void setTransformFeedbackVaryings(const std::vector<String>& nameStrings);
     protected:
         /// Container of atomic counter uniform references that are active in the program object
         GLAtomicCounterReferenceList mGLAtomicCounterReferences;
@@ -106,8 +107,6 @@ namespace Ogre {
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
         void getMicrocodeFromCache(void);
-        // /// Put a program in use
-        // virtual void _useProgram(void) = 0;
     };
 
 

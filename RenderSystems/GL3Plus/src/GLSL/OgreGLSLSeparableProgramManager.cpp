@@ -193,6 +193,10 @@ namespace Ogre
             }
         }
 
+        // Make the program object active
+        if (mActiveSeparableProgram)
+            mActiveSeparableProgram->activate();
+
         return mActiveSeparableProgram;
     }
 }

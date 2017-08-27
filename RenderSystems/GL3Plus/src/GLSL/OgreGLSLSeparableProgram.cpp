@@ -243,14 +243,6 @@ namespace Ogre
         }
     }
 
-    // void GLSLSeparableProgram::_useProgram(void)
-    // {
-    //     if (mLinked)
-    //     {
-    //        OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
-    //     }
-    // }
-
     void GLSLSeparableProgram::activate(void)
     {
         if (!mLinked && !mTriedToLinkAndFailed)
@@ -261,9 +253,6 @@ namespace Ogre
 
             buildGLUniformReferences();
         }
-
-        // _useProgram();
-
 
         if (mLinked)
         {

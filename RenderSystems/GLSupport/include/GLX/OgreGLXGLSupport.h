@@ -49,14 +49,10 @@ namespace Ogre {
         /** @copydoc see GLNativeSupport::addConfig */
         void addConfig(void);
 
-        /** @copydoc see GLNativeSupport::validateConfig */
-        String validateConfig(void);
-
         /** @copydoc see GLNativeSupport::setConfigOption */
         void setConfigOption(const String &name, const String &value);
 
-        /// @copydoc GLNativeSupport::createWindow
-        RenderWindow* createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle);
+        NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
 
         /// @copydoc RenderSystem::createRenderWindow
         RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height,

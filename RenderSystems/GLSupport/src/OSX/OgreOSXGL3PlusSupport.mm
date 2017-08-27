@@ -238,83 +238,69 @@ void OSXGLSupport::addConfig( void )
     //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Resources/RTShaderLib/GLSL150");
 }
 
-String OSXGLSupport::validateConfig( void )
+NameValuePairList OSXGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
 {
-	return String( "" );
-}
+    ConfigOptionMap::iterator opt = mOptions.find( "Full Screen" );
+    if( opt == mOptions.end() )
+        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find full screen options!", "OSXGLSupport::createWindow" );
+    fullscreen = ( opt->second.currentValue == "Yes" );
+    opt = mOptions.find( "Video Mode" );
+    if( opt == mOptions.end() )
+        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find video mode options!", "OSXGLSupport::createWindow" );
+    String val = opt->second.currentValue;
+    String::size_type pos = val.find( 'x' );
+    if( pos == String::npos )
+        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Invalid Video Mode provided", "OSXGLSupport::createWindow" );
 
-RenderWindow* OSXGLSupport::createWindow( bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle ) 
-{
-	if( autoCreateWindow )
-	{
-		ConfigOptionMap::iterator opt = mOptions.find( "Full Screen" );
-		if( opt == mOptions.end() )
-			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find full screen options!", "OSXGLSupport::createWindow" );
-		bool fullscreen = ( opt->second.currentValue == "Yes" );
-		opt = mOptions.find( "Video Mode" );
-		if( opt == mOptions.end() )
-			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find video mode options!", "OSXGLSupport::createWindow" );
-		String val = opt->second.currentValue;
-		String::size_type pos = val.find( 'x' );
-		if( pos == String::npos )
-			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Invalid Video Mode provided", "OSXGLSupport::createWindow" );
+    w = StringConverter::parseUnsignedInt( val.substr( 0, pos ) );
+    h = StringConverter::parseUnsignedInt( val.substr( pos + 1 ) );
 
-		unsigned int w = StringConverter::parseUnsignedInt( val.substr( 0, pos ) );
-		unsigned int h = StringConverter::parseUnsignedInt( val.substr( pos + 1 ) );
+    // Parse FSAA config
+    NameValuePairList winOptions;
+    opt = mOptions.find( "FSAA" );
+    if( opt != mOptions.end() )
+    {
+        winOptions[ "FSAA" ] = opt->second.currentValue;
+    }
 
-        // Parse FSAA config
-		NameValuePairList winOptions;
-		winOptions[ "title" ] = windowTitle;
-        opt = mOptions.find( "FSAA" );
-        if( opt != mOptions.end() )
-        {
-			winOptions[ "FSAA" ] = opt->second.currentValue;
-        }
+    opt = mOptions.find( "hidden" );
+    if( opt != mOptions.end() )
+    {
+        winOptions[ "hidden" ] = opt->second.currentValue;
+    }
 
-        opt = mOptions.find( "hidden" );
-        if( opt != mOptions.end() )
-        {
-            winOptions[ "hidden" ] = opt->second.currentValue;
-        }
+    opt = mOptions.find( "vsync" );
+    if( opt != mOptions.end() )
+    {
+        winOptions[ "vsync" ] = opt->second.currentValue;
+    }
 
-        opt = mOptions.find( "vsync" );
-        if( opt != mOptions.end() )
-        {
-            winOptions[ "vsync" ] = opt->second.currentValue;
-        }
+    opt = mOptions.find( "Content Scaling Factor" );
+    if( opt != mOptions.end() )
+    {
+        winOptions["contentScalingFactor"] = opt->second.currentValue;
+    }
 
-        opt = mOptions.find( "Content Scaling Factor" );
-        if( opt != mOptions.end() )
-        {
-            winOptions["contentScalingFactor"] = opt->second.currentValue;
-        }
+    opt = mOptions.find( "sRGB Gamma Conversion" );
+    if( opt != mOptions.end() )
+        winOptions["gamma"] = opt->second.currentValue;
 
-        opt = mOptions.find( "sRGB Gamma Conversion" );
-        if( opt != mOptions.end() )
-            winOptions["gamma"] = opt->second.currentValue;
-
-        opt = mOptions.find( "macAPI" );
-        if( opt != mOptions.end() )
-        {
-			winOptions[ "macAPI" ] = opt->second.currentValue;
-        }
+    opt = mOptions.find( "macAPI" );
+    if( opt != mOptions.end() )
+    {
+        winOptions[ "macAPI" ] = opt->second.currentValue;
+    }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		opt = mOptions.find("Stereo Mode");
-		if (opt == mOptions.end())
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "OSXGLSupport::createWindow");
-		winOptions["stereoMode"] = opt->second.currentValue;
+    opt = mOptions.find("Stereo Mode");
+    if (opt == mOptions.end())
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "OSXGLSupport::createWindow");
+    winOptions["stereoMode"] = opt->second.currentValue;
 #endif
 
-        winOptions["contextProfile"] = StringConverter::toString(int(mContextProfile));
+    winOptions["contextProfile"] = StringConverter::toString(int(mContextProfile));
 
-		return renderSystem->_createRenderWindow( windowTitle, w, h, fullscreen, &winOptions );
-	}
-	else
-	{
-		// XXX What is the else?
-		return NULL;
-	}
+    return winOptions;
 }
 
 RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, 

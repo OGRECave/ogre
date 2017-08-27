@@ -1018,9 +1018,9 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
           | Overrides the default window title.
           -----------------------------------------------------------------------------*/
-        virtual Ogre::RenderWindow* createWindow()
+        virtual Ogre::RenderWindow* createWindow(const Ogre::String& name)
         {
-            Ogre::RenderWindow* res = ApplicationContext::createWindow();
+            Ogre::RenderWindow* res = ApplicationContext::createWindow(name);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             mGestureView = [[SampleBrowserGestureView alloc] init];

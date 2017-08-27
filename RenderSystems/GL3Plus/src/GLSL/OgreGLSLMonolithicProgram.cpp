@@ -59,16 +59,6 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
     }
 
-
-    void GLSLMonolithicProgram::_useProgram(void)
-    {
-        if (mLinked)
-        {
-            OGRE_CHECK_GL_ERROR(glUseProgram(mGLProgramHandle));
-        }
-    }
-
-
     void GLSLMonolithicProgram::activate(void)
     {
         if (!mLinked && !mTriedToLinkAndFailed)
@@ -89,7 +79,10 @@ namespace Ogre {
             buildGLUniformReferences();
         }
 
-        _useProgram();
+        if (mLinked)
+        {
+            OGRE_CHECK_GL_ERROR(glUseProgram(mGLProgramHandle));
+        }
     }
 
 
