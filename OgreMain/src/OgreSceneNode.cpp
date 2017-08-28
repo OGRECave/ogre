@@ -439,6 +439,15 @@ namespace Ogre {
         pChild->getCreator()->destroySceneNode(pChild);
     }
     //-----------------------------------------------------------------------
+    void SceneNode::removeAndDestroyChild(SceneNode* child)
+    {
+#if OGRE_NODE_STORAGE_LEGACY
+        removeAndDestroyChild(child->getName());
+#else
+        removeAndDestroyChild(std::find(mChildren.begin(), mChildren.end(), child) - mChildren.begin());
+#endif
+    }
+    //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyAllChildren(void)
     {
         // do not store iterators (invalidated by

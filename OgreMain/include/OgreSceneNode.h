@@ -278,17 +278,12 @@ namespace Ogre {
         */
         void removeAndDestroyChild(const String& name);
 
-        /** This method removes and destroys the child and all of its children.
-        @remarks
-            Unlike removeChild, which removes a single named child from this
-            node but does not destroy it, this method destroys the child
-            and all of it's children. 
-        @par
-            Use this if you wish to recursively destroy a node as well as 
-            detaching it from it's parent. Note that any objects attached to
-            the nodes will be detached but will not themselves be destroyed.
-        */
+        /// @overload
         void removeAndDestroyChild(unsigned short index);
+
+        /// @overload
+        void removeAndDestroyChild(SceneNode* child);
+
 
         /** Removes and destroys all children of this node.
         @remarks

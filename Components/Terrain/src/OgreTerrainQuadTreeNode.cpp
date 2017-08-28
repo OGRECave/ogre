@@ -147,7 +147,7 @@ namespace Ogre
 
         if (mLocalNode)
         {
-            mTerrain->_getRootSceneNode()->removeAndDestroyChild(mLocalNode->getName());
+            mTerrain->_getRootSceneNode()->removeAndDestroyChild(mLocalNode);
             mLocalNode = 0;
         }
 
