@@ -601,8 +601,10 @@ namespace Ogre
             }
             else if( _glXSwapIntervalMESA )
                 _glXSwapIntervalMESA( vsync ? mVSyncInterval : 0 );
-            else
+            else if( _glXSwapIntervalSGI )
                 _glXSwapIntervalSGI( vsync ? mVSyncInterval : 0 );
+            else
+                throw std::runtime_error("no glx swap interval function found");
         }
 
         mContext->endCurrent();

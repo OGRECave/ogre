@@ -856,6 +856,12 @@ namespace Ogre
         PFNGLXCREATECONTEXTATTRIBSARBPROC _glXCreateContextAttribsARB;
         _glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)const_cast<GLXGLSupport*>(this)->getProcAddress("glXCreateContextAttribsARB");
 
+        if (!_glXCreateContextAttribsARB) {
+            std::string msg = "glXCreateContextAttribsARB() function not found";
+            LogManager::getSingleton().logMessage(LML_CRITICAL, msg);
+            throw std::runtime_error(msg);
+        }
+
         while(!glxContext && (context_attribs[1] >= minVersion))
         {
             ctxErrorOccurred = false;
