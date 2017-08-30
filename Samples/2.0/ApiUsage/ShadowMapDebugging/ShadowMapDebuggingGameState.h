@@ -4,7 +4,9 @@
 
 #include "OgrePrerequisites.h"
 #include "OgreOverlayPrerequisites.h"
+#include "OgreOVerlay.h"
 #include "TutorialGameState.h"
+
 
 namespace Demo
 {

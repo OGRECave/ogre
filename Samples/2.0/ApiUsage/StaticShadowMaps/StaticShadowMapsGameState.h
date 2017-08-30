@@ -4,6 +4,7 @@
 
 #include "OgrePrerequisites.h"
 #include "OgreOverlayPrerequisites.h"
+#include "OgreOverlay.h"
 #include "TutorialGameState.h"
 
 namespace Ogre
