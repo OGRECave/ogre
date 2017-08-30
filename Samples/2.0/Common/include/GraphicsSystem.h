@@ -11,6 +11,7 @@
 
 #include "Threading/OgreUniformScalableTask.h"
 #include "SdlEmulationLayer.h"
+#include "OgreOverlaySystem.h"
 
 #if OGRE_USE_SDL2
     #include <SDL.h>
