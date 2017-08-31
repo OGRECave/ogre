@@ -2,7 +2,7 @@
 
 using namespace metal;
 
-kernel void main
+kernel void main_metal
 (
 	texture2d<float, access::write> testTexture [[texture(UAV_SLOT_START)]],
 
