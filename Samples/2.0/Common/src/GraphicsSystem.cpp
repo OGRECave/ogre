@@ -25,6 +25,8 @@
 
 #include "OgreWindowEventUtilities.h"
 
+#include "OgreLogManager.h"
+
 #if OGRE_USE_SDL2
     #include <SDL_syswm.h>
 #endif
@@ -66,7 +68,8 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     GraphicsSystem::~GraphicsSystem()
     {
-        assert( !mRoot && "deinitialize() not called!!!" );
+        Ogre::LogManager::getSingleton().logMessage( "WARNING: GraphicsSystem::deinitialize() not called!!!",
+                                                    Ogre::LML_CRITICAL );
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::initialize( const Ogre::String &windowTitle )
