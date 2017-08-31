@@ -4,7 +4,7 @@
 
 #include "OgrePrerequisites.h"
 #include "OgreOverlayPrerequisites.h"
-#include "OgreOVerlay.h"
+#include "OgreOverlay.h"
 #include "TutorialGameState.h"
 
 
