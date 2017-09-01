@@ -913,7 +913,8 @@ namespace OgreBites
         virtual void setup()
         {
             ApplicationContext::setup();
-
+            mWindow = getRenderWindow();
+            addInputListener(this);
 #ifdef OGRE_STATIC_LIB
             // Check if the render system supports any shader profiles.
             // Don't load samples that require shaders if we don't have any shader support, GL ES 1.x for example.
@@ -1018,9 +1019,9 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
           | Overrides the default window title.
           -----------------------------------------------------------------------------*/
-        virtual Ogre::RenderWindow* createWindow(const Ogre::String& name)
+        virtual NativeWindowPair createWindow(const Ogre::String& name, uint32_t w, uint32_t h, Ogre::NameValuePairList miscParams)
         {
-            Ogre::RenderWindow* res = ApplicationContext::createWindow(name);
+            NativeWindowPair res = ApplicationContext::createWindow(name, w, h, miscParams);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             mGestureView = [[SampleBrowserGestureView alloc] init];
@@ -1040,7 +1041,7 @@ namespace OgreBites
         virtual void loadResources()
         {
             Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
-            mTrayMgr = new TrayManager("BrowserControls", mWindow, this);
+            mTrayMgr = new TrayManager("BrowserControls", getRenderWindow(), this);
             mTrayMgr->showBackdrop("SdkTrays/Bands");
             mTrayMgr->getTrayContainer(TL_NONE)->hide();
 

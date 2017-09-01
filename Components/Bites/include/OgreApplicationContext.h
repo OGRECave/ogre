@@ -75,6 +75,21 @@ namespace Ogre {
 */
 namespace OgreBites
 {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    typedef ANativeWindow NativeWindowType;
+#else
+    typedef SDL_Window NativeWindowType;
+#endif
+
+    /**
+     * link between a renderwindow and a platform specific window
+     */
+    struct NativeWindowPair
+    {
+        Ogre::RenderWindow* render;
+        NativeWindowType* native;
+    };
+
     /** 
     Base class responsible for setting up a common context for applications.
     Subclass to implement specific event callbacks.
@@ -88,9 +103,13 @@ namespace OgreBites
 
         virtual ~ApplicationContext();
 
+        /**
+         * get the main RenderWindow
+         * owns the context on OpenGL
+         */
         Ogre::RenderWindow* getRenderWindow() const
         {
-            return mWindow;
+            return mWindows.empty() ? NULL : mWindows[0].render;
         }
 
         Ogre::Root* getRoot() const {
@@ -134,8 +153,9 @@ namespace OgreBites
         /**
          * inspect the event and call one of the corresponding functions on the registered InputListener
          * @param event Input Event
+         * @param windowID only call listeners of this window
          */
-        void _fireInputEvent(const Event& event) const;
+        void _fireInputEvent(const Event& event, uint32_t windowID) const;
 
         /**
           Initialize the RT Shader system.
@@ -203,7 +223,7 @@ namespace OgreBites
         virtual void shutdown();
 
         /**
-        poll for any events for the main window
+        process all window events since last call
         */
         void pollEvents();
 
@@ -224,28 +244,48 @@ namespace OgreBites
          */
         void enableShaderCache() const;
 
-        /// attach input listener
+        /** attach input listener
+         *
+         * @param lis the listener
+         * @param win the window to receive the events for.
+         */
+        void addInputListener(NativeWindowType* win, InputListener* lis);
+
+        /// @overload
         void addInputListener(InputListener* lis) {
-            mInputListeners.insert(lis);
+            OgreAssert(!mWindows.empty(), "create a window first");
+            addInputListener(mWindows[0].native, lis);
         }
 
-        /// detach input listener
+        /** detatch input listener
+         *
+         * @param lis the listener
+         * @param win the window to receive the events for.
+         */
+        void removeInputListener(NativeWindowType* win, InputListener* lis);
+
+        /// @overload
         void removeInputListener(InputListener* lis) {
-            mInputListeners.erase(lis);
+            OgreAssert(!mWindows.empty(), "called after all windows we deleted");
+            removeInputListener(mWindows[0].native, lis);
         }
-    protected:
 
         /**
-         * Create the render window to be used for this context here.
+         * Create a new render window
+         *
          * You must use SDL and not an auto-created window as SDL does not get the events
          * otherwise.
+         *
+         * By default the values from ogre.cfg are used for w, h and miscParams.
          */
-        virtual Ogre::RenderWindow* createWindow(const Ogre::String& name);
+        virtual NativeWindowPair
+        createWindow(const Ogre::String& name, uint32_t w = 0, uint32_t h = 0,
+                     Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
 
+    protected:
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);
         AAssetManager* mAAssetMgr;
-        ANativeWindow* mAWindow;
         AConfiguration* mAConfig;
 #endif
 
@@ -263,10 +303,12 @@ namespace OgreBites
         Ogre::String mNextRenderer;     // name of renderer used for next run
         Ogre::String mAppName;
         Ogre::NameValuePairList mLastSampleState;     // state of last sample
-        Ogre::RenderWindow* mWindow;    // render window
-        SDL_Window* mSDLWindow;
 
-        std::set<InputListener*> mInputListeners;
+        typedef std::vector<NativeWindowPair> WindowList;
+        WindowList mWindows; // all windows
+
+        typedef std::set<std::pair<uint32_t, InputListener*> > InputListenerList;
+        InputListenerList mInputListeners;
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*       mShaderGenerator; // The Shader generator instance.
