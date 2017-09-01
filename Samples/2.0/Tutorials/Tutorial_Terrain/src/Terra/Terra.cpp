@@ -149,6 +149,9 @@ namespace Ogre
             }
         }
 
+        m_xzRelativeSize = m_xzDimensions / Vector2( static_cast<Real>(m_width),
+                                                     static_cast<Real>(m_depth) );
+
         createNormalTexture();
 
         delete m_shadowMapper;
@@ -511,9 +514,6 @@ namespace Ogre
         m_height = dimensions.y;
         m_basePixelDimension = 64u;
         createHeightmap( image, imageName );
-
-        m_xzRelativeSize = m_xzDimensions / Vector2( static_cast<Real>(m_width),
-                                                     static_cast<Real>(m_depth) );
 
         {
             //Find out how many TerrainCells we need. I think this might be
