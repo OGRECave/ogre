@@ -83,7 +83,7 @@ JNIEnv* OgreJNIGetEnv() {
     try {
         $action
     }
-#ifdef SWIG_DIRECTORS
+#ifdef SWIGPYTHON
     catch (Swig::DirectorException &e) { 
         SWIG_fail;
     }
