@@ -93,7 +93,7 @@ namespace Ogre
         if( sceneNode )
         {
             sceneNode->detachAllObjects();
-            sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
+            sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
         }
 
         if( mRemoveOwnVertexData )

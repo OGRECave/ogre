@@ -219,7 +219,7 @@ public:
     {
         MeshManager::getSingleton().remove(mesh->getHandle());
         sceneMgr->destroyEntity(entity->getName());
-        static_cast<SceneNode*> (sceneMgr->getRootSceneNode())->removeChild(node->getName());
+        static_cast<SceneNode*> (sceneMgr->getRootSceneNode())->removeChild(node);
     }
     void animate(Real timeSinceLastFrame)
     {
