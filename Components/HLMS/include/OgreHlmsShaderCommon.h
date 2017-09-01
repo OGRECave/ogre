@@ -60,10 +60,9 @@ namespace Ogre
 		return finalHash;
 	}
 
-	inline uint32 calcHash(String str)
+	inline uint32 calcHash(const String& str)
 	{
-		const char* chars = str.c_str();
-		return calcHash(chars, str.length() * sizeof(char));
+        return calcHash(str.c_str(), str.length());
 	}
 
 	inline uint32 calcHash(const StringVector& vec)
@@ -73,9 +72,6 @@ namespace Ogre
 		{
 			stream << vec[i];
 		}
-		
-		String str = stream.str();
-		const char* chars = str.c_str();
-		return calcHash(chars, str.length() * sizeof(char));
+		return calcHash(stream.str());
 	}
 }

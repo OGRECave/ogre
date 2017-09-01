@@ -187,7 +187,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsManager::bind(Renderable* rend, HlmsMaterialBase* material, String passName)
+	void HlmsManager::bind(Renderable* rend, HlmsMaterialBase* material, const String& passName)
 	{
 		HlmsMatBindingMap* hlmsMatMap;
 		if (rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
@@ -208,7 +208,7 @@ namespace Ogre
 		(*hlmsMatMap)[passName] = material;
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsManager::unbind(Renderable* rend, String passName)
+	void HlmsManager::unbind(Renderable* rend, const String& passName)
 	{
 		if (!rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
 		{
@@ -229,7 +229,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsManager::unbindAll(String passName)
+	void HlmsManager::unbindAll(const String& passName)
 	{
 		RenderableVector::iterator bindingIt = mBindedRenderables.begin();
 		RenderableVector::iterator bindingItEnd = mBindedRenderables.end();
@@ -249,7 +249,7 @@ namespace Ogre
 		mBindedRenderables.clear();
 	}
 	//-----------------------------------------------------------------------------------
-	bool HlmsManager::hasBinding(Renderable* rend, String passName)
+	bool HlmsManager::hasBinding(Renderable* rend, const String& passName)
 	{
 		if (!rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
 		{
