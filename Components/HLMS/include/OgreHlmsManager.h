@@ -68,7 +68,7 @@ namespace Ogre
 		typedef vector<Renderable*>::type RenderableVector;
 
 		SceneManager* mSceneManager;
-		ShaderManager* mShaderManager;
+		ShaderManager mShaderManager;
 		RenderableVector mBindedRenderables;
     };
 }

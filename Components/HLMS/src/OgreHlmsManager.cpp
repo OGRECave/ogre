@@ -33,18 +33,17 @@ namespace Ogre
 {
 	static const String& HLMS_KEY = "hlmsMatBinding";
 	//-----------------------------------------------------------------------------------
-	HlmsManager::HlmsManager(SceneManager* sceneManager, const String& pieseFilesResorceGroup) : mSceneManager(sceneManager)		
-	{
-		mShaderManager = new ShaderManager(mSceneManager, pieseFilesResorceGroup);
-		mSceneManager->addListener(this);
-		mSceneManager->addRenderObjectListener(this);
+    HlmsManager::HlmsManager(SceneManager* sceneManager, const String& pieseFilesResorceGroup)
+            : mSceneManager(sceneManager), mShaderManager(pieseFilesResorceGroup)
+    {
+        mSceneManager->addListener(this);
+        mSceneManager->addRenderObjectListener(this);
 	}
 	//-----------------------------------------------------------------------------------
 	HlmsManager::~HlmsManager()
 	{
 		mSceneManager->removeListener(this);
 		mSceneManager->removeRenderObjectListener(this);
-		delete mShaderManager;
 	}
 	//-----------------------------------------------------------------------------------
 	void HlmsManager::preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v)
@@ -128,7 +127,7 @@ namespace Ogre
 							HlmsDatablock* vertexDatablock = hlmsMaterial->getVertexDatablock();
 							if (vertexDatablock)
 							{
-								GpuProgramPtr gpuProgram = mShaderManager->getGpuProgram(vertexDatablock);
+								GpuProgramPtr gpuProgram = mShaderManager.getGpuProgram(vertexDatablock);
 
 								if (!pass->hasVertexProgram() || pass->getVertexProgram() != gpuProgram)
 								{
@@ -143,7 +142,7 @@ namespace Ogre
 							HlmsDatablock* fragmentDatablock = hlmsMaterial->getFragmentDatablock();
 							if (fragmentDatablock)
 							{
-								GpuProgramPtr gpuProgram = mShaderManager->getGpuProgram(fragmentDatablock);
+								GpuProgramPtr gpuProgram = mShaderManager.getGpuProgram(fragmentDatablock);
 
 								if (!pass->hasFragmentProgram() || pass->getFragmentProgram() != gpuProgram)
 								{

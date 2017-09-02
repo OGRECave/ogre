@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "Ogre.h"		 
 #include "OgreHlmsPrerequisites.h"
+#include "OgreHlmsShaderPiecesManager.h"
 
 namespace Ogre
 {
@@ -45,7 +46,7 @@ namespace Ogre
 	class _OgreHlmsExport ShaderManager : public PassAlloc
     {
     public:
-		ShaderManager(SceneManager* sceneManager, const String& pieseFilesResorceGroup);
+		ShaderManager(const String& pieseFilesResorceGroup);
 		~ShaderManager();
 
 		GpuProgramPtr getGpuProgram(HlmsDatablock* dataBlock);
@@ -54,9 +55,8 @@ namespace Ogre
 	protected:
 		typedef map<uint32, GpuProgramPtr>::type ShaderCacheMap;
 
-		SceneManager* mSceneManager;
 		ShaderCacheMap mShaderCache;
-		ShaderPiecesManager* mShaderPiecesManager;
+		ShaderPiecesManager mShaderPiecesManager;
     };
 }
 

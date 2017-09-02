@@ -35,17 +35,14 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	ShaderManager::ShaderManager(SceneManager* sceneManager, const String& pieseFilesResorceGroup) : mSceneManager(sceneManager)
-	{
-		mShaderPiecesManager = new ShaderPiecesManager(pieseFilesResorceGroup);
-		mShaderPiecesManager->enumeratePieceFiles();
+    ShaderManager::ShaderManager(const String& pieseFilesResorceGroup)
+        : mShaderPiecesManager(pieseFilesResorceGroup)
+    {
+        mShaderPiecesManager.enumeratePieceFiles();
 	}
 	//-----------------------------------------------------------------------------------
 	ShaderManager::~ShaderManager()
 	{
-		delete mShaderPiecesManager;
-		mShaderPiecesManager = NULL;
-
 		ShaderCacheMap::iterator it = mShaderCache.begin();
 		ShaderCacheMap::iterator endIt = mShaderCache.end();
 		for (; it != endIt; ++it)
@@ -77,7 +74,7 @@ namespace Ogre
 
 		// generate the shader code
 		String code = dataBlock->getTemplate()->getTemplate();
-		const StringVector& pieces = mShaderPiecesManager->getPieces(dataBlock->getLanguage(), dataBlock->getShaderType());
+		const StringVector& pieces = mShaderPiecesManager.getPieces(dataBlock->getLanguage(), dataBlock->getShaderType());
 		code = ShaderGenerator::parse(code, *(dataBlock->getPropertyMap()), pieces);
 
 		GpuProgramPtr gpuProgram = createGpuProgram(name, code, dataBlock);
