@@ -84,7 +84,7 @@ namespace Demo
         mScheduledForRemoval[slot].push_back( toRemove );
         GameEntityVec::iterator itor = std::lower_bound( mGameEntities[toRemove->mType].begin(),
                                                          mGameEntities[toRemove->mType].end(),
-                                                         toRemove );
+                                                         toRemove, GameEntity::OrderById );
         assert( itor != mGameEntities[toRemove->mType].end() && *itor == toRemove );
         mGameEntities[toRemove->mType].erase( itor );
         mLogicSystem->queueSendMessage( mGraphicsSystem, Mq::GAME_ENTITY_REMOVED, toRemove );
