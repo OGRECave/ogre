@@ -50,7 +50,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ConvexBody::_initialisePool()
     {
-            OGRE_LOCK_MUTEX(msFreePolygonsMutex);
+#if OGRE_THREAD_SUPPORT
+        OGRE_LOCK_MUTEX(msFreePolygonsMutex);
+#endif
 
         if (msFreePolygons.empty())
         {
@@ -67,8 +69,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ConvexBody::_destroyPool()
     {
-            OGRE_LOCK_MUTEX(msFreePolygonsMutex);
-        
+#if OGRE_THREAD_SUPPORT
+        OGRE_LOCK_MUTEX(msFreePolygonsMutex);
+#endif
         for (PolygonList::iterator i = msFreePolygons.begin(); 
             i != msFreePolygons.end(); ++i)
         {
@@ -79,8 +82,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     Polygon* ConvexBody::allocatePolygon()
     {
-            OGRE_LOCK_MUTEX(msFreePolygonsMutex);
-
+#if OGRE_THREAD_SUPPORT
+        OGRE_LOCK_MUTEX(msFreePolygonsMutex);
+#endif
         if (msFreePolygons.empty())
         {
             // if we ran out of polys to use, create a new one
@@ -101,7 +105,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ConvexBody::freePolygon(Polygon* poly)
     {
-            OGRE_LOCK_MUTEX(msFreePolygonsMutex);
+#if OGRE_THREAD_SUPPORT
+        OGRE_LOCK_MUTEX(msFreePolygonsMutex);
+#endif
         msFreePolygons.push_back(poly);
     }
     //-----------------------------------------------------------------------
