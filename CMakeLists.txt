@@ -164,7 +164,7 @@ if (MSVC)
   endif ()
 endif ()
 if (MINGW)
-  add_definitions(-D_WIN32_WINNT=0x0500)
+  add_definitions(-D_WIN32_WINNT=0x0501)
   if( CMAKE_SIZEOF_VOID_P EQUAL 4 )
     # set architecture to i686, since otherwise some versions of MinGW can't link
     # the atomic primitives
