@@ -421,7 +421,7 @@ void Sample_NewInstancing::clearScene()
         if (sceneNode)
         {
             sceneNode->detachAllObjects();
-            sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
+            sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
         }
         if( mInstancingTechnique == NUM_TECHNIQUES )
             mSceneMgr->destroyEntity( (*itor)->getName() );

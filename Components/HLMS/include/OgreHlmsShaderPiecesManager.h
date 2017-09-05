@@ -42,8 +42,7 @@ namespace Ogre
 	class _OgreHlmsExport ShaderPiecesManager : public PassAlloc
 	{
 	public:
-		ShaderPiecesManager(const String& pieseFilesResorceGroup);
-		~ShaderPiecesManager();
+		ShaderPiecesManager(const String& pieceFilesResorceGroup) : mResorceGroup(pieceFilesResorceGroup) {}
 
 		void enumeratePieceFiles();
 

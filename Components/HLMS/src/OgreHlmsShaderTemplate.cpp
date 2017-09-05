@@ -32,16 +32,6 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	ShaderTemplate::ShaderTemplate() : mHash(0)
-	{
-
-	}
-	//-----------------------------------------------------------------------------------
-	ShaderTemplate::~ShaderTemplate()
-	{
-
-	}
-	//-----------------------------------------------------------------------------------
 	void ShaderTemplate::setTemplateFileName(const String& templateFileName)
 	{
 		mTemplateFileName = templateFileName;

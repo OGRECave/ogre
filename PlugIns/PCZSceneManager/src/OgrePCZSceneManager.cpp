@@ -1111,7 +1111,7 @@ namespace Ogre
         for (size_t i = 0; i < count; ++i)
         {
             SceneNode* node = mShadowTextureCameras[i]->getParentSceneNode();
-            mSceneRoot->removeAndDestroyChild(node->getName());
+            mSceneRoot->removeAndDestroyChild(node);
         }
         SceneManager::destroyShadowTextures();
     }

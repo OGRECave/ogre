@@ -58,17 +58,17 @@ namespace Ogre
 
 		virtual void preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v);
 
-		void bind(Renderable* rend, HlmsMaterialBase* material, String passName);
-		void unbind(Renderable* rend, String passName);
-		void unbindAll(String passName);
-		bool hasBinding(Renderable* rend, String passName);
+		void bind(Renderable* rend, HlmsMaterialBase* material, const String& passName);
+		void unbind(Renderable* rend, const String& passName);
+		void unbindAll(const String& passName);
+		bool hasBinding(Renderable* rend, const String& passName);
 
 	protected:
 		typedef OGRE_HashMap<String, HlmsMaterialBase*> HlmsMatBindingMap;
 		typedef vector<Renderable*>::type RenderableVector;
 
 		SceneManager* mSceneManager;
-		ShaderManager* mShaderManager;
+		ShaderManager mShaderManager;
 		RenderableVector mBindedRenderables;
     };
 }

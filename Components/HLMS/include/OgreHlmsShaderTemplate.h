@@ -42,8 +42,7 @@ namespace Ogre
 	class _OgreHlmsExport ShaderTemplate : public PassAlloc
 	{
 	public:
-		ShaderTemplate();
-		~ShaderTemplate();
+		ShaderTemplate() : mHash(0) {}
 
 		const String& getTemplateFileName() { return mTemplateFileName; }
 		void setTemplateFileName(const String& templateFileName);

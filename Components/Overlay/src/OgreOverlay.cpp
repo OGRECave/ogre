@@ -155,7 +155,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Overlay::remove3D(SceneNode* node)
     {
-        mRootNode->removeChild(node->getName());
+        mRootNode->removeChild(node);
     }
     //---------------------------------------------------------------------
     void Overlay::clear(void)

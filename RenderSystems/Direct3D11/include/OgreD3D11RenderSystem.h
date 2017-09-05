@@ -46,7 +46,7 @@ namespace Ogre
     */
 	/// Enable recognizing SM2.0 HLSL shaders.
 	/// (the same shader code could be used by many RenderSystems, directly or via Cg)
-	#define SUPPORT_SM2_0_HLSL_SHADERS  0
+	#define SUPPORT_SM2_0_HLSL_SHADERS  1
 
     class D3D11DriverList;
     class D3D11Driver;

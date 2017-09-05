@@ -32,17 +32,6 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	ShaderPiecesManager::ShaderPiecesManager(const String& pieseFilesResorceGroup)
-		: mResorceGroup(pieseFilesResorceGroup)
-	{
-
-	}
-	//-----------------------------------------------------------------------------------
-	ShaderPiecesManager::~ShaderPiecesManager()
-	{
-
-	}
-	//-----------------------------------------------------------------------------------
 	void ShaderPiecesManager::enumeratePieceFiles(void)
 	{
 		// remove all pieces
