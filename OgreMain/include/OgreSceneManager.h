@@ -42,7 +42,6 @@ Torus Knot Software Ltd.
 #include "OgreAnimationState.h"
 #include "OgreRenderQueue.h"
 #include "OgreResourceGroupManager.h"
-#include "OgreShadowTextureManager.h"
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreLodListener.h"
