@@ -194,8 +194,6 @@ namespace Ogre {
         // Create SceneManager enumerator (note - will be managed by singleton)
         mSceneManagerEnum = OGRE_NEW SceneManagerEnumerator();
 
-        mShadowTextureManager = OGRE_NEW ShadowTextureManager();
-
         mRenderSystemCapabilitiesManager = OGRE_NEW RenderSystemCapabilitiesManager();
 
         // ..material manager
@@ -312,7 +310,6 @@ namespace Ogre {
         shutdown();
 
         OGRE_DELETE mSceneManagerEnum;
-        OGRE_DELETE mShadowTextureManager;
         OGRE_DELETE mRenderSystemCapabilitiesManager;
 
         OGRE_DELETE mExternalTextureSourceManager;
