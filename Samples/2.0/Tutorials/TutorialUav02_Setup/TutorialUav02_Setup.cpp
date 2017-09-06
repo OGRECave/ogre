@@ -44,7 +44,7 @@ namespace Demo
                 "2.0/scripts/materials/TutorialUav02_Setup/HLSL",
             };
 
-            for( size_t i=0; i<6; ++i )
+            for( size_t i=0; i<3; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );
