@@ -715,16 +715,20 @@ namespace Ogre {
             GLES2RenderBuffer *depthBuffer = OGRE_NEW GLES2RenderBuffer( depthFormat, fbo->getWidth(),
                                                                 fbo->getHeight(), fbo->getFSAA() );
 
-            GLES2RenderBuffer *stencilBuffer = stencilFormat ? depthBuffer : NULL;
-            if( 
+            GLES2RenderBuffer *stencilBuffer = NULL;
+            if(
 #if OGRE_NO_GLES3_SUPPORT == 0
-               depthFormat != GL_DEPTH32F_STENCIL8 &&
+               depthFormat == GL_DEPTH32F_STENCIL8 ||
 #endif
-               depthFormat != GL_DEPTH24_STENCIL8_OES &&
-               stencilFormat )
+               depthFormat == GL_DEPTH24_STENCIL8_OES )
             {
-                stencilBuffer = OGRE_NEW GLES2RenderBuffer( stencilFormat, fbo->getWidth(),
-                                                           fbo->getHeight(), fbo->getFSAA() );
+                // If we have a packed format, the stencilBuffer is the same as the depthBuffer
+                stencilBuffer = depthBuffer;
+            }
+            else if(stencilFormat)
+            {
+                stencilBuffer = new GLES2RenderBuffer( stencilFormat, fbo->getWidth(),
+                                                       fbo->getHeight(), fbo->getFSAA() );
             }
 
             // No "custom-quality" multisample for now in GL
