@@ -755,8 +755,13 @@ namespace Ogre {
             GL3PlusRenderBuffer *depthBuffer = new GL3PlusRenderBuffer( depthFormat, fbo->getWidth(),
                                                                         fbo->getHeight(), fbo->getFSAA() );
 
-            GL3PlusRenderBuffer *stencilBuffer = stencilFormat ? depthBuffer : NULL;
-            if ( depthFormat != GL_DEPTH24_STENCIL8 && depthFormat != GL_DEPTH32F_STENCIL8 && stencilFormat )
+            GL3PlusRenderBuffer *stencilBuffer = NULL;
+            if ( depthFormat == GL_DEPTH24_STENCIL8 || depthFormat == GL_DEPTH32F_STENCIL8)
+            {
+                // If we have a packed format, the stencilBuffer is the same as the depthBuffer
+                stencilBuffer = depthBuffer;
+            }
+            else if(stencilFormat)
             {
                 stencilBuffer = new GL3PlusRenderBuffer( stencilFormat, fbo->getWidth(),
                                                          fbo->getHeight(), fbo->getFSAA() );
