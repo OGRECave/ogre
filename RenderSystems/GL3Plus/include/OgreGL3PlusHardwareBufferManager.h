@@ -75,9 +75,6 @@ namespace Ogre {
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 
-        /// Utility function to get the correct GL usage based on HBU's
-        static GLenum getGLUsage(unsigned int usage);
-
         /// Utility function to get the correct GL type based on VET's
         static GLenum getGLType(VertexElementType type);
 
@@ -123,10 +120,6 @@ namespace Ogre {
         /// Utility function to notify context depended resources
         void notifyContextDestroyed(GLContext* context)
             { static_cast<GL3PlusHardwareBufferManagerBase*>(mImpl)->notifyContextDestroyed(context); }
-
-        /// Utility function to get the correct GL usage based on HBU's.
-        static GLenum getGLUsage(unsigned int usage)
-        { return GL3PlusHardwareBufferManagerBase::getGLUsage(usage); }
 
         /// Utility function to get the correct GL type based on VET's.
         static GLenum getGLType(VertexElementType type)

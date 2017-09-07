@@ -28,9 +28,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGL3PlusHardwareCounterBuffer.h"
-#include "OgreRoot.h"
-#include "OgreGL3PlusRenderSystem.h"
-#include <iostream>
 
 #ifndef GL_ATOMIC_COUNTER_BUFFER
 #define GL_ATOMIC_COUNTER_BUFFER 0x92C0
@@ -41,26 +38,10 @@ namespace Ogre {
     GL3PlusHardwareCounterBuffer::GL3PlusHardwareCounterBuffer(
         HardwareBufferManagerBase* mgr, const String& name = "")
         : HardwareCounterBuffer(mgr, sizeof(GLuint), 
-                                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, false, name)
+                                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, false, name),
+        mBuffer(GL_ATOMIC_COUNTER_BUFFER, mSizeInBytes, mUsage),
+        mBinding(0)
     {
-        OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-
-        if (!mBufferId)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Cannot create GL Counter buffer",
-                        "GL3PlusHardwareCounterBuffer::GL3PlusHardwareCounterBuffer");
-        }
-
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, mBufferId));
-        OGRE_CHECK_GL_ERROR(glBufferData(GL_ATOMIC_COUNTER_BUFFER, mSizeInBytes, NULL, GL_DYNAMIC_DRAW));
-
-        std::cout << "creating Counter buffer = " << name << " " << mBufferId << std::endl;
-    }
-
-    GL3PlusHardwareCounterBuffer::~GL3PlusHardwareCounterBuffer()
-    {
-        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
     }
 
     void GL3PlusHardwareCounterBuffer::setGLBufferBinding(GLint binding)
@@ -68,87 +49,12 @@ namespace Ogre {
         mBinding = binding;
 
         // Attach the buffer to the UBO binding
-        OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, mBinding, mBufferId));
-    }
-
-    void* GL3PlusHardwareCounterBuffer::lockImpl(size_t offset,
-                                                 size_t length,
-                                                 LockOptions options)
-    {
-        if (mIsLocked)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Invalid attempt to lock a Counter buffer that has already been locked",
-                        "GL3PlusHardwareCounterBuffer::lock");
-        }
-
-        GLenum access = 0;
-        void* retPtr = 0;
-
-        // Use glMapBuffer
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, mBufferId));
-
-        if (mUsage & HBU_WRITE_ONLY)
-        {
-            access |= GL_MAP_WRITE_BIT;
-            access |= GL_MAP_FLUSH_EXPLICIT_BIT;
-            if(options == HBL_DISCARD)
-            {
-                // Discard the buffer
-                access |= GL_MAP_INVALIDATE_RANGE_BIT;
-            }
-        }
-        else if (options == HBL_READ_ONLY)
-            access |= GL_MAP_READ_BIT;
-        else
-            access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
-
-        access |= GL_MAP_UNSYNCHRONIZED_BIT;
-
-        void* pBuffer;
-        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, offset, length, access));
-
-        if(pBuffer == 0)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Counter Buffer: Out of memory",
-                        "GL3PlusHardwareCounterBuffer::lock");
-        }
-
-        // pBuffer is already offsetted in glMapBufferRange
-        retPtr = pBuffer;
-
-        mIsLocked = true;
-        return retPtr;
-    }
-
-    void GL3PlusHardwareCounterBuffer::unlockImpl(void)
-    {
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, mBufferId));
-
-        if (mUsage & HBU_WRITE_ONLY)
-        {
-            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, mLockSize));
-        }
-        GLboolean mapped;
-        OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER))
-            if(!mapped)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                            "Buffer data corrupted, please reload",
-                            "GL3PlusHardwareCounterBuffer::unlock");
-            }
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0));
-
-        mIsLocked = false;
+        OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, mBinding, getGLBufferId()));
     }
 
     void GL3PlusHardwareCounterBuffer::readData(size_t offset, size_t length, void* pDest)
     {
-        // get data from the real buffer
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, mBufferId));
-
-        OGRE_CHECK_GL_ERROR(glGetBufferSubData(GL_ATOMIC_COUNTER_BUFFER, offset, length, pDest));
+        mBuffer.readData(offset, length, pDest);
     }
 
     void GL3PlusHardwareCounterBuffer::writeData(size_t offset,
@@ -156,23 +62,7 @@ namespace Ogre {
                                                  const void* pSource,
                                                  bool discardWholeBuffer)
     {
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, mBufferId));
-
-        if (offset == 0 && length == mSizeInBytes)
-        {
-            OGRE_CHECK_GL_ERROR(glBufferData(GL_ATOMIC_COUNTER_BUFFER, mSizeInBytes, pSource,
-                                             GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
-        }
-        else
-        {
-            if(discardWholeBuffer)
-            {
-                OGRE_CHECK_GL_ERROR(glBufferData(GL_ATOMIC_COUNTER_BUFFER, mSizeInBytes, NULL,
-                                                 GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
-            }
-
-            OGRE_CHECK_GL_ERROR(glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, offset, length, pSource));
-        }
+        mBuffer.writeData(offset, length, pSource, discardWholeBuffer);
     }
 
     void GL3PlusHardwareCounterBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
@@ -185,22 +75,8 @@ namespace Ogre {
         }
         else
         {
-            // Unbind the current buffer
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0));
-
-            // Zero out this(destination) buffer
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, mBufferId));
-            OGRE_CHECK_GL_ERROR(glBufferData(GL_ATOMIC_COUNTER_BUFFER, length, 0, GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0));
-
-            // Do it the fast way.
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, static_cast<GL3PlusHardwareCounterBuffer &>(srcBuffer).getGLBufferId()));
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, mBufferId));
-
-            OGRE_CHECK_GL_ERROR(glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, srcOffset, dstOffset, length));
-
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, 0));
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
+            mBuffer.copyData(static_cast<GL3PlusHardwareCounterBuffer&>(srcBuffer).getGLBufferId(),
+                                                     srcOffset, dstOffset, length, discardWholeBuffer);
         }
     }
 

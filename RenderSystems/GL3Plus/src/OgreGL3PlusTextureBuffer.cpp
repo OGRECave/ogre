@@ -47,7 +47,7 @@ namespace Ogre {
                                                GLint face, GLint level, Usage usage,
                                                bool writeGamma, uint fsaa)
         : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-          mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level), mSliceTRT(0)
+          mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSliceTRT(0)
     {
         // devise mWidth, mHeight and mDepth and mFormat
         GLint value = 0;
@@ -143,13 +143,9 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
 
         // PBOs have no advantage with this usage pattern
-        // but trigger VIDEO -> HOST transfers with NVIDIA 378.13
-#ifdef USE_PBO
-        OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-
-        // Use PBO as a texture buffer.
-        mRenderSystem->_getStateCacheManager()->bindGLBuffer( GL_PIXEL_UNPACK_BUFFER, mBufferId );
-
+        // see: https://www.khronos.org/opengl/wiki/Pixel_Buffer_Object
+        // but PlayPen_BlitSubTextures fails if we use them
+#if 0
         // Calculate size for all mip levels of the texture.
         size_t dataSize = 0;
         if (mTarget == GL_TEXTURE_2D_ARRAY)
@@ -161,13 +157,12 @@ namespace Ogre {
             dataSize = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), mDepth, data.format);
         }
 
-        //TODO Is this the correct was to set buffer size in this case?
-        // Fill buffer with NULL values in order to set the buffer size.
-        OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_UNPACK_BUFFER, dataSize, NULL, GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
+        GL3PlusHardwareBuffer buffer(GL_PIXEL_UNPACK_BUFFER, dataSize, mUsage);
+        buffer.writeData(0, dataSize, data.data, false);
 
         // std::stringstream str;
         // str << "GL3PlusHardwarePixelBuffer::upload: " << mTextureID
-        // << " pixel buffer: " << mBufferId
+        // << " pixel buffer: " << buffer.getGLBufferId()
         // << " bytes: " << mSizeInBytes
         // << " dest depth: " << dest.getDepth()
         // << " dest front: " << dest.front
@@ -176,29 +171,6 @@ namespace Ogre {
         // << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
         // << " format: " << PixelUtil::getFormatName(mFormat);
         // LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
-
-        void* pBuffer = NULL;
-        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(
-            GL_PIXEL_UNPACK_BUFFER, 0, dataSize,
-            GL_MAP_WRITE_BIT|GL_MAP_INVALIDATE_RANGE_BIT));
-
-        if (pBuffer == 0)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Texture Buffer: Out of memory",
-                        "GL3PlusTextureBuffer::upload");
-        }
-
-        // Copy texture data to destination buffer.
-        memcpy(pBuffer, data.data, dataSize);
-        GLboolean mapped = false;
-        OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER));
-        if (!mapped)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Buffer data corrupted, please reload",
-                        "GL3PlusTextureBuffer::upload");
-        }
 
         void* pdata = NULL;
 #else
@@ -322,13 +294,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
         }
 
-#ifdef USE_PBO
-        // Delete PBO.
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
-        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
-        mBufferId = 0;
-#endif
-
         // Restore defaults.
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
@@ -345,12 +310,8 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL",
                         "GL3PlusTextureBuffer::download");
 
-        // Upload data to PBO
-        OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-        mRenderSystem->_getStateCacheManager()->bindGLBuffer(GL_PIXEL_PACK_BUFFER, mBufferId);
-
-        OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, mSizeInBytes, NULL,
-                                         GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
+        // Download data to PBO
+        GL3PlusHardwareBuffer buffer(GL_PIXEL_PACK_BUFFER, mSizeInBytes, mUsage);
 
         //        std::stringstream str;
         //        str << "GL3PlusHardwarePixelBuffer::download: " << mTextureID
@@ -414,32 +375,8 @@ namespace Ogre {
                 depth = depth / 2;
         }
 
-        void* pBuffer;
-        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_PACK_BUFFER, offsetInBytes, mSizeInBytes, GL_MAP_READ_BIT));
-
-        if (pBuffer == 0)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Texture Buffer: Out of memory",
-                        "GL3PlusTextureBuffer::download");
-        }
-
         // Copy to destination buffer
-        memcpy(data.data, pBuffer, mSizeInBytes);
-
-        GLboolean mapped;
-        OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_PIXEL_PACK_BUFFER));
-        if (!mapped)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Buffer data corrupted, please reload",
-                        "GL3PlusTextureBuffer::download");
-        }
-
-        // Delete PBO
-        mRenderSystem->_getStateCacheManager()->bindGLBuffer(GL_PIXEL_PACK_BUFFER, 0);
-        mRenderSystem->_getStateCacheManager()->deleteGLBuffer(GL_PIXEL_PACK_BUFFER, mBufferId);
-        mBufferId = 0;
+        buffer.readData(offsetInBytes, mSizeInBytes, data.data);
     }
 
 

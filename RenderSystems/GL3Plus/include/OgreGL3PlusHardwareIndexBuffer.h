@@ -31,30 +31,27 @@ THE SOFTWARE.
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreGL3PlusHardwareBuffer.h"
 
 namespace Ogre {
     class _OgreGL3PlusExport GL3PlusHardwareIndexBuffer : public HardwareIndexBuffer
     {
         private:
-            GLuint mBufferId;
-            // Scratch buffer handling
-            bool mLockedToScratch;
-            size_t mScratchOffset;
-            size_t mScratchSize;
-            void* mScratchPtr;
-            bool mScratchUploadOnUnlock;
+            GL3PlusHardwareBuffer mBuffer;
 
         protected:
-            /** See HardwareBuffer. */
-            void* lockImpl(size_t offset, size_t length, LockOptions options);
-            /** See HardwareBuffer. */
-            void unlockImpl(void);
+            void* lockImpl(size_t offset, size_t length, LockOptions options) {
+                return mBuffer.lockImpl(offset, length, options);
+            }
+            void unlockImpl() {
+                mBuffer.unlockImpl(mLockSize);
+            }
 
         public:
             GL3PlusHardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
                                   HardwareBuffer::Usage usage,
                                   bool useShadowBuffer);
-            ~GL3PlusHardwareIndexBuffer();
+
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);
             /** See HardwareBuffer. */
@@ -66,7 +63,7 @@ namespace Ogre {
             /** See HardwareBuffer. */
             void _updateFromShadow(void);
 
-            GLuint getGLBufferId(void) const { return mBufferId; }
+            GLuint getGLBufferId(void) const { return mBuffer.getGLBufferId(); }
     };
 }
 

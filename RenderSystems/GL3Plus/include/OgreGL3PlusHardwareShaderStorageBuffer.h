@@ -31,6 +31,7 @@
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHardwareUniformBuffer.h"
 //#include "OgreHardwareShaderStorageBuffer.h"
+#include "OgreGL3PlusHardwareBuffer.h"
 
 namespace Ogre {
 
@@ -38,19 +39,20 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusHardwareShaderStorageBuffer : public HardwareUniformBuffer
     {
     private:
-        GLuint mBufferId;
+        GL3PlusHardwareBuffer mBuffer;
         GLint mBinding;
 
     protected:
-        /** See HardwareBuffer. */
-        void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /** See HardwareBuffer. */
-        void unlockImpl(void);
+        void* lockImpl(size_t offset, size_t length, LockOptions options) {
+            return mBuffer.lockImpl(offset, length, options);
+        }
+        void unlockImpl() {
+            mBuffer.unlockImpl(mLockSize);
+        }
 
     public:
         GL3PlusHardwareShaderStorageBuffer(HardwareBufferManagerBase* mgr, size_t bufferSize, HardwareBuffer::Usage usage,
                                            bool useShadowBuffer, const String& name);
-        ~GL3PlusHardwareShaderStorageBuffer();
 
         /** See HardwareBuffer. */
         void readData(size_t offset, size_t length, void* pDest);
@@ -63,7 +65,7 @@ namespace Ogre {
         void copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
                       size_t dstOffset, size_t length, bool discardWholeBuffer = false);
 
-        inline GLuint getGLBufferId(void) const { return mBufferId; }
+        inline GLuint getGLBufferId(void) const { return mBuffer.getGLBufferId(); }
         void setGLBufferBinding(GLint binding);
         inline GLint getGLBufferBinding(void) const { return mBinding; }
     };

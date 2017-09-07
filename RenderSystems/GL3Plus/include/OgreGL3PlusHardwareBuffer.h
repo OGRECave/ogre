@@ -25,47 +25,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __GL3PlusHARDWAREVERTEXBUFFER_H__
-#define __GL3PlusHARDWAREVERTEXBUFFER_H__
+#ifndef __GL3PlusHARDWAREBUFFER_H__
+#define __GL3PlusHARDWAREBUFFER_H__
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "OgreHardwareVertexBuffer.h"
-#include "OgreGL3PlusHardwareBuffer.h"
+#include "OgreHardwareBuffer.h"
 
 namespace Ogre {
-
-    /// Specialisation of HardwareVertexBuffer for OpenGL
-    class _OgreGL3PlusExport GL3PlusHardwareVertexBuffer : public HardwareVertexBuffer
+    class GL3PlusHardwareBuffer
     {
     private:
-        GL3PlusHardwareBuffer mBuffer;
-    protected:
-        void* lockImpl(size_t offset, size_t length, LockOptions options) {
-            return mBuffer.lockImpl(offset, length, options);
-        }
-        void unlockImpl() {
-            mBuffer.unlockImpl(mLockSize);
-        }
+        GLenum mTarget;
+        size_t mSizeInBytes;
+        uint32 mUsage;
 
+        GLuint mBufferId;
+        GL3PlusRenderSystem* mRenderSystem;
+
+        /// Utility function to get the correct GL usage based on HBU's
+        static GLenum getGLUsage(uint32 usage);
     public:
-        GL3PlusHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
-                                    HardwareBuffer::Usage usage, bool useShadowBuffer);
+        void* lockImpl(size_t offset, size_t length, HardwareBuffer::LockOptions options);
+        void unlockImpl(size_t lockSize);
 
-        /** See HardwareBuffer. */
+        GL3PlusHardwareBuffer(GLenum target, size_t sizeInBytes, uint32 usage);
+        ~GL3PlusHardwareBuffer();
+
         void readData(size_t offset, size_t length, void* pDest);
 
-        /** See HardwareBuffer. */
-        void writeData(size_t offset, size_t length,
-                       const void* pSource, bool discardWholeBuffer = false);
+        void writeData(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer);
 
-        /** See HardwareBuffer. */
-        void copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
-                      size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+        void copyData(GLuint srcBufferId, size_t srcOffset, size_t dstOffset, size_t length,
+                      bool discardWholeBuffer);
 
-        /** See HardwareBuffer. */
-        void _updateFromShadow(void);
-
-        GLuint getGLBufferId(void) const { return mBuffer.getGLBufferId(); }
+        GLuint getGLBufferId(void) const { return mBufferId; }
     };
 }
-#endif // __GL3PlusHARDWAREVERTEXBUFFER_H__
+#endif // __GL3PlusHARDWAREBUFFER_H__
