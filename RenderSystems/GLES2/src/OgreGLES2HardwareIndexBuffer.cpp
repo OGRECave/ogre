@@ -110,6 +110,10 @@ namespace Ogre {
         }
         else
         {
+            if(mUseShadowBuffer) {
+                mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            }
+
             mBuffer.copyData(static_cast<GLES2HardwareIndexBuffer&>(srcBuffer).getGLBufferId(),
                     srcOffset, dstOffset, length, discardWholeBuffer);
         }
