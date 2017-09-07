@@ -117,13 +117,6 @@ namespace Ogre {
             OGRE_DELETE decl;
     }
 
-    GLenum GLES2HardwareBufferManagerBase::getGLUsage(unsigned int usage)
-    {
-        return  (usage & HardwareBuffer::HBU_DISCARDABLE) ? GL_STREAM_DRAW :
-                (usage & HardwareBuffer::HBU_STATIC) ? GL_STATIC_DRAW :
-                GL_DYNAMIC_DRAW;
-    }
-
     GLenum GLES2HardwareBufferManagerBase::getGLType(VertexElementType type)
     {
         switch(type)

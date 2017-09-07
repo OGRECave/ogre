@@ -26,56 +26,49 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLES2HardwareVertexBuffer_H__
-#define __GLES2HardwareVertexBuffer_H__
+#ifndef __GLES2HardwareBuffer_H__
+#define __GLES2HardwareBuffer_H__
 
 #include "OgreGLES2Prerequisites.h"
-#include "OgreHardwareVertexBuffer.h"
-#include "OgreGLES2ManagedResource.h"
-#include "OgreGLES2HardwareBuffer.h"
+#include "OgreHardwareBuffer.h"
 
 namespace Ogre {
-    /// Specialisation of HardwareVertexBuffer for OpenGL ES
-    class _OgreGLES2Export GLES2HardwareVertexBuffer : public HardwareVertexBuffer MANAGED_RESOURCE
+    class GLES2RenderSystem;
+    class GLES2HardwareBuffer
     {
         private:
-            GLES2HardwareBuffer mBuffer;
+            GLenum mTarget;
+            size_t mSizeInBytes;
+            GLenum mUsage;
 
-        protected:
-            void* lockImpl(size_t offset, size_t length, LockOptions options) {
-                return mBuffer.lockImpl(offset, length, options);
-            }
-            void unlockImpl() {
-                mBuffer.unlockImpl(mLockSize);
-            }
-        
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-            /** See AndroidResource. */
-            virtual void notifyOnContextLost();
-        
-            /** See AndroidResource. */
-            virtual void notifyOnContextReset();
-#endif
-        
+            GLuint mBufferId;
+            GLES2RenderSystem* mRenderSystem;
+
+            /// Utility function to get the correct GL usage based on HBU's
+            static GLenum getGLUsage(uint32 usage);
+
         public:
-            GLES2HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
-                                   HardwareBuffer::Usage usage, bool useShadowBuffer);
+            void createBuffer();
 
-            /** See HardwareBuffer. */
+            void destroyBuffer();
+
+            void* lockImpl(size_t offset, size_t length, HardwareBuffer::LockOptions options);
+
+            void unlockImpl(size_t lockSize);
+
+            GLES2HardwareBuffer(GLenum target, size_t sizeInBytes, GLenum usage);
+            ~GLES2HardwareBuffer();
+
             void readData(size_t offset, size_t length, void* pDest);
 
-            /** See HardwareBuffer. */
             void writeData(size_t offset, size_t length, 
                            const void* pSource, bool discardWholeBuffer = false);
-#if OGRE_NO_GLES3_SUPPORT == 0
-            /** See HardwareBuffer. */
-            void copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
-                      size_t dstOffset, size_t length, bool discardWholeBuffer = false);
-#endif
-            /** See HardwareBuffer. */
-            void _updateFromShadow(void);
 
-            GLuint getGLBufferId(void) const { return mBuffer.getGLBufferId(); }
+            void copyData(GLuint srcBufferId, size_t srcOffset, size_t dstOffset, size_t length,
+                          bool discardWholeBuffer);
+
+
+            GLuint getGLBufferId(void) const { return mBufferId; }
     };
 }
 

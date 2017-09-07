@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreBitwise.h"
 #include "OgreGLES2Support.h"
+#include "OgreGLES2HardwareBuffer.h"
 
 namespace Ogre {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
@@ -162,7 +163,7 @@ namespace Ogre {
                                            GLint face, GLint level, Usage usage,
                                            bool writeGamma, uint fsaa)
     : GLES2HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-        mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level)
+        mTarget(target), mTextureID(id), mFace(face), mLevel(level)
     {
         getGLES2RenderSystem()->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
         
@@ -255,16 +256,6 @@ namespace Ogre {
 
         bool hasGLES30 = rs->hasMinGLVersion(3, 0);
 #if OGRE_NO_GLES3_SUPPORT == 0
-        OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-
-        // Upload data to PBO
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mBufferId));
-
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
-        {
-            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Pixel Buffer #" + StringConverter::toString(mBufferId)).c_str()));
-        }
-
         // Calculate size for all mip levels of the texture
         size_t dataSize = 0;
         if(mTarget == GL_TEXTURE_2D_ARRAY)
@@ -275,13 +266,16 @@ namespace Ogre {
         {
             dataSize = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), mDepth, data.format);
         }
-        OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_UNPACK_BUFFER, dataSize, NULL,
-                                         GLES2HardwareBufferManager::getGLUsage(mUsage)));
 
+        // Upload data to PBO
+        GLES2HardwareBuffer buffer(GL_PIXEL_UNPACK_BUFFER, dataSize, mUsage);
+        buffer.writeData(0, dataSize, data.data, false);
+
+        void* pdata = NULL;
 #if OGRE_DEBUG_MODE
         std::stringstream str;
         str << "GLES2TextureBuffer::upload: " << mTextureID
-        << " pixel buffer: " << mBufferId
+        << " pixel buffer: " << buffer.getGLBufferId()
         << " bytes: " << mSizeInBytes
         << " dest depth: " << dest.getDepth()
         << " dest front: " << dest.front
@@ -292,27 +286,6 @@ namespace Ogre {
         << " data format: " << PixelUtil::getFormatName(data.format);
         LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 #endif
-        void* pBuffer = 0;
-        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, dataSize, GL_MAP_WRITE_BIT|GL_MAP_INVALIDATE_RANGE_BIT));
-
-        if(pBuffer == 0)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Texture Buffer: Out of memory",
-                        "GLES2TextureBuffer::upload");
-        }
-
-        // Copy to destination buffer
-        memcpy(pBuffer, data.data, dataSize);
-        GLboolean mapped = false;
-        OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER));
-        if(!mapped)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Buffer data corrupted, please reload",
-                        "GLES2TextureBuffer::upload");
-        }
-        void* pdata = NULL;
 #else
         void* pdata = data.data;
 #if OGRE_DEBUG_MODE
@@ -416,13 +389,6 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
             }
         }
-
-#if OGRE_NO_GLES3_SUPPORT == 0
-        // Delete PBO
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
-        OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
-        mBufferId = 0;
-#endif
 
         // Restore defaults
         if(hasGLES30) {
