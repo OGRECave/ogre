@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareUniformBuffer.h"
+#include "OgreGLES2HardwareBuffer.h"
 
 namespace Ogre {
 
@@ -37,19 +38,20 @@ namespace Ogre {
     class _OgreGLES2Export GLES2HardwareUniformBuffer : public HardwareUniformBuffer
     {
         private:
-            GLuint mBufferId;
+            GLES2HardwareBuffer mBuffer;
             GLint mBinding;
 
         protected:
-            /** See HardwareBuffer. */
-            void* lockImpl(size_t offset, size_t length, LockOptions options);
-            /** See HardwareBuffer. */
-            void unlockImpl(void);
+            void* lockImpl(size_t offset, size_t length, LockOptions options) {
+                return mBuffer.lockImpl(offset, length, options);
+            }
+            void unlockImpl() {
+                mBuffer.unlockImpl(mLockSize);
+            }
 
         public:
             GLES2HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t bufferSize, HardwareBuffer::Usage usage,
                                          bool useShadowBuffer, const String& name);
-            ~GLES2HardwareUniformBuffer();
 
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);
@@ -62,9 +64,9 @@ namespace Ogre {
             void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
                           size_t dstOffset, size_t length, bool discardWholeBuffer = false);
 
-            inline GLuint getGLBufferId(void) const { return mBufferId; }
+            GLuint getGLBufferId(void) const { return mBuffer.getGLBufferId(); }
             void setGLBufferBinding(GLint binding);
-            inline GLint getGLBufferBinding(void) const { return mBinding; }
+            GLint getGLBufferBinding(void) const { return mBinding; }
     };
 }
 #endif // __GLES2HARDWAREUNIFORMBUFFER_H__

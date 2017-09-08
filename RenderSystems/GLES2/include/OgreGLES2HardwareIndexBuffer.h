@@ -32,22 +32,21 @@ THE SOFTWARE.
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreGLES2ManagedResource.h"
+#include "OgreGLES2HardwareBuffer.h"
 
 namespace Ogre {
     class _OgreGLES2Export GLES2HardwareIndexBuffer : public HardwareIndexBuffer MANAGED_RESOURCE
     {
         private:
-            GLuint mBufferId;
-        
+            GLES2HardwareBuffer mBuffer;
+
         protected:
-            /** See HardwareBuffer. */
-            void* lockImpl(size_t offset, size_t length, LockOptions options);
-            /** See HardwareBuffer. */
-            void unlockImpl(void);
-        
-            void createBuffer();
-        
-            void destroyBuffer();
+            void* lockImpl(size_t offset, size_t length, LockOptions options) {
+                return mBuffer.lockImpl(offset, length, options);
+            }
+            void unlockImpl() {
+                mBuffer.unlockImpl(mLockSize);
+            }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             /** See AndroidResource. */
@@ -61,7 +60,7 @@ namespace Ogre {
             GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
                                   HardwareBuffer::Usage usage,
                                   bool useShadowBuffer);
-            virtual ~GLES2HardwareIndexBuffer();
+
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);
             /** See HardwareBuffer. */
@@ -75,7 +74,7 @@ namespace Ogre {
             /** See HardwareBuffer. */
             void _updateFromShadow(void);
 
-            inline GLuint getGLBufferId(void) const { return mBufferId; }
+            inline GLuint getGLBufferId(void) const { return mBuffer.getGLBufferId(); }
     };
 }
 

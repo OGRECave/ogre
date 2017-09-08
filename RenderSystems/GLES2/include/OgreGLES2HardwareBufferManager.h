@@ -67,9 +67,6 @@ namespace Ogre {
                                                                HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                                bool useShadowBuffer = false, const String& name = "");
 
-            /// Utility function to get the correct GL usage based on HBU's
-            static GLenum getGLUsage(unsigned int usage);
-
             /// Utility function to get the correct GL type based on VET's
             static GLenum getGLType(VertexElementType type);
 
@@ -94,10 +91,6 @@ namespace Ogre {
         /// Utility function to notify context depended resources
         void notifyContextDestroyed(GLContext* context)
             { static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->notifyContextDestroyed(context); }
-
-        /// Utility function to get the correct GL usage based on HBU's
-        static GLenum getGLUsage(unsigned int usage) 
-            { return GLES2HardwareBufferManagerBase::getGLUsage(usage); }
 
         /// Utility function to get the correct GL type based on VET's
         static GLenum getGLType(VertexElementType type)

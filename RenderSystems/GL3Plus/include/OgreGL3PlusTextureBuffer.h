@@ -80,7 +80,6 @@ namespace Ogre {
         // for cubemaps.
         GLenum mFaceTarget;
         GLuint mTextureID;
-        GLuint mBufferId;
         GLint mFace;
         GLint mLevel;
 
