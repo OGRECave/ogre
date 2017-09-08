@@ -85,7 +85,7 @@ namespace Ogre {
             allocateBuffer();
 
             // No scaling or conversion needed
-            scaled = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), src.format, src.data);
+            scaled = src;
 
             if (src.format == PF_R8G8B8)
             {
@@ -255,7 +255,8 @@ namespace Ogre {
         rs->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
 
         bool hasGLES30 = rs->hasMinGLVersion(3, 0);
-#if OGRE_NO_GLES3_SUPPORT == 0
+        // PBO handling is broken
+#if 0// OGRE_NO_GLES3_SUPPORT == 0
         // Calculate size for all mip levels of the texture
         size_t dataSize = 0;
         if(mTarget == GL_TEXTURE_2D_ARRAY)
