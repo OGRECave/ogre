@@ -81,7 +81,6 @@ namespace Ogre {
         }
         else
         {
-            allocateBuffer();
             // No scaling or conversion needed.
             scaled = src;
         }

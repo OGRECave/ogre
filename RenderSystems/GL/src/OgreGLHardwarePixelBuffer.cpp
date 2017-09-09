@@ -74,7 +74,6 @@ void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dstBo
     }
     else
     {
-        allocateBuffer();
         // No scaling or conversion needed
         scaled = src;
     }
