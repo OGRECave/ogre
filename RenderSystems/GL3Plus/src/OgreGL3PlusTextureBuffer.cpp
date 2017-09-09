@@ -174,7 +174,7 @@ namespace Ogre {
 
         void* pdata = NULL;
 #else
-        void* pdata = data.data;
+        void* pdata = data.getTopLeftFrontPixelPtr();
 #endif
 
         if (PixelUtil::isCompressed(data.format))
@@ -227,8 +227,6 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
             if (data.getHeight() * data.getWidth() != data.slicePitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-            if (data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
             if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right.
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
@@ -297,7 +295,6 @@ namespace Ogre {
         // Restore defaults.
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
     }
 
@@ -340,8 +337,6 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, data.rowPitch));
             if (data.getHeight()*data.getWidth() != data.slicePitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-            if (data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
             if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
@@ -355,7 +350,6 @@ namespace Ogre {
             // Restore defaults
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, 0));
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, 0));
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         }
 
@@ -376,7 +370,7 @@ namespace Ogre {
         }
 
         // Copy to destination buffer
-        buffer.readData(offsetInBytes, mSizeInBytes, data.data);
+        buffer.readData(offsetInBytes, mSizeInBytes, data.getTopLeftFrontPixelPtr());
     }
 
 
