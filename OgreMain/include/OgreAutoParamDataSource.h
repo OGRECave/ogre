@@ -101,10 +101,10 @@ namespace Ogre {
         mutable bool mSpotlightViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable bool mSpotlightWorldViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable bool mShadowCamDepthRangesDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
-        mutable ColourValue mAmbientLight;
-        mutable ColourValue mFogColour;
-        mutable Vector4 mFogParams;
-        mutable int mPassNumber;
+        ColourValue mAmbientLight;
+        ColourValue mFogColour;
+        Vector4 mFogParams;
+        int mPassNumber;
         mutable Vector4 mSceneDepthRange;
         mutable bool mSceneDepthRangeDirty;
         mutable bool mLodCameraPositionDirty;
