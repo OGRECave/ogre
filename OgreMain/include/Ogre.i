@@ -461,6 +461,8 @@ ADD_REPR(ColourValue)
 %ignore Ogre::SceneManager::getCameraIterator; // deprecated
 %ignore Ogre::SceneManager::getAnimationIterator;
 %ignore Ogre::SceneManager::getAnimationStateIterator;
+%ignore Ogre::SceneManager::setShadowTextureCasterMaterial(const String&);
+%ignore Ogre::SceneManager::setShadowTextureReceiverMaterial(const String&);
 %include "OgreSceneManager.h"
 %include "OgreSceneManagerEnumerator.h"
 %include "OgreConfigDialog.h"

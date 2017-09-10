@@ -722,8 +722,8 @@ protected:
             {
             case MAT_STANDARD:
                 mSceneMgr->setShadowTexturePixelFormat(PF_X8R8G8B8);
-                mSceneMgr->setShadowTextureCasterMaterial(BLANKSTRING);
-                mSceneMgr->setShadowTextureReceiverMaterial(BLANKSTRING);
+                mSceneMgr->setShadowTextureCasterMaterial(MaterialPtr());
+                mSceneMgr->setShadowTextureReceiverMaterial(MaterialPtr());
                 mSceneMgr->setShadowTextureSelfShadow(false);   
                 
                 resetMaterials();
@@ -742,8 +742,10 @@ protected:
                     // but the precision doesn't work well
                     mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
                 }
-                mSceneMgr->setShadowTextureCasterMaterial(CUSTOM_CASTER_MATERIAL);
-                mSceneMgr->setShadowTextureReceiverMaterial(CUSTOM_RECEIVER_MATERIAL);
+                themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
+                mSceneMgr->setShadowTextureCasterMaterial(themat);
+                themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL);
+                mSceneMgr->setShadowTextureReceiverMaterial(themat);
                 mSceneMgr->setShadowTextureSelfShadow(true);    
                 // Sort out base materials
                 pPlaneEnt->setMaterialName(CUSTOM_ROCKWALL_MATERIAL);
@@ -779,8 +781,10 @@ protected:
                     // but the precision doesn't work well
                     mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
                 }
-                mSceneMgr->setShadowTextureCasterMaterial(CUSTOM_CASTER_MATERIAL);
-                mSceneMgr->setShadowTextureReceiverMaterial(CUSTOM_RECEIVER_MATERIAL + "/PCF");
+                themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
+                mSceneMgr->setShadowTextureCasterMaterial(themat);
+                themat = MaterialManager::getSingleton().getByName(CUSTOM_RECEIVER_MATERIAL + "/PCF");
+                mSceneMgr->setShadowTextureReceiverMaterial(themat);
                 mSceneMgr->setShadowTextureSelfShadow(true);    
                 // Sort out base materials
                 pPlaneEnt->setMaterialName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");

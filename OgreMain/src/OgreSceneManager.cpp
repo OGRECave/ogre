@@ -6187,32 +6187,42 @@ void SceneManager::setShadowTextureCasterMaterial(const String& name)
                 "Cannot locate material called '" + name + "'", 
                 "SceneManager::setShadowTextureCasterMaterial");
         }
-        mat->load();
-        if (!mat->getBestTechnique())
-        {
-            // unsupported
-            mShadowTextureCustomCasterPass = 0;
-        }
-        else
-        {
 
-            mShadowTextureCustomCasterPass = mat->getBestTechnique()->getPass(0);
-            if (mShadowTextureCustomCasterPass->hasVertexProgram())
-            {
-                // Save vertex program and params in case we have to swap them out
-                mShadowTextureCustomCasterVertexProgram = 
-                    mShadowTextureCustomCasterPass->getVertexProgramName();
-                mShadowTextureCustomCasterVPParams = 
-                    mShadowTextureCustomCasterPass->getVertexProgramParameters();
-            }
-            if (mShadowTextureCustomCasterPass->hasFragmentProgram())
-            {
-                // Save fragment program and params in case we have to swap them out
-                mShadowTextureCustomCasterFragmentProgram = 
-                mShadowTextureCustomCasterPass->getFragmentProgramName();
-                mShadowTextureCustomCasterFPParams = 
-                mShadowTextureCustomCasterPass->getFragmentProgramParameters();
-            }
+        setShadowTextureCasterMaterial(mat);
+    }
+}
+void SceneManager::setShadowTextureCasterMaterial(const MaterialPtr& mat)
+{
+    if(!mat) {
+        mShadowTextureCustomCasterPass = 0;
+        return;
+    }
+
+    mat->load();
+    if (!mat->getBestTechnique())
+    {
+        // unsupported
+        mShadowTextureCustomCasterPass = 0;
+    }
+    else
+    {
+
+        mShadowTextureCustomCasterPass = mat->getBestTechnique()->getPass(0);
+        if (mShadowTextureCustomCasterPass->hasVertexProgram())
+        {
+            // Save vertex program and params in case we have to swap them out
+            mShadowTextureCustomCasterVertexProgram =
+                mShadowTextureCustomCasterPass->getVertexProgramName();
+            mShadowTextureCustomCasterVPParams =
+                mShadowTextureCustomCasterPass->getVertexProgramParameters();
+        }
+        if (mShadowTextureCustomCasterPass->hasFragmentProgram())
+        {
+            // Save fragment program and params in case we have to swap them out
+            mShadowTextureCustomCasterFragmentProgram =
+            mShadowTextureCustomCasterPass->getFragmentProgramName();
+            mShadowTextureCustomCasterFPParams =
+            mShadowTextureCustomCasterPass->getFragmentProgramParameters();
         }
     }
 }
@@ -6232,40 +6242,50 @@ void SceneManager::setShadowTextureReceiverMaterial(const String& name)
                 "Cannot locate material called '" + name + "'", 
                 "SceneManager::setShadowTextureReceiverMaterial");
         }
-        mat->load();
-        if (!mat->getBestTechnique())
+
+        setShadowTextureReceiverMaterial(mat);
+    }
+}
+void SceneManager::setShadowTextureReceiverMaterial(const MaterialPtr& mat)
+{
+    if(!mat) {
+        mShadowTextureCustomReceiverPass = 0;
+        return;
+    }
+
+    mat->load();
+    if (!mat->getBestTechnique())
+    {
+        // unsupported
+        mShadowTextureCustomReceiverPass = 0;
+    }
+    else
+    {
+
+        mShadowTextureCustomReceiverPass = mat->getBestTechnique()->getPass(0);
+        if (mShadowTextureCustomReceiverPass->hasVertexProgram())
         {
-            // unsupported
-            mShadowTextureCustomReceiverPass = 0;
+            // Save vertex program and params in case we have to swap them out
+            mShadowTextureCustomReceiverVertexProgram =
+                mShadowTextureCustomReceiverPass->getVertexProgramName();
+            mShadowTextureCustomReceiverVPParams =
+                mShadowTextureCustomReceiverPass->getVertexProgramParameters();
         }
         else
         {
-
-            mShadowTextureCustomReceiverPass = mat->getBestTechnique()->getPass(0);
-            if (mShadowTextureCustomReceiverPass->hasVertexProgram())
-            {
-                // Save vertex program and params in case we have to swap them out
-                mShadowTextureCustomReceiverVertexProgram = 
-                    mShadowTextureCustomReceiverPass->getVertexProgramName();
-                mShadowTextureCustomReceiverVPParams = 
-                    mShadowTextureCustomReceiverPass->getVertexProgramParameters();
-            }
-            else
-            {
-                mShadowTextureCustomReceiverVertexProgram = BLANKSTRING;
-            }
-            if (mShadowTextureCustomReceiverPass->hasFragmentProgram())
-            {
-                // Save fragment program and params in case we have to swap them out
-                mShadowTextureCustomReceiverFragmentProgram = 
-                    mShadowTextureCustomReceiverPass->getFragmentProgramName();
-                mShadowTextureCustomReceiverFPParams = 
-                    mShadowTextureCustomReceiverPass->getFragmentProgramParameters();
-            }
-            else
-            {
-                mShadowTextureCustomReceiverFragmentProgram = BLANKSTRING;
-            }
+            mShadowTextureCustomReceiverVertexProgram = BLANKSTRING;
+        }
+        if (mShadowTextureCustomReceiverPass->hasFragmentProgram())
+        {
+            // Save fragment program and params in case we have to swap them out
+            mShadowTextureCustomReceiverFragmentProgram =
+                mShadowTextureCustomReceiverPass->getFragmentProgramName();
+            mShadowTextureCustomReceiverFPParams =
+                mShadowTextureCustomReceiverPass->getFragmentProgramParameters();
+        }
+        else
+        {
+            mShadowTextureCustomReceiverFragmentProgram = BLANKSTRING;
         }
     }
 }
