@@ -1,15 +1,29 @@
-# Basic Tutorial 1 {#basictutorial1}
+# Basic Tutorial 1  - Your First Scene {#basictutorial1}
 
-## How Ogre Works
+@tableofcontents
+
+This first tutorial will cover the basic elements of building a scene in Ogre. The primary focus will be the Ogre::SceneManager, Ogre::SceneNode, and Entity(external link). An Entity is anything represented by a mesh. A SceneNode is what attaches an object to your scene. Finally, the SceneManager is the object that organizes everything. It keeps track of the entities and nodes in your scene and determines how to display them.
+
+We'll start with an explanation of some of the basic concepts in Ogre. Don't worry, this first tutorial has a little more explanation than the rest, but that changes very quickly once you get to the later tutorials. We will be building plenty of things. We just have to lay a little groundwork first, so you have somewhere to stand.
+
+The full source for this tutorial is here: @ref basictutorial1fullsource
+
+@note  Any problems you encounter during working with this tutorial should be posted in the [Help Forum](http://www.ogre3d.org/forums/viewforum.php?f=2).
+
+# Prerequisites {#Prerequisites}
+
+This tutorial assumes that you already know how to set up an Ogre project and compile it successfully. If you need help with this, then read @ref setup.
+
+# How Ogre Works {#howogreworks}
 We are going to provide a quick introduction to the basic elements of an Ogre scene.
 
-### SceneManager
+## SceneManager {#scenemanager}
 
 Everything that appears on the screen is managed by the SceneManager. The SceneManager keeps track of the locations and other attributes of the objects in your scene. The SceneManager also manages any cameras that you add to your scene. There are multiples types of SceneManagers. There are managers focused on rendering terrain and other managers focused on rendering BSP maps. The different types of SceneManager are listed [here](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=SceneManagersFAQ).
 
 [//]: <> (TODO: Move content of the link into manual pages as well)
 
-### SceneNode
+## SceneNode {#SceneNode}
 
 SceneNodes carry information that is used for all of the objects that are attached to it. An Entity is not rendered in your scene until it is attached to a SceneNode. In addition, a SceneNode is not a visible object in your scene. It only holds abstract information like location and orientation. Only when it is connected to something like an Entity is that information used to actually render something in the scene.
 
@@ -17,11 +31,11 @@ SceneNodes can have more than one object attached to them. We may want to have a
 
 One final thing to keep in mind about SceneNodes is that their position is **always** relative to their parent SceneNode and each SceneManager creates a root Node to which all other SceneNodes are attached.
 
-### Entity
+## Entity {#Entity}
 
 An Entity is one type of object that you can render in your scene. It is anything that is represented by a 3D mesh. Even terrain objects are very large entities. Lights, Billboards, Particles, and Cameras are examples of scene elements that are not entities. Ogre uses a well-known design pattern that separates renderable objects from information like their location. This means that you don't directly place an Entity into your scene. Instead, you place a SceneNode into your scene, then attach your Entity to that SceneNode. The Entity is then rendered using information taken from the SceneNode.
 
-## Getting started with codding
+# Getting started with coding {#Gettingstartedwithcodding}
 
 We will be using starter files for this tutorials which are based on OgreBites::ApplicationContext.
 
@@ -36,7 +50,7 @@ As you may noticed we already put main() function into TutorialApplication.cpp f
 
 Let's get started!
 
-## Setting Up the Scene
+# Setting Up the Scene {#SettingUptheScene}
 
 It's finally time to start building something in our scene. All source addition will be in "tutorial section" in cpp file of the tutorial TutorialApplication::setup method.
 
@@ -80,7 +94,7 @@ We now have a basic scene set up. Compile and run your application. You should s
 
 ![](bt1_first_run.png)
 
-## Coordinates Systems
+# Coordinates Systems {#CoordinatesSystems}
 
 Before we go on, let's cover some basics of Ogre's coordinate system. Ogre, like many other graphics engines, uses the x-z plane as the "floor" in a scene. This means that the y-axis is the vertical axis to ensure Ogre is using a [right-handed coordinate system](http://mathworld.wolfram.com/Right-HandedCoordinateSystem.html)
 
@@ -93,7 +107,7 @@ When you run your application, notice how your Ogre head is facing towards the c
 
 Ogre uses a vector class to represent positions and directions. There are vectors defined for 2-4 dimensions. They are called Ogre::Vector2, Ogre::Vector3, and Ogre::Vector4 - Vector3 being the most commonly used by far. If you are not familiar with the concept of vectors it is highly recommended to learn a little before attempting these tutorials. Even though Ogre is an abstraction over many of the complications involved with OpenGL and DirectX, there is still no escaping some mathematical concepts. Vectors and basic linear algebra will be some of the most useful things you can learn if you intend to proceed with 3D rendering. This [site](http://www.wildbunny.co.uk/blog/vector-maths-a-primer-for-games-programmers/) has produced a nice primer on vectors focused on game programmers.
 
-## Adding Another Entity
+# Adding Another Entity {#AddingAnotherEntity}
 
 It's time to get back to the coding. With our first Entity, we did not specify the location we wanted anywhere. Many of the functions in Ogre have default parameters. The SceneNode::createChildSceneNode(external link) method can take three parameters, but we called it with none. The parameters are the name, position, and rotation of the SceneNode being created. We've already mentioned that Ogre generates a unique name for us. It also uses (0, 0, 0) as a default position.
 
@@ -111,7 +125,7 @@ Compile and run your application. Your Ogre head should have a buddy.
 
 ![](bt1_added_entity.png)
 
-## More About Entities
+# More About Entities {#MoreAboutEntities}
 
 The Ogre::Entity class is very extensive. We will now introduce just a few more of its methods that will be useful. The Entity class has setVisible and isVisible methods. If you want an Entity to be hidden, but you still need it later, then you can use this function instead of destroying the Entity and rebuilding it later.
 
@@ -119,7 +133,7 @@ The Ogre::Entity class is very extensive. We will now introduce just a few more 
 
 The getName method returns the name of an Entity, and the getParentSceneNode method returns the SceneNode that the Entity is attached to. In our case, this would be the root SceneNode.
 
-## More About SceneNodes
+# More About SceneNodes {#MoreAboutSceneNodes}
 
 The Ogre::SceneNode class is very complex. For now, we will only cover some of the most useful methods.
 
@@ -165,7 +179,7 @@ Take a few seconds to soak this in. Relativity is hard. That's why it took an Ei
 
 Lastly, you can get a SceneNode or Entity by its name (if you gave it one), by calling getSceneNode or getEntity, which are Ogre::SceneManager methods. This way you don't have to keep a pointer to all of your SceneNodes. You should generally only define pointers for nodes you will use often.
 
-## Changing An Entity's Scale
+# Changing An Entity's Scale {#ChangingAnEntitysScale}
 
 We can set the scale of an Entity by calling setScale. This method allows us to provide a scale factor for each dimension. Let's add another Ogre head and give it a different scale for demonstration. We will also position it so it fits well on the screen.
 
@@ -175,7 +189,7 @@ Compile and run your application. You should see a fat Ogre head up top.
 
 ![](bt_1scaled_entity.png)
 
-## Rotating An Entity
+# Rotating An Entity {#RotatingAnEntity}
 
 An Entity's rotation can be changed using the yaw, pitch, and roll methods. 
 
@@ -193,39 +207,39 @@ Compile and run your application. We should now have a rotated Ogre head in our 
 
 ![](bt1_rotated_entity.png)
 
-## The Ogre Environment
+# The Ogre Environment {#TheOgreEnvironment}
 
 The library and configuration files for Ogre can be found in the 'bin' folder of your OgreSDK. You should use the debug files when building your application in debug mod
 
-### Libraries and Plugins
+## Libraries and Plugins {#LibrariesandPlugins}
 
 Ogre is divided into three shared library groups: main library, plugins, and third-party libraries.
 
-#### Main library
+### Main library {#Mainlibrary}
 
 The main library group contains the Ogre library itself and the shared libraries it relies on. The Ogre library is contained within OgreMain.dll or libOgreMain.so depending on your platform. This library must be included in all of your Ogre applications. OgreMain.dll requires a few other libraries like cg.dll.
 
-#### Plugins
+### Plugins {#Plugins}
 
 The second group of shared libraries are the plugins. Ogre pushes a good portion of its functionality into shared libraries so that they may be turned on or off easily. The core plugins that are included with Ogre have names that start with "Plugin_". You can also write your own plugins.
 
 Ogre also uses plugins for the different render systems (such as OpenGL, DirectX, etc). These plugins start with "RenderSystem_". This is also so that you can add only the systems you will need. This can be useful if you write shaders that rely on a particular system, because you can simply remove the incompatible system so that the program won't try to run incorrect code. This also means you can write your own plugins if you want to extend Ogre into another render system.
 
-#### Third-party Plugins
+### Third-party Plugins {#ThirdpartyPlugins}
 
 The last major group contains third-party libraries and other general support libraries. Ogre is focused sharply on being a graphics rendering library. This group makes it easy to integrate external libraries to add things like physics, input, and GUI systems. These libraries are used together to form a full game development environment. You might find this piecemeal approach a little strange, but it is a very common design pattern in large software projects. It is harder to comprehend at first, but it is a much more flexible approach when you want to start building more complicated scenes.
 
 The Ogre demos and SDK include some of these third-party libraries. The [Simple DirectMedia](https://www.libsdl.org/) can be used to manage input events and distribute them to Ogre. You can also make use of Cg, which is used by CgProgramManager. This library allows you to produce materials with custom shaders. There are other libraries (not included with Ogre) that offer functionality such as sound and physics.
 
-#### Testing vs Release
+### Testing vs Release {#TestingvsRelease}
 
 When you're building your application you can just leave every plugin activated. This will allow you to experiment with using them or not. But when you get ready to distribute a release build of your work, then you will want to deactivate any of the plugins you are not using.
 
-### Configuration Files
+## Configuration Files {#ConfigurationFiles}
 
 Ogre uses several configuration files (\*.cfg). They control things like which plugins are loaded and where your application will search for resource files. We will briefly introduce you to each of these files. You'll slowly read more about them as you progress through the tutorials as well.
 
-#### Plugin Configuration
+### Plugin Configuration {#PluginConfiguration}
 
 **plugins.cfg**
 
@@ -248,7 +262,7 @@ PluginFolder=/usr/local/lib/OGRE
 
 By default, Ogre would have been looking in '/usr/lib/OGRE'. This is where it would be placed if you installed Ogre from a package manager. You may have to do something similar on Mac.
 
-#### Resource Configuration
+### Resource Configuration {#ResourceConfiguration}
 
 **resources.cfg**
 
@@ -264,19 +278,19 @@ FileSystem=../media/models
 
 Here is an example of a relative path being used and the need to list subdirectories. Including the '../media' directory did not automatically include the '../media/models' directory. This is so that Ogre doesn't get greedy and waste time loading up unneeded resources.
 
-#### Media Configuration
+### Media Configuration {#MediaConfiguration}
 
 **media.cfg**
 
 This file provides Ogre with more detailed information about some resources. It is unlikely that you will need to modify this file for quite a long time. More information can be found in the Ogre manual.
 
-#### Ogre Configuration
+### Ogre Configuration {#OgreConfiguration}
 
 **ogre.cfg**
 
 This file is generated by the Render Settings dialog that appears when you run your application. This file will be specific to your own setup. **Do not** distribute this file with your application. This file will contain your choices for things like screen resolution. Do not modify this file directly. Change the settings with the dialog and it will be automatically updated.
 
-#### Quake 3 Settings Configuration
+### Quake 3 Settings Configuration {#Quake3SettingsConfiguration}
 
 **quake3settings.cfg**
 
@@ -284,15 +298,15 @@ This file is used by the BSPSceneManager. You would only need this file if you w
 
 That covers all of the configuration files that Ogre manipulates directly. Ogre will look for these files in the same directory as your executable and it must find 'plugins.cfg', 'resources.cfg', and 'media.cfg' to function properly. Later tutorials will cover more of their use.
 
-## Conclusion
+# Conclusion {#Conclusion}
 
 You should now have a basic understanding of setting up an Ogre scene. This tutorial provided an introduction to three of the most important objects in Ogre: Ogre::Entity, Ogre::SceneNode, and Ogre::SceneManager. These objects allow us to render and manipulate a scene filled with 3D objects.
 
 An Ogre::Entity represents anything that has an Ogre mesh. A Ogre::SceneNode is used to hold properties like location, scale, and rotation. It is also the anchor that attaches your Entities to your scene and allows them to be rendered on screen. Finally, The Ogre::SceneManager is the object that orchestrates it all. It has methods that allow you to create Entities and SceneNodes and keep them organized within a complicated scene.
 
-You can find full source code here: @subpage basictutorial1fullsource
+You can find full source code here: @ref basictutorial1fullsource
 
-## Next
+# Next {#Next}
 To be done.
 
 [//]: <> (TODO: make Tutorial 2 in manuals)

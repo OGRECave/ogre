@@ -32,8 +32,8 @@ THE SOFTWARE
 #define _TUTORIALAPPLICATION_HPP_
 
 #include <Ogre.h>
-#include <Bites/OgreApplicationContext.h>
-#include <Bites/OgreInput.h>
+#include <OgreApplicationContext.h>
+#include <OgreInput.h>
 #include <RTShaderSystem/OgreRTShaderSystem.h>
 #include <Bites/OgreApplicationContext.h>
 

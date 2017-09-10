@@ -18,19 +18,20 @@ if (WIN32 OR APPLE)
 elseif (UNIX)
   set(OGRE_DOCS_PATH "share/OGRE/docs")
 endif ()
-  
+
 # Build and install API documentation if doxygen is available
 if(DOXYGEN_FOUND)
     if (OGRE_INSTALL_DOCS)
       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-	DESTINATION ${OGRE_DOCS_PATH}
-	PATTERN ".hg" EXCLUDE
-	PATTERN "src" EXCLUDE
+    DESTINATION ${OGRE_DOCS_PATH}
+    PATTERN ".hg" EXCLUDE
+    PATTERN "src" EXCLUDE
       )
     endif ()
 
     file(GLOB TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/*.md)
-    file(GLOB_RECURSE BASIC_TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
+    file(GLOB BASIC_TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
+    file(GLOB BASIC_TUTORIALS_CODES ${OGRE_SOURCE_DIR}/Docs/src/tutorials/basictutorials/code/*.md)
 
     set(CMAKE_DOXYGEN_INPUT_LIST
         ${OGRE_SOURCE_DIR}/OgreMain
@@ -45,7 +46,8 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/Docs/src/particle-scripts.md
         ${OGRE_SOURCE_DIR}/Docs/src/hardware-buffers.md
         ${TUTORIALS}
-        ${BASIC_TUTORIALS})
+        ${BASIC_TUTORIALS}
+        ${BASIC_TUTORIALS_CODES})
     string(REPLACE ";" " \\\n" CMAKE_DOXYGEN_INPUT_LIST "${CMAKE_DOXYGEN_INPUT_LIST}")
     configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)
     add_custom_target(OgreDoc COMMAND 
