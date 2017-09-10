@@ -6,7 +6,7 @@ This first tutorial will cover the basic elements of building a scene in Ogre. T
 
 We'll start with an explanation of some of the basic concepts in Ogre. Don't worry, this first tutorial has a little more explanation than the rest, but that changes very quickly once you get to the later tutorials. We will be building plenty of things. We just have to lay a little groundwork first, so you have somewhere to stand.
 
-The full source for this tutorial is here: @ref basictutorial1fullsource
+The full source for this tutorial (BasicTutorial1.cpp, BasicTutorial1.hpp) can be found in samples directory Samples/Tutorials.
 
 @note  Any problems you encounter during working with this tutorial should be posted in the [Help Forum](http://www.ogre3d.org/forums/viewforum.php?f=2).
 
@@ -303,8 +303,6 @@ That covers all of the configuration files that Ogre manipulates directly. Ogre 
 You should now have a basic understanding of setting up an Ogre scene. This tutorial provided an introduction to three of the most important objects in Ogre: Ogre::Entity, Ogre::SceneNode, and Ogre::SceneManager. These objects allow us to render and manipulate a scene filled with 3D objects.
 
 An Ogre::Entity represents anything that has an Ogre mesh. A Ogre::SceneNode is used to hold properties like location, scale, and rotation. It is also the anchor that attaches your Entities to your scene and allows them to be rendered on screen. Finally, The Ogre::SceneManager is the object that orchestrates it all. It has methods that allow you to create Entities and SceneNodes and keep them organized within a complicated scene.
-
-You can find full source code here: @ref basictutorial1fullsource
 
 # Next {#Next}
 To be done.

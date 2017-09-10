@@ -31,7 +31,6 @@ if(DOXYGEN_FOUND)
 
     file(GLOB TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/*.md)
     file(GLOB BASIC_TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
-    file(GLOB BASIC_TUTORIALS_CODES ${OGRE_SOURCE_DIR}/Docs/src/tutorials/basictutorials/code/*.md)
 
     set(CMAKE_DOXYGEN_INPUT_LIST
         ${OGRE_SOURCE_DIR}/OgreMain
@@ -46,8 +45,7 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/Docs/src/particle-scripts.md
         ${OGRE_SOURCE_DIR}/Docs/src/hardware-buffers.md
         ${TUTORIALS}
-        ${BASIC_TUTORIALS}
-        ${BASIC_TUTORIALS_CODES})
+        ${BASIC_TUTORIALS})
     string(REPLACE ";" " \\\n" CMAKE_DOXYGEN_INPUT_LIST "${CMAKE_DOXYGEN_INPUT_LIST}")
     configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)
     add_custom_target(OgreDoc COMMAND 
