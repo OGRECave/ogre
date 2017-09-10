@@ -111,13 +111,13 @@ namespace Ogre {
                 /** Combination of HBU_STATIC and HBU_WRITE_ONLY
                 This is the optimal buffer usage setting.
                 */
-                HBU_STATIC_WRITE_ONLY = 5,
+                HBU_STATIC_WRITE_ONLY = HBU_STATIC | HBU_WRITE_ONLY,
                 /** Combination of HBU_DYNAMIC and HBU_WRITE_ONLY. If you use
                 this, strongly consider using HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
                 instead if you update the entire contents of the buffer very
                 regularly.
                 */
-                HBU_DYNAMIC_WRITE_ONLY = 6,
+                HBU_DYNAMIC_WRITE_ONLY = HBU_DYNAMIC | HBU_WRITE_ONLY,
                 /** Combination of HBU_DYNAMIC, HBU_WRITE_ONLY and HBU_DISCARDABLE
                  This means that you expect to replace the entire contents of the buffer on an
                  extremely regular basis, most likely every frame. By selecting this option, you
@@ -128,7 +128,7 @@ namespace Ogre {
                  update regularly. Note that if you create a buffer this way, you should use the
                  HBL_DISCARD flag when locking the contents of it for writing.
                  */
-                HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE = 14
+                HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_DYNAMIC_WRITE_ONLY | HBU_DISCARDABLE
 
             };
             /// Locking options

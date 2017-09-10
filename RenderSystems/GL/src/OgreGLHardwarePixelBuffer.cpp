@@ -74,7 +74,6 @@ void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dstBo
     }
     else
     {
-        allocateBuffer();
         // No scaling or conversion needed
         scaled = src;
     }
@@ -308,19 +307,20 @@ void GLTextureBuffer::upload(const PixelBox &data, const Box &dest)
             glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch);
         if(data.getWidth() > 0 && data.getHeight()*data.getWidth() != data.slicePitch)
             glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth()));
-        if(data.left > 0 || data.top > 0 || data.front > 0)
-            glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front);
         if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
             // Standard alignment of 4 is not right
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         }
+
+        void* pdata = data.getTopLeftFrontPixelPtr();
+
         switch(mTarget) {
             case GL_TEXTURE_1D:
                 glTexSubImage1D(GL_TEXTURE_1D, mLevel, 
                     dest.left,
                     dest.getWidth(),
                     GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
-                    data.data);
+                    pdata);
                 break;
             case GL_TEXTURE_2D:
             case GL_TEXTURE_CUBE_MAP:
@@ -328,7 +328,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Box &dest)
                     dest.left, dest.top, 
                     dest.getWidth(), dest.getHeight(),
                     GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
-                    data.data);
+                    pdata);
                 break;
             case GL_TEXTURE_3D:
             case GL_TEXTURE_2D_ARRAY_EXT:
@@ -337,7 +337,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Box &dest)
                     dest.left, dest.top, dest.front,
                     dest.getWidth(), dest.getHeight(), dest.getDepth(),
                     GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
-                    data.data);
+                    pdata);
                 break;
         }   
     }
@@ -353,7 +353,6 @@ void GLTextureBuffer::upload(const PixelBox &data, const Box &dest)
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     if (GLEW_VERSION_1_2)
         glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0);
-    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 //-----------------------------------------------------------------------------  
@@ -381,8 +380,6 @@ void GLTextureBuffer::download(const PixelBox &data)
             glPixelStorei(GL_PACK_ROW_LENGTH, data.rowPitch);
         if(data.getHeight()*data.getWidth() != data.slicePitch)
             glPixelStorei(GL_PACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth()));
-        if(data.left > 0 || data.top > 0 || data.front > 0)
-            glPixelStorei(GL_PACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front);
         if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
             // Standard alignment of 4 is not right
             glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -390,11 +387,10 @@ void GLTextureBuffer::download(const PixelBox &data)
         // We can only get the entire texture
         glGetTexImage(mFaceTarget, mLevel, 
             GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
-            data.data);
+            data.getTopLeftFrontPixelPtr());
         // Restore defaults
         glPixelStorei(GL_PACK_ROW_LENGTH, 0);
         glPixelStorei(GL_PACK_IMAGE_HEIGHT, 0);
-        glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
     }
 }

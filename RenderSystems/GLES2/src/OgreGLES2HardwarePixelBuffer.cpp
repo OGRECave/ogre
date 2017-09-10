@@ -59,7 +59,6 @@ namespace Ogre {
                         "GLES2HardwarePixelBuffer::blitFromMemory");
         }
 
-        bool freeScaledBuffer = false;
         PixelBox scaled;
 
         if (src.getWidth() != dstBox.getWidth() ||
@@ -82,36 +81,12 @@ namespace Ogre {
         }
         else
         {
-            allocateBuffer();
-
             // No scaling or conversion needed
-            scaled = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), src.format, src.data);
-
-            if (src.format == PF_R8G8B8)
-            {
-                freeScaledBuffer = true;
-                size_t srcSize = PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(), src.format);
-                scaled.format = PF_B8G8R8;
-                scaled.data = new uint8[srcSize];
-                memcpy(scaled.data, src.data, srcSize);
-                PixelUtil::bulkPixelConversion(src, scaled);
-            }
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-            if (src.format == PF_A8R8G8B8)
-            {
-                scaled.format = PF_A8B8G8R8;
-                PixelUtil::bulkPixelConversion(src, scaled);
-            }
-#endif
+            scaled = src;
         }
 
         upload(scaled, dstBox);
         freeBuffer();
-        
-        if (freeScaledBuffer)
-        {
-            delete[] (uint8*)scaled.data;
-        }
     }
 
     void GLES2HardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
@@ -255,7 +230,8 @@ namespace Ogre {
         rs->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
 
         bool hasGLES30 = rs->hasMinGLVersion(3, 0);
-#if OGRE_NO_GLES3_SUPPORT == 0
+        // PBO handling is broken
+#if 0// OGRE_NO_GLES3_SUPPORT == 0
         // Calculate size for all mip levels of the texture
         size_t dataSize = 0;
         if(mTarget == GL_TEXTURE_2D_ARRAY)
@@ -287,7 +263,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 #endif
 #else
-        void* pdata = data.data;
+        void* pdata = data.getTopLeftFrontPixelPtr();
 #if OGRE_DEBUG_MODE
         LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
                                               " Target: " + StringConverter::toString(mTarget) +
@@ -350,9 +326,6 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
             }
 
-            if(hasGLES30 && (data.left > 0 || data.top > 0 || data.front > 0))
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-
             if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
@@ -394,7 +367,6 @@ namespace Ogre {
         if(hasGLES30) {
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
         }
 
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
