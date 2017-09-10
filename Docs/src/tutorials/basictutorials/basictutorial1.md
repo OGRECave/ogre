@@ -23,80 +23,58 @@ An Entity is one type of object that you can render in your scene. It is anythin
 
 ## Getting started with codding
 
-Grab sources from following page @subpage tutorialapplicationcpp and configure your project. Source files has to be called TutorialApplication.cpp and .hpp respectively.
+We will be using starter files for this tutorials which are based on OgreBites::ApplicationContext.
 
-Tutorial application sources based on  OgreBites::ApplicationContext.
+Here is **TutorialApplication.cpp**:
+@snippet Samples/Tutorials/TutorialApplication.cpp starter
+and **TutorialApplication.hpp**:
+@snippet Samples/Tutorials/TutorialApplication.hpp starter
 
-In order to run tutorial application your main() function has to have follwoing lines:
+Starter files as well as complete source of this tutorial can be located in source directory **Samples/Tutorial**.
 
-```cpp
-TutorialApplication app;
-app.initApp();
-app.getRoot()->startRendering();
-app.closeApp();
-```
+As you may noticed we already put main() function into TutorialApplication.cpp file. Content of this function performs initialization, renedering and finalization of the application execution after user pressed Escape button.
 
-After your include TutorialApplicaion.hpp file. Basically all these lines execute initialization, renedering and finalization of the application execution after user pressed Escape button.
+Let's get started!
 
 ## Setting Up the Scene
 
 It's finally time to start building something in our scene. All source addition will be in "tutorial section" in cpp file of the tutorial TutorialApplication::setup method.
 
 The first thing we want to do is turn on the lights.
-```cpp
-scnMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
-```
+
+@snippet Samples/Tutorials/BasicTutorial1.cpp turnlights
 
 The setAmbientLight method takes an Ogre::ColourValue. The three values represent the red, green, and blue values of the colour, and they range between 0 and 1.
 
 scnMgr is a variable that is defined in OgreBites::ApplicationContext. There are a number of features avariables, like setting up resources and initialization of required routines for rendering. They will be introduced as we need them.
 
 Lights will be covered in detail in the next tutorial, but we will still add a simple one to this scene as a teaser. New Light objects can also be requested from the Ogre::SceneManager. We give the Light a unique name when it is created.
-```cpp
-Ogre::Light* light = scnMgr->createLight("MainLight");
-```
+
+@snippet Samples/Tutorials/BasicTutorial1.cpp newlight
 
 Once the Light is created, we set its position. The three parameters are the x, y, and z coordinates of the location we want to place the Light.
-```cpp
-light->setPosition(20, 80, 50);
-```
+
+@snippet Samples/Tutorials/BasicTutorial1.cpp lightpos
 
 Next step is to create a camera. Starting from Ogre 1.10 it is required to create separate scene node for camera. Following code covers it.
 
-```cpp
-// also need to tell where we are
-Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-camNode->setPosition(0, 0, 140);
+@snippet Samples/Tutorials/BasicTutorial1.cpp camera
 
-// create the camera
-Ogre::Camera* cam = scnMgr->createCamera("myCam");
-cam->setNearClipDistance(5); // specific to this sample
-cam->setAutoAspectRatio(true);
-camNode->attachObject(cam);
-
-// and tell it to render into the main window
-getRenderWindow()->addViewport(cam);
-```
 Details about camera will be covered in the following tutorial.
 
 The next thing we do is ask the SceneManager to create an Entity.
 
-```cpp
-Ogre::Entity* ogreEntity = scnMgr->createEntity("ogrehead.mesh");
-```
-The parameter given to this function must be a mesh that was loaded by Ogre's resource manager. For now, resource loading is one of the many things that BaseApplication is taking care of for us. It will be explained further in later tutorials.
+@snippet Samples/Tutorials/BasicTutorial1.cpp entity1
+
+The parameter given to this function must be a mesh that was loaded by Ogre's resource manager. For now, resource loading is one of the many things that OgreBites::ApplicationContext is taking care of for us. It will be explained further in later tutorials.
 
 Now that we have an Entity, we need to create a SceneNode so the Entity can be displayed in our scene. Every SceneManager has a root node. That node has a method called createChildSceneNode that will return a new SceneNode attached to the root. In older versions of Ogre, you were required to provide a unique name for your Entities and SceneNodes. This is now optional. Ogre will generate names for them if you do not provide one.
 
-```cpp
-Ogre::SceneNode* ogreNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-```
+@snippet Samples/Tutorials/BasicTutorial1.cpp entity1node
 
 We save the SceneNode pointer that is returned by the method so that we can attach our Entity to it.
 
-```cpp
-ogreNode->attachObject(ogreEntity);
-```
+@snippet Samples/Tutorials/BasicTutorial1.cpp entity1nodeattach
 
 We now have a basic scene set up. Compile and run your application. You should see an Ogre's head on your screen. This is only the beginning...
 
@@ -110,8 +88,7 @@ Before we go on, let's cover some basics of Ogre's coordinate system. Ogre, like
 
 The x-axis starts with negative values to the left and increases to the right (passing through zero at the origin). The z-axis runs forwards and backwards. The positive direction of the z-axis points "out of the screen". So if a character walks towards the screen, then its z value will be increasing. Finally, the y-axis runs from the bottom to the top. Values that are "below ground" are negative. Don't take these terms in parenthesis literally. You can put the ground wherever you want. It is just to help you orient yourself in the scene.
 
-When you run your application, notice how your Ogre head is facing towards the camera down the positive z-axis. This is a property of the mesh itself and the orientation of the camera. Cameras are covered in a later tutorial. The Ogre head is sitting at the origin of our world, (0, 0, 0). The direction the head is facing by default is a result of which way it was facing when it was originally modeled. You can effectively change this from within Ogre as well, but it will require some knowledge of quaternions, which aren't really covered until the [Intermediate Tutorials](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Intermediate+Tutorials).
-
+When you run your application, notice how your Ogre head is facing towards the camera down the positive z-axis. This is a property of the mesh itself and the orientation of the camera. Cameras are covered in a later tutorial. The Ogre head is sitting at the origin of our world, (0, 0, 0). The direction the head is facing by default is a result of which way it was facing when it was originally modeled. You can effectively change this from within Ogre as well, but it will require some knowledge of quaternions, which aren't really covered until the [Intermediate Tutorials](#).
 [//]: <> (TODO: Replace link with manual page when time has come)
 
 Ogre uses a vector class to represent positions and directions. There are vectors defined for 2-4 dimensions. They are called Ogre::Vector2, Ogre::Vector3, and Ogre::Vector4 - Vector3 being the most commonly used by far. If you are not familiar with the concept of vectors it is highly recommended to learn a little before attempting these tutorials. Even though Ogre is an abstraction over many of the complications involved with OpenGL and DirectX, there is still no escaping some mathematical concepts. Vectors and basic linear algebra will be some of the most useful things you can learn if you intend to proceed with 3D rendering. This [site](http://www.wildbunny.co.uk/blog/vector-maths-a-primer-for-games-programmers/) has produced a nice primer on vectors focused on game programmers.
@@ -122,17 +99,11 @@ It's time to get back to the coding. With our first Entity, we did not specify t
 
 First, let's move the camera so we can fit more Entities on screen. Place this call right after you set the ambient light in createScene:
 
-```cpp
-camNode->setPosition(0, 47, 222);
-```
+@snippet Samples/Tutorials/BasicTutorial1.cpp cameramove
 
 Now, let's create another Entity and SceneNode, but this time we'll give it a new position.
 
-```cpp
-Ogre::Entity* ogreEntity2 = scnMgr->createEntity("ogrehead.mesh");
-Ogre::SceneNode* ogreNode2 = scnMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(84, 48, 0));
-ogreNode2->attachObject(ogreEntity2);
-```
+@snippet Samples/Tutorials/BasicTutorial1.cpp entity2
 
 This is the same thing we did the first time, except we are now providing a Vector3 to our createChildSceneNode method. This will override the default position. Remember, the SceneNode's position is always relative to its parent. In this case, the parent SceneNode is the root SceneNode, which is positioned at (0, 0, 0) by default.
 
@@ -144,7 +115,7 @@ Compile and run your application. Your Ogre head should have a buddy.
 
 The Ogre::Entity class is very extensive. We will now introduce just a few more of its methods that will be useful. The Entity class has setVisible and isVisible methods. If you want an Entity to be hidden, but you still need it later, then you can use this function instead of destroying the Entity and rebuilding it later.
 
-**Note:** Entities do not need to be pooled like they are in some graphics engines. Only one copy of each mesh and texture is ever loaded into memory, so there is not a big savings from trying to minimize the number of Entities.
+@note Entities do not need to be pooled like they are in some graphics engines. Only one copy of each mesh and texture is ever loaded into memory, so there is not a big savings from trying to minimize the number of Entities.
 
 The getName method returns the name of an Entity, and the getParentSceneNode method returns the SceneNode that the Entity is attached to. In our case, this would be the root SceneNode.
 
@@ -154,7 +125,7 @@ The Ogre::SceneNode class is very complex. For now, we will only cover some of t
 
 You can set the position after creating the node with setPosition. This is still relative to its parent node. You can move an objective relative to its current position by using translate.
 
-SceneNodes are used to set a lot more than just position. They also manage the scale and rotation of objects. You can set the scale of an object with setScale. And you can use yaw, pitch, and roll to set the object's orientation. You can use resetRotation to return the object to its default orientation. Finally, you can use rotate to perform more complicated rotations. This will again involve the use of quaternions, which will not be covered until the [Intermediate Tutorials](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Intermediate+Tutorials).
+SceneNodes are used to set a lot more than just position. They also manage the scale and rotation of objects. You can set the scale of an object with setScale. And you can use yaw, pitch, and roll to set the object's orientation. You can use resetRotation to return the object to its default orientation. Finally, you can use rotate to perform more complicated rotations. This will again involve the use of quaternions, which will not be covered until the [Intermediate Tutorials](#).
 
 [//]: <> (TODO: Replace link with manual page when time has come)
 
@@ -176,19 +147,19 @@ Then our new node would be parented directly to the SceneNode for our first Enti
 
 If you're having trouble with the idea of a relative location, then maybe an example will help. Let's say we put our first node, ogreNode, at (10, 10, 10) and attach ogreNode2 directly to ogreNode. Then we set the position of ogreNode2 to be (-10, -10, -10). To figure out where ogreNode2 will be displayed we add its position to the position of its parent.
 
-<pre>
+```
 (10, 10, 10) + (-10, -10, -10) = (0, 0, 0)
   ogreNode        ogreNode2
    parent           child
-</pre>
+```
 
 So this means that ogreNode2 would actually be placed at (0, 0, 0) in our world, even though we set its position to (-10, -10, -10). If we detached this node and reattached it to the root SceneNode, then it would really be displayed at (-10, -10, -10), because:
 
-<pre>
+```
 (0, 0, 0) + (-10, -10, -10) = (-10, -10, -10)
    root        ogreNode2
   parent         child
-</pre>
+```
 
 Take a few seconds to soak this in. Relativity is hard. That's why it took an Einstein to really figure it out.
 
@@ -198,14 +169,7 @@ Lastly, you can get a SceneNode or Entity by its name (if you gave it one), by c
 
 We can set the scale of an Entity by calling setScale. This method allows us to provide a scale factor for each dimension. Let's add another Ogre head and give it a different scale for demonstration. We will also position it so it fits well on the screen.
 
-```cpp
-Ogre::Entity* ogreEntity3 = scnMgr->createEntity("ogrehead.mesh");
-
-Ogre::SceneNode* ogreNode3 = scnMgr->getRootSceneNode()->createChildSceneNode();
-ogreNode3->setPosition(0, 104, 0);
-ogreNode3->setScale(2, 1.2, 1);
-ogreNode3->attachObject(ogreEntity3);
-```
+@snippet Samples/Tutorials/BasicTutorial1.cpp entity3
 
 Compile and run your application. You should see a fat Ogre head up top.
 
@@ -223,14 +187,7 @@ There is a well-known trick for remembering which direction is a positive rotati
 
 Let's put this to use and place a rotated Entity into our scene. We will also position it nicely.
 
-```cpp
-Ogre::Entity* ogreEntity4 = scnMgr->createEntity("ogrehead.mesh");
-
-Ogre::SceneNode* ogreNode4 = scnMgr->getRootSceneNode()->createChildSceneNode();
-ogreNode4->setPosition(-84, 48, 0);
-ogreNode4->roll(Ogre::Degree(-90));
-ogreNode4->attachObject(ogreEntity4);
-```
+@snippet Samples/Tutorials/BasicTutorial1.cpp entity4
 
 Compile and run your application. We should now have a rotated Ogre head in our scene.
 
@@ -258,7 +215,7 @@ Ogre also uses plugins for the different render systems (such as OpenGL, DirectX
 
 The last major group contains third-party libraries and other general support libraries. Ogre is focused sharply on being a graphics rendering library. This group makes it easy to integrate external libraries to add things like physics, input, and GUI systems. These libraries are used together to form a full game development environment. You might find this piecemeal approach a little strange, but it is a very common design pattern in large software projects. It is harder to comprehend at first, but it is a much more flexible approach when you want to start building more complicated scenes.
 
-The Ogre demos and SDK include some of these third-party libraries. The [Open Input System](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=OIS) can be used to manage input events and distribute them to Ogre. This is contained in OIS.dll or libOIS.so. You can also make use of Cg, which is used by CgProgramManager. This library allows you to produce materials with custom shaders. There are other libraries (not included with Ogre) that offer functionality such as sound and physics.
+The Ogre demos and SDK include some of these third-party libraries. The [Simple DirectMedia](https://www.libsdl.org/) can be used to manage input events and distribute them to Ogre. You can also make use of Cg, which is used by CgProgramManager. This library allows you to produce materials with custom shaders. There are other libraries (not included with Ogre) that offer functionality such as sound and physics.
 
 #### Testing vs Release
 
@@ -274,20 +231,20 @@ Ogre uses several configuration files (\*.cfg). They control things like which p
 
 This file tells Ogre which plugins to load. You modify this file when you want to load a different set of plugins. It is often most useful to simply "comment out" lines instead of removing them, because you never know when a stroke of inspiration will mean you want to reload some unused plugins. Here is some sample content:
 
-<pre>
+```
 # Plugin=RenderSystem_Direct3D9
 # Plugin=RenderSystem_Direct3D10
 # Plugin=RenderSystem_Direct3D11
 Plugin=RenderSystem_GL
-</pre>
+```
 
 We have the three DirectX systems commented out, and an active line for OpenGL. On a windows system, you may have this reversed. You can see why it might be helpful not to delete unused lines, because then you have to try and remember whether it was RenderSystem_OpenGL or RenderSystem_GL.
 
 You can also decide where Ogre looks for plugins by changing the 'PluginFolder' variable. You can use both absolute and relative paths, but you cannot use environment variables like $(OGRE_HOME). For example, if you have built Ogre from source on a linux machine, then you will need a line like this at the beginning of your file:
 
-<pre>
+```
 PluginFolder=/usr/local/lib/OGRE
-</pre>
+```
 
 By default, Ogre would have been looking in '/usr/lib/OGRE'. This is where it would be placed if you installed Ogre from a package manager. You may have to do something similar on Mac.
 
@@ -297,13 +254,13 @@ By default, Ogre would have been looking in '/usr/lib/OGRE'. This is where it wo
 
 This file contains a list of the directories Ogre will use to search for resources. Resources include scripts, meshes, textures, GUI layouts, and others. You can also use both absolute and relative paths in this file, but you still cannot use environment variables. Ogre will **not** search subdirectories, so you have to manually enter them. Here is an example:
 
-<pre>
+```
 [General]
 FileSystem=../media
 FileSystem=../media/materials/scripts
 FileSystem=../media/materials/textures
 FileSystem=../media/models
-</pre>
+```
 
 Here is an example of a relative path being used and the need to list subdirectories. Including the '../media' directory did not automatically include the '../media/models' directory. This is so that Ogre doesn't get greedy and waste time loading up unneeded resources.
 
@@ -335,10 +292,8 @@ An Ogre::Entity represents anything that has an Ogre mesh. A Ogre::SceneNode is 
 
 You can find full source code here: @subpage basictutorial1fullsource
 
-
 ## Next
 To be done.
-In a mean time refer to this [link](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Basic+Tutorial+2):
 
 [//]: <> (TODO: make Tutorial 2 in manuals)
 
