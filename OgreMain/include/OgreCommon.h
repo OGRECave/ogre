@@ -211,7 +211,7 @@ namespace Ogre {
             than the additive stencil shadow approach when there are multiple
             lights, but is not an accurate model. 
         */
-        SHADOWTYPE_STENCIL_MODULATIVE = 0x12,
+        SHADOWTYPE_STENCIL_MODULATIVE = SHADOWDETAILTYPE_STENCIL | SHADOWDETAILTYPE_MODULATIVE,
         /** Stencil shadow technique which renders each light as a separate
             additive pass to the scene. This technique can be very fillrate
             intensive because it requires at least 2 passes of the entire
@@ -219,12 +219,12 @@ namespace Ogre {
             accurate model than the modulative stencil approach and this is
             especially apparent when using coloured lights or bump mapping.
         */
-        SHADOWTYPE_STENCIL_ADDITIVE = 0x11,
+        SHADOWTYPE_STENCIL_ADDITIVE = SHADOWDETAILTYPE_STENCIL | SHADOWDETAILTYPE_ADDITIVE,
         /** Texture-based shadow technique which involves a monochrome render-to-texture
             of the shadow caster and a projection of that texture onto the 
             shadow receivers as a modulative pass. 
         */
-        SHADOWTYPE_TEXTURE_MODULATIVE = 0x22,
+        SHADOWTYPE_TEXTURE_MODULATIVE = SHADOWDETAILTYPE_TEXTURE | SHADOWDETAILTYPE_MODULATIVE,
         
         /** Texture-based shadow technique which involves a render-to-texture
             of the shadow caster and a projection of that texture onto the 
@@ -234,7 +234,7 @@ namespace Ogre {
             modulative approach and this is especially apparent when using coloured lights 
             or bump mapping.
         */
-        SHADOWTYPE_TEXTURE_ADDITIVE = 0x21,
+        SHADOWTYPE_TEXTURE_ADDITIVE = SHADOWDETAILTYPE_TEXTURE | SHADOWDETAILTYPE_ADDITIVE,
 
         /** Texture-based shadow technique which involves a render-to-texture
         of the shadow caster and a projection of that texture on to the shadow
@@ -251,7 +251,7 @@ namespace Ogre {
         not mean it does the adding on your receivers automatically though, how you
         use that result is up to you.
         */
-        SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED = 0x25,
+        SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED = SHADOWTYPE_TEXTURE_ADDITIVE | SHADOWDETAILTYPE_INTEGRATED,
         /** Texture-based shadow technique which involves a render-to-texture
             of the shadow caster and a projection of that texture on to the shadow
             receivers, with the usage of those shadow textures completely controlled
@@ -267,7 +267,7 @@ namespace Ogre {
             not mean it modulates on your receivers automatically though, how you
             use that result is up to you.
         */
-        SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED = 0x26
+        SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED = SHADOWTYPE_TEXTURE_MODULATIVE | SHADOWDETAILTYPE_INTEGRATED
     };
 
     /** An enumeration describing which material properties should track the vertex colours */
