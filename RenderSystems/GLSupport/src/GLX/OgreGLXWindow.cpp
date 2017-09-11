@@ -142,12 +142,13 @@ namespace Ogre
             if ((opt = miscParams->find("currentGLContext")) != end &&
                 StringConverter::parseBool(opt->second))
             {
-                if (! glXGetCurrentContext())
+                glxContext = glXGetCurrentContext();
+
+                if (!glxContext)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "currentGLContext was specified with no current GL context", "GLXWindow::create");
                 }
 
-                glxContext = glXGetCurrentContext();
                 glxDrawable = glXGetCurrentDrawable();
             }
 
@@ -205,6 +206,10 @@ namespace Ogre
                     // xid format
                     parentWindow = StringConverter::parseUnsignedLong(tokens[0]);
                 }
+
+                // reset drawable in case currentGLContext was used
+                // it should be queried from the parentWindow
+                glxDrawable = 0;
             }
             else if((opt = miscParams->find("externalWindowHandle")) != end)
             {
