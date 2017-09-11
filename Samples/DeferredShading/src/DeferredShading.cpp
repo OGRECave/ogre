@@ -72,7 +72,8 @@ DeferredShadingSystem::DeferredShadingSystem(
     mViewport(vp), mSceneMgr(sm), mCamera(cam)
 {
     sm->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE);
-    sm->setShadowTextureCasterMaterial("DeferredShading/Shadows/Caster");
+    sm->setShadowTextureCasterMaterial(
+        MaterialManager::getSingleton().getByName("DeferredShading/Shadows/Caster", "General"));
     mSceneMgr->setShadowTextureCount(1);
     mSceneMgr->setShadowFarDistance(150);
     //Use a value of "2" to use a different depth buffer pool and avoid sharing this with the Backbuffer's

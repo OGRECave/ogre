@@ -94,10 +94,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    AutoParamDataSource::~AutoParamDataSource()
-    {
-    }
-    //-----------------------------------------------------------------------------
 	const Camera* AutoParamDataSource::getCurrentCamera() const
 	{
 		return mCurrentCamera;
