@@ -140,8 +140,7 @@ void TestContext::setup()
     mWindow->setDeactivateOnFocusChange(false);
     
     locateResources();
-
-    createDummyScene();
+    initialiseRTShaderSystem();
 
     loadResources();
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -371,8 +370,6 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
 
         if (mCurrentTest->isDone())
         {
-            createDummyScene();
-
             // continue onto the next test
             runSample(0);
 
@@ -401,7 +398,6 @@ void TestContext::runSample(OgreBites::Sample* s)
     Ogre::ControllerManager::getSingleton().setFrameDelay(0);
     Ogre::ControllerManager::getSingleton().setTimeFactor(1.f);
     mCurrentFrame = 0;
-    destroyDummyScene();
 
     OgreBites::Sample* sampleToRun = s;
 
