@@ -785,6 +785,13 @@ void ApplicationContext::pollEvents()
             break;
         }
     }
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
+    {
+        Ogre::RenderWindow* win = it->render;
+        win->windowMovedOrResized();
+        windowResized(win);
+    }
 #endif
 }
 

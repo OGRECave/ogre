@@ -1006,15 +1006,6 @@ namespace OgreBites
             }
         }
 
-        /*-----------------------------------------------------------------------------
-          | Notify the window size changed or it was moved
-          -----------------------------------------------------------------------------*/
-        virtual void windowMovedOrResized()
-        {
-            mWindow->windowMovedOrResized();    // notify window
-            windowResized(mWindow);                             // notify window event listeners
-        }
-
     protected:
         /*-----------------------------------------------------------------------------
           | Overrides the default window title.

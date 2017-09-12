@@ -141,7 +141,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 							}
 
                             if (initOGRE && wndCreate) {
-                                ogreApp.getRenderWindow().windowMovedOrResized();
                                 ogreApp.getRoot().renderOneFrame();
                             }
 

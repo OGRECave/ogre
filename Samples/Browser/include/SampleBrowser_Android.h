@@ -152,7 +152,6 @@ namespace OgreBites
                 
                 if(mBrowser.getRenderWindow() && mBrowser.getRenderWindow()->isActive())
                 {
-                    mBrowser.getRenderWindow()->windowMovedOrResized();
                     mBrowser.getRoot()->renderOneFrame();
                 }
             }
