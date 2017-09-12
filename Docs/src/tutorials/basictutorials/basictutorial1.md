@@ -6,7 +6,7 @@ This first tutorial will cover the basic elements of building a scene in Ogre. T
 
 We'll start with an explanation of some of the basic concepts in Ogre. Don't worry, this first tutorial has a little more explanation than the rest, but that changes very quickly once you get to the later tutorials. We will be building plenty of things. We just have to lay a little groundwork first, so you have somewhere to stand.
 
-The full source for this tutorial (BasicTutorial1.cpp, BasicTutorial1.hpp) can be found in samples directory Samples/Tutorials.
+The full source for this tutorial (BasicTutorial1.cpp) can be found in samples directory **Samples/Tutorials**.
 
 @note  Any problems you encounter during working with this tutorial should be posted in the [Help Forum](http://www.ogre3d.org/forums/viewforum.php?f=2).
 
@@ -41,10 +41,8 @@ We will be using starter files for this tutorials which are based on OgreBites::
 
 Here is **TutorialApplication.cpp**:
 @snippet Samples/Tutorials/TutorialApplication.cpp starter
-and **TutorialApplication.hpp**:
-@snippet Samples/Tutorials/TutorialApplication.hpp starter
 
-Starter files as well as complete source of this tutorial can be located in source directory **Samples/Tutorial**.
+Starter file as well as complete source of this tutorial can be located in source directory **Samples/Tutorial**.
 
 As you may noticed we already put main() function into TutorialApplication.cpp file. Content of this function performs initialization, renedering and finalization of the application execution after user pressed Escape button.
 
@@ -305,10 +303,5 @@ You should now have a basic understanding of setting up an Ogre scene. This tuto
 An Ogre::Entity represents anything that has an Ogre mesh. A Ogre::SceneNode is used to hold properties like location, scale, and rotation. It is also the anchor that attaches your Entities to your scene and allows them to be rendered on screen. Finally, The Ogre::SceneManager is the object that orchestrates it all. It has methods that allow you to create Entities and SceneNodes and keep them organized within a complicated scene.
 
 # Next {#Next}
-To be done.
-
-[//]: <> (TODO: make Tutorial 2 in manuals)
-
-
-
+@ref basictutorial2
 

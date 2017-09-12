@@ -31,7 +31,24 @@ THE SOFTWARE
 #include <exception>
 #include <iostream>
 
-#include "TutorialApplication.hpp"
+#include <Ogre.h>
+#include <OgreApplicationContext.h>
+#include <OgreInput.h>
+#include <OgreRTShaderSystem.h>
+#include <OgreApplicationContext.h>
+
+class TutorialApplication
+        : public OgreBites::ApplicationContext
+        , public OgreBites::InputListener
+{
+public:
+    TutorialApplication();
+    virtual ~TutorialApplication();
+
+    void setup();
+    bool keyPressed(const OgreBites::KeyboardEvent& evt);
+};
+
 
 TutorialApplication::TutorialApplication()
     : OgreBites::ApplicationContext("Tutorial Application")

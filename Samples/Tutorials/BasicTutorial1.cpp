@@ -28,16 +28,30 @@ THE SOFTWARE
 
 //! [fullsource]
 
-#include "BasicTutorial1.hpp"
+#include <Ogre.h>
+#include <OgreApplicationContext.h>
+#include <OgreInput.h>
+#include <OgreRTShaderSystem.h>
+#include <OgreApplicationContext.h>
+
+class BasicTutorial1
+        : public OgreBites::ApplicationContext
+        , public OgreBites::InputListener
+{
+public:
+    BasicTutorial1();
+    virtual ~BasicTutorial1() {}
+
+    void setup();
+    bool keyPressed(const OgreBites::KeyboardEvent& evt);
+};
+
 
 BasicTutorial1::BasicTutorial1()
     : OgreBites::ApplicationContext("Tutorial Application")
 {
     addInputListener(this);
 }
-
-
-BasicTutorial1::~BasicTutorial1() {}
 
 
 void BasicTutorial1::setup()
@@ -130,7 +144,6 @@ bool BasicTutorial1::keyPressed(const OgreBites::KeyboardEvent& evt)
     }
     return true;
 }
-
 
 
 int main(int argc, char **argv)
