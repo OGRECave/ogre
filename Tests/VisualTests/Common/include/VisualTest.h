@@ -81,12 +81,6 @@ class VisualTest : public OgreBites::Sample
         Sample::unloadResources();
     }
 
-    /** Changes aspect ratio to match any window resizings */
-    virtual void windowResized(Ogre::RenderWindow* rw)
-    {
-        mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
-    }
-
     /** Returns whether or not a screenshot should be taken at the given frame */
     virtual bool isScreenshotFrame(unsigned int frame)
     {
