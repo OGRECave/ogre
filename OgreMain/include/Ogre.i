@@ -466,6 +466,8 @@ ADD_REPR(ColourValue)
 %include "OgreSceneManager.h"
 %include "OgreSceneManagerEnumerator.h"
 %include "OgreConfigDialog.h"
+%template() Ogre::vector<Ogre::RenderSystem*>;
+%template(RenderSystemList) std::vector<Ogre::RenderSystem*>;
 %ignore Ogre::Root::showConfigDialog(); // deprecated
 %ignore Ogre::Root::addResourceLocation; // deprecated
 %ignore Ogre::Root::removeResourceLocation; // deprecated

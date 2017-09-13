@@ -39,7 +39,13 @@ namespace Ogre {
     /** \addtogroup Image
     *  @{
     */
-    /** The pixel format used for images, textures, and render surfaces */
+    /** The pixel format used for images, textures, and render surfaces
+     *
+     * @note the components are specified in "packed" native byte order.
+     * For PF_BYTE_* formats this means that platform endianess changes the order:
+     * e.g. Ogre::PF_BYTE_RGBA on little endian (x86) forms an integer as Ogre::PF_A8B8G8R8,
+     * while on big endian it "packs" as Ogre::PF_R8G8B8A8
+     */
     enum PixelFormat
     {
         /// Unknown pixel format.
@@ -80,10 +86,10 @@ namespace Ogre {
         /// 32-bit pixel format, 8 bits for red, green, blue and alpha.
         PF_R8G8B8A8 = 28,
         /// 32-bit pixel format, 8 bits for red, 8 bits for green, 8 bits for blue
-        /// like PF_A8R8G8B8, but alpha will get discarded
+        /// like Ogre::PF_A8R8G8B8, but alpha will get discarded
         PF_X8R8G8B8 = 26,
         /// 32-bit pixel format, 8 bits for blue, 8 bits for green, 8 bits for red
-        /// like PF_A8B8G8R8, but alpha will get discarded
+        /// like Ogre::PF_A8B8G8R8, but alpha will get discarded
         PF_X8B8G8R8 = 27,
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
         /// 3 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue
@@ -124,7 +130,7 @@ namespace Ogre {
         PF_FLOAT16_RGB = 22,
         /// 64-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue, 16 bits (float) for alpha
         PF_FLOAT16_RGBA = 23,
-        // 32-bit pixel format, 32 bits (float) for red
+        /// 32-bit pixel format, 32 bits (float) for red
         PF_FLOAT32_R = 33,
         /// 96-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue
         PF_FLOAT32_RGB = 24,

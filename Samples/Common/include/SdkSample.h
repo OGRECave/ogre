@@ -107,11 +107,6 @@ namespace OgreBites
             return true;
         }
 
-        virtual void windowResized(Ogre::RenderWindow* rw)
-        {
-            mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
-        }
-
         virtual bool keyPressed(const KeyboardEvent& evt)
         {
         	int key = evt.keysym.sym;
