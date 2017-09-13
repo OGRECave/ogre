@@ -87,9 +87,8 @@ namespace Ogre  {
             return GL_BGR;
         case PF_A4R4G4B4:
             return GL_BGRA;
+        // endianess sensitive byte formats
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-            // Formats are in native endian, so R8G8B8 on little endian is
-            // BGR, on big endian it is RGB.
         case PF_R8G8B8:
             return GL_RGB;
         case PF_B8G8R8:
@@ -102,10 +101,10 @@ namespace Ogre  {
 #endif
         case PF_X8R8G8B8:
         case PF_A8R8G8B8:
-            return GL_BGRA;
+            return GL_BGRA; // rev
         case PF_X8B8G8R8:
         case PF_A8B8G8R8:
-            return GL_RGBA;
+            return GL_RGBA; // rev
         case PF_B8G8R8A8:
             return GL_BGRA;
         case PF_R8G8B8A8:
@@ -267,29 +266,20 @@ namespace Ogre  {
             return GL_UNSIGNED_SHORT_4_4_4_4_REV;
         case PF_L16:
             return GL_UNSIGNED_SHORT;
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+
         case PF_X8B8G8R8:
         case PF_A8B8G8R8:
-            return GL_UNSIGNED_INT_8_8_8_8_REV;
+            // RGBA
         case PF_X8R8G8B8:
         case PF_A8R8G8B8:
+            // BGRA
             return GL_UNSIGNED_INT_8_8_8_8_REV;
         case PF_B8G8R8A8:
-            return GL_UNSIGNED_BYTE;
+            // BGRA
         case PF_R8G8B8A8:
-            return GL_UNSIGNED_BYTE;
-#else
-        case PF_X8B8G8R8:
-        case PF_A8B8G8R8:
-            return GL_UNSIGNED_BYTE;
-        case PF_X8R8G8B8:
-        case PF_A8R8G8B8:
-            return GL_UNSIGNED_BYTE;
-        case PF_B8G8R8A8:
+            // RGBA
             return GL_UNSIGNED_INT_8_8_8_8;
-        case PF_R8G8B8A8:
-            return GL_UNSIGNED_INT_8_8_8_8;
-#endif
+
         case PF_A2R10G10B10:
             return GL_UNSIGNED_INT_2_10_10_10_REV;
         case PF_A2B10G10R10:
