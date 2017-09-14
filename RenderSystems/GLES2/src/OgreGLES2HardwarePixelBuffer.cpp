@@ -72,7 +72,7 @@ namespace Ogre {
             scaled = mBuffer.getSubVolume(dstBox);
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
-        else if (GLES2PixelUtil::getGLOriginFormat(src.format) == 0)
+        else if (GLES2PixelUtil::getGLInternalFormat(src.format) == 0)
         {
             // Extents match, but format is not accepted as valid source format for GL
             // do conversion in temporary buffer
@@ -127,7 +127,7 @@ namespace Ogre {
             dst.getWidth() == getWidth() &&
             dst.getHeight() == getHeight() &&
             dst.getDepth() == getDepth() &&
-            GLES2PixelUtil::getGLOriginFormat(dst.format) != 0)
+            GLES2PixelUtil::getGLInternalFormat(dst.format) != 0)
         {
             // The direct case: the user wants the entire texture in a format supported by GL
             // so we don't need an intermediate buffer
@@ -745,7 +745,7 @@ namespace Ogre {
         PixelBox src;
         
         // First, convert the srcbox to a OpenGL compatible pixel format
-        if(GLES2PixelUtil::getGLOriginFormat(src_orig.format) == 0)
+        if(GLES2PixelUtil::getGLInternalFormat(src_orig.format) == 0)
         {
             // Convert to buffer internal format
             buf.reset(OGRE_NEW MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(),

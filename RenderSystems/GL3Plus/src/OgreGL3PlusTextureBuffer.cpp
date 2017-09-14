@@ -619,7 +619,7 @@ namespace Ogre {
         PixelBox src;
 
         // First, convert the srcbox to a OpenGL compatible pixel format
-        if (GL3PlusPixelUtil::getGLOriginFormat(src_orig.format) == 0)
+        if (GL3PlusPixelUtil::getGLInternalFormat(src_orig.format) == 0)
         {
             // Convert to buffer internal format
             buf.reset(new MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(),

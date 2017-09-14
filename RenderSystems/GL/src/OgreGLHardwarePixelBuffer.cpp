@@ -64,7 +64,7 @@ void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dstBo
         scaled = mBuffer.getSubVolume(dstBox);
         Image::scale(src, scaled, Image::FILTER_BILINEAR);
     }
-    else if(GLPixelUtil::getGLOriginFormat(src.format) == 0)
+    else if(GLPixelUtil::getGLInternalFormat(src.format) == 0)
     {
         // Extents match, but format is not accepted as valid source format for GL
         // do conversion in temporary buffer
@@ -93,7 +93,7 @@ void GLHardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
        dst.getWidth() == getWidth() &&
        dst.getHeight() == getHeight() &&
        dst.getDepth() == getDepth() &&
-       GLPixelUtil::getGLOriginFormat(dst.format) != 0)
+       GLPixelUtil::getGLInternalFormat(dst.format) != 0)
     {
         // The direct case: the user wants the entire texture in a format supported by GL
         // so we don't need an intermediate buffer
@@ -696,7 +696,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Box &dstBox
     PixelBox src;
     
     /// First, convert the srcbox to a OpenGL compatible pixel format
-    if(GLPixelUtil::getGLOriginFormat(src_orig.format) == 0)
+    if(GLPixelUtil::getGLInternalFormat(src_orig.format) == 0)
     {
         /// Convert to buffer internal format
         buf.reset(new MemoryDataStream(
