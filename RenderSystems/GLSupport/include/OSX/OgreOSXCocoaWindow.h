@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "OgreOSXCocoaView.h"
 #include "OgreOSXCocoaWindowDelegate.h"
 
+typedef NSUInteger NSWindowStyleMask; // NSWindowStyleMask was declared only since OSX 10.12 SDK
+
 @class CocoaWindowDelegate;
 
 @interface OgreGLWindow : NSWindow
