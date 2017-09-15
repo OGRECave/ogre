@@ -68,8 +68,11 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     GraphicsSystem::~GraphicsSystem()
     {
-        Ogre::LogManager::getSingleton().logMessage( "WARNING: GraphicsSystem::deinitialize() not called!!!",
-                                                    Ogre::LML_CRITICAL );
+        if( mRoot )
+        {
+            Ogre::LogManager::getSingleton().logMessage(
+                        "WARNING: GraphicsSystem::deinitialize() not called!!!", Ogre::LML_CRITICAL );
+        }
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::initialize( const Ogre::String &windowTitle )
