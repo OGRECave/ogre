@@ -1297,7 +1297,7 @@ namespace Ogre {
         }
         else
         {
-            glBindImageTexture( 0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI );
+            glBindImageTexture( slot, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI );
         }
     }
 
