@@ -164,13 +164,11 @@ namespace Ogre
             if( propTexture == ComputeProperty::Uav )
             {
                 propName.a( "_width_with_lod" );    //uav0_width_with_lod
-                setProperty( propName.c_str(), std::max( texture->getWidth() >>
-                                                         (uint32)mipLevel, 1u ) );
+                removePiece( propName.c_str() );
                 propName.resize( texturePropSize );
 
                 propName.a( "_height_with_lod" );   //uav0_height_with_lod
-                setProperty( propName.c_str(), std::max( texture->getHeight() >>
-                                                         (uint32)mipLevel, 1u ) );
+                removePiece( propName.c_str() );
                 propName.resize( texturePropSize );
             }
         }
