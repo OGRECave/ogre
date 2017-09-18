@@ -541,6 +541,7 @@ namespace Ogre {
 
         /// Root scene node
         SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
+        SceneNode* mSceneDummy;
 
         /// Autotracking scene nodes
 		struct AutoTrackingSceneNode
@@ -1265,6 +1266,11 @@ namespace Ogre {
                 can be children of a dynamic root node.
         */
         SceneNode* getRootSceneNode( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
+
+        /// Unlike mNodeMemoryManager->_getDummyNode(), this dummy node is fully allocated,
+        /// which makes it possible to actually attach objects to this dummy, while
+        /// we guarantee the dummy won't change its transform.
+        SceneNode* getDummySceneNode(void) const        { return mSceneDummy; }
 
         /** Retrieves a SceneNode based on it's ID from the scene graph.
         @remarks
