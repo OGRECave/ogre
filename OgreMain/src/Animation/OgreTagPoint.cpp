@@ -81,7 +81,7 @@ namespace Ogre {
             this->migrateTo( nodeMemoryManager );
 
         // Somewhat hacky way to mark our base classes that we can't be attached.
-        mParent = mNodeMemoryManager->_getDummyNode();
+        mParent = mCreator->getDummySceneNode();
     }
     //-----------------------------------------------------------------------
     void TagPoint::_unsetParentBone(void)
@@ -105,7 +105,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TagPoint::updateFromParentImpl(void)
     {
-        assert( "false" && "Not implemented" );
+        assert( false && "Not implemented" );
         //I'm lazy, but before you implement it, remember that the skeleton needs to be updated as well.
     }
     //-----------------------------------------------------------------------

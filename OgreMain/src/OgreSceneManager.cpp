@@ -162,6 +162,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
 
     for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
         mSceneRoot[i] = 0;
+    mSceneDummy = 0;
 
     setAmbientLight( ColourValue::Black, ColourValue::Black, Vector3::UNIT_Y, 1.0f );
 
@@ -230,6 +231,10 @@ mGpuParamsDirty((uint16)GPV_ALL)
         mSceneRoot[i]->setName( "Ogre/SceneRoot" + StringConverter::toString( i ) );
         mSceneRoot[i]->_getDerivedPositionUpdated();
     }
+
+    mSceneDummy = createSceneNodeImpl( (SceneNode*)0, &mNodeMemoryManager[SCENE_DYNAMIC] );
+    mSceneDummy->setName( "Ogre/SceneManager/Dummy");
+    mSceneDummy->_getDerivedPositionUpdated();
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -254,6 +259,9 @@ SceneManager::~SceneManager()
     }
 
     OGRE_DELETE mSkyBoxObj;
+
+    OGRE_DELETE mSceneDummy;
+    mSceneDummy = 0;
 
     for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
     {
