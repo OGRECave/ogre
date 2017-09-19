@@ -37,23 +37,25 @@ THE SOFTWARE
 #include <OgreRTShaderSystem.h>
 #include <OgreApplicationContext.h>
 
+using namespace Ogre;
+using namespace OgreBites;
+
 class TutorialApplication
-        : public OgreBites::ApplicationContext
-        , public OgreBites::InputListener
+        : public ApplicationContext
+        , public InputListener
 {
 public:
     TutorialApplication();
     virtual ~TutorialApplication();
 
     void setup();
-    bool keyPressed(const OgreBites::KeyboardEvent& evt);
+    bool keyPressed(const KeyboardEvent& evt);
 };
 
 
 TutorialApplication::TutorialApplication()
-    : OgreBites::ApplicationContext("Tutorial Application")
+    : ApplicationContext("Tutorial Application")
 {
-    addInputListener(this);
 }
 
 
@@ -63,14 +65,15 @@ TutorialApplication::~TutorialApplication() {}
 void TutorialApplication::setup()
 {
     // do not forget to call the base first
-    OgreBites::ApplicationContext::setup();
+    ApplicationContext::setup();
+    addInputListener(this);
 
     // get a pointer to the already created root
-    Ogre::Root* root = getRoot();
-    Ogre::SceneManager* scnMgr = root->createSceneManager(Ogre::ST_GENERIC);
+    Root* root = getRoot();
+    SceneManager* scnMgr = root->createSceneManager(ST_GENERIC);
 
     // register our scene with the RTSS
-    Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+    RTShader::ShaderGenerator* shadergen = RTShader::ShaderGenerator::getSingletonPtr();
     shadergen->addSceneManager(scnMgr);
 
     // -- tutorial section start --
@@ -79,7 +82,7 @@ void TutorialApplication::setup()
 }
 
 
-bool TutorialApplication::keyPressed(const OgreBites::KeyboardEvent& evt)
+bool TutorialApplication::keyPressed(const KeyboardEvent& evt)
 {
     if (evt.keysym.sym == SDLK_ESCAPE)
     {

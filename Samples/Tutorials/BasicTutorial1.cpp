@@ -34,57 +34,62 @@ THE SOFTWARE
 #include <OgreRTShaderSystem.h>
 #include <OgreApplicationContext.h>
 
+using namespace Ogre;
+using namespace OgreBites;
+
 class BasicTutorial1
-        : public OgreBites::ApplicationContext
-        , public OgreBites::InputListener
+        : public ApplicationContext
+        , public InputListener
 {
 public:
     BasicTutorial1();
     virtual ~BasicTutorial1() {}
 
     void setup();
-    bool keyPressed(const OgreBites::KeyboardEvent& evt);
+    bool keyPressed(const KeyboardEvent& evt);
 };
 
 
 BasicTutorial1::BasicTutorial1()
-    : OgreBites::ApplicationContext("Tutorial Application")
+    : ApplicationContext("Tutorial Application")
 {
-    addInputListener(this);
 }
 
 
 void BasicTutorial1::setup()
 {
     // do not forget to call the base first
-    OgreBites::ApplicationContext::setup();
+    ApplicationContext::setup();
+    addInputListener(this);
 
     // get a pointer to the already created root
-    Ogre::Root* root = getRoot();
-    Ogre::SceneManager* scnMgr = root->createSceneManager(Ogre::ST_GENERIC);
+    Root* root = getRoot();
+    SceneManager* scnMgr = root->createSceneManager(ST_GENERIC);
 
     // register our scene with the RTSS
-    Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+    RTShader::ShaderGenerator* shadergen = RTShader::ShaderGenerator::getSingletonPtr();
     shadergen->addSceneManager(scnMgr);
 
     // -- tutorial section start --
     //! [turnlights]
-    scnMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+    scnMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
     //! [turnlights]
 
     //! [newlight]
-    Ogre::Light* light = scnMgr->createLight("MainLight");
+    Light* light = scnMgr->createLight("MainLight");
+    SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
+    lightNode->attachObject(light);
     //! [newlight]
 
     //! [lightpos]
-    light->setPosition(20, 80, 50);
+    lightNode->setPosition(20, 80, 50);
     //! [lightpos]
 
     //! [camera]
-    Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
+    SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
 
     // create the camera
-    Ogre::Camera* cam = scnMgr->createCamera("myCam");
+    Camera* cam = scnMgr->createCamera("myCam");
     cam->setNearClipDistance(5); // specific to this sample
     cam->setAutoAspectRatio(true);
     camNode->attachObject(cam);
@@ -95,11 +100,11 @@ void BasicTutorial1::setup()
     //! [camera]
 
     //! [entity1]
-    Ogre::Entity* ogreEntity = scnMgr->createEntity("ogrehead.mesh");
+    Entity* ogreEntity = scnMgr->createEntity("ogrehead.mesh");
     //! [entity1]
 
     //! [entity1node]
-    Ogre::SceneNode* ogreNode = scnMgr->getRootSceneNode()->createChildSceneNode();
+    SceneNode* ogreNode = scnMgr->getRootSceneNode()->createChildSceneNode();
     //! [entity1node]
 
     //! [entity1nodeattach]
@@ -111,24 +116,24 @@ void BasicTutorial1::setup()
     //! [cameramove]
 
     //! [entity2]
-    Ogre::Entity* ogreEntity2 = scnMgr->createEntity("ogrehead.mesh");
-    Ogre::SceneNode* ogreNode2 = scnMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(84, 48, 0));
+    Entity* ogreEntity2 = scnMgr->createEntity("ogrehead.mesh");
+    SceneNode* ogreNode2 = scnMgr->getRootSceneNode()->createChildSceneNode(Vector3(84, 48, 0));
     ogreNode2->attachObject(ogreEntity2);
     //! [entity2]
 
     //! [entity3]
-    Ogre::Entity* ogreEntity3 = scnMgr->createEntity("ogrehead.mesh");
-    Ogre::SceneNode* ogreNode3 = scnMgr->getRootSceneNode()->createChildSceneNode();
+    Entity* ogreEntity3 = scnMgr->createEntity("ogrehead.mesh");
+    SceneNode* ogreNode3 = scnMgr->getRootSceneNode()->createChildSceneNode();
     ogreNode3->setPosition(0, 104, 0);
     ogreNode3->setScale(2, 1.2, 1);
     ogreNode3->attachObject(ogreEntity3);
     //! [entity3]
 
     //! [entity4]
-    Ogre::Entity* ogreEntity4 = scnMgr->createEntity("ogrehead.mesh");
-    Ogre::SceneNode* ogreNode4 = scnMgr->getRootSceneNode()->createChildSceneNode();
+    Entity* ogreEntity4 = scnMgr->createEntity("ogrehead.mesh");
+    SceneNode* ogreNode4 = scnMgr->getRootSceneNode()->createChildSceneNode();
     ogreNode4->setPosition(-84, 48, 0);
-    ogreNode4->roll(Ogre::Degree(-90));
+    ogreNode4->roll(Degree(-90));
     ogreNode4->attachObject(ogreEntity4);
     //! [entity4]
 
@@ -136,7 +141,7 @@ void BasicTutorial1::setup()
 }
 
 
-bool BasicTutorial1::keyPressed(const OgreBites::KeyboardEvent& evt)
+bool BasicTutorial1::keyPressed(const KeyboardEvent& evt)
 {
     if (evt.keysym.sym == SDLK_ESCAPE)
     {

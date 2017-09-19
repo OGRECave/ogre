@@ -14,6 +14,8 @@ file(COPY ${OGRE_CONFIG_DIR}/plugins.cfg ${OGRE_CONFIG_DIR}/resources.cfg
      DESTINATION ${CMAKE_BINARY_DIR})
 ## [discover_ogre]
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
+
 add_executable(starter TutorialApplication.cpp)
 target_link_libraries(starter ${OGRE_LIBRARIES})
 

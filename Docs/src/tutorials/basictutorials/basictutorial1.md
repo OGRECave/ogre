@@ -64,11 +64,13 @@ Lights will be covered in detail in the next tutorial, but we will still add a s
 
 @snippet Samples/Tutorials/BasicTutorial1.cpp newlight
 
-Once the Light is created, we set its position. The three parameters are the x, y, and z coordinates of the location we want to place the Light.
+Starting from Ogre 1.10 camera and lights require to create separate scene node for them so that they need to be attached to them.
+
+Once the Light is created and attached to its SceneNode, we set its position. The three parameters are the x, y, and z coordinates of the location we want to place the Light.
 
 @snippet Samples/Tutorials/BasicTutorial1.cpp lightpos
 
-Next step is to create a camera. Starting from Ogre 1.10 it is required to create separate scene node for camera. Following code covers it.
+Next step is to create a camera.
 
 @snippet Samples/Tutorials/BasicTutorial1.cpp camera
 

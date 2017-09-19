@@ -2,7 +2,7 @@
 
 @tableofcontents
 
-This tutorial will expand on the use of Lights in a scene and using them to cast shadows. It will also cover the basics of using the Camera in Ogre.
+This tutorial will expand on the use of Lights in a scene and using them to cast shadows.
 
 The full source for this tutorial (BasicTutorial2.cpp) can be found in samples directory **Samples/Tutorials**.
 
@@ -21,14 +21,16 @@ A Camera is the object we use to view our scene. A Ogre::Camera is a special obj
 @note Starting from version 1.10 functionality related to rotate and translate camera are depricated. You should attach camera to Ogre::SceneNode and do all transofrmation with this node.
 
 # Creating a Camera {#bt2CreatingaCamera}
-We will now cover camera creation part which we just applied in previous tutorial. We remeber that now we need to have SceneNode for camera. The first step will be doing is creating that SceneNode and asking the SceneManager to create a new Camera. Add the following to create Camera:
+We will now cover camera creation part which we just applied in previous tutorial. We remeber that now we need to have SceneNode for camera. The first step will be doing is creating that SceneNode and asking the SceneManager to create a new Camera. Add the following to create SceneNode and Camera:
 
 @snippet Samples/Tutorials/BasicTutorial2.cpp cameracreate
 You can retrieve the Camera by name using the SceneManager's getCamera method.
 
-Next, we will position the Camera and use a method called lookAt to set its direction.
+Next, we will position the Camera and use a method called lookAt to set its direction using camNode.
 @snippet Samples/Tutorials/BasicTutorial2.cpp cameraposition
 The Ogre::SceneNode::lookAt method is very useful. It does exactly what it says. It rotates the SceneNode so that its line of sight focuses on the vector you give it. It makes the Camera "look at" the point.
+
+[//]: <> (TODO: add explanation about second arguemnt of lookAt method)
 
 The last thing we'll do (apart of attachning camera to a SceneNode) is set the near clipping distance to 5 units. This is the distance at which the Camera will no longer render any mesh. If you get very close to a mesh, this will sometimes cut the mesh and allow you to see inside of it. The alternative is filling the entire screen with a tiny, highly magnified piece of the mesh's texture. It's up to you what you want in your scene. For demonstration, we'll set it here.
 
@@ -42,7 +44,9 @@ There are three constructs that are crucial to understanding how Ogre renders a 
 # Creating a Viewport {#bt2CreatingaViewport}
 Let's create a Viewport for our scene. To do this, we will use the addViewport method of the RenderWindow.
 @snippet Samples/Tutorials/BasicTutorial2.cpp addviewport
-mWindow is another variable defined for us in OgreBites::ApplicationContext. Let's set the background color of the Viewport.
+getRenderWindow() is a method defined for us in OgreBites::ApplicationContext which returns Ogre::RenderWindow.
+
+Now let's set the background color of the Viewport.
 @snippet Samples/Tutorials/BasicTutorial2.cpp viewportback
 
 We've set it to black because we are going to add colored lighting later, and we don't want the background color affecting how we see the lighting.
@@ -53,7 +57,7 @@ The last thing we are going to do is set the aspect ratio of our Camera. If you 
 
 We have retrieved the width and height from the Viewport to set the aspect ratio. As we mentioned, the default is already set to use the full screen's dimensions.
 
-Compile and run your application. You should still only see a black screen with the overlays, just make sure it runs.
+Compile and run your application. You should still only see a black screen, just make sure it runs.
 
 # Building the Scene {#bt2BuildingtheScene}
 Before we get to shadows and lighting, let's add some elements to our scene. Let's put a ninja right in the middle of things. Add the following code right after we set the ambient light:
@@ -91,7 +95,7 @@ And finally we need to give our ground a material. For now, it will be easiest t
 Make sure you add the texture for the material and the Examples.material script to your resource loading path. In our case, the texture is called 'rockwall.tga'. You can find the name yourself by reading the entry in the material script.
 
 # Using Shadows in Ogre {#bt2UsingShadowsinOgre}
-Enabling shadows in Ogre is easy. The SceneManager class has a sOgre::SceneManager::setShadowTechnique method we can use. Then whenever we create an Entity, we call setCastShadows to choose which Entities will cast shadows. setShadowTechinique method takes several of different techniques. Refer to Ogre::ShadowTechnique for more details.
+Enabling shadows in Ogre is easy. The SceneManager class has a Ogre::SceneManager::setShadowTechnique method we can use. Then whenever we create an Entity, we call setCastShadows to choose which Entities will cast shadows. setShadowTechinique method takes several of different techniques. Refer to Ogre::ShadowTechnique for more details.
 
 Let's turn off the ambient light so we can see the full effect of our lights. Add the following changes:
 
@@ -108,7 +112,7 @@ Ogre provides three types of lighting.
 The Ogre::Light class has a wide range of properties. Two of the most important are the [diffuse](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=-Diffuse+%28Light%29) and [specular](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=-Specular+%28Light%29) color. Each material script defines how much specular and diffuse lighting a material reflects. These properties will be covered in some of the later tutorials.
 
 # Creating a Light {#CreatingaLight}
-Let's add a Light to our scene. We do this by calling the SceneManager's createLight method. Add the following code right after we finish creating the groundEntity:
+Let's add a Light to our scene. We do this by calling the Ogre::SceneManager::createLight method. Add the following code right after we finish creating the groundEntity:
 @snippet Samples/Tutorials/BasicTutorial2.cpp spotlight
 
 We'll set the diffuse and specular colors to pure blue.
@@ -121,6 +125,8 @@ Next we will set the type of the light to spotlight.
 The spotlight requires both a position and a direction - remember it acts like a flashlight. We'll place the spotlight above the right shoulder of the ninja shining down on him at a 45 degree angle.
 
 @snippet Samples/Tutorials/BasicTutorial2.cpp spotlightposrot
+
+@note You must be wondering why we call setDirection for light source and then call the same method for related SceneNode. As long as setDirection is depricated for Light it has to be attached to SceneNode. Since SceneNode default rotation is NEGATIVE\_UNIT\_Z we need to set same value for Light. Direction for light by default is not NEGATIVE\_UNIT\_Z but in the future releases it will be replaced with this value, so that extrac call of setDirection for Light could be deleted in code. In other words we need this extra move for future compatibilty.
 
 ![](bt2_light_dir_1.png)
 

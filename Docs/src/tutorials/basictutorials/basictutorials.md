@@ -4,8 +4,8 @@ This is where you should start learning Ogre. These tutorials assume you have no
 
 If you need help with the set up, then read @ref setup.
 
-@subpage basictutorial1 <br/>
-@subpage basictutorial2
+- @subpage basictutorial1
+- @subpage basictutorial2
 
 [//]: <> (TODO: make tutorial 2 with contolling camera with CameraMan, existing tutroals number increment by one)
 [//]: <> (TODO: make an overview of OgreBites::ApplicationContext class as a tutoriali 9)
