@@ -210,6 +210,7 @@ namespace Ogre
         /// required (i.e. GL needs them for UAVs and Compute Shaders)
         RSC_EXPLICIT_API = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 5),
         RSC_CONST_BUFFER_SLOTS_IN_SHADER     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 6),
+        RSC_TEXTURE_COMPRESSION_ASTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 7),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

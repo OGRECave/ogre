@@ -226,6 +226,40 @@ namespace Ogre {
                 case PF_ATC_RGBA_INTERPOLATED_ALPHA:
                     return ((width + 3) / 4) * ((height + 3) / 4) * 16;
 
+                case PF_ASTC_RGBA_4X4_LDR:
+                case PF_ASTC_SRGB8A8_4X4_LDR:
+                case PF_ASTC_RGBA_5X4_LDR:
+                case PF_ASTC_SRGB8A8_5X4_LDR:
+                case PF_ASTC_RGBA_5X5_LDR:
+                case PF_ASTC_SRGB8A8_5X5_LDR:
+                case PF_ASTC_RGBA_6X5_LDR:
+                case PF_ASTC_SRGB8A8_6X5_LDR:
+                case PF_ASTC_RGBA_6X6_LDR:
+                case PF_ASTC_SRGB8A8_6X6_LDR:
+                case PF_ASTC_RGBA_8X5_LDR:
+                case PF_ASTC_SRGB8A8_8X5_LDR:
+                case PF_ASTC_RGBA_8X6_LDR:
+                case PF_ASTC_SRGB8A8_8X6_LDR:
+                case PF_ASTC_RGBA_8X8_LDR:
+                case PF_ASTC_SRGB8A8_8X8_LDR:
+                case PF_ASTC_RGBA_10X5_LDR:
+                case PF_ASTC_SRGB8A8_10X5_LDR:
+                case PF_ASTC_RGBA_10X6_LDR:
+                case PF_ASTC_SRGB8A8_10X6_LDR:
+                case PF_ASTC_RGBA_10X8_LDR:
+                case PF_ASTC_SRGB8A8_10X8_LDR:
+                case PF_ASTC_RGBA_10X10_LDR:
+                case PF_ASTC_SRGB8A8_10X10_LDR:
+                case PF_ASTC_RGBA_12X10_LDR:
+                case PF_ASTC_SRGB8A8_12X10_LDR:
+                case PF_ASTC_RGBA_12X12_LDR:
+                case PF_ASTC_SRGB8A8_12X12_LDR:
+                {
+                    uint32 blockWidth = getCompressedBlockWidth( format );
+                    uint32 blockHeight = getCompressedBlockWidth( format );
+                    return  (alignToNextMultiple( width, blockWidth ) / blockWidth) *
+                            (alignToNextMultiple( height, blockHeight ) / blockHeight) * depth * 16u;
+                }
                 default:
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid compressed pixel format",
                     "PixelUtil::getMemorySize");
@@ -284,6 +318,41 @@ namespace Ogre {
             case PF_PVRTC2_4BPP:
                 return 0;
 
+            case PF_ASTC_RGBA_4X4_LDR:
+            case PF_ASTC_SRGB8A8_4X4_LDR:
+                return 4u;
+            case PF_ASTC_RGBA_5X4_LDR:
+            case PF_ASTC_SRGB8A8_5X4_LDR:
+            case PF_ASTC_RGBA_5X5_LDR:
+            case PF_ASTC_SRGB8A8_5X5_LDR:
+                return 5u;
+            case PF_ASTC_RGBA_6X5_LDR:
+            case PF_ASTC_SRGB8A8_6X5_LDR:
+            case PF_ASTC_RGBA_6X6_LDR:
+            case PF_ASTC_SRGB8A8_6X6_LDR:
+                return 6u;
+            case PF_ASTC_RGBA_8X5_LDR:
+            case PF_ASTC_SRGB8A8_8X5_LDR:
+            case PF_ASTC_RGBA_8X6_LDR:
+            case PF_ASTC_SRGB8A8_8X6_LDR:
+            case PF_ASTC_RGBA_8X8_LDR:
+            case PF_ASTC_SRGB8A8_8X8_LDR:
+                return 8u;
+            case PF_ASTC_RGBA_10X5_LDR:
+            case PF_ASTC_SRGB8A8_10X5_LDR:
+            case PF_ASTC_RGBA_10X6_LDR:
+            case PF_ASTC_SRGB8A8_10X6_LDR:
+            case PF_ASTC_RGBA_10X8_LDR:
+            case PF_ASTC_SRGB8A8_10X8_LDR:
+            case PF_ASTC_RGBA_10X10_LDR:
+            case PF_ASTC_SRGB8A8_10X10_LDR:
+                return 10u;
+            case PF_ASTC_RGBA_12X10_LDR:
+            case PF_ASTC_SRGB8A8_12X10_LDR:
+            case PF_ASTC_RGBA_12X12_LDR:
+            case PF_ASTC_SRGB8A8_12X12_LDR:
+                return 12u;
+
             default:
                 assert( !isCompressed( format ) );
                 return 1;
@@ -292,6 +361,47 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     uint32 PixelUtil::getCompressedBlockHeight( PixelFormat format, bool apiStrict )
     {
+        switch( format )
+        {
+        case PF_ASTC_RGBA_4X4_LDR:
+        case PF_ASTC_SRGB8A8_4X4_LDR:
+        case PF_ASTC_RGBA_5X4_LDR:
+        case PF_ASTC_SRGB8A8_5X4_LDR:
+            return 4u;
+        case PF_ASTC_RGBA_5X5_LDR:
+        case PF_ASTC_SRGB8A8_5X5_LDR:
+        case PF_ASTC_RGBA_6X5_LDR:
+        case PF_ASTC_SRGB8A8_6X5_LDR:
+        case PF_ASTC_RGBA_8X5_LDR:
+        case PF_ASTC_SRGB8A8_8X5_LDR:
+        case PF_ASTC_RGBA_10X5_LDR:
+        case PF_ASTC_SRGB8A8_10X5_LDR:
+            return 5u;
+        case PF_ASTC_RGBA_6X6_LDR:
+        case PF_ASTC_SRGB8A8_6X6_LDR:
+        case PF_ASTC_RGBA_8X6_LDR:
+        case PF_ASTC_SRGB8A8_8X6_LDR:
+        case PF_ASTC_RGBA_10X6_LDR:
+        case PF_ASTC_SRGB8A8_10X6_LDR:
+            return 6u;
+        case PF_ASTC_RGBA_8X8_LDR:
+        case PF_ASTC_SRGB8A8_8X8_LDR:
+        case PF_ASTC_RGBA_10X8_LDR:
+        case PF_ASTC_SRGB8A8_10X8_LDR:
+            return 8u;
+        case PF_ASTC_RGBA_10X10_LDR:
+        case PF_ASTC_SRGB8A8_10X10_LDR:
+        case PF_ASTC_RGBA_12X10_LDR:
+        case PF_ASTC_SRGB8A8_12X10_LDR:
+            return 10u;
+
+        case PF_ASTC_RGBA_12X12_LDR:
+        case PF_ASTC_SRGB8A8_12X12_LDR:
+            return 12u;
+        default:
+            return getCompressedBlockWidth( format, apiStrict );
+        }
+
         return getCompressedBlockWidth( format, apiStrict );
     }
     //-----------------------------------------------------------------------
