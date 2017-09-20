@@ -153,6 +153,38 @@ namespace Ogre
         case PF_ATC_RGBA_EXPLICIT_ALPHA:        return MTLPixelFormatInvalid;
         case PF_ATC_RGBA_INTERPOLATED_ALPHA:    return MTLPixelFormatInvalid;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        case PF_ASTC_RGBA_4X4_LDR:      return MTLPixelFormatASTC_4x4_LDR;
+        case PF_ASTC_RGBA_5X4_LDR:      return MTLPixelFormatASTC_5x4_LDR;
+        case PF_ASTC_RGBA_5X5_LDR:      return MTLPixelFormatASTC_5x5_LDR;
+        case PF_ASTC_RGBA_6X5_LDR:      return MTLPixelFormatASTC_6x5_LDR;
+        case PF_ASTC_RGBA_6X6_LDR:      return MTLPixelFormatASTC_6x6_LDR;
+        case PF_ASTC_RGBA_8X5_LDR:      return MTLPixelFormatASTC_8x5_LDR;
+        case PF_ASTC_RGBA_8X6_LDR:      return MTLPixelFormatASTC_8x6_LDR;
+        case PF_ASTC_RGBA_8X8_LDR:      return MTLPixelFormatASTC_8x8_LDR;
+        case PF_ASTC_RGBA_10X5_LDR:     return MTLPixelFormatASTC_10x5_LDR;
+        case PF_ASTC_RGBA_10X6_LDR:     return MTLPixelFormatASTC_10x6_LDR;
+        case PF_ASTC_RGBA_10X8_LDR:     return MTLPixelFormatASTC_10x8_LDR;
+        case PF_ASTC_RGBA_10X10_LDR:    return MTLPixelFormatASTC_10x10_LDR;
+        case PF_ASTC_RGBA_12X10_LDR:    return MTLPixelFormatASTC_12x10_LDR;
+        case PF_ASTC_RGBA_12X12_LDR:    return MTLPixelFormatASTC_12x12_LDR;
+
+        case PF_ASTC_SRGB8A8_4X4_LDR:   return MTLPixelFormatASTC_4x4_sRGB;
+        case PF_ASTC_SRGB8A8_5X4_LDR:   return MTLPixelFormatASTC_5x4_sRGB;
+        case PF_ASTC_SRGB8A8_5X5_LDR:   return MTLPixelFormatASTC_5x5_sRGB;
+        case PF_ASTC_SRGB8A8_6X5_LDR:   return MTLPixelFormatASTC_6x5_sRGB;
+        case PF_ASTC_SRGB8A8_6X6_LDR:   return MTLPixelFormatASTC_6x6_sRGB;
+        case PF_ASTC_SRGB8A8_8X5_LDR:   return MTLPixelFormatASTC_8x5_sRGB;
+        case PF_ASTC_SRGB8A8_8X6_LDR:   return MTLPixelFormatASTC_8x6_sRGB;
+        case PF_ASTC_SRGB8A8_8X8_LDR:   return MTLPixelFormatASTC_8x8_sRGB;
+        case PF_ASTC_SRGB8A8_10X5_LDR:  return MTLPixelFormatASTC_10x5_sRGB;
+        case PF_ASTC_SRGB8A8_10X6_LDR:  return MTLPixelFormatASTC_10x6_sRGB;
+        case PF_ASTC_SRGB8A8_10X8_LDR:  return MTLPixelFormatASTC_10x8_sRGB;
+        case PF_ASTC_SRGB8A8_10X10_LDR: return MTLPixelFormatASTC_10x10_sRGB;
+        case PF_ASTC_SRGB8A8_12X10_LDR: return MTLPixelFormatASTC_12x10_sRGB;
+        case PF_ASTC_SRGB8A8_12X12_LDR: return MTLPixelFormatASTC_12x12_sRGB;
+#endif
+
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         case PF_D24_UNORM_S8_UINT:      return MTLPixelFormatDepth24Unorm_Stencil8;
         case PF_D24_UNORM_X8:           return MTLPixelFormatDepth24Unorm_Stencil8;
