@@ -344,6 +344,11 @@ if (OGRE_CONFIG_ENABLE_ETC)
   list(APPEND SOURCE_FILES src/OgreETCCodec.cpp)
 endif ()
 
+if (OGRE_CONFIG_ENABLE_ASTC)
+  list(APPEND HEADER_FILES include/OgreASTCCodec.h)
+  list(APPEND SOURCE_FILES src/OgreASTCCodec.cpp)
+endif ()
+
 if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND HEADER_FILES include/OgreZip.h)
   list(APPEND SOURCE_FILES src/OgreZip.cpp)

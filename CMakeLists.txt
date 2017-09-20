@@ -396,6 +396,10 @@ if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
   set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL 3+" FORCE)
 endif()
 
+if(OGRE_BUILD_RENDERSYSTEM_METAL AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+  set(OGRE_CONFIG_ENABLE_ASTC TRUE CACHE BOOL "Forcing ASTC codec for Metal" FORCE)
+endif()
+
 ######################################################################
 # Provide user options to customise the build process
 ######################################################################
@@ -471,6 +475,7 @@ option(OGRE_CONFIG_ENABLE_MESHLOD "Enable Mesh Lod." TRUE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
 option(OGRE_CONFIG_ENABLE_ETC "Build ETC codec." FALSE)
+option(OGRE_CONFIG_ENABLE_ASTC "Build ASTC codec." FALSE)
 option(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO "Enable stereoscopic 3D support" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND" FALSE)
 option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
@@ -526,6 +531,7 @@ mark_as_advanced(
   OGRE_CONFIG_ENABLE_PVRTC
   OGRE_CONFIG_ENABLE_ETC
   OGRE_CONFIG_ENABLE_STBI
+  OGRE_CONFIG_ENABLE_ASTC
   OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE
   OGRE_CONFIG_ENABLE_ZIP
   OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT

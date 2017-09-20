@@ -109,6 +109,7 @@ namespace Ogre
         file << "\t" << "texture_compression_etc2 " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_ETC2)) << endl;
         file << "\t" << "texture_compression_bc4_bc5 " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5)) << endl;
         file << "\t" << "texture_compression_bc6h_bc7 " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7)) << endl;
+        file << "\t" << "texture_compression_astc " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_ASTC)) << endl;
         file << "\t" << "gl1_5_novbo " << StringConverter::toString(caps->hasCapability(RSC_GL1_5_NOVBO)) << endl;
         file << "\t" << "fbo " << StringConverter::toString(caps->hasCapability(RSC_FBO)) << endl;
         file << "\t" << "fbo_arb " << StringConverter::toString(caps->hasCapability(RSC_FBO_ARB)) << endl;
@@ -460,6 +461,7 @@ namespace Ogre
         addKeywordType("texture_compression_etc2", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_bc4_bc5", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_bc6h_bc7", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("texture_compression_astc", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("gl1_5_novbo", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("fbo", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("fbo_arb", SET_CAPABILITY_ENUM_BOOL);
@@ -510,6 +512,7 @@ namespace Ogre
         addCapabilitiesMapping("texture_compression_etc2", RSC_TEXTURE_COMPRESSION_ETC2);
         addCapabilitiesMapping("texture_compression_bc4_bc5", RSC_TEXTURE_COMPRESSION_BC4_BC5);
         addCapabilitiesMapping("texture_compression_bc6h_bc7", RSC_TEXTURE_COMPRESSION_BC6H_BC7);
+        addCapabilitiesMapping("texture_compression_astc", RSC_TEXTURE_COMPRESSION_ASTC);
         addCapabilitiesMapping("hwrender_to_vertex_buffer", RSC_HWRENDER_TO_VERTEX_BUFFER);
         addCapabilitiesMapping("gl1_5_novbo", RSC_GL1_5_NOVBO);
         addCapabilitiesMapping("fbo", RSC_FBO);
