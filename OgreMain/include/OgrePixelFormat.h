@@ -262,8 +262,36 @@ namespace Ogre {
         PF_ATC_RGBA_EXPLICIT_ALPHA = 93,
         /// ATC (AMD_compressed_ATC_texture)
         PF_ATC_RGBA_INTERPOLATED_ALPHA = 94,
-        // Number of pixel formats currently defined
-        PF_COUNT = 95
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 4x4)
+        PF_ASTC_RGBA_4X4_LDR = 95,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 5x4)
+        PF_ASTC_RGBA_5X4_LDR = 96,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 5x5)
+        PF_ASTC_RGBA_5X5_LDR = 97,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 6x5)
+        PF_ASTC_RGBA_6X5_LDR = 98,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 6x6)
+        PF_ASTC_RGBA_6X6_LDR = 99,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x5)
+        PF_ASTC_RGBA_8X5_LDR = 100,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x6)
+        PF_ASTC_RGBA_8X6_LDR = 101,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x8)
+        PF_ASTC_RGBA_8X8_LDR = 102,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x5)
+        PF_ASTC_RGBA_10X5_LDR = 103,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x6)
+        PF_ASTC_RGBA_10X6_LDR = 104,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x8)
+        PF_ASTC_RGBA_10X8_LDR = 105,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x10)
+        PF_ASTC_RGBA_10X10_LDR = 106,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 12x10)
+        PF_ASTC_RGBA_12X10_LDR = 107,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 12x12)
+        PF_ASTC_RGBA_12X12_LDR = 108,
+        /// Number of pixel formats currently defined
+        PF_COUNT = 109
     };
     typedef vector<PixelFormat>::type PixelFormatList;
 

@@ -197,7 +197,8 @@ namespace Ogre
         RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 0),
         /// Supports different texture bindings
         RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 1),
-
+        /// Supports compressed textures in the ASTC format
+        RSC_TEXTURE_COMPRESSION_ASTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 2),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

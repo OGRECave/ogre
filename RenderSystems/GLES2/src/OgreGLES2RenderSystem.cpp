@@ -296,7 +296,9 @@ namespace Ogre {
             checkExtension("WEBGL_compressed_texture_s3tc") ||
             checkExtension("WEBGL_compressed_texture_atc") ||
             checkExtension("WEBGL_compressed_texture_pvrtc") ||
-            checkExtension("WEBGL_compressed_texture_etc1"))
+            checkExtension("WEBGL_compressed_texture_etc1") ||
+            checkExtension("WEBGL_compressed_texture_astc") ||
+            checkExtension("GL_KHR_texture_compression_astc_ldr"))
 
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION);
@@ -321,6 +323,10 @@ namespace Ogre {
             if(checkExtension("GL_AMD_compressed_ATC_texture") ||
                checkExtension("WEBGL_compressed_texture_atc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ATC);
+
+            if(checkExtension("WEBGL_compressed_texture_astc") ||
+               checkExtension("GL_KHR_texture_compression_astc_ldr"))
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
         }
 
         // Check for Anisotropy support

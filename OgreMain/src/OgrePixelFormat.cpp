@@ -95,6 +95,11 @@ namespace Ogre {
         return getDescriptionFor(format).elemBytes;
     }
     //-----------------------------------------------------------------------
+    static size_t astc_slice_size(uint32 width, uint32 height, uint32 blockWidth, uint32 blockHeight)
+    {
+        return ((width + blockWidth - 1) / blockWidth) *
+               ((height + blockHeight - 1) / blockHeight) * 16;
+    }
     size_t PixelUtil::getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format)
     {
         if(isCompressed(format))
@@ -147,6 +152,34 @@ namespace Ogre {
                 case PF_ATC_RGBA_INTERPOLATED_ALPHA:
                     return ((width + 3) / 4) * ((height + 3) / 4) * 16;
 
+                case PF_ASTC_RGBA_4X4_LDR:
+                    return astc_slice_size(width, height, 4, 4) * depth;
+                case PF_ASTC_RGBA_5X4_LDR:
+                    return astc_slice_size(width, height, 5, 5) * depth;
+                case PF_ASTC_RGBA_5X5_LDR:
+                    return astc_slice_size(width, height, 5, 5) * depth;
+                case PF_ASTC_RGBA_6X5_LDR:
+                    return astc_slice_size(width, height, 6, 5) * depth;
+                case PF_ASTC_RGBA_6X6_LDR:
+                    return astc_slice_size(width, height, 6, 6) * depth;
+                case PF_ASTC_RGBA_8X5_LDR:
+                    return astc_slice_size(width, height, 8, 5) * depth;
+                case PF_ASTC_RGBA_8X6_LDR:
+                    return astc_slice_size(width, height, 8, 6) * depth;
+                case PF_ASTC_RGBA_8X8_LDR:
+                    return astc_slice_size(width, height, 8, 8) * depth;
+                case PF_ASTC_RGBA_10X5_LDR:
+                    return astc_slice_size(width, height, 10, 5) * depth;
+                case PF_ASTC_RGBA_10X6_LDR:
+                    return astc_slice_size(width, height, 10, 6) * depth;
+                case PF_ASTC_RGBA_10X8_LDR:
+                    return astc_slice_size(width, height, 10, 8) * depth;
+                case PF_ASTC_RGBA_10X10_LDR:
+                    return astc_slice_size(width, height, 10, 10) * depth;
+                case PF_ASTC_RGBA_12X10_LDR:
+                    return astc_slice_size(width, height, 12, 10) * depth;
+                case PF_ASTC_RGBA_12X12_LDR:
+                    return astc_slice_size(width, height, 12, 12) * depth;
                 default:
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid compressed pixel format",
                     "PixelUtil::getMemorySize");
