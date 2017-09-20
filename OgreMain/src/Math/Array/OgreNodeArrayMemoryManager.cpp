@@ -50,16 +50,30 @@ namespace Ogre
         sizeof( bool ),                 //ArrayMemoryManager::InheritOrientation
         sizeof( bool )                  //ArrayMemoryManager::InheritScale
     };
+    const CleanupRoutines NodeArrayMemoryManager::NodeInitRoutines[NumMemoryTypes] =
+    {
+        0,                          //ArrayMemoryManager::Parent
+        0,                          //ArrayMemoryManager::Owner
+        0,                          //ArrayMemoryManager::Position
+        cleanerArrayQuaternion,     //ArrayMemoryManager::Orientation
+        cleanerArrayVector3Unit,    //ArrayMemoryManager::Scale
+        0,                          //ArrayMemoryManager::DerivedPosition
+        cleanerArrayQuaternion,     //ArrayMemoryManager::DerivedOrientation
+        cleanerArrayVector3Unit,    //ArrayMemoryManager::DerivedScale
+        0,                          //ArrayMemoryManager::WorldMat
+        0,                          //ArrayMemoryManager::InheritOrientation
+        0                           //ArrayMemoryManager::InheritScale
+    };
     const CleanupRoutines NodeArrayMemoryManager::NodeCleanupRoutines[NumMemoryTypes] =
     {
         cleanerFlat,                    //ArrayMemoryManager::Parent
         cleanerFlat,                    //ArrayMemoryManager::Owner
-        cleanerArrayVector3,            //ArrayMemoryManager::Position
+        cleanerArrayVector3Zero,        //ArrayMemoryManager::Position
         cleanerArrayQuaternion,         //ArrayMemoryManager::Orientation
-        cleanerArrayVector3,            //ArrayMemoryManager::Scale
-        cleanerArrayVector3,            //ArrayMemoryManager::DerivedPosition
+        cleanerArrayVector3Unit,        //ArrayMemoryManager::Scale
+        cleanerArrayVector3Zero,        //ArrayMemoryManager::DerivedPosition
         cleanerArrayQuaternion,         //ArrayMemoryManager::DerivedOrientation
-        cleanerArrayVector3,            //ArrayMemoryManager::DerivedScale
+        cleanerArrayVector3Unit,        //ArrayMemoryManager::DerivedScale
         cleanerFlat,                    //ArrayMemoryManager::WorldMat
         cleanerFlat,                    //ArrayMemoryManager::InheritOrientation
         cleanerFlat                     //ArrayMemoryManager::InheritScale
@@ -69,7 +83,7 @@ namespace Ogre
                                                     Node *dummyNode, size_t cleanupThreshold,
                                                     size_t maxHardLimit,
                                                     RebaseListener *rebaseListener ) :
-            ArrayMemoryManager( ElementsMemSize, NodeCleanupRoutines,
+            ArrayMemoryManager( ElementsMemSize, NodeInitRoutines, NodeCleanupRoutines,
                                 sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
                                 hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
             mDummyNode( dummyNode )
