@@ -9,6 +9,8 @@ struct Material
 	float4 roughness;
 	float4 metalness;
 	float4 detailOffsetScale[4];
+
+	@insertpiece( custom_materialBuffer )
 };
 
 cbuffer MaterialBuf : register(b1)
