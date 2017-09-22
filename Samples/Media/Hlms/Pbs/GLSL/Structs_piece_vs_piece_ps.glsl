@@ -130,6 +130,8 @@ struct Material
 	uvec4 indices0_3;
 	//uintBitsToFloat( indices4_7.w ) contains mNormalMapWeight.
 	uvec4 indices4_7;
+
+	@insertpiece( custom_materialBuffer )
 };
 
 layout_constbuffer(binding = 1) uniform MaterialBuf

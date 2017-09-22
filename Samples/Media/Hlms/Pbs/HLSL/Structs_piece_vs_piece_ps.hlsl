@@ -132,6 +132,8 @@ struct Material
 	uint4 indices0_3;
 	//asfloat( indices4_7.w ) contains mNormalMapWeight.
 	uint4 indices4_7;
+
+	@insertpiece( custom_materialBuffer )
 };
 
 cbuffer MaterialBuf : register(b1)
