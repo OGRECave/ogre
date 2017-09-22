@@ -160,8 +160,6 @@ namespace Ogre
 
         camera->setProjectionType( mCurrentCamera->getProjectionType() );
         camera->setAspectRatio( mCurrentCamera->getAspectRatio() );
-        camera->setFOVy( mCurrentCamera->getFOVy() );
-        camera->setFocalLength( mCurrentCamera->getFocalLength() );
         camera->setOrthoWindowHeight( mCurrentCamera->getOrthoWindowHeight() );
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         camera->setOrientationMode( mCurrentCamera->getOrientationMode() );
@@ -171,12 +169,17 @@ namespace Ogre
         else if( mCurrentCamera->isReflected() )
             camera->enableReflection( mCurrentCamera->getReflectionPlane() );
 
+        Real origFrustumLeft, origFrustumRight, origFrustumTop, origFrustumBottom;
+        mCurrentCamera->getFrustumExtents(origFrustumLeft, origFrustumRight,
+                                          origFrustumTop, origFrustumBottom, FET_TAN_HALF_ANGLES);
+        camera->setFrustumExtents(origFrustumLeft, origFrustumRight,
+                                          origFrustumTop, origFrustumBottom, FET_TAN_HALF_ANGLES);
+
         camera->setNearClipDistance( nearDepthAtSlice );
         camera->setFarClipDistance( farDepthAtSlice );
 
-        Real origFrustumLeft, origFrustumRight, origFrustumTop, origFrustumBottom;
         camera->getFrustumExtents( origFrustumLeft, origFrustumRight,
-                                   origFrustumTop, origFrustumBottom );
+                                   origFrustumTop, origFrustumBottom, FET_PROJ_PLANE_POS );
 
         const Real frustumHorizLength = (origFrustumRight - origFrustumLeft) / (Real)mWidth;
         const Real frustumVertLength = (origFrustumTop - origFrustumBottom) / (Real)mHeight;
@@ -196,7 +199,7 @@ namespace Ogre
                     const Real newBottom = origFrustumBottom + yStep * frustumVertLength;
                     const Real newTop    = newBottom + frustumVertLength;
 
-                    camera->setFrustumExtents( newLeft, newRight, newTop, newBottom, false );
+                    camera->setFrustumExtents( newLeft, newRight, newTop, newBottom, FET_PROJ_PLANE_POS );
 
                     const Vector3 *wsCorners = camera->getWorldSpaceCorners();
 
