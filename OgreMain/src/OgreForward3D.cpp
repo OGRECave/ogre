@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreForward3D.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
+#include "OgreViewport.h"
 #include "OgreCamera.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -405,12 +406,12 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     size_t Forward3D::getConstBufferSize(void) const
     {
-        // (1 + mNumSlices) vars * 4 (vec4) * 4 bytes = 12
-        return (1 + mNumSlices) * 4 * 4;
+        // (2 + mNumSlices) vars * 4 (vec4) * 4 bytes = 12
+        return (2 + mNumSlices) * 4 * 4;
     }
     //-----------------------------------------------------------------------------------
-    void Forward3D::fillConstBufferData( RenderTarget *renderTarget,
-                                         float * RESTRICT_ALIAS passBufferPtr ) const
+    void Forward3D::fillConstBufferData( Viewport *viewport, RenderTarget* renderTarget,
+                  const Ogre::String& shaderProfile, float * RESTRICT_ALIAS passBufferPtr) const
     {
         //vec4 f3dData;
         *passBufferPtr++ = mMinDistance;
@@ -421,17 +422,35 @@ namespace Ogre
 
         const float fLightsPerCell = static_cast<float>( mLightsPerCell );
 
-        const float renderTargetWidth = static_cast<float>( renderTarget->getWidth() );
-        const float renderTargetHeight = static_cast<float>( renderTarget->getHeight() );
+        const float viewportWidth = static_cast<float>( viewport->getActualWidth() );
+        const float viewportHeight = static_cast<float>( viewport->getActualHeight() );
+        const float viewportWidthOffset = static_cast<float>( viewport->getActualLeft() );
+        float viewportHeightOffset = static_cast<float>( viewport->getActualTop() );
+
+        //The way ogre represents viewports is top = 0 bottom = 1. As a result if 'texture flipping' is required 
+        //all is ok. However if it is not required then viewport offsets are actually represented from the bottom up.
+        //As a result we need convert our veiwport height offsets to work bottom up instead of top down;
+        //This is compounded by DirectX standard being different to OpenGl
+        if ( !renderTarget->requiresTextureFlipping() && shaderProfile != "hlsl" )
+        {
+            viewportHeightOffset = static_cast<float>( (1.0 - (viewport->getTop() + viewport->getHeight()) )
+                                                                              * renderTarget->getHeight() );
+        }
 
         //vec4 f3dGridHWW[mNumSlices];
         for( uint32 i=0; i<mNumSlices; ++i )
         {
-            *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].width ) / renderTargetWidth;
-            *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].height ) / renderTargetHeight;
+            *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].width ) / viewportWidth;
+            *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].height ) / viewportHeight;
             *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].width * mLightsPerCell );
-            *passBufferPtr++ = i < 1u ? fLightsPerCell : renderTargetHeight;
+            *passBufferPtr++ = i < 1u ? fLightsPerCell : viewportHeight;
         }
+
+        //vec4 f3dViewportOffset
+        *passBufferPtr++ = viewportWidthOffset;
+        *passBufferPtr++ = viewportHeightOffset;
+        *passBufferPtr++ = 0;
+        *passBufferPtr++ = 0;
     }
     //-----------------------------------------------------------------------------------
     void Forward3D::setHlmsPassProperties( Hlms *hlms )
