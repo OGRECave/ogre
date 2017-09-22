@@ -126,7 +126,7 @@ The spotlight requires both a position and a direction - remember it acts like a
 
 @snippet Samples/Tutorials/BasicTutorial2.cpp spotlightposrot
 
-@note You must be wondering why we call setDirection for light source and then call the same method for related SceneNode. As long as setDirection is depricated for Light it has to be attached to SceneNode. Since SceneNode default rotation is NEGATIVE\_UNIT\_Z we need to set same value for Light. Direction for light by default is not NEGATIVE\_UNIT\_Z but in the future releases it will be replaced with this value, so that extrac call of setDirection for Light could be deleted in code. In other words we need this extra move for future compatibilty.
+@note You must be wondering why we call setDirection for light source and then call the same method for related SceneNode. As long as setDirection is depricated for Light it has to be attached to SceneNode. Since SceneNode default rotation is NEGATIVE\_UNIT\_Z we need to set same value for Light. Direction for light by default is not NEGATIVE\_UNIT\_Z but in the future releases it will be replaced with this value. So this extra call of setDirection for Light could be deleted in future. In other words we need this extra move for future compatibilty.
 
 ![](bt2_light_dir_1.png)
 
