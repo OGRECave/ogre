@@ -90,6 +90,7 @@ layout_constbuffer(binding = 0) uniform PassBuffer
 	vec4 f3dData;
 	@property( hlms_forwardplus == forward3d )
 		vec4 f3dGridHWW[@value( forward3d_num_slices )];
+		vec4 f3dViewportOffset;
 	@end
 	@property( hlms_forwardplus != forward3d )
 		vec4 fwdScreenToGrid;
