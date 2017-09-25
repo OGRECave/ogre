@@ -94,23 +94,8 @@ using namespace Ogre;
     if(window != NULL)
     {
         // Get the window size and initialize temp variables
-        unsigned int w = 0, h = 0;
         unsigned int width = (uint)self.bounds.size.width;
         unsigned int height = (uint)self.bounds.size.height;
-
-        if (UIDeviceOrientationIsLandscape(deviceOrientation))
-        {
-            w = std::max(width, height);
-            h = std::min(width, height);
-        }
-        else
-        {
-            h = std::max(width, height);
-            w = std::min(width, height);
-        }
-
-        width = w;
-        height = h;
 
         // Resize the window
         window->resize(width, height);
