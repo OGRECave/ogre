@@ -382,7 +382,7 @@ namespace Ogre {
         GLenum attachments[3];
         unsigned int buffers = mContext->mDiscardBuffers;
         
-        if(buffers & FBT_COLOUR)
+        if((buffers & FBT_COLOUR) && mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             attachments[attachmentCount++] = GL_COLOR_ATTACHMENT0;
         }

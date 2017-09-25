@@ -375,7 +375,7 @@ namespace Ogre {
             static_cast<GLESRenderSystem*>(Root::getSingleton().getRenderSystem());
         unsigned int buffers = rs->getDiscardBuffers();
         
-        if(buffers & FBT_COLOUR)
+        if((buffers & FBT_COLOUR) && mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             attachments[attachmentCount++] = GL_COLOR_ATTACHMENT0_OES;
         }
