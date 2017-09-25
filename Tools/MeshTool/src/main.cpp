@@ -64,8 +64,11 @@ void help(void)
          << " " << OGRE_VERSION_SUFFIX << endl;
 
     // Print help message
-    cout << endl << "Upgrades or downgrades .mesh file versions." << endl;
-    cout << "Provided for OGRE by Steve Streeting 2004-2015" << endl << endl;
+    cout << endl << "* Converts to and from XML" << endl;
+    cout << "* Processes meshes" << endl;
+    cout << "* Converts between v2 and v1 mesh formats" << endl;
+    cout << "* Upgrades or downgrades .mesh file versions from either v2 and v1 mesh formats" << endl;
+    cout << "Provided for OGRE by Steve Streeting 2004-2017" << endl << endl;
     cout << "Usage: OgreMeshTool [opts] sourcefile [destfile] " << endl;
     cout << "-i             = Interactive mode, prompt for options. Implies -U" << endl;
     cout << "-autogen       = Generate autoconfigured LOD. No more LOD options needed!. Implies -U" << endl;
