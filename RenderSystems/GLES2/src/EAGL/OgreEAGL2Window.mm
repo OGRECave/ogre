@@ -42,6 +42,16 @@ THE SOFTWARE.
 #include "ARCMacros.h"
 
 namespace Ogre {
+
+    struct EAGLContextGuard
+    {
+        EAGLContextGuard(EAGLContext* ctx) : mPrevContext([EAGLContext currentContext]) { if(ctx != mPrevContext) [EAGLContext setCurrentContext:ctx]; }
+        ~EAGLContextGuard() { [EAGLContext setCurrentContext:mPrevContext]; }
+    private:
+         EAGLContext *mPrevContext;
+    };
+
+
     EAGL2Window::EAGL2Window(EAGL2Support *glsupport)
         :   mClosed(false),
             mVisible(false),
@@ -124,7 +134,9 @@ namespace Ogre {
         if(mWidth == widthPx && mHeight == heightPx)
             return;
         
-        // Destroy and recreate the framebuffer with new dimensions 
+        // Destroy and recreate the framebuffer with new dimensions
+        EAGLContextGuard ctx_guard(mContext->getContext());
+        
         mContext->destroyFramebuffer();
         
         mWidth = widthPx;
