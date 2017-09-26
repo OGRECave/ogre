@@ -415,7 +415,7 @@ namespace Ogre {
     void GLES2FrameBufferObject::detachDepthBuffer()
     {
         // do nothing if FBO was destroyed with creator context
-        if(mContext == nil)
+        if(mContext == NULL)
             return;
         
         // destroy FBO if it is unusable with current context
