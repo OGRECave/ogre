@@ -1905,7 +1905,7 @@ namespace Ogre {
         mCurrentContext->setCurrent();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GL3PlusStateCacheManager>();
-        _completeDeferredVaoDestruction();
+        _completeDeferredVaoFboDestruction();
 
         // Check if the context has already done one-time initialisation
         if (!mCurrentContext->getInitialized())
