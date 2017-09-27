@@ -17,8 +17,15 @@ This tutorial assumes that you already know how to set up an Ogre project and co
 We will be using starter files for this tutorials which are based on OgreBites::ApplicationContext. Plase refer to @ref basictutorial1 to get starter code.
 
 # The Ogre Camera Class {#bt2TheOgreCameraClass}
-A Camera is the object we use to view our scene. A Ogre::Camera is a special object that works similar to a Ogre::SceneNode. It has methods like setPosition and yaw. You can also attach it to a SceneNode. For instance, you might want to temporarily attach your Camera to a SceneNode that follows a path through the sky to create an aerial cutscene. Just like a SceneNode the Camera's position will be relative to its parent SceneNode. The Camera is not a SceneNode (it actually inherits from the Frustum class), but for movement and rotation, you can treat it like a SceneNode.
-@note Starting from version 1.10 functionality related to rotate and translate camera are depricated. You should attach camera to Ogre::SceneNode and do all transofrmation with this node.
+A Camera is the object we use to view our scene. A Ogre::Camera is a special object that works similar to a
+Ogre::SceneNode. It has methods like setPosition and yaw. You can also attach it to a SceneNode. For instance,
+you might want to temporarily attach your Camera to a SceneNode that follows a path through the sky to create an
+aerial cutscene. Just like a SceneNode the Camera's position will be relative to its parent SceneNode. The Camera
+is not a SceneNode (it actually inherits from the Frustum class), but for movement and rotation, you can treat it
+like a SceneNode.
+
+@note Starting from version 1.10 functionality related to rotate and translate camera are deprecated. 
+You should attach camera to Ogre::SceneNode and do all transofrmation with this node.
 
 # Creating a Camera {#bt2CreatingaCamera}
 We will now cover camera creation part which we just applied in previous tutorial. We remeber that now we need to have SceneNode for camera. The first step will be doing is creating that SceneNode and asking the SceneManager to create a new Camera. Add the following to create SceneNode and Camera:
@@ -126,7 +133,11 @@ The spotlight requires both a position and a direction - remember it acts like a
 
 @snippet Samples/Tutorials/BasicTutorial2.cpp spotlightposrot
 
-@note You must be wondering why we call setDirection for light source and then call the same method for related SceneNode. As long as setDirection is depricated for Light it has to be attached to SceneNode. Since SceneNode default rotation is NEGATIVE\_UNIT\_Z we need to set same value for Light. Direction for light by default is not NEGATIVE\_UNIT\_Z but in the future releases it will be replaced with this value. So this extra call of setDirection for Light could be deleted in future. In other words we need this extra move for future compatibilty.
+@note You must be wondering why we call setDirection for light source and then call the same method for related
+SceneNode. As long as setDirection is deprecated for Light it has to be attached to SceneNode. Since SceneNode
+default rotation is NEGATIVE\_UNIT\_Z we need to set same value for Light. Direction for light by default is not
+NEGATIVE\_UNIT\_Z but in the future releases it will be replaced with this value. So this extra call
+of setDirection for Light could be deleted in future. In other words we need this extra move for future compatibilty.
 
 ![](bt2_light_dir_1.png)
 
@@ -173,10 +184,7 @@ Compile and run the application. You should see a long shadow cast in front of t
 ![](bt2_ninja3.jpg)
 
 # Shadow Types {#ShadowTypes}
-Ogre currently supports three types of Shadows:
-1. Ogre::SHADOWTYPE_TEXTURE_MODULATIVE - This is the least computationally expensive type. A black and white render-to-texture is created using all of the shadow casters. This is then applied to the scene.
-2. Ogre::SHADOWTYPE_STENCIL_MODULATIVE - This technique renders all shadow volumes as a modulation after all non-transparent objects have been rendered to the scene. This is not as intensive as Ogre::SHADOWTYPE_STENCIL_ADDITIVE, but it is also less accurate.
-3. Ogre::SHADOWTYPE_STENCIL_ADDITIVE - This technique renders each light as a separate additive pass on the scene. This is very hard on the graphics card because each additional light requires an additional rendering pass.
+Ogre supports set of different shadow types. Please refer to Ogre::ShadowTechnique enumerator for more details.
 
 Try experimenting with the different shadow types. There are also other shadow-related methods in the Ogre::SceneManager class that you can play with.
 
