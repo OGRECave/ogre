@@ -1971,7 +1971,8 @@ namespace Ogre {
         */
         virtual void _setDestinationRenderSystem(RenderSystem* sys);
 
-        void _setViewport( Viewport *vp )                                   { setViewport( vp ); }
+        void _setViewport( Viewport *vp )                               { setViewport( vp ); }
+        void _setCameraInProgress( Camera *camera )                     { mCameraInProgress = camera; }
 
         /** Enables / disables a 'sky plane' i.e. a plane at constant
             distance from the camera representing the sky.
