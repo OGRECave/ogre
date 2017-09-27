@@ -335,6 +335,10 @@ namespace Ogre {
             if((internalFormat == GL_NONE || fmt == GL_NONE || type == GL_NONE) && (x != 0))
                 continue;
 
+            // not color-renderable in GLES
+            if(fmt == GL_BGRA_EXT)
+                continue;
+
             // No test for compressed formats
             if(PixelUtil::isCompressed((PixelFormat)x))
                 continue;
