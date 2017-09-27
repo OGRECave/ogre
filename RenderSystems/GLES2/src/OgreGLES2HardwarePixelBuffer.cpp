@@ -59,7 +59,6 @@ namespace Ogre {
                         "GLES2HardwarePixelBuffer::blitFromMemory");
         }
 
-        bool freeScaledBuffer = false;
         PixelBox scaled;
 
         if (src.getWidth() != dstBox.getWidth() ||
@@ -84,32 +83,10 @@ namespace Ogre {
         {
             // No scaling or conversion needed
             scaled = src;
-
-            if (src.format == PF_R8G8B8)
-            {
-                freeScaledBuffer = true;
-                size_t srcSize = PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(), src.format);
-                scaled.format = PF_B8G8R8;
-                scaled.data = new uint8[srcSize];
-                memcpy(scaled.data, src.data, srcSize);
-                PixelUtil::bulkPixelConversion(src, scaled);
-            }
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-            if (src.format == PF_A8R8G8B8)
-            {
-                scaled.format = PF_A8B8G8R8;
-                PixelUtil::bulkPixelConversion(src, scaled);
-            }
-#endif
         }
 
         upload(scaled, dstBox);
         freeBuffer();
-        
-        if (freeScaledBuffer)
-        {
-            delete[] (uint8*)scaled.data;
-        }
     }
 
     void GLES2HardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
