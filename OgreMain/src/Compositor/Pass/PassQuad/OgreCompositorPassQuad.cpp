@@ -259,6 +259,7 @@ namespace Ogre
 
         SceneManager *sceneManager = mCamera->getSceneManager();
         sceneManager->_setViewport( mViewport );
+        sceneManager->_setCameraInProgress( mCamera );
 
         //Fire the listener in case it wants to change anything
         if( listener )
