@@ -61,7 +61,7 @@ void Sample_VolumeTex::setupContent()
     }
     // Create dynamic texture
     ptex = TextureManager::getSingleton().createManual(
-                "DynaTex","VolumeRenderable", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);
+                "DynaTex","VolumeRenderable", TEX_TYPE_3D, 64, 64, 64, 0, PF_BYTE_RGBA);
 
     // Set ambient light
     mSceneMgr->setAmbientLight(ColourValue(0.6, 0.6, 0.6));
@@ -181,7 +181,7 @@ void Sample_VolumeTex::generate()
                     if(val > vcut)
                         val = vcut;
 
-                    PixelUtil::packColour((float)x/pb.getWidth(), (float)y/pb.getHeight(), (float)z/pb.getDepth(), (1.0f-(val*vscale))*0.7f, PF_A8R8G8B8, &pbptr[x]);
+                    PixelUtil::packColour((float)x/pb.getWidth(), (float)y/pb.getHeight(), (float)z/pb.getDepth(), (1.0f-(val*vscale))*0.7f, PF_BYTE_RGBA, &pbptr[x]);
 
                 }
             }
