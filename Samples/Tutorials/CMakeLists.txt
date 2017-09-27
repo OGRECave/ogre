@@ -20,3 +20,6 @@ target_link_libraries(starter ${OGRE_LIBRARIES})
 add_executable(basic1 BasicTutorial1.cpp)
 target_link_libraries(basic1 ${OGRE_LIBRARIES})
 
+add_executable(basic2 BasicTutorial2.cpp)
+target_link_libraries(basic2 ${OGRE_LIBRARIES})
+
