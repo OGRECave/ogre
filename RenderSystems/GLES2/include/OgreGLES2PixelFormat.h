@@ -39,6 +39,9 @@ namespace Ogre {
     class _OgreGLES2Export GLES2PixelUtil
     {
         public:
+            /// use sized pixel formats. (to be used with GLES3)
+            static void useSizedFormats();
+
             /** Takes the OGRE pixel format and returns the appropriate GL one
                 @returns a GLenum describing the format, or 0 if there is no exactly matching 
                 one (and conversion is needed)

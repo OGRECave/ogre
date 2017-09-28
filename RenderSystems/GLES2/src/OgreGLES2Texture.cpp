@@ -138,9 +138,10 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+        bool hasGLES30 = mRenderSystem->hasMinGLVersion(3, 0);
+
         // Set up texture swizzling
-#if OGRE_NO_GLES3_SUPPORT == 0
-        if (PixelUtil::isLuminance(mFormat))
+        if (hasGLES30 && PixelUtil::isLuminance(mFormat))
         {
             if (PixelUtil::getComponentCount(mFormat) == 2)
             {
@@ -157,7 +158,6 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE));
             }
         }
-#endif
 
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
@@ -167,8 +167,6 @@ namespace Ogre {
         uint32 height = mHeight;
         uint32 depth = mDepth;
         
-        bool hasGLES30 = mRenderSystem->hasMinGLVersion(3, 0);
-
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
@@ -240,7 +238,7 @@ namespace Ogre {
             return;
         }
 
-        if(!OGRE_NO_GLES3_SUPPORT)
+        if(hasGLES30)
         {
 #if OGRE_DEBUG_MODE
             LogManager::getSingleton().logMessage("GLES2Texture::create - Name: " + mName +

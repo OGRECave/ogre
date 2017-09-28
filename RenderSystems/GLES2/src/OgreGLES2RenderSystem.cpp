@@ -1871,6 +1871,7 @@ namespace Ogre {
 
         if(hasMinGLVersion(3, 0)) {
             gl2ext_to_gl3core();
+            GLES2PixelUtil::useSizedFormats();
         }
 
         LogManager::getSingleton().logMessage("**************************************");

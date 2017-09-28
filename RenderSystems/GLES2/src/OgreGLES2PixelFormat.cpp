@@ -38,41 +38,32 @@ namespace Ogre {
         GLenum internalFormat;
     };
 
-    static GLPixelFormatDescription _pixelFormats[] = {
+    static GLPixelFormatDescription _pixelFormatsSized[] = {
             {GL_NONE},                                           // PF_UNKNOWN
-#if OGRE_NO_GLES3_SUPPORT
-            {GL_LUMINANCE, GL_UNSIGNED_BYTE, GL_LUMINANCE},      // PF_L8
-            {GL_NONE},                                           // PF_L16
-            {GL_ALPHA, GL_UNSIGNED_BYTE, GL_ALPHA},              // PF_A8
-            {GL_NONE},                                           // PF_A4L4
-            {GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, GL_LUMINANCE_ALPHA},// PF_BYTE_LA
-
-#else
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8},                   // PF_L8
             {GL_RED, GL_UNSIGNED_SHORT, GL_R16UI},               // PF_L16
             {GL_ALPHA, GL_UNSIGNED_BYTE, GL_R8},                 // PF_A8
             {GL_NONE},                                           // PF_A4L4
             {GL_RG, GL_UNSIGNED_BYTE, GL_RG8},                   // PF_BYTE_LA
-#endif
-            {GL_RGB, GL_UNSIGNED_SHORT_5_6_5, OGRE_NO_GLES3_SUPPORT ? GL_RGB : GL_RGB565},      // PF_R5G6B5
-            {GL_NONE},                                                                          // PF_B5G6R5
-            {GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, OGRE_NO_GLES3_SUPPORT ? GL_RGBA : GL_RGBA4},   // PF_A4R4G4B4, todo: reversed?
-            {GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, OGRE_NO_GLES3_SUPPORT ? GL_RGBA : GL_RGB5_A1}, // PF_A1R5G5B5, todo: reversed?
+            {GL_RGB, GL_UNSIGNED_SHORT_5_6_5, GL_RGB565},        // PF_R5G6B5
+            {GL_NONE},                                           // PF_B5G6R5
+            {GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, GL_RGBA4},      // PF_A4R4G4B4, todo: reversed?
+            {GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, GL_RGB5_A1},    // PF_A1R5G5B5, todo: reversed?
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-            {GL_RGB, GL_UNSIGNED_BYTE, OGRE_NO_GLES3_SUPPORT ? GL_RGB : GL_RGB8}, // PF_R8G8B8
-            {GL_NONE},                                                            // PF_B8G8R8
-            {GL_NONE},                                                            // PF_A8R8G8B8
-            {GL_NONE},                                                            // PF_A8B8G8R8
-            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, OGRE_NO_GLES3_SUPPORT ? GL_BGRA_EXT : GL_BGRA8_EXT},// PF_B8G8R8A8
+            {GL_RGB, GL_UNSIGNED_BYTE, GL_RGB8},                 // PF_R8G8B8
+            {GL_NONE},                                           // PF_B8G8R8
+            {GL_NONE},                                           // PF_A8R8G8B8
+            {GL_NONE},                                           // PF_A8B8G8R8
+            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, GL_BGRA8_EXT},       // PF_B8G8R8A8
 #else
-            {GL_NONE},                                                            // PF_R8G8B8
-            {GL_RGB, GL_UNSIGNED_BYTE, OGRE_NO_GLES3_SUPPORT ? GL_RGB : GL_RGB8}, // PF_B8G8R8
-            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, OGRE_NO_GLES3_SUPPORT ? GL_BGRA_EXT : GL_BGRA8_EXT},// PF_A8R8G8B8
-            {GL_RGBA, GL_UNSIGNED_BYTE, OGRE_NO_GLES3_SUPPORT ? GL_RGBA : GL_RGBA8},// PF_A8B8G8R8
-            {GL_NONE},                                                              // PF_B8G8R8A8
+            {GL_NONE},                                           // PF_R8G8B8
+            {GL_RGB, GL_UNSIGNED_BYTE, GL_RGB8},                 // PF_B8G8R8
+            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, GL_BGRA8_EXT},       // PF_A8R8G8B8
+            {GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA8},               // PF_A8B8G8R8
+            {GL_NONE},                                           // PF_B8G8R8A8
 #endif
-            {GL_NONE},                                                         // PF_A2R10G10B10
-            {GL_RGBA_INTEGER, GL_UNSIGNED_INT_2_10_10_10_REV, GL_RGB10_A2UI},  // PF_A2B10G10R10
+            {GL_NONE},                                                       // PF_A2R10G10B10
+            {GL_RGBA_INTEGER, GL_UNSIGNED_INT_2_10_10_10_REV, GL_RGB10_A2UI},// PF_A2B10G10R10
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT},// PF_DXT1
             {GL_NONE},                                           // PF_DXT2
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT},// PF_DXT3
@@ -83,25 +74,15 @@ namespace Ogre {
             {GL_RGB, GL_FLOAT, GL_RGB32F},                       // PF_FLOAT32_RGB
             {GL_RGBA, GL_FLOAT, GL_RGBA32F},                     // PF_FLOAT32_RGBA
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-            {GL_NONE},                                                                          // PF_X8R8G8B8
-            {GL_NONE},                                                                          // PF_X8B8G8R8
-            {GL_RGBA, GL_UNSIGNED_BYTE, OGRE_NO_GLES3_SUPPORT ? GL_RGBA : GL_RGBA8},            // PF_R8G8B8A8
+            {GL_NONE},                                           // PF_X8R8G8B8
+            {GL_NONE},                                           // PF_X8B8G8R8
+            {GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA8},               // PF_R8G8B8A8
 #else
-            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, OGRE_NO_GLES3_SUPPORT ? GL_BGRA_EXT : GL_BGRA8_EXT},// PF_X8R8G8B8
-            {GL_RGBA, GL_UNSIGNED_BYTE, OGRE_NO_GLES3_SUPPORT ? GL_RGBA : GL_RGBA8},            // PF_X8B8G8R8
-            {GL_NONE},                                                                          // PF_R8G8B8A8
+            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, GL_BGRA8_EXT},       // PF_X8R8G8B8
+            {GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA8},               // PF_X8B8G8R8
+            {GL_NONE},                                           // PF_R8G8B8A8
 #endif
             {GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, GL_DEPTH_COMPONENT16}, // PF_DEPTH
-#if OGRE_NO_GLES3_SUPPORT
-            {GL_NONE},                                           // PF_SHORT_RGBA
-            {GL_NONE},                                           // PF_R3G3B2
-            {GL_NONE},                                           // PF_FLOAT16_R
-            {GL_NONE},                                           // PF_FLOAT32_R
-            {GL_NONE},                                           // PF_SHORT_GR
-            {GL_NONE},                                           // PF_FLOAT16_GR
-            {GL_NONE},                                           // PF_FLOAT32_GR
-            {GL_NONE},                                           // PF_SHORT_RGB
-#else
             {GL_RGBA, GL_UNSIGNED_SHORT, GL_RGBA16UI},           // PF_SHORT_RGBA
             {GL_NONE},                                           // PF_R3G3B2
             {GL_RED, GL_HALF_FLOAT, GL_R16F},                    // PF_FLOAT16_R
@@ -110,41 +91,12 @@ namespace Ogre {
             {GL_RG, GL_HALF_FLOAT, GL_RG16F},                    // PF_FLOAT16_GR
             {GL_RG, GL_FLOAT, GL_RG32F},                         // PF_FLOAT32_GR
             {GL_RGB, GL_UNSIGNED_SHORT, GL_RGB16UI},             // PF_SHORT_RGB
-#endif
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG}, // PF_PVRTC_RGB2
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG},// PF_PVRTC_RGBA2
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG}, // PF_PVRTC_RGB4
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG},// PF_PVRTC_RGBA4
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG},// PF_PVRTC2_2BPP
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG},// PF_PVRTC2_4BPP
-#if OGRE_NO_GLES3_SUPPORT
-            {GL_NONE},                                           // PF_R11G11B10_FLOAT
-            {GL_NONE},                                           // PF_R8_UINT
-            {GL_NONE},                                           // PF_R8G8_UINT
-            {GL_NONE},                                           // PF_R8G8B8_UINT
-            {GL_NONE},                                           // PF_R8G8B8A8_UINT
-            {GL_NONE},                                           // PF_R16_UINT
-            {GL_NONE},                                           // PF_R16G16_UINT
-            {GL_NONE},                                           // PF_R16G16B16_UINT
-            {GL_NONE},                                           // PF_R16G16B16A16_UINT
-            {GL_NONE},                                           // PF_R32_UINT
-            {GL_NONE},                                           // PF_R32G32_UINT
-            {GL_NONE},                                           // PF_R32G32B32_UINT
-            {GL_NONE},                                           // PF_R32G32B32A32_UINT
-            {GL_NONE},                                           // PF_R8_SINT
-            {GL_NONE},                                           // PF_R8G8_SINT
-            {GL_NONE},                                           // PF_R8G8B8_SINT
-            {GL_NONE},                                           // PF_R8G8B8A8_SINT
-            {GL_NONE},                                           // PF_R16_SINT
-            {GL_NONE},                                           // PF_R16G16_SINT
-            {GL_NONE},                                           // PF_R16G16B16_SINT
-            {GL_NONE},                                           // PF_R16G16B16A16_SINT
-            {GL_NONE},                                           // PF_R32_SINT
-            {GL_NONE},                                           // PF_R32G32_SINT
-            {GL_NONE},                                           // PF_R32G32B32_SINT
-            {GL_NONE},                                           // PF_R32G32B32A32_SINT
-            {GL_NONE},                                           // PF_R9G9B9E5_SHAREDEXP
-#else
             {GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_R11F_G11F_B10F}, // PF_R11G11B10_FLOAT, todo: reversed?
             {GL_RED_INTEGER, GL_UNSIGNED_BYTE, GL_R8UI},         // PF_R8_UINT
             {GL_RG_INTEGER, GL_UNSIGNED_BYTE, GL_RG8UI},         // PF_R8G8_UINT
@@ -171,7 +123,6 @@ namespace Ogre {
             {GL_RGB_INTEGER, GL_INT, GL_RGB32I},                 // PF_R32G32B32_SINT
             {GL_RGBA_INTEGER, GL_INT, GL_RGBA32I},               // PF_R32G32B32A32_SINT
             {GL_RGB, GL_UNSIGNED_INT_5_9_9_9_REV, GL_RGB9_E5},   // PF_R9G9B9E5_SHAREDEXP
-#endif
             {GL_NONE},                                           // PF_BC4_UNORM
             {GL_NONE},                                           // PF_BC4_SNORM
             {GL_NONE},                                           // PF_BC5_UNORM
@@ -182,16 +133,6 @@ namespace Ogre {
             {GL_NONE},                                           // PF_BC7_UNORM_SRGB
             {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_R8_EXT},           // PF_R8
             {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG8_EXT},           // PF_RG8
-#if OGRE_NO_GLES3_SUPPORT
-            {GL_NONE},                                           // PF_R8_SNORM
-            {GL_NONE},                                           // PF_RG8_SNORM
-            {GL_NONE},                                           // PF_RGB8_SNORM
-            {GL_NONE},                                           // PF_RGBA8_SNORM
-            {GL_NONE},                                           // PF_R16_SNORM
-            {GL_NONE},                                           // PF_RG16_SNORM
-            {GL_NONE},                                           // PF_RGB16_SNORM
-            {GL_NONE},                                           // PF_RGBA16_SNORM
-#else
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8_SNORM},             // PF_R8_SNORM
             {GL_RG, GL_UNSIGNED_BYTE, GL_RG8_SNORM},             // PF_RG8_SNORM
             {GL_RGB, GL_UNSIGNED_BYTE, GL_RGB8_SNORM},           // PF_RGB8_SNORM
@@ -200,7 +141,112 @@ namespace Ogre {
             {GL_RG, GL_UNSIGNED_SHORT, GL_RG16_SNORM_EXT},       // PF_RG16_SNORM
             {GL_RGB, GL_UNSIGNED_SHORT, GL_RGB16_SNORM_EXT},     // PF_RGB16_SNORM
             {GL_RGBA, GL_UNSIGNED_SHORT, GL_RGBA16_SNORM_EXT},   // PF_RGBA16_SNORM
+            // the rest are compressed formats that are same
+    };
+
+    static GLPixelFormatDescription _pixelFormats[] = {
+            {GL_NONE},                                           // PF_UNKNOWN
+            {GL_LUMINANCE, GL_UNSIGNED_BYTE, GL_LUMINANCE},      // PF_L8
+            {GL_NONE},                                           // PF_L16
+            {GL_ALPHA, GL_UNSIGNED_BYTE, GL_ALPHA},              // PF_A8
+            {GL_NONE},                                           // PF_A4L4
+            {GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, GL_LUMINANCE_ALPHA},// PF_BYTE_LA
+            {GL_RGB, GL_UNSIGNED_SHORT_5_6_5, GL_RGB},           // PF_R5G6B5
+            {GL_NONE},                                           // PF_B5G6R5
+            {GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, GL_RGBA},       // PF_A4R4G4B4, todo: reversed?
+            {GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, GL_RGBA},       // PF_A1R5G5B5, todo: reversed?
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+            {GL_RGB, GL_UNSIGNED_BYTE, GL_RGB},                  // PF_R8G8B8
+            {GL_NONE},                                           // PF_B8G8R8
+            {GL_NONE},                                           // PF_A8R8G8B8
+            {GL_NONE},                                           // PF_A8B8G8R8
+            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, GL_BGRA_EXT},        // PF_B8G8R8A8
+#else
+            {GL_NONE},                                           // PF_R8G8B8
+            {GL_RGB, GL_UNSIGNED_BYTE, GL_RGB},                  // PF_B8G8R8
+            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, GL_BGRA_EXT},        // PF_A8R8G8B8
+            {GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA},                // PF_A8B8G8R8
+            {GL_NONE},                                           // PF_B8G8R8A8
 #endif
+            {GL_NONE},                                                         // PF_A2R10G10B10
+            {GL_RGBA_INTEGER, GL_UNSIGNED_INT_2_10_10_10_REV, GL_RGB10_A2UI},  // PF_A2B10G10R10
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT},// PF_DXT1
+            {GL_NONE},                                           // PF_DXT2
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT},// PF_DXT3
+            {GL_NONE},                                           // PF_DXT4
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT},// PF_DXT5
+            {GL_RGB, GL_HALF_FLOAT_OES, GL_RGB},                 // PF_FLOAT16_RGB
+            {GL_RGBA, GL_HALF_FLOAT_OES, GL_RGBA},               // PF_FLOAT16_RGBA
+            {GL_RGB, GL_FLOAT, GL_RGB},                          // PF_FLOAT32_RGB
+            {GL_RGBA, GL_FLOAT, GL_RGBA},                        // PF_FLOAT32_RGBA
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+            {GL_NONE},                                           // PF_X8R8G8B8
+            {GL_NONE},                                           // PF_X8B8G8R8
+            {GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA},                // PF_R8G8B8A8
+#else
+            {GL_BGRA_EXT, GL_UNSIGNED_BYTE, GL_BGRA_EXT},        // PF_X8R8G8B8
+            {GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA},                // PF_X8B8G8R8
+            {GL_NONE},                                           // PF_R8G8B8A8
+#endif
+            {GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, GL_DEPTH_COMPONENT16}, // PF_DEPTH
+            {GL_NONE},                                           // PF_SHORT_RGBA
+            {GL_NONE},                                           // PF_R3G3B2
+            {GL_RED, GL_HALF_FLOAT_OES, GL_R16F},                // PF_FLOAT16_R
+            {GL_RED, GL_FLOAT, GL_R32F},                         // PF_FLOAT32_R
+            {GL_NONE},                                           // PF_SHORT_GR
+            {GL_RG, GL_HALF_FLOAT_OES, GL_RG16F},                // PF_FLOAT16_GR
+            {GL_RG, GL_FLOAT, GL_RG32F},                         // PF_FLOAT32_GR
+            {GL_NONE},                                           // PF_SHORT_RGB
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG}, // PF_PVRTC_RGB2
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG},// PF_PVRTC_RGBA2
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG}, // PF_PVRTC_RGB4
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG},// PF_PVRTC_RGBA4
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG},// PF_PVRTC2_2BPP
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG},// PF_PVRTC2_4BPP
+            {GL_NONE},                                           // PF_R11G11B10_FLOAT
+            {GL_NONE},                                           // PF_R8_UINT
+            {GL_NONE},                                           // PF_R8G8_UINT
+            {GL_NONE},                                           // PF_R8G8B8_UINT
+            {GL_NONE},                                           // PF_R8G8B8A8_UINT
+            {GL_NONE},                                           // PF_R16_UINT
+            {GL_NONE},                                           // PF_R16G16_UINT
+            {GL_NONE},                                           // PF_R16G16B16_UINT
+            {GL_NONE},                                           // PF_R16G16B16A16_UINT
+            {GL_NONE},                                           // PF_R32_UINT
+            {GL_NONE},                                           // PF_R32G32_UINT
+            {GL_NONE},                                           // PF_R32G32B32_UINT
+            {GL_NONE},                                           // PF_R32G32B32A32_UINT
+            {GL_NONE},                                           // PF_R8_SINT
+            {GL_NONE},                                           // PF_R8G8_SINT
+            {GL_NONE},                                           // PF_R8G8B8_SINT
+            {GL_NONE},                                           // PF_R8G8B8A8_SINT
+            {GL_NONE},                                           // PF_R16_SINT
+            {GL_NONE},                                           // PF_R16G16_SINT
+            {GL_NONE},                                           // PF_R16G16B16_SINT
+            {GL_NONE},                                           // PF_R16G16B16A16_SINT
+            {GL_NONE},                                           // PF_R32_SINT
+            {GL_NONE},                                           // PF_R32G32_SINT
+            {GL_NONE},                                           // PF_R32G32B32_SINT
+            {GL_NONE},                                           // PF_R32G32B32A32_SINT
+            {GL_NONE},                                           // PF_R9G9B9E5_SHAREDEXP
+            {GL_NONE},                                           // PF_BC4_UNORM
+            {GL_NONE},                                           // PF_BC4_SNORM
+            {GL_NONE},                                           // PF_BC5_UNORM
+            {GL_NONE},                                           // PF_BC5_SNORM
+            {GL_NONE},                                           // PF_BC6H_UF16
+            {GL_NONE},                                           // PF_BC6H_SF16
+            {GL_NONE},                                           // PF_BC7_UNORM
+            {GL_NONE},                                           // PF_BC7_UNORM_SRGB
+            {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_RED_EXT},          // PF_R8
+            {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG_EXT},            // PF_RG8
+            {GL_NONE},                                           // PF_R8_SNORM
+            {GL_NONE},                                           // PF_RG8_SNORM
+            {GL_NONE},                                           // PF_RGB8_SNORM
+            {GL_NONE},                                           // PF_RGBA8_SNORM
+            {GL_NONE},                                           // PF_R16_SNORM
+            {GL_NONE},                                           // PF_RG16_SNORM
+            {GL_NONE},                                           // PF_RGB16_SNORM
+            {GL_NONE},                                           // PF_RGBA16_SNORM
             {GL_NONE, GL_NONE, GL_ETC1_RGB8_OES},                // PF_ETC1_RGB8
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB8_ETC2},         // PF_ETC2_RGB8
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA8_ETC2_EAC},    // PF_ETC2_RGBA8
@@ -224,6 +270,10 @@ namespace Ogre {
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_12x12_KHR},// PF_ASTC_RGBA_12X12_LDR
     };
 
+    void GLES2PixelUtil::useSizedFormats()
+    {
+        memcpy(_pixelFormats, _pixelFormatsSized, sizeof(_pixelFormatsSized));
+    }
 
     //-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLOriginFormat(PixelFormat pf)
