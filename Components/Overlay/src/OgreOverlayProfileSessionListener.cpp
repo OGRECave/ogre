@@ -50,7 +50,7 @@ namespace v1
         , mGuiBorderWidth(10)
         , mBarLineWidth(2)
         , mBarSpacing(3)
-        , mMaxDisplayProfiles(50)
+        , mMaxDisplayProfiles(100)
     {
     }
     //-----------------------------------------------------------------------

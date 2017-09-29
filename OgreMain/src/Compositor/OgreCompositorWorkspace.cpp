@@ -58,6 +58,7 @@ namespace Ogre
             mDefinition( definition ),
             mValid( false ),
             mEnabled( bEnabled ),
+            mAmalgamatedProfiling( false ),
             mListener( 0 ),
             mDefaultCamera( defaultCam ),
             mSceneManager( sceneManager ),

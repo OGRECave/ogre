@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 
 #include "OgreRenderSystem.h"
+#include "OgreProfiler.h"
 
 #include "OgreStringConverter.h"
 
@@ -165,6 +166,22 @@ namespace Ogre
             renderSystem->_executeResourceTransition( &(*itor) );
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::profilingBegin(void)
+    {
+#if OGRE_PROFILING
+        if( !mParentNode->getWorkspace()->getAmalgamatedProfiling() )
+            OgreProfileBegin( mDefinition->mProfilingId );
+#endif
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::profilingEnd(void)
+    {
+#if OGRE_PROFILING
+        if( !mParentNode->getWorkspace()->getAmalgamatedProfiling() )
+            OgreProfileEnd( mDefinition->mProfilingId );
+#endif
     }
     //-----------------------------------------------------------------------------------
     RenderTarget* CompositorPass::calculateRenderTarget( size_t rtIndex,
