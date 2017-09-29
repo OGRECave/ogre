@@ -135,10 +135,11 @@ namespace v1
         Real maxTimeMillisecs = (Real)maxTotalFrameTime / 1000.0f;
 
         ProfileBarList::const_iterator bIter = mProfileBars.begin();
-        ProfileInstance::ProfileChildren::const_iterator it = root.children.begin(), endit = root.children.end();
+        ProfileInstance::ProfileChildrenVec::const_iterator it    = root.children.begin();
+        ProfileInstance::ProfileChildrenVec::const_iterator endit = root.children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
             displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
         }
             
@@ -241,10 +242,11 @@ namespace v1
         ++profileCount;
 
         // display children
-        ProfileInstance::ProfileChildren::const_iterator it = instance->children.begin(), endit = instance->children.end();
+        ProfileInstance::ProfileChildrenVec::const_iterator it    = instance->children.begin();
+        ProfileInstance::ProfileChildrenVec::const_iterator endit = instance->children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
             displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
         }
     }

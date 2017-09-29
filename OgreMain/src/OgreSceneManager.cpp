@@ -1009,7 +1009,7 @@ void SceneManager::prepareRenderQueue(void)
 void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewport* vp,
                                  uint8 firstRq, uint8 lastRq )
 {
-    OgreProfileGroup( "_cullPhase01", OGREPROF_GENERAL );
+    OgreProfileGroup( "Frustum Culling", OGREPROF_CULLING );
 
     Root::getSingleton()._pushCurrentSceneManager(this);
     mAutoParamDataSource->setCurrentSceneManager(this);
@@ -1031,8 +1031,6 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
 
         if (mFindVisibleObjects)
         {
-            OgreProfileGroup( "cullFrustum", OGREPROF_CULLING );
-
             assert( !mEntitiesMemoryManagerCulledList.empty() );
 
             // Quick way of reducing overhead/stress on VisibleObjectsBoundsInfo
@@ -1069,7 +1067,7 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
 void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewport* vp,
                                   uint8 firstRq, uint8 lastRq, bool includeOverlays)
 {
-    OgreProfileGroup( "_renderPhase02", OGREPROF_GENERAL );
+    OgreProfileGroup( "Rendering", OGREPROF_RENDERING );
 
     Root::getSingleton()._pushCurrentSceneManager(this);
     mAutoParamDataSource->setCurrentSceneManager(this);
@@ -1116,7 +1114,6 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
         // Prepare render queue for receiving new objects
         {
-            OgreProfileGroup( "prepareRenderQueue", OGREPROF_GENERAL );
             prepareRenderQueue();
         }
 
@@ -1127,7 +1124,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
         if (mFindVisibleObjects)
         {
-            OgreProfileGroup( "_updateRenderQueue", OGREPROF_CULLING );
+            OgreProfileGroup( "V1 Renderable update", OGREPROF_RENDERING );
 
             if( mInstancingThreadedCullingMethod == INSTANCING_CULLING_THREADED )
             {
@@ -1200,7 +1197,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
     {
         //OgreProfileGroup("_renderVisibleObjects", OGREPROF_RENDERING);
         //_renderVisibleObjects();
-        OgreProfileGroup( "RenderQueue::render", OGREPROF_RENDERING );
+        OgreProfileGroup( "RenderQueue", OGREPROF_RENDERING );
         //TODO: RENDER QUEUE Add Dual Paraboloid mapping
         mRenderQueue->render( mDestRenderSystem, firstRq, lastRq,
                               mIlluminationStage == IRS_RENDER_TO_TEXTURE, false );

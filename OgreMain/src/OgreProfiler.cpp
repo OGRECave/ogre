@@ -117,12 +117,13 @@ namespace Ogre {
     }
     ProfileInstance::~ProfileInstance(void)
     {                                        
-        for(ProfileChildren::iterator it = children.begin(); it != children.end(); ++it)
+        for(ProfileChildrenVec::iterator it = children.begin(); it != children.end(); ++it)
         {
-            ProfileInstance* instance = it->second;
+            ProfileInstance* instance = *it;
             OGRE_DELETE instance;
         }
         children.clear();
+        childrenMap.clear();
     }
     //-----------------------------------------------------------------------
     Profiler::~Profiler()
@@ -222,7 +223,7 @@ namespace Ogre {
         // need a timer to profile!
         assert (mTimer && "Timer not set!");
 
-        ProfileInstance*& instance = mCurrent->children[profileName];
+        ProfileInstance*& instance = mCurrent->childrenMap[profileName];
         if(instance)
         {   // found existing child.
 
@@ -242,6 +243,7 @@ namespace Ogre {
             instance->name = profileName;
             instance->parent = mCurrent;
             instance->hierarchicalLvl = mCurrent->hierarchicalLvl + 1;
+            mCurrent->children.push_back( instance );
         }
 
         instance->frameNumber = mCurrentFrame;
@@ -285,12 +287,13 @@ namespace Ogre {
 
                 // we could use mRoot.children.find() instead of this, except we'd be compairing strings instead of a pointer.
                 // the string way could be faster, but i don't believe it would.
-                ProfileChildren::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
+                ProfileChildrenVec::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
                 for(;it != endit; ++it)
                 {
-                    if(mLast == it->second)
+                    if( mLast == *it )
                     {
-                        mRoot.children.erase(it);
+                        mRoot.childrenMap.erase( (*it)->name );
+                        mRoot.children.erase( it );
                         break;
                     }
                 }
@@ -420,10 +423,10 @@ namespace Ogre {
         if(instance->frame.frameTime > maxFrameTime)
             maxFrameTime = (Real)instance->frame.frameTime;
 
-        ProfileChildren::iterator it = instance->children.begin(), endit = instance->children.end();
+        ProfileChildrenVec::iterator it = instance->children.begin(), endit = instance->children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
 
             // we set the number of times each profile was called per frame to 0
             // because not all profiles are called every frame
@@ -440,10 +443,10 @@ namespace Ogre {
     {
         Real maxFrameTime = 0;
 
-        ProfileChildren::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
+        ProfileChildrenVec::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
 
             // we set the number of times each profile was called per frame to 0
             // because not all profiles are called every frame
@@ -493,10 +496,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool ProfileInstance::watchForMax(const String& profileName) 
     {
-        ProfileChildren::iterator it = children.begin(), endit = children.end();
+        ProfileChildrenVec::iterator it = children.begin(), endit = children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
             if( (child->name == profileName && child->watchForMax()) || child->watchForMax(profileName))
                 return true;
         }
@@ -511,10 +514,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool ProfileInstance::watchForMin(const String& profileName) 
     {
-        ProfileChildren::iterator it = children.begin(), endit = children.end();
+        ProfileChildrenVec::iterator it = children.begin(), endit = children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
             if( (child->name == profileName && child->watchForMin()) || child->watchForMin(profileName))
                 return true;
         }
@@ -529,10 +532,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool ProfileInstance::watchForLimit(const String& profileName, Real limit, bool greaterThan) 
     {
-        ProfileChildren::iterator it = children.begin(), endit = children.end();
+        ProfileChildrenVec::iterator it = children.begin(), endit = children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
             if( (child->name == profileName && child->watchForLimit(limit, greaterThan)) || child->watchForLimit(profileName, limit, greaterThan))
                 return true;
         }
@@ -543,9 +546,9 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("----------------------Profiler Results----------------------");
 
-        for(ProfileChildren::iterator it = mRoot.children.begin(); it != mRoot.children.end(); ++it)
+        for(ProfileChildrenVec::iterator it = mRoot.children.begin(); it != mRoot.children.end(); ++it)
         {
-            it->second->logResults();
+            (*it)->logResults();
         }
 
         LogManager::getSingleton().logMessage("------------------------------------------------------------");
@@ -565,9 +568,9 @@ namespace Ogre {
                         " | Max " + StringConverter::toString(history.maxTimePercent) + 
                         " | Avg "+ StringConverter::toString(history.totalTimePercent / history.totalCalls));   
 
-        for(ProfileChildren::iterator it = children.begin(); it != children.end(); ++it)
+        for(ProfileChildrenVec::iterator it = children.begin(); it != children.end(); ++it)
         {
-            it->second->logResults();
+            (*it)->logResults();
         }
     }
     //-----------------------------------------------------------------------
@@ -585,9 +588,9 @@ namespace Ogre {
 
         history.minTimePercent = 1;
         history.minTimeMillisecs = 100000;
-        for(ProfileChildren::iterator it = children.begin(); it != children.end(); ++it)
+        for(ProfileChildrenVec::iterator it = children.begin(); it != children.end(); ++it)
         {
-            it->second->reset();
+            (*it)->reset();
         }
     }
     //-----------------------------------------------------------------------

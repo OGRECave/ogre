@@ -255,6 +255,7 @@ namespace Demo
 
 #if OGRE_PROFILING
         Ogre::Profiler::getSingleton().setEnabled( true );
+        Ogre::Profiler::getSingleton().endProfile( "" );
 #endif
     }
     //-----------------------------------------------------------------------------------

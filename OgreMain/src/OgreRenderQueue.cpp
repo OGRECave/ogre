@@ -51,6 +51,8 @@ THE SOFTWARE.
 #include "CommandBuffer/OgreCbDrawCall.h"
 #include "CommandBuffer/OgreCbShaderBuffer.h"
 
+#include "OgreProfiler.h"
+
 
 namespace Ogre
 {
@@ -300,6 +302,8 @@ namespace Ogre
             mLastWasCasterPass = casterPass;
         }
 
+        OgreProfileBeginGroup( "Command Preparation", OGREPROF_RENDERING );
+
         rs->setCurrentPassIterationCount( 1 );
 
         size_t numNeededDraws = 0;
@@ -366,6 +370,8 @@ namespace Ogre
 
             if( !mRenderQueues[i].mSorted )
             {
+                OgreProfileGroup( "Sorting", OGREPROF_RENDERING );
+
                 size_t numRenderables = 0;
                 QueuedRenderableArrayPerThread::const_iterator itor = perThreadQueue.begin();
                 QueuedRenderableArrayPerThread::const_iterator end  = perThreadQueue.end();
@@ -436,6 +442,10 @@ namespace Ogre
         if( supportsIndirectBuffers && indirectBuffer )
             indirectBuffer->unmap( UO_KEEP_PERSISTENT );
 
+        OgreProfileEndGroup( "Command Preparation", OGREPROF_RENDERING );
+
+        OgreProfileBeginGroup( "Command Execution", OGREPROF_RENDERING );
+
         for( size_t i=0; i<HLMS_MAX; ++i )
         {
             Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
@@ -451,6 +461,8 @@ namespace Ogre
             if( hlms )
                 hlms->postCommandBufferExecution( mCommandBuffer );
         }
+
+        OgreProfileEndGroup( "Command Execution", OGREPROF_RENDERING );
     }
     //-----------------------------------------------------------------------
     void RenderQueue::renderES2( RenderSystem *rs, bool casterPass, bool dualParaboloid,
