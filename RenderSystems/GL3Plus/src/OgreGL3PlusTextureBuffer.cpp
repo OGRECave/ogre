@@ -144,21 +144,16 @@ namespace Ogre {
 
         // PBOs have no advantage with this usage pattern
         // see: https://www.khronos.org/opengl/wiki/Pixel_Buffer_Object
-        // but PlayPen_BlitSubTextures fails if we use them
-#if 0
+#ifdef USE_PBO
         // Calculate size for all mip levels of the texture.
-        size_t dataSize = 0;
-        if (mTarget == GL_TEXTURE_2D_ARRAY)
-        {
-            dataSize = PixelUtil::getMemorySize(dest.getWidth(), dest.getHeight(), dest.getDepth(), data.format);
-        }
-        else
-        {
-            dataSize = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), mDepth, data.format);
-        }
-
+        size_t dataSize = data.getConsecutiveSize();
         GL3PlusHardwareBuffer buffer(GL_PIXEL_UNPACK_BUFFER, dataSize, mUsage);
         buffer.writeData(0, dataSize, data.data, false);
+
+        PixelBox tmp(data.getWidth(), data.getHeight(), data.getHeight(), data.format);
+        tmp.data = buffer.lockImpl(0, dataSize, HardwareBuffer::HBL_DISCARD);
+        PixelUtil::bulkPixelConversion(data, tmp);
+        buffer.unlockImpl(dataSize);
 
         // std::stringstream str;
         // str << "GL3PlusHardwarePixelBuffer::upload: " << mTextureID
@@ -223,10 +218,12 @@ namespace Ogre {
         }
         else
         {
+#ifndef USE_PBO
             if (data.getWidth() != data.rowPitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
             if (data.getHeight() * data.getWidth() != data.slicePitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
+#endif
             if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right.
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
@@ -622,7 +619,7 @@ namespace Ogre {
         PixelBox src;
 
         // First, convert the srcbox to a OpenGL compatible pixel format
-        if (GL3PlusPixelUtil::getGLOriginFormat(src_orig.format) == 0)
+        if (GL3PlusPixelUtil::getGLInternalFormat(src_orig.format) == 0)
         {
             // Convert to buffer internal format
             buf.reset(new MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(),

@@ -71,7 +71,7 @@ namespace Ogre {
             scaled = mBuffer.getSubVolume(dstBox);
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
-        else if (GL3PlusPixelUtil::getGLOriginFormat(src.format) == 0)
+        else if (GL3PlusPixelUtil::getGLInternalFormat(src.format) == 0)
         {
             // Extents match, but format is not accepted as valid
             // source format for GL. Do conversion in temporary buffer.
@@ -104,7 +104,7 @@ namespace Ogre {
             dst.getWidth() == getWidth() &&
             dst.getHeight() == getHeight() &&
             dst.getDepth() == getDepth() &&
-            GL3PlusPixelUtil::getGLOriginFormat(dst.format) != 0)
+            GL3PlusPixelUtil::getGLInternalFormat(dst.format) != 0)
         {
             // The direct case: the user wants the entire texture in a format supported by GL
             // so we don't need an intermediate buffer

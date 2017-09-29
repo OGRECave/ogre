@@ -97,13 +97,13 @@ namespace Ogre {
         if(PixelUtil::isCompressed(format) &&
             !caps->hasCapability( RSC_TEXTURE_COMPRESSION_DXT ))
         {
-            return PF_A8R8G8B8;
+            return PF_BYTE_RGBA;
         }
         // if floating point textures not supported, revert to PF_A8R8G8B8
         if(PixelUtil::isFloatingPoint(format) &&
             !caps->hasCapability( RSC_TEXTURE_FLOAT ))
         {
-            return PF_A8R8G8B8;
+            return PF_BYTE_RGBA;
         }
         
         // Check if this is a valid rendertarget format

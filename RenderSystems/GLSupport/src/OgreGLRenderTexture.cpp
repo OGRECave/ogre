@@ -71,7 +71,7 @@ namespace Ogre {
         switch (pct)
         {
         case PCT_BYTE:
-            format = PF_A8R8G8B8;
+            format = PF_BYTE_RGBA; // native endian
             break;
         case PCT_SHORT:
             format = PF_SHORT_RGBA;
@@ -91,7 +91,7 @@ namespace Ogre {
             return format;
 
         /// If none at all, return to default
-        return PF_A8R8G8B8;
+        return PF_BYTE_RGBA; // native endian
     }
 
     void GLRTTManager::releaseRenderBuffer(const GLSurfaceDesc &surface)

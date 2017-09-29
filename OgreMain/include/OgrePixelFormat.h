@@ -226,7 +226,7 @@ namespace Ogre {
         PF_BC6H_SF16 = 75,
         /// DDS (DirectDraw Surface) BC7 format (unsigned normalised)
         PF_BC7_UNORM = 76,
-        /// DDS (DirectDraw Surface) BC7 format (unsigned normalised sRGB)
+        /// DDS (DirectDraw Surface) BC7 format (unsigned normalised sRGB). @deprecated for sRGB use Ogre::Texture::setHardwareGammaEnabled
         PF_BC7_UNORM_SRGB = 77,
         /// 8-bit pixel format, all bits red.
         PF_R8 = 78,
