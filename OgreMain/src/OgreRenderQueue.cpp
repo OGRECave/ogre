@@ -395,9 +395,14 @@ namespace Ogre
                 //  * If it's shorter, reset the indices 0, 1, 2, 3, 4; probably use quicksort or other generic sort
                 //
                 //TODO2: Explore sorting first on multiple threads, then merge sort into one.
-                if( mRenderQueues[i].mDoSort )
+                if( mRenderQueues[i].mSortMode == NormalSort )
                 {
                     std::sort( queuedRenderables.begin(), queuedRenderables.end() );
+                    mRenderQueues[i].mSorted = true;
+                }
+                else if( mRenderQueues[i].mSortMode == StableSort )
+                {
+                    std::stable_sort( queuedRenderables.begin(), queuedRenderables.end() );
                     mRenderQueues[i].mSorted = true;
                 }
             }
@@ -854,14 +859,14 @@ namespace Ogre
         return mRenderQueues[rqId].mMode;
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::setSortRenderQueue( uint8 rqId, bool bSort )
+    void RenderQueue::setSortRenderQueue( uint8 rqId, RqSortMode sortMode )
     {
-        mRenderQueues[rqId].mDoSort = bSort;
+        mRenderQueues[rqId].mSortMode = sortMode;
     }
     //-----------------------------------------------------------------------
-    bool RenderQueue::getSortRenderQueue( uint8 rqId ) const
+    RenderQueue::RqSortMode RenderQueue::getSortRenderQueue( uint8 rqId ) const
     {
-        return mRenderQueues[rqId].mDoSort;
+        return mRenderQueues[rqId].mSortMode;
     }
 }
 
