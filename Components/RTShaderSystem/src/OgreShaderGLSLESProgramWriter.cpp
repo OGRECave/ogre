@@ -180,7 +180,7 @@ namespace Ogre {
                         for (; itFuncCache != mFunctionCacheMap.end(); ++itFuncCache)
                         {
 
-                            FunctionInvocation fi = itFuncCache->first;
+                            const FunctionInvocation& fi = itFuncCache->first;
                         
                             if(fi.getFunctionName() == moreTokens.back())
                             {
