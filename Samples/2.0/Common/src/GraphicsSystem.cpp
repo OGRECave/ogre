@@ -22,6 +22,7 @@
 #include "Compositor/OgreCompositorManager2.h"
 
 #include "OgreOverlaySystem.h"
+#include "OgreOverlayManager.h"
 
 #include "OgreWindowEventUtilities.h"
 
@@ -569,6 +570,9 @@ namespace Demo
                                                    "ExampleSMInstance" );
 
         mSceneManager->addRenderQueueListener( mOverlaySystem );
+        mSceneManager->getRenderQueue()->setSortRenderQueue(
+                    Ogre::v1::OverlayManager::getSingleton().mDefaultRenderQueueId,
+                    Ogre::RenderQueue::StableSort );
 
         //Set sane defaults for proper shadow mapping
         mSceneManager->setShadowDirectionalLightExtrusionDistance( 500.0f );
