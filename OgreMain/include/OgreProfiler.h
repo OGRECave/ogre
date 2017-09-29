@@ -185,6 +185,7 @@ namespace Ogre {
         typedef Ogre::vector<ProfileInstance*>::type ProfileChildrenVec;
 
         void logResults();
+        void destroyAllChildren();
         void reset();
 
         inline bool watchForMax(void) { return history.currentTimePercent == history.maxTimePercent; }
@@ -398,7 +399,7 @@ namespace Ogre {
             void logResults();
 
             /** Clears the profiler statistics */
-            void reset();
+            void reset( bool deleteAll );
 
             /** Sets the Profiler so the display of results are updated every n frames*/
             void setUpdateDisplayFrequency(uint freq);
