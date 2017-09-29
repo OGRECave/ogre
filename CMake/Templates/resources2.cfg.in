@@ -1,6 +1,7 @@
 # Resources required by the sample browser and most samples.
 [Essential]
 Zip=@OGRE_MEDIA_PACKS_DIR@/DebugPack.zip
+@OGRE_COMMENT_PROFILER_PATH@Zip=@OGRE_MEDIA_PACKS_DIR@/profiler.zip
 
 # Common sample resources needed by many of the samples.
 # Rarely used resources should be separately loaded by the
