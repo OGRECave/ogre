@@ -80,6 +80,9 @@ static void APIENTRY GLDebugCallback(GLenum source,
                                      const GLchar* message,
                                      const void* userParam)
 {
+    if( type == GL_DEBUG_TYPE_PUSH_GROUP || type == GL_DEBUG_TYPE_POP_GROUP )
+        return; //Ignore these
+
     char debSource[32], debType[32], debSev[32];
 
     if (source == GL_DEBUG_SOURCE_API)

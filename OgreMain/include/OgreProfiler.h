@@ -181,7 +181,8 @@ namespace Ogre {
         ProfileInstance(void);
         virtual ~ProfileInstance(void);
 
-        typedef Ogre::map<String,ProfileInstance*>::type ProfileChildren;
+        typedef Ogre::map<String,ProfileInstance*>::type ProfileChildrenMap;
+        typedef Ogre::vector<ProfileInstance*>::type ProfileChildrenVec;
 
         void logResults();
         void reset();
@@ -206,7 +207,8 @@ namespace Ogre {
         /// The name of the parent, null if root
         ProfileInstance* parent;
 
-        ProfileChildren children;
+        ProfileChildrenVec children;
+        ProfileChildrenMap childrenMap;
 
         ProfileFrame frame;
         ulong frameNumber;
@@ -474,7 +476,7 @@ namespace Ogre {
 
             // lol. Uses typedef; put's original container type in name.
             typedef set<String>::type DisabledProfileMap;
-            typedef ProfileInstance::ProfileChildren ProfileChildren;
+            typedef ProfileInstance::ProfileChildrenVec ProfileChildrenVec;
 
             ProfileInstance* mCurrent;
             ProfileInstance* mLast;
