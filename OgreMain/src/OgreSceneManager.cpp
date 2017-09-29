@@ -1009,7 +1009,7 @@ void SceneManager::prepareRenderQueue(void)
 void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewport* vp,
                                  uint8 firstRq, uint8 lastRq )
 {
-    OgreProfileGroup("_cullPhase01", OGREPROF_GENERAL);
+    OgreProfileGroup( "_cullPhase01", OGREPROF_GENERAL );
 
     Root::getSingleton()._pushCurrentSceneManager(this);
     mAutoParamDataSource->setCurrentSceneManager(this);
@@ -1031,7 +1031,7 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
 
         if (mFindVisibleObjects)
         {
-            OgreProfileGroup("cullFrustum", OGREPROF_CULLING);
+            OgreProfileGroup( "cullFrustum", OGREPROF_CULLING );
 
             assert( !mEntitiesMemoryManagerCulledList.empty() );
 
@@ -1069,7 +1069,7 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
 void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewport* vp,
                                   uint8 firstRq, uint8 lastRq, bool includeOverlays)
 {
-    OgreProfileGroup("_renderPhase02", OGREPROF_GENERAL);
+    OgreProfileGroup( "_renderPhase02", OGREPROF_GENERAL );
 
     Root::getSingleton()._pushCurrentSceneManager(this);
     mAutoParamDataSource->setCurrentSceneManager(this);
@@ -1116,7 +1116,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
         // Prepare render queue for receiving new objects
         {
-            OgreProfileGroup("prepareRenderQueue", OGREPROF_GENERAL);
+            OgreProfileGroup( "prepareRenderQueue", OGREPROF_GENERAL );
             prepareRenderQueue();
         }
 
@@ -1127,7 +1127,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
         if (mFindVisibleObjects)
         {
-            OgreProfileGroup("_updateRenderQueue", OGREPROF_CULLING);
+            OgreProfileGroup( "_updateRenderQueue", OGREPROF_CULLING );
 
             if( mInstancingThreadedCullingMethod == INSTANCING_CULLING_THREADED )
             {
@@ -1200,7 +1200,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
     {
         //OgreProfileGroup("_renderVisibleObjects", OGREPROF_RENDERING);
         //_renderVisibleObjects();
-        OgreProfileGroup("RenderQueue::render", OGREPROF_RENDERING);
+        OgreProfileGroup( "RenderQueue::render", OGREPROF_RENDERING );
         //TODO: RENDER QUEUE Add Dual Paraboloid mapping
         mRenderQueue->render( mDestRenderSystem, firstRq, lastRq,
                               mIlluminationStage == IRS_RENDER_TO_TEXTURE, false );
@@ -2678,7 +2678,7 @@ void SceneManager::updateSceneGraph()
         camera->_autoTrack();
     }*/
 
-    OgreProfileGroup("updateSceneGraph", OGREPROF_GENERAL);
+    OgreProfileGroup( "updateSceneGraph", OGREPROF_GENERAL );
 
     // Update controllers 
     ControllerManager::getSingleton().updateAllControllers();

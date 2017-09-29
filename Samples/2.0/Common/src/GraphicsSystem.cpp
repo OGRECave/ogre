@@ -252,6 +252,10 @@ namespace Demo
     #endif
 
         BaseSystem::initialize();
+
+#if OGRE_PROFILING
+        Ogre::Profiler::getSingleton().setEnabled( true );
+#endif
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::deinitialize(void)

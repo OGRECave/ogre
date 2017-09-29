@@ -46,10 +46,14 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #include "OgreHeaderPrefix.h"
 
 #if OGRE_PROFILING == 1
-#   define OgreProfile( a ) Ogre::Profile _OgreProfileInstance( (a) )
+#   define OgreProfileL2( a, line ) Ogre::Profile _OgreProfileInstance##line( (a) )
+#   define OgreProfileL( a, line ) OgreProfileL2( a, line )
+#   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
 #   define OgreProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
 #   define OgreProfileEnd( a ) Ogre::Profiler::getSingleton().endProfile( (a) )
-#   define OgreProfileGroup( a, g ) Ogre::Profile _OgreProfileInstance( (a), (g) )
+#   define OgreProfileGroupL2( a, g, line ) Ogre::Profile _OgreProfileInstance##line( (a), (g) )
+#   define OgreProfileGroupL( a, g, line ) OgreProfileGroupL2( a, g, line )
+#   define OgreProfileGroup( a, g ) OgreProfileGroupL( a, g, __LINE__ )
 #   define OgreProfileBeginGroup( a, g ) Ogre::Profiler::getSingleton().beginProfile( (a), (g) )
 #   define OgreProfileEndGroup( a, g ) Ogre::Profiler::getSingleton().endProfile( (a), (g) )
 #   define OgreProfileBeginGPUEvent( g ) Ogre::Profiler::getSingleton().beginGPUEvent(g)
