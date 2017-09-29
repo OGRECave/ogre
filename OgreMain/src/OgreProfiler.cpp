@@ -117,13 +117,7 @@ namespace Ogre {
     }
     ProfileInstance::~ProfileInstance(void)
     {                                        
-        for(ProfileChildrenVec::iterator it = children.begin(); it != children.end(); ++it)
-        {
-            ProfileInstance* instance = *it;
-            OGRE_DELETE instance;
-        }
-        children.clear();
-        childrenMap.clear();
+        destroyAllChildren();
     }
     //-----------------------------------------------------------------------
     Profiler::~Profiler()
@@ -574,10 +568,24 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Profiler::reset() 
+    void Profiler::reset( bool deleteAll )
     {
         mRoot.reset();
         mMaxTotalFrameTime = 0;
+
+        if( deleteAll )
+            mRoot.destroyAllChildren();
+    }
+    //-----------------------------------------------------------------------
+    void ProfileInstance::destroyAllChildren()
+    {
+        for(ProfileChildrenVec::iterator it = children.begin(); it != children.end(); ++it)
+        {
+            ProfileInstance* instance = *it;
+            OGRE_DELETE instance;
+        }
+        children.clear();
+        childrenMap.clear();
     }
     //-----------------------------------------------------------------------
     void ProfileInstance::reset(void)

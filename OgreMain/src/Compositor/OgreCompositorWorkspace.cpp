@@ -43,6 +43,8 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 #include "OgreLogManager.h"
 
+#include "OgreProfiler.h"
+
 namespace Ogre
 {
     CompositorWorkspace::CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
@@ -343,6 +345,10 @@ namespace Ogre
 
             analyzeHazardsAndPlaceBarriers();
         }
+
+#if OGRE_PROFILING
+        Profiler::getSingleton().reset( true );
+#endif
     }
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::clearAllConnections(void)

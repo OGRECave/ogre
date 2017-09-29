@@ -40,6 +40,8 @@ THE SOFTWARE.
 
 #include "OgreHlms.h"
 
+#include "OgreProfiler.h"
+
 namespace Ogre
 {
     Forward3D::Forward3D( uint32 width, uint32 height,
@@ -133,6 +135,8 @@ namespace Ogre
         CachedGrid *cachedGrid = 0;
         if( getCachedGridFor( camera, &cachedGrid ) )
             return; //Up to date.
+
+        OgreProfile( "Forward3D Light Collect" );
 
         //Cull the lights against the camera. Get non-directional, non-shadow-casting lights
         //(lights set to cast shadows but currently not casting shadows are also included)
