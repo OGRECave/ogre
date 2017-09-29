@@ -1264,6 +1264,7 @@ namespace Ogre
         mIds["allow_write_after_write"] = ID_ALLOW_WRITE_AFTER_WRITE;
         mIds["expose"]          = ID_EXPOSE;
         mIds["shadow_map_full_viewport"]= ID_SHADOW_MAP_FULL_VIEWPORT;
+        mIds["profiling_id"]    = ID_PROFILING_ID;
         mIds["lod_bias"]        = ID_LOD_BIAS;
         mIds["lod_update_list"] = ID_LOD_UPDATE_LIST;
         mIds["lod_camera"]      = ID_LOD_CAMERA;

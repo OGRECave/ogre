@@ -88,6 +88,7 @@ namespace Ogre
 
         bool                    mValid;
         bool                    mEnabled;
+        bool                    mAmalgamatedProfiling;
 
         CompositorWorkspaceListener *mListener;
 
@@ -167,6 +168,18 @@ namespace Ogre
 
         void setEnabled( bool bEnabled )                    { mEnabled = bEnabled; }
         bool getEnabled() const                             { return mEnabled; }
+
+        /** When building with OGRE_PROFILING enabled, setting this option to true
+            will cause the profiler to collapse all per-pass profiling information
+            into one group.
+            This is useful if you want to know how much (e.g.) frustum culling
+            is taking overall (all passes combined) rather than knowing how
+            much frustum culling is taking for each pass.
+        @param bEnabled
+            True to collapse all per-pass info into a global one. Default is false.
+        */
+        void setAmalgamatedProfiling( bool bEnabled )       { mAmalgamatedProfiling = bEnabled; }
+        bool getAmalgamatedProfiling(void) const            { return mAmalgamatedProfiling; }
 
         void setListener( CompositorWorkspaceListener *listener )   { mListener = listener; }
         CompositorWorkspaceListener* getListener(void) const        { return mListener; }

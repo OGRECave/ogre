@@ -859,6 +859,7 @@ namespace Ogre
                     //ID_COLOUR_WRITE,
                     ID_EXPOSE,
                     ID_SHADOW_MAP_FULL_VIEWPORT,
+                    ID_PROFILING_ID,
 
                     //Used by PASS_SCENE
                     ID_LOD_BIAS,
