@@ -43,9 +43,12 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+    #include "Remotery.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
-#if OGRE_PROFILING == 1
+#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL
 #   define OgreProfileL2( a, line ) Ogre::Profile _OgreProfileInstance##line( (a) )
 #   define OgreProfileL( a, line ) OgreProfileL2( a, line )
 #   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
@@ -59,6 +62,49 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #   define OgreProfileBeginGPUEvent( g ) Ogre::Profiler::getSingleton().beginGPUEvent(g)
 #   define OgreProfileEndGPUEvent( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
 #   define OgreProfileMarkGPUEvent( e ) Ogre::Profiler::getSingleton().markGPUEvent(e)
+#elif OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+namespace Ogre
+{
+    class RemoteryProfile;
+}
+#   define OgreProfileL2( a, line )                                                 \
+    static rmtU32 ogre_rmt_sample_hash_##line = 0;                                  \
+    Ogre::RemoteryProfile _OgreRemoteryProfileInstance##line( (a), ogre_rmt_sample_hash_##line );
+#   define OgreProfileL( a, line ) OgreProfileL2( a, line )
+#   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
+#   define Ogre_rmt_BeginCPUSampleL2( name, flags, line )                           \
+    RMT_OPTIONAL(RMT_ENABLED, {                                                     \
+        static rmtU32 rmt_sample_hash_##line = 0;                                   \
+        _rmt_BeginCPUSample( name, flags, &rmt_sample_hash_##line );               \
+    })
+#   define Ogre_rmt_BeginCPUSampleL( name, flags, line ) Ogre_rmt_BeginCPUSampleL2( name, flags, line )
+#   define OgreProfileBegin( name ) Ogre_rmt_BeginCPUSampleL( name, RMTSF_Aggregate, __LINE__ )
+#   define OgreProfileBeginDynamic( name ) RMT_OPTIONAL(RMT_ENABLED, _rmt_BeginCPUSample(name, RMTSF_Aggregate, NULL))
+#   define OgreProfileEnd( a ) RMT_OPTIONAL(RMT_ENABLED, _rmt_EndCPUSample())
+
+#   define OgreProfileGroup( a, g ) OgreProfile( a )
+#   define OgreProfileBeginGroup( a, g ) OgreProfileBegin( a )
+#   define OgreProfileEndGroup( a, g ) OgreProfileEnd( a )
+#   define OgreProfileBeginGPUEvent( g ) Ogre::Profiler::getSingleton().beginGPUEvent(g)
+#   define OgreProfileEndGPUEvent( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
+#   define OgreProfileMarkGPUEvent( e ) Ogre::Profiler::getSingleton().markGPUEvent(e)
+
+namespace Ogre
+{
+    class RemoteryProfile
+    {
+    public:
+        RemoteryProfile( const char *name, rmtU32 &hash )
+        {
+            _rmt_BeginCPUSample( name, RMTSF_Aggregate, &hash );
+        }
+        ~RemoteryProfile()
+        {
+            _rmt_EndCPUSample();
+        }
+    };
+}
+
 #else
 #   define OgreProfile( a )
 #   define OgreProfileBegin( a )
@@ -518,6 +564,10 @@ namespace Ogre {
             /// Rolling average of millisecs
             Real mAverageFrameTime;
             bool mResetExtents;
+
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+            Remotery *mRemotery;
+#endif
 
 
     }; // end class

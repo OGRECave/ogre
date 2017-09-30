@@ -105,6 +105,9 @@ endif ()
 find_package(Rapidjson)
 macro_log_feature(Rapidjson_FOUND "rapidjson" "C++ JSON parser" "http://rapidjson.org/" FALSE "" "")
 
+find_package(Remotery)
+macro_log_feature(Remotery_FOUND "Remotery" "Realtime CPU/D3D/OpenGL/CUDA/Metal Profiler in a single C file with web browser viewer" "https://github.com/Celtoys/Remotery" FALSE "" "")
+
 
 #######################################################################
 # RenderSystem dependencies

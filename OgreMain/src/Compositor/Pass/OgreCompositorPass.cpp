@@ -172,7 +172,7 @@ namespace Ogre
     {
 #if OGRE_PROFILING
         if( !mParentNode->getWorkspace()->getAmalgamatedProfiling() )
-            OgreProfileBegin( mDefinition->mProfilingId );
+            OgreProfileBeginDynamic( mDefinition->mProfilingId.c_str() );
 #endif
     }
     //-----------------------------------------------------------------------------------
