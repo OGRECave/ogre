@@ -315,6 +315,9 @@ namespace Ogre {
             << "Best time: \t"  << mFrameStats->getBestTime() << " ms\n"
             << "Worst time: \t" << mFrameStats->getWorstTime()<< " ms";
 
+#if OGRE_PROFILING
+        OGRE_DELETE mProfiler;
+#endif
         shutdown();
 
         OGRE_DELETE mSceneManagerEnum;
@@ -339,9 +342,6 @@ namespace Ogre {
 #endif
 #if OGRE_NO_ASTC_CODEC == 0
         ASTCCodec::shutdown();
-#endif
-#if OGRE_PROFILING
-        OGRE_DELETE mProfiler;
 #endif
 
         OGRE_DELETE mLodStrategyManager;
