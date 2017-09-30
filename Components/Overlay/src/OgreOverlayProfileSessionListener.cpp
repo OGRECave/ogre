@@ -130,6 +130,7 @@ namespace v1
     //-----------------------------------------------------------------------
     void OverlayProfileSessionListener::displayResults(const ProfileInstance& root, ulong maxTotalFrameTime)
     {
+#if OGRE_PROFILING != OGRE_PROFILING_REMOTERY
         Real newGuiHeight = mGuiHeight;
         int profileCount = 0;
         Real maxTimeMillisecs = (Real)maxTotalFrameTime / 1000.0f;
@@ -155,6 +156,7 @@ namespace v1
         {
             (*bIter)->hide();
         }
+#endif
     }
     //-----------------------------------------------------------------------
     void OverlayProfileSessionListener::displayResults(ProfileInstance* instance, ProfileBarList::const_iterator& bIter, Real& maxTimeMillisecs, Real& newGuiHeight, int& profileCount)
@@ -253,6 +255,9 @@ namespace v1
     //-----------------------------------------------------------------------
     void OverlayProfileSessionListener::changeEnableState(bool enabled) 
     {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        mOverlay->hide();
+#else
         if (enabled) 
         {
             mOverlay->show();
@@ -261,6 +266,7 @@ namespace v1
         {
             mOverlay->hide();
         }
+#endif
     }
     //-----------------------------------------------------------------------
     OverlayContainer* OverlayProfileSessionListener::createContainer()

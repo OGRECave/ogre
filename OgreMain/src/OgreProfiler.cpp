@@ -91,6 +91,9 @@ namespace Ogre {
         , mMaxTotalFrameTime(0)
         , mAverageFrameTime(0)
         , mResetExtents(false)
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        , mRemotery(0)
+#endif
     {
         mRoot.hierarchicalLvl = 0 - 1;
     }
@@ -130,6 +133,14 @@ namespace Ogre {
 
         // clear all our lists
         mDisabledProfiles.clear();
+
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        if( mRemotery )
+        {
+            rmt_DestroyGlobalInstance( mRemotery );
+            mRemotery = 0;
+        }
+#endif
     }
     //-----------------------------------------------------------------------
     void Profiler::setTimer(Timer* t)
@@ -150,6 +161,10 @@ namespace Ogre {
             for( TProfileSessionListener::iterator i = mListeners.begin(); i != mListeners.end(); ++i )
                 (*i)->initializeSession();
 
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+            rmt_CreateGlobalInstance( &mRemotery );
+            rmt_SetCurrentThreadName( "Main Ogre Thread" );
+#endif
             mInitialized = true;
         }
         else if (mInitialized)
@@ -159,6 +174,14 @@ namespace Ogre {
 
             mInitialized = false;
             mEnabled = false;
+
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+            if( mRemotery )
+            {
+                rmt_DestroyGlobalInstance( mRemotery );
+                mRemotery = 0;
+            }
+#endif
         }
         // We store this enable/disable request until the frame ends
         // (don't want to screw up any open profiles!)

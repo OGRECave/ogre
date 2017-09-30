@@ -318,6 +318,11 @@ if (OGRE_CONFIG_THREADS)
   list(APPEND LIBRARIES ${OGRE_THREAD_LIBRARIES})
 endif ()
 
+if (OGRE_PROFILING_PROVIDER STREQUAL "remotery")
+    include_directories( ${Remotery_INCLUDE_DIRS} )
+    list(APPEND LIBRARIES ${Remotery_LIBRARIES})
+endif ()
+
 if (OGRE_CONFIG_ENABLE_FREEIMAGE)
   list(APPEND HEADER_FILES include/OgreFreeImageCodec.h)
   list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
