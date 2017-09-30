@@ -1432,6 +1432,11 @@ namespace Ogre
         */
         virtual void markProfileEvent( const String &event ) = 0;
 
+        virtual void initGPUProfiling(void) = 0;
+        virtual void deinitGPUProfiling(void) = 0;
+        virtual void beginGPUSampleProfile( const String &name, uint32 *hashCache ) = 0;
+        virtual void endGPUSampleProfile( const String &name ) = 0;
+
         /** Determines if the system has anisotropic mip map filter support
         */
         virtual bool hasAnisotropicMipMapFilter() const = 0;

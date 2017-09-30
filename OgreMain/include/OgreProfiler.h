@@ -62,6 +62,10 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #   define OgreProfileBeginGPUEvent( g ) Ogre::Profiler::getSingleton().beginGPUEvent(g)
 #   define OgreProfileEndGPUEvent( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
 #   define OgreProfileMarkGPUEvent( e ) Ogre::Profiler::getSingleton().markGPUEvent(e)
+#   define OgreProfileGpuBegin( a )
+#   define OgreProfileGpuBeginDynamic( a )
+#   define OgreProfileGpuBeginDynamicHashed( a, hash )
+#   define OgreProfileGpuEnd( a )
 #elif OGRE_PROFILING == OGRE_PROFILING_REMOTERY
 namespace Ogre
 {
@@ -75,11 +79,14 @@ namespace Ogre
 #   define Ogre_rmt_BeginCPUSampleL2( name, flags, line )                           \
     RMT_OPTIONAL(RMT_ENABLED, {                                                     \
         static rmtU32 rmt_sample_hash_##line = 0;                                   \
-        _rmt_BeginCPUSample( name, flags, &rmt_sample_hash_##line );               \
+        _rmt_BeginCPUSample( name, flags, &rmt_sample_hash_##line );                \
     })
 #   define Ogre_rmt_BeginCPUSampleL( name, flags, line ) Ogre_rmt_BeginCPUSampleL2( name, flags, line )
 #   define OgreProfileBegin( name ) Ogre_rmt_BeginCPUSampleL( name, RMTSF_Aggregate, __LINE__ )
-#   define OgreProfileBeginDynamic( name ) RMT_OPTIONAL(RMT_ENABLED, _rmt_BeginCPUSample(name, RMTSF_Aggregate, NULL))
+#   define OgreProfileBeginDynamic( name )                                          \
+    RMT_OPTIONAL(RMT_ENABLED, _rmt_BeginCPUSample(name, RMTSF_Aggregate, NULL))
+#   define OgreProfileBeginDynamicHashed( name, hash )                              \
+    RMT_OPTIONAL(RMT_ENABLED, _rmt_BeginCPUSample(name, RMTSF_Aggregate, hash))
 #   define OgreProfileEnd( a ) RMT_OPTIONAL(RMT_ENABLED, _rmt_EndCPUSample())
 
 #   define OgreProfileGroup( a, g ) OgreProfile( a )
@@ -88,6 +95,17 @@ namespace Ogre
 #   define OgreProfileBeginGPUEvent( g ) Ogre::Profiler::getSingleton().beginGPUEvent(g)
 #   define OgreProfileEndGPUEvent( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
 #   define OgreProfileMarkGPUEvent( e ) Ogre::Profiler::getSingleton().markGPUEvent(e)
+
+#   define OgreProfileGpuBeginL2( a, line )                                         \
+    static rmtU32 rmt_sample_hash_##line = 0;                                       \
+    Ogre::Profiler::getSingleton().beginGPUSample( a, &rmt_sample_hash_##line );
+#   define OgreProfileGpuBeginL( a, line ) OgreProfileGpuBeginL2( a, line )
+#   define OgreProfileGpuBegin( a ) OgreProfileGpuBeginL( a, __LINE__ )
+#   define OgreProfileGpuBeginDynamic( a ) Ogre::Profiler::getSingleton().beginGPUSample( a, NULL )
+#   define OgreProfileGpuBeginDynamicHashed( a, hash )                              \
+    Ogre::Profiler::getSingleton().beginGPUSample( a, hash )
+#   define OgreProfileGpuEnd( a ) Ogre::Profiler::getSingleton().endGPUSample(a)
+//#   define OgreProfileGpu( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
 
 namespace Ogre
 {
@@ -108,6 +126,8 @@ namespace Ogre
 #else
 #   define OgreProfile( a )
 #   define OgreProfileBegin( a )
+#   define OgreProfileBeginDynamic( a )
+#   define OgreProfileBeginDynamicHashed
 #   define OgreProfileEnd( a )
 #   define OgreProfileGroup( a, g ) 
 #   define OgreProfileBeginGroup( a, g ) 
@@ -115,6 +135,10 @@ namespace Ogre
 #   define OgreProfileBeginGPUEvent( e )
 #   define OgreProfileEndGPUEvent( e )
 #   define OgreProfileMarkGPUEvent( e )
+#   define OgreProfileGpuBegin( a )
+#   define OgreProfileGpuBeginDynamic( a )
+#   define OgreProfileGpuBeginDynamicHashed( a, hash )
+#   define OgreProfileGpuEnd( a )
 #endif
 
 namespace Ogre {
@@ -388,6 +412,9 @@ namespace Ogre {
              @remarks Can be safely called in the middle of the profile.
              */
             void markGPUEvent(const String& event);
+
+            void beginGPUSample( const String &name, uint32 *hashCache );
+            void endGPUSample( const String &name );
 
             /** Sets whether this profiler is enabled. Only takes effect after the
                 the frame has ended.

@@ -86,6 +86,8 @@ THE SOFTWARE.
 #include "OgreZip.h"
 #endif
 
+#include "OgreLwString.h"
+
 #include "OgreHardwareBufferManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreExternalTextureSourceManager.h"
@@ -881,7 +883,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::_fireFrameStarted(FrameEvent& evt)
     {
-        OgreProfileBeginGroup("Frame", OGREPROF_GENERAL);
+#if OGRE_PROFILING
+        OgreProfileBeginGroup( "Frame", OGREPROF_GENERAL );
+        OgreProfileGpuBegin( "Frame" );
+
+        uint32 hashValue = (uint32)mNextFrame;
+        char tmpBuffer[32];
+        LwString frameNum( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+        frameNum.a( "Frame ", hashValue );
+        OgreProfileBeginDynamicHashed( frameNum.c_str(), &hashValue );
+        OgreProfileGpuBeginDynamicHashed( frameNum.c_str(), &hashValue );
+#endif
         _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
@@ -932,7 +944,17 @@ namespace Ogre {
         // Tell the queue to process responses
         mWorkQueue->processResponses();
 
-        OgreProfileEndGroup("Frame", OGREPROF_GENERAL);
+#if OGRE_PROFILING
+        char tmpBuffer[32];
+        LwString frameNum( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+        frameNum.a( "Frame ", (uint32)(mNextFrame - 1u) );
+
+        OgreProfileGpuEnd( frameNum.c_str() );
+        OgreProfileEndGroup( frameNum.c_str(), OGREPROF_GENERAL );
+
+        OgreProfileGpuEnd( "Frame" );
+        OgreProfileEndGroup( "Frame", OGREPROF_GENERAL );
+#endif
 
         return ret;
     }

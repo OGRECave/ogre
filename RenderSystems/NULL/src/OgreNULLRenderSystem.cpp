@@ -406,6 +406,22 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    void NULLRenderSystem::initGPUProfiling(void)
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::deinitGPUProfiling(void)
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache )
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::endGPUSampleProfile( const String &name )
+    {
+    }
+    //-------------------------------------------------------------------------
     void NULLRenderSystem::setClipPlanesImpl(const PlaneList& clipPlanes)
     {
     }

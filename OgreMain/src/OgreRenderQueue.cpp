@@ -445,6 +445,7 @@ namespace Ogre
         OgreProfileEndGroup( "Command Preparation", OGREPROF_RENDERING );
 
         OgreProfileBeginGroup( "Command Execution", OGREPROF_RENDERING );
+        OgreProfileGpuBegin( "Command Execution" );
 
         for( size_t i=0; i<HLMS_MAX; ++i )
         {
@@ -462,6 +463,7 @@ namespace Ogre
                 hlms->postCommandBufferExecution( mCommandBuffer );
         }
 
+        OgreProfileGpuEnd( "Command Execution" );
         OgreProfileEndGroup( "Command Execution", OGREPROF_RENDERING );
     }
     //-----------------------------------------------------------------------
