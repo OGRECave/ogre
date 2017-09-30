@@ -1179,9 +1179,12 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
             _queueSkiesForRendering(camera);
         }
 
-        //TODO: Remove this hacky listener (mostly needed by OverlayManager)
-        for( uint8 i=firstRq; i<lastRq; ++i )
-            fireRenderQueueStarted( i, BLANKSTRING );
+        {
+            //TODO: Remove this hacky listener (mostly needed by OverlayManager)
+            OgreProfileGroup( "RenderQueue Listeners (i.e. Overlays)", OGREPROF_RENDERING );
+            for( uint8 i=firstRq; i<lastRq; ++i )
+                fireRenderQueueStarted( i, BLANKSTRING );
+        }
     } // end lock on scene graph mutex
 
     mDestRenderSystem->_beginGeometryCount();
