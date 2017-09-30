@@ -58,6 +58,19 @@ if( Remotery_INCLUDE_DIR AND Remotery_LIBRARIES )
     set( Remotery_INCLUDE_DIRS ${Remotery_INCLUDE_DIR} )
 endif()
 
+if (WIN32)
+	set(Remotery_BIN_SEARCH_PATH ${OGRE_DEPENDENCIES_DIR}/bin ${CMAKE_SOURCE_DIR}/Dependencies/bin ${Remotery_HOME}/dll
+		${ENV_Remotery_HOME}/dll ${ENV_OGRE_DEPENDENCIES_DIR}/bin
+		${OGRE_SOURCE}/Dependencies/bin ${ENV_OGRE_SOURCE}/Dependencies/bin
+		${OGRE_SDK}/bin ${ENV_OGRE_SDK}/bin
+		${OGRE_HOME}/bin ${ENV_OGRE_HOME}/bin)
+	find_file(Remotery_BINARY_REL NAMES "Remotery.dll" HINTS ${Remotery_BIN_SEARCH_PATH}
+	  PATH_SUFFIXES "" Release RelWithDebInfo MinSizeRel)
+	find_file(Remotery_BINARY_DBG NAMES "Remotery_d.dll" HINTS ${Remotery_BIN_SEARCH_PATH}
+	  PATH_SUFFIXES "" Debug )
+endif()
+mark_as_advanced(Remotery_BINARY_REL Remotery_BINARY_DBG)
+
 findpkg_finish(Remotery)
 
 # add parent of Remotery folder to support Remotery/Remotery.h

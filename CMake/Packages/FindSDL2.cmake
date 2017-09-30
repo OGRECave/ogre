@@ -184,6 +184,19 @@ INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2
                                   REQUIRED_VARS SDL2_LIBRARY SDL2_INCLUDE_DIR)
 
+if (WIN32)
+	set(SDL2_BIN_SEARCH_PATH ${OGRE_DEPENDENCIES_DIR}/bin ${CMAKE_SOURCE_DIR}/Dependencies/bin ${SDL2_HOME}/dll
+		${ENV_SDL2_HOME}/dll ${ENV_OGRE_DEPENDENCIES_DIR}/bin
+		${OGRE_SOURCE}/Dependencies/bin ${ENV_OGRE_SOURCE}/Dependencies/bin
+		${OGRE_SDK}/bin ${ENV_OGRE_SDK}/bin
+		${OGRE_HOME}/bin ${ENV_OGRE_HOME}/bin)
+	find_file(SDL2_BINARY_REL NAMES "SDL2.dll" HINTS ${SDL2_BIN_SEARCH_PATH}
+	  PATH_SUFFIXES "" Release RelWithDebInfo MinSizeRel)
+	find_file(SDL2_BINARY_DBG NAMES "SDL2_d.dll" "SDL2.dll" HINTS ${SDL2_BIN_SEARCH_PATH}
+	  PATH_SUFFIXES "" Debug )
+endif()
+mark_as_advanced(SDL2_BINARY_REL SDL2_BINARY_DBG)
+
 IF(SDL2_STATIC)
   if (UNIX AND NOT APPLE)
     EXECUTE_PROCESS(COMMAND sdl2-config --static-libs OUTPUT_VARIABLE SDL2_LINK_FLAGS)

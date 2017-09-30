@@ -65,6 +65,8 @@ THE SOFTWARE.
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
 
+#include "OgreProfiler.h"
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
