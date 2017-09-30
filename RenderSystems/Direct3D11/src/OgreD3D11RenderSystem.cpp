@@ -4567,6 +4567,34 @@ bail:
 #endif
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::initGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_BindD3D11( (void*)mDevice.get(), (void*)mDevice.GetImmediateContext() );
+#endif
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::deinitGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_UnbindD3D11();
+#endif
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_BeginD3D11Sample( name.c_str(), hashCache );
+#endif
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::endGPUSampleProfile( const String &name )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_EndD3D11Sample();
+#endif
+    }
+    //---------------------------------------------------------------------
     const PixelFormatToShaderType* D3D11RenderSystem::getPixelFormatToShaderType(void) const
     {
         return &mD3D11PixelFormatToShaderType;
