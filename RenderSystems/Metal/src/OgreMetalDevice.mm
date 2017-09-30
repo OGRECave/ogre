@@ -28,6 +28,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreMetalDevice.h"
 #include "OgreMetalRenderSystem.h"
+#include "OgreProfiler.h"
 
 #import <Metal/MTLDevice.h>
 #import <Metal/MTLCommandQueue.h>
@@ -120,6 +121,9 @@ namespace Ogre
         @autoreleasepool
         {
             mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+            _rmt_BindMetal( mCurrentCommandBuffer );
+#endif
         }
     }
     //-------------------------------------------------------------------------

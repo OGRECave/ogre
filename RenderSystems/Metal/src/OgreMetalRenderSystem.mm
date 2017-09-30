@@ -2234,6 +2234,35 @@ namespace Ogre
     {
         return &mPixelFormatToShaderType;
     }
+
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::initGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+//        _rmt_BindMetal( mActiveDevice->mCurrentCommandBuffer );
+#endif
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::deinitGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_UnbindMetal();
+#endif
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_BeginMetalSample( name.c_str(), hashCache );
+#endif
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::endGPUSampleProfile( const String &name )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_EndMetalSample();
+#endif
+    }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::beginProfileEvent( const String &eventName )
     {
