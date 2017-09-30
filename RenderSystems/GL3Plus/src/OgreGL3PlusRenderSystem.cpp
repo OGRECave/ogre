@@ -71,6 +71,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreViewport.h"
 #include "OgreGL3PlusPixelFormat.h"
 
+#include "OgreProfiler.h"
+
 #if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum type,
@@ -3784,6 +3786,34 @@ namespace Ogre {
                                   static_cast<GLint>( eventName.length() ),
                                   eventName.c_str() );
         }
+    }
+
+    void GL3PlusRenderSystem::initGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_BindOpenGL();
+#endif
+    }
+
+    void GL3PlusRenderSystem::deinitGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_UnbindOpenGL();
+#endif
+    }
+
+    void GL3PlusRenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_BeginOpenGLSample( name.c_str(), hashCache );
+#endif
+    }
+
+    void GL3PlusRenderSystem::endGPUSampleProfile( const String &name )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_EndOpenGLSample();
+#endif
     }
 
     bool GL3PlusRenderSystem::activateGLTextureUnit(size_t unit)

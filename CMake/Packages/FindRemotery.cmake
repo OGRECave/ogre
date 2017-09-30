@@ -15,6 +15,7 @@
 #  Remotery_LIBRARIES - link these to use Remotery
 
 include(FindPkgMacros)
+
 findpkg_begin(Remotery)
 
 # Get path, convert backslashes as ${ENV_${var}}
@@ -33,7 +34,8 @@ create_search_paths(Remotery)
 # redo search if prefix path changed
 clear_if_changed(Remotery_PREFIX_PATH
   Remotery_INCLUDE_DIR
-  Remotery_LIBRARIES
+  Remotery_LIBRARIES_REL
+  Remotery_LIBRARIES_DBG
 )
 
 use_pkgconfig(Remotery_PKGC Remotery)
@@ -44,7 +46,10 @@ set(CMAKE_FIND_FRAMEWORK "LAST")
 findpkg_framework(Remotery)
 
 find_path(Remotery_INCLUDE_DIR NAMES Remotery.h HINTS ${Remotery_INC_SEARCH_PATH} ${Remotery_PKGC_INCLUDE_DIRS})
-find_library(Remotery_LIBRARIES NAMES Remotery HINTS ${Remotery_LIB_SEARCH_PATH} ${Remotery_PKGC_LIBRARIES_DIRS} PATH_SUFFIXES Release RelWithDebInfo MinSizeRel Debug)
+find_library(Remotery_LIBRARIES_REL NAMES Remotery HINTS ${Remotery_LIB_SEARCH_PATH} ${Remotery_PKGC_LIBRARIES_DIRS} PATH_SUFFIXES Release RelWithDebInfo MinSizeRel)
+find_library(Remotery_LIBRARIES_DBG NAMES Remotery_d HINTS ${Remotery_LIB_SEARCH_PATH} ${Remotery_PKGC_LIBRARIES_DIRS} PATH_SUFFIXES Debug)
+
+make_library_set(Remotery_LIBRARIES)
 
 find_package_handle_standard_args( Remotery DEFAULT_MSG Remotery_INCLUDE_DIR Remotery_LIBRARIES )
 
