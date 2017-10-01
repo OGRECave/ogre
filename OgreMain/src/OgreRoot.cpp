@@ -884,15 +884,20 @@ namespace Ogre {
     bool Root::_fireFrameStarted(FrameEvent& evt)
     {
 #if OGRE_PROFILING
-        OgreProfileBeginGroup( "Frame", OGREPROF_GENERAL );
-        OgreProfileGpuBegin( "Frame" );
-
-        uint32 hashValue = (uint32)mNextFrame;
-        char tmpBuffer[32];
-        LwString frameNum( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
-        frameNum.a( "Frame ", hashValue );
-        OgreProfileBeginDynamicHashed( frameNum.c_str(), &hashValue );
-        OgreProfileGpuBeginDynamicHashed( frameNum.c_str(), &hashValue );
+        if( OgreProfilerUseStableMarkers )
+        {
+            OgreProfileBeginGroup( "Frame", OGREPROF_GENERAL );
+            OgreProfileGpuBegin( "Frame" );
+        }
+        else
+        {
+            uint32 hashValue = (uint32)mNextFrame;
+            char tmpBuffer[32];
+            LwString frameNum( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+            frameNum.a( "Frame ", hashValue );
+            OgreProfileBeginDynamicHashed( frameNum.c_str(), &hashValue );
+            OgreProfileGpuBeginDynamicHashed( frameNum.c_str(), &hashValue );
+        }
 #endif
         _syncAddedRemovedFrameListeners();
 
@@ -945,15 +950,20 @@ namespace Ogre {
         mWorkQueue->processResponses();
 
 #if OGRE_PROFILING
-        char tmpBuffer[32];
-        LwString frameNum( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
-        frameNum.a( "Frame ", (uint32)(mNextFrame - 1u) );
+        if( OgreProfilerUseStableMarkers )
+        {
+            OgreProfileGpuEnd( "Frame" );
+            OgreProfileEndGroup( "Frame", OGREPROF_GENERAL );
+        }
+        else
+        {
+            char tmpBuffer[32];
+            LwString frameNum( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+            frameNum.a( "Frame ", (uint32)(mNextFrame - 1u) );
 
-        OgreProfileGpuEnd( frameNum.c_str() );
-        OgreProfileEndGroup( frameNum.c_str(), OGREPROF_GENERAL );
-
-        OgreProfileGpuEnd( "Frame" );
-        OgreProfileEndGroup( "Frame", OGREPROF_GENERAL );
+            OgreProfileGpuEnd( frameNum.c_str() );
+            OgreProfileEndGroup( frameNum.c_str(), OGREPROF_GENERAL );
+        }
 #endif
 
         return ret;

@@ -86,6 +86,7 @@ namespace Ogre {
         , mTimer(0)
         , mTotalFrameTime(0)
         , mEnabled(false)
+        , mUseStableMarkers(false)
         , mNewEnableState(false)
         , mProfileMask(0xFFFFFFFF)
         , mMaxTotalFrameTime(0)
@@ -197,6 +198,16 @@ namespace Ogre {
     bool Profiler::getEnabled() const
     {
         return mEnabled;
+    }
+    //-----------------------------------------------------------------------
+    void Profiler::setUseStableMarkers( bool useStableMarkers )
+    {
+        mUseStableMarkers = useStableMarkers;
+    }
+    //-----------------------------------------------------------------------
+    bool Profiler::getUseStableMarkers(void) const
+    {
+        return mUseStableMarkers;
     }
     //-----------------------------------------------------------------------
     void Profiler::changeEnableState() 
