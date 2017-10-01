@@ -506,10 +506,11 @@ namespace Ogre {
             rsc->setCapability(RSC_MAPBUFFER);
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        // Check if render to vertex buffer (transform feedback in OpenGL)
-        rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
-#endif
+        if(hasMinGLVersion(3, 0))
+        {
+            // Check if render to vertex buffer (transform feedback in OpenGL)
+            rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
+        }
         return rsc;
     }
 
