@@ -335,6 +335,10 @@ namespace Ogre {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         }
 
+        if (checkExtension("WEBGL_compressed_texture_astc") ||
+            checkExtension("GL_KHR_texture_compression_astc_ldr"))
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
+
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         // Probe number of draw buffers

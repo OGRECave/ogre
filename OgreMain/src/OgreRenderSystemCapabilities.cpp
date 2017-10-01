@@ -203,6 +203,9 @@ namespace Ogre {
                  "   - BC6H/BC7: "
                  + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), true));
             pLog->logMessage(
+                 "   - ASTC: "
+                 + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_ASTC), true));
+            pLog->logMessage(
                 "   - Mipmaps for compressed formats: "
                 + StringConverter::toString(hasCapability(RSC_AUTOMIPMAP_COMPRESSED), true));
         }

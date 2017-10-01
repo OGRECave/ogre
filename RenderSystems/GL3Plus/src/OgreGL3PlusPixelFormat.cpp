@@ -166,6 +166,20 @@ namespace Ogre  {
             {GL_NONE},                                           // PF_ATC_RGB
             {GL_NONE},                                           // PF_ATC_RGBA_EXPLICIT_ALPHA
             {GL_NONE},                                           // PF_ATC_RGBA_INTERPOLATED_ALPHA
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_4x4_KHR}, // PF_ASTC_RGBA_4X4_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_5x4_KHR}, // PF_ASTC_RGBA_5X4_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_5x5_KHR}, // PF_ASTC_RGBA_5X5_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_6x5_KHR}, // PF_ASTC_RGBA_6X5_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_6x6_KHR}, // PF_ASTC_RGBA_6X6_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_8x5_KHR}, // PF_ASTC_RGBA_8X5_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_8x6_KHR}, // PF_ASTC_RGBA_8X6_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_8x8_KHR}, // PF_ASTC_RGBA_8X8_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_10x5_KHR},// PF_ASTC_RGBA_10X5_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_10x6_KHR},// PF_ASTC_RGBA_10X6_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_10x8_KHR},// PF_ASTC_RGBA_10X8_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_10x10_KHR},// PF_ASTC_RGBA_10X10_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_12x10_KHR},// PF_ASTC_RGBA_12X10_LDR
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_12x12_KHR},// PF_ASTC_RGBA_12X12_LDR
     };
 
     GLenum GL3PlusPixelUtil::getGLOriginFormat(PixelFormat pf)
@@ -200,6 +214,21 @@ namespace Ogre  {
             return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
         case GL_COMPRESSED_RGBA_BPTC_UNORM_ARB:
             return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB;
+        case GL_COMPRESSED_RGBA_ASTC_4x4_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_5x4_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_5x5_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_6x5_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_6x6_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_8x5_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_8x6_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_8x8_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_10x5_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_10x6_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_10x8_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_10x10_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_12x10_KHR:
+        case GL_COMPRESSED_RGBA_ASTC_12x12_KHR:
+            return ret + 0x20; // ASTC SRGBA format offset
         default:
             return ret;
         }
@@ -332,6 +361,22 @@ namespace Ogre  {
             return PF_DXT5;
         case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB:
             return PF_BC7_UNORM;
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
+            return PixelFormat(int(PF_ASTC_RGBA_4X4_LDR) +
+                               (format - GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR));
         case GL_SRGB8:
         case GL_RGB8: // prefer native endian byte format
             return PF_BYTE_RGB;

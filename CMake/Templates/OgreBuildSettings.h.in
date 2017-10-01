@@ -119,6 +119,8 @@ OGRE_THREAD_PROVIDER = 4
 /** Disables use of the internal image codec for loading image files. */
 #cmakedefine01 OGRE_NO_STBI_CODEC
 
+#cmakedefine01 OGRE_NO_ASTC_CODEC
+
 /** Disables use of the ZIP archive support.
 WARNING: Disabling this will make the samples unusable.
 */
