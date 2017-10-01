@@ -49,6 +49,7 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #include "OgreHeaderPrefix.h"
 
 #if OGRE_PROFILING == OGRE_PROFILING_INTERNAL
+#   define OgreProfilerUseStableMarkers true
 #   define OgreProfileL2( a, line ) Ogre::Profile _OgreProfileInstance##line( (a) )
 #   define OgreProfileL( a, line ) OgreProfileL2( a, line )
 #   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
@@ -71,6 +72,7 @@ namespace Ogre
 {
     class RemoteryProfile;
 }
+#   define OgreProfilerUseStableMarkers Ogre::Profiler::getSingleton().getUseStableMarkers()
 #   define OgreProfileL2( a, line )                                                 \
     static rmtU32 ogre_rmt_sample_hash_##line = 0;                                  \
     Ogre::RemoteryProfile _OgreRemoteryProfileInstance##line( (a), ogre_rmt_sample_hash_##line );
@@ -124,6 +126,7 @@ namespace Ogre
 }
 
 #else
+#   define OgreProfilerUseStableMarkers true
 #   define OgreProfile( a )
 #   define OgreProfileBegin( a )
 #   define OgreProfileBeginDynamic( a )
@@ -426,6 +429,18 @@ namespace Ogre {
             /** Gets whether this profiler is enabled */
             bool getEnabled() const;
 
+            /** Sets whether each frame should be tagged with the frame number (starting from 0).
+                This is very useful for tagging and identifying CPU samples with GPU ones,
+                but it causes Remotery to shift colours like a rainbow.
+                Setting this to true forces each frame to not have the frame number embedded in
+                it, which stabilizes the colour.
+                Default is false.
+            @remarks
+                Relevant only when using Remotery.
+            */
+            void setUseStableMarkers( bool useStableMarkers );
+            bool getUseStableMarkers(void) const;
+
             /** Enables a previously disabled profile 
             @remarks Can be safely called in the middle of the profile.
             */
@@ -577,6 +592,7 @@ namespace Ogre {
 
             /// Whether this profiler is enabled
             bool mEnabled;
+            bool mUseStableMarkers;
 
             /// Keeps track of the new enabled/disabled state that the user has requested
             /// which will be applied after the frame ends
