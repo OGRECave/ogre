@@ -57,7 +57,7 @@ namespace Ogre
     {
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
-                                                id, true, mRenderWindow.target, mRenderSys );
+                                                id, mRenderWindow.target, mRenderSys );
 
         recreateAllNodes();
 

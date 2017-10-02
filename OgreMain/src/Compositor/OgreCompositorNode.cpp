@@ -62,7 +62,7 @@ namespace Ogre
 
         //Create local textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mLocalTextures,
-                                                id, false, finalTarget, mRenderSystem );
+                                                id, finalTarget, mRenderSystem );
 
         //Local textures will be routed now.
         routeOutputs();

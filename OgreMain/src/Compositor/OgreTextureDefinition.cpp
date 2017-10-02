@@ -207,7 +207,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void TextureDefinitionBase::createTextures( const TextureDefinitionVec &textureDefs,
                                                 CompositorChannelVec &inOutTexContainer,
-                                                IdType id, bool uniqueNames,
+                                                IdType id,
                                                 const RenderTarget *finalTarget,
                                                 RenderSystem *renderSys )
     {
@@ -219,11 +219,7 @@ namespace Ogre
 
         while( itor != end )
         {
-            String textureName;
-            if( uniqueNames )
-                textureName = (itor->getName() + IdString( id )).getFriendlyText();
-            else
-                textureName = itor->getName().getFriendlyText();
+            String textureName = (itor->getName() + IdString( id )).getFriendlyText();
 
             CompositorChannel newChannel = createTexture( *itor, textureName, finalTarget, renderSys );
             inOutTexContainer.push_back( newChannel );
