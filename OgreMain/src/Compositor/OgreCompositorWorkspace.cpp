@@ -93,7 +93,7 @@ namespace Ogre
 
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
-                                                id, true, finalTarget, mRenderSys );
+                                                id, finalTarget, mRenderSys );
 
         //Create local buffers
         mGlobalBuffers.reserve( mDefinition->mLocalBufferDefs.size() );
