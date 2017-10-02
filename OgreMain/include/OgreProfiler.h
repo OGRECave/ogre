@@ -54,6 +54,8 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #   define OgreProfileL( a, line ) OgreProfileL2( a, line )
 #   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
 #   define OgreProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
+#   define OgreProfileBeginDynamic( a ) OgreProfileBegin( a )
+#   define OgreProfileBeginDynamicHashed( a, hash ) OgreProfileBegin( a )
 #   define OgreProfileEnd( a ) Ogre::Profiler::getSingleton().endProfile( (a) )
 #   define OgreProfileGroupL2( a, g, line ) Ogre::Profile _OgreProfileInstance##line( (a), (g) )
 #   define OgreProfileGroupL( a, g, line ) OgreProfileGroupL2( a, g, line )
@@ -130,7 +132,7 @@ namespace Ogre
 #   define OgreProfile( a )
 #   define OgreProfileBegin( a )
 #   define OgreProfileBeginDynamic( a )
-#   define OgreProfileBeginDynamicHashed
+#   define OgreProfileBeginDynamicHashed( a, hash )
 #   define OgreProfileEnd( a )
 #   define OgreProfileGroup( a, g ) 
 #   define OgreProfileBeginGroup( a, g ) 
