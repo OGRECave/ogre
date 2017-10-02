@@ -17,6 +17,8 @@ struct Material
 
 	uint4 indices0_3;
 	uint4 indices4_7;
+
+	@insertpiece( custom_materialBuffer )
 };
 
 cbuffer materialArray : register(b1)

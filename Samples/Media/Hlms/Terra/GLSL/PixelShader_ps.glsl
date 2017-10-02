@@ -245,7 +245,7 @@ void main()
 
 	//Point lights
 @foreach( hlms_lights_point, n, hlms_lights_directional_non_caster )
-	lightDir = passBuf.lights[@n].position - inPs.pos;
+	lightDir = passBuf.lights[@n].position.xyz - inPs.pos;
 	fDistance= length( lightDir );
 	if( fDistance <= passBuf.lights[@n].attenuation.x )
 	{
@@ -260,10 +260,10 @@ void main()
 	//spotParams[@value(spot_params)].y = cos( OuterAngle / 2 )
 	//spotParams[@value(spot_params)].z = falloff
 @foreach( hlms_lights_spot, n, hlms_lights_point )
-	lightDir = passBuf.lights[@n].position - inPs.pos;
+	lightDir = passBuf.lights[@n].position.xyz - inPs.pos;
 	fDistance= length( lightDir );
-@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position ), passBuf.lights[@n].spotDirection );@end
-@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position ), zAxis( passBuf.lights[@n].spotQuaternion ) );@end
+@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position.xyz ), passBuf.lights[@n].spotDirection );@end
+@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position.xyz ), zAxis( passBuf.lights[@n].spotQuaternion ) );@end
 	if( fDistance <= passBuf.lights[@n].attenuation.x && spotCosAngle >= passBuf.lights[@n].spotParams.y )
 	{
 		lightDir *= 1.0 / fDistance;

@@ -40,9 +40,10 @@ Buffer<uint> f3dGrid : register(t3);
 Buffer<float4> f3dLightList : register(t4);@end
 
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
-@property( envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));@end
+@property( envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));
+SamplerState envMapSamplerState : register(s@value(envMapReg));@end
 
-@property( numSamplerStates || envprobe_map )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+@property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
 
 @property( hlms_lights_spot_textured )@insertpiece( DeclQuat_zAxis )
@@ -244,7 +245,7 @@ float3 qmul( float4 q, float3 v )
 
 	//Point lights
 @foreach( hlms_lights_point, n, hlms_lights_directional_non_caster )
-	lightDir = passBuf.lights[@n].position - inPs.pos;
+	lightDir = passBuf.lights[@n].position.xyz - inPs.pos;
 	fDistance= length( lightDir );
 	if( fDistance <= passBuf.lights[@n].attenuation.x )
 	{
@@ -259,10 +260,10 @@ float3 qmul( float4 q, float3 v )
 	//spotParams[@value(spot_params)].y = cos( OuterAngle / 2 )
 	//spotParams[@value(spot_params)].z = falloff
 @foreach( hlms_lights_spot, n, hlms_lights_point )
-	lightDir = passBuf.lights[@n].position - inPs.pos;
+	lightDir = passBuf.lights[@n].position.xyz - inPs.pos;
 	fDistance= length( lightDir );
-@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position ), passBuf.lights[@n].spotDirection );@end
-@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position ), zAxis( passBuf.lights[@n].spotQuaternion ) );@end
+@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position.xyz ), passBuf.lights[@n].spotDirection );@end
+@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position.xyz ), zAxis( passBuf.lights[@n].spotQuaternion ) );@end
 	if( fDistance <= passBuf.lights[@n].attenuation.x && spotCosAngle >= passBuf.lights[@n].spotParams.y )
 	{
 		lightDir *= 1.0 / fDistance;
@@ -285,8 +286,8 @@ float3 qmul( float4 q, float3 v )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 	
 	@property( envprobe_map )
-		float3 envColourS = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );
-		float3 envColourD = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( nNormal, passBuf.invViewMatCubemap ), 11.0 ).xyz @insertpiece( ApplyEnvMapScale );
+		float3 envColourS = texEnvProbeMap.SampleLevel( envMapSamplerState, mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );
+		float3 envColourD = texEnvProbeMap.SampleLevel( envMapSamplerState, mul( nNormal, passBuf.invViewMatCubemap ), 11.0 ).xyz @insertpiece( ApplyEnvMapScale );
 		@property( !hw_gamma_read )	//Gamma to linear space
 			envColourS = envColourS * envColourS;
 			envColourD = envColourD * envColourD;
