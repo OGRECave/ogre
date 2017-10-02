@@ -10,6 +10,7 @@ layout_constbuffer(binding = 1) uniform MaterialBuf
 	vec4 metalness;
 	vec4 detailOffsetScale[4];
 
+	@insertpiece( custom_materialBuffer )
 } material;
 @end
 

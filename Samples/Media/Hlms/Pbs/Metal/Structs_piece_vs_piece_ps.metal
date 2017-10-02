@@ -146,6 +146,8 @@ struct Material
 	ushort detailNormMapIdx3;
 	ushort envMapIdx;
 	float mNormalMapWeight;
+
+	@insertpiece( custom_materialBuffer )
 };@end
 
 @piece( MaterialDecl )
