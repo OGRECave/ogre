@@ -869,9 +869,14 @@ namespace Ogre {
 
     void Win32Window::swapBuffers()
     {
-      if (!mIsExternalGLControl) {
-        SwapBuffers(mHDC);
-      }
+        if (!mIsExternalGLControl)
+        {
+            OgreProfileBeginDynamic( ("SwapBuffers: " + mName).c_str() );
+            OgreProfileGpuBeginDynamic( "SwapBuffers: " + mName );
+            SwapBuffers(mHDC);
+            OgreProfileEnd( "SwapBuffers: " + mName );
+            OgreProfileGpuEnd( "SwapBuffers: " + mName );
+        }
 
         RenderWindow::swapBuffers();
     }
