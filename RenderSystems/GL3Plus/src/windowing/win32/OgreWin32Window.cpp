@@ -43,6 +43,7 @@ THE SOFTWARE.
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreDepthBuffer.h"
 #include "OgrePixelBox.h"
+#include "OgreProfiler.h"
 
 namespace Ogre {
 
