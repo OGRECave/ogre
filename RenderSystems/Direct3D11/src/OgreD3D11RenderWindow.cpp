@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgrePixelBox.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreProfiler.h"
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
