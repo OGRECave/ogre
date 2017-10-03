@@ -723,11 +723,7 @@ namespace Ogre {
                                                                 fbo->getHeight(), fbo->getFSAA() );
 
             GLES2RenderBuffer *stencilBuffer = NULL;
-            if(
-#if OGRE_NO_GLES3_SUPPORT == 0
-               depthFormat == GL_DEPTH32F_STENCIL8 ||
-#endif
-               depthFormat == GL_DEPTH24_STENCIL8_OES )
+            if (depthFormat == GL_DEPTH32F_STENCIL8 || depthFormat == GL_DEPTH24_STENCIL8_OES)
             {
                 // If we have a packed format, the stencilBuffer is the same as the depthBuffer
                 stencilBuffer = depthBuffer;
