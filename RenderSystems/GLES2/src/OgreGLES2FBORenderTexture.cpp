@@ -159,7 +159,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
 
         // Check multisampling if supported
-        if(!OGRE_NO_GLES3_SUPPORT)
+        if(getGLES2RenderSystem()->hasMinGLVersion(3, 0))
         {
             // Check samples supported
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &mMaxFSAASamples));

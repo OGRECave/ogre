@@ -364,7 +364,6 @@ namespace Ogre {
     {
         if (mMultisampleFB)
         {
-#if OGRE_NO_GLES3_SUPPORT == 0
             GLint oldfb = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
@@ -376,7 +375,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
             // Unbind
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
-#endif
         }
     }
 
