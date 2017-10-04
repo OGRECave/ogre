@@ -132,7 +132,8 @@ namespace Ogre
     typedef void* (OGRE_THREAD_CALL_CONVENTION *THREAD_ENTRY_POINT)( void *lpThreadParameter );
 #endif
 
-    class _OgreExport Threads
+    /// @deprecated use high-level WorkQueue interface instead
+    class OGRE_DEPRECATED _OgreExport Threads
     {
     public:
         #define THREAD_GET( threadFunction ) threadFunction##_internal
