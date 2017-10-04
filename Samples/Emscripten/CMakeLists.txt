@@ -4,6 +4,11 @@ set(CMAKE_EXECUTABLE_SUFFIX ".html")
 set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. -s EXPORTED_FUNCTIONS=\"['_passAssetAsArrayBuffer', '_clearScene', '_main']\" -s USE_SDL=2")
 
 add_definitions(-s USE_SDL=2)
+
+if(TRUE)
+    add_definitions(-s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=0)
+endif()
+
 include_directories(${OGRE_SOURCE_DIR}/Samples/Character/include)
 add_executable(EmscriptenSample Main.cpp Context.cpp)
 target_link_libraries(EmscriptenSample OgreBites ${OGRE_LIBRARIES})

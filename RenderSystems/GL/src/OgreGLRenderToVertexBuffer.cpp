@@ -73,7 +73,7 @@ namespace Ogre {
         }
     }
 //-----------------------------------------------------------------------------
-    void checkGLError(bool logError, bool throwException, 
+    static void checkGLError(bool logError, bool throwException,
         const Ogre::String& sectionName = BLANKSTRING)
     {
         String msg;

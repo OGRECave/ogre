@@ -22,7 +22,7 @@ if(MSVC)
 	# TODO: Set MSVC flags
 	add_definitions(-DMS_NO_COREDLL)
 else()
-	add_definitions(-Wno-strict-aliasing -Wno-cast-qual -Wno-shadow)
+	add_definitions(-Wno-strict-aliasing -Wno-cast-qual -Wno-shadow -Wno-missing-declarations)
 endif()
 
 set(CMAKE_SWIG_FLAGS -w401,314 -package org.Ogre)

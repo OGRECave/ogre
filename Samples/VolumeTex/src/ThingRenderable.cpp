@@ -44,11 +44,6 @@ void ThingRenderable::addTime(float t)
     }
     fillBuffer();
 }
-// Generate float between -1 and 1
-float randFloat()
-{
-    return ((float)rand()/RAND_MAX)*2.0f-1.0f;
-}
 void ThingRenderable::initialise()
 {
     // Fill array with randomly oriented quads
@@ -58,8 +53,8 @@ void ThingRenderable::initialise()
     things.clear(); orbits.clear();
     for(size_t x=0; x<mCount; x++)
     {
-        ax = Vector3(randFloat(), randFloat(), randFloat());
-        ay = Vector3(randFloat(), randFloat(), randFloat());
+        ax = Vector3(Math::SymmetricRandom(), Math::SymmetricRandom(), Math::SymmetricRandom());
+        ay = Vector3(Math::SymmetricRandom(), Math::SymmetricRandom(), Math::SymmetricRandom());
         az = ax.crossProduct(ay);
         ay = az.crossProduct(ax);
         ax.normalise(); ay.normalise(); az.normalise();
@@ -67,8 +62,8 @@ void ThingRenderable::initialise()
         //std::cerr << ax.dotProduct(ay) << " " << ay.dotProduct(az) << " " << az.dotProduct(ax) << std::endl;
         things.push_back(q);
         
-        ax = Vector3(randFloat(), randFloat(), randFloat());
-        ay = Vector3(randFloat(), randFloat(), randFloat());
+        ax = Vector3(Math::SymmetricRandom(), Math::SymmetricRandom(), Math::SymmetricRandom());
+        ay = Vector3(Math::SymmetricRandom(), Math::SymmetricRandom(), Math::SymmetricRandom());
         az = ax.crossProduct(ay);
         ay = az.crossProduct(ax);
         ax.normalise(); ay.normalise(); az.normalise();

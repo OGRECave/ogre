@@ -61,7 +61,7 @@ void UseCustomCapabilitiesTests::TearDown()
 {
 }
 //--------------------------------------------------------------------------
-void checkCaps(const Ogre::RenderSystemCapabilities* caps)
+static void checkCaps(const Ogre::RenderSystemCapabilities* caps)
 {
     using namespace Ogre;
 
@@ -138,7 +138,7 @@ void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     EXPECT_TRUE(caps->isShaderProfileSupported("arbfp1"));
 }
 //--------------------------------------------------------------------------
-void setUpGLRenderSystemOptions(Ogre::RenderSystem* rs)
+static void setUpGLRenderSystemOptions(Ogre::RenderSystem* rs)
 {
     using namespace Ogre;
     ConfigOptionMap options = rs->getConfigOptions();
@@ -213,7 +213,7 @@ TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesGL)
     OGRE_DELETE root;
 }
 //--------------------------------------------------------------------------
-void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
+static void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
 {
     using namespace Ogre;
     ConfigOptionMap options = rs->getConfigOptions();

@@ -40,7 +40,9 @@ email                : ericc@xenopi.com
 
 namespace Ogre
 {
-    OctreeZonePlugin* OZPlugin;
+    static OctreeZonePlugin* OZPlugin;
+    extern "C" void _OgreOctreeZonePluginExport dllStartPlugin(void);
+    extern "C" void _OgreOctreeZonePluginExport dllStopPlugin(void);
 
     extern "C" void _OgreOctreeZonePluginExport dllStartPlugin( void )
     {

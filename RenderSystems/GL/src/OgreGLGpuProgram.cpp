@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-GLenum getGLShaderType(GpuProgramType programType)
+static GLenum getGLShaderType(GpuProgramType programType)
 {
     switch (programType)
     {
@@ -48,7 +48,7 @@ GLenum getGLShaderType(GpuProgramType programType)
     }
 }
 
-GLGpuProgram::GLGpuProgram(ResourceManager* creator, const String& name, 
+GLGpuProgram::GLGpuProgram(ResourceManager* creator, const String& name,
     ResourceHandle handle, const String& group, bool isManual, 
     ManualResourceLoader* loader) 
     : GpuProgram(creator, name, handle, group, isManual, loader)

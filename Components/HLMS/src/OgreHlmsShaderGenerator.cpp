@@ -499,12 +499,12 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	int setOp(int op1, int op2) { return op2; }
-	int addOp(int op1, int op2) { return op1 + op2; }
-	int subOp(int op1, int op2) { return op1 - op2; }
-	int mulOp(int op1, int op2) { return op1 * op2; }
-	int divOp(int op1, int op2) { return op1 / op2; }
-	int modOp(int op1, int op2) { return op1 % op2; }
+	static int setOp(int op1, int op2) { return op2; }
+	static int addOp(int op1, int op2) { return op1 + op2; }
+	static int subOp(int op1, int op2) { return op1 - op2; }
+	static int mulOp(int op1, int op2) { return op1 * op2; }
+	static int divOp(int op1, int op2) { return op1 / op2; }
+	static int modOp(int op1, int op2) { return op1 % op2; }
 
 	struct Operation
 	{

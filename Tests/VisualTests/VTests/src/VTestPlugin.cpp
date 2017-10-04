@@ -62,6 +62,9 @@ VTestPlugin::~VTestPlugin()
 
 static VTestPlugin* testPlugin = 0;
 
+extern "C" void _OgreSampleExport dllStartPlugin(void);
+extern "C" void _OgreSampleExport dllStopPlugin(void);
+
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
     testPlugin = OGRE_NEW VTestPlugin();

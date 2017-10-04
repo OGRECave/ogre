@@ -44,6 +44,8 @@ THE SOFTWARE.
 using namespace std;
 using namespace Ogre;
 
+namespace {
+
 void help(void)
 {
     // Print help message
@@ -976,6 +978,7 @@ void resolveColourAmbiguities(Mesh* mesh)
     }
 
 
+}
 }
 
 int main(int numargs, char** args)

@@ -57,9 +57,11 @@ namespace Ogre {
 
 
     }
+
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
     //-----------------------------------------------------------------------
    // byte swapping functions
-   void SwapFourBytes(uint32* dw)
+   static void SwapFourBytes(uint32* dw)
    {
       uint32 tmp;
       tmp =  (*dw & 0x000000FF);
@@ -69,7 +71,7 @@ namespace Ogre {
       memcpy (dw, &tmp, sizeof(uint32));
    }
    //-----------------------------------------------------------------------
-   void SwapFourBytesGrup (uint32* src, int size)
+   static void SwapFourBytesGrup (uint32* src, int size)
    {
       uint32* ptr = (uint32*)src;
       int i;
@@ -77,6 +79,7 @@ namespace Ogre {
          SwapFourBytes (&ptr[i]);
       }
    }
+#endif
    //-----------------------------------------------------------------------
     void Quake3Level::initialise(bool headerOnly)
     {

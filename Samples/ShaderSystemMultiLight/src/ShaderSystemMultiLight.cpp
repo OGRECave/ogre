@@ -13,6 +13,9 @@ const String Sample_ShaderSystemMultiLight::TWIRL_LIGHTS_CHECKBOX = "TwirlLights
 static SamplePlugin* sp;
 static Sample* s;
 
+extern "C" void _OgreSampleExport dllStartPlugin(void);
+extern "C" void _OgreSampleExport dllStopPlugin(void);
+
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
     s = new Sample_ShaderSystemMultiLight;

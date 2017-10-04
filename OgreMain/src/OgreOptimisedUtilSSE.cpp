@@ -2138,6 +2138,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    extern OptimisedUtil* _getOptimisedUtilSSE(void);
     extern OptimisedUtil* _getOptimisedUtilSSE(void)
     {
         static OptimisedUtilSSE msOptimisedUtilSSE;

@@ -25,7 +25,7 @@ if(MSVC)
 	# TODO: Set MSVC flags
 	add_definitions(-DMS_NO_COREDLL)
 else()
-	add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-but-set-variable)
+	add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-but-set-variable -Wno-missing-declarations)
 endif()
 set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
 swig_add_module(Ogre python ../../OgreMain/include/Ogre.i)

@@ -40,7 +40,9 @@ email                : ericc@xenopi.com
 
 namespace Ogre
 {
-    PCZPlugin* pczPlugin;
+    static PCZPlugin* pczPlugin;
+    extern "C" void _OgrePCZPluginExport dllStartPlugin(void);
+    extern "C" void _OgrePCZPluginExport dllStopPlugin(void);
 
     extern "C" void _OgrePCZPluginExport dllStartPlugin( void )
     {

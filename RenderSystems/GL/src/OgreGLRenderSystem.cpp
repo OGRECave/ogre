@@ -70,7 +70,7 @@ extern "C" void glFlushRenderAPPLE();
 namespace Ogre {
 
     // Callback function used when registering GLGpuPrograms
-    GpuProgram* createGLArbGpuProgram(ResourceManager* creator,
+    static GpuProgram* createGLArbGpuProgram(ResourceManager* creator,
                                       const String& name, ResourceHandle handle,
                                       const String& group, bool isManual, ManualResourceLoader* loader,
                                       GpuProgramType gptype, const String& syntaxCode)
@@ -82,7 +82,7 @@ namespace Ogre {
         return ret;
     }
 
-    GpuProgram* createGLGpuNvparseProgram(ResourceManager* creator,
+    static GpuProgram* createGLGpuNvparseProgram(ResourceManager* creator,
                                           const String& name, ResourceHandle handle,
                                           const String& group, bool isManual, ManualResourceLoader* loader,
                                           GpuProgramType gptype, const String& syntaxCode)
@@ -94,7 +94,7 @@ namespace Ogre {
         return ret;
     }
 
-    GpuProgram* createGL_ATI_FS_GpuProgram(ResourceManager* creator,
+    static GpuProgram* createGL_ATI_FS_GpuProgram(ResourceManager* creator,
                                            const String& name, ResourceHandle handle,
                                            const String& group, bool isManual, ManualResourceLoader* loader,
                                            GpuProgramType gptype, const String& syntaxCode)

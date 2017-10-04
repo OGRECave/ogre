@@ -48,10 +48,8 @@
 
 #include "OgreGLRenderSystemCommon.h"
 
-extern "C"
-{
-    int
-    safeXErrorHandler (Display *display, XErrorEvent *event)
+namespace {
+    int safeXErrorHandler (Display *display, XErrorEvent *event)
     {
         // Ignore all XErrorEvents
         return 0;

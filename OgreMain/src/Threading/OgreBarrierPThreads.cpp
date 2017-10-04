@@ -30,14 +30,12 @@ THE SOFTWARE.
 #include "Threading/OgreBarrier.h"
 #include <errno.h>
 
-namespace Ogre
-{
-
 #if OGRE_CPU == OGRE_CPU_ARM
 #define __dmb() asm volatile ( "dmb sy\n" ::: "cc" );
 #endif
 
 #if defined(ANDROID) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+namespace {
     typedef int pthread_barrierattr_t;
     //-----------------------------------------------------------------------------------
     int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, int count)
@@ -88,8 +86,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+}
 #endif
-    
+
+namespace Ogre
+{
     Barrier::Barrier( size_t threadCount )
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN

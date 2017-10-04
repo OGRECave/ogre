@@ -357,36 +357,6 @@ namespace Ogre {
         }
     }
 
-
-    RenderOperation::OperationType parseOperationType(const String& val)
-    {
-        if (val == "point_list")
-        {
-            return RenderOperation::OT_POINT_LIST;
-        }
-        else if (val == "line_list")
-        {
-            return RenderOperation::OT_LINE_LIST;
-        }
-        else if (val == "line_strip")
-        {
-            return RenderOperation::OT_LINE_STRIP;
-        }
-        else if (val == "triangle_strip")
-        {
-            return RenderOperation::OT_TRIANGLE_STRIP;
-        }
-        else if (val == "triangle_fan")
-        {
-            return RenderOperation::OT_TRIANGLE_FAN;
-        }
-        else
-        {
-            // Triangle list is the default fallback. Keep it this way?
-            return RenderOperation::OT_TRIANGLE_LIST;
-        }
-    }
-
     GLenum GLSLShader::getGLShaderType(GpuProgramType programType)
     {
         //TODO Convert to map, or is speed different negligible?

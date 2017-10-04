@@ -40,11 +40,11 @@
 namespace Ogre
 {
     // memory implementations
-    void* OgreZalloc(void* opaque, unsigned int items, unsigned int size)
+    static void* OgreZalloc(void* opaque, unsigned int items, unsigned int size)
     {
         return OGRE_MALLOC(items * size, MEMCATEGORY_GENERAL);
     }
-    void OgreZfree(void* opaque, void* address)
+    static void OgreZfree(void* opaque, void* address)
     {
         OGRE_FREE(address, MEMCATEGORY_GENERAL);
     }

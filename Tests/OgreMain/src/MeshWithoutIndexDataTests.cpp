@@ -269,7 +269,7 @@ TEST_F(MeshWithoutIndexDataTests,CreateLineWithMaterial)
     mMeshMgr->remove(fileName, "General");
 }
 //--------------------------------------------------------------------------
-void createMeshWithMaterial(String fileName)
+static void createMeshWithMaterial(String fileName)
 {
     String matFileNameSuffix = ".material";
     String matName1 = "red";

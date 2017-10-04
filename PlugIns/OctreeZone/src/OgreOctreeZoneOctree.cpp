@@ -43,7 +43,7 @@ Modified to use with PCZones 2007 by Eric Cha
 
 namespace Ogre
 {
-
+    namespace {
     /* INTERSECTION UTILITY FUNCTIONS ***/
 
     enum Intersection
@@ -260,6 +260,7 @@ namespace Ogre
         }
 
 
+    }
     }
     /***************************************************/
 

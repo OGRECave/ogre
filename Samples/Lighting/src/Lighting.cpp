@@ -9,6 +9,9 @@ using namespace OgreBites;
 static SamplePlugin* sp;
 static Sample* s;
 
+extern "C" _OgreSampleExport void dllStartPlugin();
+extern "C" _OgreSampleExport void dllStopPlugin();
+
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
     s = new Sample_Lighting;

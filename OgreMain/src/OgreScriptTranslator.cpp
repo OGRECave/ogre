@@ -53,7 +53,7 @@ THE SOFTWARE.
 
 namespace Ogre{
 
-    GpuProgramType translateIDToGpuProgramType(uint32 id)
+    static GpuProgramType translateIDToGpuProgramType(uint32 id)
     {
         switch (id)
         {
@@ -4556,7 +4556,7 @@ namespace Ogre{
 
     }
     //-------------------------------------------------------------------------
-    int parseProgramParameterDimensions(String& declarator, String type)
+    static int parseProgramParameterDimensions(String& declarator, String type)
     {
         // Assume 1 unless otherwise specified
         int dimensions = 1;
