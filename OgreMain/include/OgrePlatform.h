@@ -138,9 +138,8 @@ namespace Ogre {
 #elif defined(__EMSCRIPTEN__)
 #   define OGRE_PLATFORM OGRE_PLATFORM_EMSCRIPTEN
 #elif defined( __APPLE_CC__)
-    // Device                                                     Simulator
-    // Both requiring OS version 6.0 or greater
-#   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 60000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+#   include "Availability.h"
+#   ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 #       define OGRE_PLATFORM OGRE_PLATFORM_APPLE_IOS
 #   else
 #       define OGRE_PLATFORM OGRE_PLATFORM_APPLE
