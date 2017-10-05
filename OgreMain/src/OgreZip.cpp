@@ -34,6 +34,11 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreException.h"
 
+// workaround for Wundef in zzip/conf.h
+#ifndef __GNUC_MINOR_
+#define __GNUC_MINOR_ 0
+#endif
+
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
 
