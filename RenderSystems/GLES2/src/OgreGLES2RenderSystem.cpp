@@ -340,16 +340,20 @@ namespace Ogre {
 
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
-#if OGRE_NO_GLES3_SUPPORT == 0
-        // Probe number of draw buffers
-        // Only makes sense with FBO support, so probe here
-        GLint buffers;
-        glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers);
-        rsc->setNumMultiRenderTargets(std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
-        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
-#else
-        rsc->setNumMultiRenderTargets(1);
-#endif
+        if (hasMinGLVersion(3, 0))
+        {
+            // Probe number of draw buffers
+            // Only makes sense with FBO support, so probe here
+            GLint buffers;
+            glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers);
+            rsc->setNumMultiRenderTargets(
+                std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
+            rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
+        }
+        else
+        {
+            rsc->setNumMultiRenderTargets(1);
+        }
 
         // Cube map
         rsc->setCapability(RSC_CUBEMAPPING);
