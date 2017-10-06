@@ -160,7 +160,7 @@ namespace Ogre {
         
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
-        GLenum internalformat = GLPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
+        GLenum internalformat = GLPixelUtil::getGLInternalFormat(mFormat, mHwGamma);
         uint32 width = mWidth;
         uint32 height = mHeight;
         uint32 depth = mDepth;

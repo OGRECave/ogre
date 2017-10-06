@@ -280,7 +280,7 @@ namespace Ogre {
                             "Compressed images must be consecutive, in the source format",
                             "GLES2TextureBuffer::upload");
 
-            GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(mFormat);
+            GLenum format = GLES2PixelUtil::getGLInternalFormat(mFormat);
             // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
             // for compressed formats
             switch(mTarget) {
@@ -553,7 +553,7 @@ namespace Ogre {
         if(!fboMan->checkFormat(mFormat))
         {
             // If target format not directly supported, create intermediate texture
-            GLenum tempFormat = GLES2PixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
+            GLenum tempFormat = GLES2PixelUtil::getGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
             rs->_getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
 
@@ -753,7 +753,7 @@ namespace Ogre {
             depth = Bitwise::firstPO2From(depth);
         }
 
-        GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(src.format);
+        GLenum format = GLES2PixelUtil::getGLInternalFormat(src.format);
 
         // Generate texture name
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &id));

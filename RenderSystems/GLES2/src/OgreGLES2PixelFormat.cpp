@@ -321,23 +321,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------------
-    GLenum GLES2PixelUtil::getClosestGLInternalFormat(PixelFormat format,
-                                                   bool hwGamma)
-    {
-        GLenum GLformat = getGLInternalFormat(format, hwGamma);
-
-        if (GLformat == GL_NONE)
-        {
-#if OGRE_NO_GLES3_SUPPORT == 0
-            return hwGamma ? GL_SRGB8 : GL_RGBA8;
-#else
-            return hwGamma ? GL_NONE : GL_RGBA8;
-#endif
-        }
-
-        return GLformat;
-    }
-    //-----------------------------------------------------------------------------
     PixelFormat GLES2PixelUtil::getClosestOGREFormat(GLenum format)
     {
         switch(format)

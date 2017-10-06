@@ -156,7 +156,7 @@ namespace Ogre {
             }
         }
 
-        GLenum format = GL3PlusPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
+        GLenum format = GL3PlusPixelUtil::getGLInternalFormat(mFormat, mHwGamma);
         GLenum datatype = GL3PlusPixelUtil::getGLOriginDataType(mFormat);
         width = mWidth;
         height = mHeight;

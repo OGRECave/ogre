@@ -62,13 +62,6 @@ namespace Ogre {
             */
             static GLenum getGLInternalFormat(PixelFormat mFormat, bool hwGamma = false);
 
-            /**    Takes the OGRE pixel format and returns the type that must be provided
-                to GL as internal format. If no match exists, returns the closest match.
-            @param mFormat The pixel format
-            @param hwGamma Whether a hardware gamma-corrected version is requested
-            */
-            static GLenum getClosestGLInternalFormat(PixelFormat mFormat, bool hwGamma = false);
-
             /**    Function to get the closest matching OGRE format to an internal GL format. To be
                 precise, the format will be chosen that is most efficient to transfer to the card 
                 without losing precision.

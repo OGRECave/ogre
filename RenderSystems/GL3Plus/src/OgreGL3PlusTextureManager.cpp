@@ -31,6 +31,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGLRenderTexture.h"
 #include "OgreRoot.h"
+#include "OgreGL3PlusPixelFormat.h"
 
 namespace Ogre {
     GL3PlusTextureManager::GL3PlusTextureManager(GL3PlusRenderSystem* renderSystem)
@@ -127,6 +128,11 @@ namespace Ogre {
         // if floating point textures not supported, revert to PF_A8R8G8B8
         if (PixelUtil::isFloatingPoint(format) &&
             !caps->hasCapability(RSC_TEXTURE_FLOAT))
+        {
+            return PF_BYTE_RGBA;
+        }
+
+        if(GL3PlusPixelUtil::getGLInternalFormat(format) == GL_NONE)
         {
             return PF_BYTE_RGBA;
         }
