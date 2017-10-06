@@ -71,7 +71,7 @@ namespace Ogre {
             scaled = mBuffer.getSubVolume(dstBox);
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
-        else if (GLES2PixelUtil::getGLInternalFormat(src.format) == 0)
+        else if (src.format != mFormat)
         {
             // Extents match, but format is not accepted as valid source format for GL
             // do conversion in temporary buffer

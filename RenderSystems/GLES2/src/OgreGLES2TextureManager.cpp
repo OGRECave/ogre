@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreGLES2StateCacheManager.h"
+#include "OgreGLES2PixelFormat.h"
 
 namespace Ogre {
     GLES2TextureManager::GLES2TextureManager(GLES2RenderSystem* renderSystem)
@@ -100,6 +101,12 @@ namespace Ogre {
         // if floating point textures not supported, revert to PF_A8R8G8B8
         if (PixelUtil::isFloatingPoint(format) &&
             !caps->hasCapability(RSC_TEXTURE_FLOAT))
+        {
+            return PF_BYTE_RGBA;
+        }
+
+        // format not supported by GLES2: e.g. BGR
+        if(GLES2PixelUtil::getGLInternalFormat(format) == GL_NONE)
         {
             return PF_BYTE_RGBA;
         }
