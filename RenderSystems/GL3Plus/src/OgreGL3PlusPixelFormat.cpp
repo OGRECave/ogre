@@ -234,18 +234,6 @@ namespace Ogre  {
         }
     }
 
-    GLenum GL3PlusPixelUtil::getClosestGLInternalFormat(PixelFormat format, bool hwGamma)
-    {
-        GLenum GLformat = getGLInternalFormat(format, hwGamma);
-        if (GLformat == GL_NONE)
-        {
-            return hwGamma ? GL_SRGB8 : GL_RGBA8;
-        }
-
-        return GLformat;
-    }
-
-
     GLenum GL3PlusPixelUtil::getGLImageInternalFormat(PixelFormat format)
     {
         switch(format)

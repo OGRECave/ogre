@@ -71,7 +71,7 @@ namespace Ogre {
             scaled = mBuffer.getSubVolume(dstBox);
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
-        else if (GLES2PixelUtil::getGLInternalFormat(src.format) == 0)
+        else if (src.format != mFormat)
         {
             // Extents match, but format is not accepted as valid source format for GL
             // do conversion in temporary buffer
@@ -161,7 +161,7 @@ namespace Ogre {
             mDepth = depth;
 
         mGLInternalFormat = internalFormat;
-        mFormat = GLES2PixelUtil::getClosestOGREFormat(internalFormat, format);
+        mFormat = GLES2PixelUtil::getClosestOGREFormat(internalFormat);
 
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
@@ -280,7 +280,7 @@ namespace Ogre {
                             "Compressed images must be consecutive, in the source format",
                             "GLES2TextureBuffer::upload");
 
-            GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(mFormat);
+            GLenum format = GLES2PixelUtil::getGLInternalFormat(mFormat);
             // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
             // for compressed formats
             switch(mTarget) {
@@ -553,7 +553,7 @@ namespace Ogre {
         if(!fboMan->checkFormat(mFormat))
         {
             // If target format not directly supported, create intermediate texture
-            GLenum tempFormat = GLES2PixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
+            GLenum tempFormat = GLES2PixelUtil::getGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
             rs->_getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
 
@@ -753,7 +753,7 @@ namespace Ogre {
             depth = Bitwise::firstPO2From(depth);
         }
 
-        GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(src.format);
+        GLenum format = GLES2PixelUtil::getGLInternalFormat(src.format);
 
         // Generate texture name
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &id));
@@ -812,7 +812,7 @@ namespace Ogre {
     //********* GLES2RenderBuffer
     //----------------------------------------------------------------------------- 
     GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
-    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, GL_RGBA), HBU_WRITE_ONLY)
+    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format), HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;
         mNumSamples = numSamples;

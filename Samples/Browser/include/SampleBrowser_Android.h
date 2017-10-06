@@ -104,7 +104,7 @@ namespace OgreBites
             switch (cmd) 
             {
                 case APP_CMD_SAVE_STATE:
-                break;
+                    break;
                 case APP_CMD_INIT_WINDOW:
                     if (app->window)
                     {
@@ -125,9 +125,13 @@ namespace OgreBites
                     if(mBrowser.getRenderWindow())
                         mBrowser.getRenderWindow()->_notifySurfaceDestroyed();
                     break;
-                case APP_CMD_GAINED_FOCUS:
+                case APP_CMD_RESUME:
+                    if(mBrowser.getRenderWindow())
+                        mBrowser.getRenderWindow()->setVisible(true);
                     break;
-                case APP_CMD_LOST_FOCUS:
+                case APP_CMD_PAUSE:
+                    if(mBrowser.getRenderWindow())
+                        mBrowser.getRenderWindow()->setVisible(false);
                     break;
                 case APP_CMD_CONFIG_CHANGED:
                     break;

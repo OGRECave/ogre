@@ -179,7 +179,7 @@ namespace Ogre {
                             "Compressed images must be consecutive and in the designated source format",
                             "GL3PlusTextureBuffer::upload");
 
-            GLenum format = GL3PlusPixelUtil::getClosestGLInternalFormat(mFormat);
+            GLenum format = GL3PlusPixelUtil::getGLInternalFormat(mFormat);
             // Data must be consecutive and at beginning of buffer as
             // PixelStorei not allowed for compressed formats.
             switch(mTarget)
@@ -460,7 +460,7 @@ namespace Ogre {
         if (!fboMan->checkFormat(mFormat))
         {
             // If target format not directly supported, create intermediate texture
-            GLenum tempFormat = GL3PlusPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
+            GLenum tempFormat = GL3PlusPixelUtil::getGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
             mRenderSystem->_getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
             OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));

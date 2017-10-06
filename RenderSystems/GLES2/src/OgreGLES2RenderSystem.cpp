@@ -106,7 +106,7 @@ static void gl2ext_to_gl3core() {
 
 namespace Ogre {
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     static GLES2Support* glsupport;
     static GLESWglProc get_proc(const char* proc) {
         return (GLESWglProc)glsupport->getProcAddress(proc);
@@ -136,7 +136,7 @@ namespace Ogre {
         
         mGLSupport = new GLES2Support(getGLSupport(GLNativeSupport::CONTEXT_ES));
         
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         glsupport = mGLSupport;
 #endif
 
@@ -340,16 +340,20 @@ namespace Ogre {
 
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
-#if OGRE_NO_GLES3_SUPPORT == 0
-        // Probe number of draw buffers
-        // Only makes sense with FBO support, so probe here
-        GLint buffers;
-        glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers);
-        rsc->setNumMultiRenderTargets(std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
-        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
-#else
-        rsc->setNumMultiRenderTargets(1);
-#endif
+        if (hasMinGLVersion(3, 0))
+        {
+            // Probe number of draw buffers
+            // Only makes sense with FBO support, so probe here
+            GLint buffers;
+            glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers);
+            rsc->setNumMultiRenderTargets(
+                std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
+            rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
+        }
+        else
+        {
+            rsc->setNumMultiRenderTargets(1);
+        }
 
         // Cube map
         rsc->setCapability(RSC_CUBEMAPPING);
@@ -506,10 +510,11 @@ namespace Ogre {
             rsc->setCapability(RSC_MAPBUFFER);
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        // Check if render to vertex buffer (transform feedback in OpenGL)
-        rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
-#endif
+        if(hasMinGLVersion(3, 0))
+        {
+            // Check if render to vertex buffer (transform feedback in OpenGL)
+            rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
+        }
         return rsc;
     }
 
@@ -722,11 +727,7 @@ namespace Ogre {
                                                                 fbo->getHeight(), fbo->getFSAA() );
 
             GLES2RenderBuffer *stencilBuffer = NULL;
-            if(
-#if OGRE_NO_GLES3_SUPPORT == 0
-               depthFormat == GL_DEPTH32F_STENCIL8 ||
-#endif
-               depthFormat == GL_DEPTH24_STENCIL8_OES )
+            if (depthFormat == GL_DEPTH32F_STENCIL8 || depthFormat == GL_DEPTH24_STENCIL8_OES)
             {
                 // If we have a packed format, the stencilBuffer is the same as the depthBuffer
                 stencilBuffer = depthBuffer;
@@ -1852,8 +1853,9 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // EAGL2Support redirects to glesw for get_proc. Overwriting it there would create an infinite loop.
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        // ios: EAGL2Support redirects to glesw for get_proc. Overwriting it there would create an infinite loop
+        // android: eglGetProcAddress fails in some cases (e.g. Virtual Device), whereas dlsym always works.
         if (glGetError == NULL && gleswInit())
 #else
         if (gleswInit2(get_proc))
@@ -1871,6 +1873,7 @@ namespace Ogre {
 
         if(hasMinGLVersion(3, 0)) {
             gl2ext_to_gl3core();
+            GLES2PixelUtil::useSizedFormats();
         }
 
         LogManager::getSingleton().logMessage("**************************************");

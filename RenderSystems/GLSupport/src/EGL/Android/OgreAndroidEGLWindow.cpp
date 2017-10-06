@@ -242,13 +242,15 @@ namespace Ogre {
         
         eglDestroySurface(mEglDisplay, mEglSurface);
         EGL_CHECK_ERROR
-        
-        eglTerminate(mEglDisplay);
-        EGL_CHECK_ERROR
-        
-        mEglDisplay = 0;
         mEglSurface = 0;
         
+        if (!mPreserveContext)
+        {
+            eglTerminate(mEglDisplay);
+            EGL_CHECK_ERROR
+            mEglDisplay = 0;
+        }
+
         mActive = false;
         mVisible = false;
         mClosed = true;

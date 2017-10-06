@@ -39,6 +39,9 @@ namespace Ogre {
     class _OgreGLES2Export GLES2PixelUtil
     {
         public:
+            /// use sized pixel formats. (to be used with GLES3)
+            static void useSizedFormats();
+
             /** Takes the OGRE pixel format and returns the appropriate GL one
                 @returns a GLenum describing the format, or 0 if there is no exactly matching 
                 one (and conversion is needed)
@@ -59,19 +62,12 @@ namespace Ogre {
             */
             static GLenum getGLInternalFormat(PixelFormat mFormat, bool hwGamma = false);
 
-            /**    Takes the OGRE pixel format and returns the type that must be provided
-                to GL as internal format. If no match exists, returns the closest match.
-            @param mFormat The pixel format
-            @param hwGamma Whether a hardware gamma-corrected version is requested
-            */
-            static GLenum getClosestGLInternalFormat(PixelFormat mFormat, bool hwGamma = false);
-
             /**    Function to get the closest matching OGRE format to an internal GL format. To be
                 precise, the format will be chosen that is most efficient to transfer to the card 
                 without losing precision.
                 @remarks It is valid for this function to always return PF_A8R8G8B8.
             */
-            static PixelFormat getClosestOGREFormat(GLenum fmt, GLenum dataType);
+            static PixelFormat getClosestOGREFormat(GLenum fmt);
     };
 }
 

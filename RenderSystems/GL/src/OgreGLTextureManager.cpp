@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreGLCopyingRenderTexture.h"
 #include "OgreGLTexture.h"
+#include "OgreGLPixelFormat.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
@@ -106,6 +107,11 @@ namespace Ogre {
             return PF_BYTE_RGBA;
         }
         
+        if(GLPixelUtil::getGLInternalFormat(format) == GL_NONE)
+        {
+            return PF_BYTE_RGBA;
+        }
+
         // Check if this is a valid rendertarget format
         if( usage & TU_RENDERTARGET )
         {
