@@ -14,6 +14,9 @@ const String Sample_ShaderSystemTexturedFog::ACTIVATE_SKY_BUTTON = "ActivateSkyB
 static SamplePlugin* sp;
 static Sample* s;
 
+extern "C" void _OgreSampleExport dllStartPlugin(void);
+extern "C" void _OgreSampleExport dllStopPlugin(void);
+
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
     s = new Sample_ShaderSystemTexturedFog;

@@ -43,6 +43,8 @@ THE SOFTWARE.
 using namespace std;
 using namespace Ogre;
 
+namespace {
+
 // Some flags were deprecated, because they are provided in OgreMeshUpgrader too!
 // Same feature with different implementation! Don't make duplicates!
 // Also XMLConverter should only convert between XML format 1:1, while MeshUpgrader should modify it.
@@ -520,6 +522,7 @@ void skeletonToXML(XmlOptions opts)
     // Clean up the conversion skeleton
     SkeletonManager::getSingleton().remove("conversion",
                                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+}
 }
 
 int main(int numargs, char** args)

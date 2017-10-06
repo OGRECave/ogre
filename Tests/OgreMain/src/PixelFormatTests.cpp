@@ -89,7 +89,7 @@ TEST_F(PixelFormatTests,FloatPackUnpack)
 }
 //--------------------------------------------------------------------------
 // Pure 32 bit float precision brute force pixel conversion; for comparison
-void naiveBulkPixelConversion(const PixelBox &src, const PixelBox &dst)
+static void naiveBulkPixelConversion(const PixelBox &src, const PixelBox &dst)
 {
     uint8 *srcptr = static_cast<uint8*>(src.data);
     uint8 *dstptr = static_cast<uint8*>(dst.data);

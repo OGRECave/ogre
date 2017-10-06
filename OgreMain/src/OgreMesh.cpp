@@ -989,7 +989,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    Real distLineSegToPoint( const Vector3& line0, const Vector3& line1, const Vector3& pt )
+    static Real distLineSegToPoint( const Vector3& line0, const Vector3& line1, const Vector3& pt )
     {
         Vector3 v01 = line1 - line0;
         Real tt = v01.dotProduct( pt - line0 ) / std::max( v01.dotProduct(v01), std::numeric_limits<Real>::epsilon() );
@@ -998,7 +998,7 @@ namespace Ogre {
         return pt.distance( onLine );
     }
     //---------------------------------------------------------------------
-    Real _computeBoneBoundingRadiusHelper( VertexData* vertexData,
+    static Real _computeBoneBoundingRadiusHelper( VertexData* vertexData,
         const Mesh::VertexBoneAssignmentList& boneAssignments,
         const vector<Vector3>::type& bonePositions,
         const vector< vector<ushort>::type >::type& boneChildren

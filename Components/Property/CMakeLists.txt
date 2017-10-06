@@ -29,6 +29,10 @@ include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
+    # workaround Wundef with boost
+    if(UNIX)
+        set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/OgreProperty.cpp" PROPERTIES COMPILE_FLAGS "-Wno-undef")
+    endif()
 endif()
 
 # setup target

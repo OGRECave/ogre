@@ -39,7 +39,7 @@ THE SOFTWARE.
 namespace Ogre {
     namespace GLSL {
 
-    GLint getGLGeometryInputPrimitiveType(RenderOperation::OperationType operationType, bool requiresAdjacency)
+    static GLint getGLGeometryInputPrimitiveType(RenderOperation::OperationType operationType, bool requiresAdjacency)
     {
         switch (operationType)
         {
@@ -56,7 +56,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    GLint getGLGeometryOutputPrimitiveType(RenderOperation::OperationType operationType)
+    static GLint getGLGeometryOutputPrimitiveType(RenderOperation::OperationType operationType)
     {
         switch (operationType)
         {

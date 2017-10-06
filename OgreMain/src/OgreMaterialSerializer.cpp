@@ -4498,7 +4498,7 @@ namespace Ogre
         return "point";
     }
     //-----------------------------------------------------------------------
-    String convertTexAddressMode(TextureUnitState::TextureAddressingMode tam)
+    static String convertTexAddressMode(TextureUnitState::TextureAddressingMode tam)
     {
         switch (tam)
         {

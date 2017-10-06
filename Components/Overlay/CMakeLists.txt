@@ -18,6 +18,11 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreOverlayPrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
+# workaround Wundef in freetype
+if(UNIX)
+  set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFont.cpp" PROPERTIES COMPILE_FLAGS "-Wno-undef")
+endif()
+
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)

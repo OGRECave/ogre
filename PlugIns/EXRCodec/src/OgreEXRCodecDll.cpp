@@ -30,7 +30,10 @@ THE SOFTWARE.
 
 #ifndef OGRE_STATIC_LIB
 namespace Ogre {
-    Codec *mEXRCodec;
+    static Codec *mEXRCodec;
+
+    extern "C" void _OgreEXRPluginExport dllStartPlugin(void);
+    extern "C" void _OgreEXRPluginExport dllStopPlugin(void);
     
     //-----------------------------------------------------------------------
     extern "C" _OgreEXRPluginExport void dllStartPlugin(void)

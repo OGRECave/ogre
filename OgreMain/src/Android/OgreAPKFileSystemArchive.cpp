@@ -7,14 +7,14 @@ namespace Ogre{
 
 	static std::map<String, std::vector< String > > mFiles;
 
-	bool IsFolderParsed( String Folder ) {
+	static bool IsFolderParsed( const String& Folder ) {
 		bool parsed = false;
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( Folder );
 		if(iter != mFiles.end()) parsed = true;
 		return parsed;
 	}
 
-	void ParseFolder( AAssetManager* AssetMgr, String Folder ) {
+	static void ParseFolder( AAssetManager* AssetMgr, const String& Folder ) {
 		std::vector<String> mFilenames;
 		AAssetDir* dir = AAssetManager_openDir(AssetMgr, Folder.c_str());
 		const char* fileName = NULL;

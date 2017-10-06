@@ -32,8 +32,11 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    CgPlugin* cgPlugin;
 #ifndef OGRE_STATIC_LIB
+    extern "C" void _OgreCgPluginExport dllStartPlugin(void);
+    extern "C" void _OgreCgPluginExport dllStopPlugin(void);
+
+    static CgPlugin* cgPlugin;
     //-----------------------------------------------------------------------
     extern "C" void _OgreCgPluginExport dllStartPlugin(void)
     {

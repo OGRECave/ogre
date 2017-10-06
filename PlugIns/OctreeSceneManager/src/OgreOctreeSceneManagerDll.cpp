@@ -34,7 +34,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-OctreePlugin* octreePlugin;
+extern "C" void _OgreOctreePluginExport dllStartPlugin(void);
+extern "C" void _OgreOctreePluginExport dllStopPlugin(void);
+
+static OctreePlugin* octreePlugin;
 
 extern "C" void _OgreOctreePluginExport dllStartPlugin( void )
 {

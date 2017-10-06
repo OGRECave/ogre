@@ -23,7 +23,7 @@ using namespace Ogre;
 //  Traversing the grid in a swizzled fashion improves locality of reference,
 // and this is very beneficial when sampling a texture.
 //--------------------------------------------------------------------------------------
-void UnSwizzle(Ogre::uint index, Ogre::uint sizeLog2[3], Ogre::uint * pPos)
+static void UnSwizzle(Ogre::uint index, Ogre::uint sizeLog2[3], Ogre::uint * pPos)
 {
 
     // force index traversal to occur in 2x2x2 blocks by giving each of x, y, and z one

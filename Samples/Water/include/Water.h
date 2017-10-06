@@ -35,7 +35,7 @@ using namespace OgreBites;
 #define PLANE_SIZE 3000.0f
 #define CIRCLES_MATERIAL "Examples/Water/Circles"
 
-void prepareCircleMaterial()
+static void prepareCircleMaterial()
 {
     DataStreamPtr imgstream(new MemoryDataStream(256 * 256 * 4));
     char *bmap = (char*)static_cast<MemoryDataStream*>(imgstream.get())->getPtr();

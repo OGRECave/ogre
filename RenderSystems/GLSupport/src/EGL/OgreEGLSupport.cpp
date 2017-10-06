@@ -56,9 +56,6 @@ namespace Ogre {
         ConfigOption optDisplayFrequency;
         ConfigOption optFSAA;
         ConfigOption optVSync;
-#if GL_OES_packed_depth_stencil
-        ConfigOption optRTTMode;
-#endif
 
         optFullScreen.name = "Full Screen";
         optFullScreen.immutable = false;
@@ -78,14 +75,6 @@ namespace Ogre {
         optFSAA.name = "FSAA";
         optFSAA.immutable = false;
 
-#if GL_OES_packed_depth_stencil
-        optRTTMode.name = "RTT Preferred Mode";
-        optRTTMode.possibleValues.push_back("FBO");
-        optRTTMode.possibleValues.push_back("Copy");
-        optRTTMode.currentValue = "FBO";
-        optRTTMode.immutable = false;
-        optRTTMode.currentValue = optRTTMode.possibleValues[0];
-#endif
         optFullScreen.possibleValues.push_back("No");
         optFullScreen.possibleValues.push_back("Yes");
 
@@ -117,15 +106,12 @@ namespace Ogre {
             optFSAA.currentValue = optFSAA.possibleValues[0];
         }
 
-
         mOptions[optFullScreen.name] = optFullScreen;
         mOptions[optVideoMode.name] = optVideoMode;
         mOptions[optDisplayFrequency.name] = optDisplayFrequency;
         mOptions[optFSAA.name] = optFSAA;
         mOptions[optVSync.name] = optVSync;
-#if GL_OES_packed_depth_stencil
-        mOptions[optRTTMode.name] = optRTTMode;
-#endif
+
         refreshConfig();
     }
 

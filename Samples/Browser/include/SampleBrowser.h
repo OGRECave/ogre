@@ -44,6 +44,10 @@
 #    endif
 #endif
 
+#ifndef __OGRE_WINRT_PHONE
+#define __OGRE_WINRT_PHONE 0
+#endif
+
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android_native_app_glue.h>

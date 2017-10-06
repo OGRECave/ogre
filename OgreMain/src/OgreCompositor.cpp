@@ -199,7 +199,7 @@ CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName
 
 }
 //-----------------------------------------------------------------------
-String getMRTTexLocalName(const String& baseName, size_t attachment)
+static String getMRTTexLocalName(const String& baseName, size_t attachment)
 {
     return baseName + "/" + StringConverter::toString(attachment);
 }

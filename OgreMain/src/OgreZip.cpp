@@ -34,6 +34,11 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreException.h"
 
+// workaround for Wundef in zzip/conf.h
+#ifndef __GNUC_MINOR_
+#define __GNUC_MINOR_ 0
+#endif
+
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
 
@@ -41,7 +46,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /// Utility method to format out zzip errors
-    String getZzipErrorDescription(zzip_error_t zzipError) 
+    static String getZzipErrorDescription(zzip_error_t zzipError)
     {
         String errorMsg;
         switch (zzipError)
@@ -462,12 +467,14 @@ namespace Ogre {
     typedef FileNameToIndexMap::iterator FileNameToIndexMapIter;
     /// A type to store the embedded files data
     typedef vector<EmbeddedFileData>::type EmbbedFileDataList;
+    /// A static pointer to file io alternative implementation for the embedded files
+    zzip_plugin_io_handlers* EmbeddedZipArchiveFactory::mPluginIo = NULL;
+
+    namespace {
     /// A static map between the file names to file index
     FileNameToIndexMap * EmbeddedZipArchiveFactory_mFileNameToIndexMap;
     /// A static list to store the embedded files data
     EmbbedFileDataList * EmbeddedZipArchiveFactory_mEmbbedFileDataList;
-    /// A static pointer to file io alternative implementation for the embedded files
-    zzip_plugin_io_handlers* EmbeddedZipArchiveFactory::mPluginIo = NULL;
     _zzip_plugin_io sEmbeddedZipArchiveFactory_PluginIo;
     #define EMBED_IO_BAD_FILE_HANDLE (-1)
     #define EMBED_IO_SUCCESS (0)
@@ -628,6 +635,7 @@ namespace Ogre {
         // the files in this case are read only - return an error  - nonzero value.
         return -1;
     }
+    } // namespace {
     //-----------------------------------------------------------------------
     EmbeddedZipArchiveFactory::EmbeddedZipArchiveFactory()
     {

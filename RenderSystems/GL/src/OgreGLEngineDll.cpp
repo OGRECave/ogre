@@ -35,8 +35,10 @@ THE SOFTWARE.
 namespace Ogre 
 {
     static GLPlugin* plugin;
+    extern "C" void _OgreGLExport dllStartPlugin(void);
+    extern "C" void _OgreGLExport dllStopPlugin(void);
 
-    extern "C" void _OgreGLExport dllStartPlugin(void) throw()
+    extern "C" void _OgreGLExport dllStartPlugin(void)
     {
         plugin = OGRE_NEW GLPlugin();
         Root::getSingleton().installPlugin(plugin);

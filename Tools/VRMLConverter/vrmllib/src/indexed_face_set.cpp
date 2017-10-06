@@ -14,7 +14,7 @@ struct index_set {
     int col;
 };
 
-bool operator<(const index_set &a, const index_set &b)
+static bool operator<(const index_set &a, const index_set &b)
 {
     if (a.geom < b.geom) return true;
     if (a.geom > b.geom) return false;
