@@ -49,7 +49,7 @@ namespace Ogre {
 
     FreeImageCodec::RegisteredCodecList FreeImageCodec::msCodecList;
     //---------------------------------------------------------------------
-    void FreeImageLoadErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) 
+    static void FreeImageLoadErrorHandler(FREE_IMAGE_FORMAT fif, const char *message)
     {
         // Callback method as required by FreeImage to report problems
         const char* typeName = FreeImage_GetFormatFromFIF(fif);
@@ -65,13 +65,6 @@ namespace Ogre {
                 << "FreeImage error: '" << message << "'";
         }
 
-    }
-    //---------------------------------------------------------------------
-    void FreeImageSaveErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) 
-    {
-        // Callback method as required by FreeImage to report problems
-        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
-                    message, "FreeImageCodec::save");
     }
     //---------------------------------------------------------------------
     void FreeImageCodec::startup(void)
