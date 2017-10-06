@@ -74,7 +74,7 @@ namespace Ogre {
                 without losing precision.
                 @remarks It is valid for this function to always return PF_A8R8G8B8.
             */
-            static PixelFormat getClosestOGREFormat(GLenum fmt, GLenum dataType);
+            static PixelFormat getClosestOGREFormat(GLenum fmt);
     };
 }
 

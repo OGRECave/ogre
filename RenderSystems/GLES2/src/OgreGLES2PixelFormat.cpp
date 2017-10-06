@@ -338,7 +338,7 @@ namespace Ogre {
         return GLformat;
     }
     //-----------------------------------------------------------------------------
-    PixelFormat GLES2PixelUtil::getClosestOGREFormat(GLenum format, GLenum dataType)
+    PixelFormat GLES2PixelUtil::getClosestOGREFormat(GLenum format)
     {
         switch(format)
         {

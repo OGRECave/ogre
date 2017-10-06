@@ -161,7 +161,7 @@ namespace Ogre {
             mDepth = depth;
 
         mGLInternalFormat = internalFormat;
-        mFormat = GLES2PixelUtil::getClosestOGREFormat(internalFormat, format);
+        mFormat = GLES2PixelUtil::getClosestOGREFormat(internalFormat);
 
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
@@ -812,7 +812,7 @@ namespace Ogre {
     //********* GLES2RenderBuffer
     //----------------------------------------------------------------------------- 
     GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
-    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, GL_RGBA), HBU_WRITE_ONLY)
+    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format), HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;
         mNumSamples = numSamples;
