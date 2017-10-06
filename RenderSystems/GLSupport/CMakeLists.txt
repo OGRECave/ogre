@@ -72,7 +72,7 @@ elseif (UNIX)
     set(NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/GLX)
     
-    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
+    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${OPENGL_gl_LIBRARY})
   endif()
   
   if(NOT OGRE_STATIC)
