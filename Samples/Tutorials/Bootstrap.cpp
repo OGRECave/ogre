@@ -10,9 +10,8 @@ public:
 };
 
 //! [constructor]
-MyTestApp::MyTestApp() : OgreBites::ApplicationContext("MyTestApp")
+MyTestApp::MyTestApp() : OgreBites::ApplicationContext("OgreTutorialApp")
 {
-    addInputListener(this);
 }
 //! [constructor]
 
@@ -32,6 +31,9 @@ void MyTestApp::setup(void)
 {
     // do not forget to call the base first
     OgreBites::ApplicationContext::setup();
+    
+    // register for input events
+    addInputListener(this);
 
     // get a pointer to the already created root
     Ogre::Root* root = getRoot();

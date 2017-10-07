@@ -1,6 +1,9 @@
 # Tutorials {#tutorials}
 
-- @subpage setup
+- Getting Started
+    - @subpage setup
+    - @subpage tut_FirstScene
+    - @subpage tut_LightsCamerasShadows
 - Components
     - @subpage rtss
     - @subpage hlms

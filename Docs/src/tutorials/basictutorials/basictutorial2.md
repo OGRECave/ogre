@@ -1,4 +1,4 @@
-# Basic Tutorial 2  - Lights, Cameras, and Shadows {#basictutorial2}
+# Lights, Cameras, and Shadows {#tut_LightsCamerasShadows}
 
 @tableofcontents
 
@@ -6,15 +6,7 @@ This tutorial will expand on the use of Lights in a scene and using them to cast
 
 The full source for this tutorial (BasicTutorial2.cpp) can be found in samples directory **Samples/Tutorials**.
 
-@note  Any problems you encounter during working with this tutorial should be posted in the [Help Forum](http://www.ogre3d.org/forums/viewforum.php?f=2).
-
-# Prerequisites {#bt2Prerequisites}
-
-This tutorial assumes that you already know how to set up an Ogre project and compile it successfully. If you need help with this, then read @ref setup. This tutorial is also part of the @ref basictutorials series and knowledge from the previous tutorials will be assumed.
-
-# Starting code {#bt2startingcode}
-
-We will be using starter files for this tutorials which are based on OgreBites::ApplicationContext. Plase refer to @ref basictutorial1 to get starter code.
+@note Refer to @ref setup for instructions how set up an Ogre project and compile it successfully.
 
 # The Ogre Camera Class {#bt2TheOgreCameraClass}
 A Camera is the object we use to view our scene. A Ogre::Camera is a special object that works similar to a
@@ -195,11 +187,6 @@ Ogre does not provide soft shadows as part of the engine. You can write your own
 This tutorial introduced the use of lights and shadows into the scene. To begin, we covered how to use the MeshManager to generate meshes from scratch. We then chose which shadow type Ogre should use. Finally, we begin adding an example of each type of Light to our scene. We created a spotlight, a directional light, and a point light. You can even extend Ogre's lighting and shadow systems by writing your own vertex and fragment programs. Refer to the Ogre Manual for more details.
 
 There are a lot of different settings we've covered that allow you to customize how Ogre renders light and shadow. After you've finished each tutorial, it is a good idea to play around with the new tools you have. This will greatly increase your comfort level working with the library, and it is an excellent way to learn how to navigate API documentation.
-
-# Next {#bt2Next}
-To be done.
-
-[//]: <> (TODO: make Tutorial 3 in manuals)
 
 
 
