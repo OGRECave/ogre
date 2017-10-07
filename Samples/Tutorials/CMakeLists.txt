@@ -14,12 +14,12 @@ file(COPY ${OGRE_CONFIG_DIR}/plugins.cfg ${OGRE_CONFIG_DIR}/resources.cfg
      DESTINATION ${CMAKE_BINARY_DIR})
 ## [discover_ogre]
 
-add_executable(starter TutorialApplication.cpp)
-target_link_libraries(starter ${OGRE_LIBRARIES})
+add_executable(0_Bootstrap Bootstrap.cpp)
+target_link_libraries(0_Bootstrap ${OGRE_LIBRARIES})
 
-add_executable(basic1 BasicTutorial1.cpp)
-target_link_libraries(basic1 ${OGRE_LIBRARIES})
+add_executable(1_FirstScene BasicTutorial1.cpp)
+target_link_libraries(1_FirstScene ${OGRE_LIBRARIES})
 
-add_executable(basic2 BasicTutorial2.cpp)
-target_link_libraries(basic2 ${OGRE_LIBRARIES})
+add_executable(2_CamerasAndShadows BasicTutorial2.cpp)
+target_link_libraries(2_CamerasAndShadows ${OGRE_LIBRARIES})
 

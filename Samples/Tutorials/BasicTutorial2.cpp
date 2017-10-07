@@ -55,7 +55,7 @@ public:
 
 
 TutorialApplication::TutorialApplication()
-    : ApplicationContext("Tutorial Application")
+    : ApplicationContext("OgreTutorialApp")
 {
 }
 

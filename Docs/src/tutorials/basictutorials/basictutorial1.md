@@ -1,18 +1,14 @@
-# Basic Tutorial 1  - Your First Scene {#basictutorial1}
+# Your First Scene {#tut_FirstScene}
 
 @tableofcontents
 
-This first tutorial will cover the basic elements of building a scene in Ogre. The primary focus will be the Ogre::SceneManager, Ogre::SceneNode, and Entity(external link). An Entity is anything represented by a mesh. A SceneNode is what attaches an object to your scene. Finally, the SceneManager is the object that organizes everything. It keeps track of the entities and nodes in your scene and determines how to display them.
+This first tutorial will cover the basic elements of building a scene in Ogre. The primary focus will be the Ogre::SceneManager, Ogre::SceneNode, and Entity(external link). An Ogre::Entity is anything represented by a mesh. A Ogre::SceneNode is what attaches an object to your scene. Finally, the SceneManager is the object that organizes everything. It keeps track of the entities and nodes in your scene and determines how to display them.
 
 We'll start with an explanation of some of the basic concepts in Ogre. Don't worry, this first tutorial has a little more explanation than the rest, but that changes very quickly once you get to the later tutorials. We will be building plenty of things. We just have to lay a little groundwork first, so you have somewhere to stand.
 
 The full source for this tutorial (BasicTutorial1.cpp) can be found in samples directory **Samples/Tutorials**.
 
-@note  Any problems you encounter during working with this tutorial should be posted in the [Help Forum](http://www.ogre3d.org/forums/viewforum.php?f=2).
-
-# Prerequisites {#Prerequisites}
-
-This tutorial assumes that you already know how to set up an Ogre project and compile it successfully. If you need help with this, then read @ref setup.
+@note Refer to @ref setup for instructions how set up an Ogre project and compile it successfully.
 
 # How Ogre Works {#howogreworks}
 We are going to provide a quick introduction to the basic elements of an Ogre scene.
@@ -29,24 +25,11 @@ SceneNodes carry information that is used for all of the objects that are attach
 
 SceneNodes can have more than one object attached to them. We may want to have a light that will follow a character around in a scene. To do this, we could attach both the character Entity and the light to the same SceneNode. This will cause them both to share the same location information. We can even attach SceneNodes to other SceneNodes. This is useful in many circumstances. Imagine you have a character and you want to attach a tool to their hand. You wouldn't want to attach the tool to SceneNode for the entire character. Instead, you could attach a SceneNode representing their hand to the character's main SceneNode, and then attach the tool Entity to that "child" SceneNode. more complicated uses of SceneNodes will be covered in later tutorials.
 
-One final thing to keep in mind about SceneNodes is that their position is **always** relative to their parent SceneNode and each SceneManager creates a root Node to which all other SceneNodes are attached.
+One final thing to keep in mind about SceneNodes is that their position is relative to their parent SceneNode and each SceneManager creates a root Node to which all other SceneNodes are attached.
 
 ## Entity {#Entity}
 
 An Entity is one type of object that you can render in your scene. It is anything that is represented by a 3D mesh. Even terrain objects are very large entities. Lights, Billboards, Particles, and Cameras are examples of scene elements that are not entities. Ogre uses a well-known design pattern that separates renderable objects from information like their location. This means that you don't directly place an Entity into your scene. Instead, you place a SceneNode into your scene, then attach your Entity to that SceneNode. The Entity is then rendered using information taken from the SceneNode.
-
-# Getting started with coding {#Gettingstartedwithcodding}
-
-We will be using starter files for this tutorials which are based on OgreBites::ApplicationContext.
-
-Here is **TutorialApplication.cpp**:
-@snippet Samples/Tutorials/TutorialApplication.cpp starter
-
-Starter file as well as complete source of this tutorial can be located in source directory **Samples/Tutorial**.
-
-As you may noticed we already put main() function into TutorialApplication.cpp file. Content of this function performs initialization, renedering and finalization of the application execution after user pressed Escape button.
-
-Let's get started!
 
 # Setting Up the Scene {#SettingUptheScene}
 
@@ -303,7 +286,3 @@ That covers all of the configuration files that Ogre manipulates directly. Ogre 
 You should now have a basic understanding of setting up an Ogre scene. This tutorial provided an introduction to three of the most important objects in Ogre: Ogre::Entity, Ogre::SceneNode, and Ogre::SceneManager. These objects allow us to render and manipulate a scene filled with 3D objects.
 
 An Ogre::Entity represents anything that has an Ogre mesh. A Ogre::SceneNode is used to hold properties like location, scale, and rotation. It is also the anchor that attaches your Entities to your scene and allows them to be rendered on screen. Finally, The Ogre::SceneManager is the object that orchestrates it all. It has methods that allow you to create Entities and SceneNodes and keep them organized within a complicated scene.
-
-# Next {#Next}
-@ref basictutorial2
-
