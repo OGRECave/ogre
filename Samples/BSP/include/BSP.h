@@ -44,6 +44,9 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
 
     void locateResources()
     {
+    	// Pick a new resource group so Q3Shader parser is correctly registered
+    	ResourceGroupManager::getSingleton().setWorldResourceGroupName("BSPWorld");
+
         // load the Quake archive location and map name from a config file
         ConfigFile cf;
         cf.load(mFSLayer->getConfigFilePath("quakemap.cfg"));
@@ -105,6 +108,7 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
         rgm.unloadResourceGroup(rgm.getWorldResourceGroupName());
         rgm.removeResourceLocation(mArchive, ResourceGroupManager::getSingleton().getWorldResourceGroupName());
+        rgm.setWorldResourceGroupName(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     void setupView()
