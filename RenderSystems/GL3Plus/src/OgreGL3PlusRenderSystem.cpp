@@ -422,6 +422,11 @@ namespace Ogre {
             rsc->setCapability(RSC_GLSL_SSO_REDECLARE);
         }
 
+        // Mesa 11.2 does not behave according to spec and throws a "gl_Position redefined"
+        if(rsc->getDeviceName().find("Mesa") != String::npos) {
+            rsc->unsetCapability(RSC_GLSL_SSO_REDECLARE);
+        }
+
         // Vertex/Fragment Programs
         rsc->setCapability(RSC_VERTEX_PROGRAM);
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
