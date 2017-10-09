@@ -139,7 +139,7 @@ namespace Ogre
 
         //Force the pool to contain only 1 entry.
         mSlotsPerPool   = 1u;
-        mBufferSize     = HlmsTerraDatablock::MaterialSizeInGpuAligned;
+        mBufferSize     = mBytesPerSlot;
 
         HlmsBufferManager::_changeRenderSystem( newRs );
 
