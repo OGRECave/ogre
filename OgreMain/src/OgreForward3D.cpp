@@ -430,8 +430,8 @@ namespace Ogre
         //The way ogre represents viewports is top = 0 bottom = 1. As a result if 'texture flipping' is required 
         //all is ok. However if it is not required then viewport offsets are actually represented from the bottom up.
         //As a result we need convert our veiwport height offsets to work bottom up instead of top down;
-        //This is compounded by DirectX standard being different to OpenGl
-        if ( !renderTarget->requiresTextureFlipping() && shaderProfile != "hlsl" )
+        //This is compounded by OpenGL standard being different to DirectX and Metal
+        if ( !renderTarget->requiresTextureFlipping() && shaderProfile == "glsl" )
         {
             viewportHeightOffset = static_cast<float>( (1.0 - (viewport->getTop() + viewport->getHeight()) )
                                                                               * renderTarget->getHeight() );
