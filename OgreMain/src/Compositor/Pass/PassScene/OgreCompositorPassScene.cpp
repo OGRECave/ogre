@@ -115,8 +115,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorPassScene::execute( const Camera *lodCamera )
     {
-        profilingBegin();
-
         //Execute a limited number of times?
         if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
         {
@@ -124,6 +122,8 @@ namespace Ogre
                 return;
             --mNumPassesLeft;
         }
+
+        profilingBegin();
 
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
