@@ -83,7 +83,6 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgrePatchMesh.h"
 #include "OgrePatchSurface.h"
-#include "OgreProfiler.h"
 #include "OgreRadixSort.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreRenderObjectListener.h"
