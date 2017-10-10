@@ -29,7 +29,7 @@
 		//passBuf.f3dGridHWW[slice].z = grid_width * lightsPerCell;
 		//uint sampleOffset = 0;
 		uint sampleOffset = offset +
-							uint(floor( (windowHeight - (inPs.gl_FragCoord.y - passBuf.f3dViewportOffset.y) * passBuf.f3dGridHWW[slice].y )) * passBuf.f3dGridHWW[slice].z) +
+							uint(floor( (windowHeight - (inPs.gl_FragCoord.y - passBuf.f3dViewportOffset.y)) * passBuf.f3dGridHWW[slice].y ) * passBuf.f3dGridHWW[slice].z) +
 							uint(floor( (inPs.gl_FragCoord.x - passBuf.f3dViewportOffset.x ) * passBuf.f3dGridHWW[slice].x ) * lightsPerCell);
 	@end @property( hlms_forwardplus != forward3d )
 		float f3dMinDistance	= passBuf.f3dData.x;
