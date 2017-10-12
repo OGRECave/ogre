@@ -948,6 +948,7 @@ namespace Ogre
         ID_SHADOW_NODE,
             ID_NUM_SPLITS,
             ID_PSSM_SPLIT_PADDING,
+            ID_PSSM_SPLIT_BLEND,
             ID_PSSM_LAMBDA,
             ID_SHADOW_MAP_TARGET_TYPE,
             ID_SHADOW_MAP_REPEAT,
