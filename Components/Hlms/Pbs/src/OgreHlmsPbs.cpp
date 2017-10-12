@@ -985,6 +985,8 @@ namespace Ogre
         int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
+        bool pssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;
+
         bool isShadowCastingPointLight = false;
 
         //mat4 viewProj;
@@ -1043,6 +1045,13 @@ namespace Ogre
 #endif
             //float pssmSplitPoints N times.
             mapSize += numPssmSplits * 4;
+
+            if( pssmBlend )
+            {
+                //float pssmBlendPoints N-1 times.
+                mapSize += ( numPssmSplits - 1 ) * 4;
+            }
+
             mapSize = alignToNextMultiple( mapSize, 16 );
 
             if( numShadowMapLights > 0 )
@@ -1282,7 +1291,17 @@ namespace Ogre
             for( int32 i=0; i<numPssmSplits; ++i )
                 *passBufferPtr++ = (*shadowNode->getPssmSplits(0))[i+1];
 
-            passBufferPtr += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
+            int32 numPssmBlends = 0;
+            if( pssmBlend )
+            {
+                numPssmBlends += numPssmSplits - 1;
+
+                //float pssmBlendPoints
+                for( int32 i=0; i<numPssmBlends; ++i )
+                    *passBufferPtr++ = (*shadowNode->getPssmBlends(0))[i];
+            }
+
+            passBufferPtr += alignToNextMultiple( numPssmSplits + numPssmBlends, 4 ) - ( numPssmSplits + numPssmBlends );
 
             if( numShadowMapLights > 0 )
             {

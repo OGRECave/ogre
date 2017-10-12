@@ -113,6 +113,7 @@ namespace Ogre
     const IdString HlmsBaseProp::NumShadowMapLights = IdString( "hlms_num_shadow_map_lights" );
     const IdString HlmsBaseProp::NumShadowMapTextures= IdString("hlms_num_shadow_map_textures" );
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
+    const IdString HlmsBaseProp::PssmBlend          = IdString( "hlms_pssm_blend" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
     const IdString HlmsBaseProp::ShadowCasterPoint  = IdString( "hlms_shadowcaster_point" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
@@ -279,6 +280,7 @@ namespace Ogre
         setProperty( HlmsBaseProp::BonesPerVertex, 4 );
 
         setProperty( HlmsBaseProp::PssmSplits, 3 );
+        setProperty( HlmsBaseProp::PssmBlend, 1 );
         setProperty( HlmsBaseProp::ShadowCaster, 0 );
 
         setProperty( HlmsBaseProp::LightsDirectional, 1 );
@@ -2200,6 +2202,12 @@ namespace Ogre
                 if( pssmSplits )
                     numPssmSplits = static_cast<int32>( pssmSplits->size() - 1 );
                 setProperty( HlmsBaseProp::PssmSplits, numPssmSplits );
+
+                bool pssmBlend = false;
+                const vector<Real>::type *pssmBlends = shadowNode->getPssmBlends( 0 );
+                if( pssmBlends )
+                    pssmBlend = pssmBlends->size() > 0;
+                setProperty( HlmsBaseProp::PssmBlend, pssmBlend );
 
                 const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
 

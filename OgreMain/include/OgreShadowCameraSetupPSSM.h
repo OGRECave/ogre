@@ -61,6 +61,7 @@ namespace Ogre
     protected:
         uint mSplitCount;
         SplitPointList mSplitPoints;
+        SplitPointList mSplitBlendPoints;
         Real mSplitPadding;
 
         mutable size_t mCurrentIteration;
@@ -75,16 +76,18 @@ namespace Ogre
         @param nearDist The near plane to use for the first split
         @param farDist The far plane to use for the last split
         @param lambda Factor to use to reduce the split size 
+        @param blend Factor to use to reduce the split seams
         */
-        void calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda = 0.95);
+        void calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda = 0.95, Real blend = 0.125);
 
         /** Manually configure a new splitting scheme.
         @param newSplitPoints A list which is splitCount + 1 entries long, containing the
             split points. The first value is the near point, the last value is the
             far point, and each value in between is both a far point of the previous
             split, and a near point for the next one.
+        @param blend Factor to use to reduce the split seams.
         */
-        void setSplitPoints(const SplitPointList& newSplitPoints);
+        void setSplitPoints(const SplitPointList& newSplitPoints, Real blend = 0.125);
 
         /** Set the LiSPSM optimal adjust factor for a given split (call after
             configuring splits).
@@ -111,6 +114,10 @@ namespace Ogre
         /// Returns the calculated split points.
         inline const SplitPointList& getSplitPoints() const
         { return mSplitPoints; }
+
+        /// Returns the calculated split blend points.
+        inline const SplitPointList& getSplitBlendPoints() const
+        { return mSplitBlendPoints; }
     };
     /** @} */
     /** @} */
