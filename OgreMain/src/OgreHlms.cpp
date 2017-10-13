@@ -2205,11 +2205,11 @@ namespace Ogre
                     numPssmSplits = static_cast<int32>( pssmSplits->size() - 1 );
                 setProperty( HlmsBaseProp::PssmSplits, numPssmSplits );
 
-                bool pssmBlend = false;
+                bool isPssmBlend = false;
                 const vector<Real>::type *pssmBlends = shadowNode->getPssmBlends( 0 );
                 if( pssmBlends )
-                    pssmBlend = pssmBlends->size() > 0;
-                setProperty( HlmsBaseProp::PssmBlend, pssmBlend );
+                    isPssmBlend = pssmBlends->size() > 0;
+                setProperty( HlmsBaseProp::PssmBlend, isPssmBlend );
 
                 bool isPssmFade = false;
                 const Real *pssmFade = shadowNode->getPssmFade( 0 );
