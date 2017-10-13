@@ -7266,6 +7266,8 @@ namespace Ogre{
         // No errors, create
         td->pssmLambda      = defaultParams.pssmLambda;
         td->splitPadding    = defaultParams.splitPadding;
+        td->splitBlend      = defaultParams.splitBlend;
+        td->splitFade       = defaultParams.splitFade;
         td->numSplits       = defaultParams.numSplits;
     }
     //-------------------------------------------------------------------------
@@ -7432,6 +7434,44 @@ namespace Ogre{
 
                         AbstractNodeList::const_iterator it0 = prop->values.begin();
                         if( !getReal( *it0, &defaultParams.splitPadding ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                            return;
+                        }
+                    }
+                    break;
+                case ID_PSSM_SPLIT_BLEND:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        }
+                        else if(prop->values.size() != 1)
+                        {
+                            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getReal( *it0, &defaultParams.splitBlend ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                            return;
+                        }
+                    }
+                    break;
+                case ID_PSSM_SPLIT_FADE:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        }
+                        else if(prop->values.size() != 1)
+                        {
+                            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getReal( *it0, &defaultParams.splitFade ) )
                         {
                             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
                             return;

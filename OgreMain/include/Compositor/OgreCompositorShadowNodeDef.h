@@ -69,6 +69,8 @@ namespace Ogre
         //PSSM params
         Real                pssmLambda;
         Real                splitPadding;
+        Real                splitBlend;
+        Real                splitFade;
         uint                numSplits;
 
     protected:
@@ -83,7 +85,7 @@ namespace Ogre
                 uvOffset( _uvOffset ), uvLength( _uvLength ),
                 arrayIdx( _arrayIdx ), mrtIndex( _mrtIndex ),
                 light(_light), split(_split), shadowMapTechnique(t),
-                pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),
+                pssmLambda( 0.95f ), splitPadding( 1.0f ), splitBlend( 0.125f ), splitFade( 0.313f ), numSplits( 3 ),
                 texName( texRefName ), texNameStr( texRefName ),
                 sharesSetupWith( -1 ) {}
 
