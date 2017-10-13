@@ -1253,6 +1253,27 @@ lambda will use exponential distribution, thus closer shadows will
 improve quality. A lower lambda will use a linear distribution, pushing
 the splits further, improving the quality of shadows in the distance.
 
+-   pssm\_split\_blend \<blend\>
+
+Only used by PSSM techniques. Value between 0 & 1. The default
+is 0.125; use 0 to disable it. PSSM's blend defines, in the closest N-1
+splits, the blend band size. E.g., a value of 0.1 means that the
+farthest 10% of the first split is blended with the second split (and
+so on for the other splits). A higher blend reduces visible seams
+between splits at a cost of a slightly less defined shadow. See
+[Blend between Cascades]
+(https://msdn.microsoft.com/en-us/library/windows/desktop/ee416307(v=vs.85).aspx)
+for additional info.
+
+-   pssm\_split\_fade \<fade\>
+
+Only used by PSSM techniques. Value between 0 & 1. The default
+is 0.313; use 0 to disable it. PSSM's fade defines how much of the last
+split will fade out. E.g., a value of 0.1 means that the farthest 10% of
+the last split will fade out. A higher fade makes the transition from
+shadowed to non shadowed areas (and viceversa) smoother at a cost of a
+less visible distant shadow.
+
 
 ```cpp
 shadow_map <number> <texture_name> light <lightIndex> [split <index>]
