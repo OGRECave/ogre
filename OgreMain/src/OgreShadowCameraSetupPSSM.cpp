@@ -44,13 +44,14 @@ namespace Ogre
     {
     }
     //---------------------------------------------------------------------
-    void PSSMShadowCameraSetup::calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda)
+    void PSSMShadowCameraSetup::calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda, Real blend, Real fade)
     {
         if (splitCount < 2)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot specify less than 2 splits", 
             "PSSMShadowCameraSetup::calculateSplitPoints");
 
         mSplitPoints.resize(splitCount + 1);
+        mSplitBlendPoints.resize(blend == 0.0f ? 0 : splitCount - 1);
         mSplitCount = splitCount;
 
         mSplitPoints[0] = nearDist;
@@ -61,18 +62,53 @@ namespace Ogre
                 (1.0f - lambda) * (nearDist + fraction * (farDist - nearDist));
 
             mSplitPoints[i] = splitPoint;
+
+            if (blend != 0.0f)
+            {
+                mSplitBlendPoints[i - 1] = Math::lerp(mSplitPoints[i], mSplitPoints[i - 1], blend);
+            }
         }
         mSplitPoints[splitCount] = farDist;
 
+        if (fade == 0.0f)
+        {
+            mSplitFadePoint = 0.0f;
+        }
+        else
+        {
+            mSplitFadePoint = Math::lerp(mSplitPoints[mSplitCount], mSplitPoints[mSplitCount - 1], fade);
+        }
     }
     //---------------------------------------------------------------------
-    void PSSMShadowCameraSetup::setSplitPoints(const SplitPointList& newSplitPoints)
+    void PSSMShadowCameraSetup::setSplitPoints(const SplitPointList& newSplitPoints, Real blend, Real fade)
     {
         if (newSplitPoints.size() < 3) // 3, not 2 since splits + 1 points
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot specify less than 2 splits", 
             "PSSMShadowCameraSetup::setSplitPoints");
         mSplitCount = static_cast<uint>(newSplitPoints.size() - 1);
         mSplitPoints = newSplitPoints;
+
+        if (blend == 0.0f)
+        {
+            mSplitBlendPoints.resize(0);
+        }
+        else
+        {
+            mSplitBlendPoints.resize(mSplitCount - 1);
+            for (size_t i = 1; i < mSplitCount; i++)
+            {
+                mSplitBlendPoints[i - 1] = Math::lerp(mSplitPoints[i], mSplitPoints[i - 1], blend);
+            }
+        }
+
+        if (fade == 0.0f)
+        {
+            mSplitFadePoint = 0.0f;
+        }
+        else
+        {
+            mSplitFadePoint = Math::lerp(mSplitPoints[mSplitCount], mSplitPoints[mSplitCount - 1], fade);
+        }
     }
     //---------------------------------------------------------------------
     void PSSMShadowCameraSetup::getShadowCamera( const Ogre::SceneManager *sm, const Ogre::Camera *cam,
