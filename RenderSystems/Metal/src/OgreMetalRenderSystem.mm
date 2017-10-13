@@ -176,7 +176,7 @@ namespace Ogre
 #if TARGET_OS_TV
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
 #endif
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
         //rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
