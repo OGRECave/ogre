@@ -104,6 +104,7 @@ namespace Ogre {
             mShadowCamDepthRangesDirty[i] = false;
         }
         mNullPssmSplitPoint.resize( 4, Real( 0.0f ) );
+        mNullPssmBlendPoint.resize( 2, Real( 0.0f ) );
     }
     //-----------------------------------------------------------------------------
     AutoParamDataSource::~AutoParamDataSource()
@@ -801,6 +802,42 @@ namespace Ogre {
         }
         
         return *retVal;
+    }
+    //-----------------------------------------------------------------------------
+    const vector<Real>::type& AutoParamDataSource::getPssmBlends( size_t shadowMapIdx ) const
+    {
+        vector<Real>::type const *retVal;
+        if( !mCurrentShadowNode )
+        {
+            retVal = &mNullPssmBlendPoint;
+        }
+        else
+        {
+            retVal = mCurrentShadowNode->getPssmBlends( shadowMapIdx );
+            if( !retVal )
+                retVal = &mNullPssmBlendPoint;
+        }
+        
+        return *retVal;
+    }
+    //-----------------------------------------------------------------------------
+    Real AutoParamDataSource::getPssmFade( size_t shadowMapIdx ) const
+    {
+        Real retVal;
+        if( !mCurrentShadowNode )
+        {
+            retVal = 0.0f;
+        }
+        else
+        {
+            const Real *pssmFade = mCurrentShadowNode->getPssmFade( shadowMapIdx );
+            if( !pssmFade )
+                retVal = 0.0f;
+            else
+                retVal = *pssmFade;
+        }
+        
+        return retVal;
     }
     //-----------------------------------------------------------------------------
     const RenderTarget* AutoParamDataSource::getCurrentRenderTarget(void) const

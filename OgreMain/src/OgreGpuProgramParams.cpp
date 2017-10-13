@@ -184,7 +184,9 @@ namespace Ogre
         AutoConstantDefinition(ACT_LOD_CAMERA_POSITION,               "lod_camera_position",              3, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,  "lod_camera_position_object_space", 3, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_LIGHT_CUSTOM,        "light_custom", 4, ET_REAL, ACDT_INT),
-        AutoConstantDefinition(ACT_PSSM_SPLITS,                   "pssm_splits",                  1, ET_REAL, ACDT_INT)
+        AutoConstantDefinition(ACT_PSSM_SPLITS,                   "pssm_splits",                  1, ET_REAL, ACDT_INT),
+        AutoConstantDefinition(ACT_PSSM_BLENDS,                   "pssm_blends",                  1, ET_REAL, ACDT_INT),
+        AutoConstantDefinition(ACT_PSSM_FADE,                     "pssm_fade",                    1, ET_REAL, ACDT_INT)
     };
 
     bool GpuNamedConstants::msGenerateAllConstantDefinitionArrayEntries = false;
@@ -1490,6 +1492,8 @@ namespace Ogre
         case ACT_SPOTLIGHT_VIEWPROJ_MATRIX:
         case ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY:
         case ACT_PSSM_SPLITS:
+        case ACT_PSSM_BLENDS:
+        case ACT_PSSM_FADE:
         case ACT_LIGHT_CUSTOM:
 
             return (uint16)GPV_LIGHTS;
@@ -2672,6 +2676,17 @@ namespace Ogre
                     {
                         const vector<Real>::type &pssmSplitPoints = source->getPssmSplits( i->data );
                         _writeRawConstants(i->physicalIndex, &pssmSplitPoints[1], pssmSplitPoints.size()-1);
+                    }
+                    break;
+                case ACT_PSSM_BLENDS:
+                    {
+                        const vector<Real>::type &pssmBlendPoints = source->getPssmBlends( i->data );
+                        _writeRawConstants(i->physicalIndex, &pssmBlendPoints[0], pssmBlendPoints.size()-1);
+                    }
+                    break;
+                case ACT_PSSM_FADE:
+                    {
+                        _writeRawConstant(i->physicalIndex, source->getPssmFade( i->data ));
                     }
                     break;
                 case ACT_LIGHT_POSITION_OBJECT_SPACE:
