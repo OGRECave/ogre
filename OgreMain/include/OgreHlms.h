@@ -694,6 +694,8 @@ namespace Ogre
         static const IdString NumShadowMapLights;
         static const IdString NumShadowMapTextures;
         static const IdString PssmSplits;
+        static const IdString PssmBlend;
+        static const IdString PssmFade;
         static const IdString ShadowCaster;
         static const IdString ShadowCasterPoint;
         static const IdString ShadowUsesDepthTexture;
