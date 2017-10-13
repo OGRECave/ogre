@@ -257,6 +257,16 @@ namespace Ogre
         */
         const vector<Real>::type* getPssmBlends( size_t shadowMapIdx ) const;
 
+        /** Returns the fade point of the last PSSM split in projection space
+            for the given shadow map index.
+        @remarks
+            @see getPssmSplits
+        @return
+            The fade point.
+            Returns null if shadowMapIdx is out of bounds, or is not a PSSM technique.
+        */
+        const Real* getPssmFade( size_t shadowMapIdx ) const;
+
         /** The return value may change in the future, which happens when the number of lights
             changes to or from a value lower than the supported shadow casting lights by the
             definition.

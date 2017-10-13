@@ -292,7 +292,6 @@
 			@end
 		}
 		@foreach( hlms_pssm_splits, n, 1 )
-		@sub( hlms_pssm_splits_minus_one, hlms_pssm_splits, 1 )
 		else if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
 		{
 			fShadow = getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
@@ -309,6 +308,13 @@
 					fShadow = lerp( fShadow, fShadowBlend,
 									(inPs.depth - passBuf.pssmBlendPoints@value(CurrentShadowMapBlend)) /
 									(passBuf.pssmSplitPoints@value(CurrentShadowMapBlend) - passBuf.pssmBlendPoints@counter(CurrentShadowMapBlend)) );
+				}
+			@end @property( hlms_pssm_fade && @n == hlms_pssm_splits_minus_one )
+				if( inPs.depth > passBuf.pssmFadePoint )
+				{
+					fShadow = lerp( fShadow, 1.0,
+									(inPs.depth - passBuf.pssmFadePoint) /
+									(passBuf.pssmSplitPoints@value(hlms_pssm_splits_minus_one) - passBuf.pssmFadePoint) );
 				}
 			@end
 			@property( debug_pssm_splits )

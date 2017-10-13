@@ -986,6 +986,7 @@ namespace Ogre
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
         bool pssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;
+        bool isPssmFade = getProperty( HlmsBaseProp::PssmFade ) != 0;
 
         bool isShadowCastingPointLight = false;
 
@@ -1050,6 +1051,11 @@ namespace Ogre
             {
                 //float pssmBlendPoints N-1 times.
                 mapSize += ( numPssmSplits - 1 ) * 4;
+            }
+            if( isPssmFade )
+            {
+                //float pssmFadePoint.
+                mapSize += 4;
             }
 
             mapSize = alignToNextMultiple( mapSize, 16 );
@@ -1291,17 +1297,24 @@ namespace Ogre
             for( int32 i=0; i<numPssmSplits; ++i )
                 *passBufferPtr++ = (*shadowNode->getPssmSplits(0))[i+1];
 
-            int32 numPssmBlends = 0;
+            int32 numPssmBlendsAndFade = 0;
             if( pssmBlend )
             {
-                numPssmBlends += numPssmSplits - 1;
+                numPssmBlendsAndFade += numPssmSplits - 1;
 
                 //float pssmBlendPoints
-                for( int32 i=0; i<numPssmBlends; ++i )
+                for( int32 i=0; i<numPssmBlendsAndFade; ++i )
                     *passBufferPtr++ = (*shadowNode->getPssmBlends(0))[i];
             }
+            if( isPssmFade )
+            {
+                numPssmBlendsAndFade += 1;
 
-            passBufferPtr += alignToNextMultiple( numPssmSplits + numPssmBlends, 4 ) - ( numPssmSplits + numPssmBlends );
+                //float pssmFadePoint
+                *passBufferPtr++ = *shadowNode->getPssmFade(0);
+            }
+
+            passBufferPtr += alignToNextMultiple( numPssmSplits + numPssmBlendsAndFade, 4 ) - ( numPssmSplits + numPssmBlendsAndFade );
 
             if( numShadowMapLights > 0 )
             {

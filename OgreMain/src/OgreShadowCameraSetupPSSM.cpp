@@ -44,7 +44,7 @@ namespace Ogre
     {
     }
     //---------------------------------------------------------------------
-    void PSSMShadowCameraSetup::calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda, Real blend)
+    void PSSMShadowCameraSetup::calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda, Real blend, Real fade)
     {
         if (splitCount < 2)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot specify less than 2 splits", 
@@ -70,9 +70,17 @@ namespace Ogre
         }
         mSplitPoints[splitCount] = farDist;
 
+        if (fade == 0.0f)
+        {
+            mSplitFadePoint = 0.0f;
+        }
+        else
+        {
+            mSplitFadePoint = Math::lerp(mSplitPoints[mSplitCount], mSplitPoints[mSplitCount - 1], fade);
+        }
     }
     //---------------------------------------------------------------------
-    void PSSMShadowCameraSetup::setSplitPoints(const SplitPointList& newSplitPoints, Real blend)
+    void PSSMShadowCameraSetup::setSplitPoints(const SplitPointList& newSplitPoints, Real blend, Real fade)
     {
         if (newSplitPoints.size() < 3) // 3, not 2 since splits + 1 points
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot specify less than 2 splits", 
@@ -91,6 +99,15 @@ namespace Ogre
             {
                 mSplitBlendPoints[i - 1] = Math::lerp(mSplitPoints[i], mSplitPoints[i - 1], blend);
             }
+        }
+
+        if (fade == 0.0f)
+        {
+            mSplitFadePoint = 0.0f;
+        }
+        else
+        {
+            mSplitFadePoint = Math::lerp(mSplitPoints[mSplitCount], mSplitPoints[mSplitCount - 1], fade);
         }
     }
     //---------------------------------------------------------------------
