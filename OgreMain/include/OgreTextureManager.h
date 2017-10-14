@@ -444,6 +444,9 @@ namespace Ogre {
             return mDefaultNumMipmaps;
         }
 
+        /// Internal method to create a warning texture (bound when a texture unit is blank)
+        const TexturePtr& _getWarningTexture();
+
         /// @copydoc Singleton::getSingleton()
         static TextureManager& getSingleton(void);
         /// @copydoc Singleton::getSingleton()
@@ -454,6 +457,7 @@ namespace Ogre {
         ushort mPreferredIntegerBitDepth;
         ushort mPreferredFloatBitDepth;
         uint32 mDefaultNumMipmaps;
+        TexturePtr mWarningTexture;
     };
     /** @} */
     /** @} */

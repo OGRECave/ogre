@@ -812,31 +812,22 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GLES2TexturePtr tex = static_pointer_cast<GLES2Texture>(texPtr);
-
         if (!mStateCacheManager->activateGLTextureUnit(stage))
             return;
 
         if (enabled)
         {
-            mCurTexMipCount = 0;
-            GLuint texID =  0;
-            if (tex)
-            {
-                // Note used
-                tex->touch();
-                mTextureTypes[stage] = tex->getGLES2TextureTarget();
-                texID = tex->getGLID();
-                mCurTexMipCount = tex->getNumMipmaps();
-            }
-            else
-            {
-                // Assume 2D
-                mTextureTypes[stage] = GL_TEXTURE_2D;
-                texID = static_cast<GLES2TextureManager*>(mTextureManager)->getWarningTextureID();
-            }
+            GLES2TexturePtr tex = static_pointer_cast<GLES2Texture>(
+                texPtr ? texPtr : mTextureManager->_getWarningTexture());
 
-            mStateCacheManager->bindGLTexture(mTextureTypes[stage], texID);
+            mCurTexMipCount = 0;
+
+            // Note used
+            tex->touch();
+            mTextureTypes[stage] = tex->getGLES2TextureTarget();
+            mCurTexMipCount = tex->getNumMipmaps();
+
+            mStateCacheManager->bindGLTexture(mTextureTypes[stage], tex->getGLID());
         }
         else
         {
@@ -1834,7 +1825,6 @@ namespace Ogre {
     void GLES2RenderSystem::_oneTimeContextInitialization()
     {
         mStateCacheManager->setDisabled(GL_DITHER);
-        static_cast<GLES2TextureManager*>(mTextureManager)->createWarningTexture();
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         // Enable primitive restarting with fixed indices depending upon the data type

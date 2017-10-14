@@ -885,31 +885,19 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GL3PlusTexturePtr tex = static_pointer_cast<GL3PlusTexture>(texPtr);
-
         if (!mStateCacheManager->activateGLTextureUnit(stage))
             return;
 
         if (enabled)
         {
-            if (tex)
-            {
-                // Note used
-                tex->touch();
-                mTextureTypes[stage] = tex->getGL3PlusTextureTarget();
-            }
-            else
-                // Assume 2D.
-                mTextureTypes[stage] = GL_TEXTURE_2D;
+            GL3PlusTexturePtr tex = static_pointer_cast<GL3PlusTexture>(
+                texPtr ? texPtr : mTextureManager->_getWarningTexture());
 
-            if (tex)
-            {
-                mStateCacheManager->bindGLTexture( mTextureTypes[stage], tex->getGLID() );
-            }
-            else
-            {
-                mStateCacheManager->bindGLTexture( mTextureTypes[stage], static_cast<GL3PlusTextureManager*>(mTextureManager)->getWarningTextureID() );
-            }
+            // Note used
+            tex->touch();
+            mTextureTypes[stage] = tex->getGL3PlusTextureTarget();
+
+            mStateCacheManager->bindGLTexture( mTextureTypes[stage], tex->getGLID() );
         }
         else
         {
