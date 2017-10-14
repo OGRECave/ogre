@@ -37,10 +37,14 @@ to handle input events, we then override the according method
 
 the interesting part however is the setup method
 @snippet Samples/Tutorials/Bootstrap.cpp setup
+@note The above code is explained in detail in @ref tut_FirstScene.
 
 finally we start everything as
 @snippet Samples/Tutorials/Bootstrap.cpp main
-@note you can find the full code in `Samples/Tutorials/Bootstrap.cpp`. For a more detailed walk-through of the code above see @ref tut_FirstScene.
+@note You can find the full code of the above example at 
+* `Samples/Tutorials/Bootstrap.cpp` for C++
+* `Samples/Python/bites_sample.py` for Python
+* `Samples/AndroidJNI/MainActivity.java` for Java (Android)
 
 OgreBites itself is also a good starting point if you need more control over the Camera or the Window creation.
 For instance to render into an existing Qt Window.
