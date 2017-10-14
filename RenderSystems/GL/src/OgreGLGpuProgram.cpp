@@ -34,9 +34,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-static GLenum getGLShaderType(GpuProgramType programType)
+GLenum GLArbGpuProgram::getProgramType() const
 {
-    switch (programType)
+    switch (mType)
     {
         case GPT_VERTEX_PROGRAM:
         default:
@@ -115,27 +115,21 @@ GLArbGpuProgram::~GLArbGpuProgram()
     unload(); 
 }
 
-void GLArbGpuProgram::setType(GpuProgramType t)
-{
-    GLGpuProgram::setType(t);
-    mProgramType = getGLShaderType(t);
-}
-
 void GLArbGpuProgram::bindProgram(void)
 {
-    glEnable(mProgramType);
-    glBindProgramARB(mProgramType, mProgramID);
+    glEnable(getProgramType());
+    glBindProgramARB(getProgramType(), mProgramID);
 }
 
 void GLArbGpuProgram::unbindProgram(void)
 {
-    glBindProgramARB(mProgramType, 0);
-    glDisable(mProgramType);
+    glBindProgramARB(getProgramType(), 0);
+    glDisable(getProgramType());
 }
 
 void GLArbGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
 {
-    GLenum type = getGLShaderType(mType);
+    GLenum type = getProgramType();
     
     // only supports float constants
     GpuLogicalBufferStructPtr floatStruct = params->getFloatLogicalBufferStruct();
@@ -162,7 +156,7 @@ void GLArbGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSha
 {
     if (params->hasPassIterationNumber())
     {
-        GLenum type = getGLShaderType(mType);
+        GLenum type = getProgramType();
 
         size_t physicalIndex = params->getPassIterationNumberIndex();
         size_t logicalIndex = params->getFloatLogicalIndexForPhysicalIndex(physicalIndex);
@@ -183,8 +177,8 @@ void GLArbGpuProgram::loadFromSource(void)
         LogManager::getSingleton().logMessage("Invalid Operation before loading program "+mName, LML_CRITICAL);
 
     }
-    glBindProgramARB(mProgramType, mProgramID);
-    glProgramStringARB(mProgramType, GL_PROGRAM_FORMAT_ASCII_ARB, (GLsizei)mSource.length(), mSource.c_str());
+    glBindProgramARB(getProgramType(), mProgramID);
+    glProgramStringARB(getProgramType(), GL_PROGRAM_FORMAT_ASCII_ARB, (GLsizei)mSource.length(), mSource.c_str());
 
     if (GL_INVALID_OPERATION == glGetError())
     {
@@ -197,7 +191,7 @@ void GLArbGpuProgram::loadFromSource(void)
             "Cannot load GL vertex program " + mName + 
             ".  Line " + errPosStr + ":\n" + errStr, mName);
     }
-    glBindProgramARB(mProgramType, 0);
+    glBindProgramARB(getProgramType(), 0);
 }
 
     

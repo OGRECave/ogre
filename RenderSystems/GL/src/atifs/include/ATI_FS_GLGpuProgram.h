@@ -63,6 +63,7 @@ namespace Ogre {
         /// @copydoc Resource::unload
         void unloadImpl(void);
         void loadFromSource(void);
+        GLenum mProgramType;
 
     }; // class ATI_FS_GLGpuProgram
 

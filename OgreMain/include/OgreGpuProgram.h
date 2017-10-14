@@ -218,28 +218,28 @@ namespace Ogre {
         @remarks
         Setting this will have no effect until you (re)load the program.
     */
-    virtual void setSourceFile(const String& filename);
+    void setSourceFile(const String& filename);
 
     /** Sets the source assembly for this program from an in-memory string.
         @remarks
         Setting this will have no effect until you (re)load the program.
     */
-    virtual void setSource(const String& source);
+    void setSource(const String& source);
 
     /** Gets the syntax code for this program e.g. arbvp1, fp20, vs_1_1 etc */
-    virtual const String& getSyntaxCode(void) const { return mSyntaxCode; }
+    const String& getSyntaxCode(void) const { return mSyntaxCode; }
 
     /** Sets the syntax code for this program e.g. arbvp1, fp20, vs_1_1 etc */
-    virtual void setSyntaxCode(const String& syntax);
+    void setSyntaxCode(const String& syntax);
 
     /** Gets the name of the file used as source for this program. */
-    virtual const String& getSourceFile(void) const { return mFilename; }
+    const String& getSourceFile(void) const { return mFilename; }
     /** Gets the assembler source for this program. */
-    virtual const String& getSource(void) const { return mSource; }
+    const String& getSource(void) const { return mSource; }
     /// Set the program type (only valid before load)
-    virtual void setType(GpuProgramType t);
+    void setType(GpuProgramType t);
     /// Get the program type
-    virtual GpuProgramType getType(void) const { return mType; }
+    GpuProgramType getType(void) const { return mType; }
 
     /** Returns the GpuProgram which should be bound to the pipeline.
         @remarks
@@ -403,7 +403,7 @@ namespace Ogre {
         to use the named parameters from the original high-level source.
         @see setManualNamedConstantsFile
     */
-    virtual void setManualNamedConstants(const GpuNamedConstants& namedConstants);
+    void setManualNamedConstants(const GpuNamedConstants& namedConstants);
 
     /** Specifies the name of a file from which to load named parameters mapping
         for a program which would not be able to derive named parameters itself.
@@ -415,12 +415,12 @@ namespace Ogre {
         program for the named file from which to load parameter names from.
         The file must be in the format produced by GpuNamedConstants::save.
     */
-    virtual void setManualNamedConstantsFile(const String& paramDefFile);
+    void setManualNamedConstantsFile(const String& paramDefFile);
 
     /** Gets the name of a file from which to load named parameters mapping
         for a program which would not be able to derive named parameters itself.
     */
-    virtual const String& getManualNamedConstantsFile() const { return mManualNamedConstantsFile; }
+    const String& getManualNamedConstantsFile() const { return mManualNamedConstantsFile; }
     /** Get the full list of named constants.
         @note
         Only available if this parameters object has named parameters, which means either
