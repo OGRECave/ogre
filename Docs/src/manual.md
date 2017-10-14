@@ -105,11 +105,11 @@ You’ll notice that scattered around the edge are a number of plugins. OGRE is 
 
 The Ogre::Root object is the entry point to the OGRE system. This object MUST be the first one to be created, and the last one to be destroyed. In the example applications I chose to make an instance of Root a member of my application object which ensured that it was created as soon as my application object was, and deleted when the application object was deleted.
 
-The root object lets you configure the system, for example through the showConfigDialog() method which is an extremely handy method which performs all render system options detection and shows a dialog for the user to customise resolution, colour depth, full screen options etc. It also sets the options the user selects so that you can initialise the system directly afterwards.
+The root object lets you configure the system, for example through the Ogre::Root::showConfigDialog method which is an extremely handy method which performs all render system options detection and shows a dialog for the user to customise resolution, colour depth, full screen options etc. It also sets the options the user selects so that you can initialise the system directly afterwards.
 
 The root object is also your method for obtaining pointers to other objects in the system, such as the Ogre::SceneManager, Ogre::RenderSystem and various other resource managers. See below for details.
 
-Finally, if you run OGRE in continuous rendering mode, i.e. you want to always refresh all the rendering targets as fast as possible (the norm for games and demos, but not for windowed utilities), the root object has a method called startRendering, which when called will enter a continuous rendering loop which will only end when all rendering windows are closed, or any Ogre::FrameListener objects indicate that they want to stop the cycle (see below for details of Ogre::FrameListener objects).
+Finally, if you run OGRE in continuous rendering mode, i.e. you want to always refresh all the rendering targets as fast as possible (the norm for games and demos, but not for windowed utilities), the root object has a method called Ogre::Root::startRendering, which when called will enter a continuous rendering loop which will only end when all rendering windows are closed, or any Ogre::FrameListener objects indicate that they want to stop the cycle (see below for details of Ogre::FrameListener objects).
 
 # The RenderSystem object {#The-RenderSystem-object}
 
