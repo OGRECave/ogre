@@ -257,6 +257,8 @@ ADD_REPR(ColourValue)
     %include "OgreParticleEmitter.h"
         %include "OgreParticleEmitterFactory.h"
     %template(ResourcePtr) Ogre::SharedPtr<Ogre::Resource>;
+    %ignore Ogre::Resource::setManuallyLoaded;
+    %ignore Ogre::Resource::setToLoaded;
     %include "OgreResource.h"
         %template(TexturePtr) Ogre::SharedPtr<Ogre::Texture>;
         %include "OgreTexture.h"

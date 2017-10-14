@@ -306,8 +306,9 @@ namespace Ogre {
         }
 
         /** Set "Is this resource manually loaded?"
+        @deprecated do not use
         */
-        virtual void setManuallyLoaded(bool isManual)
+        OGRE_DEPRECATED virtual void setManuallyLoaded(bool isManual)
         {
             mIsManual = isManual;
         }
@@ -358,8 +359,9 @@ namespace Ogre {
         }
 
         /** Change the Resource loading state to loaded.
+        @deprecated do not use
         */
-        virtual void setToLoaded(void) 
+        OGRE_DEPRECATED virtual void setToLoaded(void)
         { 
             // No lock required to read this state since no modify
             mLoadingState.store(LOADSTATE_LOADED);
@@ -438,16 +440,16 @@ namespace Ogre {
         virtual void changeGroupOwnership(const String& newGroup);
 
         /// Gets the manager which created this resource
-        virtual ResourceManager* getCreator(void) { return mCreator; }
+        ResourceManager* getCreator(void) { return mCreator; }
         /** Get the origin of this resource, e.g. a script file name.
         @remarks
             This property will only contain something if the creator of
             this resource chose to populate it. Script loaders are advised
             to populate it.
         */
-        virtual const String& getOrigin(void) const { return mOrigin; }
+        const String& getOrigin(void) const { return mOrigin; }
         /// Notify this resource of it's origin
-        virtual void _notifyOrigin(const String& origin) { mOrigin = origin; }
+        void _notifyOrigin(const String& origin) { mOrigin = origin; }
 
         /** Returns the number of times this resource has changed state, which 
             generally means the number of times it has been loaded. Objects that 
@@ -474,7 +476,7 @@ namespace Ogre {
             yourself.
             @param wasBackgroundLoaded Whether this was a background loaded event
         */
-        virtual void _fireLoadingComplete(bool wasBackgroundLoaded);
+        void _fireLoadingComplete(bool wasBackgroundLoaded);
 
         /** Firing of preparing complete event
         @remarks
@@ -484,7 +486,7 @@ namespace Ogre {
             yourself.
             @param wasBackgroundLoaded Whether this was a background loaded event
         */
-        virtual void _firePreparingComplete(bool wasBackgroundLoaded);
+        void _firePreparingComplete(bool wasBackgroundLoaded);
 
         /** Firing of unloading complete event
         @remarks
@@ -493,7 +495,7 @@ namespace Ogre {
         If you use Ogre's built in frame loop you don't need to call this
         yourself.
         */
-        virtual void _fireUnloadingComplete(void);
+        void _fireUnloadingComplete(void);
 
         /** Calculate the size of a resource; this will only be called after 'load' */
         virtual size_t calculateSize(void) const;
