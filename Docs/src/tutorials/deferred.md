@@ -7,7 +7,7 @@ This wiki article is complementary to the deferred shading demo that is part of 
 Deferred shading is an alternative approach to rendering 3d scenes. The classic rendering approach involves rendering each object and applying lighting passes to it. So, if an ogre head is affected by 6 lights, it will be rendered 6 times, once for each light, in order to accumulate the affection of each light.
 Deferred shading takes another approach : In the beginning, all of the objects render their "lighting related info" to a texture, often called the G-Buffer. This means their colours, normals, depths and any other info that might be relevant to calculating their final colour. Afterwards, the lights in the scene are rendered as geometry (sphere for point light, cone for spotlight and full screen quad for directional light), and they use the G-buffer to calculate the colour contribution of that light to that pixel.
 
-See the links in [Further Reading section](#further) to read more about it. It is recommended to understand deferred shading before reading this article, as the article focuses on implementing it in ogre, and not explaining how it works.
+See the links in @ref further to read more about it. It is recommended to understand deferred shading before reading this article, as the article focuses on implementing it in ogre, and not explaining how it works.
 
 ## Deferred Shading Advantages
 The main reason for using deferred shading is performance related. Classing rendering (also called forward rendering) can, in the worst case, require num_objects * num_lights batches to render a scene. Deferred shading changes that to num_objects + num_lights, which can often be a lot less.

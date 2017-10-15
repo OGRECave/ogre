@@ -19,9 +19,9 @@ fragment_program myCgFragmentProgram cg
 }
 ```
 
-There are a few differences between this and the assembler program - to begin with, we declare that the fragment program is of type ’cg’ rather than ’asm’, which indicates that it’s a high-level program using Cg. The ’source’ parameter is the same, except this time it’s referencing a Cg source file instead of a file of assembler.  Here is where things start to change. Firstly, we need to define an ’entry\_point’, which is the name of a function in the Cg program which will be the first one called as part of the fragment program. Unlike assembler programs, which just run top-to-bottom, Cg programs can include multiple functions and as such you must specify the one which start the ball rolling. Next, instead of a fixed ’syntax’ parameter, you specify one or more ’profiles’; profiles are how Cg compiles a program down to the low-level assembler. The profiles have the same names as the assembler syntax codes mentioned above; the main difference is that you can list more than one, thus allowing the program to be compiled down to more low-level syntaxes so you can write a single high-level program which runs on both D3D and GL. You are advised to just enter the simplest profiles under which your programs can be compiled in order to give it the maximum compatibility. The ordering also matters; if a card supports more than one syntax then the one listed first will be used.
+There are a few differences between this and the assembler program - to begin with, we declare that the fragment program is of type `cg` rather than `asm`, which indicates that it’s a high-level program using Cg. The `source` parameter is the same, except this time it’s referencing a Cg source file instead of a file of assembler.  Here is where things start to change. Firstly, we need to define an `entry_point`, which is the name of a function in the Cg program which will be the first one called as part of the fragment program. Unlike assembler programs, which just run top-to-bottom, Cg programs can include multiple functions and as such you must specify the one which start the ball rolling. Next, instead of a fixed `syntax` parameter, you specify one or more `profiles`; profiles are how Cg compiles a program down to the low-level assembler. The profiles have the same names as the assembler syntax codes mentioned above; the main difference is that you can list more than one, thus allowing the program to be compiled down to more low-level syntaxes so you can write a single high-level program which runs on both D3D and GL. You are advised to just enter the simplest profiles under which your programs can be compiled in order to give it the maximum compatibility. The ordering also matters; if a card supports more than one syntax then the one listed first will be used.
 
-Lastly, there is a final option called ’compile\_arguments’, where you can specify arguments exactly as you would to the cgc command-line compiler, should you wish to.
+Lastly, there is a final option called `compile_arguments`, where you can specify arguments exactly as you would to the cgc command-line compiler, should you wish to.
 
 # DirectX9 HLSL {#HLSL}
 
@@ -36,11 +36,11 @@ vertex_program myHLSLVertexProgram hlsl
 }
 ```
 
-As you can see, the main syntax is almost identical, except that instead of ’profiles’ with a list of assembler formats, you have a ’target’ parameter which allows a single assembler target to be specified - obviously this has to be a DirectX assembler format syntax code.
+As you can see, the main syntax is almost identical, except that instead of `profiles` with a list of assembler formats, you have a `target` parameter which allows a single assembler target to be specified - obviously this has to be a DirectX assembler format syntax code.
 
 **Important Matrix Ordering Note:** One thing to bear in mind is that HLSL allows you to use 2 different ways to multiply a vector by a matrix - mul(v,m) or mul(m,v). The only difference between them is that the matrix is effectively transposed. You should use mul(m,v) with the matrices passed in from Ogre - this agrees with the shaders produced from tools like RenderMonkey, and is consistent with Cg too, but disagrees with the Dx9 SDK and FX Composer which use mul(v,m) - you will have to switch the parameters to mul() in those shaders.
 
-Note that if you use the float3x4 / matrix3x4 type in your shader, bound to an OGRE auto-definition (such as bone matrices) you should use the column\_major\_matrices = false option (discussed below) in your program definition. This is because OGRE passes float3x4 as row-major to save constant space (3 float4’s rather than 4 float4’s with only the top 3 values used) and this tells OGRE to pass all matrices like this, so that you can use mul(m,v) consistently for all calculations. OGRE will also to tell the shader to compile in row-major form (you don’t have to set the /Zpr compile option or \#pragma pack(row-major) option, OGRE does this for you). Note that passing bones in float4x3 form is not supported by OGRE, but you don’t need it given the above.
+Note that if you use the float3x4 / matrix3x4 type in your shader, bound to an OGRE auto-definition (such as bone matrices) you should use the `column_major_matrices = false` option (discussed below) in your program definition. This is because OGRE passes float3x4 as row-major to save constant space (3 float4’s rather than 4 float4’s with only the top 3 values used) and this tells OGRE to pass all matrices like this, so that you can use mul(m,v) consistently for all calculations. OGRE will also to tell the shader to compile in row-major form (you don’t have to set the /Zpr compile option or \#pragma pack(row-major) option, OGRE does this for you). Note that passing bones in float4x3 form is not supported by OGRE, but you don’t need it given the above.
 
 **Advanced options**<br>
 
@@ -71,7 +71,7 @@ vertex_program myGLSLVertexProgram glsl
 }
 ```
 
-In GLSL, no entry point needs to be defined since it is always ’main()’ and there is no target definition since GLSL source is compiled into native GPU code and not intermediate assembly. 
+In GLSL, no entry point needs to be defined since it is always `main()` and there is no target definition since GLSL source is compiled into native GPU code and not intermediate assembly. 
 
 GLSL supports the use of modular shaders. This means you can write GLSL external functions that can be used in multiple shaders.
 
@@ -99,11 +99,11 @@ vertex_program myGLSLVertexProgram2 glsl
 }
 ```
 
-External GLSL functions are attached to the program that needs them by using ’attach’ and including the names of all external programs required on the same line separated by spaces. This can be done for both vertex and fragment programs.
+External GLSL functions are attached to the program that needs them by using `attach` and including the names of all external programs required on the same line separated by spaces. This can be done for both vertex and fragment programs.
 
 ## GLSL Texture Samplers {#GLSL-Texture-Samplers}
 
-To pass texture unit index values from the material script to texture samplers in glsl use ’int’ type named parameters. See the example below:<br>
+To pass texture unit index values from the material script to texture samplers in glsl use `int` type named parameters. See the example below:<br>
 
 excerpt from GLSL example.frag source:
 
@@ -183,11 +183,15 @@ material exampleGLSLmatrixUniforms
 
 GLSL can access most of the GL states directly so you do not need to pass these states through [param\_named\_auto](#param_005fnamed_005fauto) in the material script. This includes lights, material state, and all the matrices used in the openGL state i.e. model view matrix, worldview projection matrix etc. 
 
+@note this is only possible with OpenGL legacy profiles i.e. **not** with GL3+.
+
 ## Binding vertex attributes {#Binding-vertex-attributes}
 
-GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. gl\_Vertex, gl\_Normal, gl\_MultiTexCoord0 etc). However, there are some which are not automatically bound, which must be declared in the shader using the ’attribute &lt;type&gt; &lt;name&gt;’ syntax, and the vertex data bound to it by Ogre. 
+GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. `gl_Vertex`, `gl_Normal`, `gl_MultiTexCoord0` etc). However, there are some which are not automatically bound, which must be declared in the shader using the `attribute &lt;type&gt; &lt;name&gt;` syntax, and the vertex data bound to it by Ogre. 
 
-In addition to the built in attributes described in section 7.3 of the GLSL manual, Ogre supports a number of automatically bound custom vertex attributes. There are some drivers that do not behave correctly when mixing built-in vertex attributes like gl\_Normal and custom vertex attributes, so for maximum compatibility you may well wish to use all custom attributes in shaders where you need at least one (e.g. for skeletal animation).
+@note again this is only possible with OpenGL legacy profiles i.e. **not** with GL3+.
+
+In addition to the built in attributes described in section 7.3 of the GLSL manual, Ogre supports a number of automatically bound custom vertex attributes. There are some drivers that do not behave correctly when mixing built-in vertex attributes like `gl_Normal` and custom vertex attributes, so for maximum compatibility you should use all custom attributes
 
 <dl compact="compact">
 <dt>vertex</dt> <dd>
@@ -425,9 +429,9 @@ material SupportHLSLandGLSLwithUnified
 
 At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what’s supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked fro fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
 
-# Using Vertex/Geometry/Fragment Programs in a Pass {#Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass}
+# Using GPU Programs in a Pass {#Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass}
 
-Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (See [Declaring Vertex/Geometry/Fragment Programs](@ref Declaring-Vertex_002fGeometry_002fFragment-Programs)). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.
+Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (See @ref Declaring-Vertex_002fGeometry_002fFragment-Programs). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.
 
 As well as naming the program in question, you can also provide parameters to it. Here’s a simple example:
 

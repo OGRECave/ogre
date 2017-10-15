@@ -158,9 +158,9 @@ Ogre::Mesh objects are a type of resource, and are managed by the MeshManager re
 
 You can also create Mesh objects manually by calling the Ogre::MeshManager::createManual method. This way you can define the geometry yourself, but this is outside the scope of this manual.
 
-Mesh objects are the basis for the individual movable objects in the world, which are called [Entities](#Entities).
+Mesh objects are the basis for the individual movable objects in the world, which are called @ref Entities.
 
-Mesh objects can also be animated using See [Skeletal Animation](@ref Skeletal-Animation).
+Mesh objects can also be animated using See @ref Skeletal-Animation.
 
 # Entities {#Entities}
 
@@ -207,7 +207,7 @@ The SceneManager class manages the master list of materials available to the sce
 
 You can alter these settings by calling Ogre::MaterialManager::getDefaultSettings() and making the required changes to the Material which is returned.
 
-Entities automatically have Material’s associated with them if they use a Ogre::Mesh object, since the Ogre::Mesh object typically sets up it’s required materials on loading. You can also customise the material used by an entity as described in [Entities](#Entities). Just create a new Material, set it up how you like (you can copy an existing material into it if you like using a standard assignment statement) and point the SubEntity entries at it using Ogre::SubEntity::setMaterialName().
+Entities automatically have Material’s associated with them if they use a Ogre::Mesh object, since the Ogre::Mesh object typically sets up it’s required materials on loading. You can also customise the material used by an entity as described in @ref Entities. Just create a new Material, set it up how you like (you can copy an existing material into it if you like using a standard assignment statement) and point the SubEntity entries at it using Ogre::SubEntity::setMaterialName().
 
 
 

@@ -58,15 +58,15 @@ Every material in the script must be given a name, which is the line ’material
 
 @note ’:’ is the delimiter for specifying material copy in the script so it can’t be used as part of the material name.
 
-A material can inherit from a previously defined material by using a *colon* **:** after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just *parts* of a material from others; all this is covered in See [Script Inheritance](#Script-Inheritance)). You can also use variables in your script which can be replaced in inheriting versions, see See [Script Variables](#Script-Variables).
+A material can inherit from a previously defined material by using a *colon* **:** after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just *parts* of a material from others; all this is covered in See @ref Script-Inheritance). You can also use variables in your script which can be replaced in inheriting versions, see See @ref Script-Variables.
 
-A material can be made up of many techniques (See [Techniques](@ref Techniques))- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. 
+A material can be made up of many techniques (See @ref Techniques)- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. 
 
-Each technique can be made up of many passes (See [Passes](#Passes)), that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as ’ambient’ to set the amount & colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See [Passes](#Passes) for more details. 
+Each technique can be made up of many passes (See @ref Passes), that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as ’ambient’ to set the amount & colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See @ref Passes for more details. 
 
-Within each pass, there can be zero or many texture units in use (See [Texture Units](#Texture-Units)). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.
+Within each pass, there can be zero or many texture units in use (See @ref Texture-Units). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.
 
-You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See [Declaring Vertex/Geometry/Fragment Programs](#Declaring-Vertex_002fGeometry_002fFragment-Programs)) and are used as described in [Using Vertex/Geometry/Fragment Programs in a Pass](#Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass).
+You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See @ref Declaring-Vertex_002fGeometry_002fFragment-Programs) and are used as described in @ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass.
 
 <a name="Top_002dlevel-material-attributes"></a>
 
@@ -1560,7 +1560,7 @@ Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m3
 
 The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&gt;.
 
-## Declaring Vertex/Geometry/Fragment Programs {#Declaring-Vertex_002fGeometry_002fFragment-Programs}
+## Declaring GPU Programs {#Declaring-Vertex_002fGeometry_002fFragment-Programs}
 
 In order to use a vertex, geometry or fragment program in your materials (See [Using Vertex/Geometry/Fragment Programs in a Pass](@ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass)), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.
 
