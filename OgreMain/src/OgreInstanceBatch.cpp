@@ -162,6 +162,9 @@ namespace Ogre
 
 
         mBoundingRadius = Math::boundingRadiusFromAABBCentered( mFullBoundingBox );
+        if (mParentNode) {
+            mParentNode->needUpdate();
+        }
         mBoundsDirty    = false;
     }
 
