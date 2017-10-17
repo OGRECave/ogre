@@ -627,6 +627,14 @@ namespace v1 {
         case PF_DXT3:
         case PF_DXT4:
         case PF_DXT5:
+        case PF_BC4_UNORM:
+        case PF_BC4_SNORM:
+        case PF_BC5_UNORM:
+        case PF_BC5_SNORM:
+        case PF_BC6H_UF16:
+        case PF_BC6H_SF16:
+        case PF_BC7_UNORM:
+        case PF_BC7_UNORM_SRGB:
             isDds = true;
             break;
         default:
