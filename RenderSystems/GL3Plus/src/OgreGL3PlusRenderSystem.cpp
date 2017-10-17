@@ -2018,6 +2018,14 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 0, NULL, GL_TRUE));
 #endif
         }
+
+        if(getCapabilities()->getVendor() == GPU_NVIDIA)
+        {
+            // bug in NVIDIA driver, see e.g.
+            // https://www.opengl.org/discussion_boards/showthread.php/168217-gl_PointCoord-and-OpenGL-3-1-GLSL-1-4
+            glEnable(0x8861); // GL_POINT_SPRITE
+            glGetError();     // clear the error that it generates nevertheless..
+        }
     }
 
     void GL3PlusRenderSystem::initialiseContext(RenderWindow* primary)
