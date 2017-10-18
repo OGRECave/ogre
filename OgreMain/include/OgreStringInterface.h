@@ -67,10 +67,10 @@ namespace Ogre {
     {
     public:
         String name;
-        String description;
+        String description; //!< @deprecated use the manual instead
         ParameterType paramType;
         ParameterDef(const String& newName, const String& newDescription, ParameterType newType)
-            : name(newName), description(newDescription), paramType(newType) {}
+            : name(newName), paramType(newType) {}
     };
     typedef vector<ParameterDef>::type ParameterList;
 

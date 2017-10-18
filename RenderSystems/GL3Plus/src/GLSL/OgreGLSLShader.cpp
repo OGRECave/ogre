@@ -146,12 +146,16 @@ namespace Ogre {
                     {
                         size_t versionPos = mSource.find("#version");
                         int shaderVersion = 100;
+                        size_t belowVersionPos = 0;
+
                         if(versionPos != String::npos)
+                        {
                         	shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
+                            belowVersionPos = mSource.find("\n", versionPos) + 1;
+                        }
 
                         if (shaderVersion >= 150)
                         {
-                            size_t belowVersionPos = mSource.find("\n", versionPos) + 1;
                             switch (mType)
                             {
                             case GPT_VERTEX_PROGRAM:
@@ -178,7 +182,7 @@ namespace Ogre {
                         }
                         else if(mType == GPT_VERTEX_PROGRAM) // shaderVersion < 150, means we only have vertex shaders
                         {
-                            mSource.insert(0, "varying vec4 gl_Position;\nvarying float gl_PointSize;\nvarying float gl_ClipDistance[];\n\n");
+                            mSource.insert(belowVersionPos, "varying vec4 gl_Position;\nvarying float gl_PointSize;\nvarying float gl_ClipDistance[];\n\n");
                         }
                     }
                 }

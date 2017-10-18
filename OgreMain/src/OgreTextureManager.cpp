@@ -290,4 +290,30 @@ namespace Ogre {
         return PixelUtil::getNumElemBits(supportedFormat) >= PixelUtil::getNumElemBits(format);
         
     }
+
+    const TexturePtr& TextureManager::_getWarningTexture()
+    {
+        if(mWarningTexture)
+            return mWarningTexture;
+
+        // Generate warning texture
+        PixelBox pixels(8, 8, 1, PF_R5G6B5);
+        DataStreamPtr data(new MemoryDataStream(pixels.getConsecutiveSize()));
+        pixels.data = static_pointer_cast<MemoryDataStream>(data)->getPtr();
+
+        // Yellow/black stripes
+        const ColourValue black(0, 0, 0), yellow(1, 1, 0);
+        for (size_t y = 0; y < pixels.getHeight(); ++y)
+        {
+            for (size_t x = 0; x < pixels.getWidth(); ++x)
+            {
+                pixels.setColourAt((((x + y) % 8) < 4) ? black : yellow, x, y, 0);
+            }
+        }
+
+        mWarningTexture = loadRawData("Warning", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                      data, pixels.getWidth(), pixels.getHeight(), pixels.format);
+
+        return mWarningTexture;
+    }
 }

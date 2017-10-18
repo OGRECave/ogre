@@ -35,25 +35,16 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
     GL3PlusTextureManager::GL3PlusTextureManager(GL3PlusRenderSystem* renderSystem)
-        : TextureManager(), mRenderSystem(renderSystem), mWarningTextureID(0)//, mImages()
+        : TextureManager(), mRenderSystem(renderSystem)
     {
         // Register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
-
-        createWarningTexture();
     }
 
     GL3PlusTextureManager::~GL3PlusTextureManager()
     {
         // Unregister with group manager
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
-
-        // Delete warning texture
-        if (GL3PlusStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
-        {
-            OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mWarningTextureID));
-            stateCacheManager->invalidateStateForTexture(mWarningTextureID);
-        }
     }
 
     Resource* GL3PlusTextureManager::createImpl(const String& name, ResourceHandle handle,
@@ -84,34 +75,6 @@ namespace Ogre {
     //     return texture;
     // }
 
-    
-    void GL3PlusTextureManager::createWarningTexture()
-    {
-        // Generate warning texture
-        uint32 width = 8;
-        uint32 height = 8;
-
-        uint32* data = new uint32[width * height]; // 0xXXRRGGBB
-
-        // Yellow/black stripes
-        for(size_t y = 0; y < height; ++y)
-        {
-            for(size_t x = 0; x < width; ++x)
-            {
-                data[y * width + x] = (((x + y) % 8) < 4) ? 0x000000 : 0xFFFF00;
-            }
-        }
-
-        // Create GL resource
-        OGRE_CHECK_GL_ERROR(glGenTextures(1, &mWarningTextureID));
-        mRenderSystem->_getStateCacheManager()->bindGLTexture( GL_TEXTURE_2D, mWarningTextureID );
-        OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
-        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, (void*)data));
-
-        // Free memory
-        delete [] data;
-    }
 
     PixelFormat GL3PlusTextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)
     {

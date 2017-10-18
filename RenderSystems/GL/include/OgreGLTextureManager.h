@@ -41,8 +41,6 @@ namespace Ogre {
         GLTextureManager(GLRenderSystem* renderSystem);
         virtual ~GLTextureManager();
 
-        GLuint getWarningTextureID() { return mWarningTextureID; }
-
         /// @copydoc TextureManager::getNativeFormat
         PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
 
@@ -58,11 +56,7 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* createParams);
 
-        /// Internal method to create a warning texture (bound when a texture unit is blank)
-        void createWarningTexture();
-
         GLRenderSystem* mRenderSystem;
-        GLuint mWarningTextureID;
     };
 }
 #endif

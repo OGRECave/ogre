@@ -1537,7 +1537,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GLTexturePtr tex = static_pointer_cast<GLTexture>(texPtr);
         GLenum lastTextureType = mTextureTypes[stage];
 
         if (!mStateCacheManager->activateGLTextureUnit(stage))
@@ -1545,15 +1544,12 @@ namespace Ogre {
 
         if (enabled)
         {
-            if (tex)
-            {
-                // note used
-                tex->touch();
-                mTextureTypes[stage] = tex->getGLTextureTarget();
-            }
-            else
-                // assume 2D
-                mTextureTypes[stage] = GL_TEXTURE_2D;
+            GLTexturePtr tex = static_pointer_cast<GLTexture>(
+                texPtr ? texPtr : mTextureManager->_getWarningTexture());
+
+            // note used
+            tex->touch();
+            mTextureTypes[stage] = tex->getGLTextureTarget();
 
             if(lastTextureType != mTextureTypes[stage] && lastTextureType != 0)
             {
@@ -1570,10 +1566,7 @@ namespace Ogre {
                     glEnable( mTextureTypes[stage] );
             }
 
-            if(tex)
-                mStateCacheManager->bindGLTexture( mTextureTypes[stage], tex->getGLID() );
-            else
-                mStateCacheManager->bindGLTexture( mTextureTypes[stage], static_cast<GLTextureManager*>(mTextureManager)->getWarningTextureID() );
+            mStateCacheManager->bindGLTexture( mTextureTypes[stage], tex->getGLID() );
         }
         else
         {
@@ -3302,8 +3295,6 @@ namespace Ogre {
             // Enable seamless cube maps
             glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		}
-
-        static_cast<GLTextureManager*>(mTextureManager)->createWarningTexture();
     }
 
     //---------------------------------------------------------------------

@@ -7,7 +7,6 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
     def __init__(self):
         OgreBites.ApplicationContext.__init__(self, "PySample", False)
         OgreBites.InputListener.__init__(self)
-        self.addInputListener(self)
 
     def keyPressed(self, evt):
         if evt.keysym.sym == OgreBites.SDLK_ESCAPE:
@@ -35,6 +34,7 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
 
     def setup(self):
         OgreBites.ApplicationContext.setup(self)
+        self.addInputListener(self)
 
         root = self.getRoot()
         scn_mgr = root.createSceneManager(Ogre.ST_GENERIC)
