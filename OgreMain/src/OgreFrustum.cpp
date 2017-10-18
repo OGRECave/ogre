@@ -319,7 +319,7 @@ namespace Ogre {
         return SceneManager::FRUSTUM_TYPE_MASK;
     }
     //-----------------------------------------------------------------------
-    void Frustum::calcProjectionParameters(Real& left, Real& right, Real& bottom, Real& top) const
+    RealRect Frustum::calcProjectionParameters() const
     { 
         if (mCustomProjMatrix)
         {
@@ -331,20 +331,13 @@ namespace Ogre {
             topLeft = invProj * topLeft;
             bottomRight = invProj * bottomRight;
 
-            left = topLeft.x;
-            top = topLeft.y;
-            right = bottomRight.x;
-            bottom = bottomRight.y;
-
+            return RealRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
         }
         else
         {
             if (mFrustumExtentsManuallySet)
             {
-                left = mLeft;
-                right = mRight;
-                top = mTop;
-                bottom = mBottom;
+                return mExtents;
             }
             // Calculate general projection parameters
             else if (mProjType == PT_PERSPECTIVE)
@@ -359,15 +352,8 @@ namespace Ogre {
                 Real half_w = tanThetaX * mNearDist;
                 Real half_h = tanThetaY * mNearDist;
 
-                left   = - half_w + nearOffsetX;
-                right  = + half_w + nearOffsetX;
-                bottom = - half_h + nearOffsetY;
-                top    = + half_h + nearOffsetY;
-
-                mLeft = left;
-                mRight = right;
-                mTop = top;
-                mBottom = bottom;
+                mExtents = RealRect(-half_w + nearOffsetX, +half_h + nearOffsetY,
+                                    +half_w + nearOffsetX, -half_h + nearOffsetY);
             }
             else
             {
@@ -375,31 +361,25 @@ namespace Ogre {
                 Real half_w = getOrthoWindowWidth() * 0.5f;
                 Real half_h = getOrthoWindowHeight() * 0.5f;
 
-                left   = - half_w;
-                right  = + half_w;
-                bottom = - half_h;
-                top    = + half_h;
-
-                mLeft = left;
-                mRight = right;
-                mTop = top;
-                mBottom = bottom;
+                mExtents = RealRect(-half_w, +half_h, +half_w, -half_h);
             }
 
+            return mExtents;
         }
     }
     //-----------------------------------------------------------------------
     void Frustum::updateFrustumImpl(void) const
     {
         // Common calcs
-        Real left, right, bottom, top;
+        RealRect rect = calcProjectionParameters();
 
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-        if (mOrientationMode != OR_PORTRAIT)
-            calcProjectionParameters(bottom, top, left, right);
-        else
-#endif
-            calcProjectionParameters(left, right, bottom, top);
+        if (!OGRE_NO_VIEWPORT_ORIENTATIONMODE && mOrientationMode != OR_PORTRAIT)
+        {
+            std::swap(rect.left, rect.bottom);
+            std::swap(rect.right, rect.top);
+        }
+
+        Real left = rect.left, right = rect.right, top = rect.top, bottom = rect.bottom;
 
         if (!mCustomProjMatrix)
         {
@@ -616,8 +596,8 @@ namespace Ogre {
             //       still need to working with projection parameters.
 
             // Calc near plane corners
-            Real vpLeft, vpRight, vpBottom, vpTop;
-            calcProjectionParameters(vpLeft, vpRight, vpBottom, vpTop);
+            const RealRect vp = calcProjectionParameters();
+            Real vpLeft = vp.left, vpRight = vp.right, vpBottom = vp.bottom, vpTop = vp.top;
 
             // Treat infinite fardist as some arbitrary far value
             Real farDist = (mFarDist == 0) ? 100000 : mFarDist;
@@ -865,8 +845,8 @@ namespace Ogre {
         //       still need to working with projection parameters.
 
         // Calc near plane corners
-        Real nearLeft, nearRight, nearBottom, nearTop;
-        calcProjectionParameters(nearLeft, nearRight, nearBottom, nearTop);
+        RealRect near = calcProjectionParameters();
+        Real nearLeft = near.left, nearRight = near.right, nearBottom = near.bottom, nearTop = near.top;
 
         // Treat infinite fardist as some arbitrary far value
         Real farDist = (mFarDist == 0) ? 100000 : mFarDist;
@@ -1321,10 +1301,7 @@ namespace Ogre {
     void Frustum::setFrustumExtents(Real left, Real right, Real top, Real bottom)
     {
         mFrustumExtentsManuallySet = true;
-        mLeft = left;
-        mRight = right;
-        mTop = top;
-        mBottom = bottom;
+        mExtents = RealRect(left, top, right, bottom);
 
         invalidateFrustum();
     }
@@ -1335,13 +1312,18 @@ namespace Ogre {
         invalidateFrustum();
     }
     //---------------------------------------------------------------------
+    RealRect Frustum::getFrustumExtents() const
+    {
+        updateFrustum();
+        return mExtents;
+    }
     void Frustum::getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const
     {
         updateFrustum();
-        outleft = mLeft;
-        outright = mRight;
-        outtop = mTop;
-        outbottom = mBottom;
+        outleft = mExtents.left;
+        outright = mExtents.right;
+        outtop = mExtents.top;
+        outbottom = mExtents.bottom;
     }
     //---------------------------------------------------------------------
     PlaneBoundedVolume Frustum::getPlaneBoundedVolume()

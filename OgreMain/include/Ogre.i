@@ -363,8 +363,8 @@ ADD_REPR(ColourValue)
         %include "OgreShadowCameraSetupFocused.h"
         %include "OgreShadowCameraSetupLiSPSM.h"
         %include "OgreShadowCameraSetupPlaneOptimal.h"
-        %include "OgreShadowCameraSetupPSSM.h"
-    %apply Ogre::Real& OUTPUT {Ogre::Real& outleft, Ogre::Real& outright, Ogre::Real& outtop, Ogre::Real& outbottom};        
+        %include "OgreShadowCameraSetupPSSM.h"  
+    %ignore Ogre::Frustum::getFrustumExtents(Real&, Real& ,Real& ,Real&) const;
     %include "OgreFrustum.h"
         %ignore Ogre::Camera::setPosition;
         %ignore Ogre::Camera::getPosition;

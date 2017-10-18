@@ -410,7 +410,7 @@ namespace Ogre {
         }
         else
         {
-            mPixelDisplayRatio = (mTop - mBottom) / vp->getActualHeight();
+            mPixelDisplayRatio = -mExtents.height() / vp->getActualHeight();
         }
 
         //notify prerender scene
@@ -783,16 +783,15 @@ namespace Ogre {
             return;
 
         // Calculate general projection parameters
-        Real vpLeft, vpRight, vpBottom, vpTop;
-        calcProjectionParameters(vpLeft, vpRight, vpBottom, vpTop);
+        RealRect vp = calcProjectionParameters();
 
-        Real vpWidth = vpRight - vpLeft;
-        Real vpHeight = vpTop - vpBottom;
+        Real vpWidth = vp.width();
+        Real vpHeight = -vp.height();
 
-        Real wvpLeft   = vpLeft + mWLeft * vpWidth;
-        Real wvpRight  = vpLeft + mWRight * vpWidth;
-        Real wvpTop    = vpTop - mWTop * vpHeight;
-        Real wvpBottom = vpTop - mWBottom * vpHeight;
+        Real wvpLeft   = vp.left + mWLeft * vpWidth;
+        Real wvpRight  = vp.left + mWRight * vpWidth;
+        Real wvpTop    = vp.top - mWTop * vpHeight;
+        Real wvpBottom = vp.top - mWBottom * vpHeight;
 
         Vector3 vp_ul (wvpLeft, wvpTop, -mNearDist);
         Vector3 vp_ur (wvpRight, wvpTop, -mNearDist);
