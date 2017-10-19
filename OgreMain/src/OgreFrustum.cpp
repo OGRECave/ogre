@@ -845,8 +845,8 @@ namespace Ogre {
         //       still need to working with projection parameters.
 
         // Calc near plane corners
-        RealRect near = calcProjectionParameters();
-        Real nearLeft = near.left, nearRight = near.right, nearBottom = near.bottom, nearTop = near.top;
+        RealRect vp = calcProjectionParameters();
+        Real nearLeft = vp.left, nearRight = vp.right, nearBottom = vp.bottom, nearTop = vp.top;
 
         // Treat infinite fardist as some arbitrary far value
         Real farDist = (mFarDist == 0) ? 100000 : mFarDist;
