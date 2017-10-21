@@ -443,7 +443,13 @@ namespace Ogre {
         if( mYawFixed )
         {
             // Calculate the quaternion for rotate local Z to target direction
-            Vector3 xVec = mYawFixedAxis.crossProduct( targetDir );
+            Vector3 yawAxis = mYawFixedAxis;
+
+            if (inheritOrientation && mParent) {
+                yawAxis = mParent->_getDerivedOrientation() * yawAxis;
+            }
+
+            Vector3 xVec = yawAxis.crossProduct(targetDir);
             xVec.normalise();
             Vector3 yVec = targetDir.crossProduct(xVec);
             yVec.normalise();
