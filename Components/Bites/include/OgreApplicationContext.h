@@ -198,7 +198,6 @@ namespace OgreBites
         */
         virtual void setupInput(bool grab);
 
-
         /**
         Finds context-wide resource groups. I load paths from a config file here,
         but you can choose your resource locations however you want.
@@ -282,6 +281,12 @@ namespace OgreBites
         createWindow(const Ogre::String& name, uint32_t w = 0, uint32_t h = 0,
                      Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
 
+        /**
+         * the directory where the media files were installed
+         *
+         * same as OGRE_MEDIA_DIR in CMake
+         */
+        static Ogre::String getDefaultMediaDir();
     protected:
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);

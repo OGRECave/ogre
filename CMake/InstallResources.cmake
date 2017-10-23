@@ -54,6 +54,9 @@ elseif (UNIX)
   set(OGRE_CFG_INSTALL_PATH "share/OGRE")
 endif ()
 
+# generate OgreConfigPaths.h
+configure_file(${OGRE_TEMPLATES_DIR}/OgreConfigPaths.h.in ${OGRE_BINARY_DIR}/include/OgreConfigPaths.h @ONLY)
+
 # configure plugins.cfg
 if (NOT OGRE_BUILD_RENDERSYSTEM_D3D9)
   set(OGRE_COMMENT_RENDERSYSTEM_D3D9 "#")
@@ -129,53 +132,35 @@ configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${OGRE_BINARY_DIR}/inst/bin/re
 configure_file(${OGRE_TEMPLATES_DIR}/tests_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg)
 
 # install resource files
-if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
-  install(FILES 
-    ${OGRE_BINARY_DIR}/inst/bin/debug/resources_d.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg
-	${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg
-	${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg
-    DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug
-  )
-  install(FILES 
-    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
-	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
-	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
-    DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELEASE_PATH}" CONFIGURATIONS Release None ""
-  )
-  install(FILES 
-    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
-	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
-	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
-	DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELWDBG_PATH}" CONFIGURATIONS RelWithDebInfo
-  )
-  install(FILES 
-    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
-	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
-	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
-	DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
-  )
+install(FILES 
+  ${OGRE_BINARY_DIR}/inst/bin/debug/resources_d.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg
+  DESTINATION "${OGRE_CFG_INSTALL_PATH}" CONFIGURATIONS Debug
+)
+install(FILES 
+  ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
+  DESTINATION "${OGRE_CFG_INSTALL_PATH}"
+  CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+)
 
-  # Need a special case here for the iOS SDK, configuration is not being matched, could be a CMake bug.
-  if (APPLE_IOS)
-    install(FILES 
-      ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
-      ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
-      ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
-      ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
-      ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
-      DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELEASE_PATH}"
-    )
-  endif()
-
-endif (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
+# Need a special case here for the iOS SDK, configuration is not being matched, could be a CMake bug.
+if (APPLE_IOS)
+  install(FILES 
+    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
+    DESTINATION "${OGRE_CFG_INSTALL_PATH}"
+  )
+endif()
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
