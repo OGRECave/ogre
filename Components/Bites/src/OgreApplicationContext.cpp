@@ -16,6 +16,8 @@
 #include "OgreDataStream.h"
 #include "OgreBitesConfigDialog.h"
 
+#include "OgreConfigPaths.h"
+
 #if OGRE_BITES_HAVE_SDL
 #include <SDL_video.h>
 #include <SDL_syswm.h>
@@ -209,10 +211,16 @@ void ApplicationContext::createRoot()
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     mRoot = OGRE_NEW Ogre::Root("");
 #else
-    Ogre::String pluginsPath = Ogre::BLANKSTRING;
+    Ogre::String pluginsPath;
 #   ifndef OGRE_STATIC_LIB
     pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+
+    if (!Ogre::FileSystemLayer::fileExists(pluginsPath))
+    {
+        pluginsPath = Ogre::FileSystemLayer::resolveBundlePath(OGRE_CONFIG_DIR "/plugins.cfg");
+    }
 #   endif
+
     mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogre.cfg"),
                                 mFSLayer->getWritablePath("ogre.log"));
 #endif
@@ -537,6 +545,11 @@ void ApplicationContext::setupInput(bool _grab)
 #endif
 }
 
+Ogre::String ApplicationContext::getDefaultMediaDir()
+{
+    return Ogre::FileSystemLayer::resolveBundlePath(OGRE_MEDIA_DIR);
+}
+
 void ApplicationContext::locateResources()
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
@@ -550,7 +563,18 @@ void ApplicationContext::locateResources()
     Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAAssetMgr) );
     cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
 #   else
-    cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
+    Ogre::String resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
+    if (Ogre::FileSystemLayer::fileExists(resourcesPath))
+    {
+        cf.load(resourcesPath);
+    }
+    else
+    {
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+            getDefaultMediaDir(), "FileSystem",
+            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    }
+
 #   endif
 
     Ogre::String sec, type, arch;
