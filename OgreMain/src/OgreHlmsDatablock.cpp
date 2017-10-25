@@ -182,6 +182,32 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    HlmsDatablock* HlmsDatablock::clone( String name ) const
+    {
+        HlmsDatablock *datablock = mCreator->createDatablock( name, name,
+                                                              HlmsMacroblock(), HlmsBlendblock(),
+                                                              HlmsParamVec() );
+
+        // Directly const cast macroblocks to keep their mRefCount consistent
+        datablock->setMacroblock( const_cast<HlmsMacroblock*>( mMacroblock[0] ), false );
+        datablock->setMacroblock( const_cast<HlmsMacroblock*>( mMacroblock[1] ), true );
+
+        // Directly const cast blendblocks to keep their mRefCount consistent
+        datablock->setBlendblock( const_cast<HlmsBlendblock*>( mBlendblock[0] ), false );
+        datablock->setBlendblock( const_cast<HlmsBlendblock*>( mBlendblock[1] ), true );
+
+        datablock->mAlphaTestCmp = mAlphaTestCmp;
+        datablock->mAlphaTestThreshold = mAlphaTestThreshold;
+
+        datablock->mShadowConstantBias = mShadowConstantBias;
+
+        cloneImpl( datablock );
+
+        datablock->calculateHash();
+
+        return datablock;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsDatablock::setMacroblock( const HlmsMacroblock &macroblock, bool casterBlock )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
