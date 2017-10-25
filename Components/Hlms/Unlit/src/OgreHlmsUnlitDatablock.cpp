@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 #include "OgreLogManager.h"
 
+#include "OgreHlmsUnlitDatablock.cpp.inc"
+
 namespace Ogre
 {
     extern const String c_unlitBlendModes[];
