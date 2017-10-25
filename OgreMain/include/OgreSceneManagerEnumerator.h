@@ -131,9 +131,16 @@ namespace Ogre {
         */
         const SceneManagerMetaData* getMetaData(const String& typeName) const;
 
+        /** get all types of SceneManager available for construction
+
+            providing some information about each one.
+        */
+        const MetaDataList& getMetaData() const { return mMetaDataList; }
+
         typedef ConstVectorIterator<MetaDataList> MetaDataIterator;
         /** Iterate over all types of SceneManager available for construction, 
             providing some information about each one.
+            @deprecated use getMetaData()
         */
         MetaDataIterator getMetaDataIterator(void) const;
 
@@ -162,6 +169,8 @@ namespace Ogre {
         @param typeMask A mask containing one or more SceneType flags
         @param instanceName Optional name to given the new instance that is
             created. If you leave this blank, an auto name will be assigned.
+        @deprecated obsolete API - SceneTypeMask leads to arbitrary results.
+        In doubt use createSceneManager() instead
         */
         SceneManager* createSceneManager(SceneTypeMask typeMask, 
             const String& instanceName = BLANKSTRING);
@@ -181,8 +190,12 @@ namespace Ogre {
         bool hasSceneManager(const String& instanceName) const;
 
         typedef MapIterator<Instances> SceneManagerIterator;
-        /** Get an iterator over all the existing SceneManager instances. */
+        /** Get an iterator over all the existing SceneManager instances.
+        @deprecated use getSceneManagers() instead */
         SceneManagerIterator getSceneManagerIterator(void);
+
+        /// Get all the existing SceneManager instances.
+        const Instances& getSceneManagers() const;
 
         /** Notifies all SceneManagers of the destination rendering system.
         */

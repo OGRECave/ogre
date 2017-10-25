@@ -72,7 +72,7 @@ void TerrainTests::SetUp()
         }
     }
 
-    mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
+    mSceneMgr = mRoot->createSceneManager();
 }
 //--------------------------------------------------------------------------
 void TerrainTests::TearDown()

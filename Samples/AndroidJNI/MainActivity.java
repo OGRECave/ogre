@@ -110,7 +110,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                                     ogreApp = new ApplicationContext();
                                     ogreApp.initAppForAndroid(assetMgr, lastSurface);
                                     
-                                    SceneManager scnMgr = ogreApp.getRoot().createSceneManager(SceneType.ST_GENERIC.swigValue());
+                                    SceneManager scnMgr = ogreApp.getRoot().createSceneManager();
                                     ShaderGenerator.getSingleton().addSceneManager(scnMgr);
                                     
                                     Light light = scnMgr.createLight("MainLight");

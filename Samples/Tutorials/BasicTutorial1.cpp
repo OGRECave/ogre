@@ -64,7 +64,7 @@ void BasicTutorial1::setup()
 
     // get a pointer to the already created root
     Root* root = getRoot();
-    SceneManager* scnMgr = root->createSceneManager(ST_GENERIC);
+    SceneManager* scnMgr = root->createSceneManager();
 
     // register our scene with the RTSS
     RTShader::ShaderGenerator* shadergen = RTShader::ShaderGenerator::getSingletonPtr();

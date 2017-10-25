@@ -474,6 +474,10 @@ ADD_REPR(ColourValue)
 %ignore Ogre::Root::addResourceLocation; // deprecated
 %ignore Ogre::Root::removeResourceLocation; // deprecated
 %ignore Ogre::Root::getErrorDescription; // deprecated
+%ignore Ogre::Root::getSceneManagerMetaDataIterator;
+%ignore Ogre::Root::getSceneManagerIterator;
+%ignore Ogre::Root::createSceneManager(SceneTypeMask);
+%ignore Ogre::Root::createSceneManager(SceneTypeMask, const String&);
 %include "OgreRoot.h"
 // dont wrap: platform specific
 // %include "OgreWindowEventUtilities.h"
