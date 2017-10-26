@@ -3491,7 +3491,8 @@ namespace Ogre {
     {
         /// A globally unique string identifying the scene manager type
         String typeName;
-        /// A text description of the scene manager
+        /// A text description of the scene manager.
+        /// @deprecated use manual instead
         String description;
         /// A mask describing which sorts of scenes this manager can handle
         SceneTypeMask sceneTypeMask;

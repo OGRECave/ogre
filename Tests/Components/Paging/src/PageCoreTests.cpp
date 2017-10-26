@@ -51,7 +51,7 @@ void PageCoreTests::SetUp()
     ResourceGroupManager::getSingleton().addResourceLocation("./", "FileSystem",
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, false, false);
 
-    mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
+    mSceneMgr = mRoot->createSceneManager();
 }
 //--------------------------------------------------------------------------
 void PageCoreTests::TearDown()

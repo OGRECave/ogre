@@ -246,7 +246,7 @@ namespace Ogre {
         @return
             true if set was successful, false otherwise (NB no exceptions thrown - tolerant method)
         */
-        virtual bool setParameter(const String& name, const String& value);
+        bool setParameter(const String& name, const String& value);
         /** Generic multiple parameter setting method.
         @remarks
             Call this method with a list of name / value pairs
@@ -256,7 +256,7 @@ namespace Ogre {
         @param
             paramList Name/value pair list
         */
-        virtual void setParameterList(const NameValuePairList& paramList);
+        void setParameterList(const NameValuePairList& paramList);
         /** Generic parameter retrieval method.
         @remarks
             Call this method with the name of a parameter to retrieve a string-format value of
@@ -268,7 +268,7 @@ namespace Ogre {
         @return
             String value of parameter, blank if not found
         */
-        virtual String getParameter(const String& name) const
+        String getParameter(const String& name) const
         {
             // Get dictionary
             const ParamDictionary* dict = getParamDictionary();
@@ -299,7 +299,7 @@ namespace Ogre {
         @param dest Pointer to object to have it's parameters set the same as this object.
 
         */
-        virtual void copyParametersTo(StringInterface* dest) const
+        void copyParametersTo(StringInterface* dest) const
         {
             // Get dictionary
             const ParamDictionary* dict = getParamDictionary();

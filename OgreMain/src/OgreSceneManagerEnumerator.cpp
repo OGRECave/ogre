@@ -283,6 +283,11 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
+    const SceneManagerEnumerator::Instances& SceneManagerEnumerator::getSceneManagers(void) const
+    {
+        return mInstances;
+    }
+    //-----------------------------------------------------------------------
     void SceneManagerEnumerator::setRenderSystem(RenderSystem* rs)
     {
         mCurrentRenderSystem = rs;

@@ -37,7 +37,7 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
         self.addInputListener(self)
 
         root = self.getRoot()
-        scn_mgr = root.createSceneManager(Ogre.ST_GENERIC)
+        scn_mgr = root.createSceneManager()
 
         shadergen = OgreRTShader.ShaderGenerator.getSingleton()
         shadergen.addSceneManager(scn_mgr)  # must be done before we do anything with the scene

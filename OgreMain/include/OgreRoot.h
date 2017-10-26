@@ -366,70 +366,45 @@ namespace Ogre
         */
         void addSceneManagerFactory(SceneManagerFactory* fact);
 
-        /** Unregister a SceneManagerFactory.
-        */
+        /// @copydoc SceneManagerEnumerator::addFactory
         void removeSceneManagerFactory(SceneManagerFactory* fact);
 
-        /** Get more information about a given type of SceneManager.
-        @remarks
-            The metadata returned tells you a few things about a given type 
-            of SceneManager, which can be created using a factory that has been
-            registered already. 
-        @param typeName The type name of the SceneManager you want to enquire on.
-            If you don't know the typeName already, you can iterate over the 
-            metadata for all types using getMetaDataIterator.
-        */
+        /// @copydoc SceneManagerEnumerator::getMetaData(const String& )
         const SceneManagerMetaData* getSceneManagerMetaData(const String& typeName) const;
 
-        /** Iterate over all types of SceneManager available for construction, 
-            providing some information about each one.
-        */
-        SceneManagerEnumerator::MetaDataIterator getSceneManagerMetaDataIterator(void) const;
+        /// @copydoc SceneManagerEnumerator::getMetaData()
+        const SceneManagerEnumerator::MetaDataList& getSceneManagerMetaData() const;
 
-        /** Create a SceneManager instance of a given type.
-        @remarks
-            You can use this method to create a SceneManager instance of a 
-            given specific type. You may know this type already, or you may
-            have discovered it by looking at the results from getMetaDataIterator.
-        @note
-            This method throws an exception if the named type is not found.
-        @param typeName String identifying a unique SceneManager type
-        @param instanceName Optional name to given the new instance that is
-            created. If you leave this blank, an auto name will be assigned.
-        */
+        /// @copydoc SceneManagerEnumerator::getMetaDataIterator
+        OGRE_DEPRECATED SceneManagerEnumerator::MetaDataIterator getSceneManagerMetaDataIterator(void) const;
+
+        /// create a default scene manager
+        SceneManager* createSceneManager()
+        {
+            return createSceneManager(DefaultSceneManagerFactory::FACTORY_TYPE_NAME);
+        }
+
+        /// @copydoc SceneManagerEnumerator::createSceneManager(const String&, const String&)
         SceneManager* createSceneManager(const String& typeName, 
             const String& instanceName = BLANKSTRING);
 
-        /** Create a SceneManager instance based on scene type support.
-        @remarks
-            Creates an instance of a SceneManager which supports the scene types
-            identified in the parameter. If more than one type of SceneManager 
-            has been registered as handling that combination of scene types, 
-            in instance of the last one registered is returned.
-        @note This method always succeeds, if a specific scene manager is not
-            found, the default implementation is always returned.
-        @param typeMask A mask containing one or more SceneType flags
-        @param instanceName Optional name to given the new instance that is
-            created. If you leave this blank, an auto name will be assigned.
-        */
-        SceneManager* createSceneManager(SceneTypeMask typeMask, 
+        /// @copydoc SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&)
+        OGRE_DEPRECATED SceneManager* createSceneManager(SceneTypeMask typeMask,
             const String& instanceName = BLANKSTRING);
 
-        /** Destroy an instance of a SceneManager. */
+        /// @copydoc SceneManagerEnumerator::destroySceneManager
         void destroySceneManager(SceneManager* sm);
 
-        /** Get an existing SceneManager instance that has already been created,
-            identified by the instance name.
-        @param instanceName The name of the instance to retrieve.
-        */
+        /// @copydoc SceneManagerEnumerator::getSceneManager
         SceneManager* getSceneManager(const String& instanceName) const;
 
-        /** Determines if a given SceneManager already exists
-        @param instanceName The name of the instance to retrieve.
-        */
+        /// @copydoc SceneManagerEnumerator::hasSceneManager
         bool hasSceneManager(const String& instanceName) const;
-        /** Get an iterator over all the existing SceneManager instances. */
-        SceneManagerEnumerator::SceneManagerIterator getSceneManagerIterator(void);
+        /// @copydoc SceneManagerEnumerator::getSceneManagerIterator
+        OGRE_DEPRECATED SceneManagerEnumerator::SceneManagerIterator getSceneManagerIterator(void);
+
+        /// @copydoc SceneManagerEnumerator::getSceneManagers
+        const SceneManagerEnumerator::Instances& getSceneManagers(void) const;
 
         /** Retrieves a reference to the current TextureManager.
             @remarks

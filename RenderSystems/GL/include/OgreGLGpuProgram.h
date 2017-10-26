@@ -67,7 +67,6 @@ namespace Ogre {
         void unloadImpl(void) {}
 
         GLuint mProgramID;
-        GLenum mProgramType;
     };
 
     /** Specialisation of the GL low-level program for ARB programs. */
@@ -77,10 +76,6 @@ namespace Ogre {
         GLArbGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
         virtual ~GLArbGpuProgram();
-
-        /// @copydoc GpuProgram::setType
-        void setType(GpuProgramType t);
-
 
         /// Execute the binding functions for this program
         void bindProgram(void);
@@ -92,8 +87,7 @@ namespace Ogre {
         void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
         /// Get the GL type for the program
-        GLuint getProgramType(void) const
-        { return mProgramType; }
+        GLenum getProgramType(void) const;
 
     protected:
         void loadFromSource(void);

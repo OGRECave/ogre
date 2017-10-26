@@ -767,7 +767,12 @@ namespace Ogre {
     Root::getSceneManagerMetaDataIterator(void) const
     {
         return mSceneManagerEnum->getMetaDataIterator();
-
+    }
+    //-----------------------------------------------------------------------
+    const SceneManagerEnumerator::MetaDataList&
+    Root::getSceneManagerMetaData(void) const
+    {
+        return mSceneManagerEnum->getMetaData();
     }
     //-----------------------------------------------------------------------
     SceneManager* Root::createSceneManager(const String& typeName,
@@ -800,6 +805,11 @@ namespace Ogre {
     SceneManagerEnumerator::SceneManagerIterator Root::getSceneManagerIterator(void)
     {
         return mSceneManagerEnum->getSceneManagerIterator();
+    }
+    //-----------------------------------------------------------------------
+    const SceneManagerEnumerator::Instances& Root::getSceneManagers(void) const
+    {
+        return mSceneManagerEnum->getSceneManagers();
     }
     //-----------------------------------------------------------------------
     TextureManager* Root::getTextureManager(void)
@@ -1447,8 +1457,9 @@ namespace Ogre {
         // This belongs here, as all render targets must be updated before events are
         // triggered, otherwise targets could be mismatched.  This could produce artifacts,
         // for instance, with shadows.
-        for (SceneManagerEnumerator::SceneManagerIterator it = getSceneManagerIterator(); it.hasMoreElements(); it.moveNext())
-            it.peekNextValue()->_handleLodEvents();
+        SceneManagerEnumerator::Instances::const_iterator it, end = getSceneManagers().end();
+        for (it = getSceneManagers().begin(); it != end; ++it)
+            it->second->_handleLodEvents();
 
         return ret;
     }
@@ -1465,8 +1476,9 @@ namespace Ogre {
         // This belongs here, as all render targets must be updated before events are
         // triggered, otherwise targets could be mismatched.  This could produce artifacts,
         // for instance, with shadows.
-        for (SceneManagerEnumerator::SceneManagerIterator it = getSceneManagerIterator(); it.hasMoreElements(); it.moveNext())
-            it.peekNextValue()->_handleLodEvents();
+        SceneManagerEnumerator::Instances::const_iterator it, end = getSceneManagers().end();
+        for (it = getSceneManagers().begin(); it != end; ++it)
+            it->second->_handleLodEvents();
 
         return ret;
     }

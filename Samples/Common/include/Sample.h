@@ -244,7 +244,7 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void createSceneManager()
         {
-            mSceneMgr = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC);
+            mSceneMgr = Ogre::Root::getSingleton().createSceneManager();
 #ifdef INCLUDE_RTSHADER_SYSTEM
             mShaderGenerator->addSceneManager(mSceneMgr);
 #endif

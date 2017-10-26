@@ -41,7 +41,7 @@ TEST(Root,shutdown)
 TEST(SceneManager,removeAndDestroyAllChildren)
 {
     Root root;
-    SceneManager* sm = root.createSceneManager(ST_GENERIC);
+    SceneManager* sm = root.createSceneManager();
     sm->getRootSceneNode()->createChildSceneNode();
     sm->getRootSceneNode()->createChildSceneNode();
     sm->getRootSceneNode()->removeAndDestroyAllChildren();

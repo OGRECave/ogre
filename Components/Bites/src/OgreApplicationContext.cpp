@@ -246,7 +246,7 @@ bool ApplicationContext::oneTimeConfig()
 void ApplicationContext::createDummyScene()
 {
     mWindows[0].render->removeAllViewports();
-    Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
+    Ogre::SceneManager* sm = mRoot->createSceneManager("DefaultSceneManager", "DummyScene");
     sm->addRenderQueueListener(mOverlaySystem);
     Ogre::Camera* cam = sm->createCamera("DummyCamera");
     mWindows[0].render->addViewport(cam);
