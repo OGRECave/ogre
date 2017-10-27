@@ -510,6 +510,19 @@ namespace Ogre{
 
             *op = (GpuConstantType)(GCT_DOUBLE1 + count - 1);
         }
+		else if (val.find("uint") != String::npos)
+		{
+			int count = 1;
+			if (val.size() == 5)
+				count = StringConverter::parseInt(val.substr(4));
+			else if (val.size() > 5)
+				return false;
+
+			if (count > 4 || count == 0)
+				return false;
+
+			*op = (GpuConstantType)(GCT_UINT1 + count - 1);
+		}
         else if (val.find("int") != String::npos)
         {
             int count = 1;
@@ -522,19 +535,6 @@ namespace Ogre{
                 return false;
 
             *op = (GpuConstantType)(GCT_INT1 + count - 1);
-        }
-        else if (val.find("uint") != String::npos)
-        {
-            int count = 1;
-            if (val.size() == 5)
-                count = StringConverter::parseInt(val.substr(4));
-            else if (val.size() > 5)
-                return false;
-
-            if (count > 4 || count == 0)
-                return false;
-
-            *op = (GpuConstantType)(GCT_UINT1 + count - 1);
         }
         else if (val.find("bool") != String::npos)
         {
