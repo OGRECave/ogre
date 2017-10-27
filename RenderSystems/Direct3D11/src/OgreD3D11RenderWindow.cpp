@@ -318,7 +318,7 @@ namespace Ogre
     void D3D11RenderWindowBase::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
         if(src.right > mWidth || src.bottom > mHeight || src.front != 0 || src.back != 1
-        || dst.getWidth() != src.getWidth() || dst.getHeight() != dst.getHeight() || dst.getDepth() != 1)
+        || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight() || dst.getDepth() != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "D3D11RenderWindowBase::copyContentsToMemory");
         }
