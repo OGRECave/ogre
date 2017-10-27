@@ -126,7 +126,7 @@ namespace Ogre
             //*static_cast<ID3D11RenderTargetView***>(pData) = mRenderTargetViews;
             ID3D11RenderTargetView ** pRTView = (ID3D11RenderTargetView**)pData;
 
-            memset(pRTView,0,sizeof(pRTView));
+            memset(pRTView,0,sizeof(**pRTView));
 
             for(int y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && mRenderTargets[y]; ++y)
             {
