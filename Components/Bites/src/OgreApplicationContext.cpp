@@ -97,10 +97,10 @@ void ApplicationContext::initApp()
 void ApplicationContext::closeApp()
 {
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-	if (mRoot)
-	{
-		mRoot->saveConfig();
-	}
+    if (mRoot)
+    {
+        mRoot->saveConfig();
+    }
 #endif
 
     shutdown();

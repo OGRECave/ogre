@@ -920,14 +920,14 @@ void ps10::invoke(vector<constdef> * c,
 		for_each(a->begin(), a->end(), set_texture_shaders(c));
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	int numCombiners = 0;
-	if(b)
-	{
-		list<vector<string> >::iterator it = b->begin();
-		for (; it != b->end(); ++it) {
-			if ((*it)[0] != "+")
-				numCombiners++;
-		}
-	}
+    if(b)
+    {
+        list<vector<string> >::iterator it = b->begin();
+        for (; it != b->end(); ++it) {
+            if ((*it)[0] != "+")
+                numCombiners++;
+        }
+    }
     glCombinerParameteriNV(GL_NUM_GENERAL_COMBINERS_NV, numCombiners);
     if(b)
         for_each(b->begin(), b->end(), set_register_combiners());
