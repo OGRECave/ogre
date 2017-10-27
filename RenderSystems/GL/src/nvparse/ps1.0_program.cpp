@@ -905,25 +905,28 @@ void ps10::SetFinalCombinerStage()
 }
 
 void ps10::invoke(vector<constdef> * c,
-                  list<vector<string> > * a,
-                  list<vector<string> > * b)
+	list<vector<string> > * a,
+	list<vector<string> > * b)
 {
-    const_to_combiner_reg_mapping_count = 0; // Hansong
+	const_to_combiner_reg_mapping_count = 0; // Hansong
 
-    GLint activeTex = 0;
-    glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
+	GLint activeTex = 0;
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
 
-    glEnable(GL_PER_STAGE_CONSTANTS_NV); // should we require apps to do this?
-    if(c)
-        for_each(c->begin(), c->end(), set_constants());
-    if(a)
-        for_each(a->begin(), a->end(), set_texture_shaders(c));
-    glActiveTextureARB( GL_TEXTURE0_ARB );
-    int numCombiners = 0;
-    list<vector<string> >::iterator it = b->begin();
-    for(; it!=b->end(); ++it) {
-      if ( (*it)[0] != "+" )
-        numCombiners++;
+	glEnable(GL_PER_STAGE_CONSTANTS_NV); // should we require apps to do this?
+	if (c)
+		for_each(c->begin(), c->end(), set_constants());
+	if (a)
+		for_each(a->begin(), a->end(), set_texture_shaders(c));
+	glActiveTextureARB(GL_TEXTURE0_ARB);
+	int numCombiners = 0;
+    if(b)
+    {
+        list<vector<string> >::iterator it = b->begin();
+        for (; it != b->end(); ++it) {
+            if ((*it)[0] != "+")
+                numCombiners++;
+        }
     }
     glCombinerParameteriNV(GL_NUM_GENERAL_COMBINERS_NV, numCombiners);
     if(b)

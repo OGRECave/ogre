@@ -2001,7 +2001,7 @@ namespace Ogre {
                     AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex-1]->mAnimationState;
                     if (mAnimationState != targetState) // only copy if lods have different skeleton instances
                     {
-                        if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
+                        if (mAnimationState && mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
                             mAnimationState->copyMatchingState(targetState);
                     }
                 }
