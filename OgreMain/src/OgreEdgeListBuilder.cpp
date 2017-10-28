@@ -483,7 +483,7 @@ namespace Ogre {
         l->logMessage("Number of vertex sets: " + StringConverter::toString(mVertexDataList.size()));
         l->logMessage("Number of index sets: " + StringConverter::toString(mGeometryList.size()));
         
-        size_t i, j;
+        size_t i, j, k;
         // Log original vertex data
         for(i = 0; i < mVertexDataList.size(); ++i)
         {
@@ -591,10 +591,10 @@ namespace Ogre {
             l->logMessage(".");
             l->logMessage("Common vertex list - vertex count " + 
                 StringConverter::toString(mVertices.size()));
-            for (i = 0; i < mVertices.size(); ++i)
+            for (k = 0; k < mVertices.size(); ++k)
             {
-                CommonVertex& c = mVertices[i];
-                l->logMessage("Common vertex " + StringConverter::toString(i) + 
+                CommonVertex& c = mVertices[k];
+                l->logMessage("Common vertex " + StringConverter::toString(k) + 
                     ": (vertexSet=" + StringConverter::toString(c.vertexSet) + 
                     ", originalIndex=" + StringConverter::toString(c.originalIndex) + 
                     ", position=" + StringConverter::toString(c.position));
