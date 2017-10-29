@@ -4080,8 +4080,8 @@ void SceneManager::setRelativeOrigin( const Vector3 &relativeOrigin, bool bPerma
             propagateRelativeOrigin( mSceneRoot[i], relativeOrigin );
         }
 
-        if( mSkyBoxNode )
-            propagateRelativeOrigin( mSkyBoxNode, relativeOrigin );
+        if( mSkyPlaneNode )
+            propagateRelativeOrigin( mSkyPlaneNode, relativeOrigin );
         if( mSkyDomeNode )
             propagateRelativeOrigin( mSkyDomeNode, relativeOrigin );
         if( mSkyBoxNode )
