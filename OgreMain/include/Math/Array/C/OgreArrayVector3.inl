@@ -115,30 +115,30 @@ namespace Ogre
 #endif
 
     // Update operations
-#define DEFINE_UPDATE_OPERATION( leftClass, op )\
+#define DEFINE_UPDATE_OPERATION( leftClass, op, op_func )\
     inline void ArrayVector3::operator op ( const leftClass &a )\
     {\
         ArrayReal * RESTRICT_ALIAS chunkBase = mChunkBase;\
         const ArrayReal * RESTRICT_ALIAS aChunkBase = a.mChunkBase;\
-        chunkBase[0] = chunkBase[0] op aChunkBase[0];\
-        chunkBase[1] = chunkBase[1] op aChunkBase[1];\
-        chunkBase[2] = chunkBase[2] op aChunkBase[2];\
+        chunkBase[0] = chunkBase[0] op_func aChunkBase[0];\
+        chunkBase[1] = chunkBase[1] op_func aChunkBase[1];\
+        chunkBase[2] = chunkBase[2] op_func aChunkBase[2];\
     }
-#define DEFINE_UPDATE_R_SCALAR_OPERATION( rightType, op )\
+#define DEFINE_UPDATE_R_SCALAR_OPERATION( rightType, op, op_func )\
     inline void ArrayVector3::operator op ( const rightType fScalar )\
     {\
-        mChunkBase[0] = mChunkBase[0] op fScalar;\
-        mChunkBase[1] = mChunkBase[1] op fScalar;\
-        mChunkBase[2] = mChunkBase[2] op fScalar;\
+        mChunkBase[0] = mChunkBase[0] op_func fScalar;\
+        mChunkBase[1] = mChunkBase[1] op_func fScalar;\
+        mChunkBase[2] = mChunkBase[2] op_func fScalar;\
     }
-#define DEFINE_UPDATE_DIVISION( leftClass, op )\
+#define DEFINE_UPDATE_DIVISION( leftClass, op, op_func )\
     inline void ArrayVector3::operator op ( const leftClass &a )\
     {\
         ArrayReal * RESTRICT_ALIAS chunkBase = mChunkBase;\
         const ArrayReal * RESTRICT_ALIAS aChunkBase = a.mChunkBase;\
-        chunkBase[0] = chunkBase[0] op aChunkBase[0];\
-        chunkBase[1] = chunkBase[1] op aChunkBase[1];\
-        chunkBase[2] = chunkBase[2] op aChunkBase[2];\
+        chunkBase[0] = chunkBase[0] op_func aChunkBase[0];\
+        chunkBase[1] = chunkBase[1] op_func aChunkBase[1];\
+        chunkBase[2] = chunkBase[2] op_func aChunkBase[2];\
     }
 #define DEFINE_UPDATE_R_SCALAR_DIVISION( rightType, op, op_func )\
     inline void ArrayVector3::operator op ( const rightType fScalar )\
@@ -194,19 +194,19 @@ namespace Ogre
 
     // Update operations
     // +=
-    DEFINE_UPDATE_OPERATION(            ArrayVector3,       += );
-    DEFINE_UPDATE_R_SCALAR_OPERATION(   Real,               += );
+    DEFINE_UPDATE_OPERATION(            ArrayVector3,       +=, + );
+    DEFINE_UPDATE_R_SCALAR_OPERATION(   Real,               +=, + );
 
     // -=
-    DEFINE_UPDATE_OPERATION(            ArrayVector3,       -= );
-    DEFINE_UPDATE_R_SCALAR_OPERATION(   Real,               -= );
+    DEFINE_UPDATE_OPERATION(            ArrayVector3,       -=, - );
+    DEFINE_UPDATE_R_SCALAR_OPERATION(   Real,               -=, - );
 
     // *=
-    DEFINE_UPDATE_OPERATION(            ArrayVector3,       *= );
-    DEFINE_UPDATE_R_SCALAR_OPERATION(   Real,               *= );
+    DEFINE_UPDATE_OPERATION(            ArrayVector3,       *=, * );
+    DEFINE_UPDATE_R_SCALAR_OPERATION(   Real,               *=, * );
 
     // /=
-    DEFINE_UPDATE_DIVISION(             ArrayVector3,       /= );
+    DEFINE_UPDATE_DIVISION(             ArrayVector3,       /=, / );
     DEFINE_UPDATE_R_SCALAR_DIVISION(    Real,               /=, * );
 
     //Functions
