@@ -478,7 +478,9 @@ namespace Ogre
             {
                 const uint8 shadowMapIdx = pass->getDefinition()->mShadowMapIdx;
                 const Light *light = shadowNode->getLightAssociatedWith( shadowMapIdx );
-                if( light->getType() == Light::LT_POINT )
+                if( light->getType() == Light::LT_DIRECTIONAL )
+                    setProperty( HlmsBaseProp::ShadowCasterDirectional, 1 );
+                else if( light->getType() == Light::LT_POINT )
                     setProperty( HlmsBaseProp::ShadowCasterPoint, 1 );
             }
         }
