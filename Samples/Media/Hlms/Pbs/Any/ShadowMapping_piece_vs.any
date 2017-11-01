@@ -10,7 +10,9 @@
 
 		@foreach( hlms_num_shadow_map_lights, n )
 			@property( !hlms_shadowmap@n_is_point_light )
-				outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;
+				@property( !hlms_shadowmap@n_is_directional_light )
+					outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;
+				@end
 				@property( syntax == glsl )outVs.posL@n.z = (outVs.posL@n.z * 0.5) + 0.5;@end
 			@end
 		@end
@@ -29,7 +31,7 @@
 				//It's the same as (float4( worldPos.xyz, 1 ) * texViewMatrix).z
 				outVs.posL@n.z = -(dot( worldPos.xyz, passBuf.shadowRcv[@n].texViewZRow.xyz ) + passBuf.shadowRcv[@n].texViewZRow.w);
 				outVs.posL@n.z = (outVs.posL@n.z - passBuf.shadowRcv[@n].shadowDepthRange.x)
-									* passBuf.shadowRcv[@n].shadowDepthRange.y;
+										* passBuf.shadowRcv[@n].shadowDepthRange.y;
 			@end
 		@end
 

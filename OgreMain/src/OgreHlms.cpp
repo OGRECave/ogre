@@ -116,6 +116,7 @@ namespace Ogre
     const IdString HlmsBaseProp::PssmBlend          = IdString( "hlms_pssm_blend" );
     const IdString HlmsBaseProp::PssmFade           = IdString( "hlms_pssm_fade" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
+    const IdString HlmsBaseProp::ShadowCasterDirectional= IdString( "hlms_shadowcaster_directional" );
     const IdString HlmsBaseProp::ShadowCasterPoint  = IdString( "hlms_shadowcaster_point" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
@@ -2302,7 +2303,13 @@ namespace Ogre
                         setProperty( propName.c_str(), shadowTexDef->arrayIdx );
 
                         const Light *light = shadowNode->getLightAssociatedWith( shadowMapTexIdx );
-                        if( light->getType() == Light::LT_POINT )
+                        if( light->getType() == Light::LT_DIRECTIONAL )
+                        {
+                            propName.resize( basePropSize );
+                            propName.a( "_is_directional_light" );
+                            setProperty( propName.c_str(), 1 );
+                        }
+                        else if( light->getType() == Light::LT_POINT )
                         {
                             propName.resize( basePropSize );
                             propName.a( "_is_point_light" );
@@ -2473,7 +2480,9 @@ namespace Ogre
             {
                 const uint8 shadowMapIdx = pass->getDefinition()->mShadowMapIdx;
                 const Light *light = shadowNode->getLightAssociatedWith( shadowMapIdx );
-                if( light->getType() == Light::LT_POINT )
+                if( light->getType() == Light::LT_DIRECTIONAL )
+                    setProperty( HlmsBaseProp::ShadowCasterDirectional, 1 );
+                else if( light->getType() == Light::LT_POINT )
                     setProperty( HlmsBaseProp::ShadowCasterPoint, 1 );
             }
 
