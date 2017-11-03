@@ -113,7 +113,10 @@ namespace Ogre
     const IdString HlmsBaseProp::NumShadowMapLights = IdString( "hlms_num_shadow_map_lights" );
     const IdString HlmsBaseProp::NumShadowMapTextures= IdString("hlms_num_shadow_map_textures" );
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
+    const IdString HlmsBaseProp::PssmBlend          = IdString( "hlms_pssm_blend" );
+    const IdString HlmsBaseProp::PssmFade           = IdString( "hlms_pssm_fade" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
+    const IdString HlmsBaseProp::ShadowCasterDirectional= IdString( "hlms_shadowcaster_directional" );
     const IdString HlmsBaseProp::ShadowCasterPoint  = IdString( "hlms_shadowcaster_point" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
@@ -279,6 +282,8 @@ namespace Ogre
         setProperty( HlmsBaseProp::BonesPerVertex, 4 );
 
         setProperty( HlmsBaseProp::PssmSplits, 3 );
+        setProperty( HlmsBaseProp::PssmBlend, 1 );
+        setProperty( HlmsBaseProp::PssmFade, 1 );
         setProperty( HlmsBaseProp::ShadowCaster, 0 );
 
         setProperty( HlmsBaseProp::LightsDirectional, 1 );
@@ -2201,6 +2206,18 @@ namespace Ogre
                     numPssmSplits = static_cast<int32>( pssmSplits->size() - 1 );
                 setProperty( HlmsBaseProp::PssmSplits, numPssmSplits );
 
+                bool isPssmBlend = false;
+                const vector<Real>::type *pssmBlends = shadowNode->getPssmBlends( 0 );
+                if( pssmBlends )
+                    isPssmBlend = pssmBlends->size() > 0;
+                setProperty( HlmsBaseProp::PssmBlend, isPssmBlend );
+
+                bool isPssmFade = false;
+                const Real *pssmFade = shadowNode->getPssmFade( 0 );
+                if( pssmFade )
+                    isPssmFade = *pssmFade != 0.0f;
+                setProperty( HlmsBaseProp::PssmFade, isPssmFade );
+
                 const TextureVec &contiguousShadowMapTex = shadowNode->getContiguousShadowMapTex();
 
                 size_t numShadowMapLights = shadowNode->getNumActiveShadowCastingLights();
@@ -2286,7 +2303,13 @@ namespace Ogre
                         setProperty( propName.c_str(), shadowTexDef->arrayIdx );
 
                         const Light *light = shadowNode->getLightAssociatedWith( shadowMapTexIdx );
-                        if( light->getType() == Light::LT_POINT )
+                        if( light->getType() == Light::LT_DIRECTIONAL )
+                        {
+                            propName.resize( basePropSize );
+                            propName.a( "_is_directional_light" );
+                            setProperty( propName.c_str(), 1 );
+                        }
+                        else if( light->getType() == Light::LT_POINT )
                         {
                             propName.resize( basePropSize );
                             propName.a( "_is_point_light" );
@@ -2457,7 +2480,9 @@ namespace Ogre
             {
                 const uint8 shadowMapIdx = pass->getDefinition()->mShadowMapIdx;
                 const Light *light = shadowNode->getLightAssociatedWith( shadowMapIdx );
-                if( light->getType() == Light::LT_POINT )
+                if( light->getType() == Light::LT_DIRECTIONAL )
+                    setProperty( HlmsBaseProp::ShadowCasterDirectional, 1 );
+                else if( light->getType() == Light::LT_POINT )
                     setProperty( HlmsBaseProp::ShadowCasterPoint, 1 );
             }
 

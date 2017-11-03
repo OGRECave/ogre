@@ -43,21 +43,96 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+    #include "Remotery.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
-#if OGRE_PROFILING == 1
-#   define OgreProfile( a ) Ogre::Profile _OgreProfileInstance( (a) )
+#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL
+#   define OgreProfilerUseStableMarkers true
+#   define OgreProfileL2( a, line ) Ogre::Profile _OgreProfileInstance##line( (a) )
+#   define OgreProfileL( a, line ) OgreProfileL2( a, line )
+#   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
 #   define OgreProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
+#   define OgreProfileBeginDynamic( a ) OgreProfileBegin( a )
+#   define OgreProfileBeginDynamicHashed( a, hash ) OgreProfileBegin( a )
 #   define OgreProfileEnd( a ) Ogre::Profiler::getSingleton().endProfile( (a) )
-#   define OgreProfileGroup( a, g ) Ogre::Profile _OgreProfileInstance( (a), (g) )
+#   define OgreProfileGroupL2( a, g, line ) Ogre::Profile _OgreProfileInstance##line( (a), (g) )
+#   define OgreProfileGroupL( a, g, line ) OgreProfileGroupL2( a, g, line )
+#   define OgreProfileGroup( a, g ) OgreProfileGroupL( a, g, __LINE__ )
 #   define OgreProfileBeginGroup( a, g ) Ogre::Profiler::getSingleton().beginProfile( (a), (g) )
 #   define OgreProfileEndGroup( a, g ) Ogre::Profiler::getSingleton().endProfile( (a), (g) )
 #   define OgreProfileBeginGPUEvent( g ) Ogre::Profiler::getSingleton().beginGPUEvent(g)
 #   define OgreProfileEndGPUEvent( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
 #   define OgreProfileMarkGPUEvent( e ) Ogre::Profiler::getSingleton().markGPUEvent(e)
+#   define OgreProfileGpuBegin( a )
+#   define OgreProfileGpuBeginDynamic( a )
+#   define OgreProfileGpuBeginDynamicHashed( a, hash )
+#   define OgreProfileGpuEnd( a )
+#elif OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+namespace Ogre
+{
+    class RemoteryProfile;
+}
+#   define OgreProfilerUseStableMarkers Ogre::Profiler::getSingleton().getUseStableMarkers()
+#   define OgreProfileL2( a, line )                                                 \
+    static rmtU32 ogre_rmt_sample_hash_##line = 0;                                  \
+    Ogre::RemoteryProfile _OgreRemoteryProfileInstance##line( (a), ogre_rmt_sample_hash_##line );
+#   define OgreProfileL( a, line ) OgreProfileL2( a, line )
+#   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
+#   define Ogre_rmt_BeginCPUSampleL2( name, flags, line )                           \
+    RMT_OPTIONAL(RMT_ENABLED, {                                                     \
+        static rmtU32 rmt_sample_hash_##line = 0;                                   \
+        _rmt_BeginCPUSample( name, flags, &rmt_sample_hash_##line );                \
+    })
+#   define Ogre_rmt_BeginCPUSampleL( name, flags, line ) Ogre_rmt_BeginCPUSampleL2( name, flags, line )
+#   define OgreProfileBegin( name ) Ogre_rmt_BeginCPUSampleL( name, RMTSF_Aggregate, __LINE__ )
+#   define OgreProfileBeginDynamic( name )                                          \
+    RMT_OPTIONAL(RMT_ENABLED, _rmt_BeginCPUSample(name, RMTSF_Aggregate, NULL))
+#   define OgreProfileBeginDynamicHashed( name, hash )                              \
+    RMT_OPTIONAL(RMT_ENABLED, _rmt_BeginCPUSample(name, RMTSF_Aggregate, hash))
+#   define OgreProfileEnd( a ) RMT_OPTIONAL(RMT_ENABLED, _rmt_EndCPUSample())
+
+#   define OgreProfileGroup( a, g ) OgreProfile( a )
+#   define OgreProfileBeginGroup( a, g ) OgreProfileBegin( a )
+#   define OgreProfileEndGroup( a, g ) OgreProfileEnd( a )
+#   define OgreProfileBeginGPUEvent( g ) Ogre::Profiler::getSingleton().beginGPUEvent(g)
+#   define OgreProfileEndGPUEvent( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
+#   define OgreProfileMarkGPUEvent( e ) Ogre::Profiler::getSingleton().markGPUEvent(e)
+
+#   define OgreProfileGpuBeginL2( a, line )                                         \
+    static rmtU32 rmt_sample_hash_##line = 0;                                       \
+    Ogre::Profiler::getSingleton().beginGPUSample( a, &rmt_sample_hash_##line );
+#   define OgreProfileGpuBeginL( a, line ) OgreProfileGpuBeginL2( a, line )
+#   define OgreProfileGpuBegin( a ) OgreProfileGpuBeginL( a, __LINE__ )
+#   define OgreProfileGpuBeginDynamic( a ) Ogre::Profiler::getSingleton().beginGPUSample( a, NULL )
+#   define OgreProfileGpuBeginDynamicHashed( a, hash )                              \
+    Ogre::Profiler::getSingleton().beginGPUSample( a, hash )
+#   define OgreProfileGpuEnd( a ) Ogre::Profiler::getSingleton().endGPUSample(a)
+//#   define OgreProfileGpu( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
+
+namespace Ogre
+{
+    class RemoteryProfile
+    {
+    public:
+        RemoteryProfile( const char *name, rmtU32 &hash )
+        {
+            _rmt_BeginCPUSample( name, RMTSF_Aggregate, &hash );
+        }
+        ~RemoteryProfile()
+        {
+            _rmt_EndCPUSample();
+        }
+    };
+}
+
 #else
+#   define OgreProfilerUseStableMarkers true
 #   define OgreProfile( a )
 #   define OgreProfileBegin( a )
+#   define OgreProfileBeginDynamic( a )
+#   define OgreProfileBeginDynamicHashed( a, hash )
 #   define OgreProfileEnd( a )
 #   define OgreProfileGroup( a, g ) 
 #   define OgreProfileBeginGroup( a, g ) 
@@ -65,6 +140,10 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #   define OgreProfileBeginGPUEvent( e )
 #   define OgreProfileEndGPUEvent( e )
 #   define OgreProfileMarkGPUEvent( e )
+#   define OgreProfileGpuBegin( a )
+#   define OgreProfileGpuBeginDynamic( a )
+#   define OgreProfileGpuBeginDynamicHashed( a, hash )
+#   define OgreProfileGpuEnd( a )
 #endif
 
 namespace Ogre {
@@ -177,9 +256,11 @@ namespace Ogre {
         ProfileInstance(void);
         virtual ~ProfileInstance(void);
 
-        typedef Ogre::map<String,ProfileInstance*>::type ProfileChildren;
+        typedef Ogre::map<String,ProfileInstance*>::type ProfileChildrenMap;
+        typedef Ogre::vector<ProfileInstance*>::type ProfileChildrenVec;
 
         void logResults();
+        void destroyAllChildren();
         void reset();
 
         inline bool watchForMax(void) { return history.currentTimePercent == history.maxTimePercent; }
@@ -202,7 +283,8 @@ namespace Ogre {
         /// The name of the parent, null if root
         ProfileInstance* parent;
 
-        ProfileChildren children;
+        ProfileChildrenVec children;
+        ProfileChildrenMap childrenMap;
 
         ProfileFrame frame;
         ulong frameNumber;
@@ -336,6 +418,9 @@ namespace Ogre {
              */
             void markGPUEvent(const String& event);
 
+            void beginGPUSample( const String &name, uint32 *hashCache );
+            void endGPUSample( const String &name );
+
             /** Sets whether this profiler is enabled. Only takes effect after the
                 the frame has ended.
                 @remarks When this is called the first time with the parameter true,
@@ -345,6 +430,18 @@ namespace Ogre {
 
             /** Gets whether this profiler is enabled */
             bool getEnabled() const;
+
+            /** Sets whether each frame should be tagged with the frame number (starting from 0).
+                This is very useful for tagging and identifying CPU samples with GPU ones,
+                but it causes Remotery to shift colours like a rainbow.
+                Setting this to true forces each frame to not have the frame number embedded in
+                it, which stabilizes the colour.
+                Default is false.
+            @remarks
+                Relevant only when using Remotery.
+            */
+            void setUseStableMarkers( bool useStableMarkers );
+            bool getUseStableMarkers(void) const;
 
             /** Enables a previously disabled profile 
             @remarks Can be safely called in the middle of the profile.
@@ -392,7 +489,7 @@ namespace Ogre {
             void logResults();
 
             /** Clears the profiler statistics */
-            void reset();
+            void reset( bool deleteAll );
 
             /** Sets the Profiler so the display of results are updated every n frames*/
             void setUpdateDisplayFrequency(uint freq);
@@ -470,7 +567,7 @@ namespace Ogre {
 
             // lol. Uses typedef; put's original container type in name.
             typedef set<String>::type DisabledProfileMap;
-            typedef ProfileInstance::ProfileChildren ProfileChildren;
+            typedef ProfileInstance::ProfileChildrenVec ProfileChildrenVec;
 
             ProfileInstance* mCurrent;
             ProfileInstance* mLast;
@@ -497,6 +594,7 @@ namespace Ogre {
 
             /// Whether this profiler is enabled
             bool mEnabled;
+            bool mUseStableMarkers;
 
             /// Keeps track of the new enabled/disabled state that the user has requested
             /// which will be applied after the frame ends
@@ -511,6 +609,10 @@ namespace Ogre {
             /// Rolling average of millisecs
             Real mAverageFrameTime;
             bool mResetExtents;
+
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+            Remotery *mRemotery;
+#endif
 
 
     }; // end class

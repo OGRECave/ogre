@@ -141,6 +141,7 @@ namespace Ogre
         ///One per memory type
         MemoryPoolVec               mMemoryPools;
         size_t const                *mElementsMemSizes;
+        CleanupRoutines const       *mInitRoutines;
         CleanupRoutines const       *mCleanupRoutines;
         size_t                      mTotalMemoryMultiplier;
 
@@ -164,6 +165,10 @@ namespace Ogre
         /** Constructor. @See intialize. @See destroy.
             @param elementsMemSize
                 Array containing the size in bytes of each element type (i.e. NodeElementsMemSize)
+            @param initRoutines
+                Array containing the cleanup function that will be called when default initializing
+                memory. Unlike cleanupRoutines, just leave the function pointer null if all you
+                want is just to initialize to 0.
             @param cleanupRoutines
                 Array containing the cleanup function that will be called when performing cleanups.
                 Many pointers can use the flatCleaner and is the fastest. However Array variables
@@ -191,7 +196,9 @@ namespace Ogre
                 The listener to be called when cleaning up or growing the memory pool. If null,
                 cleanupThreshold is set to -1 & maxHardLimit will be set to hintMaxNodes
         */
-        ArrayMemoryManager( size_t const *elementsMemSize, CleanupRoutines const *cleanupRoutines,
+        ArrayMemoryManager( size_t const *elementsMemSize,
+                            CleanupRoutines const *initRoutines,
+                            CleanupRoutines const *cleanupRoutines,
                             size_t numElementsSize, uint16 depthLevel, size_t hintMaxNodes,
                             size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
                             RebaseListener *rebaseListener=0 );
@@ -293,6 +300,7 @@ namespace Ogre
         };
 
         static const size_t ElementsMemSize[NumMemoryTypes];
+        static const CleanupRoutines NodeInitRoutines[NumMemoryTypes];
         static const CleanupRoutines NodeCleanupRoutines[NumMemoryTypes];
 
         /// @copydoc ArrayMemoryManager::ArrayMemoryManager
@@ -386,8 +394,10 @@ namespace Ogre
 
     extern void cleanerFlat( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
                              size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
-    extern void cleanerArrayVector3( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-                                     size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
+    extern void cleanerArrayVector3Zero( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+                                         size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
+    extern void cleanerArrayVector3Unit( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+                                         size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
     extern void cleanerArrayQuaternion( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
                                         size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
     extern void cleanerArrayAabb( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,

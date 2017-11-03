@@ -47,12 +47,25 @@ namespace Ogre
         sizeof( bool ),                 //ArrayMemoryManager::InheritOrientation
         sizeof( bool )                  //ArrayMemoryManager::InheritScale
     };
+    const CleanupRoutines BoneArrayMemoryManager::BoneInitRoutines[NumMemoryTypes] =
+    {
+        0,                              //ArrayMemoryManager::Owner
+        0,                              //ArrayMemoryManager::Position
+        cleanerArrayQuaternion,         //ArrayMemoryManager::Orientation
+        cleanerArrayVector3Unit,        //ArrayMemoryManager::Scale
+        0,                              //ArrayMemoryManager::ParentNode
+        0,                              //ArrayMemoryManager::ParentMat
+        0,                              //ArrayMemoryManager::WorldMat
+        0,                              //ArrayMemoryManager::FinalMat
+        0,                              //ArrayMemoryManager::InheritOrientation
+        0                               //ArrayMemoryManager::InheritScale
+    };
     const CleanupRoutines BoneArrayMemoryManager::BoneCleanupRoutines[NumMemoryTypes] =
     {
         cleanerFlat,                    //ArrayMemoryManager::Owner
-        cleanerArrayVector3,            //ArrayMemoryManager::Position
+        cleanerArrayVector3Zero,        //ArrayMemoryManager::Position
         cleanerArrayQuaternion,         //ArrayMemoryManager::Orientation
-        cleanerArrayVector3,            //ArrayMemoryManager::Scale
+        cleanerArrayVector3Unit,        //ArrayMemoryManager::Scale
         cleanerFlat,                    //ArrayMemoryManager::ParentNode
         cleanerFlat,                    //ArrayMemoryManager::ParentMat
         cleanerFlat,                    //ArrayMemoryManager::WorldMat
@@ -64,7 +77,7 @@ namespace Ogre
     BoneArrayMemoryManager::BoneArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
                                                     size_t cleanupThreshold, size_t maxHardLimit,
                                                     RebaseListener *rebaseListener ) :
-            ArrayMemoryManager( ElementsMemSize, BoneCleanupRoutines,
+            ArrayMemoryManager( ElementsMemSize, BoneInitRoutines, BoneCleanupRoutines,
                                 sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
                                 hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener )
     {

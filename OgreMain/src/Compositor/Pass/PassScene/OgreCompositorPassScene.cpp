@@ -123,6 +123,8 @@ namespace Ogre
             --mNumPassesLeft;
         }
 
+        profilingBegin();
+
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
             listener->passEarlyPreExecute( this );
@@ -236,6 +238,8 @@ namespace Ogre
         //Call endUpdate if we're the last pass in a row to use this RT
         if( mDefinition->mEndRtUpdate )
             mTarget->_endUpdate();
+
+        profilingEnd();
     }
     //-----------------------------------------------------------------------------------
     void CompositorPassScene::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],

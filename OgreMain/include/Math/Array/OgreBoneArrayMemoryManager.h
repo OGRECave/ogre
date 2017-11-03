@@ -68,6 +68,7 @@ namespace Ogre
         };
 
         static const size_t ElementsMemSize[NumMemoryTypes];
+        static const CleanupRoutines BoneInitRoutines[NumMemoryTypes];
         static const CleanupRoutines BoneCleanupRoutines[NumMemoryTypes];
 
         /// @copydoc ArrayMemoryManager::ArrayMemoryManager

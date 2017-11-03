@@ -60,6 +60,8 @@ namespace Ogre
             --mNumPassesLeft;
         }
 
+        profilingBegin();
+
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
             listener->passEarlyPreExecute( this );
@@ -85,6 +87,8 @@ namespace Ogre
 
         if( listener )
             listener->passPosExecute( this );
+
+        profilingEnd();
     }
     //-----------------------------------------------------------------------------------
     void CompositorPassClear::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],

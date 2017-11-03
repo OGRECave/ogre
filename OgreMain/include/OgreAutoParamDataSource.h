@@ -123,6 +123,7 @@ namespace Ogre {
         const HlmsComputeJob *mCurrentJob;
         const CompositorShadowNode *mCurrentShadowNode;
         vector<Real>::type          mNullPssmSplitPoint;
+        vector<Real>::type          mNullPssmBlendPoint;
 
         ObjectMemoryManager mObjectMemoryManager;
         NodeMemoryManager *mNodeMemoryManager;
@@ -205,6 +206,8 @@ namespace Ogre {
          const Matrix4& getSpotlightWorldViewProjMatrix(size_t index) const;
          const Matrix4& getTextureTransformMatrix(size_t index) const;
          const vector<Real>::type& getPssmSplits( size_t shadowMapIdx ) const;
+         const vector<Real>::type& getPssmBlends( size_t shadowMapIdx ) const;
+         Real getPssmFade( size_t shadowMapIdx ) const;
          const RenderTarget* getCurrentRenderTarget(void) const;
          const Renderable* getCurrentRenderable(void) const;
          const Pass* getCurrentPass(void) const;

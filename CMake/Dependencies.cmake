@@ -154,6 +154,22 @@ endif()
 # Additional features
 #######################################################################
 
+# Find Remotery
+find_package(Remotery)
+macro_log_feature(Remotery_FOUND "Remotery" "Realtime CPU/D3D/OpenGL/CUDA/Metal Profiler in a single C file with web browser viewer" "https://github.com/Celtoys/Remotery" FALSE "" "")
+
+if( Remotery_LIBRARIES )
+    if( UNIX OR WIN32 )
+        set( Remotery_LIBRARIES ${Remotery_LIBRARIES} ${OPENGL_LIBRARIES} )
+    endif()
+    if( WIN32 )
+        set( Remotery_LIBRARIES ${Remotery_LIBRARIES} ${DirectX11_LIBRARIES} )
+    endif()
+    if( APPLE )
+        set( Remotery_LIBRARIES ${Remotery_LIBRARIES} "-framework Metal" )
+    endif()
+endif()
+
 # Find Cg
 if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
   find_package(Cg)

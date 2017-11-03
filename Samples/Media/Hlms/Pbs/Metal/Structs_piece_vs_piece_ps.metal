@@ -64,8 +64,12 @@ struct PassData
 	float4 irradianceSize;		//.w = 1.0f / irradianceTexture->getHeight()
 	float4x4 invView;
 @end
-@property( hlms_pssm_splits )@foreach( hlms_pssm_splits, n )
+@property( hlms_pssm_splits )@psub( hlms_pssm_splits_minus_one, hlms_pssm_splits, 1 )@foreach( hlms_pssm_splits, n )
 	float pssmSplitPoints@n;@end @end
+@property( hlms_pssm_blend )@foreach( hlms_pssm_splits_minus_one, n )
+	float pssmBlendPoints@n;@end @end
+@property( hlms_pssm_fade )
+	float pssmFadePoint;@end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
@@ -147,6 +151,8 @@ struct Material
 	ushort detailNormMapIdx3;
 	ushort envMapIdx;
 	float mNormalMapWeight;
+
+	@insertpiece( custom_materialBuffer )
 };@end
 
 @piece( MaterialDecl )

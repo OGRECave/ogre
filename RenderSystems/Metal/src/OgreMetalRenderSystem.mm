@@ -173,10 +173,21 @@ namespace Ogre
         rsc->setCapability(RSC_DOT3);
         rsc->setCapability(RSC_CUBEMAPPING);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
+#if TARGET_OS_TV
+        rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
+#endif
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
         //rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
+#else
+        //Actually the limit is not the count but rather how many bytes are in the
+        //GPU's internal TBDR cache (16 bytes for Family 1, 32 bytes for the rest)
+        //Consult Metal's manual for more info.
+        if( [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily2_v1] )
+        {
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
+        }
 #endif
         rsc->setCapability(RSC_VBO);
         rsc->setCapability(RSC_32BIT_INDEX);
@@ -2222,6 +2233,35 @@ namespace Ogre
     const PixelFormatToShaderType* MetalRenderSystem::getPixelFormatToShaderType(void) const
     {
         return &mPixelFormatToShaderType;
+    }
+
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::initGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+//        _rmt_BindMetal( mActiveDevice->mCurrentCommandBuffer );
+#endif
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::deinitGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_UnbindMetal();
+#endif
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_BeginMetalSample( name.c_str(), hashCache );
+#endif
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::endGPUSampleProfile( const String &name )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_EndMetalSample();
+#endif
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::beginProfileEvent( const String &eventName )

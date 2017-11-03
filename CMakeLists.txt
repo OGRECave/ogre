@@ -396,6 +396,10 @@ if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
   set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL 3+" FORCE)
 endif()
 
+if(OGRE_BUILD_RENDERSYSTEM_METAL AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+  set(OGRE_CONFIG_ENABLE_ASTC TRUE CACHE BOOL "Forcing ASTC codec for Metal" FORCE)
+endif()
+
 ######################################################################
 # Provide user options to customise the build process
 ######################################################################
@@ -471,6 +475,7 @@ option(OGRE_CONFIG_ENABLE_MESHLOD "Enable Mesh Lod." TRUE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
 option(OGRE_CONFIG_ENABLE_ETC "Build ETC codec." FALSE)
+option(OGRE_CONFIG_ENABLE_ASTC "Build ASTC codec." FALSE)
 option(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO "Enable stereoscopic 3D support" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND" FALSE)
 option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
@@ -489,7 +494,6 @@ option(OGRE_INSTALL_DOCS "Install documentation." TRUE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC" FALSE)
 cmake_dependent_option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE "NOT WIN32" FALSE)
-option(OGRE_PROFILING "Enable internal profiling support." FALSE)
 option(OGRE_LEGACY_ANIMATIONS "Use the skeletal animation from 1.x. It's much slower, but the new system is still experimental" TRUE)
 option(OGRE_SIMD_SSE2 "Enable SIMD (Include SSE2 files)." TRUE)
 option(OGRE_SIMD_NEON "Enable SIMD (Include NEON files)." TRUE)
@@ -510,6 +514,19 @@ endif ()
 option(OGRE_UNITY_BUILD "Enable unity build for Ogre." FALSE)
 set(OGRE_UNITY_FILES_PER_UNIT "50" CACHE STRING "Number of files per compilation unit in Unity build.")
 
+set( OGRE_PROFILING_PROVIDER "none" CACHE STRING
+	"Enable profiling of Ogre for performance analysis. Profiling has a performance
+	overhead so you may want to ship your game with this option disabled.
+	none - Profiling OFF
+	internal - Use internal profiling with on-screen overlays
+	remotery - Use Remotery. https://github.com/Celtoys/Remotery"
+)
+
+if( NOT Remotery_FOUND AND OGRE_PROFILING_PROVIDER STREQUAL "remotery" )
+	message( STATUS "WARNING: Remotery not found! Forcing profiling to disable" )
+	set( OGRE_PROFILING_PROVIDER "none" )
+endif()
+
 # hide advanced options
 mark_as_advanced(
   OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS
@@ -526,6 +543,7 @@ mark_as_advanced(
   OGRE_CONFIG_ENABLE_PVRTC
   OGRE_CONFIG_ENABLE_ETC
   OGRE_CONFIG_ENABLE_STBI
+  OGRE_CONFIG_ENABLE_ASTC
   OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE
   OGRE_CONFIG_ENABLE_ZIP
   OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT
@@ -538,7 +556,7 @@ mark_as_advanced(
   OGRE_USE_BOOST
   OGRE_INSTALL_SAMPLES_SOURCE
   OGRE_FULL_RPATH
-  OGRE_PROFILING
+  OGRE_PROFILING_PROVIDER
   OGRE_CONFIG_STATIC_LINK_CRT
   OGRE_LIB_DIRECTORY
 )

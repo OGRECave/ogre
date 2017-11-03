@@ -86,6 +86,8 @@ THE SOFTWARE.
 #include "OgreZip.h"
 #endif
 
+#include "OgreLwString.h"
+
 #include "OgreHardwareBufferManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreExternalTextureSourceManager.h"
@@ -100,6 +102,9 @@ THE SOFTWARE.
 #endif
 #if OGRE_NO_ETC_CODEC == 0
 #  include "OgreETCCodec.h"
+#endif
+#if OGRE_NO_ASTC_CODEC == 0
+#  include "OgreASTCCodec.h"
 #endif
 
 namespace Ogre {
@@ -251,6 +256,9 @@ namespace Ogre {
 #if OGRE_NO_STBI_CODEC == 0
         STBIImageCodec::startup();
 #endif
+#if OGRE_NO_ASTC_CODEC == 0
+        ASTCCodec::startup();
+#endif
 
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
@@ -307,6 +315,9 @@ namespace Ogre {
             << "Best time: \t"  << mFrameStats->getBestTime() << " ms\n"
             << "Worst time: \t" << mFrameStats->getWorstTime()<< " ms";
 
+#if OGRE_PROFILING
+        OGRE_DELETE mProfiler;
+#endif
         shutdown();
 
         OGRE_DELETE mSceneManagerEnum;
@@ -329,8 +340,8 @@ namespace Ogre {
 #if OGRE_NO_STBI_CODEC == 0
         STBIImageCodec::shutdown();
 #endif
-#if OGRE_PROFILING
-        OGRE_DELETE mProfiler;
+#if OGRE_NO_ASTC_CODEC == 0
+        ASTCCodec::shutdown();
 #endif
 
         OGRE_DELETE mLodStrategyManager;
@@ -872,7 +883,22 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::_fireFrameStarted(FrameEvent& evt)
     {
-        OgreProfileBeginGroup("Frame", OGREPROF_GENERAL);
+#if OGRE_PROFILING
+        if( OgreProfilerUseStableMarkers )
+        {
+            OgreProfileBeginGroup( "Frame", OGREPROF_GENERAL );
+            OgreProfileGpuBegin( "Frame" );
+        }
+        else
+        {
+            uint32 hashValue = (uint32)mNextFrame;
+            char tmpBuffer[32];
+            LwString frameNum( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+            frameNum.a( "Frame ", hashValue );
+            OgreProfileBeginDynamicHashed( frameNum.c_str(), &hashValue );
+            OgreProfileGpuBeginDynamicHashed( frameNum.c_str(), &hashValue );
+        }
+#endif
         _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
@@ -923,7 +949,22 @@ namespace Ogre {
         // Tell the queue to process responses
         mWorkQueue->processResponses();
 
-        OgreProfileEndGroup("Frame", OGREPROF_GENERAL);
+#if OGRE_PROFILING
+        if( OgreProfilerUseStableMarkers )
+        {
+            OgreProfileGpuEnd( "Frame" );
+            OgreProfileEndGroup( "Frame", OGREPROF_GENERAL );
+        }
+        else
+        {
+            char tmpBuffer[32];
+            LwString frameNum( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+            frameNum.a( "Frame ", (uint32)(mNextFrame - 1u) );
+
+            OgreProfileGpuEnd( frameNum.c_str() );
+            OgreProfileEndGroup( frameNum.c_str(), OGREPROF_GENERAL );
+        }
+#endif
 
         return ret;
     }

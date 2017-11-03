@@ -60,6 +60,8 @@ namespace Ogre
         PASS_CUSTOM
     };
 
+    extern const char *CompositorPassTypeEnumNames[PASS_CUSTOM+1u];
+
     class CompositorTargetDef;
 
     /** Interface to abstract all types of pass definitions (@see CompositorPassType):
@@ -155,6 +157,8 @@ namespace Ogre
         };
         typedef vector<UavDependency>::type UavDependencyVec;
         UavDependencyVec    mUavDependencies;
+
+        String              mProfilingId;
 
     public:
         CompositorPassDef( CompositorPassType passType, CompositorTargetDef *parentTargetDef ) :

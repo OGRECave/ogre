@@ -325,8 +325,8 @@ namespace Ogre
         */
         static void createTextures( const TextureDefinitionVec &textureDefs,
                                     CompositorChannelVec &inOutTexContainer,
-                                    IdType id, bool uniqueNames,
-                                    const RenderTarget *finalTarget, RenderSystem *renderSys );
+                                    IdType id, const RenderTarget *finalTarget,
+                                    RenderSystem *renderSys );
 
         static CompositorChannel createTexture( const TextureDefinition &textureDef,
                                                 const String &texName, const RenderTarget *finalTarget,

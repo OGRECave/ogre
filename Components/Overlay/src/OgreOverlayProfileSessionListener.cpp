@@ -50,7 +50,7 @@ namespace v1
         , mGuiBorderWidth(10)
         , mBarLineWidth(2)
         , mBarSpacing(3)
-        , mMaxDisplayProfiles(50)
+        , mMaxDisplayProfiles(100)
     {
     }
     //-----------------------------------------------------------------------
@@ -130,15 +130,17 @@ namespace v1
     //-----------------------------------------------------------------------
     void OverlayProfileSessionListener::displayResults(const ProfileInstance& root, ulong maxTotalFrameTime)
     {
+#if OGRE_PROFILING != OGRE_PROFILING_REMOTERY
         Real newGuiHeight = mGuiHeight;
         int profileCount = 0;
         Real maxTimeMillisecs = (Real)maxTotalFrameTime / 1000.0f;
 
         ProfileBarList::const_iterator bIter = mProfileBars.begin();
-        ProfileInstance::ProfileChildren::const_iterator it = root.children.begin(), endit = root.children.end();
+        ProfileInstance::ProfileChildrenVec::const_iterator it    = root.children.begin();
+        ProfileInstance::ProfileChildrenVec::const_iterator endit = root.children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
             displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
         }
             
@@ -154,6 +156,7 @@ namespace v1
         {
             (*bIter)->hide();
         }
+#endif
     }
     //-----------------------------------------------------------------------
     void OverlayProfileSessionListener::displayResults(ProfileInstance* instance, ProfileBarList::const_iterator& bIter, Real& maxTimeMillisecs, Real& newGuiHeight, int& profileCount)
@@ -241,16 +244,20 @@ namespace v1
         ++profileCount;
 
         // display children
-        ProfileInstance::ProfileChildren::const_iterator it = instance->children.begin(), endit = instance->children.end();
+        ProfileInstance::ProfileChildrenVec::const_iterator it    = instance->children.begin();
+        ProfileInstance::ProfileChildrenVec::const_iterator endit = instance->children.end();
         for(;it != endit; ++it)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = *it;
             displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
         }
     }
     //-----------------------------------------------------------------------
     void OverlayProfileSessionListener::changeEnableState(bool enabled) 
     {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        mOverlay->hide();
+#else
         if (enabled) 
         {
             mOverlay->show();
@@ -259,6 +266,7 @@ namespace v1
         {
             mOverlay->hide();
         }
+#endif
     }
     //-----------------------------------------------------------------------
     OverlayContainer* OverlayProfileSessionListener::createContainer()
@@ -295,7 +303,7 @@ namespace v1
         textArea->setHeight(height);
         textArea->setTop(top);
         textArea->setLeft(left);
-        textArea->setParameter("font_name", "SdkTrays/Value");
+        textArea->setParameter("font_name", "DebugFont");
         textArea->setParameter("char_height", StringConverter::toString(fontSize));
         textArea->setCaption(caption);
         textArea->setParameter("colour_top", "1 1 1");

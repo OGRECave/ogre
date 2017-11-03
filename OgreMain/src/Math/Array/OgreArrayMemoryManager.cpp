@@ -46,11 +46,13 @@ namespace Ogre
                                                             - OGRE_PREFETCH_SLOT_DISTANCE;
 
     ArrayMemoryManager::ArrayMemoryManager( size_t const *elementsMemSize,
+                                            const CleanupRoutines *initRoutines,
                                             CleanupRoutines const *cleanupRoutines,
                                             size_t numElementsSize, uint16 depthLevel,
                                             size_t hintMaxNodes, size_t cleanupThreshold,
                                             size_t maxHardLimit, RebaseListener *rebaseListener ) :
                             mElementsMemSizes( elementsMemSize ),
+                            mInitRoutines( initRoutines ),
                             mCleanupRoutines( cleanupRoutines ),
                             mTotalMemoryMultiplier( 0 ),
                             mUsedMemory( 0 ),
@@ -103,7 +105,10 @@ namespace Ogre
 //          *itor = reinterpret_cast<char*>(_aligned_malloc(mMaxMemory * ElementsMemSize[i], 16));
             *itor = (char*)OGRE_MALLOC_SIMD( mMaxMemory * mElementsMemSizes[i],
                                              MEMCATEGORY_SCENE_OBJECTS );
-            memset( *itor, 0, mMaxMemory * mElementsMemSizes[i] );
+            if( mInitRoutines && mInitRoutines[i] )
+                mInitRoutines[i]( *itor, 0, 0, 0, 0, mMaxMemory, mElementsMemSizes[i] );
+            else
+                memset( *itor, 0, mMaxMemory * mElementsMemSizes[i] );
             ++i;
             ++itor;
         }
@@ -191,8 +196,16 @@ namespace Ogre
                 char *tmp = (char*)OGRE_MALLOC_SIMD( newMemory * mElementsMemSizes[i],
                                                      MEMCATEGORY_SCENE_OBJECTS );
                 memcpy( tmp, *itor, mMaxMemory * mElementsMemSizes[i] );
-                memset( tmp + mMaxMemory * mElementsMemSizes[i], 0,
-                        (newMemory - mMaxMemory) * mElementsMemSizes[i] );
+                if( mInitRoutines && mInitRoutines[i] )
+                {
+                    mInitRoutines[i]( tmp + mMaxMemory * mElementsMemSizes[i], 0, 0, 0, 0,
+                                      newMemory - mMaxMemory, mElementsMemSizes[i] );
+                }
+                else
+                {
+                    memset( tmp + mMaxMemory * mElementsMemSizes[i], 0,
+                            (newMemory - mMaxMemory) * mElementsMemSizes[i] );
+                }
                 OGRE_FREE_SIMD( *itor, MEMCATEGORY_SCENE_OBJECTS );
                 *itor = tmp;
                 ++i;
@@ -294,8 +307,10 @@ namespace Ogre
         memset( dstPtr + numSlots * elementsMemSize, 0, numFreeSlots * elementsMemSize );
     }
     //-----------------------------------------------------------------------------------
+    inline
     void cleanerArrayVector3( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-                                size_t numSlots, size_t numFreeSlots, size_t elementsMemSize )
+                              size_t numSlots, size_t numFreeSlots, size_t elementsMemSize,
+                              Vector3 defaultVal, const ArrayVector3 &_defaultValArray )
     {
         ArrayVector3 *dst = reinterpret_cast<ArrayVector3*>( dstPtr - indexDst * elementsMemSize );
         ArrayVector3 *src = reinterpret_cast<ArrayVector3*>( srcPtr - indexSrc * elementsMemSize );
@@ -325,16 +340,34 @@ namespace Ogre
         size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, numFreeSlots );
         for( size_t i=0; i<scalarRemainder; ++i )
         {
-            dst->setFromVector3( Vector3::ZERO, indexDst );
+            dst->setFromVector3( defaultVal, indexDst );
             ++indexDst;
         }
 
         ++dst;
 
+        ArrayVector3 defaultValArray = _defaultValArray;
+
         //Keep default initializing, but now on bulk (faster)
         size_t remainder = numFreeSlots - scalarRemainder;
         for( size_t i=0; i<remainder; i += ARRAY_PACKED_REALS )
-            *dst++ = ArrayVector3::ZERO;
+            *dst++ = defaultValArray;
+    }
+    //-----------------------------------------------------------------------------------
+    void cleanerArrayVector3Zero( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+                                  size_t numSlots, size_t numFreeSlots, size_t elementsMemSize )
+    {
+        cleanerArrayVector3( dstPtr, indexDst, srcPtr, indexSrc,
+                             numSlots, numFreeSlots, elementsMemSize,
+                             Vector3::ZERO, ArrayVector3::ZERO );
+    }
+    //-----------------------------------------------------------------------------------
+    void cleanerArrayVector3Unit( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+                                  size_t numSlots, size_t numFreeSlots, size_t elementsMemSize )
+    {
+        cleanerArrayVector3( dstPtr, indexDst, srcPtr, indexSrc,
+                             numSlots, numFreeSlots, elementsMemSize,
+                             Vector3::UNIT_SCALE, ArrayVector3::UNIT_SCALE );
     }
     //-----------------------------------------------------------------------------------
     void cleanerArrayQuaternion( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,

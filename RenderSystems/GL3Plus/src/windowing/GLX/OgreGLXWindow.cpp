@@ -40,6 +40,8 @@
 #include "OgreViewport.h"
 #include "OgrePixelBox.h"
 
+#include "OgreProfiler.h"
+
 #include <iostream>
 #include <algorithm>
 #include <sys/time.h>
@@ -698,10 +700,15 @@ namespace Ogre
         if (mClosed || mIsExternalGLControl)
             return;
 
+        OgreProfileBeginDynamic( ("SwapBuffers: " + mName).c_str() );
+        OgreProfileGpuBeginDynamic( "SwapBuffers: " + mName );
+
         glXSwapBuffers(mGLSupport->getGLDisplay(), mContext->mDrawable);
         RenderWindow::swapBuffers();
-    }
 
+        OgreProfileEnd( "SwapBuffers: " + mName );
+        OgreProfileGpuEnd( "SwapBuffers: " + mName );
+    }
     //-------------------------------------------------------------------------------------------------//
     void GLXWindow::getCustomAttribute( const String& name, void* pData )
     {

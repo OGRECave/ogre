@@ -116,6 +116,9 @@ namespace Ogre
                         CompositorNode *parentNode );
         virtual ~CompositorPass();
 
+        void profilingBegin(void);
+        void profilingEnd(void);
+
         virtual void execute( const Camera *lodCameraconst ) = 0;
 
         void addResourceTransition( ResourceLayoutMap::iterator currentLayout,

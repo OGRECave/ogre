@@ -51,6 +51,8 @@ THE SOFTWARE.
 #include "CommandBuffer/OgreCbDrawCall.h"
 #include "CommandBuffer/OgreCbShaderBuffer.h"
 
+#include "OgreProfiler.h"
+
 
 namespace Ogre
 {
@@ -300,6 +302,8 @@ namespace Ogre
             mLastWasCasterPass = casterPass;
         }
 
+        OgreProfileBeginGroup( "Command Preparation", OGREPROF_RENDERING );
+
         rs->setCurrentPassIterationCount( 1 );
 
         size_t numNeededDraws = 0;
@@ -366,6 +370,8 @@ namespace Ogre
 
             if( !mRenderQueues[i].mSorted )
             {
+                OgreProfileGroup( "Sorting", OGREPROF_RENDERING );
+
                 size_t numRenderables = 0;
                 QueuedRenderableArrayPerThread::const_iterator itor = perThreadQueue.begin();
                 QueuedRenderableArrayPerThread::const_iterator end  = perThreadQueue.end();
@@ -395,9 +401,14 @@ namespace Ogre
                 //  * If it's shorter, reset the indices 0, 1, 2, 3, 4; probably use quicksort or other generic sort
                 //
                 //TODO2: Explore sorting first on multiple threads, then merge sort into one.
-                if( mRenderQueues[i].mDoSort )
+                if( mRenderQueues[i].mSortMode == NormalSort )
                 {
                     std::sort( queuedRenderables.begin(), queuedRenderables.end() );
+                    mRenderQueues[i].mSorted = true;
+                }
+                else if( mRenderQueues[i].mSortMode == StableSort )
+                {
+                    std::stable_sort( queuedRenderables.begin(), queuedRenderables.end() );
                     mRenderQueues[i].mSorted = true;
                 }
             }
@@ -431,6 +442,11 @@ namespace Ogre
         if( supportsIndirectBuffers && indirectBuffer )
             indirectBuffer->unmap( UO_KEEP_PERSISTENT );
 
+        OgreProfileEndGroup( "Command Preparation", OGREPROF_RENDERING );
+
+        OgreProfileBeginGroup( "Command Execution", OGREPROF_RENDERING );
+        OgreProfileGpuBegin( "Command Execution" );
+
         for( size_t i=0; i<HLMS_MAX; ++i )
         {
             Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
@@ -446,6 +462,9 @@ namespace Ogre
             if( hlms )
                 hlms->postCommandBufferExecution( mCommandBuffer );
         }
+
+        OgreProfileGpuEnd( "Command Execution" );
+        OgreProfileEndGroup( "Command Execution", OGREPROF_RENDERING );
     }
     //-----------------------------------------------------------------------
     void RenderQueue::renderES2( RenderSystem *rs, bool casterPass, bool dualParaboloid,
@@ -854,14 +873,14 @@ namespace Ogre
         return mRenderQueues[rqId].mMode;
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::setSortRenderQueue( uint8 rqId, bool bSort )
+    void RenderQueue::setSortRenderQueue( uint8 rqId, RqSortMode sortMode )
     {
-        mRenderQueues[rqId].mDoSort = bSort;
+        mRenderQueues[rqId].mSortMode = sortMode;
     }
     //-----------------------------------------------------------------------
-    bool RenderQueue::getSortRenderQueue( uint8 rqId ) const
+    RenderQueue::RqSortMode RenderQueue::getSortRenderQueue( uint8 rqId ) const
     {
-        return mRenderQueues[rqId].mDoSort;
+        return mRenderQueues[rqId].mSortMode;
     }
 }
 

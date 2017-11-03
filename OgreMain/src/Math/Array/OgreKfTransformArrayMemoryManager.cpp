@@ -42,7 +42,7 @@ namespace Ogre
     KfTransformArrayMemoryManager::KfTransformArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
                                                     size_t cleanupThreshold, size_t maxHardLimit,
                                                     RebaseListener *rebaseListener ) :
-            ArrayMemoryManager( ElementsMemSize, 0,
+            ArrayMemoryManager( ElementsMemSize, 0, 0,
                                 sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
                                 hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener )
     {

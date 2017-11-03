@@ -108,6 +108,13 @@ namespace Ogre {
             FAST
         };
 
+        enum RqSortMode
+        {
+            DisableSort,
+            NormalSort,
+            StableSort,
+        };
+
     private:
         typedef FastArray<QueuedRenderable> QueuedRenderableArray;
 
@@ -124,11 +131,11 @@ namespace Ogre {
         {
             QueuedRenderableArrayPerThread mQueuedRenderablesPerThread;
             QueuedRenderableArray   mQueuedRenderables;
-            bool                    mDoSort;
+            RqSortMode              mSortMode;
             bool                    mSorted;
             Modes                   mMode;
 
-            RenderQueueGroup() : mDoSort( true ), mSorted( false ), mMode( V1_FAST ) {}
+            RenderQueueGroup() : mSortMode( NormalSort ), mSorted( false ), mMode( V1_FAST ) {}
         };
 
         typedef vector<IndirectBufferPacked*>::type IndirectBufferPackedVec;
@@ -240,8 +247,8 @@ namespace Ogre {
             or when you have a deep CPU bottleneck where the time taken to
             sort hurts more than it is supposed to help.
         */
-        void setSortRenderQueue( uint8 rqId, bool bSort );
-        bool getSortRenderQueue( uint8 rqId ) const;
+        void setSortRenderQueue( uint8 rqId, RqSortMode sortMode );
+        RqSortMode getSortRenderQueue( uint8 rqId ) const;
     };
 
     #define OGRE_RQ_MAKE_MASK( x ) ( (1 << (x)) - 1 )
