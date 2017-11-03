@@ -42,8 +42,25 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/Pass/OgreCompositorPassProvider.h"
 
+#include "OgreLwString.h"
+
 namespace Ogre
 {
+    const char *CompositorPassTypeEnumNames[PASS_CUSTOM+1u] =
+    {
+        "INVALID",
+        "SCENE",
+        "QUAD",
+        "CLEAR",
+        "STENCIL",
+        "RESOLVE",
+        "DEPTHCOPY",
+        "UAV",
+        "MIPMAP",
+        "COMPUTE",
+        "CUSTOM"
+    };
+
     CompositorTargetDef::~CompositorTargetDef()
     {
         CompositorPassDefVec::const_iterator itor = mCompositorPasses.begin();
@@ -104,6 +121,12 @@ namespace Ogre
         default:
             break;
         }
+
+        char tmpBuffer[128];
+        LwString profilingId( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+        profilingId.a( CompositorPassTypeEnumNames[passType], " ",
+                       Id::generateNewId<CompositorPassDef>() );
+        retVal->mProfilingId = profilingId.c_str();
 
         mParentNodeDef->postInitializePassDef( retVal );
 

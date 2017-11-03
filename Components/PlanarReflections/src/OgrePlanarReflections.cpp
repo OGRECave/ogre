@@ -405,7 +405,7 @@ namespace Ogre
 
         bool operator () ( const PlanarReflectionActor *_l, const PlanarReflectionActor *_r ) const
         {
-            if( _l->mActivationPriority != _r->mActivationPriority )
+            if( _l->mActivationPriority == _r->mActivationPriority )
                 return _l->getSquaredDistanceTo( point ) < _r->getSquaredDistanceTo( point );
 
             return _l->mActivationPriority < _r->mActivationPriority;

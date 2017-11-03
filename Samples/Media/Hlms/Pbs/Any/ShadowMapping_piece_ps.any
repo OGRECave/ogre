@@ -265,6 +265,9 @@
 		float3 debugPssmSplit = float3( 0, 0, 0 );
 	@end
 	float fShadow = 1.0;
+	@property( hlms_pssm_blend )
+		float fShadowBlend = 1.0;
+	@end
 	@property( receive_shadows )
 		if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
 		{
@@ -272,6 +275,18 @@
 								 inPs.posL0,
 								 passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize
 								 hlms_shadowmap@counter(CurrentShadowMap)_uv_param );
+			@property( hlms_pssm_blend )
+				if( inPs.depth > passBuf.pssmBlendPoints@value(CurrentShadowMapBlend) )
+				{
+					fShadowBlend = getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
+											  inPs.posL1,
+											  passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize
+											  hlms_shadowmap@value(CurrentShadowMap)_uv_param );
+					fShadow = lerp( fShadow, fShadowBlend,
+									(inPs.depth - passBuf.pssmBlendPoints@value(CurrentShadowMapBlend)) /
+									(passBuf.pssmSplitPoints@value(CurrentShadowMapBlend) - passBuf.pssmBlendPoints@counter(CurrentShadowMapBlend)) );
+				}
+			@end
 			@property( debug_pssm_splits )
 				debugPssmSplit = float3( 0.0, 1.0, 0.0 );
 			@end
@@ -283,6 +298,25 @@
 								 inPs.posL@n,
 								 passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize
 								 hlms_shadowmap@counter(CurrentShadowMap)_uv_param );
+			@property( hlms_pssm_blend && @n < hlms_pssm_splits_minus_one )
+				if( inPs.depth > passBuf.pssmBlendPoints@value(CurrentShadowMapBlend) )
+				{
+					fShadowBlend = getShadow( hlms_shadowmap@value(CurrentShadowMap), @insertpiece( UseSamplerShadow )
+											  inPs.posL@value(CurrentShadowMap),
+											  passBuf.shadowRcv[@value(CurrentShadowMap)].invShadowMapSize
+											  hlms_shadowmap@value(CurrentShadowMap)_uv_param );
+					fShadow = lerp( fShadow, fShadowBlend,
+									(inPs.depth - passBuf.pssmBlendPoints@value(CurrentShadowMapBlend)) /
+									(passBuf.pssmSplitPoints@value(CurrentShadowMapBlend) - passBuf.pssmBlendPoints@counter(CurrentShadowMapBlend)) );
+				}
+			@end @property( hlms_pssm_fade && @n == hlms_pssm_splits_minus_one )
+				if( inPs.depth > passBuf.pssmFadePoint )
+				{
+					fShadow = lerp( fShadow, 1.0,
+									(inPs.depth - passBuf.pssmFadePoint) /
+									(passBuf.pssmSplitPoints@value(hlms_pssm_splits_minus_one) - passBuf.pssmFadePoint) );
+				}
+			@end
 			@property( debug_pssm_splits )
 				@property( @n == 1 )
 					debugPssmSplit = float3( 0.0, 0.0, 1.0 );

@@ -15,7 +15,11 @@
 
 		@property( !hlms_shadow_uses_depth_texture && !hlms_shadowcaster_point && !exponential_shadow_maps )
 			//Linear depth
-			outVs.depth	= (outVs_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
+			@property( hlms_shadowcaster_directional )
+				outVs.depth	= outVs_Position.z + shadowConstantBias * passBuf.depthRange.y * passBuf.depthRange.y;
+			@end @property( !hlms_shadowcaster_directional )
+				outVs.depth	= (outVs_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
+			@end
 			@property( syntax == glsl )outVs.depth = (outVs.depth * 0.5) + 0.5;@end
 		@end
 
@@ -30,7 +34,11 @@
 			//We can't make the depth buffer linear without Z out in the fragment shader;
 			//however we can use a cheap approximation ("pseudo linear depth")
 			//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
-			outVs_Position.z = (outVs_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y * outVs_Position.w;
+			@property( hlms_shadowcaster_directional )
+				outVs_Position.z = outVs_Position.z + shadowConstantBias * passBuf.depthRange.y * passBuf.depthRange.y;
+			@end @property( !hlms_shadowcaster_directional )
+				outVs_Position.z = (outVs_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y * outVs_Position.w;
+			@end
 		@end
 
 		@property( exponential_shadow_maps && !hlms_shadowcaster_point )

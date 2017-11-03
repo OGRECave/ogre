@@ -58,21 +58,21 @@ namespace Ogre
     }
 
     // Update operations
-#define DEFINE_UPDATE_OPERATION( leftClass, op )\
+#define DEFINE_UPDATE_OPERATION( leftClass, op, op_func )\
     inline void ArrayQuaternion::operator op ( const leftClass &a )\
     {\
-        w = w op a.w;\
-        x = x op a.x;\
-        y = y op a.y;\
-        z = z op a.z;\
+        w = w op_func a.w;\
+        x = x op_func a.x;\
+        y = y op_func a.y;\
+        z = z op_func a.z;\
     }
-#define DEFINE_UPDATE_R_OPERATION( rightType, op )\
+#define DEFINE_UPDATE_R_OPERATION( rightType, op, op_func )\
     inline void ArrayQuaternion::operator op ( const rightType a )\
     {\
-        w = w op a;\
-        x = x op a;\
-        y = y op a;\
-        z = z op a;\
+        w = w op_func a;\
+        x = x op_func a;\
+        y = y op_func a;\
+        z = z op_func a;\
     }
 
     // + Addition
@@ -87,13 +87,13 @@ namespace Ogre
 
     // Update operations
     // +=
-    DEFINE_UPDATE_OPERATION(            ArrayQuaternion,        += );
+    DEFINE_UPDATE_OPERATION(            ArrayQuaternion,        +=, + );
 
     // -=
-    DEFINE_UPDATE_OPERATION(            ArrayQuaternion,        -= );
+    DEFINE_UPDATE_OPERATION(            ArrayQuaternion,        -=, - );
 
     // *=
-    DEFINE_UPDATE_R_OPERATION(          ArrayReal,          *= );
+    DEFINE_UPDATE_R_OPERATION(          ArrayReal,          *=, * );
 
     // Notes: This operator doesn't get inlined. The generated instruction count is actually high so
     // the compiler seems to be clever in not inlining. There is no gain in doing a "mul()" equivalent

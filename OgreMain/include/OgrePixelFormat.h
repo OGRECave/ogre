@@ -257,6 +257,63 @@ namespace Ogre {
         /// ATC (AMD_compressed_ATC_texture)
         PF_ATC_RGBA_INTERPOLATED_ALPHA = 94,
 
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 4x4)
+        PF_ASTC_RGBA_4X4_LDR = 95,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 5x4)
+        PF_ASTC_RGBA_5X4_LDR = 96,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 5x5)
+        PF_ASTC_RGBA_5X5_LDR = 97,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 6x5)
+        PF_ASTC_RGBA_6X5_LDR = 98,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 6x6)
+        PF_ASTC_RGBA_6X6_LDR = 99,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x5)
+        PF_ASTC_RGBA_8X5_LDR = 100,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x6)
+        PF_ASTC_RGBA_8X6_LDR = 101,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x8)
+        PF_ASTC_RGBA_8X8_LDR = 102,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x5)
+        PF_ASTC_RGBA_10X5_LDR = 103,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x6)
+        PF_ASTC_RGBA_10X6_LDR = 104,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x8)
+        PF_ASTC_RGBA_10X8_LDR = 105,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x10)
+        PF_ASTC_RGBA_10X10_LDR = 106,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 12x10)
+        PF_ASTC_RGBA_12X10_LDR = 107,
+        /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 12x12)
+        PF_ASTC_RGBA_12X12_LDR = 108,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 4x4)
+        PF_ASTC_SRGB8A8_4X4_LDR = 109,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 5x4)
+        PF_ASTC_SRGB8A8_5X4_LDR = 110,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 5x5)
+        PF_ASTC_SRGB8A8_5X5_LDR = 111,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 6x5)
+        PF_ASTC_SRGB8A8_6X5_LDR = 112,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 6x6)
+        PF_ASTC_SRGB8A8_6X6_LDR = 113,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 8x5)
+        PF_ASTC_SRGB8A8_8X5_LDR = 114,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 8x6)
+        PF_ASTC_SRGB8A8_8X6_LDR = 115,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 8x8)
+        PF_ASTC_SRGB8A8_8X8_LDR = 116,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 10x5)
+        PF_ASTC_SRGB8A8_10X5_LDR = 117,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 10x6)
+        PF_ASTC_SRGB8A8_10X6_LDR = 118,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 10x8)
+        PF_ASTC_SRGB8A8_10X8_LDR = 119,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 10x10)
+        PF_ASTC_SRGB8A8_10X10_LDR = 120,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 12x10)
+        PF_ASTC_SRGB8A8_12X10_LDR = 121,
+        /// ASTC (ARM Adaptive Scalable Texture Compression 8 bits each sRGB 8 bits alpha, block size 12x12)
+        PF_ASTC_SRGB8A8_12X12_LDR = 122,
+
         /// Depth texture format. 24 bits for depth, 8 bits for stencil.
         /// The following formats are just reinterpretations of the same depth buffer:
         ///  24-bit normalized uint depth and 8-bit stencil
@@ -278,31 +335,31 @@ namespace Ogre {
         /// may or may not internally point to the same depth buffer. Use depth buffer
         /// pools if you want a guarantee that they use different buffers.
         /// Last but not least, not all GPUs support all these formats.
-        PF_D24_UNORM_S8_UINT = 95,
+        PF_D24_UNORM_S8_UINT = 123,
         /// Depth texture format. 24 bits for depth.
-        PF_D24_UNORM_X8 = 96,
+        PF_D24_UNORM_X8 = 124,
         /// Depth texture format. 8 bits for stencil.
-        PF_X24_S8_UINT = 97,
+        PF_X24_S8_UINT = 125,
         /// Depth texture format 24 bits for depth.
-        PF_D24_UNORM = 98,
+        PF_D24_UNORM = 126,
         /// Depth texture format. 16 bits for depth.
-        PF_D16_UNORM = 99,
+        PF_D16_UNORM = 127,
         /// Depth texture format. 32 bits for depth.
-        PF_D32_FLOAT = 100,
+        PF_D32_FLOAT = 128,
         /// Depth texture format. 32 bits for depth. 8 bits for stencil
-        PF_D32_FLOAT_X24_S8_UINT = 101,
+        PF_D32_FLOAT_X24_S8_UINT = 129,
         /// Depth texture format. 32 bits for depth.
-        PF_D32_FLOAT_X24_X8 = 102,
+        PF_D32_FLOAT_X24_X8 = 130,
         /// Depth texture format. 8 bits for stencil
-        PF_X32_X24_S8_UINT = 103,
+        PF_X32_X24_S8_UINT = 131,
 
         /// Dummy, used for UAV-only rendering. D3D11 calls it
         /// Target-independent rasterization / UAVOnlyRenderingForcedSampleCount
         /// OpenGL is under GL_ARB_framebuffer_no_attachments
-        PF_NULL = 104,
+        PF_NULL = 132,
 
         // Number of pixel formats currently defined
-        PF_COUNT = 105
+        PF_COUNT = 133
     };
     typedef vector<PixelFormat>::type PixelFormatList;
 

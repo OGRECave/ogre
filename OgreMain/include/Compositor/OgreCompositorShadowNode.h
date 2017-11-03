@@ -246,6 +246,27 @@ namespace Ogre
         */
         const vector<Real>::type* getPssmSplits( size_t shadowMapIdx ) const;
 
+        /** Returns a list of points with the blend band boundaries of the closest N-1 PSSM split
+            in projection space for the given shadow map index.
+        @remarks
+            @see getPssmSplits
+        @return
+            An array with the blend points. The number of elements is N-1 where N is the number
+            of splits for that shadow map.
+            Returns null if shadowMapIdx is out of bounds, or is not a PSSM technique.
+        */
+        const vector<Real>::type* getPssmBlends( size_t shadowMapIdx ) const;
+
+        /** Returns the fade point of the last PSSM split in projection space
+            for the given shadow map index.
+        @remarks
+            @see getPssmSplits
+        @return
+            The fade point.
+            Returns null if shadowMapIdx is out of bounds, or is not a PSSM technique.
+        */
+        const Real* getPssmFade( size_t shadowMapIdx ) const;
+
         /** The return value may change in the future, which happens when the number of lights
             changes to or from a value lower than the supported shadow casting lights by the
             definition.

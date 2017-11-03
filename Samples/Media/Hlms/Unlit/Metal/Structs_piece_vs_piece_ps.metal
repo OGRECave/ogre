@@ -17,6 +17,8 @@ struct Material
 
 	@foreach( 16, n )
 		ushort diffuseIdx@n;@end
+
+	@insertpiece( custom_materialBuffer )
 };@end
 
 @piece( MaterialDecl )

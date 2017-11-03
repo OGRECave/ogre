@@ -1349,6 +1349,16 @@ namespace Ogre {
             */
             ACT_PSSM_SPLITS,
 
+            /** Array of PSSM blend points (pixel depth must be lower) in projection space.
+                Extra param indicates which shadow map it comes from.
+            */
+            ACT_PSSM_BLENDS,
+
+            /** PSSM fade point (pixel depth must be lower) in projection space.
+                Extra param indicates which shadow map it comes from.
+            */
+            ACT_PSSM_FADE,
+
             ACT_UNKNOWN = 999
         };
 

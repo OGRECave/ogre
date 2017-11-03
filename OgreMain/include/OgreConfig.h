@@ -40,6 +40,10 @@ THE SOFTWARE.
 #define OGRE_PROFILING 0
 #endif
 
+#define OGRE_PROFILING_NONE         0
+#define OGRE_PROFILING_INTERNAL     1
+#define OGRE_PROFILING_REMOTERY     2
+
 /** There are three modes for handling asserts in OGRE:
 0 - STANDARD - Standard asserts in debug builds, nothing in release builds
 1 - RELEASE_EXCEPTIONS - Standard asserts in debug builds, exceptions in release builds

@@ -1357,6 +1357,370 @@ namespace Ogre {
             0, 0, 0, 0, 0, 0, 0, 0
         },
         //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_4X4_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_5X4_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_5X5_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_6X5_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_6X6_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_8X5_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_8X6_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_8X8_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_10X5_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_10X6_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_10X8_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_10X10_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_12X10_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_RGBA_12X12_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_4X4_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_5X4_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_5X5_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_6X5_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_6X6_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_8X5_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_8X6_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_8X8_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_10X5_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_10X6_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_10X8_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_10X10_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_12X10_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_ASTC_SRGB8A8_12X12_LDR",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            PFF_COMPRESSED | PFF_HASALPHA,
+            /* Component type and count */
+            PCT_BYTE, 4,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
         {"PF_D24_UNORM_S8_UINT",
             /* Bytes per element */
             4,

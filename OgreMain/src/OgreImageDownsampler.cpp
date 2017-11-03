@@ -145,9 +145,9 @@ namespace Ogre
             //Linear
             {
                 0, 0, 0, 0, 0,
-                0, 0, 1, 1, 0,
-                0, 0, 1, 1, 0,
                 0, 0, 0, 0, 0,
+                0, 0, 1, 1, 0,
+                0, 0, 1, 1, 0,
                 0, 0, 0, 0, 0
             },
             0, 1,
@@ -415,7 +415,7 @@ namespace Ogre
             for( int32 x=0; x<dstWidth; ++x )
             {
                 int kStartY = std::max<int>( -y, kernelStartY );
-                int kEndY   = std::min<int>( dstHeight - 1 - y, kernelEndY );
+                int kEndY   = std::min<int>( dstHeight - y, kernelEndY );
 
     #ifdef OGRE_DOWNSAMPLE_R
                 OGRE_UINT32 accumR = 0;

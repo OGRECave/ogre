@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgrePixelBox.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreProfiler.h"
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
@@ -543,6 +544,9 @@ namespace Ogre
             // Step of resolving MSAA resource for swap chains in FlipSequentialMode should be done by application rather than by OS.
             if(mUseFlipSequentialMode && mFSAAType.Count > 1)
             {
+                OgreProfileBeginDynamic( ("Resolve Sequential MSAA: " + mName).c_str() );
+                OgreProfileGpuBeginDynamic( "Resolve Sequential MSAA: " + mName );
+
                 ID3D11Texture2D* swapChainBackBuffer = NULL;
                 HRESULT hr = mpSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&swapChainBackBuffer);
                 if(FAILED(hr))
@@ -559,13 +563,22 @@ namespace Ogre
                     mDevice.GetImmediateContext()->CopyResource(swapChainBackBuffer, mpBackBufferNoMSAA);
                 }
                 SAFE_RELEASE(swapChainBackBuffer);
+
+                OgreProfileEnd( ("Resolve Sequential MSAA: " + mName).c_str() );
+                OgreProfileGpuEnd( "Resolve Sequential MSAA: " + mName );
 			}
+
+            OgreProfileBeginDynamic( ("SwapBuffers: " + mName).c_str() );
+            OgreProfileGpuBeginDynamic( "SwapBuffers: " + mName );
 
             // flip presentation model swap chains have another semantic for first parameter
             UINT syncInterval = mUseFlipSequentialMode ? std::max(1U, mVSyncInterval) : (mVSync ? mVSyncInterval : 0);
             HRESULT hr = mpSwapChain->Present(syncInterval, 0);
             if( FAILED(hr) )
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers");
+
+            OgreProfileEnd( "SwapBuffers: " + mName );
+            OgreProfileGpuEnd( "SwapBuffers: " + mName );
         }
 
 		D3D11RenderWindowBase::swapBuffers();

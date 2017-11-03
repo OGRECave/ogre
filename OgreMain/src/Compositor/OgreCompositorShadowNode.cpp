@@ -180,7 +180,7 @@ namespace Ogre
                     {
                         PSSMShadowCameraSetup *setup = OGRE_NEW PSSMShadowCameraSetup();
                         shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
-                        setup->calculateSplitPoints( itor->numSplits, 0.1f, 100.0f, 0.95f );
+                        setup->calculateSplitPoints( itor->numSplits, 0.1f, 100.0f, 0.95f, 0.125f, 0.313f );
                         setup->setSplitPadding( itor->splitPadding );
                     }
                     break;
@@ -576,7 +576,7 @@ namespace Ogre
                         pssmSetup->getSplitPoints()[itor->numSplits-1] != light->getShadowFarDistance() )
                     {
                         pssmSetup->calculateSplitPoints( itor->numSplits, camera->getNearClipDistance(),
-                                                    light->getShadowFarDistance(), itor->pssmLambda );
+                                                    light->getShadowFarDistance(), itor->pssmLambda, itor->splitBlend, itor->splitFade );
                     }
                 }
 
@@ -895,6 +895,50 @@ namespace Ogre
                 PSSMShadowCameraSetup *pssmSetup = static_cast<PSSMShadowCameraSetup*>(
                                             mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() );
                 retVal = &pssmSetup->getSplitPoints();
+            }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    const vector<Real>::type* CompositorShadowNode::getPssmBlends( size_t shadowMapIdx ) const
+    {
+        vector<Real>::type const *retVal = 0;
+
+        if( shadowMapIdx < mShadowMapCastingLights.size() )
+        {
+            if( mDefinition->mShadowMapTexDefinitions[shadowMapIdx].shadowMapTechnique ==
+                SHADOWMAP_PSSM &&
+                isShadowMapIdxActive( shadowMapIdx ) )
+            {
+                assert( dynamic_cast<PSSMShadowCameraSetup*>(
+                        mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() ) );
+
+                PSSMShadowCameraSetup *pssmSetup = static_cast<PSSMShadowCameraSetup*>(
+                                            mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() );
+                retVal = &pssmSetup->getSplitBlendPoints();
+            }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    const Real* CompositorShadowNode::getPssmFade( size_t shadowMapIdx ) const
+    {
+        Real const *retVal = 0;
+
+        if( shadowMapIdx < mShadowMapCastingLights.size() )
+        {
+            if( mDefinition->mShadowMapTexDefinitions[shadowMapIdx].shadowMapTechnique ==
+                SHADOWMAP_PSSM &&
+                isShadowMapIdxActive( shadowMapIdx ) )
+            {
+                assert( dynamic_cast<PSSMShadowCameraSetup*>(
+                        mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() ) );
+
+                PSSMShadowCameraSetup *pssmSetup = static_cast<PSSMShadowCameraSetup*>(
+                                            mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() );
+                retVal = &pssmSetup->getSplitFadePoint();
             }
         }
 

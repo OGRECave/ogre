@@ -563,6 +563,11 @@ namespace Ogre {
 
         /// @copydoc RenderSystem::markProfileEvent
         virtual void markProfileEvent( const String &eventName );
+
+        virtual void initGPUProfiling(void);
+        virtual void deinitGPUProfiling(void);
+        virtual void beginGPUSampleProfile( const String &name, uint32 *hashCache );
+        virtual void endGPUSampleProfile( const String &name );
     };
 }
 

@@ -139,7 +139,7 @@ namespace Ogre
 
         //Force the pool to contain only 1 entry.
         mSlotsPerPool   = 1u;
-        mBufferSize     = HlmsTerraDatablock::MaterialSizeInGpuAligned;
+        mBufferSize     = mBytesPerSlot;
 
         HlmsBufferManager::_changeRenderSystem( newRs );
 
@@ -542,6 +542,9 @@ namespace Ogre
         int32 numShadowMapLights   = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
+        bool isPssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;
+        bool isPssmFade = getProperty( HlmsBaseProp::PssmFade ) != 0;
+
         //mat4 viewProj + mat4 view;
         size_t mapSize = (16 + 16) * 4;
 
@@ -573,6 +576,18 @@ namespace Ogre
 
         //float pssmSplitPoints N times.
         mapSize += numPssmSplits * 4;
+
+        if( isPssmBlend )
+        {
+            //float pssmBlendPoints N-1 times.
+            mapSize += ( numPssmSplits - 1 ) * 4;
+        }
+        if( isPssmFade )
+        {
+            //float pssmFadePoint.
+            mapSize += 4;
+        }
+
         mapSize = alignToNextMultiple( mapSize, 16 );
 
         if( shadowNode )
@@ -717,7 +732,24 @@ namespace Ogre
         for( int32 i=0; i<numPssmSplits; ++i )
             *passBufferPtr++ = (*shadowNode->getPssmSplits(0))[i+1];
 
-        passBufferPtr += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
+        int32 numPssmBlendsAndFade = 0;
+        if( isPssmBlend )
+        {
+            numPssmBlendsAndFade += numPssmSplits - 1;
+
+            //float pssmBlendPoints
+            for( int32 i=0; i<numPssmSplits-1; ++i )
+                *passBufferPtr++ = (*shadowNode->getPssmBlends(0))[i];
+        }
+        if( isPssmFade )
+        {
+            numPssmBlendsAndFade += 1;
+
+            //float pssmFadePoint
+            *passBufferPtr++ = *shadowNode->getPssmFade(0);
+        }
+
+        passBufferPtr += alignToNextMultiple( numPssmSplits + numPssmBlendsAndFade, 4 ) - ( numPssmSplits + numPssmBlendsAndFade );
 
         if( numShadowMapLights > 0 )
         {

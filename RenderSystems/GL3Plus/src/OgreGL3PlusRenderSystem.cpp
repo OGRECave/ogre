@@ -71,6 +71,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreViewport.h"
 #include "OgreGL3PlusPixelFormat.h"
 
+#include "OgreProfiler.h"
+
 #if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum type,
@@ -80,6 +82,9 @@ static void APIENTRY GLDebugCallback(GLenum source,
                                      const GLchar* message,
                                      const void* userParam)
 {
+    if( type == GL_DEBUG_TYPE_PUSH_GROUP || type == GL_DEBUG_TYPE_POP_GROUP )
+        return; //Ignore these
+
     char debSource[32], debType[32], debSev[32];
 
     if (source == GL_DEBUG_SOURCE_API)
@@ -107,6 +112,10 @@ static void APIENTRY GLDebugCallback(GLenum source,
         strcpy(debType, "performance");
     else if (type == GL_DEBUG_TYPE_OTHER)
         strcpy(debType, "message");
+    else if (type == GL_DEBUG_TYPE_PUSH_GROUP)
+        strcpy(debType, "push");
+    else if (type == GL_DEBUG_TYPE_POP_GROUP)
+        strcpy(debType, "pop");
 
     if (severity == GL_DEBUG_SEVERITY_HIGH)
     {
@@ -3746,31 +3755,65 @@ namespace Ogre {
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
         markProfileEvent("Begin Event: " + eventName);
-        if (mGLSupport->checkExtension("ARB_debug_group") || mHasGL43)
-            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
+        if( mHasGL43 || mGLSupport->checkExtension("ARB_debug_group") )
+        {
+            OCGE( glPushDebugGroup( GL_DEBUG_SOURCE_THIRD_PARTY, 0,
+                                    static_cast<GLint>( eventName.length() ),
+                                    eventName.c_str() ) );
+        }
     }
 
 
     void GL3PlusRenderSystem::endProfileEvent( void )
     {
         markProfileEvent("End Event");
-        if (mGLSupport->checkExtension("ARB_debug_group") || mHasGL43)
-            OGRE_CHECK_GL_ERROR(glPopDebugGroup());
+        if( mHasGL43 || mGLSupport->checkExtension("ARB_debug_group") )
+            OCGE( glPopDebugGroup() );
     }
 
 
     void GL3PlusRenderSystem::markProfileEvent( const String &eventName )
     {
-        if ( eventName.empty() )
+        if( eventName.empty() )
             return;
 
-        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
-            glDebugMessageInsert(GL_DEBUG_SOURCE_THIRD_PARTY,
-                                 GL_DEBUG_TYPE_PERFORMANCE,
-                                 GL_DEBUG_SEVERITY_LOW,
-                                 0,
-                                 static_cast<GLint>(eventName.length()),
-                                 eventName.c_str());
+        if( mHasGL43 || mGLSupport->checkExtension("GL_KHR_debug") )
+        {
+            glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY,
+                                  GL_DEBUG_TYPE_PERFORMANCE,
+                                  0,
+                                  GL_DEBUG_SEVERITY_LOW,
+                                  static_cast<GLint>( eventName.length() ),
+                                  eventName.c_str() );
+        }
+    }
+
+    void GL3PlusRenderSystem::initGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_BindOpenGL();
+#endif
+    }
+
+    void GL3PlusRenderSystem::deinitGPUProfiling(void)
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_UnbindOpenGL();
+#endif
+    }
+
+    void GL3PlusRenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_BeginOpenGLSample( name.c_str(), hashCache );
+#endif
+    }
+
+    void GL3PlusRenderSystem::endGPUSampleProfile( const String &name )
+    {
+#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+        _rmt_EndOpenGLSample();
+#endif
     }
 
     bool GL3PlusRenderSystem::activateGLTextureUnit(size_t unit)

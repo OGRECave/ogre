@@ -47,6 +47,8 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 #include "OgreWireAabb.h"
 
+#include "OgreProfiler.h"
+
 namespace Ogre
 {
     //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
@@ -503,6 +505,8 @@ namespace Ogre
         CachedGrid *cachedGrid = 0;
         if( getCachedGridFor( camera, &cachedGrid ) )
             return; //Up to date.
+
+        OgreProfile( "Forward Clustered Light Collect" );
 
         //Cull the lights against the camera. Get non-directional, non-shadow-casting lights
         //(lights set to cast shadows but currently not casting shadows are also included)

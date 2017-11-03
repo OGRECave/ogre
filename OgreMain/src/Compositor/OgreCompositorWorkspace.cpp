@@ -43,6 +43,8 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 #include "OgreLogManager.h"
 
+#include "OgreProfiler.h"
+
 namespace Ogre
 {
     CompositorWorkspace::CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
@@ -58,6 +60,7 @@ namespace Ogre
             mDefinition( definition ),
             mValid( false ),
             mEnabled( bEnabled ),
+            mAmalgamatedProfiling( false ),
             mListener( 0 ),
             mDefaultCamera( defaultCam ),
             mSceneManager( sceneManager ),
@@ -90,7 +93,7 @@ namespace Ogre
 
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
-                                                id, true, finalTarget, mRenderSys );
+                                                id, finalTarget, mRenderSys );
 
         //Create local buffers
         mGlobalBuffers.reserve( mDefinition->mLocalBufferDefs.size() );
@@ -342,6 +345,10 @@ namespace Ogre
 
             analyzeHazardsAndPlaceBarriers();
         }
+
+#if OGRE_PROFILING
+        Profiler::getSingleton().reset( true );
+#endif
     }
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::clearAllConnections(void)
