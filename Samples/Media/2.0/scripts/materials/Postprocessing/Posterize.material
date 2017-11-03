@@ -1,7 +1,6 @@
 fragment_program Postprocess/Posterize_ps_HLSL hlsl
 {
 	source Posterize_ps.hlsl
-	source Invert_ps.hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point main
 }
