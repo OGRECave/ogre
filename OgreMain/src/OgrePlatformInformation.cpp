@@ -40,7 +40,11 @@ THE SOFTWARE.
 #include <signal.h>
 #include <setjmp.h>
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-    #include <sys/sysctl.h>
+    #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        #include <linux/sysctl.h>
+    #else
+        #include <sys/sysctl.h>
+    #endif
 #endif
 
     #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
