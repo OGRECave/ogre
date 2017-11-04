@@ -13,6 +13,7 @@
 #  Rapidjson_FOUND - system has Rapidjson
 #  Rapidjson_INCLUDE_DIRS - the Rapidjson include directories
 
+include(FindPackageHandleStandardArgs)
 include(FindPkgMacros)
 findpkg_begin(Rapidjson)
 
