@@ -551,7 +551,7 @@
 #define SMAASampleLevelZeroPoint(tex, coord) tex2Dlod(tex, float4(coord, 0.0, 0.0))
 #define SMAASampleLevelZeroOffset(tex, coord, offset) tex2Dlod(tex, float4(coord + offset * SMAA_RT_METRICS.xy, 0.0, 0.0))
 #define SMAASample(tex, coord) tex2D(tex, coord)
-#define SMAASamplePoint(tex, coord) fromSRGB( tex2D(tex, coord) )
+#define SMAASamplePoint(tex, coord) toSRGB( tex2D(tex, coord) )
 #define SMAASampleOffset(tex, coord, offset) tex2D(tex, coord + offset * SMAA_RT_METRICS.xy)
 #define SMAA_FLATTEN [flatten]
 #define SMAA_BRANCH [branch]
@@ -565,7 +565,7 @@ SamplerState PointSampler { Filter = MIN_MAG_MIP_POINT; AddressU = Clamp; Addres
 #define SMAASampleLevelZeroPoint(tex, coord) tex.SampleLevel(PointSampler, coord, 0)
 #define SMAASampleLevelZeroOffset(tex, coord, offset) tex.SampleLevel(LinearSampler, coord, 0, offset)
 #define SMAASample(tex, coord) tex.Sample(LinearSampler, coord)
-#define SMAASamplePoint(tex, coord) fromSRGB( tex.Sample(PointSampler, coord) )
+#define SMAASamplePoint(tex, coord) toSRGB( tex.Sample(PointSampler, coord) )
 #define SMAASampleOffset(tex, coord, offset) tex.Sample(LinearSampler, coord, offset)
 #define SMAA_FLATTEN [flatten]
 #define SMAA_BRANCH [branch]
@@ -584,7 +584,7 @@ SamplerState PointSampler { Filter = MIN_MAG_MIP_POINT; AddressU = Clamp; Addres
 #define SMAASampleLevelZeroPoint(tex, coord) textureLod(tex, coord, 0.0)
 #define SMAASampleLevelZeroOffset(tex, coord, offset) textureLodOffset(tex, coord, 0.0, offset)
 #define SMAASample(tex, coord) texture(tex, coord)
-#define SMAASamplePoint(tex, coord) fromSRGB( texture(tex, coord) )
+#define SMAASamplePoint(tex, coord) toSRGB( texture(tex, coord) )
 #define SMAASampleOffset(tex, coord, offset) texture(tex, coord, offset)
 #define SMAA_FLATTEN
 #define SMAA_BRANCH
@@ -621,7 +621,7 @@ constexpr sampler PointSampler = sampler( coord::normalized,
 #define SMAASampleLevelZeroPoint(tex, coord) tex.sample(PointSampler, coord, level(0))
 #define SMAASampleLevelZeroOffset(tex, coord, offset) tex.sample(LinearSampler, coord, level(0), offset)
 #define SMAASample(tex, coord) tex.sample(LinearSampler, coord)
-#define SMAASamplePoint(tex, coord) fromSRGB( tex.sample(PointSampler, coord) )
+#define SMAASamplePoint(tex, coord) toSRGB( tex.sample(PointSampler, coord) )
 #define SMAASampleOffset(tex, coord, offset) tex.sample(LinearSampler, coord, offset)
 #define SMAA_FLATTEN
 #define SMAA_BRANCH

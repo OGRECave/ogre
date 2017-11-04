@@ -38,6 +38,11 @@ float fromSRGB( float x )
 	return (x <= 0.040449907) ? x / 12.92 : pow( (x + 0.055) / 1.055, 2.4 );
 }
 
+float4 toSRGB( float4 x )
+{
+	return float4( toSRGB( x.x ), toSRGB( x.y ), toSRGB( x.z ), x.w );
+}
+
 float4 fromSRGB( float4 x )
 {
     return float4( fromSRGB( x.x ), fromSRGB( x.y ), fromSRGB( x.z ), x.w );
