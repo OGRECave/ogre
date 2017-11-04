@@ -9,7 +9,10 @@ compositor_node SmaaNode
 
 	target edgesTex
 	{
-		pass clear {}
+		pass clear
+		{
+			buffers depth stencil
+		}
 		pass stencil
 		{
 			check true
@@ -57,7 +60,6 @@ compositor_node SmaaNode
 		}
 		pass clear
 		{
-			discard_only yes
 			buffers colour
 		}
 		pass render_quad
