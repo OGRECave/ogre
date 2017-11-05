@@ -95,6 +95,7 @@ cbuffer PassBuffer : register(b0)
 	float4 f3dData;
 	@property( hlms_forwardplus == forward3d )
 		float4 f3dGridHWW[@value( forward3d_num_slices )];
+		float4 f3dViewportOffset;
 	@end
 	@property( hlms_forwardplus != forward3d )
 		float4 fwdScreenToGrid;

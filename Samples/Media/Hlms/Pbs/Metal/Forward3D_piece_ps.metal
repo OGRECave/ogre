@@ -29,8 +29,8 @@
 		//passBuf.f3dGridHWW[slice].z = grid_width * lightsPerCell;
 		//uint sampleOffset = 0;
 		uint sampleOffset = offset +
-							uint(floor( (windowHeight - inPs.gl_FragCoord.y) * passBuf.f3dGridHWW[slice].y ) * passBuf.f3dGridHWW[slice].z) +
-							uint(floor( inPs.gl_FragCoord.x * passBuf.f3dGridHWW[slice].x ) * lightsPerCell);
+							uint(floor( (windowHeight - (inPs.gl_FragCoord.y - passBuf.f3dViewportOffset.y)) * passBuf.f3dGridHWW[slice].y ) * passBuf.f3dGridHWW[slice].z) +
+							uint(floor( (inPs.gl_FragCoord.x - passBuf.f3dViewportOffset.x ) * passBuf.f3dGridHWW[slice].x ) * lightsPerCell);
 	@end @property( hlms_forwardplus != forward3d )
 		float f3dMinDistance	= passBuf.f3dData.x;
 		float f3dInvExponentK	= passBuf.f3dData.y;
@@ -42,9 +42,9 @@
 		uint sliceSkip = uint( fSlice * @value( fwd_clustered_width_x_height ) );
 
 		uint sampleOffset = sliceSkip +
-							uint(floor( inPs.gl_FragCoord.x * passBuf.fwdScreenToGrid.x ));
+							uint(floor( (inPs.gl_FragCoord.x - passBuf.fwdScreenToGrid.z) * passBuf.fwdScreenToGrid.x ));
 		float windowHeight = passBuf.f3dData.w; //renderTarget->height
-		sampleOffset += uint(floor( (windowHeight - inPs.gl_FragCoord.y) * passBuf.fwdScreenToGrid.y ) *
+		sampleOffset += uint(floor( (windowHeight - (inPs.gl_FragCoord.y - passBuf.fwdScreenToGrid.w)) * passBuf.fwdScreenToGrid.y ) *
 							 @value( fwd_clustered_width ));
 
 		sampleOffset *= @value( fwd_clustered_lights_per_cell )u;

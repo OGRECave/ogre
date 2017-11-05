@@ -67,7 +67,7 @@ namespace Ogre {
         mCustomViewMatrix(false),
         mCustomProjMatrix(false),
         mFrustumExtentsManuallySet(false),
-        mMultiplyNearPlaneAgainstManuallFrustumExtents(false),
+        mFrustrumExtentsType(FET_PROJ_PLANE_POS),
         mOrientationMode(OR_DEGREE_0),
         mReflect(false), 
         mLinkedReflectPlane(0),
@@ -343,7 +343,7 @@ namespace Ogre {
                 top = mTop;
                 bottom = mBottom;
 
-                if( mMultiplyNearPlaneAgainstManuallFrustumExtents )
+                if (mFrustrumExtentsType == FET_TAN_HALF_ANGLES)
                 {
                     left    *= mNearDist;
                     right   *= mNearDist;
@@ -1340,10 +1340,10 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void Frustum::setFrustumExtents( Real left, Real right, Real top, Real bottom,
-                                     bool multiplyNearPlaneAgainstManuallFrustumExtents )
+                                     FrustrumExtentsType frustrumExtentsType)
     {
         mFrustumExtentsManuallySet = true;
-        mMultiplyNearPlaneAgainstManuallFrustumExtents = multiplyNearPlaneAgainstManuallFrustumExtents;
+        mFrustrumExtentsType = frustrumExtentsType;
         mLeft = left;
         mRight = right;
         mTop = top;
@@ -1355,17 +1355,37 @@ namespace Ogre {
     void Frustum::resetFrustumExtents()
     {
         mFrustumExtentsManuallySet = false;
-        mMultiplyNearPlaneAgainstManuallFrustumExtents = false;
+        mFrustrumExtentsType = FET_PROJ_PLANE_POS;
         invalidateFrustum();
     }
     //---------------------------------------------------------------------
-    void Frustum::getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const
+    void Frustum::getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom,
+                                    FrustrumExtentsType frustrumExtentsType) const
     {
         updateFrustum();
-        outleft = mLeft;
-        outright = mRight;
-        outtop = mTop;
-        outbottom = mBottom;
+        if (frustrumExtentsType == FET_TAN_HALF_ANGLES &&
+            mFrustrumExtentsType == FET_PROJ_PLANE_POS)
+        {
+            outleft = mLeft / mNearDist;
+            outright = mRight / mNearDist;
+            outtop = mTop / mNearDist;
+            outbottom = mBottom / mNearDist;
+        }
+        else if (frustrumExtentsType == FET_PROJ_PLANE_POS &&
+                 mFrustrumExtentsType == FET_TAN_HALF_ANGLES)
+        {
+            outleft = mLeft * mNearDist;
+            outright = mRight * mNearDist;
+            outtop = mTop * mNearDist;
+            outbottom = mBottom * mNearDist;
+        }
+        else
+        {
+            outleft = mLeft;
+            outright = mRight;
+            outtop = mTop;
+            outbottom = mBottom;
+        }
     }
     //---------------------------------------------------------------------
     PlaneBoundedVolume Frustum::getPlaneBoundedVolume()

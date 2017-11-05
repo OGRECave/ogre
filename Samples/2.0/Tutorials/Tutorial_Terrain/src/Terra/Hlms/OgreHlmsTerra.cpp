@@ -893,7 +893,7 @@ namespace Ogre
 
         if( forwardPlus )
         {
-            forwardPlus->fillConstBufferData( renderTarget, passBufferPtr );
+            forwardPlus->fillConstBufferData( sceneManager->getCurrentViewport(), renderTarget, mShaderProfile, passBufferPtr );
             passBufferPtr += forwardPlus->getConstBufferSize() >> 2;
         }
 

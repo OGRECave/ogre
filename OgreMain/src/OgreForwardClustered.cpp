@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreForwardClustered.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
+#include "OgreViewport.h"
 #include "OgreCamera.h"
 
 #include "Math/Array/OgreArraySphere.h"
@@ -162,8 +163,6 @@ namespace Ogre
 
         camera->setProjectionType( mCurrentCamera->getProjectionType() );
         camera->setAspectRatio( mCurrentCamera->getAspectRatio() );
-        camera->setFOVy( mCurrentCamera->getFOVy() );
-        camera->setFocalLength( mCurrentCamera->getFocalLength() );
         camera->setOrthoWindowHeight( mCurrentCamera->getOrthoWindowHeight() );
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         camera->setOrientationMode( mCurrentCamera->getOrientationMode() );
@@ -173,12 +172,17 @@ namespace Ogre
         else if( mCurrentCamera->isReflected() )
             camera->enableReflection( mCurrentCamera->getReflectionPlane() );
 
+        Real origFrustumLeft, origFrustumRight, origFrustumTop, origFrustumBottom;
+        mCurrentCamera->getFrustumExtents(origFrustumLeft, origFrustumRight,
+                                          origFrustumTop, origFrustumBottom, FET_TAN_HALF_ANGLES);
+        camera->setFrustumExtents(origFrustumLeft, origFrustumRight,
+                                          origFrustumTop, origFrustumBottom, FET_TAN_HALF_ANGLES);
+
         camera->setNearClipDistance( nearDepthAtSlice );
         camera->setFarClipDistance( farDepthAtSlice );
 
-        Real origFrustumLeft, origFrustumRight, origFrustumTop, origFrustumBottom;
         camera->getFrustumExtents( origFrustumLeft, origFrustumRight,
-                                   origFrustumTop, origFrustumBottom );
+                                   origFrustumTop, origFrustumBottom, FET_PROJ_PLANE_POS );
 
         const Real frustumHorizLength = (origFrustumRight - origFrustumLeft) / (Real)mWidth;
         const Real frustumVertLength = (origFrustumTop - origFrustumBottom) / (Real)mHeight;
@@ -198,7 +202,7 @@ namespace Ogre
                     const Real newBottom = origFrustumBottom + yStep * frustumVertLength;
                     const Real newTop    = newBottom + frustumVertLength;
 
-                    camera->setFrustumExtents( newLeft, newRight, newTop, newBottom, false );
+                    camera->setFrustumExtents( newLeft, newRight, newTop, newBottom, FET_PROJ_PLANE_POS );
 
                     const Vector3 *wsCorners = camera->getWorldSpaceCorners();
 
@@ -618,23 +622,35 @@ namespace Ogre
         return (4 + 4) * 4;
     }
     //-----------------------------------------------------------------------------------
-    void ForwardClustered::fillConstBufferData( RenderTarget *renderTarget,
-                                         float * RESTRICT_ALIAS passBufferPtr ) const
+    void ForwardClustered::fillConstBufferData( Viewport *viewport, RenderTarget* renderTarget,
+                        const Ogre::String& shaderProfile, float * RESTRICT_ALIAS passBufferPtr) const
     {
-        const float renderTargetWidth = static_cast<float>( renderTarget->getWidth() );
-        const float renderTargetHeight = static_cast<float>( renderTarget->getHeight() );
+        const float viewportWidth = static_cast<float>( viewport->getActualWidth());
+        const float viewportHeight = static_cast<float>( viewport->getActualHeight() );
+        const float viewportWidthOffset = static_cast<float>( viewport->getActualLeft() );
+        float viewportHeightOffset = static_cast<float>( viewport->getActualTop() );
+        
+        //The way ogre represents viewports is top = 0 bottom = 1. As a result if 'texture flipping' is required 
+        //all is ok. However if it is not required then viewport offsets are actually represented from the bottom up.
+        //As a result we need convert our veiwport height offsets to work bottom up instead of top down;
+        //This is compounded by OpenGL standard being different to DirectX and Metal
+        if ( !renderTarget->requiresTextureFlipping() && shaderProfile == "glsl" )
+        {
+            viewportHeightOffset = static_cast<float>((1.0 - (viewport->getTop() + viewport->getHeight()) )
+                                                                               * renderTarget->getHeight());
+        }
 
         //vec4 f3dData;
         *passBufferPtr++ = mMinDistance;
         *passBufferPtr++ = mInvExponentK;
         *passBufferPtr++ = static_cast<float>( mNumSlices - 1 );
-        *passBufferPtr++ = static_cast<float>( renderTargetHeight );
+        *passBufferPtr++ = static_cast<float>( viewportHeight );
 
         //vec4 fwdScreenToGrid
-        *passBufferPtr++ = static_cast<float>( mWidth ) / renderTargetWidth;
-        *passBufferPtr++ = static_cast<float>( mHeight ) / renderTargetHeight;
-        *passBufferPtr++ = 0;
-        *passBufferPtr++ = 0;
+        *passBufferPtr++ = static_cast<float>( mWidth ) / viewportWidth;
+        *passBufferPtr++ = static_cast<float>( mHeight ) / viewportHeight;
+        *passBufferPtr++ = viewportWidthOffset;
+        *passBufferPtr++ = viewportHeightOffset;
     }
     //-----------------------------------------------------------------------------------
     void ForwardClustered::setHlmsPassProperties( Hlms *hlms )
