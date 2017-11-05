@@ -281,6 +281,8 @@ namespace Ogre
             vMax = vMaxCamFrustumLS;
         }
 
+        vMin.z = Ogre::min( vMin.z, vMinCamFrustumLS.z );
+
         //Some padding
         vMax += 2.5f;
         vMin -= 2.5f;
