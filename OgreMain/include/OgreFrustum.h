@@ -77,6 +77,16 @@ namespace Ogre
         FRUSTUM_PLANE_BOTTOM = 5
     };
 
+    /** Specify how the frustrum extents are represented.
+    */
+    enum FrustrumExtentsType
+    {
+        /// Represent extents as positions on the near clip plane
+        FET_PROJ_PLANE_POS,
+        /// Represet extents as tan of the half angles in radians (ie FoV)
+        FET_TAN_HALF_ANGLES
+    };
+
     /** A frustum represents a pyramid, capped at the near and far end which is
         used to represent either a visible area or a projection area. Can be used
         for a number of applications.
@@ -134,8 +144,8 @@ namespace Ogre
         /// Have the frustum extents been manually set?
         bool mFrustumExtentsManuallySet;
         /// Whether to treat frustum extents as tangents of the angles between the viewing
-        /// vector and the edges of the field of view. This needs to be true for VR.
-        bool mMultiplyNearPlaneAgainstManuallFrustumExtents;
+        /// vector and the edges of the field of view or as positions on the projection plane
+        FrustrumExtentsType mFrustrumExtentsType;
         /// Frustum extents
         mutable Real mLeft, mRight, mTop, mBottom;
         /// Frustum orientation mode
@@ -317,19 +327,32 @@ namespace Ogre
 
         /** Manually set the extents of the frustum.
         @param left, right, top, bottom The position where the side clip planes intersect
-            the near clip plane, in eye space
-        @param multiplyNearPlaneAgainstManuallFrustumExtents
-            Whether to multiply the near plane against the left/right/top/bottom when
-            calling calcProjectionParameters. This needs to be true for VR,
-            treating frustum extents as tangents of the angles between the viewing vector and
-            the edges of the field of view.
+            the near clip plane, in eye space OR the tangent of the half angles from the eye to the edges
+            of the near clip plane
+        @param frustrumExtentsType
+            Specifies how the extents are represented. Be default they are the positions on near clip plane.
+            However if this is a scene camera it is recommended that you actually use the tangent of the half angles. ie Half the FoV angles.
+            This is because Ogre uses this camera setup to calculate custom clipping planes for PSSM algorithms, and Forward+ algorithms,
+            but alter the near and far clip distances. 
+            @par
+            If you supply extents as positions on the projection plane the near clip distance has already been calculated as part of the
+            supplied extents, however if they are tangent of the half angles Ogre can apply different near clip distances dynamically.
         */
         virtual void setFrustumExtents( Real left, Real right, Real top, Real bottom,
-                                        bool multiplyNearPlaneAgainstManuallFrustumExtents=false );
+                                        FrustrumExtentsType frustrumExtentsType = FET_PROJ_PLANE_POS);
+
         /** Reset the frustum extents to be automatically derived from other params. */
         virtual void resetFrustumExtents(); 
-        /** Get the extents of the frustum in view space. */
-        virtual void getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const;
+
+        /** Get the extents of the frustum in view space. 
+        @param left, right, top, bottom The position where the side clip planes intersect
+            the near clip plane, in eye space OR the tangent of the half angles from the eye to the edges
+            of the near clip plane 
+        @param frustrumExtentsType
+            Specifies in what format the extents are returned. See OgreFrustrum::setFrustumExtents for more information
+        */
+        virtual void getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom,
+                                       FrustrumExtentsType frustrumExtentsType = FET_PROJ_PLANE_POS) const;
 
 
         /** Gets the projection matrix for this frustum adjusted for the current

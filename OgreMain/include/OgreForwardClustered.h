@@ -120,8 +120,8 @@ namespace Ogre
         @remarks
             Assumes 'passBufferPtr' is aligned to a vec4/float4 boundary.
         */
-        virtual void fillConstBufferData( RenderTarget *renderTarget,
-                                          float * RESTRICT_ALIAS passBufferPtr ) const;
+        virtual void fillConstBufferData( Viewport *viewport, RenderTarget* renderTarget,
+                    const Ogre::String& shaderProfile, float * RESTRICT_ALIAS passBufferPtr) const;
 
         virtual void setHlmsPassProperties( Hlms *hlms );
     };
