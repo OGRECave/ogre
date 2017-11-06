@@ -13,6 +13,11 @@ set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINO
 
 set(CMAKE_SWIG_FLAGS -w401,314 -builtin)
 
+if (APPLE AND NOT ANDROID)
+    # we are using libc++ on OSX
+    list(APPEND CMAKE_SWIG_FLAGS -D_LIBCPP_VERSION)
+endif()
+
 macro(ogre_python_module target)
     set_target_properties(${SWIG_MODULE_${target}_REAL_NAME} PROPERTIES 
                         DEBUG_POSTFIX ""
