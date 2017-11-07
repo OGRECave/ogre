@@ -1,6 +1,8 @@
 ![](Docs/ogre-logo-wetfloor.gif)
 
 ## Summary
+
+[![Join the chat at https://gitter.im/OGRECave/ogre](https://badges.gitter.im/OGRECave/ogre.svg)](https://gitter.im/OGRECave/ogre?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 **OGRE** (Object-Oriented Graphics Rendering Engine) is a
 scene-oriented, flexible 3D engine written in C++ designed to make it
 easier and more intuitive for developers to produce games and demos
