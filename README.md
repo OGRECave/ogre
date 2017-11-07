@@ -33,8 +33,8 @@ applications, artwork or pretty much anything else! If you would like
 to contribute to the development of OGRE, please create a pull request on [bitbucket](https://bitbucket.org/sinbad/ogre/pull-requests/) or [github](https://github.com/OGRECave/ogre/pulls).
 
 ## Getting Support
-Please use our [community support forums](http://www.ogre3d.org/forums) if you need help or
-think you may have found a bug.
+Please use our [community support forums](http://forums.ogre3d.org/) if you need help or
+think you may have found a bug. Additionally you can [![Join the chat at https://gitter.im/OGRECave/ogre](https://badges.gitter.im/OGRECave/ogre.svg)](https://gitter.im/OGRECave/ogre?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge).
 
 ## Licensing
 Please see the [full license documentation](Docs/License.md) for details.
