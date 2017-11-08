@@ -302,18 +302,23 @@ namespace Ogre
                 (textureDef.depth == 1 || textureDef.textureType > TEX_TYPE_2D) &&
                 (textureDef.depth == 6 || textureDef.textureType != TEX_TYPE_CUBE_MAP) );
 
-        if( textureDef.formatList.size() == 1 )
+        if( textureDef.formatList.empty() || textureDef.formatList.size() == 1 )
         {
+            PixelFormat format = finalTarget->getFormat();
+
+            if( !textureDef.formatList.empty() )
+                format = textureDef.formatList[0];
+
             //Normal RT
             TexturePtr tex = TextureManager::getSingleton().createManual( texName,
                                             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
                                             textureDef.textureType, width, height, textureDef.depth,
-                                            numMips, textureDef.formatList[0], (int)texUsageFlags, 0,
+                                            numMips, format, (int)texUsageFlags, 0,
                                             hwGamma, fsaa, fsaaHint, textureDef.fsaaExplicitResolve,
                                             textureDef.depthBufferId != DepthBuffer::POOL_NON_SHAREABLE );
             RenderTexture* rt = tex->getBuffer()->getRenderTarget();
             rt->setDepthBufferPool( textureDef.depthBufferId );
-            if( !PixelUtil::isDepth( textureDef.formatList[0] ) )
+            if( !PixelUtil::isDepth( format ) )
                 rt->setPreferDepthTexture( textureDef.preferDepthTexture );
             if( textureDef.depthBufferFormat != PF_UNKNOWN )
                 rt->setDesiredDepthBufferFormat( textureDef.depthBufferFormat );

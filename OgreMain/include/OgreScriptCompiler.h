@@ -828,6 +828,7 @@ namespace Ogre
                 ID_TARGET_HEIGHT,
                 ID_TARGET_WIDTH_SCALED,
                 ID_TARGET_HEIGHT_SCALED,
+                ID_TARGET_FORMAT,
             //  ID_GAMMA,
                 ID_NO_GAMMA,
                 ID_NO_FSAA,

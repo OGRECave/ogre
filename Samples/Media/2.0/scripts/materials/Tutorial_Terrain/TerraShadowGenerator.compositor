@@ -2,7 +2,7 @@ compositor_node Terra/ShadowGenerator
 {
 	in 0 terrain_shadows
 	
-	texture tmpGaussianFilter target_width target_height PF_A2R10G10B10 depth_pool 0 no_gamma uav
+	texture tmpGaussianFilter target_width target_height target_format depth_pool 0 no_gamma uav
 
 	target terrain_shadows
 	{

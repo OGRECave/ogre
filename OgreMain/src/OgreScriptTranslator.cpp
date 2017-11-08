@@ -6288,6 +6288,9 @@ namespace Ogre{
                     *pSetFlag = true;
                 }
                 break;
+            case ID_TARGET_FORMAT:
+                formatSet = true;
+                break;
             case ID_GAMMA:
                 hwGammaWrite = TextureDefinitionBase::BoolTrue;
                 break;

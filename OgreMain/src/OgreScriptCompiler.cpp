@@ -1230,6 +1230,7 @@ namespace Ogre
         mIds["target_height"]       = ID_TARGET_HEIGHT;
         mIds["target_width_scaled"] = ID_TARGET_WIDTH_SCALED;
         mIds["target_height_scaled"]= ID_TARGET_HEIGHT_SCALED;
+        mIds["target_format"]       = ID_TARGET_FORMAT;
         mIds["no_gamma"]            = ID_NO_GAMMA;
         mIds["no_fsaa"]             = ID_NO_FSAA;
         mIds["explicit_resolve"]    = ID_EXPLICIT_RESOLVE;
