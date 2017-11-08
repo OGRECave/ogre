@@ -51,7 +51,7 @@ namespace Ogre {
 		iend = mProfiles.end();
 		GpuProgramManager& gpuMgr = GpuProgramManager::getSingleton();
 		bool useDelegate = false;
-		bool foundProfile = false;
+
 		for (i = mProfiles.begin(); i != iend; ++i)
 		{
 			bool syntaxSupported = gpuMgr.isSyntaxSupported(*i);
@@ -105,14 +105,8 @@ namespace Ogre {
 					mDelegate.reset();
 				}
 				
-				foundProfile = true;
 				break;
 			}
-		}
-
-		if (!foundProfile)
-		{
-			LogManager::getSingleton().logMessage(String("Error: ") + mName +  "'s syntax is not supported", LML_CRITICAL);
 		}
 	}
 	//-----------------------------------------------------------------------
