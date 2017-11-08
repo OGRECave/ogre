@@ -494,12 +494,10 @@ namespace v1 {
 
         // Convert to the target pixel format and vertically flip
         PixelUtil::bulkPixelConversion(tempBox, data);
-        PixelUtil::bulkPixelVerticalFlip(data);
 
         delete[] (uint8*) tempBox.data;
         tempBox.data = 0;
     }
-
     //-----------------------------------------------------------------------------------
     void MetalTextureBuffer::bindToFramebuffer(uint32 attachment, size_t zoffset)
     {
