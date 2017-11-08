@@ -44,13 +44,8 @@ namespace Ogre
     {
         const size_t defaultCapacity = 4 * 1024 * 1024;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         MTLResourceOptions resourceOptions = MTLResourceCPUCacheModeWriteCombined |
                                              MTLResourceStorageModeShared;
-#else
-        MTLResourceOptions resourceOptions = MTLResourceCPUCacheModeWriteCombined |
-                                             MTLResourceStorageModeManaged;
-#endif
 
         mBuffer = [mDevice->mDevice newBufferWithLength:defaultCapacity options:resourceOptions];
         mBuffer.label = @"Discardable Buffer";
@@ -348,10 +343,10 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalDiscardBuffer::unmap(void)
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        NSRange range = NSMakeRange( mBufferOffset, mBufferSize );
-        [mBuffer didModifyRange:range];
-#endif
+//#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+//        NSRange range = NSMakeRange( mBufferOffset, mBufferSize );
+//        [mBuffer didModifyRange:range];
+//#endif
     }
     //-------------------------------------------------------------------------
     id<MTLBuffer> MetalDiscardBuffer::getBufferName( size_t &outOffset )

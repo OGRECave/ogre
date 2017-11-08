@@ -226,13 +226,8 @@ namespace Ogre
                 resourceOptions = MTLResourceCPUCacheModeWriteCombined;
                 if( vboFlag == CPU_ACCESSIBLE_DEFAULT )
                     resourceOptions |= 0;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 else if( vboFlag == CPU_ACCESSIBLE_PERSISTENT )
                     resourceOptions |= MTLResourceStorageModeShared;
-#else
-                else if( vboFlag == CPU_ACCESSIBLE_PERSISTENT )
-                    resourceOptions |= MTLResourceStorageModeManaged;
-#endif
                 else if( vboFlag == CPU_ACCESSIBLE_PERSISTENT_COHERENT )
                     resourceOptions |= MTLResourceCPUCacheModeDefaultCache;
             }
@@ -860,11 +855,7 @@ namespace Ogre
 
         MTLResourceOptions resourceOptions = 0;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         resourceOptions |= MTLResourceStorageModeShared;
-#else
-        resourceOptions |= MTLResourceStorageModeManaged;
-#endif
 
         if( forUpload )
             resourceOptions |= MTLResourceCPUCacheModeWriteCombined;

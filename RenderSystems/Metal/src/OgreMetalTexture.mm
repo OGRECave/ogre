@@ -143,6 +143,9 @@ namespace Ogre
         if( mUsage & TU_UAV )
             desc.usage |= MTLTextureUsageShaderWrite;
 
+        if( mUsage & (TU_UAV|TU_NOT_TEXTURE|TU_RENDERTARGET) )
+            desc.storageMode = MTLStorageModePrivate;
+
         mTexture = [mDevice->mDevice newTextureWithDescriptor:desc];
         mTexture.label = [NSString stringWithUTF8String:mName.c_str()];
 
