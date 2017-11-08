@@ -50,13 +50,6 @@ namespace Ogre {
     {
     }
 
-
-    GLSLProgram::~GLSLProgram(void)
-    {
-        OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-    }
-
-
     Ogre::String GLSLProgram::getCombinedName()
     {
         String name;

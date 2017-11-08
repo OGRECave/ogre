@@ -26,6 +26,12 @@ else()
 endif()
 
 set(CMAKE_SWIG_FLAGS -w401,314 -package org.Ogre)
+
+if (APPLE AND NOT ANDROID)
+	# we are using libc++ on OSX
+	list(APPEND CMAKE_SWIG_FLAGS -D_LIBCPP_VERSION)
+endif()
+
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/java/libs")
 set(CMAKE_SWIG_OUTDIR "${OGRE_BINARY_DIR}/java/src/org/Ogre")
 

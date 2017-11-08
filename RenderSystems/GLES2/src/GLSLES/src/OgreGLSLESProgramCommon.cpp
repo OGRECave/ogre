@@ -42,13 +42,7 @@ namespace Ogre {
     , mFragmentProgram(fragmentProgram)
     {
     }
-    
-    //-----------------------------------------------------------------------
-    GLSLESProgramCommon::~GLSLESProgramCommon(void)
-    {
-        OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-    }
-    
+
     //-----------------------------------------------------------------------
     Ogre::String GLSLESProgramCommon::getCombinedName()
     {
