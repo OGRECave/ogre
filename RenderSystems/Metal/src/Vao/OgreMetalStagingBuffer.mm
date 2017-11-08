@@ -210,13 +210,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void MetalStagingBuffer::unmapImpl( const Destination *destinations, size_t numDestinations )
     {
-        if( mUploadOnly )
-        {
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-            NSRange range = NSMakeRange( mInternalBufferStart + mMappingStart, mMappingCount );
-            [mVboName didModifyRange:range];
-#endif
-        }
+//        if( mUploadOnly )
+//        {
+//#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+//            NSRange range = NSMakeRange( mInternalBufferStart + mMappingStart, mMappingCount );
+//            [mVboName didModifyRange:range];
+//#endif
+//        }
 
         mMappedPtr = 0;
 
@@ -332,13 +332,13 @@ namespace Ogre
                          "MetalStagingBuffer::unmap" );
         }
 
-        if( mUploadOnly )
-        {
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-            NSRange range = NSMakeRange( mInternalBufferStart + mMappingStart, mMappingCount );
-            [mVboName didModifyRange:range];
-#endif
-        }
+//        if( mUploadOnly )
+//        {
+//#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+//            NSRange range = NSMakeRange( mInternalBufferStart + mMappingStart, mMappingCount );
+//            [mVboName didModifyRange:range];
+//#endif
+//        }
 
         mMappedPtr = 0;
 
