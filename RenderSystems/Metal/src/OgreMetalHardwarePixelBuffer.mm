@@ -445,12 +445,7 @@ namespace v1 {
 
         nanosleep(&tim, &tim2);
 
-        NSUInteger alignment = 4;
-        if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
-        {
-            // Standard alignment of 4 is not right
-            alignment = 1;
-        }
+        NSUInteger bytesPerPixel = PixelUtil::getNumElemBytes(data.format);
 
         // Construct a temp PixelBox
         size_t sizeInBytes = PixelUtil::getMemorySize( data.getWidth(), data.getHeight(),
@@ -458,7 +453,7 @@ namespace v1 {
         PixelBox tempBox = PixelBox( data.getWidth(), data.getHeight(), data.getDepth(), mFormat );
         tempBox.data = new uint8[sizeInBytes];
         [mTexture getBytes:tempBox.data
-               bytesPerRow:alignment * data.getWidth()
+               bytesPerRow:bytesPerPixel * data.getWidth()
                 fromRegion:MTLRegionMake2D(data.left, data.top, data.getWidth(), data.getHeight())
                mipmapLevel:0];
 
