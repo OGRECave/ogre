@@ -78,7 +78,7 @@ public:
     bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
     /// has the attribute been found in the linked code?
-    static bool isAttributeValid(VertexElementSemantic semantic, uint index) {
+    virtual bool isAttributeValid(VertexElementSemantic semantic, uint index) {
         return getFixedAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
     }
 
