@@ -75,9 +75,6 @@ namespace Ogre {
             VertexElementSemantic sem = elem.getSemantic();
             unsigned short elemIndex = elem.getIndex();
 
-            if (!GLSLProgramCommon::isAttributeValid(sem, elemIndex))
-                continue; // Skip unused elements
-
             uint32 attrib = (uint32)GLSLProgramCommon::getFixedAttributeIndex(sem, elemIndex);
 
             const HardwareVertexBufferSharedPtr& vertexBuffer = vertexBufferBinding->getBuffer(source);
@@ -119,9 +116,6 @@ namespace Ogre {
 
             VertexElementSemantic sem = elem.getSemantic();
             unsigned short elemIndex = elem.getIndex();
-
-            if (!GLSLProgramCommon::isAttributeValid(sem, elemIndex))
-                continue; // Skip unused elements
 
             uint32 attrib = (uint32)GLSLProgramCommon::getFixedAttributeIndex(sem, elemIndex);
 
