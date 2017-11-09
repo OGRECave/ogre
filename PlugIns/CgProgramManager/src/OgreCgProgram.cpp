@@ -86,7 +86,7 @@ namespace Ogre {
 					"Unable to find CG profile enum for program " + mName + ": ", mCgContext);
 				
 				// do we need a delegate?
-				if (useDelegate && mDelegate)
+				if (useDelegate && !mDelegate)
 				{
 					mDelegate =
 						HighLevelGpuProgramManager::getSingleton().createProgram(
