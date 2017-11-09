@@ -1349,6 +1349,7 @@ namespace Ogre
         {
             __unsafe_unretained id <MTLSamplerState> sampler =
                     (__bridge id<MTLSamplerState>)samplerblock->mRsData;
+            [mActiveRenderEncoder setVertexSamplerState:sampler atIndex: texUnit];
             [mActiveRenderEncoder setFragmentSamplerState:sampler atIndex: texUnit];
         }
     }
