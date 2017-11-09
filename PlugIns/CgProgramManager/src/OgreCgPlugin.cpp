@@ -55,13 +55,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void CgPlugin::initialise()
     {
-        // Cg is also not supported on OpenGL 3+
-        if(Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
-        {
-            LogManager::getSingleton().logMessage("Disabling Cg Plugin for GL3+");
-            return;
-        }
-
         // Check for gles2 by the glsles factory (this plugin is not supported on embedded systems for now)
         if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles") == false)
 
