@@ -873,6 +873,11 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::unloadHighLevelImpl(void)
 	{
+        if (mDelegate)
+        {
+            mDelegate->getCreator()->remove(mDelegate);
+            mDelegate.reset();
+        }
 	}
 	//-----------------------------------------------------------------------
 	void CgProgram::buildConstantDefinitions() const
