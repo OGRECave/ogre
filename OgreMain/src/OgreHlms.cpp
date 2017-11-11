@@ -133,6 +133,8 @@ namespace Ogre
                                                     = IdString( "hlms_forward_fade_attenuation_range" );
     const IdString HlmsBaseProp::ForwardPlusFineLightMask
                                                     = IdString( "hlms_forwardplus_fine_light_mask" );
+    const IdString HlmsBaseProp::ForwardPlusCoversEntireTarget
+                                                    = IdString("hlms_forwardplus_covers_entire_target");
     const IdString HlmsBaseProp::Forward3DNumSlices = IdString( "forward3d_num_slices" );
     const IdString HlmsBaseProp::FwdClusteredWidthxHeight  = IdString( "fwd_clustered_width_x_height" );
     const IdString HlmsBaseProp::FwdClusteredWidth         = IdString( "fwd_clustered_width" );

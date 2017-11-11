@@ -712,6 +712,7 @@ namespace Ogre
         static const IdString ForwardPlusDebug;
         static const IdString ForwardPlusFadeAttenRange;
         static const IdString ForwardPlusFineLightMask;
+        static const IdString ForwardPlusCoversEntireTarget;
         static const IdString Forward3DNumSlices;
         static const IdString FwdClusteredWidthxHeight;
         static const IdString FwdClusteredWidth;
