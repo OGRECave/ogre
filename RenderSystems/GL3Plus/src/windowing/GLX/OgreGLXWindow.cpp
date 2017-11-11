@@ -316,7 +316,7 @@ namespace Ogre
 
             if (gamma != 0)
             {
-                mGLSupport->getFBConfigAttrib(fbConfig, GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &gamma);
+                mGLSupport->getFBConfigAttrib(fbConfig, GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, &gamma);
             }
 
             mHwGamma = (gamma != 0);
