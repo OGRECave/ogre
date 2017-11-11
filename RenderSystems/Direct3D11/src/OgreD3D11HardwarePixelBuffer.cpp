@@ -540,7 +540,9 @@ namespace v1 {
                     0,
                     0,
                     rsrcDx11->mParentTexture->GetTex1D(),
-                    static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                    D3D11CalcSubresource( static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                                          rsrcDx11->mFace,
+                                          rsrcDx11->mParentTexture->getNumMipmaps() + 1u ),
                     &srcBoxDx11);
                 if (mDevice.isError())
                 {
@@ -559,9 +561,11 @@ namespace v1 {
                     D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1),
                     static_cast<UINT>(dstBox.left),
                     static_cast<UINT>(dstBox.top),
-                    mFace,
+                    0,
                     rsrcDx11->mParentTexture->GetTex2D(),
-                    static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                    D3D11CalcSubresource( static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                                          rsrcDx11->mFace,
+                                          rsrcDx11->mParentTexture->getNumMipmaps() + 1u ),
                     &srcBoxDx11);
                 if (mDevice.isError())
                 {
@@ -581,7 +585,9 @@ namespace v1 {
                     static_cast<UINT>(dstBox.top),
                     srcBox.front,
                     rsrcDx11->mParentTexture->GetTex2D(),
-                    static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                    D3D11CalcSubresource( static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                                          rsrcDx11->mFace,
+                                          rsrcDx11->mParentTexture->getNumMipmaps() + 1u ),
                     &srcBoxDx11);
                 if (mDevice.isError())
                 {
