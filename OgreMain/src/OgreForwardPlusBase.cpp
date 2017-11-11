@@ -404,6 +404,10 @@ namespace Ogre
         if( mEnableVpls )
             hlms->_setProperty( HlmsBaseProp::EnableVpls, 1 );
 
+        Viewport *viewport = mSceneManager->getCurrentViewport();
+        if( viewport->coversEntireTarget() )
+            hlms->_setProperty( HlmsBaseProp::ForwardPlusCoversEntireTarget, 1 );
+
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         if( mFineLightMaskGranularity )
             hlms->_setProperty( HlmsBaseProp::ForwardPlusFineLightMask, 1 );
