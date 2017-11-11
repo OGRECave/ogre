@@ -139,6 +139,9 @@ namespace Ogre {
                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         bool hasGLES30 = mRenderSystem->hasMinGLVersion(3, 0);
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        hasGLES30 = false; // still just Editors Draft
+#endif
 
         // Set up texture swizzling
         if (hasGLES30 && PixelUtil::isLuminance(mFormat))
