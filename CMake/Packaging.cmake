@@ -20,8 +20,8 @@ set(CPACK_PACKAGE_VENDOR "Torus Knot Software")
 
 # CPack won't allow file without recognized extension to be used as
 # license file.
-configure_file("${OGRE_SOURCE_DIR}/COPYING" "${OGRE_BINARY_DIR}/COPYING.txt" COPYONLY)
-set(CPACK_RESOURCE_FILE_LICENSE "${OGRE_BINARY_DIR}/COPYING.txt")
+file(COPY "${OGRE_SOURCE_DIR}/LICENSE" DESTINATION "${OGRE_BINARY_DIR}/LICENSE.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${OGRE_BINARY_DIR}/LICENSE.txt")
 
 #set(CPACK_PACKAGE_ICON "${OGRE_SOURCE_DIR}\\\\ogrelogo.gif")
 

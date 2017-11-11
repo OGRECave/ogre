@@ -272,7 +272,9 @@ namespace Ogre {
 
     void GLES2PixelUtil::useSizedFormats()
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN // still just Editors Draft
         memcpy(_pixelFormats, _pixelFormatsSized, sizeof(_pixelFormatsSized));
+#endif
     }
 
     //-----------------------------------------------------------------------------

@@ -567,7 +567,7 @@ void ApplicationContext::locateResources()
     cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
 #   else
     Ogre::String resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
-    if (Ogre::FileSystemLayer::fileExists(resourcesPath))
+    if (Ogre::FileSystemLayer::fileExists(resourcesPath) || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
     {
         cf.load(resourcesPath);
     }

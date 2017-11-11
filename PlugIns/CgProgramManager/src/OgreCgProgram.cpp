@@ -51,7 +51,7 @@ namespace Ogre {
 		iend = mProfiles.end();
 		GpuProgramManager& gpuMgr = GpuProgramManager::getSingleton();
 		bool useDelegate = false;
-		bool foundProfile = false;
+
 		for (i = mProfiles.begin(); i != iend; ++i)
 		{
 			bool syntaxSupported = gpuMgr.isSyntaxSupported(*i);
@@ -86,7 +86,7 @@ namespace Ogre {
 					"Unable to find CG profile enum for program " + mName + ": ", mCgContext);
 				
 				// do we need a delegate?
-				if (useDelegate && mDelegate)
+				if (useDelegate && !mDelegate)
 				{
 					mDelegate =
 						HighLevelGpuProgramManager::getSingleton().createProgram(
@@ -105,14 +105,8 @@ namespace Ogre {
 					mDelegate.reset();
 				}
 				
-				foundProfile = true;
 				break;
 			}
-		}
-
-		if (!foundProfile)
-		{
-			LogManager::getSingleton().logMessage(String("Error: ") + mName +  "'s syntax is not supported", LML_CRITICAL);
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -879,6 +873,11 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::unloadHighLevelImpl(void)
 	{
+        if (mDelegate)
+        {
+            mDelegate->getCreator()->remove(mDelegate);
+            mDelegate.reset();
+        }
 	}
 	//-----------------------------------------------------------------------
 	void CgProgram::buildConstantDefinitions() const

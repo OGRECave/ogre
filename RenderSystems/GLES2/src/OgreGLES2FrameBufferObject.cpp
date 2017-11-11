@@ -236,7 +236,7 @@ namespace Ogre {
         // Depth buffer is not handled here anymore.
         // See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
-        if(rs->hasMinGLVersion(3, 0))
+        if(rs->hasMinGLVersion(3, 0) && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN) // ED on Emscripten
         {
             GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
             GLsizei n=0;
