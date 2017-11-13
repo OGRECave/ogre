@@ -355,6 +355,7 @@ NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre
     {
         miscParams["FSAA"] = ropts["FSAA"].currentValue;
         miscParams["vsync"] = ropts["VSync"].currentValue;
+        miscParams["gamma"] = ropts["sRGB Gamma Conversion"].currentValue;
     }
 
     if(!mWindows.empty()) {
