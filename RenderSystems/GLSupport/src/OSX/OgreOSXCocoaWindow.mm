@@ -72,7 +72,7 @@ namespace Ogre {
 
     CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
         mWindowDelegate(NULL), mActive(false), mClosed(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
-        mUseOgreGLView(true), mContentScalingFactor(1.0), mStyleMask(NSResizableWindowMask|NSTitledWindowMask)
+        mUseOgreGLView(true), mContentScalingFactor(1.0), mStyleMask(NSResizableWindowMask|NSTitledWindowMask), mHidden(false)
     {
         // Set vsync by default to save battery and reduce tearing
     }
@@ -692,8 +692,7 @@ namespace Ogre {
 //        rs->clearFrameBuffer(FBT_COLOUR);
 
         // Show window
-        if(mWindow)
-            [mWindow makeKeyAndOrderFront:nil];
+        setHidden(mHidden);
 
         // Add our window to the window event listener class
         WindowEventUtilities::_addRenderWindow(this);
