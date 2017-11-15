@@ -352,16 +352,16 @@ namespace Ogre {
     */
     virtual GpuProgramParametersSharedPtr getDefaultParameters(void);
 
-#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#   pragma warning ( push )
-#   pragma warning ( disable: 4800 )
-#endif
     /** Returns true if default parameters have been set up.
      */
-    virtual bool hasDefaultParameters(void) const { return (bool)mDefaultParams; }
+    virtual bool hasDefaultParameters(void) const
+    {
 #ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#   pragma warning ( pop )
+        return mDefaultParams != 0;
+#else
+        return (bool)mDefaultParams;
 #endif
+    }
 
     /** Returns whether a vertex program wants light and material states to be passed
         through fixed pipeline low level API rendering calls (default false, subclasses can override)
