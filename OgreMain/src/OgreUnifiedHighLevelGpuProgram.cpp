@@ -185,7 +185,7 @@ namespace Ogre
     bool UnifiedHighLevelGpuProgram::isSupported(void) const
     {
         // Supported if one of the delegates is
-        return (bool)_getDelegate();
+        return _getDelegate().get() != 0;
     }
     //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::isSkeletalAnimationIncluded(void) const
