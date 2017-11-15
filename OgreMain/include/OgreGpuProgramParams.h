@@ -1591,27 +1591,13 @@ namespace Ogre {
 
 
         /// Does this parameter set include named parameters?
-        bool hasNamedParameters() const
-        {
-#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
-            return mNamedConstants != 0;
-#else
-            return (bool)mNamedConstants;
-#endif
-        }
+        bool hasNamedParameters() const { return mNamedConstants.get() != 0; }
         /** Does this parameter set include logically indexed parameters?
             @note Not mutually exclusive with hasNamedParameters since some high-level
             programs still use logical indexes to set the parameters on the
             rendersystem.
         */
-        bool hasLogicalIndexedParameters() const
-        {
-#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
-            return mFloatLogicalToPhysical != 0;
-#else
-            return (bool)mFloatLogicalToPhysical;
-#endif
-        }
+        bool hasLogicalIndexedParameters() const { return mFloatLogicalToPhysical.get() != 0; }
 
         /** Sets a 4-element floating-point parameter to the program.
             @param index The logical constant index at which to place the parameter

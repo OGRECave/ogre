@@ -185,11 +185,7 @@ namespace Ogre
     bool UnifiedHighLevelGpuProgram::isSupported(void) const
     {
         // Supported if one of the delegates is
-#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        return _getDelegate() != 0;
-#else
-        return (bool)_getDelegate();
-#endif
+        return _getDelegate().get() != 0;
     }
     //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::isSkeletalAnimationIncluded(void) const

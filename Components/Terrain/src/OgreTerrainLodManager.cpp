@@ -66,11 +66,7 @@ namespace Ogre
 
     bool TerrainLodManager::isOpen() const
     {
-#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        return mDataStream != 0;
-#else
-        return (bool)mDataStream;
-#endif
+        return mDataStream.get() != 0;
     }
 
     void TerrainLodManager::init()

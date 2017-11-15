@@ -179,12 +179,6 @@ namespace Ogre {
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
 
 //----------------------------------------------------------------------------
-// C++11 compatibility settings
-#if __cplusplus >= 201103L || OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1800
-#define OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#endif
-
-//----------------------------------------------------------------------------
 // Windows Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
