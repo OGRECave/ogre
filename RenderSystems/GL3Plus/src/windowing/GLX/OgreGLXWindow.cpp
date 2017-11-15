@@ -296,6 +296,7 @@ namespace Ogre
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 				GLX_STEREO, mStereoEnabled ? True : False,
 #endif
+                GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, gamma,
                 None
             };
 
