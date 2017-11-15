@@ -131,7 +131,7 @@ protected:
     /// Compiles and links the vertex and fragment programs
     virtual void compileAndLink(void) = 0;
 
-    static VertexElementSemantic getAttributeSemanticEnum(String type);
+    static VertexElementSemantic getAttributeSemanticEnum(const String& type);
     static const char * getAttributeSemanticString(VertexElementSemantic semantic);
 
     /// Name / attribute list

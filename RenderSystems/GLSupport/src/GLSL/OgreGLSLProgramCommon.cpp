@@ -10,7 +10,7 @@
 
 namespace Ogre
 {
-VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(String type)
+VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(const String& type)
 {
     size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
     for (size_t i = 0; i < numAttribs; ++i)
@@ -117,10 +117,7 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
         String attrName = parts[2];
         String::size_type uvPos = attrName.find("uv");
 
-        // Special case for attribute named position.
-        if (attrName == "position")
-            semantic = getAttributeSemanticEnum("vertex");
-        else if(uvPos == 0)
+        if(uvPos == 0)
             semantic = getAttributeSemanticEnum("uv0"); // treat "uvXY" as "uv0"
         else
             semantic = getAttributeSemanticEnum(attrName);
@@ -138,8 +135,8 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
     }
 }
 
-// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
-// and end up aliasing existing built-ins. So avoid! Fixed builtins are:
+// Switching attribute bindings requires re-creating VAOs. So avoid!
+// Fixed builtins (from ARB_vertex_program Table X.2) are:
 
 //  a  builtin              custom attrib name
 // ----------------------------------------------
@@ -149,6 +146,7 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
 //  3  gl_Color             colour
 //  4  gl_SecondaryColor    secondary_colour
 //  5  gl_FogCoord          n/a
+//  6  n/a                  n/a
 //  7  n/a                  blendIndices
 //  8  gl_MultiTexCoord0    uv0
 //  9  gl_MultiTexCoord1    uv1
