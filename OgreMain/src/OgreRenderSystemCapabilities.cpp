@@ -262,9 +262,6 @@ namespace Ogre {
             " * Vertex texture fetch: "
             + StringConverter::toString(hasCapability(RSC_VERTEX_TEXTURE_FETCH), true));
         pLog->logMessage(
-             " * Number of world matrices: "
-             + StringConverter::toString(mNumWorldMatrices));
-        pLog->logMessage(
              " * Number of texture units: "
              + StringConverter::toString(mNumTextureUnits));
         pLog->logMessage(

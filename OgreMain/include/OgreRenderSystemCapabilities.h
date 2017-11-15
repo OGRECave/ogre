@@ -466,6 +466,7 @@ namespace Ogre
             return false;
         }
 
+        /// @deprecated do not use
         void setNumWorldMatrices(ushort num)
         {
             mNumWorldMatrices = num;
@@ -492,6 +493,7 @@ namespace Ogre
             mNumMultiRenderTargets = num;
         }
 
+        /// @deprecated do not use
         ushort getNumWorldMatrices(void) const
         { 
             return mNumWorldMatrices;
