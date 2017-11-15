@@ -77,11 +77,6 @@ public:
                                                                          */
     bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
-    /// has the attribute been found in the linked code?
-    virtual bool isAttributeValid(VertexElementSemantic semantic, uint index) {
-        return getFixedAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
-    }
-
     /// Get the GL Handle for the program object
     uint getGLProgramHandle(void) const { return mGLProgramHandle; }
 
