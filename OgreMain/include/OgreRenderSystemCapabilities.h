@@ -398,8 +398,8 @@ namespace Ogre
         /// The number of boolean constants compute programs support
         ushort mComputeProgramConstantBoolCount;
 
-
-
+        /// The number of vertex attributes available
+        ushort mNumVertexAttributes;
     public: 
         RenderSystemCapabilities ();
         virtual ~RenderSystemCapabilities () {}
@@ -497,6 +497,16 @@ namespace Ogre
         ushort getNumWorldMatrices(void) const
         { 
             return mNumWorldMatrices;
+        }
+
+        void setNumVertexAttributes(ushort num)
+        {
+            mNumVertexAttributes = num;
+        }
+
+        ushort getNumVertexAttributes(void) const
+        {
+            return mNumVertexAttributes;
         }
 
         /** Returns the number of texture units the current output hardware
