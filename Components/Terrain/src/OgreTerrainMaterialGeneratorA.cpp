@@ -269,7 +269,7 @@ namespace Ogre
             mat = matMgr.getByName(matName);
             if (!mat)
             {
-                mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                mat = matMgr.create(matName, terrain->_getDerivedResourceGroup());
             }
         }
         // clear everything
@@ -319,7 +319,7 @@ namespace Ogre
             mat = matMgr.getByName(matName);
             if (!mat)
             {
-                mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                mat = matMgr.create(matName, terrain->_getDerivedResourceGroup());
             }
         }
         // clear everything
