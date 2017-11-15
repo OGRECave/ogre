@@ -324,7 +324,7 @@ namespace Ogre {
         /// @deprecated use get() instead
         OGRE_DEPRECATED T* getPointer() const { return pRep; }
 
-#if __cplusplus >= 201103L || OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1800
+#ifdef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
         explicit operator bool() const
         {
             return pRep != 0;

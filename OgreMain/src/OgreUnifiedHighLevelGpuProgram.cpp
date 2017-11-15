@@ -185,7 +185,14 @@ namespace Ogre
     bool UnifiedHighLevelGpuProgram::isSupported(void) const
     {
         // Supported if one of the delegates is
+#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#   pragma warning ( push )
+#   pragma warning ( disable: 4800 )
+#endif
         return (bool)_getDelegate();
+#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#   pragma warning ( pop )
+#endif
     }
     //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::isSkeletalAnimationIncluded(void) const

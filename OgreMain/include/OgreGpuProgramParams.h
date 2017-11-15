@@ -1590,6 +1590,10 @@ namespace Ogre {
                                 const GpuLogicalBufferStructPtr&  boolIndexMap);
 
 
+#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#   pragma warning ( push )
+#   pragma warning ( disable: 4800 )
+#endif
         /// Does this parameter set include named parameters?
         bool hasNamedParameters() const { return (bool)mNamedConstants; }
         /** Does this parameter set include logically indexed parameters?
@@ -1598,6 +1602,9 @@ namespace Ogre {
             rendersystem.
         */
         bool hasLogicalIndexedParameters() const { return (bool)mFloatLogicalToPhysical; }
+#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#   pragma warning ( pop )
+#endif
 
         /** Sets a 4-element floating-point parameter to the program.
             @param index The logical constant index at which to place the parameter

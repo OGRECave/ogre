@@ -361,6 +361,10 @@ namespace Ogre {
         */
         virtual ResourcePtr getByHandle(ResourceHandle handle);
         
+#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#   pragma warning ( push )
+#   pragma warning ( disable: 4800 )
+#endif
         /// Returns whether the named resource exists in this manager
         bool
 #if OGRE_RESOURCEMANAGER_STRICT
@@ -376,6 +380,9 @@ namespace Ogre {
         {
             return (bool)getByHandle(handle);
         }
+#ifndef OGRE_HAS_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#   pragma warning ( pop )
+#endif
 
         /** Notify this manager that a resource which it manages has been 
             'touched', i.e. used. 

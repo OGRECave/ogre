@@ -165,12 +165,16 @@ struct _OgreLodExport LodData {
         return id;
     }
 
+// We know it's safe to pass this pointer to VertexHash because it's not used there yet.
+#pragma warning ( push )
+#pragma warning ( disable: 4355 )
     LodData() :
         mUniqueVertexSet((UniqueVertexSet::size_type) 0,
         (const UniqueVertexSet::hasher&) VertexHash(this)),
         mMeshBoundingSphereRadius(0.0f),
         mUseVertexNormals(true)
     {}
+#pragma warning ( pop )
 };
 /** @} */
 /** @} */
