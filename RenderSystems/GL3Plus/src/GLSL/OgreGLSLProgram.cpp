@@ -95,14 +95,13 @@ namespace Ogre {
 
     void GLSLProgram::bindFixedAttributes(GLuint program)
     {
-        GLint max_vertex_attribs = 16;
-        glGetIntegerv( GL_MAX_VERTEX_ATTRIBS , &max_vertex_attribs);
+        GLint maxAttribs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumVertexAttributes();
 
         size_t numAttribs = sizeof(msCustomAttributes) / sizeof(CustomAttribute);
         for (size_t i = 0; i < numAttribs; ++i)
         {
             const CustomAttribute& a = msCustomAttributes[i];
-            if (a.attrib < max_vertex_attribs)
+            if (a.attrib < maxAttribs)
             {
 
                 OGRE_CHECK_GL_ERROR(glBindAttribLocation(program, a.attrib, a.name));
