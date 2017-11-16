@@ -101,6 +101,13 @@ public:
 
     /** Get the fixed attribute bindings normally used by GL for a semantic. */
     static int32 getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
+
+    /**
+     * use alternate vertex attribute layout using only 8 vertex attributes
+     *
+     * For "Vivante GC1000" and "VideoCore IV" (notably in Raspberry Pi) on GLES2
+     */
+    static void useTightAttributeLayout();
 protected:
     /// Container of uniform references that are active in the program object
     GLUniformReferenceList mGLUniformReferences;

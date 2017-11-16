@@ -530,6 +530,9 @@ namespace Ogre {
                         "GLES2RenderSystem::initialiseFromRenderSystemCapabilities");
         }
 
+        if(caps->getNumVertexAttributes() < 16)
+            GLSLProgramCommon::useTightAttributeLayout();
+
         mGpuProgramManager = OGRE_NEW GLES2GpuProgramManager();
 
         mGLSLESProgramFactory = OGRE_NEW GLSLESProgramFactory();
