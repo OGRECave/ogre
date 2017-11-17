@@ -179,8 +179,7 @@ namespace Ogre {
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap pyramid
             
-            uint8* tmpdata = new uint8[size];
-            memset(tmpdata, 0, size);
+            vector<uint8>::type tmpdata(size);
             for (uint32 mip = 0; mip <= mNumMipmaps; mip++)
             {
 #if OGRE_DEBUG_MODE
@@ -204,13 +203,13 @@ namespace Ogre {
                                                width, height,
                                                0,
                                                size,
-                                               tmpdata));
+                                               &tmpdata[0]));
                         break;
                     case TEX_TYPE_CUBE_MAP:
                         for(int face = 0; face < 6; face++) {
                             OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
                                 width, height, 0, 
-                                size, tmpdata));
+                                size, &tmpdata[0]));
                         }
                         break;
                     case TEX_TYPE_2D_ARRAY:
@@ -220,7 +219,7 @@ namespace Ogre {
                     case TEX_TYPE_3D:
                         glCompressedTexImage3DOES(getGLES2TextureTarget(), mip, format,
                             width, height, depth, 0, 
-                            size, tmpdata);
+                            size, &tmpdata[0]);
                         break;
                 };
                 
@@ -237,7 +236,6 @@ namespace Ogre {
                     depth = depth / 2;
                 }
             }
-            delete [] tmpdata;
             return;
         }
 
