@@ -156,6 +156,14 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     void HardwarePixelBuffer::readData(size_t offset, size_t length, void* pDest)
     {
+        // allow easy full buffer reads
+        if (offset == 0 && length == mSizeInBytes)
+        {
+            Box box(0, 0, 0, mWidth, mHeight, mDepth);
+            blitToMemory(box, PixelBox(box, mFormat, pDest));
+            return;
+        }
+
         // TODO
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                 "Reading a byte range is not implemented. Use blitToMemory.",
@@ -166,6 +174,15 @@ namespace Ogre
     void HardwarePixelBuffer::writeData(size_t offset, size_t length, const void* pSource,
             bool discardWholeBuffer)
     {
+        // allow easy full buffer updates
+        if (offset == 0 && length == mSizeInBytes)
+        {
+            Box box(0, 0, 0, mWidth, mHeight, mDepth);
+            // we know pSource will not be written to
+            blitFromMemory(PixelBox(box, mFormat, const_cast<void*>(pSource)), box);
+            return;
+        }
+
         // TODO
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                 "Writing a byte range is not implemented. Use blitFromMemory.",
