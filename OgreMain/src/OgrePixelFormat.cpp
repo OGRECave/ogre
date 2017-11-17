@@ -917,7 +917,7 @@ namespace Ogre {
         OGRE_FREE_ALIGN(tmpptr, MEMCATEGORY_GENERAL, false);
     }
 
-    ColourValue PixelBox::getColourAt(size_t x, size_t y, size_t z)
+    ColourValue PixelBox::getColourAt(size_t x, size_t y, size_t z) const
     {
         ColourValue cv;
 

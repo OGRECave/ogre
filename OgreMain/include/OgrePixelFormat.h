@@ -439,7 +439,7 @@ namespace Ogre {
          * is only valid for cubemaps and volume textures. This uses the first (largest)
          * mipmap.
          */
-        ColourValue getColourAt(size_t x, size_t y, size_t z);
+        ColourValue getColourAt(size_t x, size_t y, size_t z) const;
 
         /**
          * Set colour value at a certain location in the PixelBox. The z coordinate
