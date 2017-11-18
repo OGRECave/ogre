@@ -375,7 +375,7 @@ namespace Ogre {
             when the stream is destroyed.
         @param readOnly Whether to make the stream on this memory read-only once created
         */
-        MemoryDataStream(DataStreamPtr& sourceStream, 
+        MemoryDataStream(const DataStreamPtr& sourceStream,
                 bool freeOnClose = true, bool readOnly = false);
 
         /** Create a named stream which pre-buffers the contents of 
