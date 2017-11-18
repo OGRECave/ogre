@@ -58,13 +58,13 @@ EXRCodec::~EXRCodec()
     LogManager::getSingleton().logMessage("EXRCodec deinitialised");
 }
 
-DataStreamPtr EXRCodec::encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const
+DataStreamPtr EXRCodec::encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const
 {
     OgreAssert(false, "not implemented");
     return DataStreamPtr();
 }
 
-Codec::DecodeResult EXRCodec::decode(DataStreamPtr& input) const
+Codec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
 {
     ImageData * imgData = new ImageData;
     MemoryDataStreamPtr output;
@@ -139,7 +139,8 @@ Codec::DecodeResult EXRCodec::decode(DataStreamPtr& input) const
     return ret;
 }
 
-void EXRCodec::encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const
+void EXRCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
+                            const CodecDataPtr& pData) const
 {
     OgreAssert(false, "not implemented");
 }
