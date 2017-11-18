@@ -134,22 +134,23 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ETCCodec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
-    {        
+    DataStreamPtr ETCCodec::encode(const MemoryDataStreamPtr& input,
+                                   const Codec::CodecDataPtr& pData) const
+    {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ETC encoding not supported",
                     "ETCCodec::encode" ) ;
     }
     //---------------------------------------------------------------------
-    void ETCCodec::encodeToFile(MemoryDataStreamPtr& input,
-        const String& outFileName, Codec::CodecDataPtr& pData) const
+    void ETCCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
+                                const Codec::CodecDataPtr& pData) const
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ETC encoding not supported",
                     "ETCCodec::encodeToFile" ) ;
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult ETCCodec::decode(DataStreamPtr& stream) const
+    Codec::DecodeResult ETCCodec::decode(const DataStreamPtr& stream) const
     {
         DecodeResult ret;
         if (decodeKTX(stream, ret))
@@ -200,7 +201,7 @@ namespace Ogre {
         return BLANKSTRING;
     }
     //---------------------------------------------------------------------
-    bool ETCCodec::decodePKM(DataStreamPtr& stream, DecodeResult& result) const
+    bool ETCCodec::decodePKM(const DataStreamPtr& stream, DecodeResult& result) const
     {
         PKMHeader header;
 
@@ -278,7 +279,7 @@ namespace Ogre {
         return true;
     }
     //---------------------------------------------------------------------
-    bool ETCCodec::decodeKTX(DataStreamPtr& stream, DecodeResult& result) const
+    bool ETCCodec::decodeKTX(const DataStreamPtr& stream, DecodeResult& result) const
     {
         KTXHeader header;
         // Read the ETC1 header
