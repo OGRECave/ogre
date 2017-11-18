@@ -16,6 +16,7 @@ addons:
     - libzzip-dev
     - libxrandr-dev
     - libfreetype6-dev
+    - libfreeimage-dev
     - libxt-dev
     - libboost-all-dev
     - libgles2-mesa-dev
