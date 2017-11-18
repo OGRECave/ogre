@@ -1142,6 +1142,10 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
             firePreFindVisibleObjects(vp);
 
+            //Some v1 Renderables may bind their own GL buffers during _updateRenderQueue,
+            //thus we need to be sure the correct VAO is bound.
+            mDestRenderSystem->_startLegacyV1Rendering();
+
             while( it != en )
             {
                 for( uint8 i=firstRq; i<lastRq; ++i )
