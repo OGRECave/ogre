@@ -66,6 +66,7 @@ namespace Ogre
         PBSM_DETAIL1_NM,
         PBSM_DETAIL2_NM,
         PBSM_DETAIL3_NM,
+        PBSM_EMISSIVE,
         PBSM_REFLECTION,
         NUM_PBSM_SOURCES = PBSM_REFLECTION,
         NUM_PBSM_TEXTURE_TYPES

@@ -131,11 +131,11 @@ struct Material
 	float4 F0;
 	float4 normalWeights;
 	float4 cDetailWeights;
-	float4 detailOffsetScaleD[4];
-	float4 detailOffsetScaleN[4];
+	float4 detailOffsetScale[4];
+	float4 emissive;		//emissive.w contains mNormalMapWeight.
+	float4 reserved[3];
 
 	uint4 indices0_3;
-	//asfloat( indices4_7.w ) contains mNormalMapWeight.
 	uint4 indices4_7;
 
 	@insertpiece( custom_materialBuffer )

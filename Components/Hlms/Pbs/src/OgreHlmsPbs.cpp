@@ -80,6 +80,7 @@ namespace Ogre
     const char *PbsProperty::NormalMapTex       = "normal_map_tex";
     const char *PbsProperty::SpecularMap        = "specular_map";
     const char *PbsProperty::RoughnessMap       = "roughness_map";
+    const char *PbsProperty::EmissiveMap        = "emissive_map";
     const char *PbsProperty::EnvProbeMap        = "envprobe_map";
     const char *PbsProperty::DetailWeightMap    = "detail_weight_map";
     const char *PbsProperty::DetailMapN         = "detail_map";     //detail_map0-4
@@ -109,14 +110,10 @@ namespace Ogre
     const IdString PbsProperty::NormalWeightDetail3   = IdString( "normal_weight_detail3" );
 
     const IdString PbsProperty::DetailWeights     = IdString( "detail_weights" );
-    const IdString PbsProperty::DetailOffsetsD0   = IdString( "detail_offsetsD0" );
-    const IdString PbsProperty::DetailOffsetsD1   = IdString( "detail_offsetsD1" );
-    const IdString PbsProperty::DetailOffsetsD2   = IdString( "detail_offsetsD2" );
-    const IdString PbsProperty::DetailOffsetsD3   = IdString( "detail_offsetsD3" );
-    const IdString PbsProperty::DetailOffsetsN0   = IdString( "detail_offsetsN0" );
-    const IdString PbsProperty::DetailOffsetsN1   = IdString( "detail_offsetsN1" );
-    const IdString PbsProperty::DetailOffsetsN2   = IdString( "detail_offsetsN2" );
-    const IdString PbsProperty::DetailOffsetsN3   = IdString( "detail_offsetsN3" );
+    const IdString PbsProperty::DetailOffsets0    = IdString( "detail_offsets0" );
+    const IdString PbsProperty::DetailOffsets1    = IdString( "detail_offsets1" );
+    const IdString PbsProperty::DetailOffsets2    = IdString( "detail_offsets2" );
+    const IdString PbsProperty::DetailOffsets3    = IdString( "detail_offsets3" );
 
     const IdString PbsProperty::UvDiffuse         = IdString( "uv_diffuse" );
     const IdString PbsProperty::UvNormal          = IdString( "uv_normal" );
@@ -131,6 +128,7 @@ namespace Ogre
     const IdString PbsProperty::UvDetailNm1       = IdString( "uv_detail_nm1" );
     const IdString PbsProperty::UvDetailNm2       = IdString( "uv_detail_nm2" );
     const IdString PbsProperty::UvDetailNm3       = IdString( "uv_detail_nm3" );
+    const IdString PbsProperty::UvEmissive        = IdString( "uv_emissive" );
 
     const IdString PbsProperty::BlendModeIndex0   = IdString( "blend_mode_idx0" );
     const IdString PbsProperty::BlendModeIndex1   = IdString( "blend_mode_idx1" );
@@ -140,6 +138,7 @@ namespace Ogre
     const IdString PbsProperty::DetailMapsDiffuse = IdString( "detail_maps_diffuse" );
     const IdString PbsProperty::DetailMapsNormal  = IdString( "detail_maps_normal" );
     const IdString PbsProperty::FirstValidDetailMapNm= IdString( "first_valid_detail_map_nm" );
+    const IdString PbsProperty::EmissiveConstant  = IdString( "emissive_constant" );
 
     const IdString PbsProperty::Pcf3x3            = IdString( "pcf_3x3" );
     const IdString PbsProperty::Pcf4x4            = IdString( "pcf_4x4" );
@@ -176,7 +175,8 @@ namespace Ogre
         &PbsProperty::UvDetailNm0,
         &PbsProperty::UvDetailNm1,
         &PbsProperty::UvDetailNm2,
-        &PbsProperty::UvDetailNm3
+        &PbsProperty::UvDetailNm3,
+        &PbsProperty::UvEmissive,
     };
 
     const IdString *PbsProperty::DetailNormalWeights[4] =
@@ -187,20 +187,12 @@ namespace Ogre
         &PbsProperty::NormalWeightDetail3
     };
 
-    const IdString *PbsProperty::DetailOffsetsDPtrs[4] =
+    const IdString *PbsProperty::DetailOffsetsPtrs[4] =
     {
-        &PbsProperty::DetailOffsetsD0,
-        &PbsProperty::DetailOffsetsD1,
-        &PbsProperty::DetailOffsetsD2,
-        &PbsProperty::DetailOffsetsD3
-    };
-
-    const IdString *PbsProperty::DetailOffsetsNPtrs[4] =
-    {
-        &PbsProperty::DetailOffsetsN0,
-        &PbsProperty::DetailOffsetsN1,
-        &PbsProperty::DetailOffsetsN2,
-        &PbsProperty::DetailOffsetsN3
+        &PbsProperty::DetailOffsets0,
+        &PbsProperty::DetailOffsets1,
+        &PbsProperty::DetailOffsets2,
+        &PbsProperty::DetailOffsets3
     };
 
     const IdString *PbsProperty::BlendModes[4] =
@@ -486,10 +478,7 @@ namespace Ogre
             }
 
             if( datablock->getDetailMapOffsetScale( i ) != Vector4( 0, 0, 1, 1 ) )
-                setProperty( *PbsProperty::DetailOffsetsDPtrs[i], 1 );
-
-            if( datablock->getDetailMapOffsetScale( i+4 ) != Vector4( 0, 0, 1, 1 ) )
-                setProperty( *PbsProperty::DetailOffsetsNPtrs[i], 1 );
+                setProperty( *PbsProperty::DetailOffsetsPtrs[i], 1 );
 
             if( datablock->mDetailWeight[i] != 1.0f &&
                 (!datablock->getTexture( PBSM_DETAIL0 + i ).isNull() ||
@@ -647,6 +636,7 @@ namespace Ogre
         setTextureProperty( PbsProperty::NormalMapTex,  datablock,  PBSM_NORMAL );
         setTextureProperty( PbsProperty::SpecularMap,   datablock,  PBSM_SPECULAR );
         setTextureProperty( PbsProperty::RoughnessMap,  datablock,  PBSM_ROUGHNESS );
+        setTextureProperty( PbsProperty::EmissiveMap,   datablock,  PBSM_EMISSIVE );
         setTextureProperty( PbsProperty::EnvProbeMap,   datablock,  PBSM_REFLECTION );
         setTextureProperty( PbsProperty::DetailWeightMap,datablock, PBSM_DETAIL_WEIGHT );
 
@@ -662,6 +652,12 @@ namespace Ogre
                 setProperty( PbsProperty::EnvProbeMap, static_cast<int32>(
                              IdString( reflectionTexture->getName() ).mHash ) );
             }
+        }
+
+        if( datablock->hasEmissive() )
+        {
+            if( datablock->getEmissive() != Vector3::ZERO )
+                setProperty( PbsProperty::EmissiveConstant, 1 );
         }
 
         bool usesNormalMap = !datablock->getTexture( PBSM_NORMAL ).isNull();
@@ -792,8 +788,8 @@ namespace Ogre
                 keyName == PbsProperty::DetailMap0 || keyName == PbsProperty::DetailMap1 ||
                 keyName == PbsProperty::DetailMap2 || keyName == PbsProperty::DetailMap3 ||
                 keyName == PbsProperty::DetailWeights ||
-                keyName == PbsProperty::DetailOffsetsD0 || keyName == PbsProperty::DetailOffsetsD1 ||
-                keyName == PbsProperty::DetailOffsetsD2 || keyName == PbsProperty::DetailOffsetsD3 ||
+                keyName == PbsProperty::DetailOffsets0 || keyName == PbsProperty::DetailOffsets1 ||
+                keyName == PbsProperty::DetailOffsets2 || keyName == PbsProperty::DetailOffsets3 ||
                 keyName == PbsProperty::UvDetailWeight ||
                 keyName == PbsProperty::UvDetail0 || keyName == PbsProperty::UvDetail1 ||
                 keyName == PbsProperty::UvDetail2 || keyName == PbsProperty::UvDetail3 ||

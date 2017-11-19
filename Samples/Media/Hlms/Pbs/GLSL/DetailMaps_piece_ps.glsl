@@ -1,13 +1,9 @@
 // detail_maps_diffuse & detail_maps_normal are either 0 or 4
 
-@foreach( detail_maps_diffuse, n )
-	@property( detail_offsetsD@n )
-		@piece( offsetDetailD@n ) * material.detailOffsetScaleD[@value(currOffsetDetailD)].zw + material.detailOffsetScaleD[@counter(currOffsetDetailD)].xy@end
-	@end
-@end
-@foreach( detail_maps_normal, n )
-	@property( detail_offsetsN@n )
-		@piece( offsetDetailN@n ) * material.detailOffsetScaleN[@value(currOffsetDetailN)].zw + material.detailOffsetScaleN[@counter(currOffsetDetailN)].xy@end
+@pmax( NumDetailMaps, detail_maps_diffuse, detail_maps_normal )
+@foreach( NumDetailMaps, n )
+	@property( detail_offsets@n )
+		@piece( offsetDetail@n ) * material.detailOffsetScale[@value(currOffsetDetail)].zw + material.detailOffsetScale[@counter(currOffsetDetail)].xy@end
 	@end
 @end
 
