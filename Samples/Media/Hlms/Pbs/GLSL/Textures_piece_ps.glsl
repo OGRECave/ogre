@@ -79,7 +79,7 @@ ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 @property( emissive_map )
 	@piece( SampleEmissiveMap )
 		vec3 emissiveCol = texture( textureMaps[@value( emissive_map_idx )],
-									vec3( inPs.uv@value(uv_emissive).xy, emissiveIdx ) ).xyz;
+									vec3( inPs.uv@value(uv_emissive).xy, emissiveMapIdx ) ).xyz;
 		@property( emissive_constant )
 			emissiveCol *= material.emissive.xyz;
 		@end
