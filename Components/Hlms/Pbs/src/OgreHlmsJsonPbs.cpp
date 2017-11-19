@@ -494,8 +494,19 @@ namespace Ogre
                 if( itor != subobj.MemberEnd() && itor->value.IsArray() )
                     parseScale( itor->value, offsetScale );
 
-                pbsDatablock->setDetailMapOffsetScale( i + 4, offsetScale );
+                pbsDatablock->setDetailMapOffsetScale( i, offsetScale );
             }
+        }
+
+        itor = json.FindMember("emissive");
+        if( itor != json.MemberEnd() && itor->value.IsObject() )
+        {
+            const rapidjson::Value &subobj = itor->value;
+            loadTexture( subobj, blocks, PBSM_EMISSIVE, pbsDatablock, resourceGroup );
+
+            itor = subobj.FindMember( "value" );
+            if( itor != subobj.MemberEnd() && itor->value.IsArray() )
+                pbsDatablock->setEmissive( parseVector3Array( itor->value ) );
         }
 
         itor = json.FindMember("reflection");
@@ -799,7 +810,7 @@ namespace Ogre
 
         for( int i=0; i<4; ++i )
         {
-            const Vector4 &offsetScale = pbsDatablock->getDetailMapOffsetScale( i + 4 );
+            const Vector4 &offsetScale = pbsDatablock->getDetailMapOffsetScale( i );
             const Vector2 offset( offsetScale.x, offsetScale.y );
             const Vector2 scale( offsetScale.z, offsetScale.w );
 
@@ -817,6 +828,12 @@ namespace Ogre
                              static_cast<PbsTextureTypes>(PBSM_DETAIL0_NM + i), pbsDatablock,
                              outString );
             }
+        }
+
+        if( pbsDatablock->hasEmissive() )
+        {
+            saveTexture( pbsDatablock->getEmissive(), "emissive", PBSM_EMISSIVE,
+                         pbsDatablock, outString );
         }
 
         if( !pbsDatablock->getTexture( PBSM_REFLECTION ).isNull() )

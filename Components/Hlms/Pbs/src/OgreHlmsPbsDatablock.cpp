@@ -47,7 +47,7 @@ namespace Ogre
         "GrainMerge", "Difference"
     };
 
-    const size_t HlmsPbsDatablock::MaterialSizeInGpu          = 56 * 4 + NUM_PBSM_TEXTURE_TYPES * 2 + 4;
+    const size_t HlmsPbsDatablock::MaterialSizeInGpu          = 56 * 4 + NUM_PBSM_TEXTURE_TYPES * 2;
     const size_t HlmsPbsDatablock::MaterialSizeInGpuAligned   = alignToNextMultiple(
                                                                     HlmsPbsDatablock::MaterialSizeInGpu,
                                                                     4 * 4 );
@@ -76,13 +76,14 @@ namespace Ogre
     {
         memset( mUvSource, 0, sizeof( mUvSource ) );
         memset( mBlendModes, 0, sizeof( mBlendModes ) );
+        memset( mReserved, 0, sizeof( mReserved ) );
 
         mBgDiffuse[0] = mBgDiffuse[1] = mBgDiffuse[2] = mBgDiffuse[3] = 1.0f;
 
         mDetailNormalWeight[0] = mDetailNormalWeight[1] = 1.0f;
         mDetailNormalWeight[2] = mDetailNormalWeight[3] = 1.0f;
         mDetailWeight[0] = mDetailWeight[1] = mDetailWeight[2] = mDetailWeight[3] = 1.0f;
-        for( size_t i=0; i<8; ++i )
+        for( size_t i=0; i<4; ++i )
         {
             mDetailsOffsetScale[i][0] = 0;
             mDetailsOffsetScale[i][1] = 0;
@@ -90,6 +91,7 @@ namespace Ogre
             mDetailsOffsetScale[i][3] = 1;
         }
 
+        mEmissive[0] = mEmissive[1] = mEmissive[2] = 0.0f;
         memset( mTexIndices, 0, sizeof( mTexIndices ) );
         memset( mSamplerblocks, 0, sizeof( mSamplerblocks ) );
 
@@ -128,6 +130,12 @@ namespace Ogre
                             name.getFriendlyText() + "' Very low roughness values can "
                                                        "cause NaNs in the pixel shader!" );
             }
+        }
+
+        if( Hlms::findParamInVec( params, "emissive", paramVal ) )
+        {
+            Vector3 val = StringConverter::parseVector3( paramVal, Vector3::UNIT_SCALE );
+            setEmissive( val );
         }
 
         if( Hlms::findParamInVec( params, "fresnel", paramVal ) )
@@ -189,6 +197,11 @@ namespace Ogre
         {
             textures[PBSM_ROUGHNESS].texture = setTexture( paramVal, PBSM_ROUGHNESS );
             mSamplerblocks[PBSM_ROUGHNESS] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
+        }
+        if( Hlms::findParamInVec( params, "roughness_map", paramVal ) )
+        {
+            textures[PBSM_EMISSIVE].texture = setTexture( paramVal, PBSM_EMISSIVE );
+            mSamplerblocks[PBSM_EMISSIVE] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "detail_weight_map", paramVal ) )
         {
@@ -264,17 +277,6 @@ namespace Ogre
                 mDetailsOffsetScale[i][1] = static_cast<float>( offsetScale[1] );
                 mDetailsOffsetScale[i][2] = static_cast<float>( offsetScale[2] );
                 mDetailsOffsetScale[i][3] = static_cast<float>( offsetScale[3] );
-            }
-
-            key = "detail_normal_offset_scale" + StringConverter::toString( i );
-            if( Hlms::findParamInVec( params, key, paramVal ) )
-            {
-                Vector4 offsetScale = StringConverter::parseVector4( paramVal,
-                                                                     getDetailMapOffsetScale( i+4 ) );
-                mDetailsOffsetScale[i+4][0] = static_cast<float>( offsetScale[0] );
-                mDetailsOffsetScale[i+4][1] = static_cast<float>( offsetScale[1] );
-                mDetailsOffsetScale[i+4][2] = static_cast<float>( offsetScale[2] );
-                mDetailsOffsetScale[i+4][3] = static_cast<float>( offsetScale[3] );
             }
 
             key = "uv_detail_map" + StringConverter::toString( i );
@@ -578,6 +580,30 @@ namespace Ogre
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setEmissive( const Vector3 &emissiveColour )
+    {
+        bool hadEmissive = hasEmissive();
+        mEmissive[0] = emissiveColour.x;
+        mEmissive[1] = emissiveColour.y;
+        mEmissive[2] = emissiveColour.z;
+
+        scheduleConstBufferUpdate();
+
+        if( hadEmissive != hasEmissive() )
+            flushRenderables();
+    }
+    //-----------------------------------------------------------------------------------
+    Vector3 HlmsPbsDatablock::getEmissive(void) const
+    {
+        return Vector3( mEmissive[0], mEmissive[1], mEmissive[2] );
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsPbsDatablock::hasEmissive(void) const
+    {
+        return  mEmissive[0] != 0 || mEmissive[1] != 0 ||
+                mEmissive[2] != 0 || mTextures[PBSM_EMISSIVE] != 0;
+    }
+    //-----------------------------------------------------------------------------------
     float HlmsPbsDatablock::getRoughness(void) const
     {
         return mRoughness;
@@ -876,7 +902,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale )
     {
-        assert( detailMap < 8 );
+        assert( detailMap < 4 );
         bool wasDisabled = getDetailMapOffsetScale( detailMap ) == Vector4( 0, 0, 1, 1 );
 
         mDetailsOffsetScale[detailMap][0] = static_cast<float>( offsetScale[0] );
@@ -894,7 +920,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Vector4 HlmsPbsDatablock::getDetailMapOffsetScale( uint8 detailMap ) const
     {
-        assert( detailMap < 8 );
+        assert( detailMap < 4 );
         return Vector4( mDetailsOffsetScale[detailMap][0], mDetailsOffsetScale[detailMap][1],
                         mDetailsOffsetScale[detailMap][2], mDetailsOffsetScale[detailMap][3] );
     }

@@ -7,6 +7,8 @@ hlms AllSettings pbs
 
 	specular	1 1 1
 
+	emissive 0.2 0.1 0.05
+
 	//Valid values are in range (0; inf]; but the range (0; 1] is physically correct.
 	//Note: Values extremely close to zero could cause NaNs and
 	//INFs in the pixel shader, also depends on the GPU's precision.

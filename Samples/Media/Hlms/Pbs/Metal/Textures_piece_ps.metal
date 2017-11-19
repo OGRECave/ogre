@@ -124,7 +124,13 @@
 @piece( brdfExtraParams )@insertpiece( diffuseExtraParam )@insertpiece( specularExtraParam )@insertpiece( roughnessExtraParam )@insertpiece( metallicExtraParam )@end
 
 @foreach( detail_maps_normal, n )
-	@piece( SampleDetailMapNm@n )getTSNormal( samplerStates@value(detail_map_nm@n_idx), textureMaps@value(detail_map_nm@n_idx), inPs.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetailN@n ), detailNormMapIdx@n ) * detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul )@end
+	@piece( SampleDetailMapNm@n )getTSNormal( samplerStates@value(detail_map_nm@n_idx),
+												textureMaps@value(detail_map_nm@n_idx),
+												@insertpiece(custom_ps_pre_detailmap@n)
+												(inPs.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetail@n ))
+												@insertpiece(custom_ps_pos_detailmap@n),
+												detailNormMapIdx@n ) * detailWeights.@insertpiece(detail_swizzle@n)
+												@insertpiece( detail@n_nm_weight_mul )@end
 @end
 
 @property( detail_weight_map )
@@ -133,6 +139,22 @@
 
 @property( envmap_scale )
 	@piece( ApplyEnvMapScale )* passBuf.ambientUpperHemi.w@end
+@end
+
+@property( emissive_map )
+	@piece( SampleEmissiveMap )
+		float3 emissiveCol = textureMaps@value( emissive_map_idx ).sample(
+										samplerState@value(emissive_map_sampler),
+										inPs.uv@value(uv_emissive).xy, emissiveIdx ).xyz;
+		@property( emissive_constant )
+			emissiveCol *= material.emissive.xyz;
+		@end
+	@end
+@end
+@property( !emissive_map && emissive_constant )
+	@piece( SampleEmissiveMap )
+		float3 emissiveCol = material.emissive.xyz;
+	@end
 @end
 
 @property( !hlms_render_depth_only && !hlms_shadowcaster && hlms_prepass )

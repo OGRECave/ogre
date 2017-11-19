@@ -53,7 +53,7 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 	return tsNormal;
 }
 @end
-@property( normal_weight_tex )#define normalMapWeight material.mNormalMapWeight@end
+@property( normal_weight_tex )#define normalMapWeight material.emissive.w@end
 @property( detail_maps_normal )
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
@@ -153,6 +153,7 @@ fragment @insertpiece( output_type ) main_metal
 	@property( detail_map@n )ushort detailMapIdx@n;@end @end
 @foreach( 4, n )
 	@property( detail_map_nm@n )ushort detailNormMapIdx@n;@end @end
+@property( emissive_map )	ushort emissiveMapIdx;@end
 @property( use_envprobe_map )	ushort envMapIdx;@end
 
 float4 diffuseCol;
@@ -181,6 +182,7 @@ float4 diffuseCol;
 @property( detail_map_nm1 )	detailNormMapIdx1	= material.detailNormMapIdx1;@end
 @property( detail_map_nm2 )	detailNormMapIdx2	= material.detailNormMapIdx2;@end
 @property( detail_map_nm3 )	detailNormMapIdx3	= material.detailNormMapIdx3;@end
+@property( emissive_map )	emissiveMapIdx		= material.emissiveMapIdx;@end
 @property( use_envprobe_map )	envMapIdx			= material.envMapIdx;@end
 
 	@insertpiece( custom_ps_posMaterialLoad )
@@ -198,7 +200,12 @@ float4 diffuseCol;
 
 	/// Sample detail maps and weight them against the weight map in the next foreach loop.
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
-	float4 detailCol@n	= textureMaps@value(detail_map@n_idx).sample( samplerStates@value(detail_map@n_idx), inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n );
+	float4 detailCol@n	= textureMaps@value(detail_map@n_idx).sample(
+									samplerStates@value(detail_map@n_idx),
+									@insertpiece(custom_ps_pre_detailmap@n)
+									(inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetail@n ))
+									@insertpiece(custom_ps_pos_detailmap@n),
+									detailMapIdx@n );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol@n.xyz = detailCol@n.xyz * detailCol@n.xyz;@end
 	detailWeights.@insertpiece(detail_swizzle@n) *= detailCol@n.w;
@@ -373,6 +380,11 @@ float4 diffuseCol;
 
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )
+
+@property( emissive_map || emissive_constant )
+	@insertpiece( SampleEmissiveMap )
+	finalColour += emissiveCol.xyz;
+@end
 
 @property( use_envprobe_map || hlms_use_ssr || use_planar_reflections || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
@@ -550,7 +562,12 @@ fragment @insertpiece( output_type ) main_metal
 
 	/// Sample detail maps and weight them against the weight map in the next foreach loop.
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
-	float detailCol@n	= textureMaps@value(detail_map@n_idx).sample( samplerStates@value(detail_map@n_idx), inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ).w;
+	float detailCol@n	= textureMaps@value(detail_map@n_idx).sample(
+										samplerStates@value(detail_map@n_idx),
+										@insertpiece(custom_ps_pre_detailmap@n)
+										inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetail@n )
+										@insertpiece(custom_ps_pos_detailmap@n),
+										detailMapIdx@n ).w;
 	detailCol@n = detailWeights.@insertpiece(detail_swizzle@n) * detailCol@n;@end
 @end
 

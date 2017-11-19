@@ -129,11 +129,11 @@ struct Material
 	vec4 F0;
 	vec4 normalWeights;
 	vec4 cDetailWeights;
-	vec4 detailOffsetScaleD[4];
-	vec4 detailOffsetScaleN[4];
+	vec4 detailOffsetScale[4];
+	vec4 emissive;		//emissive.w contains mNormalMapWeight.
+	vec4 reserved[3];
 
 	uvec4 indices0_3;
-	//uintBitsToFloat( indices4_7.w ) contains mNormalMapWeight.
 	uvec4 indices4_7;
 
 	@insertpiece( custom_materialBuffer )

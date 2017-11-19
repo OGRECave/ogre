@@ -303,6 +303,7 @@ namespace Ogre
         static const char *NormalMapTex;
         static const char *SpecularMap;
         static const char *RoughnessMap;
+        static const char *EmissiveMap;
         static const char *EnvProbeMap;
         static const char *DetailWeightMap;
         static const char *DetailMapN;
@@ -332,14 +333,10 @@ namespace Ogre
         static const IdString NormalWeightDetail3;
 
         static const IdString DetailWeights;
-        static const IdString DetailOffsetsD0;
-        static const IdString DetailOffsetsD1;
-        static const IdString DetailOffsetsD2;
-        static const IdString DetailOffsetsD3;
-        static const IdString DetailOffsetsN0;
-        static const IdString DetailOffsetsN1;
-        static const IdString DetailOffsetsN2;
-        static const IdString DetailOffsetsN3;
+        static const IdString DetailOffsets0;
+        static const IdString DetailOffsets1;
+        static const IdString DetailOffsets2;
+        static const IdString DetailOffsets3;
 
         static const IdString UvDiffuse;
         static const IdString UvNormal;
@@ -357,6 +354,8 @@ namespace Ogre
         static const IdString UvDetailNm2;
         static const IdString UvDetailNm3;
 
+        static const IdString UvEmissive;
+        static const IdString EmissiveConstant;
         static const IdString DetailMapsDiffuse;
         static const IdString DetailMapsNormal;
         static const IdString FirstValidDetailMapNm;
@@ -390,8 +389,7 @@ namespace Ogre
         static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
         static const IdString *BlendModes[4];
         static const IdString *DetailNormalWeights[4];
-        static const IdString *DetailOffsetsDPtrs[4];
-        static const IdString *DetailOffsetsNPtrs[4];
+        static const IdString *DetailOffsetsPtrs[4];
     };
 
     /** @} */

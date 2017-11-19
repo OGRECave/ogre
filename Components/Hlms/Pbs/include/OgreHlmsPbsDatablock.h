@@ -240,9 +240,10 @@ namespace Ogre
         float   mTransparencyValue;
         float   mDetailNormalWeight[4];
         float   mDetailWeight[4];
-        float   mDetailsOffsetScale[8][4];
-        uint16  mTexIndices[NUM_PBSM_TEXTURE_TYPES];
+        float   mDetailsOffsetScale[4][4];
+        float   mEmissive[3];
         float   mNormalMapWeight;
+        uint16  mTexIndices[NUM_PBSM_TEXTURE_TYPES];
 
         PbsBakedTextureArray mBakedTextures;
         /// The way to read this variable is i.e. get diffuse texture,
@@ -378,6 +379,14 @@ namespace Ogre
         /// Sets the roughness
         void setRoughness( float roughness );
         float getRoughness(void) const;
+
+        /// Sets emissive colour (e.g. a firefly). Emissive colour has no physical basis.
+        /// Though in HDR, if you're working in lumens, this value should probably be in lumens too.
+        /// To disable emissive, setEmissive( Vector3::ZERO ) and unset any texture
+        /// in PBSM_EMISSIVE slot.
+        void setEmissive( const Vector3 &emissiveColour );
+        Vector3 getEmissive(void) const;
+        bool hasEmissive(void) const;
 
         /** Sets whether to use a specular workflow, or a metallic workflow.
         @remarks
@@ -568,9 +577,7 @@ namespace Ogre
             A value of Vector4( 0, 0, 1, 1 ) will cause a flushRenderables as we
             remove the code from the shader.
         @param detailMap
-            Value in the range [0; 8)
-            Range [0; 4) affects diffuse maps.
-            Range [4; 8) affects normal maps.
+            Value in the range [0; 4)
         @param offsetScale
             XY = Contains the UV offset.
             ZW = Constains the UV scale.

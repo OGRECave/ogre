@@ -150,6 +150,14 @@ including invalid combinations (i.e. having a Metallic texture and a Specular te
                 "uv" : 0
             },
 
+            "emissive" :
+            {
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
             "reflection" :
             {
                 "texture" : "cubemap.png",
