@@ -502,7 +502,7 @@ namespace Ogre
         if( itor != json.MemberEnd() && itor->value.IsObject() )
         {
             const rapidjson::Value &subobj = itor->value;
-            loadTexture( subobj, blocks, PBSM_EMISSIVE, pbsDatablock, resourceGroup );
+            loadTexture( subobj, blocks, PBSM_EMISSIVE, pbsDatablock, packedTextures );
 
             itor = subobj.FindMember( "value" );
             if( itor != subobj.MemberEnd() && itor->value.IsArray() )
