@@ -59,8 +59,6 @@ hlms Rocks pbs
 {
 	roughness	0.4
 	fresnel		1.33
-
-emissive 0.2 0.1 0.05
 	
 	diffuse_map		Rocks_Diffuse.tga
 	normal_map		Rocks_Normal.tga
