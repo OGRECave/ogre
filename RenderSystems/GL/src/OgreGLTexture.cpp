@@ -304,26 +304,28 @@ namespace Ogre {
     {
         mSurfaceList.clear();
         
+        uint32 depth = mDepth;
+
         // For all faces and mipmaps, store surfaces as HardwarePixelBufferSharedPtr
         for(GLint face=0; face<static_cast<GLint>(getNumFaces()); face++)
         {
+            uint32 width = mWidth;
+            uint32 height = mHeight;
+
             for(uint32 mip=0; mip<=getNumMipmaps(); mip++)
             {
-                GLHardwarePixelBuffer *buf = new GLTextureBuffer(mRenderSystem, mName, getGLTextureTarget(), mTextureID, face, mip,
-                        static_cast<HardwareBuffer::Usage>(mUsage), mHwGamma, mFSAA);
+                GLHardwarePixelBuffer* buf = new GLTextureBuffer(
+                    mRenderSystem, mName, getGLTextureTarget(), mTextureID, face, mip, width,
+                    height, depth, mFormat, static_cast<HardwareBuffer::Usage>(mUsage), mHwGamma,
+                    mFSAA);
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
                 
-                /// Check for error
-                if(buf->getWidth()==0 || buf->getHeight()==0 || buf->getDepth()==0)
-                {
-                    OGRE_EXCEPT(
-                        Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Zero sized texture surface on texture "+getName()+
-                            " face "+StringConverter::toString(face)+
-                            " mipmap "+StringConverter::toString(mip)+
-                            ". Probably, the GL driver refused to create the texture.", 
-                            "GLTexture::_createSurfaceList");
-                }
+                if (width > 1)
+                    width = width / 2;
+                if (height > 1)
+                    height = height / 2;
+                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    depth = depth / 2;
             }
         }
     }

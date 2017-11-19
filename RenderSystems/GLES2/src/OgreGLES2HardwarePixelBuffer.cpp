@@ -133,35 +133,19 @@ namespace Ogre {
     }
     
     // TextureBuffer
-    GLES2TextureBuffer::GLES2TextureBuffer(const String &baseName, GLenum target, GLuint id, 
-                                           GLint width, GLint height, GLint depth, GLint internalFormat, GLint format,
-                                           GLint face, GLint level, Usage usage,
+    GLES2TextureBuffer::GLES2TextureBuffer(const String& baseName, GLenum target, GLuint id,
+                                           GLint face, GLint level, GLint width, GLint height,
+                                           GLint depth, PixelFormat format, Usage usage,
                                            bool writeGamma, uint fsaa)
-    : GLES2HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-        mTarget(target), mTextureID(id), mFace(face), mLevel(level)
+        : GLES2HardwarePixelBuffer(width, height, depth, format, usage), mTarget(target),
+          mTextureID(id), mFace(face), mLevel(level)
     {
-        getGLES2RenderSystem()->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
-        
         // Get face identifier
         mFaceTarget = mTarget;
         if(mTarget == GL_TEXTURE_CUBE_MAP)
             mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
 
-        // Calculate the width and height of the texture at this mip level
-        mWidth = mLevel == 0 ? width : width / static_cast<size_t>(pow(2.0f, level));
-        mHeight = mLevel == 0 ? height : height / static_cast<size_t>(pow(2.0f, level));
-        if(mWidth < 1)
-            mWidth = 1;
-        if(mHeight < 1)
-            mHeight = 1;
-
-        if(target != GL_TEXTURE_3D_OES && target != GL_TEXTURE_2D_ARRAY)
-            mDepth = 1; // Depth always 1 for non-3D textures
-        else
-            mDepth = depth;
-
-        mGLInternalFormat = internalFormat;
-        mFormat = GLES2PixelUtil::getClosestOGREFormat(internalFormat);
+        mGLInternalFormat = GLES2PixelUtil::getGLInternalFormat(format, writeGamma);
 
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
@@ -788,9 +772,9 @@ namespace Ogre {
 #endif
 
         // GL texture buffer
-        GLES2TextureBuffer tex(BLANKSTRING, target, id, width, height, depth, format, src.format,
-                              0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
-        
+        GLES2TextureBuffer tex(BLANKSTRING, target, id, 0, 0, width, height, depth, src.format,
+                               (Usage)(TU_AUTOMIPMAP | HBU_STATIC_WRITE_ONLY), false, 0);
+
         // Upload data to 0,0,0 in temporary texture
         Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
         tex.upload(src, tempTarget);

@@ -121,45 +121,21 @@ void GLHardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     }
 }
 //********* GLTextureBuffer
-GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, const String &baseName, GLenum target, GLuint id,
-                                 GLint face, GLint level, Usage usage,
-                                 bool writeGamma, uint fsaa):
-    GLHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-    mTarget(target), mFaceTarget(0), mTextureID(id), mFace(face), mLevel(level),
-    mHwGamma(writeGamma), mSliceTRT(0), mRenderSystem(renderSystem)
+GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, const String& baseName,
+                                 GLenum target, GLuint id, GLint face, GLint level, uint32 width,
+                                 uint32 height, uint32 depth, PixelFormat format, Usage usage,
+                                 bool writeGamma, uint fsaa)
+    : GLHardwarePixelBuffer(width, height, depth, format, usage), mTarget(target), mFaceTarget(0),
+      mTextureID(id), mFace(face), mLevel(level), mHwGamma(writeGamma), mSliceTRT(0),
+      mRenderSystem(renderSystem)
 {
-    // devise mWidth, mHeight and mDepth and mFormat
-    GLint value = 0;
-    
-    mRenderSystem->_getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
-    
     // Get face identifier
     mFaceTarget = mTarget;
     if(mTarget == GL_TEXTURE_CUBE_MAP)
         mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
     
-    // Get width
-    glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_WIDTH, &value);
-    mWidth = value;
-    
-    // Get height
-    if(target == GL_TEXTURE_1D)
-        value = 1;  // Height always 1 for 1D textures
-    else
-        glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_HEIGHT, &value);
-    mHeight = value;
-    
-    // Get depth
-    if(target != GL_TEXTURE_3D && target != GL_TEXTURE_2D_ARRAY_EXT)
-        value = 1; // Depth always 1 for non-3D textures
-    else
-        glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_DEPTH, &value);
-    mDepth = value;
-
     // Get format
-    glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &value);
-    mGLInternalFormat = value;
-    mFormat = GLPixelUtil::getClosestOGREFormat(value);
+    mGLInternalFormat = GLPixelUtil::getGLInternalFormat(mFormat, writeGamma);
     
     // Default
     mRowPitch = mWidth;
@@ -736,8 +712,9 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Box &dstBox
         glTexImage2D(target, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
     /// GL texture buffer
-    GLTextureBuffer tex(mRenderSystem, BLANKSTRING, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
-    
+    GLTextureBuffer tex(mRenderSystem, BLANKSTRING, target, id, 0, 0, width, height, depth,
+                        PF_BYTE_RGBA, (Usage)(TU_AUTOMIPMAP | HBU_STATIC_WRITE_ONLY), false, 0);
+
     /// Upload data to 0,0,0 in temporary texture
     Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
     tex.upload(src, tempTarget);

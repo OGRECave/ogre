@@ -397,33 +397,26 @@ namespace Ogre {
     {
         mSurfaceList.clear();
 
+        size_t depth = mDepth;
         for (uint8 face = 0; face < getNumFaces(); face++)
         {
+            size_t width = mWidth;
+            size_t height = mHeight;
+
             for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {
-                GL3PlusHardwarePixelBuffer *buf = new GL3PlusTextureBuffer(mName,
-                                                                           getGL3PlusTextureTarget(),
-                                                                           mTextureID,
-                                                                           face,
-                                                                           mip,
-                                                                           static_cast<HardwareBuffer::Usage>(mUsage),
-                                                                           mHwGamma, mFSAA);
+                GL3PlusHardwarePixelBuffer* buf = new GL3PlusTextureBuffer(
+                    mName, getGL3PlusTextureTarget(), mTextureID, face, mip, width, height, depth,
+                    mFormat, static_cast<HardwareBuffer::Usage>(mUsage), mHwGamma, mFSAA);
 
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 
-                // Check for error
-                if (buf->getWidth() == 0 ||
-                    buf->getHeight() == 0 ||
-                    buf->getDepth() == 0)
-                {
-                    OGRE_EXCEPT(
-                        Exception::ERR_RENDERINGAPI_ERROR,
-                        "Zero sized texture surface on texture "+getName()+
-                        " face "+StringConverter::toString(face)+
-                        " mipmap "+StringConverter::toString(mip)+
-                        ". The GL driver probably refused to create the texture.",
-                        "GL3PlusTexture::_createSurfaceList");
-                }
+                if (width > 1)
+                    width = width / 2;
+                if (height > 1)
+                    height = height / 2;
+                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    depth = depth / 2;
             }
         }
     }

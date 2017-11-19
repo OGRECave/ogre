@@ -43,44 +43,20 @@
 
 namespace Ogre {
 
-    GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id,
-                                               GLint face, GLint level, Usage usage,
+    GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String& baseName, GLenum target, GLuint id,
+                                               GLint face, GLint level, uint32 width, uint32 height,
+                                               uint32 depth, PixelFormat format, Usage usage,
                                                bool writeGamma, uint fsaa)
-        : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
+        : GL3PlusHardwarePixelBuffer(width, height, depth, format, usage),
           mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSliceTRT(0)
     {
-        // devise mWidth, mHeight and mDepth and mFormat
-        GLint value = 0;
-
-        mRenderSystem->_getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
-
         // Get face identifier
         mFaceTarget = mTarget;
         if (mTarget == GL_TEXTURE_CUBE_MAP)
             mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
 
-        // Get width
-        OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_WIDTH, &value));
-        mWidth = value;
-
-        // Get height
-        if (mTarget == GL_TEXTURE_1D)
-            value = 1;  // Height always 1 for 1D textures
-        else
-            OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_HEIGHT, &value));
-        mHeight = value;
-
-        // Get depth
-        if (mTarget != GL_TEXTURE_3D && mTarget != GL_TEXTURE_2D_ARRAY)
-            value = 1; // Depth always 1 for non-3D textures
-        else
-            OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_DEPTH, &value));
-        mDepth = value;
-
         // Get format
-        OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &value));
-        mGLInternalFormat = value;
-        mFormat = GL3PlusPixelUtil::getClosestOGREFormat(value);
+        mGLInternalFormat = GL3PlusPixelUtil::getGLInternalFormat(mFormat, writeGamma);
 
         // Default
         mRowPitch = mWidth;
@@ -675,7 +651,9 @@ namespace Ogre {
         }
 
         // GL texture buffer
-        GL3PlusTextureBuffer tex(BLANKSTRING, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
+        GL3PlusTextureBuffer tex(BLANKSTRING, target, id, 0, 0, src.getWidth(), src.getHeight(),
+                                 src.getDepth(), PF_BYTE_RGBA,
+                                 (Usage)(TU_AUTOMIPMAP | HBU_STATIC_WRITE_ONLY), false, 0);
 
         // Upload data to 0,0,0 in temporary texture
         Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
