@@ -103,8 +103,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             http://zlib.net/zlib-1.2.11.tar.gz
             ${OGRE_BINARY_DIR}/zlib-1.2.11.tar.gz 
             EXPECTED_MD5 1c9f62f0778697a09d36121ead88e08e)
-        execute_process(COMMAND cmake -E tar xf zlib-1.2.11.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
-        execute_process(COMMAND cmake
+        execute_process(COMMAND ${CMAKE_COMMAND} 
+            -E tar xf zlib-1.2.11.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
+        execute_process(COMMAND ${CMAKE_COMMAND}
             -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
@@ -112,15 +113,17 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             ${CROSS}
             ${CMAKE_BINARY_DIR}/zlib-1.2.11
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/zlib-1.2.11)
-        execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/zlib-1.2.11 ${BUILD_COMMAND_OPTS})
+        execute_process(COMMAND ${CMAKE_COMMAND} 
+            --build ${CMAKE_BINARY_DIR}/zlib-1.2.11 ${BUILD_COMMAND_OPTS})
     endif()
 
     message(STATUS "Building ZZIPlib")
     file(DOWNLOAD
         https://github.com/paroj/ZZIPlib/archive/master.tar.gz
         ${OGRE_BINARY_DIR}/ZZIPlib-master.tar.gz)
-    execute_process(COMMAND cmake -E tar xf ZZIPlib-master.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
-    execute_process(COMMAND cmake
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        -E tar xf ZZIPlib-master.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
+    execute_process(COMMAND ${CMAKE_COMMAND}
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DZLIB_ROOT=${OGREDEPS_PATH}
@@ -129,19 +132,21 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         ${CROSS}
         ${CMAKE_BINARY_DIR}/ZZIPlib-master
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ZZIPlib-master)
-    execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/ZZIPlib-master ${BUILD_COMMAND_OPTS})
+    execute_process(COMMAND ${CMAKE_COMMAND} 
+        --build ${CMAKE_BINARY_DIR}/ZZIPlib-master ${BUILD_COMMAND_OPTS})
     
     message(STATUS "Building freetype")
     file(DOWNLOAD
         http://download.savannah.gnu.org/releases/freetype/freetype-2.6.5.tar.gz
         ${OGRE_BINARY_DIR}/freetype-2.6.5.tar.gz)
-    execute_process(COMMAND cmake -E tar xf freetype-2.6.5.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        -E tar xf freetype-2.6.5.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
     # patch toolchain for iOS
-    execute_process(COMMAND cmake -E copy
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
         freetype-2.6.5/builds/cmake/iOS.cmake
 		WORKING_DIRECTORY ${OGRE_BINARY_DIR})
-    execute_process(COMMAND cmake
+    execute_process(COMMAND ${CMAKE_COMMAND}
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
@@ -152,16 +157,19 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -G ${CMAKE_GENERATOR}
         ${CMAKE_BINARY_DIR}/freetype-2.6.5
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs)
-    execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs ${BUILD_COMMAND_OPTS})
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        --build ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs ${BUILD_COMMAND_OPTS})
 
     if(MSVC) # other platforms dont need this
         message(STATUS "Building SDL2")
         file(DOWNLOAD
             https://libsdl.org/release/SDL2-2.0.5.tar.gz
             ${OGRE_BINARY_DIR}/SDL2-2.0.5.tar.gz)
-        execute_process(COMMAND cmake -E tar xf SDL2-2.0.5.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
-        execute_process(COMMAND cmake -E make_directory ${OGRE_BINARY_DIR}/SDL2-build)
-        execute_process(COMMAND cmake
+        execute_process(COMMAND ${CMAKE_COMMAND} 
+            -E tar xf SDL2-2.0.5.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
+        execute_process(COMMAND ${CMAKE_COMMAND}
+            -E make_directory ${OGRE_BINARY_DIR}/SDL2-build)
+        execute_process(COMMAND ${CMAKE_COMMAND}
             -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DSDL_STATIC=FALSE
@@ -169,7 +177,8 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             ${CROSS}
             ${OGRE_BINARY_DIR}/SDL2-2.0.5
             WORKING_DIRECTORY ${OGRE_BINARY_DIR}/SDL2-build)
-        execute_process(COMMAND cmake --build ${OGRE_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
+        execute_process(COMMAND ${CMAKE_COMMAND}
+            --build ${OGRE_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
     endif()
 endif()
 
