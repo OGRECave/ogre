@@ -175,8 +175,7 @@ namespace Ogre {
             // Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap piramid
-            uint8 *tmpdata = new uint8[size];
-            memset(tmpdata, 0, size);
+            vector<uint8>::type tmpdata(size);
             
             for(uint32 mip=0; mip<=mNumMipmaps; mip++)
             {
@@ -186,24 +185,24 @@ namespace Ogre {
                     case TEX_TYPE_1D:
                         glCompressedTexImage1DARB(GL_TEXTURE_1D, mip, internalformat, 
                             width, 0, 
-                            size, tmpdata);
+                            size, &tmpdata[0]);
                         break;
                     case TEX_TYPE_2D:
                         glCompressedTexImage2DARB(GL_TEXTURE_2D, mip, internalformat,
                             width, height, 0, 
-                            size, tmpdata);
+                            size, &tmpdata[0]);
                         break;
                     case TEX_TYPE_2D_ARRAY:
                     case TEX_TYPE_3D:
                         glCompressedTexImage3DARB(getGLTextureTarget(), mip, internalformat,
                             width, height, depth, 0, 
-                            size, tmpdata);
+                            size, &tmpdata[0]);
                         break;
                     case TEX_TYPE_CUBE_MAP:
                         for(int face=0; face<6; face++) {
                             glCompressedTexImage2DARB(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
                                 width, height, 0, 
-                                size, tmpdata);
+                                size, &tmpdata[0]);
                         }
                         break;
                     case TEX_TYPE_2D_RECT:
@@ -216,7 +215,6 @@ namespace Ogre {
                 if(depth>1 && mTextureType != TEX_TYPE_2D_ARRAY)
                     depth = depth/2;
             }
-            delete [] tmpdata;
         }
         else
         {

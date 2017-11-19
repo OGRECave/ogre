@@ -10,7 +10,7 @@
 
 namespace Ogre
 {
-VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(String type)
+VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(const String& type)
 {
     size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
     for (size_t i = 0; i < numAttribs; ++i)
@@ -117,10 +117,7 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
         String attrName = parts[2];
         String::size_type uvPos = attrName.find("uv");
 
-        // Special case for attribute named position.
-        if (attrName == "position")
-            semantic = getAttributeSemanticEnum("vertex");
-        else if(uvPos == 0)
+        if(uvPos == 0)
             semantic = getAttributeSemanticEnum("uv0"); // treat "uvXY" as "uv0"
         else
             semantic = getAttributeSemanticEnum(attrName);
@@ -138,8 +135,8 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
     }
 }
 
-// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
-// and end up aliasing existing built-ins. So avoid! Fixed builtins are:
+// Switching attribute bindings requires re-creating VAOs. So avoid!
+// Fixed builtins (from ARB_vertex_program Table X.2) are:
 
 //  a  builtin              custom attrib name
 // ----------------------------------------------
@@ -149,6 +146,7 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
 //  3  gl_Color             colour
 //  4  gl_SecondaryColor    secondary_colour
 //  5  gl_FogCoord          n/a
+//  6  n/a                  n/a
 //  7  n/a                  blendIndices
 //  8  gl_MultiTexCoord0    uv0
 //  9  gl_MultiTexCoord1    uv1
@@ -178,31 +176,60 @@ GLSLProgramCommon::CustomAttribute GLSLProgramCommon::msCustomAttributes[17] = {
     {"binormal", getFixedAttributeIndex(VES_BINORMAL, 0), VES_BINORMAL},
 };
 
+static int32 attributeIndex[VES_COUNT + 1] = {
+        -1,// n/a
+        0, // VES_POSITION
+        1, // VES_BLEND_WEIGHTS
+        7, // VES_BLEND_INDICES
+        2, // VES_NORMAL
+        3, // VES_DIFFUSE
+        4, // VES_SPECULAR
+        8, // VES_TEXTURE_COORDINATES
+        15,// VES_BINORMAL
+        14 // VES_TANGENT
+};
+
+void GLSLProgramCommon::useTightAttributeLayout() {
+    //  a  builtin              custom attrib name
+    // ----------------------------------------------
+    //  0  gl_Vertex            vertex/ position
+    //  1  gl_Normal            normal
+    //  2  gl_Color             colour
+    //  3  gl_MultiTexCoord0    uv0
+    //  4  gl_MultiTexCoord1    uv1, blendWeights
+    //  5  gl_MultiTexCoord2    uv2, blendIndices
+    //  6  gl_MultiTexCoord3    uv3, tangent
+    //  7  gl_MultiTexCoord4    uv4, binormal
+
+    size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
+    for (size_t i = 0; i < numAttribs; ++i)
+    {
+        CustomAttribute& a = msCustomAttributes[i];
+        a.attrib -= attributeIndex[a.semantic]; // only keep index (for uvXY)
+    }
+
+    attributeIndex[VES_NORMAL] = 1;
+    attributeIndex[VES_DIFFUSE] = 2;
+    attributeIndex[VES_TEXTURE_COORDINATES] = 3;
+    attributeIndex[VES_BLEND_WEIGHTS] = 4;
+    attributeIndex[VES_BLEND_INDICES] = 5;
+    attributeIndex[VES_TANGENT] = 6;
+    attributeIndex[VES_BINORMAL] = 7;
+
+    for (size_t i = 0; i < numAttribs; ++i)
+    {
+        CustomAttribute& a = msCustomAttributes[i];
+        a.attrib += attributeIndex[a.semantic];
+    }
+}
+
 int32 GLSLProgramCommon::getFixedAttributeIndex(VertexElementSemantic semantic, uint index)
 {
-    switch(semantic)
-    {
-    case VES_POSITION:
-        return 0;
-    case VES_BLEND_WEIGHTS:
-        return 1;
-    case VES_NORMAL:
-        return 2;
-    case VES_DIFFUSE:
-        return 3;
-    case VES_SPECULAR:
-        return 4;
-    case VES_BLEND_INDICES:
-        return 7;
-    case VES_TEXTURE_COORDINATES:
-        return 8 + index;
-    case VES_TANGENT:
-        return 14;
-    case VES_BINORMAL:
-        return 15;
-    default:
-        OgreAssertDbg(false, "Missing attribute!");
-        return NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
-    };
+    OgreAssertDbg(semantic > 0 && semantic <= VES_COUNT, "Missing attribute!");
+
+    if(semantic == VES_TEXTURE_COORDINATES)
+        return attributeIndex[semantic] + index;
+
+    return attributeIndex[semantic];
 }
 } /* namespace Ogre */

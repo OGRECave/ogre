@@ -992,8 +992,9 @@ namespace Ogre
         || SUCCEEDED(mDevice->CheckFormatSupport(DXGI_FORMAT_R32_UINT, &formatSupport)) && 0 != (formatSupport & D3D11_FORMAT_SUPPORT_IA_INDEX_BUFFER))
             rsc->setCapability(RSC_32BIT_INDEX);
 
-        // Set number of texture units, always 16
-        rsc->setNumTextureUnits(16);
+        // Set number of texture units, cap at OGRE_MAX_TEXTURE_LAYERS
+        rsc->setNumTextureUnits(OGRE_MAX_TEXTURE_LAYERS);
+        rsc->setNumVertexAttributes(D3D11_STANDARD_VERTEX_ELEMENT_COUNT);
         rsc->setCapability(RSC_ANISOTROPY);
         rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);

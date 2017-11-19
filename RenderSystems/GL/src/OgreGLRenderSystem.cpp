@@ -294,7 +294,7 @@ namespace Ogre {
                 if (arbUnits > units)
                     units = arbUnits;
             }
-            rsc->setNumTextureUnits(std::min<ushort>(16, units));
+            rsc->setNumTextureUnits(std::min(OGRE_MAX_TEXTURE_LAYERS, units));
         }
         else
         {
@@ -381,6 +381,10 @@ namespace Ogre {
             GLint floatConstantCount;
             glGetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, &floatConstantCount);
             rsc->setVertexProgramConstantFloatCount(floatConstantCount);
+
+            GLint attrs;
+            glGetIntegerv( GL_MAX_VERTEX_ATTRIBS_ARB, &attrs);
+            rsc->setNumVertexAttributes(attrs);
 
             rsc->addShaderProfile("arbvp1");
             if (GLEW_NV_vertex_program2_option)

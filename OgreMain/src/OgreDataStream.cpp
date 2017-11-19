@@ -236,7 +236,7 @@ namespace Ogre {
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
-    MemoryDataStream::MemoryDataStream(DataStreamPtr& sourceStream, 
+    MemoryDataStream::MemoryDataStream(const DataStreamPtr& sourceStream,
         bool freeOnClose, bool readOnly)
         : DataStream(static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {

@@ -43,6 +43,7 @@ namespace Ogre {
         , mMaxSupportedAnisotropy(0)
         , mVertexTextureUnitsShared(0)
         , mGeometryProgramNumOutputVertices(0)
+        , mNumVertexAttributes(1)
     {
         for(int i = 0; i < CAPS_CATEGORY_COUNT; i++)
         {
@@ -262,11 +263,11 @@ namespace Ogre {
             " * Vertex texture fetch: "
             + StringConverter::toString(hasCapability(RSC_VERTEX_TEXTURE_FETCH), true));
         pLog->logMessage(
-             " * Number of world matrices: "
-             + StringConverter::toString(mNumWorldMatrices));
-        pLog->logMessage(
              " * Number of texture units: "
              + StringConverter::toString(mNumTextureUnits));
+        pLog->logMessage(
+             " * Number of vertex attributes: "
+             + StringConverter::toString(mNumVertexAttributes));
         pLog->logMessage(
              " * Stencil buffer depth: "
              + StringConverter::toString(mStencilBufferBitDepth));

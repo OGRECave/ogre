@@ -77,7 +77,7 @@ namespace Ogre {
         */
         void activate(void);
 
-        virtual bool isAttributeValid(VertexElementSemantic semantic, uint index);
+        bool isAttributeValid(VertexElementSemantic semantic, uint index);
         
         /** Updates program object uniforms using data from GpuProgramParameters.
         normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.

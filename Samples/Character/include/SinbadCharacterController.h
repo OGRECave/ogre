@@ -133,7 +133,7 @@ public:
     void injectMouseWheel(const MouseWheelEvent& evt)
     {
         // update camera goal based on mouse movement
-        updateCameraGoal(0, 0, -0.0005f * evt.y);
+        updateCameraGoal(0, 0, -0.05f * evt.y);
     }
 
     void injectMouseDown(const MouseButtonEvent& evt)

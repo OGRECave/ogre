@@ -72,8 +72,7 @@ namespace Ogre
         }
         else
         {
-            ID3D11Texture2D* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-            memset( pBack, 0, sizeof(pBack) );
+            ID3D11Texture2D* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS] = {0};
             renderTarget->getCustomAttribute( "DDBACKBUFFER", &pBack );
             
             if( pBack[0] )

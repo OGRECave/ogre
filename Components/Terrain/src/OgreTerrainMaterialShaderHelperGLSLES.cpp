@@ -286,6 +286,7 @@ namespace Ogre
         {
             outStream << "out vec4 fragColour;\n";
             outStream << "#define texture2D texture\n";
+            outStream << "#define texture2DProj textureProj\n";
             outStream << "#define texture3D texture\n";
             outStream << "#define textureCube texture\n";
         }

@@ -679,8 +679,7 @@ namespace Ogre {
                     
                     // allow 8 digit hex number. there should never be that many texture units.
                     // This sprintf replaced a call to StringConverter::toString for performance reasons
-                    char buff[9];
-                    memset(buff, 0, 9);
+                    char buff[9] = {0};
                     sprintf(buff, "%lx", static_cast<long>(idx));
                     state->setName( buff );
                     

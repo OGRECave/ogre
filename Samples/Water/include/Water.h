@@ -37,9 +37,7 @@ using namespace OgreBites;
 
 static void prepareCircleMaterial()
 {
-    DataStreamPtr imgstream(new MemoryDataStream(256 * 256 * 4));
-    char *bmap = (char*)static_cast<MemoryDataStream*>(imgstream.get())->getPtr();
-    memset(bmap, 127, 256 * 256 * 4);
+    vector<uchar>::type bmap(256 * 256 * 4, 127);
     for(int b=0;b<16;b++) {
         int x0 = b % 4 ;
         int y0 = b >> 2 ;
@@ -65,6 +63,8 @@ static void prepareCircleMaterial()
     //~ Image img;
     //~ img.loadRawData( imgstream, 256, 256, PF_A8R8G8B8 );
     //~ TextureManager::getSingleton().loadImage( CIRCLES_MATERIAL , img );
+
+    DataStreamPtr imgstream(new MemoryDataStream(&bmap[0], bmap.size()));
     TextureManager::getSingleton().loadRawData(CIRCLES_MATERIAL,
                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                imgstream, 256, 256, PF_A8R8G8B8);
