@@ -150,7 +150,7 @@
 	@piece( SampleEmissiveMap )
 		float3 emissiveCol = textureMaps[@value( emissive_map_idx )].Sample(
 										samplerState@value(emissive_map_sampler),
-										float3( inPs.uv@value(uv_emissive).xy, emissiveIdx ) ).xyz;
+										float3( inPs.uv@value(uv_emissive).xy, emissiveMapIdx ) ).xyz;
 		@property( emissive_constant )
 			emissiveCol *= material.emissive.xyz;
 		@end
