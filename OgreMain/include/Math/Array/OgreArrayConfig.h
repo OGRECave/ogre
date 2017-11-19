@@ -41,8 +41,12 @@ THE SOFTWARE.
                 typedef __m128d ArrayReal;
             }
         #else
-            #include <xmmintrin.h>
-            #include <emmintrin.h>  //SSE Math library still needs SSE2
+			#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1910
+				#include <intrin.h> // Bugfix Visual Studio 2017
+			#else
+				#include <xmmintrin.h>
+				#include <emmintrin.h>  //SSE Math library still needs SSE2
+			#endif
             #define ARRAY_PACKED_REALS 4
             namespace Ogre {
                 typedef __m128 ArrayReal;
