@@ -29,6 +29,8 @@
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
 
+#include "OgreTextureManager.h"
+
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusTextureBuffer.h"
@@ -571,100 +573,40 @@ namespace Ogre {
     }
 
 
-    // blitFromMemory doing hardware trilinear scaling
-    void GL3PlusTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Box &dstBox)
+    // blitFromMemory doing hardware bilinear scaling
+    void GL3PlusTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     {
         // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case
         // - FBO is not supported
         // - Either source or target is luminance due doesn't looks like supported by hardware
         // - the source dimensions match the destination ones, in which case no scaling is needed
-        if (PixelUtil::isLuminance(src_orig.format) ||
-            PixelUtil::isLuminance(mFormat) ||
-            (src_orig.getWidth() == dstBox.getWidth() &&
-             src_orig.getHeight() == dstBox.getHeight() &&
-             src_orig.getDepth() == dstBox.getDepth()))
+        if (PixelUtil::isLuminance(src.format) || PixelUtil::isLuminance(mFormat) ||
+            (src.getWidth() == dstBox.getWidth() && src.getHeight() == dstBox.getHeight() &&
+             src.getDepth() == dstBox.getDepth()))
         {
-            GL3PlusHardwarePixelBuffer::blitFromMemory(src_orig, dstBox);
+            GL3PlusHardwarePixelBuffer::blitFromMemory(src, dstBox);
             return;
         }
         if (!mBuffer.contains(dstBox))
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Destination box out of range",
                         "GL3PlusTextureBuffer::blitFromMemory");
-        // For scoped deletion of conversion buffer
-        MemoryDataStreamPtr buf;
-        PixelBox src;
 
-        // First, convert the srcbox to a OpenGL compatible pixel format
-        if (GL3PlusPixelUtil::getGLInternalFormat(src_orig.format) == 0)
-        {
-            // Convert to buffer internal format
-            buf.reset(new MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(),
-                                                                   src_orig.getDepth(), mFormat)));
-            src = PixelBox(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(), mFormat, buf->getPtr());
-            PixelUtil::bulkPixelConversion(src_orig, src);
-        }
-        else
-        {
-            // No conversion needed
-            src = src_orig;
-        }
+        TextureType type = (src.getDepth() != 1) ? TEX_TYPE_3D : TEX_TYPE_2D;
 
-        // Create temporary texture to store source data
-        GLuint id;
-        GLenum target = (src.getDepth() != 1) ? GL_TEXTURE_3D : GL_TEXTURE_2D;
-
-        // Generate texture name
-        OGRE_CHECK_GL_ERROR(glGenTextures(1, &id));
-
-        // Set texture type
-        mRenderSystem->_getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
-
-        // Set automatic mipmap generation; nice for minimisation
-        OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000));
-
-        GLenum internalFormat = GL3PlusPixelUtil::getGLInternalFormat(src.format);
-
-        GLenum format = GL_RGBA;
-
-        switch (internalFormat)
-        {
-            case GL_DEPTH_COMPONENT:
-            case GL_DEPTH_COMPONENT16:
-            case GL_DEPTH_COMPONENT24:
-            case GL_DEPTH_COMPONENT32:
-                format = GL_DEPTH_COMPONENT;
-                break;
-
-            default:
-                break;
-        }
-
-        // Allocate texture memory
-        if (target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY)
-        {
-            OGRE_CHECK_GL_ERROR(glTexImage3D(target, 0, internalFormat, src.getWidth(), src.getHeight(), src.getDepth(), 0, format, GL_UNSIGNED_BYTE, 0));
-        }
-        else
-        {
-            OGRE_CHECK_GL_ERROR(glTexImage2D(target, 0, internalFormat, src.getWidth(), src.getHeight(), 0, format, GL_UNSIGNED_BYTE, 0));
-        }
-
-        // GL texture buffer
-        GL3PlusTextureBuffer tex(BLANKSTRING, target, id, 0, 0, src.getWidth(), src.getHeight(),
-                                 src.getDepth(), PF_BYTE_RGBA,
-                                 (Usage)(TU_AUTOMIPMAP | HBU_STATIC_WRITE_ONLY), false, 0);
+        // no mipmaps. blitFromTexture does not use them
+        TexturePtr tex = TextureManager::getSingleton().createManual(
+            "GLBlitFromMemoryTMP", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, type,
+            src.getWidth(), src.getHeight(), src.getDepth(), 0, src.format);
 
         // Upload data to 0,0,0 in temporary texture
         Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
-        tex.upload(src, tempTarget);
+        tex->getBuffer()->blitFromMemory(src, tempTarget);
 
-        // Blit
-        blitFromTexture(&tex, tempTarget, dstBox);
+        // Blit from texture
+        blit(tex->getBuffer(), tempTarget, dstBox);
 
         // Delete temp texture
-        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &id));
-        mRenderSystem->_getStateCacheManager()->invalidateStateForTexture( id );
+        TextureManager::getSingleton().remove(tex);
     }
 
 

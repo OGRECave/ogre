@@ -26,6 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreGLHardwarePixelBuffer.h"
+
+#include "OgreTextureManager.h"
+
 #include "OgreGLTexture.h"
 #include "OgreGLRenderSystem.h"
 #include "OgreGLPixelFormat.h"
@@ -648,82 +651,40 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
 }
 //-----------------------------------------------------------------------------  
 /// blitFromMemory doing hardware trilinear scaling
-void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Box &dstBox)
+void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
 {
     /// Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
     /// - FBO is not supported
     /// - Either source or target is luminance due doesn't looks like supported by hardware
     /// - the source dimensions match the destination ones, in which case no scaling is needed
-    if(!GLEW_EXT_framebuffer_object ||
-        PixelUtil::isLuminance(src_orig.format) ||
+    if (!GLEW_EXT_framebuffer_object || PixelUtil::isLuminance(src.format) ||
         PixelUtil::isLuminance(mFormat) ||
-        (src_orig.getWidth() == dstBox.getWidth() &&
-        src_orig.getHeight() == dstBox.getHeight() &&
-        src_orig.getDepth() == dstBox.getDepth()))
+        (src.getWidth() == dstBox.getWidth() && src.getHeight() == dstBox.getHeight() &&
+         src.getDepth() == dstBox.getDepth()))
     {
-        GLHardwarePixelBuffer::blitFromMemory(src_orig, dstBox);
+        GLHardwarePixelBuffer::blitFromMemory(src, dstBox);
         return;
     }
     if(!mBuffer.contains(dstBox))
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range",
                     "GLTextureBuffer::blitFromMemory");
-    /// For scoped deletion of conversion buffer
-    MemoryDataStreamPtr buf;
-    PixelBox src;
-    
-    /// First, convert the srcbox to a OpenGL compatible pixel format
-    if(GLPixelUtil::getGLInternalFormat(src_orig.format) == 0)
-    {
-        /// Convert to buffer internal format
-        buf.reset(new MemoryDataStream(
-                PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(),
-                                         mFormat)));
-        src = PixelBox(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(), mFormat, buf->getPtr());
-        PixelUtil::bulkPixelConversion(src_orig, src);
-    }
-    else
-    {
-        /// No conversion needed
-        src = src_orig;
-    }
-    
-    /// Create temporary texture to store source data
-    GLuint id;
-    GLenum target = (src.getDepth()!=1)?GL_TEXTURE_3D:GL_TEXTURE_2D;
-    GLsizei width = GLPixelUtil::optionalPO2(src.getWidth());
-    GLsizei height = GLPixelUtil::optionalPO2(src.getHeight());
-    GLsizei depth = GLPixelUtil::optionalPO2(src.getDepth());
-    GLenum format = GLPixelUtil::getGLInternalFormat(src.format, mHwGamma);
-    
-    /// Generate texture name
-    glGenTextures(1, &id);
-    
-    /// Set texture type
-    mRenderSystem->_getStateCacheManager()->bindGLTexture(target, id);
-    
-    /// Set automatic mipmap generation; nice for minimisation
-    mRenderSystem->_getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000 );
-    mRenderSystem->_getStateCacheManager()->setTexParameteri(target, GL_GENERATE_MIPMAP, GL_TRUE );
-    
-    /// Allocate texture memory
-    if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY_EXT)
-        glTexImage3D(target, 0, format, width, height, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    else
-        glTexImage2D(target, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-    /// GL texture buffer
-    GLTextureBuffer tex(mRenderSystem, BLANKSTRING, target, id, 0, 0, width, height, depth,
-                        PF_BYTE_RGBA, (Usage)(TU_AUTOMIPMAP | HBU_STATIC_WRITE_ONLY), false, 0);
+    TextureType type = (src.getDepth() != 1) ? TEX_TYPE_3D : TEX_TYPE_2D;
 
-    /// Upload data to 0,0,0 in temporary texture
+    // Set automatic mipmap generation; nice for minimisation
+    TexturePtr tex = TextureManager::getSingleton().createManual(
+        "GLBlitFromMemoryTMP", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, type,
+        src.getWidth(), src.getHeight(), src.getDepth(), MIP_UNLIMITED, src.format);
+
+    // Upload data to 0,0,0 in temporary texture
     Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
-    tex.upload(src, tempTarget);
-    
-    /// Blit
-    blitFromTexture(&tex, tempTarget, dstBox);
-    
-    /// Delete temp texture
-    glDeleteTextures(1, &id);
+    tex->getBuffer()->blitFromMemory(src, tempTarget);
+
+    // Blit from texture
+    blit(tex->getBuffer(), tempTarget, dstBox);
+
+    // Delete temp texture
+    TextureManager::getSingleton().remove(tex);
 }
 //-----------------------------------------------------------------------------    
 
