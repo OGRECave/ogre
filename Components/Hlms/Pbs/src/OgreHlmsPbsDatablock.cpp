@@ -198,7 +198,7 @@ namespace Ogre
             textures[PBSM_ROUGHNESS].texture = setTexture( paramVal, PBSM_ROUGHNESS );
             mSamplerblocks[PBSM_ROUGHNESS] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
-        if( Hlms::findParamInVec( params, "roughness_map", paramVal ) )
+        if( Hlms::findParamInVec( params, "emissive_map", paramVal ) )
         {
             textures[PBSM_EMISSIVE].texture = setTexture( paramVal, PBSM_EMISSIVE );
             mSamplerblocks[PBSM_EMISSIVE] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
@@ -601,7 +601,7 @@ namespace Ogre
     bool HlmsPbsDatablock::hasEmissive(void) const
     {
         return  mEmissive[0] != 0 || mEmissive[1] != 0 ||
-                mEmissive[2] != 0 || mTextures[PBSM_EMISSIVE] != 0;
+                mEmissive[2] != 0 || mTexToBakedTextureIdx[PBSM_EMISSIVE] != NUM_PBSM_TEXTURE_TYPES;
     }
     //-----------------------------------------------------------------------------------
     float HlmsPbsDatablock::getRoughness(void) const
@@ -1159,6 +1159,7 @@ namespace Ogre
         {
         default:
         case PBSM_DIFFUSE:
+        case PBSM_EMISSIVE:
             retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
             break;
         case PBSM_SPECULAR:

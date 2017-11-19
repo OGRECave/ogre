@@ -243,6 +243,7 @@ namespace Ogre
         float   mDetailsOffsetScale[4][4];
         float   mEmissive[3];
         float   mNormalMapWeight;
+        float   mReserved[3][4];
         uint16  mTexIndices[NUM_PBSM_TEXTURE_TYPES];
 
         PbsBakedTextureArray mBakedTextures;
