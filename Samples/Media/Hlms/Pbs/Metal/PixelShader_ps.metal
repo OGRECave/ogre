@@ -134,7 +134,7 @@ fragment @insertpiece( output_type ) main_metal
 		, texturecube<float>	texEnvProbeMap [[texture(@value(envMapReg))]]
 		, sampler envMapSamplerState [[sampler(@value(envMapReg))]]@end
 	@foreach( numSamplerStates, n )
-		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
+		, sampler samplerState@n [[sampler(@counter(samplerStateStart))]]@end
 	@insertpiece( DeclShadowSamplers )
 )
 {
@@ -201,7 +201,7 @@ float4 diffuseCol;
 	/// Sample detail maps and weight them against the weight map in the next foreach loop.
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
 	float4 detailCol@n	= textureMaps@value(detail_map@n_idx).sample(
-									samplerStates@value(detail_map@n_idx),
+									samplerState@value(detail_map@n_idx),
 									@insertpiece(custom_ps_pre_detailmap@n)
 									(inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetail@n ))
 									@insertpiece(custom_ps_pos_detailmap@n),
@@ -249,7 +249,7 @@ float4 diffuseCol;
 		float3 vBinormal	= normalize( cross( geomNormal, vTangent )@insertpiece( tbnApplyReflection ) );
 		float3x3 TBN		= float3x3( vTangent, vBinormal, geomNormal );
 
-		@property( normal_map_tex )nNormal = getTSNormal( samplerStates@value( normal_map_tex_idx ),
+		@property( normal_map_tex )nNormal = getTSNormal( samplerState@value( normal_map_tex_idx ),
 														  textureMaps@value( normal_map_tex_idx ),
 														  inPs.uv@value(uv_normal).xy, normalIdx );@end
 		@property( normal_weight_tex )
@@ -520,7 +520,7 @@ fragment @insertpiece( output_type ) main_metal
 	@foreach( num_textures, n )
 		, texture2d_array<float> textureMaps@n [[texture(@counter(textureRegStart))]]@end
 	@foreach( numSamplerStates, n )
-		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
+		, sampler samplerState@n [[sampler(@counter(samplerStateStart))]]@end
 )
 {
 @property( !hlms_render_depth_only || exponential_shadow_maps || hlms_shadowcaster_point )
@@ -563,7 +563,7 @@ fragment @insertpiece( output_type ) main_metal
 	/// Sample detail maps and weight them against the weight map in the next foreach loop.
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
 	float detailCol@n	= textureMaps@value(detail_map@n_idx).sample(
-										samplerStates@value(detail_map@n_idx),
+										samplerState@value(detail_map@n_idx),
 										@insertpiece(custom_ps_pre_detailmap@n)
 										inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetail@n )
 										@insertpiece(custom_ps_pos_detailmap@n),

@@ -29,7 +29,8 @@
 
 @foreach( detail_maps_normal, n )
 	@undefpiece( SampleDetailMapNm@n )
-	@piece( SampleDetailMapNm@n )getTSDetailNormal( samplerStates[@value(detail_map_nm@n_idx)], textureMaps[@value(detail_map_nm@n_idx)],
+	@piece( SampleDetailMapNm@n )getTSDetailNormal( samplerState@value(detail_map_nm@n_idx),
+													textureMaps[@value(detail_map_nm@n_idx)],
 													float3( inPs.uv0.xy * material.detailOffsetScale[@n].zw +
 															material.detailOffsetScale[@n].xy, @value(detail_map_nm@n_idx_slice) ) )@end
 @end
