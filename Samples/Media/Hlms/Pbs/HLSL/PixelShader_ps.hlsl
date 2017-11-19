@@ -53,7 +53,8 @@ Buffer<float4> f3dLightList : register(t2);@end
 @property( use_envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));
 SamplerState envMapSamplerState : register(s@value(envMapReg));@end
 
-@property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+@foreach( numSamplerStates, n )
+	SamplerState samplerState@n : register(s@counter(samplerStateStart));@end
 
 @property( normal_map )
 @property( hlms_qtangent )
@@ -73,10 +74,10 @@ float3 qmul( float4 q, float3 v )
 	float3 tsNormal;
 @property( signed_int_textures )
 	//Normal texture must be in U8V8 or BC5 format!
-	tsNormal.xy = textureMaps[@value( normal_map_tex_idx )].Sample( samplerStates[@value( normal_map_tex_idx )], uv ).xy;
+	tsNormal.xy = textureMaps[@value( normal_map_tex_idx )].Sample( samplerState@value( normal_map_tex_idx ), uv ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = textureMaps[@value( normal_map_tex_idx )].Sample( samplerStates[@value( normal_map_tex_idx )], uv ).xw * 2.0 - 1.0;
+	tsNormal.xy = textureMaps[@value( normal_map_tex_idx )].Sample( samplerState@value( normal_map_tex_idx ), uv ).xw * 2.0 - 1.0;
 @end
 	tsNormal.z	= sqrt( max( 0, 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
@@ -533,7 +534,8 @@ float4 diffuseCol;
 @insertpiece( DeclShadowCasterMacros )
 
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
-@property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+@foreach( numSamplerStates, n )
+	SamplerState samplerState@n : register(s@counter(samplerStateStart));@end
 
 @property( hlms_shadowcaster_point || exponential_shadow_maps )
 	@insertpiece( PassDecl )

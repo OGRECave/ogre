@@ -43,7 +43,8 @@ Buffer<float4> f3dLightList : register(t4);@end
 @property( envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));
 SamplerState envMapSamplerState : register(s@value(envMapReg));@end
 
-@property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+@foreach( numSamplerStates, n )
+	SamplerState samplerState@n : register(s@counter(samplerStateStart));@end
 
 
 @property( hlms_lights_spot_textured )@insertpiece( DeclQuat_zAxis )
@@ -99,7 +100,7 @@ float3 qmul( float4 q, float3 v )
 //Prepare weight map for the detail maps.
 @property( detail_weight_map )
 	float4 detailWeights = textureMaps[@value( detail_weight_map_idx )].Sample(
-									samplerStates[@value(detail_weight_map_idx)],
+									samplerState@value(detail_weight_map_idx),
 									float3( inPs.uv0.xy, @value(detail_weight_map_idx_slice) ) );
 @end @property( !detail_weight_map )
 	float4 detailWeights = float4( 1.0, 1.0, 1.0, 1.0 );
@@ -107,7 +108,7 @@ float3 qmul( float4 q, float3 v )
 
 @property( diffuse_map )
 	diffuseCol = textureMaps[@value( diffuse_map_idx )].Sample(
-									samplerStates[@value(diffuse_map_idx)],
+									samplerState@value(diffuse_map_idx),
 									float3( inPs.uv0.xy, @value(diffuse_map_idx_slice) ) );
 @end
 
@@ -115,7 +116,7 @@ float3 qmul( float4 q, float3 v )
 @foreach( 4, n )
 	@property( detail_map@n )
 		float3 detailCol@n = textureMaps[@value(detail_map@n_idx)].Sample(
-								samplerStates[@value(detail_map@n_idx)],
+								samplerState@value(detail_map@n_idx),
 								float3( inPs.uv0.xy * material.detailOffsetScale[@value(currOffsetDetail)].zw +
 										material.detailOffsetScale[@value(currOffsetDetail)].xy,
 										@value(detail_map@n_idx_slice) ) ).xyz;
@@ -125,7 +126,7 @@ float3 qmul( float4 q, float3 v )
 
 	@property( metalness_map@n )
 		float metalness@n = textureMaps[@value( metalness_map@n_idx )].Sample(
-									samplerStates[@value(metalness_map@n_idx)],
+									samplerState@value(metalness_map@n_idx),
 									float3( inPs.uv0.xy * material.detailOffsetScale[@value(currOffsetDetail)].zw +
 											material.detailOffsetScale[@value(currOffsetDetail)].xy,
 											@value( metalness_map@n_idx_slice ) ) ).x;
@@ -135,7 +136,7 @@ float3 qmul( float4 q, float3 v )
 
 	@property( roughness_map@n )
 		float roughness@n = textureMaps[@value( roughness_map@n_idx )].Sample(
-									samplerStates[@value(roughness_map@n_idx)],
+									samplerState@value(roughness_map@n_idx),
 									float3( inPs.uv0.xy * material.detailOffsetScale[@value(currOffsetDetail)].zw +
 											material.detailOffsetScale[@value(currOffsetDetail)].xy,
 											@value( roughness_map@n_idx_slice ) ) ).x;
