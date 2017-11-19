@@ -287,16 +287,18 @@ namespace Ogre
         vMax += 0.05f;
         vMin -= 0.05f;
 
+        const float zPadding = 2.0f;
+
         texCam->setProjectionType( PT_ORTHOGRAPHIC );
         Vector3 shadowCameraPos = (vMin + vMax) * 0.5f;
-        shadowCameraPos.z       = vMax.z + 2.0f; // Backwards is towards +Z!
+        shadowCameraPos.z       = vMax.z + zPadding; // Backwards is towards +Z!
         //Go back from light space to world space
         shadowCameraPos = scalarLightSpaceToWorld * shadowCameraPos;
         texCam->setPosition( shadowCameraPos );
         texCam->setOrthoWindow( (vMax.x - vMin.x), (vMax.y - vMin.y) );
 
         mMinDistance = 1.0f;
-        mMaxDistance = vMax.z - vMin.z + 1.0f;
+        mMaxDistance = vMax.z - vMin.z + zPadding; //We just went backwards, we need to enlarge our depth
         texCam->setNearClipDistance( mMinDistance );
         texCam->setFarClipDistance( mMaxDistance );
 
