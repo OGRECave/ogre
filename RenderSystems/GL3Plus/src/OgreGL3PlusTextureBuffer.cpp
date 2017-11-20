@@ -436,22 +436,18 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, fboMan->getTemporaryFBO(0) );
         mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, fboMan->getTemporaryFBO(1) );
 
-        GLuint tempTex = 0;
+        TexturePtr tempTex;
         if (!fboMan->checkFormat(mFormat))
         {
             // If target format not directly supported, create intermediate texture
-            GLenum tempFormat = GL3PlusPixelUtil::getGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
-            OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
-            mRenderSystem->_getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
-            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
-            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
+            tempTex = TextureManager::getSingleton().createManual(
+                "GLBlitFromTextureTMP", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D,
+                dstBox.getWidth(), dstBox.getHeight(), dstBox.getDepth(), 0,
+                fboMan->getSupportedAlternative(mFormat));
 
-            // Allocate temporary texture of the size of the destination area
-            OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, tempFormat,
-                                             dstBox.getWidth(), dstBox.getHeight(),
-                                             0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
-            OGRE_CHECK_GL_ERROR(glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                                     tempTex, 0));
+            OGRE_CHECK_GL_ERROR(
+                glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                     static_pointer_cast<GL3PlusTexture>(tempTex)->getGLID(), 0));
 
             OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
@@ -544,8 +540,8 @@ namespace Ogre {
 
         // Restore old framebuffer
         mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, oldfb);
-        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tempTex));
-        mRenderSystem->_getStateCacheManager()->invalidateStateForTexture( tempTex );
+        if(tempTex)
+            TextureManager::getSingleton().remove(tempTex);
     }
 
     void GL3PlusTextureBuffer::_bindToFramebuffer(GLenum attachment, uint32 zoffset, GLenum which)

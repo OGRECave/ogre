@@ -538,35 +538,18 @@ namespace Ogre {
         // Set up temporary FBO
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fboMan->getTemporaryFBO()));
 
-        GLuint tempTex = 0;
+        TexturePtr tempTex;
         if(!fboMan->checkFormat(mFormat))
         {
             // If target format not directly supported, create intermediate texture
-            GLenum tempFormat = GLES2PixelUtil::getGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
-            OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
-            rs->_getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
+            tempTex = TextureManager::getSingleton().createManual(
+                "GLBlitFromTextureTMP", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D,
+                dstBox.getWidth(), dstBox.getHeight(), dstBox.getDepth(), 0,
+                fboMan->getSupportedAlternative(mFormat));
 
-            if(rs->hasMinGLVersion(3, 0) || rs->checkExtension("GL_APPLE_texture_max_level"))
-                rs->_getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
-
-            const RenderSystemCapabilities *renderCaps =
-                    Root::getSingleton().getRenderSystem()->getCapabilities();
-
-            GLsizei width = dstBox.getWidth();
-            GLsizei height = dstBox.getHeight();
-
-            if(!renderCaps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES)) {
-                width = Bitwise::firstPO2From(width);
-                height = Bitwise::firstPO2From(height);
-            }
-
-
-            // Allocate temporary texture of the size of the destination area
-            OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, tempFormat,
-                         width, height,
-                         0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
-            OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                      GL_TEXTURE_2D, tempTex, 0));
+            OGRE_CHECK_GL_ERROR(
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                                       static_pointer_cast<GLES2Texture>(tempTex)->getGLID(), 0));
             // Set viewport to size of destination slice
             OGRE_CHECK_GL_ERROR(glViewport(0, 0, dstBox.getWidth(), dstBox.getHeight()));
         }
@@ -683,7 +666,8 @@ namespace Ogre {
         }
         // Restore old framebuffer
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
-        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tempTex));
+        if(tempTex)
+            TextureManager::getSingleton().remove(tempTex);
     }
     //-----------------------------------------------------------------------------  
     // blitFromMemory doing hardware trilinear scaling

@@ -534,20 +534,17 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
     /// Set up temporary FBO
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboMan->getTemporaryFBO());
     
-    GLuint tempTex = 0;
+    TexturePtr tempTex;
     if(!fboMan->checkFormat(mFormat))
     {
         /// If target format not directly supported, create intermediate texture
-        GLenum tempFormat = GLPixelUtil::getGLInternalFormat(fboMan->getSupportedAlternative(mFormat), mHwGamma);
-        glGenTextures(1, &tempTex);
-        mRenderSystem->_getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-        /// Allocate temporary texture of the size of the destination area
-        glTexImage2D(GL_TEXTURE_2D, 0, tempFormat, 
-            GLPixelUtil::optionalPO2(dstBox.getWidth()), GLPixelUtil::optionalPO2(dstBox.getHeight()), 
-            0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        tempTex = TextureManager::getSingleton().createManual(
+            "GLBlitFromTextureTMP", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D,
+            dstBox.getWidth(), dstBox.getHeight(), dstBox.getDepth(), 0,
+            fboMan->getSupportedAlternative(mFormat));
+
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-            GL_TEXTURE_2D, tempTex, 0);
+            GL_TEXTURE_2D, static_pointer_cast<GLTexture>(tempTex)->getGLID(), 0);
         /// Set viewport to size of destination slice
         mRenderSystem->_getStateCacheManager()->setViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
     }
@@ -646,7 +643,9 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glPopAttrib();
-    glDeleteTextures(1, &tempTex);
+
+    if(tempTex)
+        TextureManager::getSingleton().remove(tempTex);
 }
 //-----------------------------------------------------------------------------  
 /// blitFromMemory doing hardware trilinear scaling
