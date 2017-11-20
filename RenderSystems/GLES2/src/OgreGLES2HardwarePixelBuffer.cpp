@@ -690,12 +690,9 @@ namespace Ogre {
     void GLES2TextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     {
         // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
-        // - FBO is not supported
-        // - Either source or target is luminance due doesn't looks like supported by hardware
-        // - the source dimensions match the destination ones, in which case no scaling is needed
-        // TODO: Check that extension is NOT available
-        if(PixelUtil::isLuminance(src.format) ||
-           PixelUtil::isLuminance(mFormat) ||
+        // the source dimensions match the destination ones, in which case no scaling is needed
+        // FIXME: always uses software path, as blitFromTexture is not implemented
+        if(true ||
            (src.getWidth() == dstBox.getWidth() &&
             src.getHeight() == dstBox.getHeight() &&
             src.getDepth() == dstBox.getDepth()))

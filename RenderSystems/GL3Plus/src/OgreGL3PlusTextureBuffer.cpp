@@ -579,12 +579,9 @@ namespace Ogre {
     void GL3PlusTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     {
         // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case
-        // - FBO is not supported
-        // - Either source or target is luminance due doesn't looks like supported by hardware
-        // - the source dimensions match the destination ones, in which case no scaling is needed
-        if (PixelUtil::isLuminance(src.format) || PixelUtil::isLuminance(mFormat) ||
-            (src.getWidth() == dstBox.getWidth() && src.getHeight() == dstBox.getHeight() &&
-             src.getDepth() == dstBox.getDepth()))
+        // the source dimensions match the destination ones, in which case no scaling is needed
+        if (src.getWidth() == dstBox.getWidth() && src.getHeight() == dstBox.getHeight() &&
+            src.getDepth() == dstBox.getDepth())
         {
             GL3PlusHardwarePixelBuffer::blitFromMemory(src, dstBox);
             return;

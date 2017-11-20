@@ -654,10 +654,8 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
 {
     /// Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
     /// - FBO is not supported
-    /// - Either source or target is luminance due doesn't looks like supported by hardware
     /// - the source dimensions match the destination ones, in which case no scaling is needed
-    if (!GLEW_EXT_framebuffer_object || PixelUtil::isLuminance(src.format) ||
-        PixelUtil::isLuminance(mFormat) ||
+    if (!GLEW_EXT_framebuffer_object ||
         (src.getWidth() == dstBox.getWidth() && src.getHeight() == dstBox.getHeight() &&
          src.getDepth() == dstBox.getDepth()))
     {
