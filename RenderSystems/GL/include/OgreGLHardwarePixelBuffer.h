@@ -53,10 +53,8 @@ namespace Ogre {
     {
     public:
         /** Texture constructor */
-        GLTextureBuffer(GLRenderSystem* renderSystem, const String& baseName, GLenum target,
-                        GLuint id, GLint face, GLint level, uint32 mWidth, uint32 mHeight,
-                        uint32 mDepth, PixelFormat mFormat, Usage usage, bool writeGamma,
-                        uint fsaa);
+        GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent, GLint face, GLint level,
+                        uint32 mWidth, uint32 mHeight, uint32 mDepth);
         ~GLTextureBuffer();
         
         /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer

@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreGLES2Support.h"
 #include "OgreGLES2HardwareBuffer.h"
+#include "OgreGLES2Texture.h"
 
 namespace Ogre {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
@@ -136,19 +137,19 @@ namespace Ogre {
     }
     
     // TextureBuffer
-    GLES2TextureBuffer::GLES2TextureBuffer(const String& baseName, GLenum target, GLuint id,
-                                           GLint face, GLint level, GLint width, GLint height,
-                                           GLint depth, PixelFormat format, Usage usage,
-                                           bool writeGamma, uint fsaa)
-        : GLES2HardwarePixelBuffer(width, height, depth, format, usage), mTarget(target),
-          mTextureID(id), mFace(face), mLevel(level)
+    GLES2TextureBuffer::GLES2TextureBuffer(GLES2Texture* parent, GLint face, GLint level,
+                                           GLint width, GLint height, GLint depth)
+        : GLES2HardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
+          mTarget(parent->getGLES2TextureTarget()), mTextureID(parent->getGLID()), mFace(face),
+          mLevel(level)
     {
         // Get face identifier
         mFaceTarget = mTarget;
         if(mTarget == GL_TEXTURE_CUBE_MAP)
             mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
 
-        mGLInternalFormat = GLES2PixelUtil::getGLInternalFormat(format, writeGamma);
+        mGLInternalFormat =
+            GLES2PixelUtil::getGLInternalFormat(mFormat, parent->isHardwareGammaEnabled());
 
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
@@ -179,11 +180,12 @@ namespace Ogre {
             for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
             {
                 String name;
-                name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
+                name = "rtt/" + StringConverter::toString((size_t)this) + "/" + parent->getName();
                 GLSurfaceDesc surface;
                 surface.buffer = this;
                 surface.zoffset = zoffset;
-                RenderTexture *trt = GLRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
+                RenderTexture* trt = GLRTTManager::getSingleton().createRenderTexture(
+                    name, surface, parent->isHardwareGammaEnabled(), parent->getFSAA());
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
             }

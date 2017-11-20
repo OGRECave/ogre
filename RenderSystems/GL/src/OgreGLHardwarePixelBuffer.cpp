@@ -124,12 +124,11 @@ void GLHardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     }
 }
 //********* GLTextureBuffer
-GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, const String& baseName,
-                                 GLenum target, GLuint id, GLint face, GLint level, uint32 width,
-                                 uint32 height, uint32 depth, PixelFormat format, Usage usage,
-                                 bool writeGamma, uint fsaa)
-    : GLHardwarePixelBuffer(width, height, depth, format, usage), mTarget(target), mFaceTarget(0),
-      mTextureID(id), mFace(face), mLevel(level), mHwGamma(writeGamma), mSliceTRT(0),
+GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent, GLint face,
+                                 GLint level, uint32 width, uint32 height, uint32 depth)
+    : GLHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
+      mTarget(parent->getGLTextureTarget()), mFaceTarget(0), mTextureID(parent->getGLID()),
+      mFace(face), mLevel(level), mHwGamma(parent->isHardwareGammaEnabled()), mSliceTRT(0),
       mRenderSystem(renderSystem)
 {
     // Get face identifier
@@ -138,7 +137,7 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, const String& bas
         mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
     
     // Get format
-    mGLInternalFormat = GLPixelUtil::getGLInternalFormat(mFormat, writeGamma);
+    mGLInternalFormat = GLPixelUtil::getGLInternalFormat(mFormat, mHwGamma);
     
     // Default
     mRowPitch = mWidth;
@@ -173,11 +172,11 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, const String& bas
         for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
         {
             String name;
-            name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
+            name = "rtt/" + StringConverter::toString((size_t)this) + "/" + parent->getName();
             GLSurfaceDesc surface;
             surface.buffer = this;
             surface.zoffset = zoffset;
-            RenderTexture *trt = GLRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
+            RenderTexture *trt = GLRTTManager::getSingleton().createRenderTexture(name, surface, mHwGamma, parent->getFSAA());
             mSliceTRT.push_back(trt);
             Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
         }

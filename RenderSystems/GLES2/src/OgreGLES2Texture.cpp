@@ -440,9 +440,7 @@ namespace Ogre {
             for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GLES2HardwarePixelBuffer* buf = OGRE_NEW GLES2TextureBuffer(
-                    mName, getGLES2TextureTarget(), mTextureID, static_cast<GLint>(face), mip,
-                    width, height, depth, mFormat, static_cast<HardwareBuffer::Usage>(mUsage),
-                    mHwGamma, mFSAA);
+                    this, static_cast<GLint>(face), mip, width, height, depth);
 
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 

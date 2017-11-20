@@ -314,10 +314,8 @@ namespace Ogre {
 
             for(uint32 mip=0; mip<=getNumMipmaps(); mip++)
             {
-                GLHardwarePixelBuffer* buf = new GLTextureBuffer(
-                    mRenderSystem, mName, getGLTextureTarget(), mTextureID, face, mip, width,
-                    height, depth, mFormat, static_cast<HardwareBuffer::Usage>(mUsage), mHwGamma,
-                    mFSAA);
+                GLHardwarePixelBuffer* buf =
+                    new GLTextureBuffer(mRenderSystem, this, face, mip, width, height, depth);
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
                 
                 if (width > 1)

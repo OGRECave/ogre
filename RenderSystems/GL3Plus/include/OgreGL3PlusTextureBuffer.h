@@ -39,9 +39,8 @@ namespace Ogre {
     {
     public:
         /** Texture constructor */
-        GL3PlusTextureBuffer(const String& baseName, GLenum target, GLuint id, GLint face,
-                             GLint level, uint32 width, uint32 height, uint32 depth,
-                             PixelFormat format, Usage usage, bool writeGamma, uint fsaa);
+        GL3PlusTextureBuffer(GL3PlusTexture* parent, GLint face, GLint level, uint32 width,
+                             uint32 height, uint32 depth);
         ~GL3PlusTextureBuffer();
 
         virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);

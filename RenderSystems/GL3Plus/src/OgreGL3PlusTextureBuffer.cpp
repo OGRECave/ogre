@@ -43,14 +43,15 @@
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreGLSLSeparableProgramManager.h"
 
+#include "OgreGL3PlusTexture.h"
+
 namespace Ogre {
 
-    GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String& baseName, GLenum target, GLuint id,
+    GL3PlusTextureBuffer::GL3PlusTextureBuffer(GL3PlusTexture* parent,
                                                GLint face, GLint level, uint32 width, uint32 height,
-                                               uint32 depth, PixelFormat format, Usage usage,
-                                               bool writeGamma, uint fsaa)
-        : GL3PlusHardwarePixelBuffer(width, height, depth, format, usage),
-          mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSliceTRT(0)
+                                               uint32 depth)
+        : GL3PlusHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
+          mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mFace(face), mLevel(level), mSliceTRT(0)
     {
         // Get face identifier
         mFaceTarget = mTarget;
@@ -58,7 +59,7 @@ namespace Ogre {
             mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
 
         // Get format
-        mGLInternalFormat = GL3PlusPixelUtil::getGLInternalFormat(mFormat, writeGamma);
+        mGLInternalFormat = GL3PlusPixelUtil::getGLInternalFormat(mFormat, parent->isHardwareGammaEnabled());
 
         // Default
         mRowPitch = mWidth;
@@ -90,11 +91,12 @@ namespace Ogre {
             for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
             {
                 String name;
-                name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
+                name = "rtt/" + StringConverter::toString((size_t)this) + "/" + parent->getName();
                 GLSurfaceDesc surface;
                 surface.buffer = this;
                 surface.zoffset = zoffset;
-                RenderTexture *trt = GL3PlusRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
+                RenderTexture* trt = GL3PlusRTTManager::getSingleton().createRenderTexture(
+                    name, surface, parent->isHardwareGammaEnabled(), parent->getFSAA());
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
             }
