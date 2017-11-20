@@ -165,6 +165,8 @@ vec3 qmul( vec4 q, vec3 v )
 @insertpiece( DeclShadowSamplers )
 @insertpiece( DeclShadowSamplingFuncs )
 
+@insertpiece( custom_ps_functions )
+
 void main()
 {
     @insertpiece( custom_ps_preExecution )

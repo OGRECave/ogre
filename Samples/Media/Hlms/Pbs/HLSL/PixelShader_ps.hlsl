@@ -122,6 +122,8 @@ float3 qmul( float4 q, float3 v )
 
 @insertpiece( DeclOutputType )
 
+@insertpiece( custom_ps_functions )
+
 @insertpiece( output_type ) main( PS_INPUT inPs
 @property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end
 @property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end
