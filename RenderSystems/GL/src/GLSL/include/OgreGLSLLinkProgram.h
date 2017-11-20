@@ -49,9 +49,11 @@ namespace Ogre {
         /// Linked fragment program
         GLSLProgram* mFragmentProgram;
         GLUniformCache *mUniformCache;
+        GLhandleARB mVertexProgramHandle;
+        GLhandleARB mGeometryProgramHandle;
+        GLhandleARB mFragmentProgramHandle;
 
-        /// Flag to indicate that uniform references have already been built
-        bool        mUniformRefsBuilt;
+        void destroy();
 
         /// Build uniform references from active named uniforms
         void buildGLUniformReferences(void);
@@ -77,6 +79,7 @@ namespace Ogre {
         */
         void activate(void);
 
+        bool isValid() const;
         bool isAttributeValid(VertexElementSemantic semantic, uint index);
         
         /** Updates program object uniforms using data from GpuProgramParameters.

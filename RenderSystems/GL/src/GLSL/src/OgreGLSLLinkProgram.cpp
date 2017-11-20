@@ -79,7 +79,9 @@ namespace Ogre {
         : GLSLProgramCommon(vertexProgram)
         , mGeometryProgram(geometryProgram)
         , mFragmentProgram(fragmentProgram)
-        , mUniformRefsBuilt(false)
+        , mVertexProgramHandle(0)
+        , mGeometryProgramHandle(0)
+        , mFragmentProgramHandle(0)
     {
         // Initialise uniform cache
         mUniformCache = new GLUniformCache();
@@ -88,7 +90,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLLinkProgram::~GLSLLinkProgram(void)
     {
-        glDeleteObjectARB(mGLProgramHandle);
+        destroy();
 
         delete mUniformCache;
         mUniformCache = 0;
@@ -97,6 +99,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::activate(void)
     {
+        // Program was unloaded so we need to recompile.
+        if (!isValid())
+        {
+            destroy();
+        }
+
         if (!mLinked && !mTriedToLinkAndFailed)
         {           
             glGetError(); //Clean up the error. Otherwise will flood log.
@@ -140,6 +148,20 @@ namespace Ogre {
                     "Error using GLSL Program Object : ", mGLProgramHandle, false, false);
             }
         }
+    }
+    //-----------------------------------------------------------------------
+    bool GLSLLinkProgram::isValid() const
+    {
+        if (mVertexShader && ((GLSLProgram*)mVertexShader)->getGLHandle() != mVertexProgramHandle)
+            return false;
+
+        if (mGeometryProgram && mGeometryProgram->getGLHandle() != mGeometryProgramHandle)
+            return false;
+
+        if (mFragmentProgram && mFragmentProgram->getGLHandle() != mFragmentProgramHandle)
+            return false;
+
+        return true;
     }
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::getMicrocodeFromCache(void)
@@ -187,6 +209,20 @@ namespace Ogre {
     bool GLSLLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
     {
         return mValidAttributes.find(getFixedAttributeIndex(semantic, index)) != mValidAttributes.end();
+    }
+    //-----------------------------------------------------------------------
+    void GLSLLinkProgram::destroy()
+    {
+        glDeleteObjectARB(mGLProgramHandle);
+        mGLProgramHandle = 0;
+        mLinked = 0;
+        mTriedToLinkAndFailed = false;
+        if (GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
+            GpuProgramManager::getSingleton().removeMicrocodeFromCache(getCombinedName());
+        mUniformRefsBuilt = false;
+        mGLUniformReferences.clear();
+        mUniformCache->clearCache();
+        mValidAttributes.clear();
     }
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::buildGLUniformReferences(void)
@@ -449,6 +485,7 @@ namespace Ogre {
                 return;
             }
             mVertexShader->attachToProgramObject(mGLProgramHandle);
+            mVertexProgramHandle = ((GLSLProgram*)mVertexShader)->getGLHandle();
             setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
 
             // Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
@@ -505,6 +542,7 @@ namespace Ogre {
             }
 
             mGeometryProgram->attachToProgramObject(mGLProgramHandle);
+            mGeometryProgramHandle = mGeometryProgram->getGLHandle();
 
             //Don't set adjacency flag. We handle it internally and expose "false"
 
@@ -530,6 +568,7 @@ namespace Ogre {
                 return;
             }       
             mFragmentProgram->attachToProgramObject(mGLProgramHandle);
+            mFragmentProgramHandle = mFragmentProgram->getGLHandle();
         }
 
         

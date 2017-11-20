@@ -104,7 +104,12 @@ namespace Ogre {
     {
         // if there is an active link program then return it
         if (mActiveLinkProgram)
+        {
+            if (!mActiveLinkProgram->isValid())
+                mActiveLinkProgram->activate();
+
             return mActiveLinkProgram;
+        }
 
         // no active link program so find one or make a new one
         // is there an active key?
