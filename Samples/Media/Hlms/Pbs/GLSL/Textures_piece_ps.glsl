@@ -1,9 +1,14 @@
 @property( diffuse_map )
 	@property( !hlms_shadowcaster )
-		@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map_idx )], vec3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) );
-@property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end @end
+		@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map_idx )],
+														vec3( UV_DIFFUSE( inPs.uv@value(uv_diffuse).xy ),
+															  diffuseIdx ) );
+		@property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end
+	@end
 	@end @property( hlms_shadowcaster )
-		@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map_idx )], vec3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) ).w;@end
+		@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map_idx )],
+														vec3( UV_DIFFUSE( inPs.uv@value(uv_diffuse).xy ),
+															  diffuseIdx ) ).w;@end
 	@end
 @end
 
@@ -13,11 +18,15 @@
 @property( !hlms_prepass )
 @property( !metallic_workflow )
 	@property( specular_map && !fresnel_workflow )
-		@piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).xyz * material.kS.xyz;@end
+		@piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map_idx )],
+														vec3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
+															  specularIdx) ).xyz * material.kS.xyz;@end
 		@piece( kS )specularCol@end
 	@end
 	@property( specular_map && fresnel_workflow )
-		@piece( SampleSpecularMap )	F0 = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );@end
+		@piece( SampleSpecularMap )	F0 = texture( textureMaps[@value( specular_map_idx )],
+												vec3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
+													  specularIdx) ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );@end
 	@end
 	@property( !specular_map || fresnel_workflow )
 		@piece( kS )material.kS@end
@@ -25,7 +34,9 @@
 @end @property( metallic_workflow )
 @piece( SampleSpecularMap )
 	@property( specular_map )
-		float metalness = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).x * material.F0.x;
+		float metalness = texture( textureMaps[@value( specular_map_idx )],
+								vec3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
+									  specularIdx) ).x * material.F0.x;
 		F0 = mix( vec3( 0.03f ), @insertpiece( kD ).xyz * 3.14159f, metalness );
 		@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * metalness;
 	@end @property( !specular_map )
@@ -41,21 +52,24 @@
 @end
 
 @property( roughness_map )
-	@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w * texture( textureMaps[@value( roughness_map_idx )], vec3(inPs.uv@value(uv_roughness).xy, roughnessIdx) ).x;
-ROUGHNESS = max( ROUGHNESS, 0.001f );@end
+	@piece( SampleRoughnessMap )
+		ROUGHNESS = material.kS.w * texture( textureMaps[@value( roughness_map_idx )],
+											vec3( UV_ROUGHNESS( inPs.uv@value(uv_roughness).xy ),
+												  roughnessIdx) ).x;
+		ROUGHNESS = max( ROUGHNESS, 0.001f );
+	@end
 @end
 
 @foreach( detail_maps_normal, n )
 	@piece( SampleDetailMapNm@n )getTSDetailNormal( textureMaps[@value(detail_map_nm@n_idx)],
-								vec3( @insertpiece(custom_ps_pre_detailmap@n)
-									  (inPs.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetail@n ))
-									  @insertpiece(custom_ps_pos_detailmap@n),
+								vec3( UV_DETAIL_NM@n( inPs.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetail@n ) ),
 									  detailNormMapIdx@n ) ) * detailWeights.@insertpiece(detail_swizzle@n)
 									  @insertpiece( detail@n_nm_weight_mul )@end
 @end
 
 @property( detail_weight_map )
-	@piece( SamplerDetailWeightMap )texture( textureMaps[@value(detail_weight_map_idx)], vec3(inPs.uv@value(uv_detail_weight).xy, weightMapIdx) )@end
+	@piece( SamplerDetailWeightMap )texture( textureMaps[@value(detail_weight_map_idx)],
+		vec3( UV_DETAL_WEIGHT( inPs.uv@value(uv_detail_weight).xy ), weightMapIdx) )@end
 @end
 
 @property( envmap_scale )
@@ -79,7 +93,8 @@ ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 @property( emissive_map )
 	@piece( SampleEmissiveMap )
 		vec3 emissiveCol = texture( textureMaps[@value( emissive_map_idx )],
-									vec3( inPs.uv@value(uv_emissive).xy, emissiveMapIdx ) ).xyz;
+									vec3( UV_EMISSIVE( inPs.uv@value(uv_emissive).xy ),
+										  emissiveMapIdx ) ).xyz;
 		@property( emissive_constant )
 			emissiveCol *= material.emissive.xyz;
 		@end

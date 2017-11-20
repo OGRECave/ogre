@@ -1,4 +1,5 @@
 @insertpiece( SetCrossPlatformSettings )
+@insertpiece( DeclareUvModifierMacros )
 
 // START UNIFORM DECLARATION
 @property( !hlms_shadowcaster || alpha_test )
@@ -192,9 +193,7 @@ float4 diffuseCol;
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
 	float4 detailCol@n	= textureMaps[@value(detail_map@n_idx)].Sample(
 								samplerState@value(detail_map@n_idx),
-								float3( @insertpiece(custom_ps_pre_detailmap@n)
-										(inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetail@n ))
-										@insertpiece(custom_ps_pos_detailmap@n),
+								float3( UV_DETAIL@n( inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetail@n ) ),
 										detailMapIdx@n ) );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol@n.xyz = detailCol@n.xyz * detailCol@n.xyz;@end
@@ -239,7 +238,8 @@ float4 diffuseCol;
 		float3 vBinormal	= normalize( cross( geomNormal, vTangent )@insertpiece( tbnApplyReflection ) );
 		float3x3 TBN		= float3x3( vTangent, vBinormal, geomNormal );
 
-		@property( normal_map_tex )nNormal = getTSNormal( float3( inPs.uv@value(uv_normal).xy, normalIdx ) );@end
+		@property( normal_map_tex )nNormal = getTSNormal( float3( UV_NORMAL( inPs.uv@value(uv_normal).xy ),
+																  normalIdx ) );@end
 		@property( normal_weight_tex )
 			// Apply the weight to the main normal map
 			nNormal = lerp( float3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );
@@ -586,7 +586,7 @@ float4 diffuseCol;
 	/// Sample detail maps and weight them against the weight map in the next foreach loop.
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
 	float detailCol@n	= textureMaps[@value(detail_map@n_idx)].Sample(
-									samplerState@value(detail_map@n_idx),
+									samplerState@value(detail_map@n_sampler),
 									float3( @insertpiece(custom_ps_pre_detailmap@n)
 											(inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetail@n ))
 											@insertpiece(custom_ps_pos_detailmap@n),
