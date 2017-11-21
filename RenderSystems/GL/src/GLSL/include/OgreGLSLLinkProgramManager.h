@@ -112,6 +112,12 @@ namespace Ogre {
             const GpuConstantDefinitionMap* fragmentConstantDefs,
             GLUniformReferenceList& list);
 
+        /** Find all link programs that contain this shader and remove (destroy) them.
+         *
+         * @param gpuProgram Vertex/Fragment/Geometry program whose link programs to remove.
+         */
+        void removeShader(GLSLProgram* gpuProgram);
+
         static GLSLLinkProgramManager& getSingleton(void);
         static GLSLLinkProgramManager* getSingletonPtr(void);
 

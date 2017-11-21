@@ -104,12 +104,7 @@ namespace Ogre {
     {
         // if there is an active link program then return it
         if (mActiveLinkProgram)
-        {
-            if (!mActiveLinkProgram->isValid())
-                mActiveLinkProgram->activate();
-
             return mActiveLinkProgram;
-        }
 
         // no active link program so find one or make a new one
         // is there an active key?
@@ -400,6 +395,31 @@ namespace Ogre {
             } // end if
         } // end for
 
+    }
+    //---------------------------------------------------------------------
+    void GLSLLinkProgramManager::removeShader(GLSLProgram* gpuProgram)
+    {
+        for (LinkProgramMap::iterator iLinkProgram = mLinkPrograms.begin();
+             iLinkProgram != mLinkPrograms.end();)
+        {
+            if (iLinkProgram->second->getVertexProgram() == gpuProgram ||
+                iLinkProgram->second->getFragmentProgram() == gpuProgram ||
+                iLinkProgram->second->getGeometryProgram() == gpuProgram)
+            {
+                if (mActiveLinkProgram == iLinkProgram->second)
+                {
+                    mActiveLinkProgram = NULL;
+                    // change back to fixed pipeline
+                    glUseProgramObjectARB(0);
+                }
+                delete iLinkProgram->second;
+                iLinkProgram = mLinkPrograms.erase(iLinkProgram);
+            }
+            else
+            {
+                ++iLinkProgram;
+            }
+        }
     }
 }
 }

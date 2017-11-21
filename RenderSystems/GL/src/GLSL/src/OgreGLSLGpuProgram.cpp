@@ -63,7 +63,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLSLGpuProgram::unloadImpl(void)
     {
-        // nothing to unload
+        switch (mType)
+        {
+        case GPT_VERTEX_PROGRAM:
+        case GPT_FRAGMENT_PROGRAM:
+        case GPT_GEOMETRY_PROGRAM:
+            GLSLLinkProgramManager::getSingleton().removeShader( mGLSLProgram );
+            break;
+        default:
+                break;
+        }
     }
 
     //-----------------------------------------------------------------------------
