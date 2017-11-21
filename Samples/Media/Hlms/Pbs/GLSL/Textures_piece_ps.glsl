@@ -69,7 +69,7 @@
 
 @property( detail_weight_map )
 	@piece( SamplerDetailWeightMap )texture( textureMaps[@value(detail_weight_map_idx)],
-		vec3( UV_DETAL_WEIGHT( inPs.uv@value(uv_detail_weight).xy ), weightMapIdx) )@end
+		vec3( UV_DETAIL_WEIGHT( inPs.uv@value(uv_detail_weight).xy ), weightMapIdx) )@end
 @end
 
 @property( envmap_scale )
