@@ -53,15 +53,7 @@ namespace Ogre {
         GLSLESProgramManagerCommon(), mActiveLinkProgram(NULL) { }
 
     //-----------------------------------------------------------------------
-    GLSLESLinkProgramManager::~GLSLESLinkProgramManager(void)
-    {
-        // iterate through map container and delete link programs
-        for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
-            currentProgram != mLinkPrograms.end(); ++currentProgram)
-        {
-            OGRE_DELETE currentProgram->second;
-        }
-    }
+    GLSLESLinkProgramManager::~GLSLESLinkProgramManager(void) {}
 
     //-----------------------------------------------------------------------
     GLSLESLinkProgram* GLSLESLinkProgramManager::getActiveLinkProgram(void)
@@ -72,32 +64,31 @@ namespace Ogre {
 
         // No active link program so find one or make a new one
         // Is there an active key?
-        uint64 activeKey = 0;
-
+        uint32 activeKey = 0;
         if (mActiveVertexGpuProgram)
         {
-            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getShaderID()) << 32;
+            activeKey = HashCombine(mActiveVertexGpuProgram->getShaderID(), activeKey);
         }
         if (mActiveFragmentGpuProgram)
         {
-            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getShaderID());
+            activeKey = HashCombine(mActiveFragmentGpuProgram->getShaderID(), activeKey);
         }
 
         // Only return a link program object if a vertex or fragment program exist
         if (activeKey > 0)
         {
             // Find the key in the hash map
-            LinkProgramIterator programFound = mLinkPrograms.find(activeKey);
+            ProgramIterator programFound = mPrograms.find(activeKey);
             // Program object not found for key so need to create it
-            if (programFound == mLinkPrograms.end())
+            if (programFound == mPrograms.end())
             {
                 mActiveLinkProgram = new GLSLESLinkProgram(mActiveVertexGpuProgram,mActiveFragmentGpuProgram);
-                mLinkPrograms[activeKey] = mActiveLinkProgram;
+                mPrograms[activeKey] = mActiveLinkProgram;
             }
             else
             {
                 // Found a link program in map container so make it active
-                mActiveLinkProgram = programFound->second;
+                mActiveLinkProgram = static_cast<GLSLESLinkProgram*>(programFound->second);
             }
 
         }
@@ -110,10 +101,10 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GLSLESLinkProgram* GLSLESLinkProgramManager::getByProgram(GLSLESProgram* gpuProgram)
 	{
-		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
-			currentProgram != mLinkPrograms.end(); ++currentProgram)
+		for (ProgramIterator currentProgram = mPrograms.begin();
+			currentProgram != mPrograms.end(); ++currentProgram)
 		{
-			GLSLESLinkProgram* prgm = currentProgram->second;
+			GLSLESLinkProgram* prgm = static_cast<GLSLESLinkProgram*>(currentProgram->second);
 			if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
 			{
 				return prgm;
@@ -126,13 +117,13 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool GLSLESLinkProgramManager::destroyLinkProgram(GLSLESLinkProgram* linkProgram)
 	{
-		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
-			currentProgram != mLinkPrograms.end(); ++currentProgram)
+		for (ProgramIterator currentProgram = mPrograms.begin();
+			currentProgram != mPrograms.end(); ++currentProgram)
 		{
-			GLSLESLinkProgram* prgm = currentProgram->second;
+			GLSLESLinkProgram* prgm = static_cast<GLSLESLinkProgram*>(currentProgram->second);
 			if(prgm == linkProgram)
 			{
-				mLinkPrograms.erase(mLinkPrograms.find(currentProgram->first));
+				mPrograms.erase(mPrograms.find(currentProgram->first));
 				OGRE_DELETE prgm;
 				return true;				
 			}
@@ -144,11 +135,11 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgramManager::destroyAllByProgram(GLSLESProgram* gpuProgram)
 	{
-		std::vector<uint64> keysToErase;
-		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
-			currentProgram != mLinkPrograms.end(); ++currentProgram)
+		std::vector<uint32> keysToErase;
+		for (ProgramIterator currentProgram = mPrograms.begin();
+			currentProgram != mPrograms.end(); ++currentProgram)
 		{
-			GLSLESLinkProgram* prgm = currentProgram->second;
+			GLSLESLinkProgram* prgm = static_cast<GLSLESLinkProgram*>(currentProgram->second);
 			if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
 			{
 				OGRE_DELETE prgm;
@@ -158,7 +149,7 @@ namespace Ogre {
 		
 		for(size_t i = 0; i < keysToErase.size(); ++i)
 		{
-			mLinkPrograms.erase(mLinkPrograms.find(keysToErase[i]));
+			mPrograms.erase(mPrograms.find(keysToErase[i]));
 		}
     }
 

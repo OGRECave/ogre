@@ -62,15 +62,7 @@ namespace Ogre {
     }
 
 
-    GLSLMonolithicProgramManager::~GLSLMonolithicProgramManager(void)
-    {
-        // iterate through map container and delete link programs
-        for (MonolithicProgramIterator currentProgram = mMonolithicPrograms.begin();
-             currentProgram != mMonolithicPrograms.end(); ++currentProgram)
-        {
-            delete currentProgram->second;
-        }
-    }
+    GLSLMonolithicProgramManager::~GLSLMonolithicProgramManager(void) {}
 
 
     GLSLMonolithicProgram* GLSLMonolithicProgramManager::getActiveMonolithicProgram(void)
@@ -82,46 +74,38 @@ namespace Ogre {
         // No active link program so find one or make a new one.
         // Is there an active key?
         uint32 activeKey = 0;
-        GLuint shaderID = 0;
-
         if (mActiveVertexShader)
         {
-            shaderID = mActiveVertexShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
-        }
-        if (mActiveFragmentShader)
-        {
-            shaderID = mActiveFragmentShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
-        }
-        if (mActiveGeometryShader)
-        {
-            shaderID = mActiveGeometryShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveVertexShader->getShaderID(), activeKey);
         }
         if (mActiveDomainShader)
         {
-            shaderID = mActiveDomainShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveDomainShader->getShaderID(), activeKey);
         }
         if (mActiveHullShader)
         {
-            shaderID = mActiveHullShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveHullShader->getShaderID(), activeKey);
+        }
+        if (mActiveGeometryShader)
+        {
+            activeKey = HashCombine(mActiveGeometryShader->getShaderID(), activeKey);
+        }
+        if (mActiveFragmentShader)
+        {
+            activeKey = HashCombine(mActiveFragmentShader->getShaderID(), activeKey);
         }
         if (mActiveComputeShader)
         {
-            shaderID = mActiveComputeShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveComputeShader->getShaderID(), activeKey);
         }
 
         // Only return a link program object if a program exists.
         if (activeKey > 0)
         {
             // Find the key in the hash map.
-            MonolithicProgramIterator programFound = mMonolithicPrograms.find(activeKey);
+            ProgramIterator programFound = mPrograms.find(activeKey);
             // Program object not found for key so need to create it.
-            if (programFound == mMonolithicPrograms.end())
+            if (programFound == mPrograms.end())
             {
                 mActiveMonolithicProgram = new GLSLMonolithicProgram(
                     mActiveVertexShader,
@@ -130,12 +114,12 @@ namespace Ogre {
                     mActiveGeometryShader,
                     mActiveFragmentShader,
                     mActiveComputeShader);
-                mMonolithicPrograms[activeKey] = mActiveMonolithicProgram;
+                mPrograms[activeKey] = mActiveMonolithicProgram;
             }
             else
             {
                 // Found a link program in map container so make it active.
-                mActiveMonolithicProgram = programFound->second;
+                mActiveMonolithicProgram = static_cast<GLSLMonolithicProgram*>(programFound->second);
             }
         }
         // Make the program object active.

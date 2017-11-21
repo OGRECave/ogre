@@ -29,8 +29,19 @@
 #include "OgreGLSLProgramManagerCommon.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
+#include "OgreGLSLProgramCommon.h"
 
 namespace Ogre {
+
+    GLSLProgramManagerCommon::~GLSLProgramManagerCommon()
+    {
+        // iterate through map container and delete link programs
+        for (ProgramIterator currentProgram = mPrograms.begin();
+             currentProgram != mPrograms.end(); ++currentProgram)
+        {
+            delete currentProgram->second;
+        }
+    }
 
     void GLSLProgramManagerCommon::parseGLSLUniform(
         String line, GpuNamedConstants& defs,

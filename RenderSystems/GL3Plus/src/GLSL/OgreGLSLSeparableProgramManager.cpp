@@ -51,15 +51,7 @@ namespace Ogre
         GLSLProgramManager(renderSystem), mActiveSeparableProgram(NULL) { }
 
 
-    GLSLSeparableProgramManager::~GLSLSeparableProgramManager(void)
-    {
-        // Iterate through map container and delete program pipelines.
-        for (SeparableProgramIterator currentProgram = mSeparablePrograms.begin();
-             currentProgram != mSeparablePrograms.end(); ++currentProgram)
-        {
-            delete currentProgram->second;
-        }
-    }
+    GLSLSeparableProgramManager::~GLSLSeparableProgramManager(void) {}
 
 
     void GLSLSeparableProgramManager::setActiveFragmentShader(GLSLShader* fragmentShader)
@@ -137,45 +129,38 @@ namespace Ogre
         // No active link program so find one or make a new one.
         // Is there an active key?
         uint32 activeKey = 0;
-        GLuint shaderID = 0;
         if (mActiveVertexShader)
         {
-            shaderID = mActiveVertexShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveVertexShader->getShaderID(), activeKey);
         }
         if (mActiveDomainShader)
         {
-            shaderID = mActiveDomainShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveDomainShader->getShaderID(), activeKey);
         }
         if (mActiveHullShader)
         {
-            shaderID = mActiveHullShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveHullShader->getShaderID(), activeKey);
         }
         if (mActiveGeometryShader)
         {
-            shaderID = mActiveGeometryShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveGeometryShader->getShaderID(), activeKey);
         }
         if (mActiveFragmentShader)
         {
-            shaderID = mActiveFragmentShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveFragmentShader->getShaderID(), activeKey);
         }
         if (mActiveComputeShader)
         {
-            shaderID = mActiveComputeShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+            activeKey = HashCombine(mActiveComputeShader->getShaderID(), activeKey);
         }
 
         // Only return a program pipeline object if a vertex or fragment stage exist.
         if (activeKey > 0)
         {
             // Find the key in the hash map.
-            SeparableProgramIterator programFound = mSeparablePrograms.find(activeKey);
+            ProgramIterator programFound = mPrograms.find(activeKey);
             // Program object not found for key so need to create it.
-            if (programFound == mSeparablePrograms.end())
+            if (programFound == mPrograms.end())
             {
                 mActiveSeparableProgram = new GLSLSeparableProgram(
                     mActiveVertexShader,
@@ -184,12 +169,12 @@ namespace Ogre
                     mActiveGeometryShader,
                     mActiveFragmentShader,
                     mActiveComputeShader);
-                mSeparablePrograms[activeKey] = mActiveSeparableProgram;
+                mPrograms[activeKey] = mActiveSeparableProgram;
             }
             else
             {
                 // Found a link program in map container so make it active.
-                mActiveSeparableProgram = programFound->second;
+                mActiveSeparableProgram = static_cast<GLSLSeparableProgram*>(programFound->second);
             }
         }
 

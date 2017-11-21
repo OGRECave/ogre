@@ -56,23 +56,12 @@ namespace Ogre {
     {
 
     private:
-
-        typedef map<uint32, GLSLMonolithicProgram*>::type MonolithicProgramMap;
-        typedef MonolithicProgramMap::iterator MonolithicProgramIterator;
-
-        /// container holding previously created program objects
-        MonolithicProgramMap mMonolithicPrograms;
-
         /// active objects defining the active rendering gpu state
         GLSLMonolithicProgram* mActiveMonolithicProgram;
-
-        typedef map<String, GLenum>::type StringToEnumMap;
-        StringToEnumMap mTypeEnumMap;
 
     public:
 
         GLSLMonolithicProgramManager(GL3PlusRenderSystem* renderSystem);
-
         ~GLSLMonolithicProgramManager(void);
 
         /** Get the program object that links the two active shader

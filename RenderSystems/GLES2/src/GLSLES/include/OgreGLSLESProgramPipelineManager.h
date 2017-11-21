@@ -48,13 +48,6 @@ namespace Ogre
     class _OgreGLES2Export GLSLESProgramPipelineManager : public GLSLESProgramManagerCommon, public Singleton<GLSLESProgramPipelineManager>
     {
     private:
-
-        typedef map<uint64, GLSLESProgramPipeline*>::type ProgramPipelineMap;
-        typedef ProgramPipelineMap::iterator ProgramPipelineIterator;
-
-        /// Container holding previously created program pipeline objects 
-        ProgramPipelineMap mProgramPipelines;
-
         /// Active objects defining the active rendering gpu state
         GLSLESProgramPipeline* mActiveProgramPipeline;
 

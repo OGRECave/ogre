@@ -53,13 +53,6 @@ namespace Ogre
     class _OgreGL3PlusExport GLSLSeparableProgramManager : public GLSLProgramManager, public Singleton<GLSLSeparableProgramManager>
     {
     private:
-
-        typedef map<uint32, GLSLSeparableProgram*>::type SeparableProgramMap;
-        typedef SeparableProgramMap::iterator SeparableProgramIterator;
-
-        /// Container holding previously created program pipeline objects
-        SeparableProgramMap mSeparablePrograms;
-
         /// Active objects defining the active rendering gpu state
         GLSLSeparableProgram* mActiveSeparableProgram;
 

@@ -53,23 +53,11 @@ namespace Ogre {
     {
 
     private:
-    
-        typedef map<uint64, GLSLESLinkProgram*>::type LinkProgramMap;
-        typedef LinkProgramMap::iterator LinkProgramIterator;
-
-        /// Container holding previously created program objects 
-        LinkProgramMap mLinkPrograms; 
-
         /// Active objects defining the active rendering gpu state
         GLSLESLinkProgram* mActiveLinkProgram;
-
-        typedef map<String, GLenum>::type StringToEnumMap;
-        StringToEnumMap mTypeEnumMap;
-
     public:
 
         GLSLESLinkProgramManager(void);
-
         ~GLSLESLinkProgramManager(void);
 
         /**

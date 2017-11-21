@@ -42,13 +42,6 @@ namespace Ogre {
     {
 
     private:
-    
-        typedef map<uint64, GLSLLinkProgram*>::type LinkProgramMap;
-        typedef LinkProgramMap::iterator LinkProgramIterator;
-
-        /// container holding previously created program objects 
-        LinkProgramMap mLinkPrograms; 
-
         /// active objects defining the active rendering gpu state
         GLSLProgram* mActiveVertexGpuProgram;
         GLSLProgram* mActiveGeometryGpuProgram;
@@ -67,7 +60,6 @@ namespace Ogre {
     public:
 
         GLSLLinkProgramManager(void);
-
         ~GLSLLinkProgramManager(void);
 
         /**

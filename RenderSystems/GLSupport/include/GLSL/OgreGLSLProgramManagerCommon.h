@@ -33,6 +33,7 @@
 #include "OgreGpuProgramParams.h"
 
 namespace Ogre {
+    class GLSLProgramCommon;
 
     /** Ogre assumes that there are separate programs to deal with but
         GLSL has one program object that represents the active shader
@@ -46,7 +47,6 @@ namespace Ogre {
         stored along with a unique key in a hash_map for quick
         retrieval the next time the program object is required.
     */
-
     class GLSLProgramManagerCommon
     {
     protected:
@@ -64,8 +64,13 @@ namespace Ogre {
             String line, GpuNamedConstants& defs,
             const String& filename, const GpuSharedParametersPtr& sharedParams);
 
+        typedef map<uint32, GLSLProgramCommon*>::type ProgramMap;
+        typedef ProgramMap::iterator ProgramIterator;
+
+        /// container holding previously created program objects
+        ProgramMap mPrograms;
     public:
-        virtual ~GLSLProgramManagerCommon() {}
+        virtual ~GLSLProgramManagerCommon();
 
         /** Populate a list of uniforms based on GLSL source and store
             them in GpuNamedConstants.  
