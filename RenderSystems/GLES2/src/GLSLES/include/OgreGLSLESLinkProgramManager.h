@@ -66,21 +66,6 @@ namespace Ogre {
         */
         GLSLESLinkProgram* getActiveLinkProgram(void);
 
-		/**
-			Get the linker program by a gpu program
-		*/
-		GLSLESLinkProgram* getByProgram(GLSLESProgram* gpuProgram);
-
-		/**
-			Destroy and remove the linker program from the local cache
-		*/
-		bool destroyLinkProgram(GLSLESLinkProgram* linkProgram);
-
-		/**
-			Destroy all linker programs which referencing this gpu program
-		*/
-		void destroyAllByProgram(GLSLESProgram* gpuProgram);
-
         /** Set the active fragment shader for the next rendering state.
             The active program object will be cleared.
             Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods

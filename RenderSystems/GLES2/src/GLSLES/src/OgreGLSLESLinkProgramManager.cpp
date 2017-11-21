@@ -98,61 +98,6 @@ namespace Ogre {
         return mActiveLinkProgram;
 	}
 
-	//-----------------------------------------------------------------------
-	GLSLESLinkProgram* GLSLESLinkProgramManager::getByProgram(GLSLESProgram* gpuProgram)
-	{
-		for (ProgramIterator currentProgram = mPrograms.begin();
-			currentProgram != mPrograms.end(); ++currentProgram)
-		{
-			GLSLESLinkProgram* prgm = static_cast<GLSLESLinkProgram*>(currentProgram->second);
-			if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
-			{
-				return prgm;
-			}
-		}
-
-		return NULL;
-	}
-
-	//-----------------------------------------------------------------------
-	bool GLSLESLinkProgramManager::destroyLinkProgram(GLSLESLinkProgram* linkProgram)
-	{
-		for (ProgramIterator currentProgram = mPrograms.begin();
-			currentProgram != mPrograms.end(); ++currentProgram)
-		{
-			GLSLESLinkProgram* prgm = static_cast<GLSLESLinkProgram*>(currentProgram->second);
-			if(prgm == linkProgram)
-			{
-				mPrograms.erase(mPrograms.find(currentProgram->first));
-				OGRE_DELETE prgm;
-				return true;				
-			}
-		}
-
-		return false;
-	}
-
-	//-----------------------------------------------------------------------
-	void GLSLESLinkProgramManager::destroyAllByProgram(GLSLESProgram* gpuProgram)
-	{
-		std::vector<uint32> keysToErase;
-		for (ProgramIterator currentProgram = mPrograms.begin();
-			currentProgram != mPrograms.end(); ++currentProgram)
-		{
-			GLSLESLinkProgram* prgm = static_cast<GLSLESLinkProgram*>(currentProgram->second);
-			if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
-			{
-				OGRE_DELETE prgm;
-				keysToErase.push_back(currentProgram->first);
-			}
-		}
-		
-		for(size_t i = 0; i < keysToErase.size(); ++i)
-		{
-			mPrograms.erase(mPrograms.find(keysToErase[i]));
-		}
-    }
-
     //-----------------------------------------------------------------------
     void GLSLESLinkProgramManager::setActiveFragmentShader(GLSLESProgram* fragmentGpuProgram)
     {

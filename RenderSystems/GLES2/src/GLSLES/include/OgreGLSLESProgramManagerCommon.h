@@ -61,6 +61,21 @@ namespace Ogre {
         GLSLESProgramManagerCommon(void);
         ~GLSLESProgramManagerCommon(void);
 
+        /**
+            Get the linker program by a gpu program
+        */
+        GLSLESProgramCommon* getByProgram(GLSLESProgram* gpuProgram);
+
+        /**
+            Destroy and remove the linker program from the local cache
+        */
+        bool destroyLinkProgram(GLSLESProgramCommon* linkProgram);
+
+        /**
+            Destroy all linker programs which referencing this gpu program
+        */
+        void destroyAllByProgram(GLSLESProgram* gpuProgram);
+
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /**
          

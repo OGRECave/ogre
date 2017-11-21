@@ -104,6 +104,61 @@ namespace Ogre {
         }
 #endif
     }
+    //-----------------------------------------------------------------------
+    GLSLESProgramCommon* GLSLESProgramManagerCommon::getByProgram(GLSLESProgram* gpuProgram)
+    {
+        for (ProgramIterator currentProgram = mPrograms.begin();
+            currentProgram != mPrograms.end(); ++currentProgram)
+        {
+            GLSLESProgramCommon* prgm = static_cast<GLSLESProgramCommon*>(currentProgram->second);
+            if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
+            {
+                return prgm;
+            }
+        }
+
+        return NULL;
+    }
+
+    //-----------------------------------------------------------------------
+    bool GLSLESProgramManagerCommon::destroyLinkProgram(GLSLESProgramCommon* linkProgram)
+    {
+        for (ProgramIterator currentProgram = mPrograms.begin();
+            currentProgram != mPrograms.end(); ++currentProgram)
+        {
+            GLSLESProgramCommon* prgm = static_cast<GLSLESProgramCommon*>(currentProgram->second);
+            if(prgm == linkProgram)
+            {
+                mPrograms.erase(currentProgram);
+                OGRE_DELETE prgm;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //-----------------------------------------------------------------------
+    void GLSLESProgramManagerCommon::destroyAllByProgram(GLSLESProgram* gpuProgram)
+    {
+        std::vector<uint32> keysToErase;
+        for (ProgramIterator currentProgram = mPrograms.begin();
+            currentProgram != mPrograms.end(); ++currentProgram)
+        {
+            GLSLESProgramCommon* prgm = static_cast<GLSLESProgramCommon*>(currentProgram->second);
+            if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
+            {
+                OGRE_DELETE prgm;
+                keysToErase.push_back(currentProgram->first);
+            }
+        }
+
+        for(size_t i = 0; i < keysToErase.size(); ++i)
+        {
+            mPrograms.erase(mPrograms.find(keysToErase[i]));
+        }
+    }
+
     //---------------------------------------------------------------------
     void GLSLESProgramManagerCommon::convertGLUniformtoOgreType(GLenum gltype,
         GpuConstantDefinition& defToUpdate)

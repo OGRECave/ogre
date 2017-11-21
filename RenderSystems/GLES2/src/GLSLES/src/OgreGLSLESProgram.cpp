@@ -237,6 +237,12 @@ namespace Ogre {
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+                // destroy all programs using this shader
+                GLSLESProgramPipelineManager::getSingletonPtr()->destroyAllByProgram(this);
+            }
+            else {
+                // destroy all programs using this shader
+                GLSLESLinkProgramManager::getSingletonPtr()->destroyAllByProgram(this);
             }
             
             mGLShaderHandle = 0;
