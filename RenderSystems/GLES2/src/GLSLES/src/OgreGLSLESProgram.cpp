@@ -238,11 +238,11 @@ namespace Ogre {
             {
                 OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
                 // destroy all programs using this shader
-                GLSLESProgramPipelineManager::getSingletonPtr()->destroyAllByProgram(this);
+                GLSLESProgramPipelineManager::getSingletonPtr()->destroyAllByShader(this);
             }
             else {
                 // destroy all programs using this shader
-                GLSLESLinkProgramManager::getSingletonPtr()->destroyAllByProgram(this);
+                GLSLESLinkProgramManager::getSingletonPtr()->destroyAllByShader(this);
             }
             
             mGLShaderHandle = 0;

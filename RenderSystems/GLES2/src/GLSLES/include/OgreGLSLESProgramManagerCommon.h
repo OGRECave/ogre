@@ -71,11 +71,6 @@ namespace Ogre {
         */
         bool destroyLinkProgram(GLSLESProgramCommon* linkProgram);
 
-        /**
-            Destroy all linker programs which referencing this gpu program
-        */
-        void destroyAllByProgram(GLSLESProgram* gpuProgram);
-
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /**
          

@@ -99,19 +99,19 @@ namespace Ogre {
 
         // no active link program so find one or make a new one
         // is there an active key?
-        uint64 activeKey = 0;
+        uint32 activeKey = 0;
 
         if (mActiveVertexGpuProgram)
         {
-            activeKey = HashCombine(mActiveVertexGpuProgram->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveVertexGpuProgram->getShaderID());
         }
         if (mActiveGeometryGpuProgram)
         {
-            activeKey = HashCombine(mActiveGeometryGpuProgram->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveGeometryGpuProgram->getShaderID());
         }
         if (mActiveFragmentGpuProgram)
         {
-            activeKey = HashCombine(mActiveFragmentGpuProgram->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveFragmentGpuProgram->getShaderID());
         }
 
         // only return a link program object if a vertex, geometry or fragment program exist

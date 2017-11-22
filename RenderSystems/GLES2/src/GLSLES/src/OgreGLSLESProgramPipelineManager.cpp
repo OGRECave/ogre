@@ -86,11 +86,11 @@ namespace Ogre
         uint32 activeKey = 0;
         if (mActiveVertexGpuProgram)
         {
-            activeKey = HashCombine(mActiveVertexGpuProgram->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveVertexGpuProgram->getShaderID());
         }
         if (mActiveFragmentGpuProgram)
         {
-            activeKey = HashCombine(mActiveFragmentGpuProgram->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveFragmentGpuProgram->getShaderID());
         }
 
         // Only return a program pipeline object if a vertex or fragment stage exist

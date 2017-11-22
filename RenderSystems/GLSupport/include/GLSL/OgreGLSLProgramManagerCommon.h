@@ -34,6 +34,7 @@
 
 namespace Ogre {
     class GLSLProgramCommon;
+    class GLSLShaderCommon;
 
     /** Ogre assumes that there are separate programs to deal with but
         GLSL has one program object that represents the active shader
@@ -82,6 +83,9 @@ namespace Ogre {
         */
         void extractUniformsFromGLSL(
             const String& src, GpuNamedConstants& constantDefs, const String& filename);
+
+        /// Destroy all programs which referencing this shader
+        void destroyAllByShader(GLSLShaderCommon* shader);
     };
 
 }

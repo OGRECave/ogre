@@ -76,27 +76,27 @@ namespace Ogre {
         uint32 activeKey = 0;
         if (mActiveVertexShader)
         {
-            activeKey = HashCombine(mActiveVertexShader->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveVertexShader->getShaderID());
         }
         if (mActiveDomainShader)
         {
-            activeKey = HashCombine(mActiveDomainShader->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveDomainShader->getShaderID());
         }
         if (mActiveHullShader)
         {
-            activeKey = HashCombine(mActiveHullShader->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveHullShader->getShaderID());
         }
         if (mActiveGeometryShader)
         {
-            activeKey = HashCombine(mActiveGeometryShader->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveGeometryShader->getShaderID());
         }
         if (mActiveFragmentShader)
         {
-            activeKey = HashCombine(mActiveFragmentShader->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveFragmentShader->getShaderID());
         }
         if (mActiveComputeShader)
         {
-            activeKey = HashCombine(mActiveComputeShader->getShaderID(), activeKey);
+            activeKey = HashCombine(activeKey, mActiveComputeShader->getShaderID());
         }
 
         // Only return a link program object if a program exists.
