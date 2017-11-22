@@ -46,8 +46,7 @@ THE SOFTWARE.
 #include "OgreGLSLESCgProgramFactory.h"
 #endif
 #include "OgreGLSLESLinkProgram.h"
-#include "OgreGLSLESLinkProgramManager.h"
-#include "OgreGLSLESProgramPipelineManager.h"
+#include "OgreGLSLESProgramManager.h"
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRenderWindow.h"

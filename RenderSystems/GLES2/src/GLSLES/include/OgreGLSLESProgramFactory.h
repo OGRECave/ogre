@@ -35,8 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class GLSLESLinkProgramManager;
-    class GLSLESProgramPipelineManager;
+    class GLSLESProgramManager;
 
     /** Factory class for GLSL ES programs. */
     class _OgreGLES2Export GLSLESProgramFactory : public HighLevelGpuProgramFactory
@@ -55,8 +54,7 @@ namespace Ogre
         void destroy(HighLevelGpuProgram* prog);
 
     private:
-        static GLSLESLinkProgramManager* mLinkProgramManager;
-        static GLSLESProgramPipelineManager* mProgramPipelineManager;
+        static GLSLESProgramManager* mProgramManager;
     };
 }
 

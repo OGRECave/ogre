@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLSLESProgramManagerCommon.h"
+#include "../include/OgreGLSLESProgramManager.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -35,11 +35,31 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLSLESProgram.h"
 
+#include "OgreGLSLESLinkProgram.h"
+#include "OgreGLSLESProgramPipeline.h"
+
+#include "OgreRoot.h"
+
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    GLSLESProgramManagerCommon::GLSLESProgramManagerCommon(void) : mActiveVertexGpuProgram(NULL),
-        mActiveFragmentGpuProgram(NULL)
+    template<> GLSLESProgramManager* Singleton<GLSLESProgramManager>::msSingleton = 0;
+
+    //-----------------------------------------------------------------------
+    GLSLESProgramManager* GLSLESProgramManager::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+
+    //-----------------------------------------------------------------------
+    GLSLESProgramManager& GLSLESProgramManager::getSingleton(void)
+    {
+        assert( msSingleton );  return ( *msSingleton );
+    }
+
+    //-----------------------------------------------------------------------
+    GLSLESProgramManager::GLSLESProgramManager(void) : mActiveVertexGpuProgram(NULL),
+        mActiveFragmentGpuProgram(NULL), mActiveProgram(NULL)
     {
         // Fill in the relationship between type names and enums
         mTypeEnumMap.insert(StringToEnumMap::value_type("float", GL_FLOAT));
@@ -94,7 +114,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLESProgramManagerCommon::~GLSLESProgramManagerCommon(void)
+    GLSLESProgramManager::~GLSLESProgramManager(void)
     {
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         if(mGLSLOptimiserContext)
@@ -104,8 +124,85 @@ namespace Ogre {
         }
 #endif
     }
+
     //-----------------------------------------------------------------------
-    GLSLESProgramCommon* GLSLESProgramManagerCommon::getByProgram(GLSLESProgram* gpuProgram)
+    GLSLESProgramCommon* GLSLESProgramManager::getActiveProgram(void)
+    {
+        // If there is an active link program then return it
+        if (mActiveProgram)
+            return mActiveProgram;
+
+        // No active link program so find one or make a new one
+        // Is there an active key?
+        uint32 activeKey = 0;
+        if (mActiveVertexGpuProgram)
+        {
+            activeKey = HashCombine(activeKey, mActiveVertexGpuProgram->getShaderID());
+        }
+        if (mActiveFragmentGpuProgram)
+        {
+            activeKey = HashCombine(activeKey, mActiveFragmentGpuProgram->getShaderID());
+        }
+
+        // Only return a link program object if a vertex or fragment program exist
+        if (activeKey > 0)
+        {
+            // Find the key in the hash map
+            ProgramIterator programFound = mPrograms.find(activeKey);
+            // Program object not found for key so need to create it
+            if (programFound == mPrograms.end())
+            {
+                if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
+                        RSC_SEPARATE_SHADER_OBJECTS))
+                {
+                    mActiveProgram =
+                        new GLSLESProgramPipeline(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
+                }
+                else
+                {
+                    mActiveProgram =
+                        new GLSLESLinkProgram(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
+                }
+
+                mPrograms[activeKey] = mActiveProgram;
+            }
+            else
+            {
+                // Found a link program in map container so make it active
+                mActiveProgram = static_cast<GLSLESLinkProgram*>(programFound->second);
+            }
+
+        }
+        // Make the program object active
+        if (mActiveProgram) mActiveProgram->activate();
+
+        return mActiveProgram;
+    }
+
+    //-----------------------------------------------------------------------
+    void GLSLESProgramManager::setActiveFragmentShader(GLSLESProgram* fragmentGpuProgram)
+    {
+        if (fragmentGpuProgram != mActiveFragmentGpuProgram)
+        {
+            mActiveFragmentGpuProgram = fragmentGpuProgram;
+            // ActiveLinkProgram is no longer valid
+            mActiveProgram = NULL;
+        }
+    }
+
+    //-----------------------------------------------------------------------
+    void GLSLESProgramManager::setActiveVertexShader(GLSLESProgram* vertexGpuProgram)
+    {
+        if (vertexGpuProgram != mActiveVertexGpuProgram)
+        {
+            mActiveVertexGpuProgram = vertexGpuProgram;
+            // ActiveLinkProgram is no longer valid
+            mActiveProgram = NULL;
+        }
+    }
+
+    //-----------------------------------------------------------------------
+    GLSLESProgramCommon* GLSLESProgramManager::getByProgram(GLSLESProgram* gpuProgram)
     {
         for (ProgramIterator currentProgram = mPrograms.begin();
             currentProgram != mPrograms.end(); ++currentProgram)
@@ -121,7 +218,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    bool GLSLESProgramManagerCommon::destroyLinkProgram(GLSLESProgramCommon* linkProgram)
+    bool GLSLESProgramManager::destroyLinkProgram(GLSLESProgramCommon* linkProgram)
     {
         for (ProgramIterator currentProgram = mPrograms.begin();
             currentProgram != mPrograms.end(); ++currentProgram)
@@ -139,7 +236,7 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    void GLSLESProgramManagerCommon::convertGLUniformtoOgreType(GLenum gltype,
+    void GLSLESProgramManager::convertGLUniformtoOgreType(GLenum gltype,
         GpuConstantDefinition& defToUpdate)
     {
         // Decode uniform size and type
@@ -230,7 +327,7 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    bool GLSLESProgramManagerCommon::completeParamSource(
+    bool GLSLESProgramManager::completeParamSource(
         const String& paramName,
         const GpuConstantDefinitionMap* vertexConstantDefs, 
         const GpuConstantDefinitionMap* fragmentConstantDefs,
@@ -263,7 +360,7 @@ namespace Ogre {
     }
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
-    void GLSLESProgramManagerCommon::optimiseShaderSource(GLSLESGpuProgram* gpuProgram)
+    void GLSLESProgramManager::optimiseShaderSource(GLSLESGpuProgram* gpuProgram)
     {
         if(!gpuProgram->getGLSLProgram()->getIsOptimised())
         {
@@ -295,7 +392,7 @@ namespace Ogre {
 #endif
 
     //---------------------------------------------------------------------
-    void GLSLESProgramManagerCommon::extractUniforms(GLuint programObject, 
+    void GLSLESProgramManager::extractUniforms(GLuint programObject,
         const GpuConstantDefinitionMap* vertexConstantDefs, 
         const GpuConstantDefinitionMap* fragmentConstantDefs,
         GLUniformReferenceList& list, GLUniformBufferList& sharedList)

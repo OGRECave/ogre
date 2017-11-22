@@ -60,9 +60,6 @@ namespace Ogre
         GLSLESProgramPipeline(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram);
         virtual ~GLSLESProgramPipeline();
 
-        /// GL Program Pipeline Handle
-        GLuint getGLProgramPipelineHandle() const { return mGLProgramPipelineHandle; }
-
         /** Updates program pipeline object uniforms using data from GpuProgramParameters.
          normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
          */
@@ -90,8 +87,6 @@ namespace Ogre
             FRAGMENT_PROGRAM_LINKED = 2,
             ALL_PROGRAMS_LINKED = 3
         };
-        /// GL handle for pipeline object
-        GLuint mGLProgramPipelineHandle;
 
         /// Compiles and links the separate vertex and fragment programs
         virtual void compileAndLink(void);
