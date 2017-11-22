@@ -35,10 +35,25 @@
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
 
-#include <iostream>
+#include "OgreGLSLMonolithicProgram.h"
+#include "OgreGLSLSeparableProgram.h"
 
 namespace Ogre {
 
+    template<> GLSLProgramManager* Singleton<GLSLProgramManager>::msSingleton = 0;
+
+
+    GLSLProgramManager* GLSLProgramManager::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+
+
+    GLSLProgramManager& GLSLProgramManager::getSingleton(void)
+    {
+        assert(msSingleton);
+        return (*msSingleton);
+    }
     
     GLSLProgramManager::GLSLProgramManager(GL3PlusRenderSystem* renderSystem) :
         mActiveVertexShader(NULL),
@@ -47,6 +62,7 @@ namespace Ogre {
         mActiveGeometryShader(NULL),
         mActiveFragmentShader(NULL),
         mActiveComputeShader(NULL),
+        mActiveProgram(NULL),
         mRenderSystem(renderSystem)
     {
         // Fill in the relationship between type names and enums
@@ -183,9 +199,147 @@ namespace Ogre {
         mTypeEnumMap.insert(StringToEnumMap::value_type("atomic_uint", GL_UNSIGNED_INT_ATOMIC_COUNTER));
     }
 
+    GLSLProgramManager::~GLSLProgramManager(void) {}
+
     GL3PlusStateCacheManager* GLSLProgramManager::getStateCacheManager()
     {
         return mRenderSystem->_getStateCacheManager();
+    }
+
+    GLSLProgram* GLSLProgramManager::getActiveProgram(void)
+    {
+        // If there is an active link program then return it.
+        if (mActiveProgram)
+            return mActiveProgram;
+
+        // No active link program so find one or make a new one.
+        // Is there an active key?
+        uint32 activeKey = 0;
+        if (mActiveVertexShader)
+        {
+            activeKey = HashCombine(activeKey, mActiveVertexShader->getShaderID());
+        }
+        if (mActiveDomainShader)
+        {
+            activeKey = HashCombine(activeKey, mActiveDomainShader->getShaderID());
+        }
+        if (mActiveHullShader)
+        {
+            activeKey = HashCombine(activeKey, mActiveHullShader->getShaderID());
+        }
+        if (mActiveGeometryShader)
+        {
+            activeKey = HashCombine(activeKey, mActiveGeometryShader->getShaderID());
+        }
+        if (mActiveFragmentShader)
+        {
+            activeKey = HashCombine(activeKey, mActiveFragmentShader->getShaderID());
+        }
+        if (mActiveComputeShader)
+        {
+            activeKey = HashCombine(activeKey, mActiveComputeShader->getShaderID());
+        }
+
+        // Only return a link program object if a program exists.
+        if (activeKey > 0)
+        {
+            // Find the key in the hash map.
+            ProgramIterator programFound = mPrograms.find(activeKey);
+            // Program object not found for key so need to create it.
+            if (programFound == mPrograms.end())
+            {
+                if (mRenderSystem->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+                {
+                    mActiveProgram = new GLSLSeparableProgram(
+                        mActiveVertexShader, mActiveHullShader, mActiveDomainShader,
+                        mActiveGeometryShader, mActiveFragmentShader, mActiveComputeShader);
+                }
+                else
+                {
+                    mActiveProgram = new GLSLMonolithicProgram(
+                        mActiveVertexShader, mActiveHullShader, mActiveDomainShader,
+                        mActiveGeometryShader, mActiveFragmentShader, mActiveComputeShader);
+                }
+
+                mPrograms[activeKey] = mActiveProgram;
+            }
+            else
+            {
+                // Found a link program in map container so make it active.
+                mActiveProgram = static_cast<GLSLProgram*>(programFound->second);
+            }
+        }
+
+        // Make the program object active.
+        if (mActiveProgram)
+            mActiveProgram->activate();
+
+        return mActiveProgram;
+    }
+
+    void GLSLProgramManager::setActiveFragmentShader(GLSLShader* fragmentShader)
+    {
+        if (fragmentShader != mActiveFragmentShader)
+        {
+            mActiveFragmentShader = fragmentShader;
+            // ActiveMonolithicProgram is no longer valid
+            mActiveProgram = NULL;
+        }
+    }
+
+
+    void GLSLProgramManager::setActiveVertexShader(GLSLShader* vertexShader)
+    {
+        if (vertexShader != mActiveVertexShader)
+        {
+            mActiveVertexShader = vertexShader;
+            // ActiveMonolithicProgram is no longer valid
+            mActiveProgram = NULL;
+        }
+    }
+
+
+    void GLSLProgramManager::setActiveGeometryShader(GLSLShader* geometryShader)
+    {
+        if (geometryShader != mActiveGeometryShader)
+        {
+            mActiveGeometryShader = geometryShader;
+            // ActiveMonolithicProgram is no longer valid
+            mActiveProgram = NULL;
+        }
+    }
+
+
+    void GLSLProgramManager::setActiveHullShader(GLSLShader* hullShader)
+    {
+        if (hullShader != mActiveHullShader)
+        {
+            mActiveHullShader = hullShader;
+            // ActiveMonolithicProgram is no longer valid
+            mActiveProgram = NULL;
+        }
+    }
+
+
+    void GLSLProgramManager::setActiveDomainShader(GLSLShader* domainShader)
+    {
+        if (domainShader != mActiveDomainShader)
+        {
+            mActiveDomainShader = domainShader;
+            // ActiveMonolithicProgram is no longer valid
+            mActiveProgram = NULL;
+        }
+    }
+
+
+    void GLSLProgramManager::setActiveComputeShader(GLSLShader* computeShader)
+    {
+        if (computeShader != mActiveComputeShader)
+        {
+            mActiveComputeShader = computeShader;
+            // ActiveMonolithicProgram is no longer valid
+            mActiveProgram = NULL;
+        }
     }
 
     void GLSLProgramManager::convertGLUniformtoOgreType(GLenum gltype,
@@ -517,7 +671,7 @@ namespace Ogre {
                     paramName = paramName.substr(0, arrayStart);
                 }
 
-                std::cout << "ATOMIC COUNTER FOUND: " << paramName  << " " << arraySize << std::endl;
+                printf("ATOMIC COUNTER FOUND: %s %d", paramName.c_str(), arraySize);
 
                 // Find out which params object this comes from
                 bool foundSource = findAtomicCounterDataSource(

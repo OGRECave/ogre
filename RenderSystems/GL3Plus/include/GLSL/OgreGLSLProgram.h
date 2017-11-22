@@ -84,6 +84,9 @@ namespace Ogre {
                    (GLSLShaderCommon*)mComputeShader == shader;
         }
 
+        virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
+                                          GpuProgramType fromProgType) = 0;
+
         void setTransformFeedbackVaryings(const std::vector<String>& nameStrings);
     protected:
         /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager

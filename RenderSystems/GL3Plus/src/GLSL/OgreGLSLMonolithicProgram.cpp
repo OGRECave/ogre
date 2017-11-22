@@ -29,7 +29,7 @@
 #include "OgreGLSLMonolithicProgram.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLSLShader.h"
-#include "OgreGLSLMonolithicProgramManager.h"
+#include "OgreGLSLProgramManager.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreStringVector.h"
 #include "OgreLogManager.h"
@@ -217,7 +217,7 @@ namespace Ogre {
         }
 
         // Do we know how many shared params there are yet? Or if there are any blocks defined?
-        GLSLMonolithicProgramManager::getSingleton().extractUniformsFromProgram(
+        GLSLProgramManager::getSingleton().extractUniformsFromProgram(
             mGLProgramHandle, params, mGLUniformReferences, mGLAtomicCounterReferences,
             mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
 

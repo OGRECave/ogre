@@ -39,9 +39,8 @@
 #include "OgreGL3PlusStateCacheManager.h"
 
 #include "OgreGLSLMonolithicProgram.h"
-#include "OgreGLSLMonolithicProgramManager.h"
+#include "OgreGLSLProgramManager.h"
 #include "OgreGLSLSeparableProgram.h"
-#include "OgreGLSLSeparableProgramManager.h"
 
 #include "OgreGL3PlusTexture.h"
 

@@ -87,6 +87,9 @@ namespace Ogre {
             pass rendering occurs.
         */
         void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
+
+        void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
+                                  GpuProgramType fromProgType) {}
     };
 
 }
