@@ -266,6 +266,8 @@ namespace Ogre {
             }
             else
             {
+                GLenum originFormat = GL3PlusPixelUtil::getGLOriginFormat(mFormat);
+
                 // Run through this process to pregenerate mipmap pyramid
                 for(uint32 mip = 0; mip <= mNumMipmaps; mip++)
                 {
@@ -287,7 +289,7 @@ namespace Ogre {
                     case TEX_TYPE_1D:
                         OGRE_CHECK_GL_ERROR(glTexImage1D(GL_TEXTURE_1D, mip, format,
                                                          width, 0,
-                                                         GL3PlusPixelUtil::getGLOriginFormat(mFormat), datatype, NULL));
+                                                         originFormat, datatype, NULL));
                         break;
                     case TEX_TYPE_2D:
                         OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D,
@@ -295,7 +297,7 @@ namespace Ogre {
                                                          format,
                                                          width, height,
                                                          0,
-                                                         GL3PlusPixelUtil::getGLOriginFormat(mFormat),
+                                                         originFormat,
                                                          datatype, NULL));
                         break;
                     case TEX_TYPE_2D_RECT:
@@ -304,20 +306,20 @@ namespace Ogre {
                                                          format,
                                                          width, height,
                                                          0,
-                                                         GL3PlusPixelUtil::getGLOriginFormat(mFormat),
+                                                         originFormat,
                                                          datatype, NULL));
                         break;
                     case TEX_TYPE_3D:
                     case TEX_TYPE_2D_ARRAY:
                         OGRE_CHECK_GL_ERROR(glTexImage3D(texTarget, mip, format,
                                                          width, height, depth, 0,
-                                                         GL3PlusPixelUtil::getGLOriginFormat(mFormat), datatype, NULL));
+                                                         originFormat, datatype, NULL));
                         break;
                     case TEX_TYPE_CUBE_MAP:
                         for(int face = 0; face < 6; face++) {
                             OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
                                                              width, height, 0,
-                                                             GL3PlusPixelUtil::getGLOriginFormat(mFormat), datatype, NULL));
+                                                             originFormat, datatype, NULL));
                         }
                         break;
                     default:
@@ -395,33 +397,24 @@ namespace Ogre {
     {
         mSurfaceList.clear();
 
+        size_t depth = mDepth;
         for (uint8 face = 0; face < getNumFaces(); face++)
         {
+            size_t width = mWidth;
+            size_t height = mHeight;
+
             for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {
-                GL3PlusHardwarePixelBuffer *buf = new GL3PlusTextureBuffer(mName,
-                                                                           getGL3PlusTextureTarget(),
-                                                                           mTextureID,
-                                                                           face,
-                                                                           mip,
-                                                                           static_cast<HardwareBuffer::Usage>(mUsage),
-                                                                           mHwGamma, mFSAA);
-
+                GL3PlusHardwarePixelBuffer* buf =
+                    new GL3PlusTextureBuffer(this, face, mip, width, height, depth);
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 
-                // Check for error
-                if (buf->getWidth() == 0 ||
-                    buf->getHeight() == 0 ||
-                    buf->getDepth() == 0)
-                {
-                    OGRE_EXCEPT(
-                        Exception::ERR_RENDERINGAPI_ERROR,
-                        "Zero sized texture surface on texture "+getName()+
-                        " face "+StringConverter::toString(face)+
-                        " mipmap "+StringConverter::toString(mip)+
-                        ". The GL driver probably refused to create the texture.",
-                        "GL3PlusTexture::_createSurfaceList");
-                }
+                if (width > 1)
+                    width = width / 2;
+                if (height > 1)
+                    height = height / 2;
+                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    depth = depth / 2;
             }
         }
     }
