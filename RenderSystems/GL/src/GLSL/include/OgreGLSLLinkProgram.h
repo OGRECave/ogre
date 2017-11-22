@@ -50,9 +50,6 @@ namespace Ogre {
         GLSLProgram* mFragmentProgram;
         GLUniformCache *mUniformCache;
 
-        /// Flag to indicate that uniform references have already been built
-        bool        mUniformRefsBuilt;
-
         /// Build uniform references from active named uniforms
         void buildGLUniformReferences(void);
         /// Extract attributes
@@ -76,7 +73,6 @@ namespace Ogre {
 
         */
         void activate(void);
-
         bool isAttributeValid(VertexElementSemantic semantic, uint index);
         
         /** Updates program object uniforms using data from GpuProgramParameters.
@@ -92,6 +88,9 @@ namespace Ogre {
         void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
         /// Get the GL Handle for the program object
         GLhandleARB getGLHandle(void) const { return mGLProgramHandle; }
+        GLSLProgram* getVertexProgram() const { return (GLSLProgram*)mVertexShader; }
+        GLSLProgram* getGeometryProgram() const { return mGeometryProgram; }
+        GLSLProgram* getFragmentProgram() const { return mFragmentProgram; }
     };
 
     }

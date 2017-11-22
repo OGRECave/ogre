@@ -396,5 +396,30 @@ namespace Ogre {
         } // end for
 
     }
+    //---------------------------------------------------------------------
+    void GLSLLinkProgramManager::removeShader(GLSLProgram* gpuProgram)
+    {
+        for (LinkProgramMap::iterator iLinkProgram = mLinkPrograms.begin();
+             iLinkProgram != mLinkPrograms.end();)
+        {
+            if (iLinkProgram->second->getVertexProgram() == gpuProgram ||
+                iLinkProgram->second->getFragmentProgram() == gpuProgram ||
+                iLinkProgram->second->getGeometryProgram() == gpuProgram)
+            {
+                if (mActiveLinkProgram == iLinkProgram->second)
+                {
+                    mActiveLinkProgram = NULL;
+                    // change back to fixed pipeline
+                    glUseProgramObjectARB(0);
+                }
+                delete iLinkProgram->second;
+                iLinkProgram = mLinkPrograms.erase(iLinkProgram);
+            }
+            else
+            {
+                ++iLinkProgram;
+            }
+        }
+    }
 }
 }
