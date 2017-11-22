@@ -50,9 +50,6 @@ namespace Ogre {
         GLSLProgram* mFragmentProgram;
         GLUniformCache *mUniformCache;
 
-        /// Flag to indicate that uniform references have already been built
-        bool        mUniformRefsBuilt;
-
         /// Build uniform references from active named uniforms
         void buildGLUniformReferences(void);
         /// Extract attributes
