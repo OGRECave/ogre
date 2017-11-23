@@ -35,9 +35,8 @@
 #include "OgreGL3PlusRenderSystem.h"
 
 #include "OgreRoot.h"
-#include "OgreGLSLMonolithicProgramManager.h"
+#include "OgreGLSLProgramManager.h"
 #include "OgreGLSLMonolithicProgram.h"
-#include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGLSLSeparableProgram.h"
 
 namespace Ogre {

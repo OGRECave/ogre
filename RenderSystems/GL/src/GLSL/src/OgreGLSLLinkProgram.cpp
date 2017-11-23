@@ -79,7 +79,6 @@ namespace Ogre {
         : GLSLProgramCommon(vertexProgram)
         , mGeometryProgram(geometryProgram)
         , mFragmentProgram(fragmentProgram)
-        , mUniformRefsBuilt(false)
     {
         // Initialise uniform cache
         mUniformCache = new GLUniformCache();

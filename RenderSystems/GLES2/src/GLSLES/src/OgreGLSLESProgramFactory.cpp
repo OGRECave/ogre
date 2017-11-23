@@ -27,48 +27,29 @@ THE SOFTWARE.
 */
 
 #include "OgreGLSLESProgramFactory.h"
-#include "OgreGLSLESLinkProgramManager.h"
-#include "OgreGLSLESProgramPipelineManager.h"
+#include "OgreGLSLESProgramManager.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
-    GLSLESLinkProgramManager* GLSLESProgramFactory::mLinkProgramManager = NULL;
-    GLSLESProgramPipelineManager* GLSLESProgramFactory::mProgramPipelineManager = NULL;
+    GLSLESProgramManager* GLSLESProgramFactory::mProgramManager = NULL;
     //-----------------------------------------------------------------------
     String GLSLESProgramFactory::sLanguageName = "glsles";
     //-----------------------------------------------------------------------
     GLSLESProgramFactory::GLSLESProgramFactory(void)
     {
-        if (mLinkProgramManager == NULL)
+        if (mProgramManager == NULL)
         {
-            mLinkProgramManager = new GLSLESLinkProgramManager();
-        }
-
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            if (mProgramPipelineManager == NULL)
-            {
-                mProgramPipelineManager = new GLSLESProgramPipelineManager();
-            }
+            mProgramManager = new GLSLESProgramManager();
         }
     }
     //-----------------------------------------------------------------------
     GLSLESProgramFactory::~GLSLESProgramFactory(void)
     {
-        if (mLinkProgramManager)
+        if (mProgramManager)
         {
-            delete mLinkProgramManager;
-            mLinkProgramManager = NULL;
-        }
-
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            if (mProgramPipelineManager)
-            {
-                delete mProgramPipelineManager;
-                mProgramPipelineManager = NULL;
-            }
+            delete mProgramManager;
+            mProgramManager = NULL;
         }
     }
     //-----------------------------------------------------------------------

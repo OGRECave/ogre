@@ -88,16 +88,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgramManager::~GLSLLinkProgramManager(void)
-    {
-        // iterate through map container and delete link programs
-        for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
-            currentProgram != mLinkPrograms.end(); ++currentProgram)
-        {
-            delete currentProgram->second;
-        }
-
-    }
+    GLSLLinkProgramManager::~GLSLLinkProgramManager(void) {}
 
     //-----------------------------------------------------------------------
     GLSLLinkProgram* GLSLLinkProgramManager::getActiveLinkProgram(void)
@@ -108,36 +99,36 @@ namespace Ogre {
 
         // no active link program so find one or make a new one
         // is there an active key?
-        uint64 activeKey = 0;
+        uint32 activeKey = 0;
 
         if (mActiveVertexGpuProgram)
         {
-            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getShaderID()) << 32;
+            activeKey = HashCombine(activeKey, mActiveVertexGpuProgram->getShaderID());
         }
         if (mActiveGeometryGpuProgram)
         {
-            activeKey += static_cast<uint64>(mActiveGeometryGpuProgram->getShaderID()) << 16;
+            activeKey = HashCombine(activeKey, mActiveGeometryGpuProgram->getShaderID());
         }
         if (mActiveFragmentGpuProgram)
         {
-            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getShaderID());
+            activeKey = HashCombine(activeKey, mActiveFragmentGpuProgram->getShaderID());
         }
 
         // only return a link program object if a vertex, geometry or fragment program exist
         if (activeKey > 0)
         {
             // find the key in the hash map
-            LinkProgramIterator programFound = mLinkPrograms.find(activeKey);
+            ProgramIterator programFound = mPrograms.find(activeKey);
             // program object not found for key so need to create it
-            if (programFound == mLinkPrograms.end())
+            if (programFound == mPrograms.end())
             {
                 mActiveLinkProgram = new GLSLLinkProgram(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,mActiveFragmentGpuProgram);
-                mLinkPrograms[activeKey] = mActiveLinkProgram;
+                mPrograms[activeKey] = mActiveLinkProgram;
             }
             else
             {
                 // found a link program in map container so make it active
-                mActiveLinkProgram = programFound->second;
+                mActiveLinkProgram = static_cast<GLSLLinkProgram*>(programFound->second);
             }
 
         }

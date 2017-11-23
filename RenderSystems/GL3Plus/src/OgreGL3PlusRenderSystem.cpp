@@ -52,9 +52,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLShaderFactory.h"
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
-#include "OgreGLSLSeparableProgramManager.h"
+#include "OgreGLSLProgramManager.h"
 #include "OgreGLSLSeparableProgram.h"
-#include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGLVertexArrayObject.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
@@ -1514,15 +1513,7 @@ namespace Ogre {
             numberOfInstances *= getGlobalNumberOfInstances();
         }
 
-        GLSLProgram* program;
-        if (mCurrentCapabilities->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            program = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-        }
-        else
-        {
-            program = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-        }
+        GLSLProgram* program = GLSLProgramManager::getSingleton().getActiveProgram();
 
         if (!program)
         {

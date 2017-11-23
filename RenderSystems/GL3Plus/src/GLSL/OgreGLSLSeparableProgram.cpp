@@ -29,7 +29,7 @@
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreStringConverter.h"
 #include "OgreGLSLShader.h"
-#include "OgreGLSLSeparableProgramManager.h"
+#include "OgreGLSLProgramManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLUtil.h"
 #include "OgreLogManager.h"
@@ -256,7 +256,7 @@ namespace Ogre
 
         if (mLinked)
         {
-            GLSLSeparableProgramManager::getSingleton().getStateCacheManager()->bindGLProgramPipeline(mGLProgramPipelineHandle);
+            GLSLProgramManager::getSingleton().getStateCacheManager()->bindGLProgramPipeline(mGLProgramPipelineHandle);
         }
     }
 
@@ -278,7 +278,7 @@ namespace Ogre
 
             const GpuConstantDefinitionMap* params[6] = {NULL};
             params[i] = &(shaders[i]->getConstantDefinitions().map);
-            GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(
+            GLSLProgramManager::getSingleton().extractUniformsFromProgram(
                 shaders[i]->getGLProgramHandle(), params, mGLUniformReferences,
                 mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap,
                 mGLCounterBufferReferences);

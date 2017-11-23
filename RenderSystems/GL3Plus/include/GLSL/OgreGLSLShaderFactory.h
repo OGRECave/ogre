@@ -34,8 +34,7 @@
 
 namespace Ogre
 {
-    class GLSLMonolithicProgramManager;
-    class GLSLSeparableProgramManager;
+    class GLSLProgramManager;
 
     /** Factory class for GLSL shaders.
      */
@@ -56,8 +55,7 @@ namespace Ogre
         void destroy(HighLevelGpuProgram* prog);
 
     private:
-        static GLSLMonolithicProgramManager* mMonolithicProgramManager;
-        static GLSLSeparableProgramManager* mSeparableProgramManager;
+        static GLSLProgramManager* mProgramManager;
     };
 }
 

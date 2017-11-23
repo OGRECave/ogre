@@ -84,6 +84,9 @@ public:
      */
     virtual void activate(void) = 0;
 
+    /// query if the program is using the given shader
+    virtual bool isUsingShader(GLSLShaderCommon* shader) const = 0;
+
     /** Updates program object uniforms using data from GpuProgramParameters.
         Normally called by GLSLShader::bindParameters() just before rendering occurs.
     */

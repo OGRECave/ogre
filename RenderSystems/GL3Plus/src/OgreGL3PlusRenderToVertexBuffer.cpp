@@ -33,9 +33,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreGLSLMonolithicProgramManager.h"
+#include "OgreGLSLProgramManager.h"
 #include "OgreGLSLShader.h"
-#include "OgreGLSLSeparableProgramManager.h"
 #include "OgreStringConverter.h"
 #include "OgreTechnique.h"
 
@@ -141,16 +140,7 @@ namespace Ogre {
             nameStrings.push_back(name);
         }
 
-        GLSLProgram* program;
-        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
-                RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            program = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-        }
-        else
-        {
-            program = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-        }
+        GLSLProgram* program = GLSLProgramManager::getSingleton().getActiveProgram();
 
         program->setTransformFeedbackVaryings(nameStrings);
     }
@@ -229,8 +219,7 @@ namespace Ogre {
         // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[mSourceBufferIndex]));
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLSeparableProgram* separableProgram =
-                GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+            GLSLProgram* separableProgram = GLSLProgramManager::getSingleton().getActiveProgram();
             separableProgram->activate();
         }
 

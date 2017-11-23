@@ -67,6 +67,11 @@ namespace Ogre {
 
         GLSLESProgram* getVertexProgram(void) const { return static_cast<GLSLESProgram*>(mVertexShader); }
         GLSLESProgram* getFragmentProgram(void) const { return mFragmentProgram; }
+
+        bool isUsingShader(GLSLShaderCommon* shader) const
+        {
+            return mVertexShader == shader || (GLSLShaderCommon*)mFragmentProgram == shader;
+        }
     };
 }
 

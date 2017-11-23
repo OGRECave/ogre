@@ -75,6 +75,18 @@ namespace Ogre {
         GLSLShader* getFragmentShader() const { return mFragmentShader; }
         GLSLShader* getComputeShader() const { return mComputeShader; }
 
+        bool isUsingShader(GLSLShaderCommon* shader) const
+        {
+            return mVertexShader == shader || (GLSLShaderCommon*)mGeometryShader == shader ||
+                   (GLSLShaderCommon*)mFragmentShader == shader ||
+                   (GLSLShaderCommon*)mHullShader == shader ||
+                   (GLSLShaderCommon*)mDomainShader == shader ||
+                   (GLSLShaderCommon*)mComputeShader == shader;
+        }
+
+        virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
+                                          GpuProgramType fromProgType) = 0;
+
         void setTransformFeedbackVaryings(const std::vector<String>& nameStrings);
     protected:
         /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager

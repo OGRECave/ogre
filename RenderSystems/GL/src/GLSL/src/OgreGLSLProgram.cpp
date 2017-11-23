@@ -126,6 +126,9 @@ namespace Ogre {
             glDeleteObjectARB(mGLHandle);           
             mCompiled = 0;
             mGLHandle = 0;
+
+            // destroy all programs using this shader
+            GLSLLinkProgramManager::getSingletonPtr()->destroyAllByShader(this);
         }
     }
 

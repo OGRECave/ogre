@@ -29,8 +29,39 @@
 #include "OgreGLSLProgramManagerCommon.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
+#include "OgreGLSLProgramCommon.h"
 
 namespace Ogre {
+
+    GLSLProgramManagerCommon::~GLSLProgramManagerCommon()
+    {
+        // iterate through map container and delete link programs
+        for (ProgramIterator currentProgram = mPrograms.begin();
+             currentProgram != mPrograms.end(); ++currentProgram)
+        {
+            delete currentProgram->second;
+        }
+    }
+
+    void GLSLProgramManagerCommon::destroyAllByShader(GLSLShaderCommon* shader)
+    {
+        std::vector<uint32> keysToErase;
+        for (ProgramIterator currentProgram = mPrograms.begin();
+            currentProgram != mPrograms.end(); ++currentProgram)
+        {
+            GLSLProgramCommon* prgm = currentProgram->second;
+            if(prgm->isUsingShader(shader))
+            {
+                OGRE_DELETE prgm;
+                keysToErase.push_back(currentProgram->first);
+            }
+        }
+
+        for(size_t i = 0; i < keysToErase.size(); ++i)
+        {
+            mPrograms.erase(mPrograms.find(keysToErase[i]));
+        }
+    }
 
     void GLSLProgramManagerCommon::parseGLSLUniform(
         String line, GpuNamedConstants& defs,

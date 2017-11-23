@@ -36,7 +36,21 @@
 
 namespace Ogre {
 
-    class _OgreGL3PlusExport GLSLProgramManager : public GLSLProgramManagerCommon
+    /** Ogre assumes that there are separate vertex and fragment
+        programs to deal with but GLSL has one program object that
+        represents the active vertex and fragment shader objects
+        during a rendering state.  GLSL Vertex and fragment shader
+        objects are compiled separately and then attached to a program
+        object and then the program object is linked.  Since Ogre can
+        only handle one vertex program and one fragment program being
+        active in a pass, the GLSL Link Program Manager does the same.
+        The GLSL Link program manager acts as a state machine and
+        activates a program object based on the active vertex and
+        fragment program.  Previously created program objects are
+        stored along with a unique key in a hash_map for quick
+        retrieval the next time the program object is required.
+    */
+    class _OgreGL3PlusExport GLSLProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLProgramManager>
     {
     protected:
         /// Active shader objects defining the active program object.
@@ -46,6 +60,9 @@ namespace Ogre {
         GLSLShader* mActiveGeometryShader;
         GLSLShader* mActiveFragmentShader;
         GLSLShader* mActiveComputeShader;
+
+        /// active objects defining the active rendering gpu state
+        GLSLProgram* mActiveProgram;
 
         GL3PlusRenderSystem* mRenderSystem;
 
@@ -70,6 +87,31 @@ namespace Ogre {
     public:
 
         GLSLProgramManager(GL3PlusRenderSystem* renderSystem);
+        ~GLSLProgramManager();
+
+        /** Get the program object that links the two active shader
+            objects together if a program object was not already
+            created and linked a new one is created and linked
+            @note this method does NOT link seperable programs.
+        */
+        GLSLProgram* getActiveProgram(void);
+
+        /** Set the shader for the next rendering state.
+            The active program object will be cleared.  Normally
+            called from the GLSLShader::bindProgram and
+            unbindProgram methods
+        */
+        void setActiveVertexShader(GLSLShader* vertexGpuProgram);
+        /// @copydoc setActiveVertexShader
+        void setActiveHullShader(GLSLShader* hullGpuProgram);
+        /// @copydoc setActiveVertexShader
+        void setActiveDomainShader(GLSLShader* domainGpuProgram);
+        /// @copydoc setActiveVertexShader
+        void setActiveGeometryShader(GLSLShader* geometryGpuProgram);
+        /// @copydoc setActiveVertexShader
+        void setActiveFragmentShader(GLSLShader* fragmentGpuProgram);
+        /// @copydoc setActiveVertexShader
+        void setActiveComputeShader(GLSLShader* computeGpuProgram);
 
         /** Populate a list of uniforms based on an OpenGL program object.
         */
@@ -84,6 +126,9 @@ namespace Ogre {
             GLCounterBufferList& counterBufferList);
 
         GL3PlusStateCacheManager* getStateCacheManager();
+
+        static GLSLProgramManager& getSingleton(void);
+        static GLSLProgramManager* getSingletonPtr(void);
     };
 
 }

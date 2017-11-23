@@ -657,7 +657,7 @@ namespace Ogre
             "// Simple PCF \n"
             "// Number of samples in one dimension (square for total samples) \n"
             "#define NUM_SHADOW_SAMPLES_1D 2.0 \n"
-            "#define SHADOW_FILTER_SCALE 1 \n"
+            "#define SHADOW_FILTER_SCALE 1.0 \n"
 
             "#define SHADOW_SAMPLES NUM_SHADOW_SAMPLES_1D*NUM_SHADOW_SAMPLES_1D \n"
 
@@ -674,7 +674,7 @@ namespace Ogre
                 "    // 4-sample PCF \n"
 
                 "    float shadow = 0.0; \n"
-                "    float offset = (NUM_SHADOW_SAMPLES_1D/2 - 0.5) * SHADOW_FILTER_SCALE; \n"
+                "    float offset = (NUM_SHADOW_SAMPLES_1D/2.0 - 0.5) * SHADOW_FILTER_SCALE; \n"
                 "    for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE) \n"
                 "        for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE) \n"
                 "        { \n"
@@ -684,7 +684,7 @@ namespace Ogre
                 "            newUV = newUV / newUV.w; \n"
                 "            float depth = texture2DProj(shadowMap, newUV.xyz).x; \n"
 //                "            float depth = textureProjGrad(shadowMap, newUV.xyz, vec2(1), vec2(1)).x; \n"
-                "            if (depth >= 1 || depth >= uv.z)\n"
+                "            if (depth >= 1.0 || depth >= uv.z)\n"
                 "                shadow += 1.0;\n"
                 "        } \n"
 
