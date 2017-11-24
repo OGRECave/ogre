@@ -206,11 +206,6 @@ namespace Ogre {
         op = mRenderOp;
     }
     //---------------------------------------------------------------------
-    void PanelOverlayElement::setMaterialName(const String& matName)
-    {
-        OverlayContainer::setMaterialName(matName);
-    }
-    //---------------------------------------------------------------------
     void PanelOverlayElement::_updateRenderQueue(RenderQueue* queue)
     {
         if (mVisible)

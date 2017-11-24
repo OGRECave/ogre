@@ -318,19 +318,30 @@ namespace Ogre {
         return mMaterial ? mMaterial->getName() : BLANKSTRING;
     }
     //---------------------------------------------------------------------
+    void OverlayElement::setMaterial(const MaterialPtr& mat)
+    {
+        mMaterial = mat;
+
+        if(!mMaterial)
+            return;
+
+        mMaterial->load();
+        // Set some prerequisites to be sure
+        mMaterial->setLightingEnabled(false);
+        mMaterial->setDepthCheckEnabled(false);
+    }
+
     void OverlayElement::setMaterialName(const String& matName)
     {
-        if (matName != BLANKSTRING)
+        if (!matName.empty())
         {
             mMaterial = MaterialManager::getSingleton().getByName(
                 matName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
             if (!mMaterial)
                 OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + matName,
                     "OverlayElement::setMaterialName" );
-            mMaterial->load();
-            // Set some prerequisites to be sure
-            mMaterial->setLightingEnabled(false);
-            mMaterial->setDepthCheckEnabled(false);
+
+            setMaterial(mMaterial);
         }
         else
         {
