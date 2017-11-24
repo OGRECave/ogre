@@ -351,14 +351,9 @@ namespace Ogre
             {
                 mShaderGen = OGRE_NEW ShaderHelperHLSL();
             }
-            else if (hmgr.isLanguageSupported("glsl") &&
-                     Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() >= 150)
+            else if (hmgr.isLanguageSupported("glsl") || hmgr.isLanguageSupported("glsles"))
             {
                 mShaderGen = OGRE_NEW ShaderHelperGLSL();
-            }
-            else if (hmgr.isLanguageSupported("glsles"))
-            {
-                mShaderGen = OGRE_NEW ShaderHelperGLSLES();
             }
             else if (hmgr.isLanguageSupported("cg"))
             {
