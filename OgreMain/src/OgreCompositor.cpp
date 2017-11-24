@@ -189,7 +189,7 @@ CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName
     // didn't find a matching one
     for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
     {
-        if ((*i)->getSchemeName() == BLANKSTRING)
+        if ((*i)->getSchemeName().empty())
         {
             return *i;
         }

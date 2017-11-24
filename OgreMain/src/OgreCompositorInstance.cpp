@@ -341,7 +341,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
             }
 
             RSSetSchemeOperation* setSchemeOperation = 0;
-            if (pass->getMaterialScheme() != BLANKSTRING)
+            if (!pass->getMaterialScheme().empty())
             {
                 //Add the triggers that will set the scheme and restore it each frame
                 finalState.currentQueueGroupID = pass->getFirstRenderQueue();

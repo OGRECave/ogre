@@ -89,7 +89,7 @@ TestContext::TestContext(int argc, char** argv) : OgreBites::SampleContext(), mS
     mSummaryOutputDir = binOpt["-o"];
     mHelp = unOpt["-h"] || unOpt["--help"];
 
-    if(mReferenceSetPath == BLANKSTRING)
+    if(mReferenceSetPath.empty())
         mReferenceSetPath = mOutputDir;
 }
 //-----------------------------------------------------------------------
@@ -200,7 +200,7 @@ void TestContext::setup()
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
     Ogre::String timestamp = Ogre::String(temp);
 
-    if(mOutputDir == BLANKSTRING)
+    if(mOutputDir.empty())
     {
         Ogre::String filestamp = Ogre::String(temp);
         // name for this batch (used for naming the directory, and uniquely identifying this batch)
@@ -537,7 +537,7 @@ bool TestContext::oneTimeConfig()
 void TestContext::setupDirectories(Ogre::String batchName)
 {
     // ensure there's a root directory for visual tests
-    if(mOutputDir == BLANKSTRING)
+    if(mOutputDir.empty())
     {
         mOutputDir = mFSLayer->getWritablePath("VisualTests/");
         static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);

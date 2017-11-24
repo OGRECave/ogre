@@ -403,7 +403,7 @@ namespace Volume {
             stream << "materialOfLevel" << i;
 
             String materialOfLevel = config.getSetting(stream.str());
-            if (materialOfLevel != BLANKSTRING)
+            if (!materialOfLevel.empty())
             {
                 mat = MaterialManager::getSingleton().getByName(config.getSetting(stream.str()));
                 setMaterialOfLevel(i, mat);
