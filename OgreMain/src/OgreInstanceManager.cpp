@@ -174,7 +174,8 @@ namespace Ogre
     {
         InstanceBatch *instanceBatch;
 
-        if( mInstanceBatches.empty() )
+        if( mInstanceBatches.empty() ||
+            (mInstanceBatches[materialName].size () == 0))
             instanceBatch = buildNewBatch( materialName, true );
         else
             instanceBatch = getFreeBatch( materialName );
