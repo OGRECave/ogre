@@ -529,6 +529,10 @@ protected:
 
         updateGUI(mCurrentShadowTechnique);
         mTrayMgr->showCursor();
+
+        // Uncomment this to display the shadow textures
+        // addTextureDebugOverlay(TL_RIGHT, mSceneMgr->getShadowTexture(0), 0);
+        // addTextureDebugOverlay(TL_RIGHT, mSceneMgr->getShadowTexture(1), 1);
     }
 
     void updateGUI(ShadowTechnique newTech)
@@ -680,19 +684,6 @@ protected:
         }
     }
 
-    void rebindDebugShadowOverlays()
-    {
-        /*MaterialPtr debugMat = 
-            MaterialManager::getSingleton().getByName("Ogre/DebugShadowMap0");
-        TexturePtr shadowTex = mSceneMgr->getShadowTexture(0);
-        debugMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(shadowTex->getName());
-
-        debugMat = 
-            MaterialManager::getSingleton().getByName("Ogre/DebugShadowMap1");
-        shadowTex = mSceneMgr->getShadowTexture(1);
-        debugMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(shadowTex->getName());*/
-    }
-
     void resetMaterials()
     {
         // Sort out base materials
@@ -828,7 +819,6 @@ protected:
                 mTrayMgr->removeWidgetFromTray(mClampSlider);       
             }
             //updateTipForCombo(cbo);
-            //rebindDebugShadowOverlays();
         }
     }
 };
