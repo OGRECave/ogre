@@ -590,7 +590,7 @@ namespace Ogre
 
         mapSize = alignToNextMultiple( mapSize, 16 );
 
-        if( shadowNode )
+        if( numShadowMapLights > 0 )
         {
             //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
             mapSize += ( 6 * 4 * 4 ) * numLights;
