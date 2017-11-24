@@ -193,8 +193,12 @@ namespace Ogre
         if( casterBox.isNull() )
         {
             texCam->setProjectionType( PT_ORTHOGRAPHIC );
-            //Anything will do, there are no casters
-            texCam->setPosition( Vector3::ZERO );
+            //Anything will do, there are no casters. But we must ensure depth of the receiver
+            //doesn't become negative else a shadow square will appear (i.e. "the sun is below the floor")
+            const Real farDistance = Ogre::min( cam->getFarClipDistance(),
+                                                light->getShadowFarDistance() );
+            texCam->setPosition( cam->getDerivedPosition() -
+                                 light->getDerivedDirection() * farDistance );
             texCam->setOrthoWindow( 1, 1 );
             texCam->setNearClipDistance( 1.0f );
             texCam->setFarClipDistance( 1.1f );
@@ -279,6 +283,9 @@ namespace Ogre
             //Rollback to something valid
             vMin = vMinCamFrustumLS;
             vMax = vMaxCamFrustumLS;
+
+            //Add some padding to prevent negative depth (i.e. "the sun is below the floor")
+            vMax.z += 5.0f; // Backwards is towards +Z!
         }
 
         vMin.z = Ogre::min( vMin.z, vMinCamFrustumLS.z );
