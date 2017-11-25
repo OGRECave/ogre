@@ -249,6 +249,9 @@ compositor_node HdrRenderUi
 			rq_last		255
 		}
 	}
+
+	//This output is not always used.
+	out 0 rt_output
 }
 
 workspace HdrWorkspace
