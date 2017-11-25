@@ -281,7 +281,7 @@ namespace Ogre {
         /** Gets the name of the material this element uses. */
         virtual const String& getMaterialName(void) const;
 
-        /** Sets the name of the material this element will use. 
+        /** Sets the the material this element will use.
         @remarks
         Different elements will use different materials. One constant about them
         all though is that a Material used for a OverlayElement must have it's depth
@@ -291,7 +291,11 @@ namespace Ogre {
         scene objects. It's fine to use the same textures, just not the same
         Material.
         */
-        virtual void setMaterialName(const String& matName);
+
+        void setMaterial(const MaterialPtr& mat);
+
+        /// @overload
+        void setMaterialName(const String& matName);
 
 
         // --- Renderable Overrides ---

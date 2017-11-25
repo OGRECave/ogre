@@ -578,7 +578,7 @@ namespace Ogre {
             // The particle is a visual particle if the emit_emitter property of the emitter isn't set 
             Particle* p = 0;
             String  emitterName = emitter->getEmittedEmitter();
-            if (emitterName == BLANKSTRING)
+            if (emitterName.empty())
                 p = createParticle();
             else
                 p = createEmitterParticle(emitterName);
@@ -1306,7 +1306,7 @@ namespace Ogre {
         {
             // Determine the names of all emitters that are emitted
             ParticleEmitter* emitter = *emitterIterator ;
-            if (emitter && emitter->getEmittedEmitter() != BLANKSTRING)
+            if (emitter && !emitter->getEmittedEmitter().empty())
             {
                 // This one will be emitted, register its name and leave the vector empty!
                 EmittedEmitterList empty;
@@ -1319,7 +1319,7 @@ namespace Ogre {
                 emitterInner = *emitterIteratorInner;
                 if (emitter && 
                     emitterInner && 
-                    emitter->getName() != BLANKSTRING && 
+                    !emitter->getName().empty() &&
                     emitter->getName() == emitterInner->getEmittedEmitter())
                 {
                     emitter->setEmitted(true);

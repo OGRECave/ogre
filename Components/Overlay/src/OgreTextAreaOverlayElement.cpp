@@ -470,11 +470,6 @@ namespace Ogre {
         op = mRenderOp;
     }
     //---------------------------------------------------------------------
-    void TextAreaOverlayElement::setMaterialName(const String& matName)
-    {
-        OverlayElement::setMaterialName(matName);
-    }
-    //---------------------------------------------------------------------
     void TextAreaOverlayElement::addBaseParameters(void)
     {
         OverlayElement::addBaseParameters();

@@ -85,8 +85,6 @@ namespace Ogre
         const MaterialPtr& getMaterial(void) const;
         /** See Renderable. */
         void getRenderOperation(RenderOperation& op);
-        /** Overridden from OverlayElement */
-        void setMaterialName(const String& matName);
 
         /** Sets the colour of the text. 
         @remarks

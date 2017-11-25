@@ -731,7 +731,7 @@ namespace Ogre {
         if (mUseBaseKeyFrame)
         {
             Animation* baseAnim = this;
-            if (mBaseKeyFrameAnimationName != BLANKSTRING && mContainer)
+            if (!mBaseKeyFrameAnimationName.empty() && mContainer)
                 baseAnim = mContainer->getAnimation(mBaseKeyFrameAnimationName);
             
             if (baseAnim)

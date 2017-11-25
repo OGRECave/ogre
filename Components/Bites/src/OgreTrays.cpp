@@ -1247,13 +1247,13 @@ void TrayManager::hideAll()
 
 void TrayManager::showBackdrop(const Ogre::String &materialName)
 {
-    if (materialName != Ogre::BLANKSTRING) mBackdrop->setMaterialName(materialName);
+    if (!materialName.empty()) mBackdrop->setMaterialName(materialName);
     mBackdropLayer->show();
 }
 
 void TrayManager::showCursor(const Ogre::String &materialName)
 {
-    if (materialName != Ogre::BLANKSTRING) getCursorImage()->setMaterialName(materialName);
+    if (!materialName.empty()) getCursorImage()->setMaterialName(materialName);
 
     if (!mCursorLayer->isVisible())
     {

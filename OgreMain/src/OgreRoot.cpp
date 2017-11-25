@@ -668,7 +668,7 @@ namespace Ogre {
         // .rendercaps manager
         RenderSystemCapabilitiesManager& rscManager = RenderSystemCapabilitiesManager::getSingleton();
         // caller wants to load custom RenderSystemCapabilities form a config file
-        if(customCapabilitiesConfig != BLANKSTRING)
+        if(!customCapabilitiesConfig.empty())
         {
             ConfigFile cfg;
             cfg.load(customCapabilitiesConfig, "\t:=", false);

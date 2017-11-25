@@ -786,7 +786,7 @@ namespace Ogre {
             {
                 FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
                 FunctionInvocation invoc = FunctionInvocation("", 0, 0);
-                String body = BLANKSTRING;
+                String body;
 
                 // Find the function in the cache
                 for (; itCache != mFunctionCacheMap.end(); ++itCache)
