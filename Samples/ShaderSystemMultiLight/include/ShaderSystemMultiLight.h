@@ -122,7 +122,8 @@ protected:
         mTrayMgr->createCheckBox(TL_BOTTOM, DEBUG_MODE_CHECKBOX, "Show Grid", 240)->setChecked(false, false);
 
         // Set our camera to orbit around the origin at a suitable distance
-        mCameraNode->setPosition(0, 100, 600);
+        mCameraMan->setStyle(CS_ORBIT);
+        mCameraMan->setYawPitchDist(Degree(0), Degree(25), 600);
 
         mTrayMgr->showCursor();
 
@@ -323,42 +324,6 @@ protected:
             mTwirlLights = box->isChecked();
         }
     }
-
-    bool mousePressed(const MouseButtonEvent& evt)
-    {
-        if (mTrayMgr->mousePressed(evt)) 
-            return true;
-        if (evt.button == BUTTON_LEFT)
-            // Hide the cursor if user left-clicks in the scene            .
-            mTrayMgr->hideCursor();  
-    
-        return true;
-    }
-
-
-    bool mouseReleased(const MouseButtonEvent& evt)
-    {
-        if (mTrayMgr->mouseReleased(evt)) 
-            return true;
-        if (evt.button == BUTTON_LEFT)
-            // Unhide the cursor if user lets go of LMB.
-            mTrayMgr->showCursor();  
-
-        return true;
-    }
-
-
-    bool mouseMoved(const MouseMotionEvent& evt)
-    {
-        // only rotate the camera if cursor is hidden
-        if (mTrayMgr->isCursorVisible()) 
-            mTrayMgr->mouseMoved(evt);
-        else 
-            mCameraMan->mouseMoved(evt);
-
-        return true;
-    }
-
 private:
 
     struct LightState

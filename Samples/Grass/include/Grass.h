@@ -164,8 +164,8 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
 
      setupLighting();
 
-     // set initial camera position and speed
-     mCameraNode->setPosition(0, 50, 100);
+     mCameraMan->setStyle(CS_ORBIT);
+     mCameraMan->setYawPitchDist(Degree(0), Degree(25), 200);
  }
 
  void createGrassMesh()

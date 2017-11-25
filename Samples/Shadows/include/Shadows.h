@@ -374,9 +374,6 @@ protected:
         //mSceneMgr->setShowDebugShadows(true);
 
         setupGUI();
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        setDragLook(true);
-#endif
     }
 
     virtual void setupView()
@@ -386,8 +383,8 @@ protected:
         // incase infinite far distance is not supported
         mCamera->setFarClipDistance(100000);
 
-        mCameraNode->setPosition(250, 20, 400);
-        mCameraNode->lookAt(Vector3(0, 10, 0), Node::TS_WORLD);
+        mCameraMan->setStyle(CS_ORBIT);
+        mCameraMan->setYawPitchDist(Degree(0), Degree(45), 400);
     }
     
     virtual void cleanupContent()

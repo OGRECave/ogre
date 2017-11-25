@@ -123,7 +123,7 @@ void Sample_VolumeTex::setupContent()
     // show GUI
     createControls();
 
-    setDragLook(true);
+    mCameraMan->setStyle(CS_ORBIT);
 
     generate();
 }
