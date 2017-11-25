@@ -148,7 +148,7 @@ namespace OgreBites
         CameraStyle mStyle;
         Ogre::SceneNode* mTarget;
         bool mOrbiting;
-        bool mZooming;
+        bool mMoving;
         Ogre::Real mTopSpeed;
         Ogre::Vector3 mVelocity;
         bool mGoingForward;
@@ -158,6 +158,7 @@ namespace OgreBites
         bool mGoingUp;
         bool mGoingDown;
         bool mFastMove;
+        Ogre::Vector3 mOffset;
     };
 }
 /** @} */
