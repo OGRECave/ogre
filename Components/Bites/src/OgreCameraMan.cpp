@@ -31,22 +31,14 @@ void CameraMan::setCamera(Ogre::SceneNode *cam)
 
 void CameraMan::setTarget(Ogre::SceneNode *target)
 {
-    if (target != mTarget)
+    if (target == mTarget)
+        return;
+
+    mTarget = target;
+    if(target)
     {
-        mTarget = target;
-        if(target)
-        {
-            setYawPitchDist(Ogre::Degree(0), Ogre::Degree(15), 150);
-            mCamera->setAutoTracking(true, mTarget);
-        }
-        else
-        {
-            mCamera->setAutoTracking(false);
-        }
-
+        setYawPitchDist(Ogre::Degree(0), Ogre::Degree(15), 150);
     }
-
-
 }
 
 void CameraMan::setYawPitchDist(Ogre::Radian yaw, Ogre::Radian pitch, Ogre::Real dist)
@@ -69,16 +61,14 @@ void CameraMan::setStyle(CameraStyle style)
     }
     else if (mStyle != CS_FREELOOK && style == CS_FREELOOK)
     {
-        mCamera->setAutoTracking(false);
         mCamera->setFixedYawAxis(true); // also fix axis with lookAt calls
     }
     else if (mStyle != CS_MANUAL && style == CS_MANUAL)
     {
-        mCamera->setAutoTracking(false);
         manualStop();
     }
     mStyle = style;
-
+    mCamera->setAutoTracking(false);
 }
 
 void CameraMan::manualStop()
