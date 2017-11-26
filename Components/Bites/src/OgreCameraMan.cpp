@@ -44,6 +44,8 @@ void CameraMan::setTarget(Ogre::SceneNode *target)
 
 void CameraMan::setYawPitchDist(Ogre::Radian yaw, Ogre::Radian pitch, Ogre::Real dist)
 {
+    OgreAssert(mTarget, "no target set");
+
     mOffset = Ogre::Vector3::ZERO;
     mCamera->setPosition(mTarget->_getDerivedPosition());
     mCamera->setOrientation(mTarget->_getDerivedOrientation());
