@@ -159,8 +159,7 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
     }
     mMeshEntity = mSceneMgr->createEntity(name, mLodConfig.mesh);
     mMeshNode->attachObject(mMeshEntity);
-    mCameraNode->setPosition(Vector3(0, 0, 0));
-    mCameraNode->translate(Vector3(0, 0, mLodConfig.mesh->getBoundingSphereRadius() * 2), Node::TS_LOCAL);
+    mCameraMan->setYawPitchDist(Radian(0), Radian(0), mLodConfig.mesh->getBoundingSphereRadius() * 2);
     mCamera->setNearClipDistance(mLodConfig.mesh->getBoundingSphereRadius() / 16);
     mCamera->setFarClipDistance(mLodConfig.mesh->getBoundingSphereRadius() * 256);
 
