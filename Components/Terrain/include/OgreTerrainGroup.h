@@ -513,6 +513,7 @@ namespace Ogre
         void autoUpdateLodAll(bool synchronous, const Any &data);
 
     protected:
+        typedef std::map<Terrain*, bool> TerrainLoadRequestMap;
         SceneManager *mSceneManager;
         Terrain::Alignment mAlignment;
         uint16 mTerrainSize;
@@ -520,6 +521,7 @@ namespace Ogre
         Terrain::ImportData mDefaultImportData;
         Vector3 mOrigin;
         TerrainSlotMap mTerrainSlots;
+        TerrainLoadRequestMap mTerrainLoadRequests;
         uint16 mWorkQueueChannel;
         String mFilenamePrefix;
         String mFilenameExtension;
@@ -532,6 +534,7 @@ namespace Ogre
         /// Retrieve a slot, potentially allocate one
         TerrainSlot* getTerrainSlot(long x, long y, bool createIfMissing);
         TerrainSlot* getTerrainSlot(long x, long y) const;
+        void freeTerrainSlotInstance(TerrainSlot* slot);
         void connectNeighbour(TerrainSlot* slot, long offsetx, long offsety);
 
         void loadTerrainImpl(TerrainSlot* slot, bool synchronous);

@@ -185,7 +185,7 @@ namespace Ogre
     {
         TerrainSlot* slot = getTerrainSlot(x, y, true);
 
-        slot->freeInstance();
+        freeTerrainSlotInstance(slot);
         slot->def.useImportData();
 
         *slot->def.importData = mDefaultImportData;
@@ -209,7 +209,7 @@ namespace Ogre
     {
         TerrainSlot* slot = getTerrainSlot(x, y, true);
 
-        slot->freeInstance();
+        freeTerrainSlotInstance(slot);
         slot->def.useImportData();
 
         *slot->def.importData = mDefaultImportData;
@@ -236,7 +236,7 @@ namespace Ogre
     {
         TerrainSlot* slot = getTerrainSlot(x, y, true);
 
-        slot->freeInstance();
+        freeTerrainSlotInstance(slot);
 
         slot->def.useFilename();
         slot->def.filename = filename;
@@ -310,8 +310,9 @@ namespace Ogre
             req.slot = slot;
             req.origin = this;
             ++LoadRequest::loadingTaskNum;
+            mTerrainLoadRequests.insert(TerrainLoadRequestMap::value_type(slot->instance, false));
             Root::getSingleton().getWorkQueue()->addRequest(
-                mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST, 
+                mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST,
                 Any(req), 0, synchronous);
 
         }
@@ -367,13 +368,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void TerrainGroup::unloadTerrain(long x, long y)
     {
-        TerrainSlot* slot = getTerrainSlot(x, y, false);
-        if (slot)
-        {
-            slot->freeInstance();
-        }
-
-
+        freeTerrainSlotInstance(getTerrainSlot(x, y, false));
     }
     //---------------------------------------------------------------------
     void TerrainGroup::removeTerrain(long x, long y)
@@ -702,6 +697,23 @@ namespace Ogre
         LoadRequest lreq = any_cast<LoadRequest>(res->getRequest()->getData());
         --LoadRequest::loadingTaskNum;
 
+        TerrainLoadRequestMap::iterator it = mTerrainLoadRequests.find(lreq.slot->instance);
+
+        assert(it != mTerrainLoadRequests.end());
+
+        if (it != mTerrainLoadRequests.end())
+        {
+            bool isRemoved = it->second;
+            mTerrainLoadRequests.erase(it);
+
+            // Instance was scheduled for removal while it was processed in another thread.
+            if (isRemoved)
+            {
+                freeTerrainSlotInstance(lreq.slot);
+                return;
+            }
+        }
+
         if (res->succeeded())
         {
             TerrainSlot* slot = lreq.slot;
@@ -736,7 +748,7 @@ namespace Ogre
             LogManager::getSingleton().stream(LML_CRITICAL) <<
                 "We failed to prepare the terrain at (" << lreq.slot->x << ", " <<
                 lreq.slot->y <<") with the error '" << res->getMessages() << "'";
-            lreq.slot->freeInstance();
+            freeTerrainSlotInstance(lreq.slot);
         }
 
     }
@@ -823,6 +835,26 @@ namespace Ogre
         else
             return 0;
 
+    }
+    //---------------------------------------------------------------------
+    void TerrainGroup::freeTerrainSlotInstance(TerrainSlot* slot)
+    {
+        if (!slot)
+            return;
+
+        TerrainLoadRequestMap::iterator it = mTerrainLoadRequests.find(slot->instance);
+
+        // Terrain was in load request so we need to schedule the deletion see handleResponse().
+        if (it != mTerrainLoadRequests.end())
+        {
+            // We would like to abort the request here but WorkQueue does not provide proper tools for this
+            // (the data we need will be destroyed if we call abortRequest()).
+            it->second = true;
+        }
+        else
+        {
+            slot->freeInstance();
+        }
     }
     //---------------------------------------------------------------------
     void TerrainGroup::freeTemporaryResources()
