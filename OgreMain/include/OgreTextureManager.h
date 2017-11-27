@@ -313,7 +313,8 @@ namespace Ogre {
             
         /** Create a manual texture with a depth of 1 (not loaded from a file).
             @param
-                name The name to give the resulting texture
+                name The name to give the resulting texture. If name already exists, it'll return the
+                existing texture.
             @param
                 group The name of the resource group to assign the texture to
             @param
