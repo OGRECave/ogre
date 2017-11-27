@@ -296,7 +296,9 @@ namespace Ogre
         if( mVolumeData )
         {
             OGRE_FREE( mVolumeData, MEMCATEGORY_GENERAL );
-            OGRE_FREE(mBlurredVolumeData, MEMCATEGORY_GENERAL);
+            OGRE_FREE( mBlurredVolumeData, MEMCATEGORY_GENERAL );
+            mVolumeData = 0;
+            mBlurredVolumeData = 0;
         }
     }
 
