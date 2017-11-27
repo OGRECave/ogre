@@ -152,6 +152,7 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore Ogre::SharedPtr::unspecified_bool; // c++11 compatibility
 %include "OgreSharedPtr.h"
 %ignore Ogre::Any::getType; // deprecated
+%ignore Ogre::Any::destroy; // deprecated
 %include "OgreAny.h"
 %include "OgreIteratorWrapper.h"
 %include "OgreMath.h"

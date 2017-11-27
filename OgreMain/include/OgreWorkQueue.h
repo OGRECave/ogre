@@ -143,7 +143,7 @@ namespace Ogre
             /// Return the response data (user defined, only valid on success)
             const Any& getData() const { return mData; }
             /// Abort the request
-            void abortRequest() { mRequest->abortRequest(); mData.destroy(); }
+            void abortRequest() { mRequest->abortRequest(); mData.reset(); }
         };
 
         /** Interface definition for a handler of requests. 

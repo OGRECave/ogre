@@ -135,7 +135,7 @@ namespace Ogre
         }
 
         /// @deprecated use reset() instead
-        void destroy() { reset(); }
+        OGRE_DEPRECATED void destroy() { reset(); }
 
     protected: // types
 
