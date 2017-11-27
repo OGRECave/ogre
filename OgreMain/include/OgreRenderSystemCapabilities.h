@@ -402,10 +402,9 @@ namespace Ogre
         ushort mNumVertexAttributes;
     public: 
         RenderSystemCapabilities ();
-        virtual ~RenderSystemCapabilities () {}
 
         /// @deprecated
-        OGRE_DEPRECATED virtual size_t calculateSize() const {return 0;}
+        OGRE_DEPRECATED size_t calculateSize() const {return 0;}
 
         /** Set the driver version. */
         void setDriverVersion(const DriverVersion& version)
