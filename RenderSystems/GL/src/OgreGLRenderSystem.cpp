@@ -2732,18 +2732,6 @@ namespace Ogre {
         RenderSystem::_render(op);
 
         mMaxBuiltInTextureAttribIndex = 0;
-        if ( ! mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
-             && 
-             (
-                 ( mCurrentVertexProgram == NULL ) ||
-                 ( mCurrentFragmentProgram == NULL && op.operationType != RenderOperation::OT_POINT_LIST) 		  
-             )
-        ) 
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Attempted to render using the fixed pipeline when it is disabled.",
-                        "GLRenderSystem::_render");
-        }
 
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
