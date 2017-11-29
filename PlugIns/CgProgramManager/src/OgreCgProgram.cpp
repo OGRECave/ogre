@@ -729,11 +729,15 @@ namespace Ogre {
 		// Cg logs its renamings in the comments at the beginning of the
 		// processed source file. We can get them from there.
 		// We'll also get rid of those comments to trim down source code size.
+#if OGRE_DEBUG_MODE
 		LogManager::getSingleton().stream() << "Cg high level output for " << getName() << ":\n" << hlSource;
+#endif
 		hlSource = HighLevelOutputFixer(hlSource, mParametersMap, mSamplerRegisterMap, 
 			mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || 
 			mSelectedCgProfile == CG_PROFILE_GLSLG).output;
+#if OGRE_DEBUG_MODE
 		LogManager::getSingleton().stream() << "Cleaned high level output for " << getName() << ":\n" << hlSource;
+#endif
 	}
 
 
