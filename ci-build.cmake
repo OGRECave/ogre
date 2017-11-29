@@ -55,7 +55,7 @@ endif()
 if(DEFINED ENV{ANDROID})
     set(CROSS
         -DANDROID_NATIVE_API_LEVEL=16
-        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r15b
+        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r15c
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/CMake/toolchain/android.toolchain.cmake
         "-DANDROID_ABI=armeabi-v7a with NEON")
 
@@ -71,13 +71,13 @@ if(DEFINED ENV{ANDROID})
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
     set(BUILD_DEPS TRUE)
     
-    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r15b)
+    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r15c)
         message(STATUS "Downloading Android NDK")
         file(DOWNLOAD
-            http://dl.google.com/android/repository/android-ndk-r15b-linux-x86_64.zip
-            ./android-ndk-r15b-linux-x86_64.zip)
+            http://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip
+            ./android-ndk-r15c-linux-x86_64.zip)
         message(STATUS "Extracting Android NDK")
-        execute_process(COMMAND unzip android-ndk-r15b-linux-x86_64.zip OUTPUT_QUIET)
+        execute_process(COMMAND unzip android-ndk-r15c-linux-x86_64.zip OUTPUT_QUIET)
     endif()
 endif()
 
