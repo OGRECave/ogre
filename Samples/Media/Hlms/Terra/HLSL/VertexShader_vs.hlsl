@@ -45,11 +45,6 @@ Texture2D<float> heightMap: register(t0);
 	outVs.gl_Position.xy	/= outVs.gl_Position.z;
 	outVs.gl_Position.z	= (L - NearPlane) / (FarPlane - NearPlane);@end
 @end
-@piece( ShadowReceive )
-@foreach( hlms_num_shadow_map_lights, n )
-	@property( !hlms_shadowmap@n_is_point_light )
-		outVs.posL@n = mul( float4(worldPos.xyz, 1.0f), passBuf.shadowRcv[@n].texViewProj );@end @end
-@end
 
 PS_INPUT main( VS_INPUT input )
 {
@@ -108,10 +103,7 @@ PS_INPUT main( VS_INPUT input )
 
 	outVs.uv0.xy = float2( uVertexPos.xy ) * float2( cellData.pos.w, cellData.scale.w );
 
-	@insertpiece( ShadowReceive )
-@foreach( hlms_num_shadow_map_lights, n )
-	@property( !hlms_shadowmap@n_is_point_light )
-		outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;@end @end
+	@insertpiece( DoShadowReceiveVS )
 
 @property( hlms_pssm_splits )	outVs.depth = outVs.gl_Position.z;@end
 
