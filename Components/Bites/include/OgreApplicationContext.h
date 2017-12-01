@@ -99,7 +99,7 @@ namespace OgreBites
             public Ogre::WindowEventListener
     {
     public:
-        explicit ApplicationContext(const Ogre::String& appName = OGRE_VERSION_NAME, bool grabInput = true);
+        explicit ApplicationContext(const Ogre::String& appName = OGRE_VERSION_NAME, bool unused = true);
 
         virtual ~ApplicationContext();
 
@@ -194,9 +194,15 @@ namespace OgreBites
         virtual bool oneTimeConfig();
 
         /**
-        Sets up SDL input.
+        When input is grabbed the mouse is confined to the window.
         */
-        virtual void setupInput(bool grab);
+        void setWindowGrab(NativeWindowType* win, bool grab = true);
+
+        /// @overload
+        void setWindowGrab(bool grab = true) {
+            OgreAssert(!mWindows.empty(), "create a window first");
+            setWindowGrab(mWindows[0].native, grab);
+        }
 
         /**
         Finds context-wide resource groups. I load paths from a config file here,
@@ -265,7 +271,7 @@ namespace OgreBites
 
         /// @overload
         void removeInputListener(InputListener* lis) {
-            OgreAssert(!mWindows.empty(), "called after all windows we deleted");
+            OgreAssert(!mWindows.empty(), "called after all windows were deleted");
             removeInputListener(mWindows[0].native, lis);
         }
 
@@ -303,7 +309,6 @@ namespace OgreBites
         Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
         Ogre::Root* mRoot;              // OGRE root
         StaticPluginLoader mStaticPluginLoader;
-        bool mGrabInput;
         bool mFirstRun;
         Ogre::String mNextRenderer;     // name of renderer used for next run
         Ogre::String mAppName;

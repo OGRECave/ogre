@@ -158,6 +158,7 @@ protected:
 		}
 
 		mCameraMan->setStyle(CS_ORBIT);
+		mTrayMgr->showCursor();
 		mCameraMan->setYawPitchDist(Degree(0), Degree(25), 20);
 		mCameraMan->setTopSpeed(5);
 		mCamera->setNearClipDistance(1);

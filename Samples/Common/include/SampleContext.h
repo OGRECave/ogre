@@ -44,8 +44,8 @@ namespace OgreBites
     public:
         Ogre::RenderWindow* mWindow;
 
-        SampleContext(const Ogre::String& appName = OGRE_VERSION_NAME, bool grabInput = true)
-        : ApplicationContext(appName, grabInput), mWindow(NULL)
+        SampleContext(const Ogre::String& appName = OGRE_VERSION_NAME)
+        : ApplicationContext(appName), mWindow(NULL)
         {
             mCurrentSample = 0;
             mSamplePaused = false;

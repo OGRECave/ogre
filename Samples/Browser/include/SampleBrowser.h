@@ -149,7 +149,7 @@ namespace OgreBites
     public:
 
     SampleBrowser(bool nograb = false, int startSampleIndex = -1)
-    : SampleContext("OGRE Sample Browser", !nograb)
+    : SampleContext("OGRE Sample Browser"), mGrabInput(!nograb)
         {
             mIsShuttingDown = false;
             mTrayMgr = 0;
@@ -919,6 +919,7 @@ namespace OgreBites
             ApplicationContext::setup();
             mWindow = getRenderWindow();
             addInputListener(this);
+            if(mGrabInput) setWindowGrab();
 #ifdef OGRE_STATIC_LIB
             // Check if the render system supports any shader profiles.
             // Don't load samples that require shaders if we don't have any shader support, GL ES 1.x for example.
@@ -1509,6 +1510,7 @@ namespace OgreBites
         SampleBrowserGestureView *mGestureView;
 #endif
         bool mIsShuttingDown;
+        bool mGrabInput;
     };
 }
 

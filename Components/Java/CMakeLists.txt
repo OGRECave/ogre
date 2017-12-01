@@ -75,5 +75,4 @@ swig_add_module(OgreJNI java ${SWIG_INPUT_MODULES})
 swig_link_libraries(OgreJNI OgreBites OgreOverlay OgreRTShaderSystem OgreMain ${JNI_LIBRARIES})
 if(ANDROID)
 	set_target_properties(${SWIG_MODULE_OgreJNI_REAL_NAME} PROPERTIES LINK_FLAGS -s) # strip symbols
-	set_target_properties(${SWIG_MODULE_OgreJNI_REAL_NAME} PROPERTIES NO_SONAME OFF) # workaround for SWIG/ android interop
 endif()
