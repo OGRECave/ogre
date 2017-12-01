@@ -96,6 +96,7 @@ namespace Ogre {
         void removeTextureDefinition(size_t idx);
         
         /** Get a local texture definition.
+        @deprecated use getTextureDefinitions()
         */
         TextureDefinition *getTextureDefinition(size_t idx);
         
@@ -104,15 +105,19 @@ namespace Ogre {
         TextureDefinition *getTextureDefinition(const String& name);
 
         /** Get the number of local texture definitions.
+        @deprecated use getTextureDefinitions()
         */
-        size_t getNumTextureDefinitions();
+        OGRE_DEPRECATED size_t getNumTextureDefinitions();
         
         /** Remove all Texture Definitions
         */
         void removeAllTextureDefinitions();
         
-        /** Get an iterator over the TextureDefinitions in this Technique. */
-        TextureDefinitionIterator getTextureDefinitionIterator(void);
+        /** Get the TextureDefinitions in this Technique. */
+        const TextureDefinitions& getTextureDefinitions() const { return mTextureDefinitions; }
+
+        /// @deprecated use getTextureDefinitions()
+        OGRE_DEPRECATED TextureDefinitionIterator getTextureDefinitionIterator(void);
         
         /** Create a new target pass, and return a pointer to it.
         */
@@ -123,19 +128,24 @@ namespace Ogre {
         void removeTargetPass(size_t idx);
         
         /** Get a target pass.
+        @deprecated use getTargetPasses()
         */
-        CompositionTargetPass *getTargetPass(size_t idx);
+        OGRE_DEPRECATED CompositionTargetPass *getTargetPass(size_t idx);
         
         /** Get the number of target passes.
+        @deprecated use getTargetPasses()
         */
-        size_t getNumTargetPasses();
+        OGRE_DEPRECATED size_t getNumTargetPasses();
         
         /** Remove all target passes.
         */
         void removeAllTargetPasses();
         
-        /** Get an iterator over the TargetPasses in this Technique. */
-        TargetPassIterator getTargetPassIterator(void);
+        /** Get the TargetPasses in this Technique. */
+        const TargetPasses& getTargetPasses() const { return mTargetPasses; }
+
+        /// @deprecated use getTargetPasses()
+        OGRE_DEPRECATED TargetPassIterator getTargetPassIterator(void);
         
         /** Get output (final) target pass
          */

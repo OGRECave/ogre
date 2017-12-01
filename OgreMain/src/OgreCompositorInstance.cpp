@@ -444,10 +444,11 @@ void CompositorInstance::_compileTargetOperations(CompiledState &compiledState)
     if(mPreviousInstance)
         mPreviousInstance->_compileTargetOperations(compiledState);
     /// Texture targets
-    CompositionTechnique::TargetPassIterator it = mTechnique->getTargetPassIterator();
-    while(it.hasMoreElements())
+    const CompositionTechnique::TargetPasses& passes = mTechnique->getTargetPasses();
+    CompositionTechnique::TargetPasses::const_iterator it;
+    for (it = passes.begin(); it != passes.end(); ++it)
     {
-        CompositionTargetPass *target = it.getNext();
+        CompositionTargetPass *target = *it;
         
         TargetOperation ts(getTargetForTex(target->getOutputName()));
         /// Set "only initial" flag, visibilityMask and lodBias according to CompositionTargetPass.
@@ -511,10 +512,11 @@ void CompositorInstance::setTechnique(CompositionTechnique* tech, bool reuseText
             // make sure we store all (shared) textures in use in our reserve pool
             // this will ensure they don't get destroyed as unreferenced
             // so they're ready to use again later
-            CompositionTechnique::TextureDefinitionIterator it = mTechnique->getTextureDefinitionIterator();
-            while(it.hasMoreElements())
+            const CompositionTechnique::TextureDefinitions& tdefs = mTechnique->getTextureDefinitions();
+            CompositionTechnique::TextureDefinitions::const_iterator it = tdefs.begin();
+            for (; it != tdefs.end(); ++it)
             {
-                CompositionTechnique::TextureDefinition *def = it.getNext();
+                CompositionTechnique::TextureDefinition *def = *it;
                 if (def->pooled)
                 {
                     LocalTextureMap::iterator i = mLocalTextures.find(def->name);
@@ -616,11 +618,13 @@ void CompositorInstance::createResources(bool forResizeOnly)
     /// In principle, temporary textures could be shared between multiple viewports
     /// (CompositorChains). This will save a lot of memory in case more viewports
     /// are composited.
-    CompositionTechnique::TextureDefinitionIterator it = mTechnique->getTextureDefinitionIterator();
     CompositorManager::UniqueTextureSet assignedTextures;
-    while(it.hasMoreElements())
+
+    const CompositionTechnique::TextureDefinitions& tdefs = mTechnique->getTextureDefinitions();
+    CompositionTechnique::TextureDefinitions::const_iterator it = tdefs.begin();
+    for (; it != tdefs.end(); ++it)
     {
-        CompositionTechnique::TextureDefinition *def = it.getNext();
+        CompositionTechnique::TextureDefinition *def = *it;
         
         if (!def->refCompName.empty()) {
             //This is a reference, isn't created in this compositor
@@ -808,10 +812,11 @@ void CompositorInstance::deriveTextureRenderTargetOptions(
     // or use input previous
     bool renderingScene = false;
 
-    CompositionTechnique::TargetPassIterator it = mTechnique->getTargetPassIterator();
-    while (it.hasMoreElements())
+    const CompositionTechnique::TargetPasses& passes = mTechnique->getTargetPasses();
+    CompositionTechnique::TargetPasses::const_iterator it;
+    for (it = passes.begin(); it != passes.end(); ++it)
     {
-        CompositionTargetPass* tp = it.getNext();
+        CompositionTargetPass* tp = *it;
         if (tp->getOutputName() == texname)
         {
             if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
@@ -888,10 +893,11 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
     // We can also only free textures which are derived from the target size, if
     // required (saves some time & memory thrashing / fragmentation on resize)
 
-    CompositionTechnique::TextureDefinitionIterator it = mTechnique->getTextureDefinitionIterator();
-    while(it.hasMoreElements())
+    const CompositionTechnique::TextureDefinitions& tdefs = mTechnique->getTextureDefinitions();
+    CompositionTechnique::TextureDefinitions::const_iterator it = tdefs.begin();
+    for (; it != tdefs.end(); ++it)
     {
-        CompositionTechnique::TextureDefinition *def = it.getNext();
+        CompositionTechnique::TextureDefinition *def = *it;
 
         if (!def->refCompName.empty()) 
         {
