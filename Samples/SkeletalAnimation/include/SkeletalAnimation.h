@@ -230,6 +230,7 @@ protected:
 
         // set camera initial transform and speed
         mCameraMan->setStyle(CS_ORBIT);
+        mTrayMgr->showCursor();
         mCameraMan->setYawPitchDist(Degree(0), Degree(25), 100);
         mCameraMan->setTopSpeed(50);
 

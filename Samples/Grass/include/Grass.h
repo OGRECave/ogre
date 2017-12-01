@@ -165,6 +165,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      setupLighting();
 
      mCameraMan->setStyle(CS_ORBIT);
+     mTrayMgr->showCursor();
      mCameraMan->setYawPitchDist(Degree(0), Degree(25), 200);
  }
 
