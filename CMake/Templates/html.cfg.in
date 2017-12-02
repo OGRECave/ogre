@@ -711,7 +711,10 @@ EXCLUDE_SYMLINKS       = NO
 # for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = *UTF* \
-                         */GLSupport/include/*/* \
+                         */GLSupport/include/EGL/* \
+                         */GLSupport/include/GLX/* \
+                         */GLSupport/include/OSX/* \
+                         */GLSupport/include/win32/* \
                          *EAGL* \
                          */RenderSystems/GLES/*
 
@@ -1583,6 +1586,7 @@ PREDEFINED             = OGRE_MEMORY_ALLOCATOR=1 \
                          RTSHADER_SYSTEM_BUILD_EXT_SHADERS \
                          OGRE_PLATFORM=10 \
                          OGRE_DEPRECATED= \
+                         MANAGED_RESOURCE= \
                          protected=private
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
