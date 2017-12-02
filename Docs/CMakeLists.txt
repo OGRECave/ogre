@@ -40,6 +40,7 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/RenderSystems
         ${OGRE_SOURCE_DIR}/Docs/src/apimainpage.md
         ${OGRE_SOURCE_DIR}/Docs/src/manual.md
+        ${OGRE_SOURCE_DIR}/Docs/src/OgreShadows.md
         ${OGRE_SOURCE_DIR}/Docs/src/material-scripts.md
         ${OGRE_SOURCE_DIR}/Docs/src/high-level-programs.md
         ${OGRE_SOURCE_DIR}/Docs/src/particle-scripts.md
