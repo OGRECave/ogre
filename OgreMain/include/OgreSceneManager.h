@@ -2838,7 +2838,7 @@ namespace Ogre {
         */
         void setShadowTextureCasterMaterial(const MaterialPtr& mat);
 
-        /// @override
+        /// @overload
         /// @deprecated use setShadowTextureCasterMaterial(const MaterialPtr&)
         OGRE_DEPRECATED void setShadowTextureCasterMaterial(const String& name);
         /** Sets the default material to use for rendering shadow receivers.
@@ -2864,7 +2864,7 @@ namespace Ogre {
         */
         void setShadowTextureReceiverMaterial(const MaterialPtr& mat);
 
-        /// @override
+        /// @overload
         /// @deprecated use setShadowTextureReceiverMaterial(const MaterialPtr&)
         OGRE_DEPRECATED void setShadowTextureReceiverMaterial(const String& name);
 
