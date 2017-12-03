@@ -382,7 +382,7 @@ namespace Ogre {
 
 namespace std
 {
-    #if __cplusplus < 201103L
+    #if __cplusplus < 201103L && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     namespace tr1
     {
     #endif
@@ -398,7 +398,7 @@ namespace std
                 return MyBase::operator()( k.get() );
             }
         };
-    #if __cplusplus < 201103L
+    #if __cplusplus < 201103L && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     }
     #endif
 }
