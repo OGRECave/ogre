@@ -132,6 +132,7 @@ namespace Ogre
         */
         void initWorkspace( float cameraNear = 0.5f, float cameraFar = 500.0f,
                             IdString workspaceDefOverride=IdString() );
+        bool isInitialized(void) const;
 
         /** Sets cubemap probe's parameters.
         @param cameraPos
