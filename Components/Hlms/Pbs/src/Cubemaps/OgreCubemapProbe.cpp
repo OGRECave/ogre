@@ -143,7 +143,7 @@ namespace Ogre
             cameraFar = mCamera->getFarClipDistance();
         }
 
-        const bool reinitWorkspace = mWorkspace != 0;
+        const bool reinitWorkspace = isInitialized();
         destroyWorkspace();
         destroyTexture();
 
@@ -238,6 +238,11 @@ namespace Ogre
                                                      "AutoGen_ParallaxCorrectedCubemapClear_Workspace",
                                                      false );
         }
+    }
+    //-----------------------------------------------------------------------------------
+    bool CubemapProbe::isInitialized(void) const
+    {
+        return mWorkspace != 0;
     }
     //-----------------------------------------------------------------------------------
     void CubemapProbe::set( const Vector3 &cameraPos, const Aabb &area, const Vector3 &areaInnerRegion,
