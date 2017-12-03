@@ -6427,6 +6427,9 @@ void SceneManager::destroyShadowTextures(void)
     mShadowTextures.clear();
     mShadowTextureCameras.clear();
 
+    // set by render*TextureShadowedQueueGroupObjects
+    mAutoParamDataSource->setTextureProjector(NULL, 0);
+
     // Will destroy if no other scene managers referencing
     ShadowTextureManager::getSingleton().clearUnused();
 
