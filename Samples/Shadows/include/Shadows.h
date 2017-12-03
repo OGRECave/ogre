@@ -732,7 +732,7 @@ protected:
                 }
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
                 mSceneMgr->setShadowTextureCasterMaterial(themat);
-                themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL);
+                themat = MaterialManager::getSingleton().getByName(CUSTOM_RECEIVER_MATERIAL);
                 mSceneMgr->setShadowTextureReceiverMaterial(themat);
                 mSceneMgr->setShadowTextureSelfShadow(true);    
                 // Sort out base materials
