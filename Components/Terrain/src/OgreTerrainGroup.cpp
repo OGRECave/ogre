@@ -709,6 +709,7 @@ namespace Ogre
         if (it == mTerrainPrepareRequests.end())
         {
             freeTerrainSlotInstance(lreq.slot);
+            return;
         }
         else
         {
