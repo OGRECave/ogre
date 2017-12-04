@@ -280,6 +280,15 @@ namespace Ogre
         */
         virtual void abortRequest(RequestID id) = 0;
 
+        /** Abort request if it is not being processed currently.
+         *
+         * @param id The ID of the previously issued request.
+         *
+         * @retval true If request was aborted successfully.
+         * @retval false If request is already being processed so it can not be aborted.
+         */
+        virtual bool abortPendingRequest(RequestID id) = 0;
+
         /** Abort all previously issued requests in a given channel.
         Any requests still waiting to be processed of the given channel, will be 
         removed from the queue.
@@ -436,6 +445,8 @@ namespace Ogre
             bool forceSynchronous = false, bool idleThread = false);
         /// @copydoc WorkQueue::abortRequest
         virtual void abortRequest(RequestID id);
+        /// @copydoc WorkQueue::abortPendingRequest
+        virtual bool abortPendingRequest(RequestID id);
         /// @copydoc WorkQueue::abortRequestsByChannel
         virtual void abortRequestsByChannel(uint16 channel);
         /// @copydoc WorkQueue::abortPendingRequestsByChannel

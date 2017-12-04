@@ -38,7 +38,6 @@ namespace Ogre
     const uint16 TerrainGroup::WORKQUEUE_LOAD_REQUEST = 1;
     const uint32 TerrainGroup::CHUNK_ID = StreamSerialiser::makeIdentifier("TERG");
     const uint16 TerrainGroup::CHUNK_VERSION = 1;
-    uint TerrainGroup::LoadRequest::loadingTaskNum = 0;
 
     //---------------------------------------------------------------------
     TerrainGroup::TerrainGroup(SceneManager* sm, Terrain::Alignment align, 
@@ -100,7 +99,7 @@ namespace Ogre
         }
 
         // waiting for terrain preparing finished
-        while(LoadRequest::loadingTaskNum>0)
+        while (getNumTerrainPrepareRequests() > 0)
         {
             OGRE_THREAD_SLEEP(50);
             Root::getSingleton().getWorkQueue()->processResponses();
@@ -309,12 +308,11 @@ namespace Ogre
             LoadRequest req;
             req.slot = slot;
             req.origin = this;
-            ++LoadRequest::loadingTaskNum;
-            mTerrainLoadRequests.insert(TerrainLoadRequestMap::value_type(slot->instance, false));
-            Root::getSingleton().getWorkQueue()->addRequest(
-                mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST,
-                Any(req), 0, synchronous);
-
+            WorkQueue::RequestID id =
+                Root::getSingleton().getWorkQueue()->addRequest(
+                    mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST,
+                    Any(req), 0, synchronous);
+            mTerrainPrepareRequests.insert(TerrainPrepareRequestMap::value_type(slot, id));
         }
     }
     //---------------------------------------------------------------------
@@ -364,6 +362,11 @@ namespace Ogre
                 mAutoUpdateLod->autoUpdateLod(slot->instance, synchronous, data);
             }
         }
+    }
+    //---------------------------------------------------------------------
+    size_t TerrainGroup::getNumTerrainPrepareRequests() const
+    {
+        return mTerrainPrepareRequests.size();
     }
     //---------------------------------------------------------------------
     void TerrainGroup::unloadTerrain(long x, long y)
@@ -693,25 +696,23 @@ namespace Ogre
     //---------------------------------------------------------------------
     void TerrainGroup::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
     {
+        // Data was already deleted so nothing we can do anymore.
+        if (res->getRequest()->getAborted())
+            return;
+
         // No response data, just request
         LoadRequest lreq = any_cast<LoadRequest>(res->getRequest()->getData());
-        --LoadRequest::loadingTaskNum;
 
-        TerrainLoadRequestMap::iterator it = mTerrainLoadRequests.find(lreq.slot->instance);
+        TerrainPrepareRequestMap::iterator it = mTerrainPrepareRequests.find(lreq.slot);
 
-        assert(it != mTerrainLoadRequests.end());
-
-        if (it != mTerrainLoadRequests.end())
+        // This slot was scheduled to be deleted.
+        if (it == mTerrainPrepareRequests.end())
         {
-            bool isRemoved = it->second;
-            mTerrainLoadRequests.erase(it);
-
-            // Instance was scheduled for removal while it was processed in another thread.
-            if (isRemoved)
-            {
-                freeTerrainSlotInstance(lreq.slot);
-                return;
-            }
+            freeTerrainSlotInstance(lreq.slot);
+        }
+        else
+        {
+            mTerrainPrepareRequests.erase(it);
         }
 
         if (res->succeeded())
@@ -842,14 +843,17 @@ namespace Ogre
         if (!slot)
             return;
 
-        TerrainLoadRequestMap::iterator it = mTerrainLoadRequests.find(slot->instance);
+        TerrainPrepareRequestMap::iterator it = mTerrainPrepareRequests.find(slot);
 
         // Terrain was in load request so we need to schedule the deletion see handleResponse().
-        if (it != mTerrainLoadRequests.end())
+        if (it != mTerrainPrepareRequests.end())
         {
-            // We would like to abort the request here but WorkQueue does not provide proper tools for this
-            // (the data we need will be destroyed if we call abortRequest()).
-            it->second = true;
+            WorkQueue::RequestID id = it->second;
+            mTerrainPrepareRequests.erase(it);
+
+            // We can free immediately since this slot was aborted before it could've been processed.
+            if (Root::getSingleton().getWorkQueue()->abortPendingRequest(id))
+                slot->freeInstance();
         }
         else
         {
