@@ -323,6 +323,35 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
+    bool DefaultWorkQueueBase::abortPendingRequest(RequestID id)
+    {
+        // Request should not exist in idle queue and request queue simultaneously.
+        {
+            OGRE_WQ_LOCK_MUTEX(mRequestMutex);
+            for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
+            {
+                if ((*i)->getID() == id)
+                {
+                    (*i)->abortRequest();
+                    return true;
+                }
+            }
+        }
+        {
+            OGRE_WQ_LOCK_MUTEX(mIdleMutex);
+            for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
+            {
+                if ((*i)->getID() == id)
+                {
+                    (*i)->abortRequest();
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+    //---------------------------------------------------------------------
     void DefaultWorkQueueBase::abortRequestsByChannel(uint16 channel)
     {
             OGRE_WQ_LOCK_MUTEX(mProcessMutex);

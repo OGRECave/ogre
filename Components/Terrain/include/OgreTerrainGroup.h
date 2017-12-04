@@ -512,7 +512,17 @@ namespace Ogre
         void autoUpdateLod(long x, long y, bool synchronous, const Any &data);
         void autoUpdateLodAll(bool synchronous, const Any &data);
 
+        /** Get the number of terrains that are still waiting for the Terrain::prepare() to be called.
+         *
+         * @note Terrain::prepare() happens in background thread so the actual call will be completed
+         *       a bit before this returns the reduced number.
+         *
+         * @return Amount of terrain prepare requests pending.
+         */
+        size_t getNumTerrainPrepareRequests() const;
+
     protected:
+        typedef std::map<TerrainSlot*, WorkQueue::RequestID> TerrainPrepareRequestMap;
         SceneManager *mSceneManager;
         Terrain::Alignment mAlignment;
         uint16 mTerrainSize;
@@ -520,6 +530,7 @@ namespace Ogre
         Terrain::ImportData mDefaultImportData;
         Vector3 mOrigin;
         TerrainSlotMap mTerrainSlots;
+        TerrainPrepareRequestMap mTerrainPrepareRequests;
         uint16 mWorkQueueChannel;
         String mFilenamePrefix;
         String mFilenameExtension;
@@ -532,6 +543,7 @@ namespace Ogre
         /// Retrieve a slot, potentially allocate one
         TerrainSlot* getTerrainSlot(long x, long y, bool createIfMissing);
         TerrainSlot* getTerrainSlot(long x, long y) const;
+        void freeTerrainSlotInstance(TerrainSlot* slot);
         void connectNeighbour(TerrainSlot* slot, long offsetx, long offsety);
 
         void loadTerrainImpl(TerrainSlot* slot, bool synchronous);
@@ -541,7 +553,6 @@ namespace Ogre
         {
             TerrainSlot* slot;
             TerrainGroup* origin;
-            static uint loadingTaskNum;
             _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const LoadRequest& r)
             { return o; }       
         };
