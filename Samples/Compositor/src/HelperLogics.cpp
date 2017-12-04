@@ -158,12 +158,12 @@ void HDRListener::notifyViewportSize(int width, int height)
 void HDRListener::notifyCompositor(Ogre::CompositorInstance* instance)
 {
     // Get some RTT dimensions for later calculations
-    Ogre::CompositionTechnique::TextureDefinitionIterator defIter =
-        instance->getTechnique()->getTextureDefinitionIterator();
-    while (defIter.hasMoreElements())
+    const Ogre::CompositionTechnique::TextureDefinitions& defs =
+        instance->getTechnique()->getTextureDefinitions();
+    Ogre::CompositionTechnique::TextureDefinitions::const_iterator defIter;
+    for (defIter = defs.begin(); defIter != defs.end(); ++defIter)
     {
-        Ogre::CompositionTechnique::TextureDefinition* def =
-            defIter.getNext();
+        Ogre::CompositionTechnique::TextureDefinition* def = *defIter;
         if(def->name == "rt_bloom0")
         {
             mBloomSize = (int)def->width; // should be square

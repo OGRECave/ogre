@@ -745,7 +745,37 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
     return createShaderBasedTechnique(*srcMat, srcTechniqueSchemeName, dstTechniqueSchemeName, overProgrammable);
 }
+//-----------------------------------------------------------------------------
+static bool hasFixedFunctionPass(Technique* tech)
+{
+    for (unsigned short i=0; i < tech->getNumPasses(); ++i)
+    {
+        if (!tech->getPass(i)->isProgrammable())
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
+static Technique* findSourceTechnique(const Material& mat, const String& srcTechniqueSchemeName,
+                                      bool overProgrammable)
+{
+    // Find the source technique
+    Material::Techniques::const_iterator it;
+    for (it = mat.getTechniques().begin(); it != mat.getTechniques().end(); ++it)
+    {
+        Technique* curTechnique = *it;
+
+        if (curTechnique->getSchemeName() == srcTechniqueSchemeName &&
+            (hasFixedFunctionPass(curTechnique) || overProgrammable))
+        {
+            return curTechnique;
+        }
+    }
+
+    return NULL;
+}
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
                                                  const String& srcTechniqueSchemeName, 
@@ -787,11 +817,10 @@ bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
     }
 
     // No technique created -> check if one can be created from the given source technique scheme.  
-    Technique* srcTechnique = NULL;
-    srcTechnique = findSourceTechnique(srcMat, srcTechniqueSchemeName, overProgrammable);
+    Technique* srcTechnique = findSourceTechnique(srcMat, srcTechniqueSchemeName, overProgrammable);
 
     // No appropriate source technique found.
-    if (srcTechnique == NULL)
+    if (!srcTechnique)
     {
         return false;
     }
@@ -812,8 +841,8 @@ bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
     }
 
     // Create the new technique entry.
-    SGTechnique* techEntry = OGRE_NEW SGTechnique(matEntry, srcTechnique, dstTechniqueSchemeName);
-                    
+    SGTechnique* techEntry =
+        OGRE_NEW SGTechnique(matEntry, srcTechnique, dstTechniqueSchemeName, overProgrammable);
 
     // Add to material entry map.
     matEntry->getTechniqueList().push_back(techEntry);
@@ -1058,42 +1087,6 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
         removeAllShaderBasedTechniques(itMatEntry->first.first, itMatEntry->first.second);
     }
 }
-
-//-----------------------------------------------------------------------------
- Technique* ShaderGenerator::findSourceTechnique(const Material& mat,
-                const String& srcTechniqueSchemeName, bool allowProgrammable)
- {
-     // Find the source technique and make sure it is not programmable.
-     Material::Techniques::const_iterator it;
-     for(it = mat.getTechniques().begin(); it != mat.getTechniques().end(); ++it)
-     {
-         Technique *curTechnique = *it;
-
-         if (curTechnique->getSchemeName() == srcTechniqueSchemeName && (allowProgrammable || !isProgrammable(curTechnique)))
-         {
-             return curTechnique;               
-         }      
-     }
-
-     return NULL;
- }
-
- //-----------------------------------------------------------------------------
- bool ShaderGenerator::isProgrammable(Technique* tech)
- {
-     if (tech != NULL)
-     {
-         for (unsigned short i=0; i < tech->getNumPasses(); ++i)
-         {
-             if (tech->getPass(i)->isProgrammable() == true)
-             {
-                 return true;
-             }              
-         }
-     }
-     return false;
- }
-
 
 //-----------------------------------------------------------------------------
  void ShaderGenerator::notifyRenderSingleObject(Renderable* rend, 
@@ -1558,6 +1551,7 @@ ShaderGenerator::SGPass::~SGPass()
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::buildTargetRenderState()
 {   
+    if(mSrcPass->isProgrammable() && !mParent->overProgrammablePass()) return;
     const String& schemeName = mParent->getDestinationTechniqueSchemeName();
     const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
     
@@ -1604,12 +1598,14 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::acquirePrograms()
 {
+    if(!mTargetRenderState) return;
     ProgramManager::getSingleton().acquirePrograms(mDstPass, mTargetRenderState);
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::releasePrograms()
 {
+    if(!mTargetRenderState) return;
     ProgramManager::getSingleton().releasePrograms(mDstPass, mTargetRenderState);   
 }
 
@@ -1667,8 +1663,11 @@ SubRenderState* ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder,
 }
 
 //-----------------------------------------------------------------------------
-ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, Technique* srcTechnique, const String& dstTechniqueSchemeName) :
-    mParent(parent), mSrcTechnique(srcTechnique), mDstTechnique(NULL), mBuildDstTechnique(true), mDstTechniqueSchemeName(dstTechniqueSchemeName)
+ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, Technique* srcTechnique,
+                                          const String& dstTechniqueSchemeName,
+                                          bool overProgrammable)
+    : mParent(parent), mSrcTechnique(srcTechnique), mDstTechnique(NULL), mBuildDstTechnique(true),
+      mDstTechniqueSchemeName(dstTechniqueSchemeName), mOverProgrammable(overProgrammable)
 {
 }
 

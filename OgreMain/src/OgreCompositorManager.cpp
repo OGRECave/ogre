@@ -341,10 +341,11 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
 //---------------------------------------------------------------------
 bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, const Ogre::String& localName)
 {
-    CompositionTechnique::TargetPassIterator tpit = inst->getTechnique()->getTargetPassIterator();
-    while(tpit.hasMoreElements())
+    const CompositionTechnique::TargetPasses& passes = inst->getTechnique()->getTargetPasses();
+    CompositionTechnique::TargetPasses::const_iterator it;
+    for (it = passes.begin(); it != passes.end(); ++it)
     {
-        CompositionTargetPass* tp = tpit.getNext();
+        CompositionTargetPass* tp = *it;
         if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS &&
             tp->getOutputName() == localName)
         {
@@ -359,10 +360,11 @@ bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, const Og
 //---------------------------------------------------------------------
 bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, TexturePtr tex)
 {
-    CompositionTechnique::TargetPassIterator tpit = inst->getTechnique()->getTargetPassIterator();
-    while(tpit.hasMoreElements())
+    const CompositionTechnique::TargetPasses& passes = inst->getTechnique()->getTargetPasses();
+    CompositionTechnique::TargetPasses::const_iterator it;
+    for (it = passes.begin(); it != passes.end(); ++it)
     {
-        CompositionTargetPass* tp = tpit.getNext();
+        CompositionTargetPass* tp = *it;
         if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
         {
             // Don't have to worry about an MRT, because no MRT can be input previous

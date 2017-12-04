@@ -263,10 +263,12 @@ void CompositorChain::setCompositorEnabled(size_t position, bool state)
         CompositorInstance* nextInstance = getNextInstance(inst, true);
         if (nextInstance)
         {
-            CompositionTechnique::TargetPassIterator tpit = nextInstance->getTechnique()->getTargetPassIterator();
-            while(tpit.hasMoreElements())
+            const CompositionTechnique::TargetPasses& tps =
+                nextInstance->getTechnique()->getTargetPasses();
+            CompositionTechnique::TargetPasses::const_iterator tpit = tps.begin();
+            for(;tpit != tps.end(); ++tpit)
             {
-                CompositionTargetPass* tp = tpit.getNext();
+                CompositionTargetPass* tp = *tpit;
                 if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
                 {
                     if (nextInstance->getTechnique()->getTextureDefinition(tp->getOutputName())->pooled)

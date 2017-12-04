@@ -218,12 +218,12 @@ void Compositor::createGlobalTextures()
 
     //Initialize global textures from first supported technique
     CompositionTechnique* firstTechnique = mSupportedTechniques[0];
-    
-    CompositionTechnique::TextureDefinitionIterator texDefIt = 
-        firstTechnique->getTextureDefinitionIterator();
-    while (texDefIt.hasMoreElements()) 
+
+    const CompositionTechnique::TextureDefinitions& tdefs = firstTechnique->getTextureDefinitions();
+    CompositionTechnique::TextureDefinitions::const_iterator texDefIt = tdefs.begin();
+    for (; texDefIt != tdefs.end(); ++texDefIt)
     {
-        CompositionTechnique::TextureDefinition* def = texDefIt.getNext();
+        CompositionTechnique::TextureDefinition* def = *texDefIt;
         if (def->scope == CompositionTechnique::TS_GLOBAL) 
         {
             //Check that this is a legit global texture
@@ -317,10 +317,11 @@ void Compositor::createGlobalTextures()
         CompositionTechnique* technique = mSupportedTechniques[i];
         bool isConsistent = true;
         size_t numGlobals = 0;
-        texDefIt = technique->getTextureDefinitionIterator();
-        while (texDefIt.hasMoreElements()) 
+        const CompositionTechnique::TextureDefinitions& tdefs2 = technique->getTextureDefinitions();
+        texDefIt = tdefs2.begin();
+        for (; texDefIt != tdefs2.end(); ++texDefIt)
         {
-            CompositionTechnique::TextureDefinition* texDef = texDefIt.getNext();
+            CompositionTechnique::TextureDefinition* texDef = *texDefIt;
             if (texDef->scope == CompositionTechnique::TS_GLOBAL) 
             {
                 if (globalTextureNames.find(texDef->name) == globalTextureNames.end()) 

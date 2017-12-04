@@ -301,7 +301,7 @@ public:
     @param srcMat The source material.
     @param srcTechniqueSchemeName The source technique scheme name.
     @param dstTechniqueSchemeName The destination shader based technique scheme name.
-    @param overProgrammable If true a shader will be created even if the material has shaders
+    @param overProgrammable If true a shader will be created even if the pass already has shaders
     */
     bool createShaderBasedTechnique(const Material& srcMat, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
@@ -607,7 +607,8 @@ protected:
     class _OgreRTSSExport SGTechnique : public RTShaderSystemAlloc
     {
     public:
-        SGTechnique(SGMaterial* parent, Technique* srcTechnique, const String& dstTechniqueSchemeName);     
+        SGTechnique(SGMaterial* parent, Technique* srcTechnique,
+                    const String& dstTechniqueSchemeName, bool overProgrammable);
         ~SGTechnique();
         
         /** Get the parent SGMaterial */
@@ -653,6 +654,9 @@ protected:
         /** Tells if a custom render state exists for the given pass. */
         bool hasRenderState(unsigned short passIndex);
 
+        /// whether shaders are created for passes with shaders
+        bool overProgrammablePass() { return mOverProgrammable; }
+
         // Key name for associating with a Technique instance.
         static String UserKey;
 
@@ -684,6 +688,7 @@ protected:
         bool mBuildDstTechnique;
         // Scheme name of destination technique.
         String mDstTechniqueSchemeName;
+        bool mOverProgrammable;
     };
 
     
@@ -694,9 +699,7 @@ protected:
     public:
         /** Class constructor. */
         SGMaterial(const String& materialName, const String& groupName) : mName(materialName), mGroup(groupName) 
-        {
-
-        }
+        {}
 
         /** Get the material name. */
         const String& getMaterialName() const   { return mName; }
@@ -942,12 +945,6 @@ protected:
     
     /** Destory the shader generator instance. */
     void _destroy();
-
-    /** Find source technique to generate shader based technique based on it. */
-    static Technique* findSourceTechnique(const Material& material, const String& srcTechniqueSchemeName, bool allowProgrammable);
-
-    /** Checks if a given technique has passes with shaders. */
-    static bool isProgrammable(Technique* tech);
  
     /** Called from the sub class of the RenderObjectLister when single object is rendered. */
     void notifyRenderSingleObject(Renderable* rend, const Pass* pass,  const AutoParamDataSource* source, const LightList* pLightList, bool suppressRenderStateChanges);
