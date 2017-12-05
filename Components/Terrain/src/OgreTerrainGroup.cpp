@@ -308,11 +308,15 @@ namespace Ogre
             LoadRequest req;
             req.slot = slot;
             req.origin = this;
+            std::pair<TerrainPrepareRequestMap::iterator, bool> ret =
+                mTerrainPrepareRequests.insert(TerrainPrepareRequestMap::value_type(slot, 0));
+            assert(ret.second == true);
             WorkQueue::RequestID id =
                 Root::getSingleton().getWorkQueue()->addRequest(
                     mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST,
                     Any(req), 0, synchronous);
-            mTerrainPrepareRequests.insert(TerrainPrepareRequestMap::value_type(slot, id));
+            if (!synchronous)
+                ret.first->second = id;
         }
     }
     //---------------------------------------------------------------------
