@@ -152,6 +152,7 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore Ogre::SharedPtr::unspecified_bool; // c++11 compatibility
 %include "OgreSharedPtr.h"
 %ignore Ogre::Any::getType; // deprecated
+%ignore Ogre::Any::destroy; // deprecated
 %include "OgreAny.h"
 %include "OgreIteratorWrapper.h"
 %include "OgreMath.h"
@@ -279,7 +280,7 @@ ADD_REPR(ColourValue)
 %template(HardwareIndexBufferPtr) Ogre::SharedPtr<Ogre::HardwareIndexBuffer>;
 %include "OgreHardwareIndexBuffer.h"
 %template(HardwarePixelBufferPtr) Ogre::SharedPtr<Ogre::HardwarePixelBuffer>;
-#ifdef __ANDROID__
+#ifdef SWIGJAVA
 %ignore Ogre::HardwarePixelBuffer::lock;  // duplicate definition
 #endif
 %include "OgreHardwarePixelBuffer.h"

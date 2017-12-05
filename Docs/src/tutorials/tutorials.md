@@ -10,6 +10,7 @@
     - @subpage trays
     - @subpage volume
 - @subpage profiler
-- @subpage External-Texture-Sources
+- @subpage ShadowMappingOgre
 - @subpage deferred
+- @subpage External-Texture-Sources
 - @subpage pczscenemanager

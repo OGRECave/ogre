@@ -182,7 +182,7 @@ Try experimenting with the different shadow types. There are also other shadow-r
 
 Ogre does not provide soft shadows as part of the engine. You can write your own vertex and fragment programs to implement soft shadows and many other things. The Ogre Manual has a full description of @ref Shadows.
 
-# Conclusion {#Conclusion}
+# Conclusion {#Conclusion2}
 
 This tutorial introduced the use of lights and shadows into the scene. To begin, we covered how to use the MeshManager to generate meshes from scratch. We then chose which shadow type Ogre should use. Finally, we begin adding an example of each type of Light to our scene. We created a spotlight, a directional light, and a point light. You can even extend Ogre's lighting and shadow systems by writing your own vertex and fragment programs. Refer to the Ogre Manual for more details.
 

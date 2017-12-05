@@ -281,7 +281,7 @@ This file is used by the BSPSceneManager. You would only need this file if you w
 
 That covers all of the configuration files that Ogre manipulates directly. Ogre will look for these files in the same directory as your executable and it must find 'plugins.cfg', 'resources.cfg', and 'media.cfg' to function properly. Later tutorials will cover more of their use.
 
-# Conclusion {#Conclusion}
+# Conclusion {#Conclusion1}
 
 You should now have a basic understanding of setting up an Ogre scene. This tutorial provided an introduction to three of the most important objects in Ogre: Ogre::Entity, Ogre::SceneNode, and Ogre::SceneManager. These objects allow us to render and manipulate a scene filled with 3D objects.
 

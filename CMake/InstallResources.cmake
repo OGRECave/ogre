@@ -245,12 +245,11 @@ endif ()
 # Create the CMake package files
 include(CMakePackageConfigHelpers)
 
-if (WIN32)
-   set(OGRE_CMAKE_DIR CMake)
-elseif (UNIX)
-   set(OGRE_CMAKE_DIR lib/OGRE/cmake)
-elseif (APPLE)
-endif ()
+if(WIN32 OR APPLE)
+  set(OGRE_CMAKE_DIR "CMake")
+else()
+  set(OGRE_CMAKE_DIR "${OGRE_LIB_DIRECTORY}/OGRE/cmake")
+endif()
 configure_package_config_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
     INSTALL_DESTINATION ${OGRE_CMAKE_DIR}
     PATH_VARS CMAKE_INSTALL_PREFIX)

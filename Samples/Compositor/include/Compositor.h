@@ -321,10 +321,12 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
             CompositorInstance* instance = CompositorManager::getSingleton().getCompositorChain(mViewport)->getCompositor(compositorName);
             if (instance)
             {
-                CompositionTechnique::TextureDefinitionIterator it = instance->getTechnique()->getTextureDefinitionIterator();
-                while (it.hasMoreElements())
+                const CompositionTechnique::TextureDefinitions& defs =
+                    instance->getTechnique()->getTextureDefinitions();
+                CompositionTechnique::TextureDefinitions::const_iterator defIter;
+                for (defIter = defs.begin(); defIter != defs.end(); ++defIter)
                 {
-                    CompositionTechnique::TextureDefinition* texDef = it.getNext();
+                    CompositionTechnique::TextureDefinition* texDef = *defIter;
                     size_t numTextures = texDef->formatList.size();
                     if (numTextures > 1)
                     {
