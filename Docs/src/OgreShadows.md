@@ -335,17 +335,17 @@ as it may affect how certain resources are loaded.
 // Use Ogre's custom shadow mapping ability
 sceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
 sceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE );
-sceneMgr->setShadowTextureCasterMaterial("CustomShadows/ShadowCaster");
-sceneMgr->setShadowTextureReceiverMaterial("CustomShadows/ShadowReceiver");
+sceneMgr->setShadowTextureCasterMaterial("Ogre/DepthShadowmap/Caster/Float");
+sceneMgr->setShadowTextureReceiverMaterial("Ogre/DepthShadowmap/Receiver/Float");
 sceneMgr->setShadowTextureSelfShadow(true); 
-sceneMgr->setShadowTextureSize(512);
+sceneMgr->setShadowTextureSize(1024);
 ```
 
 The setShadowTechnique call is all that is required for Ogre’s default
 shadow mapping. In the code above, we have told Ogre to use the R
 channel of a floating point texture to store depth values. This tends to
 be a very portable method (over graphics cards and APIs). The sample
-sticks to using Ogre’s default of 512x512 shadow maps. Self-shadowing is
+uses 1024x1024 shadow maps. Self-shadowing is
 turned on, but be warned that this will only work properly if
 appropriate depth biasing is also used. The example code will manually
 account for depth biasing via the method described above in section
@@ -354,294 +354,12 @@ defined in a materials script. They tell Ogre which shaders to use when
 rendering shadow casters into the shadow map and rendering shadow
 receivers during shadow determination.
 
-The CustomShadows.material material script is given below:
+The `DepthShadowmap.material` script is given below:
 
-```cpp
-// Shadow Caster __________________________________________________
+@snippet Samples/Media/materials/scripts/DepthShadowmap.material shadow_material
 
-
-vertex_program CustomShadows/ShadowCasterVP/Cg cg
-{
-    source customshadowcastervp.cg
-    entry_point main
-    profiles arbvp1 vs_2_0
-
-    default_params
-    {
-        param_named_auto uModelViewProjection worldviewproj_matrix
-    }
-}
-
-fragment_program CustomShadows/ShadowCasterFP/Cg cg
-{
-    source customshadowcasterfp.cg
-    entry_point main
-    profiles arbfp1 ps_2_0
-
-    default_params
-    {
-        param_named      uDepthOffset float       1.0
-        param_named      uSTexWidth float         512.0
-        param_named      uSTexHeight float        512.0
-        param_named_auto uInvModelViewProjection  inverse_worldviewproj_matrix
-        param_named_auto uProjection              projection_matrix
-    }
-}
-
-vertex_program CustomShadows/ShadowCasterVP/GLSL glsl
-{
-    source customshadowcastervp.vert
-
-    default_params
-    {
-        param_named_auto uModelViewProjection worldviewproj_matrix
-    }
-}
-
-fragment_program CustomShadows/ShadowCasterFP/GLSL glsl
-{
-    source customshadowcasterfp.frag
-
-    default_params
-    {
-        param_named      uDepthOffset float       1.0
-        param_named      uSTexWidth float         512.0
-        param_named      uSTexHeight float        512.0
-        param_named_auto uInvModelViewProjection  inverse_worldviewproj_matrix
-        param_named_auto uProjection              projection_matrix
-    }
-}
-
-vertex_program CustomShadows/ShadowCasterVP/HLSL hlsl
-{
-    source customshadowcastervp.hlsl
-    entry_point main
-    target vs_2_0
-
-    default_params
-    {
-        param_named_auto uModelViewProjection worldviewproj_matrix
-    }
-}
-
-fragment_program CustomShadows/ShadowCasterFP/HLSL hlsl
-{
-    source customshadowcasterfp.hlsl
-    entry_point main
-    target ps_2_0
-
-    default_params
-    {
-        param_named      uDepthOffset float       1.0
-        param_named      uSTexWidth float         512.0
-        param_named      uSTexHeight float        512.0
-        param_named_auto uInvModelViewProjection  inverse_worldviewproj_matrix
-        param_named_auto uProjection              projection_matrix
-    }
-}
-
-material CustomShadows/ShadowCaster
-{
-    technique glsl
-    {
-        // Z-write only pass
-        pass Z-write
-        {
-            vertex_program_ref CustomShadows/ShadowCasterVP/GLSL
-            {
-            }
-            fragment_program_ref CustomShadows/ShadowCasterFP/GLSL
-            {
-            }
-        }
-    }
-
-    technique hlsl
-    {
-        // Z-write only pass
-        pass Z-write
-        {
-            //Instead of using depth_bias, we'll be implementing it manually
-
-            vertex_program_ref CustomShadows/ShadowCasterVP/HLSL
-            {
-            }
-            fragment_program_ref CustomShadows/ShadowCasterFP/HLSL
-            {
-            }
-        }
-    }
-
-    technique cg
-    {
-        // Z-write only pass
-        pass Z-write
-        {
-            //Instead of using depth_bias, we'll be implementing it manually
-
-            vertex_program_ref CustomShadows/ShadowCasterVP/Cg
-            {
-            }
-            fragment_program_ref CustomShadows/ShadowCasterFP/Cg
-            {
-            }
-        }
-    }
-}
-
-
-
-// Shadow Receiver ________________________________________________
-
-vertex_program CustomShadows/ShadowReceiverVP/Cg cg
-{
-    source customshadowreceivervp.cg
-    entry_point main
-    profiles arbvp1 vs_2_0
-
-    default_params
-    {
-        param_named_auto uModelViewProjection   worldviewproj_matrix
-        param_named_auto uLightPosition         light_position_object_space 0
-        param_named_auto uModel                 world_matrix
-        param_named_auto uTextureViewProjection texture_viewproj_matrix
-    }
-}
-
-fragment_program CustomShadows/ShadowReceiverFP/Cg cg
-{
-    source customshadowreceiverfp.cg
-    entry_point main
-    profiles arbfp1 ps_2_x
-
-    default_params
-    {
-        param_named uSTexWidth  float 512.0
-        param_named uSTexHeight float 512.0
-    }
-}
-
-vertex_program CustomShadows/ShadowReceiverVP/GLSL glsl
-{
-    source customshadowreceiver.vert
-    
-    default_params
-    {
-        param_named_auto uModelViewProjection   worldviewproj_matrix
-        param_named_auto uLightPosition         light_position_object_space 0
-        param_named_auto uModel                 world_matrix
-        param_named_auto uTextureViewProjection texture_viewproj_matrix
-    }
-}
-
-fragment_program CustomShadows/ShadowReceiverFP/GLSL glsl
-{
-    source customshadowreceiver.frag
-
-    default_params
-    {
-        param_named uSTexWidth  float 512.0
-        param_named uSTexHeight float 512.0
-    }
-}
-
-vertex_program CustomShadows/ShadowReceiverVP/HLSL hlsl
-{
-    source customshadowreceivervp.hlsl
-    entry_point main
-    target vs_2_0
-
-    default_params
-    {
-        param_named_auto uModelViewProjection   worldviewproj_matrix
-        param_named_auto uLightPosition         light_position_object_space 0
-        param_named_auto uModel                 world_matrix
-        param_named_auto uTextureViewProjection texture_viewproj_matrix
-    }
-}
-
-fragment_program CustomShadows/ShadowReceiverFP/HLSL hlsl
-{
-    source customshadowreceiverfp.hlsl
-    entry_point main
-    target ps_3_0
-
-    default_params
-    {
-        param_named uSTexWidth  float 512.0
-        param_named uSTexHeight float 512.0
-    }
-}
-
-material CustomShadows/ShadowReceiver
-{
-    technique glsl
-    {
-        pass lighting
-        {
-            vertex_program_ref CustomShadows/ShadowReceiverVP/GLSL
-            {
-            }
-
-            fragment_program_ref CustomShadows/ShadowReceiverFP/GLSL
-            {
-                param_named uShadowMap int 0
-            }
-
-            texture_unit ShadowMap
-            {
-                tex_address_mode clamp
-                filtering none
-            }
-        }
-    }
-
-    technique hlsl
-    {
-        pass lighting
-        {
-            vertex_program_ref CustomShadows/ShadowReceiverVP/HLSL
-            {
-            }
-
-            fragment_program_ref CustomShadows/ShadowReceiverFP/HLSL
-            {
-            }
-
-            // we won't rely on hardware specific filtering of z-tests
-            texture_unit ShadowMap
-            {
-                tex_address_mode clamp
-                filtering none
-            }
-        }
-    }
-
-    technique cg
-    {
-        pass lighting
-        {
-            vertex_program_ref CustomShadows/ShadowReceiverVP/Cg
-            {
-            }
-
-            fragment_program_ref CustomShadows/ShadowReceiverFP/Cg
-            {
-            }
-
-            // we won't rely on hardware specific filtering of z-tests
-            texture_unit ShadowMap
-            {
-                tex_address_mode clamp
-                filtering none
-            }
-        }
-    }
-}
-```
-
-Three techniques are presented, one for GLSL, one for HLSL, and one for
-Cg. We’ll present the GLSL code below. Note that while most of the
+The material uses unified programs for HLSL, GLSL and GLSLES. 
+We’ll present the GLSL code below. Note that while most of the
 shader files are direct translations of each other, DirectX HLSL shaders
 must handle percentage closest filtering slightly differently from
 OpenGL. OpenGL chooses the convention of having integers index sample
@@ -654,273 +372,26 @@ With minimal effort one can match the shader equations with those
 presented earlier. The code is presented here mostly to demonstrate how
 things fit together.
 
-```cpp
-    //////////////////////////////////////////////////////////////////
-    //
-    // shadowcastervp.vert
-    //
-    // This is an example vertex shader for shadow caster objects.  
-    //
-    //////////////////////////////////////////////////////////////////
-
-
-    // I N P U T   V A R I A B L E S /////////////////////////////////
-
-    uniform mat4 uModelViewProjection;   // modelview projection matrix
-
-    // O U T P U T   V A R I A B L E S ///////////////////////////////
-
-    varying vec4 pPosition;      // post projection position coordinates
-    varying vec4 pNormal;        // normal in object space (to be interpolated)
-    varying vec4 pModelPos;      // position in object space (to be interpolated) 
-
-    // M A I N ///////////////////////////////////////////////////////
-
-    void main()
-    {
-        // Transform vertex position into post projective (homogenous screen) space.
-        gl_Position = uModelViewProjection * gl_Vertex;
-        pPosition   = uModelViewProjection * gl_Vertex;
-       
-        // copy over data to interpolate using perspective correct interpolation
-        pNormal   = vec4(gl_Normal.x, gl_Normal.y, gl_Normal.z, 0.0);
-        pModelPos = gl_Vertex;
-    }
-```
+@include Samples/Media/materials/programs/GLSL/DepthShadowmapCasterVp.glsl
 
 This is a pretty standard vertex shader.
 
-```cpp
-    /////////////////////////////////////////////////////////////////////////////////
-    //
-    // shadowcasterfp.frag
-    //
-    // This is an example fragment shader for shadow caster objects.  
-    //
-    /////////////////////////////////////////////////////////////////////////////////
+@include Samples/Media/materials/programs/GLSL/DepthShadowmapCasterFp.glsl
 
-    // I N P U T   V A R I A B L E S ////////////////////////////////////////////////
+Just write out the depth values here. We compute the bias and derivatives in the receiver.
 
-    // uniform constants
-    uniform float uDepthOffset;           // offset amount (constant in eye space)
-    uniform float uSTexWidth;             // shadow map texture width
-    uniform float uSTexHeight;            // shadow map texture height
-    uniform mat4  uInvModelViewProjection;// inverse model-view-projection matrix
-    uniform mat4  uProjection;            // projection matrix
+@include Samples/Media/materials/programs/GLSL/DepthShadowmapReceiverVp.glsl
 
-    // per fragment inputs
-    varying vec4 pPosition;      // position of fragment (in homogeneous coordinates)
-    varying vec4 pNormal;        // un-normalized normal in object space
-    varying vec4 pModelPos;      // coordinates of model in object space at this point
+This is a pretty standard vertex shader as well.
 
-
-    // M A I N //////////////////////////////////////////////////////////////////////
-
-    void main(void)
-    {
-        // compute the "normalized device coordinates" (no viewport applied yet)
-        vec4 postProj = pPosition / pPosition.w;
-
-        // get the normalized normal of the geometry seen at this point
-        vec4 normal = normalize(pNormal);
-
-
-        // -- Computing Depth Bias Quantities -----------------------------
-
-        // We want to compute the "depth slope" of the polygon.  
-        // This is the change in z value that accompanies a change in x or y on screen
-        // such that the coordinates stay on the triangle. 
-        // The depth slope, dzlen below, is a measure of the uncertainty in our z value 
-        // Roughly, these equations come from re-arrangement of the product rule:
-        // d(uq) = d(u)q + u d(q) --> d(u) = 1/q * (d(uq) - u d(q))
-        vec4 duqdx = uInvModelViewProjection * vec4(1.0/uSTexWidth,0.0,0.0,0.0);
-        vec4 dudx  = pPosition.w * (duqdx - (pModelPos * duqdx.w));
-        vec4 duqdy = uInvModelViewProjection * vec4(0.0,1.0/uSTexHeight,0.0,0.0);
-        vec4 dudy  = pPosition.w * (duqdy - (pModelPos * duqdy.w));
-        vec4 duqdz = uInvModelViewProjection * vec4(0.0,0.0,1.0,0.0);
-        vec4 dudz  = pPosition.w * (duqdz - (pModelPos * duqdz.w));
-        // The next relations come from the requirement dot(normal, displacement) = 0
-        float denom = 1.0 / dot(normal.xyz, dudz.xyz);
-        vec2  dz = -  vec2( dot(normal.xyz, dudx.xyz) * denom , 
-                             dot(normal.xyz, dudy.xyz) * denom );
-        float  dzlen = max(abs(dz.x), abs(dz.y)); 
-
-
-        // We now compute the change in z that would signify a push in the z direction
-        // by 1 unit in eye space.  Note that eye space z is related in a nonlinear way to
-        // screen space z, so this is not just a constant.  
-        // ddepth below is how much screen space z at this point would change for that push.
-        // NOTE: computation of ddepth likely differs from OpenGL's glPolygonOffset "unit"
-        //  computation, which is allowed to be vendor specific.
-        vec4 dpwdz = uProjection * vec4(0.0, 0.0, 1.0, 0.0);
-        vec4 dpdz = (dpwdz - (postProj * dpwdz.w)) / pPosition.w;
-        float  ddepth = abs(dpdz.z);
-
-        // -- End depth bias helper section --------------------------------   
-
-        // We now compute the depth of the fragment.  This is the actual depth value plus
-        // our depth bias.  The depth bias depends on how uncertain we are about the z value
-        // plus some constant push in the z direction.  The exact coefficients to use are
-        // up to you, but at least it should be somewhat intuitive now what the tradeoffs are.
-        float depthval = postProj.z + (0.5 * dzlen)+ (uDepthOffset * ddepth);
-        depthval = (0.5 * depthval) + 0.5; // put into [0,1] range instead of [-1,1] 
-
-        gl_FragColor = vec4(depthval, depthval, depthval, 0.0);
-    }
-```
+@include Samples/Media/materials/programs/GLSL/DepthShadowmapReceiverFp.glsl
 
 This shader computes the two depth bias pieces described in section
 @ref DepthBias. These are used to offset the stored depth value. This is
 where the notation differs from above, but the translation is quite
 straightforward.
 
-```cpp
-    //////////////////////////////////////////////////////////////////
-    //
-    // shadowreceiver.vert
-    //
-    //////////////////////////////////////////////////////////////////
-
-
-    // I N P U T   V A R I A B L E S /////////////////////////////////
-
-    uniform mat4 uModelViewProjection;  // modelview projection matrix
-    uniform mat4 uModel;                    // model matrix
-    uniform mat4 uTextureViewProjection;    // shadow map's view projection matrix
-    uniform vec4 uLightPosition;            // light position in object space
-
-
-    // O U T P U T   V A R I A B L E S ///////////////////////////////
-
-    varying vec4   pShadowCoord;    // vertex position in shadow map coordinates
-    varying float  pDiffuse;        // diffuse shading value
-
-    // M A I N ///////////////////////////////////////////////////////
-
-    void main()
-    {
-        // compute diffuse shading
-        vec3 lightDirection = normalize(uLightPosition.xyz - gl_Vertex.xyz);
-        pDiffuse = dot(gl_Normal.xyz, lightDirection);
-
-        // compute shadow map lookup coordinates
-        pShadowCoord = uTextureViewProjection * (uModel * gl_Vertex);
-
-        // compute vertex's homogenous screen-space coordinates
-        // Use following line if other passes use shaders
-        //gl_Position = uModelViewProjection * gl_Vertex;   
-        gl_Position = ftransform(); // uncomment if other passes use fixed function pipeline
-    }
-```
-
-This is a pretty standard vertex shader as well. The ftransform()
-function guarantees the output matches the fixed function pipeline. If
-the objects you render use shaders instead of fixed function, then you
-should do so here as well.
-
-```cpp
-    /////////////////////////////////////////////////////////////////////////////////
-    //
-    // shadowreceiver.frag
-    //
-    /////////////////////////////////////////////////////////////////////////////////
-
-    // I N P U T   V A R I A B L E S ////////////////////////////////////////////////
-
-    // uniform constants
-    uniform sampler2D    uShadowMap;
-    uniform float        uSTexWidth;
-    uniform float        uSTexHeight;
-
-    // per fragment inputs
-    varying vec4   pShadowCoord;    // vertex position in shadow map coordinates
-    varying float  pDiffuse;        // diffuse shading value
-
-    // M A I N //////////////////////////////////////////////////////////////////////
-
-    void main(void)
-    {
-        // compute the shadow coordinates for texture lookup
-        // NOTE: texture_viewproj_matrix maps z into [0,1] range, not [-1,1], so
-        //  have to make sure shadow caster stores depth values with same convention.
-        vec4 scoord = pShadowCoord / pShadowCoord.w;
-
-
-        // -- "Percentage Closest Filtering" ----------------------------------------- 
-
-        // One could use scoord.xy to look up the shadow map for depth testing, but
-        // we'll be implementing a simple "percentage closest filtering" algorithm instead.
-        // This mimics the behavior of turning on bilinear filtering on NVIDIA hardware
-        // when also performing shadow comparisons.  This causes bilinear filtering of
-        // depth tests.  Note that this is NOT the same as bilinear filtering the depth
-        // values and then doing the depth comparison.  The two operations are not 
-        // commutative.  PCF is explicitly about filtering the test values since
-        // testing filtered z values is often meaningless.  
-
-        // Real percentage closest filtering should sample from the entire footprint
-        // on the shadow map, not just seek the closest four sample points.  Such 
-        // an improvement is for future work.
-
-        
-        // NOTE: Assuming OpenGL convention for texture lookups with integers in centers.
-        //  DX convention is to have integers mark sample corners
-        vec2 tcoord;
-        tcoord.x = (scoord.x * uSTexWidth) - 0.5;
-        tcoord.y = (scoord.y * uSTexHeight) - 0.5;
-        float x0 = floor(tcoord.x);
-        float x1 = ceil(tcoord.x);
-        float fracx = fract(tcoord.x);
-        float y0 = floor(tcoord.y);
-        float y1 = ceil(tcoord.y);
-        float fracy = fract(tcoord.y);
-        
-        // sample coordinates in [0,1]^2 domain
-        vec2 t00, t01, t10, t11;
-        float invWidth  = 1.0 / uSTexWidth;
-        float invHeight = 1.0 / uSTexHeight;
-        t00 = float2((x0+0.5) * invWidth, (y0+0.5) * invHeight);
-        t10 = float2((x1+0.5) * invWidth, (y0+0.5) * invHeight);
-        t01 = float2((x0+0.5) * invWidth, (y1+0.5) * invHeight);
-        t11 = float2((x1+0.5) * invWidth, (y1+0.5) * invHeight);
-        
-        // grab the samples
-        float z00 = texture2D(uShadowMap, t00).x;
-        float viz00 = (z00 <= scoord.z) ? 0.0 : 1.0;
-        float z01 = texture2D(uShadowMap, t01).x;
-        float viz01 = (z01 <= scoord.z) ? 0.0 : 1.0;
-        float z10 = texture2D(uShadowMap, t10).x;
-        float viz10 = (z10 <= scoord.z) ? 0.0 : 1.0;
-        float z11 = texture2D(uShadowMap, t11).x;
-        float viz11 = (z11 <= scoord.z) ? 0.0 : 1.0;
-
-        // determine that all geometry outside the shadow test frustum is lit
-        viz00 = ((abs(t00.x - 0.5) <= 0.5) && (abs(t00.y - 0.5) <= 0.5)) ? viz00 : 1.0;
-        viz01 = ((abs(t01.x - 0.5) <= 0.5) && (abs(t01.y - 0.5) <= 0.5)) ? viz01 : 1.0;
-        viz10 = ((abs(t10.x - 0.5) <= 0.5) && (abs(t10.y - 0.5) <= 0.5)) ? viz10 : 1.0; 
-        viz11 = ((abs(t11.x - 0.5) <= 0.5) && (abs(t11.y - 0.5) <= 0.5)) ? viz11 : 1.0;
-
-        // bilinear filter test results
-        float v0 = (1.0 - fracx) * viz00 + fracx * viz10;
-        float v1 = (1.0 - fracx) * viz01 + fracx * viz11;
-        float visibility = (1.0 - fracy) * v0 + fracy * v1;
-
-        // ------------------------------------------------------------------------------
-
-        // Non-PCF code (comment out above section and uncomment the following three lines)
-
-        //float zvalue = texture2D(uShadowMap, scoord.xy).x;
-        //float visibility = (zvalue <= scoord.z) ? 0.0 : 1.0;
-        //visibility = ((abs(scoord.x - 0.5) <= 0.5) && (abs(scoord.y - 0.5) <= 0.5)) 
-        //             ? visibility : 1.0;
-        
-        // ------------------------------------------------------------------------------
-
-        visibility *= pDiffuse;
-        gl_FragColor = vec4(visibility, visibility, visibility, 0.0);
-    }
-```
-
-This file implements percentage closest filtering. To use unfiltered
+Additionally this file implements percentage closest filtering. To use unfiltered
 shadow mapping, comment out the PCF block as noted and uncomment the
 Non-PCF block. Note that after doing this, the uSTexWidth and
 uSTexHeight variables are likely to be optimized away and so you should
@@ -930,12 +401,11 @@ The following shows how to activate plane optimal shadow mapping given
 some pointer to a MovablePlane and a pointer to a light.
 
 ```cpp
-        PlaneOptimalShadowCameraSetup *planeOptShadowCamera = 
-                                       new PlaneOptimalShadowCameraSetup(movablePlane);
-        Entity *movablePlaneEntity = sceneMgr->createEntity( "movablePlane", "plane.mesh" );
-        SceneNode *movablePlaneNode = 
-                     sceneMgr->getRootSceneNode()->createChildSceneNode("MovablePlaneNode");
-        movablePlaneNode->attachObject(movablePlaneEntity);
-        SharedPtr<ShadowCameraSetup> planeOptPtr(planeOptShadowCamera);
-        light->setCustomShadowCameraSetup(planeOptPtr);
+Ogre::PlaneOptimalShadowCameraSetup *planeOptShadowCamera = 
+                                new PlaneOptimalShadowCameraSetup(movablePlane);
+Ogre::Entity *movablePlaneEntity = sceneMgr->createEntity( "movablePlane", "plane.mesh" );
+Ogre::SceneNode *movablePlaneNode = 
+                sceneMgr->getRootSceneNode()->createChildSceneNode("MovablePlaneNode");
+movablePlaneNode->attachObject(movablePlaneEntity);
+light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(planeOptShadowCamera));
 ```
