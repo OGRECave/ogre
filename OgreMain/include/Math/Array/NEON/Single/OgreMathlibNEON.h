@@ -643,7 +643,10 @@ namespace Ogre
         static inline ArrayReal Sqrt( ArrayReal f )
         {
             //Netwon-Raphson, 2 iterations.
-            const ArrayReal fStep0 = vrsqrteq_f32( f );
+            ArrayReal fStep0 = vrsqrteq_f32( f );
+            //Nuke NaN when f == 0
+            fStep0 = vreinterpretq_f32_u32( vandq_u32( vtstq_u32( f, f ),
+                                                       vreinterpretq_u32_f32( fStep0 ) ) );
             // step fStep0 = 1 / sqrt(x)
             const ArrayReal fStepParm0  = vmulq_f32( f, fStep0 );
             const ArrayReal fStepResult0= vrsqrtsq_f32( fStepParm0, fStep0 );
