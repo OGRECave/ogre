@@ -529,11 +529,18 @@ namespace Ogre {
 #endif
 
         RenderSystem* renderSystem = Root::getSingleton().getRenderSystem();
-        // API specific
-        renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRS);
-        // API specific for Gpu Programs
-        renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRSDepth, true);
 
+        if(renderSystem)
+        {
+            // API specific
+            renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRS);
+            renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRSDepth, true);
+        }
+        else
+        {
+            mProjMatrixRS = mProjMatrix;
+            mProjMatrixRSDepth = mProjMatrix;
+        }
 
         // Calculate bounding box (local)
         // Box is from 0, down -Z, max dimensions as determined from far plane
