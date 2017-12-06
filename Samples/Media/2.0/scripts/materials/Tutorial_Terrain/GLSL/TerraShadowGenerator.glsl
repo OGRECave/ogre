@@ -82,6 +82,10 @@ void main()
 	}
 	else
 	{
+		//Due to alignment nightmares, instead of doing startXY[8192];
+		//we perform startXY[4096] and store the values in .zw instead of .xy
+		//It only gets used if the picture is very big. This branch is coherent as
+		//long as 4096 is multiple of threads_per_group_x.
 		x = startXY[gl_GlobalInvocationID.x - 4096u].z;
 		y = startXY[gl_GlobalInvocationID.x - 4096u].w;
 	}
