@@ -246,7 +246,7 @@ endif()
 target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_LIBRARIES} OgreBites)
 
 if(ANDROID)
-    target_link_libraries(SampleBrowser native_app_glue cpufeatures android c m dl z log EGL GLESv2)
+    target_link_libraries(SampleBrowser native_app_glue cpufeatures android c m dl z log EGL GLESv2 "-u ANativeActivity_onCreate")
 endif()
 
 # Add samples as dependencies
