@@ -408,6 +408,28 @@ if (APPLE)
 
 endif (APPLE)
 
+if (ANDROID)
+    SET(ANDROID_MOD_NAME "OgreSampleBrowser")
+    SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
+    SET(PKG_NAME "org.ogre.browser")
+    SET(HAS_CODE "false")
+    SET(MAIN_ACTIVITY "android.app.NativeActivity")
+    SET(HEADERS "")
+    SET(SAMPLE_LDLIBS "")
+
+    copy_assets_to_android_proj()
+
+    file(MAKE_DIRECTORY "${NDKOUT}/libs")
+    file(MAKE_DIRECTORY "${NDKOUT}/libs/${ANDROID_NDK_ABI_NAME}")
+    set_target_properties(SampleBrowser PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${NDKOUT}/libs/${ANDROID_NDK_ABI_NAME}")
+
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
+    ogre_add_library_to_folder(Samples SampleBrowserDummy SHARED ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
+
+    create_android_proj(SampleBrowserDummy)
+    # this whole part should be simplified more
+endif(ANDROID)
+
 if (OGRE_INSTALL_SAMPLES)
 	ogre_install_target(SampleBrowser "" FALSE)
 	if (OGRE_INSTALL_PDB)
