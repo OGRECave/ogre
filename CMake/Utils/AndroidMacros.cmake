@@ -8,23 +8,25 @@
 #-------------------------------------------------------------------
 
 
-if(NOT TARGET cpufeatures)
-    add_library(cpufeatures STATIC ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
-    target_link_libraries(cpufeatures dl)
-endif(NOT TARGET cpufeatures)
+if(OGRE_BUILD_ANDROID_JNI_LIBS_CMAKE)
+    if(NOT TARGET cpufeatures)
+        add_library(cpufeatures STATIC ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
+        target_link_libraries(cpufeatures dl)
+    endif(NOT TARGET cpufeatures)
 
-if(NOT TARGET native_app_glue)
-    add_library(native_app_glue STATIC ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
-    target_link_libraries(native_app_glue log)
-endif(NOT TARGET native_app_glue)
+    if(NOT TARGET native_app_glue)
+        add_library(native_app_glue STATIC ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+        target_link_libraries(native_app_glue log)
+    endif(NOT TARGET native_app_glue)
 
-macro(add_ndk_cpufeatures_includes)
-    include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
-endmacro(add_ndk_cpufeatures_includes)
+    macro(add_ndk_cpufeatures_includes)
+        include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
+    endmacro(add_ndk_cpufeatures_includes)
 
-macro(add_ndk_native_app_glue_includes)
-    include_directories(${ANDROID_NDK}/sources/android/native_app_glue)
-endmacro(add_ndk_native_app_glue_includes)
+    macro(add_ndk_native_app_glue_includes)
+        include_directories(${ANDROID_NDK}/sources/android/native_app_glue)
+    endmacro(add_ndk_native_app_glue_includes)
+endif(OGRE_BUILD_ANDROID_JNI_LIBS_CMAKE)
 
 macro(add_static_libs LIB_DIR)
     foreach(LIB_NAME ${ARGN})
