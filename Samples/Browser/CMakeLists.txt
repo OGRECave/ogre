@@ -422,6 +422,7 @@ if (ANDROID)
     file(MAKE_DIRECTORY "${NDKOUT}/libs")
     file(MAKE_DIRECTORY "${NDKOUT}/libs/${ANDROID_NDK_ABI_NAME}")
     set_target_properties(SampleBrowser PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${NDKOUT}/libs/${ANDROID_NDK_ABI_NAME}")
+    set_target_properties(SampleBrowser PROPERTIES OUTPUT_NAME "OgreSampleBrowser")
 
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
     ogre_add_library_to_folder(Samples SampleBrowserDummy SHARED ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
