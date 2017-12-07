@@ -637,6 +637,10 @@ namespace Ogre {
             break;
         }
 
+        //It should be already normalized, but floating point can cause
+        //successive calls to rotate to accumulate error.
+        orientation.normalise();
+
         mTransform.mOrientation->setFromQuaternion( orientation, mTransform.mIndex );
         CACHED_TRANSFORM_OUT_OF_DATE();
     }
