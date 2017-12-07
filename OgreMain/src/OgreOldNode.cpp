@@ -515,6 +515,7 @@ namespace v1 {
             mOrientation = mOrientation * qnorm;
             break;
         }
+        mOrientation.normalise();
         needUpdate();
     }
 

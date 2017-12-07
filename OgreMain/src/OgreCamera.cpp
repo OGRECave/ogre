@@ -292,6 +292,7 @@ namespace Ogre {
         Quaternion qnorm = q;
         qnorm.normalise();
         mOrientation = qnorm * mOrientation;
+        mOrientation.normalise();
 
         invalidateView();
 
