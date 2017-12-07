@@ -228,6 +228,9 @@ endif()
 if (ANDROID)
     include(AndroidMacros) # makes libraries native_app_glue and cpufeatures available
 
+    add_ndk_cpufeatures_includes()
+    add_ndk_native_app_glue_includes()
+
     set(SOURCE_FILES src/gestureDetector.cpp)
 
     ogre_add_library(SampleBrowser SHARED ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
