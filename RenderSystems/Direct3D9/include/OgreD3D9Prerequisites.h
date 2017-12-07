@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 #include "Threading/OgreThreadHeaders.h"
 
-#if OGRE_THREAD_SUPPORT
+#if OGRE_THREAD_SUPPORT == 1 || OGRE_THREAD_SUPPORT == 2
 #   define OGRE_LOCK_RECURSIVE_MUTEX(name)   name.lock();
 #   define OGRE_UNLOCK_RECURSIVE_MUTEX(name) name.unlock();
 #else
