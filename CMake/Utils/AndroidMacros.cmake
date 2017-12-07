@@ -8,6 +8,18 @@
 #-------------------------------------------------------------------
 
 
+if(NOT TARGET cpufeatures)
+    include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
+    add_library(cpufeatures STATIC ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
+    target_link_libraries(cpufeatures dl)
+endif(NOT TARGET cpufeatures)
+
+if(NOT TARGET native_app_glue)
+    include_directories(${ANDROID_NDK}/sources/android/native_app_glue)
+    add_library(native_app_glue STATIC ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+    target_link_libraries(native_app_glue log)
+endif(NOT TARGET native_app_glue)
+
 macro(add_static_libs LIB_DIR)
     foreach(LIB_NAME ${ARGN})
         SET(HEADERS "${HEADERS}# ${LIB_NAME}\n\tinclude $(CLEAR_VARS)\n\tLOCAL_MODULE    := ${LIB_NAME}\n\tLOCAL_SRC_FILES := ${LIB_DIR}/lib${LIB_NAME}.a\n\tinclude $(PREBUILT_STATIC_LIBRARY)\n\n")
