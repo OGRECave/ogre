@@ -170,7 +170,7 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 endif()
 
 
-if(ANDROID)
+if(ANDROID AND NOT OGRE_BUILD_ANDROID_JNI_LIBS_CMAKE)
     include(AndroidMacros)
     
     SET(ANDROID_MOD_NAME "OgreSampleBrowser")
@@ -225,7 +225,15 @@ if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
     link_directories(${DirectX9_LIBRARY_DIR})
 endif()
 
-ogre_add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+if (ANDROID)
+    include(AndroidMacros) # makes libraries native_app_glue and cpufeatures available
+
+    set(SOURCE_FILES src/gestureDetector.cpp)
+
+    ogre_add_library(SampleBrowser SHARED ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+else()
+    ogre_add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+endif()
 
 # Fix for static build with MinGW
 if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
@@ -233,6 +241,10 @@ if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
 endif()
 
 target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_LIBRARIES} OgreBites)
+
+if(ANDROID)
+    target_link_libraries(SampleBrowser native_app_glue cpufeatures android c m dl z log EGL GLESv2)
+endif()
 
 # Add samples as dependencies
 add_dependencies(SampleBrowser ${OGRE_SAMPLES_LIST})
@@ -408,4 +420,4 @@ if (OGRE_INSTALL_SAMPLES)
 			)
 	endif ()
 endif ()
-endif(ANDROID)
+endif(ANDROID AND NOT OGRE_BUILD_ANDROID_JNI_LIBS_CMAKE)
