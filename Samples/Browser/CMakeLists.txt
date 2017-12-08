@@ -10,14 +10,14 @@
 # Configure Browser demo build
 
 set (HEADER_FILES
-	include/SampleBrowser.h
+	${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 )
 
-set(SOURCE_FILES src/SampleBrowser.cpp)
+set(SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/SampleBrowser.cpp)
 
 # Get the list of configured samples
 get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
@@ -43,20 +43,20 @@ endif ()
 
 if (APPLE AND APPLE_IOS)
   set(HEADER_FILES ${HEADER_FILES}
-    include/SampleBrowser_iOS.h
+    ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_iOS.h
   )
 elseif (OGRE_BUILD_PLATFORM_NACL)
   set(HEADER_FILES ${HEADER_FILES}
-    include/SampleBrowser_NaCl.h
+    ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_NaCl.h
   )
 elseif (APPLE)
   set(HEADER_FILES ${HEADER_FILES}
-    include/SampleBrowser_OSX.h
+    ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_OSX.h
 	${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns
   )
 elseif (ANDROID)
   set(HEADER_FILES ${HEADER_FILES}
-    include/SampleBrowser_Android.h)
+    ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_Android.h)
 endif (APPLE AND APPLE_IOS)
 
 
@@ -186,7 +186,7 @@ if (ANDROID)
     add_ndk_cpufeatures_library()
     add_ndk_native_app_glue_library()
 
-    set(SOURCE_FILES ${SOURCE_FILES} src/gestureDetector.cpp)
+    set(SOURCE_FILES ${SOURCE_FILES} ${OGRE_SOURCE_DIR}/Samples/Browser/src/gestureDetector.cpp)
 
     ogre_add_library(SampleBrowser SHARED ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 else()
