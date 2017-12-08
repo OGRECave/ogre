@@ -269,7 +269,6 @@ elseif (ANDROID)
   set(OGRE_PLATFORM OGRE_PLATFORM_ANDROID)
   set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE FALSE CACHE BOOL "Disable viewport orientation Android" FORCE)
   option(OGRE_BUILD_ANDROID_JNI_SAMPLE "Enable JNI Sample" FALSE)
-  option(OGRE_BUILD_ANDROID_JNI_LIBS_CMAKE "Build native android JNI libs using CMake instead of android makefiles [BETA]" FALSE)
 
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for Android" FORCE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE CACHE BOOL "Disable OpenGL ES 1 RenderSystem for Android" FORCE)
