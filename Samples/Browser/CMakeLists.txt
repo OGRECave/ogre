@@ -226,10 +226,10 @@ if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
 endif()
 
 if (ANDROID)
-    include(AndroidMacros) # makes libraries native_app_glue and cpufeatures available
+    include(AndroidMacros)
 
-    add_ndk_cpufeatures_includes()
-    add_ndk_native_app_glue_includes()
+    add_ndk_cpufeatures_library()
+    add_ndk_native_app_glue_library()
 
     set(SOURCE_FILES ${SOURCE_FILES} src/gestureDetector.cpp)
 
