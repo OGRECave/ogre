@@ -78,7 +78,7 @@ namespace Ogre
          */
         const Ogre::String getConfigFilePath(Ogre::String filename) const
         {
-            #if OGRE_DEBUG_MODE == 1 && (OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS)
+            #if OGRE_DEBUG_MODE && OGRE_PLATFORM == OGRE_PLATFORM_WIN32
                 // add OGRE_BUILD_SUFFIX (default: "_d") to config file names
                 Ogre::String::size_type pos = filename.rfind('.');
                 if (pos != Ogre::String::npos)

@@ -252,7 +252,7 @@ endif ()
 ogre_config_common(SampleBrowser)
 
 # append _d for debug builds
-if (NOT (APPLE OR WINDOWS_STORE OR WINDOWS_PHONE))
+if (WIN32 AND NOT (WINDOWS_STORE OR WINDOWS_PHONE))
 	set_property(TARGET SampleBrowser APPEND PROPERTY DEBUG_POSTFIX "_d")
 endif ()
 

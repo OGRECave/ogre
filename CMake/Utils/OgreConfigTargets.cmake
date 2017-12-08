@@ -419,7 +419,7 @@ function(ogre_config_tool TOOLNAME)
   ogre_config_common(${TOOLNAME})
 
   #set _d debug postfix
-  if (NOT APPLE)
+  if (WIN32)
 	set_property(TARGET ${TOOLNAME} APPEND PROPERTY DEBUG_POSTFIX "_d")
   endif ()
 
