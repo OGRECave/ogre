@@ -169,51 +169,6 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 
 endif()
 
-
-if(ANDROID AND NOT OGRE_BUILD_ANDROID_JNI_LIBS_CMAKE)
-    include(AndroidMacros)
-    
-    SET(ANDROID_MOD_NAME "OgreSampleBrowser")
-    SET(JNI_PATH "${CMAKE_SOURCE_DIR}/Samples/Browser/src")
-    SET(JNI_SRC_FILES "SampleBrowser.cpp gestureDetector.cpp")
-    
-    SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
-    
-    # Force export ANativeActivity_onCreate()  
-    # Refer to: https://github.com/android-ndk/ndk/issues/381.
-    # Only needed when building with NDK-R14 and older
-    SET(OGRE_ANDROID_LDFLAGS "-u ANativeActivity_onCreate")
-
-    SET(PKG_NAME "org.ogre.browser")
-    # Set this variable to false if no java code will be present (google android:hasCode for more info)
-    SET(HAS_CODE "false")
-    
-    SET(MAIN_ACTIVITY "android.app.NativeActivity")
-    SET(HEADERS "")
-    SET(SAMPLE_LDLIBS "android_native_app_glue")
-    
-    add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_Water" "Sample_Ocean" "Sample_NewInstancing" "Sample_ShaderSystem" "Sample_DeferredShading" "Sample_EndlessWorld" "Sample_VolumeCSG" "Sample_VolumeTerrain" "Sample_Terrain" "Sample_ShaderSystemMultiLight" "Sample_ShaderSystemTexturedFog")
-	add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Fresnel" "Sample_Grass" "Sample_ParticleFX" "Sample_MeshLod" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
-	add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_CameraTrack" "Sample_CelShading" "Sample_Character" "Sample_Compositor" "Sample_Lighting" "Sample_BezierPatch" "Sample_CubeMapping" "Sample_DynTex")
-	add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_HLMS" "Sample_VolumeTex")
-
-    if(OGRE_BUILD_TESTS)
-        set(OGRE_ANDROID_CFLAGS -DSAMPLES_INCLUDE_PLAYPEN)
-        set(OGRE_ANDROID_INCLUDES ${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
-        add_static_libs("${OGRE_BINARY_DIR}/lib" PlayPenTests)
-    endif()
-
-	copy_assets_to_android_proj()
-    
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
-    ogre_add_library_to_folder(Samples SampleBrowserDummy SHARED ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
-    target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
-    add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
-    
-    create_android_proj(SampleBrowserDummy)
-
-else()
-
 if (OGRE_BUILD_TESTS)
 	add_definitions(-DSAMPLES_INCLUDE_PLAYPEN)
 	include_directories(${OGRE_SOURCE_DIR}/Tests/PlayPen/include
@@ -443,4 +398,3 @@ if (OGRE_INSTALL_SAMPLES)
 			)
 	endif ()
 endif ()
-endif(ANDROID AND NOT OGRE_BUILD_ANDROID_JNI_LIBS_CMAKE)
