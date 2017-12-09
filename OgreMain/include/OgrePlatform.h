@@ -265,7 +265,7 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Library suffixes
 // "_d" for debug builds, nothing otherwise
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE && OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #   define OGRE_BUILD_SUFFIX "_d"
 #else
 #   define OGRE_BUILD_SUFFIX ""

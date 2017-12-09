@@ -139,8 +139,6 @@ protected:
     // transient pointer to LiSPSM setup if present
     LiSPSMShadowCameraSetup* mLiSPSMSetup;
 
-    bool mIsOpenGL;
-
 public:
 
     bool frameEnded(const FrameEvent& evt)
@@ -209,9 +207,6 @@ protected:
     // Just override the mandatory create scene method
     void setupContent(void)
     {
-        // Need to detect D3D or GL for best depth shadowmapping
-        mIsOpenGL = Root::getSingleton().getRenderSystem()->getName().find("GL") != String::npos;
-
         // do this first so we generate edge lists
         if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_HWSTENCIL))
         {
@@ -358,18 +353,7 @@ protected:
         pPlaneEnt->setMaterialName(BASIC_ROCKWALL_MATERIAL);
         pPlaneEnt->setCastShadows(false);
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
-
-        if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_HWRENDER_TO_TEXTURE))
-        {
-            // In D3D, use a 1024x1024 shadow texture
-            mSceneMgr->setShadowTextureSettings(1024, 2);
-        }
-        else
-        {
-            // Use 512x512 texture in GL since we can't go higher than the window res
-            mSceneMgr->setShadowTextureSettings(512, 2);
-        }
-
+        mSceneMgr->setShadowTextureSettings(1024, 2);
         mSceneMgr->setShadowColour(ColourValue(0.5, 0.5, 0.5));
         //mSceneMgr->setShowDebugShadows(true);
 
@@ -718,18 +702,8 @@ protected:
 
                 break;
             case MAT_DEPTH_FLOAT:
-                //if (mIsOpenGL)
-                //{
-                //  // GL performs much better if you pick half-float format
-                //  mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT16_R);
-                //}
-                //else
-                {
-                    // D3D is the opposite - if you ask for PF_FLOAT16_R you
-                    // get an integer format instead! You can ask for PF_FLOAT16_GR
-                    // but the precision doesn't work well
-                    mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
-                }
+                mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
+
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
                 mSceneMgr->setShadowTextureCasterMaterial(themat);
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_RECEIVER_MATERIAL);
@@ -757,18 +731,8 @@ protected:
                 setDefaultDepthShadowParams();
                 break;
             case MAT_DEPTH_FLOAT_PCF:
-                //if (mIsOpenGL)
-                //{
-                //  // GL performs much better if you pick half-float format
-                //  mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT16_R);
-                //}
-                //else
-                {
-                    // D3D is the opposite - if you ask for PF_FLOAT16_R you
-                    // get an integer format instead! You can ask for PF_FLOAT16_GR
-                    // but the precision doesn't work well
-                    mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
-                }
+                mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
+
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
                 mSceneMgr->setShadowTextureCasterMaterial(themat);
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_RECEIVER_MATERIAL + "/PCF");

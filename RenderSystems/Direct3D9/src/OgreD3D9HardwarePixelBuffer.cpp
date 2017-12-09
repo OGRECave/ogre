@@ -640,7 +640,7 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dst
     // convert to pixelbuffer's native format if necessary
     if (D3D9Mappings::_getPF(src.format) == D3DFMT_UNKNOWN)
     {
-        buf.bind(OGRE_NEW MemoryDataStream(
+        buf.reset(OGRE_NEW MemoryDataStream(
             PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(),
             mFormat)));
         converted = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), mFormat, buf->getPtr());

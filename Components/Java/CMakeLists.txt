@@ -9,6 +9,7 @@ if(ANDROID)
 	set(JNI_INCLUDE_DIRS "")
 else()
 	find_package(JNI)
+	find_package(Java QUIET)
 endif()
 
 if(NOT JNI_FOUND OR NOT SWIG_FOUND)
@@ -73,6 +74,15 @@ endif()
 
 swig_add_module(OgreJNI java ${SWIG_INPUT_MODULES})
 swig_link_libraries(OgreJNI OgreBites OgreOverlay OgreRTShaderSystem OgreMain ${JNI_LIBRARIES})
+
+if(${Java_FOUND})
+	include(UseJava)
+	file(GLOB JAVA_SRCS "${OGRE_BINARY_DIR}/java/src/org/Ogre/*.java")
+	add_jar(Ogre SOURCES ${JAVA_SRCS} 
+				 VERSION ${OGRE_VERSION}
+				 OUTPUT_DIR ${OGRE_BINARY_DIR}/java)
+endif()
+
 if(ANDROID)
 	set_target_properties(${SWIG_MODULE_OgreJNI_REAL_NAME} PROPERTIES LINK_FLAGS -s) # strip symbols
 endif()

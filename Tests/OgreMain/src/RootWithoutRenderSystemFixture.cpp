@@ -43,7 +43,7 @@ void RootWithoutRenderSystemFixture::SetUp()
 
 void RootWithoutRenderSystemFixture::TearDown()
 {
-    delete mHBM;
     delete mRoot;
+    delete mHBM;
     delete mFSLayer;
 }

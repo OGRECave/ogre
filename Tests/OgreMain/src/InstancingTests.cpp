@@ -51,9 +51,6 @@ TEST_F(Instancing, Bounds) {
 
     EXPECT_EQ(instanced_entity.getBoundingBox(), entity->getBoundingBox());
     EXPECT_EQ(instanced_entity.getBoundingRadius(), entity->getBoundingRadius());
-
-    sceneMgr->destroyEntity(entity);
-    MeshManager::getSingleton().remove(mesh->getHandle());
 }
 
 

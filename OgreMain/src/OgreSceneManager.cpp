@@ -349,7 +349,8 @@ void SceneManager::destroyCamera(const String& name)
             mShadowCamLightMapping.erase( camLightIt );
 
         // Notify render system
-        mDestRenderSystem->_notifyCameraRemoved(i->second);
+        if(mDestRenderSystem)
+            mDestRenderSystem->_notifyCameraRemoved(i->second);
         OGRE_DELETE i->second;
         mCameras.erase(i);
     }
