@@ -7,6 +7,21 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
+macro(add_ndk_cpufeatures_library)
+    include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
+    if(NOT TARGET cpufeatures)
+        add_library(cpufeatures STATIC ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
+        target_link_libraries(cpufeatures dl)
+    endif(NOT TARGET cpufeatures)
+endmacro(add_ndk_cpufeatures_library)
+
+macro(add_ndk_native_app_glue_library)
+    include_directories(${ANDROID_NDK}/sources/android/native_app_glue)
+    if(NOT TARGET native_app_glue)
+        add_library(native_app_glue STATIC ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+        target_link_libraries(native_app_glue log)
+    endif(NOT TARGET native_app_glue)
+endmacro(add_ndk_native_app_glue_library)
 
 macro(add_static_libs LIB_DIR)
     foreach(LIB_NAME ${ARGN})
