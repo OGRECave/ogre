@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreCamera.h"
 #include "RootWithoutRenderSystemFixture.h"
 
-#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1600)
 #include <random>
 using std::minstd_rand;
 #else
