@@ -306,10 +306,11 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
     Technique *srctech;
     MaterialPtr mat, srcmat;
     
-    CompositionTargetPass::PassIterator it = target->getPassIterator();
-    while(it.hasMoreElements())
+    CompositionTargetPass::Passes::const_iterator it = target->getPasses().begin();
+
+    for (;it != target->getPasses().end(); ++it)
     {
-        CompositionPass *pass = it.getNext();
+        CompositionPass *pass = *it;
         switch(pass->getType())
         {
         case CompositionPass::PT_CLEAR:
@@ -844,10 +845,11 @@ void CompositorInstance::deriveTextureRenderTargetOptions(
             else
             {
                 // look for a render_scene pass
-                CompositionTargetPass::PassIterator pit = tp->getPassIterator();
-                while(pit.hasMoreElements())
+                CompositionTargetPass::Passes::const_iterator pit = tp->getPasses().begin();
+
+                for (;pit != tp->getPasses().end(); ++pit)
                 {
-                    CompositionPass* pass = pit.getNext();
+                    CompositionPass* pass = *pit;
                     if (pass->getType() == CompositionPass::PT_RENDERSCENE)
                     {
                         renderingScene = true;
