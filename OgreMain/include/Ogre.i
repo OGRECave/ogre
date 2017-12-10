@@ -272,7 +272,15 @@ ADD_REPR(ColourValue)
 %include "OgreControllerManager.h"
 %template(CompositorPtr) Ogre::SharedPtr<Ogre::Compositor>;
 %include "OgreCompositor.h"
+%ignore Ogre::CompositionTechnique::getNumTextureDefinitions;
+%ignore Ogre::CompositionTechnique::getTextureDefinitionIterator;
+%ignore Ogre::CompositionTechnique::getTargetPass;
+%ignore Ogre::CompositionTechnique::getNumTargetPasses;
+%ignore Ogre::CompositionTechnique::getTargetPassIterator;
 %include "OgreCompositionTechnique.h"
+%ignore Ogre::CompositionTargetPass::getPass;
+%ignore Ogre::CompositionTargetPass::getNumPasses;
+%ignore Ogre::CompositionTargetPass::getPassIterator;
 %include "OgreCompositionTargetPass.h"
 %include "OgreResourceBackgroundQueue.h"
 %template(HardwareVertexBufferPtr) Ogre::SharedPtr<Ogre::HardwareVertexBuffer>;
@@ -306,6 +314,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::UnifiedHighLevelGpuProgram::setPrioriry;
 %include "OgreUnifiedHighLevelGpuProgram.h"
 // animations
+%ignore Ogre::VertexPoseKeyFrame::getPoseReferenceIterator;
 %include "OgreKeyFrame.h"
 %include "OgrePose.h"
 %include "OgreAnimationTrack.h"
