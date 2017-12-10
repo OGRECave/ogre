@@ -66,57 +66,20 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     # Creates a basic android JNI project
     # Expects :
     #    - ANDROID_MOD_NAME    Name of the android module
-    #    - JNI_PATH            Path to the jni directory containing .cpp files
-    #    - JNI_SRC_FILES       A list of native .cpp file names to compile
     #    - PKG_NAME            The name of the output android package ex"Org.Ogre.OgreJNI"
     #    - NDKOUT              The directory for the Ndk project to be written to
     #    - HAS_CODE            Set this variable to "false" if no java code will be present 
     #                          (google android:hasCode for more info)
     #    - MAIN_ACTIVITY       Name of the main java activity ex "android.app.MainActivity" 
-    #    - OGRE_ANDROID_CFLAGS (optional) additional CFLAGS to use
-    ##################################################################    
-    	
-	if(OGRE_BUILD_RENDERSYSTEM_GLES2)
-	    SET(DEPENDENCIES OgreMain OgreGLSupport RenderSystem_GLES2)
-	else()
-	    SET(DEPENDENCIES OgreMain RenderSystem_GLES)		
-	endif()
-	
-	SET(DEPENDENCIES ${DEPENDENCIES} OgreHLMS OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager OgreBites)
-	add_dependencies(${ANDROID_PROJECT_TARGET} ${DEPENDENCIES})
-	set(DEPEND_STATIC_LIBS "")	
-	foreach(DEPENDENCY ${DEPENDENCIES})
-	    set(DEPEND_STATIC_LIBS "${DEPENDENCY}Static" ${DEPEND_STATIC_LIBS})
-	endforeach(DEPENDENCY ${DEPENDENCIES})
-	add_static_libs("${OGRE_BINARY_DIR}/lib" ${DEPEND_STATIC_LIBS})
-	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
-        add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@"  "glsl_optimizer" "glcpp-library" "mesa")
-	endif()
-
-	if(OGRE_CONFIG_ENABLE_FREEIMAGE)
-	    add_static_libs_from_paths(${FreeImage_LIBRARIES})
-    endif()
-
-    if(Boost_FOUND)
-       list(APPEND OGRE_ANDROID_INCLUDES ${Boost_INCLUDE_DIRS})       
-	   add_static_libs_from_paths(${Boost_LIBRARIES})
-    endif()
-
-    add_static_libs_from_paths(${FREETYPE_LIBRARIES} ${ZZip_LIBRARIES})
+    ##################################################################
 
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
-      SET(NDK_BUILD_EXECUTABLE "ndk-build")
     else()
       if(EXISTS $ENV{ANDROID_SDK})
         SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
       else()
-	    SET(ANDROID_EXECUTABLE "/opt/android-sdk/tools/android")
-      endif()
-      if(EXISTS $ENV{ANDROID_NDK})
-        SET(NDK_BUILD_EXECUTABLE "$ENV{ANDROID_NDK}/ndk-build")
-      else()
-        SET(NDK_BUILD_EXECUTABLE "${ANDROID_NDK}/ndk-build")
+        SET(ANDROID_EXECUTABLE "/opt/android-sdk/tools/android")
       endif()
     endif()
 
@@ -129,38 +92,15 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 		SET(SCREEN_SIZE "|screenSize")
 	endif()
 	
-    set(OGRE_ANDROID_CFLAGS "${CMAKE_CXX_FLAGS} ${OGRE_ANDROID_CFLAGS}")
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
 
     file(MAKE_DIRECTORY "${NDKOUT}")
-    file(MAKE_DIRECTORY "${NDKOUT}/assets")	
-    file(MAKE_DIRECTORY "${NDKOUT}/res")	
+    file(MAKE_DIRECTORY "${NDKOUT}/assets")
+    file(MAKE_DIRECTORY "${NDKOUT}/res")
 	file(MAKE_DIRECTORY "${NDKOUT}/src")
 
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
     file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
-
-    if(JNI_SRC_FILES)
-        file(MAKE_DIRECTORY "${NDKOUT}/jni")
-        file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_NDK_ABI_NAME}\nLOCAL_ARM_NEON := ${NEON}\nAPP_STL := gnustl_static\nNDK_TOOLCHAIN_VERSION := ${ANDROID_COMPILER_VERSION}")
-        configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
-    endif()
-
-    if(DEBUG)    
-        add_custom_command(
-                            TARGET ${ANDROID_PROJECT_TARGET}
-                            POST_BUILD
-                            COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
-                            WORKING_DIRECTORY ${NDKOUT}
-                          )
-    elseif(JNI_SRC_FILES)
-        add_custom_command(
-                            TARGET ${ANDROID_PROJECT_TARGET}
-                            POST_BUILD
-                            COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1
-                            WORKING_DIRECTORY ${NDKOUT}
-                          )
-    endif()
     
     if(EXISTS ${ANDROID_EXECUTABLE})
     	add_custom_command(
