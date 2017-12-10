@@ -215,11 +215,11 @@ namespace Ogre
         {
             PoseRef& myPoseRef = *i;
             
-            VertexPoseKeyFrame::ConstPoseRefIterator basePoseIt = base->getPoseReferenceIterator();
+            PoseRefList::const_iterator basePoseIt = base->getPoseReferences().begin();
             Real baseInfluence = 0.0f;
-            while (basePoseIt.hasMoreElements())
+            for (;basePoseIt != base->getPoseReferences().end(); ++basePoseIt)
             {
-                const VertexPoseKeyFrame::PoseRef& basePoseRef = basePoseIt.getNext();
+                const PoseRef& basePoseRef = *basePoseIt;
                 if (basePoseRef.poseIndex == myPoseRef.poseIndex)
                 {
                     baseInfluence = basePoseRef.influence;

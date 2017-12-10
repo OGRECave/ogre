@@ -2393,11 +2393,11 @@ namespace Ogre {
         writeFloats(&timePos, 1);
         pushInnerChunk(mStream);
         // pose references
-        VertexPoseKeyFrame::ConstPoseRefIterator poseRefIt =
-            kf->getPoseReferenceIterator();
-        while (poseRefIt.hasMoreElements())
+        VertexPoseKeyFrame::PoseRefList::const_iterator poseRefIt =
+            kf->getPoseReferences().begin();
+        for (;poseRefIt != kf->getPoseReferences().begin(); ++poseRefIt)
         {
-            writePoseKeyframePoseRef(poseRefIt.getNext());
+            writePoseKeyframePoseRef(*poseRefIt);
         }
         popInnerChunk(mStream);
     }

@@ -232,11 +232,13 @@ namespace Ogre
         typedef VectorIterator<PoseRefList> PoseRefIterator;
         typedef ConstVectorIterator<PoseRefList> ConstPoseRefIterator;
 
-        /** Get an iterator over the pose references. */
-        PoseRefIterator getPoseReferenceIterator(void);
+        /** Get an iterator over the pose references.
+        @deprecated use getPoseReferences() */
+        OGRE_DEPRECATED PoseRefIterator getPoseReferenceIterator(void);
 
-        /** Get a const iterator over the pose references. */
-        ConstPoseRefIterator getPoseReferenceIterator(void) const;
+        /** Get a const iterator over the pose references.
+        @deprecated use getPoseReferences() */
+        OGRE_DEPRECATED ConstPoseRefIterator getPoseReferenceIterator(void) const;
 
         /** Clone a keyframe (internal use only) */
         KeyFrame* _clone(AnimationTrack* newParent) const;
