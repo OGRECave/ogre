@@ -74,48 +74,48 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     ##################################################################
 
     if(APPLE OR WIN32)
-      SET(ANDROID_EXECUTABLE "android")
+        SET(ANDROID_EXECUTABLE "android")
     else()
-      if(EXISTS $ENV{ANDROID_SDK})
-        SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
-      else()
-        SET(ANDROID_EXECUTABLE "/opt/android-sdk/tools/android")
-      endif()
+        if(EXISTS $ENV{ANDROID_SDK})
+            SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
+        else()
+            SET(ANDROID_EXECUTABLE "/opt/android-sdk/tools/android")
+        endif()
     endif()
 
-	SET(ANT_EXECUTABLE "ant")
-	
-	if(${ANDROID_NATIVE_API_LEVEL} LESS 14)
-		MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
-	else()
-		SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
-		SET(SCREEN_SIZE "|screenSize")
-	endif()
-	
+    SET(ANT_EXECUTABLE "ant")
+
+    if(${ANDROID_NATIVE_API_LEVEL} LESS 14)
+        MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
+    else()
+        SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
+        SET(SCREEN_SIZE "|screenSize")
+    endif()
+
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
 
     file(MAKE_DIRECTORY "${NDKOUT}")
     file(MAKE_DIRECTORY "${NDKOUT}/assets")
     file(MAKE_DIRECTORY "${NDKOUT}/res")
-	file(MAKE_DIRECTORY "${NDKOUT}/src")
+    file(MAKE_DIRECTORY "${NDKOUT}/src")
 
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
     file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
     
     if(EXISTS ${ANDROID_EXECUTABLE})
-    	add_custom_command(
-    	                    TARGET ${ANDROID_PROJECT_TARGET}
-                            POST_BUILD
-    	                    COMMAND ${ANDROID_EXECUTABLE} update project  --target ${ANDROID_TARGET} --path "${NDKOUT}"
-    	                    WORKING_DIRECTORY ${NDKOUT}
-    	                  )
-    	                  
-    	add_custom_command(
-    	                    TARGET ${ANDROID_PROJECT_TARGET}
-                            POST_BUILD
-    	                    COMMAND ${ANT_EXECUTABLE} debug
-    	                    WORKING_DIRECTORY ${NDKOUT}
-    	                  )
+        add_custom_command(
+            TARGET ${ANDROID_PROJECT_TARGET}
+            POST_BUILD
+            COMMAND ${ANDROID_EXECUTABLE} update project  --target ${ANDROID_TARGET} --path "${NDKOUT}"
+            WORKING_DIRECTORY ${NDKOUT}
+        )
+
+        add_custom_command(
+            TARGET ${ANDROID_PROJECT_TARGET}
+            POST_BUILD
+            COMMAND ${ANT_EXECUTABLE} debug
+            WORKING_DIRECTORY ${NDKOUT}
+        )
     else()
         message(WARNING "Android executable not found. Not building ${ANDROID_PROJECT_TARGET} APK. Do you have the Android SDK installed?")
     endif()
