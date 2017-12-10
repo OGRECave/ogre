@@ -23,25 +23,6 @@ macro(add_ndk_native_app_glue_library)
     endif(NOT TARGET native_app_glue)
 endmacro(add_ndk_native_app_glue_library)
 
-macro(add_static_libs LIB_DIR)
-    foreach(LIB_NAME ${ARGN})
-        SET(HEADERS "${HEADERS}# ${LIB_NAME}\n\tinclude $(CLEAR_VARS)\n\tLOCAL_MODULE    := ${LIB_NAME}\n\tLOCAL_SRC_FILES := ${LIB_DIR}/lib${LIB_NAME}.a\n\tinclude $(PREBUILT_STATIC_LIBRARY)\n\n")
-        SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS} ${LIB_NAME}")
-    endforeach(LIB_NAME ${ARGN})
-    SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\n    LOCAL_STATIC_LIBRARIES\t+= ")
-endmacro(add_static_libs)
-
-macro(add_static_libs_from_paths)
-    foreach(LIB ${ARGN})
-        get_filename_component(LIB_NAME ${LIB} NAME_WE)
-        string(SUBSTRING ${LIB_NAME} 3 -1 LIB_NAME) # strip lib prefix
-        
-        set(HEADERS "${HEADERS}# ${LIB_NAME}\n\tinclude $(CLEAR_VARS)\n\tLOCAL_MODULE    := ${LIB_NAME}\n\tLOCAL_SRC_FILES := ${LIB}\n\tinclude $(PREBUILT_STATIC_LIBRARY)\n\n")
-        set(SAMPLE_LDLIBS "${SAMPLE_LDLIBS} ${LIB_NAME}")
-    endforeach()
-    set(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\n    LOCAL_STATIC_LIBRARIES\t+= ")
-endmacro(add_static_libs_from_paths)
-
 macro(copy_assets_to_android_proj)
     configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
