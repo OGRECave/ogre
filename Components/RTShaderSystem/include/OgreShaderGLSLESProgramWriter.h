@@ -83,7 +83,6 @@ public:
     typedef     map<FunctionInvocation, String>::type       FunctionMap;
     typedef     vector<FunctionInvocation>::type            FunctionVector;
     typedef     FunctionMap::const_iterator                 FunctionMapIterator;
-    typedef     FunctionVector::const_iterator              FunctionVectorIterator;
     typedef     GpuConstTypeToStringMap::const_iterator     GpuConstTypeToStringMapIterator;
 
     // Protected methods.
