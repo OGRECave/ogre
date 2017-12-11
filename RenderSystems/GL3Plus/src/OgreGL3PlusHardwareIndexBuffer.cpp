@@ -40,7 +40,7 @@ namespace Ogre {
         size_t numIndexes,
         HardwareBuffer::Usage usage,
         bool useShadowBuffer)
-    : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, false),
+    : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer),
       mBuffer(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, usage)
     {
     }

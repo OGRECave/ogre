@@ -40,7 +40,7 @@ namespace Ogre {
         size_t numVertices,
         HardwareBuffer::Usage usage,
         bool useShadowBuffer)
-    : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, false),
+    : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer),
       mBuffer(GL_ARRAY_BUFFER, mSizeInBytes, usage)
     {
     }
