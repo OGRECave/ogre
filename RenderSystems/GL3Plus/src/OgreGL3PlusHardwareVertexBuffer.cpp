@@ -39,7 +39,7 @@ namespace v1 {
         size_t numVertices,
         HardwareBuffer::Usage usage,
         bool useShadowBuffer)
-    : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, false), mLockedToScratch(false),
+    : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, mShadowBuffer), mLockedToScratch(false),
         mScratchOffset(0), mScratchSize(0), mScratchPtr(0), mScratchUploadOnUnlock(false)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));

@@ -37,7 +37,7 @@ namespace v1 {
                                                           size_t numVertices,
                                                           HardwareBuffer::Usage usage,
                                                           bool useShadowBuffer ) :
-        HardwareVertexBuffer( mgr, vertexSize, numVertices, usage, false, false ),
+        HardwareVertexBuffer( mgr, vertexSize, numVertices, usage, false, useShadowBuffer ),
         mMetalHardwareBufferCommon( mSizeInBytes, usage, 16, mgr->_getDiscardBufferManager(),
                                     mgr->_getDiscardBufferManager()->getDevice() )
     {

@@ -37,7 +37,7 @@ namespace v1 {
                                                         size_t numIndexes,
                                                         HardwareBuffer::Usage usage,
                                                         bool useShadowBuffer ) :
-        HardwareIndexBuffer( mgr, idxType, numIndexes, usage, false, false ),
+        HardwareIndexBuffer( mgr, idxType, numIndexes, usage, false, useShadowBuffer ),
         mMetalHardwareBufferCommon( mSizeInBytes, usage, 4, mgr->_getDiscardBufferManager(),
                                     mgr->_getDiscardBufferManager()->getDevice() )
     {
