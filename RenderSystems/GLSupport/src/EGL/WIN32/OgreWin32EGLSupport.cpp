@@ -32,9 +32,6 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
-
 #include "OgreWin32EGLSupport.h"
 #include "OgreWin32EGLWindow.h"
 #include "OgreWin32EGLRenderTexture.h"
@@ -47,7 +44,8 @@ namespace Ogre {
         return new Win32EGLSupport(profile);
     }
 
-    Win32EGLSupport::Win32EGLSupport()
+    Win32EGLSupport::Win32EGLSupport(int profile)
+		: EGLSupport(profile)
     {
         //RECT windowRect;
         //GetClientRect(mNativeDisplay, &windowRect);
