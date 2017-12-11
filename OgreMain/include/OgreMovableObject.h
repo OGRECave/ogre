@@ -411,6 +411,9 @@ namespace Ogre {
         */
         Aabb getWorldAabbUpdated();
 
+        /// See getLocalAabb and getWorldRadius
+        float getLocalRadius(void) const;
+
         /** Gets the bounding Radius scaled by max( scale.x, scale.y, scale.z ).
         @remarks
             Assumes the caches are already updated. Will trigger an assert
