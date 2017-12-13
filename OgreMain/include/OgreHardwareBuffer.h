@@ -357,12 +357,12 @@ namespace Ogre {
                     // Do this manually to avoid locking problems
                     const void *srcData = mShadowBuffer->lockImpl(
                         mLockStart, mLockSize, HBL_READ_ONLY);
-                    // Lock with discard if the whole buffer was locked, otherwise normal
+                    // Lock with discard if the whole buffer was locked, otherwise w/o
                     LockOptions lockOpt;
                     if (mLockStart == 0 && mLockSize == mSizeInBytes)
                         lockOpt = HBL_DISCARD;
                     else
-                        lockOpt = HBL_NORMAL;
+                        lockOpt = HBL_WRITE_ONLY;
                     
                     void *destData = this->lockImpl(
                         mLockStart, mLockSize, lockOpt);
