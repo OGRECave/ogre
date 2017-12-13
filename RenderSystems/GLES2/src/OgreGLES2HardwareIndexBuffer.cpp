@@ -72,10 +72,7 @@ namespace Ogre {
     {
         if(mUseShadowBuffer)
         {
-            // Get data from the shadow buffer
-            void* srcData = mShadowBuffer->lock(offset, length, HBL_READ_ONLY);
-            memcpy(pDest, srcData, length);
-            mShadowBuffer->unlock();
+            mShadowBuffer->readData(offset, length, pDest);
         }
         else
         {
@@ -90,10 +87,7 @@ namespace Ogre {
         // Update the shadow buffer
         if (mUseShadowBuffer)
         {
-            void* destData = mShadowBuffer->lock(offset, length,
-                                                  discardWholeBuffer ? HBL_DISCARD : HBL_NORMAL);
-            memcpy(destData, pSource, length);
-            mShadowBuffer->unlock();
+            mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
         }
 
         mBuffer.writeData(offset, length, pSource, discardWholeBuffer);
