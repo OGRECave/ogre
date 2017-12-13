@@ -65,8 +65,13 @@ namespace Ogre {
 
         // Use glMapBuffer
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget,mBufferId);
-        
-        if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
+
+        bool writeOnly =
+            options == HardwareBuffer::HBL_WRITE_ONLY ||
+            ((mUsage & HardwareBuffer::HBU_WRITE_ONLY) &&
+             options != HardwareBuffer::HBL_READ_ONLY && options != HardwareBuffer::HBL_NORMAL);
+
+        if (writeOnly)
         {
             access |= GL_MAP_WRITE_BIT;
             if(options == HardwareBuffer::HBL_DISCARD || options == HardwareBuffer::HBL_NO_OVERWRITE)
@@ -85,7 +90,6 @@ namespace Ogre {
         // FIXME: Big stall here
         void* pBuffer;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(mTarget, offset, length, access));
-        //OGRE_CHECK_GL_ERROR(pBuffer = glMapBuffer(mTarget, GL_WRITE_ONLY));
 
         if(pBuffer == 0)
         {
