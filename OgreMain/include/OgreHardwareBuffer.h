@@ -173,6 +173,7 @@ namespace Ogre {
             /// Device load options
             /// The following enum is used to controls how data is loaded to devices in a multi device environment
             /// This enum only works with the Direct3D 9 render system (5/2013).
+            /// @deprecated do not use
             enum UploadOptions 
             {
                 /* Normal mode, 

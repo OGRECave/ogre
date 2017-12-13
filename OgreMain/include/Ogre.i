@@ -488,6 +488,8 @@ ADD_REPR(ColourValue)
 %ignore Ogre::Root::getSceneManagerIterator;
 %ignore Ogre::Root::createSceneManager(SceneTypeMask);
 %ignore Ogre::Root::createSceneManager(SceneTypeMask, const String&);
+%ignore Ogre::Root::setFreqUpdatedBuffersUploadOption;
+%ignore Ogre::Root::getFreqUpdatedBuffersUploadOption;
 %include "OgreRoot.h"
 // dont wrap: platform specific
 // %include "OgreWindowEventUtilities.h"

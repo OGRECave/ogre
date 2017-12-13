@@ -1047,13 +1047,13 @@ namespace Ogre
         Setting upload option to HBU_ON_DEMAND can increase the framerate in multi-device scenarios,
         as it will upload frequently changing buffers to devices that require them.
         However setting the HBU_ON_DEMAND may also introduce hiccups.
+        @deprecated do not use
         */
-        void setFreqUpdatedBuffersUploadOption(HardwareBuffer::UploadOptions uploadOp) { mFreqUpdatedBuffersUploadOption = uploadOp; }
+        OGRE_DEPRECATED void setFreqUpdatedBuffersUploadOption(HardwareBuffer::UploadOptions uploadOp) { mFreqUpdatedBuffersUploadOption = uploadOp; }
         /** Get the default upload option for buffers that frequently changed
-        @note
-            To use this feature see Camera::setFreqUpdatedBuffersUploadOption()
+        @deprecated do not use
         */
-        HardwareBuffer::UploadOptions getFreqUpdatedBuffersUploadOption() const { return mFreqUpdatedBuffersUploadOption; }
+        OGRE_DEPRECATED HardwareBuffer::UploadOptions getFreqUpdatedBuffersUploadOption() const { return mFreqUpdatedBuffersUploadOption; }
 
     };
     /** @} */
