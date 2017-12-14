@@ -80,10 +80,15 @@ namespace Ogre {
         // Use glMapBuffer
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
+        bool writeOnly =
+            options == HardwareBuffer::HBL_WRITE_ONLY ||
+            ((mUsage & HardwareBuffer::HBU_WRITE_ONLY) &&
+             options != HardwareBuffer::HBL_READ_ONLY && options != HardwareBuffer::HBL_NORMAL);
+
         void* pBuffer = NULL;
-        if(!OGRE_NO_GLES3_SUPPORT || mRenderSystem->checkExtension("GL_EXT_map_buffer_range"))
+        if(mRenderSystem->getCapabilities()->hasCapability(RSC_MAPBUFFER))
         {
-            if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
+            if (writeOnly)
             {
                 access = GL_MAP_WRITE_BIT_EXT;
                 if (options == HardwareBuffer::HBL_DISCARD ||
@@ -99,26 +104,7 @@ namespace Ogre {
                 access = GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT;
 
             OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(mTarget, offset, length, access));
-            // pBuffer is already offsetted in glMapBufferRange
-            offset = 0;
         }
-#if OGRE_NO_GLES3_SUPPORT == 1
-        else if(mRenderSystem->checkExtension("GL_OES_mapbuffer"))
-        {
-            // Use glMapBuffer
-            if (options == HardwareBuffer::HBL_DISCARD ||
-                options == HardwareBuffer::HBL_NO_OVERWRITE)
-            {
-                // Discard the buffer
-                OGRE_CHECK_GL_ERROR(
-                    glBufferData(mTarget, (GLsizeiptr)mSizeInBytes, NULL, getGLUsage(mUsage)));
-            }
-            if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
-                access = GL_WRITE_ONLY_OES;
-
-            OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferOES(mTarget, access));
-        }
-#endif
 
         if (!pBuffer)
         {
@@ -126,17 +112,15 @@ namespace Ogre {
                         "GLES2HardwareBuffer::lock");
         }
 
-        // return offsetted
-        return static_cast<uint8*>(pBuffer) + offset;
+        // pBuffer is already offsetted in glMapBufferRange
+        return static_cast<uint8*>(pBuffer);
     }
 
     void GLES2HardwareBuffer::unlockImpl()
     {
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
-        bool hasMapBufferRange = !OGRE_NO_GLES3_SUPPORT || mRenderSystem->checkExtension("GL_EXT_map_buffer_range");
-
-        if(hasMapBufferRange || mRenderSystem->checkExtension("GL_OES_mapbuffer")) {
+        if(mRenderSystem->getCapabilities()->hasCapability(RSC_MAPBUFFER)) {
             GLboolean mapped;
             OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(mTarget));
             if(!mapped)
