@@ -31,7 +31,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 			set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Phone Kits/8.0/lib/${MSVC_CXX_ARCHITECTURE_ID}/"
 
 		endif()
-	else()
+	elseif( NOT MSVC90 )
 		# Windows 10.x SDK
 		if(CMAKE_CL_64)
 			set(DirectX11_LIBPATH_SUFFIX "x64")
