@@ -505,7 +505,7 @@ namespace Ogre {
             rsc->setCapability(RSC_DEBUG);
         }
 
-        if ((!OGRE_NO_GLES3_SUPPORT && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN) ||
+        if ((hasMinGLVersion(3, 0) && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN) ||
             checkExtension("GL_EXT_map_buffer_range"))
         {
             rsc->setCapability(RSC_MAPBUFFER);
