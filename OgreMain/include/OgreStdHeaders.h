@@ -37,9 +37,10 @@
 #include <queue>
 #include <bitset>
 
-// Note - not in the original STL, but exists in SGI STL and STLport
-// For gcc 4.3 see http://gcc.gnu.org/gcc-4.3/changes.html
-#if (OGRE_COMPILER == OGRE_COMPILER_GNUC) && !defined(STLPORT)
+#if __cplusplus >= 201103L || OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1600) // C++11 or VC++ 2010+
+#       include <unordered_map>
+#       include <unordered_set>
+#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC) && !defined(STLPORT)
 #   if OGRE_COMP_VER >= 430
 #       include <tr1/unordered_map>
 #       include <tr1/unordered_set> 
