@@ -46,7 +46,7 @@ namespace Ogre {
                 return mBuffer.lockImpl(offset, length, options);
             }
             void unlockImpl() {
-                mBuffer.unlockImpl(mLockSize);
+                mBuffer.unlockImpl();
             }
         
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN

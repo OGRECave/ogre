@@ -54,7 +54,7 @@ namespace Ogre {
 
             void* lockImpl(size_t offset, size_t length, HardwareBuffer::LockOptions options);
 
-            void unlockImpl(size_t lockSize);
+            void unlockImpl();
 
             GLES2HardwareBuffer(GLenum target, size_t sizeInBytes, GLenum usage);
             ~GLES2HardwareBuffer();

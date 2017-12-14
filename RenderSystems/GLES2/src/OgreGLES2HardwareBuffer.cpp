@@ -86,7 +86,6 @@ namespace Ogre {
             if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
             {
                 access = GL_MAP_WRITE_BIT_EXT;
-                access |= GL_MAP_FLUSH_EXPLICIT_BIT_EXT;
                 if (options == HardwareBuffer::HBL_DISCARD ||
                     options == HardwareBuffer::HBL_NO_OVERWRITE)
                 {
@@ -131,15 +130,11 @@ namespace Ogre {
         return static_cast<uint8*>(pBuffer) + offset;
     }
 
-    void GLES2HardwareBuffer::unlockImpl(size_t lockSize)
+    void GLES2HardwareBuffer::unlockImpl()
     {
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
         bool hasMapBufferRange = !OGRE_NO_GLES3_SUPPORT || mRenderSystem->checkExtension("GL_EXT_map_buffer_range");
-        if ((mUsage & HardwareBuffer::HBU_WRITE_ONLY) && hasMapBufferRange)
-        {
-            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRangeEXT(mTarget, 0, lockSize));
-        }
 
         if(hasMapBufferRange || mRenderSystem->checkExtension("GL_OES_mapbuffer")) {
             GLboolean mapped;
