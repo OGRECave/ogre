@@ -603,6 +603,9 @@ namespace Ogre{
         if(!processed)
         {
             mMaterial = MaterialManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get();
+
+            if(!mMaterial) // duplicate definition resolved by "use previous"
+                return;
         }
         else
         {
