@@ -228,6 +228,14 @@ namespace Ogre
         jsonStr.a( ",\n\t\t\t\t\"query_flags\" : ", objData.mQueryFlags[objData.mIndex] );
         jsonStr.a( ",\n\t\t\t\t\"light_mask\" : ", objData.mLightMask[objData.mIndex] );
 
+        Node *parentNode = movableObject->getParentNode();
+        if( parentNode )
+        {
+            NodeToIdxMap::const_iterator itor = mNodeToIdxMap.find( parentNode );
+            if( itor != mNodeToIdxMap.end() )
+                jsonStr.a( ",\n\t\t\t\t\"parent_node_id\" : ", itor->second );
+        }
+
         flushLwString( jsonStr, outJson );
 
         outJson += "\n\t\t\t}\n";
