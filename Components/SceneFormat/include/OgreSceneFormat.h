@@ -50,14 +50,20 @@ namespace Ogre
         SceneManager            *mSceneManager;
         CompositorManager2      *mCompositorManager;
 
+        typedef map<Node*, uint32>::type NodeToIdxMap;
+        NodeToIdxMap            mNodeToIdxMap;
+
         static const char* toStr( bool value );
 
         static uint32 encodeFloat( float value );
-        static void encodeVector( LwString &jsonStr, Vector3 value );
-        static void encodeVector( LwString &jsonStr, Vector4 value );
+        static void encodeVector( LwString &jsonStr, const Vector3 &value );
+        static void encodeVector( LwString &jsonStr, const Vector4 &value );
+        static void encodeQuaternion( LwString &jsonStr, const Quaternion &value );
 
         static inline void flushLwString( LwString &jsonStr, String &outJson );
 
+        void exportNode( LwString &jsonStr, String &outJson, Node *node );
+        void exportSceneNode( LwString &jsonStr, String &outJson, SceneNode *sceneNode );
         void exportRenderable( LwString &jsonStr, String &outJson, Renderable *renderable );
         void exportMovableObject( LwString &jsonStr, String &outJson, MovableObject *movableObject );
         void exportItem( LwString &jsonStr, String &outJson, Item *item );
