@@ -44,6 +44,11 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------------------
+    const char* SceneFormat::toStr( bool value )
+    {
+        return value ? "true" : "false";
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormat::encodeVector( LwString &jsonStr, Vector3 value )
     {
         jsonStr.a( "[ ",
@@ -122,7 +127,7 @@ namespace Ogre
         const ObjectData &objData = movableObject->_getObjectData();
 
         jsonStr.a( ",\n\t\t\t\t\"local_radius\" : ",
-                   encodeFloat( movableObject->getLocalRadius() ), );
+                   encodeFloat( movableObject->getLocalRadius() ) );
         jsonStr.a( ",\n\t\t\t\t\"rendering_distance\" : ",
                    encodeFloat( movableObject->getRenderingDistance() ) );
 
@@ -175,13 +180,12 @@ namespace Ogre
 
         flushLwString( jsonStr, outJson );
 
-        SceneManager::MovableObjectIterator movableObjects;
-
-        movableObjects = mSceneManager->getMovableObjectIterator( ItemFactory::FACTORY_TYPE_NAME );
+        SceneManager::MovableObjectIterator movableObjects =
+                mSceneManager->getMovableObjectIterator( ItemFactory::FACTORY_TYPE_NAME );
 
         if( movableObjects.hasMoreElements() )
         {
-            outJson += ",\n\t\"items\" :\n\t[\n",;
+            outJson += ",\n\t\"items\" :\n\t[\n";
 
             while( movableObjects.hasMoreElements() )
             {

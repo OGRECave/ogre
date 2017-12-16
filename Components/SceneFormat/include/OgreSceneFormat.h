@@ -50,6 +50,8 @@ namespace Ogre
         SceneManager            *mSceneManager;
         CompositorManager2      *mCompositorManager;
 
+        static const char* toStr( bool value );
+
         static uint32 encodeFloat( float value );
         static void encodeVector( LwString &jsonStr, Vector3 value );
 
