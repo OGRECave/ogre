@@ -67,7 +67,7 @@ namespace Ogre
         return myUnion.u32;
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::encodeVector( LwString &jsonStr, Vector3 value )
+    void SceneFormat::encodeVector( LwString &jsonStr, const Vector3 &value )
     {
         jsonStr.a( "[ ",
                    encodeFloat( value.x ), ", ",
@@ -76,7 +76,17 @@ namespace Ogre
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::encodeVector( LwString &jsonStr, Vector4 value )
+    void SceneFormat::encodeVector( LwString &jsonStr, const Vector4 &value )
+    {
+        jsonStr.a( "[ ",
+                   encodeFloat( value.x ), ", ",
+                   encodeFloat( value.y ), ", ",
+                   encodeFloat( value.z ), ", " );
+        jsonStr.a( encodeFloat( value.w ),
+                   " ]" );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::encodeQuaternion( LwString &jsonStr, const Quaternion &value )
     {
         jsonStr.a( "[ ",
                    encodeFloat( value.x ), ", ",
@@ -90,6 +100,39 @@ namespace Ogre
     {
         outJson += jsonStr.c_str();
         jsonStr.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::exportNode( LwString &jsonStr, String &outJson, Node *node )
+    {
+        outJson += "\n\t\t\t\"node\" :\n\t\t\t{";
+
+        jsonStr.a( "\n\t\t\t\t\"position\" : " );
+        encodeVector( jsonStr, node->getPosition() );
+        jsonStr.a( ",\n\t\t\t\t\"rotation\" : " );
+        encodeQuaternion( jsonStr, node->getOrientation() );
+        jsonStr.a( ",\n\t\t\t\t\"scale\" : " );
+        encodeVector( jsonStr, node->getScale() );
+
+        jsonStr.a( ",\n\t\t\t\t\"inherit_orientation\" : ", toStr( node->getInheritOrientation() ) );
+        jsonStr.a( ",\n\t\t\t\t\"inherit_scale\" : ", toStr( node->getInheritScale() ) );
+        jsonStr.a( ",\n\t\t\t\t\"is_static\" : ", toStr( node->isStatic() ) );
+
+        Node *parentNode = node->getParent();
+        if( parentNode )
+        {
+            NodeToIdxMap::const_iterator itor = mNodeToIdxMap.find( parentNode );
+            if( itor != mNodeToIdxMap.end() )
+                jsonStr.a( ",\n\t\t\t\t\"parent_id\" : ", itor->second );
+        }
+
+        flushLwString( jsonStr, outJson );
+
+        outJson += "\n\t\t\t}";
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::exportSceneNode( LwString &jsonStr, String &outJson, SceneNode *sceneNode )
+    {
+        exportNode( jsonStr, outJson, sceneNode );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormat::exportRenderable( LwString &jsonStr, String &outJson, Renderable *renderable )
@@ -222,6 +265,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormat::exportScene( String &outJson )
     {
+        mNodeToIdxMap.clear();
+
         char tmpBuffer[4096];
         LwString jsonStr( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
 
@@ -231,33 +276,72 @@ namespace Ogre
 
         flushLwString( jsonStr, outJson );
 
-        SceneManager::MovableObjectIterator movableObjects =
-                mSceneManager->getMovableObjectIterator( ItemFactory::FACTORY_TYPE_NAME );
-
-        if( movableObjects.hasMoreElements() )
         {
-            outJson += ",\n\t\"items\" :\n\t[\n";
+            uint32 nodeCount = 0;
 
-            bool firstObject = true;
-
-            while( movableObjects.hasMoreElements() )
+            outJson += ",\n\t\"scene_nodes\" :\n\t[";
+            for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
             {
-                MovableObject *mo = movableObjects.getNext();
-                Item *item = static_cast<Item*>( mo );
-                if( firstObject )
-                {
+                SceneNode *rootSceneNode =
+                        mSceneManager->getRootSceneNode( static_cast<SceneMemoryMgrTypes>(i) );
+
+                mNodeToIdxMap[rootSceneNode] = nodeCount++;
+                if( i == 0 )
                     outJson += "\n\t\t{";
-                    firstObject = false;
-                }
                 else
                     outJson += ",\n\t\t{";
-                exportItem( jsonStr, outJson, item );
+                exportSceneNode( jsonStr, outJson, rootSceneNode );
                 outJson += "\n\t\t}";
-            }
 
+                Node::NodeVecIterator nodeItor = rootSceneNode->getChildIterator();
+                while( nodeItor.hasMoreElements() )
+                {
+                    Node *node = nodeItor.getNext();
+                    SceneNode *sceneNode = dynamic_cast<SceneNode*>( node );
+
+                    if( sceneNode )
+                    {
+                        mNodeToIdxMap[sceneNode] = nodeCount++;
+                        outJson += ",\n\t\t{";
+                        exportSceneNode( jsonStr, outJson, sceneNode );
+                        outJson += "\n\t\t}";
+                    }
+                }
+            }
             outJson += "\n\t]";
         }
 
+        {
+            SceneManager::MovableObjectIterator movableObjects =
+                    mSceneManager->getMovableObjectIterator( ItemFactory::FACTORY_TYPE_NAME );
+
+            if( movableObjects.hasMoreElements() )
+            {
+                outJson += ",\n\t\"items\" :\n\t[\n";
+
+                bool firstObject = true;
+
+                while( movableObjects.hasMoreElements() )
+                {
+                    MovableObject *mo = movableObjects.getNext();
+                    Item *item = static_cast<Item*>( mo );
+                    if( firstObject )
+                    {
+                        outJson += "\n\t\t{";
+                        firstObject = false;
+                    }
+                    else
+                        outJson += ",\n\t\t{";
+                    exportItem( jsonStr, outJson, item );
+                    outJson += "\n\t\t}";
+                }
+
+                outJson += "\n\t]";
+            }
+        }
+
         outJson += "\n}\n";
+
+        mNodeToIdxMap.clear();
     }
 }
