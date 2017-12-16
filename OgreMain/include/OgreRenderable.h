@@ -288,6 +288,9 @@ namespace Ogre {
             }
         }
 
+        typedef map<size_t, Vector4>::type CustomParameterMap;
+        const CustomParameterMap& getCustomParameters(void) const   { return mCustomParameters; }
+
         /** Update a custom GpuProgramParameters constant which is derived from 
             information only this Renderable knows.
         @remarks
@@ -426,7 +429,6 @@ namespace Ogre {
         uint8 getRenderQueueSubGroup(void) const        { return mRenderQueueSubGroup; }
 
     protected:
-        typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
         /// VAO to render the submesh. One per LOD level. Each LOD may or
         /// may not share the vertex and index buffers the other levels

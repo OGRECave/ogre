@@ -49,12 +49,35 @@ namespace Ogre
         return value ? "true" : "false";
     }
     //-----------------------------------------------------------------------------------
+    uint32 SceneFormat::encodeFloat( float value )
+    {
+        union MyUnion
+        {
+            float   f32;
+            uint32  u32;
+        };
+
+        MyUnion myUnion;
+        myUnion.f32 = value;
+        return myUnion.u32;
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormat::encodeVector( LwString &jsonStr, Vector3 value )
     {
         jsonStr.a( "[ ",
                    encodeFloat( value.x ), ", ",
                    encodeFloat( value.y ), ", ",
                    encodeFloat( value.z ),
+                   " ]" );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::encodeVector( LwString &jsonStr, Vector4 value )
+    {
+        jsonStr.a( "[ ",
+                   encodeFloat( value.x ), ", ",
+                   encodeFloat( value.y ), ", ",
+                   encodeFloat( value.z ), ", " );
+        jsonStr.a( encodeFloat( value.w ),
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
@@ -67,8 +90,6 @@ namespace Ogre
     void SceneFormat::exportRenderable( LwString &jsonStr, String &outJson, Renderable *renderable )
     {
         outJson += "\t\t\t\t\t\"renderable\" :\n\t\t\t\t\t{";
-
-        TODO_custom_parameters;
 
         if( !renderable->getMaterial() )
         {
@@ -99,7 +120,28 @@ namespace Ogre
 
         flushLwString( jsonStr, outJson );
 
-        outJson += ",\n\t\t\t\t\t}\n";
+        const Renderable::CustomParameterMap &customParams = renderable->getCustomParameters();
+
+        if( customParams.empty() )
+        {
+            outJson += ",\n\t\t\t\t\t\"custom_parameters\" : { ";
+            Renderable::CustomParameterMap::const_iterator begin = customParams.begin();
+            Renderable::CustomParameterMap::const_iterator itor  = customParams.begin();
+            Renderable::CustomParameterMap::const_iterator end   = customParams.end();
+            while( itor != end )
+            {
+                if( itor != begin )
+                    jsonStr.a( ", " );
+                //, "127" : ["value_x", "value_y", "value_z", "value_w"]
+                jsonStr.a( "\"", static_cast<uint32>( itor->first ), "\" : " );
+                encodeVector( jsonStr, itor->second );
+                ++itor;
+            }
+
+            flushLwString( jsonStr, outJson );
+        }
+
+        outJson += "\n\t\t\t\t\t}\n";
     }
     //-----------------------------------------------------------------------------------
     void SceneFormat::exportMovableObject( LwString &jsonStr, String &outJson,
