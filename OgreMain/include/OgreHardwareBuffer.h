@@ -173,6 +173,7 @@ namespace Ogre {
             /// Device load options
             /// The following enum is used to controls how data is loaded to devices in a multi device environment
             /// This enum only works with the Direct3D 9 render system (5/2013).
+            /// @deprecated do not use
             enum UploadOptions 
             {
                 /* Normal mode, 
@@ -356,12 +357,12 @@ namespace Ogre {
                     // Do this manually to avoid locking problems
                     const void *srcData = mShadowBuffer->lockImpl(
                         mLockStart, mLockSize, HBL_READ_ONLY);
-                    // Lock with discard if the whole buffer was locked, otherwise normal
+                    // Lock with discard if the whole buffer was locked, otherwise w/o
                     LockOptions lockOpt;
                     if (mLockStart == 0 && mLockSize == mSizeInBytes)
                         lockOpt = HBL_DISCARD;
                     else
-                        lockOpt = HBL_NORMAL;
+                        lockOpt = HBL_WRITE_ONLY;
                     
                     void *destData = this->lockImpl(
                         mLockStart, mLockSize, lockOpt);

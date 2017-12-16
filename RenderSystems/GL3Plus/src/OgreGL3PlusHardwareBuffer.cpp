@@ -65,11 +65,15 @@ namespace Ogre {
 
         // Use glMapBuffer
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget,mBufferId);
-        
-        if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
+
+        bool writeOnly =
+            options == HardwareBuffer::HBL_WRITE_ONLY ||
+            ((mUsage & HardwareBuffer::HBU_WRITE_ONLY) &&
+             options != HardwareBuffer::HBL_READ_ONLY && options != HardwareBuffer::HBL_NORMAL);
+
+        if (writeOnly)
         {
             access |= GL_MAP_WRITE_BIT;
-            access |= GL_MAP_FLUSH_EXPLICIT_BIT;
             if(options == HardwareBuffer::HBL_DISCARD || options == HardwareBuffer::HBL_NO_OVERWRITE)
             {
                 // Discard the buffer
@@ -86,7 +90,6 @@ namespace Ogre {
         // FIXME: Big stall here
         void* pBuffer;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(mTarget, offset, length, access));
-        //OGRE_CHECK_GL_ERROR(pBuffer = glMapBuffer(mTarget, GL_WRITE_ONLY));
 
         if(pBuffer == 0)
         {
@@ -100,14 +103,9 @@ namespace Ogre {
         return pBuffer;
     }
 
-    void GL3PlusHardwareBuffer::unlockImpl(size_t lockSize)
+    void GL3PlusHardwareBuffer::unlockImpl()
     {
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
-
-        if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
-        {
-            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(mTarget, 0, lockSize));
-        }
 
         GLboolean mapped;
         OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(mTarget));

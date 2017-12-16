@@ -58,7 +58,8 @@ namespace Ogre {
 
         addImpl(ret);
         // Tell resource group manager
-        ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
+        if(ret)
+            ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
         return ret;
 
     }
@@ -134,7 +135,8 @@ namespace Ogre {
         {
             if(listener->resourceCollision(res.get(), this) == false)
             {
-                // explicitly use previous instance
+                // explicitly use previous instance and destroy current
+                res.reset();
                 return;
             }
 

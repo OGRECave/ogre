@@ -43,7 +43,7 @@ namespace Ogre {
         //virtual EGLWindow* createEGLWindow( EGLSupport * support);
 
         public:
-            Win32EGLSupport();
+            Win32EGLSupport(int profile);
             virtual ~Win32EGLSupport();
 
             //virtual GLESPBuffer* createPBuffer(PixelComponentType format,

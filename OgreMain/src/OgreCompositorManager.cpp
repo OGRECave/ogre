@@ -382,11 +382,11 @@ bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, TextureP
 bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, const Ogre::String& localName)
 {
     CompositionTargetPass* tp = inst->getTechnique()->getOutputTargetPass();
-    CompositionTargetPass::PassIterator pit = tp->getPassIterator();
+    CompositionTargetPass::Passes::const_iterator pit = tp->getPasses().begin();
 
-    while(pit.hasMoreElements())
+    for (;pit != tp->getPasses().end(); ++pit)
     {
-        CompositionPass* p = pit.getNext();
+        CompositionPass* p = *pit;
         for (size_t i = 0; i < p->getNumInputs(); ++i)
         {
             if (p->getInput(i).name == localName)
@@ -401,11 +401,11 @@ bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, const Og
 bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, TexturePtr tex)
 {
     CompositionTargetPass* tp = inst->getTechnique()->getOutputTargetPass();
-    CompositionTargetPass::PassIterator pit = tp->getPassIterator();
+    CompositionTargetPass::Passes::const_iterator pit = tp->getPasses().begin();
 
-    while(pit.hasMoreElements())
+    for (;pit != tp->getPasses().end(); ++pit)
     {
-        CompositionPass* p = pit.getNext();
+        CompositionPass* p = *pit;
         for (size_t i = 0; i < p->getNumInputs(); ++i)
         {
             TexturePtr t = inst->getTextureInstance(p->getInput(i).name, 0);

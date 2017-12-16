@@ -1668,7 +1668,7 @@ namespace Ogre
         const D3DCAPS9& rkCurCaps = device->getD3D9DeviceCaps();                        
         D3DFORMAT eBackBufferFormat = device->getBackBufferFormat();
 
-        if (rkCurCaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP == 0)
+        if ((rkCurCaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP) == 0)
             return false;
 
         // check for auto gen. mip maps support

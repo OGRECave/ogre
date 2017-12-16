@@ -2061,7 +2061,7 @@ void SceneManager::_setSkyBox(
                 }
 
                 // section per material
-                mSkyBoxObj->begin(matName, RenderOperation::OT_TRIANGLE_LIST, groupName);
+                mSkyBoxObj->begin(matName, RenderOperation::OT_TRIANGLE_FAN, groupName);
                 // top left
                 mSkyBoxObj->position(middle + up - right);
                 mSkyBoxObj->textureCoord(0,0);
@@ -2074,8 +2074,6 @@ void SceneManager::_setSkyBox(
                 // top right
                 mSkyBoxObj->position(middle + up + right);
                 mSkyBoxObj->textureCoord(1,0);
-                
-                mSkyBoxObj->quad(0, 1, 2, 3);
 
                 mSkyBoxObj->end();
 

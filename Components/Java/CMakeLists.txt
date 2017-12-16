@@ -76,11 +76,13 @@ swig_add_module(OgreJNI java ${SWIG_INPUT_MODULES})
 swig_link_libraries(OgreJNI OgreBites OgreOverlay OgreRTShaderSystem OgreMain ${JNI_LIBRARIES})
 
 if(${Java_FOUND})
-	include(UseJava)
-	file(GLOB JAVA_SRCS "${OGRE_BINARY_DIR}/java/src/org/Ogre/*.java")
-	add_jar(Ogre SOURCES ${JAVA_SRCS} 
-				 VERSION ${OGRE_VERSION}
-				 OUTPUT_DIR ${OGRE_BINARY_DIR}/java)
+	set(CLASS_OUTPUT_PATH "${OGRE_BINARY_DIR}/java/classes")
+	set(JAR_NAME "${OGRE_BINARY_DIR}/java/Ogre-${OGRE_VERSION}.jar")
+	file(MAKE_DIRECTORY ${CLASS_OUTPUT_PATH})
+	add_custom_command(TARGET ${SWIG_MODULE_OgreJNI_REAL_NAME} POST_BUILD
+    	COMMAND "${Java_JAVAC_EXECUTABLE}" -d ${CLASS_OUTPUT_PATH} "${OGRE_BINARY_DIR}/java/src/org/Ogre/*.java" 
+		COMMAND "${Java_JAR_EXECUTABLE}" cf ${JAR_NAME} -C ${CLASS_OUTPUT_PATH} .
+	)
 endif()
 
 if(ANDROID)

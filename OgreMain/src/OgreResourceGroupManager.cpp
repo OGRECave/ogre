@@ -1249,7 +1249,7 @@ namespace Ogre {
             for (LoadUnloadResourceList::iterator k = j->second.begin();
                 k != j->second.end(); ++k)
             {
-                (*k)->getCreator()->remove((*k)->getHandle());
+                (*k)->getCreator()->remove((*k));
             }
         }
         grp->loadResourceOrderMap.clear();

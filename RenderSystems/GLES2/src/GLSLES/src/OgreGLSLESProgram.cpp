@@ -116,7 +116,7 @@ namespace Ogre {
         return mGLProgramHandle;
     }
 
-    bool GLSLESProgram::compile(const bool checkErrors)
+    bool GLSLESProgram::compile(bool checkErrors)
     {
         if (mCompiled == 1)
         {

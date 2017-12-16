@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreViewport.h"
 
 #include "OgreWin32EGLSupport.h"
 #include "OgreWin32EGLWindow.h"
@@ -286,7 +287,50 @@ namespace Ogre {
 
     void Win32EGLWindow::windowMovedOrResized()
     {
+		if (!mWindow || IsIconic(mWindow))
+			return;
+		
+		RECT rc;
+		BOOL result;
 
+		// Update top left parameters
+		result = GetWindowRect(mWindow, &rc);
+		if (result == FALSE)
+		{
+			mTop = 0;
+			mLeft = 0;
+			mWidth = 0;
+			mHeight = 0;
+			return;
+		}
+
+		mTop = rc.top;
+		mLeft = rc.left;
+
+		// width and height represent drawable area only
+		result = GetClientRect(mWindow, &rc);
+		if (result == FALSE)
+		{
+			mTop = 0;
+			mLeft = 0;
+			mWidth = 0;
+			mHeight = 0;
+			return;
+		}
+		unsigned int width = rc.right - rc.left;
+		unsigned int height = rc.bottom - rc.top;
+
+		// Case window resized.
+		if (width != mWidth || height != mHeight)
+		{
+			mWidth  = rc.right - rc.left;
+			mHeight = rc.bottom - rc.top;
+
+			// Notify viewports of resize
+			ViewportList::iterator it = mViewportList.begin();
+			while( it != mViewportList.end() )
+				(*it++).second->_updateDimensions();			
+		}
     }
 
     void Win32EGLWindow::switchFullScreen( bool fullscreen )

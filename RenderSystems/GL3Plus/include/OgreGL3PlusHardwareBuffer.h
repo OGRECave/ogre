@@ -46,7 +46,7 @@ namespace Ogre {
         static GLenum getGLUsage(uint32 usage);
     public:
         void* lockImpl(size_t offset, size_t length, HardwareBuffer::LockOptions options);
-        void unlockImpl(size_t lockSize);
+        void unlockImpl();
 
         GL3PlusHardwareBuffer(GLenum target, size_t sizeInBytes, uint32 usage);
         ~GL3PlusHardwareBuffer();

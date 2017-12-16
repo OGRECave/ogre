@@ -95,7 +95,7 @@ namespace Ogre {
         GpuProgramParametersSharedPtr createParameters(void);
 
         /// compile source into shader object
-        bool compile( const bool checkErrors = false);
+        bool compile( bool checkErrors = false);
 
         /// Since GLSL has no assembly, use this shader for binding.
         GpuProgram* _getBindingDelegate(void) { return this; }

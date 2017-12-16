@@ -465,14 +465,12 @@ namespace Ogre {
             mLockPtr = static_cast<float*>(
                 mMainBuf->lock(0, numBillboards * billboardSize, 
                 mMainBuf->getUsage() & HardwareBuffer::HBU_DYNAMIC ?
-                HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL,
-                mAutoUpdate ? Root::getSingleton().getFreqUpdatedBuffersUploadOption() : HardwareBuffer::HBU_DEFAULT) );
+                HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL) );
         }
         else // lock the entire thing
             mLockPtr = static_cast<float*>(
             mMainBuf->lock(mMainBuf->getUsage() & HardwareBuffer::HBU_DYNAMIC ?
-            HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL,
-            mAutoUpdate ? Root::getSingleton().getFreqUpdatedBuffersUploadOption() : HardwareBuffer::HBU_DEFAULT) );
+            HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL) );
 
     }
     //-----------------------------------------------------------------------

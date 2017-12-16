@@ -44,7 +44,7 @@ namespace Ogre {
             return mBuffer.lockImpl(offset, length, options);
         }
         void unlockImpl() {
-            mBuffer.unlockImpl(mLockSize);
+            mBuffer.unlockImpl();
         }
 
     public:

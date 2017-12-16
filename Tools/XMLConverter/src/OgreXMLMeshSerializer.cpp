@@ -2308,10 +2308,11 @@ namespace Ogre {
             keyNode->SetAttribute("time", 
                 StringConverter::toString(kf->getTime()));
 
-            VertexPoseKeyFrame::PoseRefIterator poseIt = kf->getPoseReferenceIterator();
-            while (poseIt.hasMoreElements())
+            VertexPoseKeyFrame::PoseRefList::const_iterator poseIt =
+                kf->getPoseReferences().begin();
+            for (;poseIt != kf->getPoseReferences().begin(); ++poseIt)
             {
-                const VertexPoseKeyFrame::PoseRef& poseRef = poseIt.getNext();
+                const VertexPoseKeyFrame::PoseRef& poseRef = *poseIt;
                 TiXmlElement* poseRefNode = 
                     keyNode->InsertEndChild(TiXmlElement("poseref"))->ToElement();
 

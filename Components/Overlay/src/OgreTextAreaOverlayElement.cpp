@@ -188,7 +188,7 @@ namespace Ogre {
         const HardwareVertexBufferSharedPtr& vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(POS_TEX_BINDING);
         pVert = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
+            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
 
         float largestWidth = 0;
         float left = _getDerivedLeft() * 2.0f - 1.0f;
@@ -556,7 +556,7 @@ namespace Ogre {
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(COLOUR_BINDING);
 
         RGBA* pDest = static_cast<RGBA*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
+            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
 
         for (size_t i = 0; i < mAllocSize; ++i)
         {

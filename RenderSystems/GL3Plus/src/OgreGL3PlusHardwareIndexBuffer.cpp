@@ -40,7 +40,7 @@ namespace Ogre {
         size_t numIndexes,
         HardwareBuffer::Usage usage,
         bool useShadowBuffer)
-    : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, false),
+    : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer),
       mBuffer(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, usage)
     {
     }
@@ -51,10 +51,7 @@ namespace Ogre {
     {
         if(mUseShadowBuffer)
         {
-            // get data from the shadow buffer
-            void* srcData = mShadowBuffer->lock(offset, length, HBL_READ_ONLY);
-            memcpy(pDest, srcData, length);
-            mShadowBuffer->unlock();
+            mShadowBuffer->readData(offset, length, pDest);
         }
         else
         {
@@ -69,10 +66,7 @@ namespace Ogre {
         // Update the shadow buffer
         if (mUseShadowBuffer)
         {
-            void* destData = mShadowBuffer->lock(offset, length,
-                                                 discardWholeBuffer ? HBL_DISCARD : HBL_NORMAL);
-            memcpy(destData, pSource, length);
-            mShadowBuffer->unlock();
+            mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
         }
 
         mBuffer.writeData(offset, length, pSource, discardWholeBuffer);
@@ -88,6 +82,10 @@ namespace Ogre {
         }
         else
         {
+            if(mUseShadowBuffer) {
+                mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            }
+
             mBuffer.copyData(static_cast<GL3PlusHardwareIndexBuffer&>(srcBuffer).getGLBufferId(),
                                          srcOffset, dstOffset, length, discardWholeBuffer);
         }

@@ -341,7 +341,7 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
         return;
 
     // set original scene details from viewport
-    CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPass(0);
+    CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPasses()[0];
     CompositionTargetPass* passParent = pass->getParent();
     if (pass->getClearBuffers() != mViewport->getClearBuffers() ||
         pass->getClearColour() != mViewport->getBackgroundColour() ||
@@ -489,7 +489,7 @@ void CompositorChain::_compile()
     /// Set previous CompositorInstance for each compositor in the list
     CompositorInstance *lastComposition = mOriginalScene;
     mOriginalScene->mPreviousInstance = 0;
-    CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPass(0);
+    CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPasses()[0];
     pass->setClearBuffers(mViewport->getClearBuffers());
     pass->setClearColour(mViewport->getBackgroundColour());
     pass->setClearDepth(mViewport->getDepthClear());

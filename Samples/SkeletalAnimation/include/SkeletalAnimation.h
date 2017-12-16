@@ -245,6 +245,12 @@ protected:
         Entity* ent = NULL;
         AnimationState* as = NULL;
 
+        // make sure we can get the buffers for bbox calculations
+        MeshManager::getSingleton().load("jaiqua.mesh",
+                                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, true, true);
+
         for (int i = 0; i < NUM_MODELS; i++)
         {
             // create scene nodes for the models at regular angular intervals

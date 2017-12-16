@@ -97,6 +97,10 @@ if (OGRE_BUILD_TESTS)
         set(CROSS ${CROSS} -DCMAKE_CXX_FLAGS=-stdlib=libc++)
     endif()
     
+    if(MSVC)
+        set(CROSS ${CROSS} -DCMAKE_CXX_FLAGS=-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+    endif()
+
     set(GTEST_INSTALL_DIR ${CMAKE_BINARY_DIR}/gtest)
     include(ExternalProject)
     ExternalProject_Add(googletest
