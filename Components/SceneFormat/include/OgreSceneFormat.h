@@ -54,6 +54,7 @@ namespace Ogre
 
         static uint32 encodeFloat( float value );
         static void encodeVector( LwString &jsonStr, Vector3 value );
+        static void encodeVector( LwString &jsonStr, Vector4 value );
 
         static inline void flushLwString( LwString &jsonStr, String &outJson );
 
