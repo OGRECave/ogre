@@ -39,9 +39,14 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    SceneFormat::SceneFormat( SceneManager *sceneManager, CompositorManager2 *compositorManager )
+    SceneFormat::SceneFormat( SceneManager *sceneManager, CompositorManager2 *compositorManager ) :
+        mSceneManager( sceneManager ),
+        mCompositorManager( compositorManager )
     {
-
+    }
+    //-----------------------------------------------------------------------------------
+    SceneFormat::~SceneFormat()
+    {
     }
     //-----------------------------------------------------------------------------------
     const char* SceneFormat::toStr( bool value )
@@ -89,7 +94,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormat::exportRenderable( LwString &jsonStr, String &outJson, Renderable *renderable )
     {
-        outJson += "\t\t\t\t\t\"renderable\" :\n\t\t\t\t\t{";
+        outJson += "\n\t\t\t\t\t\"renderable\" :\n\t\t\t\t\t{";
 
         if( !renderable->getMaterial() )
         {
@@ -97,34 +102,35 @@ namespace Ogre
             const String *datablockName = datablock->getNameStr();
 
             if( datablockName )
-                jsonStr.a( "\t\t\t\t\t\"datablock\" : ", datablockName->c_str() );
+                jsonStr.a( "\n\t\t\t\t\t\t\"datablock\" : \"", datablockName->c_str(), "\"" );
             else
-                jsonStr.a( "\t\t\t\t\t\"datablock\" : ",
-                           datablock->getName().getFriendlyText().c_str() );
-            jsonStr.a( "\n,\t\t\t\t\t\"is_v1_material\" : false" );
+                jsonStr.a( "\n\t\t\t\t\t\t\"datablock\" : \"",
+                           datablock->getName().getFriendlyText().c_str(), "\"" );
+            jsonStr.a( "\n,\t\t\t\t\t\t\"is_v1_material\" : false" );
         }
         else
         {
-            jsonStr.a( "\t\t\t\t\t\"datablock\" : ", renderable->getMaterial()->getName().c_str() );
-            jsonStr.a( "\n,\t\t\t\t\t\"is_v1_material\" : true" );
+            jsonStr.a( "\n\t\t\t\t\t\t\"datablock\" : \"",
+                       renderable->getMaterial()->getName().c_str(), "\"" );
+            jsonStr.a( "\n,\t\t\t\t\t\t\"is_v1_material\" : true" );
         }
 
-        jsonStr.a( ",\n\t\t\t\t\t\"custom_parameter\" : ", renderable->mCustomParameter );
-        jsonStr.a( ",\n\t\t\t\t\t\"render_queue_sub_group\" : ", renderable->getRenderQueueSubGroup() );
-        jsonStr.a( ",\n\t\t\t\t\t\"polygon_mode_overrideable\" : ",
+        jsonStr.a( ",\n\t\t\t\t\t\t\"custom_parameter\" : ", renderable->mCustomParameter );
+        jsonStr.a( ",\n\t\t\t\t\t\t\"render_queue_sub_group\" : ", renderable->getRenderQueueSubGroup() );
+        jsonStr.a( ",\n\t\t\t\t\t\t\"polygon_mode_overrideable\" : ",
                    toStr( renderable->getPolygonModeOverrideable() ) );
-        jsonStr.a( ",\n\t\t\t\t\t\"use_identity_view\" : ",
+        jsonStr.a( ",\n\t\t\t\t\t\t\"use_identity_view\" : ",
                    toStr( renderable->getUseIdentityView() ) );
-        jsonStr.a( ",\n\t\t\t\t\t\"use_identity_projection\" : ",
+        jsonStr.a( ",\n\t\t\t\t\t\t\"use_identity_projection\" : ",
                    toStr( renderable->getUseIdentityProjection() ) );
 
         flushLwString( jsonStr, outJson );
 
         const Renderable::CustomParameterMap &customParams = renderable->getCustomParameters();
 
-        if( customParams.empty() )
+        if( !customParams.empty() )
         {
-            outJson += ",\n\t\t\t\t\t\"custom_parameters\" : { ";
+            outJson += ",\n\t\t\t\t\t\t\"custom_parameters\" : { ";
             Renderable::CustomParameterMap::const_iterator begin = customParams.begin();
             Renderable::CustomParameterMap::const_iterator itor  = customParams.begin();
             Renderable::CustomParameterMap::const_iterator end   = customParams.end();
@@ -139,6 +145,7 @@ namespace Ogre
             }
 
             flushLwString( jsonStr, outJson );
+            outJson += " }";
         }
 
         outJson += "\n\t\t\t\t\t}\n";
@@ -150,12 +157,12 @@ namespace Ogre
         outJson += "\t\t\t\"movable_object\" :\n\t\t\t{";
         if( !movableObject->getName().empty() )
         {
-            outJson += "\t\t\t\t\"name\" : \"";
+            outJson += "\n\t\t\t\t\"name\" : \"";
             outJson += movableObject->getName();
             outJson += "\",\n";
         }
 
-        jsonStr.a( "\t\t\t\t\"render_queue\" : ", movableObject->getRenderQueueGroup() );
+        jsonStr.a( "\n\t\t\t\t\"render_queue\" : ", movableObject->getRenderQueueGroup() );
 
         {
             Aabb localAabb = movableObject->getLocalAabb();
@@ -180,14 +187,14 @@ namespace Ogre
 
         flushLwString( jsonStr, outJson );
 
-        outJson += ",\n\t\t\t}\n";
+        outJson += "\n\t\t\t}\n";
     }
     //-----------------------------------------------------------------------------------
     void SceneFormat::exportItem( LwString &jsonStr, String &outJson, Item *item )
     {
         const MeshPtr &mesh = item->getMesh();
 
-        outJson += "\t\t\t\"mesh\" : \"";
+        outJson += "\n\t\t\t\"mesh\" : \"";
         outJson += mesh->getName();
         outJson += "\"";
 
@@ -204,9 +211,11 @@ namespace Ogre
         {
             if( i != 0 )
                 outJson += ",\n";
+            else
+                outJson += "\n";
             outJson += "\t\t\t\t{";
             exportRenderable( jsonStr, outJson, item->getSubItem( i ) );
-            outJson += ",\n\t\t\t\t}";
+            outJson += "\t\t\t\t}";
         }
         outJson += "\n\t\t\t]";
     }
@@ -229,15 +238,24 @@ namespace Ogre
         {
             outJson += ",\n\t\"items\" :\n\t[\n";
 
+            bool firstObject = true;
+
             while( movableObjects.hasMoreElements() )
             {
                 MovableObject *mo = movableObjects.getNext();
                 Item *item = static_cast<Item*>( mo );
+                if( firstObject )
+                {
+                    outJson += "\n\t\t{";
+                    firstObject = false;
+                }
+                else
+                    outJson += ",\n\t\t{";
                 exportItem( jsonStr, outJson, item );
+                outJson += "\n\t\t}";
             }
 
-            outJson.resize( outJson.size() - 1u ); //Remove last comma
-            outJson += "\t]";
+            outJson += "\n\t]";
         }
 
         outJson += "\n}\n";
