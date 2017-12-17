@@ -59,6 +59,7 @@ namespace Ogre
         static void encodeVector( LwString &jsonStr, const Vector3 &value );
         static void encodeVector( LwString &jsonStr, const Vector4 &value );
         static void encodeQuaternion( LwString &jsonStr, const Quaternion &value );
+        static void encodeColour( LwString &jsonStr, const ColourValue &value );
 
         static inline void flushLwString( LwString &jsonStr, String &outJson );
 
@@ -67,6 +68,7 @@ namespace Ogre
         void exportRenderable( LwString &jsonStr, String &outJson, Renderable *renderable );
         void exportMovableObject( LwString &jsonStr, String &outJson, MovableObject *movableObject );
         void exportItem( LwString &jsonStr, String &outJson, Item *item );
+        void exportLight( LwString &jsonStr, String &outJson, Light *light );
 
     public:
         SceneFormat( SceneManager *sceneManager, CompositorManager2 *compositorManager );
