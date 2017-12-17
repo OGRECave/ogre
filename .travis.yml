@@ -59,8 +59,8 @@ script:
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then BUILD_CMD="set -o pipefail && $BUILD_CMD | xcpretty" ; fi
     - echo $BUILD_CMD && eval $BUILD_CMD
     # run unit tests
-    - if [ $TEST ]; then bin/Test_Ogre ; fi
-    - if [ "$TRAVIS_OS_NAME" == "osx" -a "$IOS" != "TRUE" ]; then bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre ; fi
+    - if [ $TEST ]; then bin/Test_Ogre || { cat OgreTest.log ; exit 1 ; } ; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" -a "$IOS" != "TRUE" ]; then bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre || { cat OgreTest.log ; exit 1 ; } ; fi
     # run visual tests
     - if [ $TEST ]; then cd bin && ./TestContext -rs "OpenGL Rendering Subsystem" ; fi
     # verify that the python modules are loadable
