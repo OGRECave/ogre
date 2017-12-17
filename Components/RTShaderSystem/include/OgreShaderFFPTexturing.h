@@ -241,6 +241,8 @@ protected:
     ParameterPtr mPSDiffuse;
     // Pixel shader specular colour.
     ParameterPtr mPSSpecular;
+
+    bool mIsPointSprite;
 };
 
 

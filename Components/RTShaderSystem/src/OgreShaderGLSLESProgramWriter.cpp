@@ -595,7 +595,13 @@ namespace Ogre {
                 String paramName = pParam->getName();
 
                 if (gpuType == GPT_FRAGMENT_PROGRAM)
-                {                   
+                {
+                    if(paramContent == Parameter::SPC_POINTSPRITE_COORDINATE)
+                    {
+                        mInputToGLStatesMap[pParam->getName()] = "gl_PointCoord";
+                        continue;
+                    }
+
                     // push fragment inputs they all could be written (in glsl you can not write
                     // input params in the fragment program)
                     mFragInputParams.push_back(paramName);
