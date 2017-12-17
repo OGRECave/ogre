@@ -96,6 +96,16 @@ namespace Ogre
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormat::encodeColour( LwString &jsonStr, const ColourValue &value )
+    {
+        jsonStr.a( "[ ",
+                   encodeFloat( value.r ), ", ",
+                   encodeFloat( value.g ), ", ",
+                   encodeFloat( value.b ), ", " );
+        jsonStr.a( encodeFloat( value.a ),
+                   " ]" );
+    }
+    //-----------------------------------------------------------------------------------
     inline void SceneFormat::flushLwString( LwString &jsonStr, String &outJson )
     {
         outJson += jsonStr.c_str();
@@ -271,6 +281,19 @@ namespace Ogre
         outJson += "\n\t\t\t]";
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormat::exportLight( LwString &jsonStr, String &outJson, Light *light )
+    {
+        jsonStr.a( "\n\t\t\t\"diffuse\" : " );
+        encodeColour( jsonStr, light->getDiffuseColour() );
+        jsonStr.a( ",\n\t\t\t\"specular\" : " );
+        encodeColour( jsonStr, light->getSpecularColour() );
+        jsonStr.a( ",\n\t\t\t\"power\" : ", encodeFloat( light->getPowerScale() ) );
+
+        jsonStr.a( ",\n" );
+        flushLwString( jsonStr, outJson );
+        exportMovableObject( jsonStr, outJson, light );
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormat::exportScene( String &outJson )
     {
         mNodeToIdxMap.clear();
@@ -341,6 +364,35 @@ namespace Ogre
                     else
                         outJson += ",\n\t\t{";
                     exportItem( jsonStr, outJson, item );
+                    outJson += "\n\t\t}";
+                }
+
+                outJson += "\n\t]";
+            }
+        }
+
+        {
+            SceneManager::MovableObjectIterator movableObjects =
+                    mSceneManager->getMovableObjectIterator( LightFactory::FACTORY_TYPE_NAME );
+
+            if( movableObjects.hasMoreElements() )
+            {
+                outJson += ",\n\t\"lights\" :\n\t[\n";
+
+                bool firstObject = true;
+
+                while( movableObjects.hasMoreElements() )
+                {
+                    MovableObject *mo = movableObjects.getNext();
+                    Light *light = static_cast<Light*>( mo );
+                    if( firstObject )
+                    {
+                        outJson += "\n\t\t{";
+                        firstObject = false;
+                    }
+                    else
+                        outJson += ",\n\t\t{";
+                    exportLight( jsonStr, outJson, light );
                     outJson += "\n\t\t}";
                 }
 
