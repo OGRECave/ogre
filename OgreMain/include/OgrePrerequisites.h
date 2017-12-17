@@ -74,12 +74,7 @@ namespace Ogre {
         typedef float Real;
     #endif
 
-    #if __cplusplus >= 201103L || OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1600) // C++11 or VC++ 2010+
-    #       define OGRE_HashMap ::std::unordered_map
-    #       define OGRE_HashMultiMap ::std::unordered_multimap
-    #       define OGRE_HashSet ::std::unordered_set
-    #       define OGRE_HashMultiSet ::std::unordered_multiset
-    #elif OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
+    #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
     #   if OGRE_COMP_VER >= 430
     #       define OGRE_HashMap ::std::tr1::unordered_map
     #       define OGRE_HashMultiMap ::std::tr1::unordered_multimap

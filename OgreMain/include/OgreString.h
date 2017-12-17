@@ -224,9 +224,7 @@ namespace Ogre {
     };
 
 
-#if __cplusplus >= 201103L || OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1600) // C++11 or VC++ 2010+
-    typedef ::std::hash< _StringBase > _StringHash;
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
 #   if OGRE_COMP_VER < 430
     typedef ::__gnu_cxx::hash< _StringBase > _StringHash;
 #   else
