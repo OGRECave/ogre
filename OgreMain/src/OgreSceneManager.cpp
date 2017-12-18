@@ -1227,6 +1227,11 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
             mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
 
+        mAutoParamDataSource->setPointParameters(
+            pass->getPointSize(), pass->isPointAttenuationEnabled(),
+            pass->getPointAttenuationConstant(), pass->getPointAttenuationLinear(),
+            pass->getPointAttenuationQuadratic());
+
         // Texture unit settings
         size_t unit = 0;
         // Reset the shadow texture index for each pass
