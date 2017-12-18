@@ -290,9 +290,6 @@ namespace Ogre
         D3D11HLSLProgram* _getBoundTessellationHullProgram() const;
         D3D11HLSLProgram* _getBoundTessellationDomainProgram() const;
         D3D11HLSLProgram* _getBoundComputeProgram() const;
-        void _setPointSpritesEnabled(bool enabled);
-        void _setPointParameters(Real size, bool attenuationEnabled, 
-            Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
         void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
         void _setBindingType(TextureUnitState::BindingType bindingType);
         void _setVertexTexture(size_t unit, const TexturePtr& tex);

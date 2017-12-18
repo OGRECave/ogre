@@ -846,45 +846,6 @@ namespace Ogre {
         delete pWin;
     }
 
-    void GL3PlusRenderSystem::_setPointParameters(Real size,
-                                                  bool attenuationEnabled, Real constant, Real linear, Real quadratic,
-                                                  Real minSize, Real maxSize)
-    {
-
-        if (attenuationEnabled)
-        {
-            // Point size is still calculated in pixels even when attenuation is
-            // enabled, which is pretty awkward, since you typically want a viewport
-            // independent size if you're looking for attenuation.
-            // So, scale the point size up by viewport size (this is equivalent to
-            // what D3D does as standard).
-            size = size * mActiveViewport->getActualHeight();
-
-            // XXX: why do I need this for results to be consistent with D3D?
-            // Equations are supposedly the same once you factor in vp height.
-            // Real correction = 0.005;
-            // Scaling required.
-            // float val[4] = {1, 0, 0, 1};
-            // val[1] = linear * correction;
-            // val[2] = quadratic * correction;
-            // val[3] = 1;
-
-            mStateCacheManager->setEnabled(GL_PROGRAM_POINT_SIZE,true);
-        }
-        else
-        {
-            mStateCacheManager->setEnabled(GL_PROGRAM_POINT_SIZE,false);
-        }
-
-         mStateCacheManager->setPointSize(size);
-        //OGRE_CHECK_GL_ERROR(glPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, 64.0));
-    }
-
-    void GL3PlusRenderSystem::_setPointSpritesEnabled(bool enabled)
-    {
-        // Point sprites are always on in OpenGL 3.2 and up.
-    }
-
     void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
         if (!mStateCacheManager->activateGLTextureUnit(stage))
@@ -2012,6 +1973,8 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 0, NULL, GL_TRUE));
 #endif
         }
+
+        glEnable(GL_PROGRAM_POINT_SIZE);
 
         if(getCapabilities()->getVendor() == GPU_NVIDIA)
         {

@@ -1779,16 +1779,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setPointParameters(Real size, 
-        bool attenuationEnabled, Real constant, Real linear, Real quadratic,
-        Real minSize, Real maxSize)
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setPointSpritesEnabled(bool enabled)
-    {
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
     {
         static D3D11TexturePtr dt;
