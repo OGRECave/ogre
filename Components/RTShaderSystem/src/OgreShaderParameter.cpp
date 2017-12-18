@@ -60,10 +60,10 @@ namespace RTShader {
         virtual String toString () const
         {
             const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
-            return  
-                ((lang.empty() == false) && (lang[0] == 'g') ? String("vec2(") : String("float2(")) +
-                Ogre::StringConverter::toString(mValue.x) + "," + 
-                Ogre::StringConverter::toString(mValue.y) + ")";
+            StringStream str;
+            str << (!lang.empty() && lang[0] == 'g' ? "vec2(" : "float2(");
+            str << std::showpoint << mValue.x << "," << mValue.y << ")";
+            return str.str();
         }
     };
 
@@ -87,11 +87,10 @@ namespace RTShader {
         virtual String toString () const
         {
             const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
-            return  
-                ((lang.empty() == false) && (lang[0] == 'g') ? String("vec3(") : String("float3(")) +
-                Ogre::StringConverter::toString(mValue.x) + "," + 
-                Ogre::StringConverter::toString(mValue.y) + "," + 
-                Ogre::StringConverter::toString(mValue.z) + ")";
+            StringStream str;
+            str << (!lang.empty() && lang[0] == 'g' ? "vec3(" : "float3(");
+            str << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << ")";
+            return str.str();
         }
     };
 
@@ -115,12 +114,10 @@ namespace RTShader {
         virtual String toString () const
         {
             const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
-            return  
-                ((lang.empty() == false) && (lang[0] == 'g') ? String("vec4(") : String("float4(")) +
-                Ogre::StringConverter::toString(mValue.x) + "," + 
-                Ogre::StringConverter::toString(mValue.y) + "," + 
-                Ogre::StringConverter::toString(mValue.z) + "," + 
-                Ogre::StringConverter::toString(mValue.w) + ")";
+            StringStream str;
+            str << (!lang.empty() && lang[0] == 'g' ? "vec4(" : "float4(");
+            str << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << "," << mValue.w << ")";
+            return str.str();
         }
     };
 
@@ -144,15 +141,7 @@ namespace RTShader {
         */
         virtual String toString () const
         {
-            String val = Ogre::StringConverter::toString(mValue);
-
-            // Make sure that float params have always this representation #.#
-            if(val.find(".") == String::npos)
-            {
-                val += ".0";
-            }
-
-            return val;
+            return StringConverter::toString(mValue, 6, 0, ' ', std::ios::showpoint);
         }
     };
     /** ConstParameterInt represents an int constant.
