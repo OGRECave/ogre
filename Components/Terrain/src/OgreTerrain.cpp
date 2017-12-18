@@ -377,9 +377,9 @@ namespace Ogre
         {
             if (mLayerBlendMapSize != mLayerBlendMapSizeActual)
             {
-                LogManager::getSingleton().stream() << 
-                    "WARNING: blend maps were requested at a size larger than was supported "
-                    "on this hardware, which means the quality has been degraded";
+                LogManager::getSingleton().logWarning(
+                    "blend maps were requested at a size larger than was supported "
+                    "on this hardware, which means the quality has been degraded");
             }
             stream.write(&mLayerBlendMapSizeActual);
             uint8* tmpData = (uint8*)OGRE_MALLOC(mLayerBlendMapSizeActual * mLayerBlendMapSizeActual * 4, MEMCATEGORY_GENERAL);

@@ -139,7 +139,7 @@ namespace Ogre
         // Page Strategy Data
         bool strategyDataOk = mStrategyData->load(ser);
         if (!strategyDataOk)
-            LogManager::getSingleton().stream() << "Error: PageStrategyData for section '"
+            LogManager::getSingleton().stream(LML_CRITICAL) << "Error: PageStrategyData for section '"
             << mName << "' was not loaded correctly, check file contents";
 
         /// Load any data specific to a subtype of this class

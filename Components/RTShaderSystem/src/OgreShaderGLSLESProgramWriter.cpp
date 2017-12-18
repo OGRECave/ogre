@@ -196,7 +196,7 @@ namespace Ogre {
             }
             else
             {
-                LogManager::getSingleton().logMessage("ERROR: Cached function not found " + invoc.getFunctionName());
+                LogManager::getSingleton().logError("Cached function not found " + invoc.getFunctionName());
             }
         }
         

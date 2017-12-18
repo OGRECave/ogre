@@ -324,8 +324,8 @@ bool TextureAtlasSampler::preAddToRenderState(const RenderState* renderState, Pa
         {
             if (table->size() > TAS_MAX_SAFE_ATLASED_TEXTURES)
             {
-                LogManager::getSingleton().logMessage(LML_CRITICAL,
-                    "Warning : Compiling atlas texture has to many internally defined textures. Shader may fail to compile.");
+                LogManager::getSingleton().logWarning(
+                    "Compiling atlas texture has to many internally defined textures. Shader may fail to compile.");
             }
             if (i >= TAS_MAX_TEXTURES)
             {

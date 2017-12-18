@@ -170,7 +170,7 @@ namespace Ogre {
     {
         if(!mRenderBufferMap.empty())
         {
-            LogManager::getSingleton().logMessage("GL ES 2: Warning! GLES2FBOManager destructor called, but not all renderbuffers were released.");
+            LogManager::getSingleton().logWarning("GLES2FBOManager destructor called, but not all renderbuffers were released.");
         }
         
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));

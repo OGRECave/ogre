@@ -773,11 +773,10 @@ namespace Ogre
 
             if( !videoMode )
             {
-                LogManager::getSingleton().logMessage(
-                            "WARNING D3D11: Couldn't find requested video mode. Forcing 32bpp. "
+                LogManager::getSingleton().logWarning(
+                            "D3D11: Couldn't find requested video mode. Forcing 32bpp. "
                             "If you have two GPUs and you're rendering to the GPU that is not "
-                            "plugged to the monitor you can then ignore this message.",
-                            LML_CRITICAL );
+                            "plugged to the monitor you can then ignore this message.");
             }
 
             NameValuePairList miscParams;

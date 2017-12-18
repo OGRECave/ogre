@@ -144,7 +144,7 @@ namespace Ogre {
     {
         if(!mRenderBufferMap.empty())
         {
-            LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.", LML_CRITICAL);
+            LogManager::getSingleton().logWarning("GL3PlusFBOManager destructor called, but not all renderbuffers were released.");
         }
 
         if(GL3PlusStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())

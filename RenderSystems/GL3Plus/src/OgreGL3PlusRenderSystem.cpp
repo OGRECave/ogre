@@ -1478,8 +1478,7 @@ namespace Ogre {
 
         if (!program)
         {
-            LogManager::getSingleton().logMessage("ERROR: Failed to create shader program.",
-                                                  LML_CRITICAL);
+            LogManager::getSingleton().logError("Failed to create shader program.");
         }
 
         GLVertexArrayObject* vao =

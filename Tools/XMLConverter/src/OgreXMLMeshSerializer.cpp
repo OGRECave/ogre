@@ -769,7 +769,7 @@ namespace Ogre {
                 const char *claimedCount_ = faces->Attribute("count");
                 if (claimedCount_ && StringConverter::parseInt(claimedCount_)!=actualCount)
                 {
-                    LogManager::getSingleton().stream()
+                    LogManager::getSingleton().stream(LML_WARNING)
                         << "WARNING: face count (" << actualCount << ") " <<
                         "is not as claimed (" << claimedCount_ << ")";
                 }
@@ -1040,7 +1040,7 @@ namespace Ogre {
             }
             if (claimedVertexCount_ && actualVertexCount!=claimedVertexCount)
             {
-                LogManager::getSingleton().stream()
+                LogManager::getSingleton().stream(LML_WARNING)
                     << "WARNING: vertex count (" << actualVertexCount 
                     << ") is not as claimed (" << claimedVertexCount_ << ")";
             }
@@ -1663,7 +1663,7 @@ namespace Ogre {
         {
             val = manualNode->Attribute("fromdepthsquared");
             if (val)
-                LogManager::getSingleton().logMessage("WARNING: 'fromdepthsquared' attribute has been renamed to 'value'.");
+                LogManager::getSingleton().logWarning("'fromdepthsquared' attribute has been renamed to 'value'.");
             // user values are non-squared
             usage.userValue = Math::Sqrt(StringConverter::parseReal(val));
         }
@@ -1696,7 +1696,7 @@ namespace Ogre {
         {
             val = genNode->Attribute("fromdepthsquared");
             if (val)
-                LogManager::getSingleton().logMessage("WARNING: 'fromdepthsquared' attribute has been renamed to 'value'.");
+                LogManager::getSingleton().logWarning("'fromdepthsquared' attribute has been renamed to 'value'.");
             // user values are non-squared
             usage.userValue = Math::Sqrt(StringConverter::parseReal(val));
         }

@@ -146,9 +146,9 @@ namespace Ogre {
 
             if (!mUseTexCoords && !mUseVertexColour)
             {
-                LogManager::getSingleton().logMessage(
-                    "Error - BillboardChain '" + mName + "' is using neither "
-                    "texture coordinates or vertex colours; it will not be "
+                LogManager::getSingleton().logError(
+                    "BillboardChain '" + mName + "' is using neither "
+                    "texture coordinates nor vertex colours; it will not be "
                     "visible on some rendering APIs so you should change this "
                     "so you use one or the other.");
             }

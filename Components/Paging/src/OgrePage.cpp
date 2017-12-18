@@ -135,7 +135,7 @@ namespace Ogre
         stream.read(&storedID);
         if (mID != storedID)
         {
-            LogManager::getSingleton().stream() << "Error: Tried to populate Page ID " << mID
+            LogManager::getSingleton().stream(LML_CRITICAL) << "Error: Tried to populate Page ID " << mID
                 << " with data corresponding to page ID " << storedID;
             stream.undoReadChunk(CHUNK_ID);
             return false;
