@@ -651,18 +651,15 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
         break;
 
     case LBS_MANUAL:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
 
         if (isAlphaArgument)
         {
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(alphaValue), Operand::OPS_IN);                       
+            curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(alphaValue)), Operand::OPS_IN);
         }
         else
         {               
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.r), Operand::OPS_IN);        
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.g), Operand::OPS_IN);        
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.b), Operand::OPS_IN);        
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.a), Operand::OPS_IN);        
+            curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(colourValue.ptr())), Operand::OPS_IN);
         }
         
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);
@@ -779,7 +776,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(blendMode.factor), Operand::OPS_IN);
+        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(blendMode.factor), Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);
         break;

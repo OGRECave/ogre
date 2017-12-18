@@ -149,11 +149,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_VS_COLOUR, internalCounter++);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR, internalCounter++);
+        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(1.0)), Operand::OPS_IN);
         curFuncInvocation->pushOperand(vsDiffuse, Operand::OPS_OUT);
         vsMain->addAtomInstance(curFuncInvocation);
     }
@@ -174,11 +171,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     {
         vsSpecular = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_VS_COLOUR, internalCounter++);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR, internalCounter++);
+        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4::ZERO), Operand::OPS_IN);
         curFuncInvocation->pushOperand(vsSpecular, Operand::OPS_OUT);
         vsMain->addAtomInstance(curFuncInvocation);
     }
@@ -206,11 +200,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         psDiffuse = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_PS_COLOUR_BEGIN, internalCounter++);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN, internalCounter++);
+        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(1.0)), Operand::OPS_IN);
         curFuncInvocation->pushOperand(psDiffuse, Operand::OPS_OUT);
         psMain->addAtomInstance(curFuncInvocation);
     }
@@ -223,11 +214,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         psSpecular = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_PS_COLOUR_BEGIN, internalCounter++);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN, internalCounter++);
+        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4::ZERO), Operand::OPS_IN);
         curFuncInvocation->pushOperand(psSpecular, Operand::OPS_OUT);
         psMain->addAtomInstance(curFuncInvocation);
     }

@@ -858,39 +858,31 @@ UniformParameterPtr ParameterFactory::createSamplerCUBE(int index)
         (uint16)GPV_GLOBAL, 1));
 }
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createConstParamVector2(Vector2 val)
+ParameterPtr ParameterFactory::createConstParam(const Vector2& val)
 {
-    return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec2(val, 
-                                                    GCT_FLOAT2, 
-                                                    Parameter::SPS_UNKNOWN,  
+    return ParameterPtr(OGRE_NEW ConstParameterVec2(val, GCT_FLOAT2, Parameter::SPS_UNKNOWN,
                                                     Parameter::SPC_UNKNOWN));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createConstParamVector3(Vector3 val)
+ParameterPtr ParameterFactory::createConstParam(const Vector3& val)
 {
-    return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec3(val, 
-                                                    GCT_FLOAT3, 
-                                                    Parameter::SPS_UNKNOWN,  
+    return ParameterPtr(OGRE_NEW ConstParameterVec3(val, GCT_FLOAT3, Parameter::SPS_UNKNOWN,
                                                     Parameter::SPC_UNKNOWN));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createConstParamVector4(Vector4 val)
+ParameterPtr ParameterFactory::createConstParam(const Vector4& val)
 {
-    return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec4(val, 
-                                                    GCT_FLOAT4, 
-                                                    Parameter::SPS_UNKNOWN,  
+    return ParameterPtr(OGRE_NEW ConstParameterVec4(val, GCT_FLOAT4, Parameter::SPS_UNKNOWN,
                                                     Parameter::SPC_UNKNOWN));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createConstParamFloat(float val)
+ParameterPtr ParameterFactory::createConstParam(float val)
 {
-    return ParameterPtr((Parameter*)OGRE_NEW ConstParameterFloat(val, 
-                                                  GCT_FLOAT1, 
-                                                  Parameter::SPS_UNKNOWN,  
-                                                  Parameter::SPC_UNKNOWN));
+    return ParameterPtr(OGRE_NEW ConstParameterFloat(val, GCT_FLOAT1, Parameter::SPS_UNKNOWN,
+                                                     Parameter::SPC_UNKNOWN));
 }
 
 //-----------------------------------------------------------------------
