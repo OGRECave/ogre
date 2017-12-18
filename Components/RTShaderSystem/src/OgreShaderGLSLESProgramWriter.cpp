@@ -686,6 +686,10 @@ namespace Ogre {
                     {
                         mInputToGLStatesMap[pParam->getName()] = "outputPosition";
                     }
+                    else if(pParam->getContent() == Parameter::SPC_POINTSPRITE_SIZE)
+                    {
+                        mInputToGLStatesMap[pParam->getName()] = "gl_PointSize";
+                    }
                     else
                     {
                         if(mGLSLVersion > 100)

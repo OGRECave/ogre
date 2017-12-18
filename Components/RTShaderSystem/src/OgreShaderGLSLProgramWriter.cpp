@@ -611,6 +611,10 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             {
                 mInputToGLStatesMap[pParam->getName()] = "gl_Position";
             }
+            else if(pParam->getContent() == Parameter::SPC_POINTSPRITE_SIZE)
+            {
+                mInputToGLStatesMap[pParam->getName()] = "gl_PointSize";
+            }
             else
             {
                 // After GLSL 1.20 varying is deprecated

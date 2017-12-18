@@ -296,6 +296,9 @@ public:
         /// point sprite coordinates
         SPC_POINTSPRITE_COORDINATE,
 
+        /// point sprite size
+        SPC_POINTSPRITE_SIZE,
+
         /// Reserved custom content range to be used by user custom shader extensions.
         SPC_CUSTOM_CONTENT_BEGIN    = 1000,
         SPC_CUSTOM_CONTENT_END      = 2000

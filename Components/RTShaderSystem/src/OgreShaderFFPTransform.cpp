@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
 #include "OgreMaterialSerializer.h"
+#include "OgrePass.h"
+#include "OgreShaderGenerator.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -51,6 +53,12 @@ const String& FFPTransform::getType() const
 int FFPTransform::getExecutionOrder() const
 {
     return FFP_TRANSFORM;
+}
+
+bool FFPTransform::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
+{
+    mSetPointSize = srcPass->getPointSize() != 1.0f || srcPass->isPointAttenuationEnabled();
+    return true;
 }
 
 //-----------------------------------------------------------------------
@@ -87,6 +95,19 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 
     vsEntry->addAtomInstance(transformFunc);
 
+    if(!mSetPointSize || ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl") // not supported with DX11
+        return true;
+
+    UniformParameterPtr pointParams = vsProgram->resolveAutoParameterReal(GpuProgramParameters::ACT_POINT_PARAMS, 0);
+    ParameterPtr pointSize = vsEntry->resolveOutputParameter(
+        Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POINTSPRITE_SIZE, GCT_FLOAT1); // abuse of texture semantic
+
+    vsProgram->addDependency(FFP_LIB_COMMON);
+    transformFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  FFP_VS_TRANSFORM, 1);
+    transformFunc->pushOperand(pointParams, Operand::OPS_IN, Operand::OPM_X);
+    transformFunc->pushOperand(pointSize, Operand::OPS_OUT);
+    vsEntry->addAtomInstance(transformFunc);
+
     return true;
 }
 
@@ -94,7 +115,8 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 void FFPTransform::copyFrom(const SubRenderState& rhs)
 {
-
+    const FFPTransform& rhsTransform = static_cast<const FFPTransform&>(rhs);
+    mSetPointSize = rhsTransform.mSetPointSize;
 }
 
 //-----------------------------------------------------------------------

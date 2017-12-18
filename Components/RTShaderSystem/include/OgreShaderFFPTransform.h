@@ -71,8 +71,11 @@ public:
     */
     virtual bool createCpuSubPrograms(ProgramSet* programSet);
 
+    bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
     static String Type;
+protected:
+    bool mSetPointSize;
 };
 
 
