@@ -1034,7 +1034,7 @@ namespace Ogre {
                 const VertexPoseKeyFrame* kf = static_cast<const VertexPoseKeyFrame*>(*i);
                 VertexPoseKeyFrame::PoseRefList::const_iterator poseIt
                     = kf->getPoseReferences().begin();
-                for (;poseIt != kf->getPoseReferences().begin(); ++poseIt)
+                for (;poseIt != kf->getPoseReferences().end(); ++poseIt)
                 {
                     const VertexPoseKeyFrame::PoseRef& poseRef = *poseIt;
                     if (poseRef.influence > 0.0f)

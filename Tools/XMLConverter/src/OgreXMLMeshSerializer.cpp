@@ -2310,7 +2310,7 @@ namespace Ogre {
 
             VertexPoseKeyFrame::PoseRefList::const_iterator poseIt =
                 kf->getPoseReferences().begin();
-            for (;poseIt != kf->getPoseReferences().begin(); ++poseIt)
+            for (;poseIt != kf->getPoseReferences().end(); ++poseIt)
             {
                 const VertexPoseKeyFrame::PoseRef& poseRef = *poseIt;
                 TiXmlElement* poseRefNode = 

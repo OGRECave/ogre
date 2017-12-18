@@ -2395,7 +2395,7 @@ namespace Ogre {
         // pose references
         VertexPoseKeyFrame::PoseRefList::const_iterator poseRefIt =
             kf->getPoseReferences().begin();
-        for (;poseRefIt != kf->getPoseReferences().begin(); ++poseRefIt)
+        for (;poseRefIt != kf->getPoseReferences().end(); ++poseRefIt)
         {
             writePoseKeyframePoseRef(*poseRefIt);
         }
