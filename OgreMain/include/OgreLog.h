@@ -67,7 +67,8 @@ namespace Ogre {
     {
         LML_TRIVIAL = 1,
         LML_NORMAL = 2,
-        LML_CRITICAL = 3
+        LML_WARNING = 3,
+        LML_CRITICAL = 4
     };
 
     /** @remarks Pure Abstract class, derive this class and register to the Log to listen to log messages */
@@ -109,6 +110,7 @@ namespace Ogre {
         bool            mSuppressFile;
         bool            mTimeStamp;
         String          mLogName;
+        bool            mTermHasColours;
 
         typedef vector<LogListener*>::type mtLogListener;
         mtLogListener mListeners;
