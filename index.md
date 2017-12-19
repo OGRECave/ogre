@@ -24,6 +24,7 @@ Currently only the legacy GL RenderSystem is able to pass all VTests from the su
 * [GL3Plus vs GL](https://ogrecave.github.io/ogre/gl_status/TestResults_GL3Plus.html)
 * [GLES2 vs GL](https://ogrecave.github.io/ogre/gl_status/TestResults_GLES2.html)
 * [GLES2 vs GL3Plus](https://ogrecave.github.io/ogre/gl_status/TestResults_GLES22.html)
+* [GL vs D3D9](https://ogrecave.github.io/ogre/gl_status/TestResults_GL9.html)
 
 # Additional information
 
