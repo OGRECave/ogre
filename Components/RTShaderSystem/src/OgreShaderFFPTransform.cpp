@@ -102,10 +102,14 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     ParameterPtr pointSize = vsEntry->resolveOutputParameter(
         Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POINTSPRITE_SIZE, GCT_FLOAT1); // abuse of texture semantic
 
-    vsProgram->addDependency(FFP_LIB_COMMON);
-    transformFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  FFP_VS_TRANSFORM, 1);
-    transformFunc->pushOperand(pointParams, Operand::OPS_IN, Operand::OPM_X);
+    transformFunc = OGRE_NEW FunctionInvocation("FFP_DerivePointSize", FFP_VS_TRANSFORM, 1);
+
+    transformFunc->pushOperand(pointParams, Operand::OPS_IN);
+    // using eye space depth only instead of the eye real distance
+    // its faster to obtain, so lets call it close enough..
+    transformFunc->pushOperand(positionOut, Operand::OPS_IN, Operand::OPM_W);
     transformFunc->pushOperand(pointSize, Operand::OPS_OUT);
+
     vsEntry->addAtomInstance(transformFunc);
 
     return true;
