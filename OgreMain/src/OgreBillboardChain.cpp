@@ -403,6 +403,12 @@ namespace Ogre {
                 "BillboardChain::getChainElement");
         }
         const ChainSegment& seg = mChainSegmentList[chainIndex];
+        if (seg.head == SEGMENT_EMPTY)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                "Chain segment is empty",
+                "BillboardChain::getChainElement");
+        }
 
         size_t idx = seg.head + elementIndex;
         // adjust for the edge and start
@@ -421,7 +427,11 @@ namespace Ogre {
         }
         const ChainSegment& seg = mChainSegmentList[chainIndex];
         
-        if( seg.tail < seg.head )
+        if (seg.head == SEGMENT_EMPTY)
+        {
+            return 0;
+        }
+        else if (seg.tail < seg.head)
         {
             return seg.tail - seg.head + mMaxElementsPerChain + 1;
         }
