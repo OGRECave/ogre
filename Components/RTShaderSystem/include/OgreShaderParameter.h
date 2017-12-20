@@ -293,6 +293,12 @@ public:
         SPC_TEXTURE_COORDINATE6,
         SPC_TEXTURE_COORDINATE7,
 		
+        /// point sprite coordinates
+        SPC_POINTSPRITE_COORDINATE,
+
+        /// point sprite size
+        SPC_POINTSPRITE_SIZE,
+
         /// Reserved custom content range to be used by user custom shader extensions.
         SPC_CUSTOM_CONTENT_BEGIN    = 1000,
         SPC_CUSTOM_CONTENT_END      = 2000
@@ -634,10 +640,15 @@ public:
     static ParameterPtr createInTexcoord4(int index, Parameter::Content content);           
     static ParameterPtr createOutTexcoord4(int index, Parameter::Content content);
 
-    static ParameterPtr createConstParamVector2(Vector2 val);
-    static ParameterPtr createConstParamVector3(Vector3 val);
-    static ParameterPtr createConstParamVector4(Vector4 val);
-    static ParameterPtr createConstParamFloat(float val);   
+    OGRE_DEPRECATED static ParameterPtr createConstParamVector2(Vector2 val) { return createConstParam(val); }
+    OGRE_DEPRECATED static ParameterPtr createConstParamVector3(Vector3 val) { return createConstParam(val); }
+    OGRE_DEPRECATED static ParameterPtr createConstParamVector4(Vector4 val) { return createConstParam(val); }
+    OGRE_DEPRECATED static ParameterPtr createConstParamFloat(float val) { return createConstParam(val); }
+
+    static ParameterPtr createConstParam(const Vector2& val);
+    static ParameterPtr createConstParam(const Vector3& val);
+    static ParameterPtr createConstParam(const Vector4& val);
+    static ParameterPtr createConstParam(float val);
 
     static UniformParameterPtr createSampler(GpuConstantType type, int index);
     static UniformParameterPtr createSampler1D(int index);

@@ -275,7 +275,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
 
     //set w value of temporary param to 1
     curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
-    curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0f), Operand::OPS_IN);
+    curFuncInvocation->pushOperand(ParameterFactory::createConstParam(1.0f), Operand::OPS_IN);
     curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, Operand::OPM_W);
     vsMain->addAtomInstance(curFuncInvocation);
 

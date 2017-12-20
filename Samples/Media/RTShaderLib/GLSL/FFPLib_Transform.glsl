@@ -75,3 +75,11 @@ void FFP_Transform(in mat4 m,
 {
 	vOut = mat3(m) * v;
 }
+
+//-----------------------------------------------------------------------------
+void FFP_DerivePointSize(in vec4 params,
+                         in float d,
+                         out float sz)
+{
+	sz = params.x/sqrt(params.y + params.z*d + params.w*d*d);
+}

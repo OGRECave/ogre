@@ -135,7 +135,7 @@ static const size_t depthBits[] =
     {
         if(!mRenderBufferMap.empty())
         {
-            LogManager::getSingleton().logMessage("GL: Warning! GLFBOManager destructor called, but not all renderbuffers were released.", LML_CRITICAL);
+            LogManager::getSingleton().logWarning("GLFBOManager destructor called, but not all renderbuffers were released.");
         }
         
         glDeleteFramebuffersEXT(1, &mTempFBO);      

@@ -1762,7 +1762,8 @@ namespace Ogre {
 
     void GLES2RenderSystem::_unregisterContext(GLContext *context)
     {
-        static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
+        if(HardwareBufferManager::getSingletonPtr())
+            static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
         
         for(RenderTargetMap::iterator it = mRenderTargets.begin(); it!=mRenderTargets.end(); ++it)
         {

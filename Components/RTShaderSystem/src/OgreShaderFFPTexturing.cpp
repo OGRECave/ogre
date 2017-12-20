@@ -48,7 +48,7 @@ String FFPTexturing::Type = "FFP_Texturing";
 const String c_ParamTexelEx("texel_");
 
 //-----------------------------------------------------------------------
-FFPTexturing::FFPTexturing()
+FFPTexturing::FFPTexturing() : mIsPointSprite(false)
 {   
 }
 
@@ -182,6 +182,9 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
         case TEXCALC_NONE:                  
             // Resolve explicit vs input texture coordinates.
             
+            if(mIsPointSprite)
+                break;
+
             if (textureUnitParams->mTextureMatrix.get() == NULL)
                 texCoordContent = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet());
 
@@ -218,17 +221,26 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
             break;
     }
 
-    // Resolve vs output texture coordinates.
-    textureUnitParams->mVSOutputTexCoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        -1,
-        texCoordContent,
-        textureUnitParams->mVSOutTextureCoordinateType);
+    if(mIsPointSprite)
+    {
+        textureUnitParams->mPSInputTexCoord =
+            psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 0,
+                                          Parameter::SPC_POINTSPRITE_COORDINATE, GCT_FLOAT2);
+    }
+    else
+    {
+        // Resolve vs output texture coordinates.
+        textureUnitParams->mVSOutputTexCoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES,
+            -1,
+            texCoordContent,
+            textureUnitParams->mVSOutTextureCoordinateType);
 
-    // Resolve ps input texture coordinates.
-    textureUnitParams->mPSInputTexCoord = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        textureUnitParams->mVSOutputTexCoord->getIndex(),
-        textureUnitParams->mVSOutputTexCoord->getContent(),
-        textureUnitParams->mVSOutTextureCoordinateType);
+        // Resolve ps input texture coordinates.
+        textureUnitParams->mPSInputTexCoord = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES,
+            textureUnitParams->mVSOutputTexCoord->getIndex(),
+            textureUnitParams->mVSOutputTexCoord->getContent(),
+            textureUnitParams->mVSOutTextureCoordinateType);
+    }
 
     const ShaderParameterList& inputParams = psMain->getInputParameters();
     const ShaderParameterList& localParams = psMain->getLocalParameters();
@@ -246,10 +258,11 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
     }
 
     mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-    
-    hasError |= !(textureUnitParams->mVSOutputTexCoord.get()) || !(textureUnitParams->mPSInputTexCoord.get()) || 
-        !(mPSDiffuse.get()) || !(mPSSpecular.get()) || !(mPSOutDiffuse.get());
-    
+
+    hasError |= (!textureUnitParams->mVSOutputTexCoord && !mIsPointSprite) ||
+                !textureUnitParams->mPSInputTexCoord || !mPSDiffuse || !mPSSpecular ||
+                !mPSOutDiffuse;
+
     if (hasError)
     {
         OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
@@ -300,6 +313,9 @@ bool FFPTexturing::addFunctionInvocations(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* vsMain)
 {
+    if(mIsPointSprite)
+        return true;
+
     FunctionInvocation* texCoordCalcFunc = NULL;
 
     
@@ -635,18 +651,15 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
         break;
 
     case LBS_MANUAL:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
 
         if (isAlphaArgument)
         {
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(alphaValue), Operand::OPS_IN);                       
+            curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(alphaValue)), Operand::OPS_IN);
         }
         else
         {               
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.r), Operand::OPS_IN);        
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.g), Operand::OPS_IN);        
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.b), Operand::OPS_IN);        
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.a), Operand::OPS_IN);        
+            curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(colourValue.ptr())), Operand::OPS_IN);
         }
         
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);
@@ -763,7 +776,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(blendMode.factor), Operand::OPS_IN);
+        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(blendMode.factor), Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);
         break;
@@ -877,6 +890,8 @@ void FFPTexturing::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
+    mIsPointSprite = srcPass->getPointSpritesEnabled();
+
     //count the number of texture units we need to process
     size_t validTexUnits = 0;
     for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)

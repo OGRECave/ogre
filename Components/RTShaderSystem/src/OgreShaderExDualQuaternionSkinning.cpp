@@ -249,14 +249,14 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
             
             //Multiply the index by 2
             curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM, funcCounter++);
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(2.0f), Operand::OPS_IN);
+            curFuncInvocation->pushOperand(ParameterFactory::createConstParam(2.0f), Operand::OPS_IN);
             curFuncInvocation->pushOperand(mParamIndex1, Operand::OPS_IN);
             curFuncInvocation->pushOperand(mParamIndex1, Operand::OPS_OUT);
             vsMain->addAtomInstance(curFuncInvocation);
             
             //Add 1 to the index and assign as the second row's index
             curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++);
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0f), Operand::OPS_IN);
+            curFuncInvocation->pushOperand(ParameterFactory::createConstParam(1.0f), Operand::OPS_IN);
             curFuncInvocation->pushOperand(mParamIndex1, Operand::OPS_IN);
             curFuncInvocation->pushOperand(mParamIndex2, Operand::OPS_OUT);
             vsMain->addAtomInstance(curFuncInvocation);

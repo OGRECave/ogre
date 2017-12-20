@@ -767,10 +767,10 @@ namespace Ogre {
         if (mPointRendering && mBillboardType != BBT_POINT)
         {
 
-            LogManager::getSingleton().logMessage("Warning: BillboardSet " +
+            LogManager::getSingleton().logWarning("BillboardSet " +
                 mName + " has point rendering enabled but is using a type "
                 "other than BBT_POINT, this may not give you the results you "
-                "expect.", LML_CRITICAL);
+                "expect.");
         }
 
         mVertexData = OGRE_NEW VertexData();

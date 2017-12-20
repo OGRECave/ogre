@@ -1227,6 +1227,11 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
             mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
 
+        mAutoParamDataSource->setPointParameters(
+            pass->getPointSize(), pass->isPointAttenuationEnabled(),
+            pass->getPointAttenuationConstant(), pass->getPointAttenuationLinear(),
+            pass->getPointAttenuationQuadratic());
+
         // Texture unit settings
         size_t unit = 0;
         // Reset the shadow texture index for each pass
@@ -1907,8 +1912,8 @@ void SceneManager::_setSkyBox(
         if (!m->getBestTechnique() || 
             !m->getBestTechnique()->getNumPasses())
         {
-            LogManager::getSingleton().logMessage(
-                "Warning, skybox material " + materialName + " is not supported, defaulting.", LML_CRITICAL);
+            LogManager::getSingleton().logWarning("skybox material " + materialName +
+                                                  " is not supported, defaulting");
             m = MaterialManager::getSingleton().getDefaultSettings();
         }
 
@@ -4364,9 +4369,9 @@ void SceneManager::setShadowTechnique(ShadowTechnique technique)
         // Otherwise forget it
         if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_HWSTENCIL))
         {
-            LogManager::getSingleton().logMessage(
-                "WARNING: Stencil shadows were requested, but this device does not "
-                "have a hardware stencil. Shadows disabled.", LML_CRITICAL);
+            LogManager::getSingleton().logWarning(
+                "Stencil shadows were requested, but this device does not "
+                "have a hardware stencil. Shadows disabled.");
             mShadowTechnique = SHADOWTYPE_NONE;
         }
         else if (!mShadowIndexBuffer)

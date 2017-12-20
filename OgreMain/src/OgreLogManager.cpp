@@ -138,6 +138,16 @@ namespace Ogre {
             mDefaultLog->logMessage(message, lml, maskDebug);
         }
     }
+
+    void LogManager::logError(const String& message, bool maskDebug )
+    {
+        stream(LML_CRITICAL, maskDebug) << "Error: " << message;
+    }
+
+    void LogManager::logWarning(const String& message, bool maskDebug )
+    {
+        stream(LML_WARNING, maskDebug) << "Warning: " << message;
+    }
     //-----------------------------------------------------------------------
     void LogManager::setLogDetail(LoggingLevel ll)
     {

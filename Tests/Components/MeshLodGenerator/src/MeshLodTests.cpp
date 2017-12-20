@@ -117,28 +117,25 @@ TEST_F(MeshLodTests,LodConfigSerializer)
     LodConfigSerializer serializer;
     serializer.exportLodConfig(config, "testLodConfigSerializer.lodconfig");
     serializer.importLodConfig(&config2, "testLodConfigSerializer.lodconfig");
-    EXPECT_TRUE(config.mesh->getHandle() == config2.mesh->getHandle());
-    EXPECT_TRUE(config.strategy == config2.strategy);
-    EXPECT_TRUE(config.advanced.outsideWalkAngle == config.advanced.outsideWalkAngle);
-    EXPECT_TRUE(config.advanced.outsideWeight == config.advanced.outsideWeight);
-    EXPECT_TRUE(config.advanced.useBackgroundQueue == config.advanced.useBackgroundQueue);
-    EXPECT_TRUE(config.advanced.useCompression == config.advanced.useCompression);
-    EXPECT_TRUE(config.advanced.useVertexNormals == config.advanced.useVertexNormals);
+    EXPECT_EQ(config.mesh->getHandle(), config2.mesh->getHandle());
+    EXPECT_EQ(config.strategy, config2.strategy);
+    EXPECT_EQ(config.advanced.outsideWalkAngle, config.advanced.outsideWalkAngle);
+    EXPECT_EQ(config.advanced.outsideWeight, config.advanced.outsideWeight);
+    EXPECT_EQ(config.advanced.useBackgroundQueue, config.advanced.useBackgroundQueue);
+    EXPECT_EQ(config.advanced.useCompression, config.advanced.useCompression);
+    EXPECT_EQ(config.advanced.useVertexNormals, config.advanced.useVertexNormals);
 
     {
         // Compare profiles
         LodProfile& p1 = config.advanced.profile;
         LodProfile& p2 = config2.advanced.profile;
-        bool isProfileSameSize = (p1.size() == p2.size());
-        EXPECT_TRUE(isProfileSameSize);
-        if (isProfileSameSize) 
+
+        ASSERT_EQ(p1.size(), p2.size());
+        for (size_t i = 0; i < p1.size(); i++)
         {
-            for (size_t i = 0; i < p1.size(); i++) 
-            {
-                EXPECT_TRUE(p1[i].src == p2[i].src);
-                EXPECT_TRUE(p1[i].dst == p2[i].dst);
-                EXPECT_FLOAT_EQ(p1[i].cost, p2[i].cost);
-            }
+            EXPECT_EQ(p1[i].src, p2[i].src);
+            EXPECT_EQ(p1[i].dst, p2[i].dst);
+            EXPECT_FLOAT_EQ(p1[i].cost, p2[i].cost);
         }
     }
 
@@ -146,17 +143,14 @@ TEST_F(MeshLodTests,LodConfigSerializer)
         // Compare Lod Levels
         LodConfig::LodLevelList& l1 = config.levels;
         LodConfig::LodLevelList& l2 = config2.levels;
-        bool isLevelsSameSize = (l1.size() == l2.size());
-        EXPECT_TRUE(isLevelsSameSize);
-        if (isLevelsSameSize) 
+
+        ASSERT_EQ(l1.size(), l2.size());
+        for (size_t i = 0; i < l1.size(); i++)
         {
-            for (size_t i = 0; i < l1.size(); i++) 
-            {
-                EXPECT_TRUE(l1[i].distance == l2[i].distance);
-                EXPECT_TRUE(l1[i].manualMeshName == l2[i].manualMeshName);
-                EXPECT_TRUE(l1[i].reductionMethod == l2[i].reductionMethod);
-                EXPECT_FLOAT_EQ(l1[i].reductionValue, l2[i].reductionValue);
-            }
+            EXPECT_EQ(l1[i].distance , l2[i].distance);
+            EXPECT_EQ(l1[i].manualMeshName, l2[i].manualMeshName);
+            EXPECT_EQ(l1[i].reductionMethod, l2[i].reductionMethod);
+            EXPECT_FLOAT_EQ(l1[i].reductionValue, l2[i].reductionValue);
         }
     }
 }

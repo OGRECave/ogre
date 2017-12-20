@@ -335,10 +335,10 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
             {
                 /// Mismatch -- warn user
                 /// XXX We could support repeating the last queue, with some effort
-                LogManager::getSingleton().logMessage("Warning in compilation of Compositor "
+                LogManager::getSingleton().logWarning("in compilation of Compositor "
                     +mCompositor->getName()+": Attempt to render queue "+
                     StringConverter::toString(pass->getFirstRenderQueue())+" after "+
-                    StringConverter::toString(finalState.currentQueueGroupID), LML_CRITICAL);
+                    StringConverter::toString(finalState.currentQueueGroupID));
             }
 
             RSSetSchemeOperation* setSchemeOperation = 0;
@@ -374,16 +374,16 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
             if(!srcmat)
             {
                 /// No material -- warn user
-                LogManager::getSingleton().logMessage("Warning in compilation of Compositor "
-                    +mCompositor->getName()+": No material defined for composition pass", LML_CRITICAL);
+                LogManager::getSingleton().logWarning("in compilation of Compositor "
+                    +mCompositor->getName()+": No material defined for composition pass");
                 break;
             }
             srcmat->load();
             if(srcmat->getSupportedTechniques().empty())
             {
                 /// No supported techniques -- warn user
-                LogManager::getSingleton().logMessage("Warning in compilation of Compositor "
-                    +mCompositor->getName()+": material "+srcmat->getName()+" has no supported techniques", LML_CRITICAL);
+                LogManager::getSingleton().logWarning("in compilation of Compositor "
+                    +mCompositor->getName()+": material "+srcmat->getName()+" has no supported techniques");
                 break;
             }
             srctech = srcmat->getBestTechnique(0);
@@ -410,9 +410,9 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
                         else
                         {
                             /// Texture unit not there
-                            LogManager::getSingleton().logMessage("Warning in compilation of Compositor "
+                            LogManager::getSingleton().logWarning("in compilation of Compositor "
                                 +mCompositor->getName()+": material "+srcmat->getName()+" texture unit "
-                                +StringConverter::toString(x)+" out of bounds", LML_CRITICAL);
+                                +StringConverter::toString(x)+" out of bounds");
                         }
                     }
                 }

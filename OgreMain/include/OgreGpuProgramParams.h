@@ -1409,6 +1409,8 @@ namespace Ogre {
             ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,
             /** Binds custom per-light constants to the shaders. */
             ACT_LIGHT_CUSTOM,
+            /// Point params: size; constant, linear, quadratic attenuation
+            ACT_POINT_PARAMS,
 
             ACT_UNKNOWN = 999
         };

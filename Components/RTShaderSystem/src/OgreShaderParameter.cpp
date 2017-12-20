@@ -60,10 +60,10 @@ namespace RTShader {
         virtual String toString () const
         {
             const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
-            return  
-                ((lang.empty() == false) && (lang[0] == 'g') ? String("vec2(") : String("float2(")) +
-                Ogre::StringConverter::toString(mValue.x) + "," + 
-                Ogre::StringConverter::toString(mValue.y) + ")";
+            StringStream str;
+            str << (!lang.empty() && lang[0] == 'g' ? "vec2(" : "float2(");
+            str << std::showpoint << mValue.x << "," << mValue.y << ")";
+            return str.str();
         }
     };
 
@@ -87,11 +87,10 @@ namespace RTShader {
         virtual String toString () const
         {
             const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
-            return  
-                ((lang.empty() == false) && (lang[0] == 'g') ? String("vec3(") : String("float3(")) +
-                Ogre::StringConverter::toString(mValue.x) + "," + 
-                Ogre::StringConverter::toString(mValue.y) + "," + 
-                Ogre::StringConverter::toString(mValue.z) + ")";
+            StringStream str;
+            str << (!lang.empty() && lang[0] == 'g' ? "vec3(" : "float3(");
+            str << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << ")";
+            return str.str();
         }
     };
 
@@ -115,12 +114,10 @@ namespace RTShader {
         virtual String toString () const
         {
             const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
-            return  
-                ((lang.empty() == false) && (lang[0] == 'g') ? String("vec4(") : String("float4(")) +
-                Ogre::StringConverter::toString(mValue.x) + "," + 
-                Ogre::StringConverter::toString(mValue.y) + "," + 
-                Ogre::StringConverter::toString(mValue.z) + "," + 
-                Ogre::StringConverter::toString(mValue.w) + ")";
+            StringStream str;
+            str << (!lang.empty() && lang[0] == 'g' ? "vec4(" : "float4(");
+            str << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << "," << mValue.w << ")";
+            return str.str();
         }
     };
 
@@ -144,15 +141,7 @@ namespace RTShader {
         */
         virtual String toString () const
         {
-            String val = Ogre::StringConverter::toString(mValue);
-
-            // Make sure that float params have always this representation #.#
-            if(val.find(".") == String::npos)
-            {
-                val += ".0";
-            }
-
-            return val;
+            return StringConverter::toString(mValue, 6, 0, ' ', std::ios::showpoint);
         }
     };
     /** ConstParameterInt represents an int constant.
@@ -328,7 +317,8 @@ namespace RTShader {
         AutoShaderParameter(GpuProgramParameters::ACT_TEXTURE_MATRIX,                            "texture_matrix",                          GCT_MATRIX_4X4),
         AutoShaderParameter(GpuProgramParameters::ACT_LOD_CAMERA_POSITION,                      "lod_camera_position",                      GCT_FLOAT3),
         AutoShaderParameter(GpuProgramParameters::ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,         "lod_camera_position_object_space",         GCT_FLOAT3),
-        AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_CUSTOM,                             "light_custom",                             GCT_FLOAT1)
+        AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_CUSTOM,                             "light_custom",                             GCT_FLOAT1),
+        AutoShaderParameter(GpuProgramParameters::ACT_POINT_PARAMS,                             "point_params",                             GCT_FLOAT4),
     };
 
 //-----------------------------------------------------------------------
@@ -868,39 +858,31 @@ UniformParameterPtr ParameterFactory::createSamplerCUBE(int index)
         (uint16)GPV_GLOBAL, 1));
 }
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createConstParamVector2(Vector2 val)
+ParameterPtr ParameterFactory::createConstParam(const Vector2& val)
 {
-    return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec2(val, 
-                                                    GCT_FLOAT2, 
-                                                    Parameter::SPS_UNKNOWN,  
+    return ParameterPtr(OGRE_NEW ConstParameterVec2(val, GCT_FLOAT2, Parameter::SPS_UNKNOWN,
                                                     Parameter::SPC_UNKNOWN));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createConstParamVector3(Vector3 val)
+ParameterPtr ParameterFactory::createConstParam(const Vector3& val)
 {
-    return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec3(val, 
-                                                    GCT_FLOAT3, 
-                                                    Parameter::SPS_UNKNOWN,  
+    return ParameterPtr(OGRE_NEW ConstParameterVec3(val, GCT_FLOAT3, Parameter::SPS_UNKNOWN,
                                                     Parameter::SPC_UNKNOWN));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createConstParamVector4(Vector4 val)
+ParameterPtr ParameterFactory::createConstParam(const Vector4& val)
 {
-    return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec4(val, 
-                                                    GCT_FLOAT4, 
-                                                    Parameter::SPS_UNKNOWN,  
+    return ParameterPtr(OGRE_NEW ConstParameterVec4(val, GCT_FLOAT4, Parameter::SPS_UNKNOWN,
                                                     Parameter::SPC_UNKNOWN));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createConstParamFloat(float val)
+ParameterPtr ParameterFactory::createConstParam(float val)
 {
-    return ParameterPtr((Parameter*)OGRE_NEW ConstParameterFloat(val, 
-                                                  GCT_FLOAT1, 
-                                                  Parameter::SPS_UNKNOWN,  
-                                                  Parameter::SPC_UNKNOWN));
+    return ParameterPtr(OGRE_NEW ConstParameterFloat(val, GCT_FLOAT1, Parameter::SPS_UNKNOWN,
+                                                     Parameter::SPC_UNKNOWN));
 }
 
 //-----------------------------------------------------------------------

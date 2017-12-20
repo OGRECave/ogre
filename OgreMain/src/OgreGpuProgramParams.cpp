@@ -184,7 +184,8 @@ namespace Ogre
         AutoConstantDefinition(ACT_TEXTURE_MATRIX,  "texture_matrix", 16, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_LOD_CAMERA_POSITION,               "lod_camera_position",              3, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,  "lod_camera_position_object_space", 3, ET_REAL, ACDT_NONE),
-        AutoConstantDefinition(ACT_LIGHT_CUSTOM,        "light_custom", 4, ET_REAL, ACDT_INT)
+        AutoConstantDefinition(ACT_LIGHT_CUSTOM,        "light_custom", 4, ET_REAL, ACDT_INT),
+        AutoConstantDefinition(ACT_POINT_PARAMS,                    "point_params",                   4, ET_REAL, ACDT_NONE),
     };
 
     bool GpuNamedConstants::msGenerateAllConstantDefinitionArrayEntries = false;
@@ -2491,7 +2492,9 @@ namespace Ogre
                 case ACT_FOG_PARAMS:
                     _writeRawConstant(i->physicalIndex, source->getFogParams(), i->elementCount);
                     break;
-
+                case ACT_POINT_PARAMS:
+                    _writeRawConstant(i->physicalIndex, source->getPointParams(), i->elementCount);
+                    break;
                 case ACT_SURFACE_AMBIENT_COLOUR:
                     _writeRawConstant(i->physicalIndex, source->getSurfaceAmbientColour(),
                                       i->elementCount);

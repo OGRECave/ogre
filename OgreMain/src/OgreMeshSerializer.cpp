@@ -190,9 +190,9 @@ namespace Ogre {
         // Warn on old version of mesh
         if (ver != mVersionData[0]->versionString)
         {
-            LogManager::getSingleton().logMessage("WARNING: " + pDest->getName() + 
+            LogManager::getSingleton().logWarning( pDest->getName() +
                 " is an older format (" + ver + "); you should upgrade it as soon as possible" +
-                " using the OgreMeshUpgrade tool.", LML_CRITICAL);
+                " using the OgreMeshUpgrade tool.");
         }
 
         if(mListener)

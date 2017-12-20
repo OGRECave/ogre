@@ -36,7 +36,7 @@ namespace RTShader {
 String GLSLProgramWriter::TargetLanguage = "glsl";
 
 //-----------------------------------------------------------------------
-GLSLProgramWriter::GLSLProgramWriter()
+GLSLProgramWriter::GLSLProgramWriter() : mIsGLSLES(false)
 {
     mGLSLVersion = Ogre::Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
     initializeStringMaps();
@@ -56,7 +56,7 @@ void GLSLProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_FLOAT2] = "vec2";
     mGpuConstTypeMap[GCT_FLOAT3] = "vec3";
     mGpuConstTypeMap[GCT_FLOAT4] = "vec4";
-    mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
+    mGpuConstTypeMap[GCT_SAMPLER1D] = mIsGLSLES ? "sampler2D" : "sampler1D";
     mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
     mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "sampler2DArray";
     mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
@@ -98,7 +98,7 @@ void GLSLProgramWriter::initializeStringMaps()
     mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE6] = "uv6";
     mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE7] = "uv7";  
 
-    if (mGLSLVersion >= 130)
+    if (mGLSLVersion >= 130 || mIsGLSLES)
     {
         mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
         mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
@@ -108,23 +108,6 @@ void GLSLProgramWriter::initializeStringMaps()
 //-----------------------------------------------------------------------
 void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
-    GpuProgramType gpuType = program->getType();
-    if(gpuType == GPT_GEOMETRY_PROGRAM)
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, 
-            "Geometry Program not supported in GLSL writer ", 
-            "GLSLProgramWriter::writeSourceCode" ); 
-    }
-
-    // Clear out old input params
-    mFragInputParams.clear();
-
-    const ShaderFunctionList& functionList = program->getFunctions();
-    ShaderFunctionConstIterator itFunction;
-
-    const UniformParameterList& parameterList = program->getParameters();
-    UniformParameterConstIterator itUniformParam = parameterList.begin();
-    
     // Write the current version (this force the driver to more fulfill the glsl standard)
     os << "#version "<< mGLSLVersion << std::endl;
 
@@ -135,6 +118,28 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     // Write forward declarations
     writeForwardDeclarations(os, program);
     os<< std::endl;
+
+    writeMainSourceCode(os, program);
+}
+
+void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
+{
+    GpuProgramType gpuType = program->getType();
+    if(gpuType == GPT_GEOMETRY_PROGRAM)
+    {
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+            "Geometry Program not supported in GLSL writer ",
+            "GLSLProgramWriter::writeSourceCode" );
+    }
+
+    // Clear out old input params
+    mFragInputParams.clear();
+
+    const ShaderFunctionList& functionList = program->getFunctions();
+    ShaderFunctionConstIterator itFunction;
+
+    const UniformParameterList& parameterList = program->getParameters();
+    UniformParameterConstIterator itUniformParam = parameterList.begin();
     
     // Generate global variable code.
     writeUniformParametersTitle(os, program);
@@ -504,7 +509,13 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
         String paramName = pParam->getName();
 
         if (gpuType == GPT_FRAGMENT_PROGRAM)
-        {                   
+        {
+            if(paramContent == Parameter::SPC_POINTSPRITE_COORDINATE)
+            {
+                mInputToGLStatesMap[pParam->getName()] = "gl_PointCoord";
+                continue;
+            }
+
             // push fragment inputs they all could be written (in glsl you can not write
             // input params in the fragment program)
             mFragInputParams.push_back(paramName);
@@ -516,7 +527,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             mInputToGLStatesMap[pParam->getName()] = paramName;
 
             // After GLSL 1.20 varying is deprecated
-            if(mGLSLVersion <= 120)
+            if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))
             {
                 os << "varying\t";
             }
@@ -538,7 +549,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             mInputToGLStatesMap[paramName] = mContentToPerVertexAttributes[paramContent];
 
             // After GLSL 1.40 attribute is deprecated
-            if (mGLSLVersion >= 140)
+            if (mGLSLVersion >= 140 || (mGLSLVersion > 100 && mIsGLSLES))
             {
                 os << "in\t";
             }
@@ -567,11 +578,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             os << mContentToPerVertexAttributes[paramContent];
             os << ";" << std::endl; 
         }
-        else if(paramContent == Parameter::SPC_COLOR_DIFFUSE)
+        else if(paramContent == Parameter::SPC_COLOR_DIFFUSE && !mIsGLSLES)
         {
             mInputToGLStatesMap[paramName] = "gl_Color";
         }
-        else if(paramContent == Parameter::SPC_COLOR_SPECULAR)
+        else if(paramContent == Parameter::SPC_COLOR_SPECULAR && !mIsGLSLES)
         {
             mInputToGLStatesMap[paramName] = "gl_SecondaryColor";
         }
@@ -605,10 +616,14 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             {
                 mInputToGLStatesMap[pParam->getName()] = "gl_Position";
             }
+            else if(pParam->getContent() == Parameter::SPC_POINTSPRITE_SIZE)
+            {
+                mInputToGLStatesMap[pParam->getName()] = "gl_PointSize";
+            }
             else
             {
                 // After GLSL 1.20 varying is deprecated
-                if(mGLSLVersion <= 120)
+                if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))
                 {
                     os << "varying\t";
                 }
@@ -632,7 +647,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
         {                   
             // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 130)
             // Always add gl_FragColor as an output.  The name is for compatibility.
-            if(mGLSLVersion <= 130)
+            if(mGLSLVersion <= 130 || (mIsGLSLES && mGLSLVersion == 100))
             {
                 mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";
             }
@@ -644,7 +659,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
         }
     }
     
-    if(gpuType == GPT_VERTEX_PROGRAM)
+    if(gpuType == GPT_VERTEX_PROGRAM && !mIsGLSLES) // TODO: also use for GLSLES?
     {
         // Special case where gl_Position needs to be redeclared
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_GLSL_SSO_REDECLARE) &&

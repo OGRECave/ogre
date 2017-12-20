@@ -104,6 +104,7 @@ namespace Ogre {
         ColourValue mAmbientLight;
         ColourValue mFogColour;
         Vector4 mFogParams;
+        Vector4 mPointParams;
         int mPassNumber;
         mutable Vector4 mSceneDepthRange;
         mutable bool mSceneDepthRangeDirty;
@@ -196,6 +197,9 @@ namespace Ogre {
         void setFog(FogMode mode, const ColourValue& colour, Real expDensity, Real linearStart, Real linearEnd);
         const ColourValue& getFogColour(void) const;
         const Vector4& getFogParams(void) const;
+        void setPointParameters(Real size, bool attenuation, Real constant, Real linear,
+                                Real quadratic);
+        const Vector4& getPointParams() const;
         const Matrix4& getTextureViewProjMatrix(size_t index) const;
         const Matrix4& getTextureWorldViewProjMatrix(size_t index) const;
         const Matrix4& getSpotlightViewProjMatrix(size_t index) const;

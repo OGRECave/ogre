@@ -147,7 +147,7 @@ namespace Ogre
         // really this should be empty if read/write was complete, but be tidy
         if (!mChunkStack.empty())
         {
-            LogManager::getSingleton().stream() <<
+            LogManager::getSingleton().stream(LML_WARNING) <<
                 "Warning: stream " << mStream->getName() << " was not fully read / written; " <<
                 mChunkStack.size() << " chunks remain unterminated.";
         }
@@ -208,7 +208,7 @@ namespace Ogre
         }
         else if (c->version > maxVersion)
         {
-            LogManager::getSingleton().stream() << "Error: " << msg 
+            LogManager::getSingleton().stream(LML_CRITICAL) << "Error: " << msg
                 << " : Data version is " << c->version << " but this software can only read "
                 << "up to version " << maxVersion;
             // skip

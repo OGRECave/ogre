@@ -584,8 +584,8 @@ namespace Ogre
             // low is < 200fps in this context
             if (!mIsFullScreen)
             {
-                LogManager::getSingleton().logMessage("D3D9 : WARNING - "
-                    "disabling VSync in windowed mode can cause timing issues at lower "
+                LogManager::getSingleton().logWarning(
+                    "D3D9: disabling VSync in windowed mode can cause timing issues at lower "
                     "frame rates, turn VSync on if you observe this problem.");
             }
             presentParams->PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;

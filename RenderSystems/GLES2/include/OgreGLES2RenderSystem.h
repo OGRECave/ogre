@@ -171,11 +171,6 @@ namespace Ogre {
 
             bool areFixedFunctionLightsInViewSpace() const { return true; }
 
-            void _setPointParameters(Real size, bool attenuationEnabled,
-                                     Real constant, Real linear, Real quadratic, Real minSize, Real maxSize) {}
-
-            void _setPointSpritesEnabled(bool enabled) {}
-
             void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
 
             void _setTextureCoordSet(size_t stage, size_t index);

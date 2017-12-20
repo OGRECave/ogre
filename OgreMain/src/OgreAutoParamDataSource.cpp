@@ -639,6 +639,22 @@ namespace Ogre {
     {
         return mFogParams;
     }
+
+    void AutoParamDataSource::setPointParameters(Real size, bool attenuation, Real constant,
+                                                 Real linear, Real quadratic)
+    {
+        mPointParams.x = size;
+        if(attenuation)
+            mPointParams.x *= getViewportHeight();
+        mPointParams.y = constant;
+        mPointParams.z = linear;
+        mPointParams.w = quadratic;
+    }
+
+    const Vector4& AutoParamDataSource::getPointParams() const
+    {
+        return mPointParams;
+    }
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setTextureProjector(const Frustum* frust, size_t index = 0)
     {

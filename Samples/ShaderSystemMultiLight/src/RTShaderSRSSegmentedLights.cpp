@@ -572,7 +572,7 @@ bool RTShaderSRSSegmentedLights::addPSGlobalIlluminationInvocationBegin(Function
         psMain->addAtomInstance(curFuncInvocation);     
     }
 
-    ParameterPtr pZeroParam = ParameterFactory::createConstParamVector3(Ogre::Vector3::ZERO);
+    ParameterPtr pZeroParam = ParameterFactory::createConstParam(Ogre::Vector3::ZERO);
     
     curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
     curFuncInvocation->pushOperand(pZeroParam, Operand::OPS_IN);    
@@ -743,8 +743,8 @@ bool RTShaderSRSSegmentedLights::addPSSegmentedTextureLightInvocation(Function* 
 {
     float invWidth = 1.0f / (float)SegmentedDynamicLightManager::getSingleton().getTextureWidth();
     float invHeight = 1.0f / (float)SegmentedDynamicLightManager::getSingleton().getTextureHeight();
-    ParameterPtr paramInvWidth = ParameterFactory::createConstParamFloat(invWidth);
-    ParameterPtr paramInvHeight = ParameterFactory::createConstParamFloat(invHeight);
+    ParameterPtr paramInvWidth = ParameterFactory::createConstParam(invWidth);
+    ParameterPtr paramInvHeight = ParameterFactory::createConstParam(invHeight);
 
     FunctionInvocation* curFuncInvocation = NULL;   
     curFuncInvocation = OGRE_NEW FunctionInvocation(SL_FUNC_LIGHT_SEGMENT_TEXTURE_AMBIENT_DIFFUSE, groupOrder, internalCounter++);                      

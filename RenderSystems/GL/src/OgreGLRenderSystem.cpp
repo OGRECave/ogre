@@ -1494,13 +1494,9 @@ namespace Ogre {
             else
                 maxSize = maxSize * mActiveViewport->getActualHeight();
 
-            // XXX: why do I need this for results to be consistent with D3D?
-            // Equations are supposedly the same once you factor in vp height
-            Real correction = 0.005;
-            // scaling required
             val[0] = constant;
-            val[1] = linear * correction;
-            val[2] = quadratic * correction;
+            val[1] = linear;
+            val[2] = quadratic;
 
             if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
                 mStateCacheManager->setEnabled(GL_VERTEX_PROGRAM_POINT_SIZE, true);

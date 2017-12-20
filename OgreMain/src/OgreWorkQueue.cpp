@@ -588,7 +588,7 @@ namespace Ogre {
             if (!r->getAborted())
             {
             // no response, delete request
-            LogManager::getSingleton().stream() << 
+            LogManager::getSingleton().stream(LML_WARNING) <<
                 "DefaultWorkQueueBase('" << mName << "') warning: no handler processed request "
                 << r->getID() << ", channel " << r->getChannel()
                 << ", type " << r->getType();

@@ -255,11 +255,11 @@ try
     log.logMessage(message);
 
     if (!tcs && !norm && !color)
-        log.logMessage("Warning: OGRE will refuse to render SubMeshes that have neither\n"
+        log.logWarning("OGRE will refuse to render SubMeshes that have neither\n"
             "\ttexture coordinates, normals or vertex colours.");
 
     if (!norm) {
-        log.logMessage("Warning: No normals found.\n"
+        log.logWarning("No normals found.\n"
             "\tVRML dictates that normals should be generated, but this program\n"
             "\tdoes not do so. If you want the resulting mesh to contain normals,\n"
             "\tmake sure they are exported.");

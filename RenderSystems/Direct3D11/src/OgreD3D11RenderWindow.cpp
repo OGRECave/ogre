@@ -961,8 +961,8 @@ namespace Ogre
             // frame rates no matter what buffering modes are used (odd - perhaps a
             // timer issue in D3D11 since GL doesn't suffer from this) 
             // low is < 200fps in this context
-            LogManager::getSingleton().logMessage("D3D11: WARNING - "
-                "disabling VSync in windowed mode can cause timing issues at lower "
+            LogManager::getSingleton().logWarning(
+                "D3D11: disabling VSync in windowed mode can cause timing issues at lower "
                 "frame rates, turn VSync on if you observe this problem.");
         }
 

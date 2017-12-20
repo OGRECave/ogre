@@ -517,8 +517,9 @@ namespace Ogre
         render point sprites (textured quads) or plain points.
         @param enabled True enables point sprites, false returns to normal
         point rendering.
+        @deprecated only needed for fixed function APIs
         */  
-        virtual void _setPointSpritesEnabled(bool enabled) = 0;
+        virtual void _setPointSpritesEnabled(bool enabled) {};
 
         /** Sets the size of points and how they are attenuated with distance.
         @remarks
@@ -529,9 +530,10 @@ namespace Ogre
         For example, to disable distance attenuation (constant screensize) 
         you would set constant to 1, and linear and quadratic to 0. A
         standard perspective attenuation would be 0, 1, 0 respectively.
+        @deprecated only needed for fixed function APIs
         */
         virtual void _setPointParameters(Real size, bool attenuationEnabled, 
-            Real constant, Real linear, Real quadratic, Real minSize, Real maxSize) = 0;
+            Real constant, Real linear, Real quadratic, Real minSize, Real maxSize) {};
 
 
         /**

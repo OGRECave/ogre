@@ -525,11 +525,11 @@ namespace Ogre {
                 {
                     mSkeleton.reset();
                     // Log this error
-                    String msg = "Unable to load skeleton ";
-                    msg += skelName + " for Mesh " + mName
-                        + ". This Mesh will not be animated. "
+                    String msg = "Unable to load skeleton '";
+                    msg += skelName + "' for Mesh '" + mName
+                        + "'. This Mesh will not be animated. "
                         + "You can ignore this message if you are using an offline tool.";
-                    LogManager::getSingleton().logMessage(msg);
+                    LogManager::getSingleton().logError(msg);
 
                 }
 
@@ -710,13 +710,13 @@ namespace Ogre {
         if (maxBones > OGRE_MAX_BLEND_WEIGHTS)
         {
             // Warn that we've reduced bone assignments
-            LogManager::getSingleton().logMessage("WARNING: the mesh '" + mName + "' "
+            LogManager::getSingleton().logWarning("the mesh '" + mName + "' "
                 "includes vertices with more than " +
                 StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + " bone assignments. "
                 "The lowest weighted assignments beyond this limit have been removed, so "
                 "your animation may look slightly different. To eliminate this, reduce "
                 "the number of bone assignments per vertex on your mesh to " +
-                StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + ".", LML_CRITICAL);
+                StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + ".");
             // we've adjusted them down to the max
             maxBones = OGRE_MAX_BLEND_WEIGHTS;
 
@@ -725,11 +725,11 @@ namespace Ogre {
         if (existsNonSkinnedVertices)
         {
             // Warn that we've non-skinned vertices
-            LogManager::getSingleton().logMessage("WARNING: the mesh '" + mName + "' "
+            LogManager::getSingleton().logWarning("the mesh '" + mName + "' "
                 "includes vertices without bone assignments. Those vertices will "
                 "transform to wrong position when skeletal animation enabled. "
                 "To eliminate this, assign at least one bone assignment per vertex "
-                "on your mesh.", LML_CRITICAL);
+                "on your mesh.");
         }
 
         return maxBones;

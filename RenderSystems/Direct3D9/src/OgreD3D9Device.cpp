@@ -1152,7 +1152,7 @@ namespace Ogre
             }
             else
             {
-                LogManager::getSingleton().logMessage("D3D9 : WARNING - Depth buffer could not be acquired.");
+                LogManager::getSingleton().logWarning("D3D9: Depth buffer could not be acquired.");
             }
         }
 

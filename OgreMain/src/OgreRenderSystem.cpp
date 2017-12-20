@@ -673,8 +673,8 @@ namespace Ogre {
                                      " it says it's incompatible with that RT" );
             }
             else
-                LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited DepthBuffer"
-                                                       "for RT: " + renderTarget->getName() , LML_CRITICAL);
+                LogManager::getSingleton().logWarning( "Couldn't create a suited DepthBuffer"
+                                                       "for RT: " + renderTarget->getName());
         }
     }
     bool RenderSystem::getWBufferEnabled(void) const

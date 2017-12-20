@@ -193,10 +193,6 @@ namespace Ogre {
 
         bool areFixedFunctionLightsInViewSpace() const { return true; }
 
-        void _setPointParameters(Real size, bool attenuationEnabled,
-                                 Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
-
-        void _setPointSpritesEnabled(bool enabled);
         /** See
          RenderSystem
          */

@@ -120,7 +120,7 @@ namespace Ogre {
                     if (glerrStr)
                         glErrDesc = glerrStr;
                     
-                    LogManager::getSingleton().logMessage("GLHardwareVertexBuffer::lock - Error: failed to Discard the buffer. Try to recreate the buffer", LML_CRITICAL);
+                    LogManager::getSingleton().logError("GLHardwareVertexBuffer::lock - failed to Discard the buffer. Try to recreate the buffer");
                     
                     static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
                     mBufferId = 0;

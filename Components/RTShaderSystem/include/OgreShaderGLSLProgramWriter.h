@@ -77,6 +77,8 @@ public:
     // Protected methods.
 protected:
 
+    void writeMainSourceCode(std::ostream& os, Program* program);
+
     /** Initialize string maps. */
     void initializeStringMaps();
 
@@ -113,6 +115,9 @@ protected:
     int mGLSLVersion;
     // Holds the fragment input params 
     StringVector mFragInputParams;
+
+    // set by derived class
+    bool mIsGLSLES;
 };
 
 /** GLSL program writer factory implementation.
