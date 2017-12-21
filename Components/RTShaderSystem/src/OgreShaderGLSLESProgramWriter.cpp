@@ -268,7 +268,7 @@ namespace Ogre {
             const ShaderFunctionList& functionList = program->getFunctions();
 
             Function* curFunction = *(functionList.begin());
-            FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
+            const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
             FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
             FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
             // Now iterate over all function atoms

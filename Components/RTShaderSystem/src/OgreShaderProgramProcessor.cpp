@@ -670,7 +670,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
 }
 
 //-----------------------------------------------------------------------------
-void ProgramProcessor::rebuildFunctionInvocations(FunctionAtomInstanceList& funcAtomList, 
+void ProgramProcessor::rebuildFunctionInvocations(const FunctionAtomInstanceList& funcAtomList,
                                                   MergeParameterList& mergedParams,
                                                   LocalParameterMap& localParamsMap)
 {   
@@ -689,11 +689,11 @@ void ProgramProcessor::rebuildFunctionInvocations(FunctionAtomInstanceList& func
 }
 
 //-----------------------------------------------------------------------------
-void ProgramProcessor::buildParameterReferenceMap(FunctionAtomInstanceList& funcAtomList, ParameterOperandMap& paramsRefMap)
+void ProgramProcessor::buildParameterReferenceMap(const FunctionAtomInstanceList& funcAtomList, ParameterOperandMap& paramsRefMap)
 {
     
-    FunctionAtomInstanceIterator it    = funcAtomList.begin();
-    FunctionAtomInstanceIterator itEnd = funcAtomList.end();
+    FunctionAtomInstanceConstIterator it    = funcAtomList.begin();
+    FunctionAtomInstanceConstIterator itEnd = funcAtomList.end();
 
     for (; it != itEnd; ++it)
     {

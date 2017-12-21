@@ -138,9 +138,6 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
             os << ";" << std::endl;                     
         }
 
-        // Sort and write function atoms.
-        curFunction->sortAtomInstances();
-
         const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
         FunctionAtomInstanceConstIterator itAtom;
 

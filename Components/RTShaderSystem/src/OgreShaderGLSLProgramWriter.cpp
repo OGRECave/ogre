@@ -192,9 +192,6 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             os << ";" << std::endl;                     
         }
         os << std::endl;            
-
-        // Sort function atoms.
-        curFunction->sortAtomInstances();
         
         const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
         FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
