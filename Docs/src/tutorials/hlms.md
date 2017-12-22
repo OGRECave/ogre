@@ -1,16 +1,19 @@
 #  HLMS: High Level Material System {#hlms}
 
-The HLMS is the new approach to shader management.
-It stands for “High Level Material System”, because for the user, the
-HLMS means just define the material and start looking at it (no need for
-coding or shader knowledge!).
+This component allows you to manage shader variations of a specific shader template.
+It is a different take to the Uber shader management, but instead of using plain
+`#ifdef`s it uses a custom, more powerful preprocessor language.
+
+Additionally it allows you to define a set of abstract properties that are then used to
+configure the shader generation.
+
 Basically it solves the same problem like the @ref rtss : automatically generate
 a shader based on an abstract description so you do not have to write them yourself.
 
 But while the RTSS uses the classical @ref Material-Scripts and several C++ classes 
-to glue code together, the HLMS instead relies on a custom preprocessor language.
+to glue code together, the HLMS instead relies on textual shader templates.
 
-Currently there is only Physically Based Shading (PBS) material implementation based on the HLMS
+Currently there is only the Physically Based Shading (PBS) material implementation based on the HLMS
 that does not read the classical Materials and therefore does not respect 
 the settings for fog, diffuse_color etc.
 
@@ -22,7 +25,7 @@ the settings for fog, diffuse_color etc.
 
 1.  Scripts. To set the material properties (i.e. type of Hlms to use:
     PBS, Toon shading, GUI; what textures, diffuse colour,
-    roughness, etc). You can also do this from C++ obviously. Everybody
+    roughness, etc). **You currently have to do this from C++.** Everybody
     will be using this part.
 
 2.  Shader template. The Hlms takes a couple hand-written glsl/hlsl
@@ -58,12 +61,8 @@ want to mess with. Most users will just use the scripts to define
 materials, advanced users will change the template, and very advanced
 users who need something entirely different will change all three.
 
-For example the PBS (Physically Based Shading) type has its own C++
-implementation and its own set of shader templates. The Toon Shading has
-its own C++ implementation and set of shaders. There is also an “Unlit”
-implementation, specifically meant to deal with GUI and simple particle
-FXs (ignores normals & lighting, manages multiple UVs, can mix multiple
-texture with photoshop-like blend modes, can animate the UVs, etc)
+For example the PBS material has its own C++ implementation and its own set of shader templates.
+The Toon Shading has its own C++ implementation and set of shaders.
 
 It is theoretically possible to implement both Toon & PBS in the same
 C++ module, but that would be crazy, hard to maintain and not very
@@ -71,9 +70,7 @@ modular.
 
 # Compared to classical materials {#materials}
 
-Let me get this straight: You should be using the HLMS.
-
-However, materials are still useful for:
+Materials are still useful for:
 
 -   Quick iteration. You need to write a shader, just define the
     material and start coding. Why would you deal with the template’s

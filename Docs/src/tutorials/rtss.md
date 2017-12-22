@@ -6,13 +6,55 @@ This component is used to generate shaders on the fly based on object material p
 
 # Core features of the system {#core-feats}
 * Runtime shader generation synchronized with scene state. Each time scene settings change, a new set of shaders is generated.
-* Full FFP (Fixed Function Pipeline) emulation. This feature is most useful combined with render system that doesn't provide any FFP functionality (OpenGL ES 2.0, D3D10, D3D11 etc).
+* Full FFP (Fixed Function Pipeline) emulation. This feature is most useful combined with render system that doesn't provide any FFP functionality (OpenGL ES 2.0, D3D11 etc).
 * Shader language independent interface: the logic representation of the shader programs is completely independent from the target shader language. You can generate code for different shader languages from the same program.
 * Pluggable interface allows extending the target shader languages set. 
 * Pluggable interface allows adding new shader based effects to the system in a seamless way. Each effect code will be automatically combined with the rest of the shader code.
 * Smart program management: each shader program is created only once and may be used by multiple passes.
 * Automatic vertex shader compacting mechanism: no more compacting variables by hand. In case the amount of used vertex shader output registers exceeds the maximum allowed (12 to 32, depending on [D3DPSHADERCAPS2_0.NumTemps](http://msdn.microsoft.com/en-us/library/bb172918%28v=VS.85%29.aspx)), a compacting algorithm packs the vertex shader outputs and adds unpack code in the fragment shader side.
 * Material script support, for both export and import.
+
+# System overview {#rtss_overview}
+
+The RTSS is not another Uber shader with an exploding amount of #ifdefs that make it increasingly difficult to add new functionality. 
+Instead, it manages a set of opaque components (SubRenderStates) that each implement a specific effect and are completely isolated from each other.
+The implemented effects include Fixed Function transformation and lighting. The interface of these components are simple shaders files providing a set of functions; e.g. @ref FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, @ref FFP_FUNC_LIGHT_POINT_DIFFUSE.
+
+Correctly ordering these functions, providing them with the right input values and interconnecting them is the main purpose of the RTSS.
+
+To this end the RTSS defines a set of stages; e.g Ogre::RTShader::FFP_TRANSFORM, Ogre::RTShader::FFP_TEXTURING. It then queries all registered SubRenderStates which in turn attach functions given a Ogre::Pass. The stages are conceptually very similar to render queue groups.
+
+After the RTSS has queried the SubRenderStates it continues to fill the entry function (e.g. `main()` for GLSL) by generating the actual function invocations.
+
+Basically it performs the following (simplified) transformation, given
+```cpp
+// GLOBAL PARAMETERS
+$global_parameters
+// FUNCTION: $function_type
+$input_parameters
+$output_parameters
+void main() {
+	$local_parameters
+	$FFP_TRANSFORM
+	(...)
+	$FFP_TEXTURING
+}
+```
+and `$FFP_TRANSFORM = [FFP_FUNC_TRANSFORM]`, `$FFP_TEXTURING = [FFP_FUNC_TRANSFORM_TEXCOORD]` to
+
+```cpp
+// GLOBAL PARAMETERS
+uniform	mat4	worldviewproj_matrix;
+uniform	mat4	texture_matrix1;
+// FUNCTION: Vertex Program Entry point
+in	vec4	vertex;
+in	vec4	uv0;
+out	vec4	oTexcoord4_0;
+void main() {
+	FFP_Transform(worldviewproj_matrix, vertex, gl_Position);
+	FFP_TransformTexCoord(texture_matrix1, uv0.xy, oTexcoord4_0.xy);
+}
+```
 
 # Integration of RTSS {#integration}
 
@@ -92,8 +134,7 @@ The result of this entire process is that each technique associated with the SGS
 
 ![](RuntimeShaderGeneration.svg)
 
-# High system overview
-# Main components
+# Main components {#rtss__components}
 The following is an partial list of components within the RTSS. These components are listed as they have great importance in understanding controlling and later extending the RTSS system.
 
 ## ShaderGenerator
@@ -114,7 +155,7 @@ There are 5 basic SRSs. These are used to recreate the functionality provided by
 * Ogre::RTShader::FFPTexturing - responsible for adding code that modulates the color of the pixels based on textures assigned to the material.
 * Ogre::RTShader::FFPFog - responsible for adding code that modulates the color of a pixel based on the scene or object fog parameters.
 
-__Note:__ There are many more sub render states that already exist in the Ogre system and new ones can be added. Some of the existing SRSs include capabilities such as: per-pixel lighting, texture atlas, advanced texture blend, bump mapping, efficient multiple lights (sample), textured fog (sample), etc...
+There are many more sub render states that already exist in the Ogre system and new ones can be added. Some of the existing SRSs include capabilities such as: per-pixel lighting, texture atlas, advanced texture blend, bump mapping, efficient multiple lights (sample), textured fog (sample), etc...
 
 ## SubRenderStateFactory
 As the name suggests, sub render state factories are factories that produce sub render states. Each factory generates a specific SRS. 
