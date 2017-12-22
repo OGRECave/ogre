@@ -157,7 +157,6 @@ String Operand::toString() const
 FunctionAtom::FunctionAtom()
 {
     mGroupExecutionOrder   = -1;
-    mInternalExecutionOrder = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -166,22 +165,22 @@ int FunctionAtom::getGroupExecutionOrder() const
     return mGroupExecutionOrder;
 }
 
-//-----------------------------------------------------------------------------
-int FunctionAtom::getInternalExecutionOrder() const
-{
-    return mInternalExecutionOrder;
-}
-
-
 String FunctionInvocation::Type = "FunctionInvocation";
 
 //-----------------------------------------------------------------------
-FunctionInvocation::FunctionInvocation(const String& functionName, 
-                                       int groupOrder, int internalOrder, String returnType) :
+FunctionInvocation::FunctionInvocation(const String& functionName, int groupOrder,
+                                       const String& returnType)
+    : mFunctionName(functionName), mReturnType(returnType)
+{
+    mGroupExecutionOrder = groupOrder;
+}
+
+//-----------------------------------------------------------------------
+FunctionInvocation::FunctionInvocation(const String& functionName,
+                                       int groupOrder, int, String returnType) :
     mFunctionName(functionName), mReturnType(returnType)
 {
     mGroupExecutionOrder = groupOrder;
-    mInternalExecutionOrder = internalOrder;
 }
 
 //-----------------------------------------------------------------------------
@@ -189,7 +188,6 @@ FunctionInvocation::FunctionInvocation(const FunctionInvocation& other) :
     mFunctionName(other.mFunctionName), mReturnType(other.mReturnType)
 {
     mGroupExecutionOrder = other.mGroupExecutionOrder;
-    mInternalExecutionOrder = other.mInternalExecutionOrder;
     
     for ( OperandVector::const_iterator it = other.mOperands.begin(); it != other.mOperands.end(); ++it)
         mOperands.push_back(Operand(*it));

@@ -87,7 +87,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     // Add dependency.
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
 
-    FunctionInvocation* transformFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM,  FFP_VS_TRANSFORM, 0); 
+    FunctionInvocation* transformFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM,  FFP_VS_TRANSFORM);
 
     transformFunc->pushOperand(wvpMatrix, Operand::OPS_IN);
     transformFunc->pushOperand(positionIn, Operand::OPS_IN);
@@ -102,7 +102,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     ParameterPtr pointSize = vsEntry->resolveOutputParameter(
         Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POINTSPRITE_SIZE, GCT_FLOAT1); // abuse of texture semantic
 
-    transformFunc = OGRE_NEW FunctionInvocation("FFP_DerivePointSize", FFP_VS_TRANSFORM, 1);
+    transformFunc = OGRE_NEW FunctionInvocation("FFP_DerivePointSize", FFP_VS_TRANSFORM);
 
     transformFunc->pushOperand(pointParams, Operand::OPS_IN);
     // using eye space depth only instead of the eye real distance

@@ -149,7 +149,6 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
     // Calculate the position and size of the texture in the atlas in the vertex shader
     //
     int groupOrder = (FFP_VS_TEXTURING - FFP_VS_LIGHTING) / 2;
-    int internalCounter = 0;
 
     for(ushort i = 0 ; i <  TAS_MAX_TEXTURES; ++i)
     {
@@ -163,7 +162,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
             case 3: textureIndexMask = Operand::OPM_W; break;
             }
             
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
+            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
             curFuncInvocation->pushOperand(mVSTextureTable[i], Operand::OPS_IN);
             curFuncInvocation->pushOperand(mVSInpTextureTableIndex, Operand::OPS_IN, textureIndexMask, 1);
             curFuncInvocation->pushOperand(mVSOutTextureDatas[i], Operand::OPS_OUT);
@@ -177,8 +176,6 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 
 
     groupOrder = (FFP_PS_SAMPLING + FFP_PS_TEXTURING) / 2;
-
-    internalCounter = 0;
 
     const ShaderParameterList& inpParams = psMain->getInputParameters();
     const ShaderParameterList& localParams = psMain->getLocalParameters();
@@ -205,13 +202,13 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
             if (texcoord && texel && sampler && addressUFuncName && addressVFuncName)
             {
                 //calculate the U value due to addressing mode
-                curFuncInvocation = OGRE_NEW FunctionInvocation(addressUFuncName, groupOrder, internalCounter++);
+                curFuncInvocation = OGRE_NEW FunctionInvocation(addressUFuncName, groupOrder);
                 curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_X);
                 curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_OUT, Operand::OPM_X);
                 psMain->addAtomInstance(curFuncInvocation);
 
                 //calculate the V value due to addressing mode
-                curFuncInvocation = OGRE_NEW FunctionInvocation(addressVFuncName, groupOrder, internalCounter++);
+                curFuncInvocation = OGRE_NEW FunctionInvocation(addressVFuncName, groupOrder);
                 curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_Y);
                 curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_OUT, Operand::OPM_Y);
                 psMain->addAtomInstance(curFuncInvocation);
@@ -219,11 +216,11 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
                 bool isHLSL = Ogre::RTShader::ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
                 
                 if (isHLSL)
-                    FFPTexturing::AddTextureSampleWrapperInvocation(sampler,samplerState,GCT_SAMPLER2D,psMain,groupOrder,internalCounter);
+                    FFPTexturing::AddTextureSampleWrapperInvocation(sampler,samplerState,GCT_SAMPLER2D,psMain,groupOrder);
 
                 //sample the texel color
                 curFuncInvocation = OGRE_NEW FunctionInvocation(
-                    mAutoAdjustPollPosition ? SGX_FUNC_ATLAS_SAMPLE_AUTO_ADJUST : SGX_FUNC_ATLAS_SAMPLE_NORMAL, groupOrder, internalCounter++);
+                    mAutoAdjustPollPosition ? SGX_FUNC_ATLAS_SAMPLE_AUTO_ADJUST : SGX_FUNC_ATLAS_SAMPLE_NORMAL, groupOrder);
                 if (isHLSL)
 					curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(sampler, psMain), Operand::OPS_IN);
                 else

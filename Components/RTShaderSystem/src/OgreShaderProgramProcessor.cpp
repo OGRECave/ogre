@@ -632,8 +632,6 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
         localParamsMap[srcParameter.get()] = localParameter;        
     }   
 
-    int invocationCounter = 0;
-
     // Establish link between the local parameter to the merged parameter.
     for (unsigned int i=0; i < mergedParams.size(); ++i)
     {
@@ -650,7 +648,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
                 // Case it is the vertex shader -> assign the local parameter to the output merged parameter.
                 if (progType == GPT_VERTEX_PROGRAM)
                 {
-                    FunctionInvocation* curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_POST_PROCESS, invocationCounter++);
+                    FunctionInvocation* curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_POST_PROCESS);
                     
                     curFuncInvocation->pushOperand(itFind->second, Operand::OPS_IN, curMergeParameter.getSourceParameterMask(p));
                     curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(Operand::OPS_OUT, i), Operand::OPS_OUT, curMergeParameter.getDestinationParameterMask(p));     
@@ -658,7 +656,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
                 }
                 else if (progType == GPT_FRAGMENT_PROGRAM)
                 {
-                    FunctionInvocation* curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_PRE_PROCESS, invocationCounter++);
+                    FunctionInvocation* curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_PRE_PROCESS);
                     
                     curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(Operand::OPS_IN, i), Operand::OPS_IN, curMergeParameter.getDestinationParameterMask(p));       
                     curFuncInvocation->pushOperand(itFind->second, Operand::OPS_OUT, curMergeParameter.getSourceParameterMask(p));

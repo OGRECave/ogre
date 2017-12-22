@@ -214,10 +214,8 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
     FunctionInvocation* curFuncInvocation = NULL;   
-    int internalCounter;
 
-    internalCounter = 0;
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_POSITION_DEPTH, FFP_VS_FOG, internalCounter++);
+    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_POSITION_DEPTH, FFP_VS_FOG);
     curFuncInvocation->pushOperand(mWorldMatrix, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mCameraPos, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);  
@@ -225,8 +223,7 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);  
     vsMain->addAtomInstance(curFuncInvocation);     
     
-    internalCounter = 0;
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, FFP_PS_FOG, internalCounter++);
+    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, FFP_PS_FOG);
     curFuncInvocation->pushOperand(mBackgroundTextureSampler, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSInPosView, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mFogColour, Operand::OPS_OUT);
@@ -236,13 +233,13 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     switch (mFogMode)
     {
     case FOG_LINEAR:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_LINEAR, FFP_PS_FOG, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_LINEAR, FFP_PS_FOG);
         break;
     case FOG_EXP:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP, FFP_PS_FOG, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP, FFP_PS_FOG);
         break;
     case FOG_EXP2:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP2, FFP_PS_FOG, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP2, FFP_PS_FOG);
         break;
        case FOG_NONE:
        default:

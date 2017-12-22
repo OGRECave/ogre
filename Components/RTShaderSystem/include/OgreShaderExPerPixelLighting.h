@@ -185,23 +185,23 @@ protected:
     /** 
     Internal method that adds related vertex shader functions invocations.
     */
-    bool addVSInvocation(Function* vsMain, const int groupOrder, int& internalCounter);
+    bool addVSInvocation(Function* vsMain, const int groupOrder);
 
     
     /** 
     Internal method that adds global illumination component functions invocations.
     */
-    bool addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder, int& internalCounter);
+    bool addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder);
 
     /** 
     Internal method that adds per light illumination component functions invocations.
     */
-    bool addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder, int& internalCounter);
+    bool addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder);
 
     /** 
     Internal method that adds the final colour assignments.
     */
-    bool addPSFinalAssignmentInvocation(Function* psMain, const int groupOrder, int& internalCounter);
+    bool addPSFinalAssignmentInvocation(Function* psMain, const int groupOrder);
 
 
 // Attributes.

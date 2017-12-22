@@ -57,7 +57,7 @@ public:
     int getGroupExecutionOrder() const;
     
     /** Get an internal execution order within a group of this function atom. */
-    int getInternalExecutionOrder() const;
+    OGRE_DEPRECATED int getInternalExecutionOrder() const { return -1; }
     
     /** Abstract method that writes a source code to the given output stream in the target shader language. */
     virtual void writeSourceCode(std::ostream& os, const String& targetLanguage) const = 0;
@@ -69,8 +69,6 @@ public:
 protected:
     // The owner group execution order. 
     int mGroupExecutionOrder;
-    // The execution order within the group.        
-    int mInternalExecutionOrder;
 };
 
 /** A class that represents a function operand (its the combination of a parameter the in/out semantic and the used fields)
@@ -186,7 +184,12 @@ public:
     @param internalOrder The internal order of this invocation.
     @param returnType The return type of the used function.
     */
-    FunctionInvocation(const String& functionName, int groupOrder, int internalOrder, String returnType = "void");
+    FunctionInvocation(const String& functionName, int groupOrder, const String& returnType = "void");
+
+    /// @overload
+    /// @deprecated internalOrder parameter is obsolete
+    OGRE_DEPRECATED FunctionInvocation(const String& functionName, int groupOrder, int internalOrder, String returnType = "void");
+
 
     /** Copy constructor */
     FunctionInvocation(const FunctionInvocation& rhs);

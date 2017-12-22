@@ -173,7 +173,6 @@ protected:
                                        int samplerIndex,
                                        const LayerBlendModeEx& blendMode,
                                        const int groupOrder, 
-                                       int& internalCounter,
                                        int targetChannels);
     /** 
     Adds the function invocation to the pixel shader which will modify
@@ -184,7 +183,6 @@ protected:
                                  ParameterPtr arg1,
                                  ParameterPtr arg2,
                                  const int groupOrder, 
-                                 int& internalCounter,
                                  int targetChannels);
 
     // Attributes.

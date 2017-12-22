@@ -87,7 +87,7 @@ namespace Ogre {
 			FunctionInvocation *curFuncInvocation;
 
 			//Fragment shader invocations
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ALPHA_TEST, FFP_PS_ALPHA_TEST, 0);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ALPHA_TEST, FFP_PS_ALPHA_TEST);
 			curFuncInvocation->pushOperand(mPSAlphaFunc, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSAlphaRef, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);

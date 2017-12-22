@@ -294,7 +294,6 @@ bool FFPTexturing::addFunctionInvocations(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuFragmentProgram();
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* psMain   = psProgram->getEntryPointFunction();
-    int internalCounter = 0;
 
     for (unsigned int i=0; i < mTextureUnitParamsList.size(); ++i)
     {
@@ -303,7 +302,7 @@ bool FFPTexturing::addFunctionInvocations(ProgramSet* programSet)
         if (false == addVSFunctionInvocations(curParams, vsMain))
             return false;
 
-        if (false == addPSFunctionInvocations(curParams, psMain, internalCounter))
+        if (false == addPSFunctionInvocations(curParams, psMain))
             return false;
     }
 
@@ -324,14 +323,14 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     case TEXCALC_NONE:
         if (textureUnitParams->mTextureMatrix.get() == NULL)
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  FFP_VS_TEXTURING);
 
             texCoordCalcFunc->pushOperand(textureUnitParams->mVSInputTexCoord, Operand::OPS_IN);
             texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);                  
         }
         else
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM_TEXCOORD,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM_TEXCOORD,  FFP_VS_TEXTURING);
 
             texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
             texCoordCalcFunc->pushOperand(textureUnitParams->mVSInputTexCoord, Operand::OPS_IN);
@@ -343,7 +342,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     case TEXCALC_ENVIRONMENT_MAP_PLANAR:
         if (textureUnitParams->mTextureMatrix.get() == NULL)
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING);
 
             //TODO: Add field member mWorldViewITMatrix 
             texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);   
@@ -355,7 +354,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
         }
         else
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING);
 
             texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);   
             texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);    
@@ -371,7 +370,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
         if (textureUnitParams->mTextureMatrix.get() == NULL)
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING);
 
             texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
             texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
@@ -382,7 +381,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
         }
         else
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING);
 
             texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
             texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
@@ -397,7 +396,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     case TEXCALC_ENVIRONMENT_MAP_NORMAL:
         if (textureUnitParams->mTextureMatrix.get() == NULL)
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING);
 
             texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
             texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);    
@@ -406,7 +405,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
         }
         else
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING);
 
             texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
             texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);    
@@ -418,7 +417,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 
     case TEXCALC_PROJECTIVE_TEXTURE:
 
-        texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_PROJECTION,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
+        texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_PROJECTION,  FFP_VS_TEXTURING);
 
         texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
         texCoordCalcFunc->pushOperand(textureUnitParams->mTextureViewProjImageMatrix, Operand::OPS_IN); 
@@ -434,7 +433,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     return true;
 }
 //-----------------------------------------------------------------------
-bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter)
+bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain)
 {
     const LayerBlendModeEx& colourBlend = textureUnitParams->mTextureUnitState->getColourBlendMode();
     const LayerBlendModeEx& alphaBlend  = textureUnitParams->mTextureUnitState->getAlphaBlendMode();
@@ -445,7 +444,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
             
     // Add texture sampling code.
     ParameterPtr texel = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, c_ParamTexelEx + StringConverter::toString(textureUnitParams->mTextureSamplerIndex), GCT_FLOAT4);
-    addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING, internalCounter);
+    addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
     // Build colour argument for source1.
     source1 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "source1", GCT_FLOAT4);
@@ -453,7 +452,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     addPSArgumentInvocations(psMain, source1, texel, 
         textureUnitParams->mTextureSamplerIndex,
         colourBlend.source1, colourBlend.colourArg1, 
-        colourBlend.alphaArg1, false, groupOrder, internalCounter);
+        colourBlend.alphaArg1, false, groupOrder);
 
     // Build colour argument for source2.
     source2 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "source2", GCT_FLOAT4);
@@ -461,7 +460,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     addPSArgumentInvocations(psMain, source2, texel, 
         textureUnitParams->mTextureSamplerIndex,
         colourBlend.source2, colourBlend.colourArg2, 
-        colourBlend.alphaArg2, false, groupOrder, internalCounter);
+        colourBlend.alphaArg2, false, groupOrder);
 
     bool needDifferentAlphaBlend = false;
     if (alphaBlend.operation != colourBlend.operation ||
@@ -476,7 +475,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     // Build colours blend
     addPSBlendInvocations(psMain, source1, source2, texel, 
         textureUnitParams->mTextureSamplerIndex,
-        colourBlend, groupOrder, internalCounter, 
+        colourBlend, groupOrder,
         needDifferentAlphaBlend ? Operand::OPM_XYZ : Operand::OPM_ALL);
 
     // Case we need different alpha channel code.
@@ -486,19 +485,18 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
         addPSArgumentInvocations(psMain, source1, texel,
             textureUnitParams->mTextureSamplerIndex, 
             alphaBlend.source1, alphaBlend.colourArg1, 
-            alphaBlend.alphaArg1, true, groupOrder, internalCounter);
+            alphaBlend.alphaArg1, true, groupOrder);
 
         // Build alpha argument for source2.
         addPSArgumentInvocations(psMain, source2, texel, 
             textureUnitParams->mTextureSamplerIndex,
             alphaBlend.source2, alphaBlend.colourArg2, 
-            alphaBlend.alphaArg2, true, groupOrder, internalCounter);
+            alphaBlend.alphaArg2, true, groupOrder);
 
         // Build alpha blend
-        addPSBlendInvocations(psMain, source1, source2, texel, 
-            textureUnitParams->mTextureSamplerIndex, 
-            alphaBlend, groupOrder, internalCounter,
-            Operand::OPM_W);
+        addPSBlendInvocations(psMain, source1, source2, texel,
+                              textureUnitParams->mTextureSamplerIndex, alphaBlend, groupOrder,
+                              Operand::OPM_W);
     }
     
     
@@ -529,13 +527,13 @@ ParameterPtr FFPTexturing::GetSamplerWrapperParam(UniformParameterPtr sampler, F
 }
 
 void FFPTexturing::AddTextureSampleWrapperInvocation(UniformParameterPtr textureSampler,UniformParameterPtr textureSamplerState,
-    GpuConstantType samplerType, Function* function, int groupOrder, int& internalCounter)
+    GpuConstantType samplerType, Function* function, int groupOrder)
 {
 
     FunctionInvocation* curFuncInvocation = NULL;
     
 	ParameterPtr samplerWrapperParam = GetSamplerWrapperParam(textureSampler, function);
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT_SAMPLER_WRAPPER, groupOrder, internalCounter++);
+    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT_SAMPLER_WRAPPER, groupOrder);
     curFuncInvocation->pushOperand(textureSampler, Operand::OPS_IN);
 
     if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
@@ -547,7 +545,7 @@ void FFPTexturing::AddTextureSampleWrapperInvocation(UniformParameterPtr texture
 
 //-----------------------------------------------------------------------
 void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
-                                              const ParameterPtr& texel, int groupOrder, int& internalCounter)
+                                              const ParameterPtr& texel, int groupOrder)
 {
 
     Ogre::String targetLanguage =  RTShader::ShaderGenerator::getSingleton().getTargetLanguage();
@@ -559,12 +557,12 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
     {
         FunctionInvocation* curFuncInvocation = NULL;
         ParameterPtr samplerWrapperParam =  GetSamplerWrapperParam(textureUnitParams->mTextureSampler,psMain);
-        AddTextureSampleWrapperInvocation(textureUnitParams->mTextureSampler,textureUnitParams->mTextureSamplerState,textureUnitParams->mTextureSamplerType,psMain,groupOrder,internalCounter);
+        AddTextureSampleWrapperInvocation(textureUnitParams->mTextureSampler,textureUnitParams->mTextureSamplerState,textureUnitParams->mTextureSamplerType,psMain,groupOrder);
 
             if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
-                curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder, internalCounter++);
+                curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder);
             else    
-                curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
+                curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder);
 
 
         curFuncInvocation->pushOperand(samplerWrapperParam, Operand::OPS_IN);
@@ -579,9 +577,9 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
         FunctionInvocation* curFuncInvocation = NULL;
 
         if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder, internalCounter++);
+            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder);
         else    
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
+            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder);
 
 		
 		if (textureUnitParams->mTextureSamplerType == GCT_SAMPLER2DARRAY)
@@ -615,15 +613,14 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
                                              const ColourValue& colourValue,
                                              Real alphaValue,
                                              bool isAlphaArgument,
-                                             const int groupOrder, 
-                                             int& internalCounter)
+                                             const int groupOrder)
 {
     FunctionInvocation* curFuncInvocation = NULL;
 
     switch(blendSrc)
     {
     case LBS_CURRENT:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
         if (samplerIndex == 0)
             curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
         else
@@ -632,26 +629,26 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBS_TEXTURE:       
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
         curFuncInvocation->pushOperand(texel, Operand::OPS_IN);
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);      
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBS_DIFFUSE:       
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);    
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
         curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);        
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);      
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBS_SPECULAR:      
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);    
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
         curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);       
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);      
         psMain->addAtomInstance(curFuncInvocation); 
         break;
 
     case LBS_MANUAL:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
 
         if (isAlphaArgument)
         {
@@ -676,7 +673,6 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
                                           int samplerIndex,
                                           const LayerBlendModeEx& blendMode,
                                           const int groupOrder, 
-                                          int& internalCounter,
                                           int targetChannels)
 {
     FunctionInvocation* curFuncInvocation = NULL;
@@ -684,68 +680,68 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
     switch(blendMode.operation)
     {
     case LBX_SOURCE1:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);                     
         break;
     case LBX_SOURCE2:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);                         
         break;
     case LBX_MODULATE:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);         
         break;
     case LBX_MODULATE_X2:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATEX2, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATEX2, groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);         
         break;
     case LBX_MODULATE_X4:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATEX4, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATEX4, groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation); 
         break;
     case LBX_ADD:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);         
         break;
     case LBX_ADD_SIGNED:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDSIGNED, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDSIGNED, groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);             
         break;
     case LBX_ADD_SMOOTH:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDSMOOTH, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDSMOOTH, groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);         
         break;
     case LBX_SUBTRACT:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation); 
         break;
     case LBX_BLEND_DIFFUSE_ALPHA:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_W);
@@ -753,7 +749,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBX_BLEND_TEXTURE_ALPHA:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(texel, Operand::OPS_IN, Operand::OPM_W);
@@ -761,7 +757,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBX_BLEND_CURRENT_ALPHA:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 
@@ -773,7 +769,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBX_BLEND_MANUAL:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(ParameterFactory::createConstParam(blendMode.factor), Operand::OPS_IN);
@@ -781,14 +777,14 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         psMain->addAtomInstance(curFuncInvocation);
         break;
     case LBX_DOTPRODUCT:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_DOTPRODUCT, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_DOTPRODUCT, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);      
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBX_BLEND_DIFFUSE_COLOUR:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);

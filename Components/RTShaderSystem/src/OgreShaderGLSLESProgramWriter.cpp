@@ -65,7 +65,7 @@ namespace Ogre {
             returnType      = leftTokens2[0];
             functionName    = leftTokens2[1];
 
-            invoc = OGRE_NEW FunctionInvocation(functionName, 0, 0, returnType);
+            invoc = OGRE_NEW FunctionInvocation(functionName, 0, returnType);
 
             // Split out the parameters
             StringVector parameters;
@@ -316,7 +316,7 @@ namespace Ogre {
             for (FunctionVector::const_iterator it = forwardDecl.begin(); it != forwardDecl.end(); ++it)
             {
                 FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
-                FunctionInvocation invoc = FunctionInvocation("", 0, 0);
+                FunctionInvocation invoc = FunctionInvocation("", 0);
                 String body;
 
                 // Find the function in the cache

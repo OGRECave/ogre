@@ -149,12 +149,12 @@ protected:
     /** 
     Internal method that adds related vertex shader functions invocations.
     */
-    bool addVSInvocation(Function* vsMain, const int groupOrder, int& internalCounter);
+    bool addVSInvocation(Function* vsMain, const int groupOrder);
 
     /** 
     Internal method that adds related pixel shader functions invocations.
     */
-    bool addPSInvocation(Program* psProgram, const int groupOrder, int& internalCounter);
+    bool addPSInvocation(Program* psProgram, const int groupOrder);
 
 
 

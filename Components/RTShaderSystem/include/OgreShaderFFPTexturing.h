@@ -87,7 +87,7 @@ public:
     //Direct3D HLSL specific methods
     /// Wraps a sampler with a SamplerData[x]D struct defined in FFPLib_Texturing.hlsl
     static void AddTextureSampleWrapperInvocation(UniformParameterPtr textureSampler,UniformParameterPtr textureSamplerState,
-        GpuConstantType samplerType, Function* function, int groupOrder, int& internalCounter);
+        GpuConstantType samplerType, Function* function, int groupOrder);
 
     /// Get a sampler wrapper type according to the sampler type
 	static ParameterPtr GetSamplerWrapperParam(UniformParameterPtr sampler, Function* function);
@@ -189,21 +189,21 @@ protected:
     /** 
     Internal method that adds pixel shader functions invocations.
     */
-    bool addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter);
+    bool addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain);
 
     /** 
     Adds the fragment shader code which samples the texel color in the texture
     */
     virtual void addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
-        const ParameterPtr& texel, int groupOrder, int& internalCounter);
+        const ParameterPtr& texel, int groupOrder);
 
     virtual void addPSArgumentInvocations(Function* psMain, ParameterPtr arg, ParameterPtr texel,
                 int samplerIndex, LayerBlendSource blendSrc, const ColourValue& colourValue, Real alphaValue,
-                 bool isAlphaArgument, const int groupOrder, int& internalCounter);
+                 bool isAlphaArgument, const int groupOrder);
 
     virtual void addPSBlendInvocations(Function* psMain, ParameterPtr arg1, ParameterPtr arg2,
                 ParameterPtr texel,int samplerIndex, const LayerBlendModeEx& blendMode,
-                const int groupOrder, int& internalCounter, int targetChannels);
+                const int groupOrder, int targetChannels);
     
     /** 
     Determines the texture coordinates calculation method of the given texture unit state.
