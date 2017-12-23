@@ -80,13 +80,13 @@ namespace Ogre {
                 parameters = StringUtil::split(input, ",");
             }
 
-            StringVector::const_iterator itParam;
+            StringVector::iterator itParam;
             int i = 0;
             for(itParam = parameters.begin(); itParam != parameters.end(); ++itParam, i++)
             {
-                StringUtil::replaceAll(*itParam, ")", "");
-                StringUtil::replaceAll(*itParam, ",", "");
+                *itParam = StringUtil::replaceAll(*itParam, ")", "");
                 StringVector paramTokens = StringUtil::split(*itParam, " ");
+
                 // There should be three parts for each token
                 // 1. The operand type(in, out, inout)
                 // 2. The type
@@ -395,7 +395,7 @@ namespace Ogre {
                             os << ", ";
                         }
                     }
-                    os << std::endl << "{" << std::endl << body << std::endl << "}" << std::endl;
+                    os << ")" << std::endl << "{" << std::endl << body << std::endl << "}" << std::endl;
                 }
             }
         }
