@@ -109,8 +109,8 @@ protected:
     // Map between parameter semantic to string value.
     ParamSemanticToStringMap mParamSemanticMap;
 
-    // Map parameter name to a new parameter name (sometime renaming is required to match names between vertex and fragment shader)
-    StringMap mInputToGLStatesMap;
+    set<String>::type mLocalRenames;
+
     // Map parameter content to vertex attributes 
     ParamContentToStringMap mContentToPerVertexAttributes;
     // Holds the current glsl version

@@ -43,22 +43,6 @@ namespace RTShader {
 *  @{
 */
 
-// Paramter comparer
-
-struct CompareByName
-{
-    const String& name;
-
-    template<typename T>
-    CompareByName(const T& param) : name(param->getName()) {}
-
-    template<typename T>
-    bool operator()( const T& param) const
-    {
-        return param->getName() == name;
-    }
-};
-
 /** Base class interface for shader program writers.
 The main usage of this class is to generate a shader source code from the given CPU program.
 In order to support specific shader language one should subclass this interface and implement the pure methods.

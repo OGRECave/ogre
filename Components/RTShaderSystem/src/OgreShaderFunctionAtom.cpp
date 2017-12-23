@@ -223,15 +223,19 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
     ushort curIndLevel = 0;
     for (OperandVector::const_iterator it = mOperands.begin(); it != mOperands.end(); )
     {
-        os << (*it).toString();
+        os << it->toString();
         ++it;
 
         ushort opIndLevel = 0;
         if (it != mOperands.end())
         {
-            opIndLevel = (*it).getIndirectionLevel();
+            opIndLevel = it->getIndirectionLevel();
         }
 
+        if (curIndLevel != 0)
+        {
+            os << ")";
+        }
         if (curIndLevel < opIndLevel)
         {
             while (curIndLevel < opIndLevel)
@@ -255,6 +259,10 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
             {
                 os << ", ";
             }
+        }
+        if (curIndLevel != 0)
+        {
+            os << "int("; // required by GLSL
         }
     }
 

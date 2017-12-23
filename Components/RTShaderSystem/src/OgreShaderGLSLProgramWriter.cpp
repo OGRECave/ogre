@@ -167,10 +167,6 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 
         writeFunctionTitle(os, curFunction);
         
-        // Clear output mapping this map is used when we use
-        // glsl built in types like gl_Color for example
-        mInputToGLStatesMap.clear();
-
         // Write inout params and fill mInputToGLStatesMap
         writeInputParameters(os, curFunction, gpuType);
         writeOutParameters(os, curFunction, gpuType);
@@ -201,146 +197,52 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
             FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
 
-            // Local string stream
-            StringStream localOs;
-
-            // Write function name          
-            localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
-
-            ushort curIndLevel = 0;
-
-            for (; itOperand != itOperandEnd; )
+            for (; itOperand != itOperandEnd; ++itOperand)
             {
                 const ParameterPtr& param = itOperand->getParameter();
                 Operand::OpSemantic opSemantic = itOperand->getSemantic();
 
+                bool isInputParam =
+                    std::find(inParams.begin(), inParams.end(), param) != inParams.end();
+
                 if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
                 {
-                    // Is the written parameter read only?
-                    String newVar;
-                    String origVar;
-
                     // Check if we write to an input variable because they are only readable
                     // Well, actually "attribute" were writable in GLSL < 120, but we dont care here
-                    ShaderParameterList::const_iterator itFound = std::find_if(
-                        inParams.begin(), inParams.end(), CompareByName(param));
-                    if (itFound != inParams.end())
-                    {
-                        // Declare the copy variable
-                        newVar = "local_" + param->getName();
-
-                        if (gpuType == GPT_FRAGMENT_PROGRAM)
-                        {
-                            origVar = param->getName();
-                            // We stored the original values in the mFragInputParams thats why we have to replace the first var with o
-                            // because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
-                            origVar[0] = 'o';
-                        }
-                        else
-                        {
-                            origVar = mInputToGLStatesMap[param->getName()];
-
-                            if(origVar != newVar)
-                                mInputToGLStatesMap.erase(param->getName()); // drop previous redirect
-                        }
-                    }
+                    bool doLocalRename = isInputParam;
 
                     // If its not a varying param check if a uniform is written
-                    if(newVar.empty())
+                    if (!doLocalRename)
                     {
-                        UniformParameterList::const_iterator uFound = std::find_if(
-                            parameterList.begin(), parameterList.end(), CompareByName(param));
-                        if (uFound != parameterList.end())
-                        {   
-                            // Declare the copy variable
-                            newVar = "local_" + param->getName();
-                            origVar = param->getName();
-                        }
+                        doLocalRename = std::find(parameterList.begin(), parameterList.end(),
+                                                  param) != parameterList.end();
                     }
 
                     // now we check if we already declared a redirector var
-                    if(!newVar.empty() && mInputToGLStatesMap.find(param->getName()) == mInputToGLStatesMap.end())
+                    if(doLocalRename && mLocalRenames.find(param->getName()) == mLocalRenames.end())
                     {
                         // Declare the copy variable and assign the original
-                        os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << origVar << ";" << std::endl;
+                        String newVar = "local_" + param->getName();
+                        os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << param->getName() << ";" << std::endl;
 
                         // From now on we replace it automatic
-                        mInputToGLStatesMap[param->getName()] = newVar;
+                        param->_rename(newVar);
+                        mLocalRenames.insert(newVar);
                     }
                 }
 
-                if(mInputToGLStatesMap.find(param->getName()) != mInputToGLStatesMap.end())
+                // Now that every texcoord is a vec4 (passed as vertex attributes) we
+                // have to swizzle them according the desired type.
+                if (gpuType == GPT_VERTEX_PROGRAM && isInputParam &&
+                    param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
                 {
-                    // Here we insert the renamed param name
-                    localOs << mInputToGLStatesMap[param->getName()];
-
-                    // Now that every texcoord is a vec4 (passed as vertex attributes) we
-                    // have to swizzle them according the desired type.
-                    if(gpuType == GPT_VERTEX_PROGRAM &&
-                            param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
-                    {
-                        itOperand->setMaskToParamType();
-                    }
-
-                    int mask = itOperand->getMask(); // our swizzle mask
-                    if(mask != Operand::OPM_ALL)
-                    {
-                        localOs << "." << Operand::getMaskAsString(mask);
-                    }
-                }
-                else
-                {
-                    localOs << itOperand->toString();
-                }
-                
-                ++itOperand;
-
-                // Prepare for the next operand
-                ushort opIndLevel = 0;
-                if (itOperand != itOperandEnd)
-                {
-                    opIndLevel = itOperand->getIndirectionLevel();
-                }
-
-                if (curIndLevel != 0)
-                {
-                    localOs << ")";
-                }
-
-                if (curIndLevel < opIndLevel)
-                {
-                    while (curIndLevel < opIndLevel)
-                    {
-                        ++curIndLevel;
-                        localOs << "[";
-                    }
-                }
-                else //if (curIndLevel >= opIndLevel)
-                {
-                    while (curIndLevel > opIndLevel)
-                    {
-                        --curIndLevel;
-                        localOs << "]";
-                    }
-                    if (opIndLevel != 0)
-                    {
-                        localOs << "][";
-                    }
-                    else if (itOperand != itOperandEnd)
-                    {
-                        localOs << ", ";
-                    }
-                }
-                if (curIndLevel != 0)
-                {
-                    localOs << "int(";
+                    itOperand->setMaskToParamType();
                 }
             }
 
-            // Write function call closer.
-            localOs << ");" << std::endl;
-            localOs << std::endl;
-            os << localOs.str();
+            os << "\t";
+            pFuncInvoc->writeSourceCode(os, getTargetLanguage());
+            os << std::endl;
         }
         os << "}" << std::endl;
     }
@@ -483,15 +385,15 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
         {
             if(paramContent == Parameter::SPC_POINTSPRITE_COORDINATE)
             {
-                mInputToGLStatesMap[pParam->getName()] = "gl_PointCoord";
+                pParam->_rename("gl_PointCoord");
                 continue;
             }
 
             // In the vertex and fragment program the variable names must match.
             // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
-            // Thats why we are using a map for name mapping (we rename the params which are used in function atoms).
+            // Thats why we rename the params which are used in function atoms
             paramName[0] = 'o';
-            mInputToGLStatesMap[pParam->getName()] = paramName;
+            pParam->_rename(paramName);
 
             // After GLSL 1.20 varying is deprecated
             if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))
@@ -513,7 +415,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
         {
             // Due the fact that glsl does not have register like cg we have to rename the params
             // according there content.
-            mInputToGLStatesMap[paramName] = mContentToPerVertexAttributes[paramContent];
+            pParam->_rename(mContentToPerVertexAttributes[paramContent]);
 
             // After GLSL 1.40 attribute is deprecated
             if (mGLSLVersion >= 140 || (mGLSLVersion > 100 && mIsGLSLES))
@@ -547,11 +449,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
         }
         else if(paramContent == Parameter::SPC_COLOR_DIFFUSE && !mIsGLSLES)
         {
-            mInputToGLStatesMap[paramName] = "gl_Color";
+            pParam->_rename("gl_Color");
         }
         else if(paramContent == Parameter::SPC_COLOR_SPECULAR && !mIsGLSLES)
         {
-            mInputToGLStatesMap[paramName] = "gl_SecondaryColor";
+            pParam->_rename("gl_SecondaryColor");
         }
         else
         {
@@ -581,11 +483,11 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             // GLSL vertex program has to write always gl_Position (but this is also deprecated after version 130)
             if(pParam->getContent() == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
             {
-                mInputToGLStatesMap[pParam->getName()] = "gl_Position";
+                pParam->_rename("gl_Position");
             }
             else if(pParam->getContent() == Parameter::SPC_POINTSPRITE_SIZE)
             {
-                mInputToGLStatesMap[pParam->getName()] = "gl_PointSize";
+                pParam->_rename("gl_PointSize");
             }
             else
             {
@@ -616,12 +518,12 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             // Always add gl_FragColor as an output.  The name is for compatibility.
             if(mGLSLVersion <= 130 || (mIsGLSLES && mGLSLVersion == 100))
             {
-                mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";
+                pParam->_rename("gl_FragColor");
             }
             else
             {
                 os << "out vec4 fragColour;" << std::endl;
-                mInputToGLStatesMap[pParam->getName()] = "fragColour";
+                pParam->_rename("fragColour");
             }
         }
     }
