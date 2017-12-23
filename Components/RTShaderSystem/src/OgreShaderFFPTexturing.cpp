@@ -323,10 +323,9 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     case TEXCALC_NONE:
         if (textureUnitParams->mTextureMatrix.get() == NULL)
         {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  FFP_VS_TEXTURING);
-
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSInputTexCoord, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);                  
+            texCoordCalcFunc =
+                OGRE_NEW AssignmentAtom(textureUnitParams->mVSOutputTexCoord,
+                                        textureUnitParams->mVSInputTexCoord, FFP_VS_TEXTURING);
         }
         else
         {
@@ -620,7 +619,7 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
     switch(blendSrc)
     {
     case LBS_CURRENT:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         if (samplerIndex == 0)
             curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
         else
@@ -629,26 +628,26 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBS_TEXTURE:       
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(texel, Operand::OPS_IN);
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);      
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBS_DIFFUSE:       
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);        
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);      
         psMain->addAtomInstance(curFuncInvocation);     
         break;
     case LBS_SPECULAR:      
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);       
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);      
         psMain->addAtomInstance(curFuncInvocation); 
         break;
 
     case LBS_MANUAL:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
 
         if (isAlphaArgument)
         {
@@ -680,13 +679,13 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
     switch(blendMode.operation)
     {
     case LBX_SOURCE1:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);                     
         break;
     case LBX_SOURCE2:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);                         

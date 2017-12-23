@@ -263,7 +263,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
     vsMain->addAtomInstance(curFuncInvocation);
 
     //set w value of temporary param to 1
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_VS_TRANSFORM);
     curFuncInvocation->pushOperand(ParameterFactory::createConstParam(1.0f), Operand::OPS_IN);
     curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, Operand::OPM_W);
     vsMain->addAtomInstance(curFuncInvocation);
@@ -279,7 +279,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
     if (index == 0)
     {
         //set the local param as the value of the world param
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);
         vsMain->addAtomInstance(curFuncInvocation);
@@ -326,7 +326,7 @@ void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
     if (index == 0)
     {
         //set the local param as the value of the world normal
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);
         vsMain->addAtomInstance(curFuncInvocation);

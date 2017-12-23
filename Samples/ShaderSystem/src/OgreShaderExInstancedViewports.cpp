@@ -221,13 +221,13 @@ bool ShaderExInstancedViewports::addVSInvocations( Function* vsMain, const int g
     vsMain->addAtomInstance(funcInvocation);
 
     // Output position in projective space.
-    funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder);
+    funcInvocation = OGRE_NEW AssignmentAtom( groupOrder);
     funcInvocation->pushOperand(mVSOriginalOutPositionProjectiveSpace, Operand::OPS_IN);
     funcInvocation->pushOperand(mVSOutPositionProjectiveSpace, Operand::OPS_OUT);
     vsMain->addAtomInstance(funcInvocation);
 
     // Output monitor index.
-    funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder);
+    funcInvocation = OGRE_NEW AssignmentAtom( groupOrder);
     funcInvocation->pushOperand(mVSInMonitorIndex, Operand::OPS_IN);
     funcInvocation->pushOperand(mVSOutMonitorIndex, Operand::OPS_OUT);
     vsMain->addAtomInstance(funcInvocation);

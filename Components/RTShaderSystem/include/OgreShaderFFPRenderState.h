@@ -79,8 +79,9 @@ enum FFPShaderStage
 
 // Fixed Function Library: Common functions
 #define FFP_LIB_COMMON                              "FFPLib_Common"
+/// @deprecated use ShaderFunction::addAssignmentAtom
 #define FFP_FUNC_ASSIGN                             "FFP_Assign"
-/// @deprecated use FFP_FUNC_ASSIGN with ParameterFactory::createConstParam
+/// @deprecated use ShaderFunction::addAssignmentAtom with ParameterFactory::createConstParam
 #define FFP_FUNC_CONSTRUCT                          "FFP_Construct"
 #define FFP_FUNC_MODULATE                           "FFP_Modulate"
 #define FFP_FUNC_ADD                                "FFP_Add"

@@ -703,7 +703,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder)
     
 
     // Output texture coordinates.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
     curFuncInvocation->pushOperand(mVSInTexcoord, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mVSOutTexcoord, Operand::OPS_OUT);   
     vsMain->addAtomInstance(curFuncInvocation);
@@ -750,7 +750,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder)
         // Output object space.
         else if (mNormalMapSpace == NMS_OBJECT)
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+            curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
             curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_IN);
             curFuncInvocation->pushOperand(mVSOutView, Operand::OPS_OUT);                   
             vsMain->addAtomInstance(curFuncInvocation);
@@ -789,7 +789,7 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
         // Output object space.
         else if (mNormalMapSpace == NMS_OBJECT)
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+            curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
             curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
             curFuncInvocation->pushOperand(curLightParams->mVSOutDirection, Operand::OPS_OUT);                  
             vsMain->addAtomInstance(curFuncInvocation);
@@ -827,7 +827,7 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
         // Output object space.
         else if (mNormalMapSpace == NMS_OBJECT)
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+            curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
             curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_IN);
             curFuncInvocation->pushOperand(curLightParams->mVSOutToLightDir, Operand::OPS_OUT);                 
             vsMain->addAtomInstance(curFuncInvocation);
@@ -870,7 +870,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
         (mTrackVertexColourType & TVC_EMISSIVE) == 0)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
         psMain->addAtomInstance(curFuncInvocation);     
@@ -887,7 +887,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
         }
         else
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+            curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
             curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, Operand::OPM_XYZ);  
             curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
             psMain->addAtomInstance(curFuncInvocation);
@@ -913,7 +913,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
 
     if (mSpecularEnable)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT);    
         psMain->addAtomInstance(curFuncInvocation); 
@@ -1053,19 +1053,19 @@ bool NormalMapLighting::addPSFinalAssignmentInvocation( Function* psMain, const 
 {
     FunctionInvocation* curFuncInvocation;
 
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
     curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);  
     curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_OUT);   
     psMain->addAtomInstance(curFuncInvocation); 
 
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
     curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);    
     curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);    
     psMain->addAtomInstance(curFuncInvocation);
 
     if (mSpecularEnable)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
         curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_OUT);          
         psMain->addAtomInstance(curFuncInvocation); 

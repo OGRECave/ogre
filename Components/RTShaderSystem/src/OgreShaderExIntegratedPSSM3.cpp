@@ -286,7 +286,7 @@ bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder)
     FunctionInvocation* curFuncInvocation;
 
     // Output the vertex depth in camera space.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
     curFuncInvocation->pushOperand(mVSOutPos, Operand::OPS_IN, Operand::OPM_Z); 
     curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);  
     vsMain->addAtomInstance(curFuncInvocation); 
@@ -351,7 +351,7 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
     psMain->addAtomInstance(curFuncInvocation);
 
     // Assign the local diffuse to output diffuse.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
     curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);    
     curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);    
     psMain->addAtomInstance(curFuncInvocation);

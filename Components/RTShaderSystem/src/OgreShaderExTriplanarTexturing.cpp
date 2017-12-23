@@ -134,15 +134,8 @@ namespace RTShader {
 		Program* vsProgram = programSet->getCpuVertexProgram();
 		Function* vsMain = vsProgram->getEntryPointFunction();
 
-		FunctionInvocation *curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING);
-		curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mVSOutNormal, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);
-
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING);
-		curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mVSOutPosition, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);
+		vsMain->addAtomAssign(mVSOutNormal, mVSInNormal, FFP_VS_TEXTURING);
+		vsMain->addAtomAssign(mVSOutPosition, mVSInPosition, FFP_VS_TEXTURING);
 
 		if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
 		{
@@ -151,6 +144,7 @@ namespace RTShader {
 			FFPTexturing::AddTextureSampleWrapperInvocation(mSamplerFromZ, mSamplerFromZState, GCT_SAMPLER2D, psMain, FFP_PS_TEXTURING);
 		}
 
+        FunctionInvocation *curFuncInvocation;
 		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRIPLANAR_TEXTURING, FFP_PS_TEXTURING);
 		curFuncInvocation->pushOperand(mPSInDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);

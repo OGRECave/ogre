@@ -242,10 +242,7 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
     FunctionInvocation* funcInvocation = NULL;
 
     // Output mask texture coordinates.
-    funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder);
-    funcInvocation->pushOperand(mVSInMaskTexcoord, Operand::OPS_IN);
-    funcInvocation->pushOperand(mVSOutMaskTexcoord, Operand::OPS_OUT);
-    vsMain->addAtomInstance(funcInvocation);
+    vsMain->addAtomAssign(mVSOutMaskTexcoord, mVSInMaskTexcoord, groupOrder);
 
     // Output reflection texture coordinates.
     if (mReflectionMapType == TEX_TYPE_2D)

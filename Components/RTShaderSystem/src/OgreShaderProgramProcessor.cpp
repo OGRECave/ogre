@@ -648,7 +648,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
                 // Case it is the vertex shader -> assign the local parameter to the output merged parameter.
                 if (progType == GPT_VERTEX_PROGRAM)
                 {
-                    FunctionInvocation* curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_POST_PROCESS);
+                    FunctionInvocation* curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_VS_POST_PROCESS);
                     
                     curFuncInvocation->pushOperand(itFind->second, Operand::OPS_IN, curMergeParameter.getSourceParameterMask(p));
                     curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(Operand::OPS_OUT, i), Operand::OPS_OUT, curMergeParameter.getDestinationParameterMask(p));     
@@ -656,7 +656,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
                 }
                 else if (progType == GPT_FRAGMENT_PROGRAM)
                 {
-                    FunctionInvocation* curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_PRE_PROCESS);
+                    FunctionInvocation* curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_PRE_PROCESS);
                     
                     curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(Operand::OPS_IN, i), Operand::OPS_IN, curMergeParameter.getDestinationParameterMask(p));       
                     curFuncInvocation->pushOperand(itFind->second, Operand::OPS_OUT, curMergeParameter.getSourceParameterMask(p));

@@ -544,7 +544,7 @@ bool RTShaderSRSSegmentedLights::addPSGlobalIlluminationInvocationBegin(Function
 
     if (mPSInNormal.get())
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_PRE_PROCESS + 1);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_PRE_PROCESS + 1);
         curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSLocalNormal, Operand::OPS_OUT);   
         psMain->addAtomInstance(curFuncInvocation);
@@ -553,14 +553,14 @@ bool RTShaderSRSSegmentedLights::addPSGlobalIlluminationInvocationBegin(Function
     //alpha channel is controlled by the diffuse value
     if (mTrackVertexColourType & TVC_DIFFUSE)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_W);
         curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_W); 
         psMain->addAtomInstance(curFuncInvocation);
     }
     else
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN, Operand::OPM_W);
         curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_W); 
         psMain->addAtomInstance(curFuncInvocation);     
@@ -568,14 +568,14 @@ bool RTShaderSRSSegmentedLights::addPSGlobalIlluminationInvocationBegin(Function
 
     ParameterPtr pZeroParam = ParameterFactory::createConstParam(Ogre::Vector3::ZERO);
     
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
     curFuncInvocation->pushOperand(pZeroParam, Operand::OPS_IN);    
     curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);
     psMain->addAtomInstance(curFuncInvocation); 
 
     if (mSpecularEnable)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
         curFuncInvocation->pushOperand(pZeroParam, Operand::OPS_IN);    
         curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);
         psMain->addAtomInstance(curFuncInvocation); 
@@ -779,19 +779,19 @@ bool RTShaderSRSSegmentedLights::addPSFinalAssignmentInvocation( Function* psMai
 {
     FunctionInvocation* curFuncInvocation;
 
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
     curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);  
     curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_OUT);   
     psMain->addAtomInstance(curFuncInvocation); 
 
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
     curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);    
     curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);    
     psMain->addAtomInstance(curFuncInvocation);
 
     if (mSpecularEnable)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
         curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_OUT);          
         psMain->addAtomInstance(curFuncInvocation); 

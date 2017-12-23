@@ -162,7 +162,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
             case 3: textureIndexMask = Operand::OPM_W; break;
             }
             
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
+            curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
             curFuncInvocation->pushOperand(mVSTextureTable[i], Operand::OPS_IN);
             curFuncInvocation->pushOperand(mVSInpTextureTableIndex, Operand::OPS_IN, textureIndexMask, 1);
             curFuncInvocation->pushOperand(mVSOutTextureDatas[i], Operand::OPS_OUT);
