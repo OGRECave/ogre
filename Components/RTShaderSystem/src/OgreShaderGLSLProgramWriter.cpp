@@ -213,10 +213,9 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 
             for (; itOperand != itOperandEnd; )
             {
-                Operand op = *itOperand;
-                Operand::OpSemantic opSemantic = op.getSemantic();
-                String paramName = op.getParameter()->getName();
-                Parameter::Content content = op.getParameter()->getContent();
+                const ParameterPtr& param = itOperand->getParameter();
+                Operand::OpSemantic opSemantic = itOperand->getSemantic();
+                Parameter::Content content = param->getContent();
 
                 if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
                 {
@@ -225,13 +224,14 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 
                     // Check if we write to an varying because the are only readable in fragment programs 
                     if (gpuType == GPT_FRAGMENT_PROGRAM)
-                    {   
-                        StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);    
-                        if(itFound != mFragInputParams.end())
-                        {                       
+                    {
+                        StringVector::iterator itFound = std::find(
+                            mFragInputParams.begin(), mFragInputParams.end(), param->getName());
+                        if (itFound != mFragInputParams.end())
+                        {
                             // Declare the copy variable
-                            String newVar = "local_" + paramName;
-                            String tempVar = paramName;
+                            String newVar = "local_" + param->getName();
+                            String tempVar = param->getName();
                             isVarying = true;
 
                             // We stored the original values in the mFragInputParams thats why we have to replace the first var with o
@@ -239,10 +239,10 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
                             tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
 
                             // Declare the copy variable and assign the original
-                            os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;    
+                            os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;
 
                             // From now on we replace it automatic 
-                            mInputToGLStatesMap[paramName] = newVar;
+                            mInputToGLStatesMap[param->getName()] = newVar;
 
                             // Remove the param because now it is replaced automatic with the local variable
                             // (which could be written).
@@ -253,31 +253,33 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
                     // If its not a varying param check if a uniform is written
                     if(!isVarying)
                     {
-                        UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByName(), paramName ) );
-                        if(itFound != parameterList.end())
+                        UniformParameterList::const_iterator itFound =
+                            std::find_if(parameterList.begin(), parameterList.end(),
+                                         std::bind2nd(CompareUniformByName(), param->getName()));
+                        if (itFound != parameterList.end())
                         {   
                             // Declare the copy variable
-                            String newVar = "local_" + paramName;
+                            String newVar = "local_" + param->getName();
 
                             // now we check if we already declared a uniform redirector var
                             if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
                             {
                                 // Declare the copy variable and assign the original
-                                os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << std::endl; 
+                                os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << param->getName() << ";\n" << std::endl;
 
                                 // From now on we replace it automatic 
-                                mInputToGLStatesMap[paramName] = newVar;
+                                mInputToGLStatesMap[param->getName()] = newVar;
                             }
                         }
                     }
                 }
 
-                if(mInputToGLStatesMap.find(paramName) != mInputToGLStatesMap.end())
+                if(mInputToGLStatesMap.find(param->getName()) != mInputToGLStatesMap.end())
                 {
-                    int mask = op.getMask(); // our swizzle mask
+                    int mask = itOperand->getMask(); // our swizzle mask
 
                     // Here we insert the renamed param name
-                    localOs << mInputToGLStatesMap[paramName];
+                    localOs << mInputToGLStatesMap[param->getName()];
 
                     if(mask != Operand::OPM_ALL)
                     {
@@ -297,7 +299,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
                     {
                         // Now generate the swizzel mask according
                         // the type.
-                        switch(op.getParameter()->getType())
+                        switch(param->getType())
                         {
                         case GCT_FLOAT1:
                             localOs << ".x";
@@ -319,7 +321,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
                 }
                 else
                 {
-                    localOs << op.toString();
+                    localOs << itOperand->toString();
                 }
                 
                 ++itOperand;
