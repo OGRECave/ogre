@@ -39,6 +39,15 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    static const char* c_lightTypes[Light::NUM_LIGHT_TYPES+1u] =
+    {
+        "directional",
+        "point",
+        "spotlight",
+        "vpl",
+        "NUM_LIGHT_TYPES"
+    };
+
     SceneFormat::SceneFormat( SceneManager *sceneManager, CompositorManager2 *compositorManager ) :
         mSceneManager( sceneManager ),
         mCompositorManager( compositorManager )
@@ -49,9 +58,14 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    const char* SceneFormat::toStr( bool value )
+    const char* SceneFormat::toQuotedStr( bool value )
     {
         return value ? "true" : "false";
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::toQuotedStr( LwString &jsonStr, Light::LightTypes lightType )
+    {
+        jsonStr.a( "\"", c_lightTypes[lightType], "\"" );
     }
     //-----------------------------------------------------------------------------------
     uint32 SceneFormat::encodeFloat( float value )
@@ -65,6 +79,14 @@ namespace Ogre
         MyUnion myUnion;
         myUnion.f32 = value;
         return myUnion.u32;
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::encodeVector( LwString &jsonStr, const Vector2 &value )
+    {
+        jsonStr.a( "[ ",
+                   encodeFloat( value.x ), ", ",
+                   encodeFloat( value.y ),
+                   " ]" );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormat::encodeVector( LwString &jsonStr, const Vector3 &value )
@@ -123,9 +145,10 @@ namespace Ogre
         jsonStr.a( ",\n\t\t\t\t\"scale\" : " );
         encodeVector( jsonStr, node->getScale() );
 
-        jsonStr.a( ",\n\t\t\t\t\"inherit_orientation\" : ", toStr( node->getInheritOrientation() ) );
-        jsonStr.a( ",\n\t\t\t\t\"inherit_scale\" : ", toStr( node->getInheritScale() ) );
-        jsonStr.a( ",\n\t\t\t\t\"is_static\" : ", toStr( node->isStatic() ) );
+        jsonStr.a( ",\n\t\t\t\t\"inherit_orientation\" : ",
+                   toQuotedStr( node->getInheritOrientation() ) );
+        jsonStr.a( ",\n\t\t\t\t\"inherit_scale\" : ", toQuotedStr( node->getInheritScale() ) );
+        jsonStr.a( ",\n\t\t\t\t\"is_static\" : ", toQuotedStr( node->isStatic() ) );
 
         Node *parentNode = node->getParent();
         if( parentNode )
@@ -159,23 +182,23 @@ namespace Ogre
             else
                 jsonStr.a( "\n\t\t\t\t\t\t\"datablock\" : \"",
                            datablock->getName().getFriendlyText().c_str(), "\"" );
-            jsonStr.a( "\n,\t\t\t\t\t\t\"is_v1_material\" : false" );
+            jsonStr.a( ",\n\t\t\t\t\t\t\"is_v1_material\" : false" );
         }
         else
         {
             jsonStr.a( "\n\t\t\t\t\t\t\"datablock\" : \"",
                        renderable->getMaterial()->getName().c_str(), "\"" );
-            jsonStr.a( "\n,\t\t\t\t\t\t\"is_v1_material\" : true" );
+            jsonStr.a( ",\n\t\t\t\t\t\t\"is_v1_material\" : true" );
         }
 
         jsonStr.a( ",\n\t\t\t\t\t\t\"custom_parameter\" : ", renderable->mCustomParameter );
         jsonStr.a( ",\n\t\t\t\t\t\t\"render_queue_sub_group\" : ", renderable->getRenderQueueSubGroup() );
         jsonStr.a( ",\n\t\t\t\t\t\t\"polygon_mode_overrideable\" : ",
-                   toStr( renderable->getPolygonModeOverrideable() ) );
+                   toQuotedStr( renderable->getPolygonModeOverrideable() ) );
         jsonStr.a( ",\n\t\t\t\t\t\t\"use_identity_view\" : ",
-                   toStr( renderable->getUseIdentityView() ) );
+                   toQuotedStr( renderable->getUseIdentityView() ) );
         jsonStr.a( ",\n\t\t\t\t\t\t\"use_identity_projection\" : ",
-                   toStr( renderable->getUseIdentityProjection() ) );
+                   toQuotedStr( renderable->getUseIdentityProjection() ) );
 
         flushLwString( jsonStr, outJson );
 
@@ -248,7 +271,7 @@ namespace Ogre
 
         flushLwString( jsonStr, outJson );
 
-        outJson += "\n\t\t\t}\n";
+        outJson += "\n\t\t\t}";
     }
     //-----------------------------------------------------------------------------------
     void SceneFormat::exportItem( LwString &jsonStr, String &outJson, Item *item )
@@ -288,6 +311,35 @@ namespace Ogre
         jsonStr.a( ",\n\t\t\t\"specular\" : " );
         encodeColour( jsonStr, light->getSpecularColour() );
         jsonStr.a( ",\n\t\t\t\"power\" : ", encodeFloat( light->getPowerScale() ) );
+
+        jsonStr.a( ",\n\t\t\t\"type\" : " );
+        toQuotedStr( jsonStr, light->getType() );
+
+        jsonStr.a( ",\n\t\t\t\"attenuation\" : " );
+        encodeVector( jsonStr, Vector4( light->getAttenuationRange(),
+                                        light->getAttenuationConstant(),
+                                        light->getAttenuationLinear(),
+                                        light->getAttenuationQuadric() ) );
+
+        jsonStr.a( ",\n\t\t\t\"spot\" : " );
+        encodeVector( jsonStr, Vector4( light->getSpotlightInnerAngle().valueRadians(),
+                                        light->getSpotlightOuterAngle().valueRadians(),
+                                        light->getSpotlightFalloff(),
+                                        light->getSpotlightNearClipDistance() ) );
+
+        const Real ownShadowFarDistance = light->_getOwnShadowFarDistance();
+        if( ownShadowFarDistance )
+        {
+            jsonStr.a( ",\n\t\t\t\"shadow_far_dist\" : ", encodeFloat( light->getShadowFarDistance() ) );
+        }
+
+        const Real nearClipDistance = light->getShadowNearClipDistance();
+        const Real farClipDistance = light->getShadowFarClipDistance();
+        if( nearClipDistance >= 0 || farClipDistance >= 0 )
+        {
+            jsonStr.a( ",\n\t\t\t\"shadow_clip_dist\" : " );
+            encodeVector( jsonStr, Vector2( nearClipDistance, farClipDistance ) );
+        }
 
         jsonStr.a( ",\n" );
         flushLwString( jsonStr, outJson );

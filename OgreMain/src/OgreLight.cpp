@@ -465,6 +465,11 @@ namespace Ogre {
         mShadowFarDistSquared = distance * distance;
     }
     //-----------------------------------------------------------------------
+    bool Light::_getOwnShadowFarDistance(void) const
+    {
+        return mOwnShadowFarDist;
+    }
+    //-----------------------------------------------------------------------
     void Light::resetShadowFarDistance(void)
     {
         mOwnShadowFarDist = false;
