@@ -377,6 +377,76 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 }
 
 //-----------------------------------------------------------------------
+void GLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func)
+{
+    os << func.getReturnType() << " " << func.getFunctionName() << "(";
+
+    FunctionInvocation::OperandVector::iterator itOperand    = func.getOperandList().begin();
+    FunctionInvocation::OperandVector::iterator itOperandEnd = func.getOperandList().end();
+    for (; itOperand != itOperandEnd;)
+    {
+      const ParameterPtr& param = itOperand->getParameter();
+      Operand::OpSemantic opSemantic = itOperand->getSemantic();
+      int opMask = itOperand->getMask();
+      GpuConstantType gpuType = GCT_UNKNOWN;
+
+      switch(opSemantic)
+      {
+      case Operand::OPS_IN:
+          os << "in ";
+          break;
+
+      case Operand::OPS_OUT:
+          os << "out ";
+          break;
+
+      case Operand::OPS_INOUT:
+          os << "inout ";
+          break;
+
+      default:
+          break;
+      }
+
+      // Swizzle masks are only defined for types like vec2, vec3, vec4.
+      if (opMask == Operand::OPM_ALL)
+      {
+          gpuType = param->getType();
+      }
+      else
+      {
+          // Now we have to convert the mask to operator
+          gpuType = Operand::getGpuConstantType(opMask);
+      }
+
+      // We need a valid type otherwise glsl compilation will not work
+      if (gpuType == GCT_UNKNOWN)
+      {
+          OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+              "Can not convert Operand::OpMask to GpuConstantType",
+              "GLSLProgramWriter::writeFunctionDeclaration" );
+      }
+
+      // Write the operand type.
+      os << mGpuConstTypeMap[gpuType] << " " << param->getName();
+
+      ++itOperand;
+      //move over all operators with indirection
+      while ((itOperand != itOperandEnd) && (itOperand->getIndirectionLevel() != 0))
+      {
+          ++itOperand;
+      }
+
+      // Prepare for the next operand
+      if (itOperand != itOperandEnd)
+      {
+          os << ", ";
+      }
+    }
+    os << ")";
+}
+
+//-----------------------------------------------------------------------
 void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* program)
 {
     os << "//-----------------------------------------------------------------------------" << std::endl;
@@ -402,81 +472,14 @@ void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* prog
             if ((*itAtom)->getFunctionAtomType() != FunctionInvocation::Type)
                 continue;
 
-            FunctionInvocation* pFuncInvoc = static_cast<FunctionInvocation*>(*itAtom);         
-            FunctionInvocation::OperandVector::iterator itOperator = pFuncInvoc->getOperandList().begin();
-            FunctionInvocation::OperandVector::iterator itOperatorEnd = pFuncInvoc->getOperandList().end();
+            FunctionInvocation* pFuncInvoc = static_cast<FunctionInvocation*>(*itAtom);
 
-            // Start with function declaration 
-            String funcDecl = pFuncInvoc->getReturnType() + " " + pFuncInvoc->getFunctionName() + "(";
-
-            // Now iterate overall operands
-            for (; itOperator != itOperatorEnd; )
-            {
-                ParameterPtr pParam = (*itOperator).getParameter();             
-                Operand::OpSemantic opSemantic = (*itOperator).getSemantic();
-                int opMask = (*itOperator).getMask();
-                GpuConstantType gpuType = GCT_UNKNOWN;
-
-                // Write the semantic in, out, inout
-                switch(opSemantic)
-                {
-                case Operand::OPS_IN:
-                    funcDecl += "in ";
-                    break;
-
-                case Operand::OPS_OUT:
-                    funcDecl += "out ";
-                    break;
-
-                case Operand::OPS_INOUT:
-                    funcDecl += "inout ";
-                    break;
-
-                default:
-                    break;
-                }               
-                
-                //  Swizzle masks are only defined for types like vec2, vec3, vec4.
-                if (opMask == Operand::OPM_ALL)
-                {
-                    gpuType = pParam->getType();
-                }
-                else 
-                {
-                    // Now we have to convert the mask to operator
-                    gpuType = Operand::getGpuConstantType(opMask);
-                }
-
-                // We need a valid type otherwise glsl compilation will not work
-                if (gpuType == GCT_UNKNOWN)
-                {
-                    OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                        "Can not convert Operand::OpMask to GpuConstantType", 
-                        "GLSLProgramWriter::writeForwardDeclarations" );    
-                }
-
-                // Write the operand type.
-                funcDecl += mGpuConstTypeMap[gpuType];
-
-                ++itOperator;
-                //move over all operators with indirection
-                while ((itOperator != itOperatorEnd) && (itOperator->getIndirectionLevel() != 0)) 
-                {
-                    ++itOperator;
-                }
-
-                // Prepare for the next operand
-                if (itOperator != itOperatorEnd)
-                {
-                    funcDecl += ", ";
-                }
-            }
-            // Write function call closer.
-            funcDecl += ");\n";
+            StringStream funcDecl;
+            writeFunctionDeclaration(funcDecl, *pFuncInvoc);
 
             // Push the generated declaration into the vector
             // duplicate declarations will be removed later.
-            forwardDecl.push_back(funcDecl);
+            forwardDecl.push_back(funcDecl.str());
         }
     }
 
@@ -487,7 +490,7 @@ void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* prog
     // Finally write all function declarations to the shader file
     for (StringVector::iterator it = forwardDecl.begin(); it != endIt; ++it)
     {
-        os << *it;
+        os << *it << ";\n";
     }
 }
 

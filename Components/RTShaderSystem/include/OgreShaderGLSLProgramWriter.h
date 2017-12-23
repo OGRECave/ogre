@@ -37,6 +37,7 @@ namespace RTShader {
 
     class Function;
     class Program;
+    class FunctionInvocation;
 
 /** \addtogroup Optional
 *  @{
@@ -87,6 +88,7 @@ protected:
 
     /** Write forward declarations. This is needed so that we can attach library shader at a later step. */
     void writeForwardDeclarations(std::ostream& os, Program* program);
+    void writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func);
 
     /** Write the input params of the function */
     void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);

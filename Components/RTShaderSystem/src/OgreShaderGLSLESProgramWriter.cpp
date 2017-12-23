@@ -332,70 +332,8 @@ namespace Ogre {
 
                 if(invoc.getFunctionName().length())
                 {
-                    // Write out the function from the cached FunctionInvocation;
-                    os << invoc.getReturnType();
-                    os << " ";
-                    os << invoc.getFunctionName();
-                    os << "(";
-
-                    FunctionInvocation::OperandVector::iterator itOperand    = invoc.getOperandList().begin();
-                    FunctionInvocation::OperandVector::iterator itOperandEnd = invoc.getOperandList().end();
-                    for (; itOperand != itOperandEnd;)
-                    {
-                        Operand op = *itOperand;
-                        Operand::OpSemantic opSemantic = op.getSemantic();
-                        String paramName = op.getParameter()->getName();
-                        int opMask = (*itOperand).getMask();
-                        GpuConstantType gpuType = GCT_UNKNOWN;
-
-                        switch(opSemantic)
-                        {
-                        case Operand::OPS_IN:
-                            os << "in ";
-                            break;
-
-                        case Operand::OPS_OUT:
-                            os << "out ";
-                            break;
-
-                        case Operand::OPS_INOUT:
-                            os << "inout ";
-                            break;
-
-                        default:
-                            break;
-                        }
-
-                        // Swizzle masks are only defined for types like vec2, vec3, vec4.
-                        if (opMask == Operand::OPM_ALL)
-                        {
-                            gpuType = op.getParameter()->getType();
-                        }
-                        else
-                        {
-                            // Now we have to convert the mask to operator
-                            gpuType = Operand::getGpuConstantType(opMask);
-                        }
-
-                        // We need a valid type otherwise glsl compilation will not work
-                        if (gpuType == GCT_UNKNOWN)
-                        {
-                            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                                "Can not convert Operand::OpMask to GpuConstantType", 
-                                "GLSLESProgramWriter::writeProgramDependencies" );  
-                        }
-
-                        os << mGpuConstTypeMap[gpuType] << " " << paramName;
-
-                        ++itOperand;
-
-                        // Prepare for the next operand
-                        if (itOperand != itOperandEnd)
-                        {
-                            os << ", ";
-                        }
-                    }
-                    os << ")" << std::endl << "{" << std::endl << body << std::endl << "}" << std::endl;
+                    writeFunctionDeclaration(os, invoc);
+                    os << std::endl << "{" << std::endl << body << std::endl << "}" << std::endl;
                 }
             }
         }
