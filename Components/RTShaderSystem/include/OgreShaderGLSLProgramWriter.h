@@ -115,9 +115,6 @@ protected:
     ParamContentToStringMap mContentToPerVertexAttributes;
     // Holds the current glsl version
     int mGLSLVersion;
-    // Holds the fragment input params 
-    StringVector mFragInputParams;
-
     // set by derived class
     bool mIsGLSLES;
 };

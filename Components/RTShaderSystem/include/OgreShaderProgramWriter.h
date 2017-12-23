@@ -43,12 +43,19 @@ namespace RTShader {
 *  @{
 */
 
-// Uniform comparer
-struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
+// Paramter comparer
+
+struct CompareByName
 {
-    bool operator()( const UniformParameterPtr& uniform, const String& name ) const
+    const String& name;
+
+    template<typename T>
+    CompareByName(const T& param) : name(param->getName()) {}
+
+    template<typename T>
+    bool operator()( const T& param) const
     {
-        return uniform->getName() == name;
+        return param->getName() == name;
     }
 };
 

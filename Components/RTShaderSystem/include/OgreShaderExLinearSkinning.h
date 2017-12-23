@@ -77,7 +77,6 @@ protected:
 
     /** Adds the calculations for calculating a normal related element */
     void addNormalRelatedCalculations(Function* vsMain,
-                        ParameterPtr& pNormalIn,
                         ParameterPtr& pNormalRelatedParam,
                         ParameterPtr& pNormalWorldRelatedParam);
 

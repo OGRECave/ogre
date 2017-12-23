@@ -77,7 +77,6 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
     //local param
     mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT4);
     mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);
-    mParamLocalNormal = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
     //mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);
     //mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);
 
@@ -163,7 +162,6 @@ bool LinearSkinning::addFunctionInvocations(ProgramSet* programSet)
     addPositionCalculations(vsMain);
 
     //add functions to calculate normal and normal related data in world and object space
-    addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormal, mParamLocalNormalWorld);
     //addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
     //addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
     return true;
@@ -216,17 +214,10 @@ void LinearSkinning::addPositionCalculations(Function* vsMain)
 
 //-----------------------------------------------------------------------
 void LinearSkinning::addNormalRelatedCalculations(Function* vsMain,
-                                ParameterPtr& pNormalIn,
                                 ParameterPtr& pNormalRelatedParam,
                                 ParameterPtr& pNormalWorldRelatedParam)
 {
     FunctionInvocation* curFuncInvocation;
-
-    // allow writing to normal parameter
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM);
-    curFuncInvocation->pushOperand(pNormalIn, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
-    vsMain->addAtomInstance(curFuncInvocation);
 
     if (mDoBoneCalculations == true)
     {

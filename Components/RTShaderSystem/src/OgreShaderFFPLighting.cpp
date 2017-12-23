@@ -264,11 +264,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	mSurfaceShininess = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_SHININESS, 0);
 	
 	// Resolve input vertex shader normal.
-	// first look in local variables so other SRS can override
-	mVSInNormal = vsMain->getParameterByContent(vsMain->getLocalParameters(), Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-	if(!mVSInNormal) {
-	    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-	}
+    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 	
 	if (mTrackVertexColourType != 0)
 	{

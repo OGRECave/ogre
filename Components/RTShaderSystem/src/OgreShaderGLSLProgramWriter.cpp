@@ -132,9 +132,6 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             "GLSLProgramWriter::writeSourceCode" );
     }
 
-    // Clear out old input params
-    mFragInputParams.clear();
-
     const ShaderFunctionList& functionList = program->getFunctions();
     ShaderFunctionConstIterator itFunction;
 
@@ -166,6 +163,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
     {
         Function* curFunction = *itFunction;
+        const ShaderParameterList& inParams = curFunction->getInputParameters();
 
         writeFunctionTitle(os, curFunction);
         
@@ -219,58 +217,56 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 
                 if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
                 {
-                    // Is the written parameter a varying 
-                    bool isVarying = false;
+                    // Is the written parameter read only?
+                    String newVar;
+                    String origVar;
 
-                    // Check if we write to an varying because the are only readable in fragment programs 
-                    if (gpuType == GPT_FRAGMENT_PROGRAM)
+                    // Check if we write to an input variable because they are only readable
+                    // Well, actually "attribute" were writable in GLSL < 120, but we dont care here
+                    ShaderParameterList::const_iterator itFound = std::find_if(
+                        inParams.begin(), inParams.end(), CompareByName(param));
+                    if (itFound != inParams.end())
                     {
-                        StringVector::iterator itFound = std::find(
-                            mFragInputParams.begin(), mFragInputParams.end(), param->getName());
-                        if (itFound != mFragInputParams.end())
-                        {
-                            // Declare the copy variable
-                            String newVar = "local_" + param->getName();
-                            String tempVar = param->getName();
-                            isVarying = true;
+                        // Declare the copy variable
+                        newVar = "local_" + param->getName();
 
+                        if (gpuType == GPT_FRAGMENT_PROGRAM)
+                        {
+                            origVar = param->getName();
                             // We stored the original values in the mFragInputParams thats why we have to replace the first var with o
                             // because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
-                            tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
+                            origVar[0] = 'o';
+                        }
+                        else
+                        {
+                            origVar = mInputToGLStatesMap[param->getName()];
 
-                            // Declare the copy variable and assign the original
-                            os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;
-
-                            // From now on we replace it automatic 
-                            mInputToGLStatesMap[param->getName()] = newVar;
-
-                            // Remove the param because now it is replaced automatic with the local variable
-                            // (which could be written).
-                            mFragInputParams.erase(itFound++);
+                            if(origVar != newVar)
+                                mInputToGLStatesMap.erase(param->getName()); // drop previous redirect
                         }
                     }
-                    
+
                     // If its not a varying param check if a uniform is written
-                    if(!isVarying)
+                    if(newVar.empty())
                     {
-                        UniformParameterList::const_iterator itFound =
-                            std::find_if(parameterList.begin(), parameterList.end(),
-                                         std::bind2nd(CompareUniformByName(), param->getName()));
-                        if (itFound != parameterList.end())
+                        UniformParameterList::const_iterator uFound = std::find_if(
+                            parameterList.begin(), parameterList.end(), CompareByName(param));
+                        if (uFound != parameterList.end())
                         {   
                             // Declare the copy variable
-                            String newVar = "local_" + param->getName();
-
-                            // now we check if we already declared a uniform redirector var
-                            if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
-                            {
-                                // Declare the copy variable and assign the original
-                                os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << param->getName() << ";\n" << std::endl;
-
-                                // From now on we replace it automatic 
-                                mInputToGLStatesMap[param->getName()] = newVar;
-                            }
+                            newVar = "local_" + param->getName();
+                            origVar = param->getName();
                         }
+                    }
+
+                    // now we check if we already declared a redirector var
+                    if(!newVar.empty() && mInputToGLStatesMap.find(param->getName()) == mInputToGLStatesMap.end())
+                    {
+                        // Declare the copy variable and assign the original
+                        os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << origVar << ";" << std::endl;
+
+                        // From now on we replace it automatic
+                        mInputToGLStatesMap[param->getName()] = newVar;
                     }
                 }
 
@@ -518,14 +514,10 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 continue;
             }
 
-            // push fragment inputs they all could be written (in glsl you can not write
-            // input params in the fragment program)
-            mFragInputParams.push_back(paramName);
-
             // In the vertex and fragment program the variable names must match.
             // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
             // Thats why we are using a map for name mapping (we rename the params which are used in function atoms).
-            paramName.replace(paramName.begin(), paramName.begin() + 1, "o");   
+            paramName[0] = 'o';
             mInputToGLStatesMap[pParam->getName()] = paramName;
 
             // After GLSL 1.20 varying is deprecated
