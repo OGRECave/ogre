@@ -218,10 +218,17 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
 {
     // Write function name.
     os << mFunctionName << "(";
+    writeOperands(os, mOperands.begin(), mOperands.end());
+    // Write function call closer.
+    os << ");";
+}
 
+void FunctionInvocation::writeOperands(std::ostream& os, OperandVector::const_iterator begin,
+                                       OperandVector::const_iterator end) const
+{
     // Write parameters.
     ushort curIndLevel = 0;
-    for (OperandVector::const_iterator it = mOperands.begin(); it != mOperands.end(); )
+    for (OperandVector::const_iterator it = begin; it != end; )
     {
         os << it->toString();
         ++it;
@@ -255,7 +262,7 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
             {
                 os << "][";
             }
-            else if (it != mOperands.end())
+            else if (it != end)
             {
                 os << ", ";
             }
@@ -265,9 +272,6 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
             os << "int("; // required by GLSL
         }
     }
-
-    // Write function call closer.
-    os << ");";
 }
 
 //-----------------------------------------------------------------------
@@ -436,6 +440,26 @@ bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocati
 
     // Passed all tests, they are the same
     return true;
+}
+
+String AssignmentAtom::Type = "AssignmentAtom";
+AssignmentAtom::AssignmentAtom(ParameterPtr lhs, ParameterPtr rhs, int groupOrder) {
+    // do this backwards for compatibility with FFP_FUNC_ASSIGN calls
+    pushOperand(rhs, Operand::OPS_IN);
+    pushOperand(lhs, Operand::OPS_OUT);
+    mGroupExecutionOrder = groupOrder;
+}
+
+void AssignmentAtom::writeSourceCode(std::ostream& os, const String& targetLanguage) const
+{
+    OperandVector::const_iterator outOp = mOperands.begin();
+    // find the output operand
+    while(outOp->getSemantic() != Operand::OPS_OUT)
+        outOp++;
+    writeOperands(os, outOp, mOperands.end());
+    os << "\t=\t";
+    writeOperands(os, mOperands.begin(), outOp);
+    os << ";";
 }
 
 }

@@ -695,12 +695,10 @@ void ProgramProcessor::buildParameterReferenceMap(const FunctionAtomInstanceList
 
     for (; it != itEnd; ++it)
     {
-        FunctionAtom* curAtom = *it;
-
         // Deal only with function invocations.
-        if (curAtom->getFunctionAtomType() == FunctionInvocation::Type)
+        FunctionInvocation* curFuncInvocation = dynamic_cast<FunctionInvocation*>(*it);
+        if (curFuncInvocation)
         {
-            FunctionInvocation* curFuncInvocation = static_cast<FunctionInvocation*>(curAtom);
             FunctionInvocation::OperandVector& funcOperands = curFuncInvocation->getOperandList();
 
             for (unsigned int op=0; op < funcOperands.size(); ++op)

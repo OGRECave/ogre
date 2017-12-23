@@ -253,10 +253,27 @@ public:
     static String Type;
 
     // Attributes.
-protected:  
+protected:
+    FunctionInvocation() {}
+
+    void writeOperands(std::ostream& os, OperandVector::const_iterator begin,
+                       OperandVector::const_iterator end) const;
+
     String mFunctionName;
     String mReturnType;
     OperandVector mOperands;    
+};
+
+/// shorthand for "lhs = rhs;" insted of using FFP_Assign(rhs, lhs)
+class _OgreRTSSExport AssignmentAtom : public FunctionInvocation
+{
+public:
+    explicit AssignmentAtom(int groupOrder) { mGroupExecutionOrder = groupOrder; }
+    AssignmentAtom(ParameterPtr lhs, ParameterPtr rhs, int groupOrder);
+    void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
+    const String& getFunctionAtomType() { return Type; }
+
+    static String Type;
 };
 
 typedef vector<FunctionAtom*>::type                 FunctionAtomInstanceList;

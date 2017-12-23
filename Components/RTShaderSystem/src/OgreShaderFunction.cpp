@@ -467,6 +467,12 @@ void Function::addAtomInstance(FunctionAtom* atomInstance)
 }
 
 //-----------------------------------------------------------------------------
+void Function::addAtomAssign(ParameterPtr lhs, ParameterPtr rhs, int groupOrder)
+{
+    addAtomInstance(OGRE_NEW AssignmentAtom(lhs, rhs, groupOrder));
+}
+
+//-----------------------------------------------------------------------------
 bool Function::deleteAtomInstance(FunctionAtom* atomInstance)
 {
     FunctionAtomInstanceIterator it;
