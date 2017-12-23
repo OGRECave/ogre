@@ -43,6 +43,18 @@ namespace Ogre
     *  @{
     */
 
+    namespace SceneFlags
+    {
+        enum SceneFlags
+        {
+            SceneNodes  = 1u << 0u,
+            Items       = 1u << 1u,
+            Entities    = 1u << 2u,
+            Lights      = 1u << 3u,
+            Cameras     = 1u << 4u,
+        };
+    }
+
     /**
     */
     class _OgreSceneFormatExport SceneFormat
@@ -72,12 +84,20 @@ namespace Ogre
         void exportMovableObject( LwString &jsonStr, String &outJson, MovableObject *movableObject );
         void exportItem( LwString &jsonStr, String &outJson, Item *item );
         void exportLight( LwString &jsonStr, String &outJson, Light *light );
+        void exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity );
 
     public:
         SceneFormat( SceneManager *sceneManager, CompositorManager2 *compositorManager );
         ~SceneFormat();
 
-        void exportScene( String &outJson );
+        /**
+        @param outJson
+        @param exportFlags
+            Combination of SceneFlags::SceneFlags, to know what to export and what to exclude.
+            Default to exporting everything.
+            Note that avoiding to export scene nodes can cause issues during import.
+        */
+        void exportScene( String &outJson, uint32 exportFlags=~0u );
     };
 
     /** @} */
