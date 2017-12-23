@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _OgreSceneFormat_H_
 
 #include "OgreSceneFormatPrerequisites.h"
+#include "OgreLight.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -53,9 +54,11 @@ namespace Ogre
         typedef map<Node*, uint32>::type NodeToIdxMap;
         NodeToIdxMap            mNodeToIdxMap;
 
-        static const char* toStr( bool value );
+        static const char* toQuotedStr( bool value );
+        static void toQuotedStr( LwString &jsonStr, Light::LightTypes lightType );
 
         static uint32 encodeFloat( float value );
+        static void encodeVector( LwString &jsonStr, const Vector2 &value );
         static void encodeVector( LwString &jsonStr, const Vector3 &value );
         static void encodeVector( LwString &jsonStr, const Vector4 &value );
         static void encodeQuaternion( LwString &jsonStr, const Quaternion &value );

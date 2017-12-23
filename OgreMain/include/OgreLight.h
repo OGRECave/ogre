@@ -391,9 +391,11 @@ namespace Ogre {
             and scene setup.
         */
         void setShadowFarDistance(Real distance);
+        bool _getOwnShadowFarDistance(void) const;
         /** Tells the light to use the shadow far distance of the SceneManager
         */
         void resetShadowFarDistance(void);
+
         /** Gets the maximum distance away from the camera that shadows
             by this light will be visible.
         */
