@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 #include "OgreItem.h"
 #include "OgreMesh2.h"
+#include "OgreEntity.h"
 #include "OgreHlms.h"
 
 namespace Ogre
@@ -346,7 +347,37 @@ namespace Ogre
         exportMovableObject( jsonStr, outJson, light );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportScene( String &outJson )
+    void SceneFormat::exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity )
+    {
+        const v1::MeshPtr &mesh = entity->getMesh();
+
+        outJson += "\n\t\t\t\"mesh\" : \"";
+        outJson += mesh->getName();
+        outJson += "\"";
+
+        outJson += ",\n\t\t\t\"mesh_resource_group\" : \"";
+        outJson += mesh->getGroup();
+        outJson += "\"";
+
+        outJson += ",\n";
+        exportMovableObject( jsonStr, outJson, entity );
+
+        outJson += ",\n\t\t\t\"sub_entities\" :\n\t\t\t[";
+        const size_t numSubEntities = entity->getNumSubEntities();
+        for( size_t i=0; i<numSubEntities; ++i )
+        {
+            if( i != 0 )
+                outJson += ",\n";
+            else
+                outJson += "\n";
+            outJson += "\t\t\t\t{";
+            exportRenderable( jsonStr, outJson, entity->getSubEntity( i ) );
+            outJson += "\t\t\t\t}";
+        }
+        outJson += "\n\t\t\t]";
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::exportScene( String &outJson, uint32 exportFlags )
     {
         mNodeToIdxMap.clear();
 
@@ -359,6 +390,7 @@ namespace Ogre
 
         flushLwString( jsonStr, outJson );
 
+        if( exportFlags & SceneFlags::SceneNodes )
         {
             uint32 nodeCount = 0;
 
@@ -394,6 +426,7 @@ namespace Ogre
             outJson += "\n\t]";
         }
 
+        if( exportFlags & SceneFlags::Items )
         {
             SceneManager::MovableObjectIterator movableObjects =
                     mSceneManager->getMovableObjectIterator( ItemFactory::FACTORY_TYPE_NAME );
@@ -423,6 +456,7 @@ namespace Ogre
             }
         }
 
+        if( exportFlags & SceneFlags::Lights )
         {
             SceneManager::MovableObjectIterator movableObjects =
                     mSceneManager->getMovableObjectIterator( LightFactory::FACTORY_TYPE_NAME );
@@ -445,6 +479,36 @@ namespace Ogre
                     else
                         outJson += ",\n\t\t{";
                     exportLight( jsonStr, outJson, light );
+                    outJson += "\n\t\t}";
+                }
+
+                outJson += "\n\t]";
+            }
+        }
+
+        if( exportFlags & SceneFlags::Entities )
+        {
+            SceneManager::MovableObjectIterator movableObjects =
+                    mSceneManager->getMovableObjectIterator( v1::EntityFactory::FACTORY_TYPE_NAME );
+
+            if( movableObjects.hasMoreElements() )
+            {
+                outJson += ",\n\t\"entities\" :\n\t[\n";
+
+                bool firstObject = true;
+
+                while( movableObjects.hasMoreElements() )
+                {
+                    MovableObject *mo = movableObjects.getNext();
+                    v1::Entity *entity = static_cast<v1::Entity*>( mo );
+                    if( firstObject )
+                    {
+                        outJson += "\n\t\t{";
+                        firstObject = false;
+                    }
+                    else
+                        outJson += ",\n\t\t{";
+                    exportEntity( jsonStr, outJson, entity );
                     outJson += "\n\t\t}";
                 }
 
