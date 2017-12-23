@@ -213,7 +213,6 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             {
                 const ParameterPtr& param = itOperand->getParameter();
                 Operand::OpSemantic opSemantic = itOperand->getSemantic();
-                Parameter::Content content = param->getContent();
 
                 if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
                 {
@@ -272,48 +271,22 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 
                 if(mInputToGLStatesMap.find(param->getName()) != mInputToGLStatesMap.end())
                 {
-                    int mask = itOperand->getMask(); // our swizzle mask
-
                     // Here we insert the renamed param name
                     localOs << mInputToGLStatesMap[param->getName()];
 
+                    // Now that every texcoord is a vec4 (passed as vertex attributes) we
+                    // have to swizzle them according the desired type.
+                    if(gpuType == GPT_VERTEX_PROGRAM &&
+                            param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
+                    {
+                        itOperand->setMaskToParamType();
+                    }
+
+                    int mask = itOperand->getMask(); // our swizzle mask
                     if(mask != Operand::OPM_ALL)
                     {
                         localOs << "." << Operand::getMaskAsString(mask);
-                    }   
-                    // Now that every texcoord is a vec4 (passed as vertex attributes) we
-                    // have to swizzle them according the desired type.
-                    else if(gpuType == GPT_VERTEX_PROGRAM &&
-                            (content == Parameter::SPC_TEXTURE_COORDINATE0 ||
-                            content == Parameter::SPC_TEXTURE_COORDINATE1 ||
-                            content == Parameter::SPC_TEXTURE_COORDINATE2 ||
-                            content == Parameter::SPC_TEXTURE_COORDINATE3 ||
-                            content == Parameter::SPC_TEXTURE_COORDINATE4 ||
-                            content == Parameter::SPC_TEXTURE_COORDINATE5 ||
-                            content == Parameter::SPC_TEXTURE_COORDINATE6 ||
-                            content == Parameter::SPC_TEXTURE_COORDINATE7) )
-                    {
-                        // Now generate the swizzel mask according
-                        // the type.
-                        switch(param->getType())
-                        {
-                        case GCT_FLOAT1:
-                            localOs << ".x";
-                            break;
-                        case GCT_FLOAT2:
-                            localOs << ".xy";
-                            break;
-                        case GCT_FLOAT3:
-                            localOs << ".xyz";
-                            break;
-                        case GCT_FLOAT4:
-                            localOs << ".xyzw";
-                            break;
-
-                        default:
-                            break;
-                        }
-                    }                       
+                    }
                 }
                 else
                 {

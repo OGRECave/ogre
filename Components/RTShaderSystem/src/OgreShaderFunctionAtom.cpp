@@ -55,8 +55,28 @@ Operand& Operand::operator= (const Operand & other)
 //-----------------------------------------------------------------------------
 Operand::~Operand()
 {
-    // nothing todo
+    // nothing to do
 }
+
+void Operand::setMaskToParamType()
+{
+    switch (mParameter->getType())
+    {
+    case GCT_FLOAT1:
+        mMask = OPM_X;
+        break;
+    case GCT_FLOAT2:
+        mMask = OPM_XY;
+        break;
+    case GCT_FLOAT3:
+        mMask = OPM_XYZ;
+        break;
+    default:
+        mMask = OPM_ALL;
+        break;
+    }
+}
+
 //-----------------------------------------------------------------------------
 String Operand::getMaskAsString(int mask)
 {

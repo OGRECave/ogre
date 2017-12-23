@@ -137,6 +137,9 @@ public:
     /** Returns the mask bitfield. */
     int getMask()   const { return mMask; }
 
+    /// automatically set swizzle to match parameter arity
+    void setMaskToParamType();
+
     /** Returns the operand semantic (do we read/write or both with the parameter). */
     OpSemantic getSemantic()    const { return mSemantic; }
 
