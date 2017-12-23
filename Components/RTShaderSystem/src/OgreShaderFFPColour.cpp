@@ -140,47 +140,34 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     // Create vertex shader colour invocations.
     ParameterPtr vsDiffuse;
     ParameterPtr vsSpecular;
-    if (mVSInputDiffuse.get() != NULL)
+    if (mVSInputDiffuse)
     {
         vsDiffuse = mVSInputDiffuse;
     }
     else
     {
         vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(1.0)), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(vsDiffuse, Operand::OPS_OUT);
-        vsMain->addAtomInstance(curFuncInvocation);
+        vsMain->addAtomAssign(vsDiffuse, ParameterFactory::createConstParam(Vector4(1.0)), FFP_VS_COLOUR);
     }
 
-    if (mVSOutputDiffuse.get() != NULL)
+    if (mVSOutputDiffuse)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR);
-        curFuncInvocation->pushOperand(vsDiffuse, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mVSOutputDiffuse, Operand::OPS_OUT);
-        vsMain->addAtomInstance(curFuncInvocation);
+        vsMain->addAtomAssign(mVSOutputDiffuse, vsDiffuse, FFP_VS_COLOUR);
     }
     
-    if (mVSInputSpecular.get() != NULL)
+    if (mVSInputSpecular)
     {
         vsSpecular = mVSInputSpecular;      
     }
     else
     {
         vsSpecular = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4::ZERO), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(vsSpecular, Operand::OPS_OUT);
-        vsMain->addAtomInstance(curFuncInvocation);
+        vsMain->addAtomAssign(vsSpecular, ParameterFactory::createConstParam(Vector4::ZERO), FFP_VS_COLOUR);
     }
 
-    if (mVSOutputSpecular.get() != NULL)
+    if (mVSOutputSpecular)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR);
-        curFuncInvocation->pushOperand(vsSpecular, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mVSOutputSpecular, Operand::OPS_OUT);
-        vsMain->addAtomInstance(curFuncInvocation);
+        vsMain->addAtomAssign(mVSOutputSpecular, vsSpecular, FFP_VS_COLOUR);
     }
     
     
@@ -197,42 +184,30 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         psDiffuse = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(1.0)), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(psDiffuse, Operand::OPS_OUT);
-        psMain->addAtomInstance(curFuncInvocation);
+        psMain->addAtomAssign(psDiffuse, ParameterFactory::createConstParam(Vector4(1.0)), FFP_PS_COLOUR_BEGIN);
     }
 
     // Handle specular colour.
-    if (mPSInputSpecular.get() != NULL)
+    if (mPSInputSpecular)
     {
         psSpecular = mPSInputSpecular;      
     }
     else
     {
         psSpecular = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN);
-        curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4::ZERO), Operand::OPS_IN);
-        curFuncInvocation->pushOperand(psSpecular, Operand::OPS_OUT);
-        psMain->addAtomInstance(curFuncInvocation);
+        psMain->addAtomAssign(psSpecular, ParameterFactory::createConstParam(Vector4::ZERO), FFP_PS_COLOUR_BEGIN);
     }
 
     // Assign diffuse colour.
-    if (mPSOutputDiffuse.get() != NULL)
+    if (mPSOutputDiffuse)
     {   
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN);
-        curFuncInvocation->pushOperand(psDiffuse, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT);     
-        psMain->addAtomInstance(curFuncInvocation);
+        psMain->addAtomAssign(mPSOutputDiffuse, psDiffuse, FFP_PS_COLOUR_BEGIN);
     }
 
     // Assign specular colour.
-    if (mPSOutputSpecular.get() != NULL)
+    if (mPSOutputSpecular)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN);
-        curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mPSOutputSpecular, Operand::OPS_OUT);        
-        psMain->addAtomInstance(curFuncInvocation);
+        psMain->addAtomAssign(mPSOutputSpecular, psSpecular, FFP_PS_COLOUR_BEGIN);
     }
 
     // Add specular to out colour.

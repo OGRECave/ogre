@@ -416,10 +416,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 	if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
 		(mTrackVertexColourType & TVC_EMISSIVE) == 0)
 	{
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
-		curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
-		vsMain->addAtomInstance(curFuncInvocation);		
+		vsMain->addAtomAssign(mVSOutDiffuse, mDerivedSceneColour, groupOrder);
 	}
 	else
 	{
@@ -433,10 +430,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 		}
 		else
 		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder);
-			curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			vsMain->addAtomInstance(curFuncInvocation);
+		    vsMain->addAtomAssign(mVSOutDiffuse, mDerivedAmbientLightColour, groupOrder);
 		}
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
