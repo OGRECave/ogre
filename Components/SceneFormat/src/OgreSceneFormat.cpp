@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreSceneFormat.h"
 #include "OgreSceneManager.h"
+#include "OgreRoot.h"
 
 #include "OgreLwString.h"
 
@@ -37,6 +38,10 @@ THE SOFTWARE.
 #include "OgreMesh2.h"
 #include "OgreEntity.h"
 #include "OgreHlms.h"
+
+#include "OgreMeshSerializer.h"
+#include "OgreMesh2Serializer.h"
+#include "OgreFileSystemLayer.h"
 
 namespace Ogre
 {
@@ -49,9 +54,9 @@ namespace Ogre
         "NUM_LIGHT_TYPES"
     };
 
-    SceneFormat::SceneFormat( SceneManager *sceneManager, CompositorManager2 *compositorManager ) :
-        mSceneManager( sceneManager ),
-        mCompositorManager( compositorManager )
+    SceneFormat::SceneFormat( Root *root, SceneManager *sceneManager ) :
+        mRoot( root ),
+        mSceneManager( sceneManager )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -275,9 +280,9 @@ namespace Ogre
         outJson += "\n\t\t\t}";
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportItem( LwString &jsonStr, String &outJson, Item *item )
+    void SceneFormat::exportItem( LwString &jsonStr, String &outJson, Item *item, bool exportMesh )
     {
-        const MeshPtr &mesh = item->getMesh();
+        const Mesh *mesh = item->getMesh().get();
 
         outJson += "\n\t\t\t\"mesh\" : \"";
         outJson += mesh->getName();
@@ -303,6 +308,18 @@ namespace Ogre
             outJson += "\t\t\t\t}";
         }
         outJson += "\n\t\t\t]";
+
+        //Export the mesh, if we haven't done that already
+        if( exportMesh &&
+            mExportedMeshes.find( item->getMesh().get() ) == mExportedMeshes.end() )
+        {
+            FileSystemLayer::createDirectory( mCurrentExportFolder + "/v2/" );
+
+            Ogre::MeshSerializer meshSerializer( mRoot->getRenderSystem()->getVaoManager() );
+            meshSerializer.exportMesh( mesh, mCurrentExportFolder + "/v2/" + mesh->getName(),
+                                       MESH_VERSION_LATEST );
+            mExportedMeshes.insert( mesh );
+        }
     }
     //-----------------------------------------------------------------------------------
     void SceneFormat::exportLight( LwString &jsonStr, String &outJson, Light *light )
@@ -347,9 +364,10 @@ namespace Ogre
         exportMovableObject( jsonStr, outJson, light );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity )
+    void SceneFormat::exportEntity( LwString &jsonStr, String &outJson,
+                                    v1::Entity *entity, bool exportMesh )
     {
-        const v1::MeshPtr &mesh = entity->getMesh();
+        const v1::Mesh *mesh = entity->getMesh().get();
 
         outJson += "\n\t\t\t\"mesh\" : \"";
         outJson += mesh->getName();
@@ -375,11 +393,25 @@ namespace Ogre
             outJson += "\t\t\t\t}";
         }
         outJson += "\n\t\t\t]";
+
+        //Export the mesh, if we haven't done that already
+        if( exportMesh &&
+            mExportedMeshesV1.find( entity->getMesh().get() ) == mExportedMeshesV1.end() )
+        {
+            FileSystemLayer::createDirectory( mCurrentExportFolder + "/v1/" );
+
+            Ogre::v1::MeshSerializer meshSerializer;
+            meshSerializer.exportMesh( mesh, mCurrentExportFolder + "/v1/" + mesh->getName(),
+                                       v1::MESH_VERSION_LATEST );
+            mExportedMeshesV1.insert( mesh );
+        }
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportScene( String &outJson, uint32 exportFlags )
+    void SceneFormat::_exportScene( String &outJson, uint32 exportFlags )
     {
         mNodeToIdxMap.clear();
+        mExportedMeshes.clear();
+        mExportedMeshesV1.clear();
 
         char tmpBuffer[4096];
         LwString jsonStr( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
@@ -448,7 +480,7 @@ namespace Ogre
                     }
                     else
                         outJson += ",\n\t\t{";
-                    exportItem( jsonStr, outJson, item );
+                    exportItem( jsonStr, outJson, item, exportFlags & SceneFlags::Meshes );
                     outJson += "\n\t\t}";
                 }
 
@@ -508,7 +540,7 @@ namespace Ogre
                     }
                     else
                         outJson += ",\n\t\t{";
-                    exportEntity( jsonStr, outJson, entity );
+                    exportEntity( jsonStr, outJson, entity, exportFlags & SceneFlags::MeshesV1 );
                     outJson += "\n\t\t}";
                 }
 
@@ -519,5 +551,42 @@ namespace Ogre
         outJson += "\n}\n";
 
         mNodeToIdxMap.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::exportScene( String &outJson, uint32 exportFlags )
+    {
+        mCurrentExportFolder.clear();
+        _exportScene( outJson, exportFlags & ~(SceneFlags::Meshes | SceneFlags::MeshesV1) );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormat::exportSceneToFile( const String &folderPath, uint32 exportFlags )
+    {
+        mCurrentExportFolder = folderPath;
+        FileSystemLayer::createDirectory( mCurrentExportFolder );
+
+        {
+            String jsonString;
+            _exportScene( jsonString, exportFlags );
+
+            const String scenePath = folderPath + "/scene.json";
+            std::ofstream file( scenePath.c_str(), std::ios::binary | std::ios::out );
+            if( file.is_open() )
+                file.write( jsonString.c_str(), jsonString.size() );
+            file.close();
+        }
+
+        if( exportFlags & SceneFlags::Materials )
+        {
+            HlmsManager *hlmsManager = mRoot->getHlmsManager();
+            for( size_t i=HLMS_LOW_LEVEL + 1u; i<HLMS_MAX; ++i )
+            {
+                if( hlmsManager->getHlms( static_cast<HlmsTypes>( i ) ) )
+                {
+                    const String materialPath = folderPath + "/material" +
+                                                StringConverter::toString( i ) + ".json";
+                    hlmsManager->saveMaterials( static_cast<HlmsTypes>( i ), materialPath.c_str() );
+                }
+            }
+        }
     }
 }
