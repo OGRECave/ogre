@@ -52,6 +52,9 @@ namespace Ogre
             Entities    = 1u << 2u,
             Lights      = 1u << 3u,
             Cameras     = 1u << 4u,
+            Materials   = 1u << 5u,
+            Meshes      = 1u << 6u,
+            MeshesV1    = 1u << 7u,
         };
     }
 
@@ -60,11 +63,17 @@ namespace Ogre
     class _OgreSceneFormatExport SceneFormat
     {
     protected:
+        Root                    *mRoot;
         SceneManager            *mSceneManager;
-        CompositorManager2      *mCompositorManager;
+        String                  mCurrentExportFolder;
 
         typedef map<Node*, uint32>::type NodeToIdxMap;
         NodeToIdxMap            mNodeToIdxMap;
+
+        typedef set<const Mesh*>::type MeshSet;
+        typedef set<const v1::Mesh*>::type MeshV1Set;
+        MeshSet     mExportedMeshes;
+        MeshV1Set   mExportedMeshesV1;
 
         static const char* toQuotedStr( bool value );
         static void toQuotedStr( LwString &jsonStr, Light::LightTypes lightType );
@@ -82,12 +91,21 @@ namespace Ogre
         void exportSceneNode( LwString &jsonStr, String &outJson, SceneNode *sceneNode );
         void exportRenderable( LwString &jsonStr, String &outJson, Renderable *renderable );
         void exportMovableObject( LwString &jsonStr, String &outJson, MovableObject *movableObject );
-        void exportItem( LwString &jsonStr, String &outJson, Item *item );
+        void exportItem( LwString &jsonStr, String &outJson, Item *item, bool exportMesh );
         void exportLight( LwString &jsonStr, String &outJson, Light *light );
-        void exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity );
+        void exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity, bool exportMesh );
+
+        /**
+        @param outJson
+        @param exportFlags
+            Combination of SceneFlags::SceneFlags, to know what to export and what to exclude.
+            Default to exporting everything.
+            Note that excluding scene nodes can cause issues later during import.
+        */
+        void _exportScene( String &outJson, uint32 exportFlags=~0u );
 
     public:
-        SceneFormat( SceneManager *sceneManager, CompositorManager2 *compositorManager );
+        SceneFormat( Root *root, SceneManager *sceneManager );
         ~SceneFormat();
 
         /**
@@ -95,9 +113,11 @@ namespace Ogre
         @param exportFlags
             Combination of SceneFlags::SceneFlags, to know what to export and what to exclude.
             Default to exporting everything.
-            Note that avoiding to export scene nodes can cause issues during import.
+            Note that excluding scene nodes can cause issues later during import.
         */
         void exportScene( String &outJson, uint32 exportFlags=~0u );
+
+        void exportSceneToFile( const String &folderPath, uint32 exportFlags=~0u );
     };
 
     /** @} */
