@@ -649,18 +649,15 @@ namespace Ogre
                 outString += ",\n\t\t\t\t\"mode\" : \"coeff\"";
         }
 
-        if( textureType >= PBSM_DETAIL0 && textureType <= PBSM_DETAIL3_NM )
+        if( textureType >= PBSM_DETAIL0 && textureType <= PBSM_DETAIL3 )
         {
-            if( textureType >= PBSM_DETAIL0 && textureType <= PBSM_DETAIL3 )
-            {
-                PbsBlendModes blendMode = datablock->getDetailMapBlendMode( textureType - PBSM_DETAIL0 );
+            PbsBlendModes blendMode = datablock->getDetailMapBlendMode( textureType - PBSM_DETAIL0 );
 
-                if( blendMode != PBSM_BLEND_NORMAL_NON_PREMUL )
-                {
-                    outString += ",\n\t\t\t\t\"mode\" : \"";
-                    outString += c_pbsBlendModes[blendMode];
-                    outString += '"';
-                }
+            if( blendMode != PBSM_BLEND_NORMAL_NON_PREMUL )
+            {
+                outString += ",\n\t\t\t\t\"mode\" : \"";
+                outString += c_pbsBlendModes[blendMode];
+                outString += '"';
             }
 
             const Vector4 &offsetScale =
@@ -810,14 +807,9 @@ namespace Ogre
 
         for( int i=0; i<4; ++i )
         {
-            const Vector4 &offsetScale = pbsDatablock->getDetailMapOffsetScale( i );
-            const Vector2 offset( offsetScale.x, offsetScale.y );
-            const Vector2 scale( offsetScale.z, offsetScale.w );
-
             const PbsTextureTypes textureType = static_cast<PbsTextureTypes>(PBSM_DETAIL0_NM + i);
 
-            if( offset != Vector2::ZERO || scale != Vector2::UNIT_SCALE ||
-                pbsDatablock->getDetailNormalWeight( i ) != 1.0f ||
+            if( pbsDatablock->getDetailNormalWeight( i ) != 1.0f ||
                 !pbsDatablock->getTexture( textureType ).isNull() )
             {
                 char tmpBuffer[64];

@@ -127,8 +127,8 @@ namespace Ogre
 
         if (!mHomePath.empty())
         {
-            // create an .ogre subdir
-            mHomePath.append("/.ogre/");
+            // create an .config subdir. This usually should be there already.
+            mHomePath.append("/.config/");
             if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
             {
                 // can't create dir
@@ -136,12 +136,22 @@ namespace Ogre
             }
             else
             {
-                // now create the given subdir
-                mHomePath.append(subdir + '/');
+                // create an ogre subdir inside .config
+                mHomePath.append("ogre/");
                 if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
                 {
                     // can't create dir
                     mHomePath.clear();
+                }
+                else
+                {
+                    // now create the given subdir
+                    mHomePath.append(subdir + '/');
+                    if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
+                    {
+                        // can't create dir
+                        mHomePath.clear();
+                    }
                 }
             }
         }
