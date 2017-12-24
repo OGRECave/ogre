@@ -1046,7 +1046,8 @@ namespace Ogre
         }
 
         {
-            if( !datablockMap.empty() )
+            const size_t numDatablocks = datablockMap.size();
+            if( numDatablocks > 1u )
             {
                 outString += "\n\n\t\"";
                 outString += hlms->getTypeNameStr();
@@ -1067,7 +1068,7 @@ namespace Ogre
                 ++itor;
             }
 
-            if( !datablockMap.empty() )
+            if( numDatablocks > 1u )
             {
                 outString.erase( outString.size() - 1 ); //Remove an extra comma
                 outString += "\n\t},";
