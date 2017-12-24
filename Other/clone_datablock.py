@@ -6,6 +6,7 @@ import clang.cindex
 import io;
 import os;
 import sys
+#import hashlib
 
 if not sys.platform.startswith("win32"):
     from ctypes.util import find_library
@@ -66,13 +67,34 @@ def parse_fielddecl(cursor, classname, classmembers):
 
 
 def dump_cpp(dirname, basename, classname, classmembers):
-    file = io.open(dirname + "/" + basename, "w", encoding = "utf-8", newline = "\n")
+    fullPath = dirname + "/" + basename
+    #file = io.open(fullPath, "w", encoding = "utf-8", newline = "\n")
+    newFile = io.StringIO(newline = "\n")
 
-    dump_cpp_disclaimer(file)
-    dump_cpp_license(file)
-    dump_cpp_implementation(file, classname, classmembers)
+    dump_cpp_disclaimer( newFile )
+    dump_cpp_license( newFile )
+    dump_cpp_implementation( newFile, classname, classmembers )
 
-    file.close()
+    newFile.seek( 0, io.SEEK_SET )
+    oldFile = io.open( fullPath, 'r', encoding='utf-8', newline = "\n" )
+
+    # Hash code removed since it's useless (why compare if we need to hash both?). Just raw compare.
+    #oldHash = hashlib.md5( oldFile.read() ).hexdigest()
+    #newHash = hashlib.md5( newFile.read() ).hexdigest()
+    if oldFile.read() != newFile.read():
+        oldFile.seek( 0, io.SEEK_SET )
+        newFile.seek( 0, io.SEEK_SET )
+        #print( "File " + fullPath + " is outdated " + str( oldHash ) + " (old) vs " + str( newHash ) + " (new). Overwriting..." )
+        print( "File " + fullPath + " is outdated. Overwriting..." )
+        oldFile.close()
+        oldFile = io.open( fullPath, 'w', encoding='utf-8', newline = "\n" )
+        oldFile.write( newFile.read() )
+        oldFile.close()
+    else:
+        #print( "File " + fullPath + " is up to date (" + str( oldHash ) + ")" )
+        print( "File " + fullPath + " is up to date." )
+
+    newFile.close()
 
 
 def dump_cpp_disclaimer(file):
