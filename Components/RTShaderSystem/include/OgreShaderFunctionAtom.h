@@ -57,7 +57,7 @@ public:
     int getGroupExecutionOrder() const;
     
     /** Get an internal execution order within a group of this function atom. */
-    int getInternalExecutionOrder() const;
+    OGRE_DEPRECATED int getInternalExecutionOrder() const { return -1; }
     
     /** Abstract method that writes a source code to the given output stream in the target shader language. */
     virtual void writeSourceCode(std::ostream& os, const String& targetLanguage) const = 0;
@@ -69,8 +69,6 @@ public:
 protected:
     // The owner group execution order. 
     int mGroupExecutionOrder;
-    // The execution order within the group.        
-    int mInternalExecutionOrder;
 };
 
 /** A class that represents a function operand (its the combination of a parameter the in/out semantic and the used fields)
@@ -139,6 +137,9 @@ public:
     /** Returns the mask bitfield. */
     int getMask()   const { return mMask; }
 
+    /// automatically set swizzle to match parameter arity
+    void setMaskToParamType();
+
     /** Returns the operand semantic (do we read/write or both with the parameter). */
     OpSemantic getSemantic()    const { return mSemantic; }
 
@@ -186,7 +187,12 @@ public:
     @param internalOrder The internal order of this invocation.
     @param returnType The return type of the used function.
     */
-    FunctionInvocation(const String& functionName, int groupOrder, int internalOrder, String returnType = "void");
+    FunctionInvocation(const String& functionName, int groupOrder, const String& returnType = "void");
+
+    /// @overload
+    /// @deprecated internalOrder parameter is obsolete
+    OGRE_DEPRECATED FunctionInvocation(const String& functionName, int groupOrder, int internalOrder, String returnType = "void");
+
 
     /** Copy constructor */
     FunctionInvocation(const FunctionInvocation& rhs);
@@ -247,10 +253,27 @@ public:
     static String Type;
 
     // Attributes.
-protected:  
+protected:
+    FunctionInvocation() {}
+
+    void writeOperands(std::ostream& os, OperandVector::const_iterator begin,
+                       OperandVector::const_iterator end) const;
+
     String mFunctionName;
     String mReturnType;
     OperandVector mOperands;    
+};
+
+/// shorthand for "lhs = rhs;" insted of using FFP_Assign(rhs, lhs)
+class _OgreRTSSExport AssignmentAtom : public FunctionInvocation
+{
+public:
+    explicit AssignmentAtom(int groupOrder) { mGroupExecutionOrder = groupOrder; }
+    AssignmentAtom(ParameterPtr lhs, ParameterPtr rhs, int groupOrder);
+    void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
+    const String& getFunctionAtomType() { return Type; }
+
+    static String Type;
 };
 
 typedef vector<FunctionAtom*>::type                 FunctionAtomInstanceList;

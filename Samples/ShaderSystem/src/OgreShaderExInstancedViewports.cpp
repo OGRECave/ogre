@@ -206,9 +206,8 @@ bool ShaderExInstancedViewports::addFunctionInvocations(ProgramSet* programSet)
 bool ShaderExInstancedViewports::addVSInvocations( Function* vsMain, const int groupOrder )
 {
     FunctionInvocation* funcInvocation = NULL;
-    int internalCounter = 0;
     
-    funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_INSTANCED_VIEWPORTS_TRANSFORM, groupOrder, internalCounter++);
+    funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_INSTANCED_VIEWPORTS_TRANSFORM, groupOrder);
     funcInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
     funcInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
     funcInvocation->pushOperand(mProjectionMatrix, Operand::OPS_IN);
@@ -222,13 +221,13 @@ bool ShaderExInstancedViewports::addVSInvocations( Function* vsMain, const int g
     vsMain->addAtomInstance(funcInvocation);
 
     // Output position in projective space.
-    funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
+    funcInvocation = OGRE_NEW AssignmentAtom( groupOrder);
     funcInvocation->pushOperand(mVSOriginalOutPositionProjectiveSpace, Operand::OPS_IN);
     funcInvocation->pushOperand(mVSOutPositionProjectiveSpace, Operand::OPS_OUT);
     vsMain->addAtomInstance(funcInvocation);
 
     // Output monitor index.
-    funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
+    funcInvocation = OGRE_NEW AssignmentAtom( groupOrder);
     funcInvocation->pushOperand(mVSInMonitorIndex, Operand::OPS_IN);
     funcInvocation->pushOperand(mVSOutMonitorIndex, Operand::OPS_OUT);
     vsMain->addAtomInstance(funcInvocation);
@@ -240,9 +239,8 @@ bool ShaderExInstancedViewports::addVSInvocations( Function* vsMain, const int g
 bool ShaderExInstancedViewports::addPSInvocations( Function* psMain, const int groupOrder )
 {
     FunctionInvocation* funcInvocation = NULL;
-    int internalCounter = 0;
 
-    funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_INSTANCED_VIEWPORTS_DISCARD_OUT_OF_BOUNDS, groupOrder, internalCounter++);
+    funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_INSTANCED_VIEWPORTS_DISCARD_OUT_OF_BOUNDS, groupOrder);
     funcInvocation->pushOperand(mPSInMonitorsCount, Operand::OPS_IN);
     funcInvocation->pushOperand(mPSInMonitorIndex, Operand::OPS_IN);
     funcInvocation->pushOperand(mPSInPositionProjectiveSpace, Operand::OPS_IN);

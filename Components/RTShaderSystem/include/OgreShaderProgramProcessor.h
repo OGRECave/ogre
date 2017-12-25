@@ -230,10 +230,10 @@ protected:
     void rebuildParameterList(Function* func, int paramsUsage, MergeParameterList& mergedParams);
 
     /** Rebuild function invocations by replacing references to old source parameters with the matching merged parameters components. */
-    void rebuildFunctionInvocations(FunctionAtomInstanceList& funcAtomList, MergeParameterList& mergedParams, LocalParameterMap& localParamsMap);
+    void rebuildFunctionInvocations(const FunctionAtomInstanceList& funcAtomList, MergeParameterList& mergedParams, LocalParameterMap& localParamsMap);
 
     /** Builds a map between parameter and all the references to it. */
-    void buildParameterReferenceMap(FunctionAtomInstanceList& funcAtomList, ParameterOperandMap& paramsRefMap);
+    void buildParameterReferenceMap(const FunctionAtomInstanceList& funcAtomList, ParameterOperandMap& paramsRefMap);
 
     /** Replace references to old parameters with the new merged parameters. */
     void replaceParametersReferences(MergeParameterList& mergedParams, ParameterOperandMap& paramsRefMap);

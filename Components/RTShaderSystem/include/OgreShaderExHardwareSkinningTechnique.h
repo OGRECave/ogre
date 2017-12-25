@@ -138,7 +138,6 @@ protected:
     ParameterPtr mParamTempFloat3;
     ParameterPtr mParamLocalPositionWorld;
     ParameterPtr mParamLocalNormalWorld;
-    ParameterPtr mParamLocalNormal;
     //ParameterPtr mParamLocalTangentWorld;
     //ParameterPtr mParamLocalBinormalWorld;
     ParameterPtr mParamOutPositionProj;

@@ -159,29 +159,29 @@ protected:
     /** 
     Internal method that adds related vertex shader functions invocations.
     */
-    bool addVSInvocation(Ogre::RTShader::Function* vsMain, const int groupOrder, int& internalCounter);
+    bool addVSInvocation(Ogre::RTShader::Function* vsMain, const int groupOrder);
 
 
     /** 
     Internal method that adds global illumination component functions invocations.
     */
-    bool addPSGlobalIlluminationInvocationBegin(Ogre::RTShader::Function* psMain, const int groupOrder, int& internalCounter);
-    bool addPSGlobalIlluminationInvocationEnd(Ogre::RTShader::Function* psMain, const int groupOrder, int& internalCounter);
+    bool addPSGlobalIlluminationInvocationBegin(Ogre::RTShader::Function* psMain, const int groupOrder);
+    bool addPSGlobalIlluminationInvocationEnd(Ogre::RTShader::Function* psMain, const int groupOrder);
 
     /** 
     Internal method that adds per light illumination component functions invocations.
     */
-    bool addPSIlluminationInvocation(LightParams* curLightParams, Ogre::RTShader::Function* psMain, const int groupOrder, int& internalCounter);
+    bool addPSIlluminationInvocation(LightParams* curLightParams, Ogre::RTShader::Function* psMain, const int groupOrder);
 
     /** 
     Internal method that adds light illumination component calculated from the segmented texture.
     */
-    bool addPSSegmentedTextureLightInvocation(Ogre::RTShader::Function* psMain, const int groupOrder, int& internalCounter);
+    bool addPSSegmentedTextureLightInvocation(Ogre::RTShader::Function* psMain, const int groupOrder);
 
     /** 
     Internal method that adds the final colour assignments.
     */
-    bool addPSFinalAssignmentInvocation(Ogre::RTShader::Function* psMain, const int groupOrder, int& internalCounter);
+    bool addPSFinalAssignmentInvocation(Ogre::RTShader::Function* psMain, const int groupOrder);
 
 
     // Attributes.

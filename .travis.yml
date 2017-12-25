@@ -23,6 +23,7 @@ addons:
     - libgl1-mesa-dev
     - libglu1-mesa-dev # legacy GL RenderSystem only
     - python3-dev
+    - python3-lxml     # for validate script
     - nvidia-cg-dev
     - swig3.0
 before_script:
@@ -61,6 +62,9 @@ script:
     # run unit tests
     - if [ $TEST ]; then bin/Test_Ogre ; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" -a "$IOS" != "TRUE" ]; then bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre ; fi
+    # XMLConverter works & validates
+    - if [ $TEST ]; then bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton ; fi
+    - if [ $TEST ]; then python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml ; fi
     # run visual tests
     - if [ $TEST ]; then cd bin && ./TestContext -rs "OpenGL Rendering Subsystem" ; fi
     # verify that the python modules are loadable

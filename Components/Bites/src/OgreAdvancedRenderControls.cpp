@@ -171,6 +171,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
     else if (key == SDLK_F3) {
         static bool usePerPixelLighting = true;
 
+        //![rtss_per_pixel]
         // Grab the scheme render state.
         Ogre::RTShader::RenderState* schemRenderState =
             mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -183,6 +184,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
 
             schemRenderState->addTemplateSubRenderState(perPixelLightModel);
         }
+        //![rtss_per_pixel]
 
         // Search the per pixel sub render state and remove it.
         else {

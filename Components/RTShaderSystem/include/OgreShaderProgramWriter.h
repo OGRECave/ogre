@@ -43,15 +43,6 @@ namespace RTShader {
 *  @{
 */
 
-// Uniform comparer
-struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
-{
-    bool operator()( const UniformParameterPtr& uniform, const String& name ) const
-    {
-        return uniform->getName() == name;
-    }
-};
-
 /** Base class interface for shader program writers.
 The main usage of this class is to generate a shader source code from the given CPU program.
 In order to support specific shader language one should subclass this interface and implement the pure methods.

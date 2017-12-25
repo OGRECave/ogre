@@ -143,6 +143,7 @@ namespace OgreBites
         bool mouseReleased(const MouseButtonEvent& evt);
 
     protected:
+        Ogre::Real getDistToTarget();
 
         Ogre::SceneNode* mCamera;
         CameraStyle mStyle;

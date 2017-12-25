@@ -144,19 +144,16 @@ public:
     */
     void addAtomInstance(FunctionAtom* atomInstance);
 
+    /// shorthand for a simple assignment "a = b;"
+    void addAtomAssign(ParameterPtr lhs, ParameterPtr rhs, int groupOrder);
+
     /** Delete a function atom instance from this function. 
     @param atomInstance The atom instance to OGRE_DELETE.
     */
     bool deleteAtomInstance(FunctionAtom* atomInstance);
 
-    /** Sort all atom instances of this function. */
-    void sortAtomInstances();
-
-    /** Return list of atom instances composing this function. */
-    FunctionAtomInstanceList& getAtomInstances() { return mAtomInstances; }
-
     /** Return list of atom instances composing this function. (Const version) */
-    const FunctionAtomInstanceList& getAtomInstances() const { return mAtomInstances; }
+    const FunctionAtomInstanceList& getAtomInstances();
 
     /** Add input parameter to this function. */
     void addInputParameter(ParameterPtr parameter);
@@ -210,7 +207,8 @@ protected:
     // Local parameters.
     ShaderParameterList mLocalParameters;
     // Atom instances composing this function.
-    FunctionAtomInstanceList mAtomInstances;
+    map<size_t, FunctionAtomInstanceList>::type mAtomInstances;
+    FunctionAtomInstanceList mSortedAtomInstances;
     // Function type
     FunctionType mFunctionType;
     

@@ -70,22 +70,20 @@ public:
 
 protected:
     /** Adds functions to calculate position data in world, object and projective space */
-    void addPositionCalculations(Function* vsMain, int& funcCounter);
+    void addPositionCalculations(Function* vsMain);
 
     /** Adds the weight of a given position for a given index */
-    void addIndexedPositionWeight(Function* vsMain, int index, int& funcCounter);
+    void addIndexedPositionWeight(Function* vsMain, int index);
 
     /** Adds the calculations for calculating a normal related element */
     void addNormalRelatedCalculations(Function* vsMain,
-                        ParameterPtr& pNormalIn,
                         ParameterPtr& pNormalRelatedParam,
-                        ParameterPtr& pNormalWorldRelatedParam,
-                        int& funcCounter);
+                        ParameterPtr& pNormalWorldRelatedParam);
 
     /** Adds the weight of a given normal related parameter for a given index */
     void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalRelatedParam,
                         ParameterPtr& pNormalWorldRelatedParam,
-                        int index, int& funcCounter);
+                        int index);
 };
 
 }

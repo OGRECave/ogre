@@ -41,8 +41,13 @@ Function::Function(const String& name, const String& desc, const FunctionType fu
 //-----------------------------------------------------------------------------
 Function::~Function()
 {
-    for (FunctionAtomInstanceIterator it=mAtomInstances.begin(); it != mAtomInstances.end(); ++it)      
-        OGRE_DELETE (*it);
+    map<size_t, FunctionAtomInstanceList>::iterator jt;
+    for(jt = mAtomInstances.begin(); jt != mAtomInstances.end(); ++jt)
+    {
+        for (FunctionAtomInstanceIterator it=jt->second.begin(); it != jt->second.end(); ++it)
+            OGRE_DELETE (*it);
+    }
+
     mAtomInstances.clear();
 
     for (ShaderParameterIterator it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
@@ -457,20 +462,28 @@ ParameterPtr Function::getParameterByContent(const ShaderParameterList& paramete
 //-----------------------------------------------------------------------------
 void Function::addAtomInstance(FunctionAtom* atomInstance)
 {
-    mAtomInstances.push_back(atomInstance);
+    mAtomInstances[atomInstance->getGroupExecutionOrder()].push_back(atomInstance);
+    mSortedAtomInstances.clear();
+}
+
+//-----------------------------------------------------------------------------
+void Function::addAtomAssign(ParameterPtr lhs, ParameterPtr rhs, int groupOrder)
+{
+    addAtomInstance(OGRE_NEW AssignmentAtom(lhs, rhs, groupOrder));
 }
 
 //-----------------------------------------------------------------------------
 bool Function::deleteAtomInstance(FunctionAtom* atomInstance)
 {
     FunctionAtomInstanceIterator it;
-
-    for (it=mAtomInstances.begin(); it != mAtomInstances.end(); ++it)
+    size_t g = atomInstance->getGroupExecutionOrder();
+    for (it=mAtomInstances[g].begin(); it != mAtomInstances[g].end(); ++it)
     {
         if (*it == atomInstance)
         {
             OGRE_DELETE atomInstance;
-            mAtomInstances.erase(it);
+            mAtomInstances[g].erase(it);
+            mSortedAtomInstances.clear();
             return true;
         }       
     }
@@ -479,23 +492,21 @@ bool Function::deleteAtomInstance(FunctionAtom* atomInstance)
     
 }
 
-namespace {
-    struct CmpAtomInstance {
-        bool operator()(const FunctionAtom* a, const FunctionAtom* b) const
-        {
-            if (a->getGroupExecutionOrder() < b->getGroupExecutionOrder())
-                return true;
-            if (b->getGroupExecutionOrder() < a->getGroupExecutionOrder())
-                return false;
-            return a->getInternalExecutionOrder() < b->getInternalExecutionOrder();
-        }
-    };
-}
-
 //-----------------------------------------------------------------------------
-void Function::sortAtomInstances()
+const FunctionAtomInstanceList& Function::getAtomInstances()
 {
-    std::sort(mAtomInstances.begin(), mAtomInstances.end(), CmpAtomInstance());
+    if(!mSortedAtomInstances.empty())
+        return mSortedAtomInstances;
+
+    // put atom instances into order
+    map<size_t, FunctionAtomInstanceList>::const_iterator it;
+    for(it = mAtomInstances.begin(); it != mAtomInstances.end(); ++it)
+    {
+        mSortedAtomInstances.insert(mSortedAtomInstances.end(), it->second.begin(),
+                                    it->second.end());
+    }
+
+    return mSortedAtomInstances;
 }
 
 //-----------------------------------------------------------------------------

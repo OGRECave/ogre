@@ -533,8 +533,7 @@ void Sample_ShaderSystem::setupUI()
     // Allow reflection map only on PS3 and above since with all lights on + specular + bump we 
     // exceed the instruction count limits of PS2.
     if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") ||
-        GpuProgramManager::getSingleton().isSyntaxSupported("glsles") ||
-        GpuProgramManager::getSingleton().isSyntaxSupported("fp30"))
+        !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0"))
     {
         mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map", 240)->setChecked(mReflectionMapEnable);
         mReflectionPowerSlider = mTrayMgr->createThickSlider(TL_BOTTOM, REFLECTIONMAP_POWER_SLIDER, "Reflection Power", 240, 80, 0, 1, 100);

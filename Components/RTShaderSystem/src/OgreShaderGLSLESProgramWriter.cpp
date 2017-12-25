@@ -65,7 +65,7 @@ namespace Ogre {
             returnType      = leftTokens2[0];
             functionName    = leftTokens2[1];
 
-            invoc = OGRE_NEW FunctionInvocation(functionName, 0, 0, returnType);
+            invoc = OGRE_NEW FunctionInvocation(functionName, 0, returnType);
 
             // Split out the parameters
             StringVector parameters;
@@ -80,13 +80,13 @@ namespace Ogre {
                 parameters = StringUtil::split(input, ",");
             }
 
-            StringVector::const_iterator itParam;
+            StringVector::iterator itParam;
             int i = 0;
             for(itParam = parameters.begin(); itParam != parameters.end(); ++itParam, i++)
             {
-                StringUtil::replaceAll(*itParam, ")", "");
-                StringUtil::replaceAll(*itParam, ",", "");
+                *itParam = StringUtil::replaceAll(*itParam, ")", "");
                 StringVector paramTokens = StringUtil::split(*itParam, " ");
+
                 // There should be three parts for each token
                 // 1. The operand type(in, out, inout)
                 // 2. The type
@@ -268,7 +268,7 @@ namespace Ogre {
             const ShaderFunctionList& functionList = program->getFunctions();
 
             Function* curFunction = *(functionList.begin());
-            FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
+            const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
             FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
             FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
             // Now iterate over all function atoms
@@ -316,7 +316,7 @@ namespace Ogre {
             for (FunctionVector::const_iterator it = forwardDecl.begin(); it != forwardDecl.end(); ++it)
             {
                 FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
-                FunctionInvocation invoc = FunctionInvocation("", 0, 0);
+                FunctionInvocation invoc = FunctionInvocation("", 0);
                 String body;
 
                 // Find the function in the cache
@@ -332,69 +332,7 @@ namespace Ogre {
 
                 if(invoc.getFunctionName().length())
                 {
-                    // Write out the function from the cached FunctionInvocation;
-                    os << invoc.getReturnType();
-                    os << " ";
-                    os << invoc.getFunctionName();
-                    os << "(";
-
-                    FunctionInvocation::OperandVector::iterator itOperand    = invoc.getOperandList().begin();
-                    FunctionInvocation::OperandVector::iterator itOperandEnd = invoc.getOperandList().end();
-                    for (; itOperand != itOperandEnd;)
-                    {
-                        Operand op = *itOperand;
-                        Operand::OpSemantic opSemantic = op.getSemantic();
-                        String paramName = op.getParameter()->getName();
-                        int opMask = (*itOperand).getMask();
-                        GpuConstantType gpuType = GCT_UNKNOWN;
-
-                        switch(opSemantic)
-                        {
-                        case Operand::OPS_IN:
-                            os << "in ";
-                            break;
-
-                        case Operand::OPS_OUT:
-                            os << "out ";
-                            break;
-
-                        case Operand::OPS_INOUT:
-                            os << "inout ";
-                            break;
-
-                        default:
-                            break;
-                        }
-
-                        // Swizzle masks are only defined for types like vec2, vec3, vec4.
-                        if (opMask == Operand::OPM_ALL)
-                        {
-                            gpuType = op.getParameter()->getType();
-                        }
-                        else
-                        {
-                            // Now we have to convert the mask to operator
-                            gpuType = Operand::getGpuConstantType(opMask);
-                        }
-
-                        // We need a valid type otherwise glsl compilation will not work
-                        if (gpuType == GCT_UNKNOWN)
-                        {
-                            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                                "Can not convert Operand::OpMask to GpuConstantType", 
-                                "GLSLESProgramWriter::writeProgramDependencies" );  
-                        }
-
-                        os << mGpuConstTypeMap[gpuType] << " " << paramName;
-
-                        ++itOperand;
-
-                        // Prepare for the next operand
-                        if (itOperand != itOperandEnd)
-                        {
-                            os << ", ";
-                        }
-                    }
+                    writeFunctionDeclaration(os, invoc);
                     os << std::endl << "{" << std::endl << body << std::endl << "}" << std::endl;
                 }
             }

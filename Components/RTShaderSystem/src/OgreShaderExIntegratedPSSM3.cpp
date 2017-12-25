@@ -268,28 +268,25 @@ bool IntegratedPSSM3::addFunctionInvocations(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuVertexProgram(); 
     Function* vsMain = vsProgram->getEntryPointFunction();  
     Program* psProgram = programSet->getCpuFragmentProgram();
-    int internalCounter;
 
     // Add vertex shader invocations.
-    internalCounter = 0;
-    if (false == addVSInvocation(vsMain, FFP_VS_TEXTURING + 1, internalCounter))
+    if (false == addVSInvocation(vsMain, FFP_VS_TEXTURING + 1))
         return false;
 
     // Add pixel shader invocations.
-    internalCounter = 0;
-    if (false == addPSInvocation(psProgram, FFP_PS_COLOUR_BEGIN + 2, internalCounter))
+    if (false == addPSInvocation(psProgram, FFP_PS_COLOUR_BEGIN + 2))
         return false;
 
     return true;
 }
 
 //-----------------------------------------------------------------------
-bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder, int& internalCounter)
+bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder)
 {
     FunctionInvocation* curFuncInvocation;
 
     // Output the vertex depth in camera space.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);                                
+    curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
     curFuncInvocation->pushOperand(mVSOutPos, Operand::OPS_IN, Operand::OPM_Z); 
     curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);  
     vsMain->addAtomInstance(curFuncInvocation); 
@@ -300,7 +297,7 @@ bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder, in
 
     while(it != mShadowTextureParamsList.end())
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, groupOrder, internalCounter++);                                 
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, groupOrder);
         curFuncInvocation->pushOperand(it->mWorldViewProjMatrix, Operand::OPS_IN);  
         curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);
         curFuncInvocation->pushOperand(it->mVSOutLightPosition, Operand::OPS_OUT);  
@@ -313,7 +310,7 @@ bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder, in
 }
 
 //-----------------------------------------------------------------------
-bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder, int& internalCounter)
+bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
 {
     Function* psMain = psProgram->getEntryPointFunction();
     FunctionInvocation* curFuncInvocation;
@@ -323,7 +320,7 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder, 
     ShadowTextureParams& splitParams2 = mShadowTextureParamsList[2];
 
     // Compute shadow factor.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_COMPUTE_SHADOW_COLOUR3, groupOrder, internalCounter++);                                
+    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_COMPUTE_SHADOW_COLOUR3, groupOrder);
     curFuncInvocation->pushOperand(mPSInDepth, Operand::OPS_IN);    
     curFuncInvocation->pushOperand(mPSSplitPoints, Operand::OPS_IN);        
     curFuncInvocation->pushOperand(splitParams0.mPSInLightPosition, Operand::OPS_IN);   
@@ -339,7 +336,7 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder, 
     psMain->addAtomInstance(curFuncInvocation); 
     
     // Apply shadow factor on diffuse colour.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_APPLYSHADOWFACTOR_DIFFUSE, groupOrder, internalCounter++);                                 
+    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_APPLYSHADOWFACTOR_DIFFUSE, groupOrder);
     curFuncInvocation->pushOperand(mPSDerivedSceneColour, Operand::OPS_IN);     
     curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);    
     curFuncInvocation->pushOperand(mPSLocalShadowFactor, Operand::OPS_IN);  
@@ -347,14 +344,14 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder, 
     psMain->addAtomInstance(curFuncInvocation); 
 
     // Apply shadow factor on specular colour.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_MODULATE_SCALAR, groupOrder, internalCounter++);                               
+    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_MODULATE_SCALAR, groupOrder);
     curFuncInvocation->pushOperand(mPSLocalShadowFactor, Operand::OPS_IN);      
     curFuncInvocation->pushOperand(mPSSpecualr, Operand::OPS_IN);   
     curFuncInvocation->pushOperand(mPSSpecualr, Operand::OPS_OUT);      
     psMain->addAtomInstance(curFuncInvocation);
 
     // Assign the local diffuse to output diffuse.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);                                
+    curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
     curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);    
     curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);    
     psMain->addAtomInstance(curFuncInvocation);

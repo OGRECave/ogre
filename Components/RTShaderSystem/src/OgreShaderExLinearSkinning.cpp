@@ -77,7 +77,6 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
     //local param
     mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT4);
     mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);
-    mParamLocalNormal = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
     //mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);
     //mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);
 
@@ -158,20 +157,18 @@ bool LinearSkinning::addFunctionInvocations(ProgramSet* programSet)
 
     Program* vsProgram = programSet->getCpuVertexProgram();
     Function* vsMain = vsProgram->getEntryPointFunction();
-    int internalCounter = 0;
 
     //add functions to calculate position data in world, object and projective space
-    addPositionCalculations(vsMain, internalCounter);
+    addPositionCalculations(vsMain);
 
     //add functions to calculate normal and normal related data in world and object space
-    addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormal, mParamLocalNormalWorld, internalCounter);
     //addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
     //addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
     return true;
 }
 
 //-----------------------------------------------------------------------
-void LinearSkinning::addPositionCalculations(Function* vsMain, int& funcCounter)
+void LinearSkinning::addPositionCalculations(Function* vsMain)
 {
     FunctionInvocation* curFuncInvocation = NULL;
 
@@ -180,18 +177,18 @@ void LinearSkinning::addPositionCalculations(Function* vsMain, int& funcCounter)
         //set functions to calculate world position
         for(int i = 0 ; i < getWeightCount() ; ++i)
         {
-            addIndexedPositionWeight(vsMain, i, funcCounter);
+            addIndexedPositionWeight(vsMain, i);
         }
 
         //update back the original position relative to the object
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_OUT);
         vsMain->addAtomInstance(curFuncInvocation);
 
         //update the projective position thereby filling the transform stage role
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamInViewProjMatrix, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamOutPositionProj, Operand::OPS_OUT);
@@ -200,14 +197,14 @@ void LinearSkinning::addPositionCalculations(Function* vsMain, int& funcCounter)
     else
     {
         //update from object to world space
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamInWorldMatrix, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);
         vsMain->addAtomInstance(curFuncInvocation);
 
         //update from object to projective space
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamInWorldViewProjMatrix, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamOutPositionProj, Operand::OPS_OUT);
@@ -217,29 +214,21 @@ void LinearSkinning::addPositionCalculations(Function* vsMain, int& funcCounter)
 
 //-----------------------------------------------------------------------
 void LinearSkinning::addNormalRelatedCalculations(Function* vsMain,
-                                ParameterPtr& pNormalIn,
                                 ParameterPtr& pNormalRelatedParam,
-                                ParameterPtr& pNormalWorldRelatedParam,
-                                int& funcCounter)
+                                ParameterPtr& pNormalWorldRelatedParam)
 {
     FunctionInvocation* curFuncInvocation;
-
-    // allow writing to normal parameter
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
-    curFuncInvocation->pushOperand(pNormalIn, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
-    vsMain->addAtomInstance(curFuncInvocation);
 
     if (mDoBoneCalculations == true)
     {
         //set functions to calculate world normal
         for(int i = 0 ; i < getWeightCount() ; ++i)
         {
-            addIndexedNormalRelatedWeight(vsMain, pNormalRelatedParam, pNormalWorldRelatedParam, i, funcCounter);
+            addIndexedNormalRelatedWeight(vsMain, pNormalRelatedParam, pNormalWorldRelatedParam, i);
         }
 
         //update back the original position relative to the object
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
@@ -248,7 +237,7 @@ void LinearSkinning::addNormalRelatedCalculations(Function* vsMain,
     else
     {
         //update from object to world space
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamInWorldMatrix, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);
@@ -259,14 +248,14 @@ void LinearSkinning::addNormalRelatedCalculations(Function* vsMain,
 
 //-----------------------------------------------------------------------
 void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
-                                int index, int& funcCounter)
+                                int index)
 {
     Operand::OpMask indexMask = indexToMask(index);
 
     FunctionInvocation* curFuncInvocation;
 
     //multiply position with world matrix and put into temporary param
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
     curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
     curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
@@ -274,13 +263,13 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
     vsMain->addAtomInstance(curFuncInvocation);
 
     //set w value of temporary param to 1
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+    curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_VS_TRANSFORM);
     curFuncInvocation->pushOperand(ParameterFactory::createConstParam(1.0f), Operand::OPS_IN);
     curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, Operand::OPM_W);
     vsMain->addAtomInstance(curFuncInvocation);
 
     //multiply temporary param with  weight
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM, funcCounter++);
+    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM);
     curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
     curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT);
@@ -290,7 +279,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
     if (index == 0)
     {
         //set the local param as the value of the world param
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);
         vsMain->addAtomInstance(curFuncInvocation);
@@ -298,7 +287,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
     else
     {
         //add the local param as the value of the world param
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);
@@ -311,7 +300,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
 void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
                                 ParameterPtr& pNormalParam,
                                 ParameterPtr& pNormalWorldRelatedParam,
-                                int index, int& funcCounter)
+                                int index)
 {
 
     FunctionInvocation* curFuncInvocation;
@@ -319,7 +308,7 @@ void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
     Operand::OpMask indexMask = indexToMask(index);
 
     //multiply position with world matrix and put into temporary param
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
     curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN, Operand::OPM_ALL);
     curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
     curFuncInvocation->pushOperand(pNormalParam, Operand::OPS_IN);
@@ -327,7 +316,7 @@ void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
     vsMain->addAtomInstance(curFuncInvocation);
 
     //multiply temporary param with weight
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM, funcCounter++);
+    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM);
     curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
     curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_OUT);
@@ -337,7 +326,7 @@ void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
     if (index == 0)
     {
         //set the local param as the value of the world normal
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);
         vsMain->addAtomInstance(curFuncInvocation);
@@ -345,7 +334,7 @@ void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
     else
     {
         //add the local param as the value of the world normal
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);

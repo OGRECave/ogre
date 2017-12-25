@@ -37,6 +37,7 @@ namespace RTShader {
 
     class Function;
     class Program;
+    class FunctionInvocation;
 
 /** \addtogroup Optional
 *  @{
@@ -87,6 +88,7 @@ protected:
 
     /** Write forward declarations. This is needed so that we can attach library shader at a later step. */
     void writeForwardDeclarations(std::ostream& os, Program* program);
+    void writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func);
 
     /** Write the input params of the function */
     void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
@@ -107,15 +109,12 @@ protected:
     // Map between parameter semantic to string value.
     ParamSemanticToStringMap mParamSemanticMap;
 
-    // Map parameter name to a new parameter name (sometime renaming is required to match names between vertex and fragment shader)
-    StringMap mInputToGLStatesMap;
+    set<String>::type mLocalRenames;
+
     // Map parameter content to vertex attributes 
     ParamContentToStringMap mContentToPerVertexAttributes;
     // Holds the current glsl version
     int mGLSLVersion;
-    // Holds the fragment input params 
-    StringVector mFragInputParams;
-
     // set by derived class
     bool mIsGLSLES;
 };

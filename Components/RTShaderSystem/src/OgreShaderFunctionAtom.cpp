@@ -55,8 +55,28 @@ Operand& Operand::operator= (const Operand & other)
 //-----------------------------------------------------------------------------
 Operand::~Operand()
 {
-    // nothing todo
+    // nothing to do
 }
+
+void Operand::setMaskToParamType()
+{
+    switch (mParameter->getType())
+    {
+    case GCT_FLOAT1:
+        mMask = OPM_X;
+        break;
+    case GCT_FLOAT2:
+        mMask = OPM_XY;
+        break;
+    case GCT_FLOAT3:
+        mMask = OPM_XYZ;
+        break;
+    default:
+        mMask = OPM_ALL;
+        break;
+    }
+}
+
 //-----------------------------------------------------------------------------
 String Operand::getMaskAsString(int mask)
 {
@@ -157,7 +177,6 @@ String Operand::toString() const
 FunctionAtom::FunctionAtom()
 {
     mGroupExecutionOrder   = -1;
-    mInternalExecutionOrder = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -166,22 +185,22 @@ int FunctionAtom::getGroupExecutionOrder() const
     return mGroupExecutionOrder;
 }
 
-//-----------------------------------------------------------------------------
-int FunctionAtom::getInternalExecutionOrder() const
-{
-    return mInternalExecutionOrder;
-}
-
-
 String FunctionInvocation::Type = "FunctionInvocation";
 
 //-----------------------------------------------------------------------
-FunctionInvocation::FunctionInvocation(const String& functionName, 
-                                       int groupOrder, int internalOrder, String returnType) :
+FunctionInvocation::FunctionInvocation(const String& functionName, int groupOrder,
+                                       const String& returnType)
+    : mFunctionName(functionName), mReturnType(returnType)
+{
+    mGroupExecutionOrder = groupOrder;
+}
+
+//-----------------------------------------------------------------------
+FunctionInvocation::FunctionInvocation(const String& functionName,
+                                       int groupOrder, int, String returnType) :
     mFunctionName(functionName), mReturnType(returnType)
 {
     mGroupExecutionOrder = groupOrder;
-    mInternalExecutionOrder = internalOrder;
 }
 
 //-----------------------------------------------------------------------------
@@ -189,7 +208,6 @@ FunctionInvocation::FunctionInvocation(const FunctionInvocation& other) :
     mFunctionName(other.mFunctionName), mReturnType(other.mReturnType)
 {
     mGroupExecutionOrder = other.mGroupExecutionOrder;
-    mInternalExecutionOrder = other.mInternalExecutionOrder;
     
     for ( OperandVector::const_iterator it = other.mOperands.begin(); it != other.mOperands.end(); ++it)
         mOperands.push_back(Operand(*it));
@@ -200,20 +218,31 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
 {
     // Write function name.
     os << mFunctionName << "(";
+    writeOperands(os, mOperands.begin(), mOperands.end());
+    // Write function call closer.
+    os << ");";
+}
 
+void FunctionInvocation::writeOperands(std::ostream& os, OperandVector::const_iterator begin,
+                                       OperandVector::const_iterator end) const
+{
     // Write parameters.
     ushort curIndLevel = 0;
-    for (OperandVector::const_iterator it = mOperands.begin(); it != mOperands.end(); )
+    for (OperandVector::const_iterator it = begin; it != end; )
     {
-        os << (*it).toString();
+        os << it->toString();
         ++it;
 
         ushort opIndLevel = 0;
         if (it != mOperands.end())
         {
-            opIndLevel = (*it).getIndirectionLevel();
+            opIndLevel = it->getIndirectionLevel();
         }
 
+        if (curIndLevel != 0)
+        {
+            os << ")";
+        }
         if (curIndLevel < opIndLevel)
         {
             while (curIndLevel < opIndLevel)
@@ -233,15 +262,16 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
             {
                 os << "][";
             }
-            else if (it != mOperands.end())
+            else if (it != end)
             {
                 os << ", ";
             }
         }
+        if (curIndLevel != 0)
+        {
+            os << "int("; // required by GLSL
+        }
     }
-
-    // Write function call closer.
-    os << ");";
 }
 
 //-----------------------------------------------------------------------
@@ -410,6 +440,26 @@ bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocati
 
     // Passed all tests, they are the same
     return true;
+}
+
+String AssignmentAtom::Type = "AssignmentAtom";
+AssignmentAtom::AssignmentAtom(ParameterPtr lhs, ParameterPtr rhs, int groupOrder) {
+    // do this backwards for compatibility with FFP_FUNC_ASSIGN calls
+    pushOperand(rhs, Operand::OPS_IN);
+    pushOperand(lhs, Operand::OPS_OUT);
+    mGroupExecutionOrder = groupOrder;
+}
+
+void AssignmentAtom::writeSourceCode(std::ostream& os, const String& targetLanguage) const
+{
+    OperandVector::const_iterator outOp = mOperands.begin();
+    // find the output operand
+    while(outOp->getSemantic() != Operand::OPS_OUT)
+        outOp++;
+    writeOperands(os, outOp, mOperands.end());
+    os << "\t=\t";
+    writeOperands(os, mOperands.begin(), outOp);
+    os << ";";
 }
 
 }

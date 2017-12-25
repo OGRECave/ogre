@@ -168,12 +168,12 @@ protected:
     /** 
     Internal method that adds global illumination component functions invocations.
     */
-    bool addGlobalIlluminationInvocation(Function* vsMain, const int groupOrder, int& internalCounter);
+    bool addGlobalIlluminationInvocation(Function* vsMain, const int groupOrder);
             
     /** 
     Internal method that adds per light illumination component functions invocations.
     */
-    bool addIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder, int& internalCounter);
+    bool addIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder);
 
 
 // Attributes.
