@@ -172,10 +172,9 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
     Technique* pFirstTech = srcPass->getParent()->getParent()->getTechnique(0);
     const Any& hsAny = pFirstTech->getUserObjectBindings().getUserAny(HS_DATA_BIND_NAME);
 
-    if (hsAny.isEmpty() == false)
+    if (hsAny.has_value())
     {
-        HardwareSkinning::SkinningData pData =
-            (any_cast<HardwareSkinning::SkinningData>(hsAny));
+        HardwareSkinning::SkinningData pData = any_cast<HardwareSkinning::SkinningData>(hsAny);
         isValid = pData.isValid;
         
         //If the skinning data is being passed through the material, we need to create an instance of the appropriate
@@ -514,9 +513,9 @@ bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, 
         //get the previous skinning data if available
         UserObjectBindings& binding = pMaterial->getTechnique(0)->getUserObjectBindings();
         const Any& hsAny = binding.getUserAny(HS_DATA_BIND_NAME);
-        if (hsAny.isEmpty() == false)
+        if (hsAny.has_value())
         {
-            data = (any_cast<HardwareSkinning::SkinningData>(hsAny));
+            data = any_cast<HardwareSkinning::SkinningData>(hsAny);
         }
 
         //check if we need to update the data
