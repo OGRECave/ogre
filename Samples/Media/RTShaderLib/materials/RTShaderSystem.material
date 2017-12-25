@@ -18,13 +18,15 @@ material RTSS/PerPixel_SinglePass
 			{
 				texture Panels_Diffuse.png
 			}				
-			
+
+	        //![rtss_per_pixel]
 			// RT Shader system section.
  			rtshader_system
  			{	 	
  				// Override lighting stage with per pixel lighting. 			
  				lighting_stage per_pixel				
- 			}			
+ 			}	
+ 			//![rtss_per_pixel]		
 		}				
 	}
 }
