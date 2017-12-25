@@ -6,7 +6,7 @@ This component is used to generate shaders on the fly based on object material p
 
 # Core features of the system {#core-feats}
 * Runtime shader generation synchronized with scene state. Each time scene settings change, a new set of shaders is generated.
-* Full FFP (Fixed Function Pipeline) emulation. This feature is most useful combined with render system that doesn't provide any FFP functionality (OpenGL ES 2.0, D3D11 etc).
+* Full Fixed Function Pipeline (FFP) emulation. This feature is most useful combined with render system that doesn't provide any FFP functionality (OpenGL ES 2.0, D3D11 etc).
 * Shader language independent interface: the logic representation of the shader programs is completely independent from the target shader language. You can generate code for different shader languages from the same program.
 * Pluggable interface allows extending the target shader languages set. 
 * Pluggable interface allows adding new shader based effects to the system in a seamless way. Each effect code will be automatically combined with the rest of the shader code.
@@ -63,7 +63,7 @@ Now that you know what the RTSS does, you are probably wondering how to change w
 
 The RTSS is flexible enough to "just" move the according calculations from the vertex shader to the pixel shader.
 
-## Customising via API
+## Customising via API {#rtss_custom_api}
 
 The first option is to globally enforce per-pixel lighting, you can do the following
 
@@ -71,13 +71,97 @@ The first option is to globally enforce per-pixel lighting, you can do the follo
 
 any non FFP SRS will automatically override the default SRS for the same stage. Ogre::RTShader::FFP_LIGHTING in this case.
 
-## Customizing via Material Script
+## Customizing via Material Script {#rtss_custom_mat}
 
-Alternatively you can enable per-pixel lighting for one material only, by adding a `rtshader_system` section as following
+Alternatively you can enable per-pixel lighting for one material only, by adding a `rtshader_system` section to the pass as following
 
 @snippet Samples/Media/RTShaderLib/materials/RTShaderSystem.material rtss_per_pixel
 
-for more examples on how to use the rtshader_system section in your scripts see `Samples/Media/RTShaderLib/materials/RTShaderSystem.material`.
+for more examples see `Samples/Media/RTShaderLib/materials/RTShaderSystem.material`.
+
+Here are the attributes you can use in a `rtshader_system` section of a .material script:
+
+- [lighting_stage](#lighting_stage)
+- [light_count](#light_count)
+- [triplanarTexturing](#triplanarTexturing)
+- [integrated_pssm4](#integrated_pssm4)
+- [layered_blend](#layered_blend)
+- [source_modifier](#source_modifier)
+
+<a name="lighting_stage"></a>
+
+### lighting_stage
+
+Force a specific lighting model.
+
+Format1: `lighting_stage <ffp|per_pixel>`
+
+Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [none|bilinear|trilinear|anisotropic] [max_anisotropy] [mipmap_bias]`
+
+Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0	bilinear 1 -1.0`
+
+<a name="light_count"></a>
+
+### light_count
+
+Override dynamic light count. Allows to customize which lights the RTSS will consider.
+
+Format: `light_count <pointLights> <directionalLights> <spotLights>`
+
+<a name="triplanarTexturing"></a>
+
+### triplanarTexturing
+
+Force [triplanar texturing](https://www.volume-gfx.com/volume-rendering/triplanar-texturing/)
+
+Format: `triplanarTexturing <textureScale> <plateauSize> <transitionSpeed> <textureFromX> <textureFromY> <textureFromZ>`
+
+Example: `triplanarTexturing 0.05 0.2 4.0 BumpyMetal.jpg egyptrockyfull.jpg MtlPlat2.jpg`
+
+@param textureScale texture coordinates are multiplied by this.
+@param plateauSize plateau on which small components of the normal have no influence. 
+@param transitionSpeed transitions speed between the three textures
+Valid values are [0; 0.57] not bigger to avoid division by zero
+@param textureFromX Texture for the x-direction planar mapping
+@param textureFromY Texture for the y-direction planar mapping
+@param textureFromZ Texture for the z-direction planar mapping
+
+<a name="integrated_pssm4"></a>
+
+### integrated_pssm4
+Integrated PSSM shadow receiver with 3 splits. Custom split points.
+
+Format: `integrated_pssm4 <sp0> <sp1> <sp2> <sp3>`
+
+<a name="layered_blend"></a>
+
+### layered_blend
+
+Apply photoshop-like blend effects to texture layers
+
+Format: `layered_blend <effect>`
+
+Example: layered_blend luminosity
+
+@note only applicable inside a texture_unit section
+
+@param effect one of `default, normal, lighten, darken, multiply, average, add, subtract, difference, negation, exclusion, screen, overlay, hard_light, soft_light, color_dodge, color_burn, linear_dodge, linear_burn, linear_light, vivid_light, pin_light, hard_mix, reflect, glow, phoenix, saturation, color, luminosity`
+
+
+<a name="source_modifier"></a>
+
+### source_modifier
+
+Apply custom modulate effect to texture layer
+
+Format: `source_modifier <operation> custom <parameterNum>`
+
+Example: `source_modifier src1_inverse_modulate custom 2`
+
+@note only applicable inside a texture_unit section
+
+@param operation one of `src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate`
+@param parameterNum number of the custom shader parameter that controls the operation
 
 # The RTSS in Depth {#rtss_indepth}
 
