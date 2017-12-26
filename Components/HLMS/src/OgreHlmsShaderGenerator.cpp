@@ -815,6 +815,8 @@ namespace Ogre
 				PiecesMap::const_iterator it = pieces.find(pieceName);
 				if (it != pieces.end())
 					outBuffer += it->second;
+				else
+				    LogManager::getSingleton().logError("Piece not found: "+argValues[0]);
 			}
 			else
 			{
