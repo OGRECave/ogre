@@ -174,10 +174,10 @@ namespace Ogre
 		Real getLightRoughnessOffset(){ return mLightRoughnessOffset; }
 		void setLightRoughnessOffset(Real val){ mLightRoughnessOffset = val; }
 
-		void setAlbedoTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float blendFactor = 0);
+		void setAlbedoTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float blendFactor = 1);
 		/// set texture containing normals and roughness
-		void setNormalRTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), float normalBlendFactor = 0, float rBlendFactor = 0);
-		void setF0Texture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float blendFactor = 0);
+		void setNormalRTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), float normalBlendFactor = 1, float rBlendFactor = 0);
+		void setF0Texture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float blendFactor = 1);
 		void setOffsetAndScale(MapSlot mapSlot, Vector2 offset, Vector2 scale);
 		void setUvSetIndex(MapSlot mapSlot, uint index);
 

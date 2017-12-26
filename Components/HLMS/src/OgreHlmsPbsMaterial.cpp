@@ -465,6 +465,7 @@ namespace Ogre
 		s.blendFunc = blendFunc;
 		s.blendFactor1 = blendFactor1;
 		s.blendFactor2 = blendFactor2;
+		s.hasBlendFactor1 = s.hasBlendFactor2 = true;
 
 		s.intensity = intensityFactor;
 		s.mipmapCount = !tex ? 0.0f : tex->getNumMipmaps();
