@@ -100,6 +100,9 @@ Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [
 
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0	bilinear 1 -1.0`
 
+@see Ogre::RTShader::NormalMapLighting::NormalMapSpace
+@see Ogre::TextureFilterOptions
+
 <a name="light_count"></a>
 
 ### light_count
