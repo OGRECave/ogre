@@ -605,11 +605,18 @@ void ApplicationContext::locateResources()
 # endif
     type = genLocs.front()->archive->getType();
 
-#ifdef OGRE_BUILD_PLUGIN_CG
-    bool use_HLSL_Cg_shared = true;
-#else
-    bool use_HLSL_Cg_shared = Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl");
-#endif
+    bool hasCgPlugin = false;
+    const Ogre::Root::PluginInstanceList& plugins = getRoot()->getInstalledPlugins();
+    for(size_t i = 0; i < plugins.size(); i++)
+    {
+        if(plugins[i]->getName() == "Cg Program Manager")
+        {
+            hasCgPlugin = true;
+            break;
+        }
+    }
+
+    bool use_HLSL_Cg_shared = hasCgPlugin || Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl");
 
     // Add locations for supported shader languages
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
@@ -638,13 +645,11 @@ void ApplicationContext::locateResources()
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL", type, sec);
     }
-#ifdef OGRE_BUILD_PLUGIN_CG
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/Cg", type, sec);
-#endif
+
+    if(hasCgPlugin)
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/Cg", type, sec);
     if (use_HLSL_Cg_shared)
-    {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL_Cg", type, sec);
-    }
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     mRTShaderLibPath = arch + "/RTShaderLib";
@@ -663,13 +668,12 @@ void ApplicationContext::locateResources()
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/HLSL", type, sec);
     }
-#   ifdef OGRE_BUILD_PLUGIN_CG
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/Cg", type, sec);
-#   endif
+
+    if(hasCgPlugin)
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/Cg", type, sec);
     if (use_HLSL_Cg_shared)
-    {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/HLSL_Cg", type, sec);
-    }
+
 #endif /* OGRE_BUILD_COMPONENT_RTSHADERSYSTEM */
 #endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
 }
