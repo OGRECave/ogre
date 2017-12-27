@@ -1,0 +1,35 @@
+vertex_program glTF2/PBR_vs_glsl glsl
+{
+	source pbr-vert.glsl
+    preprocessor_defines HAS_NORMALS,HAS_TANGENTS,HAS_UV
+}
+
+fragment_program glTF2/PBR_fs_glsl glsl
+{
+	source pbr-frag.glsl
+    preprocessor_defines MANUAL_SRGB,SRGB_FAST_APPROXIMATION,HAS_NORMALS,HAS_TANGENTS,HAS_BASECOLORMAP,HAS_NORMALMAP,HAS_EMISSIVEMAP,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,USE_IBL,USE_TEX_LOD
+}
+
+vertex_program glTF2/PBR_vs_glsles glsles
+{
+	source pbr-vert.glsl
+    preprocessor_defines HAS_NORMALS,HAS_TANGENTS,HAS_UV
+}
+
+fragment_program glTF2/PBR_fs_glsles glsles
+{
+	source pbr-frag.glsl
+    preprocessor_defines MANUAL_SRGB,SRGB_FAST_APPROXIMATION,HAS_NORMALS,HAS_TANGENTS,HAS_BASECOLORMAP,HAS_NORMALMAP,HAS_EMISSIVEMAP,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,USE_IBL
+}
+
+vertex_program glTF2/PBR_vs unified
+{
+	delegate glTF2/PBR_vs_glsl
+	delegate glTF2/PBR_vs_glsles
+}
+
+fragment_program glTF2/PBR_fs unified
+{
+	delegate glTF2/PBR_fs_glsl
+	delegate glTF2/PBR_fs_glsles
+}

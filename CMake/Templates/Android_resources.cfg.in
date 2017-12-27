@@ -13,6 +13,7 @@ APKFileSystem=/fonts
 APKFileSystem=/materials/programs
 APKFileSystem=/materials/scripts
 APKFileSystem=/materials/textures
+APKFileSystem=/materials/textures/glTF2_IBL
 APKFileSystem=/materials/textures/nvidia
 APKFileSystem=/models
 APKFileSystem=/particle
@@ -26,6 +27,7 @@ APKZip=/packs/ogretestmap.zip
 APKZip=/packs/ogredance.zip
 APKZip=/packs/Sinbad.zip
 APKZip=/packs/skybox.zip
+APKZip=/packs/DamagedHelmet.zip
 
-
+APKFileSystem=/PBR
 APKFileSystem=/HLMS

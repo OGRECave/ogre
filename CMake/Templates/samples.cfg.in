@@ -24,6 +24,7 @@ SamplePlugin=Sample_NewInstancing
 SamplePlugin=Sample_Ocean
 SamplePlugin=Sample_ParticleGS
 SamplePlugin=Sample_ParticleFX
+SamplePlugin=Sample_PBR
 @OGRE_COMMENT_COMPONENT_RTSHADERSYSTEM@SamplePlugin=Sample_ShaderSystem
 @OGRE_COMMENT_COMPONENT_RTSHADERSYSTEM@SamplePlugin=Sample_ShaderSystemMultiLight
 @OGRE_COMMENT_COMPONENT_RTSHADERSYSTEM@SamplePlugin=Sample_ShaderSystemTexturedFog

@@ -1,0 +1,67 @@
+material glTF2/PBR
+{
+    technique
+    {
+        pass
+        {
+            texture_unit Albedo
+            {}
+            texture_unit Normal
+            {}
+			texture_unit Emissive
+			{}
+			texture_unit MetalRoughness
+			{}
+			texture_unit AmbientOcclusion
+			{}
+            texture_unit IBL_Diffuse
+			{
+				cubic_texture diffuse.jpg combinedUVW
+			}
+            texture_unit IBL_Specular
+			{
+				cubic_texture specular.jpg combinedUVW
+			}
+			texture_unit IBL_LUT
+			{
+				texture brdfLUT.png
+			}
+
+			vertex_program_ref glTF2/PBR_vs
+			{
+                param_named_auto u_MVPMatrix   worldviewproj_matrix
+                param_named_auto u_ModelMatrix world_matrix		
+			}
+			fragment_program_ref glTF2/PBR_fs
+			{
+                // standard parameters
+				param_named_auto u_LightDirection light_position 0
+                param_named_auto u_LightColor     light_diffuse_colour 0
+                param_named_auto u_Camera         camera_position
+
+                // PBR parameters
+                param_named      u_BaseColorFactor  float4 1 1 1 1
+                param_named      u_NormalScale      float 1
+                param_named      u_EmissiveFactor   float3 1 1 1
+                param_named      u_MetallicRoughnessValues float2 1 1
+                param_named      u_OcclusionStrength float 1
+
+                // GL sampler settings
+                param_named      u_BaseColorSampler   int 0
+                param_named      u_NormalSampler      int 1
+                param_named      u_EmissiveSampler    int 2
+                param_named      u_MetallicRoughnessSampler int 3
+                param_named      u_OcclusionSampler   int 4
+                param_named      u_DiffuseEnvSampler  int 5
+                param_named      u_SpecularEnvSampler int 6
+                param_named      u_brdfLUT            int 7
+
+                // This section is used to override final color for reference app visualization
+                // of various parameters in the lighting equation.
+                param_named      u_ScaleFGDSpec       float4 0 0 0 0
+                param_named      u_ScaleDiffBaseMR    float4 0 0 0 0
+                param_named      u_ScaleIBLAmbient    float4 1 1 1 1
+			}
+        }
+    }
+}

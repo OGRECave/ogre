@@ -33,6 +33,10 @@ Zip=@OGRE_MEDIA_DIR_REL@/packs/Sinbad.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/skybox.zip
 Zip=@OGRE_MEDIA_DIR_REL@/volumeTerrain/volumeTerrainBig.zip
 
+FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/glTF2_IBL
+Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
+
 FileSystem=@OGRE_MEDIA_DIR_REL@/HLMS
 
 # Materials for visual tests

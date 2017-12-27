@@ -94,6 +94,7 @@
 #   include "Lighting.h"
 #   include "MeshLod.h"
 #   include "ParticleFX.h"
+#   include "PBR.h"
 #   include "PNTrianglesTessellation.h"
 #   include "Shadows.h"
 #   include "SkeletalAnimation.h"
@@ -953,6 +954,7 @@ namespace OgreBites
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
             mPluginNameMap["Sample_MeshLod"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_MeshLod();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
+            mPluginNameMap["Sample_PBR"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_PBR();
             mPluginNameMap["Sample_Smoke"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Smoke();
 #       endif // OGRE_PLATFORM_WINRT
             mPluginNameMap["Sample_SkeletalAnimation"]  = (OgreBites::SdkSample *) OGRE_NEW Sample_SkeletalAnimation();
