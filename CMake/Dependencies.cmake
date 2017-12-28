@@ -14,7 +14,7 @@
 # OGRE_DEPENDENCIES_DIR can be used to specify a single base
 # folder where the required dependencies may be found.
 set(OGRE_DEPENDENCIES_DIR "" CACHE PATH "Path to prebuilt OGRE dependencies")
-option(OGRE_BUILD_DEPENDENCIES "automaitcally build Ogre Dependencies (freetype, zzip)" TRUE)
+option(OGRE_BUILD_DEPENDENCIES "automatically build Ogre Dependencies (freetype, zzip)" TRUE)
 
 include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
