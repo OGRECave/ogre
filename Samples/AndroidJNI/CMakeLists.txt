@@ -15,7 +15,6 @@ if(ANDROID AND OGRE_BUILD_COMPONENT_JAVA)
     # Setup create_android_proj macro requirements
     SET(ANDROID_MOD_NAME "OgreJNI")
     SET(JNI_PATH ".")
-    #SET(JNI_SRC_FILES "OgreActivityJNI.cpp")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/${ANDROID_MOD_NAME}")
     
@@ -29,19 +28,13 @@ if(ANDROID AND OGRE_BUILD_COMPONENT_JAVA)
     SET(SAMPLE_LDLIBS "")
     
     # Copy and create resource files
-	# file(COPY "${JNI_PATH}/OgreActivityJNI.java" DESTINATION "${NDKOUT}/src/org/ogre/android")
-	file(COPY "${JNI_PATH}/MainActivity.java" DESTINATION "${NDKOUT}/src/org/Ogre/example")
-    
     copy_assets_to_android_proj()
-        
-    # Create CMake target
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp "int x = 23;")
-    ADD_LIBRARY(OgreJNIDummy SHARED ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
-    
-    # copy the SDK
-    add_custom_command(TARGET OgreJNIDummy PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${OGRE_BINARY_DIR}/java" "${NDKOUT}")
 
-    # set(JNI_PATH "${NDKOUT}/jni")
-    create_android_proj(OgreJNIDummy)
+    # copy the SDK when its done
+    add_custom_command(OUTPUT "${NDKOUT}/libs"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${OGRE_BINARY_DIR}/java" "${NDKOUT}"
+        DEPENDS "${OGRE_BINARY_DIR}/java/libs/${ANDROID_NDK_OUTPUT_ABI_NAME}/libOgreJNI.so")
+    add_custom_target(copy_java_sdk ALL DEPENDS "${NDKOUT}/libs")
+
+    create_android_proj(copy_java_sdk)
 endif()
