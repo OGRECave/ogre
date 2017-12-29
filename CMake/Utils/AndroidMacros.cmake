@@ -88,7 +88,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         add_custom_command(
             TARGET ${ANDROID_PROJECT_TARGET}
             POST_BUILD
-            COMMAND ${ANDROID_EXECUTABLE} update project  --target ${ANDROID_TARGET} --path "${NDKOUT}"
+            COMMAND ${ANDROID_EXECUTABLE} update project  --target 1 --path "${NDKOUT}"
             WORKING_DIRECTORY ${NDKOUT}
         )
 
