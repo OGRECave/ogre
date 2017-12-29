@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreException.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
@@ -95,17 +96,24 @@ namespace Ogre
                     *i, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
             // Silently ignore missing links
-            if(deleg && deleg->isSupported())
+            if(!deleg || !deleg->isSupported())
+                continue;
+
+            if (deleg->getType() != getType())
             {
-                int priority = getPriority(deleg->getLanguage());
-                //Find the delegate with the highest prioriry
-                if (priority >= tmpPriority)
-                {
-                    tmpDelegate = deleg;
-                    tmpPriority = priority;
-                }
+                LogManager::getSingleton().logError(
+                    "unified program '" + getName() +
+                    "' delegating to program with different type '" + *i + "'");
+                continue;
             }
 
+            int priority = getPriority(deleg->getLanguage());
+            //Find the delegate with the highest prioriry
+            if (priority >= tmpPriority)
+            {
+                tmpDelegate = deleg;
+                tmpPriority = priority;
+            }
         }
 
         mChosenDelegate = tmpDelegate;

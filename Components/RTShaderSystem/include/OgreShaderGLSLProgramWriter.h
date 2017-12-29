@@ -88,7 +88,8 @@ protected:
 
     /** Write forward declarations. This is needed so that we can attach library shader at a later step. */
     void writeForwardDeclarations(std::ostream& os, Program* program);
-    void writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func);
+    void writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func,
+                                  bool writeParamName = true);
 
     /** Write the input params of the function */
     void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);

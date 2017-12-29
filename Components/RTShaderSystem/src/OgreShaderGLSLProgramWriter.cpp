@@ -250,7 +250,8 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func)
+void GLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func,
+                                                 bool writeParamName)
 {
     os << func.getReturnType() << " " << func.getFunctionName() << "(";
 
@@ -301,7 +302,10 @@ void GLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, FunctionInvoc
       }
 
       // Write the operand type.
-      os << mGpuConstTypeMap[gpuType] << " " << param->getName();
+      os << mGpuConstTypeMap[gpuType];
+
+      if(writeParamName)
+          os << " " << param->getName();
 
       ++itOperand;
       //move over all operators with indirection
@@ -348,7 +352,7 @@ void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* prog
             FunctionInvocation* pFuncInvoc = static_cast<FunctionInvocation*>(*itAtom);
 
             StringStream funcDecl;
-            writeFunctionDeclaration(funcDecl, *pFuncInvoc);
+            writeFunctionDeclaration(funcDecl, *pFuncInvoc, false);
 
             // Push the generated declaration into the vector
             // duplicate declarations will be removed later.

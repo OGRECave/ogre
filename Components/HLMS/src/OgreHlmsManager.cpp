@@ -62,7 +62,7 @@ namespace Ogre
 			Any hlmsMatBindingAny = rend->getUserObjectBindings().getUserAny(HLMS_KEY);
 
 			// this check should not fail
-			if (hlmsMatBindingAny.isEmpty())
+			if (!hlmsMatBindingAny.has_value())
 				continue;
 
 			HlmsMatBindingMap* hlmsMatBindingMap = any_cast<HlmsMatBindingMap*>(hlmsMatBindingAny);
@@ -85,7 +85,7 @@ namespace Ogre
 			Any hlmsMatBindingAny = rend->getUserObjectBindings().getUserAny(HLMS_KEY);
 
 			// this check should not fail
-			if (hlmsMatBindingAny.isEmpty())
+			if (!hlmsMatBindingAny.has_value())
 				continue;
 
 			HlmsMatBindingMap* hlmsMatBindingMap = any_cast<HlmsMatBindingMap*>(hlmsMatBindingAny);
@@ -171,7 +171,7 @@ namespace Ogre
 	{
 		// check if the renderable has bounded hlmsMaterials
 		Any hlmsMatBindingAny = rend->getUserObjectBindings().getUserAny(HLMS_KEY);
-		if (hlmsMatBindingAny.isEmpty())
+		if (!hlmsMatBindingAny.has_value())
 			return;
 
 		// get the bounded material for the current pass
@@ -189,7 +189,7 @@ namespace Ogre
 	void HlmsManager::bind(Renderable* rend, HlmsMaterialBase* material, const String& passName)
 	{
 		HlmsMatBindingMap* hlmsMatMap;
-		if (rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
+		if (!rend->getUserObjectBindings().getUserAny(HLMS_KEY).has_value())
 		{
 			hlmsMatMap = new HlmsMatBindingMap();
 			rend->getUserObjectBindings().setUserAny(HLMS_KEY, Any(hlmsMatMap));
@@ -209,7 +209,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void HlmsManager::unbind(Renderable* rend, const String& passName)
 	{
-		if (!rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
+		if (rend->getUserObjectBindings().getUserAny(HLMS_KEY).has_value())
 		{
 			HlmsMatBindingMap* hlmsMatMap = any_cast<HlmsMatBindingMap*>(rend->getUserObjectBindings().getUserAny(HLMS_KEY));
 			hlmsMatMap->erase(passName);
@@ -250,7 +250,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	bool HlmsManager::hasBinding(Renderable* rend, const String& passName)
 	{
-		if (!rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
+		if (rend->getUserObjectBindings().getUserAny(HLMS_KEY).has_value())
 		{
 		    HlmsMatBindingMap* hlmsMatMap = any_cast<HlmsMatBindingMap*>(rend->getUserObjectBindings().getUserAny(HLMS_KEY));
 			return hlmsMatMap->find(passName) != hlmsMatMap->end();

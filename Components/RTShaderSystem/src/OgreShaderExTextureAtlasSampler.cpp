@@ -548,7 +548,7 @@ bool TextureAtlasSamplerFactory::hasMaterialAtlasingAttributes(Ogre::Material* m
         const Ogre::Any& anyAttrib = 
             //find if the "IsTerrain" flag exists in the first technique
             material->getTechnique(0)->getUserObjectBindings().getUserAny(c_RTAtlasKey);
-        isMaterialSpecific = (anyAttrib.isEmpty() == false);
+        isMaterialSpecific = anyAttrib.has_value();
         if ((isMaterialSpecific) && (attrib))
         {
             *attrib = Ogre::any_cast<TextureAtlasAttib>(anyAttrib);

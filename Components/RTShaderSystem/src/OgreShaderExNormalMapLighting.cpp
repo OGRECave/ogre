@@ -45,38 +45,23 @@ namespace RTShader {
 /************************************************************************/
 String NormalMapLighting::Type                      = "SGX_NormalMapLighting";
 
-Light NormalMapLighting::msBlankLight;
-
 //-----------------------------------------------------------------------
-NormalMapLighting::NormalMapLighting()
+NormalMapLighting::NormalMapLighting() : PerPixelLighting()
 {
-    mTrackVertexColourType          = TVC_NONE;
     mNormalMapSamplerIndex          = 0;
     mVSTexCoordSetIndex             = 0;
-    mSpecularEnable                 = false;
     mNormalMapSpace                 = NMS_TANGENT;
     mNormalMapMinFilter             = FO_LINEAR;
     mNormalMapMagFilter             = FO_LINEAR;
     mNormalMapMipFilter             = FO_POINT;
     mNormalMapAnisotropy            = 1;
     mNormalMapMipBias               = -1.0;
-
-    msBlankLight.setDiffuseColour(ColourValue::Black);
-    msBlankLight.setSpecularColour(ColourValue::Black);
-    msBlankLight.setAttenuation(0,1,0,0);
 }
 
 //-----------------------------------------------------------------------
 const String& NormalMapLighting::getType() const
 {
     return Type;
-}
-
-
-//-----------------------------------------------------------------------
-int NormalMapLighting::getExecutionOrder() const
-{
-    return FFP_LIGHTING;
 }
 
 //-----------------------------------------------------------------------
@@ -239,18 +224,6 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
             }
         }                                                                           
     }
-}
-
-//-----------------------------------------------------------------------
-bool NormalMapLighting::resolveParameters(ProgramSet* programSet)
-{
-    if (false == resolveGlobalParameters(programSet))
-        return false;
-    
-    if (false == resolvePerLightParameters(programSet))
-        return false;
-    
-    return true;
 }
 
 //-----------------------------------------------------------------------
@@ -863,66 +836,6 @@ bool NormalMapLighting::addPSNormalFetchInvocation(Function* psMain, const int g
 }
 
 //-----------------------------------------------------------------------
-bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder)
-{
-    FunctionInvocation* curFuncInvocation = NULL;   
-
-    if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
-        (mTrackVertexColourType & TVC_EMISSIVE) == 0)
-    {
-        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
-        curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-        psMain->addAtomInstance(curFuncInvocation);     
-    }
-    else
-    {
-        if (mTrackVertexColourType & TVC_AMBIENT)
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-            curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);            
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
-        }
-        else
-        {
-            curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
-            curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, Operand::OPM_XYZ);  
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            psMain->addAtomInstance(curFuncInvocation);
-        }
-
-        if (mTrackVertexColourType & TVC_EMISSIVE)
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
-            curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
-        }
-        else
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
-            curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
-        }       
-    }
-
-    if (mSpecularEnable)
-    {
-        curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
-        curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT);    
-        psMain->addAtomInstance(curFuncInvocation); 
-    }
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------
 bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder)
 {   
     FunctionInvocation* curFuncInvocation = NULL;   
@@ -1049,33 +962,6 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 }
 
 //-----------------------------------------------------------------------
-bool NormalMapLighting::addPSFinalAssignmentInvocation( Function* psMain, const int groupOrder)
-{
-    FunctionInvocation* curFuncInvocation;
-
-    curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
-    curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_OUT);   
-    psMain->addAtomInstance(curFuncInvocation); 
-
-    curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
-    curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);    
-    curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);    
-    psMain->addAtomInstance(curFuncInvocation);
-
-    if (mSpecularEnable)
-    {
-        curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
-        curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_OUT);          
-        psMain->addAtomInstance(curFuncInvocation); 
-    }
-
-    return true;
-}
-
-
-//-----------------------------------------------------------------------
 void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 {
     const NormalMapLighting& rhsLighting = static_cast<const NormalMapLighting&>(rhs);
@@ -1098,12 +984,8 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-    if (srcPass->getLightingEnabled() == false)
+    if (!PerPixelLighting::preAddToRenderState(renderState, srcPass, dstPass))
         return false;
-
-    int lightCount[3];
-
-    renderState->getLightCount(lightCount);
 
     TextureUnitState* normalMapTexture = dstPass->createTextureUnitState();
 
@@ -1113,101 +995,8 @@ bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass
     normalMapTexture->setTextureMipmapBias(mNormalMapMipBias);
     mNormalMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
-    setTrackVertexColourType(srcPass->getVertexColourTracking());           
-
-    if (srcPass->getShininess() > 0.0 &&
-        srcPass->getSpecular() != ColourValue::Black)
-    {
-        setSpecularEnable(true);
-    }
-    else
-    {
-        setSpecularEnable(false);   
-    }
-
-    // Case this pass should run once per light(s) -> override the light policy.
-    if (srcPass->getIteratePerLight())
-    {       
-
-        // This is the preferred case -> only one type of light is handled.
-        if (srcPass->getRunOnlyForOneLightType())
-        {
-            if (srcPass->getOnlyLightType() == Light::LT_POINT)
-            {
-                lightCount[0] = srcPass->getLightCountPerIteration();
-                lightCount[1] = 0;
-                lightCount[2] = 0;
-            }
-            else if (srcPass->getOnlyLightType() == Light::LT_DIRECTIONAL)
-            {
-                lightCount[0] = 0;
-                lightCount[1] = srcPass->getLightCountPerIteration();
-                lightCount[2] = 0;
-            }
-            else if (srcPass->getOnlyLightType() == Light::LT_SPOTLIGHT)
-            {
-                lightCount[0] = 0;
-                lightCount[1] = 0;
-                lightCount[2] = srcPass->getLightCountPerIteration();
-            }
-        }
-
-        // This is worse case -> all light types expected to be handled.
-        // Can not handle this request in efficient way - throw an exception.
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Using iterative lighting method with RT Shader System requires specifying explicit light type.",
-                "NormalMapLighting::preAddToRenderState");          
-        }
-    }
-
-    setLightCount(lightCount);
-
     return true;
 }
-
-//-----------------------------------------------------------------------
-void NormalMapLighting::setLightCount(const int lightCount[3])
-{
-    for (int type=0; type < 3; ++type)
-    {
-        for (int i=0; i < lightCount[type]; ++i)
-        {
-            LightParams curParams;
-
-            if (type == 0)
-                curParams.mType = Light::LT_POINT;
-            else if (type == 1)
-                curParams.mType = Light::LT_DIRECTIONAL;
-            else if (type == 2)
-                curParams.mType = Light::LT_SPOTLIGHT;
-
-            mLightParamsList.push_back(curParams);
-        }
-    }           
-}
-
-//-----------------------------------------------------------------------
-void NormalMapLighting::getLightCount(int lightCount[3]) const
-{
-    lightCount[0] = 0;
-    lightCount[1] = 0;
-    lightCount[2] = 0;
-
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-    {
-        const LightParams curParams = mLightParamsList[i];
-
-        if (curParams.mType == Light::LT_POINT)
-            lightCount[0]++;
-        else if (curParams.mType == Light::LT_DIRECTIONAL)
-            lightCount[1]++;
-        else if (curParams.mType == Light::LT_SPOTLIGHT)
-            lightCount[2]++;
-    }
-}
-
 
 //-----------------------------------------------------------------------
 const String& NormalMapLightingFactory::getType() const

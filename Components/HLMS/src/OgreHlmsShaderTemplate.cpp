@@ -62,15 +62,7 @@ namespace Ogre
 	{
         if (mTemplateFileName.empty()) return;
 
-		DataStreamPtr logoCornersFile;
-        try
-        {
-            logoCornersFile = ResourceGroupManager::getSingletonPtr()->openResource(mTemplateFileName);
-        }
-        catch (FileNotFoundException&)
-        {
-            return;
-        }
+		DataStreamPtr logoCornersFile = ResourceGroupManager::getSingletonPtr()->openResource(mTemplateFileName);
 
         mTemplate = logoCornersFile->getAsString();
         mHash = calcHash(mTemplate);

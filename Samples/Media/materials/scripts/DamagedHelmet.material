@@ -1,0 +1,80 @@
+import glTF2/PBR from glTF2_PBR.material
+
+material DamagedHelmet : glTF2/PBR
+{
+    technique
+    {
+        pass
+        {
+            texture_unit Albedo
+            {
+                texture Default_albedo.jpg
+            }
+            texture_unit Normal
+            {
+                texture Default_normal.jpg
+            }
+			texture_unit Emissive
+			{
+				texture Default_emissive.jpg
+			}
+			texture_unit MetalRoughness
+			{
+				texture Default_metalRoughness.jpg
+			}
+			texture_unit AmbientOcclusion
+			{
+				texture Default_AO.jpg
+			}
+        }
+    }
+}
+
+material DamagedHelmet_FFP {
+    technique
+    {
+        pass 
+        {
+            ambient 0.8 0.8 0.8 1.0
+            diffuse 0.64 0.64 0.64 1.0
+            specular 1 1 1 1.0 12.5
+
+            // albedo - simple            
+            texture_unit
+            {
+                texture Default_albedo.jpg
+            }
+
+			// reflections
+			texture_unit
+			{
+				cubic_texture specular.jpg combinedUVW
+				env_map cubic_reflection
+				colour_op_ex blend_manual src_texture src_current 0.2
+			}
+
+            // emissive - also simple, just add on top
+			texture_unit
+			{
+				texture Default_emissive.jpg
+				colour_op add
+			}
+			
+            // normal map - requires RTSS
+            rtshader_system
+            {
+                lighting_stage normal_map Default_normal.jpg
+            }
+        }
+    }
+}
+
+// for usage with HLMS. The parameters must be set programattically
+material DamagedHelmet_HLMS 
+{
+    technique {
+        scheme ShaderGeneratorDefaultScheme
+        pass pbs 
+        {}
+    }
+}

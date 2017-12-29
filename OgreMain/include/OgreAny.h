@@ -110,7 +110,7 @@ namespace Ogre
         }
 
         /// @deprecated use has_value() instead
-        bool isEmpty() const { return !has_value(); }
+        OGRE_DEPRECATED bool isEmpty() const { return !has_value(); }
 
         const std::type_info& type() const
         {

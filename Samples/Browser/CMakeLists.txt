@@ -202,6 +202,7 @@ target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} $
 
 if(ANDROID)
     target_link_libraries(SampleBrowser native_app_glue cpufeatures android c m dl z log EGL GLESv2 "-u ANativeActivity_onCreate")
+    set_target_properties(SampleBrowser PROPERTIES LINK_FLAGS -s) # strip symbols
 endif()
 
 # Add samples as dependencies

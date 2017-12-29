@@ -96,24 +96,34 @@ public:
 
 // Protected types:
 protected:
-    
-    // Per light parameters.
+    /// Per light parameters.
     struct _OgreRTSSExport LightParams
     {
-        Light::LightTypes       mType;              // Light type.      
-        // Light position.
+        /// Light type.
+        Light::LightTypes mType;
+        /// Light position.
         UniformParameterPtr mPosition;
-        // Light direction.
+        /// Light direction.
         UniformParameterPtr mDirection;
-        // Attenuation parameters.
+        /// Attenuation parameters.
         UniformParameterPtr mAttenuatParams;
-        // Spot light parameters.
+        /// Spot light parameters.
         UniformParameterPtr mSpotParams;
-        // Diffuse colour.
+        /// Diffuse colour.
         UniformParameterPtr mDiffuseColour;
-        // Specular colour.
+        /// Specular colour.
         UniformParameterPtr mSpecularColour;
 
+        // for normal mapping:
+
+        /// Vertex shader output vertex position to light position direction (texture space).
+        ParameterPtr mVSOutToLightDir;
+        /// Pixel shader input vertex position to light position direction (texture space).
+        ParameterPtr mPSInToLightDir;
+        /// Vertex shader output light direction (texture space).
+        ParameterPtr mVSOutDirection;
+        /// Pixel shader input light direction (texture space).
+        ParameterPtr mPSInDirection;
     };
 
     typedef vector<LightParams>::type LightParamsList;
@@ -166,10 +176,10 @@ protected:
     virtual bool resolveParameters(ProgramSet* programSet);
 
     /** Resolve global lighting parameters */
-    bool resolveGlobalParameters(ProgramSet* programSet);
+    virtual bool resolveGlobalParameters(ProgramSet* programSet);
 
     /** Resolve per light parameters */
-    bool resolvePerLightParameters(ProgramSet* programSet);
+    virtual bool resolvePerLightParameters(ProgramSet* programSet);
 
     /** 
     @see SubRenderState::resolveDependencies.

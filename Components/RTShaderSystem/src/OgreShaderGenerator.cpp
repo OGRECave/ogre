@@ -1007,7 +1007,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
         if (pSrcPass)
         {
             const Any& passUserData = pSrcPass->getUserObjectBindings().getUserAny(SGPass::UserKey);
-            if (!passUserData.isEmpty())    
+            if (passUserData.has_value())
             {
                 schemesToRemove.insert(pSrcTech->_getSchemeIndex());
             }
@@ -1098,7 +1098,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
     {
         const Any& passUserData = pass->getUserObjectBindings().getUserAny(SGPass::UserKey);
 
-        if (passUserData.isEmpty()) 
+        if (!passUserData.has_value())
             return; 
 
         OGRE_LOCK_AUTO_MUTEX;
@@ -1704,7 +1704,7 @@ void ShaderGenerator::SGTechnique::createIlluminationSGPasses()
 		SGPass* passEntry = OGRE_NEW SGPass(this, p->originalPass, p->pass, p->stage);
 
 		const Any& origPassUserData = p->originalPass->getUserObjectBindings().getUserAny(SGPass::UserKey);
-		if(!origPassUserData.isEmpty())
+		if(origPassUserData.has_value())
 		{
 
 			SGPass* origPassEntry = any_cast<SGPass*>(origPassUserData);

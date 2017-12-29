@@ -29,7 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderSubRenderState.h"
+#include "OgreShaderExPerPixelLighting.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
 
@@ -45,20 +45,12 @@ namespace RTShader {
 
 #define SGX_LIB_NORMALMAPLIGHTING                   "SGXLib_NormalMapLighting"
 #define SGX_FUNC_CONSTRUCT_TBNMATRIX                "SGX_ConstructTBNMatrix"
-#define SGX_FUNC_TRANSFORMNORMAL                    "SGX_TransformNormal"
-#define SGX_FUNC_TRANSFORMPOSITION                  "SGX_TransformPosition"
 #define SGX_FUNC_FETCHNORMAL                        "SGX_FetchNormal"
-#define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE          "SGX_Light_Directional_Diffuse"
-#define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR  "SGX_Light_Directional_DiffuseSpecular"
-#define SGX_FUNC_LIGHT_POINT_DIFFUSE                "SGX_Light_Point_Diffuse"
-#define SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR        "SGX_Light_Point_DiffuseSpecular"
-#define SGX_FUNC_LIGHT_SPOT_DIFFUSE                 "SGX_Light_Spot_Diffuse"
-#define SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR         "SGX_Light_Spot_DiffuseSpecular"
 
 /** Normal Map Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class _OgreRTSSExport NormalMapLighting : public SubRenderState
+class _OgreRTSSExport NormalMapLighting : public PerPixelLighting
 {
 
 // Interface.
@@ -70,11 +62,6 @@ public:
     @see SubRenderState::getType.
     */
     virtual const String& getType() const;
-
-    /** 
-    @see SubRenderState::getType.
-    */
-    virtual int getExecutionOrder() const;
 
     /** 
     @see SubRenderState::updateGpuProgramsParams.
@@ -105,19 +92,24 @@ public:
     // Type of this render state.
     static String Type;
 
-    // Normal map space definition.
+    /// Normal map space definition.
     enum NormalMapSpace
     {
-        NMS_TANGENT,        // Normal map contains normal data in tangent space.
-                            // This is the default normal mapping behavior and it requires that the
-                            // target mesh will have valid tangents within its vertex data.
-        
-        NMS_OBJECT          // Normal map contains normal data in object local space.
-                            // This normal mapping technique has the advantages of better visualization results,
-                            // lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
-                            // and it also saves some instruction in the vertex shader stage.
-                            // The main drawback of using this kind of normal map is that the target object must be static
-                            // in terms of local space rotations and translations.
+        /**
+        Normal map contains normal data in tangent space.
+        This is the default normal mapping behavior and it requires that the
+        target mesh will have valid tangents within its vertex data.
+         */
+        NMS_TANGENT,
+        /**
+        Normal map contains normal data in object local space.
+        This normal mapping technique has the advantages of better visualization results,
+        lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
+        and it also saves some instruction in the vertex shader stage.
+        The main drawback of using this kind of normal map is that the target object must be static
+        in terms of local space rotations and translations.
+         */
+        NMS_OBJECT
     };
 
     /** 
@@ -176,88 +168,8 @@ public:
     /** Return the normal map mip bias value. */
     Real getNormalMapMipBias() const { return mNormalMapMipBias; }
 
-
-
-// Protected types:
-protected:
-    
-    // Per light parameters.
-    struct _OgreRTSSExport LightParams
-    {
-        // Light type.
-        Light::LightTypes mType;
-        // Light position.
-        UniformParameterPtr mPosition;
-        // Vertex shader output vertex position to light position direction (texture space).
-        ParameterPtr mVSOutToLightDir;
-        // Pixel shader input vertex position to light position direction (texture space).
-        ParameterPtr mPSInToLightDir;
-        // Light direction.
-        UniformParameterPtr mDirection;
-        // Vertex shader output light direction (texture space).
-        ParameterPtr mVSOutDirection;
-        // Pixel shader input light direction (texture space).      
-        ParameterPtr mPSInDirection;
-        // Attenuation parameters.
-        UniformParameterPtr mAttenuatParams;
-        // Spot light parameters.
-        UniformParameterPtr mSpotParams;
-        // Diffuse colour.
-        UniformParameterPtr mDiffuseColour;
-        // Specular colour.
-        UniformParameterPtr mSpecularColour;
-
-    };
-
-    typedef vector<LightParams>::type LightParamsList;
-    typedef LightParamsList::iterator LightParamsIterator;
-    typedef LightParamsList::const_iterator LightParamsConstIterator;
-
 // Protected methods
 protected:
-
-    /** 
-    Set the track per vertex colour type. Ambient, Diffuse, Specular and Emissive lighting components source
-    can be the vertex colour component. To establish such a link one should provide the matching flags to this
-    sub render state.
-    */
-    void setTrackVertexColourType(TrackVertexColourType type) { mTrackVertexColourType = type; }
-
-    /** 
-    Return the current track per vertex type.
-    */
-    TrackVertexColourType getTrackVertexColourType() const { return mTrackVertexColourType; }
-
-
-    /** 
-    Set the light count per light type that this sub render state will generate.
-    @see ShaderGenerator::setLightCount.
-    */
-    void setLightCount(const int lightCount[3]);
-
-    /** 
-    Get the light count per light type that this sub render state will generate.
-    @see ShaderGenerator::getLightCount.
-    */
-    void getLightCount(int lightCount[3]) const;
-    /** 
-    Set the specular component state. If set to true this sub render state will compute a specular
-    lighting component in addition to the diffuse component.
-    @param enable Pass true to enable specular component computation.
-    */
-    void setSpecularEnable(bool enable) { mSpecularEnable = enable; }
-
-    /** 
-    Get the specular component state. 
-    */
-    bool getSpecularEnable() const    { return mSpecularEnable; }
-
-
-    /** 
-    @see SubRenderState::resolveParameters.
-    */
-    virtual bool resolveParameters(ProgramSet* programSet);
-
     /** Resolve global lighting parameters */
     bool resolveGlobalParameters(ProgramSet* programSet);
 
@@ -274,7 +186,6 @@ protected:
     */
     virtual bool addFunctionInvocations(ProgramSet* programSet);
     
-
     /** 
     Internal method that adds related vertex shader functions invocations.
     */
@@ -290,33 +201,15 @@ protected:
     */
     bool addPSNormalFetchInvocation(Function* psMain, const int groupOrder);
 
-
-    /** 
-    Internal method that adds global illumination component functions invocations.
-    */
-    bool addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder);
-
     /** 
     Internal method that adds per light illumination component functions invocations.
     */
     bool addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder);
 
-    /** 
-    Internal method that adds the final colour assignments.
-    */
-    bool addPSFinalAssignmentInvocation(Function* psMain, const int groupOrder);
-
-
 // Attributes.
 protected:  
     // The normal map texture name.
     String mNormalMapTextureName;
-    // Track per vertex colour type.
-    TrackVertexColourType mTrackVertexColourType;
-    // Specular component enabled/disabled.
-    bool mSpecularEnable;
-    // Light list.
-    LightParamsList mLightParamsList;
     // Normal map texture sampler index.
     unsigned short mNormalMapSamplerIndex;
     // Vertex shader input texture coordinate set index.
@@ -339,16 +232,12 @@ protected:
     UniformParameterPtr mWorldInvRotMatrix;
     // Camera position in world space parameter.    
     UniformParameterPtr mCamPosWorldSpace;
-    // Vertex shader input position parameter.
-    ParameterPtr mVSInPosition;
     // Vertex shader world position parameter.
     ParameterPtr mVSWorldPosition;
     // Vertex shader output view vector (position in camera space) parameter.
     ParameterPtr mVSOutView;
     // Pixel shader input view position (position in camera space) parameter.
     ParameterPtr mPSInView;
-    // Vertex shader input normal.
-    ParameterPtr mVSInNormal;
     // Vertex shader input tangent.
     ParameterPtr mVSInTangent;
     // Vertex shader local TNB matrix.
@@ -367,36 +256,6 @@ protected:
     ParameterPtr mVSOutTexcoord;
     // Pixel shader input texture coordinates.
     ParameterPtr mPSInTexcoord;
-    // Pixel shader temporary diffuse calculation parameter.
-    ParameterPtr mPSTempDiffuseColour;
-    // Pixel shader temporary specular calculation parameter.
-    ParameterPtr mPSTempSpecularColour;
-    // Pixel shader input/local diffuse parameter.  
-    ParameterPtr mPSDiffuse;
-    // Pixel shader input/local specular parameter. 
-    ParameterPtr mPSSpecular;
-    // Pixel shader output diffuse parameter.   
-    ParameterPtr mPSOutDiffuse;
-    // Pixel shader output specular parameter.  
-    ParameterPtr mPSOutSpecular;
-    // Derived scene colour parameter.
-    UniformParameterPtr mDerivedSceneColour;
-    // Ambient light colour parameter.
-    UniformParameterPtr mLightAmbientColour;
-    // Derived ambient light colour parameter.
-    UniformParameterPtr mDerivedAmbientLightColour;
-    // Surface ambient colour parameter.
-    UniformParameterPtr mSurfaceAmbientColour;
-    // Surface diffuse colour parameter.
-    UniformParameterPtr mSurfaceDiffuseColour;
-    // Surface specular colour parameter.
-    UniformParameterPtr mSurfaceSpecularColour;
-    // Surface emissive colour parameter.
-    UniformParameterPtr mSurfaceEmissiveColour;
-    // Surface shininess parameter.
-    UniformParameterPtr mSurfaceShininess;
-    // Shared blank light.
-    static Light msBlankLight;
 };
 
 
