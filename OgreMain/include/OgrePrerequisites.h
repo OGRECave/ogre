@@ -104,7 +104,7 @@ namespace Ogre {
     #       define OGRE_HashMultiSet ::std::tr1::unordered_multiset
     #    endif
     #else
-    #   if OGRE_COMPILER == OGRE_COMPILER_MSVC && !defined(_STLP_MSVC)
+    #   if OGRE_COMPILER == OGRE_COMPILER_MSVC && _MSC_VER < 1700 && !defined(_STLP_MSVC) // before VC++ 11.0 (2012)
     #       if _MSC_FULL_VER >= 150030729 // VC++ 9.0 SP1+
     #           define OGRE_HashMap ::std::tr1::unordered_map
     #           define OGRE_HashMultiMap ::std::tr1::unordered_multimap
