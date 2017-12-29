@@ -1415,7 +1415,7 @@ namespace Ogre
         : D3D11RenderWindowSwapChainBased(device)
         , mCompositionScale(1.0f, 1.0f)
     {
-        mUseFlipSequentialMode = true;
+        mUseFlipMode = true;
     }
 
     float D3D11RenderWindowSwapChainPanel::getViewPointToPixelScale()
@@ -1507,12 +1507,12 @@ namespace Ogre
         rsys->determineFSAASettings(mFSAA, mFSAAHint, _getRenderFormat(), &mFSAAType);
 #endif
 
-        mSwapChainDesc.Width                = mWidth;                                    // Use automatic sizing.
+        mSwapChainDesc.Width                = mWidth;                               // Use automatic sizing.
         mSwapChainDesc.Height               = mHeight;
         mSwapChainDesc.Format               = _getSwapChainFormat();
         mSwapChainDesc.Stereo               = false;
 
-        assert(mUseFlipSequentialMode);                                             // i.e. no FSAA for swapchain, but can be enabled in separate backbuffer
+        assert(mUseFlipMode);                                                       // i.e. no FSAA for swapchain, but can be enabled in separate backbuffer
         mSwapChainDesc.SampleDesc.Count     = 1;
         mSwapChainDesc.SampleDesc.Quality   = 0;
 

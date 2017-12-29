@@ -62,11 +62,13 @@ namespace Ogre
             mLog.open(name.c_str());
         }
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
         if(mDebugOut)
         {
             char* val = getenv("TERM");
             mTermHasColours = val && String(val).find("xterm") != String::npos;
         }
+#endif
     }
     //-----------------------------------------------------------------------
     Log::~Log()
