@@ -30,6 +30,5 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreIteratorWrapper.h"
-#include "OgreIteratorRange.h"
 
 #endif
