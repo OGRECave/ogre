@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "Threading/OgreBarrier.h"
+#include "OgrePlatformInformation.h"
 #include <errno.h>
 
 #if OGRE_CPU == OGRE_CPU_ARM

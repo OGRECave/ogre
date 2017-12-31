@@ -141,7 +141,7 @@ JNIEnv* OgreJNIGetEnv() {
 
 // Basic Data Types
 %include "OgreException.h"
-%include "OgreAtomicScalar.h"
+%ignore Ogre::SharedPtrInfo;
 // deprecated
 %ignore Ogre::SharedPtr::useCount;
 %ignore Ogre::SharedPtr::bind;
