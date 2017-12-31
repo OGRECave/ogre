@@ -14,9 +14,11 @@
 # and provide build configuration options.
 ######################################################################
 
-cmake_minimum_required(VERSION 2.8.6)
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
-cmake_policy(SET CMP0003 NEW)
+cmake_minimum_required(VERSION 3.3.0)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(CMAKE_VS_PLATFORM_NAME STREQUAL "Tegra-Android")
 	set(CMAKE_LINK_LIBRARY_FLAG "")
@@ -31,13 +33,6 @@ if(WIN32)
 endif()
 
 if (APPLE AND NOT ANDROID)
-  cmake_policy(SET CMP0042 NEW)
-
-  if(CMAKE_VERSION VERSION_LESS 3.0.0)
-    include(CMakeForceCompiler)
-    CMAKE_FORCE_C_COMPILER(clang GNU)
-    CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
-  endif()
   SET(CMAKE_SIZEOF_VOID_P 4)
   set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
   set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
@@ -179,21 +174,9 @@ if (MINGW)
 endif ()
 
 include(GenerateExportHeader)
-add_compiler_export_flags(OGRE_VISIBILITY_FLAGS)
-
-if (OGRE_VISIBILITY_FLAGS)
-    set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY ${OGRE_VISIBILITY_FLAGS}")
-    set(XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "YES")
-    
-    if(APPLE AND NOT APPLE_IOS)
-      if(OGRE_VISIBILITY_FLAGS MATCHES -fvisibility-inlines-hidden)
-        message(STATUS "Skipping -fvisibility-inlines-hidden due to linker issues")
-        set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
-      else()
-        set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "YES")
-      endif()
-    endif ()
-endif()
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
+set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY") # for legacy headers
 
 if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
   # Fix x64 issues on Linux
