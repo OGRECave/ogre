@@ -188,12 +188,8 @@ endmacro ()
 # allocator settings
 if (OGRE_CONFIG_ALLOCATOR EQUAL 1)
 	set(_allocator "standard")
-elseif (OGRE_CONFIG_ALLOCATOR EQUAL 2)
-	set(_allocator "nedmalloc [DEPRECATED]")
 elseif (OGRE_CONFIG_ALLOCATOR EQUAL 3)
 	set(_allocator "user")
-else ()
-    set(_allocator "nedmalloc (pooling) [DEPRECATED]")
 endif()
 # assert settings
 if (OGRE_ASSERT_MODE EQUAL 0)

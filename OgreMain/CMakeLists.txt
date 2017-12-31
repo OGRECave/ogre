@@ -248,11 +248,6 @@ endif ()
 
 list(APPEND HEADER_FILES ${THREAD_HEADER_FILES})
 
-# Add needed definitions and nedmalloc include dir
-if(NOT OGRE_CONFIG_ALLOCATOR EQUAL 1)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
-endif()
-
 set(LIBRARIES ${PLATFORM_LIBS})
 
 if (OGRE_CONFIG_THREADS)
