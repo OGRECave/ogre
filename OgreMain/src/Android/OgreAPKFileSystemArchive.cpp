@@ -86,21 +86,21 @@ namespace Ogre{
 
 	}
 
-	StringVectorPtr APKFileSystemArchive::list(bool recursive, bool dirs) const
+	StringVector APKFileSystemArchive::list(bool recursive, bool dirs) const
 	{
-		StringVectorPtr files(new StringVector);
+		StringVector files;
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
 		std::vector< String > fileList = iter->second;
 		for( size_t i = 0; i < fileList.size(); i++ )
 		{
-			files->push_back(fileList[i]);
+			files.push_back(fileList[i]);
 		}
 		return files;
 	}
 
-	FileInfoListPtr APKFileSystemArchive::listFileInfo(bool recursive, bool dirs) const
+	FileInfoList APKFileSystemArchive::listFileInfo(bool recursive, bool dirs) const
 	{
-		FileInfoListPtr files(new FileInfoList);
+		FileInfoList files;
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
 		std::vector< String > fileList = iter->second;
 		for( size_t i = 0; i < fileList.size(); i++ )
@@ -115,29 +115,29 @@ namespace Ogre{
 				info.basename = fileList[i];
 				info.compressedSize = AAsset_getLength(asset);
 				info.uncompressedSize = info.compressedSize;
-				files->push_back(info);
+				files.push_back(info);
 				AAsset_close(asset);
 			}
 		}
 		return files;
 	}
 
-	StringVectorPtr APKFileSystemArchive::find(const String& pattern, bool recursive, bool dirs) const
+	StringVector APKFileSystemArchive::find(const String& pattern, bool recursive, bool dirs) const
 	{
-		StringVectorPtr files(new StringVector);
+		StringVector files;
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
 		std::vector< String > fileList = iter->second;
 		for( size_t i = 0; i < fileList.size(); i++ ) 
 		{
 			if(StringUtil::match(fileList[i], pattern))
-				files->push_back(fileList[i]);
+				files.push_back(fileList[i]);
 		}
 		return files;
 	}
 
-	FileInfoListPtr APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs) const
+	FileInfoList APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs) const
 	{
-		FileInfoListPtr files(new FileInfoList);
+		FileInfoList files;
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
 		std::vector< String > fileList = iter->second;
 		for( size_t i = 0; i < fileList.size(); i++ ) 
@@ -153,7 +153,7 @@ namespace Ogre{
 					info.basename = fileList[i];
 					info.compressedSize = AAsset_getLength(asset);
 					info.uncompressedSize = info.compressedSize;
-					files->push_back(info);
+					files.push_back(info);
 					AAsset_close(asset);
 				}
 			}

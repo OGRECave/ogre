@@ -70,10 +70,10 @@ namespace Ogre {
     {
         // get the list of .rendercaps files
         Archive* arch = ArchiveManager::getSingleton().load(filename, archiveType, true);
-        StringVectorPtr files = arch->find(mScriptPattern, recursive);
+        StringVector files = arch->find(mScriptPattern, recursive);
 
         // loop through .rendercaps files and load each one
-        for (StringVector::iterator it = files->begin(), end = files->end(); it != end; ++it)
+        for (StringVector::iterator it = files.begin(), end = files.end(); it != end; ++it)
         {
             DataStreamPtr stream = arch->open(*it);
             mSerializer->parseScript(stream);

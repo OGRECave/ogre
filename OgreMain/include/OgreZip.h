@@ -88,17 +88,17 @@ namespace Ogre {
         void remove(const String& filename);
 
         /// @copydoc Archive::list
-        StringVectorPtr list(bool recursive = true, bool dirs = false) const;
+        StringVector list(bool recursive = true, bool dirs = false) const;
 
         /// @copydoc Archive::listFileInfo
-        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const;
+        FileInfoList listFileInfo(bool recursive = true, bool dirs = false) const;
 
         /// @copydoc Archive::find
-        StringVectorPtr find(const String& pattern, bool recursive = true,
+        StringVector find(const String& pattern, bool recursive = true,
             bool dirs = false) const;
 
         /// @copydoc Archive::findFileInfo
-        FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true,
+        FileInfoList findFileInfo(const String& pattern, bool recursive = true,
             bool dirs = false) const;
 
         /// @copydoc Archive::exists

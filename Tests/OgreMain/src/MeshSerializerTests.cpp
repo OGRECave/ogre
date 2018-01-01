@@ -618,10 +618,10 @@ void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, Strin
     String group = resource->getGroup();
     String name = resource->getName();
     FileInfo* info = NULL;
-    FileInfoListPtr locPtr = resourceGroupMgr.listResourceFileInfo(group);
+    FileInfoList locPtr = resourceGroupMgr.listResourceFileInfo(group);
     FileInfoList::iterator it, itEnd;
-    it = locPtr->begin();
-    itEnd = locPtr->end();
+    it = locPtr.begin();
+    itEnd = locPtr.end();
     for (; it != itEnd; it++) {
         if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
             info = &*it;

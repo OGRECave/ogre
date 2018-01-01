@@ -83,10 +83,10 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
     models->addItem("sibenik.mesh");
 
     // Add all meshes from popular:
-    StringVectorPtr meshes = ResourceGroupManager::getSingleton().findResourceNames("General", "*.mesh");
+    StringVector meshes = ResourceGroupManager::getSingleton().findResourceNames("General", "*.mesh");
     StringVector::iterator it, itEnd;
-    it = meshes->begin();
-    itEnd = meshes->end();
+    it = meshes.begin();
+    itEnd = meshes.end();
     for(; it != itEnd; it++){
         models->addItem(*it);
     }
@@ -438,10 +438,10 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
     String group = mesh->getGroup();
     String name = mesh->getName();
     Ogre::FileInfo* info = NULL;
-    FileInfoListPtr locPtr = resourceGroupMgr.listResourceFileInfo(group);
+    FileInfoList locPtr = resourceGroupMgr.listResourceFileInfo(group);
     FileInfoList::iterator it, itEnd;
-    it = locPtr->begin();
-    itEnd = locPtr->end();
+    it = locPtr.begin();
+    itEnd = locPtr.end();
     for (; it != itEnd; it++) {
         if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
             info = &*it;

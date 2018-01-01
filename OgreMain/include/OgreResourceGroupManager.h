@@ -770,7 +770,7 @@ namespace Ogre {
         @return Shared pointer to a data stream list , will be
             destroyed automatically when no longer referenced
         */
-        DataStreamListPtr openResources(const String& pattern, 
+        DataStreamList openResources(const String& pattern,
             const String& groupName = DEFAULT_RESOURCE_GROUP_NAME) const;
         
         /** List all file or directory names in a resource group.
@@ -781,7 +781,7 @@ namespace Ogre {
         @param dirs If true, directory names will be returned instead of file names
         @return A list of filenames matching the criteria, all are fully qualified
         */
-        StringVectorPtr listResourceNames(const String& groupName, bool dirs = false) const;
+        StringVector listResourceNames(const String& groupName, bool dirs = false) const;
 
         /** List all files in a resource group with accompanying information.
         @param groupName The name of the group
@@ -789,7 +789,7 @@ namespace Ogre {
         @return A list of structures detailing quite a lot of information about
         all the files in the archive.
         */
-        FileInfoListPtr listResourceFileInfo(const String& groupName, bool dirs = false) const;
+        FileInfoList listResourceFileInfo(const String& groupName, bool dirs = false) const;
 
         /** Find all file or directory names matching a given pattern in a
             resource group.
@@ -802,7 +802,7 @@ namespace Ogre {
             instead of files
         @return A list of filenames matching the criteria, all are fully qualified
         */
-        StringVectorPtr findResourceNames(const String& groupName, const String& pattern,
+        StringVector findResourceNames(const String& groupName, const String& pattern,
             bool dirs = false) const;
 
         /** Find out if the named file exists in a group. 
@@ -833,7 +833,7 @@ namespace Ogre {
         @return A list of file information structures for all files matching 
         the criteria.
         */
-        FileInfoListPtr findResourceFileInfo(const String& group, const String& pattern,
+        FileInfoList findResourceFileInfo(const String& group, const String& pattern,
             bool dirs = false) const;
 
         /** Retrieve the modification time of a given file */
@@ -842,7 +842,7 @@ namespace Ogre {
         @param groupName The name of the group
         @return A list of resource locations matching the criteria
         */
-        StringVectorPtr listResourceLocations(const String& groupName) const;
+        StringVector listResourceLocations(const String& groupName) const;
 
         /** Find all resource location names matching a given pattern in a
             resource group.
@@ -850,7 +850,7 @@ namespace Ogre {
         @param pattern The pattern to search for; wildcards (*) are allowed
         @return A list of resource locations matching the criteria
         */
-        StringVectorPtr findResourceLocation(const String& groupName, const String& pattern) const;
+        StringVector findResourceLocation(const String& groupName, const String& pattern) const;
 
         /** Create a new resource file in a given group.
         @remarks

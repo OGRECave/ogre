@@ -171,10 +171,10 @@ namespace Ogre {
         {
             String basename, path;
             StringUtil::splitFilename(lookUpFileName, basename, path);
-            const FileInfoListPtr fileNfo = findFileInfo(basename, true);
-            if (fileNfo->size() == 1) // If there are more files with the same do not open anyone
+            const FileInfoList fileNfo = findFileInfo(basename, true);
+            if (fileNfo.size() == 1) // If there are more files with the same do not open anyone
             {
-                Ogre::FileInfo info = fileNfo->at(0);
+                Ogre::FileInfo info = fileNfo.at(0);
                 lookUpFileName = info.path + info.basename;
                 zzipFile = zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | flags); // When an error happens here we will catch it below
             }
@@ -214,39 +214,39 @@ namespace Ogre {
             "ZipArchive::remove");
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr ZipArchive::list(bool recursive, bool dirs) const
+    StringVector ZipArchive::list(bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        StringVector ret;
 
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
             if ((dirs == (i->compressedSize == size_t (-1))) &&
                 (recursive || i->path.empty()))
-                ret->push_back(i->filename);
+                ret.push_back(i->filename);
 
         return ret;
     }
     //-----------------------------------------------------------------------
-    FileInfoListPtr ZipArchive::listFileInfo(bool recursive, bool dirs) const
+    FileInfoList ZipArchive::listFileInfo(bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        FileInfoList* fil = OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)();
+        FileInfoList fil;
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
             if ((dirs == (i->compressedSize == size_t (-1))) &&
                 (recursive || i->path.empty()))
-                fil->push_back(*i);
+                fil.push_back(*i);
 
-        return FileInfoListPtr(fil, SPFM_DELETE_T);
+        return fil;
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr ZipArchive::find(const String& pattern, bool recursive, bool dirs) const
+    StringVector ZipArchive::find(const String& pattern, bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        StringVector ret;
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
@@ -259,16 +259,16 @@ namespace Ogre {
                 (recursive || full_match || wildCard))
                 // Check basename matches pattern (zip is case insensitive)
                 if (StringUtil::match(full_match ? i->filename : i->basename, pattern, false))
-                    ret->push_back(i->filename);
+                    ret.push_back(i->filename);
 
         return ret;
     }
     //-----------------------------------------------------------------------
-    FileInfoListPtr ZipArchive::findFileInfo(const String& pattern, 
+    FileInfoList ZipArchive::findFileInfo(const String& pattern,
         bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        FileInfoListPtr ret = FileInfoListPtr(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        FileInfoList ret;
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
@@ -281,7 +281,7 @@ namespace Ogre {
                 (recursive || full_match || wildCard))
                 // Check name matches pattern (zip is case insensitive)
                 if (StringUtil::match(full_match ? i->filename : i->basename, pattern, false))
-                    ret->push_back(*i);
+                    ret.push_back(*i);
 
         return ret;
     }

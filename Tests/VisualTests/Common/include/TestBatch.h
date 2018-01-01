@@ -178,22 +178,22 @@ public:
         TestBatchSet out;
         // use ArchiveManager to get a list of all subdirectories
         Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(directory, "FileSystem", true);
-        Ogre::StringVectorPtr tests = testDir->list(false, true);
-        for (unsigned int i = 0; i < tests->size(); ++i)
+        Ogre::StringVector tests = testDir->list(false, true);
+        for (unsigned int i = 0; i < tests.size(); ++i)
         {
             Ogre::ConfigFile info;
             
             // look for info.cfg, if none found, must not be a batch directory
             try
             {
-                info.load(directory + (*tests)[i] + "/info.cfg");
+                info.load(directory + tests[i] + "/info.cfg");
             }
             catch (Ogre::FileNotFoundException& e)
             {
                 continue;
             }
 
-            out.insert(TestBatch(info, directory + (*tests)[i]));
+            out.insert(TestBatch(info, directory + tests[i]));
         }
 
         return out;

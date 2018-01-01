@@ -65,7 +65,6 @@ namespace Ogre {
     };
 
     typedef vector<FileInfo>::type FileInfoList;
-    typedef SharedPtr<FileInfoList> FileInfoListPtr;
 
     /** Archive-handling class.
     @remarks
@@ -168,7 +167,7 @@ namespace Ogre {
             instead of files
         @return A list of filenames matching the criteria, all are fully qualified
         */
-        virtual StringVectorPtr list(bool recursive = true, bool dirs = false) const = 0;
+        virtual StringVector list(bool recursive = true, bool dirs = false) const = 0;
         
         /** List all files in the archive with accompanying information.
         @param recursive Whether all paths of the archive are searched (if the 
@@ -178,7 +177,7 @@ namespace Ogre {
         @return A list of structures detailing quite a lot of information about
             all the files in the archive.
         */
-        virtual FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const = 0;
+        virtual FileInfoList listFileInfo(bool recursive = true, bool dirs = false) const = 0;
 
         /** Find all file or directory names matching a given pattern
             in this archive.
@@ -192,7 +191,7 @@ namespace Ogre {
             instead of files
         @return A list of filenames matching the criteria, all are fully qualified
         */
-        virtual StringVectorPtr find(const String& pattern, bool recursive = true,
+        virtual StringVector find(const String& pattern, bool recursive = true,
             bool dirs = false) const = 0;
 
         /** Find out if the named file exists (note: fully qualified filename required) */
@@ -212,8 +211,8 @@ namespace Ogre {
         @return A list of file information structures for all files matching 
             the criteria.
         */
-        virtual FileInfoListPtr findFileInfo(const String& pattern, 
-            bool recursive = true, bool dirs = false) const = 0;
+        virtual FileInfoList findFileInfo(const String& pattern, bool recursive = true,
+                                          bool dirs = false) const = 0;
 
         /// Return the type code of this Archive
         const String& getType(void) const { return mType; }

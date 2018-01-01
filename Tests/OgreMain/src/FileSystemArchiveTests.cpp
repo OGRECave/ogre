@@ -60,12 +60,12 @@ TEST_F(FileSystemArchiveTests,ListNonRecursive)
     try {
         FileSystemArchive arch(mTestPath, "FileSystem", true);
         arch.load();
-        StringVectorPtr vec = arch.list(false);
+        StringVector vec = arch.list(false);
 
-        EXPECT_EQ((unsigned int)2, (unsigned int)vec->size());
-        sort(vec->begin(), vec->end());
-        EXPECT_EQ(String("rootfile.txt"), vec->at(0));
-        EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
+        EXPECT_EQ((unsigned int)2, (unsigned int)vec.size());
+        sort(vec.begin(), vec.end());
+        EXPECT_EQ(String("rootfile.txt"), vec.at(0));
+        EXPECT_EQ(String("rootfile2.txt"), vec.at(1));
     }
     catch (Exception& e)
     {
@@ -77,37 +77,37 @@ TEST_F(FileSystemArchiveTests,ListRecursive)
 {
     FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
-    StringVectorPtr vec = arch.list(true);
+    StringVector vec = arch.list(true);
 
-    EXPECT_EQ((size_t)6, vec->size());
-    sort(vec->begin(), vec->end());
-    EXPECT_EQ(String("level1/materials/scripts/file.material"), vec->at(0));
-    EXPECT_EQ(String("level1/materials/scripts/file2.material"), vec->at(1));
-    EXPECT_EQ(String("level2/materials/scripts/file3.material"), vec->at(2));
-    EXPECT_EQ(String("level2/materials/scripts/file4.material"), vec->at(3));
-    EXPECT_EQ(String("rootfile.txt"), vec->at(4));
-    EXPECT_EQ(String("rootfile2.txt"), vec->at(5));
+    EXPECT_EQ((size_t)6, vec.size());
+    sort(vec.begin(), vec.end());
+    EXPECT_EQ(String("level1/materials/scripts/file.material"), vec.at(0));
+    EXPECT_EQ(String("level1/materials/scripts/file2.material"), vec.at(1));
+    EXPECT_EQ(String("level2/materials/scripts/file3.material"), vec.at(2));
+    EXPECT_EQ(String("level2/materials/scripts/file4.material"), vec.at(3));
+    EXPECT_EQ(String("rootfile.txt"), vec.at(4));
+    EXPECT_EQ(String("rootfile2.txt"), vec.at(5));
 }
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,ListFileInfoNonRecursive)
 {
     FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
-    FileInfoListPtr vec = arch.listFileInfo(false);
+    FileInfoList vec = arch.listFileInfo(false);
 
     // Only execute size checks, if the values have been set for the current platform
     if(mFileSizeRoot1 >0 && mFileSizeRoot2 > 0) 
     {
-        EXPECT_EQ((size_t)2, vec->size());
-        sort(vec->begin(), vec->end());
-        FileInfo& fi1 = vec->at(0);
+        EXPECT_EQ((size_t)2, vec.size());
+        sort(vec.begin(), vec.end());
+        FileInfo& fi1 = vec.at(0);
         EXPECT_EQ(String("rootfile.txt"), fi1.filename);
         EXPECT_EQ(String("rootfile.txt"), fi1.basename);
         EXPECT_EQ(BLANKSTRING, fi1.path);
         EXPECT_EQ((size_t)mFileSizeRoot1, fi1.compressedSize);
         EXPECT_EQ((size_t)mFileSizeRoot1, fi1.uncompressedSize);
 
-        FileInfo& fi2 = vec->at(1);
+        FileInfo& fi2 = vec.at(1);
         EXPECT_EQ(String("rootfile2.txt"), fi2.filename);
         EXPECT_EQ(String("rootfile2.txt"), fi2.basename);
         EXPECT_EQ(BLANKSTRING, fi2.path);
@@ -120,21 +120,21 @@ TEST_F(FileSystemArchiveTests,ListFileInfoRecursive)
 {
     FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
-    FileInfoListPtr vec = arch.listFileInfo(true);
-    sort(vec->begin(), vec->end());
+    FileInfoList vec = arch.listFileInfo(true);
+    sort(vec.begin(), vec.end());
 
     // Only execute size checks, if the values have been set for the current platform
     if(mFileSizeRoot1 >0 && mFileSizeRoot2 > 0) 
     {
-        EXPECT_EQ((size_t)6, vec->size()); 
-        FileInfo& fi1 = vec->at(4);
+        EXPECT_EQ((size_t)6, vec.size());
+        FileInfo& fi1 = vec.at(4);
         EXPECT_EQ(String("rootfile.txt"), fi1.filename);
         EXPECT_EQ(String("rootfile.txt"), fi1.basename);
         EXPECT_EQ(BLANKSTRING, fi1.path);
         EXPECT_EQ((size_t)mFileSizeRoot1, fi1.compressedSize);
         EXPECT_EQ((size_t)mFileSizeRoot1, fi1.uncompressedSize);
 
-        FileInfo& fi2 = vec->at(5);
+        FileInfo& fi2 = vec.at(5);
         EXPECT_EQ(String("rootfile2.txt"), fi2.filename);
         EXPECT_EQ(String("rootfile2.txt"), fi2.basename);
         EXPECT_EQ(BLANKSTRING, fi2.path);
@@ -142,28 +142,28 @@ TEST_F(FileSystemArchiveTests,ListFileInfoRecursive)
         EXPECT_EQ((size_t)mFileSizeRoot2, fi2.uncompressedSize);
     }
 
-    FileInfo& fi3 = vec->at(0);
+    FileInfo& fi3 = vec.at(0);
     EXPECT_EQ(String("level1/materials/scripts/file.material"), fi3.filename);
     EXPECT_EQ(String("file.material"), fi3.basename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi3.path);
     EXPECT_EQ((size_t)0, fi3.compressedSize);
     EXPECT_EQ((size_t)0, fi3.uncompressedSize);
 
-    FileInfo& fi4 = vec->at(1);
+    FileInfo& fi4 = vec.at(1);
     EXPECT_EQ(String("level1/materials/scripts/file2.material"), fi4.filename);
     EXPECT_EQ(String("file2.material"), fi4.basename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi4.path);
     EXPECT_EQ((size_t)0, fi4.compressedSize);
     EXPECT_EQ((size_t)0, fi4.uncompressedSize);
 
-    FileInfo& fi5 = vec->at(2);
+    FileInfo& fi5 = vec.at(2);
     EXPECT_EQ(String("level2/materials/scripts/file3.material"), fi5.filename);
     EXPECT_EQ(String("file3.material"), fi5.basename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi5.path);
     EXPECT_EQ((size_t)0, fi5.compressedSize);
     EXPECT_EQ((size_t)0, fi5.uncompressedSize);
 
-    FileInfo& fi6 = vec->at(3);
+    FileInfo& fi6 = vec.at(3);
     EXPECT_EQ(String("level2/materials/scripts/file4.material"), fi6.filename);
     EXPECT_EQ(String("file4.material"), fi6.basename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi6.path);
@@ -175,47 +175,47 @@ TEST_F(FileSystemArchiveTests,FindNonRecursive)
 {
     FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
-    StringVectorPtr vec = arch.find("*.txt", false);
+    StringVector vec = arch.find("*.txt", false);
 
-    EXPECT_EQ((size_t)2, vec->size());
-    sort(vec->begin(), vec->end());
-    EXPECT_EQ(String("rootfile.txt"), vec->at(0));
-    EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
+    EXPECT_EQ((size_t)2, vec.size());
+    sort(vec.begin(), vec.end());
+    EXPECT_EQ(String("rootfile.txt"), vec.at(0));
+    EXPECT_EQ(String("rootfile2.txt"), vec.at(1));
 }
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,FindRecursive)
 {
     FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
-    StringVectorPtr vec = arch.find("*.material", true);
+    StringVector vec = arch.find("*.material", true);
 
-    EXPECT_EQ((size_t)4, vec->size());
-    sort(vec->begin(), vec->end());
-    EXPECT_EQ(String("level1/materials/scripts/file.material"), vec->at(0));
-    EXPECT_EQ(String("level1/materials/scripts/file2.material"), vec->at(1));
-    EXPECT_EQ(String("level2/materials/scripts/file3.material"), vec->at(2));
-    EXPECT_EQ(String("level2/materials/scripts/file4.material"), vec->at(3));
+    EXPECT_EQ((size_t)4, vec.size());
+    sort(vec.begin(), vec.end());
+    EXPECT_EQ(String("level1/materials/scripts/file.material"), vec.at(0));
+    EXPECT_EQ(String("level1/materials/scripts/file2.material"), vec.at(1));
+    EXPECT_EQ(String("level2/materials/scripts/file3.material"), vec.at(2));
+    EXPECT_EQ(String("level2/materials/scripts/file4.material"), vec.at(3));
 }
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,FindFileInfoNonRecursive)
 {
     FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
-    FileInfoListPtr vec = arch.findFileInfo("*.txt", false);
+    FileInfoList vec = arch.findFileInfo("*.txt", false);
 
     // Only execute size checks, if the values have been set for the current platform
     if(mFileSizeRoot1 >0 && mFileSizeRoot2 > 0) 
     {
-        EXPECT_EQ((size_t)2, vec->size());
-        sort(vec->begin(), vec->end());
-        FileInfo& fi1 = vec->at(0);
+        EXPECT_EQ((size_t)2, vec.size());
+        sort(vec.begin(), vec.end());
+        FileInfo& fi1 = vec.at(0);
         EXPECT_EQ(String("rootfile.txt"), fi1.filename);
         EXPECT_EQ(String("rootfile.txt"), fi1.basename);
         EXPECT_EQ(BLANKSTRING, fi1.path);
         EXPECT_EQ((size_t)mFileSizeRoot1, fi1.compressedSize);
         EXPECT_EQ((size_t)mFileSizeRoot1, fi1.uncompressedSize);
 
-        FileInfo& fi2 = vec->at(1);
+        FileInfo& fi2 = vec.at(1);
         EXPECT_EQ(String("rootfile2.txt"), fi2.filename);
         EXPECT_EQ(String("rootfile2.txt"), fi2.basename);
         EXPECT_EQ(BLANKSTRING, fi2.path);
@@ -228,33 +228,33 @@ TEST_F(FileSystemArchiveTests,FindFileInfoRecursive)
 {
     FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
-    FileInfoListPtr vec = arch.findFileInfo("*.material", true);
+    FileInfoList vec = arch.findFileInfo("*.material", true);
 
-    EXPECT_EQ((size_t)4, vec->size());
-    sort(vec->begin(), vec->end());
+    EXPECT_EQ((size_t)4, vec.size());
+    sort(vec.begin(), vec.end());
 
-    FileInfo& fi3 = vec->at(0);
+    FileInfo& fi3 = vec.at(0);
     EXPECT_EQ(String("level1/materials/scripts/file.material"), fi3.filename);
     EXPECT_EQ(String("file.material"), fi3.basename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi3.path);
     EXPECT_EQ((size_t)0, fi3.compressedSize);
     EXPECT_EQ((size_t)0, fi3.uncompressedSize);
 
-    FileInfo& fi4 = vec->at(1);
+    FileInfo& fi4 = vec.at(1);
     EXPECT_EQ(String("level1/materials/scripts/file2.material"), fi4.filename);
     EXPECT_EQ(String("file2.material"), fi4.basename);
     EXPECT_EQ(String("level1/materials/scripts/"), fi4.path);
     EXPECT_EQ((size_t)0, fi4.compressedSize);
     EXPECT_EQ((size_t)0, fi4.uncompressedSize);
 
-    FileInfo& fi5 = vec->at(2);
+    FileInfo& fi5 = vec.at(2);
     EXPECT_EQ(String("level2/materials/scripts/file3.material"), fi5.filename);
     EXPECT_EQ(String("file3.material"), fi5.basename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi5.path);
     EXPECT_EQ((size_t)0, fi5.compressedSize);
     EXPECT_EQ((size_t)0, fi5.uncompressedSize);
 
-    FileInfo& fi6 = vec->at(3);
+    FileInfo& fi6 = vec.at(3);
     EXPECT_EQ(String("level2/materials/scripts/file4.material"), fi6.filename);
     EXPECT_EQ(String("file4.material"), fi6.basename);
     EXPECT_EQ(String("level2/materials/scripts/"), fi6.path);

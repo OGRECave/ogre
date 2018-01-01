@@ -47,9 +47,9 @@ namespace Ogre
 		{
 			StringVecMap& pieceFileNames = mPieceFileNames[i];
 
-			FileInfoListPtr list = rgm.findResourceFileInfo(mResorceGroup, "*_piece" + FilePatterns[i] + ".*");
-			FileInfoList::iterator it = list->begin();
-			FileInfoList::iterator end = list->end();
+			FileInfoList list = rgm.findResourceFileInfo(mResorceGroup, "*_piece" + FilePatterns[i] + ".*");
+			FileInfoList::iterator it = list.begin();
+			FileInfoList::iterator end = list.end();
 
 			for (; it != end; it++)
 			{

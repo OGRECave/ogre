@@ -542,7 +542,7 @@ namespace Ogre {
         ResourceLocation* loc = OGRE_NEW_T(ResourceLocation, MEMCATEGORY_RESOURCE);
         loc->archive = pArch;
         loc->recursive = recursive;
-        StringVectorPtr vec = pArch->find("*", recursive);
+        StringVector vec = pArch->find("*", recursive);
 
         ResourceGroup* grp = getResourceGroup(resGroup);
         if (!grp)
@@ -555,7 +555,7 @@ namespace Ogre {
         grp->locationList.push_back(loc);
 
         // Index resources
-        for( StringVector::iterator it = vec->begin(); it != vec->end(); ++it )
+        for( StringVector::iterator it = vec.begin(); it != vec.end(); ++it )
             grp->addToIndex(*it, pArch);
         
         StringStream msg;
@@ -709,7 +709,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    DataStreamListPtr ResourceGroupManager::openResources(
+    DataStreamList ResourceGroupManager::openResources(
         const String& pattern, const String& groupName) const
     {
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -724,8 +724,7 @@ namespace Ogre {
 
         // Iterate through all the archives and build up a combined list of
         // streams
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        DataStreamListPtr ret = DataStreamListPtr(OGRE_NEW_T(DataStreamList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        DataStreamList ret;
 
         LocationList::iterator li, liend;
         liend = grp->locationList.end();
@@ -733,15 +732,15 @@ namespace Ogre {
         {
             Archive* arch = (*li)->archive;
             // Find all the names based on whether this archive is recursive
-            StringVectorPtr names = arch->find(pattern, (*li)->recursive);
+            StringVector names = arch->find(pattern, (*li)->recursive);
 
             // Iterate over the names and load a stream for each
-            for (StringVector::iterator ni = names->begin(); ni != names->end(); ++ni)
+            for (StringVector::iterator ni = names.begin(); ni != names.end(); ++ni)
             {
                 DataStreamPtr ptr = arch->open(*ni);
                 if (ptr)
                 {
-                    ret->push_back(ptr);
+                    ret.push_back(ptr);
                 }
             }
         }
@@ -848,8 +847,8 @@ namespace Ogre {
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
             {
-                StringVectorPtr matchingFiles = arch->find(filePattern);
-                for (StringVector::iterator f = matchingFiles->begin(); f != matchingFiles->end(); ++f)
+                StringVector matchingFiles = arch->find(filePattern);
+                for (StringVector::iterator f = matchingFiles.begin(); f != matchingFiles.end(); ++f)
                 {
                     arch->remove(*f);
                     grp->removeFromIndex(*f, arch);
@@ -966,7 +965,7 @@ namespace Ogre {
             "Parsing scripts for resource group " + grp->name);
 
         // Count up the number of scripts we have to parse
-        typedef list<FileInfoListPtr>::type FileListList;
+        typedef list<FileInfoList>::type FileListList;
         typedef SharedPtr<FileListList> FileListListPtr;
         typedef std::pair<ScriptLoader*, FileListListPtr> LoaderFileListPair;
         typedef list<LoaderFileListPair>::type ScriptLoaderFileList;
@@ -978,15 +977,14 @@ namespace Ogre {
             oi != mScriptLoaderOrderMap.end(); ++oi)
         {
             ScriptLoader* su = oi->second;
-            // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-            FileListListPtr fileListList(OGRE_NEW_T(FileListList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+            FileListListPtr fileListList;
 
             // Get all the patterns and search them
             const StringVector& patterns = su->getScriptPatterns();
             for (StringVector::const_iterator p = patterns.begin(); p != patterns.end(); ++p)
             {
-                FileInfoListPtr fileList = findResourceFileInfo(grp->name, *p);
-                scriptCount += fileList->size();
+                FileInfoList fileList = findResourceFileInfo(grp->name, *p);
+                scriptCount += fileList.size();
                 fileListList->push_back(fileList);
             }
             scriptLoaderFileList.push_back(
@@ -1005,7 +1003,7 @@ namespace Ogre {
             for (FileListList::iterator flli = slfli->second->begin(); flli != slfli->second->end(); ++flli)
             {
                 // Iterate over each item in the list
-                for (FileInfoList::iterator fii = (*flli)->begin(); fii != (*flli)->end(); ++fii)
+                for (FileInfoList::iterator fii = flli->begin(); fii != flli->end(); ++fii)
                 {
                     bool skipScript = false;
                     fireScriptStarted(fii->filename, skipScript);
@@ -1454,10 +1452,9 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr ResourceGroupManager::listResourceNames(const String& groupName, bool dirs) const
+    StringVector ResourceGroupManager::listResourceNames(const String& groupName, bool dirs) const
     {
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        StringVector vec;
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1475,8 +1472,8 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            StringVectorPtr lst = (*i)->archive->list((*i)->recursive, dirs);
-            vec->insert(vec->end(), lst->begin(), lst->end());
+            StringVector lst = (*i)->archive->list((*i)->recursive, dirs);
+            vec.insert(vec.end(), lst.begin(), lst.end());
         }
 
         return vec;
@@ -1484,10 +1481,9 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    FileInfoListPtr ResourceGroupManager::listResourceFileInfo(const String& groupName, bool dirs) const
+    FileInfoList ResourceGroupManager::listResourceFileInfo(const String& groupName, bool dirs) const
     {
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        FileInfoList vec;
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1505,19 +1501,18 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            FileInfoListPtr lst = (*i)->archive->listFileInfo((*i)->recursive, dirs);
-            vec->insert(vec->end(), lst->begin(), lst->end());
+            FileInfoList lst = (*i)->archive->listFileInfo((*i)->recursive, dirs);
+            vec.insert(vec.end(), lst.begin(), lst.end());
         }
 
         return vec;
 
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr ResourceGroupManager::findResourceNames(const String& groupName, 
+    StringVector ResourceGroupManager::findResourceNames(const String& groupName,
         const String& pattern, bool dirs) const
     {
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        StringVector vec;
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1535,18 +1530,17 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            StringVectorPtr lst = (*i)->archive->find(pattern, (*i)->recursive, dirs);
-            vec->insert(vec->end(), lst->begin(), lst->end());
+            StringVector lst = (*i)->archive->find(pattern, (*i)->recursive, dirs);
+            vec.insert(vec.end(), lst.begin(), lst.end());
         }
 
         return vec;
     }
     //-----------------------------------------------------------------------
-    FileInfoListPtr ResourceGroupManager::findResourceFileInfo(const String& groupName, 
+    FileInfoList ResourceGroupManager::findResourceFileInfo(const String& groupName,
         const String& pattern, bool dirs) const
     {
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        FileInfoList vec;
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1564,8 +1558,8 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            FileInfoListPtr lst = (*i)->archive->findFileInfo(pattern, (*i)->recursive, dirs);
-            vec->insert(vec->end(), lst->begin(), lst->end());
+            FileInfoList lst = (*i)->archive->findFileInfo(pattern, (*i)->recursive, dirs);
+            vec.insert(vec.end(), lst.begin(), lst.end());
         }
 
         return vec;
@@ -1688,9 +1682,9 @@ namespace Ogre {
             "ResourceGroupManager::findGroupContainingResource");
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr ResourceGroupManager::listResourceLocations(const String& groupName) const
+    StringVector ResourceGroupManager::listResourceLocations(const String& groupName) const
     {
-        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        StringVector vec;
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1708,15 +1702,15 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            vec->push_back((*i)->archive->getName());
+            vec.push_back((*i)->archive->getName());
         }
 
         return vec;
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr ResourceGroupManager::findResourceLocation(const String& groupName, const String& pattern) const
+    StringVector ResourceGroupManager::findResourceLocation(const String& groupName, const String& pattern) const
     {
-        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        StringVector vec;
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1738,7 +1732,7 @@ namespace Ogre {
             // Search for the pattern
             if(StringUtil::match(location, pattern))
             {
-                vec->push_back(location);
+                vec.push_back(location);
             }
         }
 

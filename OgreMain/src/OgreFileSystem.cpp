@@ -397,46 +397,45 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr FileSystemArchive::list(bool recursive, bool dirs) const
+    StringVector FileSystemArchive::list(bool recursive, bool dirs) const
     {
         // directory change requires locking due to saved returns
         // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
-        StringVectorPtr ret(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        StringVector ret;
 
-        findFiles("*", recursive, dirs, ret.get(), 0);
+        findFiles("*", recursive, dirs, &ret, 0);
 
         return ret;
     }
     //-----------------------------------------------------------------------
-    FileInfoListPtr FileSystemArchive::listFileInfo(bool recursive, bool dirs) const
+    FileInfoList FileSystemArchive::listFileInfo(bool recursive, bool dirs) const
     {
         // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
-        FileInfoListPtr ret(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        FileInfoList ret;
 
-        findFiles("*", recursive, dirs, 0, ret.get());
+        findFiles("*", recursive, dirs, 0, &ret);
 
         return ret;
     }
     //-----------------------------------------------------------------------
-    StringVectorPtr FileSystemArchive::find(const String& pattern,
-                                            bool recursive, bool dirs) const
+    StringVector FileSystemArchive::find(const String& pattern, bool recursive, bool dirs) const
     {
         // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
-        StringVectorPtr ret(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        StringVector ret;
 
-        findFiles(pattern, recursive, dirs, ret.get(), 0);
+        findFiles(pattern, recursive, dirs, &ret, 0);
 
         return ret;
 
     }
     //-----------------------------------------------------------------------
-    FileInfoListPtr FileSystemArchive::findFileInfo(const String& pattern, 
+    FileInfoList FileSystemArchive::findFileInfo(const String& pattern,
         bool recursive, bool dirs) const
     {
         // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
-        FileInfoListPtr ret(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        FileInfoList ret;
 
-        findFiles(pattern, recursive, dirs, 0, ret.get());
+        findFiles(pattern, recursive, dirs, 0, &ret);
 
         return ret;
     }
