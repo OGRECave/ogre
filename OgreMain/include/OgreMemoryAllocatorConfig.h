@@ -185,7 +185,6 @@ namespace Ogre
 }
 
 #include "OgreMemoryAllocatedObject.h"
-#include "OgreMemorySTLAllocator.h"
 
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_STD
 

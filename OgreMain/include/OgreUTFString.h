@@ -464,9 +464,6 @@ namespace Ogre {
         UTFString( const char* c_str, size_type length );
         //! duplicate of \a str (UTF-8 encoding)
         UTFString( const std::string& str );
-#if OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
-        UTFString( const Ogre::String& str );
-#endif
 
         //! destructor
         ~UTFString();
@@ -904,10 +901,6 @@ namespace Ogre {
         operator std::string() const;
         //! implicit cast to std::wstring
         operator std::wstring() const;
-#if OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
-        //! implicit cast to Ogre::String
-        operator Ogre::String() const;
-#endif
         //@}
 
         //////////////////////////////////////////////////////////////////////////

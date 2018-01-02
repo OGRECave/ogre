@@ -278,7 +278,6 @@ elseif(EMSCRIPTEN)
   set(OGRE_BUILD_COMPONENT_PAGING FALSE CACHE BOOL "Disable paging component on Emscripten" FORCE)
   set(OGRE_BUILD_COMPONENT_TERRAIN FALSE CACHE BOOL "Disable terrain component on Emscripten" FORCE)
   set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING "Use default allocator on Emscripten" FORCE)
-  set(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR FALSE CACHE BOOL "Containers use default allocator on Emscripten" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Emscripten" FORCE)
 elseif (APPLE AND NOT APPLE_IOS)
 
@@ -383,8 +382,6 @@ set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING
 )
 endif ()
 
-option(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR "STL containers in Ogre use the custom allocator" FALSE)
-option(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR "Ogre String uses the custom allocator" FALSE)
 option(OGRE_CONFIG_MEMTRACK_DEBUG "Enable Ogre's memory tracker in debug mode" FALSE)
 option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mode" FALSE)
 # determine threading options
@@ -448,8 +445,6 @@ mark_as_advanced(
   OGRE_CONFIG_DOUBLE
   OGRE_CONFIG_NODE_INHERIT_TRANSFORM
   OGRE_CONFIG_ALLOCATOR
-  OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR
-  OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR
   OGRE_CONFIG_MEMTRACK_DEBUG
   OGRE_CONFIG_MEMTRACK_RELEASE
   OGRE_CONFIG_ENABLE_MESHLOD

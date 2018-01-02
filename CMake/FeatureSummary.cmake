@@ -197,12 +197,10 @@ else ()
     set(_assert "exceptions")
 endif()
 # various true/false settings
-var_to_string(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR _containers)
 var_to_string(OGRE_CONFIG_DOUBLE _double)
 var_to_string(OGRE_CONFIG_NODE_INHERIT_TRANSFORM _inherit_transform)
 var_to_string(OGRE_CONFIG_MEMTRACK_DEBUG _memtrack_debug)
 var_to_string(OGRE_CONFIG_MEMTRACK_RELEASE _memtrack_release)
-var_to_string(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR _string)
 
 # threading settings
 if (OGRE_CONFIG_THREADS EQUAL 0 OR OGRE_CONFIG_THREADS EQUAL 3)
