@@ -42,7 +42,7 @@ float calcDepthShadow(sampler2DShadow shadowMap, vec4 uv, float invShadowMapSize
 	for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE)
 		for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE)
 		{
-			float depth = shadow2DProj(shadowMap, offsetSample(uv, vec2(x, y), invShadowMapSize)).x;
+			float depth = vec4(shadow2DProj(shadowMap, offsetSample(uv, vec2(x, y), invShadowMapSize))).x;
 			if (depth >= 1.0 || depth >= uv.z)
 				shadow += 1.0;
 		}
@@ -55,7 +55,7 @@ float calcDepthShadow(sampler2DShadow shadowMap, vec4 uv, float invShadowMapSize
 
 float calcSimpleShadow(sampler2DShadow shadowMap, vec4 shadowMapPos)
 {
-	return shadow2DProj(shadowMap, shadowMapPos).x;
+	return vec4(shadow2DProj(shadowMap, shadowMapPos)).x;
 }
 
 float calcPSSMDepthShadow(sampler2DShadow shadowMap0, sampler2DShadow shadowMap1, sampler2DShadow shadowMap2, 
@@ -127,19 +127,19 @@ vec3 calcPSSMDebugShadow(sampler2DShadow shadowMap0, sampler2DShadow shadowMap1,
 	{
 		//splitColour = vec4(0.3, 0.0, 0, 0);
 		//splitColour = lsPos0 / lsPos0.w;
-		splitColour.rgb = shadow2DProj(shadowMap0, lsPos0).xxx;
+		splitColour.rgb = vec4(shadow2DProj(shadowMap0, lsPos0)).xxx;
 	}
 	else if (camDepth <= pssmSplitPoints.z)
 	{
 		//splitColour = vec4(0, 0.3, 0, 0);
 		//splitColour = lsPos1 / lsPos1.w;
-		splitColour.rgb = shadow2DProj(shadowMap1, lsPos1).xxx;
+		splitColour.rgb = vec4(shadow2DProj(shadowMap1, lsPos1)).xxx;
 	}
 	else
 	{
 		//splitColour = vec4(0.0, 0.0, 0.3, 0);
 		//splitColour = lsPos2 / lsPos2.w;
-		splitColour.rgb = shadow2DProj(shadowMap2, lsPos2).xxx;
+		splitColour.rgb = vec4(shadow2DProj(shadowMap2, lsPos2)).xxx;
 	}
 
 	return splitColour.rgb;
