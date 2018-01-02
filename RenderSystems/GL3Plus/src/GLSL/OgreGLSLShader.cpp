@@ -132,8 +132,20 @@ namespace Ogre {
         // submit shader source to OpenGL.
         if (!mSource.empty())
         {
+            const RenderSystemCapabilities* rsc = Root::getSingleton().getRenderSystem()->getCapabilities();
+
+            size_t versionPos = mSource.find("#version");
+            int shaderVersion = 100;
+            size_t belowVersionPos = 0;
+
+            if(versionPos != String::npos)
+            {
+                shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
+                belowVersionPos = mSource.find("\n", versionPos) + 1;
+            }
+
             // Add standard shader input and output blocks, if missing.
-            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_GLSL_SSO_REDECLARE))
+            if (rsc->hasCapability(RSC_GLSL_SSO_REDECLARE))
             {
                 // Assume blocks are missing if gl_Position is missing.
                 if (mSource.find("vec4 gl_Position") == String::npos)
@@ -143,16 +155,6 @@ namespace Ogre {
                     // shader, i.e. has a main function.
                     if (mainPos != String::npos)
                     {
-                        size_t versionPos = mSource.find("#version");
-                        int shaderVersion = 100;
-                        size_t belowVersionPos = 0;
-
-                        if(versionPos != String::npos)
-                        {
-                        	shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
-                            belowVersionPos = mSource.find("\n", versionPos) + 1;
-                        }
-
                         if (shaderVersion >= 150)
                         {
                             switch (mType)
@@ -184,6 +186,33 @@ namespace Ogre {
                             mSource.insert(belowVersionPos, "varying vec4 gl_Position;\nvarying float gl_PointSize;\nvarying float gl_ClipDistance[];\n\n");
                         }
                     }
+                }
+
+                // OSX driver only supports glsl150+ in core profile
+                if(!rsc->isShaderProfileSupported("glsl130") && shaderVersion < 150)
+                {
+                    if(belowVersionPos != 0)
+                        mSource = mSource.erase(0, belowVersionPos); // drop old definition
+
+                    // automatically upgrade to glsl150. thank you apple.
+                    const char* prefixFp =
+                            "#version 150\n"
+                            "#define varying in\n"
+                            "#define texture1D texture\n"
+                            "#define texture2D texture\n"
+                            "#define texture3D texture\n"
+                            "#define textureCube texture\n"
+                            "#define texture2DLod textureLod\n"
+                            "#define textureCubeLod textureLod\n"
+                            "#define shadow2DProj textureProj\n"
+                            "#define gl_FragColor FragColor\n"
+                            "out vec4 FragColor;\n";
+                    const char* prefixVp =
+                            "#version 150\n"
+                            "#define attribute in\n"
+                            "#define varying out\n";
+
+                    mSource.insert(0, mType == GPT_FRAGMENT_PROGRAM ? prefixFp : prefixVp);
                 }
             }
             // Submit shader source.
