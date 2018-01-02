@@ -8,7 +8,7 @@
     * What you do **NOT** need: Boost. Don't waste your time.
     * Clang >3.5 or GCC >4.0
     * [QtCreator](https://download.qt.io/official_releases/qtcreator/) recommended (Optional).
-    * Debian-based: `sudo apt-get install libfreetype6-dev libfreeimage-dev libzzip-dev libxrandr-dev libxaw7-dev freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev doxygen graphviz`
+    * Debian-based: `sudo apt-get install libfreetype6-dev libfreeimage-dev libzzip-dev libxrandr-dev libxaw7-dev freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev doxygen graphviz python-clang-4.0`
     * Arch: `pacman -S freeimage freetype2 libxaw libxrandr mesa zziplib cmake gcc`
     * For HW & SW requirements, please visit http://www.ogre3d.org/developers/requirements
     * NVIDIA users: Proprietary drivers are recommended.

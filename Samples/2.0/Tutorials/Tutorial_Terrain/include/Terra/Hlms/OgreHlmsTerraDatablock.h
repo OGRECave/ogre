@@ -165,6 +165,8 @@ namespace Ogre
         /// @see TerraBrdf::TerraBrdf
         uint32  mBrdf;
 
+        virtual void cloneImpl( HlmsDatablock *datablock ) const;
+
         void scheduleConstBufferUpdate(void);
         virtual void uploadToConstBuffer( char *dstPtr );
 
