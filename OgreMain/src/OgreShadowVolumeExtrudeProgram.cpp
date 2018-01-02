@@ -111,6 +111,25 @@ namespace Ogre {
         "\n"
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "}\n";
+    
+    String ShadowVolumeExtrudeProgram::mPointVs_glsl150 =
+    "#version 150\n"
+    "// Point light shadow volume extrude\n"
+    "in vec4 uv0;\n"
+    "in vec4 position;\n\n"
+    "uniform mat4 worldviewproj_matrix;\n"
+    "uniform vec4 light_position_object_space; // homogenous, object space\n\n"
+    "void main()\n"
+    "{\n"
+    "    // Extrusion in object space\n"
+    "    // Vertex unmodified if w==1, extruded if w==0\n"
+    "    vec4 newpos = \n"
+    "        (uv0.xxxx * light_position_object_space) + \n"
+    "        vec4(position.xyz - light_position_object_space.xyz, 0.0);\n"
+    "\n"
+    "    gl_Position = worldviewproj_matrix * newpos;\n"
+    "}\n";
+
     String ShadowVolumeExtrudeProgram::mPointVs_glsles = glsles_prefix + mPointVs_glsl;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1 = 
@@ -179,6 +198,23 @@ namespace Ogre {
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "}\n";
 
+    String ShadowVolumeExtrudeProgram::mDirVs_glsl150 =
+    "#version 150\n"
+    "// Directional light extrude\n"
+    "in vec4 uv0;\n"
+    "in vec4 position;\n\n"
+    "uniform mat4 worldviewproj_matrix;\n"
+    "uniform vec4 light_position_object_space; // homogenous, object space\n\n"
+    "void main()\n"
+    "{\n"
+    "    // Extrusion in object space\n"
+    "    // Vertex unmodified if w==1, extruded if w==0\n"
+    "    vec4 newpos = \n"
+    "        (uv0.xxxx * (position + light_position_object_space)) - light_position_object_space;\n"
+    "\n"
+    "    gl_Position = worldviewproj_matrix * newpos;\n"
+    "}\n";
+
     String ShadowVolumeExtrudeProgram::mDirVs_glsles = glsles_prefix + mDirVs_glsl;
 
 
@@ -218,6 +254,7 @@ namespace Ogre {
 
     String ShadowVolumeExtrudeProgram::mPointVs_4_0Debug = mPointVs_4_0;
     String ShadowVolumeExtrudeProgram::mPointVs_glslDebug = mPointVs_glsl;
+    String ShadowVolumeExtrudeProgram::mPointVs_glsl150Debug = mPointVs_glsl150;
     String ShadowVolumeExtrudeProgram::mPointVs_glslesDebug = mPointVs_glsles;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1Debug = 
@@ -252,6 +289,7 @@ namespace Ogre {
 
     String ShadowVolumeExtrudeProgram::mDirVs_4_0Debug = mDirVs_4_0;
     String ShadowVolumeExtrudeProgram::mDirVs_glslDebug = mDirVs_glsl;
+    String ShadowVolumeExtrudeProgram::mDirVs_glsl150Debug = mDirVs_glsl150;
     String ShadowVolumeExtrudeProgram::mDirVs_glslesDebug = mDirVs_glsles;
 
 
@@ -346,6 +384,27 @@ namespace Ogre {
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "}\n";
 
+    String ShadowVolumeExtrudeProgram::mPointVs_glsl150Finite =
+    "#version 150\n"
+    "// Point light shadow volume extrude - FINITE\n"
+    "in vec4 uv0;\n"
+    "in vec4 position;\n\n"
+    "uniform mat4 worldviewproj_matrix;\n"
+    "uniform vec4 light_position_object_space; // homogenous, object space\n"
+    "uniform float shadow_extrusion_distance; // how far to extrude\n\n"
+    "void main()\n"
+    "{\n"
+    "    // Extrusion in object space\n"
+    "    // Vertex unmodified if w==1, extruded if w==0\n"
+    "   vec3 extrusionDir = position.xyz - light_position_object_space.xyz;\n"
+    "   extrusionDir = normalize(extrusionDir);\n"
+    "   \n"
+    "    vec4 newpos = vec4(position.xyz +  \n"
+    "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
+    "\n"
+    "    gl_Position = worldviewproj_matrix * newpos;\n"
+    "}\n";
+
     String ShadowVolumeExtrudeProgram::mPointVs_glslesFinite = glsles_prefix + mPointVs_glslFinite;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1Finite = 
@@ -436,6 +495,28 @@ namespace Ogre {
         "\n"
         "}\n";
 
+    String ShadowVolumeExtrudeProgram::mDirVs_glsl150Finite =
+    "#version 150\n"
+    "// Directional light extrude - FINITE\n"
+    "in vec4 uv0;\n"
+    "in vec4 position;\n\n"
+    "uniform mat4 worldviewproj_matrix;\n"
+    "uniform vec4 light_position_object_space; // homogenous, object space\n"
+    "uniform float shadow_extrusion_distance;  // how far to extrude\n\n"
+    "void main()\n"
+    "{\n"
+    "    // Extrusion in object space\n"
+    "    // Vertex unmodified if w==1, extruded if w==0\n"
+    "   vec3 extrusionDir = - light_position_object_space.xyz;\n"
+    "   extrusionDir = normalize(extrusionDir);\n"
+    "   \n"
+    "    vec4 newpos = vec4(position.xyz +  \n"
+    "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
+    "\n"
+    "    gl_Position = worldviewproj_matrix * newpos;\n"
+    "\n"
+    "}\n";
+
     String ShadowVolumeExtrudeProgram::mDirVs_glslesFinite = glsles_prefix + mDirVs_glslFinite;
 
     String ShadowVolumeExtrudeProgram::mPointArbvp1FiniteDebug = 
@@ -482,6 +563,7 @@ namespace Ogre {
 
     String ShadowVolumeExtrudeProgram::mPointVs_4_0FiniteDebug = mPointVs_4_0Finite;
     String ShadowVolumeExtrudeProgram::mPointVs_glslFiniteDebug = mPointVs_glslFinite;
+    String ShadowVolumeExtrudeProgram::mPointVs_glsl150FiniteDebug = mPointVs_glsl150Finite;
     String ShadowVolumeExtrudeProgram::mPointVs_glslesFiniteDebug = mPointVs_glslesFinite;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1FiniteDebug = 
@@ -527,6 +609,7 @@ namespace Ogre {
 
     String ShadowVolumeExtrudeProgram::mDirVs_4_0FiniteDebug = mDirVs_4_0Finite;
     String ShadowVolumeExtrudeProgram::mDirVs_glslFiniteDebug = mDirVs_glslFinite;
+    String ShadowVolumeExtrudeProgram::mDirVs_glsl150FiniteDebug = mDirVs_glsl150Finite;
     String ShadowVolumeExtrudeProgram::mDirVs_glslesFiniteDebug = mDirVs_glslesFinite;
 
 
@@ -546,6 +629,14 @@ namespace Ogre {
         "{\n"
         "    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
         "}\n";
+
+    String ShadowVolumeExtrudeProgram::mGeneralFs_glsl150 =
+    "#version 150\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "    FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
+    "}\n";
 
     String ShadowVolumeExtrudeProgram::mGeneralFs_glsles = glsles_prefix + mGeneralFs_glsl;
 
@@ -601,6 +692,23 @@ namespace Ogre {
         "    gl_Position = worldViewProj*vertex; \n"
         "}";
 
+    String ShadowVolumeExtrudeProgram::mModulate_Fs_glsl150 =
+    "#version 150\n"
+    "out vec4 FragColor;\n"
+    "uniform vec4 shadowColor;\n"
+    "\n"
+    "void main() {\n"
+    "    FragColor = shadowColor;\n"
+    "}";
+    
+    String ShadowVolumeExtrudeProgram::mModulate_Vs_glsl150 =
+    "#version 150\n"
+    "uniform mat4 worldViewProj; \n"
+    "in vec4 vertex; \n"
+    "\n"
+    "void main() {\n"
+    "    gl_Position = worldViewProj*vertex; \n"
+    "}";
 
 
 
@@ -641,6 +749,7 @@ namespace Ogre {
 	{
 		bool vs_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
 		bool ps_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0_level_9_1");
+        bool glsl150 = GpuProgramManager::getSingleton().isSyntaxSupported("glsl150");
 		bool glsl = GpuProgramManager::getSingleton().isSyntaxSupported("glsl");
 		bool glsles = GpuProgramManager::getSingleton().isSyntaxSupported("glsles");
 
@@ -656,7 +765,14 @@ namespace Ogre {
 		String vsProgram;
 		String fsProgram;
 
-		if (glsl)
+        if (glsl150)
+        {
+            vsTarget = "glsl";
+            fsTarget = "glsl";
+            language = "glsl";
+            vsProgram = mModulate_Vs_glsl150;
+            fsProgram = mModulate_Fs_glsl150;
+        }else if (glsl)
 		{
 			vsTarget = "glsl";
 			fsTarget = "glsl";
@@ -742,6 +858,10 @@ namespace Ogre {
 			{
 				syntax = "glsles";
 			}
+            else if (GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+            {
+                syntax = "glsl150";
+            }
 			else if (GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
 			{
 				syntax = "glsl";
@@ -750,7 +870,7 @@ namespace Ogre {
 			{
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 					"Vertex programs are supposedly supported, but neither "
-					"arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.",
+					"arbvp1, glsl150, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.",
 					"SceneManager::initShadowVolumeMaterials");
 			}
 			// Create all programs
@@ -811,6 +931,30 @@ namespace Ogre {
 							fp->load();
 						}
 					}
+                    else if (syntax == "glsl150")
+                    {
+                        HighLevelGpuProgramPtr vp =
+                        HighLevelGpuProgramManager::getSingleton().createProgram(
+                                                                                 programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                                                                 "glsl", GPT_VERTEX_PROGRAM);
+                        vp->setSource(ShadowVolumeExtrudeProgram::getProgramSource(
+                                                                                   vertexProgramLightTypes[v], syntax,
+                                                                                   vertexProgramFinite[v], vertexProgramDebug[v]));
+                        vp->setParameter("target", syntax);
+                        vp->load();
+                        
+                        if (frgProgramName.empty())
+                        {
+                            frgProgramName = "Ogre/ShadowFrgProgram";
+                            HighLevelGpuProgramPtr fp =
+                            HighLevelGpuProgramManager::getSingleton().createProgram(
+                                                                                     frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                                                                     "glsl", GPT_FRAGMENT_PROGRAM);
+                            fp->setSource(mGeneralFs_glsl150);
+                            fp->setParameter("target", "glsl150");
+                            fp->load();
+                        }
+                    }
 					else if (syntax == "glsl")
 					{
 						HighLevelGpuProgramPtr vp =
@@ -908,7 +1052,18 @@ namespace Ogre {
 					return debug ? getDirectionalLightExtruderVs_4_0Debug() : getDirectionalLightExtruderVs_4_0();
 				}
 			}
-            else if (syntax == "glsl")
+            else if (syntax == "glsl150")
+            {
+                if (finite)
+                {
+                    return debug ? getDirectionalLightExtruderVs_glsl150FiniteDebug() : getDirectionalLightExtruderVs_glsl150Finite();
+                }
+                else
+                {
+                    return debug ? getDirectionalLightExtruderVs_glsl150Debug() : getDirectionalLightExtruderVs_glsl150();
+                }
+            }
+           else if (syntax == "glsl")
             {
                 if (finite)
                 {
@@ -973,6 +1128,17 @@ namespace Ogre {
 					return debug ? getPointLightExtruderVs_4_0Debug() : getPointLightExtruderVs_4_0();
 				}
 			}
+            else if (syntax == "glsl150")
+            {
+                if (finite)
+                {
+                    return debug ? getPointLightExtruderVs_glsl150FiniteDebug() : getPointLightExtruderVs_glsl150Finite();
+                }
+                else
+                {
+                    return debug ? getPointLightExtruderVs_glsl150Debug() : getPointLightExtruderVs_glsl150();
+                }
+            }
             else if (syntax == "glsl")
             {
                 if (finite)
