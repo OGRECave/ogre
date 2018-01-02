@@ -126,7 +126,6 @@ namespace Ogre {
     class EdgeData;
     class EdgeListBuilder;
     class Entity;
-    class ErrorDialog;
     class ExternalTextureSourceManager;
     class Factory;
     struct FrameEvent;
