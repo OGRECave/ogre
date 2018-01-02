@@ -55,10 +55,6 @@ THE SOFTWARE.
 */
 #define OGRE_MAX_BLEND_WEIGHTS 4
 
-// define the memory allocator configuration to use
-#define OGRE_MEMORY_ALLOCATOR_STD 1
-#define OGRE_MEMORY_ALLOCATOR_USER 3
-
 /** Define max number of multiple render targets (MRTs) to render to at once.
 */
 #define OGRE_MAX_MULTIPLE_RENDER_TARGETS 8

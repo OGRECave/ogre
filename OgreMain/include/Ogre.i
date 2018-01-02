@@ -133,7 +133,7 @@ JNIEnv* OgreJNIGetEnv() {
 %include "OgrePrerequisites.h"
 %include "OgrePlatform.h"
 %include "OgreConfig.h"
-%include "OgreMemoryAllocatorConfig.h"
+%import "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
 %template() Ogre::map<Ogre::String, Ogre::String>;
 %template(NameValuePairList) std::map<Ogre::String, Ogre::String>;

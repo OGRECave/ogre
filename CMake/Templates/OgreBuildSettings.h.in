@@ -41,14 +41,6 @@
 
 #cmakedefine01 OGRE_NODE_INHERIT_TRANSFORM
 
-#define OGRE_MEMORY_ALLOCATOR @OGRE_SET_ALLOCATOR@
-
-// enable or disable the memory tracker, recording the memory allocations & tracking leaks
-// default is to disable since it's expensive, but you can enable if needed per build target
-#cmakedefine01 OGRE_MEMORY_TRACKER_DEBUG_MODE
-
-#cmakedefine01 OGRE_MEMORY_TRACKER_RELEASE_MODE
-
 /** There are three modes for handling asserts in OGRE:
 0 - STANDARD - Standard asserts in debug builds, nothing in release builds
 1 - RELEASE_EXCEPTIONS - Standard asserts in debug builds, exceptions in release builds

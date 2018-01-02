@@ -277,7 +277,6 @@ elseif(EMSCRIPTEN)
   set(OGRE_BUILD_COMPONENT_VOLUME FALSE CACHE BOOL "Disable volume component on Emscripten" FORCE)
   set(OGRE_BUILD_COMPONENT_PAGING FALSE CACHE BOOL "Disable paging component on Emscripten" FORCE)
   set(OGRE_BUILD_COMPONENT_TERRAIN FALSE CACHE BOOL "Disable terrain component on Emscripten" FORCE)
-  set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING "Use default allocator on Emscripten" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Emscripten" FORCE)
 elseif (APPLE AND NOT APPLE_IOS)
 
@@ -371,19 +370,6 @@ option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)
 option(OGRE_CONFIG_NODE_INHERIT_TRANSFORM "Tells the node whether it should inherit full transform from it's parent node or derived position, orientation and scale" FALSE)
 
-if (WINDOWS_STORE OR WINDOWS_PHONE)
-# WinRT can only use the standard allocator
-set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING "Forcing Standard Allocator for WinRT" FORCE)
-else ()
-set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING
-"Specify the memory allocator to use. Possible values:
-  1 - Standard allocator
-  3 - User-provided allocator"
-)
-endif ()
-
-option(OGRE_CONFIG_MEMTRACK_DEBUG "Enable Ogre's memory tracker in debug mode" FALSE)
-option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mode" FALSE)
 # determine threading options
 include(PrepareThreadingOptions)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec." FALSE "FreeImage_FOUND" FALSE)
@@ -444,9 +430,6 @@ mark_as_advanced(
   OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS
   OGRE_CONFIG_DOUBLE
   OGRE_CONFIG_NODE_INHERIT_TRANSFORM
-  OGRE_CONFIG_ALLOCATOR
-  OGRE_CONFIG_MEMTRACK_DEBUG
-  OGRE_CONFIG_MEMTRACK_RELEASE
   OGRE_CONFIG_ENABLE_MESHLOD
   OGRE_CONFIG_ENABLE_DDS
   OGRE_CONFIG_ENABLE_FREEIMAGE

@@ -182,12 +182,6 @@ macro(var_to_string VAR STR)
 	endif ()
 endmacro ()
 
-# allocator settings
-if (OGRE_CONFIG_ALLOCATOR EQUAL 1)
-	set(_allocator "standard")
-elseif (OGRE_CONFIG_ALLOCATOR EQUAL 3)
-	set(_allocator "user")
-endif()
 # assert settings
 if (OGRE_ASSERT_MODE EQUAL 0)
 	set(_assert "standard")
@@ -199,8 +193,6 @@ endif()
 # various true/false settings
 var_to_string(OGRE_CONFIG_DOUBLE _double)
 var_to_string(OGRE_CONFIG_NODE_INHERIT_TRANSFORM _inherit_transform)
-var_to_string(OGRE_CONFIG_MEMTRACK_DEBUG _memtrack_debug)
-var_to_string(OGRE_CONFIG_MEMTRACK_RELEASE _memtrack_release)
 
 # threading settings
 if (OGRE_CONFIG_THREADS EQUAL 0 OR OGRE_CONFIG_THREADS EQUAL 3)
@@ -237,11 +229,6 @@ set(_features "${_features}ResourceManager behaviour:       ${_resmgr}\n")
 set(_features "${_features}Use double precision:            ${_double}\n")
 set(_features "${_features}Nodes inherit transform:         ${_inherit_transform}\n")
 set(_features "${_features}Assert mode:                     ${_assert}\n")
-set(_features "${_features}Allocator type:                  ${_allocator}\n")
-set(_features "${_features}STL containers use allocator:    ${_containers}\n")
-set(_features "${_features}Strings use allocator:           ${_string}\n")
-set(_features "${_features}Memory tracker (debug):          ${_memtrack_debug}\n")
-set(_features "${_features}Memory tracker (release):        ${_memtrack_release}\n")
 
 
 set(_features "${_features}\n----------------------------------------------------------------------------\n")

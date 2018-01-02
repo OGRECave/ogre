@@ -29,8 +29,8 @@ THE SOFTWARE.
 #ifndef __GLStateCacheManagerCommon_H__
 #define __GLStateCacheManagerCommon_H__
 
+#include "OgrePrerequisites.h"
 #include "OgreGLSupportPrerequisites.h"
-#include "OgreMemoryAllocatorConfig.h"
 
 namespace Ogre
 {
