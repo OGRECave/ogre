@@ -79,8 +79,9 @@ namespace Ogre {
                 // Discard the buffer
                 access |= GL_MAP_INVALIDATE_RANGE_BIT;
             }
-            //FIXME Is this correct usage for shader storage buffers?
-            access |= GL_MAP_UNSYNCHRONIZED_BIT;
+ 
+            if(options == HardwareBuffer::HBL_NO_OVERWRITE)
+                access |= GL_MAP_UNSYNCHRONIZED_BIT;
         }
         else if (options == HardwareBuffer::HBL_READ_ONLY)
             access |= GL_MAP_READ_BIT;
