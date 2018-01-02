@@ -269,7 +269,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
     Image & Image::loadRawData(
-        DataStreamPtr& stream, 
+        const DataStreamPtr& stream,
         uint32 uWidth, uint32 uHeight, uint32 uDepth,
         PixelFormat eFormat,
         size_t numFaces, uint32 numMipMaps)
@@ -377,7 +377,7 @@ namespace Ogre {
         return pCodec->encode(wrapper, codeDataPtr);
     }
     //-----------------------------------------------------------------------------
-    Image & Image::load(DataStreamPtr& stream, const String& type )
+    Image & Image::load(const DataStreamPtr& stream, const String& type )
     {
         freeMemory();
 
@@ -431,7 +431,7 @@ namespace Ogre {
         return *this;
     }
     //---------------------------------------------------------------------
-    String Image::getFileExtFromMagic(DataStreamPtr stream)
+    String Image::getFileExtFromMagic(const DataStreamPtr stream)
     {
         // read the first 32 bytes or file size, if less
         size_t magicLen = std::min(stream->size(), (size_t)32);
@@ -773,8 +773,9 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    Image & Image::loadTwoImagesAsRGBA(DataStreamPtr& rgbStream, DataStreamPtr& alphaStream,
-        PixelFormat fmt, const String& rgbType, const String& alphaType)
+    Image& Image::loadTwoImagesAsRGBA(const DataStreamPtr& rgbStream,
+                                      const DataStreamPtr& alphaStream, PixelFormat fmt,
+                                      const String& rgbType, const String& alphaType)
     {
         Image rgb, alpha;
 
