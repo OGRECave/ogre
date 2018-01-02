@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "Cubemaps/OgreCubemapProbe.h"
 
+#include "OgreHlmsPbsDatablock.cpp.inc"
+
 namespace Ogre
 {
     extern const String c_pbsBlendModes[];
