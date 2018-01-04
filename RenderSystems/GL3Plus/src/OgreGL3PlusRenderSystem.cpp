@@ -1676,9 +1676,9 @@ namespace Ogre {
             } while (updatePassIterationRenderState());
         }
 
-        // Unbind the vertex array object.
-        // Marks the end of what state will be included.
-        mStateCacheManager->bindGLVertexArray(0);
+        // Do not unbind the vertex array object
+        // VAOs > 0 are selected each time before usage
+        // VAO #0 is not supported in Core profiles, and WOULD NOT be used by Ogre even in compatibility profiles
     }
 
     void GL3PlusRenderSystem::setScissorTest(bool enabled, size_t left,
