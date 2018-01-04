@@ -167,6 +167,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
             }
         }
     }
+#   ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     // Toggles per pixel per light model.
     else if (key == SDLK_F3) {
         static bool usePerPixelLighting = true;
@@ -215,7 +216,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
             mDetailsPanel->setParamValue(12, "Vertex");
         usePerPixelLighting = !usePerPixelLighting;
     }
-
+#   endif
     // Switch vertex shader outputs compaction policy.
     else if (key == SDLK_F4) {
         switch (mShaderGenerator->getVertexShaderOutputsCompactPolicy()) {
