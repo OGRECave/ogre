@@ -143,6 +143,9 @@ namespace Ogre {
                 shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
                 belowVersionPos = mSource.find("\n", versionPos) + 1;
             }
+            
+            // OSX driver only supports glsl150+ in core profile
+            bool shouldUpgradeToVersion150 = !rsc->isShaderProfileSupported("glsl130") && shaderVersion < 150;
 
             // Add standard shader input and output blocks, if missing.
             if (rsc->hasCapability(RSC_GLSL_SSO_REDECLARE))
@@ -155,7 +158,7 @@ namespace Ogre {
                     // shader, i.e. has a main function.
                     if (mainPos != String::npos)
                     {
-                        if (shaderVersion >= 150)
+                        if (shaderVersion >= 150 || shouldUpgradeToVersion150)
                         {
                             switch (mType)
                             {
@@ -188,8 +191,7 @@ namespace Ogre {
                     }
                 }
 
-                // OSX driver only supports glsl150+ in core profile
-                if(!rsc->isShaderProfileSupported("glsl130") && shaderVersion < 150)
+                if(shouldUpgradeToVersion150)
                 {
                     if(belowVersionPos != 0)
                         mSource = mSource.erase(0, belowVersionPos); // drop old definition
