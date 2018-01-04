@@ -8,6 +8,7 @@
 #include "OgreCameraMan.h"
 #include "OgreTrays.h"
 #include "OgreAdvancedRenderControls.h"
+#include "OgreUnifiedHighLevelGpuProgram.h"
 
 #if OGRE_BITES_HAVE_SDL
 #include "SDL_stdinc.h"
