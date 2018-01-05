@@ -14,9 +14,11 @@
 # and provide build configuration options.
 ######################################################################
 
-cmake_minimum_required(VERSION 2.8.6)
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
-cmake_policy(SET CMP0003 NEW)
+cmake_minimum_required(VERSION 3.3.0)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(CMAKE_VS_PLATFORM_NAME STREQUAL "Tegra-Android")
 	set(CMAKE_LINK_LIBRARY_FLAG "")
@@ -31,13 +33,6 @@ if(WIN32)
 endif()
 
 if (APPLE AND NOT ANDROID)
-  cmake_policy(SET CMP0042 NEW)
-
-  if(CMAKE_VERSION VERSION_LESS 3.0.0)
-    include(CMakeForceCompiler)
-    CMAKE_FORCE_C_COMPILER(clang GNU)
-    CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
-  endif()
   SET(CMAKE_SIZEOF_VOID_P 4)
   set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
   set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
@@ -179,21 +174,9 @@ if (MINGW)
 endif ()
 
 include(GenerateExportHeader)
-add_compiler_export_flags(OGRE_VISIBILITY_FLAGS)
-
-if (OGRE_VISIBILITY_FLAGS)
-    set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY ${OGRE_VISIBILITY_FLAGS}")
-    set(XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "YES")
-    
-    if(APPLE AND NOT APPLE_IOS)
-      if(OGRE_VISIBILITY_FLAGS MATCHES -fvisibility-inlines-hidden)
-        message(STATUS "Skipping -fvisibility-inlines-hidden due to linker issues")
-        set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
-      else()
-        set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "YES")
-      endif()
-    endif ()
-endif()
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
+set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY") # for legacy headers
 
 if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
   # Fix x64 issues on Linux
@@ -258,7 +241,6 @@ if (APPLE_IOS)
   set(XCODE_ATTRIBUTE_LLVM_VECTORIZE_LOOPS "YES")
   set(XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
   set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
-  set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE CACHE BOOL "Disable OpenGL ES RenderSystem for iOS" FORCE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
@@ -271,7 +253,6 @@ elseif (ANDROID)
   option(OGRE_BUILD_ANDROID_JNI_SAMPLE "Enable JNI Sample" FALSE)
 
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for Android" FORCE)
-  set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE CACHE BOOL "Disable OpenGL ES 1 RenderSystem for Android" FORCE)
 
   set(OGRE_BUILD_PLUGIN_PCZ FALSE CACHE BOOL "Disable pcz on Android" FORCE)
   set(OGRE_BUILD_PLUGIN_BSP FALSE CACHE BOOL "Disable bsp scenemanager on Android" FORCE)
@@ -296,8 +277,6 @@ elseif(EMSCRIPTEN)
   set(OGRE_BUILD_COMPONENT_VOLUME FALSE CACHE BOOL "Disable volume component on Emscripten" FORCE)
   set(OGRE_BUILD_COMPONENT_PAGING FALSE CACHE BOOL "Disable paging component on Emscripten" FORCE)
   set(OGRE_BUILD_COMPONENT_TERRAIN FALSE CACHE BOOL "Disable terrain component on Emscripten" FORCE)
-  set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING "Use default allocator on Emscripten" FORCE)
-  set(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR FALSE CACHE BOOL "Containers use default allocator on Emscripten" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Emscripten" FORCE)
 elseif (APPLE AND NOT APPLE_IOS)
 
@@ -329,7 +308,6 @@ elseif (APPLE AND NOT APPLE_IOS)
   set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
 
   # Make sure that the OpenGL render system is selected for non-iOS Apple builds
-  set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE)
 endif ()
 
@@ -338,7 +316,7 @@ if(OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
 endif()
 
 # Enable the PVRTC codec if OpenGL ES is being built
-if(OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
+if(OGRE_BUILD_RENDERSYSTEM_GLES2)
   set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
   set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL ES" FORCE)
 endif()
@@ -364,7 +342,6 @@ cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSyste
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem" TRUE "WIN32;DirectX11_FOUND OR WINDOWS_STORE OR WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL3PLUS "Build OpenGL 3+ RenderSystem" TRUE "OPENGL_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT APPLE_IOS;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderSystem" FALSE "OPENGLES_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
@@ -393,23 +370,6 @@ option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)
 option(OGRE_CONFIG_NODE_INHERIT_TRANSFORM "Tells the node whether it should inherit full transform from it's parent node or derived position, orientation and scale" FALSE)
 
-if (WINDOWS_STORE OR WINDOWS_PHONE)
-# WinRT can only use the standard allocator
-set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING "Forcing Standard Allocator for WinRT" FORCE)
-else ()
-set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING
-"Specify the memory allocator to use. Possible values:
-  1 - Standard allocator
-  2 - nedmalloc - NOT RECOMMENDED - Only useful in WinXP & for debugging mem. corruption - Has known issues see https://github.com/ned14/nedmalloc/issues/15
-  3 - User-provided allocator
-  4 - nedmalloc with pooling - NOT RECOMMENDED - See nedmalloc issues."
-)
-endif ()
-
-option(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR "STL containers in Ogre use the custom allocator" FALSE)
-option(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR "Ogre String uses the custom allocator" FALSE)
-option(OGRE_CONFIG_MEMTRACK_DEBUG "Enable Ogre's memory tracker in debug mode" FALSE)
-option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mode" FALSE)
 # determine threading options
 include(PrepareThreadingOptions)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec." FALSE "FreeImage_FOUND" FALSE)
@@ -425,7 +385,7 @@ cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you
 option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT "Enable Cg support to ES 2 render system" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER "Enable GLSL optimiser use in GLES 2 render system" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
-cmake_dependent_option(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT "Enable OpenGL state cache management" FALSE "OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2 OR OGRE_BUILD_RENDERSYSTEM_GL3PLUS" FALSE)
+cmake_dependent_option(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT "Enable OpenGL state cache management" FALSE "OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_BUILD_RENDERSYSTEM_GLES2 OR OGRE_BUILD_RENDERSYSTEM_GL3PLUS" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES3_SUPPORT "Enable OpenGL ES 3.x Features" FALSE "OPENGLES3_FOUND;OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 option(OGRE_CONFIG_ENABLE_TBB_SCHEDULER "Enable TBB's scheduler initialisation/shutdown." TRUE)
 # Customise what to install
@@ -470,11 +430,6 @@ mark_as_advanced(
   OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS
   OGRE_CONFIG_DOUBLE
   OGRE_CONFIG_NODE_INHERIT_TRANSFORM
-  OGRE_CONFIG_ALLOCATOR
-  OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR
-  OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR
-  OGRE_CONFIG_MEMTRACK_DEBUG
-  OGRE_CONFIG_MEMTRACK_RELEASE
   OGRE_CONFIG_ENABLE_MESHLOD
   OGRE_CONFIG_ENABLE_DDS
   OGRE_CONFIG_ENABLE_FREEIMAGE

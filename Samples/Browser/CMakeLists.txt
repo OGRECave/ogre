@@ -25,10 +25,6 @@ get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
 if (APPLE_IOS)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 
-  if(OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
-    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_BSP Sample_Compositor Sample_CelShading Sample_CubeMapping Sample_Dot3Bump Sample_Fresnel Sample_Instancing Sample_Lighting Sample_ShaderSystem Sample_ShaderSystemTexturedFog Sample_ShaderSystemMultiLight Sample_VolumeTex Sample_Water)
-  endif()
-
   if(NOT OGRE_BUILD_COMPONENT_TERRAIN AND NOT OGRE_SDK_BUILD)
     list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_Terrain)
     list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_EndlessWorld)

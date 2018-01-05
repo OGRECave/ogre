@@ -143,22 +143,23 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr PVRTCCodec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
-    {        
+    DataStreamPtr PVRTCCodec::encode(const MemoryDataStreamPtr& input,
+                                     const Codec::CodecDataPtr& pData) const
+    {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "PVRTC encoding not supported",
                     "PVRTCCodec::encode" ) ;
     }
     //---------------------------------------------------------------------
-    void PVRTCCodec::encodeToFile(MemoryDataStreamPtr& input,
-        const String& outFileName, Codec::CodecDataPtr& pData) const
+    void PVRTCCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
+                                  const Codec::CodecDataPtr& pData) const
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "PVRTC encoding not supported",
                     "PVRTCCodec::encodeToFile" ) ;
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult PVRTCCodec::decode(DataStreamPtr& stream) const
+    Codec::DecodeResult PVRTCCodec::decode(const DataStreamPtr& stream) const
     {
         // Assume its a pvr 2 header
         PVRTCTexHeaderV2 headerV2;
@@ -185,7 +186,7 @@ namespace Ogre {
                         "This is not a PVR2 / PVR3 file!", "PVRTCCodec::decode");
     }
     //---------------------------------------------------------------------    
-    Codec::DecodeResult PVRTCCodec::decodeV2(DataStreamPtr& stream) const
+    Codec::DecodeResult PVRTCCodec::decodeV2(const DataStreamPtr& stream) const
     {
         PVRTCTexHeaderV2 header;
         uint32 flags = 0, formatFlags = 0;
@@ -243,7 +244,7 @@ namespace Ogre {
         return ret;
     }
     //---------------------------------------------------------------------    
-    Codec::DecodeResult PVRTCCodec::decodeV3(DataStreamPtr& stream) const
+    Codec::DecodeResult PVRTCCodec::decodeV3(const DataStreamPtr& stream) const
     {
         PVRTCTexHeaderV3 header;
         PVRTCMetadata metadata;

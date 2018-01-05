@@ -126,12 +126,6 @@ endif () # OGRE_INSTALL_DEPENDENCIES
       endif ()
     endif () # OGRE_BUILD_PLUGIN_CG
 
-    # install GLES dlls
-    if (OGRE_BUILD_RENDERSYSTEM_GLES)
-      install_debug(libgles_cm.dll)
-      install_release(libgles_cm.dll)
-    endif ()
-
     # install GLES2 dlls
     if (OGRE_BUILD_RENDERSYSTEM_GLES2)
       install_debug(libGLESv2.dll)
@@ -250,11 +244,6 @@ if (OGRE_COPY_DEPENDENCIES)
         endif ()
       endif()
     endif()
-   
-    if (OGRE_BUILD_RENDERSYSTEM_GLES)
-      copy_debug(libgles_cm.dll)
-      copy_release(libgles_cm.dll)
-    endif ()
     
     if (OGRE_BUILD_RENDERSYSTEM_GLES2)	
       copy_debug(libEGL.dll)

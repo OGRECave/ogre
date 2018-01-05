@@ -198,7 +198,7 @@ namespace Ogre {
                 depth too.
         */
         Image & loadRawData( 
-            DataStreamPtr& stream, 
+            const DataStreamPtr& stream,
             uint32 width, uint32 height, uint32 depth,
             PixelFormat format,
             size_t numFaces = 1, uint32 numMipMaps = 0);
@@ -208,7 +208,7 @@ namespace Ogre {
                 with future Ogre versions.
         */
         OGRE_DEPRECATED Image & loadRawData(
-            DataStreamPtr& stream, 
+            const DataStreamPtr& stream,
             uint32 width, uint32 height,
             PixelFormat format )
         {
@@ -252,7 +252,7 @@ namespace Ogre {
             @see
                 Image::load( const String& filename )
         */
-        Image & load(DataStreamPtr& stream, const String& type = BLANKSTRING );
+        Image & load(const DataStreamPtr& stream, const String& type = BLANKSTRING );
 
         /** Utility method to combine 2 separate images into this one, with the first
         image source supplying the RGB channels, and the second image supplying the 
@@ -282,8 +282,10 @@ namespace Ogre {
             codec to use. Can be left blank if the stream data includes
             a header to identify the data.
         */
-        Image & loadTwoImagesAsRGBA(DataStreamPtr& rgbStream, DataStreamPtr& alphaStream, PixelFormat format = PF_BYTE_RGBA,
-            const String& rgbType = BLANKSTRING, const String& alphaType = BLANKSTRING);
+        Image& loadTwoImagesAsRGBA(const DataStreamPtr& rgbStream, const DataStreamPtr& alphaStream,
+                                   PixelFormat format = PF_BYTE_RGBA,
+                                   const String& rgbType = BLANKSTRING,
+                                   const String& alphaType = BLANKSTRING);
 
         /** Utility method to combine 2 separate images into this one, with the first
             image source supplying the RGB channels, and the second image supplying the 

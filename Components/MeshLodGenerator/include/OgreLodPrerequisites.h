@@ -61,11 +61,11 @@ namespace Ogre
     class LodWorkQueueInjectorListener;
     struct LodData;
 
-    typedef SharedPtr<LodCollapseCost> LodCollapseCostPtr;
-    typedef SharedPtr<LodCollapser> LodCollapserPtr;
-    typedef SharedPtr<LodData> LodDataPtr;
-    typedef SharedPtr<LodInputProvider> LodInputProviderPtr;
-    typedef SharedPtr<LodOutputProvider> LodOutputProviderPtr;
+    typedef shared_ptr<LodCollapseCost> LodCollapseCostPtr;
+    typedef shared_ptr<LodCollapser> LodCollapserPtr;
+    typedef shared_ptr<LodData> LodDataPtr;
+    typedef shared_ptr<LodInputProvider> LodInputProviderPtr;
+    typedef shared_ptr<LodOutputProvider> LodOutputProviderPtr;
 
     typedef GeneralAllocatedObject MeshLodAlloc;
 }

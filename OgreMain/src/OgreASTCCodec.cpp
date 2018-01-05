@@ -209,15 +209,15 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ASTCCodec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
+    DataStreamPtr ASTCCodec::encode(const MemoryDataStreamPtr& input, const Codec::CodecDataPtr& pData) const
     {        
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ASTC encoding not supported",
                     "ASTCCodec::encode" ) ;
     }
     //---------------------------------------------------------------------
-    void ASTCCodec::encodeToFile(MemoryDataStreamPtr& input,
-        const String& outFileName, Codec::CodecDataPtr& pData) const
+    void ASTCCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
+                                 const Codec::CodecDataPtr& pData) const
     {
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ASTC encoding not supported",
@@ -225,7 +225,7 @@ namespace Ogre {
 	}
 
     //---------------------------------------------------------------------
-    Codec::DecodeResult ASTCCodec::decode(DataStreamPtr& stream) const
+    Codec::DecodeResult ASTCCodec::decode(const DataStreamPtr& stream) const
     {
         DecodeResult ret;
         ASTCHeader header;

@@ -125,7 +125,7 @@ namespace Ogre {
         /** Codes the data in the input stream and saves the result in the output
             stream.
         */
-        virtual DataStreamPtr encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const = 0;
+        virtual DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const = 0;
         /** Codes the data in the input chunk and saves the result in the output
             filename provided. Provided for efficiency since coding to memory is
             progressive therefore memory required is unknown leading to reallocations.
@@ -133,14 +133,14 @@ namespace Ogre {
         @param outFileName The filename to write to
         @param pData Extra information to be passed to the codec (codec type specific)
         */
-        virtual void encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const = 0;
+        virtual void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const = 0;
 
         /// Result of a decoding; both a decoded data stream and CodecData metadata
         typedef std::pair<MemoryDataStreamPtr, CodecDataPtr> DecodeResult;
         /** Codes the data from the input chunk into the output chunk.
             @param input Stream containing the encoded data
         */
-        virtual DecodeResult decode(DataStreamPtr& input) const = 0;
+        virtual DecodeResult decode(const DataStreamPtr& input) const = 0;
 
         /** Returns the type of the codec as a String
         */

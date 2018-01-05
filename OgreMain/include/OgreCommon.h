@@ -345,7 +345,7 @@ namespace Ogre {
     class HashedVector
     {
     public:
-        typedef std::vector<T, STLAllocator<T, GeneralAllocPolicy> > VectorImpl;
+        typedef typename vector<T>::type VectorImpl;
     protected:
         VectorImpl mList;
         mutable uint32 mListHash;

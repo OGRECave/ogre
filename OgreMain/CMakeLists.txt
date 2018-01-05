@@ -53,21 +53,6 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp"
 )
 
-# Add threading (backport from 2.X)
-list(APPEND HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/OgreThreads.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/OgreBarrier.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/OgreLightweightMutex.h)
-	
-if(WIN32 AND NOT ANDROID)
-	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreBarrierWin.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreThreadsWin.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreLightweightMutexWin.cpp)
-else()
-	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreBarrierPThreads.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreLightweightMutexPThreads.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreThreadsPThreads.cpp)
-endif()
-
 # Add platform specific files
 if (OGRE_BUILD_PLATFORM_NACL)
   include_directories("include/NaCl")
@@ -109,17 +94,14 @@ elseif (WIN32)
   else ()
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
-      include/WIN32/OgreErrorDialogImp.h
       include/WIN32/OgreTimerImp.h
       include/WIN32/OgreMinGWSupport.h
       include/WIN32/OgreComPtr.h
     )
     
-    list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreErrorDialogNoOp.cpp")
     set(PLATFORM_SOURCE_FILES
       src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialog.cpp
-      src/WIN32/OgreErrorDialog.cpp
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
       src/WIN32/resource.h
@@ -165,7 +147,6 @@ elseif (APPLE)
     
     file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX/*.h")
     
-    list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreErrorDialogNoOp.cpp")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
@@ -262,11 +243,6 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 4)
 endif ()
 
 list(APPEND HEADER_FILES ${THREAD_HEADER_FILES})
-
-# Add needed definitions and nedmalloc include dir
-if(NOT OGRE_CONFIG_ALLOCATOR EQUAL 1)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
-endif()
 
 set(LIBRARIES ${PLATFORM_LIBS})
 

@@ -11,7 +11,6 @@
 #cmakedefine OGRE_BUILD_RENDERSYSTEM_D3D11
 #cmakedefine OGRE_BUILD_RENDERSYSTEM_GL
 #cmakedefine OGRE_BUILD_RENDERSYSTEM_GL3PLUS
-#cmakedefine OGRE_BUILD_RENDERSYSTEM_GLES
 #cmakedefine OGRE_BUILD_RENDERSYSTEM_GLES2
 #cmakedefine OGRE_BUILD_PLUGIN_BSP
 #cmakedefine OGRE_BUILD_PLUGIN_OCTREE
@@ -41,21 +40,6 @@
 #cmakedefine01 OGRE_DOUBLE_PRECISION
 
 #cmakedefine01 OGRE_NODE_INHERIT_TRANSFORM
-
-#define OGRE_MEMORY_ALLOCATOR @OGRE_SET_ALLOCATOR@
-
-// Whether to use the custom memory allocator in STL containers
-#cmakedefine01 OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
-
-// if you want to make Ogre::String use the custom memory allocator
-// Doing this will mean Ogre's strings will not be compatible with std::string however
-#cmakedefine01 OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
-
-// enable or disable the memory tracker, recording the memory allocations & tracking leaks
-// default is to disable since it's expensive, but you can enable if needed per build target
-#cmakedefine01 OGRE_MEMORY_TRACKER_DEBUG_MODE
-
-#cmakedefine01 OGRE_MEMORY_TRACKER_RELEASE_MODE
 
 /** There are three modes for handling asserts in OGRE:
 0 - STANDARD - Standard asserts in debug builds, nothing in release builds

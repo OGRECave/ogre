@@ -8,11 +8,7 @@
 #include "OgreTrays.h"
 
 #if OGRE_UNICODE_SUPPORT
-#   if  OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
-#       define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8_c_str())
-#   else
-#       define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8())
-#   endif
+    #define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8())
 #else
     #define DISPLAY_STRING_TO_STRING(DS) (DS)
 #endif
