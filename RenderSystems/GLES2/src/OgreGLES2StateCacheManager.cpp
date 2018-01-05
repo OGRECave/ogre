@@ -448,36 +448,6 @@ namespace Ogre {
 #endif
     }
 
-    void GLES2StateCacheManager::setVertexAttribEnabled(GLuint attrib)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        bool found = std::find(mEnabledVertexAttribs.begin(), mEnabledVertexAttribs.end(), attrib) != mEnabledVertexAttribs.end();
-        if(!found)
-        {
-            mEnabledVertexAttribs.push_back(attrib);
-
-            OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
-        }
-#else
-        OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
-#endif
-    }
-
-    void GLES2StateCacheManager::setVertexAttribDisabled(GLuint attrib)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        vector<GLuint>::iterator iter = std::find(mEnabledVertexAttribs.begin(), mEnabledVertexAttribs.end(), attrib);
-        if(iter != mEnabledVertexAttribs.end())
-        {
-            mEnabledVertexAttribs.erase(iter);
-
-            OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(attrib));
-        }
-#else
-        OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(attrib));
-#endif
-    }
-
     void GLES2StateCacheManager::setCullFace(GLenum face)
     {
         if(mCullFace != face)

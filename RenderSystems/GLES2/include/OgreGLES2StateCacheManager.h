@@ -178,16 +178,6 @@ namespace Ogre
          */
         void setDisabled(GLenum flag);
 
-        /** Enables a vertex attribute.
-         @param attrib The attribute to enable.
-         */
-        void setVertexAttribEnabled(GLuint attrib);
-
-        /** Disables a vertex attribute.
-         @param attrib The attribute to disable.
-         */
-        void setVertexAttribDisabled(GLuint attrib);
-
         /** Sets the face culling setting.
          @param face The face culling mode to use.
          */
