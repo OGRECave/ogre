@@ -268,6 +268,12 @@ namespace Ogre
                        const HlmsParamVec &params );
         virtual ~HlmsDatablock();
 
+        /** Creates a copy of this datablock with the same settings, but a different name.
+        @param name
+            Name of the cloned datablock.
+        */
+        HlmsDatablock* clone( String name ) const;
+
         /// Calculates the hashes needed for sorting by the RenderQueue (i.e. mTextureHash)
         virtual void calculateHash() {}
 
@@ -374,6 +380,9 @@ namespace Ogre
         virtual bool hasCustomShadowMacroblock(void) const;
 
         static const char* getCmpString( CompareFunction compareFunction );
+
+    protected:
+        virtual void cloneImpl( HlmsDatablock *datablock ) const {};
     };
 
     /** @} */

@@ -94,6 +94,8 @@ namespace Ogre
 
         HlmsSamplerblock const  *mSamplerblocks[NUM_UNLIT_TEXTURE_TYPES];
 
+        virtual void cloneImpl( HlmsDatablock *datablock ) const;
+
         void scheduleConstBufferUpdate(void);
         virtual void uploadToConstBuffer( char *dstPtr );
         virtual void uploadToExtraBuffer( char *dstPtr );
