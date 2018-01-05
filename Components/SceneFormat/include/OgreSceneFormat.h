@@ -28,8 +28,7 @@ THE SOFTWARE.
 #ifndef _OgreSceneFormat_H_
 #define _OgreSceneFormat_H_
 
-#include "OgreSceneFormatPrerequisites.h"
-#include "OgreLight.h"
+#include "OgreSceneFormatBase.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -43,28 +42,11 @@ namespace Ogre
     *  @{
     */
 
-    namespace SceneFlags
-    {
-        enum SceneFlags
-        {
-            SceneNodes  = 1u << 0u,
-            Items       = 1u << 1u,
-            Entities    = 1u << 2u,
-            Lights      = 1u << 3u,
-            Cameras     = 1u << 4u,
-            Materials   = 1u << 5u,
-            Meshes      = 1u << 6u,
-            MeshesV1    = 1u << 7u,
-        };
-    }
-
     /**
     */
-    class _OgreSceneFormatExport SceneFormat
+    class _OgreSceneFormatExport SceneFormat : public SceneFormatBase
     {
     protected:
-        Root                    *mRoot;
-        SceneManager            *mSceneManager;
         String                  mCurrentExportFolder;
 
         typedef map<Node*, uint32>::type NodeToIdxMap;

@@ -45,18 +45,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    static const char* c_lightTypes[Light::NUM_LIGHT_TYPES+1u] =
-    {
-        "directional",
-        "point",
-        "spotlight",
-        "vpl",
-        "NUM_LIGHT_TYPES"
-    };
-
     SceneFormat::SceneFormat( Root *root, SceneManager *sceneManager ) :
-        mRoot( root ),
-        mSceneManager( sceneManager )
+        SceneFormatBase( root, sceneManager )
     {
     }
     //-----------------------------------------------------------------------------------
