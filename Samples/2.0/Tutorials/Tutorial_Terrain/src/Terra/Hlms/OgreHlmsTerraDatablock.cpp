@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreLogManager.h"
 
+#include "OgreHlmsTerraDatablock.cpp.inc"
+
 namespace Ogre
 {
     const size_t HlmsTerraDatablock::MaterialSizeInGpu          = 4 * 7 * 4;

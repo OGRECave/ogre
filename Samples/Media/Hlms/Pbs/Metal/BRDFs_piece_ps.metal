@@ -72,7 +72,10 @@ inline float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDi
 		blinnPhong *= (shininess + 8.0) / (8.0 * 3.141592654);
 
 		//Avoid very small denominators, they go to NaN or cause aliasing artifacts
-		@insertpiece( FresnelType ) Rs = ( fresnelS * blinnPhong ) / max( 4.0 * NdotV * NdotL, 0.01 );
+		//Note: For blinn-phong we use larger denominators otherwise specular blows out of proportion
+		@insertpiece( FresnelType ) Rs = ( fresnelS * blinnPhong ) / max( 4.0 * NdotV * NdotL, 0.75 );
+		//Make diffuse look closer to Default.
+		fresnelD *= mix( 1.0, 1.0 / 1.51, ROUGHNESS );
 	@end @property( legacy_math_brdf )
 		float Rs = blinnPhong;
 		float fresnelD = 1.0;
