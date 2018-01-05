@@ -654,8 +654,12 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
             curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(alphaValue)), Operand::OPS_IN);
         }
         else
-        {               
-            curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4(colourValue.ptr())), Operand::OPS_IN);
+        {
+            curFuncInvocation->pushOperand(ParameterFactory::createConstParam(Vector4((Real)colourValue.r,
+                                                                                      (Real)colourValue.g,
+                                                                                      (Real)colourValue.b,
+                                                                                      (Real)colourValue.a)),
+                                           Operand::OPS_IN);
         }
         
         curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);
