@@ -6,11 +6,14 @@ build:
 
 build_script:
  - cmake -P ci-build.cmake
- - cmake --build .
+ - cmake --build . --config Release --target INSTALL
  - set PATH=%PATH%;gtest\lib
- - bin\debug\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
+ - bin\release\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
 cache:
 - ogredeps -> CMake/Dependencies.cmake
 branches:
   only:
     - master
+artifacts:
+  - path: sdk
+    name: ogre-sdk-master-vc14-x64
