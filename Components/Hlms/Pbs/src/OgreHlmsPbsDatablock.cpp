@@ -716,6 +716,9 @@ namespace Ogre
     void HlmsPbsDatablock::setTexture( PbsTextureTypes texType, uint16 arrayIndex,
                                        const TexturePtr &newTexture, const HlmsSamplerblock *refParams )
     {
+        //PBS can only use texture arrays.
+        assert( newTexture->getTextureType() == TextureType::TEX_TYPE_2D_ARRAY || texType == PBSM_REFLECTION );
+
         PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
 
         //Decompile the baked textures to know which texture is assigned to each type.
