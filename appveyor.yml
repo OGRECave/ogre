@@ -2,18 +2,28 @@ platform: x64
 configuration: Release
 image: Visual Studio 2017
 
-build:
-
 build_script:
  - cmake -P ci-build.cmake
- - cmake --build . --config Release --target INSTALL
- - set PATH=%PATH%;gtest\lib
- - bin\release\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
+ - cmake --build build --config Release --target INSTALL
+test_script:
+ - set PATH=%PATH%;build\gtest\lib
+ - build\bin\release\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
 cache:
 - ogredeps -> CMake/Dependencies.cmake
 branches:
   only:
     - master
 artifacts:
-  - path: sdk
+  - path: build/sdk
     name: ogre-sdk-master-vc14-x64
+deploy:
+- provider: BinTray
+  username: paroj
+  api_key:
+    secure: 4nFEwKApbHUf7UajsDt6Z7QOl3zzgEz6YbWGSGx5AiPxozWEQHEyGc6c9xE7utWE
+  subject: paroj
+  repo: ogre
+  package: ogre-sdk-vc14-x64
+  publish: true
+  override: true
+  version: master
