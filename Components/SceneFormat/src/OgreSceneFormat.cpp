@@ -252,6 +252,9 @@ namespace Ogre
         jsonStr.a( ",\n\t\t\t\t\"rendering_distance\" : ",
                    encodeFloat( movableObject->getRenderingDistance() ) );
 
+        if( movableObject->isStatic() )
+            jsonStr.a( ",\n\t\t\t\t\"is_static\" : ", toQuotedStr( movableObject->isStatic() ) );
+
         //Encode raw flag values
         jsonStr.a( ",\n\t\t\t\t\"visibility_flags\" : ", objData.mVisibilityFlags[objData.mIndex] );
         jsonStr.a( ",\n\t\t\t\t\"query_flags\" : ", objData.mQueryFlags[objData.mIndex] );
