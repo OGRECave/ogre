@@ -222,7 +222,6 @@ set(_node_storage "vector")
 endif ()
 
 set(_features "${_features}Build type:                      ${_buildtype}\n")
-set(_features "${_features}Use C++11 std library:           ${OGRE_USE_STD11}\n")
 set(_features "${_features}Store child nodes as:            ${_node_storage}\n")
 set(_features "${_features}Thread safety:                   ${_threads}\n")
 set(_features "${_features}ResourceManager behaviour:       ${_resmgr}\n")

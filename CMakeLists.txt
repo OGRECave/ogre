@@ -336,7 +336,6 @@ include(Dependencies)
 # Customise what to build
 option(OGRE_STATIC "Static build" FALSE)
 option(OGRE_RESOURCEMANAGER_STRICT "Make ResourceManager strict for faster operation. (case sensitive, indexing required etc.)" FALSE)
-option(OGRE_USE_STD11 "Use C++11 std library. Changes API, requires compiler support" FALSE)
 option(OGRE_NODE_STORAGE_LEGACY "use maps for child nodes instead of vectors. About 20% slower but backwards compatible. " TRUE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX9_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem" TRUE "WIN32;DirectX11_FOUND OR WINDOWS_STORE OR WINDOWS_PHONE" FALSE)
@@ -405,11 +404,6 @@ if (WIN32)
 		configure_file(${OGRE_TEMPLATES_DIR}/OGRE.props.in ${OGRE_BINARY_DIR}/OGRE.props)
 		install(FILES ${OGRE_BINARY_DIR}/OGRE.props DESTINATION "${CMAKE_INSTALL_PREFIX}")
 	endif ()
-endif ()
-
-if(UNIX AND OGRE_USE_STD11)
-  # c++11 has to be explicitly enabled on gcc/ clang. default on on MSVC
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif ()
 
 # For Visual studio enable project folders by default.
