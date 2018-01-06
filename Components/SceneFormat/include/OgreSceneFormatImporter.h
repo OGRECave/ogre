@@ -67,12 +67,20 @@ namespace Ogre
 
         static inline float decodeFloat( const rapidjson::Value &jsonValue );
         static inline Vector3 decodeVector3Array( const rapidjson::Value &jsonArray );
+        static inline Vector4 decodeVector4Array( const rapidjson::Value &jsonArray );
         static inline Quaternion decodeQuaternionArray( const rapidjson::Value &jsonArray );
+        static inline Aabb decodeAabbArray( const rapidjson::Value &jsonArray,
+                                            const Aabb &defaultValue );
 
         void importNode( const rapidjson::Value &nodeValue, Node *node );
         SceneNode* importSceneNode( const rapidjson::Value &sceneNodeValue, uint32 nodeIdx,
                                     const rapidjson::Value &sceneNodesJson );
         void importSceneNodes( const rapidjson::Value &json );
+        void importMovableObject( const rapidjson::Value &movableObjectValue,
+                                  MovableObject *movableObject );
+        void importRenderable( const rapidjson::Value &renderableValue, Renderable *renderable );
+        void importSubItem( const rapidjson::Value &subItemValue, SubItem *subItem );
+        void importItems( const rapidjson::Value &json );
 
     public:
         SceneFormatImporter( Root *root, SceneManager *sceneManager );
