@@ -55,18 +55,18 @@ matrix:
           env: ANDROID=TRUE
 script:
     - cmake -P ci-build.cmake
-    - BUILD_CMD="cmake --build ."
+    - BUILD_CMD="cmake --build build"
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then BUILD_CMD="$BUILD_CMD -- -k -j 2" ; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then BUILD_CMD="set -o pipefail && $BUILD_CMD | xcpretty" ; fi
     - echo $BUILD_CMD && eval $BUILD_CMD
     # run unit tests
-    - if [ $TEST ]; then bin/Test_Ogre ; fi
-    - if [ "$TRAVIS_OS_NAME" == "osx" -a "$IOS" != "TRUE" ]; then bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre ; fi
+    - if [ $TEST ]; then build/bin/Test_Ogre ; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" -a "$IOS" != "TRUE" ]; then build/bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre ; fi
     # XMLConverter works & validates
-    - if [ $TEST ]; then bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton ; fi
+    - if [ $TEST ]; then build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton ; fi
     - if [ $TEST ]; then python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml ; fi
     # run visual tests
-    - if [ $TEST ]; then cd bin && ./TestContext -rs "OpenGL Rendering Subsystem" ; fi
+    - if [ $TEST ]; then cd build/bin && ./TestContext -rs "OpenGL Rendering Subsystem" ; fi
     # verify that the python modules are loadable
     - if [ $TEST ]; then cd ../lib && python3 -c "import _Ogre; import _OgreRTShader" ; fi
 os:
