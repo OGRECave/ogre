@@ -28,13 +28,16 @@ THE SOFTWARE.
 #ifndef __AlignedAllocator_H__
 #define __AlignedAllocator_H__
 
+#include <cstdlib>
+#include "OgrePlatform.h"
+
 namespace Ogre {
 
     /** \addtogroup Core
     *  @{
     */
 
-    /** \addtogroup Memory
+    /** \addtogroup General
     *  @{
     */
 
@@ -59,19 +62,6 @@ namespace Ogre {
     class _OgreExport AlignedMemory
     {
     public:
-        /** Allocate memory with given alignment.
-            @param
-                size The size of memory need to allocate.
-            @param
-                alignment The alignment of result pointer, must be power of two
-                and in range [1, 128].
-            @return
-                The allocated memory pointer.
-            @par
-                On failure, exception will be throw.
-        */
-        static DECL_MALLOC void* allocate(size_t size, size_t alignment);
-
         /** Allocate memory with default platform dependent alignment.
             @remarks
                 The default alignment depend on target machine, this function

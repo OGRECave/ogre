@@ -12,13 +12,8 @@
 # build, depending on the dependencies found.
 #######################################################################
 
-if(OGRE_USE_STD11)
-	set(OGRE_THREAD_DEFAULT_PROVIDER "std")
-	set(OGRE_THREAD_TYPE "3")
-else()
-	set(OGRE_THREAD_DEFAULT_PROVIDER "none")
-	set(OGRE_THREAD_TYPE "0")
-endif()
+set(OGRE_THREAD_DEFAULT_PROVIDER "std")
+set(OGRE_THREAD_TYPE "3")
 
 if (Boost_THREAD_FOUND AND Boost_DATE_TIME_FOUND)
 	set(Boost_THREADING TRUE)

@@ -28,11 +28,7 @@ THE SOFTWARE.
 #include "OgreBspSceneNode.h"
 #include "OgreBspSceneManager.h"
 
-#if OGRE_NODE_STORAGE_LEGACY
-#define ITER_VAL(it) it->second
-#else
 #define ITER_VAL(it) (*it)
-#endif
 
 namespace Ogre {
 

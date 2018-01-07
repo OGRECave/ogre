@@ -48,11 +48,11 @@ namespace Ogre {
         virtual ~EXRCodec();
 
         /// @copydoc Codec::encode
-        DataStreamPtr encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
+        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const;
         /// @copydoc Codec::encodeToFile
-        void encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
+        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
-        DecodeResult decode(DataStreamPtr& input) const;
+        DecodeResult decode(const DataStreamPtr& input) const;
         /// @copydoc Codec::magicNumberToFileExt
         String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const;
 

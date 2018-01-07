@@ -1,3 +1,6 @@
+[![GitHub release](https://img.shields.io/github/release/ogrecave/ogre.svg)](https://github.com/OGRECave/ogre/releases/latest)
+[![Join the chat at https://gitter.im/OGRECave/ogre](https://badges.gitter.im/OGRECave/ogre.svg)](https://gitter.im/OGRECave/ogre?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ![](Docs/ogre-logo-wetfloor.gif)
 
 ## Summary
@@ -9,8 +12,10 @@ using the underlying system libraries like Direct3D and OpenGL and
 provides an interface based on world objects and other intuitive
 classes.
 
-The current CI status on *github* is Ubuntu/ OSX/ Android/ iOS [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre) MSVC [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
-
+| Build | Status (github) |
+|-------|-----------------|
+| Ubuntu, OSX, Android, iOS | [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre) |
+| MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
 
 ## Index Of Contents
 * [What's New?](Docs/1.10-Notes.md)  
@@ -34,7 +39,7 @@ to contribute to the development of OGRE, please create a pull request on [bitbu
 
 ## Getting Support
 Please use our [community support forums](http://forums.ogre3d.org/) if you need help or
-think you may have found a bug. Additionally you can [![Join the chat at https://gitter.im/OGRECave/ogre](https://badges.gitter.im/OGRECave/ogre.svg)](https://gitter.im/OGRECave/ogre?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge).
+think you may have found a bug.
 
 ## Licensing
 Please see the [full license documentation](Docs/License.md) for details.

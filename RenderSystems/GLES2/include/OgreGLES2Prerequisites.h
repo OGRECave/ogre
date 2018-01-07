@@ -89,8 +89,8 @@ namespace Ogre {
     class GLES2Support;
     class GLES2GpuProgram;
     class GLES2Texture;
-    typedef SharedPtr<GLES2GpuProgram> GLES2GpuProgramPtr;
-    typedef SharedPtr<GLES2Texture> GLES2TexturePtr;
+    typedef shared_ptr<GLES2GpuProgram> GLES2GpuProgramPtr;
+    typedef shared_ptr<GLES2Texture> GLES2TexturePtr;
 };
 
 #if OGRE_NO_GLES3_SUPPORT == 0

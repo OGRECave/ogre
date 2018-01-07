@@ -37,8 +37,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class NameGenerator;
-
     /** \addtogroup Core
     *  @{
     */
@@ -69,15 +67,9 @@ namespace Ogre {
             /// Transform is relative to world space
             TS_WORLD
         };
-#if OGRE_NODE_STORAGE_LEGACY
-        typedef OGRE_HashMap<String, Node*> ChildNodeMap;
-        typedef MapIterator<ChildNodeMap> ChildNodeIterator;
-        typedef ConstMapIterator<ChildNodeMap> ConstChildNodeIterator;
-#else
         typedef vector<Node*>::type ChildNodeMap;
         typedef VectorIterator<ChildNodeMap> ChildNodeIterator;
         typedef ConstVectorIterator<ChildNodeMap> ConstChildNodeIterator;
-#endif
 
         /** Listener which gets called back on Node events.
         */
@@ -140,11 +132,8 @@ namespace Ogre {
         /// Flag indicating that the node has been queued for update
         bool mQueuedForUpdate;
 
-        /// Friendly name of this node, can be automatically generated if you don't care
+        /// Friendly name of this node
         String mName;
-
-        /// Incremented count for next name extension
-        static NameGenerator msNameGenerator;
 
         /// Stores the orientation of the node relative to it's parent.
         Quaternion mOrientation;
@@ -508,10 +497,8 @@ namespace Ogre {
         /// @overload
         ConstChildNodeIterator getChildIterator(void) const;
 
-#if !OGRE_NODE_STORAGE_LEGACY
         /// List of sub-nodes of this Node
         const ChildNodeMap& getChildren() const { return mChildren; }
-#endif
 
         /** Drops the specified child from this node. 
         @remarks

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreConfigOptionMap.h"
 #include "OgrePixelFormat.h"
+#include "OgreException.h"
 
 namespace Ogre
 {

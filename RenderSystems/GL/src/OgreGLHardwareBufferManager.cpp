@@ -45,7 +45,6 @@ namespace Ogre {
         uint32 free: 1;
     };
     #define SCRATCH_POOL_SIZE 1 * 1024 * 1024
-    #define SCRATCH_ALIGNMENT 32
     //---------------------------------------------------------------------
     GLHardwareBufferManagerBase::GLHardwareBufferManagerBase() 
         : mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
@@ -55,7 +54,7 @@ namespace Ogre {
         // Init scratch pool
         // TODO make it a configurable size?
         // 32-bit aligned buffer
-        mScratchBufferPool = static_cast<char*>(OGRE_MALLOC_ALIGN(SCRATCH_POOL_SIZE, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT));
+        mScratchBufferPool = static_cast<char*>(OGRE_MALLOC_SIMD(SCRATCH_POOL_SIZE, MEMCATEGORY_GEOMETRY));
         GLScratchBufferAlloc* ptrAlloc = (GLScratchBufferAlloc*)mScratchBufferPool;
         ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GLScratchBufferAlloc);
         ptrAlloc->free = 1;
@@ -67,7 +66,7 @@ namespace Ogre {
         destroyAllDeclarations();
         destroyAllBindings();
 
-        OGRE_FREE_ALIGN(mScratchBufferPool, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT);
+        OGRE_FREE_SIMD(mScratchBufferPool, MEMCATEGORY_GEOMETRY);
     }
     //-----------------------------------------------------------------------
     GLStateCacheManager * GLHardwareBufferManagerBase::getStateCacheManager()

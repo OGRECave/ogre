@@ -80,8 +80,8 @@ THE SOFTWARE
 
 // Thread-local pointer
 #define OGRE_THREAD_POINTER(T, var) boost::thread_specific_ptr<T> var
-#define OGRE_THREAD_POINTER_INIT(var) var(&deletePtr)
-#define OGRE_THREAD_POINTER_VAR(T, var) boost::thread_specific_ptr<T> var (&deletePtr<T>)
+#define OGRE_THREAD_POINTER_INIT(var) var()
+#define OGRE_THREAD_POINTER_VAR(T, var) boost::thread_specific_ptr<T> var
 #define OGRE_THREAD_POINTER_SET(var, expr) var.reset(expr)
 #define OGRE_THREAD_POINTER_GET(var) var.get()
 #define OGRE_THREAD_POINTER_DELETE(var) var.reset(0)

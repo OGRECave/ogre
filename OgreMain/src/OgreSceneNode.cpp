@@ -35,11 +35,7 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreWireBoundingBox.h"
 
-#if OGRE_NODE_STORAGE_LEGACY
-#define ITER_VAL(it) it->second
-#else
 #define ITER_VAL(it) (*it)
-#endif
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -138,19 +134,12 @@ namespace Ogre {
         obj->_notifyAttached(this);
 
         // Also add to name index
-#if OGRE_NODE_STORAGE_LEGACY
-        std::pair<ObjectMap::iterator, bool> insresult = 
-            mObjectsByName.insert(ObjectMap::value_type(obj->getName(), obj));
-        OgreAssert(insresult.second, "Object was not attached because an object of the "
-            "same name was already attached to this node.");
-        (void)insresult;
-#else
         MovableObjectNameExists pred = {obj->getName()};
         ObjectMap::iterator it = std::find_if(mObjectsByName.begin(), mObjectsByName.end(), pred);
         OgreAssert(it == mObjectsByName.end(), "Object was not attached because an object of the "
                                                "same name was already attached to this node.");
         mObjectsByName.push_back(obj);
-#endif
+
         // Make sure bounds get updated (must go right to the top)
         needUpdate();
     }
@@ -164,15 +153,7 @@ namespace Ogre {
     {
         if (index < mObjectsByName.size())
         {
-#if OGRE_NODE_STORAGE_LEGACY
-            ObjectMap::iterator i = mObjectsByName.begin();
-            // Increment (must do this one at a time)            
-            while (index--)++i;
-
-            return i->second;
-#else
             return mObjectsByName[index];
-#endif
         }
         else
         {
@@ -183,12 +164,8 @@ namespace Ogre {
     MovableObject* SceneNode::getAttachedObject(const String& name)
     {
         // Look up 
-#if OGRE_NODE_STORAGE_LEGACY
-        ObjectMap::iterator i = mObjectsByName.find(name);
-#else
         MovableObjectNameExists pred = {name};
         ObjectMap::iterator i = std::find_if(mObjectsByName.begin(), mObjectsByName.end(), pred);
-#endif
 
         if (i == mObjectsByName.end())
         {
@@ -205,20 +182,11 @@ namespace Ogre {
         {
 
             ObjectMap::iterator i = mObjectsByName.begin();
-#if OGRE_NODE_STORAGE_LEGACY
-            // Increment (must do this one at a time)
-            while (index--)++i;
-#else
             i += index;
-#endif
-            MovableObject* ret = ITER_VAL(i);
 
-#if OGRE_NODE_STORAGE_LEGACY
-            mObjectsByName.erase(i);
-#else
+            MovableObject* ret = ITER_VAL(i);
             std::swap(*i, mObjectsByName.back());
             mObjectsByName.pop_back();
-#endif
 
             ret->_notifyAttached((SceneNode*)0);
 
@@ -236,12 +204,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MovableObject* SceneNode::detachObject(const String& name)
     {
-#if OGRE_NODE_STORAGE_LEGACY
-        ObjectMap::iterator it = mObjectsByName.find(name);
-#else
         MovableObjectNameExists pred = {name};
         ObjectMap::iterator it = std::find_if(mObjectsByName.begin(), mObjectsByName.end(), pred);
-#endif
+
         if (it == mObjectsByName.end())
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Object " + name + " is not attached "
@@ -249,13 +214,9 @@ namespace Ogre {
         }
 
         MovableObject* ret = ITER_VAL(it);
-
-#if OGRE_NODE_STORAGE_LEGACY
-        mObjectsByName.erase(it);
-#else
         std::swap(*it, mObjectsByName.back());
         mObjectsByName.pop_back();
-#endif
+
         ret->_notifyAttached((SceneNode*)0);
         // Make sure bounds get updated (must go right to the top)
         needUpdate();
@@ -272,12 +233,8 @@ namespace Ogre {
         {
             if (ITER_VAL(i) == obj)
             {
-#if OGRE_NODE_STORAGE_LEGACY
-                mObjectsByName.erase(i);
-#else
                 std::swap(*i, mObjectsByName.back());
                 mObjectsByName.pop_back();
-#endif
                 break;
             }
         }
@@ -428,11 +385,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(unsigned short index)
     {
-#if OGRE_NODE_STORAGE_LEGACY
-        SceneNode* pChild = static_cast<SceneNode*>(getChild(index));
-#else
         SceneNode* pChild = static_cast<SceneNode*>(mChildren[index]);
-#endif
         pChild->removeAndDestroyAllChildren();
 
         removeChild(index);
@@ -441,11 +394,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(SceneNode* child)
     {
-#if OGRE_NODE_STORAGE_LEGACY
-        removeAndDestroyChild(child->getName());
-#else
         removeAndDestroyChild(std::find(mChildren.begin(), mChildren.end(), child) - mChildren.begin());
-#endif
     }
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyAllChildren(void)

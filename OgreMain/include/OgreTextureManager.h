@@ -457,14 +457,7 @@ namespace Ogre {
         ushort mPreferredIntegerBitDepth;
         ushort mPreferredFloatBitDepth;
         uint32 mDefaultNumMipmaps;
-#if !OGRE_USE_STD11 && OGRE_COMPILER == OGRE_COMPILER_MSVC
-#pragma warning ( push )
-#pragma warning ( disable: 4251 )
-#endif
         TexturePtr mWarningTexture;
-#if !OGRE_USE_STD11 && OGRE_COMPILER == OGRE_COMPILER_MSVC
-#pragma warning ( pop )
-#endif
     };
     /** @} */
     /** @} */

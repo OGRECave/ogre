@@ -44,11 +44,7 @@ email                : ericc@xenopi.com
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
-#if OGRE_NODE_STORAGE_LEGACY
-#define ITER_VAL(it) it->second
-#else
 #define ITER_VAL(it) (*it)
-#endif
 
 namespace Ogre
 {
@@ -338,11 +334,8 @@ namespace Ogre
     SceneNode * PCZSceneManager::createSceneNode( void )
     {
         SceneNode * on = createSceneNodeImpl();
-#if OGRE_NODE_STORAGE_LEGACY
-        mSceneNodes[ on->getName() ] = on;
-#else
         mSceneNodes.push_back(on);
-#endif
+
         // create any zone-specific data necessary
         createZoneSpecificNodeData((PCZSceneNode*)on);
         // return pointer to the node
@@ -360,11 +353,8 @@ namespace Ogre
                 "PCZSceneManager::createSceneNode" );
         }
         SceneNode * on = createSceneNodeImpl( name );
-#if OGRE_NODE_STORAGE_LEGACY
-        mSceneNodes[ on->getName() ] = on;
-#else
         mSceneNodes.push_back(on);
-#endif
+
         // create any zone-specific data necessary
         createZoneSpecificNodeData((PCZSceneNode*)on);
         // return pointer to the node
