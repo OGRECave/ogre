@@ -10,6 +10,9 @@
 # Configure OpenGL ES 2.0 RenderSystem build
 
 file(GLOB HEADER_FILES "include/*.h")
+list(APPEND HEADER_FILES
+    ${CMAKE_BINARY_DIR}/include/OgreGLES2Exports.h
+    ${CMAKE_BINARY_DIR}/include/OgreGLES2Config.h)
 file(GLOB SOURCE_FILES "src/*.cpp")
 list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/glesw.c")
 
@@ -74,6 +77,10 @@ endif ()
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_GLES2 ${OGRE_THREAD_LIBRARIES})
 endif ()
+
+generate_export_header(RenderSystem_GLES2 
+    EXPORT_MACRO_NAME _OgreGLES2Export
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreGLES2Exports.h)
 
 ogre_config_plugin(RenderSystem_GLES2)
 
