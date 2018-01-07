@@ -65,10 +65,13 @@ namespace Ogre
         typedef map<uint32, SceneNode*>::type IndexToSceneNodeMap;
         IndexToSceneNodeMap mCreatedSceneNodes;
 
+        static inline Light::LightTypes parseLightType( const char *value );
         static inline float decodeFloat( const rapidjson::Value &jsonValue );
+        static inline Vector2 decodeVector2Array( const rapidjson::Value &jsonArray );
         static inline Vector3 decodeVector3Array( const rapidjson::Value &jsonArray );
         static inline Vector4 decodeVector4Array( const rapidjson::Value &jsonArray );
         static inline Quaternion decodeQuaternionArray( const rapidjson::Value &jsonArray );
+        static inline ColourValue decodeColourValueArray( const rapidjson::Value &jsonArray );
         static inline Aabb decodeAabbArray( const rapidjson::Value &jsonArray,
                                             const Aabb &defaultValue );
 
@@ -80,7 +83,10 @@ namespace Ogre
                                   MovableObject *movableObject );
         void importRenderable( const rapidjson::Value &renderableValue, Renderable *renderable );
         void importSubItem( const rapidjson::Value &subItemValue, SubItem *subItem );
+        void importItem( const rapidjson::Value &itemValue );
         void importItems( const rapidjson::Value &json );
+        void importLight( const rapidjson::Value &lightValue );
+        void importLights( const rapidjson::Value &json );
 
     public:
         SceneFormatImporter( Root *root, SceneManager *sceneManager );

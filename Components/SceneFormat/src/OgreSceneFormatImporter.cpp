@@ -58,6 +58,17 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
+    Light::LightTypes SceneFormatImporter::parseLightType( const char *value )
+    {
+        for( size_t i=0; i<Light::NUM_LIGHT_TYPES+1u; ++i )
+        {
+            if( !strcmp( value, c_lightTypes[i] ) )
+                return static_cast<Light::LightTypes>( i );
+        }
+
+        return Light::LT_DIRECTIONAL;
+    }
+    //-----------------------------------------------------------------------------------
     inline float SceneFormatImporter::decodeFloat( const rapidjson::Value &jsonValue )
     {
         union MyUnion
@@ -69,6 +80,20 @@ namespace Ogre
         MyUnion myUnion;
         myUnion.u32 = jsonValue.GetUint();
         return myUnion.f32;
+    }
+    //-----------------------------------------------------------------------------------
+    inline Vector2 SceneFormatImporter::decodeVector2Array( const rapidjson::Value &jsonArray )
+    {
+        Vector2 retVal( Vector2::ZERO );
+
+        const rapidjson::SizeType arraySize = std::min( 2u, jsonArray.Size() );
+        for( rapidjson::SizeType i=0; i<arraySize; ++i )
+        {
+            if( jsonArray[i].IsUint() )
+                retVal[i] = decodeFloat( jsonArray[i] );
+        }
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     inline Vector3 SceneFormatImporter::decodeVector3Array( const rapidjson::Value &jsonArray )
@@ -102,6 +127,20 @@ namespace Ogre
     inline Quaternion SceneFormatImporter::decodeQuaternionArray( const rapidjson::Value &jsonArray )
     {
         Quaternion retVal( Quaternion::IDENTITY );
+
+        const rapidjson::SizeType arraySize = std::min( 4u, jsonArray.Size() );
+        for( rapidjson::SizeType i=0; i<arraySize; ++i )
+        {
+            if( jsonArray[i].IsUint() )
+                retVal[i] = decodeFloat( jsonArray[i] );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    inline ColourValue SceneFormatImporter::decodeColourValueArray( const rapidjson::Value &jsonArray )
+    {
+        ColourValue retVal( ColourValue::Black );
 
         const rapidjson::SizeType arraySize = std::min( 4u, jsonArray.Size() );
         for( rapidjson::SizeType i=0; i<arraySize; ++i )
@@ -386,68 +425,146 @@ namespace Ogre
             importRenderable( tmpIt->value, subItem );
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importItem( const rapidjson::Value &itemValue )
+    {
+        String meshName, resourceGroup;
+
+        rapidjson::Value::ConstMemberIterator tmpIt;
+
+        tmpIt = itemValue.FindMember( "mesh" );
+        if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsString() )
+            meshName = tmpIt->value.GetString();
+
+        tmpIt = itemValue.FindMember( "mesh_resource_group" );
+        if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsString() )
+            resourceGroup = tmpIt->value.GetString();
+
+        if( resourceGroup.empty() )
+            resourceGroup = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
+
+        bool isStatic = false;
+        rapidjson::Value const *movableObjectValue = 0;
+
+        tmpIt = itemValue.FindMember( "movable_object" );
+        if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsObject() )
+        {
+            movableObjectValue = &tmpIt->value;
+
+            tmpIt = movableObjectValue->FindMember( "is_static" );
+            if( tmpIt != movableObjectValue->MemberEnd() && tmpIt->value.IsBool() )
+                isStatic = tmpIt->value.GetBool();
+        }
+
+        const SceneMemoryMgrTypes sceneNodeType = isStatic ? SCENE_STATIC : SCENE_DYNAMIC;
+
+        Item *item = mSceneManager->createItem( meshName, resourceGroup, sceneNodeType );
+
+        if( movableObjectValue )
+            importMovableObject( *movableObjectValue, item );
+
+        tmpIt = itemValue.FindMember( "sub_items" );
+        if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsArray() )
+        {
+            const rapidjson::Value &subItemsArray = tmpIt->value;
+            const size_t numSubItems = std::min<size_t>( item->getNumSubItems(),
+                                                         subItemsArray.Size() );
+            for( size_t i=0; i<numSubItems; ++i )
+            {
+                const rapidjson::Value &subItemValue = subItemsArray[i];
+
+                if( subItemValue.IsObject() )
+                    importSubItem( subItemValue, item->getSubItem( i ) );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importItems( const rapidjson::Value &json )
     {
-        rapidjson::Value::ConstMemberIterator begin = json.MemberBegin();
-        rapidjson::Value::ConstMemberIterator itor = begin;
+        rapidjson::Value::ConstMemberIterator itor = json.MemberBegin();
         rapidjson::Value::ConstMemberIterator end  = json.MemberEnd();
 
         while( itor != end )
         {
             if( itor->value.IsObject() )
-            {
-                const rapidjson::Value &itemValue = itor->value;
+                importItem( itor->value );
 
-                String meshName, resourceGroup;
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importLight( const rapidjson::Value &lightValue )
+    {
+        rapidjson::Value::ConstMemberIterator tmpIt;
 
-                rapidjson::Value::ConstMemberIterator tmpIt;
+        Light *light = mSceneManager->createLight();
 
-                tmpIt = itemValue.FindMember( "mesh" );
-                if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsString() )
-                    meshName = tmpIt->value.GetString();
+        tmpIt = lightValue.FindMember( "movable_object" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsObject() )
+        {
+            const rapidjson::Value &movableObjectValue = tmpIt->value;
+            importMovableObject( movableObjectValue, light );
+        }
 
-                tmpIt = itemValue.FindMember( "mesh_resource_group" );
-                if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsString() )
-                    resourceGroup = tmpIt->value.GetString();
+        tmpIt = lightValue.FindMember( "diffuse" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsArray() )
+            light->setDiffuseColour( decodeColourValueArray( tmpIt->value ) );
 
-                if( resourceGroup.empty() )
-                    resourceGroup = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
+        tmpIt = lightValue.FindMember( "specular" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsArray() )
+            light->setSpecularColour( decodeColourValueArray( tmpIt->value ) );
 
-                bool isStatic = false;
-                rapidjson::Value const *movableObjectValue = 0;
+        tmpIt = lightValue.FindMember( "power" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsUint() )
+            light->setPowerScale( decodeFloat( tmpIt->value ) );
 
-                tmpIt = itemValue.FindMember( "movable_object" );
-                if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsObject() )
-                {
-                    movableObjectValue = &tmpIt->value;
+        tmpIt = lightValue.FindMember( "type" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsString() )
+            light->setType( parseLightType( tmpIt->value.GetString() ) );
 
-                    tmpIt = movableObjectValue->FindMember( "is_static" );
-                    if( tmpIt != movableObjectValue->MemberEnd() && tmpIt->value.IsBool() )
-                        isStatic = tmpIt->value.GetBool();
-                }
+        tmpIt = lightValue.FindMember( "attenuation" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsArray() )
+        {
+            const Vector4 rangeConstLinQuad = decodeVector4Array( tmpIt->value );
+            light->setAttenuation( rangeConstLinQuad.x, rangeConstLinQuad.y,
+                                   rangeConstLinQuad.z, rangeConstLinQuad.w );
+        }
 
-                const SceneMemoryMgrTypes sceneNodeType = isStatic ? SCENE_STATIC : SCENE_DYNAMIC;
+        tmpIt = lightValue.FindMember( "spot" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsArray() )
+        {
+            const Vector4 innerOuterFalloffNearClip = decodeVector4Array( tmpIt->value );
+            light->setSpotlightInnerAngle( Radian( innerOuterFalloffNearClip.x ) );
+            light->setSpotlightOuterAngle( Radian( innerOuterFalloffNearClip.y ) );
+            light->setSpotlightFalloff( innerOuterFalloffNearClip.z );
+            light->setSpotlightNearClipDistance( innerOuterFalloffNearClip.w );
+        }
 
-                Item *item = mSceneManager->createItem( meshName, resourceGroup, sceneNodeType );
+        tmpIt = lightValue.FindMember( "affect_parent_node" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsBool() )
+            light->setAffectParentNode( tmpIt->value.GetBool() );
 
-                if( movableObjectValue )
-                    importMovableObject( *movableObjectValue, item );
+        tmpIt = lightValue.FindMember( "shadow_far_dist" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsUint() )
+            light->setShadowFarDistance( decodeFloat( tmpIt->value ) );
 
-                tmpIt = itemValue.FindMember( "sub_items" );
-                if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsArray() )
-                {
-                    const rapidjson::Value &subItemsArray = tmpIt->value;
-                    const size_t numSubItems = std::min<size_t>( item->getNumSubItems(),
-                                                                 subItemsArray.Size() );
-                    for( size_t i=0; i<numSubItems; ++i )
-                    {
-                        const rapidjson::Value &subItemValue = subItemsArray[i];
+        tmpIt = lightValue.FindMember( "shadow_clip_dist" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsUint() )
+        {
+            const Vector2 nearFar = decodeVector2Array( tmpIt->value );
+            light->setShadowNearClipDistance( nearFar.x );
+            light->setShadowFarClipDistance( nearFar.y );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importLights( const rapidjson::Value &json )
+    {
+        rapidjson::Value::ConstMemberIterator itor = json.MemberBegin();
+        rapidjson::Value::ConstMemberIterator end  = json.MemberEnd();
 
-                        if( subItemValue.IsObject() )
-                            importSubItem( subItemValue, item->getSubItem( i ) );
-                    }
-                }
-            }
+        while( itor != end )
+        {
+            if( itor->value.IsObject() )
+                importLight( itor->value );
 
             ++itor;
         }
@@ -474,5 +591,9 @@ namespace Ogre
         itor = d.FindMember( "items" );
         if( itor != d.MemberEnd() && itor->value.IsArray() )
             importItems( itor->value );
+
+        itor = d.FindMember( "lights" );
+        if( itor != d.MemberEnd() && itor->value.IsArray() )
+            importLights( itor->value );
     }
 }
