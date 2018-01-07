@@ -94,7 +94,7 @@ namespace Ogre {
     {
         return _toString(val, width, fill, flags);
     }
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL &&  ( OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS )
+#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     //-----------------------------------------------------------------------
     String StringConverter::toString(unsigned int val,
         unsigned short width, char fill, std::ios::fmtflags flags)

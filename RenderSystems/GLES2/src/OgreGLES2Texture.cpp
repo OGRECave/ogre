@@ -286,14 +286,6 @@ namespace Ogre {
             {
                 case TEX_TYPE_1D:
                 case TEX_TYPE_2D:
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-                    if(internalformat != format)
-                    {
-                        LogManager::getSingleton().logMessage("glTexImage2D: format != internalFormat, "
-                            "format=" + StringConverter::toString(format) +
-                            ", internalFormat=" + StringConverter::toString(internalformat));
-                    }
-#endif
                     OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D,
                                  mip,
                                  internalformat,

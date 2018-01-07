@@ -46,14 +46,11 @@ namespace Ogre
 
     GLSLESProgramPipeline::~GLSLESProgramPipeline()
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         OGRE_CHECK_GL_ERROR(glDeleteProgramPipelinesEXT(1, &mGLProgramHandle));
-#endif
     }
 
     void GLSLESProgramPipeline::compileAndLink()
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         GLint linkStatus = 0;
         
         OGRE_CHECK_GL_ERROR(glGenProgramPipelinesEXT(1, &mGLProgramHandle));
@@ -170,7 +167,6 @@ namespace Ogre
                              (getVertexProgram()->getName() + "/" + mFragmentProgram->getName()).c_str());
             }
         }
-#endif
     }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
@@ -218,9 +214,7 @@ namespace Ogre
 
         if (mLinked)
         {
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramHandle));
-#endif
         }
     }
 
@@ -257,7 +251,6 @@ namespace Ogre
         // Iterate through uniform reference list and update uniform values
         GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
         GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         GLuint progID = 0;
         GLUniformCache* uniformCache=0;
         if(fromProgType == GPT_VERTEX_PROGRAM)
@@ -430,7 +423,6 @@ namespace Ogre
             } // fromProgType == currentUniform->mSourceProgType
             
         } // End for
-#endif
     }
     //-----------------------------------------------------------------------
     void GLSLESProgramPipeline::updateUniformBlocks(GpuProgramParametersSharedPtr params,
@@ -477,7 +469,6 @@ namespace Ogre
                 // Get the index in the parameter real list
                 if (index == currentUniform->mConstantDef->physicalIndex)
                 {
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
                     GLuint progID = 0;
                     if (getVertexProgram() && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
@@ -490,7 +481,7 @@ namespace Ogre
                         progID = mFragmentProgram->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     }
-#endif
+
                     // There will only be one multipass entry
                     return;
                 }

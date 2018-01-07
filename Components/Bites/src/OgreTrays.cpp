@@ -1993,7 +1993,7 @@ void TrayManager::frameRendered(const Ogre::FrameEvent &evt)
 
 void TrayManager::windowUpdate()
 {
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
     mWindow->update();
 #endif
 }

@@ -42,13 +42,7 @@ if(NOT OPENGLES3_FOUND)
 endif()
 
 # Add system specific settings
-if (OGRE_BUILD_PLATFORM_NACL)
-  file(GLOB PLATFORM_HEADERS "include/NaCl/*.h")
-  file(GLOB PLATFORM_SOURCES "src/NaCl/*.cpp")
-
-  include_directories(src/NaCl include/NaCl)
-  set(PLATFORM_HEADER_INSTALL "NaCl")
-elseif (APPLE)
+if (APPLE)
   file(GLOB PLATFORM_HEADERS "include/EAGL/*.h")
   file(GLOB PLATFORM_SOURCES "src/EAGL/*.mm")
 

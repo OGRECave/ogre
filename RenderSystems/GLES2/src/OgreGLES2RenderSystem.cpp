@@ -411,7 +411,6 @@ namespace Ogre {
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
         // Separate shader objects
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
         if(checkExtension("GL_EXT_separate_shader_objects"))
         {
@@ -423,7 +422,6 @@ namespace Ogre {
         if(rsc->getDeviceName().find("Mesa") != String::npos) {
             rsc->unsetCapability(RSC_GLSL_SSO_REDECLARE);
         }
-#endif
 
         GLfloat floatConstantCount = 0;
 #if OGRE_NO_GLES3_SUPPORT == 0

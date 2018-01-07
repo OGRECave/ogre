@@ -52,13 +52,12 @@ namespace Ogre
             {
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
             }
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+
             else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 if(glIsProgramPipelineEXT(obj))
                     OGRE_CHECK_GL_ERROR(glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength));
             }
-#endif
 
             if (infologLength > 1)
             {
@@ -75,13 +74,11 @@ namespace Ogre
                 {
                     OGRE_CHECK_GL_ERROR(glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog));
                 }
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
                 {
                     if(glIsProgramPipelineEXT(obj))
                         OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog));
                 }
-#endif
 
                 if (strlen(infoLog) > 0)
                 {

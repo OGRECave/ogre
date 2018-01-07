@@ -106,12 +106,10 @@ namespace Ogre {
             return mGLProgramHandle;
 
         OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
         {
             glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
         }
-#endif
 
         return mGLProgramHandle;
     }
@@ -137,12 +135,11 @@ namespace Ogre {
             }
             OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
             {
                 glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
             }
-#endif
+
             createGLProgramHandle();
         }
 

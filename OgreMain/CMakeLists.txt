@@ -54,17 +54,7 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
 )
 
 # Add platform specific files
-if (OGRE_BUILD_PLATFORM_NACL)
-  include_directories("include/NaCl")
-  file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/NaCl/*.h")
-  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/NaCl/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
-
-  set(PLATFORM_LIBS nosys)
-  set(PLATFORM_HEADER_INSTALL "NaCl")
-elseif (EMSCRIPTEN)
+if (EMSCRIPTEN)
   list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
 
   include_directories(include/Emscripten)

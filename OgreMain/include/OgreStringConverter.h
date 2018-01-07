@@ -93,7 +93,7 @@ namespace Ogre {
             char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0));
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL &&  ( OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS )
+#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         /** Converts an unsigned int to a String. */
         static String toString(unsigned int val, 
             unsigned short width = 0, char fill = ' ', 

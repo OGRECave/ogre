@@ -129,7 +129,6 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | This function encapsulates the entire lifetime of the context.
         -----------------------------------------------------------------------------*/
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         virtual void go(Sample* initialSample = 0)
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__)
@@ -173,7 +172,6 @@ namespace OgreBites
             }
 #endif
         }
-#endif
 
         virtual void loadStartUpSample() {}
         

@@ -47,16 +47,6 @@ namespace Ogre {
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
-#       include "ppapi/cpp/completion_callback.h"
-#       include "ppapi/cpp/instance.h"
-#       include "ppapi/c/ppp_graphics_3d.h"
-#       include "ppapi/cpp/graphics_3d.h"
-#       include "ppapi/cpp/graphics_3d_client.h"
-#       include "ppapi/gles2/gl2ext_ppapi.h"
-#       undef GL_OES_get_program_binary
-#       undef GL_OES_mapbuffer
-#       undef GL_OES_vertex_array_object
 #else
 #   if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 #       if !defined( __MINGW32__ )
