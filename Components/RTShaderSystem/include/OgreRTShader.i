@@ -12,6 +12,7 @@
 
 #define _OgreRTSSExport
 
+%include "OgreRTShaderConfig.h"
 %include "OgreShaderPrerequisites.h"
 %include "OgreShaderScriptTranslator.h"
 %include "OgreShaderSubRenderState.h"

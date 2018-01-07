@@ -12,6 +12,9 @@
 PROJECT(OgreRTShaderSystem)
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+list(APPEND HEADER_FILES 
+    ${CMAKE_BINARY_DIR}/include/OgreRTShaderExports.h 
+    ${CMAKE_BINARY_DIR}/include/OgreRTShaderConfig.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -19,6 +22,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 ogre_add_library_to_folder(Components OgreRTShaderSystem ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreRTShaderSystem OgreMain)
+
+generate_export_header(OgreRTShaderSystem 
+    EXPORT_MACRO_NAME _OgreRTSSExport
+    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreRTShaderExports.h)
 
 ogre_config_framework(OgreRTShaderSystem)
 ogre_config_component(OgreRTShaderSystem)

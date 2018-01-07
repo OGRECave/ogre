@@ -127,8 +127,5 @@ WARNING: Disabling this will make the samples unusable.
 
 #cmakedefine01 OGRE_BITES_HAVE_SDL
 
-#cmakedefine RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-
-#cmakedefine RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
 #endif
