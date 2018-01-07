@@ -27,3 +27,5 @@ deploy:
   publish: true
   override: true
   version: master
+  on:
+    branch: master
