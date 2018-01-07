@@ -56,9 +56,7 @@
 #endif
 
 #ifdef OGRE_STATIC_LIB
-#   ifdef OGRE_BUILD_PLUGIN_BSP
-#       include "BSP.h"
-#   endif
+#   include "BSP.h"
 #   ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #       include "ShaderSystem.h"
 #       include "ShaderSystemTexturedFog.h"
@@ -969,9 +967,7 @@ namespace OgreBites
 #if defined(INCLUDE_RTSHADER_SYSTEM) && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
             if(hasProgrammableGPU)
             {
-#   ifdef OGRE_BUILD_PLUGIN_BSP
                 mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
-#   endif
                 mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
                 mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
                 mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
