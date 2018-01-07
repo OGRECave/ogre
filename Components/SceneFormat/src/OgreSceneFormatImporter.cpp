@@ -47,8 +47,6 @@ THE SOFTWARE.
 
 #include "rapidjson/document.h"
 
-#define TODO_root_value_will_be_duplicated
-
 namespace Ogre
 {
     SceneFormatImporter::SceneFormatImporter( Root *root, SceneManager *sceneManager ) :
@@ -213,8 +211,15 @@ namespace Ogre
             {
                 //Has no parent. Could be root scene node,
                 //or a loose node whose parent wasn't exported.
-                sceneNode = mSceneManager->createSceneNode( sceneNodeType );
-                TODO_root_value_will_be_duplicated;
+                bool isRootNode = false;
+                itTmp = sceneNodeValue.FindMember( "is_root_node" );
+                if( itTmp != sceneNodeValue.MemberEnd() && itTmp->value.IsBool() )
+                    isRootNode = itTmp->value.GetBool();
+
+                if( isRootNode )
+                    sceneNode = mSceneManager->getRootSceneNode( sceneNodeType );
+                else
+                    sceneNode = mSceneManager->createSceneNode( sceneNodeType );
             }
 
             importNode( nodeValue, sceneNode );
