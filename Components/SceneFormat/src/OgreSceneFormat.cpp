@@ -161,6 +161,12 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormat::exportSceneNode( LwString &jsonStr, String &outJson, SceneNode *sceneNode )
     {
+        if( sceneNode == mSceneManager->getRootSceneNode( SCENE_DYNAMIC ) ||
+            sceneNode == mSceneManager->getRootSceneNode( SCENE_STATIC ) )
+        {
+            outJson += outJson += "\n\t\t\t\"is_root_node\" : true,";
+        }
+
         exportNode( jsonStr, outJson, sceneNode );
     }
     //-----------------------------------------------------------------------------------
