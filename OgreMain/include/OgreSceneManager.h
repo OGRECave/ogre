@@ -410,11 +410,7 @@ namespace Ogre {
         typedef map<String, InstanceManager*>::type InstanceManagerMap;
         InstanceManagerMap  mInstanceManagerMap;
 
-#if OGRE_NODE_STORAGE_LEGACY
-        typedef map<String, SceneNode*>::type SceneNodeList;
-#else
         typedef vector<SceneNode*>::type SceneNodeList;
-#endif
 
         /** Central list of SceneNodes - for easy memory management.
             @note

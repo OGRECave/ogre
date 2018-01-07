@@ -227,11 +227,7 @@ namespace Ogre
 
         while ( mit != mObjectsByName.end() )
         {
-#if OGRE_NODE_STORAGE_LEGACY
-            MovableObject * mo = mit->second;
-#else
             MovableObject * mo = *mit;
-#endif
 
             mo->_notifyCurrentCamera(cam);
             if ( mo->isVisible() &&

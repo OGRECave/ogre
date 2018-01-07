@@ -29,8 +29,6 @@
 #cmakedefine OGRE_CONFIG_LITTLE_ENDIAN
 #cmakedefine OGRE_CONFIG_BIG_ENDIAN
 
-#cmakedefine01 OGRE_NODE_STORAGE_LEGACY
-
 /** If set to 1, Real is typedef'ed to double. Otherwise, Real is typedef'ed
     to float. Setting this allows you to perform mathematical operations in the
     CPU (Quaternion, Vector3 etc) with more precision, but bear in mind that the
