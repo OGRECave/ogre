@@ -164,7 +164,7 @@ namespace Ogre
         if( sceneNode == mSceneManager->getRootSceneNode( SCENE_DYNAMIC ) ||
             sceneNode == mSceneManager->getRootSceneNode( SCENE_STATIC ) )
         {
-            outJson += outJson += "\n\t\t\t\"is_root_node\" : true,";
+            outJson += "\n\t\t\t\"is_root_node\" : true,";
         }
 
         exportNode( jsonStr, outJson, sceneNode );
