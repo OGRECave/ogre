@@ -880,7 +880,7 @@ namespace Ogre {
             {
                 StringUtil::toLowerCase(line);
                 // Remove quotes
-                while( ( pos = line.find("\"",0) ) != String::npos )
+                while( ( pos = line.find('\"',0) ) != String::npos )
                 {
                     line = line.substr(0,pos) + line.substr(pos+1,line.length()-(pos+1));
                 }

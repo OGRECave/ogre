@@ -4568,7 +4568,7 @@ namespace Ogre{
 
         if (start != String::npos)
         {
-            size_t end = declarator.find_first_of("[", start);
+            size_t end = declarator.find_first_of('[', start);
 
             // int1, int2, etc.
             if (end != start)
@@ -4581,10 +4581,10 @@ namespace Ogre{
             // C-style array
             while (start != String::npos)
             {
-                end = declarator.find_first_of("]", start);
+                end = declarator.find_first_of(']', start);
                 dimensions *= StringConverter::parseInt(
                     declarator.substr(start + 1, end - start - 1));
-                start = declarator.find_first_of("[", end);
+                start = declarator.find_first_of('[', end);
             }
         }
         

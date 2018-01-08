@@ -433,7 +433,7 @@ namespace Ogre {
                 String paramName = String( uniformName );
 
                 // If the uniform name has a "[" in it then its an array element uniform.
-                String::size_type arrayStart = paramName.find("[");
+                String::size_type arrayStart = paramName.find('[');
                 if (arrayStart != String::npos)
                 {
                     // If not the first array element then skip it and continue to the next uniform

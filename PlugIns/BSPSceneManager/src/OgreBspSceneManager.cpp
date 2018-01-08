@@ -95,7 +95,7 @@ namespace Ogre {
         mLevel.reset();
         // Check extension is .bsp
         char extension[6];
-        size_t pos = filename.find_last_of(".");
+        size_t pos = filename.find_last_of('.');
         if( pos == String::npos )
             OGRE_EXCEPT(
                 Exception::ERR_INVALIDPARAMS,

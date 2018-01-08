@@ -74,7 +74,7 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
         VertexElementSemantic semantic;
         int index = 0;
 
-        String::size_type endPos = shaderSource.find(";", currPos);
+        String::size_type endPos = shaderSource.find(';', currPos);
         if (endPos == String::npos)
         {
             // Problem, missing semicolon, abort.
@@ -87,8 +87,8 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
         currPos += 6;
 
         // Skip until '='.
-        String::size_type eqPos = line.find("=");
-        String::size_type parenPos = line.find(")");
+        String::size_type eqPos = line.find('=');
+        String::size_type parenPos = line.find(')');
 
         // Skip past '=' up to a ')' which contains an integer(the position).
         // TODO This could be a definition, does the preprocessor do replacement?

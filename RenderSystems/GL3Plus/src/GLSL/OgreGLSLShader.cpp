@@ -141,7 +141,7 @@ namespace Ogre {
             if(versionPos != String::npos)
             {
                 shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
-                belowVersionPos = mSource.find("\n", versionPos) + 1;
+                belowVersionPos = mSource.find('\n', versionPos) + 1;
             }
             
             // OSX driver only supports glsl150+ in core profile

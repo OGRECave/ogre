@@ -42,13 +42,13 @@ namespace Ogre {
        
         String tmpStr = (const char*)pcVer;
         LogManager::getSingleton().logMessage("GL_VERSION = " + tmpStr);
-        mVersion = tmpStr.substr(0, tmpStr.find(" "));
+        mVersion = tmpStr.substr(0, tmpStr.find(' '));
 
         // Get vendor
         const GLubyte* pcVendor = glGetString(GL_VENDOR);
         tmpStr = (const char*)pcVendor;
         LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
-        mVendor = tmpStr.substr(0, tmpStr.find(" "));
+        mVendor = tmpStr.substr(0, tmpStr.find(' '));
 
         // Get renderer
         const GLubyte* pcRenderer = glGetString(GL_RENDERER);
@@ -78,11 +78,11 @@ namespace Ogre {
         if(v == mVersion)
             return true;
 
-        String::size_type pos = v.find(".");
+        String::size_type pos = v.find('.');
         if(pos == String::npos)
             return false;
 
-        String::size_type pos1 = v.rfind(".");
+        String::size_type pos1 = v.rfind('.');
         if(pos1 == String::npos)
             return false;
 
@@ -90,11 +90,11 @@ namespace Ogre {
         second = ::atoi(v.substr(pos + 1, pos1 - (pos + 1)).c_str());
         third = ::atoi(v.substr(pos1 + 1, v.length()).c_str());
 
-        pos = mVersion.find(".");
+        pos = mVersion.find('.');
         if(pos == String::npos)
             return false;
 
-        pos1 = mVersion.rfind(".");
+        pos1 = mVersion.rfind('.');
         if(pos1 == String::npos)
             return false;
 
