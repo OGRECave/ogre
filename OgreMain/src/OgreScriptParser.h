@@ -43,7 +43,7 @@ namespace Ogre {
     *  @{
     */
 
-    class _OgreExport ScriptParser : public ScriptCompilerAlloc
+    class _OgrePrivate ScriptParser : public ScriptCompilerAlloc
     {
     public:
         static ConcreteNodeListPtr parse(const ScriptTokenListPtr &tokens);

@@ -72,7 +72,7 @@ namespace Ogre {
     typedef vector<ScriptTokenPtr>::type ScriptTokenList;
     typedef SharedPtr<ScriptTokenList> ScriptTokenListPtr;
 
-    class _OgreExport ScriptLexer : public ScriptCompilerAlloc
+    class _OgrePrivate ScriptLexer : public ScriptCompilerAlloc
     {
     public:
         /** Tokenizes the given input and returns the list of tokens found */
