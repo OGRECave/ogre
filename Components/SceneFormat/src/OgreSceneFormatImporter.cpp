@@ -278,17 +278,17 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneNodes( const rapidjson::Value &json )
     {
-        rapidjson::Value::ConstMemberIterator begin = json.MemberBegin();
-        rapidjson::Value::ConstMemberIterator itor = begin;
-        rapidjson::Value::ConstMemberIterator end  = json.MemberEnd();
+        rapidjson::Value::ConstValueIterator begin = json.Begin();
+        rapidjson::Value::ConstValueIterator itor = begin;
+        rapidjson::Value::ConstValueIterator end  = json.End();
 
         while( itor != end )
         {
             const size_t nodeIdx = itor - begin;
-            if( itor->value.IsObject() &&
+            if( itor->IsObject() &&
                 mCreatedSceneNodes.find( nodeIdx ) == mCreatedSceneNodes.end() )
             {
-                importSceneNode( itor->value, nodeIdx, json );
+                importSceneNode( *itor, nodeIdx, json );
             }
 
             ++itor;
@@ -489,13 +489,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importItems( const rapidjson::Value &json )
     {
-        rapidjson::Value::ConstMemberIterator itor = json.MemberBegin();
-        rapidjson::Value::ConstMemberIterator end  = json.MemberEnd();
+        rapidjson::Value::ConstValueIterator itor = json.Begin();
+        rapidjson::Value::ConstValueIterator end  = json.End();
 
         while( itor != end )
         {
-            if( itor->value.IsObject() )
-                importItem( itor->value );
+            if( itor->IsObject() )
+                importItem( *itor );
 
             ++itor;
         }
@@ -556,13 +556,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importEntities( const rapidjson::Value &json )
     {
-        rapidjson::Value::ConstMemberIterator itor = json.MemberBegin();
-        rapidjson::Value::ConstMemberIterator end  = json.MemberEnd();
+        rapidjson::Value::ConstValueIterator itor = json.Begin();
+        rapidjson::Value::ConstValueIterator end  = json.End();
 
         while( itor != end )
         {
-            if( itor->value.IsObject() )
-                importEntity( itor->value );
+            if( itor->IsObject() )
+                importEntity( *itor );
 
             ++itor;
         }
@@ -634,13 +634,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importLights( const rapidjson::Value &json )
     {
-        rapidjson::Value::ConstMemberIterator itor = json.MemberBegin();
-        rapidjson::Value::ConstMemberIterator end  = json.MemberEnd();
+        rapidjson::Value::ConstValueIterator itor = json.Begin();
+        rapidjson::Value::ConstValueIterator end  = json.End();
 
         while( itor != end )
         {
-            if( itor->value.IsObject() )
-                importLight( itor->value );
+            if( itor->IsObject() )
+                importLight( *itor );
 
             ++itor;
         }
