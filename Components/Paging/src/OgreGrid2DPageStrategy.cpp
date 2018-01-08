@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreGrid2DPageStrategy.h"
+
+#include <cmath>
 #include "OgreStreamSerialiser.h"
 #include "OgreCamera.h"
 #include "OgrePagedWorldSection.h"
@@ -159,8 +161,8 @@ namespace Ogre
         relPos.x += offset;
         relPos.y += offset;
 
-        *x = static_cast<int32>(floor(relPos.x / mCellSize));
-        *y = static_cast<int32>(floor(relPos.y / mCellSize));
+        *x = static_cast<int32>(std::floor(relPos.x / mCellSize));
+        *y = static_cast<int32>(std::floor(relPos.y / mCellSize));
 
     }
     //---------------------------------------------------------------------

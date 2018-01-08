@@ -28,6 +28,8 @@ THE SOFTWARE.
 
 #include <time.h>
 
+#include <cmath>
+
 namespace Ogre {
 namespace Volume {
 
@@ -89,9 +91,9 @@ namespace Volume {
         Real n0, n1, n2, n3; // Noise contributions from the four corners
         // Skew the input space to determine which simplex cell we're in
         Real s = (xIn + yIn + zIn) * F3; // Very nice and simple skew factor for 3D
-        int i = (int)floor(xIn + s);
-        int j = (int)floor(yIn + s);
-        int k = (int)floor(zIn + s);
+        int i = (int)std::floor(xIn + s);
+        int j = (int)std::floor(yIn + s);
+        int k = (int)std::floor(zIn + s);
         Real t = (i + j + k) * G3;
         Real X0 = i - t; // Unskew the cell origin back to (x,y,z) space
         Real Y0 = j - t;

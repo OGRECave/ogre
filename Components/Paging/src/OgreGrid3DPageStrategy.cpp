@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreGrid3DPageStrategy.h"
 
+#include <cmath>
+
 #include "OgreStreamSerialiser.h"
 #include "OgreCamera.h"
 #include "OgrePagedWorldSection.h"
@@ -113,9 +115,9 @@ namespace Ogre
     {
         Vector3 relPos = pos - mOrigin + mCellSize * 0.5f;
 
-        *x = static_cast<int32>(floor(relPos.x / mCellSize.x));
-        *y = static_cast<int32>(floor(relPos.y / mCellSize.y));
-        *z = static_cast<int32>(floor(relPos.z / mCellSize.z));
+        *x = static_cast<int32>(std::floor(relPos.x / mCellSize.x));
+        *y = static_cast<int32>(std::floor(relPos.y / mCellSize.y));
+        *z = static_cast<int32>(std::floor(relPos.z / mCellSize.z));
     }
     //---------------------------------------------------------------------
     void Grid3DPageStrategyData::getBottomLeftGridSpace(int32 x, int32 y, int32 z, Vector3& bl)
