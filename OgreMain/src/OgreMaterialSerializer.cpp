@@ -1924,7 +1924,7 @@ namespace
 
         if (start != String::npos)
         {
-            size_t end = dimensions.find_first_of("[", start);
+            size_t end = dimensions.find_first_of('[', start);
 
             // int1, int2, etc.
             if (end != start)
@@ -1937,10 +1937,10 @@ namespace
             // C-style array
             while (start != String::npos)
             {
-                end = dimensions.find_first_of("]", start);
+                end = dimensions.find_first_of(']', start);
                 dims *= StringConverter::parseInt(
                     dimensions.substr(start + 1, end - start - 1));
-                start = dimensions.find_first_of("[", start);
+                start = dimensions.find_first_of('[', start);
             }
         }
         
@@ -5445,7 +5445,7 @@ namespace Ogre
         // Skip any params with array qualifiers
         // These are only for convenience of setters, the full array will be
         // written using the base, non-array identifier
-        if (identifier.find("[") != String::npos)
+        if (identifier.find('[') != String::npos)
         {
             return;
         }

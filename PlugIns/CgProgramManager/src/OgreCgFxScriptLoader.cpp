@@ -3603,7 +3603,7 @@ namespace Ogre {
                 String theWordLight = "Light";
                 if (StringUtil::startsWith(uiNameValueAsString, theWordLight, false))
                 {
-                    size_t firstSpacePos = uiNameValueAsString.find(" ");
+                    size_t firstSpacePos = uiNameValueAsString.find(' ');
                     if (firstSpacePos > 0)
                     {
                         String lightNumberAsString = uiNameValueAsString.substr(theWordLight.size(), firstSpacePos - theWordLight.size());

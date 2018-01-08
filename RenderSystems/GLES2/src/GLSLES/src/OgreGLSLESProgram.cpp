@@ -152,7 +152,7 @@ namespace Ogre {
             {
                 size_t versionPos = mSource.find("#version");
                 int shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
-                size_t belowVersionPos = mSource.find("\n", versionPos) + 1;
+                size_t belowVersionPos = mSource.find('\n', versionPos) + 1;
 
                 if(shaderVersion >= 300) {
                     // Check that it's missing and that this shader has a main function, ie. not a child shader.

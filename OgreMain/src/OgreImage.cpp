@@ -297,7 +297,7 @@ namespace Ogre {
 
         String strExt;
 
-        size_t pos = strFileName.find_last_of(".");
+        size_t pos = strFileName.find_last_of('.');
         if( pos != String::npos && pos < (strFileName.length() - 1))
         {
             strExt = strFileName.substr(pos+1);
@@ -317,7 +317,7 @@ namespace Ogre {
         }
 
         String strExt;
-        size_t pos = filename.find_last_of(".");
+        size_t pos = filename.find_last_of('.');
         if( pos == String::npos )
             OGRE_EXCEPT(
             Exception::ERR_INVALIDPARAMS, 

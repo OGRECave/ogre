@@ -509,9 +509,9 @@ namespace Ogre {
                                     foundEndOfBody = true;
 
                                     // Remove first and last braces
-                                    size_t pos = functionBody.find("{");
+                                    size_t pos = functionBody.find('{');
                                     functionBody.erase(pos, 1);
-                                    pos = functionBody.rfind("}");
+                                    pos = functionBody.rfind('}');
                                     functionBody.erase(pos, 1);
                                     mFunctionCacheMap.insert(FunctionMap::value_type(*functionInvoc, functionBody));
                                 }

@@ -252,7 +252,7 @@ namespace Ogre {
                     String externalName = parts.front();
 
                     // Now there should be an opening brace
-                    String::size_type openBracePos = src.find("{", currPos);
+                    String::size_type openBracePos = src.find('{', currPos);
                     if (openBracePos != String::npos)
                     {
                         currPos = openBracePos + 1;
@@ -265,11 +265,11 @@ namespace Ogre {
                     }
 
                     // First we need to find the internal name for the uniform block
-                    String::size_type endBracePos = src.find("}", currPos);
+                    String::size_type endBracePos = src.find('}', currPos);
 
                     // Find terminating semicolon
                     currPos = endBracePos + 1;
-                    endPos = src.find(";", currPos);
+                    endPos = src.find(';', currPos);
                     if (endPos == String::npos)
                     {
                         // problem, missing semicolon, abort
@@ -279,7 +279,7 @@ namespace Ogre {
                 else
                 {
                     // find terminating semicolon
-                    endPos = src.find(";", currPos);
+                    endPos = src.find(';', currPos);
                     if (endPos == String::npos)
                     {
                         // problem, missing semicolon, abort

@@ -359,7 +359,7 @@ namespace Ogre {
                 // ie you can't start updating an array starting at element 1, must always be element 0.
 
                 // if the uniform name has a "[" in it then its an array element uniform.
-                String::size_type arrayStart = paramName.find("[");
+                String::size_type arrayStart = paramName.find('[');
                 if (arrayStart != String::npos)
                 {
                     // if not the first array element then skip it and continue to the next uniform
