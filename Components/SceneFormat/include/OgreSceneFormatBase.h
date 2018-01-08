@@ -53,6 +53,7 @@ namespace Ogre
             Materials   = 1u << 5u,
             Meshes      = 1u << 6u,
             MeshesV1    = 1u << 7u,
+            SceneSettings = 1u << 8u,
         };
     }
 

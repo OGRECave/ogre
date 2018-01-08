@@ -107,10 +107,10 @@ namespace Ogre
     void SceneFormat::encodeQuaternion( LwString &jsonStr, const Quaternion &value )
     {
         jsonStr.a( "[ ",
+                   encodeFloat( value.w ), ", ",
                    encodeFloat( value.x ), ", ",
-                   encodeFloat( value.y ), ", ",
-                   encodeFloat( value.z ), ", " );
-        jsonStr.a( encodeFloat( value.w ),
+                   encodeFloat( value.y ), ", " );
+        jsonStr.a( encodeFloat( value.z ),
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
@@ -406,6 +406,23 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormat::exportSceneSettings( LwString &jsonStr, String &outJson )
+    {
+        jsonStr.a( ",\n\t\"scene\" :\n\t{" );
+
+        jsonStr.a( "\n\t\t\"ambient\" : [ " );
+        encodeColour( jsonStr, mSceneManager->getAmbientLightUpperHemisphere() );
+        jsonStr.a( ", " );
+        encodeColour( jsonStr, mSceneManager->getAmbientLightLowerHemisphere() );
+        jsonStr.a( ", " );
+        encodeVector( jsonStr, mSceneManager->getAmbientLightHemisphereDir() );
+        jsonStr.a( ", ", encodeFloat( mSceneManager->getAmbientLightUpperHemisphere().a ), " ]" );
+
+        jsonStr.a( "\n\t}" );
+
+        flushLwString( jsonStr, outJson );
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormat::_exportScene( String &outJson, uint32 exportFlags )
     {
         mNodeToIdxMap.clear();
@@ -546,6 +563,9 @@ namespace Ogre
                 outJson += "\n\t]";
             }
         }
+
+        if( exportFlags & SceneFlags::SceneSettings )
+            exportSceneSettings( jsonStr, outJson );
 
         outJson += "\n}\n";
 
