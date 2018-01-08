@@ -39,6 +39,8 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreRoot.h"
 #include "OgreVolumeChunk.h"
+
+#include <cmath>
 #include "OgreVolumeMeshBuilder.h"
 #include "OgreVolumeOctreeNode.h"
 #include "OgreMaterialManager.h"
@@ -507,7 +509,7 @@ namespace Volume {
             return true;
         }
     
-        Real k = ((Real)mCamera->getViewport()->getActualHeight() / ((Real)2.0 * tan(mCamera->getFOVy().valueRadians() / (Real)2.0)));
+        Real k = ((Real)mCamera->getViewport()->getActualHeight() / ((Real)2.0 * std::tan(mCamera->getFOVy().valueRadians() / (Real)2.0)));
 
         
         // Get the distance to the center.

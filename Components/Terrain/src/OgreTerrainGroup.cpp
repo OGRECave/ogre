@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreStreamSerialiser.h"
 #include "OgreLogManager.h"
 #include "OgreTerrainAutoUpdateLod.h"
+#include <cmath>
 #include <iomanip>
 
 namespace Ogre
@@ -617,8 +618,8 @@ namespace Ogre
         terrainPos.x += offset;
         terrainPos.y += offset;
 
-        *x = static_cast<long>(floor(terrainPos.x / mTerrainWorldSize));
-        *y = static_cast<long>(floor(terrainPos.y / mTerrainWorldSize));
+        *x = static_cast<long>(std::floor(terrainPos.x / mTerrainWorldSize));
+        *y = static_cast<long>(std::floor(terrainPos.y / mTerrainWorldSize));
 
 
     }

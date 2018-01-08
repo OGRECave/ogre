@@ -15,6 +15,8 @@ same license as the rest of the engine.
 
 #include "WaterMesh.h"
 
+#include <cmath>
+
 #define ANIMATIONS_PER_SECOND 100.0f
 
 WaterMesh::WaterMesh(const String& inMeshName, Real planeSize, int inComplexity)
@@ -199,9 +201,9 @@ Real WaterMesh::getHeight(Real x, Real y)
     Real xb = xa + 1 ;
     Real ya = floor(y);
     Real yb = ya + 1 ;
-    Real yaxavg = hat(xa,ya) * (1.0f-fabs(xa-x)) + hat(xb,ya) * (1.0f-fabs(xb-x));
-    Real ybxavg = hat(xa,yb) * (1.0f-fabs(xa-x)) + hat(xb,yb) * (1.0f-fabs(xb-x));
-    Real yavg = yaxavg * (1.0f-fabs(ya-y)) + ybxavg * (1.0f-fabs(yb-y)) ;
+    Real yaxavg = hat(xa,ya) * (1.0f-std::fabs(xa-x)) + hat(xb,ya) * (1.0f-std::fabs(xb-x));
+    Real ybxavg = hat(xa,yb) * (1.0f-std::fabs(xa-x)) + hat(xb,yb) * (1.0f-std::fabs(xb-x));
+    Real yavg = yaxavg * (1.0f-std::fabs(ya-y)) + ybxavg * (1.0f-std::fabs(yb-y)) ;
     return yavg ;
 }
 /* ========================================================================= */
