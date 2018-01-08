@@ -444,12 +444,13 @@ namespace Ogre
         if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
             meshName = tmpIt->value.GetString();
 
-        tmpIt = entityValue.FindMember( "mesh_resource_group" );
-        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
-            resourceGroup = tmpIt->value.GetString();
+        resourceGroup = "SceneFormatImporter";
+//        tmpIt = entityValue.FindMember( "mesh_resource_group" );
+//        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
+//            resourceGroup = tmpIt->value.GetString();
 
-        if( resourceGroup.empty() )
-            resourceGroup = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
+//        if( resourceGroup.empty() )
+//            resourceGroup = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
 
         bool isStatic = false;
         rapidjson::Value const *movableObjectValue = 0;
@@ -511,12 +512,13 @@ namespace Ogre
         if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
             meshName = tmpIt->value.GetString();
 
-        tmpIt = entityValue.FindMember( "mesh_resource_group" );
-        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
-            resourceGroup = tmpIt->value.GetString();
+        resourceGroup = "SceneFormatImporter";
+//        tmpIt = entityValue.FindMember( "mesh_resource_group" );
+//        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
+//            resourceGroup = tmpIt->value.GetString();
 
-        if( resourceGroup.empty() )
-            resourceGroup = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
+//        if( resourceGroup.empty() )
+//            resourceGroup = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
 
         bool isStatic = false;
         rapidjson::Value const *movableObjectValue = 0;
@@ -646,6 +648,24 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json )
+    {
+        rapidjson::Value::ConstMemberIterator tmpIt;
+        tmpIt = json.FindMember( "ambient" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsArray() && tmpIt->value.Size() >= 4u &&
+            tmpIt->value[0].IsArray() &&
+            tmpIt->value[1].IsArray() &&
+            tmpIt->value[2].IsArray() &&
+            tmpIt->value[3].IsUint() )
+        {
+            const ColourValue upperHemisphere = decodeColourValueArray( tmpIt->value[0] );
+            const ColourValue lowerHemisphere = decodeColourValueArray( tmpIt->value[1] );
+            const Vector3 hemiDir = decodeVector3Array( tmpIt->value[2] );
+            const float envmapScale = decodeFloat( tmpIt->value[3] );
+            mSceneManager->setAmbientLight( upperHemisphere, lowerHemisphere, hemiDir, envmapScale );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const char *jsonString )
     {
         mFilename = filename;
@@ -675,6 +695,10 @@ namespace Ogre
         itor = d.FindMember( "lights" );
         if( itor != d.MemberEnd() && itor->value.IsArray() )
             importLights( itor->value );
+
+        itor = d.FindMember( "scene" );
+        if( itor != d.MemberEnd() && itor->value.IsObject() )
+            importSceneSettings( itor->value );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneFromFile( const String &folderPath )
@@ -685,6 +709,8 @@ namespace Ogre
                                                   "FileSystem", "SceneFormatImporter" );
         resourceGroupManager.addResourceLocation( folderPath + "/v1",
                                                   "FileSystem", "SceneFormatImporter" );
+
+        resourceGroupManager.initialiseResourceGroup( "SceneFormatImporter", true );
 
         DataStreamPtr stream = resourceGroupManager.openResource( "scene.json", "SceneFormatImporter" );
 

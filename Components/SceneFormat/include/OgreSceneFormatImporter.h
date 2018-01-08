@@ -90,6 +90,7 @@ namespace Ogre
         void importEntities( const rapidjson::Value &json );
         void importLight( const rapidjson::Value &lightValue );
         void importLights( const rapidjson::Value &json );
+        void importSceneSettings( const rapidjson::Value &json );
 
     public:
         SceneFormatImporter( Root *root, SceneManager *sceneManager );

@@ -76,6 +76,7 @@ namespace Ogre
         void exportItem( LwString &jsonStr, String &outJson, Item *item, bool exportMesh );
         void exportLight( LwString &jsonStr, String &outJson, Light *light );
         void exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity, bool exportMesh );
+        void exportSceneSettings( LwString &jsonStr, String &outJson );
 
         /**
         @param outJson
