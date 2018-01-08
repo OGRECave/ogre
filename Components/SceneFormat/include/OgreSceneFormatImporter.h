@@ -96,6 +96,8 @@ namespace Ogre
         ~SceneFormatImporter();
 
         void importScene( const String &filename, const char *jsonString );
+
+        void importSceneFromFile( const String &filename );
     };
 
     /** @} */

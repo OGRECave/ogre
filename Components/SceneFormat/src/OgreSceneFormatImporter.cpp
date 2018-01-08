@@ -676,4 +676,31 @@ namespace Ogre
         if( itor != d.MemberEnd() && itor->value.IsArray() )
             importLights( itor->value );
     }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importSceneFromFile( const String &folderPath )
+    {
+        ResourceGroupManager &resourceGroupManager = ResourceGroupManager::getSingleton();
+        resourceGroupManager.addResourceLocation( folderPath, "FileSystem", "SceneFormatImporter" );
+        resourceGroupManager.addResourceLocation( folderPath + "/v2",
+                                                  "FileSystem", "SceneFormatImporter" );
+        resourceGroupManager.addResourceLocation( folderPath + "/v1",
+                                                  "FileSystem", "SceneFormatImporter" );
+
+        DataStreamPtr stream = resourceGroupManager.openResource( "scene.json", "SceneFormatImporter" );
+
+        vector<char>::type fileData;
+        fileData.resize( stream->size() + 1 );
+        if( !fileData.empty() )
+        {
+            stream->read( &fileData[0], stream->size() );
+
+            //Add null terminator just in case (to prevent bad input)
+            fileData.back() = '\0';
+            importScene( stream->getName(), &fileData[0] );
+        }
+
+        resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );
+        resourceGroupManager.removeResourceLocation( folderPath + "/v2", "SceneFormatImporter" );
+        resourceGroupManager.removeResourceLocation( folderPath + "/v1", "SceneFormatImporter" );
+    }
 }
