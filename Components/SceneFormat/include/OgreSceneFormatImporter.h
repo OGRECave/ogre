@@ -83,8 +83,11 @@ namespace Ogre
                                   MovableObject *movableObject );
         void importRenderable( const rapidjson::Value &renderableValue, Renderable *renderable );
         void importSubItem( const rapidjson::Value &subItemValue, SubItem *subItem );
+        void importSubEntity( const rapidjson::Value &subEntityValue, v1::SubEntity *subEntity );
         void importItem( const rapidjson::Value &itemValue );
         void importItems( const rapidjson::Value &json );
+        void importEntity( const rapidjson::Value &entityValue );
+        void importEntities( const rapidjson::Value &json );
         void importLight( const rapidjson::Value &lightValue );
         void importLights( const rapidjson::Value &json );
 

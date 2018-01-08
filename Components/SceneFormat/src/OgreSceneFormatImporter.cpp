@@ -417,26 +417,35 @@ namespace Ogre
             renderable->setUseIdentityProjection( tmpIt->value.GetBool() );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormatImporter::importSubItem( const rapidjson::Value &subItemValue, SubItem *subItem )
+    void SceneFormatImporter::importSubItem( const rapidjson::Value &subentityValue, SubItem *subItem )
     {
         rapidjson::Value::ConstMemberIterator tmpIt;
-        tmpIt = subItemValue.FindMember( "renderable" );
-        if( tmpIt != subItemValue.MemberEnd() && tmpIt->value.IsObject() )
+        tmpIt = subentityValue.FindMember( "renderable" );
+        if( tmpIt != subentityValue.MemberEnd() && tmpIt->value.IsObject() )
             importRenderable( tmpIt->value, subItem );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormatImporter::importItem( const rapidjson::Value &itemValue )
+    void SceneFormatImporter::importSubEntity( const rapidjson::Value &subEntityValue,
+                                               v1::SubEntity *subEntity )
+    {
+        rapidjson::Value::ConstMemberIterator tmpIt;
+        tmpIt = subEntityValue.FindMember( "renderable" );
+        if( tmpIt != subEntityValue.MemberEnd() && tmpIt->value.IsObject() )
+            importRenderable( tmpIt->value, subEntity );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importItem( const rapidjson::Value &entityValue )
     {
         String meshName, resourceGroup;
 
         rapidjson::Value::ConstMemberIterator tmpIt;
 
-        tmpIt = itemValue.FindMember( "mesh" );
-        if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsString() )
+        tmpIt = entityValue.FindMember( "mesh" );
+        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
             meshName = tmpIt->value.GetString();
 
-        tmpIt = itemValue.FindMember( "mesh_resource_group" );
-        if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsString() )
+        tmpIt = entityValue.FindMember( "mesh_resource_group" );
+        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
             resourceGroup = tmpIt->value.GetString();
 
         if( resourceGroup.empty() )
@@ -445,8 +454,8 @@ namespace Ogre
         bool isStatic = false;
         rapidjson::Value const *movableObjectValue = 0;
 
-        tmpIt = itemValue.FindMember( "movable_object" );
-        if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsObject() )
+        tmpIt = entityValue.FindMember( "movable_object" );
+        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsObject() )
         {
             movableObjectValue = &tmpIt->value;
 
@@ -462,18 +471,18 @@ namespace Ogre
         if( movableObjectValue )
             importMovableObject( *movableObjectValue, item );
 
-        tmpIt = itemValue.FindMember( "sub_items" );
-        if( tmpIt != itemValue.MemberEnd() && tmpIt->value.IsArray() )
+        tmpIt = entityValue.FindMember( "sub_items" );
+        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsArray() )
         {
             const rapidjson::Value &subItemsArray = tmpIt->value;
             const size_t numSubItems = std::min<size_t>( item->getNumSubItems(),
                                                          subItemsArray.Size() );
             for( size_t i=0; i<numSubItems; ++i )
             {
-                const rapidjson::Value &subItemValue = subItemsArray[i];
+                const rapidjson::Value &subentityValue = subItemsArray[i];
 
-                if( subItemValue.IsObject() )
-                    importSubItem( subItemValue, item->getSubItem( i ) );
+                if( subentityValue.IsObject() )
+                    importSubItem( subentityValue, item->getSubItem( i ) );
             }
         }
     }
@@ -487,6 +496,73 @@ namespace Ogre
         {
             if( itor->value.IsObject() )
                 importItem( itor->value );
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importEntity( const rapidjson::Value &entityValue )
+    {
+        String meshName, resourceGroup;
+
+        rapidjson::Value::ConstMemberIterator tmpIt;
+
+        tmpIt = entityValue.FindMember( "mesh" );
+        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
+            meshName = tmpIt->value.GetString();
+
+        tmpIt = entityValue.FindMember( "mesh_resource_group" );
+        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsString() )
+            resourceGroup = tmpIt->value.GetString();
+
+        if( resourceGroup.empty() )
+            resourceGroup = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
+
+        bool isStatic = false;
+        rapidjson::Value const *movableObjectValue = 0;
+
+        tmpIt = entityValue.FindMember( "movable_object" );
+        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsObject() )
+        {
+            movableObjectValue = &tmpIt->value;
+
+            tmpIt = movableObjectValue->FindMember( "is_static" );
+            if( tmpIt != movableObjectValue->MemberEnd() && tmpIt->value.IsBool() )
+                isStatic = tmpIt->value.GetBool();
+        }
+
+        const SceneMemoryMgrTypes sceneNodeType = isStatic ? SCENE_STATIC : SCENE_DYNAMIC;
+
+        v1::Entity *entity = mSceneManager->createEntity( meshName, resourceGroup, sceneNodeType );
+
+        if( movableObjectValue )
+            importMovableObject( *movableObjectValue, entity );
+
+        tmpIt = entityValue.FindMember( "sub_entities" );
+        if( tmpIt != entityValue.MemberEnd() && tmpIt->value.IsArray() )
+        {
+            const rapidjson::Value &subEntitiesArray = tmpIt->value;
+            const size_t numSubEntities = std::min<size_t>( entity->getNumSubEntities(),
+                                                            subEntitiesArray.Size() );
+            for( size_t i=0; i<numSubEntities; ++i )
+            {
+                const rapidjson::Value &subEntityValue = subEntitiesArray[i];
+
+                if( subEntityValue.IsObject() )
+                    importSubEntity( subEntityValue, entity->getSubEntity( i ) );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importEntities( const rapidjson::Value &json )
+    {
+        rapidjson::Value::ConstMemberIterator itor = json.MemberBegin();
+        rapidjson::Value::ConstMemberIterator end  = json.MemberEnd();
+
+        while( itor != end )
+        {
+            if( itor->value.IsObject() )
+                importEntity( itor->value );
 
             ++itor;
         }
@@ -591,6 +667,10 @@ namespace Ogre
         itor = d.FindMember( "items" );
         if( itor != d.MemberEnd() && itor->value.IsArray() )
             importItems( itor->value );
+
+        itor = d.FindMember( "entities" );
+        if( itor != d.MemberEnd() && itor->value.IsArray() )
+            importEntities( itor->value );
 
         itor = d.FindMember( "lights" );
         if( itor != d.MemberEnd() && itor->value.IsArray() )
