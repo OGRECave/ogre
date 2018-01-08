@@ -37,8 +37,6 @@ email                : janders@users.sf.net
 #include "OgreOctreeNode.h"
 #include "OgreOctreeSceneManager.h"
 
-#define ITER_VAL(it) (*it)
-
 namespace Ogre
 {
 unsigned long green = 0xFFFFFFFF;
@@ -68,7 +66,7 @@ void OctreeNode::_removeNodeAndChildren( )
     ChildNodeMap::iterator it = mChildren.begin();
     while( it != mChildren.end() )
     {
-        static_cast<OctreeNode *>( ITER_VAL(it) ) -> _removeNodeAndChildren();
+        static_cast<OctreeNode *>( *it ) -> _removeNodeAndChildren();
         ++it;
     }
 }
@@ -90,7 +88,7 @@ void OctreeNode::removeAllChildren()
     iend = mChildren.end();
     for (i = mChildren.begin(); i != iend; ++i)
     {
-        OctreeNode* on = static_cast<OctreeNode*>(ITER_VAL(i));
+        OctreeNode* on = static_cast<OctreeNode*>(*i);
         on->setParent(0);
         on->_removeNodeAndChildren();
     }
@@ -120,11 +118,11 @@ void OctreeNode::_updateBounds( void )
     {
 
         // Get local bounds of object
-        bx = ITER_VAL(i)->getBoundingBox();
+        bx = (*i)->getBoundingBox();
 
         mLocalAABB.merge( bx );
 
-        mWorldAABB.merge( ITER_VAL(i)->getWorldBoundingBox(true) );
+        mWorldAABB.merge( (*i)->getWorldBoundingBox(true) );
         ++i;
     }
 
@@ -177,7 +175,7 @@ void OctreeNode::_addToRenderQueue( Camera* cam, RenderQueue *queue,
 
     while ( mit != mObjectsByName.end() )
     {
-        MovableObject * mo = ITER_VAL(mit);
+        MovableObject * mo = *mit;
         
         queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
 

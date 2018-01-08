@@ -44,8 +44,6 @@ email                : ericc@xenopi.com
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
-#define ITER_VAL(it) (*it)
-
 namespace Ogre
 {
     PCZSceneManager::PCZSceneManager(const String& name) :
@@ -430,7 +428,7 @@ namespace Ogre
         for (SceneNodeList::iterator i = mSceneNodes.begin();
             i != mSceneNodes.end(); ++i)
         {
-            OGRE_DELETE ITER_VAL(i);
+            OGRE_DELETE *i;
         }
         mSceneNodes.clear();
         mAutoTrackingSceneNodes.clear();
@@ -603,7 +601,7 @@ namespace Ogre
 
         while ( it != mSceneNodes.end() )
         {
-            pczsn = (PCZSceneNode*)ITER_VAL(it);
+            pczsn = (PCZSceneNode*)*it;
             if (pczsn->isMoved() && pczsn->isEnabled())
             {
                 // Update a single entry 
@@ -764,7 +762,7 @@ namespace Ogre
         for (SceneNodeList::iterator i = mSceneNodes.begin();
             i != mSceneNodes.end(); ++i)
         {
-            PCZSceneNode * pczsn = (PCZSceneNode*)ITER_VAL(i);
+            PCZSceneNode * pczsn = (PCZSceneNode*)*i;
             if (!destroySceneNodes)
             {
                 if (pczsn->getHomeZone() == zone)
@@ -910,7 +908,7 @@ namespace Ogre
         {
             while ( it != mSceneNodes.end() )
             {
-                pczsn = (PCZSceneNode*)ITER_VAL(it);
+                pczsn = (PCZSceneNode*)*it;
                 // create zone specific data for the node 
                 zone->createNodeZoneData(pczsn);
                 // proceed to next entry in the list
