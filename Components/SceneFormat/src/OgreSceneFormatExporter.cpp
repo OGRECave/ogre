@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreSceneFormat.h"
+#include "OgreSceneFormatExporter.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
 
@@ -45,26 +45,26 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    SceneFormat::SceneFormat( Root *root, SceneManager *sceneManager ) :
+    SceneFormatExporter::SceneFormatExporter( Root *root, SceneManager *sceneManager ) :
         SceneFormatBase( root, sceneManager )
     {
     }
     //-----------------------------------------------------------------------------------
-    SceneFormat::~SceneFormat()
+    SceneFormatExporter::~SceneFormatExporter()
     {
     }
     //-----------------------------------------------------------------------------------
-    const char* SceneFormat::toQuotedStr( bool value )
+    const char* SceneFormatExporter::toQuotedStr( bool value )
     {
         return value ? "true" : "false";
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::toQuotedStr( LwString &jsonStr, Light::LightTypes lightType )
+    void SceneFormatExporter::toQuotedStr( LwString &jsonStr, Light::LightTypes lightType )
     {
         jsonStr.a( "\"", c_lightTypes[lightType], "\"" );
     }
     //-----------------------------------------------------------------------------------
-    uint32 SceneFormat::encodeFloat( float value )
+    uint32 SceneFormatExporter::encodeFloat( float value )
     {
         union MyUnion
         {
@@ -77,7 +77,7 @@ namespace Ogre
         return myUnion.u32;
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::encodeVector( LwString &jsonStr, const Vector2 &value )
+    void SceneFormatExporter::encodeVector( LwString &jsonStr, const Vector2 &value )
     {
         jsonStr.a( "[ ",
                    encodeFloat( value.x ), ", ",
@@ -85,7 +85,7 @@ namespace Ogre
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::encodeVector( LwString &jsonStr, const Vector3 &value )
+    void SceneFormatExporter::encodeVector( LwString &jsonStr, const Vector3 &value )
     {
         jsonStr.a( "[ ",
                    encodeFloat( value.x ), ", ",
@@ -94,7 +94,7 @@ namespace Ogre
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::encodeVector( LwString &jsonStr, const Vector4 &value )
+    void SceneFormatExporter::encodeVector( LwString &jsonStr, const Vector4 &value )
     {
         jsonStr.a( "[ ",
                    encodeFloat( value.x ), ", ",
@@ -104,7 +104,7 @@ namespace Ogre
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::encodeQuaternion( LwString &jsonStr, const Quaternion &value )
+    void SceneFormatExporter::encodeQuaternion( LwString &jsonStr, const Quaternion &value )
     {
         jsonStr.a( "[ ",
                    encodeFloat( value.w ), ", ",
@@ -114,7 +114,7 @@ namespace Ogre
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::encodeColour( LwString &jsonStr, const ColourValue &value )
+    void SceneFormatExporter::encodeColour( LwString &jsonStr, const ColourValue &value )
     {
         jsonStr.a( "[ ",
                    encodeFloat( value.r ), ", ",
@@ -124,13 +124,13 @@ namespace Ogre
                    " ]" );
     }
     //-----------------------------------------------------------------------------------
-    inline void SceneFormat::flushLwString( LwString &jsonStr, String &outJson )
+    inline void SceneFormatExporter::flushLwString( LwString &jsonStr, String &outJson )
     {
         outJson += jsonStr.c_str();
         jsonStr.clear();
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportNode( LwString &jsonStr, String &outJson, Node *node )
+    void SceneFormatExporter::exportNode( LwString &jsonStr, String &outJson, Node *node )
     {
         outJson += "\n\t\t\t\"node\" :\n\t\t\t{";
 
@@ -159,7 +159,7 @@ namespace Ogre
         outJson += "\n\t\t\t}";
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportSceneNode( LwString &jsonStr, String &outJson, SceneNode *sceneNode )
+    void SceneFormatExporter::exportSceneNode( LwString &jsonStr, String &outJson, SceneNode *sceneNode )
     {
         if( sceneNode == mSceneManager->getRootSceneNode( SCENE_DYNAMIC ) ||
             sceneNode == mSceneManager->getRootSceneNode( SCENE_STATIC ) )
@@ -170,7 +170,7 @@ namespace Ogre
         exportNode( jsonStr, outJson, sceneNode );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportRenderable( LwString &jsonStr, String &outJson, Renderable *renderable )
+    void SceneFormatExporter::exportRenderable( LwString &jsonStr, String &outJson, Renderable *renderable )
     {
         outJson += "\n\t\t\t\t\t\"renderable\" :\n\t\t\t\t\t{";
 
@@ -229,7 +229,7 @@ namespace Ogre
         outJson += "\n\t\t\t\t\t}\n";
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportMovableObject( LwString &jsonStr, String &outJson,
+    void SceneFormatExporter::exportMovableObject( LwString &jsonStr, String &outJson,
                                            MovableObject *movableObject )
     {
         outJson += "\t\t\t\"movable_object\" :\n\t\t\t{";
@@ -279,7 +279,7 @@ namespace Ogre
         outJson += "\n\t\t\t}";
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportItem( LwString &jsonStr, String &outJson, Item *item, bool exportMesh )
+    void SceneFormatExporter::exportItem( LwString &jsonStr, String &outJson, Item *item, bool exportMesh )
     {
         const Mesh *mesh = item->getMesh().get();
 
@@ -321,7 +321,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportLight( LwString &jsonStr, String &outJson, Light *light )
+    void SceneFormatExporter::exportLight( LwString &jsonStr, String &outJson, Light *light )
     {
         jsonStr.a( "\n\t\t\t\"diffuse\" : " );
         encodeColour( jsonStr, light->getDiffuseColour() );
@@ -363,7 +363,7 @@ namespace Ogre
         exportMovableObject( jsonStr, outJson, light );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportEntity( LwString &jsonStr, String &outJson,
+    void SceneFormatExporter::exportEntity( LwString &jsonStr, String &outJson,
                                     v1::Entity *entity, bool exportMesh )
     {
         const v1::Mesh *mesh = entity->getMesh().get();
@@ -406,7 +406,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportSceneSettings( LwString &jsonStr, String &outJson )
+    void SceneFormatExporter::exportSceneSettings( LwString &jsonStr, String &outJson )
     {
         jsonStr.a( ",\n\t\"scene\" :\n\t{" );
 
@@ -423,11 +423,12 @@ namespace Ogre
         flushLwString( jsonStr, outJson );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::_exportScene( String &outJson, uint32 exportFlags )
+    void SceneFormatExporter::_exportScene( String &outJson, uint32 exportFlags )
     {
         mNodeToIdxMap.clear();
         mExportedMeshes.clear();
         mExportedMeshesV1.clear();
+        mExportedTextures.clear();
 
         char tmpBuffer[4096];
         LwString jsonStr( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
@@ -572,13 +573,13 @@ namespace Ogre
         mNodeToIdxMap.clear();
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportScene( String &outJson, uint32 exportFlags )
+    void SceneFormatExporter::exportScene( String &outJson, uint32 exportFlags )
     {
         mCurrentExportFolder.clear();
         _exportScene( outJson, exportFlags & ~(SceneFlags::Meshes | SceneFlags::MeshesV1) );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormat::exportSceneToFile( const String &folderPath, uint32 exportFlags )
+    void SceneFormatExporter::exportSceneToFile( const String &folderPath, uint32 exportFlags )
     {
         mCurrentExportFolder = folderPath;
         FileSystemLayer::createDirectory( mCurrentExportFolder );
