@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreSceneFormat_H_
-#define _OgreSceneFormat_H_
+#ifndef _OgreSceneFormatExporter_H_
+#define _OgreSceneFormatExporter_H_
 
 #include "OgreSceneFormatBase.h"
 #include "OgreHeaderPrefix.h"
@@ -44,7 +44,7 @@ namespace Ogre
 
     /**
     */
-    class _OgreSceneFormatExport SceneFormat : public SceneFormatBase
+    class _OgreSceneFormatExport SceneFormatExporter : public SceneFormatBase
     {
     protected:
         String                  mCurrentExportFolder;
@@ -88,8 +88,8 @@ namespace Ogre
         void _exportScene( String &outJson, uint32 exportFlags=~0u );
 
     public:
-        SceneFormat( Root *root, SceneManager *sceneManager );
-        ~SceneFormat();
+        SceneFormatExporter( Root *root, SceneManager *sceneManager );
+        ~SceneFormatExporter();
 
         /**
         @param outJson
