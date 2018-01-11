@@ -52,7 +52,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class SceneFormat;
+    class SceneFormatExporter;
+    class SceneFormatImporter;
 }
 
 #endif

@@ -455,6 +455,10 @@ namespace Ogre
         return *macroblock0 != macroblock1;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsDatablock::saveTextures( const String &folderPath, set<String>::type &savedTextures )
+    {
+    }
+    //-----------------------------------------------------------------------------------
     static const char *c_cmpStrings[NUM_COMPARE_FUNCTIONS+1] =
     {
         "==",   //CMPF_ALWAYS_FAIL (dummy)

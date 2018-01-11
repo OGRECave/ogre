@@ -435,7 +435,8 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void Texture::convertToImage( Image &destImage, bool includeMipMaps, uint32 mipmapBias )
+    void Texture::convertToImage( Image &destImage, bool includeMipMaps, uint32 mipmapBias,
+                                  uint32 firstSlice, uint32 numSlices )
     {
         mipmapBias = std::min<uint32>( mipmapBias, getNumMipmaps() );
 
@@ -443,8 +444,18 @@ namespace Ogre {
         const uint32 startingHeight = std::max( getHeight() >> mipmapBias, 1u );
         const uint32 startingDepth  = std::max( getDepth() >> mipmapBias, 1u );
 
+        if( numSlices == 0 )
+            numSlices = getNumFaces() - firstSlice;
+        if( firstSlice >= getNumFaces() ||
+            firstSlice + numSlices >= getNumFaces() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Invalid firstSlice and numSlices parameters",
+                         "Texture::convertToImage" );
+        }
+
         const size_t numMips = includeMipMaps ? (getNumMipmaps() - mipmapBias + 1) : 1;
-        const size_t dataSize = Image::calculateSize( numMips, getNumFaces(),
+        const size_t dataSize = Image::calculateSize( numMips, numSlices,
                                                       startingWidth, startingHeight,
                                                       startingDepth, getFormat() );
 
@@ -452,7 +463,8 @@ namespace Ogre {
         // if there are multiple faces and mipmaps we must pack them into the data
         // faces, then mips
         void* currentPixData = pixData;
-        for (size_t face = 0; face < getNumFaces(); ++face)
+
+        for( size_t face=0; face<numSlices; ++face )
         {
             uint32 width  = startingWidth;
             uint32 height = startingHeight;
@@ -462,7 +474,7 @@ namespace Ogre {
                 size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
 
                 Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
-                getBuffer(face, mip)->blitToMemory(pixBox);
+                getBuffer(face + firstSlice, mip)->blitToMemory(pixBox);
 
                 currentPixData = (void*)((char*)currentPixData + mipDataSize);
 
@@ -478,7 +490,7 @@ namespace Ogre {
         // load, and tell Image to delete the memory when it's done.
         destImage.loadDynamicImage( (Ogre::uchar*)pixData, startingWidth, startingHeight,
                                     startingDepth, getFormat(), true,
-                                    getNumFaces(), numMips - 1 );
+                                    numSlices, numMips - 1 );
     }
     //--------------------------------------------------------------------------
     void Texture::getCustomAttribute(const String&, void*)
