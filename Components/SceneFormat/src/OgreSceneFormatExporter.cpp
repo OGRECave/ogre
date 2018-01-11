@@ -428,7 +428,6 @@ namespace Ogre
         mNodeToIdxMap.clear();
         mExportedMeshes.clear();
         mExportedMeshesV1.clear();
-        mExportedTextures.clear();
 
         char tmpBuffer[4096];
         LwString jsonStr( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
@@ -605,6 +604,22 @@ namespace Ogre
                     const String materialPath = folderPath + "/material" +
                                                 StringConverter::toString( i ) + ".json";
                     hlmsManager->saveMaterials( static_cast<HlmsTypes>( i ), materialPath.c_str() );
+                }
+            }
+        }
+
+        if( exportFlags & SceneFlags::Textures )
+        {
+            set<String>::type savedTextures;
+            HlmsManager *hlmsManager = mRoot->getHlmsManager();
+            for( size_t i=HLMS_LOW_LEVEL + 1u; i<HLMS_MAX; ++i )
+            {
+                Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+                if( hlms )
+                {
+//                    const String materialPath = folderPath + "/material" +
+//                                                StringConverter::toString( i ) + ".json";
+                    hlms->saveAllTexturesFromDatablocks( folderPath, savedTextures );
                 }
             }
         }

@@ -1213,4 +1213,45 @@ namespace Ogre
 
         return retVal;
     }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::saveTextures( const String &folderPath, set<String>::type &savedTextures )
+    {
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
+
+        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+        {
+            if( mTexToBakedTextureIdx[i] < mBakedTextures.size() )
+            {
+                TexturePtr texture = mBakedTextures[mTexToBakedTextureIdx[i]].texture;
+
+                HlmsTextureManager::TextureLocation texLocation;
+                texLocation.texture = texture;
+                texLocation.xIdx    = mTexIndices[i];
+                texLocation.yIdx    = 0;
+                texLocation.divisor = 1;
+                const String *aliasName = hlmsTextureManager->findAliasName( texLocation );
+
+                const String &finalName = aliasName ? *aliasName : texture->getName();
+
+                //Render Targets are... complicated. Let's not, for now.
+                if( savedTextures.find( finalName ) == savedTextures.end() &&
+                    (aliasName || i == PBSM_REFLECTION) &&
+                    !(texture->getUsage() & TU_RENDERTARGET) )
+                {
+                    Image image;
+                    texture->convertToImage( image, false, 0u, texLocation.xIdx, 1u );
+
+                    //DDS is the format that supports most of what we need.
+                    String texName = finalName;
+                    if( texName.find( ".dds" ) != texName.size() - 4u )
+                        texName += ".dds";
+                    image.save( folderPath + "/" + texName + ".dds" );
+
+                    savedTextures.insert( finalName );
+                }
+            }
+        }
+
+    }
 }

@@ -740,6 +740,8 @@ namespace Ogre
         HlmsTextureManager::TextureMapType suggestMapTypeBasedOnTextureType(
                                                                 PbsTextureTypes type );
 
+        virtual void saveTextures( const String &folderPath, set<String>::type &savedTextures );
+
         virtual void calculateHash();
 
         static const size_t MaterialSizeInGpu;
