@@ -71,6 +71,9 @@ namespace Ogre {
         SharedPtr(const shared_ptr<Y>& r) : shared_ptr<T>(r) {}
         operator const shared_ptr<T>&() { return static_cast<shared_ptr<T>&>(*this); }
 
+        // so swig recognizes it should forward the operators
+        T* operator->() const { return shared_ptr<T>::operator->(); }
+
         /// @deprecated use Ogre::static_pointer_cast instead
         template<typename Y>
         OGRE_DEPRECATED SharedPtr<Y> staticCast() const { return static_pointer_cast<Y>(*this); }
