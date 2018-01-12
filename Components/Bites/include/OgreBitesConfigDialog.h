@@ -35,7 +35,13 @@ THE SOFTWARE.
 namespace OgreBites {
 
     /**
-     * get an platform native  dialog instance.
+        OGRE comes with it's own renderer configuration dialog, which
+        applications can use to easily allow the user to configure the
+        settings appropriate to their machine. This defines the
+        interface to this standard dialog. Because dialogs are inherently
+        tied to a particular platform's windowing system, there will be a
+        different subclass for each platform.
+
      * @return pointer to Ogre::ConfigDialog or NULL if not available on the current platform.
      */
     _OgreBitesExport Ogre::ConfigDialog* getNativeConfigDialog();

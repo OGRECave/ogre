@@ -6,11 +6,12 @@
  */
 
 #include "OgreBitesConfigDialog.h"
+#include "OgreConfigDialogImp.h"
 
 namespace OgreBites {
     Ogre::ConfigDialog* getNativeConfigDialog() {
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        static Ogre::ConfigDialog dialog;
+        static ConfigDialog dialog;
         return &dialog;
 #else
         return NULL;

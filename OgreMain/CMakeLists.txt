@@ -42,7 +42,6 @@ list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImage
 
 # Remove optional source files
 list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreDDSCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePVRTCCodec.cpp"
@@ -61,8 +60,7 @@ if (EMSCRIPTEN)
 
   file(GLOB PLATFORM_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten/*.h)
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Emscripten/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp")
 
   set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (WIN32)
@@ -75,7 +73,6 @@ elseif (WIN32)
     )
     set(PLATFORM_SOURCE_FILES
       src/WIN32/OgreOptimisedUtilDirectXMath.cpp
-      src/OgreConfigDialogNoOp.cpp
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
     )  
@@ -91,34 +88,10 @@ elseif (WIN32)
     
     set(PLATFORM_SOURCE_FILES
       src/WIN32/OgreOptimisedUtilDirectXMath.cpp
-      src/WIN32/OgreConfigDialog.cpp
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
-      src/WIN32/resource.h
     )  
-    set(RESOURCE_FILES
-      src/WIN32/resource.h
-      src/WIN32/OgreWin32Resources.rc
-    )
-    source_group(Resources FILES ${RESOURCE_FILES})
     set(PLATFORM_HEADER_INSTALL "WIN32")
-
-    if (MINGW)
-      # Older CMake versions do not know how to deal with resource files on MinGW.
-      # Newer ones do, but pass along invalid command options to windres.
-      # This is a manual fix for the moment.
-      if (NOT CMAKE_RC_COMPILER)
-        message(SEND_ERROR "Could not find MinGW resource compiler. Please specify path in CMAKE_RC_COMPILER.")
-      endif ()
-      add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
-        COMMAND ${CMAKE_RC_COMPILER} -I${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32 
-                                     -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
-                                     -o${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
-        DEPENDS ${RESOURCE_FILES})
-      list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)
-    else ()
-      list(APPEND PLATFORM_SOURCE_FILES src/WIN32/OgreWin32Resources.rc)
-    endif ()
   endif ()
 
 elseif (APPLE)
@@ -127,27 +100,17 @@ elseif (APPLE)
     file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS/*.h")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.mm"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
 
     set(PLATFORM_LIBS "")
     set(PLATFORM_HEADER_INSTALL "iOS")
   else ()
     include_directories("include/OSX")
-    
     file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX/*.h")
-    
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
-      include/OSX/ogrelogo.png
     )
-
-    set(RESOURCE_FILES
-	  include/OSX/ogrelogo.png
-    )
-    source_group(Resources FILES ${RESOURCE_FILES})
-
     set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
     set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
@@ -157,8 +120,7 @@ elseif(ANDROID)
 
   file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/Android/*.h")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
 
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)

@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __CommonConfigDialog_H__
 
 #include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
 
 namespace Ogre
 {
@@ -41,24 +40,11 @@ namespace Ogre
     */
 
     /** Defines the behaviour of an automatic renderer configuration dialog.
-    @remarks
-        OGRE comes with it's own renderer configuration dialog, which
-        applications can use to easily allow the user to configure the
-        settings appropriate to their machine. This class defines the
-        interface to this standard dialog. Because dialogs are inherently
-        tied to a particular platform's windowing system, there will be a
-        different subclass for each platform.
-    @author
-        Steven J. Streeting
     */
     class _OgreExport ConfigDialog : public UtilityAlloc
     {
     public:
-        /**
-         * @deprecated this class will become a pure interface in the future. Use OgreBites::getNativeConfigDialog instead.
-         */
-        ConfigDialog();
-        virtual ~ConfigDialog();
+        virtual ~ConfigDialog() {}
 
         /** Displays the dialog.
         @remarks
@@ -75,12 +61,7 @@ namespace Ogre
         @see
             RenderSystem
         */
-        virtual bool display();
-
-    protected:
-        // platform specific implementation
-        struct PrivateData;
-        PrivateData* mImpl;
+        virtual bool display() = 0;
     };
     /** @} */
     /** @} */

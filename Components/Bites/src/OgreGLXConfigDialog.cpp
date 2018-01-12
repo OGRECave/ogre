@@ -25,16 +25,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreConfigDialog.h"
 #include "OgreException.h"
 #include "OgreImage.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
+#include "OgreConfigPaths.h"
+#include "OgreFileSystemLayer.h"
 
 #include <cstdlib>
 #include <iostream>
 
 #include <string>
+#include "OgreConfigDialogImp.h"
 
 #define XTSTRINGDEFINES
 
@@ -55,27 +57,10 @@ THE SOFTWARE.
 
 #include <list>
 
-namespace {
-/**
-Backdrop image. This must be sized mWidth by mHeight, and produce a
-RGB pixel format when loaded with Image::load .
+using namespace Ogre;
 
-You can easily generate your own backdrop with the following python script:
-
-#!/usr/bin/python
-import sys
-pngstring=open(sys.argv[2], "rb").read()
-print "const unsigned char %s[%i]={%s};" % (sys.argv[1],len(pngstring), ",".join([str(ord(x)) for x in pngstring]))
-
-Call this with
-$ bintoheader.py GLX_backdrop_data GLX_backdrop.png > GLX_backdrop.h
-
-*/
-#include "GLX_backdrop.h"
-
-}
-
-namespace Ogre {
+namespace OgreBites {
+    using Ogre::String;
 
 /**
  * Single X window with image backdrop, making it possible to configure
@@ -349,15 +334,12 @@ Pixmap GLXConfigurator::CreateBackdrop(Window rootWindow, int depth) {
     unsigned char *data = 0; // Must be allocated with malloc
 
     try {
-        String imgType = "png";
         Image img;
-        MemoryDataStream *imgStream;
-        DataStreamPtr imgStreamPtr;
 
         // Load backdrop image using OGRE
-        imgStream = new MemoryDataStream(const_cast<unsigned char*>(GLX_backdrop_data), sizeof(GLX_backdrop_data), false);
-        imgStreamPtr = DataStreamPtr(imgStream);
-        img.load(imgStreamPtr, imgType);
+        String path = FileSystemLayer::resolveBundlePath(OGRE_MEDIA_DIR "/../GLX_backdrop.png");
+        DataStreamPtr imgStreamPtr = Root::openFileStream(path);
+        img.load(imgStreamPtr, "png");
 
         PixelBox src = img.getPixelBox(0, 0);
 
