@@ -104,15 +104,6 @@ if (OGRE_BUILD_SAMPLES)
 
 	# Link to all enabled plugins
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
-
-	# Need to include resource files so that icons are linked
-	if (WIN32)
-		set(RESOURCE_FILES
-    		${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/resource.h
-	    	${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/OgreWin32Resources.rc
-		)
-		source_group(Resources FILES ${RESOURCE_FILES})
-	endif ()
   else ()
 	# Link to RT Shader System if enabled.
 	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)	

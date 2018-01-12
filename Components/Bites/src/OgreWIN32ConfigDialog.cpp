@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreConfigDialogImp.h"
 #include "OgreStableHeaders.h"
-#include "OgreConfigDialog.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreException.h"
@@ -40,11 +40,13 @@ THE SOFTWARE.
 
 namespace
 {
-    Ogre::ConfigDialog* dlg;  // This is a pointer to instance, since this is a static member
+    OgreBites::ConfigDialog* dlg;  // This is a pointer to instance, since this is a static member
 }
 
 
-namespace Ogre
+using namespace Ogre;
+
+namespace OgreBites
 {
     struct ConfigDialog::PrivateData {
         RenderSystem* mSelectedRenderSystem;

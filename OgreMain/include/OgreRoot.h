@@ -263,12 +263,6 @@ namespace Ogre
          */
         bool showConfigDialog(ConfigDialog* dialog);
 
-        /** @overload
-
-            @deprecated use showConfigDialog(ConfigDialog* dialog);
-         */
-        OGRE_DEPRECATED bool showConfigDialog(void);
-
         /** Adds a new rendering subsystem to the list of available renderers.
             @remarks
                 Intended for use by advanced users and plugin writers only!

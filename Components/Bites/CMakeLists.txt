@@ -44,15 +44,6 @@ if (OGRE_STATIC)
 
   # Link to all enabled plugins
   set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
-
-  # Need to include resource files so that icons are linked
-  if (WIN32)
-	  set(RESOURCE_FILES
-		  ${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/resource.h
-		  ${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/OgreWin32Resources.rc
-	  )
-	  source_group(Resources FILES ${RESOURCE_FILES})
-  endif ()
 endif ()
 
 if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
@@ -63,7 +54,39 @@ endif ()
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreBitesPrerequisites.h)
-file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+set(SOURCES 
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreAdvancedRenderControls.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContext.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreBitesConfigDialog.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreCameraMan.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSGTechniqueResolverListener.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStaticPluginLoader.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTrays.cpp")
+
+if(ANDROID OR EMSCRIPTEN OR APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE)
+  # no config dialog available
+elseif(WIN32)
+  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+  list(APPEND SOURCES 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreWIN32ConfigDialog.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/resource.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/misc/OgreWin32Resources.rc")
+  # Need to include resource files so that icons are linked
+  set(RESOURCE_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/resource.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/misc/OgreWin32Resources.rc"
+  )
+  source_group(Resources FILES ${RESOURCE_FILES})
+elseif(APPLE)
+  list(APPEND SOURCES 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreOSXConfigDialog.mm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/misc/ogrelogo.png")
+  set(RESOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/ogrelogo.png")
+  source_group(Resources FILES ${RESOURCE_FILES})
+elseif(UNIX)
+  list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLXConfigDialog.cpp")
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/GLX_backdrop.png" DESTINATION "share/OGRE/")
+endif()
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -71,7 +94,7 @@ include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 ogre_add_component_include_dir(Overlay)
 
 # setup target
-ogre_add_library_to_folder(Components OgreBites ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+ogre_add_library_to_folder(Components OgreBites ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
 set_target_properties(OgreBites PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreBites OgreMain OgreOverlay ${DEPENDENCIES})
 

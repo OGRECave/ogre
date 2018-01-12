@@ -552,23 +552,6 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    bool Root::showConfigDialog(void)
-    {
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "showConfigDialog is not supported",
-            "Root::showConfigDialog");
-#endif
-
-        // Displays the standard config dialog
-        // Will use stored defaults if available
-        ConfigDialog* dlg = OGRE_NEW ConfigDialog();
-        bool isOk = showConfigDialog(dlg);
-
-        OGRE_DELETE dlg;
-        return isOk;
-    }
-
-    //-----------------------------------------------------------------------
     const RenderSystemList& Root::getAvailableRenderers(void)
     {
         // Returns a vector of renders

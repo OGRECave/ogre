@@ -27,13 +27,13 @@ THE SOFTWARE.
 */
 
 #import "OgreLogManager.h"
-#import "OgreConfigDialog.h"
 #import "OgreRoot.h"
 #import "OgreRenderSystem.h"
 #import "OgreConfigOptionMap.h"
 
 #import <Cocoa/Cocoa.h>
 #import <AppKit/AppKit.h>
+#include "OgreConfigDialogImp.h"
 
 using namespace Ogre;
 
@@ -75,7 +75,7 @@ using namespace Ogre;
 
 @end
 
-namespace Ogre {
+namespace OgreBites {
 
     struct ConfigDialog::PrivateData {
         OgreConfigWindowDelegate *mWindowDelegate;
