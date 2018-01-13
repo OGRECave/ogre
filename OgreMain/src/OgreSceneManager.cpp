@@ -4744,9 +4744,6 @@ void SceneManager::initShadowVolumeMaterials(void)
             mShadowDebugPass->setSceneBlending(SBT_ADD); 
             mShadowDebugPass->setLightingEnabled(false);
             mShadowDebugPass->setDepthWriteEnabled(false);
-            TextureUnitState* t = mShadowDebugPass->createTextureUnitState();
-            t->setColourOperationEx(LBX_MODULATE, LBS_MANUAL, LBS_CURRENT, 
-                ColourValue(0.7, 0.0, 0.2));
             mShadowDebugPass->setCullingMode(CULL_NONE);
 
             if (mDestRenderSystem->getCapabilities()->hasCapability(
@@ -5783,9 +5780,11 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
         {
             // reset stencil & colour ops
             mDestRenderSystem->setStencilBufferParams();
-            mShadowDebugPass->getTextureUnitState(0)->
-                setColourOperationEx(LBX_MODULATE, LBS_MANUAL, LBS_CURRENT,
-                zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
+            if (mShadowDebugPass->hasFragmentProgram())
+            {
+                mShadowDebugPass->getFragmentProgramParameters()->setNamedConstant(
+                    "colour", zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
+            }
             _setPass(mShadowDebugPass);
             renderShadowVolumeObjects(iShadowRenderables, mShadowDebugPass, &lightList, flags,
                 true, false, false);
