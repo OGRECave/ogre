@@ -56,9 +56,7 @@
 #endif
 
 #ifdef OGRE_STATIC_LIB
-#   ifdef OGRE_BUILD_PLUGIN_BSP
-#       include "BSP.h"
-#   endif
+#   include "BSP.h"
 #   ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #       include "ShaderSystem.h"
 #       include "ShaderSystemTexturedFog.h"
@@ -165,31 +163,11 @@ namespace OgreBites
             mDescBox = 0;
             mRendererMenu = 0;
             mCarouselPlace = 0.0f;
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-            mNaClInstance = 0;
-            mNaClSwapCallback = 0;
-            mInitWidth = 0;
-            mInitHeight = 0;
-#endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             mGestureView = 0;
 #endif
         }
-
-        /*-----------------------------------------------------------------------------
-          | init data members needed only by NaCl
-          -----------------------------------------------------------------------------*/
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-        void initAppForNaCl( pp::Instance* naClInstance, pp::CompletionCallback* naClSwapCallback, OIS::FactoryCreator * oisFactory, Ogre::uint32 initWidth, Ogre::uint32 initHeight )
-        {
-            mNaClInstance = naClInstance;
-            mNaClSwapCallback = naClSwapCallback;
-            mOisFactory = oisFactory;
-            mInitWidth = initWidth;
-            mInitHeight = initHeight;
-        }
-#endif
 
         virtual void loadStartUpSample()
         {
@@ -945,7 +923,7 @@ namespace OgreBites
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
             mPluginNameMap["Sample_Tessellation"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
             mPluginNameMap["Sample_PNTriangles"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_PNTriangles();
-#                       if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#                       if defined(OGRE_BUILD_COMPONENT_VOLUME)
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
 #                       endif
@@ -969,9 +947,7 @@ namespace OgreBites
 #if defined(INCLUDE_RTSHADER_SYSTEM) && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
             if(hasProgrammableGPU)
             {
-#   ifdef OGRE_BUILD_PLUGIN_BSP
                 mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
-#   endif
                 mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
                 mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
                 mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
@@ -1049,13 +1025,10 @@ namespace OgreBites
             // Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 
             createDummyScene();
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+
             mTrayMgr->showLoadingBar(1, 0);
-#endif
             Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("General");
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mTrayMgr->hideLoadingBar();
-#endif
         }
 
         /*-----------------------------------------------------------------------------
@@ -1066,40 +1039,6 @@ namespace OgreBites
             Sample* startupSample = 0;
 
             Ogre::StringVector unloadedSamplePlugins;
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-            Ogre::String startupSampleTitle = "";
-            Ogre::String sampleDir = "";
-            Ogre::StringVector sampleList;
-            sampleList.push_back("Sample_BezierPatch");
-            sampleList.push_back("Sample_CameraTrack");
-            sampleList.push_back("Sample_CelShading");
-            sampleList.push_back("Sample_Character");
-            sampleList.push_back("Sample_Compositor");
-            sampleList.push_back("Sample_CubeMapping");
-            sampleList.push_back("Sample_Dot3Bump");
-            sampleList.push_back("Sample_DynTex");
-            sampleList.push_back("Sample_FacialAnimation");
-            sampleList.push_back("Sample_Fresnel");
-            sampleList.push_back("Sample_ParticleFX");
-#   ifdef INCLUDE_RTSHADER_SYSTEM
-            sampleList.push_back("Sample_ShaderSystem");
-#       endif
-            sampleList.push_back("Sample_Lighting");
-            sampleList.push_back("Sample_MeshLod");
-            sampleList.push_back("Sample_SkyBox");
-            sampleList.push_back("Sample_SkyDome");
-            sampleList.push_back("Sample_SkyPlane");
-            sampleList.push_back("Sample_Smoke");
-            sampleList.push_back("Sample_Water");
-            sampleList.push_back("Sample_PNTriangles");
-            sampleList.push_back("Sample_Tessellation");
-            sampleList.push_back("Sample_Hair");
-            sampleList.push_back("Sample_Island");
-            sampleList.push_back("Sample_TerrainTessellation");
-            sampleList.push_back("Sample_Transparency");
-            sampleList.push_back("Sample_TextureFX");
-#else
             Ogre::ConfigFile cfg;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             cfg.load(openAPKFile(mFSLayer->getConfigFilePath("samples.cfg")));
@@ -1127,7 +1066,6 @@ namespace OgreBites
                 sampleDir += "/";
 #endif
             }
-#endif
 
             SampleSet newSamples;
 #if defined(SAMPLES_INCLUDE_PLAYPEN) && defined(OGRE_STATIC_LIB)
@@ -1279,13 +1217,12 @@ namespace OgreBites
             mTrayMgr->showLogo(TL_RIGHT);
             mTrayMgr->createSeparator(TL_RIGHT, "LogoSep");
             mTrayMgr->createButton(TL_RIGHT, "StartStop", "Start Sample", 120);
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+
 #       if      OGRE_PLATFORM != OGRE_PLATFORM_WINRT
             mTrayMgr->createButton(TL_RIGHT, "UnloadReload", mLoadedSamples.empty() ? "Reload Samples" : "Unload Samples");
             mTrayMgr->createButton(TL_RIGHT, "Configure", "Configure");
 #       endif // OGRE_PLATFORM_WINRT
             mTrayMgr->createButton(TL_RIGHT, "Quit", "Quit");
-#endif // OGRE_PLATFORM_NACL
 
             // create sample viewing controls
             mTitleLabel = mTrayMgr->createLabel(TL_LEFT, "SampleTitle", "");
@@ -1500,13 +1437,6 @@ namespace OgreBites
         int mLastViewCategory;                         // last sample category viewed
         int mLastSampleIndex;                          // index of last sample running
         int mStartSampleIndex;                         // directly starts the sample with the given index
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-        pp::Instance* mNaClInstance;
-        pp::CompletionCallback* mNaClSwapCallback;
-        OIS::FactoryCreator * mOisFactory;
-        Ogre::uint32 mInitWidth;
-        Ogre::uint32 mInitHeight;
-#endif
     public:
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         SampleBrowserGestureView *mGestureView;

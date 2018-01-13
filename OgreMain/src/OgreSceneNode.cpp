@@ -35,8 +35,6 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreWireBoundingBox.h"
 
-#define ITER_VAL(it) (*it)
-
 namespace Ogre {
     //-----------------------------------------------------------------------
     SceneNode::SceneNode(SceneManager* creator)
@@ -69,11 +67,9 @@ namespace Ogre {
     {
         // Detach all objects, do this manually to avoid needUpdate() call 
         // which can fail because of deleted items
-        ObjectMap::iterator itr;
-        for ( itr = mObjectsByName.begin(); itr != mObjectsByName.end(); ++itr )
+        for (ObjectMap::iterator itr = mObjectsByName.begin(); itr != mObjectsByName.end(); ++itr )
         {
-            MovableObject* ret = ITER_VAL(itr);
-            ret->_notifyAttached((SceneNode*)0);
+            (*itr)->_notifyAttached((SceneNode*)0);
         }
         mObjectsByName.clear();
 
@@ -107,10 +103,9 @@ namespace Ogre {
         {
             mIsInSceneGraph = inGraph;
             // Tell children
-            ChildNodeMap::iterator child;
-            for (child = mChildren.begin(); child != mChildren.end(); ++child)
+            for (ChildNodeMap::iterator child = mChildren.begin(); child != mChildren.end(); ++child)
             {
-                SceneNode* sceneChild = static_cast<SceneNode*>(ITER_VAL(child));
+                SceneNode* sceneChild = static_cast<SceneNode*>(*child);
                 sceneChild->setInSceneGraph(inGraph);
             }
         }
@@ -173,7 +168,7 @@ namespace Ogre {
                 name + " not found.", "SceneNode::getAttachedObject");
         }
 
-        return ITER_VAL(i);
+        return *i;
     }
     //-----------------------------------------------------------------------
     MovableObject* SceneNode::detachObject(unsigned short index)
@@ -184,7 +179,7 @@ namespace Ogre {
             ObjectMap::iterator i = mObjectsByName.begin();
             i += index;
 
-            MovableObject* ret = ITER_VAL(i);
+            MovableObject* ret = *i;
             std::swap(*i, mObjectsByName.back());
             mObjectsByName.pop_back();
 
@@ -213,7 +208,7 @@ namespace Ogre {
                 "to this node.", "SceneNode::detachObject");
         }
 
-        MovableObject* ret = ITER_VAL(it);
+        MovableObject* ret = *it;
         std::swap(*it, mObjectsByName.back());
         mObjectsByName.pop_back();
 
@@ -231,7 +226,7 @@ namespace Ogre {
         iend = mObjectsByName.end();
         for (i = mObjectsByName.begin(); i != iend; ++i)
         {
-            if (ITER_VAL(i) == obj)
+            if (*i == obj)
             {
                 std::swap(*i, mObjectsByName.back());
                 mObjectsByName.pop_back();
@@ -247,11 +242,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::detachAllObjects(void)
     {
-        ObjectMap::iterator itr;
-        for ( itr = mObjectsByName.begin(); itr != mObjectsByName.end(); ++itr )
+        for (ObjectMap::iterator itr = mObjectsByName.begin(); itr != mObjectsByName.end(); ++itr )
         {
-            MovableObject* ret = ITER_VAL(itr);
-            ret->_notifyAttached((SceneNode*)0);
+            (*itr)->_notifyAttached((SceneNode*)0);
         }
         mObjectsByName.clear();
         // Make sure bounds get updated (must go right to the top)
@@ -268,14 +261,14 @@ namespace Ogre {
         for (i = mObjectsByName.begin(); i != mObjectsByName.end(); ++i)
         {
             // Merge world bounds of each object
-            mWorldAABB.merge(ITER_VAL(i)->getWorldBoundingBox(true));
+            mWorldAABB.merge((*i)->getWorldBoundingBox(true));
         }
 
         // Merge with children
         ChildNodeMap::iterator child;
         for (child = mChildren.begin(); child != mChildren.end(); ++child)
         {
-            SceneNode* sceneChild = static_cast<SceneNode*>(ITER_VAL(child));
+            SceneNode* sceneChild = static_cast<SceneNode*>(*child);
             mWorldAABB.merge(sceneChild->mWorldAABB);
         }
 
@@ -294,7 +287,7 @@ namespace Ogre {
         ObjectMap::iterator iobjend = mObjectsByName.end();
         for (iobj = mObjectsByName.begin(); iobj != iobjend; ++iobj)
         {
-            MovableObject* mo = ITER_VAL(iobj);
+            MovableObject* mo = *iobj;
 
             queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
         }
@@ -305,7 +298,7 @@ namespace Ogre {
             childend = mChildren.end();
             for (child = mChildren.begin(); child != childend; ++child)
             {
-                SceneNode* sceneChild = static_cast<SceneNode*>(ITER_VAL(child));
+                SceneNode* sceneChild = static_cast<SceneNode*>(*child);
                 sceneChild->_findVisibleObjects(cam, queue, visibleBounds, includeChildren, 
                     displayNodes, onlyShadowCasters);
             }
@@ -353,11 +346,9 @@ namespace Ogre {
         Node::updateFromParentImpl();
 
         // Notify objects that it has been moved
-        ObjectMap::const_iterator i;
-        for (i = mObjectsByName.begin(); i != mObjectsByName.end(); ++i)
+        for (ObjectMap::const_iterator i = mObjectsByName.begin(); i != mObjectsByName.end(); ++i)
         {
-            MovableObject* object = ITER_VAL(i);
-            object->_notifyMoved();
+            (*i)->_notifyMoved();
         }
     }
     //-----------------------------------------------------------------------
@@ -402,7 +393,7 @@ namespace Ogre {
         // do not store iterators (invalidated by
         // SceneManager::destroySceneNode because it causes removal from parent)
         while(!mChildren.empty()) {
-            SceneNode* sn = static_cast<SceneNode*>(ITER_VAL(mChildren.begin()));
+            SceneNode* sn = static_cast<SceneNode*>(*mChildren.begin());
             sn->removeAndDestroyAllChildren();
             sn->getCreator()->destroySceneNode(sn);
         }
@@ -622,7 +613,7 @@ namespace Ogre {
         oiend = mObjectsByName.end();
         for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
         {
-            ITER_VAL(oi)->setVisible(visible);
+            (*oi)->setVisible(visible);
         }
 
         if (cascade)
@@ -631,7 +622,7 @@ namespace Ogre {
             iend = mChildren.end();
             for (i = mChildren.begin(); i != iend; ++i)
             {
-                static_cast<SceneNode*>(ITER_VAL(i))->setVisible(visible, cascade);
+                static_cast<SceneNode*>(*i)->setVisible(visible, cascade);
             }
         }
     }
@@ -642,7 +633,7 @@ namespace Ogre {
         oiend = mObjectsByName.end();
         for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
         {
-            ITER_VAL(oi)->setDebugDisplayEnabled(enabled);
+            (*oi)->setDebugDisplayEnabled(enabled);
         }
 
         if (cascade)
@@ -651,7 +642,7 @@ namespace Ogre {
             iend = mChildren.end();
             for (i = mChildren.begin(); i != iend; ++i)
             {
-                static_cast<SceneNode*>(ITER_VAL(i))->setDebugDisplayEnabled(enabled, cascade);
+                static_cast<SceneNode*>(*i)->setDebugDisplayEnabled(enabled, cascade);
             }
         }
     }
@@ -662,7 +653,7 @@ namespace Ogre {
         oiend = mObjectsByName.end();
         for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
         {
-            ITER_VAL(oi)->setVisible(!ITER_VAL(oi)->getVisible());
+            (*oi)->setVisible(!(*oi)->getVisible());
         }
 
         if (cascade)
@@ -671,7 +662,7 @@ namespace Ogre {
             iend = mChildren.end();
             for (i = mChildren.begin(); i != iend; ++i)
             {
-                static_cast<SceneNode*>(ITER_VAL(i))->flipVisibility(cascade);
+                static_cast<SceneNode*>((*i))->flipVisibility(cascade);
             }
         }
     }

@@ -276,29 +276,29 @@ namespace Ogre {
     using std::unique_ptr;
     template<typename T> class SharedPtr;
 
-    typedef shared_ptr<AnimableValue> AnimableValuePtr;
-    typedef shared_ptr<Compositor> CompositorPtr;
-    typedef shared_ptr<DataStream> DataStreamPtr;
-    typedef shared_ptr<GpuProgram> GpuProgramPtr;
-    typedef shared_ptr<GpuNamedConstants> GpuNamedConstantsPtr;
-    typedef shared_ptr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
-    typedef shared_ptr<GpuSharedParameters> GpuSharedParametersPtr;
-    typedef shared_ptr<GpuProgramParameters> GpuProgramParametersSharedPtr;
-    typedef shared_ptr<HardwareCounterBuffer> HardwareCounterBufferSharedPtr;
-    typedef shared_ptr<HardwareIndexBuffer> HardwareIndexBufferSharedPtr;
-    typedef shared_ptr<HardwarePixelBuffer> HardwarePixelBufferSharedPtr;
-    typedef shared_ptr<HardwareUniformBuffer> HardwareUniformBufferSharedPtr;
-    typedef shared_ptr<HardwareVertexBuffer> HardwareVertexBufferSharedPtr;
-    typedef shared_ptr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
-    typedef shared_ptr<Material> MaterialPtr;
-    typedef shared_ptr<MemoryDataStream> MemoryDataStreamPtr;
-    typedef shared_ptr<Mesh> MeshPtr;
-    typedef shared_ptr<PatchMesh> PatchMeshPtr;
-    typedef shared_ptr<RenderToVertexBuffer> RenderToVertexBufferSharedPtr;
-    typedef shared_ptr<Resource> ResourcePtr;
-    typedef shared_ptr<ShadowCameraSetup> ShadowCameraSetupPtr;
-    typedef shared_ptr<Skeleton> SkeletonPtr;
-    typedef shared_ptr<Texture> TexturePtr;
+    typedef SharedPtr<AnimableValue> AnimableValuePtr;
+    typedef SharedPtr<Compositor> CompositorPtr;
+    typedef SharedPtr<DataStream> DataStreamPtr;
+    typedef SharedPtr<GpuProgram> GpuProgramPtr;
+    typedef SharedPtr<GpuNamedConstants> GpuNamedConstantsPtr;
+    typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
+    typedef SharedPtr<GpuSharedParameters> GpuSharedParametersPtr;
+    typedef SharedPtr<GpuProgramParameters> GpuProgramParametersSharedPtr;
+    typedef SharedPtr<HardwareCounterBuffer> HardwareCounterBufferSharedPtr;
+    typedef SharedPtr<HardwareIndexBuffer> HardwareIndexBufferSharedPtr;
+    typedef SharedPtr<HardwarePixelBuffer> HardwarePixelBufferSharedPtr;
+    typedef SharedPtr<HardwareUniformBuffer> HardwareUniformBufferSharedPtr;
+    typedef SharedPtr<HardwareVertexBuffer> HardwareVertexBufferSharedPtr;
+    typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
+    typedef SharedPtr<Material> MaterialPtr;
+    typedef SharedPtr<MemoryDataStream> MemoryDataStreamPtr;
+    typedef SharedPtr<Mesh> MeshPtr;
+    typedef SharedPtr<PatchMesh> PatchMeshPtr;
+    typedef SharedPtr<RenderToVertexBuffer> RenderToVertexBufferSharedPtr;
+    typedef SharedPtr<Resource> ResourcePtr;
+    typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
+    typedef SharedPtr<Skeleton> SkeletonPtr;
+    typedef SharedPtr<Texture> TexturePtr;
 }
 
 /* Include all the standard header *after* all the configuration

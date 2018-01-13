@@ -119,6 +119,11 @@ JNIEnv* OgreJNIGetEnv() {
 }
 %enddef
 
+%define SHARED_PTR(classname)
+// %shared_ptr(type);
+%template(classname ## Ptr) Ogre::SharedPtr<Ogre::classname >;
+%enddef
+
 #ifdef SWIGJAVA
 // conflicts with SWIG method
 %ignore *::getType;
@@ -148,6 +153,13 @@ JNIEnv* OgreJNIGetEnv() {
 
 // Basic Data Types
 %include "OgreException.h"
+%ignore Ogre::SharedPtr::useCount;
+%ignore Ogre::SharedPtr::bind;
+%ignore Ogre::SharedPtr::getPointer;
+%ignore Ogre::SharedPtr::setNull;
+%ignore Ogre::SharedPtr::isNull;
+%ignore Ogre::SharedPtr::setUseCount;
+%include "OgreSharedPtr.h"
 %ignore Ogre::Any::getType; // deprecated
 %ignore Ogre::Any::destroy; // deprecated
 %include "OgreAny.h"
@@ -201,12 +213,12 @@ ADD_REPR(Plane)
 %ignore Ogre::MemoryDataStream::MemoryDataStream(size_t, bool);
 %ignore Ogre::AtomAbstractNode::getValue;
 #endif
-%shared_ptr(Ogre::DataStream);
+SHARED_PTR(DataStream);
 %ignore Ogre::MemoryDataStream::MemoryDataStream(DataStream&, bool = true, bool = false);
 %ignore Ogre::MemoryDataStream::MemoryDataStream(const String&, DataStream&, bool = true, bool = false);
-%shared_ptr(Ogre::MemoryDataStream);
-%shared_ptr(Ogre::FileStreamDataStream);
-%shared_ptr(Ogre::FileHandleDataStream);
+SHARED_PTR(MemoryDataStream);
+SHARED_PTR(FileStreamDataStream);
+SHARED_PTR(FileHandleDataStream);
 %include "OgreDataStream.h"
 %include "OgreArchive.h"
 %include "OgreFactoryObj.h"
@@ -245,7 +257,7 @@ ADD_REPR(ColourValue)
 %include "OgreBillboard.h"
 %include "OgreParticle.h"
 %include "OgreHardwareOcclusionQuery.h"
-%shared_ptr(Ogre::HardwareBuffer);
+SHARED_PTR(HardwareBuffer);
 %include "OgreHardwareBuffer.h"
 %include "OgreParticleIterator.h"
 
@@ -255,29 +267,29 @@ ADD_REPR(ColourValue)
 %ignore std::vector<Ogre::ParameterDef>::vector;
 %template(ParameterList) std::vector<Ogre::ParameterDef>;
 #endif
-%shared_ptr(Ogre::StringInterface);
+SHARED_PTR(StringInterface);
 %include "OgreStringInterface.h"
-    %shared_ptr(Ogre::ParticleAffector);
+    SHARED_PTR(ParticleAffector);
     %include "OgreParticleAffector.h"
         %include "OgreParticleAffectorFactory.h"
     %include "OgreParticleEmitterCommands.h"
-    %shared_ptr(Ogre::ParticleEmitter);
+//    SHARED_PTR(ParticleEmitter);
     %include "OgreParticleEmitter.h"
         %include "OgreParticleEmitterFactory.h"
-    %shared_ptr(Ogre::Resource);
+    SHARED_PTR(Resource);
     %ignore Ogre::Resource::setManuallyLoaded;
     %ignore Ogre::Resource::setToLoaded;
     %include "OgreResource.h"
-        %shared_ptr(Ogre::Texture);
+        SHARED_PTR(Texture);
         %include "OgreTexture.h"
-        %shared_ptr(Ogre::GpuProgram);
+        SHARED_PTR(GpuProgram);
         %include "OgreGpuProgram.h"
-            %shared_ptr(Ogre::HighLevelGpuProgram);
+            SHARED_PTR(HighLevelGpuProgram);
             %include "OgreHighLevelGpuProgram.h"
 %include "OgreScriptCompiler.h"
 %include "OgreTextureUnitState.h"
 %include "OgreControllerManager.h"
-%shared_ptr(Ogre::Compositor);
+SHARED_PTR(Compositor);
 %include "OgreCompositor.h"
 %ignore Ogre::CompositionTechnique::getNumTextureDefinitions;
 %ignore Ogre::CompositionTechnique::getTextureDefinitionIterator;
@@ -290,18 +302,18 @@ ADD_REPR(ColourValue)
 %ignore Ogre::CompositionTargetPass::getPassIterator;
 %include "OgreCompositionTargetPass.h"
 %include "OgreResourceBackgroundQueue.h"
-%shared_ptr(Ogre::HardwareVertexBuffer);
+SHARED_PTR(HardwareVertexBuffer);
 %include "OgreHardwareVertexBuffer.h"
-%shared_ptr(Ogre::HardwareIndexBuffer);
+SHARED_PTR(HardwareIndexBuffer);
 %include "OgreHardwareIndexBuffer.h"
-%shared_ptr(Ogre::HardwarePixelBuffer);
+SHARED_PTR(HardwarePixelBuffer);
 #ifdef SWIGJAVA
 %ignore Ogre::HardwarePixelBuffer::lock;  // duplicate definition
 #endif
 %include "OgreHardwarePixelBuffer.h"
-%shared_ptr(Ogre::HardwareCounterBuffer);
+SHARED_PTR(HardwareCounterBuffer);
 %include "OgreHardwareCounterBuffer.h"
-%shared_ptr(Ogre::HardwareUniformBuffer);
+SHARED_PTR(HardwareUniformBuffer);
 %include "OgreHardwareUniformBuffer.h"
 %ignore Ogre::HardwareBufferManagerBase::_forceReleaseBufferCopies(HardwareVertexBuffer* sourceBuffer);
 %include "OgreHardwareBufferManager.h"
@@ -320,7 +332,7 @@ ADD_REPR(ColourValue)
     %include "OgreGpuProgramManager.h"
     %include "OgreHighLevelGpuProgramManager.h"
 %ignore Ogre::UnifiedHighLevelGpuProgram::setPrioriry;
-%shared_ptr(Ogre::UnifiedHighLevelGpuProgram);
+SHARED_PTR(UnifiedHighLevelGpuProgram);
 %include "OgreUnifiedHighLevelGpuProgram.h"
 // animations
 %ignore Ogre::VertexPoseKeyFrame::getPoseReferenceIterator;
@@ -331,13 +343,13 @@ ADD_REPR(ColourValue)
 %ignore Ogre::AnimationStateSet::getEnabledAnimationStateIterator;
 %include "OgreAnimationState.h"
 %include "OgreAnimation.h"
-%shared_ptr(Ogre::Skeleton);
+SHARED_PTR(Skeleton);
 // deprecated
 %ignore Ogre::Skeleton::getRootBone;
 %ignore Ogre::Skeleton::getRootBoneIterator;
 %ignore Ogre::Skeleton::getBoneIterator;
 %include "OgreSkeleton.h"
-    %shared_ptr(Ogre::SkeletonInstance);
+    SHARED_PTR(SkeletonInstance);
     %include "OgreSkeletonInstance.h"
 %include "OgreSkeletonManager.h"
 %include "OgreRenderQueue.h"
@@ -348,7 +360,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::Material::getTechniqueIterator;
 %ignore Ogre::Material::getSupportedTechnique;
 %ignore Ogre::Material::getNumSupportedTechniques;
-%shared_ptr(Ogre::Material);
+SHARED_PTR(Material);
 %template() Ogre::vector<Ogre::Technique*>;
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
@@ -383,16 +395,16 @@ ADD_REPR(ColourValue)
     %include "OgreNode.h"
         %include "OgreBone.h"
         %include "OgreSceneNode.h"
-    %shared_ptr(Ogre::ShadowCameraSetup);
-    %shared_ptr(Ogre::DefaultShadowCameraSetup);
+    SHARED_PTR(ShadowCameraSetup);
+    SHARED_PTR(DefaultShadowCameraSetup);
     %include "OgreShadowCameraSetup.h"
-        %shared_ptr(Ogre::FocusedShadowCameraSetup);
+        SHARED_PTR(FocusedShadowCameraSetup);
         %include "OgreShadowCameraSetupFocused.h"
-        %shared_ptr(Ogre::LiSPSMShadowCameraSetup);
+        SHARED_PTR(LiSPSMShadowCameraSetup);
         %include "OgreShadowCameraSetupLiSPSM.h"
-        %shared_ptr(Ogre::PlaneOptimalShadowCameraSetup);
+        SHARED_PTR(PlaneOptimalShadowCameraSetup);
         %include "OgreShadowCameraSetupPlaneOptimal.h"
-        %shared_ptr(Ogre::PSSMShadowCameraSetup);
+        SHARED_PTR(PSSMShadowCameraSetup);
         %include "OgreShadowCameraSetupPSSM.h"  
     %ignore Ogre::Frustum::getFrustumExtents(Real&, Real& ,Real& ,Real&) const;
     %include "OgreFrustum.h"
@@ -420,7 +432,7 @@ ADD_REPR(ColourValue)
     %template(SubEntityList) std::vector<Ogre::SubEntity*>;
     %include "OgreEntity.h"
     %include "OgreSubEntity.h"
-    %shared_ptr(Ogre::ParticleSystem);
+    SHARED_PTR(ParticleSystem);
     %include "OgreParticleSystem.h"
     %include "OgreInstancedEntity.h"
     %include "OgreInstanceBatch.h"
@@ -440,12 +452,12 @@ ADD_REPR(ColourValue)
 %template(PoseList) std::vector<Ogre::Pose*>;
 %template() Ogre::vector<Ogre::SubMesh*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
-%shared_ptr(Ogre::Mesh);
+SHARED_PTR(Mesh);
 %include "OgreMesh.h"
 %include "OgreSubMesh.h"
 %include "OgreStaticGeometry.h"
 %include "OgrePatchSurface.h"
-    %shared_ptr(Ogre::PatchMesh);
+    SHARED_PTR(PatchMesh);
     %include "OgrePatchMesh.h"
 %include "OgreMeshManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated

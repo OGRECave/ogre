@@ -26,43 +26,37 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __NaClGLContext_H__
-#define __NaClGLContext_H__
+#ifndef __SCRIPTPARSER_H_
+#define __SCRIPTPARSER_H_
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLContext.h"
-#include "OgreNaClWindow.h"
-#include "OgreNaClGLContext.h"
+#include "OgrePrerequisites.h"
+#include "OgreScriptCompiler.h"
+#include "OgreScriptLexer.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-    class NaClGLSupport;
 
-    class _OgrePrivate NaClGLContext : public GLContext, public pp::Graphics3DClient
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
+
+    class _OgrePrivate ScriptParser : public ScriptCompilerAlloc
     {
-        private:
-            const NaClGLSupport *mGLSupport;
-            const NaClWindow * mWindow;
-            pp::Instance* mInstance;
-            pp::CompletionCallback* mSwapCallback;
-            pp::Graphics3D mContext;
-            unsigned int mWidth;
-            unsigned int mHeight;
-        public:
-            NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance, pp::CompletionCallback* swapCallback);
-            virtual ~NaClGLContext();
-
-            virtual void setCurrent();
-            virtual void endCurrent();
-            GLContext* clone() const;
-
-            void swapBuffers();
-
-            void resize();
-
-            /// The Graphics3DClient interface - pp::Graphics3DClient_Dev
-            virtual void Graphics3DContextLost();
-
+    public:
+        static ConcreteNodeListPtr parse(const ScriptTokenListPtr &tokens);
+        static ConcreteNodeListPtr parseChunk(const ScriptTokenListPtr &tokens);
+    private:
+        static ScriptToken *getToken(ScriptTokenList::iterator i, ScriptTokenList::iterator end, int offset);
+        static ScriptTokenList::iterator skipNewlines(ScriptTokenList::iterator i, ScriptTokenList::iterator end);
     };
+    
+    /** @} */
+    /** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

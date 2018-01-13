@@ -1278,7 +1278,7 @@ namespace Ogre {
 		{
 			size_t includePos = i;
 			size_t afterIncludePos = includePos + 8;
-			size_t newLineBefore = inSource.rfind("\n", includePos);
+			size_t newLineBefore = inSource.rfind('\n', includePos);
 
 			// check we're not in a comment
 			size_t lineCommentIt = inSource.rfind("//", includePos);
@@ -1306,14 +1306,14 @@ namespace Ogre {
 			}
 
 			// find following newline (or EOF)
-			size_t newLineAfter = inSource.find("\n", afterIncludePos);
+			size_t newLineAfter = inSource.find('\n', afterIncludePos);
 			// find include file string container
 			String endDelimeter = "\"";
-			size_t startIt = inSource.find("\"", afterIncludePos);
+			size_t startIt = inSource.find('\"', afterIncludePos);
 			if (startIt == String::npos || startIt > newLineAfter)
 			{
 				// try <>
-				startIt = inSource.find("<", afterIncludePos);
+				startIt = inSource.find('<', afterIncludePos);
 				if (startIt == String::npos || startIt > newLineAfter)
 				{
 					OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,

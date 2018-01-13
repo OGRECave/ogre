@@ -60,11 +60,6 @@ namespace Ogre {
     void ConfigFile::loadDirect(const String& filename, const String& separators, 
         bool trimWhitespace)
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "loadDirect is not supported on NaCl - tried to open: " + filename,
-            "ConfigFile::loadDirect");
-#endif
-
         /* Open the configuration file */
         std::ifstream fp;
         // Always open in binary mode

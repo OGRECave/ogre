@@ -44,7 +44,7 @@ namespace Ogre {
         // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glGetString.xml
         size_t offset = sizeof("OpenGL ES ") - 1;
         if(tmpStr.length() > offset) {
-            mVersion.fromString(tmpStr.substr(offset, tmpStr.find(" ", offset)));
+            mVersion.fromString(tmpStr.substr(offset, tmpStr.find(' ', offset)));
         }
 #else
         // GLES3 way, but should work with ES2 as well, so disabled for now
@@ -59,7 +59,7 @@ namespace Ogre {
         const GLubyte* pcVendor = glGetString(GL_VENDOR);
         tmpStr = (const char*)pcVendor;
         LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
-        mVendor = tmpStr.substr(0, tmpStr.find(" "));
+        mVendor = tmpStr.substr(0, tmpStr.find(' '));
 
         // Get renderer
         const GLubyte* pcRenderer = glGetString(GL_RENDERER);

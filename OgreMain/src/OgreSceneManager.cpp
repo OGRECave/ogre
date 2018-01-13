@@ -69,8 +69,6 @@ THE SOFTWARE.
 
 #include <cstdio>
 
-#define ITER_VAL(it) (*it)
-
 namespace Ogre {
 
 //-----------------------------------------------------------------------
@@ -792,7 +790,7 @@ void SceneManager::clearScene(void)
     for (SceneNodeList::iterator i = mSceneNodes.begin();
         i != mSceneNodes.end(); ++i)
     {
-        OGRE_DELETE ITER_VAL(i);
+        OGRE_DELETE *i;
     }
     mSceneNodes.clear();
     mAutoTrackingSceneNodes.clear();
@@ -867,7 +865,7 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
 
     if (i == mSceneNodes.end())
     {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + ITER_VAL(i)->getName() + "' not found.",
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + (*i)->getName() + "' not found.",
             "SceneManager::destroySceneNode");
     }
 
@@ -880,13 +878,13 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
         AutoTrackingSceneNodes::iterator curri = ai++;
         SceneNode* n = *curri;
         // Tracking this node
-        if (n->getAutoTrackTarget() == ITER_VAL(i))
+        if (n->getAutoTrackTarget() == *i)
         {
             // turn off, this will notify SceneManager to remove
             n->setAutoTracking(false);
         }
         // node is itself a tracker
-        else if (n == ITER_VAL(i))
+        else if (n == *i)
         {
             mAutoTrackingSceneNodes.erase(curri);
         }
@@ -894,12 +892,12 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
 
     // detach from parent (don't do this in destructor since bulk destruction
     // behaves differently)
-    Node* parentNode = ITER_VAL(i)->getParent();
+    Node* parentNode = (*i)->getParent();
     if (parentNode)
     {
-        parentNode->removeChild(ITER_VAL(i));
+        parentNode->removeChild(*i);
     }
-    OGRE_DELETE ITER_VAL(i);
+    OGRE_DELETE *i;
     std::swap(*i, mSceneNodes.back());
     mSceneNodes.pop_back();
 }
@@ -937,7 +935,7 @@ SceneNode* SceneManager::getSceneNode(const String& name) const
             "SceneManager::getSceneNode");
     }
 
-    return ITER_VAL(i);
+    return *i;
 
 }
 //-----------------------------------------------------------------------

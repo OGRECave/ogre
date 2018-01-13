@@ -43,6 +43,10 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
 
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+#include <OgreRTShaderConfig.h>
+#endif
+
 namespace Ogre {
 
     RenderSystem::Listener* RenderSystem::msSharedEventListener = 0;

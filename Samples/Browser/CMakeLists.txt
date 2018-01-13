@@ -41,10 +41,6 @@ if (APPLE AND APPLE_IOS)
   set(HEADER_FILES ${HEADER_FILES}
     ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_iOS.h
   )
-elseif (OGRE_BUILD_PLATFORM_NACL)
-  set(HEADER_FILES ${HEADER_FILES}
-    ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_NaCl.h
-  )
 elseif (APPLE)
   set(HEADER_FILES ${HEADER_FILES}
     ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_OSX.h

@@ -382,7 +382,7 @@ namespace Ogre {
         if (mName.empty())
             return BLANKSTRING;
 
-        String::size_type pos = mName.find_last_of(".");
+        String::size_type pos = mName.find_last_of('.');
         if (pos != String::npos && pos < (mName.length() - 1))
         {
             String ext = mName.substr(pos+1);

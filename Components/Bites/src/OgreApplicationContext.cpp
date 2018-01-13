@@ -78,11 +78,7 @@ void ApplicationContext::initApp()
     Ogre::Root::getSingleton().clearEventTimes();
 #else
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-    mNextRenderer = mRoot->getAvailableRenderers()[0]->getName();
-#else
     if (!oneTimeConfig()) return;
-#endif
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     // if the context was reconfigured, set requested renderer
@@ -126,7 +122,7 @@ bool ApplicationContext::initialiseRTShaderSystem()
     {
         mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
         // Core shader libs not found -> shader generating will fail.
         if (mRTShaderLibPath.empty())
             return false;
@@ -326,12 +322,7 @@ bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt)
 NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre::uint32 w, Ogre::uint32 h, Ogre::NameValuePairList miscParams)
 {
     NativeWindowPair ret = {NULL, NULL};
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-    miscParams["pp::Instance"] = Ogre::StringConverter::toString((unsigned long)mNaClInstance);
-    miscParams["SwapCallback"] = Ogre::StringConverter::toString((unsigned long)mNaClSwapCallback);
-    // create 1x1 window - we will resize later
-    ret.render = mRoot->createRenderWindow(name, mInitWidth, mInitHeight, false, &miscParams);
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mWindows[0].native));
     miscParams["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAConfig));
     miscParams["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
@@ -545,17 +536,13 @@ Ogre::String ApplicationContext::getDefaultMediaDir()
 
 void ApplicationContext::locateResources()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Essential.zip", "EmbeddedZip", "Essential");
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Popular.zip", "EmbeddedZip", "General");
-#else
     // load resource paths from config file
     Ogre::ConfigFile cf;
-#   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAAssetMgr) );
     Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAAssetMgr) );
     cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
-#   else
+#else
     Ogre::String resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
     if (Ogre::FileSystemLayer::fileExists(resourcesPath) || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
     {
@@ -568,7 +555,7 @@ void ApplicationContext::locateResources()
             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
-#   endif
+#endif
 
     Ogre::String sec, type, arch;
     // go through all specified resource groups
@@ -602,7 +589,7 @@ void ApplicationContext::locateResources()
 #else
     arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
     arch = Ogre::StringUtil::replaceAll(arch, "media/../../Tests/Media", "");
-# endif
+#endif
     type = genLocs.front()->archive->getType();
 
     bool hasCgPlugin = false;
@@ -675,7 +662,6 @@ void ApplicationContext::locateResources()
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/HLSL_Cg", type, sec);
 
 #endif /* OGRE_BUILD_COMPONENT_RTSHADERSYSTEM */
-#endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
 }
 
 void ApplicationContext::loadResources()

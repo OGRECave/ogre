@@ -14,6 +14,8 @@ same license as the rest of the engine.
 
 #include "HelperLogics.h"
 
+#include <cmath>
+
 #include "Ogre.h"
 #include "OgreTimer.h"
 
@@ -122,7 +124,7 @@ void HeatVisionListener::notifyMaterialRender(Ogre::uint32 pass_id, Ogre::Materi
 
         // "depth_modulator" parameter
         float inc = ((float)timer->getMilliseconds())/1000.0f;
-        if ( (fabs(curr-end) <= 0.001) ) {
+        if ( (std::fabs(curr-end) <= 0.001) ) {
             // take a new value to reach
             end = Ogre::Math::RangeRandom(0.95, 1.0);
             start = curr;

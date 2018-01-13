@@ -153,9 +153,7 @@ protected:
 
     void windowUpdate()
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         mWindow->update();
-#endif
     }
 
     void setupProps()

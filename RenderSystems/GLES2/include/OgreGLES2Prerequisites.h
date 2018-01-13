@@ -33,6 +33,9 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreMath.h"
 
+#include "OgreGLES2Exports.h"
+#include "OgreGLES2Config.h"
+
 namespace Ogre {
     class GLContext;
     typedef GLContext GLES2Context;
@@ -44,16 +47,6 @@ namespace Ogre {
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
-#       include "ppapi/cpp/completion_callback.h"
-#       include "ppapi/cpp/instance.h"
-#       include "ppapi/c/ppp_graphics_3d.h"
-#       include "ppapi/cpp/graphics_3d.h"
-#       include "ppapi/cpp/graphics_3d_client.h"
-#       include "ppapi/gles2/gl2ext_ppapi.h"
-#       undef GL_OES_get_program_binary
-#       undef GL_OES_mapbuffer
-#       undef GL_OES_vertex_array_object
 #else
 #   if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 #       if !defined( __MINGW32__ )
@@ -101,22 +94,6 @@ namespace Ogre {
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 // an error in all windows gles sdks...
 #   undef GL_OES_get_program_binary
-#endif
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
-#   ifdef OGRE_GLES2PLUGIN_EXPORTS
-#       define _OgreGLES2Export __declspec(dllexport)
-#   else
-#       if defined( __MINGW32__ )
-#           define _OgreGLES2Export
-#       else
-#           define _OgreGLES2Export __declspec(dllimport)
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgreGLES2Export  __attribute__ ((visibility("default")))
-#else
-#    define _OgreGLES2Export
 #endif
 
 #define ENABLE_GL_CHECK 0

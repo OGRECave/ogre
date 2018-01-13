@@ -92,10 +92,8 @@ bool GLSLESProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
     // Bind texture samplers for the fragment shader.
     bindTextureSamplers(fsCpuProgram, fsGpuProgram);
 
-#if !OGRE_NO_GLES2_GLSL_OPTIMISER
     vsGpuProgram->setParameter("use_optimiser", "true");
     fsGpuProgram->setParameter("use_optimiser", "true");
-#endif
 
     return true;
 }

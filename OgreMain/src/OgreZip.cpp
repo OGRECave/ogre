@@ -250,7 +250,7 @@ namespace Ogre {
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
-        bool wildCard = pattern.find("*") != String::npos;
+        bool wildCard = pattern.find('*') != String::npos;
             
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
@@ -272,7 +272,7 @@ namespace Ogre {
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
-        bool wildCard = pattern.find("*") != String::npos;
+        bool wildCard = pattern.find('*') != String::npos;
 
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
@@ -299,7 +299,7 @@ namespace Ogre {
         OGRE_LOCK_AUTO_MUTEX;
         String cleanName = filename;
 #if !OGRE_RESOURCEMANAGER_STRICT
-        if(filename.rfind("/") != String::npos)
+        if(filename.rfind('/') != String::npos)
         {
             StringVector tokens = StringUtil::split(filename, "/");
             cleanName = tokens[tokens.size() - 1];

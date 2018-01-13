@@ -38,11 +38,6 @@ THE SOFTWARE.
 #   endif
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-#   include "ppapi/cpp/var.h"
-#   include "ppapi/cpp/instance.h"
-#endif
-
 namespace {
     const char* RED = "\x1b[31;1m";
     const char* YELLOW = "\x1b[33;1m";
@@ -51,10 +46,6 @@ namespace {
 
 namespace Ogre
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-    pp::Instance* Log::mInstance = NULL;    
-#endif
-    
     //-----------------------------------------------------------------------
     Log::Log( const String& name, bool debuggerOutput, bool suppressFile ) : 
         mLogLevel(LL_NORMAL), mDebugOut(debuggerOutput),
@@ -107,12 +98,6 @@ namespace Ogre
             
             if (!skipThisMessage)
             {
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-                if(mInstance != NULL)
-                {
-                    mInstance->PostMessage(message.c_str());
-                }
-#else
                 if (mDebugOut && !maskDebug)
                 {
 #    if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && OGRE_DEBUG_MODE
@@ -138,7 +123,6 @@ namespace Ogre
 
                     os << std::endl;
                 }
-#endif
 
                 // Write time into log
                 if (!mSuppressFile)
