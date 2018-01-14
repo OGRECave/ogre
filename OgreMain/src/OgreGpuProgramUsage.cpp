@@ -55,59 +55,53 @@ namespace Ogre
             mProgram->removeListener(this);
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramUsage::setProgramName(const String& name, bool resetParams)
-    {
-        if (mProgram)
-        {
-            mProgram->removeListener(this);
-            mRecreateParams = true;
-        }
 
-        mProgram = GpuProgramManager::getSingleton().getByName(name, mParent->getResourceGroup());
-        
+    GpuProgramPtr GpuProgramUsage::_getProgramByName(const String& name, const String& group,
+                                                     GpuProgramType type)
+    {
+        GpuProgramPtr program =
+            GpuProgramManager::getSingleton().getByName(name, group);
+
         //Look again without the group if not found
-        if (!mProgram)
-            mProgram = GpuProgramManager::getSingleton().getByName(
+        if (!program)
+            program = GpuProgramManager::getSingleton().getByName(
                 name, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-        if (!mProgram)
+        if (!program)
         {
             String progType = "fragment";
-            if (mType == GPT_VERTEX_PROGRAM)
+            if (type == GPT_VERTEX_PROGRAM)
             {
                 progType = "vertex";
             }
-            else if (mType == GPT_GEOMETRY_PROGRAM)
+            else if (type == GPT_GEOMETRY_PROGRAM)
             {
                 progType = "geometry";
             }
-            else if (mType == GPT_DOMAIN_PROGRAM)
+            else if (type == GPT_DOMAIN_PROGRAM)
             {
                 progType = "domain";
             }
-            else if (mType == GPT_HULL_PROGRAM)
+            else if (type == GPT_HULL_PROGRAM)
             {
                 progType = "hull";
             }
-            else if (mType == GPT_COMPUTE_PROGRAM)
+            else if (type == GPT_COMPUTE_PROGRAM)
             {
                 progType = "compute";
             }
 
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                 "Unable to locate " + progType + " program called " + name + ".",
-                "GpuProgramUsage::setProgramName");
+                "GpuProgramUsage::_getProgramByName");
         }
 
-        // Reset parameters 
-        if (resetParams || !mParameters || mRecreateParams)
-        {
-            recreateParameters();
-        }
+        return program;
+    }
 
-        // Listen in on reload events so we can regenerate params
-        mProgram->addListener(this);
-
+    void GpuProgramUsage::setProgramName(const String& name, bool resetParams)
+    {
+        setProgram(_getProgramByName(name, mParent->getResourceGroup(), mType), resetParams);
     }
     //-----------------------------------------------------------------------------
     void GpuProgramUsage::setParameters(GpuProgramParametersSharedPtr params)
@@ -126,11 +120,24 @@ namespace Ogre
         return mParameters;
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramUsage::setProgram(GpuProgramPtr& prog) 
+    void GpuProgramUsage::setProgram(const GpuProgramPtr& prog, bool resetParams)
     {
+        if (mProgram)
+        {
+            mProgram->removeListener(this);
+            mRecreateParams = true;
+        }
+
         mProgram = prog;
-        // Reset parameters 
-        mParameters = mProgram->createParameters();
+
+        // Reset parameters
+        if (resetParams || !mParameters || mRecreateParams)
+        {
+            recreateParameters();
+        }
+
+        // Listen in on reload events so we can regenerate params
+        mProgram->addListener(this);
     }
     //-----------------------------------------------------------------------------
     size_t GpuProgramUsage::calculateSize(void) const
