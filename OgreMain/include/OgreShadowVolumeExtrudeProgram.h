@@ -136,8 +136,7 @@ namespace Ogre {
     class _OgreExport ShadowVolumeExtrudeProgram : public ShadowDataAlloc
     {
     private:
-        static bool mInitialised;
-
+        static vector<GpuProgramPtr>::type mPrograms;
     public:
         enum Programs
         {

@@ -373,7 +373,7 @@ namespace Ogre {
 
     String ShadowVolumeExtrudeProgram::frgProgramName = "";
 
-    bool ShadowVolumeExtrudeProgram::mInitialised = false;
+    vector<GpuProgramPtr>::type ShadowVolumeExtrudeProgram::mPrograms;
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 
@@ -389,7 +389,7 @@ namespace Ogre {
 		else
 			program->setParameter("target", target);
 
-		program->load();
+		mPrograms.push_back(program);
 	}
 
 	void ShadowVolumeExtrudeProgram::initialiseModulationPassPrograms(void)
@@ -456,7 +456,7 @@ namespace Ogre {
 
     void ShadowVolumeExtrudeProgram::initialise(void)
     {
-		if (!mInitialised)
+		if (mPrograms.empty())
 		{
 			String syntax;
 			bool vertexProgramFinite[NUM_SHADOW_EXTRUDER_PROGRAMS] =
@@ -515,7 +515,7 @@ namespace Ogre {
 
 						vp->setParameter("target", "vs_4_0_level_9_1"); // shared subset, to be usable from microcode cache on all devices
 						vp->setParameter("entry_point", "vs_main");
-						vp->load();
+						mPrograms.push_back(vp);
 
 						if (frgProgramName.empty())
 						{
@@ -527,7 +527,7 @@ namespace Ogre {
 							fp->setSource(mGeneralFs_4_0);
 							fp->setParameter("target", "ps_4_0_level_9_1"); // shared subset, to be usable from microcode cache on all devices
 							fp->setParameter("entry_point", "fs_main");
-							fp->load();
+							mPrograms.push_back(fp);
 						}
 					}
 					else if (syntax == "glsles")
@@ -540,7 +540,7 @@ namespace Ogre {
 							vertexProgramLightTypes[v], syntax,
 							vertexProgramFinite[v], false));
 						vp->setParameter("target", syntax);
-						vp->load();
+						mPrograms.push_back(vp);
 
 						if (frgProgramName.empty())
 						{
@@ -551,7 +551,7 @@ namespace Ogre {
 								"glsles", GPT_FRAGMENT_PROGRAM);
 							fp->setSource(mGeneralFs_glsles);
 							fp->setParameter("target", "glsles");
-							fp->load();
+							mPrograms.push_back(fp);
 						}
 					}
 					else if (syntax == "glsl")
@@ -564,7 +564,7 @@ namespace Ogre {
 							vertexProgramLightTypes[v], syntax,
 							vertexProgramFinite[v], false));
 						vp->setParameter("target", syntax);
-						vp->load();
+						mPrograms.push_back(vp);
 
 						if (frgProgramName.empty())
 						{
@@ -575,7 +575,7 @@ namespace Ogre {
 								"glsl", GPT_FRAGMENT_PROGRAM);
 							fp->setSource(mGeneralFs_glsl);
 							fp->setParameter("target", "glsl");
-							fp->load();
+							mPrograms.push_back(fp);
 						}
 					}
 					else
@@ -587,28 +587,29 @@ namespace Ogre {
 							vertexProgramLightTypes[v], syntax,
 							vertexProgramFinite[v], false),
 							GPT_VERTEX_PROGRAM, syntax);
-						vp->load();
+						mPrograms.push_back(vp);
 					}
 				}
 			}
 
 			initialiseModulationPassPrograms();
-            mInitialised = true;
+
+			for(auto& prog : mPrograms)
+			{
+			    prog->load();
+			}
         }
     }
     //---------------------------------------------------------------------
     void ShadowVolumeExtrudeProgram::shutdown(void)
     {
-        if (mInitialised)
+        if (!mPrograms.empty())
         {
             for (unsigned short v = 0; v < NUM_SHADOW_EXTRUDER_PROGRAMS; ++v)
             {
-                // Destroy debug extruders
-                GpuProgramPtr prog = GpuProgramManager::getSingleton().getByName(
-                    programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-                prog->getCreator()->remove(prog); // handle high level and low level programs
+                mPrograms[v]->getCreator()->remove(mPrograms[v]); // handle high level and low level programs
             }
-            mInitialised = false;
+            mPrograms.clear();
 			frgProgramName = "";
         }
     }
@@ -677,7 +678,7 @@ namespace Ogre {
         // however this is currently just one uniform in the fragment shader..
         if (lightType == Light::LT_DIRECTIONAL)
         {
-            return programNames[finite  ? DIRECTIONAL_LIGHT_FINITE : DIRECTIONAL_LIGHT];
+            return programNames[finite ? DIRECTIONAL_LIGHT_FINITE : DIRECTIONAL_LIGHT];
         }
         else
         {
