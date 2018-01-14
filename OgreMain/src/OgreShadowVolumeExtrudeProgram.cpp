@@ -371,7 +371,7 @@ namespace Ogre {
         "Ogre/ShadowExtrudeDirLightFinite"
     };
 
-    String ShadowVolumeExtrudeProgram::frgProgramName = "";
+    HighLevelGpuProgramPtr ShadowVolumeExtrudeProgram::frgProgram;
 
     vector<GpuProgramPtr>::type ShadowVolumeExtrudeProgram::mPrograms;
     //---------------------------------------------------------------------
@@ -517,17 +517,15 @@ namespace Ogre {
 						vp->setParameter("entry_point", "vs_main");
 						mPrograms.push_back(vp);
 
-						if (frgProgramName.empty())
+						if (!frgProgram)
 						{
-							frgProgramName = "Ogre/ShadowFrgProgram";
-							HighLevelGpuProgramPtr fp =
+						    frgProgram =
 								HighLevelGpuProgramManager::getSingleton().createProgram(
-								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+								        "Ogre/ShadowFrgProgram", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 								"hlsl", GPT_FRAGMENT_PROGRAM);
-							fp->setSource(mGeneralFs_4_0);
-							fp->setParameter("target", "ps_4_0_level_9_1"); // shared subset, to be usable from microcode cache on all devices
-							fp->setParameter("entry_point", "fs_main");
-							mPrograms.push_back(fp);
+						    frgProgram->setSource(mGeneralFs_4_0);
+						    frgProgram->setParameter("target", "ps_4_0_level_9_1"); // shared subset, to be usable from microcode cache on all devices
+						    frgProgram->setParameter("entry_point", "fs_main");
 						}
 					}
 					else if (syntax == "glsles")
@@ -542,16 +540,14 @@ namespace Ogre {
 						vp->setParameter("target", syntax);
 						mPrograms.push_back(vp);
 
-						if (frgProgramName.empty())
+						if (!frgProgram)
 						{
-							frgProgramName = "Ogre/ShadowFrgProgram";
-							HighLevelGpuProgramPtr fp =
+							frgProgram =
 								HighLevelGpuProgramManager::getSingleton().createProgram(
-								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+								"Ogre/ShadowFrgProgram", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 								"glsles", GPT_FRAGMENT_PROGRAM);
-							fp->setSource(mGeneralFs_glsles);
-							fp->setParameter("target", "glsles");
-							mPrograms.push_back(fp);
+							frgProgram->setSource(glsles_prefix + mGeneralFs_glsl);
+							frgProgram->setParameter("target", "glsles");
 						}
 					}
 					else if (syntax == "glsl")
@@ -566,16 +562,14 @@ namespace Ogre {
 						vp->setParameter("target", syntax);
 						mPrograms.push_back(vp);
 
-						if (frgProgramName.empty())
+						if (!frgProgram)
 						{
-							frgProgramName = "Ogre/ShadowFrgProgram";
-							HighLevelGpuProgramPtr fp =
+						    frgProgram =
 								HighLevelGpuProgramManager::getSingleton().createProgram(
-								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+								"Ogre/ShadowFrgProgram", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 								"glsl", GPT_FRAGMENT_PROGRAM);
-							fp->setSource(mGeneralFs_glsl);
-							fp->setParameter("target", "glsl");
-							mPrograms.push_back(fp);
+						    frgProgram->setSource(mGeneralFs_glsl);
+						    frgProgram->setParameter("target", "glsl");
 						}
 					}
 					else
@@ -598,6 +592,9 @@ namespace Ogre {
 			{
 			    prog->load();
 			}
+
+			if(frgProgram)
+			    frgProgram->load();
         }
     }
     //---------------------------------------------------------------------
@@ -610,7 +607,10 @@ namespace Ogre {
                 mPrograms[v]->getCreator()->remove(mPrograms[v]); // handle high level and low level programs
             }
             mPrograms.clear();
-			frgProgramName = "";
+
+            if(frgProgram)
+                frgProgram->getCreator()->remove(frgProgram);
+            frgProgram.reset();
         }
     }
     //---------------------------------------------------------------------
@@ -671,18 +671,18 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    const String& ShadowVolumeExtrudeProgram::getProgramName(
-        Light::LightTypes lightType, bool finite, bool debug)
+    const GpuProgramPtr& ShadowVolumeExtrudeProgram::get(Light::LightTypes lightType, bool finite,
+                                                         bool debug)
     {
         // note: we could use the debug flag to create special "debug" programs
         // however this is currently just one uniform in the fragment shader..
         if (lightType == Light::LT_DIRECTIONAL)
         {
-            return programNames[finite ? DIRECTIONAL_LIGHT_FINITE : DIRECTIONAL_LIGHT];
+            return mPrograms[finite ? DIRECTIONAL_LIGHT_FINITE : DIRECTIONAL_LIGHT];
         }
         else
         {
-            return programNames[finite ? POINT_LIGHT_FINITE : POINT_LIGHT];
+            return mPrograms[finite ? POINT_LIGHT_FINITE : POINT_LIGHT];
         }
     }
 

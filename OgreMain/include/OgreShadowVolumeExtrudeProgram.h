@@ -136,8 +136,6 @@ namespace Ogre {
     class _OgreExport ShadowVolumeExtrudeProgram : public ShadowDataAlloc
     {
     private:
-        static vector<GpuProgramPtr>::type mPrograms;
-    public:
         enum Programs
         {
             // Point light extruder, infinite distance
@@ -150,23 +148,27 @@ namespace Ogre {
             DIRECTIONAL_LIGHT_FINITE,
             NUM_SHADOW_EXTRUDER_PROGRAMS
         };
-        static const String programNames[NUM_SHADOW_EXTRUDER_PROGRAMS];
-        static String frgProgramName;
 
-        /// Initialise the creation of these vertex programs
-        static void initialise(void);
-		/// Initialise the creation of these modulation pass programs
-		static void initialiseModulationPassPrograms(void);
-		/// Add and load high level gpu program
-		static void AddInternalProgram(String name, String source, String language, String entryPoint, String target, GpuProgramType type);
-        /// Shutdown & destroy the vertex programs
-        static void shutdown(void);
+        static vector<GpuProgramPtr>::type mPrograms;
+        static const String programNames[NUM_SHADOW_EXTRUDER_PROGRAMS];
 
         /// General purpose method to get any of the program sources
         static const String& getProgramSource(Light::LightTypes lightType, const String &syntax,
             bool finite, bool debug);
 
-        static const String& getProgramName(Light::LightTypes lightType, bool finite, bool debug);
+        /// Initialise the creation of these modulation pass programs
+        static void initialiseModulationPassPrograms(void);
+        /// Add and load high level gpu program
+        static void AddInternalProgram(String name, String source, String language, String entryPoint, String target, GpuProgramType type);
+    public:
+        static HighLevelGpuProgramPtr frgProgram;
+
+        /// Initialise the creation of these vertex programs
+        static void initialise(void);
+        /// Shutdown & destroy the vertex programs
+        static void shutdown(void);
+
+        static const GpuProgramPtr& get(Light::LightTypes lightType, bool finite, bool debug = false);
     };
     /** @} */
     /** @} */
