@@ -1239,14 +1239,16 @@ namespace Ogre
                     (aliasName || i == PBSM_REFLECTION) &&
                     !(texture->getUsage() & TU_RENDERTARGET) )
                 {
+                    const uint32 numSlices = i == PBSM_REFLECTION ? 6u : 1u;
+
                     Image image;
-                    texture->convertToImage( image, false, 0u, texLocation.xIdx, 1u );
+                    texture->convertToImage( image, false, 0u, texLocation.xIdx, numSlices );
 
                     //DDS is the format that supports most of what we need.
                     String texName = finalName;
                     if( texName.find( ".dds" ) != texName.size() - 4u )
                         texName += ".dds";
-                    image.save( folderPath + "/" + texName + ".dds" );
+                    image.save( folderPath + "/" + texName + ".oitd" );
 
                     savedTextures.insert( finalName );
                 }

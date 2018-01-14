@@ -442,12 +442,36 @@ namespace Ogre {
 
         const uint32 startingWidth  = std::max( getWidth() >> mipmapBias, 1u );
         const uint32 startingHeight = std::max( getHeight() >> mipmapBias, 1u );
-        const uint32 startingDepth  = std::max( getDepth() >> mipmapBias, 1u );
+        const uint32 startingDepth  = std::max( mTextureType == TEX_TYPE_CUBE_MAP ?
+                                                    getDepth() >> mipmapBias :
+                                                    getDepth(), 1u );
+
+        uint32 firstZ   = 0;
+        uint32 numZ     = startingDepth;
+
+        if( mTextureType != TEX_TYPE_CUBE_MAP )
+        {
+            firstZ  = firstSlice;
+            numZ    = numSlices;
+
+            firstSlice = 0u;
+            numSlices = 1u;
+
+            if( numZ == 0 )
+                numZ = startingDepth - firstZ;
+            if( firstZ >= startingDepth ||
+                firstZ + numZ > startingDepth )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Invalid firstSlice and numSlices parameters",
+                             "Texture::convertToImage" );
+            }
+        }
 
         if( numSlices == 0 )
             numSlices = getNumFaces() - firstSlice;
         if( firstSlice >= getNumFaces() ||
-            firstSlice + numSlices >= getNumFaces() )
+            firstSlice + numSlices > getNumFaces() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                          "Invalid firstSlice and numSlices parameters",
@@ -468,13 +492,14 @@ namespace Ogre {
         {
             uint32 width  = startingWidth;
             uint32 height = startingHeight;
-            uint32 depth  = startingDepth;
+            uint32 depth  = numZ;
             for (size_t mip = 0; mip < numMips; ++mip)
             {
                 size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
 
+                Box srcBox( 0, 0, firstZ, width, height, firstZ + depth );
                 Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
-                getBuffer(face + firstSlice, mip)->blitToMemory(pixBox);
+                getBuffer(face + firstSlice, mip)->blitToMemory( srcBox, pixBox );
 
                 currentPixData = (void*)((char*)currentPixData + mipDataSize);
 
@@ -482,14 +507,18 @@ namespace Ogre {
                     width >>= 1u;
                 if( height != 1 )
                     height >>= 1u;
-                if( depth != 1 )
-                    depth >>= 1u;
+                if( mTextureType == TEX_TYPE_3D )
+                {
+                    firstZ >>= 1u;
+                    if( depth != 1 )
+                        depth >>= 1u;
+                }
             }
         }
 
         // load, and tell Image to delete the memory when it's done.
         destImage.loadDynamicImage( (Ogre::uchar*)pixData, startingWidth, startingHeight,
-                                    startingDepth, getFormat(), true,
+                                    numZ, getFormat(), true,
                                     numSlices, numMips - 1 );
     }
     //--------------------------------------------------------------------------
