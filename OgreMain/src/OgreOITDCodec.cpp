@@ -130,7 +130,7 @@ namespace Ogre
         oitdHeader.width            = pImgData->width;
         oitdHeader.height           = pImgData->height;
         oitdHeader.depthOrSlices    = pImgData->depth;
-        oitdHeader.numMipmaps       = pImgData->num_mipmaps;
+        oitdHeader.numMipmaps       = pImgData->num_mipmaps + 1u;
 
         oitdHeader.textureType = TextureTypes::Type2D;
         if( oitdHeader.depthOrSlices > 1u )
@@ -160,7 +160,7 @@ namespace Ogre
                                                                     oitdHeader.getDepth(),
                                                                     oitdHeader.getNumSlices(),
                                                                     pImgData->format,
-                                                                    pImgData->num_mipmaps );
+                                                                    oitdHeader.numMipmaps );
 
         const size_t totalSize = sizeof(uint32) + sizeof(OITDHeader) + requiredBytes;
 
@@ -191,7 +191,7 @@ namespace Ogre
         oitdHeader.width            = pImgData->width;
         oitdHeader.height           = pImgData->height;
         oitdHeader.depthOrSlices    = pImgData->depth;
-        oitdHeader.numMipmaps       = pImgData->num_mipmaps;
+        oitdHeader.numMipmaps       = pImgData->num_mipmaps + 1u;
 
         oitdHeader.textureType = TextureTypes::Type2D;
         if( oitdHeader.depthOrSlices > 1u )
@@ -221,7 +221,7 @@ namespace Ogre
                                                                     oitdHeader.getDepth(),
                                                                     oitdHeader.getNumSlices(),
                                                                     pImgData->format,
-                                                                    pImgData->num_mipmaps );
+                                                                    oitdHeader.numMipmaps );
         // Write the file
         std::ofstream outFile;
         outFile.open( outFileName.c_str(), std::ios_base::binary|std::ios_base::out );
@@ -272,7 +272,7 @@ namespace Ogre
         imgData->height     = header.height;
         imgData->depth      = header.depthOrSlices;
         imgData->format     = static_cast<PixelFormat>( header.pixelFormat );
-        imgData->num_mipmaps= header.numMipmaps;
+        imgData->num_mipmaps= header.numMipmaps - 1u;
 
         imgData->flags = 0;
 
@@ -289,7 +289,7 @@ namespace Ogre
                                                                     header.getDepth(),
                                                                     header.getNumSlices(),
                                                                     imgData->format,
-                                                                    imgData->num_mipmaps );
+                                                                    header.numMipmaps );
 
         MemoryDataStreamPtr output;
         // Bind output buffer
