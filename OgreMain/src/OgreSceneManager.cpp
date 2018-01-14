@@ -4744,9 +4744,6 @@ void SceneManager::initShadowVolumeMaterials(void)
             mShadowDebugPass->setSceneBlending(SBT_ADD); 
             mShadowDebugPass->setLightingEnabled(false);
             mShadowDebugPass->setDepthWriteEnabled(false);
-            TextureUnitState* t = mShadowDebugPass->createTextureUnitState();
-            t->setColourOperationEx(LBX_MODULATE, LBS_MANUAL, LBS_CURRENT, 
-                ColourValue(0.7, 0.0, 0.2));
             mShadowDebugPass->setCullingMode(CULL_NONE);
 
             if (mDestRenderSystem->getCapabilities()->hasCapability(
@@ -4755,9 +4752,9 @@ void SceneManager::initShadowVolumeMaterials(void)
                 ShadowVolumeExtrudeProgram::initialise();
 
                 // Enable the (infinite) point light extruder for now, just to get some params
-                mShadowDebugPass->setVertexProgram(
-                    ShadowVolumeExtrudeProgram::programNames[ShadowVolumeExtrudeProgram::POINT_LIGHT]);
-                mShadowDebugPass->setFragmentProgram(ShadowVolumeExtrudeProgram::frgProgramName);               
+                mShadowDebugPass->setGpuProgram(
+                    GPT_VERTEX_PROGRAM, ShadowVolumeExtrudeProgram::get(Light::LT_POINT, false));
+                mShadowDebugPass->setGpuProgram(GPT_FRAGMENT_PROGRAM, ShadowVolumeExtrudeProgram::frgProgram);
                 mInfiniteExtrusionParams = 
                     mShadowDebugPass->getVertexProgramParameters();
                 mInfiniteExtrusionParams->setAutoConstant(0, 
@@ -4809,9 +4806,9 @@ void SceneManager::initShadowVolumeMaterials(void)
             {
 
                 // Enable the finite point light extruder for now, just to get some params
-                mShadowStencilPass->setVertexProgram(
-                    ShadowVolumeExtrudeProgram::programNames[ShadowVolumeExtrudeProgram::POINT_LIGHT_FINITE]);
-                mShadowStencilPass->setFragmentProgram(ShadowVolumeExtrudeProgram::frgProgramName);             
+                mShadowStencilPass->setGpuProgram(
+                    GPT_VERTEX_PROGRAM, ShadowVolumeExtrudeProgram::get(Light::LT_POINT, true));
+                mShadowStencilPass->setGpuProgram(GPT_FRAGMENT_PROGRAM, ShadowVolumeExtrudeProgram::frgProgram);
                 mFiniteExtrusionParams = 
                     mShadowStencilPass->getVertexProgramParameters();
                 mFiniteExtrusionParams->setAutoConstant(0, 
@@ -5622,10 +5619,10 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
         extrudeInSoftware = false;
         // attach the appropriate extrusion vertex program
         // Note we never unset it because support for vertex programs is constant
-        mShadowStencilPass->setVertexProgram(
-            ShadowVolumeExtrudeProgram::getProgramName(light->getType(), finiteExtrude, false)
-            , false);
-        mShadowStencilPass->setFragmentProgram(ShadowVolumeExtrudeProgram::frgProgramName);             
+        mShadowStencilPass->setGpuProgram(
+            GPT_VERTEX_PROGRAM, ShadowVolumeExtrudeProgram::get(light->getType(), finiteExtrude),
+            false);
+        mShadowStencilPass->setGpuProgram(GPT_FRAGMENT_PROGRAM, ShadowVolumeExtrudeProgram::frgProgram);
         // Set params
         if (finiteExtrude)
         {
@@ -5637,10 +5634,10 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
         }
         if (mDebugShadows)
         {
-            mShadowDebugPass->setVertexProgram(
-                ShadowVolumeExtrudeProgram::getProgramName(light->getType(), finiteExtrude, true)
-                 , false);
-            mShadowDebugPass->setFragmentProgram(ShadowVolumeExtrudeProgram::frgProgramName);               
+            mShadowDebugPass->setGpuProgram(
+                GPT_VERTEX_PROGRAM,
+                ShadowVolumeExtrudeProgram::get(light->getType(), finiteExtrude, true), false);
+            mShadowDebugPass->setGpuProgram(GPT_FRAGMENT_PROGRAM, ShadowVolumeExtrudeProgram::frgProgram);
 
                
             // Set params
@@ -5655,7 +5652,7 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
         }
 
         bindGpuProgram(mShadowStencilPass->getVertexProgram()->_getBindingDelegate());
-        if (!ShadowVolumeExtrudeProgram::frgProgramName.empty())
+        if (ShadowVolumeExtrudeProgram::frgProgram)
         {
             bindGpuProgram(mShadowStencilPass->getFragmentProgram()->_getBindingDelegate());
         }
@@ -5783,9 +5780,11 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
         {
             // reset stencil & colour ops
             mDestRenderSystem->setStencilBufferParams();
-            mShadowDebugPass->getTextureUnitState(0)->
-                setColourOperationEx(LBX_MODULATE, LBS_MANUAL, LBS_CURRENT,
-                zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
+            if (mShadowDebugPass->hasFragmentProgram())
+            {
+                mShadowDebugPass->getFragmentProgramParameters()->setNamedConstant(
+                    "colour", zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
+            }
             _setPass(mShadowDebugPass);
             renderShadowVolumeObjects(iShadowRenderables, mShadowDebugPass, &lightList, flags,
                 true, false, false);

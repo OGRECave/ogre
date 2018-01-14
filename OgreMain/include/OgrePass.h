@@ -1176,27 +1176,9 @@ namespace Ogre {
         /// Gets the resource group of the ultimate parent Material
         const String& getResourceGroup(void) const;
 
-        /** Sets the details of the vertex program to use.
-            @remarks
-            Only applicable to programmable passes, this sets the details of
-            the vertex program to use in this pass. The program will not be
-            loaded until the parent Material is loaded.
-            @param name The name of the program - this must have been
-            created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any vertex program in this pass is disabled.
-            @param resetParams
-            If true, this will create a fresh set of parameters from the
-            new program being linked, so if you had previously set parameters
-            you will have to set them again. If you set this to false, you must
-            be absolutely sure that the parameters match perfectly, and in the
-            case of named parameters refers to the indexes underlying them,
-            not just the names.
-        */
-        void setVertexProgram(const String& name, bool resetParams = true);
-
         const GpuProgramPtr getGpuProgram(GpuProgramType programType) const;
 
-        bool hasGpuProgram(GpuProgramType programType);
+        bool hasGpuProgram(GpuProgramType programType) const;
 
         /** Sets the vertex program parameters.
             @remarks
@@ -1205,8 +1187,6 @@ namespace Ogre {
             for setting high-level program parameters.
         */
         void setVertexProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the name of the vertex program used by this pass. */
-        const String& getVertexProgramName(void) const;
         /** Gets the vertex program parameters used by this pass. */
         GpuProgramParametersSharedPtr getVertexProgramParameters(void) const;
         /** Gets the vertex program used by this pass, only available after _load(). */
@@ -1382,14 +1362,14 @@ namespace Ogre {
             only available after _load(). */
         const GpuProgramPtr& getShadowReceiverFragmentProgram(void) const;
 
-        /** Sets the details of the fragment program to use.
+        /** Sets the details of the program to use.
             @remarks
             Only applicable to programmable passes, this sets the details of
-            the fragment program to use in this pass. The program will not be
+            the program to use in this pass. The program will not be
             loaded until the parent Material is loaded.
             @param name The name of the program - this must have been
             created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any fragment program in this pass is disabled.
+            is loaded. If this parameter is blank, any program of the type in this pass is disabled.
             @param resetParams
             If true, this will create a fresh set of parameters from the
             new program being linked, so if you had previously set parameters
@@ -1398,43 +1378,52 @@ namespace Ogre {
             case of named parameters refers to the indexes underlying them,
             not just the names.
         */
+        void setGpuProgram(GpuProgramType type, const GpuProgramPtr& prog, bool resetParams = true);
+        /// @overload
+        void setGpuProgram(GpuProgramType type, const String& name, bool resetParams = true);
+        /// @overload
         void setFragmentProgram(const String& name, bool resetParams = true);
+        /// @overload
+        void setGeometryProgram(const String& name, bool resetParams = true);
+        /// @overload
+        void setTessellationDomainProgram(const String& name, bool resetParams = true);
+        /// @overload
+        void setTessellationHullProgram(const String& name, bool resetParams = true);
+        /// @overload
+        void setVertexProgram(const String& name, bool resetParams = true);
+        /// @overload
+        void setComputeProgram(const String& name, bool resetParams = true);
+
+        /** Gets the name of the program used by this pass. */
+        const String& getGpuProgramName(GpuProgramType type) const;
+        /// @overload
+        const String& getFragmentProgramName(void) const { return getGpuProgramName(GPT_FRAGMENT_PROGRAM); }
+        /// @overload
+        const String& getGeometryProgramName(void) const { return getGpuProgramName(GPT_GEOMETRY_PROGRAM); }
+        /// @overload
+        const String& getTessellationDomainProgramName(void) const { return getGpuProgramName(GPT_DOMAIN_PROGRAM); }
+        /// @overload
+        const String& getTessellationHullProgramName(void) const { return getGpuProgramName(GPT_HULL_PROGRAM); }
+        /// @overload
+        const String& getVertexProgramName(void) const { return getGpuProgramName(GPT_VERTEX_PROGRAM); }
+        /// @overload
+        const String& getComputeProgramName(void) const { return getGpuProgramName(GPT_COMPUTE_PROGRAM); }
+
         /** Sets the fragment program parameters.
             @remarks
             Only applicable to programmable passes.
         */
         void setFragmentProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the name of the fragment program used by this pass. */
-        const String& getFragmentProgramName(void) const;
         /** Gets the fragment program parameters used by this pass. */
         GpuProgramParametersSharedPtr getFragmentProgramParameters(void) const;
         /** Gets the fragment program used by this pass, only available after _load(). */
         const GpuProgramPtr& getFragmentProgram(void) const;
 
-        /** Sets the details of the geometry program to use.
-            @remarks
-            Only applicable to programmable passes, this sets the details of
-            the geometry program to use in this pass. The program will not be
-            loaded until the parent Material is loaded.
-            @param name The name of the program - this must have been
-            created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any geometry program in this pass is disabled.
-            @param resetParams
-            If true, this will create a fresh set of parameters from the
-            new program being linked, so if you had previously set parameters
-            you will have to set them again. If you set this to false, you must
-            be absolutely sure that the parameters match perfectly, and in the
-            case of named parameters refers to the indexes underlying them,
-            not just the names.
-        */
-        void setGeometryProgram(const String& name, bool resetParams = true);
         /** Sets the geometry program parameters.
             @remarks
             Only applicable to programmable passes.
         */
         void setGeometryProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the name of the geometry program used by this pass. */
-        const String& getGeometryProgramName(void) const;
         /** Gets the geometry program parameters used by this pass. */
         GpuProgramParametersSharedPtr getGeometryProgramParameters(void) const;
         /** Gets the geometry program used by this pass, only available after _load(). */
@@ -1734,89 +1723,32 @@ namespace Ogre {
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
-        /// Support for shader model 5.0, hull and domain shaders
-        /** Sets the details of the tessellation control program to use.
-            @remarks
-            Only applicable to programmable passes, this sets the details of
-            the Tessellation Hull program to use in this pass. The program will not be
-            loaded until the parent Material is loaded.
-            @param name The name of the program - this must have been
-            created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any Tessellation Hull program in this pass is disabled.
-            @param resetParams
-            If true, this will create a fresh set of parameters from the
-            new program being linked, so if you had previously set parameters
-            you will have to set them again. If you set this to false, you must
-            be absolutely sure that the parameters match perfectly, and in the
-            case of named parameters refers to the indexes underlying them,
-            not just the names.
-        */
-        void setTessellationHullProgram(const String& name, bool resetParams = true);
+        // Support for shader model 5.0, hull and domain shaders
         /** Sets the Tessellation Hull program parameters.
             @remarks
             Only applicable to programmable passes.
         */
         void setTessellationHullProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the name of the Tessellation Hull program used by this pass. */
-        const String& getTessellationHullProgramName(void) const;
         /** Gets the Tessellation Hull program parameters used by this pass. */
         GpuProgramParametersSharedPtr getTessellationHullProgramParameters(void) const;
         /** Gets the Tessellation Hull program used by this pass, only available after _load(). */
         const GpuProgramPtr& getTessellationHullProgram(void) const;
 
-        /** Sets the details of the tessellation domain program to use.
-            @remarks
-            Only applicable to programmable passes, this sets the details of
-            the Tessellation domain program to use in this pass. The program will not be
-            loaded until the parent Material is loaded.
-            @param name The name of the program - this must have been
-            created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any Tessellation domain program in this pass is disabled.
-            @param resetParams
-            If true, this will create a fresh set of parameters from the
-            new program being linked, so if you had previously set parameters
-            you will have to set them again. If you set this to false, you must
-            be absolutely sure that the parameters match perfectly, and in the
-            case of named parameters refers to the indexes underlying them,
-            not just the names.
-        */
-        void setTessellationDomainProgram(const String& name, bool resetParams = true);
         /** Sets the Tessellation Domain program parameters.
             @remarks
             Only applicable to programmable passes.
         */
         void setTessellationDomainProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the name of the Domain Evaluation program used by this pass. */
-        const String& getTessellationDomainProgramName(void) const;
         /** Gets the Tessellation Domain program parameters used by this pass. */
         GpuProgramParametersSharedPtr getTessellationDomainProgramParameters(void) const;
         /** Gets the Tessellation Domain program used by this pass, only available after _load(). */
         const GpuProgramPtr& getTessellationDomainProgram(void) const;
 
-        /** Sets the details of the compute program to use.
-            @remarks
-            Only applicable to programmable passes, this sets the details of
-            the compute program to use in this pass. The program will not be
-            loaded until the parent Material is loaded.
-            @param name The name of the program - this must have been
-            created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any compute program in this pass is disabled.
-            @param resetParams
-            If true, this will create a fresh set of parameters from the
-            new program being linked, so if you had previously set parameters
-            you will have to set them again. If you set this to false, you must
-            be absolutely sure that the parameters match perfectly, and in the
-            case of named parameters refers to the indexes underlying them,
-            not just the names.
-        */
-        void setComputeProgram(const String& name, bool resetParams = true);
         /** Sets the Tessellation Evaluation program parameters.
             @remarks
             Only applicable to programmable passes.
         */
         void setComputeProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the name of the Tessellation Hull program used by this pass. */
-        const String& getComputeProgramName(void) const;
         /** Gets the Tessellation Hull program parameters used by this pass. */
         GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
         /** Gets the Tessellation EHull program used by this pass, only available after _load(). */
@@ -1824,6 +1756,8 @@ namespace Ogre {
         
      protected:
         const GpuProgramPtr& getProgram(GpuProgramUsage* const* gpuProgramUsage) const;
+        GpuProgramUsage*& getProgramUsage(GpuProgramType programType);
+        const GpuProgramUsage* getProgramUsage(GpuProgramType programType) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

@@ -79,6 +79,7 @@ class VisualTest : public OgreBites::Sample
     {
         Ogre::ResourceGroupManager::getSingleton().clearResourceGroup(TRANSIENT_RESOURCE_GROUP);
         Sample::unloadResources();
+        mAnimStateList.clear();
     }
 
     /** Returns whether or not a screenshot should be taken at the given frame */
