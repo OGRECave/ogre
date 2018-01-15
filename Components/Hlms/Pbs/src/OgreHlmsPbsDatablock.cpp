@@ -1246,8 +1246,8 @@ namespace Ogre
 
                     //DDS is the format that supports most of what we need.
                     String texName = finalName;
-                    if( texName.find( ".dds" ) != texName.size() - 4u )
-                        texName += ".dds";
+//                    if( texName.find( ".dds" ) != texName.size() - 4u )
+//                        texName += ".dds";
                     image.save( folderPath + "/" + texName + ".oitd" );
 
                     savedTextures.insert( finalName );

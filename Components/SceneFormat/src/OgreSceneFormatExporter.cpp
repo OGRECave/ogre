@@ -602,7 +602,7 @@ namespace Ogre
                 if( hlmsManager->getHlms( static_cast<HlmsTypes>( i ) ) )
                 {
                     const String materialPath = folderPath + "/material" +
-                                                StringConverter::toString( i ) + ".json";
+                                                StringConverter::toString( i ) + ".material.json";
                     hlmsManager->saveMaterials( static_cast<HlmsTypes>( i ), materialPath.c_str() );
                 }
             }

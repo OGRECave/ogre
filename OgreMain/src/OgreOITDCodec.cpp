@@ -282,6 +282,7 @@ namespace Ogre
                  header.textureType == TextureTypes::TypeCubeArray )
         {
             imgData->flags |= IF_CUBEMAP;
+            imgData->depth = 1u;
         }
 
         const size_t requiredBytes = PixelUtil::calculateSizeBytes( imgData->width,
