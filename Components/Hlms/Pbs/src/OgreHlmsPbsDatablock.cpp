@@ -1242,7 +1242,7 @@ namespace Ogre
                     const uint32 numSlices = i == PBSM_REFLECTION ? 6u : 1u;
 
                     Image image;
-                    texture->convertToImage( image, false, 0u, texLocation.xIdx, numSlices );
+                    texture->convertToImage( image, true, 0u, texLocation.xIdx, numSlices );
 
                     //DDS is the format that supports most of what we need.
                     String texName = finalName;
