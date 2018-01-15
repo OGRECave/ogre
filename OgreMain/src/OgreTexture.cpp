@@ -442,9 +442,12 @@ namespace Ogre {
 
         const uint32 startingWidth  = std::max( getWidth() >> mipmapBias, 1u );
         const uint32 startingHeight = std::max( getHeight() >> mipmapBias, 1u );
-        const uint32 startingDepth  = std::max( mTextureType == TEX_TYPE_CUBE_MAP ?
-                                                    getDepth() >> mipmapBias :
-                                                    getDepth(), 1u );
+        uint32 startingDepth = 1u;
+
+        if( mTextureType == TEX_TYPE_3D )
+            startingDepth = std::max( getDepth() >> mipmapBias, 1u );
+        else if( mTextureType == TEX_TYPE_2D_ARRAY )
+            startingDepth = getDepth();
 
         uint32 firstZ   = 0;
         uint32 numZ     = startingDepth;
