@@ -845,10 +845,14 @@ namespace v1 {
         mDevice.GetImmediateContext()->CopyResource( pStagingTexture, textureResource );
         //Create a mapped resource and map the staging texture to the resource
         D3D11_MAPPED_SUBRESOURCE mapped = {0};
-        mDevice.GetImmediateContext()->Map( pStagingTexture, 0, D3D11_MAP_READ , 0, &mapped );
+        mDevice.GetImmediateContext()->Map( pStagingTexture, mSubresourceIndex,
+                                            D3D11_MAP_READ, 0, &mapped );
         
         // read the data out of the texture.
-        PixelBox locked = D3D11Mappings::getPixelBoxWithMapping(dst.getWidth(), dst.getHeight(), dst.getDepth(), D3D11Mappings::_getPF(desc.Format), mapped);
+        PixelBox locked = D3D11Mappings::getPixelBoxWithMapping( dst.getWidth(), dst.getHeight(),
+                                                                 dst.getDepth(),
+                                                                 D3D11Mappings::_getPF(desc.Format),
+                                                                 mapped );
         PixelUtil::bulkPixelConversion(locked, dst);
 
         //Release the staging texture
