@@ -17,6 +17,7 @@
 if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	include(FindPkgMacros)
 	findpkg_begin(DirectX11)
+	set(USING_WINDOWS_SDK TRUE)
 
 	# Windows Phone
 	if(WINDOWS_PHONE)
@@ -45,14 +46,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 				get_filename_component(kit10_ver ${tmp_elem} NAME)
 				set(DirectX11_LIB_SEARCH_PATH "${kit10_dir}/Lib/${kit10_ver}/um")
 				find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "${tmp_elem}/um")
-				find_library(DirectX11_DXGUID_LIBRARY NAMES dxguid HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
-				find_library(DirectX11_DXGI_LIBRARY NAMES dxgi HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
-				find_library(DirectX11_D3D11_LIBRARY NAMES d3d11 HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
-				set(DirectX11_LIBRARY
-					${DirectX11_D3D11_LIBRARY}
-					${DirectX11_DXGI_LIBRARY}
-					${DirectX11_DXGUID_LIBRARY}
-				)
+				set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/10/Lib/10.*/um/${MSVC_CXX_ARCHITECTURE_ID}/"
 			endif()
 		endforeach()
 		# Windows 8.1 SDK
@@ -69,6 +63,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 
 	# Legacy Direct X SDK
 	if( NOT DirectX11_INCLUDE_DIR OR NOT DirectX11_LIBRARY )
+		set(USING_WINDOWS_SDK FALSE)
 		# Get path, convert backslashes as ${ENV_DXSDK_DIR}
 		getenv_path(DXSDK_DIR)
 		getenv_path(DIRECTX_HOME)
@@ -140,5 +135,12 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	endif () # Legacy Direct X SDK
 
 	findpkg_finish(DirectX11)
+	
+	if(DirectX11_FOUND AND USING_WINDOWS_SDK)
+		#if Dx11 is found at this point then we will be using the Windows SDK version. 
+		#In which case we should NOT include the full include path as that should be decided/set by the build environment
+		unset (DirectX11_INCLUDE_DIR CACHE)
+		unset (DirectX11_INCLUDE_DIRS CACHE)
+	endif()		
 	
 endif(WIN32)
