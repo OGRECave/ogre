@@ -79,7 +79,7 @@ void OSXGLSupport::addConfig( void )
 	optHiddenWindow.immutable = false;
 
     // FS setting possibilities
-	optVsync.name = "vsync";
+	optVsync.name = "VSync";
 	optVsync.possibleValues.push_back( "Yes" );
 	optVsync.possibleValues.push_back( "No" );
 	optVsync.currentValue = "Yes";
@@ -262,7 +262,7 @@ NameValuePairList OSXGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
         winOptions[ "hidden" ] = opt->second.currentValue;
     }
 
-    opt = mOptions.find( "vsync" );
+    opt = mOptions.find( "VSync" );
     if( opt != mOptions.end() )
     {
         winOptions[ "vsync" ] = opt->second.currentValue;
