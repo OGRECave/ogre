@@ -285,18 +285,21 @@ NameValuePairList OSXGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
     winOptions["stereoMode"] = opt->second.currentValue;
 #endif
 
-    winOptions["contextProfile"] = StringConverter::toString(int(mContextProfile));
-
     return winOptions;
 }
 
 RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, 
 	bool fullScreen, const NameValuePairList *miscParams )
 {
+    NameValuePairList params;
+    if(miscParams)
+        params = *miscParams;
+    params["contextProfile"] = StringConverter::toString(int(mContextProfile));
+
 	// Create the window, if Cocoa return a Cocoa window
     LogManager::getSingleton().logMessage("Creating a Cocoa Compatible Render System");
     CocoaWindow *window = OGRE_NEW CocoaWindow();
-    window->create(name, width, height, fullScreen, miscParams);
+    window->create(name, width, height, fullScreen, &params);
 
     return window;
 }
