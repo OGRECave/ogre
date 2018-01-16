@@ -120,11 +120,6 @@ namespace OgreBites {
 			rs->setConfigOption("RTT Preferred Mode", "FBO");
 			rs->setConfigOption("sRGB Gamma Conversion", "No");
 			rs->setConfigOption("Content Scaling Factor", "1.0");
-#ifdef __LP64__
-			rs->setConfigOption("macAPI", "cocoa");
-#else
-			rs->setConfigOption("macAPI", "carbon");
-#endif
             
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			rs->setConfigOption("Stereo Mode", "None");
@@ -172,11 +167,6 @@ namespace OgreBites {
                                  [NSArray arrayWithObjects:@"FBO", @"PBuffer", @"Copy", nil], @"RTT Preferred Mode",
                                  [NSArray arrayWithObjects:@"Yes", @"No", nil], @"sRGB Gamma Conversion",
                                  [NSArray arrayWithObjects:@"2.0", @"1.5", @"1.33", @"1.0", nil], @"Content Scaling Factor",
-#ifdef __LP64__
-                                 //[NSArray arrayWithObjects:@"cocoa", nil], @"macAPI", // single choice means no choice
-#else
-                                 [NSArray arrayWithObjects:@"cocoa", @"carbon", nil], @"macAPI",
-#endif
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
                                  [NSArray arrayWithObjects:@"None", @"Frame Sequential", nil], @"Stereo Mode",
 #endif

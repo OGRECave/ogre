@@ -56,7 +56,6 @@ void OSXGLSupport::addConfig( void )
 	ConfigOption optBitDepth;
 	ConfigOption optFSAA;
 	ConfigOption optRTTMode;
-    ConfigOption optMacAPI;
 	ConfigOption optHiddenWindow;
 	ConfigOption optVsync;
 	ConfigOption optSRGB;
@@ -122,12 +121,6 @@ void OSXGLSupport::addConfig( void )
 	optStereoMode.immutable = false;
 #endif
 
-    optMacAPI.name = "macAPI";
-    optMacAPI.possibleValues.push_back( "cocoa" );
-	optMacAPI.currentValue = "cocoa";
-    optMacAPI.immutable = false;
-
-    mOptions[ optMacAPI.name ] = optMacAPI;
     mOptions[ optFullScreen.name ] = optFullScreen;
 	mOptions[ optBitDepth.name ] = optBitDepth;
     mOptions[ optContentScalingFactor.name ] = optContentScalingFactor;
@@ -284,12 +277,6 @@ NameValuePairList OSXGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
     opt = mOptions.find( "sRGB Gamma Conversion" );
     if( opt != mOptions.end() )
         winOptions["gamma"] = opt->second.currentValue;
-
-    opt = mOptions.find( "macAPI" );
-    if( opt != mOptions.end() )
-    {
-        winOptions[ "macAPI" ] = opt->second.currentValue;
-    }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
     opt = mOptions.find("Stereo Mode");
