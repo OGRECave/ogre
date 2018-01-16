@@ -8,6 +8,7 @@
 #extension GL_OES_standard_derivatives : enable
 #extension GL_EXT_shader_texture_lod: enable
 #define textureCubeLod textureLodEXT
+precision highp float;
 #endif
 // The MIT License
 // Copyright (c) 2016-2017 Mohamad Moneimne and Contributors
@@ -24,8 +25,6 @@
 //     https://github.com/KhronosGroup/glTF-WebGL-PBR/#environment-maps
 // [4] "An Inexpensive BRDF Model for Physically based Rendering" by Christophe Schlick
 //     https://www.cs.virginia.edu/~jdl/bib/appearance/analytic%20models/schlick94b.pdf
-
-precision highp float;
 
 uniform vec3 u_LightDirection;
 uniform vec3 u_LightColor;
