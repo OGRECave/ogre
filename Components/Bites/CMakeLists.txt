@@ -86,6 +86,7 @@ elseif(APPLE)
   set(DEPENDENCIES ${DEPENDENCIES} "-framework Cocoa")
 elseif(UNIX)
   list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLXConfigDialog.cpp")
+  list(APPEND DEPENDENCIES ${X11_Xt_LIB} ${XAW_LIBRARY})
   install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/GLX_backdrop.png" DESTINATION "share/OGRE/")
 endif()
 
