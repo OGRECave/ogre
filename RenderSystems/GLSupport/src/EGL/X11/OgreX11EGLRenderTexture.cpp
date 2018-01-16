@@ -28,8 +28,6 @@ THE SOFTWARE.
 */
 
 #if 0
-#include "OgreStableHeaders.h"
-
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"

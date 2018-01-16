@@ -26,9 +26,7 @@
  -----------------------------------------------------------------------------
  */
 
-#include "OgreStableHeaders.h"
 #include "OgreGLUniformCache.h"
-#include "OgreCommon.h"
 
 namespace Ogre {
 

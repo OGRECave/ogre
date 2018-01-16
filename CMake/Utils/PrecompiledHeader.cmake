@@ -61,4 +61,9 @@ macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
     #include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/__precomp_header.dir/hacked")
 
   endif ()
+
+  if(OGRE_BUILD_LIBS_AS_FRAMEWORKS)
+    set_target_properties(${TARGET} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+    set_target_properties(${TARGET} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${HEADER_FILE}")
+  endif()
 endmacro(use_precompiled_header)

@@ -143,7 +143,7 @@ endif()
 
 # Configure threading files
 file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
-include_directories("include/Threading")
+include_directories("include/Threading" "src/")
 
 if (OGRE_THREAD_PROVIDER EQUAL 0)
 	list(APPEND THREAD_HEADER_FILES
@@ -342,7 +342,7 @@ endif ()
 
 # specify a precompiled header to use
 use_precompiled_header(OgreMain 
-  "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreStableHeaders.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePrecompiledHeaders.cpp"
 )
 
