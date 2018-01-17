@@ -55,8 +55,7 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
 # Add platform specific files
 if (EMSCRIPTEN)
   list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
-
-  include_directories(include/Emscripten)
+  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten")
 
   file(GLOB PLATFORM_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten/*.h)
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Emscripten/*.cpp"
@@ -65,9 +64,10 @@ if (EMSCRIPTEN)
   set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (WIN32)
   list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
+  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/WIN32")
+  set(PLATFORM_HEADER_INSTALL "WIN32")
 
   if (WINDOWS_STORE OR WINDOWS_PHONE)
-    include_directories("include/WIN32")
     set(PLATFORM_HEADERS
       include/WIN32/OgreTimerImp.h
     )
@@ -75,11 +75,8 @@ elseif (WIN32)
       src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
-    )  
-
-    set(PLATFORM_HEADER_INSTALL "WIN32")
+    )
   else ()
-    include_directories("include/WIN32")
     set(PLATFORM_HEADERS
       include/WIN32/OgreTimerImp.h
       include/WIN32/OgreMinGWSupport.h
@@ -91,12 +88,12 @@ elseif (WIN32)
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
     )  
-    set(PLATFORM_HEADER_INSTALL "WIN32")
+
   endif ()
 
 elseif (APPLE)
   if (APPLE_IOS)
-    include_directories("include/iOS")
+    set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS")
     file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS/*.h")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.mm"
@@ -105,7 +102,7 @@ elseif (APPLE)
     set(PLATFORM_LIBS "")
     set(PLATFORM_HEADER_INSTALL "iOS")
   else ()
-    include_directories("include/OSX")
+    set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX")
     file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX/*.h")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm"
@@ -124,7 +121,8 @@ elseif(ANDROID)
 
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
-  include_directories(include/GLX ${X11_INCLUDE_DIR})
+  include_directories(${X11_INCLUDE_DIR})
+  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/GLX")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
 
@@ -141,6 +139,7 @@ if(NOT WIN32)
     list(APPEND PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp")
 endif()
 
+include_directories("${ZLIB_INCLUDE_DIRS}" "${ZZip_INCLUDE_DIRS}")
 # Configure threading files
 file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
 include_directories("include/Threading" "src/")
@@ -154,6 +153,9 @@ if (OGRE_THREAD_PROVIDER EQUAL 0)
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 1)
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+
 	list(APPEND THREAD_HEADER_FILES
 		include/Threading/OgreThreadDefinesBoost.h
 		include/Threading/OgreThreadHeadersBoost.h
@@ -269,6 +271,8 @@ generate_export_header(OgreMain
     NO_EXPORT_MACRO_NAME _OgrePrivate
     DEPRECATED_MACRO_NAME OGRE_DEPRECATED
     EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreExports.h)
+
+target_include_directories(OgreMain PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${OGRE_BINARY_DIR}/include" ${PLATFORM_INCLUDE})
 
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
 if(WIN32 AND MSVC10 AND CMAKE_CL_64)

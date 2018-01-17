@@ -92,7 +92,6 @@ endif()
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 ogre_add_component_include_dir(Overlay)
 
 # setup target
