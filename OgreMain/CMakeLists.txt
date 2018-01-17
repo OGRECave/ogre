@@ -125,13 +125,10 @@ elseif(ANDROID)
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
-
-  file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/GLX/*.h")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
 
-  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread)
-  set(PLATFORM_HEADER_INSTALL "GLX")
+  set(PLATFORM_LIBS ${X11_LIBRARIES} pthread)
   # some platforms require explicit linking to libdl, see if it's available
   find_library(DL_LIBRARY NAMES dl dlsym)
   mark_as_advanced(DL_LIBRARY)
@@ -253,14 +250,6 @@ if (OGRE_CONFIG_ENABLE_ZIP)
 
   list(APPEND LIBRARIES "${ZZip_LIBRARIES}")
   list(APPEND LIBRARIES "${ZLIB_LIBRARIES}")
-endif ()
-
-if (OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
-  list(APPEND LIBRARIES "${GLSL_Optimizer_LIBRARIES}")
-endif ()
-
-if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
-  list(APPEND LIBRARIES "${HLSL2GLSL_LIBRARIES}")
 endif ()
 
 set (TARGET_LINK_FLAGS "")

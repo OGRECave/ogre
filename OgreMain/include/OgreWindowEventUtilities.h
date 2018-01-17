@@ -41,8 +41,6 @@ THE SOFTWARE.
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #  include <windows.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !defined(__LP64__)
-#  include <Carbon/Carbon.h>
 #endif
 
 
@@ -172,9 +170,6 @@ namespace Ogre
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         //! Internal winProc (RenderWindow's use this when creating the Win32 Window)
         static LRESULT CALLBACK _WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !defined __OBJC__ && !defined(__LP64__)
-        //! Internal UPP Window Handler (RenderWindow's use this when creating the OS X Carbon Window
-        static OSStatus _CarbonWindowHandler(EventHandlerCallRef nextHandler, EventRef event, void* wnd);
 #endif
 
         //These are public only so GLXProc can access them without adding Xlib headers header

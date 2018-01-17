@@ -55,36 +55,21 @@ static GL3WglProc get_proc(const char *proc)
 		res = (GL3WglProc)GetProcAddress(libgl, proc);
 	return res;
 }
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#include <Carbon/Carbon.h>
-
-CFBundleRef bundle;
-CFURLRef bundleURL;
-
+#elif defined(__APPLE__)
+#include <dlfcn.h>
+static void *libgl;
 static void open_libgl(void)
 {
-	bundleURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-		CFSTR("/System/Library/Frameworks/OpenGL.framework"),
-		kCFURLPOSIXPathStyle, true);
-
-	bundle = CFBundleCreate(kCFAllocatorDefault, bundleURL);
-	assert(bundle != NULL);
+	libgl = dlopen("/System/Library/Frameworks/OpenGL.framework/OpenGL", RTLD_LAZY | RTLD_LOCAL);
 }
-
 static void close_libgl(void)
 {
-	CFRelease(bundle);
-	CFRelease(bundleURL);
+	dlclose(libgl);
 }
-
 static GL3WglProc get_proc(const char *proc)
 {
 	GL3WglProc res;
-
-	CFStringRef procname = CFStringCreateWithCString(kCFAllocatorDefault, proc,
-		kCFStringEncodingASCII);
-	*(void **)(&res) = CFBundleGetFunctionPointerForName(bundle, procname);
-	CFRelease(procname);
+	*(void **)(&res) = dlsym(libgl, proc);
 	return res;
 }
 #else

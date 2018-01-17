@@ -80,22 +80,6 @@ void WindowEventUtilities::messagePump()
         GLXProc(*win, event);
         }
     }
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !defined __OBJC__ && !defined __LP64__
-    // OSX Message Pump
-    EventRef event = NULL;
-    EventTargetRef targetWindow;
-    targetWindow = GetEventDispatcherTarget();
-    
-    // If we are unable to get the target then we no longer care about events.
-    if( !targetWindow ) return;
-    
-    // Grab the next event, process it if it is a window event
-    while( ReceiveNextEvent( 0, NULL, kEventDurationNoWait, true, &event ) == noErr )
-    {
-        // Dispatch the event
-        SendEventToEventTarget( event, targetWindow );
-        ReleaseEvent( event );
-    }
 #endif
 }
 
@@ -361,93 +345,5 @@ void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
     default:
         break;
     } //End switch event.type
-}
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !defined __OBJC__ && !defined __LP64__
-//--------------------------------------------------------------------------------//
-namespace Ogre {
-OSStatus WindowEventUtilities::_CarbonWindowHandler(EventHandlerCallRef nextHandler, EventRef event, void* wnd)
-{
-    OSStatus status = noErr;
-
-    // Only events from our window should make it here
-    // This ensures that our user data is our WindowRef
-    RenderWindow* curWindow = (RenderWindow*)wnd;
-    if(!curWindow) return eventNotHandledErr;
-    
-    //Iterator of all listeners registered to this RenderWindow
-    WindowEventListeners::iterator index,
-        start = _msListeners.lower_bound(curWindow),
-        end = _msListeners.upper_bound(curWindow);
-    
-    // We only get called if a window event happens
-    UInt32 eventKind = GetEventKind( event );
-
-    switch( eventKind )
-    {
-        case kEventWindowActivated:
-            curWindow->setActive( true );
-            for( ; start != end; ++start )
-                (start->second)->windowFocusChange(curWindow);
-            break;
-        case kEventWindowDeactivated:
-            if( curWindow->isDeactivatedOnFocusChange() )
-            {
-                curWindow->setActive( false );
-            }
-
-            for( ; start != end; ++start )
-                (start->second)->windowFocusChange(curWindow);
-
-            break;
-        case kEventWindowShown:
-        case kEventWindowExpanded:
-            curWindow->setActive( true );
-            curWindow->setVisible( true );
-            for( ; start != end; ++start )
-                (start->second)->windowFocusChange(curWindow);
-            break;
-        case kEventWindowHidden:
-        case kEventWindowCollapsed:
-            curWindow->setActive( false );
-            curWindow->setVisible( false );
-            for( ; start != end; ++start )
-                (start->second)->windowFocusChange(curWindow);
-            break;            
-        case kEventWindowDragCompleted:
-            curWindow->windowMovedOrResized();
-            for( ; start != end; ++start )
-                (start->second)->windowMoved(curWindow);
-            break;
-        case kEventWindowBoundsChanged:
-            curWindow->windowMovedOrResized();
-            for( ; start != end; ++start )
-                (start->second)->windowResized(curWindow);
-            break;
-        case kEventWindowClose:
-        {
-            bool close = true;
-            for( ; start != end; ++start )
-            {
-                if (!(start->second)->windowClosing(curWindow))
-                    close = false;
-            }
-            if (close)
-                // This will cause event handling to continue on to the standard handler, which calls
-                // DisposeWindow(), which leads to the 'kEventWindowClosed' event
-                status = eventNotHandledErr;
-            break;
-        }
-        case kEventWindowClosed:
-            curWindow->destroy();
-            for( ; start != end; ++start )
-                (start->second)->windowClosed(curWindow);
-            break;
-        default:
-            status = eventNotHandledErr;
-            break;
-    }
-    
-    return status;
-}
 }
 #endif

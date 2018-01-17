@@ -25,7 +25,6 @@ Ogre::SceneManager *mSceneMgr;
 	
 	// Build the param list for a embedded cocoa window...
 	NameValuePairList misc;
-	misc["macAPI"] = "cocoa";
 	misc["externalWindowHandle"] = StringConverter::toString((size_t)ogreView);
 	
 	// Create the window and load the params

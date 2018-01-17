@@ -449,11 +449,6 @@ namespace OgreBites
 
                 mRoot->saveConfig();
                 shutdown();
-                if (mRoot)
-                {
-                    OGRE_DELETE mOverlaySystem;
-                    OGRE_DELETE mRoot;
-                }
 #endif
             }
         }
