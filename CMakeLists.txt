@@ -197,18 +197,10 @@ else()
 endif()
 
 # Add OgreMain include path
-include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
-include_directories("${OGRE_BINARY_DIR}/include")
-if (APPLE)
-  if (APPLE_IOS)
-    include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iOS")
-
-    # Set static early for proper dependency detection
-    set(OGRE_STATIC TRUE)
-  else ()
-    include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/OSX")
-  endif ()
-endif (APPLE)
+if (APPLE_IOS)
+  # Set static early for proper dependency detection
+  set(OGRE_STATIC TRUE)
+endif()
 
 # definitions for samples
 set(OGRE_LIBRARIES OgreMain)
@@ -234,8 +226,6 @@ endif(WIN32 OR APPLE)
 
 # Set up iOS overrides.
 if (APPLE_IOS)
-  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iOS")
-
   set(CMAKE_EXE_LINKER_FLAGS "-framework OpenGLES -framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
   set(XCODE_ATTRIBUTE_LLVM_VECTORIZE_LOOPS "YES")

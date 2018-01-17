@@ -141,6 +141,7 @@ if(NOT WIN32)
     list(APPEND PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp")
 endif()
 
+include_directories("${ZLIB_INCLUDE_DIRS}" "${ZZip_INCLUDE_DIRS}")
 # Configure threading files
 file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
 include_directories("include/Threading" "src/")
@@ -154,6 +155,9 @@ if (OGRE_THREAD_PROVIDER EQUAL 0)
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 1)
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+
 	list(APPEND THREAD_HEADER_FILES
 		include/Threading/OgreThreadDefinesBoost.h
 		include/Threading/OgreThreadHeadersBoost.h
@@ -269,6 +273,8 @@ generate_export_header(OgreMain
     NO_EXPORT_MACRO_NAME _OgrePrivate
     DEPRECATED_MACRO_NAME OGRE_DEPRECATED
     EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreExports.h)
+
+target_include_directories(OgreMain PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${OGRE_BINARY_DIR}/include")
 
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
 if(WIN32 AND MSVC10 AND CMAKE_CL_64)

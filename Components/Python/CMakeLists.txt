@@ -1,12 +1,13 @@
 project(OgrePython)
 
 find_package(SWIG)
-include_directories(${PYTHON_INCLUDE_PATH})
 
 if(NOT PYTHONLIBS_FOUND OR NOT SWIG_FOUND)
     return()
 endif()
 
+include_directories(${PYTHON_INCLUDE_PATH})
+include_directories("${OGRE_BINARY_DIR}/include" "${OGRE_SOURCE_DIR}/OgreMain/include")
 include(${SWIG_USE_FILE})
 
 set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/)
