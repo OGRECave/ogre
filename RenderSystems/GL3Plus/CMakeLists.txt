@@ -32,6 +32,8 @@ if(NOT APPLE)
   )
 endif()
 
+add_definitions(${OGRE_VISIBILITY_FLAGS})
+
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGL3PlusStateCacheManager.cpp 
     PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)

@@ -66,16 +66,12 @@ if(NOT APPLE)
 endif()
 
 add_definitions(-DGLEW_STATIC -DYY_NEVER_INTERACTIVE)
+add_definitions(-DOGRE_GLPLUGIN_EXPORTS ${OGRE_VISIBILITY_FLAGS})
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
 ogre_add_library_to_folder(RenderSystems RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_GL OgreMain ${GLSUPPORT_LIBS} ${OPENGL_LIBRARIES})
 
-if (NOT OGRE_STATIC)
-  set_target_properties(RenderSystem_GL PROPERTIES
-    COMPILE_DEFINITIONS OGRE_GLPLUGIN_EXPORTS
-  )
-endif ()
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_GL ${OGRE_THREAD_LIBRARIES})
 endif ()

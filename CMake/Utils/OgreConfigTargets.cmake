@@ -179,8 +179,6 @@ function(ogre_config_common TARGETNAME)
 
   if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-    # add GCC visibility flags to shared library build
-    set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "${OGRE_VISIBILITY_FLAGS}")
   endif()
 
   ogre_create_vcproj_userfile(${TARGETNAME})
@@ -399,6 +397,11 @@ function(ogre_config_sample_lib SAMPLENAME)
       )
     endif()
   endif(APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
+
+  if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+    # add GCC visibility flags to shared library build
+    set_target_properties(${SAMPLENAME} PROPERTIES COMPILE_FLAGS "${OGRE_VISIBILITY_FLAGS}")
+  endif()
 
   # Add sample to the list of link targets
   # Global property so that we can build this up across entire sample tree
