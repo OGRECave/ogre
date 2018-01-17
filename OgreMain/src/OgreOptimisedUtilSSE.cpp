@@ -26,13 +26,10 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-
 #include "OgreOptimisedUtil.h"
-#include "OgrePlatformInformation.h"
+
 
 #if __OGRE_HAVE_SSE
-
-#include "OgreMatrix4.h"
 
 // Should keep this includes at latest to avoid potential "xmmintrin.h" included by
 // other header file on some platform for some reason.

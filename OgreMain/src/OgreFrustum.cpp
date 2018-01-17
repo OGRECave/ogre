@@ -26,18 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreFrustum.h"
-
-#include "OgreMath.h"
-#include "OgreMatrix3.h"
-#include "OgreSphere.h"
-#include "OgreException.h"
-#include "OgreRoot.h"
-#include "OgreCamera.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreMaterialManager.h"
-#include "OgreRenderSystem.h"
 #include "OgreMovablePlane.h"
 
 namespace Ogre {

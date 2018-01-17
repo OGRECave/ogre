@@ -28,10 +28,6 @@ THE SOFTWARE.
 #ifndef __PixelFormatDescriptions_H__
 #define __PixelFormatDescriptions_H__
 
-#include "OgrePrerequisites.h"
-#include "OgreCommon.h"
-#include "OgreHeaderPrefix.h"
-
 namespace Ogre {
     //-----------------------------------------------------------------------
     /**
@@ -1538,7 +1534,5 @@ namespace Ogre {
     /** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

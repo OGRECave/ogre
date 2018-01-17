@@ -26,19 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreNode.h"
-
-#include "OgreException.h"
-#include "OgreMath.h"
-
-// Dependencies on render-related types due to ability to render node
-#include "OgreMaterialManager.h"
-#include "OgreMeshManager.h"
-#include "OgreSubMesh.h"
-#include "OgreCamera.h"
-#include "OgreTechnique.h"
 #include "OgreManualObject.h"
-#include "OgreMesh.h"
 
 namespace Ogre {
 

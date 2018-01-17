@@ -27,12 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreImage.h"
-#include "OgreException.h"
 #include "OgreImageCodec.h"
-#include "OgreColourValue.h"
-#include "OgreMath.h"
 #include "OgreImageResampler.h"
-#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
     ImageCodec::~ImageCodec() {

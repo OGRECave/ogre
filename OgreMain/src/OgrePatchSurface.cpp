@@ -26,9 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-
 #include "OgrePatchSurface.h"
-#include "OgreException.h"
 
 #define LEVEL_WIDTH(lvl) ((1 << (lvl+1)) + 1)
 

@@ -28,9 +28,6 @@ THE SOFTWARE.
 #ifndef __SIMDHelper_H__
 #define __SIMDHelper_H__
 
-#include "OgrePrerequisites.h"
-#include "OgrePlatformInformation.h"
-
 // Stack-alignment hackery.
 //
 // If macro __OGRE_SIMD_ALIGN_STACK defined, means there requests

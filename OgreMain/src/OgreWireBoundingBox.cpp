@@ -26,12 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreWireBoundingBox.h"
-
-#include "OgreSimpleRenderable.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreCamera.h"
-#include "OgreMaterialManager.h"
 
 namespace Ogre {
     #define POSITION_BINDING 0

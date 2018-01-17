@@ -28,11 +28,6 @@ THE SOFTWARE.
 // Ogre includes
 #include "OgreStableHeaders.h"
 
-#include "OgreResource.h"
-#include "OgreResourceManager.h"
-#include "OgreLogManager.h"
-#include "OgreException.h"
-
 namespace Ogre 
 {
     //-----------------------------------------------------------------------

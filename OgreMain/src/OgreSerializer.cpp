@@ -27,14 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreSerializer.h"
-#include "OgreBitwise.h"
-#include "OgreLogManager.h"
-#include "OgreException.h"
-#include "OgreVector3.h"
-#include "OgreQuaternion.h"
-
-
 namespace Ogre {
 
     const uint16 HEADER_STREAM_ID = 0x1000;

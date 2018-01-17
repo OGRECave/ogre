@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
-#include "OgreException.h"
 
 namespace {
     using Ogre::String;

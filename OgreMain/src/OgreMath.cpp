@@ -27,16 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreMath.h"
-#include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
-#include "OgreRay.h"
-#include "OgreSphere.h"
-#include "OgreAxisAlignedBox.h"
-#include "OgrePlane.h"
-
-
 namespace Ogre
 {
 

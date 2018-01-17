@@ -29,8 +29,6 @@ THE SOFTWARE.
 
 #include "OgreDynLib.h"
 
-#include "OgreException.h"
-#include "OgreLogManager.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #  define WIN32_LEAN_AND_MEAN

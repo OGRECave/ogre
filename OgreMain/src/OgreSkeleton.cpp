@@ -26,11 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreSkeleton.h"
-#include "OgreBone.h"
 #include "OgreAnimationState.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
 #include "OgreSkeletonManager.h"
 #include "OgreSkeletonSerializer.h"
 // Just for logging

@@ -29,10 +29,8 @@ THE SOFTWARE.
 #ifndef __SCRIPTPARSER_H_
 #define __SCRIPTPARSER_H_
 
-#include "OgrePrerequisites.h"
-#include "OgreScriptCompiler.h"
 #include "OgreScriptLexer.h"
-#include "OgreHeaderPrefix.h"
+#include "OgreScriptCompiler.h"
 
 namespace Ogre {
 
@@ -56,7 +54,5 @@ namespace Ogre {
     /** @} */
     /** @} */
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

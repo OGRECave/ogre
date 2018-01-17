@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgrePose.h"
-#include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
     //---------------------------------------------------------------------

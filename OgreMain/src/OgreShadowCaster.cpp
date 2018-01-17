@@ -29,9 +29,6 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreOptimisedUtil.h"
-#include "OgreLogManager.h"
-#include "OgreRoot.h"
-#include "OgreSceneManager.h"
 
 namespace Ogre {
     const LightList& ShadowRenderable::getLights(void) const 

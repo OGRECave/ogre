@@ -32,15 +32,9 @@ THE SOFTWARE.
 //  being aware of the 3D API. However there are a few
 //  simple functions which can have a base implementation
 
-#include "OgreRenderSystem.h"
-
-#include "OgreException.h"
 #include "OgreRenderTarget.h"
 #include "OgreDepthBuffer.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreLogManager.h"
-#include "OgreTextureManager.h"
-#include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM

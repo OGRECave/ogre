@@ -28,8 +28,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgrePolygon.h"
-#include "OgreException.h"
-#include "OgreVector3.h"
 
 namespace Ogre
 {

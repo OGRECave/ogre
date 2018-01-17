@@ -29,16 +29,8 @@ THE SOFTWARE.
 
 #include "OgreAutoParamDataSource.h"
 #include "OgreRenderable.h"
-#include "OgreCamera.h"
 #include "OgreRenderTarget.h"
 #include "OgreControllerManager.h"
-#include "OgreMath.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreMatrix4.h"
-#include "OgreVector4.h"
-#include "OgreColourValue.h"
-#include "OgreSceneNode.h"
 #include "OgreViewport.h"
 
 namespace Ogre {

@@ -28,9 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRectangle2D.h"
 
-#include "OgreHardwareBufferManager.h"
-#include "OgreMaterialManager.h"
-
 namespace Ogre {
 #define POSITION_BINDING 0
 #define NORMAL_BINDING 1

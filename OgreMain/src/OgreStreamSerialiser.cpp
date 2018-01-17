@@ -27,21 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreCommon.h"
 #include "OgreStreamSerialiser.h"
-#include "OgreBitwise.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
-#include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
-#include "OgreMatrix3.h"
-#include "OgreMatrix4.h"
-#include "OgreQuaternion.h"
-#include "OgreAxisAlignedBox.h"
-#include "OgreNode.h"
-#include "OgreRay.h"
-#include "OgreSphere.h"
 #include "OgreDeflate.h"
 
 namespace Ogre

@@ -28,21 +28,10 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreStaticGeometry.h"
 #include "OgreEntity.h"
-#include "OgreSubEntity.h"
-#include "OgreSceneNode.h"
-#include "OgreException.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
-#include "OgreLogManager.h"
-#include "OgreSceneManager.h"
-#include "OgreCamera.h"
-#include "OgreMaterialManager.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 #include "OgreEdgeListBuilder.h"
-#include "OgreTechnique.h"
 #include "OgreLodStrategy.h"
 #include "OgreIteratorWrappers.h"
+#include "OgreSubEntity.h"
 
 namespace Ogre {
 

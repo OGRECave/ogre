@@ -27,12 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreViewport.h"
-
-#include "OgreLogManager.h"
-#include "OgreCamera.h"
-#include "OgreRoot.h"
-#include "OgreMaterialManager.h"
-#include "OgreRenderSystem.h"
 #include "OgreRenderTarget.h"
 #include <iomanip>
 

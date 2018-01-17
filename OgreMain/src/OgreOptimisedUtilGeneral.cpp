@@ -29,9 +29,6 @@ THE SOFTWARE.
 
 #include "OgreOptimisedUtil.h"
 
-#include "OgreVector3.h"
-#include "OgreMatrix4.h"
-
 namespace Ogre {
 
 //-------------------------------------------------------------------------

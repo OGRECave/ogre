@@ -28,9 +28,6 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgrePrefabFactory.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
 
 namespace Ogre {
     //---------------------------------------------------------------------

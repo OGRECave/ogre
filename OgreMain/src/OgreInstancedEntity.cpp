@@ -31,8 +31,6 @@ THE SOFTWARE.
 #include "OgreSkeletonInstance.h"
 #include "OgreAnimationState.h"
 #include "OgreOptimisedUtil.h"
-#include "OgreCamera.h"
-#include "OgreException.h"
 #include "OgreNameGenerator.h"
 
 namespace Ogre

@@ -26,15 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-
 #include "OgreOptimisedUtil.h"
 
-#include "OgrePlatformInformation.h"
-
 //#define __DO_PROFILE__
-#ifdef __DO_PROFILE__
-#include "OgreRoot.h"
-#endif
 
 namespace Ogre {
 

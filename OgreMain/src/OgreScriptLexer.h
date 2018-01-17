@@ -29,9 +29,6 @@ THE SOFTWARE.
 #ifndef __ScriptLexer_H_
 #define __ScriptLexer_H_
 
-#include "OgrePrerequisites.h"
-#include "OgreHeaderPrefix.h"
-
 namespace Ogre {
 
     /** \addtogroup Core
@@ -86,7 +83,5 @@ namespace Ogre {
     /** @} */
     /** @} */
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

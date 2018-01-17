@@ -9,9 +9,6 @@
 
 #include "OgreStableHeaders.h"
 
-#include "OgrePlatform.h"
-#include "OgreMurmurHash3.h"
-
 //-----------------------------------------------------------------------------
 // Platform-specific functions and macros
 
