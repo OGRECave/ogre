@@ -137,10 +137,6 @@ if (MSVC)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
   endif()
 
-  if (OGRE_UNITY_BUILD)
-    # object files can get large with Unity builds
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-  endif ()
   if (MSVC_VERSION GREATER 1500 OR MSVC_VERSION EQUAL 1500)
     option(OGRE_BUILD_MSVC_MP "Enable build with multiple processes in Visual Studio" TRUE)
   else()
@@ -402,12 +398,6 @@ endif ()
 if (MSVC)
 	option(OGRE_PROJECT_FOLDERS "Organize project into project folders." TRUE)
 endif ()
-
-# Unity build options
-# A Unity build includes all sources files in just a few actual compilation units
-# to potentially speed up the compilation.
-option(OGRE_UNITY_BUILD "Enable unity build for Ogre." FALSE)
-set(OGRE_UNITY_FILES_PER_UNIT "50" CACHE STRING "Number of files per compilation unit in Unity build.")
 
 # hide advanced options
 mark_as_advanced(

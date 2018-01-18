@@ -183,7 +183,7 @@ Run CMake, specify source and binaries folders, than "Configure", select
 option, specify Operating System = "WindowsStore" or "WindowsPhone",
 Version = "8.0", "8.1" or for UAP Operating System = "WindowsStore", Version = "10.0.10240.0", "10.0.10586.0" then "Finish", specify WinRT dependencies folder
 for OGRE_DEPENDENCIES_DIR, "Configure", should be no more errors, then press
-"Generate". If you want build time to be shorter - set OGRE_UNITY_BUILD to on.
+"Generate".
 
 Select SampleBrowser as the start up project and run.
 
