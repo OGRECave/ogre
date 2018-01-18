@@ -34,6 +34,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     class LwString;
+    class InstantRadiosity;
 
     /** \addtogroup Component
     *  @{
@@ -47,6 +48,7 @@ namespace Ogre
     class _OgreSceneFormatExport SceneFormatExporter : public SceneFormatBase
     {
     protected:
+        InstantRadiosity        *mInstantRadiosity;
         String                  mCurrentExportFolder;
 
         typedef map<Node*, uint32>::type NodeToIdxMap;
@@ -66,6 +68,7 @@ namespace Ogre
         static void encodeVector( LwString &jsonStr, const Vector4 &value );
         static void encodeQuaternion( LwString &jsonStr, const Quaternion &value );
         static void encodeColour( LwString &jsonStr, const ColourValue &value );
+        static void encodeAabb( LwString &jsonStr, const Aabb &aabb );
 
         static inline void flushLwString( LwString &jsonStr, String &outJson );
 
@@ -76,7 +79,8 @@ namespace Ogre
         void exportItem( LwString &jsonStr, String &outJson, Item *item, bool exportMesh );
         void exportLight( LwString &jsonStr, String &outJson, Light *light );
         void exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity, bool exportMesh );
-        void exportSceneSettings( LwString &jsonStr, String &outJson );
+        void exportInstantRadiosity( LwString &jsonStr, String &outJson );
+        void exportSceneSettings( LwString &jsonStr, String &outJson, uint32 exportFlags );
 
         /**
         @param outJson
@@ -88,7 +92,8 @@ namespace Ogre
         void _exportScene( String &outJson, uint32 exportFlags=~0u );
 
     public:
-        SceneFormatExporter( Root *root, SceneManager *sceneManager );
+        SceneFormatExporter( Root *root, SceneManager *sceneManager,
+                             InstantRadiosity *instantRadiosity );
         ~SceneFormatExporter();
 
         /**

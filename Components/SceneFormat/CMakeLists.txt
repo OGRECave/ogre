@@ -21,6 +21,9 @@ file(
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+include_directories(${CMAKE_SOURCE_DIR}/Components/Hlms/Common/include)
+ogre_add_component_include_dir(Hlms/Pbs)
+
 add_definitions( -DOgreSceneFormat_EXPORTS )
 
 ogre_add_library(OgreSceneFormat ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})

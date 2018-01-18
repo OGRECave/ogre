@@ -45,16 +45,17 @@ namespace Ogre
     {
         enum SceneFlags
         {
-            SceneNodes  = 1u << 0u,
-            Items       = 1u << 1u,
-            Entities    = 1u << 2u,
-            Lights      = 1u << 3u,
-            Cameras     = 1u << 4u,
-            Materials   = 1u << 5u,
-            Textures    = 1u << 6u,
-            Meshes      = 1u << 7u,
-            MeshesV1    = 1u << 8u,
-            SceneSettings=1u << 9u,
+            SceneNodes          = 1u << 0u,
+            Items               = 1u << 1u,
+            Entities            = 1u << 2u,
+            Lights              = 1u << 3u,
+            Cameras             = 1u << 4u,
+            Materials           = 1u << 5u,
+            Textures            = 1u << 6u,
+            Meshes              = 1u << 7u,
+            MeshesV1            = 1u << 8u,
+            SceneSettings       = 1u << 9u,
+            InstantRadiosity    = 1u << 10u,
         };
     }
 
