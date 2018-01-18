@@ -38,6 +38,7 @@ namespace Ogre
 
     class HlmsPbsTerraShadows : public HlmsListener
     {
+    protected:
         Terra                   *mTerra;
         HlmsSamplerblock const  *mTerraSamplerblock;
 #if OGRE_DEBUG_MODE
