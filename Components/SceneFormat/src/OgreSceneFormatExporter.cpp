@@ -421,8 +421,9 @@ namespace Ogre
         if( !mInstantRadiosity )
             return;
 
-        jsonStr.a( ",\n\t\t\"instant_radiosity\" :\n\t\t{" );
-        jsonStr.a( ",\n\t\t\t\"first_rq\" : ", mInstantRadiosity->mFirstRq );
+        jsonStr.a( ",\n\t\t\"instant_radiosity\" :"
+                   "\n\t\t{" );
+        jsonStr.a( "\n\t\t\t\"first_rq\" : ", mInstantRadiosity->mFirstRq );
         jsonStr.a( ",\n\t\t\t\"last_rq\" : ", mInstantRadiosity->mLastRq );
         jsonStr.a( ",\n\t\t\t\"visibility_mask\" : ", mInstantRadiosity->mVisibilityMask );
         jsonStr.a( ",\n\t\t\t\"light_mask\" : ", mInstantRadiosity->mLightMask );
