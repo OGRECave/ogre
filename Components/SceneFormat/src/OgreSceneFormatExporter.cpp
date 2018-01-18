@@ -43,10 +43,14 @@ THE SOFTWARE.
 #include "OgreMesh2Serializer.h"
 #include "OgreFileSystemLayer.h"
 
+#include "InstantRadiosity/OgreInstantRadiosity.h"
+
 namespace Ogre
 {
-    SceneFormatExporter::SceneFormatExporter( Root *root, SceneManager *sceneManager ) :
-        SceneFormatBase( root, sceneManager )
+    SceneFormatExporter::SceneFormatExporter( Root *root, SceneManager *sceneManager,
+                                              InstantRadiosity *instantRadiosity ) :
+        SceneFormatBase( root, sceneManager ),
+        mInstantRadiosity( instantRadiosity )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -122,6 +126,15 @@ namespace Ogre
                    encodeFloat( value.b ), ", " );
         jsonStr.a( encodeFloat( value.a ),
                    " ]" );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatExporter::encodeAabb( LwString &jsonStr, const Aabb &value )
+    {
+        jsonStr.a( "[" );
+        encodeVector( jsonStr, value.mCenter );
+        jsonStr.a( ", " );
+        encodeVector( jsonStr, value.mHalfSize );
+        jsonStr.a( "]" );
     }
     //-----------------------------------------------------------------------------------
     inline void SceneFormatExporter::flushLwString( LwString &jsonStr, String &outJson )
@@ -244,11 +257,8 @@ namespace Ogre
 
         {
             Aabb localAabb = movableObject->getLocalAabb();
-            jsonStr.a( ",\n\t\t\t\t\"local_aabb\" : [" );
-            encodeVector( jsonStr, localAabb.mCenter );
-            jsonStr.a( ", " );
-            encodeVector( jsonStr, localAabb.mHalfSize );
-            jsonStr.a( "]" );
+            jsonStr.a( ",\n\t\t\t\t\"local_aabb\" : " );
+            encodeAabb( jsonStr, localAabb );
         }
 
         const ObjectData &objData = movableObject->_getObjectData();
@@ -406,7 +416,71 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormatExporter::exportSceneSettings( LwString &jsonStr, String &outJson )
+    void SceneFormatExporter::exportInstantRadiosity( LwString &jsonStr, String &outJson )
+    {
+        if( !mInstantRadiosity )
+            return;
+
+        jsonStr.a( ",\n\t\t\"instant_radiosity\" :\n\t\t{" );
+        jsonStr.a( ",\n\t\t\t\"first_rq\" : ", mInstantRadiosity->mFirstRq );
+        jsonStr.a( ",\n\t\t\t\"last_rq\" : ", mInstantRadiosity->mLastRq );
+        jsonStr.a( ",\n\t\t\t\"visibility_mask\" : ", mInstantRadiosity->mVisibilityMask );
+        jsonStr.a( ",\n\t\t\t\"light_mask\" : ", mInstantRadiosity->mLightMask );
+        jsonStr.a( ",\n\t\t\t\"num_rays\" : ", (uint64)mInstantRadiosity->mNumRays );
+        jsonStr.a( ",\n\t\t\t\"num_ray_bounces\" : ", (uint64)mInstantRadiosity->mNumRayBounces );
+        jsonStr.a( ",\n\t\t\t\"surviving_ray_fraction\" : ",
+                   encodeFloat( mInstantRadiosity->mSurvivingRayFraction ) );
+        jsonStr.a( ",\n\t\t\t\"cell_size\" : ", encodeFloat( mInstantRadiosity->mCellSize ) );
+        jsonStr.a( ",\n\t\t\t\"bias\" : ", encodeFloat( mInstantRadiosity->mBias ) );
+        jsonStr.a( ",\n\t\t\t\"num_spread_iterations\" : ", mInstantRadiosity->mNumSpreadIterations );
+        jsonStr.a( ",\n\t\t\t\"spread_threshold\" : ",
+                   encodeFloat( mInstantRadiosity->mSpreadThreshold ) );
+        if( !mInstantRadiosity->mAoI.empty() )
+        {
+            flushLwString( jsonStr, outJson );
+            jsonStr.a( ",\n\t\t\t\"areas_of_interest\" :\n\t\t\t[" );
+            bool firstIteration = true;
+            InstantRadiosity::AreaOfInterestVec::const_iterator itor = mInstantRadiosity->mAoI.begin();
+            InstantRadiosity::AreaOfInterestVec::const_iterator end  = mInstantRadiosity->mAoI.end();
+
+            while( itor != end )
+            {
+                if( !firstIteration )
+                    jsonStr.a( "," );
+                firstIteration = false;
+                jsonStr.a( "\n\t\t\t\"[ " );
+                encodeAabb( jsonStr, itor->aabb );
+                jsonStr.a( ", ", itor->sphereRadius, " ]" );
+                ++itor;
+            }
+            jsonStr.a( "\n\t\t\t]" );
+            flushLwString( jsonStr, outJson );
+        }
+        jsonStr.a( ",\n\t\t\t\"vpl_max_range\" : ",
+                   encodeFloat( mInstantRadiosity->mVplMaxRange ) );
+        jsonStr.a( ",\n\t\t\t\"vpl_const_atten\" : ",
+                   encodeFloat( mInstantRadiosity->mVplConstAtten ) );
+        jsonStr.a( ",\n\t\t\t\"vpl_linear_atten\" : ",
+                   encodeFloat( mInstantRadiosity->mVplLinearAtten ) );
+        jsonStr.a( ",\n\t\t\t\"vpl_quad_atten\" : ",
+                   encodeFloat( mInstantRadiosity->mVplQuadAtten ) );
+        jsonStr.a( ",\n\t\t\t\"vpl_threshold\" : ",
+                   encodeFloat( mInstantRadiosity->mVplThreshold ) );
+        jsonStr.a( ",\n\t\t\t\"vpl_power_boost\" : ",
+                   encodeFloat( mInstantRadiosity->mVplPowerBoost ) );
+        jsonStr.a( ",\n\t\t\t\"vpl_use_intensity_for_max_range\" : ",
+                   toQuotedStr( mInstantRadiosity->mVplUseIntensityForMaxRange ) );
+        jsonStr.a( ",\n\t\t\t\"mipmap_bias\" : ", mInstantRadiosity->mMipmapBias );
+        jsonStr.a( ",\n\t\t\t\"use_textures\" : ",
+                   toQuotedStr( mInstantRadiosity->getUseTextures() ) );
+        jsonStr.a( ",\n\t\t\t\"use_irradiance_volume\" : ",
+                   toQuotedStr( mInstantRadiosity->getUseIrradianceVolume() ) );
+        jsonStr.a( "\n\t\t}" );
+        flushLwString( jsonStr, outJson );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatExporter::exportSceneSettings( LwString &jsonStr, String &outJson,
+                                                   uint32 exportFlags )
     {
         jsonStr.a( ",\n\t\"scene\" :\n\t{" );
 
@@ -417,6 +491,9 @@ namespace Ogre
         jsonStr.a( ", " );
         encodeVector( jsonStr, mSceneManager->getAmbientLightHemisphereDir() );
         jsonStr.a( ", ", encodeFloat( mSceneManager->getAmbientLightUpperHemisphere().a ), " ]" );
+
+        if( exportFlags & SceneFlags::InstantRadiosity )
+            exportInstantRadiosity( jsonStr, outJson );
 
         jsonStr.a( "\n\t}" );
 
@@ -565,7 +642,7 @@ namespace Ogre
         }
 
         if( exportFlags & SceneFlags::SceneSettings )
-            exportSceneSettings( jsonStr, outJson );
+            exportSceneSettings( jsonStr, outJson , exportFlags );
 
         outJson += "\n}\n";
 
