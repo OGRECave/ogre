@@ -35,10 +35,6 @@ endif ()
 # configure threading options
 set(OGRE_THREAD_PROVIDER 0)
 if (OGRE_CONFIG_THREADS)
-	if (UNIX)
-		add_definitions(-pthread)
-	endif ()
-
 	if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "boost")
 		set(OGRE_THREAD_PROVIDER 1)
 		include_directories(${Boost_INCLUDE_DIRS})
