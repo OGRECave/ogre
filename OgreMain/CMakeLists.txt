@@ -256,14 +256,16 @@ endif ()
 
 set (TARGET_LINK_FLAGS "")
 
+get_native_precompiled_header(OgreMain)
+
 # setup OgreMain target
 if (WINDOWS_STORE OR WINDOWS_PHONE)
 	# exclude OgreTimer.cpp from unity builds; causes problem
-	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
+	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${OgreMain_pch} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
 	set_target_properties(OgreMain PROPERTIES VS_WINRT_COMPONENT "true")
 else ()
 	# exclude OgreAlignedAllocator.cpp from unity builds; causes problems on Linux
-	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")
+	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${OgreMain_pch} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")
 endif ()
 
 generate_export_header(OgreMain 
@@ -345,10 +347,7 @@ if (MINGW)
 endif ()
 
 # specify a precompiled header to use
-use_precompiled_header(OgreMain 
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePrecompiledHeaders.cpp"
-)
+add_native_precompiled_header(OgreMain "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h")
 
 # install OgreMain
 ogre_config_lib(OgreMain TRUE)
