@@ -193,14 +193,6 @@ FunctionInvocation::FunctionInvocation(const String& functionName, int groupOrde
     mGroupExecutionOrder = groupOrder;
 }
 
-//-----------------------------------------------------------------------
-FunctionInvocation::FunctionInvocation(const String& functionName,
-                                       int groupOrder, int, String returnType) :
-    mFunctionName(functionName), mReturnType(returnType)
-{
-    mGroupExecutionOrder = groupOrder;
-}
-
 //-----------------------------------------------------------------------------
 FunctionInvocation::FunctionInvocation(const FunctionInvocation& other) :
     mFunctionName(other.mFunctionName), mReturnType(other.mReturnType)
