@@ -1184,18 +1184,6 @@ namespace Ogre
         case 0x8086:
             rsc->setVendor(GPU_INTEL);
             break;
-        case 0x5333:
-            rsc->setVendor(GPU_S3);
-            break;
-        case 0x3D3D:
-            rsc->setVendor(GPU_3DLABS);
-            break;
-        case 0x102B:
-            rsc->setVendor(GPU_MATROX);
-            break;
-        case 0x1039:
-            rsc->setVendor(GPU_SIS);
-            break;
         default:
             rsc->setVendor(GPU_UNKNOWN);
             break;

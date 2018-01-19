@@ -246,14 +246,6 @@ namespace Ogre {
             rsc->setVendor(GPU_AMD);
         else if (strstr(vendorName, "Intel"))
             rsc->setVendor(GPU_INTEL);
-        else if (strstr(vendorName, "S3"))
-            rsc->setVendor(GPU_S3);
-        else if (strstr(vendorName, "Matrox"))
-            rsc->setVendor(GPU_MATROX);
-        else if (strstr(vendorName, "3DLabs"))
-            rsc->setVendor(GPU_3DLABS);
-        else if (strstr(vendorName, "SiS"))
-            rsc->setVendor(GPU_SIS);
         else
             rsc->setVendor(GPU_UNKNOWN);
 
