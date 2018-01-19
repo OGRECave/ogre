@@ -283,24 +283,20 @@ namespace Ogre
     enum GPUVendor
     {
         GPU_UNKNOWN = 0,
-        GPU_NVIDIA = 1,
-        GPU_AMD = 2,
-        GPU_INTEL = 3,
-        GPU_S3 = 4,  //!< @deprecated
-        GPU_MATROX = 5, //!< @deprecated
-        GPU_3DLABS = 6, //!< @deprecated
-        GPU_SIS = 7, //!< @deprecated
-        GPU_IMAGINATION_TECHNOLOGIES = 8,
-        GPU_APPLE = 9,  //!< Apple Software Renderer
-        GPU_NOKIA = 10,
-        GPU_MS_SOFTWARE = 11, //!< Microsoft software device
-        GPU_MS_WARP = 12, //!< Microsoft WARP (Windows Advanced Rasterization Platform) software device - http://msdn.microsoft.com/en-us/library/dd285359.aspx
-        GPU_ARM = 13, //!< For the Mali chipsets
-        GPU_QUALCOMM = 14,
-        GPU_MOZILLA = 15, //!<  WebGL on Mozilla/Firefox based browser
-        GPU_WEBKIT = 16, //!< WebGL on WebKit/Chrome base browser
+        GPU_NVIDIA,
+        GPU_AMD,
+        GPU_INTEL,
+        GPU_IMAGINATION_TECHNOLOGIES,
+        GPU_APPLE,  //!< Apple Software Renderer
+        GPU_NOKIA,
+        GPU_MS_SOFTWARE, //!< Microsoft software device
+        GPU_MS_WARP, //!< Microsoft WARP (Windows Advanced Rasterization Platform) software device - http://msdn.microsoft.com/en-us/library/dd285359.aspx
+        GPU_ARM, //!< For the Mali chipsets
+        GPU_QUALCOMM,
+        GPU_MOZILLA, //!<  WebGL on Mozilla/Firefox based browser
+        GPU_WEBKIT, //!< WebGL on WebKit/Chrome base browser
         /// placeholder
-        GPU_VENDOR_COUNT = 17
+        GPU_VENDOR_COUNT
     };
 
     /** This class stores the capabilities of the graphics card.
