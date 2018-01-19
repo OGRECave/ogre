@@ -25,11 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreLodOutsideMarker.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreMeshManager.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre
 {

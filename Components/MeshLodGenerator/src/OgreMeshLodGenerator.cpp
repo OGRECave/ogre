@@ -26,25 +26,7 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "OgreMeshLodGenerator.h"
-#include "OgrePixelCountLodStrategy.h"
-#include "OgreLodWorkQueueWorker.h"
-#include "OgreLodWorkQueueInjector.h"
-#include "OgreLodInputProvider.h"
-#include "OgreLodInputProviderMesh.h"
-#include "OgreLodInputProviderBuffer.h"
-#include "OgreLodOutputProvider.h"
-#include "OgreLodOutputProviderMesh.h"
-#include "OgreLodOutputProviderCompressedMesh.h"
-#include "OgreLodOutputProviderBuffer.h"
-#include "OgreLodOutputProviderCompressedBuffer.h"
-#include "OgreLodCollapseCost.h"
-#include "OgreLodCollapseCostCurvature.h"
-#include "OgreLodCollapseCostProfiler.h"
-#include "OgreLodCollapseCostOutside.h"
-#include "OgreLodData.h"
-#include "OgreLodCollapser.h"
-
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre
 {

@@ -22,11 +22,16 @@ add_definitions(-DOGRE_MESHLODGENERATOR_EXPORTS ${OGRE_VISIBILITY_FLAGS})
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+# repeat for PCH
+include_directories("${OGRE_SOURCE_DIR}/OgreMain/include" "${OGRE_BINARY_DIR}/include")
 
 # setup target
-add_library(OgreMeshLodGenerator ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
+get_native_precompiled_header(OgreMeshLodGenerator)
+add_library(OgreMeshLodGenerator ${OGRE_COMP_LIB_TYPE} ${OgreMeshLodGenerator_pch} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreMeshLodGenerator PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreMeshLodGenerator OgreMain)
+add_native_precompiled_header(OgreMeshLodGenerator "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePrecompiledHeaders.h")
+
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreMeshLodGenerator ${OGRE_THREAD_LIBRARIES})
 endif ()
