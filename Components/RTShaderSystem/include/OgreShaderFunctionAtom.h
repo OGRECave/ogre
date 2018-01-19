@@ -184,15 +184,9 @@ public:
     /** Class constructor 
     @param functionName The name of the function to invoke.
     @param groupOrder The group order of this invocation.
-    @param internalOrder The internal order of this invocation.
     @param returnType The return type of the used function.
     */
     FunctionInvocation(const String& functionName, int groupOrder, const String& returnType = "void");
-
-    /// @overload
-    /// @deprecated internalOrder parameter is obsolete
-    OGRE_DEPRECATED FunctionInvocation(const String& functionName, int groupOrder, int internalOrder, String returnType = "void");
-
 
     /** Copy constructor */
     FunctionInvocation(const FunctionInvocation& rhs);
