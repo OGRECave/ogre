@@ -15,7 +15,7 @@ file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-ogre_add_library_to_folder(Plugins Plugin_ParticleFX ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+add_library(Plugin_ParticleFX ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(Plugin_ParticleFX OgreMain)
 generate_export_header(Plugin_ParticleFX 
     EXPORT_MACRO_NAME _OgreParticleFXExport

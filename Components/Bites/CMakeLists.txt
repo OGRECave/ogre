@@ -95,7 +95,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 ogre_add_component_include_dir(Overlay)
 
 # setup target
-ogre_add_library_to_folder(Components OgreBites ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
+add_library(OgreBites ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
 set_target_properties(OgreBites PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreBites OgreMain OgreOverlay ${DEPENDENCIES})
 
