@@ -409,16 +409,6 @@ namespace Ogre
         */
         void setGlobalNumberOfInstances(const size_t val);
 
-        /** Sets if fixed pipeline rendering is enabled on the system.
-        @deprecated use getMutableCapabilites()
-        */
-        OGRE_DEPRECATED void setFixedPipelineEnabled(bool enabled);
-
-        /** Returns true if fixed pipeline rendering is enabled on the system.
-        @deprecated use getCapabilites()
-        */
-        OGRE_DEPRECATED bool getFixedPipelineEnabled(void) const;
-
         /** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
             and sets it.
             @remarks
@@ -1424,9 +1414,6 @@ namespace Ogre
         VertexDeclaration* mGlobalInstanceVertexBufferVertexDeclaration;
         /// the number of global instances (this number will be multiply by the render op instance number) 
         size_t mGlobalNumberOfInstances;
-
-        /// is fixed pipeline enabled
-        bool mEnableFixedPipeline;
 
         /** updates pass iteration rendering state including bound gpu program parameter
         pass iteration auto constant entry

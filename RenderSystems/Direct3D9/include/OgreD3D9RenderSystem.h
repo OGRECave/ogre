@@ -98,6 +98,8 @@ namespace Ogre
         /// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
         bool mIsDirectX9Ex;
 
+        bool mEnableFixedPipeline;
+
         /// structure holding texture unit settings for every stage
         struct sD3DTextureStageDesc
         {
