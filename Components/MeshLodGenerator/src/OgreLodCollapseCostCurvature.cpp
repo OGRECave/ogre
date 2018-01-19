@@ -32,8 +32,7 @@
  * by Stan Melax (c) 1998
  */
 
-#include "OgreLodCollapseCostCurvature.h"
-#include "OgreVector3.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre
 {

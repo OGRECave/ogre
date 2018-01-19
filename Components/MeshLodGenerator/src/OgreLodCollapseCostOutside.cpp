@@ -26,8 +26,7 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "OgreLodCollapseCostOutside.h"
-#include "OgreLodOutsideMarker.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre
 {
