@@ -67,6 +67,7 @@ namespace Ogre
 
         static inline Light::LightTypes parseLightType( const char *value );
         static inline float decodeFloat( const rapidjson::Value &jsonValue );
+        static inline double decodeDouble( const rapidjson::Value &jsonValue );
         static inline Vector2 decodeVector2Array( const rapidjson::Value &jsonArray );
         static inline Vector3 decodeVector3Array( const rapidjson::Value &jsonArray );
         static inline Vector4 decodeVector4Array( const rapidjson::Value &jsonArray );
@@ -90,6 +91,7 @@ namespace Ogre
         void importEntities( const rapidjson::Value &json );
         void importLight( const rapidjson::Value &lightValue );
         void importLights( const rapidjson::Value &json );
+        void importInstantRadiosity( const rapidjson::Value &irValue );
         void importSceneSettings( const rapidjson::Value &json );
 
     public:

@@ -39,6 +39,8 @@ THE SOFTWARE.
 #include "OgreEntity.h"
 #include "OgreHlms.h"
 
+#include "InstantRadiosity/OgreInstantRadiosity.h"
+
 #include "OgreMeshSerializer.h"
 #include "OgreMesh2Serializer.h"
 #include "OgreFileSystemLayer.h"
@@ -80,6 +82,19 @@ namespace Ogre
         MyUnion myUnion;
         myUnion.u32 = jsonValue.GetUint();
         return myUnion.f32;
+    }
+    //-----------------------------------------------------------------------------------
+    inline double SceneFormatImporter::decodeDouble( const rapidjson::Value &jsonValue )
+    {
+        union MyUnion
+        {
+            double  f64;
+            uint64  u64;
+        };
+
+        MyUnion myUnion;
+        myUnion.u64 = jsonValue.GetUint64();
+        return myUnion.f64;
     }
     //-----------------------------------------------------------------------------------
     inline Vector2 SceneFormatImporter::decodeVector2Array( const rapidjson::Value &jsonArray )
@@ -646,6 +661,119 @@ namespace Ogre
 
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importInstantRadiosity( const rapidjson::Value &json )
+    {
+        InstantRadiosity *instantRadiosity = 0;
+
+        rapidjson::Value::ConstMemberIterator tmpIt;
+        tmpIt = json.FindMember( "first_rq" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mFirstRq = static_cast<uint8>( tmpIt->value.GetUint() );
+
+        tmpIt = json.FindMember( "last_rq" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mLastRq = static_cast<uint8>( tmpIt->value.GetUint() );
+
+        tmpIt = json.FindMember( "visibility_mask" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mVisibilityMask = static_cast<uint32>( tmpIt->value.GetUint() );
+
+        tmpIt = json.FindMember( "light_mask" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mLightMask = static_cast<uint32>( tmpIt->value.GetUint() );
+
+        tmpIt = json.FindMember( "num_rays" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mNumRays = static_cast<size_t>( tmpIt->value.GetUint() );
+
+        tmpIt = json.FindMember( "num_ray_bounces" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mNumRayBounces = static_cast<size_t>( tmpIt->value.GetUint() );
+
+        tmpIt = json.FindMember( "surviving_ray_fraction" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mSurvivingRayFraction = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "cell_size" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mCellSize = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "bias" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mBias = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "num_spread_iterations" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mNumSpreadIterations = static_cast<uint32>( tmpIt->value.GetUint() );
+
+        tmpIt = json.FindMember( "spread_threshold" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mSpreadThreshold = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "areas_of_interest" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsArray() )
+        {
+            const size_t numAoIs = tmpIt->value.Size();
+
+            for( size_t i=0; i<numAoIs; ++i )
+            {
+                const rapidjson::Value &aoi = tmpIt->value[i];
+
+                if( aoi.IsArray() && aoi.Size() == 2u )
+                {
+                    const Aabb aabb = decodeAabbArray( aoi[0], Aabb::BOX_ZERO );
+                    const float sphereRadius = decodeFloat( aoi[1] );
+                    InstantRadiosity::AreaOfInterest areaOfInterest( aabb, sphereRadius );
+                    instantRadiosity->mAoI.push_back( areaOfInterest );
+                }
+            }
+        }
+
+        tmpIt = json.FindMember( "vpl_max_range" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mVplMaxRange = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "vpl_const_atten" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mVplConstAtten = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "vpl_linear_atten" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mVplLinearAtten = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "vpl_quad_atten" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mVplQuadAtten = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "vpl_threshold" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mVplThreshold = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "vpl_power_boost" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mVplPowerBoost = decodeFloat( tmpIt->value );
+
+        tmpIt = json.FindMember( "vpl_use_intensity_for_max_range" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsBool() )
+            instantRadiosity->mVplUseIntensityForMaxRange = tmpIt->value.GetBool();
+
+        tmpIt = json.FindMember( "vpl_intensity_range_multiplier" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint64() )
+            instantRadiosity->mVplIntensityRangeMultiplier = decodeDouble( tmpIt->value );
+
+        tmpIt = json.FindMember( "mipmap_bias" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+            instantRadiosity->mMipmapBias = static_cast<uint32>( tmpIt->value.GetUint() );
+
+        tmpIt = json.FindMember( "use_textures" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsBool() )
+            instantRadiosity->setUseTextures( tmpIt->value.GetBool() );
+
+        tmpIt = json.FindMember( "use_irradiance_volume" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsBool() )
+            instantRadiosity->setUseIrradianceVolume( tmpIt->value.GetBool() );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json )
