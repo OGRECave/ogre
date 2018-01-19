@@ -424,12 +424,6 @@ namespace Ogre
         */
         MeshManager* getMeshManager(void);
 
-        /** Utility function for getting a better description of an error
-            code.
-            @deprecated obsolete API
-        */
-        OGRE_DEPRECATED String getErrorDescription(long errorNumber);
-
         /** Registers a FrameListener which will be called back every frame.
             @remarks
                 A FrameListener is a class which implements methods which

@@ -711,17 +711,6 @@ namespace Ogre {
         mActiveRenderer->useCustomRenderSystemCapabilities(capabilities);
     }
     //-----------------------------------------------------------------------
-    String Root::getErrorDescription(long errorNumber)
-    {
-
-        // Pass to render system
-        if (mActiveRenderer)
-            return mActiveRenderer->getErrorDescription(errorNumber);
-        else
-            return "";
-
-    }
-    //-----------------------------------------------------------------------
     void Root::addSceneManagerFactory(SceneManagerFactory* fact)
     {
         mSceneManagerEnum->addFactory(fact);

@@ -3696,11 +3696,6 @@ namespace Ogre
         // nothing to do - D3D11 shares rendering context already
     }
     //---------------------------------------------------------------------
-    String D3D11RenderSystem::getErrorDescription( long errorNumber ) const
-    {
-        return mDevice.getErrorDescription(errorNumber);
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::determineFSAASettings(uint fsaa, const String& fsaaHint, 
         DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings)
     {
