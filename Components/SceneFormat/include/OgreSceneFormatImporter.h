@@ -48,6 +48,9 @@ namespace rapidjson
 namespace Ogre
 {
     class LwString;
+    class InstantRadiosity;
+    class IrradianceVolume;
+    class HlmsPbs;
 
     /** \addtogroup Component
     *  @{
@@ -61,9 +64,15 @@ namespace Ogre
     {
     protected:
         String mFilename;
+        InstantRadiosity *mInstantRadiosity;
+        IrradianceVolume *mIrradianceVolume;
 
         typedef map<uint32, SceneNode*>::type IndexToSceneNodeMap;
         IndexToSceneNodeMap mCreatedSceneNodes;
+
+        void destroyInstantRadiosity(void);
+
+        HlmsPbs* getPbs(void) const;
 
         static inline Light::LightTypes parseLightType( const char *value );
         static inline float decodeFloat( const rapidjson::Value &jsonValue );
@@ -101,6 +110,30 @@ namespace Ogre
         void importScene( const String &filename, const char *jsonString );
 
         void importSceneFromFile( const String &filename );
+
+        /** Retrieve the InstantRadiosity pointer that may have been created while importing a scene
+        @param releaseOwnership
+            If true, we will return the InstantRadiosity & IrradianceVolume pointers and
+            release ownership. Meaning further calls to this function will return null and
+            you will be responsible for deleting it (otherwise it will leak).
+
+            If false, we will return the InstantRadiosity & IrradianceVolume pointers but
+            retain ownership. Meaning further calls to this function will still return the pointer,
+            and we will delete the pointer when 'this' is destroyed, or if a new scene is imported.
+        @param outInstantRadiosity [out]
+            InstantRadiosity pointer. Input cannot be null. Output *outInstantRadiosity may be null
+            May be null if the imported scene didn't have IR enabled,
+            or if the ownership has already been released.
+        @param outIrradianceVolume [out]
+            IrradianceVolume pointer. Input cannot be null. Output *outIrradianceVolume may be null.
+            May be null if the imported scene didn't have IR/IV enabled,
+            or if the ownership has already been released.
+        @return
+            InstantRadiosity pointer.
+        */
+        void getInstantRadiosity( bool releaseOwnership,
+                                  InstantRadiosity **outInstantRadiosity,
+                                  IrradianceVolume **outIrradianceVolume );
     };
 
     /** @} */
