@@ -39,7 +39,9 @@ THE SOFTWARE.
 #include "OgreEntity.h"
 #include "OgreHlms.h"
 
+#include "OgreHlmsPbs.h"
 #include "InstantRadiosity/OgreInstantRadiosity.h"
+#include "OgreIrradianceVolume.h"
 
 #include "OgreMeshSerializer.h"
 #include "OgreMesh2Serializer.h"
@@ -52,12 +54,38 @@ THE SOFTWARE.
 namespace Ogre
 {
     SceneFormatImporter::SceneFormatImporter( Root *root, SceneManager *sceneManager ) :
-        SceneFormatBase( root, sceneManager )
+        SceneFormatBase( root, sceneManager ),
+        mInstantRadiosity( 0 ),
+        mIrradianceVolume( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
     SceneFormatImporter::~SceneFormatImporter()
     {
+        destroyInstantRadiosity();
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::destroyInstantRadiosity(void)
+    {
+        if( mIrradianceVolume )
+        {
+            HlmsPbs *hlmsPbs = getPbs();
+            if( hlmsPbs && hlmsPbs->getIrradianceVolume() == mIrradianceVolume )
+                hlmsPbs->setIrradianceVolume( 0 );
+
+            delete mIrradianceVolume;
+            mIrradianceVolume = 0;
+        }
+
+        delete mInstantRadiosity;
+        mInstantRadiosity = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsPbs* SceneFormatImporter::getPbs(void) const
+    {
+        HlmsManager *hlmsManager = mRoot->getHlmsManager();
+        Hlms *hlms = hlmsManager->getHlms( "pbs" );
+        return dynamic_cast<HlmsPbs*>( hlms );
     }
     //-----------------------------------------------------------------------------------
     Light::LightTypes SceneFormatImporter::parseLightType( const char *value )
@@ -665,52 +693,52 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importInstantRadiosity( const rapidjson::Value &json )
     {
-        InstantRadiosity *instantRadiosity = 0;
+        mInstantRadiosity = new InstantRadiosity( mSceneManager, mRoot->getHlmsManager() );
 
         rapidjson::Value::ConstMemberIterator tmpIt;
         tmpIt = json.FindMember( "first_rq" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mFirstRq = static_cast<uint8>( tmpIt->value.GetUint() );
+            mInstantRadiosity->mFirstRq = static_cast<uint8>( tmpIt->value.GetUint() );
 
         tmpIt = json.FindMember( "last_rq" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mLastRq = static_cast<uint8>( tmpIt->value.GetUint() );
+            mInstantRadiosity->mLastRq = static_cast<uint8>( tmpIt->value.GetUint() );
 
         tmpIt = json.FindMember( "visibility_mask" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mVisibilityMask = static_cast<uint32>( tmpIt->value.GetUint() );
+            mInstantRadiosity->mVisibilityMask = static_cast<uint32>( tmpIt->value.GetUint() );
 
         tmpIt = json.FindMember( "light_mask" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mLightMask = static_cast<uint32>( tmpIt->value.GetUint() );
+            mInstantRadiosity->mLightMask = static_cast<uint32>( tmpIt->value.GetUint() );
 
         tmpIt = json.FindMember( "num_rays" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mNumRays = static_cast<size_t>( tmpIt->value.GetUint() );
+            mInstantRadiosity->mNumRays = static_cast<size_t>( tmpIt->value.GetUint() );
 
         tmpIt = json.FindMember( "num_ray_bounces" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mNumRayBounces = static_cast<size_t>( tmpIt->value.GetUint() );
+            mInstantRadiosity->mNumRayBounces = static_cast<size_t>( tmpIt->value.GetUint() );
 
         tmpIt = json.FindMember( "surviving_ray_fraction" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mSurvivingRayFraction = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mSurvivingRayFraction = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "cell_size" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mCellSize = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mCellSize = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "bias" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mBias = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mBias = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "num_spread_iterations" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mNumSpreadIterations = static_cast<uint32>( tmpIt->value.GetUint() );
+            mInstantRadiosity->mNumSpreadIterations = static_cast<uint32>( tmpIt->value.GetUint() );
 
         tmpIt = json.FindMember( "spread_threshold" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mSpreadThreshold = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mSpreadThreshold = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "areas_of_interest" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsArray() )
@@ -726,54 +754,93 @@ namespace Ogre
                     const Aabb aabb = decodeAabbArray( aoi[0], Aabb::BOX_ZERO );
                     const float sphereRadius = decodeFloat( aoi[1] );
                     InstantRadiosity::AreaOfInterest areaOfInterest( aabb, sphereRadius );
-                    instantRadiosity->mAoI.push_back( areaOfInterest );
+                    mInstantRadiosity->mAoI.push_back( areaOfInterest );
                 }
             }
         }
 
         tmpIt = json.FindMember( "vpl_max_range" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mVplMaxRange = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mVplMaxRange = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "vpl_const_atten" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mVplConstAtten = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mVplConstAtten = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "vpl_linear_atten" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mVplLinearAtten = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mVplLinearAtten = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "vpl_quad_atten" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mVplQuadAtten = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mVplQuadAtten = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "vpl_threshold" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mVplThreshold = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mVplThreshold = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "vpl_power_boost" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mVplPowerBoost = decodeFloat( tmpIt->value );
+            mInstantRadiosity->mVplPowerBoost = decodeFloat( tmpIt->value );
 
         tmpIt = json.FindMember( "vpl_use_intensity_for_max_range" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsBool() )
-            instantRadiosity->mVplUseIntensityForMaxRange = tmpIt->value.GetBool();
+            mInstantRadiosity->mVplUseIntensityForMaxRange = tmpIt->value.GetBool();
 
         tmpIt = json.FindMember( "vpl_intensity_range_multiplier" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint64() )
-            instantRadiosity->mVplIntensityRangeMultiplier = decodeDouble( tmpIt->value );
+            mInstantRadiosity->mVplIntensityRangeMultiplier = decodeDouble( tmpIt->value );
 
         tmpIt = json.FindMember( "mipmap_bias" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
-            instantRadiosity->mMipmapBias = static_cast<uint32>( tmpIt->value.GetUint() );
+            mInstantRadiosity->mMipmapBias = static_cast<uint32>( tmpIt->value.GetUint() );
 
         tmpIt = json.FindMember( "use_textures" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsBool() )
-            instantRadiosity->setUseTextures( tmpIt->value.GetBool() );
+            mInstantRadiosity->setUseTextures( tmpIt->value.GetBool() );
 
         tmpIt = json.FindMember( "use_irradiance_volume" );
         if( tmpIt != json.MemberEnd() && tmpIt->value.IsBool() )
-            instantRadiosity->setUseIrradianceVolume( tmpIt->value.GetBool() );
+            mInstantRadiosity->setUseIrradianceVolume( tmpIt->value.GetBool() );
+
+        tmpIt = json.FindMember( "irradiance_volume" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
+        {
+            mIrradianceVolume = new IrradianceVolume( mRoot->getHlmsManager() );
+
+            tmpIt = json.FindMember( "num_blocks" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsArray() &&
+                tmpIt->value.Size() == 3u &&
+                tmpIt->value[0].IsUint() &&
+                tmpIt->value[1].IsUint() &&
+                tmpIt->value[2].IsUint() )
+            {
+                mIrradianceVolume->createIrradianceVolumeTexture(
+                            tmpIt->value[0].GetUint(),
+                            tmpIt->value[1].GetUint(),
+                            tmpIt->value[2].GetUint() );
+            }
+
+            tmpIt = json.FindMember( "power_scale" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+                mIrradianceVolume->setPowerScale( decodeFloat( tmpIt->value ) );
+
+            tmpIt = json.FindMember( "irradiance_max_power" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
+                mIrradianceVolume->setIrradianceMaxPower( decodeFloat( tmpIt->value ) );
+
+            tmpIt = json.FindMember( "irradiance_origin" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsArray() )
+                mIrradianceVolume->setIrradianceOrigin( decodeVector3Array( tmpIt->value ) );
+
+            tmpIt = json.FindMember( "irradiance_cell_size" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsArray() )
+                mIrradianceVolume->setIrradianceCellSize( decodeVector3Array( tmpIt->value ) );
+        }
+        else
+        {
+            mInstantRadiosity->setUseIrradianceVolume( false );
+        }
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json )
@@ -792,11 +859,17 @@ namespace Ogre
             const float envmapScale = decodeFloat( tmpIt->value[3] );
             mSceneManager->setAmbientLight( upperHemisphere, lowerHemisphere, hemiDir, envmapScale );
         }
+
+        tmpIt = json.FindMember( "instant_radiosity" );
+        if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
+            importInstantRadiosity( tmpIt->value );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const char *jsonString )
     {
         mFilename = filename;
+
+        destroyInstantRadiosity();
 
         rapidjson::Document d;
         d.Parse( jsonString );
@@ -827,6 +900,21 @@ namespace Ogre
         itor = d.FindMember( "scene" );
         if( itor != d.MemberEnd() && itor->value.IsObject() )
             importSceneSettings( itor->value );
+
+        if( mInstantRadiosity )
+        {
+            mInstantRadiosity->build();
+
+            HlmsPbs *hlmsPbs = getPbs();
+            if( hlmsPbs && mInstantRadiosity->getUseIrradianceVolume() )
+                hlmsPbs->setIrradianceVolume( mIrradianceVolume );
+
+            mInstantRadiosity->fillIrradianceVolume( mIrradianceVolume,
+                                                     mIrradianceVolume->getIrradianceCellSize(),
+                                                     mIrradianceVolume->getIrradianceOrigin(),
+                                                     mIrradianceVolume->getIrradianceMaxPower(),
+                                                     false );
+        }
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneFromFile( const String &folderPath )
@@ -856,5 +944,18 @@ namespace Ogre
         resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );
         resourceGroupManager.removeResourceLocation( folderPath + "/v2", "SceneFormatImporter" );
         resourceGroupManager.removeResourceLocation( folderPath + "/v1", "SceneFormatImporter" );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::getInstantRadiosity( bool releaseOwnership,
+                                                   InstantRadiosity **outInstantRadiosity,
+                                                   IrradianceVolume **outIrradianceVolume )
+    {
+        *outInstantRadiosity = mInstantRadiosity;
+        *outIrradianceVolume = mIrradianceVolume;
+        if( releaseOwnership )
+        {
+            mInstantRadiosity = 0;
+            mIrradianceVolume = 0;
+        }
     }
 }
