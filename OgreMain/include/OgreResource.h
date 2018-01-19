@@ -358,15 +358,6 @@ namespace Ogre {
             return (mLoadingState.load() == LOADSTATE_LOADED);
         }
 
-        /** Change the Resource loading state to loaded.
-        @deprecated do not use
-        */
-        OGRE_DEPRECATED virtual void setToLoaded(void)
-        { 
-            // No lock required to read this state since no modify
-            mLoadingState.store(LOADSTATE_LOADED);
-        }
-
         /** Returns whether the resource is currently in the process of
             background loading.
         */
