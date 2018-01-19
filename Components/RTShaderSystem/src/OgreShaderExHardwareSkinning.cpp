@@ -24,20 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderExHardwareSkinning.h"
+#include "OgrePrecompiledHeaders.h"
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderFFPRenderState.h"
-#include "OgreShaderExDualQuaternionSkinning.h"
-#include "OgreShaderExLinearSkinning.h"
-#include "OgreMesh.h"
-#include "OgreShaderGenerator.h"
-#include "OgreEntity.h"
-#include "OgreSubEntity.h"
-#include "OgreMaterial.h"
-#include "OgreSubMesh.h"
-#include "OgreTechnique.h"
-#include "OgreMaterialSerializer.h"
 
 #define HS_DATA_BIND_NAME "HS_SRS_DATA"
 

@@ -24,18 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderExNormalMapLighting.h"
+#include "OgrePrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderFFPRenderState.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderParameter.h"
-#include "OgreShaderProgramSet.h"
-#include "OgreAutoParamDataSource.h"
-#include "OgreShaderRenderState.h"
-#include "OgrePass.h"
-#include "OgreMaterialSerializer.h"
-#include "OgreShaderGenerator.h"
-#include "OgreShaderFFPTexturing.h"
 
 namespace Ogre {
 namespace RTShader {

@@ -24,27 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderGenerator.h"
-#include "OgreShaderProgramManager.h"
-#include "OgreShaderFFPRenderStateBuilder.h"
-#include "OgreShaderRenderState.h"
-#include "OgreMaterialManager.h"
-#include "OgreTechnique.h"
-#include "OgreSceneManager.h"
-#include "OgreViewport.h"
-#include "OgreShaderExPerPixelLighting.h"
-#include "OgreShaderExNormalMapLighting.h"
-#include "OgreShaderExIntegratedPSSM3.h"
-#include "OgreShaderExLayeredBlending.h"
-#include "OgreShaderExHardwareSkinning.h"
-#include "OgreShaderMaterialSerializerListener.h"
-#include "OgreShaderProgramWriterManager.h"
-#include "OgreGpuProgramManager.h"
-#include "OgreHighLevelGpuProgramManager.h"
-#include "OgreShaderExTextureAtlasSampler.h"
-#include "OgreShaderExTriplanarTexturing.h"
-#include "OgreRoot.h"
-#include "OgreException.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 

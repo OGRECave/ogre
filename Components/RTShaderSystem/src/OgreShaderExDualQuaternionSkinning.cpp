@@ -25,15 +25,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreShaderExDualQuaternionSkinning.h"
+#include "OgrePrecompiledHeaders.h"
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderFFPRenderState.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderParameter.h"
-#include "OgreShaderProgramSet.h"
-#include "OgreShaderGenerator.h"
-
 #define HS_DATA_BIND_NAME "HS_SRS_DATA"
 
 
