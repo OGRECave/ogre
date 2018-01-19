@@ -20,7 +20,9 @@ if(UNIX)
   # easier than porting to new flex  
   foreach(NVSRC ${NVPARSE_SOURCE})
     set_source_files_properties(${NVSRC} 
-      PROPERTIES COMPILE_FLAGS "-Wno-unused-function -Wno-shadow -Wno-cast-qual -Wno-missing-declarations -Wno-undef")
+      PROPERTIES COMPILE_FLAGS "-Wno-unused-function -Wno-shadow -Wno-cast-qual -Wno-missing-declarations -Wno-undef"
+      COMPILE_DEFINITIONS "register="
+    )
   endforeach()
 endif()
 
