@@ -24,7 +24,6 @@ set(INST_FILES
   Utils/MacroLogFeature.cmake
   Utils/PreprocessorUtils.cmake
   Utils/PrecompiledHeader.cmake
-  Utils/OgreAddTargets.cmake
   Utils/OgreConfigTargets.cmake
   Utils/OgreGetVersion.cmake
   Utils/OgreFindFrameworks.cmake

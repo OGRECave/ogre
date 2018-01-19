@@ -24,7 +24,7 @@ add_definitions(-DOGRE_PAGING_EXPORTS ${OGRE_VISIBILITY_FLAGS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # setup target
-ogre_add_library_to_folder(Components OgrePaging ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
+add_library(OgrePaging ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgrePaging PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgrePaging OgreMain)
 if (OGRE_CONFIG_THREADS)

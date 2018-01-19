@@ -237,6 +237,9 @@ endfunction(ogre_config_lib)
 
 function(ogre_config_component LIBNAME)
   ogre_config_lib(${LIBNAME} FALSE)
+  if (OGRE_PROJECT_FOLDERS)
+    set_property(TARGET ${LIBNAME} PROPERTY FOLDER Components)
+  endif ()
 endfunction(ogre_config_component)
 
 function(ogre_config_framework LIBNAME)
@@ -259,6 +262,11 @@ endfunction(ogre_config_framework)
 # setup plugin build
 function(ogre_config_plugin PLUGINNAME)
   ogre_config_common(${PLUGINNAME})
+
+  if (OGRE_PROJECT_FOLDERS)
+    set_property(TARGET ${LIBNAME} PROPERTY FOLDER Plugins)
+  endif ()
+
   set_target_properties(${PLUGINNAME} PROPERTIES VERSION ${OGRE_SOVERSION})
   if (OGRE_STATIC)
     # add static prefix, if compiling static version
@@ -308,6 +316,10 @@ endfunction(ogre_config_plugin)
 # setup Ogre sample build
 function(ogre_config_sample_common SAMPLENAME)
   ogre_config_common(${SAMPLENAME})
+
+  if (OGRE_PROJECT_FOLDERS)
+    set_property(TARGET ${LIBNAME} PROPERTY FOLDER Samples)
+  endif ()
 
   # set install RPATH for Unix systems
   if (UNIX AND OGRE_FULL_RPATH)

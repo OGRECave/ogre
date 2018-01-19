@@ -57,7 +57,6 @@ endif()
 
 include(CMakeDependentOption)
 include(MacroLogFeature)
-include(OgreAddTargets)
 include(OgreConfigTargets)
 include(PreprocessorUtils)
 set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
