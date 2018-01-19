@@ -63,6 +63,7 @@ namespace Ogre
         static void toQuotedStr( LwString &jsonStr, Light::LightTypes lightType );
 
         static uint32 encodeFloat( float value );
+        static uint64 encodeDouble( double value );
         static void encodeVector( LwString &jsonStr, const Vector2 &value );
         static void encodeVector( LwString &jsonStr, const Vector3 &value );
         static void encodeVector( LwString &jsonStr, const Vector4 &value );

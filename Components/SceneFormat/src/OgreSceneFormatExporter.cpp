@@ -83,6 +83,19 @@ namespace Ogre
         return myUnion.u32;
     }
     //-----------------------------------------------------------------------------------
+    uint64 SceneFormatExporter::encodeDouble( double value )
+    {
+        union MyUnion
+        {
+            double  f64;
+            uint64  u64;
+        };
+
+        MyUnion myUnion;
+        myUnion.f64 = value;
+        return myUnion.u64;
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatExporter::encodeVector( LwString &jsonStr, const Vector2 &value )
     {
         jsonStr.a( "[ ",
@@ -473,6 +486,8 @@ namespace Ogre
                    encodeFloat( mInstantRadiosity->mVplPowerBoost ) );
         jsonStr.a( ",\n\t\t\t\"vpl_use_intensity_for_max_range\" : ",
                    toQuotedStr( mInstantRadiosity->mVplUseIntensityForMaxRange ) );
+        jsonStr.a( ",\n\t\t\t\"vpl_intensity_range_multiplier\" : ",
+                   encodeDouble( mInstantRadiosity->mVplIntensityRangeMultiplier ) );
         jsonStr.a( ",\n\t\t\t\"mipmap_bias\" : ", mInstantRadiosity->mMipmapBias );
         jsonStr.a( ",\n\t\t\t\"use_textures\" : ",
                    toQuotedStr( mInstantRadiosity->getUseTextures() ) );
