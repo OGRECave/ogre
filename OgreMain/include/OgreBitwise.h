@@ -306,9 +306,9 @@ namespace Ogre {
         */
         static inline uint16 floatToHalfI(uint32 i)
         {
-            register int s =  (i >> 16) & 0x00008000;
-            register int e = ((i >> 23) & 0x000000ff) - (127 - 15);
-            register int m =   i        & 0x007fffff;
+            int s =  (i >> 16) & 0x00008000;
+            int e = ((i >> 23) & 0x000000ff) - (127 - 15);
+            int m =   i        & 0x007fffff;
         
             if (e <= 0)
             {
@@ -358,9 +358,9 @@ namespace Ogre {
          */
         static inline uint32 halfToFloatI(uint16 y)
         {
-            register int s = (y >> 15) & 0x00000001;
-            register int e = (y >> 10) & 0x0000001f;
-            register int m =  y        & 0x000003ff;
+            int s = (y >> 15) & 0x00000001;
+            int e = (y >> 10) & 0x0000001f;
+            int m =  y        & 0x000003ff;
         
             if (e == 0)
             {
