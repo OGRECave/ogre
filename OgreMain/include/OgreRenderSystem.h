@@ -390,13 +390,6 @@ namespace Ogre
         RenderTargetIterator getRenderTargetIterator(void) {
             return RenderTargetIterator( mRenderTargets.begin(), mRenderTargets.end() );
         }
-        /** Returns a description of an error code.
-            @deprecated obsolete API
-        */
-        virtual String getErrorDescription(long errorNumber) const {
-            return BLANKSTRING;
-        }
-
         /** Returns the global instance vertex buffer.
         */
         HardwareVertexBufferSharedPtr getGlobalInstanceVertexBuffer() const;
