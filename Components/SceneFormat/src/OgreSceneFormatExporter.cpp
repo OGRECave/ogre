@@ -43,7 +43,9 @@ THE SOFTWARE.
 #include "OgreMesh2Serializer.h"
 #include "OgreFileSystemLayer.h"
 
+#include "OgreHlmsPbs.h"
 #include "InstantRadiosity/OgreInstantRadiosity.h"
+#include "OgreIrradianceVolume.h"
 
 namespace Ogre
 {
@@ -476,6 +478,39 @@ namespace Ogre
                    toQuotedStr( mInstantRadiosity->getUseTextures() ) );
         jsonStr.a( ",\n\t\t\t\"use_irradiance_volume\" : ",
                    toQuotedStr( mInstantRadiosity->getUseIrradianceVolume() ) );
+
+        HlmsManager *hlmsManager = mRoot->getHlmsManager();
+        Hlms *hlms = hlmsManager->getHlms( "pbs" );
+        HlmsPbs *hlmsPbs = dynamic_cast<HlmsPbs*>( hlms );
+
+        if( hlmsPbs && hlmsPbs->getIrradianceVolume() )
+        {
+            IrradianceVolume *irradianceVolume = hlmsPbs->getIrradianceVolume();
+
+            jsonStr.a( ",\n\t\t\t\"irradiance_volume\" :\n\t\t\t\t{" );
+            jsonStr.a( ",\n\t\t\t\"num_blocks\" : [ ",
+                       irradianceVolume->getNumBlocksX(), " ,",
+                       irradianceVolume->getNumBlocksY(), " ,",
+                       irradianceVolume->getNumBlocksZ(), " ]" );
+            jsonStr.a( ",\n\t\t\t\"power_scale\" : ",
+                       encodeFloat( irradianceVolume->getPowerScale() ) );
+            jsonStr.a( ",\n\t\t\t\"irradiance_max_power\" : ",
+                       encodeFloat( irradianceVolume->getIrradianceMaxPower() ) );
+            jsonStr.a( ",\n\t\t\t\"irradiance_origin\" : " );
+            encodeVector( jsonStr, irradianceVolume->getIrradianceOrigin() );
+            jsonStr.a( ",\n\t\t\t\"irradiance_cell_size\" : " );
+            encodeVector( jsonStr, irradianceVolume->getIrradianceCellSize() );
+            jsonStr.a( "\n\t\t\t}" );
+        }
+        else if( mInstantRadiosity->getUseIrradianceVolume() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Instant Radiosity claims to be using Irradiance Volumes, "
+                         "but we couldn't grab it from the Hlms PBS! "
+                         "Make sure to export after you've called HlmsPbs::setIrradianceVolume",
+                         "SceneFormatExporter::exportInstantRadiosity" );
+        }
+
         jsonStr.a( "\n\t\t}" );
         flushLwString( jsonStr, outJson );
     }
