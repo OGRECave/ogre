@@ -218,50 +218,10 @@ namespace Ogre {
         */
         virtual void removeAllViewports(void);
 
-        /** Retieves details of current rendering performance.
-            @remarks
-                If the user application wishes to do it's own performance
-                display, or use performance for some other means, this
-                method allows it to retrieve the statistics.
-                @param
-                    lastFPS Pointer to a float to receive the number of frames per second (FPS)
-                    based on the last frame rendered.
-                @param
-                    avgFPS Pointer to a float to receive the FPS rating based on an average of all
-                    the frames rendered since rendering began (the call to
-                    Root::startRendering).
-                @param
-                    bestFPS Pointer to a float to receive the best FPS rating that has been achieved
-                    since rendering began.
-                @param
-                    worstFPS Pointer to a float to receive the worst FPS rating seen so far.
-                @deprecated use getStatistics()
-        */
-        OGRE_DEPRECATED virtual void getStatistics(float& lastFPS, float& avgFPS,
-            float& bestFPS, float& worstFPS) const;  // Access to stats
-
         /** Retieves details of current rendering performance. */
         const FrameStats& getStatistics(void) const {
             return mStats;
         }
-
-        /// @deprecated use getStatistics()
-        OGRE_DEPRECATED virtual float getLastFPS() const;
-
-        /// @deprecated use getStatistics()
-        OGRE_DEPRECATED virtual float getAverageFPS() const;
-
-        /// @deprecated use getStatistics()
-        OGRE_DEPRECATED virtual float getBestFPS() const;
-
-        /// @deprecated use getStatistics()
-        OGRE_DEPRECATED virtual float getWorstFPS() const;
-
-        /// @deprecated use getStatistics()
-        OGRE_DEPRECATED virtual float getBestFrameTime() const;
-
-        /// @deprecated use getStatistics()
-        OGRE_DEPRECATED virtual float getWorstFrameTime() const;
 
         /** Resets saved frame-rate statistices.
         */
@@ -360,10 +320,6 @@ namespace Ogre {
 
         virtual bool requiresTextureFlipping() const = 0;
 
-        /// @deprecated use getStatistics()
-        OGRE_DEPRECATED virtual size_t getTriangleCount(void) const;
-        /// @deprecated use getStatistics()
-        OGRE_DEPRECATED virtual size_t getBatchCount(void) const;
         /** Utility method to notify a render target that a camera has been removed,
         incase it was referring to it as a viewer.
         */
