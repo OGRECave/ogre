@@ -92,6 +92,7 @@ namespace Ogre
         mHLSLProgramFactory = NULL;     
         mDeviceManager = NULL;  
         mPerStageConstantSupport = false;
+        mEnableFixedPipeline = true;
 
 		for(int i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
 		{

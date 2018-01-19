@@ -249,11 +249,8 @@ namespace Ogre {
         else
             rsc->setVendor(GPU_UNKNOWN);
 
-        if(mEnableFixedPipeline)
-        {
-            // Supports fixed-function
-            rsc->setCapability(RSC_FIXED_FUNCTION);
-        }
+        // Supports fixed-function
+        rsc->setCapability(RSC_FIXED_FUNCTION);
 
         // Check for hardware mipmapping support.
         if(GLEW_VERSION_1_4 || GLEW_SGIS_generate_mipmap)

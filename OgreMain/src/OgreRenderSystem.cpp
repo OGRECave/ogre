@@ -69,7 +69,6 @@ namespace Ogre {
         , mDerivedDepthBiasSlopeScale(0.0f)
         , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
         , mGlobalNumberOfInstances(1)
-        , mEnableFixedPipeline(true)
         , mVertexProgramBound(false)
         , mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
@@ -629,16 +628,6 @@ namespace Ogre {
     CullingMode RenderSystem::_getCullingMode(void) const
     {
         return mCullingMode;
-    }
-    //-----------------------------------------------------------------------
-    bool RenderSystem::getFixedPipelineEnabled(void) const
-    {
-        return mEnableFixedPipeline;
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::setFixedPipelineEnabled(bool enabled)
-    {
-        mEnableFixedPipeline = enabled;
     }
     //-----------------------------------------------------------------------
     void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )

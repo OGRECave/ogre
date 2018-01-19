@@ -130,7 +130,6 @@ namespace Ogre
     {
         LogManager::getSingleton().logMessage( "D3D11: " + getName() + " created." );
 
-        mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
         mSwitchingFullscreenCounter = 0;
         mDriverType = D3D_DRIVER_TYPE_HARDWARE;
