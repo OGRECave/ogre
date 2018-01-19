@@ -25,8 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreShaderSubRenderState.h"
-#include "OgreException.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 namespace RTShader {

@@ -25,16 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderExIntegratedPSSM3.h"
+#include "OgrePrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderFFPRenderState.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderParameter.h"
-#include "OgreAutoParamDataSource.h"
-#include "OgreShaderProgramSet.h"
-#include "OgrePass.h"
-#include "OgreHardwarePixelBuffer.h"
-#include "OgreTechnique.h"
 
 namespace Ogre {
 namespace RTShader {

@@ -25,7 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreShaderExHardwareSkinningTechnique.h"
+#include "OgrePrecompiledHeaders.h"
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 

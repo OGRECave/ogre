@@ -25,12 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreShaderParameter.h"
-#include "OgreStringConverter.h"
-#include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
-#include "OgreShaderGenerator.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 namespace RTShader {

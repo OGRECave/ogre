@@ -24,11 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderScriptTranslator.h"
-#include "OgrePass.h"
-#include "OgreTechnique.h"
-#include "OgreShaderGenerator.h"
-
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 namespace RTShader {
