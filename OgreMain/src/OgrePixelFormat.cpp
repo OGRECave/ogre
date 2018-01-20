@@ -233,36 +233,6 @@ namespace Ogre {
         return (PixelUtil::getFlags(format) & PFF_LUMINANCE) > 0;
     }
     //-----------------------------------------------------------------------
-    bool PixelUtil::isValidExtent(size_t width, size_t height, size_t depth, PixelFormat format)
-    {
-        if(isCompressed(format))
-        {
-            switch(format)
-            {
-                case PF_DXT1:
-                case PF_DXT2:
-                case PF_DXT3:
-                case PF_DXT4:
-                case PF_DXT5:
-                case PF_BC4_SNORM:
-                case PF_BC4_UNORM:
-                case PF_BC5_SNORM:
-                case PF_BC5_UNORM:
-                case PF_BC6H_SF16:
-                case PF_BC6H_UF16:
-                case PF_BC7_UNORM:
-                case PF_BC7_UNORM_SRGB:
-                    return ((width&3)==0 && (height&3)==0 && depth==1);
-                default:
-                    return true;
-            }
-        }
-        else
-        {
-            return true;
-        }
-    }
-    //-----------------------------------------------------------------------
     void PixelUtil::getBitDepths(PixelFormat format, int rgba[4])
     {
         const PixelFormatDescription &des = getDescriptionFor(format);

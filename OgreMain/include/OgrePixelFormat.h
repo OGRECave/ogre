@@ -513,21 +513,6 @@ namespace Ogre {
         static bool isNativeEndian(PixelFormat format);
         /** Shortcut method to determine if the format is a luminance format. */
         static bool isLuminance(PixelFormat format);
-        
-        /** Return whether a certain image extent is valid for this image format.
-            @param width
-                The width of the area
-            @param height
-                The height of the area
-            @param depth
-                The depth of the area
-            @param format
-                The format of the area
-            @remarks For non-compressed formats, this is always true. For DXT formats,
-            only sizes with a width and height multiple of 4 and depth 1 are allowed.
-            @deprecated do not use
-        */
-        OGRE_DEPRECATED static bool isValidExtent(size_t width, size_t height, size_t depth, PixelFormat format);
 
         /** Gives the number of bits (RGBA) for a format. See remarks.          
           @remarks      For non-colour formats (dxt, depth) this returns [0,0,0,0].
