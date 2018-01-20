@@ -3565,9 +3565,6 @@ namespace Ogre
                 "D3D9RenderSystem::_render");
         }
 
-        // To think about: possibly remove setVertexDeclaration and 
-        // setVertexBufferBinding from RenderSystem since the sequence is
-        // a bit too D3D9-specific?
         setVertexDeclaration(op.vertexData->vertexDeclaration, op.useGlobalInstancingVertexBufferIsAvailable);
         setVertexBufferBinding(op.vertexData->vertexBufferBinding, op.numberOfInstances, op.useGlobalInstancingVertexBufferIsAvailable, op.useIndexes);
 
