@@ -205,40 +205,19 @@ namespace Ogre
         RSC_PERSTAGECONSTANT = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 0),
 
         // ***** GL Specific Caps *****
-        /// Supports OpenGL version 1.5
-		/// @deprecated All targetted APIs by Ogre support this feature.
-        RSC_GL1_5_NOVBO    = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 1),
-        /// Support for Frame Buffer Objects (FBOs)
-        /// @deprecated All targetted APIs by Ogre support this feature.
-        RSC_FBO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 2),
-        /// Support for Frame Buffer Objects ARB implementation (regular FBO is higher precedence)
-        /// @deprecated obsolete
-        RSC_FBO_ARB          = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 3),
-        /// Support for Frame Buffer Objects ATI implementation (ARB FBO is higher precedence)
-        /// @deprecated obsolete
-        RSC_FBO_ATI          = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 4),
         /// Support for PBuffer
-        RSC_PBUFFER          = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 5),
-        /// Support for GL 1.5 but without HW occlusion workaround
-		/// @deprecated obsolete
-        RSC_GL1_5_NOHWOCCLUSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 6),
-        /// Support for point parameters ARB implementation
-        /// @deprecated obsolete
-        RSC_POINT_EXTENDED_PARAMETERS_ARB = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 7),
-        /// Support for point parameters EXT implementation
-        /// @deprecated obsolete
-        RSC_POINT_EXTENDED_PARAMETERS_EXT = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 8),
+        RSC_PBUFFER          = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 0),
         /// Support for Separate Shader Objects
-        RSC_SEPARATE_SHADER_OBJECTS = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 9),
+        RSC_SEPARATE_SHADER_OBJECTS = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 1),
         /// Support for Vertex Array Objects (VAOs)
-        RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10),
+        RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 2),
         /// with Separate Shader Objects the gl_PerVertex interface block must be redeclared
         /// but some drivers misbehave and do not compile if we do so
-        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 11),
+        RSC_GLSL_SSO_REDECLARE = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 3),
         /// Supports debugging/ profiling events
-        RSC_DEBUG = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 12),
+        RSC_DEBUG = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 4),
         /// RS can map driver buffer storage directly instead of using a shadow buffer
-        RSC_MAPBUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 13),
+        RSC_MAPBUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 5),
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9

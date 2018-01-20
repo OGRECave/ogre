@@ -95,10 +95,7 @@ static void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), false);
     EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5), false);
     EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), false);
-    EXPECT_EQ(caps->hasCapability(RSC_FBO), true);
-    EXPECT_EQ(caps->hasCapability(RSC_FBO_ARB), false);
 
-    EXPECT_EQ(caps->hasCapability(RSC_FBO_ATI), false);
     EXPECT_EQ(caps->hasCapability(RSC_PBUFFER), false);
     EXPECT_EQ(caps->hasCapability(RSC_PERSTAGECONSTANT), false);
     EXPECT_EQ(caps->hasCapability(RSC_VAO), false);

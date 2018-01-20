@@ -411,12 +411,8 @@ namespace Ogre
         addCapabilitiesMapping("texture_compression_bc6h_bc7", RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         addCapabilitiesMapping("texture_compression_astc", RSC_TEXTURE_COMPRESSION_ASTC);
         addCapabilitiesMapping("hwrender_to_vertex_buffer", RSC_HWRENDER_TO_VERTEX_BUFFER);
-        addCapabilitiesMapping("gl1_5_novbo", RSC_GL1_5_NOVBO);
-        addCapabilitiesMapping("fbo", RSC_FBO);
-        addCapabilitiesMapping("fbo_arb", RSC_FBO_ARB);
-        addCapabilitiesMapping("fbo_ati", RSC_FBO_ATI);
+
         addCapabilitiesMapping("pbuffer", RSC_PBUFFER);
-        addCapabilitiesMapping("gl1_5_nohwocclusion", RSC_GL1_5_NOHWOCCLUSION);
         addCapabilitiesMapping("perstageconstant", RSC_PERSTAGECONSTANT);
         addCapabilitiesMapping("vao", RSC_VAO);
         addCapabilitiesMapping("separate_shader_objects", RSC_SEPARATE_SHADER_OBJECTS);
