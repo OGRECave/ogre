@@ -3241,7 +3241,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         {
             if (numMatrices > 1)
             {
-                mDestRenderSystem->_setWorldMatrices(mTempXform, numMatrices);
+                // Set hardware matrix to nothing
+                mDestRenderSystem->_setWorldMatrix(Matrix4::IDENTITY);
             }
             else
             {

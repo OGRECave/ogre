@@ -435,9 +435,6 @@ namespace Ogre
         /** Sets the world transform matrix.
          * @deprecated only needed for fixed function APIs */
         virtual void _setWorldMatrix(const Matrix4 &m) {}
-        /** Sets multiple world matrices (vertex blending).
-         * @deprecated unused. for FFP vertex blending, which never existed. */
-        virtual void _setWorldMatrices(const Matrix4* m, unsigned short count);
         /** Sets the view transform matrix
          * @deprecated only needed for fixed function APIs */
         virtual void _setViewMatrix(const Matrix4 &m) {}
@@ -532,10 +529,6 @@ namespace Ogre
         */
         virtual void _setTexture(size_t unit, bool enabled, 
             const TexturePtr &texPtr) = 0;
-        /**
-        @deprecated do not use
-        */
-        OGRE_DEPRECATED virtual void _setTexture(size_t unit, bool enabled, const String &texname);
 
         /** Binds a texture to a vertex, geometry, compute, tesselation hull
         or tessellation domain sampler.
@@ -994,15 +987,6 @@ namespace Ogre
             bool twoSidedOperation = false,
             bool readBackAsTexture = false) = 0;
 
-
-
-        /** Sets the current vertex declaration, ie the source of vertex data.
-         @deprecated use RenderOperation */
-        OGRE_DEPRECATED virtual void setVertexDeclaration(VertexDeclaration* decl) {}
-        /** Sets the current vertex buffer binding state.
-         @deprecated use RenderOperation */
-        virtual void setVertexBufferBinding(VertexBufferBinding* binding) {}
-
         /** Sets whether or not normals are to be automatically normalised.
         @remarks
         This is useful when, for example, you are scaling SceneNodes such that
@@ -1090,9 +1074,6 @@ namespace Ogre
 
         /** Add a user clipping plane. */
         void addClipPlane (const Plane &p);
-        /** Add a user clipping plane.
-         @deprecated use addClipPlane(const Plane &p) */
-        OGRE_DEPRECATED void addClipPlane (Real A, Real B, Real C, Real D);
 
         /** Clears the user clipping region.
         */
