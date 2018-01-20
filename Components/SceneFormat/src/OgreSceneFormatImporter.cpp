@@ -749,7 +749,9 @@ namespace Ogre
             {
                 const rapidjson::Value &aoi = tmpIt->value[i];
 
-                if( aoi.IsArray() && aoi.Size() == 2u )
+                if( aoi.IsArray() && aoi.Size() == 2u &&
+                    aoi[0].IsArray() &&
+                    aoi[1].IsUint() )
                 {
                     const Aabb aabb = decodeAabbArray( aoi[0], Aabb::BOX_ZERO );
                     const float sphereRadius = decodeFloat( aoi[1] );
@@ -931,12 +933,15 @@ namespace Ogre
             if( hlmsPbs && mInstantRadiosity->getUseIrradianceVolume() )
                 hlmsPbs->setIrradianceVolume( mIrradianceVolume );
 
-            mInstantRadiosity->fillIrradianceVolume(
-                        mIrradianceVolume,
-                        mIrradianceVolume->getIrradianceCellSize(),
-                        mIrradianceVolume->getIrradianceOrigin(),
-                        mIrradianceVolume->getIrradianceMaxPower(),
-                        mIrradianceVolume->getFadeAttenuationOverDistace() );
+            if( mIrradianceVolume )
+            {
+                mInstantRadiosity->fillIrradianceVolume(
+                            mIrradianceVolume,
+                            mIrradianceVolume->getIrradianceCellSize(),
+                            mIrradianceVolume->getIrradianceOrigin(),
+                            mIrradianceVolume->getIrradianceMaxPower(),
+                            mIrradianceVolume->getFadeAttenuationOverDistace() );
+            }
         }
     }
     //-----------------------------------------------------------------------------------

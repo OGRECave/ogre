@@ -20,7 +20,7 @@ add_recursive( ./ SOURCE_FILES )
 
 ogre_add_executable(Sample_InstantRadiosity WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES})
 
-target_link_libraries(Sample_InstantRadiosity ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
+target_link_libraries(Sample_InstantRadiosity ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES} OgreSceneFormat)
 ogre_config_sample_lib(Sample_InstantRadiosity)
 
 if( APPLE )

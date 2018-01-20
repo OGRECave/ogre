@@ -464,9 +464,9 @@ namespace Ogre
                 if( !firstIteration )
                     jsonStr.a( "," );
                 firstIteration = false;
-                jsonStr.a( "\n\t\t\t\"[ " );
+                jsonStr.a( "\n\t\t\t\t[ " );
                 encodeAabb( jsonStr, itor->aabb );
-                jsonStr.a( ", ", itor->sphereRadius, " ]" );
+                jsonStr.a( ", ", encodeFloat( itor->sphereRadius ), " ]" );
                 ++itor;
             }
             jsonStr.a( "\n\t\t\t]" );
