@@ -81,20 +81,7 @@ namespace Ogre {
         class Listener
         {
         public:
-            Listener() {}
             virtual ~Listener() {}
-
-            /** Callback to indicate that background loading has completed.
-            @deprecated
-                Use Listener::loadingComplete instead.
-            */
-            OGRE_DEPRECATED virtual void backgroundLoadingComplete(Resource*) {}
-
-            /** Callback to indicate that background preparing has completed.
-            @deprecated
-                Use Listener::preparingComplete instead.
-            */
-            OGRE_DEPRECATED virtual void backgroundPreparingComplete(Resource*) {}
 
             /** Called whenever the resource finishes loading. 
             @remarks

@@ -117,7 +117,7 @@ namespace Ogre {
         _initialise();
     }
     //-----------------------------------------------------------------------
-    void Entity::backgroundLoadingComplete(Resource* res)
+    void Entity::loadingComplete(Resource* res)
     {
         if (res == mMesh.get())
         {

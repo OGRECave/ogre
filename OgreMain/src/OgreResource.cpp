@@ -379,10 +379,6 @@ namespace Ogre
         for (ListenerList::iterator i = mListenerList.begin();
             i != mListenerList.end(); ++i)
         {
-            // deprecated call
-            if (wasBackgroundLoaded)
-                (*i)->backgroundLoadingComplete(this);
-
             (*i)->loadingComplete(this);
         }
     }
@@ -394,12 +390,7 @@ namespace Ogre
         for (ListenerList::iterator i = mListenerList.begin();
             i != mListenerList.end(); ++i)
         {
-            // deprecated call
-            if (wasBackgroundLoaded)
-                (*i)->backgroundPreparingComplete(this);
-
             (*i)->preparingComplete(this);
-
         }
     }
     //-----------------------------------------------------------------------
