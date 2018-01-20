@@ -32,6 +32,14 @@
 
 namespace Ogre
 {
+    String FileSystemLayer::resolveBundlePath(String path)
+    {
+        if(!path.empty() && path[0] != '/')             // only adjust relative dirs
+            path = macBundlePath() + "/" + path;
+
+        return path;
+    }
+
 	void FileSystemLayer::getConfigPaths()
 	{
         mConfigPaths.push_back(Ogre::iOSDocumentsDirectory() + "/");

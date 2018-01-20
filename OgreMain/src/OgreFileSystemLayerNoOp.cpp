@@ -29,6 +29,10 @@
 
 namespace Ogre
 {
+    String FileSystemLayer::resolveBundlePath(String path)
+    {
+        return path;
+    }
     //---------------------------------------------------------------------
     void FileSystemLayer::getConfigPaths()
     {

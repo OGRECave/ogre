@@ -75,6 +75,16 @@ namespace Ogre
                 return "";
         }
     }
+
+    String FileSystemLayer::resolveBundlePath(String path)
+    {
+        // With Ubuntu snaps absolute paths are relative to the snap package.
+        char* env_SNAP = getenv("SNAP");
+        if(env_SNAP && !path.empty() && path[0] == '/') // only adjust absolute dirs
+            path = env_SNAP + path;
+
+        return path;
+    }
     //---------------------------------------------------------------------
     void FileSystemLayer::getConfigPaths()
     {
