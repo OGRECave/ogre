@@ -90,11 +90,7 @@ namespace Demo
         "Known issues:\n"
         " * Non shadow casting point & spot lights require Forward3D to be enabled (on desktop).\n"
         "   This is by design (more implementations will come: Forward+ & Deferred; for now the\n"
-        "   only one working is F3D).\n"
-        " * Shadow casting point lights don't work or work poorly. (feature not implemented yet)\n"
-        " * If PSSM shadow casting enabled, the system requires at least one shadow-casting\n"
-        "   directional light (bug)\n"
-        " * Mobile version only supports forward lighting.\n"
+        "   only ones working are Forward3D and Forward Clustered).\n"
         "\n"
         "LEGAL: Uses Saint Peter's Basilica (C) by Emil Persson under CC Attrib 3.0 Unported\n"
         "See Samples/Media/materials/textures/Cubemaps/License.txt for more information." );
