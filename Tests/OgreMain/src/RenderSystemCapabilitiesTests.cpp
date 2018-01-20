@@ -107,20 +107,17 @@ TEST_F(RenderSystemCapabilitiesTests,HasCapability)
     EXPECT_TRUE(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
     EXPECT_TRUE(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
     EXPECT_TRUE(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
-    EXPECT_TRUE(!rsc.hasCapability(RSC_FBO_ATI));
     EXPECT_TRUE(!rsc.hasCapability(RSC_PBUFFER));
 
     // add support for few caps from each category
     rsc.setCapability(RSC_AUTOMIPMAP);
     rsc.setCapability(RSC_FRAGMENT_PROGRAM);
     rsc.setCapability(RSC_TEXTURE_COMPRESSION);
-    rsc.setCapability(RSC_FBO_ATI);
 
     // check that the newly set caps are supported
     EXPECT_TRUE(rsc.hasCapability(RSC_AUTOMIPMAP));
     EXPECT_TRUE(rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
     EXPECT_TRUE(rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
-    EXPECT_TRUE(rsc.hasCapability(RSC_FBO_ATI));
 
     // check that the non-set caps are NOT supported
     EXPECT_TRUE(!rsc.hasCapability(RSC_BLENDING));
@@ -151,7 +148,6 @@ TEST_F(RenderSystemCapabilitiesTests,SerializeEnumCapability)
 
     // confirm that the contents are the same as in .rendercaps file
     EXPECT_TRUE(rsc->hasCapability(RSC_AUTOMIPMAP));
-    EXPECT_TRUE(rsc->hasCapability(RSC_FBO_ARB));
 }
 //--------------------------------------------------------------------------
 TEST_F(RenderSystemCapabilitiesTests,SerializeStringCapability)
@@ -346,10 +342,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_pvrtc false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_bc4_bc5 false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_bc6h_bc7 false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo_arb false") != lines.end());
 
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo_ati false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpbuffer false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tperstageconstant false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tseparate_shader_objects false") != lines.end());
@@ -407,10 +400,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     caps.setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
     caps.setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
     caps.setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
-    caps.setCapability(RSC_FBO);
-    caps.setCapability(RSC_FBO_ARB);
 
-    caps.setCapability(RSC_FBO_ATI);
     caps.setCapability(RSC_PBUFFER);
     caps.setCapability(RSC_PERSTAGECONSTANT);
     caps.setCapability(RSC_SEPARATE_SHADER_OBJECTS);
@@ -477,10 +467,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_pvrtc true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_bc4_bc5 true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_compression_bc6h_bc7 true") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo true") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo_arb true") != lines.end());
 
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfbo_ati true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpbuffer true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tperstageconstant true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tseparate_shader_objects true") != lines.end());
@@ -617,10 +604,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC));
     EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5));
     EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7));
-    EXPECT_EQ(caps.hasCapability(RSC_FBO), caps2.hasCapability(RSC_FBO));
-    EXPECT_EQ(caps.hasCapability(RSC_FBO_ARB), caps2.hasCapability(RSC_FBO_ARB));
 
-    EXPECT_EQ(caps.hasCapability(RSC_FBO_ATI), caps2.hasCapability(RSC_FBO_ATI));
     EXPECT_EQ(caps.hasCapability(RSC_PBUFFER), caps2.hasCapability(RSC_PBUFFER));
     EXPECT_EQ(caps.hasCapability(RSC_PERSTAGECONSTANT), caps2.hasCapability(RSC_PERSTAGECONSTANT));
     EXPECT_EQ(caps.hasCapability(RSC_SEPARATE_SHADER_OBJECTS), caps2.hasCapability(RSC_SEPARATE_SHADER_OBJECTS));

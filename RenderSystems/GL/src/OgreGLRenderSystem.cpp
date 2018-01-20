@@ -323,17 +323,20 @@ namespace Ogre {
             rsc->setCapability(RSC_POINT_SPRITES);
         }
         // Check for point parameters
-        if (GLEW_VERSION_1_4)
+        if (GLEW_VERSION_1_4 || GLEW_ARB_point_parameters || GLEW_EXT_point_parameters)
         {
+            if(GLEW_ARB_point_parameters)
+            {
+                glPointParameterf = glPointParameterfARB;
+                glPointParameterfv = glPointParameterfvARB;
+            }
+            else if(GLEW_EXT_point_parameters)
+            {
+                glPointParameterf = glPointParameterfEXT;
+                glPointParameterfv = glPointParameterfvEXT;
+            }
+
             rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
-        }
-        if (GLEW_ARB_point_parameters)
-        {
-            rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS_ARB);
-        }
-        if (GLEW_EXT_point_parameters)
-        {
-            rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS_EXT);
         }
 
         // Check for hardware stencil support and set bit depth
@@ -350,10 +353,6 @@ namespace Ogre {
 
         if(GLEW_VERSION_1_5 || GLEW_ARB_vertex_buffer_object)
         {
-            if (!GLEW_ARB_vertex_buffer_object)
-            {
-                rsc->setCapability(RSC_GL1_5_NOVBO);
-            }
             rsc->setCapability(RSC_VBO);
             rsc->setCapability(RSC_MAPBUFFER);
             rsc->setCapability(RSC_32BIT_INDEX);
@@ -556,13 +555,6 @@ namespace Ogre {
         // Check for hardware occlusion support
         if(GLEW_VERSION_1_5 || GLEW_ARB_occlusion_query)
         {
-            // Some buggy driver claim that it is GL 1.5 compliant and
-            // not support ARB_occlusion_query
-            if (!GLEW_ARB_occlusion_query)
-            {
-                rsc->setCapability(RSC_GL1_5_NOHWOCCLUSION);
-            }
-
             rsc->setCapability(RSC_HWOCCLUSION);
         }
         else if (GLEW_NV_occlusion_query)
@@ -606,16 +598,6 @@ namespace Ogre {
                 glGetIntegerv(GL_MAX_DRAW_BUFFERS_ARB, &buffers);
                 rsc->setNumMultiRenderTargets(std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
                 rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
-                if(!GLEW_VERSION_2_0)
-                {
-                    // Before GL version 2.0, we need to get one of the extensions
-                    if(GLEW_ARB_draw_buffers)
-                        rsc->setCapability(RSC_FBO_ARB);
-                    if(GLEW_ATI_draw_buffers)
-                        rsc->setCapability(RSC_FBO_ATI);
-                }
-                // Set FBO flag for all 3 'subtypes'
-                rsc->setCapability(RSC_FBO);
 
             }
             rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -704,7 +686,7 @@ namespace Ogre {
             }
         }
 
-        if(caps->hasCapability(RSC_GL1_5_NOVBO))
+        if(!GLEW_ARB_vertex_buffer_object)
         {
             // Assign ARB functions same to GL 1.5 version since
             // interface identical
@@ -849,21 +831,18 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("GLSL support detected");
         }
 
-        if(caps->hasCapability(RSC_HWOCCLUSION))
+        if(caps->hasCapability(RSC_HWOCCLUSION) && !GLEW_ARB_occlusion_query)
         {
-            if(caps->hasCapability(RSC_GL1_5_NOHWOCCLUSION))
-            {
-                // Assign ARB functions same to GL 1.5 version since
-                // interface identical
-                glBeginQueryARB = glBeginQuery;
-                glDeleteQueriesARB = glDeleteQueries;
-                glEndQueryARB = glEndQuery;
-                glGenQueriesARB = glGenQueries;
-                glGetQueryObjectivARB = glGetQueryObjectiv;
-                glGetQueryObjectuivARB = glGetQueryObjectuiv;
-                glGetQueryivARB = glGetQueryiv;
-                glIsQueryARB = glIsQuery;
-            }
+            // Assign ARB functions same to GL 1.5 version since
+            // interface identical
+            glBeginQueryARB = glBeginQuery;
+            glDeleteQueriesARB = glDeleteQueries;
+            glEndQueryARB = glEndQuery;
+            glGenQueriesARB = glGenQueries;
+            glGetQueryObjectivARB = glGetQueryObjectiv;
+            glGetQueryObjectuivARB = glGetQueryObjectuiv;
+            glGetQueryivARB = glGetQueryiv;
+            glIsQueryARB = glIsQuery;
         }
 
 
@@ -888,24 +867,20 @@ namespace Ogre {
 
 
         // Check for framebuffer object extension
-        if(caps->hasCapability(RSC_FBO) && rttMode < 1)
+        if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE) && rttMode < 1)
         {
             // Before GL version 2.0, we need to get one of the extensions
-            if(caps->hasCapability(RSC_FBO_ARB))
+            if(GLEW_ARB_draw_buffers)
                 GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersARB;
-            else if(caps->hasCapability(RSC_FBO_ATI))
+            else if(GLEW_ATI_draw_buffers)
                 GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersATI;
 
-            if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
-            {
-                // Create FBO manager
-                LogManager::getSingleton().logMessage("GL: Using GL_EXT_framebuffer_object for rendering to textures (best)");
-                mRTTManager = new GLFBOManager(false);
-                caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
+            // Create FBO manager
+            LogManager::getSingleton().logMessage("GL: Using GL_EXT_framebuffer_object for rendering to textures (best)");
+            mRTTManager = new GLFBOManager(false);
+            caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 
-                //TODO: Check if we're using OpenGL 3.0 and add RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL flag
-            }
-
+            //TODO: Check if we're using OpenGL 3.0 and add RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL flag
         }
         else
         {

@@ -338,7 +338,6 @@ namespace Ogre {
             rsc->setCapability(RSC_ANISOTROPY);
         }
 
-        rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         if (hasMinGLVersion(3, 0))
         {

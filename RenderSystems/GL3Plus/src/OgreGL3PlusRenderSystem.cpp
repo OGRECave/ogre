@@ -340,7 +340,6 @@ namespace Ogre {
             checkExtension("GL_KHR_texture_compression_astc_ldr"))
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
 
-        rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         // Probe number of draw buffers
         // Only makes sense with FBO support, so probe here
