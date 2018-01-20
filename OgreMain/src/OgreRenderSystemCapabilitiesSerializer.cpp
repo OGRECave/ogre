@@ -83,7 +83,6 @@ namespace Ogre
         file << "\t" << "vertex_texture_units_shared " << StringConverter::toString(caps->getVertexTextureUnitsShared())<< endl;
         
         file << endl;
-        file << "\t" << "num_world_matrices " << StringConverter::toString(caps->getNumWorldMatrices()) << endl;
         file << "\t" << "num_texture_units " << StringConverter::toString(caps->getNumTextureUnits()) << endl;
         file << "\t" << "stencil_buffer_bit_depth " << StringConverter::toString(caps->getStencilBufferBitDepth()) << endl;
         file << "\t" << "num_vertex_blend_matrices " << StringConverter::toString(caps->getNumVertexBlendMatrices()) << endl;
@@ -326,7 +325,6 @@ namespace Ogre
         addKeywordType("num_vertex_texture_units", SET_INT_METHOD);
 
         // initialize int setters
-        addSetIntMethod("num_world_matrices", &RenderSystemCapabilities::setNumWorldMatrices);
         addSetIntMethod("num_texture_units", &RenderSystemCapabilities::setNumTextureUnits);
         addSetIntMethod("stencil_buffer_bit_depth", &RenderSystemCapabilities::setStencilBufferBitDepth);
         addSetIntMethod("num_vertex_blend_matrices", &RenderSystemCapabilities::setNumVertexBlendMatrices);

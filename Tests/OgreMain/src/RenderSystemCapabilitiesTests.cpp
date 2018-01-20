@@ -229,7 +229,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteSimpleCapabilities)
     caps.addShaderProfile("vs999");
     caps.addShaderProfile("sp999");
     caps.setVertexTextureUnitsShared(true);
-    caps.setNumWorldMatrices(777);
 
     // write them to file
     serializer.writeScript(&caps, name, filename);
@@ -262,7 +261,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteSimpleCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tmax_point_size 10.5") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tshader_profile sp999") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared true") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tnum_world_matrices 777") != lines.end());
 }
 //--------------------------------------------------------------------------
 TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
@@ -508,7 +506,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     caps.setCapability(RSC_SEPARATE_SHADER_OBJECTS);
     caps.setCapability(RSC_VAO);
 
-    caps.setNumWorldMatrices(11);
     caps.setNumTextureUnits(22);
     caps.setStencilBufferBitDepth(20001);
     caps.setNumVertexBlendMatrices(33);
@@ -599,7 +596,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     EXPECT_EQ(caps.hasCapability(RSC_SEPARATE_SHADER_OBJECTS), caps2.hasCapability(RSC_SEPARATE_SHADER_OBJECTS));
     EXPECT_EQ(caps.hasCapability(RSC_VAO), caps2.hasCapability(RSC_VAO));
 
-    EXPECT_EQ(caps.getNumWorldMatrices(), caps2.getNumWorldMatrices());
     EXPECT_EQ(caps.getNumTextureUnits(), caps2.getNumTextureUnits());
     EXPECT_EQ(caps.getStencilBufferBitDepth(), caps2.getStencilBufferBitDepth());
     EXPECT_EQ(caps.getNumVertexBlendMatrices(), caps2.getNumVertexBlendMatrices());
