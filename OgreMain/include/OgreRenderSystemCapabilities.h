@@ -293,8 +293,6 @@ namespace Ogre
         static String msGPUVendorStrings[GPU_VENDOR_COUNT];
         static void initVendorStrings();
 
-        /// The number of world matrices available
-        ushort mNumWorldMatrices;
         /// The number of texture units available
         ushort mNumTextureUnits;
         /// The stencil buffer bit depth
@@ -372,9 +370,6 @@ namespace Ogre
     public: 
         RenderSystemCapabilities ();
 
-        /// @deprecated
-        OGRE_DEPRECATED size_t calculateSize() const {return 0;}
-
         /** Set the driver version. */
         void setDriverVersion(const DriverVersion& version)
         {
@@ -434,12 +429,6 @@ namespace Ogre
             return false;
         }
 
-        /// @deprecated do not use
-        void setNumWorldMatrices(ushort num)
-        {
-            mNumWorldMatrices = num;
-        }
-
         void setNumTextureUnits(ushort num)
         {
             mNumTextureUnits = num;
@@ -459,12 +448,6 @@ namespace Ogre
         void setNumMultiRenderTargets(ushort num)
         {
             mNumMultiRenderTargets = num;
-        }
-
-        /// @deprecated do not use
-        ushort getNumWorldMatrices(void) const
-        { 
-            return mNumWorldMatrices;
         }
 
         void setNumVertexAttributes(ushort num)

@@ -110,7 +110,6 @@ static void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     EXPECT_EQ(caps->getMaxPointSize(), (Real)1024);
     EXPECT_EQ(caps->getNonPOW2TexturesLimited(), false);
     EXPECT_EQ(caps->getVertexTextureUnitsShared(), true);
-    EXPECT_EQ(caps->getNumWorldMatrices(), (Ogre::ushort)0);
     EXPECT_EQ(caps->getNumTextureUnits(), (Ogre::ushort)16);
     EXPECT_EQ(caps->getStencilBufferBitDepth(), (Ogre::ushort)8);
     EXPECT_EQ(caps->getNumVertexBlendMatrices(), (Ogre::ushort)0);
