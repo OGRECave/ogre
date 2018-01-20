@@ -53,9 +53,14 @@ namespace Ogre
         uint32                  mNumBlocksY;
         uint32                  mNumBlocksZ;
 
+        /// Value kept for storing original creation parameters. It's not used after creation.
+        bool mFadeAttenuationOverDistace;
+
         /// Tweaks how strong Irradiance Volume should be.
         /// In range (0; inf)
         float                   mPowerScale;
+        /// Value kept for storing original creation parameters;
+        /// as in every frame it just gets multiplied against mPowerScale
         float                   mIrradianceMaxPower;
         Vector3                 mIrradianceOrigin;
         Vector3                 mIrradianceCellSize;
@@ -96,6 +101,7 @@ namespace Ogre
         ~IrradianceVolume();
 
         float getIrradianceMaxPower(void) const             { return mIrradianceMaxPower; }
+        /// Not really used. It's only use is keeping track of creation parameters.
         void setIrradianceMaxPower(float power)             { mIrradianceMaxPower = power; }
 
         const Vector3& getIrradianceOrigin(void) const      { return mIrradianceOrigin; }
@@ -103,6 +109,10 @@ namespace Ogre
 
         const Vector3& getIrradianceCellSize(void) const    { return mIrradianceCellSize; }
         void setIrradianceCellSize(const Vector3& cellSize) { mIrradianceCellSize = cellSize; }
+
+        /// Not really used. It's only use is keeping track of creation parameters.
+        void setFadeAttenuationOverDistace( bool fade )     { mFadeAttenuationOverDistace = fade; }
+        bool getFadeAttenuationOverDistace(void) const      { return mFadeAttenuationOverDistace; }
 
         float getPowerScale(void) const  { return mPowerScale; }
         void setPowerScale(float power)  { mPowerScale = power; }

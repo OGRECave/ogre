@@ -101,7 +101,7 @@ namespace Ogre
         @param outJson
         @param exportFlags
             Combination of SceneFlags::SceneFlags, to know what to export and what to exclude.
-            Default to exporting everything.
+            Defaults to exporting everything.
             Note that excluding scene nodes can cause issues later during import.
         */
         void exportScene( String &outJson, uint32 exportFlags=~0u );

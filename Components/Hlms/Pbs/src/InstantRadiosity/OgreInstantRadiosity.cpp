@@ -1757,6 +1757,7 @@ namespace Ogre
         volume->setIrradianceCellSize( cellSize );
         volume->setIrradianceMaxPower( lightMaxPower );
         volume->setPowerScale( mVplPowerBoost );
+        volume->setFadeAttenuationOverDistace( fadeAttenuationOverDistance );
 
         const int32 volumeOriginX = static_cast<int32>( volumeOrigin.x );
         const int32 volumeOriginY = static_cast<int32>( volumeOrigin.y );
