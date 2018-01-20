@@ -88,12 +88,9 @@ namespace Ogre {
                 "   - Wrap stencil values: "
                 + StringConverter::toString(hasCapability(RSC_STENCIL_WRAP), true));
         }
-        if(hasCapability(RSC_VBO))
-        {
-            pLog->logMessage(
-                " * 32-bit index buffers: "
-                + StringConverter::toString(hasCapability(RSC_32BIT_INDEX), true));
-        }
+        pLog->logMessage(
+            " * 32-bit index buffers: "
+            + StringConverter::toString(hasCapability(RSC_32BIT_INDEX), true));
         pLog->logMessage(
             " * Vertex programs: "
             + StringConverter::toString(hasCapability(RSC_VERTEX_PROGRAM), true));

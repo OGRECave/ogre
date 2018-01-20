@@ -101,7 +101,6 @@ TEST_F(RenderSystemCapabilitiesTests,HasCapability)
 
     // check that no caps (from 2 categories) are supported
     EXPECT_TRUE(!rsc.hasCapability(RSC_AUTOMIPMAP));
-    EXPECT_TRUE(!rsc.hasCapability(RSC_BLENDING));
     EXPECT_TRUE(!rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
     EXPECT_TRUE(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
     EXPECT_TRUE(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
@@ -120,7 +119,6 @@ TEST_F(RenderSystemCapabilitiesTests,HasCapability)
     EXPECT_TRUE(rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
 
     // check that the non-set caps are NOT supported
-    EXPECT_TRUE(!rsc.hasCapability(RSC_BLENDING));
     EXPECT_TRUE(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
     EXPECT_TRUE(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
     EXPECT_TRUE(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
@@ -309,13 +307,11 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
 
     // confirm every caps
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tblending false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tcubemapping false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil false") != lines.end());
 
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvbo false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfragment_program false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tscissor_test false") != lines.end());
@@ -367,13 +363,11 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     caps.setVertexTextureUnitsShared(true);
 
     caps.setCapability(RSC_AUTOMIPMAP);
-    caps.setCapability(RSC_BLENDING);
     caps.setCapability(RSC_ANISOTROPY);
     caps.setCapability(RSC_DOT3);
     caps.setCapability(RSC_CUBEMAPPING);
     caps.setCapability(RSC_HWSTENCIL);
 
-    caps.setCapability(RSC_VBO);
     caps.setCapability(RSC_VERTEX_PROGRAM);
     caps.setCapability(RSC_FRAGMENT_PROGRAM);
     caps.setCapability(RSC_SCISSOR_TEST);
@@ -434,13 +428,11 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
 
     // confirm all caps
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap true") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tblending true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tcubemapping true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil true") != lines.end());
 
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvbo true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfragment_program true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tscissor_test true") != lines.end());
@@ -495,7 +487,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     caps.setCapability(RSC_DOT3);
     caps.setCapability(RSC_CUBEMAPPING);
     caps.setCapability(RSC_HWSTENCIL);
-    caps.setCapability(RSC_VBO);
     caps.setCapability(RSC_FRAGMENT_PROGRAM);
     caps.setCapability(RSC_SCISSOR_TEST);
     caps.setCapability(RSC_TWO_SIDED_STENCIL);
@@ -571,13 +562,11 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     RenderSystemCapabilities& caps2 = *rsc;
 
     EXPECT_EQ(caps.hasCapability(RSC_AUTOMIPMAP), caps2.hasCapability(RSC_AUTOMIPMAP));
-    EXPECT_EQ(caps.hasCapability(RSC_BLENDING), caps2.hasCapability(RSC_BLENDING));
     EXPECT_EQ(caps.hasCapability(RSC_ANISOTROPY), caps2.hasCapability(RSC_ANISOTROPY));
     EXPECT_EQ(caps.hasCapability(RSC_DOT3), caps2.hasCapability(RSC_DOT3));
     EXPECT_EQ(caps.hasCapability(RSC_CUBEMAPPING), caps2.hasCapability(RSC_CUBEMAPPING));
     EXPECT_EQ(caps.hasCapability(RSC_HWSTENCIL), caps2.hasCapability(RSC_HWSTENCIL));
 
-    EXPECT_EQ(caps.hasCapability(RSC_VBO), caps2.hasCapability(RSC_VBO));
     EXPECT_EQ(caps.hasCapability(RSC_VERTEX_PROGRAM), caps2.hasCapability(RSC_VERTEX_PROGRAM));
     EXPECT_EQ(caps.hasCapability(RSC_FRAGMENT_PROGRAM), caps2.hasCapability(RSC_FRAGMENT_PROGRAM));
     EXPECT_EQ(caps.hasCapability(RSC_SCISSOR_TEST), caps2.hasCapability(RSC_SCISSOR_TEST));

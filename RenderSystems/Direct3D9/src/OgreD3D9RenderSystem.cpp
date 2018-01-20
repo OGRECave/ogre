@@ -1152,18 +1152,10 @@ namespace Ogre
             if((rkCurCaps.PrimitiveMiscCaps & D3DPMISCCAPS_BLENDOP) == 0)
                 rsc->unsetCapability(RSC_ADVANCED_BLEND_OPERATIONS);
         }               
-                                    
-        // Blending between stages supported
-        rsc->setCapability(RSC_BLENDING);
-        
 
         // We always support compression, D3DX will decompress if device does not support
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
-
-        // We always support VBOs
-        rsc->setCapability(RSC_VBO);
-
             
         convertVertexShaderCaps(rsc);
         convertPixelShaderCaps(rsc);

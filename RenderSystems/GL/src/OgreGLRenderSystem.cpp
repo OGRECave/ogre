@@ -255,8 +255,6 @@ namespace Ogre {
 
         rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
-        rsc->setCapability(RSC_BLENDING);
-
 
         // Check for Multitexturing support and set number of texture units
         GLint units;
@@ -317,7 +315,6 @@ namespace Ogre {
 
         rsc->setCapability(RSC_HW_GAMMA);
 
-        rsc->setCapability(RSC_VBO);
         rsc->setCapability(RSC_MAPBUFFER);
         rsc->setCapability(RSC_32BIT_INDEX);
 
