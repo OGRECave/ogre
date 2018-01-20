@@ -132,13 +132,16 @@ namespace Ogre
 
     class _OgreD3D11Export D3D11RenderingAPIException : public RenderingAPIException
     {
+        int hresult;
     public:
         D3D11RenderingAPIException(int hr, const String& inDescription, const String& inSource, const char* inFile, long inLine)
-            : RenderingAPIException(hr, inDescription, inSource, inFile, inLine) {}
+            : RenderingAPIException(hr, inDescription, inSource, inFile, inLine), hresult(hr) {}
+
+        int getHResult() const { return hresult; }
 
         const String& getFullDescription(void) const {
             StringStream ss(RenderingAPIException::getFullDescription());
-            ss << " HRESULT=" << number;
+            ss << " HRESULT=" << hresult;
             fullDesc = ss.str();
             return fullDesc;
         }
