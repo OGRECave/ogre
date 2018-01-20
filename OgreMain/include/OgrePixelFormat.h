@@ -51,46 +51,34 @@ namespace Ogre {
         /// Unknown pixel format.
         PF_UNKNOWN = 0,
         /// 8-bit pixel format, all bits luminance.
-        PF_L8 = 1,
+        PF_L8,
         PF_BYTE_L = PF_L8,
         /// 16-bit pixel format, all bits luminance.
-        PF_L16 = 2,
+        PF_L16,
         PF_SHORT_L = PF_L16,
         /// 8-bit pixel format, all bits alpha.
-        PF_A8 = 3,
+        PF_A8,
         PF_BYTE_A = PF_A8,
-        /// 8-bit pixel format, 4 bits alpha, 4 bits luminance. @deprecated legacy format
-        PF_A4L4 = 4,
         /// 2 byte pixel format, 1 byte luminance, 1 byte alpha
-        PF_BYTE_LA = 5,
+        PF_BYTE_LA,
         /// 16-bit pixel format, 5 bits red, 6 bits green, 5 bits blue.
-        PF_R5G6B5 = 6,
+        PF_R5G6B5,
         /// 16-bit pixel format, 5 bits red, 6 bits green, 5 bits blue.
-        PF_B5G6R5 = 7,
-        /// 8-bit pixel format, 2 bits blue, 3 bits green, 3 bits red.
-        PF_R3G3B2 = 31,
+        PF_B5G6R5,
         /// 16-bit pixel format, 4 bits for alpha, red, green and blue.
-        PF_A4R4G4B4 = 8,
+        PF_A4R4G4B4,
         /// 16-bit pixel format, 5 bits for blue, green, red and 1 for alpha.
-        PF_A1R5G5B5 = 9,
+        PF_A1R5G5B5,
         /// 24-bit pixel format, 8 bits for red, green and blue.
-        PF_R8G8B8 = 10,
+        PF_R8G8B8,
         /// 24-bit pixel format, 8 bits for blue, green and red.
-        PF_B8G8R8 = 11,
+        PF_B8G8R8,
         /// 32-bit pixel format, 8 bits for alpha, red, green and blue.
-        PF_A8R8G8B8 = 12,
+        PF_A8R8G8B8,
         /// 32-bit pixel format, 8 bits for blue, green, red and alpha.
-        PF_A8B8G8R8 = 13,
+        PF_A8B8G8R8,
         /// 32-bit pixel format, 8 bits for blue, green, red and alpha.
-        PF_B8G8R8A8 = 14,
-        /// 32-bit pixel format, 8 bits for red, green, blue and alpha.
-        PF_R8G8B8A8 = 28,
-        /// 32-bit pixel format, 8 bits for red, 8 bits for green, 8 bits for blue
-        /// like Ogre::PF_A8R8G8B8, but alpha will get discarded
-        PF_X8R8G8B8 = 26,
-        /// 32-bit pixel format, 8 bits for blue, 8 bits for green, 8 bits for red
-        /// like Ogre::PF_A8B8G8R8, but alpha will get discarded
-        PF_X8B8G8R8 = 27,
+        PF_B8G8R8A8,
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
         /// 3 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue
         PF_BYTE_RGB = PF_R8G8B8,
@@ -111,187 +99,195 @@ namespace Ogre {
         PF_BYTE_RGBA = PF_A8B8G8R8,
 #endif        
         /// 32-bit pixel format, 2 bits for alpha, 10 bits for red, green and blue.
-        PF_A2R10G10B10 = 15,
+        PF_A2R10G10B10 = PF_B8G8R8A8 + 1, // ensure steady continuing enumeration
         /// 32-bit pixel format, 10 bits for blue, green and red, 2 bits for alpha.
-        PF_A2B10G10R10 = 16,
+        PF_A2B10G10R10,
         /// DDS (DirectDraw Surface) DXT1 format
-        PF_DXT1 = 17,
+        PF_DXT1,
         /// DDS (DirectDraw Surface) DXT2 format
-        PF_DXT2 = 18,
+        PF_DXT2,
         /// DDS (DirectDraw Surface) DXT3 format
-        PF_DXT3 = 19,
+        PF_DXT3,
         /// DDS (DirectDraw Surface) DXT4 format
-        PF_DXT4 = 20,
+        PF_DXT4,
         /// DDS (DirectDraw Surface) DXT5 format
-        PF_DXT5 = 21,
-        /// 16-bit pixel format, 16 bits (float) for red
-        PF_FLOAT16_R = 32,
+        PF_DXT5,
         /// 48-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue
-        PF_FLOAT16_RGB = 22,
+        PF_FLOAT16_RGB,
         /// 64-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue, 16 bits (float) for alpha
-        PF_FLOAT16_RGBA = 23,
-        /// 32-bit pixel format, 32 bits (float) for red
-        PF_FLOAT32_R = 33,
+        PF_FLOAT16_RGBA,
         /// 96-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue
-        PF_FLOAT32_RGB = 24,
+        PF_FLOAT32_RGB,
         /// 128-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue, 32 bits (float) for alpha
-        PF_FLOAT32_RGBA = 25,
-        /// 32-bit, 2-channel s10e5 floating point pixel format, 16-bit green, 16-bit red
-        PF_FLOAT16_GR = 35,
-        /// 64-bit, 2-channel floating point pixel format, 32-bit green, 32-bit red
-        PF_FLOAT32_GR = 36,
+        PF_FLOAT32_RGBA,
+        /// 32-bit pixel format, 8 bits for red, 8 bits for green, 8 bits for blue
+        /// like Ogre::PF_A8R8G8B8, but alpha will get discarded
+        PF_X8R8G8B8,
+        /// 32-bit pixel format, 8 bits for blue, 8 bits for green, 8 bits for red
+        /// like Ogre::PF_A8B8G8R8, but alpha will get discarded
+        PF_X8B8G8R8,
+        /// 32-bit pixel format, 8 bits for red, green, blue and alpha.
+        PF_R8G8B8A8,
         /// Depth texture format
-        PF_DEPTH = 29,
+        PF_DEPTH,
         /// 64-bit pixel format, 16 bits for red, green, blue and alpha
-        PF_SHORT_RGBA = 30,
+        PF_SHORT_RGBA,
+        /// 8-bit pixel format, 2 bits blue, 3 bits green, 3 bits red.
+        PF_R3G3B2,
+        /// 16-bit pixel format, 16 bits (float) for red
+        PF_FLOAT16_R,
+        /// 32-bit pixel format, 32 bits (float) for red
+        PF_FLOAT32_R,
         /// 32-bit pixel format, 16-bit green, 16-bit red
-        PF_SHORT_GR = 34,
+        PF_SHORT_GR,
+        /// 32-bit, 2-channel s10e5 floating point pixel format, 16-bit green, 16-bit red
+        PF_FLOAT16_GR,
+        /// 64-bit, 2-channel floating point pixel format, 32-bit green, 32-bit red
+        PF_FLOAT32_GR,
         /// 48-bit pixel format, 16 bits for red, green and blue
-        PF_SHORT_RGB = 37,
+        PF_SHORT_RGB,
         /// PVRTC (PowerVR) RGB 2 bpp
-        PF_PVRTC_RGB2 = 38,
+        PF_PVRTC_RGB2,
         /// PVRTC (PowerVR) RGBA 2 bpp
-        PF_PVRTC_RGBA2 = 39,
+        PF_PVRTC_RGBA2,
         /// PVRTC (PowerVR) RGB 4 bpp
-        PF_PVRTC_RGB4 = 40,
+        PF_PVRTC_RGB4,
         /// PVRTC (PowerVR) RGBA 4 bpp
-        PF_PVRTC_RGBA4 = 41,
+        PF_PVRTC_RGBA4,
         /// PVRTC (PowerVR) Version 2, 2 bpp
-        PF_PVRTC2_2BPP = 42,
+        PF_PVRTC2_2BPP,
         /// PVRTC (PowerVR) Version 2, 4 bpp
-        PF_PVRTC2_4BPP = 43,
+        PF_PVRTC2_4BPP,
         /// 32-bit pixel format, 11 bits (float) for red, 11 bits (float) for green, 10 bits (float) for blue
-        PF_R11G11B10_FLOAT = 44,
+        PF_R11G11B10_FLOAT,
         /// 8-bit pixel format, 8 bits red (unsigned int).
-        PF_R8_UINT = 45,
+        PF_R8_UINT,
         /// 16-bit pixel format, 8 bits red (unsigned int), 8 bits blue (unsigned int).
-        PF_R8G8_UINT = 46,
+        PF_R8G8_UINT,
         /// 24-bit pixel format, 8 bits red (unsigned int), 8 bits blue (unsigned int), 8 bits green (unsigned int).
-        PF_R8G8B8_UINT = 47,
+        PF_R8G8B8_UINT,
         /// 32-bit pixel format, 8 bits red (unsigned int), 8 bits blue (unsigned int), 8 bits green (unsigned int), 8 bits alpha (unsigned int).
-        PF_R8G8B8A8_UINT = 48,
+        PF_R8G8B8A8_UINT,
         /// 16-bit pixel format, 16 bits red (unsigned int).
-        PF_R16_UINT = 49,
+        PF_R16_UINT,
         /// 32-bit pixel format, 16 bits red (unsigned int), 16 bits blue (unsigned int).
-        PF_R16G16_UINT = 50,
+        PF_R16G16_UINT,
         /// 48-bit pixel format, 16 bits red (unsigned int), 16 bits blue (unsigned int), 16 bits green (unsigned int).
-        PF_R16G16B16_UINT = 51,
+        PF_R16G16B16_UINT,
         /// 64-bit pixel format, 16 bits red (unsigned int), 16 bits blue (unsigned int), 16 bits green (unsigned int), 16 bits alpha (unsigned int).
-        PF_R16G16B16A16_UINT = 52,
+        PF_R16G16B16A16_UINT,
         /// 32-bit pixel format, 32 bits red (unsigned int).
-        PF_R32_UINT = 53,
+        PF_R32_UINT,
         /// 64-bit pixel format, 32 bits red (unsigned int), 32 bits blue (unsigned int).
-        PF_R32G32_UINT = 54,
+        PF_R32G32_UINT,
         /// 96-bit pixel format, 32 bits red (unsigned int), 32 bits blue (unsigned int), 32 bits green (unsigned int).
-        PF_R32G32B32_UINT = 55,
+        PF_R32G32B32_UINT,
         /// 128-bit pixel format, 32 bits red (unsigned int), 32 bits blue (unsigned int), 32 bits green (unsigned int), 32 bits alpha (unsigned int).
-        PF_R32G32B32A32_UINT = 56,
+        PF_R32G32B32A32_UINT,
         /// 8-bit pixel format, 8 bits red (signed int).
-        PF_R8_SINT = 57,
+        PF_R8_SINT,
         /// 16-bit pixel format, 8 bits red (signed int), 8 bits blue (signed int).
-        PF_R8G8_SINT = 58,
+        PF_R8G8_SINT,
         /// 24-bit pixel format, 8 bits red (signed int), 8 bits blue (signed int), 8 bits green (signed int).
-        PF_R8G8B8_SINT = 59,
+        PF_R8G8B8_SINT,
         /// 32-bit pixel format, 8 bits red (signed int), 8 bits blue (signed int), 8 bits green (signed int), 8 bits alpha (signed int).
-        PF_R8G8B8A8_SINT = 60,
+        PF_R8G8B8A8_SINT,
         /// 16-bit pixel format, 16 bits red (signed int).
-        PF_R16_SINT = 61,
+        PF_R16_SINT,
         /// 32-bit pixel format, 16 bits red (signed int), 16 bits blue (signed int).
-        PF_R16G16_SINT = 62,
+        PF_R16G16_SINT,
         /// 48-bit pixel format, 16 bits red (signed int), 16 bits blue (signed int), 16 bits green (signed int).
-        PF_R16G16B16_SINT = 63,
+        PF_R16G16B16_SINT,
         /// 64-bit pixel format, 16 bits red (signed int), 16 bits blue (signed int), 16 bits green (signed int), 16 bits alpha (signed int).
-        PF_R16G16B16A16_SINT = 64,
+        PF_R16G16B16A16_SINT,
         /// 32-bit pixel format, 32 bits red (signed int).
-        PF_R32_SINT = 65,
+        PF_R32_SINT,
         /// 64-bit pixel format, 32 bits red (signed int), 32 bits blue (signed int).
-        PF_R32G32_SINT = 66,
+        PF_R32G32_SINT,
         /// 96-bit pixel format, 32 bits red (signed int), 32 bits blue (signed int), 32 bits green (signed int).
-        PF_R32G32B32_SINT = 67,
+        PF_R32G32B32_SINT,
         /// 128-bit pixel format, 32 bits red (signed int), 32 bits blue (signed int), 32 bits green (signed int), 32 bits alpha (signed int).
-        PF_R32G32B32A32_SINT = 68,
+        PF_R32G32B32A32_SINT,
         /// 32-bit pixel format, 9 bits for blue, green, red plus a 5 bit exponent.
-        PF_R9G9B9E5_SHAREDEXP = 69,
+        PF_R9G9B9E5_SHAREDEXP,
         /// DDS (DirectDraw Surface) BC4 format (unsigned normalised)
-        PF_BC4_UNORM = 70,
+        PF_BC4_UNORM,
         /// DDS (DirectDraw Surface) BC4 format (signed normalised)
-        PF_BC4_SNORM = 71,
+        PF_BC4_SNORM,
         /// DDS (DirectDraw Surface) BC5 format (unsigned normalised)
-        PF_BC5_UNORM = 72,
+        PF_BC5_UNORM,
         /// DDS (DirectDraw Surface) BC5 format (signed normalised)
-        PF_BC5_SNORM = 73,
+        PF_BC5_SNORM,
         /// DDS (DirectDraw Surface) BC6H format (unsigned 16 bit float)
-        PF_BC6H_UF16 = 74,
+        PF_BC6H_UF16,
         /// DDS (DirectDraw Surface) BC6H format (signed 16 bit float)
-        PF_BC6H_SF16 = 75,
+        PF_BC6H_SF16,
         /// DDS (DirectDraw Surface) BC7 format (unsigned normalised)
-        PF_BC7_UNORM = 76,
-        /// DDS (DirectDraw Surface) BC7 format (unsigned normalised sRGB). @deprecated for sRGB use Ogre::Texture::setHardwareGammaEnabled
-        PF_BC7_UNORM_SRGB = 77,
+        PF_BC7_UNORM,
         /// 8-bit pixel format, all bits red.
-        PF_R8 = 78,
+        PF_R8,
         /// 16-bit pixel format, 8 bits red, 8 bits green.
-        PF_RG8 = 79,
+        PF_RG8,
         /// 8-bit pixel format, 8 bits red (signed normalised int).
-        PF_R8_SNORM = 80,
+        PF_R8_SNORM,
         /// 16-bit pixel format, 8 bits red (signed normalised int), 8 bits blue (signed normalised int).
-        PF_R8G8_SNORM = 81,
+        PF_R8G8_SNORM,
         /// 24-bit pixel format, 8 bits red (signed normalised int), 8 bits blue (signed normalised int), 8 bits green (signed normalised int).
-        PF_R8G8B8_SNORM = 82,
+        PF_R8G8B8_SNORM,
         /// 32-bit pixel format, 8 bits red (signed normalised int), 8 bits blue (signed normalised int), 8 bits green (signed normalised int), 8 bits alpha (signed normalised int).
-        PF_R8G8B8A8_SNORM = 83,
+        PF_R8G8B8A8_SNORM,
         /// 16-bit pixel format, 16 bits red (signed normalised int).
-        PF_R16_SNORM = 84,
+        PF_R16_SNORM,
         /// 32-bit pixel format, 16 bits red (signed normalised int), 16 bits blue (signed normalised int).
-        PF_R16G16_SNORM = 85,
+        PF_R16G16_SNORM,
         /// 48-bit pixel format, 16 bits red (signed normalised int), 16 bits blue (signed normalised int), 16 bits green (signed normalised int).
-        PF_R16G16B16_SNORM = 86,
+        PF_R16G16B16_SNORM,
         /// 64-bit pixel format, 16 bits red (signed normalised int), 16 bits blue (signed normalised int), 16 bits green (signed normalised int), 16 bits alpha (signed normalised int).
-        PF_R16G16B16A16_SNORM = 87,
+        PF_R16G16B16A16_SNORM,
         /// ETC1 (Ericsson Texture Compression)
-        PF_ETC1_RGB8 = 88,
+        PF_ETC1_RGB8,
         /// ETC2 (Ericsson Texture Compression)
-        PF_ETC2_RGB8 = 89,
+        PF_ETC2_RGB8,
         /// ETC2 (Ericsson Texture Compression)
-        PF_ETC2_RGBA8 = 90,
+        PF_ETC2_RGBA8,
         /// ETC2 (Ericsson Texture Compression)
-        PF_ETC2_RGB8A1 = 91,
+        PF_ETC2_RGB8A1,
         /// ATC (AMD_compressed_ATC_texture)
-        PF_ATC_RGB = 92,
+        PF_ATC_RGB,
         /// ATC (AMD_compressed_ATC_texture)
-        PF_ATC_RGBA_EXPLICIT_ALPHA = 93,
+        PF_ATC_RGBA_EXPLICIT_ALPHA,
         /// ATC (AMD_compressed_ATC_texture)
-        PF_ATC_RGBA_INTERPOLATED_ALPHA = 94,
+        PF_ATC_RGBA_INTERPOLATED_ALPHA,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 4x4)
-        PF_ASTC_RGBA_4X4_LDR = 95,
+        PF_ASTC_RGBA_4X4_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 5x4)
-        PF_ASTC_RGBA_5X4_LDR = 96,
+        PF_ASTC_RGBA_5X4_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 5x5)
-        PF_ASTC_RGBA_5X5_LDR = 97,
+        PF_ASTC_RGBA_5X5_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 6x5)
-        PF_ASTC_RGBA_6X5_LDR = 98,
+        PF_ASTC_RGBA_6X5_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 6x6)
-        PF_ASTC_RGBA_6X6_LDR = 99,
+        PF_ASTC_RGBA_6X6_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x5)
-        PF_ASTC_RGBA_8X5_LDR = 100,
+        PF_ASTC_RGBA_8X5_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x6)
-        PF_ASTC_RGBA_8X6_LDR = 101,
+        PF_ASTC_RGBA_8X6_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 8x8)
-        PF_ASTC_RGBA_8X8_LDR = 102,
+        PF_ASTC_RGBA_8X8_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x5)
-        PF_ASTC_RGBA_10X5_LDR = 103,
+        PF_ASTC_RGBA_10X5_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x6)
-        PF_ASTC_RGBA_10X6_LDR = 104,
+        PF_ASTC_RGBA_10X6_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x8)
-        PF_ASTC_RGBA_10X8_LDR = 105,
+        PF_ASTC_RGBA_10X8_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 10x10)
-        PF_ASTC_RGBA_10X10_LDR = 106,
+        PF_ASTC_RGBA_10X10_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 12x10)
-        PF_ASTC_RGBA_12X10_LDR = 107,
+        PF_ASTC_RGBA_12X10_LDR,
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 12x12)
-        PF_ASTC_RGBA_12X12_LDR = 108,
+        PF_ASTC_RGBA_12X12_LDR,
         /// Number of pixel formats currently defined
-        PF_COUNT = 109
+        PF_COUNT
     };
     typedef vector<PixelFormat>::type PixelFormatList;
 

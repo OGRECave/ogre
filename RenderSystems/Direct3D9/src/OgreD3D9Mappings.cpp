@@ -647,8 +647,6 @@ namespace Ogre
             return PF_L8;
         case D3DFMT_L16:
             return PF_L16;
-        case D3DFMT_A4L4:
-            return PF_A4L4;
         case D3DFMT_A8L8:
             return PF_BYTE_LA;  // Assume little endian here
         case D3DFMT_R3G3B2:
@@ -714,8 +712,6 @@ namespace Ogre
             return D3DFMT_L16;
         case PF_A8:
             return D3DFMT_A8;
-        case PF_A4L4:
-            return D3DFMT_A4L4;
         case PF_BYTE_LA:
             return D3DFMT_A8L8; // Assume little endian here
         case PF_R3G3B2:

@@ -44,7 +44,6 @@ namespace Ogre  {
             {GL_LUMINANCE, GL_UNSIGNED_BYTE, GL_LUMINANCE8},     // PF_L8
             {GL_LUMINANCE, GL_UNSIGNED_SHORT, GL_LUMINANCE16},   // PF_L16
             {GL_ALPHA, GL_UNSIGNED_BYTE, GL_ALPHA8},             // PF_A8
-            {GL_NONE},                                           // PF_A4L4
             {GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, GL_LUMINANCE8_ALPHA8},// PF_BYTE_LA
             {GL_RGB, GL_UNSIGNED_SHORT_5_6_5, GL_RGB5},          // PF_R5G6B5
             {GL_BGR, GL_UNSIGNED_SHORT_5_6_5, GL_RGB5},          // PF_B5G6R5

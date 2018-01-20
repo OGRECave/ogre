@@ -120,7 +120,6 @@ namespace Ogre {
                 case PF_BC6H_SF16:
                 case PF_BC6H_UF16:
                 case PF_BC7_UNORM:
-                case PF_BC7_UNORM_SRGB:
                     return ((width+3)/4)*((height+3)/4)*16 * depth;
 
                 // Size calculations from the PVRTC OpenGL extension spec
