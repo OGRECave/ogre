@@ -825,6 +825,10 @@ namespace Ogre
             if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
                 mIrradianceVolume->setPowerScale( decodeFloat( tmpIt->value ) );
 
+            tmpIt = json.FindMember( "fade_attenuation_over_distance" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsBool() )
+                mIrradianceVolume->setFadeAttenuationOverDistace( tmpIt->value.GetBool() );
+
             tmpIt = json.FindMember( "irradiance_max_power" );
             if( tmpIt != json.MemberEnd() && tmpIt->value.IsUint() )
                 mIrradianceVolume->setIrradianceMaxPower( decodeFloat( tmpIt->value ) );
@@ -843,7 +847,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json )
+    void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json, uint32 importFlags )
     {
         rapidjson::Value::ConstMemberIterator tmpIt;
         tmpIt = json.FindMember( "ambient" );
@@ -860,12 +864,16 @@ namespace Ogre
             mSceneManager->setAmbientLight( upperHemisphere, lowerHemisphere, hemiDir, envmapScale );
         }
 
-        tmpIt = json.FindMember( "instant_radiosity" );
-        if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
-            importInstantRadiosity( tmpIt->value );
+        if( importFlags & SceneFlags::InstantRadiosity )
+        {
+            tmpIt = json.FindMember( "instant_radiosity" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
+                importInstantRadiosity( tmpIt->value );
+        }
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormatImporter::importScene( const String &filename, const char *jsonString )
+    void SceneFormatImporter::importScene( const String &filename, const char *jsonString,
+                                           uint32 importFlags )
     {
         mFilename = filename;
 
@@ -881,25 +889,39 @@ namespace Ogre
                          "Invalid JSON string in file " + filename );
         }
 
-        rapidjson::Value::ConstMemberIterator itor = d.FindMember( "scene_nodes" );
-        if( itor != d.MemberEnd() && itor->value.IsArray() )
-            importSceneNodes( itor->value );
+        rapidjson::Value::ConstMemberIterator itor;
 
-        itor = d.FindMember( "items" );
-        if( itor != d.MemberEnd() && itor->value.IsArray() )
-            importItems( itor->value );
+        if( importFlags & SceneFlags::SceneNodes )
+        {
+            itor = d.FindMember( "scene_nodes" );
+            if( itor != d.MemberEnd() && itor->value.IsArray() )
+                importSceneNodes( itor->value );
+        }
 
-        itor = d.FindMember( "entities" );
-        if( itor != d.MemberEnd() && itor->value.IsArray() )
-            importEntities( itor->value );
+        if( importFlags & SceneFlags::Items )
+        {
+            itor = d.FindMember( "items" );
+            if( itor != d.MemberEnd() && itor->value.IsArray() )
+                importItems( itor->value );
+        }
 
-        itor = d.FindMember( "lights" );
-        if( itor != d.MemberEnd() && itor->value.IsArray() )
-            importLights( itor->value );
+        if( importFlags & SceneFlags::Entities )
+        {
+            itor = d.FindMember( "entities" );
+            if( itor != d.MemberEnd() && itor->value.IsArray() )
+                importEntities( itor->value );
+        }
+
+        if( importFlags & SceneFlags::Lights )
+        {
+            itor = d.FindMember( "lights" );
+            if( itor != d.MemberEnd() && itor->value.IsArray() )
+                importLights( itor->value );
+        }
 
         itor = d.FindMember( "scene" );
         if( itor != d.MemberEnd() && itor->value.IsObject() )
-            importSceneSettings( itor->value );
+            importSceneSettings( itor->value, importFlags );
 
         if( mInstantRadiosity )
         {
@@ -909,15 +931,16 @@ namespace Ogre
             if( hlmsPbs && mInstantRadiosity->getUseIrradianceVolume() )
                 hlmsPbs->setIrradianceVolume( mIrradianceVolume );
 
-            mInstantRadiosity->fillIrradianceVolume( mIrradianceVolume,
-                                                     mIrradianceVolume->getIrradianceCellSize(),
-                                                     mIrradianceVolume->getIrradianceOrigin(),
-                                                     mIrradianceVolume->getIrradianceMaxPower(),
-                                                     false );
+            mInstantRadiosity->fillIrradianceVolume(
+                        mIrradianceVolume,
+                        mIrradianceVolume->getIrradianceCellSize(),
+                        mIrradianceVolume->getIrradianceOrigin(),
+                        mIrradianceVolume->getIrradianceMaxPower(),
+                        mIrradianceVolume->getFadeAttenuationOverDistace() );
         }
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormatImporter::importSceneFromFile( const String &folderPath )
+    void SceneFormatImporter::importSceneFromFile( const String &folderPath, uint32 importFlags )
     {
         ResourceGroupManager &resourceGroupManager = ResourceGroupManager::getSingleton();
         resourceGroupManager.addResourceLocation( folderPath, "FileSystem", "SceneFormatImporter" );
@@ -938,7 +961,7 @@ namespace Ogre
 
             //Add null terminator just in case (to prevent bad input)
             fileData.back() = '\0';
-            importScene( stream->getName(), &fileData[0] );
+            importScene( stream->getName(), &fileData[0], importFlags );
         }
 
         resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );

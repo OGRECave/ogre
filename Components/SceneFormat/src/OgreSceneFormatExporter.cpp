@@ -509,6 +509,8 @@ namespace Ogre
                        irradianceVolume->getNumBlocksZ(), " ]" );
             jsonStr.a( ",\n\t\t\t\"power_scale\" : ",
                        encodeFloat( irradianceVolume->getPowerScale() ) );
+            jsonStr.a( ",\n\t\t\t\"fade_attenuation_over_distance\" : ",
+                       toQuotedStr( irradianceVolume->getFadeAttenuationOverDistace() ) );
             jsonStr.a( ",\n\t\t\t\"irradiance_max_power\" : ",
                        encodeFloat( irradianceVolume->getIrradianceMaxPower() ) );
             jsonStr.a( ",\n\t\t\t\"irradiance_origin\" : " );

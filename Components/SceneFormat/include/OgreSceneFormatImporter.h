@@ -101,15 +101,25 @@ namespace Ogre
         void importLight( const rapidjson::Value &lightValue );
         void importLights( const rapidjson::Value &json );
         void importInstantRadiosity( const rapidjson::Value &irValue );
-        void importSceneSettings( const rapidjson::Value &json );
+        void importSceneSettings( const rapidjson::Value &json, uint32 importFlags );
 
     public:
         SceneFormatImporter( Root *root, SceneManager *sceneManager );
         ~SceneFormatImporter();
 
-        void importScene( const String &filename, const char *jsonString );
+        /**
+        @param outJson
+        @param exportFlags
+            Combination of SceneFlags::SceneFlags, to know what to export and what to exclude.
+            Defaults to importing everything.
+            Note that some combinations can cause issues:
+                * Excluding scene nodes
+                * Excluding meshes without excluding Items and Entities.
+                * etc
+        */
+        void importScene( const String &filename, const char *jsonString, uint32 importFlags=~0u );
 
-        void importSceneFromFile( const String &filename );
+        void importSceneFromFile( const String &filename, uint32 importFlags=~0u );
 
         /** Retrieve the InstantRadiosity pointer that may have been created while importing a scene
         @param releaseOwnership
