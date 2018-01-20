@@ -370,12 +370,10 @@ namespace Ogre
 
         addCapabilitiesMapping("fixed_function", RSC_FIXED_FUNCTION);
         addCapabilitiesMapping("automipmap", RSC_AUTOMIPMAP);
-        addCapabilitiesMapping("blending", RSC_BLENDING);
         addCapabilitiesMapping("anisotropy", RSC_ANISOTROPY);
         addCapabilitiesMapping("dot3", RSC_DOT3);
         addCapabilitiesMapping("cubemapping", RSC_CUBEMAPPING);
         addCapabilitiesMapping("hwstencil", RSC_HWSTENCIL);
-        addCapabilitiesMapping("vbo", RSC_VBO);
         addCapabilitiesMapping("32bit_index", RSC_32BIT_INDEX);
         addCapabilitiesMapping("vertex_program", RSC_VERTEX_PROGRAM);
         addCapabilitiesMapping("geometry_program", RSC_GEOMETRY_PROGRAM);

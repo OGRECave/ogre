@@ -77,8 +77,8 @@ namespace Ogre
         /// Supports generating mipmaps in hardware
         /// @deprecated All targetted APIs by Ogre support this feature
         RSC_AUTOMIPMAP              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 0),
-        /// @deprecated All targetted APIs by Ogre support this feature
-        RSC_BLENDING                = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 1),
+        /// GL ES2/ES3 does not support generating mipmaps for compressed formats in hardware
+        RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 1),
         /// Supports anisotropic texture filtering
         RSC_ANISOTROPY              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 2),
         /// Supports fixed-function DOT3 texture blend
@@ -88,9 +88,10 @@ namespace Ogre
         RSC_CUBEMAPPING             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 4),
         /// Supports hardware stencil buffer
         RSC_HWSTENCIL               = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 5),
-        /// Supports hardware vertex and index buffers
-        /// @deprecated All targetted APIs by Ogre support this feature
-        RSC_VBO                     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 7),
+        /// Supports different texture bindings
+        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 6),
+        /// Supports compressed textures in the ASTC format
+        RSC_TEXTURE_COMPRESSION_ASTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 7),
         /// Supports 32bit hardware index buffers
         RSC_32BIT_INDEX             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 8),
         /// Supports vertex programs (vertex shaders)
@@ -192,13 +193,6 @@ namespace Ogre
         RSC_READ_BACK_AS_TEXTURE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
         /// Supports HW gamma, both in the framebuffer and as texture.
         RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 27),
-
-        /// GL ES2/ES3 does not support generating mipmaps for compressed formats in hardware
-        RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 0),
-        /// Supports different texture bindings
-        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 1),
-        /// Supports compressed textures in the ASTC format
-        RSC_TEXTURE_COMPRESSION_ASTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 2),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
