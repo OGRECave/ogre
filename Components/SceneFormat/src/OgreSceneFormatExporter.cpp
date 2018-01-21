@@ -47,6 +47,9 @@ THE SOFTWARE.
 #include "InstantRadiosity/OgreInstantRadiosity.h"
 #include "OgreIrradianceVolume.h"
 
+#include "OgreForward3D.h"
+#include "OgreForwardClustered.h"
+
 namespace Ogre
 {
     SceneFormatExporter::SceneFormatExporter( Root *root, SceneManager *sceneManager,
@@ -544,6 +547,39 @@ namespace Ogre
         jsonStr.a( ", " );
         encodeVector( jsonStr, mSceneManager->getAmbientLightHemisphereDir() );
         jsonStr.a( ", ", encodeFloat( mSceneManager->getAmbientLightUpperHemisphere().a ), " ]" );
+
+        const ForwardPlusBase *forwardPlus = mSceneManager->getForwardPlus();
+
+        if( forwardPlus )
+        {
+            jsonStr.a( ",\n\t\t\"forward_plus\" : \n\t\t{" );
+            if( forwardPlus->getForwardPlusMethod() == ForwardPlusBase::MethodForward3D )
+            {
+                const Forward3D *forwardImpl =
+                        static_cast<const Forward3D*>( forwardPlus );
+
+                jsonStr.a( "\n\t\t\t\"mode\" : \"3d\"" );
+                jsonStr.a( ",\n\t\t\t\"params\" : [" );
+                jsonStr.a( forwardImpl->getWidth(), ", ", forwardImpl->getHeight(), ", ",
+                           forwardImpl->getNumSlices(), ", ", forwardImpl->getLightsPerCell() );
+                jsonStr.a( ", ", encodeFloat( forwardImpl->getMinDistance() ), ", ",
+                           encodeFloat( forwardImpl->getMaxDistance() ), "]" );
+            }
+            else
+            {
+                const ForwardClustered *forwardImpl =
+                        static_cast<const ForwardClustered*>( forwardPlus );
+
+                jsonStr.a( "\n\t\t\t\"mode\" : \"clustered\"" );
+                jsonStr.a( ",\n\t\t\t\"params\" : [" );
+                jsonStr.a( forwardImpl->getWidth(), ", ", forwardImpl->getHeight(), ", ",
+                           forwardImpl->getNumSlices(), ", ", forwardImpl->getLightsPerCell() );
+                jsonStr.a( ", ", encodeFloat( forwardImpl->getMinDistance() ), ", ",
+                           encodeFloat( forwardImpl->getMaxDistance() ), "]" );
+            }
+
+            jsonStr.a( "\n\t\t}" );
+        }
 
         if( exportFlags & SceneFlags::InstantRadiosity )
             exportInstantRadiosity( jsonStr, outJson );

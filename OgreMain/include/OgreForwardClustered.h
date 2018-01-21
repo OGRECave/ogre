@@ -110,7 +110,12 @@ namespace Ogre
 
         virtual void collectLights( Camera *camera );
 
+        uint32 getWidth(void) const                                     { return mWidth; }
+        uint32 getHeight(void) const                                    { return mHeight; }
         uint32 getNumSlices(void) const                                 { return mNumSlices; }
+        uint32 getLightsPerCell(void) const                             { return mLightsPerCell; }
+        float getMinDistance(void) const                                { return mMinDistance; }
+        float getMaxDistance(void) const                                { return mMaxDistance; }
 
         /// Returns the amount of bytes that fillConstBufferData is going to fill.
         virtual size_t getConstBufferSize(void) const;
