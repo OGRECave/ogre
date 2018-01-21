@@ -244,7 +244,7 @@ SceneManager::~SceneManager()
     mForwardPlusImpl    = 0;
 
     fireSceneManagerDestroyed();
-    clearScene();
+    clearScene( true, false );
     destroyAllCameras();
 
     // clear down movable object collection map
@@ -698,7 +698,7 @@ void SceneManager::destroyAllParticleSystems(void)
     destroyAllMovableObjectsByType(ParticleSystemFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-void SceneManager::clearScene(void)
+void SceneManager::clearScene( bool deleteIndestructibleToo, bool reattachCameras )
 {
     destroyAllStaticGeometry();
     destroyAllInstanceManagers();
@@ -712,11 +712,16 @@ void SceneManager::clearScene(void)
         getRootSceneNode(currentMgrType)->detachAllObjects();
     }
 
+    SceneNodeList newSceneNodeList;
+
     // Delete all SceneNodes, except root that is
     for (SceneNodeList::iterator i = mSceneNodes.begin();
         i != mSceneNodes.end(); ++i)
     {
-        OGRE_DELETE *i;
+        if( deleteIndestructibleToo || !(*i)->getIndestructibleByClearScene() )
+            OGRE_DELETE *i;
+        else
+            newSceneNodeList.push_back( *i );
     }
     mSceneNodes.clear();
     mAutoTrackingSceneNodes.clear();
@@ -731,6 +736,34 @@ void SceneManager::clearScene(void)
     if (mRenderQueue)
         mRenderQueue->clear();
 
+    {
+        //Add back to the mSceneNodes list the indestructible nodes.
+        SceneNodeList::const_iterator itor = newSceneNodeList.begin();
+        SceneNodeList::const_iterator end  = newSceneNodeList.end();
+
+        while( itor != end )
+        {
+            SceneNode *sceneNode = *itor;
+            sceneNode->mGlobalIndex = mSceneNodes.size();
+            mSceneNodes.push_back( sceneNode );
+            ++itor;
+        }
+    }
+
+    if( reattachCameras )
+    {
+        //Reattach all cameras to the root scene node
+        CameraList::const_iterator itor = mCameras.begin();
+        CameraList::const_iterator end  = mCameras.end();
+
+        while( itor != end )
+        {
+            Camera *camera = *itor;
+            if( !camera->isAttached() )
+                mSceneRoot[camera->isStatic()]->attachObject( camera );
+            ++itor;
+        }
+    }
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent, NodeMemoryManager *nodeMemoryManager )

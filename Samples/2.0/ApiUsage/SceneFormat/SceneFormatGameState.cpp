@@ -71,26 +71,25 @@ namespace Demo
         mInstantRadiosity = 0;
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatGameState::resetScene(void)
+    {
+        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+        destroyInstantRadiosity();
+        sceneManager->clearScene( false );
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatGameState::generateScene(void)
     {
+        destroyInstantRadiosity();
+
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
         const float armsLength = 2.5f;
 
-        Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
-                                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                            Ogre::Plane( Ogre::Vector3::UNIT_Y, 1.0f ), 50.0f, 50.0f,
-                                            1, 1, true, 1, 4.0f, 4.0f, Ogre::Vector3::UNIT_Z,
-                                            Ogre::v1::HardwareBuffer::HBU_STATIC,
-                                            Ogre::v1::HardwareBuffer::HBU_STATIC );
-
-        Ogre::MeshPtr planeMesh = Ogre::MeshManager::getSingleton().createManual(
-                    "Plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
-
-        planeMesh->importV1( planeMeshV1.get(), true, true, true );
-
         {
-            Ogre::Item *item = sceneManager->createItem( planeMesh, Ogre::SCENE_DYNAMIC );
+            Ogre::Item *item = sceneManager->createItem(
+                                   "Plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                   Ogre::SCENE_DYNAMIC );
             item->setDatablock( "Marble" );
             Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
                                                     createChildSceneNode( Ogre::SCENE_DYNAMIC );
@@ -173,11 +172,17 @@ namespace Demo
                 {
                     Ogre::String datablockName = "Test" + Ogre::StringConverter::toString( numSpheres++ );
                     Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                                hlmsPbs->createDatablock( datablockName,
-                                                          datablockName,
-                                                          Ogre::HlmsMacroblock(),
-                                                          Ogre::HlmsBlendblock(),
-                                                          Ogre::HlmsParamVec() ) );
+                                hlmsPbs->getDatablock( datablockName ) );
+
+                    if( !datablock )
+                    {
+                        datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                                        hlmsPbs->createDatablock( datablockName,
+                                                                  datablockName,
+                                                                  Ogre::HlmsMacroblock(),
+                                                                  Ogre::HlmsBlendblock(),
+                                                                  Ogre::HlmsParamVec() ) );
+                    }
 
                     Ogre::HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
                             createOrRetrieveTexture( "SaintPetersBasilica.dds",
@@ -268,10 +273,15 @@ namespace Demo
                 Ogre::String finalName = materials[i].matName;
 
                 Ogre::HlmsPbsDatablock *datablock;
-                datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                            hlmsPbs->createDatablock( finalName, finalName,
-                                                      macroblock, blendblock,
-                                                      Ogre::HlmsParamVec() ) );
+                datablock = static_cast<Ogre::HlmsPbsDatablock*>( hlmsPbs->getDatablock( finalName ) );
+
+                if( !datablock )
+                {
+                    datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                                    hlmsPbs->createDatablock( finalName, finalName,
+                                                              macroblock, blendblock,
+                                                              Ogre::HlmsParamVec() ) );
+                }
                 datablock->setBackgroundDiffuse( materials[i].colour );
                 datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
                 datablock->setRoughness( 0.02 );
@@ -332,6 +342,18 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::createScene01(void)
     {
+        Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
+                                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                            Ogre::Plane( Ogre::Vector3::UNIT_Y, 1.0f ), 50.0f, 50.0f,
+                                            1, 1, true, 1, 4.0f, 4.0f, Ogre::Vector3::UNIT_Z,
+                                            Ogre::v1::HardwareBuffer::HBU_STATIC,
+                                            Ogre::v1::HardwareBuffer::HBU_STATIC );
+
+        Ogre::MeshPtr planeMesh = Ogre::MeshManager::getSingleton().createManual(
+                    "Plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+
+        planeMesh->importV1( planeMeshV1.get(), true, true, true );
+
         generateScene();
         mCameraController = new CameraController( mGraphicsSystem, false );
         TutorialGameState::createScene01();
@@ -360,13 +382,17 @@ namespace Demo
 
         if( arg.keysym.sym == SDLK_F2 )
         {
+            resetScene();
             generateScene();
         }
         else if( arg.keysym.sym == SDLK_F3 )
         {
+            exportScene();
         }
         else if( arg.keysym.sym == SDLK_F4 )
         {
+            resetScene();
+            importScene();
         }
         else
         {

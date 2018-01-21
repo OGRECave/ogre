@@ -301,7 +301,7 @@ namespace Ogre {
         for (Instances::iterator i = mInstances.begin(); i != mInstances.end(); ++i)
         {
             // shutdown instances (clear scene)
-            i->second->clearScene();            
+            i->second->clearScene( true, false );
         }
 
     }

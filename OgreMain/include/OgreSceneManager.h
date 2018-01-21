@@ -1606,8 +1606,23 @@ namespace Ogre {
             BillboardSets etc. Cameras are not deleted at this stage since
             they are still referenced by viewports, which are not destroyed during
             this process.
+        @remarks
+            When an indestructible SceneNode has a destructible parent, the parent
+            will be destroyed and thus the former SceneNode will be parent-less,
+            i.e. be at the same level as root. Note that parent-less SceneNodes can
+            still render to the scene (this behavior is different from Ogre 1.x)
+        @param deleteIndestructibleToo
+            If a node is marked as indestructible, it won't be deleted unless
+            deleteIndestructibleToo is marked as true.
+            Note that some Ogre compoenents mark some of their objects as internal to
+            prevent them from becoming dangling pointers.
+
+            If you don't know what to put here, set it to false.
+        @param reattachCameras
+            When true, all Cameras that have no parent node after clearing
+            will be reattached to the root node.
         */
-        virtual void clearScene(void);
+        virtual void clearScene( bool deleteIndestructibleToo, bool reattachCameras=true );
 
         /** Sets the ambient light level to be used for the scene.
         @remarks

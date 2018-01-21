@@ -20,6 +20,7 @@ namespace Demo
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
+        void resetScene(void);
         void destroyInstantRadiosity(void);
 
         void generateScene(void);
