@@ -47,6 +47,7 @@ namespace Ogre {
     Node::Node( IdType id, NodeMemoryManager *nodeMemoryManager, Node *parent ) :
         IdObject( id ),
         mDepthLevel( 0 ),
+        mIndestructibleByClearScene( false ),
         mParent( parent ),
 		mName( "" ),
 #if OGRE_DEBUG_MODE
@@ -111,6 +112,16 @@ namespace Ogre {
     Node* Node::getParent(void) const
     {
         return mParent;
+    }
+    //-----------------------------------------------------------------------
+    void Node::setIndestructibleByClearScene( bool indestructible )
+    {
+        mIndestructibleByClearScene = indestructible;
+    }
+    //-----------------------------------------------------------------------
+    bool Node::getIndestructibleByClearScene(void) const
+    {
+        return mIndestructibleByClearScene;
     }
     //-----------------------------------------------------------------------
     void Node::migrateTo( NodeMemoryManager *nodeMemoryManager )
