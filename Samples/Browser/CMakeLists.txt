@@ -24,17 +24,6 @@ get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
 
 if (APPLE_IOS)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-
-  if(NOT OGRE_BUILD_COMPONENT_TERRAIN AND NOT OGRE_SDK_BUILD)
-    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_Terrain)
-    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_EndlessWorld)
-  endif()
-
-  if(NOT OGRE_BUILD_COMPONENT_RTSHADERSYSTEM AND NOT OGRE_SDK_BUILD)
-    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_ShaderSystem)
-    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_ShaderSystemMultiLight)
-    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_ShaderSystemTexturedFog)
-  endif()
 endif ()
 
 if (APPLE AND APPLE_IOS)
@@ -51,33 +40,7 @@ elseif (ANDROID)
     ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_Android.h)
 endif (APPLE AND APPLE_IOS)
 
-
-if (OGRE_STATIC)
-  # Find all samples headers, and copy them to a single include folder
-  # We do this instead of including every sample in the include_directories directive, 
-  # because this creates a list that is too long for the MSVC command line sometimes.
-  file (GLOB SAMPLES_HEADERS ${OGRE_SOURCE_DIR}/Samples/*/include/*.h)
-  foreach(SAMPLE_HEADER_FULLPATH ${SAMPLES_HEADERS})
-	get_filename_component(SAMPLE_HEADER_NAME ${SAMPLE_HEADER_FULLPATH} NAME)
-	configure_file(${SAMPLE_HEADER_FULLPATH} ${OGRE_BINARY_DIR}/Samples/include/${SAMPLE_HEADER_NAME} COPYONLY)
-  endforeach(SAMPLE_HEADER_FULLPATH)
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-	${OGRE_BINARY_DIR}/Samples/include)
-
-  # Fix for static build with MinGW
-  if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
-    include_directories(${DirectX9_INCLUDE_DIR})
-  endif() 
-  
-	ogre_add_component_include_dir(Paging)
-	ogre_add_component_include_dir(Terrain)
-	ogre_add_component_include_dir(Volume)
-	ogre_add_component_include_dir(MeshLodGenerator)
-else()
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
-endif()
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 
 if (WINDOWS_STORE OR WINDOWS_PHONE)
 
@@ -178,6 +141,7 @@ if (ANDROID)
     add_ndk_cpufeatures_library()
     add_ndk_native_app_glue_library()
 
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
     set(SOURCE_FILES ${SOURCE_FILES} ${OGRE_SOURCE_DIR}/Samples/Browser/src/gestureDetector.cpp)
 
     add_library(SampleBrowser SHARED ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

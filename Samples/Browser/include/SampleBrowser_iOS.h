@@ -152,7 +152,7 @@
 
     dispatch_async(dispatch_get_main_queue(), ^(void)
     {
-        Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
+        Ogre::Root::getSingleton().renderOneFrame((Ogre::Real)differenceInSeconds);
     });
 }
 
