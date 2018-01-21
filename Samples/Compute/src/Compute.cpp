@@ -11,22 +11,10 @@ You may use this sample code for anything you like, it is not covered by the
 same license as the rest of the engine.
 -----------------------------------------------------------------------------
 */
-#include "SdkSample.h"
-#include "SamplePlugin.h"
+#include "Compute.h"
 
-using namespace Ogre;
-using namespace OgreBites;
-
-class _OgreSampleClassExport Sample_Compute : public SdkSample
-{
-    Entity* mOgreEnt;
-
-    TexturePtr mImage;
-    HardwarePixelBufferSharedPtr mPixelBuffer;
-
- public:
-        
-    Sample_Compute() : mOgreEnt(NULL)
+namespace OgreBites {
+    Sample_Compute::Sample_Compute() : mOgreEnt(NULL)
     { 
         mInfo["Title"] = "Compute";
         mInfo["Description"] = "A basic example of the compute shader.";
@@ -38,7 +26,7 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
                 "the sine overlay is based on the global id";
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void Sample_Compute::testCapabilities(const RenderSystemCapabilities* caps)
     {
         if (!caps->hasCapability(RSC_COMPUTE_PROGRAM))
         {
@@ -49,7 +37,7 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
     }
 
     // Just override the mandatory create scene method
-    void setupContent(void)
+    void Sample_Compute::setupContent(void)
     {
         mCameraNode->setPosition(0, 0, -40);
         mCameraNode->lookAt(Vector3(0,0,0), Node::TS_PARENT);
@@ -105,32 +93,7 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
         }
     }
 
-    void cleanupContent()
-    {
-        // Read image load/store data.
-//        mPixelBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
-//        const PixelBox &pb = mPixelBuffer->getCurrentLock();
-//        uint *data = static_cast<uint*>(pb.data);
-//        size_t height = pb.getHeight();
-//        size_t width = pb.getWidth();
-//        size_t pitch = pb.rowPitch; // Skip between rows of image
-//        printf("Buffer values.\n");
-//         for (size_t y = 0; y < height; ++y)
-//         {
-//             for(size_t x = 0; x < width; ++x)
-//             {
-//                 std::cout << " " << std::hex << data[pitch * y + x];
-//             }
-//             std::cout << std::endl;
-//         }
-//        std::cout << std::hex << data[0];
-//        std::cout << " " << data[1] << std::endl;
-//        mPixelBuffer->unlock();
-
-        //MeshManager::getSingleton().remove(mTetrahedraMesh->getName());
-    }
-
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool Sample_Compute::frameRenderingQueued(const FrameEvent& evt)
     {
         // update uniform buffer value
         Real seconds = Root::getSingleton().getTimer()->getMilliseconds()/1000.0f;
@@ -139,29 +102,4 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
 
         return SdkSample::frameRenderingQueued(evt); 
     }
-};
-
-#ifndef OGRE_STATIC_LIB
-
-static SamplePlugin* sp;
-static Sample* s;
-
-extern "C" void _OgreSampleExport dllStartPlugin(void);
-extern "C" void _OgreSampleExport dllStopPlugin(void);
-
-extern "C" _OgreSampleExport void dllStartPlugin()
-{
-    s = new Sample_Compute;
-    sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
-    sp->addSample(s);
-    Root::getSingleton().installPlugin(sp);
 }
-
-extern "C" _OgreSampleExport void dllStopPlugin()
-{
-    Root::getSingleton().uninstallPlugin(sp); 
-    OGRE_DELETE sp;
-    delete s;
-}
-
-#endif

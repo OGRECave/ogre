@@ -21,21 +21,12 @@ same license as the rest of the engine.
   -----------------------------------------------------------------------------
 */
 
-#include "SdkSample.h"
-#include "SamplePlugin.h"
-#include "ProceduralTools.h"
+#include "Isosurf.h"
 
-using namespace Ogre;
-using namespace OgreBites;
+namespace OgreBites {
+    using namespace Ogre;
 
-class _OgreSampleClassExport Sample_Isosurf : public SdkSample
-{
-    Entity* tetrahedra;
-    MeshPtr mTetrahedraMesh;
-
- public:
-        
-    Sample_Isosurf() 
+    Sample_Isosurf::Sample_Isosurf()
     { 
         mInfo["Title"] = "Isosurf";
         mInfo["Description"] = "A demo of procedural geometry manipulation using geometry shaders.";
@@ -43,7 +34,7 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
         mInfo["Category"] = "Geometry";
     }
 
-    StringVector getRequiredPlugins()
+    StringVector Sample_Isosurf::getRequiredPlugins()
     {
         StringVector names;
 		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsl150")
@@ -52,7 +43,7 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
         return names;
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void Sample_Isosurf::testCapabilities(const RenderSystemCapabilities* caps)
     {
         if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
         {
@@ -66,7 +57,7 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
     }
 
     // Just override the mandatory create scene method
-    void setupContent(void)
+    void Sample_Isosurf::setupContent(void)
     {
         mCameraNode->setPosition(0, 0, -40);
         mCameraNode->lookAt(Vector3(0,0,0), Node::TS_PARENT);
@@ -82,12 +73,12 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
         parentNode->setScale(10,10,10);
     }
 
-    void cleanupContent()
+    void Sample_Isosurf::cleanupContent()
     {
         MeshManager::getSingleton().remove(mTetrahedraMesh->getName(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool Sample_Isosurf::frameRenderingQueued(const FrameEvent& evt)
     {
         Real seconds = (Real)(Root::getSingleton().getTimer()->getMilliseconds()) / 1000.0;
         Ogre::Pass* renderPass = tetrahedra->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
@@ -104,28 +95,3 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
         return SdkSample::frameRenderingQueued(evt); 
     }
 };
-
-#ifndef OGRE_STATIC_LIB
-
-static SamplePlugin* sp;
-static Sample* s;
-
-extern "C" void _OgreSampleExport dllStartPlugin(void);
-extern "C" void _OgreSampleExport dllStopPlugin(void);
-
-extern "C" _OgreSampleExport void dllStartPlugin()
-{
-    s = new Sample_Isosurf;
-    sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
-    sp->addSample(s);
-    Root::getSingleton().installPlugin(sp);
-}
-
-extern "C" _OgreSampleExport void dllStopPlugin()
-{
-    Root::getSingleton().uninstallPlugin(sp); 
-    OGRE_DELETE sp;
-    delete s;
-}
-
-#endif

@@ -40,9 +40,10 @@
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "SampleBrowser_Android.h"
 
+namespace OgreBites {
 SampleBrowser OgreAndroidBridge::mBrowser;
 ndk_helper::PinchDetector OgreAndroidBridge::mPinchGesture;
-
+}
 #endif
 
 #include "SampleBrowser.h"
@@ -87,8 +88,8 @@ int main(int argc, char *argv[]) {
 
     return retVal;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    OgreAndroidBridge::init(state);
-    OgreAndroidBridge::go(state);
+    OgreBites::OgreAndroidBridge::init(state);
+    OgreBites::OgreAndroidBridge::go(state);
 #else
 
     try

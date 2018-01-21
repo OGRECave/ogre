@@ -34,30 +34,34 @@ if (OGRE_BUILD_SAMPLES)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-	add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
-	ogre_add_component_include_dir(RTShaderSystem)
+    add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
+    ogre_add_component_include_dir(RTShaderSystem)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreRTShaderSystem)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_OVERLAY)
-	ogre_add_component_include_dir(Overlay)
+	  ogre_add_component_include_dir(Overlay)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreOverlay)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_TERRAIN)
+    ogre_add_component_include_dir(Terrain)
+    ogre_add_component_include_dir(Paging)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreTerrain)
   endif ()
 
   if (OGRE_BUILD_COMPONENT_VOLUME)
+    ogre_add_component_include_dir(Volume)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreVolume)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_HLMS)
-	ogre_add_component_include_dir(HLMS)
+	  ogre_add_component_include_dir(HLMS)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreHLMS)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR AND OGRE_CONFIG_ENABLE_MESHLOD)
+    ogre_add_component_include_dir(MeshLodGenerator)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreMeshLodGenerator)
   endif ()
 
@@ -76,118 +80,51 @@ if (OGRE_BUILD_SAMPLES)
   if (OGRE_BUILD_RENDERSYSTEM_GLES2)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES2)
   endif ()
-  if (APPLE)
-    if (APPLE_IOS)
-      set(OGRE_LIBRARIES ${OGRE_LIBRARIES})
-    endif ()
-  endif ()
 
-  if (OGRE_STATIC)
-  	# Static linking means we need to directly use plugins
-  	include_directories(${OGRE_SOURCE_DIR}/PlugIns/BSPSceneManager/include)
-  	include_directories(${OGRE_SOURCE_DIR}/PlugIns/CgProgramManager/include)
-  	include_directories(${OGRE_SOURCE_DIR}/PlugIns/OctreeSceneManager/include)
-  	include_directories(${OGRE_SOURCE_DIR}/PlugIns/OctreeZone/include)
-  	include_directories(${OGRE_SOURCE_DIR}/PlugIns/ParticleFX/include)
-  	include_directories(${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/include)
-  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
-  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
-  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
-  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
-  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
-    if (OGRE_BUILD_RENDERSYSTEM_GL)
-      	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL/include)
-	endif()
-    if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-      	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include)
-    endif()
-
-	# Link to all enabled plugins
-	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
-  else ()
-	# Link to RT Shader System if enabled.
-	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)	
-  		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreRTShaderSystem)
-	endif () 
-    
-	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay OgreBites)
-  endif ()
+  # Link to all enabled plugins
+  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
   
   if(EMSCRIPTEN)
     add_subdirectory(Emscripten)
     return()
   endif()
-  
-  #add_subdirectory(AtomicCounters)
-  add_subdirectory(BezierPatch)
-  add_subdirectory(CameraTrack)
-  add_subdirectory(Character)
-  add_subdirectory(Compositor)
-  add_subdirectory(Compute)
-  add_subdirectory(DualQuaternion)
-  add_subdirectory(DynTex)
-  add_subdirectory(FacialAnimation)
-  add_subdirectory(Grass)
-  add_subdirectory(Instancing)
-  add_subdirectory(Lighting)
-  if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
-    add_subdirectory(MeshLod)
-  endif ()
 
-  add_subdirectory(NewInstancing)
-  add_subdirectory(OceanDemo)
-  add_subdirectory(ParticleFX)
-  add_subdirectory(PBR)
-  add_subdirectory(PNTrianglesTessellation)
-  if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-    add_subdirectory(ShaderSystem)
-	add_subdirectory(ShaderSystemTexturedFog)
-    add_subdirectory(ShaderSystemMultiLight)
-  endif ()
-  add_subdirectory(Shadows)
-  add_subdirectory(SkeletalAnimation)
-  add_subdirectory(SkyBox)
-  add_subdirectory(SkyDome)
-  add_subdirectory(SkyPlane)
-  add_subdirectory(Smoke)
-  add_subdirectory(SphereMapping)
-if (OGRE_BUILD_COMPONENT_TERRAIN)
-  add_subdirectory(Terrain)
-  add_subdirectory(EndlessWorld)
-endif ()
-  add_subdirectory(Tessellation)
-  #add_subdirectory(Hair)
-  #add_subdirectory(Island)
-  #add_subdirectory(TerrainTessellation)
-  add_subdirectory(TextureFX)
-  add_subdirectory(TextureArray)
-  add_subdirectory(Transparency)
-  add_subdirectory(VolumeTex)
-if (OGRE_BUILD_COMPONENT_VOLUME)
-  if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-    add_subdirectory(VolumeCSG)
+  ## Default Samples Plugin
+
+  # Find all samples headers, and copy them to a single include folder
+  # We do this instead of including every sample in the include_directories directive, 
+  # because this creates a list that is too long for the MSVC command line sometimes.
+  file (GLOB SAMPLES_HEADERS ${OGRE_SOURCE_DIR}/Samples/*/include/*.h)
+  foreach(SAMPLE_HEADER_FULLPATH ${SAMPLES_HEADERS})
+	  get_filename_component(SAMPLE_HEADER_NAME ${SAMPLE_HEADER_FULLPATH} NAME)
+	  configure_file(${SAMPLE_HEADER_FULLPATH} ${OGRE_BINARY_DIR}/Samples/include/${SAMPLE_HEADER_NAME} COPYONLY)
+  endforeach(SAMPLE_HEADER_FULLPATH)
+  include_directories(${OGRE_BINARY_DIR}/Samples/include)
+
+  file(GLOB SAMPLES_SOURCES ${OGRE_SOURCE_DIR}/Samples/*/src/*.cpp)
+
+  set(BLACKLIST AtomicCounters Browser TerrainTessellation PCZTestApp)
+  foreach(FILTER_SAMPLE ${BLACKLIST})
+    file(GLOB BLACKLIST_CPP ${OGRE_SOURCE_DIR}/Samples/${FILTER_SAMPLE}/src/*.cpp)
+    list(REMOVE_ITEM SAMPLES_SOURCES ${BLACKLIST_CPP})
+  endforeach()
+
+  add_library(DefaultSamples ${OGRE_LIB_TYPE} 
+              ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/DefaultSamplesPlugin.cpp
+              ${SAMPLES_SOURCES} ${SAMPLES_HEADERS})
+  target_link_libraries(DefaultSamples ${OGRE_LIBRARIES} OgreBites ${SDL2_LIBRARY})
+  ogre_config_sample_lib(DefaultSamples)
+
+  if (APPLE AND NOT APPLE_IOS)
+      # Set the INSTALL_PATH so that Samples can be installed in the application package
+      set_target_properties(DefaultSamples
+        PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+        INSTALL_NAME_DIR "@executable_path/../Plugins"
+      )
   endif()
-  add_subdirectory(VolumeTerrain)
-endif ()
-  add_subdirectory(Water)
 
-  add_subdirectory(BSP)
-  add_subdirectory(CelShading)
-  add_subdirectory(DeferredShading)
-  add_subdirectory(CubeMapping)
-  add_subdirectory(Dot3Bump)
-  add_subdirectory(Fresnel)
-  add_subdirectory(Isosurf)
-  add_subdirectory(ParticleGS)
-  add_subdirectory(SSAO)
-
-if (OGRE_BUILD_COMPONENT_HLMS)
-  add_subdirectory(HLMS)
-endif ()
-
-# Add browser last
-add_subdirectory(Browser)
-
+  ## Add browser last
+  add_subdirectory(Browser)
 endif ()
 
 

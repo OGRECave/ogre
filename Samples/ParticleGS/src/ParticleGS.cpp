@@ -21,16 +21,12 @@ Also see acknowledgements in Readme.html
   -----------------------------------------------------------------------------
 */
 
-#include "ProceduralManualObject.h"
-#include "OgreRenderToVertexBuffer.h"
-#include "RandomTools.h"
-#include "SamplePlugin.h"
-#include "SdkSample.h"
+#include "ParticleGS.h"
 
 using namespace Ogre;
 using namespace OgreBites;
 
-// #define LOG_GENERATED_BUFFER
+namespace OgreBites {
 const Vector3 GRAVITY_VECTOR = Vector3(0, -9.8, 0);
 
 #ifdef LOG_GENERATED_BUFFER
@@ -43,10 +39,7 @@ struct FireworkParticle
 };
 #endif
 
-class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
-{
- public:
-    Sample_ParticleGS()
+    Sample_ParticleGS::Sample_ParticleGS()
     {
         mInfo["Title"] = "Geometry Shader Particle System";
         mInfo["Description"] = "A demo of particle systems using geometry shaders and render to vertex buffers.";
@@ -54,9 +47,7 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         mInfo["Category"] = "Effects";
     }
 
- protected:
-
-    void createProceduralParticleSystem()
+    void Sample_ParticleGS::createProceduralParticleSystem()
     {
         mParticleSystem = static_cast<ProceduralManualObject*>
             (mSceneMgr->createMovableObject("ParticleGSEntity", ProceduralManualObjectFactory::FACTORY_TYPE_NAME));
@@ -118,7 +109,7 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         mParticleSystem->setBoundingBox(aabb);
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void Sample_ParticleGS::testCapabilities(const RenderSystemCapabilities* caps)
     {
         if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
         {
@@ -134,7 +125,7 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         }
     }
 
-    void setupContent(void)
+    void Sample_ParticleGS::setupContent(void)
     {
         demoTime = 0;
 
@@ -170,7 +161,7 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,95,0))->attachObject(pPlaneEnt);
     }
 
-    void cleanupContent()
+    void Sample_ParticleGS::cleanupContent()
     {
         Root::getSingleton().removeMovableObjectFactory(mProceduralManualObjectFactory);
         OGRE_DELETE mProceduralManualObjectFactory;
@@ -179,7 +170,7 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
-    bool frameStarted(const FrameEvent& evt)
+    bool Sample_ParticleGS::frameStarted(const FrameEvent& evt)
     {
         // Set shader parameters.
         GpuProgramParametersSharedPtr geomParams = mParticleSystem->
@@ -202,7 +193,7 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
     }
 
 #ifdef LOG_GENERATED_BUFFER
-    bool frameEnded(const FrameEvent& evt)
+    bool Sample_ParticleGS::frameEnded(const FrameEvent& evt)
     {
         // This will only work if the vertex buffer usage is dynamic
         // (see R2VB implementation).
@@ -233,32 +224,4 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         return SdkSample::frameEnded(evt);
     }
 #endif
-
-    Real demoTime;
-    ProceduralManualObject* mParticleSystem;
-    ProceduralManualObjectFactory *mProceduralManualObjectFactory;
-};
-
-#ifndef OGRE_STATIC_LIB
-
-static SamplePlugin* sp;
-static Sample* s;
-
-extern "C" void _OgreSampleExport dllStartPlugin(void);
-extern "C" void _OgreSampleExport dllStopPlugin(void);
-
-extern "C" _OgreSampleExport void dllStartPlugin()
-{
-    s = new Sample_ParticleGS;
-    sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
-    sp->addSample(s);
-    Root::getSingleton().installPlugin(sp);
 }
-
-extern "C" _OgreSampleExport void dllStopPlugin()
-{
-    Root::getSingleton().uninstallPlugin(sp);
-    OGRE_DELETE sp;
-    delete s;
-}
-#endif
