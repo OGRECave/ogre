@@ -67,6 +67,8 @@ namespace Ogre
         InstantRadiosity *mInstantRadiosity;
         IrradianceVolume *mIrradianceVolume;
 
+        LightArray mVplLights;
+
         typedef map<uint32, SceneNode*>::type IndexToSceneNodeMap;
         IndexToSceneNodeMap mCreatedSceneNodes;
 
@@ -116,10 +118,15 @@ namespace Ogre
                 * Excluding scene nodes
                 * Excluding meshes without excluding Items and Entities.
                 * etc
-        */
-        void importScene( const String &filename, const char *jsonString, uint32 importFlags=~0u );
 
-        void importSceneFromFile( const String &filename, uint32 importFlags=~0u );
+            By default LightsVpl is not set so that InstantRadiosity is regenerated.
+            By setting LightsVpl and unsetting SceneFlags::BuildInstantRadiosity, you can speed up
+            import time because the cached results will be loaded instead.
+        */
+        void importScene( const String &filename, const char *jsonString,
+                          uint32 importFlags=~SceneFlags::LightsVpl );
+
+        void importSceneFromFile( const String &filename, uint32 importFlags=~SceneFlags::LightsVpl );
 
         /** Retrieve the InstantRadiosity pointer that may have been created while importing a scene
         @param releaseOwnership
