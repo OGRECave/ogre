@@ -31,14 +31,18 @@ THE SOFTWARE.
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreGL3PlusStateCacheManager.h"
+#include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
 
 
     GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager *manager, uint fsaa):
-        mManager(manager), mNumSamples(fsaa)
+        mManager(manager), mContext(NULL), mNumSamples(fsaa)
     {
+        GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+        mContext = rs->_getCurrentContext();
+
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
@@ -74,11 +78,13 @@ namespace Ogre {
         mManager->releaseRenderBuffer(mStencil);
         mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // Delete framebuffer object
-        if (GL3PlusStateCacheManager* stateCacheManager = mManager->getStateCacheManager())
+        if(mContext && mFB)
         {
-            stateCacheManager->deleteGLFrameBuffer(GL_FRAMEBUFFER, mFB);
+            GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+            rs->_destroyFbo(mContext, mFB);
+            
             if (mMultisampleFB)
-                stateCacheManager->deleteGLFrameBuffer(GL_FRAMEBUFFER, mMultisampleFB);
+                rs->_destroyFbo(mContext, mMultisampleFB);
         }
     }
     
@@ -102,6 +108,8 @@ namespace Ogre {
     
     void GL3PlusFrameBufferObject::initialise()
     {
+        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+
         // Release depth and stencil, if they were bound
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
@@ -245,6 +253,8 @@ namespace Ogre {
     
     void GL3PlusFrameBufferObject::bind()
     {
+        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+
         // Bind it to FBO
         const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
         mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, fb );
@@ -271,6 +281,8 @@ namespace Ogre {
 
     void GL3PlusFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
+        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+
         GL3PlusDepthBuffer *glDepthBuffer = static_cast<GL3PlusDepthBuffer*>(depthBuffer);
         mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
 
@@ -297,6 +309,8 @@ namespace Ogre {
     
     void GL3PlusFrameBufferObject::detachDepthBuffer()
     {
+        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+
         mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,

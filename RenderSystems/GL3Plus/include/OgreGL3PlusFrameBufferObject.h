@@ -80,9 +80,14 @@ namespace Ogre {
         GLsizei getFSAA();
         
         GL3PlusFBOManager *getManager() { return mManager; }
+        GLContext* getContext() { return mContext; }
         const GLSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
+
+        void notifyContextDestroyed(GLContext* context) { if(mContext == context) { mContext = 0; mFB = 0; mMultisampleFB = 0; } }
+
     private:
         GL3PlusFBOManager *mManager;
+        GLContext* mContext; /// Context that was used to create FBO. It could already be destroyed, so do not dereference this field blindly
         GLsizei mNumSamples;
         GLuint mFB;
         GLuint mMultisampleFB;

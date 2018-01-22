@@ -1892,6 +1892,18 @@ namespace Ogre {
     {
         static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
 
+        for(RenderTargetMap::iterator it = mRenderTargets.begin(); it!=mRenderTargets.end(); ++it)
+        {
+            RenderTarget* target = it->second;
+            if(target)
+            {
+                GL3PlusFrameBufferObject *fbo = 0;
+                target->getCustomAttribute("FBO", &fbo);
+                if(fbo)
+                    fbo->notifyContextDestroyed(context);
+            }
+        }
+        
         if (mCurrentContext == context)
         {
             // Change the context to something else so that a valid context
@@ -1925,6 +1937,14 @@ namespace Ogre {
             context->_getVaoDeferredForDestruction().push_back(vao);
         else
             OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &vao));
+    }
+
+    void GL3PlusRenderSystem::_destroyFbo(GLContext* context, uint32 fbo)
+    {
+        if(context != mCurrentContext)
+            context->_getFboDeferredForDestruction().push_back(fbo);
+        else
+            _getStateCacheManager()->deleteGLFrameBuffer(GL_FRAMEBUFFER, fbo);
     }
 
     void GL3PlusRenderSystem::_bindVao(GLContext* context, uint32 vao)

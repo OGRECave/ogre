@@ -39,7 +39,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
-        mManager(manager), mNumSamples(fsaa), mContext(NULL)
+        mManager(manager), mContext(NULL), mNumSamples(fsaa)
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         GLint oldfb = 0;
