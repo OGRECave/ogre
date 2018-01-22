@@ -30,11 +30,7 @@
 #include "InstantRadiosity/OgreInstantRadiosity.h"
 #include "OgreIrradianceVolume.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    #define SCENE_PATH "C:/Users/matias/Desktop/test_scene"
-#else
-    #define SCENE_PATH "/home/matias/test_scene"
-#endif
+#include "OgreFileSystemLayer.h"
 
 using namespace Demo;
 
@@ -45,6 +41,8 @@ namespace Demo
         mInstantRadiosity( 0 ),
         mIrradianceVolume( 0 )
     {
+        Ogre::FileSystemLayer filesystmLayer( OGRE_VERSION_NAME );
+        mFullpathToFile = filesystmLayer.getWritablePath( "scene_format_test_scene" );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::destroyInstantRadiosity(void)
@@ -325,7 +323,7 @@ namespace Demo
         Ogre::SceneFormatExporter exporter( mGraphicsSystem->getRoot(),
                                             mGraphicsSystem->getSceneManager(),
                                             mInstantRadiosity );
-        exporter.exportSceneToFile( SCENE_PATH );
+        exporter.exportSceneToFile( mFullpathToFile );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::importScene(void)
@@ -333,7 +331,7 @@ namespace Demo
         destroyInstantRadiosity();
 
         Ogre::SceneFormatImporter importer( mGraphicsSystem->getRoot(), mGraphicsSystem->getSceneManager() );
-        importer.importSceneFromFile( SCENE_PATH );
+        importer.importSceneFromFile( mFullpathToFile );
         importer.getInstantRadiosity( true, &mInstantRadiosity, &mIrradianceVolume );
 
 //        sceneManager->setForwardClustered( true, 16, 8, 24, 96, 2, 50 );
@@ -370,6 +368,7 @@ namespace Demo
         outText += "\nPress F2 to generate the scene from code.";
         outText += "\nPress F3 to export the current scene.";
         outText += "\nPress F4 to generate the scene from an imported file.";
+        outText += "\nFile location: " + mFullpathToFile;
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::keyReleased( const SDL_KeyboardEvent &arg )
