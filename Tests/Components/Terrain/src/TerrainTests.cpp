@@ -31,10 +31,6 @@ THE SOFTWARE.
 #include "OgreResourceGroupManager.h"
 #include "OgreLogManager.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "macUtils.h"
-#endif
-
 //--------------------------------------------------------------------------
 void TerrainTests::SetUp()
 {

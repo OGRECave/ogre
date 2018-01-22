@@ -47,15 +47,6 @@ namespace Ogre {
     class OverlaySystem;
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE |OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "macUtils.h"
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   ifdef __OBJC__
-#       import <UIKit/UIKit.h>
-#   endif
-#endif
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android/configuration.h>
 #include <android/asset_manager.h>
