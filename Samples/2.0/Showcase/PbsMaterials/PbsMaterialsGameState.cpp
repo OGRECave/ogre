@@ -21,9 +21,6 @@
 #include "OgreHlmsTextureManager.h"
 #include "OgreHlmsPbs.h"
 
-#include "OgreSceneFormatExporter.h"
-#include "OgreSceneFormatImporter.h"
-
 using namespace Demo;
 
 namespace Demo
@@ -41,7 +38,7 @@ namespace Demo
     void PbsMaterialsGameState::createScene01(void)
     {
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-#if 0
+
         const float armsLength = 2.5f;
 
         Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
@@ -212,32 +209,19 @@ namespace Demo
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
 
         mLightNodes[2] = lightNode;
-#endif
 
         mCameraController = new CameraController( mGraphicsSystem, false );
-
-//        Ogre::String exportedVal;
-//        Ogre::SceneFormat exporter( mGraphicsSystem->getRoot(), sceneManager );
-//        exporter.exportSceneToFile( "/home/matias/test_scene" );
-
-        Ogre::SceneFormatImporter importer( mGraphicsSystem->getRoot(), sceneManager );
-        importer.importSceneFromFile( "/home/matias/test_scene" );
-
-//        exporter.exportScene( exportedVal );
-
-//        std::ofstream file( "/home/matias/tmp" );
-//        file << exportedVal;
 
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
     void PbsMaterialsGameState::update( float timeSinceLast )
     {
-        /*if( mAnimateObjects )
+        if( mAnimateObjects )
         {
             for( int i=0; i<16; ++i )
                 mSceneNode[i]->yaw( Ogre::Radian(timeSinceLast * i * 0.125f) );
-        }*/
+        }
 
         TutorialGameState::update( timeSinceLast );
     }
