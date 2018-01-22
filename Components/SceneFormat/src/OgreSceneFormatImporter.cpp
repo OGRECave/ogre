@@ -675,6 +675,9 @@ namespace Ogre
             light->setShadowNearClipDistance( nearFar.x );
             light->setShadowFarClipDistance( nearFar.y );
         }
+
+        if( light->getType() == Light::LT_VPL )
+            mVplLights.push_back( light );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importLights( const rapidjson::Value &json )
@@ -925,7 +928,24 @@ namespace Ogre
         if( itor != d.MemberEnd() && itor->value.IsObject() )
             importSceneSettings( itor->value, importFlags );
 
-        if( mInstantRadiosity )
+        if( !(importFlags & SceneFlags::LightsVpl) )
+        {
+            LightArray::const_iterator itLight = mVplLights.begin();
+            LightArray::const_iterator enLight = mVplLights.end();
+
+            while( itLight != enLight )
+            {
+                Light *vplLight = *itLight;
+                SceneNode *sceneNode = vplLight->getParentSceneNode();
+                mSceneManager->destroySceneNode( sceneNode );
+                mSceneManager->destroyLight( vplLight );
+                ++itLight;
+            }
+
+            mVplLights.clear();
+        }
+
+        if( mInstantRadiosity && importFlags & SceneFlags::BuildInstantRadiosity )
         {
             mInstantRadiosity->build();
 
