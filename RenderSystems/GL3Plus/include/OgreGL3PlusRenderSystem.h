@@ -297,6 +297,8 @@ namespace Ogre {
         void _bindVao(GLContext* context, uint32 vao);
         /** Destroy VAO immediately or defer if it was created on other context */
         void _destroyVao(GLContext* context, uint32 vao);
+        /** Destroy FBO immediately or defer if it was created on other context */
+        void _destroyFbo(GLContext* context, uint32 fbo);
 
         /** Unregister a render target->context mapping. If the context of target
             is the current context, change the context to the main context so it
