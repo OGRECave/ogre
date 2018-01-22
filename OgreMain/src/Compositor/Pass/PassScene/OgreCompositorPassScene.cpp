@@ -130,7 +130,7 @@ namespace Ogre
             listener->passEarlyPreExecute( this );
 
         Camera const *usedLodCamera = mLodCamera;
-        if( lodCamera && mCamera == mLodCamera )
+        if( lodCamera && mDefinition->mLodCameraName == IdString() )
             usedLodCamera = lodCamera;
 
         //store the viewports current material scheme and use the one set in the scene pass def
