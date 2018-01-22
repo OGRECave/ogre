@@ -15,6 +15,7 @@ namespace Demo
 {
     class SceneFormatGameState : public TutorialGameState
     {
+        Ogre::String            mFullpathToFile;
         Ogre::InstantRadiosity  *mInstantRadiosity;
         Ogre::IrradianceVolume  *mIrradianceVolume;
 
