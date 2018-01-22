@@ -379,6 +379,8 @@ namespace Ogre
 
         virtual bool hasCustomShadowMacroblock(void) const;
 
+        virtual void saveTextures( const String &folderPath, set<String>::type &savedTextures );
+
         static const char* getCmpString( CompareFunction compareFunction );
 
     protected:

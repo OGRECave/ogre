@@ -404,9 +404,14 @@ namespace Ogre {
             Whether to embed mipmaps in the image
         @param mipmapBias
             From which mipmap we should start from; in range [0; getNumMipmaps()]
+        @param firstSlice
+            First slice to use. Only valid for 2D Array, 3D and Cubemap textures
+        @param numSlices
+            Number of slices to export. Only valid for 2D Array, 3D and Cubemap textures.
+            A value of 0 means all of them starting from firstSlice.
         */
         virtual void convertToImage( Image& destImage, bool includeMipMaps = false,
-                                     uint32 mipmapBias=0 );
+                                     uint32 mipmapBias=0, uint32 firstSlice=0, uint32 numSlices=0 );
         
         /** Retrieve a platform or API-specific piece of information from this texture.
          This method of retrieving information should only be used if you know what you're doing.

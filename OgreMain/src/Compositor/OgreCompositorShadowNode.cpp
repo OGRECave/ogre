@@ -91,7 +91,10 @@ namespace Ogre
         SceneNode *pseudoRootNode = 0;
 
         if( !definition->mShadowMapTexDefinitions.empty() )
+        {
             pseudoRootNode = sceneManager->createSceneNode( SCENE_DYNAMIC );
+            pseudoRootNode->setIndestructibleByClearScene( true );
+        }
 
         //Create the local textures
         CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =

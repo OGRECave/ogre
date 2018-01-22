@@ -380,6 +380,8 @@ namespace Ogre
                                             const HlmsDatablock *datablock ) const {}
 #endif
 
+        void saveAllTexturesFromDatablocks( const String &folderPath, set<String>::type &savedTextures );
+
         /** Destroys all the cached shaders and in the next opportunity will recreate them
             from the new location. This is very useful for fast iteration and real-time
             editing of Hlms shader templates.

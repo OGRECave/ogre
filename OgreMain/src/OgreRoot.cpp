@@ -85,6 +85,7 @@ THE SOFTWARE.
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #include "OgreZip.h"
 #endif
+#include "OgreOITDCodec.h"
 
 #include "OgreLwString.h"
 
@@ -259,6 +260,7 @@ namespace Ogre {
 #if OGRE_NO_ASTC_CODEC == 0
         ASTCCodec::startup();
 #endif
+        OITDCodec::startup();
 
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
@@ -325,6 +327,7 @@ namespace Ogre {
 
         OGRE_DELETE mExternalTextureSourceManager;
 
+        OITDCodec::shutdown();
 #if OGRE_NO_FREEIMAGE == 0
         FreeImageCodec::shutdown();
 #endif

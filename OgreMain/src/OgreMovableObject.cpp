@@ -311,6 +311,11 @@ namespace Ogre {
         return updateSingleWorldAabb();
     }
     //-----------------------------------------------------------------------
+    float MovableObject::getLocalRadius(void) const
+    {
+        return mObjectData.mLocalRadius[mObjectData.mIndex];
+    }
+    //-----------------------------------------------------------------------
     float MovableObject::getWorldRadius() const
     {
 #if OGRE_DEBUG_MODE

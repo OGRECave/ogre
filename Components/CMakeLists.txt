@@ -36,6 +36,10 @@ if (OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS)
   add_subdirectory(PlanarReflections)
 endif ()
 
+if (OGRE_BUILD_COMPONENT_SCENE_FORMAT)
+  add_subdirectory(SceneFormat)
+endif ()
+
 if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
   add_subdirectory(MeshLodGenerator)
 endif ()
