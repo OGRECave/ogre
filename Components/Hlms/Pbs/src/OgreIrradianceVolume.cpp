@@ -40,6 +40,10 @@ namespace Ogre
 {
     IrradianceVolume::IrradianceVolume( HlmsManager *hlmsManager ) :
         mHlmsManager( hlmsManager ),
+        mNumBlocksX( 0 ),
+        mNumBlocksY( 0 ),
+        mNumBlocksZ( 0 ),
+        mFadeAttenuationOverDistace( false ),
         mPowerScale( 1.0f ),
         mIrradianceMaxPower( 1 ),
         mIrradianceOrigin( Vector3::ZERO ),

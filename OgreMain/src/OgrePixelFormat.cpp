@@ -174,6 +174,29 @@ namespace Ogre {
         return getDescriptionFor(format).elemBytes;
     }
     //-----------------------------------------------------------------------
+    size_t PixelUtil::calculateSizeBytes( uint32 width, uint32 height, uint32 depth,
+                                          uint32 slices, PixelFormat format, uint8 numMipmaps )
+    {
+        size_t totalBytes = 0;
+        while( (width > 1u || height > 1u || depth > 1u) && numMipmaps > 0 )
+        {
+            totalBytes += PixelUtil::getMemorySize( width, height, depth * slices, format );
+            width   = std::max( 1u, width  >> 1u );
+            height  = std::max( 1u, height >> 1u );
+            depth   = std::max( 1u, depth  >> 1u );
+            --numMipmaps;
+        }
+
+        if( width == 1u && height == 1u && depth == 1u && numMipmaps > 0 )
+        {
+            //Add 1x1x1 mip.
+            totalBytes += PixelUtil::getMemorySize( width, height, depth * slices, format );
+            --numMipmaps;
+        }
+
+        return totalBytes;
+    }
+    //-----------------------------------------------------------------------
     size_t PixelUtil::getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format)
     {
         if(isCompressed(format))
