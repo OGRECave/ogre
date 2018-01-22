@@ -3,7 +3,7 @@
 	@piece( andObjLightMaskFwdPlusCmp )&& ((objLightMask & floatBitsToUint( lightDiffuse.w )) != 0u)@end
 @end
 @piece( forward3dLighting )
-	@property( !hlms_forwardplus_covers_entire_target )
+	@property( hlms_forwardplus_covers_entire_target )
 		#define FWDPLUS_APPLY_OFFSET_Y(v) (v)
 		#define FWDPLUS_APPLY_OFFSET_X(v) (v)
 	@end
@@ -31,7 +31,7 @@
 
 		float lightsPerCell = passBuf.f3dGridHWW[0].w;
 
-		@property( hlms_forwardplus_covers_entire_target )
+		@property( !hlms_forwardplus_covers_entire_target )
 			#define FWDPLUS_APPLY_OFFSET_Y(v) (v - passBuf.f3dViewportOffset.y)
 			#define FWDPLUS_APPLY_OFFSET_X(v) (v - passBuf.f3dViewportOffset.x)
 		@end
@@ -64,7 +64,7 @@
 		fSlice = floor( min( fSlice, f3dNumSlicesSub1 ) );
 		uint sliceSkip = uint( fSlice * @value( fwd_clustered_width_x_height ) );
 
-		@property( hlms_forwardplus_covers_entire_target )
+		@property( !hlms_forwardplus_covers_entire_target )
 			#define FWDPLUS_APPLY_OFFSET_Y(v) (v - passBuf.fwdScreenToGrid.w)
 			#define FWDPLUS_APPLY_OFFSET_X(v) (v - passBuf.fwdScreenToGrid.z)
 		@end
