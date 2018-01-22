@@ -29,12 +29,8 @@ THE SOFTWARE.
 
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
-#include "OgreLogManager.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreRenderSystemCapabilities.h"
-
-#include <fstream>
-
 
 namespace Ogre
 {
@@ -87,7 +83,6 @@ namespace Ogre
         file << "\t" << "vertex_texture_units_shared " << StringConverter::toString(caps->getVertexTextureUnitsShared())<< endl;
         
         file << endl;
-        file << "\t" << "num_world_matrices " << StringConverter::toString(caps->getNumWorldMatrices()) << endl;
         file << "\t" << "num_texture_units " << StringConverter::toString(caps->getNumTextureUnits()) << endl;
         file << "\t" << "stencil_buffer_bit_depth " << StringConverter::toString(caps->getStencilBufferBitDepth()) << endl;
         file << "\t" << "num_vertex_blend_matrices " << StringConverter::toString(caps->getNumVertexBlendMatrices()) << endl;
@@ -330,7 +325,6 @@ namespace Ogre
         addKeywordType("num_vertex_texture_units", SET_INT_METHOD);
 
         // initialize int setters
-        addSetIntMethod("num_world_matrices", &RenderSystemCapabilities::setNumWorldMatrices);
         addSetIntMethod("num_texture_units", &RenderSystemCapabilities::setNumTextureUnits);
         addSetIntMethod("stencil_buffer_bit_depth", &RenderSystemCapabilities::setStencilBufferBitDepth);
         addSetIntMethod("num_vertex_blend_matrices", &RenderSystemCapabilities::setNumVertexBlendMatrices);
@@ -374,12 +368,10 @@ namespace Ogre
 
         addCapabilitiesMapping("fixed_function", RSC_FIXED_FUNCTION);
         addCapabilitiesMapping("automipmap", RSC_AUTOMIPMAP);
-        addCapabilitiesMapping("blending", RSC_BLENDING);
         addCapabilitiesMapping("anisotropy", RSC_ANISOTROPY);
         addCapabilitiesMapping("dot3", RSC_DOT3);
         addCapabilitiesMapping("cubemapping", RSC_CUBEMAPPING);
         addCapabilitiesMapping("hwstencil", RSC_HWSTENCIL);
-        addCapabilitiesMapping("vbo", RSC_VBO);
         addCapabilitiesMapping("32bit_index", RSC_32BIT_INDEX);
         addCapabilitiesMapping("vertex_program", RSC_VERTEX_PROGRAM);
         addCapabilitiesMapping("geometry_program", RSC_GEOMETRY_PROGRAM);
@@ -415,12 +407,8 @@ namespace Ogre
         addCapabilitiesMapping("texture_compression_bc6h_bc7", RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         addCapabilitiesMapping("texture_compression_astc", RSC_TEXTURE_COMPRESSION_ASTC);
         addCapabilitiesMapping("hwrender_to_vertex_buffer", RSC_HWRENDER_TO_VERTEX_BUFFER);
-        addCapabilitiesMapping("gl1_5_novbo", RSC_GL1_5_NOVBO);
-        addCapabilitiesMapping("fbo", RSC_FBO);
-        addCapabilitiesMapping("fbo_arb", RSC_FBO_ARB);
-        addCapabilitiesMapping("fbo_ati", RSC_FBO_ATI);
+
         addCapabilitiesMapping("pbuffer", RSC_PBUFFER);
-        addCapabilitiesMapping("gl1_5_nohwocclusion", RSC_GL1_5_NOHWOCCLUSION);
         addCapabilitiesMapping("perstageconstant", RSC_PERSTAGECONSTANT);
         addCapabilitiesMapping("vao", RSC_VAO);
         addCapabilitiesMapping("separate_shader_objects", RSC_SEPARATE_SHADER_OBJECTS);

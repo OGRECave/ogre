@@ -29,8 +29,6 @@ Torus Knot Software Ltd.
 -------------------------------------------------------------------------*/
 #include "OgreStableHeaders.h"
 #include "OgreShadowTextureManager.h"
-#include "OgreResourceGroupManager.h"
-#include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre

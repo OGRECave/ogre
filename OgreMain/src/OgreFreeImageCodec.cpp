@@ -29,8 +29,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreFreeImageCodec.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
 #include <FreeImage.h>
 
 // freeimage 3.9.1~3.11.0 interoperability fix

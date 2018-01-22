@@ -28,27 +28,17 @@ THE SOFTWARE.
 // Ogre includes
 #include "OgreStableHeaders.h"
 
-#include "OgreRoot.h"
-
-#include "OgreRenderSystem.h"
 #include "OgreRenderWindow.h"
-#include "OgreException.h"
 #include "OgreControllerManager.h"
-#include "OgreLogManager.h"
 #include "OgreDynLibManager.h"
 #include "OgreDynLib.h"
 #include "OgreConfigFile.h"
-#include "OgreMaterialManager.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
-#include "OgreMeshManager.h"
-#include "OgreTextureManager.h"
 #include "OgreParticleSystemManager.h"
 #include "OgreSkeletonManager.h"
 #include "OgreProfiler.h"
 #include "OgreConfigDialog.h"
-#include "OgreArchiveManager.h"
 #include "OgrePlugin.h"
-#include "OgreFileSystem.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreResourceBackgroundQueue.h"
 #include "OgreEntity.h"
@@ -58,7 +48,6 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreManualObject.h"
 #include "OgreRenderQueueInvocation.h"
-#include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
 #include "OgreTimer.h"
 #include "OgreFrameListener.h"
@@ -121,7 +110,6 @@ namespace Ogre {
       , mFrameSmoothingTime(0.0f)
       , mRemoveQueueStructuresOnClear(false)
       , mDefaultMinPixelSize(0)
-      , mFreqUpdatedBuffersUploadOption(HardwareBuffer::HBU_DEFAULT)
       , mNextMovableObjectTypeFlag(1)
       , mIsInitialised(false)
       , mIsBlendIndicesGpuRedundant(true)
@@ -716,17 +704,6 @@ namespace Ogre {
     void Root::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)
     {
         mActiveRenderer->useCustomRenderSystemCapabilities(capabilities);
-    }
-    //-----------------------------------------------------------------------
-    String Root::getErrorDescription(long errorNumber)
-    {
-
-        // Pass to render system
-        if (mActiveRenderer)
-            return mActiveRenderer->getErrorDescription(errorNumber);
-        else
-            return "";
-
     }
     //-----------------------------------------------------------------------
     void Root::addSceneManagerFactory(SceneManagerFactory* fact)

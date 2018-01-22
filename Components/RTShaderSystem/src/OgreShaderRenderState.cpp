@@ -24,16 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include <algorithm> // for std::sort
-#include "OgreShaderPrerequisites.h"
-#include "OgreShaderRenderState.h"
-#include "OgreShaderGenerator.h"
-#include "OgreLogManager.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderProgramSet.h"
-#include "OgreShaderProgramManager.h"
-#include "OgreShaderFFPRenderState.h"
-
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 namespace RTShader {

@@ -28,16 +28,9 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreRenderQueue.h"
-
 #include "OgreMaterial.h"
 #include "OgreRenderQueueSortingGrouping.h"
-#include "OgrePass.h"
-#include "OgreMaterialManager.h"
-#include "OgreSceneManager.h"
-#include "OgreMovableObject.h"
 #include "OgreSceneManagerEnumerator.h"
-#include "OgreTechnique.h"
-
 
 namespace Ogre {
 

@@ -281,8 +281,6 @@ namespace Ogre
             bool twoSidedOperation = false,
             bool readBackAsTexture = false);
 
-        virtual String getErrorDescription(long errorNumber) const;
-
         // Low-level overridden members, mainly for internal use
         D3D11HLSLProgram* _getBoundVertexProgram() const;
         D3D11HLSLProgram* _getBoundFragmentProgram() const;

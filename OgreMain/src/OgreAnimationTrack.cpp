@@ -29,9 +29,6 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreAnimation.h"
 #include "OgreKeyFrame.h"
-#include "OgreNode.h"
-#include "OgreMesh.h"
-#include "OgreException.h"
 
 namespace Ogre {
 

@@ -60,11 +60,6 @@ namespace Ogre {
     class _OgreExport Image : public ImageAlloc
     {
     public:
-        /// @deprecated use Ogre::Box
-        OGRE_DEPRECATED typedef Ogre::Box Box;
-        /// @deprecated use Ogre::Rect
-        OGRE_DEPRECATED typedef Ogre::Rect Rect;
-    public:
         /** Standard constructor.
         */
         Image();

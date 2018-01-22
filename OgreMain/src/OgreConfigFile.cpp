@@ -29,8 +29,6 @@ THE SOFTWARE.
 #include "OgreConfigFile.h"
 #include "OgreResourceGroupManager.h"
 
-#include "OgreException.h"
-
 #include <iostream>
 
 namespace Ogre {

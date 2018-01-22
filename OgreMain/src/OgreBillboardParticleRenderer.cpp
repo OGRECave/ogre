@@ -30,8 +30,6 @@ THE SOFTWARE.
 #include "OgreBillboardParticleRenderer.h"
 #include "OgreParticle.h"
 #include "OgreBillboard.h"
-#include "OgreStringConverter.h"
-#include "OgreSceneNode.h"
 
 namespace Ogre {
     String rendererTypeName = "billboard";

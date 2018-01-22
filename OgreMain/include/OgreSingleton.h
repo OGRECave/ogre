@@ -45,9 +45,6 @@ THE SOFTWARE.
 #   pragma warning ( disable: 4661)
 #endif
 
-#if defined ( OGRE_GCC_VISIBILITY )
-#   pragma GCC visibility push(default)
-#endif
 namespace Ogre {
     /** \addtogroup Core
     *  @{
@@ -98,9 +95,6 @@ namespace Ogre {
 }
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   pragma warning (pop)
-#endif
-#if defined ( OGRE_GCC_VISIBILITY )
-#   pragma GCC visibility pop
 #endif
 
 #endif

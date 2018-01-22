@@ -394,37 +394,5 @@ endif ()
 # Display results, terminate if anything required is missing
 MACRO_DISPLAY_FEATURE_LOG()
 
-# Add library and include paths from the dependencies
-include_directories(
-  ${ZLIB_INCLUDE_DIRS}
-  ${ZZip_INCLUDE_DIRS}
-  ${FreeImage_INCLUDE_DIRS}
-  ${FREETYPE_INCLUDE_DIRS}
-  ${OPENGL_INCLUDE_DIRS}
-  ${OPENGLES_INCLUDE_DIRS}
-  ${OPENGLES2_INCLUDE_DIRS}
-  ${OPENGLES3_INCLUDE_DIRS}
-  ${Cg_INCLUDE_DIRS}
-  ${X11_INCLUDE_DIR}
-  ${DirectX_INCLUDE_DIRS}
-  ${GLSL_Optimizer_INCLUDE_DIRS}
-  ${HLSL2GLSL_INCLUDE_DIRS}
-)
-
-link_directories(
-  ${OPENGL_LIBRARY_DIRS}
-  ${OPENGLES_LIBRARY_DIRS}
-  ${OPENGLES2_LIBRARY_DIRS}
-  ${OPENGLES3_LIBRARY_DIRS}
-  ${Cg_LIBRARY_DIRS}
-  ${X11_LIBRARY_DIRS}
-  ${DirectX_LIBRARY_DIRS}
-)
-
-if (Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-  link_directories(${Boost_LIBRARY_DIRS})
-endif ()
-
 # provide option to install dependencies on Windows
 include(InstallDependencies)

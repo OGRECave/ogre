@@ -31,13 +31,6 @@ THE SOFTWARE.
 #include "OgreInstanceBatchHW_VTF.h"
 #include "OgreInstanceBatchShader.h"
 #include "OgreInstanceBatchVTF.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
-#include "OgreMeshManager.h"
-#include "OgreMaterialManager.h"
-#include "OgreSceneManager.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreSceneNode.h"
 #include "OgreIteratorWrappers.h"
 
 namespace Ogre

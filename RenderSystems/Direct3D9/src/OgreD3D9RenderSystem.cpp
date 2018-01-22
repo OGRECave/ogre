@@ -92,6 +92,7 @@ namespace Ogre
         mHLSLProgramFactory = NULL;     
         mDeviceManager = NULL;  
         mPerStageConstantSupport = false;
+        mEnableFixedPipeline = true;
 
 		for(int i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
 		{
@@ -1151,18 +1152,10 @@ namespace Ogre
             if((rkCurCaps.PrimitiveMiscCaps & D3DPMISCCAPS_BLENDOP) == 0)
                 rsc->unsetCapability(RSC_ADVANCED_BLEND_OPERATIONS);
         }               
-                                    
-        // Blending between stages supported
-        rsc->setCapability(RSC_BLENDING);
-        
 
         // We always support compression, D3DX will decompress if device does not support
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
-
-        // We always support VBOs
-        rsc->setCapability(RSC_VBO);
-
             
         convertVertexShaderCaps(rsc);
         convertPixelShaderCaps(rsc);
@@ -1183,18 +1176,6 @@ namespace Ogre
         case 0x163C:
         case 0x8086:
             rsc->setVendor(GPU_INTEL);
-            break;
-        case 0x5333:
-            rsc->setVendor(GPU_S3);
-            break;
-        case 0x3D3D:
-            rsc->setVendor(GPU_3DLABS);
-            break;
-        case 0x102B:
-            rsc->setVendor(GPU_MATROX);
-            break;
-        case 0x1039:
-            rsc->setVendor(GPU_SIS);
             break;
         default:
             rsc->setVendor(GPU_UNKNOWN);
@@ -3584,9 +3565,6 @@ namespace Ogre
                 "D3D9RenderSystem::_render");
         }
 
-        // To think about: possibly remove setVertexDeclaration and 
-        // setVertexBufferBinding from RenderSystem since the sequence is
-        // a bit too D3D9-specific?
         setVertexDeclaration(op.vertexData->vertexDeclaration, op.useGlobalInstancingVertexBufferIsAvailable);
         setVertexBufferBinding(op.vertexData->vertexBufferBinding, op.numberOfInstances, op.useGlobalInstancingVertexBufferIsAvailable, op.useIndexes);
 

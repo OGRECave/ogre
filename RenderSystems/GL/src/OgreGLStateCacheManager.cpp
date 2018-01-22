@@ -26,10 +26,8 @@
  -----------------------------------------------------------------------------
  */
 
-#include "OgreStableHeaders.h"
 #include "OgreGLStateCacheManager.h"
 #include "OgreGLRenderSystem.h"
-#include "OgreLogManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -591,10 +589,6 @@ namespace Ogre {
             const Ogre::RenderSystemCapabilities* caps = dynamic_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities();
             if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
                 glPointParameterf(GL_POINT_SIZE_MIN, mPointSizeMin);
-            else if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS_ARB))
-                glPointParameterfARB(GL_POINT_SIZE_MIN, mPointSizeMin);
-            else if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS_EXT))
-                glPointParameterfEXT(GL_POINT_SIZE_MIN, mPointSizeMin);
         }
         if (maxSize != mPointSizeMax)
         {
@@ -602,10 +596,6 @@ namespace Ogre {
             const Ogre::RenderSystemCapabilities* caps = dynamic_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities();
             if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
                 glPointParameterf(GL_POINT_SIZE_MAX, mPointSizeMax);
-            else if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS_ARB))
-                glPointParameterfARB(GL_POINT_SIZE_MAX, mPointSizeMax);
-            else if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS_EXT))
-                glPointParameterfEXT(GL_POINT_SIZE_MAX, mPointSizeMax);
         }
         if (attenuation[0] != mPointAttenuation[0] || attenuation[1] != mPointAttenuation[1] || attenuation[2] != mPointAttenuation[2])
         {
@@ -615,10 +605,6 @@ namespace Ogre {
             const Ogre::RenderSystemCapabilities* caps = dynamic_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities();
             if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
                 glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, &mPointAttenuation[0]);
-            else if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS_ARB))
-                glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION, &mPointAttenuation[0]);
-            else if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS_EXT))
-                glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, &mPointAttenuation[0]);
         }
     }
 

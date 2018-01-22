@@ -17,6 +17,7 @@ if(NOT JNI_FOUND OR NOT SWIG_FOUND)
 endif()
 
 include_directories(${JNI_INCLUDE_DIRS})
+include_directories("${OGRE_BINARY_DIR}/include" "${OGRE_SOURCE_DIR}/OgreMain/include")
 include(${SWIG_USE_FILE})
 
 if(MSVC)

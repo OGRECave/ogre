@@ -25,11 +25,7 @@
  * THE SOFTWARE.
  * -----------------------------------------------------------------------------
  */
-
-#include "OgreLodWorkQueueWorker.h"
-#include "OgreMeshLodGenerator.h"
-#include "OgreLodWorkQueueRequest.h"
-#include "OgreRoot.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre
 {

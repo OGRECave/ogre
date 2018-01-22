@@ -28,15 +28,9 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreInstanceManager.h"
 #include "OgreInstanceBatch.h"
-#include "OgreSubMesh.h"
 #include "OgreInstancedEntity.h"
-#include "OgreSceneNode.h"
-#include "OgreCamera.h"
-#include "OgreException.h"
 #include "OgreRenderQueue.h"
 #include "OgreLodListener.h"
-#include "OgreSceneManager.h"
-#include "OgreRoot.h"
 
 namespace Ogre
 {

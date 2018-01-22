@@ -28,13 +28,8 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 #include "OgreDDSCodec.h"
 #include "OgreImage.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
-#include "OgreBitwise.h"
 
 namespace Ogre {
     // Internal DDS structure definitions

@@ -33,7 +33,6 @@ Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
 #include "OgrePCZLight.h"
 #include "OgrePCZone.h" // need for testing affected zone 
 #include "OgrePCZSceneNode.h"

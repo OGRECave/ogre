@@ -25,9 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreShaderFunctionAtom.h"
-#include "OgreShaderParameter.h"
-#include "OgreRoot.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -191,14 +189,6 @@ String FunctionInvocation::Type = "FunctionInvocation";
 FunctionInvocation::FunctionInvocation(const String& functionName, int groupOrder,
                                        const String& returnType)
     : mFunctionName(functionName), mReturnType(returnType)
-{
-    mGroupExecutionOrder = groupOrder;
-}
-
-//-----------------------------------------------------------------------
-FunctionInvocation::FunctionInvocation(const String& functionName,
-                                       int groupOrder, int, String returnType) :
-    mFunctionName(functionName), mReturnType(returnType)
 {
     mGroupExecutionOrder = groupOrder;
 }

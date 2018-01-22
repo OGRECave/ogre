@@ -26,10 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreVertexIndexData.h"
-#include "OgreLogManager.h"
-
 
 namespace Ogre {
 

@@ -28,9 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreSceneManagerEnumerator.h"
 
-#include "OgreException.h"
-#include "OgreLogManager.h"
-
 
 namespace Ogre {
 
@@ -314,7 +311,6 @@ namespace Ogre {
     void DefaultSceneManagerFactory::initMetaData(void) const
     {
         mMetaData.typeName = FACTORY_TYPE_NAME;
-        mMetaData.description = "The default scene manager";
         mMetaData.sceneTypeMask = ST_GENERIC;
         mMetaData.worldGeometrySupported = false;
     }

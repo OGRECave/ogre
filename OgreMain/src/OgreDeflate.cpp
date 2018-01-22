@@ -30,7 +30,6 @@
 #if OGRE_NO_ZIP_ARCHIVE == 0
 
 #include "OgreDeflate.h"
-#include "OgreException.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
 #endif

@@ -27,25 +27,17 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreSceneManager.h"
-
-#include "OgreCamera.h"
-#include "OgreMeshManager.h"
 #include "OgreEntity.h"
-#include "OgreSubEntity.h"
 #include "OgreLight.h"
 #include "OgreControllerManager.h"
-#include "OgreMaterialManager.h"
 #include "OgreAnimation.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreBillboardSet.h"
-#include "OgreTechnique.h"
-#include "OgreLogManager.h"
-#include "OgreRoot.h"
 #include "OgreSpotShadowFadePng.h"
 #include "OgreShadowCameraSetup.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreStaticGeometry.h"
+#include "OgreSubEntity.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreManualObject.h"
 #include "OgreRenderQueueInvocation.h"
@@ -58,8 +50,6 @@ THE SOFTWARE.
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
 #include "OgreRenderTexture.h"
-#include "OgreTextureManager.h"
-#include "OgreSceneNode.h"
 #include "OgreRectangle2D.h"
 #include "OgreLodListener.h"
 #include "OgreInstancedGeometry.h"
@@ -3251,7 +3241,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         {
             if (numMatrices > 1)
             {
-                mDestRenderSystem->_setWorldMatrices(mTempXform, numMatrices);
+                // Set hardware matrix to nothing
+                mDestRenderSystem->_setWorldMatrix(Matrix4::IDENTITY);
             }
             else
             {

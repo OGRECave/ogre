@@ -41,10 +41,6 @@ namespace Ogre {
     *  @{
     */
 
-    class DistanceLodBoxStrategy;
-    /// @deprecated Backward compatible name for Distance_Box strategy.
-    typedef DistanceLodBoxStrategy OGRE_DEPRECATED DistanceLodStrategy;
-
     /** Level of detail strategy based on distance from camera. This is an abstract base class for DistanceLodBoxStrategy and DistanceLodSphereStrategy.
         @remarks
             The purpose of the reference view is to ensure a consistent experience for all users. Monitors of different resolutions and aspect ratios will each have different results for the distance queries.

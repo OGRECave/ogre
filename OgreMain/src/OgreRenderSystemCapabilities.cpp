@@ -34,7 +34,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     RenderSystemCapabilities::RenderSystemCapabilities()
         : mVendor(GPU_UNKNOWN)
-        , mNumWorldMatrices(0)
         , mNumTextureUnits(0)
         , mStencilBufferBitDepth(0)
         , mNumVertexBlendMatrices(0)
@@ -88,12 +87,9 @@ namespace Ogre {
                 "   - Wrap stencil values: "
                 + StringConverter::toString(hasCapability(RSC_STENCIL_WRAP), true));
         }
-        if(hasCapability(RSC_VBO))
-        {
-            pLog->logMessage(
-                " * 32-bit index buffers: "
-                + StringConverter::toString(hasCapability(RSC_32BIT_INDEX), true));
-        }
+        pLog->logMessage(
+            " * 32-bit index buffers: "
+            + StringConverter::toString(hasCapability(RSC_32BIT_INDEX), true));
         pLog->logMessage(
             " * Vertex programs: "
             + StringConverter::toString(hasCapability(RSC_VERTEX_PROGRAM), true));
@@ -358,10 +354,6 @@ namespace Ogre {
             msGPUVendorStrings[GPU_NVIDIA] = "nvidia";
             msGPUVendorStrings[GPU_AMD] = "amd";
             msGPUVendorStrings[GPU_INTEL] = "intel";
-            msGPUVendorStrings[GPU_3DLABS] = "3dlabs";
-            msGPUVendorStrings[GPU_S3] = "s3";
-            msGPUVendorStrings[GPU_MATROX] = "matrox";
-            msGPUVendorStrings[GPU_SIS] = "sis";
             msGPUVendorStrings[GPU_IMAGINATION_TECHNOLOGIES] = "imagination technologies";
             msGPUVendorStrings[GPU_APPLE] = "apple";    // iOS Simulator
             msGPUVendorStrings[GPU_NOKIA] = "nokia";

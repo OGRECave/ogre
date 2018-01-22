@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreLodStrategyManager.h"
 
-#include "OgreException.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgrePixelCountLodStrategy.h"
 

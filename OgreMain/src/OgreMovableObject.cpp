@@ -27,16 +27,10 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreMovableObject.h"
-#include "OgreSceneNode.h"
 #include "OgreTagPoint.h"
 #include "OgreLight.h"
 #include "OgreEntity.h"
-#include "OgreRoot.h"
-#include "OgreSceneManager.h"
-#include "OgreCamera.h"
 #include "OgreLodListener.h"
-#include "OgreTechnique.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------

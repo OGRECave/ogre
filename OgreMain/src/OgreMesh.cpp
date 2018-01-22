@@ -26,23 +26,15 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreMesh.h"
 
-#include "OgreSubMesh.h"
-#include "OgreLogManager.h"
 #include "OgreMeshSerializer.h"
 #include "OgreSkeletonManager.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreException.h"
-#include "OgreMeshManager.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreAnimation.h"
 #include "OgreAnimationState.h"
 #include "OgreAnimationTrack.h"
-#include "OgreBone.h"
 #include "OgreOptimisedUtil.h"
-#include "OgreSkeleton.h"
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
 #include "OgrePixelCountLodStrategy.h"

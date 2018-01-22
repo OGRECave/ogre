@@ -116,7 +116,6 @@ namespace Ogre
         Real mFrameSmoothingTime;
         bool mRemoveQueueStructuresOnClear;
         Real mDefaultMinPixelSize;
-        HardwareBuffer::UploadOptions mFreqUpdatedBuffersUploadOption;
 
     public:
         typedef vector<DynLib*>::type PluginLibList;
@@ -423,12 +422,6 @@ namespace Ogre
                 and is provided for convenience to scripting engines.
         */
         MeshManager* getMeshManager(void);
-
-        /** Utility function for getting a better description of an error
-            code.
-            @deprecated obsolete API
-        */
-        OGRE_DEPRECATED String getErrorDescription(long errorNumber);
 
         /** Registers a FrameListener which will be called back every frame.
             @remarks
@@ -1036,19 +1029,6 @@ namespace Ogre
         /** Get the default minimum pixel size for object to be rendered by
         */
         Real getDefaultMinPixelSize() { return mDefaultMinPixelSize; }
-    
-        /** Set the default upload option for buffers that frequently changed
-        Setting upload option to HBU_ON_DEMAND can increase the framerate in multi-device scenarios,
-        as it will upload frequently changing buffers to devices that require them.
-        However setting the HBU_ON_DEMAND may also introduce hiccups.
-        @deprecated do not use
-        */
-        OGRE_DEPRECATED void setFreqUpdatedBuffersUploadOption(HardwareBuffer::UploadOptions uploadOp) { mFreqUpdatedBuffersUploadOption = uploadOp; }
-        /** Get the default upload option for buffers that frequently changed
-        @deprecated do not use
-        */
-        OGRE_DEPRECATED HardwareBuffer::UploadOptions getFreqUpdatedBuffersUploadOption() const { return mFreqUpdatedBuffersUploadOption; }
-
     };
     /** @} */
     /** @} */

@@ -24,23 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderFFPRenderStateBuilder.h"
+#include "OgrePrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-#include "OgreShaderGenerator.h"
-#include "OgreShaderRenderState.h"
-#include "OgreShaderFFPTransform.h"
-#include "OgreShaderFFPLighting.h"
-#include "OgreShaderFFPColour.h"
-#include "OgreShaderFFPTexturing.h"
-#include "OgreShaderFFPFog.h"
-#include "OgrePass.h"
-#include "OgreLogManager.h"
-#include "OgreShaderFFPRenderState.h"
-#include "OgreTechnique.h"
-#include "OgreShaderFFPAlphaTest.h"
-#include "OgreCommon.h"
-#include "OgreRenderSystem.h"
-#include "OgreRoot.h"
 
 namespace Ogre {
 

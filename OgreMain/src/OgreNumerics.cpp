@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreStableHeaders.h"
-#include "OgreCommon.h"
 #include "OgreNumerics.h"
 
 

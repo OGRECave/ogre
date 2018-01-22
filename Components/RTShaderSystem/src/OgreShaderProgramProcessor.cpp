@@ -25,12 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreShaderProgramProcessor.h"
-#include "OgreShaderFunctionAtom.h"
-#include "OgreShaderFunction.h"
-#include "OgreShaderFFPRenderState.h"
-#include "OgreShaderGenerator.h"
-#include "OgreShaderProgram.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 namespace RTShader {

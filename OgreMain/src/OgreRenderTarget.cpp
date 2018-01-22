@@ -29,10 +29,7 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 
 #include "OgreViewport.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
 #include "OgreRenderTargetListener.h"
-#include "OgreRoot.h"
 #include "OgreDepthBuffer.h"
 #include "OgreProfiler.h"
 #include "OgreTimer.h"
@@ -278,56 +275,6 @@ namespace Ogre {
 
         mViewportList.clear();
 
-    }
-
-    void RenderTarget::getStatistics(float& lastFPS, float& avgFPS,
-        float& bestFPS, float& worstFPS) const
-    {
-
-        // Note - the will have been updated by the last render
-        lastFPS = mStats.lastFPS;
-        avgFPS = mStats.avgFPS;
-        bestFPS = mStats.bestFPS;
-        worstFPS = mStats.worstFPS;
-
-
-    }
-
-    float RenderTarget::getLastFPS() const
-    {
-        return mStats.lastFPS;
-    }
-    float RenderTarget::getAverageFPS() const
-    {
-        return mStats.avgFPS;
-    }
-    float RenderTarget::getBestFPS() const
-    {
-        return mStats.bestFPS;
-    }
-    float RenderTarget::getWorstFPS() const
-    {
-        return mStats.worstFPS;
-    }
-
-    size_t RenderTarget::getTriangleCount(void) const
-    {
-        return mStats.triangleCount;
-    }
-
-    size_t RenderTarget::getBatchCount(void) const
-    {
-        return mStats.batchCount;
-    }
-
-    float RenderTarget::getBestFrameTime() const
-    {
-        return (float)mStats.bestFrameTime;
-    }
-
-    float RenderTarget::getWorstFrameTime() const
-    {
-        return (float)mStats.worstFrameTime;
     }
 
     void RenderTarget::resetStatistics(void)

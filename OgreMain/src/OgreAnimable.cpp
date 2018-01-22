@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreAnimable.h"
-#include "OgreAny.h"
 
 namespace Ogre {
     //--------------------------------------------------------------------------

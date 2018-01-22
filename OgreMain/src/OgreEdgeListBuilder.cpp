@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreVertexIndexData.h"
-#include "OgreException.h"
 #include "OgreOptimisedUtil.h"
 
 namespace Ogre {

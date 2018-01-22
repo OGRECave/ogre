@@ -26,10 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreMatrix4.h"
-
-#include "OgreVector3.h"
-#include "OgreMatrix3.h"
 
 namespace Ogre
 {

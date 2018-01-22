@@ -26,14 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreSceneNode.h"
-
-#include "OgreException.h"
-#include "OgreCamera.h"
-#include "OgreMath.h"
-#include "OgreSceneManager.h"
-#include "OgreMovableObject.h"
-#include "OgreWireBoundingBox.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------

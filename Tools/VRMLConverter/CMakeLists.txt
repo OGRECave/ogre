@@ -18,7 +18,7 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vrmllib/include)
 
-ogre_add_executable(VRMLConverter ${HEADER_FILES} ${SOURCE_FILES})
+add_executable(VRMLConverter ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(VRMLConverter ${OGRE_LIBRARIES})
 
 if (APPLE)

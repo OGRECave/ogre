@@ -26,10 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-
 #include "OgreRenderQueueInvocation.h"
-#include "OgreSceneManager.h"
-#include "OgreException.h"
+
 
 namespace Ogre
 {

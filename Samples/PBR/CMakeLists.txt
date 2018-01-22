@@ -6,7 +6,7 @@ set(SOURCE_FILES src/PBR.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-ogre_add_library_to_folder(Samples Sample_PBR ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
+add_library(Sample_PBR ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_PBR ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_PBR)

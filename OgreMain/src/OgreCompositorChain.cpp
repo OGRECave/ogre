@@ -32,12 +32,8 @@ THE SOFTWARE.
 #include "OgreCompositorInstance.h"
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionPass.h"
-#include "OgreCamera.h"
 #include "OgreCompositorManager.h"
-#include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
-#include "OgreLogManager.h"
-#include "OgreMaterialManager.h"
 
 namespace Ogre {
 CompositorChain::CompositorChain(Viewport *vp):

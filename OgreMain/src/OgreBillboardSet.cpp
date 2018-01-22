@@ -28,18 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreBillboardSet.h"
-
 #include "OgreBillboard.h"
-#include "OgreMaterialManager.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreCamera.h"
-#include "OgreMath.h"
-#include "OgreSphere.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreException.h"
-#include "OgreSceneNode.h"
-#include "OgreLogManager.h"
+
 #include <algorithm>
 
 namespace Ogre {

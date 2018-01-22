@@ -24,31 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
-#include "OgreShaderProgramManager.h"
-#include "OgreHighLevelGpuProgramManager.h"
-#include "OgreShaderRenderState.h"
-#include "OgreShaderProgramSet.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderGenerator.h"
-#include "OgrePass.h"
-#include "OgreLogManager.h"
-#include "OgreHighLevelGpuProgram.h"
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#include "OgreShaderCGProgramWriter.h"
-#include "OgreShaderHLSLProgramWriter.h"
-#include "OgreShaderGLSLProgramWriter.h"
-#endif
-#include "OgreShaderGLSLESProgramWriter.h"
-#include "OgreShaderProgramProcessor.h"
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#include "OgreShaderCGProgramProcessor.h"
-#include "OgreShaderHLSLProgramProcessor.h"
-#include "OgreShaderGLSLProgramProcessor.h"
-#endif
-#include "OgreShaderGLSLESProgramProcessor.h"
-#include "OgreGpuProgramManager.h"
-
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 

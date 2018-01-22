@@ -28,11 +28,6 @@ THE SOFTWARE.
 // Ogre includes
 #include "OgreStableHeaders.h"
 
-#include "OgreResource.h"
-#include "OgreResourceManager.h"
-#include "OgreLogManager.h"
-#include "OgreException.h"
-
 namespace Ogre 
 {
     //-----------------------------------------------------------------------
@@ -384,10 +379,6 @@ namespace Ogre
         for (ListenerList::iterator i = mListenerList.begin();
             i != mListenerList.end(); ++i)
         {
-            // deprecated call
-            if (wasBackgroundLoaded)
-                (*i)->backgroundLoadingComplete(this);
-
             (*i)->loadingComplete(this);
         }
     }
@@ -399,12 +390,7 @@ namespace Ogre
         for (ListenerList::iterator i = mListenerList.begin();
             i != mListenerList.end(); ++i)
         {
-            // deprecated call
-            if (wasBackgroundLoaded)
-                (*i)->backgroundPreparingComplete(this);
-
             (*i)->preparingComplete(this);
-
         }
     }
     //-----------------------------------------------------------------------

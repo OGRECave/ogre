@@ -33,14 +33,9 @@ THE SOFTWARE.
 #include "OgreParticleAffector.h"
 #include "OgreParticle.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreCamera.h"
-#include "OgreStringConverter.h"
 #include "OgreParticleAffectorFactory.h"
 #include "OgreParticleSystemRenderer.h"
-#include "OgreMaterialManager.h"
-#include "OgreSceneManager.h"
 #include "OgreControllerManager.h"
-#include "OgreRoot.h"
 
 namespace Ogre {
     // Init statics

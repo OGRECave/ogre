@@ -81,20 +81,7 @@ namespace Ogre {
         class Listener
         {
         public:
-            Listener() {}
             virtual ~Listener() {}
-
-            /** Callback to indicate that background loading has completed.
-            @deprecated
-                Use Listener::loadingComplete instead.
-            */
-            OGRE_DEPRECATED virtual void backgroundLoadingComplete(Resource*) {}
-
-            /** Callback to indicate that background preparing has completed.
-            @deprecated
-                Use Listener::preparingComplete instead.
-            */
-            OGRE_DEPRECATED virtual void backgroundPreparingComplete(Resource*) {}
 
             /** Called whenever the resource finishes loading. 
             @remarks
@@ -356,15 +343,6 @@ namespace Ogre {
         { 
             // No lock required to read this state since no modify
             return (mLoadingState.load() == LOADSTATE_LOADED);
-        }
-
-        /** Change the Resource loading state to loaded.
-        @deprecated do not use
-        */
-        OGRE_DEPRECATED virtual void setToLoaded(void)
-        { 
-            // No lock required to read this state since no modify
-            mLoadingState.store(LOADSTATE_LOADED);
         }
 
         /** Returns whether the resource is currently in the process of
