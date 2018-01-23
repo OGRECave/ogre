@@ -309,10 +309,6 @@ namespace Ogre {
         }
         else
         {
-            if (data.getWidth() != data.rowPitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, data.rowPitch));
-            if (data.getHeight()*data.getWidth() != data.slicePitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
             if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
@@ -324,8 +320,6 @@ namespace Ogre {
                                               0));
 
             // Restore defaults
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, 0));
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         }
 
@@ -346,7 +340,16 @@ namespace Ogre {
         }
 
         // Copy to destination buffer
-        buffer.readData(offsetInBytes, mSizeInBytes, data.getTopLeftFrontPixelPtr());
+        if(data.isConsecutive())
+            buffer.readData(offsetInBytes, mSizeInBytes, data.getTopLeftFrontPixelPtr());
+        else
+        {
+            size_t elemSizeInBytes = PixelUtil::getNumElemBytes(data.format);
+            size_t rowSizeInBytes = width * elemSizeInBytes, destRowPitchInBytes = data.rowPitch * elemSizeInBytes;
+            for(GLint i = 0; i < height; ++i)
+                buffer.readData(offsetInBytes + i * rowSizeInBytes, rowSizeInBytes,
+                                (uint8*)data.getTopLeftFrontPixelPtr() + i * destRowPitchInBytes);
+        }
     }
 
 
