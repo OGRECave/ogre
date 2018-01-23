@@ -16,13 +16,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/Components/Hlms/Common/include)
 ogre_add_component_include_dir(Hlms/Pbs)
 
-ogre_add_component_include_dir(SceneFormat)
-
 add_recursive( ./ SOURCE_FILES )
 
 ogre_add_executable(Sample_PbsMaterials WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES})
 
-target_link_libraries(Sample_PbsMaterials ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES} OgreSceneFormat)
+target_link_libraries(Sample_PbsMaterials ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_PbsMaterials)
 
 if( APPLE )
