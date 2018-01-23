@@ -58,8 +58,9 @@ namespace Ogre
         "Fade"
     };
 
-    HlmsJsonPbs::HlmsJsonPbs( HlmsManager *hlmsManager ) :
-        mHlmsManager( hlmsManager )
+    HlmsJsonPbs::HlmsJsonPbs( HlmsManager *hlmsManager, const String &additionalExtension ) :
+        mHlmsManager( hlmsManager ),
+        mAdditionalExtension( additionalExtension )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -210,8 +211,8 @@ namespace Ogre
 
             HlmsTextureManager *hlmsTextureManager = mHlmsManager->getTextureManager();
             HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
-                createOrRetrieveTexture(textureName,
-                texMapTypes[textureType]);
+                createOrRetrieveTexture( textureName + mAdditionalExtension,
+                                         texMapTypes[textureType] );
 
             assert(texLocation.texture->isTextureTypeArray() || textureType == PBSM_REFLECTION);
 
@@ -693,7 +694,7 @@ namespace Ogre
                 if( texName )
                 {
                     outString += ",\n\t\t\t\t\"texture\" : \"";
-                    outString += *texName;
+                    outString += (*texName) + mAdditionalExtension;
                     outString += '"';
                 }
             }

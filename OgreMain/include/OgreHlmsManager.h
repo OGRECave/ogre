@@ -100,6 +100,11 @@ namespace Ogre
 
 #if !OGRE_NO_JSON
         StringVector mScriptPatterns;
+
+    public:
+        typedef map<String, String>::type ResourceToTexExtensionMap;
+        ResourceToTexExtensionMap mAdditionalTextureExtensionsPerGroup;
+    protected:
 #endif
 
         void renderSystemDestroyAllBlocks(void);
@@ -268,11 +273,12 @@ namespace Ogre
                 const char *string = ...;
                 hlmsJson.loadMaterials( "Filename for debug purposes", string );
             To load materials from an arbitrary JSON string.
-            @see HlmsJson::loadMaterials
+            See HlmsJson::loadMaterials
         @param filename
         @param groupName
         */
-        void loadMaterials( const String &filename, const String &groupName );
+        void loadMaterials( const String &filename, const String &groupName,
+                            const String &additionalTextureExtension );
 
         /** Saves all materials of the registered Hlms at the given file location.
         @param hlmsType
@@ -280,7 +286,8 @@ namespace Ogre
         @param filename
             Valid file path.
         */
-        void saveMaterials( HlmsTypes hlmsType,const String &filename );
+        void saveMaterials( HlmsTypes hlmsType,const String &filename,
+                            const String &additionalTextureExtension );
 
         /** Saves a specific Hlms material at the given file location.
         @param datablock
@@ -288,7 +295,8 @@ namespace Ogre
         @param filename
             Valid file path.
         */
-        void saveMaterial( const HlmsDatablock *datablock, const String &filename );
+        void saveMaterial( const HlmsDatablock *datablock, const String &filename,
+                           const String &additionalTextureExtension );
 
         //ScriptLoader overloads
         virtual void parseScript(DataStreamPtr& stream, const String& groupName);

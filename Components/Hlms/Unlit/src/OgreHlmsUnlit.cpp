@@ -926,14 +926,15 @@ namespace Ogre
     }
 #if !OGRE_NO_JSON
 	//-----------------------------------------------------------------------------------
-	void HlmsUnlit::_loadJson(const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
-		HlmsDatablock *datablock) const
+    void HlmsUnlit::_loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
+                               HlmsDatablock *datablock, const String &additionalTextureExtension ) const
 	{
 		HlmsJsonUnlit jsonUnlit(mHlmsManager);
 		jsonUnlit.loadMaterial(jsonValue, blocks, datablock);
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsUnlit::_saveJson(const HlmsDatablock *datablock, String &outString) const
+    void HlmsUnlit::_saveJson( const HlmsDatablock *datablock, String &outString,
+                               const String &additionalTextureExtension ) const
 	{
 		HlmsJsonUnlit jsonUnlit(mHlmsManager);
 		jsonUnlit.saveMaterial(datablock, outString);

@@ -91,7 +91,8 @@ namespace Ogre
                                          HlmsDatablock *datablock );
 
         void loadDatablocks( const rapidjson::Value &json, const NamedBlocks &blocks, Hlms *hlms,
-                             const String &filename, const String &resourceGroup );
+                             const String &filename, const String &resourceGroup,
+                             const String &additionalTextureExtension );
 
     public:
         static void toQuotedStr( FilterOptions value, String &outString );
@@ -114,7 +115,8 @@ namespace Ogre
         void saveSamplerblock( const HlmsSamplerblock *samplerblock, String &outString );
         void saveMacroblock( const HlmsMacroblock *macroblock, String &outString );
         void saveBlendblock( const HlmsBlendblock *blendblock, String &outString );
-        void saveDatablock( const String &fullName, const HlmsDatablock *datablock, String &outString );
+        void saveDatablock( const String &fullName, const HlmsDatablock *datablock, String &outString,
+                            const String &additionalTextureExtension );
 
     public:
         HlmsJson( HlmsManager *hlmsManager );
@@ -131,9 +133,15 @@ namespace Ogre
         @param jsonString
             Null-terminated C string (UTF8) containing
             valid JSON with the Hlms definitions.
+        @param additionalTextureExtension
+            Additional string to append to the texture files while loading. e.g.
+            if texture to load is "mytex.png" and additionalTextureExtension = ".dds"
+            then the actual texture loaded will be "mytex.png.dds"
+            Leave it blank if you don't know what to put
         */
         void loadMaterials( const String &filename, const String &resourceGroup,
-                            const char *jsonString );
+                            const char *jsonString,
+                            const String &additionalTextureExtension );
 
         /** Saves all the Datablocks defined in the given
             Hlms into a JSON formatted string.
@@ -141,16 +149,28 @@ namespace Ogre
             Hlms from whose materials to save.
         @param outString [out]
             String with valid JSON output. String is appended to existing contents.
+        @param additionalTextureExtension
+            Additional string to append to the texture files while saving. e.g.
+            if texture name is "mytex.png" and additionalTextureExtension = ".dds"
+            then the actual texture saved will be "mytex.png.dds"
+            Leave it blank if you don't know what to put
         */
-        void saveMaterials( const Hlms *hlms, String &outString );
+        void saveMaterials( const Hlms *hlms, String &outString,
+                            const String &additionalTextureExtension );
 
         /** Saves a single datablock to a string
         @param datablock
             Material to save.
         @param outString [out]
             String with valid JSON output. String is appended to existing contents.
+        @param additionalTextureExtension
+            Additional string to append to the texture files while saving. e.g.
+            if texture name is "mytex.png" and additionalTextureExtension = ".dds"
+            then the actual texture saved will be "mytex.png.dds"
+            Leave it blank if you don't know what to put
         */
-        void saveMaterial( const HlmsDatablock *datablock, String &outString );
+        void saveMaterial( const HlmsDatablock *datablock, String &outString,
+                           const String &additionalTextureExtension );
     };
     /** @} */
     /** @} */

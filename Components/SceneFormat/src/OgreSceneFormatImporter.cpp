@@ -974,7 +974,10 @@ namespace Ogre
         resourceGroupManager.addResourceLocation( folderPath + "/v1",
                                                   "FileSystem", "SceneFormatImporter" );
 
+        HlmsManager *hlmsManager = mRoot->getHlmsManager();
+        hlmsManager->mAdditionalTextureExtensionsPerGroup["SceneFormatImporter"] = ".oitd";
         resourceGroupManager.initialiseResourceGroup( "SceneFormatImporter", true );
+        hlmsManager->mAdditionalTextureExtensionsPerGroup.erase( "SceneFormatImporter" );
 
         DataStreamPtr stream = resourceGroupManager.openResource( "scene.json", "SceneFormatImporter" );
 
