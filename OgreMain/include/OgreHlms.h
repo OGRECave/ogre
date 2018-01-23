@@ -373,8 +373,10 @@ namespace Ogre
             Datablock to fill the values.
         */
         virtual void _loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
-                                HlmsDatablock *datablock ) const {}
-        virtual void _saveJson( const HlmsDatablock *datablock, String &outString ) const {}
+                                HlmsDatablock *datablock,
+                                const String &additionalTextureExtension ) const {}
+        virtual void _saveJson( const HlmsDatablock *datablock, String &outString,
+                                const String &additionalTextureExtension ) const {}
 
         virtual void _collectSamplerblocks( set<const HlmsSamplerblock*>::type &outSamplerblocks,
                                             const HlmsDatablock *datablock ) const {}

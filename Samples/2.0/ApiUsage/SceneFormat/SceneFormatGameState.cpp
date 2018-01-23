@@ -334,6 +334,7 @@ namespace Demo
         importer.importSceneFromFile( mFullpathToFile );
         importer.getInstantRadiosity( true, &mInstantRadiosity, &mIrradianceVolume );
 
+//        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 //        sceneManager->setForwardClustered( true, 16, 8, 24, 96, 2, 50 );
 //        sceneManager->getForwardPlus()->setEnableVpls( true );
     }

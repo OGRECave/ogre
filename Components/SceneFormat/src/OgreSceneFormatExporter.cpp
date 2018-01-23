@@ -769,7 +769,8 @@ namespace Ogre
                 {
                     const String materialPath = folderPath + "/material" +
                                                 StringConverter::toString( i ) + ".material.json";
-                    hlmsManager->saveMaterials( static_cast<HlmsTypes>( i ), materialPath.c_str() );
+                    hlmsManager->saveMaterials( static_cast<HlmsTypes>( i ), materialPath.c_str(),
+                                                BLANKSTRING );
                 }
             }
         }
