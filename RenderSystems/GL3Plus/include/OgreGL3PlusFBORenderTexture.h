@@ -90,16 +90,9 @@ namespace Ogre {
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
          */
         GLSurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
-        /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
-         */
-        GLuint getTemporaryFBO(size_t i);
 
         GL3PlusStateCacheManager* getStateCacheManager();
     private:
-        /** Temporary FBO identifier
-         */
-        std::vector<GLuint> mTempFBO;
-
         GL3PlusRenderSystem* mRenderSystem;
 
         /** Detect allowed FBO formats */

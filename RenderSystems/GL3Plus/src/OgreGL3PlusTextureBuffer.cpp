@@ -432,8 +432,11 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
         // Set up temporary FBO
-        mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, fboMan->getTemporaryFBO(0) );
-        mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, fboMan->getTemporaryFBO(1) );
+        GLuint tempFBO[2] = { 0, 0 };
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &tempFBO[0]));
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &tempFBO[1]));
+        mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, tempFBO[0] );
+        mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, tempFBO[1] );
 
         TexturePtr tempTex;
         if (!fboMan->checkFormat(mFormat))
@@ -539,6 +542,10 @@ namespace Ogre {
 
         // Restore old framebuffer
         mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, oldfb);
+        
+        mRenderSystem->_getStateCacheManager()->deleteGLFrameBuffer(GL_FRAMEBUFFER, tempFBO[0]);
+        mRenderSystem->_getStateCacheManager()->deleteGLFrameBuffer(GL_FRAMEBUFFER, tempFBO[1]);
+        
         if(tempTex)
             TextureManager::getSingleton().remove(tempTex);
     }
