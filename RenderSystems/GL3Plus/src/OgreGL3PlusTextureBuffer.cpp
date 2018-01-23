@@ -329,8 +329,8 @@ namespace Ogre {
         else
         {
             size_t srcOffset = 0, elemSizeInBytes = PixelUtil::getNumElemBytes(data.format);
-            for(GLint z = 0; z < mDepth; ++z)
-                for(GLint y = 0; y < mHeight; ++y)
+            for(size_t z = 0; z < mDepth; ++z)
+                for(size_t y = 0; y < mHeight; ++y)
                 {
                     buffer.readData(srcOffset, mWidth * elemSizeInBytes,
                         (uint8*)data.getTopLeftFrontPixelPtr() + (z * data.slicePitch + y * data.rowPitch) * elemSizeInBytes);
