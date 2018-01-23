@@ -176,13 +176,6 @@ if((CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU") AND NOT OGRE_STATIC)
   set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY") # for legacy headers
 endif()
 
-if ((CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU") AND NOT MINGW)
-  # Fix x64 issues on Linux
-  if(OGRE_PLATFORM_X64 AND NOT APPLE)
-    add_definitions(-fPIC)
-  endif()
-endif()
-
 # determine system endianess
 if (MSVC OR ANDROID OR EMSCRIPTEN OR APPLE_IOS)
   # This doesn't work on VS 2010
