@@ -323,32 +323,19 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         }
 
-        GLint offsetInBytes = 0;
-        uint32 width = mWidth;
-        uint32 height = mHeight;
-        uint32 depth = mDepth;
-        for(GLint i = 0; i < mLevel; i++)
-        {
-            offsetInBytes += PixelUtil::getMemorySize(width, height, depth, data.format);
-
-            if (width > 1)
-                width = width / 2;
-            if (height > 1)
-                height = height / 2;
-            if (depth > 1)
-                depth = depth / 2;
-        }
-
         // Copy to destination buffer
         if(data.isConsecutive())
-            buffer.readData(offsetInBytes, mSizeInBytes, data.getTopLeftFrontPixelPtr());
+            buffer.readData(0, mSizeInBytes, data.getTopLeftFrontPixelPtr());
         else
         {
-            size_t elemSizeInBytes = PixelUtil::getNumElemBytes(data.format);
-            size_t rowSizeInBytes = width * elemSizeInBytes, destRowPitchInBytes = data.rowPitch * elemSizeInBytes;
-            for(GLint i = 0; i < height; ++i)
-                buffer.readData(offsetInBytes + i * rowSizeInBytes, rowSizeInBytes,
-                                (uint8*)data.getTopLeftFrontPixelPtr() + i * destRowPitchInBytes);
+            size_t srcOffset = 0, elemSizeInBytes = PixelUtil::getNumElemBytes(data.format);
+            for(GLint z = 0; z < mDepth; ++z)
+                for(GLint y = 0; y < mHeight; ++y)
+                {
+                    buffer.readData(srcOffset, mWidth * elemSizeInBytes,
+                        (uint8*)data.getTopLeftFrontPixelPtr() + (z * data.slicePitch + y * data.rowPitch) * elemSizeInBytes);
+                    srcOffset += mWidth * elemSizeInBytes;
+                }
         }
     }
 
