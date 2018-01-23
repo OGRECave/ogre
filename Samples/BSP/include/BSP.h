@@ -4,10 +4,6 @@
 #include "SdkSample.h"
 #include "OgreFileSystemLayer.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "macUtils.h"
-#endif
-
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -53,24 +49,7 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         mArchive = cf.getSetting("Archive");
         mMap = cf.getSetting("Map");
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    Ogre::String bundle = Ogre::macBundlePath();
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-    char* env_SNAP = getenv("SNAP");
-    Ogre::String bundle(env_SNAP ? env_SNAP : "");
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // OS X does not set the working directory relative to the app,
-        // In order to make things portable on OS X we need to provide
-        // the loading with it's own bundle path location
-        if (!Ogre::StringUtil::startsWith(mArchive, "/", false)) // only adjust relative dirs
-            mArchive = bundle + "/" + mArchive;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-            // With Ubuntu Snappy changes absolute paths are relative to the snap package.
-            if (Ogre::StringUtil::startsWith(mArchive, "/", false)) // only adjust absolute dirs
-                mArchive = bundle + mArchive;
-#endif
+        mArchive = FileSystemLayer::resolveBundlePath(mArchive);
 
         // add the Quake archive to the world resource group
         ResourceGroupManager::getSingleton().addResourceLocation(mArchive, "Zip",

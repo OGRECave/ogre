@@ -27,17 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreMeshManager.h"
-
-#include <cmath>
-
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
-#include "OgreMatrix4.h"
 #include "OgrePatchMesh.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreException.h"
-
 #include "OgrePrefabFactory.h"
 
 namespace Ogre

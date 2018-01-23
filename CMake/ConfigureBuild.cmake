@@ -35,10 +35,6 @@ endif ()
 # configure threading options
 set(OGRE_THREAD_PROVIDER 0)
 if (OGRE_CONFIG_THREADS)
-	if (UNIX)
-		add_definitions(-pthread)
-	endif ()
-
 	if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "boost")
 		set(OGRE_THREAD_PROVIDER 1)
 		include_directories(${Boost_INCLUDE_DIRS})
@@ -247,11 +243,6 @@ if (UNIX)
     configure_file(${OGRE_TEMPLATES_DIR}/OGRE-HLMS.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-HLMS.pc @ONLY)
     install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-HLMS.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
   endif ()
-
-  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_COMPILER_IS_CLANGXX 1)
-  endif ()
-
 endif ()
 
 if(OGRE_CONFIG_STATIC_LINK_CRT)

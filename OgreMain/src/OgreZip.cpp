@@ -28,12 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #if OGRE_NO_ZIP_ARCHIVE == 0
-
-//#include "OgreZip.h"
-
-#include "OgreLogManager.h"
-#include "OgreException.h"
-
 // workaround for Wundef in zzip/conf.h
 #ifndef __GNUC_MINOR_
 #define __GNUC_MINOR_ 0

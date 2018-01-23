@@ -27,9 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreHighLevelGpuProgram.h"
-#include "OgreException.h"
 #include "OgreGpuProgramManager.h"
-#include "OgreLogManager.h"
 
 namespace Ogre
 {

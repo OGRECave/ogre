@@ -29,10 +29,7 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 
 #include "OgreViewport.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
 #include "OgreRenderTargetListener.h"
-#include "OgreRoot.h"
 #include "OgreDepthBuffer.h"
 #include "OgreProfiler.h"
 #include "OgreTimer.h"

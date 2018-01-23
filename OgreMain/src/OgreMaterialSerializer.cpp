@@ -28,13 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreMaterialSerializer.h"
-#include "OgreStringConverter.h"
-#include "OgreLogManager.h"
-#include "OgreException.h"
-#include "OgreTechnique.h"
-#include "OgrePass.h"
 #include "OgreTextureUnitState.h"
-#include "OgreMaterialManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreExternalTextureSourceManager.h"

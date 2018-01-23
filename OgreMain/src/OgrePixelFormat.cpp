@@ -27,9 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgrePixelFormat.h"
-#include "OgreBitwise.h"
-#include "OgreColourValue.h"
-#include "OgreException.h"
 #include "OgrePixelFormatDescriptions.h"
 
 namespace {

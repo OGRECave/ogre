@@ -30,10 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePVRTCCodec.h"
 #include "OgreImage.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
-#include "OgreBitwise.h"
-#include "OgreDataStream.h"
 
 #define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define PVR_TEXTURE_FLAG_TYPE_MASK  0xff

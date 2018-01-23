@@ -57,7 +57,6 @@ endif()
 
 include(CMakeDependentOption)
 include(MacroLogFeature)
-include(OgreAddTargets)
 include(OgreConfigTargets)
 include(PreprocessorUtils)
 set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
@@ -137,10 +136,6 @@ if (MSVC)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
   endif()
 
-  if (OGRE_UNITY_BUILD)
-    # object files can get large with Unity builds
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-  endif ()
   if (MSVC_VERSION GREATER 1500 OR MSVC_VERSION EQUAL 1500)
     option(OGRE_BUILD_MSVC_MP "Enable build with multiple processes in Visual Studio" TRUE)
   else()
@@ -176,14 +171,17 @@ endif ()
 include(GenerateExportHeader)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
-set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY") # for legacy headers
 
-if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
+if((CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU") AND NOT OGRE_STATIC)
+  set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY") # for legacy headers
+endif()
+
+if ((CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU") AND NOT MINGW)
   # Fix x64 issues on Linux
   if(OGRE_PLATFORM_X64 AND NOT APPLE)
     add_definitions(-fPIC)
   endif()
-endif ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
+endif()
 
 # determine system endianess
 if (MSVC OR ANDROID OR EMSCRIPTEN OR APPLE_IOS)
@@ -197,18 +195,10 @@ else()
 endif()
 
 # Add OgreMain include path
-include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
-include_directories("${OGRE_BINARY_DIR}/include")
-if (APPLE)
-  if (APPLE_IOS)
-    include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iOS")
-
-    # Set static early for proper dependency detection
-    set(OGRE_STATIC TRUE)
-  else ()
-    include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/OSX")
-  endif ()
-endif (APPLE)
+if (APPLE_IOS)
+  # Set static early for proper dependency detection
+  set(OGRE_STATIC TRUE)
+endif()
 
 # definitions for samples
 set(OGRE_LIBRARIES OgreMain)
@@ -234,8 +224,6 @@ endif(WIN32 OR APPLE)
 
 # Set up iOS overrides.
 if (APPLE_IOS)
-  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iOS")
-
   set(CMAKE_EXE_LINKER_FLAGS "-framework OpenGLES -framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
   set(XCODE_ATTRIBUTE_LLVM_VECTORIZE_LOOPS "YES")
@@ -410,12 +398,6 @@ if (MSVC)
 	option(OGRE_PROJECT_FOLDERS "Organize project into project folders." TRUE)
 endif ()
 
-# Unity build options
-# A Unity build includes all sources files in just a few actual compilation units
-# to potentially speed up the compilation.
-option(OGRE_UNITY_BUILD "Enable unity build for Ogre." FALSE)
-set(OGRE_UNITY_FILES_PER_UNIT "50" CACHE STRING "Number of files per compilation unit in Unity build.")
-
 # hide advanced options
 mark_as_advanced(
   OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS
@@ -461,6 +443,9 @@ endif()
 
 # install resource files
 include(InstallResources)
+
+# enable PCH support
+include(PrecompiledHeader)
 
 # Setup OgreMain project
 add_subdirectory(OgreMain)

@@ -5,7 +5,7 @@ set(SOURCE_FILES src/SphereMapping.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-ogre_add_library_to_folder(Samples Sample_SphereMapping ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
+add_library(Sample_SphereMapping ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_SphereMapping ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_SphereMapping)

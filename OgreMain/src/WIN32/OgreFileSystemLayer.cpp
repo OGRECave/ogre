@@ -37,7 +37,7 @@
 
 namespace Ogre
 {
-    bool widePathToOgreString(String& dest, const WCHAR* wpath)
+    static bool widePathToOgreString(String& dest, const WCHAR* wpath)
     {
         // need to convert to narrow (OEM or ANSI) codepage so that fstream can use it 
         // properly on international systems.
@@ -63,7 +63,10 @@ namespace Ogre
         WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, wlength, &dest[0], (int)dest.size(), NULL, NULL);
         return true;
     }
-
+    String FileSystemLayer::resolveBundlePath(String path)
+    {
+        return path;
+    }
     void FileSystemLayer::getConfigPaths()
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

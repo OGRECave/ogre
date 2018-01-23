@@ -45,7 +45,7 @@ if(UNIX)
     add_definitions(-Wno-shadow) # inside tinyxml sources
 endif()
 
-ogre_add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
+add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES} ${TINYXML_LIBRARIES} ${OGRE_MeshLodGenerator_LIBRARIES})
 
 if (APPLE)

@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreDynLibManager.h"
-
 #include "OgreDynLib.h"
 
 namespace Ogre

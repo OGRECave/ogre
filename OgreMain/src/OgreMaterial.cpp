@@ -28,10 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreMaterial.h"
-
-#include "OgreMaterialManager.h"
-#include "OgreTechnique.h"
-#include "OgreLogManager.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreLodStrategy.h"
 

@@ -29,8 +29,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreLodStrategy.h"
 
-#include "OgreCamera.h"
-
 namespace Ogre {
     //-----------------------------------------------------------------------
     LodStrategy::LodStrategy(const String& name)

@@ -63,10 +63,6 @@ THE SOFTWARE.
 #include "OgreLodConfig.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "macUtils.h"
-#endif
-
 // Register the test suite
 
 //--------------------------------------------------------------------------

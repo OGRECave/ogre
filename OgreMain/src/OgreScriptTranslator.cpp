@@ -28,10 +28,6 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreScriptTranslator.h"
-#include "OgreLogManager.h"
-#include "OgreMaterialManager.h"
-#include "OgreTechnique.h"
-#include "OgrePass.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreParticleSystemManager.h"
@@ -48,7 +44,6 @@ THE SOFTWARE.
 #include "OgreDistanceLodStrategy.h"
 #include "OgreDepthBuffer.h"
 #include "OgreParticleSystem.h"
-#include "OgreRoot.h"
 #include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre{

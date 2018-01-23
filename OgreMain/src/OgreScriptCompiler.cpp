@@ -30,8 +30,6 @@ THE SOFTWARE.
 #include "OgreScriptCompiler.h"
 #include "OgreScriptParser.h"
 #include "OgreScriptTranslator.h"
-#include "OgreLogManager.h"
-#include "OgreResourceGroupManager.h"
 
 namespace Ogre
 {

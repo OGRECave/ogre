@@ -28,10 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreLight.h"
 
-#include "OgreException.h"
-#include "OgreCamera.h"
-#include "OgreSceneManager.h"
-
 namespace Ogre {
     //-----------------------------------------------------------------------
     Light::Light()

@@ -29,12 +29,9 @@ THE SOFTWARE.
 
 #include "OgreSkeletonFileFormat.h"
 #include "OgreSkeletonSerializer.h"
-#include "OgreSkeleton.h"
 #include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
 #include "OgreKeyFrame.h"
-#include "OgreBone.h"
-#include "OgreLogManager.h"
 
 namespace Ogre {
     /// stream overhead = ID + size

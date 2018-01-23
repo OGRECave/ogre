@@ -29,6 +29,10 @@
 #include "Android/OgreAPKZipArchive.h"
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#include "macUtils.h"
+#endif
+
 namespace OgreBites {
 
 static const char* SHADER_CACHE_FILENAME = "cache.bin";
@@ -583,9 +587,9 @@ void ApplicationContext::locateResources()
     arch = genLocs.front()->archive->getName();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    arch = Ogre::macBundlePath() + "/Contents/Resources/Media";
+    arch = Ogre::FileSystemLayer::resolveBundlePath("Contents/Resources/Media");
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    arch = Ogre::macBundlePath() + "/Media";
+    arch = Ogre::FileSystemLayer::resolveBundlePath("Media");
 #else
     arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
     arch = Ogre::StringUtil::replaceAll(arch, "media/../../Tests/Media", "");

@@ -26,10 +26,8 @@
  -----------------------------------------------------------------------------
  */
 
-#include "OgreStableHeaders.h"
 #include "OgreGLStateCacheManager.h"
 #include "OgreGLRenderSystem.h"
-#include "OgreLogManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {

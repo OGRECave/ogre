@@ -26,10 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-
-#include "OgrePrerequisites.h"
-#include "OgreAlignedAllocator.h"
-
 #include "OgrePlatformInformation.h"
 
 /**

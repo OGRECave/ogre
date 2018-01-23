@@ -28,12 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreAnimation.h"
 #include "OgreKeyFrame.h"
-#include "OgreException.h"
 #include "OgreEntity.h"
-#include "OgreSkeleton.h"
-#include "OgreBone.h"
-#include "OgreMesh.h"
-
 #include "OgreSubEntity.h"
 
 namespace Ogre {

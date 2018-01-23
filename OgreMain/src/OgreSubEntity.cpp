@@ -26,14 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreSubEntity.h"
 
 #include "OgreEntity.h"
-#include "OgreMaterialManager.h"
-#include "OgreSubMesh.h"
-#include "OgreLogManager.h"
-#include "OgreMesh.h"
-#include "OgreException.h"
+#include "OgreSubEntity.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------

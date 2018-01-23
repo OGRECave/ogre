@@ -26,10 +26,7 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "OgreLodInputProvider.h"
-#include "OgreLodData.h"
-
-#include "OgreLogManager.h"
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre
 {

@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreDataStream.h"
 #include "OgreStringVector.h"
-#include "OgreException.h"
 #include <ctime>
 #include "OgreHeaderPrefix.h"
 

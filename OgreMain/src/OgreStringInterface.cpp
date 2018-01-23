@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreStringInterface.h"
 
 namespace Ogre {
     OGRE_STATIC_MUTEX_INSTANCE( StringInterface::msDictionaryMutex );

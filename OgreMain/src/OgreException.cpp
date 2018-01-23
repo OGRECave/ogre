@@ -26,8 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
 
 #ifdef __BORLANDC__
     #include <stdio.h>

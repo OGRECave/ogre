@@ -27,11 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreVertexIndexData.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h" 
-#include "OgreException.h"
 
 namespace Ogre {
 

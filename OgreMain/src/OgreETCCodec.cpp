@@ -30,10 +30,6 @@ THE SOFTWARE.
 
 #include "OgreETCCodec.h"
 #include "OgreImage.h"
-#include "OgreException.h"
-
-#include "OgreLogManager.h"
-#include "OgreBitwise.h"
 
 #define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define KTX_ENDIAN_REF      (0x04030201)

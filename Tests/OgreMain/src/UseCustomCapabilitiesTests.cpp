@@ -32,11 +32,7 @@ THE SOFTWARE.
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
 #include "OgreStringConverter.h"
-
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "macUtils.h"
-#endif
+#include "OgreFileSystemLayer.h"
 
 // Register the test suite
 
@@ -175,7 +171,7 @@ TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesGL)
 #else
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    Root* root = OGRE_NEW Root(macBundlePath() + "/Contents/Resources/plugins.cfg");
+    Root* root = OGRE_NEW Root(FileSystemLayer::resolveBundlePath("Contents/Resources/plugins.cfg"));
 #else
     Root* root = OGRE_NEW Root("plugins.cfg");
 #endif
@@ -195,7 +191,7 @@ TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesGL)
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
-                macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+                FileSystemLayer::resolveBundlePath("Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg"));
 #else
             root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
                 "../../Tests/Media/CustomCapabilities/customCapabilitiesTest.cfg");

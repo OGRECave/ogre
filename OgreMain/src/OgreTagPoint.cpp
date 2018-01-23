@@ -26,11 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-
 #include "OgreTagPoint.h"
-#include "OgreMatrix4.h"
 #include "OgreEntity.h"
-#include "OgreQuaternion.h"
+
 
 namespace Ogre {
 

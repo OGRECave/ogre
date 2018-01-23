@@ -24,9 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include <algorithm> // for std::sort
-#include "OgreShaderFunction.h"
-#include "OgreStringConverter.h"
+
+#include "OgrePrecompiledHeaders.h"
 
 namespace Ogre {
 namespace RTShader {

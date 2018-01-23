@@ -32,10 +32,6 @@
 #include "OgreStringVector.h"
 #include "OgreHeaderPrefix.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "macUtils.h"
-#endif
-
 namespace Ogre
 {
     /** Provides methods to find out where the Ogre config files are stored
@@ -131,18 +127,7 @@ namespace Ogre
          * @param path
          * @return path inside the bundle
          */
-        static String resolveBundlePath(String path) {
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-            // With Ubuntu snaps absolute paths are relative to the snap package.
-            char* env_SNAP = getenv("SNAP");
-            if(env_SNAP && !path.empty() && path[0] == '/') // only adjust absolute dirs
-                path = env_SNAP + path;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            if(!path.empty() && path[0] != '/')             // only adjust relative dirs
-                path = macBundlePath() + "/" + path;
-#endif
-            return path;
-        }
+        static String resolveBundlePath(String path);
 
         /** Create a directory. */
         static bool createDirectory(const Ogre::String& name);

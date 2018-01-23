@@ -179,8 +179,6 @@ function(ogre_config_common TARGETNAME)
 
   if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-    # add GCC visibility flags to shared library build
-    set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "${OGRE_VISIBILITY_FLAGS}")
   endif()
 
   ogre_create_vcproj_userfile(${TARGETNAME})
@@ -239,6 +237,9 @@ endfunction(ogre_config_lib)
 
 function(ogre_config_component LIBNAME)
   ogre_config_lib(${LIBNAME} FALSE)
+  if (OGRE_PROJECT_FOLDERS)
+    set_property(TARGET ${LIBNAME} PROPERTY FOLDER Components)
+  endif ()
 endfunction(ogre_config_component)
 
 function(ogre_config_framework LIBNAME)
@@ -251,8 +252,6 @@ function(ogre_config_framework LIBNAME)
          INSTALL_NAME_DIR "@executable_path/../Frameworks"
       )
       set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES};${PLATFORM_HEADERS};" )
-      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
-      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
       set_target_properties(${LIBNAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")
       set_source_files_properties("${RESOURCE_FILES}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
@@ -263,6 +262,11 @@ endfunction(ogre_config_framework)
 # setup plugin build
 function(ogre_config_plugin PLUGINNAME)
   ogre_config_common(${PLUGINNAME})
+
+  if (OGRE_PROJECT_FOLDERS)
+    set_property(TARGET ${LIBNAME} PROPERTY FOLDER Plugins)
+  endif ()
+
   set_target_properties(${PLUGINNAME} PROPERTIES VERSION ${OGRE_SOVERSION})
   if (OGRE_STATIC)
     # add static prefix, if compiling static version
@@ -312,6 +316,10 @@ endfunction(ogre_config_plugin)
 # setup Ogre sample build
 function(ogre_config_sample_common SAMPLENAME)
   ogre_config_common(${SAMPLENAME})
+
+  if (OGRE_PROJECT_FOLDERS)
+    set_property(TARGET ${LIBNAME} PROPERTY FOLDER Samples)
+  endif ()
 
   # set install RPATH for Unix systems
   if (UNIX AND OGRE_FULL_RPATH)
@@ -401,6 +409,11 @@ function(ogre_config_sample_lib SAMPLENAME)
       )
     endif()
   endif(APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
+
+  if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+    # add GCC visibility flags to shared library build
+    set_target_properties(${SAMPLENAME} PROPERTIES COMPILE_FLAGS "${OGRE_VISIBILITY_FLAGS}")
+  endif()
 
   # Add sample to the list of link targets
   # Global property so that we can build this up across entire sample tree

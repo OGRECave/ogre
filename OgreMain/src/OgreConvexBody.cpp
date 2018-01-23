@@ -28,13 +28,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreConvexBody.h"
-#include "OgreException.h"
-#include "OgreVector3.h"
-#include "OgreLogManager.h"
-#include "OgreRay.h"
-#include "OgreFrustum.h"
-#include "OgreAxisAlignedBox.h"
-
 
 namespace Ogre
 {

@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreString.h"
 
 namespace Ogre {
     const String& StringUtil::BLANK = BLANKSTRING;

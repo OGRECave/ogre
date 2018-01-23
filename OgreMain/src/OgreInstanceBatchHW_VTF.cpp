@@ -27,12 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreInstanceBatchHW_VTF.h"
-#include "OgreSubMesh.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreInstancedEntity.h"
-#include "OgreCamera.h"
-#include "OgreRoot.h"
 
 namespace Ogre
 {

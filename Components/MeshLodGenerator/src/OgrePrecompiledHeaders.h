@@ -26,6 +26,45 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-// This source file generates the precompiled headers
+#ifndef __OgreStableHeaders__
+#define __OgreStableHeaders__
 
-#include "OgreStableHeaders.h"
+#ifdef __cplusplus // xcode tries to create a PCH for C code using this
+#include <fstream>
+
+#include "OgreRoot.h"
+#include "OgrePixelCountLodStrategy.h"
+#include "OgreHardwareBufferManager.h"
+#include "OgreHardwareIndexBuffer.h"
+#include "OgreMeshManager.h"
+#include "OgreMesh.h"
+#include "OgreSubMesh.h"
+#include "OgreLogManager.h"
+
+#include "OgreMeshLodGenerator.h"
+#include "OgreLodWorkQueueWorker.h"
+#include "OgreLodWorkQueueRequest.h"
+#include "OgreLodWorkQueueInjector.h"
+#include "OgreLodWorkQueueInjectorListener.h"
+#include "OgreLodInputProvider.h"
+#include "OgreLodInputProviderMesh.h"
+#include "OgreLodInputProviderBuffer.h"
+#include "OgreLodOutputProvider.h"
+#include "OgreLodOutputProviderMesh.h"
+#include "OgreLodOutputProviderCompressedMesh.h"
+#include "OgreLodOutputProviderBuffer.h"
+#include "OgreLodOutputProviderCompressedBuffer.h"
+#include "OgreLodOutsideMarker.h"
+#include "OgreLodCollapseCost.h"
+#include "OgreLodCollapseCostCurvature.h"
+#include "OgreLodCollapseCostProfiler.h"
+#include "OgreLodCollapseCostOutside.h"
+#include "OgreLodConfig.h"
+#include "OgreLodConfigSerializer.h"
+#include "OgreLodData.h"
+#include "OgreLodCollapser.h"
+#include "OgreLodStrategyManager.h"
+
+#endif
+
+#endif 

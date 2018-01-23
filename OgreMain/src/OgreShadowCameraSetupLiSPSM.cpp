@@ -29,10 +29,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreShadowCameraSetupLiSPSM.h"
-#include "OgreSceneManager.h"
-#include "OgreCamera.h"
 #include "OgreLight.h"
-#include "OgrePlane.h"
 
 namespace Ogre
 {

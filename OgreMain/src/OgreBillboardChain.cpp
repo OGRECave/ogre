@@ -31,13 +31,6 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreBillboardChain.h"
-
-#include "OgreHardwareBufferManager.h"
-#include "OgreNode.h"
-#include "OgreCamera.h"
-#include "OgreRoot.h"
-#include "OgreMaterialManager.h"
-#include "OgreLogManager.h"
 #include "OgreViewport.h"
 
 #include <limits>

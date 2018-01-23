@@ -26,10 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreCommon.h"
 #include "OgreWindowEventUtilities.h"
 #include "OgreRenderWindow.h"
-#include "OgreLogManager.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #include <X11/Xlib.h>
 void GLXProc( Ogre::RenderWindow *win, const XEvent &event );

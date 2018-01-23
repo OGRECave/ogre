@@ -27,11 +27,8 @@ THE SOFTWARE.
 */
 
 #include "OgreStableHeaders.h"
-#include "OgreCommon.h"
-#include "OgreSceneManager.h"
-#include "OgreLight.h"
+
 #include "OgreShadowCameraSetup.h"
-#include "OgreCamera.h"
 #include "OgreViewport.h"
 
 

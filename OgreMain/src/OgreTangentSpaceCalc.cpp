@@ -27,9 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreTangentSpaceCalc.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreLogManager.h"
-#include "OgreException.h"
 
 namespace Ogre
 {

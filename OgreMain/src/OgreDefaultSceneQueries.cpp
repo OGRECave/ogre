@@ -26,8 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreSceneManager.h"
-#include "OgreRoot.h"
 
 namespace Ogre {
     //---------------------------------------------------------------------
