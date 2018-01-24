@@ -52,6 +52,9 @@ elseif (APPLE)
   file(GLOB PLATFORM_HEADERS "include/OSX/*.h")
   file(GLOB PLATFORM_SOURCES "src/OSX/*.mm")
 
+  # ignore usage of deprecated OSX API for now
+  add_definitions(-Wno-deprecated-declarations)
+
   set(NATIVE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/OSX 
     ${OGRE_SOURCE_DIR}/OgreMain/include/OSX)
