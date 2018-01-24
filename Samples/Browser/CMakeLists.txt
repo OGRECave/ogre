@@ -229,7 +229,7 @@ if (APPLE)
         ${OGRE_SOURCE_DIR}/RenderSystems/GL/include/OSX
         )
 
-	target_link_libraries(SampleBrowser ${OPENGL_LIBRARIES} ${CoreVideo_LIBRARIES})
+	target_link_libraries(SampleBrowser ${OPENGL_gl_LIBRARY} ${CoreVideo_LIBRARIES})
 
    set_target_properties(SampleBrowser PROPERTIES
         LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework CoreVideo -framework ApplicationServices")

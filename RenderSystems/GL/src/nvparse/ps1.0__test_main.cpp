@@ -11,7 +11,6 @@
 #include "nvparse_errors.h"
 
 #include <string>
-#include <GL/glut.h>
 
 #define GLH_EXT_SINGLE_FILE
 #include <glh_extensions.h>

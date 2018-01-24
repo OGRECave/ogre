@@ -66,6 +66,26 @@ namespace Ogre {
 #   include <GL/glew.h>
 #endif
 
+namespace Ogre {
+    inline const char* glErrorToString(GLenum glErr) {
+        switch(glErr)
+        {
+            case GL_INVALID_ENUM:
+                return "GL_INVALID_ENUM";
+            case GL_INVALID_VALUE:
+                return "GL_INVALID_VALUE";
+            case GL_INVALID_OPERATION:
+                return "GL_INVALID_OPERATION";
+            case GL_INVALID_FRAMEBUFFER_OPERATION:
+                return "GL_INVALID_FRAMEBUFFER_OPERATION";
+            case GL_OUT_OF_MEMORY:
+                return "GL_OUT_OF_MEMORY";
+            default:
+                return "";
+        }
+    }
+}
+
 /// Lots of generated code in here which triggers the new VC CRT security warnings
 #if !defined( _CRT_SECURE_NO_DEPRECATE )
 #define _CRT_SECURE_NO_DEPRECATE

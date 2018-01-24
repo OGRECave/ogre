@@ -3666,9 +3666,9 @@ namespace Ogre {
 		GLenum error = glGetError();
 		if (result && GL_NO_ERROR != error)
 		{		
-			const GLubyte* errorCode = gluErrorString(error);
+			const char* errorCode = glErrorToString(error);
 			String errorString = "GLRenderSystem::setDrawBuffer(" 
-				+ Ogre::StringConverter::toString(colourBuffer) + "): " + (const char*)errorCode;
+				+ Ogre::StringConverter::toString(colourBuffer) + "): " + errorCode;
 
 			Ogre::LogManager::getSingleton().logMessage(errorString);			
 			result = false;

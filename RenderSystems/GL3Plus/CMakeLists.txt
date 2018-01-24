@@ -39,7 +39,7 @@ if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
     PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
 endif()
 add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL3Plus OgreMain ${GLSUPPORT_LIBS} ${OPENGL_LIBRARIES})
+target_link_libraries(RenderSystem_GL3Plus OgreMain ${GLSUPPORT_LIBS} ${OPENGL_gl_LIBRARY})
 
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_GL3Plus ${OGRE_THREAD_LIBRARIES})

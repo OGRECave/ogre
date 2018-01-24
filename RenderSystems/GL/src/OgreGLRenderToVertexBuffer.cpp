@@ -83,11 +83,7 @@ namespace Ogre {
         GLenum glErr = glGetError();
         while (glErr != GL_NO_ERROR)
         {
-            const char* glerrStr = (const char*)gluErrorString(glErr);
-            if (glerrStr)
-            {
-                msg += String(glerrStr);
-            }
+            msg += glErrorToString(glErr);
             glErr = glGetError();
             foundError = true;  
         }
