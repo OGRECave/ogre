@@ -123,6 +123,11 @@ add_library(OgreBites ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
 set_target_properties(OgreBites PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreBites OgreMain OgreOverlay ${DEPENDENCIES})
 
+if(OGRE_STATIC AND APPLE AND OGRE_BUILD_PLUGIN_CG)
+  # workaround so the Cg framework is found in the above condition
+  target_include_directories(OgreBites PUBLIC ${Cg_INCLUDE_DIRS})
+endif()
+
 if(SDL2_FOUND)
   target_include_directories(OgreBites PUBLIC ${SDL2_INCLUDE_DIR})
   target_link_libraries(OgreBites ${SDL2_LIBRARY})
