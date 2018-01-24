@@ -455,7 +455,8 @@ namespace Ogre
         return *macroblock0 != macroblock1;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsDatablock::saveTextures( const String &folderPath, set<String>::type &savedTextures )
+    void HlmsDatablock::saveTextures( const String &folderPath, set<String>::type &savedTextures,
+                                      bool saveOitd, bool saveOriginal )
     {
     }
     //-----------------------------------------------------------------------------------

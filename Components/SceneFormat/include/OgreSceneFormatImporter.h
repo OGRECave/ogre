@@ -37,8 +37,8 @@ namespace rapidjson
     class CrtAllocator;
     template <typename> class MemoryPoolAllocator;
     template <typename> struct UTF8;
-    //template <typename, typename, typename> class GenericDocument;
-    //typedef GenericDocument< UTF8<char>, MemoryPoolAllocator<CrtAllocator>, CrtAllocator > Document;
+    template <typename, typename, typename> class GenericDocument;
+    typedef GenericDocument< UTF8<char>, MemoryPoolAllocator<CrtAllocator>, CrtAllocator > Document;
 
     template <typename BaseAllocator> class MemoryPoolAllocator;
     template <typename Encoding, typename>  class GenericValue;
@@ -104,6 +104,9 @@ namespace Ogre
         void importLights( const rapidjson::Value &json );
         void importInstantRadiosity( const rapidjson::Value &irValue );
         void importSceneSettings( const rapidjson::Value &json, uint32 importFlags );
+
+        void importScene( const String &filename, const rapidjson::Document &d,
+                          uint32 importFlags=~SceneFlags::LightsVpl );
 
     public:
         SceneFormatImporter( Root *root, SceneManager *sceneManager );

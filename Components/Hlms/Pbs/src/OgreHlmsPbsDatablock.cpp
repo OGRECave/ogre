@@ -1217,7 +1217,8 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::saveTextures( const String &folderPath, set<String>::type &savedTextures )
+    void HlmsPbsDatablock::saveTextures( const String &folderPath, set<String>::type &savedTextures,
+                                         bool saveOitd, bool saveOriginal )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
@@ -1242,16 +1243,41 @@ namespace Ogre
                     (aliasName || i == PBSM_REFLECTION) &&
                     !(texture->getUsage() & TU_RENDERTARGET) )
                 {
-                    const uint32 numSlices = i == PBSM_REFLECTION ? 6u : 1u;
+                    DataStreamPtr inFile;
+                    if( saveOriginal )
+                    {
+                        try
+                        {
+                            inFile = ResourceGroupManager::getSingleton().openResource(
+                                         finalName, texture->getGroup() );
+                        }
+                        catch( Exception &e )
+                        {
+                        }
 
-                    Image image;
-                    texture->convertToImage( image, true, 0u, texLocation.xIdx, numSlices );
+                        if( inFile )
+                        {
+                            size_t fileSize = inFile->size();
+                            vector<uint8>::type fileData;
+                            fileData.resize( fileSize );
+                            inFile->read( &fileData[0], fileData.size() );
+                            std::ofstream outFile( (folderPath + "/" + finalName).c_str(),
+                                                   std::ios::binary | std::ios::out );
+                            outFile.write( (const char*)&fileData[0], fileData.size() );
+                            outFile.close();
+                        }
+                    }
 
-                    //DDS is the format that supports most of what we need.
-                    String texName = finalName;
-//                    if( texName.find( ".dds" ) != texName.size() - 4u )
-//                        texName += ".dds";
-                    image.save( folderPath + "/" + texName + ".oitd" );
+                    if( saveOitd )
+                    {
+                        const uint32 numSlices = i == PBSM_REFLECTION ? 6u : 1u;
+
+                        Image image;
+                        texture->convertToImage( image, true, 0u, texLocation.xIdx, numSlices );
+
+                        String texName = finalName;
+                        image.save( folderPath + "/" + texName + ".oitd" );
+                    }
 
                     savedTextures.insert( finalName );
                 }

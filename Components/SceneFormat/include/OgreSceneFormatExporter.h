@@ -104,9 +104,10 @@ namespace Ogre
             Defaults to exporting everything.
             Note that excluding scene nodes can cause issues later during import.
         */
-        void exportScene( String &outJson, uint32 exportFlags=~0u );
+        void exportScene( String &outJson, uint32 exportFlags=~SceneFlags::TexturesOriginal );
 
-        void exportSceneToFile( const String &folderPath, uint32 exportFlags=~0u );
+        void exportSceneToFile( const String &folderPath,
+                                uint32 exportFlags=~SceneFlags::TexturesOriginal );
     };
 
     /** @} */

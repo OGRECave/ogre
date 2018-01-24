@@ -602,6 +602,11 @@ namespace Ogre
         jsonStr.a( ",\n\t\"MovableObject_msDefaultVisibilityFlags\" : ",
                    MovableObject::getDefaultVisibilityFlags() );
 
+        if( exportFlags & SceneFlags::TexturesOitd )
+            jsonStr.a( ",\n\t\"saved_oitd_textures\" : \"true\"" );
+        if( exportFlags & SceneFlags::TexturesOriginal )
+            jsonStr.a( ",\n\t\"saved_original_textures\" : \"true\"" );
+
         flushLwString( jsonStr, outJson );
 
         if( exportFlags & SceneFlags::SceneNodes )
@@ -775,7 +780,7 @@ namespace Ogre
             }
         }
 
-        if( exportFlags & SceneFlags::Textures )
+        if( exportFlags & (SceneFlags::TexturesOitd|SceneFlags::TexturesOriginal)  )
         {
             set<String>::type savedTextures;
             HlmsManager *hlmsManager = mRoot->getHlmsManager();
@@ -786,7 +791,10 @@ namespace Ogre
                 {
 //                    const String materialPath = folderPath + "/material" +
 //                                                StringConverter::toString( i ) + ".json";
-                    hlms->saveAllTexturesFromDatablocks( folderPath, savedTextures );
+                    hlms->saveAllTexturesFromDatablocks(
+                                folderPath, savedTextures,
+                                (exportFlags & SceneFlags::TexturesOitd) != 0,
+                                (exportFlags & SceneFlags::TexturesOriginal) != 0 );
                 }
             }
         }

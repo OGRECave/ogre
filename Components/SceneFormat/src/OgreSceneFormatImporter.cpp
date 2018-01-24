@@ -877,22 +877,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormatImporter::importScene( const String &filename, const char *jsonString,
+    void SceneFormatImporter::importScene( const String &filename, const rapidjson::Document &d,
                                            uint32 importFlags )
     {
         mFilename = filename;
-
         destroyInstantRadiosity();
-
-        rapidjson::Document d;
-        d.Parse( jsonString );
-
-        if( d.HasParseError() )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "SceneFormatImporter::importScene",
-                         "Invalid JSON string in file " + filename );
-        }
 
         rapidjson::Value::ConstMemberIterator itor;
 
@@ -965,6 +954,22 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importScene( const String &filename, const char *jsonString,
+                                           uint32 importFlags )
+    {
+        rapidjson::Document d;
+        d.Parse( jsonString );
+
+        if( d.HasParseError() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "SceneFormatImporter::importScene",
+                         "Invalid JSON string in file " + filename );
+        }
+
+        importScene( filename, d, importFlags );
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneFromFile( const String &folderPath, uint32 importFlags )
     {
         ResourceGroupManager &resourceGroupManager = ResourceGroupManager::getSingleton();
@@ -974,13 +979,7 @@ namespace Ogre
         resourceGroupManager.addResourceLocation( folderPath + "/v1",
                                                   "FileSystem", "SceneFormatImporter" );
 
-        HlmsManager *hlmsManager = mRoot->getHlmsManager();
-        hlmsManager->mAdditionalTextureExtensionsPerGroup["SceneFormatImporter"] = ".oitd";
-        resourceGroupManager.initialiseResourceGroup( "SceneFormatImporter", true );
-        hlmsManager->mAdditionalTextureExtensionsPerGroup.erase( "SceneFormatImporter" );
-
         DataStreamPtr stream = resourceGroupManager.openResource( "scene.json", "SceneFormatImporter" );
-
         vector<char>::type fileData;
         fileData.resize( stream->size() + 1 );
         if( !fileData.empty() )
@@ -989,12 +988,37 @@ namespace Ogre
 
             //Add null terminator just in case (to prevent bad input)
             fileData.back() = '\0';
+
+            rapidjson::Document d;
+            d.Parse( &fileData[0] );
+
+            if( d.HasParseError() )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "SceneFormatImporter::importScene",
+                             "Invalid JSON string in file " + stream->getName() );
+            }
+
+            rapidjson::Value::ConstMemberIterator  itor;
+
+            bool useOitd = false;
+            itor = d.FindMember( "saved_oitd_textures" );
+            if( itor != d.MemberEnd() && itor->value.IsBool() )
+                useOitd = itor->value.GetBool();
+
+            HlmsManager *hlmsManager = mRoot->getHlmsManager();
+            if( useOitd )
+                hlmsManager->mAdditionalTextureExtensionsPerGroup["SceneFormatImporter"] = ".oitd";
+            resourceGroupManager.initialiseResourceGroup( "SceneFormatImporter", true );
+            if( useOitd )
+                hlmsManager->mAdditionalTextureExtensionsPerGroup.erase( "SceneFormatImporter" );
+
+            resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );
+            resourceGroupManager.removeResourceLocation( folderPath + "/v2", "SceneFormatImporter" );
+            resourceGroupManager.removeResourceLocation( folderPath + "/v1", "SceneFormatImporter" );
+
             importScene( stream->getName(), &fileData[0], importFlags );
         }
-
-        resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );
-        resourceGroupManager.removeResourceLocation( folderPath + "/v2", "SceneFormatImporter" );
-        resourceGroupManager.removeResourceLocation( folderPath + "/v1", "SceneFormatImporter" );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::getInstantRadiosity( bool releaseOwnership,
