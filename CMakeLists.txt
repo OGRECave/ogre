@@ -284,9 +284,6 @@ elseif (APPLE AND NOT APPLE_IOS)
     endif()
   endif()
 
-  # 10.7 is the minimum for libc++ support
-  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
-
   # Make sure that the OpenGL render system is selected for non-iOS Apple builds
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE)
 endif ()
