@@ -13,7 +13,6 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${Cg_INCLUDE_DIRS})
-link_directories(${Cg_LIBRARY_DIRS})
 add_definitions(-DOGRE_CGPLUGIN_EXPORTS ${OGRE_VISIBILITY_FLAGS})
 
 add_library(Plugin_CgProgramManager ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
