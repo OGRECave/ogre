@@ -394,5 +394,9 @@ endif ()
 # Display results, terminate if anything required is missing
 MACRO_DISPLAY_FEATURE_LOG()
 
+if(APPLE)
+link_directories(${Cg_LIBRARY_DIRS}) # defect in FindCg: frameworks do not use absolute path
+endif()
+
 # provide option to install dependencies on Windows
 include(InstallDependencies)
