@@ -68,6 +68,10 @@ namespace Ogre {
         {
             *static_cast<GL3PlusFrameBufferObject **>(pData) = &fbo;
         }
+        else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
+        {
+            *static_cast<GLContext**>(pData) = fbo.getContext();
+        }
     }
 
     bool GL3PlusFBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )

@@ -57,6 +57,10 @@ namespace Ogre {
         {
             *static_cast<GL3PlusFrameBufferObject **>(pData) = &mFB;
         }
+        else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
+        {
+            *static_cast<GLContext**>(pData) = mFB.getContext();
+        }
         else if (name == "GL_FBOID")
         {
             *static_cast<GLuint*>(pData) = mFB.getGLFBOID();

@@ -64,9 +64,13 @@ namespace Ogre {
 
     void GLES2FBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
     {
-        if(name=="FBO")
+        if(name == GLRenderTexture::CustomAttributeString_FBO)
         {
             *static_cast<GLES2FrameBufferObject **>(pData) = &fbo;
+        }
+        else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
+        {
+            *static_cast<GLContext**>(pData) = fbo.getContext();
         }
     }
     //-----------------------------------------------------------------------------
