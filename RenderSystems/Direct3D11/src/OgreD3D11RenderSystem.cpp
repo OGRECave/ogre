@@ -3850,12 +3850,12 @@ namespace Ogre
     {
         if( name == "D3DDEVICE" )
         {
-            ID3D11DeviceN  **device = (ID3D11DeviceN **)pData;
-            *device = mDevice.get();
-            return;
+            *(ID3D11DeviceN**)pData = mDevice.get();
         }
-
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found: " + name, "RenderSystem::getCustomAttribute");
+        else
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found: " + name, "RenderSystem::getCustomAttribute");
+        }
     }
     //---------------------------------------------------------------------
     bool D3D11RenderSystem::_getDepthBufferCheckEnabled( void )

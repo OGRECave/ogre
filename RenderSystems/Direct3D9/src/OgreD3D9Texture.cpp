@@ -2049,27 +2049,20 @@ namespace Ogre
             if (mFSAA > 0)
             {
                 // rendering to AA surface
-                IDirect3DSurface9 ** pSurf = (IDirect3DSurface9 **)pData;
-                *pSurf = static_cast<D3D9HardwarePixelBuffer*>(mBuffer)->getFSAASurface(D3D9RenderSystem::getActiveD3D9Device());
-                return;
+                *(IDirect3DSurface9**)pData = static_cast<D3D9HardwarePixelBuffer*>(mBuffer)->getFSAASurface(D3D9RenderSystem::getActiveD3D9Device());
             }
             else
             {
-                IDirect3DSurface9 ** pSurf = (IDirect3DSurface9 **)pData;
-                *pSurf = static_cast<D3D9HardwarePixelBuffer*>(mBuffer)->getSurface(D3D9RenderSystem::getActiveD3D9Device());
-                return;
+                *(IDirect3DSurface9**)pData = static_cast<D3D9HardwarePixelBuffer*>(mBuffer)->getSurface(D3D9RenderSystem::getActiveD3D9Device());
             }
         }
         else if(name == "HWND")
         {
-            HWND *pHwnd = (HWND*)pData;
-            *pHwnd = NULL;
-            return;
+            *(HWND*)pData = NULL;
         }
         else if(name == "BUFFER")
         {
             *static_cast<HardwarePixelBuffer**>(pData) = mBuffer;
-            return;
         }
     }    
     //---------------------------------------------------------------------

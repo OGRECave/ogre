@@ -974,47 +974,34 @@ namespace Ogre
     {
         if(name == "DDBACKBUFFER")
         {
-            //IDXGISurface ** pSurf = (IDXGISurface **)pData;
-            //*pSurf = static_cast<D3D11HardwarePixelBuffer*>(mBuffer)->getSurface();
-            *static_cast<HardwarePixelBuffer**>(pData) = mBuffer;
-            return;
+            *(HardwarePixelBuffer**)pData = mBuffer;
         }
 		else if(name == "HWND" || name == "WINDOW")
         {
-            HWND *pHwnd = (HWND*)pData;
-            *pHwnd = NULL;
-            return;
+            *(HWND*)pData = NULL;
         }
         else if(name == "isTexture")
         {
-            bool *b = static_cast< bool * >( pData );
-            *b = true;
-            return;
+            *(bool*)pData = true;
         }
         else if(name == "BUFFER")
         {
-            *static_cast<HardwarePixelBuffer**>(pData) = mBuffer;
-            return;
+            *(HardwarePixelBuffer**)pData = mBuffer;
         }
         else if( name == "ID3D11Texture2D" )
         {
-            ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
-            *pBackBuffer = static_cast<D3D11HardwarePixelBuffer*>(mBuffer)->getParentTexture()->GetTex2D();
-            return;
+            *(ID3D11Texture2D**)pData = static_cast<D3D11HardwarePixelBuffer*>(mBuffer)->getParentTexture()->GetTex2D();
         }
         else if(name == "ID3D11RenderTargetView")
         {
-            *static_cast<ID3D11RenderTargetView**>(pData) = mRenderTargetView.Get();
-            return;
+            *(ID3D11RenderTargetView**)pData = mRenderTargetView.Get();
         }
         else if( name == "numberOfViews" )
         {
-            unsigned int* n = static_cast<unsigned int*>(pData);
-            *n = 1;
-            return;
+            *(unsigned*)pData = 1;
         }
-
-        RenderTexture::getCustomAttribute(name, pData);
+        else
+            RenderTexture::getCustomAttribute(name, pData);
     }
     //---------------------------------------------------------------------
     D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer, uint32 zoffset, D3D11Device & device )

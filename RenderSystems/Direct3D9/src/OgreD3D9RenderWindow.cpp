@@ -781,40 +781,27 @@ namespace Ogre
 
         if( name == "D3DDEVICE" )
         {
-            IDirect3DDevice9* *pDev = (IDirect3DDevice9**)pData;
-            *pDev = getD3D9Device();
-            return;
+            *(IDirect3DDevice9**)pData = getD3D9Device();
         }       
         else if( name == "WINDOW" )
         {
-            HWND *pHwnd = (HWND*)pData;
-            *pHwnd = getWindowHandle();
-            return;
+            *(HWND*)pData = getWindowHandle();
         }
         else if( name == "isTexture" )
         {
-            bool *b = reinterpret_cast< bool * >( pData );
-            *b = false;
-
-            return;
+            *(bool*)pData = false;
         }
         else if( name == "D3DZBUFFER" )
         {
-            IDirect3DSurface9* *pSurf = (IDirect3DSurface9**)pData;
-            *pSurf = mDevice->getDepthBuffer(this);
-            return;
+            *(IDirect3DSurface9**)pData = mDevice->getDepthBuffer(this);
         }
         else if( name == "DDBACKBUFFER" )
         {
-            IDirect3DSurface9* *pSurf = (IDirect3DSurface9**)pData;
-            *pSurf = mDevice->getBackBuffer(this);
-            return;
+            *(IDirect3DSurface9**)pData = mDevice->getBackBuffer(this);
         }
         else if( name == "DDFRONTBUFFER" )
         {
-            IDirect3DSurface9* *pSurf = (IDirect3DSurface9**)pData;
-            *pSurf = mDevice->getBackBuffer(this);
-            return;
+            *(IDirect3DSurface9**)pData = mDevice->getBackBuffer(this);
         }
     }
 

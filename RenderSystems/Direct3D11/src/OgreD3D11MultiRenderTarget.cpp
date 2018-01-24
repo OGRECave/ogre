@@ -112,44 +112,27 @@ namespace Ogre
     {
         if(name == "DDBACKBUFFER")
         {
-            ID3D11Texture2D ** pSurf = (ID3D11Texture2D **)pData;
-            /// Transfer surfaces
-            for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-            {
-                if(targets[x])
-                    pSurf[x] = targets[x]->getParentTexture()->GetTex2D();
-            }
-            return;
+            ID3D11Texture2D** pSurf = (ID3D11Texture2D**)pData;
+            for(unsigned i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i)
+                pSurf[i] = targets[i] ? targets[i]->getParentTexture()->GetTex2D() : NULL;
         }
         else if(name == "ID3D11RenderTargetView")
         {
-            //*static_cast<ID3D11RenderTargetView***>(pData) = mRenderTargetViews;
-            ID3D11RenderTargetView ** pRTView = (ID3D11RenderTargetView**)pData;
-
-            memset(pRTView,0,sizeof(**pRTView));
-
-            for(int y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && mRenderTargets[y]; ++y)
-            {
-                ID3D11RenderTargetView * view;
-                mRenderTargets[y]->getCustomAttribute("ID3D11RenderTargetView",&view);
-                pRTView[y]=view;
-            }
-            return;
+            ID3D11RenderTargetView** pRTView = (ID3D11RenderTargetView**)pData;
+            memset(pRTView, 0, OGRE_MAX_MULTIPLE_RENDER_TARGETS * sizeof(ID3D11RenderTargetView*));
+            for(unsigned i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS && mRenderTargets[i]; ++i)
+                mRenderTargets[i]->getCustomAttribute("ID3D11RenderTargetView", &pRTView[i]);
         }
         else if( name == "numberOfViews" )
         {
-            uint* n = static_cast<unsigned int*>(pData);
-            *n = mNumberOfViews;
-            return;
+            *(unsigned*)pData = mNumberOfViews;
         }
         else if(name == "isTexture")
         {
-            bool *b = static_cast< bool * >( pData );
-            *b = false;
-            return;
+            *(bool*)pData = false;
         }
-
-        MultiRenderTarget::getCustomAttribute(name, pData);
+        else
+            MultiRenderTarget::getCustomAttribute(name, pData);
     }
     //---------------------------------------------------------------------
     void D3D11MultiRenderTarget::checkAndUpdate()
