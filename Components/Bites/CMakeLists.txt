@@ -105,6 +105,9 @@ elseif(APPLE)
   list(APPEND SOURCES 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreOSXConfigDialog.mm"
     "${CMAKE_CURRENT_SOURCE_DIR}/misc/ogrelogo.png")
+  set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/OgreOSXConfigDialog.mm"
+    PROPERTIES COMPILE_FLAGS "-Wno-deprecated-declarations"
+  )
   set(RESOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/ogrelogo.png")
   source_group(Resources FILES ${RESOURCE_FILES})
   set(DEPENDENCIES ${DEPENDENCIES} "-framework Cocoa")
