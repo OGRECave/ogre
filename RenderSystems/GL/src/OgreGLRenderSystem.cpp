@@ -168,14 +168,6 @@ namespace Ogre {
     {
         shutdown();
 
-        // Destroy render windows
-        RenderTargetMap::iterator i;
-        for (i = mRenderTargets.begin(); i != mRenderTargets.end(); ++i)
-        {
-            delete i->second;
-        }
-        mRenderTargets.clear();
-
         delete mGLSupport;
     }
 
