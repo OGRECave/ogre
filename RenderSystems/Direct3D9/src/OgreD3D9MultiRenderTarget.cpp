@@ -135,7 +135,6 @@ namespace Ogre
                 if(mRenderTargets[x] != NULL)                               
                     pSurf[x] = mRenderTargets[x]->getSurface(D3D9RenderSystem::getActiveD3D9Device());          
             }
-            return;
         }
     }
 
