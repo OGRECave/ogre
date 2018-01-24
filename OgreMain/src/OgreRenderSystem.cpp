@@ -69,7 +69,6 @@ namespace Ogre {
         , mDerivedDepthBiasSlopeScale(0.0f)
         , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
         , mGlobalNumberOfInstances(1)
-        , mEnableFixedPipeline(true)
         , mVertexProgramBound(false)
         , mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
@@ -516,14 +515,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::_setTexture(size_t unit, bool enabled, 
-        const String &texname)
-    {
-        TexturePtr t = TextureManager::getSingleton().getByName(
-            texname, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-        _setTexture(unit, enabled, t);
-    }
-    //-----------------------------------------------------------------------
     void RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
@@ -629,16 +620,6 @@ namespace Ogre {
     CullingMode RenderSystem::_getCullingMode(void) const
     {
         return mCullingMode;
-    }
-    //-----------------------------------------------------------------------
-    bool RenderSystem::getFixedPipelineEnabled(void) const
-    {
-        return mEnableFixedPipeline;
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::setFixedPipelineEnabled(bool enabled)
-    {
-        mEnableFixedPipeline = enabled;
     }
     //-----------------------------------------------------------------------
     void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
@@ -748,15 +729,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::_setWorldMatrices(const Matrix4* m, unsigned short count)
-    {
-        // Do nothing with these matrices here, it never used for now,
-        // derived class should take care with them if required.
-
-        // Set hardware matrix to nothing
-        _setWorldMatrix(Matrix4::IDENTITY);
-    }
-    //-----------------------------------------------------------------------
     void RenderSystem::_render(const RenderOperation& op)
     {
         // Update stats
@@ -855,11 +827,6 @@ namespace Ogre {
     {
         mClipPlanes.push_back(p);
         mClipPlanesDirty = true;
-    }
-    //---------------------------------------------------------------------
-    void RenderSystem::addClipPlane (Real A, Real B, Real C, Real D)
-    {
-        addClipPlane(Plane(A, B, C, D));
     }
     //---------------------------------------------------------------------
     void RenderSystem::setClipPlanes(const PlaneList& clipPlanes)

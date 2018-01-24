@@ -146,8 +146,7 @@ namespace Ogre {
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
         //check if we can delay the update of secondary buffer resources
-        //if the user requested it and we have a shadow buffer we can always recreate the buffer later
-        if ((mShadowBuffer == NULL) || ((mLockUploadOption & HBU_ON_DEMAND) == 0))
+        if (!mShadowBuffer)
         {
             DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
             uint nextFrameNumber = Root::getSingleton().getNextFrameNumber();

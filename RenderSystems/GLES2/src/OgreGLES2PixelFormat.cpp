@@ -43,7 +43,6 @@ namespace Ogre {
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8},                   // PF_L8
             {GL_RED, GL_UNSIGNED_SHORT, GL_R16UI},               // PF_L16
             {GL_ALPHA, GL_UNSIGNED_BYTE, GL_R8},                 // PF_A8
-            {GL_NONE},                                           // PF_A4L4
             {GL_RG, GL_UNSIGNED_BYTE, GL_RG8},                   // PF_BYTE_LA
             {GL_RGB, GL_UNSIGNED_SHORT_5_6_5, GL_RGB565},        // PF_R5G6B5
             {GL_NONE},                                           // PF_B5G6R5
@@ -130,7 +129,6 @@ namespace Ogre {
             {GL_NONE},                                           // PF_BC6H_UF16
             {GL_NONE},                                           // PF_BC6H_SF16
             {GL_NONE},                                           // PF_BC7_UNORM
-            {GL_NONE},                                           // PF_BC7_UNORM_SRGB
             {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_R8_EXT},           // PF_R8
             {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG8_EXT},           // PF_RG8
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8_SNORM},             // PF_R8_SNORM
@@ -149,7 +147,7 @@ namespace Ogre {
             {GL_LUMINANCE, GL_UNSIGNED_BYTE, GL_LUMINANCE},      // PF_L8
             {GL_NONE},                                           // PF_L16
             {GL_ALPHA, GL_UNSIGNED_BYTE, GL_ALPHA},              // PF_A8
-            {GL_NONE},                                           // PF_A4L4
+            {GL_NONE},                                           // UNUSED
             {GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, GL_LUMINANCE_ALPHA},// PF_BYTE_LA
             {GL_RGB, GL_UNSIGNED_SHORT_5_6_5, GL_RGB},           // PF_R5G6B5
             {GL_NONE},                                           // PF_B5G6R5
@@ -236,7 +234,7 @@ namespace Ogre {
             {GL_NONE},                                           // PF_BC6H_UF16
             {GL_NONE},                                           // PF_BC6H_SF16
             {GL_NONE},                                           // PF_BC7_UNORM
-            {GL_NONE},                                           // PF_BC7_UNORM_SRGB
+            {GL_NONE},                                           // UNUSED
             {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_RED_EXT},          // PF_R8
             {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG_EXT},            // PF_RG8
             {GL_NONE},                                           // PF_R8_SNORM

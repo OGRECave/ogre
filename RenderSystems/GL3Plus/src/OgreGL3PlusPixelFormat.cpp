@@ -70,7 +70,6 @@ namespace Ogre  {
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8},                   // PF_L8
             {GL_RED, GL_UNSIGNED_SHORT, GL_R16},                 // PF_L16
             {GL_ALPHA, GL_UNSIGNED_BYTE, GL_R8},                 // PF_A8
-            {GL_NONE},                                           // PF_A4L4
             {GL_RG, GL_UNSIGNED_BYTE, GL_RG8},                   // PF_BYTE_LA
             {GL_RGB, GL_UNSIGNED_SHORT_5_6_5, GL_RGB5},          // PF_R5G6B5
             {GL_BGR, GL_UNSIGNED_SHORT_5_6_5, GL_RGB5},          // PF_B5G6R5
@@ -148,7 +147,6 @@ namespace Ogre  {
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB},// PF_BC6H_UF16
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB},  // PF_BC6H_SF16
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_BPTC_UNORM_ARB},        // PF_BC7_UNORM
-            {GL_NONE, GL_NONE, GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB},  // PF_BC7_UNORM_SRGB
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8},                   // PF_R8
             {GL_RG, GL_UNSIGNED_BYTE, GL_RG8},                   // PF_RG8
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8_SNORM},             // PF_R8_SNORM

@@ -35,18 +35,14 @@ namespace Ogre {
 
     Exception::Exception(int num, const String& desc, const String& src) :
         line( 0 ),
-        number( num ),
         description( desc ),
         source( src )
     {
-        // Log this error - not any more, allow catchers to do it
-        //LogManager::getSingleton().logMessage(this->getFullDescription());
     }
 
     Exception::Exception(int num, const String& desc, const String& src, 
         const char* typ, const char* fil, long lin) :
         line( lin ),
-        number( num ),
         typeName(typ),
         description( desc ),
         source( src ),
@@ -64,24 +60,11 @@ namespace Ogre {
 
     Exception::Exception(const Exception& rhs)
         : line( rhs.line ), 
-        number( rhs.number ), 
         typeName( rhs.typeName ), 
         description( rhs.description ), 
         source( rhs.source ), 
         file( rhs.file )
     {
-    }
-
-    Exception& Exception::operator = ( const Exception& rhs )
-    {
-        description = rhs.description;
-        number = rhs.number;
-        source = rhs.source;
-        file = rhs.file;
-        line = rhs.line;
-        typeName = rhs.typeName;
-
-        return *this;
     }
 
     const String& Exception::getFullDescription(void) const
@@ -104,11 +87,6 @@ namespace Ogre {
         }
 
         return fullDesc;
-    }
-
-    int Exception::getNumber(void) const throw()
-    {
-        return number;
     }
 
 }

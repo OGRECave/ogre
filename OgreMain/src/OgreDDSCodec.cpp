@@ -530,9 +530,8 @@ namespace Ogre {
             case 96: // DXGI_FORMAT_BC6H_SF16
                 return PF_BC6H_SF16;
             case 98: // DXGI_FORMAT_BC7_UNORM
-                return PF_BC7_UNORM;
             case 99: // DXGI_FORMAT_BC7_UNORM_SRGB
-                return PF_BC7_UNORM_SRGB;
+                return PF_BC7_UNORM;
             case 20: // DXGI_FORMAT_D32_FLOAT_S8X24_UINT
             case 22: // DXGI_FORMAT_X32_TYPELESS_G8X24_UINT
             case 40: // DXGI_FORMAT_D32_FLOAT

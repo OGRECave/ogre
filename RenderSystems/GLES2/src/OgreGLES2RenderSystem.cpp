@@ -127,8 +127,6 @@ namespace Ogre {
         mRenderAttribsBound.reserve(100);
         mRenderInstanceAttribsBound.reserve(100);
 
-        mEnableFixedPipeline = false;
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         mResourceManager = OGRE_NEW GLES2ManagedResourceManager();
 #endif
@@ -269,7 +267,6 @@ namespace Ogre {
         rsc->setCapability(RSC_SCISSOR_TEST);
 
         // Vertex Buffer Objects are always supported by OpenGL ES
-        rsc->setCapability(RSC_VBO);
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_element_index_uint"))
             rsc->setCapability(RSC_32BIT_INDEX);
 
@@ -332,7 +329,6 @@ namespace Ogre {
             rsc->setCapability(RSC_ANISOTROPY);
         }
 
-        rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         if (hasMinGLVersion(3, 0))
         {
@@ -362,7 +358,6 @@ namespace Ogre {
         rsc->setCapability(RSC_AUTOMIPMAP);
 
         // Blending support
-        rsc->setCapability(RSC_BLENDING);
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
         // DOT3 support is standard

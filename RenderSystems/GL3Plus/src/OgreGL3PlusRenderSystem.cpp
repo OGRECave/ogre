@@ -169,7 +169,6 @@ namespace Ogre {
         mCurrentHullShader = 0;
         mCurrentDomainShader = 0;
         mCurrentComputeShader = 0;
-        mEnableFixedPipeline = false;
         mLargestSupportedAnisotropy = 1;
     }
 
@@ -254,9 +253,6 @@ namespace Ogre {
         rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
 
-        // Check for blending support
-        rsc->setCapability(RSC_BLENDING);
-
         // Multitexturing support and set number of texture units
         GLint units;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units));
@@ -292,7 +288,6 @@ namespace Ogre {
         rsc->setCapability(RSC_HW_GAMMA);
 
         // Vertex Buffer Objects are always supported
-        rsc->setCapability(RSC_VBO);
         rsc->setCapability(RSC_MAPBUFFER);
         rsc->setCapability(RSC_32BIT_INDEX);
 
@@ -333,7 +328,6 @@ namespace Ogre {
             checkExtension("GL_KHR_texture_compression_astc_ldr"))
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
 
-        rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         // Probe number of draw buffers
         // Only makes sense with FBO support, so probe here
@@ -349,7 +343,6 @@ namespace Ogre {
         rsc->setVertexTextureUnitsShared(true);
 
         // Blending support
-        rsc->setCapability(RSC_BLENDING);
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
         // Check for non-power-of-2 texture support

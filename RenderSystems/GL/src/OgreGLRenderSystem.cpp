@@ -238,61 +238,30 @@ namespace Ogre {
             rsc->setVendor(GPU_AMD);
         else if (strstr(vendorName, "Intel"))
             rsc->setVendor(GPU_INTEL);
-        else if (strstr(vendorName, "S3"))
-            rsc->setVendor(GPU_S3);
-        else if (strstr(vendorName, "Matrox"))
-            rsc->setVendor(GPU_MATROX);
-        else if (strstr(vendorName, "3DLabs"))
-            rsc->setVendor(GPU_3DLABS);
-        else if (strstr(vendorName, "SiS"))
-            rsc->setVendor(GPU_SIS);
         else
             rsc->setVendor(GPU_UNKNOWN);
 
-        if(mEnableFixedPipeline)
-        {
-            // Supports fixed-function
-            rsc->setCapability(RSC_FIXED_FUNCTION);
-        }
+        // Supports fixed-function
+        rsc->setCapability(RSC_FIXED_FUNCTION);
 
-        // Check for hardware mipmapping support.
-        if(GLEW_VERSION_1_4 || GLEW_SGIS_generate_mipmap)
-        {
-            rsc->setCapability(RSC_AUTOMIPMAP);
-            rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
-        }
 
-        // Check for blending support
-        if(GLEW_VERSION_1_3 ||
-           GLEW_ARB_texture_env_combine ||
-           GLEW_EXT_texture_env_combine)
-        {
-            rsc->setCapability(RSC_BLENDING);
-        }
+        rsc->setCapability(RSC_AUTOMIPMAP);
+        rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
 
         // Check for Multitexturing support and set number of texture units
-        if(GLEW_VERSION_1_3 ||
-           GLEW_ARB_multitexture)
-        {
-            GLint units;
-            glGetIntegerv( GL_MAX_TEXTURE_UNITS, &units );
+        GLint units;
+        glGetIntegerv( GL_MAX_TEXTURE_UNITS, &units );
 
-            if (GLEW_ARB_fragment_program)
-            {
-                // Also check GL_MAX_TEXTURE_IMAGE_UNITS_ARB since NV at least
-                // only increased this on the FX/6x00 series
-                GLint arbUnits;
-                glGetIntegerv( GL_MAX_TEXTURE_IMAGE_UNITS_ARB, &arbUnits );
-                if (arbUnits > units)
-                    units = arbUnits;
-            }
-            rsc->setNumTextureUnits(std::min(OGRE_MAX_TEXTURE_LAYERS, units));
-        }
-        else
+        if (GLEW_ARB_fragment_program)
         {
-            // If no multitexture support then set one texture unit
-            rsc->setNumTextureUnits(1);
+            // Also check GL_MAX_TEXTURE_IMAGE_UNITS_ARB since NV at least
+            // only increased this on the FX/6x00 series
+            GLint arbUnits;
+            glGetIntegerv( GL_MAX_TEXTURE_IMAGE_UNITS_ARB, &arbUnits );
+            if (arbUnits > units)
+                units = arbUnits;
         }
+        rsc->setNumTextureUnits(std::min(OGRE_MAX_TEXTURE_LAYERS, units));
 
         // Check for Anisotropy support
         if(GLEW_EXT_texture_filter_anisotropic)
@@ -303,41 +272,28 @@ namespace Ogre {
             rsc->setCapability(RSC_ANISOTROPY);
         }
 
-        // Check for DOT3 support
-        if(GLEW_VERSION_1_3 ||
-           GLEW_ARB_texture_env_dot3 ||
-           GLEW_EXT_texture_env_dot3)
-        {
-            rsc->setCapability(RSC_DOT3);
-        }
-
-        // Check for cube mapping
-        if(GLEW_VERSION_1_3 ||
-           GLEW_ARB_texture_cube_map ||
-           GLEW_EXT_texture_cube_map)
-        {
-            rsc->setCapability(RSC_CUBEMAPPING);
-        }
-
+        rsc->setCapability(RSC_DOT3);
+        rsc->setCapability(RSC_CUBEMAPPING);
 
         // Point sprites
         if (GLEW_VERSION_2_0 || GLEW_ARB_point_sprite)
         {
             rsc->setCapability(RSC_POINT_SPRITES);
         }
-        // Check for point parameters
-        if (GLEW_VERSION_1_4)
+
+        if(GLEW_ARB_point_parameters)
         {
-            rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
+            glPointParameterf = glPointParameterfARB;
+            glPointParameterfv = glPointParameterfvARB;
         }
-        if (GLEW_ARB_point_parameters)
+        else if(GLEW_EXT_point_parameters)
         {
-            rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS_ARB);
+            glPointParameterf = glPointParameterfEXT;
+            glPointParameterfv = glPointParameterfvEXT;
         }
-        if (GLEW_EXT_point_parameters)
-        {
-            rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS_EXT);
-        }
+
+        rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
+
 
         // Check for hardware stencil support and set bit depth
         GLint stencil;
@@ -351,16 +307,8 @@ namespace Ogre {
 
         rsc->setCapability(RSC_HW_GAMMA);
 
-        if(GLEW_VERSION_1_5 || GLEW_ARB_vertex_buffer_object)
-        {
-            if (!GLEW_ARB_vertex_buffer_object)
-            {
-                rsc->setCapability(RSC_GL1_5_NOVBO);
-            }
-            rsc->setCapability(RSC_VBO);
-            rsc->setCapability(RSC_MAPBUFFER);
-            rsc->setCapability(RSC_32BIT_INDEX);
-        }
+        rsc->setCapability(RSC_MAPBUFFER);
+        rsc->setCapability(RSC_32BIT_INDEX);
 
         if(GLEW_ARB_vertex_program)
         {
@@ -520,24 +468,21 @@ namespace Ogre {
         }
 
         // Check for texture compression
-        if(GLEW_VERSION_1_3 || GLEW_ARB_texture_compression)
-        {
-            rsc->setCapability(RSC_TEXTURE_COMPRESSION);
+        rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 
-            // Check for dxt compression
-            if(GLEW_EXT_texture_compression_s3tc)
-            {
+        // Check for dxt compression
+        if(GLEW_EXT_texture_compression_s3tc)
+        {
 #if defined(__APPLE__) && defined(__PPC__)
-                // Apple on ATI & PPC has errors in DXT
-                if (mGLSupport->getGLVendor().find("ATI") == std::string::npos)
+            // Apple on ATI & PPC has errors in DXT
+            if (mGLSupport->getGLVendor().find("ATI") == std::string::npos)
 #endif
-                    rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
-            }
-            // Check for vtc compression
-            if(GLEW_NV_texture_compression_vtc)
-            {
-                rsc->setCapability(RSC_TEXTURE_COMPRESSION_VTC);
-            }
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
+        }
+        // Check for vtc compression
+        if(GLEW_NV_texture_compression_vtc)
+        {
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION_VTC);
         }
 
         // Scissor test is standard in GL 1.2 (is it emulated on some cards though?)
@@ -550,29 +495,8 @@ namespace Ogre {
         {
             rsc->setCapability(RSC_TWO_SIDED_STENCIL);
         }
-        // stencil wrapping?
-        if (GLEW_VERSION_1_4 || GLEW_EXT_stencil_wrap)
-        {
-            rsc->setCapability(RSC_STENCIL_WRAP);
-        }
-
-        // Check for hardware occlusion support
-        if(GLEW_VERSION_1_5 || GLEW_ARB_occlusion_query)
-        {
-            // Some buggy driver claim that it is GL 1.5 compliant and
-            // not support ARB_occlusion_query
-            if (!GLEW_ARB_occlusion_query)
-            {
-                rsc->setCapability(RSC_GL1_5_NOHWOCCLUSION);
-            }
-
-            rsc->setCapability(RSC_HWOCCLUSION);
-        }
-        else if (GLEW_NV_occlusion_query)
-        {
-            // Support NV extension too for old hardware
-            rsc->setCapability(RSC_HWOCCLUSION);
-        }
+        rsc->setCapability(RSC_STENCIL_WRAP);
+        rsc->setCapability(RSC_HWOCCLUSION);
 
         // UBYTE4 always supported
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
@@ -609,16 +533,6 @@ namespace Ogre {
                 glGetIntegerv(GL_MAX_DRAW_BUFFERS_ARB, &buffers);
                 rsc->setNumMultiRenderTargets(std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
                 rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
-                if(!GLEW_VERSION_2_0)
-                {
-                    // Before GL version 2.0, we need to get one of the extensions
-                    if(GLEW_ARB_draw_buffers)
-                        rsc->setCapability(RSC_FBO_ARB);
-                    if(GLEW_ATI_draw_buffers)
-                        rsc->setCapability(RSC_FBO_ATI);
-                }
-                // Set FBO flag for all 3 'subtypes'
-                rsc->setCapability(RSC_FBO);
 
             }
             rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -633,18 +547,9 @@ namespace Ogre {
         }
 
         // Point size
-        if (GLEW_VERSION_1_4)
-        {
-            float ps;
-            glGetFloatv(GL_POINT_SIZE_MAX, &ps);
-            rsc->setMaxPointSize(ps);
-        }
-        else
-        {
-            GLint vSize[2];
-            glGetIntegerv(GL_POINT_SIZE_RANGE,vSize);
-            rsc->setMaxPointSize(vSize[1]);
-        }
+        float ps;
+        glGetFloatv(GL_POINT_SIZE_MAX, &ps);
+        rsc->setMaxPointSize(ps);
 
         // Vertex texture fetching
         if (mGLSupport->checkExtension("GL_ARB_vertex_shader"))
@@ -660,11 +565,7 @@ namespace Ogre {
             rsc->setVertexTextureUnitsShared(true);
         }
 
-        // Mipmap LOD biasing?
-        if (GLEW_VERSION_1_4 || GLEW_EXT_texture_lod_bias)
-        {
-            rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
-        }
+        rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
 
         // Alpha to coverage?
         if (mGLSupport->checkExtension("GL_ARB_multisample"))
@@ -707,7 +608,7 @@ namespace Ogre {
             }
         }
 
-        if(caps->hasCapability(RSC_GL1_5_NOVBO))
+        if(!GLEW_ARB_vertex_buffer_object)
         {
             // Assign ARB functions same to GL 1.5 version since
             // interface identical
@@ -724,15 +625,7 @@ namespace Ogre {
             glUnmapBufferARB = glUnmapBuffer;
         }
 
-        if(caps->hasCapability(RSC_VBO))
-        {
-
-            mHardwareBufferManager = new GLHardwareBufferManager;
-        }
-        else
-        {
-            mHardwareBufferManager = new DefaultHardwareBufferManager;
-        }
+        mHardwareBufferManager = new GLHardwareBufferManager;
 
         // XXX Need to check for nv2 support and make a program manager for it
         // XXX Probably nv1 as well for older cards
@@ -852,21 +745,18 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("GLSL support detected");
         }
 
-        if(caps->hasCapability(RSC_HWOCCLUSION))
+        if(caps->hasCapability(RSC_HWOCCLUSION) && !GLEW_ARB_occlusion_query)
         {
-            if(caps->hasCapability(RSC_GL1_5_NOHWOCCLUSION))
-            {
-                // Assign ARB functions same to GL 1.5 version since
-                // interface identical
-                glBeginQueryARB = glBeginQuery;
-                glDeleteQueriesARB = glDeleteQueries;
-                glEndQueryARB = glEndQuery;
-                glGenQueriesARB = glGenQueries;
-                glGetQueryObjectivARB = glGetQueryObjectiv;
-                glGetQueryObjectuivARB = glGetQueryObjectuiv;
-                glGetQueryivARB = glGetQueryiv;
-                glIsQueryARB = glIsQuery;
-            }
+            // Assign ARB functions same to GL 1.5 version since
+            // interface identical
+            glBeginQueryARB = glBeginQuery;
+            glDeleteQueriesARB = glDeleteQueries;
+            glEndQueryARB = glEndQuery;
+            glGenQueriesARB = glGenQueries;
+            glGetQueryObjectivARB = glGetQueryObjectiv;
+            glGetQueryObjectuivARB = glGetQueryObjectuiv;
+            glGetQueryivARB = glGetQueryiv;
+            glIsQueryARB = glIsQuery;
         }
 
 
@@ -891,24 +781,20 @@ namespace Ogre {
 
 
         // Check for framebuffer object extension
-        if(caps->hasCapability(RSC_FBO) && rttMode < 1)
+        if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE) && rttMode < 1)
         {
             // Before GL version 2.0, we need to get one of the extensions
-            if(caps->hasCapability(RSC_FBO_ARB))
+            if(GLEW_ARB_draw_buffers)
                 GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersARB;
-            else if(caps->hasCapability(RSC_FBO_ATI))
+            else if(GLEW_ATI_draw_buffers)
                 GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersATI;
 
-            if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
-            {
-                // Create FBO manager
-                LogManager::getSingleton().logMessage("GL: Using GL_EXT_framebuffer_object for rendering to textures (best)");
-                mRTTManager = new GLFBOManager(false);
-                caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
+            // Create FBO manager
+            LogManager::getSingleton().logMessage("GL: Using GL_EXT_framebuffer_object for rendering to textures (best)");
+            mRTTManager = new GLFBOManager(false);
+            caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 
-                //TODO: Check if we're using OpenGL 3.0 and add RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL flag
-            }
-
+            //TODO: Check if we're using OpenGL 3.0 and add RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL flag
         }
         else
         {
@@ -1205,6 +1091,12 @@ namespace Ogre {
 
         // Get extension function pointers
         glewInit();
+
+        if (!GLEW_VERSION_1_5) {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "OpenGL 1.5 is not supported",
+                        "GLRenderSystem::initialiseContext");
+        }
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLStateCacheManager>();
     }
@@ -2471,10 +2363,6 @@ namespace Ogre {
             return;
         }
 
-        // Check to see if blending is supported
-        if(!mCurrentCapabilities->hasCapability(RSC_BLENDING))
-            return;
-
         GLenum src1op, src2op, cmd;
         GLfloat cv1[4], cv2[4];
 
@@ -2798,24 +2686,12 @@ namespace Ogre {
         if (op.useIndexes)
         {
             void* pBufferData = 0;
+            mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB,
+                            static_cast<GLHardwareIndexBuffer*>(
+                                op.indexData->indexBuffer.get())->getGLBufferId());
 
-            if(mCurrentCapabilities->hasCapability(RSC_VBO))
-            {
-                mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                                static_cast<GLHardwareIndexBuffer*>(
-                                    op.indexData->indexBuffer.get())->getGLBufferId());
-
-                pBufferData = VBO_BUFFER_OFFSET(
-                    op.indexData->indexStart * op.indexData->indexBuffer->getIndexSize());
-            }
-            else
-            {
-                // DefaultHardwareIndexBuffer: fancy way to get data pointer
-                pBufferData = op.indexData->indexBuffer->lock(
-                    op.indexData->indexStart * op.indexData->indexBuffer->getIndexSize(), 0,
-                    HardwareBuffer::HBL_NORMAL);
-                op.indexData->indexBuffer->unlock();
-            }
+            pBufferData = VBO_BUFFER_OFFSET(
+                op.indexData->indexStart * op.indexData->indexBuffer->getIndexSize());
 
             GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
@@ -3487,18 +3363,10 @@ namespace Ogre {
         void* pBufferData = 0;
         const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get());
 
-        if(mCurrentCapabilities->hasCapability(RSC_VBO))
-        {
-            mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER_ARB, 
-                            hwGlBuffer->getGLBufferId());
-            pBufferData = VBO_BUFFER_OFFSET(elem.getOffset());
-        }
-        else
-        {
-            // DefaultHardwareVertexBuffer: fancy way to get data pointer
-            pBufferData = vertexBuffer->lock(elem.getOffset(), 0, HardwareBuffer::HBL_NORMAL);
-            vertexBuffer->unlock();
-        }
+        mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER_ARB, 
+                        hwGlBuffer->getGLBufferId());
+        pBufferData = VBO_BUFFER_OFFSET(elem.getOffset());
+
         if (vertexStart)
         {
             pBufferData = static_cast<char*>(pBufferData) + vertexStart * vertexBuffer->getVertexSize();

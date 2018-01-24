@@ -1474,7 +1474,6 @@ namespace Ogre
     void PCZSceneManagerFactory::initMetaData(void) const
     {
         mMetaData.typeName = FACTORY_TYPE_NAME;
-        mMetaData.description = "Scene manager organising the scene using Portal Connected Zones.";
         mMetaData.sceneTypeMask = 0xFFFF; // support all types
         mMetaData.worldGeometrySupported = false;
     }

@@ -171,7 +171,6 @@ namespace Ogre {
         case PF_X8B8G8R8:
         case PF_B8G8R8A8:
         case PF_R8G8B8A8:
-        case PF_A4L4:
         case PF_BYTE_LA:
         case PF_R3G3B2:
         case PF_A4R4G4B4:

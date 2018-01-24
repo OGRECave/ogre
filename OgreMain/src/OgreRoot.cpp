@@ -114,7 +114,6 @@ namespace Ogre {
       , mFrameSmoothingTime(0.0f)
       , mRemoveQueueStructuresOnClear(false)
       , mDefaultMinPixelSize(0)
-      , mFreqUpdatedBuffersUploadOption(HardwareBuffer::HBU_DEFAULT)
       , mNextMovableObjectTypeFlag(1)
       , mIsInitialised(false)
       , mIsBlendIndicesGpuRedundant(true)
@@ -709,17 +708,6 @@ namespace Ogre {
     void Root::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)
     {
         mActiveRenderer->useCustomRenderSystemCapabilities(capabilities);
-    }
-    //-----------------------------------------------------------------------
-    String Root::getErrorDescription(long errorNumber)
-    {
-
-        // Pass to render system
-        if (mActiveRenderer)
-            return mActiveRenderer->getErrorDescription(errorNumber);
-        else
-            return "";
-
     }
     //-----------------------------------------------------------------------
     void Root::addSceneManagerFactory(SceneManagerFactory* fact)

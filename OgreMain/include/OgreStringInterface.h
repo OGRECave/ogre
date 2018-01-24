@@ -67,7 +67,6 @@ namespace Ogre {
     {
     public:
         String name;
-        String description; //!< @deprecated use the manual instead
         ParameterType paramType;
         ParameterDef(const String& newName, const String& newDescription, ParameterType newType)
             : name(newName), paramType(newType) {}

@@ -130,7 +130,6 @@ namespace Ogre
     {
         LogManager::getSingleton().logMessage( "D3D11: " + getName() + " created." );
 
-        mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
         mSwitchingFullscreenCounter = 0;
         mDriverType = D3D_DRIVER_TYPE_HARDWARE;
@@ -985,7 +984,6 @@ namespace Ogre
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setStencilBufferBitDepth(8);
 
-        rsc->setCapability(RSC_VBO);
         UINT formatSupport;
         if(mFeatureLevel >= D3D_FEATURE_LEVEL_9_2
         || SUCCEEDED(mDevice->CheckFormatSupport(DXGI_FORMAT_R32_UINT, &formatSupport)) && 0 != (formatSupport & D3D11_FORMAT_SUPPORT_IA_INDEX_BUFFER))
@@ -997,7 +995,6 @@ namespace Ogre
         rsc->setCapability(RSC_ANISOTROPY);
         rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
-        rsc->setCapability(RSC_BLENDING);
         rsc->setCapability(RSC_DOT3);
         // Cube map
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
@@ -1057,15 +1054,6 @@ namespace Ogre
             case 0x163C:
             case 0x8086:
                 rsc->setVendor(GPU_INTEL);
-                break;
-            case 0x5333:
-                rsc->setVendor(GPU_S3);
-                break;
-            case 0x3D3D:
-                rsc->setVendor(GPU_3DLABS);
-                break;
-            case 0x102B:
-                rsc->setVendor(GPU_MATROX);
                 break;
             default:
                 rsc->setVendor(GPU_UNKNOWN);
@@ -1659,7 +1647,7 @@ namespace Ogre
         }
         catch(const D3D11RenderingAPIException& e)
         {
-            if(e.getNumber() == DXGI_ERROR_DEVICE_REMOVED || e.getNumber() == DXGI_ERROR_DEVICE_RESET)
+            if(e.getHResult() == DXGI_ERROR_DEVICE_REMOVED || e.getHResult() == DXGI_ERROR_DEVICE_RESET)
                 LogManager::getSingleton().logMessage("D3D11: Device was lost while rendering.");
             else
                 throw;
@@ -1674,7 +1662,7 @@ namespace Ogre
         }
         catch(const D3D11RenderingAPIException& e)
         {
-            if(e.getNumber() == DXGI_ERROR_DEVICE_REMOVED || e.getNumber() == DXGI_ERROR_DEVICE_RESET)
+            if(e.getHResult() == DXGI_ERROR_DEVICE_REMOVED || e.getHResult() == DXGI_ERROR_DEVICE_RESET)
                 LogManager::getSingleton().logMessage("D3D11: Device was lost while rendering.");
             else
                 throw;
@@ -3703,11 +3691,6 @@ namespace Ogre
     void D3D11RenderSystem::postExtraThreadsStarted()
     {
         // nothing to do - D3D11 shares rendering context already
-    }
-    //---------------------------------------------------------------------
-    String D3D11RenderSystem::getErrorDescription( long errorNumber ) const
-    {
-        return mDevice.getErrorDescription(errorNumber);
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::determineFSAASettings(uint fsaa, const String& fsaaHint, 
