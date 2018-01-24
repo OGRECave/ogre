@@ -1,9 +1,5 @@
 # Configure Samples build
 
-if(SDL2_FOUND)
-  include_directories(${SDL2_INCLUDE_DIR})
-endif()
-
 # Add android JNI binding example
 if(OGRE_BUILD_ANDROID_JNI_SAMPLE)
   add_subdirectory(AndroidJNI)
@@ -13,40 +9,6 @@ if (OGRE_BUILD_SAMPLES)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
   ogre_add_component_include_dir(Bites)
-
-  # link against plugins in static build
-  if(OGRE_STATIC)
-    if (OGRE_BUILD_PLUGIN_OCTREE)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} Plugin_OctreeSceneManager)
-    endif ()
-    if (OGRE_BUILD_PLUGIN_BSP)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} Plugin_BSPSceneManager)
-    endif ()
-    if (OGRE_BUILD_PLUGIN_CG)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} Plugin_CgProgramManager)
-    endif ()
-    if (OGRE_BUILD_PLUGIN_PFX)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} Plugin_ParticleFX)
-    endif ()
-    if (OGRE_BUILD_PLUGIN_PCZ)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} Plugin_PCZSceneManager)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_D3D9)
-  	  set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_Direct3D9)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_D3D11)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_Direct3D11)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_GL)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL3Plus)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_GLES2)
-      set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES2)
-    endif ()
-  endif()
 
   if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
@@ -79,9 +41,6 @@ if (OGRE_BUILD_SAMPLES)
     ogre_add_component_include_dir(MeshLodGenerator)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreMeshLodGenerator)
   endif ()
-
-  # Link to all enabled plugins
-  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
   
   if(EMSCRIPTEN)
     add_subdirectory(Emscripten)
@@ -111,7 +70,7 @@ if (OGRE_BUILD_SAMPLES)
   add_library(DefaultSamples ${OGRE_LIB_TYPE} 
               ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/DefaultSamplesPlugin.cpp
               ${SAMPLES_SOURCES} ${SAMPLES_HEADERS})
-  target_link_libraries(DefaultSamples ${OGRE_LIBRARIES} OgreBites ${SDL2_LIBRARY})
+  target_link_libraries(DefaultSamples OgreMain ${SAMPLE_DEPENDENCIES} OgreBites)
   ogre_config_sample_lib(DefaultSamples)
 
   if (APPLE AND NOT APPLE_IOS)
