@@ -1469,14 +1469,15 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void Hlms::saveAllTexturesFromDatablocks( const String &folderPath,
-                                              set<String>::type &savedTextures )
+                                              set<String>::type &savedTextures,
+                                              bool saveOitd, bool saveOriginal )
     {
         HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
         HlmsDatablockMap::const_iterator end  = mDatablocks.end();
 
         while( itor != end )
         {
-            itor->second.datablock->saveTextures( folderPath, savedTextures );
+            itor->second.datablock->saveTextures( folderPath, savedTextures, saveOitd, saveOriginal );
             ++itor;
         }
     }

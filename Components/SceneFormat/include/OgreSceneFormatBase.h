@@ -51,17 +51,20 @@ namespace Ogre
             Lights                  = 1u << 3u,
             Cameras                 = 1u << 4u,
             Materials               = 1u << 5u,
-            Textures                = 1u << 6u,
-            Meshes                  = 1u << 7u,
-            MeshesV1                = 1u << 8u,
-            SceneSettings           = 1u << 9u,
-            InstantRadiosity        = 1u << 10u,
+            /// See HlmsDatablock::saveTextures
+            TexturesOitd            = 1u << 6u,
+            /// See HlmsDatablock::saveTextures
+            TexturesOriginal        = 1u << 7u,
+            Meshes                  = 1u << 8u,
+            MeshesV1                = 1u << 9u,
+            SceneSettings           = 1u << 10u,
+            InstantRadiosity        = 1u << 11u,
             /// Only used for importing. Has no effect if InstantRadiosity is not set.
             /// If this flag is present, InstantRadiosity will be build.
-            BuildInstantRadiosity   = 1u << 11u,
+            BuildInstantRadiosity   = 1u << 12u,
             /// Warning: Importing w/ both BuildInstantRadiosity and LightsVpl can result
             /// in an incorrect scene (VPLs will exist twice).
-            LightsVpl               = 1u << 12u,
+            LightsVpl               = 1u << 13u,
         };
     }
 

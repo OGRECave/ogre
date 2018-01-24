@@ -379,7 +379,27 @@ namespace Ogre
 
         virtual bool hasCustomShadowMacroblock(void) const;
 
-        virtual void saveTextures( const String &folderPath, set<String>::type &savedTextures );
+        /**
+        @remarks
+            It's possible to set both saveOitd & saveOriginal to true, but will likely double
+            storage requirements (2x as many textures). Setting both to true is useful
+            for troubleshooting obscure Ogre bugs.
+        @param folderPath
+            Folder where to dump the textures.
+        @param savedTextures [in/out]
+            Set of texture names. Textures whose name is already in the set won't be saved again.
+            Textures that were saved will be inserted into the set.
+        @param saveOitd
+            When true, we will download the texture from GPU and save it in OITD format.
+            OITD is faster to load as it's stored in Ogre's native format it understands,
+            but it cannot be opened by traditional image editors; also OITD is not backwards
+            compatible with older versions of Ogre.
+        @param saveOriginal
+            When true, we will attempt to read the raw filestream of the original texture
+            and save it (i.e. copy the original png/dds/etc file).
+        */
+        virtual void saveTextures( const String &folderPath, set<String>::type &savedTextures,
+                                   bool saveOitd, bool saveOriginal );
 
         static const char* getCmpString( CompareFunction compareFunction );
 
