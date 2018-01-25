@@ -14,6 +14,8 @@ if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     ogre_add_component_include_dir(RTShaderSystem)
 endif ()
 
+add_definitions(${OGRE_VISIBILITY_FLAGS})
+
 if(NOT ANDROID)
     # add Context directory
     add_subdirectory(Context)
