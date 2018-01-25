@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __OgreStableHeaders__
-#define __OgreStableHeaders__
+#ifndef __OgreMeshLodPrecompiledHeaders__
+#define __OgreMeshLodPrecompiledHeaders__
 
 #ifdef __cplusplus // xcode tries to create a PCH for C code using this
 
