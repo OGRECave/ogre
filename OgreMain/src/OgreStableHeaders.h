@@ -35,9 +35,6 @@ THE SOFTWARE.
 #ifndef __OgreStableHeaders__
 #define __OgreStableHeaders__
 
-#ifdef __cplusplus // xcode tries to create a PCH for C code using this
-
-
 #include "OgreAny.h"
 #include "OgreArchive.h"
 #include "OgreArchiveManager.h"
@@ -97,7 +94,6 @@ THE SOFTWARE.
 #include "OgreWireBoundingBox.h"
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #   include "OgreZip.h"
-#endif
 #endif
 
 #endif 

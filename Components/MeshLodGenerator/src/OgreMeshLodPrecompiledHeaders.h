@@ -29,8 +29,6 @@ THE SOFTWARE.
 #ifndef __OgreMeshLodPrecompiledHeaders__
 #define __OgreMeshLodPrecompiledHeaders__
 
-#ifdef __cplusplus // xcode tries to create a PCH for C code using this
-
 #include "OgreRoot.h"
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreHardwareBufferManager.h"
@@ -63,7 +61,5 @@ THE SOFTWARE.
 #include "OgreLodData.h"
 #include "OgreLodCollapser.h"
 #include "OgreLodStrategyManager.h"
-
-#endif
 
 #endif 
