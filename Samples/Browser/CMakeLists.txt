@@ -289,6 +289,8 @@ if (APPLE)
         OgreRTShaderSystem
         OgreTerrain
         OgreVolume
+        OgreHLMS
+        OgreMeshLodGenerator
         Plugin_BSPSceneManager
         Plugin_CgProgramManager
         Plugin_OctreeSceneManager
