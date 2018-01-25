@@ -27,6 +27,7 @@
  */
 
 #include "OgreGLUniformCache.h"
+#include "OgreCommon.h"
 
 namespace Ogre {
 
