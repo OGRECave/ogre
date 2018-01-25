@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __OgreStableHeaders__
 
 #ifdef __cplusplus // xcode tries to create a PCH for C code using this
-#include <fstream>
 
 #include "OgreRoot.h"
 #include "OgrePixelCountLodStrategy.h"
