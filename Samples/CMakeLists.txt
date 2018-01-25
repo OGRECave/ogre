@@ -67,6 +67,7 @@ if (OGRE_BUILD_SAMPLES)
     list(REMOVE_ITEM SAMPLES_SOURCES ${BLACKLIST_CPP})
   endforeach()
 
+  add_definitions(${OGRE_VISIBILITY_FLAGS})
   add_library(DefaultSamples ${OGRE_LIB_TYPE} 
               ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/DefaultSamplesPlugin.cpp
               ${SAMPLES_SOURCES} ${SAMPLES_HEADERS})
