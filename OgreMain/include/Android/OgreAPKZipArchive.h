@@ -30,9 +30,8 @@ THE SOFTWARE.
 #define __APKZipArchive_H__
 
 #include <OgreZip.h>
-#include <OgreLogManager.h>
-#include <android/asset_manager.h>
 
+struct AAssetManager;
 
 namespace Ogre{
     class APKZipArchiveFactory : public EmbeddedZipArchiveFactory
@@ -47,21 +46,7 @@ namespace Ogre{
         const String& getType(void) const;
 
         /// @copydoc ArchiveFactory::createInstance
-        Archive *createInstance( const String& name, bool readOnly )
-        {
-            String apkName = name;
-            if (apkName.size() > 0 && apkName[0] == '/')
-                apkName.erase(apkName.begin());
-
-            AAsset* asset = AAssetManager_open(mAssetMgr, apkName.c_str(), AASSET_MODE_BUFFER);
-            if(asset)
-            {
-                EmbeddedZipArchiveFactory::addEmbbeddedFile(apkName, (const Ogre::uint8*)AAsset_getBuffer(asset), AAsset_getLength(asset), 0);
-            }
-
-            ZipArchive * resZipArchive = OGRE_NEW ZipArchive(apkName, "APKZip", mPluginIo);
-            return resZipArchive;
-        }
+        Archive *createInstance( const String& name, bool readOnly );
     };
 }
 

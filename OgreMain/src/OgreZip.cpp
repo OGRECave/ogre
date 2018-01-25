@@ -36,11 +36,93 @@ THE SOFTWARE.
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
 
-
 namespace Ogre {
+namespace {
+    class ZipArchive : public Archive
+    {
+    protected:
+        /// Handle to root zip file
+        ZZIP_DIR* mZzipDir;
+        /// Handle any errors from zzip
+        void checkZzipError(int zzipError, const String& operation) const;
+        /// File list (since zziplib seems to only allow scanning of dir tree once)
+        FileInfoList mFileList;
+        /// A pointer to file io alternative implementation
+        zzip_plugin_io_handlers* mPluginIo;
+
+        OGRE_AUTO_MUTEX;
+    public:
+        ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo = NULL);
+        ~ZipArchive();
+        /// @copydoc Archive::isCaseSensitive
+        bool isCaseSensitive(void) const { return OGRE_RESOURCEMANAGER_STRICT; }
+
+        /// @copydoc Archive::load
+        void load();
+        /// @copydoc Archive::unload
+        void unload();
+
+        /// @copydoc Archive::open
+        DataStreamPtr open(const String& filename, bool readOnly = true) const;
+
+        /// @copydoc Archive::create
+        DataStreamPtr create(const String& filename);
+
+        /// @copydoc Archive::remove
+        void remove(const String& filename);
+
+        /// @copydoc Archive::list
+        StringVectorPtr list(bool recursive = true, bool dirs = false) const;
+
+        /// @copydoc Archive::listFileInfo
+        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const;
+
+        /// @copydoc Archive::find
+        StringVectorPtr find(const String& pattern, bool recursive = true,
+            bool dirs = false) const;
+
+        /// @copydoc Archive::findFileInfo
+        FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true,
+            bool dirs = false) const;
+
+        /// @copydoc Archive::exists
+        bool exists(const String& filename) const;
+
+        /// @copydoc Archive::getModifiedTime
+        time_t getModifiedTime(const String& filename) const;
+    };
+
+    /** Specialisation of DataStream to handle streaming data from zip archives. */
+    class ZipDataStream : public DataStream
+    {
+    protected:
+        ZZIP_FILE* mZzipFile;
+        /// We need caching because sometimes serializers step back in data stream and zziplib behaves slow
+        StaticCache<2 * OGRE_STREAM_TEMP_SIZE> mCache;
+    public:
+        /// Unnamed constructor
+        ZipDataStream(ZZIP_FILE* zzipFile, size_t uncompressedSize);
+        /// Constructor for creating named streams
+        ZipDataStream(const String& name, ZZIP_FILE* zzipFile, size_t uncompressedSize);
+        ~ZipDataStream();
+        /// @copydoc DataStream::read
+        size_t read(void* buf, size_t count);
+        /// @copydoc DataStream::write
+        size_t write(const void* buf, size_t count);
+        /// @copydoc DataStream::skip
+        void skip(long count);
+        /// @copydoc DataStream::seek
+        void seek( size_t pos );
+        /// @copydoc DataStream::seek
+        size_t tell(void) const;
+        /// @copydoc DataStream::eof
+        bool eof(void) const;
+        /// @copydoc DataStream::close
+        void close(void);
+    };
 
     /// Utility method to format out zzip errors
-    static String getZzipErrorDescription(zzip_error_t zzipError)
+    String getZzipErrorDescription(zzip_error_t zzipError)
     {
         String errorMsg;
         switch (zzipError)
@@ -78,6 +160,10 @@ namespace Ogre {
 
         return errorMsg;
     }
+
+    /// A static pointer to file io alternative implementation for the embedded files
+    zzip_plugin_io_handlers* gPluginIo = NULL;
+}
     //-----------------------------------------------------------------------
     ZipArchive::ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo)
         : Archive(name, archType), mZzipDir(0), mPluginIo(pluginIo)
@@ -435,6 +521,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //  ZipArchiveFactory
     //-----------------------------------------------------------------------
+    Archive *ZipArchiveFactory::createInstance( const String& name, bool readOnly )
+    {
+        if(!readOnly)
+            return NULL;
+
+        return OGRE_NEW ZipArchive(name, getType());
+    }
     //-----------------------------------------------------------------------
     const String& ZipArchiveFactory::getType(void) const
     {
@@ -461,8 +554,6 @@ namespace Ogre {
     typedef FileNameToIndexMap::iterator FileNameToIndexMapIter;
     /// A type to store the embedded files data
     typedef vector<EmbeddedFileData>::type EmbbedFileDataList;
-    /// A static pointer to file io alternative implementation for the embedded files
-    zzip_plugin_io_handlers* EmbeddedZipArchiveFactory::mPluginIo = NULL;
 
     namespace {
     /// A static map between the file names to file index
@@ -634,23 +725,29 @@ namespace Ogre {
     EmbeddedZipArchiveFactory::EmbeddedZipArchiveFactory()
     {
         // init static member
-        if (mPluginIo == NULL)
+        if (gPluginIo == NULL)
         {
-            mPluginIo = &sEmbeddedZipArchiveFactory_PluginIo;
-            mPluginIo->fd.open = EmbeddedZipArchiveFactory_open;    
-            mPluginIo->fd.close = EmbeddedZipArchiveFactory_close;    
-            mPluginIo->fd.read = EmbeddedZipArchiveFactory_read;    
-            mPluginIo->fd.seeks = EmbeddedZipArchiveFactory_seeks;    
-            mPluginIo->fd.filesize = EmbeddedZipArchiveFactory_filesize;    
-            mPluginIo->fd.write = EmbeddedZipArchiveFactory_write;    
-            mPluginIo->fd.sys = 1;    
-            mPluginIo->fd.type = 1;    
+            gPluginIo = &sEmbeddedZipArchiveFactory_PluginIo;
+            gPluginIo->fd.open = EmbeddedZipArchiveFactory_open;
+            gPluginIo->fd.close = EmbeddedZipArchiveFactory_close;
+            gPluginIo->fd.read = EmbeddedZipArchiveFactory_read;
+            gPluginIo->fd.seeks = EmbeddedZipArchiveFactory_seeks;
+            gPluginIo->fd.filesize = EmbeddedZipArchiveFactory_filesize;
+            gPluginIo->fd.write = EmbeddedZipArchiveFactory_write;
+            gPluginIo->fd.sys = 1;
+            gPluginIo->fd.type = 1;
         }
     }
     //-----------------------------------------------------------------------
     EmbeddedZipArchiveFactory::~EmbeddedZipArchiveFactory()
     {
-    }    
+    }
+    //-----------------------------------------------------------------------
+    Archive *EmbeddedZipArchiveFactory::createInstance( const String& name, bool readOnly )
+    {
+        ZipArchive * resZipArchive = OGRE_NEW ZipArchive(name, getType(), gPluginIo);
+        return resZipArchive;
+    }
     //-----------------------------------------------------------------------
     const String& EmbeddedZipArchiveFactory::getType(void) const
     {

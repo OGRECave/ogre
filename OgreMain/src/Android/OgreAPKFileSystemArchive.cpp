@@ -2,19 +2,66 @@
 
 #include <OgreStringConverter.h>
 #include <OgreLogManager.h>
+#include <android/asset_manager.h>
 
 namespace Ogre{
+namespace {
+    class APKFileSystemArchive : public Archive
+    {
+    private:
+        AAssetManager* mAssetMgr;
+        String mPathPreFix;
 
-	static std::map<String, std::vector< String > > mFiles;
+    public:
+        APKFileSystemArchive(const String& name, const String& archType, AAssetManager* assetMgr);
+        ~APKFileSystemArchive();
 
-	static bool IsFolderParsed( const String& Folder ) {
+        /// @copydoc Archive::isCaseSensitive
+        bool isCaseSensitive(void) const;
+
+        /// @copydoc Archive::load
+        void load();
+        /// @copydoc Archive::unload
+        void unload();
+
+        /// @copydoc Archive::open
+        DataStreamPtr open(const String& filename, bool readOnly = true) const;
+
+        /// @copydoc Archive::create
+        DataStreamPtr create(const String& filename);
+
+        /// @copydoc Archive::remove
+        void remove(const String& filename);
+
+        /// @copydoc Archive::list
+        StringVectorPtr list(bool recursive = true, bool dirs = false) const;
+
+        /// @copydoc Archive::listFileInfo
+        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const;
+
+        /// @copydoc Archive::find
+        StringVectorPtr find(const String& pattern, bool recursive = true, bool dirs = false) const;
+
+        /// @copydoc Archive::findFileInfo
+        FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true, bool dirs = false) const;
+
+        /// @copydoc Archive::exists
+        bool exists(const String& filename) const;
+
+        /// @copydoc Archive::getModifiedTime
+        time_t getModifiedTime(const String& filename) const;
+    };
+
+	std::map<String, std::vector< String > > mFiles;
+
+	bool IsFolderParsed( const String& Folder ) {
 		bool parsed = false;
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( Folder );
 		if(iter != mFiles.end()) parsed = true;
 		return parsed;
 	}
 
-	static void ParseFolder( AAssetManager* AssetMgr, const String& Folder ) {
+	void ParseFolder( AAssetManager* AssetMgr, const String& Folder ) {
 		std::vector<String> mFilenames;
 		AAssetDir* dir = AAssetManager_openDir(AssetMgr, Folder.c_str());
 		const char* fileName = NULL;
@@ -23,7 +70,7 @@ namespace Ogre{
 		}
 		mFiles.insert( std::make_pair( Folder, mFilenames ) );
 	}
-
+}
 	APKFileSystemArchive::APKFileSystemArchive(const String& name, const String& archType, AAssetManager* assetMgr)
 		:Archive(name, archType), mAssetMgr(assetMgr)
 	{
@@ -185,4 +232,8 @@ namespace Ogre{
 		return type;
 	}
 
+    Archive *APKFileSystemArchiveFactory::createInstance( const String& name, bool readOnly )
+    {
+        return OGRE_NEW APKFileSystemArchive(name, getType(), mAssetMgr);
+    }
 }

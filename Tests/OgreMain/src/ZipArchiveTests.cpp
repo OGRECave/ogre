@@ -50,7 +50,7 @@ void ZipArchiveTests::SetUp()
     cf.load(Ogre::FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
     Ogre::String testPath = cf.getSettings("Tests").begin()->second+"/misc/ArchiveTest.zip";
 
-    arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    arch = Ogre::ZipArchiveFactory().createInstance(testPath, true);
     arch->load();
 }
 //--------------------------------------------------------------------------
