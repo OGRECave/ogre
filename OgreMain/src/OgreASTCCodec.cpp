@@ -249,7 +249,7 @@ namespace Ogre {
         // For 3D we calculate the bitrate then find the nearest 2D block size.
         if(zdim > 1)
         {
-            float bitrate = 128.0 / (xdim * ydim * zdim);
+            float bitrate = 128.0f / (xdim * ydim * zdim);
             getClosestBlockDim2d(bitrate, &xdim, &ydim);
         }
 

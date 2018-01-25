@@ -887,7 +887,7 @@ namespace Ogre {
     void ParticleSystem::fastForward(Real time, Real interval)
     {
         // First make sure all transforms are up to date
-        size_t steps(time/interval + 0.5f); // integer round
+        size_t steps = size_t(time/interval + 0.5f); // integer round
         for (size_t i = 0; i < steps; i++)
         {
             _update(interval);

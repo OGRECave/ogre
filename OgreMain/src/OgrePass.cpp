@@ -42,9 +42,9 @@ namespace Ogre {
         {
             OGRE_LOCK_MUTEX(p->mTexUnitChangeMutex);
             uint32 hash = 0;
-            size_t c = p->getNumTextureUnitStates();
+            ushort c = p->getNumTextureUnitStates();
 
-            for (size_t i = 0; i < c; ++i)
+            for (ushort i = 0; i < c; ++i)
             {
                 const TextureUnitState* tus = 0;
                 tus = p->getTextureUnitState(i);

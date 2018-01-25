@@ -575,11 +575,6 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    void Chunk::setMaterial(const String& matName)
-    {
-        setMaterial(MaterialManager::getSingleton().getByName(matName));
-    }
-
     void Chunk::setMaterial(const MaterialPtr& mat)
     {
         SimpleRenderable::setMaterial(mat);
