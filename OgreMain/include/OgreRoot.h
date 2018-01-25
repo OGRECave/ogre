@@ -520,67 +520,6 @@ namespace Ogre
         */
         void shutdown(void);
 
-        /** Adds a location to the list of searchable locations for a
-            Resource type.
-            @remarks
-                Resource files (textures, models etc) need to be loaded from
-                specific locations. By calling this method, you add another 
-                search location to the list. Locations added first are preferred
-                over locations added later.
-            @par
-                Locations can be folders, compressed archives, even perhaps
-                remote locations. Facilities for loading from different
-                locations are provided by plugins which provide
-                implementations of the Archive class.
-                All the application user has to do is specify a 'loctype'
-                string in order to indicate the type of location, which
-                should map onto one of the provided plugins. Ogre comes
-                configured with the 'FileSystem' (folders) and 'Zip' (archive
-                compressed with the pkzip / WinZip etc utilities) types.
-            @par
-                You can also supply the name of a resource group which should
-                have this location applied to it. The 
-                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME group is the
-                default, and one resource group which will always exist. You
-                should consider defining resource groups for your more specific
-                resources (e.g. per level) so that you can control loading /
-                unloading better.
-            @param
-                name The name of the location, e.g. './data' or
-                '/compressed/gamedata.zip'
-            @param
-                locType A string identifying the location type, e.g.
-                'FileSystem' (for folders), 'Zip' etc. Must map to a
-                registered plugin which deals with this type (FileSystem and
-                Zip should always be available)
-            @param
-                groupName Type of name of the resource group which this location
-                should apply to; defaults to the General group which applies to
-                all non-specific resources.
-            @param
-                recursive If the resource location has a concept of recursive
-                directory traversal, enabling this option will mean you can load
-                resources in subdirectories using only their unqualified name.
-                The default is to disable this so that resources in subdirectories
-                with the same name are still unique.
-            @see
-                Archive
-            @deprecated use ResourceGroupManager::addResourceLocation
-        */
-        OGRE_DEPRECATED void addResourceLocation(const String& name, const String& locType,
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-            bool recursive = false);
-
-        /** Removes a resource location from the list.
-        @see addResourceLocation
-        @param name The name of the resource location as specified in addResourceLocation
-        @param groupName The name of the resource group to which this location 
-            was assigned.
-        @deprecated use ResourceGroupManager::removeResourceLocation
-        */
-        OGRE_DEPRECATED void removeResourceLocation(const String& name,
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
         /** Helper method to assist you in creating writeable file streams.
         @remarks
             This is a high-level utility method which you can use to find a place to 

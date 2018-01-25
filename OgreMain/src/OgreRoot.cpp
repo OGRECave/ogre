@@ -1105,19 +1105,6 @@ namespace Ogre {
         mPlugins.clear();
 #endif
     }
-    //-----------------------------------------------------------------------
-    void Root::addResourceLocation(const String& name, const String& locType,
-        const String& groupName, bool recursive)
-    {
-        ResourceGroupManager::getSingleton().addResourceLocation(
-            name, locType, groupName, recursive);
-    }
-    //-----------------------------------------------------------------------
-    void Root::removeResourceLocation(const String& name, const String& groupName)
-    {
-        ResourceGroupManager::getSingleton().removeResourceLocation(
-            name, groupName);
-    }
     //---------------------------------------------------------------------
     DataStreamPtr Root::createFileStream(const String& filename, const String& groupName,
         bool overwrite, const String& locationPattern)
