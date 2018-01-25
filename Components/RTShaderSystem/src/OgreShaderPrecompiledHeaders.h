@@ -29,8 +29,6 @@ THE SOFTWARE.
 #ifndef __OgreShaderPrecompiledHeaders__
 #define __OgreShaderPrecompiledHeaders__
 
-#ifdef __cplusplus // xcode tries to create a PCH for C code using this
-
 #include <algorithm> // for std::sort
 
 #include "OgreMaterialManager.h"
@@ -93,7 +91,5 @@ THE SOFTWARE.
 #include "OgreShaderHLSLProgramWriter.h"
 #include "OgreShaderGLSLProgramWriter.h"
 #include "OgreShaderGLSLESProgramWriter.h"
-
-#endif
 
 #endif 
