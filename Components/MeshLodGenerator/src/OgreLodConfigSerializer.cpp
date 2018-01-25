@@ -82,9 +82,9 @@ namespace Ogre
     void LodConfigSerializer::readLodConfig()
     {
         pushInnerChunk(mStream);
+        unsigned short streamID = readChunk(mStream);
         while(!mStream->eof())
         {
-            unsigned short streamID = readChunk(mStream);
             switch(streamID)
             {
             case LCCID_BASIC_INFO:
@@ -105,6 +105,8 @@ namespace Ogre
                 popInnerChunk(mStream);
                 return;
             }
+
+            streamID = readChunk(mStream);
         }
         popInnerChunk(mStream);
     }
