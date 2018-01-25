@@ -25,7 +25,7 @@ get_native_precompiled_header(OgreRTShaderSystem)
 add_library(OgreRTShaderSystem ${OGRE_COMP_LIB_TYPE} ${OgreRTShaderSystem_pch} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreRTShaderSystem OgreMain)
-add_native_precompiled_header(OgreRTShaderSystem "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePrecompiledHeaders.h")
+add_native_precompiled_header(OgreRTShaderSystem "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreShaderPrecompiledHeaders.h")
 
 generate_export_header(OgreRTShaderSystem 
     EXPORT_MACRO_NAME _OgreRTSSExport

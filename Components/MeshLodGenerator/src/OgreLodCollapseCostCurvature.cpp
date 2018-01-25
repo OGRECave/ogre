@@ -32,7 +32,7 @@
  * by Stan Melax (c) 1998
  */
 
-#include "OgrePrecompiledHeaders.h"
+#include "OgreMeshLodPrecompiledHeaders.h"
 
 namespace Ogre
 {
