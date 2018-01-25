@@ -292,15 +292,6 @@ namespace Ogre {
             return mIsManual;
         }
 
-        /** Set "Is this resource manually loaded?"
-        @deprecated do not use
-        */
-        OGRE_DEPRECATED virtual void setManuallyLoaded(bool isManual)
-        {
-            mIsManual = isManual;
-        }
-
-
         /** Unloads the resource; this is not permanent, the resource can be
             reloaded later if required.
         */
