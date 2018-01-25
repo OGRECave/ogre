@@ -5360,6 +5360,12 @@ namespace Ogre{
     }
 
     //-------------------------------------------------------------------------
+    template <class T> static T parseParam(const Ogre::String& param, BaseConstantType baseType); // unimplemented
+    template <> static int parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return StringConverter::parseInt(str); }
+    template <> static uint parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return baseType == BCT_BOOL ? (uint)StringConverter::parseBool(str) : StringConverter::parseUnsignedInt(str); }
+    template <> static float parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return (float)StringConverter::parseReal(str); }
+    template <> static double parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return (double)StringConverter::parseReal(str); }
+
     template <class T>
     static void translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters* sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType)
     {
@@ -5388,31 +5394,16 @@ namespace Ogre{
                 }
                 arraySz = StringConverter::parseInt(arrayStr);
             }
+            else if (baseType == BCT_FLOAT || baseType == BCT_INT || baseType == BCT_DOUBLE || baseType == BCT_UINT || baseType == BCT_BOOL)
+            {
+                values.push_back(parseParam<T>(atom->value, baseType));
+            }
             else
             {
-                switch(baseType)
-                {
-                case BCT_FLOAT:
-                    values.push_back((float)StringConverter::parseReal(atom->value));
-                    break;
-                case BCT_INT:
-                    values.push_back(StringConverter::parseInt(atom->value));
-                    break;
-                case BCT_DOUBLE:
-                    values.push_back((double)StringConverter::parseReal(atom->value));
-                    break;
-                case BCT_UINT:
-                    values.push_back(StringConverter::parseUnsignedInt(atom->value));
-                    break;
-                case BCT_BOOL:
-                    values.push_back((uint)StringConverter::parseBool(atom->value));
-                    break;
-                default:
-                    // This should never be reached.
-                    compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                            atom->value + " invalid - extra parameters to shared_param_named");
-                    continue;
-                }
+                // This should never be reached.
+                compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                   atom->value + " invalid - extra parameters to shared_param_named");
+                continue;
             }
 
         } // each extra param
