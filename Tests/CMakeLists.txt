@@ -13,7 +13,6 @@ if (OGRE_BUILD_TESTS)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
   ogre_add_component_include_dir(Bites)
-  set(TEST_DEPENDENCIES OgreBites)
 
     set(GTEST_SHARED TRUE)
     if(ANDROID)
@@ -146,103 +145,35 @@ if (OGRE_BUILD_TESTS)
         COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Frameworks
         COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework
         ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreMeshLodGenerator.framework
-        ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
         COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}
         ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
         )
       add_custom_command(TARGET Test_Ogre POST_BUILD
         COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Plugins)
-      if (OGRE_BUILD_RENDERSYSTEM_GL)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/RenderSystem_GL.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif ()
-      if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/RenderSystem_GL3Plus.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif ()
-      if (OGRE_BUILD_PLUGIN_BSP)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_BSPSceneManager.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_PLUGIN_CG)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_CgProgramManager.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_PLUGIN_OCTREE)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_OctreeSceneManager.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_PLUGIN_PCZ)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_PCZSceneManager.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_OctreeZone.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_PLUGIN_PFX)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_ParticleFX.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
 
-      # Components
-      if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
+      set(FRAMEWORKS OgreOverlay
+        OgreBites
+        OgrePaging
+        OgreProperty
+        OgreRTShaderSystem
+        OgreTerrain
+        OgreVolume
+        OgreMeshLodGenerator
+        Plugin_BSPSceneManager
+        Plugin_CgProgramManager
+        Plugin_OctreeSceneManager
+        Plugin_OctreeZone
+        Plugin_ParticleFX
+        Plugin_PCZSceneManager
+        RenderSystem_GL
+        RenderSystem_GL3Plus
+      )
+  
+      foreach(FWK ${FRAMEWORKS})
         add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreMeshLodGenerator.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_COMPONENT_PAGING)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgrePaging.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_COMPONENT_PROPERTY)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreProperty.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreRTShaderSystem.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_COMPONENT_TERRAIN)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreTerrain.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_COMPONENT_VOLUME)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreVolume.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
-      if (OGRE_BUILD_COMPONENT_OVERLAY)
-        add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreOverlay.framework
-          ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-          )
-      endif()
+          COMMAND ARGS if [ -d ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ]\; then ln -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ${OGRE_TEST_CONTENTS_PATH}/Frameworks/${FWK}.framework\; fi
+        )
+      endforeach()
     endif()
     
     add_subdirectory(VisualTests)
