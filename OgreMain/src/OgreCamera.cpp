@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreProfiler.h"
 #include "OgreViewport.h"
 #include "OgreMovablePlane.h"
 

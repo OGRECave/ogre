@@ -27,12 +27,10 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreParticleSystemManager.h"
 #include "OgreParticleEmitterFactory.h"
 #include "OgreParticleAffectorFactory.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreBillboardParticleRenderer.h"
-#include "OgreScriptCompiler.h"
 #include "OgreParticleSystem.h"
 
 namespace Ogre {

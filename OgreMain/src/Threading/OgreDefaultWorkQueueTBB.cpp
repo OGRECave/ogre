@@ -26,11 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreWorkQueue.h"
-#include "Threading/OgreDefaultWorkQueueTBB.h"
-#include "OgreLogManager.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 
 namespace Ogre
 {
