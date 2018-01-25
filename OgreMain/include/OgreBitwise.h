@@ -123,11 +123,14 @@ namespace Ogre {
         */
         static OGRE_FORCE_INLINE unsigned int mostSignificantBitSet(unsigned int value)
         {
+            //                                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F
+            static const unsigned char msb[16] = { 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4 };
+
             unsigned int result = 0;
-            while (value != 0) {
-                ++result;
-                value >>= 1;
-            }
+            if(value & 0xFFFF0000) { result += 16;value >>= 16; }
+            if(value & 0x0000FF00) { result += 8; value >>= 8; }
+            if(value & 0x000000F0) { result += 4; value >>= 4; }
+            result += msb[value];
             return result-1;
         }
         /** Returns the closest power-of-two number greater or equal to value.
