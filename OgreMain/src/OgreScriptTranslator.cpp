@@ -5365,14 +5365,16 @@ namespace Ogre{
     }
 
     //-------------------------------------------------------------------------
-    template <class T> static T parseParam(const Ogre::String& param, BaseConstantType baseType); // unimplemented
-    template <> static int parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return StringConverter::parseInt(str); }
-    template <> static uint parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return baseType == BCT_BOOL ? (uint)StringConverter::parseBool(str) : StringConverter::parseUnsignedInt(str); }
-    template <> static float parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return (float)StringConverter::parseReal(str); }
-    template <> static double parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return (double)StringConverter::parseReal(str); }
+    namespace {
+        
+    template <class T> T parseParam(const Ogre::String& param, BaseConstantType baseType); // unimplemented
+    template <> int parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return StringConverter::parseInt(str); }
+    template <> uint parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return baseType == BCT_BOOL ? (uint)StringConverter::parseBool(str) : StringConverter::parseUnsignedInt(str); }
+    template <> float parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return (float)StringConverter::parseReal(str); }
+    template <> double parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return (double)StringConverter::parseReal(str); }
 
     template <class T>
-    static void translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters* sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType)
+    void translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters* sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType)
     {
         std::vector<T> values;
 
@@ -5442,6 +5444,8 @@ namespace Ogre{
 
             sharedParams->setNamedConstant(pName, &values[0], elemsFound);
         }
+    }
+        
     }
 
     //-------------------------------------------------------------------------
