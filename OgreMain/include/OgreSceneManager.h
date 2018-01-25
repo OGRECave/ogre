@@ -3487,8 +3487,6 @@ namespace Ogre {
     {
         /// A globally unique string identifying the scene manager type
         String typeName;
-        /// A mask describing which sorts of scenes this manager can handle
-        SceneTypeMask sceneTypeMask;
         /// Flag indicating whether world geometry is supported
         bool worldGeometrySupported;
     };

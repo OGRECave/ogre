@@ -383,7 +383,8 @@ namespace Ogre
 
         /// @copydoc SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&)
         OGRE_DEPRECATED SceneManager* createSceneManager(SceneTypeMask typeMask,
-            const String& instanceName = BLANKSTRING);
+            const String& instanceName = BLANKSTRING)
+        { return createSceneManager(DefaultSceneManagerFactory::FACTORY_TYPE_NAME, instanceName); }
 
         /// @copydoc SceneManagerEnumerator::destroySceneManager
         void destroySceneManager(SceneManager* sm);

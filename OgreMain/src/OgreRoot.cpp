@@ -743,12 +743,6 @@ namespace Ogre {
         return mSceneManagerEnum->createSceneManager(typeName, instanceName);
     }
     //-----------------------------------------------------------------------
-    SceneManager* Root::createSceneManager(SceneTypeMask typeMask,
-        const String& instanceName)
-    {
-        return mSceneManagerEnum->createSceneManager(typeMask, instanceName);
-    }
-    //-----------------------------------------------------------------------
     void Root::destroySceneManager(SceneManager* sm)
     {
         mSceneManagerEnum->destroySceneManager(sm);

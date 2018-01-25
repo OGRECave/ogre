@@ -158,22 +158,12 @@ namespace Ogre {
         SceneManager* createSceneManager(const String& typeName, 
             const String& instanceName = BLANKSTRING);
 
-        /** Create a SceneManager instance based on scene type support.
-        @remarks
-            Creates an instance of a SceneManager which supports the scene types
-            identified in the parameter. If more than one type of SceneManager 
-            has been registered as handling that combination of scene types, 
-            in instance of the last one registered is returned.
-        @note This method always succeeds, if a specific scene manager is not
-            found, the default implementation is always returned.
-        @param typeMask A mask containing one or more SceneType flags
-        @param instanceName Optional name to given the new instance that is
-            created. If you leave this blank, an auto name will be assigned.
-        @deprecated obsolete API - SceneTypeMask leads to arbitrary results.
-        In doubt use createSceneManager() instead
+        /**
+        @deprecated obsolete API - SceneTypeMask leads to arbitrary results
         */
-        SceneManager* createSceneManager(SceneTypeMask typeMask, 
-            const String& instanceName = BLANKSTRING);
+        OGRE_DEPRECATED SceneManager* createSceneManager(SceneTypeMask typeMask,
+            const String& instanceName = BLANKSTRING)
+        { return createSceneManager(DefaultSceneManagerFactory::FACTORY_TYPE_NAME, instanceName); }
 
         /** Destroy an instance of a SceneManager. */
         void destroySceneManager(SceneManager* sm);
