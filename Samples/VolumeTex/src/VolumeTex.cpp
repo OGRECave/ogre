@@ -139,7 +139,7 @@ void Sample_VolumeTex::generate()
     d << "PixelBox " << pb.getWidth() << " " << pb.getHeight() << " " << pb.getDepth() << " " << pb.rowPitch << " " << pb.slicePitch << " " << pb.data << " " << PixelUtil::getFormatName(pb.format);
     LogManager::getSingleton().logMessage(d.str());
 
-    Ogre::uint32 *pbptr = static_cast<Ogre::uint32*>(pb.data);
+    Ogre::uint32 *pbptr = reinterpret_cast<Ogre::uint32*>(pb.data);
     for(size_t z=pb.front; z<pb.back; z++)
     {
         for(size_t y=pb.top; y<pb.bottom; y++)

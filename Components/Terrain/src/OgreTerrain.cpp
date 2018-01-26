@@ -2853,7 +2853,7 @@ namespace Ogre
         unsigned char rgbaShift[4];
         Box box(0, 0, destBuffer->getWidth(), destBuffer->getHeight());
 
-        uint8* pDestBase = static_cast<uint8*>(destBuffer->lock(box, HardwareBuffer::HBL_NORMAL).data);
+        uint8* pDestBase = destBuffer->lock(box, HardwareBuffer::HBL_NORMAL).data;
         PixelUtil::getBitShifts(destBuffer->getFormat(), rgbaShift);
         uint8* pDest = pDestBase + rgbaShift[destChannel] / 8;
         size_t destInc = PixelUtil::getNumElemBytes(destBuffer->getFormat());
@@ -2868,7 +2868,7 @@ namespace Ogre
         }
         else
         {
-            pSrc = static_cast<uint8*>(srcBuffer->lock(box, HardwareBuffer::HBL_READ_ONLY).data);
+            pSrc = srcBuffer->lock(box, HardwareBuffer::HBL_READ_ONLY).data;
             PixelUtil::getBitShifts(srcBuffer->getFormat(), rgbaShift);
             pSrc += rgbaShift[srcChannel] / 8;
             srcInc = PixelUtil::getNumElemBytes(srcBuffer->getFormat());
@@ -2896,7 +2896,7 @@ namespace Ogre
         unsigned char rgbaShift[4];
         Box box(0, 0, buffer->getWidth(), buffer->getHeight());
 
-        uint8* pData = static_cast<uint8*>(buffer->lock(box, HardwareBuffer::HBL_NORMAL).data);
+        uint8* pData = buffer->lock(box, HardwareBuffer::HBL_NORMAL).data;
         PixelUtil::getBitShifts(buffer->getFormat(), rgbaShift);
         pData += rgbaShift[channel] / 8;
         size_t inc = PixelUtil::getNumElemBytes(buffer->getFormat());
@@ -2955,7 +2955,7 @@ namespace Ogre
                 // initialise black
                 Box box(0, 0, mLayerBlendMapSize, mLayerBlendMapSize);
                 HardwarePixelBufferSharedPtr buf = mBlendTextureList[i]->getBuffer();
-                uint8* pInit = static_cast<uint8*>(buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data);
+                uint8* pInit = buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data;
                 memset(pInit, 0, PixelUtil::getNumElemBytes(fmt) * mLayerBlendMapSize * mLayerBlendMapSize);
                 buf->unlock();
             }
@@ -3738,7 +3738,7 @@ namespace Ogre
                 // initialise to full-bright
                 Box box(0, 0, mLightmapSizeActual, mLightmapSizeActual);
                 HardwarePixelBufferSharedPtr buf = mLightmap->getBuffer();
-                uint8* pInit = static_cast<uint8*>(buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data);
+                uint8* pInit = buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data;
                 memset(pInit, 255, mLightmapSizeActual * mLightmapSizeActual);
                 buf->unlock();
 
@@ -3779,7 +3779,7 @@ namespace Ogre
                 // initialise to black
                 Box box(0, 0, mCompositeMapSizeActual, mCompositeMapSizeActual);
                 HardwarePixelBufferSharedPtr buf = mCompositeMap->getBuffer();
-                uint8* pInit = static_cast<uint8*>(buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data);
+                uint8* pInit = buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data;
                 memset(pInit, 0, mCompositeMapSizeActual * mCompositeMapSizeActual * 4);
                 buf->unlock();
 

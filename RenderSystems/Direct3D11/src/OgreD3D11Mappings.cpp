@@ -261,7 +261,7 @@ namespace Ogre
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid pixel format", "setPixelBoxMapping");
         }
-        box.data = mapping.pData;
+        box.data = (uchar*)mapping.pData;
     }
     //---------------------------------------------------------------------
     PixelBox D3D11Mappings::getPixelBoxWithMapping(D3D11_BOX extents, DXGI_FORMAT pixelFormat, const D3D11_MAPPED_SUBRESOURCE& mapping)

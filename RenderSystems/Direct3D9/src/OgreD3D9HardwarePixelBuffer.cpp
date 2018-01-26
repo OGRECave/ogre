@@ -122,7 +122,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *sur
                 Box fullBufferBox(0,0,0,mWidth,mHeight,mDepth);
                 PixelBox dstBox(fullBufferBox, mFormat);
 
-                dstBox.data = OGRE_MALLOC (getSizeInBytes(), MEMCATEGORY_RESOURCE);
+                dstBox.data = (uchar*)OGRE_MALLOC (getSizeInBytes(), MEMCATEGORY_RESOURCE);
                 blitToMemory(fullBufferBox, dstBox, it->second, it->first);
                 blitFromMemory(dstBox, fullBufferBox, bufferResources);
                 OGRE_FREE(dstBox.data, MEMCATEGORY_RESOURCE);
@@ -178,7 +178,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *volu
                 Box fullBufferBox(0,0,0,mWidth,mHeight,mDepth);
                 PixelBox dstBox(fullBufferBox, mFormat);
 
-                dstBox.data = OGRE_MALLOC(getSizeInBytes(), MEMCATEGORY_RESOURCE);
+                dstBox.data = (uchar*)OGRE_MALLOC(getSizeInBytes(), MEMCATEGORY_RESOURCE);
                 blitToMemory(fullBufferBox, dstBox, it->second, it->first);
                 blitFromMemory(dstBox, fullBufferBox, bufferResources);
                 OGRE_FREE(dstBox.data, MEMCATEGORY_RESOURCE);
@@ -264,7 +264,7 @@ void fromD3DLock(PixelBox &rval, const D3DLOCKED_RECT &lrect)
             "Invalid pixel format", "fromD3DLock");
     }
 
-    rval.data = lrect.pBits;
+    rval.data = (uchar*)lrect.pBits;
 }
 void fromD3DLock(PixelBox &rval, const D3DLOCKED_BOX &lbox)
 {
@@ -286,7 +286,7 @@ void fromD3DLock(PixelBox &rval, const D3DLOCKED_BOX &lbox)
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
             "Invalid pixel format", "fromD3DLock");
     }
-    rval.data = lbox.pBits;
+    rval.data = (uchar*)lbox.pBits;
 }
 // Convert Ogre integer Box to D3D rectangle
 RECT toD3DRECT(const Box &lockBox)

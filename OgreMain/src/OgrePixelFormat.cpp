@@ -70,9 +70,9 @@ namespace Ogre {
 
         return rval;
     }
-    void* PixelBox::getTopLeftFrontPixelPtr() const
+    uchar* PixelBox::getTopLeftFrontPixelPtr() const
     {
-        return (uint8*)data + (left + top * rowPitch + front * slicePitch) * PixelUtil::getNumElemBytes(format);
+        return data + (left + top * rowPitch + front * slicePitch) * PixelUtil::getNumElemBytes(format);
     }
     //-----------------------------------------------------------------------
     /**
@@ -715,9 +715,8 @@ namespace Ogre {
             {
                 // we can copy with slice granularity, useful for Tex2DArray handling
                 size_t bytesPerSlice = getMemorySize(src.getWidth(), src.getHeight(), 1, src.format);
-                memcpy(
-                    (uint8*)dst.data + bytesPerSlice * dst.front,
-                    (uint8*)src.data + bytesPerSlice * src.front,
+                memcpy(dst.data + bytesPerSlice * dst.front,
+                    src.data + bytesPerSlice * src.front,
                     bytesPerSlice * src.getDepth());
                 return;
             }
@@ -740,9 +739,9 @@ namespace Ogre {
 
             const size_t srcPixelSize = PixelUtil::getNumElemBytes(src.format);
             const size_t dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
-            uint8 *srcptr = static_cast<uint8*>(src.data)
+            uint8 *srcptr = src.data
                 + (src.left + src.top * src.rowPitch + src.front * src.slicePitch) * srcPixelSize;
-            uint8 *dstptr = static_cast<uint8*>(dst.data)
+            uint8 *dstptr = dst.data
                 + (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch) * dstPixelSize;
 
             // Calculate pitches+skips in bytes
@@ -804,9 +803,9 @@ namespace Ogre {
 
         const size_t srcPixelSize = PixelUtil::getNumElemBytes(src.format);
         const size_t dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
-        uint8 *srcptr = static_cast<uint8*>(src.data)
+        uint8 *srcptr = src.data
             + (src.left + src.top * src.rowPitch + src.front * src.slicePitch) * srcPixelSize;
-        uint8 *dstptr = static_cast<uint8*>(dst.data)
+        uint8 *dstptr = dst.data
             + (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch) * dstPixelSize;
         
         // Old way, not taking into account box dimensions
@@ -856,7 +855,7 @@ namespace Ogre {
         const size_t rowPitchBytes = box.rowPitch * pixelSize;
         const size_t slicePitchBytes = box.slicePitch * pixelSize;
 
-        uint8 *basesrcptr = static_cast<uint8*>(box.data)
+        uint8 *basesrcptr = box.data
             + (box.left + box.top * box.rowPitch + box.front * box.slicePitch) * pixelSize;
         uint8 *basedstptr = basesrcptr + (box.bottom - box.top - 1) * rowPitchBytes;
         uint8* tmpptr = (uint8*)OGRE_MALLOC_SIMD(copySize, MEMCATEGORY_GENERAL);
