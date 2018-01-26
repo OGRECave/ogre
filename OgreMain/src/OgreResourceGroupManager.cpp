@@ -518,7 +518,7 @@ namespace Ogre {
         liend = grp->locationList.end();
         for (li = grp->locationList.begin(); li != liend; ++li)
         {
-            Archive* pArch = (*li)->archive;
+            Archive* pArch = li->archive;
             if (pArch->getName() == name)
                 // Delete indexes
                 return true;
@@ -532,9 +532,8 @@ namespace Ogre {
         // Get archive
         Archive* pArch = ArchiveManager::getSingleton().load( name, locType, readOnly );
         // Add to location list
-        ResourceLocation* loc = OGRE_NEW_T(ResourceLocation, MEMCATEGORY_RESOURCE);
-        loc->archive = pArch;
-        loc->recursive = recursive;
+
+        ResourceLocation loc = {pArch, recursive};
         StringVectorPtr vec = pArch->find("*", recursive);
 
         ResourceGroup* grp = getResourceGroup(resGroup);
@@ -578,12 +577,10 @@ namespace Ogre {
         liend = grp->locationList.end();
         for (li = grp->locationList.begin(); li != liend; ++li)
         {
-            Archive* pArch = (*li)->archive;
+            Archive* pArch = li->archive;
             if (pArch->getName() == name)
             {
                 grp->removeFromIndex(pArch);
-                // Erase list entry
-                OGRE_DELETE_T(*li, ResourceLocation, MEMCATEGORY_RESOURCE);
                 grp->locationList.erase(li);
 
                 break;
@@ -723,9 +720,9 @@ namespace Ogre {
         liend = grp->locationList.end();
         for (li = grp->locationList.begin(); li != liend; ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
             // Find all the names based on whether this archive is recursive
-            StringVectorPtr names = arch->find(pattern, (*li)->recursive);
+            StringVectorPtr names = arch->find(pattern, li->recursive);
 
             // Iterate over the names and load a stream for each
             for (StringVector::iterator ni = names->begin(); ni != names->end(); ++ni)
@@ -758,7 +755,7 @@ namespace Ogre {
         for (LocationList::iterator li = grp->locationList.begin(); 
             li != grp->locationList.end(); ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
@@ -800,7 +797,7 @@ namespace Ogre {
         for (LocationList::iterator li = grp->locationList.begin(); 
             li != grp->locationList.end(); ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
@@ -835,7 +832,7 @@ namespace Ogre {
         for (LocationList::iterator li = grp->locationList.begin(); 
             li != grp->locationList.end(); ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
@@ -1252,13 +1249,6 @@ namespace Ogre {
             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME);
             // delete all the load list entries
             grp->loadResourceOrderMap.clear();
-
-            // Drop location list
-            for (LocationList::iterator ll = grp->locationList.begin();
-                ll != grp->locationList.end(); ++ll)
-            {
-                OGRE_DELETE_T(*ll, ResourceLocation, MEMCATEGORY_RESOURCE);
-            }
         }
 
         // delete ResourceGroup
@@ -1461,7 +1451,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            StringVectorPtr lst = (*i)->archive->list((*i)->recursive, dirs);
+            StringVectorPtr lst = i->archive->list(i->recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1491,7 +1481,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            FileInfoListPtr lst = (*i)->archive->listFileInfo((*i)->recursive, dirs);
+            FileInfoListPtr lst = i->archive->listFileInfo(i->recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1521,7 +1511,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            StringVectorPtr lst = (*i)->archive->find(pattern, (*i)->recursive, dirs);
+            StringVectorPtr lst = i->archive->find(pattern, i->recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1550,7 +1540,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            FileInfoListPtr lst = (*i)->archive->findFileInfo(pattern, (*i)->recursive, dirs);
+            FileInfoListPtr lst = i->archive->findFileInfo(pattern, i->recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1600,7 +1590,7 @@ namespace Ogre {
         liend = grp->locationList.end();
         for (li = grp->locationList.begin(); li != liend; ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
             if (arch->exists(resourceName))
             {
                 return arch;
@@ -1694,7 +1684,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            vec->push_back((*i)->archive->getName());
+            vec->push_back(i->archive->getName());
         }
 
         return vec;
@@ -1720,7 +1710,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            String location = (*i)->archive->getName();
+            String location = i->archive->getName();
             // Search for the pattern
             if(StringUtil::match(location, pattern))
             {

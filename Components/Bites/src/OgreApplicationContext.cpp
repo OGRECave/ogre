@@ -584,7 +584,7 @@ void ApplicationContext::locateResources()
 
     OgreAssert(!genLocs.empty(), ("Resource Group '"+sec+"' must contain at least one entry").c_str());
 
-    arch = genLocs.front()->archive->getName();
+    arch = genLocs.front().archive->getName();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     arch = Ogre::FileSystemLayer::resolveBundlePath("Contents/Resources/Media");
@@ -594,7 +594,7 @@ void ApplicationContext::locateResources()
     arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
     arch = Ogre::StringUtil::replaceAll(arch, "media/../../Tests/Media", "");
 #endif
-    type = genLocs.front()->archive->getType();
+    type = genLocs.front().archive->getType();
 
     bool hasCgPlugin = false;
     const Ogre::Root::PluginInstanceList& plugins = getRoot()->getInstalledPlugins();

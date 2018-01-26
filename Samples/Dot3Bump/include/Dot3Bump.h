@@ -145,9 +145,9 @@ protected:
             // Find the location of the core shader libs
             for (; it != itEnd; ++it)
             {
-                if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
+                if (it->archive->getName().find("RTShaderLib") != Ogre::String::npos)
                 {
-                    shaderCoreLibsPath = (*it)->archive->getName() + "/";   
+                    shaderCoreLibsPath = it->archive->getName() + "/";
                     coreLibsFound = true;
                     break;
                 }

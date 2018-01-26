@@ -293,7 +293,7 @@ namespace Ogre {
             bool recursive;
         };
         /// List of possible file locations
-        typedef list<ResourceLocation*>::type LocationList;
+        typedef vector<ResourceLocation>::type LocationList;
 
     protected:
         /// Map of resource types (strings) to ResourceManagers, used to notify them to load / unload group contents
