@@ -509,7 +509,7 @@ namespace Ogre {
         GLES2FrameBufferObject *fbo = 0;
         target->getCustomAttribute("FBO", &fbo);
         if(fbo)
-            fbo->bind();
+            fbo->bind(true);
             // Old style context (window/pbuffer) or copying render texture
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         else

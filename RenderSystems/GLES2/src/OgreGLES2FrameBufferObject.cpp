@@ -302,7 +302,7 @@ namespace Ogre {
         
     }
     
-    void GLES2FrameBufferObject::bind()
+    bool GLES2FrameBufferObject::bind(bool recreateIfNeeded)
     {
         GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
         GLContext* currentContext = rs->_getCurrentContext();
@@ -317,13 +317,13 @@ namespace Ogre {
             mFB = 0;
             mMultisampleFB = 0;
         }
-        
-        if(!mContext) // create FBO lazy or recreate after destruction
+
+        if(!mContext && recreateIfNeeded) // create FBO lazy or recreate after destruction
         {
             mContext = currentContext;
+            
             // Generate framebuffer object
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-
 #ifdef DEBUG
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
             {
@@ -348,17 +348,20 @@ namespace Ogre {
                 }
 #endif
             }
+            else
+            {
+                mMultisampleFB = 0;
+            }
             
             // Re-initialise
             if(mColour[0].buffer)
                 initialise();
         }
 
-        assert(mContext == currentContext);
+        if(mContext)
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB));
 
-        // Bind it to FBO
-        const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fb));
+        return mContext != 0;
     }
 
     void GLES2FrameBufferObject::swapBuffers()
@@ -381,13 +384,9 @@ namespace Ogre {
 
     void GLES2FrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
-        // recreate FBO using current context if previous FBO was destroyed with creator context
-        bind();
-
-        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+        bind(true); // recreate FBO if unusable with current context, bind it
 
         GLES2DepthBuffer *glDepthBuffer = static_cast<GLES2DepthBuffer*>(depthBuffer);
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
 
         if( glDepthBuffer )
         {
@@ -413,32 +412,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLES2FrameBufferObject::detachDepthBuffer()
     {
-        // do nothing if FBO was destroyed with creator context
-        if(mContext == NULL)
-            return;
-        
-        // destroy FBO if it is unusable with current context
-        GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
-        GLContext* currentContext = rs->_getCurrentContext();
-        if(mContext != currentContext)
+        if(bind(false)) // bind or destroy FBO if unusable with current context
         {
-            if(mFB != 0)
-                rs->_destroyFbo(mContext, mFB);
-            if(mMultisampleFB != 0)
-                rs->_destroyFbo(mContext, mMultisampleFB);
-            
-            mContext = 0;
-            mFB = 0;
-            mMultisampleFB = 0;
-            return;
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0 ));
         }
-
-        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
-
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
-        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
-        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                                                      GL_RENDERBUFFER, 0 ));
     }
 
     uint32 GLES2FrameBufferObject::getWidth()
