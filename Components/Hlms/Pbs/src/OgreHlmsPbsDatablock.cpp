@@ -717,7 +717,9 @@ namespace Ogre
                                        const TexturePtr &newTexture, const HlmsSamplerblock *refParams )
     {
         //PBS can only use texture arrays.
-        assert( newTexture->getTextureType() == TEX_TYPE_2D_ARRAY || texType == PBSM_REFLECTION );
+        assert( newTexture.isNull() ||
+                newTexture->getTextureType() == TEX_TYPE_2D_ARRAY ||
+                texType == PBSM_REFLECTION );
 
         PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
 
