@@ -43,7 +43,6 @@ set(STATIC_INST_FILES
   Packages/FindDirectX11.cmake
   Packages/FindFreeImage.cmake
   Packages/FindFreetype.cmake
-  Packages/FindOpenGLES.cmake
   Packages/FindOpenGLES2.cmake
   Packages/FindZZip.cmake
   Packages/FindSoftimage.cmake

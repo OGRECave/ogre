@@ -635,26 +635,51 @@ namespace Ogre {
         */
         bool resourceGroupExists(const String& name) const;
 
-        /** Method to add a resource location to for a given resource group. 
-        @remarks
-            Resource locations are places which are searched to load resource files.
-            When you choose to load a file, or to search for valid files to load, 
-            the resource locations are used.
-        @param name The name of the resource location; probably a directory, zip file, URL etc.
-        @param locType The codename for the resource type, which must correspond to the 
-            Archive factory which is providing the implementation.
-        @param resGroup The name of the resource group for which this location is
-            to apply. ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME is the 
-            default group which always exists, and can
-            be used for resources which are unlikely to be unloaded until application
-            shutdown. Otherwise it must be the name of a group; if it
-            has not already been created with createResourceGroup then it is created
-            automatically.
-        @param recursive Whether subdirectories will be searched for files when using 
-            a pattern match (such as *.material), and whether subdirectories will be
-            indexed. This can slow down initial loading of the archive and searches.
-            When opening a resource you still need to use the fully qualified name, 
-            this allows duplicate names in alternate paths.
+        /** Adds a location to the list of searchable locations for a
+            Resource type.
+            @remarks
+                Resource files (textures, models etc) need to be loaded from
+                specific locations. By calling this method, you add another
+                search location to the list. Locations added first are preferred
+                over locations added later.
+            @par
+                Locations can be folders, compressed archives, even perhaps
+                remote locations. Facilities for loading from different
+                locations are provided by plugins which provide
+                implementations of the Archive class.
+                All the application user has to do is specify a 'loctype'
+                string in order to indicate the type of location, which
+                should map onto one of the provided plugins. Ogre comes
+                configured with the 'FileSystem' (folders) and 'Zip' (archive
+                compressed with the pkzip / WinZip etc utilities) types.
+            @par
+                You can also supply the name of a resource group which should
+                have this location applied to it. The
+                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME group is the
+                default, and one resource group which will always exist. You
+                should consider defining resource groups for your more specific
+                resources (e.g. per level) so that you can control loading /
+                unloading better.
+            @param
+                name The name of the location, e.g. './data' or
+                '/compressed/gamedata.zip'
+            @param
+                locType A string identifying the location type, e.g.
+                'FileSystem' (for folders), 'Zip' etc. Must map to a
+                registered plugin which deals with this type (FileSystem and
+                Zip should always be available)
+            @param
+                groupName Type of name of the resource group which this location
+                should apply to; defaults to the General group which applies to
+                all non-specific resources.
+            @param
+                recursive If the resource location has a concept of recursive
+                directory traversal, enabling this option will mean you can load
+                resources in subdirectories using only their unqualified name.
+                The default is to disable this so that resources in subdirectories
+                with the same name are still unique.
+            @param readOnly whether the Archive is read only
+            @see Archive
         */
         void addResourceLocation(const String& name, const String& locType, 
             const String& resGroup = DEFAULT_RESOURCE_GROUP_NAME, bool recursive = false, bool readOnly = true);

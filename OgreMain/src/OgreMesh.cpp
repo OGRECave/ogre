@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreMeshSerializer.h"
 #include "OgreSkeletonManager.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreEdgeListBuilder.h"

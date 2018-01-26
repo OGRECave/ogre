@@ -1799,12 +1799,6 @@ bool TrayManager::isDialogVisible()
     return mDialog != 0;
 }
 
-Widget *TrayManager::getWidget(TrayLocation trayLoc, unsigned int place)
-{
-    if (place < mWidgets[trayLoc].size()) return mWidgets[trayLoc][place];
-    return 0;
-}
-
 Widget *TrayManager::getWidget(TrayLocation trayLoc, const Ogre::String &name)
 {
     for (unsigned int i = 0; i < mWidgets[trayLoc].size(); i++)
@@ -1836,16 +1830,6 @@ unsigned int TrayManager::getNumWidgets()
     }
 
     return total;
-}
-
-size_t TrayManager::getNumWidgets(TrayLocation trayLoc)
-{
-    return mWidgets[trayLoc].size();
-}
-
-WidgetIterator TrayManager::getWidgetIterator(TrayLocation trayLoc)
-{
-    return WidgetIterator(mWidgets[trayLoc].begin(), mWidgets[trayLoc].end());
 }
 
 int TrayManager::locateWidgetInTray(Widget *widget)

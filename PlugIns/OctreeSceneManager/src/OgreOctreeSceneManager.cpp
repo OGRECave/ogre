@@ -1131,7 +1131,6 @@ const String OctreeSceneManagerFactory::FACTORY_TYPE_NAME = "OctreeSceneManager"
 void OctreeSceneManagerFactory::initMetaData(void) const
 {
     mMetaData.typeName = FACTORY_TYPE_NAME;
-    mMetaData.sceneTypeMask = 0xFFFF; // support all types
     mMetaData.worldGeometrySupported = false;
 }
 //-----------------------------------------------------------------------

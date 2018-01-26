@@ -53,7 +53,7 @@ namespace Ogre {
     {
     public:
         Serializer();
-        virtual ~Serializer();
+        ~Serializer();
 
         /// The endianness of written files
         enum Endian
@@ -75,9 +75,9 @@ namespace Ogre {
         bool mFlipEndian; /// Default to native endian, derive from header
 
         // Internal methods
-        virtual void writeFileHeader(void);
-        virtual void writeChunkHeader(uint16 id, size_t size);
-        virtual size_t calcChunkHeaderSize();
+        void writeFileHeader(void);
+        void writeChunkHeader(uint16 id, size_t size);
+        size_t calcChunkHeaderSize();
         size_t calcStringSize(const String& string);
 
         void writeFloats(const float* const pfloat, size_t count);
@@ -91,8 +91,8 @@ namespace Ogre {
         void writeString(const String& string);
         void writeData(const void* const buf, size_t size, size_t count);
         
-        virtual void readFileHeader(DataStreamPtr& stream);
-        virtual unsigned short readChunk(DataStreamPtr& stream);
+        void readFileHeader(DataStreamPtr& stream);
+        unsigned short readChunk(DataStreamPtr& stream);
         
         void readBools(DataStreamPtr& stream, bool* pDest, size_t count);
         void readFloats(DataStreamPtr& stream, float* pDest, size_t count);
@@ -109,18 +109,18 @@ namespace Ogre {
         void flipFromLittleEndian(void* pData, size_t size, size_t count = 1);
 
         /// Determine the endianness of the incoming stream compared to native
-        virtual void determineEndianness(DataStreamPtr& stream);
+        void determineEndianness(DataStreamPtr& stream);
         /// Determine the endianness to write with based on option
-        virtual void determineEndianness(Endian requestedEndian);
+        void determineEndianness(Endian requestedEndian);
 
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
         typedef vector<size_t>::type ChunkSizeStack;
         ChunkSizeStack mChunkSizeStack;
         bool mReportChunkErrors;
 #endif
-        virtual void pushInnerChunk(const DataStreamPtr& stream);
-        virtual void popInnerChunk(const DataStreamPtr& stream);
-        virtual void backpedalChunkHeader(DataStreamPtr& stream);
+        void pushInnerChunk(const DataStreamPtr& stream);
+        void popInnerChunk(const DataStreamPtr& stream);
+        void backpedalChunkHeader(DataStreamPtr& stream);
     };
     /** @} */
     /** @} */

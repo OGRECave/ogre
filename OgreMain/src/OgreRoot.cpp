@@ -34,9 +34,7 @@ THE SOFTWARE.
 #include "OgreDynLib.h"
 #include "OgreConfigFile.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
-#include "OgreParticleSystemManager.h"
 #include "OgreSkeletonManager.h"
-#include "OgreProfiler.h"
 #include "OgreConfigDialog.h"
 #include "OgrePlugin.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
@@ -52,7 +50,6 @@ THE SOFTWARE.
 #include "OgreTimer.h"
 #include "OgreFrameListener.h"
 #include "OgreLodStrategyManager.h"
-#include "Threading/OgreDefaultWorkQueue.h"
 #include "OgreFileSystemLayer.h"
 
 #if OGRE_NO_FREEIMAGE == 0
@@ -64,15 +61,11 @@ THE SOFTWARE.
 #if OGRE_NO_STBI_CODEC == 0
 #include "OgreSTBICodec.h"
 #endif
-#if OGRE_NO_ZIP_ARCHIVE == 0
-#include "OgreZip.h"
-#endif
 
 #include "OgreHardwareBufferManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreExternalTextureSourceManager.h"
 #include "OgreCompositorManager.h"
-#include "OgreScriptCompiler.h"
 #include "OgreWindowEventUtilities.h"
 
 #if OGRE_NO_PVRTC_CODEC == 0
@@ -743,12 +736,6 @@ namespace Ogre {
         return mSceneManagerEnum->createSceneManager(typeName, instanceName);
     }
     //-----------------------------------------------------------------------
-    SceneManager* Root::createSceneManager(SceneTypeMask typeMask,
-        const String& instanceName)
-    {
-        return mSceneManagerEnum->createSceneManager(typeMask, instanceName);
-    }
-    //-----------------------------------------------------------------------
     void Root::destroySceneManager(SceneManager* sm)
     {
         mSceneManagerEnum->destroySceneManager(sm);
@@ -1104,19 +1091,6 @@ namespace Ogre {
         }
         mPlugins.clear();
 #endif
-    }
-    //-----------------------------------------------------------------------
-    void Root::addResourceLocation(const String& name, const String& locType,
-        const String& groupName, bool recursive)
-    {
-        ResourceGroupManager::getSingleton().addResourceLocation(
-            name, locType, groupName, recursive);
-    }
-    //-----------------------------------------------------------------------
-    void Root::removeResourceLocation(const String& name, const String& groupName)
-    {
-        ResourceGroupManager::getSingleton().removeResourceLocation(
-            name, groupName);
     }
     //---------------------------------------------------------------------
     DataStreamPtr Root::createFileStream(const String& filename, const String& groupName,

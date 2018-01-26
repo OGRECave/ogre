@@ -188,50 +188,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    SceneManager* SceneManagerEnumerator::createSceneManager(
-        SceneTypeMask typeMask, const String& instanceName)
-    {
-        if (mInstances.find(instanceName) != mInstances.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-                "SceneManager instance called '" + instanceName + "' already exists",
-                "SceneManagerEnumerator::createSceneManager");
-        }
-
-        SceneManager* inst = 0;
-        String name = instanceName;
-        if (name.empty())
-        {
-            // generate a name
-            StringStream s;
-            s << "SceneManagerInstance" << ++mInstanceCreateCount;
-            name = s.str();
-        }
-
-        // Iterate backwards to find the matching factory registered last
-        for(Factories::reverse_iterator i = mFactories.rbegin(); i != mFactories.rend(); ++i)
-        {
-            if ((*i)->getMetaData().sceneTypeMask & typeMask)
-            {
-                inst = (*i)->createInstance(name);
-                break;
-            }
-        }
-
-        // use default factory if none
-        if (!inst)
-            inst = mDefaultFactory.createInstance(name);
-
-        /// assign rs if already configured
-        if (mCurrentRenderSystem)
-            inst->_setDestinationRenderSystem(mCurrentRenderSystem);
-        
-        mInstances[inst->getName()] = inst;
-
-        return inst;
-
-    }
-    //-----------------------------------------------------------------------
     void SceneManagerEnumerator::destroySceneManager(SceneManager* sm)
     {
         if(!sm)
@@ -311,7 +267,6 @@ namespace Ogre {
     void DefaultSceneManagerFactory::initMetaData(void) const
     {
         mMetaData.typeName = FACTORY_TYPE_NAME;
-        mMetaData.sceneTypeMask = ST_GENERIC;
         mMetaData.worldGeometrySupported = false;
     }
     //-----------------------------------------------------------------------

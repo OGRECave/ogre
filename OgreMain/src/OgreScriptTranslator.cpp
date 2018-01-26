@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreScriptTranslator.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreParticleSystemManager.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreParticleEmitter.h"
 #include "OgreParticleAffector.h"

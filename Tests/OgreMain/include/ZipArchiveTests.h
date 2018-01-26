@@ -36,7 +36,7 @@ class ZipArchiveTests : public ::testing::Test
 {
 
 protected:
-    Ogre::ZipArchive* arch;
+    Ogre::Archive* arch;
 public:
     void SetUp();
     void TearDown();

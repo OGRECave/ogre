@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreMeshSerializerImpl.h"
 #include "OgreMeshFileFormat.h"
-#include "OgreMeshSerializer.h"
 #include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
 #include "OgreLodStrategyManager.h"

@@ -31,9 +31,7 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreRenderTargetListener.h"
 #include "OgreDepthBuffer.h"
-#include "OgreProfiler.h"
 #include "OgreTimer.h"
-#include <iomanip>
 
 namespace Ogre {
 

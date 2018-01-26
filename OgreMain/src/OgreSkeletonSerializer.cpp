@@ -113,7 +113,25 @@ namespace Ogre {
         determineEndianness(stream);
 
         // Check header
-        readFileHeader(stream);
+        unsigned short headerID;
+        readShorts(stream, &headerID, 1);
+        if (headerID != HEADER_STREAM_ID_EXT)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "File header not found",
+                "SkeletonSerializer::importSkeleton");
+        }
+
+        // Read version
+        String ver = readString(stream);
+        if ((ver != "[Serializer_v1.10]") &&
+            (ver != "[Serializer_v1.80]"))
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Invalid file: version incompatible, file reports " + String(ver),
+                "SkeletonSerializer::importSkeleton");
+        }
+        mVersion = ver;
+
         pushInnerChunk(stream);
         unsigned short streamID = readChunk(stream);
 
@@ -434,33 +452,6 @@ namespace Ogre {
         size += sizeof(float) * 3;
 
         return size;
-    }
-    //---------------------------------------------------------------------
-    void SkeletonSerializer::readFileHeader(DataStreamPtr& stream)
-    {
-        unsigned short headerID;
-
-        // Read header ID
-        readShorts(stream, &headerID, 1);
-
-        if (headerID == HEADER_STREAM_ID_EXT)
-        {
-            // Read version
-            String ver = readString(stream);
-            if ((ver != "[Serializer_v1.10]") &&
-                (ver != "[Serializer_v1.80]"))
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Invalid file: version incompatible, file reports " + String(ver),
-                    "Serializer::readFileHeader");
-            }
-            mVersion = ver;
-        }
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid file: no header", 
-                "Serializer::readFileHeader");
-        }
     }
     //---------------------------------------------------------------------
     void SkeletonSerializer::readBone(DataStreamPtr& stream, Skeleton* pSkel)

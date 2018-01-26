@@ -957,7 +957,6 @@ namespace Ogre {
     void BspSceneManagerFactory::initMetaData(void) const
     {
         mMetaData.typeName = FACTORY_TYPE_NAME;
-        mMetaData.sceneTypeMask = ST_INTERIOR;
         mMetaData.worldGeometrySupported = true;
     }
     //-----------------------------------------------------------------------

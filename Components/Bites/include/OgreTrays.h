@@ -187,7 +187,6 @@ namespace OgreBites
     };
 
     typedef std::vector<Widget*> WidgetList;
-    typedef Ogre::VectorIterator<WidgetList> WidgetIterator;
 
     /**
     Basic button class.
@@ -393,12 +392,6 @@ namespace OgreBites
         void removeItem(size_t index);
 
         void clearItems();
-
-        /// @deprecated use getNumItems
-        OGRE_DEPRECATED size_t getItemsCount()
-        {
-            return mItems.size();
-        }
 
         void selectItem(size_t index, bool notifyListener = true);
 
@@ -965,12 +958,6 @@ namespace OgreBites
         bool isDialogVisible();
 
         /**
-        Gets a widget from a tray by place.
-        @deprecated use getWidgets() instead
-        */
-        OGRE_DEPRECATED Widget* getWidget(TrayLocation trayLoc, unsigned int place);
-
-        /**
         Gets a widget from a tray by name.
         */
         Widget* getWidget(TrayLocation trayLoc, const Ogre::String& name);
@@ -984,18 +971,6 @@ namespace OgreBites
         Gets the number of widgets in total.
         */
         unsigned int getNumWidgets();
-
-        /**
-        Gets the number of widgets in a tray.
-        @deprecated use getWidgets() instead
-        */
-        OGRE_DEPRECATED size_t getNumWidgets(TrayLocation trayLoc);
-
-        /**
-        Gets all the widgets of a specific tray.
-        @deprecated use getWidgets() instead
-        */
-        OGRE_DEPRECATED WidgetIterator getWidgetIterator(TrayLocation trayLoc);
 
         /**
         Gets all the widgets of a specific tray.

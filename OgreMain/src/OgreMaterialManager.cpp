@@ -26,9 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-
-#include "OgreMaterialSerializer.h"
-#include "OgreScriptCompiler.h"
 #include "OgreLodStrategyManager.h"
 
 

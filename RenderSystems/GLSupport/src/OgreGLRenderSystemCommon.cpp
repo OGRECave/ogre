@@ -180,20 +180,4 @@ namespace Ogre {
 
         }
     }
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-    void GLRenderSystemCommon::_destroyInternalResources(RenderWindow* pRenderWnd)
-    {
-        static_cast<EGLWindow*>(pRenderWnd)->_notifySurfaceDestroyed();
-    }
-
-    void GLRenderSystemCommon::_createInternalResources(RenderWindow* pRenderWnd, void* window,
-                                                        void* config)
-    {
-#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
-        static_cast<EGLWindow*>(pRenderWnd)
-            ->_notifySurfaceCreated(reinterpret_cast<EGLNativeWindowType>(window), config);
-#endif
-    }
-#endif
 }
