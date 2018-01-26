@@ -95,10 +95,6 @@ namespace Ogre {
         /** Clear all user objects from this binding.   */
         void clear() const;
 
-        /** Returns empty user any object.
-        */
-        OGRE_DEPRECATED static const Any& getEmptyUserAny() { return msEmptyAny; }
-
     // copying
     public:
 
@@ -160,9 +156,7 @@ namespace Ogre {
 
     // Attributes.
     private:
-        static Any              msEmptyAny;         // Shared empty any object.
         mutable Attributes*     mAttributes;        // Class attributes - will be allocated on demand.
-
     };
 
     /** @} */
