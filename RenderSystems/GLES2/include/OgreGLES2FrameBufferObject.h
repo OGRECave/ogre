@@ -52,9 +52,9 @@ namespace Ogre {
         */
         void unbindSurface(size_t attachment);
         
-        /** Bind FrameBufferObject
+        /** Bind FrameBufferObject. Attempt to bind on incompatible GL context will cause FBO destruction and optional recreation.
         */
-        void bind();
+        bool bind(bool recreateIfNeeded);
         
         /** Swap buffers - only useful when using multisample buffers.
         */

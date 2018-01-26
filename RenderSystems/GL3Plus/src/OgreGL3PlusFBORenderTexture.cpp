@@ -487,7 +487,7 @@ namespace Ogre {
         GL3PlusFrameBufferObject *fbo = 0;
         target->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
         if(fbo)
-            fbo->bind();
+            fbo->bind(true);
         else
             // Old style context (window/pbuffer) or copying render texture
             mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );

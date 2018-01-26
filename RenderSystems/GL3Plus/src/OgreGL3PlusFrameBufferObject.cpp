@@ -251,13 +251,55 @@ namespace Ogre {
         
     }
     
-    void GL3PlusFrameBufferObject::bind()
+    bool GL3PlusFrameBufferObject::bind(bool recreateIfNeeded)
     {
-        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+        GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+        GLContext* currentContext = rs->_getCurrentContext();
+        if(mContext && mContext != currentContext) // FBO is unusable with current context, destroy it
+        {
+            if(mFB != 0)
+                rs->_destroyFbo(mContext, mFB);
+            if(mMultisampleFB != 0)
+                rs->_destroyFbo(mContext, mMultisampleFB);
+            
+            mContext = 0;
+            mFB = 0;
+            mMultisampleFB = 0;
+        }
 
-        // Bind it to FBO
-        const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
-        mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, fb );
+        if(!mContext && recreateIfNeeded) // create FBO lazy or recreate after destruction
+        {
+            mContext = currentContext;
+            
+            // Generate framebuffer object
+            OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
+            
+            // Check samples supported
+            mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mFB );
+            
+            GLint maxSamples;
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
+            mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
+            
+            // Will we need a second FBO to do multisampling?
+            if (mNumSamples)
+            {
+                OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
+            }
+            else
+            {
+                mMultisampleFB = 0;
+            }
+            
+            // Re-initialise
+            if(mColour[0].buffer)
+                initialise();
+        }
+
+        if(mContext)
+	        mManager->getStateCacheManager()->bindGLFrameBuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB);
+
+        return mContext != 0;
     }
 
     void GL3PlusFrameBufferObject::swapBuffers()
@@ -281,11 +323,9 @@ namespace Ogre {
 
     void GL3PlusFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
-        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
+        bind(true); // recreate FBO if unusable with current context, bind it
 
         GL3PlusDepthBuffer *glDepthBuffer = static_cast<GL3PlusDepthBuffer*>(depthBuffer);
-        mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
-
         if( glDepthBuffer )
         {
             GL3PlusRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
@@ -309,12 +349,11 @@ namespace Ogre {
     
     void GL3PlusFrameBufferObject::detachDepthBuffer()
     {
-        assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
-
-        mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
-        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
-        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                                                      GL_RENDERBUFFER, 0 ));
+        if(bind(false)) // bind or destroy FBO if it is unusable with current context
+        {
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0 ));
+        }
     }
 
     uint32 GL3PlusFrameBufferObject::getWidth()
