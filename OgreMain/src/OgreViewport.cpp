@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
-#include <iomanip>
 
 namespace Ogre {
     OrientationMode Viewport::mDefaultOrientationMode = OR_DEGREE_0;

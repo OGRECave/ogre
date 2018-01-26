@@ -35,6 +35,13 @@ THE SOFTWARE.
 #ifndef __OgreStableHeaders__
 #define __OgreStableHeaders__
 
+#include "OgreConfig.h"
+#include "OgreExports.h"
+#include "OgrePrerequisites.h"
+#include "OgrePlatform.h"
+#include "OgreStdHeaders.h"
+#include <iomanip>
+
 #include "OgreAny.h"
 #include "OgreArchive.h"
 #include "OgreArchiveManager.h"
@@ -65,9 +72,7 @@ THE SOFTWARE.
 #include "OgreParticleSystemManager.h"
 #include "OgrePass.h"
 #include "OgrePlane.h"
-#include "OgrePlatform.h"
 #include "OgrePlatformInformation.h"
-#include "OgrePrerequisites.h"
 #include "OgreProfiler.h"
 #include "OgreQuaternion.h"
 #include "OgreRay.h"
@@ -85,7 +90,6 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreSkeleton.h"
 #include "OgreSphere.h"
-#include "OgreStdHeaders.h"
 #include "OgreStringConverter.h"
 #include "OgreString.h"
 #include "OgreStringInterface.h"
