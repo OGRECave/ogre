@@ -27,11 +27,10 @@ THE SOFTWARE.
 */
 #include "OgreTimer.h"
 
+using namespace std::chrono;
+
 namespace Ogre {
 
-// better: use clock_gettime( CLOCK_MONOTONIC, &ts ) as gettimeofday might drift
-// for instance in case of leap days, travel across TZ etc.
-// even better: let std::chrono::steady_clock handle this cross platform
 //--------------------------------------------------------------------------------//
 Timer::Timer()
 {
@@ -39,31 +38,24 @@ Timer::Timer()
 }
 
 //--------------------------------------------------------------------------------//
-Timer::~Timer()
-{
-}
-
-//--------------------------------------------------------------------------------//
 void Timer::reset()
 {
     zeroClock = clock();
-    gettimeofday(&start, NULL);
+    start = steady_clock::now();
 }
 
 //--------------------------------------------------------------------------------//
 unsigned long Timer::getMilliseconds()
 {
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    return (now.tv_sec-start.tv_sec)*1000+(now.tv_usec-start.tv_usec)/1000;
+    auto now = steady_clock::now();
+    return duration_cast<milliseconds>(now - start).count();
 }
 
 //--------------------------------------------------------------------------------//
 unsigned long Timer::getMicroseconds()
 {
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    return (now.tv_sec-start.tv_sec)*1000000+(now.tv_usec-start.tv_usec);
+    auto now = steady_clock::now();
+    return duration_cast<microseconds>(now - start).count();
 }
 
 //-- Common Across All Timers ----------------------------------------------------//
