@@ -81,13 +81,6 @@ namespace Ogre
         mInstantRadiosity = 0;
     }
     //-----------------------------------------------------------------------------------
-    HlmsPbs* SceneFormatImporter::getPbs(void) const
-    {
-        HlmsManager *hlmsManager = mRoot->getHlmsManager();
-        Hlms *hlms = hlmsManager->getHlms( "pbs" );
-        return dynamic_cast<HlmsPbs*>( hlms );
-    }
-    //-----------------------------------------------------------------------------------
     Light::LightTypes SceneFormatImporter::parseLightType( const char *value )
     {
         for( size_t i=0; i<Light::NUM_LIGHT_TYPES+1u; ++i )

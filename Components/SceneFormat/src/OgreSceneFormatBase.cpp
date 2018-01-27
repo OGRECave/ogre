@@ -35,6 +35,9 @@ THE SOFTWARE.
 #include "OgreEntity.h"
 #include "OgreLight.h"
 
+#include "OgreHlmsPbs.h"
+#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+
 namespace Ogre
 {
     const char* SceneFormatBase::c_lightTypes[Light::NUM_LIGHT_TYPES+1u] =
@@ -59,6 +62,13 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
+    HlmsPbs* SceneFormatBase::getPbs(void) const
+    {
+        HlmsManager *hlmsManager = mRoot->getHlmsManager();
+        Hlms *hlms = hlmsManager->getHlms( "pbs" );
+        return dynamic_cast<HlmsPbs*>( hlms );
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatBase::setListener( SceneFormatListener *listener )
     {
         if( listener )
@@ -69,13 +79,19 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
-    DefaultSceneFormatListener::DefaultSceneFormatListener() : mSceneFlags( 0 )
+    DefaultSceneFormatListener::DefaultSceneFormatListener() :
+        mSceneFlags( 0 ),
+        mParallaxCorrectedCubemap( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
-    void DefaultSceneFormatListener::setSceneFlags( uint32 sceneFlags )
+    void DefaultSceneFormatListener::setSceneFlags( uint32 sceneFlags, SceneFormatBase *parent )
     {
         mSceneFlags = sceneFlags;
+
+        HlmsPbs *hlmsPbs = parent->getPbs();
+        if( hlmsPbs )
+            mParallaxCorrectedCubemap = hlmsPbs->getParallaxCorrectedCubemap();
     }
     //-----------------------------------------------------------------------------------
     bool DefaultSceneFormatListener::hasNoAttachedObjectsOfType( const SceneNode *sceneNode )
@@ -133,6 +149,37 @@ namespace Ogre
         if( (mSceneFlags & allObjsMask) == allObjsMask )
             return true; //Everything is being exported. No need to keep digging (early out)
 
+        if( mParallaxCorrectedCubemap )
+        {
+            SceneNode * const *proxySceneNodes = mParallaxCorrectedCubemap->getProxySceneNodes();
+            if( proxySceneNodes )
+            {
+                for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+                {
+                    if( proxySceneNodes[i] == sceneNode )
+                        return false;
+                }
+            }
+        }
+
         return hasNoAttachedObjectsOfType( sceneNode );
+    }
+    //-----------------------------------------------------------------------------------
+    bool DefaultSceneFormatListener::exportItem( const Item *item )
+    {
+        if( mParallaxCorrectedCubemap )
+        {
+            Item * const *proxyItems = mParallaxCorrectedCubemap->getProxyItems();
+            if( proxyItems )
+            {
+                for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+                {
+                    if( proxyItems[i] == item )
+                        return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

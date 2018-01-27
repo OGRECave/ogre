@@ -597,7 +597,7 @@ namespace Ogre
         mExportedMeshes.clear();
         mExportedMeshesV1.clear();
 
-        mListener->setSceneFlags( exportFlags );
+        mListener->setSceneFlags( exportFlags, this );
 
         char tmpBuffer[4096];
         LwString jsonStr( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
