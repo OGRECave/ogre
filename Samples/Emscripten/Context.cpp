@@ -35,7 +35,7 @@
 #include "Context.h"
 
 Context::Context()
-    :   OgreBites::SampleContext("OGRE Emscripten Sample", false), mBuffer(NULL), mNode(NULL)
+    :   OgreBites::SampleContext("OGRE Emscripten Sample"), mBuffer(NULL), mNode(NULL)
 {
 }
 
