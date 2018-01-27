@@ -795,7 +795,7 @@ namespace Ogre {
         @return Shared pointer to a data stream list , will be
             destroyed automatically when no longer referenced
         */
-        DataStreamListPtr openResources(const String& pattern, 
+        DataStreamList openResources(const String& pattern,
             const String& groupName = DEFAULT_RESOURCE_GROUP_NAME) const;
         
         /** List all file or directory names in a resource group.

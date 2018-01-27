@@ -702,7 +702,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    DataStreamListPtr ResourceGroupManager::openResources(
+    DataStreamList ResourceGroupManager::openResources(
         const String& pattern, const String& groupName) const
     {
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -717,8 +717,7 @@ namespace Ogre {
 
         // Iterate through all the archives and build up a combined list of
         // streams
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        DataStreamListPtr ret = DataStreamListPtr(OGRE_NEW_T(DataStreamList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        DataStreamList ret;
 
         LocationList::iterator li, liend;
         liend = grp->locationList.end();
@@ -734,7 +733,7 @@ namespace Ogre {
                 DataStreamPtr ptr = arch->open(*ni);
                 if (ptr)
                 {
-                    ret->push_back(ptr);
+                    ret.push_back(ptr);
                 }
             }
         }
