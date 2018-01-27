@@ -78,9 +78,9 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void ObjectDataArrayMemoryManager::slotsRecreated( size_t prevNumSlots )
+    void ObjectDataArrayMemoryManager::initializeEmptySlots( size_t prevNumSlots )
     {
-        ArrayMemoryManager::slotsRecreated( prevNumSlots );
+        ArrayMemoryManager::initializeEmptySlots( prevNumSlots );
 
         Node **nodesPtr = reinterpret_cast<Node**>( mMemoryPools[Parent] ) + prevNumSlots;
         MovableObject **ownersPtr = reinterpret_cast<MovableObject**>(mMemoryPools[Owner])+prevNumSlots;

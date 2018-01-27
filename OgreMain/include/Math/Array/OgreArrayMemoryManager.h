@@ -256,12 +256,15 @@ namespace Ogre
         */
         void destroySlot( const char *ptrToFirstElement, uint8 index );
 
-        /** Called when mMemoryPools changes, to give a chance derived class to initialize memory
-            to default values
+        /** Called when mMemoryPools changes, to give a chance derived class to initialize
+            new memory to default values
+        @remarks
+            Must access slots in range [prevNumSlots; mMaxSlots); as the references
+            in [0; prevNumSlots) aren't yet updated.
         @param prevNumSlots
             The previous value of mMaxMemory before changing mMemoryPools
         */
-        virtual void slotsRecreated( size_t prevNumSlots ) {}
+        virtual void initializeEmptySlots( size_t prevNumSlots ) {}
     };
 
 
@@ -280,7 +283,7 @@ namespace Ogre
 
     protected:
         /// We overload to set all mParents to point to mDummyNode
-        virtual void slotsRecreated( size_t prevNumSlots );
+        virtual void initializeEmptySlots( size_t prevNumSlots );
 
     public:
         enum MemoryTypes
@@ -354,7 +357,7 @@ namespace Ogre
 
     protected:
         /// We overload to set all mParents to point to mDummyNode
-        virtual void slotsRecreated( size_t prevNumSlots );
+        virtual void initializeEmptySlots( size_t prevNumSlots );
 
     public:
         enum MemoryTypes

@@ -83,9 +83,9 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void BoneArrayMemoryManager::slotsRecreated( size_t prevNumSlots )
+    void BoneArrayMemoryManager::initializeEmptySlots( size_t prevNumSlots )
     {
-        ArrayMemoryManager::slotsRecreated( prevNumSlots );
+        ArrayMemoryManager::initializeEmptySlots( prevNumSlots );
 
         bool *inheritOrientation = reinterpret_cast<bool*>(
                                         mMemoryPools[InheritOrientation] ) + prevNumSlots;

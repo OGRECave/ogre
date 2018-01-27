@@ -272,6 +272,7 @@ namespace Ogre
                 {
                     transform.mIndex = j;
                     transform.mOwner[j]->_getTransform() = transform;
+                    transform.mOwner[j]->_callMemoryChangeListeners();
                 }
             }
 
@@ -298,6 +299,7 @@ namespace Ogre
                 {
                     transform.mIndex = j;
                     transform.mOwner[j]->_getTransform() = transform;
+                    transform.mOwner[j]->_callMemoryChangeListeners();
                 }
             }
 

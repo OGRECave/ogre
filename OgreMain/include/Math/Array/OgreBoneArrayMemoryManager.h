@@ -49,7 +49,7 @@ namespace Ogre
     {
     protected:
         /// We overload to set all mParentTransform to point to a dummy matrix
-        virtual void slotsRecreated( size_t prevNumSlots );
+        virtual void initializeEmptySlots( size_t prevNumSlots );
 
     public:
         enum MemoryTypes
