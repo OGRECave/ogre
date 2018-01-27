@@ -47,14 +47,8 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
 
 # Add platform specific files
 if (EMSCRIPTEN)
-  list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
-  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten")
-
-  file(GLOB PLATFORM_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten/*.h)
-  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Emscripten/*.cpp"
+  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp")
-
-  set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (WIN32)
   list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
   set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/WIN32")
@@ -114,7 +108,6 @@ elseif(ANDROID)
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
   include_directories(${X11_INCLUDE_DIR})
-  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/GLX")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
 
