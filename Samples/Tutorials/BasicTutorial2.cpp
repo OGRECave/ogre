@@ -161,8 +161,6 @@ void TutorialApplication::setup()
     //! [spotlighttype]
 
     //! [spotlightposrot]
-    spotLight->setDirection(Vector3::NEGATIVE_UNIT_Z);
-
     SceneNode* spotLightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
     spotLightNode->attachObject(spotLight);
     spotLightNode->setDirection(-1, -1, 0);
@@ -184,8 +182,6 @@ void TutorialApplication::setup()
     //! [directlightcolor]
 
     //! [directlightdir]
-    directionalLight->setDirection(Vector3::NEGATIVE_UNIT_Z);
-
     SceneNode* directionalLightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
     directionalLightNode->attachObject(directionalLight);
     directionalLightNode->setDirection(Vector3(0, -1, 1));

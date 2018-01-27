@@ -201,7 +201,6 @@ protected:
         SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
         ln->attachObject(l);
         l->setType(Light::LT_SPOTLIGHT);
-        l->setDirection(Vector3::NEGATIVE_UNIT_Z);
         ln->setDirection(-pos);
         l->setDiffuseColour(0.0, 0.0, 0.5);
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
@@ -210,7 +209,6 @@ protected:
         // add a green spotlight.
         l = mSceneMgr->createLight();
         l->setType(Light::LT_SPOTLIGHT);
-        l->setDirection(Vector3::NEGATIVE_UNIT_Z);
         pos = Vector3(0, 150, -100);
         ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
         ln->attachObject(l);

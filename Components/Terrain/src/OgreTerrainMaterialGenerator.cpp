@@ -77,8 +77,10 @@ namespace Ogre
             Root::getSingleton().destroySceneManager(mCompositeMapSM);
             mCompositeMapSM = 0;
             mCompositeMapCam = 0;
+            mCamNode = 0;
             mCompositeMapPlane = 0;
             mCompositeMapLight = 0;
+            mLightNode = 0;
         }
     }
     //---------------------------------------------------------------------
@@ -92,8 +94,9 @@ namespace Ogre
             float camDist = 100;
             float halfCamDist = camDist * 0.5f;
             mCompositeMapCam = mCompositeMapSM->createCamera("cam");
-            mCompositeMapCam->setPosition(Vector3(0, 0, camDist));
-            mCompositeMapCam->lookAt(Vector3::ZERO);
+            mCamNode = mCompositeMapSM->getRootSceneNode()->createChildSceneNode(Vector3(0, 0, camDist));
+            mCamNode->lookAt(Vector3::ZERO, Node::TS_PARENT);
+            mCamNode->attachObject(mCompositeMapCam);
             mCompositeMapCam->setProjectionType(PT_ORTHOGRAPHIC);
             mCompositeMapCam->setNearClipDistance(10);
             mCompositeMapCam->setFarClipDistance(500);
@@ -102,6 +105,8 @@ namespace Ogre
             // Just in case material relies on light auto params
             mCompositeMapLight = mCompositeMapSM->createLight();
             mCompositeMapLight->setType(Light::LT_DIRECTIONAL);
+            mLightNode = mCompositeMapSM->getRootSceneNode()->createChildSceneNode();
+            mLightNode->attachObject(mCompositeMapLight);
 
             RenderSystem* rSys = Root::getSingleton().getRenderSystem();
             Real hOffset = rSys->getHorizontalTexelOffset() / (Real)size;
@@ -128,7 +133,7 @@ namespace Ogre
         // update
         mCompositeMapPlane->setMaterialName(0, mat->getName());
         TerrainGlobalOptions& globalopts = TerrainGlobalOptions::getSingleton();
-        mCompositeMapLight->setDirection(globalopts.getLightMapDirection());
+        mLightNode->setDirection(globalopts.getLightMapDirection());
         mCompositeMapLight->setDiffuseColour(globalopts.getCompositeMapDiffuse());
         mCompositeMapSM->setAmbientLight(globalopts.getCompositeMapAmbient());
 

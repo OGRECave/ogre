@@ -35,7 +35,7 @@ namespace Ogre {
           mPosition(Vector3::ZERO),
           mDiffuse(ColourValue::White),
           mSpecular(ColourValue::Black),
-          mDirection(Vector3::UNIT_Z),
+          mDirection(Vector3::NEGATIVE_UNIT_Z),
           mSpotOuter(Degree(40.0f)),
           mSpotInner(Degree(30.0f)),
           mSpotFalloff(1.0f),
@@ -52,7 +52,7 @@ namespace Ogre {
           mShadowNearClipDist(-1),
           mShadowFarClipDist(-1),
           mDerivedPosition(Vector3::ZERO),
-          mDerivedDirection(Vector3::UNIT_Z),
+          mDerivedDirection(Vector3::NEGATIVE_UNIT_Z),
           mDerivedCamRelativePosition(Vector3::ZERO),
           mDerivedCamRelativeDirty(false),
           mCameraToBeRelativeTo(0),
@@ -68,7 +68,7 @@ namespace Ogre {
         mPosition(Vector3::ZERO),
         mDiffuse(ColourValue::White),
         mSpecular(ColourValue::Black),
-        mDirection(Vector3::UNIT_Z),
+        mDirection(Vector3::NEGATIVE_UNIT_Z),
         mSpotOuter(Degree(40.0f)),
         mSpotInner(Degree(30.0f)),
         mSpotFalloff(1.0f),
@@ -85,7 +85,7 @@ namespace Ogre {
         mShadowNearClipDist(-1),
         mShadowFarClipDist(-1),
         mDerivedPosition(Vector3::ZERO),
-        mDerivedDirection(Vector3::UNIT_Z),
+        mDerivedDirection(Vector3::NEGATIVE_UNIT_Z),
         mDerivedCamRelativeDirty(false),
         mCameraToBeRelativeTo(0),
         mDerivedTransformDirty(false),
@@ -937,11 +937,11 @@ namespace Ogre {
             }
 
             // Common properties
-            if ((ni = params->find("position")) != params->end())
-                light->setPosition(StringConverter::parseVector3(ni->second));
+            //if ((ni = params->find("position")) != params->end())
+            //    light->setPosition(StringConverter::parseVector3(ni->second));
 
-            if ((ni = params->find("direction")) != params->end())
-                light->setDirection(StringConverter::parseVector3(ni->second));
+            //if ((ni = params->find("direction")) != params->end())
+            //    light->setDirection(StringConverter::parseVector3(ni->second));
 
             if ((ni = params->find("diffuseColour")) != params->end())
                 light->setDiffuseColour(StringConverter::parseColourValue(ni->second));

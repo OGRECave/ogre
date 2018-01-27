@@ -438,7 +438,6 @@ protected:
             // Change moving light to spotlight
             // Point light, movable, reddish
             mLight->setType(Light::LT_SPOTLIGHT);
-            mLight->setDirection(Vector3::NEGATIVE_UNIT_Z);
             mLight->setCastShadows(true);
             mLight->setDiffuseColour(mMinLightColour);
             mLight->setSpecularColour(1, 1, 1);
