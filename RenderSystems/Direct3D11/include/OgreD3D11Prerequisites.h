@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
-#include "WIN32/OgreComPtr.h"       // too much resource leaks were caused without it by throwing constructors
+#include "OgreComPtr.h"       // too much resource leaks were caused without it by throwing constructors
 
 #include "OgreException.h"
 

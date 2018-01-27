@@ -73,7 +73,6 @@ elseif (WIN32)
     set(PLATFORM_HEADERS
       include/WIN32/OgreTimerImp.h
       include/WIN32/OgreMinGWSupport.h
-      include/WIN32/OgreComPtr.h
     )
     
     set(PLATFORM_SOURCE_FILES
