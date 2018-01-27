@@ -958,10 +958,8 @@ namespace Ogre {
             "Parsing scripts for resource group " + grp->name);
 
         // Count up the number of scripts we have to parse
-        typedef list<FileInfoListPtr>::type FileListList;
-        typedef SharedPtr<FileListList> FileListListPtr;
-        typedef std::pair<ScriptLoader*, FileListListPtr> LoaderFileListPair;
-        typedef list<LoaderFileListPair>::type ScriptLoaderFileList;
+        typedef std::pair<ScriptLoader*, FileInfoList> LoaderFileListPair;
+        typedef vector<LoaderFileListPair>::type ScriptLoaderFileList;
         ScriptLoaderFileList scriptLoaderFileList;
         size_t scriptCount = 0;
         // Iterate over script users in loading order and get streams
@@ -970,19 +968,19 @@ namespace Ogre {
             oi != mScriptLoaderOrderMap.end(); ++oi)
         {
             ScriptLoader* su = oi->second;
-            // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-            FileListListPtr fileListList(OGRE_NEW_T(FileListList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+
+            scriptLoaderFileList.push_back(LoaderFileListPair(su, FileInfoList()));
 
             // Get all the patterns and search them
             const StringVector& patterns = su->getScriptPatterns();
             for (StringVector::const_iterator p = patterns.begin(); p != patterns.end(); ++p)
             {
                 FileInfoListPtr fileList = findResourceFileInfo(grp->name, *p);
-                scriptCount += fileList->size();
-                fileListList->push_back(fileList);
+                FileInfoList& lst = scriptLoaderFileList.back().second;
+                lst.insert(lst.end(), fileList->begin(), fileList->end());
             }
-            scriptLoaderFileList.push_back(
-                LoaderFileListPair(su, fileListList));
+
+            scriptCount += scriptLoaderFileList.back().second.size();
         }
         // Fire scripting event
         fireResourceGroupScriptingStarted(grp->name, scriptCount);
@@ -993,40 +991,36 @@ namespace Ogre {
             slfli != scriptLoaderFileList.end(); ++slfli)
         {
             ScriptLoader* su = slfli->first;
-            // Iterate over each list
-            for (FileListList::iterator flli = slfli->second->begin(); flli != slfli->second->end(); ++flli)
+            // Iterate over each item in the list
+            for (FileInfoList::iterator fii = slfli->second.begin(); fii != slfli->second.end(); ++fii)
             {
-                // Iterate over each item in the list
-                for (FileInfoList::iterator fii = (*flli)->begin(); fii != (*flli)->end(); ++fii)
+                bool skipScript = false;
+                fireScriptStarted(fii->filename, skipScript);
+                if(skipScript)
                 {
-                    bool skipScript = false;
-                    fireScriptStarted(fii->filename, skipScript);
-                    if(skipScript)
-                    {
-                        LogManager::getSingleton().logMessage(
-                            "Skipping script " + fii->filename);
-                    }
-                    else
-                    {
-                        LogManager::getSingleton().logMessage(
-                            "Parsing script " + fii->filename);
-                        DataStreamPtr stream = fii->archive->open(fii->filename);
-                        if (stream)
-                        {
-                            if (mLoadingListener)
-                                mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
-
-                            if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
-                            {
-                                DataStreamPtr cachedCopy(OGRE_NEW MemoryDataStream(stream->getName(), stream));
-                                su->parseScript(cachedCopy, grp->name);
-                            }
-                            else
-                                su->parseScript(stream, grp->name);
-                        }
-                    }
-                    fireScriptEnded(fii->filename, skipScript);
+                    LogManager::getSingleton().logMessage(
+                        "Skipping script " + fii->filename);
                 }
+                else
+                {
+                    LogManager::getSingleton().logMessage(
+                        "Parsing script " + fii->filename);
+                    DataStreamPtr stream = fii->archive->open(fii->filename);
+                    if (stream)
+                    {
+                        if (mLoadingListener)
+                            mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
+
+                        if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
+                        {
+                            DataStreamPtr cachedCopy(OGRE_NEW MemoryDataStream(stream->getName(), stream));
+                            su->parseScript(cachedCopy, grp->name);
+                        }
+                        else
+                            su->parseScript(stream, grp->name);
+                    }
+                }
+                fireScriptEnded(fii->filename, skipScript);
             }
         }
 
