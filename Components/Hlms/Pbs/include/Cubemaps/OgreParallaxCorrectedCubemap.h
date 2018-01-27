@@ -230,6 +230,9 @@ namespace Ogre
         /// Do not attempt to render the objects that match in that Rq ID & visibility mask.
         uint32 getProxyReservedVisibilityMask(void) const   { return mProxyVisibilityMask; }
 
+        Item * const * getProxyItems(void) const            { return mProxyItems; }
+        SceneNode * const * getProxySceneNodes(void) const  { return mProxyNodes; }
+
         //Statistics
         uint32 getNumCollectedProbes(void) const        { return mNumCollectedProbes; }
 

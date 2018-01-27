@@ -74,6 +74,8 @@ namespace Ogre
     }
 
     class SceneFormatListener;
+    class ParallaxCorrectedCubemap;
+    class HlmsPbs;
 
     /**
     */
@@ -90,6 +92,8 @@ namespace Ogre
         SceneFormatBase( Root *root, SceneManager *sceneManager );
         ~SceneFormatBase();
 
+        HlmsPbs* getPbs(void) const;
+
         /// Caller must delete the pointer. We won't do it for you.
         void setListener( SceneFormatListener *listener );
     };
@@ -100,7 +104,7 @@ namespace Ogre
     class _OgreSceneFormatExport SceneFormatListener
     {
     public:
-        virtual void setSceneFlags( uint32 sceneFlags )             {}
+        virtual void setSceneFlags( uint32 sceneFlags, SceneFormatBase *parent )    {}
 
         // Override any of these and return false if you don't want that particular object to be exported
         virtual bool exportSceneNode( const SceneNode *sceneNode )  { return true; }
@@ -118,13 +122,16 @@ namespace Ogre
     {
         uint32 mSceneFlags;
 
+        ParallaxCorrectedCubemap    *mParallaxCorrectedCubemap;
+
         bool hasNoAttachedObjectsOfType( const SceneNode *sceneNode );
 
     public:
         DefaultSceneFormatListener();
 
-        virtual void setSceneFlags( uint32 sceneFlags );
+        virtual void setSceneFlags( uint32 sceneFlags, SceneFormatBase *parent );
         virtual bool exportSceneNode( const SceneNode *sceneNode );
+        virtual bool exportItem( const Item *item );
     };
 
     /** @} */

@@ -50,7 +50,6 @@ namespace Ogre
     class LwString;
     class InstantRadiosity;
     class IrradianceVolume;
-    class HlmsPbs;
 
     /** \addtogroup Component
     *  @{
@@ -73,8 +72,6 @@ namespace Ogre
         IndexToSceneNodeMap mCreatedSceneNodes;
 
         void destroyInstantRadiosity(void);
-
-        HlmsPbs* getPbs(void) const;
 
         static inline Light::LightTypes parseLightType( const char *value );
         static inline float decodeFloat( const rapidjson::Value &jsonValue );

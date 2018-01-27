@@ -265,6 +265,8 @@ namespace Ogre
 
         void setParallaxCorrectedCubemap( ParallaxCorrectedCubemap *pcc )
                                                             { mParallaxCorrectedCubemap = pcc; }
+        ParallaxCorrectedCubemap* getParallaxCorrectedCubemap(void) const
+                                                            { return mParallaxCorrectedCubemap; }
 
         void setIrradianceVolume( IrradianceVolume *irradianceVolume )
                                                     { mIrradianceVolume = irradianceVolume; }
