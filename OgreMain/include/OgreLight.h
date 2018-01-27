@@ -199,25 +199,17 @@ namespace Ogre {
         */
         OGRE_DEPRECATED const Vector3& getPosition(void) const;
 
-        /** Sets the direction in which a light points.
-        @remarks
-            Applicable only to the spotlight and directional light types.
-        @note
-            This will be overridden if the light is attached to a SceneNode.
-        @deprecated only call with (0, 0, -1), then attach to SceneNode and use SceneNode::setDirection
-        */
+        /// @deprecated attach to SceneNode and use SceneNode::setDirection
         void setDirection(Real x, Real y, Real z);
 
         /// @overload
-        /// @deprecated only call with Vector3::NEGATIVE_UNIT_Z, then attach to SceneNode and use SceneNode::setDirection
+        /// @deprecated attach to SceneNode and use SceneNode::setDirection
         void setDirection(const Vector3& vec);
 
-        /** Returns the light's direction.
-        @remarks
-            Applicable only to the spotlight and directional light types.
+        /**
         @deprecated attach to SceneNode and use SceneNode::getLocalAxes
         */
-        const Vector3& getDirection(void) const;
+        OGRE_DEPRECATED const Vector3& getDirection(void) const;
 
         /** Sets the range of a spotlight, i.e. the angle of the inner and outer cones
             and the rate of falloff between them.

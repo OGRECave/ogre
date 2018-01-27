@@ -199,11 +199,12 @@ protected:
             
             sprintf(cloneName, "KnotLight%d", i);
             Light* knotLight = mSceneMgr->createLight(cloneName);
+            SceneNode* ln = rootNode->createChildSceneNode(clonePos + Vector3(0,3,0));
+            ln->setDirection(Vector3::NEGATIVE_UNIT_Y);
             knotLight->setType(Light::LT_SPOTLIGHT);
             knotLight->setDiffuseColour(SAMPLE_COLORS[i]);
             knotLight->setSpecularColour(ColourValue::White);
             knotLight->setPosition(clonePos + Vector3(0,3,0));
-            knotLight->setDirection(Vector3::NEGATIVE_UNIT_Y);
             knotLight->setSpotlightRange(Degree(25), Degree(45), 1);
             knotLight->setAttenuation(6, 1, 0.2, 0);
         }

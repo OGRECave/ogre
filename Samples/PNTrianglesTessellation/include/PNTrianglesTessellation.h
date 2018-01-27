@@ -209,7 +209,6 @@ protected:
         l = mSceneMgr->createLight();
         l->setDiffuseColour(1.0f, 1.0f, 1.0f);
         l->setSpecularColour(1.0f, 1.0f, 1.0f);
-        l->setDirection(Vector3::NEGATIVE_UNIT_Z);
         SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         ln->setPosition(Vector3(200, 0, 0));
         ln->setDirection(-Vector3::UNIT_X);
@@ -226,7 +225,6 @@ protected:
         l = mSceneMgr->createLight();
         l->setDiffuseColour(1.0f, 0.0f, 0.0f);
         l->setSpecularColour(1.0f, 0.0f, 0.0f);
-        l->setDirection(Vector3::NEGATIVE_UNIT_Z);
         ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         ln->setPosition(Vector3(-200, 0, 0));
         ln->setDirection(Vector3::UNIT_X);

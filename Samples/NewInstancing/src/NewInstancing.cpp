@@ -175,8 +175,9 @@ void Sample_NewInstancing::setupLighting()
     light = mSceneMgr->createLight();
     light->setType( Light::LT_SPOTLIGHT );
     light->setDiffuseColour( ColourValue( 0.15f, 0.35f, 0.44f ) );
-    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3( 250.0f, 200.0f, 250.0f ))->attachObject(light);
-    light->setDirection( (Vector3::UNIT_SCALE * -1.0f).normalisedCopy() );
+    SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3( 250.0f, 200.0f, 250.0f ));
+    ln->attachObject(light);
+    ln->setDirection(-Vector3::UNIT_SCALE );
     light->setSpecularColour( 0.2, 0.12, 0.11 );
     light->setAttenuation( 3500, 0.005, 0.00002, 0.00001 );
     light->setSpotlightRange( Degree(80), Degree(90) );

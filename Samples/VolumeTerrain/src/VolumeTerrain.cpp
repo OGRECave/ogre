@@ -48,9 +48,11 @@ void Sample_VolumeTerrain::setupContent(void)
     // Light
     Light* directionalLight0 = mSceneMgr->createLight("directionalLight0");
     directionalLight0->setType(Light::LT_DIRECTIONAL);
-    directionalLight0->setDirection(Vector3((Real)1, (Real)-1, (Real)1));
     directionalLight0->setDiffuseColour((Real)1, (Real)0.98, (Real)0.73);
     directionalLight0->setSpecularColour((Real)0.1, (Real)0.1, (Real)0.1);
+    SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    ln->setDirection(1, -1, 1);
+    ln->attachObject(directionalLight0);
 
     mSceneMgr->setAmbientLight(Ogre::ColourValue::White);
    

@@ -33,7 +33,9 @@ void Sample_MeshLod::setupContent()
     // make the scene's main light come from above
     Light* l = mSceneMgr->createLight();
     l->setType(Light::LT_DIRECTIONAL);
-    l->setDirection(Vector3::NEGATIVE_UNIT_Y);
+    SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    ln->setDirection(Vector3::NEGATIVE_UNIT_Y);
+    ln->attachObject(l);
 
     // create a node for the model
     mMeshNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
