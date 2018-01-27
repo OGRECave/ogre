@@ -30,12 +30,7 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
-
 #include "OgreSceneManagerEnumerator.h"
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#include "Android/OgreAndroidLogListener.h"
-#endif
 
 #include <exception>
 #include "OgreHeaderPrefix.h"
@@ -48,6 +43,8 @@ namespace Ogre
     /** \addtogroup General
     *  @{
     */
+
+    class AndroidLogListener;
 
     typedef vector<RenderSystem*>::type RenderSystemList;
     
