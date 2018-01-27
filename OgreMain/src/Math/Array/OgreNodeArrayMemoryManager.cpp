@@ -90,21 +90,13 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void NodeArrayMemoryManager::slotsRecreated( size_t prevNumSlots )
+    void NodeArrayMemoryManager::initializeEmptySlots( size_t prevNumSlots )
     {
-        ArrayMemoryManager::slotsRecreated( prevNumSlots );
+        ArrayMemoryManager::initializeEmptySlots( prevNumSlots );
 
         Node **nodesPtr = reinterpret_cast<Node**>( mMemoryPools[Parent] ) + prevNumSlots;
         for( size_t i=prevNumSlots; i<mMaxMemory; ++i )
             *nodesPtr++ = mDummyNode;
-
-        nodesPtr = reinterpret_cast<Node**>( mMemoryPools[Owner] );
-        for( size_t i=0; i<prevNumSlots; ++i )
-        {
-            if( *nodesPtr )
-                (*nodesPtr)->_callMemoryChangeListeners();
-            ++nodesPtr;
-        }
     }
     //-----------------------------------------------------------------------------------
     void NodeArrayMemoryManager::createNewNode( Transform &outTransform )

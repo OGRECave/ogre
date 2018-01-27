@@ -113,7 +113,7 @@ namespace Ogre
             ++itor;
         }
 
-        slotsRecreated( 0 );
+        initializeEmptySlots( 0 );
     }
     //-----------------------------------------------------------------------------------
     void ArrayMemoryManager::destroy()
@@ -214,11 +214,10 @@ namespace Ogre
 
             const size_t prevNumSlots = mMaxMemory;
             mMaxMemory = newMemory;
+            initializeEmptySlots( prevNumSlots );
 
             //Rebase all ptrs
             mRebaseListener->applyRebase( mLevel, mMemoryPools, diffsList );
-
-            slotsRecreated( prevNumSlots );
         }
 
         return nextSlot;
@@ -284,7 +283,7 @@ namespace Ogre
                     }
 
                     mUsedMemory -= lastRange;
-                    slotsRecreated( mUsedMemory );
+                    initializeEmptySlots( mUsedMemory );
 
                     mRebaseListener->performCleanup( mLevel, mMemoryPools,
                                                      mElementsMemSizes, (newEnd - lastRange),
