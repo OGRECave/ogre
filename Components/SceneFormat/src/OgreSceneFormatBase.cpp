@@ -30,6 +30,11 @@ THE SOFTWARE.
 
 #include "OgreSceneFormatBase.h"
 
+#include "OgreSceneNode.h"
+#include "OgreItem.h"
+#include "OgreEntity.h"
+#include "OgreLight.h"
+
 namespace Ogre
 {
     const char* SceneFormatBase::c_lightTypes[Light::NUM_LIGHT_TYPES+1u] =
@@ -41,13 +46,93 @@ namespace Ogre
         "NUM_LIGHT_TYPES"
     };
 
+    static DefaultSceneFormatListener sDefaultSceneFormatListener;
+
     SceneFormatBase::SceneFormatBase( Root *root, SceneManager *sceneManager ) :
         mRoot( root ),
-        mSceneManager( sceneManager )
+        mSceneManager( sceneManager ),
+        mListener( &sDefaultSceneFormatListener )
     {
     }
     //-----------------------------------------------------------------------------------
     SceneFormatBase::~SceneFormatBase()
     {
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatBase::setListener( SceneFormatListener *listener )
+    {
+        if( listener )
+            mListener = listener;
+        else
+            mListener = &sDefaultSceneFormatListener;
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    DefaultSceneFormatListener::DefaultSceneFormatListener() : mSceneFlags( 0 )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    void DefaultSceneFormatListener::setSceneFlags( uint32 sceneFlags )
+    {
+        mSceneFlags = sceneFlags;
+    }
+    //-----------------------------------------------------------------------------------
+    bool DefaultSceneFormatListener::hasNoAttachedObjectsOfType( const SceneNode *sceneNode )
+    {
+        bool hasNoValidAttachedObject = true;
+
+        SceneNode::ConstObjectIterator objItor = sceneNode->getAttachedObjectIterator();
+
+        while( objItor.hasMoreElements() && hasNoValidAttachedObject )
+        {
+            MovableObject *movableObject =  objItor.getNext();
+
+            if( mSceneFlags & SceneFlags::Items )
+            {
+                Item *asItem = dynamic_cast<Item*>( movableObject );
+                if( asItem )
+                    hasNoValidAttachedObject = false;
+            }
+            if( mSceneFlags & SceneFlags::Entities )
+            {
+                v1::Entity *asEntity = dynamic_cast<v1::Entity*>( movableObject );
+                if( asEntity )
+                    hasNoValidAttachedObject = false;
+            }
+            if( mSceneFlags & SceneFlags::Lights )
+            {
+                Light *asLight = dynamic_cast<Light*>( movableObject );
+                if( asLight )
+                    hasNoValidAttachedObject = false;
+            }
+        }
+
+        Node::ConstNodeVecIterator nodeItor = sceneNode->getChildIterator();
+        while( nodeItor.hasMoreElements() && hasNoValidAttachedObject )
+        {
+            Node *node = nodeItor.getNext();
+            SceneNode *childNode = dynamic_cast<SceneNode*>( node );
+
+            if( childNode )
+                hasNoAttachedObjectsOfType( childNode );
+        }
+
+        return hasNoValidAttachedObject;
+    }
+    //-----------------------------------------------------------------------------------
+    bool DefaultSceneFormatListener::exportSceneNode( const SceneNode *sceneNode )
+    {
+        if( mSceneFlags & SceneFlags::ForceAllSceneNodes )
+            return true;
+
+        const uint32 allObjsMask = SceneFlags::Items | SceneFlags::Entities | SceneFlags::Lights;
+        if( !(mSceneFlags & allObjsMask) )
+            return false; //Nothing is being exported, this node has no need (early out)
+
+        if( (mSceneFlags & allObjsMask) == allObjsMask )
+            return true; //Everything is being exported. No need to keep digging (early out)
+
+        return hasNoAttachedObjectsOfType( sceneNode );
     }
 }

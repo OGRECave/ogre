@@ -338,7 +338,8 @@ namespace Ogre
 
         //Export the mesh, if we haven't done that already
         if( exportMesh &&
-            mExportedMeshes.find( item->getMesh().get() ) == mExportedMeshes.end() )
+            mExportedMeshes.find( mesh ) == mExportedMeshes.end() &&
+            mListener->exportMesh( mesh ) )
         {
             FileSystemLayer::createDirectory( mCurrentExportFolder + "/v2/" );
 
@@ -423,7 +424,8 @@ namespace Ogre
 
         //Export the mesh, if we haven't done that already
         if( exportMesh &&
-            mExportedMeshesV1.find( entity->getMesh().get() ) == mExportedMeshesV1.end() )
+            mExportedMeshesV1.find( mesh ) == mExportedMeshesV1.end() &&
+            mListener->exportMesh( mesh ) )
         {
             FileSystemLayer::createDirectory( mCurrentExportFolder + "/v1/" );
 
@@ -633,7 +635,7 @@ namespace Ogre
                     Node *node = nodeItor.getNext();
                     SceneNode *sceneNode = dynamic_cast<SceneNode*>( node );
 
-                    if( sceneNode )
+                    if( sceneNode && mListener->exportSceneNode( sceneNode ) )
                     {
                         mNodeToIdxMap[sceneNode] = nodeCount++;
                         outJson += ",\n\t\t{";
@@ -660,15 +662,18 @@ namespace Ogre
                 {
                     MovableObject *mo = movableObjects.getNext();
                     Item *item = static_cast<Item*>( mo );
-                    if( firstObject )
+                    if( mListener->exportItem( item ) )
                     {
-                        outJson += "\n\t\t{";
-                        firstObject = false;
+                        if( firstObject )
+                        {
+                            outJson += "\n\t\t{";
+                            firstObject = false;
+                        }
+                        else
+                            outJson += ",\n\t\t{";
+                        exportItem( jsonStr, outJson, item, exportFlags & SceneFlags::Meshes );
+                        outJson += "\n\t\t}";
                     }
-                    else
-                        outJson += ",\n\t\t{";
-                    exportItem( jsonStr, outJson, item, exportFlags & SceneFlags::Meshes );
-                    outJson += "\n\t\t}";
                 }
 
                 outJson += "\n\t]";
@@ -690,15 +695,18 @@ namespace Ogre
                 {
                     MovableObject *mo = movableObjects.getNext();
                     Light *light = static_cast<Light*>( mo );
-                    if( firstObject )
+                    if( mListener->exportLight( light ) )
                     {
-                        outJson += "\n\t\t{";
-                        firstObject = false;
+                        if( firstObject )
+                        {
+                            outJson += "\n\t\t{";
+                            firstObject = false;
+                        }
+                        else
+                            outJson += ",\n\t\t{";
+                        exportLight( jsonStr, outJson, light );
+                        outJson += "\n\t\t}";
                     }
-                    else
-                        outJson += ",\n\t\t{";
-                    exportLight( jsonStr, outJson, light );
-                    outJson += "\n\t\t}";
                 }
 
                 outJson += "\n\t]";
@@ -720,15 +728,18 @@ namespace Ogre
                 {
                     MovableObject *mo = movableObjects.getNext();
                     v1::Entity *entity = static_cast<v1::Entity*>( mo );
-                    if( firstObject )
+                    if( mListener->exportEntity( entity ) )
                     {
-                        outJson += "\n\t\t{";
-                        firstObject = false;
+                        if( firstObject )
+                        {
+                            outJson += "\n\t\t{";
+                            firstObject = false;
+                        }
+                        else
+                            outJson += ",\n\t\t{";
+                        exportEntity( jsonStr, outJson, entity, exportFlags & SceneFlags::MeshesV1 );
+                        outJson += "\n\t\t}";
                     }
-                    else
-                        outJson += ",\n\t\t{";
-                    exportEntity( jsonStr, outJson, entity, exportFlags & SceneFlags::MeshesV1 );
-                    outJson += "\n\t\t}";
                 }
 
                 outJson += "\n\t]";
