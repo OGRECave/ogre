@@ -67,21 +67,17 @@ elseif (WIN32)
 
 elseif (APPLE)
   if (APPLE_IOS)
-    set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS")
-    file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS/*.h")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/iOS")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.mm")
 
     set(PLATFORM_LIBS "")
-    set(PLATFORM_HEADER_INSTALL "iOS")
   else ()
-    set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX")
-    file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX/*.h")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/OSX")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm"
     )
     set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
-    set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
 elseif(ANDROID)
   # required by OgrePlatformInformation.cpp
@@ -275,21 +271,10 @@ if (APPLE)
           COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
           COMMAND ditto
           ${OGRE_SOURCE_DIR}/OgreMain/include/Threading/*.h ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
-          COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/OSX
-          COMMAND ditto
-          ${OGRE_SOURCE_DIR}/OgreMain/include/OSX/*.h ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/OSX
           COMMAND cd ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers
           )
 
       foreach(HEADER_PATH ${THREAD_HEADER_FILES})
-          get_filename_component(HEADER_FILE ${HEADER_PATH} NAME)
-          set(FWK_HEADER_PATH ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/${HEADER_FILE})
-          add_custom_command(TARGET OgreMain POST_BUILD
-              COMMAND rm -f ${FWK_HEADER_PATH}
-              )
-      endforeach()
-
-      foreach(HEADER_PATH ${PLATFORM_HEADERS})
           get_filename_component(HEADER_FILE ${HEADER_PATH} NAME)
           set(FWK_HEADER_PATH ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/${HEADER_FILE})
           add_custom_command(TARGET OgreMain POST_BUILD

@@ -29,10 +29,6 @@
 #include "Android/OgreAPKZipArchive.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "macUtils.h"
-#endif
-
 namespace OgreBites {
 
 static const char* SHADER_CACHE_FILENAME = "cache.bin";
@@ -155,9 +151,9 @@ void ApplicationContext::setRTSSWriteShadersToDisk(bool write)
 
     // Set shader cache path.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    mShaderGenerator->setShaderCachePath(Ogre::macCachePath());
+    mShaderGenerator->setShaderCachePath(mFSLayer->getWritablePath(""));
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    mShaderGenerator->setShaderCachePath(Ogre::macCachePath() + "/org.ogre3d.RTShaderCache");
+    mShaderGenerator->setShaderCachePath(mFSLayer->getWritablePath("org.ogre3d.RTShaderCache/"));
 #else
     mShaderGenerator->setShaderCachePath(mRTShaderLibPath+"/cache/");
 #endif

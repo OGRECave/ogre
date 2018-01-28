@@ -36,7 +36,6 @@ THE SOFTWARE.
 #import "OgreOSXCocoaWindow.h"
 #import "OgreGLUtil.h"
 
-#import "macUtils.h"
 #import <dlfcn.h>
 
 #import <OpenGL/OpenGL.h>
