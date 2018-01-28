@@ -141,10 +141,11 @@ namespace Ogre
 #if !OGRE_NO_JSON
 		/// @copydoc Hlms::_loadJson
         virtual void _loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
-                                HlmsDatablock *datablock,
+                                HlmsDatablock *datablock, HlmsJsonListener *listener,
                                 const String &additionalTextureExtension ) const;
 		/// @copydoc Hlms::_saveJson
         virtual void _saveJson( const HlmsDatablock *datablock, String &outString,
+                                HlmsJsonListener *listener,
                                 const String &additionalTextureExtension ) const;
 
 		/// @copydoc Hlms::_collectSamplerblocks

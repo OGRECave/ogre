@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreSceneFormatPrerequisites.h"
 #include "OgreLight.h"
+#include "OgreHlmsJson.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -101,7 +102,7 @@ namespace Ogre
     /** Override this listener if you want to filter which objects get exported.
         See DefaultSceneFormatListener
     */
-    class _OgreSceneFormatExport SceneFormatListener
+    class _OgreSceneFormatExport SceneFormatListener : public HlmsJsonListener
     {
     public:
         virtual void setSceneFlags( uint32 sceneFlags, SceneFormatBase *parent )    {}

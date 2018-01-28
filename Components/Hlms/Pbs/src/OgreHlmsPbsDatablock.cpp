@@ -1255,6 +1255,10 @@ namespace Ogre
                         }
                         catch( Exception &e )
                         {
+                            LogManager::getSingleton().logMessage(
+                                        "WARNING: Could not find texture file " + finalName +
+                                        " for copying to export location. Error: " +
+                                        e.getFullDescription() );
                         }
 
                         if( inFile )
