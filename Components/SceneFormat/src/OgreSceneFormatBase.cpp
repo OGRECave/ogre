@@ -146,9 +146,6 @@ namespace Ogre
         if( !(mSceneFlags & allObjsMask) )
             return false; //Nothing is being exported, this node has no need (early out)
 
-        if( (mSceneFlags & allObjsMask) == allObjsMask )
-            return true; //Everything is being exported. No need to keep digging (early out)
-
         if( mParallaxCorrectedCubemap )
         {
             SceneNode * const *proxySceneNodes = mParallaxCorrectedCubemap->getProxySceneNodes();
@@ -161,6 +158,9 @@ namespace Ogre
                 }
             }
         }
+
+        if( (mSceneFlags & allObjsMask) == allObjsMask )
+            return true; //Everything is being exported. No need to keep digging (early out)
 
         return hasNoAttachedObjectsOfType( sceneNode );
     }
