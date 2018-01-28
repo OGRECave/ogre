@@ -58,6 +58,14 @@ namespace Ogre
     /** \addtogroup Resources
     *  @{
     */
+
+    class _OgreExport HlmsJsonListener
+    {
+    public:
+        /// Gives you a chance to completely change the name of the texture when saving a material
+        virtual void savingChangeTextureName( String &inOutTexName ) {}
+    };
+
     /** HLMS stands for "High Level Material System". */
     class _OgreExport HlmsJson : public HlmsAlloc
     {
@@ -71,6 +79,7 @@ namespace Ogre
 
     protected:
         HlmsManager *mHlmsManager;
+        HlmsJsonListener    *mListener;
 
     public:
         static FilterOptions parseFilterOptions( const char *value );
@@ -119,7 +128,7 @@ namespace Ogre
                             const String &additionalTextureExtension );
 
     public:
-        HlmsJson( HlmsManager *hlmsManager );
+        HlmsJson( HlmsManager *hlmsManager, HlmsJsonListener *listener );
         ~HlmsJson();
 
         /** Loads all Hlms datablocks from a JSON formatted string.

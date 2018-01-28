@@ -58,8 +58,10 @@ namespace Ogre
         "Fade"
     };
 
-    HlmsJsonPbs::HlmsJsonPbs( HlmsManager *hlmsManager, const String &additionalExtension ) :
+    HlmsJsonPbs::HlmsJsonPbs( HlmsManager *hlmsManager, HlmsJsonListener *listener,
+                              const String &additionalExtension ) :
         mHlmsManager( hlmsManager ),
+        mListener( listener ),
         mAdditionalExtension( additionalExtension )
     {
     }
@@ -693,8 +695,11 @@ namespace Ogre
 
                 if( texName )
                 {
+                    String finalTexName = *texName;
+                    mListener->savingChangeTextureName( finalTexName );
+
                     outString += ",\n\t\t\t\t\"texture\" : \"";
-                    outString += (*texName) + mAdditionalExtension;
+                    outString += finalTexName + mAdditionalExtension;
                     outString += '"';
                 }
             }

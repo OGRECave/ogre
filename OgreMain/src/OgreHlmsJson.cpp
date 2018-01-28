@@ -43,6 +43,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    static HlmsJsonListener sDefaultHlmsJsonListener;
+
     const char* c_filterOptions[FO_ANISOTROPIC+1] =
     {
         "none",
@@ -111,9 +113,12 @@ namespace Ogre
         "max"
     };
 
-    HlmsJson::HlmsJson( HlmsManager *hlmsManager ) :
-        mHlmsManager( hlmsManager )
+    HlmsJson::HlmsJson( HlmsManager *hlmsManager, HlmsJsonListener *listener ) :
+        mHlmsManager( hlmsManager ),
+        mListener( listener )
     {
+        if( !mListener )
+            mListener = &sDefaultHlmsJsonListener;
     }
     //-----------------------------------------------------------------------------------
     HlmsJson::~HlmsJson()
@@ -492,7 +497,8 @@ namespace Ogre
                                                                       filename, resourceGroup );
                     loadDatablockCommon( itor->value, blocks, datablock );
 
-                    hlms->_loadJson( itor->value, blocks, datablock, additionalTextureExtension );
+                    hlms->_loadJson( itor->value, blocks, datablock, mListener,
+                                     additionalTextureExtension );
                 }
                 catch( Exception &e )
                 {
@@ -955,7 +961,7 @@ namespace Ogre
         outString += StringConverter::toString( datablock->mShadowConstantBias );
 
         const Hlms *hlms = datablock->getCreator();
-        hlms->_saveJson( datablock, outString, additionalTextureExtension );
+        hlms->_saveJson( datablock, outString, mListener, additionalTextureExtension );
 
         outString += "\n\t\t},";
     }

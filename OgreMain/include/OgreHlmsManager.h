@@ -45,6 +45,8 @@ namespace Ogre
     *  @{
     */
 
+    class HlmsJsonListener;
+
 #define OGRE_HLMS_NUM_MACROBLOCKS 32
 #define OGRE_HLMS_NUM_BLENDBLOCKS 32
 #define OGRE_HLMS_NUM_SAMPLERBLOCKS 64
@@ -103,7 +105,8 @@ namespace Ogre
 
     public:
         typedef map<String, String>::type ResourceToTexExtensionMap;
-        ResourceToTexExtensionMap mAdditionalTextureExtensionsPerGroup;
+        ResourceToTexExtensionMap   mAdditionalTextureExtensionsPerGroup;
+        HlmsJsonListener            *mJsonListener;
     protected:
 #endif
 
@@ -278,6 +281,7 @@ namespace Ogre
         @param groupName
         */
         void loadMaterials( const String &filename, const String &groupName,
+                            HlmsJsonListener *listener,
                             const String &additionalTextureExtension );
 
         /** Saves all materials of the registered Hlms at the given file location.
@@ -287,6 +291,7 @@ namespace Ogre
             Valid file path.
         */
         void saveMaterials( HlmsTypes hlmsType,const String &filename,
+                            HlmsJsonListener *listener,
                             const String &additionalTextureExtension );
 
         /** Saves a specific Hlms material at the given file location.
@@ -296,6 +301,7 @@ namespace Ogre
             Valid file path.
         */
         void saveMaterial( const HlmsDatablock *datablock, const String &filename,
+                           HlmsJsonListener *listener,
                            const String &additionalTextureExtension );
 
         //ScriptLoader overloads
