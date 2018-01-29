@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#ifdef __MINGW32__
 #include <stdint.h>
 
 // Define some symbols referred to by MSVC libs. Not having these symbols
@@ -49,3 +50,4 @@ extern "C" {
     {
     }
 }
+#endif

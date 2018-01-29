@@ -45,26 +45,7 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
 if (EMSCRIPTEN)
   set(PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp")
 elseif (WIN32)
-  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/WIN32")
-  set(PLATFORM_HEADER_INSTALL "WIN32")
-
-  if (WINDOWS_STORE OR WINDOWS_PHONE)
-    set(PLATFORM_SOURCE_FILES
-      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
-      src/WIN32/OgreFileSystemLayer.cpp
-    )
-  else ()
-    set(PLATFORM_HEADERS
-      include/WIN32/OgreMinGWSupport.h
-    )
-    
-    set(PLATFORM_SOURCE_FILES
-      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
-      src/WIN32/OgreFileSystemLayer.cpp
-    )  
-
-  endif ()
-
+  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/*.cpp")
 elseif (APPLE)
   if (APPLE_IOS)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/iOS")

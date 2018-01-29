@@ -12,11 +12,6 @@
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-if (MINGW)
-  list(APPEND HEADER_FILES ${OGRE_SOURCE_DIR}/OgreMain/include/WIN32/OgreMinGWSupport.h)
-  list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/OgreMinGWSupport.cpp)
-endif ()
-
 if (OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${DirectX9_INCLUDE_DIR} ${AMDQBS_INCLUDE_DIR} ${NVAPI_INCLUDE_DIR})
   link_directories(${DirectX9_LIBRARY_DIR} ${NVAPI_LIBRARY_DIR})  
