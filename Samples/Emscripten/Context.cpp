@@ -56,10 +56,7 @@ void Context::_mainLoop(void* target)
 	else
     {
 	    try
-	    {
-            //Pump messages in all registered RenderWindow windows
-            Ogre::WindowEventUtilities::messagePump();
-            
+	    {            
             if (!thizz->mRoot->renderOneFrame())
             {
                 emscripten_cancel_main_loop();

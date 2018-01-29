@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreD3D11RenderWindow.h"
 #include "OgreException.h"
 #include "OgreD3D11RenderSystem.h"
-#include "OgreWindowEventUtilities.h"
 #include "OgreD3D11Driver.h"
 #include "OgreRoot.h"
 #include "OgreD3D11DepthBuffer.h"
@@ -842,14 +841,13 @@ namespace Ogre
 			static const TCHAR staticVar;
 			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
 
-			WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
+			WNDCLASS wc = { classStyle, DefWindowProc, 0, 0, hInst,
 				LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
 				(HBRUSH)GetStockObject(BLACK_BRUSH), 0, OGRE_D3D11_WIN_CLASS_NAME };
 			RegisterClass(&wc);
 			mIsExternal = false;
 			mHWnd = CreateWindowEx(dwStyleEx, OGRE_D3D11_WIN_CLASS_NAME, title.c_str(), getWindowStyle(fullScreen),
 				mLeft, mTop, winWidth, winHeight, parentHWnd, 0, hInst, this);
-			WindowEventUtilities::_addRenderWindow(this);
 		}
 		else
 		{
@@ -888,7 +886,6 @@ namespace Ogre
 
         if (mHWnd && !mIsExternal)
         {
-            WindowEventUtilities::_removeRenderWindow(this);
             DestroyWindow(mHWnd);
         }
 

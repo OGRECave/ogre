@@ -128,7 +128,6 @@ THE SOFTWARE.
 #include "OgreTimer.h"
 #include "OgreVector2.h"
 #include "OgreViewport.h"
-#include "OgreWindowEventUtilities.h"
 // .... more to come
 
 #endif

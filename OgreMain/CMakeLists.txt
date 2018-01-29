@@ -66,16 +66,9 @@ elseif(ANDROID)
 
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/*.cpp")
 elseif (UNIX)
-  include_directories(${X11_INCLUDE_DIR})
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp")
 
-  set(PLATFORM_LIBS ${X11_LIBRARIES} pthread)
-  # some platforms require explicit linking to libdl, see if it's available
-  find_library(DL_LIBRARY NAMES dl dlsym)
-  mark_as_advanced(DL_LIBRARY)
-  if (DL_LIBRARY)
-    list(APPEND PLATFORM_LIBS dl)
-  endif ()
+  set(PLATFORM_LIBS pthread)
 endif()
 
 if(NOT WIN32)
@@ -269,7 +262,7 @@ if (APPLE)
     set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
   endif()
 endif ()
-target_link_libraries(OgreMain ${LIBRARIES})
+target_link_libraries(OgreMain ${LIBRARIES} ${CMAKE_DL_LIBS})
 if (MINGW)
   # may need winsock htons functions for FreeImage
   target_link_libraries(OgreMain ws2_32)

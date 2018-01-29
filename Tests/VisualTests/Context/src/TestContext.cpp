@@ -36,9 +36,9 @@ THE SOFTWARE.
 
 #include <iostream>
 
-#ifdef WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
-#include "windows.h"
+#include <windows.h>
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
@@ -145,10 +145,6 @@ void TestContext::setup()
     loadResources();
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
     mRoot->addFrameListener(this);
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
-#endif
 
     // Get the path and list of test plugins from the config file.
     Ogre::ConfigFile testConfig;

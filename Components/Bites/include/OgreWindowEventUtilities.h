@@ -29,35 +29,23 @@ THE SOFTWARE.
 #define __OgreWindowEventUtils_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreBitesPrerequisites.h"
 #include "OgrePlatform.h"
 #include "OgreCommon.h"
 #include "OgreHeaderPrefix.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#  if !defined(WIN32_LEAN_AND_MEAN)
-#   define WIN32_LEAN_AND_MEAN
-#  endif
-#  if !defined(NOMINMAX) && defined(_MSC_VER)
-#   define NOMINMAX // required to stop windows.h messing up std::min
-#  endif
-#  include <windows.h>
-#endif
-
-
-
-namespace Ogre
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup Bites
+*  @{
+*/
+namespace OgreBites
 {
-    /** \addtogroup Core
-    *  @{
-    */
-    /** \addtogroup RenderSystem
-    *  @{
-    */
     /**
-    @remarks
         Callback class used to send out window events to client app
     */
-    class _OgreExport WindowEventListener
+    class _OgreBitesExport WindowEventListener
     {
     public:
         virtual ~WindowEventListener() {}
@@ -68,8 +56,7 @@ namespace Ogre
         @param rw
             The RenderWindow which created this events
         */
-        virtual void windowMoved(RenderWindow* rw)
-                { (void)rw; }
+        virtual void windowMoved(Ogre::RenderWindow* rw) { (void)rw; }
 
         /**
         @remarks
@@ -77,8 +64,7 @@ namespace Ogre
         @param rw
             The RenderWindow which created this events
         */
-        virtual void windowResized(RenderWindow* rw)
-                { (void)rw; }
+        virtual void windowResized(Ogre::RenderWindow* rw) { (void)rw; }
 
         /**
         @remarks
@@ -87,8 +73,7 @@ namespace Ogre
             The RenderWindow which created this events
         @return True will close the window(default).
         */
-        virtual bool windowClosing(RenderWindow* rw)
-        { (void)rw; return true; }
+        virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }
 
         /**
         @remarks
@@ -100,8 +85,7 @@ namespace Ogre
             all windowClosed events are triggered. This allows apps to deinitialise properly if they
             have services that needs the window to exist when deinitialising.
         */
-        virtual void windowClosed(RenderWindow* rw)
-                { (void)rw; }
+        virtual void windowClosed(Ogre::RenderWindow* rw) { (void)rw; }
 
         /**
         @remarks
@@ -109,21 +93,21 @@ namespace Ogre
         @param rw
             The RenderWindow which created this events
         */
-        virtual void windowFocusChange(RenderWindow* rw)
-                { (void)rw; }
+        virtual void windowFocusChange(Ogre::RenderWindow* rw) { (void)rw; }
     };
 
     /**
-    @remarks
-        Utility class to handle Window Events/Pumping/Messages
+        Utility class to handle Window Messages
+
+        This only provides a minimal implementation for moving/ resizing windows.
+        For input handling and proper platform integration rather use SDL2/ Qt/ whatever.
+        @see ApplicationContext
     */
-    class _OgreExport WindowEventUtilities
+    class _OgreBitesExport WindowEventUtilities
     {
     public:
         /**
-        @remarks
-            Call this once per frame if not using Root:startRendering(). This will update all registered
-            RenderWindows (If using external Windows, you can optionally register those yourself)
+            Call this once per frame. This will update all registered RenderWindows.
         */
         static void messagePump();
 
@@ -137,7 +121,7 @@ namespace Ogre
         @param listener
             Your callback listener
         */
-        static void addWindowEventListener( RenderWindow* window, WindowEventListener* listener );
+        static void addWindowEventListener( Ogre::RenderWindow* window, WindowEventListener* listener );
 
         /**
         @remarks
@@ -147,39 +131,28 @@ namespace Ogre
         @param listener
             The listener registered
         */
-        static void removeWindowEventListener( RenderWindow* window, WindowEventListener* listener );
+        static void removeWindowEventListener( Ogre::RenderWindow* window, WindowEventListener* listener );
 
         /**
         @remarks
-            Called by RenderWindows upon creation for Ogre generated windows. You are free to add your
+            Call upon creation of Ogre windows. You are free to add your
             external windows here too if needed.
         @param window
             The RenderWindow to monitor
         */
-        static void _addRenderWindow(RenderWindow* window);
+        static void _addRenderWindow(Ogre::RenderWindow* window);
 
         /**
         @remarks
-            Called by RenderWindows upon creation for Ogre generated windows. You are free to add your
-            external windows here too if needed.
+            Called upon deletion of previously registered windows.
         @param window
             The RenderWindow to remove from list
         */
-        static void _removeRenderWindow(RenderWindow* window);
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        //! Internal winProc (RenderWindow's use this when creating the Win32 Window)
-        static LRESULT CALLBACK _WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-#endif
-
-        //These are public only so GLXProc can access them without adding Xlib headers header
-        typedef multimap<RenderWindow*, WindowEventListener*>::type WindowEventListeners;
-        static WindowEventListeners _msListeners;
-        static RenderWindowList _msWindows;
+        static void _removeRenderWindow(Ogre::RenderWindow* window);
     };
-    /** @} */
-    /** @} */
 }
+/** @} */
+/** @} */
 
 #include "OgreHeaderSuffix.h"
 

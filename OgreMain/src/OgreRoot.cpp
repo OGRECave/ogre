@@ -66,7 +66,6 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreExternalTextureSourceManager.h"
 #include "OgreCompositorManager.h"
-#include "OgreWindowEventUtilities.h"
 
 #if OGRE_NO_PVRTC_CODEC == 0
 #  include "OgrePVRTCCodec.h"
@@ -943,9 +942,6 @@ namespace Ogre {
 
         while( !mQueuedEnd )
         {
-            //Pump messages in all registered RenderWindow windows
-            WindowEventUtilities::messagePump();
-
             if (!renderOneFrame())
                 break;
         }

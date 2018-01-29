@@ -85,7 +85,8 @@ set(SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreCameraMan.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSGTechniqueResolverListener.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStaticPluginLoader.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTrays.cpp")
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTrays.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreWindowEventUtilities.cpp")
 
 if(ANDROID OR EMSCRIPTEN OR APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE)
   # no config dialog available

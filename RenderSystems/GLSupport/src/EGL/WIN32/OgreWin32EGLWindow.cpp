@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreWindowEventUtilities.h"
 
 #include "OgreViewport.h"
 
@@ -200,7 +199,7 @@ namespace Ogre {
             }
 
             // register class and create window
-            WNDCLASS wc = { CS_OWNDC, WindowEventUtilities::_WndProc, 0, 0, hInst,
+            WNDCLASS wc = { CS_OWNDC, NULL, 0, 0, hInst,
                 LoadIcon(NULL, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
                 (HBRUSH)GetStockObject(BLACK_BRUSH), NULL, "OgreGLES2Window" };
             RegisterClass(&wc);
@@ -234,8 +233,6 @@ namespace Ogre {
             // Pass pointer to self as WM_CREATE parameter
             mWindow = CreateWindowEx(dwStyleEx, "OgreGLES2Window", title.c_str(),
                 dwStyle, mLeft, mTop, mWidth, mHeight, parent, 0, hInst, this);
-
-            WindowEventUtilities::_addRenderWindow(this);
 
             LogManager::getSingleton().stream()
                 << "Created Win32Window '"

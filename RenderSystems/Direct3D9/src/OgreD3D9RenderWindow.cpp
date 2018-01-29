@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreImageCodec.h"
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
-#include "OgreWindowEventUtilities.h"
 #include "OgreD3D9DeviceManager.h"
 #include "OgreDepthBuffer.h"
 
@@ -334,7 +333,7 @@ namespace Ogre
 
             // Register the window class
             // NB allow 4 bytes of window data for D3D9RenderWindow pointer
-            WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
+            WNDCLASS wc = { classStyle, DefWindowProc, 0, 0, hInst,
                 LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
                 (HBRUSH)GetStockObject(BLACK_BRUSH), 0, "OgreD3D9Wnd" };
             RegisterClass(&wc);
@@ -344,8 +343,6 @@ namespace Ogre
             mIsExternal = false;
             mHWnd = CreateWindowEx(dwStyleEx, "OgreD3D9Wnd", title.c_str(), getWindowStyle(fullScreen),
                 mLeft, mTop, winWidth, winHeight, parentHWnd, 0, hInst, this);
-
-            WindowEventUtilities::_addRenderWindow(this);
         }
         else
         {
@@ -665,7 +662,6 @@ namespace Ogre
         
         if (mHWnd && !mIsExternal)
         {
-            WindowEventUtilities::_removeRenderWindow(this);
             DestroyWindow(mHWnd);
         }
 

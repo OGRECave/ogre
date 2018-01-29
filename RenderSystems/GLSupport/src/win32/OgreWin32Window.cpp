@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreWin32GLSupport.h"
 #include "OgreWin32Context.h"
-#include "OgreWindowEventUtilities.h"
+
 #include "OgreDepthBuffer.h"
 
 #include "OgreGLRenderSystemCommon.h"
@@ -380,7 +380,7 @@ namespace Ogre {
                 classStyle |= CS_DBLCLKS;
 
             // register class and create window
-            WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
+            WNDCLASS wc = { classStyle, NULL, 0, 0, hInst,
                 LoadIcon(NULL, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
                 (HBRUSH)GetStockObject(BLACK_BRUSH), NULL, "OgreGLWindow" };
             RegisterClass(&wc);
@@ -413,8 +413,6 @@ namespace Ogre {
             // Pass pointer to self as WM_CREATE parameter
             mHWnd = CreateWindowEx(dwStyleEx, "OgreGLWindow", title.c_str(),
                 getWindowStyle(fullScreen), mLeft, mTop, mWidth, mHeight, parent, 0, hInst, this);
-
-            WindowEventUtilities::_addRenderWindow(this);
 
             LogManager::getSingleton().stream()
                 << "Created Win32Window '"
@@ -675,8 +673,6 @@ namespace Ogre {
         }
         if (!mIsExternal)
         {
-            WindowEventUtilities::_removeRenderWindow(this);
-
             if (mIsFullScreen)
                 ChangeDisplaySettingsEx(mDeviceName, NULL, NULL, 0, NULL);
             DestroyWindow(mHWnd);

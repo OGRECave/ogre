@@ -75,7 +75,6 @@ JNIEnv* OgreJNIGetEnv();
 
 %include "OgreApplicationContext.h"
 %include "OgreCameraMan.h"
-%include "OgreWindowEventUtilities.h"
 // deprecated
 %ignore OgreBites::TrayManager::getWidget(TrayLocation, unsigned int);
 %ignore OgreBites::TrayManager::getNumWidgets(TrayLocation);
