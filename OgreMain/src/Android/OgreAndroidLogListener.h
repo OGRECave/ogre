@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -26,26 +26,19 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include <stdint.h>
+#ifndef __AndroidLogListener_H__
+#define __AndroidLogListener_H__
 
-// Define some symbols referred to by MSVC libs. Not having these symbols
-// may cause linking errors when linking against the DX SDK.
+#include "OgreLog.h"
 
-extern "C" {
-    // MSVC libs use _chkstk for stack-probing. MinGW equivalent is _alloca.
-    // But calling it to ensure Ogre build with D3D9 static does cause a crash.
-    // Might have to investige further here, later.
-    //void _alloca();
-    void _chkstk()
-    {
-        //_alloca();
-    }
+namespace Ogre
+{
     
-    // MSVC uses security cookies to prevent some buffer overflow attacks.
-    // provide dummy implementations.
-    intptr_t __security_cookie;
-    
-    void _fastcall __security_check_cookie(intptr_t i)
+    class AndroidLogListener : public LogListener, public LogAlloc
     {
-    }
+    public:
+        void messageLogged(const String& message, LogMessageLevel lml, bool maskDebug, const String &logName, bool& skipThisMessage );
+    };
 }
+
+#endif

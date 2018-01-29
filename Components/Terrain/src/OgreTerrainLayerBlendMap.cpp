@@ -74,7 +74,7 @@ namespace Ogre
         float* pDst = mData;
         // Download data
         Box box(0, 0, mBuffer->getWidth(), mBuffer->getHeight());
-        uint8* pSrc = static_cast<uint8*>(mBuffer->lock(box, HardwareBuffer::HBL_READ_ONLY).data);
+        uint8* pSrc = mBuffer->lock(box, HardwareBuffer::HBL_READ_ONLY).data;
         pSrc += mChannelOffset;
         size_t srcInc = PixelUtil::getNumElemBytes(mBuffer->getFormat());
         for (size_t y = box.top; y < box.bottom; ++y)
@@ -176,7 +176,7 @@ namespace Ogre
         {
             // Upload data
             float* pSrcBase = mData + mDirtyBox.top * mBuffer->getWidth() + mDirtyBox.left;
-            uint8* pDstBase = static_cast<uint8*>(mBuffer->lock(mDirtyBox, HardwarePixelBuffer::HBL_NORMAL).data);
+            uint8* pDstBase = mBuffer->lock(mDirtyBox, HardwarePixelBuffer::HBL_NORMAL).data;
             pDstBase += mChannelOffset;
             size_t dstInc = PixelUtil::getNumElemBytes(mBuffer->getFormat());
             for (size_t y = 0; y < mDirtyBox.getHeight(); ++y)

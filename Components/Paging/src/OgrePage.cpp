@@ -37,11 +37,8 @@ THE SOFTWARE.
 #include "OgrePageContentCollectionFactory.h"
 #include "OgrePageContentCollection.h"
 #include "OgreLogManager.h"
+#include "OgreFileSystemLayer.h"
 #include <iomanip>
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    #include "macUtils.h"
-#endif
 
 namespace Ogre
 {
@@ -457,9 +454,9 @@ namespace Ogre
         str    << std::setw(8) << std::setfill('0') << std::hex << mID << ".page";
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        static FileSystemLayer fs("");
         // For the iOS we need to prefix the file name with the path to the Caches folder
-        String cacheStr(Ogre::macCachePath() + str.str());
-        return cacheStr;
+        return fs.getWritablePath(str.str());
 #else
         return str.str();
 #endif

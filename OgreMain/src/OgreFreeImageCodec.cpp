@@ -298,7 +298,7 @@ namespace Ogre {
             // perform conversion and reassign source
             PixelBox newSrc(pImgData->width, pImgData->height, 1, pImgData->format, input->getPtr());
             PixelUtil::bulkPixelConversion(newSrc, convBox);
-            srcData = static_cast<unsigned char*>(convBox.data);
+            srcData = convBox.data;
         }
 
 

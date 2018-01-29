@@ -101,7 +101,7 @@ namespace Ogre {
             const NameValuePairList* params,
             HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
+            bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
         /** Prepares a mesh for loading from a file.  This does the IO in advance of the call to load().
             @note
@@ -127,7 +127,7 @@ namespace Ogre {
         MeshPtr prepare( const String& filename, const String& groupName,
             HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
+            bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
         /** Loads a mesh from a file, making it immediately available for use.
             @note
@@ -153,7 +153,7 @@ namespace Ogre {
         MeshPtr load( const String& filename, const String& groupName,
             HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
+            bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
 
         /** Creates a new Mesh specifically for manual definition rather

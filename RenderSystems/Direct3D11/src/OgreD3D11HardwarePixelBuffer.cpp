@@ -193,14 +193,14 @@ namespace Ogre {
         else
         {
             mDataForStaticUsageLock.resize(rval.getConsecutiveSize());
-            rval.data = mDataForStaticUsageLock.data();
+            rval.data = (uchar*)mDataForStaticUsageLock.data();
         }
         // save without offset
         mCurrentLock = rval;
         mCurrentLockOptions = options;
 
         // add the offset, so the right memory will be changed
-		rval.data = static_cast<int*>(rval.data) + offset;	// TODO: why offsetInBytes is added to (int*) pointer ???
+		rval.data = (uchar*)((int*)rval.data + offset);	// TODO: why offsetInBytes is added to (int*) pointer ???
 
         return rval;
     }

@@ -143,14 +143,12 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    uint32 StreamSerialiser::makeIdentifier(const String& code)
+    uint32 StreamSerialiser::makeIdentifier(const char (&code)[5])
     {
-        assert(code.length() <= 4 && "Characters after the 4th are being ignored");
         uint32 ret = 0;
-        size_t c = std::min((size_t)4, code.length());
-        for (size_t i = 0; i < c; ++i)
+        for (size_t i = 0; i < 4; ++i)
         {
-            ret += (code.at(i) << (i * 8));
+            ret += (code[i] << (i * 8));
         }
         return ret;
 

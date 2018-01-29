@@ -17,10 +17,7 @@ PROJECT(OgreMain)
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES
     ${CMAKE_BINARY_DIR}/include/OgreBuildSettings.h
-    ${CMAKE_BINARY_DIR}/include/OgreExports.h
-    src/OgreImageResampler.h
-    src/OgrePixelConversions.h
-    src/OgreSIMDHelper.h)
+    ${CMAKE_BINARY_DIR}/include/OgreExports.h)
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
@@ -40,84 +37,37 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePVRTCCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreETCCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreZip.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp"
 )
 
 # Add platform specific files
 if (EMSCRIPTEN)
-  list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
-  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten")
-
-  file(GLOB PLATFORM_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten/*.h)
-  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Emscripten/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp")
-
-  set(PLATFORM_HEADER_INSTALL "Emscripten")
+  set(PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp")
 elseif (WIN32)
-  list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
-  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/WIN32")
-  set(PLATFORM_HEADER_INSTALL "WIN32")
-
-  if (WINDOWS_STORE OR WINDOWS_PHONE)
-    set(PLATFORM_HEADERS
-      include/WIN32/OgreTimerImp.h
-    )
-    set(PLATFORM_SOURCE_FILES
-      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
-      src/WIN32/OgreFileSystemLayer.cpp
-      src/WIN32/OgreTimer.cpp
-    )
-  else ()
-    set(PLATFORM_HEADERS
-      include/WIN32/OgreTimerImp.h
-      include/WIN32/OgreMinGWSupport.h
-      include/WIN32/OgreComPtr.h
-    )
-    
-    set(PLATFORM_SOURCE_FILES
-      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
-      src/WIN32/OgreFileSystemLayer.cpp
-      src/WIN32/OgreTimer.cpp
-    )  
-
-  endif ()
-
+  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/*.cpp")
 elseif (APPLE)
   if (APPLE_IOS)
-    set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS")
-    file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS/*.h")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/iOS")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.mm"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.mm")
 
     set(PLATFORM_LIBS "")
-    set(PLATFORM_HEADER_INSTALL "iOS")
   else ()
-    set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX")
-    file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX/*.h")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/OSX")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
     )
     set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
-    set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
 elseif(ANDROID)
   # required by OgrePlatformInformation.cpp
   include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
 
-  file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/Android/*.h")
-  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
-
-  set(PLATFORM_HEADER_INSTALL "Android")
+  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/*.cpp")
 elseif (UNIX)
   include_directories(${X11_INCLUDE_DIR})
-  set(PLATFORM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/GLX")
-  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
+  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp")
 
   set(PLATFORM_LIBS ${X11_LIBRARIES} pthread)
   # some platforms require explicit linking to libdl, see if it's available
@@ -299,21 +249,10 @@ if (APPLE)
           COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
           COMMAND ditto
           ${OGRE_SOURCE_DIR}/OgreMain/include/Threading/*.h ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
-          COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/OSX
-          COMMAND ditto
-          ${OGRE_SOURCE_DIR}/OgreMain/include/OSX/*.h ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/OSX
           COMMAND cd ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers
           )
 
       foreach(HEADER_PATH ${THREAD_HEADER_FILES})
-          get_filename_component(HEADER_FILE ${HEADER_PATH} NAME)
-          set(FWK_HEADER_PATH ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/${HEADER_FILE})
-          add_custom_command(TARGET OgreMain POST_BUILD
-              COMMAND rm -f ${FWK_HEADER_PATH}
-              )
-      endforeach()
-
-      foreach(HEADER_PATH ${PLATFORM_HEADERS})
           get_filename_component(HEADER_FILE ${HEADER_PATH} NAME)
           set(FWK_HEADER_PATH ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/${HEADER_FILE})
           add_custom_command(TARGET OgreMain POST_BUILD

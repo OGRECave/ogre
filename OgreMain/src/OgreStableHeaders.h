@@ -97,6 +97,7 @@ THE SOFTWARE.
 #include "OgreSubMesh.h"
 #include "OgreTechnique.h"
 #include "OgreTextureManager.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreUserObjectBindings.h"
 #include "OgreVector2.h"
 #include "OgreVector3.h"

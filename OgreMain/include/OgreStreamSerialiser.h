@@ -141,9 +141,9 @@ namespace Ogre
         @remarks
             You can use this to generate id's for your chunks based on friendlier
             4-character codes rather than assigning numerical IDs, if you like.
-        @param code String to pack - must be 4 characters.
+        @param code String to pack - must be 4 characters and '\0'
         */
-        static uint32 makeIdentifier(const String& code);
+        static uint32 makeIdentifier(const char (&code)[5]);
 
         /** Report the current depth of the chunk nesting, whether reading or writing. 
         @remarks

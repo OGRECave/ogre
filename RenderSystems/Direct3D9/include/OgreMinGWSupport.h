@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -25,29 +25,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __Win32MinGWSupport_H__
+#define __Win32MinGWSupport_H__
 
-#ifndef __APKZipArchive_H__
-#define __APKZipArchive_H__
+// This header provides a compatibility layer for some MSVC symbols
+// for MinGW. They may be needed when using MSVC libraries, most
+// notably the DirectX SDK.
 
-#include <OgreZip.h>
+#ifdef __MINGW32__
+#include <stdint.h>
 
-struct AAssetManager;
+// define a number of symbols MSVC uses for annotation.
+#include <specstrings.h>
+#define __in_z
+#define __in_z_opt
+#ifdef __MINGW64_VERSION_MAJOR
+#   define __in
+#endif
+#define UINT8 uint8_t
+#define WINAPI_INLINE inline
+#ifndef __uuidof(Object)
+#   define __uuidof(Object) IID_##Object
+#endif
 
-namespace Ogre{
-    class APKZipArchiveFactory : public EmbeddedZipArchiveFactory
-    {
-    protected:
-        AAssetManager* mAssetMgr;
-    public:
-        APKZipArchiveFactory(AAssetManager* assetMgr) : mAssetMgr(assetMgr) {}
-        virtual ~APKZipArchiveFactory() {}
+#endif
 
-        /// @copydoc FactoryObj::getType
-        const String& getType(void) const;
-
-        /// @copydoc ArchiveFactory::createInstance
-        Archive *createInstance( const String& name, bool readOnly );
-    };
-}
 
 #endif

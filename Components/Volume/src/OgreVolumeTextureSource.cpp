@@ -84,7 +84,7 @@ namespace Volume {
         HardwarePixelBufferSharedPtr buffer = tex->getBuffer(0, 0);
         buffer->lock(HardwareBuffer::HBL_READ_ONLY);
         const PixelBox &pb = buffer->getCurrentLock();
-        float *pbptr = static_cast<float*>(pb.data);
+        float *pbptr = reinterpret_cast<float*>(pb.data);
         mData = OGRE_ALLOC_T(float, mWidth * mHeight * mDepth, MEMCATEGORY_GENERAL);
         float * dataRunner = mData;
         ColourValue cv;

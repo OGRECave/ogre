@@ -27,7 +27,7 @@ TexturePtr RandomTools::generateRandomVelocityTexture()
     pixelBuf->lock(HardwareBuffer::HBL_DISCARD);
     const PixelBox &pb = pixelBuf->getCurrentLock();
     
-    float *randomData = static_cast<float*>(pb.data);
+    float *randomData = reinterpret_cast<float*>(pb.data);
     // float randomData[NUM_RAND_VALUES * 4];
     for(int i = 0; i < NUM_RAND_VALUES * 4; i++)
     {

@@ -346,7 +346,7 @@ namespace Ogre {
             @param pixelData    Pointer to the actual data
         */
         PixelBox(const Box &extents, PixelFormat pixelFormat, void *pixelData=0):
-            Box(extents), data(pixelData), format(pixelFormat)
+            Box(extents), data((uchar*)pixelData), format(pixelFormat)
         {
             setConsecutive();
         }
@@ -361,13 +361,13 @@ namespace Ogre {
         */
         PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat pixelFormat, void *pixelData=0):
             Box(0, 0, 0, width, height, depth),
-            data(pixelData), format(pixelFormat)
+            data((uchar*)pixelData), format(pixelFormat)
         {
             setConsecutive();
         }
         
         /// The data pointer 
-        void *data;
+        uchar* data;
         /// The pixel format 
         PixelFormat format;
         /** Number of elements between the leftmost pixel of one row and the left
@@ -428,7 +428,7 @@ namespace Ogre {
         /** Return a data pointer pointing to top left front pixel of the pixel box.
             @remarks Non consecutive pixel boxes are supported.
          */
-        void* getTopLeftFrontPixelPtr() const;
+        uchar* getTopLeftFrontPixelPtr() const;
         
         /**
          * Get colour value from a certain location in the PixelBox. The z coordinate

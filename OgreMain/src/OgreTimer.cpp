@@ -26,10 +26,10 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreTimer.h"
-#include <emscripten/emscripten.h>
-#include <ctime>
 
-using namespace Ogre;
+using namespace std::chrono;
+
+namespace Ogre {
 
 //--------------------------------------------------------------------------------//
 Timer::Timer()
@@ -38,27 +38,24 @@ Timer::Timer()
 }
 
 //--------------------------------------------------------------------------------//
-Timer::~Timer()
-{
-}
-
-//--------------------------------------------------------------------------------//
 void Timer::reset()
 {
     zeroClock = clock();
-    start = emscripten_get_now();
+    start = steady_clock::now();
 }
 
 //--------------------------------------------------------------------------------//
 unsigned long Timer::getMilliseconds()
 {
-    return emscripten_get_now() - start;
+    auto now = steady_clock::now();
+    return duration_cast<milliseconds>(now - start).count();
 }
 
 //--------------------------------------------------------------------------------//
 unsigned long Timer::getMicroseconds()
 {
-    return (emscripten_get_now() - start) * 1000.0;
+    auto now = steady_clock::now();
+    return duration_cast<microseconds>(now - start).count();
 }
 
 //-- Common Across All Timers ----------------------------------------------------//
@@ -73,4 +70,6 @@ unsigned long Timer::getMicrosecondsCPU()
 {
     clock_t newClock = clock();
     return (unsigned long)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000000.0)) ;
+}
+
 }

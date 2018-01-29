@@ -29,8 +29,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    Any UserObjectBindings::msEmptyAny;
-
     //--------------------------------------------------------------------------
     UserObjectBindings::UserObjectBindings() :
         mAttributes(NULL)
@@ -89,13 +87,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const Any& UserObjectBindings::getUserAny(const String& key) const
     {
+        static Any emptyAny;
+
         // Allocate attributes on demand.
         if (mAttributes == NULL)
             mAttributes = OGRE_NEW UserObjectBindings::Attributes;
 
         // Case map doesn't exists.
         if (mAttributes->mUserObjectsMap == NULL)
-            return msEmptyAny;
+            return emptyAny;
 
         UserObjectsMapConstIterator it = mAttributes->mUserObjectsMap->find(key);
 
@@ -105,7 +105,7 @@ namespace Ogre {
             return it->second;
         }
 
-        return msEmptyAny;
+        return emptyAny;
     }
 
     //-----------------------------------------------------------------------

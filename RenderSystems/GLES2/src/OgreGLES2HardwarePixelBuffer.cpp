@@ -408,7 +408,7 @@ namespace Ogre {
 
         PixelUtil::bulkPixelConversion(tempBox, data);
 
-        delete[] (uint8*) tempBox.data;
+        delete[] tempBox.data;
         tempBox.data = 0;
 
         // Restore defaults

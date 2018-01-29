@@ -518,7 +518,7 @@ namespace Ogre {
         liend = grp->locationList.end();
         for (li = grp->locationList.begin(); li != liend; ++li)
         {
-            Archive* pArch = (*li)->archive;
+            Archive* pArch = li->archive;
             if (pArch->getName() == name)
                 // Delete indexes
                 return true;
@@ -532,9 +532,8 @@ namespace Ogre {
         // Get archive
         Archive* pArch = ArchiveManager::getSingleton().load( name, locType, readOnly );
         // Add to location list
-        ResourceLocation* loc = OGRE_NEW_T(ResourceLocation, MEMCATEGORY_RESOURCE);
-        loc->archive = pArch;
-        loc->recursive = recursive;
+
+        ResourceLocation loc = {pArch, recursive};
         StringVectorPtr vec = pArch->find("*", recursive);
 
         ResourceGroup* grp = getResourceGroup(resGroup);
@@ -578,12 +577,10 @@ namespace Ogre {
         liend = grp->locationList.end();
         for (li = grp->locationList.begin(); li != liend; ++li)
         {
-            Archive* pArch = (*li)->archive;
+            Archive* pArch = li->archive;
             if (pArch->getName() == name)
             {
                 grp->removeFromIndex(pArch);
-                // Erase list entry
-                OGRE_DELETE_T(*li, ResourceLocation, MEMCATEGORY_RESOURCE);
                 grp->locationList.erase(li);
 
                 break;
@@ -702,7 +699,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    DataStreamListPtr ResourceGroupManager::openResources(
+    DataStreamList ResourceGroupManager::openResources(
         const String& pattern, const String& groupName) const
     {
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -717,16 +714,15 @@ namespace Ogre {
 
         // Iterate through all the archives and build up a combined list of
         // streams
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        DataStreamListPtr ret = DataStreamListPtr(OGRE_NEW_T(DataStreamList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        DataStreamList ret;
 
         LocationList::iterator li, liend;
         liend = grp->locationList.end();
         for (li = grp->locationList.begin(); li != liend; ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
             // Find all the names based on whether this archive is recursive
-            StringVectorPtr names = arch->find(pattern, (*li)->recursive);
+            StringVectorPtr names = arch->find(pattern, li->recursive);
 
             // Iterate over the names and load a stream for each
             for (StringVector::iterator ni = names->begin(); ni != names->end(); ++ni)
@@ -734,7 +730,7 @@ namespace Ogre {
                 DataStreamPtr ptr = arch->open(*ni);
                 if (ptr)
                 {
-                    ret->push_back(ptr);
+                    ret.push_back(ptr);
                 }
             }
         }
@@ -759,7 +755,7 @@ namespace Ogre {
         for (LocationList::iterator li = grp->locationList.begin(); 
             li != grp->locationList.end(); ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
@@ -801,7 +797,7 @@ namespace Ogre {
         for (LocationList::iterator li = grp->locationList.begin(); 
             li != grp->locationList.end(); ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
@@ -836,7 +832,7 @@ namespace Ogre {
         for (LocationList::iterator li = grp->locationList.begin(); 
             li != grp->locationList.end(); ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
@@ -959,10 +955,8 @@ namespace Ogre {
             "Parsing scripts for resource group " + grp->name);
 
         // Count up the number of scripts we have to parse
-        typedef list<FileInfoListPtr>::type FileListList;
-        typedef SharedPtr<FileListList> FileListListPtr;
-        typedef std::pair<ScriptLoader*, FileListListPtr> LoaderFileListPair;
-        typedef list<LoaderFileListPair>::type ScriptLoaderFileList;
+        typedef std::pair<ScriptLoader*, FileInfoList> LoaderFileListPair;
+        typedef vector<LoaderFileListPair>::type ScriptLoaderFileList;
         ScriptLoaderFileList scriptLoaderFileList;
         size_t scriptCount = 0;
         // Iterate over script users in loading order and get streams
@@ -971,19 +965,19 @@ namespace Ogre {
             oi != mScriptLoaderOrderMap.end(); ++oi)
         {
             ScriptLoader* su = oi->second;
-            // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-            FileListListPtr fileListList(OGRE_NEW_T(FileListList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+
+            scriptLoaderFileList.push_back(LoaderFileListPair(su, FileInfoList()));
 
             // Get all the patterns and search them
             const StringVector& patterns = su->getScriptPatterns();
             for (StringVector::const_iterator p = patterns.begin(); p != patterns.end(); ++p)
             {
                 FileInfoListPtr fileList = findResourceFileInfo(grp->name, *p);
-                scriptCount += fileList->size();
-                fileListList->push_back(fileList);
+                FileInfoList& lst = scriptLoaderFileList.back().second;
+                lst.insert(lst.end(), fileList->begin(), fileList->end());
             }
-            scriptLoaderFileList.push_back(
-                LoaderFileListPair(su, fileListList));
+
+            scriptCount += scriptLoaderFileList.back().second.size();
         }
         // Fire scripting event
         fireResourceGroupScriptingStarted(grp->name, scriptCount);
@@ -994,40 +988,36 @@ namespace Ogre {
             slfli != scriptLoaderFileList.end(); ++slfli)
         {
             ScriptLoader* su = slfli->first;
-            // Iterate over each list
-            for (FileListList::iterator flli = slfli->second->begin(); flli != slfli->second->end(); ++flli)
+            // Iterate over each item in the list
+            for (FileInfoList::iterator fii = slfli->second.begin(); fii != slfli->second.end(); ++fii)
             {
-                // Iterate over each item in the list
-                for (FileInfoList::iterator fii = (*flli)->begin(); fii != (*flli)->end(); ++fii)
+                bool skipScript = false;
+                fireScriptStarted(fii->filename, skipScript);
+                if(skipScript)
                 {
-                    bool skipScript = false;
-                    fireScriptStarted(fii->filename, skipScript);
-                    if(skipScript)
-                    {
-                        LogManager::getSingleton().logMessage(
-                            "Skipping script " + fii->filename);
-                    }
-                    else
-                    {
-                        LogManager::getSingleton().logMessage(
-                            "Parsing script " + fii->filename);
-                        DataStreamPtr stream = fii->archive->open(fii->filename);
-                        if (stream)
-                        {
-                            if (mLoadingListener)
-                                mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
-
-                            if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
-                            {
-                                DataStreamPtr cachedCopy(OGRE_NEW MemoryDataStream(stream->getName(), stream));
-                                su->parseScript(cachedCopy, grp->name);
-                            }
-                            else
-                                su->parseScript(stream, grp->name);
-                        }
-                    }
-                    fireScriptEnded(fii->filename, skipScript);
+                    LogManager::getSingleton().logMessage(
+                        "Skipping script " + fii->filename);
                 }
+                else
+                {
+                    LogManager::getSingleton().logMessage(
+                        "Parsing script " + fii->filename);
+                    DataStreamPtr stream = fii->archive->open(fii->filename);
+                    if (stream)
+                    {
+                        if (mLoadingListener)
+                            mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
+
+                        if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
+                        {
+                            DataStreamPtr cachedCopy(OGRE_NEW MemoryDataStream(stream->getName(), stream));
+                            su->parseScript(cachedCopy, grp->name);
+                        }
+                        else
+                            su->parseScript(stream, grp->name);
+                    }
+                }
+                fireScriptEnded(fii->filename, skipScript);
             }
         }
 
@@ -1259,13 +1249,6 @@ namespace Ogre {
             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME);
             // delete all the load list entries
             grp->loadResourceOrderMap.clear();
-
-            // Drop location list
-            for (LocationList::iterator ll = grp->locationList.begin();
-                ll != grp->locationList.end(); ++ll)
-            {
-                OGRE_DELETE_T(*ll, ResourceLocation, MEMCATEGORY_RESOURCE);
-            }
         }
 
         // delete ResourceGroup
@@ -1468,7 +1451,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            StringVectorPtr lst = (*i)->archive->list((*i)->recursive, dirs);
+            StringVectorPtr lst = i->archive->list(i->recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1498,7 +1481,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            FileInfoListPtr lst = (*i)->archive->listFileInfo((*i)->recursive, dirs);
+            FileInfoListPtr lst = i->archive->listFileInfo(i->recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1528,7 +1511,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            StringVectorPtr lst = (*i)->archive->find(pattern, (*i)->recursive, dirs);
+            StringVectorPtr lst = i->archive->find(pattern, i->recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1557,7 +1540,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            FileInfoListPtr lst = (*i)->archive->findFileInfo(pattern, (*i)->recursive, dirs);
+            FileInfoListPtr lst = i->archive->findFileInfo(pattern, i->recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1607,7 +1590,7 @@ namespace Ogre {
         liend = grp->locationList.end();
         for (li = grp->locationList.begin(); li != liend; ++li)
         {
-            Archive* arch = (*li)->archive;
+            Archive* arch = li->archive;
             if (arch->exists(resourceName))
             {
                 return arch;
@@ -1701,7 +1684,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            vec->push_back((*i)->archive->getName());
+            vec->push_back(i->archive->getName());
         }
 
         return vec;
@@ -1727,7 +1710,7 @@ namespace Ogre {
         iend = grp->locationList.end();
         for (i = grp->locationList.begin(); i != iend; ++i)
         {
-            String location = (*i)->archive->getName();
+            String location = i->archive->getName();
             // Search for the pattern
             if(StringUtil::match(location, pattern))
             {

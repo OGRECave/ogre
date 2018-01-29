@@ -72,7 +72,7 @@ namespace Ogre
          @return
          The full path to the config file.
          */
-        const Ogre::String getConfigFilePath(Ogre::String filename) const
+        Ogre::String getConfigFilePath(Ogre::String filename) const
         {
             #if OGRE_DEBUG_MODE && OGRE_PLATFORM == OGRE_PLATFORM_WIN32
                 // add OGRE_BUILD_SUFFIX (default: "_d") to config file names
@@ -108,7 +108,7 @@ namespace Ogre
          @return
          The full path to a writable location for the given filename.
          */
-        const Ogre::String getWritablePath(const Ogre::String& filename) const
+        Ogre::String getWritablePath(const Ogre::String& filename) const
         {
             return mHomePath + filename;
         }

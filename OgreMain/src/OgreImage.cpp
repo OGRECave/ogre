@@ -851,8 +851,8 @@ namespace Ogre {
 
                 // now selectively add the alpha
                 PixelBox srcAlpha = alpha.getPixelBox(face, mip);
-                uchar* psrcAlpha = static_cast<uchar*>(srcAlpha.data);
-                uchar* pdst = static_cast<uchar*>(dst.data);
+                uchar* psrcAlpha = srcAlpha.data;
+                uchar* pdst = dst.data;
                 for (size_t d = 0; d < mDepth; ++d)
                 {
                     for (size_t y = 0; y < mHeight; ++y)

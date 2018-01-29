@@ -34,8 +34,6 @@ THE SOFTWARE.
 #include "OgreEAGL2Support.h"
 #include "OgreEAGL2Window.h"
 
-#include "macUtils.h"
-
 #import <UIKit/UIScreen.h>
 
 namespace Ogre {

@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #ifdef __MINGW32__
-#  include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
+#  include "OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
 #endif
 
 #include "Threading/OgreThreadHeaders.h"

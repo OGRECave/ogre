@@ -336,7 +336,7 @@ namespace Ogre
         mMatrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
         const PixelBox &pixelBox = mMatrixTexture->getBuffer()->getCurrentLock();
 
-        float *pDest = static_cast<float*>(pixelBox.data);
+        float *pDest = reinterpret_cast<float*>(pixelBox.data);
 
         InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
         InstancedEntityVec::const_iterator end  = mInstancedEntities.end();

@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "Threading/OgreThreadHeaders.h"
 
+struct AAssetManager;
+
 namespace Ogre {
 
     /** \addtogroup Core
@@ -56,7 +58,9 @@ namespace Ogre {
         virtual ~ZipArchiveFactory() {}
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
-        /// @copydoc FactoryObj::createInstance
+
+        using ArchiveFactory::createInstance;
+
         Archive *createInstance( const String& name, bool readOnly );
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance( Archive* ptr) { OGRE_DELETE ptr; }
@@ -70,7 +74,9 @@ namespace Ogre {
         virtual ~EmbeddedZipArchiveFactory();
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
-        /// @copydoc ArchiveFactory::createInstance
+
+        using ArchiveFactory::createInstance;
+
         Archive *createInstance( const String& name, bool readOnly );
         
         /** a function type to decrypt embedded zip file
@@ -89,6 +95,23 @@ namespace Ogre {
         static void removeEmbbeddedFile(const String& name);
 
     };
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    class APKZipArchiveFactory : public EmbeddedZipArchiveFactory
+    {
+    protected:
+        AAssetManager* mAssetMgr;
+    public:
+        APKZipArchiveFactory(AAssetManager* assetMgr) : mAssetMgr(assetMgr) {}
+        virtual ~APKZipArchiveFactory() {}
+
+        /// @copydoc FactoryObj::getType
+        const String& getType(void) const;
+
+        /// @copydoc ArchiveFactory::createInstance
+        Archive *createInstance( const String& name, bool readOnly );
+    };
+#endif
 
     /** @} */
     /** @} */

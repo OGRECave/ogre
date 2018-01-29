@@ -160,13 +160,6 @@ namespace Ogre {
         /** Returns the number of bones in this skeleton. */
         virtual unsigned short getNumBones(void) const;
 
-        /** Gets the root bone of the skeleton
-        @deprecated use Skeleton::getRootBones
-        */
-        OGRE_DEPRECATED virtual Bone* getRootBone(void) const {
-            return getRootBones()[0];
-        }
-
         typedef vector<Bone*>::type BoneList;
         typedef VectorIterator<BoneList> BoneIterator;
         /// Get an iterator over the root bones in the skeleton, ie those with no parents

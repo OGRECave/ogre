@@ -25,12 +25,8 @@
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "OgreArchiveManager.h"
-#include "Android/OgreAPKFileSystemArchive.h"
-#include "Android/OgreAPKZipArchive.h"
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "macUtils.h"
+#include "OgreFileSystem.h"
+#include "OgreZip.h"
 #endif
 
 namespace OgreBites {
@@ -155,9 +151,9 @@ void ApplicationContext::setRTSSWriteShadersToDisk(bool write)
 
     // Set shader cache path.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    mShaderGenerator->setShaderCachePath(Ogre::macCachePath());
+    mShaderGenerator->setShaderCachePath(mFSLayer->getWritablePath(""));
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    mShaderGenerator->setShaderCachePath(Ogre::macCachePath() + "/org.ogre3d.RTShaderCache");
+    mShaderGenerator->setShaderCachePath(mFSLayer->getWritablePath("org.ogre3d.RTShaderCache/"));
 #else
     mShaderGenerator->setShaderCachePath(mRTShaderLibPath+"/cache/");
 #endif
@@ -584,7 +580,7 @@ void ApplicationContext::locateResources()
 
     OgreAssert(!genLocs.empty(), ("Resource Group '"+sec+"' must contain at least one entry").c_str());
 
-    arch = genLocs.front()->archive->getName();
+    arch = genLocs.front().archive->getName();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     arch = Ogre::FileSystemLayer::resolveBundlePath("Contents/Resources/Media");
@@ -594,7 +590,7 @@ void ApplicationContext::locateResources()
     arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
     arch = Ogre::StringUtil::replaceAll(arch, "media/../../Tests/Media", "");
 #endif
-    type = genLocs.front()->archive->getType();
+    type = genLocs.front().archive->getType();
 
     bool hasCgPlugin = false;
     const Ogre::Root::PluginInstanceList& plugins = getRoot()->getInstalledPlugins();
