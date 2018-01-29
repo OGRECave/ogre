@@ -144,6 +144,16 @@ namespace Ogre
     protected:
         struct TextureArray
         {
+            struct NamePair
+            {
+                String aliasName;
+                String resourceName;
+                NamePair() {}
+                NamePair( const String &_aliasName, const String &_resourceName ) :
+                    aliasName( _aliasName ), resourceName( _resourceName ) {}
+            };
+            typedef vector<NamePair>::type NamePairVec;
+
             TexturePtr  texture;
             /// When using UV atlas maxTextures = sqrtMaxTextures * sqrtMaxTextures;
             /// However when using texture arrays, sqrtMaxTextures' value is ignored
@@ -153,7 +163,7 @@ namespace Ogre
             bool        isNormalMap;
 
             uint16      activeEntries;
-            StringVector entries;
+            NamePairVec entries;
 
             TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic, bool _isNormalMap ) :
                 sqrtMaxTextures( _sqrtMaxTextures ), maxTextures( _maxTextures ),
@@ -279,7 +289,10 @@ namespace Ogre
         /// Finds the alias name of a texture given its TextureLocation. Useful for retrieving
         /// back the name of a texture as it was called via createOrRetrieveTexture.
         /// Returns null if not found.
+        /// Note the returned pointer may be invalidated if new calls are made to
+        /// createOrRetrieveTexture or destroyTexture
         const String* findAliasName( const TextureLocation &textureLocation ) const;
+        const String* findResourceNameFromAlias( IdString alias ) const;
 
         void createFromTexturePack( const HlmsTexturePack &pack );
 

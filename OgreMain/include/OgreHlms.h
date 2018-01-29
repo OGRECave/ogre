@@ -384,7 +384,8 @@ namespace Ogre
 #endif
 
         void saveAllTexturesFromDatablocks( const String &folderPath, set<String>::type &savedTextures,
-                                            bool saveOitd, bool saveOriginal );
+                                            bool saveOitd, bool saveOriginal,
+                                            HlmsTextureExportListener *listener );
 
         /** Destroys all the cached shaders and in the next opportunity will recreate them
             from the new location. This is very useful for fast iteration and real-time

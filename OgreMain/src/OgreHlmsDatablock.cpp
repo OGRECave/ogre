@@ -456,7 +456,8 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::saveTextures( const String &folderPath, set<String>::type &savedTextures,
-                                      bool saveOitd, bool saveOriginal )
+                                      bool saveOitd, bool saveOriginal,
+                                      HlmsTextureExportListener *listener )
     {
     }
     //-----------------------------------------------------------------------------------

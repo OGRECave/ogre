@@ -741,7 +741,8 @@ namespace Ogre
                                                                 PbsTextureTypes type );
 
         virtual void saveTextures( const String &folderPath, set<String>::type &savedTextures,
-                                   bool saveOitd, bool saveOriginal );
+                                   bool saveOitd, bool saveOriginal,
+                                   HlmsTextureExportListener *listener );
 
         virtual void calculateHash();
 

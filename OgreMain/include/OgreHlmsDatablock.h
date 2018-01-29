@@ -201,6 +201,16 @@ namespace Ogre
         }
     };
 
+    class _OgreExport HlmsTextureExportListener
+    {
+    public:
+        /// Gives you a chance to completely change the name of the texture when saving a material
+        virtual void savingChangeTextureNameOriginal( const String &aliasName,
+                                                      String &inOutResourceName,
+                                                      String &inOutFilename ) {}
+        virtual void savingChangeTextureNameOitd( const String &aliasName, String &inOutFilename ) {}
+    };
+
     /** An hlms datablock contains individual information about a specific material. It consists of:
             * A const pointer to an @HlmsMacroblock we do not own and may be shared by other datablocks.
             * A const pointer to an @HlmsBlendblock we do not own and may be shared by other datablocks.
@@ -399,7 +409,8 @@ namespace Ogre
             and save it (i.e. copy the original png/dds/etc file).
         */
         virtual void saveTextures( const String &folderPath, set<String>::type &savedTextures,
-                                   bool saveOitd, bool saveOriginal );
+                                   bool saveOitd, bool saveOriginal,
+                                   HlmsTextureExportListener *listener );
 
         static const char* getCmpString( CompareFunction compareFunction );
 

@@ -102,7 +102,8 @@ namespace Ogre
     /** Override this listener if you want to filter which objects get exported.
         See DefaultSceneFormatListener
     */
-    class _OgreSceneFormatExport SceneFormatListener : public HlmsJsonListener
+    class _OgreSceneFormatExport SceneFormatListener :
+            public HlmsJsonListener, public HlmsTextureExportListener
     {
     public:
         virtual void setSceneFlags( uint32 sceneFlags, SceneFormatBase *parent )    {}

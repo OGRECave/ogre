@@ -605,7 +605,7 @@ namespace Ogre
                                baseMipLevel );
             }
 
-            dstArrayIt->entries[entryIdx] = aliasName;
+            dstArrayIt->entries[entryIdx] = TextureArray::NamePair( aliasName, texName );
             it = mEntries.insert( it, TextureEntry( searchName.name, mapType, arrayIdx, entryIdx ) );
         }
 
@@ -664,14 +664,14 @@ namespace Ogre
                 {
                     //The last element has now a new index. Update the references in mEntries
                     const size_t newArrayIdx = texArrayIt - mTextureArrays[it->mapType].begin();
-                    StringVector::const_iterator itor = texArrayIt->entries.begin();
-                    StringVector::const_iterator end  = texArrayIt->entries.end();
+                    TextureArray::NamePairVec::const_iterator itor = texArrayIt->entries.begin();
+                    TextureArray::NamePairVec::const_iterator end  = texArrayIt->entries.end();
 
                     while( itor != end )
                     {
-                        if( !itor->empty() )
+                        if( !itor->aliasName.empty() )
                         {
-                            searchName.name = *itor;
+                            searchName.name = itor->aliasName;
                             TextureEntryVec::iterator itEntry = std::lower_bound( mEntries.begin(),
                                                                                   mEntries.end(),
                                                                                   searchName );
@@ -703,11 +703,28 @@ namespace Ogre
                     size_t idx = textureLocation.yIdx * itor->sqrtMaxTextures + textureLocation.xIdx;
 
                     if( idx < itor->entries.size() )
-                        retVal = &itor->entries[idx];
+                        retVal = &itor->entries[idx].aliasName;
                 }
 
                 ++itor;
             }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    const String* HlmsTextureManager::findResourceNameFromAlias( IdString aliasName ) const
+    {
+        const String *retVal = 0;
+
+        TextureEntry searchName( aliasName );
+        TextureEntryVec::const_iterator it = std::lower_bound( mEntries.begin(), mEntries.end(),
+                                                               searchName );
+
+        if( it != mEntries.end() && it->name == searchName.name )
+        {
+            const TextureArray &texArray = mTextureArrays[it->mapType][it->arrayIdx];
+            retVal = &texArray.entries[it->entryIdx].resourceName;
         }
 
         return retVal;
@@ -867,7 +884,8 @@ namespace Ogre
                     it = mEntries.insert( it, TextureEntry( searchName.name, TEXTURE_TYPE_ENV_MAP,
                                                             mTextureArrays[TEXTURE_TYPE_ENV_MAP].size(), 0 ) );
 
-                    textureArray.entries.push_back( texInfo.name );
+                    textureArray.entries.push_back( TextureArray::NamePair( texInfo.name,
+                                                                            texInfo.name ) );
                     mTextureArrays[TEXTURE_TYPE_ENV_MAP].push_back( textureArray );
                 }
                 else
@@ -973,11 +991,11 @@ namespace Ogre
                 row += StringConverter::toString( itor->activeEntries ) + "|";
                 row += StringConverter::toString( itor->entries.size() );
 
-                StringVector::const_iterator itEntry = itor->entries.begin();
-                StringVector::const_iterator enEntry = itor->entries.end();
+                TextureArray::NamePairVec::const_iterator itEntry = itor->entries.begin();
+                TextureArray::NamePairVec::const_iterator enEntry = itor->entries.end();
 
                 while( itEntry != enEntry )
-                    row += "|" + *itEntry++;
+                    row += "|" + itEntry->aliasName;
 
                 logActual->logMessage( row, LML_CRITICAL );
                 row.clear();
@@ -1018,10 +1036,10 @@ namespace Ogre
         assert( activeEntries < maxTextures );
         ++activeEntries;
 
-        StringVector::const_iterator itor = entries.begin();
-        StringVector::const_iterator end  = entries.end();
+        TextureArray::NamePairVec::const_iterator itor = entries.begin();
+        TextureArray::NamePairVec::const_iterator end  = entries.end();
 
-        while( itor != end && !itor->empty() )
+        while( itor != end && !itor->aliasName.empty() )
             ++itor;
 
         return static_cast<uint16>( itor - entries.begin() );
@@ -1032,8 +1050,8 @@ namespace Ogre
         assert( activeEntries != 0 );
         --activeEntries;
 
-        entries[entry].clear();
+        entries[entry].aliasName.clear();
+        entries[entry].resourceName.clear();
     }
-
     //-----------------------------------------------------------------------------------
 }
