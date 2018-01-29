@@ -50,7 +50,73 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    bool FileSystemArchive::msIgnoreHidden = true;
+namespace {
+    /** Specialisation of the Archive class to allow reading of files from
+        filesystem folders / directories.
+    */
+    class FileSystemArchive : public Archive
+    {
+    protected:
+        /** Utility method to retrieve all files in a directory matching pattern.
+        @param pattern
+            File pattern.
+        @param recursive
+            Whether to cascade down directories.
+        @param dirs
+            Set to @c true if you want the directories to be listed instead of files.
+        @param simpleList
+            Populated if retrieving a simple list.
+        @param detailList
+            Populated if retrieving a detailed list.
+        */
+        void findFiles(const String& pattern, bool recursive, bool dirs,
+            StringVector* simpleList, FileInfoList* detailList) const;
+
+        OGRE_AUTO_MUTEX;
+    public:
+        FileSystemArchive(const String& name, const String& archType, bool readOnly );
+        ~FileSystemArchive();
+
+        /// @copydoc Archive::isCaseSensitive
+        bool isCaseSensitive(void) const;
+
+        /// @copydoc Archive::load
+        void load();
+        /// @copydoc Archive::unload
+        void unload();
+
+        /// @copydoc Archive::open
+        DataStreamPtr open(const String& filename, bool readOnly = true) const;
+
+        /// @copydoc Archive::create
+        DataStreamPtr create(const String& filename);
+
+        /// @copydoc Archive::remove
+        void remove(const String& filename);
+
+        /// @copydoc Archive::list
+        StringVectorPtr list(bool recursive = true, bool dirs = false) const;
+
+        /// @copydoc Archive::listFileInfo
+        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const;
+
+        /// @copydoc Archive::find
+        StringVectorPtr find(const String& pattern, bool recursive = true,
+            bool dirs = false) const;
+
+        /// @copydoc Archive::findFileInfo
+        FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true,
+            bool dirs = false) const;
+
+        /// @copydoc Archive::exists
+        bool exists(const String& filename) const;
+
+        /// @copydoc Archive::getModifiedTime
+        time_t getModifiedTime(const String& filename) const;
+    };
+
+    bool gIgnoreHidden = true;
+}
 
     //-----------------------------------------------------------------------
     FileSystemArchive::FileSystemArchive(const String& name, const String& archType, bool readOnly )
@@ -155,7 +221,7 @@ namespace Ogre {
         while (lHandle != -1 && res != -1)
         {
             if ((dirs == ((tagData.attrib & _A_SUBDIR) != 0)) &&
-                ( !msIgnoreHidden || (tagData.attrib & _A_HIDDEN) == 0 ) &&
+                ( !gIgnoreHidden || (tagData.attrib & _A_HIDDEN) == 0 ) &&
                 (!dirs || !is_reserved_dir (tagData.name)))
             {
                 if (simpleList)
@@ -221,7 +287,7 @@ namespace Ogre {
             while (lHandle != -1 && res != -1)
             {
                 if ((tagData.attrib & _A_SUBDIR) &&
-                    ( !msIgnoreHidden || (tagData.attrib & _A_HIDDEN) == 0 ) &&
+                    ( !gIgnoreHidden || (tagData.attrib & _A_HIDDEN) == 0 ) &&
                     !is_reserved_dir (tagData.name))
                 {
                     // recurse
@@ -497,4 +563,18 @@ namespace Ogre {
         return name;
     }
 
+    Archive *FileSystemArchiveFactory::createInstance( const String& name, bool readOnly )
+    {
+        return OGRE_NEW FileSystemArchive(name, getType(), readOnly);
+    }
+
+    void FileSystemArchiveFactory::setIgnoreHidden(bool ignore)
+    {
+        gIgnoreHidden = ignore;
+    }
+
+    bool FileSystemArchiveFactory::getIgnoreHidden()
+    {
+        return gIgnoreHidden;
+    }
 }

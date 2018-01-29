@@ -37,8 +37,9 @@ using namespace Ogre;
 //--------------------------------------------------------------------------
 TEST(StreamSerialiserTests,WriteBasic)
 {
-    FileSystemArchive arch("./", "FileSystem", false);
-    arch.load();
+    FileSystemArchiveFactory factory;
+    Archive* arch = factory.createInstance("./", false);
+    arch->load();
 
     String fileName = "testSerialiser.dat";
     Vector3 aTestVector(0.3, 15.2, -12.0);
@@ -48,7 +49,7 @@ TEST(StreamSerialiserTests,WriteBasic)
 
     // write the data
     {
-        DataStreamPtr stream = arch.create(fileName);
+        DataStreamPtr stream = arch->create(fileName);
 
         StreamSerialiser serialiser(stream);
 
@@ -62,7 +63,7 @@ TEST(StreamSerialiserTests,WriteBasic)
 
     // read it back
     {
-        DataStreamPtr stream = arch.open(fileName);
+        DataStreamPtr stream = arch->open(fileName);
 
         StreamSerialiser serialiser(stream);
 
@@ -85,8 +86,10 @@ TEST(StreamSerialiserTests,WriteBasic)
         EXPECT_EQ(aTestValue, inValue);
     }
 
-    arch.remove(fileName);
+    arch->remove(fileName);
 
-    EXPECT_TRUE(!arch.exists(fileName));
+    EXPECT_TRUE(!arch->exists(fileName));
+
+    factory.destroyInstance(arch);
 }
 //--------------------------------------------------------------------------

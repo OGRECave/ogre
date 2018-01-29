@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
-#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -43,99 +42,29 @@ namespace Ogre {
     /** \addtogroup Resources
     *  @{
     */
-    /** Specialisation of the Archive class to allow reading of files from 
+
+    /** Specialisation of the ArchiveFactory to allow reading of files from
         filesystem folders / directories.
     */
-    class _OgreExport FileSystemArchive : public Archive 
-    {
-    protected:
-        /** Utility method to retrieve all files in a directory matching pattern.
-        @param pattern
-            File pattern.
-        @param recursive
-            Whether to cascade down directories.
-        @param dirs
-            Set to @c true if you want the directories to be listed instead of files.
-        @param simpleList
-            Populated if retrieving a simple list.
-        @param detailList
-            Populated if retrieving a detailed list.
-        */
-        void findFiles(const String& pattern, bool recursive, bool dirs,
-            StringVector* simpleList, FileInfoList* detailList) const;
-
-        OGRE_AUTO_MUTEX;
-    public:
-        FileSystemArchive(const String& name, const String& archType, bool readOnly );
-        ~FileSystemArchive();
-
-        /// @copydoc Archive::isCaseSensitive
-        bool isCaseSensitive(void) const;
-
-        /// @copydoc Archive::load
-        void load();
-        /// @copydoc Archive::unload
-        void unload();
-
-        /// @copydoc Archive::open
-        DataStreamPtr open(const String& filename, bool readOnly = true) const;
-
-        /// @copydoc Archive::create
-        DataStreamPtr create(const String& filename);
-
-        /// @copydoc Archive::remove
-        void remove(const String& filename);
-
-        /// @copydoc Archive::list
-        StringVectorPtr list(bool recursive = true, bool dirs = false) const;
-
-        /// @copydoc Archive::listFileInfo
-        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const;
-
-        /// @copydoc Archive::find
-        StringVectorPtr find(const String& pattern, bool recursive = true,
-            bool dirs = false) const;
-
-        /// @copydoc Archive::findFileInfo
-        FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true,
-            bool dirs = false) const;
-
-        /// @copydoc Archive::exists
-        bool exists(const String& filename) const;
-
-        /// @copydoc Archive::getModifiedTime
-        time_t getModifiedTime(const String& filename) const;
-
-        /// Set whether filesystem enumeration will include hidden files or not.
-        /// This should be called prior to declaring and/or initializing filesystem
-        /// resource locations. The default is true (ignore hidden files).
-        static void setIgnoreHidden(bool ignore)
-        {
-            msIgnoreHidden = ignore;
-        }
-
-        /// Get whether hidden files are ignored during filesystem enumeration.
-        static bool getIgnoreHidden()
-        {
-            return msIgnoreHidden;
-        }
-
-        static bool msIgnoreHidden;
-    };
-
-    /** Specialisation of ArchiveFactory for FileSystem files. */
     class _OgreExport FileSystemArchiveFactory : public ArchiveFactory
     {
     public:
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
-        /// @copydoc FactoryObj::createInstance
-        Archive *createInstance( const String& name, bool readOnly ) 
-        {
-            return OGRE_NEW FileSystemArchive(name, "FileSystem", readOnly);
-        }
+
+        using ArchiveFactory::createInstance;
+
+        Archive *createInstance( const String& name, bool readOnly );
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance(Archive* ptr) { OGRE_DELETE ptr; }
+
+        /// Set whether filesystem enumeration will include hidden files or not.
+        /// This should be called prior to declaring and/or initializing filesystem
+        /// resource locations. The default is true (ignore hidden files).
+        static void setIgnoreHidden(bool ignore);
+
+        /// Get whether hidden files are ignored during filesystem enumeration.
+        static bool getIgnoreHidden();
     };
 
     /** @} */

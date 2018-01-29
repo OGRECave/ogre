@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include <gtest/gtest.h>
 #include "OgreString.h"
+#include "OgreFileSystem.h"
 
 using namespace Ogre;
 
@@ -38,6 +39,8 @@ class FileSystemArchiveTests : public ::testing::Test
 {
 
 protected:
+    FileSystemArchiveFactory mFactory;
+    Archive* mArch;
     String mTestPath;
     size_t mFileSizeRoot1;
     size_t mFileSizeRoot2;

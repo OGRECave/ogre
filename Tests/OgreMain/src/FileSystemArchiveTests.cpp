@@ -49,35 +49,31 @@ void FileSystemArchiveTests::SetUp()
     Ogre::ConfigFile cf;
     cf.load(Ogre::FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
     mTestPath = cf.getSettings("Tests").begin()->second+"/misc/ArchiveTest";
+
+    mArch = mFactory.createInstance(mTestPath, false);
+    mArch->load();
 }
 //--------------------------------------------------------------------------
 void FileSystemArchiveTests::TearDown()
 {
+    if(mArch)
+        mFactory.destroyInstance(mArch);
 }
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,ListNonRecursive)
 {
-    try {
-        FileSystemArchive arch(mTestPath, "FileSystem", true);
-        arch.load();
-        StringVectorPtr vec = arch.list(false);
+    StringVectorPtr vec = mArch->list(false);
 
-        EXPECT_EQ((unsigned int)2, (unsigned int)vec->size());
-        sort(vec->begin(), vec->end());
-        EXPECT_EQ(String("rootfile.txt"), vec->at(0));
-        EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
-    }
-    catch (Exception& e)
-    {
-        std::cout << e.getFullDescription();
-    }
+    EXPECT_EQ((unsigned int)2, (unsigned int)vec->size());
+    sort(vec->begin(), vec->end());
+    EXPECT_EQ(String("rootfile.txt"), vec->at(0));
+    EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
+
 }
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,ListRecursive)
 {
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
-    StringVectorPtr vec = arch.list(true);
+    StringVectorPtr vec = mArch->list(true);
 
     EXPECT_EQ((size_t)6, vec->size());
     sort(vec->begin(), vec->end());
@@ -91,9 +87,7 @@ TEST_F(FileSystemArchiveTests,ListRecursive)
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,ListFileInfoNonRecursive)
 {
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
-    FileInfoListPtr vec = arch.listFileInfo(false);
+    FileInfoListPtr vec = mArch->listFileInfo(false);
 
     // Only execute size checks, if the values have been set for the current platform
     if(mFileSizeRoot1 >0 && mFileSizeRoot2 > 0) 
@@ -118,9 +112,7 @@ TEST_F(FileSystemArchiveTests,ListFileInfoNonRecursive)
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,ListFileInfoRecursive)
 {
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
-    FileInfoListPtr vec = arch.listFileInfo(true);
+    FileInfoListPtr vec = mArch->listFileInfo(true);
     sort(vec->begin(), vec->end());
 
     // Only execute size checks, if the values have been set for the current platform
@@ -173,9 +165,7 @@ TEST_F(FileSystemArchiveTests,ListFileInfoRecursive)
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,FindNonRecursive)
 {
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
-    StringVectorPtr vec = arch.find("*.txt", false);
+    StringVectorPtr vec = mArch->find("*.txt", false);
 
     EXPECT_EQ((size_t)2, vec->size());
     sort(vec->begin(), vec->end());
@@ -185,9 +175,7 @@ TEST_F(FileSystemArchiveTests,FindNonRecursive)
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,FindRecursive)
 {
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
-    StringVectorPtr vec = arch.find("*.material", true);
+    StringVectorPtr vec = mArch->find("*.material", true);
 
     EXPECT_EQ((size_t)4, vec->size());
     sort(vec->begin(), vec->end());
@@ -199,9 +187,7 @@ TEST_F(FileSystemArchiveTests,FindRecursive)
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,FindFileInfoNonRecursive)
 {
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
-    FileInfoListPtr vec = arch.findFileInfo("*.txt", false);
+    FileInfoListPtr vec = mArch->findFileInfo("*.txt", false);
 
     // Only execute size checks, if the values have been set for the current platform
     if(mFileSizeRoot1 >0 && mFileSizeRoot2 > 0) 
@@ -226,9 +212,7 @@ TEST_F(FileSystemArchiveTests,FindFileInfoNonRecursive)
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,FindFileInfoRecursive)
 {
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
-    FileInfoListPtr vec = arch.findFileInfo("*.material", true);
+    FileInfoListPtr vec = mArch->findFileInfo("*.material", true);
 
     EXPECT_EQ((size_t)4, vec->size());
     sort(vec->begin(), vec->end());
@@ -264,10 +248,7 @@ TEST_F(FileSystemArchiveTests,FindFileInfoRecursive)
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,FileRead)
 {
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
-
-    DataStreamPtr stream = arch.open("rootfile.txt");
+    DataStreamPtr stream = mArch->open("rootfile.txt");
     EXPECT_EQ(String("this is line 1 in file 1"), stream->getLine());
     EXPECT_EQ(String("this is line 2 in file 1"), stream->getLine());
     EXPECT_EQ(String("this is line 3 in file 1"), stream->getLine());
@@ -280,16 +261,14 @@ TEST_F(FileSystemArchiveTests,FileRead)
 TEST_F(FileSystemArchiveTests,ReadInterleave)
 {
     // Test overlapping reads from same archive
-    FileSystemArchive arch(mTestPath, "FileSystem", true);
-    arch.load();
 
     // File 1
-    DataStreamPtr stream1 = arch.open("rootfile.txt");
+    DataStreamPtr stream1 = mArch->open("rootfile.txt");
     EXPECT_EQ(String("this is line 1 in file 1"), stream1->getLine());
     EXPECT_EQ(String("this is line 2 in file 1"), stream1->getLine());
 
     // File 2
-    DataStreamPtr stream2 = arch.open("rootfile2.txt");
+    DataStreamPtr stream2 = mArch->open("rootfile2.txt");
     EXPECT_EQ(String("this is line 1 in file 2"), stream2->getLine());
     EXPECT_EQ(String("this is line 2 in file 2"), stream2->getLine());
     EXPECT_EQ(String("this is line 3 in file 2"), stream2->getLine());
@@ -311,13 +290,10 @@ TEST_F(FileSystemArchiveTests,ReadInterleave)
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,CreateAndRemoveFile)
 {
-    FileSystemArchive arch("./", "FileSystem", false);
-    arch.load();
-
-    EXPECT_TRUE(!arch.isReadOnly());
+    EXPECT_TRUE(!mArch->isReadOnly());
 
     String fileName = "a_test_file.txt";
-    DataStreamPtr stream = arch.create(fileName);
+    DataStreamPtr stream = mArch->create(fileName);
 
     String testString = "Some text here";
     size_t written = stream->write((const void*)testString.c_str(), testString.size());
@@ -325,8 +301,8 @@ TEST_F(FileSystemArchiveTests,CreateAndRemoveFile)
 
     stream->close();
 
-    arch.remove(fileName);
+    mArch->remove(fileName);
 
-    EXPECT_TRUE(!arch.exists(fileName));
+    EXPECT_TRUE(!mArch->exists(fileName));
 }
 //--------------------------------------------------------------------------
