@@ -1,7 +1,5 @@
-#include "Android/OgreAPKFileSystemArchive.h"
+#include "OgreStableHeaders.h"
 
-#include <OgreStringConverter.h>
-#include <OgreLogManager.h>
 #include <android/asset_manager.h>
 
 namespace Ogre{

@@ -56,13 +56,6 @@
 #   endif
 #endif
 
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#include <android_native_app_glue.h>
-#include "Android/OgreAPKFileSystemArchive.h"
-#include "Android/OgreAPKZipArchive.h"
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   ifdef __OBJC__
 #       import <UIKit/UIKit.h>

@@ -1,4 +1,4 @@
-#include "Android/OgreAPKZipArchive.h"
+#include "OgreStableHeaders.h"
 #include <android/asset_manager.h>
 
 namespace Ogre{

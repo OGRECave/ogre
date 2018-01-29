@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreArchiveFactory.h"
 #include "OgreHeaderPrefix.h"
 
+struct AAssetManager;
+
 namespace Ogre {
 
     /** \addtogroup Core
@@ -65,6 +67,21 @@ namespace Ogre {
 
         /// Get whether hidden files are ignored during filesystem enumeration.
         static bool getIgnoreHidden();
+    };
+
+    class APKFileSystemArchiveFactory : public ArchiveFactory
+    {
+    public:
+        APKFileSystemArchiveFactory(AAssetManager* assetMgr) : mAssetMgr(assetMgr) {}
+        virtual ~APKFileSystemArchiveFactory() {}
+        /// @copydoc FactoryObj::getType
+        const String& getType(void) const;
+        /// @copydoc ArchiveFactory::createInstance
+        Archive *createInstance( const String& name, bool readOnly );
+        /// @copydoc FactoryObj::destroyInstance
+        void destroyInstance( Archive* ptr) { OGRE_DELETE ptr; }
+    private:
+        AAssetManager* mAssetMgr;
     };
 
     /** @} */

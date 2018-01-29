@@ -25,8 +25,8 @@
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "OgreArchiveManager.h"
-#include "Android/OgreAPKFileSystemArchive.h"
-#include "Android/OgreAPKZipArchive.h"
+#include "OgreFileSystem.h"
+#include "OgreZip.h"
 #endif
 
 namespace OgreBites {

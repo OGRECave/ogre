@@ -64,10 +64,7 @@ elseif(ANDROID)
   # required by OgrePlatformInformation.cpp
   include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
 
-  file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/Android/*.h")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/*.cpp")
-
-  set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
   include_directories(${X11_INCLUDE_DIR})
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp")
