@@ -35,6 +35,15 @@ namespace Ogre {
     GLVertexArrayObject::GLVertexArrayObject() : mCreatorContext(0), mVAO(0), mNeedsUpdate(true), mVertexStart(0) {
     }
 
+    GLVertexArrayObject::~GLVertexArrayObject()
+    {
+        if(mVAO != 0)
+        {
+            GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+            rs->_destroyVao(mCreatorContext, mVAO);
+        }
+    }
+    
     void GLVertexArrayObject::bind(GLRenderSystemCommon* rs)
     {
         if(mCreatorContext && mCreatorContext != rs->_getCurrentContext()) // VAO is unusable with current context, destroy it

@@ -52,6 +52,7 @@ namespace Ogre {
         void notifyChanged() { mNeedsUpdate = true; }
     public:
         GLVertexArrayObject();
+        ~GLVertexArrayObject();
         void notifyContextDestroyed(GLContext* context) { if(mCreatorContext == context) { mCreatorContext = 0; mVAO = 0; } }
         void bind(GLRenderSystemCommon* rs);
         bool needsUpdate(VertexBufferBinding* vertexBufferBinding, size_t vertexStart);
