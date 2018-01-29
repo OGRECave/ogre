@@ -1220,7 +1220,8 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::saveTextures( const String &folderPath, set<String>::type &savedTextures,
-                                         bool saveOitd, bool saveOriginal )
+                                         bool saveOitd, bool saveOriginal,
+                                         HlmsTextureExportListener *listener )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
@@ -1236,29 +1237,69 @@ namespace Ogre
                 texLocation.xIdx    = mTexIndices[i];
                 texLocation.yIdx    = 0;
                 texLocation.divisor = 1;
-                const String *aliasName = hlmsTextureManager->findAliasName( texLocation );
+                const String *aliasNamePtr = hlmsTextureManager->findAliasName( texLocation );
 
-                const String &finalName = aliasName ? *aliasName : texture->getName();
+                const String aliasName = aliasNamePtr ? *aliasNamePtr : texture->getName();
 
                 //Render Targets are... complicated. Let's not, for now.
-                if( savedTextures.find( finalName ) == savedTextures.end() &&
-                    (aliasName || i == PBSM_REFLECTION) &&
+                if( savedTextures.find( aliasName ) == savedTextures.end() &&
+                    (aliasNamePtr || i == PBSM_REFLECTION) &&
                     !(texture->getUsage() & TU_RENDERTARGET) )
                 {
                     DataStreamPtr inFile;
                     if( saveOriginal )
                     {
+                        String resourceName;
+                        if( aliasNamePtr )
+                        {
+                            const String *resNamePtr =
+                                    hlmsTextureManager->findResourceNameFromAlias( aliasName );
+                            if( resNamePtr )
+                                resourceName = *resNamePtr;
+                            else
+                                resourceName = aliasName;
+                        }
+                        else
+                            resourceName = aliasName;
+
+                        String savingFilename = aliasName;
+                        if( listener )
+                        {
+                            listener->savingChangeTextureNameOriginal( aliasName, resourceName,
+                                                                       savingFilename );
+                        }
+
                         try
                         {
                             inFile = ResourceGroupManager::getSingleton().openResource(
-                                         finalName, texture->getGroup() );
+                                         resourceName, texture->getGroup() );
+                        }
+                        catch( FileNotFoundException &e )
+                        {
+                            //Try opening as an absolute path
+                            std::fstream *ifs = OGRE_NEW_T( std::fstream, MEMCATEGORY_GENERAL )(
+                                                    resourceName.c_str(),
+                                                    std::ios::binary|std::ios::in );
+
+                            if( ifs->is_open() )
+                            {
+                                inFile = DataStreamPtr( OGRE_NEW FileStreamDataStream( resourceName,
+                                                                                       ifs, true ) );
+                            }
+                            else
+                            {
+                                LogManager::getSingleton().logMessage(
+                                            "WARNING: Could not find texture file " + aliasName +
+                                            " (" + resourceName + ") for copying to export location. "
+                                            "Error: " + e.getFullDescription() );
+                            }
                         }
                         catch( Exception &e )
                         {
                             LogManager::getSingleton().logMessage(
-                                        "WARNING: Could not find texture file " + finalName +
-                                        " for copying to export location. Error: " +
-                                        e.getFullDescription() );
+                                        "WARNING: Could not find texture file " + aliasName +
+                                        " (" + resourceName + ") for copying to export location. "
+                                        "Error: " + e.getFullDescription() );
                         }
 
                         if( inFile )
@@ -1267,7 +1308,7 @@ namespace Ogre
                             vector<uint8>::type fileData;
                             fileData.resize( fileSize );
                             inFile->read( &fileData[0], fileData.size() );
-                            std::ofstream outFile( (folderPath + "/" + finalName).c_str(),
+                            std::ofstream outFile( (folderPath + "/" + savingFilename).c_str(),
                                                    std::ios::binary | std::ios::out );
                             outFile.write( (const char*)&fileData[0], fileData.size() );
                             outFile.close();
@@ -1276,16 +1317,18 @@ namespace Ogre
 
                     if( saveOitd )
                     {
+                        String texName = aliasName;
+                        if( listener )
+                            listener->savingChangeTextureNameOitd( aliasName, texName );
                         const uint32 numSlices = i == PBSM_REFLECTION ? 6u : 1u;
 
                         Image image;
                         texture->convertToImage( image, true, 0u, texLocation.xIdx, numSlices );
 
-                        String texName = finalName;
                         image.save( folderPath + "/" + texName + ".oitd" );
                     }
 
-                    savedTextures.insert( finalName );
+                    savedTextures.insert( aliasName );
                 }
             }
         }

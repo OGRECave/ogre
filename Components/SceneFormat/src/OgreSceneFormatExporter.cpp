@@ -807,7 +807,8 @@ namespace Ogre
                     hlms->saveAllTexturesFromDatablocks(
                                 folderPath, savedTextures,
                                 (exportFlags & SceneFlags::TexturesOitd) != 0,
-                                (exportFlags & SceneFlags::TexturesOriginal) != 0 );
+                                (exportFlags & SceneFlags::TexturesOriginal) != 0,
+                                mListener );
                 }
             }
         }
