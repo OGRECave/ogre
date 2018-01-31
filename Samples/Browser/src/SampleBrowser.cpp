@@ -33,8 +33,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
 #include "OgreString.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "SampleBrowser_OSX.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "SampleBrowser_iOS.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -76,16 +74,6 @@ int main(int argc, char *argv[]) {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
     [pool release];
-    return retVal;
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    mAppDelegate = [[AppDelegate alloc] init];
-    [[NSApplication sharedApplication] setDelegate:mAppDelegate];
-    int retVal = NSApplicationMain(argc, (const char **) argv);
-
-    [pool release];
-
     return retVal;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     OgreBites::OgreAndroidBridge::init(state);

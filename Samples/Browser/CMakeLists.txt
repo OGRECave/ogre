@@ -32,7 +32,6 @@ if (APPLE AND APPLE_IOS)
   )
 elseif (APPLE)
   set(HEADER_FILES ${HEADER_FILES}
-    ${OGRE_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_OSX.h
 	${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns
   )
 elseif (ANDROID)

@@ -378,20 +378,6 @@ namespace OgreBites
             else
             {
                 mRoot->queueEndRendering();   // exit browser
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
-                // Set the shutting down flag and sleep a bit so the displaylink thread can shut itself down
-                // Note: It is essential that you yield to the CVDisplayLink thread. Otherwise it will
-                // continue to run which will result in either a crash or kernel panic.
-                mIsShuttingDown = true;
-                struct timespec ts;
-                ts.tv_sec = 0;
-                ts.tv_nsec = 1000;
-                nanosleep(&ts, NULL);
-
-                mRoot->saveConfig();
-                shutdown();
-#endif
             }
         }
 
