@@ -224,4 +224,7 @@ set(_features "${_features}Assert mode:                     ${_assert}\n")
 
 
 set(_features "${_features}\n----------------------------------------------------------------------------\n")
+
+# Display results, terminate if anything required is missing
+MACRO_DISPLAY_FEATURE_LOG()
 message(STATUS ${_features})

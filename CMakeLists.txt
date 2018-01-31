@@ -344,9 +344,22 @@ cmake_dependent_option(OGRE_BUILD_LIBS_AS_FRAMEWORKS "Build frameworks for libra
 option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)
 option(OGRE_CONFIG_NODE_INHERIT_TRANSFORM "Tells the node whether it should inherit full transform from it's parent node or derived position, orientation and scale" FALSE)
-
-# determine threading options
-include(PrepareThreadingOptions)
+set(OGRE_CONFIG_THREADS "3" CACHE STRING 
+	"Enable Ogre thread safety support for multithreading. Possible values:
+	0 - no thread safety. DefaultWorkQueue is not threaded.
+	1 - background resource preparation and loading is thread safe. Threaded DefaultWorkQueue. [DEPRECATED]
+	2 - only background resource preparation is thread safe. Threaded DefaultWorkQueue. [DEPRECATED]
+	3 - no thread safety. Threaded DefaultWorkQueue."
+)
+set_property(CACHE OGRE_CONFIG_THREADS PROPERTY STRINGS 0 1 2 3)
+set(OGRE_CONFIG_THREAD_PROVIDER "std" CACHE STRING
+	"Select the library to use for thread support. Possible values:
+	boost - Boost thread library. [DEPRECATED]
+	poco  - Poco thread library. [DEPRECATED]
+	tbb   - ThreadingBuildingBlocks library. [DEPRECATED]
+	std   - STL thread library (requires compiler support)."
+)
+set_property(CACHE OGRE_CONFIG_THREAD_PROVIDER PROPERTY STRINGS boost poco tbb std)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec." FALSE "FreeImage_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLUGIN_EXRCODEC "Build EXR Codec plugin" TRUE "OPENEXR_FOUND;NOT OGRE_CONFIG_ENABLE_FREEIMAGE" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_STBI "Enable STBI image codec." TRUE "NOT OGRE_CONFIG_ENABLE_FREEIMAGE" FALSE)
@@ -381,6 +394,9 @@ if (WIN32)
 		install(FILES ${OGRE_BINARY_DIR}/OGRE.props DESTINATION "${CMAKE_INSTALL_PREFIX}")
 	endif ()
 endif ()
+
+# determine threading options
+include(PrepareThreadingOptions)
 
 # For Visual studio enable project folders by default.
 # Hide option from other compilers.
