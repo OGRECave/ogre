@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreWindowEventUtilities.h"
 
 #include "OgreGLRenderSystemCommon.h"
 

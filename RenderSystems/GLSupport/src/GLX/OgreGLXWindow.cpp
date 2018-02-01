@@ -33,7 +33,6 @@
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreWindowEventUtilities.h"
 #include "OgreViewport.h"
 
 #include "OgreGLXContext.h"
@@ -447,8 +446,6 @@ namespace Ogre
             // and also calls setFullScreen if appropriate.
             setHidden(hidden);
             XFlush(xDisplay);
-
-            WindowEventUtilities::_addRenderWindow(this);
         }
 
         mContext = new GLXContext(mGLSupport, fbConfig, glxDrawable, glxContext);
@@ -482,9 +479,6 @@ namespace Ogre
 
         mClosed = true;
         mActive = false;
-
-        if (! mIsExternal)
-            WindowEventUtilities::_removeRenderWindow(this);
 
         if (mIsFullScreen)
         {

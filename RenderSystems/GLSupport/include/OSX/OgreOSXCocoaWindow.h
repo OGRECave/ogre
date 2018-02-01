@@ -34,11 +34,8 @@ THE SOFTWARE.
 #include <AppKit/NSWindow.h>
 #include <QuartzCore/CVDisplayLink.h>
 #include "OgreOSXCocoaView.h"
-#include "OgreOSXCocoaWindowDelegate.h"
 
 typedef NSUInteger NSWindowStyleMask; // NSWindowStyleMask was declared only since OSX 10.12 SDK
-
-@class CocoaWindowDelegate;
 
 @interface OgreGLWindow : NSWindow
 
@@ -54,7 +51,6 @@ namespace Ogre {
         NSOpenGLPixelFormat *mGLPixelFormat;
         CVDisplayLinkRef mDisplayLink;
         NSPoint mWindowOriginPt;
-        CocoaWindowDelegate *mWindowDelegate;
         CocoaContext* mContext;
 
         bool mActive;

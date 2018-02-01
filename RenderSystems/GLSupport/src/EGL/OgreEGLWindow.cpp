@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreException.h"
 #include "OgreStringConverter.h"
-#include "OgreWindowEventUtilities.h"
 
 #include "OgreGLRenderSystemCommon.h"
 
@@ -84,11 +83,6 @@ namespace Ogre {
 
         mClosed = true;
         mActive = false;
-
-        if (!mIsExternal)
-        {
-            WindowEventUtilities::_removeRenderWindow(this);
-        }
 
         if (mIsFullScreen)
         {

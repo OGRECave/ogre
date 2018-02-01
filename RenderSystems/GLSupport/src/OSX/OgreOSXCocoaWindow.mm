@@ -30,7 +30,6 @@ THE SOFTWARE.
 #import "OgreRoot.h"
 #import "OgreLogManager.h"
 #import "OgreStringConverter.h"
-#import "OgreWindowEventUtilities.h"
 
 #import "OgreGLRenderSystemCommon.h"
 #import "OgreGLNativeSupport.h"
@@ -71,7 +70,7 @@ namespace Ogre {
 
 
     CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
-        mWindowDelegate(NULL), mActive(false), mClosed(false), mHidden(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
+        mActive(false), mClosed(false), mHidden(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
         mUseOgreGLView(true), mContentScalingFactor(1.0), mStyleMask(NSResizableWindowMask|NSTitledWindowMask)
     {
         // Set vsync by default to save battery and reduce tearing
@@ -92,12 +91,6 @@ namespace Ogre {
         {
             [mWindow release];
             mWindow = nil;
-        }
-
-        if(mWindowDelegate)
-        {
-            [mWindowDelegate release];
-            mWindowDelegate = nil;
         }
     }
 	
@@ -350,16 +343,10 @@ namespace Ogre {
 
             mWindow = [mView window];
             mIsExternal = true;
-            
-            // Add our window to the window event listener class
-            WindowEventUtilities::_addRenderWindow(this);
         }
 
         // Create register the context with the rendersystem and associate it with this window
         mContext = OGRE_NEW CocoaContext(mGLContext, mGLPixelFormat);
-
-		// Create the window delegate instance to handle window resizing and other window events
-        mWindowDelegate = [[CocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
 
         if(mContentScalingFactor > 1.0)
             [mView setWantsBestResolutionOpenGLSurface:YES];
@@ -418,12 +405,6 @@ namespace Ogre {
         {
             // Unregister and destroy OGRE GLContext
             OGRE_DELETE mContext;
-            
-            if(!mIsExternal)
-            {
-                // Remove the window from the Window listener
-                WindowEventUtilities::_removeRenderWindow(this);
-            }
 
             if(mGLContext)
             {
@@ -693,9 +674,6 @@ namespace Ogre {
 
         // Show window
         setHidden(mHidden);
-
-        // Add our window to the window event listener class
-        WindowEventUtilities::_addRenderWindow(this);
     }
 
     void CocoaWindow::createWindowFromExternal(NSView *viewRef)

@@ -36,14 +36,9 @@ THE SOFTWARE.
 
 #include <iostream>
 
-#ifdef WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#endif
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
-#include <AppKit/AppKit.h>
-static id mAppDelegate;
+#include <windows.h>
 #endif
 
 #ifdef OGRE_STATIC_LIB
@@ -145,10 +140,6 @@ void TestContext::setup()
     loadResources();
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
     mRoot->addFrameListener(this);
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
-#endif
 
     // Get the path and list of test plugins from the config file.
     Ogre::ConfigFile testConfig;
@@ -671,16 +662,6 @@ int main(int argc, char *argv[])
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
     [pool release];
-    return retVal;
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
-    mAppDelegate = [[AppDelegate alloc] init];
-    [[NSApplication sharedApplication] setDelegate:mAppDelegate];
-    int retVal = NSApplicationMain(argc, (const char **) argv);
-
-    [pool release];
-
     return retVal;
 #else
     TestContext tc(argc, argv);

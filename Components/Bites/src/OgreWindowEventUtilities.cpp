@@ -25,20 +25,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreStableHeaders.h"
 #include "OgreWindowEventUtilities.h"
 #include "OgreRenderWindow.h"
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#  if !defined(WIN32_LEAN_AND_MEAN)
+#   define WIN32_LEAN_AND_MEAN
+#  endif
+#  if !defined(NOMINMAX) && defined(_MSC_VER)
+#   define NOMINMAX // required to stop windows.h messing up std::min
+#  endif
+#  include <windows.h>
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #include <X11/Xlib.h>
-void GLXProc( Ogre::RenderWindow *win, const XEvent &event );
 #endif
 
-//using namespace Ogre;
+using namespace Ogre;
 
-Ogre::WindowEventUtilities::WindowEventListeners Ogre::WindowEventUtilities::_msListeners;
-Ogre::RenderWindowList Ogre::WindowEventUtilities::_msWindows;
+namespace OgreBites {
+typedef std::multimap<RenderWindow*, WindowEventListener*> WindowEventListeners;
+static WindowEventListeners _msListeners;
+static RenderWindowList _msWindows;
 
-namespace Ogre {
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+static void GLXProc( RenderWindow *win, const XEvent &event );
+#endif
+
 //--------------------------------------------------------------------------------//
 void WindowEventUtilities::messagePump()
 {
@@ -52,11 +64,11 @@ void WindowEventUtilities::messagePump()
     }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
     //GLX Message Pump
-    RenderWindowList::iterator win = _msWindows.begin();
-    RenderWindowList::iterator end = _msWindows.end();
+    Ogre::RenderWindowList::iterator win = _msWindows.begin();
+    Ogre::RenderWindowList::iterator end = _msWindows.end();
 
     Display* xDisplay = 0; // same for all windows
-    
+
     for (; win != end; win++)
     {
         XID xid;
@@ -116,134 +128,14 @@ void WindowEventUtilities::_removeRenderWindow(RenderWindow* window)
         _msWindows.erase( i );
 }
 
-}
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 //--------------------------------------------------------------------------------//
-namespace Ogre {
-LRESULT CALLBACK WindowEventUtilities::_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    if (uMsg == WM_CREATE)
-    {   // Store pointer to Win32Window in user data area
-        SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(((LPCREATESTRUCT)lParam)->lpCreateParams));
-        return 0;
-    }
-
-    // look up window instance
-    // note: it is possible to get a WM_SIZE before WM_CREATE
-    RenderWindow* win = (RenderWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-    if (!win)
-        return DefWindowProc(hWnd, uMsg, wParam, lParam);
-
-    //LogManager* log = LogManager::getSingletonPtr();
-    //Iterator of all listeners registered to this RenderWindow
-    WindowEventListeners::iterator index,
-        start = _msListeners.lower_bound(win),
-        end = _msListeners.upper_bound(win);
-
-    switch( uMsg )
-    {
-    case WM_ACTIVATE:
-    {
-        bool active = (LOWORD(wParam) != WA_INACTIVE);
-        if( active )
-        {
-            win->setActive( true );
-        }
-        else
-        {
-            if( win->isDeactivatedOnFocusChange() )
-            {
-                win->setActive( false );
-            }
-        }
-
-        for( ; start != end; ++start )
-            (start->second)->windowFocusChange(win);
-        break;
-    }
-    case WM_SYSKEYDOWN:
-        switch( wParam )
-        {
-        case VK_CONTROL:
-        case VK_SHIFT:
-        case VK_MENU: //ALT
-            //return zero to bypass defProc and signal we processed the message
-            return 0;
-        }
-        break;
-    case WM_SYSKEYUP:
-        switch( wParam )
-        {
-        case VK_CONTROL:
-        case VK_SHIFT:
-        case VK_MENU: //ALT
-        case VK_F10:
-            //return zero to bypass defProc and signal we processed the message
-            return 0;
-        }
-        break;
-    case WM_SYSCHAR:
-        // return zero to bypass defProc and signal we processed the message, unless it's an ALT-space
-        if (wParam != VK_SPACE)
-            return 0;
-        break;
-    case WM_ENTERSIZEMOVE:
-        //log->logMessage("WM_ENTERSIZEMOVE");
-        break;
-    case WM_EXITSIZEMOVE:
-        //log->logMessage("WM_EXITSIZEMOVE");
-        break;
-    case WM_MOVE:
-        //log->logMessage("WM_MOVE");
-        win->windowMovedOrResized();
-        for(index = start; index != end; ++index)
-            (index->second)->windowMoved(win);
-        break;
-    case WM_DISPLAYCHANGE:
-        win->windowMovedOrResized();
-        for(index = start; index != end; ++index)
-            (index->second)->windowResized(win);
-        break;
-    case WM_SIZE:
-        //log->logMessage("WM_SIZE");
-        win->windowMovedOrResized();
-        for(index = start; index != end; ++index)
-            (index->second)->windowResized(win);
-        break;
-    case WM_GETMINMAXINFO:
-        // Prevent the window from going smaller than some minimu size
-        ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 100;
-        ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 100;
-        break;
-    case WM_CLOSE:
-    {
-        //log->logMessage("WM_CLOSE");
-        bool close = true;
-        for(index = start; index != end; ++index)
-        {
-            if (!(index->second)->windowClosing(win))
-                close = false;
-        }
-        if (!close) return 0;
-
-        for(index = _msListeners.lower_bound(win); index != end; ++index)
-            (index->second)->windowClosed(win);
-        win->destroy();
-        return 0;
-    }
-    }
-
-    return DefWindowProc( hWnd, uMsg, wParam, lParam );
-}
-}
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-//--------------------------------------------------------------------------------//
-void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
+static void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
 {
     //An iterator for the window listeners
-  Ogre::WindowEventUtilities::WindowEventListeners::iterator index,
-        start = Ogre::WindowEventUtilities::_msListeners.lower_bound(win),
-        end   = Ogre::WindowEventUtilities::_msListeners.upper_bound(win);
+    WindowEventListeners::iterator index,
+        start = _msListeners.lower_bound(win),
+        end   = _msListeners.upper_bound(win);
 
     switch(event.type)
     {
@@ -345,3 +237,5 @@ void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
     } //End switch event.type
 }
 #endif
+
+}

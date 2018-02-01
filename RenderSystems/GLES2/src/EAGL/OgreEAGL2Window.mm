@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreEAGLES2Context.h"
 
 #include "OgreRoot.h"
-#include "OgreWindowEventUtilities.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
 #include "OgreViewport.h"
@@ -97,9 +96,7 @@ namespace Ogre {
         mActive = false;
 
         if (!mIsExternal)
-        {
-            WindowEventUtilities::_removeRenderWindow(this);
-        
+        {        
             SAFE_ARC_RELEASE(mWindow);
             mWindow = nil;
         }

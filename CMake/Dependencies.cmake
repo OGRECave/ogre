@@ -221,12 +221,8 @@ endif ()
 # Find OpenGL
 if(NOT ANDROID AND NOT EMSCRIPTEN)
   find_package(OpenGL)
-  macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
+  macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL and OpenGL 3+ render systems" "http://www.opengl.org/" FALSE "" "")
 endif()
-
-# Find OpenGL 3+
-find_package(OpenGL)
-macro_log_feature(OPENGL_FOUND "OpenGL 3+" "Support for the OpenGL 3+ render system" "http://www.opengl.org/" FALSE "" "")
 
 # Find OpenGL ES 2.x
 find_package(OpenGLES2)
@@ -263,81 +259,6 @@ if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
 endif ()
-
-# Find Boost
-# Prefer static linking in all cases
-if (WIN32 OR APPLE)
-	set(Boost_USE_STATIC_LIBS TRUE)
-else ()
-	# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
-	set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
-endif ()
-if (APPLE AND APPLE_IOS)
-    set(Boost_USE_MULTITHREADED OFF)
-endif()
-
-if(ANDROID)
-    # FindBoost needs extra hint on android 
-    set(Boost_COMPILER -gcc)
-endif()
-
-if (NOT Boost_FOUND)
-  set(Boost_ADDITIONAL_VERSIONS "1.57" "1.57.0" "1.56" "1.56.0" "1.55" "1.55.0" "1.54" "1.54.0" "1.53" "1.53.0" "1.52" "1.52.0" "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
-  # Components that need linking (NB does not include header-only components like bind)
-  set(OGRE_BOOST_COMPONENTS thread date_time)
-  find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
-endif()
-if (NOT Boost_FOUND)
-	# Try again with the other type of libs
-	if(Boost_USE_STATIC_LIBS)
-		set(Boost_USE_STATIC_LIBS OFF)
-	else()
-		set(Boost_USE_STATIC_LIBS ON)
-	endif()
-	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
-endif()
-
-if(Boost_FOUND AND Boost_VERSION GREATER 104900)
-    if(Boost_VERSION GREATER 105300)
-        set(OGRE_BOOST_COMPONENTS thread date_time system atomic chrono)
-    else()
-        set(OGRE_BOOST_COMPONENTS thread date_time system chrono)
-    endif()
-    find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
-endif()
-
-if(Boost_FOUND AND NOT WIN32)
-  list(REMOVE_DUPLICATES Boost_LIBRARIES)
-endif()
-
-# Optional Boost libs (Boost_${COMPONENT}_FOUND
-macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" FALSE "" "")
-if(NOT Boost_DATE_TIME_FOUND)
-    set(Boost_THREAD_FOUND FALSE)
-endif()
-if(Boost_VERSION GREATER 104900 AND (NOT Boost_SYSTEM_FOUND OR NOT Boost_CHRONO_FOUND))
-    set(Boost_THREAD_FOUND FALSE)
-endif()
-if(Boost_VERSION GREATER 105300 AND NOT Boost_ATOMIC_FOUND)
-    set(Boost_THREAD_FOUND FALSE)
-endif()
-macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
-
-# POCO
-find_package(POCO)
-macro_log_feature(POCO_FOUND "POCO" "POCO framework" "http://pocoproject.org/" FALSE "" "")
-
-# ThreadingBuildingBlocks
-find_package(TBB)
-macro_log_feature(TBB_FOUND "tbb" "Threading Building Blocks" "http://www.threadingbuildingblocks.org/" FALSE "" "")
-
-# GLSL-Optimizer
-find_package(GLSLOptimizer)
-macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http://github.com/aras-p/glsl-optimizer/" FALSE "" "")
-
-# HLSL2GLSL
-find_package(HLSL2GLSL)
-macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/" FALSE "" "")
 
 # OpenEXR
 find_package(OpenEXR)
@@ -389,10 +310,6 @@ if (EXISTS "${OGRE_SOURCE_DIR}/Dependencies/CMakeLists.txt")
 elseif (EXISTS "${OGRE_SOURCE_DIR}/ogredeps/CMakeLists.txt")
   add_subdirectory(ogredeps)
 endif ()
-
-
-# Display results, terminate if anything required is missing
-MACRO_DISPLAY_FEATURE_LOG()
 
 # provide option to install dependencies on Windows
 include(InstallDependencies)

@@ -132,7 +132,7 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void go(Sample* initialSample = 0)
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__)
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             createRoot();
 
             if (!oneTimeConfig()) return;

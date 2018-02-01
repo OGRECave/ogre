@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreWindowEventUtilities.h"
 #include "OgreViewport.h"
 
 #include "OgreX11EGLSupport.h"
@@ -296,8 +295,6 @@ namespace Ogre {
         }
 
         XFlush((Display*)mNativeDisplay);
-
-        WindowEventUtilities::_addRenderWindow(this);
     }
 
     void X11EGLWindow::setFullscreen( bool fullscreen, uint width, uint height )

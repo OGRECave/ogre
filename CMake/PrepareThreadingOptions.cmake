@@ -12,52 +12,46 @@
 # build, depending on the dependencies found.
 #######################################################################
 
-set(OGRE_THREAD_DEFAULT_PROVIDER "std")
-set(OGRE_THREAD_TYPE "3")
-
-if (Boost_THREAD_FOUND AND Boost_DATE_TIME_FOUND)
-	set(Boost_THREADING TRUE)
-endif ()
-
-set(OGRE_CONFIG_THREADS ${OGRE_THREAD_TYPE} CACHE STRING 
-	"Enable Ogre thread safety support for multithreading. Possible values:
-	0 - no thread safety. DefaultWorkQueue is not threaded.
-	1 - background resource preparation and loading is thread safe. Threaded DefaultWorkQueue. [DEPRECATED]
-	2 - only background resource preparation is thread safe. Threaded DefaultWorkQueue. [DEPRECATED]
-	3 - no thread safety. Threaded DefaultWorkQueue."
-)
-set_property(CACHE OGRE_CONFIG_THREADS PROPERTY STRINGS 0 1 2 3)
-set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER} CACHE STRING
-	"Select the library to use for thread support. Possible values:
-	boost - Boost thread library. [DEPRECATED]
-	poco  - Poco thread library. [DEPRECATED]
-	tbb   - ThreadingBuildingBlocks library. [DEPRECATED]
-	std   - STL thread library (requires compiler support)."
-)
-set_property(CACHE OGRE_CONFIG_THREAD_PROVIDER PROPERTY STRINGS boost poco tbb std)
-
 # sanitise threading choices
 if (NOT OGRE_CONFIG_THREADS)
 	set(OGRE_CONFIG_THREAD_PROVIDER "none")
 else ()
 	if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "boost")
-		if (NOT Boost_THREADING)
-			message(STATUS "Warning: boost-thread is not available. Using ${OGRE_THREAD_DEFAULT_PROVIDER} as thread provider.")
+		if (WIN32 OR APPLE)
+			# Prefer static linking in all cases
+			set(Boost_USE_STATIC_LIBS TRUE)
+		else ()
+			# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
+			set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
+		endif ()
+		if (APPLE AND APPLE_IOS)
+			set(Boost_USE_MULTITHREADED OFF)
+		endif()
+
+		if(ANDROID)
+			# FindBoost needs extra hint on android 
+			set(Boost_COMPILER -gcc)
+		endif()
+
+		find_package(Boost COMPONENTS thread QUIET)
+		if (NOT Boost_THREAD_FOUND)
+			message(WARNING "boost-thread is not available. Using ${OGRE_THREAD_DEFAULT_PROVIDER} as thread provider.")
 			set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER})
 		endif ()
 	elseif (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "poco")
+		find_package(POCO)
 		if (NOT POCO_FOUND)
-			message(STATUS "Warning: poco is not available. Using ${OGRE_THREAD_DEFAULT_PROVIDER} as thread provider.")
+			message(WARNING "poco is not available. Using ${OGRE_THREAD_DEFAULT_PROVIDER} as thread provider.")
 			set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER})
 		endif ()
 	elseif (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "tbb")
+		find_package(TBB)
 		if (NOT TBB_FOUND)
-			message(STATUS "Warning: tbb is not available. Using ${OGRE_THREAD_DEFAULT_PROVIDER} as thread provider.")
+			message(WARNING "tbb is not available. Using ${OGRE_THREAD_DEFAULT_PROVIDER} as thread provider.")
 			set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER})
 		endif ()
 	elseif (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "std")
-		#Potentially add test for compiler support
 	else ()
-		message(STATUS "Warning: Unknown thread provider chosen. Defaulting to ${OGRE_THREAD_DEFAULT_PROVIDER}.")
+		message(WARNING "Unknown thread provider chosen. Defaulting to std.")
 	endif ()	
 endif ()

@@ -35,16 +35,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include <iostream> // for Apple
 
-// These need to be included prior to everything else to prevent name clashes.
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
-
-#import <AppKit/AppKit.h>
-#include <crt_externs.h>
-
-extern int *_NSGetArgc(void);
-extern char ***_NSGetArgv(void);
-#endif
-
 class TestBatch;
 using namespace Ogre;
 
@@ -169,124 +159,7 @@ class TestContext : public OgreBites::SampleContext
     String mSummaryOutputDir;
 };
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
-
-// All this does is suppress some messages in the run log.  NSApplication does not
-// implement buttonPressed and apps without a NIB have no target for the action.
-@implementation NSApplication (_suppressUnimplementedActionWarning)
-- (void) buttonPressed:(id)sender
-{
-    /* Do nothing */
-}
-@end
-
-
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-@interface AppDelegate : NSObject <NSApplicationDelegate>
-#else
-@interface AppDelegate : NSObject
-#endif
-{
-    NSTimer *mTimer;
-
-    NSTimeInterval mLastFrameTime;
-    TestContext *tc;
-}
-
-- (void)go;
-- (void)renderOneFrame:(id)sender;
-- (void)shutdown;
-
-@property (retain) NSTimer *mTimer;
-                   @property (nonatomic) NSTimeInterval mLastFrameTime;
-
-                                         @end
-
-                                         //static id mAppDelegate;
-
-                                         @implementation AppDelegate
-
-                                         @synthesize mTimer;
-                                         @dynamic mLastFrameTime;
-
-                                         - (NSTimeInterval)mLastFrameTime
-                   {
-                       return mLastFrameTime;
-                   }
-
-- (void)setLastFrameTime:(NSTimeInterval)frameInterval
-{
-    // Frame interval defines how many display frames must pass between each time the
-    // display link fires. The display link will only fire 30 times a second when the
-    // frame internal is two on a display that refreshes 60 times a second. The default
-    // frame interval setting of one will fire 60 times a second when the display refreshes
-    // at 60 times a second. A frame interval setting of less than one results in undefined
-    // behavior.
-    if (frameInterval >= 1)
-    {
-        mLastFrameTime = frameInterval;
-    }
-}
-
-- (void)go {
-
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    mLastFrameTime = 1;
-    mTimer = nil;
-
-    try {
-        tc = new TestContext(*_NSGetArgc(), *_NSGetArgv());
-        tc->go();
-        Root::getSingleton().getRenderSystem()->_initRenderTargets();
-
-        // Clear event times
-        Root::getSingleton().clearEventTimes();
-    } catch( Exception& e ) {
-        std::cerr << "An exception has occurred: " <<
-            e.getFullDescription().c_str() << std::endl;
-    }
-    mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f) * mLastFrameTime
-              target:self
-              selector:@selector(renderOneFrame:)
-              userInfo:nil
-              repeats:YES];
-    [pool release];
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)application {
-    mLastFrameTime = 1;
-    mTimer = nil;
-
-    [self go];
-}
-
-- (void)shutdown {
-
-    [NSApp terminate:nil];
-}
-
-- (void)renderOneFrame:(id)sender
-{
-    if(Root::getSingletonPtr() && Root::getSingleton().isInitialised() && tc->getCurrentTest())
-    {
-        Root::getSingleton().renderOneFrame((Real)[mTimer timeInterval]);
-    }
-    else
-    {
-        if(mTimer)
-        {
-            [mTimer invalidate];
-            mTimer = nil;
-        }
-
-        tc->finishedTests();
-
-        [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.0];
-    }
-}
-
-@end
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && defined(__OBJC__)
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && defined(__OBJC__)
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 

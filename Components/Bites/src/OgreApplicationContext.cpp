@@ -15,6 +15,7 @@
 #include "OgreOverlaySystem.h"
 #include "OgreDataStream.h"
 #include "OgreBitesConfigDialog.h"
+#include "OgreWindowEventUtilities.h"
 
 #include "OgreConfigPaths.h"
 
@@ -383,7 +384,7 @@ NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre
 #endif
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_BITES_HAVE_SDL == 0
-    Ogre::WindowEventUtilities::addWindowEventListener(ret.render, this);
+    WindowEventUtilities::_addRenderWindow(ret.render);
 #endif
 
     return ret;
@@ -726,7 +727,7 @@ void ApplicationContext::shutdown()
     {
 #if !OGRE_BITES_HAVE_SDL
         // remove window event listener before destroying it
-        Ogre::WindowEventUtilities::removeWindowEventListener(it->render, this);
+        WindowEventUtilities::_removeRenderWindow(it->render);
 #endif
         mRoot->destroyRenderTarget(it->render);
     }
@@ -799,6 +800,9 @@ void ApplicationContext::pollEvents()
         win->windowMovedOrResized();
         windowResized(win);
     }
+#else
+    // just avoid "window not responding"
+    WindowEventUtilities::messagePump();
 #endif
 }
 
