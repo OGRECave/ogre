@@ -2732,6 +2732,7 @@ namespace Ogre{
                                                 texType = TEX_TYPE_1D;
                                                 break;
                                             }
+                                            OGRE_FALLTHROUGH;
                                         }                                                                       case ID_2D:
                                         texType = TEX_TYPE_2D;
                                         break;

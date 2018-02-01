@@ -293,12 +293,14 @@ namespace Ogre {
             {
             case PF_A8B8G8R8:
                 flipRgbMasks = true;
+                OGRE_FALLTHROUGH;
             case PF_A8R8G8B8:
                 ddsHeaderRgbBits = 8 * 4;
                 hasAlpha = true;
                 break;
             case PF_X8B8G8R8:
                 flipRgbMasks = true;
+                OGRE_FALLTHROUGH;
             case PF_X8R8G8B8:
                 ddsHeaderRgbBits = 8 * 4;
                 break;

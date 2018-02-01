@@ -215,7 +215,7 @@ namespace Ogre {
                     case TEX_TYPE_2D_ARRAY:
                         if(!hasGLES30)
                             break;
-                        /* no break */
+                        OGRE_FALLTHROUGH;
                     case TEX_TYPE_3D:
                         glCompressedTexImage3DOES(getGLES2TextureTarget(), mip, format,
                             width, height, depth, 0, 
@@ -297,7 +297,7 @@ namespace Ogre {
                 case TEX_TYPE_2D_ARRAY:
                     if(!hasGLES30)
                         break;
-                    /* no break */
+                    OGRE_FALLTHROUGH;
                 case TEX_TYPE_3D:
                     OGRE_CHECK_GL_ERROR(glTexImage3DOES(getGLES2TextureTarget(),
                                  mip,

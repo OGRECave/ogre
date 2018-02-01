@@ -120,6 +120,7 @@ namespace Ogre{
                 else
                 {
                     state = WORD;
+                    OGRE_FALLTHROUGH;
                 }
             case WORD:
                 if(isNewline(c))

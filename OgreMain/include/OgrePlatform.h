@@ -100,6 +100,13 @@ namespace Ogre {
         #define OGRE_FORCE_INLINE __inline
 #endif
 
+/* fallthrough attribute */
+#if OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_GNUC, 700)
+#define OGRE_FALLTHROUGH __attribute__((fallthrough))
+#else
+#define OGRE_FALLTHROUGH
+#endif
+
 /* define OGRE_NORETURN macro */
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #	define OGRE_NORETURN __declspec(noreturn)
