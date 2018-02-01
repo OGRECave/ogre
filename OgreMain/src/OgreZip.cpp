@@ -100,8 +100,6 @@ namespace {
         /// We need caching because sometimes serializers step back in data stream and zziplib behaves slow
         StaticCache<2 * OGRE_STREAM_TEMP_SIZE> mCache;
     public:
-        /// Unnamed constructor
-        ZipDataStream(ZZIP_FILE* zzipFile, size_t uncompressedSize);
         /// Constructor for creating named streams
         ZipDataStream(const String& name, ZZIP_FILE* zzipFile, size_t uncompressedSize);
         ~ZipDataStream();
@@ -420,12 +418,6 @@ namespace {
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    ZipDataStream::ZipDataStream(ZZIP_FILE* zzipFile, size_t uncompressedSize)
-        : mZzipFile(zzipFile)
-    {
-        mSize = uncompressedSize;
-    }
     //-----------------------------------------------------------------------
     ZipDataStream::ZipDataStream(const String& name, ZZIP_FILE* zzipFile, size_t uncompressedSize)
         :DataStream(name), mZzipFile(zzipFile)
