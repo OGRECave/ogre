@@ -146,7 +146,7 @@ namespace Ogre
             LodLevel() : batchSize(0), gpuIndexData(0), maxHeightDelta(0), calcMaxHeightDelta(0),
                 lastTransitionDist(0), lastCFactor(0) {}
         };
-        typedef vector<LodLevel*>::type LodLevelList;
+        typedef std::vector<LodLevel*> LodLevelList;
 
         /** Get the LodLevel information for a given lod.
         @param lod The lod level index relative to this classes own list; if you

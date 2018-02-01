@@ -203,7 +203,7 @@ namespace Ogre {
         /// Attached Shader names
         String mAttachedShaderNames;
         /// Container of attached programs
-        typedef vector< GLSLShaderCommon* >::type GLSLProgramContainer;
+        typedef std::vector< GLSLShaderCommon* > GLSLProgramContainer;
         typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
         GLSLProgramContainer mAttachedGLSLPrograms;
         /// Matrix in column major pack format?

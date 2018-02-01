@@ -22,8 +22,8 @@ public:
 
 private:
 	Ogre::HlmsManager* mHlmsManager;
-	Ogre::vector<Ogre::PbsMaterial*>::type mPBSMaterialList;
-	Ogre::vector<String>::type mMaterialList;
+	std::vector<Ogre::PbsMaterial*> mPBSMaterialList;
+	std::vector<String> mMaterialList;
 	Ogre::SceneNode* mLightNodes[3];
 	Ogre::MeshPtr mFloor;
 

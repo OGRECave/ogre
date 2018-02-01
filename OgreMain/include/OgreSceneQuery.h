@@ -364,7 +364,7 @@ namespace Ogre {
         }
 
     };
-    typedef vector<RaySceneQueryResultEntry>::type RaySceneQueryResult;
+    typedef std::vector<RaySceneQueryResultEntry> RaySceneQueryResult;
 
     /** Specialises the SceneQuery class for querying along a ray. */
     class _OgreExport RaySceneQuery : public SceneQuery, public RaySceneQueryListener

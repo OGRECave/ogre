@@ -336,7 +336,7 @@ private:
         BillboardSet* bbs;
     };
 
-    typedef Ogre::vector<LightState>::type VecLights;
+    typedef std::vector<LightState> VecLights;
     VecLights mLights;  
     bool mTwirlLights;
 

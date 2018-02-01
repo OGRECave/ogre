@@ -46,7 +46,7 @@ namespace Ogre
 
     class AndroidLogListener;
 
-    typedef vector<RenderSystem*>::type RenderSystemList;
+    typedef std::vector<RenderSystem*> RenderSystemList;
     
     /** The root class of the Ogre system.
         @remarks
@@ -115,15 +115,15 @@ namespace Ogre
         Real mDefaultMinPixelSize;
 
     public:
-        typedef vector<DynLib*>::type PluginLibList;
-        typedef vector<Plugin*>::type PluginInstanceList;
+        typedef std::vector<DynLib*> PluginLibList;
+        typedef std::vector<Plugin*> PluginInstanceList;
     protected:
         /// List of plugin DLLs loaded
         PluginLibList mPluginLibs;
         /// List of Plugin instances registered
         PluginInstanceList mPlugins;
 
-        typedef map<String, MovableObjectFactory*>::type MovableObjectFactoryMap;
+        typedef std::map<String, MovableObjectFactory*> MovableObjectFactoryMap;
         MovableObjectFactoryMap mMovableObjectFactoryMap;
         uint32 mNextMovableObjectTypeFlag;
         // stock movable factories
@@ -134,7 +134,7 @@ namespace Ogre
         MovableObjectFactory* mBillboardChainFactory;
         MovableObjectFactory* mRibbonTrailFactory;
 
-        typedef map<String, RenderQueueInvocationSequence*>::type RenderQueueInvocationSequenceMap;
+        typedef std::map<String, RenderQueueInvocationSequence*> RenderQueueInvocationSequenceMap;
         RenderQueueInvocationSequenceMap mRQSequenceMap;
 
         /// Are we initialised yet?

@@ -422,7 +422,7 @@ namespace Ogre
         
         InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
         
-        vector<bool>::type writtenPositions(getMaxLookupTableInstances(), false);
+        std::vector<bool> writtenPositions(getMaxLookupTableInstances(), false);
 
         size_t floatPerEntity = mMatricesPerInstance * mRowLength * 4;
         size_t entitiesPerPadding = (size_t)(mMaxFloatsPerLine / floatPerEntity);

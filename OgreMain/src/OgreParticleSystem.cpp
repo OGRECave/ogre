@@ -484,8 +484,8 @@ namespace Ogre {
     void ParticleSystem::_triggerEmitters(Real timeElapsed)
     {
         // Add up requests for emission
-        static vector<unsigned>::type requested;
-        static vector<unsigned>::type emittedRequested;
+        static std::vector<unsigned> requested;
+        static std::vector<unsigned> emittedRequested;
 
         if( requested.size() != mEmitters.size() )
             requested.resize( mEmitters.size() );
@@ -1608,7 +1608,7 @@ namespace Ogre {
     ParticleAffectorFactory::~ParticleAffectorFactory() 
     {
         // Destroy all affectors
-        vector<ParticleAffector*>::type::iterator i;
+        std::vector<ParticleAffector*>::iterator i;
         for (i = mAffectors.begin(); i != mAffectors.end(); ++i)
         {
             OGRE_DELETE (*i);
@@ -1620,7 +1620,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleAffectorFactory::destroyAffector(ParticleAffector* e)
     {
-        vector<ParticleAffector*>::type::iterator i;
+        std::vector<ParticleAffector*>::iterator i;
         for (i = mAffectors.begin(); i != mAffectors.end(); ++i)
         {
             if ((*i) == e)

@@ -192,11 +192,11 @@ namespace Ogre {
         };
 
         /// Map from original buffer to temporary buffers.
-        typedef multimap<HardwareVertexBuffer*, HardwareVertexBufferSharedPtr>::type FreeTemporaryVertexBufferMap;
+        typedef multistd::map<HardwareVertexBuffer*, HardwareVertexBufferSharedPtr> FreeTemporaryVertexBufferMap;
         /// Map of current available temp buffers.
         FreeTemporaryVertexBufferMap mFreeTempVertexBufferMap;
         /// Map from temporary buffer to details of a license.
-        typedef map<HardwareVertexBuffer*, VertexBufferLicense>::type TemporaryVertexBufferLicenseMap;
+        typedef std::map<HardwareVertexBuffer*, VertexBufferLicense> TemporaryVertexBufferLicenseMap;
         /// Map of currently licensed temporary buffers.
         TemporaryVertexBufferLicenseMap mTempVertexBufferLicenses;
         /// Number of frames elapsed since temporary buffers utilization was above half the available.

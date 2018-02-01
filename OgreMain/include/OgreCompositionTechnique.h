@@ -81,9 +81,9 @@ namespace Ogre {
                 fsaa(true), hwGammaWrite(false), depthBufferId(1), pooled(false), scope(TS_LOCAL) {}
         };
         /// Typedefs for several iterators
-        typedef vector<CompositionTargetPass *>::type TargetPasses;
+        typedef std::vector<CompositionTargetPass *> TargetPasses;
         typedef VectorIterator<TargetPasses> TargetPassIterator;
-        typedef vector<TextureDefinition*>::type TextureDefinitions;
+        typedef std::vector<TextureDefinition*> TextureDefinitions;
         typedef VectorIterator<TextureDefinitions> TextureDefinitionIterator;
         
         /** Create a new local texture definition, and return a pointer to it.

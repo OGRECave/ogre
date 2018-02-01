@@ -191,7 +191,7 @@ namespace Ogre
 
             if((opt = miscParams->find("parentWindowHandle")) != end)
             {
-                vector<String>::type tokens = StringUtil::split(opt->second, " :");
+                std::vector<String> tokens = StringUtil::split(opt->second, " :");
 
                 if (tokens.size() == 3)
                 {
@@ -210,7 +210,7 @@ namespace Ogre
             }
             else if((opt = miscParams->find("externalWindowHandle")) != end)
             {
-                vector<String>::type tokens = StringUtil::split(opt->second, " :");
+                std::vector<String> tokens = StringUtil::split(opt->second, " :");
 
                 LogManager::getSingleton().logMessage(
                     "GLXWindow::create: The externalWindowHandle parameter is deprecated.\n"

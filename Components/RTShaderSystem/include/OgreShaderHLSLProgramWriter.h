@@ -99,8 +99,8 @@ protected:
     void writeAtomInstance(std::ostream& os, FunctionAtom* atom);   
 
 protected:
-    typedef map<GpuConstantType, const char*>::type     GpuConstTypeToStringMap;
-    typedef map<Parameter::Semantic, const char*>::type ParamSemanticToStringMap;
+    typedef std::map<GpuConstantType, const char*>     GpuConstTypeToStringMap;
+    typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;
 
     // Attributes.
 protected:

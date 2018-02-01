@@ -4385,7 +4385,7 @@ namespace Ogre
         if( eventName.empty() )
             return;
 
-        vector<wchar_t>::type result(eventName.length() + 1, '\0');
+        std::vector<wchar_t> result(eventName.length() + 1, '\0');
         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
         (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
     }
@@ -4402,7 +4402,7 @@ namespace Ogre
         if( eventName.empty() )
             return;
 
-        vector<wchar_t>::type result(eventName.length() + 1, '\0');
+        std::vector<wchar_t> result(eventName.length() + 1, '\0');
         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
         (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
     }

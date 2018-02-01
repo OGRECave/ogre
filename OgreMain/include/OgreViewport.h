@@ -432,7 +432,7 @@ namespace Ogre {
         /// Automatic rendering on/off
         bool mIsAutoUpdated;
 
-        typedef vector<Listener*>::type ListenerList;
+        typedef std::vector<Listener*> ListenerList;
         ListenerList mListeners;
 		ColourBufferType mColourBuffer;
     };

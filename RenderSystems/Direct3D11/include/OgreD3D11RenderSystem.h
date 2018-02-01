@@ -191,7 +191,7 @@ namespace Ogre
         /// Primary window, the one used to create the device
         D3D11RenderWindowBase* mPrimaryWindow;
 
-        typedef vector<D3D11RenderWindowBase*>::type SecondaryWindowList;
+        typedef std::vector<D3D11RenderWindowBase*> SecondaryWindowList;
         // List of additional windows after the first (swap chains)
         SecondaryWindowList mSecondaryWindows;
 

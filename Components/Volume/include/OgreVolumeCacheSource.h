@@ -58,7 +58,7 @@ namespace Volume {
     protected:
         
         /// Map for the cache
-        typedef map<Vector3, Vector4>::type UMapPositionValue;
+        typedef std::map<Vector3, Vector4> UMapPositionValue;
         mutable UMapPositionValue mCache;
 
         /// The source to cache.

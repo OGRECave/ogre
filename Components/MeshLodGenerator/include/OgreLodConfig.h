@@ -47,7 +47,7 @@ struct _OgreLodExport ProfiledEdge {
     Real cost; // Requested collapse cost
 };
 
-typedef vector<ProfiledEdge>::type LodProfile;
+typedef std::vector<ProfiledEdge> LodProfile;
 
 /**
  * @brief Structure for automatic Lod configuration.
@@ -129,7 +129,7 @@ struct _OgreLodExport LodConfig {
     MeshPtr mesh; /// The mesh which we want to reduce.
     LodStrategy* strategy; /// Lod strategy to use.
 
-    typedef vector<LodLevel>::type LodLevelList;
+    typedef std::vector<LodLevel> LodLevelList;
     LodLevelList levels; /// Info about Lod levels
 
     LodConfig(MeshPtr & _mesh, LodStrategy * _strategy = DistanceLodBoxStrategy::getSingletonPtr());

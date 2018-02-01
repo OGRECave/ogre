@@ -575,7 +575,7 @@ namespace Ogre {
         /// Pointer to a custom shadow camera setup.
         mutable ShadowCameraSetupPtr mCustomShadowCameraSetup;
 
-        typedef map<uint16, Vector4>::type CustomParameterMap;
+        typedef std::map<uint16, Vector4> CustomParameterMap;
         /// Stores the custom parameters for the light.
         CustomParameterMap mCustomParameters;
     };

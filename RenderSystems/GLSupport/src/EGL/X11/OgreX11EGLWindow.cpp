@@ -134,7 +134,7 @@ namespace Ogre {
             }
             else if ((opt = miscParams->find("externalWindowHandle")) != end)
             {
-                //vector<String>::type tokens = StringUtil::split(opt->second, " :");
+                //std::vector<String> tokens = StringUtil::split(opt->second, " :");
                         StringVector tokens = StringUtil::split(opt->second, " :");
 
                 LogManager::getSingleton().logMessage(

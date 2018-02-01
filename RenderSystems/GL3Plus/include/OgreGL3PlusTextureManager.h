@@ -36,8 +36,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include <vector>
 
 namespace Ogre {
-    typedef vector<GL3PlusTexturePtr>::type GL3PlusTexturePtrList;
-    typedef vector<TexturePtr>::type TexturePtrList;
+    typedef std::vector<GL3PlusTexturePtr> GL3PlusTexturePtrList;
+    typedef std::vector<TexturePtr> TexturePtrList;
 
     /** GL3Plus-specific implementation of a TextureManager */
     class _OgreGL3PlusExport GL3PlusTextureManager : public TextureManager

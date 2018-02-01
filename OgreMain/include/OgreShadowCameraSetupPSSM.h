@@ -57,8 +57,8 @@ namespace Ogre
     {
         using LiSPSMShadowCameraSetup::setOptimalAdjustFactor;
     public:
-        typedef vector<Real>::type SplitPointList;
-        typedef vector<Real>::type OptimalAdjustFactorList;
+        typedef std::vector<Real> SplitPointList;
+        typedef std::vector<Real> OptimalAdjustFactorList;
 
     protected:
         uint mSplitCount;

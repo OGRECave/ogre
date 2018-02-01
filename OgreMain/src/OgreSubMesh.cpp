@@ -330,7 +330,7 @@ namespace Ogre {
         uint8 *vdata = (uint8 *)vbuf->lock (HardwareBuffer::HBL_READ_ONLY);
         size_t vsz = vbuf->getVertexSize ();
 
-        vector<Cluster>::type boxes;
+        std::vector<Cluster> boxes;
         boxes.reserve (count);
 
         // First of all, find min and max bounding box of the submesh
@@ -374,7 +374,7 @@ namespace Ogre {
             // Find the largest box with more than one vertex :)
             Cluster *split_box = NULL;
             Real split_volume = -1;
-            for (vector<Cluster>::type::iterator b = boxes.begin ();
+            for (std::vector<Cluster>::iterator b = boxes.begin ();
                  b != boxes.end (); ++b)
             {
                 if (b->empty ())
@@ -410,7 +410,7 @@ namespace Ogre {
 
         // Fine, now from every cluster choose the vertex that is most
         // distant from the geometrical center and from other extremes.
-        for (vector<Cluster>::type::const_iterator b = boxes.begin ();
+        for (std::vector<Cluster>::const_iterator b = boxes.begin ();
              b != boxes.end (); ++b)
         {
             Real rating = 0;
@@ -425,7 +425,7 @@ namespace Ogre {
                 Vector3 vv (v [0], v [1], v [2]);
                 Real r = (vv - center).squaredLength ();
 
-                for (vector<Vector3>::type::const_iterator e = extremityPoints.begin ();
+                for (std::vector<Vector3>::const_iterator e = extremityPoints.begin ();
                      e != extremityPoints.end (); ++e)
                     r += (*e - vv).squaredLength ();
                 if (r > rating)

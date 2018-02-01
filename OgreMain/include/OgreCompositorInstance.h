@@ -107,9 +107,9 @@ namespace Ogre {
             /// Set state to SceneManager and RenderSystem
             virtual void execute(SceneManager *sm, RenderSystem *rs) = 0;
         };
-        typedef map<int, MaterialPtr>::type QuadMaterialMap;
+        typedef std::map<int, MaterialPtr> QuadMaterialMap;
         typedef std::pair<int, RenderSystemOperation*> RenderSystemOpPair;
-        typedef vector<RenderSystemOpPair>::type RenderSystemOpPairs;
+        typedef std::vector<RenderSystemOpPair> RenderSystemOpPairs;
         /** Operation setup for a RenderTarget (collected).
         */
         class TargetOperation
@@ -165,7 +165,7 @@ namespace Ogre {
             /** Whether shadows will be enabled */
             bool shadowsEnabled;
         };
-        typedef vector<TargetOperation>::type CompiledState;
+        typedef std::vector<TargetOperation> CompiledState;
         
         /** Set enabled flag. The compositor instance will only render if it is
             enabled, otherwise it is pass-through. Resources are only created if
@@ -324,12 +324,12 @@ namespace Ogre {
         /// Is this instance allocating resources?
         bool mAlive;
         /// Map from name->local texture.
-        typedef map<String,TexturePtr>::type LocalTextureMap;
+        typedef std::map<String,TexturePtr> LocalTextureMap;
         LocalTextureMap mLocalTextures;
         /// Store a list of MRTs we've created.
-        typedef map<String,MultiRenderTarget*>::type LocalMRTMap;
+        typedef std::map<String,MultiRenderTarget*> LocalMRTMap;
         LocalMRTMap mLocalMRTs;
-        typedef map<CompositionTechnique::TextureDefinition*, TexturePtr>::type ReserveTextureMap;
+        typedef std::map<CompositionTechnique::TextureDefinition*, TexturePtr> ReserveTextureMap;
         /** Textures that are not currently in use, but that we want to keep for now,
             for example if we switch techniques but want to keep all textures available
             in case we switch back. 
@@ -337,7 +337,7 @@ namespace Ogre {
         ReserveTextureMap mReserveTextures;
 
         /// Vector of listeners.
-        typedef vector<Listener*>::type Listeners;
+        typedef std::vector<Listener*> Listeners;
         Listeners mListeners;
         
         /// Previous instance (set by chain).

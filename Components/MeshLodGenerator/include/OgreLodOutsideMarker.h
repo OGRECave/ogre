@@ -78,10 +78,10 @@ private:
         bool isInsideHull;
     };
 
-    typedef vector<OutsideData>::type OutsideDataList;
-    typedef vector<CHTriangle>::type CHTriangleList;
-    typedef vector<CHTriangle*>::type CHTrianglePList;
-    typedef vector<std::pair<CHVertex*, CHVertex*> >::type CHEdgeList;
+    typedef std::vector<OutsideData> OutsideDataList;
+    typedef std::vector<CHTriangle> CHTriangleList;
+    typedef std::vector<CHTriangle*> CHTrianglePList;
+    typedef std::vector<std::pair<CHVertex*, CHVertex*> > CHEdgeList;
 
 
 

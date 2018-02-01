@@ -177,7 +177,7 @@ namespace Ogre {
             
         };
 
-        typedef vector<MeshVersionData*>::type MeshVersionDataList;
+        typedef std::vector<MeshVersionData*> MeshVersionDataList;
         MeshVersionDataList mVersionData;
 
         MeshSerializerListener *mListener;

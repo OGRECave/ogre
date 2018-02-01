@@ -207,7 +207,7 @@ protected:
     // Local parameters.
     ShaderParameterList mLocalParameters;
     // Atom instances composing this function.
-    map<size_t, FunctionAtomInstanceList>::type mAtomInstances;
+    std::map<size_t, FunctionAtomInstanceList> mAtomInstances;
     FunctionAtomInstanceList mSortedAtomInstances;
     // Function type
     FunctionType mFunctionType;
@@ -216,7 +216,7 @@ private:
     friend class Program;
 };
 
-typedef vector<Function*>::type                     ShaderFunctionList;
+typedef std::vector<Function*>                     ShaderFunctionList;
 typedef ShaderFunctionList::iterator                ShaderFunctionIterator;
 typedef ShaderFunctionList::const_iterator          ShaderFunctionConstIterator;
 

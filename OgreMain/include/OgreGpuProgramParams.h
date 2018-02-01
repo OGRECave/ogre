@@ -469,7 +469,7 @@ namespace Ogre {
             , arraySize(1)
             , variability(GPV_GLOBAL) {}
     };
-    typedef map<String, GpuConstantDefinition>::type GpuConstantDefinitionMap;
+    typedef std::map<String, GpuConstantDefinition> GpuConstantDefinitionMap;
     typedef ConstMapIterator<GpuConstantDefinitionMap> GpuConstantDefinitionIterator;
 
     /// Struct collecting together the information for named constants.
@@ -567,7 +567,7 @@ namespace Ogre {
     GpuLogicalIndexUse(size_t bufIdx, size_t curSz, uint16 v)
         : physicalIndex(bufIdx), currentSize(curSz), variability(v) {}
     };
-    typedef map<size_t, GpuLogicalIndexUse>::type GpuLogicalIndexUseMap;
+    typedef std::map<size_t, GpuLogicalIndexUse> GpuLogicalIndexUseMap;
     /// Container struct to allow params to safely & update shared list of logical buffer assignments
     struct _OgreExport GpuLogicalBufferStruct : public GpuParamsAlloc
     {
@@ -584,29 +584,29 @@ namespace Ogre {
         @note Not necessarily in direct index order to constant indexes, logical
         to physical index map is derived from GpuProgram
     */
-    typedef vector<float>::type FloatConstantList;
+    typedef std::vector<float> FloatConstantList;
     /** Definition of container that holds the current double constants.
         @note Not necessarily in direct index order to constant indexes, logical
         to physical index map is derived from GpuProgram
     */
-    typedef vector<double>::type DoubleConstantList;
+    typedef std::vector<double> DoubleConstantList;
     /** Definition of container that holds the current int constants.
         @note Not necessarily in direct index order to constant indexes, logical
         to physical index map is derived from GpuProgram
     */
-    typedef vector<int>::type IntConstantList;
+    typedef std::vector<int> IntConstantList;
     /** Definition of container that holds the current uint constants.
         @note Not necessarily in direct index order to constant indexes, logical
         to physical index map is derived from GpuProgram
     */
-    typedef vector<uint>::type UnsignedIntConstantList;
+    typedef std::vector<uint> UnsignedIntConstantList;
     /** Definition of container that holds the current bool constants.
         @note Not necessarily in direct index order to constant indexes, logical
         to physical index map is derived from GpuProgram
     */
     //FIXME What is best container for bool in C++?  Apparently not vector,
     // since it stores bool as bitfield which is slow and awkward.
-    // typedef vector<bool>::type BoolConstantList;
+    // typedef std::vector<bool> BoolConstantList;
     // typedef deque<bool>::type BoolConstantList;
 
     /** A group of manually updated parameters that are shared between many parameter sets.
@@ -808,7 +808,7 @@ namespace Ogre {
             const GpuConstantDefinition* srcDefinition;
             const GpuConstantDefinition* dstDefinition;
         };
-        typedef vector<CopyDataEntry>::type CopyDataList;
+        typedef std::vector<CopyDataEntry> CopyDataList;
 
         CopyDataList mCopyDataList;
 
@@ -1496,13 +1496,13 @@ namespace Ogre {
 
         };
         // Auto parameter storage
-        typedef vector<AutoConstantEntry>::type AutoConstantList;
+        typedef std::vector<AutoConstantEntry> AutoConstantList;
 
-        typedef vector<GpuSharedParametersUsage>::type GpuSharedParamUsageList;
+        typedef std::vector<GpuSharedParametersUsage> GpuSharedParamUsageList;
 
         // Map that store subroutines associated with slots
-        typedef OGRE_HashMap<unsigned int, String> SubroutineMap;
-        typedef OGRE_HashMap<unsigned int, String>::const_iterator SubroutineIterator;
+        typedef std::unordered_map<unsigned int, String> SubroutineMap;
+        typedef std::unordered_map<unsigned int, String>::const_iterator SubroutineIterator;
 
     protected:
         SubroutineMap mSubroutineMap;

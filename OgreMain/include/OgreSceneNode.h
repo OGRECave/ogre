@@ -57,7 +57,7 @@ namespace Ogre {
     class _OgreExport SceneNode : public Node
     {
     public:
-        typedef vector<MovableObject*>::type ObjectMap;
+        typedef std::vector<MovableObject*> ObjectMap;
         typedef VectorIterator<ObjectMap> ObjectIterator;
         typedef ConstVectorIterator<ObjectMap> ConstObjectIterator;
 

@@ -126,7 +126,7 @@ private:
 };
 
 
-typedef vector<RenderState*>::type              RenderStateList;
+typedef std::vector<RenderState*>              RenderStateList;
 typedef RenderStateList::iterator               RenderStateIterator;
 typedef RenderStateList::const_iterator         RenderStateConstIterator;
 

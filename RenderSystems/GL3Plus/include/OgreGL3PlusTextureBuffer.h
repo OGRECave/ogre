@@ -82,7 +82,7 @@ namespace Ogre {
         GLint mFace;
         GLint mLevel;
 
-        typedef vector<RenderTexture*>::type SliceTRT;
+        typedef std::vector<RenderTexture*> SliceTRT;
         SliceTRT mSliceTRT;
 
         void _bindToFramebuffer(GLenum attachment, uint32 zoffset, GLenum which);

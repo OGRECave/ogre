@@ -56,7 +56,7 @@ namespace Ogre {
         void convertElement( const VertexElement & element, D3DVERTEXELEMENT9 & dxElement );
         void notifyChanged();
     protected:        
-        typedef map<IDirect3DDevice9*, IDirect3DVertexDeclaration9*>::type  DeviceToDeclarationMap;
+        typedef std::map<IDirect3DDevice9*, IDirect3DVertexDeclaration9*>  DeviceToDeclarationMap;
         typedef DeviceToDeclarationMap::iterator                            DeviceToDeclarationIterator;
 
         DeviceToDeclarationMap      mMapDeviceToDeclaration;

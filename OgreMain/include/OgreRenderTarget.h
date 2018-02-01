@@ -471,11 +471,11 @@ namespace Ogre {
 
         virtual void updateStats(void);
 
-        typedef map<int, Viewport*>::type ViewportList;
+        typedef std::map<int, Viewport*> ViewportList;
         /// List of viewports, map on Z-order
         ViewportList mViewportList;
 
-        typedef vector<RenderTargetListener*>::type RenderTargetListenerList;
+        typedef std::vector<RenderTargetListener*> RenderTargetListenerList;
         RenderTargetListenerList mListeners;
     
 

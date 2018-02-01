@@ -109,7 +109,7 @@ namespace Ogre
 
                 D3D11_INFO_QUEUE_FILTER filter;
                 ZeroMemory(&filter, sizeof(D3D11_INFO_QUEUE_FILTER));
-                vector<D3D11_MESSAGE_SEVERITY>::type severityList;
+                std::vector<D3D11_MESSAGE_SEVERITY> severityList;
 
                 switch(mExceptionsErrorLevel)
                 {

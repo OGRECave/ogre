@@ -45,7 +45,7 @@ public:
 
         Ogre::Light *iMainLight;
 
-        Ogre::vector<Ogre::Node*>::type mLightNodes;
+        std::vector<Ogre::Node*> mLightNodes;
 
 };
 

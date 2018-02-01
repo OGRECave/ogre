@@ -123,10 +123,10 @@ namespace Ogre
     class _OgreExport ObjectAbstractNode : public AbstractNode
     {
     private:
-        map<String,String>::type mEnv;
+        std::map<String,String> mEnv;
     public:
         String name, cls;
-        vector<String>::type bases;
+        std::vector<String> bases;
         uint32 id;
         bool abstract;
         AbstractNodeList children;
@@ -140,7 +140,7 @@ namespace Ogre
         void addVariable(const String &name);
         void setVariable(const String &name, const String &value);
         std::pair<bool,String> getVariable(const String &name) const;
-        const map<String,String>::type &getVariables() const;
+        const std::map<String,String> &getVariables() const;
     };
 
     /** This abstract node represents a script property */
@@ -188,8 +188,8 @@ namespace Ogre
     class _OgreExport ScriptCompiler : public ScriptCompilerAlloc
     {
     public: // Externally accessible types
-        //typedef map<String,uint32>::type IdMap;
-        typedef OGRE_HashMap<String,uint32> IdMap;
+        //typedef std::map<String,uint32> IdMap;
+        typedef std::unordered_map<String,uint32> IdMap;
 
         // The container for errors
         struct Error : public ScriptCompilerAlloc
@@ -296,12 +296,12 @@ namespace Ogre
 		uint32 mLargestRegisteredWordId;
 
         // This is an environment map
-        typedef map<String,String>::type Environment;
+        typedef std::map<String,String> Environment;
         Environment mEnv;
 
-        typedef map<String,AbstractNodeListPtr>::type ImportCacheMap;
+        typedef std::map<String,AbstractNodeListPtr> ImportCacheMap;
         ImportCacheMap mImports; // The set of imported scripts to avoid circular dependencies
-        typedef multimap<String,String>::type ImportRequestMap;
+        typedef multistd::map<String,String> ImportRequestMap;
         ImportRequestMap mImportRequests; // This holds the target objects for each script to be imported
 
         // This stores the imports of the scripts, so they are separated and can be treated specially
@@ -411,7 +411,7 @@ namespace Ogre
         ScriptCompilerListener *mListener;
 
         // Stores a map from object types to the translators that handle them
-        vector<ScriptTranslatorManager*>::type mManagers;
+        std::vector<ScriptTranslatorManager*> mManagers;
 
         // A pointer to the built-in ScriptTranslatorManager
         ScriptTranslatorManager *mBuiltinTranslatorManager;

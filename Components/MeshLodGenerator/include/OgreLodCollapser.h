@@ -77,7 +77,7 @@ protected:
         size_t submeshID;
     };
     
-    typedef vector<CollapsedEdge>::type CollapsedEdges;
+    typedef std::vector<CollapsedEdge> CollapsedEdges;
 
     /// tmp variable, to overcome allocation on every collapse.
     CollapsedEdges tmpCollapsedEdges;

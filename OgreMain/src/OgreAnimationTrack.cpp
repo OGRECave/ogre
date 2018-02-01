@@ -201,13 +201,13 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void AnimationTrack::_collectKeyFrameTimes(vector<Real>::type& keyFrameTimes)
+    void AnimationTrack::_collectKeyFrameTimes(std::vector<Real>& keyFrameTimes)
     {
         for (KeyFrameList::const_iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
         {
             Real timePos = (*i)->getTime();
 
-            vector<Real>::type::iterator it =
+            std::vector<Real>::iterator it =
                 std::lower_bound(keyFrameTimes.begin(), keyFrameTimes.end(), timePos);
             if (it == keyFrameTimes.end() || *it != timePos)
             {
@@ -216,7 +216,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void AnimationTrack::_buildKeyFrameIndexMap(const vector<Real>::type& keyFrameTimes)
+    void AnimationTrack::_buildKeyFrameIndexMap(const std::vector<Real>& keyFrameTimes)
     {
         // Pre-allocate memory
         mKeyFrameIndexMap.resize(keyFrameTimes.size() + 1);

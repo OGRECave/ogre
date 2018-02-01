@@ -130,7 +130,7 @@ protected:
         ParameterPtr mPSInputTexCoord;
     };
 
-    typedef vector<TextureUnitParams>::type         TextureUnitParamsList;
+    typedef std::vector<TextureUnitParams>         TextureUnitParamsList;
     typedef TextureUnitParamsList::iterator         TextureUnitParamsIterator;
     typedef TextureUnitParamsList::const_iterator   TextureUnitParamsConstIterator;
 

@@ -100,11 +100,11 @@ namespace Volume {
 
     /** To hold vertices.
     */
-    typedef vector<Vertex>::type VecVertex;
+    typedef std::vector<Vertex> VecVertex;
 
     /** To hold indices.
     */
-    typedef vector<size_t>::type VecIndices;
+    typedef std::vector<size_t> VecIndices;
 
     /** Callback class when the user needs information about the triangles of
         chunks of a LOD level.
@@ -139,7 +139,7 @@ namespace Volume {
         static const unsigned short MAIN_BINDING;
 
         /// Map to get a vertex index.
-        typedef map<Vertex, size_t>::type UMapVertexIndex;
+        typedef std::map<Vertex, size_t> UMapVertexIndex;
         UMapVertexIndex mIndexMap;
 
          /// Holds the vertices of the mesh.

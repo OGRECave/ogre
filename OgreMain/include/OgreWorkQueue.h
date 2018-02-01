@@ -71,7 +71,7 @@ namespace Ogre
     class _OgreExport WorkQueue : public UtilityAlloc
     {
     protected:
-        typedef map<String, uint16>::type ChannelMap;
+        typedef std::map<String, uint16> ChannelMap;
         ChannelMap mChannelMap;
         uint16 mNextChannel;
         OGRE_WQ_MUTEX(mChannelMapMutex);
@@ -547,8 +547,8 @@ namespace Ogre
 
         typedef list<RequestHandlerHolderPtr>::type RequestHandlerList;
         typedef list<ResponseHandler*>::type ResponseHandlerList;
-        typedef map<uint16, RequestHandlerList>::type RequestHandlerListByChannel;
-        typedef map<uint16, ResponseHandlerList>::type ResponseHandlerListByChannel;
+        typedef std::map<uint16, RequestHandlerList> RequestHandlerListByChannel;
+        typedef std::map<uint16, ResponseHandlerList> ResponseHandlerListByChannel;
 
         RequestHandlerListByChannel mRequestHandlers;
         ResponseHandlerListByChannel mResponseHandlers;

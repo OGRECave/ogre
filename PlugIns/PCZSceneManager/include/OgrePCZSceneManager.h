@@ -53,7 +53,7 @@ namespace Ogre
     class PCZoneFactoryManager;
     class PortalBase;
 
-    typedef vector<SceneNode*>::type NodeList;
+    typedef std::vector<SceneNode*> NodeList;
     typedef list<WireBoundingBox*>::type BoxList;
 
     /** Specialized SceneManager that uses Portal-Connected-Zones to divide the scene spatially.

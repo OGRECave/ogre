@@ -57,7 +57,7 @@ namespace Ogre {
     
     // Types.
     protected:
-        typedef vector<GLES2ManagedResource*>::type  ResourceContainer;
+        typedef std::vector<GLES2ManagedResource*>  ResourceContainer;
         typedef ResourceContainer::iterator     ResourceContainerIterator;
 
     // Protected methods.

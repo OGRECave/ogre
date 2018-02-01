@@ -164,14 +164,14 @@ namespace Ogre {
     {
         if(GLContext* ctx = mCurrentContext)
         {
-            vector<uint32>::type& vaos = ctx->_getVaoDeferredForDestruction();
+            std::vector<uint32>& vaos = ctx->_getVaoDeferredForDestruction();
             while(!vaos.empty())
             {
                 _destroyVao(ctx, vaos.back());
                 vaos.pop_back();
             }
             
-            vector<uint32>::type& fbos = ctx->_getFboDeferredForDestruction();
+            std::vector<uint32>& fbos = ctx->_getFboDeferredForDestruction();
             while(!fbos.empty())
             {
                 _destroyFbo(ctx, fbos.back());

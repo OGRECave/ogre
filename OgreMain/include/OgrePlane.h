@@ -164,7 +164,7 @@ namespace Ogre {
         _OgreExport friend std::ostream& operator<< (std::ostream& o, const Plane& p);
     };
 
-    typedef vector<Plane>::type PlaneList;
+    typedef std::vector<Plane> PlaneList;
     /** @} */
     /** @} */
 

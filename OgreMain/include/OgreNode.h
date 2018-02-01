@@ -67,7 +67,7 @@ namespace Ogre {
             /// Transform is relative to world space
             TS_WORLD
         };
-        typedef vector<Node*>::type ChildNodeMap;
+        typedef std::vector<Node*> ChildNodeMap;
         typedef VectorIterator<ChildNodeMap> ChildNodeIterator;
         typedef ConstVectorIterator<ChildNodeMap> ConstChildNodeIterator;
 
@@ -217,7 +217,7 @@ namespace Ogre {
         /** Node listener - only one allowed (no list) for size & performance reasons. */
         Listener* mListener;
 
-        typedef vector<Node*>::type QueuedUpdates;
+        typedef std::vector<Node*> QueuedUpdates;
         static QueuedUpdates msQueuedUpdates;
 
         DebugRenderable* mDebug;

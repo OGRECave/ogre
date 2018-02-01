@@ -168,19 +168,19 @@ namespace Ogre
         bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
         void detachRenderTargetImpl(const String& name);
         
-        OGRE_HashMap<IDirect3DDevice9*, unsigned short> mCurrentLights;
+        std::unordered_map<IDirect3DDevice9*, unsigned short> mCurrentLights;
         /// Saved last view matrix
         Matrix4 mViewMatrix;
 
         D3DXMATRIX mDxViewMat, mDxProjMat, mDxWorldMat;
     
-        typedef vector<D3D9RenderWindow*>::type D3D9RenderWindowList;
+        typedef std::vector<D3D9RenderWindow*> D3D9RenderWindowList;
         // List of additional windows after the first (swap chains)
         D3D9RenderWindowList mRenderWindows;
         
         /** Mapping of texture format -> DepthStencil. Used as cache by _getDepthStencilFormatFor
         */
-        typedef OGRE_HashMap<unsigned int, D3DFORMAT> DepthStencilHash;
+        typedef std::unordered_map<unsigned int, D3DFORMAT> DepthStencilHash;
         DepthStencilHash mDepthStencilHash;
 
         MultiheadUseType mMultiheadUse;

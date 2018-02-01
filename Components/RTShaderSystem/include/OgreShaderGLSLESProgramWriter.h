@@ -76,8 +76,8 @@ public:
     static String TargetLanguage;
 
     protected:
-    typedef     map<FunctionInvocation, String>::type       FunctionMap;
-    typedef     vector<FunctionInvocation>::type            FunctionVector;
+    typedef     std::map<FunctionInvocation, String>       FunctionMap;
+    typedef     std::vector<FunctionInvocation>            FunctionVector;
     typedef     FunctionMap::const_iterator                 FunctionMapIterator;
     typedef     GpuConstTypeToStringMap::const_iterator     GpuConstTypeToStringMapIterator;
 

@@ -44,7 +44,7 @@ namespace Ogre
     /** \addtogroup Scene
     *  @{
     */
-    typedef vector<TexturePtr>::type ShadowTextureList;
+    typedef std::vector<TexturePtr> ShadowTextureList;
 
     /** Structure containing the configuration for one shadow texture. */
     struct ShadowTextureConfig
@@ -59,7 +59,7 @@ namespace Ogre
             : width(512), height(512), format(PF_X8R8G8B8), fsaa(0), depthBufferPoolId(1) {}
     };
 
-    typedef vector<ShadowTextureConfig>::type ShadowTextureConfigList;
+    typedef std::vector<ShadowTextureConfig> ShadowTextureConfigList;
     typedef ConstVectorIterator<ShadowTextureConfigList> ConstShadowTextureConfigIterator;
 
     _OgreExport bool operator== ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );

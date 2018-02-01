@@ -124,7 +124,7 @@ namespace Ogre {
                 size_t stencil;   // Stencil format (0=no stencil)
             };
 
-            vector<Mode>::type modes;
+            std::vector<Mode> modes;
         };
         /** Properties for all internal formats defined by OGRE
          */
@@ -179,7 +179,7 @@ namespace Ogre {
             GLHardwarePixelBufferCommon* buffer;
             size_t refcount;
         };
-        typedef map<RBFormat, RBRef>::type RenderBufferMap;
+        typedef std::map<RBFormat, RBRef> RenderBufferMap;
         RenderBufferMap mRenderBufferMap;
     };
 

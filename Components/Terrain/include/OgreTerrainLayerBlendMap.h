@@ -185,7 +185,7 @@ namespace Ogre
 
     };
 
-    typedef vector<TerrainLayerBlendMap*>::type TerrainLayerBlendMapList;
+    typedef std::vector<TerrainLayerBlendMap*> TerrainLayerBlendMapList;
 
     /** @} */
     /** @} */

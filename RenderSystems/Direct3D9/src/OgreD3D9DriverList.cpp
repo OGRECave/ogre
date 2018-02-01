@@ -77,7 +77,7 @@ namespace Ogre
 
     D3D9Driver* D3D9DriverList::item( const String &name )
     {
-        vector<D3D9Driver>::type::iterator it = mDriverList.begin();
+        std::vector<D3D9Driver>::iterator it = mDriverList.begin();
         if (it == mDriverList.end())
             return NULL;
 

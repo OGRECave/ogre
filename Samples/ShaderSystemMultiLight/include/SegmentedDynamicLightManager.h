@@ -110,7 +110,7 @@ private:
         Real mMaxZ;
     };
 
-    typedef map<const Light*,LightData>::type MapLightData;
+    typedef std::map<const Light*,LightData> MapLightData;
 
 private:
     //Update the systems internal light lists
@@ -145,8 +145,8 @@ private:
     MapLightData mActiveLights;
         
     //A Grid structures to contain the lights as they are represented in the light texture
-    typedef vector<const Light*>::type VecLights;
-    typedef vector<VecLights>::type SegmentedVecLight;
+    typedef std::vector<const Light*> VecLights;
+    typedef std::vector<VecLights> SegmentedVecLight;
     SegmentedVecLight mSegmentedLightGrid;
 
     //A pointer to a texture which containing information from which a shader renders the lights

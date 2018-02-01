@@ -121,7 +121,7 @@ namespace Ogre {
             D3DPRESENT_PARAMETERS   presentParameters;              // Present parameters of the render window.
             bool                    acquired;                       // True if resources acquired.          
         };      
-        typedef map<D3D9RenderWindow*, RenderWindowResources*>::type RenderWindowToResourcesMap;
+        typedef std::map<D3D9RenderWindow*, RenderWindowResources*> RenderWindowToResourcesMap;
         typedef RenderWindowToResourcesMap::iterator                 RenderWindowToResourcesIterator;
 
         RenderWindowToResourcesMap mMapRenderWindowToResources;     // Map between render window to resources.

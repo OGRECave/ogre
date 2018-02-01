@@ -153,8 +153,8 @@ namespace Ogre {
 
         // local data members of _render that were moved here to improve performance
         // (save allocations)
-        vector<GLuint>::type mRenderAttribsBound;
-        vector<GLuint>::type mRenderInstanceAttribsBound;
+        std::vector<GLuint> mRenderAttribsBound;
+        std::vector<GLuint> mRenderInstanceAttribsBound;
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		/// @copydoc RenderSystem::setDrawBuffer

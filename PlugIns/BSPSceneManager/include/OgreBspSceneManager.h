@@ -78,7 +78,7 @@ namespace Ogre {
         typedef set<int>::type FaceGroupSet;
         FaceGroupSet mFaceGroupSet;
         // Material -> face group hashmap
-        typedef map<Material*, vector<StaticFaceGroup*>::type, materialLess >::type MaterialFaceGroupMap;
+        typedef std::map<Material*, std::vector<StaticFaceGroup*>, materialLess > MaterialFaceGroupMap;
         MaterialFaceGroupMap mMatFaceGroupMap;
 
         RenderOperation mRenderOp;
@@ -251,7 +251,7 @@ namespace Ogre {
         /// Set for eliminating duplicates since objects can be in > 1 node
         set<MovableObject*>::type mObjsThisQuery;
         /// list of the last single intersection world fragments (derived)
-        vector<SceneQuery::WorldFragment*>::type mSingleIntersections;
+        std::vector<SceneQuery::WorldFragment*> mSingleIntersections;
 
         void clearTemporaries(void);
         /** Internal processing of a single node.

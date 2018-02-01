@@ -233,7 +233,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, errorDescription, "D3D11HardwarePixelBuffer::_unmapstaticbuffer");
         }
 
-        mDataForStaticUsageLock.swap(vector<int8>::type()); // i.e. shrink_to_fit
+        mDataForStaticUsageLock.swap(std::vector<int8>()); // i.e. shrink_to_fit
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_unmapstagingbuffer(bool copyback)
@@ -344,7 +344,7 @@ namespace Ogre {
         // convert to pixelbuffer's native format if necessary
         if(src.format != mFormat)
         {
-            vector<uint8>::type buffer;
+            std::vector<uint8> buffer;
             buffer.resize(PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(), mFormat));
             PixelBox converted = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), mFormat, buffer.data());
             PixelUtil::bulkPixelConversion(src, converted);

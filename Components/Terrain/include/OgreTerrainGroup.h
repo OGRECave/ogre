@@ -417,7 +417,7 @@ namespace Ogre
          */
         RayResult rayIntersects(const Ray& ray, Real distanceLimit = 0) const; 
         
-        typedef vector<Terrain*>::type TerrainList; 
+        typedef std::vector<Terrain*> TerrainList; 
         /** Test intersection of a box with the terrain. 
         @remarks
             Tests an AABB for overlap with a terrain bounding box. Note that this does not mean that the box
@@ -457,7 +457,7 @@ namespace Ogre
         bool isDerivedDataUpdateInProgress() const;
 
         /// Packed map, signed 16 bits for each axis from -32767 to +32767
-        typedef map<uint32, TerrainSlot*>::type TerrainSlotMap;
+        typedef std::map<uint32, TerrainSlot*> TerrainSlotMap;
         typedef MapIterator<TerrainSlotMap> TerrainIterator;
         typedef ConstMapIterator<TerrainSlotMap> ConstTerrainIterator;
 

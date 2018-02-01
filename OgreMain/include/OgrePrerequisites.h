@@ -56,10 +56,10 @@ namespace Ogre {
         typedef float Real;
     #endif
 
-    #define OGRE_HashMap ::std::unordered_map
-    #define OGRE_HashMultiMap ::std::unordered_multimap
-    #define OGRE_HashSet ::std::unordered_set
-    #define OGRE_HashMultiSet ::std::unordered_multiset
+    //#define std::unordered_map ::std::unordered_map
+    //#define std::unordered_multimap ::std::unordered_multimap
+    //#define std::unordered_set ::std::unordered_set
+    //#define OGRE_HashMultiSet ::std::unordered_multiset
 
 
     /** In order to avoid finger-aches :)
@@ -318,6 +318,7 @@ namespace Ogre
 //for stl container
 namespace Ogre
 {
+    /*
     template <typename T>
     struct deque 
     { 
@@ -364,7 +365,7 @@ namespace Ogre
         typedef typename std::multimap<K, V, P> type;
         typedef typename std::multimap<K, V, P>::iterator iterator;
         typedef typename std::multimap<K, V, P>::const_iterator const_iterator;
-    };
+    };*/
 } // Ogre
 
 #endif // __OgrePrerequisites_H__

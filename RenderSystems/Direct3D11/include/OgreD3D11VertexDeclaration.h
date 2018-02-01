@@ -43,9 +43,9 @@ namespace Ogre {
     protected:
         D3D11Device & mlpD3DDevice;
 
-        typedef map<D3D11HLSLProgram*, ComPtr<ID3D11InputLayout>>::type ShaderToILayoutMap;
+        typedef std::map<D3D11HLSLProgram*, ComPtr<ID3D11InputLayout>> ShaderToILayoutMap;
         typedef ShaderToILayoutMap::iterator ShaderToILayoutMapIterator;
-        typedef map<D3D11HLSLProgram*, vector<D3D11_INPUT_ELEMENT_DESC>::type>::type ShaderToInputDesc;
+        typedef std::map<D3D11HLSLProgram*, std::vector<D3D11_INPUT_ELEMENT_DESC>> ShaderToInputDesc;
         typedef ShaderToInputDesc::iterator ShaderToInputDescIterator;
 
         ShaderToInputDesc  mD3delems;

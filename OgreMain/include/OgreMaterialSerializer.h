@@ -67,7 +67,7 @@ namespace Ogre {
         bool supportsMorphAnimation;
         ushort supportsPoseAnimation; // number of simultaneous poses supported
         bool usesVertexTextureFetch;
-        vector<std::pair<String, String> >::type customParameters;
+        std::vector<std::pair<String, String> > customParameters;
     };
     /** Struct for holding the script context while parsing. */
     struct MaterialScriptContext 
@@ -200,7 +200,7 @@ namespace Ogre {
 
     protected:
         /// Keyword-mapped attribute parsers.
-        typedef map<String, ATTRIBUTE_PARSER>::type AttribParserList;
+        typedef std::map<String, ATTRIBUTE_PARSER> AttribParserList;
 
         MaterialScriptContext mScriptContext;
 
@@ -232,7 +232,7 @@ namespace Ogre {
         AttribParserList mProgramDefaultParamAttribParsers;
 
         /// Listeners list of this Serializer.
-        typedef vector<Listener*>::type         ListenerList;
+        typedef std::vector<Listener*>         ListenerList;
         typedef ListenerList::iterator          ListenerListIterator;
         typedef ListenerList::const_iterator    ListenerListConstIterator;
         ListenerList mListeners;
@@ -276,7 +276,7 @@ namespace Ogre {
         void writeLayerBlendOperationEx(const LayerBlendOperationEx op);
         void writeLayerBlendSource(const LayerBlendSource lbs);
         
-        typedef multimap<TextureUnitState::TextureEffectType, TextureUnitState::TextureEffect>::type EffectMap;
+        typedef multistd::map<TextureUnitState::TextureEffectType, TextureUnitState::TextureEffect> EffectMap;
 
         void writeRotationEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
         void writeTransformEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);

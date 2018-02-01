@@ -219,7 +219,7 @@ namespace Ogre {
             {
                 if (line.substr(0,8) == "#include")
                 {
-                    vector<String>::type params = StringUtil::split(line, "\t\n ()<>");
+                    std::vector<String> params = StringUtil::split(line, "\t\n ()<>");
                     DataStreamPtr includeStream = 
                         ResourceGroupManager::getSingleton().openResource(
                             params[1], groupName);
@@ -253,7 +253,7 @@ namespace Ogre {
                 if ((pOverlay && !skipLine) || isATemplate)
                 {
                     // Already in overlay
-                    vector<String>::type params = StringUtil::split(line, "\t\n ()");
+                    std::vector<String> params = StringUtil::split(line, "\t\n ()");
 
                     if (line == "}")
                     {
@@ -372,7 +372,7 @@ namespace Ogre {
     {
         bool ret = false;
         uint skipParam =0;
-        vector<String>::type params = StringUtil::split(line, "\t\n ()");
+        std::vector<String> params = StringUtil::split(line, "\t\n ()");
 
         if (isATemplate)
         {
@@ -438,7 +438,7 @@ namespace Ogre {
     void OverlayManager::parseAttrib( const String& line, Overlay* pOverlay)
     {
         // Split params on first space
-        vector<String>::type vecparams = StringUtil::split(line, "\t ", 1);
+        std::vector<String> vecparams = StringUtil::split(line, "\t ", 1);
 
         // Look up first param (command setting)
         StringUtil::toLowerCase(vecparams[0]);
@@ -456,7 +456,7 @@ namespace Ogre {
     void OverlayManager::parseElementAttrib( const String& line, Overlay* pOverlay, OverlayElement* pElement )
     {
         // Split params on first space
-        vector<String>::type vecparams = StringUtil::split(line, "\t ", 1);
+        std::vector<String> vecparams = StringUtil::split(line, "\t ", 1);
 
         // Look up first param (command setting)
         StringUtil::toLowerCase(vecparams[0]);

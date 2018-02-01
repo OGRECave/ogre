@@ -191,10 +191,10 @@ namespace Ogre {
         /** Vector of RenderablePass objects, this is built on the assumption that
          vectors only ever increase in size, so even if we do clear() the memory stays
          allocated, ie fast */
-        typedef vector<RenderablePass>::type RenderablePassList;
-        typedef vector<Renderable*>::type RenderableList;
+        typedef std::vector<RenderablePass> RenderablePassList;
+        typedef std::vector<Renderable*> RenderableList;
         /** Map of pass to renderable lists, this is a grouping by pass. */
-        typedef map<Pass*, RenderableList, PassGroupLess>::type PassGroupRenderableMap;
+        typedef std::map<Pass*, RenderableList, PassGroupLess> PassGroupRenderableMap;
 
         /// Functor for accessing sort value 1 for radix sort (Pass)
         struct RadixSortFunctorPass
@@ -462,7 +462,7 @@ namespace Ogre {
     class _OgreExport RenderQueueGroup : public RenderQueueAlloc
     {
     public:
-        typedef map<ushort, RenderPriorityGroup*, std::less<ushort> >::type PriorityMap;
+        typedef std::map<ushort, RenderPriorityGroup*, std::less<ushort> > PriorityMap;
         typedef MapIterator<PriorityMap> PriorityMapIterator;
         typedef ConstMapIterator<PriorityMap> ConstPriorityMapIterator;
     protected:

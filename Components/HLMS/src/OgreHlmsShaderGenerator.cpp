@@ -190,7 +190,7 @@ namespace Ogre
 		bool syntaxError = false;
 		bool nextExpressionNegates = false;
 
-		vector<Expression*>::type expressionParents;
+		std::vector<Expression*> expressionParents;
 		ExpressionVec outExpressions;
 		outExpressions.clear();
 		outExpressions.resize(1);

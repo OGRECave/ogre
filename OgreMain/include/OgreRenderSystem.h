@@ -50,10 +50,10 @@ namespace Ogre
     *  @{
     */
 
-    typedef vector<DepthBuffer*>::type DepthBufferVec;
-    typedef map< uint16, DepthBufferVec >::type DepthBufferMap;
-    typedef map< String, RenderTarget * >::type RenderTargetMap;
-    typedef multimap<uchar, RenderTarget * >::type RenderTargetPriorityMap;
+    typedef std::vector<DepthBuffer*> DepthBufferVec;
+    typedef std::map< uint16, DepthBufferVec > DepthBufferMap;
+    typedef std::map< String, RenderTarget * > RenderTargetMap;
+    typedef multistd::map<uchar, RenderTarget * > RenderTargetPriorityMap;
 
     class TextureManager;
     /// Enum describing the ways to generate texture coordinates

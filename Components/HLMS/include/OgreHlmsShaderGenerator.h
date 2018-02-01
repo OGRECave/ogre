@@ -48,7 +48,7 @@ namespace Ogre
 	{
 	protected:
 
-		typedef map<IdString, String>::type PiecesMap;
+		typedef std::map<IdString, String> PiecesMap;
 
 		enum ExpressionType
 		{
@@ -63,13 +63,13 @@ namespace Ogre
 			bool                    result;
 			bool                    negated;
 			ExpressionType          type;
-			vector<Expression>::type children;
+			std::vector<Expression> children;
 			String            value;
 
 			Expression() : result(false), negated(false), type(EXPR_VAR) {}
 		};
 
-		typedef vector<Expression>::type ExpressionVec;
+		typedef std::vector<Expression> ExpressionVec;
 
 		static void copy(String &outBuffer, const SubStringRef &inSubString, size_t length);
 		static void repeat(String &outBuffer, const SubStringRef &inSubString, size_t length,

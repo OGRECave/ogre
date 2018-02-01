@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-    typedef vector<byte>::type MicroCode;
+    typedef std::vector<byte> MicroCode;
 
     /** Specialization of HighLevelGpuProgram to provide support for D3D11 
     High-Level Shader Language (HLSL).
@@ -110,7 +110,7 @@ namespace Ogre {
 
         void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
 		
-		void getDefines(String& stringBuffer, vector<D3D_SHADER_MACRO>::type& defines, const String& definesString);
+		void getDefines(String& stringBuffer, std::vector<D3D_SHADER_MACRO>& defines, const String& definesString);
 		
         String mTarget;
         String mEntryPoint;
@@ -147,7 +147,7 @@ namespace Ogre {
                 return *this;
             }
         };
-        typedef vector<ShaderVarWithPosInBuf>::type ShaderVars;
+        typedef std::vector<ShaderVarWithPosInBuf> ShaderVars;
         typedef ShaderVars::iterator ShaderVarsIter;
         typedef ShaderVars::const_iterator ShaderVarsConstIter; 
 
@@ -242,18 +242,18 @@ namespace Ogre {
         typedef std::map<String, unsigned int>::const_iterator SlotIterator;
         SlotMap mSlotMap;
 
-        typedef vector<D3D11_SIGNATURE_PARAMETER_DESC>::type D3d11ShaderParameters;
+        typedef std::vector<D3D11_SIGNATURE_PARAMETER_DESC> D3d11ShaderParameters;
         typedef D3d11ShaderParameters::iterator D3d11ShaderParametersIter; 
 
 
-        typedef vector<D3D11_SHADER_VARIABLE_DESC>::type D3d11ShaderVariables;
+        typedef std::vector<D3D11_SHADER_VARIABLE_DESC> D3d11ShaderVariables;
         typedef D3d11ShaderVariables::iterator D3d11ShaderVariablesIter; 
 
         struct GpuConstantDefinitionWithName : GpuConstantDefinition
         {
             LPCSTR                  Name;          
         };
-        typedef vector<GpuConstantDefinitionWithName>::type D3d11ShaderVariableSubparts;
+        typedef std::vector<GpuConstantDefinitionWithName> D3d11ShaderVariableSubparts;
         typedef D3d11ShaderVariableSubparts::iterator D3d11ShaderVariableSubpartsIter; 
 
         struct MemberTypeName
@@ -261,12 +261,12 @@ namespace Ogre {
             LPCSTR                  Name;           
         };
 
-        vector<String *>::type mSerStrings;
+        std::vector<String *> mSerStrings;
 
-        typedef vector<D3D11_SHADER_BUFFER_DESC>::type D3d11ShaderBufferDescs;
-        typedef vector<D3D11_SHADER_TYPE_DESC>::type D3d11ShaderTypeDescs;
-        typedef vector<UINT>::type InterfaceSlots;
-        typedef vector<MemberTypeName>::type MemberTypeNames;
+        typedef std::vector<D3D11_SHADER_BUFFER_DESC> D3d11ShaderBufferDescs;
+        typedef std::vector<D3D11_SHADER_TYPE_DESC> D3d11ShaderTypeDescs;
+        typedef std::vector<UINT> InterfaceSlots;
+        typedef std::vector<MemberTypeName> MemberTypeNames;
 
         UINT mConstantBufferSize;
         UINT mConstantBufferNr;

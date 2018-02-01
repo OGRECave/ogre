@@ -115,7 +115,7 @@ namespace Ogre {
 
     // Types.
     protected:
-        typedef map<String, Any>::type          UserObjectsMap;
+        typedef std::map<String, Any>          UserObjectsMap;
         typedef UserObjectsMap::iterator        UserObjectsMapIterator;
         typedef UserObjectsMap::const_iterator  UserObjectsMapConstIterator;
 

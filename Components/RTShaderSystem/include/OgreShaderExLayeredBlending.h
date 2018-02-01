@@ -187,7 +187,7 @@ protected:
 
     // Attributes.
 protected:
-    vector<TextureBlend>::type mTextureBlends;
+    std::vector<TextureBlend> mTextureBlends;
 
 };
 

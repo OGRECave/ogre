@@ -93,7 +93,7 @@ namespace Ogre {
     {
     public:
 
-        typedef map< uint8, RenderQueueGroup* >::type RenderQueueGroupMap;
+        typedef std::map< uint8, RenderQueueGroup* > RenderQueueGroupMap;
         /// Iterator over queue groups
         typedef MapIterator<RenderQueueGroupMap> QueueGroupIterator;
         typedef ConstMapIterator<RenderQueueGroupMap> ConstQueueGroupIterator;

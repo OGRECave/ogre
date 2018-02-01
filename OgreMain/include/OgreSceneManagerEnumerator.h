@@ -88,9 +88,9 @@ namespace Ogre {
     {
     public:
         /// Scene manager instances, indexed by instance name
-        typedef map<String, SceneManager*>::type Instances;
+        typedef std::map<String, SceneManager*> Instances;
         /// List of available scene manager types as meta data
-        typedef vector<const SceneManagerMetaData*>::type MetaDataList;
+        typedef std::vector<const SceneManagerMetaData*> MetaDataList;
     private:
         /// Scene manager factories
         typedef list<SceneManagerFactory*>::type Factories;

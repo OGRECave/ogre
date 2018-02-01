@@ -95,7 +95,7 @@ namespace Ogre
         {
         }
     };
-    typedef vector<TerrainLayerSamplerElement>::type TerrainLayerSamplerElementList;
+    typedef std::vector<TerrainLayerSamplerElement> TerrainLayerSamplerElementList;
 
     /** Description of a sampler that will be used with each layer. 
     */
@@ -121,7 +121,7 @@ namespace Ogre
         {
         }
     };
-    typedef vector<TerrainLayerSampler>::type TerrainLayerSamplerList;
+    typedef std::vector<TerrainLayerSampler> TerrainLayerSamplerList;
 
     /** The definition of the information each layer will contain in this terrain.
     All layers must contain the same structure of information, although the
@@ -208,7 +208,7 @@ namespace Ogre
         virtual ~TerrainMaterialGenerator();
 
         /// List of profiles - NB should be ordered in descending complexity
-        typedef vector<Profile*>::type ProfileList;
+        typedef std::vector<Profile*> ProfileList;
     
         /** Get the list of profiles that this generator supports.
         */

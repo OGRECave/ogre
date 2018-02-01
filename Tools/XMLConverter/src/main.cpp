@@ -288,7 +288,7 @@ XmlOptions parseArgs(int numArgs, char **args)
     }
     // Work out what kind of conversion this is
     opts.source = source;
-    Ogre::vector<String>::type srcparts = StringUtil::split(opts.source, ".");
+    std::vector<String> srcparts = StringUtil::split(opts.source, ".");
     String& ext = srcparts.back();
     StringUtil::toLowerCase(ext);
     opts.sourceExt = ext;
@@ -312,7 +312,7 @@ XmlOptions parseArgs(int numArgs, char **args)
     {
         opts.dest = dest;
     }
-    Ogre::vector<String>::type dstparts = StringUtil::split(opts.dest, ".");
+    std::vector<String> dstparts = StringUtil::split(opts.dest, ".");
     ext = dstparts.back();
     StringUtil::toLowerCase(ext);
     opts.destExt = ext;

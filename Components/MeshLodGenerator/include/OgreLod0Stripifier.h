@@ -51,7 +51,7 @@ namespace Ogre
 		static void performAnimationTrackRemap(VertexAnimationTrack* track, const RemapInfo& remapInfo);
 
 	private:
-		vector<RemapInfo>::type		remapInfos;	// 0 for shared geometry, 1+ for submesh index + 1
+		std::vector<RemapInfo>		remapInfos;	// 0 for shared geometry, 1+ for submesh index + 1
 	};
 
 
@@ -79,7 +79,7 @@ namespace Ogre
 
 	public:
 		enum{ UnusedIdx = (unsigned)-1 };
-		vector<unsigned>::type indexMap;	// returns new index if indexed by old index, or UnusedIdx
+		std::vector<unsigned> indexMap;	// returns new index if indexed by old index, or UnusedIdx
 		unsigned usedCount;
 	};
 

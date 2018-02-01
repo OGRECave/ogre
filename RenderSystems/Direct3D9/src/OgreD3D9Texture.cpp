@@ -296,7 +296,7 @@ namespace Ogre
     {
         assert(getTextureType() == TEX_TYPE_CUBE_MAP);
 
-        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T );
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (std::vector<MemoryDataStreamPtr>, MEMCATEGORY_GENERAL), SPFM_DELETE_T );
         // DDS load?
         if (getSourceFileType() == "dds")
         {
@@ -344,7 +344,7 @@ namespace Ogre
             ResourceGroupManager::getSingleton().openResource(
                 mName, mGroup, this);
 
-        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (std::vector<MemoryDataStreamPtr>, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
         loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
         return loadedStreams;
     }
@@ -358,7 +358,7 @@ namespace Ogre
             ResourceGroupManager::getSingleton().openResource(
                 mName, mGroup, this);
 
-        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (std::vector<MemoryDataStreamPtr>, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
         loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
         return loadedStreams;
     }
@@ -608,7 +608,7 @@ namespace Ogre
             if ( pos != String::npos )
                 ext = mName.substr(pos+1);
 
-            vector<Image>::type images(6);
+            std::vector<Image> images(6);
             ConstImagePtrList imagePtrs;
 
             for(size_t i = 0; i < 6; i++)

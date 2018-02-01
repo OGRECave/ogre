@@ -133,7 +133,7 @@ namespace Ogre {
         optFSAA.name = "FSAA";
         optFSAA.immutable = false;
         optFSAA.possibleValues.push_back("0");
-        for (vector<int>::type::iterator it = mFSAALevels.begin(); it != mFSAALevels.end(); ++it)
+        for (std::vector<int>::iterator it = mFSAALevels.begin(); it != mFSAALevels.end(); ++it)
         {
             String val = StringConverter::toString(*it);
             optFSAA.possibleValues.push_back(val);
@@ -200,7 +200,7 @@ namespace Ogre {
         DWORD width = StringConverter::parseUnsignedInt(val.substr(0, pos));
         DWORD height = StringConverter::parseUnsignedInt(val.substr(pos+1, String::npos));
 
-        for(vector<DEVMODE>::type::const_iterator i = mDevModes.begin(); i != mDevModes.end(); ++i)
+        for(std::vector<DEVMODE>::const_iterator i = mDevModes.begin(); i != mDevModes.end(); ++i)
         {
             if (i->dmPelsWidth != width || i->dmPelsHeight != height)
                 continue;
@@ -633,7 +633,7 @@ namespace Ogre {
         {
 
             // Use WGL to test extended caps (multisample, sRGB)
-            vector<int>::type attribList;
+            std::vector<int> attribList;
             attribList.push_back(WGL_DRAW_TO_WINDOW_ARB); attribList.push_back(true);
             attribList.push_back(WGL_SUPPORT_OPENGL_ARB); attribList.push_back(true);
             attribList.push_back(WGL_DOUBLE_BUFFER_ARB); attribList.push_back(true);

@@ -446,8 +446,8 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
     MeshPtr mesh = MeshManager::getSingleton().createManual(meshName, resourceGroupName, NULL);
     SubMesh* subMesh = mesh->createSubMesh();
 
-    vector<Real>::type vertexBuffer;
-    vector<unsigned short>::type indexBuffer;
+    std::vector<Real> vertexBuffer;
+    std::vector<unsigned short> indexBuffer;
     // 3 position/triangle * 3 Real/position
     vertexBuffer.reserve(mHull.size() * 9);
     // 3 index / triangle

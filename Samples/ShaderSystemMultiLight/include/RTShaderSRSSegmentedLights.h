@@ -90,7 +90,7 @@ protected:
 
     };
 
-    typedef Ogre::vector<LightParams>::type LightParamsList;
+    typedef std::vector<LightParams> LightParamsList;
     typedef LightParamsList::iterator LightParamsIterator;
     typedef LightParamsList::const_iterator LightParamsConstIterator;
 

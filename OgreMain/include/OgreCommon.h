@@ -345,7 +345,7 @@ namespace Ogre {
     class HashedVector
     {
     public:
-        typedef typename vector<T>::type VectorImpl;
+        typedef typename std::vector<T> VectorImpl;
     protected:
         VectorImpl mList;
         mutable uint32 mListHash;
@@ -558,14 +558,14 @@ namespace Ogre {
     /// Constant blank string, useful for returning by ref where local does not exist
     const String BLANKSTRING;
 
-    typedef map<String, bool>::type UnaryOptionList;
-    typedef map<String, String>::type BinaryOptionList;
+    typedef std::map<String, bool> UnaryOptionList;
+    typedef std::map<String, String> BinaryOptionList;
 
     /// Name / value parameter pair (first = name, second = value)
-    typedef map<String, String>::type NameValuePairList;
+    typedef std::map<String, String> NameValuePairList;
 
     /// Alias / Texture name pair (first = alias, second = texture name)
-    typedef map<String, String>::type AliasTextureNamePairList;
+    typedef std::map<String, String> AliasTextureNamePairList;
 
         template< typename T > struct TRect
         {
@@ -771,10 +771,10 @@ namespace Ogre {
     };
 
     /// Render window creation parameters container.
-    typedef vector<RenderWindowDescription>::type RenderWindowDescriptionList;
+    typedef std::vector<RenderWindowDescription> RenderWindowDescriptionList;
 
     /// Render window container.
-    typedef vector<RenderWindow*>::type RenderWindowList;
+    typedef std::vector<RenderWindow*> RenderWindowList;
 
     /** @} */
     /** @} */

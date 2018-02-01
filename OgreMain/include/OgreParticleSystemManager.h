@@ -75,10 +75,10 @@ namespace Ogre {
     {
         friend class ParticleSystemFactory;
     public:
-        typedef map<String, ParticleSystem*>::type ParticleTemplateMap;
-        typedef map<String, ParticleAffectorFactory*>::type ParticleAffectorFactoryMap;
-        typedef map<String, ParticleEmitterFactory*>::type ParticleEmitterFactoryMap;
-        typedef map<String, ParticleSystemRendererFactory*>::type ParticleSystemRendererFactoryMap;
+        typedef std::map<String, ParticleSystem*> ParticleTemplateMap;
+        typedef std::map<String, ParticleAffectorFactory*> ParticleAffectorFactoryMap;
+        typedef std::map<String, ParticleEmitterFactory*> ParticleEmitterFactoryMap;
+        typedef std::map<String, ParticleSystemRendererFactory*> ParticleSystemRendererFactoryMap;
     protected:
         OGRE_AUTO_MUTEX;
             

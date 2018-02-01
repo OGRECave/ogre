@@ -47,11 +47,11 @@ namespace Ogre {
     class _OgreExport ArchiveManager : public Singleton<ArchiveManager>, public ArchiveAlloc
     {
     protected:
-        typedef map<String, ArchiveFactory*>::type ArchiveFactoryMap;
+        typedef std::map<String, ArchiveFactory*> ArchiveFactoryMap;
         /// Factories available to create archives, indexed by archive type (String identifier e.g. 'Zip')
         ArchiveFactoryMap mArchFactories;
         /// Currently loaded archives
-        typedef map<String, Archive*>::type ArchiveMap;
+        typedef std::map<String, Archive*> ArchiveMap;
         ArchiveMap mArchives;
 
     public:

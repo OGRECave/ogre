@@ -104,7 +104,7 @@ namespace Ogre {
             virtual ~HashFunc() {}
         };
 
-        typedef vector<TextureUnitState*>::type TextureUnitStates;
+        typedef std::vector<TextureUnitState*> TextureUnitStates;
     protected:
         Technique* mParent;
         unsigned short mIndex; /// Pass index
@@ -239,7 +239,7 @@ namespace Ogre {
         /// Constant, linear, quadratic coeffs
         Real mPointAttenuationCoeffs[3];
         // TU Content type lookups
-        typedef vector<unsigned short>::type ContentTypeLookup;
+        typedef std::vector<unsigned short> ContentTypeLookup;
         mutable ContentTypeLookup mShadowContentTypeLookup;
         mutable bool mContentTypeLookupBuilt;
         /// Scissoring for the light?
@@ -1782,7 +1782,7 @@ namespace Ogre {
         IlluminationPass() {}
     };
 
-    typedef vector<IlluminationPass*>::type IlluminationPassList;
+    typedef std::vector<IlluminationPass*> IlluminationPassList;
 
     /** @} */
     /** @} */

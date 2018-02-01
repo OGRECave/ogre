@@ -89,7 +89,7 @@ namespace Ogre {
         GLint mLevel;
         bool mHwGamma;
 
-        typedef vector<RenderTexture*>::type SliceTRT;
+        typedef std::vector<RenderTexture*> SliceTRT;
         SliceTRT mSliceTRT;
 
         GLRenderSystem* mRenderSystem;

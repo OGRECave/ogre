@@ -73,7 +73,7 @@ protected:
     }
 
     /// Used to hold images between calls to prepare and load.
-    typedef vector<Image>::type LoadedImages;
+    typedef std::vector<Image> LoadedImages;
 
     /** Vector of images that were pulled from disk by
         prepareLoad but have yet to be pushed into texture memory
@@ -84,7 +84,7 @@ protected:
     void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
 
     /// Vector of pointers to subsurfaces
-    typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
+    typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
     SurfaceList mSurfaceList;
 
     uint mTextureID;
