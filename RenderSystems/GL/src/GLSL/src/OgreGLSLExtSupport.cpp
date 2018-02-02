@@ -89,7 +89,7 @@ namespace Ogre
 
                 glGetInfoLogARB(obj, infologLength, &charsWritten, infoLog);
                 logMessage += String(infoLog);
-                LogManager::getSingleton().logMessage(logMessage);
+                LogManager::getSingleton().logMessage(LML_CRITICAL, logMessage);
 
                 delete [] infoLog;
             }
