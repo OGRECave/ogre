@@ -505,12 +505,16 @@ namespace Ogre {
         if(mIsFullScreen)
             return;
 
-		NSRect frame = [mWindow frame];
+        NSRect frame = mIsExternal ? [[mView window] frame] : [mWindow frame];
         NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
 		frame.origin.x = leftPt;
 		frame.origin.y = screenFrame.size.height - frame.size.height - topPt;
         mWindowOriginPt = frame.origin;
-		[mWindow setFrame:frame display:YES];
+
+        if(mIsExternal)
+            [[mView window] setFrame:frame display:YES];
+        else
+            [mWindow setFrame:frame display:YES];
 
         // Keep our size up to date
         NSRect b = [mView bounds];
@@ -581,7 +585,7 @@ namespace Ogre {
             ([mView respondsToSelector:@selector(wantsBestResolutionOpenGLSurface)] && [(id)mView wantsBestResolutionOpenGLSurface]) ?
             (mView.window.screen ?: [NSScreen mainScreen]).backingScaleFactor : 1.0f;
 
-        NSRect winFrame = [mWindow frame];
+        NSRect winFrame = mIsExternal ? [[mView window] frame] : [mWindow frame];
         NSRect viewFrame = [mView frame];
         NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
         CGFloat leftPt = winFrame.origin.x;
