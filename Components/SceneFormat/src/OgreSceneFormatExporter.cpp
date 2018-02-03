@@ -47,6 +47,8 @@ THE SOFTWARE.
 #include "InstantRadiosity/OgreInstantRadiosity.h"
 #include "OgreIrradianceVolume.h"
 
+#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+
 #include "OgreForward3D.h"
 #include "OgreForwardClustered.h"
 
@@ -153,6 +155,20 @@ namespace Ogre
         jsonStr.a( ", " );
         encodeVector( jsonStr, value.mHalfSize );
         jsonStr.a( "]" );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatExporter::encodeMatrix( LwString &jsonStr, const Matrix3 &value )
+    {
+        jsonStr.a( "[ ",
+                   encodeFloat( value[0][0] ), ", ",
+                   encodeFloat( value[0][1] ), ", ",
+                   encodeFloat( value[0][2] ), ", " );
+        jsonStr.a( encodeFloat( value[1][0] ), ", ",
+                   encodeFloat( value[1][1] ), ", ",
+                   encodeFloat( value[1][2] ), ", " );
+        jsonStr.a( encodeFloat( value[2][0] ), ", ",
+                   encodeFloat( value[2][1] ), ", ",
+                   encodeFloat( value[2][2] ), " ]" );
     }
     //-----------------------------------------------------------------------------------
     inline void SceneFormatExporter::flushLwString( LwString &jsonStr, String &outJson )
@@ -531,6 +547,92 @@ namespace Ogre
                          "but we couldn't grab it from the Hlms PBS! "
                          "Make sure to export after you've called HlmsPbs::setIrradianceVolume",
                          "SceneFormatExporter::exportInstantRadiosity" );
+        }
+
+        jsonStr.a( "\n\t\t}" );
+        flushLwString( jsonStr, outJson );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatExporter::exportPcc( LwString &jsonStr, String &outJson )
+    {
+        HlmsPbs *hlmsPbs = getPbs();
+        if( !hlmsPbs )
+            return;
+
+        ParallaxCorrectedCubemap *pcc = hlmsPbs->getParallaxCorrectedCubemap();
+
+        if( !pcc )
+            return;
+
+        TexturePtr pccBlendTex = pcc->getBlendCubemap();
+
+        jsonStr.a( ",\n\t\t\"parallax_corrected_cubemaps\" :"
+                   "\n\t\t{" );
+        jsonStr.a( "\n\t\t\t\"paused\" : ", pcc->mPaused );
+        jsonStr.a( ",\n\t\t\t\"mask\" : ", pcc->mMask );
+        jsonStr.a( ",\n\t\t\t\"reserved_rq_id\" : ", pcc->getProxyReservedRenderQueueId() );
+        jsonStr.a( ",\n\t\t\t\"proxy_visibility_mask\" : ", pcc->getProxyReservedVisibilityMask() );
+        if( pccBlendTex )
+        {
+            jsonStr.a( ",\n\t\t\t\"max_width\" : ", pccBlendTex->getWidth() );
+            jsonStr.a( ",\n\t\t\t\"max_height\" : ", pccBlendTex->getHeight() );
+            jsonStr.a( ",\n\t\t\t\"pixel_format\" : ",
+                       PixelUtil::getFormatName( pccBlendTex->getFormat() ).c_str() );
+        }
+
+        const CubemapProbeVec& probes = pcc->getProbes();
+
+        if( !probes.empty() )
+        {
+            jsonStr.a( ",\n\t\t\t\"probes\" :"
+                       "\n\t\t\t[" );
+
+            CubemapProbeVec::const_iterator begin = probes.begin();
+            CubemapProbeVec::const_iterator itor  = probes.begin();
+            CubemapProbeVec::const_iterator end   = probes.end();
+            while( itor != end )
+            {
+                if( itor != begin )
+                    jsonStr.a( ", " );
+                jsonStr.a( ",\n\t\t\t\t{" );
+
+                CubemapProbe *probe = *itor;
+
+                TexturePtr probeTex = probe->getInternalTexture();
+
+                if( probeTex )
+                {
+                    jsonStr.a( ",\n\t\t\t\t\t\"width\" : ", probeTex->getWidth() );
+                    jsonStr.a( ",\n\t\t\t\t\t\"height\" : ", probeTex->getHeight() );
+                    jsonStr.a( ",\n\t\t\t\t\t\"msaa\" : ", probeTex->getFSAA() );
+                    jsonStr.a( ",\n\t\t\t\t\t\"format\" : ",
+                               PixelUtil::getFormatName( probeTex->getFormat() ).c_str() );
+                    jsonStr.a( ",\n\t\t\t\t\t\"use_manual\" : ",
+                               toQuotedStr( (probeTex->getUsage() & TU_AUTOMIPMAP) != 0 ) );
+                }
+
+                jsonStr.a( ",\n\t\t\t\t\t\"static\" : ", toQuotedStr( probe->getStatic() ) );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"camera_pos\" : " );
+                encodeVector( jsonStr, probe->getProbeCameraPos() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"area\" : " );
+                encodeAabb( jsonStr, probe->getArea() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"area_inner_region\" : " );
+                encodeVector( jsonStr, probe->getAreaInnerRegion() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"orientation\" : " );
+                encodeMatrix( jsonStr, probe->getOrientation() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"probe_shape\" : " );
+                encodeAabb( jsonStr, probe->getProbeShape() );
+
+                jsonStr.a( ",\n\t\t\t\t}" );
+                ++itor;
+            }
+
+            jsonStr.a( "\n\t\t\t]" );
         }
 
         jsonStr.a( "\n\t\t}" );
