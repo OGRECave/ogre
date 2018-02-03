@@ -65,6 +65,7 @@ namespace Ogre
         String mFilename;
         InstantRadiosity *mInstantRadiosity;
         IrradianceVolume *mIrradianceVolume;
+        ParallaxCorrectedCubemap *mParallaxCorrectedCubemap;
 
         LightArray mVplLights;
 
@@ -72,6 +73,7 @@ namespace Ogre
         IndexToSceneNodeMap mCreatedSceneNodes;
 
         void destroyInstantRadiosity(void);
+        void destroyParallaxCorrectedCubemap(void);
 
         static inline Light::LightTypes parseLightType( const char *value );
         static inline float decodeFloat( const rapidjson::Value &jsonValue );
@@ -83,6 +85,7 @@ namespace Ogre
         static inline ColourValue decodeColourValueArray( const rapidjson::Value &jsonArray );
         static inline Aabb decodeAabbArray( const rapidjson::Value &jsonArray,
                                             const Aabb &defaultValue );
+        static inline Matrix3 decodeMatrix3Array( const rapidjson::Value &jsonArray );
 
         void importNode( const rapidjson::Value &nodeValue, Node *node );
         SceneNode* importSceneNode( const rapidjson::Value &sceneNodeValue, uint32 nodeIdx,
@@ -100,6 +103,7 @@ namespace Ogre
         void importLight( const rapidjson::Value &lightValue );
         void importLights( const rapidjson::Value &json );
         void importInstantRadiosity( const rapidjson::Value &irValue );
+        void importPcc( const rapidjson::Value &pccValue );
         void importSceneSettings( const rapidjson::Value &json, uint32 importFlags );
 
         void importScene( const String &filename, const rapidjson::Document &d,
@@ -151,6 +155,8 @@ namespace Ogre
         void getInstantRadiosity( bool releaseOwnership,
                                   InstantRadiosity **outInstantRadiosity,
                                   IrradianceVolume **outIrradianceVolume );
+
+        ParallaxCorrectedCubemap* getParallaxCorrectedCubemap( bool releaseOwnership );
     };
 
     /** @} */

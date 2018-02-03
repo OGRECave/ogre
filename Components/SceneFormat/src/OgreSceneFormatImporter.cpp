@@ -43,6 +43,8 @@ THE SOFTWARE.
 #include "InstantRadiosity/OgreInstantRadiosity.h"
 #include "OgreIrradianceVolume.h"
 
+#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+
 #include "OgreMeshSerializer.h"
 #include "OgreMesh2Serializer.h"
 #include "OgreFileSystemLayer.h"
@@ -56,13 +58,15 @@ namespace Ogre
     SceneFormatImporter::SceneFormatImporter( Root *root, SceneManager *sceneManager ) :
         SceneFormatBase( root, sceneManager ),
         mInstantRadiosity( 0 ),
-        mIrradianceVolume( 0 )
+        mIrradianceVolume( 0 ),
+        mParallaxCorrectedCubemap( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
     SceneFormatImporter::~SceneFormatImporter()
     {
         destroyInstantRadiosity();
+        destroyParallaxCorrectedCubemap();
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::destroyInstantRadiosity(void)
@@ -79,6 +83,19 @@ namespace Ogre
 
         delete mInstantRadiosity;
         mInstantRadiosity = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::destroyParallaxCorrectedCubemap(void)
+    {
+        if( mParallaxCorrectedCubemap )
+        {
+            HlmsPbs *hlmsPbs = getPbs();
+            if( hlmsPbs && hlmsPbs->getParallaxCorrectedCubemap() == mParallaxCorrectedCubemap )
+                hlmsPbs->setParallaxCorrectedCubemap( 0 );
+
+            delete mParallaxCorrectedCubemap;
+            mParallaxCorrectedCubemap = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     Light::LightTypes SceneFormatImporter::parseLightType( const char *value )
@@ -197,6 +214,20 @@ namespace Ogre
         {
             retVal.mCenter = decodeVector3Array( jsonArray[0] );
             retVal.mHalfSize = decodeVector3Array( jsonArray[1] );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    inline Matrix3 SceneFormatImporter::decodeMatrix3Array( const rapidjson::Value &jsonArray )
+    {
+        Matrix3 retVal( Matrix3::IDENTITY );
+
+        const rapidjson::SizeType arraySize = std::min( 12u, jsonArray.Size() );
+        for( rapidjson::SizeType i=0; i<arraySize; ++i )
+        {
+            if( jsonArray[i].IsUint() )
+                retVal[0][i] = decodeFloat( jsonArray[i] );
         }
 
         return retVal;
@@ -845,6 +876,135 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importPcc( const rapidjson::Value &pccValue )
+    {
+        /*
+        uint8 reservedRqId = 250;
+        uint32 reservedProxyMask = 1u << 25u;
+
+        rapidjson::Value::ConstMemberIterator tmpIt;
+        tmpIt = pccValue.FindMember( "reserved_rq_id" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            reservedRqId = static_cast<uint8>( tmpIt->value.GetUint() );
+
+        tmpIt = pccValue.FindMember( "proxy_visibility_mask" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            reservedProxyMask = tmpIt->value.GetUint();
+
+        mParallaxCorrectedCubemap = new ParallaxCorrectedCubemap(
+                                        Ogre::Id::generateNewId<Ogre::ParallaxCorrectedCubemap>(),
+                                        mRoot,
+                                        mSceneManager, , reservedRqId, reservedProxyMask );
+
+        uint32 maxWidth = 0, maxHeight = 0;
+        PixelFormat blendPixelFormat = PF_UNKNOWN;
+        tmpIt = pccValue.FindMember( "max_width" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            maxWidth = tmpIt->value.GetUint();
+        tmpIt = pccValue.FindMember( "max_height" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            maxHeight = tmpIt->value.GetUint();
+        tmpIt = pccValue.FindMember( "pixel_format" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsString() )
+            blendPixelFormat = PixelUtil::getFormatFromName( tmpIt->value.GetString(), false, true );
+
+        if( maxWidth != 0 && maxHeight != 0 && blendPixelFormat != PF_UNKNOWN )
+            mParallaxCorrectedCubemap->setEnabled( true, maxWidth, maxHeight, blendPixelFormat );
+
+        tmpIt = pccValue.FindMember( "paused" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsBool() )
+            mParallaxCorrectedCubemap->mPaused = tmpIt->value.GetBool();
+
+        tmpIt = pccValue.FindMember( "mask" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            mParallaxCorrectedCubemap->mMask = tmpIt->value.GetUint();
+
+        tmpIt = pccValue.FindMember( "probes" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsArray() )
+        {
+            const rapidjson::Value &jsonProbeArray = tmpIt->value;
+            const size_t numProbes = jsonProbeArray.Size();
+
+            for( size_t i=0; i<numProbes; ++i )
+            {
+                const rapidjson::Value &jsonProbe = jsonProbeArray[i];
+
+                if( !jsonProbe.IsObject() )
+                    continue;
+
+                CubemapProbe *probe = mParallaxCorrectedCubemap->createProbe();
+
+                uint32 width = 0, height = 0;
+                PixelFormat pixelFormat = PF_UNKNOWN;
+                uint8 msaa = 0;
+                bool useManual = true;
+                bool isStatic = false;
+
+                tmpIt = jsonProbe.FindMember( "width" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    width = tmpIt->value.GetUint();
+                tmpIt = jsonProbe.FindMember( "height" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    height = tmpIt->value.GetUint();
+                tmpIt = jsonProbe.FindMember( "msaa" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    msaa = static_cast<uint8>( tmpIt->value.GetUint() );
+                tmpIt = jsonProbe.FindMember( "pixel_format" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsString() )
+                    pixelFormat = PixelUtil::getFormatFromName( tmpIt->value.GetString(), false, true );
+                tmpIt = jsonProbe.FindMember( "use_manual" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsBool() )
+                    useManual = tmpIt->value.GetBool();
+                tmpIt = jsonProbe.FindMember( "static" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsBool() )
+                    isStatic = tmpIt->value.GetBool();
+
+                if( width != 0 && height != 0 && pixelFormat != PF_UNKNOWN )
+                    probe->setTextureParams( width, height, useManual, pixelFormat, isStatic, msaa );
+                probe->initWorkspace();
+
+                Aabb probeArea, probeShape;
+                Vector3 cameraPos( Vector3::ZERO );
+                Vector3 areaInnerRegion( Vector3::UNIT_SCALE );
+                Matrix3 orientation( Matrix3::IDENTITY );
+
+                tmpIt = jsonProbe.FindMember( "camera_pos" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    cameraPos = decodeVector3Array( tmpIt->value );
+
+                tmpIt = jsonProbe.FindMember( "area" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    probeArea = decodeAabbArray( tmpIt->value, Aabb::BOX_ZERO );
+
+                tmpIt = jsonProbe.FindMember( "area_inner_region" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    areaInnerRegion = decodeVector3Array( tmpIt->value );
+
+                tmpIt = jsonProbe.FindMember( "orientation" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    orientation = decodeMatrix3Array( tmpIt->value );
+
+                tmpIt = jsonProbe.FindMember( "probe_shape" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    probeShape = decodeAabbArray( tmpIt->value, Aabb::BOX_ZERO );
+
+                probe->set( cameraPos, probeArea, areaInnerRegion, orientation, probeShape );
+
+                tmpIt = jsonProbe.FindMember( "enabled" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsBool() )
+                    probe->mEnabled = tmpIt->value.GetBool();
+
+                tmpIt = jsonProbe.FindMember( "num_iterations" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    probe->mNumIterations = tmpIt->value.GetUint();
+
+                tmpIt = jsonProbe.FindMember( "mask" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    probe->mMask = tmpIt->value.GetUint();
+            }
+        }*/
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json, uint32 importFlags )
     {
         rapidjson::Value::ConstMemberIterator tmpIt;
@@ -875,6 +1035,7 @@ namespace Ogre
     {
         mFilename = filename;
         destroyInstantRadiosity();
+        destroyParallaxCorrectedCubemap();
 
         rapidjson::Value::ConstMemberIterator itor;
 
@@ -1025,5 +1186,14 @@ namespace Ogre
             mInstantRadiosity = 0;
             mIrradianceVolume = 0;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    ParallaxCorrectedCubemap* SceneFormatImporter::getParallaxCorrectedCubemap( bool releaseOwnership )
+    {
+        ParallaxCorrectedCubemap *retVal = mParallaxCorrectedCubemap;
+        if( releaseOwnership )
+            mParallaxCorrectedCubemap = 0;
+
+        return retVal;
     }
 }
