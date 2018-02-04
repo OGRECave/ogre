@@ -1033,6 +1033,10 @@ namespace Ogre
                     probe->mMask = tmpIt->value.GetUint();
             }
         }
+
+        HlmsPbs *hlmsPbs = getPbs();
+        if( hlmsPbs )
+            hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json, uint32 importFlags )
