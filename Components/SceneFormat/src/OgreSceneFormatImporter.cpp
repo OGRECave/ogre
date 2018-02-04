@@ -988,8 +988,10 @@ namespace Ogre
                     isStatic = tmpIt->value.GetBool();
 
                 if( width != 0 && height != 0 && pixelFormat != PF_UNKNOWN )
+                {
                     probe->setTextureParams( width, height, useManual, pixelFormat, isStatic, msaa );
-                probe->initWorkspace();
+                    probe->initWorkspace();
+                }
 
                 Aabb probeArea, probeShape;
                 Vector3 cameraPos( Vector3::ZERO );

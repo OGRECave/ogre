@@ -611,7 +611,7 @@ namespace Ogre
                     jsonStr.a( ",\n\t\t\t\t\t\"width\" : ", probeTex->getWidth() );
                     jsonStr.a( ",\n\t\t\t\t\t\"height\" : ", probeTex->getHeight() );
                     jsonStr.a( ",\n\t\t\t\t\t\"msaa\" : ", probeTex->getFSAA() );
-                    jsonStr.a( ",\n\t\t\t\t\t\"format\" : \"",
+                    jsonStr.a( ",\n\t\t\t\t\t\"pixel_format\" : \"",
                                PixelUtil::getFormatName( probeTex->getFormat() ).c_str(), "\"" );
                     jsonStr.a( ",\n\t\t\t\t\t\"use_manual\" : ",
                                toQuotedStr( (probeTex->getUsage() & TU_AUTOMIPMAP) != 0 ) );
