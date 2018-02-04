@@ -632,6 +632,10 @@ namespace Ogre
                 jsonStr.a( ",\n\t\t\t\t\t\"probe_shape\" : " );
                 encodeAabb( jsonStr, probe->getProbeShape() );
 
+                jsonStr.a( ",\n\t\t\t\t\t\"enabled\" : ", toQuotedStr( probe->mEnabled ) );
+                jsonStr.a( ",\n\t\t\t\t\t\"num_iterations\" : ", probe->mNumIterations );
+                jsonStr.a( ",\n\t\t\t\t\t\"mask\" : ", probe->mMask );
+
                 jsonStr.a( "\n\t\t\t\t}" );
                 ++itor;
             }
