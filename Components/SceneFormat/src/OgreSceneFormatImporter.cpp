@@ -1056,6 +1056,13 @@ namespace Ogre
             if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
                 importInstantRadiosity( tmpIt->value );
         }
+
+        if( importFlags & SceneFlags::ParallaxCorrectedCubemap )
+        {
+            tmpIt = json.FindMember( "parallax_corrected_cubemaps" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
+                importPcc( tmpIt->value );
+        }
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const rapidjson::Document &d,

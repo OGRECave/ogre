@@ -577,12 +577,12 @@ namespace Ogre
         {
             jsonStr.a( ",\n\t\t\t\"max_width\" : ", pccBlendTex->getWidth() );
             jsonStr.a( ",\n\t\t\t\"max_height\" : ", pccBlendTex->getHeight() );
-            jsonStr.a( ",\n\t\t\t\"pixel_format\" : ",
-                       PixelUtil::getFormatName( pccBlendTex->getFormat() ).c_str() );
+            jsonStr.a( ",\n\t\t\t\"pixel_format\" : \"",
+                       PixelUtil::getFormatName( pccBlendTex->getFormat() ).c_str(), "\"" );
         }
 
         const CompositorWorkspaceDef *workspaceDef = pcc->getDefaultWorkspaceDef();
-        jsonStr.a( "\n\t\t\t\"workspace\" : ", workspaceDef->getNameStr().c_str() );
+        jsonStr.a( ",\n\t\t\t\"workspace\" : \"", workspaceDef->getNameStr().c_str(), "\"" );
 
         const CubemapProbeVec& probes = pcc->getProbes();
 
@@ -598,9 +598,11 @@ namespace Ogre
             {
                 if( itor != begin )
                     jsonStr.a( ", " );
-                jsonStr.a( ",\n\t\t\t\t{" );
+                jsonStr.a( "\n\t\t\t\t{" );
 
                 CubemapProbe *probe = *itor;
+
+                jsonStr.a( "\n\t\t\t\t\t\"static\" : ", toQuotedStr( probe->getStatic() ) );
 
                 TexturePtr probeTex = probe->getInternalTexture();
 
@@ -609,13 +611,11 @@ namespace Ogre
                     jsonStr.a( ",\n\t\t\t\t\t\"width\" : ", probeTex->getWidth() );
                     jsonStr.a( ",\n\t\t\t\t\t\"height\" : ", probeTex->getHeight() );
                     jsonStr.a( ",\n\t\t\t\t\t\"msaa\" : ", probeTex->getFSAA() );
-                    jsonStr.a( ",\n\t\t\t\t\t\"format\" : ",
-                               PixelUtil::getFormatName( probeTex->getFormat() ).c_str() );
+                    jsonStr.a( ",\n\t\t\t\t\t\"format\" : \"",
+                               PixelUtil::getFormatName( probeTex->getFormat() ).c_str(), "\"" );
                     jsonStr.a( ",\n\t\t\t\t\t\"use_manual\" : ",
                                toQuotedStr( (probeTex->getUsage() & TU_AUTOMIPMAP) != 0 ) );
                 }
-
-                jsonStr.a( ",\n\t\t\t\t\t\"static\" : ", toQuotedStr( probe->getStatic() ) );
 
                 jsonStr.a( ",\n\t\t\t\t\t\"camera_pos\" : " );
                 encodeVector( jsonStr, probe->getProbeCameraPos() );
@@ -632,7 +632,7 @@ namespace Ogre
                 jsonStr.a( ",\n\t\t\t\t\t\"probe_shape\" : " );
                 encodeAabb( jsonStr, probe->getProbeShape() );
 
-                jsonStr.a( ",\n\t\t\t\t}" );
+                jsonStr.a( "\n\t\t\t\t}" );
                 ++itor;
             }
 
@@ -688,6 +688,9 @@ namespace Ogre
 
             jsonStr.a( "\n\t\t}" );
         }
+
+        if( exportFlags & SceneFlags::ParallaxCorrectedCubemap )
+            exportPcc( jsonStr, outJson );
 
         if( exportFlags & SceneFlags::InstantRadiosity )
             exportInstantRadiosity( jsonStr, outJson );
