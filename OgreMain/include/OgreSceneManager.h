@@ -391,9 +391,6 @@ namespace Ogre {
         std::unique_ptr<RenderQueue> mRenderQueue;
         bool mLastRenderQueueInvocationCustom;
 
-        /// Current ambient light, cached for RenderSystem
-        ColourValue mAmbientLight;
-
         /// The rendering system to send the scene to
         RenderSystem *mDestRenderSystem;
 

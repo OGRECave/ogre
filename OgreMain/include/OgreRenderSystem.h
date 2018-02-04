@@ -245,6 +245,9 @@ namespace Ogre
         */
         virtual void setAmbientLight(float r, float g, float b) {}
 
+        /// @overload
+        void setAmbientLight(const ColourValue& c) { setAmbientLight(c.r, c.g, c.b); }
+
         /** Sets the type of light shading required (default = Gouraud).
         @deprecated only needed for fixed function APIs
         */

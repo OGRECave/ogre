@@ -57,6 +57,7 @@ namespace Ogre {
          mInverseTransposeWorldViewMatrixDirty(true),
          mCameraPositionDirty(true),
          mCameraPositionObjectSpaceDirty(true),
+         mAmbientLight(ColourValue::Black),
          mPassNumber(0),
          mSceneDepthRangeDirty(true),
          mLodCameraPositionDirty(true),

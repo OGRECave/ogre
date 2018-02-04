@@ -69,7 +69,6 @@ uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_M
 SceneManager::SceneManager(const String& name) :
 mName(name),
 mLastRenderQueueInvocationCustom(false),
-mAmbientLight(ColourValue::Black),
 mCameraInProgress(0),
 mCurrentViewport(0),
 mSkyRenderer(this),
@@ -1460,10 +1459,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
         // Set autoparams for finite dir light extrusion
         mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
 
-        // Tell params about current ambient light
-        mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
         // Tell rendersystem
-        mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
+        mDestRenderSystem->setAmbientLight(mAutoParamDataSource->getAmbientLightColour());
 
         // Tell params about render target
         mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
@@ -2015,6 +2012,7 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
     }
 
     // Override auto param ambient to force vertex programs to use shadow colour
+    ColourValue currAmbient = mAutoParamDataSource->getAmbientLightColour();
     mAutoParamDataSource->setAmbientLightColour(mShadowColour);
 
     // Iterate over lights, render all volumes to stencil
@@ -2045,7 +2043,7 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
     }// for each light
 
     // Restore ambient light
-    mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
+    mAutoParamDataSource->setAmbientLightColour(currAmbient);
 
     // Iterate again - variable name changed to appease gcc.
     RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
@@ -2087,7 +2085,8 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
     // Iterate through priorities
     RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
-    // Override auto param ambient to force vertex programs and fixed function to 
+    // Override auto param ambient to force vertex programs and fixed function to
+    ColourValue currAmbient = mAutoParamDataSource->getAmbientLightColour();
     if (isShadowTechniqueAdditive())
     {
         // Use simple black / white mask if additive
@@ -2098,7 +2097,7 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
     {
         // Use shadow colour as caster colour if modulative
         mAutoParamDataSource->setAmbientLightColour(mShadowColour);
-        mDestRenderSystem->setAmbientLight(mShadowColour.r, mShadowColour.g, mShadowColour.b);
+        mDestRenderSystem->setAmbientLight(mShadowColour);
     }
 
     while (groupIt.hasMoreElements())
@@ -2120,8 +2119,8 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
     }// for each priority
 
     // reset ambient light
-    mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
-    mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
+    mAutoParamDataSource->setAmbientLightColour(currAmbient);
+    mDestRenderSystem->setAmbientLight(currAmbient);
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderModulativeTextureShadowedQueueGroupObjects(
@@ -2406,6 +2405,7 @@ void SceneManager::renderTextureShadowReceiverQueueGroupObjects(
     RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
     // Override auto param ambient to force vertex programs to go full-bright
+    ColourValue currAmbient = mAutoParamDataSource->getAmbientLightColour();
     mAutoParamDataSource->setAmbientLightColour(ColourValue::White);
     mDestRenderSystem->setAmbientLight(1, 1, 1);
 
@@ -2421,8 +2421,8 @@ void SceneManager::renderTextureShadowReceiverQueueGroupObjects(
     }// for each priority
 
     // reset ambient
-    mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
-    mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
+    mAutoParamDataSource->setAmbientLightColour(currAmbient);
+    mDestRenderSystem->setAmbientLight(currAmbient);
 
 }
 //-----------------------------------------------------------------------
@@ -2994,13 +2994,13 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 //-----------------------------------------------------------------------
 void SceneManager::setAmbientLight(const ColourValue& colour)
 {
-    mAmbientLight = colour;
     mGpuParamsDirty |= GPV_GLOBAL;
+    mAutoParamDataSource->setAmbientLightColour(colour);
 }
 //-----------------------------------------------------------------------
 const ColourValue& SceneManager::getAmbientLight(void) const
 {
-    return mAmbientLight;
+    return mAutoParamDataSource->getAmbientLightColour();
 }
 //-----------------------------------------------------------------------
 ViewPoint SceneManager::getSuggestedViewpoint(bool random)
@@ -5818,9 +5818,7 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
 
     // Tell params about current ambient light
-    mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
-    // Tell rendersystem
-    mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
+    mDestRenderSystem->setAmbientLight(mAutoParamDataSource->getAmbientLightColour());
 
     // Tell params about render target
     mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
