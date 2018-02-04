@@ -48,6 +48,7 @@ THE SOFTWARE.
 #include "OgreIrradianceVolume.h"
 
 #include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+#include "Compositor/OgreCompositorWorkspaceDef.h"
 
 #include "OgreForward3D.h"
 #include "OgreForwardClustered.h"
@@ -579,6 +580,9 @@ namespace Ogre
             jsonStr.a( ",\n\t\t\t\"pixel_format\" : ",
                        PixelUtil::getFormatName( pccBlendTex->getFormat() ).c_str() );
         }
+
+        const CompositorWorkspaceDef *workspaceDef = pcc->getDefaultWorkspaceDef();
+        jsonStr.a( "\n\t\t\t\"workspace\" : ", workspaceDef->getNameStr().c_str() );
 
         const CubemapProbeVec& probes = pcc->getProbes();
 

@@ -66,6 +66,7 @@ namespace Ogre
         InstantRadiosity *mInstantRadiosity;
         IrradianceVolume *mIrradianceVolume;
         ParallaxCorrectedCubemap *mParallaxCorrectedCubemap;
+        String  mDefaultPccWorkspaceName;
 
         LightArray mVplLights;
 
@@ -110,7 +111,16 @@ namespace Ogre
                           uint32 importFlags=~SceneFlags::LightsVpl );
 
     public:
-        SceneFormatImporter( Root *root, SceneManager *sceneManager );
+        /**
+        @param root
+        @param sceneManager
+        @param defaultPccWorkspaceName
+            When importing PCC, the original workspace definition may not be available.
+            In such case, this allows you to use a fallback instead. If left blank,
+            we won't import PCC if the original workspace def couldn't be found.
+        */
+        SceneFormatImporter( Root *root, SceneManager *sceneManager,
+                             const String &defaultPccWorkspaceName );
         ~SceneFormatImporter();
 
         /**

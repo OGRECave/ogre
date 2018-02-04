@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreIrradianceVolume.h"
 
 #include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+#include "Compositor/OgreCompositorManager2.h"
 
 #include "OgreMeshSerializer.h"
 #include "OgreMesh2Serializer.h"
@@ -55,11 +56,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    SceneFormatImporter::SceneFormatImporter( Root *root, SceneManager *sceneManager ) :
+    SceneFormatImporter::SceneFormatImporter( Root *root, SceneManager *sceneManager,
+                                              const String &defaultPccWorkspaceName ) :
         SceneFormatBase( root, sceneManager ),
         mInstantRadiosity( 0 ),
         mIrradianceVolume( 0 ),
-        mParallaxCorrectedCubemap( 0 )
+        mParallaxCorrectedCubemap( 0 ),
+        mDefaultPccWorkspaceName( defaultPccWorkspaceName )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -878,7 +881,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importPcc( const rapidjson::Value &pccValue )
     {
-        /*
         uint8 reservedRqId = 250;
         uint32 reservedProxyMask = 1u << 25u;
 
@@ -891,10 +893,36 @@ namespace Ogre
         if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
             reservedProxyMask = tmpIt->value.GetUint();
 
+        Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+        String workspaceName = mDefaultPccWorkspaceName;
+        tmpIt = pccValue.FindMember( "workspace" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsString() )
+        {
+            workspaceName = tmpIt->value.GetString();
+            if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+            {
+                LogManager::getSingleton().logMessage(
+                            "INFO: Parallax Corrected Cubemaps workspace definition not found, "
+                            "using default one." );
+                workspaceName = mDefaultPccWorkspaceName;
+            }
+        }
+
+        if( workspaceName.empty() )
+        {
+            LogManager::getSingleton().logMessage(
+                        "WARNING: Cannot import Parallax Corrected Cubemaps." );
+            return;
+        }
+
+        Ogre::CompositorWorkspaceDef *workspaceDef =
+                compositorManager->getWorkspaceDefinition( workspaceName );
+
         mParallaxCorrectedCubemap = new ParallaxCorrectedCubemap(
                                         Ogre::Id::generateNewId<Ogre::ParallaxCorrectedCubemap>(),
-                                        mRoot,
-                                        mSceneManager, , reservedRqId, reservedProxyMask );
+                                        mRoot, mSceneManager, workspaceDef,
+                                        reservedRqId, reservedProxyMask );
 
         uint32 maxWidth = 0, maxHeight = 0;
         PixelFormat blendPixelFormat = PF_UNKNOWN;
@@ -1002,7 +1030,7 @@ namespace Ogre
                 if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
                     probe->mMask = tmpIt->value.GetUint();
             }
-        }*/
+        }
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json, uint32 importFlags )

@@ -330,7 +330,9 @@ namespace Demo
     {
         destroyInstantRadiosity();
 
-        Ogre::SceneFormatImporter importer( mGraphicsSystem->getRoot(), mGraphicsSystem->getSceneManager() );
+        Ogre::SceneFormatImporter importer( mGraphicsSystem->getRoot(),
+                                            mGraphicsSystem->getSceneManager(),
+                                            Ogre::BLANKSTRING );
         importer.importSceneFromFile( mFullpathToFile );
         importer.getInstantRadiosity( true, &mInstantRadiosity, &mIrradianceVolume );
 
