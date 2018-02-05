@@ -55,7 +55,7 @@ namespace Ogre {
         @par
             On failure, exception will be throw.
     */
-    static DECL_MALLOC void* allocate(size_t size, size_t alignment)
+    void* AlignedMemory::allocate(size_t size, size_t alignment)
     {
         assert(0 < alignment && alignment <= 128 && Bitwise::isPO2(alignment));
 
@@ -70,7 +70,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void* AlignedMemory::allocate(size_t size)
     {
-        return Ogre::allocate(size, OGRE_SIMD_ALIGNMENT);
+        return allocate(size, OGRE_SIMD_ALIGNMENT);
     }
     //---------------------------------------------------------------------
     void AlignedMemory::deallocate(void* p)

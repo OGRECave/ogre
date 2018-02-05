@@ -62,6 +62,19 @@ namespace Ogre {
     class _OgreExport AlignedMemory
     {
     public:
+        /** Allocate memory with given alignment.
+            @param
+                size The size of memory need to allocate.
+            @param
+                alignment The alignment of result pointer, must be power of two
+                and in range [1, 128].
+            @return
+                The allocated memory pointer.
+            @par
+                On failure, exception will be throw.
+        */
+        static DECL_MALLOC void* allocate(size_t size, size_t alignment);
+
         /** Allocate memory with default platform dependent alignment.
             @remarks
                 The default alignment depend on target machine, this function
@@ -85,6 +98,29 @@ namespace Ogre {
         static void deallocate(void* p);
     };
 
+    /// STL compatible wrapper for @ref AlignedMemory
+    template<typename T, size_t Alignment>
+    struct AlignedAllocator : public std::allocator<T>
+    {
+        AlignedAllocator() : std::allocator<T>() {}
+
+        template <class U>
+        AlignedAllocator(const AlignedAllocator<U, Alignment>& other) {};
+
+        template<class Other>
+        struct rebind { using other = AlignedAllocator<Other, Alignment>; };
+
+        T* allocate(size_t n) {
+            return static_cast<T*>(AlignedMemory::allocate(n * sizeof(T), Alignment));
+        }
+        T* allocate(size_t n, const void* hint) { // deprecated in C++17
+            return static_cast<T*>(AlignedMemory::allocate(n * sizeof(T), Alignment));
+        }
+
+        void deallocate(T* p, size_t /*n*/) {
+            AlignedMemory::deallocate(p);
+        }
+    };
     /** @} */
     /** @} */
 

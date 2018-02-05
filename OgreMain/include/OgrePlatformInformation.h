@@ -63,31 +63,6 @@ namespace Ogre {
 #   define OGRE_CPU OGRE_CPU_UNKNOWN
 #endif
 
-/* Find how to declare aligned variable.
-*/
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#   define OGRE_ALIGNED_DECL(type, var, alignment)  __declspec(align(alignment)) type var
-
-#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)
-#   define OGRE_ALIGNED_DECL(type, var, alignment)  type var __attribute__((__aligned__(alignment)))
-
-#else
-#   define OGRE_ALIGNED_DECL(type, var, alignment)  type var
-#endif
-
-/** Find perfect alignment (should supports SIMD alignment if SIMD available)
-*/
-#if OGRE_CPU == OGRE_CPU_X86
-#   define OGRE_SIMD_ALIGNMENT  16
-
-#else
-#   define OGRE_SIMD_ALIGNMENT  16
-#endif
-
-/* Declare variable aligned to SIMD alignment.
-*/
-#define OGRE_SIMD_ALIGNED_DECL(type, var)   OGRE_ALIGNED_DECL(type, var, OGRE_SIMD_ALIGNMENT)
-
 /* Define whether or not Ogre compiled with SSE supports.
 */
 #if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_MSVC

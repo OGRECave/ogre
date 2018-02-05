@@ -334,6 +334,14 @@ namespace Ogre
         typedef typename std::vector<T>::const_iterator const_iterator;
     };
 
+    template <typename T, size_t Alignment>
+    struct aligned_vector 
+    { 
+        typedef typename std::vector<T, AlignedAllocator<T, Alignment> > type;
+        typedef typename std::vector<T, AlignedAllocator<T, Alignment> >::iterator iterator;
+        typedef typename std::vector<T, AlignedAllocator<T, Alignment> >::const_iterator const_iterator;
+    };
+
     template <typename T>
     struct list 
     { 
