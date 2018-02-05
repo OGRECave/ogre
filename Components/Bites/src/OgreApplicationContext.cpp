@@ -19,15 +19,18 @@
 
 #include "OgreConfigPaths.h"
 
-#if OGRE_BITES_HAVE_SDL
-#include <SDL_video.h>
-#include <SDL_syswm.h>
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "OgreArchiveManager.h"
 #include "OgreFileSystem.h"
 #include "OgreZip.h"
+#endif
+
+#if OGRE_BITES_HAVE_SDL
+#include <SDL.h>
+#include <SDL_video.h>
+#include <SDL_syswm.h>
+
+#include "SDLInputMapping.h"
 #endif
 
 namespace OgreBites {
@@ -383,7 +386,7 @@ NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre
     mWindows.push_back(ret);
 #endif
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_BITES_HAVE_SDL == 0
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && !OGRE_BITES_HAVE_SDL
     WindowEventUtilities::_addRenderWindow(ret.render);
 #endif
 
@@ -423,7 +426,7 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
     static TouchFingerEvent lastTouch = {0};
 
     if(wheel) {
-        evt.type = SDL_MOUSEWHEEL;
+        evt.type = MOUSEWHEEL;
         evt.wheel.y = wheel;
         _fireInputEvent(evt, 0);
         lastTouch.fingerId = -1; // prevent move-jump after pinch is over
@@ -435,13 +438,13 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
 
         switch (action) {
         case AMOTION_EVENT_ACTION_DOWN:
-            evt.type = SDL_FINGERDOWN;
+            evt.type = FINGERDOWN;
             break;
         case AMOTION_EVENT_ACTION_UP:
-            evt.type = SDL_FINGERUP;
+            evt.type = FINGERUP;
             break;
         case AMOTION_EVENT_ACTION_MOVE:
-            evt.type = SDL_FINGERMOTION;
+            evt.type = FINGERMOTION;
             break;
         default:
             return;
@@ -453,7 +456,7 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
         evt.tfinger.x = AMotionEvent_getRawX(event, 0) / win->getWidth();
         evt.tfinger.y = AMotionEvent_getRawY(event, 0) / win->getHeight();
 
-        if(evt.type == SDL_FINGERMOTION) {
+        if(evt.type == FINGERMOTION) {
             if(evt.tfinger.fingerId != lastTouch.fingerId)
                 return; // wrong finger
 
@@ -466,7 +469,7 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
         if(AKeyEvent_getKeyCode(event) != AKEYCODE_BACK)
             return;
 
-        evt.type = AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN ? SDL_KEYDOWN : SDL_KEYUP;
+        evt.type = AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN ? KEYDOWN : KEYUP;
         evt.key.keysym.sym = SDLK_ESCAPE;
     }
 
@@ -485,35 +488,35 @@ void ApplicationContext::_fireInputEvent(const Event& event, uint32_t windowID) 
 
         switch (event.type)
         {
-        case SDL_KEYDOWN:
+        case KEYDOWN:
             // Ignore repeated signals from key being held down.
             if (event.key.repeat) break;
             l.keyPressed(event.key);
             break;
-        case SDL_KEYUP:
+        case KEYUP:
             l.keyReleased(event.key);
             break;
-        case SDL_MOUSEBUTTONDOWN:
+        case MOUSEBUTTONDOWN:
             l.mousePressed(event.button);
             break;
-        case SDL_MOUSEBUTTONUP:
+        case MOUSEBUTTONUP:
             l.mouseReleased(event.button);
             break;
-        case SDL_MOUSEWHEEL:
+        case MOUSEWHEEL:
             l.mouseWheelRolled(event.wheel);
             break;
-        case SDL_MOUSEMOTION:
+        case MOUSEMOTION:
             l.mouseMoved(event.motion);
             break;
-        case SDL_FINGERDOWN:
+        case FINGERDOWN:
             // for finger down we have to move the pointer first
             l.touchMoved(event.tfinger);
             l.touchPressed(event.tfinger);
             break;
-        case SDL_FINGERUP:
+        case FINGERUP:
             l.touchReleased(event.tfinger);
             break;
-        case SDL_FINGERMOTION:
+        case FINGERMOTION:
             l.touchMoved(event.tfinger);
             break;
         }
@@ -789,7 +792,7 @@ void ApplicationContext::pollEvents()
             }
             break;
         default:
-            _fireInputEvent(event, event.window.windowID);
+            _fireInputEvent(convert(event), event.window.windowID);
             break;
         }
     }

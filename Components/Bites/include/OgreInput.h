@@ -8,12 +8,11 @@
 #ifndef SAMPLES_COMMON_INCLUDE_INPUT_H_
 #define SAMPLES_COMMON_INCLUDE_INPUT_H_
 
-#include <OgreBuildSettings.h>
 #include <OgreBitesPrerequisites.h>
 
-#if OGRE_BITES_HAVE_SDL
-#include <SDL.h>
-#endif
+namespace Ogre {
+    struct FrameEvent;
+}
 
 /** \addtogroup Optional
 *  @{
@@ -21,37 +20,37 @@
 /** \addtogroup Bites
 *  @{
 */
-#if OGRE_BITES_HAVE_SDL
 namespace OgreBites {
-enum {
-    BUTTON_LEFT = SDL_BUTTON_LEFT,
-    BUTTON_MIDDLE = SDL_BUTTON_MIDDLE,
-    BUTTON_RIGHT = SDL_BUTTON_RIGHT,
-};
 
-typedef SDL_Event Event;
-typedef SDL_KeyboardEvent KeyboardEvent;
-typedef SDL_MouseMotionEvent MouseMotionEvent;
-typedef SDL_MouseButtonEvent MouseButtonEvent;
-typedef SDL_MouseWheelEvent MouseWheelEvent;
-typedef SDL_TouchFingerEvent TouchFingerEvent;
-typedef SDL_Keycode Keycode;
-}
-#else
-namespace OgreBites {
-typedef int Keycode;
-enum {
-    BUTTON_LEFT,
+enum ButtonType {
+    BUTTON_LEFT = 1,
     BUTTON_MIDDLE,
     BUTTON_RIGHT,
 };
+
+enum EventType {
+    KEYDOWN = 1,
+    KEYUP,
+    MOUSEBUTTONDOWN,
+    MOUSEBUTTONUP,
+    MOUSEWHEEL,
+    MOUSEMOTION,
+    FINGERDOWN,
+    FINGERUP,
+    FINGERMOTION,
+};
+
+typedef int Keycode;
+
+struct Keysym {
+    Keycode sym;
+    unsigned short mod;
+};
+
 struct KeyboardEvent {
     int type;
-    struct {
-        Keycode sym;
-        unsigned short mod;
-    } keysym;
-    int repeat;
+    Keysym keysym;
+    unsigned char repeat;
 };
 struct MouseMotionEvent {
     int type;
@@ -62,7 +61,7 @@ struct MouseMotionEvent {
 struct MouseButtonEvent {
     int type;
     int x, y;
-    int button;
+    unsigned char button;
 };
 struct MouseWheelEvent {
     int type;
@@ -84,56 +83,36 @@ union Event
     MouseMotionEvent motion;
     TouchFingerEvent tfinger;
 };
-}
-/** @} */
-/** @} */
 
 // SDL compat
 enum {
     SDLK_RETURN = '\r',
     SDLK_ESCAPE = '\033',
     SDLK_SPACE = ' ',
-    SDLK_DOWN,
-    SDLK_UP,
-    SDLK_LEFT,
-    SDLK_RIGHT,
-    SDLK_PAGEUP,
-    SDLK_PAGEDOWN,
-    SDLK_LSHIFT,
-    SDLK_F1,
+    SDLK_F1 = (1 << 30) | 58,
     SDLK_F2,
     SDLK_F3,
     SDLK_F4,
     SDLK_F5,
     SDLK_F6,
+    SDLK_F7,
+    SDLK_F8,
     SDLK_F9,
     SDLK_F10,
     SDLK_F11,
     SDLK_F12,
+    SDLK_PAGEUP = (1 << 30) | 75,
+    SDLK_PAGEDOWN = (1 << 30) | 77,
+    SDLK_RIGHT = (1 << 30) | 79,
+    SDLK_LEFT,
+    SDLK_DOWN,
+    SDLK_UP,
+    SDLK_KP_MINUS = (1 << 30) | 86,
     SDLK_KP_PLUS,
-    SDLK_KP_MINUS,
-    SDL_NUM_KEYCODES = 512
+    SDLK_LSHIFT = (1 << 30) | 225,
+    KMOD_CTRL = 0x0040 | 0x0080,
 };
 
-enum {
-    SDL_KEYDOWN,
-    SDL_KEYUP,
-    SDL_MOUSEBUTTONDOWN,
-    SDL_MOUSEBUTTONUP,
-    SDL_MOUSEWHEEL,
-    SDL_MOUSEMOTION,
-    SDL_FINGERDOWN,
-    SDL_FINGERUP,
-    SDL_FINGERMOTION,
-    KMOD_CTRL,
-};
-#endif
-
-namespace Ogre {
-    struct FrameEvent;
-}
-
-namespace OgreBites {
 /**
 the return values of the callbacks are ignored by ApplicationContext
 however they can be used to control event propagation in a hierarchy
@@ -152,5 +131,7 @@ struct _OgreBitesExport InputListener {
     virtual bool mouseReleased(const MouseButtonEvent& evt) { return true; }
 };
 }
+/** @} */
+/** @} */
 
 #endif /* SAMPLES_COMMON_INCLUDE_INPUT_H_ */

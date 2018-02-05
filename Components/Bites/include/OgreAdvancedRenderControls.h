@@ -30,6 +30,8 @@ THE SOFTWARE.
 #define COMPONENTS_BITES_INCLUDE_OGREADVANCEDRENDERCONTROLS_H_
 
 #include "OgreInput.h"
+#include "OgreRoot.h"
+#include "OgreCamera.h"
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #include <OgreRTShaderSystem.h>
