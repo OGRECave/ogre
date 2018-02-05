@@ -314,6 +314,7 @@ namespace Ogre
         | externalWindowHandle | <ul><li>Win32: HWND as integer<li>GLX: poslong:posint:poslong (display*:screen:windowHandle) or poslong:posint:poslong:poslong (display*:screen:windowHandle:XVisualInfo*)<li>OS X Cocoa: OgreGLView address as an integer. You can pass NSView or NSWindow too, but should perform OgreGLView callbacks into the Ogre manually.<li>OS X Carbon: WindowRef as an integer<li>iOS: UIWindow address as an integer</ul> | 0 (none) | External window handle, for embedding the OGRE render in an existing window |  |
         | externalGLControl | true, false | false | Let the external window control OpenGL i.e. don't select a pixel format for the window, do not change v-sync and do not swap buffer. When set to true, the calling application is responsible of OpenGL initialization and buffer swapping. It should also create an OpenGL context for its own rendering, Ogre will create one for its use. Then the calling application must also enable Ogre OpenGL context before calling any Ogre function and restore its OpenGL context after these calls. | OpenGL Specific |
         | currentGLContext | true, false | false | Use an externally created GL context. (Must be current) | OpenGL Specific |
+        | minColourBufferSize | Positive integer (usually 16, 32) | 16 | Min total colour buffer size. See EGL_BUFFER_SIZE | OpenGL Specific |
         | colourDepth | 16, 32 | Desktop depth | Colour depth of the resulting rendering window; only applies if fullScreen | Win32 Specific |
         | FSAAHint | Depends on RenderSystem and hardware. Currently supports:"Quality": on systems that have an option to prefer higher AA quality over speed, use it | Blank | Full screen antialiasing hint | Win32 Specific |
         | outerDimensions | true, false | false | Whether the width/height is expressed as the size of the outer window, rather than the content area | Win32 Specific  |
@@ -330,7 +331,6 @@ namespace Ogre
         | MSAA | Positive integer (usually 0, 2, 4, 8, 16) | 0 | Full screen antialiasing factor | Android Specific |
         | CSAA | Positive integer (usually 0, 2, 4, 8, 16) | 0 | [Coverage sampling factor](https://www.khronos.org/registry/egl/extensions/NV/EGL_NV_coverage_sample.txt) | Android Specific |
         | maxColourBufferSize | Positive integer (usually 16, 32) | 32 | Max EGL_BUFFER_SIZE | Android Specific |
-        | minColourBufferSize | Positive integer (usually 16, 32) | 16 | Min EGL_BUFFER_SIZE | Android Specific |
         | maxStencilBufferSize | Positive integer (usually 0, 8) | 0 | EGL_STENCIL_SIZE | Android Specific |
         | maxDepthBufferSize | Positive integer (usually 0, 16, 24) | 16 | EGL_DEPTH_SIZE | Android Specific |
         */
