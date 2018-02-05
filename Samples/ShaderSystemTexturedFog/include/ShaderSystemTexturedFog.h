@@ -200,10 +200,11 @@ protected:
 
     bool mouseMoved(const MouseMotionEvent& evt)
     {
+        if(mTrayMgr->mouseMoved(evt))
+            return true;
+
         // Only rotate the camera if cursor is hidden.
-        if (mTrayMgr->isCursorVisible()) 
-            mTrayMgr->mouseMoved(evt);
-        else 
+        if (!mTrayMgr->isCursorVisible())
             mCameraMan->mouseMoved(evt);
 
         return true;

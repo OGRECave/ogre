@@ -1195,6 +1195,7 @@ namespace OgreBites
         Ogre::GuiHorizontalAlignment mTrayWidgetAlign[10];   // tray widget alignments
         Ogre::Timer* mTimer;                  // Root::getSingleton().getTimer()
         unsigned long mLastStatUpdateTime;    // The last time the stat text were updated
+        Ogre::Vector2 mCursorPos;             // current cursor position
 
     };
 }

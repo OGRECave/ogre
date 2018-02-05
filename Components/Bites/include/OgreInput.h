@@ -47,8 +47,9 @@ enum {
 };
 struct KeyboardEvent {
     int type;
-    union {
+    struct {
         Keycode sym;
+        unsigned short mod;
     } keysym;
     int repeat;
 };
@@ -126,19 +127,6 @@ enum {
     SDL_FINGERMOTION,
     KMOD_CTRL,
 };
-
-typedef int SDL_Keymod;
-
-inline unsigned char* SDL_GetKeyboardState(void*) {
-    static unsigned char state[SDL_NUM_KEYCODES] = {0};
-    return state;
-}
-inline int SDL_GetMouseState(int* x, int* y) {
-    return 0;
-}
-inline SDL_Keymod SDL_GetModState() {
-    return SDL_Keymod();
-}
 #endif
 
 namespace Ogre {
