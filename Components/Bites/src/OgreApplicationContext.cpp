@@ -489,8 +489,6 @@ void ApplicationContext::_fireInputEvent(const Event& event, uint32_t windowID) 
         switch (event.type)
         {
         case KEYDOWN:
-            // Ignore repeated signals from key being held down.
-            if (event.key.repeat) break;
             l.keyPressed(event.key);
             break;
         case KEYUP:

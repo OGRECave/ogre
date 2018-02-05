@@ -272,6 +272,9 @@ namespace OgreBites
 
         virtual bool keyPressed(const KeyboardEvent& evt)
         {
+            // Ignore repeated signals from key being held down.
+            if (evt.repeat) return true;
+
             if (mCurrentSample && !mSamplePaused) return mCurrentSample->keyPressed(evt);
             return true;
         }
