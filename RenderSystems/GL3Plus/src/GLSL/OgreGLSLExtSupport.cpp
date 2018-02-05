@@ -104,7 +104,7 @@ namespace Ogre {
             {
                 logMessage.erase(logMessage.size() - 1, 1);
             }
-            LogManager::getSingleton().logMessage(logMessage);
+            LogManager::getSingleton().logMessage(LML_CRITICAL, logMessage);
         }
 
         return logMessage;

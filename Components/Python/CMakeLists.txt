@@ -57,12 +57,7 @@ if(OGRE_BUILD_COMPONENT_OVERLAY)
     ogre_python_module(OgreOverlay)
 endif()
 
-if(OGRE_BUILD_COMPONENT_BITES)
-    if(SDL2_FOUND)
-        include_directories(${SDL2_INCLUDE_DIR})
-        list(APPEND CMAKE_SWIG_FLAGS -DOGRE_BITES_HAVE_SDL=1)
-    endif()
-    
+if(OGRE_BUILD_COMPONENT_BITES)    
     ogre_add_component_include_dir(Bites)
     set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
     swig_add_module(OgreBites python ../Bites/include/OgreBites.i)

@@ -60,7 +60,6 @@ endif()
 if(OGRE_BUILD_COMPONENT_BITES)
 	if(SDL2_FOUND)
 		include_directories(${SDL2_INCLUDE_DIR})
-		list(APPEND CMAKE_SWIG_FLAGS -DOGRE_BITES_HAVE_SDL=1)
 	endif()
 
 	ogre_add_component_include_dir(Bites)

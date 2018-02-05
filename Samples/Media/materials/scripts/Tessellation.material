@@ -102,6 +102,8 @@ material Ogre/TessellationExample
         {
             lighting off
             depth_write off
+            cull_hardware none
+            polygon_mode wireframe
 
             vertex_program_ref Ogre/Tessellation/VertexProgram
             {

@@ -283,7 +283,7 @@ namespace Ogre {
                 case GL_TEXTURE_2D_ARRAY:
                     if(!hasGLES30)
                         break;
-                    /* no break */
+                    OGRE_FALLTHROUGH;
                 case GL_TEXTURE_3D_OES:
                     OGRE_CHECK_GL_ERROR(glCompressedTexSubImage3DOES(mTarget, mLevel,
                                               dest.left, dest.top, dest.front,
@@ -331,7 +331,7 @@ namespace Ogre {
                 case GL_TEXTURE_2D_ARRAY:
                     if(!hasGLES30)
                         break;
-                    /* no break */
+                    OGRE_FALLTHROUGH;
                 case GL_TEXTURE_3D_OES:
                     OGRE_CHECK_GL_ERROR(glTexSubImage3DOES(
                                     mTarget, mLevel,
