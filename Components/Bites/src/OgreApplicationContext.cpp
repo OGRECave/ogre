@@ -19,7 +19,6 @@
 #include "OgreConfigPaths.h"
 
 #if OGRE_BITES_HAVE_SDL
-#include <SDL.h>
 #include <SDL_video.h>
 #include <SDL_syswm.h>
 #endif
