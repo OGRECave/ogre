@@ -61,91 +61,6 @@ namespace Ogre
         SetColumn(2,zAxis);
 
     }
-
-    //-----------------------------------------------------------------------
-    bool Matrix3::operator== (const Matrix3& rkMatrix) const
-    {
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            for (size_t iCol = 0; iCol < 3; iCol++)
-            {
-                if ( m[iRow][iCol] != rkMatrix.m[iRow][iCol] )
-                    return false;
-            }
-        }
-
-        return true;
-    }
-    //-----------------------------------------------------------------------
-    Matrix3 Matrix3::operator+ (const Matrix3& rkMatrix) const
-    {
-        Matrix3 kSum;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            for (size_t iCol = 0; iCol < 3; iCol++)
-            {
-                kSum.m[iRow][iCol] = m[iRow][iCol] +
-                    rkMatrix.m[iRow][iCol];
-            }
-        }
-        return kSum;
-    }
-    //-----------------------------------------------------------------------
-    Matrix3 Matrix3::operator- (const Matrix3& rkMatrix) const
-    {
-        Matrix3 kDiff;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            for (size_t iCol = 0; iCol < 3; iCol++)
-            {
-                kDiff.m[iRow][iCol] = m[iRow][iCol] -
-                    rkMatrix.m[iRow][iCol];
-            }
-        }
-        return kDiff;
-    }
-    //-----------------------------------------------------------------------
-    Matrix3 Matrix3::operator* (const Matrix3& rkMatrix) const
-    {
-        Matrix3 kProd;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            for (size_t iCol = 0; iCol < 3; iCol++)
-            {
-                kProd.m[iRow][iCol] =
-                    m[iRow][0]*rkMatrix.m[0][iCol] +
-                    m[iRow][1]*rkMatrix.m[1][iCol] +
-                    m[iRow][2]*rkMatrix.m[2][iCol];
-            }
-        }
-        return kProd;
-    }
-    //-----------------------------------------------------------------------
-    Vector3 Matrix3::operator* (const Vector3& rkPoint) const
-    {
-        Vector3 kProd;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            kProd[iRow] =
-                m[iRow][0]*rkPoint[0] +
-                m[iRow][1]*rkPoint[1] +
-                m[iRow][2]*rkPoint[2];
-        }
-        return kProd;
-    }
-    //-----------------------------------------------------------------------
-    Vector3 operator* (const Vector3& rkPoint, const Matrix3& rkMatrix)
-    {
-        Vector3 kProd;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            kProd[iRow] =
-                rkPoint[0]*rkMatrix.m[0][iRow] +
-                rkPoint[1]*rkMatrix.m[1][iRow] +
-                rkPoint[2]*rkMatrix.m[2][iRow];
-        }
-        return kProd;
-    }
     //-----------------------------------------------------------------------
     Matrix3 Matrix3::operator- () const
     {
@@ -158,40 +73,7 @@ namespace Ogre
         return kNeg;
     }
     //-----------------------------------------------------------------------
-    Matrix3 Matrix3::operator* (Real fScalar) const
-    {
-        Matrix3 kProd;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            for (size_t iCol = 0; iCol < 3; iCol++)
-                kProd[iRow][iCol] = fScalar*m[iRow][iCol];
-        }
-        return kProd;
-    }
-    //-----------------------------------------------------------------------
-    Matrix3 operator* (Real fScalar, const Matrix3& rkMatrix)
-    {
-        Matrix3 kProd;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            for (size_t iCol = 0; iCol < 3; iCol++)
-                kProd[iRow][iCol] = fScalar*rkMatrix.m[iRow][iCol];
-        }
-        return kProd;
-    }
-    //-----------------------------------------------------------------------
-    Matrix3 Matrix3::Transpose () const
-    {
-        Matrix3 kTranspose;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            for (size_t iCol = 0; iCol < 3; iCol++)
-                kTranspose[iRow][iCol] = m[iCol][iRow];
-        }
-        return kTranspose;
-    }
-    //-----------------------------------------------------------------------
-    bool Matrix3::Inverse (Matrix3& rkInverse, Real fTolerance) const
+    static bool invert(const Matrix<3, 3>& m, Matrix<3, 3>& rkInverse, Real fTolerance)
     {
         // Invert a 3x3 using cofactors.  This is about 8 times faster than
         // the Numerical Recipes code which uses Gaussian elimination.
@@ -232,15 +114,25 @@ namespace Ogre
 
         return true;
     }
-    //-----------------------------------------------------------------------
+    bool Matrix3::Inverse (Matrix<3, 3>& rkInverse, Real fTolerance) const
+    {
+        return invert(*this, rkInverse, fTolerance);
+    }
     Matrix3 Matrix3::Inverse (Real fTolerance) const
     {
         Matrix3 kInverse = Matrix3::ZERO;
-        Inverse(kInverse,fTolerance);
+        invert(*this, kInverse, fTolerance);
         return kInverse;
     }
     //-----------------------------------------------------------------------
-    Real Matrix3::Determinant () const
+    template<> Matrix<3, 3> Matrix<3, 3>::inverse() const
+    {
+        Matrix<3, 3> ret;
+        invert(*this, ret, 1e-06);
+        return ret;
+    }
+    //-----------------------------------------------------------------------
+    template<> Real Matrix<3, 3>::determinant () const
     {
         Real fCofactor00 = m[1][1]*m[2][2] -
             m[1][2]*m[2][1];

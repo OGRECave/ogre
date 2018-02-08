@@ -31,6 +31,7 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
+#include "OgreMatrix.h"
 #include "OgreMatrix3.h"
 #include "OgreVector4.h"
 #include "OgrePlane.h"
@@ -74,24 +75,18 @@ namespace Ogre
                 [ m[3][0]  m[3][1]  m[3][2]  m[3][3] ]   {1}
             </pre>
     */
-    class _OgreExport Matrix4
+    class _OgreExport Matrix4 : public Matrix<4, 4>
     {
-    protected:
-        /// The matrix entries, indexed by [row][col].
-        union {
-            Real m[4][4];
-            Real _m[16];
-        };
     public:
         /** Default constructor.
             @note
                 It does <b>NOT</b> initialize the matrix for efficiency.
         */
-        inline Matrix4()
-        {
-        }
+        Matrix4() {}
 
-        inline Matrix4(
+        Matrix4(const Matrix<4, 4>& other) : Matrix<4, 4>(other) {}
+
+        Matrix4(
             Real m00, Real m01, Real m02, Real m03,
             Real m10, Real m11, Real m12, Real m13,
             Real m20, Real m21, Real m22, Real m23,
@@ -118,7 +113,7 @@ namespace Ogre
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling 3x3 matrix.
          */
 
-        inline Matrix4(const Matrix3& m3x3)
+        Matrix4(const Matrix3& m3x3)
         {
           operator=(IDENTITY);
           operator=(m3x3);
@@ -127,225 +122,26 @@ namespace Ogre
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling Quaternion.
          */
         
-        inline Matrix4(const Quaternion& rot)
+        Matrix4(const Quaternion& rot)
         {
           Matrix3 m3x3;
           rot.ToRotationMatrix(m3x3);
           operator=(IDENTITY);
           operator=(m3x3);
         }
-        
 
-        /** Exchange the contents of this matrix with another. 
-        */
-        inline void swap(Matrix4& other)
+        Matrix4 concatenate(const Matrix<4, 4>& m2) const
         {
-            std::swap(m[0][0], other.m[0][0]);
-            std::swap(m[0][1], other.m[0][1]);
-            std::swap(m[0][2], other.m[0][2]);
-            std::swap(m[0][3], other.m[0][3]);
-            std::swap(m[1][0], other.m[1][0]);
-            std::swap(m[1][1], other.m[1][1]);
-            std::swap(m[1][2], other.m[1][2]);
-            std::swap(m[1][3], other.m[1][3]);
-            std::swap(m[2][0], other.m[2][0]);
-            std::swap(m[2][1], other.m[2][1]);
-            std::swap(m[2][2], other.m[2][2]);
-            std::swap(m[2][3], other.m[2][3]);
-            std::swap(m[3][0], other.m[3][0]);
-            std::swap(m[3][1], other.m[3][1]);
-            std::swap(m[3][2], other.m[3][2]);
-            std::swap(m[3][3], other.m[3][3]);
-        }
-
-        inline Real* operator [] ( size_t iRow )
-        {
-            assert( iRow < 4 );
-            return m[iRow];
-        }
-
-        inline const Real *operator [] ( size_t iRow ) const
-        {
-            assert( iRow < 4 );
-            return m[iRow];
-        }
-
-        inline Matrix4 concatenate(const Matrix4 &m2) const
-        {
-            Matrix4 r;
-            r.m[0][0] = m[0][0] * m2.m[0][0] + m[0][1] * m2.m[1][0] + m[0][2] * m2.m[2][0] + m[0][3] * m2.m[3][0];
-            r.m[0][1] = m[0][0] * m2.m[0][1] + m[0][1] * m2.m[1][1] + m[0][2] * m2.m[2][1] + m[0][3] * m2.m[3][1];
-            r.m[0][2] = m[0][0] * m2.m[0][2] + m[0][1] * m2.m[1][2] + m[0][2] * m2.m[2][2] + m[0][3] * m2.m[3][2];
-            r.m[0][3] = m[0][0] * m2.m[0][3] + m[0][1] * m2.m[1][3] + m[0][2] * m2.m[2][3] + m[0][3] * m2.m[3][3];
-
-            r.m[1][0] = m[1][0] * m2.m[0][0] + m[1][1] * m2.m[1][0] + m[1][2] * m2.m[2][0] + m[1][3] * m2.m[3][0];
-            r.m[1][1] = m[1][0] * m2.m[0][1] + m[1][1] * m2.m[1][1] + m[1][2] * m2.m[2][1] + m[1][3] * m2.m[3][1];
-            r.m[1][2] = m[1][0] * m2.m[0][2] + m[1][1] * m2.m[1][2] + m[1][2] * m2.m[2][2] + m[1][3] * m2.m[3][2];
-            r.m[1][3] = m[1][0] * m2.m[0][3] + m[1][1] * m2.m[1][3] + m[1][2] * m2.m[2][3] + m[1][3] * m2.m[3][3];
-
-            r.m[2][0] = m[2][0] * m2.m[0][0] + m[2][1] * m2.m[1][0] + m[2][2] * m2.m[2][0] + m[2][3] * m2.m[3][0];
-            r.m[2][1] = m[2][0] * m2.m[0][1] + m[2][1] * m2.m[1][1] + m[2][2] * m2.m[2][1] + m[2][3] * m2.m[3][1];
-            r.m[2][2] = m[2][0] * m2.m[0][2] + m[2][1] * m2.m[1][2] + m[2][2] * m2.m[2][2] + m[2][3] * m2.m[3][2];
-            r.m[2][3] = m[2][0] * m2.m[0][3] + m[2][1] * m2.m[1][3] + m[2][2] * m2.m[2][3] + m[2][3] * m2.m[3][3];
-
-            r.m[3][0] = m[3][0] * m2.m[0][0] + m[3][1] * m2.m[1][0] + m[3][2] * m2.m[2][0] + m[3][3] * m2.m[3][0];
-            r.m[3][1] = m[3][0] * m2.m[0][1] + m[3][1] * m2.m[1][1] + m[3][2] * m2.m[2][1] + m[3][3] * m2.m[3][1];
-            r.m[3][2] = m[3][0] * m2.m[0][2] + m[3][1] * m2.m[1][2] + m[3][2] * m2.m[2][2] + m[3][3] * m2.m[3][2];
-            r.m[3][3] = m[3][0] * m2.m[0][3] + m[3][1] * m2.m[1][3] + m[3][2] * m2.m[2][3] + m[3][3] * m2.m[3][3];
-
-            return r;
-        }
-
-        /** Matrix concatenation using '*'.
-        */
-        inline Matrix4 operator * ( const Matrix4 &m2 ) const
-        {
-            return concatenate( m2 );
-        }
-
-        /** Vector transformation using '*'.
-            @remarks
-                Transforms the given 3-D vector by the matrix, projecting the 
-                result back into <i>w</i> = 1.
-            @note
-                This means that the initial <i>w</i> is considered to be 1.0,
-                and then all the tree elements of the resulting 3-D vector are
-                divided by the resulting <i>w</i>.
-        */
-        inline Vector3 operator * ( const Vector3 &v ) const
-        {
-            Vector3 r;
-
-            Real fInvW = 1.0f / ( m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] );
-
-            r.x = ( m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] ) * fInvW;
-            r.y = ( m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] ) * fInvW;
-            r.z = ( m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] ) * fInvW;
-
-            return r;
-        }
-        inline Vector4 operator * (const Vector4& v) const
-        {
-            return Vector4(
-                m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w, 
-                m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
-                m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
-                m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w
-                );
-        }
-        inline Plane operator * (const Plane& p) const
-        {
-            Plane ret;
-            Matrix4 invTrans = inverse().transpose();
-            Vector4 v4( p.normal.x, p.normal.y, p.normal.z, p.d );
-            v4 = invTrans * v4;
-            ret.normal.x = v4.x; 
-            ret.normal.y = v4.y; 
-            ret.normal.z = v4.z;
-            ret.d = v4.w / ret.normal.normalise();
-
-            return ret;
-        }
-
-
-        /** Matrix addition.
-        */
-        inline Matrix4 operator + ( const Matrix4 &m2 ) const
-        {
-            Matrix4 r;
-
-            r.m[0][0] = m[0][0] + m2.m[0][0];
-            r.m[0][1] = m[0][1] + m2.m[0][1];
-            r.m[0][2] = m[0][2] + m2.m[0][2];
-            r.m[0][3] = m[0][3] + m2.m[0][3];
-
-            r.m[1][0] = m[1][0] + m2.m[1][0];
-            r.m[1][1] = m[1][1] + m2.m[1][1];
-            r.m[1][2] = m[1][2] + m2.m[1][2];
-            r.m[1][3] = m[1][3] + m2.m[1][3];
-
-            r.m[2][0] = m[2][0] + m2.m[2][0];
-            r.m[2][1] = m[2][1] + m2.m[2][1];
-            r.m[2][2] = m[2][2] + m2.m[2][2];
-            r.m[2][3] = m[2][3] + m2.m[2][3];
-
-            r.m[3][0] = m[3][0] + m2.m[3][0];
-            r.m[3][1] = m[3][1] + m2.m[3][1];
-            r.m[3][2] = m[3][2] + m2.m[3][2];
-            r.m[3][3] = m[3][3] + m2.m[3][3];
-
-            return r;
-        }
-
-        /** Matrix subtraction.
-        */
-        inline Matrix4 operator - ( const Matrix4 &m2 ) const
-        {
-            Matrix4 r;
-            r.m[0][0] = m[0][0] - m2.m[0][0];
-            r.m[0][1] = m[0][1] - m2.m[0][1];
-            r.m[0][2] = m[0][2] - m2.m[0][2];
-            r.m[0][3] = m[0][3] - m2.m[0][3];
-
-            r.m[1][0] = m[1][0] - m2.m[1][0];
-            r.m[1][1] = m[1][1] - m2.m[1][1];
-            r.m[1][2] = m[1][2] - m2.m[1][2];
-            r.m[1][3] = m[1][3] - m2.m[1][3];
-
-            r.m[2][0] = m[2][0] - m2.m[2][0];
-            r.m[2][1] = m[2][1] - m2.m[2][1];
-            r.m[2][2] = m[2][2] - m2.m[2][2];
-            r.m[2][3] = m[2][3] - m2.m[2][3];
-
-            r.m[3][0] = m[3][0] - m2.m[3][0];
-            r.m[3][1] = m[3][1] - m2.m[3][1];
-            r.m[3][2] = m[3][2] - m2.m[3][2];
-            r.m[3][3] = m[3][3] - m2.m[3][3];
-
-            return r;
-        }
-
-        /** Tests 2 matrices for equality.
-        */
-        inline bool operator == ( const Matrix4& m2 ) const
-        {
-            if( 
-                m[0][0] != m2.m[0][0] || m[0][1] != m2.m[0][1] || m[0][2] != m2.m[0][2] || m[0][3] != m2.m[0][3] ||
-                m[1][0] != m2.m[1][0] || m[1][1] != m2.m[1][1] || m[1][2] != m2.m[1][2] || m[1][3] != m2.m[1][3] ||
-                m[2][0] != m2.m[2][0] || m[2][1] != m2.m[2][1] || m[2][2] != m2.m[2][2] || m[2][3] != m2.m[2][3] ||
-                m[3][0] != m2.m[3][0] || m[3][1] != m2.m[3][1] || m[3][2] != m2.m[3][2] || m[3][3] != m2.m[3][3] )
-                return false;
-            return true;
-        }
-
-        /** Tests 2 matrices for inequality.
-        */
-        inline bool operator != ( const Matrix4& m2 ) const
-        {
-            if( 
-                m[0][0] != m2.m[0][0] || m[0][1] != m2.m[0][1] || m[0][2] != m2.m[0][2] || m[0][3] != m2.m[0][3] ||
-                m[1][0] != m2.m[1][0] || m[1][1] != m2.m[1][1] || m[1][2] != m2.m[1][2] || m[1][3] != m2.m[1][3] ||
-                m[2][0] != m2.m[2][0] || m[2][1] != m2.m[2][1] || m[2][2] != m2.m[2][2] || m[2][3] != m2.m[2][3] ||
-                m[3][0] != m2.m[3][0] || m[3][1] != m2.m[3][1] || m[3][2] != m2.m[3][2] || m[3][3] != m2.m[3][3] )
-                return true;
-            return false;
+            return *this * m2;
         }
 
         /** Assignment from 3x3 matrix.
         */
-        inline void operator = ( const Matrix3& mat3 )
+        void operator = ( const Matrix3& mat3 )
         {
             m[0][0] = mat3.m[0][0]; m[0][1] = mat3.m[0][1]; m[0][2] = mat3.m[0][2];
             m[1][0] = mat3.m[1][0]; m[1][1] = mat3.m[1][1]; m[1][2] = mat3.m[1][2];
             m[2][0] = mat3.m[2][0]; m[2][1] = mat3.m[2][1]; m[2][2] = mat3.m[2][2];
-        }
-
-        inline Matrix4 transpose(void) const
-        {
-            return Matrix4(m[0][0], m[1][0], m[2][0], m[3][0],
-                           m[0][1], m[1][1], m[2][1], m[3][1],
-                           m[0][2], m[1][2], m[2][2], m[3][2],
-                           m[0][3], m[1][3], m[2][3], m[3][3]);
         }
 
         /*
@@ -372,15 +168,9 @@ namespace Ogre
 
         /** Builds a translation matrix
         */
-        inline void makeTrans( const Vector3& v )
-        {
-            m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = v.x;
-            m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = v.y;
-            m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = v.z;
-            m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
-        }
+        void makeTrans(const Vector3& v) { makeTrans(v.x, v.y, v.z); }
 
-        inline void makeTrans( Real tx, Real ty, Real tz )
+        void makeTrans( Real tx, Real ty, Real tz )
         {
             m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = tx;
             m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = ty;
@@ -390,21 +180,11 @@ namespace Ogre
 
         /** Gets a translation matrix.
         */
-        inline static Matrix4 getTrans( const Vector3& v )
-        {
-            Matrix4 r;
-
-            r.m[0][0] = 1.0; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = v.x;
-            r.m[1][0] = 0.0; r.m[1][1] = 1.0; r.m[1][2] = 0.0; r.m[1][3] = v.y;
-            r.m[2][0] = 0.0; r.m[2][1] = 0.0; r.m[2][2] = 1.0; r.m[2][3] = v.z;
-            r.m[3][0] = 0.0; r.m[3][1] = 0.0; r.m[3][2] = 0.0; r.m[3][3] = 1.0;
-
-            return r;
-        }
+        static Matrix4 getTrans(const Vector3& v) { return getTrans(v.x, v.y, v.z); }
 
         /** Gets a translation matrix - variation for not using a vector.
         */
-        inline static Matrix4 getTrans( Real t_x, Real t_y, Real t_z )
+        static Matrix4 getTrans( Real t_x, Real t_y, Real t_z )
         {
             Matrix4 r;
 
@@ -432,20 +212,11 @@ namespace Ogre
 
         /** Gets a scale matrix.
         */
-        inline static Matrix4 getScale( const Vector3& v )
-        {
-            Matrix4 r;
-            r.m[0][0] = v.x; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = 0.0;
-            r.m[1][0] = 0.0; r.m[1][1] = v.y; r.m[1][2] = 0.0; r.m[1][3] = 0.0;
-            r.m[2][0] = 0.0; r.m[2][1] = 0.0; r.m[2][2] = v.z; r.m[2][3] = 0.0;
-            r.m[3][0] = 0.0; r.m[3][1] = 0.0; r.m[3][2] = 0.0; r.m[3][3] = 1.0;
-
-            return r;
-        }
+        static Matrix4 getScale(const Vector3& v) { return getScale(v.x, v.y, v.z); }
 
         /** Gets a scale matrix - variation for not using a vector.
         */
-        inline static Matrix4 getScale( Real s_x, Real s_y, Real s_z )
+        static Matrix4 getScale( Real s_x, Real s_y, Real s_z )
         {
             Matrix4 r;
             r.m[0][0] = s_x; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = 0.0;
@@ -473,28 +244,8 @@ namespace Ogre
 
         }
 
-        /** Determines if this matrix involves a scaling. */
-        inline bool hasScale() const
-        {
-            // check magnitude of column vectors (==local axes)
-            Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-            t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-            t = m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-
-            return false;
-        }
-
         /** Determines if this matrix involves a negative scaling. */
-        inline bool hasNegativeScale() const
-        {
-            return determinant() < 0;
-        }
+        bool hasNegativeScale() const { return determinant() < 0; }
 
         /** Extracts the rotation / scaling part as a quaternion from the Matrix.
          */
@@ -505,44 +256,14 @@ namespace Ogre
           return Quaternion(m3x3);
         }
 
-    static const Matrix4 ZERO;
-    static const Matrix4 ZEROAFFINE;
-    static const Matrix4 IDENTITY;
+        static const Matrix4 ZERO;
+        static const Matrix4 ZEROAFFINE;
+        static const Matrix4 IDENTITY;
         /** Useful little matrix which takes 2D clipspace {-1, 1} to {0,1}
             and inverts the Y. */
         static const Matrix4 CLIPSPACE2DTOIMAGESPACE;
-
-        inline Matrix4 operator*(Real scalar) const
-        {
-            return Matrix4(
-                scalar*m[0][0], scalar*m[0][1], scalar*m[0][2], scalar*m[0][3],
-                scalar*m[1][0], scalar*m[1][1], scalar*m[1][2], scalar*m[1][3],
-                scalar*m[2][0], scalar*m[2][1], scalar*m[2][2], scalar*m[2][3],
-                scalar*m[3][0], scalar*m[3][1], scalar*m[3][2], scalar*m[3][3]);
-        }
-
-        /** Function for writing to a stream.
-        */
-        inline _OgreExport friend std::ostream& operator <<
-            ( std::ostream& o, const Matrix4& mat )
-        {
-            o << "Matrix4(";
-            for (size_t i = 0; i < 4; ++i)
-            {
-                o << " row" << (unsigned)i << "{";
-                for(size_t j = 0; j < 4; ++j)
-                {
-                    o << mat[i][j] << " ";
-                }
-                o << "}";
-            }
-            o << ")";
-            return o;
-        }
         
         Matrix4 adjoint() const;
-        Real determinant() const;
-        Matrix4 inverse() const;
 
         /** Building a Matrix4 from orientation / scale / position.
         @remarks
@@ -568,7 +289,7 @@ namespace Ogre
                 An affine matrix is a 4x4 matrix with row 3 equal to (0, 0, 0, 1),
                 e.g. no projective coefficients.
         */
-        inline bool isAffine(void) const
+        bool isAffine(void) const
         {
             return m[3][0] == 0 && m[3][1] == 0 && m[3][2] == 0 && m[3][3] == 1;
         }
@@ -656,18 +377,65 @@ namespace Ogre
         }
     };
 
-    /* Removed from Vector4 and made a non-member here because otherwise
-       OgreMatrix4.h and OgreVector4.h have to try to include and inline each 
-       other, which frankly doesn't work ;)
-   */
-    inline Vector4 operator * (const Vector4& v, const Matrix4& mat)
+    /** Vector transformation using '*'.
+        @remarks
+            Transforms the given 3-D vector by the matrix, projecting the
+            result back into <i>w</i> = 1.
+        @note
+            This means that the initial <i>w</i> is considered to be 1.0,
+            and then all the tree elements of the resulting 3-D vector are
+            divided by the resulting <i>w</i>.
+    */
+    inline Vector3 operator*(const Matrix<4, 4>& m, const Vector3& v)
     {
-        return Vector4(
-            v.x*mat[0][0] + v.y*mat[1][0] + v.z*mat[2][0] + v.w*mat[3][0],
-            v.x*mat[0][1] + v.y*mat[1][1] + v.z*mat[2][1] + v.w*mat[3][1],
-            v.x*mat[0][2] + v.y*mat[1][2] + v.z*mat[2][2] + v.w*mat[3][2],
-            v.x*mat[0][3] + v.y*mat[1][3] + v.z*mat[2][3] + v.w*mat[3][3]
-            );
+        Vector3 r;
+
+        Real fInvW = 1.0f / ( m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] );
+
+        r.x = ( m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] ) * fInvW;
+        r.y = ( m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] ) * fInvW;
+        r.z = ( m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] ) * fInvW;
+
+        return r;
+    }
+
+    inline Plane operator*(const Matrix<4, 4>& mat, const Plane& p)
+    {
+        Plane ret;
+        Matrix<4, 4> invTrans = mat.inverse().transpose();
+        Vector<4> v4( p.normal.x, p.normal.y, p.normal.z, p.d );
+        v4 = invTrans * v4;
+        ret.normal = v4.xyz();
+        ret.d = v4.w / ret.normal.normalise();
+
+        return ret;
+    }
+
+    // optimised overload. still 20% faster with -O3. The rest is about the same
+    inline Matrix<4, 4> operator*(const Matrix<4, 4>& m, const Matrix<4, 4>& m2)
+    {
+        Matrix<4, 4> r;
+        r[0][0] = m[0][0] * m2[0][0] + m[0][1] * m2[1][0] + m[0][2] * m2[2][0] + m[0][3] * m2[3][0];
+        r[0][1] = m[0][0] * m2[0][1] + m[0][1] * m2[1][1] + m[0][2] * m2[2][1] + m[0][3] * m2[3][1];
+        r[0][2] = m[0][0] * m2[0][2] + m[0][1] * m2[1][2] + m[0][2] * m2[2][2] + m[0][3] * m2[3][2];
+        r[0][3] = m[0][0] * m2[0][3] + m[0][1] * m2[1][3] + m[0][2] * m2[2][3] + m[0][3] * m2[3][3];
+
+        r[1][0] = m[1][0] * m2[0][0] + m[1][1] * m2[1][0] + m[1][2] * m2[2][0] + m[1][3] * m2[3][0];
+        r[1][1] = m[1][0] * m2[0][1] + m[1][1] * m2[1][1] + m[1][2] * m2[2][1] + m[1][3] * m2[3][1];
+        r[1][2] = m[1][0] * m2[0][2] + m[1][1] * m2[1][2] + m[1][2] * m2[2][2] + m[1][3] * m2[3][2];
+        r[1][3] = m[1][0] * m2[0][3] + m[1][1] * m2[1][3] + m[1][2] * m2[2][3] + m[1][3] * m2[3][3];
+
+        r[2][0] = m[2][0] * m2[0][0] + m[2][1] * m2[1][0] + m[2][2] * m2[2][0] + m[2][3] * m2[3][0];
+        r[2][1] = m[2][0] * m2[0][1] + m[2][1] * m2[1][1] + m[2][2] * m2[2][1] + m[2][3] * m2[3][1];
+        r[2][2] = m[2][0] * m2[0][2] + m[2][1] * m2[1][2] + m[2][2] * m2[2][2] + m[2][3] * m2[3][2];
+        r[2][3] = m[2][0] * m2[0][3] + m[2][1] * m2[1][3] + m[2][2] * m2[2][3] + m[2][3] * m2[3][3];
+
+        r[3][0] = m[3][0] * m2[0][0] + m[3][1] * m2[1][0] + m[3][2] * m2[2][0] + m[3][3] * m2[3][0];
+        r[3][1] = m[3][0] * m2[0][1] + m[3][1] * m2[1][1] + m[3][2] * m2[2][1] + m[3][3] * m2[3][1];
+        r[3][2] = m[3][0] * m2[0][2] + m[3][1] * m2[1][2] + m[3][2] * m2[2][2] + m[3][3] * m2[3][2];
+        r[3][3] = m[3][0] * m2[0][3] + m[3][1] * m2[1][3] + m[3][2] * m2[2][3] + m[3][3] * m2[3][3];
+
+        return r;
     }
     /** @} */
     /** @} */

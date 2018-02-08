@@ -29,5 +29,5 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const Vector4 Vector4::ZERO( 0, 0, 0, 0 );
+    const Vector<4> Vector4::ZERO( 0, 0, 0, 0 );
 }

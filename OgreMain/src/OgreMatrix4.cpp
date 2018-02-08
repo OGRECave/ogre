@@ -87,7 +87,7 @@ namespace Ogre
             MINOR(*this, 0, 1, 2, 0, 1, 2));
     }
     //-----------------------------------------------------------------------
-    Real Matrix4::determinant() const
+    template<> Real Matrix<4, 4>::determinant() const
     {
         return m[0][0] * MINOR(*this, 1, 2, 3, 1, 2, 3) -
             m[0][1] * MINOR(*this, 1, 2, 3, 0, 2, 3) +
@@ -95,7 +95,7 @@ namespace Ogre
             m[0][3] * MINOR(*this, 1, 2, 3, 0, 1, 2);
     }
     //-----------------------------------------------------------------------
-    Matrix4 Matrix4::inverse() const
+    template<> Matrix<4, 4> Matrix<4, 4>::inverse() const
     {
         Real m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m03 = m[0][3];
         Real m10 = m[1][0], m11 = m[1][1], m12 = m[1][2], m13 = m[1][3];
