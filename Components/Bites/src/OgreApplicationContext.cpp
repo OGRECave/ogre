@@ -356,13 +356,23 @@ NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre
         miscParams["currentGLContext"] = "true";
     }
 
+
+
 #if OGRE_BITES_HAVE_SDL
     if(!SDL_WasInit(SDL_INIT_VIDEO)) {
         SDL_InitSubSystem(SDL_INIT_VIDEO);
     }
 
+    Uint32 flags = SDL_WINDOW_RESIZABLE;
+
+    if(ropts["Full Screen"].currentValue == "Yes"){
+       flags = SDL_WINDOW_FULLSCREEN;
+    } else {
+       flags = SDL_WINDOW_RESIZABLE;
+    }
+
     ret.native = SDL_CreateWindow(name.c_str(),
-                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
+                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flags);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     SDL_GL_CreateContext(ret.native);
