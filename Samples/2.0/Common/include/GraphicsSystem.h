@@ -131,6 +131,10 @@ namespace Demo
         Ogre::CompositorWorkspace* getCompositorWorkspace(void) const { return mWorkspace; }
         Ogre::v1::OverlaySystem* getOverlaySystem(void) const   { return mOverlaySystem; }
 
+        const Ogre::String& getPluginsFolder(void) const        { return mPluginsFolder; }
+        const Ogre::String& getWriteAccessFolder(void) const    { return mWriteAccessFolder; }
+        const Ogre::String& getResourcePath(void) const         { return mResourcePath; }
+
         virtual void stopCompositor(void);
         virtual void restartCompositor(void);
     };
