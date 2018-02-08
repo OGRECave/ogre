@@ -36,7 +36,7 @@ namespace Demo
         Ogre::SceneManager          *mSceneManager;
         Ogre::Camera                *mCamera;
         Ogre::CompositorWorkspace   *mWorkspace;
-        Ogre::String                mPluginsPath;
+        Ogre::String                mPluginsFolder;
         Ogre::String                mWriteAccessFolder;
         Ogre::String                mResourcePath;
 
@@ -60,6 +60,8 @@ namespace Demo
     #if OGRE_USE_SDL2
         void handleWindowEvent( const SDL_Event& evt );
     #endif
+
+        bool isWriteAccessFolder( const Ogre::String &folderPath, const Ogre::String &fileToSave );
 
         /// @see MessageQueueSystem::processIncomingMessage
         virtual void processIncomingMessage( Mq::MessageId messageId, const void *data );

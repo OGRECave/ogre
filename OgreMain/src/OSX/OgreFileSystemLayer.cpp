@@ -102,4 +102,9 @@ namespace Ogre
     {
         return !rename(oldname.c_str(), newname.c_str());
     }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::hasWriteAccess(const Ogre::String& path)
+    {
+        return macHasWriteAccess( path.c_str() );
+    }
 }

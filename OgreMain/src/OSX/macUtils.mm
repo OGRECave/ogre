@@ -177,4 +177,21 @@ namespace Ogre {
         }
         return String([tempFilePath cStringUsingEncoding:NSASCIIStringEncoding]);
     }
+
+    bool macHasWriteAccess( const char *path )
+    {
+        NSString *fullPath = [NSString stringWithUTF8String:path];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+
+        BOOL isDirectory = false;
+        BOOL bExists = [fileManager fileExistsAtPath:fullPath isDirectory:&isDirectory];
+
+        if( !bExists )
+            return false;
+
+        if( isDirectory && ![fullPath hasSuffix:@"/"])
+            fullPath = [fullPath stringByAppendingString:@"/"];
+
+        return [fileManager isWritableFileAtPath:fullPath] == YES;
+    }
 }
