@@ -32,58 +32,31 @@ namespace Ogre {
 
     Node::QueuedUpdates Node::msQueuedUpdates;
     //-----------------------------------------------------------------------
-    Node::Node()
-        :mParent(0),
-        mNeedParentUpdate(false),
-        mNeedChildUpdate(false),
-        mParentNotified(false),
-        mQueuedForUpdate(false),
-        mOrientation(Quaternion::IDENTITY),
-        mPosition(Vector3::ZERO),
-        mScale(Vector3::UNIT_SCALE),
-        mInheritOrientation(true),
-        mInheritScale(true),
-        mDerivedOrientation(Quaternion::IDENTITY),
-        mDerivedPosition(Vector3::ZERO),
-        mDerivedScale(Vector3::UNIT_SCALE),
-        mInitialPosition(Vector3::ZERO),
-        mInitialOrientation(Quaternion::IDENTITY),
-        mInitialScale(Vector3::UNIT_SCALE),
-        mCachedTransformOutOfDate(true),
-        mListener(0), 
-        mDebug(0)
-    {
-        needUpdate();
-
-    }
+    Node::Node() : Node(BLANKSTRING) {}
     //-----------------------------------------------------------------------
     Node::Node(const String& name)
-        :
-        mParent(0),
+        :mParent(0),
+        mName(name),
         mNeedParentUpdate(false),
         mNeedChildUpdate(false),
         mParentNotified(false),
         mQueuedForUpdate(false),
-        mName(name),
+        mInheritOrientation(true),
+        mInheritScale(true),
+        mCachedTransformOutOfDate(true),
         mOrientation(Quaternion::IDENTITY),
         mPosition(Vector3::ZERO),
         mScale(Vector3::UNIT_SCALE),
-        mInheritOrientation(true),
-        mInheritScale(true),
         mDerivedOrientation(Quaternion::IDENTITY),
         mDerivedPosition(Vector3::ZERO),
         mDerivedScale(Vector3::UNIT_SCALE),
         mInitialPosition(Vector3::ZERO),
         mInitialOrientation(Quaternion::IDENTITY),
         mInitialScale(Vector3::UNIT_SCALE),
-        mCachedTransformOutOfDate(true),
         mListener(0), 
         mDebug(0)
-
     {
-
         needUpdate();
-
     }
 
     //-----------------------------------------------------------------------

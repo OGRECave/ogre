@@ -32,7 +32,7 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------------
     Technique::Technique(Material* parent)
-        : mParent(parent), mIsSupported(false), mIlluminationPassesCompilationPhase(IPS_NOT_COMPILED), mLodIndex(0), mSchemeIndex(0)
+        : mParent(parent), mIlluminationPassesCompilationPhase(IPS_NOT_COMPILED), mLodIndex(0), mSchemeIndex(0), mIsSupported(false)
     {
         // See above, defaults to unsupported until examined
     }

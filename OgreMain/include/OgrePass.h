@@ -107,10 +107,9 @@ namespace Ogre {
         typedef vector<TextureUnitState*>::type TextureUnitStates;
     protected:
         Technique* mParent;
-        unsigned short mIndex; /// Pass index
         String mName; /// Optional name for the pass
         uint32 mHash; /// Pass hash
-        bool mHashDirtyQueued; /// Needs to be dirtied when next loaded
+        ushort mIndex; /// Pass index
         //-------------------------------------------------------------------------
         // Colour properties, only applicable in fixed-function passes
         ColourValue mAmbient;
@@ -128,40 +127,57 @@ namespace Ogre {
         SceneBlendFactor mSourceBlendFactorAlpha;
         SceneBlendFactor mDestBlendFactorAlpha;
 
-        // Used to determine if separate alpha blending should be used for color and alpha channels
-        bool mSeparateBlend;
-
         //-------------------------------------------------------------------------
         // Blending operations
         SceneBlendOperation mBlendOperation;
         SceneBlendOperation mAlphaBlendOperation;
 
+        /// Needs to be dirtied when next loaded
+        bool mHashDirtyQueued : 1;
+        /// Used to determine if separate alpha blending should be used for color and alpha channels
+        bool mSeparateBlend : 1;
         /// Determines if we should use separate blending operations for color and alpha channels
-        bool mSeparateBlendOperation;
-
-        //-------------------------------------------------------------------------
-
-        //-------------------------------------------------------------------------
+        bool mSeparateBlendOperation : 1;
+        /// Colour buffer settings
+        bool mColourWrite : 1;
         // Depth buffer settings
-        bool mDepthCheck;
-        bool mDepthWrite;
+        bool mDepthCheck : 1;
+        bool mDepthWrite : 1;
+        bool mAlphaToCoverageEnabled : 1;
+        /// Transparent depth sorting
+        bool mTransparentSorting : 1;
+        /// Transparent depth sorting forced
+        bool mTransparentSortingForced : 1;
+        /// Lighting enabled?
+        bool mLightingEnabled : 1;
+        /// Run this pass once per light?
+        bool mIteratePerLight : 1;
+        /// Should it only be run for a certain light type?
+        bool mRunOnlyForOneLightType : 1;
+        /// Normalisation
+        bool mNormaliseNormals : 1;
+        bool mPolygonModeOverrideable : 1;
+        bool mFogOverride : 1;
+        /// Is this pass queued for deletion?
+        bool mQueuedForDeletion : 1;
+        /// Scissoring for the light?
+        bool mLightScissoring : 1;
+        /// User clip planes for light?
+        bool mLightClipPlanes : 1;
+        bool mPointSpritesEnabled : 1;
+        bool mPointAttenuationEnabled : 1;
+        mutable bool mContentTypeLookupBuilt : 1;
+
+        uchar mAlphaRejectVal;
+
         CompareFunction mDepthFunc;
         float mDepthBiasConstant;
         float mDepthBiasSlopeScale;
         float mDepthBiasPerIteration;
 
-        /// Colour buffer settings
-        bool mColourWrite;
-
         // Alpha reject settings
         CompareFunction mAlphaRejectFunc;
-        unsigned char mAlphaRejectVal;
-        bool mAlphaToCoverageEnabled;
 
-        /// Transparent depth sorting
-        bool mTransparentSorting;
-        /// Transparent depth sorting forced
-        bool mTransparentSortingForced;
         //-------------------------------------------------------------------------
 
         //-------------------------------------------------------------------------
@@ -170,18 +186,13 @@ namespace Ogre {
         ManualCullingMode mManualCullMode;
         //-------------------------------------------------------------------------
 
-        /// Lighting enabled?
-        bool mLightingEnabled;
         /// Max simultaneous lights
         unsigned short mMaxSimultaneousLights;
         /// Starting light index
         unsigned short mStartLight;
-        /// Run this pass once per light?
-        bool mIteratePerLight;
         /// Iterate per how many lights?
         unsigned short mLightsPerIteration;
-        /// Should it only be run for a certain light type?
-        bool mRunOnlyForOneLightType;
+
         Light::LightTypes mOnlyLightType;
         /// With a specific light mask?
         uint32 mLightMask;
@@ -190,12 +201,9 @@ namespace Ogre {
         ShadeOptions mShadeOptions;
         /// Polygon mode
         PolygonMode mPolygonMode;
-        /// Normalisation
-        bool mNormaliseNormals;
-        bool mPolygonModeOverrideable;
+
         //-------------------------------------------------------------------------
         // Fog
-        bool mFogOverride;
         FogMode mFogMode;
         ColourValue mFogColour;
         Real mFogStart;
@@ -226,31 +234,22 @@ namespace Ogre {
         GpuProgramUsage *mTessellationDomainProgramUsage;
         /// Compute program details
         GpuProgramUsage *mComputeProgramUsage;
-        /// Is this pass queued for deletion?
-        bool mQueuedForDeletion;
         /// Number of pass iterations to perform
         size_t mPassIterationCount;
         /// Point size, applies when not using per-vertex point size
         Real mPointSize;
         Real mPointMinSize;
         Real mPointMaxSize;
-        bool mPointSpritesEnabled;
-        bool mPointAttenuationEnabled;
         /// Constant, linear, quadratic coeffs
         Real mPointAttenuationCoeffs[3];
         // TU Content type lookups
         typedef vector<unsigned short>::type ContentTypeLookup;
         mutable ContentTypeLookup mShadowContentTypeLookup;
-        mutable bool mContentTypeLookupBuilt;
-        /// Scissoring for the light?
-        bool mLightScissoring;
-        /// User clip planes for light?
-        bool mLightClipPlanes;
+
         /// Illumination stage?
         IlluminationStage mIlluminationStage;
         /// User objects binding.
         UserObjectBindings      mUserObjectBindings;
-
 
         /// Used to get scene blending flags from a blending type
         void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);

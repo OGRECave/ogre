@@ -153,10 +153,10 @@ namespace Ogre {
         AtomicScalar<LoadingState> mLoadingState;
         /// Is this resource going to be background loaded? Only applicable for multithreaded
         volatile bool mIsBackgroundLoaded;
-        /// The size of the resource in bytes
-        size_t mSize;
         /// Is this file manually loaded?
         bool mIsManual;
+        /// The size of the resource in bytes
+        size_t mSize;
         /// Origin of this resource (e.g. script name) - optional
         String mOrigin;
         /// Optional manual loader; if provided, data is loaded from here instead of a file
@@ -172,7 +172,7 @@ namespace Ogre {
         */
         Resource() 
             : mCreator(0), mHandle(0), mLoadingState(LOADSTATE_UNLOADED), 
-            mIsBackgroundLoaded(false), mSize(0), mIsManual(0), mLoader(0), mStateCount(0)
+              mIsBackgroundLoaded(0), mIsManual(0), mSize(0), mLoader(0), mStateCount(0)
         { 
         }
 

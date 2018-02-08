@@ -118,12 +118,12 @@ namespace Ogre {
         LodValueList mUserLodValues;
         LodValueList mLodValues;
         const LodStrategy *mLodStrategy;
+        /// Text description of why any techniques are not supported
+        String mUnsupportedReasons;
         bool mReceiveShadows;
         bool mTransparencyCastsShadows;
         /// Does this material require compilation?
         bool mCompilationRequired;
-        /// Text description of why any techniques are not supported
-        String mUnsupportedReasons;
 
         /** Insert a supported technique into the local collections. */
         void insertSupportedTechnique(Technique* t);

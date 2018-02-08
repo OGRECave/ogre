@@ -68,7 +68,6 @@ namespace Ogre {
         IlluminationPassList mIlluminationPasses;
         // Raw pointer since we don't want child to stop parent's destruction
         Material* mParent;
-        bool mIsSupported;
         IlluminationPassesState mIlluminationPassesCompilationPhase;
         /// LOD level
         unsigned short mLodIndex;
@@ -78,7 +77,6 @@ namespace Ogre {
         unsigned short mSchemeIndex;
         /// Optional name for the technique
         String mName;
-
         /// Internal method for clearing illumination pass list
         void clearIlluminationPasses(void);
         /// Internal method - check for manually assigned illumination passes
@@ -109,6 +107,7 @@ namespace Ogre {
         // User objects binding.
         UserObjectBindings  mUserObjectBindings;
 
+        bool mIsSupported;
     public:
         /** Directive used to manually control technique support based on the
             inclusion or exclusion of some factor.
