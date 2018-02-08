@@ -63,7 +63,7 @@ endmacro()
 # Generates Plugins.cfg file out of user-editable Plugins.cfg.in file. Will automatically disable those plugins
 # that were not built
 # Copies all relevant DLLs: RenderSystem files, OgreOverlay, Hlms PBS & Unlit.
-macro( setupPluginFileFromTemplate BUILD_TYPE )
+macro( setupPluginFileFromTemplate BUILD_TYPE OGRE_USE_SCENE_FORMAT )
 	if( NOT APPLE )
 		file( MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${BUILD_TYPE}/Plugins" )
 	endif()
@@ -94,6 +94,10 @@ macro( setupPluginFileFromTemplate BUILD_TYPE )
 				OgreHlmsPbs
 				OgreHlmsUnlit
 			)
+
+		if( ${OGRE_USE_SCENE_FORMAT} )
+			set( OGRE_DLLS ${OGRE_DLLS} OgreSceneFormat )
+		endif()
 
 		# Deal with OS and Ogre naming shenanigans:
 		#	* OgreMain.dll vs libOgreMain.so
@@ -165,7 +169,8 @@ endfunction()
 #----------------------------------------------------------------------------------------
 
 # Main call to setup Ogre.
-macro( setupOgre OGRE_SOURCE, OGRE_BINARIES, OGRE_LIBRARIES_OUT )
+macro( setupOgre OGRE_SOURCE, OGRE_BINARIES, OGRE_LIBRARIES_OUT,
+		OGRE_USE_SCENE_FORMAT )
 
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/Ogre/CMake/Packages" )
 
@@ -191,6 +196,9 @@ include_directories( "${OGRE_SOURCE}/Components/Hlms/Common/include" )
 include_directories( "${OGRE_SOURCE}/Components/Hlms/Unlit/include" )
 include_directories( "${OGRE_SOURCE}/Components/Hlms/Pbs/include" )
 include_directories( "${OGRE_SOURCE}/Components/Overlay/include" )
+if( ${OGRE_USE_SCENE_FORMAT} )
+	include_directories( "${OGRE_SOURCE}/Components/SceneFormat/include" )
+endif()
 
 # Parse OgreBuildSettings.h to see if it's a static build
 set( OGRE_DEPENDENCY_LIBS "" )
@@ -239,6 +247,13 @@ set( OGRE_LIBRARIES
 	${OGRE_DEPENDENCY_LIBS}
 	)
 
+if( ${OGRE_USE_SCENE_FORMAT} )
+	set( OGRE_LIBRARIES ${OGRE_LIBRARIES}
+		debug OgreSceneFormat${OGRE_STATIC}${OGRE_DEBUG_SUFFIX}
+		optimized OgreSceneFormat${OGRE_STATIC}
+		)
+endif()
+
 if( OGRE_STATIC )
 	if( OGRE_BUILD_RENDERSYSTEM_METAL )
 		message( STATUS "Detected Metal RenderSystem. Linking against it." )
@@ -267,13 +282,13 @@ file( COPY "${OGRE_SOURCE}/Samples/Media/2.0/scripts/materials/Common"	DESTINATI
 file( COPY "${OGRE_SOURCE}/Samples/Media/packs/DebugPack.zip"	DESTINATION "${CMAKE_SOURCE_DIR}/bin/Data" )
 
 message( STATUS "Copying DLLs and generating Plugins.cfg for Debug" )
-setupPluginFileFromTemplate( "Debug" )
+setupPluginFileFromTemplate( "Debug" ${OGRE_USE_SCENE_FORMAT} )
 message( STATUS "Copying DLLs and generating Plugins.cfg for Release" )
-setupPluginFileFromTemplate( "Release" )
+setupPluginFileFromTemplate( "Release" ${OGRE_USE_SCENE_FORMAT} )
 message( STATUS "Copying DLLs and generating Plugins.cfg for RelWithDebInfo" )
-setupPluginFileFromTemplate( "RelWithDebInfo" )
+setupPluginFileFromTemplate( "RelWithDebInfo" ${OGRE_USE_SCENE_FORMAT} )
 message( STATUS "Copying DLLs and generating Plugins.cfg for MinSizeRel" )
-setupPluginFileFromTemplate( "MinSizeRel" )
+setupPluginFileFromTemplate( "MinSizeRel" ${OGRE_USE_SCENE_FORMAT} )
 
 setupResourceFileFromTemplate()
 setupOgreSamplesCommon()
