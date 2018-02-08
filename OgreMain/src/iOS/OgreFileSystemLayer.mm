@@ -79,9 +79,4 @@ namespace Ogre
     {
         return false;
     }
-    //---------------------------------------------------------------------
-    bool FileSystemLayer::hasWriteAccess(const Ogre::String& path)
-    {
-        return macHasWriteAccess( path.c_str() );
-    }
 }
