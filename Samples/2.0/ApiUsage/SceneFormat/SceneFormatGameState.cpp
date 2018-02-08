@@ -44,8 +44,8 @@ namespace Demo
         mIrradianceVolume( 0 ),
         mParallaxCorrectedCubemap( 0 )
     {
-        Ogre::FileSystemLayer filesystmLayer( OGRE_VERSION_NAME );
-        mFullpathToFile = filesystmLayer.getWritablePath( "scene_format_test_scene" );
+        Ogre::FileSystemLayer filesystemLayer( OGRE_VERSION_NAME );
+        mFullpathToFile = filesystemLayer.getWritablePath( "scene_format_test_scene" );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::destroyInstantRadiosity(void)

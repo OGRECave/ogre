@@ -131,6 +131,12 @@ namespace Ogre
         /** Rename a file. */
         static bool renameFile(const Ogre::String& oldpath, const Ogre::String& newpath);
 
+        /// Returns false if path does not exist or doesn't have write access.
+        /// Works on folders and files.
+        /// On Linux it checks for effective user permissions
+        /// On Apple OSes it checks for real user permissions
+        static bool hasWriteAccess(const Ogre::String& path);
+
     private:
         Ogre::StringVector mConfigPaths;
         Ogre::String mHomePath;
