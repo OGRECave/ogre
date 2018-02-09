@@ -177,11 +177,19 @@ u"""
             )
 
             if len(classmember[1]) == 1:
-                file.write(
+                if classmember[0] == "mSamplerblocks":
+                    file.write(
+u"""            datablockImpl->{membername}[i] = {membername}[i];
+            mCreator->getHlmsManager()->addReference( datablockImpl->{membername}[i] );
+        }}
+""".format(membername = classmember[0])
+                    )
+                else:
+                    file.write(
 u"""            datablockImpl->{membername}[i] = {membername}[i];
         }}
 """.format(membername = classmember[0])
-                )
+                    )
             else:
                 file.write(
 u"""            for( size_t j=0; j<{membersize_1}; ++j )
