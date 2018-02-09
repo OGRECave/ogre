@@ -73,6 +73,9 @@ namespace Ogre
         typedef map<uint32, SceneNode*>::type IndexToSceneNodeMap;
         IndexToSceneNodeMap mCreatedSceneNodes;
 
+        SceneNode *mRootNodes[NUM_SCENE_MEMORY_MANAGER_TYPES];
+        SceneNode *mParentlessRootNodes[NUM_SCENE_MEMORY_MANAGER_TYPES];
+
         void destroyInstantRadiosity(void);
         void destroyParallaxCorrectedCubemap(void);
 
@@ -122,6 +125,48 @@ namespace Ogre
         SceneFormatImporter( Root *root, SceneManager *sceneManager,
                              const String &defaultPccWorkspaceName );
         ~SceneFormatImporter();
+
+        /** Set the nodes that act as the root nodes for the scene to import.
+            By default these are nullptrs, which means we'll be using the real
+            root scenenodes from SceneManager (see SceneManager::getRootSceneNode)
+
+            This function allows you to define your own root nodes; which gives
+            you the power to easily transform the whole scene (e.g. globally
+            displace the scene, rotate it, scale it, etc)
+        @remarks
+            The scene root nodes may be modified during the import process.
+            Any transform set to these nodes before import may be lost.
+            Make sure to apply them after importing.
+        @see
+            setParentlessRootNodes
+        @param dynamicRoot
+            SceneNode to use as Root for SCENE_DYNAMIC nodes.
+            Leave nullptr for the default one.
+        @param staticRoot
+            SceneNode to use as Root for SCENE_STATIC nodes.
+            Leave nullptr for the default one.
+        */
+        void setRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot );
+
+        /** Similar to setRootNodes.
+            During export, it's possible some nodes were not attached to anything; thus
+            they were exported like that. They're parentless.
+            By default, importing the scene with such nodes means these nodes will b
+            created without a parent, like in the original.
+
+            This behavior may not always be desired, which is why you can control it
+            via this function, and have these nodes be attached to a parent node of
+            your choosing instead.
+        @remarks
+            Unlike setRootNodes, these nodes won't be modified during the import process.
+        @param dynamicRoot
+            SceneNode to use as parent for SCENE_DYNAMIC parentless nodes.
+            Leave nullptr for none.
+        @param staticRoot
+            SceneNode to use as parent for SCENE_STATIC parentless nodes.
+            Leave nullptr for none.
+        */
+        void setParentlessRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot );
 
         /**
         @param outJson

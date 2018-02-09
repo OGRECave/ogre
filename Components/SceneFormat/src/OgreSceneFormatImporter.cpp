@@ -64,6 +64,8 @@ namespace Ogre
         mParallaxCorrectedCubemap( 0 ),
         mDefaultPccWorkspaceName( defaultPccWorkspaceName )
     {
+        memset( mRootNodes, 0, sizeof(mRootNodes) );
+        memset( mParentlessRootNodes, 0, sizeof(mParentlessRootNodes) );
     }
     //-----------------------------------------------------------------------------------
     SceneFormatImporter::~SceneFormatImporter()
@@ -326,9 +328,14 @@ namespace Ogre
                     isRootNode = itTmp->value.GetBool();
 
                 if( isRootNode )
-                    sceneNode = mSceneManager->getRootSceneNode( sceneNodeType );
+                    sceneNode = mRootNodes[sceneNodeType];
                 else
-                    sceneNode = mSceneManager->createSceneNode( sceneNodeType );
+                {
+                    if( mParentlessRootNodes[sceneNodeType] )
+                        sceneNode = mParentlessRootNodes[sceneNodeType]->createChildSceneNode();
+                    else
+                        sceneNode = mSceneManager->createSceneNode( sceneNodeType );
+                }
             }
 
             importNode( nodeValue, sceneNode );
@@ -1078,6 +1085,15 @@ namespace Ogre
         destroyInstantRadiosity();
         destroyParallaxCorrectedCubemap();
 
+        //Set null pointers to valid root scene nodes. We'll restore the nullptrs at the end.
+        SceneNode *oldRootNodes[NUM_SCENE_MEMORY_MANAGER_TYPES];
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+        {
+            oldRootNodes[i] = mRootNodes[i];
+            if( !mRootNodes[i] )
+                mRootNodes[i] = mSceneManager->getRootSceneNode( static_cast<SceneMemoryMgrTypes>(i) );
+        }
+
         rapidjson::Value::ConstMemberIterator itor;
 
         if( importFlags & SceneFlags::SceneNodes )
@@ -1147,6 +1163,22 @@ namespace Ogre
                             mIrradianceVolume->getFadeAttenuationOverDistace() );
             }
         }
+
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+            mRootNodes[i] = oldRootNodes[i];
+    }
+
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::setRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot )
+    {
+        mRootNodes[SCENE_DYNAMIC] = dynamicRoot;
+        mRootNodes[SCENE_STATIC] = staticRoot;
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::setParentlessRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot )
+    {
+        mParentlessRootNodes[SCENE_DYNAMIC] = dynamicRoot;
+        mParentlessRootNodes[SCENE_STATIC] = staticRoot;
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const char *jsonString,
