@@ -1208,11 +1208,11 @@ namespace Ogre
             if( useOitd )
                 hlmsManager->mAdditionalTextureExtensionsPerGroup.erase( "SceneFormatImporter" );
 
+            importScene( stream->getName(), &fileData[0], importFlags );
+
             resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );
             resourceGroupManager.removeResourceLocation( folderPath + "/v2", "SceneFormatImporter" );
             resourceGroupManager.removeResourceLocation( folderPath + "/v1", "SceneFormatImporter" );
-
-            importScene( stream->getName(), &fileData[0], importFlags );
         }
     }
     //-----------------------------------------------------------------------------------
