@@ -552,14 +552,15 @@ namespace Ogre {
 
             iend = mActiveBillboards.end();
             Matrix4 invWorld;
-            if (mWorldSpace && getParentSceneNode())
+            bool invert = mWorldSpace && getParentSceneNode();
+            if (invert)
                 invWorld = getParentSceneNode()->_getFullTransform().inverse();
 
             for (i = mActiveBillboards.begin(); i != iend; ++i)
             {
                 Vector3 pos = (*i)->getPosition();
                 // transform from world space to local space
-                if (mWorldSpace && getParentSceneNode())
+                if (invert)
                     pos = invWorld * pos;
                 min.makeFloor(pos);
                 max.makeCeil(pos);

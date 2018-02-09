@@ -135,8 +135,9 @@ namespace Ogre {
         mBillboardSet->beginBillboards(currentParticles.size());
         Billboard bb;
         Matrix4 invWorld;
+        bool invert = mBillboardSet->getBillboardsInWorldSpace() && mBillboardSet->getParentSceneNode();
 
-        if (mBillboardSet->getBillboardsInWorldSpace() && mBillboardSet->getParentSceneNode())
+        if (invert)
             invWorld = mBillboardSet->getParentSceneNode()->_getFullTransform().inverse();
 
         for (list<Particle*>::type::iterator i = currentParticles.begin();
@@ -146,7 +147,7 @@ namespace Ogre {
             bb.mPosition = p->mPosition;
             Vector3 pos = p->mPosition;
 
-            if (mBillboardSet->getBillboardsInWorldSpace() && mBillboardSet->getParentSceneNode())
+            if (invert)
                 pos = invWorld * pos;
 
             bboxMin.makeFloor( pos );
