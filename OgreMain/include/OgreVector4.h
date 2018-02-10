@@ -77,11 +77,6 @@ namespace Ogre
             w = (Real)afCoordinate[3];
         }
 
-        inline explicit Vector4( Real* const r )
-            : x( r[0] ), y( r[1] ), z( r[2] ), w( r[3] )
-        {
-        }
-
         inline explicit Vector4( const Real scaler )
             : x( scaler )
             , y( scaler )
@@ -144,20 +139,6 @@ namespace Ogre
         inline const Real* ptr() const
         {
             return &x;
-        }
-
-        /** Assigns the value of the other vector.
-            @param
-                rkVector The other vector
-        */
-        inline Vector4& operator = ( const Vector4& rkVector )
-        {
-            x = rkVector.x;
-            y = rkVector.y;
-            z = rkVector.z;
-            w = rkVector.w;
-
-            return *this;
         }
 
         inline bool operator == ( const Vector4& rkVector ) const
