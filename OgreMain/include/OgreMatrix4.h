@@ -78,10 +78,7 @@ namespace Ogre
     {
     protected:
         /// The matrix entries, indexed by [row][col].
-        union {
-            Real m[4][4];
-            Real _m[16];
-        };
+        Real m[4][4];
     public:
         /** Default constructor.
             @note
