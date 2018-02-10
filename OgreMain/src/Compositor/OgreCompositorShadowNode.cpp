@@ -1061,8 +1061,10 @@ namespace Ogre
         const bool supportsCompute =
                 renderSystem->getCapabilities()->hasCapability( RSC_COMPUTE_PROGRAM );
 
-        const uint32 spotAndDirMask = (1u << Light::LT_DIRECTIONAL) | (1u << Light::LT_SPOTLIGHT);
-        const uint32 pointMask = 1u << Light::LT_POINT;
+        const uint32 spotMask           = 1u << Light::LT_SPOTLIGHT;
+        const uint32 directionalMask    = 1u << Light::LT_DIRECTIONAL;
+        const uint32 pointMask          = 1u << Light::LT_POINT;
+        const uint32 spotAndDirMask = spotMask | directionalMask;
 
         typedef vector< Resolution >::type ResolutionVec;
 
@@ -1080,7 +1082,7 @@ namespace Ogre
         {
             if( itor->technique == SHADOWMAP_PSSM )
             {
-                if( itor->supportedLightTypes != (1u << Light::LT_DIRECTIONAL) )
+                if( itor->supportedLightTypes != directionalMask )
                 {
                     OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                                  "PSSM can only only be used with directional lights!",
@@ -1100,7 +1102,7 @@ namespace Ogre
                 }
 
                 numExtraShadowMapsForPssmSplits = itor->numPssmSplits - 1u;
-                numTargetPasses += numExtraShadowMapsForPssmSplits; //1 per PSSM split
+                numTargetPasses += numExtraShadowMapsForPssmSplits + 1u; //1 per PSSM split
             }
 
             if( itor->atlasId >= atlasResolutions.size() )
@@ -1121,18 +1123,19 @@ namespace Ogre
                 resolution.y = std::max( resolution.y, itor->atlasStart[i].y + itor->resolution[i].y );
             }
 
-            ++numTargetPasses;
-
             if( itor->supportedLightTypes & pointMask )
             {
                 hasPointLights = true;
                 numTargetPasses += 7u; //6 target passes per cubemap + 1 for copy
             }
-            else if( itor->supportedLightTypes & spotAndDirMask )
+            if( itor->supportedLightTypes & spotAndDirMask &&
+                itor->technique != SHADOWMAP_PSSM )
             {
-                numTargetPasses += 1u; //1 per directional/spot light (w/out counting PSSM splits)
+                //1 per directional/spot light (for non-PSSM techniques)
+                numTargetPasses += 1u;
             }
-            else
+
+            if( !(itor->supportedLightTypes & (spotAndDirMask|pointMask)) )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                              "supportedLightTypes does not indicate any valid Light::LightTypes bit",
@@ -1145,7 +1148,11 @@ namespace Ogre
         //One clear for each atlas
         numTargetPasses += atlasResolutions.size();
         if( useEsm )
+        {
+            //ESM using compute: 1 extra pass (2 subpasses) for the gaussian filter
+            //ESM using graphics: 2 extra passes for the gaussian filter
             numTargetPasses += atlasResolutions.size() * (supportsCompute ? 1u : 2u);
+        }
 
         //Create the shadow node definition
         CompositorShadowNodeDef *shadowNodeDef =
@@ -1222,9 +1229,10 @@ namespace Ogre
 
                 texDef->width   = pointLightCubemapResolution;
                 texDef->height  = pointLightCubemapResolution;
+                texDef->depth   = 6u;
                 texDef->textureType = TEX_TYPE_CUBE_MAP;
                 texDef->formatList.push_back( PF_FLOAT32_R );
-                texDef->depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                texDef->depthBufferId = 1u;
                 texDef->depthBufferFormat = PF_D32_FLOAT;
                 texDef->preferDepthTexture = false;
                 texDef->fsaa = false;
@@ -1297,7 +1305,9 @@ namespace Ogre
                 if( shadowParam.atlasId == atlasId &&
                     shadowParam.supportedLightTypes & spotAndDirMask )
                 {
-                    for( size_t i=0; i<numExtraShadowMapsForPssmSplits + 1u; ++i )
+                    const size_t numSplits =
+                            shadowParam.technique == SHADOWMAP_PSSM ? shadowParam.numPssmSplits : 1u;
+                    for( size_t i=0; i<numSplits; ++i )
                     {
                         CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( texName );
                         targetDef->setShadowMapSupportedLightTypes( shadowParam.supportedLightTypes &
@@ -1343,6 +1353,7 @@ namespace Ogre
                                     static_cast<CompositorPassClearDef*>( passDef );
                             passClear->mColourValue = ColourValue::White;
                             passClear->mDepthValue = 1.0f;
+                            passClear->mShadowMapIdx = shadowMapIdx;
                         }
 
                         {
@@ -1369,7 +1380,9 @@ namespace Ogre
                     passQuad->addQuadTextureSource( 0, "tmpCubemap", 0 );
                     passQuad->mShadowMapIdx = shadowMapIdx;
                 }
-                ++shadowMapIdx;
+                const size_t numSplits =
+                        shadowParam.technique == SHADOWMAP_PSSM ? shadowParam.numPssmSplits : 1u;
+                shadowMapIdx += numSplits;
                 ++itor;
             }
 

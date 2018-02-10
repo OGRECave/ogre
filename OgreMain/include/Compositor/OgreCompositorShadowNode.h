@@ -341,7 +341,7 @@ namespace Ogre
     class _OgreExport ShadowNodeHelper
     {
     public:
-        struct Resolution
+        struct _OgreExport Resolution
         {
             uint32 x;
             uint32 y;
@@ -352,7 +352,7 @@ namespace Ogre
             uint64 asUint64(void) const;
         };
 
-        struct ShadowParam
+        struct _OgreExport ShadowParam
         {
             /// Bitmask OR of e.g.
             /// (1u << LT_DIRECTIONAL) | (1u << LT_POINT) | (1u << LT_SPOTLIGHT)
