@@ -155,15 +155,6 @@ namespace Ogre
             return *this;
         }
 
-        inline Vector4& operator = ( const Real fScalar)
-        {
-            x = fScalar;
-            y = fScalar;
-            z = fScalar;
-            w = fScalar;
-            return *this;
-        }
-
         inline bool operator == ( const Vector4& rkVector ) const
         {
             return ( x == rkVector.x &&

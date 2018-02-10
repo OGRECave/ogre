@@ -144,7 +144,7 @@ namespace Volume {
         {
             if (volumeValues)
             {
-                values[i] = volumeValues[indices[i]].w;
+                values[i] = Vector4(volumeValues[indices[i]].w);
             }
             else
             {

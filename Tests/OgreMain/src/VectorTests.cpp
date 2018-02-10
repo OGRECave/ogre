@@ -38,9 +38,9 @@ TEST(VectorTests,Vector2Scaler)
     EXPECT_EQ(Vector2(1, 1) + Vector2(2, 2), Vector2(3, 3));
     EXPECT_EQ(1 + Vector2(2), Vector2(3, 3));
     Vector2 v1;
-    v1 = 1;
+    v1 = Vector2(1);
     EXPECT_EQ(v1, Vector2(1, 1));
-    v1 = 0.0;
+    v1 = Vector2(0.0);
     EXPECT_EQ(v1, Vector2::ZERO);
     v1 += 3;
     EXPECT_EQ(v1, Vector2(3, 3));
@@ -58,9 +58,9 @@ TEST(VectorTests,Vector3Scaler)
     EXPECT_EQ(Vector3(1, 1, 1) + Vector3(2, 2, 2), Vector3(3, 3, 3));
     EXPECT_EQ(1 + Vector3(2), Vector3(3, 3, 3));
     Vector3 v1;
-    v1 = 1;
+    v1 = Vector3(1);
     EXPECT_EQ(v1, Vector3(1));
-    v1 = 0.0;
+    v1 = Vector3(0.0);
     EXPECT_EQ(v1, Vector3::ZERO);
     v1 += 3;
     EXPECT_EQ(v1, Vector3(3));
@@ -78,9 +78,9 @@ TEST(VectorTests,Vector4Scaler)
     EXPECT_EQ(Vector4(1, 1, 1, 1) + Vector4(2, 2, 2, 2), Vector4(3, 3, 3, 3));
     EXPECT_EQ(1 + Vector4(2, 2, 2, 2), Vector4(3, 3, 3, 3));
     Vector4 v1;
-    v1 = 1;
+    v1 = Vector4(1);
     EXPECT_EQ(v1, Vector4(1, 1, 1, 1));
-    v1 = 0.0;
+    v1 = Vector4(0.0);
     EXPECT_EQ(v1, Vector4(0,0,0,0));
     v1 += 3;
     EXPECT_EQ(v1, Vector4(3,3,3,3));
