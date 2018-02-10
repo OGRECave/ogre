@@ -1046,7 +1046,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void ShadowNodeHelper::createShadowNodeWithSettings( CompositorManager2 *compositorManager,
-                                                         RenderSystem *renderSystem,
+                                                         const RenderSystemCapabilities *capabilities,
                                                          const String &shadowNodeName,
                                                          const ShadowNodeHelper::
                                                          ShadowParamVec &shadowParams,
@@ -1058,8 +1058,7 @@ namespace Ogre
         typedef map<uint64, uint32>::type ResolutionsToEsmMap;
 
         ResolutionsToEsmMap resolutionsToEsmMap;
-        const bool supportsCompute =
-                renderSystem->getCapabilities()->hasCapability( RSC_COMPUTE_PROGRAM );
+        const bool supportsCompute = capabilities->hasCapability( RSC_COMPUTE_PROGRAM );
 
         const uint32 spotMask           = 1u << Light::LT_SPOTLIGHT;
         const uint32 directionalMask    = 1u << Light::LT_DIRECTIONAL;
@@ -1110,7 +1109,8 @@ namespace Ogre
 
             Resolution &resolution = atlasResolutions[itor->atlasId];
 
-            for( size_t i=0; i<4u; ++i )
+            const size_t numSplits = itor->technique == SHADOWMAP_PSSM ? itor->numPssmSplits : 1u;
+            for( size_t i=0; i<numSplits; ++i )
             {
                 if( itor->resolution[i].x == 0 || itor->resolution[i].y == 0 )
                 {
@@ -1180,13 +1180,15 @@ namespace Ogre
                 texDef->width   = std::max( atlasRes.x, 1u );
                 texDef->height  = std::max( atlasRes.y, 1u );
                 if( !useEsm )
+                {
                     texDef->formatList.push_back( PF_D32_FLOAT );
+                    texDef->depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                }
                 else
                 {
                     texDef->formatList.push_back( PF_L16 );
                     texDef->uav = supportsCompute;
                 }
-                texDef->depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
                 texDef->depthBufferFormat = PF_D32_FLOAT;
                 texDef->preferDepthTexture = false;
                 texDef->fsaa = false;

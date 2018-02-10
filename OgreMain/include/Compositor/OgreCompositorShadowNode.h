@@ -379,6 +379,7 @@ namespace Ogre
         /** Utility to programmatically create a shadow node, since doing it yourself
             can be confusing.
         @param compositorManager
+        @param capabilities
         @param shadowNodeName
             Name to give to the shadow node definition. Must be unique and not exist already.
         @param shadowParams
@@ -401,7 +402,7 @@ namespace Ogre
             PSSM split fade. Ignored if not using PSSM.
         */
         static void createShadowNodeWithSettings( CompositorManager2 *compositorManager,
-                                                  RenderSystem *renderSystem,
+                                                  const RenderSystemCapabilities *capabilities,
                                                   const String &shadowNodeName,
                                                   const ShadowNodeHelper::
                                                   ShadowParamVec &shadowParams,
