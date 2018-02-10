@@ -910,8 +910,8 @@ namespace Ogre
             if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
             {
                 LogManager::getSingleton().logMessage(
-                            "INFO: Parallax Corrected Cubemaps workspace definition not found, "
-                            "using default one." );
+                            "INFO: Parallax Corrected Cubemaps workspace definition '" +
+                            workspaceName + "not found, using default one." );
                 workspaceName = mDefaultPccWorkspaceName;
             }
         }
