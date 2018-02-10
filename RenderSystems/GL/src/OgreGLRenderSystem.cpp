@@ -65,7 +65,7 @@ extern "C" void glFlushRenderAPPLE();
 #endif
 
 // Convenience macro from ARB_vertex_buffer_object spec
-#define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define VBO_BUFFER_OFFSET(i) ((char *)(i))
 
 namespace Ogre {
 

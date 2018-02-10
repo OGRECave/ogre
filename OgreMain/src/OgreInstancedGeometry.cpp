@@ -1083,7 +1083,6 @@ namespace Ogre {
 
         if(mSkeletonInstance)
         {
-            GeometryBucketList::iterator it;
             mSkeletonInstance->setAnimationState(*mAnimationState);
             mSkeletonInstance->_getBoneMatrices(mBoneMatrices);
 
