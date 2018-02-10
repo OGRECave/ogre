@@ -34,7 +34,11 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
+#include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
+#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
+#include "Compositor/Pass/PassCompute/OgreCompositorPassComputeDef.h"
 
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
@@ -47,6 +51,8 @@ THE SOFTWARE.
 
 #include "OgreShadowCameraSetupFocused.h"
 #include "OgreShadowCameraSetupPSSM.h"
+
+#include "OgreLogManager.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
     #include <intrin.h>
@@ -1017,6 +1023,406 @@ namespace Ogre
 
             ++itDef;
             ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    ShadowNodeHelper::Resolution::Resolution() :
+        x( 0 ), y( 0 ) {}
+    //-----------------------------------------------------------------------------------
+    ShadowNodeHelper::Resolution::Resolution( uint32 _x, uint32 _y ) :
+        x( _x ), y( _y ) {}
+    //-----------------------------------------------------------------------------------
+    uint64 ShadowNodeHelper::Resolution::asUint64(void) const
+    {
+        return ((uint64)x << (uint64)32ul) | ((uint64)y);
+    }
+    //-----------------------------------------------------------------------------------
+    void ShadowNodeHelper::ShadowParam::addLightType( Light::LightTypes lightType )
+    {
+        assert( lightType <= Light::LT_SPOTLIGHT );
+        supportedLightTypes |= 1u << lightType;
+    }
+    //-----------------------------------------------------------------------------------
+    void ShadowNodeHelper::createShadowNodeWithSettings( CompositorManager2 *compositorManager,
+                                                         RenderSystem *renderSystem,
+                                                         const String &shadowNodeName,
+                                                         const ShadowNodeHelper::
+                                                         ShadowParamVec &shadowParams,
+                                                         bool useEsm,
+                                                         uint32 pointLightCubemapResolution,
+                                                         Real pssmLambda, Real splitPadding,
+                                                         Real splitBlend, Real splitFade )
+    {
+        typedef map<uint64, uint32>::type ResolutionsToEsmMap;
+
+        ResolutionsToEsmMap resolutionsToEsmMap;
+        const bool supportsCompute =
+                renderSystem->getCapabilities()->hasCapability( RSC_COMPUTE_PROGRAM );
+
+        const uint32 spotAndDirMask = (1u << Light::LT_DIRECTIONAL) | (1u << Light::LT_SPOTLIGHT);
+        const uint32 pointMask = 1u << Light::LT_POINT;
+
+        typedef vector< Resolution >::type ResolutionVec;
+
+        size_t numExtraShadowMapsForPssmSplits = 0;
+        size_t numTargetPasses = 0;
+        ResolutionVec atlasResolutions;
+
+        //Validation and data gathering
+        bool hasPointLights = false;
+
+        ShadowParamVec::const_iterator itor = shadowParams.begin();
+        ShadowParamVec::const_iterator end  = shadowParams.end();
+
+        while( itor != end )
+        {
+            if( itor->technique == SHADOWMAP_PSSM )
+            {
+                if( itor->supportedLightTypes != (1u << Light::LT_DIRECTIONAL) )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 "PSSM can only only be used with directional lights!",
+                                 "CompositorShadowNode::createShadowNodeWithSettings" );
+                }
+                if( (itor - shadowParams.begin()) != 0 )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 "PSSM must be specified in the first entry of shadowParams",
+                                 "CompositorShadowNode::createShadowNodeWithSettings" );
+                }
+                if( itor->numPssmSplits <= 1 || itor->numPssmSplits > 4u )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 "Valid numPssmSplits values must be in range [2; 4]",
+                                 "CompositorShadowNode::createShadowNodeWithSettings" );
+                }
+
+                numExtraShadowMapsForPssmSplits = itor->numPssmSplits - 1u;
+            }
+
+            if( itor->atlasId >= atlasResolutions.size() )
+                atlasResolutions.resize( itor->atlasId + 1u );
+
+            Resolution &resolution = atlasResolutions[itor->atlasId];
+
+            for( size_t i=0; i<4u; ++i )
+            {
+                if( itor->resolution[i].x == 0 || itor->resolution[i].y == 0 )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 "Resolution can't be 0",
+                                 "CompositorShadowNode::createShadowNodeWithSettings" );
+                }
+
+                resolution.x = std::max( resolution.x, itor->atlasStart[i].x + itor->resolution[i].x );
+                resolution.y = std::max( resolution.y, itor->atlasStart[i].y + itor->resolution[i].y );
+            }
+
+            ++numTargetPasses;
+
+            if( itor->supportedLightTypes & pointMask )
+            {
+                hasPointLights = true;
+                numTargetPasses += 7u; //6 target passes per cubemap + 1 for copy
+            }
+            else if( itor->supportedLightTypes & spotAndDirMask )
+            {
+                numTargetPasses += 1u; //1 per directional/spot light
+            }
+            else
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "supportedLightTypes does not indicate any valid Light::LightTypes bit",
+                             "CompositorShadowNode::createShadowNodeWithSettings" );
+            }
+
+            ++itor;
+        }
+
+        //One clear for each atlas
+        numTargetPasses += atlasResolutions.size();
+        if( useEsm )
+            numTargetPasses += atlasResolutions.size() * 2u;
+
+        //Create the shadow node definition
+        CompositorShadowNodeDef *shadowNodeDef =
+                compositorManager->addShadowNodeDefinition( shadowNodeName );
+
+        const size_t numTextures = atlasResolutions.size();
+        {
+            //Define the atlases (textures)
+            shadowNodeDef->setNumLocalTextureDefinitions( numTextures + (hasPointLights ? 1u : 0u) );
+            for( size_t i=0; i<numTextures; ++i )
+            {
+                const Resolution &atlasRes = atlasResolutions[i];
+
+                if( atlasRes.x == 0 || atlasRes.y == 0 )
+                {
+                    LogManager::getSingleton().logMessage(
+                                "WARNING: atlasId is having gaps (e.g. you're using IDs 0 & 2, "
+                                "but not using 1). This leads to pointless GPU memory waste. "
+                                "Currently not using atlasId = " + StringConverter::toString( i ) );
+                }
+
+                TextureDefinitionBase::TextureDefinition *texDef =
+                        shadowNodeDef->addTextureDefinition( "atlas" + StringConverter::toString(i) );
+
+                texDef->width   = std::max( atlasRes.x, 1u );
+                texDef->height  = std::max( atlasRes.y, 1u );
+                if( !useEsm )
+                    texDef->formatList.push_back( PF_D32_FLOAT );
+                else
+                {
+                    texDef->formatList.push_back( PF_L16 );
+                    texDef->uav = supportsCompute;
+                }
+                texDef->depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                texDef->depthBufferFormat = PF_D32_FLOAT;
+                texDef->preferDepthTexture = false;
+                texDef->fsaa = false;
+
+                //Make all atlases with the same resolution share the same temporary
+                //gaussian filter target (to avoid wasting GPU RAM) and give
+                //each one a unique ID.
+                resolutionsToEsmMap[atlasRes.asUint64()] = i;
+            }
+
+            //Define the temporary needed to filter ESM using gaussian filters
+            if( useEsm )
+            {
+                ResolutionsToEsmMap::const_iterator itEsm = resolutionsToEsmMap.begin();
+                ResolutionsToEsmMap::const_iterator enEsm = resolutionsToEsmMap.end();
+
+                while( itEsm != enEsm )
+                {
+                    TextureDefinitionBase::TextureDefinition *texDef =
+                            shadowNodeDef->addTextureDefinition(
+                                "tmpGaussianFilter" + StringConverter::toString(itEsm->second) );
+
+                    texDef->width   = static_cast<uint32>( (itEsm->first >> (uint64)32ul) );
+                    texDef->height  = static_cast<uint32>( (itEsm->first & (uint64)0xfffffffful) );
+                    texDef->formatList.push_back( PF_L16 );
+                    texDef->depthBufferId = DepthBuffer::POOL_NO_DEPTH;
+                    texDef->preferDepthTexture = false;
+                    texDef->fsaa = false;
+                    texDef->uav = supportsCompute;
+
+                    ++itEsm;
+                }
+            }
+
+            //Define the cubemap needed by point lights
+            if( hasPointLights )
+            {
+                TextureDefinitionBase::TextureDefinition *texDef =
+                        shadowNodeDef->addTextureDefinition( "tmpCubemap" );
+
+                texDef->width   = pointLightCubemapResolution;
+                texDef->height  = pointLightCubemapResolution;
+                texDef->textureType = TEX_TYPE_CUBE_MAP;
+                texDef->formatList.push_back( PF_FLOAT32_R );
+                texDef->depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                texDef->depthBufferFormat = PF_D32_FLOAT;
+                texDef->preferDepthTexture = false;
+                texDef->fsaa = false;
+            }
+        }
+
+        //Create the shadow maps
+        const size_t numShadowMaps = shadowParams.size() + numExtraShadowMapsForPssmSplits;
+        shadowNodeDef->setNumShadowTextureDefinitions( numShadowMaps );
+
+        itor = shadowParams.begin();
+
+        while( itor != end )
+        {
+            const size_t lightIdx = itor - shadowParams.begin();
+            const ShadowParam &shadowParam = *itor;
+
+            const Resolution &texResolution = atlasResolutions[shadowParam.atlasId];
+
+            const size_t numSplits =
+                    shadowParam.technique == SHADOWMAP_PSSM ? shadowParam.numPssmSplits : 1u;
+
+            for( size_t j=0; j<numSplits; ++j )
+            {
+                Vector2 uvOffset( shadowParam.atlasStart[j].x, shadowParam.atlasStart[j].y );
+                Vector2 uvLength( shadowParam.resolution[j].x, shadowParam.resolution[j].y );
+
+                uvOffset /= Vector2( texResolution.x, texResolution.y );
+                uvLength /= Vector2( texResolution.x, texResolution.y );
+
+                const String texName = "atlas" + StringConverter::toString( shadowParam.atlasId );
+
+                ShadowTextureDefinition *shadowTexDef =
+                        shadowNodeDef->addShadowTextureDefinition( lightIdx, j, texName,
+                                                                   0, uvOffset, uvLength, 0 );
+                shadowTexDef->shadowMapTechnique = shadowParam.technique;
+                shadowTexDef->pssmLambda = pssmLambda;
+                shadowTexDef->splitPadding = splitPadding;
+                shadowTexDef->splitBlend = splitBlend;
+                shadowTexDef->splitFade = splitFade;
+                shadowTexDef->numSplits = numSplits;
+            }
+
+            ++itor;
+        }
+
+        shadowNodeDef->setNumTargetPass( numTargetPasses );
+
+        //Create the passes for each atlas
+        for( size_t atlasId=0; atlasId<numTextures; ++atlasId )
+        {
+            const String texName = "atlas" + StringConverter::toString( atlasId );
+            {
+                //Atlas clear pass
+                CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( texName );
+                targetDef->setNumPasses( 1u );
+
+                CompositorPassDef *passDef = targetDef->addPass( PASS_CLEAR );
+                CompositorPassClearDef *passClear = static_cast<CompositorPassClearDef*>( passDef );
+                passClear->mColourValue = ColourValue::White;
+                passClear->mDepthValue = 1.0f;
+            }
+
+            //Pass scene for directional and spot lights first
+            size_t shadowMapIdx = 0;
+            itor = shadowParams.begin();
+            while( itor != end )
+            {
+                const ShadowParam &shadowParam = *itor;
+                if( shadowParam.atlasId == atlasId &&
+                    shadowParam.supportedLightTypes & spotAndDirMask )
+                {
+                    CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( texName );
+                    targetDef->setShadowMapSupportedLightTypes( shadowParam.supportedLightTypes &
+                                                                spotAndDirMask );
+                    targetDef->setNumPasses( 1u );
+
+                    CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
+                    CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>( passDef );
+
+                    passScene->mShadowMapIdx = shadowMapIdx;
+                    passScene->mIncludeOverlays = false;
+                }
+                ++shadowMapIdx;
+                ++itor;
+            }
+
+            //Pass scene for point lights last
+            shadowMapIdx = 0;
+            itor = shadowParams.begin();
+            while( itor != end )
+            {
+                const ShadowParam &shadowParam = *itor;
+                if( shadowParam.atlasId == atlasId &&
+                    shadowParam.supportedLightTypes & pointMask )
+                {
+                    //Render to cubemap, each face clear + render
+                    for( uint32 i=0; i<6u; ++i )
+                    {
+                        CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( "tmpCubemap", i );
+                        targetDef->setNumPasses( 2u );
+                        targetDef->setShadowMapSupportedLightTypes( shadowParam.supportedLightTypes &
+                                                                    pointMask );
+                        {
+                            //Clear pass
+                            CompositorPassDef *passDef = targetDef->addPass( PASS_CLEAR );
+                            CompositorPassClearDef *passClear =
+                                    static_cast<CompositorPassClearDef*>( passDef );
+                            passClear->mColourValue = ColourValue::White;
+                            passClear->mDepthValue = 1.0f;
+                        }
+
+                        {
+                            //Scene pass
+                            CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
+                            CompositorPassSceneDef *passScene =
+                                    static_cast<CompositorPassSceneDef*>( passDef );
+                            passScene->mCameraCubemapReorient = true;
+                            passScene->mShadowMapIdx = shadowMapIdx;
+                            passScene->mIncludeOverlays = false;
+                        }
+                    }
+
+                    //Copy to the atlas using a pass quad (Cubemap -> DPSM / Dual Paraboloid).
+                    CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( texName );
+                    targetDef->setShadowMapSupportedLightTypes( shadowParam.supportedLightTypes &
+                                                                pointMask );
+                    targetDef->setNumPasses( 1u );
+
+                    CompositorPassDef *passDef = targetDef->addPass( PASS_QUAD );
+                    CompositorPassQuadDef *passQuad = static_cast<CompositorPassQuadDef*>( passDef );
+                    passQuad->mMaterialIsHlms = false;
+                    passQuad->mMaterialName = "Ogre/DPSM/CubeToDpsm";
+                    passQuad->addQuadTextureSource( 0, "tmpCubemap", 0 );
+                    passQuad->mShadowMapIdx = shadowMapIdx;
+                }
+                ++shadowMapIdx;
+                ++itor;
+            }
+
+            //Apply Gaussian Filter on top of the whole atlas after we're done with it
+            if( useEsm )
+            {
+                const String tmpGaussianFilterName =
+                        "tmpGaussianFilter" +
+                        StringConverter::toString(
+                            resolutionsToEsmMap[atlasResolutions[atlasId].asUint64()] );
+                if( supportsCompute )
+                {
+                    CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( texName );
+                    targetDef->setNumPasses( 2u );
+                    {
+                        //Compute pass
+                        CompositorPassDef *passDef = targetDef->addPass( PASS_COMPUTE );
+                        CompositorPassComputeDef *passCompute =
+                                static_cast<CompositorPassComputeDef*>( passDef );
+                        passCompute->mJobName = "ESM/GaussianLogFilterH";
+                        passCompute->addTextureSource( 0, texName, 0 );
+                        passCompute->addUavSource( 0, tmpGaussianFilterName, 0, ResourceAccess::Write,
+                                                   0, 0, PF_L16, false );
+                    }
+                    {
+                        //Compute pass
+                        CompositorPassDef *passDef = targetDef->addPass( PASS_COMPUTE );
+                        CompositorPassComputeDef *passCompute =
+                                static_cast<CompositorPassComputeDef*>( passDef );
+                        passCompute->mJobName = "ESM/GaussianLogFilterV";
+                        passCompute->addTextureSource( 0, tmpGaussianFilterName, 0 );
+                        passCompute->addUavSource( 0, texName, 0, ResourceAccess::Write,
+                                                   0, 0, PF_L16, false );
+                    }
+                }
+                else
+                {
+                    {
+                        //Quad pass
+                        CompositorTargetDef *targetDef =
+                                shadowNodeDef->addTargetPass( tmpGaussianFilterName );
+                        targetDef->setNumPasses( 1u );
+
+                        CompositorPassDef *passDef = targetDef->addPass( PASS_QUAD );
+                        CompositorPassQuadDef *passQuad = static_cast<CompositorPassQuadDef*>( passDef );
+                        passQuad->mMaterialIsHlms = false;
+                        passQuad->mMaterialName = "ESM/GaussianLogFilterH";
+                        passQuad->addQuadTextureSource( 0, texName, 0 );
+                    }
+                    {
+                        //Quad  pass
+                        CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( texName );
+                        targetDef->setNumPasses( 1u );
+
+                        CompositorPassDef *passDef = targetDef->addPass( PASS_QUAD );
+                        CompositorPassQuadDef *passQuad = static_cast<CompositorPassQuadDef*>( passDef );
+                        passQuad->mMaterialIsHlms = false;
+                        passQuad->mMaterialName = "ESM/GaussianLogFilterV";
+                        passQuad->addQuadTextureSource( 0, tmpGaussianFilterName, 0 );
+                    }
+                }
+            }
         }
     }
 }

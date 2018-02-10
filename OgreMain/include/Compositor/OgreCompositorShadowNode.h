@@ -338,6 +338,79 @@ namespace Ogre
         virtual void finalTargetResized( const RenderTarget *finalTarget );
     };
 
+    class _OgreExport ShadowNodeHelper
+    {
+    public:
+        struct Resolution
+        {
+            uint32 x;
+            uint32 y;
+
+            Resolution();
+            Resolution( uint32 x, uint32 y );
+
+            uint64 asUint64(void) const;
+        };
+
+        struct ShadowParam
+        {
+            /// Bitmask OR of e.g.
+            /// (1u << LT_DIRECTIONAL) | (1u << LT_POINT) | (1u << LT_SPOTLIGHT)
+            uint32 supportedLightTypes;
+            /// Technique to use
+            ShadowMapTechniques technique;
+            /// Number of PSSM splits. In range [2; 4]. Ignored for non-PSSM techniques
+            uint8 numPssmSplits;
+            /// What texture atlas to use. Should be in range [0; numShadowParam)
+            /// You can have all shadow maps share the same shadow map if you want.
+            /// Don't leave gaps (e.g. use atlasId = 0 and atlasId = 2, but not atlasId = 1)
+            uint8 atlasId;
+            /// In pixels, start of the texture (XY). One for each PSSM split.
+            /// When not using PSSM, entries in range [1; 4) are ignored.
+            /// Be careful not to overlap within the same atlasId.
+            Resolution atlasStart[4];
+            Resolution resolution[4];
+
+            /// See Light::LightTypes
+            void addLightType( Light::LightTypes lightType );
+        };
+        typedef vector<ShadowParam>::type ShadowParamVec;
+
+        /** Utility to programmatically create a shadow node, since doing it yourself
+            can be confusing.
+        @param compositorManager
+        @param shadowNodeName
+            Name to give to the shadow node definition. Must be unique and not exist already.
+        @param shadowParams
+            Array of params, one per shadow map.
+            PSSM techniques must come first, and there can only be one shadow map using
+            that technique.
+        @param useEsm
+            True if the shadow node should be set for ESM (Exponential Shadow Maps)
+        @param pointLightCubemapResolution
+            The resolution to use for the temporary cubemap used in case of point lights.
+            If you don't set point lights in any of the ShadowParam::supportedLightTypes in
+            the shadowParams array, this value is ignored.
+        @param pssmLambda
+            PSSM lambda. Ignored if not using PSSM.
+        @param splitPadding
+            PSSM split padding. Ignored if not using PSSM.
+        @param splitBlend
+            PSSM blend. Ignored if not using PSSM.
+        @param splitFade
+            PSSM split fade. Ignored if not using PSSM.
+        */
+        static void createShadowNodeWithSettings( CompositorManager2 *compositorManager,
+                                                  RenderSystem *renderSystem,
+                                                  const String &shadowNodeName,
+                                                  const ShadowNodeHelper::
+                                                  ShadowParamVec &shadowParams,
+                                                  bool useEsm,
+                                                  uint32 pointLightCubemapResolution=1024u,
+                                                  Real pssmLambda=0.95f, Real splitPadding=1.0f,
+                                                  Real splitBlend=0.125f, Real splitFade=0.313f );
+    };
+
     /** @} */
     /** @} */
 }
