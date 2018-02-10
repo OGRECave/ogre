@@ -1100,6 +1100,7 @@ namespace Ogre
                 }
 
                 numExtraShadowMapsForPssmSplits = itor->numPssmSplits - 1u;
+                numTargetPasses += numExtraShadowMapsForPssmSplits; //1 per PSSM split
             }
 
             if( itor->atlasId >= atlasResolutions.size() )
@@ -1129,7 +1130,7 @@ namespace Ogre
             }
             else if( itor->supportedLightTypes & spotAndDirMask )
             {
-                numTargetPasses += 1u; //1 per directional/spot light
+                numTargetPasses += 1u; //1 per directional/spot light (w/out counting PSSM splits)
             }
             else
             {
@@ -1144,7 +1145,7 @@ namespace Ogre
         //One clear for each atlas
         numTargetPasses += atlasResolutions.size();
         if( useEsm )
-            numTargetPasses += atlasResolutions.size() * 2u;
+            numTargetPasses += atlasResolutions.size() * (supportsCompute ? 1u : 2u);
 
         //Create the shadow node definition
         CompositorShadowNodeDef *shadowNodeDef =
@@ -1296,18 +1297,26 @@ namespace Ogre
                 if( shadowParam.atlasId == atlasId &&
                     shadowParam.supportedLightTypes & spotAndDirMask )
                 {
-                    CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( texName );
-                    targetDef->setShadowMapSupportedLightTypes( shadowParam.supportedLightTypes &
-                                                                spotAndDirMask );
-                    targetDef->setNumPasses( 1u );
+                    for( size_t i=0; i<numExtraShadowMapsForPssmSplits + 1u; ++i )
+                    {
+                        CompositorTargetDef *targetDef = shadowNodeDef->addTargetPass( texName );
+                        targetDef->setShadowMapSupportedLightTypes( shadowParam.supportedLightTypes &
+                                                                    spotAndDirMask );
+                        targetDef->setNumPasses( 1u );
 
-                    CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
-                    CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>( passDef );
+                        CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
+                        CompositorPassSceneDef *passScene =
+                                static_cast<CompositorPassSceneDef*>( passDef );
 
-                    passScene->mShadowMapIdx = shadowMapIdx;
-                    passScene->mIncludeOverlays = false;
+                        passScene->mShadowMapIdx = shadowMapIdx;
+                        passScene->mIncludeOverlays = false;
+                        ++shadowMapIdx;
+                    }
                 }
-                ++shadowMapIdx;
+                else
+                {
+                    ++shadowMapIdx;
+                }
                 ++itor;
             }
 
