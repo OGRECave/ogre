@@ -86,18 +86,21 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
         Ogre::TextureFilterOptions tfo;
         unsigned int aniso;
 
+        Ogre::FilterOptions mip = Ogre::MaterialManager::getSingleton().getDefaultTextureFiltering(Ogre::FT_MIP);
+
         switch (Ogre::MaterialManager::getSingleton().getDefaultTextureFiltering(Ogre::FT_MAG)) {
-        case Ogre::TFO_BILINEAR:
-            newVal = "Trilinear";
-            tfo = Ogre::TFO_TRILINEAR;
-            aniso = 1;
+        case Ogre::FO_LINEAR:
+            if (mip == Ogre::FO_POINT) {
+                newVal = "Trilinear";
+                tfo = Ogre::TFO_TRILINEAR;
+                aniso = 1;
+            } else {
+                newVal = "Anisotropic";
+                tfo = Ogre::TFO_ANISOTROPIC;
+                aniso = 8;
+            }
             break;
-        case Ogre::TFO_TRILINEAR:
-            newVal = "Anisotropic";
-            tfo = Ogre::TFO_ANISOTROPIC;
-            aniso = 8;
-            break;
-        case Ogre::TFO_ANISOTROPIC:
+        case Ogre::FO_ANISOTROPIC:
             newVal = "None";
             tfo = Ogre::TFO_NONE;
             aniso = 1;
