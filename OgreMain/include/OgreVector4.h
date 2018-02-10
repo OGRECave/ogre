@@ -95,6 +95,11 @@ namespace Ogre
         {
         }
 
+        inline explicit Vector4(const Vector3& rhs, Real fW)
+            : x(rhs.x), y(rhs.y), z(rhs.z), w(fW)
+        {
+        }
+
         /** Swizzle-like narrowing operations
         */
         inline Vector3 xyz() const
@@ -169,15 +174,6 @@ namespace Ogre
                 y != rkVector.y ||
                 z != rkVector.z ||
                 w != rkVector.w );
-        }
-
-        inline Vector4& operator = (const Vector3& rhs)
-        {
-            x = rhs.x;
-            y = rhs.y;
-            z = rhs.z;
-            w = 1.0f;
-            return *this;
         }
 
         // arithmetic operations
