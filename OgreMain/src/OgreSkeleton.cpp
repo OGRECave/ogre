@@ -451,7 +451,7 @@ namespace Ogre {
         return (unsigned short)mBoneList.size();
     }
     //-----------------------------------------------------------------------
-    void Skeleton::_getBoneMatrices(Matrix4* pMatrices)
+    void Skeleton::_getBoneMatrices(Affine3* pMatrices)
     {
         // Update derived transforms
         _updateTransforms();

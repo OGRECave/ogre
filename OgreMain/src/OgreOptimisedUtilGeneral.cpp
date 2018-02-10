@@ -47,7 +47,7 @@ namespace Ogre {
             const float *srcPosPtr, float *destPosPtr,
             const float *srcNormPtr, float *destNormPtr,
             const float *blendWeightPtr, const unsigned char* blendIndexPtr,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t srcPosStride, size_t destPosStride,
             size_t srcNormStride, size_t destNormStride,
             size_t blendWeightStride, size_t blendIndexStride,
@@ -65,9 +65,9 @@ namespace Ogre {
 
         /// @copydoc OptimisedUtil::concatenateAffineMatrices
         virtual void concatenateAffineMatrices(
-            const Matrix4& baseMatrix,
-            const Matrix4* srcMatrices,
-            Matrix4* dstMatrices,
+            const Affine3& baseMatrix,
+            const Affine3* srcMatrices,
+            Affine3* dstMatrices,
             size_t numMatrices);
 
         /// @copydoc OptimisedUtil::calculateFaceNormals
@@ -99,7 +99,7 @@ namespace Ogre {
         const float *pSrcPos, float *pDestPos,
         const float *pSrcNorm, float *pDestNorm,
         const float *pBlendWeight, const unsigned char* pBlendIndex,
-        const Matrix4* const* blendMatrices,
+        const Affine3* const* blendMatrices,
         size_t srcPosStride, size_t destPosStride,
         size_t srcNormStride, size_t destNormStride,
         size_t blendWeightStride, size_t blendIndexStride,
@@ -147,7 +147,7 @@ namespace Ogre {
                 if (weight)
                 {
                     // Blend position, use 3x4 matrix
-                    const Matrix4& mat = *blendMatrices[pBlendIndex[blendIdx]];
+                    const Affine3& mat = *blendMatrices[pBlendIndex[blendIdx]];
                     accumVecPos.x +=
                         (mat[0][0] * sourceVec.x +
                          mat[0][1] * sourceVec.y +
@@ -219,39 +219,14 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void OptimisedUtilGeneral::concatenateAffineMatrices(
-        const Matrix4& baseMatrix,
-        const Matrix4* pSrcMat,
-        Matrix4* pDstMat,
+        const Affine3& baseMatrix,
+        const Affine3* pSrcMat,
+        Affine3* pDstMat,
         size_t numMatrices)
     {
-        const Matrix4& m = baseMatrix;
-
         for (size_t i = 0; i < numMatrices; ++i)
         {
-            const Matrix4& s = *pSrcMat;
-            Matrix4& d = *pDstMat;
-
-            // TODO: Promote following code to Matrix4 class.
-
-            d[0][0] = m[0][0] * s[0][0] + m[0][1] * s[1][0] + m[0][2] * s[2][0];
-            d[0][1] = m[0][0] * s[0][1] + m[0][1] * s[1][1] + m[0][2] * s[2][1];
-            d[0][2] = m[0][0] * s[0][2] + m[0][1] * s[1][2] + m[0][2] * s[2][2];
-            d[0][3] = m[0][0] * s[0][3] + m[0][1] * s[1][3] + m[0][2] * s[2][3] + m[0][3];
-
-            d[1][0] = m[1][0] * s[0][0] + m[1][1] * s[1][0] + m[1][2] * s[2][0];
-            d[1][1] = m[1][0] * s[0][1] + m[1][1] * s[1][1] + m[1][2] * s[2][1];
-            d[1][2] = m[1][0] * s[0][2] + m[1][1] * s[1][2] + m[1][2] * s[2][2];
-            d[1][3] = m[1][0] * s[0][3] + m[1][1] * s[1][3] + m[1][2] * s[2][3] + m[1][3];
-
-            d[2][0] = m[2][0] * s[0][0] + m[2][1] * s[1][0] + m[2][2] * s[2][0];
-            d[2][1] = m[2][0] * s[0][1] + m[2][1] * s[1][1] + m[2][2] * s[2][1];
-            d[2][2] = m[2][0] * s[0][2] + m[2][1] * s[1][2] + m[2][2] * s[2][2];
-            d[2][3] = m[2][0] * s[0][3] + m[2][1] * s[1][3] + m[2][2] * s[2][3] + m[2][3];
-
-            d[3][0] = 0;
-            d[3][1] = 0;
-            d[3][2] = 0;
-            d[3][3] = 1;
+            *pDstMat = baseMatrix * *pSrcMat ;
 
             ++pSrcMat;
             ++pDstMat;

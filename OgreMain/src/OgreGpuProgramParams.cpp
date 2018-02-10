@@ -1273,7 +1273,7 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Matrix4* pMatrix, size_t numEntries)
+    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const TransformBase* pMatrix, size_t numEntries)
     {
         // remember, raw content access uses raw float count rather than float4
         if (mTransposeMatrices)
@@ -2402,7 +2402,7 @@ namespace Ogre
 
         size_t index;
         size_t numMatrices;
-        const Matrix4* pMatrix;
+        const Affine3* pMatrix;
         size_t m;
         Vector3 vec3;
         Vector4 vec4;
@@ -2668,8 +2668,8 @@ namespace Ogre
                     break;
                 case ACT_LIGHT_POSITION_OBJECT_SPACE:
                     _writeRawConstant(i->physicalIndex,
-                                      source->getInverseWorldMatrix().transformAffine(
-                                          source->getLightAs4DVector(i->data)),
+                                      source->getInverseWorldMatrix() *
+                                          source->getLightAs4DVector(i->data),
                                       i->elementCount);
                     break;
                 case ACT_LIGHT_DIRECTION_OBJECT_SPACE:
@@ -2681,14 +2681,14 @@ namespace Ogre
                     _writeRawConstant(i->physicalIndex, Vector4(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
                     break;
                 case ACT_LIGHT_DISTANCE_OBJECT_SPACE:
-                    vec3 = source->getInverseWorldMatrix().transformAffine(source->getLightPosition(i->data));
+                    vec3 = source->getInverseWorldMatrix() * source->getLightPosition(i->data);
                     _writeRawConstant(i->physicalIndex, vec3.length());
                     break;
                 case ACT_LIGHT_POSITION_OBJECT_SPACE_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
                         _writeRawConstant(i->physicalIndex + l*i->elementCount,
-                                          source->getInverseWorldMatrix().transformAffine(
-                                              source->getLightAs4DVector(l)),
+                                          source->getInverseWorldMatrix() *
+                                              source->getLightAs4DVector(l),
                                           i->elementCount);
                     break;
 
@@ -2707,7 +2707,7 @@ namespace Ogre
                 case ACT_LIGHT_DISTANCE_OBJECT_SPACE_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
                     {
-                        vec3 = source->getInverseWorldMatrix().transformAffine(source->getLightPosition(l));
+                        vec3 = source->getInverseWorldMatrix() * source->getLightPosition(l);
                         _writeRawConstant(i->physicalIndex + l*i->elementCount, vec3.length());
                     }
                     break;
@@ -2766,9 +2766,7 @@ namespace Ogre
                     {
                         //Based on Matrix4::decompostion, but we don't need the rotation or position components
                         //but do need the scaling and shearing. Shearing isn't available from Matrix4::decomposition
-                        assert((*pMatrix).isAffine());
-
-                        (*pMatrix).extract3x3Matrix(m3);
+                        pMatrix->extract3x3Matrix(m3);
 
                         Matrix3 matQ;
                         Vector3 scale;
@@ -2855,7 +2853,7 @@ namespace Ogre
                     break;
                 case ACT_LIGHT_POSITION_VIEW_SPACE:
                     _writeRawConstant(i->physicalIndex,
-                                      source->getViewMatrix().transformAffine(source->getLightAs4DVector(i->data)), i->elementCount);
+                                      source->getViewMatrix() * source->getLightAs4DVector(i->data), i->elementCount);
                     break;
                 case ACT_LIGHT_DIRECTION_VIEW_SPACE:
                     source->getInverseTransposeViewMatrix().extract3x3Matrix(m3);
@@ -2950,8 +2948,8 @@ namespace Ogre
                 case ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
                         _writeRawConstant(i->physicalIndex + l*i->elementCount,
-                                          source->getViewMatrix().transformAffine(
-                                              source->getLightAs4DVector(l)),
+                                          source->getViewMatrix() *
+                                              source->getLightAs4DVector(l),
                                           i->elementCount);
                     break;
 

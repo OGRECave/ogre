@@ -60,7 +60,7 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass*
     if ((mLightParamsList.empty()) && (!mUseSegmentedLightTexture))
         return;
 
-    const Matrix4& matWorld = source->getWorldMatrix();
+    const Affine3& matWorld = source->getWorldMatrix();
     Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
     unsigned int curSearchLightIndex = 0;
 
@@ -105,14 +105,14 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass*
         case Light::LT_DIRECTIONAL:
 
             // Update light direction.
-            vParameter = matWorld.transformAffine(srcLight->getAs4DVector(true));
+            vParameter = matWorld * srcLight->getAs4DVector(true);
             curParams.mDirection->setGpuParameter(vParameter.ptr(),3,1);
             break;
 
         case Light::LT_POINT:
 
             // Update light position.
-            vParameter = matWorld.transformAffine(srcLight->getAs4DVector(true));
+            vParameter = matWorld * srcLight->getAs4DVector(true);
             curParams.mPosition->setGpuParameter(vParameter.ptr(),3,1);
 
             // Update light attenuation parameters.
@@ -126,7 +126,7 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass*
 
 
                 // Update light position.
-                vParameter = matWorld.transformAffine(srcLight->getAs4DVector(true));
+                vParameter = matWorld * srcLight->getAs4DVector(true);
                 curParams.mPosition->setGpuParameter(vParameter.ptr(),3,1);
 
 

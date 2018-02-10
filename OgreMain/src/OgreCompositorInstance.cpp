@@ -228,7 +228,7 @@ public:
             const Ogre::Vector3 *corners = vp->getCamera()->getWorldSpaceCorners();
             if(mQuadFarCornersViewSpace)
             {
-                const Ogre::Matrix4 &viewMat = vp->getCamera()->getViewMatrix(true);
+                const Affine3 &viewMat = vp->getCamera()->getViewMatrix(true);
                 rect->setNormals(viewMat*corners[5], viewMat*corners[6], viewMat*corners[4], viewMat*corners[7]);
             }
             else

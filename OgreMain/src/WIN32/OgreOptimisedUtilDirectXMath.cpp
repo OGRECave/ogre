@@ -115,7 +115,7 @@ namespace Ogre {
             const float *srcPosPtr, float *destPosPtr,
             const float *srcNormPtr, float *destNormPtr,
             const float *blendWeightPtr, const unsigned char* blendIndexPtr,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t srcPosStride, size_t destPosStride,
             size_t srcNormStride, size_t destNormStride,
             size_t blendWeightStride, size_t blendIndexStride,
@@ -133,9 +133,9 @@ namespace Ogre {
 
         /// @copydoc OptimisedUtil::concatenateAffineMatrices
         virtual void concatenateAffineMatrices(
-            const Matrix4& baseMatrix,
-            const Matrix4* srcMatrices,
-            Matrix4* dstMatrices,
+            const Affine3& baseMatrix,
+            const Affine3* srcMatrices,
+            Affine3* dstMatrices,
             size_t numMatrices);
 
         /// @copydoc OptimisedUtil::calculateFaceNormals
@@ -428,7 +428,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
     {                                                                           \
         /* Important Note: If reuse pMatrixXXX frequently, M$ VC7.1 will */     \
         /* generate wrong code here!!!                                   */     \
-        const Matrix4* pMatrix0, *pMatrix1, *pMatrix2, *pMatrix3;               \
+        const Affine3* pMatrix0, *pMatrix1, *pMatrix2, *pMatrix3;               \
         XMVECTOR weight, weights;                                               \
                                                                                 \
         switch (numWeightsPerVertex)                                            \
@@ -482,7 +482,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
     {                                                                           \
         /* Important Note: If reuse pMatrixXXX frequently, M$ VC7.1 will */     \
         /* generate wrong code here!!!                                   */     \
-        const Matrix4* pMatrix0, *pMatrix1, *pMatrix2, *pMatrix3;               \
+        const Affine3* pMatrix0, *pMatrix1, *pMatrix2, *pMatrix3;               \
         XMVECTOR weight, weights;                                                 \
                                                                                 \
         switch (numWeightsPerVertex)                                            \
@@ -558,7 +558,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
         const float *pSrcPos, float *pDestPos,
         const float *pSrcNorm, float *pDestNorm,
         const float *pBlendWeight, const unsigned char* pBlendIndex,
-        const Matrix4* const* blendMatrices,
+        const Affine3* const* blendMatrices,
         size_t srcPosStride, size_t destPosStride,
         size_t srcNormStride, size_t destNormStride,
         size_t blendWeightStride, size_t blendIndexStride,
@@ -641,7 +641,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
         static void apply(
             const float* pSrc, float* pDest,
             const float* pBlendWeight, const unsigned char* pBlendIndex,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t blendWeightStride, size_t blendIndexStride,
             size_t numWeightsPerVertex,
             size_t numIterations)
@@ -761,7 +761,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
     static OGRE_FORCE_INLINE void softwareVertexSkinning_DirectXMath_PosNorm_Shared_Packed(
             const float* pSrcPos, float* pDestPos,
             const float* pBlendWeight, const unsigned char* pBlendIndex,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t blendWeightStride, size_t blendIndexStride,
             size_t numWeightsPerVertex,
             size_t numIterations)
@@ -800,7 +800,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
             const float* pSrcPos, float* pDestPos,
             const float* pSrcNorm, float* pDestNorm,
             const float* pBlendWeight, const unsigned char* pBlendIndex,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t blendWeightStride, size_t blendIndexStride,
             size_t numWeightsPerVertex,
             size_t numIterations)
@@ -917,7 +917,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
         const float* pSrcPos, float* pDestPos,
         const float* pSrcNorm, float* pDestNorm,
         const float* pBlendWeight, const unsigned char* pBlendIndex,
-        const Matrix4* const* blendMatrices,
+        const Affine3* const* blendMatrices,
         size_t blendWeightStride, size_t blendIndexStride,
         size_t numWeightsPerVertex,
         size_t numIterations)
@@ -957,7 +957,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
         static void apply(
             const float* pSrcPos, float* pDestPos,
             const float* pBlendWeight, const unsigned char* pBlendIndex,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t blendWeightStride, size_t blendIndexStride,
             size_t numWeightsPerVertex,
             size_t numIterations)
@@ -1035,7 +1035,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
     static OGRE_FORCE_INLINE void softwareVertexSkinning_DirectXMath_PosOnly_Packed(
         const float* pSrcPos, float* pDestPos,
         const float* pBlendWeight, const unsigned char* pBlendIndex,
-        const Matrix4* const* blendMatrices,
+        const Affine3* const* blendMatrices,
         size_t blendWeightStride, size_t blendIndexStride,
         size_t numWeightsPerVertex,
         size_t numIterations)
@@ -1069,7 +1069,7 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
         const float *pSrcPos, float *pDestPos,
         const float *pSrcNorm, float *pDestNorm,
         const float *pBlendWeight, const unsigned char* pBlendIndex,
-        const Matrix4* const* blendMatrices,
+        const Affine3* const* blendMatrices,
         size_t srcPosStride, size_t destPosStride,
         size_t srcNormStride, size_t destNormStride,
         size_t blendWeightStride, size_t blendIndexStride,
@@ -1494,9 +1494,9 @@ static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
     }
     //---------------------------------------------------------------------
     void OptimisedUtilDirectXMath::concatenateAffineMatrices(
-        const Matrix4& baseMatrix,
-        const Matrix4* pSrcMat,
-        Matrix4* pDstMat,
+        const Affine3& baseMatrix,
+        const Affine3* pSrcMat,
+        Affine3* pDstMat,
         size_t numMatrices)
     {
         assert(_isAlignedForDirectXMath(pSrcMat));

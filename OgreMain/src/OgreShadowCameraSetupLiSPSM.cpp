@@ -104,7 +104,7 @@ namespace Ogre
         Matrix4 invLightSpace = lightSpace.inverse();
 
         // get view matrix
-        const Matrix4& viewMatrix = cam.getViewMatrix();
+        const Affine3& viewMatrix = cam.getViewMatrix();
 
         // calculate z0_ls
         const Vector3 e_ws  = getNearCameraPoint_ws(viewMatrix, bodyLVS);
@@ -138,7 +138,7 @@ namespace Ogre
         const Camera& cam) const
     {
         // get view matrix
-        const Matrix4& viewMatrix = cam.getViewMatrix();
+        const Affine3& viewMatrix = cam.getViewMatrix();
 
         // calculate e_es
         const Vector3 e_ws  = getNearCameraPoint_ws(viewMatrix, bodyLVS);
@@ -229,7 +229,7 @@ namespace Ogre
 
 
         // calculate standard shadow mapping matrix
-        Matrix4 LView, LProj;
+        Affine3 LView; Matrix4 LProj;
         calculateShadowMappingMatrix(*sm, *cam, *light, &LView, &LProj, NULL);
         
         // if the direction of the light and the direction of the camera tend to be parallel,

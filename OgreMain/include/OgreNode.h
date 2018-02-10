@@ -211,7 +211,7 @@ namespace Ogre {
         Vector3 mInitialScale;
 
         /// Cached derived transform as a 4x4 matrix
-        mutable Matrix4 mCachedTransform;
+        mutable Affine3 mCachedTransform;
         mutable bool mCachedTransformOutOfDate;
 
         /** Node listener - only one allowed (no list) for size & performance reasons. */
@@ -556,7 +556,7 @@ namespace Ogre {
             derived transforms have been updated before calling this method.
             Applications using Ogre should just use the relative transforms.
         */
-        const Matrix4& _getFullTransform(void) const;
+        const Affine3& _getFullTransform(void) const;
 
         /** Internal method to update the Node.
         @note

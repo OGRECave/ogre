@@ -36,11 +36,15 @@ namespace Ogre
         0, 0, 0, 0,
         0, 0, 0, 0 );
     
-    const Matrix4 Matrix4::ZEROAFFINE(
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 1 );
+    const Affine3 Affine3::ZERO(
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0);
+
+    const Affine3 Affine3::IDENTITY(
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0);
 
     const Matrix4 Matrix4::IDENTITY(
         1, 0, 0, 0,
@@ -55,8 +59,8 @@ namespace Ogre
           0,    0,  0,   1);
 
     //-----------------------------------------------------------------------
-    inline static Real
-        MINOR(const Matrix4& m, const size_t r0, const size_t r1, const size_t r2, 
+    static Real
+        MINOR(const TransformBase& m, const size_t r0, const size_t r1, const size_t r2,
                                 const size_t c0, const size_t c1, const size_t c2)
     {
         return m[r0][c0] * (m[r1][c1] * m[r2][c2] - m[r2][c1] * m[r1][c2]) -
@@ -87,7 +91,7 @@ namespace Ogre
             MINOR(*this, 0, 1, 2, 0, 1, 2));
     }
     //-----------------------------------------------------------------------
-    Real Matrix4::determinant() const
+    Real TransformBase::determinant() const
     {
         return m[0][0] * MINOR(*this, 1, 2, 3, 1, 2, 3) -
             m[0][1] * MINOR(*this, 1, 2, 3, 0, 2, 3) +
@@ -157,10 +161,8 @@ namespace Ogre
             d30, d31, d32, d33);
     }
     //-----------------------------------------------------------------------
-    Matrix4 Matrix4::inverseAffine(void) const
+    Affine3 Affine3::inverse() const
     {
-        assert(isAffine());
-
         Real m10 = m[1][0], m11 = m[1][1], m12 = m[1][2];
         Real m20 = m[2][0], m21 = m[2][1], m22 = m[2][2];
 
@@ -194,14 +196,13 @@ namespace Ogre
         Real r13 = - (r10 * m03 + r11 * m13 + r12 * m23);
         Real r23 = - (r20 * m03 + r21 * m13 + r22 * m23);
 
-        return Matrix4(
+        return Affine3(
             r00, r01, r02, r03,
             r10, r11, r12, r13,
-            r20, r21, r22, r23,
-              0,   0,   0,   1);
+            r20, r21, r22, r23);
     }
     //-----------------------------------------------------------------------
-    void Matrix4::makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
+    void TransformBase::makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
     {
         // Ordering:
         //    1. Scale
@@ -220,7 +221,7 @@ namespace Ogre
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
     }
     //-----------------------------------------------------------------------
-    void Matrix4::makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
+    void TransformBase::makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
     {
         // Invert the parameters
         Vector3 invTranslate = -position;
@@ -245,10 +246,8 @@ namespace Ogre
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
     }
     //-----------------------------------------------------------------------
-    void Matrix4::decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
+    void Affine3::decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
     {
-        assert(isAffine());
-
         Matrix3 m3x3;
         extract3x3Matrix(m3x3);
 

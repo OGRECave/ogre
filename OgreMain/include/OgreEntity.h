@@ -173,9 +173,9 @@ namespace Ogre {
         void finalisePoseNormals(const VertexData* srcData, VertexData* destData);
 
         /// Cached bone matrices, including any world transform.
-        Matrix4 *mBoneWorldMatrices;
+        Affine3 *mBoneWorldMatrices;
         /// Cached bone matrices in skeleton local space, might shares with other entity instances.
-        Matrix4 *mBoneMatrices;
+        Affine3 *mBoneMatrices;
         unsigned short mNumBoneMatrices;
         /// Records the last frame in which animation was updated.
         unsigned long mFrameAnimationLastUpdated;
@@ -270,7 +270,7 @@ namespace Ogre {
         bool mInitialised;
 
         /// Last parent transform.
-        Matrix4 mLastParentXform;
+        Affine3 mLastParentXform;
 
         /// Mesh state count, used to detect differences.
         size_t mMeshStateCount;
@@ -624,7 +624,7 @@ namespace Ogre {
             bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0);
 
         /** Internal method for retrieving bone matrix information. */
-        const Matrix4* _getBoneMatrices(void) const { return mBoneMatrices;}
+        const Affine3* _getBoneMatrices(void) const { return mBoneMatrices;}
         /** Internal method for retrieving bone matrix information. */
         unsigned short _getNumBoneMatrices(void) const { return mNumBoneMatrices; }
         /** Returns whether or not this entity is skeletally animated. */

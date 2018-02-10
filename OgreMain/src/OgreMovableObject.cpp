@@ -306,7 +306,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
+    const Affine3& MovableObject::_getParentNodeFullTransform(void) const
     {
         
         if(mParentNode)
@@ -315,7 +315,7 @@ namespace Ogre {
             return mParentNode->_getFullTransform();
         }
         // fallback
-        return Matrix4::IDENTITY;
+        return Affine3::IDENTITY;
     }
     //-----------------------------------------------------------------------
     const AxisAlignedBox& MovableObject::getWorldBoundingBox(bool derive) const
@@ -323,7 +323,7 @@ namespace Ogre {
         if (derive)
         {
             mWorldAABB = this->getBoundingBox();
-            mWorldAABB.transformAffine(_getParentNodeFullTransform());
+            mWorldAABB.transform(_getParentNodeFullTransform());
         }
 
         return mWorldAABB;

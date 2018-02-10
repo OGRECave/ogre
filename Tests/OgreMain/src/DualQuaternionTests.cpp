@@ -64,7 +64,7 @@ TEST(DualQuaternionTests,DefaultValue)
 //--------------------------------------------------------------------------
 TEST(DualQuaternionTests,Matrix)
 {
-    Matrix4 transform;
+    Affine3 transform;
     Vector3 translation(10, 4, 0);
     Vector3 scale = Vector3::UNIT_SCALE;
     Quaternion rotation;
@@ -73,7 +73,7 @@ TEST(DualQuaternionTests,Matrix)
 
     DualQuaternion dQuat;
     dQuat.fromTransformationMatrix(transform);
-    Matrix4 transformResult;
+    Affine3 transformResult;
     dQuat.toTransformationMatrix(transformResult);
 
     Vector3 translationResult;

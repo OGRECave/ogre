@@ -248,11 +248,11 @@ namespace Ogre
     //---------------------------------------------------------------------
     AxisAlignedBox Terrain::getWorldAABB() const
     {
-        Matrix4 m = Matrix4::IDENTITY;
+        Affine3 m = Affine3::IDENTITY;
         m.setTrans(getPosition());
 
         AxisAlignedBox ret = getAABB();
-        ret.transformAffine(m);
+        ret.transform(m);
         return ret;
     }
     //---------------------------------------------------------------------

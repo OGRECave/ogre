@@ -114,7 +114,7 @@ namespace Ogre
         @remarks
             Internal use only.
         */
-        void _getOffsetTransform(Matrix4& m) const;
+        void _getOffsetTransform(Affine3& m) const;
 
         /** Gets the inverted binding pose scale. */
         const Vector3& _getBindingPoseInverseScale(void) const { return mBindDerivedInverseScale; }

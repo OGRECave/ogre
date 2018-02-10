@@ -68,7 +68,7 @@ namespace Ogre {
         invalidateView();
 
         // Init matrices
-        mViewMatrix = Matrix4::ZERO;
+        mViewMatrix = Affine3::ZERO;
         mProjMatrixRS = Matrix4::ZERO;
 
         mParentNode = 0;
@@ -367,7 +367,7 @@ namespace Ogre {
                 mDerivedOrientation = dir.getRotationTo(rdir, up) * mRealOrientation;
 
                 // Calculate reflected position.
-                mDerivedPosition = mReflectMatrix.transformAffine(mRealPosition);
+                mDerivedPosition = mReflectMatrix * mRealPosition;
             }
             else
             {
@@ -605,7 +605,7 @@ namespace Ogre {
         // NB assumes that all scene nodes have been updated
         if (mAutoTrackTarget)
         {
-            lookAt(mAutoTrackTarget->_getFullTransform().transformAffine(mAutoTrackOffset));
+            lookAt(mAutoTrackTarget->_getFullTransform() * mAutoTrackOffset);
         }
     }
     //-----------------------------------------------------------------------
@@ -792,12 +792,12 @@ namespace Ogre {
         Vector3 vp_bl (wvpLeft, wvpBottom, -mNearDist);
         Vector3 vp_br (wvpRight, wvpBottom, -mNearDist);
 
-        Matrix4 inv = mViewMatrix.inverseAffine();
+        Affine3 inv = mViewMatrix.inverse();
 
-        Vector3 vw_ul = inv.transformAffine(vp_ul);
-        Vector3 vw_ur = inv.transformAffine(vp_ur);
-        Vector3 vw_bl = inv.transformAffine(vp_bl);
-        Vector3 vw_br = inv.transformAffine(vp_br);
+        Vector3 vw_ul = inv * vp_ul;
+        Vector3 vw_ur = inv * vp_ur;
+        Vector3 vw_bl = inv * vp_bl;
+        Vector3 vw_br = inv * vp_br;
 
         mWindowClipPlanes.clear();
         if (mProjType == PT_PERSPECTIVE)
@@ -957,7 +957,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    const Matrix4& Camera::getViewMatrix(void) const
+    const Affine3& Camera::getViewMatrix(void) const
     {
         if (mCullFrustum)
         {
@@ -969,7 +969,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    const Matrix4& Camera::getViewMatrix(bool ownFrustumOnly) const
+    const Affine3& Camera::getViewMatrix(bool ownFrustumOnly) const
     {
         if (ownFrustumOnly)
         {

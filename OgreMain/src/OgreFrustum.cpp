@@ -182,7 +182,7 @@ namespace Ogre {
         return mProjMatrixRS;
     }
     //-----------------------------------------------------------------------
-    const Matrix4& Frustum::getViewMatrix(void) const
+    const Affine3& Frustum::getViewMatrix(void) const
     {
         updateView();
 
@@ -759,7 +759,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Frustum::calcViewMatrixRelative(const Vector3& relPos, Matrix4& matToUpdate) const
     {
-        Matrix4 matTrans = Matrix4::IDENTITY;
+        Affine3 matTrans = Affine3::IDENTITY;
         matTrans.setTrans(relPos);
         matToUpdate = getViewMatrix() * matTrans;
 
@@ -834,7 +834,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Frustum::updateWorldSpaceCornersImpl(void) const
     {
-        Matrix4 eyeToWorld = mViewMatrix.inverseAffine();
+        Affine3 eyeToWorld = mViewMatrix.inverse();
 
         // Note: Even though we can dealing with general projection matrix here,
         //       but because it's incompatibly with infinite far plane, thus, we
@@ -855,16 +855,15 @@ namespace Ogre {
         Real farTop = nearTop * radio;
 
         // near
-        mWorldSpaceCorners[0] = eyeToWorld.transformAffine(Vector3(nearRight, nearTop,    -mNearDist));
-        mWorldSpaceCorners[1] = eyeToWorld.transformAffine(Vector3(nearLeft,  nearTop,    -mNearDist));
-        mWorldSpaceCorners[2] = eyeToWorld.transformAffine(Vector3(nearLeft,  nearBottom, -mNearDist));
-        mWorldSpaceCorners[3] = eyeToWorld.transformAffine(Vector3(nearRight, nearBottom, -mNearDist));
+        mWorldSpaceCorners[0] = eyeToWorld * Vector3(nearRight, nearTop, -mNearDist);
+        mWorldSpaceCorners[1] = eyeToWorld * Vector3(nearLeft, nearTop, -mNearDist);
+        mWorldSpaceCorners[2] = eyeToWorld * Vector3(nearLeft, nearBottom, -mNearDist);
+        mWorldSpaceCorners[3] = eyeToWorld * Vector3(nearRight, nearBottom, -mNearDist);
         // far
-        mWorldSpaceCorners[4] = eyeToWorld.transformAffine(Vector3(farRight,  farTop,     -farDist));
-        mWorldSpaceCorners[5] = eyeToWorld.transformAffine(Vector3(farLeft,   farTop,     -farDist));
-        mWorldSpaceCorners[6] = eyeToWorld.transformAffine(Vector3(farLeft,   farBottom,  -farDist));
-        mWorldSpaceCorners[7] = eyeToWorld.transformAffine(Vector3(farRight,  farBottom,  -farDist));
-
+        mWorldSpaceCorners[4] = eyeToWorld * Vector3(farRight, farTop, -farDist);
+        mWorldSpaceCorners[5] = eyeToWorld * Vector3(farLeft, farTop, -farDist);
+        mWorldSpaceCorners[6] = eyeToWorld * Vector3(farLeft, farBottom, -farDist);
+        mWorldSpaceCorners[7] = eyeToWorld * Vector3(farRight, farBottom, -farDist);
 
         mRecalcWorldSpaceCorners = false;
     }
@@ -1049,7 +1048,7 @@ namespace Ogre {
         // Transform light position into camera space
 
         updateView();
-        Vector3 eyeSpacePos = mViewMatrix.transformAffine(sphere.getCenter());
+        Vector3 eyeSpacePos = mViewMatrix * sphere.getCenter();
 
         // initialise
         *left = *bottom = -1.0f;
@@ -1233,12 +1232,11 @@ namespace Ogre {
         invalidateFrustum();
     }
     //---------------------------------------------------------------------
-    void Frustum::setCustomViewMatrix(bool enable, const Matrix4& viewMatrix)
+    void Frustum::setCustomViewMatrix(bool enable, const Affine3& viewMatrix)
     {
         mCustomViewMatrix = enable;
         if (enable)
         {
-            assert(viewMatrix.isAffine());
             mViewMatrix = viewMatrix;
         }
         invalidateView();

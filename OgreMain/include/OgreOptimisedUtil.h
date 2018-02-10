@@ -100,7 +100,7 @@ namespace Ogre {
             const float *srcPosPtr, float *destPosPtr,
             const float *srcNormPtr, float *destNormPtr,
             const float *blendWeightPtr, const unsigned char* blendIndexPtr,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t srcPosStride, size_t destPosStride,
             size_t srcNormStride, size_t destNormStride,
             size_t blendWeightStride, size_t blendIndexStride,
@@ -139,9 +139,9 @@ namespace Ogre {
         @param numMatrices Number of matrices in the array.
         */
         virtual void concatenateAffineMatrices(
-            const Matrix4& baseMatrix,
-            const Matrix4* srcMatrices,
-            Matrix4* dstMatrices,
+            const Affine3& baseMatrix,
+            const Affine3* srcMatrices,
+            Affine3* dstMatrices,
             size_t numMatrices) = 0;
 
         /** Calculate the face normals for the triangles based on position

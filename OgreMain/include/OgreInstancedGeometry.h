@@ -273,15 +273,15 @@ namespace Ogre {
         protected:
             GeometryBucketList mGeometryBucketList;
             unsigned short mIndex;
-            Matrix4  mTransformation;
+            Affine3  mTransformation;
             Quaternion mOrientation;
             Vector3 mScale;
             Vector3 mPosition;
             SkeletonInstance* mSkeletonInstance;
             /// Cached bone matrices, including any world transform
-            Matrix4 *mBoneWorldMatrices;
+            Affine3 *mBoneWorldMatrices;
             /// Cached bone matrices in skeleton local space
-            Matrix4 *mBoneMatrices;
+            Affine3 *mBoneMatrices;
             /// State of animation for animable meshes
             AnimationStateSet* mAnimationState;
             unsigned short mNumBoneMatrices;
