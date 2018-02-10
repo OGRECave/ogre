@@ -607,7 +607,7 @@ namespace Ogre {
         /// @copydoc Frustum::getFarClipDistance
         Real getFarClipDistance(void) const;
         /// @copydoc Frustum::getViewMatrix
-        const Matrix4& getViewMatrix(void) const;
+        const Affine3& getViewMatrix(void) const;
         /** Specialised version of getViewMatrix allowing caller to differentiate
             whether the custom culling frustum should be allowed or not. 
         @remarks
@@ -616,7 +616,7 @@ namespace Ogre {
             performing CPU calculations, but the final rendering must be performed
             using the real view matrix in order to display the correct debug view.
         */
-        const Matrix4& getViewMatrix(bool ownFrustumOnly) const;
+        const Affine3& getViewMatrix(bool ownFrustumOnly) const;
         /** Set whether this camera should use the 'rendering distance' on
             objects to exclude distant objects from the final image. The
             default behaviour is to use it.

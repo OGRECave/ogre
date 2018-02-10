@@ -330,7 +330,7 @@ namespace Ogre
                                  0.0, 0.0, 0.0, 5.0,
                                  0.0, 0.0, 0.0, 5.0,
                                  0.0, 0.0, 0.0, 1.0);
-                texCam->setCustomViewMatrix(true, Matrix4::IDENTITY);
+                texCam->setCustomViewMatrix(true, Affine3::IDENTITY);
                 texCam->setCustomProjectionMatrix(true, crazyMat);  
                 return;
             }
@@ -377,7 +377,7 @@ namespace Ogre
             // TODO: factor into view and projection pieces.
             // Note: In fact, it's unnecessary to factor into view and projection pieces,
             // but if we do, we will more according with academic requirement :)
-            texCam->setCustomViewMatrix(true, Matrix4::IDENTITY);
+            texCam->setCustomViewMatrix(true, Affine3::IDENTITY);
             texCam->setCustomProjectionMatrix(true, customMatrix);
             return;
         }
@@ -385,14 +385,12 @@ namespace Ogre
         Vector3 tempPos = Vector3(pinhole.x, pinhole.y, pinhole.z);
 
         // factor into view and projection pieces
-        Matrix4    translation(1.0, 0.0, 0.0,  tempPos.x,
+        Affine3    translation(1.0, 0.0, 0.0,  tempPos.x,
             0.0, 1.0, 0.0,  tempPos.y,
-            0.0, 0.0, 1.0,  tempPos.z,
-            0.0, 0.0, 0.0,  1.0);
-        Matrix4 invTranslation(1.0, 0.0, 0.0, -tempPos.x,
+            0.0, 0.0, 1.0,  tempPos.z);
+        Affine3 invTranslation(1.0, 0.0, 0.0, -tempPos.x,
             0.0, 1.0, 0.0, -tempPos.y,
-            0.0, 0.0, 1.0, -tempPos.z,
-            0.0, 0.0, 0.0,  1.0);
+            0.0, 0.0, 1.0, -tempPos.z);
         Matrix4 tempMatrix = customMatrix * translation;
         Vector3 zRow(-tempMatrix[3][0], -tempMatrix[3][1], -tempMatrix[3][2]);
         zRow.normalise();
@@ -404,12 +402,11 @@ namespace Ogre
         Vector3 xDir = up.crossProduct(zRow);
         xDir.normalise();
         up = zRow.crossProduct(xDir);
-        Matrix4 rotation(xDir.x, up.x, zRow.x, 0.0,
+        Affine3 rotation(xDir.x, up.x, zRow.x, 0.0,
             xDir.y, up.y, zRow.y, 0.0,
-            xDir.z, up.z, zRow.z, 0.0,
-            0.0,  0.0,    0.0, 1.0 );
+            xDir.z, up.z, zRow.z, 0.0);
         Matrix4 customProj = tempMatrix * rotation;
-        Matrix4 customView = rotation.transpose() * invTranslation;
+        Affine3 customView(rotation.transpose() * invTranslation);
         // note: now customProj * (0,0,0,1)^t = (0, 0, k, 0)^t for k some constant
         // note: also customProj's 4th row is (0, 0, c, 0) for some negative c.
 

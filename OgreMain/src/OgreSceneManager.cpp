@@ -3225,7 +3225,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     
     if (numMatrices > 0)
     {
-        rend->getWorldTransforms(mTempXform);
+        rend->getWorldTransforms(reinterpret_cast<Matrix4*>(mTempXform));
 
         if (mCameraRelativeRendering && !rend->getUseIdentityView())
         {
@@ -3887,8 +3887,8 @@ void SceneManager::_applySceneAnimations(void)
 }
 //---------------------------------------------------------------------
 void SceneManager::manualRender(RenderOperation* rend, 
-                                Pass* pass, Viewport* vp, const Matrix4& worldMatrix, 
-                                const Matrix4& viewMatrix, const Matrix4& projMatrix, 
+                                Pass* pass, Viewport* vp, const Affine3& worldMatrix,
+                                const Affine3& viewMatrix, const Matrix4& projMatrix,
                                 bool doBeginEndFrame) 
 {
     if (vp)
@@ -3927,7 +3927,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 }
 //---------------------------------------------------------------------
 void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp,
-    const Matrix4& viewMatrix, 
+    const Affine3& viewMatrix,
     const Matrix4& projMatrix,bool doBeginEndFrame,
     bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList)
 {
@@ -3979,7 +3979,7 @@ void SceneManager::useRenderableViewProjMode(const Renderable* pRend, bool fixed
     {
         // Using identity view now, change it
         if (fixedFunction)
-            setViewMatrix(Matrix4::IDENTITY);
+            setViewMatrix(Affine3::IDENTITY);
         mGpuParamsDirty |= (uint16)GPV_GLOBAL;
         mResetIdentityView = true;
     }
@@ -7332,7 +7332,7 @@ void SceneManager::_handleLodEvents()
     mEntityMaterialLodChangedEvents.clear();
 }
 //---------------------------------------------------------------------
-void SceneManager::setViewMatrix(const Matrix4& m)
+void SceneManager::setViewMatrix(const Affine3& m)
 {
     mDestRenderSystem->_setViewMatrix(m);
     if (mDestRenderSystem->areFixedFunctionLightsInViewSpace())

@@ -84,12 +84,12 @@ namespace Ogre {
         return mInheritParentEntityScale;
     }
     //-----------------------------------------------------------------------------
-    const Matrix4& TagPoint::_getFullLocalTransform(void) const
+    const Affine3& TagPoint::_getFullLocalTransform(void) const
     {
         return mFullLocalTransform;
     }
     //-----------------------------------------------------------------------------
-    const Matrix4& TagPoint::getParentEntityTransform(void) const
+    const Affine3& TagPoint::getParentEntityTransform(void) const
     {
 
         return mParentEntity->_getParentNodeFullTransform();

@@ -279,7 +279,7 @@ namespace Ogre {
             be at least as large as the number of bones.
             Assumes animation has already been updated.
         */
-        virtual void _getBoneMatrices(Matrix4* pMatrices);
+        virtual void _getBoneMatrices(Affine3* pMatrices);
 
         /** Gets the number of animations on this skeleton. */
         virtual unsigned short getNumAnimations(void) const;

@@ -276,7 +276,7 @@ namespace Ogre {
                 {
                     mAutoParamDataSource->setCurrentRenderable(0);
                     mAutoParamDataSource->setCurrentSceneManager(this);
-                    mAutoParamDataSource->setWorldMatrices(&Matrix4::IDENTITY, 1);
+                    mAutoParamDataSource->setWorldMatrices(&Affine3::IDENTITY, 1);
                     mAutoParamDataSource->setCurrentCamera(mCameraInProgress, false);
                     updateGpuProgramParameters(pass);
                 }

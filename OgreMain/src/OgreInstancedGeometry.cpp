@@ -899,7 +899,7 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     InstancedGeometry::InstancedObject::InstancedObject(unsigned short index,SkeletonInstance *skeleton, AnimationStateSet*animations)
         : mIndex(index),
-        mTransformation(Matrix4::ZERO),
+        mTransformation(Affine3::ZERO),
         mOrientation(Quaternion::IDENTITY),
         mScale(Vector3::UNIT_SCALE),
         mPosition(Vector3::ZERO),
@@ -915,7 +915,7 @@ namespace Ogre {
         
             mAnimationState = OGRE_NEW AnimationStateSet();
             mNumBoneMatrices = mSkeletonInstance->getNumBones();
-            mBoneMatrices = OGRE_ALLOC_T(Matrix4, mNumBoneMatrices, MEMCATEGORY_ANIMATION);
+            mBoneMatrices = OGRE_ALLOC_T(Affine3, mNumBoneMatrices, MEMCATEGORY_ANIMATION);
             AnimationStateMap::const_iterator it;
             for (it=animations->getAnimationStates().begin(); it != animations->getAnimationStates().end(); ++it)
             {
@@ -929,7 +929,7 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     InstancedGeometry::InstancedObject::InstancedObject(unsigned short index)
         :mIndex(index),
-        mTransformation(Matrix4::ZERO),
+        mTransformation(Affine3::ZERO),
         mOrientation(Quaternion::IDENTITY),
         mScale(Vector3::UNIT_SCALE),
         mPosition(Vector3::ZERO),
@@ -1083,7 +1083,7 @@ namespace Ogre {
             // when using software animation.
             if (!mBoneWorldMatrices)
             {
-                mBoneWorldMatrices = OGRE_ALLOC_T(Matrix4, mNumBoneMatrices, MEMCATEGORY_ANIMATION);
+                mBoneWorldMatrices = OGRE_ALLOC_T(Affine3, mNumBoneMatrices, MEMCATEGORY_ANIMATION);
             }
 
             for (unsigned short i = 0; i < mNumBoneMatrices; ++i)
@@ -1868,7 +1868,7 @@ namespace Ogre {
                 {
                     
                         *xform = it->second->mTransformation;
-                        *(xform+1) = xform->inverse();
+                        *(xform+1) = it->second->mTransformation.inverse();
                 }
             }
             else
@@ -1898,7 +1898,7 @@ namespace Ogre {
                     for(int i=0;i<it->second->mNumBoneMatrices;++i,xform+=2)
                     {
                         *xform = it->second->mBoneWorldMatrices[i];
-                        *(xform+1) = xform->inverse();
+                        *(xform+1) = it->second->mBoneWorldMatrices[i].inverse();
                     }
                 }
                 else

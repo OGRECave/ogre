@@ -42,6 +42,9 @@ namespace Ogre
     /** \addtogroup Math
     *  @{
     */
+    class Matrix4;
+    class Affine3;
+    Matrix4 operator*(const Matrix4 &m, const Matrix4 &m2);
     /** Class encapsulating a standard 4x4 homogeneous matrix.
         @remarks
             OGRE uses column vectors when applying matrix multiplications,
@@ -65,7 +68,7 @@ namespace Ogre
             right-to-left matrix multiplication, (OGRE transposes matrices it
             passes to D3D to compensate).
         @par
-            The generic form M * V which shows the layout of the matrix 
+            The generic form M * V which shows the layout of the matrix
             entries is shown below:
             <pre>
                 [ m[0][0]  m[0][1]  m[0][2]  m[0][3] ]   {x}
@@ -74,42 +77,169 @@ namespace Ogre
                 [ m[3][0]  m[3][1]  m[3][2]  m[3][3] ]   {1}
             </pre>
     */
-    class _OgreExport Matrix4
+    class _OgreExport TransformBase
     {
     protected:
         /// The matrix entries, indexed by [row][col].
         Real m[4][4];
+        // do not reduce storage for affine for compatibility with SSE, shader mat4 types
     public:
-        /** Default constructor.
-            @note
-                It does <b>NOT</b> initialize the matrix for efficiency.
-        */
-        inline Matrix4()
+        Real* operator[](size_t iRow)
         {
+            assert(iRow < 4);
+            return m[iRow];
         }
 
-        inline Matrix4(
+        const Real* operator[](size_t iRow) const
+        {
+            assert(iRow < 4);
+            return m[iRow];
+        }
+
+        /** Assignment from 3x3 matrix.
+        */
+        void set3x3Matrix(const Matrix3& mat3)
+        {
+            m[0][0] = mat3[0][0]; m[0][1] = mat3[0][1]; m[0][2] = mat3[0][2];
+            m[1][0] = mat3[1][0]; m[1][1] = mat3[1][1]; m[1][2] = mat3[1][2];
+            m[2][0] = mat3[2][0]; m[2][1] = mat3[2][1]; m[2][2] = mat3[2][2];
+        }
+
+        /** Extracts the rotation / scaling part of the Matrix as a 3x3 matrix.
+        @param m3x3 Destination Matrix3
+        */
+        void extract3x3Matrix(Matrix3& m3x3) const
+        {
+            m3x3[0][0] = m[0][0];
+            m3x3[0][1] = m[0][1];
+            m3x3[0][2] = m[0][2];
+            m3x3[1][0] = m[1][0];
+            m3x3[1][1] = m[1][1];
+            m3x3[1][2] = m[1][2];
+            m3x3[2][0] = m[2][0];
+            m3x3[2][1] = m[2][1];
+            m3x3[2][2] = m[2][2];
+        }
+        /** Extracts the rotation / scaling part as a quaternion from the Matrix.
+         */
+        Quaternion extractQuaternion() const
+        {
+          Matrix3 m3x3;
+          extract3x3Matrix(m3x3);
+          return Quaternion(m3x3);
+        }
+        /// Sets the translation transformation part of the matrix.
+        void setTrans( const Vector3& v )
+        {
+            m[0][3] = v.x;
+            m[1][3] = v.y;
+            m[2][3] = v.z;
+        }
+        /// Extracts the translation transformation part of the matrix.
+        Vector3 getTrans() const
+        {
+          return Vector3(m[0][3], m[1][3], m[2][3]);
+        }
+        /// Sets the scale part of the matrix.
+        void setScale( const Vector3& v )
+        {
+            m[0][0] = v.x;
+            m[1][1] = v.y;
+            m[2][2] = v.z;
+        }
+
+        /** Builds a translation matrix
+        */
+        void makeTrans( const Vector3& v )
+        {
+            makeTrans(v.x, v.y, v.z);
+        }
+
+        void makeTrans( Real tx, Real ty, Real tz )
+        {
+            m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = tx;
+            m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = ty;
+            m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = tz;
+            m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
+        }
+
+        /** Determines if this matrix involves a scaling. */
+        bool hasScale() const
+        {
+            // check magnitude of column vectors (==local axes)
+            Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
+            t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
+            t = m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
+
+            return false;
+        }
+
+        /** Determines if this matrix involves a negative scaling. */
+        bool hasNegativeScale() const { return determinant() < 0; }
+
+        Real determinant() const;
+
+        Matrix4 transpose() const;
+
+        /** Building a Affine3 from orientation / scale / position.
+        @remarks
+            Transform is performed in the order scale, rotate, translation, i.e. translation is independent
+            of orientation axes, scale does not affect size of translation, rotation and scaling are always
+            centered on the origin.
+        */
+        void makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
+
+        /** Building an inverse Affine3 from orientation / scale / position.
+        @remarks
+            As makeTransform except it build the inverse given the same data as makeTransform, so
+            performing -translation, -rotate, 1/scale in that order.
+        */
+        void makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
+
+        /** Function for writing to a stream.
+         */
+        inline _OgreExport friend std::ostream& operator<<(std::ostream& o, const TransformBase& mat)
+        {
+            o << "Matrix4(";
+            for (size_t i = 0; i < 4; ++i)
+            {
+                for (size_t j = 0; j < 4; ++j)
+                {
+                    o << mat[i][j];
+                    if(j != 3)
+                        o << ", ";
+                }
+
+                if(i != 3)
+                    o << ";";
+            }
+            o << ")";
+            return o;
+        }
+    };
+    /// Transform specialization for projective - encapsulating a 4x4 Matrix
+    class _OgreExport Matrix4 : public TransformBase
+    {
+    public:
+        /// Do <b>NOT</b> initialize the matrix for efficiency.
+        Matrix4() {}
+
+        Matrix4(
             Real m00, Real m01, Real m02, Real m03,
             Real m10, Real m11, Real m12, Real m13,
             Real m20, Real m21, Real m22, Real m23,
             Real m30, Real m31, Real m32, Real m33 )
         {
-            m[0][0] = m00;
-            m[0][1] = m01;
-            m[0][2] = m02;
-            m[0][3] = m03;
-            m[1][0] = m10;
-            m[1][1] = m11;
-            m[1][2] = m12;
-            m[1][3] = m13;
-            m[2][0] = m20;
-            m[2][1] = m21;
-            m[2][2] = m22;
-            m[2][3] = m23;
-            m[3][0] = m30;
-            m[3][1] = m31;
-            m[3][2] = m32;
-            m[3][3] = m33;
+            m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
+            m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
+            m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
+            m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
         }
 
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling 3x3 matrix.
@@ -128,54 +258,16 @@ namespace Ogre
         {
           Matrix3 m3x3;
           rot.ToRotationMatrix(m3x3);
-          operator=(IDENTITY);
-          operator=(m3x3);
+          *this = IDENTITY;
+          *this = m3x3;
         }
         
-        inline Real* operator [] ( size_t iRow )
-        {
-            assert( iRow < 4 );
-            return m[iRow];
+        Matrix4& operator=(const Matrix3& mat3) {
+            set3x3Matrix(mat3);
+            return *this;
         }
 
-        inline const Real *operator [] ( size_t iRow ) const
-        {
-            assert( iRow < 4 );
-            return m[iRow];
-        }
-
-        inline Matrix4 concatenate(const Matrix4 &m2) const
-        {
-            Matrix4 r;
-            r.m[0][0] = m[0][0] * m2.m[0][0] + m[0][1] * m2.m[1][0] + m[0][2] * m2.m[2][0] + m[0][3] * m2.m[3][0];
-            r.m[0][1] = m[0][0] * m2.m[0][1] + m[0][1] * m2.m[1][1] + m[0][2] * m2.m[2][1] + m[0][3] * m2.m[3][1];
-            r.m[0][2] = m[0][0] * m2.m[0][2] + m[0][1] * m2.m[1][2] + m[0][2] * m2.m[2][2] + m[0][3] * m2.m[3][2];
-            r.m[0][3] = m[0][0] * m2.m[0][3] + m[0][1] * m2.m[1][3] + m[0][2] * m2.m[2][3] + m[0][3] * m2.m[3][3];
-
-            r.m[1][0] = m[1][0] * m2.m[0][0] + m[1][1] * m2.m[1][0] + m[1][2] * m2.m[2][0] + m[1][3] * m2.m[3][0];
-            r.m[1][1] = m[1][0] * m2.m[0][1] + m[1][1] * m2.m[1][1] + m[1][2] * m2.m[2][1] + m[1][3] * m2.m[3][1];
-            r.m[1][2] = m[1][0] * m2.m[0][2] + m[1][1] * m2.m[1][2] + m[1][2] * m2.m[2][2] + m[1][3] * m2.m[3][2];
-            r.m[1][3] = m[1][0] * m2.m[0][3] + m[1][1] * m2.m[1][3] + m[1][2] * m2.m[2][3] + m[1][3] * m2.m[3][3];
-
-            r.m[2][0] = m[2][0] * m2.m[0][0] + m[2][1] * m2.m[1][0] + m[2][2] * m2.m[2][0] + m[2][3] * m2.m[3][0];
-            r.m[2][1] = m[2][0] * m2.m[0][1] + m[2][1] * m2.m[1][1] + m[2][2] * m2.m[2][1] + m[2][3] * m2.m[3][1];
-            r.m[2][2] = m[2][0] * m2.m[0][2] + m[2][1] * m2.m[1][2] + m[2][2] * m2.m[2][2] + m[2][3] * m2.m[3][2];
-            r.m[2][3] = m[2][0] * m2.m[0][3] + m[2][1] * m2.m[1][3] + m[2][2] * m2.m[2][3] + m[2][3] * m2.m[3][3];
-
-            r.m[3][0] = m[3][0] * m2.m[0][0] + m[3][1] * m2.m[1][0] + m[3][2] * m2.m[2][0] + m[3][3] * m2.m[3][0];
-            r.m[3][1] = m[3][0] * m2.m[0][1] + m[3][1] * m2.m[1][1] + m[3][2] * m2.m[2][1] + m[3][3] * m2.m[3][1];
-            r.m[3][2] = m[3][0] * m2.m[0][2] + m[3][1] * m2.m[1][2] + m[3][2] * m2.m[2][2] + m[3][3] * m2.m[3][2];
-            r.m[3][3] = m[3][0] * m2.m[0][3] + m[3][1] * m2.m[1][3] + m[3][2] * m2.m[2][3] + m[3][3] * m2.m[3][3];
-
-            return r;
-        }
-
-        /** Matrix concatenation using '*'.
-        */
-        inline Matrix4 operator * ( const Matrix4 &m2 ) const
-        {
-            return concatenate( m2 );
-        }
+        Matrix4 concatenate(const Matrix4& m2) const { return *this * m2; }
 
         /** Vector transformation using '*'.
             @remarks
@@ -207,20 +299,6 @@ namespace Ogre
                 m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w
                 );
         }
-        inline Plane operator * (const Plane& p) const
-        {
-            Plane ret;
-            Matrix4 invTrans = inverse().transpose();
-            Vector4 v4( p.normal.x, p.normal.y, p.normal.z, p.d );
-            v4 = invTrans * v4;
-            ret.normal.x = v4.x; 
-            ret.normal.y = v4.y; 
-            ret.normal.z = v4.z;
-            ret.d = v4.w / ret.normal.normalise();
-
-            return ret;
-        }
-
 
         /** Matrix addition.
         */
@@ -305,183 +383,8 @@ namespace Ogre
             return false;
         }
 
-        /** Assignment from 3x3 matrix.
-        */
-        inline void operator = ( const Matrix3& mat3 )
-        {
-            m[0][0] = mat3.m[0][0]; m[0][1] = mat3.m[0][1]; m[0][2] = mat3.m[0][2];
-            m[1][0] = mat3.m[1][0]; m[1][1] = mat3.m[1][1]; m[1][2] = mat3.m[1][2];
-            m[2][0] = mat3.m[2][0]; m[2][1] = mat3.m[2][1]; m[2][2] = mat3.m[2][2];
-        }
-
-        inline Matrix4 transpose(void) const
-        {
-            return Matrix4(m[0][0], m[1][0], m[2][0], m[3][0],
-                           m[0][1], m[1][1], m[2][1], m[3][1],
-                           m[0][2], m[1][2], m[2][2], m[3][2],
-                           m[0][3], m[1][3], m[2][3], m[3][3]);
-        }
-
-        /*
-        -----------------------------------------------------------------------
-        Translation Transformation
-        -----------------------------------------------------------------------
-        */
-        /** Sets the translation transformation part of the matrix.
-        */
-        inline void setTrans( const Vector3& v )
-        {
-            m[0][3] = v.x;
-            m[1][3] = v.y;
-            m[2][3] = v.z;
-        }
-
-        /** Extracts the translation transformation part of the matrix.
-         */
-        inline Vector3 getTrans() const
-        {
-          return Vector3(m[0][3], m[1][3], m[2][3]);
-        }
-        
-
-        /** Builds a translation matrix
-        */
-        inline void makeTrans( const Vector3& v )
-        {
-            m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = v.x;
-            m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = v.y;
-            m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = v.z;
-            m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
-        }
-
-        inline void makeTrans( Real tx, Real ty, Real tz )
-        {
-            m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = tx;
-            m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = ty;
-            m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = tz;
-            m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
-        }
-
-        /** Gets a translation matrix.
-        */
-        inline static Matrix4 getTrans( const Vector3& v )
-        {
-            Matrix4 r;
-
-            r.m[0][0] = 1.0; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = v.x;
-            r.m[1][0] = 0.0; r.m[1][1] = 1.0; r.m[1][2] = 0.0; r.m[1][3] = v.y;
-            r.m[2][0] = 0.0; r.m[2][1] = 0.0; r.m[2][2] = 1.0; r.m[2][3] = v.z;
-            r.m[3][0] = 0.0; r.m[3][1] = 0.0; r.m[3][2] = 0.0; r.m[3][3] = 1.0;
-
-            return r;
-        }
-
-        /** Gets a translation matrix - variation for not using a vector.
-        */
-        inline static Matrix4 getTrans( Real t_x, Real t_y, Real t_z )
-        {
-            Matrix4 r;
-
-            r.m[0][0] = 1.0; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = t_x;
-            r.m[1][0] = 0.0; r.m[1][1] = 1.0; r.m[1][2] = 0.0; r.m[1][3] = t_y;
-            r.m[2][0] = 0.0; r.m[2][1] = 0.0; r.m[2][2] = 1.0; r.m[2][3] = t_z;
-            r.m[3][0] = 0.0; r.m[3][1] = 0.0; r.m[3][2] = 0.0; r.m[3][3] = 1.0;
-
-            return r;
-        }
-
-        /*
-        -----------------------------------------------------------------------
-        Scale Transformation
-        -----------------------------------------------------------------------
-        */
-        /** Sets the scale part of the matrix.
-        */
-        inline void setScale( const Vector3& v )
-        {
-            m[0][0] = v.x;
-            m[1][1] = v.y;
-            m[2][2] = v.z;
-        }
-
-        /** Gets a scale matrix.
-        */
-        inline static Matrix4 getScale( const Vector3& v )
-        {
-            Matrix4 r;
-            r.m[0][0] = v.x; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = 0.0;
-            r.m[1][0] = 0.0; r.m[1][1] = v.y; r.m[1][2] = 0.0; r.m[1][3] = 0.0;
-            r.m[2][0] = 0.0; r.m[2][1] = 0.0; r.m[2][2] = v.z; r.m[2][3] = 0.0;
-            r.m[3][0] = 0.0; r.m[3][1] = 0.0; r.m[3][2] = 0.0; r.m[3][3] = 1.0;
-
-            return r;
-        }
-
-        /** Gets a scale matrix - variation for not using a vector.
-        */
-        inline static Matrix4 getScale( Real s_x, Real s_y, Real s_z )
-        {
-            Matrix4 r;
-            r.m[0][0] = s_x; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = 0.0;
-            r.m[1][0] = 0.0; r.m[1][1] = s_y; r.m[1][2] = 0.0; r.m[1][3] = 0.0;
-            r.m[2][0] = 0.0; r.m[2][1] = 0.0; r.m[2][2] = s_z; r.m[2][3] = 0.0;
-            r.m[3][0] = 0.0; r.m[3][1] = 0.0; r.m[3][2] = 0.0; r.m[3][3] = 1.0;
-
-            return r;
-        }
-
-        /** Extracts the rotation / scaling part of the Matrix as a 3x3 matrix. 
-        @param m3x3 Destination Matrix3
-        */
-        inline void extract3x3Matrix(Matrix3& m3x3) const
-        {
-            m3x3.m[0][0] = m[0][0];
-            m3x3.m[0][1] = m[0][1];
-            m3x3.m[0][2] = m[0][2];
-            m3x3.m[1][0] = m[1][0];
-            m3x3.m[1][1] = m[1][1];
-            m3x3.m[1][2] = m[1][2];
-            m3x3.m[2][0] = m[2][0];
-            m3x3.m[2][1] = m[2][1];
-            m3x3.m[2][2] = m[2][2];
-
-        }
-
-        /** Determines if this matrix involves a scaling. */
-        inline bool hasScale() const
-        {
-            // check magnitude of column vectors (==local axes)
-            Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-            t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-            t = m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-
-            return false;
-        }
-
-        /** Determines if this matrix involves a negative scaling. */
-        inline bool hasNegativeScale() const
-        {
-            return determinant() < 0;
-        }
-
-        /** Extracts the rotation / scaling part as a quaternion from the Matrix.
-         */
-        inline Quaternion extractQuaternion() const
-        {
-          Matrix3 m3x3;
-          extract3x3Matrix(m3x3);
-          return Quaternion(m3x3);
-        }
-
-    static const Matrix4 ZERO;
-    static const Matrix4 ZEROAFFINE;
-    static const Matrix4 IDENTITY;
+        static const Matrix4 ZERO;
+        static const Matrix4 IDENTITY;
         /** Useful little matrix which takes 2D clipspace {-1, 1} to {0,1}
             and inverts the Y. */
         static const Matrix4 CLIPSPACE2DTOIMAGESPACE;
@@ -494,74 +397,68 @@ namespace Ogre
                 scalar*m[2][0], scalar*m[2][1], scalar*m[2][2], scalar*m[2][3],
                 scalar*m[3][0], scalar*m[3][1], scalar*m[3][2], scalar*m[3][3]);
         }
-
-        /** Function for writing to a stream.
-        */
-        inline _OgreExport friend std::ostream& operator <<
-            ( std::ostream& o, const Matrix4& mat )
-        {
-            o << "Matrix4(";
-            for (size_t i = 0; i < 4; ++i)
-            {
-                o << " row" << (unsigned)i << "{";
-                for(size_t j = 0; j < 4; ++j)
-                {
-                    o << mat[i][j] << " ";
-                }
-                o << "}";
-            }
-            o << ")";
-            return o;
-        }
         
         Matrix4 adjoint() const;
-        Real determinant() const;
         Matrix4 inverse() const;
+    };
 
-        /** Building a Matrix4 from orientation / scale / position.
-        @remarks
-            Transform is performed in the order scale, rotate, translation, i.e. translation is independent
-            of orientation axes, scale does not affect size of translation, rotation and scaling are always
-            centered on the origin.
-        */
-        void makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
+    /// Transform specialization for 3D Affine - encapsulating a 3x4 Matrix
+    class _OgreExport Affine3 : public TransformBase
+    {
+    public:
+        /// Do <b>NOT</b> initialize the matrix for efficiency.
+        Affine3() {}
 
-        /** Building an inverse Matrix4 from orientation / scale / position.
-        @remarks
-            As makeTransform except it build the inverse given the same data as makeTransform, so
-            performing -translation, -rotate, 1/scale in that order.
-        */
-        void makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
-
-        /** Decompose a Matrix4 to orientation / scale / position.
-        */
-        void decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const;
-
-        /** Check whether or not the matrix is affine matrix.
-            @remarks
-                An affine matrix is a 4x4 matrix with row 3 equal to (0, 0, 0, 1),
-                e.g. no projective coefficients.
-        */
-        inline bool isAffine(void) const
+        /// @copydoc TransformBase::makeTransform
+        Affine3(const Vector3& position, const Quaternion& orientation, const Vector3& scale = Vector3::UNIT_SCALE)
         {
-            return m[3][0] == 0 && m[3][1] == 0 && m[3][2] == 0 && m[3][3] == 1;
+            makeTransform(position, scale, orientation);
         }
 
-        /** Returns the inverse of the affine matrix.
-            @note
-                The matrix must be an affine matrix. @see Matrix4::isAffine.
-        */
-        Matrix4 inverseAffine(void) const;
-
-        /** Concatenate two affine matrices.
-            @note
-                The matrices must be affine matrix. @see Matrix4::isAffine.
-        */
-        inline Matrix4 concatenateAffine(const Matrix4 &m2) const
+        Affine3(
+            Real m00, Real m01, Real m02, Real m03,
+            Real m10, Real m11, Real m12, Real m13,
+            Real m20, Real m21, Real m22, Real m23)
         {
-            assert(isAffine() && m2.isAffine());
+            m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
+            m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
+            m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
+            m[3][0] = 0;   m[3][1] = 0;   m[3][2] = 0;   m[3][3] = 1;
+        }
 
-            return Matrix4(
+        /// extract the Affine part of a Matrix4
+        explicit Affine3(const Matrix4& mat)
+        {
+            m[0][0] = mat[0][0]; m[0][1] = mat[0][1]; m[0][2] = mat[0][2]; m[0][3] = mat[0][3];
+            m[1][0] = mat[1][0]; m[1][1] = mat[1][1]; m[1][2] = mat[1][2]; m[1][3] = mat[1][3];
+            m[2][0] = mat[2][0]; m[2][1] = mat[2][1]; m[2][2] = mat[2][2]; m[2][3] = mat[2][3];
+            m[3][0] = 0;         m[3][1] = 0;         m[3][2] = 0;         m[3][3] = 1;
+        }
+
+        Affine3& operator=(const Matrix3& mat3) {
+            set3x3Matrix(mat3);
+            return *this;
+        }
+
+        /** Tests 2 matrices for equality.
+        */
+        bool operator==(const Affine3& m2) const
+        {
+            if(
+                m[0][0] != m2.m[0][0] || m[0][1] != m2.m[0][1] || m[0][2] != m2.m[0][2] || m[0][3] != m2.m[0][3] ||
+                m[1][0] != m2.m[1][0] || m[1][1] != m2.m[1][1] || m[1][2] != m2.m[1][2] || m[1][3] != m2.m[1][3] ||
+                m[2][0] != m2.m[2][0] || m[2][1] != m2.m[2][1] || m[2][2] != m2.m[2][2] || m[2][3] != m2.m[2][3] )
+                return false;
+            return true;
+        }
+
+        bool operator!=(const Affine3& m2) const { return !(*this == m2); }
+
+        Affine3 inverse() const;
+
+        Affine3 operator*(const Affine3 &m2) const
+        {
+            return Affine3(
                 m[0][0] * m2.m[0][0] + m[0][1] * m2.m[1][0] + m[0][2] * m2.m[2][0],
                 m[0][0] * m2.m[0][1] + m[0][1] * m2.m[1][1] + m[0][2] * m2.m[2][1],
                 m[0][0] * m2.m[0][2] + m[0][1] * m2.m[1][2] + m[0][2] * m2.m[2][2],
@@ -575,65 +472,132 @@ namespace Ogre
                 m[2][0] * m2.m[0][0] + m[2][1] * m2.m[1][0] + m[2][2] * m2.m[2][0],
                 m[2][0] * m2.m[0][1] + m[2][1] * m2.m[1][1] + m[2][2] * m2.m[2][1],
                 m[2][0] * m2.m[0][2] + m[2][1] * m2.m[1][2] + m[2][2] * m2.m[2][2],
-                m[2][0] * m2.m[0][3] + m[2][1] * m2.m[1][3] + m[2][2] * m2.m[2][3] + m[2][3],
-
-                0, 0, 0, 1);
+                m[2][0] * m2.m[0][3] + m[2][1] * m2.m[1][3] + m[2][2] * m2.m[2][3] + m[2][3]);
         }
 
-        /** 3-D Vector transformation specially for an affine matrix.
-            @remarks
-                Transforms the given 3-D vector by the 3x3 submatrix, without
-                adding translation, as should be transformed directions and normals.
-            @note
-                The matrix must be an affine matrix. @see Matrix4::isAffine.
-        */
-        inline Vector3 transformDirectionAffine(const Vector3& v) const
+        Vector3 operator*(const Vector3& v) const
         {
-            assert(isAffine());
+            return Vector3(
+                    m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3],
+                    m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3],
+                    m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3]);
+        }
 
+        Vector4 operator*(const Vector4& v) const
+        {
+            return Vector4(
+                m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w,
+                m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
+                m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
+                v.w);
+        }
+
+        /**
+        Transforms the given 3-D vector by the 3x3 submatrix, without
+        adding translation, as should be transformed directions and normals.
+        */
+        Vector3 transformDirection(const Vector3& v) const
+        {
             return Vector3(
                     m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
                     m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
                     m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
         }
 
-        /** 3-D Vector transformation specially for an affine matrix.
-            @remarks
-                Transforms the given 3-D vector by the matrix, projecting the 
-                result back into <i>w</i> = 1.
-            @note
-                The matrix must be an affine matrix. @see Matrix4::isAffine.
+        /** Decompose to orientation / scale / position.
         */
-        inline Vector3 transformAffine(const Vector3& v) const
-        {
-            assert(isAffine());
+        void decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const;
 
-            return Vector3(
-                    m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3], 
-                    m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3],
-                    m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3]);
+        /// every Affine3 transform is also a _const_ Matrix4
+        operator const Matrix4&() const { return reinterpret_cast<const Matrix4&>(*this); }
+
+        using TransformBase::getTrans;
+
+        /** Gets a translation matrix.
+        */
+        static Affine3 getTrans( const Vector3& v )
+        {
+            return getTrans(v.x, v.y, v.z);
         }
 
-        /** 4-D Vector transformation specially for an affine matrix.
-            @note
-                The matrix must be an affine matrix. @see Matrix4::isAffine.
+        /** Gets a translation matrix - variation for not using a vector.
         */
-        inline Vector4 transformAffine(const Vector4& v) const
+        static Affine3 getTrans( Real t_x, Real t_y, Real t_z )
         {
-            assert(isAffine());
-
-            return Vector4(
-                m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w, 
-                m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
-                m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
-                v.w);
+            return Affine3(1, 0, 0, t_x,
+                           0, 1, 0, t_y,
+                           0, 0, 1, t_z);
         }
+
+        /** Gets a scale matrix.
+        */
+        static Affine3 getScale( const Vector3& v )
+        {
+            return getScale(v.x, v.y, v.z);
+        }
+
+        /** Gets a scale matrix - variation for not using a vector.
+        */
+        static Affine3 getScale( Real s_x, Real s_y, Real s_z )
+        {
+            return Affine3(s_x, 0, 0, 0,
+                           0, s_y, 0, 0,
+                           0, 0, s_z, 0);
+        }
+
+
+        static const Affine3 ZERO;
+        static const Affine3 IDENTITY;
     };
 
-    /* Removed from Vector4 and made a non-member here because otherwise
-       OgreMatrix4.h and OgreVector4.h have to try to include and inline each 
-       other, which frankly doesn't work ;)
-   */
+    inline Matrix4 operator*(const Matrix4 &m, const Matrix4 &m2)
+    {
+        Matrix4 r;
+        r[0][0] = m[0][0] * m2[0][0] + m[0][1] * m2[1][0] + m[0][2] * m2[2][0] + m[0][3] * m2[3][0];
+        r[0][1] = m[0][0] * m2[0][1] + m[0][1] * m2[1][1] + m[0][2] * m2[2][1] + m[0][3] * m2[3][1];
+        r[0][2] = m[0][0] * m2[0][2] + m[0][1] * m2[1][2] + m[0][2] * m2[2][2] + m[0][3] * m2[3][2];
+        r[0][3] = m[0][0] * m2[0][3] + m[0][1] * m2[1][3] + m[0][2] * m2[2][3] + m[0][3] * m2[3][3];
+
+        r[1][0] = m[1][0] * m2[0][0] + m[1][1] * m2[1][0] + m[1][2] * m2[2][0] + m[1][3] * m2[3][0];
+        r[1][1] = m[1][0] * m2[0][1] + m[1][1] * m2[1][1] + m[1][2] * m2[2][1] + m[1][3] * m2[3][1];
+        r[1][2] = m[1][0] * m2[0][2] + m[1][1] * m2[1][2] + m[1][2] * m2[2][2] + m[1][3] * m2[3][2];
+        r[1][3] = m[1][0] * m2[0][3] + m[1][1] * m2[1][3] + m[1][2] * m2[2][3] + m[1][3] * m2[3][3];
+
+        r[2][0] = m[2][0] * m2[0][0] + m[2][1] * m2[1][0] + m[2][2] * m2[2][0] + m[2][3] * m2[3][0];
+        r[2][1] = m[2][0] * m2[0][1] + m[2][1] * m2[1][1] + m[2][2] * m2[2][1] + m[2][3] * m2[3][1];
+        r[2][2] = m[2][0] * m2[0][2] + m[2][1] * m2[1][2] + m[2][2] * m2[2][2] + m[2][3] * m2[3][2];
+        r[2][3] = m[2][0] * m2[0][3] + m[2][1] * m2[1][3] + m[2][2] * m2[2][3] + m[2][3] * m2[3][3];
+
+        r[3][0] = m[3][0] * m2[0][0] + m[3][1] * m2[1][0] + m[3][2] * m2[2][0] + m[3][3] * m2[3][0];
+        r[3][1] = m[3][0] * m2[0][1] + m[3][1] * m2[1][1] + m[3][2] * m2[2][1] + m[3][3] * m2[3][1];
+        r[3][2] = m[3][0] * m2[0][2] + m[3][1] * m2[1][2] + m[3][2] * m2[2][2] + m[3][3] * m2[3][2];
+        r[3][3] = m[3][0] * m2[0][3] + m[3][1] * m2[1][3] + m[3][2] * m2[2][3] + m[3][3] * m2[3][3];
+
+        return r;
+    }
+
+    inline Plane operator * (const Matrix4& mat, const Plane& p)
+    {
+        Plane ret;
+        Matrix4 invTrans = mat.inverse().transpose();
+        Vector4 v4( p.normal.x, p.normal.y, p.normal.z, p.d );
+        v4 = invTrans * v4;
+        ret.normal.x = v4.x;
+        ret.normal.y = v4.y;
+        ret.normal.z = v4.z;
+        ret.d = v4.w / ret.normal.normalise();
+
+        return ret;
+    }
+
+    inline Matrix4 TransformBase::transpose() const
+    {
+        return Matrix4(m[0][0], m[1][0], m[2][0], m[3][0],
+                       m[0][1], m[1][1], m[2][1], m[3][1],
+                       m[0][2], m[1][2], m[2][2], m[3][2],
+                       m[0][3], m[1][3], m[2][3], m[3][3]);
+    }
+
     inline Vector4 operator * (const Vector4& v, const Matrix4& mat)
     {
         return Vector4(

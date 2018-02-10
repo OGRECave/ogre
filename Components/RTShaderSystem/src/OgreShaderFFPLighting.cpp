@@ -66,7 +66,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 	if (mLightParamsList.empty())
 		return;
 
-	const Matrix4& matView = source->getViewMatrix();
+	const Affine3& matView = source->getViewMatrix();
 	Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
 	unsigned int curSearchLightIndex = 0;
 
@@ -108,14 +108,14 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		case Light::LT_DIRECTIONAL:
 
 			// Update light direction.
-			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
+			vParameter = matView * srcLight->getAs4DVector(true);
 			curParams.mDirection->setGpuParameter(vParameter);
 			break;
 
 		case Light::LT_POINT:
 
 			// Update light position.
-			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
+			vParameter = matView * srcLight->getAs4DVector(true);
 			curParams.mPosition->setGpuParameter(vParameter);
 
 			// Update light attenuation parameters.
@@ -135,7 +135,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 
 			
 			// Update light position.
-			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
+			vParameter = matView * srcLight->getAs4DVector(true);
 			curParams.mPosition->setGpuParameter(vParameter);
 			
 							

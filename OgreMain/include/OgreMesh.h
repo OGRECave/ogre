@@ -789,8 +789,8 @@ namespace Ogre {
         @param indexMap
             The index map used to translate blend index to bone index.
         */
-        static void prepareMatricesForVertexBlend(const Matrix4** blendMatrices,
-            const Matrix4* boneMatrices, const IndexMap& indexMap);
+        static void prepareMatricesForVertexBlend(const Affine3** blendMatrices,
+            const Affine3* boneMatrices, const IndexMap& indexMap);
 
         /** Performs a software indexed vertex blend, of the kind used for
             skeletal animation although it can be used for other purposes. 
@@ -817,7 +817,7 @@ namespace Ogre {
         */
         static void softwareVertexBlend(const VertexData* sourceVertexData, 
             const VertexData* targetVertexData,
-            const Matrix4* const* blendMatrices, size_t numMatrices,
+            const Affine3* const* blendMatrices, size_t numMatrices,
             bool blendNormals);
 
         /** Performs a software vertex morph, of the kind used for

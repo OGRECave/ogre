@@ -89,7 +89,7 @@ namespace Ogre {
         return mManuallyControlled;
     }
     //---------------------------------------------------------------------
-    void Bone::_getOffsetTransform(Matrix4& m) const
+    void Bone::_getOffsetTransform(Affine3& m) const
     {
         // Combine scale with binding pose inverse scale,
         // NB just combine as equivalent axes, no shearing

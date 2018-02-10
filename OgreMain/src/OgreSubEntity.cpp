@@ -254,7 +254,7 @@ namespace Ogre {
         if (!mSubMesh->extremityPoints.empty())
         {
             const Vector3 &cp = cam->getDerivedPosition();
-            const Matrix4 &l2w = mParentEntity->_getParentNodeFullTransform();
+            const Affine3 &l2w = mParentEntity->_getParentNodeFullTransform();
             dist = std::numeric_limits<Real>::infinity();
             for (vector<Vector3>::type::const_iterator i = mSubMesh->extremityPoints.begin();
                  i != mSubMesh->extremityPoints.end (); ++i)

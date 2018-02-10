@@ -72,6 +72,7 @@ namespace Ogre {
 // Pre-declare classes
 // Allows use of pointers in header files without including individual .h
 // so decreases dependencies between files
+    class Affine3;
     class Angle;
     class AnimableValue;
     class Animation;

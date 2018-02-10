@@ -61,7 +61,7 @@ namespace Ogre {
         }
         
         /// Construct a dual quaternion from a transformation matrix
-        inline DualQuaternion(const Matrix4& rot)
+        inline DualQuaternion(const Affine3& rot)
         {
             this->fromTransformationMatrix(rot);
         }
@@ -158,10 +158,10 @@ namespace Ogre {
         void toRotationTranslation (Quaternion& q, Vector3& translation) const;
 
         /// Construct a dual quaternion from a 4x4 transformation matrix
-        void fromTransformationMatrix (const Matrix4& kTrans);
+        void fromTransformationMatrix (const Affine3& kTrans);
         
         /// Convert a dual quaternion to a 4x4 transformation matrix
-        void toTransformationMatrix (Matrix4& kTrans) const;
+        void toTransformationMatrix (Affine3& kTrans) const;
 
         Real w, x, y, z, dw, dx, dy, dz;
 

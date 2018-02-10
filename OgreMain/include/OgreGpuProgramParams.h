@@ -38,6 +38,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+    class TransformBase;
 
     /** \addtogroup Core
      *  @{
@@ -1847,7 +1848,7 @@ namespace Ogre {
             @param m The value to set
             @param numEntries Number of Matrix4 entries
         */
-        void _writeRawConstant(size_t physicalIndex, const Matrix4* m, size_t numEntries);
+        void _writeRawConstant(size_t physicalIndex, const TransformBase* m, size_t numEntries);
         /** Write a ColourValue parameter to the program.
             @note You can use these methods if you have already derived the physical
             constant buffer location, for a slight speed improvement over using

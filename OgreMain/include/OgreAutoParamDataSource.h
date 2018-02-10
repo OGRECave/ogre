@@ -59,15 +59,15 @@ namespace Ogre {
     {
     protected:
         const Light& getLight(size_t index) const;
-        mutable Matrix4 mWorldMatrix[256];
+        mutable Affine3 mWorldMatrix[256];
         mutable size_t mWorldMatrixCount;
-        mutable const Matrix4* mWorldMatrixArray;
-        mutable Matrix4 mWorldViewMatrix;
+        mutable const Affine3* mWorldMatrixArray;
+        mutable Affine3 mWorldViewMatrix;
         mutable Matrix4 mViewProjMatrix;
         mutable Matrix4 mWorldViewProjMatrix;
-        mutable Matrix4 mInverseWorldMatrix;
-        mutable Matrix4 mInverseWorldViewMatrix;
-        mutable Matrix4 mInverseViewMatrix;
+        mutable Affine3 mInverseWorldMatrix;
+        mutable Affine3 mInverseWorldViewMatrix;
+        mutable Affine3 mInverseViewMatrix;
         mutable Matrix4 mInverseTransposeWorldMatrix;
         mutable Matrix4 mInverseTransposeWorldViewMatrix;
         mutable Vector4 mCameraPosition;
@@ -77,7 +77,7 @@ namespace Ogre {
         mutable Matrix4 mSpotlightViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable Matrix4 mSpotlightWorldViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable Vector4 mShadowCamDepthRanges[OGRE_MAX_SIMULTANEOUS_LIGHTS];
-        mutable Matrix4 mViewMatrix;
+        mutable Affine3 mViewMatrix;
         mutable Matrix4 mProjectionMatrix;
         mutable Real mDirLightExtrusionDistance;
         mutable Vector4 mLodCameraPosition;
@@ -129,7 +129,7 @@ namespace Ogre {
         /** Updates the current renderable */
         void setCurrentRenderable(const Renderable* rend);
         /** Sets the world matrices, avoid query from renderable again */
-        void setWorldMatrices(const Matrix4* m, size_t count);
+        void setWorldMatrices(const Affine3* m, size_t count);
         /** Updates the current camera */
         void setCurrentCamera(const Camera* cam, bool useCameraRelative);
         /** Sets the light list that should be used, and it's base index from the global list */
@@ -152,17 +152,17 @@ namespace Ogre {
 		/** Returns the current bounded camera */
 		const Camera* getCurrentCamera() const;
 
-        const Matrix4& getWorldMatrix(void) const;
-        const Matrix4* getWorldMatrixArray(void) const;
+        const Affine3& getWorldMatrix(void) const;
+        const Affine3* getWorldMatrixArray(void) const;
         size_t getWorldMatrixCount(void) const;
-        const Matrix4& getViewMatrix(void) const;
+        const Affine3& getViewMatrix(void) const;
         const Matrix4& getViewProjectionMatrix(void) const;
         const Matrix4& getProjectionMatrix(void) const;
         const Matrix4& getWorldViewProjMatrix(void) const;
-        const Matrix4& getWorldViewMatrix(void) const;
-        const Matrix4& getInverseWorldMatrix(void) const;
-        const Matrix4& getInverseWorldViewMatrix(void) const;
-        const Matrix4& getInverseViewMatrix(void) const;
+        const Affine3& getWorldViewMatrix(void) const;
+        const Affine3& getInverseWorldMatrix(void) const;
+        const Affine3& getInverseWorldViewMatrix(void) const;
+        const Affine3& getInverseViewMatrix(void) const;
         const Matrix4& getInverseTransposeWorldMatrix(void) const;
         const Matrix4& getInverseTransposeWorldViewMatrix(void) const;
         const Vector4& getCameraPosition(void) const;

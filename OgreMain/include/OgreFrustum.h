@@ -116,7 +116,7 @@ namespace Ogre
         /// Pre-calced standard projection matrix
         mutable Matrix4 mProjMatrix;
         /// Pre-calced view matrix
-        mutable Matrix4 mViewMatrix;
+        mutable Affine3 mViewMatrix;
         /// Something's changed in the frustum shape?
         mutable bool mRecalcFrustum;
         /// Something re the view pos has changed
@@ -174,7 +174,7 @@ namespace Ogre
         /// Is this frustum to act as a reflection of itself?
         bool mReflect;
         /// Derived reflection matrix
-        mutable Matrix4 mReflectMatrix;
+        mutable Affine3 mReflectMatrix;
         /// Fixed reflection plane
         mutable Plane mReflectPlane;
         /// Pointer to a reflection plane (automatically updated)
@@ -363,7 +363,7 @@ namespace Ogre
 
         /** Gets the view matrix for this frustum. Mainly for use by OGRE internally.
         */
-        const Matrix4& getViewMatrix(void) const;
+        const Affine3& getViewMatrix(void) const;
 
         /** Calculate a view matrix for this frustum, relative to a potentially dynamic point. 
             Mainly for use by OGRE internally when using camera-relative rendering
@@ -384,11 +384,10 @@ namespace Ogre
         @param enable If @c true, the custom view matrix passed as the second 
             parameter will be used in preference to an auto calculated one. If
             false, the frustum will revert to auto calculating the view matrix.
-        @param viewMatrix The custom view matrix to use, the matrix must be an
-            affine matrix.
-        @see Frustum::setCustomProjectionMatrix, Matrix4::isAffine
+        @param viewMatrix The custom view matrix to use
+        @see Frustum::setCustomProjectionMatrix
         */
-        void setCustomViewMatrix(bool enable, const Matrix4& viewMatrix = Matrix4::IDENTITY);
+        void setCustomViewMatrix(bool enable, const Affine3& viewMatrix = Affine3::IDENTITY);
 
         /// Returns whether a custom view matrix is in use
         bool isCustomViewMatrixEnabled(void) const { return mCustomViewMatrix; }
@@ -578,7 +577,7 @@ namespace Ogre
         /// Returns whether this frustum is being reflected
         bool isReflected(void) const { return mReflect; }
         /// Returns the reflection matrix of the frustum if appropriate
-        const Matrix4& getReflectionMatrix(void) const { return mReflectMatrix; }
+        const Affine3& getReflectionMatrix(void) const { return mReflectMatrix; }
         /// Returns the reflection plane of the frustum if appropriate
         const Plane& getReflectionPlane(void) const { return mReflectPlane; }
 

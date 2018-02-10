@@ -298,7 +298,7 @@ namespace Ogre
     size_t BaseInstanceBatchVTF::convert3x4MatricesToDualQuaternions(float* matrices, size_t numOfMatrices, float* outDualQuaternions)
     {
         DualQuaternion dQuat;
-        Matrix4 matrix;
+        Affine3 matrix;
         size_t floatsWritten = 0;
 
         for (size_t m = 0; m < numOfMatrices; ++m)
@@ -310,11 +310,6 @@ namespace Ogre
                     matrix[i][b] = *matrices++;
                 }
             }
-
-            matrix[3][0] = 0;
-            matrix[3][1] = 0;
-            matrix[3][2] = 0;
-            matrix[3][3] = 1;
             
             dQuat.fromTransformationMatrix(matrix);
             
@@ -389,7 +384,7 @@ namespace Ogre
                 // 1. All entities sharing the same transformation will share the same unique number
                 // 2. "transform lookup number" will be numbered from 0 up to getMaxLookupTableInstances
                 uint16 lookupCounter = 0;
-                typedef map<Matrix4*,uint16>::type MapTransformId;
+                typedef map<Affine3*,uint16>::type MapTransformId;
                 MapTransformId transformToId;
                 InstancedEntityVec::const_iterator itEnt = mInstancedEntities.begin(),
                     itEntEnd = mInstancedEntities.end();
@@ -397,7 +392,7 @@ namespace Ogre
                 {
                     if ((*itEnt)->isInScene())
                     {
-                        Matrix4* transformUniqueId = (*itEnt)->mBoneMatrices;
+                        Affine3* transformUniqueId = (*itEnt)->mBoneMatrices;
                         MapTransformId::iterator itLu = transformToId.find(transformUniqueId);
                         if (itLu == transformToId.end())
                         {

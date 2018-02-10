@@ -551,7 +551,7 @@ namespace Ogre {
             ActiveBillboardList::iterator i, iend;
 
             iend = mActiveBillboards.end();
-            Matrix4 invWorld;
+            Affine3 invWorld;
             if (mWorldSpace && getParentSceneNode())
                 invWorld = getParentSceneNode()->_getFullTransform().inverse();
 
@@ -975,7 +975,7 @@ namespace Ogre {
 
         getWorldTransforms(&xworld);
 
-        sph.setCenter(xworld.transformAffine(bill.mPosition));
+        sph.setCenter(xworld * bill.mPosition);
 
         if (bill.mOwnDimensions)
         {

@@ -134,7 +134,7 @@ namespace Ogre {
         Real radius = 0.0f;
         mBillboardSet->beginBillboards(currentParticles.size());
         Billboard bb;
-        Matrix4 invWorld;
+        Affine3 invWorld;
 
         if (mBillboardSet->getBillboardsInWorldSpace() && mBillboardSet->getParentSceneNode())
             invWorld = mBillboardSet->getParentSceneNode()->_getFullTransform().inverse();

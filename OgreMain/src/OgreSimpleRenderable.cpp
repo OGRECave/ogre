@@ -34,7 +34,7 @@ namespace Ogre {
 
     SimpleRenderable::SimpleRenderable()
     : MovableObject()
-    , mTransform(Matrix4::IDENTITY)
+    , mTransform(Affine3::IDENTITY)
     , mMaterial(MaterialManager::getSingleton().getDefaultMaterial())
     , mParentSceneManager(NULL)
     , mCamera(NULL)
@@ -48,7 +48,7 @@ namespace Ogre {
 
     SimpleRenderable::SimpleRenderable(const String& name)
     : MovableObject(name)
-    , mTransform(Matrix4::IDENTITY)
+    , mTransform(Affine3::IDENTITY)
     , mMaterial(MaterialManager::getSingleton().getDefaultMaterial())
     , mParentSceneManager(NULL)
     , mCamera(NULL)
@@ -88,7 +88,7 @@ namespace Ogre {
         mRenderOp = rend;
     }
 
-    void SimpleRenderable::setTransform( const Matrix4& xform )
+    void SimpleRenderable::setTransform( const Affine3& xform )
     {
         mTransform = xform;
     }

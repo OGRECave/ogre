@@ -299,7 +299,7 @@ namespace Ogre
 
                     if (useMatrixLookup)
                     {
-                        const Matrix4& mat =  entity->_getParentNodeFullTransform();
+                        const Affine3& mat =  entity->_getParentNodeFullTransform();
                         *(thisVec)     = static_cast<float>( mat[0][0] );
                         *(thisVec + 1) = static_cast<float>( mat[0][1] );
                         *(thisVec + 2) = static_cast<float>( mat[0][2] );

@@ -274,7 +274,7 @@ namespace Ogre
         /// Flag indicating whether or not derived values are up-to-date
         mutable bool mDerivedUpToDate;
         /// Previous world transform
-        mutable Matrix4 mPrevWorldTransform;
+        mutable Affine3 mPrevWorldTransform;
         /// Flag defining if portal is enabled or disabled.
         bool mEnabled;
         /// Cache of portal's capsule.

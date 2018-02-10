@@ -873,7 +873,7 @@ namespace Ogre {
                 // node transform, so reverse transform back since we're expected to 
                 // provide a local AABB
                 AxisAlignedBox newAABB(mWorldAABB);
-                newAABB.transformAffine(mParentNode->_getFullTransform().inverseAffine());
+                newAABB.transform(mParentNode->_getFullTransform().inverse());
 
                 // Merge calculated box with current AABB to preserve any user-set AABB
                 mAABB.merge(newAABB);

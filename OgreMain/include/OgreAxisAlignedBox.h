@@ -500,13 +500,9 @@ namespace Ogre {
         extents are mapped back onto the axes to produce another
         AABB. Useful when you have a local AABB for an object which
         is then transformed.
-        @note
-        The matrix must be an affine matrix. @see Matrix4::isAffine.
         */
-        void transformAffine(const Matrix4& m)
+        void transform(const Affine3& m)
         {
-            assert(m.isAffine());
-
             // Do nothing if current null or infinite
             if ( mExtent != EXTENT_FINITE )
                 return;
@@ -514,7 +510,7 @@ namespace Ogre {
             Vector3 centre = getCenter();
             Vector3 halfSize = getHalfSize();
 
-            Vector3 newCentre = m.transformAffine(centre);
+            Vector3 newCentre = m * centre;
             Vector3 newHalfSize(
                 Math::Abs(m[0][0]) * halfSize.x + Math::Abs(m[0][1]) * halfSize.y + Math::Abs(m[0][2]) * halfSize.z, 
                 Math::Abs(m[1][0]) * halfSize.x + Math::Abs(m[1][1]) * halfSize.y + Math::Abs(m[1][2]) * halfSize.z,

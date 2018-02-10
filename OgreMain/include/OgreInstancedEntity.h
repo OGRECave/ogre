@@ -90,8 +90,8 @@ namespace Ogre
 
         AnimationStateSet *mAnimationState;
         SkeletonInstance *mSkeletonInstance;
-        Matrix4 *mBoneMatrices;  //Local space
-        Matrix4 *mBoneWorldMatrices; //World space
+        Affine3 *mBoneMatrices;  //Local space
+        Affine3 *mBoneWorldMatrices; //World space
         unsigned long mFrameAnimationLastUpdated;
 
         InstancedEntity* mSharedTransformEntity;    //When not null, another InstancedEntity controls the skeleton
@@ -119,7 +119,7 @@ namespace Ogre
         /// The maximum absolute scale for all dimension
         Real mMaxScaleLocal;
         /// Full world transform
-        Matrix4 mFullLocalTransform;
+        Affine3 mFullLocalTransform;
         /// Tells if mFullTransform needs an updated
         bool mNeedTransformUpdate;
         /// Tells if the animation world transform needs an update
@@ -255,10 +255,10 @@ namespace Ogre
         void setInUse(bool used);
 
         /** Returns the world transform of the instanced entity including local transform */
-        virtual const Matrix4& _getParentNodeFullTransform(void) const { 
+        virtual const Affine3& _getParentNodeFullTransform(void) const {
             assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
             return mUseLocalTransform ? mFullLocalTransform :
-                mParentNode ? mParentNode->_getFullTransform() : Matrix4::IDENTITY;
+                mParentNode ? mParentNode->_getFullTransform() : Affine3::IDENTITY;
         }
 
         /** Returns the derived position of the instanced entity including local transform */

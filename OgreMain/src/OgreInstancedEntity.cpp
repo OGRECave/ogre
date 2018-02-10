@@ -168,7 +168,7 @@ namespace Ogre
             }
             else
             {
-                Matrix4* matrices = mBatchOwner->useBoneWorldMatrices() ? mBoneWorldMatrices : mBoneMatrices;
+                Affine3* matrices = mBatchOwner->useBoneWorldMatrices() ? mBoneWorldMatrices : mBoneMatrices;
                 const Mesh::IndexMap *indexMap = mBatchOwner->_getIndexToBoneMap();
                 Mesh::IndexMap::const_iterator itor = indexMap->begin();
                 Mesh::IndexMap::const_iterator end  = indexMap->end();
@@ -184,7 +184,7 @@ namespace Ogre
             if( mSkeletonInstance )
                 retVal = mBatchOwner->_getIndexToBoneMap()->size();
 
-            std::fill_n( xform, retVal, Matrix4::ZEROAFFINE );
+            std::fill_n( xform, retVal, Matrix4::ZERO );
         }
 
         return retVal;
@@ -198,8 +198,8 @@ namespace Ogre
         {
             if( !mSkeletonInstance )
             {
-                const Matrix4& mat = mBatchOwner->useBoneWorldMatrices() ? 
-                    _getParentNodeFullTransform() : Matrix4::IDENTITY;
+                const Affine3& mat = mBatchOwner->useBoneWorldMatrices() ?
+                    _getParentNodeFullTransform() : Affine3::IDENTITY;
                 for( int i=0; i<3; ++i )
                 {
                     Real const *row = mat[i];
@@ -211,7 +211,7 @@ namespace Ogre
             }
             else
             {
-                Matrix4* matrices = mBatchOwner->useBoneWorldMatrices() ? mBoneWorldMatrices : mBoneMatrices;
+                Affine3* matrices = mBatchOwner->useBoneWorldMatrices() ? mBoneWorldMatrices : mBoneMatrices;
 
                 const Mesh::IndexMap *indexMap = mBatchOwner->_getIndexToBoneMap();
                 Mesh::IndexMap::const_iterator itor = indexMap->begin();
@@ -219,7 +219,7 @@ namespace Ogre
                 
                 while( itor != end )
                 {
-                    const Matrix4 &mat = matrices[*itor++];
+                    const Affine3 &mat = matrices[*itor++];
                     for( int i=0; i<3; ++i )
                     {
                         Real const *row = mat[i];
@@ -271,12 +271,12 @@ namespace Ogre
             mSkeletonInstance = OGRE_NEW SkeletonInstance( mBatchOwner->_getMeshRef()->getSkeleton() );
             mSkeletonInstance->load();
 
-            mBoneMatrices       = static_cast<Matrix4*>(OGRE_MALLOC_SIMD( sizeof(Matrix4) *
+            mBoneMatrices       = static_cast<Affine3*>(OGRE_MALLOC_SIMD( sizeof(Affine3) *
                                                                     mSkeletonInstance->getNumBones(),
                                                                     MEMCATEGORY_ANIMATION));
             if (mBatchOwner->useBoneWorldMatrices())
             {
-                mBoneWorldMatrices  = static_cast<Matrix4*>(OGRE_MALLOC_SIMD( sizeof(Matrix4) *
+                mBoneWorldMatrices  = static_cast<Affine3*>(OGRE_MALLOC_SIMD( sizeof(Affine3) *
                                                                     mSkeletonInstance->getNumBones(),
                                                                     MEMCATEGORY_ANIMATION));
             }

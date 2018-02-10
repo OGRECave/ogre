@@ -97,7 +97,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void DualQuaternion::fromTransformationMatrix (const Matrix4& kTrans)
+    void DualQuaternion::fromTransformationMatrix (const Affine3& kTrans)
     {
         Vector3 pos;
         Vector3 scale;
@@ -108,7 +108,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void DualQuaternion::toTransformationMatrix (Matrix4& kTrans) const
+    void DualQuaternion::toTransformationMatrix (Affine3& kTrans) const
     {
         Vector3 pos;
         Quaternion rot;
