@@ -66,6 +66,7 @@ namespace Ogre
         InstantRadiosity *mInstantRadiosity;
         IrradianceVolume *mIrradianceVolume;
         ParallaxCorrectedCubemap *mParallaxCorrectedCubemap;
+        Matrix4 mSceneComponentTransform;
         String  mDefaultPccWorkspaceName;
 
         LightArray mVplLights;
@@ -167,6 +168,17 @@ namespace Ogre
             Leave nullptr for none.
         */
         void setParentlessRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot );
+
+        /** Set a 4x4 matrix to apply a transformation to all the PCC probes during
+            import process. Also affects Areas of Interest for Instant Radiosity.
+            This is useful if you need to rotate or translate a scene.
+        @remarks
+            While any affine matrix will work; the best results are achieved if the matrix
+            is orthogonal (e.g. +- 90° and +- 180° changes)
+        @param transform
+            Must be affine. Default is identity matrix.
+        */
+        void setSceneComponentTransform( const Matrix4 &transform );
 
         /**
         @param outJson
