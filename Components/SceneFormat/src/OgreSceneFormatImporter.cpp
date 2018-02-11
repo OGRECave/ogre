@@ -62,6 +62,7 @@ namespace Ogre
         mInstantRadiosity( 0 ),
         mIrradianceVolume( 0 ),
         mParallaxCorrectedCubemap( 0 ),
+        mSceneComponentTransform( Matrix4::IDENTITY ),
         mDefaultPccWorkspaceName( defaultPccWorkspaceName )
     {
         memset( mRootNodes, 0, sizeof(mRootNodes) );
@@ -790,8 +791,9 @@ namespace Ogre
                     aoi[0].IsArray() &&
                     aoi[1].IsUint() )
                 {
-                    const Aabb aabb = decodeAabbArray( aoi[0], Aabb::BOX_ZERO );
+                    Aabb aabb = decodeAabbArray( aoi[0], Aabb::BOX_ZERO );
                     const float sphereRadius = decodeFloat( aoi[1] );
+                    aabb.transformAffine( mSceneComponentTransform );
                     InstantRadiosity::AreaOfInterest areaOfInterest( aabb, sphereRadius );
                     mInstantRadiosity->mAoI.push_back( areaOfInterest );
                 }
@@ -953,7 +955,6 @@ namespace Ogre
         tmpIt = pccValue.FindMember( "mask" );
         if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
             mParallaxCorrectedCubemap->mMask = tmpIt->value.GetUint();
-
         tmpIt = pccValue.FindMember( "probes" );
         if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsArray() )
         {
@@ -1024,6 +1025,12 @@ namespace Ogre
                 tmpIt = jsonProbe.FindMember( "probe_shape" );
                 if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
                     probeShape = decodeAabbArray( tmpIt->value, Aabb::BOX_ZERO );
+
+                cameraPos = mSceneComponentTransform * cameraPos;
+                probeArea.transformAffine( mSceneComponentTransform );
+                areaInnerRegion = mSceneComponentTransform * areaInnerRegion;
+                //orientation = pccTransform3x3 * orientation;
+                probeShape.transformAffine( mSceneComponentTransform );
 
                 probe->set( cameraPos, probeArea, areaInnerRegion, orientation, probeShape );
 
@@ -1179,6 +1186,11 @@ namespace Ogre
     {
         mParentlessRootNodes[SCENE_DYNAMIC] = dynamicRoot;
         mParentlessRootNodes[SCENE_STATIC] = staticRoot;
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::setSceneComponentTransform( const Matrix4 &transform )
+    {
+        mSceneComponentTransform = transform;
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const char *jsonString,
