@@ -2590,8 +2590,7 @@ namespace Ogre {
         // Set spotlight direction
         if (lt->getType() == Light::LT_SPOTLIGHT)
         {
-            vec = lt->getDerivedDirection();
-            vec.w = 0.0;
+            vec = Vector4(lt->getDerivedDirection(), 0.0);
 
             // Must convert to float*
             float tmp2[4] = {static_cast<float>(vec.x),

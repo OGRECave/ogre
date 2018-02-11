@@ -456,13 +456,13 @@ namespace Ogre {
         {
             if (mCameraRelativeRendering)
             {
-                mCameraPositionObjectSpace = 
-                    getInverseWorldMatrix().transformAffine(Vector3::ZERO);
+                mCameraPositionObjectSpace =
+                    Vector4(getInverseWorldMatrix().transformAffine(Vector3::ZERO));
             }
             else
             {
-                mCameraPositionObjectSpace = 
-                    getInverseWorldMatrix().transformAffine(mCurrentCamera->getDerivedPosition());
+                mCameraPositionObjectSpace = Vector4(
+                    getInverseWorldMatrix().transformAffine(mCurrentCamera->getDerivedPosition()));
             }
             mCameraPositionObjectSpaceDirty = false;
         }
@@ -493,14 +493,14 @@ namespace Ogre {
         {
             if (mCameraRelativeRendering)
             {
-                mLodCameraPositionObjectSpace = 
-                    getInverseWorldMatrix().transformAffine(mCurrentCamera->getLodCamera()->getDerivedPosition()
-                        - mCameraRelativePosition);
+                mLodCameraPositionObjectSpace = Vector4(getInverseWorldMatrix().transformAffine(
+                    mCurrentCamera->getLodCamera()->getDerivedPosition() -
+                    mCameraRelativePosition));
             }
             else
             {
-                mLodCameraPositionObjectSpace = 
-                    getInverseWorldMatrix().transformAffine(mCurrentCamera->getLodCamera()->getDerivedPosition());
+                mLodCameraPositionObjectSpace = Vector4(getInverseWorldMatrix().transformAffine(
+                    mCurrentCamera->getLodCamera()->getDerivedPosition()));
             }
             mLodCameraPositionObjectSpaceDirty = false;
         }

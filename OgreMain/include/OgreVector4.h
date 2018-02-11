@@ -77,11 +77,6 @@ namespace Ogre
             w = (Real)afCoordinate[3];
         }
 
-        inline explicit Vector4( Real* const r )
-            : x( r[0] ), y( r[1] ), z( r[2] ), w( r[3] )
-        {
-        }
-
         inline explicit Vector4( const Real scaler )
             : x( scaler )
             , y( scaler )
@@ -95,6 +90,11 @@ namespace Ogre
         {
         }
 
+        inline explicit Vector4(const Vector3& rhs, Real fW)
+            : x(rhs.x), y(rhs.y), z(rhs.z), w(fW)
+        {
+        }
+
         /** Swizzle-like narrowing operations
         */
         inline Vector3 xyz() const
@@ -104,16 +104,6 @@ namespace Ogre
         inline Vector2 xy() const
         {
             return Vector2(x, y);
-        }
-
-        /** Exchange the contents of this vector with another. 
-        */
-        inline void swap(Vector4& other)
-        {
-            std::swap(x, other.x);
-            std::swap(y, other.y);
-            std::swap(z, other.z);
-            std::swap(w, other.w);
         }
     
         inline Real operator [] ( const size_t i ) const
@@ -141,29 +131,6 @@ namespace Ogre
             return &x;
         }
 
-        /** Assigns the value of the other vector.
-            @param
-                rkVector The other vector
-        */
-        inline Vector4& operator = ( const Vector4& rkVector )
-        {
-            x = rkVector.x;
-            y = rkVector.y;
-            z = rkVector.z;
-            w = rkVector.w;
-
-            return *this;
-        }
-
-        inline Vector4& operator = ( const Real fScalar)
-        {
-            x = fScalar;
-            y = fScalar;
-            z = fScalar;
-            w = fScalar;
-            return *this;
-        }
-
         inline bool operator == ( const Vector4& rkVector ) const
         {
             return ( x == rkVector.x &&
@@ -178,15 +145,6 @@ namespace Ogre
                 y != rkVector.y ||
                 z != rkVector.z ||
                 w != rkVector.w );
-        }
-
-        inline Vector4& operator = (const Vector3& rhs)
-        {
-            x = rhs.x;
-            y = rhs.y;
-            z = rhs.z;
-            w = 1.0f;
-            return *this;
         }
 
         // arithmetic operations

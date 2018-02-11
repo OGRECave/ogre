@@ -342,18 +342,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Vector4 Light::getAs4DVector(bool cameraRelativeIfSet) const
     {
-        Vector4 ret;
         if (mLightType == Light::LT_DIRECTIONAL)
         {
-            ret = -(getDerivedDirection()); // negate direction as 'position'
-            ret.w = 0.0; // infinite distance
+            return Vector4(-getDerivedDirection(), // negate direction as 'position'
+                           0.0);                   // infinite distance
         }   
         else
         {
-            ret = getDerivedPosition(cameraRelativeIfSet);
-            ret.w = 1.0;
+            return Vector4(getDerivedPosition(cameraRelativeIfSet), 1.0);
         }
-        return ret;
     }
     //-----------------------------------------------------------------------
     const PlaneBoundedVolume& Light::_getNearClipVolume(const Camera* const cam) const

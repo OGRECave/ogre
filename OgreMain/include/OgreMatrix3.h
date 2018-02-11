@@ -96,21 +96,6 @@ namespace Ogre
             m[2][2] = fEntry22;
         }
 
-        /** Exchange the contents of this matrix with another. 
-        */
-        inline void swap(Matrix3& other)
-        {
-            std::swap(m[0][0], other.m[0][0]);
-            std::swap(m[0][1], other.m[0][1]);
-            std::swap(m[0][2], other.m[0][2]);
-            std::swap(m[1][0], other.m[1][0]);
-            std::swap(m[1][1], other.m[1][1]);
-            std::swap(m[1][2], other.m[1][2]);
-            std::swap(m[2][0], other.m[2][0]);
-            std::swap(m[2][1], other.m[2][1]);
-            std::swap(m[2][2], other.m[2][2]);
-        }
-
         /// Member access, allows use of construct mat[r][c]
         inline const Real* operator[] (size_t iRow) const
         {
@@ -131,13 +116,6 @@ namespace Ogre
         Vector3 GetColumn (size_t iCol) const;
         void SetColumn(size_t iCol, const Vector3& vec);
         void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
-
-        /// Assignment and comparison
-        inline Matrix3& operator= (const Matrix3& rkMatrix)
-        {
-            memcpy(m,rkMatrix.m,9*sizeof(Real));
-            return *this;
-        }
 
         /** Tests 2 matrices for equality.
          */

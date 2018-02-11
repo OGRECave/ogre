@@ -84,19 +84,6 @@ namespace Ogre
             y = (Real)afCoordinate[1];
         }
 
-        inline explicit Vector2( Real* const r )
-            : x( r[0] ), y( r[1] )
-        {
-        }
-
-        /** Exchange the contents of this vector with another. 
-        */
-        inline void swap(Vector2& other)
-        {
-            std::swap(x, other.x);
-            std::swap(y, other.y);
-        }
-
         inline Real operator [] ( const size_t i ) const
         {
             assert( i < 2 );
@@ -120,26 +107,6 @@ namespace Ogre
         inline const Real* ptr() const
         {
             return &x;
-        }
-
-        /** Assigns the value of the other vector.
-            @param
-                rkVector The other vector
-        */
-        inline Vector2& operator = ( const Vector2& rkVector )
-        {
-            x = rkVector.x;
-            y = rkVector.y;
-
-            return *this;
-        }
-
-        inline Vector2& operator = ( const Real fScalar)
-        {
-            x = fScalar;
-            y = fScalar;
-
-            return *this;
         }
 
         inline bool operator == ( const Vector2& rkVector ) const
