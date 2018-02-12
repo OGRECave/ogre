@@ -1213,9 +1213,11 @@ namespace Ogre
     {
         ResourceGroupManager &resourceGroupManager = ResourceGroupManager::getSingleton();
         resourceGroupManager.addResourceLocation( folderPath, "FileSystem", "SceneFormatImporter" );
-        resourceGroupManager.addResourceLocation( folderPath + "/v2",
+        resourceGroupManager.addResourceLocation( folderPath + "/v2/",
                                                   "FileSystem", "SceneFormatImporter" );
-        resourceGroupManager.addResourceLocation( folderPath + "/v1",
+        resourceGroupManager.addResourceLocation( folderPath + "/v1/",
+                                                  "FileSystem", "SceneFormatImporter" );
+        resourceGroupManager.addResourceLocation( folderPath + "/textures/",
                                                   "FileSystem", "SceneFormatImporter" );
 
         DataStreamPtr stream = resourceGroupManager.openResource( "scene.json", "SceneFormatImporter" );
@@ -1254,9 +1256,10 @@ namespace Ogre
 
             importScene( stream->getName(), &fileData[0], importFlags );
 
+            resourceGroupManager.removeResourceLocation( folderPath + "/textures/", "SceneFormatImporter" );
+            resourceGroupManager.removeResourceLocation( folderPath + "/v2/", "SceneFormatImporter" );
+            resourceGroupManager.removeResourceLocation( folderPath + "/v1/", "SceneFormatImporter" );
             resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );
-            resourceGroupManager.removeResourceLocation( folderPath + "/v2", "SceneFormatImporter" );
-            resourceGroupManager.removeResourceLocation( folderPath + "/v1", "SceneFormatImporter" );
         }
     }
     //-----------------------------------------------------------------------------------

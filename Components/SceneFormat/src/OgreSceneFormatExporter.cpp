@@ -908,6 +908,9 @@ namespace Ogre
 
         if( exportFlags & (SceneFlags::TexturesOitd|SceneFlags::TexturesOriginal)  )
         {
+            const String textureFolder = folderPath + "/textures/";
+            FileSystemLayer::createDirectory( textureFolder );
+
             set<String>::type savedTextures;
             HlmsManager *hlmsManager = mRoot->getHlmsManager();
             for( size_t i=HLMS_LOW_LEVEL + 1u; i<HLMS_MAX; ++i )
@@ -915,10 +918,8 @@ namespace Ogre
                 Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
                 if( hlms )
                 {
-//                    const String materialPath = folderPath + "/material" +
-//                                                StringConverter::toString( i ) + ".json";
                     hlms->saveAllTexturesFromDatablocks(
-                                folderPath, savedTextures,
+                                textureFolder, savedTextures,
                                 (exportFlags & SceneFlags::TexturesOitd) != 0,
                                 (exportFlags & SceneFlags::TexturesOriginal) != 0,
                                 mListener );

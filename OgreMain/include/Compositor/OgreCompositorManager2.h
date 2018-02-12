@@ -180,6 +180,9 @@ namespace Ogre
         /// Removes the node definition with the given name. Throws if not found
         void removeNodeDefinition( IdString nodeDefName );
 
+        /// Returns true if a shadow node definition with the given name exists
+        bool hasShadowNodeDefinition( IdString nodeDefName ) const;
+
         /// Returns the node definition with the given name. Throws if not found
         const CompositorShadowNodeDef* getShadowNodeDefinition( IdString nodeDefName ) const;
 
