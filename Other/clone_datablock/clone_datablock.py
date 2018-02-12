@@ -180,7 +180,8 @@ u"""
                 if classmember[0] == "mSamplerblocks":
                     file.write(
 u"""            datablockImpl->{membername}[i] = {membername}[i];
-            mCreator->getHlmsManager()->addReference( datablockImpl->{membername}[i] );
+            if( datablockImpl->{membername}[i] )
+                mCreator->getHlmsManager()->addReference( datablockImpl->{membername}[i] );
         }}
 """.format(membername = classmember[0])
                     )

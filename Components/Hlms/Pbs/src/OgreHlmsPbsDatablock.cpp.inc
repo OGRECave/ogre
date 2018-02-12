@@ -122,7 +122,8 @@ namespace Ogre
         for( size_t i=0; i<15; ++i )
         {
             datablockImpl->mSamplerblocks[i] = mSamplerblocks[i];
-            mCreator->getHlmsManager()->addReference( datablockImpl->mSamplerblocks[i] );
+            if( datablockImpl->mSamplerblocks[i] )
+                mCreator->getHlmsManager()->addReference( datablockImpl->mSamplerblocks[i] );
         }
     }
 }
