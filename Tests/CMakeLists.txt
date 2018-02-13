@@ -36,6 +36,7 @@ if (OGRE_BUILD_TESTS)
             -DCMAKE_INSTALL_PREFIX=${GTEST_INSTALL_DIR}
             -DBUILD_SHARED_LIBS=${GTEST_SHARED}
             -G ${CMAKE_GENERATOR}
+            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
             ${CROSS})
 
     # unit tests are go!
