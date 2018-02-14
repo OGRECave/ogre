@@ -200,7 +200,7 @@ namespace Ogre {
             }
             if ((opt = miscParams->find("externalGLContext")) != end)
             {
-                mGlrc = (HGLRC)StringConverter::parseUnsignedLong(opt->second);
+                mGlrc = (HGLRC)StringConverter::parseSizeT(opt->second);
 
                 if( mGlrc )
                 {
@@ -247,7 +247,7 @@ namespace Ogre {
             
             // monitor handle
             if ((opt = miscParams->find("monitorHandle")) != end)
-                hMonitor = (HMONITOR)StringConverter::parseInt(opt->second);
+                hMonitor = (HMONITOR)StringConverter::parseSizeT(opt->second);
 
             // enable double click messages
             if ((opt = miscParams->find("enableDoubleClick")) != end)
