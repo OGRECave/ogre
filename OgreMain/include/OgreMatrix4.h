@@ -269,94 +269,6 @@ namespace Ogre
 
         Matrix4 concatenate(const Matrix4& m2) const { return *this * m2; }
 
-        /** Vector transformation using '*'.
-            @remarks
-                Transforms the given 3-D vector by the matrix, projecting the 
-                result back into <i>w</i> = 1.
-            @note
-                This means that the initial <i>w</i> is considered to be 1.0,
-                and then all the tree elements of the resulting 3-D vector are
-                divided by the resulting <i>w</i>.
-        */
-        inline Vector3 operator * ( const Vector3 &v ) const
-        {
-            Vector3 r;
-
-            Real fInvW = 1.0f / ( m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] );
-
-            r.x = ( m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] ) * fInvW;
-            r.y = ( m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] ) * fInvW;
-            r.z = ( m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] ) * fInvW;
-
-            return r;
-        }
-        inline Vector4 operator * (const Vector4& v) const
-        {
-            return Vector4(
-                m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w, 
-                m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
-                m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
-                m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w
-                );
-        }
-
-        /** Matrix addition.
-        */
-        inline Matrix4 operator + ( const Matrix4 &m2 ) const
-        {
-            Matrix4 r;
-
-            r.m[0][0] = m[0][0] + m2.m[0][0];
-            r.m[0][1] = m[0][1] + m2.m[0][1];
-            r.m[0][2] = m[0][2] + m2.m[0][2];
-            r.m[0][3] = m[0][3] + m2.m[0][3];
-
-            r.m[1][0] = m[1][0] + m2.m[1][0];
-            r.m[1][1] = m[1][1] + m2.m[1][1];
-            r.m[1][2] = m[1][2] + m2.m[1][2];
-            r.m[1][3] = m[1][3] + m2.m[1][3];
-
-            r.m[2][0] = m[2][0] + m2.m[2][0];
-            r.m[2][1] = m[2][1] + m2.m[2][1];
-            r.m[2][2] = m[2][2] + m2.m[2][2];
-            r.m[2][3] = m[2][3] + m2.m[2][3];
-
-            r.m[3][0] = m[3][0] + m2.m[3][0];
-            r.m[3][1] = m[3][1] + m2.m[3][1];
-            r.m[3][2] = m[3][2] + m2.m[3][2];
-            r.m[3][3] = m[3][3] + m2.m[3][3];
-
-            return r;
-        }
-
-        /** Matrix subtraction.
-        */
-        inline Matrix4 operator - ( const Matrix4 &m2 ) const
-        {
-            Matrix4 r;
-            r.m[0][0] = m[0][0] - m2.m[0][0];
-            r.m[0][1] = m[0][1] - m2.m[0][1];
-            r.m[0][2] = m[0][2] - m2.m[0][2];
-            r.m[0][3] = m[0][3] - m2.m[0][3];
-
-            r.m[1][0] = m[1][0] - m2.m[1][0];
-            r.m[1][1] = m[1][1] - m2.m[1][1];
-            r.m[1][2] = m[1][2] - m2.m[1][2];
-            r.m[1][3] = m[1][3] - m2.m[1][3];
-
-            r.m[2][0] = m[2][0] - m2.m[2][0];
-            r.m[2][1] = m[2][1] - m2.m[2][1];
-            r.m[2][2] = m[2][2] - m2.m[2][2];
-            r.m[2][3] = m[2][3] - m2.m[2][3];
-
-            r.m[3][0] = m[3][0] - m2.m[3][0];
-            r.m[3][1] = m[3][1] - m2.m[3][1];
-            r.m[3][2] = m[3][2] - m2.m[3][2];
-            r.m[3][3] = m[3][3] - m2.m[3][3];
-
-            return r;
-        }
-
         /** Tests 2 matrices for equality.
         */
         inline bool operator == ( const Matrix4& m2 ) const
@@ -456,42 +368,6 @@ namespace Ogre
 
         Affine3 inverse() const;
 
-        Affine3 operator*(const Affine3 &m2) const
-        {
-            return Affine3(
-                m[0][0] * m2.m[0][0] + m[0][1] * m2.m[1][0] + m[0][2] * m2.m[2][0],
-                m[0][0] * m2.m[0][1] + m[0][1] * m2.m[1][1] + m[0][2] * m2.m[2][1],
-                m[0][0] * m2.m[0][2] + m[0][1] * m2.m[1][2] + m[0][2] * m2.m[2][2],
-                m[0][0] * m2.m[0][3] + m[0][1] * m2.m[1][3] + m[0][2] * m2.m[2][3] + m[0][3],
-
-                m[1][0] * m2.m[0][0] + m[1][1] * m2.m[1][0] + m[1][2] * m2.m[2][0],
-                m[1][0] * m2.m[0][1] + m[1][1] * m2.m[1][1] + m[1][2] * m2.m[2][1],
-                m[1][0] * m2.m[0][2] + m[1][1] * m2.m[1][2] + m[1][2] * m2.m[2][2],
-                m[1][0] * m2.m[0][3] + m[1][1] * m2.m[1][3] + m[1][2] * m2.m[2][3] + m[1][3],
-
-                m[2][0] * m2.m[0][0] + m[2][1] * m2.m[1][0] + m[2][2] * m2.m[2][0],
-                m[2][0] * m2.m[0][1] + m[2][1] * m2.m[1][1] + m[2][2] * m2.m[2][1],
-                m[2][0] * m2.m[0][2] + m[2][1] * m2.m[1][2] + m[2][2] * m2.m[2][2],
-                m[2][0] * m2.m[0][3] + m[2][1] * m2.m[1][3] + m[2][2] * m2.m[2][3] + m[2][3]);
-        }
-
-        Vector3 operator*(const Vector3& v) const
-        {
-            return Vector3(
-                    m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3],
-                    m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3],
-                    m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3]);
-        }
-
-        Vector4 operator*(const Vector4& v) const
-        {
-            return Vector4(
-                m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w,
-                m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
-                m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
-                v.w);
-        }
-
         /**
         Transforms the given 3-D vector by the 3x3 submatrix, without
         adding translation, as should be transformed directions and normals.
@@ -550,6 +426,71 @@ namespace Ogre
         static const Affine3 IDENTITY;
     };
 
+    inline Matrix4 TransformBase::transpose() const
+    {
+        return Matrix4(m[0][0], m[1][0], m[2][0], m[3][0],
+                       m[0][1], m[1][1], m[2][1], m[3][1],
+                       m[0][2], m[1][2], m[2][2], m[3][2],
+                       m[0][3], m[1][3], m[2][3], m[3][3]);
+    }
+
+    /** Matrix addition.
+    */
+    inline Matrix4 operator+(const Matrix4& m, const Matrix4& m2)
+    {
+        Matrix4 r;
+
+        r[0][0] = m[0][0] + m2[0][0];
+        r[0][1] = m[0][1] + m2[0][1];
+        r[0][2] = m[0][2] + m2[0][2];
+        r[0][3] = m[0][3] + m2[0][3];
+
+        r[1][0] = m[1][0] + m2[1][0];
+        r[1][1] = m[1][1] + m2[1][1];
+        r[1][2] = m[1][2] + m2[1][2];
+        r[1][3] = m[1][3] + m2[1][3];
+
+        r[2][0] = m[2][0] + m2[2][0];
+        r[2][1] = m[2][1] + m2[2][1];
+        r[2][2] = m[2][2] + m2[2][2];
+        r[2][3] = m[2][3] + m2[2][3];
+
+        r[3][0] = m[3][0] + m2[3][0];
+        r[3][1] = m[3][1] + m2[3][1];
+        r[3][2] = m[3][2] + m2[3][2];
+        r[3][3] = m[3][3] + m2[3][3];
+
+        return r;
+    }
+
+    /** Matrix subtraction.
+    */
+    inline Matrix4 operator-(const Matrix4& m, const Matrix4& m2)
+    {
+        Matrix4 r;
+        r[0][0] = m[0][0] - m2[0][0];
+        r[0][1] = m[0][1] - m2[0][1];
+        r[0][2] = m[0][2] - m2[0][2];
+        r[0][3] = m[0][3] - m2[0][3];
+
+        r[1][0] = m[1][0] - m2[1][0];
+        r[1][1] = m[1][1] - m2[1][1];
+        r[1][2] = m[1][2] - m2[1][2];
+        r[1][3] = m[1][3] - m2[1][3];
+
+        r[2][0] = m[2][0] - m2[2][0];
+        r[2][1] = m[2][1] - m2[2][1];
+        r[2][2] = m[2][2] - m2[2][2];
+        r[2][3] = m[2][3] - m2[2][3];
+
+        r[3][0] = m[3][0] - m2[3][0];
+        r[3][1] = m[3][1] - m2[3][1];
+        r[3][2] = m[3][2] - m2[3][2];
+        r[3][3] = m[3][3] - m2[3][3];
+
+        return r;
+    }
+
     inline Matrix4 operator*(const Matrix4 &m, const Matrix4 &m2)
     {
         Matrix4 r;
@@ -575,6 +516,81 @@ namespace Ogre
 
         return r;
     }
+    inline Affine3 operator*(const Affine3 &m, const Affine3 &m2)
+    {
+        return Affine3(
+            m[0][0] * m2[0][0] + m[0][1] * m2[1][0] + m[0][2] * m2[2][0],
+            m[0][0] * m2[0][1] + m[0][1] * m2[1][1] + m[0][2] * m2[2][1],
+            m[0][0] * m2[0][2] + m[0][1] * m2[1][2] + m[0][2] * m2[2][2],
+            m[0][0] * m2[0][3] + m[0][1] * m2[1][3] + m[0][2] * m2[2][3] + m[0][3],
+
+            m[1][0] * m2[0][0] + m[1][1] * m2[1][0] + m[1][2] * m2[2][0],
+            m[1][0] * m2[0][1] + m[1][1] * m2[1][1] + m[1][2] * m2[2][1],
+            m[1][0] * m2[0][2] + m[1][1] * m2[1][2] + m[1][2] * m2[2][2],
+            m[1][0] * m2[0][3] + m[1][1] * m2[1][3] + m[1][2] * m2[2][3] + m[1][3],
+
+            m[2][0] * m2[0][0] + m[2][1] * m2[1][0] + m[2][2] * m2[2][0],
+            m[2][0] * m2[0][1] + m[2][1] * m2[1][1] + m[2][2] * m2[2][1],
+            m[2][0] * m2[0][2] + m[2][1] * m2[1][2] + m[2][2] * m2[2][2],
+            m[2][0] * m2[0][3] + m[2][1] * m2[1][3] + m[2][2] * m2[2][3] + m[2][3]);
+    }
+
+    /** Vector transformation using '*'.
+        @remarks
+            Transforms the given 3-D vector by the matrix, projecting the
+            result back into <i>w</i> = 1.
+        @note
+            This means that the initial <i>w</i> is considered to be 1.0,
+            and then all the tree elements of the resulting 3-D vector are
+            divided by the resulting <i>w</i>.
+    */
+    inline Vector3 operator*(const Matrix4& m, const Vector3& v)
+    {
+        Vector3 r;
+
+        Real fInvW = 1.0f / ( m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] );
+
+        r.x = ( m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] ) * fInvW;
+        r.y = ( m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] ) * fInvW;
+        r.z = ( m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] ) * fInvW;
+
+        return r;
+    }
+    /// @overload
+    inline Vector3 operator*(const Affine3& m,const Vector3& v)
+    {
+        return Vector3(
+                m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3],
+                m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3],
+                m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3]);
+    }
+
+    inline Vector4 operator*(const Matrix4& m, const Vector4& v)
+    {
+        return Vector4(
+            m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w,
+            m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
+            m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
+            m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w);
+    }
+    inline Vector4 operator*(const Affine3& m, const Vector4& v)
+    {
+        return Vector4(
+            m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w,
+            m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
+            m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
+            v.w);
+    }
+
+    inline Vector4 operator * (const Vector4& v, const Matrix4& mat)
+    {
+        return Vector4(
+            v.x*mat[0][0] + v.y*mat[1][0] + v.z*mat[2][0] + v.w*mat[3][0],
+            v.x*mat[0][1] + v.y*mat[1][1] + v.z*mat[2][1] + v.w*mat[3][1],
+            v.x*mat[0][2] + v.y*mat[1][2] + v.z*mat[2][2] + v.w*mat[3][2],
+            v.x*mat[0][3] + v.y*mat[1][3] + v.z*mat[2][3] + v.w*mat[3][3]
+            );
+    }
 
     inline Plane operator * (const Matrix4& mat, const Plane& p)
     {
@@ -588,24 +604,6 @@ namespace Ogre
         ret.d = v4.w / ret.normal.normalise();
 
         return ret;
-    }
-
-    inline Matrix4 TransformBase::transpose() const
-    {
-        return Matrix4(m[0][0], m[1][0], m[2][0], m[3][0],
-                       m[0][1], m[1][1], m[2][1], m[3][1],
-                       m[0][2], m[1][2], m[2][2], m[3][2],
-                       m[0][3], m[1][3], m[2][3], m[3][3]);
-    }
-
-    inline Vector4 operator * (const Vector4& v, const Matrix4& mat)
-    {
-        return Vector4(
-            v.x*mat[0][0] + v.y*mat[1][0] + v.z*mat[2][0] + v.w*mat[3][0],
-            v.x*mat[0][1] + v.y*mat[1][1] + v.z*mat[2][1] + v.w*mat[3][1],
-            v.x*mat[0][2] + v.y*mat[1][2] + v.z*mat[2][2] + v.w*mat[3][2],
-            v.x*mat[0][3] + v.y*mat[1][3] + v.z*mat[2][3] + v.w*mat[3][3]
-            );
     }
     /** @} */
     /** @} */
