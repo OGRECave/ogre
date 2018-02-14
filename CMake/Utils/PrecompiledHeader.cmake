@@ -337,7 +337,9 @@ MACRO(ADD_NATIVE_PRECOMPILED_HEADER _targetName _input)
         SET(_dowarn 1)
     ENDIF()
 
-    if(CMAKE_GENERATOR MATCHES "^Visual.*$")
+    if(NOT OGRE_ENABLE_PRECOMPILED_HEADERS)
+        # do nothing
+    elseif(CMAKE_GENERATOR MATCHES "^Visual.*$")
 
         # Auto include the precompile (useful for moc processing, since the use of
         # precompiled is specified at the target level
