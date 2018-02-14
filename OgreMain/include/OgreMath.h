@@ -377,7 +377,7 @@ namespace Ogre
             return tmp;
         }
         
-        /** Linear interpolation. Given 3 parameters a, b and wthe function returns the value
+        /** Linear interpolation. Given 3 parameters a, b and w the function returns the value
             of (1 – w)* a + w * b. Where a and b are matching vector or scalar types and w can
             be either a scalar or a vector of the same type as a and b.
         @remarks
