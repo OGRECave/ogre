@@ -70,6 +70,7 @@ namespace Ogre
         static void encodeQuaternion( LwString &jsonStr, const Quaternion &value );
         static void encodeColour( LwString &jsonStr, const ColourValue &value );
         static void encodeAabb( LwString &jsonStr, const Aabb &aabb );
+        static void encodeMatrix( LwString &jsonStr, const Matrix3 &aabb );
 
         static inline void flushLwString( LwString &jsonStr, String &outJson );
 
@@ -81,6 +82,7 @@ namespace Ogre
         void exportLight( LwString &jsonStr, String &outJson, Light *light );
         void exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity, bool exportMesh );
         void exportInstantRadiosity( LwString &jsonStr, String &outJson );
+        void exportPcc( LwString &jsonStr, String &outJson );
         void exportSceneSettings( LwString &jsonStr, String &outJson, uint32 exportFlags );
 
         /**

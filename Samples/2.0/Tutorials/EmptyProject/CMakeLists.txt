@@ -10,42 +10,15 @@
 
 #set( CMAKE_TOOLCHAIN_FILE CMake/iOS.cmake )
 
-project( EmptyProject )
 cmake_minimum_required( VERSION 3.0 )
+project( EmptyProject )
 
-if( NOT MSVC )
-	set( CMAKE_CXX_FLAGS_DEBUG			"${CMAKE_CXX_FLAGS_DEBUG}			-DDEBUG=1 -D_DEBUG=1 -g"	)
-	set( CMAKE_CXX_FLAGS_MINSIZEREL		"${CMAKE_CXX_FLAGS_MINSIZEREL}		-Os -DNDEBUG"				)
-	set( CMAKE_CXX_FLAGS_RELEASE		"${CMAKE_CXX_FLAGS_RELEASE}			-O2 -DNDEBUG"				)
-	set( CMAKE_CXX_FLAGS_RELWITHDEBINFO	"${CMAKE_CXX_FLAGS_RELWITHDEBINFO}	-O2 -g"						)
-endif()
+set( EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}" )
 
-if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-	set( CMAKE_CXX_FLAGS_DEBUG		"${CMAKE_CXX_FLAGS_DEBUG}			-fno-limit-debug-info"		)
-endif()
-
-if( NOT APPLE )
-	if( CMAKE_BUILD_TYPE STREQUAL "" )
-		set( CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "One of: Debug Release RelWithDebInfo MinSizeRel." FORCE )
-	endif()
-else()
-	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")
-endif()
-
-# Determine if we are compiling for a 32bit or 64bit system
-if( NOT APPLE )
-	include(CheckTypeSize)
-	CHECK_TYPE_SIZE("void*" ARCH_PTR_SIZE BUILTIN_TYPES_ONLY)
-	if (ARCH_PTR_SIZE EQUAL 8)
-	  set(PLATFORM_X64 TRUE)
-	else ()
-	  set(PLATFORM_X64 FALSE)
-	endif ()
-endif()
-
+include( CMake/Bootstrap.cmake )
 include( CMake/Dependencies/OGRE.cmake )
 
-setupOgre( OGRE_SOURCE, OGRE_BINARIES, OGRE_LIBRARIES )
+setupOgre( OGRE_SOURCE, OGRE_BINARIES, OGRE_LIBRARIES, FALSE )
 
 # Setup our application
 set( EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}" )

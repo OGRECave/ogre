@@ -43,6 +43,9 @@ THE SOFTWARE.
 #include "InstantRadiosity/OgreInstantRadiosity.h"
 #include "OgreIrradianceVolume.h"
 
+#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+#include "Compositor/OgreCompositorManager2.h"
+
 #include "OgreMeshSerializer.h"
 #include "OgreMesh2Serializer.h"
 #include "OgreFileSystemLayer.h"
@@ -53,16 +56,23 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    SceneFormatImporter::SceneFormatImporter( Root *root, SceneManager *sceneManager ) :
+    SceneFormatImporter::SceneFormatImporter( Root *root, SceneManager *sceneManager,
+                                              const String &defaultPccWorkspaceName ) :
         SceneFormatBase( root, sceneManager ),
         mInstantRadiosity( 0 ),
-        mIrradianceVolume( 0 )
+        mIrradianceVolume( 0 ),
+        mParallaxCorrectedCubemap( 0 ),
+        mSceneComponentTransform( Matrix4::IDENTITY ),
+        mDefaultPccWorkspaceName( defaultPccWorkspaceName )
     {
+        memset( mRootNodes, 0, sizeof(mRootNodes) );
+        memset( mParentlessRootNodes, 0, sizeof(mParentlessRootNodes) );
     }
     //-----------------------------------------------------------------------------------
     SceneFormatImporter::~SceneFormatImporter()
     {
         destroyInstantRadiosity();
+        destroyParallaxCorrectedCubemap();
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::destroyInstantRadiosity(void)
@@ -79,6 +89,19 @@ namespace Ogre
 
         delete mInstantRadiosity;
         mInstantRadiosity = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::destroyParallaxCorrectedCubemap(void)
+    {
+        if( mParallaxCorrectedCubemap )
+        {
+            HlmsPbs *hlmsPbs = getPbs();
+            if( hlmsPbs && hlmsPbs->getParallaxCorrectedCubemap() == mParallaxCorrectedCubemap )
+                hlmsPbs->setParallaxCorrectedCubemap( 0 );
+
+            delete mParallaxCorrectedCubemap;
+            mParallaxCorrectedCubemap = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     Light::LightTypes SceneFormatImporter::parseLightType( const char *value )
@@ -202,6 +225,20 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    inline Matrix3 SceneFormatImporter::decodeMatrix3Array( const rapidjson::Value &jsonArray )
+    {
+        Matrix3 retVal( Matrix3::IDENTITY );
+
+        const rapidjson::SizeType arraySize = std::min( 12u, jsonArray.Size() );
+        for( rapidjson::SizeType i=0; i<arraySize; ++i )
+        {
+            if( jsonArray[i].IsUint() )
+                retVal[0][i] = decodeFloat( jsonArray[i] );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importNode( const rapidjson::Value &nodeValue, Node *node )
     {
         rapidjson::Value::ConstMemberIterator  itor;
@@ -292,9 +329,14 @@ namespace Ogre
                     isRootNode = itTmp->value.GetBool();
 
                 if( isRootNode )
-                    sceneNode = mSceneManager->getRootSceneNode( sceneNodeType );
+                    sceneNode = mRootNodes[sceneNodeType];
                 else
-                    sceneNode = mSceneManager->createSceneNode( sceneNodeType );
+                {
+                    if( mParentlessRootNodes[sceneNodeType] )
+                        sceneNode = mParentlessRootNodes[sceneNodeType]->createChildSceneNode();
+                    else
+                        sceneNode = mSceneManager->createSceneNode( sceneNodeType );
+                }
             }
 
             importNode( nodeValue, sceneNode );
@@ -749,8 +791,9 @@ namespace Ogre
                     aoi[0].IsArray() &&
                     aoi[1].IsUint() )
                 {
-                    const Aabb aabb = decodeAabbArray( aoi[0], Aabb::BOX_ZERO );
+                    Aabb aabb = decodeAabbArray( aoi[0], Aabb::BOX_ZERO );
                     const float sphereRadius = decodeFloat( aoi[1] );
+                    aabb.transformAffine( mSceneComponentTransform );
                     InstantRadiosity::AreaOfInterest areaOfInterest( aabb, sphereRadius );
                     mInstantRadiosity->mAoI.push_back( areaOfInterest );
                 }
@@ -845,6 +888,171 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::importPcc( const rapidjson::Value &pccValue )
+    {
+        uint8 reservedRqId = 250;
+        uint32 reservedProxyMask = 1u << 25u;
+
+        rapidjson::Value::ConstMemberIterator tmpIt;
+        tmpIt = pccValue.FindMember( "reserved_rq_id" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            reservedRqId = static_cast<uint8>( tmpIt->value.GetUint() );
+
+        tmpIt = pccValue.FindMember( "proxy_visibility_mask" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            reservedProxyMask = tmpIt->value.GetUint();
+
+        Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+        String workspaceName = mDefaultPccWorkspaceName;
+        tmpIt = pccValue.FindMember( "workspace" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsString() )
+        {
+            workspaceName = tmpIt->value.GetString();
+            if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+            {
+                LogManager::getSingleton().logMessage(
+                            "INFO: Parallax Corrected Cubemaps workspace definition '" +
+                            workspaceName + "not found, using default one." );
+                workspaceName = mDefaultPccWorkspaceName;
+            }
+        }
+
+        if( workspaceName.empty() )
+        {
+            LogManager::getSingleton().logMessage(
+                        "WARNING: Cannot import Parallax Corrected Cubemaps." );
+            return;
+        }
+
+        Ogre::CompositorWorkspaceDef *workspaceDef =
+                compositorManager->getWorkspaceDefinition( workspaceName );
+
+        mParallaxCorrectedCubemap = new ParallaxCorrectedCubemap(
+                                        Ogre::Id::generateNewId<Ogre::ParallaxCorrectedCubemap>(),
+                                        mRoot, mSceneManager, workspaceDef,
+                                        reservedRqId, reservedProxyMask );
+
+        uint32 maxWidth = 0, maxHeight = 0;
+        PixelFormat blendPixelFormat = PF_UNKNOWN;
+        tmpIt = pccValue.FindMember( "max_width" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            maxWidth = tmpIt->value.GetUint();
+        tmpIt = pccValue.FindMember( "max_height" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            maxHeight = tmpIt->value.GetUint();
+        tmpIt = pccValue.FindMember( "pixel_format" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsString() )
+            blendPixelFormat = PixelUtil::getFormatFromName( tmpIt->value.GetString(), false, true );
+
+        if( maxWidth != 0 && maxHeight != 0 && blendPixelFormat != PF_UNKNOWN )
+            mParallaxCorrectedCubemap->setEnabled( true, maxWidth, maxHeight, blendPixelFormat );
+
+        tmpIt = pccValue.FindMember( "paused" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsBool() )
+            mParallaxCorrectedCubemap->mPaused = tmpIt->value.GetBool();
+
+        tmpIt = pccValue.FindMember( "mask" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsUint() )
+            mParallaxCorrectedCubemap->mMask = tmpIt->value.GetUint();
+        tmpIt = pccValue.FindMember( "probes" );
+        if( tmpIt != pccValue.MemberEnd() && tmpIt->value.IsArray() )
+        {
+            const rapidjson::Value &jsonProbeArray = tmpIt->value;
+            const size_t numProbes = jsonProbeArray.Size();
+
+            for( size_t i=0; i<numProbes; ++i )
+            {
+                const rapidjson::Value &jsonProbe = jsonProbeArray[i];
+
+                if( !jsonProbe.IsObject() )
+                    continue;
+
+                CubemapProbe *probe = mParallaxCorrectedCubemap->createProbe();
+
+                uint32 width = 0, height = 0;
+                PixelFormat pixelFormat = PF_UNKNOWN;
+                uint8 msaa = 0;
+                bool useManual = true;
+                bool isStatic = false;
+
+                tmpIt = jsonProbe.FindMember( "width" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    width = tmpIt->value.GetUint();
+                tmpIt = jsonProbe.FindMember( "height" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    height = tmpIt->value.GetUint();
+                tmpIt = jsonProbe.FindMember( "msaa" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    msaa = static_cast<uint8>( tmpIt->value.GetUint() );
+                tmpIt = jsonProbe.FindMember( "pixel_format" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsString() )
+                    pixelFormat = PixelUtil::getFormatFromName( tmpIt->value.GetString(), false, true );
+                tmpIt = jsonProbe.FindMember( "use_manual" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsBool() )
+                    useManual = tmpIt->value.GetBool();
+                tmpIt = jsonProbe.FindMember( "static" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsBool() )
+                    isStatic = tmpIt->value.GetBool();
+
+                if( width != 0 && height != 0 && pixelFormat != PF_UNKNOWN )
+                {
+                    probe->setTextureParams( width, height, useManual, pixelFormat, isStatic, msaa );
+                    probe->initWorkspace();
+                }
+
+                Aabb probeArea, probeShape;
+                Vector3 cameraPos( Vector3::ZERO );
+                Vector3 areaInnerRegion( Vector3::UNIT_SCALE );
+                Matrix3 orientation( Matrix3::IDENTITY );
+
+                tmpIt = jsonProbe.FindMember( "camera_pos" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    cameraPos = decodeVector3Array( tmpIt->value );
+
+                tmpIt = jsonProbe.FindMember( "area" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    probeArea = decodeAabbArray( tmpIt->value, Aabb::BOX_ZERO );
+
+                tmpIt = jsonProbe.FindMember( "area_inner_region" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    areaInnerRegion = decodeVector3Array( tmpIt->value );
+
+                tmpIt = jsonProbe.FindMember( "orientation" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    orientation = decodeMatrix3Array( tmpIt->value );
+
+                tmpIt = jsonProbe.FindMember( "probe_shape" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsArray() )
+                    probeShape = decodeAabbArray( tmpIt->value, Aabb::BOX_ZERO );
+
+                cameraPos = mSceneComponentTransform * cameraPos;
+                probeArea.transformAffine( mSceneComponentTransform );
+                areaInnerRegion = mSceneComponentTransform * areaInnerRegion;
+                //orientation = pccTransform3x3 * orientation;
+                probeShape.transformAffine( mSceneComponentTransform );
+
+                probe->set( cameraPos, probeArea, areaInnerRegion, orientation, probeShape );
+
+                tmpIt = jsonProbe.FindMember( "enabled" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsBool() )
+                    probe->mEnabled = tmpIt->value.GetBool();
+
+                tmpIt = jsonProbe.FindMember( "num_iterations" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    probe->mNumIterations = tmpIt->value.GetUint();
+
+                tmpIt = jsonProbe.FindMember( "mask" );
+                if( tmpIt != jsonProbe.MemberEnd() && tmpIt->value.IsUint() )
+                    probe->mMask = tmpIt->value.GetUint();
+            }
+        }
+
+        HlmsPbs *hlmsPbs = getPbs();
+        if( hlmsPbs )
+            hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importSceneSettings( const rapidjson::Value &json, uint32 importFlags )
     {
         rapidjson::Value::ConstMemberIterator tmpIt;
@@ -868,6 +1076,13 @@ namespace Ogre
             if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
                 importInstantRadiosity( tmpIt->value );
         }
+
+        if( importFlags & SceneFlags::ParallaxCorrectedCubemap )
+        {
+            tmpIt = json.FindMember( "parallax_corrected_cubemaps" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
+                importPcc( tmpIt->value );
+        }
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const rapidjson::Document &d,
@@ -875,6 +1090,16 @@ namespace Ogre
     {
         mFilename = filename;
         destroyInstantRadiosity();
+        destroyParallaxCorrectedCubemap();
+
+        //Set null pointers to valid root scene nodes. We'll restore the nullptrs at the end.
+        SceneNode *oldRootNodes[NUM_SCENE_MEMORY_MANAGER_TYPES];
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+        {
+            oldRootNodes[i] = mRootNodes[i];
+            if( !mRootNodes[i] )
+                mRootNodes[i] = mSceneManager->getRootSceneNode( static_cast<SceneMemoryMgrTypes>(i) );
+        }
 
         rapidjson::Value::ConstMemberIterator itor;
 
@@ -945,6 +1170,27 @@ namespace Ogre
                             mIrradianceVolume->getFadeAttenuationOverDistace() );
             }
         }
+
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+            mRootNodes[i] = oldRootNodes[i];
+    }
+
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::setRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot )
+    {
+        mRootNodes[SCENE_DYNAMIC] = dynamicRoot;
+        mRootNodes[SCENE_STATIC] = staticRoot;
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::setParentlessRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot )
+    {
+        mParentlessRootNodes[SCENE_DYNAMIC] = dynamicRoot;
+        mParentlessRootNodes[SCENE_STATIC] = staticRoot;
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatImporter::setSceneComponentTransform( const Matrix4 &transform )
+    {
+        mSceneComponentTransform = transform;
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const char *jsonString,
@@ -967,9 +1213,11 @@ namespace Ogre
     {
         ResourceGroupManager &resourceGroupManager = ResourceGroupManager::getSingleton();
         resourceGroupManager.addResourceLocation( folderPath, "FileSystem", "SceneFormatImporter" );
-        resourceGroupManager.addResourceLocation( folderPath + "/v2",
+        resourceGroupManager.addResourceLocation( folderPath + "/v2/",
                                                   "FileSystem", "SceneFormatImporter" );
-        resourceGroupManager.addResourceLocation( folderPath + "/v1",
+        resourceGroupManager.addResourceLocation( folderPath + "/v1/",
+                                                  "FileSystem", "SceneFormatImporter" );
+        resourceGroupManager.addResourceLocation( folderPath + "/textures/",
                                                   "FileSystem", "SceneFormatImporter" );
 
         DataStreamPtr stream = resourceGroupManager.openResource( "scene.json", "SceneFormatImporter" );
@@ -1006,11 +1254,12 @@ namespace Ogre
             if( useOitd )
                 hlmsManager->mAdditionalTextureExtensionsPerGroup.erase( "SceneFormatImporter" );
 
-            resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );
-            resourceGroupManager.removeResourceLocation( folderPath + "/v2", "SceneFormatImporter" );
-            resourceGroupManager.removeResourceLocation( folderPath + "/v1", "SceneFormatImporter" );
-
             importScene( stream->getName(), &fileData[0], importFlags );
+
+            resourceGroupManager.removeResourceLocation( folderPath + "/textures/", "SceneFormatImporter" );
+            resourceGroupManager.removeResourceLocation( folderPath + "/v2/", "SceneFormatImporter" );
+            resourceGroupManager.removeResourceLocation( folderPath + "/v1/", "SceneFormatImporter" );
+            resourceGroupManager.removeResourceLocation( folderPath, "SceneFormatImporter" );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -1025,5 +1274,14 @@ namespace Ogre
             mInstantRadiosity = 0;
             mIrradianceVolume = 0;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    ParallaxCorrectedCubemap* SceneFormatImporter::getParallaxCorrectedCubemap( bool releaseOwnership )
+    {
+        ParallaxCorrectedCubemap *retVal = mParallaxCorrectedCubemap;
+        if( releaseOwnership )
+            mParallaxCorrectedCubemap = 0;
+
+        return retVal;
     }
 }

@@ -77,13 +77,6 @@ namespace Ogre
         destroyWorkspace();
         destroyTexture();
 
-        if( mCamera )
-        {
-            SceneManager *sceneManager = mCamera->getSceneManager();
-            sceneManager->destroyCamera( mCamera );
-            mCamera = 0;
-        }
-
         assert( !mNumDatablockUsers &&
                 "There's still datablocks using this probe! Pointers will become dangling!" );
         if( mConstBufferForManualProbes )
@@ -118,6 +111,13 @@ namespace Ogre
             CompositorManager2 *compositorManager = mClearWorkspace->getCompositorManager();
             compositorManager->removeWorkspace( mClearWorkspace );
             mClearWorkspace = 0;
+        }
+
+        if( mCamera )
+        {
+            SceneManager *sceneManager = mCamera->getSceneManager();
+            sceneManager->destroyCamera( mCamera );
+            mCamera = 0;
         }
     }
     //-----------------------------------------------------------------------------------

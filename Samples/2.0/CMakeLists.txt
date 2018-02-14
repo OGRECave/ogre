@@ -91,6 +91,7 @@ if( OGRE_BUILD_SAMPLES2 AND NOT OGRE_BUILD_SAMPLES2_SKIP )
 	add_subdirectory(ApiUsage/StencilTest)
 	add_subdirectory(ApiUsage/StereoRendering)
 	add_subdirectory(ApiUsage/ShadowMapDebugging)
+	add_subdirectory(ApiUsage/ShadowMapFromCode)
 
 	add_subdirectory(Showcase/Forward3D)
 	add_subdirectory(Showcase/Hdr)

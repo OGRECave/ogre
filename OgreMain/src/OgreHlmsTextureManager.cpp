@@ -995,7 +995,10 @@ namespace Ogre
                 TextureArray::NamePairVec::const_iterator enEntry = itor->entries.end();
 
                 while( itEntry != enEntry )
+                {
                     row += "|" + itEntry->aliasName;
+                    ++itEntry;
+                }
 
                 logActual->logMessage( row, LML_CRITICAL );
                 row.clear();
