@@ -26,6 +26,8 @@
 
 #include "OgreWindowEventUtilities.h"
 
+#include "OgreFileSystemLayer.h"
+
 #include "OgreLogManager.h"
 
 #if OGRE_USE_SDL2
@@ -56,6 +58,7 @@ namespace Demo
         mSceneManager( 0 ),
         mCamera( 0 ),
         mWorkspace( 0 ),
+        mPluginsFolder( "./" ),
         mOverlaySystem( 0 ),
         mAccumTimeSinceLastLogicFrame( 0 ),
         mCurrentTransformIdx( 0 ),
@@ -65,6 +68,22 @@ namespace Demo
         mAlwaysAskForConfig( true ),
         mBackgroundColour( backgroundColour )
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        // Note:  macBundlePath works for iOS too. It's misnamed.
+        mResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        mResourcePath = Ogre::macBundlePath() + "/";
+#endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        mPluginsFolder = mResourcePath;
+#endif
+        if( isWriteAccessFolder( mPluginsFolder, "Ogre.log" ) )
+            mWriteAccessFolder = mPluginsFolder;
+        else
+        {
+            Ogre::FileSystemLayer filesystemLayer( OGRE_VERSION_NAME );
+            mWriteAccessFolder = filesystemLayer.getWritablePath( "" );
+        }
     }
     //-----------------------------------------------------------------------------------
     GraphicsSystem::~GraphicsSystem()
@@ -74,6 +93,20 @@ namespace Demo
             Ogre::LogManager::getSingleton().logMessage(
                         "WARNING: GraphicsSystem::deinitialize() not called!!!", Ogre::LML_CRITICAL );
         }
+    }
+    //-----------------------------------------------------------------------------------
+    bool GraphicsSystem::isWriteAccessFolder( const Ogre::String &folderPath,
+                                              const Ogre::String &fileToSave )
+    {
+        if( !Ogre::FileSystemLayer::createDirectory( folderPath ) )
+            return false;
+
+        std::ofstream of( (folderPath + fileToSave).c_str(),
+                          std::ios::out | std::ios::binary | std::ios::app );
+        if( !of )
+            return false;
+
+        return true;
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::initialize( const Ogre::String &windowTitle )
@@ -88,29 +121,19 @@ namespace Demo
         }
     #endif
 
-    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        // Note:  macBundlePath works for iOS too. It's misnamed.
-        mResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
-    #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        mResourcePath = Ogre::macBundlePath() + "/";
-    #endif
-
         Ogre::String pluginsPath;
         // only use plugins.cfg if not static
     #ifndef OGRE_STATIC_LIB
-    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-         mPluginsPath += mResourcePath;
-    #endif
     #if OGRE_DEBUG_MODE && !((OGRE_PLATFORM == OGRE_PLATFORM_APPLE) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS))
-        pluginsPath = mResourcePath + "plugins_d.cfg";
+        pluginsPath = mPluginsFolder + "plugins_d.cfg";
     #else
-        pluginsPath = mResourcePath + "plugins.cfg";
+        pluginsPath = mPluginsFolder + "plugins.cfg";
     #endif
     #endif
 
         mRoot = OGRE_NEW Ogre::Root( pluginsPath,
-                                     mResourcePath + "ogre.cfg",
-                                     mResourcePath + "Ogre.log" );
+                                     mWriteAccessFolder + "ogre.cfg",
+                                     mWriteAccessFolder + "Ogre.log" );
 
         mStaticPluginLoader.install( mRoot );
 

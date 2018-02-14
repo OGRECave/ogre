@@ -9,6 +9,7 @@ namespace Ogre
 {
     class InstantRadiosity;
     class IrradianceVolume;
+    class ParallaxCorrectedCubemap;
 }
 
 namespace Demo
@@ -18,11 +19,14 @@ namespace Demo
         Ogre::String            mFullpathToFile;
         Ogre::InstantRadiosity  *mInstantRadiosity;
         Ogre::IrradianceVolume  *mIrradianceVolume;
+        Ogre::ParallaxCorrectedCubemap *mParallaxCorrectedCubemap;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
         void resetScene(void);
+        void setupParallaxCorrectCubemaps(void);
         void destroyInstantRadiosity(void);
+        void destroyParallaxCorrectCubemaps(void);
 
         void generateScene(void);
         void exportScene(void);

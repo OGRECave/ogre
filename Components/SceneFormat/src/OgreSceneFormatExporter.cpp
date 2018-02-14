@@ -47,6 +47,9 @@ THE SOFTWARE.
 #include "InstantRadiosity/OgreInstantRadiosity.h"
 #include "OgreIrradianceVolume.h"
 
+#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
+#include "Compositor/OgreCompositorWorkspaceDef.h"
+
 #include "OgreForward3D.h"
 #include "OgreForwardClustered.h"
 
@@ -153,6 +156,20 @@ namespace Ogre
         jsonStr.a( ", " );
         encodeVector( jsonStr, value.mHalfSize );
         jsonStr.a( "]" );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatExporter::encodeMatrix( LwString &jsonStr, const Matrix3 &value )
+    {
+        jsonStr.a( "[ ",
+                   encodeFloat( value[0][0] ), ", ",
+                   encodeFloat( value[0][1] ), ", ",
+                   encodeFloat( value[0][2] ), ", " );
+        jsonStr.a( encodeFloat( value[1][0] ), ", ",
+                   encodeFloat( value[1][1] ), ", ",
+                   encodeFloat( value[1][2] ), ", " );
+        jsonStr.a( encodeFloat( value[2][0] ), ", ",
+                   encodeFloat( value[2][1] ), ", ",
+                   encodeFloat( value[2][2] ), " ]" );
     }
     //-----------------------------------------------------------------------------------
     inline void SceneFormatExporter::flushLwString( LwString &jsonStr, String &outJson )
@@ -537,6 +554,99 @@ namespace Ogre
         flushLwString( jsonStr, outJson );
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatExporter::exportPcc( LwString &jsonStr, String &outJson )
+    {
+        HlmsPbs *hlmsPbs = getPbs();
+        if( !hlmsPbs )
+            return;
+
+        ParallaxCorrectedCubemap *pcc = hlmsPbs->getParallaxCorrectedCubemap();
+
+        if( !pcc )
+            return;
+
+        TexturePtr pccBlendTex = pcc->getBlendCubemap();
+
+        jsonStr.a( ",\n\t\t\"parallax_corrected_cubemaps\" :"
+                   "\n\t\t{" );
+        jsonStr.a( "\n\t\t\t\"paused\" : ", pcc->mPaused );
+        jsonStr.a( ",\n\t\t\t\"mask\" : ", pcc->mMask );
+        jsonStr.a( ",\n\t\t\t\"reserved_rq_id\" : ", pcc->getProxyReservedRenderQueueId() );
+        jsonStr.a( ",\n\t\t\t\"proxy_visibility_mask\" : ", pcc->getProxyReservedVisibilityMask() );
+        if( pccBlendTex )
+        {
+            jsonStr.a( ",\n\t\t\t\"max_width\" : ", pccBlendTex->getWidth() );
+            jsonStr.a( ",\n\t\t\t\"max_height\" : ", pccBlendTex->getHeight() );
+            jsonStr.a( ",\n\t\t\t\"pixel_format\" : \"",
+                       PixelUtil::getFormatName( pccBlendTex->getFormat() ).c_str(), "\"" );
+        }
+
+        const CompositorWorkspaceDef *workspaceDef = pcc->getDefaultWorkspaceDef();
+        jsonStr.a( ",\n\t\t\t\"workspace\" : \"", workspaceDef->getNameStr().c_str(), "\"" );
+
+        const CubemapProbeVec& probes = pcc->getProbes();
+
+        if( !probes.empty() )
+        {
+            jsonStr.a( ",\n\t\t\t\"probes\" :"
+                       "\n\t\t\t[" );
+
+            CubemapProbeVec::const_iterator begin = probes.begin();
+            CubemapProbeVec::const_iterator itor  = probes.begin();
+            CubemapProbeVec::const_iterator end   = probes.end();
+            while( itor != end )
+            {
+                if( itor != begin )
+                    jsonStr.a( ", " );
+                jsonStr.a( "\n\t\t\t\t{" );
+
+                CubemapProbe *probe = *itor;
+
+                jsonStr.a( "\n\t\t\t\t\t\"static\" : ", toQuotedStr( probe->getStatic() ) );
+
+                TexturePtr probeTex = probe->getInternalTexture();
+
+                if( probeTex )
+                {
+                    jsonStr.a( ",\n\t\t\t\t\t\"width\" : ", probeTex->getWidth() );
+                    jsonStr.a( ",\n\t\t\t\t\t\"height\" : ", probeTex->getHeight() );
+                    jsonStr.a( ",\n\t\t\t\t\t\"msaa\" : ", probeTex->getFSAA() );
+                    jsonStr.a( ",\n\t\t\t\t\t\"pixel_format\" : \"",
+                               PixelUtil::getFormatName( probeTex->getFormat() ).c_str(), "\"" );
+                    jsonStr.a( ",\n\t\t\t\t\t\"use_manual\" : ",
+                               toQuotedStr( (probeTex->getUsage() & TU_AUTOMIPMAP) != 0 ) );
+                }
+
+                jsonStr.a( ",\n\t\t\t\t\t\"camera_pos\" : " );
+                encodeVector( jsonStr, probe->getProbeCameraPos() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"area\" : " );
+                encodeAabb( jsonStr, probe->getArea() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"area_inner_region\" : " );
+                encodeVector( jsonStr, probe->getAreaInnerRegion() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"orientation\" : " );
+                encodeMatrix( jsonStr, probe->getOrientation() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"probe_shape\" : " );
+                encodeAabb( jsonStr, probe->getProbeShape() );
+
+                jsonStr.a( ",\n\t\t\t\t\t\"enabled\" : ", toQuotedStr( probe->mEnabled ) );
+                jsonStr.a( ",\n\t\t\t\t\t\"num_iterations\" : ", probe->mNumIterations );
+                jsonStr.a( ",\n\t\t\t\t\t\"mask\" : ", probe->mMask );
+
+                jsonStr.a( "\n\t\t\t\t}" );
+                ++itor;
+            }
+
+            jsonStr.a( "\n\t\t\t]" );
+        }
+
+        jsonStr.a( "\n\t\t}" );
+        flushLwString( jsonStr, outJson );
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatExporter::exportSceneSettings( LwString &jsonStr, String &outJson,
                                                    uint32 exportFlags )
     {
@@ -582,6 +692,9 @@ namespace Ogre
 
             jsonStr.a( "\n\t\t}" );
         }
+
+        if( exportFlags & SceneFlags::ParallaxCorrectedCubemap )
+            exportPcc( jsonStr, outJson );
 
         if( exportFlags & SceneFlags::InstantRadiosity )
             exportInstantRadiosity( jsonStr, outJson );
@@ -795,6 +908,9 @@ namespace Ogre
 
         if( exportFlags & (SceneFlags::TexturesOitd|SceneFlags::TexturesOriginal)  )
         {
+            const String textureFolder = folderPath + "/textures/";
+            FileSystemLayer::createDirectory( textureFolder );
+
             set<String>::type savedTextures;
             HlmsManager *hlmsManager = mRoot->getHlmsManager();
             for( size_t i=HLMS_LOW_LEVEL + 1u; i<HLMS_MAX; ++i )
@@ -802,10 +918,8 @@ namespace Ogre
                 Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
                 if( hlms )
                 {
-//                    const String materialPath = folderPath + "/material" +
-//                                                StringConverter::toString( i ) + ".json";
                     hlms->saveAllTexturesFromDatablocks(
-                                folderPath, savedTextures,
+                                textureFolder, savedTextures,
                                 (exportFlags & SceneFlags::TexturesOitd) != 0,
                                 (exportFlags & SceneFlags::TexturesOriginal) != 0,
                                 mListener );

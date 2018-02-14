@@ -100,8 +100,8 @@ namespace Ogre
         /// Defaults to 0xffffffff
         uint32  mMask;
 
-    protected:
         void destroyWorkspace(void);
+    protected:
         void destroyTexture(void);
 
     public:
@@ -182,6 +182,7 @@ namespace Ogre
         void _clearCubemap(void);
         void _updateRender(void);
 
+        const Vector3& getProbeCameraPos(void) const        { return mProbeCameraPos; }
         const Aabb& getArea(void) const                     { return mArea; }
         const Vector3& getAreaInnerRegion(void) const       { return mAreaInnerRegion; }
         const Matrix3& getOrientation(void) const           { return mOrientation; }

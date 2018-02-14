@@ -63,6 +63,19 @@ namespace Ogre
             datablockImpl->mBakedTextures.push_back( mBakedTextures[i] );
         }
 
+        for( size_t i=0; i<3; ++i )
+        {
+            datablockImpl->mEmissive[i] = mEmissive[i];
+        }
+
+        for( size_t i=0; i<3; ++i )
+        {
+            for( size_t j=0; j<4; ++j )
+            {
+                datablockImpl->mReserved[i][j] = mReserved[i][j];
+            }
+        }
+
         for( size_t i=0; i<4; ++i )
         {
             datablockImpl->mBlendModes[i] = mBlendModes[i];
@@ -83,7 +96,7 @@ namespace Ogre
             datablockImpl->mDetailWeight[i] = mDetailWeight[i];
         }
 
-        for( size_t i=0; i<8; ++i )
+        for( size_t i=0; i<4; ++i )
         {
             for( size_t j=0; j<4; ++j )
             {
@@ -91,24 +104,26 @@ namespace Ogre
             }
         }
 
-        for( size_t i=0; i<13; ++i )
+        for( size_t i=0; i<14; ++i )
         {
             datablockImpl->mUvSource[i] = mUvSource[i];
         }
 
-        for( size_t i=0; i<14; ++i )
+        for( size_t i=0; i<15; ++i )
         {
             datablockImpl->mTexIndices[i] = mTexIndices[i];
         }
 
-        for( size_t i=0; i<14; ++i )
+        for( size_t i=0; i<15; ++i )
         {
             datablockImpl->mTexToBakedTextureIdx[i] = mTexToBakedTextureIdx[i];
         }
 
-        for( size_t i=0; i<14; ++i )
+        for( size_t i=0; i<15; ++i )
         {
             datablockImpl->mSamplerblocks[i] = mSamplerblocks[i];
+            if( datablockImpl->mSamplerblocks[i] )
+                mCreator->getHlmsManager()->addReference( datablockImpl->mSamplerblocks[i] );
         }
     }
 }

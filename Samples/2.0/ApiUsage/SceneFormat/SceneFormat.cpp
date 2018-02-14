@@ -30,7 +30,7 @@ namespace Demo
         {
             Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
             return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-                                                    "PbsMaterialsWorkspace", true );
+                                                    "LocalCubemapsWorkspace", true );
         }
 
         virtual void setupResources(void)
@@ -40,16 +40,27 @@ namespace Demo
             Ogre::ConfigFile cf;
             cf.load(mResourcePath + "resources2.cfg");
 
-            Ogre::String dataFolder = cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+            Ogre::String originalDataFolder = cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
 
-            if( dataFolder.empty() )
-                dataFolder = "./";
-            else if( *(dataFolder.end() - 1) != '/' )
-                dataFolder += "/";
+            if( originalDataFolder.empty() )
+                originalDataFolder = "./";
+            else if( *(originalDataFolder.end() - 1) != '/' )
+                originalDataFolder += "/";
 
-            dataFolder += "2.0/scripts/materials/PbsMaterials";
+            const char *c_locations[5] =
+            {
+                "2.0/scripts/materials/PbsMaterials",
+                "2.0/scripts/materials/LocalCubemaps/",
+                "2.0/scripts/materials/LocalCubemaps/GLSL",
+                "2.0/scripts/materials/LocalCubemaps/HLSL",
+                "2.0/scripts/materials/LocalCubemaps/Metal"
+            };
 
-            addResourceLocation( dataFolder, "FileSystem", "General" );
+            for( size_t i=0; i<sizeof(c_locations) / sizeof(c_locations[0]); ++i )
+            {
+                Ogre::String dataFolder = originalDataFolder + c_locations[i];
+                addResourceLocation( dataFolder, "FileSystem", "General" );
+            }
         }
 
     public:

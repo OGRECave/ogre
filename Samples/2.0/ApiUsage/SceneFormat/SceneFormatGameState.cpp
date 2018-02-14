@@ -26,6 +26,8 @@
 #include "OgreForwardPlusBase.h"
 
 #include "../LocalCubemaps/LocalCubemapScene.h"
+#include "Compositor/OgreCompositorManager2.h"
+#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
 
 #include "InstantRadiosity/OgreInstantRadiosity.h"
 #include "OgreIrradianceVolume.h"
@@ -39,10 +41,11 @@ namespace Demo
     SceneFormatGameState::SceneFormatGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mInstantRadiosity( 0 ),
-        mIrradianceVolume( 0 )
+        mIrradianceVolume( 0 ),
+        mParallaxCorrectedCubemap( 0 )
     {
-        Ogre::FileSystemLayer filesystmLayer( OGRE_VERSION_NAME );
-        mFullpathToFile = filesystmLayer.getWritablePath( "scene_format_test_scene" );
+        Ogre::FileSystemLayer filesystemLayer( OGRE_VERSION_NAME );
+        mFullpathToFile = filesystemLayer.getWritablePath( "scene_format_test_scene" );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::destroyInstantRadiosity(void)
@@ -69,16 +72,109 @@ namespace Demo
         mInstantRadiosity = 0;
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatGameState::destroyParallaxCorrectCubemaps(void)
+    {
+        if( mParallaxCorrectedCubemap )
+        {
+            Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+            Ogre::Hlms *hlms = hlmsManager->getHlms( Ogre::HLMS_PBS );
+            assert( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
+
+            Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlms );
+
+            if( hlmsPbs && hlmsPbs->getParallaxCorrectedCubemap() == mParallaxCorrectedCubemap )
+                hlmsPbs->setParallaxCorrectedCubemap( 0 );
+
+            delete mParallaxCorrectedCubemap;
+            mParallaxCorrectedCubemap = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatGameState::resetScene(void)
     {
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
         destroyInstantRadiosity();
+        destroyParallaxCorrectCubemaps();
         sceneManager->clearScene( false );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatGameState::setupParallaxCorrectCubemaps(void)
+    {
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+
+        if( mParallaxCorrectedCubemap )
+        {
+            hlmsPbs->setParallaxCorrectedCubemap( 0 );
+
+            delete mParallaxCorrectedCubemap;
+            mParallaxCorrectedCubemap = 0;
+        }
+
+        Ogre::Root *root = mGraphicsSystem->getRoot();
+        Ogre::CompositorManager2 *compositorManager = root->getCompositorManager2();
+        Ogre::CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition(
+                    "LocalCubemapsProbeWorkspace" );
+
+        mParallaxCorrectedCubemap = new Ogre::ParallaxCorrectedCubemap(
+                    Ogre::Id::generateNewId<Ogre::ParallaxCorrectedCubemap>(),
+                    mGraphicsSystem->getRoot(),
+                    mGraphicsSystem->getSceneManager(),
+                    workspaceDef, 250, 1u << 25u );
+
+        mParallaxCorrectedCubemap->setEnabled( true, 1024, 1024, Ogre::PF_R8G8B8A8 );
+
+        Ogre::CubemapProbe *probe = 0;
+        Ogre::Aabb roomShape( Ogre::Vector3( -0.505, 3.400016, 5.066226 ),
+                              Ogre::Vector3( 5.064587, 3.891282, 9.556003 ) );
+        Ogre::Aabb probeArea;
+        probeArea.mHalfSize = Ogre::Vector3( 5.064587, 3.891282, 3.891282 );
+
+        const bool useMultipleProbes = true;
+
+        if( useMultipleProbes )
+        {
+            //Probe 00
+            probe = mParallaxCorrectedCubemap->createProbe();
+            probe->setTextureParams( 1024, 1024 );
+            probe->initWorkspace();
+
+            probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, -0.598495 );
+            probe->set( probeArea.mCenter, probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
+                        Ogre::Matrix3::IDENTITY, roomShape );
+        }
+
+        //Probe 01
+        probe = mParallaxCorrectedCubemap->createProbe();
+        probe->setTextureParams( 1024, 1024 );
+        probe->initWorkspace();
+
+        probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 5.423867 );
+        probe->set( useMultipleProbes ? probeArea.mCenter : roomShape.mCenter,
+                    useMultipleProbes ? probeArea : roomShape,
+                    Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
+                    Ogre::Matrix3::IDENTITY, roomShape );
+
+        if( useMultipleProbes )
+        {
+            //Probe 02
+            probe = mParallaxCorrectedCubemap->createProbe();
+            probe->setTextureParams( 1024, 1024 );
+            probe->initWorkspace();
+
+            probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 10.657585 );
+            probe->set( probeArea.mCenter, probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
+                        Ogre::Matrix3::IDENTITY, roomShape );
+        }
+
+        hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::generateScene(void)
     {
         destroyInstantRadiosity();
+        destroyParallaxCorrectCubemaps();
 
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
@@ -316,6 +412,8 @@ namespace Demo
             //Required by InstantRadiosity
             sceneManager->getForwardPlus()->setEnableVpls( true );
         }
+
+        setupParallaxCorrectCubemaps();
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::exportScene(void)
@@ -329,10 +427,14 @@ namespace Demo
     void SceneFormatGameState::importScene(void)
     {
         destroyInstantRadiosity();
+        destroyParallaxCorrectCubemaps();
 
-        Ogre::SceneFormatImporter importer( mGraphicsSystem->getRoot(), mGraphicsSystem->getSceneManager() );
+        Ogre::SceneFormatImporter importer( mGraphicsSystem->getRoot(),
+                                            mGraphicsSystem->getSceneManager(),
+                                            Ogre::BLANKSTRING );
         importer.importSceneFromFile( mFullpathToFile );
         importer.getInstantRadiosity( true, &mInstantRadiosity, &mIrradianceVolume );
+        mParallaxCorrectedCubemap = importer.getParallaxCorrectedCubemap( true );
 
 //        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 //        sceneManager->setForwardClustered( true, 16, 8, 24, 96, 2, 50 );
@@ -361,6 +463,7 @@ namespace Demo
     void SceneFormatGameState::destroyScene()
     {
         destroyInstantRadiosity();
+        destroyParallaxCorrectCubemaps();
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )

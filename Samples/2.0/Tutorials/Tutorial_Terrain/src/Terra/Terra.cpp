@@ -269,8 +269,10 @@ namespace Ogre
         const float fWidth = static_cast<float>( m_width );
         const float fDepth = static_cast<float>( m_depth );
 
-        retVal.x = (uint32)floorf( ((vPos.x - m_terrainOrigin.x) * m_xzInvDimensions.x) * fWidth );
-        retVal.z = (uint32)floorf( ((vPos.z - m_terrainOrigin.z) * m_xzInvDimensions.y) * fDepth );
+        const float fX = floorf( ((vPos.x - m_terrainOrigin.x) * m_xzInvDimensions.x) * fWidth );
+        const float fZ = floorf( ((vPos.z - m_terrainOrigin.z) * m_xzInvDimensions.y) * fDepth );
+        retVal.x = fX >= 0.0f ? static_cast<uint32>( fX ) : 0xffffffff;
+        retVal.z = fZ >= 0.0f ? static_cast<uint32>( fZ ) : 0xffffffff;
 
         return retVal;
     }

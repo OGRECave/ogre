@@ -65,13 +65,20 @@ namespace Ogre
         String mFilename;
         InstantRadiosity *mInstantRadiosity;
         IrradianceVolume *mIrradianceVolume;
+        ParallaxCorrectedCubemap *mParallaxCorrectedCubemap;
+        Matrix4 mSceneComponentTransform;
+        String  mDefaultPccWorkspaceName;
 
         LightArray mVplLights;
 
         typedef map<uint32, SceneNode*>::type IndexToSceneNodeMap;
         IndexToSceneNodeMap mCreatedSceneNodes;
 
+        SceneNode *mRootNodes[NUM_SCENE_MEMORY_MANAGER_TYPES];
+        SceneNode *mParentlessRootNodes[NUM_SCENE_MEMORY_MANAGER_TYPES];
+
         void destroyInstantRadiosity(void);
+        void destroyParallaxCorrectedCubemap(void);
 
         static inline Light::LightTypes parseLightType( const char *value );
         static inline float decodeFloat( const rapidjson::Value &jsonValue );
@@ -83,6 +90,7 @@ namespace Ogre
         static inline ColourValue decodeColourValueArray( const rapidjson::Value &jsonArray );
         static inline Aabb decodeAabbArray( const rapidjson::Value &jsonArray,
                                             const Aabb &defaultValue );
+        static inline Matrix3 decodeMatrix3Array( const rapidjson::Value &jsonArray );
 
         void importNode( const rapidjson::Value &nodeValue, Node *node );
         SceneNode* importSceneNode( const rapidjson::Value &sceneNodeValue, uint32 nodeIdx,
@@ -100,14 +108,77 @@ namespace Ogre
         void importLight( const rapidjson::Value &lightValue );
         void importLights( const rapidjson::Value &json );
         void importInstantRadiosity( const rapidjson::Value &irValue );
+        void importPcc( const rapidjson::Value &pccValue );
         void importSceneSettings( const rapidjson::Value &json, uint32 importFlags );
 
         void importScene( const String &filename, const rapidjson::Document &d,
                           uint32 importFlags=~SceneFlags::LightsVpl );
 
     public:
-        SceneFormatImporter( Root *root, SceneManager *sceneManager );
+        /**
+        @param root
+        @param sceneManager
+        @param defaultPccWorkspaceName
+            When importing PCC, the original workspace definition may not be available.
+            In such case, this allows you to use a fallback instead. If left blank,
+            we won't import PCC if the original workspace def couldn't be found.
+        */
+        SceneFormatImporter( Root *root, SceneManager *sceneManager,
+                             const String &defaultPccWorkspaceName );
         ~SceneFormatImporter();
+
+        /** Set the nodes that act as the root nodes for the scene to import.
+            By default these are nullptrs, which means we'll be using the real
+            root scenenodes from SceneManager (see SceneManager::getRootSceneNode)
+
+            This function allows you to define your own root nodes; which gives
+            you the power to easily transform the whole scene (e.g. globally
+            displace the scene, rotate it, scale it, etc)
+        @remarks
+            The scene root nodes may be modified during the import process.
+            Any transform set to these nodes before import may be lost.
+            Make sure to apply them after importing.
+        @see
+            setParentlessRootNodes
+        @param dynamicRoot
+            SceneNode to use as Root for SCENE_DYNAMIC nodes.
+            Leave nullptr for the default one.
+        @param staticRoot
+            SceneNode to use as Root for SCENE_STATIC nodes.
+            Leave nullptr for the default one.
+        */
+        void setRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot );
+
+        /** Similar to setRootNodes.
+            During export, it's possible some nodes were not attached to anything; thus
+            they were exported like that. They're parentless.
+            By default, importing the scene with such nodes means these nodes will b
+            created without a parent, like in the original.
+
+            This behavior may not always be desired, which is why you can control it
+            via this function, and have these nodes be attached to a parent node of
+            your choosing instead.
+        @remarks
+            Unlike setRootNodes, these nodes won't be modified during the import process.
+        @param dynamicRoot
+            SceneNode to use as parent for SCENE_DYNAMIC parentless nodes.
+            Leave nullptr for none.
+        @param staticRoot
+            SceneNode to use as parent for SCENE_STATIC parentless nodes.
+            Leave nullptr for none.
+        */
+        void setParentlessRootNodes( SceneNode *dynamicRoot, SceneNode *staticRoot );
+
+        /** Set a 4x4 matrix to apply a transformation to all the PCC probes during
+            import process. Also affects Areas of Interest for Instant Radiosity.
+            This is useful if you need to rotate or translate a scene.
+        @remarks
+            While any affine matrix will work; the best results are achieved if the matrix
+            is orthogonal (e.g. +- 90° and +- 180° changes)
+        @param transform
+            Must be affine. Default is identity matrix.
+        */
+        void setSceneComponentTransform( const Matrix4 &transform );
 
         /**
         @param outJson
@@ -151,6 +222,8 @@ namespace Ogre
         void getInstantRadiosity( bool releaseOwnership,
                                   InstantRadiosity **outInstantRadiosity,
                                   IrradianceVolume **outIrradianceVolume );
+
+        ParallaxCorrectedCubemap* getParallaxCorrectedCubemap( bool releaseOwnership );
     };
 
     /** @} */

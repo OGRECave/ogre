@@ -280,6 +280,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    bool CompositorManager2::hasShadowNodeDefinition( IdString nodeDefName ) const
+    {
+        return mShadowNodeDefs.find( nodeDefName ) != mShadowNodeDefs.end();
+    }
+    //-----------------------------------------------------------------------------------
     const CompositorShadowNodeDef* CompositorManager2::getShadowNodeDefinition(
                                                                     IdString nodeDefName ) const
     {
