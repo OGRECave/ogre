@@ -122,8 +122,6 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass*
         case Light::LT_SPOTLIGHT:
             {                       
                 Ogre::Vector3 vec3;
-                Ogre::Matrix3 matWorldIT;
-
 
                 // Update light position.
                 vParameter = matWorld * srcLight->getAs4DVector(true);
@@ -131,8 +129,7 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass*
 
 
                 // Update light direction.
-                source->getInverseTransposeWorldMatrix().extract3x3Matrix(matWorldIT);
-                vec3 = matWorldIT * srcLight->getDerivedDirection();
+                vec3 = source->getInverseTransposeWorldMatrix().linear() * srcLight->getDerivedDirection();
                 vec3.normalise();
 
                 vParameter.x = -vec3.x;

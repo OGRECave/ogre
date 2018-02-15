@@ -115,11 +115,8 @@ namespace Ogre
                            m[2][0], m[2][1], m[2][2]);
         }
 
-        void extract3x3Matrix(Matrix3& m3x3) const { m3x3 = linear(); }
-
-        /** Extracts the rotation / scaling part as a quaternion from the Matrix.
-         */
-        Quaternion extractQuaternion() const { return Quaternion(linear()); }
+        OGRE_DEPRECATED void extract3x3Matrix(Matrix3& m3x3) const { m3x3 = linear(); }
+        OGRE_DEPRECATED Quaternion extractQuaternion() const { return Quaternion(linear()); }
         /// Sets the translation transformation part of the matrix.
         void setTrans( const Vector3& v )
         {
@@ -242,7 +239,7 @@ namespace Ogre
             return *this;
         }
 
-        Matrix4 concatenate(const Matrix4& m2) const { return *this * m2; }
+        OGRE_DEPRECATED Matrix4 concatenate(const Matrix4& m2) const { return *this * m2; }
 
         /** Tests 2 matrices for equality.
         */

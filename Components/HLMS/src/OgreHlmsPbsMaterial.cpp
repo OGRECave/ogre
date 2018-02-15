@@ -321,7 +321,7 @@ namespace Ogre
 		if (count)
 		{
 		    Affine3 viewMatrix = source->getViewMatrix();
-			Quaternion viewMatrixQuat = viewMatrix.extractQuaternion();
+			Quaternion viewMatrixQuat = Quaternion(viewMatrix.linear());
 
 			int directionalLightIndex = 0;
 			int pointLightLightIndex = 0;

@@ -264,7 +264,6 @@ void PortalBase::updateDerivedValues(void) const
         }
         // save world transform
         Affine3 transform = mParentNode->_getFullTransform();
-        Matrix3 rotation;
         // save off the current DerivedCP
         mPrevDerivedCP = mDerivedCP;
         mDerivedCP = transform * mLocalCP;
@@ -276,8 +275,7 @@ void PortalBase::updateDerivedValues(void) const
             {
                 mDerivedCorners[i] =  transform * mCorners[i];
             }
-            transform.extract3x3Matrix(rotation);
-            mDerivedDirection = rotation * mDirection;
+            mDerivedDirection = transform.linear() * mDirection;
             break;
         case PORTAL_TYPE_AABB:
             {

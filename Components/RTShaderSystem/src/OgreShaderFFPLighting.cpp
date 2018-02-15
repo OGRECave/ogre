@@ -129,17 +129,13 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		case Light::LT_SPOTLIGHT:
 		{						
 			Vector3 vec3;
-			Matrix3 matViewIT;
-
-			source->getInverseTransposeViewMatrix().extract3x3Matrix(matViewIT);
-
 			
 			// Update light position.
 			vParameter = matView * srcLight->getAs4DVector(true);
 			curParams.mPosition->setGpuParameter(vParameter);
 			
 							
-			vec3 = matViewIT * srcLight->getDerivedDirection();
+			vec3 = source->getInverseTransposeViewMatrix().linear() * srcLight->getDerivedDirection();
 			vec3.normalise();
 
 			vParameter.x = -vec3.x;
