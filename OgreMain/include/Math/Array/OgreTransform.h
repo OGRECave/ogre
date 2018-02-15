@@ -134,7 +134,7 @@ namespace Ogre
             inCopy.mDerivedScale->getAsVector3( tmp, inCopy.mIndex );
             mDerivedScale->setFromVector3( tmp, mIndex );
 
-            mDerivedTransform[mIndex] = inCopy.mDerivedTransform[mIndex];
+            mDerivedTransform[mIndex] = inCopy.mDerivedTransform[inCopy.mIndex];
 
             mInheritOrientation[mIndex] = inCopy.mInheritOrientation[inCopy.mIndex];
             mInheritScale[mIndex]       = inCopy.mInheritScale[inCopy.mIndex];
