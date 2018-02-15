@@ -121,19 +121,6 @@ namespace Ogre
         return kProd;
     }
     //-----------------------------------------------------------------------
-    Vector3 Matrix3::operator* (const Vector3& rkPoint) const
-    {
-        Vector3 kProd;
-        for (size_t iRow = 0; iRow < 3; iRow++)
-        {
-            kProd[iRow] =
-                m[iRow][0]*rkPoint[0] +
-                m[iRow][1]*rkPoint[1] +
-                m[iRow][2]*rkPoint[2];
-        }
-        return kProd;
-    }
-    //-----------------------------------------------------------------------
     Vector3 operator* (const Vector3& rkPoint, const Matrix3& rkMatrix)
     {
         Vector3 kProd;

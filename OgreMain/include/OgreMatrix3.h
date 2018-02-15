@@ -142,9 +142,6 @@ namespace Ogre
         Matrix3 operator* (const Matrix3& rkMatrix) const;
         Matrix3 operator- () const;
 
-        /// Matrix * vector [3x3 * 3x1 = 3x1]
-        Vector3 operator* (const Vector3& rkVector) const;
-
         /// Vector * matrix [1x3 * 3x3 = 1x3]
         _OgreExport friend Vector3 operator* (const Vector3& rkVector,
             const Matrix3& rkMatrix);
@@ -214,7 +211,7 @@ namespace Ogre
             Matrix3& rkProduct);
 
         /** Determines if this matrix involves a scaling. */
-        inline bool hasScale() const
+        bool hasScale() const
         {
             // check magnitude of column vectors (==local axes)
             Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
@@ -266,6 +263,16 @@ namespace Ogre
         // for faster access
         friend class Matrix4;
     };
+
+    /// Matrix * vector [3x3 * 3x1 = 3x1]
+    inline Vector3 operator*(const Matrix3& m, const Vector3& v)
+    {
+        return Vector3(
+                m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+                m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+                m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
+    }
+
     /** @} */
     /** @} */
 }

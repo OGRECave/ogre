@@ -108,26 +108,18 @@ namespace Ogre
         /** Extracts the rotation / scaling part of the Matrix as a 3x3 matrix.
         @param m3x3 Destination Matrix3
         */
-        void extract3x3Matrix(Matrix3& m3x3) const
+        Matrix3 linear() const
         {
-            m3x3[0][0] = m[0][0];
-            m3x3[0][1] = m[0][1];
-            m3x3[0][2] = m[0][2];
-            m3x3[1][0] = m[1][0];
-            m3x3[1][1] = m[1][1];
-            m3x3[1][2] = m[1][2];
-            m3x3[2][0] = m[2][0];
-            m3x3[2][1] = m[2][1];
-            m3x3[2][2] = m[2][2];
+            return Matrix3(m[0][0], m[0][1], m[0][2],
+                           m[1][0], m[1][1], m[1][2],
+                           m[2][0], m[2][1], m[2][2]);
         }
+
+        void extract3x3Matrix(Matrix3& m3x3) const { m3x3 = linear(); }
+
         /** Extracts the rotation / scaling part as a quaternion from the Matrix.
          */
-        Quaternion extractQuaternion() const
-        {
-          Matrix3 m3x3;
-          extract3x3Matrix(m3x3);
-          return Quaternion(m3x3);
-        }
+        Quaternion extractQuaternion() const { return Quaternion(linear()); }
         /// Sets the translation transformation part of the matrix.
         void setTrans( const Vector3& v )
         {
@@ -161,23 +153,6 @@ namespace Ogre
             m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = ty;
             m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = tz;
             m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
-        }
-
-        /** Determines if this matrix involves a scaling. */
-        bool hasScale() const
-        {
-            // check magnitude of column vectors (==local axes)
-            Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-            t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-            t = m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2];
-            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-                return true;
-
-            return false;
         }
 
         /** Determines if this matrix involves a negative scaling. */
@@ -367,18 +342,6 @@ namespace Ogre
         bool operator!=(const Affine3& m2) const { return !(*this == m2); }
 
         Affine3 inverse() const;
-
-        /**
-        Transforms the given 3-D vector by the 3x3 submatrix, without
-        adding translation, as should be transformed directions and normals.
-        */
-        Vector3 transformDirection(const Vector3& v) const
-        {
-            return Vector3(
-                    m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
-                    m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
-                    m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
-        }
 
         /** Decompose to orientation / scale / position.
         */

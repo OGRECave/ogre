@@ -592,9 +592,7 @@ namespace Ogre {
         {
             _updateFromParent();
         }
-        return useScale ? 
-            _getFullTransform().transformDirection(localDir) :
-            mDerivedOrientation * localDir;
+        return useScale ? _getFullTransform().linear() * localDir : mDerivedOrientation * localDir;
     }
     //-----------------------------------------------------------------------
     Quaternion Node::convertWorldToLocalOrientation( const Quaternion &worldOrientation )

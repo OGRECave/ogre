@@ -248,12 +248,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void Affine3::decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
     {
-        Matrix3 m3x3;
-        extract3x3Matrix(m3x3);
-
         Matrix3 matQ;
         Vector3 vecU;
-        m3x3.QDUDecomposition( matQ, scale, vecU ); 
+        linear().QDUDecomposition( matQ, scale, vecU );
 
         orientation = Quaternion( matQ );
         position = Vector3( m[0][3], m[1][3], m[2][3] );
