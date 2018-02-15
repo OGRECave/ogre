@@ -192,7 +192,7 @@ namespace Ogre
                 }
 
                 if(i != 3)
-                    o << ";";
+                    o << "; ";
             }
             o << ")";
             return o;
