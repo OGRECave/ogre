@@ -1,6 +1,6 @@
 project(OgreJava)
 
-find_package(SWIG)
+find_package(SWIG 3.0.8)
 
 if(ANDROID)
 	set(JNI_FOUND TRUE)
