@@ -1,6 +1,6 @@
 project(OgrePython)
 
-find_package(SWIG)
+find_package(SWIG 3.0.8)
 include_directories(${PYTHON_INCLUDE_PATH})
 
 if(NOT PYTHONLIBS_FOUND OR NOT SWIG_FOUND)
