@@ -64,12 +64,6 @@ namespace Ogre {
     protected:
         ObjectMap mObjectsByName;
 
-        /// Pointer to a Wire Bounding Box for this Node
-        WireBoundingBox *mWireBoundingBox;
-        /// Flag that determines if the bounding box of the node should be displayed
-        bool mShowBoundingBox;
-        bool mHideBoundingBox;
-
         /// SceneManager which created this node
         SceneManager* mCreator;
 
@@ -92,19 +86,24 @@ namespace Ogre {
         */
         virtual void setInSceneGraph(bool inGraph);
 
-        /// Whether to yaw around a fixed axis.
-        bool mYawFixed;
-        /// Fixed axis to yaw around
-        Vector3 mYawFixedAxis;
-
         /// Auto tracking target
         SceneNode* mAutoTrackTarget;
+        /// Pointer to a Wire Bounding Box for this Node
+        WireBoundingBox *mWireBoundingBox;
         /// Tracking offset for fine tuning
         Vector3 mAutoTrackOffset;
         /// Local 'normal' direction vector
         Vector3 mAutoTrackLocalDirection;
+        /// Fixed axis to yaw around
+        Vector3 mYawFixedAxis;
+
+        /// Whether to yaw around a fixed axis.
+        bool mYawFixed : 1;
         /// Is this node a current part of the scene graph?
-        bool mIsInSceneGraph;
+        bool mIsInSceneGraph : 1;
+        /// Flag that determines if the bounding box of the node should be displayed
+        bool mShowBoundingBox : 1;
+        bool mHideBoundingBox : 1;
     public:
         /** Constructor, only to be called by the creator SceneManager.
         @remarks

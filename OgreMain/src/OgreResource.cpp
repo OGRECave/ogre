@@ -35,7 +35,7 @@ namespace Ogre
         const String& group, bool isManual, ManualResourceLoader* loader)
         : mCreator(creator), mName(name), mGroup(group), mHandle(handle), 
         mLoadingState(LOADSTATE_UNLOADED), mIsBackgroundLoaded(false),
-        mSize(0), mIsManual(isManual), mLoader(loader), mStateCount(0)
+        mIsManual(isManual), mSize(0),  mLoader(loader), mStateCount(0)
     {
     }
     //-----------------------------------------------------------------------

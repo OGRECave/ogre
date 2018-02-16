@@ -123,32 +123,32 @@ namespace Ogre {
         typedef set<Node*>::type ChildUpdateSet;
         /// List of children which need updating, used if self is not out of date but children are
         ChildUpdateSet mChildrenToUpdate;
-        /// Flag to indicate own transform from parent is out of date
-        mutable bool mNeedParentUpdate;
-        /// Flag indicating that all children need to be updated
-        bool mNeedChildUpdate;
-        /// Flag indicating that parent has been notified about update request
-        bool mParentNotified ;
-        /// Flag indicating that the node has been queued for update
-        bool mQueuedForUpdate;
-
         /// Friendly name of this node
         String mName;
 
+        /// Flag to indicate own transform from parent is out of date
+        mutable bool mNeedParentUpdate : 1;
+        /// Flag indicating that all children need to be updated
+        bool mNeedChildUpdate : 1;
+        /// Flag indicating that parent has been notified about update request
+        bool mParentNotified : 1;
+        /// Flag indicating that the node has been queued for update
+        bool mQueuedForUpdate : 1;
+        /// Stores whether this node inherits orientation from it's parent
+        bool mInheritOrientation : 1;
+        /// Stores whether this node inherits scale from it's parent
+        bool mInheritScale : 1;
+        mutable bool mCachedTransformOutOfDate : 1;
+
         /// Stores the orientation of the node relative to it's parent.
         Quaternion mOrientation;
-
         /// Stores the position/translation of the node relative to its parent.
         Vector3 mPosition;
-
         /// Stores the scaling factor applied to this node
         Vector3 mScale;
 
-        /// Stores whether this node inherits orientation from it's parent
-        bool mInheritOrientation;
-
-        /// Stores whether this node inherits scale from it's parent
-        bool mInheritScale;
+        /// Cached derived transform as a 4x4 matrix
+        mutable Affine3 mCachedTransform;
 
         /// Only available internally - notification of parent.
         virtual void setParent(Node* parent);
@@ -210,20 +210,16 @@ namespace Ogre {
         /// The scale to use as a base for keyframe animation
         Vector3 mInitialScale;
 
-        /// Cached derived transform as a 4x4 matrix
-        mutable Affine3 mCachedTransform;
-        mutable bool mCachedTransformOutOfDate;
-
         /** Node listener - only one allowed (no list) for size & performance reasons. */
         Listener* mListener;
-
-        typedef vector<Node*>::type QueuedUpdates;
-        static QueuedUpdates msQueuedUpdates;
 
         DebugRenderable* mDebug;
 
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;
+
+        typedef vector<Node*>::type QueuedUpdates;
+        static QueuedUpdates msQueuedUpdates;
 
     public:
         /** Constructor, should only be called by parent, not directly.

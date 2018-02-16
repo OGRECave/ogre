@@ -72,15 +72,12 @@ namespace Ogre
             @note
                 It does <b>NOT</b> initialize the matrix for efficiency.
         */
-        inline Matrix3 () {}
-        inline explicit Matrix3 (const Real arr[3][3])
+        Matrix3 () {}
+        explicit Matrix3 (const Real arr[3][3])
         {
             memcpy(m,arr,9*sizeof(Real));
         }
-        inline Matrix3 (const Matrix3& rkMatrix)
-        {
-            memcpy(m,rkMatrix.m,9*sizeof(Real));
-        }
+
         Matrix3 (Real fEntry00, Real fEntry01, Real fEntry02,
                     Real fEntry10, Real fEntry11, Real fEntry12,
                     Real fEntry20, Real fEntry21, Real fEntry22)
@@ -97,22 +94,16 @@ namespace Ogre
         }
 
         /// Member access, allows use of construct mat[r][c]
-        inline const Real* operator[] (size_t iRow) const
+        const Real* operator[] (size_t iRow) const
         {
             return m[iRow];
         }
 
-        inline Real* operator[] (size_t iRow)
+        Real* operator[] (size_t iRow)
         {
             return m[iRow];
         }
 
-
-
-        /*inline operator Real* ()
-        {
-            return (Real*)m[0];
-        }*/
         Vector3 GetColumn (size_t iCol) const;
         void SetColumn(size_t iCol, const Vector3& vec);
         void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
@@ -123,7 +114,7 @@ namespace Ogre
 
         /** Tests 2 matrices for inequality.
          */
-        inline bool operator!= (const Matrix3& rkMatrix) const
+        bool operator!= (const Matrix3& rkMatrix) const
         {
             return !operator==(rkMatrix);
         }
@@ -142,9 +133,6 @@ namespace Ogre
         Matrix3 operator* (const Matrix3& rkMatrix) const;
         Matrix3 operator- () const;
 
-        /// Matrix * vector [3x3 * 3x1 = 3x1]
-        Vector3 operator* (const Vector3& rkVector) const;
-
         /// Vector * matrix [1x3 * 3x3 = 1x3]
         _OgreExport friend Vector3 operator* (const Vector3& rkVector,
             const Matrix3& rkMatrix);
@@ -160,6 +148,10 @@ namespace Ogre
         bool Inverse (Matrix3& rkInverse, Real fTolerance = 1e-06) const;
         Matrix3 Inverse (Real fTolerance = 1e-06) const;
         Real Determinant () const;
+
+        Matrix3 transpose() const { return Transpose(); }
+        Matrix3 inverse() const { return Inverse(); }
+        Real determinant() const { return Determinant(); }
 
         /// Singular value decomposition
         void SingularValueDecomposition (Matrix3& rkL, Vector3& rkS,
@@ -214,7 +206,7 @@ namespace Ogre
             Matrix3& rkProduct);
 
         /** Determines if this matrix involves a scaling. */
-        inline bool hasScale() const
+        bool hasScale() const
         {
             // check magnitude of column vectors (==local axes)
             Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
@@ -235,8 +227,8 @@ namespace Ogre
         inline _OgreExport friend std::ostream& operator <<
             ( std::ostream& o, const Matrix3& mat )
         {
-            o << "Matrix3(" << mat[0][0] << ", " << mat[0][1] << ", " << mat[0][2] << ", " 
-                            << mat[1][0] << ", " << mat[1][1] << ", " << mat[1][2] << ", " 
+            o << "Matrix3(" << mat[0][0] << ", " << mat[0][1] << ", " << mat[0][2] << "; "
+                            << mat[1][0] << ", " << mat[1][1] << ", " << mat[1][2] << "; "
                             << mat[2][0] << ", " << mat[2][1] << ", " << mat[2][2] << ")";
             return o;
         }
@@ -266,6 +258,16 @@ namespace Ogre
         // for faster access
         friend class Matrix4;
     };
+
+    /// Matrix * vector [3x3 * 3x1 = 3x1]
+    inline Vector3 operator*(const Matrix3& m, const Vector3& v)
+    {
+        return Vector3(
+                m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+                m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+                m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
+    }
+
     /** @} */
     /** @} */
 }

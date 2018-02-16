@@ -3287,7 +3287,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         // Assume first world matrix representative - shaders that use multiple
         // matrices should control renormalisation themselves
         if ((pass->getNormaliseNormals() || mNormaliseNormalsOnScale)
-            && mTempXform[0].hasScale())
+            && mTempXform[0].linear().hasScale())
             mDestRenderSystem->setNormaliseNormals(true);
         else
             mDestRenderSystem->setNormaliseNormals(false);

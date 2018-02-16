@@ -110,28 +110,34 @@ namespace Ogre {
         SceneManager* mManager;
         /// node to which this object is attached
         Node* mParentNode;
-        bool mParentIsTagPoint;
+        /// MovableObject listener - only one allowed (no list) for size & performance reasons. */
+        Listener* mListener;
+        bool mParentIsTagPoint : 1;
         /// Is this object visible?
-        bool mVisible;
+        bool mVisible : 1;
         /// Is debug display enabled?
-        bool mDebugDisplay;
+        bool mDebugDisplay : 1;
+        /// Hidden because of distance?
+        bool mBeyondFarDistance : 1;
+        /// Does this object cast shadows?
+        bool mCastShadows : 1;
+        /// Flags whether the RenderQueue's default should be used.
+        bool mRenderQueueIDSet : 1;
+        /// Flags whether the RenderQueue's default should be used.
+        bool mRenderQueuePrioritySet : 1;
+        /// Does rendering this object disabled by listener?
+        bool mRenderingDisabled : 1;
+        /// The render queue to use when rendering this object
+        uint8 mRenderQueueID;
+        /// The render queue group to use when rendering this object
+        ushort mRenderQueuePriority;
         /// Upper distance to still render
         Real mUpperDistance;
         Real mSquaredUpperDistance;
-        // Minimum pixel size to still render
+        /// Minimum pixel size to still render
         Real mMinPixelSize;
-        /// Hidden because of distance?
-        bool mBeyondFarDistance;    
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;
-        /// The render queue to use when rendering this object
-        uint8 mRenderQueueID;
-        /// Flags whether the RenderQueue's default should be used.
-        bool mRenderQueueIDSet;
-        /// The render queue group to use when rendering this object
-        ushort mRenderQueuePriority;
-        /// Flags whether the RenderQueue's default should be used.
-        bool mRenderQueuePrioritySet;
         /// Flags determining whether this object is included / excluded from scene queries
         uint32 mQueryFlags;
         /// Flags determining whether this object is visible (compared to SceneManager mask)
@@ -142,19 +148,10 @@ namespace Ogre {
         mutable Sphere mWorldBoundingSphere;
         /// World space AABB of this object's dark cap
         mutable AxisAlignedBox mWorldDarkCapBounds;
-        /// Does this object cast shadows?
-        bool mCastShadows;
-
-        /// Does rendering this object disabled by listener?
-        bool mRenderingDisabled;
-        /// MovableObject listener - only one allowed (no list) for size & performance reasons. */
-        Listener* mListener;
-
         /// List of lights for this object
         mutable LightList mLightList;
         /// The last frame that this light list was updated in
         mutable ulong mLightListUpdated;
-
         /// the light mask defined for this movable. This will be taken into consideration when deciding which light should affect this movable
         uint32 mLightMask;
 

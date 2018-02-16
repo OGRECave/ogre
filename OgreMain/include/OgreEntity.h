@@ -121,10 +121,25 @@ namespace Ogre {
         /// - separate since we need to s/w anim for shadows whilst still altering
         ///   the vertex data for hardware morphing (pos2 binding)
         VertexData* mHardwareVertexAnimVertexData;
+
         /// Have we applied any vertex animation to shared geometry?
-        bool mVertexAnimationAppliedThisFrame;
+        bool mVertexAnimationAppliedThisFrame : 1;
         /// Have the temp buffers already had their geometry prepared for use in rendering shadow volumes?
-        bool mPreparedForShadowVolumes;
+        bool mPreparedForShadowVolumes : 1;
+        /// Flag determines whether or not to display skeleton.
+        bool mDisplaySkeleton : 1;
+        /// Current state of the hardware animation as represented by the entities parameters.
+        bool mCurrentHWAnimationState : 1;
+        /// Flag indicating whether to skip automatic updating of the Skeleton's AnimationState.
+        bool mSkipAnimStateUpdates : 1;
+        /// Flag indicating whether to update the main entity skeleton even when an LOD is displayed.
+        bool mAlwaysUpdateMainSkeleton : 1;
+        /// Flag indicating whether to update the bounding box from the bones of the skeleton.
+        bool mUpdateBoundingBoxFromSkeleton : 1;
+        /// Flag indicating whether we have a vertex program in use on any of our subentities.
+        bool mVertexProgramInUse : 1;
+        /// Has this entity been initialised yet?
+        bool mInitialised : 1;
 
         /** Internal method - given vertex data which could be from the Mesh or
             any submesh, finds the temporary blend copy.
@@ -172,11 +187,13 @@ namespace Ogre {
         */
         void finalisePoseNormals(const VertexData* srcData, VertexData* destData);
 
+        /// Number of hardware poses supported by materials.
+        ushort mHardwarePoseCount;
+        ushort mNumBoneMatrices;
         /// Cached bone matrices, including any world transform.
         Affine3 *mBoneWorldMatrices;
         /// Cached bone matrices in skeleton local space, might shares with other entity instances.
         Affine3 *mBoneMatrices;
-        unsigned short mNumBoneMatrices;
         /// Records the last frame in which animation was updated.
         unsigned long mFrameAnimationLastUpdated;
 
@@ -200,30 +217,16 @@ namespace Ogre {
         */
         bool cacheBoneMatrices(void);
 
-        /// Flag determines whether or not to display skeleton.
-        bool mDisplaySkeleton;
         /** Flag indicating whether hardware animation is supported by this entities materials
             data is saved per scehme number.
         */
         SchemeHardwareAnimMap mSchemeHardwareAnim;
 
-        /// Current state of the hardware animation as represented by the entities parameters.
-        bool mCurrentHWAnimationState;
-
-        /// Number of hardware poses supported by materials.
-        ushort mHardwarePoseCount;
-        /// Flag indicating whether we have a vertex program in use on any of our subentities.
-        bool mVertexProgramInUse;
         /// Counter indicating number of requests for software animation.
         int mSoftwareAnimationRequests;
         /// Counter indicating number of requests for software blended normals.
         int mSoftwareAnimationNormalsRequests;
-        /// Flag indicating whether to skip automatic updating of the Skeleton's AnimationState.
-        bool mSkipAnimStateUpdates;
-        /// Flag indicating whether to update the main entity skeleton even when an LOD is displayed.
-        bool mAlwaysUpdateMainSkeleton;
-        /// Flag indicating whether to update the bounding box from the bones of the skeleton.
-        bool mUpdateBoundingBoxFromSkeleton;
+
 
 #if !OGRE_NO_MESHLOD
         /// The LOD number of the mesh to use, calculated by _notifyCurrentCamera.
@@ -265,9 +268,6 @@ namespace Ogre {
         /** This Entity's personal copy of the skeleton, if skeletally animated.
         */
         SkeletonInstance* mSkeletonInstance;
-
-        /// Has this entity been initialised yet?
-        bool mInitialised;
 
         /// Last parent transform.
         Affine3 mLastParentXform;
@@ -330,11 +330,10 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr mWBuffer;
             /// Link to current vertex data used to bind (maybe changes).
             const VertexData* mCurrentVertexData;
-            /// Original position buffer source binding.
-            unsigned short mOriginalPosBufferBinding;
             /// Link to SubEntity, only present if SubEntity has it's own geometry.
             SubEntity* mSubEntity;
-
+            /// Original position buffer source binding.
+            ushort mOriginalPosBufferBinding;
 
         public:
             EntityShadowRenderable(Entity* parent,
