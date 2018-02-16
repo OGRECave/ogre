@@ -42,6 +42,9 @@ namespace Ogre {
     /** \addtogroup RenderSystem
     *  @{
     */
+
+    typedef vector<Renderable*>::type RenderableList;
+
     /** Struct associating a single Pass with a single Renderable. 
         This is used to for objects sorted by depth and thus not
         grouped by pass.
@@ -73,30 +76,18 @@ namespace Ogre {
         /** Called when visiting a RenderablePass, i.e. items in a
             sorted collection where items are not grouped by pass.
         @remarks
-            If this is called, neither of the other 2 visit methods
-            will be called.
+            If this is called, the other visit method
+            will not be called.
         */
         virtual void visit(RenderablePass* rp) = 0;
 
-        /* When visiting a collection grouped by pass, this is
-            called when the grouping pass changes.
+        /** When visiting a collection grouped by pass, this is
+            called.
         @remarks
             If this method is called, the RenderablePass visit 
-            method will not be called for this collection. The 
-            Renderable visit method will be called for each item
-            underneath the pass grouping level.
-        @return True to continue, false to skip the Renderables underneath
+            method will not be called for this collection.
         */
-        virtual bool visit(const Pass* p) = 0;
-        /** Visit method called once per Renderable on a grouped 
-            collection.
-        @remarks
-            If this method is called, the RenderablePass visit 
-            method will not be called for this collection. 
-        */
-        virtual void visit(Renderable* r) = 0;
-        
-        
+        virtual void visit(const Pass* p, RenderableList& rs) = 0;
     };
 
     /** Lowest level collection of renderables.
@@ -192,7 +183,6 @@ namespace Ogre {
          vectors only ever increase in size, so even if we do clear() the memory stays
          allocated, ie fast */
         typedef vector<RenderablePass>::type RenderablePassList;
-        typedef vector<Renderable*>::type RenderableList;
         /** Map of pass to renderable lists, this is a grouping by pass. */
         typedef map<Pass*, RenderableList, PassGroupLess>::type PassGroupRenderableMap;
 

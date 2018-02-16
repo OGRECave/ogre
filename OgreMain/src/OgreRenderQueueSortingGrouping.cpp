@@ -416,18 +416,7 @@ namespace Ogre {
             // Fast bypass if this group is now empty
             if (ipass->second.empty()) continue;
 
-            // Visit Pass - allow skip
-            if (!visitor->visit(ipass->first))
-                continue;
-
-            const RenderableList& rendList = ipass->second;
-            RenderableList::const_iterator irend, irendend;
-            irendend = rendList.end();
-            for (irend = rendList.begin(); irend != irendend; ++irend)
-            {
-                // Visit Renderable
-                visitor->visit(const_cast<Renderable*>(*irend));
-            }
+            visitor->visit(ipass->first, const_cast<RenderableList&>(ipass->second));
         } 
 
     }

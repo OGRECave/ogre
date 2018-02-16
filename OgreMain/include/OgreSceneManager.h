@@ -357,8 +357,7 @@ namespace Ogre {
             SceneMgrQueuedRenderableVisitor() 
                 :transparentShadowCastersMode(false) {}
             ~SceneMgrQueuedRenderableVisitor() {}
-            void visit(Renderable* r);
-            bool visit(const Pass* p);
+            void visit(const Pass* p, RenderableList& rs);
             void visit(RenderablePass* rp);
 
             /// Target SM to send renderables to

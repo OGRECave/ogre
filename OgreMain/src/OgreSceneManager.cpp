@@ -2949,27 +2949,24 @@ void SceneManager::renderTextureShadowReceiverQueueGroupObjects(
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::SceneMgrQueuedRenderableVisitor::visit(Renderable* r)
-{
-    // Give SM a chance to eliminate
-    if (targetSceneMgr->validateRenderableForRendering(mUsedPass, r))
-    {
-        // Render a single object, this will set up auto params if required
-        targetSceneMgr->renderSingleObject(r, mUsedPass, scissoring, autoLights, manualLightList);
-    }
-}
-//-----------------------------------------------------------------------
-bool SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p)
+void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p, RenderableList& rs)
 {
     // Give SM a chance to eliminate this pass
     if (!targetSceneMgr->validatePassForRendering(p))
-        return false;
+        return;
 
     // Set pass, store the actual one used
     mUsedPass = targetSceneMgr->_setPass(p);
 
+    for (Renderable* r : rs)
+    {
+        // Give SM a chance to eliminate
+        if (!targetSceneMgr->validateRenderableForRendering(mUsedPass, r))
+            continue;
 
-    return true;
+        // Render a single object, this will set up auto params if required
+        targetSceneMgr->renderSingleObject(r, mUsedPass, scissoring, autoLights, manualLightList);
+    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::SceneMgrQueuedRenderableVisitor::visit(RenderablePass* rp)
