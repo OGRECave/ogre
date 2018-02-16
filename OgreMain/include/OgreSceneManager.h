@@ -990,13 +990,11 @@ namespace Ogre {
         /// Last light sets
         uint32 mLastLightHash;
         unsigned short mLastLightLimit;
-        uint32 mLastLightHashGpuProgram;
         /// Gpu params that need rebinding (mask of GpuParamVariability)
         uint16 mGpuParamsDirty;
 
-        void useLights(const LightList& lights, unsigned short limit);
+        void useLights(const LightList& lights, ushort limit, bool fixedFunction);
         void setViewMatrix(const Affine3& m);
-        void useLightsGpuProgram(const Pass* pass, const LightList* lights);
         void bindGpuProgram(GpuProgram* prog);
         void updateGpuProgramParameters(const Pass* p);
 

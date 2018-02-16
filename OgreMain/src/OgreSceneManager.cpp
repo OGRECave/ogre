@@ -138,7 +138,6 @@ mSuppressShadows(false),
 mCameraRelativeRendering(false),
 mLastLightHash(0),
 mLastLightLimit(0),
-mLastLightHashGpuProgram(0),
 mGpuParamsDirty((uint16)GPV_ALL)
 {
 
@@ -1387,7 +1386,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	
     // reset light hash so even if light list is the same, we refresh the content every frame
     LightList emptyLightList;
-    useLights(emptyLightList, 0);
+    useLights(emptyLightList, 0, true);
 
     if (isShadowTechniqueInUse())
     {
@@ -3235,7 +3234,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     }
 
     // pass the FFP lighting state to shader
-    bool passSurfaceAndLightParams = !vprog || vprog->getPassSurfaceAndLightStates();
+    bool passLightParams =
+        pass->getLightingEnabled() && (!vprog || vprog->getPassSurfaceAndLightStates());
 
     if (pass->isProgrammable())
     {
@@ -3459,17 +3459,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
             fireRenderSingleObject(rend, pass, mAutoParamDataSource, pLightListToUse, false);
 
-            // Do we need to update GPU program parameters?
-            if (pass->isProgrammable())
-            {
-                useLightsGpuProgram(pass, pLightListToUse);
-            }
             // Do we need to update light states?
             // Only do this if fixed-function vertex lighting applies
-            if (pass->getLightingEnabled() && passSurfaceAndLightParams)
-            {
-                useLights(*pLightListToUse, pass->getMaxSimultaneousLights());
-            }
+            if (pass->isProgrammable() || pass->getLightingEnabled())
+                useLights(*pLightListToUse, pass->getMaxSimultaneousLights(), passLightParams);
+
             // optional light scissoring & clipping
             ClipResult scissored = CLIPPED_NONE;
             ClipResult clipped = CLIPPED_NONE;
@@ -3546,17 +3540,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         if (!skipBecauseOfLightType)
         {
             fireRenderSingleObject(rend, pass, mAutoParamDataSource, manualLightList, false);
-            // Do we need to update GPU program parameters?
-            if (pass->isProgrammable() && manualLightList)
-            {
-                useLightsGpuProgram(pass, manualLightList);
-            }
 
             // Use manual lights if present, and not using vertex programs that don't use fixed pipeline
-            if (manualLightList && pass->getLightingEnabled() && passSurfaceAndLightParams)
-            {
-                useLights(*manualLightList, pass->getMaxSimultaneousLights());
-            }
+            if (manualLightList && (pass->isProgrammable() || pass->getLightingEnabled()))
+                useLights(*manualLightList, pass->getMaxSimultaneousLights(), passLightParams);
 
             // optional light scissoring
             ClipResult scissored = CLIPPED_NONE;
@@ -7284,38 +7271,34 @@ void SceneManager::setViewMatrix(const Affine3& m)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::useLights(const LightList& lights, unsigned short limit)
+void SceneManager::useLights(const LightList& lights, ushort limit, bool fixedFunction)
 {
-    // only call the rendersystem if light list has changed
-    if (lights.getHash() != mLastLightHash || limit != mLastLightLimit)
+    bool updateGpu = lights.getHash() != mLastLightHash;
+    bool updateFF = fixedFunction && (updateGpu || limit != mLastLightLimit);
+
+    if(updateGpu)
     {
-        mDestRenderSystem->_useLights(lights, limit);
         mLastLightHash = lights.getHash();
-        mLastLightLimit = limit;
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::useLightsGpuProgram(const Pass* pass, const LightList* lights)
-{
-    // only call the rendersystem if light list has changed
-    if (lights->getHash() != mLastLightHashGpuProgram)
-    {
+
         // Update any automatic gpu params for lights
         // Other bits of information will have to be looked up
-        mAutoParamDataSource->setCurrentLightList(lights);
+        mAutoParamDataSource->setCurrentLightList(&lights);
         mGpuParamsDirty |= GPV_LIGHTS;
+    }
 
-        mLastLightHashGpuProgram = lights->getHash();
-
+    if (updateFF)
+    {
+        mDestRenderSystem->_useLights(lights, limit);
+        mLastLightLimit = limit;
     }
 }
 //---------------------------------------------------------------------
 void SceneManager::bindGpuProgram(GpuProgram* prog)
 {
-    // need to dirty the light hash, and paarams that need resetting, since program params will have been invalidated
+    // need to dirty the light hash, and params that need resetting, since program params will have been invalidated
     // Use 1 to guarantee changing it (using 0 could result in no change if list is empty)
     // Hash == 1 is almost impossible to achieve otherwise
-    mLastLightHashGpuProgram = 1;
+    mLastLightHash = 1;
     mGpuParamsDirty = (uint16)GPV_ALL;
     mDestRenderSystem->bindGpuProgram(prog);
 }
