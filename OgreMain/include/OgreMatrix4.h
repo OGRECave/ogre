@@ -152,9 +152,6 @@ namespace Ogre
             m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
         }
 
-        /** Determines if this matrix involves a negative scaling. */
-        bool hasNegativeScale() const { return determinant() < 0; }
-
         Real determinant() const;
 
         Matrix4 transpose() const;

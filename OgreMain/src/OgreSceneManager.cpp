@@ -3298,7 +3298,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         {
             CullingMode cullMode = mPassCullingMode;
 
-            if (mTempXform[0].hasNegativeScale())
+            if (mTempXform[0].linear().hasNegativeScale())
             {
                 switch(mPassCullingMode)
                 {
