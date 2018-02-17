@@ -953,374 +953,355 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         //Should we warn or throw an exception if an illegal state was achieved?
     }
 
-    if (!mSuppressRenderStateChanges || evenIfSuppressed)
+    if (mSuppressRenderStateChanges && !evenIfSuppressed)
+        return pass;
+
+    if (mIlluminationStage == IRS_RENDER_TO_TEXTURE && shadowDerivation)
     {
-        if (mIlluminationStage == IRS_RENDER_TO_TEXTURE && shadowDerivation)
+        // Derive a special shadow caster pass from this one
+        pass = deriveShadowCasterPass(pass);
+    }
+    else if (mIlluminationStage == IRS_RENDER_RECEIVER_PASS && shadowDerivation)
+    {
+        pass = deriveShadowReceiverPass(pass);
+    }
+
+    // Tell params about current pass
+    mAutoParamDataSource->setCurrentPass(pass);
+
+    GpuProgram* vprog = pass->hasVertexProgram() ? pass->getVertexProgram().get() : 0;
+    GpuProgram* fprog = pass->hasFragmentProgram() ? pass->getFragmentProgram().get() : 0;
+
+    bool passSurfaceAndLightParams = !vprog || vprog->getPassSurfaceAndLightStates();
+    bool passFogParams = !fprog || fprog->getPassFogStates();
+
+    if (vprog)
+    {
+        bindGpuProgram(vprog->_getBindingDelegate());
+    }
+    else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION))
+    {
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                    "RenderSystem does not support FixedFunction, "
+                    "but technique has no Vertex Shader: " +
+                        pass->getParent()->getParent()->getName(),
+                    "SceneManager::_setPass");
+    }
+    else
+    {
+        // Unbind program?
+        if (mDestRenderSystem->isGpuProgramBound(GPT_VERTEX_PROGRAM))
         {
-            // Derive a special shadow caster pass from this one
-            pass = deriveShadowCasterPass(pass);
+            mDestRenderSystem->unbindGpuProgram(GPT_VERTEX_PROGRAM);
         }
-        else if (mIlluminationStage == IRS_RENDER_RECEIVER_PASS && shadowDerivation)
+        // Set fixed-function vertex parameters
+    }
+
+    if (pass->hasGeometryProgram())
+    {
+        bindGpuProgram(pass->getGeometryProgram()->_getBindingDelegate());
+        // bind parameters later
+    }
+    else
+    {
+        // Unbind program?
+        if (mDestRenderSystem->isGpuProgramBound(GPT_GEOMETRY_PROGRAM))
         {
-            pass = deriveShadowReceiverPass(pass);
+            mDestRenderSystem->unbindGpuProgram(GPT_GEOMETRY_PROGRAM);
+        }
+    }
+    if (pass->hasTessellationHullProgram())
+    {
+        bindGpuProgram(pass->getTessellationHullProgram()->_getBindingDelegate());
+        // bind parameters later
+    }
+    else
+    {
+        // Unbind program?
+        if (mDestRenderSystem->isGpuProgramBound(GPT_HULL_PROGRAM))
+        {
+            mDestRenderSystem->unbindGpuProgram(GPT_HULL_PROGRAM);
+        }
+    }
+
+    if (pass->hasTessellationDomainProgram())
+    {
+        bindGpuProgram(pass->getTessellationDomainProgram()->_getBindingDelegate());
+        // bind parameters later
+    }
+    else
+    {
+        // Unbind program?
+        if (mDestRenderSystem->isGpuProgramBound(GPT_DOMAIN_PROGRAM))
+        {
+            mDestRenderSystem->unbindGpuProgram(GPT_DOMAIN_PROGRAM);
+        }
+    }
+
+    if (pass->hasComputeProgram())
+    {
+        bindGpuProgram(pass->getComputeProgram()->_getBindingDelegate());
+        // bind parameters later
+    }
+    else
+    {
+        // Unbind program?
+        if (mDestRenderSystem->isGpuProgramBound(GPT_COMPUTE_PROGRAM))
+        {
+            mDestRenderSystem->unbindGpuProgram(GPT_COMPUTE_PROGRAM);
+        }
+    }
+
+    if (passSurfaceAndLightParams)
+    {
+        // Set surface reflectance properties, only valid if lighting is enabled
+        if (pass->getLightingEnabled())
+        {
+            mDestRenderSystem->_setSurfaceParams(
+                pass->getAmbient(),
+                pass->getDiffuse(),
+                pass->getSpecular(),
+                pass->getSelfIllumination(),
+                pass->getShininess(),
+                pass->getVertexColourTracking() );
         }
 
-        // Tell params about current pass
-        mAutoParamDataSource->setCurrentPass(pass);
+        // Dynamic lighting enabled?
+        mDestRenderSystem->setLightingEnabled(pass->getLightingEnabled());
+    }
 
-        bool passSurfaceAndLightParams = true;
-        bool passFogParams = true;
-
-        if (pass->hasVertexProgram())
+    // Using a fragment program?
+    if (fprog)
+    {
+        bindGpuProgram(fprog->_getBindingDelegate());
+    }
+    else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION) &&
+             !pass->hasGeometryProgram())
+    {
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                    "RenderSystem does not support FixedFunction, "
+                    "but technique has no Fragment Shader: " +
+                        pass->getParent()->getParent()->getName(),
+                    "SceneManager::_setPass");
+    }
+    else
+    {
+        // Unbind program?
+        if (mDestRenderSystem->isGpuProgramBound(GPT_FRAGMENT_PROGRAM))
         {
-            bindGpuProgram(pass->getVertexProgram()->_getBindingDelegate());
-            // bind parameters later 
-            // does the vertex program want surface and light params passed to rendersystem?
-            passSurfaceAndLightParams = pass->getVertexProgram()->getPassSurfaceAndLightStates();
+            mDestRenderSystem->unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
         }
-        else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION))
+        // Set fixed-function fragment settings
+    }
+
+    if (passFogParams)
+    {
+        // New fog params can either be from scene or from material
+        FogMode newFogMode;
+        ColourValue newFogColour;
+        Real newFogStart, newFogEnd, newFogDensity;
+        if (pass->getFogOverride())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                        "RenderSystem does not support FixedFunction, "
-                        "but technique has no Vertex Shader: " +
-                            pass->getParent()->getParent()->getName(),
-                        "SceneManager::_setPass");
+            // New fog params from material
+            newFogMode = pass->getFogMode();
+            newFogColour = pass->getFogColour();
+            newFogStart = pass->getFogStart();
+            newFogEnd = pass->getFogEnd();
+            newFogDensity = pass->getFogDensity();
         }
         else
         {
-            // Unbind program?
-            if (mDestRenderSystem->isGpuProgramBound(GPT_VERTEX_PROGRAM))
-            {
-                mDestRenderSystem->unbindGpuProgram(GPT_VERTEX_PROGRAM);
-            }
-            // Set fixed-function vertex parameters
+            // New fog params from scene
+            newFogMode = mFogMode;
+            newFogColour = mFogColour;
+            newFogStart = mFogStart;
+            newFogEnd = mFogEnd;
+            newFogDensity = mFogDensity;
         }
 
-        if (pass->hasGeometryProgram())
-        {
-            bindGpuProgram(pass->getGeometryProgram()->_getBindingDelegate());
-            // bind parameters later 
-        }
-        else
-        {
-            // Unbind program?
-            if (mDestRenderSystem->isGpuProgramBound(GPT_GEOMETRY_PROGRAM))
-            {
-                mDestRenderSystem->unbindGpuProgram(GPT_GEOMETRY_PROGRAM);
-            }
-            // Set fixed-function vertex parameters
-        }
-        if (pass->hasTessellationHullProgram())
-        {
-            bindGpuProgram(pass->getTessellationHullProgram()->_getBindingDelegate());
-            // bind parameters later
-        }
-        else
-        {
-            // Unbind program?
-            if (mDestRenderSystem->isGpuProgramBound(GPT_HULL_PROGRAM))
-            {
-                mDestRenderSystem->unbindGpuProgram(GPT_HULL_PROGRAM);
-            }
-            // Set fixed-function tessellation control parameters
-        }
+        /* In D3D, it applies to shaders prior
+        to version vs_3_0 and ps_3_0. And in OGL, it applies to "ARB_fog_XXX" in
+        fragment program, and in other ways, them maybe access by gpu program via
+        "state.fog.XXX".
+        */
+        mDestRenderSystem->_setFog(newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
+    }
+    // Tell params about ORIGINAL fog
+    // Need to be able to override fixed function fog, but still have
+    // original fog parameters available to a shader than chooses to use
+    mAutoParamDataSource->setFog(mFogMode, mFogColour, mFogDensity, mFogStart, mFogEnd);
 
-        if (pass->hasTessellationDomainProgram())
-        {
-            bindGpuProgram(pass->getTessellationDomainProgram()->_getBindingDelegate());
-            // bind parameters later
-        }
-        else
-        {
-            // Unbind program?
-            if (mDestRenderSystem->isGpuProgramBound(GPT_DOMAIN_PROGRAM))
-            {
-                mDestRenderSystem->unbindGpuProgram(GPT_DOMAIN_PROGRAM);
-            }
-            // Set fixed-function tessellation evaluation parameters
-        }
+    // The rest of the settings are the same no matter whether we use programs or not
 
-                if (pass->hasComputeProgram())
-        {
-                    bindGpuProgram(pass->getComputeProgram()->_getBindingDelegate());
-                    // bind parameters later
-        }
-        else
-        {
-                    // Unbind program?
-                    if (mDestRenderSystem->isGpuProgramBound(GPT_COMPUTE_PROGRAM))
-                    {
-                        mDestRenderSystem->unbindGpuProgram(GPT_COMPUTE_PROGRAM);
-                    }
-                    // Set fixed-function compute parameters
-        }
-
-        if (passSurfaceAndLightParams)
-        {
-            // Set surface reflectance properties, only valid if lighting is enabled
-            if (pass->getLightingEnabled())
-            {
-                mDestRenderSystem->_setSurfaceParams( 
-                    pass->getAmbient(), 
-                    pass->getDiffuse(), 
-                    pass->getSpecular(), 
-                    pass->getSelfIllumination(), 
-                    pass->getShininess(),
-            pass->getVertexColourTracking() );
-            }
-
-            // Dynamic lighting enabled?
-            mDestRenderSystem->setLightingEnabled(pass->getLightingEnabled());
-        }
-
-        // Using a fragment program?
-        if (pass->hasFragmentProgram())
-        {
-            bindGpuProgram(pass->getFragmentProgram()->_getBindingDelegate());
-            // bind parameters later 
-            passFogParams = pass->getFragmentProgram()->getPassFogStates();
-        }
-        else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION) &&
-                 !pass->hasGeometryProgram())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                        "RenderSystem does not support FixedFunction, "
-                        "but technique has no Fragment Shader: " +
-                            pass->getParent()->getParent()->getName(),
-                        "SceneManager::_setPass");
-        }
-        else
-        {
-            // Unbind program?
-            if (mDestRenderSystem->isGpuProgramBound(GPT_FRAGMENT_PROGRAM))
-            {
-                mDestRenderSystem->unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
-            }
-
-            // Set fixed-function fragment settings
-        }
-
-        if (passFogParams)
-        {
-            // New fog params can either be from scene or from material
-            FogMode newFogMode;
-            ColourValue newFogColour;
-            Real newFogStart, newFogEnd, newFogDensity;
-            if (pass->getFogOverride())
-            {
-                // New fog params from material
-                newFogMode = pass->getFogMode();
-                newFogColour = pass->getFogColour();
-                newFogStart = pass->getFogStart();
-                newFogEnd = pass->getFogEnd();
-                newFogDensity = pass->getFogDensity();
-            }
-            else
-            {
-                // New fog params from scene
-                newFogMode = mFogMode;
-                newFogColour = mFogColour;
-                newFogStart = mFogStart;
-                newFogEnd = mFogEnd;
-                newFogDensity = mFogDensity;
-            }
-
-            /* In D3D, it applies to shaders prior
-            to version vs_3_0 and ps_3_0. And in OGL, it applies to "ARB_fog_XXX" in
-            fragment program, and in other ways, them maybe access by gpu program via
-            "state.fog.XXX".
-            */
-            mDestRenderSystem->_setFog(
-                newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
-        }
-        // Tell params about ORIGINAL fog
-        // Need to be able to override fixed function fog, but still have
-        // original fog parameters available to a shader than chooses to use
-        mAutoParamDataSource->setFog(
-            mFogMode, mFogColour, mFogDensity, mFogStart, mFogEnd);
-
-        // The rest of the settings are the same no matter whether we use programs or not
-
-        // Set scene blending
-        if ( pass->hasSeparateSceneBlending( ) )
+    // Set scene blending
+    if ( pass->hasSeparateSceneBlending( ) )
+    {
+        mDestRenderSystem->_setSeparateSceneBlending(
+            pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
+            pass->getSourceBlendFactorAlpha(), pass->getDestBlendFactorAlpha(),
+            pass->getSceneBlendingOperation(),
+            pass->hasSeparateSceneBlendingOperations() ? pass->getSceneBlendingOperation() : pass->getSceneBlendingOperationAlpha() );
+    }
+    else
+    {
+        if(pass->hasSeparateSceneBlendingOperations( ) )
         {
             mDestRenderSystem->_setSeparateSceneBlending(
                 pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
-                pass->getSourceBlendFactorAlpha(), pass->getDestBlendFactorAlpha(),
-                pass->getSceneBlendingOperation(), 
-                pass->hasSeparateSceneBlendingOperations() ? pass->getSceneBlendingOperation() : pass->getSceneBlendingOperationAlpha() );
+                pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
+                pass->getSceneBlendingOperation(), pass->getSceneBlendingOperationAlpha() );
         }
         else
         {
-            if(pass->hasSeparateSceneBlendingOperations( ) )
+            mDestRenderSystem->_setSceneBlending(
+                pass->getSourceBlendFactor(), pass->getDestBlendFactor(), pass->getSceneBlendingOperation() );
+        }
+    }
+
+    // Set point parameters
+    mDestRenderSystem->_setPointParameters(
+        pass->getPointSize(),
+        pass->isPointAttenuationEnabled(),
+        pass->getPointAttenuationConstant(),
+        pass->getPointAttenuationLinear(),
+        pass->getPointAttenuationQuadratic(),
+        pass->getPointMinSize(),
+        pass->getPointMaxSize());
+
+    if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
+        mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
+
+    mAutoParamDataSource->setPointParameters(
+        pass->getPointSize(), pass->isPointAttenuationEnabled(),
+        pass->getPointAttenuationConstant(), pass->getPointAttenuationLinear(),
+        pass->getPointAttenuationQuadratic());
+
+    // Texture unit settings
+    size_t unit = 0;
+    // Reset the shadow texture index for each pass
+    size_t startLightIndex = pass->getStartLight();
+    size_t shadowTexUnitIndex = 0;
+    size_t shadowTexIndex = mShadowTextures.size();
+    if (mShadowTextureIndexLightList.size() > startLightIndex)
+        shadowTexIndex = mShadowTextureIndexLightList[startLightIndex];
+    Pass::TextureUnitStates::const_iterator it;
+    for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
+    {
+        TextureUnitState* pTex = *it;
+        if (!pass->getIteratePerLight() && isShadowTechniqueTextureBased() &&
+            pTex->getContentType() == TextureUnitState::CONTENT_SHADOW)
+        {
+            // Need to bind the correct shadow texture, based on the start light
+            // Even though the light list can change per object, our restrictions
+            // say that when texture shadows are enabled, the lights up to the
+            // number of texture shadows will be fixed for all objects
+            // to match the shadow textures that have been generated
+            // see Listener::sortLightsAffectingFrustum and
+            // MovableObject::Listener::objectQueryLights
+            // Note that light iteration throws the indexes out so we don't bind here
+            // if that's the case, we have to bind when lights are iterated
+            // in renderSingleObject
+
+            TexturePtr shadowTex;
+            if (shadowTexIndex < mShadowTextures.size())
             {
-                mDestRenderSystem->_setSeparateSceneBlending(
-                    pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
-                    pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
-                    pass->getSceneBlendingOperation(), pass->getSceneBlendingOperationAlpha() );
+                shadowTex = getShadowTexture(shadowTexIndex);
+                // Hook up projection frustum
+                Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
+                // Enable projective texturing if fixed-function, but also need to
+                // disable it explicitly for program pipeline.
+                pTex->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
+                mAutoParamDataSource->setTextureProjector(cam, shadowTexUnitIndex);
             }
             else
             {
-                mDestRenderSystem->_setSceneBlending(
-                    pass->getSourceBlendFactor(), pass->getDestBlendFactor(), pass->getSceneBlendingOperation() );
+                // Use fallback 'null' shadow texture
+                // no projection since all uniform colour anyway
+                shadowTex = mNullShadowTexture;
+                pTex->setProjectiveTexturing(false);
+                mAutoParamDataSource->setTextureProjector(0, shadowTexUnitIndex);
             }
+            pTex->_setTexturePtr(shadowTex);
+
+            ++shadowTexIndex;
+            ++shadowTexUnitIndex;
         }
-
-        // Set point parameters
-        mDestRenderSystem->_setPointParameters(
-            pass->getPointSize(),
-            pass->isPointAttenuationEnabled(), 
-            pass->getPointAttenuationConstant(), 
-            pass->getPointAttenuationLinear(), 
-            pass->getPointAttenuationQuadratic(), 
-            pass->getPointMinSize(), 
-            pass->getPointMaxSize());
-
-        if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
-            mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
-
-        mAutoParamDataSource->setPointParameters(
-            pass->getPointSize(), pass->isPointAttenuationEnabled(),
-            pass->getPointAttenuationConstant(), pass->getPointAttenuationLinear(),
-            pass->getPointAttenuationQuadratic());
-
-        // Texture unit settings
-        size_t unit = 0;
-        // Reset the shadow texture index for each pass
-        size_t startLightIndex = pass->getStartLight();
-        size_t shadowTexUnitIndex = 0;
-        size_t shadowTexIndex = mShadowTextures.size();
-        if (mShadowTextureIndexLightList.size() > startLightIndex)
-            shadowTexIndex = mShadowTextureIndexLightList[startLightIndex];
-        Pass::TextureUnitStates::const_iterator it;
-        for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
+        else if (mIlluminationStage == IRS_NONE && pass->hasVertexProgram())
         {
-            TextureUnitState* pTex = *it;
-            if (!pass->getIteratePerLight() && 
-                isShadowTechniqueTextureBased() && 
-                pTex->getContentType() == TextureUnitState::CONTENT_SHADOW)
+            // Manually set texture projector for shaders if present
+            // This won't get set any other way if using manual projection
+            TextureUnitState::EffectMap::const_iterator effi =
+                pTex->getEffects().find(TextureUnitState::ET_PROJECTIVE_TEXTURE);
+            if (effi != pTex->getEffects().end())
             {
-                // Need to bind the correct shadow texture, based on the start light
-                // Even though the light list can change per object, our restrictions
-                // say that when texture shadows are enabled, the lights up to the
-                // number of texture shadows will be fixed for all objects
-                // to match the shadow textures that have been generated
-                // see Listener::sortLightsAffectingFrustum and
-                // MovableObject::Listener::objectQueryLights
-                // Note that light iteration throws the indexes out so we don't bind here
-                // if that's the case, we have to bind when lights are iterated
-                // in renderSingleObject
-
-                TexturePtr shadowTex;
-                if (shadowTexIndex < mShadowTextures.size())
-                {
-                    shadowTex = getShadowTexture(shadowTexIndex);
-                    // Hook up projection frustum
-                    Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-                    // Enable projective texturing if fixed-function, but also need to
-                    // disable it explicitly for program pipeline.
-                    pTex->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-                    mAutoParamDataSource->setTextureProjector(cam, shadowTexUnitIndex);
-                }
-                else
-                {
-                    // Use fallback 'null' shadow texture
-                    // no projection since all uniform colour anyway
-                    shadowTex = mNullShadowTexture;
-                    pTex->setProjectiveTexturing(false);
-                    mAutoParamDataSource->setTextureProjector(0, shadowTexUnitIndex);
-
-                }
-                pTex->_setTexturePtr(shadowTex);
-
-                ++shadowTexIndex;
-                ++shadowTexUnitIndex;
+                mAutoParamDataSource->setTextureProjector(effi->second.frustum, unit);
             }
-            else if (mIlluminationStage == IRS_NONE && pass->hasVertexProgram())
-            {
-                // Manually set texture projector for shaders if present
-                // This won't get set any other way if using manual projection
-                TextureUnitState::EffectMap::const_iterator effi = 
-                    pTex->getEffects().find(TextureUnitState::ET_PROJECTIVE_TEXTURE);
-                if (effi != pTex->getEffects().end())
-                {
-                    mAutoParamDataSource->setTextureProjector(effi->second.frustum, unit);
-                }
-            }
-            if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
-            {
-                CompositorChain* currentChain = _getActiveCompositorChain();
-                if (!currentChain)
-                {
-                    OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                        "A pass that wishes to reference a compositor texture "
-                        "attempted to render in a pipeline without a compositor",
-                        "SceneManager::_setPass");
-                }
-                CompositorInstance* refComp = currentChain->getCompositor(pTex->getReferencedCompositorName());
-                if (refComp == 0)
-                {
-                    OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                        "Invalid compositor content_type compositor name",
-                        "SceneManager::_setPass");
-                }
-                Ogre::TexturePtr refTex = refComp->getTextureInstance(
-                    pTex->getReferencedTextureName(), pTex->getReferencedMRTIndex());
-                if (!refTex)
-                {
-                    OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                        "Invalid compositor content_type texture name",
-                        "SceneManager::_setPass");
-                }
-                pTex->_setTexturePtr(refTex);
-            }
-            mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
-            ++unit;
         }
-        // Disable remaining texture units
-        mDestRenderSystem->_disableTextureUnitsFrom(pass->getNumTextureUnitStates());
-
-        // Set up non-texture related material settings
-        // Depth buffer settings
-        mDestRenderSystem->_setDepthBufferFunction(pass->getDepthFunction());
-        mDestRenderSystem->_setDepthBufferCheckEnabled(pass->getDepthCheckEnabled());
-        mDestRenderSystem->_setDepthBufferWriteEnabled(pass->getDepthWriteEnabled());
-        mDestRenderSystem->_setDepthBias(pass->getDepthBiasConstant(), 
-            pass->getDepthBiasSlopeScale());
-        // Alpha-reject settings
-        mDestRenderSystem->_setAlphaRejectSettings(
-            pass->getAlphaRejectFunction(), pass->getAlphaRejectValue(), pass->isAlphaToCoverageEnabled());
-        // Set colour write mode
-        // Right now we only use on/off, not per-channel
-        bool colWrite = pass->getColourWriteEnabled();
-        mDestRenderSystem->_setColourBufferWriteEnabled(colWrite, colWrite, colWrite, colWrite);
-        // Culling mode
-        if (isShadowTechniqueTextureBased() 
-            && mIlluminationStage == IRS_RENDER_TO_TEXTURE
-            && mShadowCasterRenderBackFaces
-            && pass->getCullingMode() == CULL_CLOCKWISE)
+        if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
         {
-            // render back faces into shadow caster, can help with depth comparison
-            mPassCullingMode = CULL_ANTICLOCKWISE;
+            CompositorChain* currentChain = _getActiveCompositorChain();
+            if (!currentChain)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                    "A pass that wishes to reference a compositor texture "
+                    "attempted to render in a pipeline without a compositor",
+                    "SceneManager::_setPass");
+            }
+            CompositorInstance* refComp = currentChain->getCompositor(pTex->getReferencedCompositorName());
+            if (refComp == 0)
+            {
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                    "Invalid compositor content_type compositor name",
+                    "SceneManager::_setPass");
+            }
+            TexturePtr refTex = refComp->getTextureInstance(pTex->getReferencedTextureName(),
+                                                            pTex->getReferencedMRTIndex());
+            if (!refTex)
+            {
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                    "Invalid compositor content_type texture name",
+                    "SceneManager::_setPass");
+            }
+            pTex->_setTexturePtr(refTex);
         }
-        else
-        {
-            mPassCullingMode = pass->getCullingMode();
-        }
-        mDestRenderSystem->_setCullingMode(mPassCullingMode);
-        
-        // Shading
-        mDestRenderSystem->setShadingType(pass->getShadingMode());
-        // Polygon mode
-        mDestRenderSystem->_setPolygonMode(pass->getPolygonMode());
-
-        // set pass number
-        mAutoParamDataSource->setPassNumber( pass->getIndex() );
-
-        // mark global params as dirty
-        mGpuParamsDirty |= (uint16)GPV_GLOBAL;
-
+        mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
+        ++unit;
     }
+    // Disable remaining texture units
+    mDestRenderSystem->_disableTextureUnitsFrom(pass->getNumTextureUnitStates());
+
+    // Set up non-texture related material settings
+    // Depth buffer settings
+    mDestRenderSystem->_setDepthBufferFunction(pass->getDepthFunction());
+    mDestRenderSystem->_setDepthBufferCheckEnabled(pass->getDepthCheckEnabled());
+    mDestRenderSystem->_setDepthBufferWriteEnabled(pass->getDepthWriteEnabled());
+    mDestRenderSystem->_setDepthBias(pass->getDepthBiasConstant(), pass->getDepthBiasSlopeScale());
+    // Alpha-reject settings
+    mDestRenderSystem->_setAlphaRejectSettings(pass->getAlphaRejectFunction(),
+                                               pass->getAlphaRejectValue(),
+                                               pass->isAlphaToCoverageEnabled());
+    // Set colour write mode
+    // Right now we only use on/off, not per-channel
+    bool colWrite = pass->getColourWriteEnabled();
+    mDestRenderSystem->_setColourBufferWriteEnabled(colWrite, colWrite, colWrite, colWrite);
+    // Culling mode
+    if (isShadowTechniqueTextureBased() && mIlluminationStage == IRS_RENDER_TO_TEXTURE &&
+        mShadowCasterRenderBackFaces && pass->getCullingMode() == CULL_CLOCKWISE)
+    {
+        // render back faces into shadow caster, can help with depth comparison
+        mPassCullingMode = CULL_ANTICLOCKWISE;
+    }
+    else
+    {
+        mPassCullingMode = pass->getCullingMode();
+    }
+    mDestRenderSystem->_setCullingMode(mPassCullingMode);
+    mDestRenderSystem->setShadingType(pass->getShadingMode());
+    mDestRenderSystem->_setPolygonMode(pass->getPolygonMode());
+
+    mAutoParamDataSource->setPassNumber( pass->getIndex() );
+    // mark global params as dirty
+    mGpuParamsDirty |= (uint16)GPV_GLOBAL;
 
     return pass;
 }
