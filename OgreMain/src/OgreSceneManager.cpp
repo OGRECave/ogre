@@ -1483,8 +1483,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
             mDestRenderSystem->setInvertVertexWinding(false);
         }
 
-        // Tell params about viewport
-        mAutoParamDataSource->setCurrentViewport(vp);
         // Set the viewport - this is deliberately after the shadow texture update
         setViewport(vp);
 
@@ -3820,7 +3818,7 @@ void SceneManager::manualRender(RenderOperation* rend,
                                 bool doBeginEndFrame) 
 {
     if (vp)
-        mDestRenderSystem->_setViewport(vp);
+        setViewport(vp);
 
     if (doBeginEndFrame)
         mDestRenderSystem->_beginFrame();
@@ -3836,7 +3834,6 @@ void SceneManager::manualRender(RenderOperation* rend,
         mAutoParamDataSource->setCurrentRenderable(0);
         if (vp)
         {
-            mAutoParamDataSource->setCurrentViewport(vp);
             mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
         }
         mAutoParamDataSource->setCurrentSceneManager(this);
@@ -3860,7 +3857,7 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
     bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList)
 {
     if (vp)
-        mDestRenderSystem->_setViewport(vp);
+        setViewport(vp);
 
     if (doBeginEndFrame)
         mDestRenderSystem->_beginFrame();
@@ -3877,7 +3874,6 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
     {
         if (vp)
         {
-            mAutoParamDataSource->setCurrentViewport(vp);
             mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
         }
         
@@ -3889,10 +3885,8 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 
 		mAutoParamDataSource->setCurrentCamera(oldCam, false);
     }
-    if (vp)
-        mCurrentViewport = vp;
-    renderSingleObject(rend, pass, lightScissoringClipping, doLightIteration, manualLightList);
 
+    renderSingleObject(rend, pass, lightScissoringClipping, doLightIteration, manualLightList);
 
     if (doBeginEndFrame)
         mDestRenderSystem->_endFrame();
@@ -4213,6 +4207,8 @@ void SceneManager::fireSceneManagerDestroyed()
 void SceneManager::setViewport(Viewport* vp)
 {
     mCurrentViewport = vp;
+    // Tell params about viewport
+    mAutoParamDataSource->setCurrentViewport(vp);
     // Set viewport in render system
     mDestRenderSystem->_setViewport(vp);
     // Set the active material scheme for this viewport
@@ -6477,8 +6473,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     Ogre::Viewport* vp = context->viewport;
     Ogre::Camera* camera = context->camera;
 
-    // Tell params about viewport
-    mAutoParamDataSource->setCurrentViewport(vp);
     // Set the viewport - this is deliberately after the shadow texture update
     setViewport(vp);
 
