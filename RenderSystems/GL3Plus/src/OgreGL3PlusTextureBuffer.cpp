@@ -611,6 +611,8 @@ namespace v1 {
         // Reset source texture to sane state
         OGRE_CHECK_GL_ERROR(glBindTexture(src->mTarget, src->mTextureID));
 
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                                      GL_RENDERBUFFER, 0));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                                       GL_RENDERBUFFER, 0));
 
