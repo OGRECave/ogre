@@ -133,7 +133,8 @@ namespace Ogre
 
             OCGE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
             mDynamicBuffer->flush( mUnmapTicket,
-                                   mBuffer->mLastMappingStart + flushStartElem,
+                                   (mBuffer->mLastMappingStart + flushStartElem) *
+                                   mBuffer->mBytesPerElement,
                                    flushSizeElem * mBuffer->mBytesPerElement );
 
             if( unmapOption == UO_UNMAP_ALL || !canPersistentMap ||

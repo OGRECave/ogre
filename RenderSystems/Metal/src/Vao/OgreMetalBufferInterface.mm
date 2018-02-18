@@ -125,7 +125,8 @@ namespace Ogre
                 flushSizeElem = mBuffer->mLastMappingCount - flushStartElem;
 
             mDynamicBuffer->flush( mUnmapTicket,
-                                   mBuffer->mLastMappingStart + flushStartElem,
+                                   (mBuffer->mLastMappingStart + flushStartElem) *
+                                   mBuffer->mBytesPerElement,
                                    flushSizeElem * mBuffer->mBytesPerElement );
 
             if( unmapOption == UO_UNMAP_ALL ||
