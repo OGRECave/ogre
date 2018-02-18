@@ -2840,9 +2840,6 @@ namespace Ogre {
         */
         void setShadowTextureCasterMaterial(const MaterialPtr& mat);
 
-        /// @overload
-        /// @deprecated use setShadowTextureCasterMaterial(const MaterialPtr&)
-        OGRE_DEPRECATED void setShadowTextureCasterMaterial(const String& name);
         /** Sets the default material to use for rendering shadow receivers.
         @remarks
             By default shadow receivers are rendered as a post-pass using basic
@@ -2865,10 +2862,6 @@ namespace Ogre {
             techniques may be used for hardware fallback.
         */
         void setShadowTextureReceiverMaterial(const MaterialPtr& mat);
-
-        /// @overload
-        /// @deprecated use setShadowTextureReceiverMaterial(const MaterialPtr&)
-        OGRE_DEPRECATED void setShadowTextureReceiverMaterial(const String& name);
 
         /** Sets whether or not shadow casters should be rendered into shadow
             textures using their back faces rather than their front faces. 

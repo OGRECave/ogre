@@ -596,11 +596,6 @@ namespace Volume {
     }
     
     //-----------------------------------------------------------------------
-    void Chunk::setMaterialOfLevel(size_t level, const String& matName)
-    {
-        setMaterialOfLevel(level, MaterialManager::getSingleton().getByName(matName));
-    }
-
     void Chunk::setMaterialOfLevel(size_t level, const MaterialPtr& mat)
     {
         if (level == 0)

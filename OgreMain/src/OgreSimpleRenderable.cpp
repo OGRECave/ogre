@@ -55,17 +55,6 @@ namespace Ogre {
     {
     }
 
-    void SimpleRenderable::setMaterial( const String& matName )
-    {
-        mMaterial = MaterialManager::getSingleton().getByName(matName);
-        if (!mMaterial)
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + matName,
-                "SimpleRenderable::setMaterial" );
-    
-        // Won't load twice anyway
-        mMaterial->load();
-    }
-
     void SimpleRenderable::setMaterial( const MaterialPtr& mat )
     {
         mMaterial = mat;
