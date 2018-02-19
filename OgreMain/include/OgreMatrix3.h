@@ -153,6 +153,9 @@ namespace Ogre
         Matrix3 inverse() const { return Inverse(); }
         Real determinant() const { return Determinant(); }
 
+        /** Determines if this matrix involves a negative scaling. */
+        bool hasNegativeScale() const { return determinant() < 0; }
+
         /// Singular value decomposition
         void SingularValueDecomposition (Matrix3& rkL, Vector3& rkS,
             Matrix3& rkR) const;

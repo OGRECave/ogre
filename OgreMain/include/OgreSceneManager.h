@@ -638,6 +638,14 @@ namespace Ogre {
             which override the camera's own view / projection materices. */
         void useRenderableViewProjMode(const Renderable* pRend, bool fixedFunction);
         
+        /** Internal method used by _renderSingleObject to set the world transform */
+        void setWorldTransform(Renderable* rend, bool fixedFunction);
+
+        /** Internal method used by _renderSingleObject to render a single light pass */
+        void issueRenderWithLights(Renderable* rend, const Pass* pass,
+                                   const LightList* pLightListToUse, bool fixedFunction,
+                                   bool lightScissoringClipping);
+
         /** Internal method used by _renderSingleObject to deal with renderables
             which override the camera's own view / projection matrices. */
         void resetViewProjMode(bool fixedFunction);
@@ -990,13 +998,11 @@ namespace Ogre {
         /// Last light sets
         uint32 mLastLightHash;
         unsigned short mLastLightLimit;
-        uint32 mLastLightHashGpuProgram;
         /// Gpu params that need rebinding (mask of GpuParamVariability)
         uint16 mGpuParamsDirty;
 
-        void useLights(const LightList& lights, unsigned short limit);
+        void useLights(const LightList& lights, ushort limit, bool fixedFunction);
         void setViewMatrix(const Affine3& m);
-        void useLightsGpuProgram(const Pass* pass, const LightList* lights);
         void bindGpuProgram(GpuProgram* prog);
         void updateGpuProgramParameters(const Pass* p);
 
