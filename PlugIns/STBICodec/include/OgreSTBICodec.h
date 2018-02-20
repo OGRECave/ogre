@@ -29,21 +29,18 @@ THE SOFTWARE.
 #define __STBICodec_H__
 
 #include "OgreImageCodec.h"
+#include "OgrePlugin.h"
 
 namespace Ogre {
 
-    /** \addtogroup Core
+    /** \addtogroup Plugins Plugins
     *  @{
     */
-    /** \addtogroup Image
-    *  @{
+    /** \defgroup STBIImageCodec STBIImageCodec
+    * %Codec specialized in images loaded using stb image (https://github.com/nothings/stb).
+    * @{
     */
-    /** Codec specialized in images loaded using stbi (https://github.com/nothings/stb).
-        @remarks
-            The users implementing subclasses of ImageCodec are required to return
-            a valid pointer to a ImageData class from the decode(...) function.
-    */
-    class _OgreExport STBIImageCodec : public ImageCodec
+    class STBIImageCodec : public ImageCodec
     {
     private:
         String mType;
@@ -68,10 +65,19 @@ namespace Ogre {
         /// @copydoc Codec::magicNumberToFileExt
         String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
 
-        /// Static method to startup FreeImage and register the FreeImage codecs
+        /// Static method to startup and register the codecs
         static void startup(void);
-        /// Static method to shutdown FreeImage and unregister the FreeImage codecs
+        /// Static method to shutdown and unregister the codecs
         static void shutdown(void);
+    };
+
+    class STBIPlugin : public Plugin
+    {
+        const String& getName() const;
+        void install() {}
+        void uninstall() {}
+        void initialise() { STBIImageCodec::startup(); }
+        void shutdown() { STBIImageCodec::shutdown(); }
     };
     /** @} */
     /** @} */

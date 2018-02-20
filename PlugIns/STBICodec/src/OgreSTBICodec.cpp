@@ -26,8 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
+#include "OgreSTBICodecExports.h"
 #include "OgreSTBICodec.h"
+#include "OgreLogManager.h"
+#include "OgreDataStream.h"
+
+#include "OgrePlatformInformation.h"
 
 #if __OGRE_HAVE_NEON
 #define STBI_NEON
@@ -51,7 +55,7 @@ namespace Ogre {
         stbi_convert_iphone_png_to_rgb(1);
         stbi_set_unpremultiply_on_load(1);
 
-        LogManager::getSingleton().logMessage(LML_NORMAL, "stb_image - v2.15 - public domain JPEG/PNG reader");
+        LogManager::getSingleton().logMessage("stb_image - v2.15 - public domain JPEG/PNG reader");
         
         // Register codecs
         String exts = "jpeg,jpg,png,bmp,psd,tga,gif,pic,ppm,pgm,hdr";
@@ -65,10 +69,8 @@ namespace Ogre {
         
         StringStream strExt;
         strExt << "Supported formats: " << exts;
-        
-        LogManager::getSingleton().logMessage(
-            LML_NORMAL,
-            strExt.str());
+
+        LogManager::getSingleton().logMessage(strExt.str());
     }
     //---------------------------------------------------------------------
     void STBIImageCodec::shutdown(void)
@@ -216,4 +218,23 @@ namespace Ogre {
     {
         return BLANKSTRING;
     }
+
+    const String& STBIPlugin::getName() const {
+        static String name = "STB Image Codec";
+        return name;
+    }
+
+#ifndef OGRE_STATIC_LIB
+    extern "C" void _OgreSTBICodecExport dllStartPlugin();
+    extern "C" void _OgreSTBICodecExport dllStopPlugin();
+
+    extern "C" void _OgreSTBICodecExport dllStartPlugin()
+    {
+        STBIImageCodec::startup();
+    }
+    extern "C" void _OgreSTBICodecExport dllStopPlugin()
+    {
+        STBIImageCodec::shutdown();
+    }
+#endif
 }

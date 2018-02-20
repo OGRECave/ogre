@@ -76,6 +76,9 @@
 #ifdef OGRE_STATIC_OctreeZone
 #  include "OgreOctreeZonePlugin.h"
 #endif
+#ifdef OGRE_BUILD_PLUGIN_STBI
+#   include "OgreSTBICodec.h"
+#endif
 #endif
 
 void OgreBites::StaticPluginLoader::load()
@@ -126,6 +129,10 @@ void OgreBites::StaticPluginLoader::load()
 #endif
 #ifdef OGRE_STATIC_OctreeZone
     plugin = OGRE_NEW OctreeZonePlugin();
+    mPlugins.push_back(plugin);
+#endif
+#ifdef OGRE_BUILD_PLUGIN_STBI
+    plugin = OGRE_NEW STBIPlugin();
     mPlugins.push_back(plugin);
 #endif
 #endif

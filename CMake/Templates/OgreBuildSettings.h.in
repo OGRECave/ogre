@@ -17,6 +17,7 @@
 #cmakedefine OGRE_BUILD_PLUGIN_PCZ
 #cmakedefine OGRE_BUILD_PLUGIN_PFX
 #cmakedefine OGRE_BUILD_PLUGIN_CG
+#cmakedefine OGRE_BUILD_PLUGIN_STBI
 #cmakedefine OGRE_BUILD_COMPONENT_PAGING
 #cmakedefine OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 #cmakedefine OGRE_BUILD_COMPONENT_TERRAIN
@@ -96,9 +97,6 @@ OGRE_THREAD_PROVIDER = 4
 
 /** Disables use of the internal image codec for loading ETC files. */
 #cmakedefine01 OGRE_NO_ETC_CODEC
-
-/** Disables use of the internal image codec for loading image files. */
-#cmakedefine01 OGRE_NO_STBI_CODEC
 
 #cmakedefine01 OGRE_NO_ASTC_CODEC
 

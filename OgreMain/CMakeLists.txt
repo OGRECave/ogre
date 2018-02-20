@@ -27,7 +27,6 @@ list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImage
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePVRTCCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreETCCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreZip.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSTBICodec.h"
 )
 
 # Remove optional source files
@@ -38,7 +37,6 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreETCCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreZip.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp"
 )
 
 # Add platform specific files
@@ -143,20 +141,6 @@ if (OGRE_CONFIG_ENABLE_FREEIMAGE)
   list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
   list(APPEND LIBRARIES    "${FreeImage_LIBRARIES}")
 endif()
-
-if (OGRE_CONFIG_ENABLE_STBI)
-  list(APPEND HEADER_FILES include/OgreSTBICodec.h)
-  list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
-  
-  if(UNIX)
-    set_source_files_properties(src/OgreSTBICodec.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function -Wno-shadow -Wno-missing-declarations")
-  endif()
-  
-  if(CMAKE_COMPILER_IS_GNUCXX)
-      # workaround gcc5 bug on Ubuntu 16.04 regarding __builtin_cpu_supports
-      list(APPEND LIBRARIES gcc)
-  endif()
-endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
   list(APPEND HEADER_FILES include/OgreDDSCodec.h)
