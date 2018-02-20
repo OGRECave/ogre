@@ -26,10 +26,13 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
-
+#include "OgreFreeImageCodecExports.h"
 #include "OgreFreeImageCodec.h"
+
 #include <FreeImage.h>
+
+#include "OgreLogManager.h"
+#include "OgreDataStream.h"
 
 // freeimage 3.9.1~3.11.0 interoperability fix
 #ifndef FREEIMAGE_COLORORDER
@@ -590,4 +593,23 @@ namespace Ogre {
             return BLANKSTRING;
         }
     }
+
+    const String& FreeImagePlugin::getName() const {
+        static String name = "Free Image Codec";
+        return name;
+    }
+
+#ifndef OGRE_STATIC_LIB
+    extern "C" void _OgreFreeImageCodecExport dllStartPlugin();
+    extern "C" void _OgreFreeImageCodecExport dllStopPlugin();
+
+    extern "C" void _OgreFreeImageCodecExport dllStartPlugin()
+    {
+        FreeImageCodec::startup();
+    }
+    extern "C" void _OgreFreeImageCodecExport dllStopPlugin()
+    {
+        FreeImageCodec::shutdown();
+    }
+#endif
 }

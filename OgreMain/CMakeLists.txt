@@ -22,7 +22,7 @@ list(APPEND HEADER_FILES
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 # Remove optional header files
-list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
+list(REMOVE_ITEM HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreDDSCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePVRTCCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreETCCodec.h"
@@ -30,7 +30,7 @@ list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImage
 )
 
 # Remove optional source files
-list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp"
+list(REMOVE_ITEM SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreDDSCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePVRTCCodec.cpp"
@@ -134,13 +134,6 @@ set(LIBRARIES ${PLATFORM_LIBS})
 if (OGRE_CONFIG_THREADS)
   list(APPEND LIBRARIES ${OGRE_THREAD_LIBRARIES})
 endif ()
-
-if (OGRE_CONFIG_ENABLE_FREEIMAGE)
-  add_definitions(-DFREEIMAGE_LIB)
-  list(APPEND HEADER_FILES include/OgreFreeImageCodec.h)
-  list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
-  list(APPEND LIBRARIES    "${FreeImage_LIBRARIES}")
-endif()
 
 if (OGRE_CONFIG_ENABLE_DDS)
   list(APPEND HEADER_FILES include/OgreDDSCodec.h)
@@ -247,10 +240,6 @@ if (APPLE)
   endif()
 endif ()
 target_link_libraries(OgreMain ${LIBRARIES} ${CMAKE_DL_LIBS})
-if (MINGW)
-  # may need winsock htons functions for FreeImage
-  target_link_libraries(OgreMain ws2_32)
-endif ()
 
 # specify a precompiled header to use
 add_native_precompiled_header(OgreMain "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h")

@@ -18,6 +18,7 @@
 #cmakedefine OGRE_BUILD_PLUGIN_PFX
 #cmakedefine OGRE_BUILD_PLUGIN_CG
 #cmakedefine OGRE_BUILD_PLUGIN_STBI
+#cmakedefine OGRE_BUILD_PLUGIN_FREEIMAGE
 #cmakedefine OGRE_BUILD_COMPONENT_PAGING
 #cmakedefine OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 #cmakedefine OGRE_BUILD_COMPONENT_TERRAIN
@@ -85,9 +86,6 @@ OGRE_THREAD_PROVIDER = 4
 #define OGRE_THREAD_PROVIDER @OGRE_SET_THREAD_PROVIDER@
 
 #cmakedefine01 OGRE_NO_MESHLOD
-
-/** Disables use of the FreeImage image library for loading images. */
-#cmakedefine01 OGRE_NO_FREEIMAGE
 
 /** Disables use of the internal image codec for loading DDS files. */
 #cmakedefine01 OGRE_NO_DDS_CODEC

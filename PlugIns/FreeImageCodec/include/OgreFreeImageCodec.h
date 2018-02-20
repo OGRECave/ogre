@@ -29,7 +29,8 @@ THE SOFTWARE.
 #define _FreeImageCodec_H__
 
 #include "OgreImageCodec.h"
-#include "OgreHeaderPrefix.h"
+#include "OgrePlugin.h"
+
 // Forward-declaration to avoid external dependency on FreeImage
 struct FIBITMAP;
 
@@ -46,7 +47,7 @@ namespace Ogre {
             The users implementing subclasses of ImageCodec are required to return
             a valid pointer to a ImageData class from the decode(...) function.
     */
-    class _OgreExport FreeImageCodec : public ImageCodec
+    class FreeImageCodec : public ImageCodec
     {
     private:
         String mType;
@@ -80,11 +81,18 @@ namespace Ogre {
         /// Static method to shutdown FreeImage and unregister the FreeImage codecs
         static void shutdown(void);
     };
+
+    class FreeImagePlugin : public Plugin
+    {
+        const String& getName() const;
+        void install() {}
+        void uninstall() {}
+        void initialise() { FreeImageCodec::startup(); }
+        void shutdown() { FreeImageCodec::shutdown(); }
+    };
     /** @} */
     /** @} */
 
 } // namespace
-
-#include "OgreHeaderSuffix.h"
 
 #endif

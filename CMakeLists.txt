@@ -249,7 +249,7 @@ elseif(EMSCRIPTEN)
   set(OGRE_BUILD_RENDERSYSTEM_GL FALSE CACHE BOOL "Disable OpenGL RenderSystem for Emscripten" FORCE)
 
   set(OGRE_BUILD_PLUGIN_STBI TRUE CACHE BOOL "Enable STBIImageCodec on Emscripten (Smaller Footprint)" FORCE)
-  set(OGRE_CONFIG_ENABLE_FREEIMAGE FALSE CACHE BOOL "Disable Freeimage on Emscripten (Smaller Footprint)" FORCE)
+  set(OGRE_BUILD_PLUGIN_FREEIMAGE FALSE CACHE BOOL "Disable Freeimage on Emscripten (Smaller Footprint)" FORCE)
   set(OGRE_BUILD_PLUGIN_PCZ FALSE CACHE BOOL "Disable pcz on Emscripten" FORCE)
   set(OGRE_BUILD_PLUGIN_BSP FALSE CACHE BOOL "Disable pcz on Emscripten" FORCE)
   set(OGRE_BUILD_TOOLS FALSE CACHE BOOL "Disable tools on Emscripten" FORCE)
@@ -361,9 +361,9 @@ set(OGRE_CONFIG_THREAD_PROVIDER "std" CACHE STRING
 	std   - STL thread library (requires compiler support)."
 )
 set_property(CACHE OGRE_CONFIG_THREAD_PROVIDER PROPERTY STRINGS boost poco tbb std)
-cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec." FALSE "FreeImage_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLUGIN_EXRCODEC "Build EXR Codec plugin" TRUE "OPENEXR_FOUND;NOT OGRE_CONFIG_ENABLE_FREEIMAGE" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLUGIN_STBI "Enable STBI image codec." TRUE "NOT OGRE_CONFIG_ENABLE_FREEIMAGE" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLUGIN_FREEIMAGE "Build FreeImage codec." TRUE "FreeImage_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLUGIN_EXRCODEC "Build EXR Codec plugin" TRUE "OPENEXR_FOUND;" FALSE)
+option(OGRE_BUILD_PLUGIN_STBI "Enable STBI image codec." TRUE)
 option(OGRE_CONFIG_ENABLE_MESHLOD "Enable Mesh Lod." TRUE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
@@ -413,7 +413,6 @@ mark_as_advanced(
   OGRE_CONFIG_NODE_INHERIT_TRANSFORM
   OGRE_CONFIG_ENABLE_MESHLOD
   OGRE_CONFIG_ENABLE_DDS
-  OGRE_CONFIG_ENABLE_FREEIMAGE
   OGRE_CONFIG_ENABLE_PVRTC
   OGRE_CONFIG_ENABLE_ETC
   OGRE_CONFIG_ENABLE_ASTC

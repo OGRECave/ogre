@@ -14,6 +14,7 @@ PluginFolder=@OGRE_PLUGIN_DIR_REL@
 @OGRE_COMMENT_PLUGIN_CG@ Plugin=Plugin_CgProgramManager
 @OGRE_COMMENT_PLUGIN_EXRCODEC@ Plugin=Plugin_EXRCodec
 @OGRE_COMMENT_PLUGIN_STBI@ Plugin=Codec_STBI
+@OGRE_COMMENT_PLUGIN_FREEIMAGE@ Plugin=Codec_FreeImage
 @OGRE_COMMENT_PLUGIN_PCZ@ Plugin=Plugin_PCZSceneManager
 @OGRE_COMMENT_PLUGIN_PCZ@ Plugin=Plugin_OctreeZone
 @OGRE_COMMENT_PLUGIN_OCTREE@ Plugin=Plugin_OctreeSceneManager

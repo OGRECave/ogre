@@ -52,9 +52,6 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreFileSystemLayer.h"
 
-#if OGRE_NO_FREEIMAGE == 0
-#include "OgreFreeImageCodec.h"
-#endif
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
 #endif
@@ -214,10 +211,6 @@ namespace Ogre {
         // Register image codecs
         DDSCodec::startup();
 #endif
-#if OGRE_NO_FREEIMAGE == 0
-        // Register image codecs
-        FreeImageCodec::startup();
-#endif
 #if OGRE_NO_PVRTC_CODEC == 0
         PVRTCCodec::startup();
 #endif
@@ -276,9 +269,6 @@ namespace Ogre {
         destroyAllRenderQueueInvocationSequences();
         OGRE_DELETE mCompositorManager;
         OGRE_DELETE mExternalTextureSourceManager;
-#if OGRE_NO_FREEIMAGE == 0
-        FreeImageCodec::shutdown();
-#endif
 #if OGRE_NO_DDS_CODEC == 0
         DDSCodec::shutdown();
 #endif
