@@ -11,7 +11,7 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreSTBICodecExports.h)
 set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include "${ZLIB_INCLUDE_DIRS}")
 
 if(UNIX)
   set_source_files_properties(src/OgreSTBICodec.cpp PROPERTIES  
@@ -23,6 +23,9 @@ target_link_libraries(Codec_STBI OgreMain)
 if(CMAKE_COMPILER_IS_GNUCXX)
   # workaround gcc5 bug on Ubuntu 16.04 regarding __builtin_cpu_supports
   target_link_libraries(Codec_STBI gcc)
+endif()
+if(OGRE_CONFIG_ENABLE_ZIP)
+  target_link_libraries(Codec_STBI "${ZLIB_LIBRARIES}")
 endif()
 
 ogre_config_framework(Codec_STBI)

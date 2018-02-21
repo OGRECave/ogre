@@ -42,6 +42,25 @@ THE SOFTWARE.
 #define STB_IMAGE_STATIC
 #include "stbi/stb_image.h"
 
+#if OGRE_NO_ZIP_ARCHIVE == 0
+#include <zlib.h>
+static Ogre::uchar* custom_zlib_compress(Ogre::uchar* data, int data_len, int* out_len, int /*quality*/)
+{
+    unsigned long destLen = compressBound(data_len);
+    Ogre::uchar* dest = (Ogre::uchar*)malloc(destLen);
+    int ret = compress(dest, &destLen, data, data_len); // use default quality
+    if (ret != Z_OK)
+    {
+        free(dest);
+        OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, "compress failed", __FUNCTION__);
+    }
+
+    *out_len = destLen;
+    return dest;
+}
+#define STBIW_ZLIB_COMPRESS custom_zlib_compress
+#endif
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_WRITE_NO_STDIO
 #include "stbi/stb_image_write.h"
