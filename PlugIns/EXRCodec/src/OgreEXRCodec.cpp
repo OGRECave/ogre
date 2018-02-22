@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreImage.h"
 #include "OgreException.h"
+#include "OgreEXRCodecExports.h"
 
 #include "OgreEXRCodec.h"
 
@@ -163,4 +164,21 @@ String EXRCodec::magicNumberToFileExt(const char* magicNumberPtr, size_t maxbyte
   return "";
 }
 
+#ifndef OGRE_STATIC_LIB
+static Codec *mEXRCodec;
+
+extern "C" _OgreEXRPluginExport void dllStartPlugin();
+extern "C" _OgreEXRPluginExport void dllStopPlugin();
+
+extern "C" _OgreEXRPluginExport void dllStartPlugin()
+{
+    mEXRCodec = new EXRCodec;
+    Codec::registerCodec( mEXRCodec );
+}
+extern "C" _OgreEXRPluginExport void dllStopPlugin()
+{
+    Codec::unregisterCodec( mEXRCodec );
+    delete mEXRCodec;
+}
+#endif
 }

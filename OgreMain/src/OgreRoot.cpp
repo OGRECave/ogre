@@ -52,14 +52,8 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreFileSystemLayer.h"
 
-#if OGRE_NO_FREEIMAGE == 0
-#include "OgreFreeImageCodec.h"
-#endif
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
-#endif
-#if OGRE_NO_STBI_CODEC == 0
-#include "OgreSTBICodec.h"
 #endif
 
 #include "OgreHardwareBufferManager.h"
@@ -217,18 +211,11 @@ namespace Ogre {
         // Register image codecs
         DDSCodec::startup();
 #endif
-#if OGRE_NO_FREEIMAGE == 0
-        // Register image codecs
-        FreeImageCodec::startup();
-#endif
 #if OGRE_NO_PVRTC_CODEC == 0
         PVRTCCodec::startup();
 #endif
 #if OGRE_NO_ETC_CODEC == 0
         ETCCodec::startup();
-#endif
-#if OGRE_NO_STBI_CODEC == 0
-        STBIImageCodec::startup();
 #endif
 #if OGRE_NO_ASTC_CODEC == 0
         ASTCCodec::startup();
@@ -282,9 +269,6 @@ namespace Ogre {
         destroyAllRenderQueueInvocationSequences();
         OGRE_DELETE mCompositorManager;
         OGRE_DELETE mExternalTextureSourceManager;
-#if OGRE_NO_FREEIMAGE == 0
-        FreeImageCodec::shutdown();
-#endif
 #if OGRE_NO_DDS_CODEC == 0
         DDSCodec::shutdown();
 #endif
@@ -293,9 +277,6 @@ namespace Ogre {
 #endif
 #if OGRE_NO_ETC_CODEC == 0
         ETCCodec::shutdown();
-#endif
-#if OGRE_NO_STBI_CODEC == 0
-        STBIImageCodec::shutdown();
 #endif
 #if OGRE_NO_ASTC_CODEC == 0
         ASTCCodec::shutdown();

@@ -35,12 +35,9 @@ namespace Ogre {
     *  @{
     */
     /** \defgroup EXRCodec EXRCodec
-    * Codec specialized in loading OpenEXR high dynamic range images.
+    * %Codec specialized in loading OpenEXR high dynamic range images.
     *  @{
     */
-    /** 
-     * Codec specialized in loading OpenEXR high dynamic range images.
-     */
     class EXRCodec : public ImageCodec
     {
     public:

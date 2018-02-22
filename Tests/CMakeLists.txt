@@ -166,6 +166,8 @@ if (OGRE_BUILD_TESTS)
         Plugin_OctreeZone
         Plugin_ParticleFX
         Plugin_PCZSceneManager
+        Codec_STBI
+        Codec_FreeImage
         RenderSystem_GL
         RenderSystem_GL3Plus
       )

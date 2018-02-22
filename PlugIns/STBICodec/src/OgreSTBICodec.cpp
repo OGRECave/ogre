@@ -26,8 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
+#include "OgreSTBICodecExports.h"
 #include "OgreSTBICodec.h"
+#include "OgreLogManager.h"
+#include "OgreDataStream.h"
+
+#include "OgrePlatformInformation.h"
 
 #if __OGRE_HAVE_NEON
 #define STBI_NEON
@@ -37,6 +41,25 @@ THE SOFTWARE.
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 #include "stbi/stb_image.h"
+
+#if OGRE_NO_ZIP_ARCHIVE == 0
+#include <zlib.h>
+static Ogre::uchar* custom_zlib_compress(Ogre::uchar* data, int data_len, int* out_len, int /*quality*/)
+{
+    unsigned long destLen = compressBound(data_len);
+    Ogre::uchar* dest = (Ogre::uchar*)malloc(destLen);
+    int ret = compress(dest, &destLen, data, data_len); // use default quality
+    if (ret != Z_OK)
+    {
+        free(dest);
+        OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, "compress failed", __FUNCTION__);
+    }
+
+    *out_len = destLen;
+    return dest;
+}
+#define STBIW_ZLIB_COMPRESS custom_zlib_compress
+#endif
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_WRITE_NO_STDIO
@@ -51,7 +74,7 @@ namespace Ogre {
         stbi_convert_iphone_png_to_rgb(1);
         stbi_set_unpremultiply_on_load(1);
 
-        LogManager::getSingleton().logMessage(LML_NORMAL, "stb_image - v2.15 - public domain JPEG/PNG reader");
+        LogManager::getSingleton().logMessage("stb_image - v2.19 - public domain JPEG/PNG reader");
         
         // Register codecs
         String exts = "jpeg,jpg,png,bmp,psd,tga,gif,pic,ppm,pgm,hdr";
@@ -65,10 +88,8 @@ namespace Ogre {
         
         StringStream strExt;
         strExt << "Supported formats: " << exts;
-        
-        LogManager::getSingleton().logMessage(
-            LML_NORMAL,
-            strExt.str());
+
+        LogManager::getSingleton().logMessage(strExt.str());
     }
     //---------------------------------------------------------------------
     void STBIImageCodec::shutdown(void)
@@ -216,4 +237,23 @@ namespace Ogre {
     {
         return BLANKSTRING;
     }
+
+    const String& STBIPlugin::getName() const {
+        static String name = "STB Image Codec";
+        return name;
+    }
+
+#ifndef OGRE_STATIC_LIB
+    extern "C" void _OgreSTBICodecExport dllStartPlugin();
+    extern "C" void _OgreSTBICodecExport dllStopPlugin();
+
+    extern "C" void _OgreSTBICodecExport dllStartPlugin()
+    {
+        STBIImageCodec::startup();
+    }
+    extern "C" void _OgreSTBICodecExport dllStopPlugin()
+    {
+        STBIImageCodec::shutdown();
+    }
+#endif
 }

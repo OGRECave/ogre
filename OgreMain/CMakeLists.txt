@@ -22,23 +22,21 @@ list(APPEND HEADER_FILES
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 # Remove optional header files
-list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
+list(REMOVE_ITEM HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreDDSCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePVRTCCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreETCCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreZip.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSTBICodec.h"
 )
 
 # Remove optional source files
-list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp"
+list(REMOVE_ITEM SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreDDSCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePVRTCCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreETCCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreZip.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp"
 )
 
 # Add platform specific files
@@ -135,27 +133,6 @@ set(LIBRARIES ${PLATFORM_LIBS})
 
 if (OGRE_CONFIG_THREADS)
   list(APPEND LIBRARIES ${OGRE_THREAD_LIBRARIES})
-endif ()
-
-if (OGRE_CONFIG_ENABLE_FREEIMAGE)
-  add_definitions(-DFREEIMAGE_LIB)
-  list(APPEND HEADER_FILES include/OgreFreeImageCodec.h)
-  list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
-  list(APPEND LIBRARIES    "${FreeImage_LIBRARIES}")
-endif()
-
-if (OGRE_CONFIG_ENABLE_STBI)
-  list(APPEND HEADER_FILES include/OgreSTBICodec.h)
-  list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
-  
-  if(UNIX)
-    set_source_files_properties(src/OgreSTBICodec.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function -Wno-shadow -Wno-missing-declarations")
-  endif()
-  
-  if(CMAKE_COMPILER_IS_GNUCXX)
-      # workaround gcc5 bug on Ubuntu 16.04 regarding __builtin_cpu_supports
-      list(APPEND LIBRARIES gcc)
-  endif()
 endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
@@ -263,10 +240,6 @@ if (APPLE)
   endif()
 endif ()
 target_link_libraries(OgreMain ${LIBRARIES} ${CMAKE_DL_LIBS})
-if (MINGW)
-  # may need winsock htons functions for FreeImage
-  target_link_libraries(OgreMain ws2_32)
-endif ()
 
 # specify a precompiled header to use
 add_native_precompiled_header(OgreMain "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h")

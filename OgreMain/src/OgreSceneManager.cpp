@@ -6032,25 +6032,6 @@ void SceneManager::setShadowTextureSelfShadow(bool selfShadow)
         getRenderQueue()->setShadowCastersCannotBeReceivers(!selfShadow);
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowTextureCasterMaterial(const String& name)
-{
-    if (name.empty())
-    {
-        mShadowTextureCustomCasterPass = 0;
-    }
-    else
-    {
-        MaterialPtr mat = MaterialManager::getSingleton().getByName(name);
-        if (!mat)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "Cannot locate material called '" + name + "'", 
-                "SceneManager::setShadowTextureCasterMaterial");
-        }
-
-        setShadowTextureCasterMaterial(mat);
-    }
-}
 void SceneManager::setShadowTextureCasterMaterial(const MaterialPtr& mat)
 {
     if(!mat) {
@@ -6087,25 +6068,6 @@ void SceneManager::setShadowTextureCasterMaterial(const MaterialPtr& mat)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowTextureReceiverMaterial(const String& name)
-{
-    if (name.empty())
-    {
-        mShadowTextureCustomReceiverPass = 0;
-    }
-    else
-    {
-        MaterialPtr mat = MaterialManager::getSingleton().getByName(name);
-        if (!mat)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "Cannot locate material called '" + name + "'", 
-                "SceneManager::setShadowTextureReceiverMaterial");
-        }
-
-        setShadowTextureReceiverMaterial(mat);
-    }
-}
 void SceneManager::setShadowTextureReceiverMaterial(const MaterialPtr& mat)
 {
     if(!mat) {

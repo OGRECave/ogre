@@ -436,10 +436,6 @@ namespace Volume {
         */
         void setMaterialOfLevel(size_t level, const MaterialPtr& mat);
 
-        /// @overload
-        /// @deprecated use setMaterialOfLevel(size_t level, const MaterialPtr& mat)
-        OGRE_DEPRECATED void setMaterialOfLevel(size_t level, const String& matName);
-
         /** A list of Chunks.
         */
         typedef vector<const Chunk*>::type VecChunk;

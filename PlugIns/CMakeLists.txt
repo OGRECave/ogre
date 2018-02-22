@@ -31,6 +31,14 @@ if (OGRE_BUILD_PLUGIN_EXRCODEC)
   add_subdirectory(EXRCodec)
 endif (OGRE_BUILD_PLUGIN_EXRCODEC)
 
+if(OGRE_BUILD_PLUGIN_STBI)
+  add_subdirectory(STBICodec)
+endif()
+
+if(OGRE_BUILD_PLUGIN_FREEIMAGE)
+  add_subdirectory(FreeImageCodec)
+endif()
+
 if (OGRE_BUILD_PLUGIN_PFX)
   add_subdirectory(ParticleFX)
 endif (OGRE_BUILD_PLUGIN_PFX)

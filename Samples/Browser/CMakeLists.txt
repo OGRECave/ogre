@@ -296,6 +296,8 @@ if (APPLE)
         Plugin_OctreeZone
         Plugin_ParticleFX
         Plugin_PCZSceneManager
+        Codec_STBI
+        Codec_FreeImage
         RenderSystem_GL
         RenderSystem_GL3Plus
     )
