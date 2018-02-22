@@ -194,6 +194,10 @@ namespace Ogre
         jsonStr.a( ",\n\t\t\t\t\"inherit_scale\" : ", toQuotedStr( node->getInheritScale() ) );
         jsonStr.a( ",\n\t\t\t\t\"is_static\" : ", toQuotedStr( node->isStatic() ) );
 
+        const String &nodeName = node->getName();
+        if( !nodeName.empty() )
+            jsonStr.a( ",\n\t\t\t\t\"name\" : \"", node->getName().c_str(), "\"" );
+
         Node *parentNode = node->getParent();
         if( parentNode )
         {

@@ -262,6 +262,10 @@ namespace Ogre
         itor = nodeValue.FindMember( "inherit_scale" );
         if( itor != nodeValue.MemberEnd() && itor->value.IsBool() )
             node->setInheritScale( itor->value.GetBool() );
+
+        itor = nodeValue.FindMember( "name" );
+        if( itor != nodeValue.MemberEnd() && itor->value.IsString() )
+            node->setName( itor->value.GetString() );
     }
     //-----------------------------------------------------------------------------------
     SceneNode* SceneFormatImporter::importSceneNode( const rapidjson::Value &sceneNodeValue,
