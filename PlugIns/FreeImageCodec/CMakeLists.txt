@@ -11,7 +11,7 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreFreeImageCodecExports.h)
 set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include "${FreeImage_INCLUDE_DIR}")
 add_definitions(-DFREEIMAGE_LIB)
 add_library(Codec_FreeImage ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
 target_link_libraries(Codec_FreeImage OgreMain "${FreeImage_LIBRARIES}")
