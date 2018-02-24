@@ -62,7 +62,7 @@ namespace Assert
 }
 
 #define OGRE_HALT() debug_break()
-#define OGRE_UNUSED(x) do { (void)sizeof(x); } while(0)
+#define OGRE_UNUSED(x) do { (void)(0); } while(0)
 
 #ifdef OGRE_ASSERTS_ENABLED
     #define OGRE_ASSERT(cond) \
