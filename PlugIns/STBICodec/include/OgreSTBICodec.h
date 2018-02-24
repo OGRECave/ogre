@@ -74,10 +74,10 @@ namespace Ogre {
     class STBIPlugin : public Plugin
     {
         const String& getName() const;
-        void install() {}
-        void uninstall() {}
-        void initialise() { STBIImageCodec::startup(); }
-        void shutdown() { STBIImageCodec::shutdown(); }
+        void install() { STBIImageCodec::startup(); }
+        void uninstall() { STBIImageCodec::shutdown(); }
+        void initialise() {}
+        void shutdown() {}
     };
     /** @} */
     /** @} */
