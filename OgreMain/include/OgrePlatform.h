@@ -233,20 +233,6 @@ namespace Ogre {
 #       define _OgrePrivate
 #   endif
 
-// on windows we override OgreBuildSettings.h for convenience
-// see https://bitbucket.org/sinbad/ogre/pull-requests/728
-#ifdef OGRE_DEBUG_MODE
-#undef OGRE_DEBUG_MODE
-#endif
-
-// Win32 compilers use _DEBUG for specifying debug builds.
-// for MinGW, we set DEBUG
-#   if defined(_DEBUG) || defined(DEBUG)
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
-
 // Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
 // STLPORT fixes this though so allow if found
 // MinGW C++ Toolkit supports unicode and sets the define __MINGW32_TOOLBOX_UNICODE__ in _mingw.h
@@ -304,22 +290,45 @@ namespace Ogre {
 #endif
 
 //----------------------------------------------------------------------------
-// Apple Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+// Debug mode and asserts
+
+// No checks done at all
+#define OGRE_DEBUG_NONE     0
+// We perform basic assert checks and other non-performance intensive checks
+#define OGRE_DEBUG_LOW      1
+// We alter classes to add some debug variables for a bit more thorough checking
+// and also perform checks that may cause some performance hit
+#define OGRE_DEBUG_MEDIUM   2
+// We perform intensive validation without concerns for performance
+#define OGRE_DEBUG_HIGH     3
+
 // on Apple & Windows we override OgreBuildSettings.h for convenience
 // see https://bitbucket.org/sinbad/ogre/pull-requests/728
-#   ifdef OGRE_DEBUG_MODE
-#   undef OGRE_DEBUG_MODE
-#   endif
-
-// Win32 compilers use _DEBUG for specifying debug builds.
-// for MinGW, we set DEBUG
-#   if defined(_DEBUG) || defined(DEBUG)
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
+// Win32 compilers use _DEBUG for specifying debug builds, for MinGW, we use DEBUG
+#if (defined(_DEBUG) || defined(DEBUG))
+#   define OGRE_DEBUG_MODE OGRE_DEBUG_LEVEL_DEBUG
+#else
+#   define OGRE_DEBUG_MODE OGRE_DEBUG_LEVEL_RELEASE
 #endif
+
+#if OGRE_DEBUG_MODE >= OGRE_DEBUG_LOW
+#   define OGRE_ASSERTS_ENABLED
+#endif
+
+#define OGRE_ASSERT_LOW OGRE_ASSERT
+
+#if OGREGUI_DEBUG >= OGREGUI_DEBUG_MEDIUM
+#   define OGRE_ASSERT_MEDIUM OGRE_ASSERT
+#else
+#   define OGRE_ASSERT_MEDIUM do { OGRE_UNUSED(condition); } while(0)
+#endif
+
+#if OGREGUI_DEBUG >= OGREGUI_DEBUG_HIGH
+#   define OGRE_ASSERT_HIGH OGRE_ASSERT
+#else
+#   define OGRE_ASSERT_HIGH do { OGRE_UNUSED(condition); } while(0)
+#endif
+
 
 //----------------------------------------------------------------------------
 // Android Settings
