@@ -85,10 +85,10 @@ namespace Ogre {
     class FreeImagePlugin : public Plugin
     {
         const String& getName() const;
-        void install() {}
-        void uninstall() {}
-        void initialise() { FreeImageCodec::startup(); }
-        void shutdown() { FreeImageCodec::shutdown(); }
+        void install() { FreeImageCodec::startup(); }
+        void uninstall() { FreeImageCodec::shutdown(); }
+        void initialise() {}
+        void shutdown() {}
     };
     /** @} */
     /** @} */
