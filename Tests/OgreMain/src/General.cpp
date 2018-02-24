@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreEntity.h"
 #include "OgreCamera.h"
 #include "RootWithoutRenderSystemFixture.h"
+#include "OgreStaticPluginLoader.h"
 
 #if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1600)
 #include <random>
@@ -45,13 +46,19 @@ using namespace Ogre;
 
 TEST(Root,shutdown)
 {
+#ifdef OGRE_STATIC_LIB
+    Root root("");
+    OgreBites::StaticPluginLoader mStaticPluginLoader;
+    mStaticPluginLoader.load();
+#else
     Root root;
+#endif
     root.shutdown();
 }
 
 TEST(SceneManager,removeAndDestroyAllChildren)
 {
-    Root root;
+    Root root("");
     SceneManager* sm = root.createSceneManager();
     sm->getRootSceneNode()->createChildSceneNode();
     sm->getRootSceneNode()->createChildSceneNode();
