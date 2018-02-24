@@ -320,13 +320,13 @@ namespace Ogre {
 #if OGREGUI_DEBUG >= OGREGUI_DEBUG_MEDIUM
 #   define OGRE_ASSERT_MEDIUM OGRE_ASSERT
 #else
-#   define OGRE_ASSERT_MEDIUM do { OGRE_UNUSED(condition); } while(0)
+#   define OGRE_ASSERT_MEDIUM ((void)0)
 #endif
 
 #if OGREGUI_DEBUG >= OGREGUI_DEBUG_HIGH
 #   define OGRE_ASSERT_HIGH OGRE_ASSERT
 #else
-#   define OGRE_ASSERT_HIGH do { OGRE_UNUSED(condition); } while(0)
+#   define OGRE_ASSERT_HIGH ((void)0)
 #endif
 
 

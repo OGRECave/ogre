@@ -62,7 +62,7 @@ namespace Assert
 }
 
 #define OGRE_HALT() debug_break()
-#define OGRE_UNUSED(x) do { (void)(0); } while(0)
+#define OGRE_UNUSED(x) do { (void)sizeof(x); } while(0)
 
 #ifdef OGRE_ASSERTS_ENABLED
     #define OGRE_ASSERT(cond) \
@@ -120,15 +120,11 @@ namespace Assert
 
     #define OGRE_VERIFY(cond) OGRE_ASSERT(cond)
 #else
-    #define OGRE_ASSERT(condition) \
-        do { OGRE_UNUSED(condition); } while(0)
-    #define OGRE_ASSERT_MSG(condition, msg, ...) \
-        do { OGRE_UNUSED(condition); OGRE_UNUSED(msg); } while(0)
-    #define OGRE_ASSERT_FAIL(msg, ...) \
-        do { OGRE_UNUSED(msg); } while(0)
-    #define OGRE_VERIFY(cond) (void)(cond)
-    #define OGRE_VERIFY_MSG(cond, msg, ...) \
-        do { (void)(cond); OGRE_UNUSED(msg); } while(0)
+    #define OGRE_ASSERT(condition) ((void)0)
+    #define OGRE_ASSERT_MSG(condition, msg, ...) ((void)0)
+    #define OGRE_ASSERT_FAIL(msg, ...) ((void)0)
+    #define OGRE_VERIFY(cond) ((void)0)
+    #define OGRE_VERIFY_MSG(cond, msg, ...) ((void)0)
 #endif
 
 #if __cplusplus >= 201103L
