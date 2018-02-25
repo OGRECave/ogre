@@ -1271,9 +1271,6 @@ namespace Ogre
         mIds["pass_op"] = ID_PASS_OP;
         mIds["two_sided"] = ID_TWO_SIDED;
         mIds["read_back_as_texture"] = ID_READ_BACK_AS_TEXTURE;
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        mIds["rtshader_system"] = ID_RT_SHADER_SYSTEM;
-#endif
 
         mIds["subroutine"] = ID_SUBROUTINE;
 

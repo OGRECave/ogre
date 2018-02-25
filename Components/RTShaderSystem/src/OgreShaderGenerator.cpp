@@ -138,7 +138,7 @@ bool ShaderGenerator::_initialize()
     // Allocate script translator manager.
     mScriptTranslatorManager = OGRE_NEW SGScriptTranslatorManager(this);
     ScriptCompilerManager::getSingleton().addTranslatorManager(mScriptTranslatorManager);
-
+    ScriptCompilerManager::getSingleton().registerCustomWordId("rtshader_system");
     addCustomScriptTranslator("rtshader_system", &mCoreScriptTranslator);
 
     // Create the default scheme.
