@@ -114,6 +114,13 @@ protected:
         TexturePtr tex = TextureManager::getSingleton().createManual("dyncubemap",
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_CUBE_MAP, 128, 128, 0, PF_R8G8B8, TU_RENDERTARGET);
 
+        MaterialManager::getSingleton()
+            .getByName("Examples/DynamicCubeMap", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+            ->getTechnique(0)
+            ->getPass(0)
+            ->getTextureUnitState(0)
+            ->setCubicTexture(&tex, true);
+
         // assign our camera to all 6 render targets of the texture (1 for each direction)
         for (unsigned int i = 0; i < 6; i++)
         {

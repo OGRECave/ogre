@@ -720,17 +720,13 @@ material Examples/FresnelReflectionRefraction
 				filtering linear linear none
 			}
 			// Reflection
-			texture_unit
+			texture_unit reflection
 			{
-				// Will be filled in at runtime
-				texture reflection
 				tex_address_mode clamp
 			}
 			// Refraction
-			texture_unit
+			texture_unit refraction
 			{
-				// Will be filled in at runtime
-				texture refraction
 				tex_address_mode clamp
 			}
 		}
@@ -987,13 +983,6 @@ material Examples/TextureArray
 			fragment_program_ref Examples/TextureArrayPSglsl
 			{
 			}
-
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture TextureArrayTex
-				tex_address_mode clamp
-			}
 		}
 	}
 
@@ -1007,13 +996,6 @@ material Examples/TextureArray
 
 			fragment_program_ref Examples/TextureArrayPSglsles
 			{
-			}
-
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture TextureArrayTex
-				tex_address_mode clamp
 			}
 		}
 	}

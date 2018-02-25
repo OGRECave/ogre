@@ -349,8 +349,6 @@ material Examples/DynamicCubeMap
 		{
 			texture_unit
 			{
-				// will be filled in at runtime
-				cubic_texture dyncubemap combinedUVW
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}

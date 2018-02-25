@@ -1176,7 +1176,6 @@ protected:
         // Complex members (those that can't be copied using memcpy) are at the end to 
         // allow for fast copying of the basic members.
         //
-        vector<String>::type mFrames;
         mutable vector<TexturePtr>::type mFramePtrs;
         String mName;               ///< Optional name for the TUS.
         String mTextureNameAlias;   ///< Optional alias for texture frames.
@@ -1212,7 +1211,7 @@ protected:
         /** Internal method for ensuring the texture for a given frame is loaded. */
         void ensureLoaded(size_t frame) const;
 
-
+        TexturePtr retrieveTexture(const String& name);
     };
 
     /** @} */
