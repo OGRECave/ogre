@@ -132,6 +132,13 @@ protected:
             TexturePtr tex = TextureManager::getSingleton().createManual(i == 0 ? "refraction" : "reflection",
                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 512, 512, 0, PF_R8G8B8, TU_RENDERTARGET);
 
+            MaterialManager::getSingleton()
+                .getByName("Examples/FresnelReflectionRefraction", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+                ->getTechnique(0)
+                ->getPass(0)
+                ->getTextureUnitState(tex->getName())
+                ->setTexture(tex);
+
             RenderTarget* rtt = tex->getBuffer()->getRenderTarget();
             rtt->addViewport(mCamera)->setOverlaysEnabled(false);
             rtt->addListener(this);

@@ -98,6 +98,12 @@ protected:
         // create our dynamic texture with 8-bit luminance texels
         TexturePtr tex = TextureManager::getSingleton().createManual("thaw", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
             TEX_TYPE_2D, TEXTURE_SIZE, TEXTURE_SIZE, 0, PF_L8, TU_DYNAMIC_WRITE_ONLY);
+        MaterialManager::getSingleton()
+            .getByName("Examples/Frost", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+            ->getTechnique(0)
+            ->getPass(0)
+            ->getTextureUnitState(1)
+            ->setTexture(tex);
 
         mTexBuf = tex->getBuffer();  // save off the texture buffer
 

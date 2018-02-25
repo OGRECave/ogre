@@ -60,7 +60,6 @@ material Ogre/Compositor/Dither
 			
 			texture_unit noise
 			{
-				texture DitherTex
 				tex_address_mode wrap
 				tex_coord_set 1
 				filtering none

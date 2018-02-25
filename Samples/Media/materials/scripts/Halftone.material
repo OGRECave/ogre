@@ -83,7 +83,6 @@ material Ogre/Compositor/Halftone
 
 			texture_unit noise
 			{
-				texture HalftoneVolume
 				tex_coord_set 0
 				filtering trilinear
 				tex_address_mode clamp
