@@ -2957,7 +2957,7 @@ namespace Ogre
         DWORD oldVal;
 
         // can only set fixed-function texture stage state
-        if (stage < 8)
+        if (mEnableFixedPipeline && stage < 8)
         {
             if ( FAILED( hr = getActiveD3D9Device()->GetTextureStageState(stage, type, &oldVal) ) )
                 return hr;

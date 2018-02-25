@@ -43,7 +43,7 @@ namespace Ogre {
     // Interface.
     public:     
         void                setActiveDevice                 (D3D9Device* device);
-        D3D9Device*         getActiveDevice                 ();
+        D3D9Device*         getActiveDevice                 () {return mActiveDevice;}
         void                setActiveRenderTargetDevice     (D3D9Device* device);
         D3D9Device*         getActiveRenderTargetDevice     ();     
         UINT                getDeviceCount                  ();
