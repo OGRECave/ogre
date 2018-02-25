@@ -64,9 +64,9 @@ namespace Ogre {
         , mIsDefaultFiltering(true)
         , mBindingType(BT_FRAGMENT)
         , mContentType(CONTENT_NAMED)
+        , mNumFrames(0)
         , mParent(parent)
         , mAnimController(0)
-        , mNumFrames(0)
     {
         mColourBlendMode.blendType = LBT_COLOUR;
         mAlphaBlendMode.operation = LBX_MODULATE;
@@ -131,6 +131,7 @@ namespace Ogre {
         , mIsDefaultFiltering(true)
         , mBindingType(BT_FRAGMENT)
         , mContentType(CONTENT_NAMED)
+        , mNumFrames(0)
         , mParent(parent)
         , mAnimController(0)
     {
