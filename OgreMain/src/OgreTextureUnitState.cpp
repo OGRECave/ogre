@@ -64,6 +64,7 @@ namespace Ogre {
         , mIsDefaultFiltering(true)
         , mBindingType(BT_FRAGMENT)
         , mContentType(CONTENT_NAMED)
+        , mNumFrames(0)
         , mParent(parent)
         , mAnimController(0)
     {
@@ -80,6 +81,16 @@ namespace Ogre {
             mParent->_dirtyHash();
         }
 
+    }
+
+    void TextureUnitState::setNumFrames(int numFrames)
+    {
+        if (mNumFrames != numFrames)
+        {
+            mFrames.resize(numFrames);
+            mFramePtrs.resize(numFrames);
+            mNumFrames = numFrames;
+        }
     }
 
     //-----------------------------------------------------------------------
@@ -120,6 +131,7 @@ namespace Ogre {
         , mIsDefaultFiltering(true)
         , mBindingType(BT_FRAGMENT)
         , mContentType(CONTENT_NAMED)
+        , mNumFrames(0)
         , mParent(parent)
         , mAnimController(0)
     {
@@ -206,8 +218,7 @@ namespace Ogre {
         }
         else
         {
-            mFrames.resize(1);
-            mFramePtrs.resize(1);
+            setNumFrames(1);
             mFrames[0] = name;
             mFramePtrs[0].reset();
             // defer load until used, so don't grab pointer yet
@@ -253,8 +264,7 @@ namespace Ogre {
         }
         else
         {
-            mFrames.resize(1);
-            mFramePtrs.resize(1);
+            setNumFrames(1);
             mFrames[0] = texPtr->getName();
             mFramePtrs[0] = texPtr;
             // defer load until used, so don't grab pointer yet
@@ -265,7 +275,7 @@ namespace Ogre {
             // Load immediately ?
             if (isLoaded())
             {
-                _load(); // reload
+                _loadTextures(); // reload only textures
             }
             // Tell parent to recalculate hash
             if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
@@ -292,7 +302,7 @@ namespace Ogre {
         if (ct == CONTENT_SHADOW || ct == CONTENT_COMPOSITOR)
         {
             // Clear out texture frames, not applicable
-            mFrames.clear();
+            setNumFrames(0);
             // One reference space, set manually through _setTexturePtr
             mFramePtrs.resize(1);
             mFramePtrs[0].reset();
@@ -334,9 +344,8 @@ namespace Ogre {
     {
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
-        mFrames.resize(forUVW ? 1 : 6);
-        // resize pointers, but don't populate until asked for
-        mFramePtrs.resize(forUVW ? 1 : 6);
+        //// resize pointers, but don't populate until asked for
+        setNumFrames(forUVW ? 1 : 6);
         mAnimDuration = 0;
         mCurrentFrame = 0;
         mCubic = true;
@@ -351,13 +360,12 @@ namespace Ogre {
         mParent->_notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setCubicTexture( const TexturePtr* const texPtrs, bool forUVW )
+    void TextureUnitState::setCubicTexture(const TexturePtr* const texPtrs, bool forUVW)
     {
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
-        mFrames.resize(forUVW ? 1 : 6);
         // resize pointers, but don't populate until asked for
-        mFramePtrs.resize(forUVW ? 1 : 6);
+        setNumFrames(forUVW ? 1 : 6);
         mAnimDuration = 0;
         mCurrentFrame = 0;
         mCubic = true;
@@ -475,10 +483,8 @@ namespace Ogre {
         size_t pos = name.find_last_of('.');
         baseName = name.substr(0, pos);
         ext = name.substr(pos);
-
-        mFrames.resize(numFrames);
         // resize pointers, but don't populate until needed
-        mFramePtrs.resize(numFrames);
+        setNumFrames(numFrames);
         mAnimDuration = duration;
         mCurrentFrame = 0;
         mCubic = false;
@@ -508,10 +514,8 @@ namespace Ogre {
     {
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
-
-        mFrames.resize(numFrames);
         // resize pointers, but don't populate until needed
-        mFramePtrs.resize(numFrames);
+        setNumFrames(numFrames);
         mAnimDuration = duration;
         mCurrentFrame = 0;
         mCubic = false;
@@ -571,7 +575,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     unsigned int TextureUnitState::getNumFrames(void) const
     {
-        return (unsigned int)mFrames.size();
+        return static_cast<unsigned int>(mNumFrames);
     }
     //-----------------------------------------------------------------------
     const String& TextureUnitState::getFrameTextureName(unsigned int frameNumber) const
@@ -1071,14 +1075,20 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::_load(void)
+    void TextureUnitState::_loadTextures(void)
     {
-
         // Load textures
         for (unsigned int i = 0; i < mFrames.size(); ++i)
         {
             ensureLoaded(i);
         }
+    }
+
+    //-----------------------------------------------------------------------
+    void TextureUnitState::_load(void)
+    {
+        _loadTextures();
+
         // Animation controller
         if (mAnimDuration != 0)
         {

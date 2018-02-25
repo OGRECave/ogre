@@ -216,6 +216,8 @@ namespace Ogre {
         */
         void setTexture( const TexturePtr& texPtr);
 
+        void setNumFrames(int numFrames);
+
         /** Sets this texture layer to use a combination of 6 texture maps, each one relating to a face of a cube.
         @remarks
             Cubic textures are made up of 6 separate texture images. Each one of these is an orthogonal view of the
@@ -1050,6 +1052,8 @@ namespace Ogre {
         void _prepare(void);
         /** Internal method for undoing the preparation this object as part of Material::unprepare. */
         void _unprepare(void);
+        /** Internal method for loading the textures of this object as part of Material::load. */
+        void _loadTextures(void);
         /** Internal method for loading this object as part of Material::load. */
         void _load(void);
         /** Internal method for unloading this object as part of Material::unload. */
@@ -1171,6 +1175,7 @@ protected:
         ContentType mContentType;
         /// The index of the referenced texture if referencing an MRT in a compositor.
         size_t mCompositorRefMrtIndex;
+        int mNumFrames;
 
         //-----------------------------------------------------------------------------
         // Complex members (those that can't be copied using memcpy) are at the end to 
