@@ -14,12 +14,7 @@ if (OGRE_BUILD_TESTS)
 
   ogre_add_component_include_dir(Bites)
 
-    set(GTEST_SHARED TRUE)
-    if(ANDROID)
-        set(GTEST_SHARED FALSE)
-    endif()
     if(APPLE AND NOT APPLE_IOS)
-        set(GTEST_SHARED FALSE)
         set(CROSS ${CROSS} -DCMAKE_CXX_FLAGS=-stdlib=libc++)
     endif()
     
@@ -34,7 +29,10 @@ if (OGRE_BUILD_TESTS)
         SOURCE_DIR ${GTEST_INSTALL_DIR}
         CMAKE_ARGS
             -DCMAKE_INSTALL_PREFIX=${GTEST_INSTALL_DIR}
-            -DBUILD_SHARED_LIBS=${GTEST_SHARED}
+            -DBUILD_SHARED_LIBS=FALSE
+            -DBUILD_GMOCK=FALSE
+            -DBUILD_GTEST=TRUE
+            -Dgtest_force_shared_crt=TRUE
             -G ${CMAKE_GENERATOR}
             -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
             ${CROSS})
