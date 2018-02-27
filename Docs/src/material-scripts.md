@@ -263,7 +263,7 @@ Here are the attributes you can use in a ’pass’ section of a .material scrip
 
 ## ambient
 
-Sets the ambient colour reflectance properties of this pass. **This attribute has no effect if an asm, CG, or HLSL shader program is used. With GLSL, the shader can read the OpenGL material state.** 
+Sets the ambient colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification 
 
 Format: ambient (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
 
@@ -277,7 +277,7 @@ Default: ambient 1.0 1.0 1.0 1.0
 
 ## diffuse
 
-Sets the diffuse colour reflectance properties of this pass. **This attribute has no effect if an asm, CG, or HLSL shader program is used. With GLSL, the shader can read the OpenGL material state.**
+Sets the diffuse colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
 
 Format: diffuse (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
 
@@ -291,7 +291,7 @@ Default: diffuse 1.0 1.0 1.0 1.0
 
 ## specular
 
-Sets the specular colour reflectance properties of this pass. **This attribute has no effect if an asm, CG, or HLSL shader program is used. With GLSL, the shader can read the OpenGL material state.**
+Sets the specular colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
 
 Format: specular (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour) &lt;shininess&gt;<br> NB valid colour values are between 0.0 and 1.0. Shininess can be any value greater than 0.
 
@@ -305,7 +305,7 @@ Default: specular 0.0 0.0 0.0 0.0 0.0
 
 ## emissive
 
-Sets the amount of self-illumination an object has. **This attribute has no effect if an asm, CG, or HLSL shader program is used. With GLSL, the shader can read the OpenGL material state.**
+Sets the amount of self-illumination an object has. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
 
 Format: emissive (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
 
@@ -1126,7 +1126,7 @@ Format: content\_type &lt;named|shadow|compositor&gt; \[&lt;Referenced Composito
 
 Sets which texture coordinate set is to be used for this texture layer. A mesh can define multiple sets of texture coordinates, this sets which one this material uses.
 
-@note Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
+@note Only has an effect with the fixed-function pipeline or the @ref RTShader
 
 Format: tex\_coord\_set &lt;set\_num&gt;
 
@@ -1239,7 +1239,7 @@ Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 
 ## colour\_op
 
-Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer). @note Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
+Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer). @note Only has an effect with the fixed-function pipeline or the @ref RTShader
 
 Format: colour\_op &lt;replace|add|modulate|alpha\_blend&gt;
 
@@ -1270,7 +1270,7 @@ Default: colour\_op modulate
 
 ## colour\_op\_ex
 
-This is an extended version of the [colour\_op](#colour_005fop) attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blending, but you are limited to the number of texture units which are available in hardware. @note Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
+This is an extended version of the [colour\_op](#colour_005fop) attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blending, but you are limited to the number of texture units which are available in hardware. @note Only has an effect with the fixed-function pipeline or the @ref RTShader
 
 Format: colour\_op\_ex &lt;operation&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manual\_factor&gt;\] \[&lt;manual\_colour1&gt;\] \[&lt;manual\_colour2&gt;\]
 
@@ -1393,13 +1393,13 @@ The parameters are the same as in the scene\_blend attribute; this is because mu
 
 ## alpha\_op\_ex
 
-Behaves in exactly the same away as [colour\_op\_ex](#colour_005fop_005fex) except that it determines how alpha values are combined between texture layers rather than colour values.The only difference is that the 2 manual colours at the end of colour\_op\_ex are just single floating-point values in alpha\_op\_ex. @note Only applies to the fixed-function pipeline, if you’re using a fragment program this will have no effect.
+Behaves in exactly the same away as [colour\_op\_ex](#colour_005fop_005fex) except that it determines how alpha values are combined between texture layers rather than colour values.The only difference is that the 2 manual colours at the end of colour\_op\_ex are just single floating-point values in alpha\_op\_ex. @note Only has an effect with the fixed-function pipeline or the @ref RTShader
 
 <a name="env_005fmap"></a><a name="env_005fmap-1"></a>
 
 ## env\_map
 
-Turns on/off texture coordinate effect that makes this layer an environment map. @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect.
+Turns on/off texture coordinate effect that makes this layer an environment map. @note Only has an effect with the fixed-function pipeline or the @ref RTShader
 
 Format: env\_map &lt;off|spherical|planar|cubic\_reflection|cubic\_normal&gt;
 
