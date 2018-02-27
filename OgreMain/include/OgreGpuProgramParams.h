@@ -885,6 +885,9 @@ namespace Ogre {
     public:
         /** Defines the types of automatically updated values that may be bound to GpuProgram
             parameters, or used to modify parameters on a per-object basis.
+
+            For use in @ref Program-Parameter-Specification, drop the `ACT_` prefix. 
+            E.g. `ACT_WORLD_MATRIX` becomes `world_matrix`.
         */
         enum AutoConstantType
         {
