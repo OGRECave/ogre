@@ -323,6 +323,18 @@ namespace Ogre {
         case 33779: // DXT 5
             imgData->format = PF_DXT5;
             break;
+         case 0x8c00: // COMPRESSED_RGB_PVRTC_4BPPV1_IMG
+            imgData->format = PF_PVRTC_RGB4;
+            break;
+        case 0x8c01: // COMPRESSED_RGB_PVRTC_2BPPV1_IMG
+            imgData->format = PF_PVRTC_RGB2;
+            break;
+        case 0x8c02: // COMPRESSED_RGBA_PVRTC_4BPPV1_IMG
+            imgData->format = PF_PVRTC_RGBA4;
+            break;
+        case 0x8c03: // COMPRESSED_RGBA_PVRTC_2BPPV1_IMG
+            imgData->format = PF_PVRTC_RGBA2;
+            break;
         default:        
             imgData->format = PF_ETC1_RGB8;
             break;
