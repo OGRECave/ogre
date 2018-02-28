@@ -344,8 +344,10 @@ namespace Ogre {
         if (header.glType == 0 || header.glFormat == 0)
             imgData->flags |= IF_COMPRESSED;
 
-        size_t numFaces = 1; // Assume one face until we know otherwise
-                             // Calculate total size from number of mipmaps, faces and size
+		size_t numFaces = header.numberOfFaces;
+		if (numFaces > 1)
+			imgData->flags |= IF_CUBEMAP;
+        // Calculate total size from number of mipmaps, faces and size
         imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces,
                                              imgData->width, imgData->height, imgData->depth, imgData->format);
 
@@ -356,12 +358,18 @@ namespace Ogre {
 
         // Now deal with the data
         uchar* destPtr = output->getPtr();
+        uint32 mipOffset = 0;
         for (uint32 level = 0; level < header.numberOfMipmapLevels; ++level)
         {
             uint32 imageSize = 0;
             stream->read(&imageSize, sizeof(uint32));
-            stream->read(destPtr, imageSize);
-            destPtr += imageSize;
+
+            for(uint32 face = 0; face < numFaces; ++face)
+            {
+                uchar* placePtr = destPtr + ((imgData->size)/numFaces)*face + mipOffset; // shuffle mip and face
+                stream->read(placePtr, imageSize);
+            }
+            mipOffset += imageSize;
         }
 
         result.first = output;
