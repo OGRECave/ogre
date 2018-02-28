@@ -440,11 +440,11 @@ namespace Ogre {
         //-----------------------------------------------------------------------
         {"PF_DEPTH",
             /* Bytes per element */
-            4,
+            2,
             /* Flags */
-            PFF_DEPTH,
+            PFF_LUMINANCE | PFF_DEPTH,
             /* Component type and count */
-            PCT_FLOAT16, 1, // ?
+            PCT_SHORT, 1,
             /* rbits, gbits, bbits, abits */
             16, 0, 0, 0,
             /* Masks and shifts */
