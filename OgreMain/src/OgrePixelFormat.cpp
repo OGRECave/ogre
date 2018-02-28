@@ -44,8 +44,8 @@ namespace Ogre {
     {
         if(PixelUtil::isCompressed(format))
         {
-            if(def.left == left && def.top == top && def.front == front &&
-               def.right == right && def.bottom == bottom && def.back == back)
+            if(def.left == left && def.top == top && def.right == right &&
+			   def.bottom == bottom)
             {
                 // Entire buffer is being queried
                 return *this;
@@ -705,8 +705,7 @@ namespace Ogre {
     void PixelUtil::bulkPixelConversion(const PixelBox &src, const PixelBox &dst)
     {
         assert(src.getWidth() == dst.getWidth() &&
-               src.getHeight() == dst.getHeight() &&
-               src.getDepth() == dst.getDepth());
+               src.getHeight() == dst.getHeight());
 
         // Check for compressed formats, we don't support decompression, compression or recoding
         if(PixelUtil::isCompressed(src.format) || PixelUtil::isCompressed(dst.format))
