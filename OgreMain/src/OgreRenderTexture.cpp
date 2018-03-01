@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreException.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreDepthBuffer.h"
 
 namespace Ogre
 {
@@ -43,6 +44,9 @@ namespace Ogre
         mHeight = mBuffer->getHeight();
         mColourDepth = static_cast<unsigned int>(
             Ogre::PixelUtil::getNumElemBits(mBuffer->getFormat()));
+
+        if(mBuffer->getFormat() == PF_DEPTH)
+            mDepthBufferPoolId = DepthBuffer::POOL_NO_DEPTH;
     }
     RenderTexture::~RenderTexture()
     {
