@@ -58,43 +58,43 @@ Every material in the script must be given a name, which is the line ’material
 
 @note ’:’ is the delimiter for specifying material copy in the script so it can’t be used as part of the material name.
 
-A material can inherit from a previously defined material by using a *colon* **:** after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just *parts* of a material from others; all this is covered in See @ref Script-Inheritance). You can also use variables in your script which can be replaced in inheriting versions, see See @ref Script-Variables.
+A material can inherit from a previously defined material by using a *colon* **:** after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just *parts* of a material from others; all this is covered in @ref Script-Inheritance). You can also use variables in your script which can be replaced in inheriting versions, see @ref Script-Variables.
 
-A material can be made up of many techniques (See @ref Techniques)- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. 
+A material can be made up of many @ref Techniques - a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. 
 
-Each technique can be made up of many passes (See @ref Passes), that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as ’ambient’ to set the amount & colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See @ref Passes for more details. 
+Each technique can be made up of many @ref Passes, that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as ’ambient’ to set the amount & colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See @ref Passes for more details. 
 
-Within each pass, there can be zero or many texture units in use (See @ref Texture-Units). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.
+Within each pass, there can be zero or many @ref Texture-Units in use. These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.
 
 You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See @ref Declaring-Vertex_002fGeometry_002fFragment-Programs) and are used as described in @ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass.
 
 <a name="Top_002dlevel-material-attributes"></a>
 
-## Top-level material attributes
+## Material {#Material}
 
-The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are: <a name="lod_005fdistances"></a>
+The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are: 
 
-## lod\_distances (deprecated)
+<a name="lod_005fdistances"></a>
+## lod\_distances
 
-This option is deprecated in favour of [lod\_values](#lod_005fvalues) now.  <a name="lod_005fstrategy"></a>
+@deprecated This option is deprecated in favour of [lod\_values](#lod_005fvalues) now.  
 
+
+<a name="lod_005fstrategy"></a>
 <a name="lod_005fstrategy-1"></a>
 
 ## lod\_strategy
 
 Sets the name of the LOD strategy to use. Defaults to ’Distance’ which means LOD changes based on distance from the camera. Also supported is ’PixelCount’ which changes LOD based on an estimate of the screen-space pixels affected.  Format: lod\_strategy &lt;name&gt;<br> Default: lod\_strategy Distance
 
-
-
 <a name="lod_005fvalues"></a>
-
-## lod\_values
-
 <a name="lod_005fvalues-1"></a>
 
 ## lod\_values
 
-This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for [lod\_strategy](#lod_005fstrategy) - it is a list of distances for the ’Distance’ strategy, and a list of pixel counts for the ’PixelCount’ strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. Implicitly, all materials activate LOD index 0 for values less than the first entry, so you do not have to specify ’0’ at the start of the list. You must ensure that there is at least one Technique with a [lod\_index](#lod_005findex) value for each value in the list (so if you specify 3 values, you must have techniques for LOD indexes 0, 1, 2 and 3). Note you must always have at least one Technique at lod\_index 0.  Format: lod\_values &lt;value0&gt; &lt;value1&gt; &lt;value2&gt; ...<br> Default: none
+This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for [lod\_strategy](#lod_005fstrategy) - it is a list of distances for the ’Distance’ strategy, and a list of pixel counts for the ’PixelCount’ strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. Implicitly, all materials activate LOD index 0 for values less than the first entry, so you do not have to specify ’0’ at the start of the list. You must ensure that there is at least one Technique with a [lod\_index](#lod_005findex) value for each value in the list (so if you specify 3 values, you must have techniques for LOD indexes 0, 1, 2 and 3). Note you must always have at least one Technique at lod\_index 0.
+
+Format: lod\_values &lt;value0&gt; &lt;value1&gt; &lt;value2&gt; ...<br> Default: none
 
 Example: <br> lod\_strategy Distance lod\_values 300.0 600.5 1200
 
@@ -108,7 +108,7 @@ This attribute controls whether objects using this material can have shadows cas
 
 Format: receive\_shadows &lt;on|off&gt;<br> Default: on
 
-Whether or not an object receives a shadow is the combination of a number of factors, See [Shadows](#Shadows) for full details; however this allows you to make a material opt-out of receiving shadows if required. Note that transparent materials never receive shadows so this option only has an effect on solid materials.
+Whether or not an object receives a shadow is the combination of a number of factors, See @ref Shadows for full details; however this allows you to make a material opt-out of receiving shadows if required. Note that transparent materials never receive shadows so this option only has an effect on solid materials.
 
 <a name="transparency_005fcasts_005fshadows"></a><a name="transparency_005fcasts_005fshadows-1"></a>
 
@@ -116,7 +116,10 @@ Whether or not an object receives a shadow is the combination of a number of fac
 
 This attribute controls whether transparent materials can cast certain kinds of shadow.
 
-Format: transparency\_casts\_shadows &lt;on|off&gt;<br> Default: off Whether or not an object casts a shadow is the combination of a number of factors, See [Shadows](#Shadows) for full details; however this allows you to make a transparent material cast shadows, when it would otherwise not. For example, when using texture shadows, transparent materials are normally not rendered into the shadow texture because they should not block light. This flag overrides that.
+Format: transparency\_casts\_shadows &lt;on|off&gt;<br> 
+Default: off 
+
+Whether or not an object casts a shadow is the combination of a number of factors, See @ref Shadows for full details; however this allows you to make a transparent material cast shadows, when it would otherwise not. For example, when using texture shadows, transparent materials are normally not rendered into the shadow texture because they should not block light. This flag overrides that.
 
 <a name="set_005ftexture_005falias"></a><a name="set_005ftexture_005falias-1"></a>
 
@@ -126,7 +129,7 @@ This attribute associates a texture alias with a texture name.
 
 Format: set\_texture\_alias &lt;alias name&gt; &lt;texture name&gt;
 
-This attribute can be used to set the textures used in texture unit states that were inherited from another material.(See [Texture Aliases](#Texture-Aliases))
+This attribute can be used to set the textures used in texture unit states that were inherited from another material.(See @ref Texture-Aliases)
 
 
 
@@ -145,7 +148,7 @@ When a material is used for the first time, it is ’compiled’. That involves 
 
 In a material script, techniques must be listed in order of preference, i.e. the earlier techniques are preferred over the later techniques. This normally means you will list your most advanced, most demanding techniques first in the script, and list fallbacks afterwards.
 
-To help clearly identify what each technique is used for, the technique can be named but its optional. Techniques not named within the script will take on a name that is the technique index number. For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script. The technique name must be unique within the material or else the final technique is the resulting merge of all techniques with the same name in the material. A warning message is posted in the Ogre.log if this occurs. Named techniques can help when inheriting a material and modifying an existing technique: (See [Script Inheritance](#Script-Inheritance))
+To help clearly identify what each technique is used for, the technique can be named but its optional. Techniques not named within the script will take on a name that is the technique index number. For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script. The technique name must be unique within the material or else the final technique is the resulting merge of all techniques with the same name in the material. A warning message is posted in the Ogre.log if this occurs. Named techniques can help when inheriting a material and modifying an existing technique: (See @ref Script-Inheritance)
 
 Format: technique name
 
@@ -180,19 +183,19 @@ All techniques must belong to a LOD index, by default they all belong to index 0
 
 Default: lod\_index 0
 
-Techniques also contain one or more passes (and there must be at least one), See [Passes](#Passes).
+Techniques also contain one or more @ref Passes (and there must be at least one).
 
 <a name="shadow_005fcaster_005fmaterial"></a><a name="shadow_005fcaster_005fmaterial-1"></a>
 
 ## shadow\_caster\_material
 
-When using See [Texture-based Shadows](#Texture_002dbased-Shadows) you can specify an alternate material to use when rendering the object using this material into the shadow texture. This is like a more advanced version of using shadow\_caster\_vertex\_program, however note that for the moment you are expected to render the shadow in one pass, i.e. only the first pass is respected.
+When using @ref Texture_002dbased-Shadows you can specify an alternate material to use when rendering the object using this material into the shadow texture. This is like a more advanced version of using shadow\_caster\_vertex\_program, however note that for the moment you are expected to render the shadow in one pass, i.e. only the first pass is respected.
 
 <a name="shadow_005freceiver_005fmaterial"></a><a name="shadow_005freceiver_005fmaterial-1"></a>
 
 ## shadow\_receiver\_material
 
-When using See [Texture-based Shadows](#Texture_002dbased-Shadows) you can specify an alternate material to use when performing the receiver shadow pass. Note that this explicit ’receiver’ pass is only done when you’re **not** using [Integrated Texture Shadows](#Integrated-Texture-Shadows) - i.e. the shadow rendering is done separately (either as a modulative pass, or a masked light pass). This is like a more advanced version of using shadow\_receiver\_vertex\_program and shadow\_receiver\_fragment\_program, however note that for the moment you are expected to render the shadow in one pass, i.e. only the first pass is respected.
+When using @ref Texture_002dbased-Shadows you can specify an alternate material to use when performing the receiver shadow pass. Note that this explicit ’receiver’ pass is only done when you’re **not** using @ref Integrated-Texture-Shadows - i.e. the shadow rendering is done separately (either as a modulative pass, or a masked light pass). This is like a more advanced version of using shadow\_receiver\_vertex\_program and shadow\_receiver\_fragment\_program, however note that for the moment you are expected to render the shadow in one pass, i.e. only the first pass is respected.
 
 <a name="gpu_005fvendor_005frule"></a><a name="gpu_005fdevice_005frule"></a><a name="gpu_005fvendor_005frule-and-gpu_005fdevice_005frule"></a>
 
@@ -210,9 +213,9 @@ Note that these rules can only mark a technique ’unsupported’ when it would 
 
 A pass is a single render of the geometry in question; a single call to the rendering API with a certain set of rendering properties. A technique can have between one and 16 passes, although clearly the more passes you use, the more expensive the technique will be to render.
 
-To help clearly identify what each pass is used for, the pass can be named but its optional. Passes not named within the script will take on a name that is the pass index number. For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script. The pass name must be unique within the technique or else the final pass is the resulting merge of all passes with the same name in the technique. A warning message is posted in the Ogre.log if this occurs. Named passes can help when inheriting a material and modifying an existing pass: (See [Script Inheritance](#Script-Inheritance))
+To help clearly identify what each pass is used for, the pass can be named but its optional. Passes not named within the script will take on a name that is the pass index number. For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script. The pass name must be unique within the technique or else the final pass is the resulting merge of all passes with the same name in the technique. A warning message is posted in the Ogre.log if this occurs. Named passes can help when inheriting a material and modifying an existing pass: (See @ref Script-Inheritance)
 
-Passes have a set of global attributes (described below), zero or more nested texture\_unit entries (See [Texture Units](#Texture-Units)), and optionally a reference to a vertex and / or a fragment program (See [Using Vertex/Geometry/Fragment Programs in a Pass](#Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass)).
+Passes have a set of global attributes (described below), zero or more nested texture\_unit entries (See @ref Texture-Units), and optionally a reference to a vertex and / or a fragment program (See @ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass).
 
 
 
@@ -765,7 +768,7 @@ Default: start\_light 0<br>
 
 Sets the maximum number of lights which will be considered for use with this pass. Format: max\_lights &lt;number&gt;
 
-The maximum number of lights which can be used when rendering fixed-function materials is set by the rendering system, and is typically set at 8. When you are using the programmable pipeline (See [Using Vertex/Geometry/Fragment Programs in a Pass](@ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass)) this limit is dependent on the program you are running, or, if you use ’iteration once\_per\_light’ or a variant (See [iteration](#iteration)), it effectively only bounded by the number of passes you are willing to use. If you are not using pass iteration, the light limit applies once for this pass. If you are using pass iteration, the light limit applies across all iterations of this pass - for example if you have 12 lights in range with an ’iteration once\_per\_light’ setup but your max\_lights is set to 4 for that pass, the pass will only iterate 4 times. 
+The maximum number of lights which can be used when rendering fixed-function materials is set by the rendering system, and is typically set at 8. When you are using the programmable pipeline (See [Using Vertex/Geometry/Fragment Programs in a Pass](@ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass)) this limit is dependent on the program you are running, or, if you use ’iteration once\_per\_light’ or a variant (See @ref iteration), it effectively only bounded by the number of passes you are willing to use. If you are not using pass iteration, the light limit applies once for this pass. If you are using pass iteration, the light limit applies across all iterations of this pass - for example if you have 12 lights in range with an ’iteration once\_per\_light’ setup but your max\_lights is set to 4 for that pass, the pass will only iterate 4 times. 
 
 Default: max\_lights 8<br>
 
@@ -976,7 +979,7 @@ Here are the attributes you can use in a ’texture\_unit’ section of a .mater
 -   [binding\_type](#binding_005ftype)
 -   [content\_type](#content_005ftype)
 
-You can also use a nested ’texture\_source’ section in order to use a special add-in as a source of texture data, See [External Texture Sources](#External-Texture-Sources) for details.
+You can also use a nested ’texture\_source’ section in order to use a special add-in as a source of texture data, See @ref External-Texture-Sources for details.
 
 <a name="Attribute-Descriptions-1"></a>
 
@@ -992,7 +995,7 @@ Format: texture\_alias &lt;name&gt;
 
 Example: texture\_alias NormalMap
 
-Setting the texture alias name is useful if this material is to be inherited by other other materials and only the textures will be changed in the new material.(See [Texture Aliases](#Texture-Aliases)) Default: If a texture\_unit has a name then the texture\_alias defaults to the texture\_unit name.
+Setting the texture alias name is useful if this material is to be inherited by other other materials and only the textures will be changed in the new material.(See @ref Texture-Aliases) Default: If a texture\_unit has a name then the texture\_alias defaults to the texture\_unit name.
 
 <a name="texture"></a><a name="texture-1"></a>
 
@@ -1093,9 +1096,11 @@ Default: none
 
 ## binding\_type
 
-Tells this texture unit to bind to either the fragment processing unit or the vertex processing unit (for [Vertex Texture Fetch](#Vertex-Texture-Fetch)). 
+Tells this texture unit to bind to either the fragment processing unit or the vertex processing unit (for @ref Vertex-Texture-Fetch). 
 
-Format: binding\_type &lt;vertex|fragment&gt; Default: binding\_type fragment
+Format: binding\_type &lt;vertex|fragment&gt;
+
+Default: binding\_type fragment
 
 <a name="content_005ftype"></a><a name="content_005ftype-1"></a>
 
@@ -1110,7 +1115,7 @@ The default option, this derives texture content from a texture name, loaded by 
 
 </dd> <dt>shadow</dt> <dd>
 
-This option allows you to pull in a shadow texture, and is only valid when you use texture shadows and one of the ’custom sequence’ shadowing types (See [Shadows](#Shadows)). The shadow texture in question will be from the ’n’th closest light that casts shadows, unless you use light-based pass iteration or the light\_start option which may start the light index higher. When you use this option in multiple texture units within the same pass, each one references the next shadow texture. The shadow texture index is reset in the next pass, in case you want to take into account the same shadow textures again in another pass (e.g. a separate specular / gloss pass). By using this option, the correct light frustum projection is set up for you for use in fixed-function, if you use shaders just reference the texture\_viewproj\_matrix auto parameter in your shader.
+This option allows you to pull in a shadow texture, and is only valid when you use texture shadows and one of the ’custom sequence’ shadowing types (See @ref Shadows). The shadow texture in question will be from the ’n’th closest light that casts shadows, unless you use light-based pass iteration or the light\_start option which may start the light index higher. When you use this option in multiple texture units within the same pass, each one references the next shadow texture. The shadow texture index is reset in the next pass, in case you want to take into account the same shadow textures again in another pass (e.g. a separate specular / gloss pass). By using this option, the correct light frustum projection is set up for you for use in fixed-function, if you use shaders just reference the texture\_viewproj\_matrix auto parameter in your shader.
 
 </dd> <dt>compositor</dt> <dd>
 
@@ -1179,7 +1184,10 @@ Default: tex\_border\_colour 0.0 0.0 0.0 1.0
 
 ## filtering
 
-Sets the type of texture filtering used when magnifying or minifying a texture. There are 2 formats to this attribute, the simple format where you simply specify the name of a predefined set of filtering options, and the complex format, where you individually set the minification, magnification, and mip filters yourself. **Simple Format**<br> Format: filtering &lt;none|bilinear|trilinear|anisotropic&gt;<br> Default: filtering bilinear With this format, you only need to provide a single parameter which is one of the following:
+Sets the type of texture filtering used when magnifying or minifying a texture. There are 2 formats to this attribute, the simple format where you simply specify the name of a predefined set of filtering options, and the complex format, where you individually set the minification, magnification, and mip filters yourself.
+
+### Simple Format
+Format: filtering &lt;none|bilinear|trilinear|anisotropic&gt;<br> Default: filtering bilinear With this format, you only need to provide a single parameter which is one of the following:
 
 <dl compact="compact">
 <dt>none</dt> <dd>
@@ -1200,7 +1208,8 @@ This is the same as ’trilinear’, except the filtering algorithm takes accoun
 
 </dd> </dl> 
 
-**Complex Format**<br> Format: filtering &lt;minification&gt; &lt;magnification&gt; &lt;mip&gt;<br> Default: filtering linear linear point This format gives you complete control over the minification, magnification, and mip filters. Each parameter can be one of the following:
+### Complex Format
+Format: filtering &lt;minification&gt; &lt;magnification&gt; &lt;mip&gt;<br> Default: filtering linear linear point This format gives you complete control over the minification, magnification, and mip filters. Each parameter can be one of the following:
 
 <dl compact="compact">
 <dt>none</dt> <dd>
@@ -1276,7 +1285,7 @@ Format: colour\_op\_ex &lt;operation&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;m
 
 Example colour\_op\_ex add\_signed src\_manual src\_current 0.5
 
-See the IMPORTANT note below about the issues between multipass and multitexturing that using this method can create. Texture colour operations determine how the final colour of the surface appears when rendered. Texture units are used to combine colour values from various sources (e.g. the diffuse colour of the surface from lighting calculations, combined with the colour of the texture). This method allows you to specify the ’operation’ to be used, i.e. the calculation such as adds or multiplies, and which values to use as arguments, such as a fixed value or a value from a previous calculation.
+See the Attention note below about the issues between multipass and multitexturing that using this method can create. Texture colour operations determine how the final colour of the surface appears when rendered. Texture units are used to combine colour values from various sources (e.g. the diffuse colour of the surface from lighting calculations, combined with the colour of the texture). This method allows you to specify the ’operation’ to be used, i.e. the calculation such as adds or multiplies, and which values to use as arguments, such as a fixed value or a value from a previous calculation.
 
 @param operation
 <dl compact="compact">
@@ -1371,7 +1380,7 @@ For example ’modulate’ takes the colour results of the previous layer, and m
 
 Note that the last parameter is only required if you decide to pass a value manually into the operation. Hence you only need to fill these in if you use the ’blend\_manual’ operation.
 
-IMPORTANT: Ogre tries to use multitexturing hardware to blend texture layers together. However, if it runs out of texturing units (e.g. 2 of a GeForce2, 4 on a GeForce3) it has to fall back on multipass rendering, i.e. rendering the same object multiple times with different textures. This is both less efficient and there is a smaller range of blending operations which can be performed. For this reason, if you use this method you really should set the colour\_op\_multipass\_fallback attribute to specify which effect you want to fall back on if sufficient hardware is not available (the default is just ’modulate’ which is unlikely to be what you want if you’re doing swanky blending here). If you wish to avoid having to do this, use the simpler colour\_op attribute which allows less flexible blending options but sets up the multipass fallback automatically, since it only allows operations which have direct multipass equivalents.
+@attention Ogre tries to use multitexturing hardware to blend texture layers together. However, if it runs out of texturing units (e.g. 2 of a GeForce2, 4 on a GeForce3) it has to fall back on multipass rendering, i.e. rendering the same object multiple times with different textures. This is both less efficient and there is a smaller range of blending operations which can be performed. For this reason, if you use this method you really should set the colour\_op\_multipass\_fallback attribute to specify which effect you want to fall back on if sufficient hardware is not available (the default is just ’modulate’ which is unlikely to be what you want if you’re doing swanky blending here). If you wish to avoid having to do this, use the simpler colour\_op attribute which allows less flexible blending options but sets up the multipass fallback automatically, since it only allows operations which have direct multipass equivalents.
 
 Default: none (colour\_op modulate)<br>
 
@@ -1703,7 +1712,7 @@ vertex_program Ogre/CelShadingVP cg
 }
 ```
 
-The syntax of the parameter definition is exactly the same as when you define parameters when using programs, See [Program Parameter Specification](#Program-Parameter-Specification). Defining default parameters allows you to avoid rebinding common parameters repeatedly (clearly in the above example, all but ’shininess’ are unlikely to change between uses of the program) which makes your material declarations shorter.
+The syntax of the parameter definition is exactly the same as when you define parameters when using programs, See @ref Program-Parameter-Specification. Defining default parameters allows you to avoid rebinding common parameters repeatedly (clearly in the above example, all but ’shininess’ are unlikely to change between uses of the program) which makes your material declarations shorter.
 
 ## Declaring Shared Parameters {#Declaring-Shared-Parameters}
 
@@ -1731,9 +1740,9 @@ For example, to make a new material that is based on one previously defined, add
 
 Format: material &lt;NewUniqueChildName&gt; : &lt;ReferenceParentMaterial&gt;
 
-The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed. The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the ’import’ directive (See [Script Import Directive](#Script-Import-Directive)). Note that inheritance is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure. If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.
+The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed. The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the ’import’ directive (See @ref Script-Import-Directive). Note that inheritance is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure. If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.
 
-Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier. Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them, Techniques and passes can take a name and texture units can be numbered within the material script. You can also use variables, See [Script Variables](#Script-Variables).
+Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier. Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them, Techniques and passes can take a name and texture units can be numbered within the material script. You can also use variables, See @ref Script-Variables.
 
 Names become very useful in materials that copy from other materials. In order to override values they must be in the correct technique, pass, texture unit etc. The script could be lain out using the sequence of techniques, passes, texture units in the child material but if only one parameter needs to change in say the 5th pass then the first four passes prior to the fifth would have to be placed in the script:
 
