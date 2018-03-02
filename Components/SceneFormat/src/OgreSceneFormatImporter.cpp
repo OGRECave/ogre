@@ -53,6 +53,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 #include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
 
 namespace Ogre
 {
@@ -1207,7 +1208,9 @@ namespace Ogre
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                          "SceneFormatImporter::importScene",
-                         "Invalid JSON string in file " + filename );
+                         "Invalid JSON string in file " + filename + " at line " +
+                         StringConverter::toString( d.GetErrorOffset() ) + " Reason: " +
+                         rapidjson::GetParseError_En( d.GetParseError() ) );
         }
 
         importScene( filename, d, importFlags );
@@ -1241,7 +1244,9 @@ namespace Ogre
             {
                 OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                              "SceneFormatImporter::importScene",
-                             "Invalid JSON string in file " + stream->getName() );
+                             "Invalid JSON string in file " + stream->getName() + " at line " +
+                             StringConverter::toString( d.GetErrorOffset() ) + " Reason: " +
+                             rapidjson::GetParseError_En( d.GetParseError() ) );
             }
 
             rapidjson::Value::ConstMemberIterator  itor;
