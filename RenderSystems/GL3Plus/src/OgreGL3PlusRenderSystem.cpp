@@ -1979,6 +1979,11 @@ namespace Ogre {
 #endif
         }
 
+        if(hasMinGLVersion(4, 3) || checkExtension("GL_ARB_ES3_compatibility"))
+        {
+            OGRE_CHECK_GL_ERROR(glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX));
+        }
+
         glEnable(GL_PROGRAM_POINT_SIZE);
 
         if(getCapabilities()->getVendor() == GPU_NVIDIA)

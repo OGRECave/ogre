@@ -1815,10 +1815,11 @@ namespace Ogre {
     {
         mStateCacheManager->setDisabled(GL_DITHER);
 
-#if OGRE_NO_GLES3_SUPPORT == 0
+        if(!hasMinGLVersion(3, 0))
+            return;
+
         // Enable primitive restarting with fixed indices depending upon the data type
         OGRE_CHECK_GL_ERROR(glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX));
-#endif
     }
 
     void GLES2RenderSystem::initialiseContext(RenderWindow* primary)
