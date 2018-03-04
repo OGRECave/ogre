@@ -624,7 +624,7 @@ namespace Ogre {
         }
 
         // trim off CR if we found CR/LF
-        if (trimCR && buf[ret-1] == '\r')
+        if (trimCR && ret && buf[ret-1] == '\r')
         {
             --ret;
             buf[ret] = '\0';
