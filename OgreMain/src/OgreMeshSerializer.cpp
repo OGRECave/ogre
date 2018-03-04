@@ -26,8 +26,23 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "OgreMeshSerializerImpl.h"
 
 namespace Ogre {
+
+    class _OgrePrivate MeshVersionData : public SerializerAlloc
+    {
+    public:
+        MeshVersion version;
+        String versionString;
+        MeshSerializerImpl* impl;
+
+        MeshVersionData(MeshVersion _ver, const String& _string, MeshSerializerImpl* _impl)
+        : version(_ver), versionString(_string), impl(_impl) {}
+
+        ~MeshVersionData() { OGRE_DELETE impl; }
+
+    };
 
     const unsigned short HEADER_CHUNK_ID = 0x1000;
     //---------------------------------------------------------------------

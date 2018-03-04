@@ -155,7 +155,6 @@ namespace Ogre {
     class MemoryManager;
     class Mesh;
     class MeshSerializer;
-    class MeshSerializerImpl;
     class MeshManager;
     class MovableObject;
     class MovablePlane;

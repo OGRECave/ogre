@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreSkeleton.h"
+#include "OgreKeyFrame.h"
 
 
 //#define I_HAVE_LOT_OF_FREE_TIME
