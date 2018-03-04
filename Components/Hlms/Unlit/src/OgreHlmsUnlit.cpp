@@ -493,7 +493,11 @@ namespace Ogre
 
         Camera *camera = sceneManager->getCameraInProgress();
         if( camera && camera->isReflected() )
-            setProperty( HlmsBaseProp::GlobalClipDistances, 1 );
+        {
+            int32 numClipDist = std::max( getProperty( HlmsBaseProp::PsoClipDistances ), 1 );
+            setProperty( HlmsBaseProp::PsoClipDistances, numClipDist );
+            setProperty( HlmsBaseProp::GlobalClipPlanes, 1 );
+        }
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 

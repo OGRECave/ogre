@@ -28,9 +28,9 @@ struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 	float4 gl_Position: SV_Position;
-@property( hlms_global_clip_distances )
-	float gl_ClipDistance0 : SV_ClipDistance0;
-@end
+	@foreach( n, hlms_pso_clip_distances )
+		float gl_ClipDistance@n : SV_ClipDistance@n;
+	@end
 };
 
 // START UNIFORM DECLARATION
@@ -175,7 +175,7 @@ PS_INPUT main( VS_INPUT input )
 		outVs.zwDepth.xy = outVs.gl_Position.zw;
 	@end
 
-@property( hlms_global_clip_distances )
+@property( hlms_global_clip_planes )
 	outVs.gl_ClipDistance0 = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
 @end
 

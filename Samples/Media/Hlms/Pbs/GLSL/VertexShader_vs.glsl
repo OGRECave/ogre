@@ -4,8 +4,8 @@
 out gl_PerVertex
 {
 	vec4 gl_Position;
-@property( hlms_global_clip_distances )
-	float gl_ClipDistance[1];
+@property( hlms_global_clip_planes )
+	float gl_ClipDistance[@value(hlms_global_clip_planes)];
 @end
 };
 
@@ -189,7 +189,7 @@ void main()
 		outVs.zwDepth.xy = outVs.gl_Position.zw;
 	@end
 
-@property( hlms_global_clip_distances )
+@property( hlms_global_clip_planes )
 	gl_ClipDistance[0] = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
 @end
 

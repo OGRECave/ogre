@@ -4,8 +4,8 @@
 out gl_PerVertex
 {
 	vec4 gl_Position;
-@property( hlms_global_clip_distances )
-	float gl_ClipDistance[1];
+@property( hlms_pso_clip_distances )
+	float gl_ClipDistance[@value(hlms_pso_clip_distances)];
 @end
 };
 
@@ -94,12 +94,12 @@ void main()
 
 @end
 
-	@property( hlms_global_clip_distances || (hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point)) )
+	@property( hlms_global_clip_planes || (hlms_shadowcaster && (exponential_shadow_maps || hlms_shadowcaster_point)) )
 		float3 worldPos = (gl_Position * passBuf.invViewProj).xyz;
 	@end
 	@insertpiece( DoShadowCasterVS )
 
-@property( hlms_global_clip_distances )
+@property( hlms_global_clip_planes )
 	gl_ClipDistance[0] = dot( float4( worldPos.xyz, 1.0 ), passBuf.clipPlane0.xyzw );
 @end
 

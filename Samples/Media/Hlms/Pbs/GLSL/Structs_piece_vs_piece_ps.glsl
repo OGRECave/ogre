@@ -29,7 +29,7 @@ layout_constbuffer(binding = 0) uniform PassBuffer
 	//Vertex shader (common to both receiver and casters)
 	mat4 viewProj;
 
-@property( hlms_global_clip_distances )
+@property( hlms_global_clip_planes )
 	vec4 clipPlane0;
 @end
 
