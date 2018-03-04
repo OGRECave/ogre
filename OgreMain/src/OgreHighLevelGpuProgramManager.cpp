@@ -119,16 +119,14 @@ namespace Ogre {
 
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);    
 
-        mNullFactory = OGRE_NEW NullProgramFactory();
-        addFactory(mNullFactory);
-        mUnifiedFactory = OGRE_NEW UnifiedHighLevelGpuProgramFactory();
-        addFactory(mUnifiedFactory);
+        mNullFactory.reset(new NullProgramFactory());
+        addFactory(mNullFactory.get());
+        mUnifiedFactory.reset(new UnifiedHighLevelGpuProgramFactory());
+        addFactory(mUnifiedFactory.get());
     }
     //-----------------------------------------------------------------------
     HighLevelGpuProgramManager::~HighLevelGpuProgramManager()
     {
-        OGRE_DELETE mUnifiedFactory;
-        OGRE_DELETE mNullFactory;
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);    
     }
     //---------------------------------------------------------------------------

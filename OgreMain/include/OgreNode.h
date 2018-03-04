@@ -213,7 +213,7 @@ namespace Ogre {
         /** Node listener - only one allowed (no list) for size & performance reasons. */
         Listener* mListener;
 
-        DebugRenderable* mDebug;
+        std::unique_ptr<DebugRenderable> mDebug;
 
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;

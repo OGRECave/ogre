@@ -177,7 +177,7 @@ namespace Ogre {
             size_t mLockSize;
             bool mSystemMemory;
             bool mUseShadowBuffer;
-            HardwareBuffer* mShadowBuffer;
+            std::unique_ptr<HardwareBuffer> mShadowBuffer;
             bool mShadowUpdated;
             bool mSuppressHardwareUpdate;
             
@@ -190,7 +190,7 @@ namespace Ogre {
             /// Constructor, to be called by HardwareBufferManager only
             HardwareBuffer(Usage usage, bool systemMemory, bool useShadowBuffer) 
                 : mSizeInBytes(0), mUsage(usage), mIsLocked(false), mLockStart(0), mLockSize(0), mSystemMemory(systemMemory),
-                mUseShadowBuffer(useShadowBuffer), mShadowBuffer(NULL), mShadowUpdated(false), 
+                mUseShadowBuffer(useShadowBuffer), mShadowUpdated(false),
                 mSuppressHardwareUpdate(false) 
             {
                 // If use shadow buffer, upgrade to WRITE_ONLY on hardware side

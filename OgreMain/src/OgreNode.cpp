@@ -53,8 +53,7 @@ namespace Ogre {
         mInitialPosition(Vector3::ZERO),
         mInitialOrientation(Quaternion::IDENTITY),
         mInitialScale(Vector3::UNIT_SCALE),
-        mListener(0), 
-        mDebug(0)
+        mListener(0)
     {
         needUpdate();
     }
@@ -62,9 +61,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Node::~Node()
     {
-        OGRE_DELETE mDebug;
-        mDebug = 0;
-
         // Call listener (note, only called if there's something to do)
         if (mListener)
         {
@@ -822,10 +818,10 @@ namespace Ogre {
     {
         if (!mDebug)
         {
-            mDebug = OGRE_NEW DebugRenderable(this);
+            mDebug.reset(new DebugRenderable(this));
         }
         mDebug->setScaling(scaling);
-        return mDebug;
+        return mDebug.get();
     }
     //---------------------------------------------------------------------
     //-----------------------------------------------------------------------

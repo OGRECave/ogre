@@ -68,10 +68,7 @@ namespace Ogre {
         /** Private constructor - don't allow creation by anybody else.
         */
         SubEntity(Entity* parent, SubMesh* subMeshBasis);
-
-        /** Private destructor.
-        */
-        virtual ~SubEntity();
+        ~SubEntity();
 
         /// Pointer to parent.
         Entity* mParentEntity;
@@ -106,17 +103,17 @@ namespace Ogre {
         const unsigned short mMaterialLodIndex; // = 0
 #endif
         /// Blend buffer details for dedicated geometry
-        VertexData* mSkelAnimVertexData;
+        std::unique_ptr<VertexData> mSkelAnimVertexData;
         /// Quick lookup of buffers
         TempBlendedBufferInfo mTempSkelAnimInfo;
         /// Temp buffer details for software Vertex anim geometry
         TempBlendedBufferInfo mTempVertexAnimInfo;
         /// Vertex data details for software Vertex anim of shared geometry
-        VertexData* mSoftwareVertexAnimVertexData;
+        std::unique_ptr<VertexData> mSoftwareVertexAnimVertexData;
         /// Vertex data details for hardware Vertex anim of shared geometry
         /// - separate since we need to s/w anim for shadows whilst still altering
         ///   the vertex data for hardware morphing (pos2 binding)
-        VertexData* mHardwareVertexAnimVertexData;
+        std::unique_ptr<VertexData> mHardwareVertexAnimVertexData;
         /// Have we applied any vertex animation to geometry?
         bool mVertexAnimationAppliedThisFrame;
         /// Number of hardware blended poses supported by material

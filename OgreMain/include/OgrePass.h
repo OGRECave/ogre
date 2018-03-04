@@ -215,25 +215,16 @@ namespace Ogre {
         TextureUnitStates mTextureUnitStates;
 
         /// Vertex program details
-        GpuProgramUsage *mVertexProgramUsage;
-        /// Vertex program details
-        GpuProgramUsage *mShadowCasterVertexProgramUsage;
-        /// Fragment program details
-        GpuProgramUsage *mShadowCasterFragmentProgramUsage;
-        /// Vertex program details
-        GpuProgramUsage *mShadowReceiverVertexProgramUsage;
-        /// Fragment program details
-        GpuProgramUsage *mFragmentProgramUsage;
-        /// Fragment program details
-        GpuProgramUsage *mShadowReceiverFragmentProgramUsage;
-        /// Geometry program details
-        GpuProgramUsage *mGeometryProgramUsage;
-        /// Tessellation hull program details
-        GpuProgramUsage *mTessellationHullProgramUsage;
-        /// Tessellation domain program details
-        GpuProgramUsage *mTessellationDomainProgramUsage;
-        /// Compute program details
-        GpuProgramUsage *mComputeProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mVertexProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mShadowCasterVertexProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mShadowCasterFragmentProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mShadowReceiverVertexProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mShadowReceiverFragmentProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mFragmentProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mGeometryProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mTessellationHullProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mTessellationDomainProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mComputeProgramUsage;
         /// Number of pass iterations to perform
         size_t mPassIterationCount;
         /// Point size, applies when not using per-vertex point size
@@ -272,9 +263,11 @@ namespace Ogre {
         Pass(Technique* parent, unsigned short index);
         /// Copy constructor
         Pass(Technique* parent, unsigned short index, const Pass& oth );
+
+        ~Pass();
+
         /// Operator = overload
         Pass& operator=(const Pass& oth);
-        ~Pass();
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
         bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage ||
@@ -1754,9 +1747,9 @@ namespace Ogre {
         const GpuProgramPtr& getComputeProgram(void) const;
         
      protected:
-        const GpuProgramPtr& getProgram(GpuProgramUsage* const* gpuProgramUsage) const;
-        GpuProgramUsage*& getProgramUsage(GpuProgramType programType);
-        const GpuProgramUsage* getProgramUsage(GpuProgramType programType) const;
+        const GpuProgramPtr& getProgram(const std::unique_ptr<GpuProgramUsage>& gpuProgramUsage) const;
+        std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType);
+        const std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

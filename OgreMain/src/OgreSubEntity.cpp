@@ -42,20 +42,12 @@ namespace Ogre {
         mRenderQueuePrioritySet = false;
         mSkelAnimVertexData = 0;
         mVertexAnimationAppliedThisFrame = false;
-        mSoftwareVertexAnimVertexData = 0;
-        mHardwareVertexAnimVertexData = 0;
         mHardwarePoseCount = 0;
         mIndexStart = 0;
         mIndexEnd = 0;
         setMaterial(MaterialManager::getSingleton().getDefaultMaterial());
     }
-    //-----------------------------------------------------------------------
-    SubEntity::~SubEntity()
-    {
-        OGRE_DELETE mSkelAnimVertexData;
-        OGRE_DELETE mHardwareVertexAnimVertexData;
-        OGRE_DELETE mSoftwareVertexAnimVertexData;
-    }
+    SubEntity::~SubEntity() = default; // ensure unique_ptr destructors are in cpp
     //-----------------------------------------------------------------------
     SubMesh* SubEntity::getSubMesh(void)
     {
@@ -174,11 +166,11 @@ namespace Ogre {
             case Entity::BIND_ORIGINAL:
                 return mSubMesh->vertexData;
             case Entity::BIND_HARDWARE_MORPH:
-                return mHardwareVertexAnimVertexData;
+                return mHardwareVertexAnimVertexData.get();
             case Entity::BIND_SOFTWARE_MORPH:
-                return mSoftwareVertexAnimVertexData;
+                return mSoftwareVertexAnimVertexData.get();
             case Entity::BIND_SOFTWARE_SKELETAL:
-                return mSkelAnimVertexData;
+                return mSkelAnimVertexData.get();
             };
             // keep compiler happy
             return mSubMesh->vertexData;
@@ -294,21 +286,9 @@ namespace Ogre {
         if (mSubMesh->useSharedVertices)
             return;
 
-        if (mSkelAnimVertexData) 
-        {
-            OGRE_DELETE mSkelAnimVertexData;
-            mSkelAnimVertexData = 0;
-        }
-        if (mSoftwareVertexAnimVertexData) 
-        {
-            OGRE_DELETE mSoftwareVertexAnimVertexData;
-            mSoftwareVertexAnimVertexData = 0;
-        }
-        if (mHardwareVertexAnimVertexData) 
-        {
-            OGRE_DELETE mHardwareVertexAnimVertexData;
-            mHardwareVertexAnimVertexData = 0;
-        }
+        mSkelAnimVertexData.reset();
+        mSoftwareVertexAnimVertexData.reset();
+        mHardwareVertexAnimVertexData.reset();
 
         if (!mSubMesh->useSharedVertices)
         {
@@ -318,12 +298,12 @@ namespace Ogre {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, don't remove any blending info
                 // (since if we skeletally animate too, we need it)
-                mSoftwareVertexAnimVertexData = mSubMesh->vertexData->clone(false);
-                mParentEntity->extractTempBufferInfo(mSoftwareVertexAnimVertexData, &mTempVertexAnimInfo);
+                mSoftwareVertexAnimVertexData.reset(mSubMesh->vertexData->clone(false));
+                mParentEntity->extractTempBufferInfo(mSoftwareVertexAnimVertexData.get(), &mTempVertexAnimInfo);
 
                 // Also clone for hardware usage, don't remove blend info since we'll
                 // need it if we also hardware skeletally animate
-                mHardwareVertexAnimVertexData = mSubMesh->vertexData->clone(false);
+                mHardwareVertexAnimVertexData.reset(mSubMesh->vertexData->clone(false));
             }
 
             if (mParentEntity->hasSkeleton())
@@ -332,9 +312,9 @@ namespace Ogre {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, remove blending info
                 // (since blend is performed in software)
-                mSkelAnimVertexData = 
-                    mParentEntity->cloneVertexDataRemoveBlendInfo(mSubMesh->vertexData);
-                mParentEntity->extractTempBufferInfo(mSkelAnimVertexData, &mTempSkelAnimInfo);
+                mSkelAnimVertexData.reset(
+                    mParentEntity->cloneVertexDataRemoveBlendInfo(mSubMesh->vertexData));
+                mParentEntity->extractTempBufferInfo(mSkelAnimVertexData.get(), &mTempSkelAnimInfo);
 
             }
         }
@@ -348,19 +328,19 @@ namespace Ogre {
     VertexData* SubEntity::_getSkelAnimVertexData(void) 
     {
         assert (mSkelAnimVertexData && "Not software skinned or has no dedicated geometry!");
-        return mSkelAnimVertexData;
+        return mSkelAnimVertexData.get();
     }
     //-----------------------------------------------------------------------
     VertexData* SubEntity::_getSoftwareVertexAnimVertexData(void)
     {
         assert (mSoftwareVertexAnimVertexData && "Not vertex animated or has no dedicated geometry!");
-        return mSoftwareVertexAnimVertexData;
+        return mSoftwareVertexAnimVertexData.get();
     }
     //-----------------------------------------------------------------------
     VertexData* SubEntity::_getHardwareVertexAnimVertexData(void)
     {
         assert (mHardwareVertexAnimVertexData && "Not vertex animated or has no dedicated geometry!");
-        return mHardwareVertexAnimVertexData;
+        return mHardwareVertexAnimVertexData.get();
     }
     //-----------------------------------------------------------------------
     TempBlendedBufferInfo* SubEntity::_getSkelAnimTempBufferInfo(void) 
@@ -383,7 +363,7 @@ namespace Ogre {
             // Pack into 4-element constants offset based on constant data index
             // If there are more than 4 entries, this will be called more than once
             Vector4 val(0.0f,0.0f,0.0f,0.0f);
-            const VertexData* vd = mHardwareVertexAnimVertexData ? mHardwareVertexAnimVertexData : mParentEntity->mHardwareVertexAnimVertexData;
+            const auto& vd = mHardwareVertexAnimVertexData ? mHardwareVertexAnimVertexData : mParentEntity->mHardwareVertexAnimVertexData;
             
             size_t animIndex = constantEntry.data * 4;
             for (size_t i = 0; i < 4 && 
@@ -447,7 +427,7 @@ namespace Ogre {
             && mSubMesh->getVertexAnimationType() == VAT_POSE)
         {
             mParentEntity->bindMissingHardwarePoseBuffers(
-                mSubMesh->vertexData, mHardwareVertexAnimVertexData);
+                mSubMesh->vertexData, mHardwareVertexAnimVertexData.get());
         }
 
     }

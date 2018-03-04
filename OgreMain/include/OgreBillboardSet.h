@@ -177,7 +177,7 @@ namespace Ogre {
         BillboardPool mBillboardPool;
 
         /// The vertex position data for all billboards in this set.
-        VertexData* mVertexData;
+        std::unique_ptr<VertexData> mVertexData;
         /// Shortcut to main buffer (positions, colours, texture coords)
         HardwareVertexBufferSharedPtr mMainBuf;
         /// Locked pointer to buffer
@@ -200,7 +200,7 @@ namespace Ogre {
         Vector3 mCamPos;
 
         /// The vertex index data for all billboards in this set (1 set only)
-        IndexData* mIndexData;
+        std::unique_ptr<IndexData> mIndexData;
 
         /// Flag indicating whether each billboard should be culled separately (default: false)
         bool mCullIndividual;

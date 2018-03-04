@@ -79,9 +79,9 @@ namespace Ogre {
         FactoryMap mFactories;
 
         /// Factory for dealing with programs for languages we can't create
-        HighLevelGpuProgramFactory* mNullFactory;
+        std::unique_ptr<HighLevelGpuProgramFactory> mNullFactory;
         /// Factory for unified high-level programs
-        HighLevelGpuProgramFactory* mUnifiedFactory;
+        std::unique_ptr<HighLevelGpuProgramFactory> mUnifiedFactory;
 
         HighLevelGpuProgramFactory* getFactory(const String& language);
 

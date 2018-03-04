@@ -389,7 +389,7 @@ namespace Ogre {
         String mName;
 
         /// Queue of objects for rendering
-        RenderQueue* mRenderQueue;
+        std::unique_ptr<RenderQueue> mRenderQueue;
         bool mLastRenderQueueInvocationCustom;
 
         /// Current ambient light, cached for RenderSystem
@@ -426,7 +426,7 @@ namespace Ogre {
         Viewport* mCurrentViewport;
 
         /// Root scene node
-        SceneNode* mSceneRoot;
+        std::unique_ptr<SceneNode> mSceneRoot;
 
         /// Autotracking scene nodes
         typedef set<SceneNode*>::type AutoTrackingSceneNodes;
@@ -436,7 +436,7 @@ namespace Ogre {
         // Sky plane
         Entity* mSkyPlaneEntity;
         Entity* mSkyDomeEntity[5];
-        ManualObject* mSkyBoxObj;
+        std::unique_ptr<ManualObject> mSkyBoxObj;
 
         SceneNode* mSkyPlaneNode;
         SceneNode* mSkyDomeNode;
@@ -724,7 +724,7 @@ namespace Ogre {
         }
 
         /// Utility class for calculating automatic parameters for gpu programs
-        AutoParamDataSource* mAutoParamDataSource;
+        std::unique_ptr<AutoParamDataSource> mAutoParamDataSource;
 
         CompositorChain* mActiveCompositorChain;
         bool mLateMaterialResolving;
@@ -739,7 +739,7 @@ namespace Ogre {
         HardwareIndexBufferSharedPtr mShadowIndexBuffer;
         size_t mShadowIndexBufferSize;
         size_t mShadowIndexBufferUsedSize;
-        Rectangle2D* mFullScreenQuad;
+        std::unique_ptr<Rectangle2D> mFullScreenQuad;
         Real mShadowDirLightExtrudeDist;
         IlluminationRenderStage mIlluminationStage;
         ShadowTextureConfigList mShadowTextureConfigList;
@@ -857,8 +857,8 @@ namespace Ogre {
 
         typedef vector<ShadowCaster*>::type ShadowCasterList;
         ShadowCasterList mShadowCasterList;
-        SphereSceneQuery* mShadowCasterSphereQuery;
-        AxisAlignedBoxSceneQuery* mShadowCasterAABBQuery;
+        std::unique_ptr<SphereSceneQuery> mShadowCasterSphereQuery;
+        std::unique_ptr<AxisAlignedBoxSceneQuery> mShadowCasterAABBQuery;
         Real mDefaultShadowFarDist;
         Real mDefaultShadowFarDistSquared;
         Real mShadowTextureOffset; /// Proportion of texture offset in view direction e.g. 0.4
@@ -921,7 +921,7 @@ namespace Ogre {
             bool queryResult(SceneQuery::WorldFragment* fragment);
         };
 
-        ShadowCasterSceneQueryListener* mShadowCasterQueryListener;
+        std::unique_ptr<ShadowCasterSceneQueryListener> mShadowCasterQueryListener;
 
         /** Internal method for locating a list of shadow casters which 
             could be affecting the frustum for a given light. 

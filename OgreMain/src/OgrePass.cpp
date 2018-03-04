@@ -184,16 +184,6 @@ namespace Ogre {
         , mFogStart(0.0)
         , mFogEnd(1.0)
         , mFogDensity(0.001)
-        , mVertexProgramUsage(0)
-        , mShadowCasterVertexProgramUsage(0)
-        , mShadowCasterFragmentProgramUsage(0)
-        , mShadowReceiverVertexProgramUsage(0)
-        , mFragmentProgramUsage(0)
-        , mShadowReceiverFragmentProgramUsage(0)
-        , mGeometryProgramUsage(0)
-        , mTessellationHullProgramUsage(0)
-        , mTessellationDomainProgramUsage(0)
-        , mComputeProgramUsage(0)
         , mPassIterationCount(1)
         , mPointSize(1.0f)
         , mPointMinSize(0.0f)
@@ -212,10 +202,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
     Pass::Pass(Technique *parent, unsigned short index, const Pass& oth)
-        :mParent(parent), mIndex(index), mQueuedForDeletion(false), mVertexProgramUsage(0), mShadowCasterVertexProgramUsage(0),
-        mShadowCasterFragmentProgramUsage(0), mShadowReceiverVertexProgramUsage(0), mFragmentProgramUsage(0), 
-        mShadowReceiverFragmentProgramUsage(0), mGeometryProgramUsage(0), mTessellationHullProgramUsage(0)
-        , mTessellationDomainProgramUsage(0), mComputeProgramUsage(0), mPassIterationCount(1)
+        : mParent(parent), mIndex(index), mQueuedForDeletion(false), mPassIterationCount(1)
     {
         *this = oth;
         mParent = parent;
@@ -225,20 +212,7 @@ namespace Ogre {
         // init the hash inline
         _recalculateHash();
     }
-    //-----------------------------------------------------------------------------
-    Pass::~Pass()
-    {
-        OGRE_DELETE mVertexProgramUsage;
-        OGRE_DELETE mFragmentProgramUsage;
-        OGRE_DELETE mTessellationHullProgramUsage;
-        OGRE_DELETE mTessellationDomainProgramUsage;
-        OGRE_DELETE mGeometryProgramUsage;
-        OGRE_DELETE mComputeProgramUsage;
-        OGRE_DELETE mShadowCasterVertexProgramUsage;
-        OGRE_DELETE mShadowCasterFragmentProgramUsage;
-        OGRE_DELETE mShadowReceiverVertexProgramUsage;
-        OGRE_DELETE mShadowReceiverFragmentProgramUsage;        
-    }
+    Pass::~Pass() = default; // ensure unique_ptr destructors are in cpp
     //-----------------------------------------------------------------------------
     Pass& Pass::operator=(const Pass& oth)
     {
@@ -309,104 +283,64 @@ namespace Ogre {
         mIlluminationStage = oth.mIlluminationStage;
         mLightMask = oth.mLightMask;
 
-        OGRE_DELETE mVertexProgramUsage;
+        mVertexProgramUsage.reset();
         if (oth.mVertexProgramUsage)
         {
-            mVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mVertexProgramUsage), this);
-        }
-        else
-        {
-            mVertexProgramUsage = NULL;
+            mVertexProgramUsage.reset(new GpuProgramUsage(*(oth.mVertexProgramUsage), this));
         }
 
-        OGRE_DELETE mShadowCasterVertexProgramUsage;
+        mShadowCasterVertexProgramUsage.reset();
         if (oth.mShadowCasterVertexProgramUsage)
         {
-            mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowCasterVertexProgramUsage), this);
-        }
-        else
-        {
-            mShadowCasterVertexProgramUsage = NULL;
+            mShadowCasterVertexProgramUsage.reset(new GpuProgramUsage(*(oth.mShadowCasterVertexProgramUsage), this));
         }
 
-        OGRE_DELETE mShadowCasterFragmentProgramUsage;
+        mShadowCasterFragmentProgramUsage.reset();
         if (oth.mShadowCasterFragmentProgramUsage)
         {
-            mShadowCasterFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowCasterFragmentProgramUsage), this);
-        }
-        else
-        {
-            mShadowCasterFragmentProgramUsage = NULL;
+            mShadowCasterFragmentProgramUsage.reset(new GpuProgramUsage(*(oth.mShadowCasterFragmentProgramUsage), this));
         }
 
-        OGRE_DELETE mShadowReceiverVertexProgramUsage;
+        mShadowReceiverVertexProgramUsage.reset();
         if (oth.mShadowReceiverVertexProgramUsage)
         {
-            mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverVertexProgramUsage), this);
-        }
-        else
-        {
-            mShadowReceiverVertexProgramUsage = NULL;
+            mShadowReceiverVertexProgramUsage.reset(new GpuProgramUsage(*(oth.mShadowReceiverVertexProgramUsage), this));
         }
 
-        OGRE_DELETE mFragmentProgramUsage;
+        mFragmentProgramUsage.reset();
         if (oth.mFragmentProgramUsage)
         {
-            mFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mFragmentProgramUsage), this);
-        }
-        else
-        {
-            mFragmentProgramUsage = NULL;
+            mFragmentProgramUsage.reset(new GpuProgramUsage(*(oth.mFragmentProgramUsage), this));
         }
 
-        OGRE_DELETE mGeometryProgramUsage;
+        mGeometryProgramUsage.reset();
         if (oth.mGeometryProgramUsage)
         {
-            mGeometryProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mGeometryProgramUsage), this);
-        }
-        else
-        {
-            mGeometryProgramUsage = NULL;
+            mGeometryProgramUsage.reset(new GpuProgramUsage(*(oth.mGeometryProgramUsage), this));
         }
 
-        OGRE_DELETE mTessellationHullProgramUsage;
+        mTessellationHullProgramUsage.reset();
         if (oth.mTessellationHullProgramUsage)
         {
-            mTessellationHullProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mTessellationHullProgramUsage), this);
-        }
-        else
-        {
-            mTessellationHullProgramUsage = NULL;
+            mTessellationHullProgramUsage.reset(new GpuProgramUsage(*(oth.mTessellationHullProgramUsage), this));
         }
 
-        OGRE_DELETE mTessellationDomainProgramUsage;
+        mTessellationDomainProgramUsage.reset();
         if (oth.mTessellationDomainProgramUsage)
         {
-            mTessellationDomainProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mTessellationDomainProgramUsage), this);
-        }
-        else
-        {
-            mTessellationDomainProgramUsage = NULL;
+            mTessellationDomainProgramUsage.reset(new GpuProgramUsage(*(oth.mTessellationDomainProgramUsage), this));
         }
 
-        OGRE_DELETE mComputeProgramUsage;
+        mComputeProgramUsage.reset();
         if (oth.mComputeProgramUsage)
         {
-            mComputeProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mComputeProgramUsage), this);
-        }
-        else
-        {
-            mComputeProgramUsage = NULL;
+            mComputeProgramUsage.reset(new GpuProgramUsage(*(oth.mComputeProgramUsage), this));
         }
 
-        OGRE_DELETE mShadowReceiverFragmentProgramUsage;
+        mShadowReceiverFragmentProgramUsage.reset();
         if (oth.mShadowReceiverFragmentProgramUsage)
         {
-            mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverFragmentProgramUsage), this);
-        }
-        else
-        {
-            mShadowReceiverFragmentProgramUsage = NULL;
+            mShadowReceiverFragmentProgramUsage.reset(new GpuProgramUsage(*(oth.mShadowReceiverFragmentProgramUsage), this));
         }
 
         TextureUnitStates::const_iterator i, iend;
@@ -1445,19 +1379,18 @@ namespace Ogre {
     {
         OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
 
-        GpuProgramUsage*& programUsage = getProgramUsage(type);
+        std::unique_ptr<GpuProgramUsage>& programUsage = getProgramUsage(type);
 
         // Turn off fragment program if name blank
         if (!program)
         {
-            OGRE_DELETE programUsage;
-            programUsage = NULL;
+            programUsage.reset();
         }
         else
         {
             if (!programUsage)
             {
-                programUsage = OGRE_NEW GpuProgramUsage(type, this);
+                programUsage.reset(new GpuProgramUsage(type, this));
             }
             programUsage->setProgram(program, resetParams);
         }
@@ -1579,7 +1512,7 @@ namespace Ogre {
         return mVertexProgramUsage->getParameters();
     }
 
-    GpuProgramUsage*& Pass::getProgramUsage(GpuProgramType programType) {
+    std::unique_ptr<GpuProgramUsage>& Pass::getProgramUsage(GpuProgramType programType) {
         switch (programType)
         {
         case GPT_VERTEX_PROGRAM:
@@ -1596,11 +1529,11 @@ namespace Ogre {
             return mComputeProgramUsage;
         }
 
-        static GpuProgramUsage* nullPtr = NULL;
+        static std::unique_ptr<GpuProgramUsage> nullPtr;
         return nullPtr;
     }
 
-    const GpuProgramUsage* Pass::getProgramUsage(GpuProgramType programType) const {
+    const std::unique_ptr<GpuProgramUsage>& Pass::getProgramUsage(GpuProgramType programType) const {
         switch (programType)
         {
         case GPT_VERTEX_PROGRAM:
@@ -1617,7 +1550,8 @@ namespace Ogre {
             return mComputeProgramUsage;
         }
 
-        return NULL;
+        static std::unique_ptr<GpuProgramUsage> nullPtr;
+        return nullPtr;
     }
 
     bool Pass::hasGpuProgram(GpuProgramType programType) const {
@@ -1648,23 +1582,23 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getProgram(GpuProgramUsage* const* gpuProgramUsage) const
+    const GpuProgramPtr& Pass::getProgram(const std::unique_ptr<GpuProgramUsage>& gpuProgramUsage) const
     {
         OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        OgreAssert(*gpuProgramUsage, "check whether program is available using hasGpuProgram()");
-        return (*gpuProgramUsage)->getProgram();
+        OgreAssert(gpuProgramUsage, "check whether program is available using hasGpuProgram()");
+        return gpuProgramUsage->getProgram();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getVertexProgram(void) const
     {
-        return getProgram(&mVertexProgramUsage);
+        return getProgram(mVertexProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getGpuProgramName(GpuProgramType type) const
     {
         OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
 
-        const GpuProgramUsage* programUsage = getProgramUsage(type);
+        const std::unique_ptr<GpuProgramUsage>& programUsage = getProgramUsage(type);
         if (!programUsage)
             return BLANKSTRING;
         else
@@ -1679,7 +1613,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getFragmentProgram(void) const
     {
-        return getProgram(&mFragmentProgramUsage);
+        return getProgram(mFragmentProgramUsage);
     }
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getGeometryProgramParameters(void) const
@@ -1690,7 +1624,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getGeometryProgram(void) const
     {
-        return getProgram(&mGeometryProgramUsage);
+        return getProgram(mGeometryProgramUsage);
     }
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getTessellationHullProgramParameters(void) const
@@ -1701,7 +1635,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationHullProgram(void) const
     {
-        return getProgram(&mTessellationHullProgramUsage);
+        return getProgram(mTessellationHullProgramUsage);
     }
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getTessellationDomainProgramParameters(void) const
@@ -1712,7 +1646,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationDomainProgram(void) const
     {
-        return getProgram(&mTessellationDomainProgramUsage);
+        return getProgram(mTessellationDomainProgramUsage);
     }
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getComputeProgramParameters(void) const
@@ -1723,7 +1657,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getComputeProgram(void) const
     {
-        return getProgram(&mComputeProgramUsage);
+        return getProgram(mComputeProgramUsage);
     }
     //-----------------------------------------------------------------------
     bool Pass::isLoaded(void) const
@@ -1866,63 +1800,24 @@ namespace Ogre {
         mQueuedForDeletion = true;
 
         removeAllTextureUnitStates();
-        if (mVertexProgramUsage)
-        {
-            OGRE_DELETE mVertexProgramUsage;
-            mVertexProgramUsage = 0;
-        }
-        if (mShadowCasterVertexProgramUsage)
-        {
-            OGRE_DELETE mShadowCasterVertexProgramUsage;
-            mShadowCasterVertexProgramUsage = 0;
-        }
-        if (mShadowCasterFragmentProgramUsage)
-        {
-            OGRE_DELETE mShadowCasterFragmentProgramUsage;
-            mShadowCasterFragmentProgramUsage = 0;
-        }
-        if (mShadowReceiverVertexProgramUsage)
-        {
-            OGRE_DELETE mShadowReceiverVertexProgramUsage;
-            mShadowReceiverVertexProgramUsage = 0;
-        }
-        if (mGeometryProgramUsage)
-        {
-            delete mGeometryProgramUsage;
-            mGeometryProgramUsage = 0;
-        }
-        if (mFragmentProgramUsage)
-        {
-            OGRE_DELETE mFragmentProgramUsage;
-            mFragmentProgramUsage = 0;
-        }
-        if (mTessellationHullProgramUsage)
-        {
-            OGRE_DELETE mTessellationHullProgramUsage;
-            mTessellationHullProgramUsage = 0;
-        }
-        if (mTessellationDomainProgramUsage)
-        {
-            OGRE_DELETE mTessellationDomainProgramUsage;
-            mTessellationDomainProgramUsage = 0;
-        }
-        if (mComputeProgramUsage)
-        {
-            OGRE_DELETE mComputeProgramUsage;
-            mComputeProgramUsage = 0;
-        }
-        if (mShadowReceiverFragmentProgramUsage)
-        {
-            OGRE_DELETE mShadowReceiverFragmentProgramUsage;
-            mShadowReceiverFragmentProgramUsage = 0;
-        }
+        mVertexProgramUsage.reset();
+        mShadowCasterVertexProgramUsage.reset();
+        mShadowCasterFragmentProgramUsage.reset();
+        mShadowReceiverVertexProgramUsage.reset();
+        mGeometryProgramUsage.reset();
+        mFragmentProgramUsage.reset();
+        mTessellationHullProgramUsage.reset();
+        mTessellationDomainProgramUsage.reset();
+        mComputeProgramUsage.reset();
+        mShadowReceiverFragmentProgramUsage.reset();
+
         // remove from dirty list, if there
         {
-                    OGRE_LOCK_MUTEX(msDirtyHashListMutex);
+            OGRE_LOCK_MUTEX(msDirtyHashListMutex);
             msDirtyHashList.erase(this);
         }
         {
-                    OGRE_LOCK_MUTEX(msPassGraveyardMutex);
+            OGRE_LOCK_MUTEX(msPassGraveyardMutex);
             msPassGraveyard.insert(this);
         }
     }
@@ -1945,14 +1840,13 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            OGRE_DELETE mShadowCasterVertexProgramUsage;
-            mShadowCasterVertexProgramUsage = NULL;
+            mShadowCasterVertexProgramUsage.reset();
         }
         else
         {
             if (!mShadowCasterVertexProgramUsage)
             {
-                mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM, this);
+                mShadowCasterVertexProgramUsage.reset(new GpuProgramUsage(GPT_VERTEX_PROGRAM, this));
             }
             mShadowCasterVertexProgramUsage->setProgramName(name);
         }
@@ -2000,14 +1894,13 @@ namespace Ogre {
         // Turn off fragment program if name blank
         if (name.empty())
         {
-            OGRE_DELETE mShadowCasterFragmentProgramUsage;
-            mShadowCasterFragmentProgramUsage = NULL;
+            mShadowCasterFragmentProgramUsage.reset();
         }
         else
         {
             if (!mShadowCasterFragmentProgramUsage)
             {
-                mShadowCasterFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM, this);
+                mShadowCasterFragmentProgramUsage.reset(new GpuProgramUsage(GPT_FRAGMENT_PROGRAM, this));
             }
             mShadowCasterFragmentProgramUsage->setProgramName(name);
         }
@@ -2061,14 +1954,13 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            OGRE_DELETE mShadowReceiverVertexProgramUsage;
-            mShadowReceiverVertexProgramUsage = NULL;
+            mShadowReceiverVertexProgramUsage.reset();
         }
         else
         {
             if (!mShadowReceiverVertexProgramUsage)
             {
-                mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM, this);
+                mShadowReceiverVertexProgramUsage.reset(new GpuProgramUsage(GPT_VERTEX_PROGRAM, this));
             }
             mShadowReceiverVertexProgramUsage->setProgramName(name);
         }
@@ -2116,14 +2008,13 @@ namespace Ogre {
         // Turn off Fragment program if name blank
         if (name.empty())
         {
-            OGRE_DELETE mShadowReceiverFragmentProgramUsage;
-            mShadowReceiverFragmentProgramUsage = NULL;
+            mShadowReceiverFragmentProgramUsage.reset();
         }
         else
         {
             if (!mShadowReceiverFragmentProgramUsage)
             {
-                mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM, this);
+                mShadowReceiverFragmentProgramUsage.reset(new GpuProgramUsage(GPT_FRAGMENT_PROGRAM, this));
             }
             mShadowReceiverFragmentProgramUsage->setProgramName(name);
         }

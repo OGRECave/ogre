@@ -112,15 +112,15 @@ namespace Ogre {
         /// Temp buffer details for software skeletal anim of shared geometry
         TempBlendedBufferInfo mTempSkelAnimInfo;
         /// Vertex data details for software skeletal anim of shared geometry
-        VertexData* mSkelAnimVertexData;
+        std::unique_ptr<VertexData> mSkelAnimVertexData;
         /// Temp buffer details for software vertex anim of shared geometry
         TempBlendedBufferInfo mTempVertexAnimInfo;
         /// Vertex data details for software vertex anim of shared geometry
-        VertexData* mSoftwareVertexAnimVertexData;
+        std::unique_ptr<VertexData> mSoftwareVertexAnimVertexData;
         /// Vertex data details for hardware vertex anim of shared geometry
         /// - separate since we need to s/w anim for shadows whilst still altering
         ///   the vertex data for hardware morphing (pos2 binding)
-        VertexData* mHardwareVertexAnimVertexData;
+        std::unique_ptr<VertexData> mHardwareVertexAnimVertexData;
 
         /// Have we applied any vertex animation to shared geometry?
         bool mVertexAnimationAppliedThisFrame : 1;

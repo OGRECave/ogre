@@ -121,7 +121,7 @@ namespace Ogre {
     {
         op.operationType = mOperationType;
         op.useIndexes = false;
-        op.vertexData = mVertexData;
+        op.vertexData = mVertexData.get();
     }
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

@@ -89,7 +89,7 @@ namespace Ogre {
         /// Auto tracking target
         SceneNode* mAutoTrackTarget;
         /// Pointer to a Wire Bounding Box for this Node
-        WireBoundingBox *mWireBoundingBox;
+        std::unique_ptr<WireBoundingBox> mWireBoundingBox;
         /// Tracking offset for fine tuning
         Vector3 mAutoTrackOffset;
         /// Local 'normal' direction vector

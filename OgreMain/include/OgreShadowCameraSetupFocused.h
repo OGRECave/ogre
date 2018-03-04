@@ -69,11 +69,11 @@ namespace Ogre {
         /** Temporary preallocated frustum to set up a projection matrix in 
             calculateShadowMappingMatrix().
         */
-        Frustum* mTempFrustum;
+        std::unique_ptr<Frustum> mTempFrustum;
 
         /** Temporary preallocated camera to set up a light frustum for clipping in FocusedShadowCameraSetup::calculateB.
         */
-        Camera* mLightFrustumCamera;
+        std::unique_ptr<Camera> mLightFrustumCamera;
         mutable bool mLightFrustumCameraCalculated;
 
         /// Use tighter focus region?
@@ -272,12 +272,6 @@ namespace Ogre {
             Temporary frustum and camera set up here.
         */
         FocusedShadowCameraSetup(void);
-
-        /** Default destructor.
-        @remarks
-            Temporary frustum and camera destroyed here.
-        */
-        virtual ~FocusedShadowCameraSetup(void);
 
         /** Returns a uniform shadow camera with a focused view.
         */

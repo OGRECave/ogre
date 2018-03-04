@@ -115,8 +115,8 @@ namespace Ogre {
         */
         BillboardChain(const String& name, size_t maxElements = 20, size_t numberOfChains = 1, 
             bool useTextureCoords = true, bool useColours = true, bool dynamic = true);
-        /// Destructor
-        virtual ~BillboardChain();
+
+        ~BillboardChain();
 
         /** Set the maximum number of chain elements per chain 
         */
@@ -289,9 +289,9 @@ namespace Ogre {
         /// Dynamic use?
         bool mDynamic;
         /// Vertex data
-        VertexData* mVertexData;
+        std::unique_ptr<VertexData> mVertexData;
         /// Index data (to allow multiple unconnected chains)
-        IndexData* mIndexData;
+        std::unique_ptr<IndexData> mIndexData;
         /// Is the vertex declaration dirty?
         bool mVertexDeclDirty;
         /// Do the buffers need recreating?
