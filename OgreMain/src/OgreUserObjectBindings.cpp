@@ -28,44 +28,31 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 namespace Ogre {
+    static Any emptyAny;
 
     //--------------------------------------------------------------------------
-    UserObjectBindings::UserObjectBindings() :
-        mAttributes(NULL)
+    UserObjectBindings::UserObjectBindings(const UserObjectBindings& other)
     {
-
-    }
-
-    //--------------------------------------------------------------------------
-    UserObjectBindings::UserObjectBindings(const UserObjectBindings& other) :
-        mAttributes(NULL)
-    {
-        if (other.mAttributes != NULL)
-            mAttributes = OGRE_NEW UserObjectBindings::Attributes(*other.mAttributes);
-    }
-
-    //--------------------------------------------------------------------------
-    UserObjectBindings::~UserObjectBindings()
-    {
-        clear();
+        if (other.mAttributes)
+            mAttributes.reset(new Attributes(*other.mAttributes));
     }
 
     //-----------------------------------------------------------------------
     void UserObjectBindings::setUserAny( const Any& anything )
     {
         // Allocate attributes on demand.
-        if (mAttributes == NULL)
-            mAttributes = OGRE_NEW UserObjectBindings::Attributes;
+        if (!mAttributes)
+            mAttributes.reset(new Attributes);
 
         mAttributes->mKeylessAny = anything;
     }
 
     //-----------------------------------------------------------------------
-    const Any& UserObjectBindings::getUserAny( void ) const
+    const Any& UserObjectBindings::getUserAny() const
     {
         // Allocate attributes on demand.
-        if (mAttributes == NULL)
-            mAttributes = OGRE_NEW UserObjectBindings::Attributes;
+        if (!mAttributes)
+            return emptyAny;
 
         return mAttributes->mKeylessAny;
     }
@@ -74,12 +61,12 @@ namespace Ogre {
     void UserObjectBindings::setUserAny(const String& key, const Any& anything)
     {
         // Allocate attributes on demand.
-        if (mAttributes == NULL)
-            mAttributes = OGRE_NEW UserObjectBindings::Attributes;
+        if (!mAttributes)
+            mAttributes.reset(new Attributes);
 
         // Case map doesn't exists.
-        if (mAttributes->mUserObjectsMap == NULL)
-            mAttributes->mUserObjectsMap = OGRE_NEW_T(UserObjectsMap, MEMCATEGORY_GENERAL) ();
+        if (!mAttributes->mUserObjectsMap)
+            mAttributes->mUserObjectsMap.reset(new UserObjectsMap);
 
         (*mAttributes->mUserObjectsMap)[key] = anything;
     }
@@ -87,14 +74,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const Any& UserObjectBindings::getUserAny(const String& key) const
     {
-        static Any emptyAny;
-
-        // Allocate attributes on demand.
-        if (mAttributes == NULL)
-            mAttributes = OGRE_NEW UserObjectBindings::Attributes;
+        if (!mAttributes)
+            return emptyAny;
 
         // Case map doesn't exists.
-        if (mAttributes->mUserObjectsMap == NULL)
+        if (!mAttributes->mUserObjectsMap)
             return emptyAny;
 
         UserObjectsMapConstIterator it = mAttributes->mUserObjectsMap->find(key);
@@ -112,7 +96,7 @@ namespace Ogre {
     void UserObjectBindings::eraseUserAny(const String& key)
     {
         // Case attributes and map allocated.
-        if (mAttributes != NULL && mAttributes->mUserObjectsMap != NULL)
+        if (mAttributes && mAttributes->mUserObjectsMap)
         {
             UserObjectsMapIterator it = mAttributes->mUserObjectsMap->find(key);
 
@@ -125,12 +109,8 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void UserObjectBindings::clear() const
+    void UserObjectBindings::clear()
     {
-        if (mAttributes != NULL)
-        {
-            OGRE_DELETE mAttributes;
-            mAttributes = NULL;
-        }
+        mAttributes.reset();
     }
 }

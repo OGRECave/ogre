@@ -40,10 +40,7 @@ namespace Ogre {
     Entity::Entity ()
         : mAnimationState(NULL),
           mTempSkelAnimInfo(),
-          mSkelAnimVertexData(0),
           mTempVertexAnimInfo(),
-          mSoftwareVertexAnimVertexData(0),
-          mHardwareVertexAnimVertexData(0),
           mVertexAnimationAppliedThisFrame(false),
           mPreparedForShadowVolumes(false),
           mDisplaySkeleton(false),
@@ -262,9 +259,9 @@ namespace Ogre {
             mAnimationState = 0;
         }
 
-        OGRE_DELETE mSkelAnimVertexData; mSkelAnimVertexData = 0;
-        OGRE_DELETE mSoftwareVertexAnimVertexData; mSoftwareVertexAnimVertexData = 0;
-        OGRE_DELETE mHardwareVertexAnimVertexData; mHardwareVertexAnimVertexData = 0;
+        mSkelAnimVertexData.reset();
+        mSoftwareVertexAnimVertexData.reset();
+        mHardwareVertexAnimVertexData.reset();
 
         mInitialised = false;
     }
@@ -871,7 +868,7 @@ namespace Ogre {
                         // NB we suppress hardware upload while doing blend if we're
                         // hardware animation, because the only reason for doing this
                         // is for shadow, which need only be uploaded then
-                        mTempVertexAnimInfo.bindTempCopies(mSoftwareVertexAnimVertexData,
+                        mTempVertexAnimInfo.bindTempCopies(mSoftwareVertexAnimVertexData.get(),
                                                            hwAnimation);
                     }
                     SubEntityList::iterator i, iend;
@@ -885,7 +882,7 @@ namespace Ogre {
                         {
                             bool useNormals = se->getSubMesh()->getVertexAnimationIncludesNormals();
                             se->mTempVertexAnimInfo.checkoutTempCopies(true, useNormals);
-                            se->mTempVertexAnimInfo.bindTempCopies(se->mSoftwareVertexAnimVertexData,
+                            se->mTempVertexAnimInfo.bindTempCopies(se->mSoftwareVertexAnimVertexData.get(),
                                                                    hwAnimation);
                         }
 
@@ -912,7 +909,7 @@ namespace Ogre {
                         // hardware animation, because the only reason for doing this
                         // is for shadow, which need only be uploaded then
                         mTempSkelAnimInfo.checkoutTempCopies(true, blendNormals);
-                        mTempSkelAnimInfo.bindTempCopies(mSkelAnimVertexData,
+                        mTempSkelAnimInfo.bindTempCopies(mSkelAnimVertexData.get(),
                                                          hwAnimation);
                         // Prepare blend matrices, TODO: Move out of here
                         Mesh::prepareMatricesForVertexBlend(blendMatrices,
@@ -920,8 +917,8 @@ namespace Ogre {
                         // Blend, taking source from either mesh data or morph data
                         Mesh::softwareVertexBlend(
                             (mMesh->getSharedVertexDataAnimationType() != VAT_NONE) ?
-                            mSoftwareVertexAnimVertexData : mMesh->sharedVertexData,
-                            mSkelAnimVertexData,
+                            mSoftwareVertexAnimVertexData.get() : mMesh->sharedVertexData,
+                            mSkelAnimVertexData.get(),
                             blendMatrices, mMesh->sharedBlendIndexToBoneIndexMap.size(),
                             blendNormals);
                     }
@@ -934,7 +931,7 @@ namespace Ogre {
                         if (se->isVisible() && se->mSkelAnimVertexData)
                         {
                             se->mTempSkelAnimInfo.checkoutTempCopies(true, blendNormals);
-                            se->mTempSkelAnimInfo.bindTempCopies(se->mSkelAnimVertexData,
+                            se->mTempSkelAnimInfo.bindTempCopies(se->mSkelAnimVertexData.get(),
                                                                  hwAnimation);
                             // Prepare blend matrices, TODO: Move out of here
                             Mesh::prepareMatricesForVertexBlend(blendMatrices,
@@ -942,8 +939,8 @@ namespace Ogre {
                             // Blend, taking source from either mesh data or morph data
                             Mesh::softwareVertexBlend(
                                 (se->getSubMesh()->getVertexAnimationType() != VAT_NONE)?
-                                se->mSoftwareVertexAnimVertexData : se->mSubMesh->vertexData,
-                                se->mSkelAnimVertexData,
+                                se->mSoftwareVertexAnimVertexData.get() : se->mSubMesh->vertexData,
+                                se->mSkelAnimVertexData.get(),
                                 blendMatrices, se->mSubMesh->blendIndexToBoneIndexMap.size(),
                                 blendNormals);
                         }
@@ -1031,7 +1028,7 @@ namespace Ogre {
                 && msh->getSharedVertexDataAnimationType() != VAT_NONE)
             {
                 ushort supportedCount =
-                    initHardwareAnimationElements(mHardwareVertexAnimVertexData,
+                    initHardwareAnimationElements(mHardwareVertexAnimVertexData.get(),
                                                   (msh->getSharedVertexDataAnimationType() == VAT_POSE)
                                                   ? mHardwarePoseCount : 1, 
                                                   msh->getSharedVertexDataAnimationIncludesNormals());
@@ -1090,7 +1087,7 @@ namespace Ogre {
                     ->vertexBufferBinding->getBuffer(elem->getSource());
                 buf->suppressHardwareUpdate(true);
                 
-                initialisePoseVertexData(mMesh->sharedVertexData, mSoftwareVertexAnimVertexData, 
+                initialisePoseVertexData(mMesh->sharedVertexData, mSoftwareVertexAnimVertexData.get(),
                     mMesh->getSharedVertexDataAnimationIncludesNormals());
             }
             for (SubEntityList::iterator si = mSubEntityList.begin();
@@ -1140,7 +1137,7 @@ namespace Ogre {
             {
                 // if we're animating normals, if pose influence < 1 need to use the base mesh
                 if (mMesh->getSharedVertexDataAnimationIncludesNormals())
-                    finalisePoseNormals(mMesh->sharedVertexData, mSoftwareVertexAnimVertexData);
+                    finalisePoseNormals(mMesh->sharedVertexData, mSoftwareVertexAnimVertexData.get());
             
                 const VertexElement* elem = mSoftwareVertexAnimVertexData
                     ->vertexDeclaration->findElementBySemantic(VES_POSITION);
@@ -1219,7 +1216,7 @@ namespace Ogre {
         if (mMesh->sharedVertexData && hardwareAnimation 
             && mMesh->getSharedVertexDataAnimationType() == VAT_POSE)
         {
-            bindMissingHardwarePoseBuffers(mMesh->sharedVertexData, mHardwareVertexAnimVertexData);
+            bindMissingHardwarePoseBuffers(mMesh->sharedVertexData, mHardwareVertexAnimVertexData.get());
         }
 
 
@@ -1382,19 +1379,19 @@ namespace Ogre {
     VertexData* Entity::_getSkelAnimVertexData(void) const
     {
         assert (mSkelAnimVertexData && "Not software skinned or has no shared vertex data!");
-        return mSkelAnimVertexData;
+        return mSkelAnimVertexData.get();
     }
     //-----------------------------------------------------------------------
     VertexData* Entity::_getSoftwareVertexAnimVertexData(void) const
     {
         assert (mSoftwareVertexAnimVertexData && "Not vertex animated or has no shared vertex data!");
-        return mSoftwareVertexAnimVertexData;
+        return mSoftwareVertexAnimVertexData.get();
     }
     //-----------------------------------------------------------------------
     VertexData* Entity::_getHardwareVertexAnimVertexData(void) const
     {
         assert (mHardwareVertexAnimVertexData && "Not vertex animated or has no shared vertex data!");
-        return mHardwareVertexAnimVertexData;
+        return mHardwareVertexAnimVertexData.get();
     }
     //-----------------------------------------------------------------------
     TempBlendedBufferInfo* Entity::_getSkelAnimTempBufferInfo(void)
@@ -1631,21 +1628,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::prepareTempBlendBuffers(void)
     {
-        if (mSkelAnimVertexData)
-        {
-            OGRE_DELETE mSkelAnimVertexData;
-            mSkelAnimVertexData = 0;
-        }
-        if (mSoftwareVertexAnimVertexData)
-        {
-            OGRE_DELETE mSoftwareVertexAnimVertexData;
-            mSoftwareVertexAnimVertexData = 0;
-        }
-        if (mHardwareVertexAnimVertexData)
-        {
-            OGRE_DELETE mHardwareVertexAnimVertexData;
-            mHardwareVertexAnimVertexData = 0;
-        }
+        mSkelAnimVertexData.reset();
+        mSoftwareVertexAnimVertexData.reset();
+        mHardwareVertexAnimVertexData.reset();
 
         if (hasVertexAnimation())
         {
@@ -1657,12 +1642,12 @@ namespace Ogre {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, don't remove any blending info
                 // (since if we skeletally animate too, we need it)
-                mSoftwareVertexAnimVertexData = mMesh->sharedVertexData->clone(false);
-                extractTempBufferInfo(mSoftwareVertexAnimVertexData, &mTempVertexAnimInfo);
+                mSoftwareVertexAnimVertexData.reset(mMesh->sharedVertexData->clone(false));
+                extractTempBufferInfo(mSoftwareVertexAnimVertexData.get(), &mTempVertexAnimInfo);
 
                 // Also clone for hardware usage, don't remove blend info since we'll
                 // need it if we also hardware skeletally animate
-                mHardwareVertexAnimVertexData = mMesh->sharedVertexData->clone(false);
+                mHardwareVertexAnimVertexData.reset(mMesh->sharedVertexData->clone(false));
             }
         }
 
@@ -1675,9 +1660,9 @@ namespace Ogre {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, remove blending info
                 // (since blend is performed in software)
-                mSkelAnimVertexData =
-                    cloneVertexDataRemoveBlendInfo(mMesh->sharedVertexData);
-                extractTempBufferInfo(mSkelAnimVertexData, &mTempSkelAnimInfo);
+                mSkelAnimVertexData.reset(
+                    cloneVertexDataRemoveBlendInfo(mMesh->sharedVertexData));
+                extractTempBufferInfo(mSkelAnimVertexData.get(), &mTempSkelAnimInfo);
             }
 
         }
@@ -2105,7 +2090,7 @@ namespace Ogre {
 
         if (orig == mMesh->sharedVertexData)
         {
-            return skel? mSkelAnimVertexData : mSoftwareVertexAnimVertexData;
+            return skel? mSkelAnimVertexData.get() : mSoftwareVertexAnimVertexData.get();
         }
         SubEntityList::iterator i, iend;
         iend = mSubEntityList.end();
@@ -2428,11 +2413,11 @@ namespace Ogre {
         case BIND_ORIGINAL:
             return mMesh->sharedVertexData;
         case BIND_HARDWARE_MORPH:
-            return mHardwareVertexAnimVertexData;
+            return mHardwareVertexAnimVertexData.get();
         case BIND_SOFTWARE_MORPH:
-            return mSoftwareVertexAnimVertexData;
+            return mSoftwareVertexAnimVertexData.get();
         case BIND_SOFTWARE_SKELETAL:
-            return mSkelAnimVertexData;
+            return mSkelAnimVertexData.get();
         };
         // keep compiler happy
         return mMesh->sharedVertexData;

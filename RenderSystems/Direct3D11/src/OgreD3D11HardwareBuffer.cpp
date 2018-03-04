@@ -97,8 +97,8 @@ namespace Ogre {
         // Create shadow buffer
         if (mUseShadowBuffer)
         {
-            mShadowBuffer = new D3D11HardwareBuffer(mBufferType, 
-                    mSizeInBytes, mUsage, mDevice, true, false, false);
+            mShadowBuffer.reset(new D3D11HardwareBuffer(mBufferType,
+                    mSizeInBytes, mUsage, mDevice, true, false, false));
         }
 
     }
@@ -106,7 +106,7 @@ namespace Ogre {
     D3D11HardwareBuffer::~D3D11HardwareBuffer()
     {
         SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
-        SAFE_DELETE(mShadowBuffer);
+        mShadowBuffer.reset();
     }
     //---------------------------------------------------------------------
     void* D3D11HardwareBuffer::lockImpl(size_t offset, 
@@ -232,7 +232,7 @@ namespace Ogre {
     {
 		if (mUseShadowBuffer)
 		{
-			static_cast<D3D11HardwareBuffer*>(mShadowBuffer)->copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+			static_cast<D3D11HardwareBuffer*>(mShadowBuffer.get())->copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 		}
 		copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 	}
@@ -282,7 +282,7 @@ namespace Ogre {
 		if(mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
 		{
 			bool discardWholeBuffer = mLockStart == 0 && mLockSize == mSizeInBytes;
-			copyDataImpl(*static_cast<D3D11HardwareBuffer*>(mShadowBuffer), mLockStart, mLockStart, mLockSize, discardWholeBuffer);
+			copyDataImpl(*mShadowBuffer, mLockStart, mLockStart, mLockSize, discardWholeBuffer);
 			mShadowUpdated = false;
         }
     }

@@ -48,8 +48,8 @@ namespace Ogre {
         // Create a shadow buffer if required
         if (mUseShadowBuffer)
         {
-            mShadowBuffer = OGRE_NEW DefaultHardwareVertexBuffer(mMgr, mVertexSize, 
-                    mNumVertices, HardwareBuffer::HBU_DYNAMIC);
+            mShadowBuffer.reset(new DefaultHardwareVertexBuffer(mMgr, mVertexSize,
+                    mNumVertices, HardwareBuffer::HBU_DYNAMIC));
         }
 
     }
@@ -60,7 +60,6 @@ namespace Ogre {
         {
             mMgr->_notifyVertexBufferDestroyed(this);
         }
-        OGRE_DELETE mShadowBuffer;
     }
     //-----------------------------------------------------------------------------
     bool HardwareVertexBuffer::checkIfVertexInstanceDataIsSupported()

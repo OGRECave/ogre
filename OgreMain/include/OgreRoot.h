@@ -72,43 +72,56 @@ namespace Ogre
         String mVersion;
         String mConfigFileName;
         bool mQueuedEnd;
-        /// In case multiple render windows are created, only once are the resources loaded.
+        // In case multiple render windows are created, only once are the resources loaded.
         bool mFirstTimePostWindowInit;
 
-        // Singletons
-        LogManager* mLogManager;
-        ControllerManager* mControllerManager;
-        SceneManagerEnumerator* mSceneManagerEnum;
+        // ordered in reverse destruction sequence
+        std::unique_ptr<LogManager> mLogManager;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        std::unique_ptr<AndroidLogListener> mAndroidLogger;
+#endif
+        std::unique_ptr<ScriptCompilerManager> mCompilerManager;
+        std::unique_ptr<DynLibManager> mDynLibManager;
+        std::unique_ptr<Timer> mTimer;
+        std::unique_ptr<WorkQueue> mWorkQueue;
+        std::unique_ptr<ResourceGroupManager> mResourceGroupManager;
+        std::unique_ptr<ResourceBackgroundQueue> mResourceBackgroundQueue;
+        std::unique_ptr<MaterialManager> mMaterialManager;
+        std::unique_ptr<HighLevelGpuProgramManager> mHighLevelGpuProgramManager;
+        std::unique_ptr<ControllerManager> mControllerManager;
+        std::unique_ptr<MeshManager> mMeshManager;
+        std::unique_ptr<SkeletonManager> mSkeletonManager;
+
+        std::unique_ptr<ArchiveFactory> mFileSystemArchiveFactory;
+        std::unique_ptr<ArchiveFactory> mEmbeddedZipArchiveFactory;
+        std::unique_ptr<ArchiveFactory> mZipArchiveFactory;
+        std::unique_ptr<ArchiveManager> mArchiveManager;
+
+        typedef map<String, MovableObjectFactory*>::type MovableObjectFactoryMap;
+        MovableObjectFactoryMap mMovableObjectFactoryMap;
+        std::unique_ptr<MovableObjectFactory> mRibbonTrailFactory;
+        std::unique_ptr<MovableObjectFactory> mBillboardChainFactory;
+        std::unique_ptr<MovableObjectFactory> mManualObjectFactory;
+        std::unique_ptr<MovableObjectFactory> mBillboardSetFactory;
+        std::unique_ptr<MovableObjectFactory> mLightFactory;
+        std::unique_ptr<MovableObjectFactory> mEntityFactory;
+
+        std::unique_ptr<ParticleSystemManager> mParticleManager;
+        std::unique_ptr<LodStrategyManager> mLodStrategyManager;
+        std::unique_ptr<Profiler> mProfiler;
+
+        std::unique_ptr<ExternalTextureSourceManager> mExternalTextureSourceManager;
+        std::unique_ptr<CompositorManager> mCompositorManager;
+        std::unique_ptr<RenderSystemCapabilitiesManager> mRenderSystemCapabilitiesManager;
+
+        std::unique_ptr<SceneManagerEnumerator> mSceneManagerEnum;
         typedef deque<SceneManager*>::type SceneManagerStack;
         SceneManagerStack mSceneManagerStack;
-        DynLibManager* mDynLibManager;
-        ArchiveManager* mArchiveManager;
-        MaterialManager* mMaterialManager;
-        MeshManager* mMeshManager;
-        ParticleSystemManager* mParticleManager;
-        SkeletonManager* mSkeletonManager;
-        
-        ArchiveFactory *mZipArchiveFactory;
-        ArchiveFactory *mEmbeddedZipArchiveFactory;
-        ArchiveFactory *mFileSystemArchiveFactory;
-        
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        AndroidLogListener* mAndroidLogger;
-#endif
-        
-        ResourceGroupManager* mResourceGroupManager;
-        ResourceBackgroundQueue* mResourceBackgroundQueue;
-        ShadowTextureManager* mShadowTextureManager;
-        RenderSystemCapabilitiesManager* mRenderSystemCapabilitiesManager;
-        ScriptCompilerManager *mCompilerManager;
-        LodStrategyManager *mLodStrategyManager;
 
-        Timer* mTimer;
+        std::unique_ptr<ShadowTextureManager> mShadowTextureManager;
+
         RenderWindow* mAutoWindow;
-        Profiler* mProfiler;
-        HighLevelGpuProgramManager* mHighLevelGpuProgramManager;
-        ExternalTextureSourceManager* mExternalTextureSourceManager;
-        CompositorManager* mCompositorManager;      
+
         unsigned long mNextFrame;
         Real mFrameSmoothingTime;
         bool mRemoveQueueStructuresOnClear;
@@ -123,25 +136,13 @@ namespace Ogre
         /// List of Plugin instances registered
         PluginInstanceList mPlugins;
 
-        typedef map<String, MovableObjectFactory*>::type MovableObjectFactoryMap;
-        MovableObjectFactoryMap mMovableObjectFactoryMap;
         uint32 mNextMovableObjectTypeFlag;
-        // stock movable factories
-        MovableObjectFactory* mEntityFactory;
-        MovableObjectFactory* mLightFactory;
-        MovableObjectFactory* mBillboardSetFactory;
-        MovableObjectFactory* mManualObjectFactory;
-        MovableObjectFactory* mBillboardChainFactory;
-        MovableObjectFactory* mRibbonTrailFactory;
 
         typedef map<String, RenderQueueInvocationSequence*>::type RenderQueueInvocationSequenceMap;
         RenderQueueInvocationSequenceMap mRQSequenceMap;
 
         /// Are we initialised yet?
         bool mIsInitialised;
-
-        WorkQueue* mWorkQueue;
-
         ///Tells whether blend indices information needs to be passed to the GPU
         bool mIsBlendIndicesGpuRedundant;
         ///Tells whether blend weights information needs to be passed to the GPU
@@ -921,7 +922,7 @@ namespace Ogre
             However, you must remember to assign yourself a new channel through 
             which to process your tasks.
         */
-        WorkQueue* getWorkQueue() const { return mWorkQueue; }
+        WorkQueue* getWorkQueue() const { return mWorkQueue.get(); }
 
         /** Replace the current work queue with an alternative. 
             You can use this method to replace the internal implementation of

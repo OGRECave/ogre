@@ -51,9 +51,7 @@ namespace Ogre {
     class _OgreExport RenderToVertexBuffer
     {
     public:
-        /** C'tor */
         RenderToVertexBuffer();
-        /** D'tor */
         virtual ~RenderToVertexBuffer();
 
         /**
@@ -140,7 +138,7 @@ namespace Ogre {
         bool mResetRequested;
         MaterialPtr mMaterial;
         Renderable* mSourceRenderable;
-        VertexData* mVertexData;
+        std::unique_ptr<VertexData> mVertexData;
         unsigned int mMaxVertexCount;
     };
 

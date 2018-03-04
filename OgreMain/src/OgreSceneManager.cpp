@@ -70,14 +70,11 @@ uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_M
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
-mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
 mAmbientLight(ColourValue::Black),
 mCameraInProgress(0),
 mCurrentViewport(0),
-mSceneRoot(0),
 mSkyPlaneEntity(0),
-mSkyBoxObj(0),
 mSkyPlaneNode(0),
 mSkyDomeNode(0),
 mSkyBoxNode(0),
@@ -113,7 +110,6 @@ mShadowModulativePass(0),
 mShadowMaterialInitDone(false),
 mShadowIndexBufferSize(51200),
 mShadowIndexBufferUsedSize(0),
-mFullScreenQuad(0),
 mShadowDirLightExtrudeDist(10000),
 mIlluminationStage(IRS_NONE),
 mShadowTextureConfigDirty(true),
@@ -121,8 +117,6 @@ mShadowUseInfiniteFarPlane(true),
 mShadowCasterRenderBackFaces(true),
 mShadowAdditiveLightClip(false),
 mLightClippingInfoMapFrameNumber(999),
-mShadowCasterSphereQuery(0),
-mShadowCasterAABBQuery(0),
 mDefaultShadowFarDist(0),
 mDefaultShadowFarDistSquared(0),
 mShadowTextureOffset(0.6), 
@@ -147,7 +141,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
         mSkyDomeEntity[i] = 0;
     }
 
-    mShadowCasterQueryListener = OGRE_NEW ShadowCasterSceneQueryListener(this);
+    mShadowCasterQueryListener.reset(new ShadowCasterSceneQueryListener(this));
 
     Root *root = Root::getSingletonPtr();
     if (root)
@@ -168,7 +162,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
     mShadowTextureCountPerType[Light::LT_SPOTLIGHT] = 1;
 
     // create the auto param data source instance
-    mAutoParamDataSource = createAutoParamDataSource();
+    mAutoParamDataSource.reset(createAutoParamDataSource());
 
 }
 //-----------------------------------------------------------------------
@@ -189,16 +183,6 @@ SceneManager::~SceneManager()
         }
         mMovableObjectCollectionMap.clear();
     }
-
-    OGRE_DELETE mSkyBoxObj;
-
-    OGRE_DELETE mShadowCasterQueryListener;
-    OGRE_DELETE mSceneRoot;
-    OGRE_DELETE mFullScreenQuad;
-    OGRE_DELETE mShadowCasterSphereQuery;
-    OGRE_DELETE mShadowCasterAABBQuery;
-    OGRE_DELETE mRenderQueue;
-    OGRE_DELETE mAutoParamDataSource;
 }
 //-----------------------------------------------------------------------
 RenderQueue* SceneManager::getRenderQueue(void)
@@ -207,12 +191,12 @@ RenderQueue* SceneManager::getRenderQueue(void)
     {
         initRenderQueue();
     }
-    return mRenderQueue;
+    return mRenderQueue.get();
 }
 //-----------------------------------------------------------------------
 void SceneManager::initRenderQueue(void)
 {
-    mRenderQueue = OGRE_NEW RenderQueue();
+    mRenderQueue.reset(new RenderQueue());
     // init render queues that do not need shadows
     mRenderQueue->getQueueGroup(RENDER_QUEUE_BACKGROUND)->setShadowsEnabled(false);
     mRenderQueue->getQueueGroup(RENDER_QUEUE_OVERLAY)->setShadowsEnabled(false);
@@ -796,8 +780,7 @@ void SceneManager::clearScene(void)
         mRenderQueue->clear(true);
 
     // Reset ParamDataSource, when a resource is removed the mAutoParamDataSource keep bad references
-    OGRE_DELETE mAutoParamDataSource;
-    mAutoParamDataSource = createAutoParamDataSource();
+    mAutoParamDataSource.reset(createAutoParamDataSource());
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNodeImpl(void)
@@ -902,11 +885,11 @@ SceneNode* SceneManager::getRootSceneNode(void)
     if (!mSceneRoot)
     {
         // Create root scene node
-        mSceneRoot = createSceneNodeImpl("Ogre/SceneRoot");
+        mSceneRoot.reset(createSceneNodeImpl("Ogre/SceneRoot"));
         mSceneRoot->_notifyRootNode();
     }
 
-    return mSceneRoot;
+    return mSceneRoot.get();
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getSceneNode(const String& name) const
@@ -1863,15 +1846,15 @@ void SceneManager::_setSkyBox(
         // Create object
         if (!mSkyBoxObj)
         {
-            mSkyBoxObj = OGRE_NEW ManualObject("SkyBox");
+            mSkyBoxObj.reset(new ManualObject("SkyBox"));
             mSkyBoxObj->setCastShadows(false);
-            mSkyBoxNode->attachObject(mSkyBoxObj);
+            mSkyBoxNode->attachObject(mSkyBoxObj.get());
         }
         else
         {
             if (!mSkyBoxObj->isAttached())
             {
-                mSkyBoxNode->attachObject(mSkyBoxObj);
+                mSkyBoxNode->attachObject(mSkyBoxObj.get());
             }
             mSkyBoxObj->clear();
         }
@@ -2573,7 +2556,7 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
             mDestRenderSystem->setStencilCheckEnabled(true);
             // NB we render where the stencil is not equal to zero to render shadows, not lit areas
             mDestRenderSystem->setStencilBufferParams(CMPF_NOT_EQUAL, 0);
-            renderSingleObject(mFullScreenQuad, mShadowModulativePass, false, false);
+            renderSingleObject(mFullScreenQuad.get(), mShadowModulativePass, false, false);
             // Reset stencil params
             mDestRenderSystem->setStencilBufferParams();
             mDestRenderSystem->setStencilCheckEnabled(false);
@@ -3275,7 +3258,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
     if(mSuppressRenderStateChanges)
     {
-        fireRenderSingleObject(rend, pass, mAutoParamDataSource, NULL, true);
+        fireRenderSingleObject(rend, pass, mAutoParamDataSource.get(), NULL, true);
         // Just render
         mDestRenderSystem->setCurrentPassIterationCount(1);
         _issueRenderOp(rend, NULL);
@@ -3361,7 +3344,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             (manualLightList && (manualLightList->size() != 1 ||
                                  manualLightList->front()->getType() == pass->getOnlyLightType())))
         {
-            fireRenderSingleObject(rend, pass, mAutoParamDataSource, manualLightList, false);
+            fireRenderSingleObject(rend, pass, mAutoParamDataSource.get(), manualLightList, false);
             issueRenderWithLights(rend, pass, manualLightList, passLightParams, lightScissoringClipping);
         }
 
@@ -3513,7 +3496,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             lightsLeft = 0;
         }
 
-        fireRenderSingleObject(rend, pass, mAutoParamDataSource, pLightListToUse, false);
+        fireRenderSingleObject(rend, pass, mAutoParamDataSource.get(), pLightListToUse, false);
         // issue the render op
 
         // We might need to update the depth bias each iteration
@@ -4567,14 +4550,14 @@ const SceneManager::ShadowCasterList& SceneManager::findShadowCastersForLight(
         aabb.setExtents(min, max);
 
         if (!mShadowCasterAABBQuery)
-            mShadowCasterAABBQuery = createAABBQuery(aabb);
+            mShadowCasterAABBQuery.reset(createAABBQuery(aabb));
         else
             mShadowCasterAABBQuery->setBox(aabb);
         // Execute, use callback
         mShadowCasterQueryListener->prepare(false, 
             &(light->_getFrustumClipVolumes(camera)), 
             light, camera, &mShadowCasterList, light->getShadowFarDistanceSquared());
-        mShadowCasterAABBQuery->execute(mShadowCasterQueryListener);
+        mShadowCasterAABBQuery->execute(mShadowCasterQueryListener.get());
 
 
     }
@@ -4585,7 +4568,7 @@ const SceneManager::ShadowCasterList& SceneManager::findShadowCastersForLight(
         if (camera->isVisible(s))
         {
             if (!mShadowCasterSphereQuery)
-                mShadowCasterSphereQuery = createSphereQuery(s);
+                mShadowCasterSphereQuery.reset(createSphereQuery(s));
             else
                 mShadowCasterSphereQuery->setSphere(s);
 
@@ -4602,7 +4585,7 @@ const SceneManager::ShadowCasterList& SceneManager::findShadowCastersForLight(
             // Execute, use callback
             mShadowCasterQueryListener->prepare(lightInFrustum, 
                 volList, light, camera, &mShadowCasterList, light->getShadowFarDistanceSquared());
-            mShadowCasterSphereQuery->execute(mShadowCasterQueryListener);
+            mShadowCasterSphereQuery->execute(mShadowCasterQueryListener.get());
 
         }
 
@@ -4781,7 +4764,7 @@ void SceneManager::initShadowVolumeMaterials(void)
     // Also init full screen quad while we're at it
     if (!mFullScreenQuad)
     {
-        mFullScreenQuad = OGRE_NEW Rectangle2D();
+        mFullScreenQuad.reset(new Rectangle2D());
         mFullScreenQuad->setCorners(-1,1,1,-1);
     }
 
@@ -6397,7 +6380,7 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 SceneManager::RenderContext* SceneManager::_pauseRendering()
 {
     RenderContext* context = new RenderContext;
-    context->renderQueue = mRenderQueue;
+    context->renderQueue = mRenderQueue.release();
     context->viewport = mCurrentViewport;
     context->camera = mCameraInProgress;
     context->activeChain = _getActiveCompositorChain();
@@ -6409,8 +6392,7 @@ SceneManager::RenderContext* SceneManager::_pauseRendering()
 //---------------------------------------------------------------------
 void SceneManager::_resumeRendering(SceneManager::RenderContext* context) 
 {
-    delete mRenderQueue;
-    mRenderQueue = context->renderQueue;
+    mRenderQueue.reset(context->renderQueue);
     _setActiveCompositorChain(context->activeChain);
     Ogre::Viewport* vp = context->viewport;
     Ogre::Camera* camera = context->camera;
@@ -7253,7 +7235,7 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
             return;
 
         if (mGpuParamsDirty)
-            pass->_updateAutoParams(mAutoParamDataSource, mGpuParamsDirty);
+            pass->_updateAutoParams(mAutoParamDataSource.get(), mGpuParamsDirty);
 
         if (pass->hasVertexProgram())
         {
