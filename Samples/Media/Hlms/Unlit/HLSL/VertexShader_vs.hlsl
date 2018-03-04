@@ -35,7 +35,7 @@ struct PS_INPUT
 	@property( !hlms_identity_viewproj_dynamic )
 		@piece( worldViewProj )passBuf.viewProj[@value(hlms_identity_viewproj)]@end
 	@end @property( hlms_identity_viewproj_dynamic )
-		@piece( worldViewProj )passBuf.viewProj[worldMaterialIdx[input.drawId].z]@end
+		@piece( worldViewProj )passBuf.viewProj[worldMaterialIdx[finalDrawId].z]@end
 	@end
 @end
 
@@ -46,7 +46,7 @@ PS_INPUT main( VS_INPUT input )
 
 	@property( !hlms_identity_world )
 		float4x4 worldViewProj;
-		worldViewProj = UNPACK_MAT4( worldMatBuf, input.drawId );
+		worldViewProj = UNPACK_MAT4( worldMatBuf, finalDrawId );
 	@end
 
 @property( !hlms_dual_paraboloid_mapping )
@@ -70,13 +70,13 @@ PS_INPUT main( VS_INPUT input )
 
 @foreach( out_uv_count, n )
 	@property( out_uv@n_texture_matrix )
-		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (worldMaterialIdx[input.drawId].x << 4u) + @value( out_uv@n_tex_unit ) );
+		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (worldMaterialIdx[finalDrawId].x << 4u) + @value( out_uv@n_tex_unit ) );
 		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = mul( float4( input.uv@value( out_uv@n_source_uv ).xy, 0, 1 ), textureMatrix ).xy;
 	@end @property( !out_uv@n_texture_matrix )
 		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = input.uv@value( out_uv@n_source_uv ).xy;
 	@end @end
 
-	outVs.drawId = input.drawId;
+	outVs.drawId = finalDrawId;
 
 @end
 

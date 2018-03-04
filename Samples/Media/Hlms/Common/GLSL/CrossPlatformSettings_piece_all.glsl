@@ -32,6 +32,8 @@
 #define lerp mix
 #define INLINE
 
+#define finalDrawId drawId
+
 #define outVs_Position gl_Position
 #define OGRE_SampleLevel( tex, sampler, uv, lod ) textureLod( tex, uv.xy, lod )
 @end
