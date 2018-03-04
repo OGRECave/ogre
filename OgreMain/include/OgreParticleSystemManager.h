@@ -99,21 +99,6 @@ namespace Ogre {
         // Factory instance
         ParticleSystemFactory* mFactory;
 
-        /** Internal script parsing method. */
-        void parseNewEmitter(const String& type, DataStreamPtr& chunk, ParticleSystem* sys);
-        /** Internal script parsing method. */
-        void parseNewAffector(const String& type, DataStreamPtr& chunk, ParticleSystem* sys);
-        /** Internal script parsing method. */
-        void parseAttrib(const String& line, ParticleSystem* sys);
-        /** Internal script parsing method. */
-        void parseEmitterAttrib(const String& line, ParticleEmitter* sys);
-        /** Internal script parsing method. */
-        void parseAffectorAttrib(const String& line, ParticleAffector* sys);
-        /** Internal script parsing method. */
-        void skipToNextCloseBrace(DataStreamPtr& chunk);
-        /** Internal script parsing method. */
-        void skipToNextOpenBrace(DataStreamPtr& chunk);
-
         /// Internal implementation of createSystem
         ParticleSystem* createSystemImpl(const String& name, size_t quota, 
             const String& resourceGroup);
