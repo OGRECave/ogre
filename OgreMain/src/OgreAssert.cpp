@@ -30,6 +30,8 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "OgreStableHeaders.h"
+
 #if _MSC_VER && !defined( _CONSOLE )
     #define _CRT_SECURE_NO_WARNINGS
     #define WIN32_LEAN_AND_MEAN
