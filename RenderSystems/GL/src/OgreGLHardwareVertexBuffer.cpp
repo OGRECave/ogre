@@ -111,24 +111,7 @@ namespace Ogre {
                 // Discard the buffer
                 glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
                     GLHardwareBufferManager::getGLUsage(mUsage));
-                
-                GLenum error = glGetError();
-                if(error != 0)
-                {                    
-                    LogManager::getSingleton().logError("GLHardwareVertexBuffer::lock - failed to Discard the buffer. Try to recreate the buffer");
-                    
-                    static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
-                    mBufferId = 0;
-                    
-                    glGenBuffersARB( 1, &mBufferId );
-                    
-                    static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
-                    
-                    glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, NULL,
-                                    GLHardwareBufferManager::getGLUsage(mUsage));
-                }
             }
-            
             if (mUsage & HBU_WRITE_ONLY)
                 access = GL_WRITE_ONLY_ARB;
             else if (options == HBL_READ_ONLY)
