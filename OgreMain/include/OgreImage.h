@@ -168,13 +168,8 @@ namespace Ogre {
                              PixelFormat format, bool autoDelete = false, 
                              size_t numFaces = 1, uint32 numMipMaps = 0);
         
-        /** @overload
-            @deprecated use the
-                Image::loadDynamicImage(data, width, height, depth, format, ...) to be compatible
-                with future Ogre versions.
-         */
-        OGRE_DEPRECATED Image& loadDynamicImage( uchar* data, uint32 width,
-                                 uint32 height, PixelFormat format)
+        /// @overload
+        Image& loadDynamicImage(uchar* data, uint32 width, uint32 height, PixelFormat format)
         {
             return loadDynamicImage(data, width, height, 1, format);
         }
@@ -202,15 +197,9 @@ namespace Ogre {
             uint32 width, uint32 height, uint32 depth,
             PixelFormat format,
             size_t numFaces = 1, uint32 numMipMaps = 0);
-        /** @overload
-            @deprecated use the
-                Image::loadRawData(stream, width, height, depth, format, ...) to be compatible
-                with future Ogre versions.
-        */
-        OGRE_DEPRECATED Image & loadRawData(
-            DataStreamPtr& stream, 
-            uint32 width, uint32 height,
-            PixelFormat format )
+        /// @overload
+        Image& loadRawData(DataStreamPtr& stream, uint32 width, uint32 height,
+                           PixelFormat format)
         {
             return loadRawData(stream, width, height, 1, format);
         }
