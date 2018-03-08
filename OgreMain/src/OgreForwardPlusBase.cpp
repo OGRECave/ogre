@@ -225,7 +225,7 @@ namespace Ogre
         {
             if( itor->camera == camera &&
                 itor->reflection == camera->isReflected() &&
-                (itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
+                Math::Abs(itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
                 itor->visibilityMask == visibilityMask &&
                 itor->shadowNode == shadowNode )
             {
@@ -297,7 +297,7 @@ namespace Ogre
         {
             if( itor->camera == camera &&
                 itor->reflection == camera->isReflected() &&
-                (itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
+                Math::Abs(itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
                 itor->visibilityMask == visibilityMask &&
                 itor->shadowNode == mSceneManager->getCurrentShadowNode() )
             {
