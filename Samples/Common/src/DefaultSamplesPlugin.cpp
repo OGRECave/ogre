@@ -48,7 +48,6 @@
 #ifdef OGRE_BUILD_COMPONENT_HLMS
 #   include "HLMS.h"
 #endif
-#include "Instancing.h"
 #include "Isosurf.h"
 #include "Lighting.h"
 #include "MeshLod.h"
@@ -95,7 +94,6 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_FacialAnimation);
     addSample(new Sample_Grass);
     addSample(new Sample_DualQuaternion);
-    addSample(new Sample_Instancing);
     addSample(new Sample_Isosurf);
     addSample(new Sample_NewInstancing);
     addSample(new Sample_TextureArray);
