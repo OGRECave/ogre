@@ -50,7 +50,6 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreRectangle2D.h"
 #include "OgreLodListener.h"
-#include "OgreInstancedGeometry.h"
 #include "OgreUnifiedHighLevelGpuProgram.h"
 
 // This class implements the most basic scene manager
@@ -6503,59 +6502,6 @@ void SceneManager::destroyAllStaticGeometry(void)
         OGRE_DELETE i->second;
     }
     mStaticGeometryList.clear();
-}
-//---------------------------------------------------------------------
-InstancedGeometry* SceneManager::createInstancedGeometry(const String& name)
-{
-    // Check not existing
-    if (mInstancedGeometryList.find(name) != mInstancedGeometryList.end())
-    {
-        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-            "InstancedGeometry with name '" + name + "' already exists!", 
-            "SceneManager::createInstancedGeometry");
-    }
-    InstancedGeometry* ret = OGRE_NEW InstancedGeometry(this, name);
-    mInstancedGeometryList[name] = ret;
-    return ret;
-}
-//---------------------------------------------------------------------
-InstancedGeometry* SceneManager::getInstancedGeometry(const String& name) const
-{
-    InstancedGeometryList::const_iterator i = mInstancedGeometryList.find(name);
-    if (i == mInstancedGeometryList.end())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-            "InstancedGeometry with name '" + name + "' not found", 
-            "SceneManager::createInstancedGeometry");
-    }
-    return i->second;
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyInstancedGeometry(InstancedGeometry* geom)
-{
-    destroyInstancedGeometry(geom->getName());
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyInstancedGeometry(const String& name)
-{
-    InstancedGeometryList::iterator i = mInstancedGeometryList.find(name);
-    if (i != mInstancedGeometryList.end())
-    {
-        OGRE_DELETE i->second;
-        mInstancedGeometryList.erase(i);
-    }
-
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyAllInstancedGeometry(void)
-{
-    InstancedGeometryList::iterator i, iend;
-    iend = mInstancedGeometryList.end();
-    for (i = mInstancedGeometryList.begin(); i != iend; ++i)
-    {
-        OGRE_DELETE i->second;
-    }
-    mInstancedGeometryList.clear();
 }
 //---------------------------------------------------------------------
 InstanceManager* SceneManager::createInstanceManager( const String &customName, const String &meshName,

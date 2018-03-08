@@ -3007,26 +3007,6 @@ namespace Ogre {
         /** Remove & destroy all StaticGeometry instances. */
         void destroyAllStaticGeometry(void);
 
-        /** Creates a InstancedGeometry instance suitable for use with this
-            SceneManager.
-        @remarks
-            InstancedGeometry is a way of batching up geometry into a more 
-            efficient form, and still be able to move it. Please 
-            read the InstancedGeometry class documentation for full information.
-        @param name The name to give the new object
-        @return The new InstancedGeometry instance
-        @deprecated use createInstanceManager() with InstanceManager::ShaderBased instead
-        */
-        InstancedGeometry* createInstancedGeometry(const String& name);
-        /** Retrieve a previously created InstancedGeometry instance. */
-        InstancedGeometry* getInstancedGeometry(const String& name) const;
-        /** Remove & destroy a InstancedGeometry instance. */
-        void destroyInstancedGeometry(InstancedGeometry* geom);
-        /** Remove & destroy a InstancedGeometry instance. */
-        void destroyInstancedGeometry(const String& name);
-        /** Remove & destroy all InstancedGeometry instances. */
-        void destroyAllInstancedGeometry(void);
-
         /** Creates an InstanceManager interface to create & manipulate instanced entities
             You need to call this function at least once before start calling createInstancedEntity
             to build up an instance based on the given mesh.
