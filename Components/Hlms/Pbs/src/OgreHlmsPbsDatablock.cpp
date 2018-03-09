@@ -78,7 +78,7 @@ namespace Ogre
     {
         memset( mUvSource, 0, sizeof( mUvSource ) );
         memset( mBlendModes, 0, sizeof( mBlendModes ) );
-        memset( mReserved, 0, sizeof( mReserved ) );
+        memset( mUserValue, 0, sizeof( mUserValue ) );
 
         mBgDiffuse[0] = mBgDiffuse[1] = mBgDiffuse[2] = mBgDiffuse[3] = 1.0f;
 
@@ -1056,6 +1056,21 @@ namespace Ogre
     {
         return mReceiveShadows;
     }
+	//-----------------------------------------------------------------------------------
+	void HlmsPbsDatablock::setUserValue(uint8 userValueIdx, const Vector4 &value)
+	{
+		assert(userValueIdx < 3);
+		mUserValue[userValueIdx][0] = value.x;
+		mUserValue[userValueIdx][1] = value.y;
+		mUserValue[userValueIdx][2] = value.z;
+		mUserValue[userValueIdx][3] = value.w;
+	}
+	//-----------------------------------------------------------------------------------
+	Vector4 HlmsPbsDatablock::getUserValue(uint8 userValueIdx) const
+	{
+		assert(userValueIdx < 3);
+		return Vector4(mUserValue[userValueIdx][0], mUserValue[userValueIdx][1], mUserValue[userValueIdx][2], mUserValue[userValueIdx][3]);
+	}
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setCubemapProbe( CubemapProbe *probe )
     {

@@ -285,6 +285,8 @@ void main()
 		nNormal.xy	+= vDetail.xy;
 		nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
+	@insertpiece( custom_ps_posSampleNormal )
+
 	@property( normal_map )
 		nNormal = normalize( TBN * nNormal );
 	@end

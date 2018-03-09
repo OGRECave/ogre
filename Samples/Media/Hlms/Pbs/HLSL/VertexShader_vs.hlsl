@@ -116,6 +116,7 @@ Buffer<float4> worldMatBuf : register(t0);
 @piece( CalculatePsPos )mul( @insertpiece(local_vertex), @insertpiece( worldViewMat ) ).xyz@end
 
 @piece( VertexTransform )
+@insertpiece( custom_vs_preTransform )
 	//Lighting is in view space
 	@property( hlms_normal || hlms_qtangent )outVs.pos		= @insertpiece( CalculatePsPos );@end
 	@property( hlms_normal || hlms_qtangent )outVs.normal	= mul( @insertpiece(local_normal), (float3x3)@insertpiece( worldViewMat ) );@end
