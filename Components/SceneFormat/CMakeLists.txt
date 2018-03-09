@@ -28,7 +28,7 @@ add_definitions( -DOgreSceneFormat_EXPORTS )
 
 ogre_add_library(OgreSceneFormat ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreSceneFormat PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreSceneFormat OgreMain)
+target_link_libraries(OgreSceneFormat OgreMain OgreHlmsPbs)
 
 ogre_config_framework(OgreSceneFormat)
 ogre_config_component(OgreSceneFormat)

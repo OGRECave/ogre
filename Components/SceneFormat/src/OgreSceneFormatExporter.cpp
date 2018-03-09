@@ -573,7 +573,7 @@ namespace Ogre
 
         jsonStr.a( ",\n\t\t\"parallax_corrected_cubemaps\" :"
                    "\n\t\t{" );
-        jsonStr.a( "\n\t\t\t\"paused\" : ", pcc->mPaused );
+        jsonStr.a( "\n\t\t\t\"paused\" : ", toQuotedStr( pcc->mPaused ) );
         jsonStr.a( ",\n\t\t\t\"mask\" : ", pcc->mMask );
         jsonStr.a( ",\n\t\t\t\"reserved_rq_id\" : ", pcc->getProxyReservedRenderQueueId() );
         jsonStr.a( ",\n\t\t\t\"proxy_visibility_mask\" : ", pcc->getProxyReservedVisibilityMask() );
@@ -724,9 +724,9 @@ namespace Ogre
                    MovableObject::getDefaultVisibilityFlags() );
 
         if( exportFlags & SceneFlags::TexturesOitd )
-            jsonStr.a( ",\n\t\"saved_oitd_textures\" : \"true\"" );
+            jsonStr.a( ",\n\t\"saved_oitd_textures\" : true" );
         if( exportFlags & SceneFlags::TexturesOriginal )
-            jsonStr.a( ",\n\t\"saved_original_textures\" : \"true\"" );
+            jsonStr.a( ",\n\t\"saved_original_textures\" : true" );
 
         flushLwString( jsonStr, outJson );
 
@@ -748,18 +748,27 @@ namespace Ogre
                 exportSceneNode( jsonStr, outJson, rootSceneNode );
                 outJson += "\n\t\t}";
 
-                Node::NodeVecIterator nodeItor = rootSceneNode->getChildIterator();
-                while( nodeItor.hasMoreElements() )
-                {
-                    Node *node = nodeItor.getNext();
-                    SceneNode *sceneNode = dynamic_cast<SceneNode*>( node );
+                std::queue<SceneNode*> nodeQueue;
+                nodeQueue.push(rootSceneNode);
 
-                    if( sceneNode && mListener->exportSceneNode( sceneNode ) )
+                while( !nodeQueue.empty() )
+                {
+                    SceneNode* frontNode = nodeQueue.front();
+                    nodeQueue.pop();
+                    Node::NodeVecIterator nodeItor = frontNode->getChildIterator();
+                    while( nodeItor.hasMoreElements() )
                     {
-                        mNodeToIdxMap[sceneNode] = nodeCount++;
-                        outJson += ",\n\t\t{";
-                        exportSceneNode( jsonStr, outJson, sceneNode );
-                        outJson += "\n\t\t}";
+                        Node *node = nodeItor.getNext();
+                        SceneNode *sceneNode = dynamic_cast<SceneNode*>( node );
+
+                        if( sceneNode && mListener->exportSceneNode( sceneNode ) )
+                        {
+                            mNodeToIdxMap[sceneNode] = nodeCount++;
+                            outJson += ",\n\t\t{";
+                            exportSceneNode( jsonStr, outJson, sceneNode );
+                            outJson += "\n\t\t}";
+                            nodeQueue.push( sceneNode );
+                        }
                     }
                 }
             }
