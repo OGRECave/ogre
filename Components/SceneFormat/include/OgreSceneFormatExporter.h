@@ -59,18 +59,35 @@ namespace Ogre
         MeshSet     mExportedMeshes;
         MeshV1Set   mExportedMeshesV1;
 
+        bool mUseBinaryFloatingPoint;
+        uint8 mCurrentBinFloat;
+        uint8 mCurrentBinDouble;
+        char mFloatBinTmpString[24][64];
+        char mDoubleBinTmpString[4][384];
+
         static const char* toQuotedStr( bool value );
         static void toQuotedStr( LwString &jsonStr, Light::LightTypes lightType );
 
-        static uint32 encodeFloat( float value );
-        static uint64 encodeDouble( double value );
-        static void encodeVector( LwString &jsonStr, const Vector2 &value );
-        static void encodeVector( LwString &jsonStr, const Vector3 &value );
-        static void encodeVector( LwString &jsonStr, const Vector4 &value );
-        static void encodeQuaternion( LwString &jsonStr, const Quaternion &value );
-        static void encodeColour( LwString &jsonStr, const ColourValue &value );
-        static void encodeAabb( LwString &jsonStr, const Aabb &aabb );
-        static void encodeMatrix( LwString &jsonStr, const Matrix3 &aabb );
+        static uint32 encodeFloatBin( float value );
+        static uint64 encodeDoubleBin( double value );
+        /// Warning: not thread safe. Returned pointer gets modified with next call
+        /// encodeFloat works by using a pool of temporary strings (mFloatBinTmpString)
+        /// to store the encoded value either as uint or float. We need a pool because
+        /// if the user calls: someFunc( encodeFloat(x), encodeFloat(x), encodeFloat(x) );
+        /// we need all three strings to remain valid when someFunc is executed, otherwise
+        /// the successive calls to encodeFloat overwrite the previous returned value
+        /// while it may still be used.
+        const char* encodeFloat( float value );
+        /// Warning: not thread safe. Returned pointer gets modified with next call
+        const char* encodeDouble( double value );
+        inline void rewindFloatBinStringPool( uint8 rewindAmount );
+        void encodeVector( LwString &jsonStr, const Vector2 &value );
+        void encodeVector( LwString &jsonStr, const Vector3 &value );
+        void encodeVector( LwString &jsonStr, const Vector4 &value );
+        void encodeQuaternion( LwString &jsonStr, const Quaternion &value );
+        void encodeColour( LwString &jsonStr, const ColourValue &value );
+        void encodeAabb( LwString &jsonStr, const Aabb &aabb );
+        void encodeMatrix( LwString &jsonStr, const Matrix3 &aabb );
 
         static inline void flushLwString( LwString &jsonStr, String &outJson );
 
@@ -98,6 +115,28 @@ namespace Ogre
         SceneFormatExporter( Root *root, SceneManager *sceneManager,
                              InstantRadiosity *instantRadiosity );
         ~SceneFormatExporter();
+
+        /** By default we export floating point values as uint32 using their binary encoding.
+            This allows us to preserve the identical value as text when importing. Otherwise
+            very small errors could causes inconsistencies between the imported and the original
+            scene.
+            For example the number "1.0f" gets exported as 1065353216 (0x3f800000)
+            The only problem with this is that the value we generate is not really user readable
+            or editable (unless you aid yourself with some binary converter tool)
+
+            In many cases this exact bit preservation isn't needed, and you can opt instead for
+            us to export floating point as literal numbers, thus we'll just write "1.0" which
+            is easy to read and easy to edit.
+            Note however, not all floating point numbers can be accurately be represented as
+            strings and then back as floats, there can be small rounding errors (i.e.
+            NaNs, irrational numbers & numbers with repeating decimals)
+        @param useBinaryFp
+            True to export preserving exact binary representation.
+            False to export as a user-friendly number
+            Default: true.
+        */
+        void setUseBinaryFloatingPoint( bool useBinaryFp );
+        bool getUseBinaryFloatingPoint(void);
 
         /**
         @param outJson

@@ -83,6 +83,13 @@ namespace Ogre
     */
     class _OgreSceneFormatExport SceneFormatBase
     {
+    public:
+        enum Version
+        {
+            VERSION_0   = 0,
+            VERSION_1,
+            LATEST_VERSION = VERSION_1
+        };
     protected:
         Root                    *mRoot;
         SceneManager            *mSceneManager;
