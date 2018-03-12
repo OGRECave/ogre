@@ -657,12 +657,12 @@ namespace Ogre
         void setReceiveShadows( bool receiveShadows );
         bool getReceiveShadows(void) const;
 
-		/** Sets the value of the userValue, this can be used in a custom piece
-		@param userValueIdx
-			Which userValue to modify, in the range [0; 3)
-		*/
-		void setUserValue( uint8 userValueIdx, const Vector4 &value );
-		Vector4 getUserValue( uint8 userValueIdx ) const;
+        /** Sets the value of the userValue, this can be used in a custom piece
+        @param userValueIdx
+            Which userValue to modify, in the range [0; 3)
+        */
+        void setUserValue( uint8 userValueIdx, const Vector4 &value );
+        Vector4 getUserValue( uint8 userValueIdx ) const;
 
         /** Manually set a probe to affect this particular material.
         @remarks
