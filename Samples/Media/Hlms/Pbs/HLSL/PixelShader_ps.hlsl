@@ -133,7 +133,7 @@ float3 qmul( float4 q, float3 v )
 	@insertpiece( custom_ps_preExecution )
 
 	Material material;
-	
+
 @property( diffuse_map )	uint diffuseIdx;@end
 @property( normal_map_tex )	uint normalIdx;@end
 @property( specular_map )	uint specularIdx;@end
@@ -150,9 +150,9 @@ float4 diffuseCol;
 @property( specular_map && !metallic_workflow && !fresnel_workflow )float3 specularCol;@end
 @property( metallic_workflow || (specular_map && fresnel_workflow) )@insertpiece( FresnelType ) F0;@end
 @property( roughness_map )float ROUGHNESS;@end
-	
+
 @property( hlms_normal || hlms_qtangent )	float3 nNormal;@end
-	
+
 @property( hlms_normal || hlms_qtangent )
 	@property( !lower_gpu_overhead )
 		uint materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
@@ -267,6 +267,8 @@ float4 diffuseCol;
 		vDetail = @insertpiece( SampleDetailMapNm@n );
 		nNormal.xy	+= vDetail.xy;
 		nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
+
+	@insertpiece( custom_ps_posSampleNormal )
 
 	@property( normal_map )
 		nNormal = normalize( mul( nNormal, TBN ) );
@@ -406,7 +408,7 @@ float4 diffuseCol;
 
 @property( use_envprobe_map || hlms_use_ssr || use_planar_reflections || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	
+
 	@property( use_envprobe_map )
 		@property( use_parallax_correct_cubemaps )
 			float3 envColourS;
@@ -552,7 +554,7 @@ float4 diffuseCol;
 @end
 	@insertpiece( custom_ps_preExecution )
 
-	
+
 @property( alpha_test )
 	Material material;
 @property( diffuse_map )	uint diffuseIdx;@end
@@ -622,4 +624,3 @@ float4 diffuseCol;
 @end
 }
 @end
-

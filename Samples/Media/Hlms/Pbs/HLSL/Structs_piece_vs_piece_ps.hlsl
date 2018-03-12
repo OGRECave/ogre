@@ -54,7 +54,7 @@ cbuffer PassBuffer : register(b0)
 @property( hlms_use_prepass )
 	float4 windowHeight;
 @end
-	
+
 @property( ambient_hemisphere || ambient_fixed || envmap_scale )
 	float4 ambientUpperHemi;
 @end
@@ -133,7 +133,7 @@ struct Material
 	float4 cDetailWeights;
 	float4 detailOffsetScale[4];
 	float4 emissive;		//emissive.w contains mNormalMapWeight.
-	float4 reserved[3];
+	float4 userValue[3];
 
 	uint4 indices0_3;
 	uint4 indices4_7;
@@ -198,14 +198,14 @@ cbuffer ManualProbe : register(b3)
 		@foreach( hlms_num_shadow_map_lights, n )
 			@property( !hlms_shadowmap@n_is_point_light )
 				float4 posL@n	: TEXCOORD@counter(texcoord);@end @end
-			
+
 		@property( hlms_pssm_splits )float depth	: TEXCOORD@counter(texcoord);@end
 
 		@property( hlms_use_prepass_msaa > 1 )
 			float2 zwDepth	: TEXCOORD@counter(texcoord);
 		@end
 	@end
-	
+
 	@property( hlms_shadowcaster )
 		@property( alpha_test )
 			nointerpolation uint drawId	: TEXCOORD@counter(texcoord);
