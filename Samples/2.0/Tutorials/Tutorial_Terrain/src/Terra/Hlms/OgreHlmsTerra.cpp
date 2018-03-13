@@ -1156,13 +1156,15 @@ namespace Ogre
 #if !OGRE_NO_JSON
     //-----------------------------------------------------------------------------------
     void HlmsTerra::_loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
-                               HlmsDatablock *datablock, const String &additionalTextureExtension ) const
+                               HlmsDatablock *datablock, HlmsJsonListener *listener,
+                               const String &additionalTextureExtension ) const
     {
         HlmsJsonTerra JsonTerra( mHlmsManager );
         JsonTerra.loadMaterial( jsonValue, blocks, datablock );
     }
     //-----------------------------------------------------------------------------------
     void HlmsTerra::_saveJson( const HlmsDatablock *datablock, String &outString,
+                               HlmsJsonListener *listener,
                                const String &additionalTextureExtension ) const
     {
 //        HlmsJsonTerra JsonTerra( mHlmsManager );
