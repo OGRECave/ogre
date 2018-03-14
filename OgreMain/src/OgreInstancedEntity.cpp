@@ -255,7 +255,7 @@ namespace Ogre
 
             //Object's bounding box is viewed by the camera
             if( retVal && camera )
-                retVal = camera->isVisible(Sphere(_getDerivedPosition(),getBoundingRadius()));
+                retVal = camera->isVisible(Sphere(_getDerivedPosition(),getBoundingRadius() * getMaxScaleCoef()));
         }
 
         return retVal;
@@ -477,35 +477,38 @@ namespace Ogre
     //---------------------------------------------------------------------------
     Real InstancedEntity::getMaxScaleCoef() const 
     { 
-        if (mParentNode)
-        {
-            const Ogre::Vector3& parentScale = mParentNode->_getDerivedScale();
-            return mMaxScaleLocal * std::max<Real>(std::max<Real>(
-                Math::Abs(parentScale.x), Math::Abs(parentScale.y)), Math::Abs(parentScale.z)); 
-        }
-        return mMaxScaleLocal; 
+        return mMaxScaleLocal;
     }
 
     //---------------------------------------------------------------------------
     void InstancedEntity::updateTransforms()
     {
-        if (mUseLocalTransform && mNeedTransformUpdate)
+        if (mNeedTransformUpdate)
         {
-            if (mParentNode)
+            if (mUseLocalTransform)
             {
-                const Vector3& parentPosition = mParentNode->_getDerivedPosition();
-                const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
-                const Vector3& parentScale = mParentNode->_getDerivedScale();
-                
-                Quaternion derivedOrientation = parentOrientation * mOrientation;
-                Vector3 derivedScale = parentScale * mScale;
-                mDerivedLocalPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
-            
-                mFullLocalTransform.makeTransform(mDerivedLocalPosition, derivedScale, derivedOrientation);
-            }
-            else
-            {
-                mFullLocalTransform.makeTransform(mPosition,mScale,mOrientation);
+                if (mParentNode)
+                {
+                    const Vector3& parentPosition = mParentNode->_getDerivedPosition();
+                    const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
+                    const Vector3& parentScale = mParentNode->_getDerivedScale();
+
+                    Quaternion derivedOrientation = parentOrientation * mOrientation;
+                    Vector3 derivedScale = parentScale * mScale;
+                    mDerivedLocalPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
+
+                    mFullLocalTransform.makeTransform(mDerivedLocalPosition, derivedScale, derivedOrientation);
+                }
+                else
+                {
+                    mFullLocalTransform.makeTransform(mPosition,mScale,mOrientation);
+                }
+            } else {
+                if (mParentNode) {
+                    const Ogre::Vector3& parentScale = mParentNode->_getDerivedScale();
+                    mMaxScaleLocal = std::max<Real>(std::max<Real>(
+                            Math::Abs(parentScale.x), Math::Abs(parentScale.y)), Math::Abs(parentScale.z));
+                }
             }
             mNeedTransformUpdate = false;
         }
