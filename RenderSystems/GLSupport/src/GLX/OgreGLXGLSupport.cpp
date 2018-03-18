@@ -873,7 +873,7 @@ namespace Ogre
                 if(context_attribs[3] == 0)
                 {
                     context_attribs[1] -= 1;
-                    context_attribs[3] = 5;
+                    context_attribs[3] = 6;
                 }
                 else
                 {
