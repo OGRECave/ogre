@@ -383,18 +383,10 @@ namespace Ogre {
 
         // Support for specific shader profiles
         bool limitedOSXCoreProfile = OGRE_PLATFORM == OGRE_PLATFORM_APPLE && hasMinGLVersion(3, 2);
-        if (getNativeShadingLanguageVersion() >= 450)
-            rsc->addShaderProfile("glsl450");
-        if (getNativeShadingLanguageVersion() >= 440)
-            rsc->addShaderProfile("glsl440");
-        if (getNativeShadingLanguageVersion() >= 430)
-            rsc->addShaderProfile("glsl430");
-        if (getNativeShadingLanguageVersion() >= 420)
-            rsc->addShaderProfile("glsl420");
-        if (getNativeShadingLanguageVersion() >= 410)
-            rsc->addShaderProfile("glsl410");
-        if (getNativeShadingLanguageVersion() >= 400)
-            rsc->addShaderProfile("glsl400");
+
+        for (uint16 ver = getNativeShadingLanguageVersion(); ver >= 400; ver -= 10)
+            rsc->addShaderProfile("glsl" + StringConverter::toString(ver));
+
         if (getNativeShadingLanguageVersion() >= 330)
             rsc->addShaderProfile("glsl330");
         if (getNativeShadingLanguageVersion() >= 150)
