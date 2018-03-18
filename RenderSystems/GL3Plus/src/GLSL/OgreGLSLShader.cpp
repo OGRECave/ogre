@@ -112,6 +112,10 @@ namespace Ogre {
 
         const RenderSystemCapabilities* rsc = Root::getSingleton().getRenderSystem()->getCapabilities();
 
+        bool clipDistBug =
+            ((OGRE_PLATFORM == OGRE_PLATFORM_WIN32) || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)) &&
+            rsc->getVendor() == GPU_INTEL;
+
         size_t versionPos = mSource.find("#version");
         int shaderVersion = 100;
         size_t belowVersionPos = 0;
@@ -134,24 +138,28 @@ namespace Ogre {
             // shader, i.e. has a main function.
             if (mainPos != String::npos)
             {
+                String clipDistDecl = clipDistBug ? "float gl_ClipDistance[1];" : "float gl_ClipDistance[];";
+                String inBlock = "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\n"+clipDistDecl+"\n} gl_in[];\n\n";
+                String outBlock = "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\n"+clipDistDecl+"\n};\n\n";
+
                 if (shaderVersion >= 150 || shouldUpgradeToVersion150)
                 {
                     switch (mType)
                     {
                     case GPT_VERTEX_PROGRAM:
-                        mSource.insert(belowVersionPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n\n");
+                        mSource.insert(belowVersionPos, outBlock);
                         break;
                     case GPT_GEOMETRY_PROGRAM:
-                        mSource.insert(belowVersionPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n\n");
-                        mSource.insert(belowVersionPos, "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_in[];\n\n");
+                        mSource.insert(belowVersionPos, outBlock);
+                        mSource.insert(belowVersionPos, inBlock);
                         break;
                     case GPT_DOMAIN_PROGRAM:
-                        mSource.insert(belowVersionPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n\n");
-                        mSource.insert(belowVersionPos, "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_in[];\n\n");
+                        mSource.insert(belowVersionPos, outBlock);
+                        mSource.insert(belowVersionPos, inBlock);
                         break;
                     case GPT_HULL_PROGRAM:
-                        mSource.insert(belowVersionPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_out[];\n\n");
-                        mSource.insert(belowVersionPos, "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_in[];\n\n");
+                        mSource.insert(belowVersionPos, outBlock.substr(0, outBlock.size() - 3) + " gl_out[];\n\n");
+                        mSource.insert(belowVersionPos, inBlock);
                         break;
                     case GPT_FRAGMENT_PROGRAM:
                     case GPT_COMPUTE_PROGRAM:
@@ -162,7 +170,7 @@ namespace Ogre {
                 }
                 else if(mType == GPT_VERTEX_PROGRAM) // shaderVersion < 150, means we only have vertex shaders
                 {
-                    mSource.insert(belowVersionPos, "varying vec4 gl_Position;\nvarying float gl_PointSize;\nvarying float gl_ClipDistance[];\n\n");
+                    mSource.insert(belowVersionPos, "varying vec4 gl_Position;\nvarying float gl_PointSize;\nvarying "+clipDistDecl+"\n\n");
                 }
             }
         }
