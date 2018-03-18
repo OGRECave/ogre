@@ -126,6 +126,9 @@ namespace Ogre {
         */
         void checkAndFixInvalidDefaultPrecisionError( String &message );
 
+        /// Add boiler plate code and preprocessor extras, then
+        /// submit shader source to OpenGL.
+        void submitSource();
 
         // /// @copydoc Resource::loadImpl
         // void loadImpl(void) {}
