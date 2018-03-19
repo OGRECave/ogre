@@ -65,9 +65,9 @@ namespace Ogre {
 
         if( !material )
         {
-            LogManager::getSingleton().logMessage("Can't assign material " + name +
-                " to SubEntity of " + mParentEntity->getName() + " because this "
-                "Material does not exist in group "+groupName+". Have you forgotten to define it in a "
+            LogManager::getSingleton().logMessage("Can't assign material '" + name +
+                "' to SubEntity of '" + mParentEntity->getName() + "' because this "
+                "Material does not exist in group '"+groupName+"'. Have you forgotten to define it in a "
                 ".material script?", LML_CRITICAL);
 
             material = MaterialManager::getSingleton().getDefaultMaterial();
@@ -83,7 +83,7 @@ namespace Ogre {
         if (!mMaterialPtr)
         {
             LogManager::getSingleton().logMessage("Can't assign material "  
-                " to SubEntity of " + mParentEntity->getName() + " because this "
+                " to SubEntity of '" + mParentEntity->getName() + "' because this "
                 "Material does not exist. Have you forgotten to define it in a "
                 ".material script?", LML_CRITICAL);
             
