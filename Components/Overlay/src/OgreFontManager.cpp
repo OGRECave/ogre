@@ -95,9 +95,12 @@ namespace Ogre
         String line;
         FontPtr pFont;
 
+        int l = 0;
+
         while( !stream->eof() )
         {
             line = stream->getLine();
+            l++;
             // Ignore blanks & comments
             if( !line.length() || line.substr( 0, 2 ) == "//" )
             {
@@ -113,6 +116,12 @@ namespace Ogre
                     {
                         // chop off the 'particle_system ' needed by new compilers
                         line = line.substr(5);
+                    }
+                    else
+                    {
+                        LogManager::getSingleton().logWarning("missing 'font' keyword at " +
+                                                              stream->getName() + ":" +
+                                                              StringConverter::toString(l));
                     }
                     pFont = create(line, groupName);
                     pFont->_notifyOrigin(stream->getName());

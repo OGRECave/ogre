@@ -815,7 +815,7 @@ Several overlays may be defined in a single script. The script format is pseudo-
 
 ```cpp
 // The name of the overlay comes first
-MyOverlays/ANewOverlay
+overlay MyOverlays/ANewOverlay
 {
     zorder 200
 
@@ -948,7 +948,7 @@ template element TextArea(MyTemplates/BasicText)
     height 0.09
 }
 
-MyOverlays/AnotherOverlay
+overlay MyOverlays/AnotherOverlay
 {
     zorder 490
     container BorderPanel(MyElements/BackPanel) : MyTemplates/BasicBorderPanel
@@ -1214,7 +1214,7 @@ The former gives you the most flexibility and the best performance (in terms of 
 All font definitions are held in .fontdef files, which are parsed by the system at startup time. Each .fontdef file can contain multiple font definitions. The basic format of an entry in the .fontdef file is:
 
 ```cpp
-<font_name>
+font <font_name>
 {
     type <image | truetype>
     source <image file | truetype font file>
