@@ -243,10 +243,18 @@ namespace Ogre {
                             // chop off the 'particle_system ' needed by new compilers
                             line = line.substr(8);
                         }
+                        if (line[line.length() - 1] == '{') {
+                            // Open the overlay on the same line
+                            int i;
+                            for (i = line.length() - 2;
+                                line[i] == ' ' || line[i] == '\t'; --i);
+                            line = line.substr(0, i + 1);
+                        } else {
+                            // Skip to and over next {
+                            skipToNextOpenBrace(stream);
+                        }
                         pOverlay = create(line);
                         pOverlay->_notifyOrigin(stream->getName());
-                        // Skip to and over next {
-                        skipToNextOpenBrace(stream);
                         skipLine = true;
                     }
                 }
