@@ -13,6 +13,7 @@ cache:
 branches:
   only:
     - master
+    - stable
 artifacts:
   - path: build/sdk
     name: ogre-sdk-master-vc15-x64
