@@ -208,12 +208,14 @@ namespace Ogre {
         }
         String line;
         Overlay* pOverlay = 0;
+        int l = 0;
 
         while(!stream->eof())
         {
             bool isATemplate = false;
             bool skipLine = false;
             line = stream->getLine();
+            l++;
             // Ignore comments & blanks
             if (!(line.length() == 0 || line.substr(0,2) == "//"))
             {
@@ -242,6 +244,12 @@ namespace Ogre {
                         {
                             // chop off the 'particle_system ' needed by new compilers
                             line = line.substr(8);
+                        }
+                        else
+                        {
+                            LogManager::getSingleton().logWarning("missing 'overlay' keyword at " +
+                                                                  stream->getName() +
+                                                                  StringConverter::toString(l));
                         }
                         if (line[line.length() - 1] == '{') {
                             // Open the overlay on the same line
