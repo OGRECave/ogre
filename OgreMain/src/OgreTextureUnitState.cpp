@@ -300,6 +300,7 @@ namespace Ogre {
         for (unsigned int i = 0; i < mFramePtrs.size(); ++i)
         {
             mFramePtrs[i] = retrieveTexture(names[i]);
+            mFramePtrs[i]->setTextureType(forUVW ? TEX_TYPE_CUBE_MAP : TEX_TYPE_2D);
         }
         setCubicTexture(&mFramePtrs[0], forUVW);
     }
@@ -798,7 +799,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setBlank(void)
     {
-        setTextureName(BLANKSTRING);
+        mFramePtrs.clear();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTextureTransform(const Matrix4& xform)
@@ -1077,22 +1078,9 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     TexturePtr TextureUnitState::retrieveTexture(const String& name) {
-        // Ensure texture is loaded, specified number of mipmaps and
-        // priority
-        try {
-            TextureManager::ResourceCreateOrRetrieveResult res;
-            res = TextureManager::getSingleton().createOrRetrieve(
-                name, mParent->getResourceGroup());
-            return static_pointer_cast<Texture>(res.first);
-        }
-        catch (Exception &e) {
-            String msg = "retrieving texture " + name +
-                         ". Texture layer will be blank: " + e.getFullDescription();
-            LogManager::getSingleton().logError(msg);
-            mTextureLoadFailed = true;
-        }
-
-        return TexturePtr();
+        TextureManager::ResourceCreateOrRetrieveResult res;
+        res = TextureManager::getSingleton().createOrRetrieve(name, mParent->getResourceGroup());
+        return static_pointer_cast<Texture>(res.first);
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::ensurePrepared(size_t frame) const
@@ -1107,7 +1095,17 @@ namespace Ogre {
         tex->setNumMipmaps(mTextureSrcMipmaps);
         tex->setHardwareGammaEnabled(mHwGamma);
         tex->setTreatLuminanceAsAlpha(mIsAlpha);
-        tex->prepare();
+
+        try {
+            tex->prepare();
+        }
+        catch (Exception& e)
+        {
+            String msg = "preparing texture '" + tex->getName() +
+                         "'. Texture layer will be blank: " + e.getFullDescription();
+            LogManager::getSingleton().logError(msg);
+            mTextureLoadFailed = true;
+        }
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::ensureLoaded(size_t frame) const
@@ -1122,7 +1120,17 @@ namespace Ogre {
         tex->setNumMipmaps(mTextureSrcMipmaps);
         tex->setHardwareGammaEnabled(mHwGamma);
         tex->setTreatLuminanceAsAlpha(mIsAlpha);
-        tex->load();
+
+        try {
+            tex->load();
+        }
+        catch (Exception& e)
+        {
+            String msg = "loading texture '" + tex->getName() +
+                         "'. Texture layer will be blank: " + e.getFullDescription();
+            LogManager::getSingleton().logError(msg);
+            mTextureLoadFailed = true;
+        }
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::createAnimController(void)
