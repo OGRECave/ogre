@@ -108,28 +108,36 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
             // It should contain 3 parts, i.e. "attribute vec4 vertex".
             break;
         }
-        if (parts[0] == "out")
+        size_t attrStart = 0;
+        if (parts.size() == 4)
         {
-            // This is an output attribute, skip it
-            continue;
+            if( parts[0] == "flat" || parts[0] == "smooth"|| parts[0] == "perspective")
+            {
+                // Skip the interpolation qualifier
+                attrStart = 1;
+            }
         }
 
-        String attrName = parts[2];
-        String::size_type uvPos = attrName.find("uv");
-
-        if(uvPos == 0)
-            semantic = getAttributeSemanticEnum("uv0"); // treat "uvXY" as "uv0"
-        else
-            semantic = getAttributeSemanticEnum(attrName);
-
-        // Find the texture unit index.
-        if (uvPos == 0)
+        // Skip output attribute
+        if (parts[attrStart] != "out")
         {
-            String uvIndex = attrName.substr(uvPos + 2, attrName.length() - 2);
-            index = StringConverter::parseInt(uvIndex);
-        }
+            String attrName = parts[attrStart + 2];
+            String::size_type uvPos = attrName.find("uv");
 
-        mCustomAttributesIndexes[semantic - 1][index] = attrib;
+            if(uvPos == 0)
+                semantic = getAttributeSemanticEnum("uv0"); // treat "uvXY" as "uv0"
+            else
+                semantic = getAttributeSemanticEnum(attrName);
+
+            // Find the texture unit index.
+            if (uvPos == 0)
+            {
+                String uvIndex = attrName.substr(uvPos + 2, attrName.length() - 2);
+                index = StringConverter::parseInt(uvIndex);
+            }
+
+            mCustomAttributesIndexes[semantic - 1][index] = attrib;
+        }
 
         currPos = shaderSource.find("layout", currPos);
     }
