@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreStableHeaders.h"
-#include "OgreScriptTranslator.h"
+#include "OgreBuiltinScriptTranslators.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreParticleSystemRenderer.h"
