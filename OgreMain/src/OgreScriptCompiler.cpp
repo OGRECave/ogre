@@ -226,12 +226,11 @@ namespace Ogre
 
     void ScriptCompilerListener::handleError(ScriptCompiler *compiler, uint32 code, const String &file, int line, const String &msg)
     {
-        Ogre::String str = "Compiler error: ";
-        str = str + ScriptCompiler::formatErrorCode(code) + " in " + file + "(" +
-            Ogre::StringConverter::toString(line) + ")";
+        StringStream ss;
+        ss << "ScriptCompiler - " << ScriptCompiler::formatErrorCode(code) << " in " << file << "(" << line << ")";
         if(!msg.empty())
-            str = str + ": " + msg;
-        Ogre::LogManager::getSingleton().logMessage(str, LML_CRITICAL);
+            ss << ": " << msg;
+        LogManager::getSingleton().logError(ss.str());
     }
 
     bool ScriptCompilerListener::handleEvent(ScriptCompiler *compiler, ScriptCompilerEvent *evt, void *retval)
@@ -244,28 +243,30 @@ namespace Ogre
     {
         switch(code)
         {
-        case ScriptCompiler::CE_STRINGEXPECTED:
+        case CE_STRINGEXPECTED:
             return "string expected";
-        case ScriptCompiler::CE_NUMBEREXPECTED:
+        case CE_NUMBEREXPECTED:
             return "number expected";
-        case ScriptCompiler::CE_FEWERPARAMETERSEXPECTED:
+        case CE_FEWERPARAMETERSEXPECTED:
             return "fewer parameters expected";
-        case ScriptCompiler::CE_VARIABLEEXPECTED:
+        case CE_VARIABLEEXPECTED:
             return "variable expected";
-        case ScriptCompiler::CE_UNDEFINEDVARIABLE:
+        case CE_UNDEFINEDVARIABLE:
             return "undefined variable";
-        case ScriptCompiler::CE_OBJECTNAMEEXPECTED:
+        case CE_OBJECTNAMEEXPECTED:
             return "object name expected";
-        case ScriptCompiler::CE_OBJECTALLOCATIONERROR:
+        case CE_OBJECTALLOCATIONERROR:
             return "object allocation error";
-        case ScriptCompiler::CE_INVALIDPARAMETERS:
+        case CE_INVALIDPARAMETERS:
             return "invalid parameters";
-        case ScriptCompiler::CE_DUPLICATEOVERRIDE:
+        case CE_DUPLICATEOVERRIDE:
             return "duplicate object override";
-        case ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM:
+        case CE_UNSUPPORTEDBYRENDERSYSTEM:
             return "object unsupported by render system";
-        case ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT:
+        case CE_REFERENCETOANONEXISTINGOBJECT:
             return "reference to a non existing object";
+        case CE_UNEXPECTEDTOKEN:
+            return "unexpected token";
         default:
             return "unknown error";
         }
@@ -454,12 +455,8 @@ namespace Ogre
         }
         else
         {
-            Ogre::String str = "Compiler error: ";
-            str = str + formatErrorCode(code) + " in " + file + "(" +
-                Ogre::StringConverter::toString(line) + ")";
-            if(!msg.empty())
-                str = str + ": " + msg;
-            Ogre::LogManager::getSingleton().logMessage(str, LML_CRITICAL);
+            static ScriptCompilerListener defaultListener;
+            defaultListener.handleError(this, code, file, line, msg);
         }
 
         mErrors.push_back(err);
@@ -1483,7 +1480,8 @@ namespace Ogre
                 }
                 else
                 {
-                    mCompiler->addError(CE_UNEXPECTEDTOKEN, impl->file, impl->line, "token class, " + impl->cls + ", unrecognized.");
+                    mCompiler->addError(CE_UNEXPECTEDTOKEN, impl->file, impl->line,
+                                        "'" + impl->cls + "'. If this is a legacy script you must prepend the type (e.g. font, overlay).");
                 }
 
                 asn = AbstractNodePtr(impl);
