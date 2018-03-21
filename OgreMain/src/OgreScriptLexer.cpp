@@ -39,7 +39,7 @@ namespace Ogre{
         char c = 0, lastc = 0;
 
         String lexeme;
-        uint32 line = 1, state = READY, lastQuote = 0;
+        uint32 line = 1, state = READY, lastQuote = 0, firstOpenBrace = 0, braceLayer = 0;
         ScriptTokenListPtr tokens(OGRE_NEW_T(ScriptTokenList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Iterate over the input
@@ -51,7 +51,29 @@ namespace Ogre{
 
             if(c == quote)
                 lastQuote = line;
-
+            
+            if(state == READY || state == WORD || state == VAR)
+            {
+                if(c == openbrace)
+                {
+                    if(braceLayer == 0)
+                        firstOpenBrace = line;
+                    
+                    braceLayer ++;
+                }
+                else if(c == closebrace)
+                {
+                    if(braceLayer == 0)
+                        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                            Ogre::String("no matching open bracket '{' found for close bracket '}' at line ") + 
+                            Ogre::StringConverter::toString(line),
+                            "ScriptLexer::tokenize");
+                    
+                    braceLayer --;
+                }
+            }
+            
+            
             switch(state)
             {
             case READY:
@@ -221,7 +243,24 @@ namespace Ogre{
                     "ScriptLexer::tokenize");
             }
         }
-
+        
+        // Check that all opened brackets have been closed
+        if (braceLayer == 1)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                Ogre::String("no matching closing bracket '}' for open bracket '{' at line ") +
+                Ogre::StringConverter::toString(firstOpenBrace),
+                "ScriptLexer::tokenize");
+        }
+        else if (braceLayer > 1)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                Ogre::String("too many open brackets '{' without matching closing bracket '}' (") + 
+                Ogre::StringConverter::toString(braceLayer) +
+                Ogre::String(")"),
+                "ScriptLexer::tokenize");
+        }
+       
         return tokens;
     }
 
