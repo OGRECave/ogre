@@ -6803,11 +6803,6 @@ namespace Ogre{
     {
     }
     //-------------------------------------------------------------------------
-    size_t BuiltinScriptTranslatorManager::getNumTranslators() const
-    {
-        return 12;
-    }
-    //-------------------------------------------------------------------------
     ScriptTranslator *BuiltinScriptTranslatorManager::getTranslator(const AbstractNodePtr &node)
     {
         ScriptTranslator *translator = 0;

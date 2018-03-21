@@ -120,8 +120,6 @@ namespace Ogre{
         // required - virtual destructor
         virtual ~ScriptTranslatorManager() {}
 
-        /// Returns the number of translators being managed
-        virtual size_t getNumTranslators() const = 0;
         /// Returns a manager for the given object abstract node, or null if it is not supported
         virtual ScriptTranslator *getTranslator(const AbstractNodePtr&) = 0;
     };

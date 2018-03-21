@@ -1246,14 +1246,6 @@ bool ShaderGenerator::removeCustomScriptTranslator(const String& key)
 }
 
 //-----------------------------------------------------------------------------
-size_t ShaderGenerator::getNumTranslators() const
-{
-    OGRE_LOCK_AUTO_MUTEX;
-
-    return mScriptTranslatorsMap.size();
-}
-
-//-----------------------------------------------------------------------------
 ScriptTranslator* ShaderGenerator::getTranslator(const AbstractNodePtr& node)
 {
     OGRE_LOCK_AUTO_MUTEX;

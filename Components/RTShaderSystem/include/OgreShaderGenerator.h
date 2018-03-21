@@ -884,12 +884,6 @@ protected:
         {
             mOwner = owner;
         }
-
-        /// Returns the number of translators being managed
-        virtual size_t getNumTranslators() const
-        {
-            return mOwner->getNumTranslators();
-        }
         
         /// Returns a manager for the given object abstract node, or null if it is not supported
         virtual ScriptTranslator *getTranslator(const AbstractNodePtr& node)
@@ -992,9 +986,6 @@ protected:
     @param key The key name of the translator to remove.    
     */
     bool removeCustomScriptTranslator(const String& key);
-
-    /** Return number of script translators. */
-    size_t getNumTranslators() const;
 
     /** Return a matching script translator. */
     ScriptTranslator* getTranslator(const AbstractNodePtr& node);
