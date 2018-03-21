@@ -25,11 +25,9 @@ THE SOFTWARE
 -------------------------------------------------------------------------*/
 
 #include "OgreFontManager.h"
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreStringVector.h"
-#include "OgreException.h"
+
 #include "OgreResourceGroupManager.h"
+#include "OgreScriptCompiler.h"
 
 namespace Ogre
 {
@@ -58,8 +56,6 @@ namespace Ogre
 
         // Register with resource group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
-
-
     }
     //---------------------------------------------------------------------
     FontManager::~FontManager()
@@ -92,194 +88,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void FontManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
-        String line;
-        FontPtr pFont;
-
-        int l = 0;
-
-        while( !stream->eof() )
-        {
-            line = stream->getLine();
-            l++;
-            // Ignore blanks & comments
-            if( !line.length() || line.substr( 0, 2 ) == "//" )
-            {
-                continue;
-            }
-            else
-            {
-                if (!pFont)
-                {
-                    // No current font
-                    // So first valid data should be font name
-                    if (StringUtil::startsWith(line, "font "))
-                    {
-                        // chop off the 'particle_system ' needed by new compilers
-                        line = line.substr(5);
-                    }
-                    else
-                    {
-                        LogManager::getSingleton().logWarning("missing 'font' keyword at " +
-                                                              stream->getName() + ":" +
-                                                              StringConverter::toString(l));
-                    }
-                    pFont = create(line, groupName);
-                    pFont->_notifyOrigin(stream->getName());
-                    // Skip to and over next {
-                    stream->skipLine("{");
-                }
-                else
-                {
-                    // Already in font
-                    if (line == "}")
-                    {
-                        // Finished 
-                        pFont.reset();
-                        // NB font isn't loaded until required
-                    }
-                    else
-                    {
-                        parseAttribute(line, pFont);
-                    }
-                }
-            }
-        }
+        ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
     }
-    //---------------------------------------------------------------------
-    void FontManager::parseAttribute(const String& line, FontPtr& pFont)
-    {
-        vector<String>::type params = StringUtil::split(line);
-        String& attrib = params[0];
-        StringUtil::toLowerCase(attrib);
-        if (attrib == "type")
-        {
-            // Check params
-            if (params.size() != 2)
-            {
-                logBadAttrib(line, pFont);
-                return;
-            }
-            // Set
-            StringUtil::toLowerCase(params[1]);
-            if (params[1] == "truetype")
-            {
-                pFont->setType(FT_TRUETYPE);
-            }
-            else
-            {
-                pFont->setType(FT_IMAGE);
-            }
-
-        }
-        else if (attrib == "source")
-        {
-            // Check params
-            if (params.size() != 2)
-            {
-                logBadAttrib(line, pFont);
-                return;
-            }
-            // Set
-            pFont->setSource(params[1]);
-        }
-        else if (attrib == "glyph")
-        {
-            // Check params
-            if (params.size() != 6)
-            {
-                logBadAttrib(line, pFont);
-                return;
-            }
-            // Set
-            // Support numeric and character glyph specification
-            Font::CodePoint cp;
-            if (params[1].at(0) == 'u' && params[1].size() > 1)
-            {
-                // Unicode glyph spec
-                String trimmed = params[1].substr(1);
-                cp = StringConverter::parseUnsignedInt(trimmed);
-            }
-            else
-            {
-                // Direct character
-                cp = params[1].at(0);
-            }
-            pFont->setGlyphTexCoords(
-                cp, 
-                StringConverter::parseReal(params[2]),
-                StringConverter::parseReal(params[3]),
-                StringConverter::parseReal(params[4]),
-                StringConverter::parseReal(params[5]), 1.0 ); // assume image is square
-        }
-        else if (attrib == "size")
-        {
-            // Check params
-            if (params.size() != 2)
-            {
-                logBadAttrib(line, pFont);
-                return;
-            }
-            // Set
-            pFont->setTrueTypeSize(
-                StringConverter::parseReal(params[1]));
-        }
-        else if (attrib == "character_spacer")
-        {
-            // Check params
-            if (params.size() != 2)
-            {
-                logBadAttrib(line, pFont);
-                return;
-            }
-            // Set
-            pFont->setCharacterSpacer(
-                StringConverter::parseUnsignedInt(params[1]));
-        }
-        else if (attrib == "resolution")
-        {
-            // Check params
-            if (params.size() != 2)
-            {
-                logBadAttrib(line, pFont);
-                return;
-            }
-            // Set
-            pFont->setTrueTypeResolution(
-                (uint)StringConverter::parseReal(params[1]) );
-        }
-        else if (attrib == "antialias_colour")
-        {
-            // Check params
-            if (params.size() != 2)
-            {
-                logBadAttrib(line, pFont);
-                return;
-            }
-            // Set
-            pFont->setAntialiasColour(StringConverter::parseBool(params[1]));
-        }
-        else if (attrib == "code_points")
-        {
-            for (size_t c = 1; c < params.size(); ++c)
-            {
-                String& item = params[c];
-                StringVector itemVec = StringUtil::split(item, "-");
-                if (itemVec.size() == 2)
-                {
-                    pFont->addCodePointRange(Font::CodePointRange(
-                        StringConverter::parseUnsignedInt(itemVec[0]),
-                        StringConverter::parseUnsignedInt(itemVec[1])));
-                }
-            }
-        }
-
-    }
-    //---------------------------------------------------------------------
-    void FontManager::logBadAttrib(const String& line, FontPtr& pFont)
-    {
-        LogManager::getSingleton().logMessage("Bad attribute line: " + line +
-            " in font " + pFont->getName(), LML_CRITICAL);
-
-    }
-
 }
