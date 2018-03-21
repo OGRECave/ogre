@@ -247,9 +247,6 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_hlsl_vs hlsl
 	uses_vertex_texture_fetch true
 }
 
-		param_named			matrixTexture				int 2
-	}
-}
 //--------------------------------------------------------------
 // CG Programs
 //--------------------------------------------------------------

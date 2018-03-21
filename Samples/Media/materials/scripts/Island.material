@@ -134,6 +134,7 @@ material Ogre/Island/MainToBackBuffer
 			depth_check off
 			depth_write off
 		}
+	}
 }
 
 vertex_program Ogre/Island/WaterNormalmapCombineVS hlsl
