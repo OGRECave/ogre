@@ -63,7 +63,7 @@ namespace Ogre {
         StringVector mScriptPatterns;
 
         void parseNewElement( DataStreamPtr& chunk, String& elemType, String& elemName, 
-            bool isContainer, Overlay* pOverlay, bool isTemplate, String templateName = String(""), OverlayContainer* container = 0);
+            Overlay* pOverlay, bool isTemplate, String templateName = String(""), OverlayContainer* container = 0);
         void parseAttrib( const String& line, Overlay* pOverlay);
         void parseElementAttrib( const String& line, Overlay* pOverlay, OverlayElement* pElement );
         void skipToNextCloseBrace(DataStreamPtr& chunk);

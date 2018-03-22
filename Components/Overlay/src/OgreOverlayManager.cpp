@@ -270,8 +270,6 @@ namespace Ogre {
                 if ((pOverlay && !skipLine) || isATemplate)
                 {
                     // Already in overlay
-                    vector<String>::type params = StringUtil::split(line, "\t\n ()");
-
                     if (line == "}")
                     {
                         // Finished overlay
@@ -334,15 +332,11 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void OverlayManager::parseNewElement( DataStreamPtr& stream, String& elemType, String& elemName, 
-            bool isContainer, Overlay* pOverlay, bool isATemplate, String templateName, OverlayContainer* container)
+            Overlay* pOverlay, bool isATemplate, String templateName, OverlayContainer* container)
     {
         String line;
 
-        OverlayElement* newElement = NULL;
-        newElement = 
-                OverlayManager::getSingleton().createOverlayElementFromTemplate(templateName, elemType, elemName, isATemplate);
-
-            // do not add a template to an overlay
+        OverlayElement* newElement = createOverlayElementFromTemplate(templateName, elemType, elemName, isATemplate);
 
         // add new element to parent
         if (container)
@@ -369,7 +363,7 @@ namespace Ogre {
                 }
                 else
                 {
-                    if (isContainer && parseChildren(stream,line, pOverlay, isATemplate, static_cast<OverlayContainer*>(newElement)))
+                    if (parseChildren(stream,line, pOverlay, isATemplate, static_cast<OverlayContainer*>(newElement)))
                     {
                         // nested children... don't reparse it
                     }
@@ -443,7 +437,7 @@ namespace Ogre {
             }
        
             skipToNextOpenBrace(stream);
-            parseNewElement(stream, params[1+skipParam], params[2+skipParam], true, pOverlay, isATemplate, templateName, (OverlayContainer*)parent);
+            parseNewElement(stream, params[1+skipParam], params[2+skipParam], pOverlay, isATemplate, templateName, parent);
 
         }
 
