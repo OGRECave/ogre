@@ -27,6 +27,8 @@ THE SOFTWARE.
 #include "OgreOverlayTranslator.h"
 #include "OgreFontManager.h"
 #include "OgreScriptTranslator.h"
+#include "OgreOverlayManager.h"
+#include "OgreOverlayContainer.h"
 
 namespace Ogre
 {
@@ -129,12 +131,142 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
     }
 }
 
+void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr& node)
+{
+    ObjectAbstractNode* obj = static_cast<ObjectAbstractNode*>(node.get());
+
+    bool isATemplate = obj->cls != "overlay";
+
+    String name;
+    // legacy compat
+    if ((obj->cls == "template") && !obj->values.empty())
+    {
+        getString(obj->values.front(), &name);
+        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, obj->file, obj->line, "template. use overlay_element");
+    }
+    else
+        name = obj->name;
+
+    String type;
+    if(obj->values.empty() || ((obj->cls == "template") && obj->values.size() == 1))
+    {
+        // legacy naming support
+        std::vector<String> params = StringUtil::split(name, "()", 2);
+
+        if (params.size() != 2)
+        {
+            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line,
+                               "expecting 'element type(name)' or 'overlay_element name type'");
+            return;
+        }
+
+        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, obj->file, obj->line, "'element type(name)'. use 'overlay_element name type'");
+
+        type = params[0];
+        name = params[1];
+    }
+    else
+        getString(obj->values.front(), &type);
+
+    String templateName;
+    if(!obj->bases.empty())
+        templateName = obj->bases.front();
+
+    OverlayElement* newElement = OverlayManager::getSingleton().createOverlayElementFromTemplate(
+        templateName, type, name, isATemplate);
+
+    if(obj->parent && obj->parent->context.has_value())
+    {
+        Overlay** overlay = any_cast<Overlay*>(&obj->parent->context);
+        if(overlay && newElement->isContainer())
+            (*overlay)->add2D((OverlayContainer*)newElement);
+        else
+            any_cast<OverlayContainer*>(obj->parent->context)->addChild(newElement);
+    }
+
+    if(newElement->isContainer())
+        obj->context = Any((OverlayContainer*)newElement);
+
+    String val;
+    for (auto& c : obj->children)
+    {
+        if (c->type == ANT_PROPERTY)
+        {
+            PropertyAbstractNode* prop = static_cast<PropertyAbstractNode*>(c.get());
+
+            bool succ = true;
+            if(prop->values.size() > 1)
+            {
+                // FIXME: joining string, just so setParameter can split it again..
+                StringStream ss;
+                for(auto& v : prop->values) {
+                    succ = succ && getString(v, &val);
+                    ss << val << " ";
+                }
+                val = ss.str();
+            }
+            else
+            {
+                succ = getString(prop->values.front(), &val);
+            }
+
+            if(!succ || !newElement->setParameter(prop->name, val))
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+        }
+        else if(c->type == ANT_OBJECT)
+            translate(compiler, c); // recurse
+    }
+}
+
+void OverlayTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr& node)
+{
+    ObjectAbstractNode* obj = static_cast<ObjectAbstractNode*>(node.get());
+
+    // Must have a name - unless we are in legacy mode. Then the class is the name.
+    if (obj->name.empty() && obj->cls == "overlay")
+    {
+        compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line,
+                           "overlay must be given a name");
+        return;
+    }
+
+    String& name = obj->cls == "overlay" ? obj->name : obj->cls;
+    Overlay* overlay = OverlayManager::getSingleton().create(name);
+    overlay->_notifyOrigin(obj->file);
+
+    obj->context = Any(overlay);
+
+    for (auto& c : obj->children)
+    {
+        if (c->type == ANT_PROPERTY)
+        {
+            PropertyAbstractNode* prop = static_cast<PropertyAbstractNode*>(c.get());
+
+            if (prop->name != "zorder")
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, prop->name);
+                continue;
+            }
+            uint32 zorder;
+            getUInt(c, &zorder);
+            overlay->setZOrder((ushort)zorder);
+        }
+        else if(c->type == ANT_OBJECT)
+            processNode(compiler, c);
+    }
+}
+
 OverlayTranslatorManager::OverlayTranslatorManager()
 {
 //! [font_register]
     ScriptCompilerManager::getSingleton().addTranslatorManager(this);
     ID_FONT = ScriptCompilerManager::getSingleton().registerCustomWordId("font");
 //! [font_register]
+    ID_OVERLAY_ELEMENT = ScriptCompilerManager::getSingleton().registerCustomWordId("overlay_element");
+    ID_OVERLAY = ScriptCompilerManager::getSingleton().registerCustomWordId("overlay");
+    ID_CONTAINER = ScriptCompilerManager::getSingleton().registerCustomWordId("container");
+    ID_ELEMENT = ScriptCompilerManager::getSingleton().registerCustomWordId("element");
+    ID_TEMPLATE = ScriptCompilerManager::getSingleton().registerCustomWordId("template");
 }
 
 OverlayTranslatorManager::~OverlayTranslatorManager()
@@ -157,6 +289,13 @@ ScriptTranslator* OverlayTranslatorManager::getTranslator(const AbstractNodePtr&
     // legacy compatibility: assume this is a font if we are in a .fontdef file
     if (obj->id == 0 && StringUtil::endsWith(node->file, ".fontdef"))
         return &mFontTranslator;
+
+    if (obj->id == ID_CONTAINER || obj->id == ID_TEMPLATE || obj->id == ID_ELEMENT || obj->id == ID_OVERLAY_ELEMENT)
+        return &mElementTranslator;
+
+    // legacy compatibility: assume this is an overlay if we are in a .overlay file
+    if(obj->id == ID_OVERLAY || (obj->id == 0 && StringUtil::endsWith(node->file, ".overlay")))
+        return &mOverlayTranslator;
 
     return NULL;
 }
