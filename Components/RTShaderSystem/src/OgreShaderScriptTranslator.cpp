@@ -42,11 +42,11 @@ void SGScriptTranslator::translate(ScriptCompiler* compiler, const AbstractNodeP
     ObjectAbstractNode* parent = static_cast<ObjectAbstractNode*>(obj->parent);
 
     // Translate section within a pass context.
-    if (parent->cls == "pass")
+    if (parent->id == ID_PASS)
     {
         translatePass(compiler, node);
     }
-    if (parent->cls == "texture_unit")
+    if (parent->id == ID_TEXTURE_UNIT)
     {
         translateTextureUnit(compiler, node);
     }

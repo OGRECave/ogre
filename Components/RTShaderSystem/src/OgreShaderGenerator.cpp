@@ -138,8 +138,7 @@ bool ShaderGenerator::_initialize()
     // Allocate script translator manager.
     mScriptTranslatorManager = OGRE_NEW SGScriptTranslatorManager(this);
     ScriptCompilerManager::getSingleton().addTranslatorManager(mScriptTranslatorManager);
-    ScriptCompilerManager::getSingleton().registerCustomWordId("rtshader_system");
-    addCustomScriptTranslator("rtshader_system", &mCoreScriptTranslator);
+    ID_RT_SHADER_SYSTEM = ScriptCompilerManager::getSingleton().registerCustomWordId("rtshader_system");
 
     // Create the default scheme.
     createScheme(DEFAULT_SCHEME_NAME);
@@ -268,8 +267,6 @@ void ShaderGenerator::_destroy()
         OGRE_DELETE mProgramWriterManager;
         mProgramWriterManager = NULL;
     }
-
-    removeCustomScriptTranslator("rtshader_system");
 
     // Delete script translator manager.
     if (mScriptTranslatorManager != NULL)
@@ -1216,52 +1213,19 @@ void ShaderGenerator::flushShaderCache()
 }
 
 //-----------------------------------------------------------------------------
-bool ShaderGenerator::addCustomScriptTranslator(const String& key, ScriptTranslator* translator)
-{
-    OGRE_LOCK_AUTO_MUTEX;
-
-    SGScriptTranslatorIterator itFind = mScriptTranslatorsMap.find(key);
-
-    if (itFind != mScriptTranslatorsMap.end())  
-        return false;
-    
-    mScriptTranslatorsMap[key] = translator;
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::removeCustomScriptTranslator(const String& key)
-{
-    OGRE_LOCK_AUTO_MUTEX;
-
-    SGScriptTranslatorIterator itFind = mScriptTranslatorsMap.find(key);
-
-    if (itFind == mScriptTranslatorsMap.end())  
-        return false;
-
-    mScriptTranslatorsMap.erase(itFind);
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
 ScriptTranslator* ShaderGenerator::getTranslator(const AbstractNodePtr& node)
 {
     OGRE_LOCK_AUTO_MUTEX;
 
-    ScriptTranslator *translator = 0;
+    if(node->type != ANT_OBJECT)
+        return NULL;
     
-    if(node->type == Ogre::ANT_OBJECT)
-    {
-        ObjectAbstractNode *obj           = static_cast<ObjectAbstractNode*>(node.get());
-        SGScriptTranslatorIterator itFind = mScriptTranslatorsMap.find(obj->cls);
-        
-        if(itFind != mScriptTranslatorsMap.end())
-            translator = itFind->second;
-    }
+    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
+
+    if(obj->id == ID_RT_SHADER_SYSTEM)
+        return &mCoreScriptTranslator;
     
-    return translator;
+    return NULL;
 }
 
 //-----------------------------------------------------------------------------
