@@ -62,13 +62,6 @@ namespace Ogre {
         OverlayMap mOverlayMap;
         StringVector mScriptPatterns;
 
-        void parseNewElement( DataStreamPtr& chunk, int& l, String& elemType, String& elemName,
-            Overlay* pOverlay, bool isTemplate, String templateName = String(""), OverlayContainer* container = 0);
-        void parseAttrib( const String& line, Overlay* pOverlay);
-        void parseElementAttrib( const String& line, Overlay* pOverlay, OverlayElement* pElement );
-        void skipToNextCloseBrace(DataStreamPtr& chunk, int& l);
-        void skipToNextOpenBrace(DataStreamPtr& chunk, int& l);
-
         int mLastViewportWidth, mLastViewportHeight;
         OrientationMode mLastViewportOrientationMode;
 
@@ -79,9 +72,6 @@ namespace Ogre {
 
         ElementMap mInstances;
         ElementMap mTemplates;
-
-        typedef std::set<String> LoadedScripts;
-        LoadedScripts mLoadedScripts;
 
         std::unique_ptr<ScriptTranslatorManager> mTranslatorManager;
 

@@ -609,21 +609,18 @@ namespace Ogre
                 ObjectAbstractNode *obj = (ObjectAbstractNode*)(*i).get();
 
                 // Overlay base classes in order.
-                for (std::vector<String>::const_iterator baseIt = obj->bases.begin(), end_it = obj->bases.end(); baseIt != end_it; ++baseIt)
+                for (const String& base : obj->bases)
                 {
-                    const String& base = *baseIt;
                     // Check the top level first, then check the import table
                     AbstractNodeList newNodes = locateTarget(top, base);
                     if(newNodes.empty())
                         newNodes = locateTarget(mImportTable, base);
 
-                    if (!newNodes.empty()) {
-                        for(AbstractNodeList::iterator j = newNodes.begin(); j != newNodes.end(); ++j) {
-                            overlayObject(**j, *obj);
-                        }
-                    } else {
+                    if (newNodes.empty())
                         addError(CE_OBJECTBASENOTFOUND, obj->file, obj->line, base);
-                    }
+
+                    for(const auto& n : newNodes)
+                        overlayObject(*n, *obj);
                 }
 
                 // Recurse into children
@@ -642,6 +639,12 @@ namespace Ogre
         if(source.type == ANT_OBJECT)
         {
             const ObjectAbstractNode& src = static_cast<const ObjectAbstractNode&>(source);
+
+#ifdef OGRE_BUILD_COMPONENT_OVERLAY
+            // uses custom inheritance for renaming children
+            if(!src.abstract && (dest.cls == "overlay_element"))
+                return;
+#endif
 
             // Overlay the environment of one on top the other first
             for(std::map<String,String>::const_iterator i = src.getVariables().begin(); i != src.getVariables().end(); ++i)

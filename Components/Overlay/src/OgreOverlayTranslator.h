@@ -41,11 +41,27 @@ struct FontTranslator : public ScriptTranslator
 };
 //! [font_translator]
 
+struct ElementTranslator : public ScriptTranslator
+{
+    void translate(ScriptCompiler* compiler, const AbstractNodePtr& node);
+};
+
+struct OverlayTranslator : public ScriptTranslator
+{
+    void translate(ScriptCompiler* compiler, const AbstractNodePtr& node);
+};
+
 class OverlayTranslatorManager : public ScriptTranslatorManager
 {
     FontTranslator mFontTranslator;
+    ElementTranslator mElementTranslator;
+    OverlayTranslator mOverlayTranslator;
     uint32 ID_FONT;
-
+    uint32 ID_OVERLAY_ELEMENT;
+    uint32 ID_OVERLAY;
+    uint32 ID_CONTAINER;
+    uint32 ID_ELEMENT;
+    uint32 ID_TEMPLATE;
 public:
     OverlayTranslatorManager();
     ~OverlayTranslatorManager();
