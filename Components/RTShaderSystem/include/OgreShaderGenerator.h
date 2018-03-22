@@ -534,7 +534,7 @@ protected:
     typedef SGSchemeMap::iterator                   SGSchemeIterator;
     typedef SGSchemeMap::const_iterator             SGSchemeConstIterator;
 
-    typedef map<String, ScriptTranslator*>::type        SGScriptTranslatorMap;
+    typedef map<uint32, ScriptTranslator*>::type        SGScriptTranslatorMap;
     typedef SGScriptTranslatorMap::iterator         SGScriptTranslatorIterator;
     typedef SGScriptTranslatorMap::const_iterator   SGScriptTranslatorConstIterator;
 
@@ -884,12 +884,6 @@ protected:
         {
             mOwner = owner;
         }
-
-        /// Returns the number of translators being managed
-        virtual size_t getNumTranslators() const
-        {
-            return mOwner->getNumTranslators();
-        }
         
         /// Returns a manager for the given object abstract node, or null if it is not supported
         virtual ScriptTranslator *getTranslator(const AbstractNodePtr& node)
@@ -978,24 +972,6 @@ protected:
     */
     SubRenderState* createSubRenderState(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator);
 
-    /** 
-    Add custom script translator. 
-    Return true upon success.
-    @param key The key name of the given translator.
-    @param translator The translator to associate with the given key.
-    */
-    bool addCustomScriptTranslator(const String& key, ScriptTranslator* translator);
-
-    /** 
-    Remove custom script translator. 
-    Return true upon success.
-    @param key The key name of the translator to remove.    
-    */
-    bool removeCustomScriptTranslator(const String& key);
-
-    /** Return number of script translators. */
-    size_t getNumTranslators() const;
-
     /** Return a matching script translator. */
     ScriptTranslator* getTranslator(const AbstractNodePtr& node);
 
@@ -1049,8 +1025,6 @@ protected:
     SGMaterialSerializerListener* mMaterialSerializerListener;
     // get notified if materials get dropped
     SGResourceGroupListener* mResourceGroupListener;
-    // A map of the registered custom script translators.
-    SGScriptTranslatorMap mScriptTranslatorsMap;
     // The core translator of the RT Shader System.
     SGScriptTranslator mCoreScriptTranslator;
     // The target shader language (currently only cg supported).
@@ -1095,6 +1069,8 @@ protected:
     bool mCreateShaderOverProgrammablePass;
     // A flag to indicate finalizing
     bool mIsFinalizing;
+
+    uint32 ID_RT_SHADER_SYSTEM;
 private:
     friend class SGPass;
     friend class FFPRenderStateBuilder;

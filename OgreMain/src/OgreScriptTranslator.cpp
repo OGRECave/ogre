@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreStableHeaders.h"
-#include "OgreScriptTranslator.h"
+#include "OgreBuiltinScriptTranslators.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreParticleSystemRenderer.h"
@@ -6801,11 +6801,6 @@ namespace Ogre{
      *************************************************************************/
     BuiltinScriptTranslatorManager::BuiltinScriptTranslatorManager()
     {
-    }
-    //-------------------------------------------------------------------------
-    size_t BuiltinScriptTranslatorManager::getNumTranslators() const
-    {
-        return 12;
     }
     //-------------------------------------------------------------------------
     ScriptTranslator *BuiltinScriptTranslatorManager::getTranslator(const AbstractNodePtr &node)

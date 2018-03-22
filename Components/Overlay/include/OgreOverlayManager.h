@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreScriptLoader.h"
 #include "OgreFrustum.h"
+#include "OgreScriptTranslator.h"
 
 namespace Ogre {
     class Overlay;
@@ -82,8 +83,7 @@ namespace Ogre {
         typedef set<String>::type LoadedScripts;
         LoadedScripts mLoadedScripts;
 
-
-
+        std::unique_ptr<ScriptTranslatorManager> mTranslatorManager;
 
         ElementMap& getElementMap(bool isTemplate);
 

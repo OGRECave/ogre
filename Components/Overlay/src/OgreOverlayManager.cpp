@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreResourceGroupManager.h"
 #include "OgreOverlayElementFactory.h"
 #include "OgreStringConverter.h"
+#include "OgreOverlayTranslator.h"
 
 namespace Ogre {
 
@@ -58,7 +59,7 @@ namespace Ogre {
         // Scripting is supported by this manager
         mScriptPatterns.push_back("*.overlay");
         ResourceGroupManager::getSingleton()._registerScriptLoader(this);
-
+        mTranslatorManager.reset(new OverlayTranslatorManager());
     }
     //---------------------------------------------------------------------
     OverlayManager::~OverlayManager()
