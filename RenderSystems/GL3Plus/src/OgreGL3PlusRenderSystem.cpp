@@ -515,6 +515,9 @@ namespace Ogre {
         if (hasMinGLVersion(4, 3) || checkExtension("GL_KHR_debug"))
             rsc->setCapability(RSC_DEBUG);
 
+        if( hasMinGLVersion(4, 3) || checkExtension("GL_ARB_ES3_compatibility"))
+            rsc->setCapability(RSC_PRIMITIVE_RESTART);
+
         return rsc;
     }
 
@@ -1970,7 +1973,7 @@ namespace Ogre {
 #endif
         }
 
-        if(hasMinGLVersion(4, 3) || checkExtension("GL_ARB_ES3_compatibility"))
+        if(getCapabilities()->hasCapability(RSC_PRIMITIVE_RESTART))
         {
             OGRE_CHECK_GL_ERROR(glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX));
         }

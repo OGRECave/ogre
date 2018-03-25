@@ -74,6 +74,8 @@ namespace Ogre
     /// b is the value (from 0 to 27)
     enum Capabilities
     {
+        /// specifying a "-1" in the index buffer starts a new draw command.
+        RSC_PRIMITIVE_RESTART = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 0),
         /// GL ES2/ES3 does not support generating mipmaps for compressed formats in hardware
         RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 1),
         /// Supports anisotropic texture filtering

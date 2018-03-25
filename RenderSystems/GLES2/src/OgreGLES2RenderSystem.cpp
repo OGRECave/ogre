@@ -497,6 +497,8 @@ namespace Ogre {
         {
             // Check if render to vertex buffer (transform feedback in OpenGL)
             rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
+
+            rsc->setCapability(RSC_PRIMITIVE_RESTART);
         }
         return rsc;
     }
@@ -1811,7 +1813,7 @@ namespace Ogre {
     {
         mStateCacheManager->setDisabled(GL_DITHER);
 
-        if(!hasMinGLVersion(3, 0))
+        if(!getCapabilities()->hasCapability(RSC_PRIMITIVE_RESTART))
             return;
 
         // Enable primitive restarting with fixed indices depending upon the data type
