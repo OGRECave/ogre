@@ -129,8 +129,7 @@ namespace Ogre {
             mNumMipmaps = maxMips;
 
         // Check if we can do HW mipmap generation
-        mMipmapsHardwareGenerated =
-            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP);
+        mMipmapsHardwareGenerated = true;
         
         // Generate texture name
         glGenTextures( 1, &mTextureID );
@@ -152,8 +151,7 @@ namespace Ogre {
             mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
 
-        if((mUsage & TU_AUTOMIPMAP) &&
-            mNumRequestedMipmaps && mMipmapsHardwareGenerated)
+        if ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps)
         {
             mRenderSystem->_getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
         }

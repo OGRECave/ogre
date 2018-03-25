@@ -250,7 +250,6 @@ namespace Ogre {
         rsc->parseVendorFromString(mGLSupport->getGLVendor());
 
         // Check for hardware mipmapping support.
-        rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
 
         // Multitexturing support and set number of texture units

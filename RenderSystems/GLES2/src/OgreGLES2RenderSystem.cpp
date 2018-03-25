@@ -354,9 +354,6 @@ namespace Ogre {
         // GL always shares vertex and fragment texture units (for now?)
         rsc->setVertexTextureUnitsShared(true);
 
-        // Hardware support mipmapping
-        rsc->setCapability(RSC_AUTOMIPMAP);
-
         // Blending support
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 

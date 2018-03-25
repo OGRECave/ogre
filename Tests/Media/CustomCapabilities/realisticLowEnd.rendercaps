@@ -1,7 +1,7 @@
 render_system_capabilities "TestCaps Realistic Low-End GPU" 
 {
 render_system_name Direct3D9 Rendering Subsystem
-automipmap true
+automipmap_compressed true
 blending true
 anisotropy true
 dot3 true

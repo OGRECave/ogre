@@ -61,7 +61,6 @@ static void checkCaps(const Ogre::RenderSystemCapabilities* caps)
 {
     using namespace Ogre;
 
-    EXPECT_EQ(caps->hasCapability(RSC_AUTOMIPMAP), true);
     EXPECT_EQ(caps->hasCapability(RSC_ANISOTROPY), true);
     EXPECT_EQ(caps->hasCapability(RSC_DOT3), true);
     EXPECT_EQ(caps->hasCapability(RSC_CUBEMAPPING), true);

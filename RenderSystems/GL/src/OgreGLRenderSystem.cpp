@@ -244,8 +244,6 @@ namespace Ogre {
         // Supports fixed-function
         rsc->setCapability(RSC_FIXED_FUNCTION);
 
-
-        rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
 
         // Check for Multitexturing support and set number of texture units

@@ -100,7 +100,6 @@ TEST_F(RenderSystemCapabilitiesTests,HasCapability)
     RenderSystemCapabilities rsc;
 
     // check that no caps (from 2 categories) are supported
-    EXPECT_TRUE(!rsc.hasCapability(RSC_AUTOMIPMAP));
     EXPECT_TRUE(!rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
     EXPECT_TRUE(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
     EXPECT_TRUE(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
@@ -109,12 +108,10 @@ TEST_F(RenderSystemCapabilitiesTests,HasCapability)
     EXPECT_TRUE(!rsc.hasCapability(RSC_PBUFFER));
 
     // add support for few caps from each category
-    rsc.setCapability(RSC_AUTOMIPMAP);
     rsc.setCapability(RSC_FRAGMENT_PROGRAM);
     rsc.setCapability(RSC_TEXTURE_COMPRESSION);
 
     // check that the newly set caps are supported
-    EXPECT_TRUE(rsc.hasCapability(RSC_AUTOMIPMAP));
     EXPECT_TRUE(rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
     EXPECT_TRUE(rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
 
@@ -145,7 +142,7 @@ TEST_F(RenderSystemCapabilitiesTests,SerializeEnumCapability)
     EXPECT_TRUE(rsc != 0);
 
     // confirm that the contents are the same as in .rendercaps file
-    EXPECT_TRUE(rsc->hasCapability(RSC_AUTOMIPMAP));
+    EXPECT_TRUE(rsc->hasCapability(RSC_AUTOMIPMAP_COMPRESSED));
 }
 //--------------------------------------------------------------------------
 TEST_F(RenderSystemCapabilitiesTests,SerializeStringCapability)
@@ -224,7 +221,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteSimpleCapabilities)
     // set up caps of every type
     RenderSystemCapabilitiesSerializer serializer;
     RenderSystemCapabilities caps;
-    caps.setCapability(RSC_AUTOMIPMAP);
     caps.setMaxPointSize(10.5);
     caps.addShaderProfile("vs999");
     caps.addShaderProfile("sp999");
@@ -257,7 +253,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteSimpleCapabilities)
     EXPECT_EQ(String(""), lines.back());
 
     // check that all the set caps are there
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tmax_point_size 10.5") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tshader_profile sp999") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared true") != lines.end());
@@ -304,7 +299,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
     EXPECT_EQ(String(""), lines.back());
 
     // confirm every caps
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap false") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap_compressed false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tcubemapping false") != lines.end());
@@ -360,7 +355,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     // set all caps
     caps.setVertexTextureUnitsShared(true);
 
-    caps.setCapability(RSC_AUTOMIPMAP);
+    caps.setCapability(RSC_AUTOMIPMAP_COMPRESSED);
     caps.setCapability(RSC_ANISOTROPY);
     caps.setCapability(RSC_DOT3);
     caps.setCapability(RSC_CUBEMAPPING);
@@ -425,7 +420,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     EXPECT_EQ(String(""), lines.back());
 
     // confirm all caps
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap true") != lines.end());
+    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap_compressed true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tcubemapping true") != lines.end());
@@ -481,7 +476,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     // set all caps
     caps.setVertexTextureUnitsShared(true);
 
-    caps.setCapability(RSC_AUTOMIPMAP);
     caps.setCapability(RSC_DOT3);
     caps.setCapability(RSC_CUBEMAPPING);
     caps.setCapability(RSC_HWSTENCIL);
@@ -558,7 +552,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     // create a reference, so that were are working with two refs
     RenderSystemCapabilities& caps2 = *rsc;
 
-    EXPECT_EQ(caps.hasCapability(RSC_AUTOMIPMAP), caps2.hasCapability(RSC_AUTOMIPMAP));
     EXPECT_EQ(caps.hasCapability(RSC_ANISOTROPY), caps2.hasCapability(RSC_ANISOTROPY));
     EXPECT_EQ(caps.hasCapability(RSC_DOT3), caps2.hasCapability(RSC_DOT3));
     EXPECT_EQ(caps.hasCapability(RSC_CUBEMAPPING), caps2.hasCapability(RSC_CUBEMAPPING));
