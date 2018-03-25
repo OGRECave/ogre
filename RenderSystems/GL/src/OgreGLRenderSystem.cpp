@@ -790,8 +790,6 @@ namespace Ogre {
             // Create FBO manager
             LogManager::getSingleton().logMessage("GL: Using GL_EXT_framebuffer_object for rendering to textures (best)");
             mRTTManager = new GLFBOManager(false);
-            caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
-
             //TODO: Check if we're using OpenGL 3.0 and add RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL flag
         }
         else

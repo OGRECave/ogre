@@ -1005,7 +1005,6 @@ namespace Ogre
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setStencilBufferBitDepth(8);
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
-        rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
         rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
         rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);

@@ -1031,7 +1031,6 @@ namespace Ogre
         rsc->setCapability(RSC_USER_CLIP_PLANES);
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
 
-        rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
         rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
 
 

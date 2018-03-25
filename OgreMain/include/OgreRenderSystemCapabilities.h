@@ -158,8 +158,8 @@ namespace Ogre
         /// Supports Blending operations other than +
 		/// @deprecated All targetted APIs by Ogre support this feature.
         RSC_ADVANCED_BLEND_OPERATIONS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
-        /// Supports a separate depth buffer for RTTs. D3D 9 & 10, OGL w/FBO (RSC_FBO implies this flag)
-        RSC_RTT_SEPARATE_DEPTHBUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 13),
+        /// Supports HW gamma, both in the framebuffer and as texture.
+        RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 13),
         /// Supports using the MAIN depth buffer for RTTs. D3D 9&10, OGL w/FBO support unknown
         /// (undefined behavior?), OGL w/ copy supports it
         RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 14),
@@ -188,8 +188,6 @@ namespace Ogre
         RSC_ATOMIC_COUNTERS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 25),
         /// Supports reading back the inactive depth-stencil buffer as texture
         RSC_READ_BACK_AS_TEXTURE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
-        /// Supports HW gamma, both in the framebuffer and as texture.
-        RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 27),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

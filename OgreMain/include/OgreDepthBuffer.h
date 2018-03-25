@@ -60,11 +60,8 @@ namespace Ogre
 
         Behavior is consistent across all render systems, if, and only if, the same RSC flags are set
         RSC flags that affect this class are:
-            * RSC_RTT_SEPARATE_DEPTHBUFFER:
-                The RTT can create a custom depth buffer different from the main depth buffer. This means,
-                an RTT is able to not share it's depth buffer with the main window if it wants to.
             * RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE:
-                When RSC_RTT_SEPARATE_DEPTHBUFFER is set, some APIs (ie. OpenGL w/ FBO) don't allow using
+                some APIs (ie. OpenGL w/ FBO) don't allow using
                 the main depth buffer for offscreen RTTs. When this flag is set, the depth buffer can be
                 shared between the main window and an RTT.
             * RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL:

@@ -529,7 +529,6 @@ namespace Ogre {
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
         mRTTManager = new GLES2FBOManager();
-        caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 
         Log* defaultLog = LogManager::getSingleton().getDefaultLog();
         if (defaultLog)
