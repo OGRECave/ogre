@@ -62,17 +62,17 @@ namespace Ogre {
         OverlayMap mOverlayMap;
         StringVector mScriptPatterns;
 
-        void parseNewElement( DataStreamPtr& chunk, String& elemType, String& elemName, 
+        void parseNewElement( DataStreamPtr& chunk, int& l, String& elemType, String& elemName,
             Overlay* pOverlay, bool isTemplate, String templateName = String(""), OverlayContainer* container = 0);
         void parseAttrib( const String& line, Overlay* pOverlay);
         void parseElementAttrib( const String& line, Overlay* pOverlay, OverlayElement* pElement );
-        void skipToNextCloseBrace(DataStreamPtr& chunk);
-        void skipToNextOpenBrace(DataStreamPtr& chunk);
+        void skipToNextCloseBrace(DataStreamPtr& chunk, int& l);
+        void skipToNextOpenBrace(DataStreamPtr& chunk, int& l);
 
         int mLastViewportWidth, mLastViewportHeight;
         OrientationMode mLastViewportOrientationMode;
 
-        bool parseChildren( DataStreamPtr& chunk, const String& line,
+        bool parseChildren( DataStreamPtr& chunk, const String& line, int& l,
             Overlay* pOverlay, bool isTemplate, OverlayContainer* parent = NULL);
 
         FactoryMap mFactories;
