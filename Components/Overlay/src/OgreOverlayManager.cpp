@@ -219,12 +219,24 @@ namespace Ogre {
             // Ignore comments & blanks
             if (!(line.length() == 0 || line.substr(0,2) == "//"))
             {
-                if (line.substr(0,8) == "#include")
+                String import;
+                if(StringUtil::startsWith(line, "import "))
+                {
+                    vector<String>::type params = StringUtil::split(line, "\t\n \"");
+                    import = params[3];
+                }
+                else if (StringUtil::startsWith(line, "#include"))
                 {
                     vector<String>::type params = StringUtil::split(line, "\t\n ()<>");
+                    import = params[1];
+                }
+
+                if (!import.empty())
+                {
+
                     DataStreamPtr includeStream = 
                         ResourceGroupManager::getSingleton().openResource(
-                            params[1], groupName);
+                            import, groupName);
                     parseScript(includeStream, groupName);
                     continue;
                 }
@@ -233,7 +245,10 @@ namespace Ogre {
                     // No current overlay
 
                     // check to see if there is a template
-                    if (line.substr(0,8) == "template")
+                    if (StringUtil::startsWith(line, "template ") ||
+                        StringUtil::startsWith(line, "element ") ||
+                        StringUtil::startsWith(line, "container ") ||
+                        StringUtil::startsWith(line, "overlay_element "))
                     {
                         isATemplate = true;
                     }
@@ -337,11 +352,7 @@ namespace Ogre {
     {
         String line;
 
-        OverlayElement* newElement = NULL;
-        newElement = 
-                OverlayManager::getSingleton().createOverlayElementFromTemplate(templateName, elemType, elemName, isATemplate);
-
-            // do not add a template to an overlay
+        OverlayElement* newElement = createOverlayElementFromTemplate(templateName, elemType, elemName, isATemplate);
 
         // add new element to parent
         if (container)
@@ -352,7 +363,8 @@ namespace Ogre {
         // do not add a template to the overlay. For templates overlay = 0
         else if (pOverlay)  
         {
-            pOverlay->add2D((OverlayContainer*)newElement);
+            if(newElement->isContainer())
+                pOverlay->add2D((OverlayContainer*)newElement);
         }
 
         while(!stream->eof())
@@ -368,7 +380,8 @@ namespace Ogre {
                 }
                 else
                 {
-                    if (isContainer && parseChildren(stream,line, pOverlay, isATemplate, static_cast<OverlayContainer*>(newElement)))
+                    if (newElement->isContainer() &&
+                        parseChildren(stream,line, pOverlay, isATemplate, static_cast<OverlayContainer*>(newElement)))
                     {
                         // nested children... don't reparse it
                     }
@@ -388,6 +401,15 @@ namespace Ogre {
     {
         bool ret = false;
         uint skipParam =0;
+
+        int TYPE = 2;
+        int NAME = 1;
+
+        bool legacyFormat = line.find('(') != String::npos;
+
+        if(legacyFormat)
+            std::swap(TYPE, NAME);
+
         vector<String>::type params = StringUtil::split(line, "\t\n ()");
 
         if (isATemplate)
@@ -399,7 +421,8 @@ namespace Ogre {
         }
                         
         // top level component cannot be an element, it must be a container unless it is a template
-        if (params[0+skipParam] == "container" || (params[0+skipParam] == "element" && (isATemplate || parent != NULL)) )
+        if (params[0 + skipParam] == "overlay_element" || params[0 + skipParam] == "element" ||
+            params[0 + skipParam] == "container")
         {
             String templateName;
             ret = true;
@@ -442,8 +465,8 @@ namespace Ogre {
             }
        
             skipToNextOpenBrace(stream);
-            parseNewElement(stream, params[1+skipParam], params[2+skipParam], true, pOverlay, isATemplate, templateName, (OverlayContainer*)parent);
-
+            parseNewElement(stream, params[TYPE + skipParam], params[NAME + skipParam], true, pOverlay,
+                            isATemplate, templateName, parent);
         }
 
 
