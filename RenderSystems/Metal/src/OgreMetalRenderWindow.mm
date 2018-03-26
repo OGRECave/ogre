@@ -127,6 +127,7 @@ namespace Ogre
                         width: mWidth height: mHeight mipmapped: NO];
                 desc.textureType = MTLTextureType2DMultisample;
                 desc.sampleCount = mFSAA;
+                desc.usage = MTLTextureUsageRenderTarget;
 
                 mMsaaTex = [mOwnerDevice->mDevice newTextureWithDescriptor: desc];
                 mColourAttachmentDesc.texture = mMsaaTex;
