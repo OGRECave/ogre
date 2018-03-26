@@ -37,17 +37,19 @@ namespace Ogre {
         mSceneLoaders.insert(std::pair<String, SceneLoader*>(name, sl));
     }
     
-    SceneLoader *SceneLoaderManager::getByName(const String& name)
+    void SceneLoaderManager::load(const String& loaderName, DataStreamPtr& stream, const String& groupName, SceneNode *rootNode)
     {
-        auto i = mSceneLoaders.find(name);
-        SceneLoader *sl;
+        auto i = mSceneLoaders.find(loaderName);
         
         if(i == mSceneLoaders.end())
-            sl = NULL;
-        else
-            sl = i -> second;
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+			  String("SceneLoader with name \"") +
+                loaderName + String("\" was not found"),
+                "SceneLoaderManager::load");
         
-        return sl;
+        SceneLoader *sl = i -> second;
+        
+        sl -> load (stream, groupName, rootNode);
     }
     
 }
