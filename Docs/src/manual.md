@@ -813,7 +813,7 @@ overlay MyOverlays/ANewOverlay
 {
     zorder 200
 
-    container Panel(MyOverlayElements/TestPanel)
+    overlay_element MyOverlayElements/TestPanel Panel
     {
         // Center it horizontally, put it at the top
         left 0.25
@@ -823,7 +823,7 @@ overlay MyOverlays/ANewOverlay
         material MyMaterials/APanelMaterial
 
         // Another panel nested in this one
-        container Panel(MyOverlayElements/AnotherPanel)
+        overlay_element MyOverlayElements/AnotherPanel Panel
         {
              left 0
              top 0
@@ -841,26 +841,13 @@ Every overlay in the script must be given a name, which is the line before the f
 
 # Adding elements to the overlay {#Adding-elements-to-the-overlay}
 
-Within an overlay, you can include any number of 2D or 3D elements. You do this by defining a nested block headed by:
+Within an overlay, you can include any number of 2D or 3D elements. You do this by defining nested ’overlay_element’ blocks.
 
-<dl compact="compact">
-<dt>’element’</dt> <dd>
-
-if you want to define a 2D element which cannot have children of it’s own
-
-</dd> <dt>’container’</dt> <dd>
-
-if you want to define a 2D container object (which may itself have nested containers or elements)
-
-</dd> </dl> <br>
-
-The element and container blocks are pretty identical apart from their ability to store nested blocks.
-
-## ’container’ / ’element’ blocks
+## ’overlay_element’ blocks
 
 These are delimited by curly braces. The format for the header preceding the first brace is:
 
-\[container | element\] &lt;type\_name&gt; ( &lt;instance\_name&gt;) \[: &lt;template\_name&gt;\]<br> { ...
+overlay_element &lt;instance\_name&gt; &lt;type\_name&gt; \[: &lt;template\_name&gt;\]<br> { ...
 
 <dl compact="compact">
 <dt>type\_name</dt> <dd>
@@ -891,14 +878,14 @@ The properties which can be included within the braces depend on the custom type
 
 # Templates {#Templates}
 
-You can use templates to create numerous elements with the same properties. A template is an abstract element and it is not added to an overlay. It acts as a base class that elements can inherit and get its default properties. To create a template, the keyword ’template’ must be the first word in the element definition (before container or element). The template element is created in the topmost scope - it is NOT specified in an Overlay. It is recommended that you define templates in a separate overlay though this is not essential. Having templates defined in a separate file will allow different look & feels to be easily substituted.
+You can use templates to create numerous elements with the same properties. A template is an abstract element and it is not added to an overlay. It acts as a base class that elements can inherit and get its default properties. The template element is created in the topmost scope - it is NOT specified in an Overlay. It is recommended that you define templates in a separate overlay though this is not essential. Having templates defined in a separate file will allow different look & feels to be easily substituted.
 
 Elements can inherit a template in a similar way to C++ inheritance - by using the : operator on the element definition. The : operator is placed after the closing bracket of the name (separated by a space). The name of the template to inherit is then placed after the : operator (also separated by a space).
 
-A template can contain template children which are created when the template is subclassed and instantiated. Using the template keyword for the children of a template is optional but recommended for clarity, as the children of a template are always going to be templates themselves.
+A template can contain template children which are created when the template is subclassed and instantiated.
 
 ```cpp
-template container BorderPanel(MyTemplates/BasicBorderPanel)
+overlay_element MyTemplates/BasicBorderPanel BorderPanel
 {
     left 0
     top 0
@@ -920,7 +907,7 @@ template container BorderPanel(MyTemplates/BasicBorderPanel)
     border_bottom_uv 0.1914 0.2148 0.8086 0.0000
     border_bottomright_uv 0.8086 0.2148 1.0000 0.0000
 }
-template container Button(MyTemplates/BasicButton) : MyTemplates/BasicBorderPanel
+overlay_element MyTemplates/BasicButton Button : MyTemplates/BasicBorderPanel
 {
     left 0.82
     top 0.45
@@ -930,7 +917,7 @@ template container Button(MyTemplates/BasicButton) : MyTemplates/BasicBorderPane
     border_up_material Core/StatsBlockBorder/Up
     border_down_material Core/StatsBlockBorder/Down
 }
-template element TextArea(MyTemplates/BasicText)
+overlay_element MyTemplates/BasicText TextArea
 {
     font_name Ogre
     char_height 0.08
@@ -945,21 +932,21 @@ template element TextArea(MyTemplates/BasicText)
 overlay MyOverlays/AnotherOverlay
 {
     zorder 490
-    container BorderPanel(MyElements/BackPanel) : MyTemplates/BasicBorderPanel
+    overlay_element MyElements/BackPanel BorderPanel : MyTemplates/BasicBorderPanel
     {
         left 0
         top 0
         width 1
         height 1
 
-        container Button(MyElements/HostButton) : MyTemplates/BasicButton
+        overlay_element MyElements/HostButton Button : MyTemplates/BasicButton
         {
             left 0.82
             top 0.45
             caption MyTemplates/BasicText HOST
         }
 
-        container Button(MyElements/JoinButton) : MyTemplates/BasicButton
+        overlay_element MyElements/JoinButton Button : MyTemplates/BasicButton
         {
             left 0.82
             top 0.60
@@ -1115,7 +1102,7 @@ Although OGRE’s OverlayElement and OverlayContainer classes are designed to be
 
 This section describes how you define their custom attributes in an .overlay script, but you can also change these custom properties in code if you wish. You do this by calling setParameter(param, value). You may wish to use the StringConverter class to convert your types to and from strings.
 
-## Panel (container) {#Panel}
+## Panel {#Panel}
 
 This is the most bog-standard container you can use. It is a rectangular area which can contain other elements (or containers) and may or may not have a background, which can be tiled however you like. The background material is determined by the material attribute, but is only displayed if transparency is off.
 
@@ -1125,7 +1112,7 @@ This is the most bog-standard container you can use. It is a rectangular area wh
 
 @param uv\_coords <b>&lt;topleft\_u&gt; &lt;topleft\_v&gt; &lt;bottomright\_u&gt; &lt;bottomright\_v&gt;</b> Sets the texture coordinates to use for this panel.
 
-## BorderPanel (container) {#BorderPanel}
+## BorderPanel {#BorderPanel}
 
 This is a slightly more advanced version of Panel, where instead of just a single flat panel, the panel has a separate border which resizes with the panel. It does this by taking an approach very similar to the use of HTML tables for bordered content: the panel is rendered as 9 square areas, with the center area being rendered with the main material (as with Panel) and the outer 8 areas (the 4 corners and the 4 edges) rendered with a separate border material. The advantage of rendering the corners separately from the edges is that the edge textures can be designed so that they can be stretched without distorting them, meaning the single texture can serve any size panel.
 
@@ -1137,7 +1124,7 @@ This is a slightly more advanced version of Panel, where instead of just a singl
 
 @param border\_left\_uv <b>&lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;</b> \[also border\_right\_uv, border\_top\_uv, border\_bottom\_uv\]; The texture coordinates to be used for the edge areas of the border. 4 coordinates are required, 2 for the top-left corner, 2 for the bottom-right. Note that you should design the texture so that the left & right edges can be stretched / squashed vertically and the top and bottom edges can be stretched / squashed horizontally without detrimental effects.
 
-## TextArea (element) {#TextArea}
+## TextArea {#TextArea}
 
 This is a generic element that you can use to render text. It uses fonts which can be defined in code using the FontManager and Font classes, or which have been predefined in .fontdef files. See the font definitions section for more information.
 
