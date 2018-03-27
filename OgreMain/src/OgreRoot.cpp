@@ -1041,8 +1041,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr Root::openFileStream(const String& filename, const String& groupName,
-        const String& locationPattern)
+    DataStreamPtr Root::openFileStream(const String& filename, const String& groupName)
     {
         try
         {
