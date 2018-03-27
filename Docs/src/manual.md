@@ -215,7 +215,7 @@ Entities automatically have Material’s associated with them if they use a Ogre
 
 Overlays allow you to render 2D and 3D elements on top of the normal scene contents to create effects like heads-up displays (HUDs), menu systems, status panels etc. The frame rate statistics panel which comes as standard with OGRE is an example of an overlay. Overlays can contain 2D or 3D elements. 2D elements are used for HUDs, and 3D elements can be used to create cockpits or any other 3D object which you wish to be rendered on top of the rest of the scene.
 
-You can create overlays either through the Ogre::SceneManager::createOverlay method, or you can define them in an .overlay script. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling their ’show()’ method. You can also show multiple overlays at once, and their Z order is determined by the Ogre::Overlay::setZOrder() method.
+You can create overlays either through the Ogre::OverlayManager::create method, or you can define them in an .overlay script. See [Overlay Scripts](@ref Overlay-Scripts) for more info. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling Ogre::Overlay::show. You can also show multiple overlays at once, and their Z order is determined by the Ogre::Overlay::setZOrder() method.
 
 <a name="Notes-on-Integration"></a>
 
@@ -270,17 +270,11 @@ This mode is useful when you want items in the overlay to be the same size on th
 
 Another nice feature of overlays is being able to rotate, scroll and scale them as a whole. You can use this for zooming in / out menu systems, dropping them in from off screen and other nice effects. See the Ogre::Overlay::scroll, Ogre::Overlay::rotate and Ogre::Overlay::setScale methods for more information.
 
-<a name="Scripting-overlays"></a>
-
-## Scripting overlays
-
-Overlays can also be defined in scripts. See [Overlay Scripts](@ref Overlay-Scripts) for details.
-
 <a name="GUI-systems"></a>
 
 ## GUI systems
 
-Overlays are only really designed for non-interactive screen elements, although you can create a simple GUI using the [Trays System](@ref trays). For a far more complete GUI solution, we recommend [CEGui](<http://www.cegui.org.uk>), [MyGUI](<http://mygui.info/>) or [libRocket](<http://librocket.com/>)
+Overlays are only really designed for non-interactive screen elements, although you can create a simple GUI using the [Trays System](@ref trays). For a far more complete GUI solution, we recommend or [Dear ImGui](<https://github.com/OGRECave/ogre-imgui>), [CEGui](<http://www.cegui.org.uk>) or [MyGUI](<http://mygui.info/>).
 
 @page Scripts Scripts
 
