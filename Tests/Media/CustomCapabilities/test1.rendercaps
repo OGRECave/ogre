@@ -6,8 +6,8 @@ render_system_capabilities "TestCaps Blank"
 render_system_capabilities "TestCaps enum Capabilities"
 {
 	 // this rsc definition only contains RSC_XXX style caps
-	 automipmap true
-	 fbo_arb true
+	 automipmap_compressed true
+	 vao true
 }
 
 render_system_capabilities "TestCaps set String"

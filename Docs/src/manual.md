@@ -215,13 +215,13 @@ Entities automatically have Material’s associated with them if they use a Ogre
 
 Overlays allow you to render 2D and 3D elements on top of the normal scene contents to create effects like heads-up displays (HUDs), menu systems, status panels etc. The frame rate statistics panel which comes as standard with OGRE is an example of an overlay. Overlays can contain 2D or 3D elements. 2D elements are used for HUDs, and 3D elements can be used to create cockpits or any other 3D object which you wish to be rendered on top of the rest of the scene.
 
-You can create overlays either through the Ogre::SceneManager::createOverlay method, or you can define them in an .overlay script. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling their ’show()’ method. You can also show multiple overlays at once, and their Z order is determined by the Ogre::Overlay::setZOrder() method.
+You can create overlays either through the Ogre::OverlayManager::create method, or you can define them in an .overlay script. See [Overlay Scripts](@ref Overlay-Scripts) for more info. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling Ogre::Overlay::show. You can also show multiple overlays at once, and their Z order is determined by the Ogre::Overlay::setZOrder() method.
 
 <a name="Notes-on-Integration"></a>
 
 ## Notes on Integration
 
-The OverlaySystem is now its own component, you need to manually initialize it, with the following two lines of code (mSceneMgr is a pointer to your current Ogre::SceneManager):
+The OverlaySystem is its own component, you need to manually initialize it, with the following two lines of code (mSceneMgr is a pointer to your current Ogre::SceneManager):
 
 ```cpp
 Ogre::OverlaySystem* pOverlaySystem = new Ogre::OverlaySystem();
@@ -270,17 +270,11 @@ This mode is useful when you want items in the overlay to be the same size on th
 
 Another nice feature of overlays is being able to rotate, scroll and scale them as a whole. You can use this for zooming in / out menu systems, dropping them in from off screen and other nice effects. See the Ogre::Overlay::scroll, Ogre::Overlay::rotate and Ogre::Overlay::setScale methods for more information.
 
-<a name="Scripting-overlays"></a>
-
-## Scripting overlays
-
-Overlays can also be defined in scripts. See [Overlay Scripts](@ref Overlay-Scripts) for details.
-
 <a name="GUI-systems"></a>
 
 ## GUI systems
 
-Overlays are only really designed for non-interactive screen elements, although you can create a simple GUI using the [Trays System](@ref trays). For a far more complete GUI solution, we recommend [CEGui](<http://www.cegui.org.uk>), [MyGUI](<http://mygui.info/>) or [libRocket](<http://librocket.com/>)
+Overlays are only really designed for non-interactive screen elements, although you can create a simple GUI using the [Trays System](@ref trays). For a far more complete GUI solution, we recommend or [Dear ImGui](<https://github.com/OGRECave/ogre-imgui>), [CEGui](<http://www.cegui.org.uk>) or [MyGUI](<http://mygui.info/>).
 
 @page Scripts Scripts
 
@@ -819,7 +813,7 @@ overlay MyOverlays/ANewOverlay
 {
     zorder 200
 
-    container Panel(MyOverlayElements/TestPanel)
+    overlay_element MyOverlayElements/TestPanel Panel
     {
         // Center it horizontally, put it at the top
         left 0.25
@@ -829,7 +823,7 @@ overlay MyOverlays/ANewOverlay
         material MyMaterials/APanelMaterial
 
         // Another panel nested in this one
-        container Panel(MyOverlayElements/AnotherPanel)
+        overlay_element MyOverlayElements/AnotherPanel Panel
         {
              left 0
              top 0
@@ -847,26 +841,13 @@ Every overlay in the script must be given a name, which is the line before the f
 
 # Adding elements to the overlay {#Adding-elements-to-the-overlay}
 
-Within an overlay, you can include any number of 2D or 3D elements. You do this by defining a nested block headed by:
+Within an overlay, you can include any number of 2D or 3D elements. You do this by defining nested ’overlay_element’ blocks.
 
-<dl compact="compact">
-<dt>’element’</dt> <dd>
-
-if you want to define a 2D element which cannot have children of it’s own
-
-</dd> <dt>’container’</dt> <dd>
-
-if you want to define a 2D container object (which may itself have nested containers or elements)
-
-</dd> </dl> <br>
-
-The element and container blocks are pretty identical apart from their ability to store nested blocks.
-
-## ’container’ / ’element’ blocks
+## ’overlay_element’ blocks
 
 These are delimited by curly braces. The format for the header preceding the first brace is:
 
-\[container | element\] &lt;type\_name&gt; ( &lt;instance\_name&gt;) \[: &lt;template\_name&gt;\]<br> { ...
+overlay_element &lt;instance\_name&gt; &lt;type\_name&gt; \[: &lt;template\_name&gt;\]<br> { ...
 
 <dl compact="compact">
 <dt>type\_name</dt> <dd>
@@ -897,14 +878,14 @@ The properties which can be included within the braces depend on the custom type
 
 # Templates {#Templates}
 
-You can use templates to create numerous elements with the same properties. A template is an abstract element and it is not added to an overlay. It acts as a base class that elements can inherit and get its default properties. To create a template, the keyword ’template’ must be the first word in the element definition (before container or element). The template element is created in the topmost scope - it is NOT specified in an Overlay. It is recommended that you define templates in a separate overlay though this is not essential. Having templates defined in a separate file will allow different look & feels to be easily substituted.
+You can use templates to create numerous elements with the same properties. A template is an abstract element and it is not added to an overlay. It acts as a base class that elements can inherit and get its default properties. The template element is created in the topmost scope - it is NOT specified in an Overlay. It is recommended that you define templates in a separate overlay though this is not essential. Having templates defined in a separate file will allow different look & feels to be easily substituted.
 
 Elements can inherit a template in a similar way to C++ inheritance - by using the : operator on the element definition. The : operator is placed after the closing bracket of the name (separated by a space). The name of the template to inherit is then placed after the : operator (also separated by a space).
 
-A template can contain template children which are created when the template is subclassed and instantiated. Using the template keyword for the children of a template is optional but recommended for clarity, as the children of a template are always going to be templates themselves.
+A template can contain template children which are created when the template is subclassed and instantiated.
 
 ```cpp
-template container BorderPanel(MyTemplates/BasicBorderPanel)
+overlay_element MyTemplates/BasicBorderPanel BorderPanel
 {
     left 0
     top 0
@@ -926,7 +907,7 @@ template container BorderPanel(MyTemplates/BasicBorderPanel)
     border_bottom_uv 0.1914 0.2148 0.8086 0.0000
     border_bottomright_uv 0.8086 0.2148 1.0000 0.0000
 }
-template container Button(MyTemplates/BasicButton) : MyTemplates/BasicBorderPanel
+overlay_element MyTemplates/BasicButton Button : MyTemplates/BasicBorderPanel
 {
     left 0.82
     top 0.45
@@ -936,7 +917,7 @@ template container Button(MyTemplates/BasicButton) : MyTemplates/BasicBorderPane
     border_up_material Core/StatsBlockBorder/Up
     border_down_material Core/StatsBlockBorder/Down
 }
-template element TextArea(MyTemplates/BasicText)
+overlay_element MyTemplates/BasicText TextArea
 {
     font_name Ogre
     char_height 0.08
@@ -951,21 +932,21 @@ template element TextArea(MyTemplates/BasicText)
 overlay MyOverlays/AnotherOverlay
 {
     zorder 490
-    container BorderPanel(MyElements/BackPanel) : MyTemplates/BasicBorderPanel
+    overlay_element MyElements/BackPanel BorderPanel : MyTemplates/BasicBorderPanel
     {
         left 0
         top 0
         width 1
         height 1
 
-        container Button(MyElements/HostButton) : MyTemplates/BasicButton
+        overlay_element MyElements/HostButton Button : MyTemplates/BasicButton
         {
             left 0.82
             top 0.45
             caption MyTemplates/BasicText HOST
         }
 
-        container Button(MyElements/JoinButton) : MyTemplates/BasicButton
+        overlay_element MyElements/JoinButton Button : MyTemplates/BasicButton
         {
             left 0.82
             top 0.60
@@ -1121,84 +1102,44 @@ Although OGRE’s OverlayElement and OverlayContainer classes are designed to be
 
 This section describes how you define their custom attributes in an .overlay script, but you can also change these custom properties in code if you wish. You do this by calling setParameter(param, value). You may wish to use the StringConverter class to convert your types to and from strings.
 
-## Panel (container) {#Panel}
+## Panel {#Panel}
 
 This is the most bog-standard container you can use. It is a rectangular area which can contain other elements (or containers) and may or may not have a background, which can be tiled however you like. The background material is determined by the material attribute, but is only displayed if transparency is off.
 
-Attributes:
+@param transparent <b>&lt;true | false&gt;</b> If set to ’true’ the panel is transparent and is not rendered itself, it is just used as a grouping level for it’s children.
 
-<dl compact="compact">
-<dt>transparent &lt;true | false&gt;</dt> <dd>
+@param tiling <b>&lt;layer&gt; &lt;x\_tile&gt; &lt;y\_tile&gt;</b> Sets the number of times the texture(s) of the material are tiled across the panel in the x and y direction. &lt;layer&gt; is the texture layer, from 0 to the number of texture layers in the material minus one. By setting tiling per layer you can create some nice multitextured backdrops for your panels, this works especially well when you animate one of the layers.
 
-If set to ’true’ the panel is transparent and is not rendered itself, it is just used as a grouping level for it’s children.
+@param uv\_coords <b>&lt;topleft\_u&gt; &lt;topleft\_v&gt; &lt;bottomright\_u&gt; &lt;bottomright\_v&gt;</b> Sets the texture coordinates to use for this panel.
 
-</dd> <dt>tiling &lt;layer&gt; &lt;x\_tile&gt; &lt;y\_tile&gt;</dt> <dd>
-
-Sets the number of times the texture(s) of the material are tiled across the panel in the x and y direction. &lt;layer&gt; is the texture layer, from 0 to the number of texture layers in the material minus one. By setting tiling per layer you can create some nice multitextured backdrops for your panels, this works especially well when you animate one of the layers.
-
-</dd> <dt>uv\_coords &lt;topleft\_u&gt; &lt;topleft\_v&gt; &lt;bottomright\_u&gt; &lt;bottomright\_v&gt;</dt> <dd>
-
-Sets the texture coordinates to use for this panel.
-
-</dd> </dl>
-
-## BorderPanel (container) {#BorderPanel}
+## BorderPanel {#BorderPanel}
 
 This is a slightly more advanced version of Panel, where instead of just a single flat panel, the panel has a separate border which resizes with the panel. It does this by taking an approach very similar to the use of HTML tables for bordered content: the panel is rendered as 9 square areas, with the center area being rendered with the main material (as with Panel) and the outer 8 areas (the 4 corners and the 4 edges) rendered with a separate border material. The advantage of rendering the corners separately from the edges is that the edge textures can be designed so that they can be stretched without distorting them, meaning the single texture can serve any size panel.
 
-Attributes:
+@param border\_size <b>&lt;left&gt; &lt;right&gt; &lt;top&gt; &lt;bottom&gt;</b> The size of the border at each edge, as a proportion of the size of the screen. This lets you have different size borders at each edge if you like, or you can use the same value 4 times to create a constant size border.
 
-<dl compact="compact">
-<dt>border\_size &lt;left&gt; &lt;right&gt; &lt;top&gt; &lt;bottom&gt;</dt> <dd>
+@param border\_material <b>&lt;name&gt;</b> The name of the material to use for the border. This is normally a different material to the one used for the center area, because the center area is often tiled which means you can’t put border areas in there. You must put all the images you need for all the corners and the sides into a single texture.
 
-The size of the border at each edge, as a proportion of the size of the screen. This lets you have different size borders at each edge if you like, or you can use the same value 4 times to create a constant size border.
+@param border\_topleft\_uv <b>&lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;</b> \[also border\_topright\_uv, border\_bottomleft\_uv, border\_bottomright\_uv\]; The texture coordinates to be used for the corner areas of the border. 4 coordinates are required, 2 for the top-left corner of the square, 2 for the bottom-right of the square.
 
-</dd> <dt>border\_material &lt;name&gt;</dt> <dd>
+@param border\_left\_uv <b>&lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;</b> \[also border\_right\_uv, border\_top\_uv, border\_bottom\_uv\]; The texture coordinates to be used for the edge areas of the border. 4 coordinates are required, 2 for the top-left corner, 2 for the bottom-right. Note that you should design the texture so that the left & right edges can be stretched / squashed vertically and the top and bottom edges can be stretched / squashed horizontally without detrimental effects.
 
-The name of the material to use for the border. This is normally a different material to the one used for the center area, because the center area is often tiled which means you can’t put border areas in there. You must put all the images you need for all the corners and the sides into a single texture.
-
-</dd> <dt>border\_topleft\_uv &lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;</dt> <dd>
-
-\[also border\_topright\_uv, border\_bottomleft\_uv, border\_bottomright\_uv\]; The texture coordinates to be used for the corner areas of the border. 4 coordinates are required, 2 for the top-left corner of the square, 2 for the bottom-right of the square.
-
-</dd> <dt>border\_left\_uv &lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;</dt> <dd>
-
-\[also border\_right\_uv, border\_top\_uv, border\_bottom\_uv\]; The texture coordinates to be used for the edge areas of the border. 4 coordinates are required, 2 for the top-left corner, 2 for the bottom-right. Note that you should design the texture so that the left & right edges can be stretched / squashed vertically and the top and bottom edges can be stretched / squashed horizontally without detrimental effects.
-
-</dd> </dl>
-
-## TextArea (element) {#TextArea}
+## TextArea {#TextArea}
 
 This is a generic element that you can use to render text. It uses fonts which can be defined in code using the FontManager and Font classes, or which have been predefined in .fontdef files. See the font definitions section for more information.
 
-Attributes:
+@param font\_name <b>&lt;name&gt;</b> The name of the font to use. This font must be defined in a .fontdef file to ensure it is available at scripting time.
 
-<dl compact="compact">
-<dt>font\_name &lt;name&gt;</dt> <dd>
+@param char\_height <b>&lt;height&gt;</b> The height of the letters as a proportion of the screen height. Character widths may vary because OGRE supports proportional fonts, but will be based on this constant height.
 
-The name of the font to use. This font must be defined in a .fontdef file to ensure it is available at scripting time.
+@param colour <b>&lt;red&gt; &lt;green&gt; &lt;blue&gt;</b> A solid colour to render the text in. Often fonts are defined in monochrome, so this allows you to colour them in nicely and use the same texture for multiple different coloured text areas. The colour elements should all be expressed as values between 0 and 1. If you use predrawn fonts which are already full colour then you don’t need this.
 
-</dd> <dt>char\_height &lt;height&gt;</dt> <dd>
+@param colour\_bottom <b>&lt;red&gt; &lt;green&gt; &lt;blue&gt;</b>
+@param colour\_top <b>&lt;red&gt; &lt;green&gt; &lt;blue&gt;</b> As an alternative to a solid colour, you can colour the text differently at the top and bottom to create a gradient colour effect which can be very effective.
 
-The height of the letters as a proportion of the screen height. Character widths may vary because OGRE supports proportional fonts, but will be based on this constant height.
+@param alignment <b>&lt;left | center | right&gt;</b> Sets the horizontal alignment of the text. This is different from the horz\_align parameter.
 
-</dd> <dt>colour &lt;red&gt; &lt;green&gt; &lt;blue&gt;</dt> <dd>
-
-A solid colour to render the text in. Often fonts are defined in monochrome, so this allows you to colour them in nicely and use the same texture for multiple different coloured text areas. The colour elements should all be expressed as values between 0 and 1. If you use predrawn fonts which are already full colour then you don’t need this.
-
-</dd> <dt>colour\_bottom &lt;red&gt; &lt;green&gt; &lt;blue&gt; / colour\_top &lt;red&gt; &lt;green&gt; &lt;blue&gt;</dt> <dd>
-
-As an alternative to a solid colour, you can colour the text differently at the top and bottom to create a gradient colour effect which can be very effective.
-
-</dd> <dt>alignment &lt;left | center | right&gt;</dt> <dd>
-
-Sets the horizontal alignment of the text. This is different from the horz\_align parameter.
-
-</dd> <dt>space\_width &lt;width&gt;</dt> <dd>
-
-Sets the width of a space in relation to the screen.
-
-</dd> </dl>
+@param space\_width <b>&lt;width&gt;</b> Sets the width of a space in relation to the screen.
 
 @page Font-Definition-Scripts Font Definition Scripts
 
@@ -1229,22 +1170,12 @@ font <font_name>
 
 If you have one or more artists working with you, no doubt they can produce you a very nice font texture. OGRE supports full colour font textures, or alternatively you can keep them monochrome / greyscale and use TextArea’s colouring feature. Font textures should always have an alpha channel, preferably an 8-bit alpha channel such as that supported by TGA and PNG files, because it can result in much nicer edges. To use an existing texture, here are the settings you need:
 
-<dl compact="compact">
-<dt>type image</dt> <dd>
+@param type <b>image</b> This just tells OGRE you want a pre-drawn font.
 
-This just tells OGRE you want a pre-drawn font.
+@param source <b>&lt;filename&gt;</b> This is the name of the image file you want to load. This will be loaded from the standard TextureManager resource locations and can be of any type OGRE supports, although JPEG is not recommended because of the lack of alpha and the lossy compression. I recommend PNG format which has both good lossless compression and an 8-bit alpha channel.
 
-</dd> <dt>source &lt;filename&gt;</dt> <dd>
-
-This is the name of the image file you want to load. This will be loaded from the standard TextureManager resource locations and can be of any type OGRE supports, although JPEG is not recommended because of the lack of alpha and the lossy compression. I recommend PNG format which has both good lossless compression and an 8-bit alpha channel.
-
-</dd> <dt>glyph &lt;character&gt; &lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;</dt> <dd>
-
-This provides the texture coordinates for the specified character. You must repeat this for every character you have in the texture. The first 2 numbers are the x and y of the top-left corner, the second two are the x and y of the bottom-right corner. Note that you really should use a common height for all characters, but widths can vary because of proportional fonts.
-
+@param glyph <b>&lt;character&gt; &lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;</b> This provides the texture coordinates for the specified character. You must repeat this for every character you have in the texture. The first 2 numbers are the x and y of the top-left corner, the second two are the x and y of the bottom-right corner. Note that you really should use a common height for all characters, but widths can vary because of proportional fonts.
 ’character’ is either an ASCII character for non-extended 7-bit ASCII, or for extended glyphs, a unicode decimal value, which is identified by preceding the number with a ’u’ - e.g. ’u0546’ denotes unicode value 546.
-
-</dd> </dl>
 
 A note for Windows users: I recommend using BitmapFontBuilder (<http://www.lmnopc.com/bitmapfontbuilder/>), a free tool which will generate a texture and export character widths for you, you can find a tool for converting the binary output from this into ’glyph’ lines in the Tools folder.<br>
 
@@ -1256,36 +1187,19 @@ You can also generate font textures on the fly using truetype fonts. I don’t r
 
 Here are the attributes you need to supply:
 
-<dl compact="compact">
-<dt>type truetype</dt> <dd>
+@param type <b>truetype</b> Tells OGRE to generate the texture from a font
 
-Tells OGRE to generate the texture from a font
+@param source <b>&lt;ttf file&gt;</b> The name of the ttf file to load. This will be searched for in the common resource locations and in any resource locations added to FontManager.
 
-</dd> <dt>source &lt;ttf file&gt;</dt> <dd>
+@param size <b>&lt;size\_in\_points&gt;</b> The size at which to generate the font, in standard points. Note this only affects how big the characters are in the font texture, not how big they are on the screen. You should tailor this depending on how large you expect to render the fonts because generating a large texture will result in blurry characters when they are scaled very small (because of the mipmapping), and conversely generating a small font will result in blocky characters if large text is rendered.
 
-The name of the ttf file to load. This will be searched for in the common resource locations and in any resource locations added to FontManager.
+@param resolution <b>&lt;dpi&gt;</b> The resolution in dots per inch, this is used in conjunction with the point size to determine the final size. 72 / 96 dpi is normal.
 
-</dd> <dt>size &lt;size\_in\_points&gt;</dt> <dd>
+@param antialias\_colour <b>&lt;true|false&gt;</b> This is an optional flag, which defaults to ’false’. The generator will antialias the font by default using the alpha component of the texture, which will look fine if you use alpha blending to render your text (this is the default assumed by TextAreaOverlayElement for example). If, however you wish to use a colour based blend like add or modulate in your own code, you should set this to ’true’ so the colour values are anti-aliased too. If you set this to true and use alpha blending, you’ll find the edges of your font are antialiased too quickly resulting in a ’thin’ look to your fonts, because not only is the alpha blending the edges, the colour is fading too. Leave this option at the default if in doubt.
 
-The size at which to generate the font, in standard points. Note this only affects how big the characters are in the font texture, not how big they are on the screen. You should tailor this depending on how large you expect to render the fonts because generating a large texture will result in blurry characters when they are scaled very small (because of the mipmapping), and conversely generating a small font will result in blocky characters if large text is rendered.
+@param code\_points <b>nn-nn \[nn-nn\] ..</b> This directive allows you to specify which unicode code points should be generated as glyphs into the font texture. If you don’t specify this, code points 33-126 will be generated by default which covers the ASCII glyphs. If you use this flag, you should specify a space-separated list of inclusive code point ranges of the form ’start-end’. Numbers must be decimal.
 
-</dd> <dt>resolution &lt;dpi&gt;</dt> <dd>
-
-The resolution in dots per inch, this is used in conjunction with the point size to determine the final size. 72 / 96 dpi is normal.
-
-</dd> <dt>antialias\_colour &lt;true|false&gt;</dt> <dd>
-
-This is an optional flag, which defaults to ’false’. The generator will antialias the font by default using the alpha component of the texture, which will look fine if you use alpha blending to render your text (this is the default assumed by TextAreaOverlayElement for example). If, however you wish to use a colour based blend like add or modulate in your own code, you should set this to ’true’ so the colour values are anti-aliased too. If you set this to true and use alpha blending, you’ll find the edges of your font are antialiased too quickly resulting in a ’thin’ look to your fonts, because not only is the alpha blending the edges, the colour is fading too. Leave this option at the default if in doubt.
-
-</dd> <dt>code\_points nn-nn \[nn-nn\] ..</dt> <dd>
-
-This directive allows you to specify which unicode code points should be generated as glyphs into the font texture. If you don’t specify this, code points 33-126 will be generated by default which covers the ASCII glyphs. If you use this flag, you should specify a space-separated list of inclusive code point ranges of the form ’start-end’. Numbers must be decimal.
-
-</dd> <dt>character\_spacer &lt;spacing\_in\_points&gt;</dt> <dd>
-
-This option can be useful for fonts that are atypically wide, e.g. calligraphy fonts, where you may see artifacts from characters overlapping. The default value is 5.
-
-</dd> </dl> 
+@param character\_spacer <b>&lt;spacing\_in\_points&gt;</b> This option can be useful for fonts that are atypically wide, e.g. calligraphy fonts, where you may see artifacts from characters overlapping. The default value is 5.
 
 You can also create new fonts at runtime by using the FontManager if you wish.
 

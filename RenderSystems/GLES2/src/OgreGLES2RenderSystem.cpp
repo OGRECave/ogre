@@ -354,9 +354,6 @@ namespace Ogre {
         // GL always shares vertex and fragment texture units (for now?)
         rsc->setVertexTextureUnitsShared(true);
 
-        // Hardware support mipmapping
-        rsc->setCapability(RSC_AUTOMIPMAP);
-
         // Blending support
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
@@ -500,6 +497,8 @@ namespace Ogre {
         {
             // Check if render to vertex buffer (transform feedback in OpenGL)
             rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
+
+            rsc->setCapability(RSC_PRIMITIVE_RESTART);
         }
         return rsc;
     }
@@ -532,7 +531,6 @@ namespace Ogre {
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
         mRTTManager = new GLES2FBOManager();
-        caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 
         Log* defaultLog = LogManager::getSingleton().getDefaultLog();
         if (defaultLog)
@@ -1815,7 +1813,7 @@ namespace Ogre {
     {
         mStateCacheManager->setDisabled(GL_DITHER);
 
-        if(!hasMinGLVersion(3, 0))
+        if(!getCapabilities()->hasCapability(RSC_PRIMITIVE_RESTART))
             return;
 
         // Enable primitive restarting with fixed indices depending upon the data type

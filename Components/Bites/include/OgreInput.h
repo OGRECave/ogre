@@ -86,9 +86,9 @@ union Event
 
 // SDL compat
 enum {
-    SDLK_RETURN = '\r',
-    SDLK_ESCAPE = '\033',
-    SDLK_SPACE = ' ',
+    SDLK_RETURN = int('\r'),
+    SDLK_ESCAPE = int('\033'),
+    SDLK_SPACE = int(' '),
     SDLK_F1 = (1 << 30) | 58,
     SDLK_F2,
     SDLK_F3,

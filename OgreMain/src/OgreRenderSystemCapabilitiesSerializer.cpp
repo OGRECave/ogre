@@ -367,7 +367,6 @@ namespace Ogre
         addKeywordType("shader_profile", ADD_SHADER_PROFILE_STRING);
 
         addCapabilitiesMapping("fixed_function", RSC_FIXED_FUNCTION);
-        addCapabilitiesMapping("automipmap", RSC_AUTOMIPMAP);
         addCapabilitiesMapping("anisotropy", RSC_ANISOTROPY);
         addCapabilitiesMapping("dot3", RSC_DOT3);
         addCapabilitiesMapping("cubemapping", RSC_CUBEMAPPING);
