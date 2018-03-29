@@ -113,7 +113,7 @@ namespace Ogre {
                 if ( foundIter != binding->getBindings().end() )
                 {
                     HardwareVertexBufferSharedPtr bufAtSlot = foundIter->second;
-                    if ( bufAtSlot->getIsInstanceData() )
+                    if ( bufAtSlot->isInstanceData() )
                     {
                         elem.InputSlotClass        = D3D11_INPUT_PER_INSTANCE_DATA;
                         elem.InstanceDataStepRate  = bufAtSlot->getInstanceDataStepRate();

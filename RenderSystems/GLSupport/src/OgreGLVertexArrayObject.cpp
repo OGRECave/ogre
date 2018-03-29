@@ -91,7 +91,7 @@ namespace Ogre {
                           std::make_pair(attrib, vertexBuffer.get())) == mAttribsBound.end())
                 return true;
 
-            if (vertexBuffer->getIsInstanceData() &&
+            if (vertexBuffer->isInstanceData() &&
                 std::find(mInstanceAttribsBound.begin(), mInstanceAttribsBound.end(), attrib) ==
                     mInstanceAttribsBound.end())
                 return true;
@@ -134,7 +134,7 @@ namespace Ogre {
 
             rs->bindVertexElementToGpu(elem, vertexBuffer, vertexStart);
 
-            if (vertexBuffer->getIsInstanceData())
+            if (vertexBuffer->isInstanceData())
                 mInstanceAttribsBound.push_back(attrib);
         }
 

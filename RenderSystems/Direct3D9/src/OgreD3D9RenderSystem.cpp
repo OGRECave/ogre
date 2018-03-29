@@ -3406,7 +3406,7 @@ namespace Ogre
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = useGlobalInstancingVertexBufferIsAvailable &&
                     globalInstanceVertexBuffer && globalVertexDeclaration != NULL 
-                || binding->getHasInstanceData();
+                || binding->hasInstanceData();
 
 
         // TODO: attempt to detect duplicates
@@ -3446,7 +3446,7 @@ namespace Ogre
             // SetStreamSourceFreq
             if ( hasInstanceData ) 
             {
-                if ( d3d9buf->getIsInstanceData() )
+                if ( d3d9buf->isInstanceData() )
                 {
                     hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
                 }
