@@ -642,6 +642,10 @@ namespace Ogre{
                         LodStrategy *strategy = DistanceLodSphereStrategy::getSingletonPtr();
                         mMaterial->setLodStrategy(strategy);
 
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+                                           prop->line,
+                                           "lod_distances is deprecated. Use lod_values.");
+
                         // Read in LOD distances
                         Material::LodValueList lods;
                         for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
