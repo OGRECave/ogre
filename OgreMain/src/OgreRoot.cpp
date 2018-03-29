@@ -717,6 +717,9 @@ namespace Ogre {
         // Tell all listeners
         for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
+            if(mRemovedFrameListeners.find(*i) != mRemovedFrameListeners.end())
+                continue;
+
             if (!(*i)->frameStarted(evt))
                 return false;
         }
@@ -733,6 +736,9 @@ namespace Ogre {
         // Tell all listeners
         for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
+            if(mRemovedFrameListeners.find(*i) != mRemovedFrameListeners.end())
+                continue;
+
             if (!(*i)->frameRenderingQueued(evt))
                 return false;
         }
@@ -748,6 +754,9 @@ namespace Ogre {
         bool ret = true;
         for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
+            if(mRemovedFrameListeners.find(*i) != mRemovedFrameListeners.end())
+                continue;
+
             if (!(*i)->frameEnded(evt))
             {
                 ret = false;
