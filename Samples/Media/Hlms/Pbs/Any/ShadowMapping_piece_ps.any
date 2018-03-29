@@ -197,7 +197,7 @@
 				SH_HALF2( 0, 0 ),	//0, 0
 				SH_HALF2( 1, 0 ),	//1, 0
 				SH_HALF2( 0, 1 ),	//1, 1
-				SH_HALF2( 0, 0 ) 	//1, 1
+				SH_HALF2(-1, 0 ) 	//0, 1
 			@end
 			@property( pcf_4x4 )
 				SH_HALF2( 0, 0 ),	//0, 0
