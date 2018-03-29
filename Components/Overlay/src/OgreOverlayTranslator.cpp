@@ -137,6 +137,11 @@ OverlayTranslatorManager::OverlayTranslatorManager()
 //! [font_register]
 }
 
+OverlayTranslatorManager::~OverlayTranslatorManager()
+{
+    ScriptCompilerManager::getSingleton().removeTranslatorManager(this);
+}
+
 //! [font_get_translator]
 ScriptTranslator* OverlayTranslatorManager::getTranslator(const AbstractNodePtr& node)
 {
