@@ -836,57 +836,49 @@ namespace Ogre
         }
     }
 
-    bool ScriptCompiler::isNameExcluded(const String &cls, AbstractNode *parent)
+    bool ScriptCompiler::isNameExcluded(const ObjectAbstractNode* node, AbstractNode *parent)
     {
         // Run past the listener
         bool excludeName = false;
-        ProcessNameExclusionScriptCompilerEvent evt(cls, parent);
-        bool processed = _fireEvent(&evt, (void*)&excludeName);
-
-        if(!processed)
-        {
-            // Process the built-in name exclusions
-            if(cls == "emitter" || cls == "affector")
-            {
-                // emitters or affectors inside a particle_system are excluded
-                while(parent && parent->type == ANT_OBJECT)
-                {
-                    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
-                    if(obj->cls == "particle_system")
-                        return true;
-                    parent = obj->parent;
-                }
-                return false;
-            }
-            else if(cls == "pass")
-            {
-                // passes inside compositors are excluded
-                while(parent && parent->type == ANT_OBJECT)
-                {
-                    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
-                    if(obj->cls == "compositor")
-                        return true;
-                    parent = obj->parent;
-                }
-                return false;
-            }
-            else if(cls == "texture_source")
-            {
-                // Parent must be texture_unit
-                while(parent && parent->type == ANT_OBJECT)
-                {
-                    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
-                    if(obj->cls == "texture_unit")
-                        return true;
-                    parent = obj->parent;
-                }
-                return false;
-            }
-        }
-        else
-        {
+        ProcessNameExclusionScriptCompilerEvent evt(node->cls, parent);
+        if(_fireEvent(&evt, (void*)&excludeName))
             return excludeName;
+
+        // Process the built-in name exclusions
+        if(node->id == ID_EMITTER || node->id == ID_AFFECTOR)
+        {
+            // emitters or affectors inside a particle_system are excluded
+            while(parent && parent->type == ANT_OBJECT)
+            {
+                ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
+                if(obj->id == ID_PARTICLE_SYSTEM)
+                    return true;
+                parent = obj->parent;
+            }
         }
+        else if(node->id == ID_PASS)
+        {
+            // passes inside compositors are excluded
+            while(parent && parent->type == ANT_OBJECT)
+            {
+                ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
+                if(obj->id == ID_COMPOSITOR)
+                    return true;
+                parent = obj->parent;
+            }
+        }
+        else if(node->id == ID_TEXTURE_SOURCE)
+        {
+            // Parent must be texture_unit
+            while(parent && parent->type == ANT_OBJECT)
+            {
+                ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
+                if(obj->id == ID_TEXTURE_UNIT)
+                    return true;
+                parent = obj->parent;
+            }
+        }
+
         return false;
     }
 
@@ -1430,10 +1422,22 @@ namespace Ogre
                 impl->cls = (*iter)->token;
                 ++iter;
 
+                // try to map the cls to an id
+                ScriptCompiler::IdMap::const_iterator iter2 = mCompiler->mIds.find(impl->cls);
+                if(iter2 != mCompiler->mIds.end())
+                {
+                    impl->id = iter2->second;
+                }
+                else
+                {
+                    mCompiler->addError(CE_UNEXPECTEDTOKEN, impl->file, impl->line,
+                                        "'" + impl->cls + "'. If this is a legacy script you must prepend the type (e.g. font, overlay).");
+                }
+
                 // Get the name
                 // Unless the type is in the exclusion list
                 if(iter != temp.end() && ((*iter)->type == CNT_WORD || (*iter)->type == CNT_QUOTE) &&
-                    !mCompiler->isNameExcluded(impl->cls, mCurrent))
+                    !mCompiler->isNameExcluded(impl, mCurrent))
                 {
                     impl->name = (*iter)->token;
                     ++iter;
@@ -1470,18 +1474,6 @@ namespace Ogre
                     for(ConcreteNodeList::iterator j = (*iter)->children.begin(); j != (*iter)->children.end(); ++j)
                         impl->bases.push_back((*j)->token);
                     ++iter;
-                }
-
-                // Finally try to map the cls to an id
-                ScriptCompiler::IdMap::const_iterator iter2 = mCompiler->mIds.find(impl->cls);
-                if(iter2 != mCompiler->mIds.end())
-                {
-                    impl->id = iter2->second;
-                }
-                else
-                {
-                    mCompiler->addError(CE_UNEXPECTEDTOKEN, impl->file, impl->line,
-                                        "'" + impl->cls + "'. If this is a legacy script you must prepend the type (e.g. font, overlay).");
                 }
 
                 asn = AbstractNodePtr(impl);
