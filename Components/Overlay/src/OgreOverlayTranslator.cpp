@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+//! [font_translate]
 void FontTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr& node)
 {
     ObjectAbstractNode* obj = static_cast<ObjectAbstractNode*>(node.get());
@@ -55,6 +56,7 @@ void FontTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr& 
         }
     }
 }
+//! [font_translate]
 
 void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
                                     PropertyAbstractNode* prop)
@@ -129,10 +131,13 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
 
 OverlayTranslatorManager::OverlayTranslatorManager()
 {
+//! [font_register]
     ScriptCompilerManager::getSingleton().addTranslatorManager(this);
     ID_FONT = ScriptCompilerManager::getSingleton().registerCustomWordId("font");
+//! [font_register]
 }
 
+//! [font_get_translator]
 ScriptTranslator* OverlayTranslatorManager::getTranslator(const AbstractNodePtr& node)
 {
     if (node->type != ANT_OBJECT)
@@ -140,8 +145,12 @@ ScriptTranslator* OverlayTranslatorManager::getTranslator(const AbstractNodePtr&
 
     ObjectAbstractNode* obj = static_cast<ObjectAbstractNode*>(node.get());
 
+    if (obj->id == ID_FONT)
+        return &mFontTranslator;
+//! [font_get_translator]
+
     // legacy compatibility: assume this is a font if we are in a .fontdef file
-    if (obj->id == ID_FONT || (obj->id == 0 && StringUtil::endsWith(node->file, ".fontdef")))
+    if (obj->id == 0 && StringUtil::endsWith(node->file, ".fontdef"))
         return &mFontTranslator;
 
     return NULL;

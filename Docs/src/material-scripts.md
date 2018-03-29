@@ -4,17 +4,9 @@ Material scripts offer you the ability to define complex materials in a script w
 
 @tableofcontents
 
-# Loading scripts {#Loading-scripts}
+It’s important to realise that materials are not loaded completely by the parsing process: only the definition is loaded, no textures or other resources are loaded. This is because it is common to have a large library of materials, but only use a relatively small subset of them in any one scene. To load every material completely in every script would therefore cause unnecessary memory overhead. You can access a ’deferred load’ Material in the normal way (Ogre::MaterialManager::getSingleton().getByName()), but you must call the ’load’ method before trying to use it. Ogre does this for you when using the normal material assignment methods of entities etc.
 
-Material scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Ogre::ResourceGroupManager::addResourceLocation) for files with the ’.material’ extension and parses them. If you want to parse files manually, use Ogre::MaterialSerializer::parseScript.
-
-It’s important to realise that materials are not loaded completely by this parsing process: only the definition is loaded, no textures or other resources are loaded. This is because it is common to have a large library of materials, but only use a relatively small subset of them in any one scene. To load every material completely in every script would therefore cause unnecessary memory overhead. You can access a ’deferred load’ Material in the normal way (Ogre::MaterialManager::getSingleton().getByName()), but you must call the ’load’ method before trying to use it. Ogre does this for you when using the normal material assignment methods of entities etc.
-
-Another important factor is that material names must be unique throughout ALL scripts loaded by the system, since materials are always identified by name.
-
-# Format {#Format}
-
-Several materials may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces (’{’, ’}’), and comments indicated by starting a line with ’//’ (note, no nested form comments allowed). The general format is shown below in the example below (note that to start with, we only consider fixed-function materials which don’t use vertex, geometry or fragment programs, these are covered later):
+To start with, we only consider fixed-function materials which don’t use vertex, geometry or fragment programs, these are covered later:
 
 ```cpp
 // This is a comment
@@ -54,12 +46,6 @@ material walls/funkywall1
 }
 ```
 
-Every material in the script must be given a name, which is the line ’material &lt;blah&gt;’ before the first opening ’{’. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string. If you include spaces in the name, it must be enclosed in double quotes.
-
-@note ’:’ is the delimiter for specifying material copy in the script so it can’t be used as part of the material name.
-
-A material can inherit from a previously defined material by using a *colon* **:** after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just *parts* of a material from others; all this is covered in @ref Script-Inheritance). You can also use variables in your script which can be replaced in inheriting versions, see @ref Script-Variables.
-
 A material can be made up of many @ref Techniques - a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. 
 
 Each technique can be made up of many @ref Passes, that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as ’ambient’ to set the amount & colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See @ref Passes for more details. 
@@ -70,7 +56,7 @@ You can also reference vertex and fragment programs (or vertex and pixel shaders
 
 <a name="Top_002dlevel-material-attributes"></a>
 
-## Material {#Material}
+# Material {#Material}
 
 The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are: 
 
@@ -133,7 +119,7 @@ This attribute can be used to set the textures used in texture unit states that 
 
 
 
-## Techniques {#Techniques}
+# Techniques {#Techniques}
 
 A "technique" section in your material script encapsulates a single method of rendering an object. The simplest of material definitions only contains a single technique, however since PC hardware varies quite greatly in it’s capabilities, you can only do this if you are sure that every card for which you intend to target your application will support the capabilities which your technique requires. In addition, it can be useful to define simpler ways to render a material if you wish to use material LOD, such that more distant objects use a simpler, less performance-hungry technique.
 
@@ -209,7 +195,7 @@ gpu\_vendor\_rule include nvidia<br> gpu\_vendor\_rule include intel<br> gpu\_de
 
 Note that these rules can only mark a technique ’unsupported’ when it would otherwise be considered ’supported’ judging by the hardware capabilities. Even if a technique passes these rules, it is still subject to the usual hardware support tests.
 
-## Passes {#Passes}
+# Passes {#Passes}
 
 A pass is a single render of the geometry in question; a single call to the rendering API with a certain set of rendering properties. A technique can have between one and 16 passes, although clearly the more passes you use, the more expensive the technique will be to render.
 
@@ -946,7 +932,7 @@ Sets the maximum point size after attenuation ([point\_size\_attenuation](#point
 Format: point\_size\_max &lt;size&gt; Default: point\_size\_max 0
 
 
-## Texture Units {#Texture-Units}
+# Texture Units {#Texture-Units}
 
 Here are the attributes you can use in a ’texture\_unit’ section of a .material script:
 
@@ -1569,7 +1555,7 @@ Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m3
 
 The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&gt;.
 
-## Declaring GPU Programs {#Declaring-Vertex_002fGeometry_002fFragment-Programs}
+# Declaring GPU Programs {#Declaring-Vertex_002fGeometry_002fFragment-Programs}
 
 In order to use a vertex, geometry or fragment program in your materials (See [Using Vertex/Geometry/Fragment Programs in a Pass](@ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass)), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.
 
@@ -1676,7 +1662,7 @@ OpenGL Shading Language for Embedded Systems. It is a variant of GLSL, streamlin
 
 You can get a definitive list of the syntaxes supported by the current card by calling GpuProgramManager::getSingleton().getSupportedSyntax().
 
-## Specifying Named Constants for Assembler Shaders {#Specifying-Named-Constants-for-Assembler-Shaders}
+# Specifying Named Constants for Assembler Shaders {#Specifying-Named-Constants-for-Assembler-Shaders}
 
 Assembler shaders don’t have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a ’save’ method which you can use to write this data to disk, where you can reference it later using the manual\_named\_constants directive inside your assembler program declaration, e.g.
 
@@ -1691,7 +1677,7 @@ vertex_program myVertexProgram asm
 
 In this case myVertexProgram.constants has been created by calling highLevelGpuProgram-&gt;getNamedConstants().save("myVertexProgram.constants"); sometime earlier as preparation, from the original high-level program. Once you’ve used this directive, you can use named parameters here even though the assembler program itself has no knowledge of them.
 
-## Default Program Parameters {#Default-Program-Parameters}
+# Default Program Parameters {#Default-Program-Parameters}
 
 While defining a vertex, geometry or fragment program, you can also specify the default parameters to be used for materials which use it, unless they specifically override them. You do this by including a nested ’default\_params’ section, like so:
 
@@ -1714,7 +1700,7 @@ vertex_program Ogre/CelShadingVP cg
 
 The syntax of the parameter definition is exactly the same as when you define parameters when using programs, See @ref Program-Parameter-Specification. Defining default parameters allows you to avoid rebinding common parameters repeatedly (clearly in the above example, all but ’shininess’ are unlikely to change between uses of the program) which makes your material declarations shorter.
 
-## Declaring Shared Parameters {#Declaring-Shared-Parameters}
+# Declaring Shared Parameters {#Declaring-Shared-Parameters}
 
 Often, not every parameter you want to pass to a shader is unique to that program, and perhaps you want to give the same value to a number of different programs, and a number of different materials using that program. Shared parameter sets allow you to define a ’holding area’ for shared parameters that can then be referenced when you need them in particular shaders, while keeping the definition of that value in one place. To define a set of shared parameters, you do this:
 
@@ -1732,75 +1718,13 @@ The param\_name must be unique within the set, and the param\_type can be any on
 
 Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared\_params\_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via GpuProgramManager::getSharedParameters, and update the values for all instances using them.
 
-## Script Inheritance {#Script-Inheritance}
-
-When creating new script objects that are only slight variations of another object, it’s good to avoid copying and pasting between scripts. Script inheritance lets you do this; in this section we’ll use material scripts as an example, but this applies to all scripts parsed with the script compilers in Ogre 1.6 onwards.
-
-For example, to make a new material that is based on one previously defined, add a *colon* **:** after the new material name followed by the name of the material that is to be copied.
-
-Format: material &lt;NewUniqueChildName&gt; : &lt;ReferenceParentMaterial&gt;
-
-The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed. The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the ’import’ directive (See @ref Script-Import-Directive). Note that inheritance is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure. If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.
-
-Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier. Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them, Techniques and passes can take a name and texture units can be numbered within the material script. You can also use variables, See @ref Script-Variables.
-
-Names become very useful in materials that copy from other materials. In order to override values they must be in the correct technique, pass, texture unit etc. The script could be lain out using the sequence of techniques, passes, texture units in the child material but if only one parameter needs to change in say the 5th pass then the first four passes prior to the fifth would have to be placed in the script:
-
-Here is an example:
-
-```cpp
-material test2 : test1
-{
-  technique
-  {
-    pass
-    {
-    }
-
-    pass
-    {
-    }
-
-    pass
-    {
-    }
-
-    pass
-    {
-    }
-
-    pass
-    {
-      ambient 0.5 0.7 0.3 1.0
-    }
-  }
-}
-```
-
-This method is tedious for materials that only have slight variations to their parent. An easier way is to name the pass directly without listing the previous passes:<br>
-
-```cpp
-material test2 : test1
-{
-  technique 0
-  {
-    pass 4
-    {
-      ambient 0.5 0.7 0.3 1.0
-    }
-  }
-}
-```
-
-The parent pass name must be known and the pass must be in the correct technique in order for this to work correctly. Specifying the technique name and the pass name is the best method. If the parent technique/pass are not named then use their index values for their name as done in the example.
-
-## Adding new Techniques, Passes, to copied materials {#Adding-new-Techniques_002c-Passes_002c-to-copied-materials_003a}
+# Adding new Techniques, Passes, to copied materials {#Adding-new-Techniques_002c-Passes_002c-to-copied-materials_003a}
 
 If a new technique or pass needs to be added to a copied material then use a unique name for the technique or pass that does not exist in the parent material. Using an index for the name that is one greater than the last index in the parent will do the same thing. The new technique/pass will be added to the end of the techniques/passes copied from the parent material.
 
 @note if passes or techniques aren’t given a name, they will take on a default name based on their index. For example the first pass has index 0 so its name will be 0.
 
-## Identifying Texture Units to override values {#Identifying-Texture-Units-to-override-values}
+# Identifying Texture Units to override values {#Identifying-Texture-Units-to-override-values}
 
 A specific texture unit state (TUS) can be given a unique name within a pass of a material so that it can be identified later in cloned materials that need to override specified texture unit states in the pass without declaring previous texture units. Using a unique name for a Texture unit in a pass of a cloned material adds a new texture unit at the end of the texture unit list for the pass.
 
@@ -1820,50 +1744,7 @@ material BumpMap2 : BumpMap1
 }
 ```
 
-## Advanced Script Inheritance {#Advanced-Script-Inheritance}
-
-Starting with Ogre 1.6, script objects can now inherit from each other more generally. The previous concept of inheritance, material copying, was restricted only to the top-level material objects. Now, any level of object can take advantage of inheritance (for instance, techniques, passes, and compositor targets).
-
-```cpp
-material Test
-{
-    technique
-    {
-        pass : ParentPass
-        {
-        }
-    }
-}
-```
-
-Notice that the pass inherits from ParentPass. This allows for the creation of more fine-grained inheritance hierarchies.
-
-Along with the more generalized inheritance system comes an important new keyword: "abstract." This keyword is used at a top-level object declaration (not inside any other object) to denote that it is not something that the compiler should actually attempt to compile, but rather that it is only for the purpose of inheritance. For example, a material declared with the abstract keyword will never be turned into an actual usable material in the material framework. Objects which cannot be at a top-level in the document (like a pass) but that you would like to declare as such for inheriting purpose must be declared with the abstract keyword.
-
-```cpp
-abstract pass ParentPass
-{
-    diffuse 1 0 0 1
-}
-```
-
-That declares the ParentPass object which was inherited from in the above example. Notice the abstract keyword which informs the compiler that it should not attempt to actually turn this object into any sort of Ogre resource. If it did attempt to do so, then it would obviously fail, since a pass all on its own like that is not valid.
-
-The final matching option is based on wildcards. Using the ’\*’ character, you can make a powerful matching scheme and override multiple objects at once, even if you don’t know exact names or positions of those objects in the inherited object.
-
-```cpp
-abstract technique Overrider
-{
-   pass *colour*
-   {
-      diffuse 0 0 0 0
-   }
-}
-```
-
-This technique, when included in a material, will override all passes matching the wildcard "\*color\*" (color has to appear in the name somewhere) and turn their diffuse properties black. It does not matter their position or exact name in the inherited technique, this will match them. 
-
-## Texture Aliases {#Texture-Aliases}
+# Texture Aliases {#Texture-Aliases}
 
 Texture aliases are useful for when only the textures used in texture units need to be specified for a cloned material. In the source material i.e. the original material to be cloned, each texture unit can be given a texture alias name. The cloned material in the script can then specify what textures should be used for each texture alias. Note that texture aliases are a more specific version of [Script Variables](#Script-Variables) which can be used to easily set other values.
 
@@ -2024,63 +1905,3 @@ material fxTest3 : TSNormalSpecMapping
 ```
 
 fxTest3 will end up with the default textures for the normal map and spec map setup in TSNormalSpecMapping material but will have a different diffuse map. So your base material can define the default textures to use and then the child materials can override specific textures.
-
-## Script Variables {#Script-Variables}
-
-A very powerful new feature in Ogre 1.6 is variables. Variables allow you to parameterize data in materials so that they can become more generalized. This enables greater reuse of scripts by targeting specific customization points. Using variables along with inheritance allows for huge amounts of overrides and easy object reuse.
-
-```cpp
-abstract pass ParentPass
-{
-   diffuse $diffuse_colour
-}
-
-material Test
-{
-   technique
-   {
-       pass : ParentPass
-       {
-           set $diffuse_colour "1 0 0 1"
-       }
-   }
-}
-```
-
-The ParentPass object declares a variable called "diffuse\_colour" which is then overridden in the Test material’s pass. The "set" keyword is used to set the value of that variable. The variable assignment follows lexical scoping rules, which means that the value of "1 0 0 1" is only valid inside that pass definition. Variable assignment in outer scopes carry over into inner scopes.
-
-```cpp
-material Test
-{
-    set $diffuse_colour "1 0 0 1"
-    technique
-    {
-        pass : ParentPass
-        {
-        }
-    }
-}
-```
-
-The $diffuse\_colour assignment carries down through the technique and into the pass. 
-
-## Script Import Directive {#Script-Import-Directive}
-
-Imports are a feature introduced to remove ambiguity from script dependencies. When using scripts that inherit from each other but which are defined in separate files sometimes errors occur because the scripts are loaded in incorrect order. Using imports removes this issue. The script which is inheriting another can explicitly import its parent’s definition which will ensure that no errors occur because the parent’s definition was not found.
-
-```cpp
-import * from "parent.material"
-material Child : Parent
-{
-}
-```
-
-The material "Parent" is defined in parent.material and the import ensures that those definitions are found properly. You can also import specific targets from within a file.
-
-```cpp
-import Parent from "parent.material"
-```
-
-If there were other definitions in the parent.material file, they would not be imported.
-
-Note, however that importing does not actually cause objects in the imported script to be fully parsed & created, it just makes the definitions available for inheritance. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The ’import’ command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).
