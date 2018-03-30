@@ -147,7 +147,6 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore Ogre::AllocPolicy;
 %import "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
-%template() Ogre::map<Ogre::String, Ogre::String>;
 %template(NameValuePairList) std::map<Ogre::String, Ogre::String>;
 %ignore Ogre::findCommandLineOpts; // not needed in python
 
@@ -168,7 +167,6 @@ JNIEnv* OgreJNIGetEnv() {
 ADD_REPR(Degree)
 ADD_REPR(Radian)
 %include "OgreStringVector.h"
-%template() Ogre::vector<Ogre::String>; // instantiate vector<T>::type
 %template(StringVector) std::vector<Ogre::String>;  // actual vector<T>
 %template(StringVectorPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
 // Linear Algebra
@@ -198,9 +196,7 @@ ADD_REPR(Plane)
 %ignore Ogre::ConfigFile::load; // conflicting overloads
 %ignore Ogre::ConfigFile::getSettingsIterator; // deprecated
 %ignore Ogre::ConfigFile::getSectionIterator;
-%template() Ogre::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
 %template(SettingsBySection) std::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
-%template() Ogre::multimap<Ogre::String, Ogre::String>;
 #ifdef SWIGPYTHON
 %template(SettingsMultiMap) std::multimap<Ogre::String, Ogre::String>;
 #endif
@@ -260,7 +256,6 @@ SHARED_PTR(HardwareBuffer);
 %include "OgreParticleIterator.h"
 
 #ifndef SWIGJAVA
-%template() Ogre::vector<Ogre::ParameterDef>;
 %ignore std::vector<Ogre::ParameterDef>::resize; // non default constructible
 %ignore std::vector<Ogre::ParameterDef>::vector;
 %template(ParameterList) std::vector<Ogre::ParameterDef>;
@@ -359,7 +354,6 @@ SHARED_PTR(Skeleton);
 %ignore Ogre::Material::getSupportedTechnique;
 %ignore Ogre::Material::getNumSupportedTechniques;
 SHARED_PTR(Material);
-%template() Ogre::vector<Ogre::Technique*>;
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
 %ignore Ogre::RenderSystem::addClipPlane(Real, Real, Real, Real);
@@ -426,7 +420,6 @@ SHARED_PTR(Material);
         %include "OgreCamera.h"
         ADD_REPR(Camera)
     %include "OgreManualObject.h"
-    %template() Ogre::vector<Ogre::SubEntity*>;
     %template(SubEntityList) std::vector<Ogre::SubEntity*>;
     %include "OgreEntity.h"
     %include "OgreSubEntity.h"
@@ -446,9 +439,7 @@ SHARED_PTR(Material);
 %ignore Ogre::Mesh::getPoseCount;
 %ignore Ogre::Mesh::getPose;
 %ignore Ogre::Mesh::getPoseIterator;
-%template() Ogre::vector<Ogre::Pose*>;
 %template(PoseList) std::vector<Ogre::Pose*>;
-%template() Ogre::vector<Ogre::SubMesh*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
 SHARED_PTR(Mesh);
 %include "OgreMesh.h"
@@ -459,16 +450,13 @@ SHARED_PTR(Mesh);
     %include "OgrePatchMesh.h"
 %include "OgreMeshManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
-%template() Ogre::vector<Ogre::TextureUnitState*>;
 %template(TextureUnitStates) std::vector<Ogre::TextureUnitState*>;
 %include "OgrePass.h"
     %ignore Ogre::Technique::getGPUVendorRuleIterator;
     %ignore Ogre::Technique::getGPUDeviceNameRuleIterator;
     %ignore Ogre::Technique::getIlluminationPassIterator;
     %ignore Ogre::Technique::getPassIterator();
-    %template() Ogre::vector<Ogre::Pass*>;
     %template(Passes) std::vector<Ogre::Pass*>;
-    %template() Ogre::vector<Ogre::IlluminationPass*>;
     %template(IlluminationPassList) std::vector<Ogre::IlluminationPass*>;
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
@@ -508,7 +496,6 @@ SHARED_PTR(Mesh);
 %include "OgreSceneManager.h"
 %include "OgreSceneManagerEnumerator.h"
 %include "OgreConfigDialog.h"
-%template() Ogre::vector<Ogre::RenderSystem*>;
 %template(RenderSystemList) std::vector<Ogre::RenderSystem*>;
 %ignore Ogre::Root::showConfigDialog(); // deprecated
 %ignore Ogre::Root::addResourceLocation; // deprecated
