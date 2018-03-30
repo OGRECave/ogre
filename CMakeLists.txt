@@ -258,6 +258,8 @@ elseif(EMSCRIPTEN)
   set(OGRE_BUILD_COMPONENT_PAGING FALSE CACHE BOOL "Disable paging component on Emscripten" FORCE)
   set(OGRE_BUILD_COMPONENT_TERRAIN FALSE CACHE BOOL "Disable terrain component on Emscripten" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Emscripten" FORCE)
+
+  set(OGRE_CONFIG_THREADS "0" CACHE STRING "Threading is unstable on Emscripten" FORCE)
 elseif (APPLE AND NOT APPLE_IOS)
 
   set(XCODE_ATTRIBUTE_SDKROOT macosx)
