@@ -89,7 +89,7 @@ namespace Ogre {
         /** Array of 4D vector of triangle face normal, which is unit vector orthogonal
             to the triangles, plus distance from origin.
             Use aligned policy here because we are intended to use in SIMD optimised routines. */
-        typedef aligned_vector<Vector4, OGRE_SIMD_ALIGNMENT>::type TriangleFaceNormalList;
+        typedef aligned_vector<Vector4> TriangleFaceNormalList;
 
         /** Working vector used when calculating the silhouette.
             Use std::vector<char> instead of std::vector<bool> which might implemented
