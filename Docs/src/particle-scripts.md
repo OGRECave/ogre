@@ -4,19 +4,9 @@ Particle scripts allow you to define particle systems to be instantiated in your
 
 @tableofcontents
 
-# Loading scripts {#Loading-scripts-2}
-
-Particle system scripts are loaded at initialisation time by the system: by default it looks in all common resource locations (see Root::addResourceLocation) for files with the ’.particle’ extension and parses them. If you want to parse files with a different extension, use the ParticleSystemManager::getSingleton().parseAllSources method with your own extension, or if you want to parse an individual file, use ParticleSystemManager::getSingleton().parseScript.
-
 Once scripts have been parsed, your code is free to instantiate systems based on them using the SceneManager::createParticleSystem() method which can take both a name for the new system, and the name of the template to base it on (this template name is in the script).
 
-# Format {#Format-2}
-
-Several particle systems may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ({}), and comments indicated by starting a line with ’//’ (note, no nested form comments allowed). The general format is shown below in a typical example:
-
 @snippet Samples/Media/particle/Examples.particle manual_sample
-
-Every particle system in the script must be given a name, which is the line before the first opening ’{’, in the example this is ’Examples/PurpleFountain’. This name must be globally unique. It can include path characters (as in the example) to logically divide up your particle systems, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.
 
 A system can have top-level attributes set using the scripting commands available, such as ’quota’ to set the maximum number of particles allowed in the system. Emitters (which create particles) and affectors (which modify particles) are added as nested definitions within the script. The parameters available in the emitter and affector sections are entirely dependent on the type of emitter / affector.
 

@@ -33,12 +33,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-
+//! [font_translator]
 struct FontTranslator : public ScriptTranslator
 {
     void translate(ScriptCompiler* compiler, const AbstractNodePtr& node);
     void parseAttribute(ScriptCompiler* compiler, FontPtr& pFont, PropertyAbstractNode* prop);
 };
+//! [font_translator]
 
 class OverlayTranslatorManager : public ScriptTranslatorManager
 {
@@ -47,6 +48,7 @@ class OverlayTranslatorManager : public ScriptTranslatorManager
 
 public:
     OverlayTranslatorManager();
+    ~OverlayTranslatorManager();
     ScriptTranslator* getTranslator(const AbstractNodePtr& node);
 };
 }

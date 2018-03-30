@@ -154,10 +154,10 @@ namespace Ogre {
         mSlicePitch = mHeight*mWidth;
         mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
-#if 0 //OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE
         // Log a message
         std::stringstream str;
-        str << "GLES2HardwarePixelBuffer constructed for texture " << baseName
+        str << "GLES2HardwarePixelBuffer constructed for texture " << parent->getName()
             << " id " << mTextureID << " face " << mFace << " level " << mLevel << ":"
             << " width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
             << " format=" << PixelUtil::getFormatName(mFormat);

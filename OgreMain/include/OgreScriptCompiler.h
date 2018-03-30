@@ -283,7 +283,7 @@ namespace Ogre
         /// This function overlays the given object on the destination object following inheritance rules
         void overlayObject(const AbstractNodePtr &source, ObjectAbstractNode *dest);
         /// Returns true if the given class is name excluded
-        bool isNameExcluded(const String &cls, AbstractNode *parent);
+        bool isNameExcluded(const ObjectAbstractNode* node, AbstractNode *parent);
         /// This function sets up the initial values in word id map
         void initWordMap();
     private:
