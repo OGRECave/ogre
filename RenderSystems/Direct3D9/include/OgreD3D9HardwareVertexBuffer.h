@@ -98,7 +98,7 @@ namespace Ogre {
 
 
     protected:
-        typedef map<IDirect3DDevice9*, BufferResources*>::type  DeviceToBufferResourcesMap;
+        typedef std::map<IDirect3DDevice9*, BufferResources*>  DeviceToBufferResourcesMap;
         typedef DeviceToBufferResourcesMap::iterator            DeviceToBufferResourcesIterator;
 
         DeviceToBufferResourcesMap  mMapDeviceToBufferResources;    // Map between device to buffer resources.

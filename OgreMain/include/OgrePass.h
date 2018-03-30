@@ -104,7 +104,7 @@ namespace Ogre {
             virtual ~HashFunc() {}
         };
 
-        typedef vector<TextureUnitState*>::type TextureUnitStates;
+        typedef std::vector<TextureUnitState*> TextureUnitStates;
     protected:
         Technique* mParent;
         String mName; /// Optional name for the pass
@@ -234,7 +234,7 @@ namespace Ogre {
         /// Constant, linear, quadratic coeffs
         Real mPointAttenuationCoeffs[3];
         // TU Content type lookups
-        typedef vector<unsigned short>::type ContentTypeLookup;
+        typedef std::vector<unsigned short> ContentTypeLookup;
         mutable ContentTypeLookup mShadowContentTypeLookup;
 
         /// Illumination stage?
@@ -246,7 +246,7 @@ namespace Ogre {
         void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
 
     public:
-        typedef set<Pass*>::type PassSet;
+        typedef std::set<Pass*> PassSet;
     protected:
         /// List of Passes whose hashes need recalculating
         static PassSet msDirtyHashList;
@@ -1774,7 +1774,7 @@ namespace Ogre {
         IlluminationPass() {}
     };
 
-    typedef vector<IlluminationPass*>::type IlluminationPassList;
+    typedef std::vector<IlluminationPass*> IlluminationPassList;
 
     /** @} */
     /** @} */

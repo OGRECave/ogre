@@ -103,7 +103,7 @@ namespace Ogre {
             /// Only used when mFaceCamera == false
             Quaternion orientation;
         };
-        typedef vector<Element>::type ElementList;
+        typedef std::vector<Element> ElementList;
 
         /** Constructor (don't use directly, use factory) 
         @param name The name to give this object
@@ -341,7 +341,7 @@ namespace Ogre {
             /// The 'tail' of the chain, relative to start
             size_t tail;
         };
-        typedef vector<ChainSegment>::type ChainSegmentList;
+        typedef std::vector<ChainSegment> ChainSegmentList;
         ChainSegmentList mChainSegmentList;
 
         /// Setup the STL collections

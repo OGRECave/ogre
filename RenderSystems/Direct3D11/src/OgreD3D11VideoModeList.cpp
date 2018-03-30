@@ -79,7 +79,7 @@ namespace Ogre
 					if (NumModes > 0)
 					{
 						// Create an array to store Display Mode information
-						vector<DXGI_MODE_DESC>::type modes;
+						std::vector<DXGI_MODE_DESC> modes;
 						modes.resize(NumModes);
 
 						// Populate our array with information
@@ -97,7 +97,7 @@ namespace Ogre
 
 							// Check to see if it is already in the list (to filter out refresh rates)
 							BOOL found = FALSE;
-							vector<D3D11VideoMode>::type::iterator it;
+							std::vector<D3D11VideoMode>::iterator it;
 							for (it = mModeList.begin(); it != mModeList.end(); it++)
 							{
 								DXGI_OUTPUT_DESC oldOutput = it->getDisplayMode();
@@ -133,14 +133,14 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11VideoMode* D3D11VideoModeList::item( size_t index )
     {
-        vector<D3D11VideoMode>::type::iterator p = mModeList.begin();
+        std::vector<D3D11VideoMode>::iterator p = mModeList.begin();
 
         return &p[index];
     }
     //---------------------------------------------------------------------
     D3D11VideoMode* D3D11VideoModeList::item( const String &name )
     {
-        vector<D3D11VideoMode>::type::iterator it = mModeList.begin();
+        std::vector<D3D11VideoMode>::iterator it = mModeList.begin();
         if (it == mModeList.end())
             return NULL;
 

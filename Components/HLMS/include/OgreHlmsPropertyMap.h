@@ -76,7 +76,7 @@ namespace Ogre
 
 	protected:
 
-		vector<Property>::type mProperties;
+		std::vector<Property> mProperties;
 		uint32 mHash;
 
 		static bool orderPropertyByIdString(const PropertyMap::Property &_left, const PropertyMap::Property &_right)

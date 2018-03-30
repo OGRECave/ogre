@@ -193,10 +193,10 @@ protected:
     void createMaterialForTexture( const String & texName, bool isTextureAtlasTexture );
     // Types.
 protected:
-    typedef vector<Entity*>::type   EntityList;
+    typedef std::vector<Entity*>   EntityList;
     typedef EntityList::iterator    EntityListIterator;
 
-    typedef map<String, bool>::type  StringMap;
+    typedef std::map<String, bool>  StringMap;
     typedef StringMap::iterator      StringMapIterator;
 
 protected:
@@ -214,8 +214,8 @@ protected:
     InfiniteFrustum                     mInfiniteFrustum;               // todo - doc
     BillboardSet*                       mBbsFlare;                      // todo - doc
     bool                                mAddedLotsOfModels;             // todo - doc
-    vector<Entity *>::type              mLotsOfModelsEntities;          // todo - doc       
-    vector<SceneNode *>::type           mLotsOfModelsNodes;             // todo - doc  
+    std::vector<Entity *>              mLotsOfModelsEntities;          // todo - doc       
+    std::vector<SceneNode *>           mLotsOfModelsNodes;             // todo - doc  
     int                                 mNumberOfModelsAdded;           // todo - doc   
     RTShader::SubRenderStateFactory *   mInstancedViewportsFactory;     // todo - doc
 

@@ -71,7 +71,7 @@ namespace Ogre {
         ParameterDef(const String& newName, const String& newDescription, ParameterType newType)
             : name(newName), paramType(newType) {}
     };
-    typedef vector<ParameterDef>::type ParameterList;
+    typedef std::vector<ParameterDef> ParameterList;
 
     /** Abstract class which is command object which gets/sets parameters.*/
     class _OgreExport ParamCommand
@@ -82,7 +82,7 @@ namespace Ogre {
 
         virtual ~ParamCommand() { }
     };
-    typedef map<String, ParamCommand* >::type ParamCommandMap;
+    typedef std::map<String, ParamCommand* > ParamCommandMap;
 
     /** Class to hold a dictionary of parameters for a single class. */
     class _OgreExport ParamDictionary
@@ -147,7 +147,7 @@ namespace Ogre {
 
 
     };
-    typedef map<String, ParamDictionary>::type ParamDictionaryMap;
+    typedef std::map<String, ParamDictionary> ParamDictionaryMap;
     
     /** Class defining the common interface which classes can use to 
         present a reflection-style, self-defining parameter set to callers.

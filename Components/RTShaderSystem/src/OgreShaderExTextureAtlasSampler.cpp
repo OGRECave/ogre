@@ -281,7 +281,7 @@ void TextureAtlasSampler::updateGpuProgramsParams(Renderable* rend, Pass* pass, 
                 //Update the information of which texture exist where in the atlas
                 //
                 GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
-                vector<float>::type buffer(mAtlasTableDatas[j]->size() * 4);
+                std::vector<float> buffer(mAtlasTableDatas[j]->size() * 4);
                 for(size_t i = 0 ; i < mAtlasTableDatas[j]->size() ; ++i)
                 {
                     buffer[i*4] = (*(mAtlasTableDatas[j]))[i].posU;
@@ -420,7 +420,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
             if ((nonWhiteSpacePos != String::npos) && (line[nonWhiteSpacePos] != '#'))
             {
                 //parse the line
-                vector<String>::type strings = StringUtil::split(line, ",\t");
+                std::vector<String> strings = StringUtil::split(line, ",\t");
                 
                 if (strings.size() > 8)
                 {

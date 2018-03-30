@@ -51,8 +51,8 @@ protected:
     struct TriangleQuadricPlane {
         Matrix4 quadric;
     };
-    vector<Matrix4>::type mTrianglePlaneQuadricList;
-    vector<Matrix4>::type mVertexQuadricList;
+    std::vector<Matrix4> mTrianglePlaneQuadricList;
+    std::vector<Matrix4> mVertexQuadricList;
     void computeTrianglePlaneQuadric(LodData* data, size_t triangleID);
     void computeVertexQuadric(LodData* data, size_t vertexID);
 };

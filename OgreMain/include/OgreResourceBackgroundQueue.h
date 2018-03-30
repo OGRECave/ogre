@@ -138,7 +138,7 @@ namespace Ogre {
             { (void)r; return o; }
         };
 
-        typedef set<BackgroundProcessTicket>::type OutstandingRequestSet;   
+        typedef std::set<BackgroundProcessTicket> OutstandingRequestSet;   
         OutstandingRequestSet mOutstandingRequestSet;
 
         /// Struct that holds details of queued notifications

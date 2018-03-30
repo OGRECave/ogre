@@ -40,7 +40,7 @@ Function::Function(const String& name, const String& desc, const FunctionType fu
 //-----------------------------------------------------------------------------
 Function::~Function()
 {
-    map<size_t, FunctionAtomInstanceList>::iterator jt;
+    std::map<size_t, FunctionAtomInstanceList>::iterator jt;
     for(jt = mAtomInstances.begin(); jt != mAtomInstances.end(); ++jt)
     {
         for (FunctionAtomInstanceIterator it=jt->second.begin(); it != jt->second.end(); ++it)
@@ -498,7 +498,7 @@ const FunctionAtomInstanceList& Function::getAtomInstances()
         return mSortedAtomInstances;
 
     // put atom instances into order
-    map<size_t, FunctionAtomInstanceList>::const_iterator it;
+    std::map<size_t, FunctionAtomInstanceList>::const_iterator it;
     for(it = mAtomInstances.begin(); it != mAtomInstances.end(); ++it)
     {
         mSortedAtomInstances.insert(mSortedAtomInstances.end(), it->second.begin(),

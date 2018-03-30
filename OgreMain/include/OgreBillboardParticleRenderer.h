@@ -202,7 +202,7 @@ namespace Ogre {
         const String& getType(void) const;
         /// @copydoc ParticleSystemRenderer::_updateRenderQueue
         void _updateRenderQueue(RenderQueue* queue, 
-            list<Particle*>::type& currentParticles, bool cullIndividually);
+            std::list<Particle*>& currentParticles, bool cullIndividually);
         /// @copydoc ParticleSystemRenderer::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);

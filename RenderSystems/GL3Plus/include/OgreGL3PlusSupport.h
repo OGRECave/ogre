@@ -182,7 +182,7 @@ namespace Ogre
             GLNativeSupport* mNative;
 
             // This contains the complete list of supported extensions
-            set<String>::type extensionList;
+            std::set<String> extensionList;
     };
 
 }

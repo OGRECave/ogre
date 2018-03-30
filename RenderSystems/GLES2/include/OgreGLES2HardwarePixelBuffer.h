@@ -103,7 +103,7 @@ namespace Ogre {
             GLint mFace;
             GLint mLevel;
                 
-            typedef vector<RenderTexture*>::type SliceTRT;
+            typedef std::vector<RenderTexture*> SliceTRT;
             SliceTRT mSliceTRT;
 
             void buildMipmaps(const PixelBox &data);

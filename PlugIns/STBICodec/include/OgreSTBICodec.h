@@ -45,7 +45,7 @@ namespace Ogre {
     private:
         String mType;
 
-        typedef list<ImageCodec*>::type RegisteredCodecList;
+        typedef std::list<ImageCodec*> RegisteredCodecList;
         static RegisteredCodecList msCodecList;
 
     public:

@@ -98,7 +98,7 @@ namespace Ogre {
     
     // Types.
     protected:
-        typedef set<D3D9Resource*>::type        ResourceContainer;
+        typedef std::set<D3D9Resource*>        ResourceContainer;
         typedef ResourceContainer::iterator     ResourceContainerIterator;
 
     // Protected methods.

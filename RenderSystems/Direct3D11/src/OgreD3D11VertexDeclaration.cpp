@@ -70,7 +70,7 @@ namespace Ogre {
 
         if (mD3delems.find(boundVertexProgram) == mD3delems.end())
         {
-            vector<D3D11_INPUT_ELEMENT_DESC>::type D3delems;
+            std::vector<D3D11_INPUT_ELEMENT_DESC> D3delems;
 
             unsigned int idx;
             for (idx = 0; idx < iNumElements; ++idx)

@@ -438,7 +438,7 @@ namespace Volume {
 
         /** A list of Chunks.
         */
-        typedef vector<const Chunk*>::type VecChunk;
+        typedef std::vector<const Chunk*> VecChunk;
 
         /** Gathers all visible chunks (containing triangles) of a specific LOD level.
         @param level

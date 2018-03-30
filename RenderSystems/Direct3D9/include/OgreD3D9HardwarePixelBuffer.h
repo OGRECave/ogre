@@ -56,7 +56,7 @@ namespace Ogre {
             IDirect3DBaseTexture9 *mipTex;          
         };
 
-        typedef map<IDirect3DDevice9*, BufferResources*>::type  DeviceToBufferResourcesMap;
+        typedef std::map<IDirect3DDevice9*, BufferResources*>  DeviceToBufferResourcesMap;
         typedef DeviceToBufferResourcesMap::iterator            DeviceToBufferResourcesIterator;
 
         /// Map between device to buffer resources.

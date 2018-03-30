@@ -170,7 +170,7 @@ namespace Ogre {
 
         /** Texture effects in a multimap paired array.
         */
-        typedef multimap<TextureEffectType, TextureEffect>::type EffectMap;
+        typedef std::multimap<TextureEffectType, TextureEffect> EffectMap;
 
         /** Default constructor.
         */
@@ -1176,7 +1176,7 @@ protected:
         // Complex members (those that can't be copied using memcpy) are at the end to 
         // allow for fast copying of the basic members.
         //
-        mutable vector<TexturePtr>::type mFramePtrs;
+        mutable std::vector<TexturePtr> mFramePtrs;
         String mName;               ///< Optional name for the TUS.
         String mTextureNameAlias;   ///< Optional alias for texture frames.
         EffectMap mEffects;

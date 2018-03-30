@@ -45,7 +45,7 @@ namespace Ogre
 	*/
 	const String FilePatterns[] = { "_vs", "_fs", "_gs", "_ds", "_hs" };
 
-	typedef vector< std::pair<IdString, String> >::type HlmsParamVec;
+	typedef std::vector< std::pair<IdString, String> > HlmsParamVec;
 
 	inline bool OrderParamVecByKey(const std::pair<IdString, String> &_left,
 		const std::pair<IdString, String> &_right)

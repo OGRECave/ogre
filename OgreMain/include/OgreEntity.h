@@ -84,9 +84,9 @@ namespace Ogre {
         friend class SubEntity;
     public:
         
-        typedef set<Entity*>::type EntitySet;
-        typedef map<unsigned short, bool>::type SchemeHardwareAnimMap;
-        typedef vector<SubEntity*>::type SubEntityList;
+        typedef std::set<Entity*> EntitySet;
+        typedef std::map<unsigned short, bool> SchemeHardwareAnimMap;
+        typedef std::vector<SubEntity*> SubEntityList;
     protected:
 
         /** Private constructor (instances cannot be created directly).
@@ -253,7 +253,7 @@ namespace Ogre {
             same number of SubMeshes, therefore we have to allow a separate Entity list
             with each alternate one.
         */
-        typedef vector<Entity*>::type LODEntityList;
+        typedef std::vector<Entity*> LODEntityList;
         LODEntityList mLodEntityList;
 #else
         const ushort mMeshLodIndex;
@@ -309,7 +309,7 @@ namespace Ogre {
 
     public:
         /// Contains the child objects (attached to bones) indexed by name.
-        typedef map<String, MovableObject*>::type ChildObjectList;
+        typedef std::map<String, MovableObject*> ChildObjectList;
     protected:
         ChildObjectList mChildObjectList;
 

@@ -49,7 +49,7 @@ namespace Ogre
         D3D11Driver* findByName( const String &name ); // never fail but can return default driver if requested is not found
 
     private:
-        vector<SharedPtr<D3D11Driver> >::type mDriverList;
+        std::vector<SharedPtr<D3D11Driver> > mDriverList;
         unsigned mHiddenDriversCount;
     };
 }

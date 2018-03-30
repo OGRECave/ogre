@@ -289,7 +289,7 @@ namespace Ogre {
         /// Number of pixel formats currently defined
         PF_COUNT
     };
-    typedef vector<PixelFormat>::type PixelFormatList;
+    typedef std::vector<PixelFormat> PixelFormatList;
 
     /**
      * Flags defining some on/off properties of pixel formats

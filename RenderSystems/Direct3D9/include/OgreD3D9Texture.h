@@ -55,7 +55,7 @@ namespace Ogre {
             IDirect3DSurface9* pFSAASurface;            
         };
         
-        typedef map<IDirect3DDevice9*, TextureResources*>::type DeviceToTextureResourcesMap;
+        typedef std::map<IDirect3DDevice9*, TextureResources*> DeviceToTextureResourcesMap;
         typedef DeviceToTextureResourcesMap::iterator           DeviceToTextureResourcesIterator;
 
         /// Map between device to texture resources.
@@ -63,7 +63,7 @@ namespace Ogre {
 
 
         /// Vector of pointers to subsurfaces
-        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
+        typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
         SurfaceList mSurfaceList;
         /// cube texture individual face names
         String                          mCubeFaceNames[6];  
@@ -80,7 +80,7 @@ namespace Ogre {
         DWORD mFSAAQuality;
         
         // needed to store data between prepareImpl and loadImpl
-        typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
+        typedef SharedPtr<std::vector<MemoryDataStreamPtr> > LoadedStreams;
 
         /// internal method, load a cube texture
         void _loadCubeTex(IDirect3DDevice9* d3d9Device, const LoadedStreams &loadedStreams);

@@ -61,10 +61,10 @@ struct _OgreLodExport LodData {
     struct VertexHash;
     struct VertexEqual;
 
-    typedef vector<Vertex>::type VertexList;
-    typedef vector<Triangle>::type TriangleList;
+    typedef std::vector<Vertex> VertexList;
+    typedef std::vector<Triangle> TriangleList;
     typedef std::unordered_set<Vertex*, VertexHash, VertexEqual> UniqueVertexSet;
-    typedef multimap<Real, Vertex*>::type CollapseCostHeap;
+    typedef std::multimap<Real, Vertex*> CollapseCostHeap;
 
     typedef VectorSet<Edge, 8> VEdges;
     typedef VectorSet<Triangle*, 7> VTriangles;
@@ -136,7 +136,7 @@ struct _OgreLodExport LodData {
         size_t prevIndexCount; /// Used by output providers only!
     };
 
-    typedef vector<IndexBufferInfo>::type IndexBufferInfoList;
+    typedef std::vector<IndexBufferInfo> IndexBufferInfoList;
 
     /// Provides position based vertex lookup. Position is the real identifier of a vertex.
     UniqueVertexSet mUniqueVertexSet;

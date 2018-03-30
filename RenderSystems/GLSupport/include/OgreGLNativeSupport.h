@@ -48,7 +48,7 @@ namespace Ogre
     class _OgreGLExport GLNativeSupport
     {
         public:
-            typedef set<String>::type ExtensionList;
+            typedef std::set<String> ExtensionList;
 
             enum ContextProfile {
                 CONTEXT_CORE = 1,

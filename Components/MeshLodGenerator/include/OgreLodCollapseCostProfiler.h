@@ -54,7 +54,7 @@ protected:
         Real cost;
     };
 
-    typedef vector<bool>::type HasVertexProfileList;
+    typedef std::vector<bool> HasVertexProfileList;
 
     HasVertexProfileList mHasProfile;
 

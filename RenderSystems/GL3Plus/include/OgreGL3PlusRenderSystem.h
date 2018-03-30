@@ -90,7 +90,7 @@ namespace Ogre {
         /// GL support class, used for creating windows etc.
         GL3PlusSupport *mGLSupport;
 
-        typedef list<GL3PlusContext*>::type GL3PlusContextList;
+        typedef std::list<GL3PlusContext*> GL3PlusContextList;
         /// List of background thread contexts
         GL3PlusContextList mBackgroundContextList;
 

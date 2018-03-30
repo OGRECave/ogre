@@ -66,7 +66,7 @@ namespace Ogre {
 	  bool sendStereoCommand(ATIDX9STEREOCOMMAND stereoCommand, BYTE* outBuffer, DWORD outBufferSize, BYTE* inBuffer, DWORD inBufferSize);
 	  void releaseResources();
 
-	  typedef map<String, D3D9RenderWindow*>::type RenderWindowMap;
+	  typedef std::map<String, D3D9RenderWindow*> RenderWindowMap;
 	  RenderWindowMap mRenderWindowMap;
 
 	  bool mStereoEnabled;

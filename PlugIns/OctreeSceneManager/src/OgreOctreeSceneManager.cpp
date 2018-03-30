@@ -671,7 +671,7 @@ void OctreeSceneManager::walkOctree( OctreeCamera *camera, RenderQueue *queue,
 }
 
 // --- non template versions
-static void _findNodes( const AxisAlignedBox &t, list< SceneNode * >::type &list, SceneNode *exclude, bool full, Octree *octant )
+static void _findNodes( const AxisAlignedBox &t, std::list< SceneNode * > &list, SceneNode *exclude, bool full, Octree *octant )
 {
 
     if ( !full )
@@ -744,7 +744,7 @@ static void _findNodes( const AxisAlignedBox &t, list< SceneNode * >::type &list
 
 }
 
-static void _findNodes( const Sphere &t, list< SceneNode * >::type &list, SceneNode *exclude, bool full, Octree *octant )
+static void _findNodes( const Sphere &t, std::list< SceneNode * > &list, SceneNode *exclude, bool full, Octree *octant )
 {
 
     if ( !full )
@@ -818,7 +818,7 @@ static void _findNodes( const Sphere &t, list< SceneNode * >::type &list, SceneN
 }
 
 
-static void _findNodes( const PlaneBoundedVolume &t, list< SceneNode * >::type &list, SceneNode *exclude, bool full, Octree *octant )
+static void _findNodes( const PlaneBoundedVolume &t, std::list< SceneNode * > &list, SceneNode *exclude, bool full, Octree *octant )
 {
 
     if ( !full )
@@ -891,7 +891,7 @@ static void _findNodes( const PlaneBoundedVolume &t, list< SceneNode * >::type &
 
 }
 
-static void _findNodes( const Ray &t, list< SceneNode * >::type &list, SceneNode *exclude, bool full, Octree *octant )
+static void _findNodes( const Ray &t, std::list< SceneNode * > &list, SceneNode *exclude, bool full, Octree *octant )
 {
 
     if ( !full )
@@ -964,30 +964,30 @@ static void _findNodes( const Ray &t, list< SceneNode * >::type &list, SceneNode
 
 }
 
-void OctreeSceneManager::findNodesIn( const AxisAlignedBox &box, list< SceneNode * >::type &list, SceneNode *exclude )
+void OctreeSceneManager::findNodesIn( const AxisAlignedBox &box, std::list< SceneNode * > &list, SceneNode *exclude )
 {
     _findNodes( box, list, exclude, false, mOctree );
 }
 
-void OctreeSceneManager::findNodesIn( const Sphere &sphere, list< SceneNode * >::type &list, SceneNode *exclude )
+void OctreeSceneManager::findNodesIn( const Sphere &sphere, std::list< SceneNode * > &list, SceneNode *exclude )
 {
     _findNodes( sphere, list, exclude, false, mOctree );
 }
 
-void OctreeSceneManager::findNodesIn( const PlaneBoundedVolume &volume, list< SceneNode * >::type &list, SceneNode *exclude )
+void OctreeSceneManager::findNodesIn( const PlaneBoundedVolume &volume, std::list< SceneNode * > &list, SceneNode *exclude )
 {
     _findNodes( volume, list, exclude, false, mOctree );
 }
 
-void OctreeSceneManager::findNodesIn( const Ray &r, list< SceneNode * >::type &list, SceneNode *exclude )
+void OctreeSceneManager::findNodesIn( const Ray &r, std::list< SceneNode * > &list, SceneNode *exclude )
 {
     _findNodes( r, list, exclude, false, mOctree );
 }
 
 void OctreeSceneManager::resize( const AxisAlignedBox &box )
 {
-    list< SceneNode * >::type nodes;
-    list< SceneNode * >::type ::iterator it;
+    std::list< SceneNode * > nodes;
+    std::list< SceneNode * > ::iterator it;
 
     _findNodes( mOctree->mBox, nodes, 0, true, mOctree );
 

@@ -319,7 +319,7 @@ namespace Ogre
 namespace Ogre
 {
     template <typename T>
-    struct deque 
+    struct OGRE_DEPRECATED deque
     { 
         typedef typename std::deque<T> type;
         typedef typename std::deque<T>::iterator iterator;
@@ -327,7 +327,7 @@ namespace Ogre
     };
 
     template <typename T>
-    struct vector 
+    struct OGRE_DEPRECATED vector
     { 
         typedef typename std::vector<T> type;
         typedef typename std::vector<T>::iterator iterator;
@@ -338,7 +338,7 @@ namespace Ogre
     using aligned_vector = std::vector<T, AlignedAllocator<T, Alignment>>;
 
     template <typename T>
-    struct list 
+    struct OGRE_DEPRECATED list
     { 
         typedef typename std::list<T> type;
         typedef typename std::list<T>::iterator iterator;
@@ -346,7 +346,7 @@ namespace Ogre
     };
 
     template <typename T, typename P = std::less<T> >
-    struct set 
+    struct OGRE_DEPRECATED set
     { 
         typedef typename std::set<T, P> type;
         typedef typename std::set<T, P>::iterator iterator;
@@ -354,7 +354,7 @@ namespace Ogre
     };
 
     template <typename K, typename V, typename P = std::less<K> >
-    struct map 
+    struct OGRE_DEPRECATED map
     { 
         typedef typename std::map<K, V, P> type;
         typedef typename std::map<K, V, P>::iterator iterator;
@@ -362,7 +362,7 @@ namespace Ogre
     };
 
     template <typename K, typename V, typename P = std::less<K> >
-    struct multimap 
+    struct OGRE_DEPRECATED multimap
     { 
         typedef typename std::multimap<K, V, P> type;
         typedef typename std::multimap<K, V, P>::iterator iterator;

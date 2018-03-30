@@ -53,13 +53,13 @@ namespace Ogre {
         const UINT mMipLevel;
 
         // if the usage is static - alloc at lock then use device UpdateSubresource when unlock and free memory
-        vector<int8>::type mDataForStaticUsageLock; 
+        std::vector<int8> mDataForStaticUsageLock; 
 
         Box mLockBox;
         LockOptions mCurrentLockOptions;
 
         /// Render targets
-        typedef vector<RenderTexture*>::type SliceTRT;
+        typedef std::vector<RenderTexture*> SliceTRT;
         SliceTRT mSliceTRT;
 
         void createStagingBuffer();

@@ -94,10 +94,10 @@ namespace Ogre {
         /** Working vector used when calculating the silhouette.
             Use std::vector<char> instead of std::vector<bool> which might implemented
             similar bit-fields causing loss performance. */
-        typedef vector<char>::type TriangleLightFacingList;
+        typedef std::vector<char> TriangleLightFacingList;
 
-        typedef vector<Triangle>::type TriangleList;
-        typedef vector<Edge>::type EdgeList;
+        typedef std::vector<Triangle> TriangleList;
+        typedef std::vector<Edge> EdgeList;
 
         /** A group of edges sharing the same vertex data. */
         struct EdgeGroup
@@ -118,7 +118,7 @@ namespace Ogre {
 
         };
 
-        typedef vector<EdgeGroup>::type EdgeGroupList;
+        typedef std::vector<EdgeGroup> EdgeGroupList;
 
         /** Main triangles array, stores all triangles of this edge list. Note that
             triangles are grouping against edge group.
@@ -242,21 +242,21 @@ namespace Ogre {
             }
         };
 
-        typedef vector<const VertexData*>::type VertexDataList;
-        typedef vector<Geometry>::type GeometryList;
-        typedef vector<CommonVertex>::type CommonVertexList;
+        typedef std::vector<const VertexData*> VertexDataList;
+        typedef std::vector<Geometry> GeometryList;
+        typedef std::vector<CommonVertex> CommonVertexList;
 
         GeometryList mGeometryList;
         VertexDataList mVertexDataList;
         CommonVertexList mVertices;
         EdgeData* mEdgeData;
         /// Map for identifying common vertices
-        typedef map<Vector3, size_t, vectorLess>::type CommonVertexMap;
+        typedef std::map<Vector3, size_t, vectorLess> CommonVertexMap;
         CommonVertexMap mCommonVertexMap;
         /** Edge map, used to connect edges. Note we allow many triangles on an edge,
         after connected an existing edge, we will remove it and never used again.
         */
-        typedef multimap< std::pair<size_t, size_t>, std::pair<size_t, size_t> >::type EdgeMap;
+        typedef std::multimap< std::pair<size_t, size_t>, std::pair<size_t, size_t> > EdgeMap;
         EdgeMap mEdgeMap;
 
         void buildTrianglesEdges(const Geometry &geometry);

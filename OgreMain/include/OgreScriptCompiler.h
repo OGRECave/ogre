@@ -61,7 +61,7 @@ namespace Ogre
     /** The ConcreteNode is the struct that holds an un-conditioned sub-tree of parsed input */
     struct ConcreteNode;
     typedef SharedPtr<ConcreteNode> ConcreteNodePtr;
-    typedef list<ConcreteNodePtr>::type ConcreteNodeList;
+    typedef std::list<ConcreteNodePtr> ConcreteNodeList;
     typedef SharedPtr<ConcreteNodeList> ConcreteNodeListPtr;
     struct ConcreteNode : public ScriptCompilerAlloc
     {
@@ -85,7 +85,7 @@ namespace Ogre
     };
     class AbstractNode;
     typedef SharedPtr<AbstractNode> AbstractNodePtr;
-    typedef list<AbstractNodePtr>::type AbstractNodeList;
+    typedef std::list<AbstractNodePtr> AbstractNodeList;
     typedef SharedPtr<AbstractNodeList> AbstractNodeListPtr;
 
     class _OgreExport AbstractNode : public AbstractNodeAlloc
@@ -123,10 +123,10 @@ namespace Ogre
     class _OgreExport ObjectAbstractNode : public AbstractNode
     {
     private:
-        map<String,String>::type mEnv;
+        std::map<String,String> mEnv;
     public:
         String name, cls;
-        vector<String>::type bases;
+        std::vector<String> bases;
         uint32 id;
         bool abstract;
         AbstractNodeList children;
@@ -140,7 +140,7 @@ namespace Ogre
         void addVariable(const String &name);
         void setVariable(const String &name, const String &value);
         std::pair<bool,String> getVariable(const String &name) const;
-        const map<String,String>::type &getVariables() const;
+        const std::map<String,String> &getVariables() const;
     };
 
     /** This abstract node represents a script property */
@@ -188,7 +188,7 @@ namespace Ogre
     class _OgreExport ScriptCompiler : public ScriptCompilerAlloc
     {
     public: // Externally accessible types
-        //typedef map<String,uint32>::type IdMap;
+        //typedef std::map<String,uint32> IdMap;
         typedef std::unordered_map<String,uint32> IdMap;
 
         // The container for errors
@@ -199,7 +199,7 @@ namespace Ogre
             uint32 code;
         };
         typedef SharedPtr<Error> ErrorPtr;
-        typedef list<ErrorPtr>::type ErrorList;
+        typedef std::list<ErrorPtr> ErrorList;
 
         // These are the built-in error codes
         enum{
@@ -296,12 +296,12 @@ namespace Ogre
 		uint32 mLargestRegisteredWordId;
 
         // This is an environment map
-        typedef map<String,String>::type Environment;
+        typedef std::map<String,String> Environment;
         Environment mEnv;
 
-        typedef map<String,AbstractNodeListPtr>::type ImportCacheMap;
+        typedef std::map<String,AbstractNodeListPtr> ImportCacheMap;
         ImportCacheMap mImports; // The set of imported scripts to avoid circular dependencies
-        typedef multimap<String,String>::type ImportRequestMap;
+        typedef std::multimap<String,String> ImportRequestMap;
         ImportRequestMap mImportRequests; // This holds the target objects for each script to be imported
 
         // This stores the imports of the scripts, so they are separated and can be treated specially
@@ -411,7 +411,7 @@ namespace Ogre
         ScriptCompilerListener *mListener;
 
         // Stores a map from object types to the translators that handle them
-        vector<ScriptTranslatorManager*>::type mManagers;
+        std::vector<ScriptTranslatorManager*> mManagers;
 
         // A pointer to the built-in ScriptTranslatorManager
         ScriptTranslatorManager *mBuiltinTranslatorManager;

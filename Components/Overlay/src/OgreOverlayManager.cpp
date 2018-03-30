@@ -229,12 +229,12 @@ namespace Ogre {
                 String import;
                 if(StringUtil::startsWith(line, "import "))
                 {
-                    vector<String>::type params = StringUtil::split(line, "\t\n \"");
+                    std::vector<String> params = StringUtil::split(line, "\t\n \"");
                     import = params[3];
                 }
                 else if (StringUtil::startsWith(line, "#include"))
                 {
-                    vector<String>::type params = StringUtil::split(line, "\t\n ()<>");
+                    std::vector<String> params = StringUtil::split(line, "\t\n ()<>");
                     import = params[1];
                     logWarning("'#include' statements are deprected. Use 'import * from \"filename\"'",
                                stream, l);
@@ -421,7 +421,7 @@ namespace Ogre {
         if(legacyFormat)
             std::swap(TYPE, NAME);
 
-        vector<String>::type params = StringUtil::split(line, "\t\n ()");
+        std::vector<String> params = StringUtil::split(line, "\t\n ()");
 
         LogManager& lmgr = LogManager::getSingleton();
 
@@ -495,7 +495,7 @@ namespace Ogre {
     void OverlayManager::parseAttrib( const String& line, Overlay* pOverlay)
     {
         // Split params on first space
-        vector<String>::type vecparams = StringUtil::split(line, "\t ", 1);
+        std::vector<String> vecparams = StringUtil::split(line, "\t ", 1);
 
         // Look up first param (command setting)
         StringUtil::toLowerCase(vecparams[0]);
@@ -513,7 +513,7 @@ namespace Ogre {
     void OverlayManager::parseElementAttrib( const String& line, Overlay* pOverlay, OverlayElement* pElement )
     {
         // Split params on first space
-        vector<String>::type vecparams = StringUtil::split(line, "\t ", 1);
+        std::vector<String> vecparams = StringUtil::split(line, "\t ", 1);
 
         LogManager& lmgr = LogManager::getSingleton();
 

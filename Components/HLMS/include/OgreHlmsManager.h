@@ -65,7 +65,7 @@ namespace Ogre
 
 	protected:
 		typedef std::unordered_map<String, HlmsMaterialBase*> HlmsMatBindingMap;
-		typedef vector<Renderable*>::type RenderableVector;
+		typedef std::vector<Renderable*> RenderableVector;
 
 		SceneManager* mSceneManager;
 		ShaderManager mShaderManager;

@@ -147,7 +147,7 @@ namespace Ogre {
         void finishProgramDefinition(void);
 
         /// Listeners list of this Serializer.
-        typedef vector<Listener*>::type         ListenerList;
+        typedef std::vector<Listener*>         ListenerList;
         typedef ListenerList::iterator          ListenerListIterator;
         typedef ListenerList::const_iterator    ListenerListConstIterator;
         ListenerList mListeners;
@@ -191,7 +191,7 @@ namespace Ogre {
         void writeLayerBlendOperationEx(const LayerBlendOperationEx op);
         void writeLayerBlendSource(const LayerBlendSource lbs);
         
-        typedef multimap<TextureUnitState::TextureEffectType, TextureUnitState::TextureEffect>::type EffectMap;
+        typedef std::multimap<TextureUnitState::TextureEffectType, TextureUnitState::TextureEffect> EffectMap;
 
         void writeRotationEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
         void writeTransformEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
@@ -289,7 +289,7 @@ namespace Ogre {
     private:
         String mBuffer;
         String mGpuProgramBuffer;
-        typedef set<String>::type GpuProgramDefinitionContainer;
+        typedef std::set<String> GpuProgramDefinitionContainer;
         typedef GpuProgramDefinitionContainer::iterator GpuProgramDefIterator;
         GpuProgramDefinitionContainer mGpuProgramDefinitionContainer;
         bool mDefaults;

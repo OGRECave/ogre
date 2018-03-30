@@ -76,7 +76,7 @@ public:
   
 // Types.
 protected:
-    typedef vector<ShaderGenerator::SGPass*>::type  SGPassList;
+    typedef std::vector<ShaderGenerator::SGPass*>  SGPassList;
     typedef SGPassList::iterator                    SGPassListIterator;
     typedef SGPassList::const_iterator              SGPassListConstIterator;
 

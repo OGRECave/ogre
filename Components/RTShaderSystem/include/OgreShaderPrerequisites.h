@@ -73,7 +73,7 @@ class ProgramWriterManager;
 
 typedef shared_ptr<Parameter>        ParameterPtr;
 typedef shared_ptr<UniformParameter> UniformParameterPtr;
-typedef vector<ParameterPtr>::type  ShaderParameterList;
+typedef std::vector<ParameterPtr>  ShaderParameterList;
 
 // Vertex shader output parameters compact policy.
 enum VSOutputCompactPolicy

@@ -86,7 +86,7 @@ namespace Ogre
         static PCZoneFactoryManager* getSingletonPtr(void);
         /* PCZoneFactory Iterator - for querying what types of PCZone
         factories are available */
-        typedef map<String, PCZoneFactory*>::type PCZoneFactoryMap;
+        typedef std::map<String, PCZoneFactory*> PCZoneFactoryMap;
         typedef MapIterator<PCZoneFactoryMap> PCZoneFactoryIterator;
         /** Return an iterator over the PCZone factories currently registered */
         PCZoneFactoryIterator getPCZoneFactoryIterator(void);

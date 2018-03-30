@@ -50,7 +50,7 @@ namespace Ogre
         /// A map of texture parameters for each texture unit
         TexUnitsMap mTexUnitsMap;
         /// Stores the currently enabled vertex attributes
-        vector<GLuint>::type mEnabledVertexAttribs;
+        std::vector<GLuint> mEnabledVertexAttribs;
         /// Stores the current blend source function
         GLenum mBlendFuncSource;
         /// Stores the current blend destination function

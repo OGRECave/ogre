@@ -62,7 +62,7 @@ namespace Ogre
          */
 
         /// Array of each OpenGL feature that is enabled i.e. blending, depth test, etc.
-        vector<uint32>::type mEnableVector;
+        std::vector<uint32> mEnableVector;
         /// Stores the current clear colour
         float mClearColour[4];
         /// Stores the current depth clearing colour

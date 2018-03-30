@@ -291,7 +291,7 @@ namespace Ogre
 
         static const size_t LOD_MORPH_CUSTOM_PARAM;
 
-        typedef vector<Real>::type RealVector;
+        typedef std::vector<Real> RealVector;
 
         /** An instance of a layer, with specific texture names
         */
@@ -305,7 +305,7 @@ namespace Ogre
             LayerInstance()
                 : worldSize(100) {}
         };
-        typedef vector<LayerInstance>::type LayerInstanceList;
+        typedef std::vector<LayerInstance> LayerInstanceList;
 
         /// The alignment of the terrain
         enum Alignment
@@ -588,10 +588,10 @@ namespace Ogre
                 uint16 minBatchSize);
 
         protected:
-            typedef list<HardwareVertexBufferSharedPtr>::type VBufList;
+            typedef std::list<HardwareVertexBufferSharedPtr> VBufList;
             VBufList mFreePosBufList;
             VBufList mFreeDeltaBufList;
-            typedef map<uint32, HardwareIndexBufferSharedPtr>::type IBufMap;
+            typedef std::map<uint32, HardwareIndexBufferSharedPtr> IBufMap;
             IBufMap mSharedIBufMap;
 
             uint32 hashIndexBuffer(uint16 batchSize, 
@@ -1826,10 +1826,10 @@ namespace Ogre
 
         uint16 mLayerBlendMapSize;
         uint16 mLayerBlendMapSizeActual;
-        typedef vector<uint8*>::type BytePointerList;
+        typedef std::vector<uint8*> BytePointerList;
         /// Staging post for blend map data
         BytePointerList mCpuBlendMapStorage;
-        typedef vector<TexturePtr>::type TexturePtrList;
+        typedef std::vector<TexturePtr> TexturePtrList;
         TexturePtrList mBlendTextureList;
         TerrainLayerBlendMapList mLayerBlendMapList;
 

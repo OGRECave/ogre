@@ -88,8 +88,8 @@ namespace Ogre
     class _OgreExport InstanceBatch : public Renderable, public MovableObject
     {
     public:
-        typedef vector<InstancedEntity*>::type  InstancedEntityVec;
-        typedef vector<Vector4>::type           CustomParamsVec;
+        typedef std::vector<InstancedEntity*>  InstancedEntityVec;
+        typedef std::vector<Vector4>           CustomParamsVec;
     protected:
         RenderOperation     mRenderOperation;
         size_t              mInstancesPerBatch;

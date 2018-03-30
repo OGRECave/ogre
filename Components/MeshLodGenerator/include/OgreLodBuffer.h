@@ -65,7 +65,7 @@ struct _OgreLodExport LodInputBuffer
         LodVertexBuffer vertexBuffer;
         bool useSharedVertexBuffer;
     };
-    vector<Submesh>::type submesh;
+    std::vector<Submesh> submesh;
     LodVertexBuffer sharedVertexBuffer;
     String meshName;
     Real boundingSphereRadius;
@@ -75,10 +75,10 @@ struct _OgreLodExport LodInputBuffer
 struct _OgreLodExport LodOutputBuffer {
 
     struct _OgreLodExport Submesh {
-        vector<LodIndexBuffer>::type genIndexBuffers;
+        std::vector<LodIndexBuffer> genIndexBuffers;
     };
     /// Contains every generated indexBuffer from every submesh. submeshCount*lodLevelCount buffers.
-    vector<Submesh>::type submesh;
+    std::vector<Submesh> submesh;
 };
 /** @} */
 /** @} */

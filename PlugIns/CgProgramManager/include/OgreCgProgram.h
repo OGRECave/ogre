@@ -111,7 +111,7 @@ namespace Ogre {
         
         GpuConstantDefinitionMap mParametersMap;
         size_t mParametersMapSizeAsBuffer;
-        map<String,int>::type mSamplerRegisterMap;
+        std::map<String,int> mSamplerRegisterMap;
         CGenum mInputOp, mOutputOp;
         
         /// Internal method which works out which profile to use for this program

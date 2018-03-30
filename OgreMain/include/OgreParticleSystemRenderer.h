@@ -63,7 +63,7 @@ namespace Ogre {
             instance(s) it wishes.
         */
         virtual void _updateRenderQueue(RenderQueue* queue, 
-            list<Particle*>::type& currentParticles, bool cullIndividually) = 0;
+            std::list<Particle*>& currentParticles, bool cullIndividually) = 0;
 
         /** Sets the material this renderer must use; called by ParticleSystem. */
         virtual void _setMaterial(MaterialPtr& mat) = 0;
@@ -84,9 +84,9 @@ namespace Ogre {
         /** Optional callback notified when particle expired */
         virtual void _notifyParticleExpired(Particle* particle) {}
         /** Optional callback notified when particles moved */
-        virtual void _notifyParticleMoved(list<Particle*>::type& currentParticles) {}
+        virtual void _notifyParticleMoved(std::list<Particle*>& currentParticles) {}
         /** Optional callback notified when particles cleared */
-        virtual void _notifyParticleCleared(list<Particle*>::type& currentParticles) {}
+        virtual void _notifyParticleCleared(std::list<Particle*>& currentParticles) {}
         /** Create a new ParticleVisualData instance for attachment to a particle.
         @remarks
             If this renderer needs additional data in each particle, then this should

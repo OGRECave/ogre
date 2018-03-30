@@ -50,10 +50,10 @@ namespace Ogre
     *  @{
     */
 
-    typedef vector<DepthBuffer*>::type DepthBufferVec;
-    typedef map< uint16, DepthBufferVec >::type DepthBufferMap;
-    typedef map< String, RenderTarget * >::type RenderTargetMap;
-    typedef multimap<uchar, RenderTarget * >::type RenderTargetPriorityMap;
+    typedef std::vector<DepthBuffer*> DepthBufferVec;
+    typedef std::map< uint16, DepthBufferVec > DepthBufferMap;
+    typedef std::map< String, RenderTarget * > RenderTargetMap;
+    typedef std::multimap<uchar, RenderTarget * > RenderTargetPriorityMap;
 
     class TextureManager;
     /// Enum describing the ways to generate texture coordinates
@@ -1408,11 +1408,11 @@ namespace Ogre
         /// Internal method for firing a rendersystem event
         void fireEvent(const String& name, const NameValuePairList* params = 0);
 
-        typedef list<Listener*>::type ListenerList;
+        typedef std::list<Listener*> ListenerList;
         ListenerList mEventListeners;
         static Listener* msSharedEventListener;
 
-        typedef list<HardwareOcclusionQuery*>::type HardwareOcclusionQueryList;
+        typedef std::list<HardwareOcclusionQuery*> HardwareOcclusionQueryList;
         HardwareOcclusionQueryList mHwOcclusionQueries;
 
         bool mVertexProgramBound;

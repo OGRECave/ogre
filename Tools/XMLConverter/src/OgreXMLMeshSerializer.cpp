@@ -1596,7 +1596,7 @@ namespace Ogre {
 
             submeshNode->SetAttribute("index",  StringConverter::toString(idx));
 
-            for (vector<Vector3>::type::const_iterator v = sm->extremityPoints.begin ();
+            for (std::vector<Vector3>::const_iterator v = sm->extremityPoints.begin ();
                  v != sm->extremityPoints.end (); ++v)
             {
                 TiXmlElement* vert = submeshNode->InsertEndChild(

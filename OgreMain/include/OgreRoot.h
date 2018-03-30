@@ -46,7 +46,7 @@ namespace Ogre
 
     class AndroidLogListener;
 
-    typedef vector<RenderSystem*>::type RenderSystemList;
+    typedef std::vector<RenderSystem*> RenderSystemList;
     
     /** The root class of the Ogre system.
         @remarks
@@ -97,7 +97,7 @@ namespace Ogre
         std::unique_ptr<ArchiveFactory> mZipArchiveFactory;
         std::unique_ptr<ArchiveManager> mArchiveManager;
 
-        typedef map<String, MovableObjectFactory*>::type MovableObjectFactoryMap;
+        typedef std::map<String, MovableObjectFactory*> MovableObjectFactoryMap;
         MovableObjectFactoryMap mMovableObjectFactoryMap;
         std::unique_ptr<MovableObjectFactory> mRibbonTrailFactory;
         std::unique_ptr<MovableObjectFactory> mBillboardChainFactory;
@@ -115,7 +115,7 @@ namespace Ogre
         std::unique_ptr<RenderSystemCapabilitiesManager> mRenderSystemCapabilitiesManager;
 
         std::unique_ptr<SceneManagerEnumerator> mSceneManagerEnum;
-        typedef deque<SceneManager*>::type SceneManagerStack;
+        typedef std::deque<SceneManager*> SceneManagerStack;
         SceneManagerStack mSceneManagerStack;
 
         std::unique_ptr<ShadowTextureManager> mShadowTextureManager;
@@ -128,8 +128,8 @@ namespace Ogre
         Real mDefaultMinPixelSize;
 
     public:
-        typedef vector<DynLib*>::type PluginLibList;
-        typedef vector<Plugin*>::type PluginInstanceList;
+        typedef std::vector<DynLib*> PluginLibList;
+        typedef std::vector<Plugin*> PluginInstanceList;
     protected:
         /// List of plugin DLLs loaded
         PluginLibList mPluginLibs;
@@ -138,7 +138,7 @@ namespace Ogre
 
         uint32 mNextMovableObjectTypeFlag;
 
-        typedef map<String, RenderQueueInvocationSequence*>::type RenderQueueInvocationSequenceMap;
+        typedef std::map<String, RenderQueueInvocationSequence*> RenderQueueInvocationSequenceMap;
         RenderQueueInvocationSequenceMap mRQSequenceMap;
 
         /// Are we initialised yet?
@@ -173,11 +173,11 @@ namespace Ogre
         void oneTimePostWindowInit(void);
 
         /** Set of registered frame listeners */
-        set<FrameListener*>::type mFrameListeners;
+        std::set<FrameListener*> mFrameListeners;
 
         /** Set of frame listeners marked for removal and addition*/
-        set<FrameListener*>::type mRemovedFrameListeners;
-        set<FrameListener*>::type mAddedFrameListeners;
+        std::set<FrameListener*> mRemovedFrameListeners;
+        std::set<FrameListener*> mAddedFrameListeners;
         void _syncAddedRemovedFrameListeners();
 
         /** Indicates the type of event to be considered by calculateEventTime(). */
@@ -190,7 +190,7 @@ namespace Ogre
         };
 
         /// Contains the times of recently fired events
-        typedef deque<unsigned long>::type EventTimesQueue;
+        typedef std::deque<unsigned long> EventTimesQueue;
         EventTimesQueue mEventTimes[FETT_COUNT];
 
         /** Internal method for calculating the average time between recently fired events.

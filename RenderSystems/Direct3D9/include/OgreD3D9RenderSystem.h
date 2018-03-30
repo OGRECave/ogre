@@ -174,7 +174,7 @@ namespace Ogre
 
         D3DXMATRIX mDxViewMat, mDxProjMat, mDxWorldMat;
     
-        typedef vector<D3D9RenderWindow*>::type D3D9RenderWindowList;
+        typedef std::vector<D3D9RenderWindow*> D3D9RenderWindowList;
         // List of additional windows after the first (swap chains)
         D3D9RenderWindowList mRenderWindows;
         

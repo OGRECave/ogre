@@ -53,11 +53,11 @@ namespace Ogre {
         using ResourceManager::getResourceByName;
     public:
 
-        typedef set<String>::type SyntaxCodes;
-        typedef map<String, GpuSharedParametersPtr>::type SharedParametersMap;
+        typedef std::set<String> SyntaxCodes;
+        typedef std::map<String, GpuSharedParametersPtr> SharedParametersMap;
 
         typedef MemoryDataStreamPtr Microcode;
-        typedef map<String, Microcode>::type MicrocodeMap;
+        typedef std::map<String, Microcode> MicrocodeMap;
 
     protected:
 

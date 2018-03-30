@@ -47,10 +47,10 @@ struct GLUniformReference
     /// The constant definition it relates to
     const GpuConstantDefinition* mConstantDef;
 };
-typedef vector<GLUniformReference>::type GLUniformReferenceList;
+typedef std::vector<GLUniformReference> GLUniformReferenceList;
 typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 
-typedef vector<HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
+typedef std::vector<HardwareUniformBufferSharedPtr> GLUniformBufferList;
 typedef GLUniformBufferList::iterator GLUniformBufferIterator;
 
 class GLSLProgramCommon

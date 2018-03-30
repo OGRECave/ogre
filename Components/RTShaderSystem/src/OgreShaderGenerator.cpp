@@ -975,7 +975,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
     //
 
     //first gather the techniques to remove
-    set<unsigned short>::type schemesToRemove;
+    std::set<unsigned short> schemesToRemove;
     unsigned short techCount = srcMat->getNumTechniques();
     for(unsigned short ti = 0 ; ti < techCount ; ++ti)
     {

@@ -160,7 +160,7 @@ namespace Ogre {
         Resource* mProgram;
     };
 
-    void D3D11HLSLProgram::getDefines(String& stringBuffer, vector<D3D_SHADER_MACRO>::type& defines, const String& definesString)
+    void D3D11HLSLProgram::getDefines(String& stringBuffer, std::vector<D3D_SHADER_MACRO>& defines, const String& definesString)
     {
         // Populate preprocessor defines
         stringBuffer = definesString;
@@ -469,7 +469,7 @@ namespace Ogre {
         HLSLIncludeHandler includeHandler(this);
 
         String stringBuffer;
-        vector<D3D_SHADER_MACRO>::type defines;
+        std::vector<D3D_SHADER_MACRO> defines;
         const D3D_SHADER_MACRO* pDefines = NULL;
         if (!shaderMacroSet)
         {
@@ -1583,7 +1583,7 @@ namespace Ogre {
     void D3D11HLSLProgram::setTarget(const String& target)
     {
         mTarget = "";
-        vector<String>::type profiles = StringUtil::split(target, " ");
+        std::vector<String> profiles = StringUtil::split(target, " ");
         for(unsigned int i = 0 ; i < profiles.size() ; i++)
         {
             String & currentProfile = profiles[i];

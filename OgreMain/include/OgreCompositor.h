@@ -54,7 +54,7 @@ namespace Ogre {
         ~Compositor();
         
         /// Data types for internal lists
-        typedef vector<CompositionTechnique *>::type Techniques;
+        typedef std::vector<CompositionTechnique *> Techniques;
         typedef VectorIterator<Techniques> TechniqueIterator;
         
         /** Create a new technique, and return a pointer to it.
@@ -166,10 +166,10 @@ namespace Ogre {
 
         //TODO GSOC : These typedefs are duplicated from CompositorInstance. Solve?
         /// Map from name->local texture
-        typedef map<String,TexturePtr>::type GlobalTextureMap;
+        typedef std::map<String,TexturePtr> GlobalTextureMap;
         GlobalTextureMap mGlobalTextures;
         /// Store a list of MRTs we've created
-        typedef map<String,MultiRenderTarget*>::type GlobalMRTMap;
+        typedef std::map<String,MultiRenderTarget*> GlobalMRTMap;
         GlobalMRTMap mGlobalMRTs;
     };
     /** @} */

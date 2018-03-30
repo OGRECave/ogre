@@ -305,7 +305,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void PCZPlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listener)
     {
-        set<SceneNode*>::type checkedSceneNodes;
+        std::set<SceneNode*> checkedSceneNodes;
 
         PlaneBoundedVolumeList::iterator pi, piend;
         piend = mVolumes.end();

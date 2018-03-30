@@ -58,7 +58,7 @@ namespace Ogre
 	GpuProgramPtr ShaderManager::getGpuProgram(HlmsDatablock* dataBlock)
 	{
 		uint32 hash = dataBlock->getHash();
-		map<uint32, GpuProgramPtr>::iterator it = mShaderCache.find(hash);
+		std::map<uint32, GpuProgramPtr>::iterator it = mShaderCache.find(hash);
 		if (it != mShaderCache.end())
 		{
 			return (*it).second;

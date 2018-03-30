@@ -56,7 +56,7 @@ namespace Ogre {
     public:
 
         /// Typedef for an array of float values used as a bone blend mask
-        typedef vector<float>::type BoneBlendMask;
+        typedef std::vector<float> BoneBlendMask;
 
         /** Normal constructor with all params supplied
             @param
@@ -183,11 +183,11 @@ namespace Ogre {
     };
 
     // A map of animation states
-    typedef map<String, AnimationState*>::type AnimationStateMap;
+    typedef std::map<String, AnimationState*> AnimationStateMap;
     typedef MapIterator<AnimationStateMap> AnimationStateIterator;
     typedef ConstMapIterator<AnimationStateMap> ConstAnimationStateIterator;
     // A list of enabled animation states
-    typedef list<AnimationState*>::type EnabledAnimationStateList;
+    typedef std::list<AnimationState*> EnabledAnimationStateList;
     typedef ConstVectorIterator<EnabledAnimationStateList> ConstEnabledAnimationStateIterator;
 
     /** Class encapsulating a set of AnimationState objects.

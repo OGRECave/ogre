@@ -700,11 +700,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::_syncAddedRemovedFrameListeners()
     {
-        for (set<FrameListener*>::type::iterator i = mRemovedFrameListeners.begin(); i != mRemovedFrameListeners.end(); ++i)
+        for (std::set<FrameListener*>::iterator i = mRemovedFrameListeners.begin(); i != mRemovedFrameListeners.end(); ++i)
             mFrameListeners.erase(*i);
         mRemovedFrameListeners.clear();
 
-        for (set<FrameListener*>::type::iterator i = mAddedFrameListeners.begin(); i != mAddedFrameListeners.end(); ++i)
+        for (std::set<FrameListener*>::iterator i = mAddedFrameListeners.begin(); i != mAddedFrameListeners.end(); ++i)
             mFrameListeners.insert(*i);
         mAddedFrameListeners.clear();
     }
@@ -715,7 +715,7 @@ namespace Ogre {
         _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
-        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (std::set<FrameListener*>::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if(mRemovedFrameListeners.find(*i) != mRemovedFrameListeners.end())
                 continue;
@@ -734,7 +734,7 @@ namespace Ogre {
         _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
-        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (std::set<FrameListener*>::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if(mRemovedFrameListeners.find(*i) != mRemovedFrameListeners.end())
                 continue;
@@ -752,7 +752,7 @@ namespace Ogre {
 
         // Tell all listeners
         bool ret = true;
-        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (std::set<FrameListener*>::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if(mRemovedFrameListeners.find(*i) != mRemovedFrameListeners.end())
                 continue;

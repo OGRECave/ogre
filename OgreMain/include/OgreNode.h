@@ -67,7 +67,7 @@ namespace Ogre {
             /// Transform is relative to world space
             TS_WORLD
         };
-        typedef vector<Node*>::type ChildNodeMap;
+        typedef std::vector<Node*> ChildNodeMap;
         typedef VectorIterator<ChildNodeMap> ChildNodeIterator;
         typedef ConstVectorIterator<ChildNodeMap> ConstChildNodeIterator;
 
@@ -120,7 +120,7 @@ namespace Ogre {
         /// Collection of pointers to direct children
         ChildNodeMap mChildren;
 
-        typedef set<Node*>::type ChildUpdateSet;
+        typedef std::set<Node*> ChildUpdateSet;
         /// List of children which need updating, used if self is not out of date but children are
         ChildUpdateSet mChildrenToUpdate;
         /// Friendly name of this node
@@ -218,7 +218,7 @@ namespace Ogre {
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;
 
-        typedef vector<Node*>::type QueuedUpdates;
+        typedef std::vector<Node*> QueuedUpdates;
         static QueuedUpdates msQueuedUpdates;
 
     public:

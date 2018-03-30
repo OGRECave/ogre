@@ -305,7 +305,7 @@ namespace Ogre {
     Vector2 StringConverter::parseVector2(const String& val, const Vector2& defaultValue)
     {
         // Split on space
-        vector<String>::type vec = StringUtil::split(val);
+        std::vector<String> vec = StringUtil::split(val);
 
         if (vec.size() != 2)
         {
@@ -320,7 +320,7 @@ namespace Ogre {
     Vector3 StringConverter::parseVector3(const String& val, const Vector3& defaultValue)
     {
         // Split on space
-        vector<String>::type vec = StringUtil::split(val);
+        std::vector<String> vec = StringUtil::split(val);
 
         if (vec.size() != 3)
         {
@@ -337,7 +337,7 @@ namespace Ogre {
     Vector4 StringConverter::parseVector4(const String& val, const Vector4& defaultValue)
     {
         // Split on space
-        vector<String>::type vec = StringUtil::split(val);
+        std::vector<String> vec = StringUtil::split(val);
 
         if (vec.size() != 4)
         {
@@ -355,7 +355,7 @@ namespace Ogre {
     Matrix3 StringConverter::parseMatrix3(const String& val, const Matrix3& defaultValue)
     {
         // Split on space
-        vector<String>::type vec = StringUtil::split(val);
+        std::vector<String> vec = StringUtil::split(val);
 
         if (vec.size() != 9)
         {
@@ -380,7 +380,7 @@ namespace Ogre {
     Matrix4 StringConverter::parseMatrix4(const String& val, const Matrix4& defaultValue)
     {
         // Split on space
-        vector<String>::type vec = StringUtil::split(val);
+        std::vector<String> vec = StringUtil::split(val);
 
         if (vec.size() != 16)
         {
@@ -413,7 +413,7 @@ namespace Ogre {
     Quaternion StringConverter::parseQuaternion(const String& val, const Quaternion& defaultValue)
     {
         // Split on space
-        vector<String>::type vec = StringUtil::split(val);
+        std::vector<String> vec = StringUtil::split(val);
 
         if (vec.size() != 4)
         {
@@ -431,7 +431,7 @@ namespace Ogre {
     ColourValue StringConverter::parseColourValue(const String& val, const ColourValue& defaultValue)
     {
         // Split on space
-        vector<String>::type vec = StringUtil::split(val);
+        std::vector<String> vec = StringUtil::split(val);
 
         if (vec.size() == 4)
         {

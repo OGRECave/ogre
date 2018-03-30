@@ -298,13 +298,13 @@ namespace Ogre {
     void GLSLESProgram::checkAndFixInvalidDefaultPrecisionError( String &message )
     {
         String precisionQualifierErrorString = ": 'Default Precision Qualifier' : invalid type Type for default precision qualifier can be only float or int";
-        vector< String >::type linesOfSource = StringUtil::split(mSource, "\n");
+        std::vector< String > linesOfSource = StringUtil::split(mSource, "\n");
         if( message.find(precisionQualifierErrorString) != String::npos )
         {
             LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling");
 
             // remove relevant lines from source
-            vector< String >::type errors = StringUtil::split(message, "\n");
+            std::vector< String > errors = StringUtil::split(message, "\n");
 
             // going from the end so when we delete a line the numbers of the lines before will not change
             for(int i = static_cast<int>(errors.size()) - 1 ; i != -1 ; i--)

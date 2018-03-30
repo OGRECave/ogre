@@ -145,7 +145,7 @@ namespace Ogre {
             NUM_SHADOW_EXTRUDER_PROGRAMS
         };
 
-        static vector<GpuProgramPtr>::type mPrograms;
+        static std::vector<GpuProgramPtr> mPrograms;
         static const String programNames[NUM_SHADOW_EXTRUDER_PROGRAMS];
 
         /// General purpose method to get any of the program sources

@@ -55,7 +55,7 @@ namespace Ogre {
 		  D3D11RenderWindowBase* renderWindow;
       };
 
-      typedef map<String, OgreStereoHandle>::type StereoHandleMap;
+      typedef std::map<String, OgreStereoHandle> StereoHandleMap;
       StereoHandleMap mStereoMap;
   };
 }

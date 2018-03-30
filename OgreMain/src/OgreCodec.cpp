@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    map< String, Codec * >::type Codec::msMapCodecs;
+    std::map< String, Codec * > Codec::msMapCodecs;
 
     Codec::~Codec() {
     }

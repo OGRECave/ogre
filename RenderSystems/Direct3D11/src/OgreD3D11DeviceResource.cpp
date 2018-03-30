@@ -69,20 +69,20 @@ namespace Ogre
 
     void D3D11DeviceResourceManager::notifyResourceDestroyed(D3D11DeviceResource* deviceResource)
     {
-        vector<D3D11DeviceResource*>::type::iterator it = std::find(mResources.begin(), mResources.end(), deviceResource);
+        std::vector<D3D11DeviceResource*>::iterator it = std::find(mResources.begin(), mResources.end(), deviceResource);
         assert(it != mResources.end());
         mResources.erase(it);
     }
 
     void D3D11DeviceResourceManager::notifyDeviceLost(D3D11Device* device)
     {
-        for(vector<D3D11DeviceResource*>::type::iterator it = mResources.begin(), it_end = mResources.end(); it != it_end; ++it)
+        for(std::vector<D3D11DeviceResource*>::iterator it = mResources.begin(), it_end = mResources.end(); it != it_end; ++it)
             (*it)->notifyDeviceLost(device);
     }
 
     void D3D11DeviceResourceManager::notifyDeviceRestored(D3D11Device* device)
     {
-        for(vector<D3D11DeviceResource*>::type::iterator it = mResources.begin(), it_end = mResources.end(); it != it_end; ++it)
+        for(std::vector<D3D11DeviceResource*>::iterator it = mResources.begin(), it_end = mResources.end(); it != it_end; ++it)
             (*it)->notifyDeviceRestored(device);
     }
 

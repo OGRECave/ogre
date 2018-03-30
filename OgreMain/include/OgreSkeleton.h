@@ -160,7 +160,7 @@ namespace Ogre {
         /** Returns the number of bones in this skeleton. */
         virtual unsigned short getNumBones(void) const;
 
-        typedef vector<Bone*>::type BoneList;
+        typedef std::vector<Bone*> BoneList;
         typedef VectorIterator<BoneList> BoneIterator;
         /// Get an iterator over the root bones in the skeleton, ie those with no parents
         /// @deprecated use Skeleton::getRootBones
@@ -345,7 +345,7 @@ namespace Ogre {
         /// Remove all links to other skeletons for the purposes of sharing animation
         virtual void removeAllLinkedSkeletonAnimationSources(void);
         
-        typedef vector<LinkedSkeletonAnimationSource>::type 
+        typedef std::vector<LinkedSkeletonAnimationSource> 
             LinkedSkeletonAnimSourceList;
         typedef ConstVectorIterator<LinkedSkeletonAnimSourceList> 
             LinkedSkeletonAnimSourceIterator;
@@ -364,7 +364,7 @@ namespace Ogre {
         virtual bool hasManualBones(void) const { return !mManualBones.empty(); }
 
         /// Map to translate bone handle from one skeleton to another skeleton.
-        typedef vector<ushort>::type BoneHandleMap;
+        typedef std::vector<ushort> BoneHandleMap;
 
         /** Merge animations from another Skeleton object into this skeleton.
         @remarks
@@ -422,7 +422,7 @@ namespace Ogre {
         /// Storage of bones, indexed by bone handle
         BoneList mBoneList;
         /// Lookup by bone name
-        typedef map<String, Bone*>::type BoneListByName;
+        typedef std::map<String, Bone*> BoneListByName;
         BoneListByName mBoneListByName;
 
 
@@ -430,7 +430,7 @@ namespace Ogre {
         mutable BoneList mRootBones;
         /// Bone automatic handles
         unsigned short mNextAutoHandle;
-        typedef set<Bone*>::type BoneSet;
+        typedef std::set<Bone*> BoneSet;
         /// Manual bones
         BoneSet mManualBones;
         /// Manual bones dirty?
@@ -438,7 +438,7 @@ namespace Ogre {
 
 
         /// Storage of animations, lookup by name
-        typedef map<String, Animation*>::type AnimationList;
+        typedef std::map<String, Animation*> AnimationList;
         AnimationList mAnimationsList;
 
         /// List of references to other skeletons to use animations from 

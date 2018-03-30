@@ -46,7 +46,7 @@ namespace Ogre {
                                                         GpuProgramType gptype, const String& syntaxCode);
 
     private:
-        typedef map<String, CreateGpuProgramCallback>::type ShaderMap;
+        typedef std::map<String, CreateGpuProgramCallback> ShaderMap;
         ShaderMap mShaderMap;
 
     protected:

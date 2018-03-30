@@ -134,7 +134,7 @@ namespace Ogre
         virtual void _notifyRenderTargetDetached( RenderTarget *renderTarget );
 
     protected:
-        typedef set<RenderTarget*>::type RenderTargetSet;
+        typedef std::set<RenderTarget*> RenderTargetSet;
 
         uint16                      mPoolId;
         uint16                      mBitDepth;

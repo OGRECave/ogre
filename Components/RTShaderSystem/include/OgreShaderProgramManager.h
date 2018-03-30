@@ -97,23 +97,23 @@ public:
 protected:
 
     //-----------------------------------------------------------------------------
-    typedef map<String, GpuProgramPtr>::type            GpuProgramsMap;
-    typedef map<String, String>::type                   ProgramSourceToNameMap;
+    typedef std::map<String, GpuProgramPtr>            GpuProgramsMap;
+    typedef std::map<String, String>                   ProgramSourceToNameMap;
     typedef GpuProgramsMap::iterator                    GpuProgramsMapIterator;
     typedef GpuProgramsMap::const_iterator              GpuProgramsMapConstIterator;
 
     //-----------------------------------------------------------------------------
-    typedef set<Program*>::type                         ProgramList;
+    typedef std::set<Program*>                         ProgramList;
     typedef ProgramList::iterator                       ProgramListIterator;
-    typedef map<String, ProgramWriter*>::type           ProgramWriterMap;
+    typedef std::map<String, ProgramWriter*>           ProgramWriterMap;
     typedef ProgramWriterMap::iterator                  ProgramWriterIterator;
-    typedef vector<ProgramWriterFactory*>::type         ProgramWriterFactoryList;
+    typedef std::vector<ProgramWriterFactory*>         ProgramWriterFactoryList;
     
     //-----------------------------------------------------------------------------
-    typedef map<String, ProgramProcessor*>::type        ProgramProcessorMap;
+    typedef std::map<String, ProgramProcessor*>        ProgramProcessorMap;
     typedef ProgramProcessorMap::iterator               ProgramProcessorIterator;
     typedef ProgramProcessorMap::const_iterator         ProgramProcessorConstIterator;
-    typedef vector<ProgramProcessor*>::type             ProgramProcessorList;
+    typedef std::vector<ProgramProcessor*>             ProgramProcessorList;
 
     
 protected:

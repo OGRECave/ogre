@@ -542,10 +542,10 @@ namespace {
     };
     //-----------------------------------------------------------------------
     /// A type for a map between the file names to file index
-    typedef map<String, int>::type FileNameToIndexMap;
+    typedef std::map<String, int> FileNameToIndexMap;
     typedef FileNameToIndexMap::iterator FileNameToIndexMapIter;
     /// A type to store the embedded files data
-    typedef vector<EmbeddedFileData>::type EmbbedFileDataList;
+    typedef std::vector<EmbeddedFileData> EmbbedFileDataList;
 
     namespace {
     /// A static map between the file names to file index

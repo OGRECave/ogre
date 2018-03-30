@@ -52,8 +52,8 @@ protected:
     float mRadius;
     size_t mCount;
     float mQSize;
-    Ogre::vector <Ogre::Quaternion>::type things;
-    Ogre::vector <Ogre::Quaternion>::type orbits;
+    std::vector <Ogre::Quaternion> things;
+    std::vector <Ogre::Quaternion> orbits;
 };
 
 #endif
