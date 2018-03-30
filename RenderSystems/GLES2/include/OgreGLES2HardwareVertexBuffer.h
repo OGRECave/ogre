@@ -60,19 +60,11 @@ namespace Ogre {
         public:
             GLES2HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
                                    HardwareBuffer::Usage usage, bool useShadowBuffer);
-
-            /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);
-
-            /** See HardwareBuffer. */
             void writeData(size_t offset, size_t length, 
                            const void* pSource, bool discardWholeBuffer = false);
-#if OGRE_NO_GLES3_SUPPORT == 0
-            /** See HardwareBuffer. */
             void copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
                       size_t dstOffset, size_t length, bool discardWholeBuffer = false);
-#endif
-            /** See HardwareBuffer. */
             void _updateFromShadow(void);
 
             GLuint getGLBufferId(void) const { return mBuffer.getGLBufferId(); }
