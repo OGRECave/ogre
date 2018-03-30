@@ -64,7 +64,7 @@ namespace Ogre
 		bool hasBinding(Renderable* rend, const String& passName);
 
 	protected:
-		typedef OGRE_HashMap<String, HlmsMaterialBase*> HlmsMatBindingMap;
+		typedef std::unordered_map<String, HlmsMaterialBase*> HlmsMatBindingMap;
 		typedef vector<Renderable*>::type RenderableVector;
 
 		SceneManager* mSceneManager;

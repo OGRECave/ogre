@@ -44,7 +44,7 @@ namespace Ogre
             TexParameteriMap mTexParameteriMap;
         };
 
-        typedef OGRE_HashMap<GLuint, TextureUnitParams> TexUnitsMap;
+        typedef std::unordered_map<GLuint, TextureUnitParams> TexUnitsMap;
 
         /* These variables are used for caching OpenGL state.
          They are cached because state changes can be quite expensive,
@@ -52,14 +52,14 @@ namespace Ogre
          */
 
         /// Stores textures currently bound to each texture stage
-        OGRE_HashMap <GLenum, GLuint> mBoundTextures;
+        std::unordered_map <GLenum, GLuint> mBoundTextures;
 
         struct TexGenParams
         {
             std::set<GLenum> mEnabled;
         };
         /// Stores the currently enabled texcoord generation types per texture unit
-        OGRE_HashMap <GLenum, TexGenParams> mTextureCoordGen;
+        std::unordered_map <GLenum, TexGenParams> mTextureCoordGen;
 
         /// Stores the currently bound draw frame buffer value
         GLuint mActiveDrawFrameBuffer;

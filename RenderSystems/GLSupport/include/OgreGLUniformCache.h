@@ -40,7 +40,7 @@ namespace Ogre
     class _OgreGLExport GLUniformCache : public UniformCacheAlloc
     {
     protected:
-        typedef OGRE_HashMap<int, uint32> UniformMap;
+        typedef std::unordered_map<int, uint32> UniformMap;
 
         /// A map of uniform names and a hash of their values
         UniformMap mUniformValueMap;

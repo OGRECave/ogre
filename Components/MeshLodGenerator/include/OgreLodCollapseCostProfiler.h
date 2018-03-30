@@ -58,7 +58,7 @@ protected:
 
     HasVertexProfileList mHasProfile;
 
-    typedef OGRE_HashMultiMap<LodData::Vertex*, ProfiledEdge> ProfileLookup;
+    typedef std::unordered_multimap<LodData::Vertex*, ProfiledEdge> ProfileLookup;
     ProfileLookup mProfileLookup;
     LodProfile mProfile;
 

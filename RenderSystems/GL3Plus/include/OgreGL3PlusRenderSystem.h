@@ -59,7 +59,7 @@ namespace Ogre {
         /// Rendering loop control
         bool mStopRendering;
 
-        typedef OGRE_HashMap<GLenum, GLuint>  BindBufferMap;
+        typedef std::unordered_map<GLenum, GLuint>  BindBufferMap;
 
         /// Last min & mip filtering options, so we can combine them
         FilterOptions mMinFilter;

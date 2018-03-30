@@ -52,9 +52,9 @@ namespace Ogre
     class _OgreGLExport GLStateCacheManagerCommon : public StateCacheAlloc
     {
     protected:
-        typedef OGRE_HashMap<uint32, uint32> BindBufferMap;
-        typedef OGRE_HashMap<uint32, int> TexParameteriMap;
-        typedef OGRE_HashMap<uint32, float> TexParameterfMap;
+        typedef std::unordered_map<uint32, uint32> BindBufferMap;
+        typedef std::unordered_map<uint32, int> TexParameteriMap;
+        typedef std::unordered_map<uint32, float> TexParameterfMap;
 
         /* These variables are used for caching OpenGL state.
          They are cached because state changes can be quite expensive,

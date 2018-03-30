@@ -56,10 +56,10 @@ namespace Ogre {
         typedef float Real;
     #endif
 
-    #define OGRE_HashMap ::std::unordered_map
-    #define OGRE_HashMultiMap ::std::unordered_multimap
-    #define OGRE_HashSet ::std::unordered_set
-    #define OGRE_HashMultiSet ::std::unordered_multiset
+    #define OGRE_HashMap OGRE_DEPRECATED ::std::unordered_map
+    #define OGRE_HashMultiMap OGRE_DEPRECATED ::std::unordered_multimap
+    #define OGRE_HashSet OGRE_DEPRECATED ::std::unordered_set
+    #define OGRE_HashMultiSet OGRE_DEPRECATED ::std::unordered_multiset
 
 
     /** In order to avoid finger-aches :)
