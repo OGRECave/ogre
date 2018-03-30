@@ -4807,6 +4807,7 @@ void SceneManager::initShadowVolumeMaterials(void)
             // Don't set lighting and blending modes here, depends on additive / modulative
             TextureUnitState* t = mShadowReceiverPass->createTextureUnitState();
             t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+            t->setTextureFiltering(FT_MIP, FO_NONE); // we do not have mips. GLES2 is particularly picky here.
         }
         else
         {
