@@ -64,7 +64,7 @@ namespace Ogre {
         void parseShaderPassAttrib( const String& line, Quake3Shader* pShader, Quake3Shader::Pass* pPass);
         SceneBlendFactor convertBlendFunc( const String& q3func);
 
-        typedef map<String, Quake3Shader*>::type Quake3ShaderMap;
+        typedef std::map<String, Quake3Shader*> Quake3ShaderMap;
         Quake3ShaderMap mShaderMap;
         StringVector mScriptPatterns;
 

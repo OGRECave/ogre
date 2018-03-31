@@ -32,8 +32,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    ParticleIterator::ParticleIterator(list<Particle*>::type::iterator start, 
-        list<Particle*>::type::iterator last)
+    ParticleIterator::ParticleIterator(std::list<Particle*>::iterator start, 
+        std::list<Particle*>::iterator last)
     {
         mStart = mPos = start;
         mEnd = last;

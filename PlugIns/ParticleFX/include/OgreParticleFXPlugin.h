@@ -57,8 +57,8 @@ namespace Ogre
         /// @copydoc Plugin::uninstall
         void uninstall();
     protected:
-        vector<ParticleEmitterFactory*>::type mEmitterFactories;
-        vector<ParticleAffectorFactory*>::type mAffectorFactories;
+        std::vector<ParticleEmitterFactory*> mEmitterFactories;
+        std::vector<ParticleAffectorFactory*> mAffectorFactories;
 
     };
 }

@@ -157,7 +157,7 @@ namespace Ogre {
 
 
     /// List of RenderQueueInvocations
-    typedef vector<RenderQueueInvocation*>::type RenderQueueInvocationList;
+    typedef std::vector<RenderQueueInvocation*> RenderQueueInvocationList;
     typedef VectorIterator<RenderQueueInvocationList> RenderQueueInvocationIterator;
 
     /** Class to hold a linear sequence of RenderQueueInvocation objects. 

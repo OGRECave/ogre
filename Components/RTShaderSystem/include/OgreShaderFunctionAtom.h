@@ -179,7 +179,7 @@ class _OgreRTSSExport FunctionInvocation : public FunctionAtom
 {
     // Interface.
 public: 
-    typedef vector<Operand>::type OperandVector;
+    typedef std::vector<Operand> OperandVector;
 
     /** Class constructor 
     @param functionName The name of the function to invoke.
@@ -270,7 +270,7 @@ public:
     static String Type;
 };
 
-typedef vector<FunctionAtom*>::type                 FunctionAtomInstanceList;
+typedef std::vector<FunctionAtom*>                 FunctionAtomInstanceList;
 typedef FunctionAtomInstanceList::iterator          FunctionAtomInstanceIterator;
 typedef FunctionAtomInstanceList::const_iterator    FunctionAtomInstanceConstIterator;
 

@@ -66,7 +66,7 @@ namespace Ogre
     class _OgrePagingExport SimplePageContentCollection : public PageContentCollection
     {
     public:
-        typedef vector<PageContent*>::type ContentList;
+        typedef std::vector<PageContent*> ContentList;
         static const uint32 SUBCLASS_CHUNK_ID;
         static const uint16 SUBCLASS_CHUNK_VERSION;
     protected:

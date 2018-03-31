@@ -42,7 +42,7 @@ namespace Ogre {
     */
 
     /// Define a list of usage flags
-    typedef vector<HardwareBuffer::Usage>::type BufferUsageList;
+    typedef std::vector<HardwareBuffer::Usage> BufferUsageList;
 
 
     /** Summary class collecting together vertex source information. */
@@ -96,7 +96,7 @@ namespace Ogre {
             unsigned short targetBufferIndex;
             Real parametric;
         };
-        typedef vector<HardwareAnimationData>::type HardwareAnimationDataList;
+        typedef std::vector<HardwareAnimationData> HardwareAnimationDataList;
         /// VertexElements used for hardware morph / pose animation
         HardwareAnimationDataList hwAnimationDataList;
         /// Number of hardware animation data items used

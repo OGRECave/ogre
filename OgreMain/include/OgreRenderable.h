@@ -406,7 +406,7 @@ namespace Ogre {
 
 
     protected:
-        typedef map<size_t, Vector4>::type CustomParameterMap;
+        typedef std::map<size_t, Vector4> CustomParameterMap;
         CustomParameterMap mCustomParameters;
         bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;

@@ -61,7 +61,7 @@ class _OgreRTSSExport ProgramWriterManager
     : public Singleton<ProgramWriterManager>, public RTShaderSystemAlloc
 {
 public:
-    typedef map<String, ProgramWriterFactory*>::type FactoryMap;
+    typedef std::map<String, ProgramWriterFactory*> FactoryMap;
 protected:
     /// Factories capable of creating ShaderProgramWriterFactory instances
     FactoryMap mFactories;

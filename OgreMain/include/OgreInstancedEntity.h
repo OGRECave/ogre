@@ -101,7 +101,7 @@ namespace Ogre
         uint16 mTransformLookupNumber;
 
         /// Stores the master when we're the slave, store our slaves when we're the master
-        typedef vector<InstancedEntity*>::type InstancedEntityVec;
+        typedef std::vector<InstancedEntity*> InstancedEntityVec;
         InstancedEntityVec mSharingPartners;
 
         //////////////////////////////////////////////////////////////////////////

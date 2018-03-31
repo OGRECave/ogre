@@ -96,7 +96,7 @@ public:
     
 // Protected types.
 protected:
-    typedef vector<SubRenderStateFactory*>::type                SubRenderStateFactoryList;
+    typedef std::vector<SubRenderStateFactory*>                SubRenderStateFactoryList;
     typedef SubRenderStateFactoryList::iterator                 SubRenderStateFactoryIterator;
     typedef SubRenderStateFactoryList::const_iterator           SubRenderStateFactoryConstIterator;
 

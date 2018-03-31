@@ -60,7 +60,7 @@ namespace Ogre {
           NvU8 isStereoOn;
       };
 
-      typedef map<String, OgreStereoHandle>::type StereoHandleMap;
+      typedef std::map<String, OgreStereoHandle> StereoHandleMap;
       StereoHandleMap mStereoMap;
       NvU8 mStereoEnabled;
   };

@@ -173,7 +173,7 @@ namespace Ogre {
             // Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap piramid
-            vector<uint8>::type tmpdata(size);
+            std::vector<uint8> tmpdata(size);
             
             for(uint32 mip=0; mip<=mNumMipmaps; mip++)
             {

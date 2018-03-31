@@ -63,7 +63,7 @@ namespace Volume {
     
     /** To hold dual cells.
     */
-    typedef vector<DualCell>::type VecDualCell;
+    typedef std::vector<DualCell> VecDualCell;
 
     /** Class for the generation of the DualGrid.
     */

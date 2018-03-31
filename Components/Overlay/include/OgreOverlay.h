@@ -73,7 +73,7 @@ namespace Ogre {
     {
 
     public:
-              typedef list<OverlayContainer*>::type OverlayContainerList;
+              typedef std::list<OverlayContainer*> OverlayContainerList;
     protected:
         String mName;
         /// Internal root node, used as parent for 3D objects

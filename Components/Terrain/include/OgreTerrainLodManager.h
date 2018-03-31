@@ -54,8 +54,8 @@ namespace Ogre
     public:
         static const uint32 TERRAINLODDATA_CHUNK_ID;
         static const uint16 TERRAINLODDATA_CHUNK_VERSION;
-        typedef vector<float>::type LodData;
-        typedef vector<LodData>::type LodsData;
+        typedef std::vector<float> LodData;
+        typedef std::vector<LodData> LodsData;
 
         struct LoadLodRequest
         {

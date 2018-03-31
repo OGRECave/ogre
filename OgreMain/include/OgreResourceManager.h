@@ -45,7 +45,7 @@ namespace Ogre {
     class Pool
     {
     protected:
-        typedef typename list<T>::type ItemList;
+        typedef typename std::list<T> ItemList;
         ItemList mItems;
         OGRE_AUTO_MUTEX;
     public:
@@ -551,9 +551,9 @@ namespace Ogre {
 
 
     public:
-        typedef OGRE_HashMap< String, ResourcePtr > ResourceMap;
-        typedef OGRE_HashMap< String, ResourceMap > ResourceWithGroupMap;
-        typedef map<ResourceHandle, ResourcePtr>::type ResourceHandleMap;
+        typedef std::unordered_map< String, ResourcePtr > ResourceMap;
+        typedef std::unordered_map< String, ResourceMap > ResourceWithGroupMap;
+        typedef std::map<ResourceHandle, ResourcePtr> ResourceHandleMap;
     protected:
         ResourceHandleMap mResourcesByHandle;
         ResourceMap mResources;
@@ -585,7 +585,7 @@ namespace Ogre {
         }
 
     protected:
-        typedef map<String, ResourcePool*>::type ResourcePoolMap;
+        typedef std::map<String, ResourcePool*> ResourcePoolMap;
         ResourcePoolMap mResourcePoolMap;
     };
 

@@ -154,11 +154,11 @@ private:
     
 };
 
-typedef vector<SubRenderState*>::type               SubRenderStateList;
+typedef std::vector<SubRenderState*>               SubRenderStateList;
 typedef SubRenderStateList::iterator                SubRenderStateListIterator;
 typedef SubRenderStateList::const_iterator          SubRenderStateListConstIterator;
 
-typedef set<SubRenderState*>::type                  SubRenderStateSet;
+typedef std::set<SubRenderState*>                  SubRenderStateSet;
 typedef SubRenderStateSet::iterator                 SubRenderStateSetIterator;
 typedef SubRenderStateSet::const_iterator           SubRenderStateSetConstIterator;
 

@@ -53,7 +53,7 @@ namespace Ogre
 class PCZSceneNode;
 class PCZone;
 
-typedef set< PCZSceneNode * >::type PCZSceneNodeList;
+typedef std::set< PCZSceneNode * > PCZSceneNodeList;
 
 
 /** Octree datastructure for managing scene nodes.

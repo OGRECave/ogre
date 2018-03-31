@@ -281,8 +281,8 @@ namespace Ogre {
             NameValuePairList parameters;
         };
         /// List of resource declarations
-        typedef list<ResourceDeclaration>::type ResourceDeclarationList;
-        typedef map<String, ResourceManager*>::type ResourceManagerMap;
+        typedef std::list<ResourceDeclaration> ResourceDeclarationList;
+        typedef std::map<String, ResourceManager*> ResourceManagerMap;
         typedef MapIterator<ResourceManagerMap> ResourceManagerIterator;
         /// Resource location entry
         struct ResourceLocation
@@ -293,26 +293,26 @@ namespace Ogre {
             bool recursive;
         };
         /// List of possible file locations
-        typedef vector<ResourceLocation>::type LocationList;
+        typedef std::vector<ResourceLocation> LocationList;
 
     protected:
         /// Map of resource types (strings) to ResourceManagers, used to notify them to load / unload group contents
         ResourceManagerMap mResourceManagerMap;
 
         /// Map of loading order (Real) to ScriptLoader, used to order script parsing
-        typedef multimap<Real, ScriptLoader*>::type ScriptLoaderOrderMap;
+        typedef std::multimap<Real, ScriptLoader*> ScriptLoaderOrderMap;
         ScriptLoaderOrderMap mScriptLoaderOrderMap;
 
-        typedef vector<ResourceGroupListener*>::type ResourceGroupListenerList;
+        typedef std::vector<ResourceGroupListener*> ResourceGroupListenerList;
         ResourceGroupListenerList mResourceGroupListenerList;
 
         ResourceLoadingListener *mLoadingListener;
 
         /// Resource index entry, resourcename->location 
-        typedef map<String, Archive*>::type ResourceLocationIndex;
+        typedef std::map<String, Archive*> ResourceLocationIndex;
 
         /// List of resources which can be loaded / unloaded
-        typedef list<ResourcePtr>::type LoadUnloadResourceList;
+        typedef std::list<ResourcePtr> LoadUnloadResourceList;
         /// Resource group entry
         struct ResourceGroup
         {
@@ -345,7 +345,7 @@ namespace Ogre {
             /// Created resources which are ready to be loaded / unloaded
             // Group by loading order of the type (defined by ResourceManager)
             // (e.g. skeletons and materials before meshes)
-            typedef map<Real, LoadUnloadResourceList>::type LoadResourceOrderMap;
+            typedef std::map<Real, LoadUnloadResourceList> LoadResourceOrderMap;
             LoadResourceOrderMap loadResourceOrderMap;
             /// Linked world geometry, as passed to setWorldGeometry
             String worldGeometry;
@@ -360,7 +360,7 @@ namespace Ogre {
 
         };
         /// Map from resource group names to groups
-        typedef map<String, ResourceGroup*>::type ResourceGroupMap;
+        typedef std::map<String, ResourceGroup*> ResourceGroupMap;
         ResourceGroupMap mResourceGroupMap;
 
         /// Group name for world resources

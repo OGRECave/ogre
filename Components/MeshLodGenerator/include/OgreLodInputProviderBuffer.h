@@ -52,7 +52,7 @@ protected:
 
     LodInputBuffer mBuffer;
 
-    typedef vector<LodData::Vertex*>::type VertexLookupList;
+    typedef std::vector<LodData::Vertex*> VertexLookupList;
     // This helps to find the vertex* in LodData for index buffer indices
     VertexLookupList mSharedVertexLookup;
     VertexLookupList mVertexLookup;

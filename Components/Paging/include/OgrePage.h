@@ -50,7 +50,7 @@ namespace Ogre
         public WorkQueue::ResponseHandler, public PageAlloc
     {
     public:
-        typedef vector<PageContentCollection*>::type ContentCollectionList;
+        typedef std::vector<PageContentCollection*> ContentCollectionList;
     protected:
         PageID mID;
         PagedWorldSection* mParent;

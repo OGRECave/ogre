@@ -53,7 +53,7 @@ namespace Ogre
 		static GpuProgramPtr createGpuProgram(const String& name, const String& code, HlmsDatablock* dataBlock);
 
 	protected:
-		typedef map<uint32, GpuProgramPtr>::type ShaderCacheMap;
+		typedef std::map<uint32, GpuProgramPtr> ShaderCacheMap;
 
 		ShaderCacheMap mShaderCache;
 		ShaderPiecesManager mShaderPiecesManager;

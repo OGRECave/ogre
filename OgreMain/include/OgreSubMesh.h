@@ -105,10 +105,10 @@ namespace Ogre {
                 The use of shared or non-shared index map is determined when
                 model data is converted to the OGRE .mesh format.
         */
-        typedef vector<unsigned short>::type IndexMap;
+        typedef std::vector<unsigned short> IndexMap;
         IndexMap blendIndexToBoneIndexMap;
 
-        typedef vector<IndexData*>::type LODFaceList;
+        typedef std::vector<IndexData*> LODFaceList;
         LODFaceList mLodFaceList;
 
         /** A list of extreme points on the submesh (optional).
@@ -130,7 +130,7 @@ namespace Ogre {
                 If this array is empty, submesh sorting is done like in older versions -
                 by comparing the positions of the owning entity.
          */
-        vector<Vector3>::type extremityPoints;
+        std::vector<Vector3> extremityPoints;
 
         /// Reference to parent Mesh (not a smart pointer so child does not keep parent alive).
         Mesh* parent;
@@ -173,7 +173,7 @@ namespace Ogre {
         void clearBoneAssignments(void);
 
         /// Multimap of verex bone assignments (orders by vertex index)
-        typedef multimap<size_t, VertexBoneAssignment>::type VertexBoneAssignmentList;
+        typedef std::multimap<size_t, VertexBoneAssignment> VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
 
         /** Gets an iterator for access all bone assignments. 

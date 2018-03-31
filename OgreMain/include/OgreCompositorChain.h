@@ -54,7 +54,7 @@ namespace Ogre {
         virtual ~CompositorChain();
         
         /// Data types
-        typedef vector<CompositorInstance*>::type Instances;
+        typedef std::vector<CompositorInstance*> Instances;
         typedef VectorIterator<Instances> InstanceIterator;
         
         /// Identifier for "last" compositor in chain.
@@ -180,7 +180,7 @@ namespace Ogre {
         /// Render System operations queued by last compile, these are created by this
         /// instance thus managed and deleted by it. The list is cleared with 
         /// clearCompilationState()
-        typedef vector<CompositorInstance::RenderSystemOperation*>::type RenderSystemOperations;
+        typedef std::vector<CompositorInstance::RenderSystemOperation*> RenderSystemOperations;
         RenderSystemOperations mRenderSystemOperations;
 
         /** Clear compiled state */

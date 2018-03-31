@@ -110,7 +110,7 @@ namespace Ogre
 
     std::pair<bool,String> ObjectAbstractNode::getVariable(const String &inName) const
     {
-        map<String,String>::type::const_iterator i = mEnv.find(inName);
+        std::map<String,String>::const_iterator i = mEnv.find(inName);
         if(i != mEnv.end())
             return std::make_pair(true, i->second);
 
@@ -125,7 +125,7 @@ namespace Ogre
         return std::make_pair(false, "");
     }
 
-    const map<String,String>::type &ObjectAbstractNode::getVariables() const
+    const std::map<String,String> &ObjectAbstractNode::getVariables() const
     {
         return mEnv;
     }
@@ -633,7 +633,7 @@ namespace Ogre
                 ObjectAbstractNode *obj = (ObjectAbstractNode*)(*i).get();
 
                 // Overlay base classes in order.
-                for (vector<String>::const_iterator baseIt = obj->bases.begin(), end_it = obj->bases.end(); baseIt != end_it; ++baseIt)
+                for (std::vector<String>::const_iterator baseIt = obj->bases.begin(), end_it = obj->bases.end(); baseIt != end_it; ++baseIt)
                 {
                     const String& base = *baseIt;
                     // Check the top level first, then check the import table
@@ -669,7 +669,7 @@ namespace Ogre
             ObjectAbstractNode *src = static_cast<ObjectAbstractNode*>(source.get());
 
             // Overlay the environment of one on top the other first
-            for(map<String,String>::type::const_iterator i = src->getVariables().begin(); i != src->getVariables().end(); ++i)
+            for(std::map<String,String>::const_iterator i = src->getVariables().begin(); i != src->getVariables().end(); ++i)
             {
                 std::pair<bool,String> var = dest->getVariable(i->first);
                 if(!var.first)
@@ -677,12 +677,12 @@ namespace Ogre
             }
             
             // Create a vector storing each pairing of override between source and destination
-            vector<std::pair<AbstractNodePtr,AbstractNodeList::iterator> >::type overrides; 
+            std::vector<std::pair<AbstractNodePtr,AbstractNodeList::iterator> > overrides; 
             // A list of indices for each destination node tracks the minimum
             // source node they can index-match against
-            map<ObjectAbstractNode*,size_t>::type indices;
+            std::map<ObjectAbstractNode*,size_t> indices;
             // A map storing which nodes have overridden from the destination node
-            map<ObjectAbstractNode*,bool>::type overridden;
+            std::map<ObjectAbstractNode*,bool> overridden;
 
             // Fill the vector with objects from the source node (base)
             // And insert non-objects into the overrides list of the destination
@@ -928,7 +928,7 @@ namespace Ogre
                     varAccess = scope->getVariable(var->name);
                 if(!scope || !varAccess.first)
                 {
-                    map<String,String>::type::iterator k = mEnv.find(var->name);
+                    std::map<String,String>::iterator k = mEnv.find(var->name);
                     varAccess.first = k != mEnv.end();
                     if(varAccess.first)
                         varAccess.second = k->second;
@@ -1403,7 +1403,7 @@ namespace Ogre
                 impl->abstract = false;
 
                 // Create a temporary detail list
-                list<ConcreteNode*>::type temp;
+                std::list<ConcreteNode*> temp;
                 if(node->token == "abstract")
                 {
                     impl->abstract = true;
@@ -1418,7 +1418,7 @@ namespace Ogre
                 }
 
                 // Get the type of object
-                list<ConcreteNode*>::type::const_iterator iter = temp.begin();
+                std::list<ConcreteNode*>::const_iterator iter = temp.begin();
                 impl->cls = (*iter)->token;
                 ++iter;
 
@@ -1609,7 +1609,7 @@ namespace Ogre
     {
             OGRE_LOCK_AUTO_MUTEX;
         
-        for(vector<ScriptTranslatorManager*>::type::iterator i = mManagers.begin(); i != mManagers.end(); ++i)
+        for(std::vector<ScriptTranslatorManager*>::iterator i = mManagers.begin(); i != mManagers.end(); ++i)
         {
             if(*i == man)
             {
@@ -1631,7 +1631,7 @@ namespace Ogre
                     OGRE_LOCK_AUTO_MUTEX;
             
             // Start looking from the back
-            for(vector<ScriptTranslatorManager*>::type::reverse_iterator i = mManagers.rbegin(); i != mManagers.rend(); ++i)
+            for(std::vector<ScriptTranslatorManager*>::reverse_iterator i = mManagers.rbegin(); i != mManagers.rend(); ++i)
             {
                 translator = (*i)->getTranslator(node);
                 if(translator != 0)

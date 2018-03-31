@@ -224,7 +224,7 @@ namespace Ogre {
 				// otherwise, GLSL will assign them in the order first used, which is
 				// not what we want.
 				GpuProgramParametersSharedPtr params = mDelegate->getDefaultParameters();
-				for (map<String,int>::type::iterator i = mSamplerRegisterMap.begin(); i != mSamplerRegisterMap.end(); ++i)
+				for (std::map<String,int>::iterator i = mSamplerRegisterMap.begin(); i != mSamplerRegisterMap.end(); ++i)
 					params->setNamedConstant(i->first, i->second);
 			}
 			mDelegate->load();
@@ -417,8 +417,8 @@ namespace Ogre {
 			newMicrocode->write(&samplerMapSize, sizeof(size_t));
 
 			// save sampler register mapping
-			map<String,int>::type::const_iterator sampRegister = mSamplerRegisterMap.begin();
-			map<String,int>::type::const_iterator sampRegisterE = mSamplerRegisterMap.end();
+			std::map<String,int>::const_iterator sampRegister = mSamplerRegisterMap.begin();
+			std::map<String,int>::const_iterator sampRegisterE = mSamplerRegisterMap.end();
 			for (; sampRegister != sampRegisterE; ++sampRegister)
 			{
 				const String& paramName = sampRegister->first;
@@ -558,10 +558,10 @@ namespace Ogre {
 	{
 		const String& source;
 		const GpuConstantDefinitionMap& paramMap;
-		const map<String,int>::type samplerMap;
+		const std::map<String,int> samplerMap;
 		bool glsl;
 		String output;
-		map<String,String>::type paramNameMap;
+		std::map<String,String> paramNameMap;
 		String::size_type start;
 		struct ReplacementMark
 		{
@@ -569,10 +569,10 @@ namespace Ogre {
 			String replaceWith;
 			bool operator<(const ReplacementMark& o) const { return pos < o.pos; }
 		};
-		vector<ReplacementMark>::type replacements;
+		std::vector<ReplacementMark> replacements;
 
 		HighLevelOutputFixer(const String& src, const GpuConstantDefinitionMap& params, 
-			const map<String,int>::type& samplers, bool isGLSL) 
+			const std::map<String,int>& samplers, bool isGLSL) 
 			: source(src), paramMap(params), samplerMap(samplers), glsl(isGLSL), start(0)
 		{
 			findNameMappings();
@@ -591,15 +591,15 @@ namespace Ogre {
 				if (cur == String::npos)
 					break;
 				end = source.find('\n', cur);
-				vector<String>::type cols = StringUtil::split(source.substr(cur, end-cur), ":");
+				std::vector<String> cols = StringUtil::split(source.substr(cur, end-cur), ":");
 				cur = end;
 				if (cols.size() < 3)
 					continue;
-				vector<String>::type def = StringUtil::split(cols[0], "[ ");
+				std::vector<String> def = StringUtil::split(cols[0], "[ ");
 				if (def.size() < 3)
 					continue;
 				StringUtil::trim(cols[2]);
-				vector<String>::type repl = StringUtil::split(cols[2], "[ ");
+				std::vector<String> repl = StringUtil::split(cols[2], "[ ");
 				String oldName = def[2];
 				String newName = repl[0];
 				StringUtil::trim(oldName);
@@ -623,7 +623,7 @@ namespace Ogre {
 			for (GpuConstantDefinitionMap::const_iterator it = paramMap.begin(); it != paramMap.end(); ++it)
 			{
 				const String& oldName = it->first;
-				map<String,String>::type::const_iterator pi = paramNameMap.find(oldName);
+				std::map<String,String>::const_iterator pi = paramNameMap.find(oldName);
 				if (pi != paramNameMap.end())
 				{
 					const String& newName = pi->second;
@@ -656,10 +656,10 @@ namespace Ogre {
 				}
 			}
 
-			for (map<String,int>::type::const_iterator it = samplerMap.begin(); it != samplerMap.end(); ++it)
+			for (std::map<String,int>::const_iterator it = samplerMap.begin(); it != samplerMap.end(); ++it)
 			{
 				const String& oldName = it->first;
-				map<String,String>::type::const_iterator pi = paramNameMap.find(oldName);
+				std::map<String,String>::const_iterator pi = paramNameMap.find(oldName);
 				if (pi != paramNameMap.end())
 				{
 					const String& newName = pi->second;
@@ -708,7 +708,7 @@ namespace Ogre {
 			// sort replacements in order of occurrence
 			std::sort(replacements.begin(), replacements.end());
 			String::size_type cur = start;
-			for (vector<ReplacementMark>::type::iterator it = replacements.begin(); it != replacements.end(); ++it)
+			for (std::vector<ReplacementMark>::iterator it = replacements.begin(); it != replacements.end(); ++it)
 			{
 				ReplacementMark& mark = *it;
 				if (mark.pos > cur)

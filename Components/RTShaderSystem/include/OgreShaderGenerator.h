@@ -515,26 +515,26 @@ protected:
         }
     };
 
-    typedef vector<SGPass*>::type                   SGPassList;
+    typedef std::vector<SGPass*>                   SGPassList;
     typedef SGPassList::iterator                        SGPassIterator;
     typedef SGPassList::const_iterator              SGPassConstIterator;
 
-    typedef vector<SGTechnique*>::type              SGTechniqueList;
+    typedef std::vector<SGTechnique*>              SGTechniqueList;
     typedef SGTechniqueList::iterator               SGTechniqueIterator;
     typedef SGTechniqueList::const_iterator         SGTechniqueConstIterator;
 
-    typedef map<SGTechnique*, SGTechnique*>::type   SGTechniqueMap;
+    typedef std::map<SGTechnique*, SGTechnique*>   SGTechniqueMap;
     typedef SGTechniqueMap::iterator                    SGTechniqueMapIterator;
     
-    typedef map<MatGroupPair, SGMaterial*, MatGroupPair_less>::type SGMaterialMap;
+    typedef std::map<MatGroupPair, SGMaterial*, MatGroupPair_less> SGMaterialMap;
     typedef SGMaterialMap::iterator                 SGMaterialIterator;
     typedef SGMaterialMap::const_iterator           SGMaterialConstIterator;
 
-    typedef map<String, SGScheme*>::type                SGSchemeMap;
+    typedef std::map<String, SGScheme*>                SGSchemeMap;
     typedef SGSchemeMap::iterator                   SGSchemeIterator;
     typedef SGSchemeMap::const_iterator             SGSchemeConstIterator;
 
-    typedef map<uint32, ScriptTranslator*>::type        SGScriptTranslatorMap;
+    typedef std::map<uint32, ScriptTranslator*>        SGScriptTranslatorMap;
     typedef SGScriptTranslatorMap::iterator         SGScriptTranslatorIterator;
     typedef SGScriptTranslatorMap::const_iterator   SGScriptTranslatorConstIterator;
 
@@ -918,12 +918,12 @@ protected:
     };
 
     //-----------------------------------------------------------------------------
-    typedef map<String, SubRenderStateFactory*>::type       SubRenderStateFactoryMap;
+    typedef std::map<String, SubRenderStateFactory*>       SubRenderStateFactoryMap;
     typedef SubRenderStateFactoryMap::iterator              SubRenderStateFactoryIterator;
     typedef SubRenderStateFactoryMap::const_iterator        SubRenderStateFactoryConstIterator;
 
     //-----------------------------------------------------------------------------
-    typedef map<String, SceneManager*>::type                SceneManagerMap;
+    typedef std::map<String, SceneManager*>                SceneManagerMap;
     typedef SceneManagerMap::iterator                       SceneManagerIterator;
     typedef SceneManagerMap::const_iterator                 SceneManagerConstIterator;
 

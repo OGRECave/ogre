@@ -59,7 +59,7 @@ protected:
         mTrayMgr->showCursor();
 
         // the names of the textures we will use (all need to be the same size: 512*512 in our case)
-        vector<String>::type texNames;
+        std::vector<String> texNames;
         texNames.push_back("BeachStones.jpg");
         texNames.push_back("BumpyMetal.jpg");
         texNames.push_back("egyptrockyfull.jpg");

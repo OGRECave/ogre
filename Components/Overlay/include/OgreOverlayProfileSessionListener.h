@@ -77,7 +77,7 @@ namespace Ogre  {
         Real getOverlayTop() const;
 
     private:
-        typedef list<OverlayElement*>::type ProfileBarList;
+        typedef std::list<OverlayElement*> ProfileBarList;
 
         /** Prints the profiling results of each frame 
         @remarks Recursive, for all the little children. */

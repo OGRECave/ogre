@@ -83,7 +83,7 @@ namespace Ogre {
         return mCapabilitiesMap[name];
     }
 
-    const map<String, RenderSystemCapabilities*>::type &RenderSystemCapabilitiesManager::getCapabilities() const
+    const std::map<String, RenderSystemCapabilities*> &RenderSystemCapabilitiesManager::getCapabilities() const
     {
         return mCapabilitiesMap;
     }

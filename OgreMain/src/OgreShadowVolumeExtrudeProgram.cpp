@@ -372,7 +372,7 @@ namespace Ogre {
 
     HighLevelGpuProgramPtr ShadowVolumeExtrudeProgram::frgProgram;
 
-    vector<GpuProgramPtr>::type ShadowVolumeExtrudeProgram::mPrograms;
+    std::vector<GpuProgramPtr> ShadowVolumeExtrudeProgram::mPrograms;
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 

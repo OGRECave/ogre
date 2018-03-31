@@ -118,18 +118,18 @@ namespace Ogre {
             members will cause notify back to this class, and then will access to this
             two members.
         */
-        typedef set<HardwareVertexBuffer*>::type VertexBufferList;
-        typedef set<HardwareIndexBuffer*>::type IndexBufferList;
-        typedef set<HardwareUniformBuffer*>::type UniformBufferList;
-        typedef set<HardwareCounterBuffer*>::type CounterBufferList;
+        typedef std::set<HardwareVertexBuffer*> VertexBufferList;
+        typedef std::set<HardwareIndexBuffer*> IndexBufferList;
+        typedef std::set<HardwareUniformBuffer*> UniformBufferList;
+        typedef std::set<HardwareCounterBuffer*> CounterBufferList;
         VertexBufferList mVertexBuffers;
         IndexBufferList mIndexBuffers;
         UniformBufferList mUniformBuffers;
         CounterBufferList mCounterBuffers;
 
 
-        typedef set<VertexDeclaration*>::type VertexDeclarationList;
-        typedef set<VertexBufferBinding*>::type VertexBufferBindingList;
+        typedef std::set<VertexDeclaration*> VertexDeclarationList;
+        typedef std::set<VertexBufferBinding*> VertexBufferBindingList;
         VertexDeclarationList mVertexDeclarations;
         VertexBufferBindingList mVertexBufferBindings;
 
@@ -192,11 +192,11 @@ namespace Ogre {
         };
 
         /// Map from original buffer to temporary buffers.
-        typedef multimap<HardwareVertexBuffer*, HardwareVertexBufferSharedPtr>::type FreeTemporaryVertexBufferMap;
+        typedef std::multimap<HardwareVertexBuffer*, HardwareVertexBufferSharedPtr> FreeTemporaryVertexBufferMap;
         /// Map of current available temp buffers.
         FreeTemporaryVertexBufferMap mFreeTempVertexBufferMap;
         /// Map from temporary buffer to details of a license.
-        typedef map<HardwareVertexBuffer*, VertexBufferLicense>::type TemporaryVertexBufferLicenseMap;
+        typedef std::map<HardwareVertexBuffer*, VertexBufferLicense> TemporaryVertexBufferLicenseMap;
         /// Map of currently licensed temporary buffers.
         TemporaryVertexBufferLicenseMap mTempVertexBufferLicenses;
         /// Number of frames elapsed since temporary buffers utilization was above half the available.

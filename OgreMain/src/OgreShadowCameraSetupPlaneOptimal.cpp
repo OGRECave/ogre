@@ -45,8 +45,8 @@ namespace Ogre
     // --------------------------------------------------------------------
     Matrix4 PlaneOptimalShadowCameraSetup::computeConstrainedProjection(
         const Vector4& pinhole, 
-        const vector<Vector4>::type& fpoint, 
-        const vector<Vector2>::type& constraint) const
+        const std::vector<Vector4>& fpoint, 
+        const std::vector<Vector2>& constraint) const
     {
         // NOTE: will assume the z coordinates should be decided such that
         // the first 3 points (in fpoint) will have post projective
@@ -304,7 +304,7 @@ namespace Ogre
         Matrix4 camProjection = cam->getProjectionMatrix() * cam->getViewMatrix();
 
         // get the world points to constrain
-        vector<Vector4>::type vhull;
+        std::vector<Vector4> vhull;
         cam->forwardIntersect(worldPlane, &vhull);
         if (vhull.size() < 4)
             return;
@@ -340,7 +340,7 @@ namespace Ogre
         vhull.resize(4);
 
         // get the post-projective coordinate constraints
-        vector<Vector2>::type constraint;
+        std::vector<Vector2> constraint;
         for (int i=0; i<4; i++)
         {
             Vector4 postProjPt = camProjection * vhull[i];

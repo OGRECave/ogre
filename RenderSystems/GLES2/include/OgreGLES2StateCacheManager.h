@@ -43,14 +43,14 @@ namespace Ogre
             TexParameterfMap mTexParameterfMap;
         };
 
-        typedef OGRE_HashMap<GLuint, TextureUnitParams> TexUnitsMap;
+        typedef std::unordered_map<GLuint, TextureUnitParams> TexUnitsMap;
 
         /// Stores the currently bound vertex array object
         GLuint mActiveVertexArray;
         /// A map of texture parameters for each texture unit
         TexUnitsMap mTexUnitsMap;
         /// Stores the currently enabled vertex attributes
-        vector<GLuint>::type mEnabledVertexAttribs;
+        std::vector<GLuint> mEnabledVertexAttribs;
         /// Stores the current blend source function
         GLenum mBlendFuncSource;
         /// Stores the current blend destination function

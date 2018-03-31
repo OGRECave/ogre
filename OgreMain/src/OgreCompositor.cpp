@@ -210,7 +210,7 @@ void Compositor::createGlobalTextures()
     //To make sure that we are consistent, it is demanded that all composition
     //techniques define the same set of global textures.
 
-    typedef set<String>::type StringSet;
+    typedef std::set<String> StringSet;
     StringSet globalTextureNames;
 
     //Initialize global textures from first supported technique

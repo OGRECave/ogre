@@ -56,9 +56,9 @@ namespace Ogre {
     class _OgreOverlayExport OverlayContainer : public OverlayElement
     {
     public:
-        typedef map<String, OverlayElement*>::type ChildMap;
+        typedef std::map<String, OverlayElement*> ChildMap;
         typedef MapIterator<ChildMap> ChildIterator;
-        typedef map<String, OverlayContainer*>::type ChildContainerMap;
+        typedef std::map<String, OverlayContainer*> ChildContainerMap;
         typedef MapIterator<ChildContainerMap> ChildContainerIterator;
     protected:
         /// Map of all children

@@ -956,7 +956,7 @@ namespace Ogre {
 
         // Count up the number of scripts we have to parse
         typedef std::pair<ScriptLoader*, FileInfoList> LoaderFileListPair;
-        typedef vector<LoaderFileListPair>::type ScriptLoaderFileList;
+        typedef std::vector<LoaderFileListPair> ScriptLoaderFileList;
         ScriptLoaderFileList scriptLoaderFileList;
         size_t scriptCount = 0;
         // Iterate over script users in loading order and get streams

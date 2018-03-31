@@ -67,7 +67,7 @@ namespace Ogre
 
         // Create buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            vector<LodIndexBuffer>::type& lods = mBuffer.submesh[i].genIndexBuffers;
+            std::vector<LodIndexBuffer>& lods = mBuffer.submesh[i].genIndexBuffers;
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount;
             lods.reserve(lods.size() + 1);
             LodIndexBuffer& curLod = *lods.insert(lods.begin() + lodIndex, LodIndexBuffer());
@@ -114,7 +114,7 @@ void LodOutputProviderBuffer::inject()
     mMesh->removeLodLevels();
     for (unsigned short i = 0; i < submeshCount; i++) {
         SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-        typedef vector<LodIndexBuffer>::type GenBuffers;
+        typedef std::vector<LodIndexBuffer> GenBuffers;
         GenBuffers& buffers = mBuffer.submesh[i].genIndexBuffers;
 
         size_t buffCount = buffers.size();

@@ -85,12 +85,11 @@ namespace Ogre {
         mBuffer.writeData(offset, length, pSource, discardWholeBuffer);
     }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
     void GLES2HardwareVertexBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
                                                size_t dstOffset, size_t length, bool discardWholeBuffer)
     {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
-        if (srcBuffer.isSystemMemory())
+        if (OGRE_NO_GLES3_SUPPORT || srcBuffer.isSystemMemory())
         {
             HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
@@ -104,7 +103,7 @@ namespace Ogre {
                              srcOffset, dstOffset, length, discardWholeBuffer);
         }
     }
-#endif
+
     void GLES2HardwareVertexBuffer::_updateFromShadow(void)
     {
         if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)

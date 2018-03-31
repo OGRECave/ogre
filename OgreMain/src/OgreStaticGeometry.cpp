@@ -1557,8 +1557,8 @@ namespace Ogre {
         ushort b;
         ushort posBufferIdx = dcl->findElementBySemantic(VES_POSITION)->getSource();
 
-        vector<uchar*>::type destBufferLocks;
-        vector<VertexDeclaration::VertexElementList>::type bufferElements;
+        std::vector<uchar*> destBufferLocks;
+        std::vector<VertexDeclaration::VertexElementList> bufferElements;
         for (b = 0; b < binds->getBufferCount(); ++b)
         {
             size_t vertexCount = mVertexData->vertexCount;

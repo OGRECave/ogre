@@ -1550,11 +1550,11 @@ namespace Ogre {
         else // VAOs are not supported, we should clear scratch 'VAO #0'
         {
             // Unbind all attributes
-            for(vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
+            for(std::vector<GLuint>::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
                 OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(*ai));
 
             // Unbind any instance attributes
-            for (vector<GLuint>::type::iterator ai = mRenderInstanceAttribsBound.begin(); ai != mRenderInstanceAttribsBound.end(); ++ai)
+            for (std::vector<GLuint>::iterator ai = mRenderInstanceAttribsBound.begin(); ai != mRenderInstanceAttribsBound.end(); ++ai)
                 OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(*ai, 0));
         }
         mRenderAttribsBound.clear();

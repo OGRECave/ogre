@@ -55,7 +55,7 @@ namespace Ogre {
         /// Extract attributes
         void extractAttributes(void);
 
-        typedef set<GLuint>::type AttributeSet;
+        typedef std::set<GLuint> AttributeSet;
         /// Custom attribute bindings
         AttributeSet mValidAttributes;
 

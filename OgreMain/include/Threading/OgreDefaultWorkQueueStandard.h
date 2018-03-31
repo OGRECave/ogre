@@ -71,7 +71,7 @@ namespace Ogre
 
         OGRE_WQ_THREAD_SYNCHRONISER(mRequestCondition);
 #if OGRE_THREAD_SUPPORT
-        typedef vector<OGRE_THREAD_TYPE*>::type WorkerThreadList;
+        typedef std::vector<OGRE_THREAD_TYPE*> WorkerThreadList;
         WorkerThreadList mWorkers;
 #endif
 

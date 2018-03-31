@@ -69,7 +69,7 @@ namespace Ogre
     class _OgrePagingExport PagedWorldSection : public PageAlloc
     {
     public:
-        typedef map<PageID, Page*>::type PageMap;
+        typedef std::map<PageID, Page*> PageMap;
     protected:
         String mName;
         AxisAlignedBox mAABB;

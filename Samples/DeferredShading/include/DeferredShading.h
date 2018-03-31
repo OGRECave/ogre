@@ -109,7 +109,7 @@ protected:
     bool mSSAO;
 
     //Used to unregister compositor logics and free memory
-    typedef map<String, CompositorLogic*>::type CompositorLogicMap;
+    typedef std::map<String, CompositorLogic*> CompositorLogicMap;
     CompositorLogicMap mCompositorLogics;
 
     void createResources();

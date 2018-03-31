@@ -333,7 +333,7 @@ namespace Ogre
         bool mFlipEndian;
         bool mReadWriteHeader;
         RealStorageFormat mRealFormat;
-        typedef deque<Chunk*>::type ChunkStack;
+        typedef std::deque<Chunk*> ChunkStack;
         /// Current list of open chunks
         ChunkStack mChunkStack;
 

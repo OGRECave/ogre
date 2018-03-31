@@ -76,7 +76,7 @@ namespace Ogre {
             /// State cache manager which responsible to reduce redundant state changes
             GLES2StateCacheManager* mStateCacheManager;
 
-            typedef list<GLContext*>::type GLContextList;
+            typedef std::list<GLContext*> GLContextList;
             /// List of background thread contexts
             GLContextList mBackgroundContextList;
 
@@ -99,8 +99,8 @@ namespace Ogre {
 
             // local data member of _render that were moved here to improve performance
             // (save allocations)
-            vector<GLuint>::type mRenderAttribsBound;
-            vector<GLuint>::type mRenderInstanceAttribsBound;
+            std::vector<GLuint> mRenderAttribsBound;
+            std::vector<GLuint> mRenderInstanceAttribsBound;
 
             GLenum mPolygonMode;
 

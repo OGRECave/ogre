@@ -35,7 +35,7 @@ namespace Ogre
 {
     class _OgreD3D11Export D3D11VideoModeList
     {
-        vector<D3D11VideoMode>::type mModeList;
+        std::vector<D3D11VideoMode> mModeList;
 
     public:
         D3D11VideoModeList(IDXGIAdapterN* pAdapter);

@@ -476,7 +476,7 @@ namespace Ogre {
             int ySegmentsToKeep;
         };
         /** Map from resource pointer to parameter set */
-        typedef map<Resource*, MeshBuildParams>::type MeshBuildParamsMap;
+        typedef std::map<Resource*, MeshBuildParams> MeshBuildParamsMap;
         MeshBuildParamsMap mMeshBuildParams;
 
         /** Utility method for manual loading a plane */

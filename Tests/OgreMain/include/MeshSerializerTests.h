@@ -61,7 +61,7 @@ public:
     template<typename T>
     bool isContainerClone(T& a, T& b);
     template<typename K, typename V>
-    bool isHashMapClone(const OGRE_HashMap<K, V>& a, const OGRE_HashMap<K, V>& b);
+    bool isHashMapClone(const std::unordered_map<K, V>& a, const std::unordered_map<K, V>& b);
 
     void getResourceFullPath(const ResourcePtr& resource, String& outPath);
     bool copyFile(const String& srcPath, const String& dstPath);

@@ -199,7 +199,7 @@ namespace Ogre
     };
 
     /// Map from property name to shared definition
-    typedef map<String, PropertyDef>::type PropertyDefMap;
+    typedef std::map<String, PropertyDef> PropertyDefMap;
 
     /** Base interface for an instance of a property.
     */
@@ -284,7 +284,7 @@ namespace Ogre
         Ogre::Any val;
     };
     /// Defines a transferable map of properties using wrapped value types (Ogre::Any)
-    typedef map<String, PropertyValue>::type PropertyValueMap;
+    typedef std::map<String, PropertyValue> PropertyValueMap;
 
 
     /** Defines a complete set of properties for a single object instance.
@@ -316,7 +316,7 @@ namespace Ogre
         /** Removes the named property from the property set. */
         void removeProperty(const String& name);
 
-        typedef map<String, PropertyBase*>::type PropertyMap;
+        typedef std::map<String, PropertyBase*> PropertyMap;
         typedef Ogre::MapIterator<PropertyMap> PropertyIterator;
         /// Get an iterator over the available properties
         PropertyIterator getPropertyIterator();

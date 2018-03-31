@@ -98,7 +98,7 @@ protected:
     Entity* mAthene;
     AnimationState* mAnimState;
     Entity* pPlaneEnt;
-    vector<Entity*>::type pColumns;
+    std::vector<Entity*> pColumns;
     Light* mLight;
     Light* mSunLight;
     SceneNode* mLightNode;
@@ -669,7 +669,7 @@ protected:
         // Sort out base materials
         pPlaneEnt->setMaterialName(BASIC_ROCKWALL_MATERIAL);
         mAthene->setMaterialName(BASIC_ATHENE_MATERIAL);
-        for (vector<Entity*>::type::iterator i = pColumns.begin();
+        for (std::vector<Entity*>::iterator i = pColumns.begin();
             i != pColumns.end(); ++i)
         {
             (*i)->setMaterialName(BASIC_ROCKWALL_MATERIAL);
@@ -711,7 +711,7 @@ protected:
                 // Sort out base materials
                 pPlaneEnt->setMaterialName(CUSTOM_ROCKWALL_MATERIAL);
                 mAthene->setMaterialName(CUSTOM_ATHENE_MATERIAL);
-                for (vector<Entity*>::type::iterator i = pColumns.begin();
+                for (std::vector<Entity*>::iterator i = pColumns.begin();
                     i != pColumns.end(); ++i)
                 {
                     (*i)->setMaterialName(CUSTOM_ROCKWALL_MATERIAL);
@@ -740,7 +740,7 @@ protected:
                 // Sort out base materials
                 pPlaneEnt->setMaterialName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");
                 mAthene->setMaterialName(CUSTOM_ATHENE_MATERIAL + "/PCF");
-                for (vector<Entity*>::type::iterator i = pColumns.begin();
+                for (std::vector<Entity*>::iterator i = pColumns.begin();
                     i != pColumns.end(); ++i)
                 {
                     (*i)->setMaterialName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");

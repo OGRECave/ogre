@@ -62,7 +62,7 @@ protected:
         bool vertexChanged;
     };
 
-    typedef vector<TriangleCache>::type TriangleCacheList;
+    typedef std::vector<TriangleCache> TriangleCacheList;
 
     /// First pass will create the mTriangleCacheList and second pass will use it.
     /// This is required, because the triangles from first pass will be changed and we need to keep the information.

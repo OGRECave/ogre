@@ -114,7 +114,7 @@ namespace Ogre
         /// Irrelevant implementation since cannot copy
         PixelFormat suggestPixelFormat() const { return PF_UNKNOWN; }
 
-        typedef vector<RenderTexture*>::type BoundSufaceList;
+        typedef std::vector<RenderTexture*> BoundSufaceList;
         /// Get a list of the surfaces which have been bound
         const BoundSufaceList& getBoundSurfaceList() const { return mBoundSurfaces; }
 

@@ -176,12 +176,12 @@ namespace Ogre
         @return The world, or null if the world doesn't exist.
         */
         PagedWorld* getWorld(const String& name);
-        typedef map<String, PagedWorld*>::type WorldMap;
+        typedef std::map<String, PagedWorld*> WorldMap;
         /** Get a reference to the worlds that are currently loaded. */
         const WorldMap& getWorlds() const { return mWorlds; }
 
 
-        typedef map<String, PageStrategy*>::type StrategyMap;
+        typedef std::map<String, PageStrategy*> StrategyMap;
         /** Add a new PageStrategy implementation. 
         @remarks
             The caller remains resonsible for destruction of this instance. 
@@ -203,7 +203,7 @@ namespace Ogre
         const StrategyMap& getStrategies() const;
 
 
-        typedef map<String, PageContentCollectionFactory*>::type ContentCollectionFactoryMap;
+        typedef std::map<String, PageContentCollectionFactory*> ContentCollectionFactoryMap;
         /** Add a new PageContentCollectionFactory implementation. 
         @remarks
         The caller remains resonsible for destruction of this instance. 
@@ -233,7 +233,7 @@ namespace Ogre
         */
         const ContentCollectionFactoryMap& getContentCollectionFactories() const;
 
-        typedef map<String, PageContentFactory*>::type ContentFactoryMap;
+        typedef std::map<String, PageContentFactory*> ContentFactoryMap;
         /** Add a new PageContentFactory implementation. 
         @remarks
         The caller remains resonsible for destruction of this instance. 
@@ -264,7 +264,7 @@ namespace Ogre
         void destroyContent(PageContent* c);
 
 
-        typedef map<String, PagedWorldSectionFactory*>::type WorldSectionFactoryMap;
+        typedef std::map<String, PagedWorldSectionFactory*> WorldSectionFactoryMap;
         /** Add a new PagedWorldSectionFactory implementation. 
         @remarks
         The caller remains resonsible for destruction of this instance. 
@@ -404,7 +404,7 @@ namespace Ogre
         */
         bool hasCamera(Camera* c) const;
 
-        typedef vector<Camera*>::type CameraList;
+        typedef std::vector<Camera*> CameraList;
         /** Returns a list of cameras being tracked. */
         const CameraList& getCameraList() const;
 

@@ -164,7 +164,7 @@ namespace Ogre {
         /// State count, the number of times this resource has changed state
         size_t mStateCount;
 
-        typedef set<Listener*>::type ListenerList;
+        typedef std::set<Listener*> ListenerList;
         ListenerList mListenerList;
         OGRE_MUTEX(mListenerListMutex);
 

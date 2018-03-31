@@ -64,9 +64,9 @@ struct _OgreRTSSExport TextureAtlasRecord
     size_t indexInAtlas;
 };
 
-typedef vector<TextureAtlasRecord>::type TextureAtlasTable;
+typedef std::vector<TextureAtlasRecord> TextureAtlasTable;
 typedef SharedPtr<TextureAtlasTable> TextureAtlasTablePtr;
-typedef map<String, TextureAtlasTablePtr>::type TextureAtlasMap;
+typedef std::map<String, TextureAtlasTablePtr> TextureAtlasMap;
 
 
 

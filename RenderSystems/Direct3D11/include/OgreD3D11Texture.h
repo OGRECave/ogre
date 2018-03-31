@@ -79,7 +79,7 @@ namespace Ogre {
 
     protected:
         // needed to store data between prepareImpl and loadImpl
-        typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
+        typedef SharedPtr<std::vector<MemoryDataStreamPtr> > LoadedStreams;
 
         template<typename fromtype, typename totype>
         void _queryInterface(const ComPtr<fromtype>& from, ComPtr<totype> *to)
@@ -166,7 +166,7 @@ namespace Ogre {
         bool mAutoMipMapGeneration;
 
         /// Vector of pointers to subsurfaces
-        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
+        typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
         SurfaceList                     mSurfaceList;
     };
 

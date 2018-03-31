@@ -36,7 +36,7 @@ namespace Ogre
     class _OgreD3D9Export D3D9DriverList : public ResourceAlloc
     {
     private:
-        vector<D3D9Driver>::type mDriverList;
+        std::vector<D3D9Driver> mDriverList;
         
     public:
         D3D9DriverList();

@@ -64,7 +64,7 @@ namespace Ogre
 
         // Create buffers.
         for (size_t i = 0; i < submeshCount; i++) {
-            vector<LodIndexBuffer>::type& lods = buffer.submesh[i].genIndexBuffers;
+            std::vector<LodIndexBuffer>& lods = buffer.submesh[i].genIndexBuffers;
             lods.reserve(lods.size() + 2);
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount;
             assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].indexCount);

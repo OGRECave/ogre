@@ -99,7 +99,7 @@ namespace Ogre {
         try
         {
                     OGRE_LOCK_AUTO_MUTEX;
-            vector<const Image*>::type imagePtrs;
+            std::vector<const Image*> imagePtrs;
             imagePtrs.push_back(&img);
             _loadImages( imagePtrs );
 

@@ -571,7 +571,7 @@ protected:
     size_t mPhysicalIndex;
 };
 
-typedef vector<UniformParameterPtr>::type       UniformParameterList;
+typedef std::vector<UniformParameterPtr>       UniformParameterList;
 typedef UniformParameterList::iterator          UniformParameterIterator;
 typedef UniformParameterList::const_iterator    UniformParameterConstIterator;
 

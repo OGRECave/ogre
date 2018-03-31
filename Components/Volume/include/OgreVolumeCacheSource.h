@@ -58,7 +58,7 @@ namespace Volume {
     protected:
         
         /// Map for the cache
-        typedef map<Vector3, Vector4>::type UMapPositionValue;
+        typedef std::map<Vector3, Vector4> UMapPositionValue;
         mutable UMapPositionValue mCache;
 
         /// The source to cache.
@@ -73,7 +73,7 @@ namespace Volume {
         inline Vector4 getFromCache(const Vector3 &position) const
         {
             Vector4 result;
-            map<Vector3, Vector4>::iterator it = mCache.find(position);
+            std::map<Vector3, Vector4>::iterator it = mCache.find(position);
             if (it == mCache.end())
             {
                 result = mSrc->getValueAndGradient(position);

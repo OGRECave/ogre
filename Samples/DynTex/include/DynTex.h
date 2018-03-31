@@ -185,7 +185,7 @@ protected:
     const unsigned int TEXTURE_SIZE;
     const unsigned int SQR_BRUSH_RADIUS;
     HardwarePixelBufferSharedPtr mTexBuf;
-    vector<uint8>::type mConstantTexBuf;
+    std::vector<uint8> mConstantTexBuf;
     Real mPlaneSize;
     RaySceneQuery* mCursorQuery;
     Vector2 mBrushPos;

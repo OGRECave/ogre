@@ -131,7 +131,7 @@ protected:
         // The number of used floats.
         int mUsedFloatCount;
     };
-    typedef vector<MergeParameter>::type    MergeParameterList;
+    typedef std::vector<MergeParameter>    MergeParameterList;
 
     
     //-----------------------------------------------------------------------------
@@ -160,12 +160,12 @@ protected:
 
         }
     };
-    typedef vector<MergeCombination>::type  MergeCombinationList;
+    typedef std::vector<MergeCombination>  MergeCombinationList;
 
     //-----------------------------------------------------------------------------
-    typedef vector<Operand*>::type                      OperandPtrVector;
-    typedef map<Parameter*, OperandPtrVector>::type     ParameterOperandMap;
-    typedef map<Parameter*, ParameterPtr>::type         LocalParameterMap;
+    typedef std::vector<Operand*>                      OperandPtrVector;
+    typedef std::map<Parameter*, OperandPtrVector>     ParameterOperandMap;
+    typedef std::map<Parameter*, ParameterPtr>         LocalParameterMap;
 
 protected:
 
@@ -260,7 +260,7 @@ protected:
     int mMaxTexCoordSlots;
     // Maximum texcoord floats count.
     int mMaxTexCoordFloats;
-    map<Function *, String *>::type  mFunctionMap;           // Map between function signatures and source code
+    std::map<Function *, String *>  mFunctionMap;           // Map between function signatures and source code
 
 };
 

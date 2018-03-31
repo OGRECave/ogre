@@ -83,11 +83,11 @@ namespace Ogre {
         /** Gets all settings from the file with the named key. */
         StringVector getMultiSetting(const String& key, const String& section = BLANKSTRING) const;
 
-        typedef multimap<String, String>::type SettingsMultiMap;
+        typedef std::multimap<String, String> SettingsMultiMap;
         typedef MapIterator<SettingsMultiMap> SettingsIterator;
         /** Gets an iterator for stepping through all the keys / values in the file. */
-        typedef map<String, SettingsMultiMap*>::type SettingsBySection;
-        typedef map<String, SettingsMultiMap>::type SettingsBySection_;
+        typedef std::map<String, SettingsMultiMap*> SettingsBySection;
+        typedef std::map<String, SettingsMultiMap> SettingsBySection_;
         typedef MapIterator<SettingsBySection> SectionIterator;
 
         /// @deprecated use getSettingsBySection()

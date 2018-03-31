@@ -37,7 +37,7 @@ using namespace OgreBites;
 
 static void prepareCircleMaterial()
 {
-    vector<uchar>::type bmap(256 * 256 * 4, 127);
+    std::vector<uchar> bmap(256 * 256 * 4, 127);
     for(int b=0;b<16;b++) {
         int x0 = b % 4 ;
         int y0 = b >> 2 ;
@@ -418,7 +418,7 @@ protected:
 #define RAIN_HEIGHT_CONSTANT 5
     
     
-    typedef vector<WaterCircle*>::type WaterCircles ;
+    typedef std::vector<WaterCircle*> WaterCircles ;
     WaterCircles circles ;
     
     void processCircles(Real timeSinceLastFrame)

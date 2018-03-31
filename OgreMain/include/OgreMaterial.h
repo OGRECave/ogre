@@ -93,9 +93,9 @@ namespace Ogre {
 
     public:
         /// distance list used to specify LOD
-        typedef vector<Real>::type LodValueList;
+        typedef std::vector<Real> LodValueList;
         typedef ConstVectorIterator<LodValueList> LodValueIterator;
-        typedef vector<Technique*>::type Techniques;
+        typedef std::vector<Technique*> Techniques;
     protected:
 
 
@@ -107,8 +107,8 @@ namespace Ogre {
         Techniques mTechniques;
         /// Supported techniques of any sort
         Techniques mSupportedTechniques;
-        typedef map<unsigned short, Technique*>::type LodTechniques;
-        typedef map<unsigned short, LodTechniques*>::type BestTechniquesBySchemeList;
+        typedef std::map<unsigned short, Technique*> LodTechniques;
+        typedef std::map<unsigned short, LodTechniques*> BestTechniquesBySchemeList;
         /** Map of scheme -> list of LOD techniques. 
             Current scheme is set on MaterialManager,
             and can be set per Viewport for auto activation.

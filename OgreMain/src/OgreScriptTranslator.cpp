@@ -4244,7 +4244,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void GpuProgramTranslator::translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj)
     {
-        list<std::pair<String,String> >::type customParameters;
+        std::list<std::pair<String,String> > customParameters;
         String syntax, source;
         AbstractNodePtr params;
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
@@ -4347,7 +4347,7 @@ namespace Ogre{
         prog->_notifyOrigin(obj->file);
 
         // Set the custom parameters
-        for(list<std::pair<String,String> >::type::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
+        for(std::list<std::pair<String,String> >::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
             prog->setParameter(i->first, i->second);
 
         // Set up default parameters
@@ -4360,7 +4360,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void GpuProgramTranslator::translateUnifiedGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj)
     {
-        list<std::pair<String,String> >::type customParameters;
+        std::list<std::pair<String,String> > customParameters;
         AbstractNodePtr params;
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -4431,7 +4431,7 @@ namespace Ogre{
         prog->_notifyOrigin(obj->file);
 
         // Set the custom parameters
-        for(list<std::pair<String,String> >::type::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
+        for(std::list<std::pair<String,String> >::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
             prog->setParameter(i->first, i->second);
 
         // Set up default parameters
@@ -4457,7 +4457,7 @@ namespace Ogre{
             return;
         }
 
-        list<std::pair<String,String> >::type customParameters;
+        std::list<std::pair<String,String> > customParameters;
         String source;
         AbstractNodePtr params;
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
@@ -4546,7 +4546,7 @@ namespace Ogre{
         prog->_notifyOrigin(obj->file);
 
         // Set the custom parameters
-        for(list<std::pair<String,String> >::type::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
+        for(std::list<std::pair<String,String> >::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
             prog->setParameter(i->first, i->second);
 
         // Set up default parameters

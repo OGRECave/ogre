@@ -156,7 +156,7 @@ namespace Ogre
         /** Retrieve a section of the world. */
         PagedWorldSection* getSection(const String& name);
 
-        typedef map<String, PagedWorldSection*>::type SectionMap;
+        typedef std::map<String, PagedWorldSection*> SectionMap;
         /// Retrieve a const reference to all the sections in this world
         const SectionMap& getSections() const { return mSections; }
 

@@ -58,7 +58,7 @@ class _OgreSampleClassExport Sample_Compositor : public SdkSample
     size_t mNumCompositorPages;
 
     //Used to unregister compositor logics and free memory
-    typedef map<String, CompositorLogic*>::type CompositorLogicMap;
+    typedef std::map<String, CompositorLogic*> CompositorLogicMap;
     CompositorLogicMap mCompositorLogics;
 
     String mDebugCompositorName;
