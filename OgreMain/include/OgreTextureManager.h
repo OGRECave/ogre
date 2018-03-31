@@ -72,12 +72,7 @@ namespace Ogre {
                             const NameValuePairList* createParams = 0);
         /// Get a resource by name
         /// @see ResourceManager::getResourceByName
-        TexturePtr
-#if OGRE_RESOURCEMANAGER_STRICT
-        getByName(const String& name, const String& groupName);
-#else
-        getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-#endif
+        TexturePtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
         using ResourceManager::createOrRetrieve;
 

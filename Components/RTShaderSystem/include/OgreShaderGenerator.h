@@ -337,12 +337,7 @@ public:
     @param materialName The source material name.   
     @param groupName The source group name. 
     */
-    bool
-#if OGRE_RESOURCEMANAGER_STRICT
-    removeAllShaderBasedTechniques(const String& materialName, const String& groupName);
-#else
-    removeAllShaderBasedTechniques(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-#endif
+    bool removeAllShaderBasedTechniques(const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
     /** 
     Clone all shader based techniques from one material to another.
@@ -389,12 +384,7 @@ public:
     @param materialName The material to invalidate.
     @param groupName The source group name. 
     */
-    void
-#if OGRE_RESOURCEMANAGER_STRICT
-    invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName);
-#else
-    invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-#endif
+    void invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
     /** 
     Validate specific material scheme. This action will generate shader programs for the technique of the
@@ -403,12 +393,7 @@ public:
     @param materialName The material to validate.
     @param groupName The source group name. 
     */
-    bool
-#if OGRE_RESOURCEMANAGER_STRICT
-    validateMaterial(const String& schemeName, const String& materialName, const String& groupName);
-#else
-    validateMaterial(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-#endif
+    bool validateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
 	/**
 	Invalidate specific material scheme. This action will lead to shader regeneration of the technique belongs to the
@@ -417,12 +402,7 @@ public:
 	@param materialName The material to invalidate.
 	@param groupName The source group name.
 	*/
-    void
-#if OGRE_RESOURCEMANAGER_STRICT
-    invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName);
-#else
-	invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-#endif
+    void invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
 	/**
 	Validate specific material scheme. This action will generate shader programs illumination passes of the technique of the
@@ -431,12 +411,7 @@ public:
 	@param materialName The material to validate.
 	@param groupName The source group name.
 	*/
-	bool
-#if OGRE_RESOURCEMANAGER_STRICT
-    validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName);
-#else
-	validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-#endif
+	bool validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
     /** 
     Return custom material Serializer of the shader generator.
