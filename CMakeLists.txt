@@ -357,7 +357,13 @@ include(Dependencies)
 
 # Customise what to build
 option(OGRE_STATIC "Static build" FALSE)
-option(OGRE_RESOURCEMANAGER_STRICT "Make ResourceManager strict for faster operation. (case sensitive, indexing required etc.)" FALSE)
+set(OGRE_RESOURCEMANAGER_STRICT "0" CACHE STRING 
+  "Make ResourceManager strict for faster operation. Possible values:
+  0 - OFF search in all groups twice - for case sensitive and insensitive lookup [DEPRECATED]
+  1 - PEDANTIC require an explicit resource group. Case sensitive lookup.
+  2 - STRICT search in default group if not specified otherwise. Case sensitive lookup.
+  ")
+set_property(CACHE OGRE_RESOURCEMANAGER_STRICT PROPERTY STRINGS 0 1 2)
 option(OGRE_USE_STD11 "Use C++11 std library. Changes API, requires compiler support" FALSE)
 option(OGRE_NODE_STORAGE_LEGACY "use maps for child nodes instead of vectors. About 20% slower but backwards compatible. " TRUE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX9_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)

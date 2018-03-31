@@ -5,7 +5,13 @@
 
 #cmakedefine OGRE_STATIC_LIB
 #cmakedefine01 OGRE_DEBUG_MODE
-#cmakedefine01 OGRE_RESOURCEMANAGER_STRICT
+
+/** There are three modes for resource lookup
+0 - LEGACY - search in all groups twice - for case sensitive and insensitive lookup
+1 - PEDANTIC - require an explicit resource group. Case sensitive lookup.
+2 - STRICT - search in default group if not specified otherwise. Case sensitive lookup.
+*/
+#define OGRE_RESOURCEMANAGER_STRICT @OGRE_RESOURCEMANAGER_STRICT@
 
 #cmakedefine OGRE_BUILD_RENDERSYSTEM_D3D9
 #cmakedefine OGRE_BUILD_RENDERSYSTEM_D3D11

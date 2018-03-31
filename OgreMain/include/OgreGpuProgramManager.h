@@ -78,12 +78,8 @@ namespace Ogre {
 
         /// Get a resource by name
         /// @see GpuProgramManager::getResourceByName
-        GpuProgramPtr
-#if OGRE_RESOURCEMANAGER_STRICT
-        getByName(const String& name, const String& group, bool preferHighLevelPrograms = true);
-#else
-        getByName(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, bool preferHighLevelPrograms = true);
-#endif
+        GpuProgramPtr getByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT, bool preferHighLevelPrograms = true);
+
 
         /** Loads a GPU program from a file of assembly. 
         @remarks
@@ -177,12 +173,7 @@ namespace Ogre {
         @param preferHighLevelPrograms If set to true (the default), high level programs will be
             returned in preference to low-level programs.
         */
-        ResourcePtr
-#if OGRE_RESOURCEMANAGER_STRICT
-        getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms = true);
-#else
-        getResourceByName(const String& name, const String& group = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, bool preferHighLevelPrograms = true);
-#endif
+        ResourcePtr getResourceByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT, bool preferHighLevelPrograms = true);
 
         /** Create a new set of shared parameters, which can be used across many 
             GpuProgramParameters objects of different structures.
