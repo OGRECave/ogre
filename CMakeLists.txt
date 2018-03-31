@@ -315,7 +315,7 @@ include(Dependencies)
 # Customise what to build
 option(OGRE_STATIC "Static build" FALSE)
 option(OGRE_ENABLE_PRECOMPILED_HEADERS "Use precompiled headers to speed up build" TRUE)
-set(OGRE_RESOURCEMANAGER_STRICT "0" CACHE STRING 
+set(OGRE_RESOURCEMANAGER_STRICT "2" CACHE STRING 
   "Make ResourceManager strict for faster operation. Possible values:
   0 - OFF search in all groups twice - for case sensitive and insensitive lookup [DEPRECATED]
   1 - PEDANTIC require an explicit resource group. Case sensitive lookup.
