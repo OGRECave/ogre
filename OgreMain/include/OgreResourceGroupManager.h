@@ -45,6 +45,14 @@ THE SOFTWARE.
 #undef Status
 #endif
 
+#if OGRE_RESOURCEMANAGER_STRICT == 0
+#   define OGRE_RESOURCE_GROUP_INIT = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME
+#elif OGRE_RESOURCEMANAGER_STRICT == 1
+#   define OGRE_RESOURCE_GROUP_INIT
+#else
+#   define OGRE_RESOURCE_GROUP_INIT = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
+#endif
+
 namespace Ogre {
 
     /** \addtogroup Core
