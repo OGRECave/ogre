@@ -60,6 +60,8 @@ namespace Ogre {
         typedef std::map<String, SceneLoaderInfo> SceneLoaderMap;
         SceneLoaderMap mSceneLoaders;
     };
+    /** @} */
+    /** @} */
 }
 
 #endif
