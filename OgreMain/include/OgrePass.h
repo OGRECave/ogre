@@ -274,25 +274,25 @@ namespace Ogre {
                                                  mTessellationHullProgramUsage || mTessellationDomainProgramUsage || mComputeProgramUsage; }
 
         /// Returns true if this pass uses a programmable vertex pipeline
-        bool hasVertexProgram(void) const { return mVertexProgramUsage != NULL; }
+        bool hasVertexProgram(void) const { return mVertexProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a programmable fragment pipeline
-        bool hasFragmentProgram(void) const { return mFragmentProgramUsage != NULL; }
+        bool hasFragmentProgram(void) const { return mFragmentProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a programmable geometry pipeline
-        bool hasGeometryProgram(void) const { return mGeometryProgramUsage != NULL; }
+        bool hasGeometryProgram(void) const { return mGeometryProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a programmable tessellation control pipeline
-        bool hasTessellationHullProgram(void) const { return mTessellationHullProgramUsage != NULL; }
+        bool hasTessellationHullProgram(void) const { return mTessellationHullProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a programmable tessellation control pipeline
-        bool hasTessellationDomainProgram(void) const { return mTessellationDomainProgramUsage != NULL; }
+        bool hasTessellationDomainProgram(void) const { return mTessellationDomainProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a programmable compute pipeline
-        bool hasComputeProgram(void) const { return mComputeProgramUsage != NULL; }
+        bool hasComputeProgram(void) const { return mComputeProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a shadow caster vertex program
-        bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
+        bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a shadow caster fragment program
-        bool hasShadowCasterFragmentProgram(void) const { return mShadowCasterFragmentProgramUsage != NULL; }
+        bool hasShadowCasterFragmentProgram(void) const { return mShadowCasterFragmentProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a shadow receiver vertex program
-        bool hasShadowReceiverVertexProgram(void) const { return mShadowReceiverVertexProgramUsage != NULL; }
+        bool hasShadowReceiverVertexProgram(void) const { return mShadowReceiverVertexProgramUsage.get() != nullptr; }
         /// Returns true if this pass uses a shadow receiver fragment program
-        bool hasShadowReceiverFragmentProgram(void) const { return mShadowReceiverFragmentProgramUsage != NULL; }
+        bool hasShadowReceiverFragmentProgram(void) const { return mShadowReceiverFragmentProgramUsage.get() != nullptr; }
 
         size_t calculateSize(void) const;
 
