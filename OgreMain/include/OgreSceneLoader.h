@@ -26,7 +26,8 @@ namespace Ogre {
         */
         virtual void load(DataStreamPtr& stream, const String& groupName, SceneNode *rootNode) = 0;
     };
-    
+    /** @} */
+    /** @} */
 }
 
 #endif
