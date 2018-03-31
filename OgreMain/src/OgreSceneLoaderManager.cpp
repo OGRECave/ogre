@@ -29,13 +29,13 @@ SceneLoaderManager::~SceneLoaderManager()
 
 }
 
-SceneLoaderManager::SceneLoaderInfo::SceneLoaderInfo(SceneLoader *l, StringVectorPtr ext)
+SceneLoaderManager::SceneLoaderInfo::SceneLoaderInfo(SceneLoader *l, const StringVector& ext)
 {
     loader = l;
     supportedExt = ext;
 }
 
-void SceneLoaderManager::registerSceneLoader(const String& name, StringVectorPtr ext, SceneLoader *sl)
+void SceneLoaderManager::registerSceneLoader(const String& name, const StringVector& ext, SceneLoader *sl)
 {
     LogManager::getSingleton().logMessage("Registering SceneLoader " + name);
     if(mSceneLoaders.find(name) != mSceneLoaders.end())
@@ -45,14 +45,14 @@ void SceneLoaderManager::registerSceneLoader(const String& name, StringVectorPtr
             "SceneLoaderManager::registerSceneLoader");
     
     unsigned int shadow = 0;
-    for(StringVector::iterator s = (*ext).begin(); s != (*ext).end(); ++s)
+    for(StringVector::const_iterator s = ext.begin(); s != ext.end(); ++s)
     {
         bool skipCurrent = false;
         for(SceneLoaderMap::iterator l = mSceneLoaders.begin();
             l != mSceneLoaders.end() && !skipCurrent; ++l)
         {
-            StringVectorPtr ep = l->second.supportedExt;
-            for(StringVector::iterator e = ep->begin(); e != ep->end(); ++e)
+            StringVector ep = l->second.supportedExt;
+            for(StringVector::const_iterator e = ep.begin(); e != ep.end(); ++e)
             {
                 if((*s).compare(*e) == 0)
                 {
@@ -70,7 +70,7 @@ void SceneLoaderManager::registerSceneLoader(const String& name, StringVectorPtr
     if(shadow)
         LogManager::getSingleton().logWarning("registering with " + 
             StringConverter::toString(shadow) + " shadowed extension(s) out of " + 
-            StringConverter::toString((*ext).size()));
+            StringConverter::toString(ext.size()));
         
         
     
@@ -104,8 +104,8 @@ void SceneLoaderManager::load(DataStreamPtr& stream, const String& groupName, Sc
     for(SceneLoaderMap::iterator i = mSceneLoaders.begin();
         i != mSceneLoaders.end(); ++i)
     {
-        StringVectorPtr ep = i->second.supportedExt;
-        for(StringVector::iterator s = ep->begin(); s != ep -> end(); ++s)
+        StringVector ep = i->second.supportedExt;
+        for(StringVector::const_iterator s = ep.begin(); s != ep.end(); ++s)
         {
             if(!ext.compare(*s))
             {

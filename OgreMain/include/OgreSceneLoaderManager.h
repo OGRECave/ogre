@@ -25,7 +25,7 @@ namespace Ogre {
                 SceneLoader being registered.
             @param sl Pointer to the SceneLoader instance.
         */
-        void registerSceneLoader(const String& name, StringVectorPtr ext, SceneLoader *sl);
+        void registerSceneLoader(const String& name, const StringVector& ext, SceneLoader *sl);
         /** Load a scene from a SceneLoader
         @param filename The name (and path) of the file to be loaded.
             This is also used to determine the SceneLoader to use by the file extension.
@@ -52,12 +52,12 @@ namespace Ogre {
         /// Struct for storing data about SceneLoaders internally
         struct SceneLoaderInfo
         {
-            SceneLoaderInfo(SceneLoader *l, StringVectorPtr ext);
+            SceneLoaderInfo(SceneLoader *l, const StringVector& ext);
             SceneLoader* loader;
-            StringVectorPtr supportedExt;
+            StringVector supportedExt;
         };
         /// Map from scene loader names to SceneLoaderInfo
-        typedef map<String, SceneLoaderInfo>::type SceneLoaderMap;
+        typedef std::map<String, SceneLoaderInfo> SceneLoaderMap;
         SceneLoaderMap mSceneLoaders;
     };
 }
