@@ -16,7 +16,7 @@ This component is used to generate shaders on the fly based on object material p
 
 # System overview {#rtss_overview}
 
-The RTSS is not another Uber shader with an exploding amount of `#ifdefs` that make it increasingly difficult to add new functionality. 
+The RTSS is not another Uber shader with an exploding amount of @c \#ifdefs that make it increasingly difficult to add new functionality. 
 Instead, it manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
 These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @ref FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, @ref FFP_FUNC_LIGHT_POINT_DIFFUSE.
 

@@ -208,7 +208,6 @@ namespace Ogre {
             @param offset The byte offset from the start of the buffer to lock
             @param length The size of the area to lock, in bytes
             @param options Locking options
-            @param uploadOpt
             @return Pointer to the locked memory
             */
             virtual void* lock(size_t offset, size_t length, LockOptions options)

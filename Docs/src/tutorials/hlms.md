@@ -2,7 +2,7 @@
 
 This component allows you to manage shader variations of a specific shader template.
 It is a different take to the Uber shader management, but instead of using plain
-`#ifdef`s it uses a custom, more powerful preprocessor language.
+@c \#ifdefs it uses a custom, more powerful preprocessor language.
 
 Additionally it allows you to define a set of abstract properties that are then used to
 configure the shader generation.

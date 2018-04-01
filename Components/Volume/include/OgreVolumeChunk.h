@@ -431,7 +431,7 @@ namespace Volume {
         have simpler materials.
         @param level
             The tree level getting the material, 0 based. 0 means the chunk with the lowest level of detail.
-        @param matName
+        @param mat
             The material name to set.
         */
         void setMaterialOfLevel(size_t level, const MaterialPtr& mat);
