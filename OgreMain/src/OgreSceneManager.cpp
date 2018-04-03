@@ -39,7 +39,6 @@ THE SOFTWARE.
 #include "OgreStaticGeometry.h"
 #include "OgreSubEntity.h"
 #include "OgreHardwarePixelBuffer.h"
-#include "OgreManualObject.h"
 #include "OgreRenderQueueInvocation.h"
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"

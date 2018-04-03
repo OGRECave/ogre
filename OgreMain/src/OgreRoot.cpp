@@ -44,7 +44,6 @@ THE SOFTWARE.
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"
 #include "OgreLight.h"
-#include "OgreManualObject.h"
 #include "OgreRenderQueueInvocation.h"
 #include "OgreConvexBody.h"
 #include "OgreTimer.h"
