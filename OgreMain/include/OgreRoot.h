@@ -120,6 +120,8 @@ namespace Ogre
 
         std::unique_ptr<ShadowTextureManager> mShadowTextureManager;
 
+        std::unique_ptr<SceneLoaderManager> mSceneLoaderManager;
+
         RenderWindow* mAutoWindow;
 
         unsigned long mNextFrame;
