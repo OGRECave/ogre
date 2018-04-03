@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePlugin.h"
 #include "OgreBspSceneManager.h"
-#include "OgreBspResourceManager.h"
+#include "OgreBspSceneLoader.h"
 
 namespace Ogre
 {
@@ -58,7 +58,7 @@ namespace Ogre
         void uninstall();
     protected:
         BspSceneManagerFactory* mBspFactory;
-        BspResourceManager* mBspResourceManager;
+        BspSceneLoader* mBspSceneLoader;
 
 
     };

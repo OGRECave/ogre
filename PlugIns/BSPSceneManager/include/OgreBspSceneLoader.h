@@ -25,12 +25,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _BspLevelManager_H__
-#define _BspLevelManager_H__
+#ifndef _BspSceneLoader_H__
+#define _BspSceneLoader_H__
 
 #include "OgreBspPrerequisites.h"
-#include "OgreResourceManager.h"
-#include "OgreSingleton.h"
+#include "OgreSceneLoader.h"
 
 namespace Ogre {
     class Quake3ShaderManager;
@@ -42,44 +41,19 @@ namespace Ogre {
     *  @{
     */
     /** Manages the locating and loading of BSP-based indoor levels.
-    Like other ResourceManager specialisations it manages the location and loading
-    of a specific type of resource, in this case files containing Binary
-    Space Partition (BSP) based level files e.g. Quake3 levels.
-    However, note that unlike other ResourceManager implementations,
-    only 1 BspLevel resource is allowed to be loaded at one time. Loading
-    another automatically unloads the currently loaded level if any.
     */
-    class BspResourceManager : public ResourceManager, public Singleton<BspResourceManager>
+    class BspSceneLoader : public SceneLoader
     {
     public:
-        BspResourceManager();
-        ~BspResourceManager();
-
-        /** Loads a BSP-based level from the named file.
-            Currently only supports loading of Quake3 .bsp files.
-        */
-        ResourcePtr load(const String& name, 
-            const String& group, bool isManual = false, 
-            ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0,
-            bool backgroundThread = false);
+        BspSceneLoader();
+        ~BspSceneLoader();
 
         /** Loads a BSP-based level from a stream.
             Currently only supports loading of Quake3 .bsp files.
         */
-        ResourcePtr load(DataStreamPtr& stream, const String& group);
-
-        /// @copydoc Singleton::getSingleton()
-        static BspResourceManager& getSingleton(void);
-        /// @copydoc Singleton::getSingleton()
-        static BspResourceManager* getSingletonPtr(void);
-
+        void load(DataStreamPtr& stream, const String& group, SceneNode *rootNode);
 
     protected:
-        /** @copydoc ResourceManager::createImpl. */
-        Resource* createImpl(const String& name, ResourceHandle handle, 
-            const String& group, bool isManual, ManualResourceLoader* loader, 
-            const NameValuePairList* createParams);
-
         // Singleton managed by this class
         Quake3ShaderManager *mShaderMgr;
 

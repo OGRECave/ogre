@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreBspSceneManager.h"
-#include "OgreBspResourceManager.h"
 #include "OgreBspNode.h"
 #include "OgreException.h"
 #include "OgreRenderSystem.h"
@@ -44,7 +43,7 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreMaterialManager.h"
-
+#include "OgreSceneLoaderManager.h"
 
 #include <fstream>
 
@@ -87,73 +86,25 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BspSceneManager::setWorldGeometry(const String& filename)
     {
-        mLevel.reset();
-        // Check extension is .bsp
-        char extension[6];
-        size_t pos = filename.find_last_of('.');
-        if( pos == String::npos )
-            OGRE_EXCEPT(
-                Exception::ERR_INVALIDPARAMS,
-                "Unable to load world geometry. Invalid extension (must be .bsp).",
-                "BspSceneManager::setWorldGeometry");
-
-        strncpy(extension, filename.substr(pos + 1, filename.length() - pos).c_str(), 5);
-        extension[5] = 0;
-
-#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
-        if (_stricmp(extension, "bsp"))
-#else
-        if (stricmp(extension, "bsp"))
-#endif
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Unable to load world geometry. Invalid extension (must be .bsp).",
-            "BspSceneManager::setWorldGeometry");
-
-        // Load using resource manager
-        mLevel = static_pointer_cast<BspLevel>(BspResourceManager::getSingleton().load(filename,
-            ResourceGroupManager::getSingleton().getWorldResourceGroupName()));
-
-        if (mLevel->isSkyEnabled())
-        {
-            // Quake3 is always aligned with Z upwards
-            Quaternion q;
-            q.FromAngleAxis(Radian(Math::HALF_PI), Vector3::UNIT_X);
-            // Also draw last, and make close to camera (far clip plane is shorter)
-            setSkyDome(true, mLevel->getSkyMaterialName(),
-                mLevel->getSkyCurvature(), 12, 2000, false, q);
-        }
-        else
-        {
-            setSkyDome(false, BLANKSTRING);
-        }
-
-        // Init static render operation
-        mRenderOp.vertexData = mLevel->mVertexData;
-        // index data is per-frame
-        mRenderOp.indexData = OGRE_NEW IndexData();
-        mRenderOp.indexData->indexStart = 0;
-        mRenderOp.indexData->indexCount = 0;
-        // Create enough index space to render whole level
-        mRenderOp.indexData->indexBuffer = HardwareBufferManager::getSingleton()
-            .createIndexBuffer(
-                HardwareIndexBuffer::IT_32BIT, // always 32-bit
-                mLevel->mNumIndexes, 
-                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
-
-        mRenderOp.operationType = RenderOperation::OT_TRIANGLE_LIST;
-        mRenderOp.useIndexes = true;
-
-
+        SceneLoaderManager::getSingleton().load(
+            filename, ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+            getRootSceneNode());
     }
     //-----------------------------------------------------------------------
     void BspSceneManager::setWorldGeometry(DataStreamPtr& stream, 
         const String& typeName)
     {
-        mLevel.reset();
+        SceneLoaderManager::getSingleton().load(
+            stream, ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+            getRootSceneNode());
+    }
 
-        // Load using resource manager
-        mLevel = static_pointer_cast<BspLevel>(BspResourceManager::getSingleton().load(stream,
-            ResourceGroupManager::getSingleton().getWorldResourceGroupName()));
+    void BspSceneManager::setLevel(const BspLevelPtr& level)
+    {
+        mLevel = level;
+
+        if(!mLevel)
+            return;
 
         if (mLevel->isSkyEnabled())
         {
