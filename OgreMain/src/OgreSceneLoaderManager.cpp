@@ -77,6 +77,11 @@ void SceneLoaderManager::registerSceneLoader(const String& name, const StringVec
     mSceneLoaders.insert(std::pair<String, SceneLoaderInfo>(name, SceneLoaderInfo(sl, ext)));
 }
 
+void SceneLoaderManager::unregisterSceneLoader(const String& name)
+{
+    mSceneLoaders.erase(name);
+}
+
 void SceneLoaderManager::load(const String& filename, const String& groupName, SceneNode *rootNode)
 {
     DataStreamPtr stream(Root::openFileStream(filename, groupName));

@@ -26,6 +26,9 @@ namespace Ogre {
             @param sl Pointer to the SceneLoader instance.
         */
         void registerSceneLoader(const String& name, const StringVector& ext, SceneLoader *sl);
+
+        void unregisterSceneLoader(const String& name);
+
         /** Load a scene from a SceneLoader
         @param filename The name (and path) of the file to be loaded.
             This is also used to determine the SceneLoader to use by the file extension.
