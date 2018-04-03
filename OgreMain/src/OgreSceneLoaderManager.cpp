@@ -85,7 +85,7 @@ void SceneLoaderManager::load(const String& filename, const String& groupName, S
 
 void SceneLoaderManager::load(DataStreamPtr& stream, const String& groupName, SceneNode *rootNode)
 {
-    String ext = "";
+    String ext;
     String filename = stream -> getName();
     for(unsigned int i = filename.length() - 2; i > 0; --i)
     {
@@ -96,11 +96,13 @@ void SceneLoaderManager::load(DataStreamPtr& stream, const String& groupName, Sc
         }
     }
     
-    if (!ext.length())
+    if (ext.empty())
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
             String("could not get file extension from filename \"") + 
             filename + String("\""), "SceneLoaderManager::load");
     
+    StringUtil::toLowerCase(ext);
+
     for(SceneLoaderMap::iterator i = mSceneLoaders.begin();
         i != mSceneLoaders.end(); ++i)
     {
