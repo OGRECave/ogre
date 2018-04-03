@@ -57,11 +57,6 @@ namespace Ogre {
         // Set features for debugging render
         mShowNodeAABs = false;
 
-        // No sky by default
-        mSkyPlaneEnabled = false;
-        mSkyBoxEnabled = false;
-        mSkyDomeEnabled = false;
-
         mLevel.reset();
 
     }
