@@ -59,6 +59,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreLog.h"
 #include "OgreLogManager.h"
+#include "OgreManualObject.h"
 #include "OgreMaterialManager.h"
 #include "OgreMaterialSerializer.h"
 #include "OgreMath.h"

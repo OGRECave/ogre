@@ -115,19 +115,16 @@ namespace Ogre
         /** Delete an OpenGL frame buffer.
          @param target The buffer target.
          @param buffer The buffer ID.
-         @param force Optional parameter to force an update.
          */
         void deleteGLFrameBuffer(GLenum target, GLuint buffer);
 
         /** Delete an OpenGL render buffer.
          @param buffer The buffer ID.
-         @param force Optional parameter to force an update.
          */
         void deleteGLRenderBuffer(GLuint buffer);
         /** Delete an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
-         @param force Optional parameter to force an update.
          */
         void deleteGLBuffer(GLenum target, GLuint buffer);
 

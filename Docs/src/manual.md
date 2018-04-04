@@ -608,9 +608,7 @@ mSceneMgr->setShadowTextureConfig( 0, 512, 512, PF_FLOAT16_R, 50 );
 
 Note a poolId of 0 will make the shadow textures not to use a depth buffer, which isn’t usually a desired behavior.
 
-<a name="Integrated-Texture-Shadows"></a><a name="Integrated-Texture-Shadows-1"></a>
-
-## Integrated Texture Shadows
+## Integrated Texture Shadows {#Integrated-Texture-Shadows}
 
 Texture shadows have one major advantage over stencil shadows - the data used to represent them can be referenced in regular shaders. Whilst the default texture shadow modes (SHADOWTYPE\_TEXTURE\_MODULATIVE and SHADOWTYPE\_TEXTURE\_ADDITIVE) automatically render shadows for you, their disadvantage is that because they are generalised add-ons to your own materials, they tend to take more passes of the scene to use. In addition, you don’t have a lot of control over the composition of the shadows.
 

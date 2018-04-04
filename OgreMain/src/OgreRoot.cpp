@@ -44,13 +44,13 @@ THE SOFTWARE.
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"
 #include "OgreLight.h"
-#include "OgreManualObject.h"
 #include "OgreRenderQueueInvocation.h"
 #include "OgreConvexBody.h"
 #include "OgreTimer.h"
 #include "OgreFrameListener.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreFileSystemLayer.h"
+#include "OgreSceneLoaderManager.h"
 
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
@@ -202,6 +202,7 @@ namespace Ogre {
         mExternalTextureSourceManager.reset(new ExternalTextureSourceManager());
         mCompositorManager.reset(new CompositorManager());
         mCompilerManager.reset(new ScriptCompilerManager());
+        mSceneLoaderManager.reset(new SceneLoaderManager());
 
         // Auto window
         mAutoWindow = 0;

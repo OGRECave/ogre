@@ -672,7 +672,7 @@ namespace Ogre {
                 registered plugin which deals with this type (FileSystem and
                 Zip should always be available)
             @param
-                groupName Type of name of the resource group which this location
+                resGroup the resource group which this location
                 should apply to; defaults to the General group which applies to
                 all non-specific resources.
             @param
@@ -761,11 +761,6 @@ namespace Ogre {
             find() method if you need to.
         @param groupName The name of the resource group; this determines which 
             locations are searched. 
-        @param searchGroupsIfNotFound If true, if the resource is not found in 
-            the group specified, other groups will be searched. If you're
-            loading a real Resource using this option, you <strong>must</strong>
-            also provide the resourceBeingLoaded parameter to enable the 
-            group membership to be changed
         @param resourceBeingLoaded Optional pointer to the resource being 
             loaded, which you should supply if you want
         @return Shared pointer to data stream containing the data, will be
@@ -778,7 +773,13 @@ namespace Ogre {
             return openResourceImpl(resourceName, groupName, false, resourceBeingLoaded);
         }
 
-        /// @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
+        /** @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
+            @param searchGroupsIfNotFound If true, if the resource is not found in 
+            the group specified, other groups will be searched. If you're
+            loading a real Resource using this option, you <strong>must</strong>
+            also provide the resourceBeingLoaded parameter to enable the 
+            group membership to be changed
+        */
         OGRE_DEPRECATED DataStreamPtr openResource(const String& resourceName,
                                                    const String& groupName,
                                                    bool searchGroupsIfNotFound,

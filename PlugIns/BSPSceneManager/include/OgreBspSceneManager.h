@@ -151,6 +151,8 @@ namespace Ogre {
 
         const BspLevelPtr& getLevel(void) {return mLevel; }
 
+        void setLevel(const BspLevelPtr& level);
+
         /** Overridden from SceneManager. */
         void _findVisibleObjects(Camera* cam, VisibleObjectsBoundsInfo* visibleBounds, 
             bool onlyShadowCasters);

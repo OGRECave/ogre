@@ -45,19 +45,17 @@ namespace Ogre {
      * if the feature set it provides is enough for you.
      *
      * Here's a list of supported features:
-     * <ul>
-     * <li>Fast memory allocation-less operation (mostly).
-     * <li>Line continuation (backslash-newline) is swallowed.
-     * <li>Line numeration is fully preserved by inserting empty lines where
+     * - Fast memory allocation-less operation (mostly).
+     * - Line continuation (backslash-newline) is swallowed.
+     * - Line numeration is fully preserved by inserting empty lines where
      *     required. This is crucial if, say, GLSL compiler reports you an error
      *     with a line number.
-     * <li>#define: Parametrized and non-parametrized macros. Invoking a macro with
+     * - @c \#define: Parametrized and non-parametrized macros. Invoking a macro with
      *     less arguments than it takes assignes empty values to missing arguments.
-     * <li>#undef: Forget defined macros
-     * <li>#ifdef/#ifndef/#else/#endif: Conditional suppression of parts of code.
-     * <li>#if: Supports numeric expression of any complexity, also supports the
+     * - @c \#undef: Forget defined macros
+     * - @c \#ifdef / @c \#ifndef / @c \#else / @c \#endif: Conditional suppression of parts of code.
+     * - @c \#if: Supports numeric expression of any complexity, also supports the
      *     defined() pseudo-function.
-     * <ul>
      */
     class CPreprocessor
     {
