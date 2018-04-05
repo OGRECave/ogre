@@ -139,14 +139,14 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     
     message(STATUS "Building freetype")
     file(DOWNLOAD
-        http://download.savannah.gnu.org/releases/freetype/freetype-2.6.5.tar.gz
-        ${OGRE_BINARY_DIR}/freetype-2.6.5.tar.gz)
+        http://download.savannah.gnu.org/releases/freetype/freetype-2.9.tar.gz
+        ${OGRE_BINARY_DIR}/freetype-2.9.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf freetype-2.6.5.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
+        -E tar xf freetype-2.9.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
     # patch toolchain for iOS
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
-        freetype-2.6.5/builds/cmake/iOS.cmake
+        freetype-2.9/builds/cmake/iOS.cmake
 		WORKING_DIRECTORY ${OGRE_BINARY_DIR})
     execute_process(COMMAND ${CMAKE_COMMAND}
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
@@ -154,22 +154,22 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
         -DWITH_BZip2=OFF # tries to use it on iOS otherwise
         # workaround for broken iOS toolchain in freetype
-        -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.6.5
+        -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.9
         ${CROSS}
         -G ${CMAKE_GENERATOR}
         -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-        ${CMAKE_BINARY_DIR}/freetype-2.6.5
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs)
+        ${CMAKE_BINARY_DIR}/freetype-2.9
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/freetype-2.9/objs)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${CMAKE_BINARY_DIR}/freetype-2.6.5/objs ${BUILD_COMMAND_OPTS})
+        --build ${CMAKE_BINARY_DIR}/freetype-2.9/objs ${BUILD_COMMAND_OPTS})
 
     if(MSVC) # other platforms dont need this
         message(STATUS "Building SDL2")
         file(DOWNLOAD
-            https://libsdl.org/release/SDL2-2.0.5.tar.gz
-            ${OGRE_BINARY_DIR}/SDL2-2.0.5.tar.gz)
+            https://libsdl.org/release/SDL2-2.0.8.tar.gz
+            ${OGRE_BINARY_DIR}/SDL2-2.0.8.tar.gz)
         execute_process(COMMAND ${CMAKE_COMMAND} 
-            -E tar xf SDL2-2.0.5.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
+            -E tar xf SDL2-2.0.8.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
         execute_process(COMMAND ${CMAKE_COMMAND}
             -E make_directory ${OGRE_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${CMAKE_COMMAND}
@@ -179,7 +179,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             -G ${CMAKE_GENERATOR}
             -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
             ${CROSS}
-            ${OGRE_BINARY_DIR}/SDL2-2.0.5
+            ${OGRE_BINARY_DIR}/SDL2-2.0.8
             WORKING_DIRECTORY ${OGRE_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${CMAKE_COMMAND}
             --build ${OGRE_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
