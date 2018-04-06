@@ -130,7 +130,7 @@ protected:
                 (mLight2QueryArea != NULL) &&
                 (mLight2QueryVisible != NULL);
         }
-        catch (Ogre::Exception e)
+        catch (Exception& e)
         {
             mUseOcclusionQuery = false;
         }
