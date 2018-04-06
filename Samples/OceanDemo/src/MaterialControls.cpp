@@ -112,7 +112,7 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
 
         Ogre::LogManager::getSingleton().logMessage( "Material Controls setup" );
     }
-    catch (Ogre::Exception e)
+    catch (Ogre::Exception& e)
     {
         // Guess the file didn't exist
     }
