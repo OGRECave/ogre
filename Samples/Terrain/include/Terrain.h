@@ -721,9 +721,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         bool blankTerrain = false;
         //blankTerrain = true;
 
-        if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists("Terrain"))
-            Ogre::ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
-
         mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
         // Bugfix for D3D11 Render System because of pixel format incompatibility when using
@@ -763,7 +760,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
         mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
         mTerrainGroup->setOrigin(mTerrainPos);
-        mTerrainGroup->setResourceGroup("Terrain");
         
         configureTerrainDefaults(l);
 #ifdef PAGING
@@ -852,8 +848,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             OGRE_DELETE mTerrainGlobals;
             mTerrainGlobals = 0;
         }
-
-        ResourceGroupManager::getSingleton().destroyResourceGroup("Terrain");
 
         mHouseList.clear();
 
