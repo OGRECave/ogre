@@ -46,13 +46,11 @@ set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS O
 set(SWIG_INPUT_MODULES ../../OgreMain/include/Ogre.i)
 
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-	ogre_add_component_include_dir(RTShaderSystem)
 	set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON)
 	list(APPEND SWIG_INPUT_MODULES ../RTShaderSystem/include/OgreRTShader.i)
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY)
-	ogre_add_component_include_dir(Overlay)
 	set_source_files_properties(../Overlay/include/OgreOverlay.i PROPERTIES CPLUSPLUS ON)
 	list(APPEND SWIG_INPUT_MODULES ../Overlay/include/OgreOverlay.i)
 endif()
@@ -62,7 +60,6 @@ if(OGRE_BUILD_COMPONENT_BITES)
 		include_directories(${SDL2_INCLUDE_DIR})
 	endif()
 
-	ogre_add_component_include_dir(Bites)
 	set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
 
 	if(ANDROID)

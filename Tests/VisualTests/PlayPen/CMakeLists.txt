@@ -20,12 +20,6 @@ include_directories(${OGRE_SOURCE_DIR}/Samples/Common/include)
 include_directories(${OGRE_SOURCE_DIR}/Samples/Browser/include)
 include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/Common/include)
 
-ogre_add_component_include_dir(Terrain)
-ogre_add_component_include_dir(Paging)
-ogre_add_component_include_dir(MeshLodGenerator)
-ogre_add_component_include_dir(RTShaderSystem)
-ogre_add_component_include_dir(Overlay)
-
 add_library(PlayPenTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(PlayPenTests ${OGRE_LIBRARIES} ${SDL2_LIBRARY} OgreBites OgreOverlay OgreRTShaderSystem)
 ogre_config_sample_lib(PlayPenTests)

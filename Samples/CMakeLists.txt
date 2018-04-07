@@ -8,37 +8,28 @@ endif()
 if (OGRE_BUILD_SAMPLES)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
-  ogre_add_component_include_dir(Bites)
-
   if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
-    ogre_add_component_include_dir(RTShaderSystem)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreRTShaderSystem)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_OVERLAY)
-	  ogre_add_component_include_dir(Overlay)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreOverlay)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_TERRAIN)
-    ogre_add_component_include_dir(Terrain)
-    ogre_add_component_include_dir(Paging)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreTerrain)
   endif ()
 
   if (OGRE_BUILD_COMPONENT_VOLUME)
-    ogre_add_component_include_dir(Volume)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreVolume)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_HLMS)
-	  ogre_add_component_include_dir(HLMS)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreHLMS)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR AND OGRE_CONFIG_ENABLE_MESHLOD)
-    ogre_add_component_include_dir(MeshLodGenerator)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreMeshLodGenerator)
   endif ()
   

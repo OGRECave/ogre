@@ -13,10 +13,11 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreOctreePrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 add_library(Plugin_OctreeSceneManager ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(Plugin_OctreeSceneManager OgreMain)
+target_include_directories(Plugin_OctreeSceneManager PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/Plugins/OctreeSceneManager>)
 
 generate_export_header(Plugin_OctreeSceneManager 
     EXPORT_MACRO_NAME _OgreOctreePluginExport

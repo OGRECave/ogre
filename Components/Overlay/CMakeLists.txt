@@ -18,22 +18,14 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreOverlayPrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-# workaround Wundef in freetype
-if(UNIX)
-  set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFont.cpp" PROPERTIES COMPILE_FLAGS "-Wno-undef")
-endif()
-
-# include headers
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${FREETYPE_INCLUDE_DIRS})
-
 # setup target
 add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreOverlay PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES})
-if (OGRE_CONFIG_THREADS)
-  target_link_libraries(OgreOverlay ${OGRE_THREAD_LIBRARIES})
-endif ()
+target_link_libraries(OgreOverlay PUBLIC OgreMain PRIVATE "${FREETYPE_LIBRARIES}" "${ZLIB_LIBRARIES}")
+target_include_directories(OgreOverlay PUBLIC 
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  $<INSTALL_INTERFACE:include/OGRE/Overlay>
+  PRIVATE ${FREETYPE_INCLUDE_DIRS})
 
 generate_export_header(OgreOverlay 
     EXPORT_MACRO_NAME _OgreOverlayExport

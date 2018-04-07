@@ -12,8 +12,6 @@ if (OGRE_BUILD_TESTS)
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
-  ogre_add_component_include_dir(Bites)
-
     if(APPLE AND NOT APPLE_IOS)
         set(CROSS ${CROSS} -DCMAKE_CXX_FLAGS=-stdlib=libc++)
     endif()
@@ -52,24 +50,18 @@ if (OGRE_BUILD_TESTS)
 
     if (OGRE_BUILD_COMPONENT_PAGING)
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Paging/include)
-      ogre_add_component_include_dir(Paging)
-
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgrePaging)
       list(APPEND HEADER_FILES Components/Paging/include/PageCoreTests.h)
       list(APPEND SOURCE_FILES Components/Paging/src/PageCoreTests.cpp)
     endif ()
     if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/MeshLodGenerator/include)
-      ogre_add_component_include_dir(MeshLodGenerator)
-
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreMeshLodGenerator)
       list(APPEND HEADER_FILES Components/MeshLodGenerator/include/MeshLodTests.h)
       list(APPEND SOURCE_FILES Components/MeshLodGenerator/src/MeshLodTests.cpp)
     endif ()
     if (OGRE_BUILD_COMPONENT_TERRAIN)
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Terrain/include)
-      ogre_add_component_include_dir(Terrain)
-
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreTerrain)
       list(APPEND HEADER_FILES Components/Terrain/include/TerrainTests.h)
       list(APPEND SOURCE_FILES Components/Terrain/src/TerrainTests.cpp)
@@ -80,9 +72,6 @@ if (OGRE_BUILD_TESTS)
       list(APPEND SOURCE_FILES Components/Property/src/PropertyTests.cpp)
     endif ()
     if (OGRE_BUILD_COMPONENT_OVERLAY)
-      include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Overlay/include
-        ${OGRE_SOURCE_DIR}/Components/Overlay/include)
-
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
     endif ()
     

@@ -11,14 +11,17 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreFreeImageCodecExports.h)
 set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include "${FreeImage_INCLUDE_DIR}")
 add_definitions(-DFREEIMAGE_LIB)
 add_library(Codec_FreeImage ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
-target_link_libraries(Codec_FreeImage OgreMain "${FreeImage_LIBRARIES}")
+target_link_libraries(Codec_FreeImage PUBLIC OgreMain "${FreeImage_LIBRARIES}")
+target_include_directories(Codec_FreeImage PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/Plugins/FreeImageCodec>
+    PRIVATE "${FreeImage_INCLUDE_DIR}")
 
 if (MINGW)
   # may need winsock htons functions for FreeImage
-  target_link_libraries(Codec_FreeImage ws2_32)
+  target_link_libraries(Codec_FreeImage PRIVATE ws2_32)
 endif ()
 
 ogre_config_framework(Codec_FreeImage)

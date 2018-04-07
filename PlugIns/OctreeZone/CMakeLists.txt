@@ -13,23 +13,15 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreOctreeZonePrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../PCZSceneManager/include)
-
 add_library(Plugin_OctreeZone ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(Plugin_OctreeZone OgreMain Plugin_PCZSceneManager)
+target_link_libraries(Plugin_OctreeZone PUBLIC OgreMain Plugin_PCZSceneManager)
+target_include_directories(Plugin_OctreeZone PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/Plugins/OctreeZone>)
 
 generate_export_header(Plugin_OctreeZone 
     EXPORT_MACRO_NAME _OgreOctreeZonePluginExport
     EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreOctreeZonePrerequisites.h)
-
-# need to include the plugins directory in the RPATH for OctreeZone to be able
-# to find the PCZSceneManager library
-if (UNIX)
-  set_property(TARGET Plugin_OctreeZone APPEND PROPERTY
-    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}/OGRE
-  )
-endif ()
 
 ogre_config_framework(Plugin_OctreeZone)
 

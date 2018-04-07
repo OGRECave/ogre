@@ -129,7 +129,7 @@ endif ()
 
 list(APPEND HEADER_FILES ${THREAD_HEADER_FILES})
 
-set(LIBRARIES ${PLATFORM_LIBS})
+set(LIBRARIES)
 
 if (OGRE_CONFIG_THREADS)
   list(APPEND LIBRARIES ${OGRE_THREAD_LIBRARIES})
@@ -184,7 +184,10 @@ generate_export_header(OgreMain
     DEPRECATED_MACRO_NAME OGRE_DEPRECATED
     EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreExports.h)
 
-target_include_directories(OgreMain PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${OGRE_BINARY_DIR}/include" ${PLATFORM_INCLUDE})
+target_include_directories(OgreMain PUBLIC 
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" 
+  "$<BUILD_INTERFACE:${OGRE_BINARY_DIR}/include>"
+  $<INSTALL_INTERFACE:include/OGRE>)
 
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
 if(WIN32 AND MSVC10 AND CMAKE_CL_64)
@@ -239,7 +242,7 @@ if (APPLE)
     set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
   endif()
 endif ()
-target_link_libraries(OgreMain ${LIBRARIES} ${CMAKE_DL_LIBS})
+target_link_libraries(OgreMain PUBLIC ${PLATFORM_LIBS} PRIVATE ${LIBRARIES} ${CMAKE_DL_LIBS})
 
 # specify a precompiled header to use
 add_native_precompiled_header(OgreMain "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h")

@@ -17,14 +17,16 @@ list(APPEND HEADER_FILES
     ${CMAKE_BINARY_DIR}/include/OgreRTShaderConfig.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-# repeat for PCH
-include_directories("${OGRE_SOURCE_DIR}/OgreMain/include" "${OGRE_BINARY_DIR}/include")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 get_native_precompiled_header(OgreRTShaderSystem)
 add_library(OgreRTShaderSystem ${OGRE_COMP_LIB_TYPE} ${OgreRTShaderSystem_pch} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreRTShaderSystem OgreMain)
+target_link_libraries(OgreRTShaderSystem PUBLIC OgreMain)
+target_include_directories(OgreRTShaderSystem PUBLIC 
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  $<INSTALL_INTERFACE:include/OGRE/RTShaderSystem>)
+
+# repeat for PCH
+include_directories("${OGRE_SOURCE_DIR}/OgreMain/include" "${OGRE_BINARY_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/include")
 add_native_precompiled_header(OgreRTShaderSystem "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreShaderPrecompiledHeaders.h")
 
 generate_export_header(OgreRTShaderSystem 

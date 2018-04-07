@@ -23,9 +23,6 @@ set (SOURCE_FILES
 	src/OgreProperty.cpp
 )
 
-# include headers
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     # workaround Wundef with boost
@@ -37,7 +34,10 @@ endif()
 # setup target
 add_library(OgreProperty ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreProperty PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreProperty OgreMain)
+target_link_libraries(OgreProperty PUBLIC OgreMain)
+target_include_directories(OgreProperty PUBLIC 
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  $<INSTALL_INTERFACE:include/OGRE/Property>)
 
 generate_export_header(OgreProperty 
     EXPORT_MACRO_NAME _OgrePropertyExport
