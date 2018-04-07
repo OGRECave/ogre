@@ -93,23 +93,23 @@ Codec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
         uchar *pixels = output->getPtr();
         FrameBuffer frameBuffer;
         frameBuffer.insert("R",             // name
-                    Slice (FLOAT,       // type
+                    Slice (PixelType::FLOAT,       // type
                        ((char *) pixels)+0, // base
                        4 * components,      // xStride
                     4 * components * width));    // yStride
         frameBuffer.insert("G",             // name
-                    Slice (FLOAT,       // type
+                    Slice (PixelType::FLOAT,       // type
                        ((char *) pixels)+4, // base
                        4 * components,      // xStride
                     4 * components * width));    // yStride
         frameBuffer.insert("B",             // name
-                    Slice (FLOAT,       // type
+                    Slice (PixelType::FLOAT,       // type
                        ((char *) pixels)+8, // base
                        4 * components,      // xStride
                     4 * components * width));    // yStride
         if(components==4) {
             frameBuffer.insert("A",                 // name
-                        Slice (FLOAT,           // type
+                        Slice (PixelType::FLOAT,           // type
                            ((char *) pixels)+12,        // base
                            4 * components,      // xStride
                         4 * components * width));    // yStride
