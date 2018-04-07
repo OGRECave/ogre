@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreTerrainMaterialGeneratorA.h"
+#include "OgreTerrainMaterialShaderHelpers.h"
 #include "OgreTerrain.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreRoot.h"
@@ -37,7 +37,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     HighLevelGpuProgramPtr
-    TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::createVertexProgram(
+    ShaderHelperGLSL::createVertexProgram(
         const SM2Profile* prof, const Terrain* terrain, TechniqueType tt)
     {
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
@@ -60,7 +60,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     HighLevelGpuProgramPtr
-        TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::createFragmentProgram(
+        ShaderHelperGLSL::createFragmentProgram(
             const SM2Profile* prof, const Terrain* terrain, TechniqueType tt)
     {
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
@@ -83,7 +83,7 @@ namespace Ogre
     }
 
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateVpHeader(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateVpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
         bool isGLES = HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles");
@@ -242,7 +242,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
         bool isGLES = HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles");
@@ -446,13 +446,13 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateVpLayer(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateVpLayer(const SM2Profile* prof, const Terrain* terrain,
                                                                                   TechniqueType tt, uint layer, StringStream& outStream)
     {
         // nothing to do
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpLayer(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateFpLayer(const SM2Profile* prof, const Terrain* terrain,
                                                                                   TechniqueType tt, uint layer, StringStream& outStream)
     {
         uint uvIdx = layer / 2;
@@ -519,7 +519,7 @@ namespace Ogre
          */
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateVpFooter(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateVpFooter(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
         outStream <<
@@ -547,7 +547,7 @@ namespace Ogre
         outStream << "}\n";
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
         if (tt == LOW_LOD)
@@ -617,7 +617,7 @@ namespace Ogre
         outStream << "}\n";
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain,
                                                                                                   TechniqueType tt, StringStream& outStream)
     {
         // TODO make filtering configurable
@@ -731,7 +731,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    uint TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateVpDynamicShadowsParams(uint texCoord, const SM2Profile* prof,
+    uint ShaderHelperGLSL::generateVpDynamicShadowsParams(uint texCoord, const SM2Profile* prof,
                                                                                                  const Terrain* terrain, TechniqueType tt,
                                                                                                  StringStream& outStream)
     {
@@ -756,7 +756,7 @@ namespace Ogre
         return texCoord;
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain,
                                                                                            TechniqueType tt, StringStream& outStream)
     {
         uint numTextures = 1;
@@ -786,7 +786,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsParams(uint* texCoord, uint* sampler,
+    void ShaderHelperGLSL::generateFpDynamicShadowsParams(uint* texCoord, uint* sampler,
                                                                                                  const SM2Profile* prof, const Terrain* terrain,
                                                                                                  TechniqueType tt, StringStream& outStream)
     {
@@ -818,7 +818,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain,
                                                                                            TechniqueType tt, StringStream& outStream)
     {
         if (prof->getReceiveDynamicShadowsPSSM())
