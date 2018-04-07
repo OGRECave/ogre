@@ -18,7 +18,7 @@ MyTestApp::MyTestApp() : OgreBites::ApplicationContext("OgreTutorialApp")
 //! [key_handler]
 bool MyTestApp::keyPressed(const OgreBites::KeyboardEvent& evt)
 {
-    if (evt.keysym.sym == SDLK_ESCAPE)
+    if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
     {
         getRoot()->queueEndRendering();
     }
