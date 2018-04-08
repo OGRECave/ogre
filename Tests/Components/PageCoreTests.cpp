@@ -25,11 +25,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "PageCoreTests.h"
+#include <gtest/gtest.h>
+
+#include "OgreRoot.h"
+#include "OgrePageManager.h"
+#include "OgreGrid2DPageStrategy.h"
+#include "OgreFileSystemLayer.h"
+#include "OgreBuildSettings.h"
+
+
+#include "OgreStaticPluginLoader.h"
 #include "OgrePaging.h"
 #include "OgreLogManager.h"
 
+using namespace Ogre;
 
+class PageCoreTests : public ::testing::Test
+{
+public:
+    Root* mRoot;
+    PageManager* mPageManager;
+    SceneManager* mSceneMgr;
+    FileSystemLayer* mFSLayer;
+
+#ifdef OGRE_STATIC_LIB
+    OgreBites::StaticPluginLoader mStaticPluginLoader;
+#endif
+
+    void SetUp();
+    void TearDown();
+};
 // Register the test suite
 
 //--------------------------------------------------------------------------

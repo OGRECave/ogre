@@ -25,11 +25,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "TerrainTests.h"
+#include <gtest/gtest.h>
+
+#include "OgreRoot.h"
 #include "OgreTerrain.h"
+#include "OgreFileSystemLayer.h"
+
+#include "OgreBuildSettings.h"
+#include "OgreStaticPluginLoader.h"
 #include "OgreConfigFile.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreLogManager.h"
+
+using namespace Ogre;
+
+class TerrainTests : public ::testing::Test
+{
+public:
+#ifdef OGRE_STATIC_LIB
+    OgreBites::StaticPluginLoader mStaticPluginLoader;
+#endif
+
+    Root* mRoot;
+    SceneManager* mSceneMgr;
+    TerrainGlobalOptions* mTerrainOpts;
+    FileSystemLayer* mFSLayer;
+
+    void SetUp();
+    void TearDown();
+};
 
 //--------------------------------------------------------------------------
 void TerrainTests::SetUp()
