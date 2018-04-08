@@ -11,7 +11,6 @@
 
 if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
-    ogre_add_component_include_dir(RTShaderSystem)
 endif ()
 
 add_definitions(${OGRE_VISIBILITY_FLAGS})

@@ -38,7 +38,6 @@ if(NOT TINYXML_FOUND)
 endif(NOT TINYXML_FOUND)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${TINYXML_INCLUDE_DIR})
-ogre_add_component_include_dir(MeshLodGenerator)
 add_definitions(-DTIXML_USE_STL)
 
 if(UNIX)

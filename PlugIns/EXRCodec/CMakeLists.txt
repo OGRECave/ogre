@@ -11,11 +11,13 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreEXRCodecExports.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(SYSTEM ${OPENEXR_INCLUDE_DIR}/OpenEXR)
-
 add_library(Codec_EXR ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(Codec_EXR OgreMain ${OPENEXR_LIBRARIES})
+target_include_directories(Codec_EXR PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/Plugins/EXRCodec>)
+target_include_directories(Codec_EXR SYSTEM PRIVATE  "${OPENEXR_INCLUDE_DIR}/OpenEXR")
+
 ogre_config_framework(Codec_EXR)
 ogre_config_plugin(Codec_EXR)
 generate_export_header(Codec_EXR 

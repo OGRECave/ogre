@@ -44,13 +44,6 @@ if (OGRE_STATIC)
   list(APPEND SAMPLE_LIBRARIES PlayPenTests)
 endif()
 
-ogre_add_component_include_dir(Terrain)
-ogre_add_component_include_dir(Paging)
-ogre_add_component_include_dir(RTShaderSystem)
-ogre_add_component_include_dir(MeshLodGenerator)
-ogre_add_component_include_dir(Overlay)
-ogre_add_component_include_dir(Volume)
-
 add_executable(TestContext ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(TestContext OgreMain ${OGRE_PLUGIN_LIBRARIES} ${SAMPLE_LIBRARIES} OgreOverlay OgreRTShaderSystem OgreBites)
 ogre_config_common(TestContext)

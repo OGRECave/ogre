@@ -50,37 +50,27 @@ list(APPEND HEADER_FILES
   ${ATIFS_HEADERS}
 )
 
-include_directories(${GLSUPPORT_INCLUDE_DIR})
-include_directories(
-  BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/atifs/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse
-  ${OGRE_SOURCE_DIR}/OgreMain/include/Threading
 )
-
-if(NOT APPLE)
-  include_directories(
-    ${OPENGL_INCLUDE_DIR}
-  )
-endif()
 
 add_definitions(-DGLEW_STATIC -DYY_NEVER_INTERACTIVE)
 add_definitions(-DOGRE_GLPLUGIN_EXPORTS ${OGRE_VISIBILITY_FLAGS})
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
 add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL OgreMain ${GLSUPPORT_LIBS} ${OPENGL_gl_LIBRARY})
-
-if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GL ${OGRE_THREAD_LIBRARIES})
-endif ()
+target_link_libraries(RenderSystem_GL OgreMain OgreGLSupport ${OPENGL_gl_LIBRARY})
+target_include_directories(RenderSystem_GL PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL>)
 
 if (APPLE)
     set_target_properties(RenderSystem_GL PROPERTIES
         LINK_FLAGS "-framework Cocoa -framework Carbon -framework OpenGL -framework AGL")
+else()
+    target_include_directories(RenderSystem_GL PUBLIC ${OPENGL_INCLUDE_DIR})
 endif ()
 
 ogre_config_framework(RenderSystem_GL)

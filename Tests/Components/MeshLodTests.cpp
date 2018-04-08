@@ -1,4 +1,6 @@
-#include "MeshLodTests.h"
+#include "RootWithoutRenderSystemFixture.h"
+
+#include "OgreLodConfig.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreVertexIndexData.h"
 #include "OgreEdgeListBuilder.h"
@@ -18,6 +20,21 @@
 #include "OgreRenderWindow.h"
 #include "OgreLodConfigSerializer.h"
 #include "OgreWorkQueue.h"
+
+using namespace Ogre;
+
+class MeshLodTests : public RootWithoutRenderSystemFixture
+{
+public:
+    MeshPtr mMesh;
+
+    void SetUp();
+    void TearDown();
+    void runMeshLodConfigTests(LodConfig::Advanced& advanced);
+    void blockedWaitForLodGeneration(const MeshPtr& mesh);
+    void addProfile(LodConfig& config);
+    void setTestLodConfig(LodConfig& config);
+};
 
 //--------------------------------------------------------------------------
 void MeshLodTests::SetUp()

@@ -18,20 +18,6 @@ file(GLOB GLSL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/*.cpp")
 
 set(HEADER_FILES ${HEADER_FILES} ${GLSL_HEADERS})
 
-include_directories(${GLSUPPORT_INCLUDE_DIR})
-include_directories(
-  BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL
-)
-
-if(NOT APPLE)
-  include_directories(
-    ${OPENGL_INCLUDE_DIR}
-  )
-endif()
-
 add_definitions(${OGRE_VISIBILITY_FLAGS})
 
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
@@ -39,15 +25,18 @@ if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
     PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
 endif()
 add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL3Plus OgreMain ${GLSUPPORT_LIBS} ${OPENGL_gl_LIBRARY})
-
-if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GL3Plus ${OGRE_THREAD_LIBRARIES})
-endif ()
+target_link_libraries(RenderSystem_GL3Plus OgreMain OgreGLSupport ${OPENGL_gl_LIBRARY})
+target_include_directories(RenderSystem_GL3Plus PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL>"
+    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL3Plus>
+    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL3Plus/GLSL>)
 
 if (APPLE)
     set_target_properties(RenderSystem_GL3Plus PROPERTIES
         LINK_FLAGS "-framework Cocoa -framework OpenGL")
+else()
+    target_include_directories(RenderSystem_GL3Plus PUBLIC ${OPENGL_INCLUDE_DIR})
 endif ()
 
 ogre_config_framework(RenderSystem_GL3Plus)

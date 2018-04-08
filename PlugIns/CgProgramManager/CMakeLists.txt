@@ -12,11 +12,14 @@
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${Cg_INCLUDE_DIRS})
 add_definitions(-DOGRE_CGPLUGIN_EXPORTS ${OGRE_VISIBILITY_FLAGS})
 
 add_library(Plugin_CgProgramManager ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(Plugin_CgProgramManager OgreMain ${Cg_LIBRARIES})
+target_include_directories(Plugin_CgProgramManager PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/Plugins/CgProgramManager>
+    PRIVATE ${Cg_INCLUDE_DIRS})
 
 ogre_config_framework(Plugin_CgProgramManager)
 

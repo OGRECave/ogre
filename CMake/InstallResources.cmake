@@ -263,3 +263,4 @@ install(FILES
    ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake
    DESTINATION ${OGRE_CMAKE_DIR}
 )
+install(EXPORT OgreTargets DESTINATION ${OGRE_CMAKE_DIR})
