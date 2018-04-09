@@ -154,7 +154,7 @@ namespace Ogre {
         removeAllEffects();
 
         // copy basic members (int's, real's)
-        memcpy( this, &oth, (const uchar *)(&oth.mFramePtrs) - (const uchar *)(&oth) );
+        memcpy( (uchar*)this, &oth, (const uchar *)(&oth.mFramePtrs) - (const uchar *)(&oth) );
         // copy complex members
         mFramePtrs = oth.mFramePtrs;
         mName    = oth.mName;
