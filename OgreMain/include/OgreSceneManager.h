@@ -979,18 +979,14 @@ namespace Ogre {
         /** Render a group with additive texture shadows. */
         void renderAdditiveTextureShadowedQueueGroupObjects(RenderQueueGroup* group,
             QueuedRenderableCollection::OrganisationMode om);
-        /** Render a set of objects, see renderSingleObject for param definitions */
-        void renderObjects(const QueuedRenderableCollection& objs,
-            QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
-            bool doLightIteration, const LightList* manualLightList = 0);
-        /** Render those objects in the transparent pass list which have shadow casting forced on
-        @remarks
-            This function is intended to be used to render the shadows of transparent objects which have
+        /** Render a set of objects, see renderSingleObject for param definitions
+            @remarks
+            transparentShadowCastersMode is intended to be used to render the shadows of transparent objects which have
             transparency_casts_shadows set to 'on' in their material
         */
-        void renderTransparentShadowCasterObjects(const QueuedRenderableCollection& objs,
+        void renderObjects(const QueuedRenderableCollection& objs,
             QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
-            bool doLightIteration, const LightList* manualLightList = 0);
+            bool doLightIteration, const LightList* manualLightList = 0, bool transparentShadowCastersMode = false);
 
         /** Update the state of the global render queue splitting based on a shadow
         option change. */

@@ -2114,11 +2114,8 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
         // Do unsorted transparents that cast shadows
         renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, false, false, &mShadowTextureCurrentCasterLightList);
         // Do transparents that cast shadows
-        renderTransparentShadowCasterObjects(
-                pPriorityGrp->getTransparents(), 
-                QueuedRenderableCollection::OM_SORT_DESCENDING, 
-                false, false, &mShadowTextureCurrentCasterLightList);
-
+        renderObjects(pPriorityGrp->getTransparents(), QueuedRenderableCollection::OM_SORT_DESCENDING,
+                      false, false, &mShadowTextureCurrentCasterLightList, true);
 
     }// for each priority
 
@@ -2522,18 +2519,20 @@ bool SceneManager::validateRenderableForRendering(const Pass* pass, const Render
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::renderObjects(const QueuedRenderableCollection& objs, 
-                                 QueuedRenderableCollection::OrganisationMode om, 
+void SceneManager::renderObjects(const QueuedRenderableCollection& objs,
+                                 QueuedRenderableCollection::OrganisationMode om,
                                  bool lightScissoringClipping,
-                                 bool doLightIteration, 
-                                 const LightList* manualLightList)
+                                 bool doLightIteration,
+                                 const LightList* manualLightList,
+                                 bool transparentShadowCastersMode)
 {
     mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
     mActiveQueuedRenderableVisitor->manualLightList = manualLightList;
-    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
+    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = transparentShadowCastersMode;
     mActiveQueuedRenderableVisitor->scissoring = lightScissoringClipping;
     // Use visitor
     objs.acceptVisitor(mActiveQueuedRenderableVisitor, om);
+    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
 }
 //-----------------------------------------------------------------------
 void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup, 
@@ -2620,24 +2619,6 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
 
 
     }// for each priority
-}
-//-----------------------------------------------------------------------
-void SceneManager::renderTransparentShadowCasterObjects(
-    const QueuedRenderableCollection& objs, 
-    QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping, 
-    bool doLightIteration,
-    const LightList* manualLightList)
-{
-    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = true;
-    mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
-    mActiveQueuedRenderableVisitor->manualLightList = manualLightList;
-    mActiveQueuedRenderableVisitor->scissoring = lightScissoringClipping;
-    
-    // Sort descending (transparency)
-    objs.acceptVisitor(mActiveQueuedRenderableVisitor, 
-        QueuedRenderableCollection::OM_SORT_DESCENDING);
-
-    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
 }
 //-----------------------------------------------------------------------
 void SceneManager::setWorldTransform(Renderable* rend, bool fixedFunction)
