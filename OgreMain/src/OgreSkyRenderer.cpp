@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 SceneManager::SkyRenderer::SkyRenderer(SceneManager* owner) :
-        mOwner(owner),
+        mSceneManager(owner),
         mSkyPlaneEntity(0),
         mSkyPlaneNode(0),
         mSkyDomeNode(0),
@@ -69,7 +69,7 @@ void SceneManager::SkyRenderer::setSkyPlane(
 {
     if (enable)
     {
-        String meshName = mOwner->mName + "SkyPlane";
+        String meshName = mSceneManager->mName + "SkyPlane";
         mSkyPlane = plane;
 
         MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
@@ -118,7 +118,7 @@ void SceneManager::SkyRenderer::setSkyPlane(
         if (mSkyPlaneEntity)
         {
             // destroy old one, do it by name for speed
-            mOwner->destroyEntity(meshName);
+            mSceneManager->destroyEntity(meshName);
             mSkyPlaneEntity = 0;
         }
         // Create, use the same name for mesh and entity
@@ -127,17 +127,17 @@ void SceneManager::SkyRenderer::setSkyPlane(
             Root::getSingleton().getMovableObjectFactory(EntityFactory::FACTORY_TYPE_NAME);
         NameValuePairList params;
         params["mesh"] = meshName;
-        mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, mOwner, &params));
+        mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, mSceneManager, &params));
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
 
-        MovableObjectCollection* objectMap = mOwner->getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
+        MovableObjectCollection* objectMap = mSceneManager->getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
         objectMap->map[meshName] = mSkyPlaneEntity;
 
         // Create node and attach
         if (!mSkyPlaneNode)
         {
-            mSkyPlaneNode = mOwner->createSceneNode(meshName + "Node");
+            mSkyPlaneNode = mSceneManager->createSceneNode(meshName + "Node");
         }
         else
         {
@@ -191,7 +191,7 @@ void SceneManager::SkyRenderer::setSkyBox(
         // Create node
         if (!mSkyBoxNode)
         {
-            mSkyBoxNode = mOwner->createSceneNode("SkyBoxNode");
+            mSkyBoxNode = mSceneManager->createSceneNode("SkyBoxNode");
         }
 
         // Create object
@@ -298,7 +298,7 @@ void SceneManager::SkyRenderer::setSkyBox(
                 // If we're using 6 separate images, have to create 6 materials, one for each frame
                 // Used to use combined material but now we're using queue we can't split to change frame
                 // This doesn't use much memory because textures aren't duplicated
-                String matName = mOwner->mName + "SkyBoxPlane" + StringConverter::toString(i);
+                String matName = mSceneManager->mName + "SkyBoxPlane" + StringConverter::toString(i);
                 MaterialPtr boxMat = matMgr.getByName(matName, groupName);
                 if (!boxMat)
                 {
@@ -392,7 +392,7 @@ void SceneManager::SkyRenderer::setSkyDome(
         // Create node
         if (!mSkyDomeNode)
         {
-            mSkyDomeNode = mOwner->createSceneNode("SkyDomeNode");
+            mSkyDomeNode = mSceneManager->createSceneNode("SkyDomeNode");
         }
         else
         {
@@ -412,7 +412,7 @@ void SceneManager::SkyRenderer::setSkyDome(
             if (mSkyDomeEntity[i])
             {
                 // destroy old one, do it by name for speed
-                mOwner->destroyEntity(entName);
+                mSceneManager->destroyEntity(entName);
                 mSkyDomeEntity[i] = 0;
             }
             // construct manually so we don't have problems if destroyAllMovableObjects called
@@ -421,11 +421,11 @@ void SceneManager::SkyRenderer::setSkyDome(
 
             NameValuePairList params;
             params["mesh"] = planeMesh->getName();
-            mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, mOwner, &params));
+            mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, mSceneManager, &params));
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
 
-            MovableObjectCollection* objectMap = mOwner->getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
+            MovableObjectCollection* objectMap = mSceneManager->getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
             objectMap->map[entName] = mSkyDomeEntity[i];
 
             // Attach to node
@@ -453,7 +453,7 @@ MeshPtr SceneManager::SkyRenderer::createSkyboxPlane(
     String meshName;
     Vector3 up;
 
-    meshName = mOwner->mName + "SkyBoxPlane_";
+    meshName = mSceneManager->mName + "SkyBoxPlane_";
     // Set up plane equation
     plane.d = distance;
     switch(bp)
@@ -528,7 +528,7 @@ MeshPtr SceneManager::SkyRenderer::createSkydomePlane(
     String meshName;
     Vector3 up;
 
-    meshName = mOwner->mName + "SkyDomePlane_";
+    meshName = mSceneManager->mName + "SkyDomePlane_";
     // Set up plane equation
     plane.d = distance;
     switch(bp)

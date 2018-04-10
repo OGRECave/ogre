@@ -436,7 +436,7 @@ namespace Ogre {
         {
             SkyRenderer(SceneManager* owner);
 
-            SceneManager* mOwner;
+            SceneManager* mSceneManager;
 
             // Sky plane
             Entity* mSkyPlaneEntity;
