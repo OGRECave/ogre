@@ -2995,6 +2995,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 void SceneManager::setAmbientLight(const ColourValue& colour)
 {
     mAmbientLight = colour;
+    mGpuParamsDirty |= GPV_GLOBAL;
 }
 //-----------------------------------------------------------------------
 const ColourValue& SceneManager::getAmbientLight(void) const
