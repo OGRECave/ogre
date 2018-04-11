@@ -37,14 +37,9 @@ namespace Ogre {
         : mCurrentFrame(0)
         , mAnimDuration(0)
         , mCubic(false)
-        , mTextureType(TEX_TYPE_2D)
-        , mDesiredFormat(PF_UNKNOWN)
-        , mTextureSrcMipmaps(MIP_DEFAULT)
         , mTextureCoordSetIndex(0)
         , mBorderColour(ColourValue::Black)
         , mTextureLoadFailed(false)
-        , mIsAlpha(false)
-        , mHwGamma(false)
         , mGamma(1)
         , mRecalcTexMatrix(false)
         , mUMod(0)
@@ -95,14 +90,9 @@ namespace Ogre {
         : mCurrentFrame(0)
         , mAnimDuration(0)
         , mCubic(false)
-        , mTextureType(TEX_TYPE_2D)
-        , mDesiredFormat(PF_UNKNOWN)
-        , mTextureSrcMipmaps(MIP_DEFAULT)
         , mTextureCoordSetIndex(0)
         , mBorderColour(ColourValue::Black)
         , mTextureLoadFailed(false)
-        , mIsAlpha(false)
-        , mHwGamma(false)
         , mGamma(1)
         , mRecalcTexMatrix(false)
         , mUMod(0)
@@ -228,7 +218,6 @@ namespace Ogre {
 
             mCurrentFrame = 0;
             mCubic = false;
-            mTextureType = texPtr->getTextureType();
 
             // Load immediately ?
             if (isLoaded())
@@ -313,7 +302,6 @@ namespace Ogre {
         mAnimDuration = 0;
         mCurrentFrame = 0;
         mCubic = true;
-        mTextureType = forUVW ? TEX_TYPE_CUBE_MAP : TEX_TYPE_2D;
 
         for (unsigned int i = 0; i < mFramePtrs.size(); ++i)
         {
@@ -330,13 +318,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool TextureUnitState::is3D(void) const
     {
-        return mTextureType == TEX_TYPE_CUBE_MAP;
+        return getTextureType() == TEX_TYPE_CUBE_MAP;
     }
     //-----------------------------------------------------------------------
     TextureType TextureUnitState::getTextureType(void) const
     {
-        return mTextureType;
-
+        return mFramePtrs.empty() ? TEX_TYPE_2D : mFramePtrs[0]->getTextureType();
     }
 
     //-----------------------------------------------------------------------
@@ -530,42 +517,57 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setDesiredFormat(PixelFormat desiredFormat)
     {
-        mDesiredFormat = desiredFormat;
+        for(auto& frame : mFramePtrs)
+            frame->setFormat(desiredFormat);
     }
     //-----------------------------------------------------------------------
     PixelFormat TextureUnitState::getDesiredFormat(void) const
     {
-        return mDesiredFormat;
+        return mFramePtrs.empty() ? PF_UNKNOWN : mFramePtrs[0]->getDesiredFormat();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setNumMipmaps(int numMipmaps)
     {
-        mTextureSrcMipmaps = numMipmaps;
+        for (auto& frame : mFramePtrs)
+            frame->setNumMipmaps(numMipmaps == MIP_DEFAULT
+                                     ? TextureManager::getSingleton().getDefaultNumMipmaps()
+                                     : numMipmaps);
     }
     //-----------------------------------------------------------------------
     int TextureUnitState::getNumMipmaps(void) const
     {
-        return mTextureSrcMipmaps;
+        return mFramePtrs.empty() ? int(MIP_DEFAULT) : mFramePtrs[0]->getNumMipmaps();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setIsAlpha(bool isAlpha)
     {
-        mIsAlpha = isAlpha;
+        for(auto& frame : mFramePtrs)
+            frame->setTreatLuminanceAsAlpha(isAlpha);
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::getIsAlpha(void) const
     {
-        return mIsAlpha;
+        return !mFramePtrs.empty() && mFramePtrs[0]->getTreatLuminanceAsAlpha();
+    }
+    float TextureUnitState::getGamma() const
+    {
+        return mFramePtrs.empty() ? 1.0f : mFramePtrs[0]->getGamma();
+    }
+    void TextureUnitState::setGamma(float gamma)
+    {
+        for(auto& frame : mFramePtrs)
+            frame->setGamma(gamma);
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setHardwareGammaEnabled(bool g)
     {
-        mHwGamma = g;
+        for(auto& frame : mFramePtrs)
+            frame->setHardwareGammaEnabled(g);
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::isHardwareGammaEnabled() const
     {
-        return mHwGamma;
+        return !mFramePtrs.empty() && mFramePtrs[0]->isHardwareGammaEnabled();
     }
     //-----------------------------------------------------------------------
     unsigned int TextureUnitState::getTextureCoordSet(void) const
@@ -1089,12 +1091,7 @@ namespace Ogre {
         if (!tex || mTextureLoadFailed)
             return;
 
-        tex->setTextureType(mTextureType);
-        tex->setFormat(mDesiredFormat);
         tex->setGamma(mGamma);
-        tex->setNumMipmaps(mTextureSrcMipmaps);
-        tex->setHardwareGammaEnabled(mHwGamma);
-        tex->setTreatLuminanceAsAlpha(mIsAlpha);
 
         try {
             tex->prepare();
@@ -1114,12 +1111,7 @@ namespace Ogre {
         if (!tex || mTextureLoadFailed)
             return;
 
-        tex->setTextureType(mTextureType);
-        tex->setFormat(mDesiredFormat);
         tex->setGamma(mGamma);
-        tex->setNumMipmaps(mTextureSrcMipmaps);
-        tex->setHardwareGammaEnabled(mHwGamma);
-        tex->setTreatLuminanceAsAlpha(mIsAlpha);
 
         try {
             tex->load();
@@ -1267,18 +1259,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     FilterOptions TextureUnitState::getTextureFiltering(FilterType ft) const
     {
+        if(mIsDefaultFiltering)
+            return MaterialManager::getSingleton().getDefaultTextureFiltering(ft);
 
         switch (ft)
         {
         case FT_MIN:
-            return mIsDefaultFiltering ? 
-                MaterialManager::getSingleton().getDefaultTextureFiltering(FT_MIN) : mMinFilter;
+            return mMinFilter;
         case FT_MAG:
-            return mIsDefaultFiltering ? 
-                MaterialManager::getSingleton().getDefaultTextureFiltering(FT_MAG) : mMagFilter;
+            return mMagFilter;
         case FT_MIP:
-            return mIsDefaultFiltering ? 
-                MaterialManager::getSingleton().getDefaultTextureFiltering(FT_MIP) : mMipFilter;
+            return mMipFilter;
         }
         // to keep compiler happy
         return mMinFilter;
@@ -1427,7 +1418,7 @@ namespace Ogre {
                     // if cubic or 3D
                     if (mCubic)
                     {
-                        setCubicTextureName(aliasEntry->second, mTextureType == TEX_TYPE_CUBE_MAP);
+                        setCubicTextureName(aliasEntry->second, getTextureType() == TEX_TYPE_CUBE_MAP);
                     }
                     else
                     {
@@ -1436,7 +1427,7 @@ namespace Ogre {
                             setAnimatedTextureName(aliasEntry->second, 
                                 static_cast<unsigned int>(mFramePtrs.size()), mAnimDuration);
                         else
-                            setTextureName(aliasEntry->second, mTextureType);
+                            setTextureName(aliasEntry->second, getTextureType());
                     }
                 }
                 
