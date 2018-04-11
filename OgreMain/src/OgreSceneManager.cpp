@@ -2543,17 +2543,21 @@ void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup,
         mCurrentViewport->getShadowsEnabled() && 
         !mSuppressShadows && !mSuppressRenderStateChanges;
     
-    if (doShadows && mShadowTechnique == SHADOWTYPE_STENCIL_ADDITIVE)
+    if (doShadows && isShadowTechniqueStencilBased())
     {
-        // Additive stencil shadows in use
-        renderAdditiveStencilShadowedQueueGroupObjects(pGroup, om);
-    }
-    else if (doShadows && mShadowTechnique == SHADOWTYPE_STENCIL_MODULATIVE)
-    {
+        if(isShadowTechniqueAdditive())
+        {
+            // Additive stencil shadows in use
+            renderAdditiveStencilShadowedQueueGroupObjects(pGroup, om);
+            return;
+        }
+
         // Modulative stencil shadows in use
         renderModulativeStencilShadowedQueueGroupObjects(pGroup, om);
+        return;
     }
-    else if (isShadowTechniqueTextureBased())
+
+    if (isShadowTechniqueTextureBased())
     {
         // Modulative texture shadows in use
         if (mIlluminationStage == IRS_RENDER_TO_TEXTURE)
@@ -2564,35 +2568,28 @@ void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup,
             {
                 renderTextureShadowCasterQueueGroupObjects(pGroup, om);
             }
+            return;
         }
-        else
+
+        // Ordinary + receiver pass
+        if (doShadows && !isShadowTechniqueIntegrated())
         {
-            // Ordinary + receiver pass
-            if (doShadows && !isShadowTechniqueIntegrated())
+            // Receiver pass(es)
+            if (isShadowTechniqueAdditive())
             {
-                // Receiver pass(es)
-                if (isShadowTechniqueAdditive())
-                {
-                    // Auto-additive
-                    renderAdditiveTextureShadowedQueueGroupObjects(pGroup, om);
-                }
-                else
-                {
-                    // Modulative
-                    renderModulativeTextureShadowedQueueGroupObjects(pGroup, om);
-                }
+                // Auto-additive
+                renderAdditiveTextureShadowedQueueGroupObjects(pGroup, om);
+                return;
             }
-            else
-                renderBasicQueueGroupObjects(pGroup, om);
+
+            // Modulative
+            renderModulativeTextureShadowedQueueGroupObjects(pGroup, om);
+            return;
         }
     }
-    else
-    {
-        // No shadows, ordinary pass
-        renderBasicQueueGroupObjects(pGroup, om);
-    }
 
-
+    // No shadows, ordinary pass
+    renderBasicQueueGroupObjects(pGroup, om);
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup, 
