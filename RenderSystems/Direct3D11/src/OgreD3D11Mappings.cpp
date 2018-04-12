@@ -480,7 +480,7 @@ namespace Ogre
         case DXGI_FORMAT_R16_SNORM:                 return PF_UNKNOWN;
         case DXGI_FORMAT_R16_SINT:                  return PF_UNKNOWN;
         case DXGI_FORMAT_R8_TYPELESS:               return PF_UNKNOWN;
-        case DXGI_FORMAT_R8_UNORM:                  return PF_L8;
+        case DXGI_FORMAT_R8_UNORM:                  return PF_R8;
         case DXGI_FORMAT_R8_UINT:                   return PF_UNKNOWN;
         case DXGI_FORMAT_R8_SNORM:                  return PF_UNKNOWN;
         case DXGI_FORMAT_R8_SINT:                   return PF_UNKNOWN;
@@ -547,6 +547,7 @@ namespace Ogre
     {
         switch(ogrePF)
         {
+        case PF_R8:
         case PF_L8:             return DXGI_FORMAT_R8_UNORM;
         case PF_L16:            return DXGI_FORMAT_R16_UNORM;
         case PF_A8:             return DXGI_FORMAT_A8_UNORM;
