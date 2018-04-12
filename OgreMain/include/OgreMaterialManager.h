@@ -133,8 +133,7 @@ namespace Ogre {
 
         /// Default Texture anisotropy
         unsigned int mDefaultMaxAniso;
-        /// Serializer - Hold instance per thread if necessary
-        OGRE_THREAD_POINTER(MaterialSerializer, mSerializer);
+
         /// Default settings
         MaterialPtr mDefaultSettings;
 
