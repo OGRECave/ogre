@@ -980,7 +980,7 @@ namespace Ogre
         @param twoSidedOperation If set to true, then if you render both back and front faces 
         (you'll have to turn off culling) then these parameters will apply for front faces, 
         and the inverse of them will happen for back faces (keep remains the same).
-        @param readBackAsTexture D3D11 specific @see _renderUsingReadBackAsTexture
+        @param readBackAsTexture D3D11 specific
         */
         virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
             uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
@@ -1016,8 +1016,6 @@ namespace Ogre
         details of the operation to be performed.
         */
         virtual void _render(const RenderOperation& op);
-
-        virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot);
 
         /** Gets the capabilities of the render system. */
         const RenderSystemCapabilities* getCapabilities(void) const { return mCurrentCapabilities; }

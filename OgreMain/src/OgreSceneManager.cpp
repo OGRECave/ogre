@@ -3616,13 +3616,6 @@ void SceneManager::resetLightClip()
     mDestRenderSystem->resetClipPlanes();
 }
 //---------------------------------------------------------------------
-void SceneManager::renderUsingReadBackAsTexture(unsigned int secondPass, Ogre::String variableName, unsigned int StartSlot)
-{
-    if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_READ_BACK_AS_TEXTURE)) return;
-
-    mDestRenderSystem->_renderUsingReadBackAsTexture(secondPass,variableName,StartSlot);
-}
-//---------------------------------------------------------------------
 const ColourValue& SceneManager::getShadowColour(void) const
 {
     return mShadowRenderer.mShadowColour;

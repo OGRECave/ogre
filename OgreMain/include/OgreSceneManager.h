@@ -953,10 +953,6 @@ namespace Ogre {
         void _resumeRendering(RenderContext* context);
 
     protected:
-        /** render using the feature of reading back the inactive depth-stencil buffers as texture
-            only on DirectX 11 Render System*/
-        void renderUsingReadBackAsTexture(unsigned int secondpass, Ogre::String variableName,unsigned int StartSlot);
-
         typedef std::vector<ShadowCaster*> ShadowCasterList;
         ShadowCasterList mShadowCasterList;
         std::unique_ptr<SphereSceneQuery> mShadowCasterSphereQuery;
