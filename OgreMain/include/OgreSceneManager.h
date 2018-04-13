@@ -604,6 +604,7 @@ namespace Ogre {
             typedef std::map< const Camera*, const Light* > ShadowCamLightMapping;
 
             ShadowRenderer(SceneManager* owner);
+            ~ShadowRenderer();
 
             SceneManager* mSceneManager;
             RenderSystem* mDestRenderSystem;
