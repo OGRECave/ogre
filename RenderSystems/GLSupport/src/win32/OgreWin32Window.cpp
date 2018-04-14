@@ -549,6 +549,9 @@ namespace Ogre {
 
     void Win32Window::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
     {
+        if(mIsExternal)
+            return;
+
         if (mIsFullScreen != fullScreen || width != mWidth || height != mHeight)
         {
             mIsFullScreen = fullScreen;

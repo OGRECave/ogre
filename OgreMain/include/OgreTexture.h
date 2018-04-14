@@ -329,7 +329,7 @@ namespace Ogre {
             return mSrcFormat;
         }
 
-        /** Sets the pixel format for the texture surface; can only be set before load(). */
+        /** Sets the desired pixel format for the texture surface; can only be set before load(). */
         void setFormat(PixelFormat pf);
 
         /** Returns true if the texture has an alpha layer. */

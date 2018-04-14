@@ -1078,25 +1078,25 @@ namespace Ogre
     void PCZSceneManager::ensureShadowTexturesCreated()
     {
         bool shadowTextureConfigDirty = mShadowTextureConfigDirty;
-        SceneManager::ensureShadowTexturesCreated();
+        mShadowRenderer.ensureShadowTexturesCreated();
         if (!shadowTextureConfigDirty) return;
 
-        size_t count = mShadowTextureCameras.size();
+        size_t count = mShadowRenderer.mShadowTextureCameras.size();
         for (size_t i = 0; i < count; ++i)
         {
             PCZSceneNode* node = (PCZSceneNode*)mSceneRoot->createChildSceneNode(
-                mShadowTextureCameras[i]->getName());
-            node->attachObject(mShadowTextureCameras[i]);
+                    mShadowRenderer.mShadowTextureCameras[i]->getName());
+            node->attachObject(mShadowRenderer.mShadowTextureCameras[i]);
             addPCZSceneNode(node, mDefaultZone);
         }
     }
     //---------------------------------------------------------------------
     void PCZSceneManager::destroyShadowTextures(void)
     {
-        size_t count = mShadowTextureCameras.size();
+        size_t count = mShadowRenderer.mShadowTextureCameras.size();
         for (size_t i = 0; i < count; ++i)
         {
-            SceneNode* node = mShadowTextureCameras[i]->getParentSceneNode();
+            SceneNode* node = mShadowRenderer.mShadowTextureCameras[i]->getParentSceneNode();
             mSceneRoot->removeAndDestroyChild(node);
         }
         SceneManager::destroyShadowTextures();

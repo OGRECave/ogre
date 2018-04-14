@@ -43,7 +43,7 @@ namespace Ogre {
     }
     String MaterialManager::DEFAULT_SCHEME_NAME = "Default";
     //-----------------------------------------------------------------------
-    MaterialManager::MaterialManager() : OGRE_THREAD_POINTER_INIT(mSerializer)
+    MaterialManager::MaterialManager()
     {
         mDefaultMinFilter = FO_LINEAR;
         mDefaultMagFilter = FO_LINEAR;
@@ -52,10 +52,6 @@ namespace Ogre {
         mDefaultCompareFunction = CMPF_GREATER_EQUAL;
 
         mDefaultMaxAniso = 1;
-
-        // Create primary thread copies of script compiler / serializer
-        // other copies for other threads may also be instantiated
-        OGRE_THREAD_POINTER_SET(mSerializer, OGRE_NEW MaterialSerializer());
 
         // Loading order
         mLoadOrder = 100.0f;
@@ -81,10 +77,6 @@ namespace Ogre {
         // Unregister with resource group manager
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
         ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
-
-        // delete primary thread instances directly, other threads will delete
-        // theirs automatically when the threads end.
-        OGRE_THREAD_POINTER_DELETE(mSerializer);
     }
     //-----------------------------------------------------------------------
     Resource* MaterialManager::createImpl(const String& name, ResourceHandle handle,

@@ -441,34 +441,29 @@ namespace Ogre {
         */
         TextureType getTextureType(void) const;
 
-        /** Sets the desired pixel format when load the texture.
-        */
+        /// @copydoc Texture::setFormat
         void setDesiredFormat(PixelFormat desiredFormat);
 
-        /** Gets the desired pixel format when load the texture.
-        */
+        /// @copydoc Texture::getDesiredFormat
         PixelFormat getDesiredFormat(void) const;
 
-        /** Sets how many mipmaps have been requested for the texture.
-        */
+        /// @copydoc Texture::setNumMipmaps
         void setNumMipmaps(int numMipmaps);
 
         /** Gets how many mipmaps have been requested for the texture.
         */
         int getNumMipmaps(void) const;
 
-        /** Sets whether this texture is requested to be loaded as alpha if single channel
-        */
+        /// @copydoc Texture::setTreatLuminanceAsAlpha
         void setIsAlpha(bool isAlpha);
 
-        /** Gets whether this texture is requested to be loaded as alpha if single channel
-        */
+        /// @copydoc Texture::getTreatLuminanceAsAlpha
         bool getIsAlpha(void) const;
 
         /// @copydoc Texture::getGamma
-        Real getGamma() const { return mGamma; }
+        float getGamma() const;
         /// @copydoc Texture::setGamma
-        void setGamma(Real gamma) { mGamma = gamma; }
+        void setGamma(float gamma);
 
         /// @copydoc Texture::setHardwareGammaEnabled
         void setHardwareGammaEnabled(bool enabled);
@@ -1123,10 +1118,6 @@ protected:
         /// Duration of animation in seconds.
         Real mAnimDuration;
         bool mCubic; /// Is this a series of 6 2D textures to make up a cube?
-        
-        TextureType mTextureType; 
-        PixelFormat mDesiredFormat;
-        int mTextureSrcMipmaps; /// Request number of mipmaps.
 
         unsigned int mTextureCoordSetIndex;
         UVWAddressingMode mAddressMode;
@@ -1138,8 +1129,6 @@ protected:
 
         LayerBlendModeEx mAlphaBlendMode;
         mutable bool mTextureLoadFailed;
-        bool mIsAlpha;
-        bool mHwGamma;
         Real mGamma;
 
         mutable bool mRecalcTexMatrix;
