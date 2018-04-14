@@ -57,12 +57,6 @@ THE SOFTWARE
 #define OGRE_SET_AUTO_SHARED_MUTEX_NULL
 #define OGRE_MUTEX_CONDITIONAL(name) if(true)
 
-#define OGRE_THREAD_POINTER(T, var) T* var
-#define OGRE_THREAD_POINTER_INIT(var) var(0)
-#define OGRE_THREAD_POINTER_VAR(T, var) T* var = 0
-#define OGRE_THREAD_POINTER_SET(var, expr) var = expr
-#define OGRE_THREAD_POINTER_GET(var) var
-#define OGRE_THREAD_POINTER_DELETE(var) do { OGRE_DELETE var; var = 0; } while (0)
 #define OGRE_THREAD_SLEEP(ms)
 #define OGRE_THREAD_YIELD
 

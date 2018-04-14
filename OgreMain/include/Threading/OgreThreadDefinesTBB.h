@@ -58,13 +58,6 @@ THE SOFTWARE
 #define OGRE_SET_AUTO_SHARED_MUTEX_NULL OGRE_AUTO_MUTEX_NAME = 0
 #define OGRE_MUTEX_CONDITIONAL(mutex) if (mutex)
 
-// Thread-local pointer
-#define OGRE_THREAD_POINTER(T, var) tbb::enumerable_thread_specific<SharedPtr<T> > var
-#define OGRE_THREAD_POINTER_INIT(var) var()
-#define OGRE_THREAD_POINTER_VAR(T, var) tbb::enumerable_thread_specific<SharedPtr<T> > var
-#define OGRE_THREAD_POINTER_GET(var) var.local().get()
-#define OGRE_THREAD_POINTER_SET(var, expr) do { var.local().reset(); var.local().bind(expr); } while (0)
-#define OGRE_THREAD_POINTER_DELETE(var) var.local().reset()
 // Utility
 #define OGRE_THREAD_SLEEP(ms) tbb::this_tbb_thread::sleep(tbb::tick_count::interval_t(double(ms)/1000))
 #define OGRE_THREAD_ID_TYPE tbb::tbb_thread::id
