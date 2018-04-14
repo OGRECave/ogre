@@ -102,7 +102,7 @@ namespace Ogre
         /// Returns a new AbstractNode which is a replica of this one.
         virtual AbstractNode *clone() const = 0;
         /// Returns a string value depending on the type of the AbstractNode.
-        virtual String getValue() const = 0;
+        virtual const String& getValue() const = 0;
     };
 
     /** This is an abstract node which cannot be broken down further */
@@ -114,9 +114,7 @@ namespace Ogre
     public:
         AtomAbstractNode(AbstractNode *ptr);
         AbstractNode *clone() const;
-        String getValue() const;
-    private:
-        void parseNumber() const;
+        const String& getValue() const { return value; }
     };
 
     /** This specific abstract node represents a script object */
@@ -135,7 +133,7 @@ namespace Ogre
     public:
         ObjectAbstractNode(AbstractNode *ptr);
         AbstractNode *clone() const;
-        String getValue() const;
+        const String& getValue() const { return cls; }
 
         void addVariable(const String &name);
         void setVariable(const String &name, const String &value);
@@ -153,7 +151,7 @@ namespace Ogre
     public:
         PropertyAbstractNode(AbstractNode *ptr);
         AbstractNode *clone() const;
-        String getValue() const;
+        const String& getValue() const { return name; }
     };
 
     /** This abstract node represents an import statement */
@@ -164,7 +162,7 @@ namespace Ogre
     public:
         ImportAbstractNode();
         AbstractNode *clone() const;
-        String getValue() const;
+        const String& getValue() const { return target; }
     };
 
     /** This abstract node represents a variable assignment */
@@ -175,7 +173,7 @@ namespace Ogre
     public:
         VariableAccessAbstractNode(AbstractNode *ptr);
         AbstractNode *clone() const;
-        String getValue() const;
+        const String& getValue() const { return name; }
     };
 
     class ScriptCompilerEvent;
@@ -190,16 +188,6 @@ namespace Ogre
     public: // Externally accessible types
         //typedef std::map<String,uint32> IdMap;
         typedef std::unordered_map<String,uint32> IdMap;
-
-        // The container for errors
-        struct Error : public ScriptCompilerAlloc
-        {
-            String file, message;
-            int line;
-            uint32 code;
-        };
-        typedef SharedPtr<Error> ErrorPtr;
-        typedef std::list<ErrorPtr> ErrorList;
 
         // These are the built-in error codes
         enum{
@@ -308,6 +296,14 @@ namespace Ogre
         AbstractNodeList mImportTable;
 
         // Error list
+        // The container for errors
+        struct Error
+        {
+            String file, message;
+            int line;
+            uint32 code;
+        };
+        typedef std::list<Error> ErrorList;
         ErrorList mErrors;
 
         // The listener

@@ -55,11 +55,6 @@ namespace Ogre
         return node;
     }
 
-    String AtomAbstractNode::getValue() const
-    {
-        return value;
-    }
-
     // ObjectAbstractNode
     ObjectAbstractNode::ObjectAbstractNode(AbstractNode *ptr)
         :AbstractNode(ptr), id(0), abstract(false)
@@ -91,11 +86,6 @@ namespace Ogre
         }
         node->mEnv = mEnv;
         return node;
-    }
-
-    String ObjectAbstractNode::getValue() const
-    {
-        return cls;
     }
 
     void ObjectAbstractNode::addVariable(const Ogre::String &inName)
@@ -154,11 +144,6 @@ namespace Ogre
         return node;
     }
 
-    String PropertyAbstractNode::getValue() const
-    {
-        return name;
-    }
-
     // ImportAbstractNode
     ImportAbstractNode::ImportAbstractNode()
         :AbstractNode(0)
@@ -177,11 +162,6 @@ namespace Ogre
         return node;
     }
 
-    String ImportAbstractNode::getValue() const
-    {
-        return target;
-    }
-
     // VariableAccessAbstractNode
     VariableAccessAbstractNode::VariableAccessAbstractNode(AbstractNode *ptr)
         :AbstractNode(ptr)
@@ -197,11 +177,6 @@ namespace Ogre
         node->type = type;
         node->name = name;
         return node;
-    }
-
-    String VariableAccessAbstractNode::getValue() const
-    {
-        return name;
     }
 
     // ScriptCompilerListener
@@ -443,12 +418,6 @@ namespace Ogre
 
     void ScriptCompiler::addError(uint32 code, const Ogre::String &file, int line, const String &msg)
     {
-        ErrorPtr err(OGRE_NEW Error());
-        err->code = code;
-        err->file = file;
-        err->line = line;
-        err->message = msg;
-
         if(mListener)
         {
             mListener->handleError(this, code, file, line, msg);
@@ -459,7 +428,7 @@ namespace Ogre
             defaultListener.handleError(this, code, file, line, msg);
         }
 
-        mErrors.push_back(err);
+        mErrors.push_back({file, msg, line, code});
     }
 
     void ScriptCompiler::setListener(ScriptCompilerListener *listener)
