@@ -1566,7 +1566,6 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     ScriptCompilerManager::ScriptCompilerManager()
-        :mListener(0), OGRE_THREAD_POINTER_INIT(mScriptCompiler)
     {
             OGRE_LOCK_AUTO_MUTEX;
         mScriptPatterns.push_back("*.program");
@@ -1576,27 +1575,24 @@ namespace Ogre
         mScriptPatterns.push_back("*.os");
         ResourceGroupManager::getSingleton()._registerScriptLoader(this);
 
-        OGRE_THREAD_POINTER_SET(mScriptCompiler, OGRE_NEW ScriptCompiler());
-
         mBuiltinTranslatorManager = OGRE_NEW BuiltinScriptTranslatorManager();
         mManagers.push_back(mBuiltinTranslatorManager);
     }
     //-----------------------------------------------------------------------
     ScriptCompilerManager::~ScriptCompilerManager()
     {
-        OGRE_THREAD_POINTER_DELETE(mScriptCompiler);
         OGRE_DELETE mBuiltinTranslatorManager;
     }
     //-----------------------------------------------------------------------
     void ScriptCompilerManager::setListener(ScriptCompilerListener *listener)
     {
             OGRE_LOCK_AUTO_MUTEX;
-        mListener = listener;
+        mScriptCompiler.setListener(listener);
     }
     //-----------------------------------------------------------------------
     ScriptCompilerListener *ScriptCompilerManager::getListener()
     {
-        return mListener;
+        return mScriptCompiler.getListener();
     }
     //-----------------------------------------------------------------------
     void ScriptCompilerManager::addTranslatorManager(Ogre::ScriptTranslatorManager *man)
@@ -1643,7 +1639,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	uint32 ScriptCompilerManager::registerCustomWordId(const String &word)
 	{
-		return OGRE_THREAD_POINTER_GET(mScriptCompiler)->registerCustomWordId(word);
+		return mScriptCompiler.registerCustomWordId(word);
     }
     //-----------------------------------------------------------------------
     void ScriptCompilerManager::addScriptPattern(const String &pattern)
@@ -1664,21 +1660,13 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ScriptCompilerManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
-#if OGRE_THREAD_SUPPORT
-        // check we have an instance for this thread (should always have one for main thread)
-        if (!OGRE_THREAD_POINTER_GET(mScriptCompiler))
+        ConcreteNodeListPtr nodes =
+            ScriptParser::parse(ScriptLexer::tokenize(stream->getAsString(), stream->getName()));
         {
-            // create a new instance for this thread - will get deleted when
-            // the thread dies
-            OGRE_THREAD_POINTER_SET(mScriptCompiler, OGRE_NEW ScriptCompiler());
+            // compile is not reentrant
+            OGRE_LOCK_AUTO_MUTEX;
+            mScriptCompiler.compile(nodes, groupName);
         }
-#endif
-        // Set the listener on the compiler before we continue
-        {
-                    OGRE_LOCK_AUTO_MUTEX;
-            OGRE_THREAD_POINTER_GET(mScriptCompiler)->setListener(mListener);
-        }
-        OGRE_THREAD_POINTER_GET(mScriptCompiler)->compile(stream->getAsString(), stream->getName(), groupName);
     }
 
     //-------------------------------------------------------------------------

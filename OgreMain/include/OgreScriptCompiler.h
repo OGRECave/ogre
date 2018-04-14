@@ -407,17 +407,14 @@ namespace Ogre
         // A list of patterns loaded by this compiler manager
         StringVector mScriptPatterns;
 
-        // A pointer to the listener used for compiling scripts
-        ScriptCompilerListener *mListener;
-
         // Stores a map from object types to the translators that handle them
         std::vector<ScriptTranslatorManager*> mManagers;
 
         // A pointer to the built-in ScriptTranslatorManager
         ScriptTranslatorManager *mBuiltinTranslatorManager;
 
-        // A pointer to the specific compiler instance used
-        OGRE_THREAD_POINTER(ScriptCompiler, mScriptCompiler);
+        // the specific compiler instance used
+        ScriptCompiler mScriptCompiler;
     public:
         ScriptCompilerManager();
         virtual ~ScriptCompilerManager();
