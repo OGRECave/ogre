@@ -62,7 +62,7 @@ namespace Ogre{
         static void processNode(ScriptCompiler *compiler, const AbstractNodePtr &node);
 
         /// Retrieves the node iterator at the given index
-        static AbstractNodeList::const_iterator getNodeAt(const AbstractNodeList &nodes, int index);
+        static AbstractNodeList::const_iterator getNodeAt(const AbstractNodeList &nodes, size_t index);
         /// Converts the node to a boolean and returns true if successful
         static bool getBoolean(const AbstractNodePtr &node, bool *result);
         /// Converts the node to a string and returns true if successful

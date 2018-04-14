@@ -87,18 +87,12 @@ namespace Ogre{
                                "token \"" + static_cast<ObjectAbstractNode*>(node.get())->cls + "\" is not recognized");
     }
     //-------------------------------------------------------------------------
-    AbstractNodeList::const_iterator ScriptTranslator::getNodeAt(const AbstractNodeList &nodes, int index)
+    AbstractNodeList::const_iterator ScriptTranslator::getNodeAt(const AbstractNodeList &nodes, size_t index)
     {
-        AbstractNodeList::const_iterator i = nodes.begin();
-        int n = 0;
-        while(i != nodes.end())
-        {
-            if(n == index)
-                return i;
-            ++i;
-            ++n;
-        }
-        return nodes.end();
+        if(index >= nodes.size())
+            return nodes.end();
+
+        return std::next(nodes.begin(), index);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getBoolean(const AbstractNodePtr &node, bool *result)
