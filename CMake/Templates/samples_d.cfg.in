@@ -1,3 +1,0 @@
-SampleFolder=@OGRE_SAMPLES_DIR_DBG@
-SamplePlugin=DefaultSamples
-@OGRE_COMMENT_PLAYPENTESTS@SamplePlugin=PlayPenTests_d
