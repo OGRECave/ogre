@@ -99,7 +99,7 @@ material OceanHLSL_GLSL
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				tex_coord_set 1
 			}
@@ -134,7 +134,7 @@ material OceanHLSL_GLSL
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				tex_coord_set 1
 			}
@@ -170,7 +170,7 @@ material OceanHLSL_GLSL
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				tex_coord_set 1
 			}
@@ -232,7 +232,7 @@ material OceanCg
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				tex_coord_set 1
 			}
@@ -303,7 +303,7 @@ material Ocean2_Cg
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				tex_coord_set 1
 				filtering linear linear linear
@@ -423,7 +423,7 @@ material Ocean2_HLSL_GLSL
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				filtering linear linear linear
 				tex_coord_set 1
@@ -469,7 +469,7 @@ material Ocean2_HLSL_GLSL
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				filtering linear linear linear
 				tex_coord_set 1
@@ -519,7 +519,7 @@ material Ocean2_HLSL_GLSL
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				tex_coord_set 1
 				filtering linear linear linear
@@ -569,7 +569,7 @@ material Ocean2_HLSL_GLSL
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				tex_coord_set 1
 				filtering linear linear linear

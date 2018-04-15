@@ -2880,6 +2880,11 @@ namespace Ogre{
                             compiler->_fireEvent(&evt, 0);
 
                             mUnit->setCubicTextureName(evt.mName, atom1->id == ID_COMBINED_UVW);
+
+                            if(mUnit->is3D())
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+                                                   prop->line,
+                                                   "'cubic_texture .. combinedUVW' is deprecated. Use 'texture .. cubic' instead.");
                         }
                         else
                         {

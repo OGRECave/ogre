@@ -775,14 +775,14 @@ material Examples/BumpMapping/MultiLightSpecular
             // Normalisation cube map
             texture_unit
             {
-                cubic_texture nm.png combinedUVW
+                texture nm.png cubic
                 tex_coord_set 1
                 tex_address_mode clamp
             }
             // Normalisation cube map #2
             texture_unit
             {
-                cubic_texture nm.png combinedUVW
+                texture nm.png cubic
                 tex_coord_set 1
                 tex_address_mode clamp
             }

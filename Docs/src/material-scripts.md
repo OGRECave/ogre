@@ -1012,7 +1012,8 @@ A 3 dimensional texture i.e. volume texture. Your texture has a width, a height,
 
 </dd> <dt>cubic</dt> <dd>
 
-This texture is made up of 6 2D textures which are pasted around the inside of a cube. Alternatively 1 cube texture can be used if supported by the texture format(DDS for example) and rendersystem. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
+This texture is made up of 6 2D textures which are pasted around the inside of a cube. The base_name in this format is something like ’skybox.jpg’, and the system will expect you to provide skybox_fr.jpg, skybox_bk.jpg, skybox_up.jpg, skybox_dn.jpg, skybox_lf.jpg, and skybox_rt.jpg for the individual faces.
+Alternatively 1 cube texture can be used if supported by the texture format(DDS for example) and rendersystem. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
 </dd> </dl>
 
 @param numMipMaps
@@ -1068,12 +1069,15 @@ In both cases the final parameter means the following:
 <dl compact="compact">
 <dt>combinedUVW</dt> <dd>
 
-The 6 textures are combined into a single ’cubic’ texture map which is then addressed using 3D texture coordinates with U, V and W components. Necessary for reflection maps since you never know which face of the box you are going to need. Note that not all cards support cubic environment mapping.
+The 6 textures are combined into a single ’cubic’ texture map which is then addressed using 3D texture coordinates.
+
+@deprecated use the format `texture <basename> cubic` instead
 
 </dd> <dt>separateUV</dt> <dd>
 
-The 6 textures are kept separate but are all referenced by this single texture layer. One texture at a time is active (they are actually stored as 6 frames), and they are addressed using standard 2D UV coordinates. This type is good for skyboxes since only one face is rendered at one time and this has more guaranteed hardware support on older cards.
+The 6 textures are kept separate but are all referenced by this single texture layer. One texture at a time is active (they are actually stored as 6 frames), and they are addressed using standard 2D UV coordinates.
 
+@note This type is only useful with skyboxes where only one face is rendered at a time. For everything else the other format is better due to hardware support.
 </dd> </dl> <br>
 
 Default: none

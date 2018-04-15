@@ -48,7 +48,7 @@ material DamagedHelmet_FFP {
 			// reflections
 			texture_unit
 			{
-				cubic_texture specular.jpg combinedUVW
+				texture specular.jpg cubic
 				env_map cubic_reflection
 				colour_op_ex blend_manual src_texture src_current 0.2
 			}

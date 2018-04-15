@@ -116,7 +116,7 @@ material Examples/SceneCubeMap1
 
 			texture_unit
 			{
-				cubic_texture cubemap.jpg combinedUVW
+				texture cubemap.jpg cubic
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}
@@ -152,7 +152,7 @@ material Examples/SceneCubeMap2
 
 			texture_unit
 			{
-				cubic_texture cubescene.jpg combinedUVW
+				texture cubescene.jpg cubic
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}
@@ -295,7 +295,7 @@ material Examples/MorningCubeMap
 
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}
@@ -315,7 +315,7 @@ material Examples/MorningCubeMap
 			}
 			texture_unit
 			{
-				cubic_texture morning.jpg combinedUVW
+				texture morning.jpg cubic
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}
