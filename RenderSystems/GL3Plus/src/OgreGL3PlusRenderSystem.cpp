@@ -614,11 +614,11 @@ namespace Ogre {
         // Create the texture manager
         mTextureManager = new GL3PlusTextureManager(*mGLSupport);
 
-        if (caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
+        /*if (caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
         {
             // Enable microcache
             mShaderManager->setSaveMicrocodesToCache(true);
-        }
+        }*/
 
         if( mGLSupport->hasMinGLVersion( 4, 3 ) )
         {
