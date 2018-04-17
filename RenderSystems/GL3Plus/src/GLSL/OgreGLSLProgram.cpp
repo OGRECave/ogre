@@ -258,6 +258,10 @@ namespace Ogre {
             // and then retrieve and cache new program binaries once again.
             compileAndLink();
         }
+        else
+        {
+            mLinked = true;
+        }
     }
 
 
