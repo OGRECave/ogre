@@ -246,7 +246,7 @@ namespace Ogre {
         // Load binary.
         OGRE_CHECK_GL_ERROR(glProgramBinary(mGLProgramHandle,
                                             binaryFormat,
-                                            cacheMicrocode->getPtr(),
+                                            cacheMicrocode->getCurrentPtr(),
                                             binaryLength));
 
         GLint success = 0;
