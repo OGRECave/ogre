@@ -492,7 +492,7 @@ material Ogre/DepthShadowmap/Receiver/Athene
 			// Normalisation cube map
 			texture_unit
 			{
-				cubic_texture nm.png combinedUVW
+				texture nm.png cubic
 				tex_coord_set 1
 				tex_address_mode clamp
 			}

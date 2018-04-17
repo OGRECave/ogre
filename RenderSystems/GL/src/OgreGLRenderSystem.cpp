@@ -630,11 +630,6 @@ namespace Ogre {
         // GPU Program Manager setup
         mGpuProgramManager = new GLGpuProgramManager();
 
-        if(caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
-        {
-            mGpuProgramManager->setSaveMicrocodesToCache(true);
-        }
-
         if(caps->hasCapability(RSC_VERTEX_PROGRAM))
         {
             if(caps->isShaderProfileSupported("arbvp1"))

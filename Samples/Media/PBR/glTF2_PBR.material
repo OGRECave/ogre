@@ -16,11 +16,11 @@ material glTF2/PBR
 			{}
             texture_unit IBL_Diffuse
 			{
-				cubic_texture diffuse.jpg combinedUVW
+				texture diffuse.jpg cubic
 			}
             texture_unit IBL_Specular
 			{
-				cubic_texture specular.jpg combinedUVW
+				texture specular.jpg cubic
 			}
 			texture_unit IBL_LUT
 			{

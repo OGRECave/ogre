@@ -129,7 +129,7 @@ material Examples/Water6
 
 			texture_unit
 			{
-				cubic_texture cubescene.jpg combinedUVW
+				texture cubescene.jpg cubic
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}
@@ -153,7 +153,7 @@ material Examples/Water7
 
 			texture_unit
 			{
-				cubic_texture cubescene.jpg combinedUVW
+				texture cubescene.jpg cubic
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}
@@ -174,7 +174,7 @@ material Examples/Water8
 
 			texture_unit
 			{
-				cubic_texture cubescene.jpg combinedUVW
+				texture cubescene.jpg cubic
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}

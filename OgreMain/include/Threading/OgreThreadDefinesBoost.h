@@ -78,14 +78,6 @@ THE SOFTWARE
 #define OGRE_SET_AUTO_SHARED_MUTEX_NULL OGRE_AUTO_MUTEX_NAME = 0
 #define OGRE_MUTEX_CONDITIONAL(mutex) if (mutex)
 
-// Thread-local pointer
-#define OGRE_THREAD_POINTER(T, var) boost::thread_specific_ptr<T> var
-#define OGRE_THREAD_POINTER_INIT(var) var()
-#define OGRE_THREAD_POINTER_VAR(T, var) boost::thread_specific_ptr<T> var
-#define OGRE_THREAD_POINTER_SET(var, expr) var.reset(expr)
-#define OGRE_THREAD_POINTER_GET(var) var.get()
-#define OGRE_THREAD_POINTER_DELETE(var) var.reset(0)
-
 // Utility
 #define OGRE_THREAD_ID_TYPE boost::thread::id
 #define OGRE_THREAD_YIELD boost::this_thread::yield()

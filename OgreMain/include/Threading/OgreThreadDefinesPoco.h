@@ -65,14 +65,6 @@ THE SOFTWARE
 #define OGRE_SET_AUTO_SHARED_MUTEX_NULL OGRE_AUTO_MUTEX_NAME = 0
 #define OGRE_MUTEX_CONDITIONAL(mutex) if (mutex)
 
-// Thread-local pointer
-#define OGRE_THREAD_POINTER(T, var) Poco::ThreadLocal<SharedPtr<T> > var
-#define OGRE_THREAD_POINTER_INIT(var) var()
-#define OGRE_THREAD_POINTER_VAR(T, var) Poco::ThreadLocal<SharedPtr<T> > var
-#define OGRE_THREAD_POINTER_GET(var) var.get().get()
-#define OGRE_THREAD_POINTER_SET(var, expr) do { var.get().reset(); var.get().bind(expr); } while (0)
-#define OGRE_THREAD_POINTER_DELETE(var) var.get().reset()
-
 // (hardware concurrency is not accessible via POCO atm)
 // Utility
 #define OGRE_THREAD_SLEEP(ms) Poco::Thread::sleep(ms)

@@ -1195,7 +1195,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             }
             pTex->_setTexturePtr(refTex);
         }
-        mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
+        if(pTex->getNumFrames() != 0)
+            mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
         ++unit;
     }
     // Disable remaining texture units

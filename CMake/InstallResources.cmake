@@ -21,9 +21,7 @@ if (WIN32)
     set(OGRE_TEST_MEDIA_DIR_REL "../Tests/${OGRE_MEDIA_PATH}")
   endif()
   set(OGRE_PLUGIN_DIR_REL "${CMAKE_INSTALL_PREFIX}/bin")
-  set(OGRE_PLUGIN_DIR_DBG "${CMAKE_INSTALL_PREFIX}/bin")
   set(OGRE_SAMPLES_DIR_REL "${CMAKE_INSTALL_PREFIX}/bin")
-  set(OGRE_SAMPLES_DIR_DBG "${CMAKE_INSTALL_PREFIX}/bin")
   set(OGRE_CFG_INSTALL_PATH "bin")
 elseif (APPLE)
   set(OGRE_MEDIA_PATH "Media")
@@ -39,18 +37,14 @@ elseif (APPLE)
     endif()
   endif()
   set(OGRE_PLUGIN_DIR_REL "")
-  set(OGRE_PLUGIN_DIR_DBG "")
   set(OGRE_SAMPLES_DIR_REL "")
-  set(OGRE_SAMPLES_DIR_DBG "")
   set(OGRE_CFG_INSTALL_PATH "bin")
 elseif (UNIX)
   set(OGRE_MEDIA_PATH "share/OGRE/Media")
   set(OGRE_MEDIA_DIR_REL "${CMAKE_INSTALL_PREFIX}/${OGRE_MEDIA_PATH}")
   set(OGRE_TEST_MEDIA_DIR_REL "${CMAKE_INSTALL_PREFIX}/Tests/Media")
   set(OGRE_PLUGIN_DIR_REL "${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}/OGRE")
-  set(OGRE_PLUGIN_DIR_DBG "${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}/OGRE")
   set(OGRE_SAMPLES_DIR_REL "${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}/OGRE/Samples")
-  set(OGRE_SAMPLES_DIR_DBG "${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}/OGRE/Samples")
   set(OGRE_CFG_INSTALL_PATH "share/OGRE")
 endif ()
 
@@ -120,21 +114,20 @@ endif()
 
 
 # CREATE CONFIG FILES - INSTALL VERSIONS
-# create resources.cfg
+set(OGRE_BUILD_SUFFIX "_d")
 configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/resources_d.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg)
-# create plugins.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg)
-# create quakemap.cfg
+configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg)
+
+set(OGRE_BUILD_SUFFIX "")
+configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg)
-# create samples.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/samples_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg)
-# create samples.cfg
 configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/tests_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg)
+
 
 # install resource files
 install(FILES 
@@ -184,48 +177,44 @@ endif ()
 
 if (WIN32)
   set(OGRE_PLUGIN_DIR_REL ".")
-  set(OGRE_PLUGIN_DIR_DBG ".")
   set(OGRE_SAMPLES_DIR_REL ".")
-  set(OGRE_SAMPLES_DIR_DBG ".")
 elseif (APPLE)
   # not used on OS X, uses Resources
   set(OGRE_PLUGIN_DIR_REL "")
-  set(OGRE_PLUGIN_DIR_DBG "")
   set(OGRE_SAMPLES_DIR_REL "")
-  set(OGRE_SAMPLES_DIR_DBG "")
 elseif (UNIX)
   set(OGRE_PLUGIN_DIR_REL "${OGRE_BINARY_DIR}/lib")
-  set(OGRE_PLUGIN_DIR_DBG "${OGRE_BINARY_DIR}/lib")
   set(OGRE_SAMPLES_DIR_REL "${OGRE_BINARY_DIR}/lib")
-  set(OGRE_SAMPLES_DIR_DBG "${OGRE_BINARY_DIR}/lib")
 endif ()
 
 if (WINDOWS_STORE OR WINDOWS_PHONE OR EMSCRIPTEN)
   # These platfroms requires all resources to be packaged inside the application bundle,
   # therefore install versions of configs would be copied and added as content file to each project.
 elseif (MSVC AND NOT NMAKE)
-  # create resources.cfg
+  set(OGRE_BUILD_SUFFIX "_d")
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/debug/resources_d.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/debug/plugins_d.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/bin/debug/quakemap_d.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/bin/debug/samples_d.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${OGRE_BINARY_DIR}/bin/debug/tests_d.cfg)
+
+  set(OGRE_BUILD_SUFFIX "")
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/release/resources.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/resources.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/resources.cfg)
-  # create plugins.cfg
-  configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/plugins_d.cfg)
+
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/release/plugins.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/plugins.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/plugins.cfg)
-  # create quakemap.cfg
-  configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/bin/debug/quakemap_d.cfg)
+
   configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/bin/release/quakemap.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/quakemap.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/quakemap.cfg)
-  # create samples.cfg
-  configure_file(${OGRE_TEMPLATES_DIR}/samples_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/samples_d.cfg)
+
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/bin/release/samples.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/samples.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/samples.cfg)
-  # create tests.cfg
-  configure_file(${OGRE_TEMPLATES_DIR}/tests_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/tests_d.cfg)
+
   configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${OGRE_BINARY_DIR}/bin/release/tests.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/tests.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/tests.cfg)

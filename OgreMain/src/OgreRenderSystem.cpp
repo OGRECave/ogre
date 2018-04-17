@@ -312,7 +312,7 @@ namespace Ogre {
     {
         // This method is only ever called to set a texture unit to valid details
         // The method _disableTextureUnit is called to turn a unit off
-
+        assert(tl.getNumFrames());
         const TexturePtr& tex = tl._getTexturePtr();
         bool isValidBinding = false;
         

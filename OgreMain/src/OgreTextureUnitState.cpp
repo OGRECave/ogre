@@ -246,12 +246,6 @@ namespace Ogre {
     void TextureUnitState::setContentType(TextureUnitState::ContentType ct)
     {
         mContentType = ct;
-        if (ct == CONTENT_SHADOW || ct == CONTENT_COMPOSITOR)
-        {
-            // One reference space, set manually through _setTexturePtr
-            mFramePtrs.resize(1);
-            mFramePtrs[0].reset();
-        }
     }
     //-----------------------------------------------------------------------
     TextureUnitState::ContentType TextureUnitState::getContentType(void) const
@@ -357,8 +351,7 @@ namespace Ogre {
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
 
-        // Add blank pointer, load on demand
-        mFramePtrs.push_back(TexturePtr());
+        mFramePtrs.push_back(retrieveTexture(name));
 
         // Load immediately if Material loaded
         if (isLoaded())
@@ -1075,6 +1068,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::_setTexturePtr(const TexturePtr& texptr, size_t frame)
     {
+        // generated textures (compositors & shadows) are only created at this point
+        if(mFramePtrs.empty() && mContentType != CONTENT_NAMED)
+            mFramePtrs.resize(1);
+
         assert(frame < mFramePtrs.size());
         mFramePtrs[frame] = texptr;
     }
