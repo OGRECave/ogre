@@ -285,13 +285,15 @@ void ApplicationContext::enableShaderCache() const
 
     // Load for a package version of the shaders.
     Ogre::String path = mFSLayer->getWritablePath(SHADER_CACHE_FILENAME);
-    std::fstream inFile(path.c_str(), std::ios::binary);
-    if (inFile.is_open())
+    std::ifstream inFile(path.c_str(), std::ios::binary);
+    if (!inFile.is_open())
     {
-        Ogre::LogManager::getSingleton().logMessage("Loading shader cache from "+path);
-        Ogre::DataStreamPtr istream(new Ogre::FileStreamDataStream(path, &inFile, false));
-        Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
+        Ogre::LogManager::getSingleton().logWarning("Could not open '"+path+"'");
+        return;
     }
+    Ogre::LogManager::getSingleton().logMessage("Loading shader cache from '"+path+"'");
+    Ogre::DataStreamPtr istream(new Ogre::FileStreamDataStream(path, &inFile, false));
+    Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
 }
 
 void ApplicationContext::addInputListener(NativeWindowType* win, InputListener* lis)
