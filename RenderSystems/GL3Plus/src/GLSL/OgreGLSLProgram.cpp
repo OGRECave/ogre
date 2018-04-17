@@ -183,18 +183,23 @@ namespace Ogre {
         // Load binary.
         OGRE_CHECK_GL_ERROR(glProgramBinary(mGLProgramHandle,
                                             binaryFormat,
-                                            cacheMicrocode->getPtr(),
+                                            cacheMicrocode->getCurrentPtr(),
                                             binaryLength));
 
         GLint success = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success));
-        if (!success)
+
+        if(success)
         {
-            // Something must have changed since the program binaries
-            // were cached away. Fallback to source shader loading path,
-            // and then retrieve and cache new program binaries once again.
-            compileAndLink();
+            mLinked = true;
+            return;
         }
+
+        logObjectInfo("could not load from cache "+getCombinedName(), mGLProgramHandle);
+        // Something must have changed since the program binaries
+        // were cached away. Fallback to source shader loading path,
+        // and then retrieve and cache new program binaries once again.
+        compileAndLink();
     }
 
 } // namespace Ogre
