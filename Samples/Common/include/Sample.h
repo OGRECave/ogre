@@ -54,7 +54,7 @@ namespace OgreBites
         =============================================================================*/
         struct Comparer
         {
-            bool operator() (const Sample* a, const Sample* b)
+            bool operator() (const Sample* a, const Sample* b) const
             {
                 auto aTitle = a->getInfo().find("Title");
                 auto bTitle = b->getInfo().find("Title");
