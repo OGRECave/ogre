@@ -232,7 +232,7 @@ namespace Ogre {
     void GLSLProgram::getMicrocodeFromCache(void)
     {
         GpuProgramManager::Microcode cacheMicrocode =
-            GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
+            GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedSource());
 
         cacheMicrocode->seek(0);
 
