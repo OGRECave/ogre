@@ -554,12 +554,6 @@ namespace Ogre {
         // Create the texture manager
         mTextureManager = new GL3PlusTextureManager(this);
 
-        if (caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
-        {
-            // Enable microcache
-            mShaderManager->setSaveMicrocodesToCache(true);
-        }
-
         mGLInitialised = true;
     }
 
