@@ -57,6 +57,9 @@ elseif (APPLE)
   # ignore usage of deprecated OSX API for now
   add_definitions(-Wno-deprecated-declarations)
 
+  set_source_files_properties("src/OSX/OgreOSXGL3PlusSupport.mm" 
+    PROPERTIES COMPILE_FLAGS "-Wno-cast-qual")
+
   set(NATIVE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/OSX 
     ${OGRE_SOURCE_DIR}/OgreMain/include/OSX)
