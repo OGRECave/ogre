@@ -54,6 +54,9 @@ namespace Ogre {
         GPT_HULL_PROGRAM,
         GPT_COMPUTE_PROGRAM
     };
+    enum {
+        GPT_COUNT = GPT_COMPUTE_PROGRAM + 1
+    };
 
     /** Defines a program which runs on the GPU such as a vertex or fragment program.
         @remarks

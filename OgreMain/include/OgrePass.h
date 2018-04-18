@@ -215,16 +215,11 @@ namespace Ogre {
         TextureUnitStates mTextureUnitStates;
 
         /// Vertex program details
-        std::unique_ptr<GpuProgramUsage> mVertexProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mProgramUsage[GPT_COUNT];
         std::unique_ptr<GpuProgramUsage> mShadowCasterVertexProgramUsage;
         std::unique_ptr<GpuProgramUsage> mShadowCasterFragmentProgramUsage;
         std::unique_ptr<GpuProgramUsage> mShadowReceiverVertexProgramUsage;
         std::unique_ptr<GpuProgramUsage> mShadowReceiverFragmentProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mFragmentProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mGeometryProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mTessellationHullProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mTessellationDomainProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mComputeProgramUsage;
         /// Number of pass iterations to perform
         size_t mPassIterationCount;
         /// Point size, applies when not using per-vertex point size
@@ -270,21 +265,25 @@ namespace Ogre {
         Pass& operator=(const Pass& oth);
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
-        bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage ||
-                                                 mTessellationHullProgramUsage || mTessellationDomainProgramUsage || mComputeProgramUsage; }
+        bool isProgrammable(void) const
+        {
+            for (const auto& u : mProgramUsage)
+                if (u) return true;
+            return false;
+        }
 
         /// Returns true if this pass uses a programmable vertex pipeline
-        bool hasVertexProgram(void) const { return mVertexProgramUsage != NULL; }
+        bool hasVertexProgram(void) const { return hasGpuProgram(GPT_VERTEX_PROGRAM); }
         /// Returns true if this pass uses a programmable fragment pipeline
-        bool hasFragmentProgram(void) const { return mFragmentProgramUsage != NULL; }
+        bool hasFragmentProgram(void) const { return hasGpuProgram(GPT_FRAGMENT_PROGRAM); }
         /// Returns true if this pass uses a programmable geometry pipeline
-        bool hasGeometryProgram(void) const { return mGeometryProgramUsage != NULL; }
+        bool hasGeometryProgram(void) const { return hasGpuProgram(GPT_GEOMETRY_PROGRAM); }
         /// Returns true if this pass uses a programmable tessellation control pipeline
-        bool hasTessellationHullProgram(void) const { return mTessellationHullProgramUsage != NULL; }
+        bool hasTessellationHullProgram(void) const { return hasGpuProgram(GPT_HULL_PROGRAM); }
         /// Returns true if this pass uses a programmable tessellation control pipeline
-        bool hasTessellationDomainProgram(void) const { return mTessellationDomainProgramUsage != NULL; }
+        bool hasTessellationDomainProgram(void) const { return hasGpuProgram(GPT_DOMAIN_PROGRAM); }
         /// Returns true if this pass uses a programmable compute pipeline
-        bool hasComputeProgram(void) const { return mComputeProgramUsage != NULL; }
+        bool hasComputeProgram(void) const { return hasGpuProgram(GPT_COMPUTE_PROGRAM); }
         /// Returns true if this pass uses a shadow caster vertex program
         bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow caster fragment program
@@ -1731,7 +1730,6 @@ namespace Ogre {
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
      protected:
-        const GpuProgramPtr& getProgram(const std::unique_ptr<GpuProgramUsage>& gpuProgramUsage) const;
         std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType);
         const std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType) const;
     };
