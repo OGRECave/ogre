@@ -426,15 +426,12 @@ public:
     */
     SGMaterialSerializerListener* getMaterialSerializerListener();
 
-
     /** Return the current number of generated vertex shaders. */
-    size_t getVertexShaderCount() const;
-
-
-    /** Return the current number of generated fragment shaders. */
-    size_t getFragmentShaderCount() const;
-
-
+    size_t getShaderCount(GpuProgramType type) const;
+    /// @deprecated
+    OGRE_DEPRECATED size_t getVertexShaderCount() const { return getShaderCount(GPT_VERTEX_PROGRAM); }
+    /// @deprecated
+    OGRE_DEPRECATED size_t getFragmentShaderCount() const { return getShaderCount(GPT_FRAGMENT_PROGRAM); }
 
     /** Set the vertex shader outputs compaction policy. 
     @see VSOutputCompactPolicy.

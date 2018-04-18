@@ -1309,15 +1309,9 @@ void ShaderGenerator::serializeTextureUnitStateAttributes(MaterialSerializer* se
 }
 
 //-----------------------------------------------------------------------------
-size_t ShaderGenerator::getVertexShaderCount() const
+size_t ShaderGenerator::getShaderCount(GpuProgramType type) const
 {
-    return mProgramManager->getVertexShaderCount();
-}
-
-//-----------------------------------------------------------------------------
-size_t ShaderGenerator::getFragmentShaderCount() const
-{
-    return mProgramManager->getFragmentShaderCount();
+    return mProgramManager->getShaderCount(type);
 }
 
 //-----------------------------------------------------------------------------

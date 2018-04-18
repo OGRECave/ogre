@@ -55,8 +55,8 @@ GLSLProgramProcessor::~GLSLProgramProcessor()
 //-----------------------------------------------------------------------------
 bool GLSLProgramProcessor::preCreateGpuPrograms(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* fsProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* fsProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* fsMain   = fsProgram->getEntryPointFunction();    
     bool success;
@@ -72,29 +72,15 @@ bool GLSLProgramProcessor::preCreateGpuPrograms(ProgramSet* programSet)
 //-----------------------------------------------------------------------------
 bool GLSLProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
 {
-    Program* vsCpuProgram = programSet->getCpuVertexProgram();
-    Program* fsCpuProgram = programSet->getCpuFragmentProgram();
-    GpuProgramPtr vsGpuProgram = programSet->getGpuVertexProgram();
-    GpuProgramPtr fsGpuProgram = programSet->getGpuFragmentProgram();
-    
-    // Bind sub shaders for the vertex shader.
-    bindSubShaders(vsCpuProgram, vsGpuProgram);
-    
-    // Bind sub shaders for the fragment shader.
-    bindSubShaders(fsCpuProgram, fsGpuProgram);
-
-    // Bind vertex shader auto parameters.
-    bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
-
-    // Bind fragment shader auto parameters.
-    bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
-
-    // Bind texture samplers for the vertex shader.
-    bindTextureSamplers(vsCpuProgram, vsGpuProgram);
-
-    // Bind texture samplers for the fragment shader.
-    bindTextureSamplers(fsCpuProgram, fsGpuProgram);
-
+    // Bind vertex auto parameters.
+    for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
+    {
+        Program* cpuProgram = programSet->getCpuProgram(type);
+        GpuProgramPtr gpuProgram = programSet->getGpuProgram(type);
+        bindSubShaders(cpuProgram, gpuProgram);
+        bindAutoParameters(cpuProgram, gpuProgram);
+        bindTextureSamplers(cpuProgram, gpuProgram);
+    }
 
     return true;
 }

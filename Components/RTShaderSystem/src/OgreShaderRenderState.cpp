@@ -163,8 +163,8 @@ bool TargetRenderState::createCpuPrograms()
     RTShader::Function* vsMainFunc = NULL;
     RTShader::Function* psMainFunc = NULL;
 
-    programSet->setCpuVertexProgram(vsProgram);
-    programSet->setCpuFragmentProgram(psProgram);
+    programSet->setCpuProgram(vsProgram, GPT_VERTEX_PROGRAM);
+    programSet->setCpuProgram(psProgram, GPT_FRAGMENT_PROGRAM);
 
     // Create entry point functions.
     vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);

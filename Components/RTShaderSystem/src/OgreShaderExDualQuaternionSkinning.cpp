@@ -45,7 +45,7 @@ DualQuaternionSkinning::DualQuaternionSkinning() : HardwareSkinningTechnique()
 //-----------------------------------------------------------------------
 bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
 
     //if needed mark this vertex program as hardware skinned
@@ -166,7 +166,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool DualQuaternionSkinning::resolveDependencies(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
     vsProgram->addDependency(SGX_LIB_DUAL_QUATERNION);
@@ -177,7 +177,7 @@ bool DualQuaternionSkinning::resolveDependencies(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool DualQuaternionSkinning::addFunctionInvocations(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
 
     //add functions to calculate position data in world, object and projective space

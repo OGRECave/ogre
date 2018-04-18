@@ -58,7 +58,7 @@ bool FFPTransform::preAddToRenderState(const RenderState* renderState, Pass* src
 bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 {
     //! [param_resolve]
-    Program* vsProgram = programSet->getCpuVertexProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Function* vsEntry = vsProgram->getEntryPointFunction();
     
     // Resolve World View Projection Matrix.
