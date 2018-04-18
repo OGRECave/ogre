@@ -102,12 +102,12 @@ namespace Ogre
         setProgram(_getProgramByName(name, mParent->getResourceGroup(), mType), resetParams);
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramUsage::setParameters(GpuProgramParametersSharedPtr params)
+    void GpuProgramUsage::setParameters(const GpuProgramParametersSharedPtr& params)
     {
         mParameters = params;
     }
     //-----------------------------------------------------------------------------
-    GpuProgramParametersSharedPtr GpuProgramUsage::getParameters(void)
+    const GpuProgramParametersSharedPtr& GpuProgramUsage::getParameters(void) const
     {
         if (!mParameters)
         {
