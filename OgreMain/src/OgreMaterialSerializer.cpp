@@ -883,7 +883,8 @@ namespace Ogre
             }
 
             //texture name
-            if (pTex->getNumFrames() == 1 && !pTex->getTextureName().empty() && !pTex->isCubic())
+            if (pTex->getNumFrames() == 1 && !pTex->getTextureName().empty() &&
+                (!pTex->isCubic() || pTex->getTextureType() == TEX_TYPE_CUBE_MAP))
             {
                 writeAttribute(4, "texture");
                 writeValue(quoteWord(pTex->getTextureName()));
@@ -900,7 +901,7 @@ namespace Ogre
                     writeValue("3d");
                     break;
                 case TEX_TYPE_CUBE_MAP:
-                    // nothing, deal with this as cubic_texture since it copes with all variants
+                    writeValue("cubic");
                     break;
                 default:
                     break;
@@ -931,18 +932,14 @@ namespace Ogre
                 writeValue(StringConverter::toString(pTex->getAnimationDuration()));
             }
 
-            //cubic texture
-            if (pTex->isCubic())
+            //cubic texture separateUV
+            if (pTex->isCubic() && pTex->getTextureType() != TEX_TYPE_CUBE_MAP)
             {
                 writeAttribute(4, "cubic_texture");
                 for (unsigned int n = 0; n < pTex->getNumFrames(); n++)
                     writeValue(quoteWord(pTex->getFrameTextureName(n)));
 
-                //combinedUVW/separateUW
-                if (pTex->getTextureType() == TEX_TYPE_CUBE_MAP)
-                    writeValue("combinedUVW");
-                else
-                    writeValue("separateUV");
+                writeValue("separateUV");
             }
 
             //anisotropy level
