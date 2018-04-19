@@ -34,13 +34,13 @@ THE SOFTWARE.
 #include "RootWithoutRenderSystemFixture.h"
 #include "OgreStaticPluginLoader.h"
 
-#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1600)
+#include "OgreMaterialSerializer.h"
+#include "OgreTechnique.h"
+#include "OgrePass.h"
+#include "OgreMaterialManager.h"
+
 #include <random>
 using std::minstd_rand;
-#else
-#include <tr1/random>
-using std::tr1::minstd_rand;
-#endif
 
 using namespace Ogre;
 
@@ -154,4 +154,35 @@ TEST_F(SceneQueryTest, Ray) {
 
     ASSERT_EQ("501", results[0].movable->getName());
     ASSERT_EQ("397", results[1].movable->getName());
+}
+
+TEST(MaterialSerializer, Basic)
+{
+    Root root;
+
+    String group = "General";
+
+    auto mat = std::make_shared<Material>(nullptr, "Material Name", 0, group);
+    auto pass = mat->createTechnique()->createPass();
+    auto tus = pass->createTextureUnitState();
+    tus->setTextureFiltering(FT_MIP, FO_POINT);
+    tus->setName("Test TUS");
+    pass->setAmbient(ColourValue::Green);
+
+    // export to string
+    MaterialSerializer ser;
+    ser.queueForExport(mat);
+    auto str = ser.getQueuedAsString();
+
+    // printf("%s\n", str.c_str());
+
+    // load again
+    DataStreamPtr stream = std::make_shared<MemoryDataStream>("memory.material", &str[0], str.size());
+    MaterialManager::getSingleton().parseScript(stream, group);
+
+    auto mat2 = MaterialManager::getSingleton().getByName("Material Name", group);
+    ASSERT_TRUE(mat2);
+    EXPECT_EQ(mat2->getTechniques().size(), mat->getTechniques().size());
+    EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getAmbient(), ColourValue::Green);
+    EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState("Test TUS")->getTextureFiltering(FT_MIP), FO_POINT);
 }
