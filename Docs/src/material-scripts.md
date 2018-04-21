@@ -60,12 +60,6 @@ You can also reference vertex and fragment programs (or vertex and pixel shaders
 
 The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are: 
 
-<a name="lod_005fdistances"></a>
-## lod\_distances
-
-@deprecated This option is deprecated in favour of [lod\_values](#lod_005fvalues) now.  
-
-
 <a name="lod_005fstrategy"></a>
 <a name="lod_005fstrategy-1"></a>
 
@@ -85,6 +79,11 @@ Format: lod\_values &lt;value0&gt; &lt;value1&gt; &lt;value2&gt; ...<br> Default
 Example: <br> lod\_strategy Distance lod\_values 300.0 600.5 1200
 
 The above example would cause the material to use the best Technique at lod\_index 0 up to a distance of 300 world units, the best from lod\_index 1 from 300 up to 600, lod\_index 2 from 600 to 1200, and lod\_index 3 from 1200 upwards.
+
+<a name="lod_005fdistances"></a>
+## lod\_distances
+
+@deprecated This option is deprecated in favour of [lod\_values](#lod_005fvalues) now.  
 
 <a name="receive_005fshadows"></a><a name="receive_005fshadows-1"></a>
 
@@ -1067,18 +1066,20 @@ In this case each face is specified explicitly, incase you don’t want to confo
 In both cases the final parameter means the following:
 
 <dl compact="compact">
+<dt>separateUV</dt> <dd>
+
+The 6 textures are kept separate but are all referenced by this single texture layer. One texture at a time is active (they are actually stored as 6 frames), and they are addressed using standard 2D UV coordinates.
+
+@note This type is only useful with skyboxes where only one face is rendered at a time. For everything else real cubic textures are better due to hardware support.
+</dd>
 <dt>combinedUVW</dt> <dd>
 
 The 6 textures are combined into a single ’cubic’ texture map which is then addressed using 3D texture coordinates.
 
 @deprecated use the format `texture <basename> cubic` instead
 
-</dd> <dt>separateUV</dt> <dd>
-
-The 6 textures are kept separate but are all referenced by this single texture layer. One texture at a time is active (they are actually stored as 6 frames), and they are addressed using standard 2D UV coordinates.
-
-@note This type is only useful with skyboxes where only one face is rendered at a time. For everything else the other format is better due to hardware support.
-</dd> </dl> <br>
+</dd>
+</dl> <br>
 
 Default: none
 
@@ -1429,57 +1430,63 @@ Default: env\_map off<br>
 
 ## scroll
 
-Sets a fixed scroll offset for the texture. @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Sets a fixed scroll offset for the texture.
 
 Format: scroll &lt;x&gt; &lt;y&gt;
 
 This method offsets the texture in this layer by a fixed amount. Useful for small adjustments without altering texture coordinates in models. However if you wish to have an animated scroll effect, see the [scroll\_anim](#scroll_005fanim) attribute.
 
+@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+
 <a name="scroll_005fanim"></a><a name="scroll_005fanim-1"></a>
 
 ## scroll\_anim
 
-Sets up an animated scroll for the texture layer. Useful for creating fixed-speed scrolling effects on a texture layer (for varying scroll speeds, see [wave\_xform](#wave_005fxform)). @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Sets up an animated scroll for the texture layer. Useful for creating fixed-speed scrolling effects on a texture layer (for varying scroll speeds, see [wave\_xform](#wave_005fxform)). 
 
 Format: scroll\_anim &lt;xspeed&gt; &lt;yspeed&gt;<br>
 
+@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 <a name="rotate"></a><a name="rotate-1"></a>
 
 ## rotate
 
-Rotates a texture to a fixed angle. This attribute changes the rotational orientation of a texture to a fixed angle, useful for fixed adjustments. If you wish to animate the rotation, see [rotate\_anim](#rotate_005fanim). @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Rotates a texture to a fixed angle. This attribute changes the rotational orientation of a texture to a fixed angle, useful for fixed adjustments. If you wish to animate the rotation, see [rotate\_anim](#rotate_005fanim).
 
 Format: rotate &lt;angle&gt;
 
 The parameter is a anti-clockwise angle in degrees.
 
-@note Only applies to the fixed-function pipeline, if you’re using a vertex shader this will have no effect unless you use the texture\_matrix auto-param.
+@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 <a name="rotate_005fanim"></a><a name="rotate_005fanim-1"></a>
 
 ## rotate\_anim
 
-Sets up an animated rotation effect of this layer. Useful for creating fixed-speed rotation animations (for varying speeds, see [wave\_xform](#wave_005fxform)). @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
-
+Sets up an animated rotation effect of this layer. Useful for creating fixed-speed rotation animations (for varying speeds, see [wave\_xform](#wave_005fxform)). 
 Format: rotate\_anim &lt;revs\_per\_second&gt;
 
 The parameter is a number of anti-clockwise revolutions per second.
+
+@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 <a name="scale"></a><a name="scale-1"></a>
 
 ## scale
 
-Adjusts the scaling factor applied to this texture layer. Useful for adjusting the size of textures without making changes to geometry. This is a fixed scaling factor, if you wish to animate this see [wave\_xform](#wave_005fxform). @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Adjusts the scaling factor applied to this texture layer. Useful for adjusting the size of textures without making changes to geometry. This is a fixed scaling factor, if you wish to animate this see [wave\_xform](#wave_005fxform).
 
 Format: scale &lt;x\_scale&gt; &lt;y\_scale&gt;
 
 Valid scale values are greater than 0, with a scale factor of 2 making the texture twice as big in that dimension etc.
 
+ @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+
 <a name="wave_005fxform"></a><a name="wave_005fxform-1"></a>
 
 ## wave\_xform
 
-Sets up a transformation animation based on a wave function. Useful for more advanced texture layer transform effects. You can add multiple instances of this attribute to a single texture layer if you wish. @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+Sets up a transformation animation based on a wave function. Useful for more advanced texture layer transform effects. You can add multiple instances of this attribute to a single texture layer if you wish.
 
 Format: wave\_xform &lt;xform\_type&gt; &lt;wave\_type&gt; &lt;base&gt; &lt;frequency&gt; &lt;phase&gt; &lt;amplitude&gt;
 
@@ -1549,15 +1556,19 @@ The size of the wave
 
 The range of the output of the wave will be {base, base+amplitude}. So the example above scales the texture in the x direction between 1 (normal size) and 5 along a sine wave at one cycle every 5 second (0.2 waves per second).
 
+@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+
 <a name="transform"></a><a name="transform-1"></a>
 
 ## transform
 
-This attribute allows you to specify a static 4x4 transformation matrix for the texture unit, thus replacing the individual scroll, rotate and scale attributes mentioned above.  @note Only applies to the fixed-function pipeline, if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+This attribute allows you to specify a static 4x4 transformation matrix for the texture unit, thus replacing the individual scroll, rotate and scale attributes mentioned above.
 
 Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m33
 
 The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&gt;.
+
+ @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
 # Declaring GPU Programs {#Declaring-Vertex_002fGeometry_002fFragment-Programs}
 
