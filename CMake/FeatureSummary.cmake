@@ -16,7 +16,7 @@ set(_features "${_features}-----------------------------------------------------
 
 #summarise components
 if (OGRE_BUILD_COMPONENT_BITES)
-	set(_components "${_components}  + Bites [BETA]\n")
+	set(_components "${_components}  + Bites\n")
 endif ()
 if (OGRE_BUILD_COMPONENT_HLMS)
 	set(_components "${_components}  + HLMS [BETA]\n")
