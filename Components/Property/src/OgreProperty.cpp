@@ -104,11 +104,6 @@ namespace Ogre
         mPropertyMap.erase(name);
     }
     //---------------------------------------------------------------------
-    PropertySet::PropertyIterator PropertySet::getPropertyIterator()
-    {
-        return PropertyIterator(mPropertyMap.begin(), mPropertyMap.end());
-    }
-    //---------------------------------------------------------------------
     PropertyValueMap PropertySet::getValueMap() const
     {
         PropertyValueMap ret;
