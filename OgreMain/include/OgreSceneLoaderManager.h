@@ -29,6 +29,12 @@ namespace Ogre {
 
         void unregisterSceneLoader(const String& name);
 
+        SceneLoader* _getSceneLoader(const String& name) const
+        {
+            auto it = mSceneLoaders.find(name);
+            return it == mSceneLoaders.end() ? NULL : it->second.loader;
+        }
+
         /** Load a scene from a SceneLoader
         @param filename The name (and path) of the file to be loaded.
             This is also used to determine the SceneLoader to use by the file extension.
