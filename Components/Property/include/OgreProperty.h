@@ -318,8 +318,8 @@ namespace Ogre
 
         typedef map<String, PropertyBase*>::type PropertyMap;
         typedef Ogre::MapIterator<PropertyMap> PropertyIterator;
-        /// Get an iterator over the available properties
-        PropertyIterator getPropertyIterator();
+        /// @deprecated use getValueMap()
+        OGRE_DEPRECATED PropertyIterator getPropertyIterator();
 
         /** Gets an independently usable collection of property values from the
         current state.
