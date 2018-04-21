@@ -35,6 +35,13 @@ material walls/funkywall1
                 rotate_anim 0.25
                 colour_op add
             }
+
+            // Additional RT Shader system options
+            rtshader_system
+            {
+                // Do lighting calculations per-pixel 
+                lighting_stage per_pixel
+            }
         }
     }
 
@@ -200,7 +207,10 @@ A pass is a single render of the geometry in question; a single call to the rend
 
 To help clearly identify what each pass is used for, the pass can be named but its optional. Passes not named within the script will take on a name that is the pass index number. For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script. The pass name must be unique within the technique or else the final pass is the resulting merge of all passes with the same name in the technique. A warning message is posted in the Ogre.log if this occurs. Named passes can help when inheriting a material and modifying an existing pass: (See @ref Script-Inheritance)
 
-Passes have a set of global attributes (described below), zero or more nested texture\_unit entries (See @ref Texture-Units), and optionally a reference to a vertex and / or a fragment program (See @ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass).
+Passes have a set of global attributes (described below) and optionally
+- zero or more nested texture\_unit entries (See @ref Texture-Units)
+- references to shader programs (See @ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass)
+- additional instructions for the RTSS (See @ref rtss_custom_mat)
 
 
 

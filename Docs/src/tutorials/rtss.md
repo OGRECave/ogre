@@ -63,7 +63,7 @@ Now that you know what the RTSS does, you are probably wondering how to change w
 
 The RTSS is flexible enough to "just" move the according calculations from the vertex shader to the pixel shader.
 
-## Customising via API {#rtss_custom_api}
+## Customising the RTSS using the API {#rtss_custom_api}
 
 The first option is to globally enforce per-pixel lighting, you can do the following
 
@@ -71,7 +71,7 @@ The first option is to globally enforce per-pixel lighting, you can do the follo
 
 any non FFP SRS will automatically override the default SRS for the same stage. Ogre::RTShader::FFP_LIGHTING in this case.
 
-## Customizing via Material Script {#rtss_custom_mat}
+## Customizing the RTSS using Material Scripts {#rtss_custom_mat}
 
 Alternatively you can enable per-pixel lighting for one material only, by adding a `rtshader_system` section to the pass as following
 
