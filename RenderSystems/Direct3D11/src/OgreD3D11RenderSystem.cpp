@@ -1101,7 +1101,7 @@ namespace Ogre
     
         rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
         rsc->setNumVertexTextureUnits(4);
-        rsc->setVertexTextureUnitsShared(false);
+        rsc->setVertexTextureUnitsShared(true);
 
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
 
@@ -1793,54 +1793,6 @@ namespace Ogre
     void D3D11RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
     {
         mBindingType = bindingType;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
-    {
-        if (!tex)
-            _setTexture(stage, false, tex);
-        else
-            _setTexture(stage, true, tex);  
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setGeometryTexture(size_t stage, const TexturePtr& tex)
-    {
-        if (!tex)
-            _setTexture(stage, false, tex);
-        else
-            _setTexture(stage, true, tex);  
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setComputeTexture(size_t stage, const TexturePtr& tex)
-    {
-        if (!tex)
-            _setTexture(stage, false, tex);
-        else
-            _setTexture(stage, true, tex);  
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTesselationHullTexture(size_t stage, const TexturePtr& tex)
-    {
-        if (!tex)
-            _setTexture(stage, false, tex);
-        else
-            _setTexture(stage, true, tex);  
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTesselationDomainTexture(size_t stage, const TexturePtr& tex)
-    {
-        if (!tex)
-            _setTexture(stage, false, tex);
-        else
-            _setTexture(stage, true, tex);  
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_disableTextureUnit(size_t texUnit)
-    {
-        RenderSystem::_disableTextureUnit(texUnit);
-        // also disable vertex texture unit
-        static TexturePtr nullPtr;
-        _setVertexTexture(texUnit, nullPtr);
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureCoordSet( size_t stage, size_t index )

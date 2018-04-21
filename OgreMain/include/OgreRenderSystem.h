@@ -541,13 +541,9 @@ namespace Ogre
         samplers, using this method. For those that don't, you should use the
         regular texture samplers which are shared between the vertex and
         fragment units; calling this method will throw an exception.
-        @see RenderSystemCapabilites::getVertexTextureUnitsShared
+        @deprecated only needed for D3D9
         */
         virtual void _setVertexTexture(size_t unit, const TexturePtr& tex);
-        virtual void _setGeometryTexture(size_t unit, const TexturePtr& tex);
-        virtual void _setComputeTexture(size_t unit, const TexturePtr& tex);
-        virtual void _setTesselationHullTexture(size_t unit, const TexturePtr& tex);
-        virtual void _setTesselationDomainTexture(size_t unit, const TexturePtr& tex);
 
         /**
         Sets the texture coordinate set to use for a texture unit.
