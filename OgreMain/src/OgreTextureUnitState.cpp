@@ -1037,28 +1037,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const TexturePtr& TextureUnitState::_getTexturePtr(size_t frame) const
     {
-        if (mContentType == CONTENT_NAMED)
+        if (frame < mFramePtrs.size())
         {
-            if (frame < mFramePtrs.size() && !mTextureLoadFailed)
+            if (mContentType == CONTENT_NAMED)
             {
                 ensureLoaded(frame);
-                return mFramePtrs[frame];
             }
-            else
-            {
-                // Silent fail with empty texture for internal method
-                static TexturePtr nullTexPtr;
-                return nullTexPtr;
-            }
-        }
-        else
-        {
-            // Manually bound texture, no name or loading
-            assert(frame < mFramePtrs.size());
-            return mFramePtrs[frame];
 
+            return mFramePtrs[frame];
         }
         
+        // Silent fail with empty texture for internal method
+        static TexturePtr nullTexPtr;
+        return nullTexPtr;
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::_setTexturePtr(const TexturePtr& texptr)

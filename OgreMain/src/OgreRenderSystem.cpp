@@ -312,7 +312,7 @@ namespace Ogre {
     {
         // This method is only ever called to set a texture unit to valid details
         // The method _disableTextureUnit is called to turn a unit off
-        const TexturePtr& tex =  tl.getNumFrames() ? tl._getTexturePtr() : sNullTexPtr;
+        const TexturePtr& tex = tl._getTexturePtr();
         
         if (mCurrentCapabilities->hasCapability(RSC_COMPLETE_TEXTURE_BINDING))
             _setBindingType(tl.getBindingType());
