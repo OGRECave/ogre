@@ -173,7 +173,7 @@ namespace Ogre {
 
 
         /** Sets the name of the material to use for the borders. */
-        void setBorderMaterialName(const String& name);
+        void setBorderMaterialName(const String& name, const String& group = DEFAULT_RESOURCE_GROUP );
         /** Gets the name of the material to use for the borders. */
         const String& getBorderMaterialName(void) const;
 

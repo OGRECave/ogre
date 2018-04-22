@@ -109,7 +109,7 @@ namespace Ogre {
     class _OgreOverlayExport OverlayElement : public StringInterface, public Renderable, public OverlayAlloc
     {
     public:
-
+        static const String& DEFAULT_RESOURCE_GROUP;
     protected:
         // Command object for setting / getting parameters
         static OverlayElementCommands::CmdLeft msLeftCmd;
@@ -295,7 +295,7 @@ namespace Ogre {
         void setMaterial(const MaterialPtr& mat);
 
         /// @overload
-        void setMaterialName(const String& matName);
+        void setMaterialName(const String& matName, const String& group = DEFAULT_RESOURCE_GROUP );
 
 
         // --- Renderable Overrides ---

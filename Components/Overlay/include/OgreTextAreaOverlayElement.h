@@ -71,7 +71,7 @@ namespace Ogre
         void setSpaceWidth( Real width );
         Real getSpaceWidth() const;
 
-        void setFontName( const String& font );
+        void setFontName( const String& font, const String& group = DEFAULT_RESOURCE_GROUP );
         /// @deprecated use getFont()
         OGRE_DEPRECATED const String& getFontName() const;
 

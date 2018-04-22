@@ -373,10 +373,9 @@ namespace Ogre {
         mGeomUVsOutOfDate = true;
     }
 
-    void TextAreaOverlayElement::setFontName( const String& font )
+    void TextAreaOverlayElement::setFontName( const String& font, const String& group )
     {
-        mFont = FontManager::getSingleton().getByName(
-            font, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        mFont = FontManager::getSingleton().getByName(font, group);
         if (!mFont)
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find font " + font,
                 "TextAreaOverlayElement::setFontName" );
