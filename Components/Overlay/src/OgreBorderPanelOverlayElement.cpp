@@ -508,10 +508,9 @@ namespace Ogre {
 
 
     //---------------------------------------------------------------------
-    void BorderPanelOverlayElement::setBorderMaterialName(const String& name)
+    void BorderPanelOverlayElement::setBorderMaterialName(const String& name, const String& group)
     {
-        mBorderMaterial = MaterialManager::getSingleton().getByName(
-            name, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        mBorderMaterial = MaterialManager::getSingleton().getByName(name, group);
         if (!mBorderMaterial)
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
                 "BorderPanelOverlayElement::setBorderMaterialName" );

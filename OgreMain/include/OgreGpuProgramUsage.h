@@ -128,10 +128,10 @@ namespace Ogre
             to register externally created parameter objects. Otherwise, the parameters
             will be created for you when a program is linked.
         */
-        void setParameters(GpuProgramParametersSharedPtr params);
+        void setParameters(const GpuProgramParametersSharedPtr& params);
         /** Gets the parameters being used here. 
         */
-        GpuProgramParametersSharedPtr getParameters(void);
+        const GpuProgramParametersSharedPtr& getParameters(void) const;
 
         /// Load this usage (and ensure program is loaded)
         void _load(void);

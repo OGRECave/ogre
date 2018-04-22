@@ -44,7 +44,7 @@ namespace Ogre {
 		//-----------------------------------------------------------------------
 		bool FFPAlphaTest::resolveParameters(ProgramSet* programSet)
 		{
-			Program* psProgram  = programSet->getCpuFragmentProgram();
+			Program* psProgram  = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 			Function* psMain = psProgram->getEntryPointFunction();
 			  
 			mPSAlphaRef = psProgram->resolveAutoParameterReal(GpuProgramParameters::ACT_SURFACE_ALPHA_REJECTION_VALUE, 0);
@@ -60,7 +60,7 @@ namespace Ogre {
 		//-----------------------------------------------------------------------
 		bool FFPAlphaTest::resolveDependencies(ProgramSet* programSet)
 		{
-			Program* psProgram = programSet->getCpuFragmentProgram();
+			Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 			psProgram->addDependency(FFP_LIB_ALPHA_TEST);
 			return true;
 		}
@@ -74,7 +74,7 @@ namespace Ogre {
 
 		bool FFPAlphaTest::addFunctionInvocations( ProgramSet* programSet )
 		{
-			Program* psProgram = programSet->getCpuFragmentProgram();
+			Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 			Function* psMain = psProgram->getEntryPointFunction();
 
 			FunctionInvocation *curFuncInvocation;

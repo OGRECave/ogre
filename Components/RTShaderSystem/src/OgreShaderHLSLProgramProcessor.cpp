@@ -47,8 +47,8 @@ HLSLProgramProcessor::~HLSLProgramProcessor()
 //-----------------------------------------------------------------------------
 bool HLSLProgramProcessor::preCreateGpuPrograms( ProgramSet* programSet )
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* fsMain   = psProgram->getEntryPointFunction();    
     bool success;
@@ -64,11 +64,9 @@ bool HLSLProgramProcessor::preCreateGpuPrograms( ProgramSet* programSet )
 //-----------------------------------------------------------------------------
 bool HLSLProgramProcessor::postCreateGpuPrograms( ProgramSet* programSet )
 {
-    // Bind vertex shader auto parameters.
-    bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
-
-    // Bind fragment shader auto parameters.
-    bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
+    // Bind vertex auto parameters.
+    for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
+        bindAutoParameters(programSet->getCpuProgram(type), programSet->getGpuProgram(type));
 
     return true;
 }

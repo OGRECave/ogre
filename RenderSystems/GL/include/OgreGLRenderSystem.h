@@ -247,16 +247,6 @@ namespace Ogre {
 
         void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
 
-        void _setVertexTexture(size_t unit, const TexturePtr &tex);     
-
-        void _setGeometryTexture(size_t unit, const TexturePtr &tex);
-
-        void _setComputeTexture(size_t unit, const TexturePtr &tex);
-
-        void _setTesselationHullTexture(size_t unit, const TexturePtr &tex);
-
-        void _setTesselationDomainTexture(size_t unit, const TexturePtr &tex);
-
         void _setTextureCoordSet(size_t stage, size_t index);
 
         void _setTextureCoordCalculation(size_t stage, TexCoordCalcMethod m, 

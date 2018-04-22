@@ -87,8 +87,8 @@ bool ShaderExInstancedViewports::preAddToRenderState( const RenderState* renderS
 //-----------------------------------------------------------------------
 bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
 
@@ -168,8 +168,8 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool ShaderExInstancedViewports::resolveDependencies(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(SGX_LIB_INSTANCED_VIEWPORTS);
@@ -184,9 +184,9 @@ bool ShaderExInstancedViewports::resolveDependencies(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool ShaderExInstancedViewports::addFunctionInvocations(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram(); 
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM); 
     Function* vsMain = vsProgram->getEntryPointFunction();  
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* psMain = psProgram->getEntryPointFunction();  
     
 

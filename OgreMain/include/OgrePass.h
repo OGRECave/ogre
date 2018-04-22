@@ -215,16 +215,11 @@ namespace Ogre {
         TextureUnitStates mTextureUnitStates;
 
         /// Vertex program details
-        std::unique_ptr<GpuProgramUsage> mVertexProgramUsage;
+        std::unique_ptr<GpuProgramUsage> mProgramUsage[GPT_COUNT];
         std::unique_ptr<GpuProgramUsage> mShadowCasterVertexProgramUsage;
         std::unique_ptr<GpuProgramUsage> mShadowCasterFragmentProgramUsage;
         std::unique_ptr<GpuProgramUsage> mShadowReceiverVertexProgramUsage;
         std::unique_ptr<GpuProgramUsage> mShadowReceiverFragmentProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mFragmentProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mGeometryProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mTessellationHullProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mTessellationDomainProgramUsage;
-        std::unique_ptr<GpuProgramUsage> mComputeProgramUsage;
         /// Number of pass iterations to perform
         size_t mPassIterationCount;
         /// Point size, applies when not using per-vertex point size
@@ -270,21 +265,25 @@ namespace Ogre {
         Pass& operator=(const Pass& oth);
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
-        bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage ||
-                                                 mTessellationHullProgramUsage || mTessellationDomainProgramUsage || mComputeProgramUsage; }
+        bool isProgrammable(void) const
+        {
+            for (const auto& u : mProgramUsage)
+                if (u) return true;
+            return false;
+        }
 
         /// Returns true if this pass uses a programmable vertex pipeline
-        bool hasVertexProgram(void) const { return mVertexProgramUsage != NULL; }
+        bool hasVertexProgram(void) const { return hasGpuProgram(GPT_VERTEX_PROGRAM); }
         /// Returns true if this pass uses a programmable fragment pipeline
-        bool hasFragmentProgram(void) const { return mFragmentProgramUsage != NULL; }
+        bool hasFragmentProgram(void) const { return hasGpuProgram(GPT_FRAGMENT_PROGRAM); }
         /// Returns true if this pass uses a programmable geometry pipeline
-        bool hasGeometryProgram(void) const { return mGeometryProgramUsage != NULL; }
+        bool hasGeometryProgram(void) const { return hasGpuProgram(GPT_GEOMETRY_PROGRAM); }
         /// Returns true if this pass uses a programmable tessellation control pipeline
-        bool hasTessellationHullProgram(void) const { return mTessellationHullProgramUsage != NULL; }
+        bool hasTessellationHullProgram(void) const { return hasGpuProgram(GPT_HULL_PROGRAM); }
         /// Returns true if this pass uses a programmable tessellation control pipeline
-        bool hasTessellationDomainProgram(void) const { return mTessellationDomainProgramUsage != NULL; }
+        bool hasTessellationDomainProgram(void) const { return hasGpuProgram(GPT_DOMAIN_PROGRAM); }
         /// Returns true if this pass uses a programmable compute pipeline
-        bool hasComputeProgram(void) const { return mComputeProgramUsage != NULL; }
+        bool hasComputeProgram(void) const { return hasGpuProgram(GPT_COMPUTE_PROGRAM); }
         /// Returns true if this pass uses a shadow caster vertex program
         bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow caster fragment program
@@ -1168,22 +1167,22 @@ namespace Ogre {
         /// Gets the resource group of the ultimate parent Material
         const String& getResourceGroup(void) const;
 
-        const GpuProgramPtr getGpuProgram(GpuProgramType programType) const;
+        /// Gets the Gpu program used by this pass, only available after _load()
+        const GpuProgramPtr& getGpuProgram(GpuProgramType programType) const;
+        /// @overload
+        const GpuProgramPtr& getVertexProgram(void) const;
+        /// @overload
+        const GpuProgramPtr& getFragmentProgram(void) const;
+        /// @overload
+        const GpuProgramPtr& getGeometryProgram(void) const;
+        /// @overload
+        const GpuProgramPtr& getTessellationHullProgram(void) const;
+        /// @overload
+        const GpuProgramPtr& getTessellationDomainProgram(void) const;
+        /// @overload
+        const GpuProgramPtr& getComputeProgram(void) const;
 
         bool hasGpuProgram(GpuProgramType programType) const;
-
-        /** Sets the vertex program parameters.
-            @remarks
-            Only applicable to programmable passes, and this particular call is
-            designed for low-level programs; use the named parameter methods
-            for setting high-level program parameters.
-        */
-        void setVertexProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the vertex program parameters used by this pass. */
-        GpuProgramParametersSharedPtr getVertexProgramParameters(void) const;
-        /** Gets the vertex program used by this pass, only available after _load(). */
-        const GpuProgramPtr& getVertexProgram(void) const;
-
 
         /** Sets the details of the vertex program to use when rendering as a
             shadow caster.
@@ -1402,25 +1401,40 @@ namespace Ogre {
         /// @overload
         const String& getComputeProgramName(void) const { return getGpuProgramName(GPT_COMPUTE_PROGRAM); }
 
-        /** Sets the fragment program parameters.
+        /** Sets the Gpu program parameters.
             @remarks
-            Only applicable to programmable passes.
+            Only applicable to programmable passes, and this particular call is
+            designed for low-level programs; use the named parameter methods
+            for setting high-level program parameters.
         */
+        void setGpuProgramParameters(GpuProgramType type, const GpuProgramParametersSharedPtr& params);
+        /// @overload
+        void setVertexProgramParameters(GpuProgramParametersSharedPtr params);
+        /// @overload
         void setFragmentProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the fragment program parameters used by this pass. */
-        GpuProgramParametersSharedPtr getFragmentProgramParameters(void) const;
-        /** Gets the fragment program used by this pass, only available after _load(). */
-        const GpuProgramPtr& getFragmentProgram(void) const;
-
-        /** Sets the geometry program parameters.
-            @remarks
-            Only applicable to programmable passes.
-        */
+        /// @overload
         void setGeometryProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the geometry program parameters used by this pass. */
+        /// @overload
+        void setTessellationHullProgramParameters(GpuProgramParametersSharedPtr params);
+        /// @overload
+        void setTessellationDomainProgramParameters(GpuProgramParametersSharedPtr params);
+        /// @overload
+        void setComputeProgramParameters(GpuProgramParametersSharedPtr params);
+
+        /** Gets the Gpu program parameters used by this pass. */
+        const GpuProgramParametersSharedPtr& getGpuProgramParameters(GpuProgramType type) const;
+        /// @overload
+        GpuProgramParametersSharedPtr getVertexProgramParameters(void) const;
+        /// @overload
+        GpuProgramParametersSharedPtr getFragmentProgramParameters(void) const;
+        /// @overload
         GpuProgramParametersSharedPtr getGeometryProgramParameters(void) const;
-        /** Gets the geometry program used by this pass, only available after _load(). */
-        const GpuProgramPtr& getGeometryProgram(void) const;
+        /// @overload
+        GpuProgramParametersSharedPtr getTessellationHullProgramParameters(void) const;
+        /// @overload
+        GpuProgramParametersSharedPtr getTessellationDomainProgramParameters(void) const;
+        /// @overload
+        GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
 
         /** Splits this Pass to one which can be handled in the number of
             texture units specified.
@@ -1715,40 +1729,7 @@ namespace Ogre {
             @see UserObjectBindings::setUserAny.
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
-
-        // Support for shader model 5.0, hull and domain shaders
-        /** Sets the Tessellation Hull program parameters.
-            @remarks
-            Only applicable to programmable passes.
-        */
-        void setTessellationHullProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the Tessellation Hull program parameters used by this pass. */
-        GpuProgramParametersSharedPtr getTessellationHullProgramParameters(void) const;
-        /** Gets the Tessellation Hull program used by this pass, only available after _load(). */
-        const GpuProgramPtr& getTessellationHullProgram(void) const;
-
-        /** Sets the Tessellation Domain program parameters.
-            @remarks
-            Only applicable to programmable passes.
-        */
-        void setTessellationDomainProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the Tessellation Domain program parameters used by this pass. */
-        GpuProgramParametersSharedPtr getTessellationDomainProgramParameters(void) const;
-        /** Gets the Tessellation Domain program used by this pass, only available after _load(). */
-        const GpuProgramPtr& getTessellationDomainProgram(void) const;
-
-        /** Sets the Tessellation Evaluation program parameters.
-            @remarks
-            Only applicable to programmable passes.
-        */
-        void setComputeProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the Tessellation Hull program parameters used by this pass. */
-        GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
-        /** Gets the Tessellation EHull program used by this pass, only available after _load(). */
-        const GpuProgramPtr& getComputeProgram(void) const;
-        
      protected:
-        const GpuProgramPtr& getProgram(const std::unique_ptr<GpuProgramUsage>& gpuProgramUsage) const;
         std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType);
         const std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType) const;
     };

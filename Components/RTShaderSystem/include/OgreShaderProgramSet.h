@@ -54,26 +54,28 @@ public:
     /** Class destructor */
     ~ProgramSet();
 
-    /** Get the vertex shader CPU program. */
-    Program* getCpuVertexProgram();
+    /** Get the shader CPU program. */
+    Program* getCpuProgram(GpuProgramType type) const;
 
-    /** Get the fragment shader CPU program. */
-    Program* getCpuFragmentProgram();
+    /** Get the shader GPU program. */
+    const GpuProgramPtr& getGpuProgram(GpuProgramType type) const;
 
-    /** Get the vertex shader GPU program. */
-    GpuProgramPtr getGpuVertexProgram();
+    /// @deprecated
+    OGRE_DEPRECATED Program* getCpuVertexProgram() { return getCpuProgram(GPT_VERTEX_PROGRAM); }
 
-    /** Get the fragment shader GPU program. */
-    GpuProgramPtr getGpuFragmentProgram();
+    /// @deprecated
+    OGRE_DEPRECATED Program* getCpuFragmentProgram() { return getCpuProgram(GPT_FRAGMENT_PROGRAM); }
+
+    /// @deprecated
+    OGRE_DEPRECATED GpuProgramPtr getGpuVertexProgram() { return getGpuProgram(GPT_VERTEX_PROGRAM); }
+
+    /// @deprecated
+    OGRE_DEPRECATED GpuProgramPtr getGpuFragmentProgram() { return getGpuProgram(GPT_FRAGMENT_PROGRAM); }
 
     // Protected methods.
 protected:
-    void setCpuVertexProgram(Program* vsCpuProgram);
-    void setCpuFragmentProgram(Program* psCpuProgram);
-
-    void setGpuVertexProgram(GpuProgramPtr vsGpuProgram);
-    void setGpuFragmentProgram(GpuProgramPtr psGpuProgram);
-
+    void setCpuProgram(Program* program, GpuProgramType type);
+    void setGpuProgram(const GpuProgramPtr& program, GpuProgramType type);
 
     // Attributes.
 protected:

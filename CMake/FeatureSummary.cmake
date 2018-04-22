@@ -16,7 +16,7 @@ set(_features "${_features}-----------------------------------------------------
 
 #summarise components
 if (OGRE_BUILD_COMPONENT_BITES)
-	set(_components "${_components}  + Bites [BETA]\n")
+	set(_components "${_components}  + Bites\n")
 endif ()
 if (OGRE_BUILD_COMPONENT_HLMS)
 	set(_components "${_components}  + HLMS [BETA]\n")
@@ -31,7 +31,7 @@ if (OGRE_BUILD_COMPONENT_PAGING)
 	set(_components "${_components}  + Paging\n")
 endif ()
 if (OGRE_BUILD_COMPONENT_PROPERTY)
-	set(_components "${_components}  + Property [DEPRECATED]\n")
+	set(_components "${_components}  + Property\n")
 endif ()
 if (OGRE_BUILD_COMPONENT_PYTHON)
 	set(_components "${_components}  + Python [BETA]\n")

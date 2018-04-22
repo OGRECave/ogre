@@ -115,7 +115,7 @@ bool LayeredBlending::resolveParameters(ProgramSet* programSet)
     if (isSuccess)
     {
         //resolve source modification parameters
-        Program* psProgram = programSet->getCpuFragmentProgram();
+        Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
         for(size_t i = mTextureBlends.size() - 1; i != (size_t)-1 ; --i)
         {
@@ -143,7 +143,7 @@ bool LayeredBlending::resolveParameters(ProgramSet* programSet)
 bool LayeredBlending::resolveDependencies(ProgramSet* programSet)
 {
     FFPTexturing::resolveDependencies(programSet);
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     psProgram->addDependency(SGX_LIB_LAYEREDBLENDING);
 

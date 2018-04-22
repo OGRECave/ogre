@@ -220,8 +220,8 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 {
     bool hasError = false;
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
     
@@ -388,8 +388,8 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
 
@@ -597,8 +597,8 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     vsProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency(FFP_LIB_TEXTURING);
@@ -615,9 +615,9 @@ bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram(); 
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM); 
     Function* vsMain = vsProgram->getEntryPointFunction();  
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* psMain = psProgram->getEntryPointFunction();  
 
     // Add the global illumination functions.

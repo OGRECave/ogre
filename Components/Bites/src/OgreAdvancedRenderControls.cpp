@@ -249,6 +249,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
 }
 
 void AdvancedRenderControls::frameRendered(const Ogre::FrameEvent& evt) {
+    using namespace Ogre;
     if (!mTrayMgr->isDialogVisible() && mDetailsPanel->isVisible())
     {
         // if details panel is visible, then update its contents
@@ -261,8 +262,8 @@ void AdvancedRenderControls::frameRendered(const Ogre::FrameEvent& evt) {
         mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        mDetailsPanel->setParamValue(14, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
-        mDetailsPanel->setParamValue(15, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));
+        mDetailsPanel->setParamValue(14, StringConverter::toString(mShaderGenerator->getShaderCount(GPT_VERTEX_PROGRAM)));
+        mDetailsPanel->setParamValue(15, StringConverter::toString(mShaderGenerator->getShaderCount(GPT_FRAGMENT_PROGRAM)));
 #endif
     }
 }
