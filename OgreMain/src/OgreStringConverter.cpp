@@ -30,12 +30,12 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgrePlatform.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && !defined(__MINGW32__)
 #   define LC_NUMERIC_MASK LC_NUMERIC
 #   define newlocale(cat, loc, base) _create_locale(cat, loc)
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN || defined(__MINGW32__)
 #   define newlocale(cat, loc, base) 0
 #endif
 
