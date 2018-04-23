@@ -172,7 +172,7 @@ namespace Ogre
 
         /** Function for writing to a stream.
          */
-        inline _OgreExport friend std::ostream& operator<<(std::ostream& o, const TransformBase& mat)
+        inline friend std::ostream& operator<<(std::ostream& o, const TransformBase& mat)
         {
             o << "Matrix4(";
             for (size_t i = 0; i < 4; ++i)
