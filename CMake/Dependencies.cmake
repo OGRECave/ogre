@@ -97,7 +97,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
     set(BUILD_COMMAND_OPTS --target install --config ${CMAKE_BUILD_TYPE})
 
-    if(MSVC OR EMSCRIPTEN) # other platforms ship zlib
+    if(MSVC OR EMSCRIPTEN OR MINGW) # other platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD 
             http://zlib.net/zlib-1.2.11.tar.gz
@@ -163,7 +163,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     execute_process(COMMAND ${CMAKE_COMMAND}
         --build ${CMAKE_BINARY_DIR}/freetype-2.9/objs ${BUILD_COMMAND_OPTS})
 
-    if(MSVC) # other platforms dont need this
+    if(MSVC OR MINGW) # other platforms dont need this
         message(STATUS "Building SDL2")
         file(DOWNLOAD
             https://libsdl.org/release/SDL2-2.0.8.tar.gz
