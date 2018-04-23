@@ -44,9 +44,7 @@ extern "C" {
     
     // MSVC uses security cookies to prevent some buffer overflow attacks.
     // provide dummy implementations.
-    intptr_t __security_cookie;
-    
-    void _fastcall __security_check_cookie(intptr_t i)
+    void __security_check_cookie(intptr_t i)
     {
     }
 }

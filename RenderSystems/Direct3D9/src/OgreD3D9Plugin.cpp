@@ -33,7 +33,6 @@ THE SOFTWARE.
 extern "C" {   
 #include "OgreMinGWSupport.h"
 void _chkstk();
-void _fastcall __security_check_cookie(intptr_t i);
 }   
 #endif
 

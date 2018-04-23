@@ -65,11 +65,14 @@ A "contributor" is any person that distributes its contribution under this licen
 
 // This version only supports UNICODE.
 
+#include "OgrePrerequisites.h"
+
 #if !defined(NOMINMAX)
 #define NOMINMAX
 #endif
 #include <windows.h>
 
+#ifndef __MINGW32__
 #pragma warning( disable : 4005 ) // warning C4005: 'xxx': macro redefinition
 
 #include <stdio.h>
@@ -4025,11 +4028,12 @@ HRESULT WINAPI DXTraceW( _In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HR
 
     return hr;
 }
-
+#endif
 namespace Ogre
 {
 	String DXGetErrorDescription(HRESULT hr)
 	{
+#ifndef __MINGW32__
 		WCHAR wideBuf[1024];
 		wideBuf[0] = 0;
 		DXGetErrorDescriptionW(hr, wideBuf, ARRAYSIZE(wideBuf));
@@ -4040,5 +4044,8 @@ namespace Ogre
 			narrowBuf[0] = 0;
 
 		return String(narrowBuf);
+#else
+		return "";
+#endif
 	}
 }
