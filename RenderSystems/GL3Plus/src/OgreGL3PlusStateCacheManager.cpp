@@ -449,7 +449,7 @@ namespace Ogre {
     void GL3PlusStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
-        vector<uint32>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
+        auto iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
         bool was_enabled = iter != mEnableVector.end();
 
         if(was_enabled == enabled)

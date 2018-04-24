@@ -434,7 +434,7 @@ namespace Ogre {
     void GLES2StateCacheManager::setDisabled(GLenum flag)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
-        vector<GLenum>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
+        auto iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
         if(iter != mEnableVector.end())
         {
             mEnableVector.erase(iter);
