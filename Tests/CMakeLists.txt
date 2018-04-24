@@ -85,7 +85,7 @@ if (OGRE_BUILD_TESTS)
     add_executable(Test_Ogre ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
     add_dependencies(Test_Ogre googletest)
     ogre_install_target(Test_Ogre "" FALSE)
-    target_link_libraries(Test_Ogre OgreBites ${OGRE_LIBRARIES} gtest)
+    target_link_libraries(Test_Ogre OgreBites Codec_STBI ${OGRE_LIBRARIES} gtest)
     
     if(ANDROID)
         set_target_properties(Test_Ogre PROPERTIES LINK_FLAGS -pie)
