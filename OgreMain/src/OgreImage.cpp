@@ -114,74 +114,36 @@ namespace Ogre {
         
         mNumMipmaps = 0; // Image operations lose precomputed mipmaps
 
-        uchar   *pTempBuffer1 = NULL;
-        ushort  *pTempBuffer2 = NULL;
-        uchar   *pTempBuffer3 = NULL;
-        uint    *pTempBuffer4 = NULL;
-
-        uchar   *src1 = mBuffer;
-        ushort  *src2 = (ushort *)mBuffer;
-        uchar   *src3 = mBuffer;
-        uint    *src4 = (uint *)mBuffer;
-
         ushort y;
         switch (mPixelSize)
         {
         case 1:
-            pTempBuffer1 = OGRE_ALLOC_T(uchar, mWidth * mHeight, MEMCATEGORY_GENERAL);
             for (y = 0; y < mHeight; y++)
             {
-                uchar *dst1 = (pTempBuffer1 + ((y * mWidth) + mWidth - 1));
-                for (ushort x = 0; x < mWidth; x++)
-                    memcpy(dst1--, src1++, sizeof(uchar));
+                std::reverse(mBuffer + mWidth * y, mBuffer + mWidth * (y + 1));
             }
-
-            memcpy(mBuffer, pTempBuffer1, mWidth * mHeight * sizeof(uchar));
-            OGRE_FREE(pTempBuffer1, MEMCATEGORY_GENERAL);
             break;
 
         case 2:
-            pTempBuffer2 = OGRE_ALLOC_T(ushort, mWidth * mHeight, MEMCATEGORY_GENERAL);
             for (y = 0; y < mHeight; y++)
             {
-                ushort *dst2 = (pTempBuffer2 + ((y * mWidth) + mWidth - 1));
-                for (ushort x = 0; x < mWidth; x++)
-                    memcpy(dst2--, src2++, sizeof(ushort));
+                std::reverse((ushort*)mBuffer + mWidth * y, (ushort*)mBuffer + mWidth * (y + 1));
             }
-
-            memcpy(mBuffer, pTempBuffer2, mWidth * mHeight * sizeof(ushort));
-            OGRE_FREE(pTempBuffer2, MEMCATEGORY_GENERAL);
             break;
 
         case 3:
-            pTempBuffer3 = OGRE_ALLOC_T(uchar, mWidth * mHeight * 3, MEMCATEGORY_GENERAL);
+            typedef uchar uchar3[3];
             for (y = 0; y < mHeight; y++)
             {
-                size_t offset = ((y * mWidth) + (mWidth - 1)) * 3;
-                uchar *dst3 = pTempBuffer3;
-                dst3 += offset;
-                for (size_t x = 0; x < mWidth; x++)
-                {
-                    memcpy(dst3, src3, sizeof(uchar) * 3);
-                    dst3 -= 3; src3 += 3;
-                }
+                std::reverse((uchar3*)mBuffer + mWidth * y, (uchar3*)mBuffer + mWidth * (y + 1));
             }
-
-            memcpy(mBuffer, pTempBuffer3, mWidth * mHeight * sizeof(uchar) * 3);
-            OGRE_FREE(pTempBuffer3, MEMCATEGORY_GENERAL);
             break;
 
         case 4:
-            pTempBuffer4 = OGRE_ALLOC_T(uint, mWidth * mHeight, MEMCATEGORY_GENERAL);
             for (y = 0; y < mHeight; y++)
             {
-                uint *dst4 = (pTempBuffer4 + ((y * mWidth) + mWidth - 1));
-                for (ushort x = 0; x < mWidth; x++)
-                    memcpy(dst4--, src4++, sizeof(uint));
+                std::reverse((uint*)mBuffer + mWidth * y, (uint*)mBuffer + mWidth * (y + 1));
             }
-
-            memcpy(mBuffer, pTempBuffer4, mWidth * mHeight * sizeof(uint));
-            OGRE_FREE(pTempBuffer4, MEMCATEGORY_GENERAL);
             break;
 
         default:
@@ -208,21 +170,7 @@ namespace Ogre {
         }
         
         mNumMipmaps = 0; // Image operations lose precomputed mipmaps
-
-        size_t rowSpan = mWidth * mPixelSize;
-
-        uchar *pTempBuffer = OGRE_ALLOC_T(uchar, rowSpan * mHeight, MEMCATEGORY_GENERAL);
-        uchar *ptr1 = mBuffer, *ptr2 = pTempBuffer + ( ( mHeight - 1 ) * rowSpan );
-
-        for( ushort i = 0; i < mHeight; i++ )
-        {
-            memcpy( ptr2, ptr1, rowSpan );
-            ptr1 += rowSpan; ptr2 -= rowSpan;
-        }
-
-        memcpy( mBuffer, pTempBuffer, rowSpan * mHeight);
-
-        OGRE_FREE(pTempBuffer, MEMCATEGORY_GENERAL);
+        PixelUtil::bulkPixelVerticalFlip(getPixelBox());
 
         return *this;
     }
@@ -471,14 +419,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     bool Image::hasFlag(const ImageFlags imgFlag) const
     {
-        if(mFlags & imgFlag)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (mFlags & imgFlag) != 0;
     }
 
     //-----------------------------------------------------------------------------
@@ -533,8 +474,7 @@ namespace Ogre {
         if( gamma == 1.0f )
             return;
 
-        //NB only 24/32-bit supported
-        if( bpp != 24 && bpp != 32 ) return;
+        OgreAssert( bpp == 24 || bpp == 32, "only 24/32-bit supported");
 
         uint stride = bpp >> 3;
         
@@ -554,8 +494,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void Image::resize(ushort width, ushort height, Filter filter)
     {
-        // resizing dynamic images is not supported
-        assert(mAutoDelete);
+        OgreAssert(mAutoDelete, "resizing dynamic images is not supported");
         assert(mDepth == 1);
 
         // reassign buffer to temp image, make sure auto-delete is true
@@ -710,7 +649,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Face index out of range",
             "Image::getPixelBox");
         // Calculate mipmap offset and size
-        uint8 *offset = const_cast<uint8*>(getData());
+        uint8 *offset = mBuffer;
         // Base offset is number of full faces
         uint32 width = getWidth(), height=getHeight(), depth=getDepth();
         size_t numMips = getNumMipmaps();
