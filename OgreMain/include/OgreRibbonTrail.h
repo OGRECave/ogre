@@ -91,7 +91,7 @@ namespace Ogre {
         */
         virtual void addNode(Node* n);
         /** Remove tracking on a given node. */
-        virtual void removeNode(Node* n);
+        virtual void removeNode(const Node* n);
         /** Get an iterator over the nodes which are being tracked. */
         virtual NodeIterator getNodeIterator(void) const;
         /** Get the chain index for a given Node being tracked. */

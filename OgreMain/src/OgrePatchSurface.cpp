@@ -63,11 +63,11 @@ namespace Ogre {
         mVecCtlPoints.clear();
         const VertexElement* elem = declaration->findElementBySemantic(VES_POSITION);
         size_t vertSize = declaration->getVertexSize(0);
-        const unsigned char *pVert = static_cast<const unsigned char*>(controlPointBuffer);
+        uchar *pVert = static_cast<uchar*>(controlPointBuffer);
         float* pFloat;
         for (size_t i = 0; i < mCtlCount; ++i)
         {
-            elem->baseVertexPointerToElement(const_cast<unsigned char*>(pVert), &pFloat);
+            elem->baseVertexPointerToElement(pVert, &pFloat);
             mVecCtlPoints.push_back(Vector3(pFloat[0], pFloat[1], pFloat[2]));
             pVert += vertSize;
         }

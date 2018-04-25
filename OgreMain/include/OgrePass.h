@@ -525,21 +525,15 @@ namespace Ogre {
             @note
             Throws an exception if the TextureUnitState is attached to another Pass.*/
         void addTextureUnitState(TextureUnitState* state);
-        /** Retrieves a pointer to a texture unit state so it may be modified.
-         */
-        TextureUnitState* getTextureUnitState(unsigned short index);
-        /** Retrieves the Texture Unit State matching name.
-            Returns 0 if name match is not found.
-        */
-        TextureUnitState* getTextureUnitState(const String& name);
         /** Retrieves a const pointer to a texture unit state.
          * @deprecated use getTextureUnitStates()
          */
-        const TextureUnitState* getTextureUnitState(unsigned short index) const;
+        TextureUnitState* getTextureUnitState(unsigned short index) const;
         /** Retrieves the Texture Unit State matching name.
             Returns 0 if name match is not found.
         */
-        const TextureUnitState* getTextureUnitState(const String& name) const;
+        TextureUnitState* getTextureUnitState(const String& name) const;
+
 
         /**  Retrieve the index of the Texture Unit State in the pass.
              @param

@@ -583,48 +583,19 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    TextureUnitState* Pass::getTextureUnitState(unsigned short index)
-    {
-        OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
-        assert (index < mTextureUnitStates.size() && "Index out of bounds");
-        return mTextureUnitStates[index];
-    }
-    //-----------------------------------------------------------------------------
-    TextureUnitState* Pass::getTextureUnitState(const String& name)
-    {
-        OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
-        TextureUnitStates::iterator i    = mTextureUnitStates.begin();
-        TextureUnitStates::iterator iend = mTextureUnitStates.end();
-        TextureUnitState* foundTUS = 0;
-
-        // iterate through TUS Container to find a match
-        while (i != iend)
-        {
-            if ( (*i)->getName() == name )
-            {
-                foundTUS = (*i);
-                break;
-            }
-
-            ++i;
-        }
-
-        return foundTUS;
-    }
-    //-----------------------------------------------------------------------
-    const TextureUnitState* Pass::getTextureUnitState(unsigned short index) const
+    TextureUnitState* Pass::getTextureUnitState(unsigned short index) const
     {
             OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
         assert (index < mTextureUnitStates.size() && "Index out of bounds");
         return mTextureUnitStates[index];
     }
     //-----------------------------------------------------------------------------
-    const TextureUnitState* Pass::getTextureUnitState(const String& name) const
+    TextureUnitState* Pass::getTextureUnitState(const String& name) const
     {
             OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
         TextureUnitStates::const_iterator i    = mTextureUnitStates.begin();
         TextureUnitStates::const_iterator iend = mTextureUnitStates.end();
-        const TextureUnitState* foundTUS = 0;
+        TextureUnitState* foundTUS = 0;
 
         // iterate through TUS Container to find a match
         while (i != iend)

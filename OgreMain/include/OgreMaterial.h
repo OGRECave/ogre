@@ -214,11 +214,11 @@ namespace Ogre {
         Technique* createTechnique(void);
         /** Gets the indexed technique.
          * @deprecated use getTechniques()  */
-        Technique* getTechnique(unsigned short index);
+        Technique* getTechnique(unsigned short index) const;
         /** searches for the named technique.
             Return 0 if technique with name is not found
         */
-        Technique* getTechnique(const String& name);
+        Technique* getTechnique(const String& name) const;
         /** Retrieves the number of techniques.
          * @deprecated use getTechniques()  */
         unsigned short getNumTechniques(void) const;
