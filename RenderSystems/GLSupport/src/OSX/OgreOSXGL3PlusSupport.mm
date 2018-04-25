@@ -319,7 +319,7 @@ void OSXGLSupport::stop()
 			"********************************************");
 }
 
-void* OSXGLSupport::getProcAddress( const char* name )
+void* OSXGLSupport::getProcAddress( const char* name ) const
 {
     return dlsym (RTLD_DEFAULT, name);
 }

@@ -99,7 +99,7 @@ namespace Ogre
             /**
             * Get the address of a function
             */
-            virtual void *getProcAddress(const char* procname) = 0;
+            virtual void *getProcAddress(const char* procname) const = 0;
 
             bool checkExtension(const String& ext) const {
                 return extensionList.find(ext) != extensionList.end();
